@@ -1,2 +1,2 @@
-# ffmpeg-android
-Source code and scripts to build ffmpeg for Android platform
+# mobile-ffmpeg
+Source code and scripts to build ffmpeg for Android and IOS platform
