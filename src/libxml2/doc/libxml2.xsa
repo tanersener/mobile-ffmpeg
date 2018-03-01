@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE xsa PUBLIC "-//LM Garshol//DTD XML Software Autoupdate 1.0//EN//XML" "http://www.garshol.priv.no/download/xsa/xsa.dtd">
+<xsa>
+  <vendor>
+    <name>Daniel Veillard</name>
+    <email>daniel@veillard.com</email>
+    <url>http://veillard.com/</url>
+  </vendor>
+  <product id="libxml2">
+    <name>libxml2</name>
+    <version>v2.9.6</version>
+    <last-release> Oct 06 2017</last-release>
+    <info-url>http://xmlsoft.org/</info-url>
+    <changes>   - Portability:
+  Change preprocessor OS tests to __linux__ (Nick Wellnhofer)
+  
+   - Bug Fixes:
+  Fix XPath stack frame logic (Nick Wellnhofer),
+  Report undefined XPath variable error message (Nick Wellnhofer),
+  Fix regression with librsvg (Nick Wellnhofer),
+  Handle more invalid entity values in recovery mode (Nick Wellnhofer),
+  Fix structured validation errors (Nick Wellnhofer),
+  Fix memory leak in LZMA decompressor (Nick Wellnhofer),
+  Set memory limit for LZMA decompression (Nick Wellnhofer),
+  Handle illegal entity values in recovery mode (Nick Wellnhofer),
+  Fix debug dump of streaming XPath expressions (Nick Wellnhofer),
+  Fix memory leak in nanoftp (Nick Wellnhofer),
+  Fix memory leaks in SAX1 parser (Nick Wellnhofer)
+  
+
+</changes>
+  </product>
+</xsa>
