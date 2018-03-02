@@ -1,0 +1,379 @@
+'\" t
+.\"     Title: wvunpack
+.\"    Author: Sebastian Dröge <slomo@debian.org>
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 2017-01-13
+.\"    Manual: WavPack Executable Programs
+.\"    Source: WavPack 5.1.0
+.\"  Language: English
+.\"
+.TH "WVUNPACK" "1" "2017\-01\-13" "WavPack 5\&.1\&.0" "WavPack Executable Programs"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+wvunpack \- decodes wavpack encoded files
+.SH "SYNOPSIS"
+.HP \w'\fBwvunpack\fR\ 'u
+\fBwvunpack\fR [\fB\fI\-options\fR\fR] \fB\fIINFILE\fR\fR... [\fB\-o\ \fR\fB\fIOUTFILE\fR\fR]
+.SH "DESCRIPTION"
+.PP
+\fBwvunpack\fR
+decodes WavPack files back to their original uncompressed form using the options provided\&. Unless overridden with the
+\fB\-o\fR
+switch, the output filename will be identical to the source filename but with the original file extension replacing WavPack\*(Aqs
+\(lq\&.wv\(rq
+extension\&. It is also possible to output raw audio without headers (see
+\fB\-\-raw\fR
+option)\&. Multiple WavPack input files may be specified resulting in multiple output files, and in that case
+\fB\-o\fR
+may be used to specify an alternate target directory\&.
+Stdin
+and
+stdout
+may be specified with
+\(lq\-\(rq\&. It is also possible to export to one of the alternate file formats listed below, but in that case the information in the original headers and trailers will be lost (even if the alternate format is the same as the source format)\&. WavPack files are generally created with the
+\fBwavpack\fR
+program\&.
+.SS "OUTPUT FILE FORMATS"
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Microsoft RIFF, extension
+\(lq\&.wav\(rq, force with
+\fB\-w\fR
+or
+\fB\-\-wav\fR, creates
+RF64
+if > 4 GB
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Sony Wave64, extension
+\(lq\&.w64\(rq, force with
+\fB\-\-w64\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Apple Core Audio, extension
+\(lq\&.caf\(rq, force with
+\fB\-\-caf\-be\fR
+or
+\fB\-\-caf\-le\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Raw
+PCM
+or
+DSD, extension
+\(lq\&.raw\(rq, force with
+\fB\-r\fR
+or
+\fB\-\-raw\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Philips
+DSDIFF, extension
+\(lq\&.dff\(rq, force with
+\fB\-\-dsdiff\fR
+or
+\fB\-\-dff\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Sony
+DSD
+Stream, extension
+\(lq\&.dsf\(rq, force with
+\fB\-\-dsf\fR
+.RE
+.SH "OPTIONS"
+.PP
+.PP
+\fB\-b\fR
+.RS 4
+blindly decode all stream blocks and ignore length info
+.RE
+.PP
+\fB\-c\fR
+.RS 4
+do not decode audio but instead just extract cuesheet stored in APEv2 tag to
+stdout
+(equivalent to
+\fB\-x \fR\fB\(lqcuesheet\(rq\fR)
+.RE
+.PP
+\fB\-cc\fR
+.RS 4
+extract cuesheet stored in APEv2 tag to
+source\-name\&.cue
+file in same directory as decoded audio file (equivalent to
+\fB\-xx \fR\fB\(lqcuesheet=%a\&.cue\(rq\fR)
+.RE
+.PP
+\fB\-\-caf\-be\fR, \fB\-\-caf\-le\fR
+.RS 4
+force output to big\-endian or little\-endian Core Audio, extension
+\(lq\&.caf\(rq
+.RE
+.PP
+\fB\-d\fR
+.RS 4
+delete source file if successful (use with caution!)
+.RE
+.PP
+\fB\-\-dff\fR, \fB\-\-dsdiff\fR
+.RS 4
+force output to Philips
+DSDIFF,
+DSD
+audio source only, extension
+\(lq\&.dff\(rq
+.RE
+.PP
+\fB\-\-dsf\fR
+.RS 4
+force output to Sony
+DSF,
+DSD
+audio source only, extension
+\(lq\&.dsf\(rq
+.RE
+.PP
+\fB\-f\fR
+.RS 4
+do not decode audio but simply display summary information about WavPack file to
+stdout
+in a machine\-parsable format (see
+doc/wavpack_doc\&.html
+or
+cli/wvunpack\&.c
+in repository for format details)
+.RE
+.PP
+\fB\-\-help\fR
+.RS 4
+display extended help
+.RE
+.PP
+\fB\-i\fR
+.RS 4
+ignore \&.wvc file (forces hybrid lossy decompression)
+.RE
+.PP
+\fB\-m\fR
+.RS 4
+calculate and display MD5 signature; verify if lossless
+.RE
+.PP
+\fB\-n\fR
+.RS 4
+no audio decoding (use with
+\fB\-xx\fR
+to extract tags only)
+.RE
+.PP
+\fB\-\-no\-utf8\-convert\fR
+.RS 4
+leave extracted text tags in UTF\-8 encoding during extraction or display
+.RE
+.PP
+\fB\-o \fR\fB\fIOUTFILE\fR\fR
+.RS 4
+specify output filename (only if single source file) or target directory (must exist)
+.RE
+.PP
+\fB\-q\fR
+.RS 4
+quiet (keep console output to a minimum)
+.RE
+.PP
+\fB\-r\fR, \fB\-\-raw\fR
+.RS 4
+force raw
+PCM
+or
+DSD
+audio decode by skipping headers & trailers, results in
+source\-name\&.raw
+.RE
+.PP
+\fB\-s\fR
+.RS 4
+do not decode audio but simply display summary information about WavPack file to
+stdout
+.RE
+.PP
+\fB\-ss\fR
+.RS 4
+do not decode audio but simply display summary and tag information about WavPack file to
+stdout
+.RE
+.PP
+\fB \-\-skip=[\-][\fR\fB\fIsample\fR\fR\fB|\fR\fB\fIhh\fR\fR\fB:\fR\fB\fImm\fR\fR\fB:\fR\fB\fIss\&.ss\fR\fR\fB] \fR
+.RS 4
+start decoding at specified sample or time index, specifying a
+\fB\-\fR
+causes sample/time to be relative to
+EOF
+.RE
+.PP
+\fB\-t\fR
+.RS 4
+copy input file\*(Aqs time stamp to output file(s)
+.RE
+.PP
+\fB \-\-until=[+|\-][\fR\fB\fIsample\fR\fR\fB|\fR\fB\fIhh\fR\fR\fB:\fR\fB\fImm\fR\fR\fB:\fR\fB\fIss\&.ss\fR\fR\fB] \fR
+.RS 4
+stop decoding at specified sample or time index, specifying a
+\fB+\fR
+causes sample/time to be relative to
+\fB\-\-skip\fR
+point, specifying a
+\fB\-\fR
+causes sample/time to be relative to
+EOF
+.RE
+.PP
+\fB\-v\fR
+.RS 4
+verify source data only (no output file created)
+.RE
+.PP
+\fB\-\-version\fR
+.RS 4
+write program version to
+stdout
+.RE
+.PP
+\fB\-w\fR, \fB\-\-wav\fR
+.RS 4
+force output to Microsoft RIFF/RF64, extension
+\(lq\&.wav\(rq
+.RE
+.PP
+\fB\-\-w64\fR
+.RS 4
+force output to Sony Wave64, extension
+\(lq\&.w64\(rq
+.RE
+.PP
+\fB\-x \fR\fB\(lq\fIField\fR\(rq\fR
+.RS 4
+do not decode audio but instead just extract the specified tag field to
+stdout
+.RE
+.PP
+\fB\-xx \fR\fB\(lq\fIField\fR[=\fIfile\fR]\(rq\fR
+.RS 4
+extract the specified tag field to named file in same directory as decoded audio file; optional filename specification may contain
+\fB%a\fR
+which is replaced with the audio file base name,
+\fB%t\fR
+replaced with the tag field name (note: comes from data for binary tags) and
+\fB%e\fR
+replaced with the extension from the binary tag source file (or
+\(lqtxt\(rq
+for text tag)\&.
+.RE
+.PP
+\fB\-y\fR
+.RS 4
+yes to overwrite warning (use with caution!)
+.RE
+.PP
+\fB\-z[\fR\fB\fIn\fR\fR\fB]\fR
+.RS 4
+don\*(Aqt set (n = 0 or omitted) or set (n = 1) console title to indicate progress (leaves "WvUnpack Completed")
+.RE
+.SH "SEE ALSO"
+.PP
+\fBwavpack\fR(1),
+\fBwvgain\fR(1),
+\fBwvtag\fR(1)
+.PP
+Please visit www\&.wavpack\&.com for more information
+.SH "COPYRIGHT"
+.PP
+This manual page was written by Sebastian Dröge
+<slomo@debian\&.org>
+and David Bryant
+<david@wavpack\&.com>\&. Permission is granted to copy, distribute and/or modify this document under the terms of the
+BSD
+License\&.
+.SH "AUTHORS"
+.PP
+\fBSebastian Dröge\fR <\&slomo@debian\&.org\&>
+.RS 4
+Original author
+.RE
+.PP
+\fBDavid Bryant\fR <\&david@wavpack\&.com\&>
+.RS 4
+Updates
+.RE
+.SH "COPYRIGHT"
+.br
+Copyright \(co 2005 Sebastian Dröge
+.br
+Copyright \(co 2017 David Bryant
+.br

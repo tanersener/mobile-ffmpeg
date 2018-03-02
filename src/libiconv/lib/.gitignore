@@ -1,0 +1,9 @@
+/.libs/
+*.o
+*.lo
+*.h
+*.la
+*.a
+/Makefile
+/charset.alias
+/stamp-h2

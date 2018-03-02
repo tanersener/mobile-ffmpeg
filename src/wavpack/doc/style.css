@@ -1,0 +1,95 @@
+body {
+	background: #ffffff;
+	color: #000000;
+	font-family: "Verdana", sans-serif;
+	font-size: 9pt;
+	text-align: center;
+}
+
+.container {
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 760px;
+	margin-left: auto; 
+	margin-right: auto;
+}
+
+a {
+	text-decoration: underline;
+	color: #000000;
+}
+
+a:hover {
+	color: #8394b2;
+}
+
+.pageTitle, .pageMenu, .boxHeader, .boxContent {
+	padding: 2px;
+}
+
+.pageTitle, .pageMenu, .box, .boxHeader, .filesHeader {
+	border: 1px solid;
+}
+
+.pageTitle, .pageMenu, .box, .boxContent {
+	margin: 2px;
+}
+
+.pageTitle, .pageMenu, .box {
+	border-color: #072a66;
+}
+
+.pageHeader, .subHeader, .boxHeader, .filesHeader {
+	font-weight: bold;
+}
+
+.pageMenu, .boxHeader {
+	background: #bcd0ed;
+}
+
+.boxHeader, .filesHeader {
+	color: #5176b5;
+	border-color: #ffffff;
+}
+
+.pageTitle {
+	background: #618ece;
+	color: #ffffff;
+}
+
+.pageHeader {
+	font-size: 14pt;
+}
+
+.pageSubHeader {
+	font-size: 12pt;
+}
+
+.box {
+	background: #eef2f7;
+	border-color: #072a66;
+}
+
+.boxHeader {
+	letter-spacing: 2px;
+	word-spacing: 2px;
+}
+
+.boxContent {
+	text-align: left;
+}
+
+.filesBox {
+	width: 100%;
+}
+
+.filesHeader {
+	border-color: #bcd0ed;
+	text-align: center;
+}
+
+.hidden, .hidden a {
+	color: #c0c0c0;
+}

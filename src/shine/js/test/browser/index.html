@@ -1,0 +1,26 @@
+<script src="libshine.js"></script>
+<script src="encode.js"></script>
+<script src="rounds.js"></script>
+<script>
+  var log = function (msg) {
+    var el = document.getElementById("output");
+    el.innerHTML = el.innerHTML + "<br>" + msg;
+  };
+
+  var load = function() {
+    runEncodeTest(log, function (blob) {
+      if (typeof window.URL !== "undefined") {
+        var link = document.getElementById("download-link");
+        link.href = URL.createObjectURL(blob);
+        link.download = "encoded.mp3";
+      }
+
+      log("");
+      runRoundsTest(Shine, log);
+    });
+  };
+
+  window.addEventListener("load", load, false);
+</script>
+<a href="#" id="download-link">Download encoded file</a>
+<div id="output"></div>

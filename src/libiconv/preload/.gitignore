@@ -1,0 +1,7 @@
+/.libs/
+*.so
+/config.log
+/config.status
+/Makefile
+/libiconv.la
+/libtool

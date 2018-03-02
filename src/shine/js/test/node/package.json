@@ -1,0 +1,27 @@
+{
+  "name": "shine-js-test",
+  "description": "Test encoder for libshine.js",
+  "version": "0.0.1",
+  "homepage": "https://github.com/savonet/shine",
+  "author": "Romain Beauxis <toots@rastageeks.org",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/savonet/shine"
+  },
+  "bugs": {
+    "mail": "toots@rastageeks.org",
+    "url": "http://github.com/savonet/shine/issues"
+  },
+  "main": "test.coffee",
+  "scripts": {
+    "test": "coffee ./encode.coffee && coffee ./rounds.coffee"
+  },
+  "engine": {
+    "node": ">= 0.10.7",
+    "npm": "1"
+  },
+  "dependencies": {
+    "coffee-script": "1.6.3",
+    "wav": "0.1.0"
+  }
+}

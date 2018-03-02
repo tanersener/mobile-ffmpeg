@@ -1,0 +1,7 @@
+/.libs/
+*.lo
+*.o
+*.sed
+/Makefile
+/charset.alias
+/libcharset.la

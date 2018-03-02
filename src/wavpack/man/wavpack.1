@@ -1,0 +1,413 @@
+'\" t
+.\"     Title: wavpack
+.\"    Author: Sebastian Dröge <slomo@debian.org>
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 2017-01-13
+.\"    Manual: WavPack Executable Programs
+.\"    Source: WavPack 5.1.0
+.\"  Language: English
+.\"
+.TH "WAVPACK" "1" "2017\-01\-13" "WavPack 5\&.1\&.0" "WavPack Executable Programs"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+wavpack \- encode audio files to wavpack
+.SH "SYNOPSIS"
+.HP \w'\fBwavpack\fR\ 'u
+\fBwavpack\fR [\fB\fI\-options\fR\fR] \fB\fIINFILE\fR\fR... [\fB\-o\ \fR\fB\fIOUTFILE\fR\fR]
+.SH "DESCRIPTION"
+.PP
+\fBwavpack\fR
+encodes the specified source file(s) into WavPack files using the options provided\&. The source files may be any of the file format types listed below, and the audio data may be either uncompressed
+PCM
+or
+DSD
+(depending on the format)\&. Raw audio may also be specified (see
+\fB\-\-raw\-pcm\fR)\&. The output filename will be
+source\-name\&.wv
+unless overridden with the
+\fB\-o\fR
+switch\&. Multiple input files may be specified resulting in multiple WavPack files, and in that case
+\fB\-o\fR
+may be used to specify an alternate target directory\&.
+Stdin
+and
+stdout
+may be specified with
+\(lq\-\(rq\&. In the case of transcoding from existing WavPack files, all tags are copied (and may be modified with additional args) and unless an alternate name or directory is specified, the source files are safely overwritten\&. To decode WavPack files back to their original format (or raw audio) use the
+\fBwvunpack\fR
+program\&.
+.SS "INPUT FILE FORMATS"
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Microsoft RIFF, extension
+\(lq\&.wav\(rq, includes
+BWF
+and
+RF64
+varients
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+WavPack, extension
+\(lq\&.wv\(rq, trancode operation, tags copied
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Apple Core Audio, extension
+\(lq\&.caf\(rq
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Sony Wave64, extension
+\(lq\&.w64\(rq
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Philips
+DSDIFF, extension
+\(lq\&.dff\(rq
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Sony
+DSD
+Stream, extension
+\(lq\&.dsf\(rq
+.RE
+.SH "OPTIONS"
+.PP
+.PP
+\fB\-a\fR
+.RS 4
+Adobe Audition (CoolEdit) mode for 32\-bit floats
+.RE
+.PP
+\fB\-\-allow\-huge\-tags\fR
+.RS 4
+allow tag data up to 16 MB (embedding > 1 MB is not recommended for portable devices and may not work with some programs including WavPack pre\-4\&.70)
+.RE
+.PP
+\fB\-b\fR\fB\fIn\fR\fR
+.RS 4
+enable hybrid compression,
+\fIn\fR
+= 2\&.0 to 23\&.9 bits/sample, or
+\fIn\fR
+= 24\-9600 kbits/second (kbps), not available with DSD audio
+.RE
+.PP
+\fB\-\-blocksize=\fR\fB\fIn\fR\fR
+.RS 4
+specify block size in samples (max = 131072 and min = 16 with
+\fB\-\-merge\-blocks\fR, otherwise 128)
+.RE
+.PP
+\fB\-c\fR
+.RS 4
+create correction file (\&.wvc) for hybrid mode (results in 2\-file lossless compression)
+.RE
+.PP
+\fB\-cc\fR
+.RS 4
+maximum hybrid compression (hurts lossy quality & decode speed)
+.RE
+.PP
+\fB\-\-channel\-order=\fR\fB\fIlist\fR\fR
+.RS 4
+specify (comma separated) channel order if not Microsoft standard (which is FL,FR,FC,LFE,BL,BR,FLC,FRC,BC,SL,SR,TC,TFL,TFC,TFR,TBL,TBC,TBR); specify
+\(lq\&.\&.\&.\(rq
+to indicate that channels are not assigned to specific speakers, or terminate list with
+\(lq\&.\&.\&.\(rq
+to indicate that any channels beyond those specified are unassigned
+.RE
+.PP
+\fB\-\-cross\-decorr\fR
+.RS 4
+use cross\-channel correlation in hybrid mode (on by default in lossless mode and with
+\fB\-cc\fR
+option)
+.RE
+.PP
+\fB\-d\fR
+.RS 4
+delete source file if successful (use with caution!)
+.RE
+.PP
+\fB\-f\fR
+.RS 4
+fast mode (fast, but some compromise in compression ratio)
+.RE
+.PP
+\fB\-h\fR
+.RS 4
+high quality (better compression ratio, but slower encode and decode than default mode)
+.RE
+.PP
+\fB\-hh\fR
+.RS 4
+very high quality (best compression, but slowest and NOT recommended for use on portable playback devices)
+.RE
+.PP
+\fB\-\-help\fR
+.RS 4
+display extended help
+.RE
+.PP
+\fB\-i\fR
+.RS 4
+ignore length in wav header (no pipe output allowed)
+.RE
+.PP
+\fB\-\-import\-id3\fR
+.RS 4
+import applicable tag items from ID3v2\&.3 tag present in DSF files into APEv2 tag (if there are > 1 MB cover images present add
+\fB\-\-allow\-huge\-tags\fR
+to include them, and
+\fB\-r\fR
+if you do not want large images appearing twice in the WavPack file, although this will remove the entire ID3 tag wrapper)
+.RE
+.PP
+\fB\-j\fR\fB\fIn\fR\fR
+.RS 4
+joint\-stereo override (0 = left/right, 1 = mid/side)
+.RE
+.PP
+\fB\-m\fR
+.RS 4
+compute & store MD5 signature of raw audio data
+.RE
+.PP
+\fB\-\-merge\-blocks\fR
+.RS 4
+merge consecutive blocks with equal redundancy (used with
+\fB\-\-blocksize\fR
+option and is useful for files generated by the lossyWAV program or decoded HDCD files)
+.RE
+.PP
+\fB\-n\fR
+.RS 4
+calculate average and peak quantization noise (hybrid only, reference fullscale sine)
+.RE
+.PP
+\fB\-\-no\-utf8\-convert\fR
+.RS 4
+don\*(Aqt recode passed tags from local encoding to UTF\-8, assume they are in UTF\-8 already
+.RE
+.PP
+\fB\-o \fR\fB\fIOUTFILE\fR\fR
+.RS 4
+specify output filename (only if single source file) or target directory (must exist)
+.RE
+.PP
+\fB\-\-pair\-unassigned\-chans\fR
+.RS 4
+encode unassigned channels into stereo pairs
+.RE
+.PP
+\fB\-\-pre\-quantize=\fR\fB\fIbits\fR\fR
+.RS 4
+pre\-quantize samples to
+\fIbits\fR
+depth BEFORE encoding and MD5 calculation (common use would be
+\fB\-\-pre\-quantize=20\fR
+for 24\-bit or float material recorded with typical converters)
+.RE
+.PP
+\fB\-q\fR
+.RS 4
+quiet (keep console output to a minimum)
+.RE
+.PP
+\fB\-r\fR
+.RS 4
+remove file headers (file\-appropriate headers will be regenerated during unpacking)
+.RE
+.PP
+\fB\-\-raw\-pcm\fR
+.RS 4
+input data is raw pcm (44,100 Hz, 16\-bit, 2\-channels)
+.RE
+.PP
+\fB\-\-raw\-pcm=\fR\fB\fIsr\fR\fR\fB,\fR\fB\fIbits\fR\fR\fB[f|s|u],\fR\fB\fIchans\fR\fR\fB,[le|be]\fR
+.RS 4
+input data is raw pcm with specified sample\-rate, bit\-depth (float,unsigned,signed), number of channels, and endianness (defaulted parameters may be omitted, specify
+\fIbits\fR=1 for
+DSD)
+.RE
+.PP
+\fB\-\-raw\-pcm\-skip=\fR\fB\fIbegin\fR\fR\fB[,\fR\fB\fIend\fR\fR\fB]\fR
+.RS 4
+skip
+\fIbegin\fR
+bytes before encoding raw
+PCM
+(header) and skip
+\fIend\fR
+bytes at the
+EOF
+(trailer)
+.RE
+.PP
+\fB\-s\fR\fB\fIn\fR\fR
+.RS 4
+override default hybrid mode noise shaping where n is a float value between \-1\&.0 and 1\&.0; negative values move noise lower in freq, positive values move noise higher in freq, use 0 for no shaping (white noise)
+.RE
+.PP
+\fB\-t\fR
+.RS 4
+copy input file\*(Aqs time stamp to output file(s)
+.RE
+.PP
+\fB\-\-use\-dns\fR
+.RS 4
+force use of dynamic noise shaping (hybrid mode only)
+.RE
+.PP
+\fB\-v\fR
+.RS 4
+verify output file integrity after write (not for piped output)
+.RE
+.PP
+\fB\-\-version\fR
+.RS 4
+write program version to
+stdout
+.RE
+.PP
+\fB\-w Encoder\fR
+.RS 4
+write actual encoder metadata to APEv2 tag (e\&.g\&.,
+\(lqEncoder=WavPack 5\&.0\&.0\(rq)
+.RE
+.PP
+\fB\-w Settings\fR
+.RS 4
+write actual user settings metadata to APEv2 tag (e\&.g\&.,
+\(lqSettings=\-hb384cx3\(rq)
+.RE
+.PP
+\fB\-w \fR\fB\(lq\fIField\fR=\fIValue\fR\(rq\fR
+.RS 4
+write specified text metadata to APEv2 tag
+.RE
+.PP
+\fB\-w \fR\fB\(lq\fIField\fR=@\fIfile\&.ext\fR\(rq\fR
+.RS 4
+write specified text metadata from file to APEv2 tag, normally used for embedded cuesheets and logs (field names
+\(lqCuesheet\(rq
+and
+\(lqLog\(rq)
+.RE
+.PP
+\fB\-\-write\-binary\-tag \fR\fB\(lq\fIField\fR=@\fIfile\&.ext\fR\(rq\fR
+.RS 4
+write the specified binary metadata file to APEv2 tag, normally used for cover art with the specified field name
+\(lqCover Art (Front)\(rq
+.RE
+.PP
+\fB\-x[\fR\fB\fIn\fR\fR\fB]\fR
+.RS 4
+extra encode processing (optional n = 1 to 6, 1=default), \-x1 to \-x3 to choose best of predefined filters, \-x4 to \-x6 to generate custom filters (very slow!)
+.RE
+.PP
+\fB\-y\fR
+.RS 4
+yes to all warnings (use with caution!)
+.RE
+.PP
+\fB\-z[\fR\fB\fIn\fR\fR\fB]\fR
+.RS 4
+don\*(Aqt set (n = 0 or omitted) or set (n = 1) console title to indicate progress (leaves "WavPack Completed")
+.RE
+.SH "SEE ALSO"
+.PP
+\fBwvunpack\fR(1),
+\fBwvgain\fR(1),
+\fBwvtag\fR(1)
+.PP
+Please visit www\&.wavpack\&.com for more information
+.SH "COPYRIGHT"
+.PP
+This manual page was written by Sebastian Dröge
+<slomo@debian\&.org>
+and David Bryant
+<david@wavpack\&.com>\&. Permission is granted to copy, distribute and/or modify this document under the terms of the
+BSD
+License\&.
+.SH "AUTHORS"
+.PP
+\fBSebastian Dröge\fR <\&slomo@debian\&.org\&>
+.RS 4
+Original author
+.RE
+.PP
+\fBDavid Bryant\fR <\&david@wavpack\&.com\&>
+.RS 4
+Updates
+.RE
+.SH "COPYRIGHT"
+.br
+Copyright \(co 2005 Sebastian Dröge
+.br
+Copyright \(co 2017 David Bryant
+.br

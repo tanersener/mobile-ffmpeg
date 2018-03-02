@@ -1,0 +1,33 @@
+3.1.1 (2017-07-28)
+=====
+* Remove invalid MPEG 2.5 bitrates.
+
+3.1.0 (2014-08-01):
+=====
+* Fixed WAV file parsing.
+* Explicitely unroll some loops
+  to enhance encoding speed. Thanks
+  to @ckthomas on github for these
+  changes!
+* Add -funroll-loops to CFLAGS
+* Major code cleanup by @zhaoxiu-zeng
+  on `LingYunZhi/shine`.
+* Added interleaved API, also contributed
+  by @zhaoxiu-zeng
+* Bumped ABI to 3.1.0
+
+3.0.0 (2013-07-21):
+======
+* Added support for MPEG-II and 2.5
+* Added Javascript build and API.
+
+2.0.0 (2013-04-07):
+======
+* Prefix symbols to avoid name clash
+  with libmp3lame.
+* Rename public API from L3_ to shine_
+  to also avoid name clash.
+
+1.0.0 (2013-02-02):
+======
+* Initial release

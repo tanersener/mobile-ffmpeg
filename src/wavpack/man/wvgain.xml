@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+]>
+<refentry>
+  <refentryinfo>
+    <author>
+      <firstname>Sebastian</firstname>
+      <surname>Dröge</surname>
+      <email>slomo@debian.org</email>
+      <contrib>Original author</contrib>
+    </author>
+    <author>
+      <firstname>David</firstname>
+      <surname>Bryant</surname>
+      <email>david@wavpack.com</email>
+      <contrib>Updates</contrib>
+    </author>
+    <copyright>
+      <year>2005</year>
+      <holder>Sebastian Dröge</holder>
+    </copyright>
+    <copyright>
+      <year>2017</year>
+      <holder>David Bryant</holder>
+    </copyright>
+    <date>2017-01-13</date>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>wvgain</refentrytitle>
+    <refmiscinfo class="source">WavPack</refmiscinfo>
+    <refmiscinfo class="manual">WavPack Executable Programs</refmiscinfo>
+    <refmiscinfo class="version">5.1.0</refmiscinfo>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+  <refnamediv>
+    <refname>wvgain</refname>
+    <refpurpose>adds ReplayGain information to wavpack files</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>wvgain</command>
+      <arg choice="opt">
+        <option><replaceable>-options</replaceable></option>
+      </arg>
+      <arg choice="plain" rep="repeat">
+        <option><replaceable>INFILE</replaceable></option>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+    <para>
+       <command>wvgain</command> perceptually analyzes WavPack audio files for volume, calculates ReplayGain information based on this,
+       and adds the appropriate APEv2 tag fields. ReplayGain-enabled players will use this information to produce the same perceived loudness
+       on all tracks. Both individual track and whole album ReplayGain information can be calculated.
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+    <para>
+      <variablelist>
+        <varlistentry>
+          <term> <option>-a</option> </term>
+          <listitem> <para>album mode (all files scanned are considered an album)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-c</option> </term>
+          <listitem> <para>clean ReplayGain values from all files</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-d</option> </term>
+          <listitem> <para>display calculated values only (no files are modified)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-i</option> </term>
+          <listitem> <para>ignore .wvc file (forces hybrid lossy)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-n</option> </term>
+          <listitem> <para>new files only (skip files with track info, or album info if album mode specified)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-q</option> </term>
+          <listitem> <para>quiet (keep console output to a minimum)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-s</option> </term>
+          <listitem> <para>show stored values only (no analysis)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-v</option> </term>
+          <listitem> <para>write program version to <filename>stdout</filename></para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-z[<replaceable>n</replaceable>]</option> </term>
+          <listitem> <para>
+            don't set (n = 0 or omitted) or set (n = 1) console title to indicate progress (leaves "WvGain Completed")</para> </listitem>
+        </varlistentry>
+      </variablelist>
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+    <para><citerefentry>
+      <refentrytitle>wavpack</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry>, <citerefentry>
+      <refentrytitle>wvunpack</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry>, <citerefentry>
+      <refentrytitle>wvtag</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry></para>
+    <para>
+      Please visit www.wavpack.com for more information
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>COPYRIGHT</title>
+    <para>
+      This manual page was written by Sebastian Dröge
+      <email>slomo@debian.org</email> and David Bryant <email>david@wavpack.com</email>.
+      Permission is granted to copy, distribute and/or modify this document
+      under the terms of the <acronym>BSD</acronym> License.
+    </para>
+  </refsect1>
+</refentry>
+

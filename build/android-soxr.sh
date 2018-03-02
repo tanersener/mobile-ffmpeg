@@ -1,0 +1,67 @@
+#!/bin/bash
+
+if [[ -z $1 ]]; then
+    echo "usage: $0 <mobile ffmpeg base directory>"
+    exit 1
+fi
+
+if [[ -z $ANDROID_NDK ]]; then
+    echo "ANDROID_NDK not defined"
+    exit 1
+fi
+
+if [[ -z $ARCH ]]; then
+    echo "ARCH not defined"
+    exit 1
+fi
+
+if [[ -z $API ]]; then
+    echo "API not defined"
+    exit 1
+fi
+
+# ENABLE COMMON FUNCTIONS
+. $1/build/common.sh
+
+# PREPARING PATHS
+android_prepare_toolchain_paths $ARCH
+
+TARGET_HOST=$(android_get_target_host $ARCH)
+COMMON_CPPFLAGS=$(android_get_alternative_cppflags $ARCH)
+COMMON_CXXFLAGS=$(android_get_common_cxxflags $ARCH)
+COMMON_LDFLAGS=$(android_get_common_ldflags $ARCH)
+CPPFLAGS="$COMMON_CPPFLAGS -I$ANDROID_NDK/prebuilt/android-$ARCH/libiconv/include"
+CXXFLAGS="$COMMON_CXXFLAGS"
+LDFLAGS="$COMMON_LDFLAGS -L$ANDROID_NDK/prebuilt/android-$ARCH/libiconv/lib"
+
+cd $1/src/soxr || exit 1
+
+if [ -d "build" ]; then
+    rm -rf build;
+fi
+
+mkdir build;
+cd build
+
+cmake -Wno-dev \
+    -DCMAKE_VERBOSE_MAKEFILE=0 \
+    -DCMAKE_C_FLAGS="$CPPFLAGS" \
+    -DCMAKE_CXX_FLAGS="$CXXFLAGS" \
+    -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" \
+    -DSIMD32_C_FLAGS="" \
+    -DCMAKE_SYSROOT=$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/sysroot \
+    -DCMAKE_FIND_ROOT_PATH=$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/sysroot \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX=$ANDROID_NDK/prebuilt/android-$ARCH/soxr \
+    -DCMAKE_SYSTEM_NAME=Generic \
+    -DCMAKE_C_COMPILER="$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/bin/$CC" \
+    -DCMAKE_LINKER="$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/bin/$LD" \
+    -DCMAKE_AR="$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/bin/$AR" \
+    -DCMAKE_SYSTEM_PROCESSOR=$ARCH \
+    -DBUILD_EXAMPLES=0 \
+    -DBUILD_TESTS=0 \
+    -DBUILD_SHARED_LIBS=0 .. || exit 1
+
+make -j$(nproc) || exit 1
+
+make install || exit 1

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+]>
+<refentry>
+  <refentryinfo>
+    <author>
+      <firstname>Sebastian</firstname>
+      <surname>Dröge</surname>
+      <email>slomo@debian.org</email>
+      <contrib>Original author</contrib>
+    </author>
+    <author>
+      <firstname>David</firstname>
+      <surname>Bryant</surname>
+      <email>david@wavpack.com</email>
+      <contrib>Updates</contrib>
+    </author>
+    <copyright>
+      <year>2005</year>
+      <holder>Sebastian Dröge</holder>
+    </copyright>
+    <copyright>
+      <year>2017</year>
+      <holder>David Bryant</holder>
+    </copyright>
+    <date>2017-01-13</date>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>wvunpack</refentrytitle>
+    <refmiscinfo class="source">WavPack</refmiscinfo>
+    <refmiscinfo class="manual">WavPack Executable Programs</refmiscinfo>
+    <refmiscinfo class="version">5.1.0</refmiscinfo>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+  <refnamediv>
+    <refname>wvunpack</refname>
+    <refpurpose>decodes wavpack encoded files</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>wvunpack</command>
+      <arg choice="opt">
+        <option><replaceable>-options</replaceable></option>
+      </arg>
+      <arg choice="plain" rep="repeat">
+        <option><replaceable>INFILE</replaceable></option>
+      </arg>
+      <arg choice="opt">
+        <option>-o <replaceable>OUTFILE</replaceable></option>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+    <para>
+      <command>wvunpack</command> decodes WavPack files back to their original uncompressed form using the options provided.
+      Unless overridden with the <option>-o</option> switch, the output filename will be identical to the source filename but
+      with the original file extension replacing WavPack's <quote>.wv</quote> extension. It is also possible to output raw
+      audio without headers (see <option>--raw</option> option). Multiple WavPack input files may be specified
+      resulting in multiple output files, and in that case <option>-o</option> may be used to specify an alternate target directory.
+      <filename>Stdin</filename> and <filename>stdout</filename> may be specified with <quote>-</quote>. It is also possible to
+      export to one of the alternate file formats listed below, but in that case the information in the original headers and
+      trailers will be lost (even if the alternate format is the same as the source format). WavPack files are generally created
+      with the <command>wavpack</command> program.
+    </para>
+    <refsect2>
+      <title>OUTPUT FILE FORMATS</title>
+        <itemizedlist mark='bullet'>
+        <listitem>
+        <para>
+          Microsoft RIFF, extension <quote>.wav</quote>, force with <option>-w</option> or <option>--wav</option>,
+        creates <acronym>RF64</acronym> if > 4 GB
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          Sony Wave64, extension <quote>.w64</quote>, force with <option>--w64</option>
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          Apple Core Audio, extension <quote>.caf</quote>, force with <option>--caf-be</option> or <option>--caf-le</option>
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          Raw <acronym>PCM</acronym> or <acronym>DSD</acronym>, extension <quote>.raw</quote>, force with <option>-r</option> or <option>--raw</option>
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          Philips <acronym>DSDIFF</acronym>, extension <quote>.dff</quote>, force with <option>--dsdiff</option> or <option>--dff</option>
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          Sony <acronym>DSD</acronym> Stream, extension <quote>.dsf</quote>, force with <option>--dsf</option>
+        </para>
+        </listitem>
+        </itemizedlist>
+    </refsect2>
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+    <para>
+      <variablelist>
+        <varlistentry>
+          <term> <option>-b</option> </term>
+          <listitem> <para>blindly decode all stream blocks and ignore length info</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-c</option> </term>
+          <listitem> <para>
+            do not decode audio but instead just extract cuesheet stored in APEv2 tag to <filename>stdout</filename>
+            (equivalent to <option>-x <quote>cuesheet</quote></option>)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-cc</option> </term>
+          <listitem> <para>
+            extract cuesheet stored in APEv2 tag to <filename>source-name.cue</filename> file in same directory as decoded audio file
+            (equivalent to <option>-xx <quote>cuesheet=%a.cue</quote></option>)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--caf-be</option> </term>
+          <term> <option>--caf-le</option> </term>
+          <listitem> <para>force output to big-endian or little-endian Core Audio, extension <quote>.caf</quote></para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-d</option> </term>
+          <listitem> <para>delete source file if successful (use with caution!)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--dff</option> </term>
+          <term> <option>--dsdiff</option> </term>
+          <listitem> <para>force output to Philips <acronym>DSDIFF</acronym>, <acronym>DSD</acronym> audio source only, extension <quote>.dff</quote></para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--dsf</option> </term>
+          <listitem> <para>force output to Sony <acronym>DSF</acronym>, <acronym>DSD</acronym> audio source only, extension <quote>.dsf</quote></para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-f</option> </term>
+          <listitem> <para>
+            do not decode audio but simply display summary information about WavPack file to <filename>stdout</filename> in a
+            machine-parsable format (see <filename>doc/wavpack_doc.html</filename> or <filename>cli/wvunpack.c</filename> in
+            repository for format details)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--help</option> </term>
+          <listitem> <para>display extended help</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-i</option> </term>
+          <listitem> <para>ignore .wvc file (forces hybrid lossy decompression)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-m</option> </term>
+          <listitem> <para>calculate and display MD5 signature; verify if lossless</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-n</option> </term>
+          <listitem> <para>no audio decoding (use with <option>-xx</option> to extract tags only)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--no-utf8-convert</option> </term>
+          <listitem> <para>leave extracted text tags in UTF-8 encoding during extraction or display</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-o <replaceable>OUTFILE</replaceable></option> </term>
+          <listitem> <para>specify output filename (only if single source file) or target directory (must exist)</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-q</option> </term>
+          <listitem> <para>quiet (keep console output to a minimum)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-r</option> </term>
+          <term> <option>--raw</option> </term>
+          <listitem> <para>
+            force raw <acronym>PCM</acronym> or <acronym>DSD</acronym> audio decode by skipping headers &amp; trailers, results in <filename>source-name.raw</filename>
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-s</option> </term>
+          <listitem> <para>
+            do not decode audio but simply display summary information about WavPack file to <filename>stdout</filename>
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-ss</option> </term>
+          <listitem> <para>
+            do not decode audio but simply display summary and tag information about WavPack file to <filename>stdout</filename>
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>
+            --skip=[-][<replaceable>sample</replaceable>|<replaceable>hh</replaceable>:<replaceable>mm</replaceable>:<replaceable>ss.ss</replaceable>]
+          </option> </term>
+          <listitem> <para>
+            start decoding at specified sample or time index, specifying a <option>-</option> causes sample/time to be relative to <acronym>EOF</acronym>
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-t</option> </term>
+          <listitem> <para>copy input file's time stamp to output file(s)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>
+            --until=[+|-][<replaceable>sample</replaceable>|<replaceable>hh</replaceable>:<replaceable>mm</replaceable>:<replaceable>ss.ss</replaceable>]
+          </option> </term>
+          <listitem> <para>
+            stop decoding at specified sample or time index, specifying a <option>+</option> causes sample/time to be relative to <option>--skip</option> point,
+               specifying a <option>-</option> causes sample/time to be relative to <acronym>EOF</acronym>
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-v</option> </term>
+          <listitem> <para>verify source data only (no output file created)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--version</option> </term>
+          <listitem> <para>write program version to <filename>stdout</filename></para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-w</option> </term>
+          <term> <option>--wav</option> </term>
+          <listitem> <para>force output to Microsoft RIFF/RF64, extension <quote>.wav</quote></para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--w64</option> </term>
+          <listitem> <para>force output to Sony Wave64, extension <quote>.w64</quote></para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-x <quote><replaceable>Field</replaceable></quote></option> </term>
+          <listitem> <para>
+            do not decode audio but instead just extract the specified tag field to <filename>stdout</filename>
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-xx <quote><replaceable>Field</replaceable>[=<replaceable>file</replaceable>]</quote></option> </term>
+          <listitem> <para>
+            extract the specified tag field to named file in same directory as decoded audio file; optional filename specification may contain
+            <option>%a</option> which is replaced with the audio file base name,
+            <option>%t</option> replaced with the tag field name (note: comes from data for binary tags) and
+            <option>%e</option> replaced with the extension from the binary tag source file (or <quote>txt</quote> for text tag).
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-y</option> </term>
+          <listitem> <para>yes to overwrite warning (use with caution!)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-z[<replaceable>n</replaceable>]</option> </term>
+          <listitem> <para>
+            don't set (n = 0 or omitted) or set (n = 1) console title to indicate progress (leaves "WvUnpack Completed")</para> </listitem>
+        </varlistentry>
+      </variablelist>
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+    <para><citerefentry>
+      <refentrytitle>wavpack</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry>, <citerefentry>
+      <refentrytitle>wvgain</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry>, <citerefentry>
+      <refentrytitle>wvtag</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry></para>
+    <para>
+      Please visit www.wavpack.com for more information
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>COPYRIGHT</title>
+    <para>
+      This manual page was written by Sebastian Dröge
+      <email>slomo@debian.org</email> and David Bryant <email>david@wavpack.com</email>.
+      Permission is granted to copy, distribute and/or modify this document
+      under the terms of the <acronym>BSD</acronym> License.
+    </para>
+  </refsect1>
+</refentry>
+

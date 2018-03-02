@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
+Name: shine
+Description: Fixed-point mp3 encoding library.
+Version: @VERSION@
+Cflags: -I${includedir}
+Libs: -L${libdir} -lm -lshine

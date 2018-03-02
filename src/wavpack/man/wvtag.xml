@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+]>
+<refentry>
+  <refentryinfo>
+    <author>
+      <firstname>David</firstname>
+      <surname>Bryant</surname>
+      <email>david@wavpack.com</email>
+      <contrib>Author</contrib>
+    </author>
+    <copyright>
+      <year>2017</year>
+      <holder>David Bryant</holder>
+    </copyright>
+    <date>2017-01-13</date>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>wvtag</refentrytitle>
+    <refmiscinfo class="source">WavPack</refmiscinfo>
+    <refmiscinfo class="manual">WavPack Executable Programs</refmiscinfo>
+    <refmiscinfo class="version">5.1.0</refmiscinfo>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+  <refnamediv>
+    <refname>wvtag</refname>
+    <refpurpose>metadata utility for wavpack files</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>wvtag</command>
+      <arg choice="opt">
+        <option><replaceable>-options</replaceable></option>
+      </arg>
+      <arg choice="plain" rep="repeat">
+        <option><replaceable>INFILE</replaceable></option>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+    <para>
+      <command>wvtag</command> applies the specified metadata operation(s) to each of the specified WavPack source file(s) in this order:
+      clean, import, delete, write, extract, list. Note that WavPack metadata is stored in APEv2 tags, and this tool will automatically
+      import from an ID3v1 tag if it is the only tag present on the source file, and that ID3v1 tag will be deleted and replaced with an
+      APEv2 tag if an edit is requested.
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+    <para>
+      <variablelist>
+
+        <varlistentry>
+          <term> <option>--allow-huge-tags</option> </term>
+          <listitem> <para>
+            allow tag data up to 16 MB (embedding > 1 MB is not recommended for portable devices and may not work with some programs
+            including WavPack pre-4.70)
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-c</option> </term>
+          <listitem> <para>
+            extract cuesheet only to <filename>stdout</filename>
+            (equivalent to <option>-x <quote>cuesheet</quote></option>)
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-cc</option> </term>
+          <listitem> <para>
+            extract cuesheet to <filename>source-name.cue</filename> file in same directory as source file
+            (equivalent to <option>-xx <quote>cuesheet=%a.cue</quote></option>)
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>--clean</option> </term>
+          <term> <option>--clear</option> </term>
+          <listitem> <para>
+            clean all items from tag (done first)
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-d <quote><replaceable>Field</replaceable></quote></option> </term>
+          <listitem> <para>delete specified metadata item (text or binary)</para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-h</option> </term>
+          <term> <option>--help</option> </term>
+          <listitem> <para>this help display</para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>--import-id3</option> </term>
+          <listitem> <para>import applicable tag items from ID3v2.3 tag present in DSF files into APEv2 tag (if there are > 1 MB cover images present add
+            <option>--allow-huge-tags</option> to include them)
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-l</option> </term>
+          <term> <option>--list</option> </term>
+          <listitem> <para>
+            list all tag items (done last)
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>--no-utf8-convert</option> </term>
+          <listitem> <para>don't recode passed tags from local encoding to UTF-8, assume they are in UTF-8 already</para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-q</option> </term>
+          <listitem> <para>quiet (keep console output to a minimum)</para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-v</option> </term>
+          <term> <option>--version</option> </term>
+          <listitem> <para>write program version to <filename>stdout</filename></para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-w <quote><replaceable>Field</replaceable>=</quote></option> </term>
+          <listitem> <para>delete specified metadata item (text or binary)</para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-w <quote><replaceable>Field</replaceable>=<replaceable>Value</replaceable></quote></option> </term>
+          <listitem> <para>write specified text metadata to APEv2 tag</para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-w <quote><replaceable>Field</replaceable>=@<replaceable>file.ext</replaceable></quote></option> </term>
+          <listitem> <para>
+            write specified text metadata from file to APEv2 tag, normally used for embedded cuesheets and logs
+           (field names <quote>Cuesheet</quote> and <quote>Log</quote>)
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>--write-binary-tag <quote><replaceable>Field</replaceable>=@<replaceable>file.ext</replaceable></quote></option> </term>
+          <listitem> <para>
+            write the specified binary metadata file to APEv2 tag, normally used for cover art with the specified field name
+            <quote>Cover Art (Front)</quote>
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-x <quote><replaceable>Field</replaceable></quote></option> </term>
+          <listitem> <para>
+            extract the specified tag field only to <filename>stdout</filename>
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-xx <quote><replaceable>Field</replaceable>[=<replaceable>file</replaceable>]</quote></option> </term>
+          <listitem> <para>
+            extract the specified tag field to named file in same directory as source file; optional filename specification may contain
+            <option>%a</option> which is replaced with the audio file base name,
+            <option>%t</option> replaced with the tag field name (note: comes from data for binary tags) and
+            <option>%e</option> replaced with the extension from the binary tag source file (or <quote>txt</quote> for text tag).
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-y</option> </term>
+          <listitem> <para>yes to all warnings (use with caution!)</para> </listitem>
+        </varlistentry>
+
+      </variablelist>
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+    <para><citerefentry>
+      <refentrytitle>wavpack</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry>, <citerefentry>
+      <refentrytitle>wvunpack</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry>, <citerefentry>
+      <refentrytitle>wvgain</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry></para>
+    <para>
+      Please visit www.wavpack.com for more information
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>COPYRIGHT</title>
+    <para>
+      This manual page was written by David Bryant <email>david@wavpack.com</email>.
+      Permission is granted to copy, distribute and/or modify this document
+      under the terms of the <acronym>BSD</acronym> License.
+    </para>
+  </refsect1>
+</refentry>
+

@@ -30,9 +30,9 @@ TARGET_HOST=$(android_get_target_host $ARCH)
 COMMON_CPPFLAGS=$(android_get_common_cppflags $ARCH)
 COMMON_CXXFLAGS=$(android_get_common_cxxflags $ARCH)
 COMMON_LDFLAGS=$(android_get_common_ldflags $ARCH)
-CPPFLAGS="$COMMON_CPPFLAGS"
+CPPFLAGS="$COMMON_CPPFLAGS -I$ANDROID_NDK/prebuilt/android-$ARCH/libiconv/include"
 CXXFLAGS="$COMMON_CXXFLAGS"
-LDFLAGS="$COMMON_LDFLAGS"
+LDFLAGS="$COMMON_LDFLAGS -L$ANDROID_NDK/prebuilt/android-$ARCH/libiconv/lib"
 
 cd $1/src/libxml2 || exit 1
 
@@ -44,18 +44,28 @@ make clean
 # #error "LONG_BIT definition appears wrong for platform (bad gcc/glibc config?)."
 #
 
-CFLAGS=$CPPFLAGS \
+CPPFLAGS=$CPPFLAGS \
 CXXFLAGS=$CXXFLAGS \
 LDFLAGS=$LDFLAGS \
 ./configure \
+    --prefix=$ANDROID_NDK/prebuilt/android-$ARCH/libxml2 \
     --with-pic \
+    --with-sysroot=$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/sysroot \
+    --with-zlib \
+    --with-iconv \
+    --without-python \
+    --without-debug \
     --enable-static \
     --disable-shared \
-    --with-zlib \
-    --without-python \
+    --disable-fast-install \
     --host=$TARGET_HOST || exit 1
 
-CFLAGS=$CPPFLAGS \
+CPPFLAGS=$CPPFLAGS \
 CXXFLAGS=$CXXFLAGS \
 LDFLAGS=$LDFLAGS \
 make -j$(nproc) || exit 1
+
+CPPFLAGS=$CPPFLAGS \
+CXXFLAGS=$CXXFLAGS \
+LDFLAGS=$LDFLAGS \
+make install || exit 1

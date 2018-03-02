@@ -1,0 +1,118 @@
+'\" t
+.\"     Title: wvgain
+.\"    Author: Sebastian Dröge <slomo@debian.org>
+.\" Generator: DocBook XSL Stylesheets v1.78.1 <http://docbook.sf.net/>
+.\"      Date: 2017-01-13
+.\"    Manual: WavPack Executable Programs
+.\"    Source: WavPack 5.1.0
+.\"  Language: English
+.\"
+.TH "WVGAIN" "1" "2017\-01\-13" "WavPack 5\&.1\&.0" "WavPack Executable Programs"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+wvgain \- adds ReplayGain information to wavpack files
+.SH "SYNOPSIS"
+.HP \w'\fBwvgain\fR\ 'u
+\fBwvgain\fR [\fB\fI\-options\fR\fR] \fB\fIINFILE\fR\fR...
+.SH "DESCRIPTION"
+.PP
+\fBwvgain\fR
+perceptually analyzes WavPack audio files for volume, calculates ReplayGain information based on this, and adds the appropriate APEv2 tag fields\&. ReplayGain\-enabled players will use this information to produce the same perceived loudness on all tracks\&. Both individual track and whole album ReplayGain information can be calculated\&.
+.SH "OPTIONS"
+.PP
+.PP
+\fB\-a\fR
+.RS 4
+album mode (all files scanned are considered an album)
+.RE
+.PP
+\fB\-c\fR
+.RS 4
+clean ReplayGain values from all files
+.RE
+.PP
+\fB\-d\fR
+.RS 4
+display calculated values only (no files are modified)
+.RE
+.PP
+\fB\-i\fR
+.RS 4
+ignore \&.wvc file (forces hybrid lossy)
+.RE
+.PP
+\fB\-n\fR
+.RS 4
+new files only (skip files with track info, or album info if album mode specified)
+.RE
+.PP
+\fB\-q\fR
+.RS 4
+quiet (keep console output to a minimum)
+.RE
+.PP
+\fB\-s\fR
+.RS 4
+show stored values only (no analysis)
+.RE
+.PP
+\fB\-v\fR
+.RS 4
+write program version to
+stdout
+.RE
+.PP
+\fB\-z[\fR\fB\fIn\fR\fR\fB]\fR
+.RS 4
+don\*(Aqt set (n = 0 or omitted) or set (n = 1) console title to indicate progress (leaves "WvGain Completed")
+.RE
+.SH "SEE ALSO"
+.PP
+\fBwavpack\fR(1),
+\fBwvunpack\fR(1),
+\fBwvtag\fR(1)
+.PP
+Please visit www\&.wavpack\&.com for more information
+.SH "COPYRIGHT"
+.PP
+This manual page was written by Sebastian Dröge
+<slomo@debian\&.org>
+and David Bryant
+<david@wavpack\&.com>\&. Permission is granted to copy, distribute and/or modify this document under the terms of the
+BSD
+License\&.
+.SH "AUTHORS"
+.PP
+\fBSebastian Dröge\fR <\&slomo@debian\&.org\&>
+.RS 4
+Original author
+.RE
+.PP
+\fBDavid Bryant\fR <\&david@wavpack\&.com\&>
+.RS 4
+Updates
+.RE
+.SH "COPYRIGHT"
+.br
+Copyright \(co 2005 Sebastian Dröge
+.br
+Copyright \(co 2017 David Bryant
+.br

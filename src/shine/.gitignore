@@ -1,0 +1,8 @@
+/.libs/
+/Makefile
+/config.log
+/config.status
+/libshine.la
+/libtool
+/shine.pc
+/shineenc

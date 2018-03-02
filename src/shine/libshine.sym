@@ -1,0 +1,11 @@
+shine_close
+shine_encode_buffer
+shine_encode_buffer_interleaved
+shine_find_bitrate_index
+shine_find_samplerate_index
+shine_mpeg_version
+shine_check_config
+shine_flush
+shine_initialise
+shine_set_config_mpeg_defaults
+shine_samples_per_pass

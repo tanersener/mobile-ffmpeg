@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+]>
+<refentry>
+  <refentryinfo>
+    <author>
+      <firstname>Sebastian</firstname>
+      <surname>Dröge</surname>
+      <email>slomo@debian.org</email>
+      <contrib>Original author</contrib>
+    </author>
+    <author>
+      <firstname>David</firstname>
+      <surname>Bryant</surname>
+      <email>david@wavpack.com</email>
+      <contrib>Updates</contrib>
+    </author>
+    <copyright>
+      <year>2005</year>
+      <holder>Sebastian Dröge</holder>
+    </copyright>
+    <copyright>
+      <year>2017</year>
+      <holder>David Bryant</holder>
+    </copyright>
+    <date>2017-01-13</date>
+  </refentryinfo>
+  <refmeta>
+    <refentrytitle>wavpack</refentrytitle>
+    <refmiscinfo class="source">WavPack</refmiscinfo>
+    <refmiscinfo class="manual">WavPack Executable Programs</refmiscinfo>
+    <refmiscinfo class="version">5.1.0</refmiscinfo>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+  <refnamediv>
+    <refname>wavpack</refname>
+    <refpurpose>encode audio files to wavpack</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>wavpack</command>
+      <arg choice="opt">
+        <option><replaceable>-options</replaceable></option>
+      </arg>
+      <arg choice="plain" rep="repeat">
+        <option><replaceable>INFILE</replaceable></option>
+      </arg>
+      <arg choice="opt">
+        <option>-o <replaceable>OUTFILE</replaceable></option>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>DESCRIPTION</title>
+    <para>
+      <command>wavpack</command> encodes the specified source file(s) into WavPack files using the options provided. The source
+      files may be any of the file format types listed below, and the audio data may be either uncompressed <acronym>PCM</acronym>
+      or <acronym>DSD</acronym> (depending on the format). Raw audio may also be specified (see <option>--raw-pcm</option>).
+      The output filename will
+      be <filename>source-name.wv</filename> unless overridden with the <option>-o</option> switch. Multiple input files may be
+      specified resulting in multiple WavPack files, and in that case <option>-o</option> may be used to specify an alternate
+      target directory. <filename>Stdin</filename> and <filename>stdout</filename> may be specified with <quote>-</quote>. In the
+      case of transcoding from existing WavPack files, all tags are copied (and may be modified with additional args) and unless
+      an alternate name or directory is specified, the source files are safely overwritten. To decode WavPack files back to their
+      original format (or raw audio) use the <command>wvunpack</command> program.
+    </para>
+    <refsect2>
+      <title>INPUT FILE FORMATS</title>
+        <itemizedlist mark='bullet'>
+        <listitem>
+        <para>
+          Microsoft RIFF, extension <quote>.wav</quote>, includes <acronym>BWF</acronym> and <acronym>RF64</acronym> varients
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          WavPack, extension <quote>.wv</quote>, trancode operation, tags copied
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          Apple Core Audio, extension <quote>.caf</quote>
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          Sony Wave64, extension <quote>.w64</quote>
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          Philips <acronym>DSDIFF</acronym>, extension <quote>.dff</quote>
+        </para>
+        </listitem>
+        <listitem>
+        <para>
+          Sony <acronym>DSD</acronym> Stream, extension <quote>.dsf</quote>
+        </para>
+        </listitem>
+        </itemizedlist>
+    </refsect2>
+  </refsect1>
+  <refsect1>
+    <title>OPTIONS</title>
+    <para>
+      <variablelist>
+        <varlistentry>
+          <term> <option>-a</option> </term>
+          <listitem> <para>Adobe Audition (CoolEdit) mode for 32-bit floats</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--allow-huge-tags</option> </term>
+          <listitem> <para>
+            allow tag data up to 16 MB (embedding > 1 MB is not recommended for portable devices and may not work with some programs
+            including WavPack pre-4.70)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-b<replaceable>n</replaceable></option> </term>
+          <listitem> <para>
+            enable hybrid compression, <replaceable>n</replaceable> = 2.0 to 23.9 bits/sample, or
+            <replaceable>n</replaceable> = 24-9600 kbits/second (kbps), not available with DSD audio
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--blocksize=<replaceable>n</replaceable></option> </term>
+          <listitem> <para>specify block size in samples (max = 131072 and min = 16 with <option>--merge-blocks</option>, otherwise 128)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-c</option> </term>
+          <listitem> <para>create correction file (.wvc) for hybrid mode (results in 2-file lossless compression)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-cc</option> </term>
+          <listitem> <para>maximum hybrid compression (hurts lossy quality &amp; decode speed)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--channel-order=<replaceable>list</replaceable></option> </term>
+          <listitem> <para>
+            specify (comma separated) channel order if not Microsoft standard (which is
+            FL,FR,FC,LFE,BL,BR,FLC,FRC,BC,SL,SR,TC,TFL,TFC,TFR,TBL,TBC,TBR);
+            specify <quote>...</quote> to indicate that channels are not assigned to specific speakers, or terminate list with <quote>...</quote>
+            to indicate that any channels beyond those specified are unassigned
+        </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--cross-decorr</option> </term>
+          <listitem> <para>use cross-channel correlation in hybrid mode (on by default in lossless mode and with <option>-cc</option> option)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-d</option> </term>
+          <listitem> <para>delete source file if successful (use with caution!)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-f</option> </term>
+          <listitem> <para>fast mode (fast, but some compromise in compression ratio)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-h</option> </term>
+          <listitem> <para>high quality (better compression ratio, but slower encode and decode than default mode)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-hh</option> </term>
+          <listitem> <para>very high quality (best compression, but slowest and NOT recommended for use on portable playback devices)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--help</option> </term>
+          <listitem> <para>display extended help</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-i</option> </term>
+          <listitem> <para>ignore length in wav header (no pipe output allowed)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--import-id3</option> </term>
+          <listitem> <para>import applicable tag items from ID3v2.3 tag present in DSF files into APEv2 tag (if there are > 1 MB cover images present add
+            <option>--allow-huge-tags</option> to include them, and <option>-r</option> if you do not want large images appearing twice in the WavPack file,
+            although this will remove the entire ID3 tag wrapper)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-j<replaceable>n</replaceable></option> </term>
+          <listitem> <para>joint-stereo override (0 = left/right, 1 = mid/side)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-m</option> </term>
+          <listitem> <para>compute &amp; store MD5 signature of raw audio data</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--merge-blocks</option> </term>
+          <listitem> <para>
+            merge consecutive blocks with equal redundancy (used with <option>--blocksize</option> option and is useful for files generated
+            by the lossyWAV program or decoded HDCD files)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-n</option> </term>
+          <listitem> <para>calculate average and peak quantization noise (hybrid only, reference fullscale sine)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--no-utf8-convert</option> </term>
+          <listitem> <para>don't recode passed tags from local encoding to UTF-8, assume they are in UTF-8 already</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-o <replaceable>OUTFILE</replaceable></option> </term>
+          <listitem> <para>specify output filename (only if single source file) or target directory (must exist)</para>
+          </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--pair-unassigned-chans</option> </term>
+          <listitem> <para>encode unassigned channels into stereo pairs</para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>--pre-quantize=<replaceable>bits</replaceable></option> </term>
+          <listitem> <para>
+            pre-quantize samples to <replaceable>bits</replaceable> depth BEFORE encoding and MD5 calculation
+            (common use would be <option>--pre-quantize=20</option> for 24-bit or float material recorded with
+            typical converters)
+          </para> </listitem>
+        </varlistentry>
+
+        <varlistentry>
+          <term> <option>-q</option> </term>
+          <listitem> <para>quiet (keep console output to a minimum)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-r</option> </term>
+          <listitem> <para>remove file headers (file-appropriate headers will be regenerated during unpacking)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--raw-pcm</option> </term>
+          <listitem> <para>input data is raw pcm (44,100 Hz, 16-bit, 2-channels)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--raw-pcm=<replaceable>sr</replaceable>,<replaceable>bits</replaceable>[f|s|u],<replaceable>chans</replaceable>,[le|be]</option> </term>
+          <listitem> <para>
+            input data is raw pcm with specified sample-rate, bit-depth (float,unsigned,signed), number of channels, and endianness
+            (defaulted parameters may be omitted, specify <replaceable>bits</replaceable>=1 for <acronym>DSD</acronym>)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--raw-pcm-skip=<replaceable>begin</replaceable>[,<replaceable>end</replaceable>]</option> </term>
+          <listitem> <para>
+            skip <replaceable>begin</replaceable> bytes before encoding raw <acronym>PCM</acronym> (header) and skip <replaceable>end</replaceable>
+            bytes at the <acronym>EOF</acronym> (trailer)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-s<replaceable>n</replaceable></option> </term>
+          <listitem> <para>
+            override default hybrid mode noise shaping where n is a float value between -1.0 and 1.0; negative values move noise lower in freq,
+            positive values move noise higher in freq, use 0 for no shaping (white noise)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-t</option> </term>
+          <listitem> <para>copy input file's time stamp to output file(s)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--use-dns</option> </term>
+          <listitem> <para>force use of dynamic noise shaping (hybrid mode only)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-v</option> </term>
+          <listitem> <para>verify output file integrity after write (not for piped output)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--version</option> </term>
+          <listitem> <para>write program version to <filename>stdout</filename></para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-w Encoder</option> </term>
+          <listitem> <para>write actual encoder metadata to APEv2 tag (e.g., <quote>Encoder=WavPack 5.0.0</quote>)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-w Settings</option> </term>
+          <listitem> <para>write actual user settings metadata to APEv2 tag (e.g., <quote>Settings=-hb384cx3</quote>)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-w <quote><replaceable>Field</replaceable>=<replaceable>Value</replaceable></quote></option> </term>
+          <listitem> <para>write specified text metadata to APEv2 tag</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-w <quote><replaceable>Field</replaceable>=@<replaceable>file.ext</replaceable></quote></option> </term>
+          <listitem> <para>
+            write specified text metadata from file to APEv2 tag, normally used for embedded cuesheets and logs
+           (field names <quote>Cuesheet</quote> and <quote>Log</quote>)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>--write-binary-tag <quote><replaceable>Field</replaceable>=@<replaceable>file.ext</replaceable></quote></option> </term>
+          <listitem> <para>
+            write the specified binary metadata file to APEv2 tag, normally used for cover art with the specified field name
+            <quote>Cover Art (Front)</quote>
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-x[<replaceable>n</replaceable>]</option> </term>
+          <listitem> <para>
+            extra encode processing (optional n = 1 to 6, 1=default), -x1 to -x3 to choose best of predefined filters,
+            -x4 to -x6 to generate custom filters (very slow!)
+          </para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-y</option> </term>
+          <listitem> <para>yes to all warnings (use with caution!)</para> </listitem>
+        </varlistentry>
+        <varlistentry>
+          <term> <option>-z[<replaceable>n</replaceable>]</option> </term>
+          <listitem> <para>
+            don't set (n = 0 or omitted) or set (n = 1) console title to indicate progress (leaves "WavPack Completed")</para> </listitem>
+        </varlistentry>
+      </variablelist>
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>SEE ALSO</title>
+    <para><citerefentry>
+      <refentrytitle>wvunpack</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry>, <citerefentry>
+      <refentrytitle>wvgain</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry>, <citerefentry>
+      <refentrytitle>wvtag</refentrytitle>
+      <manvolnum>1</manvolnum>
+    </citerefentry></para>
+    <para>
+      Please visit www.wavpack.com for more information
+    </para>
+  </refsect1>
+  <refsect1>
+    <title>COPYRIGHT</title>
+    <para>
+      This manual page was written by Sebastian Dröge
+      <email>slomo@debian.org</email> and David Bryant <email>david@wavpack.com</email>.
+      Permission is granted to copy, distribute and/or modify this document
+      under the terms of the <acronym>BSD</acronym> License.
+    </para>
+  </refsect1>
+</refentry>
+

@@ -1,0 +1,59 @@
+libShine-fxp Fixed-point MP3 Encoder. 
+
+---------From Original Readme----------
+
+Shine (RISC OS fixed point port)
+
+This port of Gabriel Bouvigne's Shine has been converted to fixed point
+to reduce encoding time on Acorn/RISC OS computers without hardware
+floating point coprocessors.
+
+For use on other platforms, the RISC OS specifics in main.c should be
+undefined, and the assembler fractional multiply functions will need to
+be changed. Big endian support may also have to be re-instated.
+
+Pete Everett. 9/4/01
+
+email: peter@everett9981.freeserve.co.uk
+web: http://www.everett9981.freeserve.co.uk
+
+
+---------------------------------------------
+
+
+Ported to GCC StrongARM Linux by Patrick Roberts for Lower Mars, LLC.   This
+port will also work on X86, X86_64 and probably other platforms and CPUs, but
+the mult_noarch_gcc.h needs to be fixed as the math is bad. (I only need x86 to
+make testing easier... ARM code is 100% correct).
+
+
+Tested Compiler:
+
+    GCC VERSION 3.3.6
+    --target=arm-linux
+    --with-cpu=iwmmxt
+    --with-float=soft (no float in Shine anyway)
+    
+    Compiled with the dev-ezx toolchain from the dev-ezx directory.
+    
+
+CHANGES from Peter Everett's version:
+
+    - Removed global data from all but main.c
+    - Created a DSO and static library from encoding functions
+    - Ported assembly to gcc 3.6 StrongARM inline format
+    - Changed file read/write functions so no direct file i/o
+      is done by library functions (function pointers now)
+    - All printf's in lib blocked if #ifdef DEBUG
+    - Makefile for StrongARM/EZX and for generic platforms
+    - Restored missing COPYING from original floating point Shine source
+    - Moved RISC_OS-specific files to "unused" directory
+    - Removed RISC_OS stuff from Main.c (shineenc), which is now more
+      an example for library usage.
+
+What could be improved:
+
+    - "noarch-gcc" defines are not correct math (just close...)
+    - Vectorize code for WMMX-capable CPUs.
+    - Optimized assembly (mult_XXX_YYY.h) files
+    
