@@ -8,10 +8,10 @@ from distutils.core import setup, Extension
 # Below ROOT, we expect to find include, include/libxml2, lib and bin.
 # On *nix, it is not needed (but should not harm),
 # on Windows, it is set by configure.js.
-ROOT = r'/files/android-sdk/ndk-bundle/prebuilt/android-arm/libxml2'
+ROOT = r'/usr'
 
 # Thread-enabled libxml2
-with_threads = 0
+with_threads = 1
 
 # If this flag is set (windows only),
 # a private copy of the dlls are included in the package.

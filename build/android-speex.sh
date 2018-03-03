@@ -24,15 +24,12 @@ fi
 . $1/build/common.sh
 
 # PREPARING PATHS
-android_prepare_toolchain_paths $ARCH
+android_prepare_toolchain_paths
 
-TARGET_HOST=$(android_get_target_host $ARCH)
-COMMON_CPPFLAGS=$(android_get_common_cppflags $ARCH)
-COMMON_CXXFLAGS=$(android_get_common_cxxflags $ARCH)
-COMMON_LDFLAGS=$(android_get_common_ldflags $ARCH)
-CPPFLAGS="$COMMON_CPPFLAGS -I$ANDROID_NDK/prebuilt/android-$ARCH/libiconv/include"
-CXXFLAGS="$COMMON_CXXFLAGS"
-LDFLAGS="$COMMON_LDFLAGS -L$ANDROID_NDK/prebuilt/android-$ARCH/libiconv/lib"
+TARGET_HOST=$(android_get_target_host)
+CFLAGS=$(android_get_cflags "speex")
+CXXFLAGS=$(android_get_cxxflags)
+LDFLAGS=$(android_get_ldflags "speex")
 
 OPTIONAL_CPU_SUPPORT=""
 if [ $ARCH == "x86" ] || [ $ARCH == "x86_64" ]; then
@@ -43,9 +40,9 @@ cd $1/src/speex || exit 1
 
 make clean
 
-CPFLAGS=$CPPFLAGS \
-CXXFLAGS=$CXXFLAGS \
-LDFLAGS=$LDFLAGS \
+CFLAGS=${CFLAGS} \
+CXXFLAGS=${CXXFLAGS} \
+LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=$ANDROID_NDK/prebuilt/android-$ARCH/speex \
     --with-pic \
@@ -57,12 +54,12 @@ LDFLAGS=$LDFLAGS \
     --disable-fast-install \
     --host=$TARGET_HOST || exit 1
 
-CPFLAGS=$CPPFLAGS \
-CXXFLAGS=$CXXFLAGS \
-LDFLAGS=$LDFLAGS \
+CFLAGS=${CFLAGS} \
+CXXFLAGS=${CXXFLAGS} \
+LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CPFLAGS=$CPPFLAGS \
-CXXFLAGS=$CXXFLAGS \
-LDFLAGS=$LDFLAGS \
+CFLAGS=${CFLAGS} \
+CXXFLAGS=${CXXFLAGS} \
+LDFLAGS=${LDFLAGS} \
 make install || exit 1

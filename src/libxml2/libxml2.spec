@@ -203,6 +203,6 @@ rm -fr %{buildroot}
 %endif # with_python3
 
 %changelog
-* Fri Mar  2 2018 Daniel Veillard <veillard@redhat.com>
+* Thu Nov  2 2017 Daniel Veillard <veillard@redhat.com>
 - upstream release 2.9.7 see http://xmlsoft.org/news.html
 

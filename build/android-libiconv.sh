@@ -24,23 +24,20 @@ fi
 . $1/build/common.sh
 
 # PREPARING PATHS
-android_prepare_toolchain_paths $ARCH
+android_prepare_toolchain_paths
 
-TARGET_HOST=$(android_get_target_host $ARCH)
-COMMON_CPPFLAGS=$(android_get_common_cppflags $ARCH)
-COMMON_CXXFLAGS=$(android_get_common_cxxflags $ARCH)
-COMMON_LDFLAGS=$(android_get_common_ldflags $ARCH)
-CPPFLAGS="$COMMON_CPPFLAGS"
-CXXFLAGS="$COMMON_CXXFLAGS"
-LDFLAGS="$COMMON_LDFLAGS"
+TARGET_HOST=$(android_get_target_host)
+CFLAGS=$(android_get_cflags "libiconv")
+CXXFLAGS=$(android_get_cxxflags)
+LDFLAGS=$(android_get_ldflags "libiconv")
 
 cd $1/src/libiconv || exit 1
 
 make clean
 
-CPPFLAGS=$CPPFLAGS \
-CXXFLAGS=$CXXFLAGS \
-LDFLAGS=$LDFLAGS \
+CFLAGS=${CFLAGS} \
+CXXFLAGS=${CXXFLAGS} \
+LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=$ANDROID_NDK/prebuilt/android-$ARCH/libiconv \
     --with-pic \
@@ -51,12 +48,12 @@ LDFLAGS=$LDFLAGS \
     --disable-rpath \
     --host=$TARGET_HOST || exit 1
 
-CPPFLAGS=$CPPFLAGS \
-CXXFLAGS=$CXXFLAGS \
-LDFLAGS=$LDFLAGS \
+CFLAGS=${CFLAGS} \
+CXXFLAGS=${CXXFLAGS} \
+LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CPPFLAGS=$CPPFLAGS \
-CXXFLAGS=$CXXFLAGS \
-LDFLAGS=$LDFLAGS \
+CFLAGS=${CFLAGS} \
+CXXFLAGS=${CXXFLAGS} \
+LDFLAGS=${LDFLAGS} \
 make install || exit 1

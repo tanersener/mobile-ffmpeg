@@ -1,1 +1,5 @@
 *.pc
+/config.log
+/Makefile
+/config.status
+/libtool
