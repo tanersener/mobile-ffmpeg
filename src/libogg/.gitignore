@@ -1,0 +1,6 @@
+*.pc
+/Makefile
+/config.h
+/config.log
+/config.status
+/libtool

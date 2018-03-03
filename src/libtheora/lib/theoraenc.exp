@@ -1,0 +1,15 @@
+# export list for theoraenc
+_th_encode_alloc
+_th_encode_ctl
+_th_encode_flushheader
+_th_encode_ycbcr_in
+_th_encode_packetout
+_th_encode_free
+_TH_VP31_QUANT_INFO
+_TH_VP31_HUFF_CODES
+_theora_encode_init
+_theora_encode_YUVin
+_theora_encode_packetout
+_theora_encode_header
+_theora_encode_comment
+_theora_encode_tables

@@ -5,17 +5,17 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-if [[ -z $ANDROID_NDK ]]; then
+if [[ -z ${ANDROID_NDK} ]]; then
     echo "ANDROID_NDK not defined"
     exit 1
 fi
 
-if [[ -z $ARCH ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
 
-if [[ -z $API ]]; then
+if [[ -z ${API} ]]; then
     echo "API not defined"
     exit 1
 fi
@@ -32,7 +32,7 @@ CXXFLAGS=$(android_get_cxxflags)
 LDFLAGS=$(android_get_ldflags "speex")
 
 OPTIONAL_CPU_SUPPORT=""
-if [ $ARCH == "x86" ] || [ $ARCH == "x86_64" ]; then
+if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86_64" ]; then
     OPTIONAL_CPU_SUPPORT="--enable-sse"
 fi
 
@@ -44,15 +44,15 @@ CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \
 LDFLAGS=${LDFLAGS} \
 ./configure \
-    --prefix=$ANDROID_NDK/prebuilt/android-$ARCH/speex \
+    --prefix=${ANDROID_NDK}/prebuilt/android-${ARCH}/speex \
     --with-pic \
-    --with-sysroot=$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/sysroot \
+    --with-sysroot=${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
     --enable-static \
     $OPTIONAL_CPU_SUPPORT \
     --disable-shared \
     --disable-binaries \
     --disable-fast-install \
-    --host=$TARGET_HOST || exit 1
+    --host=${TARGET_HOST} || exit 1
 
 CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \

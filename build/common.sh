@@ -1,7 +1,7 @@
 #!/bin/bash
 
 android_get_target_host() {
-    case $ARCH in
+    case ${ARCH} in
         arm)
             echo "arm-linux-androideabi"
         ;;
@@ -17,15 +17,15 @@ android_get_target_host() {
     esac
 }
 android_get_common_includes() {
-    echo "-I$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/sysroot/usr/include -I$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/sysroot/usr/local/include"
+    echo "-I${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/include -I${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/local/include"
 }
 
 android_get_common_cflags() {
-    echo "-Wno-psabi -Wno-unused-but-set-variable -Wno-unused-function -fstrict-aliasing -fPIE -fPIC -DANDROID -D__ANDROID_API__=$API"
+    echo "-fstrict-aliasing -fPIE -fPIC -DANDROID -D__ANDROID_API__=${API}"
 }
 
 android_get_arch_specific_cflags() {
-    case $ARCH in
+    case ${ARCH} in
         arm)
             echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp"
         ;;
@@ -44,9 +44,13 @@ android_get_arch_specific_cflags() {
 android_get_size_optimization_cflags() {
 
     ARCH_OPTIMIZATION=""
-    case $ARCH in
+    case ${ARCH} in
         arm | arm64)
-            ARCH_OPTIMIZATION="-Os -finline-limit=64"
+            if [[ $1 -eq libwebp ]]; then
+                ARCH_OPTIMIZATION="-Os"
+            else
+                ARCH_OPTIMIZATION="-Os -finline-limit=64"
+            fi
         ;;
         x86 | x86_64)
             ARCH_OPTIMIZATION="-O2 -finline-limit=300"
@@ -55,7 +59,7 @@ android_get_size_optimization_cflags() {
 
     LIB_OPTIMIZATION=""
     case $1 in
-        libiconv | libxml2 | shine | soxr | speex | wavpack | libvpx)
+        libiconv | libxml2 | shine | soxr | speex | wavpack | libvpx | libogg | libvorbis | jpeg | giflib | libpng | tiff | libwebp | libtheora | lame)
             LIB_OPTIMIZATION=""
         ;;
         *)
@@ -70,11 +74,14 @@ android_get_app_specific_cflags() {
 
     APP_FLAGS=""
     case $1 in
-        shine)
+        libwebp)
             APP_FLAGS=""
         ;;
+        shine)
+            APP_FLAGS="-Wno-psabi -Wno-unused-but-set-variable -Wno-unused-function"
+        ;;
         *)
-            APP_FLAGS="-std=c99"
+            APP_FLAGS="-std=c99 -Wno-psabi -Wno-unused-but-set-variable -Wno-unused-function"
         ;;
     esac
 
@@ -96,12 +103,12 @@ android_get_cxxflags() {
 }
 
 android_get_common_linked_libraries() {
-    echo "-lc -lm -ldl -llog -pie -lpthread -L$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/sysroot/usr/lib -L$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/lib"
+    echo "-lc -lm -ldl -llog -pie -pthread -L${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/lib -L${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/lib -L${ANDROID_NDK}/sources/cxx-stl/llvm-libc++/lib"
 }
 
 android_get_size_optimization_ldflags() {
     case $1 in
-        libxml2 | shine | soxr | speex | wavpack | libvpx)
+        libxml2 | shine | soxr | speex | wavpack | libvpx | libogg | libvorbis | jpeg | giflib | libpng | tiff | libwebp | libtheora | lame)
             echo ""
         ;;
         *)
@@ -111,7 +118,7 @@ android_get_size_optimization_ldflags() {
 }
 
 android_get_arch_specific_ldflags() {
-    case $ARCH in
+    case ${ARCH} in
         arm)
             echo "-march=armv7-a -Wl,--fix-cortex-a8"
         ;;
@@ -136,16 +143,16 @@ android_get_ldflags() {
 }
 
 android_prepare_toolchain_paths() {
-    export PATH=$PATH:$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/bin
+    export PATH=$PATH:${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/bin
 
     TARGET_HOST=$(android_get_target_host)
     
-    export AR=$TARGET_HOST-ar
-    export AS=$TARGET_HOST-as
-    export CC=$TARGET_HOST-gcc
-    export CXX=$TARGET_HOST-g++
-    export LD=$TARGET_HOST-ld
-    export RANLIB=$TARGET_HOST-ranlib
-    export STRIP=$TARGET_HOST-strip
+    export AR=${TARGET_HOST}-ar
+    export AS=${TARGET_HOST}-clang
+    export CC=${TARGET_HOST}-clang
+    export CXX=${TARGET_HOST}-clang++
+    export LD=${TARGET_HOST}-ld
+    export RANLIB=${TARGET_HOST}-ranlib
+    export STRIP=${TARGET_HOST}-strip
 }
 

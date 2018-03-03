@@ -1,0 +1,14 @@
+# theoradec uninstalled pkg-config file
+
+prefix=
+exec_prefix=
+libdir=${pcfiledir}/lib
+includedir=${pcfiledir}/include
+
+Name: theora uninstalled
+Description: Theora video codec(decoder) (not installed)
+Version: @VERSION@
+Requires: ogg >= 1.1
+Conflicts:
+Libs: ${libdir}/libtheoradec.la
+Cflags: -I${includedir}

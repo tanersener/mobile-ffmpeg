@@ -1,0 +1,8 @@
+/Makefile
+/.deps/
+/.libs/
+*.o
+/tiff-bi
+/tiff-grayscale
+/tiff-palette
+/tiff-rgb

@@ -5,17 +5,17 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-if [[ -z $ANDROID_NDK ]]; then
+if [[ -z ${ANDROID_NDK} ]]; then
     echo "ANDROID_NDK not defined"
     exit 1
 fi
 
-if [[ -z $ARCH ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
 
-if [[ -z $API ]]; then
+if [[ -z ${API} ]]; then
     echo "API not defined"
     exit 1
 fi
@@ -39,13 +39,13 @@ CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \
 LDFLAGS=${LDFLAGS} \
 ./configure \
-    --prefix=$ANDROID_NDK/prebuilt/android-$ARCH/shine \
+    --prefix=${ANDROID_NDK}/prebuilt/android-${ARCH}/shine \
     --with-pic \
-    --with-sysroot=$ANDROID_NDK/toolchains/mobile-ffmpeg-$ARCH/sysroot \
+    --with-sysroot=${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
-    --host=$TARGET_HOST || exit 1
+    --host=${TARGET_HOST} || exit 1
 
 CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \

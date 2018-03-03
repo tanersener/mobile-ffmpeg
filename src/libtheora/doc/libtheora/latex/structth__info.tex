@@ -1,0 +1,164 @@
+\section{th\_\-info Struct Reference}
+\label{structth__info}\index{th\_\-info@{th\_\-info}}
+
+
+Theora bitstream information.  
+
+
+{\ttfamily \#include $<$codec.h$>$}\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+ogg\_\-uint32\_\-t {\bf frame\_\-width}
+\begin{DoxyCompactList}\small\item\em The encoded frame width. \item\end{DoxyCompactList}\item 
+ogg\_\-uint32\_\-t {\bf frame\_\-height}
+\begin{DoxyCompactList}\small\item\em The encoded frame height. \item\end{DoxyCompactList}\item 
+ogg\_\-uint32\_\-t {\bf pic\_\-width}
+\begin{DoxyCompactList}\small\item\em The displayed picture width. \item\end{DoxyCompactList}\item 
+ogg\_\-uint32\_\-t {\bf pic\_\-height}
+\begin{DoxyCompactList}\small\item\em The displayed picture height. \item\end{DoxyCompactList}\item 
+ogg\_\-uint32\_\-t {\bf pic\_\-x}
+\begin{DoxyCompactList}\small\item\em The X offset of the displayed picture. \item\end{DoxyCompactList}\item 
+ogg\_\-uint32\_\-t {\bf pic\_\-y}
+\begin{DoxyCompactList}\small\item\em The Y offset of the displayed picture. \item\end{DoxyCompactList}\item 
+{\bf th\_\-colorspace} {\bf colorspace}
+\begin{DoxyCompactList}\small\item\em The color space. \item\end{DoxyCompactList}\item 
+{\bf th\_\-pixel\_\-fmt} {\bf pixel\_\-fmt}
+\begin{DoxyCompactList}\small\item\em The pixel format. \item\end{DoxyCompactList}\item 
+int {\bf target\_\-bitrate}
+\begin{DoxyCompactList}\small\item\em The target bit-\/rate in bits per second. \item\end{DoxyCompactList}\item 
+int {\bf quality}
+\begin{DoxyCompactList}\small\item\em The target quality level. \item\end{DoxyCompactList}\item 
+int {\bf keyframe\_\-granule\_\-shift}
+\begin{DoxyCompactList}\small\item\em The amount to shift to extract the last keyframe number from the granule position. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{Indent}{\bf Theora version}\par
+{\em \label{_amgrpf735645ddddaaf44dc0647da0e883f6c}
+Bitstream version information.}\begin{DoxyCompactItemize}
+\item 
+unsigned char {\bf version\_\-major}
+\item 
+unsigned char {\bf version\_\-minor}
+\item 
+unsigned char {\bf version\_\-subminor}
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Frame rate}\par
+{\em \label{_amgrp801309c4a0e25a4db3fe5739b322b0a7}
+The frame rate, as a fraction.
+
+If either is 0, the frame rate is undefined. }\begin{DoxyCompactItemize}
+\item 
+ogg\_\-uint32\_\-t {\bf fps\_\-numerator}
+\item 
+ogg\_\-uint32\_\-t {\bf fps\_\-denominator}
+\end{DoxyCompactItemize}
+\end{Indent}
+\begin{Indent}{\bf Aspect ratio}\par
+{\em \label{_amgrpdeca19914b5126815a2220f15d067c9b}
+The aspect ratio of the pixels.
+
+If either value is zero, the aspect ratio is undefined. If not specified by any external means, 1:1 should be assumed. The aspect ratio of the full picture can be computed as 
+\begin{DoxyCode}
+  aspect_numerator*pic_width/(aspect_denominator*pic_height).
+\end{DoxyCode}
+ }\begin{DoxyCompactItemize}
+\item 
+ogg\_\-uint32\_\-t {\bf aspect\_\-numerator}
+\item 
+ogg\_\-uint32\_\-t {\bf aspect\_\-denominator}
+\end{DoxyCompactItemize}
+\end{Indent}
+
+
+\subsection{Detailed Description}
+Theora bitstream information. This contains the basic playback parameters for a stream, and corresponds to the initial 'info' header packet. To initialize an encoder, the application fills in this structure and passes it to \doxyref{th\_\-encode\_\-alloc()}{p.}{group__encfuncs_gaa91e47bc9dd5f6ee52045bd7b815e5a7}. A default encoding mode is chosen based on the values of the \doxyref{quality}{p.}{structth__info_aa4cdcf96cb46b256821993e9a830ee02} and \doxyref{target\_\-bitrate}{p.}{structth__info_a1d9c8d768a4ae623269f5bd8f6f7a015} fields. On decode, it is filled in by \doxyref{th\_\-decode\_\-headerin()}{p.}{group__decfuncs_ga006d01d36fbe64768c571e6a12b7fc50}, and then passed to \doxyref{th\_\-decode\_\-alloc()}{p.}{group__decfuncs_ga0ef07a9a97849054aa606c595a2d807e}.
+
+Encoded Theora frames must be a multiple of 16 in size; this is what the \doxyref{frame\_\-width}{p.}{structth__info_a6b8087a4d831da53011a43b8d74087a0} and \doxyref{frame\_\-height}{p.}{structth__info_a6b1adc3a16a8336a72692b0a5937214c} members represent. To handle arbitrary picture sizes, a crop rectangle is specified in the \doxyref{pic\_\-x}{p.}{structth__info_a5b3f834bcf141564e7bb14f49101870f}, \doxyref{pic\_\-y}{p.}{structth__info_a8aacc575cab2dfe3735001c2ad32aa14}, \doxyref{pic\_\-width}{p.}{structth__info_a5048edf77b141dd3e9a92ca85e317345} and \doxyref{pic\_\-height}{p.}{structth__info_a775178474283c5990ba73f9ba7f6b88b} members.
+
+All frame buffers contain pointers to the full, padded frame. However, the current encoder {\itshape will not\/} reference pixels outside of the cropped picture region, and the application does not need to fill them in. The decoder {\itshape will\/} allocate storage for a full frame, but the application {\itshape should not\/} rely on the padding containing sensible data.
+
+It is also generally recommended that the offsets and sizes should still be multiples of 2 to avoid chroma sampling shifts when chroma is sub-\/sampled. See {\tt the Theora specification}, Section 4.4, for more details.
+
+Frame rate, in frames per second, is stored as a rational fraction, as is the pixel aspect ratio. Note that this refers to the aspect ratio of the individual pixels, not of the overall frame itself. The frame aspect ratio can be computed from pixel aspect ratio using the image dimensions. 
+
+\subsection{Field Documentation}
+\index{th\_\-info@{th\_\-info}!aspect\_\-denominator@{aspect\_\-denominator}}
+\index{aspect\_\-denominator@{aspect\_\-denominator}!th_info@{th\_\-info}}
+\subsubsection[{aspect\_\-denominator}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::aspect\_\-denominator}}\label{structth__info_a04c0bd477222d747a76085d8720322e2}
+\index{th\_\-info@{th\_\-info}!aspect\_\-numerator@{aspect\_\-numerator}}
+\index{aspect\_\-numerator@{aspect\_\-numerator}!th_info@{th\_\-info}}
+\subsubsection[{aspect\_\-numerator}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::aspect\_\-numerator}}\label{structth__info_a5be65dac9f75e37864cf73dd543570cd}
+\index{th\_\-info@{th\_\-info}!colorspace@{colorspace}}
+\index{colorspace@{colorspace}!th_info@{th\_\-info}}
+\subsubsection[{colorspace}]{\setlength{\rightskip}{0pt plus 5cm}{\bf th\_\-colorspace} {\bf th\_\-info::colorspace}}\label{structth__info_a8c7828cd0e023e9d21108160d53659a6}
+
+
+The color space. \index{th\_\-info@{th\_\-info}!fps\_\-denominator@{fps\_\-denominator}}
+\index{fps\_\-denominator@{fps\_\-denominator}!th_info@{th\_\-info}}
+\subsubsection[{fps\_\-denominator}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::fps\_\-denominator}}\label{structth__info_aa619408f70c03935529f1d3eda7a3ec2}
+\index{th\_\-info@{th\_\-info}!fps\_\-numerator@{fps\_\-numerator}}
+\index{fps\_\-numerator@{fps\_\-numerator}!th_info@{th\_\-info}}
+\subsubsection[{fps\_\-numerator}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::fps\_\-numerator}}\label{structth__info_a20606e61676f585a7e59cfc96de190a5}
+\index{th\_\-info@{th\_\-info}!frame\_\-height@{frame\_\-height}}
+\index{frame\_\-height@{frame\_\-height}!th_info@{th\_\-info}}
+\subsubsection[{frame\_\-height}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::frame\_\-height}}\label{structth__info_a6b1adc3a16a8336a72692b0a5937214c}
+
+
+The encoded frame height. This must be a multiple of 16, and less than 1048576. \index{th\_\-info@{th\_\-info}!frame\_\-width@{frame\_\-width}}
+\index{frame\_\-width@{frame\_\-width}!th_info@{th\_\-info}}
+\subsubsection[{frame\_\-width}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::frame\_\-width}}\label{structth__info_a6b8087a4d831da53011a43b8d74087a0}
+
+
+The encoded frame width. This must be a multiple of 16, and less than 1048576. \index{th\_\-info@{th\_\-info}!keyframe\_\-granule\_\-shift@{keyframe\_\-granule\_\-shift}}
+\index{keyframe\_\-granule\_\-shift@{keyframe\_\-granule\_\-shift}!th_info@{th\_\-info}}
+\subsubsection[{keyframe\_\-granule\_\-shift}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf th\_\-info::keyframe\_\-granule\_\-shift}}\label{structth__info_a693ca4ab11fbc0c3f32594b4bb8766ed}
+
+
+The amount to shift to extract the last keyframe number from the granule position. This can be at most 31. \doxyref{th\_\-info\_\-init()}{p.}{group__basefuncs_ga430d9c605816a6ca0bdce3a0b965b926} will set this to a default value (currently {\ttfamily 6}, which is good for streaming applications), but you can set it to 0 to make every frame a keyframe. The maximum distance between key frames is {\ttfamily 1$<$$<$\doxyref{keyframe\_\-granule\_\-shift}{p.}{structth__info_a693ca4ab11fbc0c3f32594b4bb8766ed}}. The keyframe frequency can be more finely controlled with \doxyref{TH\_\-ENCCTL\_\-SET\_\-KEYFRAME\_\-FREQUENCY\_\-FORCE}{p.}{theoraenc_8h_a27e755e15b4b5604c54974b304037a49}, which can also be adjusted during encoding (for example, to force the next frame to be a keyframe), but it cannot be set larger than the amount permitted by this field after the headers have been output. \index{th\_\-info@{th\_\-info}!pic\_\-height@{pic\_\-height}}
+\index{pic\_\-height@{pic\_\-height}!th_info@{th\_\-info}}
+\subsubsection[{pic\_\-height}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::pic\_\-height}}\label{structth__info_a775178474283c5990ba73f9ba7f6b88b}
+
+
+The displayed picture height. This must be no larger than height. \index{th\_\-info@{th\_\-info}!pic\_\-width@{pic\_\-width}}
+\index{pic\_\-width@{pic\_\-width}!th_info@{th\_\-info}}
+\subsubsection[{pic\_\-width}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::pic\_\-width}}\label{structth__info_a5048edf77b141dd3e9a92ca85e317345}
+
+
+The displayed picture width. This must be no larger than width. \index{th\_\-info@{th\_\-info}!pic\_\-x@{pic\_\-x}}
+\index{pic\_\-x@{pic\_\-x}!th_info@{th\_\-info}}
+\subsubsection[{pic\_\-x}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::pic\_\-x}}\label{structth__info_a5b3f834bcf141564e7bb14f49101870f}
+
+
+The X offset of the displayed picture. This must be no larger than \doxyref{frame\_\-width}{p.}{structth__info_a6b8087a4d831da53011a43b8d74087a0}-\/\doxyref{pic\_\-width}{p.}{structth__info_a5048edf77b141dd3e9a92ca85e317345} or 255, whichever is smaller. \index{th\_\-info@{th\_\-info}!pic\_\-y@{pic\_\-y}}
+\index{pic\_\-y@{pic\_\-y}!th_info@{th\_\-info}}
+\subsubsection[{pic\_\-y}]{\setlength{\rightskip}{0pt plus 5cm}ogg\_\-uint32\_\-t {\bf th\_\-info::pic\_\-y}}\label{structth__info_a8aacc575cab2dfe3735001c2ad32aa14}
+
+
+The Y offset of the displayed picture. This must be no larger than \doxyref{frame\_\-height}{p.}{structth__info_a6b1adc3a16a8336a72692b0a5937214c}-\/\doxyref{pic\_\-height}{p.}{structth__info_a775178474283c5990ba73f9ba7f6b88b}, and \doxyref{frame\_\-height}{p.}{structth__info_a6b1adc3a16a8336a72692b0a5937214c}-\/\doxyref{pic\_\-height}{p.}{structth__info_a775178474283c5990ba73f9ba7f6b88b}-\/\doxyref{pic\_\-y}{p.}{structth__info_a8aacc575cab2dfe3735001c2ad32aa14} must be no larger than 255. This slightly funny restriction is due to the fact that the offset is specified from the top of the image for consistency with the standard graphics left-\/handed coordinate system used throughout this API, while it is stored in the encoded stream as an offset from the bottom. \index{th\_\-info@{th\_\-info}!pixel\_\-fmt@{pixel\_\-fmt}}
+\index{pixel\_\-fmt@{pixel\_\-fmt}!th_info@{th\_\-info}}
+\subsubsection[{pixel\_\-fmt}]{\setlength{\rightskip}{0pt plus 5cm}{\bf th\_\-pixel\_\-fmt} {\bf th\_\-info::pixel\_\-fmt}}\label{structth__info_a2301388ef3755c41ab12fd144c1fc54e}
+
+
+The pixel format. \index{th\_\-info@{th\_\-info}!quality@{quality}}
+\index{quality@{quality}!th_info@{th\_\-info}}
+\subsubsection[{quality}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf th\_\-info::quality}}\label{structth__info_aa4cdcf96cb46b256821993e9a830ee02}
+
+
+The target quality level. Valid values range from 0 to 63, inclusive, with higher values giving higher quality. If initializing an encoder with this struct, and \doxyref{target\_\-bitrate}{p.}{structth__info_a1d9c8d768a4ae623269f5bd8f6f7a015} is set to zero, VBR encoding at this quality will be activated by default. \index{th\_\-info@{th\_\-info}!target\_\-bitrate@{target\_\-bitrate}}
+\index{target\_\-bitrate@{target\_\-bitrate}!th_info@{th\_\-info}}
+\subsubsection[{target\_\-bitrate}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf th\_\-info::target\_\-bitrate}}\label{structth__info_a1d9c8d768a4ae623269f5bd8f6f7a015}
+
+
+The target bit-\/rate in bits per second. If initializing an encoder with this struct, set this field to a non-\/zero value to activate CBR encoding by default. \index{th\_\-info@{th\_\-info}!version\_\-major@{version\_\-major}}
+\index{version\_\-major@{version\_\-major}!th_info@{th\_\-info}}
+\subsubsection[{version\_\-major}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char {\bf th\_\-info::version\_\-major}}\label{structth__info_a60b3e2cac006fee0e105a918d6a5a9f9}
+\index{th\_\-info@{th\_\-info}!version\_\-minor@{version\_\-minor}}
+\index{version\_\-minor@{version\_\-minor}!th_info@{th\_\-info}}
+\subsubsection[{version\_\-minor}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char {\bf th\_\-info::version\_\-minor}}\label{structth__info_abb1d4887a8079c6c5aaa6d7229f243d7}
+\index{th\_\-info@{th\_\-info}!version\_\-subminor@{version\_\-subminor}}
+\index{version\_\-subminor@{version\_\-subminor}!th_info@{th\_\-info}}
+\subsubsection[{version\_\-subminor}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char {\bf th\_\-info::version\_\-subminor}}\label{structth__info_abfacc79b7cabae12b6ac2484f76602d3}
+
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+{\bf codec.h}\end{DoxyCompactItemize}

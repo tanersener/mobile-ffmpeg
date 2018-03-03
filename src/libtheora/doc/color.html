@@ -1,0 +1,602 @@
+<HTML>
+<HEAD><TITLE>xiph.org: Ogg Theora documentation</TITLE></HEAD>
+<BODY BGCOLOR="#FFFFFF" TEXT="#202020" LINK="#006666" VLINK="#000000">
+<H1><FONT COLOR="#000070">
+Ogg Theora I specification: color space conventions
+</FONT></H1>
+<H1>Overview</H1>
+<P>
+There are a large number of different color standards used in digital video.
+Since Theora is a lossy codec, it restricts itself to only a few of them to
+ simplify playback.
+Unlike the alternate method of describing all the parameters of the color
+ model, this allows a few dedicated routines for color conversion to be written
+ and heavily optimized in a decoder.
+More flexible conversion functions should instead be specified in an encoder,
+ where additional computational complexity is more easily tolerated.
+The color spaces were selected to give a fair representation of color standards
+ in use around the world today.
+Most of the standards that do not exactly match one of these can be converted
+ to one fairly easily.
+</P>
+<P>
+The Theora codec identification header contains an 8-bit value that describes
+ the color space.
+This merely selects one of the color spaces available from an enumerated list.
+Currently, only two color spaces are defined, with a third possibility that
+ indicates the color space is "unknown".
+All of them are Y'C<SUB>b</SUB>C<SUB>r</SUB> color spaces with one luma channel
+ and two chroma channels.
+Each channel contains 8-bit discrete values in the range 0-255, which represent
+ non-linear gamma pre-corrected signals.
+</P>
+<H2>color space parameters</H2>
+<P>
+The parameters which describe each color space are listed below.
+These are the parameters needed to map colors from the encoded
+ Y'C<SUB>b</SUB>C<SUB>r</SUB> representation to the device-independent color
+ space CIE XYZ (1931).
+</P>
+<DL>
+<DT>Y'C<SUB>b</SUB>C<SUB>r</SUB> to Y'P<SUB>b</SUB>P<SUB>r</SUB></DT>
+<DD>
+<P>
+This conversion takes 8-bit discrete values in the range 0-255 and maps them to
+ real values in the range [0,1] for Y and [-1/2,1/2] for P<SUB>b</SUB>
+ and P<SUB>r</SUB>.
+Because some values may fall outside the offset and excursion defined for each
+ channel in the Y'C<SUB>b</SUB>C<SUB>r</SUB> space, the results may fall
+ outside these ranges in Y'P<SUB>b</SUB>P<SUB>r</SUB> space.
+No clamping should be done at this stage.
+</P>
+<P>
+Parameters: <EM>Offset<SUB>Y,C<SUB>b</SUB>,C<SUB>r</SUB></SUB></EM>,
+ <EM>Excursion<SUB>Y,C<SUB>b</SUB>,C<SUB>r</SUB>,</SUB></EM>
+</P>
+<TABLE>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">Y'<SUB>out</SUB></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">
+(Y'<SUB>in</SUB>-<EM>Offset<SUB>Y</SUB></EM>)/
+ <EM>Excursion<SUB>Y</SUB></EM>
+</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">P<SUB>b</SUB></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">
+(C<SUB>b</SUB>-<EM>Offset<SUB>C<SUB>b</SUB></SUB></EM>)/
+ <EM>Excursion<SUB>C<SUB>b</SUB></SUB></EM>
+</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">P<SUB>r</SUB></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">
+(C<SUB>r</SUB>-<EM>Offset<SUB>C<SUB>r</SUB></SUB></EM>)/
+ <EM>Excursion<SUB>C<SUB>r</SUB></SUB></EM>
+</TD>
+</TR>
+</TABLE>
+</DD>
+<DT>Y'P<SUB>b</SUB>P<SUB>r</SUB> to R'G'B'</DT>
+<DD>
+<P>
+This conversion takes the one luma and two chroma channel representation and
+ maps it to the non-linear R'G'B' space used to drive actual output devices.
+Values should be clamped into the range [0,1] after this stage.
+<P>
+Parameters: <EM>K<SUB>b</SUB></EM>, <EM>K<SUB>r</SUB></EM>
+</P>
+<TABLE>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">R'</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">Y' + 2(1-<EM>K<SUB>r</SUB></EM>)P<SUB>r</SUB></TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">G'</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">
+Y' +
+ 2((<EM>K<SUB>b</SUB></EM>-1)<EM>K<SUB>b</SUB></EM>/
+ (1-<EM>K<SUB>b</SUB></EM>-<EM>K<SUB>r</SUB></EM>))P<SUB>b</SUB> +
+ 2((<EM>K<SUB>r</SUB></EM>-1)<EM>K<SUB>r</SUB></EM>/
+ (1-<EM>K<SUB>b</SUB></EM>-<EM>K<SUB>r</SUB></EM>))P<SUB>r</SUB>
+</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">B'</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">Y' + 2(1-<EM>K<SUB>b</SUB></EM>)P<SUB>b</SUB></TD>
+</TR>
+</TABLE>
+</DD>
+<DT>R'G'B' to RGB (Output device gamma correction)</DT>
+<DD>
+<P>
+This conversion takes the non-linear R'G'B' voltage levels and maps it to the
+ linear light levels produced by the actual output device.
+Note that this conversion is only that of the output device, and its inverse is
+ <EM>not</EM> that used by the input device.
+Because a dim viewing environment is assumed in most television standards, the
+ overall gamma between the input and output devices is usually around 1.1 to
+ 1.2, and not a strict 1.0.
+</P>
+<P>
+For calibration with actual output devices, the model
+<TABLE>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">L</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">(E'+&Delta;)<SUP><EM>&gamma;</EM></SUP></TD>
+</TR>
+</TABLE>
+should be used, with &Delta; the free parameter and <EM>&gamma;</EM> held
+ fixed to the value specified in this document.
+The conversion function presented here is an idealized version with &Delta;=0.
+</P>
+<P>
+Parameters: <EM>&gamma;</EM>
+</P>
+<TABLE>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">R</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">R'<SUP><EM>&gamma;</EM></SUP></TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">G</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">G'<SUP><EM>&gamma;</EM></SUP></TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">B</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">B'<SUP><EM>&gamma;</EM></SUP></TD>
+</TR>
+</TABLE>
+</DD>
+<DT>RGB to R'G'B' (Input device gamma correction)</DT>
+<DD>
+<P>
+This conversion takes linear light levels and maps them to the non-linear
+ voltage levels used to drive the actual output device.
+This information is merely informative.
+It is not required for building a decoder or for converting between the various
+ formats and the actual output capabilities of a particular device.
+</P>
+<P>
+A linear segment is introduced on the low end to reduce noise in dark areas of
+ the image.
+The rest of the scale is adjusted so that the power segment of the curve
+ intersects the linear segment with the proper slope, and so that it still maps
+ 0 to 0 and 1 to 1.
+</P>
+<P>
+Parameters: <EM>&beta;</EM>, <EM>&alpha;</EM>, <EM>&delta;</EM>,
+ <EM>&epsilon;</EM>
+</P>
+<TABLE>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">R'</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">
+(1+<EM>&epsilon;</EM>)R<SUP>&beta;</SUP>-<EM>&epsilon;</EM>
+</TD>
+<TD>for <EM>&delta;</EM> &le; R &le; 1</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">R'</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT"><EM>&alpha;</EM>R</TD>
+<TD>for 0 &le; R &lt; <EM>&delta;</EM></TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">G'</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">
+(1+<EM>&epsilon;</EM>)G<SUP>&beta;</SUP>-<EM>&epsilon;</EM>
+</TD>
+<TD>for <EM>&delta;</EM> &le; G &le; 1</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">G'</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT"><EM>&alpha;</EM>G</TD>
+<TD>for 0 &le; G &lt; <EM>&delta;</EM></TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">B'</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">
+(1+<EM>&epsilon;</EM>)B<SUP>&beta;</SUP>-<EM>&epsilon;</EM>
+</TD>
+<TD>for <EM>&delta;</EM> &le; B &le; 1</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">B'</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT"><EM>&alpha;</EM>B</TD>
+<TD>for 0 &le; B &lt; <EM>&delta;</EM></TD>
+</TR>
+</TABLE>
+</DD>
+<DT>RGB to CIE XYZ (1931)</DT>
+<DD>
+<P>
+This conversion maps a device-dependent linear RGB space to the
+ device-independent linear CIE XYZ space.
+The parameters are the CIE chromaticity coordinates of the three primaries,
+ red, green, and blue, as well as the chromaticity coordinates of the white
+ point of the device.
+This is how hardware manufacturers and standards typically describe a
+ particular RGB space.
+The math required to convert these parameters into a useful transformation
+ matrix is reproduced below.
+</P>
+<P>
+Parameters: <EM>x<SUB>r,g,b,w</SUB></EM>, <EM>y<SUB>r,g,b,w</SUB></EM>
+</P>
+<TABLE>
+<TR>
+<TD ALIGN="RIGHT">F</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT"><TABLE><TR>
+<TD><FONT SIZE="300%">(</FONT></TD>
+<TD><TABLE>
+<TR>
+<TD ALIGN="CENTER"><EM>x<SUB>r</SUB></EM>/<EM>y<SUB>r</SUB></EM></TD>
+<TD ALIGN="CENTER"><EM>x<SUB>g</SUB></EM>/<EM>y<SUB>g</SUB></EM></TD>
+<TD ALIGN="CENTER"><EM>x<SUB>b</SUB></EM>/<EM>y<SUB>b</SUB></EM></TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">1</TD>
+<TD ALIGN="CENTER">1</TD>
+<TD ALIGN="CENTER">1</TD>
+</TR>
+<TR>
+<TD ALIGN="CENTER">
+(1-<EM>x<SUB>r</SUB></EM>-<EM>y<SUB>r</SUB></EM>)/<EM>y<SUB>r</SUB></EM>
+</TD>
+<TD ALIGN="CENTER">
+(1-<EM>x<SUB>g</SUB></EM>-<EM>y<SUB>g</SUB></EM>)/<EM>y<SUB>g</SUB></EM>
+</TD>
+<TD ALIGN="CENTER">
+(1-<EM>x<SUB>b</SUB></EM>-<EM>y<SUB>b</SUB></EM>)/<EM>y<SUB>b</SUB></EM>
+</TD>
+</TR>
+</TABLE></TD>
+<TD<FONT SIZE="300%">)</FONT></TD>
+</TR></TABLE></TD>
+</TR>
+<TR>
+<TD ALIGN="RIGHT"><TABLE><TR>
+<TD><FONT SIZE="300%">(</FONT></TD>
+<TD><TABLE>
+<TR><TD ALIGN="CENTER">s<SUB>r</SUB></TD></TR>
+<TR><TD ALIGN="CENTER">s<SUB>g</SUB></TD></TR>
+<TR><TD ALIGN="CENTER">s<SUB>b</SUB></TD></TR>
+</TABLE></TD>
+<TD><FONT SIZE="300%">)</FONT></TD>
+</TR></TABLE></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT"><TABLE><TR>
+<TD>F<SUP>-1</SUP><FONT SIZE="300%">(</FONT></TD>
+<TD><TABLE>
+<TR><TD ALIGN="CENTER"><EM>x<SUB>w</SUB></EM>/<EM>y<SUB>w</SUB></EM></TD></TR>
+<TR><TD ALIGN="CENTER">1</TD></TR>
+<TR><TD ALIGN="CENTER">
+(1-<EM>x<SUB>w</SUB></EM>-<EM>y<SUB>w</SUB></EM>)/<EM>y<SUB>w</SUB></EM>
+</TD></TR>
+</TABLE></TD>
+<TD><FONT SIZE="300%">)</FONT></TD>
+</TR></TABLE></TD>
+</TR>
+<TR>
+<TD ALIGN="RIGHT"><TABLE><TR>
+<TD><FONT SIZE="300%">(</FONT></TD>
+<TD><TABLE>
+<TR><TD ALIGN="CENTER">X</TD></TR>
+<TR><TD ALIGN="CENTER">Y</TD></TR>
+<TR><TD ALIGN="CENTER">Z</TD></TR>
+</TABLE></TD>
+<TD><FONT SIZE="300%">)</FONT></TD>
+</TR></TABLE></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT"><TABLE><TR>
+<TD>F<FONT SIZE="300%">(</FONT></TD>
+<TD><TABLE>
+<TR><TD ALIGN="CENTER">s<SUB>r</SUB>R</TD></TR>
+<TR><TD ALIGN="CENTER">s<SUB>g</SUB>G</TD></TR>
+<TR><TD ALIGN="CENTER">s<SUB>b</SUB>B</TD></TR>
+</TABLE></TD>
+<TD><FONT SIZE="300%">)</FONT></TD>
+</TR></TABLE></TD>
+</TR>
+</TABLE>
+</DD>
+</DL>
+<H2>available color spaces</H2>
+<P>
+These are the color spaces currently defined for use by Ogg Theora video.
+Each one has a short name, with which it is referred to in this document, and
+ a more detailed specification of the standards from which its parameters are
+ derived.
+Some standards do not specify all the parameters necessary.
+For these unspecified parameters, this document serves as the definition of
+ what should be used when encoding or decoding Ogg Theora video.
+<H3>Rec 470M (Rec. ITU-R BT.470-6 System M/NTSC with Rec. ITU-R BT.601-5)</H3>
+<P>
+This color space is used by broadcast television and DVDs in much of the
+ Americas, Japan, Korea, and the Union of Myanmar
+ [<A HREF="#Rec470">Rec470</A>].
+This color space may also be used for System M/PAL (Brazil), with an
+ appropriate conversion supplied by the encoder to compensate for the
+ different gamma value.
+See the Rec 470BG section for an appropriate gamma value to assume for M/PAL
+ input.
+</P>
+<P>
+In the US, studio monitors are adjusted to a D65 white point
+ (<EM>x<SUB>w</SUB></EM>,<EM>y<SUB>w</SUB></EM>=0.313,0.329).
+In Japan, studio monitors are adjusted to a D white of 9300K
+ (<EM>x<SUB>w</SUB></EM>,<EM>y<SUB>w</SUB></EM>=0.285,0.293).
+</P>
+<P>
+Rec 470 does not specify a digital encoding of the color signals.
+For Ogg Theora, Rec. ITU-R BT.601-5 is used, starting from the R'G'B' signals
+ specified by Rec 470 [<A HREF="#Rec601">Rec601</A>].
+</P>
+<P>
+<P>
+Rec 470 does not specify an input gamma function.
+For Ogg Theora, the Rec 709 input function is used.
+This is the same as that specified by SMPTE 170M, which claims to reflect
+ modern practice in the creation of NTSC signals (c. 1994)
+ [<A HREF="#SMPTE170M">SMPTE170M</A>].
+</P>
+<H4>parameters</H4>
+<TABLE>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>Offset<SUB>Y,C<SUB>b</SUB>,C<SUB>r</SUB></SUB></EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT" COLSPAN="2">(16,128,128)</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">
+<EM>Excursion<SUB>Y,C<SUB>b</SUB>,C<SUB>r</SUB></SUB></EM>
+</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT" COLSPAN="2">(219,224,224)</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>K<SUB>b</SUB></EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT" COLSPAN="2">0.114</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>K<SUB>r</SUB></EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT" COLSPAN="2">0.299</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&gamma;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">2.2</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&beta;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">0.45</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&alpha;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">4.5</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&delta;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">0.018</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&epsilon;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">0.099</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>x<SUB>r</SUB></EM>,<EM>y<SUB>r</SUB></EM></TD>
+<TD>=</TD>
+<TD>0.67,</TD>
+<TD>0.33</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>x<SUB>g</SUB></EM>,<EM>y<SUB>g</SUB></EM></TD>
+<TD>=</TD>
+<TD>0.21,</TD>
+<TD>0.71</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>x<SUB>b</SUB></EM>,<EM>y<SUB>b</SUB></EM></TD>
+<TD>=</TD>
+<TD>0.14,</TD>
+<TD>0.08</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">
+(Illuminant C) <EM>x<SUB>w</SUB></EM>,<EM>y<SUB>w</SUB></EM>
+</TD>
+<TD>=</TD>
+<TD>0.310,</TD>
+<TD>0.316</TD>
+</TR>
+</TABLE>
+<H3>
+Rec 470BG (Rec. ITU-R BT.470-6 Systems B and G with Rec. ITU-R BT.601-5)
+</H3>
+<P>
+This color space is used by the PAL and SECAM systems in much of the rest of
+ the world [<A HREF="#Rec470">Rec470</A>].
+This can be used directly by systems (B, B1, D, D1, G, H, I, K, N)/PAL and (B,
+ D, G, H, K, K1, L)/SECAM.
+</P>
+<P>
+Note that the Rec 470BG chromaticity values are different from those specified
+ in Rec 470M.
+When PAL and SECAM systems were first designed, they were based upon the same
+ primaries as NTSC.
+However, as methods of making color picture tubes have changed, the primaries
+ used have changed as well.
+The US recommends using correction circuitry to approximate the existing,
+ standard NTSC primaries.
+Current PAL and SECAM systems have standardized on primaries in accord with
+ more recent technology.
+</P>
+<P>
+Rec 470 provisionally permits the use of the NTSC chromaticity values (given
+ above) with legacy PAL and SECAM equipment.
+In Ogg Theora, material must be decoded assuming the new PAL and SECAM
+ primaries.
+Material intended for display on old legacy devices should be converted by the
+ decoder.
+</P>
+<P>
+The official Rec 470BG specifies a gamma value of <EM>&gamma;</EM>=2.8.
+However, in practice this value is unrealistically high
+ [<A HREF="#RefPoy97">Poy97</A>].
+Rec 470BG states that the overall system gamma should be approximately
+ <EM>&gamma;</EM>/<EM>&beta;</EM>=1.2.
+However, most cameras pre-correct with a gamma value of <EM>&beta;</EM>=0.45,
+ which suggests an output device gamma of approximately <EM>&gamma;</EM>=2.67.
+This is the value recommended for use with PAL systems in Ogg Theora.
+</P>
+<P>
+Rec 470 does not specify a digital encoding of the color signals.
+For Ogg Theora, Rec. ITU-R BT.601-5 is used, starting from the R'G'B' signals
+ specified by Rec 470 [<A HREF="#Rec601">Rec601</A>].
+</P>
+<P>
+Rec 470 does not specify an input gamma function.
+For Ogg Theora, the Rec 709 input function is used.
+</P>
+<H4>parameters</H4>
+<TABLE>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>Offset<SUB>Y,C<SUB>b</SUB>,C<SUB>r</SUB></SUB></EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT" COLSPAN="2">(16,128,128)</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">
+<EM>Excursion<SUB>Y,C<SUB>b</SUB>,C<SUB>r</SUB></SUB></EM>
+</TD>
+<TD>=</TD>
+<TD ALIGN="LEFT" COLSPAN="2">(219,224,224)</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>K<SUB>b</SUB></EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT" COLSPAN="2">0.114</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>K<SUB>r</SUB></EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT" COLSPAN="2">0.299</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&gamma;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">2.67</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&beta;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">0.45</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&alpha;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">4.5</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&delta;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">0.018</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>&epsilon;</EM></TD>
+<TD>=</TD>
+<TD ALIGN="LEFT">0.099</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>x<SUB>r</SUB></EM>,<EM>y<SUB>r</SUB></EM></TD>
+<TD>=</TD>
+<TD>0.64,</TD>
+<TD>0.33</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>x<SUB>g</SUB></EM>,<EM>y<SUB>g</SUB></EM></TD>
+<TD>=</TD>
+<TD>0.29,</TD>
+<TD>0.60</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT"><EM>x<SUB>b</SUB></EM>,<EM>y<SUB>b</SUB></EM></TD>
+<TD>=</TD>
+<TD>0.15,</TD>
+<TD>0.06</TD>
+</TR>
+<TR VALIGN="BOTTOM">
+<TD ALIGN="RIGHT">
+(D65) <EM>x<SUB>w</SUB></EM>,<EM>y<SUB>w</SUB></EM>
+</TD>
+<TD>=</TD>
+<TD>0.313,</TD>
+<TD>0.329</TD>
+</TR>
+</TABLE>
+<H2>references</H2>
+<DL>
+<DT>[<A NAME="Poy97">Poy97</A>]</DT>
+<DD>
+Poynton, Charles, <I>Frequently-Asked Questions about Gamma</I>.
+ <A HREF="http://www.poynton.com/GammaFAQ.html">http://www.poynton.com/GammaFAQ/html</A>,
+ Feb. 1997.
+</DD>
+<DT>[<A NAME="Rec470">Rec470</A>]</DT>
+<DD>
+Recommendation ITU-R BT.470-6, <I>Conventional Television Systems</I>
+ (1970, revised 1998). International Telecommunications Union, 1211 Geneva 20,
+ Switzerland.
+</DD>
+<DT>[<A NAME="Rec601">Rec601</A>]</DT>
+<DD>
+Recommendation ITU-R BT.601-5, <I>Studio Encoding Parameters of
+ Digital Television for Standard 4:3 and Wide-Screen 16:9 Aspect Ratios</I>
+ (1982, revised 1995). International Telecommunications Union, 1211 Geneva 20,
+ Switzerland.
+</DD>
+<DT>[<A NAME="Rec709">Rec709</A>]</DT>
+<DD>
+Recommendation ITU-R BT.709-5, <I>Parameter values for the
+ HDTV standards for production and international programme exchange</I>
+ (1990, revised 2002). International Telecommunications Union, 1211 Geneva 20,
+ Switzerland.
+</DD>
+<DT>[<A NAME="SMPTE170M">SMPTE170M</A>]</DT>
+<DD>
+Society of Motion Picture and Television Engineers, <I>Television &mdash;
+ Composite Analog Video Signal &mdash; NTSC for Studio Applications</I>.
+ SMPTE-170M, 1994
+</DD>
+<DT>[<A NAME="SMPTE240M">SMPTE240M</A>]</DT>
+<DD>
+Society of Motion Picture and Television Engineers, <I>Television &mdash;
+ Signal Parameters &mdash; 1125-Line High-Definition Production</I>.
+ SMPTE-240M, 1999.
+</DD>
+</DL>
+</BODY>
+</HTML>

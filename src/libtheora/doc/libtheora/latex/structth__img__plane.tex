@@ -1,0 +1,49 @@
+\section{th\_\-img\_\-plane Struct Reference}
+\label{structth__img__plane}\index{th\_\-img\_\-plane@{th\_\-img\_\-plane}}
+
+
+A buffer for a single color plane in an uncompressed image.  
+
+
+{\ttfamily \#include $<$codec.h$>$}\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+int {\bf width}
+\begin{DoxyCompactList}\small\item\em The width of this plane. \item\end{DoxyCompactList}\item 
+int {\bf height}
+\begin{DoxyCompactList}\small\item\em The height of this plane. \item\end{DoxyCompactList}\item 
+int {\bf stride}
+\begin{DoxyCompactList}\small\item\em The offset in bytes between successive rows. \item\end{DoxyCompactList}\item 
+unsigned char $\ast$ {\bf data}
+\begin{DoxyCompactList}\small\item\em A pointer to the beginning of the first row. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A buffer for a single color plane in an uncompressed image. This contains the image data in a left-\/to-\/right, top-\/down format. Each row of pixels is stored contiguously in memory, but successive rows need not be. Use {\itshape stride\/} to compute the offset of the next row. The encoder accepts both positive {\itshape stride\/} values (top-\/down in memory) and negative (bottom-\/up in memory). The decoder currently always generates images with positive strides. 
+
+\subsection{Field Documentation}
+\index{th\_\-img\_\-plane@{th\_\-img\_\-plane}!data@{data}}
+\index{data@{data}!th_img_plane@{th\_\-img\_\-plane}}
+\subsubsection[{data}]{\setlength{\rightskip}{0pt plus 5cm}unsigned char$\ast$ {\bf th\_\-img\_\-plane::data}}\label{structth__img__plane_af8133681516ce88b5a201c1b4b7e6ba2}
+
+
+A pointer to the beginning of the first row. \index{th\_\-img\_\-plane@{th\_\-img\_\-plane}!height@{height}}
+\index{height@{height}!th_img_plane@{th\_\-img\_\-plane}}
+\subsubsection[{height}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf th\_\-img\_\-plane::height}}\label{structth__img__plane_a21aea1367894468de489d529d7eaf44d}
+
+
+The height of this plane. \index{th\_\-img\_\-plane@{th\_\-img\_\-plane}!stride@{stride}}
+\index{stride@{stride}!th_img_plane@{th\_\-img\_\-plane}}
+\subsubsection[{stride}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf th\_\-img\_\-plane::stride}}\label{structth__img__plane_ab1100f071ffee3b37e07e3222f819bad}
+
+
+The offset in bytes between successive rows. \index{th\_\-img\_\-plane@{th\_\-img\_\-plane}!width@{width}}
+\index{width@{width}!th_img_plane@{th\_\-img\_\-plane}}
+\subsubsection[{width}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf th\_\-img\_\-plane::width}}\label{structth__img__plane_a58cc297a99cd4594c3d30e56f2ed6b74}
+
+
+The width of this plane. 
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+{\bf codec.h}\end{DoxyCompactItemize}

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="windows-1250"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="libvorbis"
+	>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalIncludeDirectories="&quot;..\..\..\..\libvorbis-$(LIBVORBIS_VERSION)\include&quot;;..\..\..\..\vorbis\include;..\..\..\..\..\..\vorbis\libs\libvorbis\include"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		AdditionalLibraryDirectories="&quot;..\..\..\..\libvorbis-$(LIBVORBIS_VERSION)\win32\VS2005\$(PlatformName)\$(ConfigurationName)&quot;;&quot;..\..\..\..\vorbis\win32\VS2005\$(PlatformName)\$(ConfigurationName)&quot;;&quot;..\..\..\..\..\..\vorbis\libs\libvorbis\win32\VS2005\$(PlatformName)\$(ConfigurationName)&quot;"
+	/>
+	<UserMacro
+		Name="LIBVORBIS_VERSION"
+		Value="1.2.2"
+	/>
+</VisualStudioPropertySheet>

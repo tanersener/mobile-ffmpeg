@@ -1,0 +1,22 @@
+libtheora has libogg as a dependency, and for examples, also 
+libvorbis, therefore you need to have libogg and libvorbis
+compiled beforehand.
+
+Lets say you have libogg, libvorbis and libtheora in the same directory:
+
+libogg-1.1.4 
+libvorbis-1.2.2
+libtheora-1.0
+
+Because there is no automatic library detection you have to,
+either:
+
+1. Rename libogg-1.1.4 to libogg, and libvorbis-1.2.2 to libvorbis.
+
+2. Open libogg.vsprops with a text editor (even notepad.exe
+will suffice) and see if LIBOGG_VERSION is set to the correct
+version, in this case "1.1.4".
+
+The same procedure should be done for libvorbis.vsprops and 
+check LIBVORBIS_VERSION for the correct version, in this 
+case "1.2.2".

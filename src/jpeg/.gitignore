@@ -1,0 +1,17 @@
+/.deps/
+/.libs/
+*.o
+*.lo
+*.pc
+/Makefile
+/cjpeg
+/config.log
+/config.status
+/djpeg
+/jconfig.h
+/jpegtran
+/libjpeg.la
+/libtool
+/rdjpgcom
+/stamp-h1
+/wrjpgcom

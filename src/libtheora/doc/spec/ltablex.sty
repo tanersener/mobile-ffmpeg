@@ -1,0 +1,237 @@
+%%
+%% This is file ltablex.sty  (v1.0, November 1995)
+%%
+%%
+%% Author: Anil K. Goel (akgoel@uwaterloo.ca)
+%%
+%%
+%% Copyright (C) QNX Software Systems Ltd. 1995
+%%               All rights reserved. 
+%% Please send any comments/suggetions to:   latex@qnx.com
+%%
+%% This system is distributed in the hope that it will be useful
+%% to others,  but WITHOUT ANY WARRANTY; without even the implied
+%% warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+%%
+%%
+%% The file modifies the tabularx environment to
+%% combine the features of the tabularx package
+%% (auto-sized columns in a fixed width table) 
+%% with those of the longtable package 
+%% (multi-page tables).
+%% 
+%% The tables are typeset using the tabularx environment
+%% and the longtable environment is used internally to
+%% handle multi-page tables. The \setlongtables feature
+%% is used, and, therefore, the document should be
+%% run through latex twice.
+%% 
+%% Another feature that has been added is to treat the X 
+%% columns like 'l' columns if the table contents would allow
+%% that to happen without exceeding the specified width of
+%% the table. In other words, the specified width is 
+%% treated as the maximum allowed and not the exact width 
+%% of the table. This feature is the default but can be 
+%% disabled (or enabled) with \keepXColumns (or \convertXColumns).
+%%
+%% Caveats:
+%%   . The document needs to be latexed a couple times in general.
+%%   . In general, it is necessary to remove the .aux file before
+%%     the first latex run on the document.
+%%   . The table should not be larger than TeX's memory capacity
+%%
+%%
+%% Here is a a simple usage example:
+%%
+%%
+%% \documentclass{article}
+%% 
+%% \usepackage{ltablex}
+%% 
+%% \textheight=4in
+%% 
+%% \begin{document}
+%% 
+%% % we want a table that is \textwidth long, has 4 columns, columns 1
+%% % and 3 are auto sized with the 3rd columns being 3 times wider than
+%% % the first column.
+%% %
+%% 
+%% 
+%% \begin{tabularx}{\linewidth}%
+%%  {|>{\setlength{\hsize}{.5\hsize}\raggedright\arraybackslash}X| % col 1; auto-sized ragged right
+%%     c|                                                        % col 2; default    centered
+%%     >{\setlength{\hsize}{1.5\hsize}\raggedleft\arraybackslash}X|% col 3; auto-sized ragged left
+%%     l|}                                                       % col 4; default    left-justified
+%% 
+%% \caption*{The Table Caption}\\
+%% \hline
+%% F-Head1 & F-Head2 & F-Head3 & F-Head4\\
+%% \hline
+%% \hline
+%% \endfirsthead
+%% \hline
+%% Head1 & Head2 & Head3 & Head4\\
+%% \hline
+%% \hline
+%% \endhead
+%% 
+%% \hline
+%% \hline
+%% Foot1 & Foot2 & Foot3 & Foot4\\
+%% \hline
+%% \endfoot
+%% 
+%% 
+%% \hline
+%% \hline
+%% L-Foot1 & L-Foot2 & L-Foot3 & L-Foot4\\
+%% \hline
+%% \endlastfoot
+%% 
+%% This is a very long sentence not likely to fit&
+%% not too long&
+%% This is another  very long sentence not likely to fit&
+%% not long\\
+%% 
+%% \hline
+%% filler & filler & filler & filler\\
+%% 
+%% \hline
+%% This is a very long sentence not likely to fit&
+%% not too long&
+%% This is another  very long sentence not likely to fit&
+%% not long\\
+%% 
+%% \hline
+%% This is a very long sentence not likely to fit&
+%% not too long&
+%% This is another  very long sentence not likely to fit&
+%% not long\\
+%% 
+%% \hline
+%% This is a very long sentence not likely to fit&
+%% not too long&
+%% This is another  very long sentence not likely to fit&
+%% not long\\
+%% 
+%% \end{tabularx}
+%% 
+%% \begin{tabularx}{\linewidth}{|c|X|c|}
+%% \hline
+%% a &convert X to l & b\\
+%% \hline
+%% \end{tabularx}
+%% 
+%% \keepXColumns
+%% \begin{tabularx}{\linewidth}{|c|X|c|}
+%% \hline
+%% a &retain X & b\\
+%% \hline
+%% \end{tabularx}
+%% 
+%% \convertXColumns
+%% \begin{tabularx}{\linewidth}{|c|X|c|}
+%% \hline
+%% a &convert X to l & b\\
+%% \hline
+%% \end{tabularx}
+%% 
+%% 
+%% \end{document}
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{ltablex}[1995/11/06 v1.0 Modified tabularx]
+
+\RequirePackage{longtable}[1994/12/08]
+\RequirePackage{tabularx}[1994/02/03]
+
+\newif\ifTX@convertX@
+\TX@convertX@true
+
+\newcommand\keepXColumns{
+  \TX@convertX@false
+}
+
+\newcommand\convertXColumns{
+  \TX@convertX@true
+}
+
+\renewcommand\TX@endtabularx{%
+  \expandafter\TX@newcol\expandafter{\tabularxcolumn{\TX@col@width}}%
+  \let\verb\TX@verb
+  \def\@elt##1{\global\value{##1}\the\value{##1}\relax}%
+  \edef\TX@ckpt{\cl@@ckpt}%
+  \let\@elt\relax
+  \TX@old@table=\maxdimen
+  \TX@col@width=\TX@target
+  \global\TX@cols=\@ne
+  \TX@typeout@
+    {\@spaces Table Width\@spaces Column Width\@spaces X Columns}%
+   
+  %
+  % define \endhead, etc. to be \\ so that in this part
+  % of the process they are just rows
+  %
+  \let\savecaption\caption
+  \def\caption{\\}
+  \let\saveendhead\endhead
+  \def\endhead{\\}
+  \let\saveendfirsthead\endfirsthead
+  \def\endfirsthead{\\}
+  \let\saveendfoot\endfoot
+  \def\endfoot{\\}
+  \let\saveendlastfoot\endlastfoot
+  \def\endlastfoot{\\}
+  %
+  %
+  \ifTX@convertX@
+    \TX@trial{\def\NC@rewrite@X{\NC@find l}}
+    \ifdim\wd\@tempboxa<\TX@target
+      \TX@newcol{l}
+    \else
+      \TX@convertX@false
+    \fi
+  \fi
+
+  \ifTX@convertX@
+    \relax
+  \else
+    \TX@trial{\def\NC@rewrite@X{%
+        \global\advance\TX@cols\@ne\NC@find p{\TX@col@width}}}%
+    \loop
+      \TX@arith
+      \ifTX@
+      \TX@trial{}%
+    \repeat
+  \fi
+  {\let\@footnotetext\TX@ftntext\let\@xfootnotenext\TX@xftntext
+    % we may as well set \LTchunksize to be \maxdimen as the whole
+    % thing is already in memory anyway so we may as well do it in one
+    % chunk. if it is too big for one chunk we are already dead.. 
+    \LTchunksize\maxdimen
+    % 
+    % restore \endhead, etc.
+    %
+    \let\caption\savecaption
+    \let\endhead\saveendhead
+    \let\endfirsthead\saveendfirsthead
+    \let\endfoot\saveendfoot
+    \let\endlastfoot\saveendlastfoot
+    %
+    \expandafter\longtable
+      \the\toks@
+    \endlongtable
+    }%
+  \global\TX@ftn\expandafter{\expandafter}\the\TX@ftn
+  \ifnum0=`{\fi}%
+   \end{tabularx}
+}
+
+
+%
+% activate column width reading from the .aux file
+%
+
+
+\setlongtables

@@ -1,0 +1,82 @@
+Name:		libtheora
+Version:	@VERSION@
+Release:	0.xiph.0.4.alpha5
+Summary:	The Theora Video Compression Codec.
+
+Group:		System Environment/Libraries
+License:	BSD
+URL:		http://www.theora.org/
+Vendor:		Xiph.org Foundation <team@xiph.org>
+Source:		http://downloads.xiph.org/releases/theora/%{name}-%{version}.tar.gz
+BuildRoot:	%{_tmppath}/%{name}-%{version}-root
+
+BuildRequires:	libogg-devel >= 2:1.1
+BuildRequires:	libvorbis-devel >= 1:1.0.1
+BuildRequires:	SDL-devel
+
+# this needs to be explicit since vorbis's .so versioning didn't get bumped
+# when going from 1.0 to 1.0.1
+Requires:       libvorbis >= 1:1.0.1
+
+%description
+Theora is Xiph.Org's first publicly released video codec, intended
+for use within the Ogg's project's Ogg multimedia streaming system.
+Theora is derived directly from On2's VP3 codec; Currently the two are
+nearly identical, varying only in encapsulating decoder tables in the
+bitstream headers, but Theora will make use of this extra freedom
+in the future to improve over what is possible with VP3.
+
+%package devel
+Summary:        Development tools for Theora applications.
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+Requires:       libogg-devel >= 2:1.1
+
+%description devel
+The libtheora-devel package contains the header files and documentation
+needed to develop applications with Ogg Theora.
+
+%prep
+%setup -q -n %{name}-%{version}
+
+%build
+%configure --enable-shared
+make
+
+%install
+rm -rf $RPM_BUILD_ROOT
+# make sure our temp doc build dir is removed
+rm -rf $(pwd)/__docs
+
+%makeinstall docdir=$(pwd)/__docs
+
+find $RPM_BUILD_ROOT -type f -name "*.la" -exec rm -f {} ';'
+
+%clean 
+rm -rf $RPM_BUILD_ROOT
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+%files
+%defattr(-,root,root)
+%doc COPYING README
+%{_libdir}/libtheora.so.*
+
+%files devel
+%defattr(-,root,root,-)
+%doc __docs/*
+%{_libdir}/libtheora.a
+%{_libdir}/libtheora.so
+%dir %{_includedir}/theora
+%{_includedir}/theora/codec.h
+%{_includedir}/theora/theora.h
+%{_includedir}/theora/theoradec.h
+%{_libdir}/pkgconfig/theora.pc
+
+%changelog
+* Sat Aug 20 2005 Ralph Giles <giles at xiph.org>
+- updated version for 1.0alpha5 release
+* Thu Jun 10 2004 Thomas Vander Stichele <thomas at apestaart dot org>
+- transported fedora.us spec file

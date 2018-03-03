@@ -1,0 +1,58 @@
+EXPORTS
+; Old alpha API
+	theora_version_string @ 1
+	theora_version_number @ 2
+
+	theora_decode_header @ 3
+	theora_decode_init @ 4
+	theora_decode_packetin @ 5
+	theora_decode_YUVout @ 6
+
+	theora_control @ 7
+
+	theora_packet_isheader @ 8
+	theora_packet_iskeyframe @ 9
+
+	theora_granule_shift @ 10
+	theora_granule_frame @ 11
+	theora_granule_time @ 12
+
+	theora_info_init @ 13
+	theora_info_clear @ 14
+
+	theora_clear @ 15
+
+	theora_comment_init @ 16
+	theora_comment_add @ 17
+	theora_comment_add_tag @ 18
+	theora_comment_query @ 19
+	theora_comment_query_count @ 20
+	theora_comment_clear @ 21
+
+; New theora-exp API
+	th_version_string @ 22
+	th_version_number @ 23
+
+	th_decode_headerin @ 24
+	th_decode_alloc @ 25
+	th_setup_free @ 26
+	th_decode_ctl @ 27
+	th_decode_packetin @ 28
+	th_decode_ycbcr_out @ 29
+	th_decode_free @ 30
+
+	th_packet_isheader @ 31
+	th_packet_iskeyframe @ 32
+
+	th_granule_frame @ 33
+	th_granule_time @ 34
+
+	th_info_init @ 35
+	th_info_clear @ 36
+
+	th_comment_init @ 37
+	th_comment_add @ 38
+	th_comment_add_tag @ 39
+	th_comment_query @ 40
+	th_comment_query_count @ 41
+	th_comment_clear @ 42

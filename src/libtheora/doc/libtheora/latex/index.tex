@@ -1,0 +1,12 @@
+\section{Introduction}\label{index_intro}
+This is the documentation for {\ttfamily libtheora} C API. The current reference implementation for {\tt Theora}, a free, patent-\/unencumbered video codec. Theora is derived from On2's VP3 codec with additional features and integration with Ogg multimedia formats by {\tt the Xiph.Org Foundation}. Complete documentation of the format itself is available in {\tt the Theora specification}.\subsection{Organization}\label{index_Organization}
+The functions documented here are actually subdivided into three separate libraries:
+\begin{DoxyItemize}
+\item {\ttfamily libtheoraenc} contains the encoder interface, described in \doxyref{Functions for Encoding}{p.}{group__encfuncs}.
+\item {\ttfamily libtheoradec} contains the decoder interface and routines shared with the encoder. You must also link to this if you link to {\ttfamily libtheoraenc}. The routines in this library are described in \doxyref{Functions for Decoding}{p.}{group__decfuncs} and \doxyref{Functions Shared by Encode and Decode}{p.}{group__basefuncs}.
+\item {\ttfamily libtheora} contains the \doxyref{Legacy pre-\/1.0 C API}{p.}{group__oldfuncs}.
+\end{DoxyItemize}
+
+New code should link to {\ttfamily libtheoradec} and, if using encoder features, {\ttfamily libtheoraenc}. Together these two export both the standard and the legacy API, so this is all that is needed by any code. The older {\ttfamily libtheora} library is provided just for compatibility with older build configurations.
+
+In general the recommended 1.x API symbols can be distinguished by their {\ttfamily th\_\-} or {\ttfamily TH\_\-} namespace prefix. The older, legacy API uses {\ttfamily theora\_\-} or {\ttfamily OC\_\-} prefixes instead. 

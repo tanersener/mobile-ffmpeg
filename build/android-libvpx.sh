@@ -5,17 +5,17 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-if [[ -z $ANDROID_NDK ]]; then
+if [[ -z ${ANDROID_NDK} ]]; then
     echo "ANDROID_NDK not defined"
     exit 1
 fi
 
-if [[ -z $ARCH ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
 
-if [[ -z $API ]]; then
+if [[ -z ${API} ]]; then
     echo "API not defined"
     exit 1
 fi
@@ -32,7 +32,7 @@ CXXFLAGS=$(android_get_cxxflags)
 LDFLAGS=$(android_get_ldflags "libvpx")
 
 OPTIONAL_CPU_SUPPORT=""
-case $ARCH in
+case ${ARCH} in
     arm)
         SUPPORTED_CPU="armv7"
     ;;
@@ -46,7 +46,7 @@ cd $1/src/libvpx || exit 1
 make clean
 
 ./configure \
-    --prefix=$ANDROID_NDK/prebuilt/android-$ARCH/libvpx \
+    --prefix=${ANDROID_NDK}/prebuilt/android-${ARCH}/libvpx \
     --target="${SUPPORTED_CPU}-android-gcc" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \

@@ -1,0 +1,39 @@
+#include <windows.h>
+
+/*See "VERSIONINFO Resource" in MSDN,
+  http://msdn2.microsoft.com/en-us/library/Aa381058.aspx */
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION TH_VERSION_FIELD
+PRODUCTVERSION TH_VERSION_FIELD
+FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+#if defined(_DEBUG)
+FILEFLAGS VS_FF_DEBUG
+#else
+FILEFLAGS 0
+#endif
+FILEOS VOS__WINDOWS32
+FILETYPE VFT_DLL
+FILESUBTYPE 0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    /*0x040904B0 == US English, Unicode*/
+    BLOCK "0x040904B0"
+    BEGIN
+      VALUE "Comments","Xiph.Org " TH_ENC_INTERNAL_NAME ".dll"
+      VALUE "CompanyName","The Xiph.Org Foundation"
+      VALUE "FileDescription","Xiph.Org Theora Encoder Library"
+      VALUE "FileVersion",TH_VERSION_STRING
+      VALUE "InternalName",TH_ENC_INTERNAL_NAME
+      VALUE "LegalCopyright","Copyright (C) 2002-2007 Xiph.Org Foundation"
+      VALUE "OriginalFilename",TH_ENC_INTERNAL_NAME ".dll"
+      VALUE "ProductName","libtheora"
+      VALUE "ProductVersion",TH_VERSION_STRING
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    /*0x0409, 1200 == US English, Unicode*/
+    VALUE "Translation",0x0409,1200
+  END
+END

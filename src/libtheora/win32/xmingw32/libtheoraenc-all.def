@@ -1,0 +1,17 @@
+EXPORTS
+; Old alpha API
+	theora_encode_init @ 1
+	theora_encode_YUVin @ 2
+	theora_encode_packetout @ 3
+	theora_encode_header @ 4
+	theora_encode_comment @ 5
+	theora_encode_tables @ 6
+; New theora-exp API
+	th_encode_alloc @ 7
+	th_encode_ctl @ 8
+	th_encode_flushheader @ 9
+	th_encode_ycbcr_in @ 10
+	th_encode_packetout @ 11
+	th_encode_free @ 12
+	TH_VP31_QUANT_INFO @ 13
+	TH_VP31_HUFF_CODES @ 14

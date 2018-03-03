@@ -1,0 +1,53 @@
+#
+# Export file for libtheora
+#
+# Only the symbols listed in the global section will be callable from
+# applications linking to the libraries.
+#
+
+# We use something that looks like a versioned so filename here 
+# to define the old API because of a historical confusion. This
+# label must be kept to maintain ABI compatibility.
+
+libtheora.so.1.0
+{
+	global:
+		theora_version_string;
+		theora_version_number;
+
+		theora_encode_init;
+		theora_encode_YUVin;
+		theora_encode_packetout;
+		theora_encode_header;
+		theora_encode_comment;
+		theora_encode_tables;
+
+		theora_decode_header;
+		theora_decode_init;
+		theora_decode_packetin;
+		theora_decode_YUVout;
+
+		theora_control;
+
+		theora_packet_isheader;
+		theora_packet_iskeyframe;
+
+		theora_granule_shift;
+		theora_granule_frame;
+		theora_granule_time;
+
+		theora_info_init;
+		theora_info_clear;
+
+		theora_clear;
+
+		theora_comment_init;
+		theora_comment_add;
+		theora_comment_add_tag;
+		theora_comment_query;
+		theora_comment_query_count;
+		theora_comment_clear;
+
+	local:
+		*;
+};

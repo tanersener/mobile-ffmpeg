@@ -1,0 +1,185 @@
+\section{theora.h File Reference}
+\label{theora_8h}\index{theora.h@{theora.h}}
+
+
+The libtheora pre-\/1.0 legacy C API.  
+{\ttfamily \#include $<$stddef.h$>$}\par
+{\ttfamily \#include $<$ogg/ogg.h$>$}\par
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf yuv\_\-buffer}
+\begin{DoxyCompactList}\small\item\em A YUV buffer for passing uncompressed frames to and from the codec. \item\end{DoxyCompactList}\item 
+struct {\bf theora\_\-info}
+\begin{DoxyCompactList}\small\item\em Theora bitstream info. \item\end{DoxyCompactList}\item 
+struct {\bf theora\_\-state}
+\begin{DoxyCompactList}\small\item\em Codec internal state and context. \item\end{DoxyCompactList}\item 
+struct {\bf theora\_\-comment}
+\begin{DoxyCompactList}\small\item\em Comment header metadata. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf OC\_\-FAULT}~-\/1
+\begin{DoxyCompactList}\small\item\em General failure. \item\end{DoxyCompactList}\item 
+\#define {\bf OC\_\-EINVAL}~-\/10
+\begin{DoxyCompactList}\small\item\em Library encountered invalid internal data. \item\end{DoxyCompactList}\item 
+\#define {\bf OC\_\-DISABLED}~-\/11
+\begin{DoxyCompactList}\small\item\em Requested action is disabled. \item\end{DoxyCompactList}\item 
+\#define {\bf OC\_\-BADHEADER}~-\/20
+\begin{DoxyCompactList}\small\item\em Header packet was corrupt/invalid. \item\end{DoxyCompactList}\item 
+\#define {\bf OC\_\-NOTFORMAT}~-\/21
+\begin{DoxyCompactList}\small\item\em Packet is not a theora packet. \item\end{DoxyCompactList}\item 
+\#define {\bf OC\_\-VERSION}~-\/22
+\begin{DoxyCompactList}\small\item\em Bitstream version is not handled. \item\end{DoxyCompactList}\item 
+\#define {\bf OC\_\-IMPL}~-\/23
+\begin{DoxyCompactList}\small\item\em Feature or action not implemented. \item\end{DoxyCompactList}\item 
+\#define {\bf OC\_\-BADPACKET}~-\/24
+\begin{DoxyCompactList}\small\item\em Packet is corrupt. \item\end{DoxyCompactList}\item 
+\#define {\bf OC\_\-NEWPACKET}~-\/25
+\begin{DoxyCompactList}\small\item\em Packet is an (ignorable) unhandled extension. \item\end{DoxyCompactList}\item 
+\#define {\bf OC\_\-DUPFRAME}~1
+\begin{DoxyCompactList}\small\item\em Packet is a dropped frame. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{Indent}{\bf theora\_\-control() codes}\par
+{\em \label{_amgrp13fd61986cff4566fe89a40e30b74ad9}
+ }\begin{DoxyCompactItemize}
+\item 
+\#define {\bf TH\_\-DECCTL\_\-GET\_\-PPLEVEL\_\-MAX}~(1)
+\begin{DoxyCompactList}\small\item\em Get the maximum post-\/processing level. \item\end{DoxyCompactList}\item 
+\#define {\bf TH\_\-DECCTL\_\-SET\_\-PPLEVEL}~(3)
+\begin{DoxyCompactList}\small\item\em Set the post-\/processing level. \item\end{DoxyCompactList}\item 
+\#define {\bf TH\_\-ENCCTL\_\-SET\_\-KEYFRAME\_\-FREQUENCY\_\-FORCE}~(4)
+\begin{DoxyCompactList}\small\item\em Sets the maximum distance between key frames. \item\end{DoxyCompactList}\item 
+\#define {\bf TH\_\-DECCTL\_\-SET\_\-GRANPOS}~(5)
+\begin{DoxyCompactList}\small\item\em Set the granule position. \item\end{DoxyCompactList}\item 
+\#define {\bf TH\_\-ENCCTL\_\-SET\_\-QUANT\_\-PARAMS}~(2)
+\begin{DoxyCompactList}\small\item\em Sets the quantization parameters to use. \item\end{DoxyCompactList}\item 
+\#define {\bf TH\_\-ENCCTL\_\-SET\_\-VP3\_\-COMPATIBLE}~(10)
+\begin{DoxyCompactList}\small\item\em Disables any encoder features that would prevent lossless transcoding back to VP3. \item\end{DoxyCompactList}\item 
+\#define {\bf TH\_\-ENCCTL\_\-GET\_\-SPLEVEL\_\-MAX}~(12)
+\begin{DoxyCompactList}\small\item\em Gets the maximum speed level. \item\end{DoxyCompactList}\item 
+\#define {\bf TH\_\-ENCCTL\_\-SET\_\-SPLEVEL}~(14)
+\begin{DoxyCompactList}\small\item\em Sets the speed level. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bf theora\_\-colorspace} \{ {\bf OC\_\-CS\_\-UNSPECIFIED}, 
+{\bf OC\_\-CS\_\-ITU\_\-REC\_\-470M}, 
+{\bf OC\_\-CS\_\-ITU\_\-REC\_\-470BG}, 
+{\bf OC\_\-CS\_\-NSPACES}
+ \}
+\begin{DoxyCompactList}\small\item\em A Colorspace. \item\end{DoxyCompactList}\item 
+enum {\bf theora\_\-pixelformat} \{ {\bf OC\_\-PF\_\-420}, 
+{\bf OC\_\-PF\_\-RSVD}, 
+{\bf OC\_\-PF\_\-422}, 
+{\bf OC\_\-PF\_\-444}
+ \}
+\begin{DoxyCompactList}\small\item\em A Chroma subsampling. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+const char $\ast$ {\bf theora\_\-version\_\-string} (void)
+\begin{DoxyCompactList}\small\item\em Retrieve a human-\/readable string to identify the encoder vendor and version. \item\end{DoxyCompactList}\item 
+ogg\_\-uint32\_\-t {\bf theora\_\-version\_\-number} (void)
+\begin{DoxyCompactList}\small\item\em Retrieve a 32-\/bit version number. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-encode\_\-init} ({\bf theora\_\-state} $\ast$th, {\bf theora\_\-info} $\ast$ti)
+\begin{DoxyCompactList}\small\item\em Initialize the theora encoder. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-encode\_\-YUVin} ({\bf theora\_\-state} $\ast$t, {\bf yuv\_\-buffer} $\ast$yuv)
+\begin{DoxyCompactList}\small\item\em Submit a YUV buffer to the theora encoder. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-encode\_\-packetout} ({\bf theora\_\-state} $\ast$t, int last\_\-p, ogg\_\-packet $\ast$op)
+\begin{DoxyCompactList}\small\item\em Request the next packet of encoded video. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-encode\_\-header} ({\bf theora\_\-state} $\ast$t, ogg\_\-packet $\ast$op)
+\begin{DoxyCompactList}\small\item\em Request a packet containing the initial header. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-encode\_\-comment} ({\bf theora\_\-comment} $\ast$tc, ogg\_\-packet $\ast$op)
+\begin{DoxyCompactList}\small\item\em Request a comment header packet from provided metadata. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-encode\_\-tables} ({\bf theora\_\-state} $\ast$t, ogg\_\-packet $\ast$op)
+\begin{DoxyCompactList}\small\item\em Request a packet containing the codebook tables for the stream. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-decode\_\-header} ({\bf theora\_\-info} $\ast$ci, {\bf theora\_\-comment} $\ast$cc, ogg\_\-packet $\ast$op)
+\begin{DoxyCompactList}\small\item\em Decode an Ogg packet, with the expectation that the packet contains an initial header, comment data or codebook tables. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-decode\_\-init} ({\bf theora\_\-state} $\ast$th, {\bf theora\_\-info} $\ast$c)
+\begin{DoxyCompactList}\small\item\em Initialize a \doxyref{theora\_\-state}{p.}{structtheora__state} handle for decoding. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-decode\_\-packetin} ({\bf theora\_\-state} $\ast$th, ogg\_\-packet $\ast$op)
+\begin{DoxyCompactList}\small\item\em Input a packet containing encoded data into the theora decoder. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-decode\_\-YUVout} ({\bf theora\_\-state} $\ast$th, {\bf yuv\_\-buffer} $\ast$yuv)
+\begin{DoxyCompactList}\small\item\em Output the next available frame of decoded YUV data. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-packet\_\-isheader} (ogg\_\-packet $\ast$op)
+\begin{DoxyCompactList}\small\item\em Report whether a theora packet is a header or not This function does no verification beyond checking the header flag bit so it should not be used for bitstream identification; use \doxyref{theora\_\-decode\_\-header()}{p.}{group__oldfuncs_ga02915e63c1bd733ee291f577a8b75a82} for that. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-packet\_\-iskeyframe} (ogg\_\-packet $\ast$op)
+\begin{DoxyCompactList}\small\item\em Report whether a theora packet is a keyframe or not. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-granule\_\-shift} ({\bf theora\_\-info} $\ast$ti)
+\begin{DoxyCompactList}\small\item\em Report the granulepos shift radix. \item\end{DoxyCompactList}\item 
+ogg\_\-int64\_\-t {\bf theora\_\-granule\_\-frame} ({\bf theora\_\-state} $\ast$th, ogg\_\-int64\_\-t granulepos)
+\begin{DoxyCompactList}\small\item\em Convert a granulepos to an absolute frame index, starting at 0. \item\end{DoxyCompactList}\item 
+double {\bf theora\_\-granule\_\-time} ({\bf theora\_\-state} $\ast$th, ogg\_\-int64\_\-t granulepos)
+\begin{DoxyCompactList}\small\item\em Convert a granulepos to absolute time in seconds. \item\end{DoxyCompactList}\item 
+void {\bf theora\_\-info\_\-init} ({\bf theora\_\-info} $\ast$c)
+\begin{DoxyCompactList}\small\item\em Initialize a \doxyref{theora\_\-info}{p.}{structtheora__info} structure. \item\end{DoxyCompactList}\item 
+void {\bf theora\_\-info\_\-clear} ({\bf theora\_\-info} $\ast$c)
+\begin{DoxyCompactList}\small\item\em Clear a \doxyref{theora\_\-info}{p.}{structtheora__info} structure. \item\end{DoxyCompactList}\item 
+void {\bf theora\_\-clear} ({\bf theora\_\-state} $\ast$t)
+\begin{DoxyCompactList}\small\item\em Free all internal data associated with a \doxyref{theora\_\-state}{p.}{structtheora__state} handle. \item\end{DoxyCompactList}\item 
+void {\bf theora\_\-comment\_\-init} ({\bf theora\_\-comment} $\ast$tc)
+\begin{DoxyCompactList}\small\item\em Initialize an allocated \doxyref{theora\_\-comment}{p.}{structtheora__comment} structure. \item\end{DoxyCompactList}\item 
+void {\bf theora\_\-comment\_\-add} ({\bf theora\_\-comment} $\ast$tc, char $\ast$comment)
+\begin{DoxyCompactList}\small\item\em Add a comment to an initialized \doxyref{theora\_\-comment}{p.}{structtheora__comment} structure. \item\end{DoxyCompactList}\item 
+void {\bf theora\_\-comment\_\-add\_\-tag} ({\bf theora\_\-comment} $\ast$tc, char $\ast$tag, char $\ast$value)
+\begin{DoxyCompactList}\small\item\em Add a comment to an initialized \doxyref{theora\_\-comment}{p.}{structtheora__comment} structure. \item\end{DoxyCompactList}\item 
+char $\ast$ {\bf theora\_\-comment\_\-query} ({\bf theora\_\-comment} $\ast$tc, char $\ast$tag, int count)
+\begin{DoxyCompactList}\small\item\em Look up a comment value by tag. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-comment\_\-query\_\-count} ({\bf theora\_\-comment} $\ast$tc, char $\ast$tag)
+\begin{DoxyCompactList}\small\item\em Look up the number of instances of a tag. \item\end{DoxyCompactList}\item 
+void {\bf theora\_\-comment\_\-clear} ({\bf theora\_\-comment} $\ast$tc)
+\begin{DoxyCompactList}\small\item\em Clear an allocated \doxyref{theora\_\-comment}{p.}{structtheora__comment} struct so that it can be freed. \item\end{DoxyCompactList}\item 
+int {\bf theora\_\-control} ({\bf theora\_\-state} $\ast$th, int req, void $\ast$buf, size\_\-t buf\_\-sz)
+\begin{DoxyCompactList}\small\item\em Encoder control function. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The libtheora pre-\/1.0 legacy C API. \subsection{Introduction}\label{index_intro}
+This is the documentation for the libtheora legacy C API, declared in the \doxyref{theora.h}{p.}{theora_8h} header, which describes the old interface used before the 1.0 release. This API was widely deployed for several years and remains supported, but for new code we recommend the cleaner API declared in \doxyref{theoradec.h}{p.}{theoradec_8h} and \doxyref{theoraenc.h}{p.}{theoraenc_8h}.
+
+libtheora is the reference implementation for {\tt Theora}, a free video codec. Theora is derived from On2's VP3 codec with improved integration with Ogg multimedia formats by {\tt Xiph.Org}.\subsection{Overview}\label{theora_8h_overview}
+This library will both decode and encode theora packets to/from raw YUV frames. In either case, the packets will most likely either come from or need to be embedded in an Ogg stream. Use {\tt libogg} or {\tt liboggz} to extract/package these packets.\subsection{Decoding Process}\label{theora_8h_decoding}
+Decoding can be separated into the following steps:
+\begin{DoxyEnumerate}
+\item initialise \doxyref{theora\_\-info}{p.}{structtheora__info} and \doxyref{theora\_\-comment}{p.}{structtheora__comment} structures using \doxyref{theora\_\-info\_\-init()}{p.}{group__oldfuncs_ga3091c87d48f1faba018c5956379a6d90} and \doxyref{theora\_\-comment\_\-init()}{p.}{group__oldfuncs_ga811b92785df3bdbbebb3de612d9d6ce0}: \begin{DoxyVerb}
+ theora_info     info;
+ theora_comment  comment;
+   
+ theora_info_init(&info);
+ theora_comment_init(&comment);
+ \end{DoxyVerb}
+
+\item retrieve header packets from Ogg stream (there should be 3) and decode into \doxyref{theora\_\-info}{p.}{structtheora__info} and \doxyref{theora\_\-comment}{p.}{structtheora__comment} structures using \doxyref{theora\_\-decode\_\-header()}{p.}{group__oldfuncs_ga02915e63c1bd733ee291f577a8b75a82}. See \doxyref{Identifying Theora Packets}{p.}{theora_8h_identification} for more information on identifying which packets are theora packets. \begin{DoxyVerb}
+ int i;
+ for (i = 0; i < 3; i++)
+ {
+   (get a theora packet "op" from the Ogg stream)
+   theora_decode_header(&info, &comment, op);
+ }
+ \end{DoxyVerb}
+
+\item initialise the decoder based on the information retrieved into the \doxyref{theora\_\-info}{p.}{structtheora__info} struct by \doxyref{theora\_\-decode\_\-header()}{p.}{group__oldfuncs_ga02915e63c1bd733ee291f577a8b75a82}. You will need a \doxyref{theora\_\-state}{p.}{structtheora__state} struct. \begin{DoxyVerb}
+ theora_state state;
+ 
+ theora_decode_init(&state, &info);
+ \end{DoxyVerb}
+
+\item pass in packets and retrieve decoded frames! See the \doxyref{yuv\_\-buffer}{p.}{structyuv__buffer} documentation for information on how to retrieve raw YUV data. \begin{DoxyVerb}
+ yuf_buffer buffer;
+ while (last packet was not e_o_s) {
+   (get a theora packet "op" from the Ogg stream)
+   theora_decode_packetin(&state, op);
+   theora_decode_YUVout(&state, &buffer);
+ }
+ \end{DoxyVerb}
+
+\end{DoxyEnumerate}\subsubsection{Identifying Theora Packets}\label{theora_8h_identification}
+All streams inside an Ogg file have a unique serial\_\-no attached to the stream. Typically, you will want to
+\begin{DoxyItemize}
+\item retrieve the serial\_\-no for each b\_\-o\_\-s (beginning of stream) page encountered within the Ogg file;
+\item test the first (only) packet on that page to determine if it is a theora packet;
+\item once you have found a theora b\_\-o\_\-s page then use the retrieved serial\_\-no to identify future packets belonging to the same theora stream.
+\end{DoxyItemize}
+
+Note that you {\itshape cannot\/} use \doxyref{theora\_\-packet\_\-isheader()}{p.}{group__oldfuncs_gab969f9d0407683f0e5abe73d0839a25b} to determine if a packet is a theora packet or not, as this function does not perform any checking beyond whether a header bit is present. Instead, use the \doxyref{theora\_\-decode\_\-header()}{p.}{group__oldfuncs_ga02915e63c1bd733ee291f577a8b75a82} function and check the return value; or examine the header bytes at the beginning of the Ogg page. 

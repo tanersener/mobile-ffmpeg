@@ -1,0 +1,3 @@
+#define TH_ENC_INTERNAL_NAME "libtheoraenc71"
+#undef _DEBUG
+#include "libtheoraenc-all.rc"

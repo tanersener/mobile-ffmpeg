@@ -1,0 +1,1305 @@
+VP3 Bitstream Format and Decoding Process
+by Mike Melanson (mike at multimedia.cx)
+v0.5: December 8, 2004
+
+
+[December 8, 2004: Note that this document is not complete and likely
+will never be completed. However, it helped form the basis of Theora I 
+specification available at
+  http://www.theora.org/doc/Theora_I_spec.pdf ]
+
+
+Contents
+--------
+ * Introduction
+ * Underlying Coding Concepts
+ * VP3 Coding Overview
+ * VP3 Chunk Format
+ * Decoding The Frame Header
+ * Initializing The Quantization Matrices
+ * Hilbert Coding Pattern
+ * Unpacking The Block Coding Information
+ * Unpacking The Macroblock Coding Mode Information
+ * Unpacking The Macroblock Motion Vectors
+ * Unpacking The DCT Coefficients
+ * Reversing The DC Prediction
+ * Reconstructing The Frame
+ * Theora Specification
+ * Appendix A: Quantization Matrices And Scale Factors
+ * Appendix B: Macroblock Coding Mode Alphabets
+ * Appendix C: DCT Coefficient VLC Tables
+ * Appendix D: The VP3 IDCT
+ * Acknowledgements
+ * References
+ * Changelog
+
+
+Introduction
+------------
+A company named On2 (http://www.on2.com) created a video codec named
+VP3. Eventually, they decided to open source it. Like any body of code
+that was produced on a deadline, the source code was not particularly
+clean or well-documented. This makes it difficult to understand the
+fundamental operation of the codec.
+
+This document describes the VP3 bitstream format and decoding process at
+a higher level than source code.
+
+
+Underlying Coding Concepts
+-------------------------- 
+In order to understand the VP3 coding method it is necessary to
+understand the individual steps in the process. Like many multimedia
+compression algorithms VP3 does not consist of a single coding method.
+Rather, it uses a chain of methods to achieve compression.
+
+If you are acquainted with the MPEG video clique then many of VP3's
+coding concepts should look familiar as well. What follows is a list of
+the coding methods used in VP3 and a brief description of each.
+
+* Discrete Cosine Transform (DCT): This is a magical mathematical
+function that takes a group of numbers and turns it into another group
+of numbers. The transformed group of numbers exhibits some curious
+properties. Notably, larger numbers are concentrated in certain areas of
+the transformed group. 
+
+A video codec like VP3 often operates on 8x8 blocks of numbers. When
+these 8x8 blocks are transformed using a DCT the larger numbers occur
+mostly in the up and left areas of the block with the largest number
+occurring as the first in the block (up-left corner). This number is
+called the DC coefficient. The other 63 numbers are called the AC
+coefficients.
+
+The DCT and its opposite operation, the inverse DCT, require a lot of
+multiplications. Much research and experimentation is focused of
+optimizing this phase of the coding/decoding process.
+
+* Quantization: This coding step tosses out information by essentially
+dividing a number to be coded by a factor and throwing away the
+remainder. The inverse process (dequantization) involves multiplying by
+the same factor to obtain a number that is close enough to the original.
+
+* Run Length Encoding (RLE): The concept behind RLE is to shorten runs
+of numbers that are the same. For example, the string "88888" is encoded
+as (5, 8), indicating a run of 5 '8' numbers. In VP3 (and MPEG/JPEG),
+RLE is used to record the number of zero-value coefficients that occur
+before a non-zero coefficient. For example:
+
+  0 0 0 0 5 0 2 0 0 0 9
+
+is encoded as:
+
+  (4, 5), (1, 2), (3, 9)
+
+This indicates that a run of 4 zeroes is followed by a coefficient of 5;
+then a run of 1 zero is followed by 2; then a run of 3 zeroes is
+followed by 9.
+
+* Zigzag Ordering: After transforming and quantizing a block of samples,
+the samples are not in an optimal order for run length encoding. Zigzag
+ordering rearranges the samples to put more zeros between non-zero
+samples.
+
+* Differential (or Delta) Pulse Code Modulation (DPCM): 1 + 1 = 2. Got
+that? Seriously, that is what DPCM means. Rather than encoding absolute
+values, encode the differences between successive values. For example:
+
+  82 84 81 80 86 88 85
+
+Can be delta-encoded as:
+
+  82 +2 -3 -1 +6 +2 -3
+
+Most of the numbers turn into smaller numbers which require less
+information to encode.
+
+* Motion Compensation: Simply, this coding method specifies that a block
+from a certain position in the previous frame is to be copied into a new
+position in the current frame. This technique is often combined with DCT
+and DPCM coding, as well as fractional pixel motion.
+
+* Entropy Coding (a.k.a. Huffman Coding): This is the process of coding
+frequently occurring symbols with fewer bits than symbols that are not
+likely to occur as frequently.
+
+* Variable Length Run Length Booleans: An initial Boolean bit is
+extracted from the bitstream. A variable length code (VLC) is extracted
+from the bitstream and converted to a count. This count indicates that
+the next (count) elements are to be set to the Boolean value.
+Afterwards, the Boolean value is toggled, the next VLC is extracted and
+converted to a count, and the process continues until all elements are
+set to either 0 or 1.
+
+* YUV Colorspace: Like many modern video codecs, VP3 operates on a YUV
+colorspace rather than a RGB colorspace. Specifically, VP3 uses YUV
+4:2:0, alias YUV420P, YV12. Note: Throughout the course of this
+document, the U and V planes (a.k.a., Cb and Cr planes) will be
+collectively referred to as C planes (color or chrominance planes).
+
+* Frame Types: VP3 has intra-coded frames, a.k.a. intraframes, I-frames,
+or keyframes. VP3 happens to call these golden frames. VP3 has
+interframes, a.k.a. predicted frames or P-frames. These frames can use
+information from either the previous interframe or from the previous
+golden frame.
+
+
+VP3 Overview
+------------
+The first thing to understand about the VP3 coding method is that it
+encodes all 3 planes upside down. That is, the data is encoded from
+bottom-to-top rather than top-to-bottom as is done with many video
+codecs.
+
+VP3 codes a video frame by first breaking each of the 3 planes (Y, U,
+and V) into a series of 8x8 blocks called fragments. VP3 also has a
+notion of superblocks. Superblocks encapsulate 16 fragments arranged in
+a 4x4 matrix. Each plane has its own set of superblocks. Further, VP3
+also uses the notion of macroblocks which is the same as that found in
+JPEG/MPEG. One macroblock encompasses 4 blocks from the Y plane arranged
+in a 2x2 matrix, 1 block from the U plane, and 1 block from the V plane.
+While a fragment or a superblock applies to 1 and only 1 plane, a
+macroblock extends over all 3 planes.
+
+VP3 compresses golden frames by transforming each fragment with a
+discrete cosine transform. Each transformed sample is then quantized and
+the DC coefficient is reduced via DPCM using a combination of DC
+coefficients from surrounding fragments as predictors. Then, each
+fragment's DC coefficient is entropy-coded in the output bitstream,
+followed by each fragment's first AC coefficient, then each second AC
+coefficient, and so on.
+
+An interframe, naturally, is more complicated. While there is only one
+coding mode available for a golden frame (intra coding), there are 8
+coding modes that the VP3 coder can choose from for interframe
+macroblocks. Intra coding as seen in the keyframe is still available.
+The rest of the modes involve encoding a fragment diff, either from the
+previous frame or the golden frame, from the same coordinate or from the
+same coordinate plus a motion vector. All of the macroblock coding modes
+and motion vectors are encoded in an interframe bitstream.
+
+
+VP3 Chunk Format
+----------------
+The high-level format of a compressed VP3 frame is laid out as:
+
+ * chunk header
+ * block coding information
+ * macroblock coding mode information
+ * motion vectors
+ * DC coefficients
+ * 1st AC coefficients
+ * 2nd AC coefficients
+ * ...
+ * 63rd AC coefficients
+
+
+Decoding The Frame Header
+-------------------------
+The chunk header always contains at least 1 byte which has the following
+format:
+
+  bit 7: 0 = golden frame, 1 = interframe
+  bit 6: unused
+  bits 5-0: Quality index (0..63)
+
+Further, if the frame is a golden frame, there are 2 more bytes in the
+header:
+
+  byte 0: version byte 0
+  byte 1:
+    bits 7-3: VP3 version number (stored)
+    bit 2:    key frame coding method (0 = DCT key frame, only type
+              supported)
+    bits 1-0: unused, spare bits
+
+All frame headers are encoded with a quality index. This 6-bit value is
+used to index into 2 dequantizer scaling tables, 1 for DC values and 1
+for AC values. Each of the 3 dequantization tables is modified per these
+scaling values.
+
+
+Initializing The Quantization Matrices
+--------------------------------------
+VP3 has three static matrices for quantizing and dequantizing fragments.
+One matrix is for quantizing golden frame Y fragments, one matrix is for 
+quantizing golden frame C fragments, and one matrix is for quantizing both
+golden frame and interframe Y or C fragments. While these matrices are
+static, they are adjusted according to quality index coded in the header.
+
+The quality index is an index into 2 64-element tables:
+dc_scale_factor[] and ac_scale_factor[]. Each quantization factor from
+each of the three quantization matrices is adjusted by the appropriate
+scale factor according to this formula:
+
+                base quantizer * scale factor
+  quantizer  =  -----------------------------
+                            100
+     
+    where scale factor =
+        dc_scale_factor[quality_index] for DC dequantizer
+        ac_scale_factor[quality_index] for AC dequantizer
+
+The quantization matrices need to be recalculated at the beginning of a
+frame decode if the current frame's quality index is different from the
+previous frame's quality index.
+
+See Appendix A for the complete VP3 quantization matrices and scale factor
+tables.
+
+As an example, this is the base quantization matrix for golden frame Y
+fragments:
+
+    16  11  10  16  24  40  51  61
+    12  12  14  19  26  58  60  55
+    14  13  16  24  40  57  69  56
+    14  17  22  29  51  87  80  62
+    18  22  37  58  68 109 103  77
+    24  35  55  64  81 104 113  92
+    49  64  78  87 103 121 120 101
+    72  92  95  98 112 100 103  99
+
+If a particular coded frame specifies a quality index of 54. Element 54
+of the dc_scale_factor table is 20, thus:
+
+                               16 * 20
+  DC coefficient quantizer  =  -------  =  3
+                                 100
+
+Element 54 of the ac_scale_factor table is 24. The AC coefficient
+quantizers are each scaled using this factor, e.g.:
+
+    11 * 24
+    -------   =  2
+      100
+
+    100 * 24
+    --------  =  24
+      100
+
+[not complete; still need to explain how these quantizers are saturated
+and scaled with respect to the DCT process]
+
+
+Hilbert Coding Pattern
+----------------------
+VP3 uses a Hilbert pattern to code fragments within a superblock. A
+Hilbert pattern is a recursive pattern that can grow quite complicated.
+The coding pattern that VP3 uses is restricted to this pattern subset,
+where each fragment in a superblock is represented by a 'X':
+
+      X -> X    X -> X
+           |    ^
+           v    |
+      X <- X    X <- X
+      |              ^
+      v              |
+      X    X -> X    X
+      |    ^    |    ^
+      v    |    v    |
+      X -> X    X -> X
+
+As an example of this pattern, consider a plane that is 256 samples wide
+and 64 samples high. Each fragment row will be 32 fragments wide. The
+first superblock in the plane will be comprised of these 16 fragments:
+
+   0   1   2   3  ...  31
+  32  33  34  35  ...  63
+  64  65  66  67  ...  95
+  96  97  98  99  ... 127
+
+The order in which these 16 fragments are coded is:
+
+   0 |  0  1  14 15
+  32 |  3  2  13 12
+  64 |  4  7   8 11
+  96 |  5  6   9 10
+
+All of the image coding information, including the block coding status
+and modes, the motion vectors, and the DCT coefficients, are all coded
+and decoded using this pattern. Thus, it is rather critical to have the
+pattern and all of its corner cases handled correctly. In the above
+example, if the bottom row and left column were not present due to the
+superblock being in a corner, the pattern proceeds as if the missing
+fragments were present, but the missing fragments are omitted in the
+final coding list. The coding order would be:
+
+  0, 1, 2, 3, 4, 7, 8, 13, 14
+
+
+Unpacking The Block Coding Information
+--------------------------------------
+After unpacking the frame header, the decoder unpacks the block coding
+information. The only information determined in this phase is whether a
+particular superblock and its fragments are coded in the current frame
+or unchanged from the previous frame. The actual coding method is
+determined in the next phase.
+
+If the frame is a golden frame then every superblock, macroblock, and
+fragment is marked as coded.
+
+If the frame is an interframe, then the block coding information must be
+decoded. This is the phase where a decoder will build a list of coded
+fragments for which coding mode, motion vector, and DCT coefficient data
+must be decoded.
+
+First, a list of partially-coded superblocks is unpacked from the
+stream. This list is coded as a series of variable-length run length
+codes (VLRLC). First, the code is initialized by reading the next bit in
+the stream. Then, while there are still superblocks remaining in the
+list, fetch a VLC from the stream according to this table:
+
+  Codeword                Run Length
+  0                       1
+  10x                     2-3
+  110x                    4-5
+  1110xx                  6-9
+  11110xxx                10-17
+  111110xxxx              18-33
+  111111xxxxxxxxxxxx      34-4129
+
+For example, a VLC of 1101 represents a run length of 5. If the VLRLC
+was initialized to 1, then the next 5 superblocks would be set to 1,
+indicating that they are partially coded in the current frame. Then the
+bit value is toggled to 0, another VLC is fetched from the stream and
+the process continues until each superblock has been marked either
+partially coded (1) or not (0).
+
+If any of the superblocks were marked as not partially coded in the
+previous step, then a list of fully-coded superblocks is unpacked next
+using the same VLRLC as the list of partially-coded superblocks.
+Initialize the VLRLC with the next bit in the stream. For each
+superblock that was not marked as partially coded, mark it with either a
+0 or 1 according to the current VLRLC. By the end of this step, each
+superblock will be marked as either not coded, partially coded, or fully
+coded.
+
+Let's work through an example with an image frame that is 256x64 pixels.
+This means that the Y plane contains 4x2 superblocks and each of the C
+planes contains 2 superblocks each. The superblocks are numbered as
+follows:
+
+   Y:  0  1  2  3     U:  8  9
+       4  5  6  7     V: 10 11
+
+This is the state of the bitstream:
+
+  1100011001101
+
+Which is interpreted as:
+
+ initial   2 1's   1 0   4 1's  5 0's
+    1       100     0     1100   1101
+
+Superblocks 0-1 and 3-6 are marked as partially coded. Since there were
+blocks that were not marked, proceed to unpack the list of fully-coded
+superblocks. This is the state of the bitstream:
+
+  1101101
+
+Which is interpreted as:
+
+ initial  3 1's  3 0's
+    1      101    100
+
+Superblocks 2, 7, and 8 are marked as fully coded while superblocks 9,
+10, and 11 are marked as not coded. 
+
+If any of the superblocks were marked as partially coded, the next data
+in the bitstream will define which fragments inside each partially-coded
+superblock are coded. This is the first place where the Hilbert pattern
+comes into play.
+
+For each partially-coded superblock, iterate through each fragment
+according to the Hilbert pattern. Use the VLRLC method, only with a
+different table, to determine which fragments are coded. The VLRLC table
+for fragment coding runs is:
+
+  Codeword                Run Length
+  0x                      1-2
+  10x                     3-4
+  110x                    5-6
+  1110xx                  7-10
+  11110xx                 11-14
+  11111xxxx               15-30
+
+Continuing with the contrived example, superblocks 0 and 1 are both
+partially coded. This is the state of the bitstream:
+
+  0011001111010001111010...(not complete)
+
+Which is interpreted as:
+ initial  2 0's  3 1's  13 0's   1 1   13 0's
+    0      01     100   1111010   00   1111010 ...
+
+This indicates that fragments 2-4 in superblock 0 are coded, while
+fragments 0, 1, and 5-15 are not. Note that the run of 12 0's cascades
+over into the next fragment, indicating that fragment 0 of superblock 1
+is not coded. Fragment 1 of superblock 1 is coded, while the rest of the
+superblock's fragments are not coded. The example ends there (a real
+bitstream should have enough data to describe all of the partially-coded
+superblocks). Superblock 2 is fully coded which means all 16 fragments
+are coded. Thus, superblocks 0-2 have the following coded fragments:
+
+  0 |  x  x  x  x    x  x  x  x    0  1 14 15
+ 32 |  3  2  x  x    x  2  x  x    3  2 13 12
+ 64 |  4  x  x  x    x  x  x  x    4  7  8 11
+ 96 |  x  x  x  x    x  x  x  x    5  6  9 10
+
+This is a good place to generate the list of coded fragment numbers for
+this frame. In this case, the list will begin as:
+
+  33 32 64 37 8 9 41 40 72 104 105 73 ...
+
+and so on through the remaining 8 fragments of superblock 2 and onto the
+fragments for the remaining superblocks that are either fully or
+partially coded.
+
+
+Unpacking The Macroblock Coding Mode Information
+------------------------------------------------
+After unpacking the block coding information, the decoder unpacks the
+macroblock coding mode information. This process is simple when
+decoding a golden frame-- since the only possible decoding mode is INTRA,
+no macroblock coding mode information is transmitted. However, in an
+interframe, each coded macroblock is encoded with one of 8 methods:
+
+0, INTER_NO_MV: 
+  current fragment = 
+    (fragment from previous frame @ same coordinates) +
+    (DCT-encoded residual)
+
+1, INTRA: 
+  current fragment = DCT-encoded block, just like in a golden frame
+
+2, INTER_PLUS_MV:
+  current fragment =
+    (fragment from previous frame @ (same coords + motion vector)) +
+    (DCT-encoded residual)
+
+3, INTER_LAST_MV:
+  same as INTER_PLUS_MV but using the last motion vector decoded from
+  the bitstream
+
+4, INTER_PRIOR_LAST;
+  same as INTER_PLUS_MV but using the second-to-last motion vector
+  decoded from the bitstream
+
+5, USING_GOLDEN:
+  same as INTER_NO_MV but referencing the golden frame instead of
+  previous interframe
+
+6, GOLDEN_MV:
+  same as INTER_PLUS_MV but referencing the golden frame instead of
+  previous interframe
+
+7, INTER_FOURMV:
+  same as INTER_PLUS_MV except that each of the 4 Y fragments gets its
+  own motion vector, and the U and V fragments share the same motion
+  vector which is the average of the 4 Y fragment vectors
+
+The MB coding mode information is encoded using one of 8 alphabets. The
+first 3 bits of the MB coding mode stream indicate which of the 8
+alphabets, 0..7, to use to decode the MB coding information in this frame.
+The reason for the different alphabets is to minimize the number of bits
+needed to encode this section of information. Each alphabet arranges the
+coding modes in a different order, indexing the 8 modes into 8 index
+slots. Index 0 is encoded with 1 bit (0), index 1 is encoded with 2 bits
+(10), index 2 is encoded with 3 bits (110), and so on up to indices 6 and
+7 which are encoded with 6 bits each (1111110 and 1111111, respectively):
+
+  index   encoding
+  -----   --------
+    0      0
+    1      10
+    2      110
+    3      1110
+    4      11110
+    5      111110
+    6      1111110
+    7      1111111
+
+For example, the coding modes are arranged in alphabet 1 as follows:
+
+  index   coding mode
+  -----   -----------
+    0     MODE_INTER_LAST_MV
+    1     MODE_INTER_PRIOR_LAST
+    2     MODE_INTER_PLUS_MV
+    3     MODE_INTER_NO_MV
+    4     MODE_INTRA   
+    5     MODE_USING_GOLDEN,      
+    6     MODE_GOLDEN_MV   
+    7     MODE_INTER_FOURMV
+
+This alphabet arrangement is designed for frames in which motion vectors
+based off of the previous interframe dominate.
+
+When unpacking MB coding mode information for a frame, the decoder first
+reads 3 bits from the stream to determine the alphabet. In this example,
+the 3 bits would be 001 to indicate alphabet 1. Consider this contrived
+bitstream following the alphabet number:
+
+  1010000011000011111110...
+  
+The bits are read as follows:
+
+         10 10 0 0 0 0 110 0 0 0 1111111 0
+  index:  1  1 0 0 0 0   2 0 0 0       7 0
+
+This arrangement of indices translates to this series of coding modes:
+
+  index   coding mode
+  -----   -----------
+    1     MODE_INTER_PRIOR_LAST
+    1     MODE_INTER_PRIOR_LAST
+    0     MODE_INTER_LAST_MV
+    0     MODE_INTER_LAST_MV
+    0     MODE_INTER_LAST_MV
+    0     MODE_INTER_LAST_MV
+    2     MODE_INTER_PLUS_MV
+    0     MODE_INTER_LAST_MV
+    0     MODE_INTER_LAST_MV
+    0     MODE_INTER_LAST_MV
+    7     MODE_INTER_FOURMV
+    0     MODE_INTER_LAST_MV
+  
+There are 6 pre-defined alphabets. Consult Appendix B for the complete
+alphabets. What happens if none of the 6 pre-defined alphabets fit? The
+VP3 encoder can choose to use alphabet 0 which indicates a custom
+alphabet. The 3-bit coding mode numbers for each index, 0..7, are stored
+after the alphabet number in the bitstream. For example, the sequence:
+
+  000 111 110 101 100 011 010 001 000
+
+would indicate coding alphabet 0 (custom alphabet), index 0 corresponds to
+coding mode 7 (INTER_FOURMV), index 1 corresponds to coding mode 6
+(GOLDEN_MV), and so on down to index 7 which would correspond to coding
+mode 0 (INTER_NO_MV).
+
+There is one more possible alphabet: Alphabet 7. This alphabet is
+reserved for when there is such a mixture of coding modes used in a frame
+that using any variable-length coding mode would result in more bits than
+a fixed-length representation. When alphabet 7 is specified, the decoder
+reads 3 bits at a time from the bitstream, and uses those directly as the
+macroblock coding modes.
+
+To recap, this is the general algorithm for decoding macroblock coding
+mode information:
+
+  if (golden frame)
+    all frames are intracoded, there is no MB coding mode information
+  else
+    read 3 bits from bitstream to determine alphabet
+    if alphabet = 0
+      this is a custom alphabet, populate index table with 8 3-bit coding
+        modes read from bitstream
+    foreach coded macroblock, unpack a coding mode:
+      if alphabet = 7
+        read 3 bits from the bitstream as the coding mode for the
+          macroblock
+      else
+        read a VLC from the bitstream
+        use the decoded VLC value to index into the coding mode alphabet
+          selected for this frame and assign the indexed coding mode to
+          this macroblock
+  
+
+Unpacking The Macroblock Motion Vectors
+---------------------------------------
+After unpacking the macroblock coding mode information, the decoder
+unpacks the macroblock motion vectors. This phase essentially assigns a
+motion vector to each of the 6 constituent fragments of any coded
+macroblock that requires motion vectors.
+
+If the frame is a golden frame then there is no motion compensation and
+no motion vectors are encoded in the bitstream.
+
+If the frame is an interframe, the next bit is read from the bitstream
+to determine the vector entropy coding method used. If the coding method
+is zero then all of the vectors will be unpacked using a VLC method. If
+the coding method is 1 then all of the vectors will be unpacked using a
+fixed length method.
+
+The VLC unpacking method reads 3 bits from the bitstream. These 3 bits
+comprise a number ranging from 0..7 which indicate the next action:
+
+0, MV component = 0
+1, MV component = 1
+2, MV component = -1
+3, MV component = 2, read next bit for sign
+4, MV component = 3, read next bit for sign
+5, MV component = 4 + (read next 2 bits), read next bit for sign
+   range: (4..7, -4..-7)
+6, MV component = 8 + (read next 3 bits), read next bit for sign
+   range: (8..15, -8..-15)
+7, MV component = 16 + (read next 4 bits), read next bit for sign
+   range: (16..31, -16..-31)
+
+The fixed length vector unpacking method simply reads the next 5 bits
+from the bitstream, reads the next bit for sign, and calls the whole
+thing a motion vector component. This gives a range of (-31..31), which
+is the same range as the VLC method.
+
+For example, consider the following contrived motion vector bitstream:
+
+  000001011011111000...
+
+The stream is read as:
+
+  0  (000  010)  (110 111 1  100 0)
+
+The first bit indicates the entropy method which, in this example, is
+variable length as opposed to fixed length. The next 3 bits are 0 which
+indicate a X MV component of 0. The next 3 bits are 2 which indicate a Y
+MV component of -1. The first motion vector encoded in this stream is
+(0, -1). The next 3 bits are 6 which indicate 8 + next 3 bits (7) with
+another bit indicating sign (1 in this case, which is negative). Thus,
+the X MV component is -15. The next 3 bits are 4 which indicate a Y MV
+component of 3 with one more bit for the sign (0 is positive). So the
+second motion vector encoded in this stream is (-15, 3).
+
+As an example of the fixed-length entropy method, consider the following
+contrived bitstream:
+
+  1010101101010...
+
+The stream is read as:
+
+  1  01010 1  10101 0
+
+The first bit indicates the fixed length entropy method. The first 5 bits
+are 10 followed by a negative sign bit. The next 5 bits are 21 followed by
+a positive sign bit. The first motion vector in this stream is (-10, 21).
+
+During this phase of the decoding process, it is traditional to assign all
+motion vectors for all coded macroblocks that require them, whether they
+are unpacked from the motion vector bitstream or copied from previous
+coded macroblocks. It is necessary to track the motion vectors for both
+the previous macroblock as well as the next-to-last (prior) macroblock.
+The general algorithm for this phase is as follows:
+
+  foreach coded macroblock
+    last MV = 0
+    prior last MV = 0
+    if coding mode = MODE_INTER_PLUS_MV or MODE_GOLDEN_MV
+      read current MV pair from the bitstream and set all fragment motion
+        vectors to that pair
+      prior last MV = last MV
+      last MV = current MV
+    
+    if coding mode = MODE_INTER_FOURMV
+      read MV for first Y fragment in macroblock
+      read MV for second Y fragment in macroblock
+      read MV for third Y fragment in macroblock
+      read MV for fourth Y fragment in macroblock
+      set U & V fragment motion vectors to average of 4 Y vectors,
+        calculated as follows:
+        if sum of all 4 X motion components is positive, the X
+        motion component for the U & V fragments is (sum + 2) / 4,
+        otherwise, it is (sum - 2) / 4; repeat the same process for the
+        Y components
+      prior last MV = last MV
+      last MV = MV for fourth Y fragment from this macroblock
+      
+    if coding mode = MODE_INTER_LAST_MV
+      motion vectors for this macroblock are the same as last MV; note
+        that in this case, the last MV remains the last MV and the prior
+        last MV remains the prior last MV
+      
+    if coding mode = MODE_INTER_PRIOR_LAST
+      motion vectors for this macroblock are the same as prior last MV
+      prior last MV = last MV
+      last MV = current MV (effectively, swap last and prior last vectors)
+
+
+Unpacking The DCT Coefficients
+------------------------------
+After unpacking the macroblock motion vectors, the decoder unpacks the
+fragment DCT coefficient data. Each coded fragment has 64 DCT 
+coefficients. Some of the coefficients will be non-zero. Many of the 
+coefficients will, or should be 0 as this is where the coding method
+derives much of its compression.
+
+During this phase, the decoder will be unpacking DCT coefficients, zero
+runs, and end-of-block (EOB) codes. The decoder unpacks the the DC 
+coefficients for all fragments, then all of the first AC coefficients, 
+and so on until all of the 64 DCT coefficients are unpacked from the
+bitstream.
+
+To obtain the DCT coefficients, the decoder unpacks a series of VLCs
+from the bitstream which turn into a series of tokens ranging from
+0..31. Each of these tokens specifies which action to take next. VP3
+defines 80 different 32-element histograms for VLC decoding:
+
+  16 histograms for DC token decoding
+  16 histograms for group 1 AC token decoding
+  16 histograms for group 2 AC token decoding
+  16 histograms for group 3 AC token decoding
+  16 histograms for group 4 AC token decoding
+
+The decoder fetches 4 bits from the bitstream that will be used to
+select a DC histogram and 4 bits that will be used to select 4 AC
+histograms, one for each AC group.
+
+The meaning of each of the 32 possible tokens follows. 'EB' stands for
+extra bits read from bitstream directly after the VLC token:
+
+0, DCT_EOB_TOKEN
+set the current block to EOB, meaning that the block is marked as being
+fully unpacked
+
+1, DCT_EOB_PAIR_TOKEN
+set the next 2 blocks to EOB
+
+2. DCT_EOB_TRIPLE_TOKEN
+set the next 3 blocks to EOB
+
+3, DCT_REPEAT_RUN_TOKEN
+set the next (2 EBs + 4) blocks to EOB
+
+4, DCT_REPEAT_RUN2_TOKEN
+set the next (3 EBs + 8) blocks to EOB
+
+5, DCT_REPEAT_RUN3_TOKEN
+set the next (4 EBs + 16) blocks to EOB
+
+6, DCT_REPEAT_RUN4_TOKEN
+set the next (12 EBs) blocks to EOB
+
+7, DCT_SHORT_ZRL_TOKEN
+skip (3 EBs + 1) positions in the output matrix
+
+8, DCT_ZRL_TOKEN
+skip (6 EBs + 1) positions in the output matrix
+
+9, ONE_TOKEN
+output 1 as coefficient
+
+10, MINUS_ONE_TOKEN
+output -1 as coefficient
+
+11, TWO_TOKEN
+output 2 as coefficient
+
+12, MINUS_TWO_TOKEN
+output -2 as coefficient
+
+13, 14, 15, 16, LOW_VAL_TOKENS
+next EB determines coefficient sign; coeff = DCT_VAL_CAT2_MIN (3) +
+(token - 13) (this gives a range of +/- 3..6)
+
+17, DCT_VAL_CATEGORY3
+next EB determines coefficient sign; coeff = DCT_VAL_CAT3_MIN (7) + next
+EB (this gives a range of +/- 7..8)
+
+18, DCT_VAL_CATEGORY4
+next EB determines coefficient sign; coeff = DCT_VAL_CAT4_MIN (9) + next
+2 EBs (this gives a range of +/- 9..12)
+
+19, DCT_VAL_CATEGORY5
+next EB determines coefficient sign; coeff = DCT_VAL_CAT5_MIN (13) +
+next 3 EBs (this gives a range of +/- 13..20)
+
+20, DCT_VAL_CATEGORY6
+next EB determines coefficient sign; coeff = DCT_VAL_CAT6_MIN (21) +
+next 4 EBs (this gives a range of +/- 21..36)
+
+21, DCT_VAL_CATEGORY7
+next EB determines coefficient sign; coeff = DCT_VAL_CAT7_MIN (37) +
+next 5 EBs (this gives a range of +/- 37..68)
+
+22, DCT_VAL_CATEGORY8
+next EB determines coefficient sign; coeff = DCT_VAL_CAT8_MIN (69) +
+next 9 EBs (this gives a range of +/- 69..580)
+
+23, 24, 25, 26, 27, DCT_RUN_CATEGORY1
+coefficient of +/- 1 preceded by a number of 0s; next EB determines sign
+of coefficient; skip (token - 22) 0s in the output matrix before
+placing the final coefficient (this gives a range of 1..5 0s)
+
+28, DCT_RUN_CATEGORY1B
+coefficient of +/- 1 preceded by a number of 0s; next EB determines sign
+of coefficient; skip (next 2 EBs + 6) 0s in the output matrix before
+placing the final coefficient (this gives a range of 6..9 0s)
+
+29, DCT_RUN_CATEGORY1C
+coefficient of +/- 1 preceded by a number of 0s; next EB determines sign
+of coefficient; skip (next 3 EBs + 10) 0s in the output matrix before
+placing the final coefficient (this gives a range of 10..17 0s)
+
+30, DCT_RUN_CATEGORY2
+coefficient of +/- 2..3 preceded by a single zero; next EB determines
+sign of coefficient; coefficient = (next EB + 2)
+
+31, DCT_RUN_CATEGORY2B (not specifically named in VP3 source)
+coefficient of +/- 2..3 preceded by 2 or 3 0s; next EB determines
+sign of coefficient; coefficient = (next EB + 2); skip (next EB + 2) 0s
+before placing coefficient in output matrix
+
+Note: EOB runs can, and often do, cross threshold stages and plane
+boundaries. For example, a decoder may have decoded all of the AC #2
+coefficients for all fragments and still have an EOB run of 2. That
+means that during the AC #3 decode process, the first 2 coded fragments
+that are not already EOB will be set to EOB.
+
+Let's work through a highly contrived example to illustrate the
+coefficient decoding process.
+
+
+
+[not finished]
+
+
+
+
+When the decoder is finished unpacking the DCT coefficients, the entire
+encoded VP3 frame bitstream should be consumed.
+
+
+Reversing The DC Prediction
+---------------------------
+Now that all of the DCT coefficient data has been unpacked, the DC
+coefficients need to be fully reconstructed before the IDCT can be
+performed.
+
+VP3 uses a somewhat involved process for DC prediction which uses up to
+four DC coefficients from surrounding fragments. For each fragment to be
+transformed with the IDCT, the DC coefficient is predicted from weighted
+sum of the DC coefficients in the left (l), up-left (ul), up (u), and
+up-right (ur) fragments, if they are coded (not unchanged from the
+previous frame) in a compatible frame (current, previous, or golden).
+
+In a golden frame, the prediction is quite straightforward since all
+fragments will be coded. A fragment's DC prediction will fall into 1 of
+5 groups:
+
+     abbbbbbbbb
+     cdddddddde
+     cdddddddde
+     cdddddddde
+     cdddddddde
+
+* Group a is the top left corner fragment. There is nothing to predict
+from. This DC coefficient has a lot of energy and requires many bits to
+code.
+
+* Group b is the remainder of the top row of fragments. These fragments
+can only predict from the left fragment.
+
+* Group c is the left column of fragments, not including the top left
+fragment. These fragments have the top and top-right fragments from
+which to predict.
+
+* Group d is the main body of fragments. These fragments have access to
+all 4 predictors.
+
+* Group e is the right column of fragments, not including the top right
+fragment. These fragments can predict from the left, up-left and up
+fragments.
+
+The process of reversing prediction for interframes grows more complex.
+First, the decoder must evaluate which candidate fragments (l, ul, u, or
+ur) are available for as predictors. Then, it can only use fragments
+that are coded within the same frame (current, previous, or golden).
+Further, there are auxiliary predictors for each frame type that are
+initialized to 0 at the start of each video frame decode operation. The
+decoder falls back on these auxiliary predictors when it can not find
+any valid candidate predictors for the current fragment.
+
+To work through some examples, consider the following notation, e.g.:
+
+  ul-C = up-left fragment, coded in the current frame
+   u-P = up fragment, coded as a motion residual from the previous frame
+  ur-C = up-right fragment, coded in the current frame
+   l-G = left fragment, coded as a motion residual from the golden frame   
+   x-P = current fragment where DC prediction is being performed, coded
+         as a motion residual from the previous frame
+
+This is a simple case:
+
+   ul-C   u-C  ur-C
+    l-C   x-C
+
+The current fragment predicts from all four of the candidate fragments
+since they are coded in the same frame. 
+
+   ul-P   u-C  ur-C
+    l-P   x-P
+
+The current fragment predicts from the left and up-left fragments.
+
+   ul-C   u-P  ur-G
+    l-P   x-G
+
+The current fragment predicts from the up-right fragment.
+
+   ul-C   u-C  ur-C
+    l-C   x-G
+
+The current fragment does not predict from any of the candidate
+fragments since the current fragment is a motion residual from the
+golden frame. Rather, add the auxiliary golden frame predictor to the
+current fragment's DC coefficient. Save the new DC coefficient as the
+new golden frame auxiliary DC predictor.
+
+If the decoder only finds one valid candidate predictor, then it is used
+by itself. When the decoder finds multiple valid candidate fragments
+from which to predict DC, it applies a weighting function to the
+surrounding fragments' DC coefficients. The following table presents all 
+16 possible combinations of available/not available predictors and what 
+to do in each case:
+
+    ul   u  ur   l
+    --  --  --  --
+     0   0   0   0    no predictors available:
+                        use the last predictor saved for the frame type
+                        (either intra, inter, or golden)
+
+     0   0   0   1    left predictor available:
+                        pred = l.dc
+
+     0   0   1   0    up-right predictor available:
+                        pred = ur.dc
+
+     0   0   1   1    up-right, left predictors available:
+                        pred = (53 * ur.dc) + (75 * l.dc)
+                               --------------------------
+                                         128
+
+     0   1   0   0    up predictor available:
+                        pred = u.dc
+
+     0   1   0   1    up, left predictors available:
+                        pred = (u.dc + l.dc)
+                               -------------
+                                     2
+
+     0   1   1   0    up, up-right predictors available:
+                        discard up-right predictor
+                        pred = u.dc
+
+     0   1   1   1    up, up-right, left predictors available:
+                        discard up predictor
+                        pred = (53 * ur.dc) + (75 * l.dc)
+                               --------------------------
+                                         128
+
+     1   0   0   0    up-left predictor available:
+                        pred = ul.dc
+
+     1   0   0   1    up-left, left predictors available:
+                        discard up-left predictor
+                        pred = l.dc
+
+     1   0   1   0    up-left, up-right predictors available:
+                        pred = (ul.dc + ur.dc)
+                               ---------------
+                                      2
+
+     1   0   1   1    up-left, up-right, left predictors available:
+                        discard up-left predictor
+                        pred = (53 * ur.dc) + (75 * l.dc)
+                               --------------------------
+                                         128
+
+     1   1   0   0    up-left, up predictors available:
+                        discard up-left
+                        pred = u.dc
+
+     1   1   0   1    up-left, up, left predictors available:
+                        pred = (-26 * ul.dc + 29 * u.dc + 29 * l.dc)
+                               -------------------------------------
+                                                 32
+
+     1   1   1   0    up-left, up, up-right predictors available:
+                        pred = (3 * ul.dc + 10 * u.dc + 3 * ur.dc)
+                               -----------------------------------
+                                                16
+
+     1   1   1   1    all 4 predictors available:
+                        discard up-right predictor
+                        pred = (-26 * ul.dc + 29 * u.dc + 29 * l.dc)
+                               -------------------------------------
+                                                 32
+
+Note that this final prediction case ([ul u l]) risks outranging. The
+difference of the predicted DC is checked against u.dc, l.dc, and ul.dc,
+in that order, and if the difference is greater than 128 in any case,
+the predictor is assigned as that DC coefficient. In pseudocode:
+
+  if (ABSOLUTE_VALUE(pred - u.dc) > 128)
+    pref = u.dc
+  else if (ABSOLUTE_VALUE(pred - l.dc) > 128)
+    pref = l.dc
+  else if (ABSOLUTE_VALUE(pred - ul.dc) > 128)
+    pref = ul.dc
+
+The predicted value is, at long last, added to the fragment's decoded DC
+coefficient. Finally, the new DC coefficient is saved as the frame
+type's auxiliary predictor. For example, if this fragment is coded as a
+motion residual from the previous frame, save the fragment's DC
+coefficient as the previous frame auxiliary predictor.
+
+
+[still need to mention precise rounding considerations, a.k.a, the
+HIGHTBITDUPPED() macro]
+
+
+
+Reconstructing The Frame
+------------------------
+rough outline:
+  - foreach fragment:
+    - if motion vector
+      - copy motion fragment from appropriate frame into current frame
+        (don't forget to account for unrestricted motion vectors)
+    - dequantize fragment coefficients
+    - run coefficients through inverse DCT
+    - if INTRA coded fragment
+      - output transformed coefficients
+    - else
+      - apply transformed residual to motion fragment
+    
+[not finished]
+
+
+Theora Specification
+--------------------
+The Theora project leverages the VP3 codec into a new video coding
+system. The algorithm and bitstream format are the same as VP3 with a
+few minor differences:
+
+1) The frame orientation is reversed-- VP3 is coded from bottom to top
+while Theora video is coded from top to bottom.
+[nope-- only true in the first few alpha releases; final Theora spec will
+be upside-down, the same as VP3]
+
+2) Variable histograms-- VP3 uses a hardcoded set of histograms for DCT
+coefficient coding (described in section "Unpacking The DCT
+Coefficients"). Theora packs the histogram information in the header of
+the transport format (which is meant to be Ogg, but can probably be
+coerced into a variety of other multimedia container formats).
+
+3) Variable quantization-- As with the histograms, Theora codes the
+quantization tables and quality thresholds (described in section
+"Initializing The Quantization Matrices") into the header.
+
+4) [special VLRLC case for encoding unusually large runs of blocks;
+necessary for HD resolutions]
+
+[still need coding format of histogram and quantizer information]
+
+
+Appendix A: VP31 Quantization Matrices And Scale Factors
+--------------------------------------------------------
+The following quantization matrices and scale factor tables are hardcoded
+into the VP31 coding standard. These tables can vary according to the
+setup information transported along with a Theora file.
+
+Base quantization matrix for golden frame Y fragments (note that this 
+is the same as JPEG):
+
+    16  11  10  16  24  40  51  61
+    12  12  14  19  26  58  60  55
+    14  13  16  24  40  57  69  56
+    14  17  22  29  51  87  80  62
+    18  22  37  58  68 109 103  77
+    24  35  55  64  81 104 113  92
+    49  64  78  87 103 121 120 101
+    72  92  95  98 112 100 103  99
+
+
+Base quantization matrix for golden frame C fragments (note that this 
+is the same as JPEG):
+    
+    17  18  24  47  99  99  99  99
+    18  21  26  66  99  99  99  99
+    24  26  56  99  99  99  99  99
+    47  66  99  99  99  99  99  99
+    99  99  99  99  99  99  99  99
+    99  99  99  99  99  99  99  99
+    99  99  99  99  99  99  99  99
+    99  99  99  99  99  99  99  99
+
+
+Base quantization matrix for interframe Y and C fragments:
+
+    16  16  16  20  24  28  32  40
+    16  16  20  24  28  32  40  48
+    16  20  24  28  32  40  48  64
+    20  24  28  32  40  48  64  64
+    24  28  32  40  48  64  64  64
+    28  32  40  48  64  64  64  96
+    32  40  48  64  64  64  96 128
+    40  48  64  64  64  96 128 128
+
+
+DC coefficient scale factor table:
+
+   220 200 190 180 170 170 160 160
+   150 150 140 140 130 130 120 120
+   110 110 100 100  90  90  90  80
+    80  80  70  70  70  60  60  60
+    60  50  50  50  50  40  40  40
+    40  40  30  30  30  30  30  30
+    30  20  20  20  20  20  20  20
+    20  10  10  10  10  10  10  10
+
+
+AC coefficient scale factor table:
+
+   500 450 400 370 340 310 285 265
+   245 225 210 195 185 180 170 160
+   150 145 135 130 125 115 110 107
+   100  96  93  89  85  82  75  74
+    70  68  64  60  57  56  52  50
+    49  45  44  43  40  38  37  35
+    33  32  30  29  28  25  24  22
+    21  19  18  17  15  13  12  10
+
+
+Appendix B: Macroblock Coding Mode Alphabets
+--------------------------------------------
+These are the 6 pre-defined alphabets used to decode macroblock coding
+mode information:
+
+Alphabet 1:
+  index   coding mode
+  -----   -----------
+    0     MODE_INTER_LAST_MV
+    1     MODE_INTER_PRIOR_LAST
+    2     MODE_INTER_PLUS_MV
+    3     MODE_INTER_NO_MV
+    4     MODE_INTRA   
+    5     MODE_USING_GOLDEN,      
+    6     MODE_GOLDEN_MV   
+    7     MODE_INTER_FOURMV
+
+Alphabet 2:
+  index   coding mode
+  -----   -----------
+    0     MODE_INTER_LAST_MV
+    1     MODE_INTER_PRIOR_LAST
+    2     MODE_INTER_NO_MV
+    3     MODE_INTER_PLUS_MV
+    4     MODE_INTRA
+    5     MODE_USING_GOLDEN
+    6     MODE_GOLDEN_MV
+    7     MODE_INTER_FOURMV
+
+Alphabet 3:
+  index   coding mode
+  -----   -----------
+    0     MODE_INTER_LAST_MV
+    1     MODE_INTER_PLUS_MV
+    2     MODE_INTER_PRIOR_LAST
+    3     MODE_INTER_NO_MV
+    4     MODE_INTRA
+    5     MODE_USING_GOLDEN
+    6     MODE_GOLDEN_MV
+    7     MODE_INTER_FOURMV
+    
+Alphabet 4:
+  index   coding mode
+  -----   -----------
+    0     MODE_INTER_LAST_MV
+    1     MODE_INTER_PLUS_MV
+    2     MODE_INTER_NO_MV
+    3     MODE_INTER_PRIOR_LAST
+    4     MODE_INTRA
+    5     MODE_USING_GOLDEN
+    6     MODE_GOLDEN_MV
+    7     MODE_INTER_FOURMV
+
+Alphabet 5:
+  index   coding mode
+  -----   -----------
+    0     MODE_INTER_NO_MV
+    1     MODE_INTER_LAST_MV
+    2     MODE_INTER_PRIOR_LAST
+    3     MODE_INTER_PLUS_MV
+    4     MODE_INTRA
+    5     MODE_USING_GOLDEN
+    6     MODE_GOLDEN_MV
+    7     MODE_INTER_FOURMV
+    
+Alphabet 6:
+  index   coding mode
+  -----   -----------
+    0     MODE_INTER_NO_MV
+    1     MODE_USING_GOLDEN
+    2     MODE_INTER_LAST_MV
+    3     MODE_INTER_PRIOR_LAST
+    4     MODE_INTER_PLUS_MV
+    5     MODE_INTRA
+    6     MODE_GOLDEN_MV
+    7     MODE_INTER_FOURMV
+
+
+Appendix C: DCT Coefficient VLC Tables
+--------------------------------------
+- VP31 tables are hardcoded
+- Theora tables are transported with video stream
+
+[not finished]
+
+
+Appendix D: The VP3 IDCT
+------------------------
+
+[not finished]
+
+
+Acknowledgements
+----------------
+Thanks to Michael Niedermayer (michaelni at gmx dot at) for peer review,
+corrections, and recommendations for improvement.
+
+Dan Miller (dan at on2 dot com) for clarifications on pieces of the
+format.
+
+Timothy B. Terriberry (tterribe at vt dot edu) for clarification about the
+differences between VP3 and Theora, detailed explanation of motion 
+vector mechanics.
+
+
+References
+----------
+Tables necessary for decoding VP3:
+http://mplayerhq.hu/cgi-bin/cvsweb.cgi/~checkout~/ffmpeg/libavcodec/vp3data.h?content-type=text/x-cvsweb-markup&cvsroot=FFMpeg
+
+Official VP3 site:
+http://www.vp3.com/
+
+Theora, based on VP3:
+http://www.theora.org/
+
+On2, creators of the VP3 format:
+http://www.on2.com/
+
+
+ChangeLog
+---------
+v0.5: December 8, 2004
+- reworked section "Reversing The DC Prediction" to include a tabular 
+representation of all 16 prediction modes
+
+v0.4: March 2, 2004
+- renamed and expanded section "Initializing The Quantization Matrices"
+- outlined section "Reconstructing The Frame"
+- moved Theora Differences Appendix to its own section entitled "Theora
+Specification"
+- added Appendix: Quantization Matrices And Scale Factors
+- added Appendix: DCT Coefficient VLC Tables
+
+v0.3: February 29, 2004
+- expanded section "Unpacking The Macroblock Coding Mode Information"
+- expanded section "Unpacking The Macroblock Motion Vectors"
+- added Appendix: Macroblock Coding Mode Alphabets
+
+v0.2: October 9, 2003
+- expanded section "Reversing the DC Prediction"
+- added Appendix: Theora Differences
+
+v0.1: June 17, 2003
+- initial release, nowhere near complete

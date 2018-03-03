@@ -1,0 +1,6 @@
+/.deps/
+/.libs/
+*.lo
+*.o
+/Makefile
+/libmp3lame.la

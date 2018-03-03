@@ -1,0 +1,42 @@
+\section{th\_\-quant\_\-ranges Struct Reference}
+\label{structth__quant__ranges}\index{th\_\-quant\_\-ranges@{th\_\-quant\_\-ranges}}
+
+
+A set of {\itshape qi\/} ranges.  
+
+
+{\ttfamily \#include $<$codec.h$>$}\subsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+int {\bf nranges}
+\begin{DoxyCompactList}\small\item\em The number of ranges in the set. \item\end{DoxyCompactList}\item 
+const int $\ast$ {\bf sizes}
+\begin{DoxyCompactList}\small\item\em The size of each of the \doxyref{nranges}{p.}{structth__quant__ranges_a53e5a3d7f7a112100b4b670929b3ebab} ranges. \item\end{DoxyCompactList}\item 
+const {\bf th\_\-quant\_\-base} $\ast$ {\bf base\_\-matrices}
+\begin{DoxyCompactList}\small\item\em \doxyref{nranges}{p.}{structth__quant__ranges_a53e5a3d7f7a112100b4b670929b3ebab} {\ttfamily +1} base matrices. \item\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A set of {\itshape qi\/} ranges. 
+
+\subsection{Field Documentation}
+\index{th\_\-quant\_\-ranges@{th\_\-quant\_\-ranges}!base\_\-matrices@{base\_\-matrices}}
+\index{base\_\-matrices@{base\_\-matrices}!th_quant_ranges@{th\_\-quant\_\-ranges}}
+\subsubsection[{base\_\-matrices}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf th\_\-quant\_\-base}$\ast$ {\bf th\_\-quant\_\-ranges::base\_\-matrices}}\label{structth__quant__ranges_a52cb432f034737087492ea448de20bdb}
+
+
+\doxyref{nranges}{p.}{structth__quant__ranges_a53e5a3d7f7a112100b4b670929b3ebab} {\ttfamily +1} base matrices. Matrices {\itshape i\/} and {\ttfamily i+1} form the endpoints of range {\itshape i\/}. \index{th\_\-quant\_\-ranges@{th\_\-quant\_\-ranges}!nranges@{nranges}}
+\index{nranges@{nranges}!th_quant_ranges@{th\_\-quant\_\-ranges}}
+\subsubsection[{nranges}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf th\_\-quant\_\-ranges::nranges}}\label{structth__quant__ranges_a53e5a3d7f7a112100b4b670929b3ebab}
+
+
+The number of ranges in the set. \index{th\_\-quant\_\-ranges@{th\_\-quant\_\-ranges}!sizes@{sizes}}
+\index{sizes@{sizes}!th_quant_ranges@{th\_\-quant\_\-ranges}}
+\subsubsection[{sizes}]{\setlength{\rightskip}{0pt plus 5cm}const int$\ast$ {\bf th\_\-quant\_\-ranges::sizes}}\label{structth__quant__ranges_af3188a373bc0b8ffaa330d0ab4c1a194}
+
+
+The size of each of the \doxyref{nranges}{p.}{structth__quant__ranges_a53e5a3d7f7a112100b4b670929b3ebab} ranges. These must sum to 63. 
+
+The documentation for this struct was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+{\bf codec.h}\end{DoxyCompactItemize}
