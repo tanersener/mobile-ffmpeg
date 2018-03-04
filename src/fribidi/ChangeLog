@@ -1,0 +1,3389 @@
+commit e478f92986d7a3abfe2de4b521f0b710e96fe332
+Merge: 2faadd5 9b55304
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sun Feb 4 19:17:10 2018 +0200
+
+    Merge pull request #43 from luzpaz/typos
+
+    Misc. typos
+
+commit 2faadd556ef7159363c6c0b2d94ccfc1d75bc530
+Merge: d18bade ef060dd
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sun Feb 4 19:15:17 2018 +0200
+
+    Merge pull request #46 from khaledhosny/parallel-build
+
+    Fix parallel build
+
+commit ef060ddc48b83885c6f094bc2120444550decdbc
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sun Feb 4 14:32:00 2018 +0200
+
+    Fix parallel build
+
+    Parallel build was failing while building the man
+    pages. doc/Makefile.am
+    tries cleverly to handle the fact that c2man produces all the
+    man pages
+    at once, following the approach described in:
+    https://www.gnu.org/software/automake/manual/html_node/Multiple-Outputs.html
+
+    However this is failing because c2man is not generating all the
+    requested man pages, so the rule ends being run multiple times instead
+    of once and parallel builds are broken. One of the requested pages is
+    for a function that doesn’t exist,
+    fribidi_log2vis_get_embedding_levels_ex,
+    so I removed it from fribidi.def.
+
+    Two functions were not documented, so I added minimal documentation
+    for
+    them.
+
+    But the last two are for variables not functions and c2man does
+    not like
+    that it seems so I added a hack to drop these two as well without
+    modifying fribidi.def.
+
+    Fixes https://github.com/fribidi/fribidi/issues/45
+
+ doc/Makefile.am      | 3 ++-
+ lib/fribidi-common.h | 7 +++++++
+ lib/fribidi.def      | 1 -
+ 3 files changed, 9 insertions(+), 2 deletions(-)
+
+commit 9b553048642c09d3b4604fb81625bb2b1b99d39d
+Author: luz.paz <luzpaz@users.noreply.github.com>
+Date:   Sat Feb 3 15:49:16 2018 -0500
+
+    Misc. typos
+
+    Found via `codespell -q 3`
+
+ ChangeLog.old                       | 16 ++++++++--------
+ THANKS                              |  2 +-
+ lib/fribidi-arabic.h                |  2 +-
+ lib/fribidi-bidi.c                  |  2 +-
+ lib/fribidi-bidi.h                  |  4 ++--
+ lib/fribidi-deprecated.h            |  8 ++++----
+ lib/fribidi-joining.h               |  2 +-
+ lib/fribidi-run.c                   |  2 +-
+ test/test_CapRTL_explicit.input     |  2 +-
+ test/test_CapRTL_explicit.reference |  2 +-
+ 10 files changed, 21 insertions(+), 21 deletions(-)
+
+commit d18badec88bca8f6f4149156ebe7f1c6467a7bd8
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sun Jan 28 11:46:28 2018 -0800
+
+    Update git.mk
+
+ Makefile.am  |  19 ++---
+ configure.ac |   2 +-
+ git.mk       | 228
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 3 files changed, 207 insertions(+), 42 deletions(-)
+
+commit 5a99e2895bcf50c0ee3bb9445e45b8cbff6ebc4d
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sun Jan 28 11:35:41 2018 -0800
+
+    Towards fixing out-of-tree builds
+
+    One cannot just call compiler like that. Sources files need to be
+    redirected through Make to be found correctly.  Let's see if
+    overriding
+    CC and CFLAGS works.
+
+    This, still fails to build for me from a bootstrap repo and
+    out-of-tree
+    build. Make seem to have become too smart for what I wrote before.
+    Still trying.
+
+ configure.ac        |  2 --
+ gen.tab/Makefile.am | 37 +++++++++++++------------------------
+ 2 files changed, 13 insertions(+), 26 deletions(-)
+
+commit 84851fc657e8dfb7db2e733531cfae79d04fb530
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sun Jan 28 11:19:07 2018 -0800
+
+    [gen.tab] Remove reliance on VPATH
+
+ gen.tab/Makefile.am | 28 ++++++++++------------------
+ 1 file changed, 10 insertions(+), 18 deletions(-)
+
+commit 3e715b40d3d65f72332eab10e6cf3f8a976c7db5
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sun Jan 28 11:10:20 2018 -0800
+
+    Fix non-debug build
+
+ lib/fribidi-bidi.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+commit 6523694b34417b1e18c25819ed0ab0d7c16e8922
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sat Jan 27 23:40:52 2018 +0200
+
+    Preparing for release 1.0.0.
+
+ NEWS         | 12 +++++++++---
+ README.md    | 16 ++++++++++------
+ configure.ac |  6 +++---
+ 3 files changed, 22 insertions(+), 12 deletions(-)
+
+commit e15ac6745f8f5d1e61395258b3ddadce2be24da7
+Merge: ad1da2a 44ef13c
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Jan 17 09:14:36 2018 +0200
+
+    Merge pull request #39 from tmm1/xcompile
+
+    Fix clang cross compiles
+
+commit 44ef13c1c4fba5d5de81c5c0061038917090afc3
+Author: Aman Gupta <aman@tmm1.net>
+Date:   Tue Jan 16 22:53:08 2018 -0800
+
+    Fix clang compiles
+
+ gen.tab/Makefile.am | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+commit ad1da2a0d79f4d362d03d2b21834be9c505c5b74
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sat Jan 13 23:56:30 2018 +0200
+
+    Less hackish cross compilation support.
+
+    * Changed hardcoded gcc for build compiler to use
+      m4_ax_prog_cc_for_build.m4 instead as suggested by Khaled.
+
+ configure.ac                  |  22 +-------
+ gen.tab/Makefile.am           |  20 +++----
+ m4/m4_ax_prog_cc_for_build.m4 | 125
+ ++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 137 insertions(+), 30 deletions(-)
+
+commit 4a732cf9d28228a0698e9c6fa76206874b6125dd
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sun Jan 7 21:49:32 2018 +0200
+
+    Simplistic cross compilation support from a gcc based system.
+
+ configure.ac        | 23 ++++++++++++++++++++++-
+ gen.tab/Makefile.am | 20 ++++++++++----------
+ gen.tab/packtab.h   |  2 ++
+ 3 files changed, 34 insertions(+), 11 deletions(-)
+
+commit 0efbaa9052320a951823a6e776b30a580e3a2b4e
+Author: loqs <loqs@users.noreply.github.com>
+Date:   Tue Dec 5 15:55:33 2017 +0000
+
+    Do not call bootstrap from make
+
+    Calling bootstrap from make causes configure to be called again with
+    no arguments.
+    fribidi/fribidi#35
+
+ Makefile.am | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+commit 6c57b8a147469dafaea25a07db95962fc11063f7
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Nov 23 10:51:11 2017 -0800
+
+    Update symbol list
+
+ lib/fribidi.def | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit 8d5bd9c5f05be2ea98704f76c4f375d882d29e5e
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Nov 23 10:43:21 2017 -0800
+
+    Fix soname
+
+    https://github.com/fribidi/fribidi/issues/29
+
+ configure.ac | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 84ea058eb1f8211613006993e64bcc06c3e6dae7
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Nov 23 10:34:44 2017 -0800
+
+    Misc warning fixes
+
+ fribidi-vs-unicode/test-character.c | 22 ++++++------
+ fribidi-vs-unicode/test.c           |  6 ++--
+ lib/fribidi-bidi.c                  | 72
+ +++++++++++++++++++------------------
+ lib/fribidi-brackets.c              |  3 +-
+ 4 files changed, 53 insertions(+), 50 deletions(-)
+
+commit f394882c75b9ff270d2e4060e1e29ac945055cab
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Nov 23 10:30:52 2017 -0800
+
+    Fix build
+
+ bin/fribidi-benchmark.c | 1 +
+ bin/fribidi-main.c      | 1 +
+ 2 files changed, 2 insertions(+)
+
+commit ca25dc5f9a54efd612e0adbe6303a155fa2dde9a
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Nov 20 23:31:48 2017 +0200
+
+    Drop CVS keywords that make no sense now
+
+ Makefile.am                           | 7 -------
+ bin/fribidi-benchmark.c               | 6 ------
+ bin/fribidi-main.c                    | 6 ------
+ bootstrap                             | 7 -------
+ charset/fribidi-char-sets-cap-rtl.c   | 6 ------
+ charset/fribidi-char-sets-cap-rtl.h   | 6 ------
+ charset/fribidi-char-sets-cp1255.c    | 6 ------
+ charset/fribidi-char-sets-cp1255.h    | 6 ------
+ charset/fribidi-char-sets-cp1256.c    | 6 ------
+ charset/fribidi-char-sets-cp1256.h    | 6 ------
+ charset/fribidi-char-sets-iso8859-6.c | 6 ------
+ charset/fribidi-char-sets-iso8859-6.h | 6 ------
+ charset/fribidi-char-sets-iso8859-8.c | 6 ------
+ charset/fribidi-char-sets-iso8859-8.h | 6 ------
+ charset/fribidi-char-sets-list.h      | 6 ------
+ charset/fribidi-char-sets-utf8.c      | 6 ------
+ charset/fribidi-char-sets-utf8.h      | 6 ------
+ charset/fribidi-char-sets.c           | 6 ------
+ charset/fribidi-char-sets.h           | 6 ------
+ configure.ac                          | 7 -------
+ gen.tab/gen-arabic-shaping-tab.c      | 6 ------
+ gen.tab/gen-bidi-type-tab.c           | 6 ------
+ gen.tab/gen-joining-type-tab.c        | 6 ------
+ gen.tab/gen-mirroring-tab.c           | 6 ------
+ gen.tab/gen-unicode-version.c         | 6 ------
+ lib/bidi-types.h                      | 6 ------
+ lib/common.h                          | 6 ------
+ lib/debug.h                           | 6 ------
+ lib/fribidi-arabic.c                  | 6 ------
+ lib/fribidi-arabic.h                  | 6 ------
+ lib/fribidi-bidi-types-list.h         | 6 ------
+ lib/fribidi-bidi-types.c              | 6 ------
+ lib/fribidi-bidi-types.h              | 6 ------
+ lib/fribidi-bidi.c                    | 6 ------
+ lib/fribidi-bidi.h                    | 6 ------
+ lib/fribidi-brackets.h                | 6 ------
+ lib/fribidi-common.h                  | 6 ------
+ lib/fribidi-deprecated.c              | 6 ------
+ lib/fribidi-deprecated.h              | 6 ------
+ lib/fribidi-flags.h                   | 6 ------
+ lib/fribidi-joining-types-list.h      | 6 ------
+ lib/fribidi-joining-types.c           | 6 ------
+ lib/fribidi-joining-types.h           | 6 ------
+ lib/fribidi-joining.c                 | 6 ------
+ lib/fribidi-joining.h                 | 6 ------
+ lib/fribidi-mirroring.c               | 6 ------
+ lib/fribidi-mirroring.h               | 6 ------
+ lib/fribidi-run.c                     | 6 ------
+ lib/fribidi-shape.c                   | 6 ------
+ lib/fribidi-shape.h                   | 6 ------
+ lib/fribidi-types.h                   | 6 ------
+ lib/fribidi-unicode.h                 | 6 ------
+ lib/fribidi.c                         | 6 ------
+ lib/fribidi.h                         | 6 ------
+ lib/joining-types.h                   | 6 ------
+ lib/run.h                             | 6 ------
+ 56 files changed, 339 deletions(-)
+
+commit ed5f9acf2fb8111432ba99c62c324b3a4166331e
+Merge: f04ef2d a50d5ff
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Tue Nov 21 14:28:14 2017 +0100
+
+    Merge pull request #34 from khaledhosny/docs
+
+    Doc fixes
+
+commit a50d5ff754e0ea8808e80af43e9da0043521c274
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Nov 21 13:59:08 2017 +0200
+
+    Document fribidi_get_brackets
+
+ lib/fribidi-brackets.h | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
+
+commit 4783c3a8cf70eb7de8bb91d19b57093794506949
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Nov 21 13:48:42 2017 +0200
+
+    Fix doc build
+
+ lib/fribidi-types.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+commit f04ef2d0ecbc4c432534dc49370cd08a34bb800e
+Merge: 5959986 269100d
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Mon Nov 20 22:11:30 2017 +0100
+
+    Merge pull request #32 from khaledhosny/dist-check2
+
+    Thinko!
+
+commit 269100dc42d508e10effb7918ccb2a0fa4aee4f9
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Nov 20 22:53:22 2017 +0200
+
+    Thinko!
+
+ .travis.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 59599867e06edc93cd6197783e9a1afeee653a32
+Merge: e2369f1 e1c47ff
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Mon Nov 20 21:38:15 2017 +0100
+
+    Merge pull request #24 from khaledhosny/w-error-undef
+
+    Fix building with -Werror=undef
+
+commit e2369f1c55f729dc5e527f430ec27e225f9d317f
+Merge: ac8a1aa 20d5f98
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Mon Nov 20 21:37:32 2017 +0100
+
+    Merge pull request #31 from khaledhosny/dist-check
+
+    Fix make distcheck
+
+commit 20d5f9838a2aa74abfad6a814e74249800e93ab6
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Nov 20 22:13:10 2017 +0200
+
+    Show test-suite.log on failure
+
+ .travis.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit e65c57597bb8de9509a4c5ea84c22e4273724935
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Nov 20 21:56:41 2017 +0200
+
+    Fix make distcheck
+
+ .travis.yml                    |  2 +-
+ fribidi-vs-unicode/Makefile.am | 12 ++++++++----
+ 2 files changed, 9 insertions(+), 5 deletions(-)
+
+commit e1c47ff159bb6853e78dda5a59bb137beceda8d2
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Nov 13 17:19:09 2017 +0200
+
+    Fix build with -Werror=undef
+
+    Pango meson build sets this by default.
+
+ lib/fribidi-common.h     | 4 ++--
+ lib/fribidi-deprecated.c | 2 +-
+ lib/fribidi-unicode.h    | 2 +-
+ lib/fribidi.h            | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+commit 90325b276006f2cf344c77f00db541437345cff9
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Nov 13 17:14:20 2017 +0200
+
+    Simplify fribidi-types.h a bit
+
+    It is 2017, I think we can rely on the presence of one of these three
+    int types headers.
+
+    Also rename types that are not exposed in public headers to use the
+    standard names.
+
+ .indent.pro                     |  4 --
+ configure.ac                    |  2 +-
+ gen.tab/gen-bidi-type-tab.c     |  6 +--
+ gen.tab/gen-brackets-tab.c      | 10 ++---
+ gen.tab/gen-brackets-type-tab.c | 10 ++---
+ gen.tab/gen-joining-type-tab.c  |  6 +--
+ gen.tab/gen-mirroring-tab.c     | 10 ++---
+ lib/fribidi-bidi-types.h        |  4 +-
+ lib/fribidi-brackets.c          |  2 +-
+ lib/fribidi-flags.h             |  2 +-
+ lib/fribidi-joining-types.h     |  4 +-
+ lib/fribidi-types.h             | 96
+ +++++++++--------------------------------
+ 12 files changed, 48 insertions(+), 108 deletions(-)
+
+commit c8e9c5d684f1ba15ca46e38493c995ad5be3646c
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Nov 13 16:14:46 2017 +0200
+
+    FRIBIDI_CHUNK_SIZE is not used anywhere
+
+ lib/common.h | 17 -----------------
+ 1 file changed, 17 deletions(-)
+
+commit ac8a1aad8b5c9db2591ac0a9bf31ca92c64f854c
+Merge: 9105ec5 c38d7ad
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Nov 15 22:06:37 2017 +0100
+
+    Merge pull request #27 from khaledhosny/ci
+
+    Setup Travis CI builds
+
+commit 9105ec53a073700d15038833b5be685e1afed5bc
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Nov 15 22:10:28 2017 +0100
+
+    Updated the CapRTL reference test.
+
+ test/test_CapRTL_isolate.reference | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit d90624bd4df5209f83ace0f8f3af0ba6dada445a
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Nov 15 22:10:03 2017 +0100
+
+    Fixed critical bug in fribidi_get_bracket_types().
+
+ lib/fribidi-brackets.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+commit b033ed903b671dac4af9d26b7d2c618d666b2d89
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Nov 15 22:09:50 2017 +0100
+
+    Clean up of dead code.
+
+ lib/fribidi-bidi.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+commit 3325a3fb93082ffd6c54da8e49b2ac82a2940d6d
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Nov 15 22:08:59 2017 +0100
+
+    Updated licensing inline documentation.
+
+ gen.tab/packtab.c | 2 +-
+ gen.tab/packtab.h | 2 +-
+ test/run.tests    | 3 +--
+ 3 files changed, 3 insertions(+), 4 deletions(-)
+
+commit c38d7ad70f63084708e5bcb7d68c00ffdf9811e9
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Wed Nov 15 23:01:32 2017 +0200
+
+    Run fribidi-vs-unicode tests with make check
+
+ fribidi-vs-unicode/Makefile.am | 11 ++++++++---
+ fribidi-vs-unicode/run.tests   | 20 ++++++++++++++++++++
+ 2 files changed, 28 insertions(+), 3 deletions(-)
+
+commit a2b06cf79dee2a0b85b7e7056c8dc472d1a6d571
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Wed Nov 15 22:20:30 2017 +0200
+
+    Disable make distcheck on Travis for now
+
+ .travis.yml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit ea4e77b939021e4754b55986b7e54e8fd6bad3f1
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Wed Nov 15 22:10:38 2017 +0200
+
+    Add Travis CI support
+
+ .travis.yml | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+commit 101c35d582293719929d0ccb5de26148d417ed1f
+Merge: 0e273c1 88f17b5
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Nov 15 20:02:33 2017 +0100
+
+    Merge pull request #22 from khaledhosny/fix-tests
+
+    Restore call to fribidi_unicode_to_charset
+
+commit 88f17b520ec9283fbfbeacb2edfe361807e6049c
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sat Nov 11 22:59:45 2017 +0200
+
+    Restore call to fribidi_unicode_to_charset
+
+    This partially reverts commit e71e49f9645d21ab511723caf8c75e8d9880aacf
+    as it broke make check badly!
+
+ bin/fribidi-main.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+commit 0e273c103dd059f6d4e87182189d5cc37d996e00
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Tue Nov 14 19:05:22 2017 +0200
+
+    Turned FribidiBracketType into a simple UINT32 instead of a struct.
+
+ lib/fribidi-bidi.c     | 14 +++++++-------
+ lib/fribidi-brackets.c |  7 ++++---
+ lib/fribidi-brackets.h |  6 ++++--
+ lib/fribidi-run.c      |  4 ++--
+ lib/fribidi-types.h    | 11 +++--------
+ 5 files changed, 20 insertions(+), 22 deletions(-)
+
+commit a6fee5ee9d8987be1ada02d4ef5ed7c06893d05f
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Tue Nov 14 18:40:53 2017 +0200
+
+    Fixed reversed logics in optimization in fribidi-bracket_types().
+
+    * As reported by Khaled Husny.
+    * See:
+    https://github.com/fribidi/fribidi/commit/f20b6480b9cd46dae8d82a6f95d9c53558fcfd20#commitcomment-25604008
+
+ lib/fribidi-brackets.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 6e23ed0d4adf2e889cd593ed9ee4df3edaa3ba49
+Merge: 72e901c cd50fba
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sun Nov 12 23:18:28 2017 +0200
+
+    Merge pull request #14 from khaledhosny/no-glib
+
+    Drop glib dependency
+
+commit cd50fbafae142616519ffe2ff257e98611f2b7ff
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sun Nov 12 00:20:53 2017 +0200
+
+    Remove more remnants of GLib support
+
+ bin/Makefile.am                |  5 ++---
+ charset/Makefile.am            |  3 +--
+ configure.ac                   | 14 --------------
+ fribidi-vs-unicode/Makefile.am |  4 ++--
+ fribidi.pc.in                  |  1 -
+ gen.tab/Makefile.am            |  5 +----
+ lib/Makefile.am                |  4 ++--
+ 7 files changed, 8 insertions(+), 28 deletions(-)
+
+commit 39d1c30d9fbfbcf6df81b94600cb000c69a02475
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sun Nov 12 00:10:41 2017 +0200
+
+    Drop GLib use in the library and main program
+
+    Only users left are the fribidi-vs-unicode test programs.
+
+ charset/fribidi-char-sets.c | 11 +++--------
+ lib/common.h                | 39 ---------------------------------------
+ lib/fribidi-common.h        |  8 --------
+ lib/fribidi-config.h.in     |  3 ---
+ lib/fribidi-types.h         | 14 --------------
+ lib/fribidi.c               |  5 -----
+ 6 files changed, 3 insertions(+), 77 deletions(-)
+
+commit 93fbff126e3474d7b35563cc921073323fc70ed3
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sat Nov 11 23:43:00 2017 +0200
+
+    Unused macro
+
+ lib/fribidi-types.h | 6 ------
+ 1 file changed, 6 deletions(-)
+
+commit 414a4955f949830cc40d2ebc5de95dfb329c8490
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sat Nov 11 23:42:58 2017 +0200
+
+    Copy BEGIN/END_IGNORE_DEPRECATIONS from GLib
+
+ bin/fribidi-benchmark.c |  4 ++--
+ bin/fribidi-main.c      | 12 ++++++------
+ lib/fribidi-common.h    | 34 +++++++++++++++++++++++++++++-----
+ 3 files changed, 37 insertions(+), 13 deletions(-)
+
+commit 4c6aef17d645fd501a56f1d09d3a54a0dc0c1fa3
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sat Nov 11 23:42:56 2017 +0200
+
+    Just use the GCC attributes here directly as well
+
+ lib/fribidi-common.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit 8feb2f98f33d6f0351f9703823e612935239eaab
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sat Nov 11 23:42:54 2017 +0200
+
+    These definitions don’t depend on GLib
+
+ lib/fribidi-common.h | 21 ++++++++-------------
+ 1 file changed, 8 insertions(+), 13 deletions(-)
+
+commit e428f970f69750094f6dbd40dee8e1d36182a545
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sat Nov 11 23:42:52 2017 +0200
+
+    Copy LIKELY/UNLIKELY from GLib
+
+ lib/common.h | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
+
+commit 72e901ceb7850b9e8a04c60e997c46df96676c44
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Thu Nov 9 11:19:05 2017 +0200
+
+    Fixed potential crash in the gen-brackets-tab code.
+
+    * The size for parsing of UnicodeData.txt was too small.
+
+ gen.tab/gen-brackets-tab.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit ac760eba3a2c8f1a698a893da6c7886ad531dd20
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Nov 8 21:03:42 2017 +0200
+
+    Got rid of remaining warnings.
+
+ bin/fribidi-main.c       | 2 +-
+ lib/fribidi-bidi-types.c | 4 ++--
+ lib/fribidi-brackets.c   | 1 -
+ 3 files changed, 3 insertions(+), 4 deletions(-)
+
+commit 8df1c69220577d31fd2e046535f95fcd727a3dc1
+Merge: c51878f a6d3dfe
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Nov 8 20:56:38 2017 +0200
+
+    Merge pull request #13 from khaledhosny/Misc cleanups.
+
+commit c51878f9ae938ef4ff6af1773d473f1851dc441d
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Nov 8 20:41:56 2017 +0200
+
+    Changed fribidi_log2vis (deprecated but ubiquititous) to use new api.
+
+    * This changed makes the fribidi command line tool Unicode-10
+    compliant.
+
+ lib/fribidi-deprecated.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+commit 8851b0aaad3a1946168e9466a8be0442f9c129db
+Merge: 7588059 a0ab164
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Tue Nov 7 23:19:43 2017 +0200
+
+    Merge remote-tracking branch 'fribidi/master' into unicode-10
+
+commit 7588059c7d3378baf60d12f3217324781b2f7669
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Tue Nov 7 21:55:06 2017 +0200
+
+    Restored the old API and made it deprecated.
+
+    * fribidi_get_par_embedding_levels() is now a deprecated interface to
+      the new fribidi_get_par_embedding_levels_ex() function with a
+      NULL pointer for the bracket type.
+    * Removed warnings of unassigned return values from fribidi-vs-unicode
+      test.c and test-character.c .
+
+ fribidi-vs-unicode/test-character.c | 35
+ ++++++++++++++++++----------------
+ fribidi-vs-unicode/test.c           | 38
+ ++++++++++++++++++++-----------------
+ lib/fribidi-bidi.c                  |  2 +-
+ lib/fribidi-bidi.h                  |  6 +++---
+ lib/fribidi-deprecated.c            | 27 ++++++++++++++++++++++----
+ lib/fribidi-deprecated.h            | 21 +++++++++++++++++---
+ 6 files changed, 85 insertions(+), 44 deletions(-)
+
+commit a0ab164431e18fa7cdf5b0a8ce4fcbe26f7b022b
+Author: Behnam Esfahbod <behnam@zwnj.org>
+Date:   Mon Nov 6 17:35:28 2017 -0800
+
+    Update README.md
+
+ HACKING   |   2 -
+ README    | 158 +-------------------------------------------------------
+ README.md | 174
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 175 insertions(+), 159 deletions(-)
+
+commit 75c350705ef09e6505aa1080188b75a8b4fccc5e
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Mon Nov 6 17:23:10 2017 -0500
+
+    Remove generated Makefile
+
+    Oops.
+
+ build/fribidi-vs-unicode/Makefile | 698
+ --------------------------------------
+ 1 file changed, 698 deletions(-)
+
+commit 7be4e8f87c77d0ff4bdbd1638768e8772d89f7b2
+Merge: 48061bd 309aae8
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Mon Nov 6 22:48:36 2017 +0200
+
+    Merge remote-tracking branch 'fribidi/unicode-10' into unicode-10
+
+commit 48061bdbe79fdb216e86fdc41b126f21bbe95ee4
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Fri Sep 1 12:35:00 2017 +0300
+
+    Fixed compilation errors.
+
+ gen.tab/Makefile.am    | 2 +-
+ lib/fribidi-brackets.c | 3 ++-
+ lib/fribidi-brackets.h | 2 +-
+ 3 files changed, 4 insertions(+), 3 deletions(-)
+
+commit 309aae84931eb682ef21ce850b6fba834f664215
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Aug 30 18:36:57 2017 -0700
+
+    Use true/false instead of TRUE/FALSE for consistency
+
+ lib/fribidi-bidi.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+commit c603fb8ce6ec59636c6b0701ed0bf07b208219d7
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Aug 30 18:36:23 2017 -0700
+
+    Make it compile
+
+ lib/fribidi-brackets.c | 9 ++++++---
+ lib/fribidi-brackets.h | 2 +-
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+
+commit 776891d62e4cd72949e9d32041d9a4b07b2b05b1
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Aug 30 18:26:53 2017 -0700
+
+    Fix typo
+
+ gen.tab/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit f20b6480b9cd46dae8d82a6f95d9c53558fcfd20
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Tue Aug 1 20:18:38 2017 +0300
+
+    Added Unicode 6.3 support (and beyond)
+
+    - N0 support
+    - Isolate character support (LRI, RLI, FSI)
+    - Added test program test.c by Behdad that tests BidiTest.txt
+      compliance.
+    - Added test program test-character.c that tests BidiCharacterTest.txt
+      compliance.
+
+ NEWS                                  |   5 +
+ README                                |   2 +-
+ THANKS                                |  12 +-
+ bin/fribidi-benchmark.c               |   2 +-
+ bin/fribidi-main.c                    |   2 +-
+ charset/fribidi-char-sets-cap-rtl.c   |  38 +-
+ charset/fribidi-char-sets-cap-rtl.h   |   2 +-
+ charset/fribidi-char-sets-cp1255.c    |   2 +-
+ charset/fribidi-char-sets-cp1255.h    |   2 +-
+ charset/fribidi-char-sets-cp1256.c    |   2 +-
+ charset/fribidi-char-sets-cp1256.h    |   2 +-
+ charset/fribidi-char-sets-iso8859-6.c |   2 +-
+ charset/fribidi-char-sets-iso8859-6.h |   2 +-
+ charset/fribidi-char-sets-iso8859-8.c |   2 +-
+ charset/fribidi-char-sets-iso8859-8.h |   2 +-
+ charset/fribidi-char-sets-list.h      |   2 +-
+ charset/fribidi-char-sets-utf8.c      |   2 +-
+ charset/fribidi-char-sets-utf8.h      |   2 +-
+ charset/fribidi-char-sets.c           |   2 +-
+ charset/fribidi-char-sets.h           |   2 +-
+ configure.ac                          |  11 +-
+ doc/Makefile.am                       |   3 +-
+ fribidi-vs-unicode/Makefile.am        |  27 ++
+ fribidi-vs-unicode/test-character.c   | 409 ++++++++++++++++++++
+ fribidi-vs-unicode/test.c             | 391 +++++++++++++++++++
+ gen.tab/Makefile.am                   |  32 +-
+ gen.tab/gen-arabic-shaping-tab.c      |   2 +-
+ gen.tab/gen-bidi-type-tab.c           |   2 +-
+ gen.tab/gen-brackets-tab.c            | 345 +++++++++++++++++
+ gen.tab/gen-brackets-type-tab.c       | 238 ++++++++++++
+ gen.tab/gen-joining-type-tab.c        |   2 +-
+ gen.tab/gen-mirroring-tab.c           |   2 +-
+ gen.tab/gen-unicode-version.c         |   2 +-
+ lib/Headers.mk                        |   1 +
+ lib/Makefile.am                       |   9 +-
+ lib/bidi-types.h                      |   2 +-
+ lib/common.h                          |   8 +-
+ lib/debug.h                           |  10 +-
+ lib/fribidi-arabic.c                  |   2 +-
+ lib/fribidi-arabic.h                  |   2 +-
+ lib/fribidi-bidi-types-list.h         |   6 +-
+ lib/fribidi-bidi-types.c              |   2 +-
+ lib/fribidi-bidi-types.h              |  31 +-
+ lib/fribidi-bidi.c                    | 681
+ +++++++++++++++++++++++++++++++---
+ lib/fribidi-bidi.h                    |   4 +-
+ lib/fribidi-brackets.c                | 106 ++++++
+ lib/fribidi-brackets.h                |  90 +++++
+ lib/fribidi-common.h                  |   2 +-
+ lib/fribidi-deprecated.c              |  15 +-
+ lib/fribidi-deprecated.h              |   4 +-
+ lib/fribidi-flags.h                   |   2 +-
+ lib/fribidi-joining-types-list.h      |   2 +-
+ lib/fribidi-joining-types.c           |   2 +-
+ lib/fribidi-joining-types.h           |   2 +-
+ lib/fribidi-joining.c                 |   3 +-
+ lib/fribidi-joining.h                 |   2 +-
+ lib/fribidi-mem.c                     |   2 +-
+ lib/fribidi-mirroring.c               |   4 +-
+ lib/fribidi-mirroring.h               |   4 +-
+ lib/fribidi-run.c                     |  77 +---
+ lib/fribidi-shape.c                   |   2 +-
+ lib/fribidi-shape.h                   |   2 +-
+ lib/fribidi-types.h                   |  14 +-
+ lib/fribidi-unicode.h                 |  15 +-
+ lib/fribidi.c                         |   7 +-
+ lib/fribidi.h                         |   3 +-
+ lib/joining-types.h                   |   2 +-
+ lib/mem.h                             |   2 +-
+ lib/run.h                             |  13 +-
+ test/test_CapRTL_isolate.input        |   8 +
+ test/test_CapRTL_isolate.reference    |   8 +
+ 71 files changed, 2494 insertions(+), 212 deletions(-)
+
+commit 654e3f3436b90da4ec6479aa35b6f0d86e696c41
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Tue Aug 1 20:10:28 2017 +0300
+
+    Updated Unicode data tables to version 10.
+
+ fribidi-vs-unicode/BidiCharacterTest.txt |  96437 ++++++
+ fribidi-vs-unicode/BidiTest.txt          | 497588
+ ++++++++++++++++++++++++++++
+ gen.tab/unidata/ArabicShaping.txt        |    442 +-
+ gen.tab/unidata/BidiBrackets.txt         |    185 +
+ gen.tab/unidata/BidiMirroring.txt        |     38 +-
+ gen.tab/unidata/ReadMe.txt               |     17 +-
+ gen.tab/unidata/UnicodeData.txt          |   7443 +-
+ 7 files changed, 601967 insertions(+), 183 deletions(-)
+
+commit 0ca97b7feb52a9bd1b03aa379bc77fc4fe05957e
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Tue Dec 27 19:48:05 2016 -0500
+
+    Fix build without glib
+
+ lib/fribidi-bidi.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+commit 794adc15dbc70b49e4581300f9f6ad5a4d34dc64
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Mon Dec 26 16:24:28 2016 -0500
+
+    Actually add fribidi-vs-unicode/Makefile.am
+
+ fribidi-vs-unicode/Makefile.am | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+
+commit a6d3dfe04a560ba5ee69e38a62b80c5939d401bc
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Aug 4 15:56:21 2015 +0200
+
+    Remove bitrot code
+
+    FRIBIDI_MAIN_USE_ICONV_H is not defined anywhere and the code does not
+    even build, better to clean up the unnecessary #if #else maze.
+
+ bin/fribidi-main.c | 61
+ +-----------------------------------------------------
+ 1 file changed, 1 insertion(+), 60 deletions(-)
+
+commit e71e49f9645d21ab511723caf8c75e8d9880aacf
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Aug 4 15:48:46 2015 +0200
+
+    Unused variable warnings
+
+ bin/fribidi-main.c | 16 +++-------------
+ 1 file changed, 3 insertions(+), 13 deletions(-)
+
+commit be5e07413f1e7bf306ba122f6ffc27a9a9564f29
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Aug 4 15:35:47 2015 +0200
+
+    Ignore our own deprecations
+
+ bin/fribidi-benchmark.c | 2 ++
+ bin/fribidi-main.c      | 6 ++++++
+ lib/fribidi-common.h    | 4 ++++
+ 3 files changed, 12 insertions(+)
+
+commit 706e7016792bd715be1d9818a781faf9bdb42e42
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Dec 21 17:25:12 2016 -0600
+
+    Remove SConstruct
+
+ fribidi-vs-unicode/SConstruct | 16 ----------------
+ 1 file changed, 16 deletions(-)
+
+commit 1d5bd5976e33fb59b2b2bada341eae296a63f5f3
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Dec 21 17:24:36 2016 -0600
+
+    Build fribidi-vs-unicode binaries
+
+ Makefile.am                       |   2 +-
+ build/fribidi-vs-unicode/Makefile | 698
+ ++++++++++++++++++++++++++++++++++++++
+ configure.ac                      |   3 +-
+ 3 files changed, 701 insertions(+), 2 deletions(-)
+
+commit 680685e347fff7ac8abbfd44b793e7e2d3a9a2f6
+Merge: d36fab0 3cbee0b
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Dec 21 17:03:03 2016 -0600
+
+    Merge remote-tracking branch 'dov/dov-unicode63'
+
+commit d36fab04a6332952556bbf1023c6ba54015ec4c4
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Dec 21 16:11:11 2016 -0600
+
+    Revert "Add fribidi_reorder_runs()"
+
+    This reverts commit 0a8f80debcffded53db34246881cc5d73ad0cfa5.
+
+    I need to redo this without exposing full FriBidiRun struct.
+
+ lib/fribidi-bidi.c   | 112
+ ---------------------------------------------------
+ lib/fribidi-bidi.h   |  29 -------------
+ lib/fribidi-common.h |  14 ++-----
+ lib/run.h            |  11 +++++
+ 4 files changed, 15 insertions(+), 151 deletions(-)
+
+commit 3cbee0b737393c631debeddd71fa631282f74a5c
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sat Jan 30 22:50:13 2016 +0200
+
+    Mostly notes and some compilation issues.
+
+ fribidi-vs-unicode/SConstruct       |   1 +
+ fribidi-vs-unicode/test-character.c |   4 +-
+ fribidi-vs-unicode/test.c           |   2 +-
+ notes.org                           | 149
+ ++++++++++++++++++++++++++++++++++--
+ 4 files changed, 147 insertions(+), 9 deletions(-)
+
+commit 32a6cc7141052764065d7714240e782366a8e61b
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Mon Jan 25 21:48:24 2016 +0200
+
+    Dov's work area for unicode63 development.
+
+ fribidi-vs-unicode/BidiCharacterTest.txt |  96392 ++++++
+ fribidi-vs-unicode/BidiTest.txt          | 497588
+ ++++++++++++++++++++++++++++
+ fribidi-vs-unicode/SConstruct            |     15 +
+ fribidi-vs-unicode/test-character.c      |    379 +
+ fribidi-vs-unicode/test.c                |    384 +
+ notes.org                                |    179 +
+ 6 files changed, 594937 insertions(+)
+
+commit 63d6ba7e9b479eee7d10ff03e43c293b11298e72
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sat Jan 30 21:38:27 2016 +0200
+
+    Fixed all remaining BidiTest.txt bugs.
+
+    - The level was not assigned when in isolate override.
+    - Did not ignore pushing the stack when in isolate override.
+    - PDI's did not reset the overpushed level.
+
+ lib/fribidi-bidi.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+commit 56e5f121de14af07df9862a823201f3435a38a81
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Fri Jan 29 15:20:34 2016 +0200
+
+    Solved max level related bug.
+
+    * Overpushing in an even level did not prevent increasing to an
+    odd level.
+
+ lib/fribidi-bidi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+commit 6ad87e038329711983b257d5fb44e20c4eb870d5
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Mon Jan 25 21:31:13 2016 +0200
+
+    Initial unicode63 support.
+
+ README                              |  14 +-
+ bin/fribidi-main.c                  |   2 +-
+ charset/fribidi-char-sets-cap-rtl.c |  36 ++++-
+ charset/fribidi-char-sets.c         |   2 +-
+ doc/Makefile.am                     |   3 +-
+ gen.tab/gen-joining-type-tab.c      |   4 +
+ gen.tab/unidata/ArabicShaping.txt   | 227 +++++++++++++++++++++++++--
+ gen.tab/unidata/BidiMirroring.txt   |  14 +-
+ gen.tab/unidata/ReadMe.txt          |   8 +-
+ gen.tab/unidata/UnicodeData.txt     |  21 ++-
+ lib/common.h                        |   2 +-
+ lib/debug.h                         |   4 +
+ lib/fribidi-bidi-types-list.h       |   4 +
+ lib/fribidi-bidi-types.h            |  29 +++-
+ lib/fribidi-bidi.c                  | 301
+ ++++++++++++++++++++++++++++++------
+ lib/fribidi-common.h                |   1 +
+ lib/fribidi-deprecated.c            |   1 +
+ lib/fribidi-run.c                   |   6 +-
+ lib/fribidi-unicode.h               |  10 +-
+ test/Makefile.am                    |   4 +-
+ test/test_CapRTL_isolate.input      |   8 +
+ test/test_CapRTL_isolate.reference  |   8 +
+ 22 files changed, 613 insertions(+), 96 deletions(-)
+
+commit 881b8d891cc61989ab8811b74d0e721f72bf913b
+Merge: 9d8c69b ae1d86e
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Fri Dec 25 16:33:19 2015 +0100
+
+    Merge pull request #12 from khaledhosny/allocation
+
+    Remove custom memory allocator
+
+commit ae1d86e78d0406f0d14208b6895e8750fc61a7bb
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Thu Dec 24 11:31:14 2015 +0400
+
+    No need for the warpper function now
+
+ lib/fribidi-bidi.c |  2 +-
+ lib/fribidi-run.c  | 16 +++-------------
+ lib/run.h          |  5 -----
+ 3 files changed, 4 insertions(+), 19 deletions(-)
+
+commit 3519ef07cf2b8610c30b22611466df0de2f74b19
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Thu Dec 24 11:27:47 2015 +0400
+
+    Remove custom memory allocator
+
+    It have been disabled in the last release, so it just complicates the
+    code for no reason.
+
+ configure.ac          |   3 --
+ lib/Makefile.am       |   2 -
+ lib/fribidi-bidi.c    |   1 -
+ lib/fribidi-joining.c |   1 -
+ lib/fribidi-mem.c     | 140
+ --------------------------------------------------
+ lib/fribidi-run.c     |  38 --------------
+ lib/fribidi.c         |   3 --
+ lib/mem.h             |  97 ----------------------------------
+ 8 files changed, 285 deletions(-)
+
+commit 9d8c69b4aea7302391b1cafb3c1fa5c3d8c95198
+Merge: 7fd7d2b 0a8f80d
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Dec 10 11:05:51 2015 +0100
+
+    Merge pull request #10 from HOST-Oman/master
+
+    Add fribidi_reorder_runs()
+
+commit 0a8f80debcffded53db34246881cc5d73ad0cfa5
+Author: anood <anood.almuharbi@gmail.com>
+Date:   Thu Nov 26 14:52:13 2015 +0400
+
+    Add fribidi_reorder_runs()
+
+    This function reorders all runs from logical to final visual order,
+    similar to
+    fribidi_reorder_line() but without reordring the text inside the runs,
+    so that
+    it can be used e.g. with HarfBuzz.
+
+ lib/fribidi-bidi.c   | 112
+ +++++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/fribidi-bidi.h   |  29 +++++++++++++
+ lib/fribidi-common.h |  14 +++++--
+ lib/run.h            |  11 -----
+ 4 files changed, 151 insertions(+), 15 deletions(-)
+
+commit 7fd7d2badedffce5a3328301ba86204a24eed0a3
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Nov 26 18:12:29 2015 -0500
+
+    Minor
+
+ lib/common.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 1a6935cd8cd7d907fb3c5f3bcae174bee727c83d
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Aug 4 07:20:30 2015 +0200
+
+    0.19.7
+
+ NEWS         | 5 +++++
+ configure.ac | 4 ++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+commit f6eb238ca23271511d7506583cff7bc1db5cf8d8
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Aug 4 05:31:30 2015 +0200
+
+    Fix misc autotools warnings
+
+ Makefile.am  | 2 ++
+ configure.ac | 3 +++
+ 2 files changed, 5 insertions(+)
+
+commit ab07dc9442bffb999bbcb5aee69e005227ffe9c9
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sat Mar 8 19:21:31 2014 +0200
+
+    Updated my email.
+
+ AUTHORS        |  2 +-
+ ChangeLog.old  | 48 ++++++++++++++++++++++++------------------------
+ THANKS         |  2 +-
+ test/run.tests |  2 +-
+ 4 files changed, 27 insertions(+), 27 deletions(-)
+
+commit 27b9250ca4dd328bcc8eff6fd4d72914a0b6bde7
+Author: Benedikt Morbach <benedikt.morbach@googlemail.com>
+Date:   Mon Sep 15 16:37:53 2014 +0200
+
+    ignore COLUMNS for --help and --test
+
+    also fix a bug in the --help output.
+    With COLUMNS=123 it would display
+        "default is 123 but if COLUMNS is set..."
+    instead of
+        "default is 80 but if COLUMNS is set..."
+
+    https://bugs.freedesktop.org/show_bug.cgi?id=83892
+
+ bin/fribidi-main.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+commit 5623ca5bf39ae6fc04442d309aa6bec923d569f6
+Author: Behnam Esfahbod <behnam@behnam.es>
+Date:   Sat Dec 6 01:45:17 2014 -0800
+
+    Only include public glib.h
+
+    Fixes error: #error "Only glib.h can be included directly."
+    with glib versions >= 2.31.
+
+    https://bugs.freedesktop.org/show_bug.cgi?id=83894
+    https://github.com/behdad/fribidi/pull/1
+
+ charset/fribidi-char-sets.c | 2 +-
+ lib/mem.h                   | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit 9ca217ae3acecd6e175ac2b0cb0da4f91e8a6399
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Jul 23 14:26:11 2014 -0400
+
+    Fix warning
+
+    https://bugs.freedesktop.org/show_bug.cgi?id=81573
+
+ bin/fribidi-main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit d6bcbea27bd51f4e0a8e5b0cc35b2fdb8d1896d2
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Jul 10 16:06:23 2014 -0400
+
+    Support 4-byte UTF-8 sequences
+
+    Patch from Christina Brien <chris.brien@cisco.com>.
+
+ charset/fribidi-char-sets-utf8.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+commit 54b4496e9c2368c53f1cff57347c1f395328a142
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Tue Jul 1 18:20:37 2014 -0400
+
+    Disable memory pool by default
+
+    https://bugs.freedesktop.org/show_bug.cgi?id=79385
+
+ configure.ac | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
+
+commit 77f7f6c0bb16b89eac1e3b3d264f49b2ee02de3e
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Fri Dec 6 15:56:53 2013 -0500
+
+    0.19.6
+
+ NEWS         | 5 +++++
+ configure.ac | 4 ++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+commit aaa54c04807edcff6c31bd50a0fba9c2f72ed393
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Fri Dec 6 15:54:56 2013 -0500
+
+    Port test suite to automake 1.13
+
+ test/Makefile.am | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+commit c1d48ee98b3d254a6b943851665b83cdd76f6150
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Feb 7 00:06:33 2013 -0500
+
+    Revert "Try to help some builds (on Windows, no less)"
+
+    This reverts commit 7c3963fc8e852e7ed7000accb326f5f178196c41.
+
+    Previous commit broke my build.  Clearly more work needs to be done in
+    this area...
+
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 7c3963fc8e852e7ed7000accb326f5f178196c41
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Feb 7 00:05:15 2013 -0500
+
+    Try to help some builds (on Windows, no less)
+
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 39a63ad373c84d6182fa858af5eaf9d2df164116
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Feb 6 23:26:42 2013 -0500
+
+    Invoke pkg-config macros properly
+
+ configure.ac | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 8bdf69afcd07fe0085bd2131d23a3fe6741291a3
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Tue Jan 29 23:04:53 2013 -0500
+
+    Fix misprint
+
+ lib/fribidi-bidi.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 824477cf6b15ebc0023793e293a158a00c8bddfb
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Fri Jan 4 19:56:08 2013 -0600
+
+    Fix rule X8 when paragraph-separator is present
+
+    As discovered by:
+    https://github.com/behdad/fribidi-vs-unicode
+
+    All passing now.
+
+ lib/fribidi-bidi.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
+
+commit fae80c8290b8bb1f1a11e429a47e80248eaf3072
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Fri Jan 4 19:47:24 2013 -0600
+
+    Fix bug with rule W5
+
+    Test case added.
+
+    This was discovered by running against the Unicode test suite.
+
+    https://github.com/behdad/fribidi-vs-unicode
+
+ lib/fribidi-bidi.c                  | 6 +++++-
+ test/test_CapRTL_implicit.input     | 1 +
+ test/test_CapRTL_implicit.reference | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
+commit 1cca32b775123f8f7bd5a2d4b3380e8d5bee13b0
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Wed Jan 2 18:32:10 2013 -0600
+
+    Fix test when EXEEXT is not empty
+
+ test/Makefile.am | 2 +-
+ test/run.tests   | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+commit d9a040b90362809aa675c74c57121850ff5697bb
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sat Dec 29 19:11:42 2012 -0500
+
+    Remove old cruft
+
+ lib/common.h         | 4 ----
+ lib/fribidi-common.h | 4 ----
+ 2 files changed, 8 deletions(-)
+
+commit 13def08b7564769f68d7efc734dbbf147d358ded
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sat Dec 29 19:08:51 2012 -0500
+
+    Fix export-symbols on Windows
+
+ lib/Makefile.am | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+commit 78dc3af68ed0e1aafe54c176b28dadee66eb306c
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Thu Dec 6 12:17:53 2012 -0500
+
+    Fix theoretically possible overflow
+
+    https://bugzilla.redhat.com/show_bug.cgi?id=884000
+
+ bin/fribidi-main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit fecb73185c223cf1db5533ed6cb55b035563c1ee
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sun Dec 2 18:35:00 2012 +0200
+
+    0.19.5
+
+ NEWS         | 4 ++++
+ configure.ac | 4 ++--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+commit f915c75de72bc722fb565e1de6a31a05f9000216
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sun Dec 2 18:33:41 2012 +0200
+
+    Update to Unicode 6.2
+
+ gen.tab/unidata/ArabicShaping.txt | 10 +++++-----
+ gen.tab/unidata/BidiMirroring.txt | 21 +++++++--------------
+ gen.tab/unidata/ReadMe.txt        |  6 ++++--
+ gen.tab/unidata/UnicodeData.txt   |  9 +++++----
+ 4 files changed, 21 insertions(+), 25 deletions(-)
+
+commit 25f4fa28ec66960b90bcf623185184b52523843d
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sun Dec 2 18:26:07 2012 +0200
+
+    Update FSF address
+
+ COPYING                               | 4 ++--
+ README                                | 4 ++--
+ bin/fribidi-benchmark.c               | 4 ++--
+ bin/fribidi-main.c                    | 4 ++--
+ bin/getopt.c                          | 2 +-
+ bin/getopt.h                          | 2 +-
+ bin/getopt1.c                         | 2 +-
+ bin/getopt_int.h                      | 2 +-
+ charset/fribidi-char-sets-cap-rtl.c   | 4 ++--
+ charset/fribidi-char-sets-cap-rtl.h   | 4 ++--
+ charset/fribidi-char-sets-cp1255.c    | 4 ++--
+ charset/fribidi-char-sets-cp1255.h    | 4 ++--
+ charset/fribidi-char-sets-cp1256.c    | 4 ++--
+ charset/fribidi-char-sets-cp1256.h    | 4 ++--
+ charset/fribidi-char-sets-iso8859-6.c | 4 ++--
+ charset/fribidi-char-sets-iso8859-6.h | 4 ++--
+ charset/fribidi-char-sets-iso8859-8.c | 4 ++--
+ charset/fribidi-char-sets-iso8859-8.h | 4 ++--
+ charset/fribidi-char-sets-list.h      | 4 ++--
+ charset/fribidi-char-sets-utf8.c      | 4 ++--
+ charset/fribidi-char-sets-utf8.h      | 4 ++--
+ charset/fribidi-char-sets.c           | 4 ++--
+ charset/fribidi-char-sets.h           | 4 ++--
+ gen.tab/gen-arabic-shaping-tab.c      | 4 ++--
+ gen.tab/gen-bidi-type-tab.c           | 4 ++--
+ gen.tab/gen-joining-type-tab.c        | 4 ++--
+ gen.tab/gen-mirroring-tab.c           | 4 ++--
+ gen.tab/gen-unicode-version.c         | 4 ++--
+ gen.tab/packtab.c                     | 4 ++--
+ gen.tab/packtab.h                     | 4 ++--
+ lib/bidi-types.h                      | 4 ++--
+ lib/common.h                          | 4 ++--
+ lib/debug.h                           | 4 ++--
+ lib/fribidi-arabic.c                  | 2 +-
+ lib/fribidi-arabic.h                  | 2 +-
+ lib/fribidi-bidi-types-list.h         | 4 ++--
+ lib/fribidi-bidi-types.c              | 4 ++--
+ lib/fribidi-bidi-types.h              | 4 ++--
+ lib/fribidi-bidi.c                    | 4 ++--
+ lib/fribidi-bidi.h                    | 4 ++--
+ lib/fribidi-common.h                  | 4 ++--
+ lib/fribidi-deprecated.c              | 4 ++--
+ lib/fribidi-deprecated.h              | 4 ++--
+ lib/fribidi-flags.h                   | 4 ++--
+ lib/fribidi-joining-types-list.h      | 4 ++--
+ lib/fribidi-joining-types.c           | 4 ++--
+ lib/fribidi-joining-types.h           | 4 ++--
+ lib/fribidi-joining.c                 | 4 ++--
+ lib/fribidi-joining.h                 | 4 ++--
+ lib/fribidi-mem.c                     | 4 ++--
+ lib/fribidi-mirroring.c               | 2 +-
+ lib/fribidi-mirroring.h               | 2 +-
+ lib/fribidi-run.c                     | 4 ++--
+ lib/fribidi-shape.c                   | 4 ++--
+ lib/fribidi-shape.h                   | 4 ++--
+ lib/fribidi-types.h                   | 4 ++--
+ lib/fribidi-unicode.h                 | 4 ++--
+ lib/fribidi.c                         | 4 ++--
+ lib/fribidi.h                         | 4 ++--
+ lib/joining-types.h                   | 4 ++--
+ lib/mem.h                             | 4 ++--
+ lib/run.h                             | 4 ++--
+ test/run.tests                        | 4 ++--
+ 63 files changed, 118 insertions(+), 118 deletions(-)
+
+commit 7c23af76e687819023f4a4ec9127b5919044bf32
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Tue Aug 28 15:03:13 2012 -0400
+
+    Bug 54149 - Fix typo in fribidi help information
+
+ bin/fribidi-main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 9a4a7d805e4055839b319c7b5b6382a7101b1980
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Mon Aug 27 14:34:18 2012 -0400
+
+    Minor
+
+ Makefile.am | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+commit 6b0423949010d4aa596099bba62992b8c28b5abf
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Mon Aug 27 14:19:37 2012 -0400
+
+    0.19.4
+
+ NEWS         | 5 +++++
+ configure.ac | 4 ++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+commit 3ef15e5f0aa4f000f8bacb6af190daa57f8897c4
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sat Aug 25 17:41:02 2012 -0400
+
+    Add git.mk
+
+ Makefile.am         |   2 +
+ bin/Makefile.am     |   2 +
+ charset/Makefile.am |   2 +
+ doc/Makefile.am     |   2 +
+ gen.tab/Makefile.am |   2 +
+ git.mk              | 224
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/Makefile.am     |   2 +
+ test/Makefile.am    |   2 +
+ 8 files changed, 238 insertions(+)
+
+commit 40b469fd91a2bfc94dba04f837e2cec4098164e9
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sat Aug 25 17:40:05 2012 -0400
+
+    Update ChangeLog generation to git
+
+ Makefile.am | 33 ++++++++++++++-------------------
+ 1 file changed, 14 insertions(+), 19 deletions(-)
+
+commit fa21aa06dbc0b1f7e32665d7629bb4593c969495
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sat Aug 25 17:36:07 2012 -0400
+
+    Update Unicode data files to 6.1.0
+
+ gen.tab/unidata/ArabicShaping.txt | 287 ++++++++------
+ gen.tab/unidata/BidiMirroring.txt |  28 +-
+ gen.tab/unidata/ReadMe.txt        |   6 +-
+ gen.tab/unidata/UnicodeData.txt   | 799
+ ++++++++++++++++++++++++++++++++++++--
+ 4 files changed, 956 insertions(+), 164 deletions(-)
+
+commit d39b179d8de65a19390e50cfb39bb36ae193d65b
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sun Jun 17 15:01:09 2012 -0400
+
+    Modernize autofoo a bit
+
+ configure.ac | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
+
+commit 5a9009c8cc1c7825431df0d4e1002a0384f5d4c5
+Author: behdad <behdad>
+Date:   Wed May 4 18:04:29 2011 +0000
+
+    Minor optimization in struct layout for 64bit systems
+
+ lib/run.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit 4d8e4ddd627068d2088c7894925a7e3494ca671e
+Author: behdad <behdad>
+Date:   Fri Jan 21 22:49:59 2011 +0000
+
+    Update to Unicode 6.0.0 and bump version to 0.19.3
+
+ configure.ac                      |   12 +-
+ gen.tab/unidata/ArabicShaping.txt |   68 +-
+ gen.tab/unidata/BidiMirroring.txt |   27 +-
+ gen.tab/unidata/ReadMe.txt        |   12 +-
+ gen.tab/unidata/UnicodeData.txt   | 5261
+ +++++++++++++++++++++++++++++++++----
+ 5 files changed, 4882 insertions(+), 498 deletions(-)
+
+commit 6c535469bfbff7983f5052fa3cf6f8eb8dc2f26a
+Author: behdad <behdad>
+Date:   Tue Dec 7 19:44:24 2010 +0000
+
+    Fix build without charset converters
+
+ bin/Makefile.am                | 5 ++++-
+ gen.tab/gen-joining-type-tab.c | 7 ++++---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+commit ac47256bb07728c6e1a4debd9cee2600c48acab6
+Author: behdad <behdad>
+Date:   Wed Feb 24 19:40:04 2010 +0000
+
+    Include toplevel glib.h only
+
+ lib/common.h         | 12 ++++++------
+ lib/fribidi-common.h |  8 ++++----
+ lib/fribidi-types.h  |  9 ++++-----
+ 3 files changed, 14 insertions(+), 15 deletions(-)
+
+commit 05c2637b3618ee6785774b6d080ac345489042d5
+Author: behdad <behdad>
+Date:   Tue Apr 14 03:49:52 2009 +0000
+
+    Support win32 benchmarking
+
+ bin/fribidi-benchmark.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
+
+commit 9282f1fa2eada341fdf05e1167e317e084e37ad1
+Author: behdad <behdad>
+Date:   Fri Mar 27 16:14:33 2009 +0000
+
+    [doc] Make sure a minus is used, not a hyphen.
+
+ lib/fribidi-deprecated.h | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+commit 10f83ec197e821e72c6733fcc6ef763324d4ced4
+Author: behdad <behdad>
+Date:   Thu Mar 26 22:37:29 2009 +0000
+
+    NEWS, configure.ac: Released GNU FriBidi 0.19.2.
+
+ NEWS         |  6 ++++++
+ configure.ac | 12 ++++++------
+ 2 files changed, 12 insertions(+), 6 deletions(-)
+
+commit 8c13427b601bbbc03be58cc1b5aeaa6e31e65399
+Author: behdad <behdad>
+Date:   Thu Mar 26 22:25:39 2009 +0000
+
+    Bugzilla – Bug 20887 Problem with handling a certain sequence of
+    arabic characters in fribidi 0.19.1
+
+    Fix typo in ligature table.
+
+ lib/arabic-misc.tab.i | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit bd3cf818941aa166425b633f92ce0d0d8b0efb37
+Author: behdad <behdad>
+Date:   Tue Dec 30 18:42:37 2008 +0000
+
+    Add AbsoluteTelnet.
+
+ USERS | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 2202f4310dbcb95b893e3342eeb9a48a49377294
+Author: behdad <behdad>
+Date:   Mon Nov 24 17:48:31 2008 +0000
+
+    Fix typos.
+
+ lib/fribidi-bidi-types.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit d60a4546004df012871348b00be28f57baca28a8
+Author: behdad <behdad>
+Date:   Tue Apr 22 19:50:46 2008 +0000
+
+    Handle RLM/LRM in CP1255 charset converter.  (#15328, Artyom)
+
+ charset/fribidi-char-sets-cp1255.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
+
+commit 4b8dde2be6c0ed0a28ba54e0fe204f821dd5a88f
+Author: behdad <behdad>
+Date:   Tue Apr 8 21:38:22 2008 +0000
+
+    Update to Unicode Character Database 5.1.0
+
+ gen.tab/unidata/ArabicShaping.txt |   34 +-
+ gen.tab/unidata/BidiMirroring.txt |   42 +-
+ gen.tab/unidata/ReadMe.txt        |   10 +-
+ gen.tab/unidata/UnicodeData.txt   | 1694
+ ++++++++++++++++++++++++++++++++++++-
+ lib/Makefile.am                   |    2 +-
+ lib/common.h                      |   10 +-
+ 6 files changed, 1721 insertions(+), 71 deletions(-)
+
+commit 66839714d9773a37f6e653fc150f7ef685fe673f
+Author: behdad <behdad>
+Date:   Tue Jan 15 23:15:45 2008 +0000
+
+    Released GNU FriBidi 0.19.1.
+
+ NEWS         | 36 ++++++++++++++++++++++++++++++++----
+ README       |  3 +--
+ configure.ac | 12 ++++++------
+ 3 files changed, 39 insertions(+), 12 deletions(-)
+
+commit ff8fdfae41cace1151dee4adac035e0708f3a5d2
+Author: behdad <behdad>
+Date:   Tue Jan 15 22:53:06 2008 +0000
+
+    Remove RPM versioning cruft.
+
+ configure.ac | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
+
+commit 97287207e2b1fafbd027050d96222b6b672c91b3
+Author: behdad <behdad>
+Date:   Tue Jan 15 19:59:34 2008 +0000
+
+    Remove spec file.  Nobody uses upstream spec files these days.
+
+ configure.ac    |   9 ++--
+ fribidi.spec.in | 145
+ --------------------------------------------------------
+ 2 files changed, 4 insertions(+), 150 deletions(-)
+
+commit 753ed9aed90f9d31e6ff404c0c7befadbfd18d23
+Author: behdad <behdad>
+Date:   Thu Jun 7 16:33:51 2007 +0000
+
+    Add remaining issues before a release can be made.
+
+ TODO | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+commit 9cf48565b4eae059dece1bb25a2758f86c003509
+Author: behdad <behdad>
+Date:   Thu Apr 5 16:14:39 2007 +0000
+
+    Avoid non-const struct initializer.
+
+ lib/fribidi-arabic.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
+
+commit a04ddf676dec48112e077c8c3f727a313433c09f
+Author: behdad <behdad>
+Date:   Thu Apr 5 16:14:14 2007 +0000
+
+    Make sure we err if stringize is not available.
+
+ lib/common.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit 28dc6041e9f0074c68ce23a67a3b5f0ff3717241
+Author: behdad <behdad>
+Date:   Thu Apr 5 16:13:24 2007 +0000
+
+    Check for (defined(WIN32)) || (defined(_WIN32_WCE)) to detect
+    WinCE too
+
+ lib/common.h         | 8 ++++----
+ lib/fribidi-common.h | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+commit 1a25b4e31a1e0560c82086a5216cd7b064a9ca0c
+Author: behdad <behdad>
+Date:   Thu Mar 15 18:09:25 2007 +0000
+
+    Skip explicits-list reinsertion if list is empty.
+
+ lib/fribidi-bidi.c | 38 +++++++++++++++++++++-----------------
+ 1 file changed, 21 insertions(+), 17 deletions(-)
+
+commit fa423e19309e5de2e8e5671dedaf04e66a2b3ff8
+Author: behdad <behdad>
+Date:   Fri Jul 21 22:29:10 2006 +0000
+
+    Update to Unicode Character Database 5.0.0.
+
+ gen.tab/unidata/ArabicShaping.txt |   45 +-
+ gen.tab/unidata/BidiMirroring.txt |   42 +-
+ gen.tab/unidata/ReadMe.txt        |   31 +-
+ gen.tab/unidata/UnicodeData.txt   | 1493
+ +++++++++++++++++++++++++++++++++++--
+ 4 files changed, 1520 insertions(+), 91 deletions(-)
+
+commit 105e8f3c8f67fcd5a1620f9a9059b550067c1ac0
+Author: behdad <behdad>
+Date:   Tue Jun 13 00:59:08 2006 +0000
+
+    Add Nokia 9110 Hebrew Support package.
+
+ USERS | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit d7a0bb2e00f061481f83d77293834f9fde594b5f
+Author: behdad <behdad>
+Date:   Thu Jun 1 22:53:55 2006 +0000
+
+    More comments.
+
+ lib/fribidi-deprecated.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+commit a97826cdebe9be46421cea7fa7379a4c43947dec
+Author: behdad <behdad>
+Date:   Thu Jun 1 22:52:29 2006 +0000
+
+    Note about line-breaking.
+
+ lib/fribidi-deprecated.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+commit b6100183464b26258c8ebb454e857aae295f30de
+Author: behdad <behdad>
+Date:   Fri Apr 28 02:00:31 2006 +0000
+
+    Use -no-undefined unconditionally.
+
+ lib/Makefile.am | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
+
+commit 6bdbe74f19a97c855265d595ce0de48e66f28715
+Author: behdad <behdad>
+Date:   Tue Jan 31 03:23:12 2006 +0000
+
+    Add an option --disable-deprecated.
+
+ bin/fribidi-benchmark.c          | 16 +++++++-------
+ bin/fribidi-main.c               | 45
+ +++++++++++++++++++++++-----------------
+ charset/fribidi-char-sets.c      | 16 +++++++-------
+ configure.ac                     | 23 ++++++++++++++------
+ gen.tab/gen-arabic-shaping-tab.c | 12 +++++------
+ gen.tab/gen-bidi-type-tab.c      | 12 +++++------
+ gen.tab/gen-joining-type-tab.c   | 12 +++++------
+ gen.tab/gen-mirroring-tab.c      | 12 +++++------
+ gen.tab/gen-unicode-version.c    | 12 +++++------
+ gen.tab/packtab.c                |  8 +++----
+ lib/bidi-types.h                 |  8 +++----
+ lib/common.h                     | 21 +++++++++----------
+ lib/debug.h                      |  8 +++----
+ lib/fribidi-arabic.c             |  8 +++----
+ lib/fribidi-bidi-types.c         |  8 +++----
+ lib/fribidi-bidi-types.h         | 17 +++------------
+ lib/fribidi-bidi.c               |  8 +++----
+ lib/fribidi-common.h             | 18 ++++++++--------
+ lib/fribidi-deprecated.c         | 11 ++++++----
+ lib/fribidi-deprecated.h         | 30 ++++++++++++++++++++++++---
+ lib/fribidi-joining-types.c      |  8 +++----
+ lib/fribidi-joining.c            |  8 +++----
+ lib/fribidi-mem.c                | 12 ++++++-----
+ lib/fribidi-run.c                | 30 +++++++++++++--------------
+ lib/fribidi-types.h              | 39 +++++++++++++++++-----------------
+ lib/fribidi-unicode.h            | 33 +++++++----------------------
+ lib/fribidi.c                    | 21 ++++++++++---------
+ lib/fribidi.h                    | 13 +++++++-----
+ lib/joining-types.h              |  8 +++----
+ lib/mem.h                        | 34 +++++++++++++++---------------
+ lib/run.h                        |  8 +++----
+ 31 files changed, 269 insertions(+), 250 deletions(-)
+
+commit 570efad0b961ad106a05f2dbabeedbed477ea161
+Author: behdad <behdad>
+Date:   Sun Jan 22 10:12:17 2006 +0000
+
+    Add extra braces to shut gcc warnings up.
+
+ charset/fribidi-char-sets-cap-rtl.c | 17 +++++++++--------
+ lib/debug.h                         | 13 +++++++------
+ lib/run.h                           |  9 +++++----
+ 3 files changed, 21 insertions(+), 18 deletions(-)
+
+commit fd466b1f41cd1b0d1717eac9b18b188c58c2d479
+Author: behdad <behdad>
+Date:   Sun Jan 22 10:11:43 2006 +0000
+
+    Shut gcc warnings up.
+
+ bin/fribidi-main.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+commit 0c1a24cc05dc1d3b9500adbd1cc98956b27cfc12
+Author: behdad <behdad>
+Date:   Sun Jan 22 10:11:23 2006 +0000
+
+    Use memcpy for duplicating str.
+
+ lib/fribidi-deprecated.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+commit b4b92129d1d49dd926afdb2b15130345fd78ce24
+Author: behdad <behdad>
+Date:   Sun Jan 22 10:10:57 2006 +0000
+
+    Include string.h.
+
+ lib/common.h | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
+
+commit a23b982514520747e4012a7aa577607bea657fa8
+Author: behdad <behdad>
+Date:   Sat Jan 21 14:00:01 2006 +0000
+
+    Added HebrewService.
+
+ USERS | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 763d386e7bd52925cf61c93e738e35525e311392
+Author: behdad <behdad>
+Date:   Sat Jan 14 12:09:29 2006 +0000
+
+    Added fribidi_get_type_internal as a deprecated symbol.
+
+ lib/fribidi-deprecated.c | 14 +++++++++++---
+ lib/fribidi-deprecated.h | 19 ++++++++++++++-----
+ lib/fribidi-shape.h      |  9 +++++----
+ lib/fribidi.def          | 32 ++++++++++++++++++--------------
+ 4 files changed, 48 insertions(+), 26 deletions(-)
+
+commit 2f2520ff14c086976507f7fdba39e56cf7652d8e
+Author: behdad <behdad>
+Date:   Wed Nov 23 19:29:44 2005 +0000
+
+    Added Nano-X.
+
+ USERS | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 190e142a731b8a99c5ce837e48618061bc636ef5
+Author: behdad <behdad>
+Date:   Tue Nov 15 20:04:14 2005 +0000
+
+    Set TESTS_ENVIRONMENT=/bin/sh to avoid problem when running with
+    \r\n line
+    endings on Linux.
+
+ test/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 423ecf2a86a7ccb2f265ff7db3e6ec5b8d573ff5
+Author: behdad <behdad>
+Date:   Wed Nov 9 20:02:48 2005 +0000
+
+    Added a FIXME about not handling First..Last ranges in
+    UnicodeData.txt.
+
+ gen.tab/gen-bidi-type-tab.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+commit cdf20461a666da4493fc279cd2257939663c3284
+Author: behdad <behdad>
+Date:   Thu Nov 3 01:39:01 2005 +0000
+
+    Arabic shaping support added.
+
+ HACKING                              |   1 +
+ TODO                                 |   3 +
+ bin/fribidi-main.c                   |   7 +-
+ configure.ac                         |  20 +--
+ doc/Makefile.am                      |   2 +-
+ gen.tab/Makefile.am                  |  16 +-
+ gen.tab/gen-arabic-liga.sh           |   9 +
+ gen.tab/gen-arabic-shaping-tab.c     | 310
+ +++++++++++++++++++++++++++++++++++
+ gen.tab/gen-bidi-type-tab.c          |  12 +-
+ gen.tab/gen-joining-type-tab.c       |  10 +-
+ gen.tab/gen-mirroring-tab.c          |  12 +-
+ gen.tab/gen-unicode-version.c        |   7 +-
+ gen.tab/packtab.c                    |   1 +
+ lib/Headers.mk                       |   5 +-
+ lib/Makefile.am                      |   8 +-
+ lib/arabic-misc.tab.i                |  94 +++++++++++
+ lib/debug.h                          |   7 +-
+ lib/fribidi-arabic.c                 | 190 +++++++++++++++++++++
+ lib/fribidi-arabic.h                 |  88 ++++++++++
+ lib/fribidi-bidi.c                   |  62 ++-----
+ lib/fribidi-bidi.h                   |  31 ++--
+ lib/fribidi-common.h                 |  29 +++-
+ lib/fribidi-config.h.in              |   3 -
+ lib/fribidi-deprecated.c             | 296
+ +++++++++++++++++++++++++++++++++
+ lib/fribidi-deprecated.h             | 210 ++++++++++++++++++++++++
+ lib/fribidi-env.c                    | 121 --------------
+ lib/fribidi-env.h                    | 126 --------------
+ lib/fribidi-flags.h                  |  78 +++++++++
+ lib/fribidi-joining-types.c          |  10 +-
+ lib/fribidi-joining-types.h          |   9 +-
+ lib/fribidi-joining.c                |  40 +++--
+ lib/fribidi-mem.c                    |   8 +-
+ lib/fribidi-mirroring.c              |  10 +-
+ lib/fribidi-run.c                    |  13 +-
+ lib/{env.h => fribidi-shape.c}       |  53 +++---
+ lib/fribidi-shape.h                  |  77 +++++++++
+ lib/fribidi-types.h                  |  24 +--
+ lib/fribidi-unicode.h                |  12 +-
+ lib/fribidi.c                        | 213 +++---------------------
+ lib/fribidi.h                        | 116 ++-----------
+ lib/joining-types.h                  |   8 +-
+ test/test_UTF-8_persian.reference    |  28 ++--
+ test/test_UTF-8_reordernsm.reference |  14 +-
+ 43 files changed, 1635 insertions(+), 758 deletions(-)
+
+commit 7aa8a91edbc3325e8b179cc649be778dceb85499
+Author: behdad <behdad>
+Date:   Sun Sep 25 22:59:21 2005 +0000
+
+    Replaced bug URL.
+
+ configure.ac | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+commit 42b8f6c32751ec34df6b47292491a50fbf28e76f
+Author: behdad <behdad>
+Date:   Sun Sep 25 18:42:10 2005 +0000
+
+    Use sed instead of $(SED).
+
+ test/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit dc2d62315905e43fcddfe981171803f071facc9f
+Author: behdad <behdad>
+Date:   Sat Sep 24 01:04:15 2005 +0000
+
+    Updated and annotated.
+
+ USERS | 42 +++++++++++++++++++++++++++++++-----------
+ 1 file changed, 31 insertions(+), 11 deletions(-)
+
+commit 1a84d35513e311b152c3147f8f6de613ef563c3a
+Author: behdad <behdad>
+Date:   Sat Sep 24 00:44:54 2005 +0000
+
+    Moved BiCon up, since it's an easy sample to study.
+
+ USERS | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit f2b7ba2cd28592c2a1bc8b8669ea6e3cf7697673
+Author: behdad <behdad>
+Date:   Sun Sep 4 16:57:09 2005 +0000
+
+    Better handling of sys/times.h.  Also, don't pass -pedantic to gcc.
+
+ bin/fribidi-benchmark.c | 10 +++++++---
+ configure.ac            | 13 ++++++-------
+ 2 files changed, 13 insertions(+), 10 deletions(-)
+
+commit a655e7cb79937f2a3b9c3caab5c57a228564f90a
+Author: behdad <behdad>
+Date:   Sun Sep 4 16:56:16 2005 +0000
+
+    Added fribidi_version_info.
+
+ lib/fribidi.def | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 0548d9cc1f6794ac714b66f8d870aeaa0d14da4a
+Author: behdad <behdad>
+Date:   Sun Sep 4 16:55:12 2005 +0000
+
+    Use capital hex digits.
+
+ bin/fribidi-bidi-types.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit ff7183b4f6f87ea018486334c5e9b73ceffbd360
+Author: behdad <behdad>
+Date:   Sat Aug 27 10:21:51 2005 +0000
+
+    Small change to not run libtool if the package doesn't use it.
+
+ bootstrap | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+commit 6f82bd2a21dd38e03bdecab889b9fc9f98fcfeb3
+Author: behdad <behdad>
+Date:   Thu Aug 25 18:35:34 2005 +0000
+
+    Minor.
+
+ Makefile.am | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+commit f7f7232e6322d493118dce829906b626c8dd2049
+Author: behdad <behdad>
+Date:   Wed Aug 10 23:16:31 2005 +0000
+
+    Couple items added ;).
+
+ TODO | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+commit e8bca571a125502fe0735cf45d6af1d3a85a49c7
+Author: behdad <behdad>
+Date:   Sat Jul 30 09:06:27 2005 +0000
+
+    Small changes to shut gcc warnings up.
+
+ .cvsignore                          |  1 +
+ Makefile.am                         |  7 ++--
+ USERS                               |  4 +-
+ bin/fribidi-benchmark.c             | 17 ++++----
+ bin/fribidi-bidi-types.c            |  7 +++-
+ bin/fribidi-caprtl2utf8.c           | 17 ++++----
+ bin/fribidi-main.c                  | 30 +++++++-------
+ charset/fribidi-char-sets-cap-rtl.c | 78
+ +++++++++++++++++++++----------------
+ charset/fribidi-char-sets-utf8.c    | 12 +++---
+ configure.ac                        | 20 +++++-----
+ gen.tab/gen-unicode-version.c       | 33 ++++++++--------
+ lib/fribidi-bidi.c                  | 10 ++---
+ lib/fribidi-types.h                 | 10 ++---
+ lib/fribidi.c                       |  8 ++--
+ 14 files changed, 138 insertions(+), 116 deletions(-)
+
+commit 6f84aff9f7901178ef9e7e2e463a04e639b5a606
+Author: behdad <behdad>
+Date:   Wed Jun 8 18:53:50 2005 +0000
+
+    Small edits.
+
+ README | 4 ++--
+ THANKS | 2 +-
+ TODO   | 2 ++
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+commit 3c5b16d01c37a03e790617ff59fbdb634f859933
+Author: behdad <behdad>
+Date:   Tue Jun 7 08:44:23 2005 +0000
+
+    Misc fixes.
+
+ TODO         | 11 -----------
+ USERS        |  1 +
+ configure.ac | 10 +++++-----
+ 3 files changed, 6 insertions(+), 16 deletions(-)
+
+commit 24d75cf7f42251ccb7a00f5469d8e172cf10061d
+Author: behdad <behdad>
+Date:   Tue Jun 7 08:43:17 2005 +0000
+
+    In Unicode 4.1.0, the ReadMe.txt doesn't contain the Unicode version
+    anymore.
+    Updated to read version from BidiMirroring.txt, if not found in
+    ReadMe.txt.
+
+ gen.tab/Makefile.am           |  5 +--
+ gen.tab/gen-unicode-version.c | 75
+ ++++++++++++++++++++++++++++---------------
+ gen.tab/unidata/ReadMe.txt    |  3 --
+ 3 files changed, 53 insertions(+), 30 deletions(-)
+
+commit 589404c4a8e4cc462931d390badf397dae93a433
+Author: behdad <behdad>
+Date:   Tue Jun 7 08:42:15 2005 +0000
+
+    Extra space removed!
+
+ gen.tab/gen-bidi-type-tab.c    | 8 ++++----
+ gen.tab/gen-joining-type-tab.c | 8 ++++----
+ gen.tab/gen-mirroring-tab.c    | 8 ++++----
+ 3 files changed, 12 insertions(+), 12 deletions(-)
+
+commit 7693cd077b01f38470235322785488eaf3935cde
+Author: behdad <behdad>
+Date:   Tue Jun 7 08:40:21 2005 +0000
+
+    Small fixes.
+
+ THANKS | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit 6cd91b5e87ee7c33cfad2db686cc0e05bba2f547
+Author: behdad <behdad>
+Date:   Tue Jun 7 08:39:14 2005 +0000
+
+    An integrated CapRTL to UTF-8 converter added.
+
+ bin/Makefile.am           |   2 +-
+ bin/fribidi-caprtl2utf8.c |  32 +++++++++++++++
+ test/caprtl2unicode.py    | 102
+ ----------------------------------------------
+ 3 files changed, 33 insertions(+), 103 deletions(-)
+
+commit 10a1d7d29e5fc41f27e6296382c6de9a82aa5a99
+Author: behdad <behdad>
+Date:   Tue Jun 7 08:20:05 2005 +0000
+
+    Added.  Enumerates bidi char types into stdout.
+
+ bin/Makefile.am          |  2 +-
+ bin/fribidi-bidi-types.c | 14 ++++++++++++++
+ 2 files changed, 15 insertions(+), 1 deletion(-)
+
+commit d993a60a47b582fbf48da9d9fb6b0a49b80ac7b6
+Author: behdad <behdad>
+Date:   Tue Jun 7 07:31:13 2005 +0000
+
+    Unicode 4.1 character database update.
+
+ gen.tab/unidata/ArabicShaping.txt |  105 ++-
+ gen.tab/unidata/BidiMirroring.txt |   39 +-
+ gen.tab/unidata/ReadMe.txt        |   47 +-
+ gen.tab/unidata/UnicodeData.txt   | 1383
+ +++++++++++++++++++++++++++++++++++--
+ 4 files changed, 1448 insertions(+), 126 deletions(-)
+
+commit 004756f080f6bf20b27b61b419317a05a529227a
+Author: behdad <behdad>
+Date:   Mon Jan 10 06:43:53 2005 +0000
+
+    Better conversion table from CapRTL to Unicode.
+
+ charset/fribidi-char-sets-cap-rtl.c | 40
+ +++++++++++++++++++++++++++----------
+ 1 file changed, 30 insertions(+), 10 deletions(-)
+
+commit 294e001ae47168d63a2e7e7eaf7ede2a7a3dc1ae
+Author: roozbeh <roozbeh>
+Date:   Sun Jan 9 11:18:30 2005 +0000
+
+    Made the wording a little more formal, removed jokes and sad stories.
+
+ AUTHORS | 43 ++++++++++++++++++++-----------------------
+ 1 file changed, 20 insertions(+), 23 deletions(-)
+
+commit 17fc4cc584586887bb075e6759b6b9817136bff0
+Author: behnam <behnam>
+Date:   Sat Jan 8 15:27:20 2005 +0000
+
+    Correcting the table.
+
+ test/caprtl2unicode.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit 9c069fc714a833165ce62638e3769f88187e55c7
+Author: behnam <behnam>
+Date:   Sat Jan 8 13:26:58 2005 +0000
+
+    Clearing some typos.
+
+ test/caprtl2unicode.py | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+commit 9c41b72c0911188bb31821256f5d9594370cd323
+Author: behnam <behnam>
+Date:   Wed Jan 5 16:45:56 2005 +0000
+
+    Adding CapRTL to Unicode (UTF-8) convertor.
+
+ test/caprtl2unicode.py | 104
+ +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 104 insertions(+)
+
+commit 5db31e96f3c6b904325939e648a363cbcac56b14
+Author: behdad <behdad>
+Date:   Fri Oct 29 18:49:48 2004 +0000
+
+    Added Geresh.
+
+ USERS | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit 16912ed41fda35ca84cf7cdcffafd063813084d6
+Author: behdad <behdad>
+Date:   Tue Sep 28 07:58:57 2004 +0000
+
+    Minor change in comments:  Using "Authors(s)" in the file header.
+
+ lib/fribidi-mirroring.c | 8 ++++----
+ lib/fribidi-mirroring.h | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+commit e9682b9d9c3aab7cc9b84f6f7038f2d91dd7eeae
+Author: behdad <behdad>
+Date:   Fri Aug 27 21:55:59 2004 +0000
+
+    Here and there small improvements.
+
+ Makefile.am                    | 14 +++++++-------
+ TODO                           |  4 ++--
+ USERS                          |  1 +
+ configure.ac                   | 12 ++++++------
+ gen.tab/gen-bidi-type-tab.c    | 10 ++++++----
+ gen.tab/gen-joining-type-tab.c | 10 ++++++----
+ gen.tab/gen-mirroring-tab.c    | 10 ++++++----
+ gen.tab/gen-unicode-version.c  |  9 +++++----
+ 8 files changed, 39 insertions(+), 31 deletions(-)
+
+commit 72e40abf49046452016b994e2e3e390460b2d757
+Author: behdad <behdad>
+Date:   Fri Jul 16 08:39:14 2004 +0000
+
+    Added.  List of projects using FriBidi.
+
+ USERS | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+commit 3218f6b1213fe224ad0e1aac5ce0680fc08fb711
+Author: behdad <behdad>
+Date:   Sat Jul 3 20:49:32 2004 +0000
+
+    Added test_UTF-8_reordernsm to Makefile.
+
+ test/Makefile.am | 41 ++++++++++++++++++++++-------------------
+ 1 file changed, 22 insertions(+), 19 deletions(-)
+
+commit ecf61996551cf322195cec23e52ea2203461728c
+Author: behdad <behdad>
+Date:   Sat Jul 3 11:36:14 2004 +0000
+
+    Here and there fixes, found by trying to compile on sf.net Compile
+    Farm!
+
+ AUTHORS             |  6 +++---
+ TODO                |  3 ---
+ configure.ac        | 17 +++++++++--------
+ gen.tab/Makefile.am | 17 +++++++++++++++++
+ lib/Makefile.am     | 13 ++++++++++---
+ lib/fribidi-types.h | 15 ++++-----------
+ 6 files changed, 43 insertions(+), 28 deletions(-)
+
+commit 9172b19c7bff40e6dafb08e2c09bf4a8d095bfd0
+Author: behdad <behdad>
+Date:   Sat Jul 3 06:01:04 2004 +0000
+
+    Well, just testing new maildiff script.
+
+ HACKING | 1 +
+ 1 file changed, 1 insertion(+)
+
+commit e252f1935eedfbda10b7748332ba6083844b04fe
+Author: behdad <behdad>
+Date:   Sat Jul 3 01:45:08 2004 +0000
+
+    Another TODO item added.
+
+ TODO | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit 39eb7cee872fe37844cb7c4e929b69afd1998924
+Author: behdad <behdad>
+Date:   Sat Jul 3 00:04:27 2004 +0000
+
+    Boring addition of new TODO items :-(.
+
+ TODO | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+commit 584ed3fc6c0a99624ed8c77247ef5533ef7e613c
+Author: behdad <behdad>
+Date:   Wed Jun 23 22:26:06 2004 +0000
+
+    Two small fixes to make compilation with -DDONT_HAVE_FRIBIDI_CONFIG_H
+    go on.
+
+ bin/fribidi-main.c   | 8 ++++----
+ lib/fribidi-common.h | 7 ++++---
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+commit 5dae46a14998243dc121cc0a8f72176cae6e43c8
+Author: behdad <behdad>
+Date:   Mon Jun 21 21:15:31 2004 +0000
+
+    Reimplemented Arabic joining.  Hopefullly it's conforming to the
+    standard now,
+    with the exception that we assume "level run" instead of "directional
+    run",
+    which is a proposed changed to be applied for Unicode 4.1.
+
+ .indent.pro                 |   2 +-
+ lib/fribidi-bidi.h          |  17 +++---
+ lib/fribidi-joining-types.h |  18 ++++--
+ lib/fribidi-joining.c       | 133
+ ++++++++++++++++++++++++++------------------
+ lib/fribidi-joining.h       |  15 +++--
+ lib/fribidi-unicode.h       |  14 ++---
+ lib/fribidi.c               |  10 ++--
+ lib/fribidi.h               |   8 +--
+ 8 files changed, 124 insertions(+), 93 deletions(-)
+
+commit 597b12bc95d465aab5402b0a5b75516fc339e6e4
+Author: behdad <behdad>
+Date:   Mon Jun 21 18:49:23 2004 +0000
+
+    We need bidi_types all over the place (in joining, in shaping,
+    ...), so
+    make them mandatory.  As a consequence, many of our functions don't
+    need str
+    anymore:  they just need this bidi_types.
+
+ lib/bidi-types.h         |  8 +++----
+ lib/common.h             | 11 +++++++---
+ lib/fribidi-bidi-types.h | 14 +++++++-----
+ lib/fribidi-bidi.c       | 55
+ +++++++++++++++++++++---------------------------
+ lib/fribidi-bidi.h       | 43 ++++++-------------------------------
+ lib/fribidi-joining.c    | 17 +++++++++++----
+ lib/fribidi-run.c        | 15 ++++++-------
+ lib/fribidi-unicode.h    | 18 +++++++++++-----
+ lib/fribidi.c            | 20 +++++++++++++-----
+ lib/run.h                | 11 +++++-----
+ 10 files changed, 104 insertions(+), 108 deletions(-)
+
+commit b1a9af57fe88c46b5f9f7fd47db37895b3e58e78
+Author: behdad <behdad>
+Date:   Mon Jun 21 16:15:27 2004 +0000
+
+    Fixed a bug in fribidi_log2vis(), also changed fribidi_reorder_line()
+    api to
+    allow not passing visual_str, by passing str instead.
+
+ lib/fribidi-bidi.c | 37 ++++++++++++++++++++-----------------
+ lib/fribidi-bidi.h | 22 +++++++++++++++-------
+ lib/fribidi.c      | 41 +++++++++++++++++++++--------------------
+ 3 files changed, 56 insertions(+), 44 deletions(-)
+
+commit 9ccf303994daef7417fe30bce7cf7d9ec8f9a59c
+Author: behdad <behdad>
+Date:   Fri Jun 18 22:41:39 2004 +0000
+
+    Rever back to our old level setting for BN and explicits.  The new
+    method was
+    buggy.  A test case added to capture that.
+
+ lib/fribidi-bidi.c                  | 20 ++++++--------------
+ test/Makefile.am                    | 10 +++++-----
+ test/test_CapRTL_explicit.input     |  1 +
+ test/test_CapRTL_explicit.reference |  1 +
+ 4 files changed, 13 insertions(+), 19 deletions(-)
+
+commit 23b5d2354cff9b790f0e19bd78e5084b069f5679
+Author: behdad <behdad>
+Date:   Fri Jun 18 19:21:33 2004 +0000
+
+    Fixed good catch by Mark Davis that rule L1 is partly done after line
+    breaking.  Also calculate more reasonable levels for explicit marks
+    and BN.
+
+ lib/fribidi-bidi-types.h | 13 ++++++-----
+ lib/fribidi-bidi.c       | 56
+ +++++++++++++++++++++++++++++++++++++-----------
+ lib/fribidi-bidi.h       | 30 ++++++++++++++++----------
+ lib/fribidi-types.h      | 10 ++++-----
+ lib/fribidi.c            | 10 ++++-----
+ 5 files changed, 79 insertions(+), 40 deletions(-)
+
+commit 7ca6352ed7890ea20a23e6957c7cd4928c0fe7d1
+Author: behdad <behdad>
+Date:   Tue Jun 15 20:54:00 2004 +0000
+
+    Oh, no need to add tables for general category Cf, it can roughly
+    be obtained
+    by doing JOINING_TYPE_T - BIDI_TYPE_NSM...
+
+ gen.tab/Makefile.am      | 16 +---------------
+ lib/Makefile.am          |  4 +---
+ lib/fribidi-bidi-types.h | 17 +++--------------
+ 3 files changed, 5 insertions(+), 32 deletions(-)
+
+commit e6086775cc1d123d94127ee618fe6aaa0c10134a
+Author: behdad <behdad>
+Date:   Tue Jun 15 11:52:02 2004 +0000
+
+    Arabic joining is almost complete.  Going for Shaping.
+
+ .indent.pro                         |   1 +
+ TODO                                |  11 ++-
+ charset/fribidi-char-sets-cap-rtl.c |   8 +-
+ configure.ac                        |  10 +--
+ gen.tab/Makefile.am                 |  16 +++-
+ gen.tab/gen-bidi-type-tab.c         |   9 +-
+ gen.tab/gen-joining-type-tab.c      |   9 +-
+ gen.tab/gen-mirroring-tab.c         |   9 +-
+ gen.tab/gen-unicode-version.c       |   9 +-
+ lib/Makefile.am                     |   4 +-
+ lib/common.h                        |  10 ++-
+ lib/fribidi-bidi-types.c            |  12 +--
+ lib/fribidi-bidi-types.h            |  68 +++++++++++----
+ lib/fribidi-bidi.c                  | 119 +++++++++++++++-----------
+ lib/fribidi-bidi.h                  |  94 +++++++++++++++------
+ lib/fribidi-joining-types-list.h    |  10 +--
+ lib/fribidi-joining-types.c         |  30 ++++---
+ lib/fribidi-joining-types.h         | 124 ++++++++++++++++++++++-----
+ lib/fribidi-joining.c               | 161
+ ++++++++++++++++++++++++++++++++++++
+ lib/fribidi-joining.h               |  36 +++++++-
+ lib/fribidi-mirroring.c             |  14 ++--
+ lib/fribidi-mirroring.h             |  27 +++---
+ lib/fribidi-types.h                 |  24 +++++-
+ lib/fribidi.c                       |  97 +++++++++++++---------
+ lib/fribidi.def                     |   6 +-
+ lib/fribidi.h                       |  93 ++++++++++++---------
+ lib/joining-types.h                 |   9 +-
+ 27 files changed, 734 insertions(+), 286 deletions(-)
+
+commit 8a20d52ddb30e073762ec17afda2e1b9257be568
+Author: behdad <behdad>
+Date:   Tue Jun 15 09:21:32 2004 +0000
+
+    Oops, I changed Persian Yeh to Arabic Yeh last time :">.
+
+ test/test_UTF-8_persian.input     | 26 +++++++++++++-------------
+ test/test_UTF-8_persian.reference | 26 +++++++++++++-------------
+ 2 files changed, 26 insertions(+), 26 deletions(-)
+
+commit e5583f7430272861120627c3262cc1b80f020206
+Author: behdad <behdad>
+Date:   Tue Jun 15 09:19:16 2004 +0000
+
+    Replace Arabic Yeh with Persian Yeh.
+
+ test/test_UTF-8_persian.input     | 22 +++++++++++-----------
+ test/test_UTF-8_persian.reference | 22 +++++++++++-----------
+ 2 files changed, 22 insertions(+), 22 deletions(-)
+
+commit 08dd824be4a114ed07d67c5dabc12c33fd6ba3ae
+Author: behdad <behdad>
+Date:   Mon Jun 14 18:43:48 2004 +0000
+
+    fribidi-bidi-type.[ch] merged into fribidi-bidi-types.[ch].
+    fribidi-joining-type.[ch] merged into fribidi-joining-types.[ch].
+
+ charset/fribidi-char-sets-cap-rtl.c |  8 ++--
+ configure.ac                        | 22 +++++++---
+ doc/Makefile.am                     | 14 +++----
+ lib/Headers.mk                      |  3 +-
+ lib/Makefile.am                     |  2 -
+ lib/fribidi-bidi-type.c             | 80
+ -------------------------------------
+ lib/fribidi-bidi-type.h             | 72
+ ---------------------------------
+ lib/fribidi-bidi-types.c            | 69 ++++++++++++++++++++++++++------
+ lib/fribidi-bidi-types.h            | 34 +++++++++++++---
+ lib/fribidi-bidi.c                  | 48 +++++-----------------
+ lib/fribidi-bidi.h                  | 27 +++----------
+ lib/fribidi-config.h.in             |  3 ++
+ lib/fribidi-joining-type.c          | 56 --------------------------
+ lib/fribidi-joining-type.h          | 59 ---------------------------
+ lib/fribidi-joining-types.c         | 66 ++++++++++++++++++++++++------
+ lib/fribidi-joining-types.h         | 36 ++++++++++++++---
+ lib/fribidi-mirroring.c             | 34 ++++++++++++++--
+ lib/fribidi-mirroring.h             | 22 ++++++++--
+ lib/fribidi-run.c                   |  8 ++--
+ lib/fribidi.c                       | 11 ++---
+ lib/fribidi.def                     | 18 +++++----
+ lib/fribidi.h                       | 14 ++++---
+ 22 files changed, 296 insertions(+), 410 deletions(-)
+
+commit 5e32eff3de2d41d4a1674e28991eb82c1d00dd79
+Author: behdad <behdad>
+Date:   Mon Jun 14 17:00:33 2004 +0000
+
+    fribidi_get_bidi_types is back.  Allow passing bidi types to
+    get_par_embedding_levels and reorder_line functions.
+
+ lib/bidi-types.h        |  8 +++++---
+ lib/fribidi-bidi-type.c | 24 +++++++++++++++++++---
+ lib/fribidi-bidi-type.h | 19 +++++++++++++++---
+ lib/fribidi-bidi.c      | 53
+ ++++++++++++++++++++++++++++---------------------
+ lib/fribidi-bidi.h      | 33 +++++++++++++++++++++++-------
+ lib/fribidi-run.c       | 13 ++++++------
+ lib/fribidi.c           | 10 +++++-----
+ lib/run.h               |  9 +++++----
+ 8 files changed, 115 insertions(+), 54 deletions(-)
+
+commit 55c61f3adbd4bd6ccfc3a2a26fb926adfa3a4082
+Author: behdad <behdad>
+Date:   Sun Jun 13 20:11:41 2004 +0000
+
+    First joining stuff checked in.  Generate joining table using
+    my beloved
+    packtab, in gen-joining-type-tab.c.  Defined FriBidiJoiningType type
+    and wrote
+    accompanying functions and macros.
+
+ .indent.pro                         |   3 +-
+ TODO                                |  20 +-
+ charset/Makefile.am                 |  10 +-
+ charset/fribidi-char-sets-cap-rtl.c |   8 +-
+ doc/Makefile.am                     |  10 +-
+ gen.tab/Makefile.am                 |  92 ++++------
+ gen.tab/gen-bidi-type-tab.c         |  65 ++++---
+ gen.tab/gen-joining-type-tab.c      | 355
+ ++++++++++++++++++++++++++++++++++++
+ gen.tab/gen-mirroring-tab.c         |  52 +++---
+ gen.tab/gen-unicode-version.c       |  42 ++---
+ gen.tab/packtab.c                   |  16 +-
+ gen.tab/packtab.h                   |   2 +-
+ lib/Headers.mk                      |   7 +-
+ lib/Makefile.am                     |  29 ++-
+ lib/common.h                        |  12 +-
+ lib/debug.h                         |  11 +-
+ lib/env.h                           |   7 +-
+ lib/fribidi-bidi-type.c             |   9 +-
+ lib/fribidi-bidi-types-list.h       |   8 +-
+ lib/fribidi-bidi-types.c            |   8 +-
+ lib/fribidi-bidi-types.h            | 140 +++++++-------
+ lib/fribidi-joining-type.c          |  56 ++++++
+ lib/fribidi-joining-type.h          |  59 ++++++
+ lib/fribidi-joining-types-list.h    |  50 +++++
+ lib/fribidi-joining-types.c         |  78 ++++++++
+ lib/fribidi-joining-types.h         | 143 +++++++++++++++
+ lib/fribidi-joining.c               |   0
+ lib/fribidi-joining.h               |  50 +++++
+ lib/fribidi-mirroring.c             |  12 +-
+ lib/fribidi.def                     |   9 +-
+ lib/joining-types.h                 |  58 ++++++
+ lib/run.h                           |  10 +-
+ 32 files changed, 1147 insertions(+), 284 deletions(-)
+
+commit c4ac68eb37169192b1f72bd09e2fc80302cad20d
+Author: behdad <behdad>
+Date:   Wed Jun 9 20:01:00 2004 +0000
+
+    Wow!!!  I use the wonderful packtab to compress the mirroring
+    table now!  It
+    gives an smaller and faster table than the old binary search one!
+    Moreover,
+    packtab deals with tables with empty heads much better.  Voila!
+
+ bin/fribidi-main.c          |  13 ++--
+ charset/fribidi-char-sets.c |   7 ++-
+ configure.ac                |   9 ++-
+ gen.tab/Makefile.am         |   4 +-
+ gen.tab/gen-bidi-type-tab.c |  15 +++--
+ gen.tab/gen-mirroring-tab.c |  99 +++++++++++++++++++----------
+ gen.tab/packtab.c           | 147
+ ++++++++++++++++++++++++++++++++++----------
+ gen.tab/packtab.h           |  13 ++--
+ lib/fribidi-bidi-type.c     |  14 ++---
+ lib/fribidi-bidi-types.h    |  10 +--
+ lib/fribidi-mirroring.c     |  48 +++------------
+ lib/fribidi-types.h         |  79 +++++++++++++-----------
+ lib/fribidi.h               |   8 +--
+ 13 files changed, 276 insertions(+), 190 deletions(-)
+
+commit a7baa9a7e957ea338e3c683f8d85ad4bc5a533c5
+Author: behdad <behdad>
+Date:   Wed Jun 9 14:59:21 2004 +0000
+
+    Redundant and compatibility stuff removed.  A few macros added,
+    to compile
+    AbiWord from CVS.  The most important is the FRIBIDI_TYPE_PRIVATE in
+    fribidi-bidi-types.h
+
+ bin/fribidi-main.c                    | 25 +++++++++++---
+ charset/Headers.mk                    |  8 +----
+ charset/fribidi-char-sets-cap-rtl.h   |  8 +++--
+ charset/fribidi-char-sets-cp1255.h    |  8 +++--
+ charset/fribidi-char-sets-cp1256.h    |  8 +++--
+ charset/fribidi-char-sets-iso8859-6.h |  8 +++--
+ charset/fribidi-char-sets-iso8859-8.h |  8 +++--
+ charset/fribidi-char-sets-list.h      | 14 ++++----
+ charset/fribidi-char-sets-utf8.h      |  8 +++--
+ charset/fribidi-char-sets.c           | 18 ++++++----
+ charset/fribidi-char-sets.h           | 13 ++------
+ configure.ac                          | 18 ++++------
+ doc/Makefile.am                       |  1 +
+ lib/common.h                          | 28 ++++++++--------
+ lib/debug.h                           | 10 +++---
+ lib/fribidi-bidi-type.c               | 62
+ +++--------------------------------
+ lib/fribidi-bidi-type.h               | 39 ++--------------------
+ lib/fribidi-bidi-types-list.h         | 14 ++++----
+ lib/fribidi-bidi-types.h              | 35 +++++++++++---------
+ lib/fribidi-bidi.h                    |  7 ++--
+ lib/fribidi-common.h                  | 14 +++-----
+ lib/fribidi-mirroring.c               | 12 +++----
+ lib/fribidi-mirroring.h               | 12 +++----
+ lib/fribidi-types.h                   | 26 +++++++--------
+ lib/fribidi.c                         |  8 ++---
+ lib/fribidi.def                       |  3 --
+ lib/fribidi.h                         | 18 +++++++---
+ lib/mem.h                             | 10 +++---
+ 28 files changed, 189 insertions(+), 254 deletions(-)
+
+commit 7e382d2cc7f5c08bda7d0d7195b074d91811c5d7
+Author: behdad <behdad>
+Date:   Wed Jun 9 08:56:53 2004 +0000
+
+    Not serious changed.  Going to remove easy-to-replace compatibility
+    stuff.
+
+ bin/fribidi-benchmark.c |  8 ++++----
+ bin/fribidi-main.c      | 14 +++++++-------
+ lib/fribidi-bidi-type.h | 12 +++++++-----
+ lib/fribidi.h           | 16 ++++++++++++----
+ 4 files changed, 30 insertions(+), 20 deletions(-)
+
+commit 5a52ab708d73f6b8929856ddf7238ecdb04a36b0
+Author: behdad <behdad>
+Date:   Mon Jun 7 20:38:21 2004 +0000
+
+    Finally done with the clean API for bidi functionality.  The API is
+    not final
+    yet, but does the job.  Also define FriBidiCharType as an enum
+    if possible.
+    Added type FriBidiParType for paragraph direction types.
+
+ .cvsignore                        |   2 +-
+ .indent.pro                       |   4 +-
+ TODO                              |   2 +
+ lib/fribidi-bidi-types-list.h     |  11 +-
+ lib/fribidi-bidi-types.h          | 134 +++++++++++-----
+ lib/fribidi-bidi.c                | 314
+ +++++++++++++++-----------------------
+ lib/fribidi-bidi.h                | 100 +++++-------
+ lib/fribidi-mirroring.c           |   9 +-
+ lib/fribidi-mirroring.h           |   9 +-
+ lib/fribidi.c                     | 170 ++++++++++++++++++++-
+ lib/fribidi.def                   |   2 +-
+ lib/fribidi.h                     |  95 +++++++++++-
+ test/test_UTF-8_persian.reference |  16 +-
+ 13 files changed, 541 insertions(+), 327 deletions(-)
+
+commit 8fee958d0e10db5516f3897e6dc832ef56b13fcd
+Author: behdad <behdad>
+Date:   Fri Jun 4 16:43:51 2004 +0000
+
+    Isolating bidi reordering call, take 1.
+
+ lib/fribidi-bidi.c | 338
+ ++++++++++++++++++-----------------------------------
+ lib/fribidi-bidi.h |  14 +--
+ lib/fribidi-run.c  |  39 ++++---
+ lib/run.h          |   8 +-
+ 4 files changed, 149 insertions(+), 250 deletions(-)
+
+commit a6fde7f289ff58990148caef9b69283ab6263b04
+Author: behdad <behdad>
+Date:   Fri Jun 4 09:43:57 2004 +0000
+
+    Anyone seen my log ;-).
+
+ doc/Makefile.am | 3 ---
+ 1 file changed, 3 deletions(-)
+
+commit 526172111aaf46da0f28ed57917179779d1a266b
+Author: behdad <behdad>
+Date:   Fri Jun 4 09:41:11 2004 +0000
+
+    Cleaning up here and there.  Last lingers before adding joining.
+
+ Makefile.am                         |  49 ++++--
+ TODO                                |   9 +-
+ bin/fribidi-main.c                  |  12 +-
+ bootstrap                           | 130 +++++++++++-----
+ charset/fribidi-char-sets-cap-rtl.c |  12 +-
+ configure.ac                        |   9 +-
+ doc/Makefile.am                     |  18 ++-
+ gen.tab/.cvsignore                  |   4 +-
+ gen.tab/Makefile.am                 |   1 +
+ gen.tab/gen-bidi-type-tab.c         |  20 +--
+ lib/Headers.mk                      |   2 +-
+ lib/fribidi-bidi-type.c             |  17 ++-
+ lib/fribidi-bidi-type.h             |  23 +--
+ lib/fribidi-bidi-types-list.h       |  39 +++--
+ lib/fribidi-bidi-types.c            |  10 +-
+ lib/fribidi-bidi-types.h            |  17 ++-
+ lib/fribidi-bidi.c                  | 297
+ ++++++++++++++++++------------------
+ lib/fribidi-bidi.h                  |  28 +++-
+ lib/fribidi-common.h                |   8 +-
+ lib/fribidi-config.h.in             |   3 +
+ lib/fribidi.def                     |  28 ++--
+ 21 files changed, 430 insertions(+), 306 deletions(-)
+
+commit a6b4f96acbd71fd8cc05e136a9bcb2ffc594b2a1
+Author: behdad <behdad>
+Date:   Mon May 31 18:43:26 2004 +0000
+
+    GNU Coding Standards applied and typos fixed.
+
+ AUTHORS                                            | 45
+ +++++++++++++++++++++-
+ Makefile.am                                        | 10 ++---
+ README                                             | 26 +++++++------
+ THANKS                                             |  2 +-
+ TODO                                               | 41
+ ++++++++++++++++++++
+ bin/fribidi-main.c                                 | 10 ++---
+ charset/fribidi-char-sets-cap-rtl.c                |  8 ++--
+ configure.ac                                       | 40
+ ++++++++++---------
+ doc/Makefile.am                                    |  4 +-
+ gen.tab/Makefile.am                                | 12 +++---
+ gen.tab/gen-bidi-type-tab.c                        |  8 ++--
+ gen.tab/gen-mirroring-tab.c                        |  8 ++--
+ gen.tab/gen-unicode-version.c                      | 20 +++++++---
+ lib/fribidi-bidi-type.c                            | 10 ++---
+ ...bidi-types-list.h => fribidi-bidi-types-list.h} | 31 ++++++++-------
+ 15 files changed, 187 insertions(+), 88 deletions(-)
+
+commit 339717751b86715f78bd9d02159813c29c650a0a
+Author: behdad <behdad>
+Date:   Mon May 31 18:39:39 2004 +0000
+
+    GNU Coding Standards applied where appropriate.
+
+ lib/Headers.mk           |  1 +
+ lib/Makefile.am          |  1 -
+ lib/common.h             | 10 +++---
+ lib/debug.h              |  8 ++---
+ lib/fribidi-bidi-types.c | 10 +++---
+ lib/fribidi-bidi.c       | 84
+ ++++++++++++++++++++++++------------------------
+ lib/fribidi-common.h     | 33 ++++++++++---------
+ lib/fribidi-config.h.in  |  3 +-
+ lib/fribidi.c            | 20 ++++++------
+ lib/run.h                |  8 ++---
+ 10 files changed, 91 insertions(+), 87 deletions(-)
+
+commit 18e3dfa79857422629e1c790890e77be31a97507
+Author: behdad <behdad>
+Date:   Mon May 31 10:59:14 2004 +0000
+
+    To be moved to gen.tab/
+
+ gen.tab/unidata/README | 1 -
+ 1 file changed, 1 deletion(-)
+
+commit 477d11a4cda120d3e877302d0fc6485cbd8b2caf
+Author: behdad <behdad>
+Date:   Mon May 31 10:43:44 2004 +0000
+
+    We need UnicodeData.txt for shaping tables, so seems like we are
+    forced to use
+    the big fat huge UnicodeData.txt, so no need to used extracted/Derived
+    files
+    anymore. :-(
+
+ gen.tab/unidata/ArabicShaping.txt                  |   240 +
+ gen.tab/unidata/README                             |     1 +
+ gen.tab/unidata/UnicodeData.txt                    | 15100
+ +++++++++++++++++++
+ gen.tab/unidata/extracted/DerivedBidiClass.txt     |  1299 --
+ .../unidata/extracted/DerivedDecompositionType.txt |   933 --
+ gen.tab/unidata/extracted/DerivedJoiningType.txt   |   215 -
+ 6 files changed, 15341 insertions(+), 2447 deletions(-)
+
+commit 28f7f004848d56fb148290428ecff8ab3b568cdd
+Author: behdad <behdad>
+Date:   Sat May 29 11:32:23 2004 +0000
+
+    Tweaked the headers again.  According to GNU GPL now.
+
+ lib/fribidi-mirroring.c | 36 ++++++++++++++++++------------------
+ lib/fribidi-mirroring.h | 38 ++++++++++++++++++++------------------
+ lib/fribidi.c           | 10 ++++++----
+ 3 files changed, 44 insertions(+), 40 deletions(-)
+
+commit 08e0eaa79d69c795eff3f46e42f48978390dce35
+Author: behdad <behdad>
+Date:   Tue May 25 12:41:17 2004 +0000
+
+    Ok, now DLL build works with Cygwin.  Still remains to test with
+    Mingw.
+
+ lib/Makefile.am | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit 0134010bc16b3d8305f84ced5d869ad8ea74e59c
+Author: behdad <behdad>
+Date:   Tue May 25 12:28:11 2004 +0000
+
+    Ok, seems like there are a few bits wrong in Pango, and I simply
+    copied :">.
+
+ configure.ac | 30 +++++++++---------------------
+ 1 file changed, 9 insertions(+), 21 deletions(-)
+
+commit a721146c70de7d537bd307f3422fc159d90825b2
+Author: behdad <behdad>
+Date:   Tue May 25 12:15:44 2004 +0000
+
+    Seems like using $build_os instead of broken $host should fix the
+    problem.
+
+ configure.ac | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+commit ff55b08eb992fde9c99711c744aee6763adfbf4d
+Author: behdad <behdad>
+Date:   Tue May 25 12:09:39 2004 +0000
+
+    Trying to build DLL on Cygwin.
+
+ configure.ac | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
+
+commit 564566593800ae5b29a73d1cfee424f78eb3bbc7
+Author: behdad <behdad>
+Date:   Tue May 25 12:00:29 2004 +0000
+
+    Define extra GNU function attributes only if using GLIB.
+
+ lib/fribidi-common.h | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
+
+commit f4dd6b6017ca84c7649ddef2e9408a6dcb4ea1c0
+Author: behdad <behdad>
+Date:   Tue May 25 11:35:39 2004 +0000
+
+    Added a dummy gettext.h that simply defines "gettext" to null.
+
+ bin/Makefile.am | 2 +-
+ bin/gettext.h   | 2 ++
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+commit 780f36974ad355dc931fb8d9ea94327a0e4b0d18
+Author: behdad <behdad>
+Date:   Tue May 25 11:27:50 2004 +0000
+
+    Another oops.  You know, it's 7:30 in the morning!
+
+ gen.tab/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit ae620c51565dcab4493d8c221dece66cdbe68f8a
+Author: behdad <behdad>
+Date:   Tue May 25 11:26:28 2004 +0000
+
+    My oops.  Sorry.
+
+ gen.tab/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 7333eb868af79cae67e9fd6e89ded327412c6ec6
+Author: behdad <behdad>
+Date:   Tue May 25 11:21:06 2004 +0000
+
+    Added $(EXEEXT) to binaries we build and run, to make cygwin-safe.
+
+ gen.tab/Makefile.am | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
+
+commit e7798ad595b3e90ff3077a65f0e342637fdeb0de
+Author: behdad <behdad>
+Date:   Tue May 25 11:14:14 2004 +0000
+
+    Moved gen.tab to the first subdir.
+
+ Makefile.am | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+commit a0897904ce19ea9f17de60c4ec13d3bd1186d43e
+Author: behdad <behdad>
+Date:   Mon May 24 06:45:42 2004 +0000
+
+    Small fixes.
+
+ AUTHORS                       |  1 +
+ HACKING                       |  7 -------
+ doc/Makefile.am               | 23 +++++++++++++++--------
+ gen.tab/gen-bidi-type-tab.c   | 14 +++++++-------
+ gen.tab/gen-mirroring-tab.c   | 15 ++++++---------
+ gen.tab/gen-unicode-version.c | 10 +++++-----
+ 6 files changed, 34 insertions(+), 36 deletions(-)
+
+commit 3fe934b572660936b4e494a3694714a10ed12a1b
+Author: behdad <behdad>
+Date:   Sat May 22 12:17:10 2004 +0000
+
+    When reading DerivedBidiClass.txt, should only default to L.
+
+ TODO                        |  5 +++--
+ gen.tab/gen-bidi-type-tab.c | 45
+ ++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 35 insertions(+), 15 deletions(-)
+
+commit fc64781b05223801b6b69ecba791a31f5166bdbe
+Author: behdad <behdad>
+Date:   Sat May 22 11:21:39 2004 +0000
+
+    Make gen-mirroring-tab and gen-unicode-version work.  gen.tab/
+    works now.
+
+ Makefile.am                         | 10 ++--
+ bin/Makefile.am                     |  4 +-
+ bin/fribidi-benchmark.c             | 16 ++++---
+ charset/fribidi-char-sets-cap-rtl.c | 16 +++----
+ charset/fribidi-char-sets.c         |  8 ++--
+ gen.tab/Makefile.am                 | 95
+ +++++++++++++++++++++++++++----------
+ gen.tab/gen-bidi-type-tab.c         |  8 ++--
+ gen.tab/gen-mirroring-tab.c         | 10 ++--
+ gen.tab/gen-unicode-version.c       | 11 ++---
+ lib/common.h                        | 20 ++++----
+ lib/fribidi-bidi-type.c             |  7 ++-
+ lib/fribidi-mem.c                   | 13 +++--
+ 12 files changed, 137 insertions(+), 81 deletions(-)
+
+commit 285b3de138e8a4f790fe07519c1a90d759a61598
+Author: behdad <behdad>
+Date:   Sat May 22 10:35:30 2004 +0000
+
+    Making gen-bidi-tab work, and more clean up.
+
+ bin/Makefile.am               |   4 +-
+ charset/Makefile.am           |   2 +-
+ configure.ac                  |  29 ++++----
+ doc/Makefile.am               |   2 +-
+ fribidi.pc.in                 |   2 +-
+ gen.tab/Makefile.am           |  52 +++++++++++++-
+ gen.tab/gen-bidi-type-tab.c   | 163
+ ++++++++++++++++++++++++++++++------------
+ gen.tab/gen-mirroring-tab.c   |  79 +++++++++++++-------
+ gen.tab/gen-unicode-version.c |  48 ++++++-------
+ gen.tab/packtab.c             |   5 +-
+ gen.tab/packtab.h             |   2 +-
+ lib/Makefile.am               |  31 +++-----
+ lib/common.h                  |  48 +++++++------
+ lib/fribidi-bidi.h            |  12 ++--
+ lib/fribidi-mirroring.c       |  10 +--
+ lib/fribidi-mirroring.h       |  10 +--
+ 16 files changed, 323 insertions(+), 176 deletions(-)
+
+commit c33ae846fd05d20a4e557dd1b6ab1ca4a77ee796
+Author: behdad <behdad>
+Date:   Wed May 12 23:13:55 2004 +0000
+
+    gen-unicode-version is operational now.
+
+ gen.tab/.cvsignore            |   5 +-
+ gen.tab/Makefile.am           |   6 +-
+ gen.tab/gen-bidi-type-tab.c   |  10 +--
+ gen.tab/gen-mirroring-tab.c   |   8 +-
+ gen.tab/gen-unicode-version.c | 170
+ ++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 187 insertions(+), 12 deletions(-)
+
+commit 8bc4b0a145e828a6c9e90d18e4f06900291d1d3a
+Author: behdad <behdad>
+Date:   Wed May 12 08:17:19 2004 +0000
+
+    Better handling with Unicode info.
+
+ gen.tab/gen-bidi-type-tab.c | 13 +++++--------
+ lib/.cvsignore              |  2 +-
+ lib/Makefile.am             |  4 ++--
+ lib/common.h                |  7 ++++---
+ lib/fribidi-bidi-type.c     | 24 +++++++++---------------
+ lib/fribidi-common.h        | 10 +++-------
+ lib/fribidi-unicode.h       | 11 ++++++++---
+ 7 files changed, 32 insertions(+), 39 deletions(-)
+
+commit 4400e84cad664c8bd863596aa53f6e3fe0866156
+Author: behdad <behdad>
+Date:   Wed May 12 07:09:09 2004 +0000
+
+    Updated .cvsignore files.
+
+ doc/.cvsignore                | 4 ++++
+ lib/.cvsignore                | 2 ++
+ lib/fribidi-unicode-version.h | 4 ----
+ 3 files changed, 6 insertions(+), 4 deletions(-)
+
+commit d7b141a2521ad40a1c75c0aeb43920225bd08317
+Author: behdad <behdad>
+Date:   Wed May 12 07:06:21 2004 +0000
+
+    Updated the gen.tab to work again.  Other fixes here and there.
+
+ .indent.pro                 |   1 +
+ TODO                        |   2 +
+ bin/fribidi-main.c          |  11 +-
+ bootstrap                   |   9 +-
+ charset/fribidi-char-sets.c |  12 +-
+ gen.tab/Makefile.am         |   9 ++
+ gen.tab/gen-bidi-type-tab.c | 298
+ +++++++++++++++++++++-----------------------
+ gen.tab/gen-mirroring-tab.c | 223 +++++++++++++++++++--------------
+ gen.tab/packtab.c           |  18 ++-
+ lib/bidi-types-list.h       |  18 ++-
+ lib/common.h                |  12 +-
+ lib/fribidi-bidi-type.c     |   8 +-
+ lib/fribidi-mirroring.h     |  13 +-
+ 13 files changed, 340 insertions(+), 294 deletions(-)
+
+commit 4b03bbd7b4368cde918197875a83ff4661ca4857
+Author: behdad <behdad>
+Date:   Fri May 7 06:30:37 2004 +0000
+
+    Cleaning here and there.  We may be ready for a release tonight :).
+
+ Makefile.am                         |    8 +-
+ TODO                                |    3 +-
+ bin/fribidi-main.c                  |   28 +-
+ charset/fribidi-char-sets-cap-rtl.c |   92 +-
+ configure.ac                        |   10 +-
+ doc/Makefile.am                     |    2 +
+ lib/Makefile.am                     |    8 +-
+ lib/bidi-type-table.i               | 5228
+ -----------------------------------
+ lib/bidi-types-list.h               |   11 +-
+ lib/bidi-types.h                    |   25 +-
+ lib/common.h                        |   10 +-
+ lib/debug.h                         |    7 +-
+ lib/fribidi-bidi-type.c             |   61 +-
+ lib/fribidi-bidi.c                  |    8 +-
+ lib/fribidi-common.h                |   12 +-
+ lib/fribidi-mem.c                   |   20 +-
+ lib/fribidi-mirroring.c             |   13 +-
+ lib/fribidi-types.h                 |    9 +-
+ lib/fribidi-unicode.h               |   16 +-
+ lib/fribidi.c                       |    8 +-
+ lib/mem.h                           |    8 +-
+ lib/mirroring-table.i               |  360 ---
+ 22 files changed, 181 insertions(+), 5766 deletions(-)
+
+commit 7fafb2d9754e6dab124dff5b2b5ba89e69e042f7
+Author: behdad <behdad>
+Date:   Wed May 5 21:47:34 2004 +0000
+
+    More TODO.  And change autoconf requirement to 2.56 from 2.59.
+
+ TODO         |  8 ++++++++
+ configure.ac | 10 +++++-----
+ 2 files changed, 13 insertions(+), 5 deletions(-)
+
+commit 2a3c067871dcd2b595a1f3d0d79c3e0660270653
+Author: behdad <behdad>
+Date:   Mon May 3 22:05:19 2004 +0000
+
+    Changed the run data structure from a double-terminated deque, to a
+    circular deque with a single sentinel.  To debug that, also added
+    some assert
+    stuff, added function attributes, deprecated old interfaces, and humm,
+    that it
+    for now.
+
+ .indent.pro                           |    2 +-
+ TODO                                  |    4 +
+ bin/fribidi-benchmark.c               |   10 +-
+ bin/fribidi-main.c                    |   20 +-
+ charset/fribidi-char-sets-cap-rtl.c   |   11 +-
+ charset/fribidi-char-sets-cp1255.c    |   10 +-
+ charset/fribidi-char-sets-cp1256.c    |   10 +-
+ charset/fribidi-char-sets-iso8859-6.c |   10 +-
+ charset/fribidi-char-sets-iso8859-8.c |   10 +-
+ charset/fribidi-char-sets-utf8.c      |   10 +-
+ charset/fribidi-char-sets.c           |   10 +-
+ charset/fribidi-char-sets.h           |    8 +-
+ configure.ac                          |   11 +-
+ doc/Makefile.am                       |   11 +-
+ lib/Headers.mk                        |   14 +-
+ lib/Makefile.am                       |    6 +-
+ lib/bidi-type-table.i                 |    8 +-
+ lib/bidi-types-list.h                 |   15 +-
+ lib/bidi-types.h                      |   20 +-
+ lib/common.h                          |   48 +-
+ lib/debug.h                           |   66 +-
+ lib/env.h                             |   10 +-
+ lib/fribidi-bidi-type.c               |   37 +-
+ lib/fribidi-bidi-type.h               |   33 +-
+ lib/fribidi-bidi-types.c              |   12 +-
+ lib/fribidi-bidi-types.h              |   50 +-
+ lib/fribidi-bidi.c                    | 1173
+ +++++++++++++++++----------------
+ lib/fribidi-bidi.h                    |   19 +-
+ lib/fribidi-common.h                  |   29 +-
+ lib/fribidi-env.c                     |   17 +-
+ lib/fribidi-env.h                     |   27 +-
+ lib/fribidi-mem.c                     |   39 +-
+ lib/fribidi-mirroring.c               |   24 +-
+ lib/fribidi-run.c                     |  395 ++++++-----
+ lib/fribidi-types.h                   |   10 +-
+ lib/fribidi.c                         |   10 +-
+ lib/fribidi.def                       |   13 +
+ lib/mem.h                             |   25 +-
+ lib/mirroring-table.i                 |    8 +-
+ lib/run.h                             |  110 +++-
+ test/run.tests                        |    4 +-
+ 41 files changed, 1348 insertions(+), 1011 deletions(-)
+
+commit 3961e54d055a45b4ed096a08c661bf2a00a77a41
+Author: behdad <behdad>
+Date:   Wed Apr 28 03:20:22 2004 +0000
+
+    Cleaning up exported symbols.
+
+ THANKS               | 23 +++++++++----------
+ bin/fribidi-main.c   | 62
+ ++++++++++++++++++++++++++--------------------------
+ charset/Makefile.am  | 13 +----------
+ doc/Makefile.am      |  1 +
+ lib/Makefile.am      | 16 +++++++-------
+ lib/fribidi-common.h |  8 +++----
+ 6 files changed, 55 insertions(+), 68 deletions(-)
+
+commit 1fb4c69145a5222169e8b8f852807046a30d6870
+Author: behdad <behdad>
+Date:   Wed Apr 28 02:37:56 2004 +0000
+
+    Added FriBidiRun type, private for now.  Moved all library-wide
+    static variables to env.h.
+
+ lib/Makefile.am          |   5 +-
+ lib/bidi-types.h         |  12 +-
+ lib/common.h             |  23 +--
+ lib/env.h                |  63 +++++++++
+ lib/fribidi-bidi-type.c  |   8 +-
+ lib/fribidi-bidi-types.c |   8 +-
+ lib/fribidi-bidi-types.h |   8 +-
+ lib/fribidi-bidi.c       | 357
+ ++++++++---------------------------------------
+ lib/fribidi-env.c        |  27 ++--
+ lib/fribidi-mem.c        |  64 ++++++---
+ lib/fribidi-run.c        | 267 +++++++++++++++++++++++++++++++++++
+ lib/mem.h                |  16 ++-
+ lib/run.h                |  86 ++++++++++++
+ 13 files changed, 587 insertions(+), 357 deletions(-)
+
+commit ac43f238748ad5b874089a8c27d8c1eb7150859d
+Author: behdad <behdad>
+Date:   Tue Apr 27 23:53:43 2004 +0000
+
+    Nothing really important.
+
+ doc/Makefile.am         |  1 -
+ lib/common.h            |  8 ++++----
+ lib/fribidi-mirroring.c | 10 ++++++----
+ 3 files changed, 10 insertions(+), 9 deletions(-)
+
+commit 211d0f322cdb279a69c04f8212f9b1e541ecb369
+Author: behdad <behdad>
+Date:   Tue Apr 27 16:47:22 2004 +0000
+
+    First try to integrate c2man manual generation in build system.
+
+ charset/Headers.mk               | 21 ++++++++------
+ charset/fribidi-char-sets-list.h | 10 +++++--
+ doc/Makefile.am                  | 62
+ ++++++++++++++++++++++++++++------------
+ lib/Headers.mk                   | 16 ++++++++++-
+ lib/bidi-types-list.h            | 10 +++----
+ lib/common.h                     | 10 +++----
+ lib/debug.h                      |  8 +++---
+ lib/fribidi-begindecls.h         |  2 ++
+ lib/fribidi-enddecls.h           |  2 ++
+ lib/fribidi-types.h              | 14 ++++-----
+ lib/mem.h                        |  8 +++---
+ 11 files changed, 107 insertions(+), 56 deletions(-)
+
+commit a1b38172b8f2ecdc1101d2c71043ef56cb865c5d
+Author: behdad <behdad>
+Date:   Tue Apr 27 15:23:25 2004 +0000
+
+    Header changed so RCS header and Authors follow the copyright notice.
+
+ lib/fribidi-mirroring.c | 20 ++++++++++----------
+ lib/fribidi-mirroring.h | 18 +++++++++---------
+ 2 files changed, 19 insertions(+), 19 deletions(-)
+
+commit 14fe97a882a9fb368d084af1dd9537c036bf7030
+Author: behdad <behdad>
+Date:   Tue Apr 27 15:22:53 2004 +0000
+
+    New items added.  Should be cleared before the release.
+
+ TODO | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+commit afc8fca15a8a4ef1a028ea4a84f12b78572c5c97
+Author: behdad <behdad>
+Date:   Sun Apr 25 19:13:35 2004 +0000
+
+    More .cvsignore's added.
+
+ bin/.cvsignore     | 2 ++
+ gen.tab/.cvsignore | 2 ++
+ lib/.cvsignore     | 1 +
+ 3 files changed, 5 insertions(+)
+
+commit b2c7e5956487b23feb49b35bae7d22422c4d5d59
+Author: behdad <behdad>
+Date:   Sun Apr 25 19:13:04 2004 +0000
+
+    Renamed subdir tablegen to gentable.
+
+ Makefile.am  |  8 ++++----
+ configure.ac | 10 +++++-----
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+commit b1ed9614d2569ec00aeaab506e18deee65b66cc5
+Author: behdad <behdad>
+Date:   Sun Apr 25 19:12:42 2004 +0000
+
+    More recovery after the unintentionaly rm -f *.c!
+
+ lib/fribidi-bidi.c | 7 ++++---
+ lib/fribidi.c      | 8 ++++----
+ 2 files changed, 8 insertions(+), 7 deletions(-)
+
+commit be247ddb41bd2c1467f5582427388711b23087db
+Author: behdad <behdad>
+Date:   Sun Apr 25 18:58:25 2004 +0000
+
+    No #ifdef or #ifndef when possible.  #if or #if ! is a better way
+    most of the times.  See the examples in source.
+
+ configure.ac       | 9 ++++-----
+ lib/fribidi-bidi.c | 8 ++++----
+ lib/fribidi-mem.c  | 8 ++++----
+ 3 files changed, 12 insertions(+), 13 deletions(-)
+
+commit 304aac260efd5b143067b0ff6f4a5c56f3169f2e
+Author: behdad <behdad>
+Date:   Sun Apr 25 18:49:12 2004 +0000
+
+    The ChangeLog from the old days.
+
+ ChangeLog.old | 703
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 703 insertions(+)
+
+commit 63d12e574eb5cfe95290b303bac0950c25afe397
+Author: behdad <behdad>
+Date:   Sun Apr 25 18:47:56 2004 +0000
+
+    Initial revision
+
+ .cvsignore                                         |   19 +
+ .indent.pro                                        |   19 +
+ AUTHORS                                            |    1 +
+ COPYING                                            |  504 ++
+ HACKING                                            |    7 +
+ HISTORY                                            |   34 +
+ Makefile.am                                        |   54 +
+ NEWS                                               |   18 +
+ README                                             |  152 +
+ THANKS                                             |   33 +
+ TODO                                               |   13 +
+ bin/Makefile.am                                    |   25 +
+ bin/fribidi-benchmark.c                            |  278 ++
+ bin/fribidi-main.c                                 |  597 +++
+ bin/getopt.c                                       | 1268 +++++
+ bin/getopt.h                                       |  187 +
+ bin/getopt1.c                                      |  213 +
+ bin/getopt_int.h                                   |  145 +
+ bootstrap                                          |  110 +
+ charset/Headers.mk                                 |    9 +
+ charset/Makefile.am                                |   48 +
+ charset/fribidi-char-sets-cap-rtl.c                |  336 ++
+ charset/fribidi-char-sets-cap-rtl.h                |   70 +
+ charset/fribidi-char-sets-cp1255.c                 |  106 +
+ charset/fribidi-char-sets-cp1255.h                 |   62 +
+ charset/fribidi-char-sets-cp1256.c                 |  223 +
+ charset/fribidi-char-sets-cp1256.h                 |   62 +
+ charset/fribidi-char-sets-iso8859-6.c              |   81 +
+ charset/fribidi-char-sets-iso8859-6.h              |   62 +
+ charset/fribidi-char-sets-iso8859-8.c              |  120 +
+ charset/fribidi-char-sets-iso8859-8.h              |   62 +
+ charset/fribidi-char-sets-list.h                   |   56 +
+ charset/fribidi-char-sets-utf8.c                   |  126 +
+ charset/fribidi-char-sets-utf8.h                   |   66 +
+ charset/fribidi-char-sets.c                        |  230 +
+ charset/fribidi-char-sets.h                        |  125 +
+ configure.ac                                       |  208 +
+ doc/Makefile.am                                    |   27 +
+ fribidi.pc.in                                      |   13 +
+ fribidi.spec.in                                    |  145 +
+ gen.tab/Makefile.am                                |    0
+ gen.tab/gen-bidi-type-tab.c                        |  267 +
+ gen.tab/gen-mirroring-tab.c                        |  152 +
+ gen.tab/packtab.c                                  |  364 ++
+ gen.tab/packtab.h                                  |   49 +
+ gen.tab/unidata/BidiMirroring.txt                  |  525 ++
+ gen.tab/unidata/ReadMe.txt                         |   40 +
+ gen.tab/unidata/extracted/DerivedBidiClass.txt     | 1299 +++++
+ .../unidata/extracted/DerivedDecompositionType.txt |  933 ++++
+ gen.tab/unidata/extracted/DerivedJoiningType.txt   |  215 +
+ lib/Headers.mk                                     |   14 +
+ lib/Makefile.am                                    |   75 +
+ lib/bidi-type-table.i                              | 5228
+ ++++++++++++++++++++
+ lib/bidi-types-list.h                              |   69 +
+ lib/bidi-types.h                                   |   78 +
+ lib/common.h                                       |  110 +
+ lib/debug.h                                        |   87 +
+ lib/fribidi-begindecls.h                           |    1 +
+ lib/fribidi-bidi-type.c                            |   79 +
+ lib/fribidi-bidi-type.h                            |   74 +
+ lib/fribidi-bidi-types.c                           |   76 +
+ lib/fribidi-bidi-types.h                           |  278 ++
+ lib/fribidi-bidi.c                                 | 1424 ++++++
+ lib/fribidi-bidi.h                                 |  112 +
+ lib/fribidi-common.h                               |   83 +
+ lib/fribidi-config.h.in                            |   22 +
+ lib/fribidi-enddecls.h                             |    1 +
+ lib/fribidi-env.c                                  |  107 +
+ lib/fribidi-env.h                                  |  125 +
+ lib/fribidi-mem.c                                  |   94 +
+ lib/fribidi-mirroring.c                            |   90 +
+ lib/fribidi-mirroring.h                            |   67 +
+ lib/fribidi-types.h                                |  143 +
+ lib/fribidi-unicode-version.h                      |    4 +
+ lib/fribidi-unicode.h                              |  101 +
+ lib/fribidi.c                                      |   68 +
+ lib/fribidi.h                                      |   48 +
+ lib/mem.h                                          |   90 +
+ lib/mirroring-table.i                              |  358 ++
+ test/Makefile.am                                   |   33 +
+ test/run.tests                                     |   74 +
+ test/test_CapRTL_explicit.input                    |   13 +
+ test/test_CapRTL_explicit.reference                |   13 +
+ test/test_CapRTL_implicit.input                    |   26 +
+ test/test_CapRTL_implicit.reference                |   26 +
+ test/test_ISO8859-8_hebrew.input                   |   17 +
+ test/test_ISO8859-8_hebrew.reference               |   17 +
+ test/test_UTF-8_persian.input                      |   14 +
+ test/test_UTF-8_persian.reference                  |   14 +
+ test/test_UTF-8_reordernsm.input                   |    7 +
+ test/test_UTF-8_reordernsm.reference               |    7 +
+ 91 files changed, 19125 insertions(+)

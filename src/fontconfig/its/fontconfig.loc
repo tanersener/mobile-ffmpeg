@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<locatingRules>
+	<locatingRule name="Fontconfig" pattern="*.conf">
+ 		<documentRule localName="fontconfig" target="fontconfig.its"/>
+	</locatingRule>
+</locatingRules>

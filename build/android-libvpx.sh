@@ -5,8 +5,8 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-if [[ -z ${ANDROID_NDK} ]]; then
-    echo "ANDROID_NDK not defined"
+if [[ -z ${ANDROID_NDK_ROOT} ]]; then
+    echo "ANDROID_NDK_ROOT not defined"
     exit 1
 fi
 
@@ -28,7 +28,7 @@ android_prepare_toolchain_paths
 
 TARGET_HOST=$(android_get_target_host)
 CFLAGS=$(android_get_cflags "libvpx")
-CXXFLAGS=$(android_get_cxxflags)
+CXXFLAGS=$(android_get_cxxflags "libvpx")
 LDFLAGS=$(android_get_ldflags "libvpx")
 
 OPTIONAL_CPU_SUPPORT=""
@@ -46,7 +46,7 @@ cd $1/src/libvpx || exit 1
 make clean
 
 ./configure \
-    --prefix=${ANDROID_NDK}/prebuilt/android-${ARCH}/libvpx \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvpx \
     --target="${SUPPORTED_CPU}-android-gcc" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
@@ -69,7 +69,7 @@ make clean
     --disable-unit-tests \
     --disable-decode-perf-tests \
     --disable-encode-perf-tests \
-    --sdk-path=${ANDROID_NDK} \
+    --sdk-path=${ANDROID_NDK_ROOT} \
     --disable-codec-srcs \
     --disable-debug-libs \
     --enable-better-hw-compatibility \

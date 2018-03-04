@@ -1,0 +1,7 @@
+*.o
+*.lo
+/.deps/
+/.libs/
+/Makefile
+/fribidi-config.h
+/libfribidi.la

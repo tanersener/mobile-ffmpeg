@@ -16,8 +16,26 @@ android_get_target_host() {
         ;;
     esac
 }
+
+android_get_target_machine() {
+    case ${ARCH} in
+        arm)
+            echo "armv7"
+        ;;
+        arm64)
+            echo "aarch64"
+        ;;
+        x86)
+            echo "i686"
+        ;;
+        x86_64)
+            echo "x86_64"
+        ;;
+    esac
+}
+
 android_get_common_includes() {
-    echo "-I${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/include -I${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/local/include"
+    echo "-I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/local/include"
 }
 
 android_get_common_cflags() {
@@ -59,7 +77,7 @@ android_get_size_optimization_cflags() {
 
     LIB_OPTIMIZATION=""
     case $1 in
-        libiconv | libxml2 | shine | soxr | speex | wavpack | libvpx | libogg | libvorbis | jpeg | giflib | libpng | tiff | libwebp | libtheora | lame)
+        libiconv | libxml2 | shine | soxr | speex | wavpack | libvpx | libogg | libvorbis | jpeg | giflib | libpng | tiff | libwebp | libtheora | lame | openssl | fribidi | freetype | libuuid)
             LIB_OPTIMIZATION=""
         ;;
         *)
@@ -74,11 +92,14 @@ android_get_app_specific_cflags() {
 
     APP_FLAGS=""
     case $1 in
-        libwebp)
+        libwebp | openssl)
             APP_FLAGS=""
         ;;
         shine)
             APP_FLAGS="-Wno-psabi -Wno-unused-but-set-variable -Wno-unused-function"
+        ;;
+        tiff)
+            APP_FLAGS="-std=c99"
         ;;
         *)
             APP_FLAGS="-std=c99 -Wno-psabi -Wno-unused-but-set-variable -Wno-unused-function"
@@ -103,12 +124,12 @@ android_get_cxxflags() {
 }
 
 android_get_common_linked_libraries() {
-    echo "-lc -lm -ldl -llog -pie -pthread -L${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/lib -L${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/lib -L${ANDROID_NDK}/sources/cxx-stl/llvm-libc++/lib"
+    echo "-lc -lm -ldl -llog -pie -pthread -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/lib"
 }
 
 android_get_size_optimization_ldflags() {
     case $1 in
-        libxml2 | shine | soxr | speex | wavpack | libvpx | libogg | libvorbis | jpeg | giflib | libpng | tiff | libwebp | libtheora | lame)
+        libxml2 | shine | soxr | speex | wavpack | libvpx | libogg | libvorbis | jpeg | giflib | libpng | tiff | libwebp | libtheora | lame | openssl | fribidi | freetype | libuuid)
             echo ""
         ;;
         *)
@@ -143,14 +164,14 @@ android_get_ldflags() {
 }
 
 android_prepare_toolchain_paths() {
-    export PATH=$PATH:${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/bin
+    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin
 
     TARGET_HOST=$(android_get_target_host)
     
     export AR=${TARGET_HOST}-ar
-    export AS=${TARGET_HOST}-clang
-    export CC=${TARGET_HOST}-clang
-    export CXX=${TARGET_HOST}-clang++
+    export AS=${TARGET_HOST}-gcc
+    export CC=${TARGET_HOST}-gcc
+    export CXX=${TARGET_HOST}-g++
     export LD=${TARGET_HOST}-ld
     export RANLIB=${TARGET_HOST}-ranlib
     export STRIP=${TARGET_HOST}-strip

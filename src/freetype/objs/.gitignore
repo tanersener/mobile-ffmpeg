@@ -1,0 +1,7 @@
+*.o
+*.lo
+*.la
+/.libs/
+/apinames
+/ftexport.sym
+/ftmodule.h

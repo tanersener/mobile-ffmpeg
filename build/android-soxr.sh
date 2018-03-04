@@ -5,8 +5,8 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-if [[ -z ${ANDROID_NDK} ]]; then
-    echo "ANDROID_NDK not defined"
+if [[ -z ${ANDROID_NDK_ROOT} ]]; then
+    echo "ANDROID_NDK_ROOT not defined"
     exit 1
 fi
 
@@ -28,7 +28,7 @@ android_prepare_toolchain_paths
 
 TARGET_HOST=$(android_get_target_host)
 CFLAGS=$(android_get_cflags "soxr")
-CXXFLAGS=$(android_get_cxxflags)
+CXXFLAGS=$(android_get_cxxflags "soxr")
 LDFLAGS=$(android_get_ldflags "soxr")
 
 cd $1/src/soxr || exit 1
@@ -46,14 +46,14 @@ cmake -Wno-dev \
     -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \
     -DSIMD32_C_FLAGS="" \
-    -DCMAKE_SYSROOT="${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot" \
-    -DCMAKE_FIND_ROOT_PATH="${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot" \
+    -DCMAKE_SYSROOT="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot" \
+    -DCMAKE_FIND_ROOT_PATH="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${ANDROID_NDK}/prebuilt/android-${ARCH}/soxr" \
+    -DCMAKE_INSTALL_PREFIX="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/soxr" \
     -DCMAKE_SYSTEM_NAME=Generic \
-    -DCMAKE_C_COMPILER="${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/bin/$CC" \
-    -DCMAKE_LINKER="${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/bin/$LD" \
-    -DCMAKE_AR="${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/bin/$AR" \
+    -DCMAKE_C_COMPILER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin/${CC}" \
+    -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin/${LD}" \
+    -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin/${AR}" \
     -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
     -DBUILD_EXAMPLES=0 \
     -DBUILD_TESTS=0 \

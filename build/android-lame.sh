@@ -5,8 +5,8 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-if [[ -z ${ANDROID_NDK} ]]; then
-    echo "ANDROID_NDK not defined"
+if [[ -z ${ANDROID_NDK_ROOT} ]]; then
+    echo "ANDROID_NDK_ROOT not defined"
     exit 1
 fi
 
@@ -28,7 +28,7 @@ android_prepare_toolchain_paths
 
 TARGET_HOST=$(android_get_target_host)
 CFLAGS=$(android_get_cflags "lame")
-CXXFLAGS=$(android_get_cxxflags)
+CXXFLAGS=$(android_get_cxxflags "lame")
 LDFLAGS=$(android_get_ldflags "lame")
 
 cd $1/src/lame || exit 1
@@ -39,10 +39,10 @@ CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \
 LDFLAGS=${LDFLAGS} \
 ./configure \
-    --prefix=${ANDROID_NDK}/prebuilt/android-${ARCH}/lame \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/lame \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
-    --with-libiconv-prefix=${ANDROID_NDK}/prebuilt/android-${ARCH}/libiconv \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
+    --with-libiconv-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

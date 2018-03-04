@@ -1,0 +1,348 @@
+<!--
+   fontconfig/doc/func.sgml
+  
+   Copyright © 2003 Keith Packard
+  
+   Permission to use, copy, modify, distribute, and sell this software and its
+   documentation for any purpose is hereby granted without fee, provided that
+   the above copyright notice appear in all copies and that both that
+   copyright notice and this permission notice appear in supporting
+   documentation, and that the name of the author(s) not be used in
+   advertising or publicity pertaining to distribution of the software without
+   specific, written prior permission.  The authors make no
+   representations about the suitability of this software for any purpose.  It
+   is provided "as is" without express or implied warranty.
+  
+   THE AUTHOR(S) DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+   INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+   EVENT SHALL THE AUTHOR(S) BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+   CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+   DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+   TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+   PERFORMANCE OF THIS SOFTWARE.
+ -->
+    <refentry id="FcFreeTypeCharIndex">
+	<refmeta>
+	    <refentrytitle>FcFreeTypeCharIndex</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	    <refmiscinfo class="software">Fontconfig &version;</refmiscinfo>
+	</refmeta>
+	<refnamediv>
+	    <refname>FcFreeTypeCharIndex</refname>
+	    <refpurpose>map Unicode to glyph id</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+	<funcsynopsis>
+	<funcsynopsisinfo>
+#include &lt;fontconfig.h&gt;
+#include &lt;fcfreetype.h&gt;
+	</funcsynopsisinfo>
+	<funcprototype>
+	    <funcdef>FT_UInt <function>FcFreeTypeCharIndex</function></funcdef>
+		<paramdef>FT_Face <parameter>face</parameter></paramdef>
+		<paramdef>FcChar32 <parameter>ucs4</parameter></paramdef>
+	</funcprototype>
+	</funcsynopsis>
+	</refsynopsisdiv>
+	<refsect1><title>Description</title>
+	    <para>
+Maps a Unicode char to a glyph index.  This function uses information from
+several possible underlying encoding tables to work around broken fonts.
+As a result, this function isn't designed to be used in performance
+sensitive areas; results from this function are intended to be cached by
+higher level functions.
+	    </para>
+	</refsect1>
+    </refentry>
+<!--
+   fontconfig/doc/func.sgml
+  
+   Copyright © 2003 Keith Packard
+  
+   Permission to use, copy, modify, distribute, and sell this software and its
+   documentation for any purpose is hereby granted without fee, provided that
+   the above copyright notice appear in all copies and that both that
+   copyright notice and this permission notice appear in supporting
+   documentation, and that the name of the author(s) not be used in
+   advertising or publicity pertaining to distribution of the software without
+   specific, written prior permission.  The authors make no
+   representations about the suitability of this software for any purpose.  It
+   is provided "as is" without express or implied warranty.
+  
+   THE AUTHOR(S) DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+   INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+   EVENT SHALL THE AUTHOR(S) BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+   CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+   DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+   TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+   PERFORMANCE OF THIS SOFTWARE.
+ -->
+    <refentry id="FcFreeTypeCharSet">
+	<refmeta>
+	    <refentrytitle>FcFreeTypeCharSet</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	    <refmiscinfo class="software">Fontconfig &version;</refmiscinfo>
+	</refmeta>
+	<refnamediv>
+	    <refname>FcFreeTypeCharSet</refname>
+	    <refpurpose>compute Unicode coverage</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+	<funcsynopsis>
+	<funcsynopsisinfo>
+#include &lt;fontconfig.h&gt;
+#include &lt;fcfreetype.h&gt;
+	</funcsynopsisinfo>
+	<funcprototype>
+	    <funcdef>FcCharSet * <function>FcFreeTypeCharSet</function></funcdef>
+		<paramdef>FT_Face <parameter>face</parameter></paramdef>
+		<paramdef>FcBlanks *<parameter>blanks</parameter></paramdef>
+	</funcprototype>
+	</funcsynopsis>
+	</refsynopsisdiv>
+	<refsect1><title>Description</title>
+	    <para>
+Scans a FreeType face and returns the set of encoded Unicode chars.
+FcBlanks is deprecated, <parameter>blanks</parameter> is ignored and
+accepted only for compatibility with older code.
+	    </para>
+	</refsect1>
+    </refentry>
+<!--
+   fontconfig/doc/func.sgml
+  
+   Copyright © 2003 Keith Packard
+  
+   Permission to use, copy, modify, distribute, and sell this software and its
+   documentation for any purpose is hereby granted without fee, provided that
+   the above copyright notice appear in all copies and that both that
+   copyright notice and this permission notice appear in supporting
+   documentation, and that the name of the author(s) not be used in
+   advertising or publicity pertaining to distribution of the software without
+   specific, written prior permission.  The authors make no
+   representations about the suitability of this software for any purpose.  It
+   is provided "as is" without express or implied warranty.
+  
+   THE AUTHOR(S) DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+   INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+   EVENT SHALL THE AUTHOR(S) BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+   CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+   DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+   TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+   PERFORMANCE OF THIS SOFTWARE.
+ -->
+    <refentry id="FcFreeTypeCharSetAndSpacing">
+	<refmeta>
+	    <refentrytitle>FcFreeTypeCharSetAndSpacing</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	    <refmiscinfo class="software">Fontconfig &version;</refmiscinfo>
+	</refmeta>
+	<refnamediv>
+	    <refname>FcFreeTypeCharSetAndSpacing</refname>
+	    <refpurpose>compute Unicode coverage and spacing type</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+	<funcsynopsis>
+	<funcsynopsisinfo>
+#include &lt;fontconfig.h&gt;
+#include &lt;fcfreetype.h&gt;
+	</funcsynopsisinfo>
+	<funcprototype>
+	    <funcdef>FcCharSet * <function>FcFreeTypeCharSetAndSpacing</function></funcdef>
+		<paramdef>FT_Face <parameter>face</parameter></paramdef>
+		<paramdef>FcBlanks *<parameter>blanks</parameter></paramdef>
+		<paramdef>int *<parameter>spacing</parameter></paramdef>
+	</funcprototype>
+	</funcsynopsis>
+	</refsynopsisdiv>
+	<refsect1><title>Description</title>
+	    <para>
+Scans a FreeType face and returns the set of encoded Unicode chars.
+FcBlanks is deprecated, <parameter>blanks</parameter> is ignored and
+accepted only for compatibility with older code.
+<parameter>spacing</parameter> receives the computed spacing type of the
+font, one of FC_MONO for a font where all glyphs have the same width,
+FC_DUAL, where the font has glyphs in precisely two widths, one twice as
+wide as the other, or FC_PROPORTIONAL where the font has glyphs of many
+widths.
+	    </para>
+	</refsect1>
+    </refentry>
+<!--
+   fontconfig/doc/func.sgml
+  
+   Copyright © 2003 Keith Packard
+  
+   Permission to use, copy, modify, distribute, and sell this software and its
+   documentation for any purpose is hereby granted without fee, provided that
+   the above copyright notice appear in all copies and that both that
+   copyright notice and this permission notice appear in supporting
+   documentation, and that the name of the author(s) not be used in
+   advertising or publicity pertaining to distribution of the software without
+   specific, written prior permission.  The authors make no
+   representations about the suitability of this software for any purpose.  It
+   is provided "as is" without express or implied warranty.
+  
+   THE AUTHOR(S) DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+   INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+   EVENT SHALL THE AUTHOR(S) BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+   CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+   DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+   TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+   PERFORMANCE OF THIS SOFTWARE.
+ -->
+    <refentry id="FcFreeTypeQuery">
+	<refmeta>
+	    <refentrytitle>FcFreeTypeQuery</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	    <refmiscinfo class="software">Fontconfig &version;</refmiscinfo>
+	</refmeta>
+	<refnamediv>
+	    <refname>FcFreeTypeQuery</refname>
+	    <refpurpose>compute pattern from font file (and index)</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+	<funcsynopsis>
+	<funcsynopsisinfo>
+#include &lt;fontconfig.h&gt;
+#include &lt;fcfreetype.h&gt;
+	</funcsynopsisinfo>
+	<funcprototype>
+	    <funcdef>FcPattern * <function>FcFreeTypeQuery</function></funcdef>
+		<paramdef>const FcChar8 *<parameter>file</parameter></paramdef>
+		<paramdef>int <parameter>id</parameter></paramdef>
+		<paramdef>FcBlanks *<parameter>blanks</parameter></paramdef>
+		<paramdef>int *<parameter>count</parameter></paramdef>
+	</funcprototype>
+	</funcsynopsis>
+	</refsynopsisdiv>
+	<refsect1><title>Description</title>
+	    <para>
+Constructs a pattern representing the 'id'th face in 'file'.  The number
+of faces in 'file' is returned in 'count'.
+FcBlanks is deprecated, <parameter>blanks</parameter> is ignored and
+accepted only for compatibility with older code.
+	    </para>
+	</refsect1>
+    </refentry>
+<!--
+   fontconfig/doc/func.sgml
+  
+   Copyright © 2003 Keith Packard
+  
+   Permission to use, copy, modify, distribute, and sell this software and its
+   documentation for any purpose is hereby granted without fee, provided that
+   the above copyright notice appear in all copies and that both that
+   copyright notice and this permission notice appear in supporting
+   documentation, and that the name of the author(s) not be used in
+   advertising or publicity pertaining to distribution of the software without
+   specific, written prior permission.  The authors make no
+   representations about the suitability of this software for any purpose.  It
+   is provided "as is" without express or implied warranty.
+  
+   THE AUTHOR(S) DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+   INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+   EVENT SHALL THE AUTHOR(S) BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+   CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+   DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+   TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+   PERFORMANCE OF THIS SOFTWARE.
+ -->
+    <refentry id="FcFreeTypeQueryAll">
+	<refmeta>
+	    <refentrytitle>FcFreeTypeQueryAll</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	    <refmiscinfo class="software">Fontconfig &version;</refmiscinfo>
+	</refmeta>
+	<refnamediv>
+	    <refname>FcFreeTypeQueryAll</refname>
+	    <refpurpose>compute all patterns from font file (and index)</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+	<funcsynopsis>
+	<funcsynopsisinfo>
+#include &lt;fontconfig.h&gt;
+#include &lt;fcfreetype.h&gt;
+	</funcsynopsisinfo>
+	<funcprototype>
+	    <funcdef>unsigned int <function>FcFreeTypeQueryAll</function></funcdef>
+		<paramdef>const FcChar8 *<parameter>file</parameter></paramdef>
+		<paramdef>int <parameter>id</parameter></paramdef>
+		<paramdef>FcBlanks *<parameter>blanks</parameter></paramdef>
+		<paramdef>int *<parameter>count</parameter></paramdef>
+		<paramdef>FcFontSet *<parameter>set</parameter></paramdef>
+	</funcprototype>
+	</funcsynopsis>
+	</refsynopsisdiv>
+	<refsect1><title>Description</title>
+	    <para>
+Constructs patterns found in 'file'.
+If id is -1, then all patterns found in 'file' are added to 'set'.
+Otherwise, this function works exactly like FcFreeTypeQuery().
+The number of faces in 'file' is returned in 'count'.
+The number of patterns added to 'set' is returned.
+FcBlanks is deprecated, <parameter>blanks</parameter> is ignored and
+accepted only for compatibility with older code.
+	    </para>
+	</refsect1>
+	<refsect1><title>Since</title>
+	    <para>version 2.12.91</para>
+	</refsect1>
+    </refentry>
+<!--
+   fontconfig/doc/func.sgml
+  
+   Copyright © 2003 Keith Packard
+  
+   Permission to use, copy, modify, distribute, and sell this software and its
+   documentation for any purpose is hereby granted without fee, provided that
+   the above copyright notice appear in all copies and that both that
+   copyright notice and this permission notice appear in supporting
+   documentation, and that the name of the author(s) not be used in
+   advertising or publicity pertaining to distribution of the software without
+   specific, written prior permission.  The authors make no
+   representations about the suitability of this software for any purpose.  It
+   is provided "as is" without express or implied warranty.
+  
+   THE AUTHOR(S) DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+   INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+   EVENT SHALL THE AUTHOR(S) BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+   CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+   DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+   TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+   PERFORMANCE OF THIS SOFTWARE.
+ -->
+    <refentry id="FcFreeTypeQueryFace">
+	<refmeta>
+	    <refentrytitle>FcFreeTypeQueryFace</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	    <refmiscinfo class="software">Fontconfig &version;</refmiscinfo>
+	</refmeta>
+	<refnamediv>
+	    <refname>FcFreeTypeQueryFace</refname>
+	    <refpurpose>compute pattern from FT_Face</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+	<funcsynopsis>
+	<funcsynopsisinfo>
+#include &lt;fontconfig.h&gt;
+#include &lt;fcfreetype.h&gt;
+	</funcsynopsisinfo>
+	<funcprototype>
+	    <funcdef>FcPattern * <function>FcFreeTypeQueryFace</function></funcdef>
+		<paramdef>const FT_Face <parameter>face</parameter></paramdef>
+		<paramdef>const FcChar8 *<parameter>file</parameter></paramdef>
+		<paramdef>int <parameter>id</parameter></paramdef>
+		<paramdef>FcBlanks *<parameter>blanks</parameter></paramdef>
+	</funcprototype>
+	</funcsynopsis>
+	</refsynopsisdiv>
+	<refsect1><title>Description</title>
+	    <para>
+Constructs a pattern representing 'face'. 'file' and 'id' are used solely as
+data for pattern elements (FC_FILE, FC_INDEX and sometimes FC_FAMILY).
+FcBlanks is deprecated, <parameter>blanks</parameter> is ignored and
+accepted only for compatibility with older code.
+	    </para>
+	</refsect1>
+    </refentry>

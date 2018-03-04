@@ -540,7 +540,7 @@ dist:
 	@$(MAKE) SDIRS='$(SDIRS)' clean
 	@$(MAKE) TAR='$(TAR)' TARFLAGS='$(TARFLAGS)' $(DISTTARVARS) tar
 
-install: all install_docs install_sw
+install: install_docs install_sw
 
 install_sw:
 	@$(PERL) $(TOP)/util/mkdir-p.pl $(INSTALL_PREFIX)$(INSTALLTOP)/bin \

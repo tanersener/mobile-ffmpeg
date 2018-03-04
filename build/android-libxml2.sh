@@ -5,8 +5,8 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-if [[ -z ${ANDROID_NDK} ]]; then
-    echo "ANDROID_NDK not defined"
+if [[ -z ${ANDROID_NDK_ROOT} ]]; then
+    echo "ANDROID_NDK_ROOT not defined"
     exit 1
 fi
 
@@ -28,11 +28,11 @@ android_prepare_toolchain_paths
 
 TARGET_HOST=$(android_get_target_host)
 COMMON_CFLAGS=$(android_get_cflags "libxml2")
-COMMON_CXXFLAGS=$(android_get_cxxflags)
+COMMON_CXXFLAGS=$(android_get_cxxflags "libxml2")
 COMMON_LDFLAGS=$(android_get_ldflags "libxml2")
-CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK}/prebuilt/android-${ARCH}/libiconv/include"
+CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/include"
 CXXFLAGS="$COMMON_CXXFLAGS"
-LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK}/prebuilt/android-${ARCH}/libiconv/lib"
+LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/lib"
 
 cd $1/src/libxml2 || exit 1
 
@@ -48,9 +48,9 @@ CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \
 LDFLAGS=${LDFLAGS} \
 ./configure \
-    --prefix=${ANDROID_NDK}/prebuilt/android-${ARCH}/libxml2 \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2 \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
     --with-zlib \
     --with-iconv \
     --without-python \

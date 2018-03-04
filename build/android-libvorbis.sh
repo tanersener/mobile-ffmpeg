@@ -5,8 +5,8 @@ if [[ -z $1 ]]; then
     exit 1
 fi
 
-if [[ -z ${ANDROID_NDK} ]]; then
-    echo "ANDROID_NDK not defined"
+if [[ -z ${ANDROID_NDK_ROOT} ]]; then
+    echo "ANDROID_NDK_ROOT not defined"
     exit 1
 fi
 
@@ -28,7 +28,7 @@ android_prepare_toolchain_paths
 
 TARGET_HOST=$(android_get_target_host)
 CFLAGS=$(android_get_cflags "libvorbis")
-CXXFLAGS=$(android_get_cxxflags)
+CXXFLAGS=$(android_get_cxxflags "libvorbis")
 LDFLAGS=$(android_get_ldflags "libvorbis")
 
 cd $1/src/libvorbis || exit 1
@@ -39,11 +39,11 @@ CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \
 LDFLAGS=${LDFLAGS} \
 ./configure \
-    --prefix=${ANDROID_NDK}/prebuilt/android-${ARCH}/libvorbis \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
-    --with-ogg-includes=${ANDROID_NDK}/prebuilt/android-${ARCH}/libogg/include \
-    --with-ogg-libraries=${ANDROID_NDK}/prebuilt/android-${ARCH}/libogg/lib \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
+    --with-ogg-includes=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libogg/include \
+    --with-ogg-libraries=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libogg/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

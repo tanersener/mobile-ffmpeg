@@ -1,0 +1,9 @@
+*.pc
+/config.log
+/config.status
+/freetype-config
+/ftconfig.h
+/ftoption.h
+/libtool
+/unix-cc.mk
+/unix-def.mk
