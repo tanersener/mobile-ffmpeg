@@ -1,0 +1,13 @@
+/.deps/
+/Makefile
+*.o
+*.lo
+/.libs/
+/fcalias.h
+/fcaliastail.h
+/fcarch
+/fcftalias.h
+/fcftaliastail.h
+*.gperf
+*.la
+/stamp-fcstdint

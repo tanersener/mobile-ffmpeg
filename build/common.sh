@@ -17,23 +17,6 @@ android_get_target_host() {
     esac
 }
 
-android_get_target_machine() {
-    case ${ARCH} in
-        arm)
-            echo "armv7"
-        ;;
-        arm64)
-            echo "aarch64"
-        ;;
-        x86)
-            echo "i686"
-        ;;
-        x86_64)
-            echo "x86_64"
-        ;;
-    esac
-}
-
 android_get_common_includes() {
     echo "-I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/local/include"
 }
@@ -76,14 +59,6 @@ android_get_size_optimization_cflags() {
     esac
 
     LIB_OPTIMIZATION=""
-    case $1 in
-        libiconv | libxml2 | shine | soxr | speex | wavpack | libvpx | libogg | libvorbis | jpeg | giflib | libpng | tiff | libwebp | libtheora | lame | openssl | fribidi | freetype | libuuid)
-            LIB_OPTIMIZATION=""
-        ;;
-        *)
-            LIB_OPTIMIZATION="-ffunction-sections -fdata-sections -fomit-frame-pointer -funswitch-loops"
-        ;;
-    esac
 
     echo "${ARCH_OPTIMIZATION} ${LIB_OPTIMIZATION}"
 }
@@ -95,7 +70,7 @@ android_get_app_specific_cflags() {
         libwebp | openssl)
             APP_FLAGS=""
         ;;
-        shine)
+        ffmpeg | shine)
             APP_FLAGS="-Wno-psabi -Wno-unused-but-set-variable -Wno-unused-function"
         ;;
         tiff)
@@ -120,7 +95,14 @@ android_get_cflags() {
 }
 
 android_get_cxxflags() {
-    echo "-std=c++11 -fno-exceptions -fno-rtti"
+    case $1 in
+        opencore-amr)
+            echo ""
+        ;;
+        *)
+            echo "-std=c++11 -fno-exceptions -fno-rtti"
+        ;;
+    esac
 }
 
 android_get_common_linked_libraries() {
@@ -128,14 +110,7 @@ android_get_common_linked_libraries() {
 }
 
 android_get_size_optimization_ldflags() {
-    case $1 in
-        libxml2 | shine | soxr | speex | wavpack | libvpx | libogg | libvorbis | jpeg | giflib | libpng | tiff | libwebp | libtheora | lame | openssl | fribidi | freetype | libuuid)
-            echo ""
-        ;;
-        *)
-            echo "-Wl,--gc-sections,--icf=safe"
-        ;;
-    esac
+    echo "-Wl,--gc-sections,--icf=safe"
 }
 
 android_get_arch_specific_ldflags() {

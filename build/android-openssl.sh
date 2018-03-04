@@ -1,5 +1,22 @@
 #!/bin/bash
 
+android_get_target_machine() {
+    case ${ARCH} in
+        arm)
+            echo "armv7"
+        ;;
+        arm64)
+            echo "aarch64"
+        ;;
+        x86)
+            echo "i686"
+        ;;
+        x86_64)
+            echo "x86_64"
+        ;;
+    esac
+}
+
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1

@@ -31,8 +31,8 @@ COMMON_CFLAGS=$(android_get_cflags "fontconfig")
 CXXFLAGS=$(android_get_cxxflags "fontconfig")
 COMMON_LDFLAGS=$(android_get_ldflags "fontconfig")
 
-CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/include -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2/include -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype/include"
-LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/lib -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2/lib -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype/lib"
+CFLAGS="$COMMON_CFLAGS -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid/include"
+LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid/lib"
 
 cd $1/src/fontconfig || exit 1
 
@@ -41,17 +41,16 @@ make clean
 CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \
 LDFLAGS=${LDFLAGS} \
-PKG_CONFIG_PATH=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype/lib/pkgconfig:${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2/lib/pkgconfig \
+PKG_CONFIG_PATH=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype/lib/pkgconfig:${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2/lib/pkgconfig:${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid/lib/pkgconfig \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/fontconfig \
     --with-pic \
-    --with-libiconv-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
+    --with-libiconv-includes=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/include \
+    --with-libiconv-lib=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
     --disable-largefile \
-    --disable-uuid \
     --enable-iconv \
     --enable-libxml2 \
     --disable-docs \
@@ -60,9 +59,9 @@ PKG_CONFIG_PATH=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype/lib/pkgcon
 CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \
 LDFLAGS=${LDFLAGS} \
-#make -j$(nproc) || exit 1
+make -j$(nproc) || exit 1
 
 CFLAGS=${CFLAGS} \
 CXXFLAGS=${CXXFLAGS} \
 LDFLAGS=${LDFLAGS} \
-#make install || exit 1
+make install || exit 1

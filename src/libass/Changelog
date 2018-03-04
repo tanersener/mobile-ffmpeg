@@ -1,0 +1,353 @@
+libass (0.14.0)
+ * Brand new, faster and better outline stroker (replaces FreeType stroker)
+ * Remove option to use the FreeType rasterizer
+ * Fix spots of missing border around self-intersecting shapes
+ * Switch from Yasm to NASM for building hand-written assembler code
+ * Support Core Text font provider on Mac OS X 10.6 and 10.7
+ * Clear font cache in ass_set_fonts(). This fixes potentially incorrect
+   font choices and an occasional crash if this function is called midway
+   through rendering a file.
+
+libass (0.13.7)
+ * Fix invalid memory accesses with BorderStyle=4
+ * Fix change detection bug on frame resizes
+ * Fix cache bugs with border size
+ * Reduce precision of border width in font outline caching
+ * Don't treat :;<=>? as hexadecimal digits in color headers
+ * Fix parsing of unusual Alignment values in ASS style definitions
+ * Fix potential truncation in timestamp parsing
+ * Treat negative PlayResX/PlayResY like VSFilter
+ * Fixes to parsing of embedded fonts
+ * Remove arbitrary bitmap limit (fixes issues with subtitle rendering at 4K)
+ * Allow using shadow offset to adjust size of background with BorderStyle=4
+ * Fix TrueType/OpenType font collection handling with the DirectWrite backend
+
+libass (0.13.6)
+ * Bump ABI version to account for the new Justify field in ASS_Style
+   that was added in 0.13.5.
+
+libass (0.13.5)
+ * Add Justify style override that changes text justification
+   (left/right/center) without affecting event positioning.
+ * Fix ass_set_cache_limits() to affect total bitmap cache size
+   including composite bitmap cache.
+ * Number parsing fixes
+   * Fix illegal read when parsing some numbers in scientific notation
+     with huge exponents.
+   * Correctly evaluate numbers in scientific notation with large exponents.
+   * Correctly evaluate numbers with many leading zeros.
+ * Bug fixes found with fuzzing
+   * Fix a small memory leak in the parser.
+   * Fix illegal read in the parser on specially crafted input with \t tags.
+
+libass (0.13.4)
+ * Bug fixes found with fuzzing
+   * Fix memory reallocation in the shaper. (CVE-2016-7972)
+   * Fix two small memory leaks in the parser and test program.
+   * Fix illegal read in Gaussian blur coefficient calculations.
+     (CVE-2016-7970)
+   * Fix mode 0/3 line wrapping equalization in specific cases which could
+     result in illegal reads while laying out and shaping text.
+     (CVE-2016-7969)
+
+libass (0.13.3)
+ * Improve compatibility/portablility of build system,
+   should fix e.g. compilation on Solaris.
+ * Fix memory leak in DirectWrite font provider.
+ * Fix the rasterizer when rendering some large outlines.
+ * Remove hack that forced RTL base direction depending on font encoding.
+ * Greatly improve the internal caches with refcounting and gradual clearing.
+
+libass (0.13.2)
+ * Add ass_set_check_readorder() API function to disable use of the ReadOrder
+   field for duplicate checking in ass_process_chunk().
+ * ass_step_sub(track, now, 0) now finds the start of the subtitle at "now".
+ * Bug fixes
+   * Fix an issue with the new duplicate checking, which could lead to
+     missing subtitles after seeking.
+   * Fix a crash with CoreText under specific circumstances
+
+libass (0.13.1)
+ * Much faster duplicate event check in ass_process_chunk. This can
+   bring a large speedup for embedded subtitles with lots of events.
+   To make this possible, it is now forbidden to combine calls to
+   ass_process_chunk with any other method of manipulating the event
+   list, namely, manual manipulation and calls to ass_process_data,
+   ass_read_memory and ass_read_file.
+ * Interpret negative timestamp components as actual negative numbers.
+   This change increases compatibility with VSFilter.
+ * Font matching changes for VSFilter compatibility
+   * Look up fonts that contain PostScript outlines by their PostScript
+     name instead of their full names. Family names continue to be used
+     for all fonts.
+   * Keep spaces in font names
+ * Drop support for Fontconfig < 2.10.92 to ensure correct font matching
+ * Bug fixes
+   * Fix building the assembler code for the x32 ABI (GH #200)
+   * Fix static linking against libass through pkg-config when libass
+     uses libiconv
+   * Fix some small memory leaks, potential crashes and bad data uses
+
+libass (0.13.0)
+ * Add native font selection backends for OSX (CoreText) and Windows
+   (DirectWrite). You can now run libass without fontconfig on these
+   platforms. This fixes problems with fontconfig behaving badly on
+   these platforms (it could take minutes to scan all system fonts).
+   Even on Linux, this speeds up loading of embedded fonts (such as
+   provided by ass_add_font()).
+   The DirectWrite backend only works on Windows Vista and later. On
+   XP, fontconfig is still needed. libass can be compiled with both
+   DirectWrite and fontconfig, and then it will fallback to fontconfig
+   automatically if DirectWrite is not available at runtime.
+ * Add ass_get_available_font_providers() API function.
+ * Change the 4th parameter of ass_set_fonts(). This now selects the
+   font provider. This is somewhat backwards compatible with the old
+   behavior, but if you ever passed values other than 0 or 1, your
+   application might break with this libass release.
+ * The ass_fonts_update() function now does nothing. It's kept for
+   backward compatibility only.
+ * Much faster gaussian blur. This can bring a large speedup with big
+   blurred signs and such.
+ * Drop ENCA support
+ * Bug fixes
+   * Fix compilation of the freetype rasterizer (disabled by default)
+   * Fix rendering with some cases of consecutive line breaks (\N\N).
+   * Fix some memory allocation failure checks
+   * Avoid system locale dependent behavior by reinventing some standard
+     C functions
+   * Fix rendering errors with strikes (GH #193)
+   * MSVC compilation fixes
+
+libass (0.12.3)
+ * VSFilter blur compatibility changes
+ * VSFilter color/alpha parsing compatibility changes
+ * Bugfixes
+   * Fix some potential memory leaks and crashes
+   * Fix large timestamps (larger than about 600 hours)
+   * Fix a potential crash with the new rasterizer and complex fonts
+   * Do not apply user-configured line position to non-dialog events
+   * Strictly clip non-dialog events to the video rectangle
+
+libass (0.12.2)
+ * Add extern "C" guards to the public headers for C++ compatibility
+ * Improvements to style override API and implementation
+ * Bugfixes
+   * Fix some rasterizer bugs of unknown severity
+   * Fix a broken memset() of unknown severity
+   * Make timestamp parsing more lenient, which makes libass accept invalid
+     files accepted by most other ASS parsers
+   * Increase compatibility with broken ASS drawings accepted by VSFilter
+
+libass (0.12.1)
+ * Make ASS drawings with an extremely high number of control points work
+   This change increases compatibility with VSFilter.
+ * Bugfixes
+   * Fix a crash when using newer harfbuzz versions (GH #155)
+   * Load embedded memory fonts correctly
+   * Large shadow offsets rendered incorrectly (GH #142)
+   * Fix incorrect closing of last drawing contour
+   * Fix issues with undefined behavior in shifts
+   * Lots of of malloc() error checking
+
+libass (0.12.0)
+ * Implement fast quad-tree rasterizer in C and SSE2/AVX2 assembly
+ * Make \be animatable
+ * Add BorderStyle=4 (GH #105)
+ * Add selective style override functionality
+   * ass_set_selective_style_override()
+   * ass_set_selective_style_override_enabled()
+ * Support for assembly on DragonFly BSD
+ * Bugfixes
+   * Various parser fixes
+   * Fix premature parser exit on }{ in drawing mode (GH #75)
+   * Reset clipping mode on every rectangle clip
+   * Improved error handling for FriBidi and FreeType (GH #131)
+   * Fix bitmap combining cache
+
+libass (0.11.2)
+ * Improve yasm version check
+ * Fix \fscx0 crashes
+ * Actually export ass_library_version
+ * Fix change detection with vector clips
+ * SIMD assembly bugfixes
+ * Parse drawing numbers as floats (GH #63)
+ * Fix shaper sign bug (GH #68)
+ * Initialize \pbo correctly (GH #74)
+
+libass (0.11.1)
+ * Fix distfile generation
+ * No functional changes
+
+libass (0.11.0)
+ * Add bitmap run combining/compositing
+   This changes the text rendering model and increases compatibility with
+   VSFilter. It may make rendering faster or slower in certain cases.
+ * Add AVX/SSE2 implementations for \be and compositing
+   This adds yasm as (optional) build dependency.
+ * Add ass_library_version() API funcion (GC #113)
+ * Add 'profile' program for benchmarks
+ * Improve gaussian blur
+ * Fix compilation with MSVC 2013
+ * Speed up HarfBuzz shaper
+ * Speed up cache
+ * Notable compatibility bugfixes
+   * Reset origin on \fay changes (GC #88)
+   * Tons of parser fixes
+   * Fix ascender/descender metrics (GH #8)
+   * Fix \pbo sign and scaling
+   * Don't reset wrap style on \r (GC #116, GH #45)
+ * Notable bugfixes:
+   * Correctly handle @font advance (GC #94)
+   * Disable ligatures for non-zero \fsp
+   * Make sure to release vector clip (GH #22)
+
+libass (0.10.2)
+ * API additions and some ABI changes, bumped SONAME
+ * Expose header field for VSFilter color mangling (GC #87)
+ * Add functions for explicit scaling hints (GC #6)
+ * Add 'type' field to ASS_Image (GC #31)
+ * Workaround Freetype's font size grid-fitting where appropriate
+ * Apply blur to both glyph and border when using opaque box
+ * Parser bugfixes
+   * Parse angles in style as number
+   * Fix fallback event formats
+   * Make closing ')' optional for some tags
+   * Fix crazy VSFilter behaviour for \move (GC #90)
+   * Make \r fall back to line style (GC #104)
+   * Parse style name like VSFilter
+   * Ignore junk in nested \t tags
+   * Make \clip tag arguments mandatory
+ * Properly handle script and language in the HarfBuzz shaper
+ * Allow ASS_Track and ASS_Renderer to have different ASS_Library
+ * Fix stroking in some rare cases
+ * Correctly handle @font advance (GC #94)
+ * Fix ascent/descent for some fonts (GC #106)
+ * Fix ass_step_sub to not require sorted events
+ * Fix blur scaling
+ * Don't mutate input strings (GC #88)
+ * Remove/change some error messages
+ * Fix various small memory leaks
+
+libass (0.10.1)
+ * Fix letter spacing
+ * Add \rSTYLENAME syntax support (GC #43)
+ * Fix border generation and border style reset (GC #56)
+ * Fix various issues with bug-for-bug compatibility of
+   transformations (\fax, \fay, etc.) to VSFilter (GC #46, GC #42)
+ * Fix drawing parsing (GC #47)
+ * Various fixes to shaper (GC #54, GC #55, GC#59)
+ * Fix change detection
+ * Add ass_set_line_position API to set a vertical subtitle offset
+ * Fix scaling of drawing baseline offset (\pbo) values
+ * Fix skipping of zero-width characters for FriBiDi shaper
+ * Use LTR text base direction by default, similar to VSFilter
+
+libass (0.10.0)
+ * Bidirectional layout and Arabic shaping via FriBidi (GC #13)
+ * OpenType shaping via HarfBuzz-ng (GC #13)
+ * Add API for shaper configuration
+ * Add support for `Language' Script Info property, this can be used for
+   hinting the text language
+ * Vertical layout improvements
+   * Use `vert' and `vkna' OpenType features for vertical glyph variants
+   * Position rotated glyphs onto baseline
+ * Parse font encoding property for base text direction hinting
+ * Refactor cache system
+ * Use generic outlines in place of FreeType glyphs
+ * Direct outline bitmap rendering
+ * Fix whitespace trimming (GC #35)
+ * Do not render border if there's no shadow or glyph (GC #29)
+ * Adjust spacing after a italic to non-italic style change (GC #37)
+ * Fix fade timing
+ * Fix x positioning with borders (GC #27)
+ * Build system tweaks
+
+libass (0.9.12)
+ * Switch to permissive (ISC) license
+ * Support \fs+ and \fs- syntax for modifying font size
+ * Fix word-wrapping
+ * Improved charmap fallback matching
+ * Handle a few more VSFilter quirks correctly
+ * Add a sensible default style
+ * Fix compilation against libpng 1.5
+
+libass (0.9.11)
+ * Fix serious memory leaks
+ * Reduce frame/drawing initialization overhead
+
+libass (0.9.10)
+ * Basic (incorrect, but working) support for @font vertical text layout
+ * Fix multiple faces per font attachment
+ * charmap selection fixes
+ * Add ass_flush_events API function
+ * Improve fullname font matching
+ * Better PAR correction if text transforms are used
+ * Calculate drawing bounding box like VSFilter
+ * Performance improvements
+   * Cache vector clip masks
+   * Avoid unnecessary glyph copies
+ * Various rendering fixes
+
+libass (0.9.9)
+ * Parse numbers in a locale-independent way
+ * Remove support for freetype < 2.2.1, fontconfig < 2.4.1; this especially
+   means libass will not extract fonts into the file system anymore
+ * Disable script file size limit
+ * Match fonts against the full name ("name for humans")
+ * Reset clip mode after \iclip
+ * Improve VSFilter compatibility
+ * Update API documentation
+ * A couple of smaller fixes and cleanups
+
+libass (0.9.8)
+ * Support \q override tag
+ * Support wrap style 1 (i.e. wrap, but do not equalize line lengths)
+ * Support border style 3 (opaque box)
+ * Use the event bounding box (instead of vertical position and height) for
+   collision detection
+ * Embold glyphs if no bold variant is available, but was requested
+ * Modify \fax to be similar to VSFilter
+ * Trim spaces after line wrapping
+ * Fix border/shadow overlap combining in some cases
+ * Disable kerning by default.  Use "Kerning=yes" style override or
+   "Kerning: yes" in [Script Info] to enable it
+ * Slight bitmap handling optimizations
+ * Various bugfixes
+
+libass (0.9.7)
+ * Build system fixes
+ * Fixed cache lookup and overload problems
+ * All globals have been eliminated, libass is reentrant
+ * Dynamically allocate glyph and line buffers
+ * Fix up stroking of big borders
+ * Support empty lines (\N\N)
+ * Support for the following override tags:
+   \fax, \fay, \xshad, \yshad, \ybord, \xbord, \iclip, \u, \s, \p, \pbo
+ * Full subpixel accuracy for positioning
+ * PAR and rotation correction for EOSD rendering
+ * Drawing mode (including vector \clip and \iclip)
+ * Fixed a few memory leaks
+ * Removed MPlayer compatibility code
+ * Introduced message handling callback
+ * Various fixes to match VSFilter quirks and Windows font metrics
+ * Lots of bugfixes
+
+LibASS (0.9.6)
+ * Various fixes and updates to match VSFilter renderer.
+ * Support \blur tag and ScaledBordersAndShadow property.
+ * Fractional arguments and subpixel accuracy.
+ * Keep positions when pan-and-scan is used.
+ * Lots of bugfixes and other changes.
+
+LibASS (0.9.5)
+ * Support '=' and '.' in style name in arguments to ass_set_style_overrides().
+ * Allow overriding [Script Info] parameters with ass_set_style_overrides().
+ * Add workarounds for some buggy fonts.
+ * Remove buggy workarounds for some other fonts.
+ * Fixed ass_set_line_spacing() (was broken before).
+ * Negative margin sizes are now used for image cropping.
+ * Better handling of behind-the-camera objects.
+ * Case insensitive parsing of SSA/ASS section headers.
+ * Improved font matching.
+ * When 2 styles have the same name, the later one is used.
+ * Fixed several other bugs.
