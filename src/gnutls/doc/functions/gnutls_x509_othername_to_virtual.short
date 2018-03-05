@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_othername_to_virtual} (const char * @var{oid}, const gnutls_datum_t * @var{othername}, unsigned int * @var{virt_type}, gnutls_datum_t * @var{virt})

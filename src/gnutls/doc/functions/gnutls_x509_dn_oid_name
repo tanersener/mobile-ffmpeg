@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_x509_dn_oid_name} (const char * @var{oid}, unsigned int @var{flags})
+@var{oid}: holds an Object Identifier in a null terminated string
+
+@var{flags}: 0 or GNUTLS_X509_DN_OID_*
+
+This function will return the name of a known DN OID. If
+@code{GNUTLS_X509_DN_OID_RETURN_OID}  is specified this function
+will return the given OID if no descriptive name has been
+found.
+
+@strong{Returns:} A null terminated string or NULL otherwise.
+
+@strong{Since:} 3.0
+@end deftypefun

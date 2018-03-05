@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_priority_compression_list} (gnutls_priority_t @var{pcache}, const unsigned int ** @var{list})
+@var{pcache}: is a @code{gnutls_prioritity_t}  type.
+
+@var{list}: will point to an integer list
+
+Get a list of available compression method in the priority
+structure. 
+
+@strong{Returns:} the number of methods, or an error code.
+
+@strong{Since:} 3.0
+@end deftypefun

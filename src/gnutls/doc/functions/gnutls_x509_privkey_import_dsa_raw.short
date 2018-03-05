@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_privkey_import_dsa_raw} (gnutls_x509_privkey_t @var{key}, const gnutls_datum_t * @var{p}, const gnutls_datum_t * @var{q}, const gnutls_datum_t * @var{g}, const gnutls_datum_t * @var{y}, const gnutls_datum_t * @var{x})

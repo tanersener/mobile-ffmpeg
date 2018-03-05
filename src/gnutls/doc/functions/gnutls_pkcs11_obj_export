@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_obj_export} (gnutls_pkcs11_obj_t @var{obj}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{obj}: Holds the object
+
+@var{output_data}: will contain the object data
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will export the PKCS11 object data.  It is normal for
+data to be inaccesible and in that case @code{GNUTLS_E_INVALID_REQUEST} 
+will be returned.
+
+If the buffer provided is not long enough to hold the output, then
+*output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+be returned.
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and @code{GNUTLS_E_SUCCESS}  (0) on success.
+
+@strong{Since:} 2.12.0
+@end deftypefun

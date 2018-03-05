@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_sign} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_t @var{issuer}, gnutls_x509_privkey_t @var{issuer_key})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{issuer}: is the certificate of the certificate issuer
+
+@var{issuer_key}: holds the issuer's private key
+
+This function is the same a @code{gnutls_x509_crl_sign2()}  with no flags, and
+SHA1 as the hash algorithm.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Deprecated:} Use @code{gnutls_x509_crl_privkey_sign()} .
+@end deftypefun

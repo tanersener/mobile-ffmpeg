@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_check_revocation} (gnutls_x509_crt_t @var{cert}, const gnutls_x509_crl_t * @var{crl_list}, unsigned @var{crl_list_length})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{crl_list}: should contain a list of gnutls_x509_crl_t types
+
+@var{crl_list_length}: the length of the crl_list
+
+This function will check if the given certificate is
+revoked.  It is assumed that the CRLs have been verified before.
+
+@strong{Returns:} 0 if the certificate is NOT revoked, and 1 if it is.  A
+negative error code is returned on error.
+@end deftypefun

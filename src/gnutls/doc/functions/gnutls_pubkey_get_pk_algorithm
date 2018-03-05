@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_get_pk_algorithm} (gnutls_pubkey_t @var{key}, unsigned int * @var{bits})
+@var{key}: should contain a @code{gnutls_pubkey_t}  type
+
+@var{bits}: If set will return the number of bits of the parameters (may be NULL)
+
+This function will return the public key algorithm of a public
+key and if possible will return a number of bits that indicates
+the security parameter of the key.
+
+@strong{Returns:} a member of the @code{gnutls_pk_algorithm_t}  enumeration on
+success, or a negative error code on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{unsigned int} @ref{dane_query_entries} (dane_query_t @var{q})

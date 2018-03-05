@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_key_rsa_raw} (gnutls_x509_crq_t @var{crq}, const gnutls_datum_t * @var{m}, const gnutls_datum_t * @var{e})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{m}: holds the modulus
+
+@var{e}: holds the public exponent
+
+This function will set the public parameters from the given private
+key to the request. Only RSA keys are currently supported.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.6.0
+@end deftypefun

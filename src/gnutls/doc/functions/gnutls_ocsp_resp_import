@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_import} (gnutls_ocsp_resp_t @var{resp}, const gnutls_datum_t * @var{data})
+@var{resp}: The data to store the parsed response.
+
+@var{data}: DER encoded OCSP response.
+
+This function will convert the given DER encoded OCSP response to
+the native @code{gnutls_ocsp_resp_t}  format.  It also decodes the Basic
+OCSP Response part, if any.  The output will be stored in  @code{resp} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

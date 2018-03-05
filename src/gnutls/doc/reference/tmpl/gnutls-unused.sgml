@@ -1,0 +1,3514 @@
+<!-- ##### MACRO ASN1_ARRAY_TYPE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_DATA_NODE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_ANY ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_BIT_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_BMP_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_BOOLEAN ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_CHOICE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_CONSTANT ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_DEFAULT ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_DEFINITIONS ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_ENUMERATED ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_GENERALIZED_TIME ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_GENERALSTRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_IA5_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_IDENTIFIER ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_IMPORTS ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_INTEGER ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_INVALID ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_NULL ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_NUMERIC_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_OBJECT_ID ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_OCTET_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_PRINTABLE_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_SEQUENCE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_SEQUENCE_OF ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_SET ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_SET_OF ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_TAG ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_TELETEX_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_UNIVERSAL_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_UTC_TIME ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_UTF8_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_ETYPE_VISIBLE_STRING ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_MAX_ERROR_DESCRIPTION_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_MAX_LENGTH_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_MAX_TAG_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_MAX_TL_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_TYPE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ASN1_TYPE_EMPTY ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO DER_LEN ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO DTLS_RECORD_WINDOW_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ECC_A ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ECC_B ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ECC_GX ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ECC_GY ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ECC_ORDER ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO ECC_PRIME ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_OBJ_FLAG_LOGIN ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_OBJ_FLAG_LOGIN_SO ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_OBJ_FLAG_MARK_NOT_PRIVATE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PRIVKEY_DISABLE_CALLBACKS ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PRIVKEY_IMPORT_COPY ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_PUBKEY_DISABLE_CALLBACKS ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO GNUTLS_TL_VERIFY_CRL ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO LEVEL_EQ ##### -->
+<para>
+
+</para>
+
+@l: 
+@...: 
+
+<!-- ##### MACRO MAX_RECORD_OVERHEAD ##### -->
+<para>
+
+</para>
+
+@session: 
+
+<!-- ##### MACRO MAX_RECORD_RECV_SIZE ##### -->
+<para>
+
+</para>
+
+@session: 
+
+<!-- ##### MACRO MAX_RECV_SIZE ##### -->
+<para>
+
+</para>
+
+@session: 
+
+<!-- ##### MACRO PEM_KEY_DSA_SEP ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO PEM_KEY_RSA_SEP ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO SESSION_TICKET_IV_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO SESSION_TICKET_KEY_NAME_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO SESSION_TICKET_KEY_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO SESSION_TICKET_MAC_SECRET_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO TLS_MAX_SESSION_ID_SIZE ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### USER_FUNCTION _gnutls_is_secure_memory ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Returns: 
+
+<!-- ##### VARIABLE aes_gcm_padlock_struct ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE aes_gcm_struct ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF anon_auth_info_st ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE array ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION asn1_array2tree ##### -->
+<para>
+
+</para>
+
+@array: 
+@definitions: 
+@errorDescription: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_bit_der ##### -->
+<para>
+
+</para>
+
+@str: 
+@bit_len: 
+@der: 
+@der_len: 
+
+<!-- ##### FUNCTION asn1_check_version ##### -->
+<para>
+
+</para>
+
+@req_version: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_copy_node ##### -->
+<para>
+
+</para>
+
+@dst: 
+@dst_name: 
+@src: 
+@src_name: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_create_element ##### -->
+<para>
+
+</para>
+
+@definitions: 
+@source_name: 
+@element: 
+@Returns: 
+
+<!-- ##### TYPEDEF asn1_data_node_st ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION asn1_decode_simple_der ##### -->
+<para>
+
+</para>
+
+@etype: 
+@der: 
+@der_len: 
+@str: 
+@str_len: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_delete_element ##### -->
+<para>
+
+</para>
+
+@structure: 
+@element_name: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_delete_structure ##### -->
+<para>
+
+</para>
+
+@structure: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_der_coding ##### -->
+<para>
+
+</para>
+
+@element: 
+@name: 
+@ider: 
+@len: 
+@ErrorDescription: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_der_decoding ##### -->
+<para>
+
+</para>
+
+@element: 
+@ider: 
+@len: 
+@errorDescription: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_der_decoding_element ##### -->
+<para>
+
+</para>
+
+@structure: 
+@elementName: 
+@ider: 
+@len: 
+@errorDescription: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_der_decoding_startEnd ##### -->
+<para>
+
+</para>
+
+@element: 
+@ider: 
+@len: 
+@name_element: 
+@start: 
+@end: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_encode_simple_der ##### -->
+<para>
+
+</para>
+
+@etype: 
+@str: 
+@str_len: 
+@tl: 
+@tl_len: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_expand_any_defined_by ##### -->
+<para>
+
+</para>
+
+@definitions: 
+@element: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_expand_octet_string ##### -->
+<para>
+
+</para>
+
+@definitions: 
+@element: 
+@octetName: 
+@objectName: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_find_node ##### -->
+<para>
+
+</para>
+
+@pointer: 
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_find_structure_from_oid ##### -->
+<para>
+
+</para>
+
+@definitions: 
+@oidValue: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_get_bit_der ##### -->
+<para>
+
+</para>
+
+@der: 
+@der_len: 
+@ret_len: 
+@str: 
+@str_size: 
+@bit_len: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_get_length_ber ##### -->
+<para>
+
+</para>
+
+@ber: 
+@ber_len: 
+@len: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_get_length_der ##### -->
+<para>
+
+</para>
+
+@der: 
+@der_len: 
+@len: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_get_octet_der ##### -->
+<para>
+
+</para>
+
+@der: 
+@der_len: 
+@ret_len: 
+@str: 
+@str_size: 
+@str_len: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_get_tag_der ##### -->
+<para>
+
+</para>
+
+@der: 
+@der_len: 
+@cls: 
+@len: 
+@tag: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_length_der ##### -->
+<para>
+
+</para>
+
+@len: 
+@der: 
+@der_len: 
+
+<!-- ##### FUNCTION asn1_number_of_elements ##### -->
+<para>
+
+</para>
+
+@element: 
+@name: 
+@num: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_octet_der ##### -->
+<para>
+
+</para>
+
+@str: 
+@str_len: 
+@der: 
+@der_len: 
+
+<!-- ##### FUNCTION asn1_parser2array ##### -->
+<para>
+
+</para>
+
+@inputFileName: 
+@outputFileName: 
+@vectorName: 
+@error_desc: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_parser2tree ##### -->
+<para>
+
+</para>
+
+@file: 
+@definitions: 
+@error_desc: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_perror ##### -->
+<para>
+
+</para>
+
+@error: 
+
+<!-- ##### FUNCTION asn1_print_structure ##### -->
+<para>
+
+</para>
+
+@out: 
+@structure: 
+@name: 
+@mode: 
+
+<!-- ##### FUNCTION asn1_read_node_value ##### -->
+<para>
+
+</para>
+
+@node: 
+@data: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_read_tag ##### -->
+<para>
+
+</para>
+
+@root: 
+@name: 
+@tagValue: 
+@classValue: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_read_value ##### -->
+<para>
+
+</para>
+
+@root: 
+@name: 
+@ivalue: 
+@len: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_read_value_type ##### -->
+<para>
+
+</para>
+
+@root: 
+@name: 
+@ivalue: 
+@len: 
+@etype: 
+@Returns: 
+
+<!-- ##### TYPEDEF asn1_retCode ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF asn1_static_node ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO asn1_static_node_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION asn1_strerror ##### -->
+<para>
+
+</para>
+
+@error: 
+@Returns: 
+
+<!-- ##### FUNCTION asn1_write_value ##### -->
+<para>
+
+</para>
+
+@node_root: 
+@name: 
+@ivalue: 
+@len: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION auth ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@data: 
+@datasize: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_add_ui ##### -->
+<para>
+
+</para>
+
+@w: 
+@a: 
+@b: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_addm ##### -->
+<para>
+
+</para>
+
+@w: 
+@a: 
+@b: 
+@m: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_cmp ##### -->
+<para>
+
+</para>
+
+@m1: 
+@m2: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_cmp_ui ##### -->
+<para>
+
+</para>
+
+@m1: 
+@m2: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_div ##### -->
+<para>
+
+</para>
+
+@q: 
+@a: 
+@b: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_generate_group ##### -->
+<para>
+
+</para>
+
+@gg: 
+@bits: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_mod ##### -->
+<para>
+
+</para>
+
+@a: 
+@b: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_mul ##### -->
+<para>
+
+</para>
+
+@w: 
+@a: 
+@b: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_mul_ui ##### -->
+<para>
+
+</para>
+
+@w: 
+@a: 
+@b: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_mulm ##### -->
+<para>
+
+</para>
+
+@w: 
+@a: 
+@b: 
+@m: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_new ##### -->
+<para>
+
+</para>
+
+@nbits: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_powm ##### -->
+<para>
+
+</para>
+
+@w: 
+@b: 
+@e: 
+@m: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_prime_check ##### -->
+<para>
+
+</para>
+
+@pp: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_print ##### -->
+<para>
+
+</para>
+
+@a: 
+@buf: 
+@buf_size: 
+@format: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_release ##### -->
+<para>
+
+</para>
+
+@n: 
+
+<!-- ##### USER_FUNCTION bigint_scan ##### -->
+<para>
+
+</para>
+
+@buf: 
+@buf_size: 
+@format: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_set ##### -->
+<para>
+
+</para>
+
+@a: 
+@b: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_set_ui ##### -->
+<para>
+
+</para>
+
+@a: 
+@b: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_sub_ui ##### -->
+<para>
+
+</para>
+
+@w: 
+@a: 
+@b: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION bigint_subm ##### -->
+<para>
+
+</para>
+
+@w: 
+@a: 
+@b: 
+@m: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_armor_encode_buffer ##### -->
+<para>
+
+</para>
+
+@inbuf: 
+@inlen: 
+@outbuf: 
+@outlen: 
+@nwritten: 
+@type: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_check_version ##### -->
+<para>
+
+</para>
+
+@req_version: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_data_transform ##### -->
+<para>
+
+</para>
+
+@hd: 
+@mode: 
+@locusr: 
+@remusr: 
+@inbuf: 
+@insize: 
+@outbuf: 
+@outsize: 
+@modval: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_file_decrypt ##### -->
+<para>
+
+</para>
+
+@hd: 
+@file: 
+@output: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_file_encrypt ##### -->
+<para>
+
+</para>
+
+@hd: 
+@remusr: 
+@file: 
+@output: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_commit ##### -->
+<para>
+
+</para>
+
+@root: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_delete ##### -->
+<para>
+
+</para>
+
+@node: 
+
+<!-- ##### FUNCTION cdk_kbnode_find ##### -->
+<para>
+
+</para>
+
+@node: 
+@pkttype: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_find_next ##### -->
+<para>
+
+</para>
+
+@node: 
+@pkttype: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_find_packet ##### -->
+<para>
+
+</para>
+
+@node: 
+@pkttype: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_find_prev ##### -->
+<para>
+
+</para>
+
+@root: 
+@node: 
+@pkttype: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_get_packet ##### -->
+<para>
+
+</para>
+
+@node: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_hash ##### -->
+<para>
+
+</para>
+
+@node: 
+@md: 
+@is_v4: 
+@pkttype: 
+@flags: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_insert ##### -->
+<para>
+
+</para>
+
+@root: 
+@node: 
+@pkttype: 
+
+<!-- ##### FUNCTION cdk_kbnode_move ##### -->
+<para>
+
+</para>
+
+@root: 
+@node: 
+@where: 
+
+<!-- ##### FUNCTION cdk_kbnode_new ##### -->
+<para>
+
+</para>
+
+@pkt: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_read_from_mem ##### -->
+<para>
+
+</para>
+
+@ret_node: 
+@armor: 
+@buf: 
+@buflen: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_release ##### -->
+<para>
+
+</para>
+
+@node: 
+
+<!-- ##### FUNCTION cdk_kbnode_remove ##### -->
+<para>
+
+</para>
+
+@root: 
+@node: 
+
+<!-- ##### FUNCTION cdk_kbnode_walk ##### -->
+<para>
+
+</para>
+
+@root: 
+@ctx: 
+@all: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_write_to_mem ##### -->
+<para>
+
+</para>
+
+@node: 
+@buf: 
+@r_nbytes: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_kbnode_write_to_mem_alloc ##### -->
+<para>
+
+</para>
+
+@node: 
+@r_buf: 
+@r_buflen: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_key_desig_revoker_walk ##### -->
+<para>
+
+</para>
+
+@root: 
+@ctx: 
+@r_class: 
+@r_algid: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_check_sk ##### -->
+<para>
+
+</para>
+
+@hd: 
+@keyid: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_export ##### -->
+<para>
+
+</para>
+
+@hd: 
+@out: 
+@remusr: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_free ##### -->
+<para>
+
+</para>
+
+@hd: 
+
+<!-- ##### FUNCTION cdk_keydb_get_byfpr ##### -->
+<para>
+
+</para>
+
+@hd: 
+@fpr: 
+@ret_pk: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_get_bykeyid ##### -->
+<para>
+
+</para>
+
+@hd: 
+@keyid: 
+@ret_pk: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_get_bypattern ##### -->
+<para>
+
+</para>
+
+@hd: 
+@patt: 
+@ret_pk: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_get_keyblock ##### -->
+<para>
+
+</para>
+
+@inp: 
+@ret_key: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_get_pk ##### -->
+<para>
+
+</para>
+
+@khd: 
+@keyid: 
+@ret_pk: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_get_sk ##### -->
+<para>
+
+</para>
+
+@khd: 
+@keyid: 
+@ret_sk: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_idx_rebuild ##### -->
+<para>
+
+</para>
+
+@db: 
+@dbs: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_import ##### -->
+<para>
+
+</para>
+
+@hd: 
+@knode: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_new_from_mem ##### -->
+<para>
+
+</para>
+
+@r_hd: 
+@secret: 
+@armor: 
+@data: 
+@datlen: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_search ##### -->
+<para>
+
+</para>
+
+@st: 
+@hd: 
+@ret_key: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_keydb_search_release ##### -->
+<para>
+
+</para>
+
+@st: 
+
+<!-- ##### FUNCTION cdk_keydb_search_start ##### -->
+<para>
+
+</para>
+
+@st: 
+@db: 
+@type: 
+@desc: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_listkey_close ##### -->
+<para>
+
+</para>
+
+@ctx: 
+
+<!-- ##### FUNCTION cdk_listkey_next ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@ret_key: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_listkey_start ##### -->
+<para>
+
+</para>
+
+@r_ctx: 
+@db: 
+@patt: 
+@fpatt: 
+@Returns: 
+
+<!-- ##### TYPEDEF cdk_packet_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION cdk_pk_check_self_sig ##### -->
+<para>
+
+</para>
+
+@knode: 
+@r_status: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_check_sigs ##### -->
+<para>
+
+</para>
+
+@knode: 
+@hd: 
+@r_status: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_decrypt ##### -->
+<para>
+
+</para>
+
+@sk: 
+@pke: 
+@r_sk: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_encrypt ##### -->
+<para>
+
+</para>
+
+@pk: 
+@pke: 
+@sk: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_fingerprint_get_keyid ##### -->
+<para>
+
+</para>
+
+@fpr: 
+@fprlen: 
+@keyid: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_from_secret_key ##### -->
+<para>
+
+</para>
+
+@sk: 
+@ret_pk: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_get_fingerprint ##### -->
+<para>
+
+</para>
+
+@pk: 
+@fpr: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_get_keyid ##### -->
+<para>
+
+</para>
+
+@pk: 
+@keyid: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_get_mpi ##### -->
+<para>
+
+</para>
+
+@pk: 
+@idx: 
+@buf: 
+@buflen: 
+@r_nwritten: 
+@r_nbits: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_get_nbits ##### -->
+<para>
+
+</para>
+
+@pk: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_get_nenc ##### -->
+<para>
+
+</para>
+
+@algo: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_get_npkey ##### -->
+<para>
+
+</para>
+
+@algo: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_get_nsig ##### -->
+<para>
+
+</para>
+
+@algo: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_get_nskey ##### -->
+<para>
+
+</para>
+
+@algo: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_release ##### -->
+<para>
+
+</para>
+
+@pk: 
+
+<!-- ##### FUNCTION cdk_pk_sign ##### -->
+<para>
+
+</para>
+
+@sk: 
+@sig: 
+@md: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_to_fingerprint ##### -->
+<para>
+
+</para>
+
+@pk: 
+@fpr: 
+@fprlen: 
+@r_nout: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pk_verify ##### -->
+<para>
+
+</para>
+
+@pk: 
+@sig: 
+@md: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pklist_build ##### -->
+<para>
+
+</para>
+
+@ret_pkl: 
+@hd: 
+@remusr: 
+@use: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pklist_release ##### -->
+<para>
+
+</para>
+
+@pkl: 
+
+<!-- ##### FUNCTION cdk_pklist_select_algo ##### -->
+<para>
+
+</para>
+
+@pkl: 
+@preftype: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pklist_use_mdc ##### -->
+<para>
+
+</para>
+
+@pkl: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pkt_alloc ##### -->
+<para>
+
+</para>
+
+@r_pkt: 
+@pkttype: 
+@Returns: 
+
+<!-- ##### TYPEDEF cdk_pkt_compressed_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF cdk_pkt_encrypted_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION cdk_pkt_free ##### -->
+<para>
+
+</para>
+
+@pkt: 
+
+<!-- ##### TYPEDEF cdk_pkt_literal_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF cdk_pkt_mdc_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION cdk_pkt_new ##### -->
+<para>
+
+</para>
+
+@r_pkt: 
+@Returns: 
+
+<!-- ##### TYPEDEF cdk_pkt_onepass_sig_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF cdk_pkt_pubkey_enc_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF cdk_pkt_pubkey_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION cdk_pkt_read ##### -->
+<para>
+
+</para>
+
+@inp: 
+@pkt: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_pkt_release ##### -->
+<para>
+
+</para>
+
+@pkt: 
+
+<!-- ##### TYPEDEF cdk_pkt_seckey_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF cdk_pkt_signature_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF cdk_pkt_userid_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION cdk_pkt_write ##### -->
+<para>
+
+</para>
+
+@out: 
+@pkt: 
+@Returns: 
+
+<!-- ##### TYPEDEF cdk_pubkey_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION cdk_pubkey_to_sexp ##### -->
+<para>
+
+</para>
+
+@pk: 
+@sexp: 
+@len: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_s2k_free ##### -->
+<para>
+
+</para>
+
+@s2k: 
+
+<!-- ##### FUNCTION cdk_s2k_new ##### -->
+<para>
+
+</para>
+
+@ret_s2k: 
+@mode: 
+@digest_algo: 
+@salt: 
+@Returns: 
+
+<!-- ##### TYPEDEF cdk_seckey_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION cdk_seckey_to_sexp ##### -->
+<para>
+
+</para>
+
+@sk: 
+@sexp: 
+@len: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_sig_get_keyid ##### -->
+<para>
+
+</para>
+
+@sig: 
+@keyid: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_sk_get_keyid ##### -->
+<para>
+
+</para>
+
+@sk: 
+@keyid: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_sk_get_mpi ##### -->
+<para>
+
+</para>
+
+@sk: 
+@idx: 
+@buf: 
+@buflen: 
+@r_nwritten: 
+@r_nbits: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_sk_release ##### -->
+<para>
+
+</para>
+
+@sk: 
+
+<!-- ##### FUNCTION cdk_sklist_build ##### -->
+<para>
+
+</para>
+
+@ret_skl: 
+@db: 
+@hd: 
+@locusr: 
+@unlock: 
+@use: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_sklist_release ##### -->
+<para>
+
+</para>
+
+@skl: 
+
+<!-- ##### FUNCTION cdk_sklist_write ##### -->
+<para>
+
+</para>
+
+@skl: 
+@outp: 
+@mdctx: 
+@sigclass: 
+@sigver: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_sklist_write_onepass ##### -->
+<para>
+
+</para>
+
+@skl: 
+@outp: 
+@sigclass: 
+@mdalgo: 
+@Returns: 
+
+<!-- ##### TYPEDEF cdk_stream_cbs_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION cdk_stream_close ##### -->
+<para>
+
+</para>
+
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_create ##### -->
+<para>
+
+</para>
+
+@file: 
+@ret_s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_decrypt ##### -->
+<para>
+
+</para>
+
+@hd: 
+@inp: 
+@out: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_enable_cache ##### -->
+<para>
+
+</para>
+
+@s: 
+@val: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_encrypt ##### -->
+<para>
+
+</para>
+
+@hd: 
+@remusr: 
+@inp: 
+@out: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_eof ##### -->
+<para>
+
+</para>
+
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_filter_disable ##### -->
+<para>
+
+</para>
+
+@s: 
+@type: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_flush ##### -->
+<para>
+
+</para>
+
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_get_length ##### -->
+<para>
+
+</para>
+
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_getc ##### -->
+<para>
+
+</para>
+
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_is_compressed ##### -->
+<para>
+
+</para>
+
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_kick_off ##### -->
+<para>
+
+</para>
+
+@inp: 
+@out: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_mmap ##### -->
+<para>
+
+</para>
+
+@s: 
+@ret_buf: 
+@ret_buflen: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_mmap_part ##### -->
+<para>
+
+</para>
+
+@s: 
+@off: 
+@len: 
+@ret_buf: 
+@ret_buflen: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_new ##### -->
+<para>
+
+</para>
+
+@file: 
+@ret_s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_new_from_cbs ##### -->
+<para>
+
+</para>
+
+@cbs: 
+@opa: 
+@ret_s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_open ##### -->
+<para>
+
+</para>
+
+@file: 
+@ret_s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_peek ##### -->
+<para>
+
+</para>
+
+@inp: 
+@buf: 
+@buflen: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_putc ##### -->
+<para>
+
+</para>
+
+@s: 
+@c: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_read ##### -->
+<para>
+
+</para>
+
+@s: 
+@buf: 
+@count: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_seek ##### -->
+<para>
+
+</para>
+
+@s: 
+@offset: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_set_armor_flag ##### -->
+<para>
+
+</para>
+
+@s: 
+@type: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_set_compress_flag ##### -->
+<para>
+
+</para>
+
+@s: 
+@algo: 
+@level: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_set_hash_flag ##### -->
+<para>
+
+</para>
+
+@s: 
+@algo: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_set_literal_flag ##### -->
+<para>
+
+</para>
+
+@s: 
+@mode: 
+@fname: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_set_text_flag ##### -->
+<para>
+
+</para>
+
+@s: 
+@lf: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_sockopen ##### -->
+<para>
+
+</para>
+
+@host: 
+@port: 
+@ret_out: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_tell ##### -->
+<para>
+
+</para>
+
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_tmp_from_mem ##### -->
+<para>
+
+</para>
+
+@buf: 
+@buflen: 
+@r_out: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_tmp_new ##### -->
+<para>
+
+</para>
+
+@r_out: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_stream_tmp_set_mode ##### -->
+<para>
+
+</para>
+
+@s: 
+@val: 
+
+<!-- ##### FUNCTION cdk_stream_write ##### -->
+<para>
+
+</para>
+
+@s: 
+@buf: 
+@count: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_strlist_add ##### -->
+<para>
+
+</para>
+
+@list: 
+@string: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_strlist_free ##### -->
+<para>
+
+</para>
+
+@sl: 
+
+<!-- ##### FUNCTION cdk_subpkt_add ##### -->
+<para>
+
+</para>
+
+@root: 
+@node: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_subpkt_find ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@type: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_subpkt_find_next ##### -->
+<para>
+
+</para>
+
+@root: 
+@type: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_subpkt_find_nth ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@type: 
+@index: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_subpkt_free ##### -->
+<para>
+
+</para>
+
+@ctx: 
+
+<!-- ##### FUNCTION cdk_subpkt_get_data ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@r_type: 
+@r_nbytes: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_subpkt_init ##### -->
+<para>
+
+</para>
+
+@node: 
+@type: 
+@buf: 
+@buflen: 
+
+<!-- ##### FUNCTION cdk_subpkt_new ##### -->
+<para>
+
+</para>
+
+@size: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_subpkt_type_count ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@type: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_trustdb_get_ownertrust ##### -->
+<para>
+
+</para>
+
+@inp: 
+@pk: 
+@r_val: 
+@r_flags: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_trustdb_get_validity ##### -->
+<para>
+
+</para>
+
+@inp: 
+@id: 
+@r_val: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_utf8_decode ##### -->
+<para>
+
+</para>
+
+@string: 
+@length: 
+@delim: 
+@Returns: 
+
+<!-- ##### FUNCTION cdk_utf8_encode ##### -->
+<para>
+
+</para>
+
+@string: 
+@Returns: 
+
+<!-- ##### TYPEDEF cert_auth_info_st ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION certificate_credential_append_crt_list ##### -->
+<para>
+
+</para>
+
+@res: 
+@names: 
+@crt: 
+@nr: 
+@Returns: 
+
+<!-- ##### FUNCTION certificate_credentials_append_pkey ##### -->
+<para>
+
+</para>
+
+@res: 
+@pkey: 
+@Returns: 
+
+<!-- ##### FUNCTION check_if_same_cert ##### -->
+<para>
+
+</para>
+
+@cert1: 
+@cert2: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION decrypt ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@encr: 
+@encrsize: 
+@plain: 
+@plainsize: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION deinit ##### -->
+<para>
+
+</para>
+
+@ctx: 
+
+<!-- ##### USER_FUNCTION deinit_func ##### -->
+<para>
+
+</para>
+
+@handle: 
+
+<!-- ##### USER_FUNCTION derive ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@out: 
+@priv: 
+@pub: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION encrypt ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@plain: 
+@plainsize: 
+@encr: 
+@encrsize: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION exists ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION fast ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@nonce: 
+@nonce_size: 
+@key: 
+@keysize: 
+@text: 
+@textsize: 
+@digest: 
+@Returns: 
+
+<!-- ##### FUNCTION get_extension ##### -->
+<para>
+
+</para>
+
+@asn: 
+@root: 
+@extension_id: 
+@indx: 
+@ret: 
+@_critical: 
+@Returns: 
+
+<!-- ##### FUNCTION get_type ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_calc_dh_key ##### -->
+<para>
+
+</para>
+
+@key: 
+@f: 
+@x: 
+@prime: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_calc_dh_secret ##### -->
+<para>
+
+</para>
+
+@ret_y: 
+@ret_x: 
+@g: 
+@Param4: 
+@q_bits: 
+@Returns: 
+
+<!-- ##### VARIABLE gnutls_calloc ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_certificate_client_set_retrieve_function ##### -->
+<para>
+
+</para>
+
+@cred: 
+@func: 
+
+<!-- ##### FUNCTION gnutls_certificate_type_get_id ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_certificate_type_get_name ##### -->
+<para>
+
+</para>
+
+@type: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_certificate_type_list ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_cipher_get_id ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_cipher_get_key_size ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_cipher_list ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_cipher_suite_info ##### -->
+<para>
+
+</para>
+
+@idx: 
+@cs_id: 
+@kx: 
+@cipher: 
+@mac: 
+@min_version: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_compression_get_id ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_compression_get_name ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_compression_list ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_credentials_clear ##### -->
+<para>
+
+</para>
+
+@session: 
+
+<!-- ##### FUNCTION gnutls_crypto_cipher_register ##### -->
+<para>
+
+</para>
+
+@priority: 
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_crypto_digest_register ##### -->
+<para>
+
+</para>
+
+@priority: 
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_crypto_mac_register ##### -->
+<para>
+
+</para>
+
+@priority: 
+@s: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_ecc_curve_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_ecc_curve_get_name ##### -->
+<para>
+
+</para>
+
+@curve: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_ecc_curve_get_size ##### -->
+<para>
+
+</para>
+
+@curve: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_ecc_curve_list ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### STRUCT gnutls_ecdh_params_int ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF gnutls_ecdh_params_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_error_to_alert ##### -->
+<para>
+
+</para>
+
+@err: 
+@level: 
+@Returns: 
+
+<!-- ##### VARIABLE gnutls_free ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### USER_FUNCTION gnutls_generate_client_certificate ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_generate_client_crt_vrfy ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_generate_client_kx ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_generate_server_certificate ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_generate_server_crt_request ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_generate_server_kx ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_handshake_set_private_extensions ##### -->
+<para>
+
+</para>
+
+@session: 
+@allow: 
+
+<!-- ##### FUNCTION gnutls_hash_fast ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@text: 
+@textlen: 
+@digest: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_heartbeat_timeout ##### -->
+<para>
+
+</para>
+
+@session: 
+@check_only: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_hmac_fast ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@key: 
+@keylen: 
+@text: 
+@textlen: 
+@digest: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_hmac_init ##### -->
+<para>
+
+</para>
+
+@dig: 
+@algorithm: 
+@key: 
+@keylen: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_kx_get_id ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_kx_get_name ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_kx_list ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_mac_get_id ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_mac_get_key_size ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_mac_get_name ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_mac_list ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### VARIABLE gnutls_malloc ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF gnutls_openpgp_keyid_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_pk_get_id ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_pk_get_name ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_pk_list ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_pk_to_sign ##### -->
+<para>
+
+</para>
+
+@pk: 
+@hash: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_process_client_certificate ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Param3: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_process_client_crt_vrfy ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Param3: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_process_client_kx ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Param3: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_process_server_certificate ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Param3: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_process_server_crt_request ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Param3: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION gnutls_process_server_kx ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Param3: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_protocol_get_id ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_protocol_get_version ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_protocol_list ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_pubkey_get_verify_algorithm ##### -->
+<para>
+
+</para>
+
+@key: 
+@signature: 
+@hash: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_pubkey_verify_data ##### -->
+<para>
+
+</para>
+
+@pubkey: 
+@flags: 
+@data: 
+@signature: 
+@Returns: 
+
+<!-- ##### VARIABLE gnutls_realloc ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_rsa_params_generate2 ##### -->
+<para>
+
+</para>
+
+@params: 
+@bits: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_secure_calloc ##### -->
+<para>
+
+</para>
+
+@nmemb: 
+@size: 
+@Returns: 
+
+<!-- ##### VARIABLE gnutls_secure_malloc ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_session_enable_compatibility_mode ##### -->
+<para>
+
+</para>
+
+@session: 
+
+<!-- ##### FUNCTION gnutls_session_set_data ##### -->
+<para>
+
+</para>
+
+@session: 
+@session_data: 
+@session_data_size: 
+@Returns: 
+
+<!-- ##### MACRO gnutls_sign_algorithm_get_name ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_sign_algorithm_set ##### -->
+<para>
+
+</para>
+
+@session: 
+@sign: 
+
+<!-- ##### FUNCTION gnutls_sign_callback_set ##### -->
+<para>
+
+</para>
+
+@session: 
+@sign_func: 
+@userdata: 
+
+<!-- ##### FUNCTION gnutls_sign_get_hash_algorithm ##### -->
+<para>
+
+</para>
+
+@sign: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_sign_get_id ##### -->
+<para>
+
+</para>
+
+@name: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_sign_get_name ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_sign_get_pk_algorithm ##### -->
+<para>
+
+</para>
+
+@sign: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_sign_is_secure ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_sign_list ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### VARIABLE gnutls_srp_1024_group_generator ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE gnutls_srp_1024_group_prime ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE gnutls_srp_1536_group_generator ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE gnutls_srp_1536_group_prime ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE gnutls_srp_2048_group_generator ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE gnutls_srp_2048_group_prime ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE gnutls_srp_3072_group_generator ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE gnutls_srp_3072_group_prime ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE gnutls_srp_4096_group_generator ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE gnutls_srp_4096_group_prime ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### USER_FUNCTION gnutls_strdup ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_strerror_name ##### -->
+<para>
+
+</para>
+
+@error: 
+@Returns: 
+
+<!-- ##### FUNCTION gnutls_system_global_deinit ##### -->
+<para>
+
+</para>
+
+@void: 
+
+<!-- ##### FUNCTION gnutls_system_global_init ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+<!-- ##### FUNCTION hash ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### USER_FUNCTION hash_algorithm ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@sig: 
+@issuer_params: 
+@Param4: 
+@Returns: 
+
+<!-- ##### TYPEDEF heartbeat_policy_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE hmac_sha_padlock_nano_struct ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE hmac_sha_padlock_struct ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### USER_FUNCTION init ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@ctx: 
+@enc: 
+@Returns: 
+
+<!-- ##### FUNCTION int ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### MACRO is_DSA ##### -->
+<para>
+
+</para>
+
+@a: 
+
+<!-- ##### MACRO is_ELG ##### -->
+<para>
+
+</para>
+
+@a: 
+
+<!-- ##### MACRO is_RSA ##### -->
+<para>
+
+</para>
+
+@a: 
+
+<!-- ##### MACRO node_asn ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO node_asn_struct ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO node_data_struct ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE now ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### USER_FUNCTION open ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION output ##### -->
+<para>
+
+</para>
+
+@src_ctx: 
+@digest: 
+@digestsize: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION passphrase_cb ##### -->
+<para>
+
+</para>
+
+@uint8_t: 
+@prompt: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION pk_fixup_private_params ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Param3: 
+@Returns: 
+
+<!-- ##### TYPEDEF psk_auth_info_st ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### USER_FUNCTION read ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@buf: 
+@Param3: 
+@Returns: 
+
+<!-- ##### FUNCTION register_padlock_crypto ##### -->
+<para>
+
+</para>
+
+@void: 
+
+<!-- ##### USER_FUNCTION release ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION reset ##### -->
+<para>
+
+</para>
+
+@ctx: 
+
+<!-- ##### USER_FUNCTION reset_func ##### -->
+<para>
+
+</para>
+
+@ctx: 
+
+<!-- ##### USER_FUNCTION rnd ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@level: 
+@data: 
+@datasize: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION seek ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Returns: 
+
+<!-- ##### FUNCTION set_extension ##### -->
+<para>
+
+</para>
+
+@asn: 
+@root: 
+@ext_id: 
+@ext_data: 
+@critical: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION setiv ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@iv: 
+@ivsize: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION setkey ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@key: 
+@keysize: 
+@Returns: 
+
+<!-- ##### VARIABLE sha_padlock_nano_struct ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### VARIABLE sha_padlock_struct ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### USER_FUNCTION sign ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@signature: 
+@data: 
+@priv: 
+@Returns: 
+
+<!-- ##### TYPEDEF srp_server_auth_info_st ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO static_struct_asn ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF svoid ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION system_recv_timeout ##### -->
+<para>
+
+</para>
+
+@ptr: 
+@ms: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION tag ##### -->
+<para>
+
+</para>
+
+@ctx: 
+@tag: 
+@tagsize: 
+
+<!-- ##### STRUCT tag_and_class_st ##### -->
+<para>
+
+</para>
+
+@desc: 
+
+<!-- ##### USER_FUNCTION verify ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@data: 
+@sig: 
+@pub: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION verify_params ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@pub: 
+@Returns: 
+
+<!-- ##### USER_FUNCTION write ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@buf: 
+@Param3: 
+@Returns: 
+

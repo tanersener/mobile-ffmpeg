@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_dh_params_init} (gnutls_dh_params_t * @var{dh_params})

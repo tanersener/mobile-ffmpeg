@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_serial} (gnutls_x509_crt_t @var{cert}, void * @var{result}, size_t * @var{result_size})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{result}: The place where the serial number will be copied
+
+@var{result_size}: Holds the size of the result field.
+
+This function will return the X.509 certificate's serial number.
+This is obtained by the X509 Certificate serialNumber field. Serial
+is not always a 32 or 64bit number. Some CAs use large serial
+numbers, thus it may be wise to handle it as something uint8_t.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

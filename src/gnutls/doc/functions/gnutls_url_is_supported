@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_url_is_supported} (const char * @var{url})
+@var{url}: A URI to be tested
+
+Check whether the provided  @code{url} is supported.  Depending on the system libraries
+GnuTLS may support pkcs11, tpmkey or other URLs.
+
+@strong{Returns:} return non-zero if the given URL is supported, and zero if
+it is not known.
+
+@strong{Since:} 3.1.0
+@end deftypefun

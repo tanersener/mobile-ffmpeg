@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {void} {gnutls_srp_set_prime_bits} (gnutls_session_t @var{session}, unsigned int @var{bits})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{bits}: is the number of bits
+
+This function sets the minimum accepted number of bits, for use in
+an SRP key exchange.  If zero, the default 2048 bits will be used.
+
+In the client side it sets the minimum accepted number of bits.  If
+a server sends a prime with less bits than that
+@code{GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER}  will be returned by the
+handshake.
+
+This function has no effect in server side.
+
+@strong{Since:} 2.6.0
+@end deftypefun

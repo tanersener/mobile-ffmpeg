@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_authority_key_id} (gnutls_x509_crt_t @var{cert}, const void * @var{id}, size_t @var{id_size})
+@var{cert}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{id}: The key ID
+
+@var{id_size}: Holds the size of the key ID field.
+
+This function will set the X.509 certificate's authority key ID extension.
+Only the keyIdentifier field can be set with this function.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

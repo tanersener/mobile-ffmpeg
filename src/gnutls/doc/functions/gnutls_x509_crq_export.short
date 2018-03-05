@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crq_export} (gnutls_x509_crq_t @var{crq}, gnutls_x509_crt_fmt_t @var{format}, void * @var{output_data}, size_t * @var{output_data_size})

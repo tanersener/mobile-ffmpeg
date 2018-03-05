@@ -1,0 +1,1 @@
+@item @var{int} @ref{dane_raw_tlsa} (dane_state_t @var{s}, dane_query_t * @var{r}, char *const * @var{dane_data}, const int * @var{dane_data_len}, int @var{secure}, int @var{bogus})

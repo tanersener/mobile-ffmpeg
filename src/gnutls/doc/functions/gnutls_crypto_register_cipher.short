@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_crypto_register_cipher} (gnutls_cipher_algorithm_t @var{algorithm}, int @var{priority}, gnutls_cipher_init_func @var{init}, gnutls_cipher_setkey_func @var{setkey}, gnutls_cipher_setiv_func @var{setiv}, gnutls_cipher_encrypt_func @var{encrypt}, gnutls_cipher_decrypt_func @var{decrypt}, gnutls_cipher_deinit_func @var{deinit})

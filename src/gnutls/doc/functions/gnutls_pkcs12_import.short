@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs12_import} (gnutls_pkcs12_t @var{pkcs12}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})

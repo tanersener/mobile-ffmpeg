@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_serial} (gnutls_x509_crt_t @var{cert}, const void * @var{serial}, size_t @var{serial_size})
+@var{cert}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{serial}: The serial number
+
+@var{serial_size}: Holds the size of the serial field.
+
+This function will set the X.509 certificate's serial number.
+While the serial number is an integer, it is often handled
+as an opaque field by several CAs. For this reason this function
+accepts any kind of data as a serial number. To be consistent
+with the X.509/PKIX specifications the provided  @code{serial} should be 
+a big-endian positive number (i.e. it's leftmost bit should be zero).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

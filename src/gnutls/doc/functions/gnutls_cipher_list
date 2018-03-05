@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {const gnutls_cipher_algorithm_t *} {gnutls_cipher_list} ( @var{void})
+
+Get a list of supported cipher algorithms.  Note that not
+necessarily all ciphers are supported as TLS cipher suites.  For
+example, DES is not supported as a cipher suite, but is supported
+for other purposes (e.g., PKCS@code{8}  or similar).
+
+This function is not thread safe.
+
+@strong{Returns:} a (0)-terminated list of @code{gnutls_cipher_algorithm_t} 
+integers indicating the available ciphers.
+@end deftypefun

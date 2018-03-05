@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_x509_dn_deinit} (gnutls_x509_dn_t @var{dn})

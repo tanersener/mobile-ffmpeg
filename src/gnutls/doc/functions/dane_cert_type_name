@@ -1,0 +1,11 @@
+
+
+
+@deftypefun {const char *} {dane_cert_type_name} (dane_cert_type_t @var{type})
+@var{type}: is a DANE match type
+
+Convert a @code{dane_cert_type_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified
+type, or @code{NULL} .
+@end deftypefun

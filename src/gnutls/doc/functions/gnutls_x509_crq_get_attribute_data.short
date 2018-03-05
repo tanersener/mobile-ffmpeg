@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crq_get_attribute_data} (gnutls_x509_crq_t @var{crq}, unsigned @var{indx}, void * @var{data}, size_t * @var{sizeof_data})

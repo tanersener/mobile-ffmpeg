@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {gnutls_compression_method_t} {gnutls_compression_get_id} (const char * @var{name})
+@var{name}: is a compression method name
+
+The names are compared in a case insensitive way.
+
+@strong{Returns:} an id of the specified in a string compression method, or
+@code{GNUTLS_COMP_UNKNOWN}  on error.
+@end deftypefun

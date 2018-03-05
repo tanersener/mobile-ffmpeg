@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_tpm_key_list_deinit} (gnutls_tpm_key_list_t @var{list})

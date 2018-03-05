@@ -1,0 +1,497 @@
+
+@subheading gnutls_pkcs12_bag_decrypt
+@anchor{gnutls_pkcs12_bag_decrypt}
+@deftypefun {int} {gnutls_pkcs12_bag_decrypt} (gnutls_pkcs12_bag_t @var{bag}, const char * @var{pass})
+@var{bag}: The bag
+
+@var{pass}: The password used for encryption, must be ASCII.
+
+This function will decrypt the given encrypted bag and return 0 on
+success.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_deinit
+@anchor{gnutls_pkcs12_bag_deinit}
+@deftypefun {void} {gnutls_pkcs12_bag_deinit} (gnutls_pkcs12_bag_t @var{bag})
+@var{bag}: A pointer to the type to be initialized
+
+This function will deinitialize a PKCS12 Bag structure.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_enc_info
+@anchor{gnutls_pkcs12_bag_enc_info}
+@deftypefun {int} {gnutls_pkcs12_bag_enc_info} (gnutls_pkcs12_bag_t @var{bag}, unsigned int * @var{schema}, unsigned int * @var{cipher}, void * @var{salt}, unsigned int * @var{salt_size}, unsigned int * @var{iter_count}, char ** @var{oid})
+@var{bag}: The bag
+
+@var{schema}: indicate the schema as one of @code{gnutls_pkcs_encrypt_flags_t} 
+
+@var{cipher}: the cipher used as @code{gnutls_cipher_algorithm_t} 
+
+@var{salt}: PBKDF2 salt (if non-NULL then  @code{salt_size} initially holds its size)
+
+@var{salt_size}: PBKDF2 salt size
+
+@var{iter_count}: PBKDF2 iteration count
+
+@var{oid}: if non-NULL it will contain an allocated null-terminated variable with the OID
+
+This function will provide information on the encryption algorithms used
+in an encrypted bag. If the structure algorithms
+are unknown the code @code{GNUTLS_E_UNKNOWN_CIPHER_TYPE}  will be returned,
+and only  @code{oid} , will be set. That is,  @code{oid} will be set on encrypted bags
+whether supported or not. It must be deinitialized using @code{gnutls_free()} .
+The other variables are only set on supported structures.
+
+@strong{Returns:} @code{GNUTLS_E_INVALID_REQUEST}  if the provided bag isn't encrypted,
+@code{GNUTLS_E_UNKNOWN_CIPHER_TYPE}  if the structure's encryption isn't supported, or
+another negative error code in case of a failure. Zero on success.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_encrypt
+@anchor{gnutls_pkcs12_bag_encrypt}
+@deftypefun {int} {gnutls_pkcs12_bag_encrypt} (gnutls_pkcs12_bag_t @var{bag}, const char * @var{pass}, unsigned int @var{flags})
+@var{bag}: The bag
+
+@var{pass}: The password used for encryption, must be ASCII
+
+@var{flags}: should be one of @code{gnutls_pkcs_encrypt_flags_t}  elements bitwise or'd
+
+This function will encrypt the given bag.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_get_count
+@anchor{gnutls_pkcs12_bag_get_count}
+@deftypefun {int} {gnutls_pkcs12_bag_get_count} (gnutls_pkcs12_bag_t @var{bag})
+@var{bag}: The bag
+
+This function will return the number of the elements within the bag.
+
+@strong{Returns:} Number of elements in bag, or an negative error code on
+error.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_get_data
+@anchor{gnutls_pkcs12_bag_get_data}
+@deftypefun {int} {gnutls_pkcs12_bag_get_data} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx}, gnutls_datum_t * @var{data})
+@var{bag}: The bag
+
+@var{indx}: The element of the bag to get the data from
+
+@var{data}: where the bag's data will be. Should be treated as constant.
+
+This function will return the bag's data. The data is a constant
+that is stored into the bag.  Should not be accessed after the bag
+is deleted.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_get_friendly_name
+@anchor{gnutls_pkcs12_bag_get_friendly_name}
+@deftypefun {int} {gnutls_pkcs12_bag_get_friendly_name} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx}, char ** @var{name})
+@var{bag}: The bag
+
+@var{indx}: The bag's element to add the id
+
+@var{name}: will hold a pointer to the name (to be treated as const)
+
+This function will return the friendly name, of the specified bag
+element.  The key ID is usually used to distinguish the local
+private key and the certificate pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. or a negative error code on error.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_get_key_id
+@anchor{gnutls_pkcs12_bag_get_key_id}
+@deftypefun {int} {gnutls_pkcs12_bag_get_key_id} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx}, gnutls_datum_t * @var{id})
+@var{bag}: The bag
+
+@var{indx}: The bag's element to add the id
+
+@var{id}: where the ID will be copied (to be treated as const)
+
+This function will return the key ID, of the specified bag element.
+The key ID is usually used to distinguish the local private key and
+the certificate pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. or a negative error code on error.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_get_type
+@anchor{gnutls_pkcs12_bag_get_type}
+@deftypefun {int} {gnutls_pkcs12_bag_get_type} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx})
+@var{bag}: The bag
+
+@var{indx}: The element of the bag to get the type
+
+This function will return the bag's type.
+
+@strong{Returns:} On error a negative error value or one of the @code{gnutls_pkcs12_bag_type_t}  enumerations.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_init
+@anchor{gnutls_pkcs12_bag_init}
+@deftypefun {int} {gnutls_pkcs12_bag_init} (gnutls_pkcs12_bag_t * @var{bag})
+@var{bag}: A pointer to the type to be initialized
+
+This function will initialize a PKCS12 bag structure. PKCS12 Bags
+usually contain private keys, lists of X.509 Certificates and X.509
+Certificate revocation lists.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_set_crl
+@anchor{gnutls_pkcs12_bag_set_crl}
+@deftypefun {int} {gnutls_pkcs12_bag_set_crl} (gnutls_pkcs12_bag_t @var{bag}, gnutls_x509_crl_t @var{crl})
+@var{bag}: The bag
+
+@var{crl}: the CRL to be copied.
+
+This function will insert the given CRL into the
+bag. This is just a wrapper over @code{gnutls_pkcs12_bag_set_data()} .
+
+@strong{Returns:} the index of the added bag on success, or a negative error code
+on failure.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_set_crt
+@anchor{gnutls_pkcs12_bag_set_crt}
+@deftypefun {int} {gnutls_pkcs12_bag_set_crt} (gnutls_pkcs12_bag_t @var{bag}, gnutls_x509_crt_t @var{crt})
+@var{bag}: The bag
+
+@var{crt}: the certificate to be copied.
+
+This function will insert the given certificate into the
+bag. This is just a wrapper over @code{gnutls_pkcs12_bag_set_data()} .
+
+@strong{Returns:} the index of the added bag on success, or a negative
+value on failure.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_set_data
+@anchor{gnutls_pkcs12_bag_set_data}
+@deftypefun {int} {gnutls_pkcs12_bag_set_data} (gnutls_pkcs12_bag_t @var{bag}, gnutls_pkcs12_bag_type_t @var{type}, const gnutls_datum_t * @var{data})
+@var{bag}: The bag
+
+@var{type}: The data's type
+
+@var{data}: the data to be copied.
+
+This function will insert the given data of the given type into
+the bag.
+
+@strong{Returns:} the index of the added bag on success, or a negative
+value on error.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_set_friendly_name
+@anchor{gnutls_pkcs12_bag_set_friendly_name}
+@deftypefun {int} {gnutls_pkcs12_bag_set_friendly_name} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx}, const char * @var{name})
+@var{bag}: The bag
+
+@var{indx}: The bag's element to add the id
+
+@var{name}: the name
+
+This function will add the given key friendly name, to the
+specified, by the index, bag element. The name will be encoded as
+a 'Friendly name' bag attribute, which is usually used to set a
+user name to the local private key and the certificate pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. or a negative error code on error.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_set_key_id
+@anchor{gnutls_pkcs12_bag_set_key_id}
+@deftypefun {int} {gnutls_pkcs12_bag_set_key_id} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx}, const gnutls_datum_t * @var{id})
+@var{bag}: The bag
+
+@var{indx}: The bag's element to add the id
+
+@var{id}: the ID
+
+This function will add the given key ID, to the specified, by the
+index, bag element. The key ID will be encoded as a 'Local key
+identifier' bag attribute, which is usually used to distinguish
+the local private key and the certificate pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. or a negative error code on error.
+@end deftypefun
+
+@subheading gnutls_pkcs12_bag_set_privkey
+@anchor{gnutls_pkcs12_bag_set_privkey}
+@deftypefun {int} {gnutls_pkcs12_bag_set_privkey} (gnutls_pkcs12_bag_t @var{bag}, gnutls_x509_privkey_t @var{privkey}, const char * @var{password}, unsigned @var{flags})
+@var{bag}: The bag
+
+@var{privkey}: the private key to be copied.
+
+@var{password}: the password to protect the key with (may be @code{NULL} )
+
+@var{flags}: should be one of @code{gnutls_pkcs_encrypt_flags_t}  elements bitwise or'd
+
+This function will insert the given private key into the
+bag. This is just a wrapper over @code{gnutls_pkcs12_bag_set_data()} .
+
+@strong{Returns:} the index of the added bag on success, or a negative
+value on failure.
+@end deftypefun
+
+@subheading gnutls_pkcs12_deinit
+@anchor{gnutls_pkcs12_deinit}
+@deftypefun {void} {gnutls_pkcs12_deinit} (gnutls_pkcs12_t @var{pkcs12})
+@var{pkcs12}: The type to be initialized
+
+This function will deinitialize a PKCS12 type.
+@end deftypefun
+
+@subheading gnutls_pkcs12_export
+@anchor{gnutls_pkcs12_export}
+@deftypefun {int} {gnutls_pkcs12_export} (gnutls_pkcs12_t @var{pkcs12}, gnutls_x509_crt_fmt_t @var{format}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{pkcs12}: A pkcs12 type
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{output_data}: will contain a structure PEM or DER encoded
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will export the pkcs12 structure to DER or PEM format.
+
+If the buffer provided is not long enough to hold the output, then
+*output_data_size will be updated and GNUTLS_E_SHORT_MEMORY_BUFFER
+will be returned.
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN PKCS12".
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+@end deftypefun
+
+@subheading gnutls_pkcs12_export2
+@anchor{gnutls_pkcs12_export2}
+@deftypefun {int} {gnutls_pkcs12_export2} (gnutls_pkcs12_t @var{pkcs12}, gnutls_x509_crt_fmt_t @var{format}, gnutls_datum_t * @var{out})
+@var{pkcs12}: A pkcs12 type
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{out}: will contain a structure PEM or DER encoded
+
+This function will export the pkcs12 structure to DER or PEM format.
+
+The output buffer is allocated using @code{gnutls_malloc()} .
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN PKCS12".
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+
+@strong{Since:} 3.1.3
+@end deftypefun
+
+@subheading gnutls_pkcs12_generate_mac
+@anchor{gnutls_pkcs12_generate_mac}
+@deftypefun {int} {gnutls_pkcs12_generate_mac} (gnutls_pkcs12_t @var{pkcs12}, const char * @var{pass})
+@var{pkcs12}: A pkcs12 type
+
+@var{pass}: The password for the MAC
+
+This function will generate a MAC for the PKCS12 structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs12_generate_mac2
+@anchor{gnutls_pkcs12_generate_mac2}
+@deftypefun {int} {gnutls_pkcs12_generate_mac2} (gnutls_pkcs12_t @var{pkcs12}, gnutls_mac_algorithm_t @var{mac}, const char * @var{pass})
+@var{pkcs12}: A pkcs12 type
+
+@var{mac}: the MAC algorithm to use
+
+@var{pass}: The password for the MAC
+
+This function will generate a MAC for the PKCS12 structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs12_get_bag
+@anchor{gnutls_pkcs12_get_bag}
+@deftypefun {int} {gnutls_pkcs12_get_bag} (gnutls_pkcs12_t @var{pkcs12}, int @var{indx}, gnutls_pkcs12_bag_t @var{bag})
+@var{pkcs12}: A pkcs12 type
+
+@var{indx}: contains the index of the bag to extract
+
+@var{bag}: An initialized bag, where the contents of the bag will be copied
+
+This function will return a Bag from the PKCS12 structure.
+
+After the last Bag has been read
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs12_import
+@anchor{gnutls_pkcs12_import}
+@deftypefun {int} {gnutls_pkcs12_import} (gnutls_pkcs12_t @var{pkcs12}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{pkcs12}: The data to store the parsed PKCS12.
+
+@var{data}: The DER or PEM encoded PKCS12.
+
+@var{format}: One of DER or PEM
+
+@var{flags}: an ORed sequence of gnutls_privkey_pkcs8_flags
+
+This function will convert the given DER or PEM encoded PKCS12
+to the native gnutls_pkcs12_t format. The output will be stored in 'pkcs12'.
+
+If the PKCS12 is PEM encoded it should have a header of "PKCS12".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs12_init
+@anchor{gnutls_pkcs12_init}
+@deftypefun {int} {gnutls_pkcs12_init} (gnutls_pkcs12_t * @var{pkcs12})
+@var{pkcs12}: A pointer to the type to be initialized
+
+This function will initialize a PKCS12 type. PKCS12 structures
+usually contain lists of X.509 Certificates and X.509 Certificate
+revocation lists.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs12_mac_info
+@anchor{gnutls_pkcs12_mac_info}
+@deftypefun {int} {gnutls_pkcs12_mac_info} (gnutls_pkcs12_t @var{pkcs12}, unsigned int * @var{mac}, void * @var{salt}, unsigned int * @var{salt_size}, unsigned int * @var{iter_count}, char ** @var{oid})
+@var{pkcs12}: A pkcs12 type
+
+@var{mac}: the MAC algorithm used as @code{gnutls_mac_algorithm_t} 
+
+@var{salt}: the salt used for string to key (if non-NULL then  @code{salt_size} initially holds its size)
+
+@var{salt_size}: string to key salt size
+
+@var{iter_count}: string to key iteration count
+
+@var{oid}: if non-NULL it will contain an allocated null-terminated variable with the OID
+
+This function will provide information on the MAC algorithm used
+in a PKCS @code{12}  structure. If the structure algorithms
+are unknown the code @code{GNUTLS_E_UNKNOWN_HASH_ALGORITHM}  will be returned,
+and only  @code{oid} , will be set. That is,  @code{oid} will be set on structures
+with a MAC whether supported or not. It must be deinitialized using @code{gnutls_free()} .
+The other variables are only set on supported structures.
+
+@strong{Returns:} @code{GNUTLS_E_INVALID_REQUEST}  if the provided structure doesn't contain a MAC,
+@code{GNUTLS_E_UNKNOWN_HASH_ALGORITHM}  if the structure's MAC isn't supported, or
+another negative error code in case of a failure. Zero on success.
+@end deftypefun
+
+@subheading gnutls_pkcs12_set_bag
+@anchor{gnutls_pkcs12_set_bag}
+@deftypefun {int} {gnutls_pkcs12_set_bag} (gnutls_pkcs12_t @var{pkcs12}, gnutls_pkcs12_bag_t @var{bag})
+@var{pkcs12}: should contain a gnutls_pkcs12_t type
+
+@var{bag}: An initialized bag
+
+This function will insert a Bag into the PKCS12 structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs12_simple_parse
+@anchor{gnutls_pkcs12_simple_parse}
+@deftypefun {int} {gnutls_pkcs12_simple_parse} (gnutls_pkcs12_t @var{p12}, const char * @var{password}, gnutls_x509_privkey_t * @var{key}, gnutls_x509_crt_t ** @var{chain}, unsigned int * @var{chain_len}, gnutls_x509_crt_t ** @var{extra_certs}, unsigned int * @var{extra_certs_len}, gnutls_x509_crl_t * @var{crl}, unsigned int @var{flags})
+@var{p12}: A pkcs12 type
+
+@var{password}: optional password used to decrypt the structure, bags and keys.
+
+@var{key}: a structure to store the parsed private key.
+
+@var{chain}: the corresponding to key certificate chain (may be @code{NULL} )
+
+@var{chain_len}: will be updated with the number of additional (may be @code{NULL} )
+
+@var{extra_certs}: optional pointer to receive an array of additional
+certificates found in the PKCS12 structure (may be @code{NULL} ).
+
+@var{extra_certs_len}: will be updated with the number of additional
+certs (may be @code{NULL} ).
+
+@var{crl}: an optional structure to store the parsed CRL (may be @code{NULL} ).
+
+@var{flags}: should be zero or one of GNUTLS_PKCS12_SP_*
+
+This function parses a PKCS12 structure in  @code{pkcs12} and extracts the
+private key, the corresponding certificate chain, any additional
+certificates and a CRL.
+
+The  @code{extra_certs} and  @code{extra_certs_len} parameters are optional
+and both may be set to @code{NULL} . If either is non-@code{NULL} , then both must
+be set. The value for  @code{extra_certs} is allocated
+using @code{gnutls_malloc()} .
+
+Encrypted PKCS12 bags and PKCS8 private keys are supported, but
+only with password based security and the same password for all
+operations.
+
+Note that a PKCS12 structure may contain many keys and/or certificates,
+and there is no way to identify which key/certificate pair you want.
+For this reason this function is useful for PKCS12 files that contain 
+only one key/certificate pair and/or one CRL.
+
+If the provided structure has encrypted fields but no password
+is provided then this function returns @code{GNUTLS_E_DECRYPTION_FAILED} .
+
+Note that normally the chain constructed does not include self signed
+certificates, to comply with TLS' requirements. If, however, the flag 
+@code{GNUTLS_PKCS12_SP_INCLUDE_SELF_SIGNED}  is specified then
+self signed certificates will be included in the chain.
+
+Prior to using this function the PKCS @code{12}  structure integrity must
+be verified using @code{gnutls_pkcs12_verify_mac()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun
+
+@subheading gnutls_pkcs12_verify_mac
+@anchor{gnutls_pkcs12_verify_mac}
+@deftypefun {int} {gnutls_pkcs12_verify_mac} (gnutls_pkcs12_t @var{pkcs12}, const char * @var{pass})
+@var{pkcs12}: should contain a gnutls_pkcs12_t type
+
+@var{pass}: The password for the MAC
+
+This function will verify the MAC for the PKCS12 structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+

@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_policy} (gnutls_x509_crt_t @var{crt}, const struct gnutls_x509_policy_st * @var{policy}, unsigned int @var{critical})
+@var{crt}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{policy}: A pointer to a policy
+
+@var{critical}: use non-zero if the extension is marked as critical
+
+This function will set the certificate policy extension (2.5.29.32).
+Multiple calls to this function append a new policy.
+
+Note the maximum text size for the qualifier @code{GNUTLS_X509_QUALIFIER_NOTICE} 
+is 200 characters. This function will fail with @code{GNUTLS_E_INVALID_REQUEST} 
+if this is exceeded.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.5
+@end deftypefun

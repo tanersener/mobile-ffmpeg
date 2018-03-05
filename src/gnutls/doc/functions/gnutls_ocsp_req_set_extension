@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_set_extension} (gnutls_ocsp_req_t @var{req}, const char * @var{oid}, unsigned int @var{critical}, const gnutls_datum_t * @var{data})
+@var{req}: should contain a @code{gnutls_ocsp_req_t}  type
+
+@var{oid}: buffer with OID of extension as a string.
+
+@var{critical}: critical flag, normally false.
+
+@var{data}: the extension data
+
+This function will add an extension to the OCSP request.  Calling
+this function multiple times for the same OID will overwrite values
+from earlier calls.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.
+@end deftypefun

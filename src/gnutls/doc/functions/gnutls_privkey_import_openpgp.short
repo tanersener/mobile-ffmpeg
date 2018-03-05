@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_import_openpgp} (gnutls_privkey_t @var{pkey}, gnutls_openpgp_privkey_t @var{key}, unsigned int @var{flags})

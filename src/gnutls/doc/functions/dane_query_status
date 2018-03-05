@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {dane_query_status_t} {dane_query_status} (dane_query_t @var{q})
+@var{q}: The query result structure
+
+This function will return the status of the query response.
+See @code{dane_query_status_t}  for the possible types.
+
+@strong{Returns:} The status type.
+@end deftypefun

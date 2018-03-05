@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_privkey_generate2} (gnutls_x509_privkey_t @var{key}, gnutls_pk_algorithm_t @var{algo}, unsigned int @var{bits}, unsigned int @var{flags}, const gnutls_keygen_data_st * @var{data}, unsigned @var{data_size})

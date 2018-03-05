@@ -1,0 +1,176 @@
+@multitable @columnfractions .15 .40 .37
+@item 0 @tab GNUTLS_@-E_@-SUCCESS @tab Success.
+@item -3 @tab GNUTLS_@-E_@-UNKNOWN_@-COMPRESSION_@-ALGORITHM @tab Could not negotiate a supported compression method.
+@item -6 @tab GNUTLS_@-E_@-UNKNOWN_@-CIPHER_@-TYPE @tab The cipher type is unsupported.
+@item -7 @tab GNUTLS_@-E_@-LARGE_@-PACKET @tab The transmitted packet is too large (EMSGSIZE).
+@item -8 @tab GNUTLS_@-E_@-UNSUPPORTED_@-VERSION_@-PACKET @tab A packet with illegal or unsupported version was received.
+@item -9 @tab GNUTLS_@-E_@-UNEXPECTED_@-PACKET_@-LENGTH @tab A TLS packet with unexpected length was received.
+@item -10 @tab GNUTLS_@-E_@-INVALID_@-SESSION @tab The specified session has been invalidated for some reason.
+@item -12 @tab GNUTLS_@-E_@-FATAL_@-ALERT_@-RECEIVED @tab A TLS fatal alert has been received.
+@item -15 @tab GNUTLS_@-E_@-UNEXPECTED_@-PACKET @tab An unexpected TLS packet was received.
+@item -16 @tab GNUTLS_@-E_@-WARNING_@-ALERT_@-RECEIVED @tab A TLS warning alert has been received.
+@item -18 @tab GNUTLS_@-E_@-ERROR_@-IN_@-FINISHED_@-PACKET @tab An error was encountered at the TLS Finished packet calculation.
+@item -19 @tab GNUTLS_@-E_@-UNEXPECTED_@-HANDSHAKE_@-PACKET @tab An unexpected TLS handshake packet was received.
+@item -21 @tab GNUTLS_@-E_@-UNKNOWN_@-CIPHER_@-SUITE @tab Could not negotiate a supported cipher suite.
+@item -22 @tab GNUTLS_@-E_@-UNWANTED_@-ALGORITHM @tab An algorithm that is not enabled was negotiated.
+@item -23 @tab GNUTLS_@-E_@-MPI_@-SCAN_@-FAILED @tab The scanning of a large integer has failed.
+@item -24 @tab GNUTLS_@-E_@-DECRYPTION_@-FAILED @tab Decryption has failed.
+@item -25 @tab GNUTLS_@-E_@-MEMORY_@-ERROR @tab Internal error in memory allocation.
+@item -26 @tab GNUTLS_@-E_@-DECOMPRESSION_@-FAILED @tab Decompression of the TLS record packet has failed.
+@item -27 @tab GNUTLS_@-E_@-COMPRESSION_@-FAILED @tab Compression of the TLS record packet has failed.
+@item -28 @tab GNUTLS_@-E_@-AGAIN @tab Resource temporarily unavailable, try again.
+@item -29 @tab GNUTLS_@-E_@-EXPIRED @tab The session or certificate has expired.
+@item -30 @tab GNUTLS_@-E_@-DB_@-ERROR @tab Error in Database backend.
+@item -31 @tab GNUTLS_@-E_@-SRP_@-PWD_@-ERROR @tab Error in password file.
+@item -32 @tab GNUTLS_@-E_@-INSUFFICIENT_@-CREDENTIALS @tab Insufficient credentials for that request.
+@item -33 @tab GNUTLS_@-E_@-HASH_@-FAILED @tab Hashing has failed.
+@item -34 @tab GNUTLS_@-E_@-BASE64_@-DECODING_@-ERROR @tab Base64 decoding error.
+@item -35 @tab GNUTLS_@-E_@-MPI_@-PRINT_@-FAILED @tab Could not export a large integer.
+@item -37 @tab GNUTLS_@-E_@-REHANDSHAKE @tab Rehandshake was requested by the peer.
+@item -38 @tab GNUTLS_@-E_@-GOT_@-APPLICATION_@-DATA @tab TLS Application data were received, while expecting handshake data.
+@item -39 @tab GNUTLS_@-E_@-RECORD_@-LIMIT_@-REACHED @tab The upper limit of record packet sequence numbers has been reached. Wow!
+@item -40 @tab GNUTLS_@-E_@-ENCRYPTION_@-FAILED @tab Encryption has failed.
+@item -43 @tab GNUTLS_@-E_@-CERTIFICATE_@-ERROR @tab Error in the certificate.
+@item -44 @tab GNUTLS_@-E_@-PK_@-ENCRYPTION_@-FAILED @tab Public key encryption has failed.
+@item -45 @tab GNUTLS_@-E_@-PK_@-DECRYPTION_@-FAILED @tab Public key decryption has failed.
+@item -46 @tab GNUTLS_@-E_@-PK_@-SIGN_@-FAILED @tab Public key signing has failed.
+@item -47 @tab GNUTLS_@-E_@-X509_@-UNSUPPORTED_@-CRITICAL_@-EXTENSION @tab Unsupported critical extension in X.509 certificate.
+@item -48 @tab GNUTLS_@-E_@-KEY_@-USAGE_@-VIOLATION @tab Key usage violation in certificate has been detected.
+@item -49 @tab GNUTLS_@-E_@-NO_@-CERTIFICATE_@-FOUND @tab No certificate was found.
+@item -50 @tab GNUTLS_@-E_@-INVALID_@-REQUEST @tab The request is invalid.
+@item -51 @tab GNUTLS_@-E_@-SHORT_@-MEMORY_@-BUFFER @tab The given memory buffer is too short to hold parameters.
+@item -52 @tab GNUTLS_@-E_@-INTERRUPTED @tab Function was interrupted.
+@item -53 @tab GNUTLS_@-E_@-PUSH_@-ERROR @tab Error in the push function.
+@item -54 @tab GNUTLS_@-E_@-PULL_@-ERROR @tab Error in the pull function.
+@item -55 @tab GNUTLS_@-E_@-RECEIVED_@-ILLEGAL_@-PARAMETER @tab An illegal parameter has been received.
+@item -56 @tab GNUTLS_@-E_@-REQUESTED_@-DATA_@-NOT_@-AVAILABLE @tab The requested data were not available.
+@item -57 @tab GNUTLS_@-E_@-PKCS1_@-WRONG_@-PAD @tab Wrong padding in PKCS1 packet.
+@item -58 @tab GNUTLS_@-E_@-RECEIVED_@-ILLEGAL_@-EXTENSION @tab An illegal TLS extension was received.
+@item -59 @tab GNUTLS_@-E_@-INTERNAL_@-ERROR @tab GnuTLS internal error.
+@item -60 @tab GNUTLS_@-E_@-CERTIFICATE_@-KEY_@-MISMATCH @tab The certificate and the given key do not match.
+@item -61 @tab GNUTLS_@-E_@-UNSUPPORTED_@-CERTIFICATE_@-TYPE @tab The certificate type is not supported.
+@item -62 @tab GNUTLS_@-E_@-X509_@-UNKNOWN_@-SAN @tab Unknown Subject Alternative name in X.509 certificate.
+@item -63 @tab GNUTLS_@-E_@-DH_@-PRIME_@-UNACCEPTABLE @tab The Diffie-Hellman prime sent by the server is not acceptable (not long enough).
+@item -64 @tab GNUTLS_@-E_@-FILE_@-ERROR @tab Error while reading file.
+@item -67 @tab GNUTLS_@-E_@-ASN1_@-ELEMENT_@-NOT_@-FOUND @tab ASN1 parser: Element was not found.
+@item -68 @tab GNUTLS_@-E_@-ASN1_@-IDENTIFIER_@-NOT_@-FOUND @tab ASN1 parser: Identifier was not found
+@item -69 @tab GNUTLS_@-E_@-ASN1_@-DER_@-ERROR @tab ASN1 parser: Error in DER parsing.
+@item -70 @tab GNUTLS_@-E_@-ASN1_@-VALUE_@-NOT_@-FOUND @tab ASN1 parser: Value was not found.
+@item -71 @tab GNUTLS_@-E_@-ASN1_@-GENERIC_@-ERROR @tab ASN1 parser: Generic parsing error.
+@item -72 @tab GNUTLS_@-E_@-ASN1_@-VALUE_@-NOT_@-VALID @tab ASN1 parser: Value is not valid.
+@item -73 @tab GNUTLS_@-E_@-ASN1_@-TAG_@-ERROR @tab ASN1 parser: Error in TAG.
+@item -74 @tab GNUTLS_@-E_@-ASN1_@-TAG_@-IMPLICIT @tab ASN1 parser: error in implicit tag
+@item -75 @tab GNUTLS_@-E_@-ASN1_@-TYPE_@-ANY_@-ERROR @tab ASN1 parser: Error in type 'ANY'.
+@item -76 @tab GNUTLS_@-E_@-ASN1_@-SYNTAX_@-ERROR @tab ASN1 parser: Syntax error.
+@item -77 @tab GNUTLS_@-E_@-ASN1_@-DER_@-OVERFLOW @tab ASN1 parser: Overflow in DER parsing.
+@item -78 @tab GNUTLS_@-E_@-TOO_@-MANY_@-EMPTY_@-PACKETS @tab Too many empty record packets have been received.
+@item -79 @tab GNUTLS_@-E_@-OPENPGP_@-UID_@-REVOKED @tab The OpenPGP User ID is revoked.
+@item -80 @tab GNUTLS_@-E_@-UNKNOWN_@-PK_@-ALGORITHM @tab An unknown public key algorithm was encountered.
+@item -81 @tab GNUTLS_@-E_@-TOO_@-MANY_@-HANDSHAKE_@-PACKETS @tab Too many handshake packets have been received.
+@item -84 @tab GNUTLS_@-E_@-NO_@-TEMPORARY_@-RSA_@-PARAMS @tab No temporary RSA parameters were found.
+@item -86 @tab GNUTLS_@-E_@-NO_@-COMPRESSION_@-ALGORITHMS @tab No supported compression algorithms have been found.
+@item -87 @tab GNUTLS_@-E_@-NO_@-CIPHER_@-SUITES @tab No supported cipher suites have been found.
+@item -88 @tab GNUTLS_@-E_@-OPENPGP_@-GETKEY_@-FAILED @tab Could not get OpenPGP key.
+@item -89 @tab GNUTLS_@-E_@-PK_@-SIG_@-VERIFY_@-FAILED @tab Public key signature verification has failed.
+@item -90 @tab GNUTLS_@-E_@-ILLEGAL_@-SRP_@-USERNAME @tab The SRP username supplied is illegal.
+@item -91 @tab GNUTLS_@-E_@-SRP_@-PWD_@-PARSING_@-ERROR @tab Parsing error in password file.
+@item -93 @tab GNUTLS_@-E_@-NO_@-TEMPORARY_@-DH_@-PARAMS @tab No temporary DH parameters were found.
+@item -94 @tab GNUTLS_@-E_@-OPENPGP_@-FINGERPRINT_@-UNSUPPORTED @tab The OpenPGP fingerprint is not supported.
+@item -95 @tab GNUTLS_@-E_@-X509_@-UNSUPPORTED_@-ATTRIBUTE @tab The certificate has unsupported attributes.
+@item -96 @tab GNUTLS_@-E_@-UNKNOWN_@-HASH_@-ALGORITHM @tab The hash algorithm is unknown.
+@item -97 @tab GNUTLS_@-E_@-UNKNOWN_@-PKCS_@-CONTENT_@-TYPE @tab The PKCS structure's content type is unknown.
+@item -98 @tab GNUTLS_@-E_@-UNKNOWN_@-PKCS_@-BAG_@-TYPE @tab The PKCS structure's bag type is unknown.
+@item -99 @tab GNUTLS_@-E_@-INVALID_@-PASSWORD @tab The given password contains invalid characters.
+@item -100 @tab GNUTLS_@-E_@-MAC_@-VERIFY_@-FAILED @tab The Message Authentication Code verification failed.
+@item -101 @tab GNUTLS_@-E_@-CONSTRAINT_@-ERROR @tab Some constraint limits were reached.
+@item -104 @tab GNUTLS_@-E_@-IA_@-VERIFY_@-FAILED @tab Verifying TLS/IA phase checksum failed
+@item -105 @tab GNUTLS_@-E_@-UNKNOWN_@-ALGORITHM @tab The specified algorithm or protocol is unknown.
+@item -106 @tab GNUTLS_@-E_@-UNSUPPORTED_@-SIGNATURE_@-ALGORITHM @tab The signature algorithm is not supported.
+@item -107 @tab GNUTLS_@-E_@-SAFE_@-RENEGOTIATION_@-FAILED @tab Safe renegotiation failed.
+@item -108 @tab GNUTLS_@-E_@-UNSAFE_@-RENEGOTIATION_@-DENIED @tab Unsafe renegotiation denied.
+@item -109 @tab GNUTLS_@-E_@-UNKNOWN_@-SRP_@-USERNAME @tab The SRP username supplied is unknown.
+@item -110 @tab GNUTLS_@-E_@-PREMATURE_@-TERMINATION @tab The TLS connection was non-properly terminated.
+@item -111 @tab GNUTLS_@-E_@-MALFORMED_@-CIDR @tab CIDR name constraint is malformed in size or structure.
+@item -201 @tab GNUTLS_@-E_@-BASE64_@-ENCODING_@-ERROR @tab Base64 encoding error.
+@item -202 @tab GNUTLS_@-E_@-INCOMPATIBLE_@-GCRYPT_@-LIBRARY @tab The crypto library version is too old.
+@item -203 @tab GNUTLS_@-E_@-INCOMPATIBLE_@-LIBTASN1_@-LIBRARY @tab The tasn1 library version is too old.
+@item -204 @tab GNUTLS_@-E_@-OPENPGP_@-KEYRING_@-ERROR @tab Error loading the keyring.
+@item -205 @tab GNUTLS_@-E_@-X509_@-UNSUPPORTED_@-OID @tab The OID is not supported.
+@item -206 @tab GNUTLS_@-E_@-RANDOM_@-FAILED @tab Failed to acquire random data.
+@item -207 @tab GNUTLS_@-E_@-BASE64_@-UNEXPECTED_@-HEADER_@-ERROR @tab Base64 unexpected header error.
+@item -208 @tab GNUTLS_@-E_@-OPENPGP_@-SUBKEY_@-ERROR @tab Could not find OpenPGP subkey.
+@item -209 @tab GNUTLS_@-E_@-CRYPTO_@-ALREADY_@-REGISTERED @tab There is already a crypto algorithm with lower priority.
+@item -210 @tab GNUTLS_@-E_@-HANDSHAKE_@-TOO_@-LARGE @tab The handshake data size is too large.
+@item -211 @tab GNUTLS_@-E_@-CRYPTODEV_@-IOCTL_@-ERROR @tab Error interfacing with /dev/crypto
+@item -212 @tab GNUTLS_@-E_@-CRYPTODEV_@-DEVICE_@-ERROR @tab Error opening /dev/crypto
+@item -213 @tab GNUTLS_@-E_@-CHANNEL_@-BINDING_@-NOT_@-AVAILABLE @tab Channel binding data not available
+@item -214 @tab GNUTLS_@-E_@-BAD_@-COOKIE @tab The cookie was bad.
+@item -215 @tab GNUTLS_@-E_@-OPENPGP_@-PREFERRED_@-KEY_@-ERROR @tab The OpenPGP key has not a preferred key set.
+@item -216 @tab GNUTLS_@-E_@-INCOMPAT_@-DSA_@-KEY_@-WITH_@-TLS_@-PROTOCOL @tab The given DSA key is incompatible with the selected TLS protocol.
+@item -217 @tab GNUTLS_@-E_@-INSUFFICIENT_@-SECURITY @tab One of the involved algorithms has insufficient security level.
+@item -292 @tab GNUTLS_@-E_@-HEARTBEAT_@-PONG_@-RECEIVED @tab A heartbeat pong message was received.
+@item -293 @tab GNUTLS_@-E_@-HEARTBEAT_@-PING_@-RECEIVED @tab A heartbeat ping message was received.
+@item -294 @tab GNUTLS_@-E_@-UNRECOGNIZED_@-NAME @tab The SNI host name not recognised.
+@item -300 @tab GNUTLS_@-E_@-PKCS11_@-ERROR @tab PKCS #11 error.
+@item -301 @tab GNUTLS_@-E_@-PKCS11_@-LOAD_@-ERROR @tab PKCS #11 initialization error.
+@item -302 @tab GNUTLS_@-E_@-PARSING_@-ERROR @tab Error in parsing.
+@item -303 @tab GNUTLS_@-E_@-PKCS11_@-PIN_@-ERROR @tab Error in provided PIN.
+@item -305 @tab GNUTLS_@-E_@-PKCS11_@-SLOT_@-ERROR @tab PKCS #11 error in slot
+@item -306 @tab GNUTLS_@-E_@-LOCKING_@-ERROR @tab Thread locking error
+@item -307 @tab GNUTLS_@-E_@-PKCS11_@-ATTRIBUTE_@-ERROR @tab PKCS #11 error in attribute
+@item -308 @tab GNUTLS_@-E_@-PKCS11_@-DEVICE_@-ERROR @tab PKCS #11 error in device
+@item -309 @tab GNUTLS_@-E_@-PKCS11_@-DATA_@-ERROR @tab PKCS #11 error in data
+@item -310 @tab GNUTLS_@-E_@-PKCS11_@-UNSUPPORTED_@-FEATURE_@-ERROR @tab PKCS #11 unsupported feature
+@item -311 @tab GNUTLS_@-E_@-PKCS11_@-KEY_@-ERROR @tab PKCS #11 error in key
+@item -312 @tab GNUTLS_@-E_@-PKCS11_@-PIN_@-EXPIRED @tab PKCS #11 PIN expired
+@item -313 @tab GNUTLS_@-E_@-PKCS11_@-PIN_@-LOCKED @tab PKCS #11 PIN locked
+@item -314 @tab GNUTLS_@-E_@-PKCS11_@-SESSION_@-ERROR @tab PKCS #11 error in session
+@item -315 @tab GNUTLS_@-E_@-PKCS11_@-SIGNATURE_@-ERROR @tab PKCS #11 error in signature
+@item -316 @tab GNUTLS_@-E_@-PKCS11_@-TOKEN_@-ERROR @tab PKCS #11 error in token
+@item -317 @tab GNUTLS_@-E_@-PKCS11_@-USER_@-ERROR @tab PKCS #11 user error
+@item -318 @tab GNUTLS_@-E_@-CRYPTO_@-INIT_@-FAILED @tab The initialization of crypto backend has failed.
+@item -319 @tab GNUTLS_@-E_@-TIMEDOUT @tab The operation timed out
+@item -320 @tab GNUTLS_@-E_@-USER_@-ERROR @tab The operation was cancelled due to user error
+@item -321 @tab GNUTLS_@-E_@-ECC_@-NO_@-SUPPORTED_@-CURVES @tab No supported ECC curves were found
+@item -322 @tab GNUTLS_@-E_@-ECC_@-UNSUPPORTED_@-CURVE @tab The curve is unsupported
+@item -323 @tab GNUTLS_@-E_@-PKCS11_@-REQUESTED_@-OBJECT_@-NOT_@-AVAILBLE @tab The requested PKCS #11 object is not available
+@item -324 @tab GNUTLS_@-E_@-CERTIFICATE_@-LIST_@-UNSORTED @tab The provided X.509 certificate list is not sorted (in subject to issuer order)
+@item -325 @tab GNUTLS_@-E_@-ILLEGAL_@-PARAMETER @tab An illegal parameter was found.
+@item -326 @tab GNUTLS_@-E_@-NO_@-PRIORITIES_@-WERE_@-SET @tab No or insufficient priorities were set.
+@item -327 @tab GNUTLS_@-E_@-X509_@-UNSUPPORTED_@-EXTENSION @tab Unsupported extension in X.509 certificate.
+@item -328 @tab GNUTLS_@-E_@-SESSION_@-EOF @tab Peer has terminated the connection
+@item -329 @tab GNUTLS_@-E_@-TPM_@-ERROR @tab TPM error.
+@item -330 @tab GNUTLS_@-E_@-TPM_@-KEY_@-PASSWORD_@-ERROR @tab Error in provided password for key to be loaded in TPM.
+@item -331 @tab GNUTLS_@-E_@-TPM_@-SRK_@-PASSWORD_@-ERROR @tab Error in provided SRK password for TPM.
+@item -332 @tab GNUTLS_@-E_@-TPM_@-SESSION_@-ERROR @tab Cannot initialize a session with the TPM.
+@item -333 @tab GNUTLS_@-E_@-TPM_@-KEY_@-NOT_@-FOUND @tab TPM key was not found in persistent storage.
+@item -334 @tab GNUTLS_@-E_@-TPM_@-UNINITIALIZED @tab TPM is not initialized.
+@item -335 @tab GNUTLS_@-E_@-TPM_@-NO_@-LIB @tab The TPM library (trousers) cannot be found.
+@item -340 @tab GNUTLS_@-E_@-NO_@-CERTIFICATE_@-STATUS @tab There is no certificate status (OCSP).
+@item -341 @tab GNUTLS_@-E_@-OCSP_@-RESPONSE_@-ERROR @tab The OCSP response is invalid
+@item -342 @tab GNUTLS_@-E_@-RANDOM_@-DEVICE_@-ERROR @tab Error in the system's randomness device.
+@item -343 @tab GNUTLS_@-E_@-AUTH_@-ERROR @tab Could not authenticate peer.
+@item -344 @tab GNUTLS_@-E_@-NO_@-APPLICATION_@-PROTOCOL @tab No common application protocol could be negotiated.
+@item -345 @tab GNUTLS_@-E_@-SOCKETS_@-INIT_@-ERROR @tab Error in sockets initialization.
+@item -346 @tab GNUTLS_@-E_@-KEY_@-IMPORT_@-FAILED @tab Failed to import the key into store.
+@item -347 @tab GNUTLS_@-E_@-INAPPROPRIATE_@-FALLBACK @tab A connection with inappropriate fallback was attempted.
+@item -348 @tab GNUTLS_@-E_@-CERTIFICATE_@-VERIFICATION_@-ERROR @tab Error in the certificate verification.
+@item -349 @tab GNUTLS_@-E_@-PRIVKEY_@-VERIFICATION_@-ERROR @tab Error in the private key verification; seed doesn't match.
+@item -350 @tab GNUTLS_@-E_@-UNEXPECTED_@-EXTENSIONS_@-LENGTH @tab Invalid TLS extensions length field.
+@item -351 @tab GNUTLS_@-E_@-ASN1_@-EMBEDDED_@-NULL_@-IN_@-STRING @tab The provided string has an embedded null.
+@item -400 @tab GNUTLS_@-E_@-SELF_@-TEST_@-ERROR @tab Error while performing self checks.
+@item -401 @tab GNUTLS_@-E_@-NO_@-SELF_@-TEST @tab There is no self test for this algorithm.
+@item -402 @tab GNUTLS_@-E_@-LIB_@-IN_@-ERROR_@-STATE @tab An error has been detected in the library and cannot continue operations.
+@item -403 @tab GNUTLS_@-E_@-PK_@-GENERATION_@-ERROR @tab Error in public key generation.
+@item -404 @tab GNUTLS_@-E_@-IDNA_@-ERROR @tab There was an issue converting to or from UTF8.
+@item -406 @tab GNUTLS_@-E_@-SESSION_@-USER_@-ID_@-CHANGED @tab Peer's certificate or username has changed during a rehandshake.
+@item -407 @tab GNUTLS_@-E_@-HANDSHAKE_@-DURING_@-FALSE_@-START @tab Attempted handshake during false start.
+@item -408 @tab GNUTLS_@-E_@-UNAVAILABLE_@-DURING_@-HANDSHAKE @tab Cannot obtain resumption parameters while handshake is incomplete.
+@item -409 @tab GNUTLS_@-E_@-PK_@-INVALID_@-PUBKEY @tab The obtained public key is invalid.
+@item -410 @tab GNUTLS_@-E_@-PK_@-INVALID_@-PRIVKEY @tab The private key is invalid.
+@item -411 @tab GNUTLS_@-E_@-NOT_@-YET_@-ACTIVATED @tab The certificate is not yet activated.
+@item -412 @tab GNUTLS_@-E_@-INVALID_@-UTF8_@-STRING @tab The given string contains invalid UTF-8 characters.
+@item -413 @tab GNUTLS_@-E_@-NO_@-EMBEDDED_@-DATA @tab There are no embedded data in the structure.
+@item -414 @tab GNUTLS_@-E_@-INVALID_@-UTF8_@-EMAIL @tab The given email string contains non-ASCII characters before '@'.
+@item -415 @tab GNUTLS_@-E_@-INVALID_@-PASSWORD_@-STRING @tab The given password contains invalid characters.
+@end multitable

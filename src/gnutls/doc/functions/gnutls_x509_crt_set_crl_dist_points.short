@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_set_crl_dist_points} (gnutls_x509_crt_t @var{crt}, gnutls_x509_subject_alt_name_t @var{type}, const void * @var{data_string}, unsigned int @var{reason_flags})

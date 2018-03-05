@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_sign_get_oid} (gnutls_sign_algorithm_t @var{sign})
+@var{sign}: is a sign algorithm
+
+Convert a @code{gnutls_sign_algorithm_t}  value to its object identifier.
+
+@strong{Returns:} a string that contains the object identifier of the specified sign
+algorithm, or @code{NULL} .
+
+@strong{Since:} 3.4.3
+@end deftypefun

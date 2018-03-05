@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_import_tpm_raw} (gnutls_privkey_t @var{pkey}, const gnutls_datum_t * @var{fdata}, gnutls_tpmkey_fmt_t @var{format}, const char * @var{srk_password}, const char * @var{key_password}, unsigned int @var{flags})

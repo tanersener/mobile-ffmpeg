@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_import} (gnutls_x509_crt_t @var{cert}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format})
+@var{cert}: The data to store the parsed certificate.
+
+@var{data}: The DER or PEM encoded certificate.
+
+@var{format}: One of DER or PEM
+
+This function will convert the given DER or PEM encoded Certificate
+to the native gnutls_x509_crt_t format. The output will be stored
+in  @code{cert} .
+
+If the Certificate is PEM encoded it should have a header of "X509
+CERTIFICATE", or "CERTIFICATE".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

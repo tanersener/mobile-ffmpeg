@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_import_pkcs11} (gnutls_x509_crt_t @var{crt}, gnutls_pkcs11_obj_t @var{pkcs11_crt})
+@var{crt}: A certificate of type @code{gnutls_x509_crt_t} 
+
+@var{pkcs11_crt}: A PKCS 11 object that contains a certificate
+
+This function will import a PKCS 11 certificate to a @code{gnutls_x509_crt_t} 
+structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

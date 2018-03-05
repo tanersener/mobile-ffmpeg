@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_verify_stored_pubkey} (const char * @var{db_name}, gnutls_tdb_t @var{tdb}, const char * @var{host}, const char * @var{service}, gnutls_certificate_type_t @var{cert_type}, const gnutls_datum_t * @var{cert}, unsigned int @var{flags})

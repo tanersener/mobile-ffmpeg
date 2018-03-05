@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {dane_query_data} (dane_query_t @var{q}, unsigned int @var{idx}, unsigned int * @var{usage}, unsigned int * @var{type}, unsigned int * @var{match}, gnutls_datum_t * @var{data})
+@var{q}: The query result structure
+
+@var{idx}: The index of the query response.
+
+@var{usage}: The certificate usage (see @code{dane_cert_usage_t} )
+
+@var{type}: The certificate type (see @code{dane_cert_type_t} )
+
+@var{match}: The DANE matching type (see @code{dane_match_type_t} )
+
+@var{data}: The DANE data.
+
+This function will provide the DANE data from the query
+response.
+
+@strong{Returns:} On success, @code{DANE_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

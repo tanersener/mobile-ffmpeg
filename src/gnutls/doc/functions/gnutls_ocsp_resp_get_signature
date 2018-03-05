@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_get_signature} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{sig})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+@var{sig}: newly allocated output buffer with signature data
+
+This function will extract the signature field of a OCSP response.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

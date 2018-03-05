@@ -1,0 +1,33 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_name_constraints} (gnutls_x509_crt_t @var{crt}, gnutls_x509_name_constraints_t @var{nc}, unsigned int @var{flags}, unsigned int * @var{critical})
+@var{crt}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{nc}: The nameconstraints intermediate type
+
+@var{flags}: zero or @code{GNUTLS_EXT_FLAG_APPEND} 
+
+@var{critical}: the extension status
+
+This function will return an intermediate type containing
+the name constraints of the provided CA certificate. That
+structure can be used in combination with @code{gnutls_x509_name_constraints_check()} 
+to verify whether a server's name is in accordance with the constraints.
+
+When the  @code{flags} is set to @code{GNUTLS_EXT_FLAG_APPEND} ,
+then if the  @code{nc} structure is empty this function will behave
+identically as if the flag was not set.
+Otherwise if there are elements in the  @code{nc} structure then the
+constraints will be merged with the existing constraints following
+RFC5280 p6.1.4 (excluded constraints will be appended, permitted
+will be intersected).
+
+Note that  @code{nc} must be initialized prior to calling this function.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+if the extension is not present, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

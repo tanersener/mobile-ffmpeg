@@ -1,0 +1,37 @@
+
+
+@c gnutls_kx_algorithm_t
+@table @code
+@item GNUTLS_@-KX_@-UNKNOWN
+Unknown key-exchange algorithm.
+@item GNUTLS_@-KX_@-RSA
+RSA key-exchange algorithm.
+@item GNUTLS_@-KX_@-DHE_@-DSS
+DHE-DSS key-exchange algorithm.
+@item GNUTLS_@-KX_@-DHE_@-RSA
+DHE-RSA key-exchange algorithm.
+@item GNUTLS_@-KX_@-ANON_@-DH
+Anon-DH key-exchange algorithm.
+@item GNUTLS_@-KX_@-SRP
+SRP key-exchange algorithm.
+@item GNUTLS_@-KX_@-RSA_@-EXPORT
+RSA-EXPORT key-exchange algorithm (defunc).
+@item GNUTLS_@-KX_@-SRP_@-RSA
+SRP-RSA key-exchange algorithm.
+@item GNUTLS_@-KX_@-SRP_@-DSS
+SRP-DSS key-exchange algorithm.
+@item GNUTLS_@-KX_@-PSK
+PSK key-exchange algorithm.
+@item GNUTLS_@-KX_@-DHE_@-PSK
+DHE-PSK key-exchange algorithm.
+@item GNUTLS_@-KX_@-ANON_@-ECDH
+Anon-ECDH key-exchange algorithm.
+@item GNUTLS_@-KX_@-ECDHE_@-RSA
+ECDHE-RSA key-exchange algorithm.
+@item GNUTLS_@-KX_@-ECDHE_@-ECDSA
+ECDHE-ECDSA key-exchange algorithm.
+@item GNUTLS_@-KX_@-ECDHE_@-PSK
+ECDHE-PSK key-exchange algorithm.
+@item GNUTLS_@-KX_@-RSA_@-PSK
+RSA-PSK key-exchange algorithm.
+@end table

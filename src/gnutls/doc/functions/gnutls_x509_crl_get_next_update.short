@@ -1,0 +1,1 @@
+@item @var{time_t} @ref{gnutls_x509_crl_get_next_update} (gnutls_x509_crl_t @var{crl})

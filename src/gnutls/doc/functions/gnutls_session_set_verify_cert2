@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {void} {gnutls_session_set_verify_cert2} (gnutls_session_t @var{session}, gnutls_typed_vdata_st * @var{data}, unsigned @var{elements}, unsigned @var{flags})
+@var{session}: is a gnutls session
+
+@var{data}: an array of typed data
+
+@var{elements}: the number of data elements
+
+@var{flags}: flags for certificate verification -- @code{gnutls_certificate_verify_flags} 
+
+This function instructs GnuTLS to verify the peer's certificate
+using the provided typed data information. If the verification fails the handshake
+will also fail with @code{GNUTLS_E_CERTIFICATE_VERIFICATION_ERROR} . In that
+case the verification result can be obtained using @code{gnutls_session_get_verify_cert_status()} .
+
+The acceptable typed data are the same as in @code{gnutls_certificate_verify_peers()} ,
+and once set must remain valid for the lifetime of the session. More precisely
+they should be available during any subsequent handshakes.
+
+If  @code{flags} is provided which contain a profile, this function should be
+called after any session priority setting functions.
+
+@strong{Since:} 3.4.6
+@end deftypefun

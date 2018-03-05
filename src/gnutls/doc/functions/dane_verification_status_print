@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {dane_verification_status_print} (unsigned int @var{status}, gnutls_datum_t * @var{out}, unsigned int @var{flags})
+@var{status}: The status flags to be printed
+
+@var{out}: Newly allocated datum with (0) terminated string.
+
+@var{flags}: should be zero
+
+This function will pretty print the status of a verification
+process -- eg. the one obtained by @code{dane_verify_crt()} .
+
+The output  @code{out} needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

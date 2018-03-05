@@ -1,0 +1,7 @@
+
+
+@c gnutls_channel_binding_t
+@table @code
+@item GNUTLS_@-CB_@-TLS_@-UNIQUE
+"tls-unique" (RFC 5929) channel binding
+@end table

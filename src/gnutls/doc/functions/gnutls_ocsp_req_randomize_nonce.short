@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_req_randomize_nonce} (gnutls_ocsp_req_t @var{req})

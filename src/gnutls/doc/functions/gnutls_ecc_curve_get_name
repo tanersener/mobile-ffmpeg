@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_ecc_curve_get_name} (gnutls_ecc_curve_t @var{curve})
+@var{curve}: is an ECC curve
+
+Convert a @code{gnutls_ecc_curve_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified
+curve or @code{NULL} .
+
+@strong{Since:} 3.0
+@end deftypefun

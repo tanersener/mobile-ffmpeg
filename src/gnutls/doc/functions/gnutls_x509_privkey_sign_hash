@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_sign_hash} (gnutls_x509_privkey_t @var{key}, const gnutls_datum_t * @var{hash}, gnutls_datum_t * @var{signature})
+@var{key}: a key
+
+@var{hash}: holds the data to be signed
+
+@var{signature}: will contain newly allocated signature
+
+This function will sign the given hash using the private key. Do not
+use this function directly unless you know what it is. Typical signing
+requires the data to be hashed and stored in special formats 
+(e.g. BER Digest-Info for RSA).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+Deprecated in: 2.12.0
+@end deftypefun

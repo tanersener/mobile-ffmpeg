@@ -1,0 +1,11 @@
+
+
+@c gnutls_params_type_t
+@table @code
+@item GNUTLS_@-PARAMS_@-RSA_@-EXPORT
+Session RSA-EXPORT parameters (defunc).
+@item GNUTLS_@-PARAMS_@-DH
+Session Diffie-Hellman parameters.
+@item GNUTLS_@-PARAMS_@-ECDH
+Session Elliptic-Curve Diffie-Hellman parameters.
+@end table

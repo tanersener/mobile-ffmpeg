@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_import} (gnutls_x509_crl_t @var{crl}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format})
+@var{crl}: The data to store the parsed CRL.
+
+@var{data}: The DER or PEM encoded CRL.
+
+@var{format}: One of DER or PEM
+
+This function will convert the given DER or PEM encoded CRL
+to the native @code{gnutls_x509_crl_t}  format. The output will be stored in 'crl'.
+
+If the CRL is PEM encoded it should have a header of "X509 CRL".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

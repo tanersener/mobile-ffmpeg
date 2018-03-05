@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_aia} (const gnutls_datum_t * @var{ext}, gnutls_x509_aia_t @var{aia}, unsigned int @var{flags})
+@var{ext}: The DER-encoded extension data
+
+@var{aia}: The authority info access
+
+@var{flags}: should be zero
+
+This function extracts the Authority Information Access (AIA)
+extension from the provided DER-encoded data; see RFC 5280 section 4.2.2.1 
+for more information on the extension.  The
+AIA extension holds a sequence of AccessDescription (AD) data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

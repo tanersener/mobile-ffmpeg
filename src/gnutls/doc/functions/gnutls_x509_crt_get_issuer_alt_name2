@@ -1,0 +1,34 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_issuer_alt_name2} (gnutls_x509_crt_t @var{cert}, unsigned int @var{seq}, void * @var{ian}, size_t * @var{ian_size}, unsigned int * @var{ian_type}, unsigned int * @var{critical})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{seq}: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+
+@var{ian}: is the place where the alternative name will be copied to
+
+@var{ian_size}: holds the size of ret.
+
+@var{ian_type}: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
+
+@var{critical}: will be non-zero if the extension is marked as critical (may be null)
+
+This function will return the alternative names, contained in the
+given certificate. It is the same as
+@code{gnutls_x509_crt_get_issuer_alt_name()}  except for the fact that it
+will return the type of the alternative name in  @code{ian_type} even if
+the function fails for some reason (i.e.  the buffer provided is
+not enough).
+
+@strong{Returns:} the alternative issuer name type on success, one of the
+enumerated @code{gnutls_x509_subject_alt_name_t} .  It will return
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if  @code{ian_size} is not large enough
+to hold the value.  In that case  @code{ian_size} will be updated with
+the required size.  If the certificate does not have an
+Alternative name with the specified sequence number then
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned.
+
+@strong{Since:} 2.10.0
+@end deftypefun

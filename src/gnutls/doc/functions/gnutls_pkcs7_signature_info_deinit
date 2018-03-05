@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {void} {gnutls_pkcs7_signature_info_deinit} (gnutls_pkcs7_signature_info_st * @var{info})
+@var{info}: should point to a @code{gnutls_pkcs7_signature_info_st}  structure
+
+This function will deinitialize any allocated value in the
+provided @code{gnutls_pkcs7_signature_info_st} .
+
+@strong{Since:} 3.4.2
+@end deftypefun

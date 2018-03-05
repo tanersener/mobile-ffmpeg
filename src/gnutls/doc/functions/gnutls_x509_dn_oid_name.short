@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_x509_dn_oid_name} (const char * @var{oid}, unsigned int @var{flags})

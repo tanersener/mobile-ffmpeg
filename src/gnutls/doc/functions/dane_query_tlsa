@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {dane_query_tlsa} (dane_state_t @var{s}, dane_query_t * @var{r}, const char * @var{host}, const char * @var{proto}, unsigned int @var{port})
+@var{s}: The DANE state structure
+
+@var{r}: A structure to place the result
+
+@var{host}: The host name to resolve.
+
+@var{proto}: The protocol type (tcp, udp, etc.)
+
+@var{port}: The service port number (eg. 443).
+
+This function will query the DNS server for the TLSA (DANE)
+data for the given host.
+
+@strong{Returns:} On success, @code{DANE_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

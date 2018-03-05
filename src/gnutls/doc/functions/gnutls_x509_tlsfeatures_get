@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_tlsfeatures_get} (gnutls_x509_tlsfeatures_t @var{f}, unsigned @var{idx}, unsigned int * @var{feature})
+@var{f}: The TLS features
+
+@var{idx}: The index of the feature to get
+
+@var{feature}: If the function succeeds, the feature will be stored in this variable
+
+This function will get a feature from the X.509 TLS features
+extension structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error value.
+
+@strong{Since:} 3.5.1
+@end deftypefun

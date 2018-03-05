@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_export2} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_fmt_t @var{format}, gnutls_datum_t * @var{out})
+@var{crl}: Holds the revocation list
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{out}: will contain a private key PEM or DER encoded
+
+This function will export the revocation list to DER or PEM format.
+
+The output buffer is allocated using @code{gnutls_malloc()} .
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN X509 CRL".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+Since 3.1.3
+@end deftypefun

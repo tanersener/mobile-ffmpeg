@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_private_key_usage_period} (gnutls_x509_crq_t @var{crq}, time_t @var{activation}, time_t @var{expiration})
+@var{crq}: a certificate of type @code{gnutls_x509_crq_t} 
+
+@var{activation}: The activation time
+
+@var{expiration}: The expiration time
+
+This function will set the private key usage period extension (2.5.29.16).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

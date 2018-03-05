@@ -1,0 +1,1004 @@
+AutoGen Definitions options;
+prog-name     = certtool;
+prog-title    = "GnuTLS certificate tool";
+prog-desc     = "Manipulate certificates and private keys.";
+detail    = "Tool to parse and generate X.509 certificates, requests and private keys.
+It can be used interactively or non interactively by
+specifying the template command line option.
+
+The tool accepts files or URLs supported by GnuTLS. In case PIN is required for the URL
+access you can provide it using the environment variables GNUTLS_PIN and GNUTLS_SO_PIN.
+";
+short-usage   = "certtool [options]\ncerttool --help for usage instructions.\n";
+explain       = "";
+
+#define  INFILE_OPT    1
+#define  OUTFILE_OPT   1
+#define  VERBOSE_OPT 1
+#include args-std.def
+
+flag = {
+    name      = generate-self-signed;
+    value     = s;
+    descrip   = "Generate a self-signed certificate";
+    doc = "";
+};
+
+flag = {
+    name      = generate-certificate;
+    value     = c;
+    descrip   = "Generate a signed certificate";
+    doc = "";
+};
+
+flag = {
+    name      = generate-proxy;
+    descrip   = "Generates a proxy certificate";
+    doc = "";
+};
+
+flag = {
+    name      = generate-crl;
+    descrip   = "Generate a CRL";
+    doc = "This option generates a CRL. When combined with --load-crl it would use the loaded CRL as base for the generated (i.e., all revoked certificates in the base will be copied to the new CRL).";
+};
+
+flag = {
+    name      = update-certificate;
+    value     = u;
+    descrip   = "Update a signed certificate";
+    doc = "";
+};
+
+flag = {
+    name      = generate-privkey;
+    value     = p;
+    descrip   = "Generate a private key";
+    doc = "";
+};
+
+flag = {
+    name      = provable;
+    descrip   = "Generate a private key or parameters from a seed using a provable method";
+    doc = "This will use the FIPS-186-4 algorithms (i.e., Shawe-Taylor) for provable key generation.
+When specified the private keys or parameters will be generated from a seed, and can be
+later validated with --verify-provable-privkey to be correctly generated from the seed. You may
+specify --seed or allow GnuTLS to generate one (recommended). This option can be combined with
+--generate-privkey or --generate-dh-params.
+
+That option applies to RSA and DSA keys. On the DSA keys the PQG parameters
+are generated using the seed, and on RSA the two primes.";
+};
+
+flag = {
+    name      = verify-provable-privkey;
+    descrip   = "Verify a private key generated from a seed using a provable method";
+    doc = "This will use the FIPS-186-4 algorithms for provable key generation. You may specify --seed or use the seed stored in the private key structure.";
+};
+
+flag = {
+    name      = seed;
+    descrip   = "When generating a private key use the given hex-encoded seed";
+    arg-type  = string;
+    doc = "";
+};
+
+flag = {
+    name      = generate-request;
+    value     = q;
+    descrip   = "Generate a PKCS #10 certificate request";
+    flags_cant = infile;
+    doc = "Will generate a PKCS #10 certificate request. To specify a private key use --load-privkey.";
+};
+
+flag = {
+    name      = verify-chain;
+    value     = e;
+    descrip   = "Verify a PEM encoded certificate chain";
+    doc = "The last certificate in the chain must be a self signed one. It can be combined with --verify-purpose or --verify-hostname.";
+};
+
+flag = {
+    name      = verify;
+    descrip   = "Verify a PEM encoded certificate chain using a trusted list";
+    doc = "The trusted certificate list can be loaded with --load-ca-certificate. If no
+certificate list is provided, then the system's certificate list is used. Note that
+during verification multiple paths may be explored. On a successful verification
+the successful path will be the last one. It can be combined with --verify-purpose or --verify-hostname.";
+};
+
+flag = {
+    name      = verify-crl;
+    descrip   = "Verify a CRL using a trusted list";
+    doc = "The trusted certificate list must be loaded with --load-ca-certificate.";
+    flags-must = load-ca-certificate;
+};
+
+flag = {
+    name      = verify-hostname;
+    descrip   = "Specify a hostname to be used for certificate chain verification";
+    arg-type  = string;
+    doc = "This is to be combined with one of the verify certificate options.";
+};
+
+flag = {
+    name      = verify-email;
+    descrip   = "Specify a email to be used for certificate chain verification";
+    arg-type  = string;
+    doc = "This is to be combined with one of the verify certificate options.";
+    flags-cant = verify-hostname;
+};
+
+flag = {
+    name      = verify-purpose;
+    descrip   = "Specify a purpose OID to be used for certificate chain verification";
+    arg-type  = string;
+    doc = "This object identifier restricts the purpose of the certificates to be verified. Example purposes are 1.3.6.1.5.5.7.3.1 (TLS WWW), 1.3.6.1.5.5.7.3.4 (EMAIL) etc. Note that a CA certificate without a purpose set (extended key usage) is valid for any purpose.";
+};
+
+flag = {
+    name      = verify-allow-broken;
+    descrip   = "Allow broken algorithms, such as MD5 for verification";
+    doc = "This can be combined with --p7-verify, --verify or --verify-chain.";
+};
+
+flag = {
+    name      = generate-dh-params;
+    descrip   = "Generate PKCS #3 encoded Diffie-Hellman parameters";
+    doc = "The will generate random parameters to be used with
+Diffie-Hellman key exchange. The output parameters will be in PKCS #3
+format. Note that it is recommended to use the --get-dh-params option
+instead.";
+};
+
+flag = {
+    name      = get-dh-params;
+    descrip   = "Get the included PKCS #3 encoded Diffie-Hellman parameters";
+    doc = "Returns stored DH parameters in GnuTLS. Those parameters returned
+are defined in RFC7919, and can be considered standard parameters for a TLS
+key exchange.";
+};
+
+flag = {
+    name      = dh-info;
+    descrip   = "Print information PKCS #3 encoded Diffie-Hellman parameters";
+    doc = "";
+};
+
+flag = {
+    name      = load-privkey;
+    descrip   = "Loads a private key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-pubkey;
+    descrip   = "Loads a public key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-request;
+    descrip   = "Loads a certificate request file";
+    arg-type  = string;
+    doc = "This option can be used with a file";
+};
+
+flag = {
+    name      = load-certificate;
+    descrip   = "Loads a certificate file";
+    arg-type  = string;
+    doc = "This option can be used with a file";
+};
+
+flag = {
+    name      = load-ca-privkey;
+    descrip   = "Loads the certificate authority's private key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-ca-certificate;
+    descrip   = "Loads the certificate authority's certificate file";
+    arg-type  = string;
+    doc = "This option can be used with a file";
+};
+
+flag = {
+    name      = load-crl;
+    descrip   = "Loads the provided CRL";
+    arg-type  = string;
+    doc = "This option can be used with a file";
+};
+
+flag = {
+    name      = load-data;
+    descrip   = "Loads auxiliary data";
+    arg-type  = string;
+    doc = "This option can be used with a file";
+};
+
+flag = {
+    name      = password;
+    arg-type  = string;
+    descrip   = "Password to use";
+    doc   = "You can use this option to specify the password in the command line instead of reading it from the tty. Note, that the command line arguments are available for view in others in the system. Specifying password as '' is the same as specifying no password.";
+};
+
+flag = {
+    name      = null-password;
+    descrip   = "Enforce a NULL password";
+    doc   = "This option enforces a NULL password. This is different than the empty or no password in schemas like PKCS #8.";
+};
+
+flag = {
+    name      = empty-password;
+    descrip   = "Enforce an empty password";
+    doc   = "This option enforces an empty password. This is different than the NULL or no password in schemas like PKCS #8.";
+};
+
+
+flag = {
+    name      = hex-numbers;
+    descrip   = "Print big number in an easier format to parse";
+    doc   = "";
+};
+
+flag = {
+    name      = cprint;
+    descrip   = "In certain operations it prints the information in C-friendly format";
+    doc   = "In certain operations it prints the information in C-friendly format, suitable for including into C programs.";
+};
+
+flag = {
+    name      = certificate-info;
+    value     = i;
+    descrip   = "Print information on the given certificate";
+    doc       = "";
+};
+
+flag = {
+    name      = fingerprint;
+    descrip   = "Print the fingerprint of the given certificate";
+    doc       = "This is a simple hash of the DER encoding of the certificate. It can be combined with the --hash parameter. However, it is recommended for identification to use the key-id which depends only on the certificate's key.";
+};
+
+flag = {
+    name      = key-id;
+    descrip   = "Print the key ID of the given certificate";
+    doc       = "This is a hash of the public key of the given certificate. It identifies the key uniquely, remains the same on a certificate renewal and depends only on signed fields of the certificate.";
+};
+
+flag = {
+    name      = certificate-pubkey;
+    descrip   = "Print certificate's public key";
+    doc       = "";
+};
+
+flag = {
+    name      = pgp-certificate-info;
+    descrip   = "Print information on the given OpenPGP certificate";
+    doc       = "";
+};
+
+flag = {
+    name      = pgp-ring-info;
+    descrip   = "Print information on the given OpenPGP keyring structure";
+    doc       = "";
+};
+
+flag = {
+    name      = crl-info;
+    value     = l;
+    descrip   = "Print information on the given CRL structure";
+    doc       = "";
+};
+
+flag = {
+    name      = crq-info;
+    descrip   = "Print information on the given certificate request";
+    doc       = "";
+};
+
+
+flag = {
+    name      = no-crq-extensions;
+    descrip   = "Do not use extensions in certificate requests";
+    doc       = "";
+};
+
+flag = {
+    name      = p12-info;
+    descrip   = "Print information on a PKCS #12 structure";
+    doc       = "This option will dump the contents and print the metadata of the provided PKCS #12 structure.";
+};
+
+flag = {
+    name      = p12-name;
+    arg-type  = string;
+    descrip   = "The PKCS #12 friendly name to use";
+    doc = "The name to be used for the primary certificate and private key in a PKCS #12 file.";
+};
+
+flag = {
+    name      = p7-generate;
+    descrip   = "Generate a PKCS #7 structure";
+    doc       = "This option generates a PKCS #7 certificate container structure. To add certificates in the structure use --load-certificate and --load-crl.";
+};
+
+flag = {
+    name      = p7-sign;
+    descrip   = "Signs using a PKCS #7 structure";
+    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The data are stored within the structure. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure.";
+};
+
+
+flag = {
+    name      = p7-detached-sign;
+    descrip   = "Signs using a detached PKCS #7 structure";
+    doc       = "This option generates a PKCS #7 structure containing a signature for the provided data from infile. The signer certificate has to be specified using --load-certificate and --load-privkey. The input to --load-certificate can be a list of certificates. In case of a list, the first certificate is used for signing and the other certificates are included in the structure.";
+};
+
+flag = {
+    name      = p7-include-cert;
+    disable   = "no";
+    enabled;
+    descrip   = "The signer's certificate will be included in the cert list.";
+    doc       = "This options works with --p7-sign or --p7-detached-sign and will include or exclude the signer's certificate into the generated signature.";
+};
+
+flag = {
+    name      = p7-time;
+    disable   = "no";
+    disabled;
+    descrip   = "Will include a timestamp in the PKCS #7 structure";
+    doc       = "This option will include a timestamp in the generated signature";
+};
+
+flag = {
+    name      = p7-show-data;
+    disable   = "no";
+    disabled;
+    descrip   = "Will show the embedded data in the PKCS #7 structure";
+    doc       = "This option can be combined with --p7-verify or --p7-info and will display the embedded signed data in the PKCS #7 structure.";
+};
+
+flag = {
+    name      = p7-info;
+    descrip   = "Print information on a PKCS #7 structure";
+    doc       = "";
+};
+
+flag = {
+    name      = p7-verify;
+    descrip   = "Verify the provided PKCS #7 structure";
+    doc       = "This option verifies the signed PKCS #7 structure. The certificate list to use for verification can be specified with --load-ca-certificate. When no certificate list is provided, then the system's certificate list is used. Alternatively a direct signer can be provided using --load-certificate. A key purpose can be enforced with the --verify-purpose option, and the --load-data option will utilize detached data.";
+};
+
+flag = {
+    name      = p8-info;
+    descrip   = "Print information on a PKCS #8 structure";
+    doc       = "This option will print information about encrypted PKCS #8 structures. That option does not require the decryption of the structure.";
+};
+
+flag = {
+    name      = smime-to-p7;
+    descrip   = "Convert S/MIME to PKCS #7 structure";
+    doc       = "";
+};
+
+flag = {
+    name      = key-info;
+    value     = k;
+    descrip   = "Print information on a private key";
+    doc = "";
+};
+
+flag = {
+    name      = pgp-key-info;
+    descrip   = "Print information on an OpenPGP private key";
+    doc = "";
+};
+
+flag = {
+    name      = pubkey-info;
+    descrip   = "Print information on a public key";
+    doc = "The option combined with --load-request, --load-pubkey, --load-privkey and --load-certificate will extract the public key of the object in question.";
+};
+
+flag = {
+    name      = v1;
+    descrip   = "Generate an X.509 version 1 certificate (with no extensions)";
+    doc = "";
+};
+
+flag = {
+    name      = to-p12;
+    descrip   = "Generate a PKCS #12 structure";
+    doc = "It requires a certificate, a private key and possibly a CA certificate to be specified.";
+};
+
+flag = {
+    name      = to-p8;
+    descrip   = "Generate a PKCS #8 structure";
+    doc = "";
+};
+
+flag = {
+    name      = pkcs8;
+    value     = 8;
+    descrip   = "Use PKCS #8 format for private keys";
+    doc = "";
+};
+
+flag = {
+    name      = rsa;
+    descrip   = "Generate RSA key";
+    doc = "When combined with --generate-privkey generates an RSA private key.";
+};
+
+flag = {
+    name      = dsa;
+    descrip   = "Generate DSA key";
+    doc = "When combined with --generate-privkey generates a DSA private key.";
+};
+
+flag = {
+    name      = ecc;
+    descrip   = "Generate ECC (ECDSA) key";
+    doc = "When combined with --generate-privkey generates an elliptic curve private key to be used with ECDSA.";
+};
+
+flag = {
+    name      = ecdsa;
+    aliases   = ecc;
+};
+
+flag = {
+    name      = hash;
+    arg-type  = string;
+    descrip   = "Hash algorithm to use for signing";
+    doc = "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512, SHA3-224, SHA3-256, SHA3-384, SHA3-512.";
+};
+
+flag = {
+    name      = inder;
+    descrip   = "Use DER format for input certificates, private keys, and DH parameters ";
+    disabled;
+    disable   = "no";
+    doc       = "The input files will be assumed to be in DER or RAW format. 
+Unlike options that in PEM input would allow multiple input data (e.g. multiple 
+certificates), when reading in DER format a single data structure is read.";
+};
+
+flag = {
+    name      = inraw;
+    aliases   = inder;
+};
+
+flag = {
+    name      = outder;
+    descrip   = "Use DER format for output certificates, private keys, and DH parameters";
+    disabled;
+    disable   = "no";
+    doc       = "The output will be in DER or RAW format.";
+};
+
+flag = {
+    name      = outraw;
+    aliases   = outder;
+};
+
+flag = {
+    name      = bits;
+    arg-type  = number;
+    descrip   = "Specify the number of bits for key generate";
+    doc      = "";
+};
+
+flag = {
+    name      = curve;
+    arg-type  = string;
+    descrip   = "Specify the curve used for EC key generation";
+    doc      = "Supported values are secp192r1, secp224r1, secp256r1, secp384r1 and secp521r1.";
+};
+
+flag = {
+    name      = sec-param;
+    arg-type  = string;
+    arg-name  = "Security parameter";
+    descrip   = "Specify the security level [low, legacy, medium, high, ultra]";
+    doc      = "This is alternative to the bits option.";
+};
+
+flag = {
+    name      = disable-quick-random;
+    descrip   = "No effect";
+    doc      = "";
+};
+
+flag = {
+    name      = template;
+    arg-type  = string;
+    descrip   = "Template file to use for non-interactive operation";
+    doc   = "";
+};
+
+flag = {
+    name      = stdout-info;
+    descrip   = "Print information to stdout instead of stderr";
+    doc = "";
+};
+
+flag = {
+    name      = ask-pass;
+    disabled;
+    descrip   = "Enable interaction for entering password when in batch mode.";
+    doc   = "This option will enable interaction to enter password when in batch mode. That is useful when the template option has been specified.";
+};
+
+flag = {
+    name      = pkcs-cipher;
+    arg-type  = string;
+    arg-name  = "Cipher";
+    descrip   = "Cipher to use for PKCS #8 and #12 operations";
+    doc   = "Cipher may be one of 3des, 3des-pkcs12, aes-128, aes-192, aes-256, rc2-40, arcfour.";
+};
+
+flag = {
+    name      = provider;
+    arg-type  = string;
+    descrip   = "Specify the PKCS #11 provider library";
+    doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
+};
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+    p11tool (1)
+_EOT_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+@subheading Generating private keys
+To create an RSA private key, run:
+@example
+$ certtool --generate-privkey --outfile key.pem --rsa
+@end example
+
+To create a DSA or elliptic curves (ECDSA) private key use the
+above command combined with 'dsa' or 'ecc' options.
+
+@subheading Generating certificate requests
+To create a certificate request (needed when the certificate is  issued  by
+another party), run:
+@example
+certtool --generate-request --load-privkey key.pem \
+   --outfile request.pem
+@end example
+
+If the private key is stored in a smart card you can generate
+a request by specifying the private key object URL.
+@example
+$ ./certtool --generate-request --load-privkey "pkcs11:..." \
+  --load-pubkey "pkcs11:..." --outfile request.pem
+@end example
+
+
+@subheading Generating a self-signed certificate
+To create a self signed certificate, use the command:
+@example
+$ certtool --generate-privkey --outfile ca-key.pem
+$ certtool --generate-self-signed --load-privkey ca-key.pem \
+   --outfile ca-cert.pem
+@end example
+
+Note that a self-signed certificate usually belongs to a certificate
+authority, that signs other certificates.
+
+@subheading Generating a certificate
+To generate a certificate using the previous request, use the command:
+@example
+$ certtool --generate-certificate --load-request request.pem \
+   --outfile cert.pem --load-ca-certificate ca-cert.pem \
+   --load-ca-privkey ca-key.pem
+@end example
+
+To generate a certificate using the private key only, use the command:
+@example
+$ certtool --generate-certificate --load-privkey key.pem \
+   --outfile cert.pem --load-ca-certificate ca-cert.pem \
+   --load-ca-privkey ca-key.pem
+@end example
+
+@subheading Certificate information
+To view the certificate information, use:
+@example
+$ certtool --certificate-info --infile cert.pem
+@end example
+
+@subheading PKCS #12 structure generation
+To generate a PKCS #12 structure using the previous key and certificate,
+use the command:
+@example
+$ certtool --load-certificate cert.pem --load-privkey key.pem \
+   --to-p12 --outder --outfile key.p12
+@end example
+
+Some tools (reportedly web browsers) have problems with that file
+because it does not contain the CA certificate for the certificate.
+To work around that problem in the tool, you can use the
+--load-ca-certificate parameter as follows:
+
+@example
+$ certtool --load-ca-certificate ca.pem \
+  --load-certificate cert.pem --load-privkey key.pem \
+  --to-p12 --outder --outfile key.p12
+@end example
+
+@subheading Diffie-Hellman parameter generation
+To generate parameters for Diffie-Hellman key exchange, use the command:
+@example
+$ certtool --generate-dh-params --outfile dh.pem --sec-param medium
+@end example
+
+@subheading Proxy certificate generation
+Proxy certificate can be used to delegate your credential to a
+temporary, typically short-lived, certificate.  To create one from the
+previously created certificate, first create a temporary key and then
+generate a proxy certificate for it, using the commands:
+
+@example
+$ certtool --generate-privkey > proxy-key.pem
+$ certtool --generate-proxy --load-ca-privkey key.pem \
+  --load-privkey proxy-key.pem --load-certificate cert.pem \
+  --outfile proxy-cert.pem
+@end example
+
+@subheading Certificate revocation list generation
+To create an empty Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem \
+           --load-ca-certificate x509-ca.pem
+@end example
+
+To create a CRL that contains some revoked certificates, place the
+certificates in a file and use @code{--load-certificate} as follows:
+
+@example
+$ certtool --generate-crl --load-ca-privkey x509-ca-key.pem \
+  --load-ca-certificate x509-ca.pem --load-certificate revoked-certs.pem
+@end example
+
+To verify a Certificate Revocation List (CRL) do:
+
+@example
+$ certtool --verify-crl --load-ca-certificate x509-ca.pem < crl.pem
+@end example
+_EOT_;
+};
+
+
+doc-section = {
+  ds-type = 'FILES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+@subheading Certtool's template file format
+A template file can be used to avoid the interactive questions of
+certtool. Initially create a file named 'cert.cfg' that contains the information
+about the certificate. The template can be used as below:
+
+@example
+$ certtool --generate-certificate --load-privkey key.pem  \
+   --template cert.cfg --outfile cert.pem \
+   --load-ca-certificate ca-cert.pem --load-ca-privkey ca-key.pem
+@end example
+
+An example certtool template file that can be used to generate a certificate
+request or a self signed certificate follows.
+
+@example
+# X.509 Certificate options
+#
+# DN options
+
+# The organization of the subject.
+organization = "Koko inc."
+
+# The organizational unit of the subject.
+unit = "sleeping dept."
+
+# The locality of the subject.
+# locality =
+
+# The state of the certificate owner.
+state = "Attiki"
+
+# The country of the subject. Two letter code.
+country = GR
+
+# The common name of the certificate owner.
+cn = "Cindy Lauper"
+
+# A user id of the certificate owner.
+#uid = "clauper"
+
+# Set domain components
+#dc = "name"
+#dc = "domain"
+
+# If the supported DN OIDs are not adequate you can set
+# any OID here.
+# For example set the X.520 Title and the X.520 Pseudonym
+# by using OID and string pairs.
+#dn_oid = "2.5.4.12 Dr."
+#dn_oid = "2.5.4.65 jackal"
+
+# This is deprecated and should not be used in new
+# certificates.
+# pkcs9_email = "none@@none.org"
+
+# An alternative way to set the certificate's distinguished name directly
+# is with the "dn" option. The attribute names allowed are:
+# C (country), street, O (organization), OU (unit), title, CN (common name),
+# L (locality), ST (state), placeOfBirth, gender, countryOfCitizenship, 
+# countryOfResidence, serialNumber, telephoneNumber, surName, initials, 
+# generationQualifier, givenName, pseudonym, dnQualifier, postalCode, name, 
+# businessCategory, DC, UID, jurisdictionOfIncorporationLocalityName, 
+# jurisdictionOfIncorporationStateOrProvinceName,
+# jurisdictionOfIncorporationCountryName, XmppAddr, and numeric OIDs.
+
+#dn = "cn = Nikos,st = New\, Something,C=GR,surName=Mavrogiannopoulos,2.5.4.9=Arkadias"
+
+# The serial number of the certificate
+# Comment the field for a time-based serial number.
+serial = 007
+
+# In how many days, counting from today, this certificate will expire.
+# Use -1 if there is no expiration date.
+expiration_days = 700
+
+# Alternatively you may set concrete dates and time. The GNU date string 
+# formats are accepted. See:
+# http://www.gnu.org/software/tar/manual/html_node/Date-input-formats.html
+
+#activation_date = "2004-02-29 16:21:42"
+#expiration_date = "2025-02-29 16:24:41"
+
+# X.509 v3 extensions
+
+# A dnsname in case of a WWW server.
+#dns_name = "www.none.org"
+#dns_name = "www.morethanone.org"
+
+# An othername defined by an OID and a hex encoded string
+#other_name = "1.3.6.1.5.2.2 302ca00d1b0b56414e5245494e2e4f5247a11b3019a006020400000002a10f300d1b047269636b1b0561646d696e"
+#other_name_utf8 = "1.2.4.5.6 A UTF8 string"
+#other_name_octet = "1.2.4.5.6 A string that will be encoded as ASN.1 octet string"
+
+# Allows writing an XmppAddr Identifier
+#xmpp_name = juliet@@im.example.com
+
+# Names used in PKINIT
+#krb5_principal = user@@REALM.COM
+#krb5_principal = HTTP/user@@REALM.COM
+
+# A subject alternative name URI
+#uri = "http://www.example.com"
+
+# An IP address in case of a server.
+#ip_address = "192.168.1.1"
+
+# An email in case of a person
+email = "none@@none.org"
+
+# TLS feature (rfc7633) extension. That can is used to indicate mandatory TLS
+# extension features to be provided by the server. In practice this is used
+# to require the Status Request (extid: 5) extension from the server. That is,
+# to require the server holding this certificate to provide a stapled OCSP response.
+# You can have multiple lines for multiple TLS features.
+
+# To ask for OCSP status request use:
+#tls_feature = 5
+
+# Challenge password used in certificate requests
+challenge_password = 123456
+
+# Password when encrypting a private key
+#password = secret
+
+# An URL that has CRLs (certificate revocation lists)
+# available. Needed in CA certificates.
+#crl_dist_points = "http://www.getcrl.crl/getcrl/"
+
+# Whether this is a CA certificate or not
+#ca
+
+# Subject Unique ID (in hex)
+#subject_unique_id = 00153224
+
+# Issuer Unique ID (in hex)
+#issuer_unique_id = 00153225
+
+#### Key usage
+
+# The following key usage flags are used by CAs and end certificates
+
+# Whether this certificate will be used to sign data (needed
+# in TLS DHE ciphersuites). This is the digitalSignature flag
+# in RFC5280 terminology.
+signing_key
+
+# Whether this certificate will be used to encrypt data (needed
+# in TLS RSA ciphersuites). Note that it is preferred to use different
+# keys for encryption and signing. This is the keyEncipherment flag
+# in RFC5280 terminology.
+encryption_key
+
+# Whether this key will be used to sign other certificates. The
+# keyCertSign flag in RFC5280 terminology.
+#cert_signing_key
+
+# Whether this key will be used to sign CRLs. The
+# cRLSign flag in RFC5280 terminology.
+#crl_signing_key
+
+# The keyAgreement flag of RFC5280. It's purpose is loosely
+# defined. Not use it unless required by a protocol.
+#key_agreement
+
+# The dataEncipherment flag of RFC5280. It's purpose is loosely
+# defined. Not use it unless required by a protocol.
+#data_encipherment
+
+# The nonRepudiation flag of RFC5280. It's purpose is loosely
+# defined. Not use it unless required by a protocol.
+#non_repudiation
+
+#### Extended key usage (key purposes)
+
+# The following extensions are used in an end certificate
+# to clarify its purpose. Some CAs also use it to indicate
+# the types of certificates they are purposed to sign.
+
+
+# Whether this certificate will be used for a TLS client;
+# this sets the id-kp-serverAuth (1.3.6.1.5.5.7.3.1) of 
+# extended key usage.
+#tls_www_client
+
+# Whether this certificate will be used for a TLS server;
+# This sets the id-kp-clientAuth (1.3.6.1.5.5.7.3.2) of 
+# extended key usage.
+#tls_www_server
+
+# Whether this key will be used to sign code. This sets the
+# id-kp-codeSigning (1.3.6.1.5.5.7.3.3) of extended key usage
+# extension.
+#code_signing_key
+
+# Whether this key will be used to sign OCSP data. This sets the
+# id-kp-OCSPSigning (1.3.6.1.5.5.7.3.9) of extended key usage extension.
+#ocsp_signing_key
+
+# Whether this key will be used for time stamping. This sets the
+# id-kp-timeStamping (1.3.6.1.5.5.7.3.8) of extended key usage extension.
+#time_stamping_key
+
+# Whether this key will be used for email protection. This sets the
+# id-kp-emailProtection (1.3.6.1.5.5.7.3.4) of extended key usage extension.
+#email_protection_key
+
+# Whether this key will be used for IPsec IKE operations (1.3.6.1.5.5.7.3.17).
+#ipsec_ike_key
+
+## adding custom key purpose OIDs
+
+# for microsoft smart card logon
+# key_purpose_oid = 1.3.6.1.4.1.311.20.2.2
+
+# for email protection
+# key_purpose_oid = 1.3.6.1.5.5.7.3.4
+
+# for any purpose (must not be used in intermediate CA certificates)
+# key_purpose_oid = 2.5.29.37.0
+
+### end of key purpose OIDs
+
+### Adding arbitrary extensions
+# This requires to provide the extension OIDs, as well as the extension data in
+# hex format. The following two options are available since GnuTLS 3.5.3.
+#add_extension = "1.2.3.4 0x0AAB01ACFE"
+
+# As above but encode the data as an octet string
+#add_extension = "1.2.3.4 octet_string(0x0AAB01ACFE)"
+
+# For portability critical extensions shouldn't be set to certificates.
+#add_critical_extension = "5.6.7.8 0x1AAB01ACFE"
+
+# When generating a certificate from a certificate
+# request, then honor the extensions stored in the request
+# and store them in the real certificate.
+#honor_crq_extensions
+
+# Alternatively only specific extensions can be copied.
+#honor_crq_ext = 2.5.29.17
+#honor_crq_ext = 2.5.29.15
+
+# Path length contraint. Sets the maximum number of
+# certificates that can be used to certify this certificate.
+# (i.e. the certificate chain length)
+#path_len = -1
+#path_len = 2
+
+# OCSP URI
+# ocsp_uri = http://my.ocsp.server/ocsp
+
+# CA issuers URI
+# ca_issuers_uri = http://my.ca.issuer
+
+# Certificate policies
+#policy1 = 1.3.6.1.4.1.5484.1.10.99.1.0
+#policy1_txt = "This is a long policy to summarize"
+#policy1_url = http://www.example.com/a-policy-to-read
+
+#policy2 = 1.3.6.1.4.1.5484.1.10.99.1.1
+#policy2_txt = "This is a short policy"
+#policy2_url = http://www.example.com/another-policy-to-read
+
+# Name constraints
+
+# DNS
+#nc_permit_dns = example.com
+#nc_exclude_dns = test.example.com
+
+# EMAIL
+#nc_permit_email = "nmav@@ex.net"
+
+# Exclude subdomains of example.com
+#nc_exclude_email = .example.com
+
+# Exclude all e-mail addresses of example.com
+#nc_exclude_email = example.com
+
+# IP
+#nc_permit_ip = 192.168.0.0/16
+#nc_exclude_ip = 192.168.5.0/24
+#nc_permit_ip = fc0a:eef2:e7e7:a56e::/64
+
+
+# Options for proxy certificates
+#proxy_policy_language = 1.3.6.1.5.5.7.21.1
+
+
+# Options for generating a CRL
+
+# The number of days the next CRL update will be due.
+# next CRL update will be in 43 days
+#crl_next_update = 43
+
+# this is the 5th CRL by this CA
+# Comment the field for a time-based number.
+#crl_number = 5
+
+# Specify the update dates more precisely.
+#crl_this_update_date = "2004-02-29 16:21:42"
+#crl_next_update_date = "2025-02-29 16:24:41"
+
+# The date that the certificates will be made seen as
+# being revoked.
+#crl_revocation_date = "2025-02-29 16:24:41"
+
+@end example
+
+_EOT_;
+};
+

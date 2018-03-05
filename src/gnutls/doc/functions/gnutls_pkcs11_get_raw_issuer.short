@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_get_raw_issuer} (const char * @var{url}, gnutls_x509_crt_t @var{cert}, gnutls_datum_t * @var{issuer}, gnutls_x509_crt_fmt_t @var{fmt}, unsigned int @var{flags})

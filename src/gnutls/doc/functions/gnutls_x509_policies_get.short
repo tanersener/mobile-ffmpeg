@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_policies_get} (gnutls_x509_policies_t @var{policies}, unsigned int @var{seq}, struct gnutls_x509_policy_st * @var{policy})

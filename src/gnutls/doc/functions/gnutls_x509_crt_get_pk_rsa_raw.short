@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_pk_rsa_raw} (gnutls_x509_crt_t @var{crt}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e})

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_hmac_fast} (gnutls_mac_algorithm_t @var{algorithm}, const void * @var{key}, size_t @var{keylen}, const void * @var{ptext}, size_t @var{ptext_len}, void * @var{digest})

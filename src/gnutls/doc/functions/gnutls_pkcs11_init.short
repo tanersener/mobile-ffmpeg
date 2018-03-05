@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_init} (unsigned int @var{flags}, const char * @var{deprecated_config_file})

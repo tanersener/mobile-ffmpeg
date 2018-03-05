@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_tpm_key_list_get_url} (gnutls_tpm_key_list_t @var{list}, unsigned int @var{idx}, char ** @var{url}, unsigned int @var{flags})

@@ -1,0 +1,17 @@
+
+
+@c gnutls_pin_flag_t
+@table @code
+@item GNUTLS_@-PIN_@-USER
+The PIN for the user.
+@item GNUTLS_@-PIN_@-SO
+The PIN for the security officer (admin).
+@item GNUTLS_@-PIN_@-FINAL_@-TRY
+This is the final try before blocking.
+@item GNUTLS_@-PIN_@-COUNT_@-LOW
+Few tries remain before token blocks.
+@item GNUTLS_@-PIN_@-CONTEXT_@-SPECIFIC
+The PIN is for a specific action and key like signing.
+@item GNUTLS_@-PIN_@-WRONG
+Last given PIN was not correct.
+@end table

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_privkey_get_info} (gnutls_pkcs11_privkey_t @var{pkey}, gnutls_pkcs11_obj_info_t @var{itype}, void * @var{output}, size_t * @var{output_size})

@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_anon_set_params_function} (gnutls_anon_server_credentials_t @var{res}, gnutls_params_function * @var{func})

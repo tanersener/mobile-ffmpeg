@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_cipher_decrypt} (gnutls_cipher_hd_t @var{handle}, void * @var{ctext}, size_t @var{ctext_len})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{ctext}: the data to decrypt
+
+@var{ctext_len}: the length of data to decrypt
+
+This function will decrypt the given data using the algorithm
+specified by the context.
+
+Note that in AEAD ciphers, this will not check the tag. You will
+need to compare the tag sent with the value returned from @code{gnutls_cipher_tag()} .
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun

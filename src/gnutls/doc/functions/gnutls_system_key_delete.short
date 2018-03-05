@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_system_key_delete} (const char * @var{cert_url}, const char * @var{key_url})

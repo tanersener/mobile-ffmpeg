@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {void} {gnutls_global_deinit} ( @var{void})
+
+This function deinitializes the global data, that were initialized
+using @code{gnutls_global_init()} .
+
+Since GnuTLS 3.3.0 this function is no longer necessary to be explicitly
+called. GnuTLS will automatically deinitialize on library destructor. See
+@code{gnutls_global_init()}  for disabling the implicit initialization/deinitialization.
+@end deftypefun

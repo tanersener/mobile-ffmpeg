@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_get_certs} (gnutls_ocsp_resp_t @var{resp}, gnutls_x509_crt_t ** @var{certs}, size_t * @var{ncerts})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+@var{certs}: newly allocated array with @code{gnutls_x509_crt_t}  certificates
+
+@var{ncerts}: output variable with number of allocated certs.
+
+This function will extract the X.509 certificates found in the
+Basic OCSP Response.  The  @code{certs} output variable will hold a newly
+allocated zero-terminated array with X.509 certificates.
+
+Every certificate in the array needs to be de-allocated with
+@code{gnutls_x509_crt_deinit()}  and the array itself must be freed using
+@code{gnutls_free()} .
+
+Both the  @code{certs} and  @code{ncerts} variables may be NULL.  Then the
+function will work as normal but will not return the NULL:d
+information.  This can be used to get the number of certificates
+only, or to just get the certificate array without its size.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

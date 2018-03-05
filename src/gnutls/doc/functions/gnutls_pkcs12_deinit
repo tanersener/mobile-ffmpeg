@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_pkcs12_deinit} (gnutls_pkcs12_t @var{pkcs12})
+@var{pkcs12}: The type to be initialized
+
+This function will deinitialize a PKCS12 type.
+@end deftypefun

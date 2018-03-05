@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_tdb_init} (gnutls_tdb_t * @var{tdb})

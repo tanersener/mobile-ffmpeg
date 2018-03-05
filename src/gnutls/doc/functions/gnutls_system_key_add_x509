@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_system_key_add_x509} (gnutls_x509_crt_t @var{crt}, gnutls_x509_privkey_t @var{privkey}, const char * @var{label}, char ** @var{cert_url}, char ** @var{key_url})
+@var{crt}: the certificate to be added
+
+@var{privkey}: the key to be added
+
+@var{label}: the friendly name to describe the key
+
+@var{cert_url}: if non-NULL it will contain an allocated value with the certificate URL
+
+@var{key_url}: if non-NULL it will contain an allocated value with the key URL
+
+This function will added the given key and certificate pair,
+to the system list.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.0
+@end deftypefun

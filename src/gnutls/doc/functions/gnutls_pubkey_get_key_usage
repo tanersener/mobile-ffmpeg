@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_get_key_usage} (gnutls_pubkey_t @var{key}, unsigned int * @var{usage})
+@var{key}: should contain a @code{gnutls_pubkey_t}  type
+
+@var{usage}: If set will return the number of bits of the parameters (may be NULL)
+
+This function will return the key usage of the public key.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

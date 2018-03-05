@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_sign_algorithm_get_requested} (gnutls_session_t @var{session}, size_t @var{indx}, gnutls_sign_algorithm_t * @var{algo})

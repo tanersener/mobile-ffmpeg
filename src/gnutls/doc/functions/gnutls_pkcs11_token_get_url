@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_token_get_url} (unsigned int @var{seq}, gnutls_pkcs11_url_type_t @var{detailed}, char ** @var{url})
+@var{seq}: sequence number starting from 0
+
+@var{detailed}: non zero if a detailed URL is required
+
+@var{url}: will contain an allocated url
+
+This function will return the URL for each token available
+in system. The url has to be released using @code{gnutls_free()} 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if the sequence number
+exceeds the available tokens, otherwise a negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

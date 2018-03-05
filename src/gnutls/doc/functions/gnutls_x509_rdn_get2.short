@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_rdn_get2} (const gnutls_datum_t * @var{idn}, gnutls_datum_t * @var{str}, unsigned @var{flags})

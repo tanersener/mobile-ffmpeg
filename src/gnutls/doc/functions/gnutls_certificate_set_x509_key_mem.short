@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_set_x509_key_mem} (gnutls_certificate_credentials_t @var{res}, const gnutls_datum_t * @var{cert}, const gnutls_datum_t * @var{key}, gnutls_x509_crt_fmt_t @var{type})

@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_dn_import} (gnutls_x509_dn_t @var{dn}, const gnutls_datum_t * @var{data})
+@var{dn}: the structure that will hold the imported DN
+
+@var{data}: should contain a DER encoded RDN sequence
+
+This function parses an RDN sequence and stores the result to a
+@code{gnutls_x509_dn_t}  type. The data must have been initialized
+with @code{gnutls_x509_dn_init()} . You may use @code{gnutls_x509_dn_get_rdn_ava()}  to
+decode the DN.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.4.0
+@end deftypefun

@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_get_peers_subkey_id} (gnutls_session_t @var{session}, gnutls_datum_t * @var{id})
+@var{session}: is a gnutls session
+
+@var{id}: will contain the ID
+
+Get the peer's subkey ID when OpenPGP certificates are
+used. The returned  @code{id} should be treated as constant.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.1.3
+@end deftypefun

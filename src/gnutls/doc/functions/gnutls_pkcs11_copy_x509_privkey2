@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_copy_x509_privkey2} (const char * @var{token_url}, gnutls_x509_privkey_t @var{key}, const char * @var{label}, const gnutls_datum_t * @var{cid}, unsigned int @var{key_usage}, unsigned int @var{flags})
+@var{token_url}: A PKCS @code{11}  URL specifying a token
+
+@var{key}: A private key
+
+@var{label}: A name to be used for the stored data
+
+@var{cid}: The CKA_ID to set for the object -if NULL, the ID will be derived from the public key
+
+@var{key_usage}: One of GNUTLS_KEY_*
+
+@var{flags}: One of GNUTLS_PKCS11_OBJ_* flags
+
+This function will copy a private key into a PKCS @code{11}  token specified by
+a URL. It is highly recommended flags to contain @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE} 
+unless there is a strong reason not to.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.0
+@end deftypefun

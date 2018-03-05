@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crq_set_private_key_usage_period} (gnutls_x509_crq_t @var{crq}, time_t @var{activation}, time_t @var{expiration})

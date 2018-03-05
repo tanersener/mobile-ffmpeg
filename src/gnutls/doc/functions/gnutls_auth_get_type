@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {gnutls_credentials_type_t} {gnutls_auth_get_type} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Returns type of credentials for the current authentication schema.
+The returned information is to be used to distinguish the function used
+to access authentication data.
+
+Eg. for CERTIFICATE ciphersuites (key exchange algorithms:
+@code{GNUTLS_KX_RSA} , @code{GNUTLS_KX_DHE_RSA} ), the same function are to be
+used to access the authentication data.
+
+@strong{Returns:} The type of credentials for the current authentication
+schema, a @code{gnutls_credentials_type_t}  type.
+@end deftypefun

@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_authority_key_id} (gnutls_x509_crt_t @var{cert}, void * @var{id}, size_t * @var{id_size}, unsigned int * @var{critical})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{id}: The place where the identifier will be copied
+
+@var{id_size}: Holds the size of the id field.
+
+@var{critical}: will be non-zero if the extension is marked as critical (may be null)
+
+This function will return the X.509v3 certificate authority's key
+identifier.  This is obtained by the X.509 Authority Key
+identifier extension field (2.5.29.35). Note that this function
+only returns the keyIdentifier field of the extension and
+@code{GNUTLS_E_X509_UNSUPPORTED_EXTENSION} , if the extension contains
+the name and serial number of the certificate. In that case
+@code{gnutls_x509_crt_get_authority_key_gn_serial()}  may be used.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+if the extension is not present, otherwise a negative error value.
+@end deftypefun

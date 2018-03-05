@@ -1,0 +1,17 @@
+
+
+@c gnutls_session_flags_t
+@table @code
+@item GNUTLS_@-SFLAGS_@-SAFE_@-RENEGOTIATION
+Safe renegotiation (RFC5746) was used
+@item GNUTLS_@-SFLAGS_@-EXT_@-MASTER_@-SECRET
+The extended master secret (RFC7627) extension was used
+@item GNUTLS_@-SFLAGS_@-ETM
+The encrypt then MAC (RFC7366) extension was used
+@item GNUTLS_@-SFLAGS_@-HB_@-LOCAL_@-SEND
+The heartbeat negotiation allows the local side to send heartbeat messages
+@item GNUTLS_@-SFLAGS_@-HB_@-PEER_@-SEND
+The heartbeat negotiation allows the peer to send heartbeat messages
+@item GNUTLS_@-SFLAGS_@-FALSE_@-START
+The appdata set with @code{gnutls_handshake_set_appdata()}  were sent during handshake (false start)
+@end table

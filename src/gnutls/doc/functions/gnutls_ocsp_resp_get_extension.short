@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_resp_get_extension} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})

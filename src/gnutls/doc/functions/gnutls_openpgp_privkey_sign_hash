@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_openpgp_privkey_sign_hash} (gnutls_openpgp_privkey_t @var{key}, const gnutls_datum_t * @var{hash}, gnutls_datum_t * @var{signature})
+@var{key}: Holds the key
+
+@var{hash}: holds the data to be signed
+
+@var{signature}: will contain newly allocated signature
+
+This function will sign the given hash using the private key.  You
+should use @code{gnutls_openpgp_privkey_set_preferred_key_id()}  before
+calling this function to set the subkey to use.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Deprecated:} Use @code{gnutls_privkey_sign_hash()}  instead.
+@end deftypefun

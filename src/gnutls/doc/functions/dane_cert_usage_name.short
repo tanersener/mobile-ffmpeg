@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{dane_cert_usage_name} (dane_cert_usage_t @var{usage})

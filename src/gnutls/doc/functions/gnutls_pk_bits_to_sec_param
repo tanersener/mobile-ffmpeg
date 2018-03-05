@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {gnutls_sec_param_t} {gnutls_pk_bits_to_sec_param} (gnutls_pk_algorithm_t @var{algo}, unsigned int @var{bits})
+@var{algo}: is a public key algorithm
+
+@var{bits}: is the number of bits
+
+This is the inverse of @code{gnutls_sec_param_to_pk_bits()} . Given an algorithm
+and the number of bits, it will return the security parameter. This is
+a rough indication.
+
+@strong{Returns:} The security parameter.
+
+@strong{Since:} 2.12.0
+@end deftypefun

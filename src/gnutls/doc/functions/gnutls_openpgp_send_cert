@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {void} {gnutls_openpgp_send_cert} (gnutls_session_t @var{session}, gnutls_openpgp_crt_status_t @var{status})
+@var{session}: a @code{gnutls_session_t}  type.
+
+@var{status}: is one of GNUTLS_OPENPGP_CERT, or GNUTLS_OPENPGP_CERT_FINGERPRINT
+
+This function will order gnutls to send the key fingerprint
+instead of the key in the initial handshake procedure. This should
+be used with care and only when there is indication or knowledge
+that the server can obtain the client's key.
+@end deftypefun

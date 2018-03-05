@@ -1,0 +1,73 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_authority_info_access} (gnutls_x509_crt_t @var{crt}, unsigned int @var{seq}, int @var{what}, gnutls_datum_t * @var{data}, unsigned int * @var{critical})
+@var{crt}: Holds the certificate
+
+@var{seq}: specifies the sequence number of the access descriptor (0 for the first one, 1 for the second etc.)
+
+@var{what}: what data to get, a @code{gnutls_info_access_what_t}  type.
+
+@var{data}: output data to be freed with @code{gnutls_free()} .
+
+@var{critical}: pointer to output integer that is set to non-zero if the extension is marked as critical (may be @code{NULL} )
+
+Note that a simpler API to access the authority info data is provided
+by @code{gnutls_x509_aia_get()}  and @code{gnutls_x509_ext_import_aia()} .
+
+This function extracts the Authority Information Access (AIA)
+extension, see RFC 5280 section 4.2.2.1 for more information.  The
+AIA extension holds a sequence of AccessDescription (AD) data.
+
+The  @code{seq} input parameter is used to indicate which member of the
+sequence the caller is interested in.  The first member is 0, the
+second member 1 and so on.  When the  @code{seq} value is out of bounds,
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned.
+
+The type of data returned in  @code{data} is specified via  @code{what} which
+should be @code{gnutls_info_access_what_t}  values.
+
+If  @code{what} is @code{GNUTLS_IA_ACCESSMETHOD_OID}  then  @code{data} will hold the
+accessMethod OID (e.g., "1.3.6.1.5.5.7.48.1").
+
+If  @code{what} is @code{GNUTLS_IA_ACCESSLOCATION_GENERALNAME_TYPE} ,  @code{data} will
+hold the accessLocation GeneralName type (e.g.,
+"uniformResourceIdentifier").
+
+If  @code{what} is @code{GNUTLS_IA_URI} ,  @code{data} will hold the accessLocation URI
+data.  Requesting this  @code{what} value leads to an error if the
+accessLocation is not of the "uniformResourceIdentifier" type. 
+
+If  @code{what} is @code{GNUTLS_IA_OCSP_URI} ,  @code{data} will hold the OCSP URI.
+Requesting this  @code{what} value leads to an error if the accessMethod
+is not 1.3.6.1.5.5.7.48.1 aka OCSP, or if accessLocation is not of
+the "uniformResourceIdentifier" type. In that case @code{GNUTLS_E_UNKNOWN_ALGORITHM} 
+will be returned, and  @code{seq} should be increased and this function
+called again.
+
+If  @code{what} is @code{GNUTLS_IA_CAISSUERS_URI} ,  @code{data} will hold the caIssuers
+URI.  Requesting this  @code{what} value leads to an error if the
+accessMethod is not 1.3.6.1.5.5.7.48.2 aka caIssuers, or if
+accessLocation is not of the "uniformResourceIdentifier" type.
+In that case handle as in @code{GNUTLS_IA_OCSP_URI} .
+
+More  @code{what} values may be allocated in the future as needed.
+
+If  @code{data} is NULL, the function does the same without storing the
+output data, that is, it will set  @code{critical} and do error checking
+as usual.
+
+The value of the critical flag is returned in * @code{critical} .  Supply a
+NULL  @code{critical} if you want the function to make sure the extension
+is non-critical, as required by RFC 5280.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, @code{GNUTLS_E_INVALID_REQUEST}  on
+invalid  @code{crt} , @code{GNUTLS_E_CONSTRAINT_ERROR}  if the extension is
+incorrectly marked as critical (use a non-NULL  @code{critical} to
+override), @code{GNUTLS_E_UNKNOWN_ALGORITHM}  if the requested OID does
+not match (e.g., when using @code{GNUTLS_IA_OCSP_URI} ), otherwise a
+negative error code.
+
+@strong{Since:} 3.0
+@end deftypefun

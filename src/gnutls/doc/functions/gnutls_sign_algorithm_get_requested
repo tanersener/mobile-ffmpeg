@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_sign_algorithm_get_requested} (gnutls_session_t @var{session}, size_t @var{indx}, gnutls_sign_algorithm_t * @var{algo})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{indx}: is an index of the signature algorithm to return
+
+@var{algo}: the returned certificate type will be stored there
+
+Returns the signature algorithm specified by index that was
+requested by the peer. If the specified index has no data available
+this function returns @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} .  If
+the negotiated TLS version does not support signature algorithms
+then @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned even
+for the first index.  The first index is 0.
+
+This function is useful in the certificate callback functions
+to assist in selecting the correct certificate.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 2.10.0
+@end deftypefun

@@ -1,0 +1,11 @@
+
+
+@c dane_verify_flags_t
+@table @code
+@item DANE_@-VFLAG_@-FAIL_@-IF_@-NOT_@-CHECKED
+If irrelevant to this certificate DANE entries are received fail instead of succeeding.
+@item DANE_@-VFLAG_@-ONLY_@-CHECK_@-EE_@-USAGE
+The provided certificates will be verified only against any EE field. Combine with @code{DANE_VFLAG_FAIL_IF_NOT_CHECKED}  to fail if EE entries are not present.
+@item DANE_@-VFLAG_@-ONLY_@-CHECK_@-CA_@-USAGE
+The provided certificates will be verified only against any CA field. Combine with @code{DANE_VFLAG_FAIL_IF_NOT_CHECKED}  to fail if CA entries are not present.
+@end table

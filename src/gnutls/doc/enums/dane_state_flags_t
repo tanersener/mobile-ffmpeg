@@ -1,0 +1,11 @@
+
+
+@c dane_state_flags_t
+@table @code
+@item DANE_@-F_@-IGNORE_@-LOCAL_@-RESOLVER
+Many systems are not DNSSEC-ready. In that case the local resolver is ignored, and a direct recursive resolve occurs.
+@item DANE_@-F_@-INSECURE
+Ignore any DNSSEC signature verification errors.
+@item DANE_@-F_@-IGNORE_@-DNSSEC
+Do not try to initialize DNSSEC as we will not use it (will then not try to load the DNSSEC root certificate).  Useful if the TLSA data does not come from DNS.
+@end table

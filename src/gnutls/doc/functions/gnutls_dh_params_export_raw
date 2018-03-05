@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_dh_params_export_raw} (gnutls_dh_params_t @var{params}, gnutls_datum_t * @var{prime}, gnutls_datum_t * @var{generator}, unsigned int * @var{bits})
+@var{params}: Holds the DH parameters
+
+@var{prime}: will hold the new prime
+
+@var{generator}: will hold the new generator
+
+@var{bits}: if non null will hold the secret key's number of bits
+
+This function will export the pair of prime and generator for use
+in the Diffie-Hellman key exchange.  The new parameters will be
+allocated using @code{gnutls_malloc()}  and will be stored in the
+appropriate datum.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun

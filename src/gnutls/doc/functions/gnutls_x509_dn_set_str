@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_dn_set_str} (gnutls_x509_dn_t @var{dn}, const char * @var{str}, const char ** @var{err})
+@var{dn}: a pointer to DN
+
+@var{str}: a comma separated DN string (RFC4514)
+
+@var{err}: indicates the error position (if any)
+
+This function will set the DN on the provided DN structure.
+The input string should be plain ASCII or UTF-8 encoded. On
+DN parsing error @code{GNUTLS_E_PARSING_ERROR}  is returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.5.3
+@end deftypefun

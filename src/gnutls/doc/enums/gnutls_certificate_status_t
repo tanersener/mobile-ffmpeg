@@ -1,0 +1,46 @@
+
+
+@c gnutls_certificate_status_t
+@table @code
+@item GNUTLS_@-CERT_@-INVALID
+The certificate is not signed by one of the
+known authorities or the signature is invalid (deprecated by the flags 
+@code{GNUTLS_CERT_SIGNATURE_FAILURE}  and @code{GNUTLS_CERT_SIGNER_NOT_FOUND} ).
+@item GNUTLS_@-CERT_@-REVOKED
+Certificate is revoked by its authority.  In X.509 this will be
+set only if CRLs are checked.
+@item GNUTLS_@-CERT_@-SIGNER_@-NOT_@-FOUND
+The certificate's issuer is not known. 
+This is the case if the issuer is not included in the trusted certificate list.
+@item GNUTLS_@-CERT_@-SIGNER_@-NOT_@-CA
+The certificate's signer was not a CA. This
+may happen if this was a version 1 certificate, which is common with 
+some CAs, or a version 3 certificate without the basic constrains extension.
+@item GNUTLS_@-CERT_@-INSECURE_@-ALGORITHM
+The certificate was signed using an insecure
+algorithm such as MD2 or MD5. These algorithms have been broken and
+should not be trusted.
+@item GNUTLS_@-CERT_@-NOT_@-ACTIVATED
+The certificate is not yet activated.
+@item GNUTLS_@-CERT_@-EXPIRED
+The certificate has expired.
+@item GNUTLS_@-CERT_@-SIGNATURE_@-FAILURE
+The signature verification failed.
+@item GNUTLS_@-CERT_@-REVOCATION_@-DATA_@-SUPERSEDED
+The revocation data are old and have been superseded.
+@item GNUTLS_@-CERT_@-UNEXPECTED_@-OWNER
+The owner is not the expected one.
+@item GNUTLS_@-CERT_@-REVOCATION_@-DATA_@-ISSUED_@-IN_@-FUTURE
+The revocation data have a future issue date.
+@item GNUTLS_@-CERT_@-SIGNER_@-CONSTRAINTS_@-FAILURE
+The certificate's signer constraints were
+violated.
+@item GNUTLS_@-CERT_@-MISMATCH
+The certificate presented isn't the expected one (TOFU)
+@item GNUTLS_@-CERT_@-PURPOSE_@-MISMATCH
+The certificate or an intermediate does not match the intended purpose (extended key usage).
+@item GNUTLS_@-CERT_@-MISSING_@-OCSP_@-STATUS
+The certificate requires the server to send the certifiate status, but no status was received.
+@item GNUTLS_@-CERT_@-INVALID_@-OCSP_@-STATUS
+The received OCSP status response is invalid.
+@end table

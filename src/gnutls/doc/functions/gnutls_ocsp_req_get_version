@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_get_version} (gnutls_ocsp_req_t @var{req})
+@var{req}: should contain a @code{gnutls_ocsp_req_t}  type
+
+This function will return the version of the OCSP request.
+Typically this is always 1 indicating version 1.
+
+@strong{Returns:} version of OCSP request, or a negative error code on error.
+@end deftypefun

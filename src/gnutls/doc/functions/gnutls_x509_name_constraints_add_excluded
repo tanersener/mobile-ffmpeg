@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_name_constraints_add_excluded} (gnutls_x509_name_constraints_t @var{nc}, gnutls_x509_subject_alt_name_t @var{type}, const gnutls_datum_t * @var{name})
+@var{nc}: The nameconstraints
+
+@var{type}: The type of the constraints
+
+@var{name}: The data of the constraints
+
+This function will add a name constraint to the list of excluded
+constraints. The constraints  @code{type} can be any of the following types:
+@code{GNUTLS_SAN_DNSNAME} , @code{GNUTLS_SAN_RFC822NAME} , @code{GNUTLS_SAN_DN} ,
+@code{GNUTLS_SAN_URI} , @code{GNUTLS_SAN_IPADDRESS} . For the latter, an IP address
+in network byte order is expected, followed by its network mask (which is
+4 bytes in IPv4 or 16-bytes in IPv6).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

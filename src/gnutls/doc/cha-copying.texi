@@ -1,0 +1,8 @@
+@node Copying Information
+@appendix Copying Information
+@cindex FDL, GNU Free Documentation License
+
+@heading GNU Free Documentation License
+
+@include fdl-1.3.texi
+

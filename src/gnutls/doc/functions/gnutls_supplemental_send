@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {void} {gnutls_supplemental_send} (gnutls_session_t @var{session}, unsigned @var{do_send_supplemental})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{do_send_supplemental}: non-zero in order to send supplemental data
+
+This function is to be called by an extension handler to
+instruct gnutls to send supplemental data during the handshake process.
+
+@strong{Since:} 3.4.0
+@end deftypefun

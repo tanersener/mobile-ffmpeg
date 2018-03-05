@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_dtls_cookie_verify} (gnutls_datum_t * @var{key}, void * @var{client_data}, size_t @var{client_data_size}, void * @var{_msg}, size_t @var{msg_size}, gnutls_dtls_prestate_st * @var{prestate})
+@var{key}: is a random key to be used at cookie generation
+
+@var{client_data}: contains data identifying the client (i.e. address)
+
+@var{client_data_size}: The size of client's data
+
+@var{_msg}: An incoming message that initiates a connection.
+
+@var{msg_size}: The size of the message.
+
+@var{prestate}: The cookie of this client.
+
+This function will verify the received message for
+a valid cookie. If a valid cookie is returned then
+it should be associated with the session using
+@code{gnutls_dtls_prestate_set()} ;
+
+This function must be called after @code{gnutls_dtls_cookie_send()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.  
+
+@strong{Since:} 3.0
+@end deftypefun

@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import} (gnutls_pubkey_t @var{key}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format})
+@var{key}: The public key. 
+
+@var{data}: The DER or PEM encoded certificate. 
+
+@var{format}: One of DER or PEM 
+
+This function will import the provided public key in
+a SubjectPublicKeyInfo X.509 structure to a native
+@code{gnutls_pubkey_t}  type. The output will be stored 
+in  @code{key} . If the public key is PEM encoded it should have a header 
+of "PUBLIC KEY". 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

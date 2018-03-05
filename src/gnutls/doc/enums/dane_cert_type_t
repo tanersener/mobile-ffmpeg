@@ -1,0 +1,9 @@
+
+
+@c dane_cert_type_t
+@table @code
+@item DANE_@-CERT_@-X509
+An X.509 certificate.
+@item DANE_@-CERT_@-PK
+A public key.
+@end table

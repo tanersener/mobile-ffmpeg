@@ -1,0 +1,41 @@
+<!-- ##### SECTION Title ##### -->
+gnutls_compress
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO GNUTLS_COMP_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT gnutls_compression_entry ##### -->
+<para>
+
+</para>
+
+@name: 
+@id: 
+@num: 
+@window_bits: 
+@mem_level: 
+@comp_level: 
+

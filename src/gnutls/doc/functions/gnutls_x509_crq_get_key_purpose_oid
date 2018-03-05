@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_key_purpose_oid} (gnutls_x509_crq_t @var{crq}, unsigned @var{indx}, void * @var{oid}, size_t * @var{sizeof_oid}, unsigned int * @var{critical})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{indx}: This specifies which OID to return, use (0) to get the first one
+
+@var{oid}: a pointer to store the OID (may be @code{NULL} )
+
+@var{sizeof_oid}: initially holds the size of  @code{oid} 
+
+@var{critical}: output variable with critical flag, may be @code{NULL} .
+
+This function will extract the key purpose OIDs of the Certificate
+specified by the given index.  These are stored in the Extended Key
+Usage extension (2.5.29.37).  See the GNUTLS_KP_* definitions for
+human readable names.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is
+not long enough, and in that case the * @code{sizeof_oid} will be
+updated with the required size.  On success 0 is returned.
+
+@strong{Since:} 2.8.0
+@end deftypefun

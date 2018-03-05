@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_issuer_dn} (const gnutls_x509_crl_t @var{crl}, char * @var{buf}, size_t * @var{sizeof_buf})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{buf}: a pointer to a structure to hold the peer's name (may be null)
+
+@var{sizeof_buf}: initially holds the size of  @code{buf} 
+
+This function will copy the name of the CRL issuer in the provided
+buffer. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+described in RFC4514. The output string will be ASCII or UTF-8
+encoded, depending on the certificate data.
+
+If buf is @code{NULL}  then only the size will be filled.
+
+This function does not output a fully RFC4514 compliant string, if
+that is required see @code{gnutls_x509_crl_get_issuer_dn3()} .
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is
+not long enough, and in that case the sizeof_buf will be updated
+with the required size, and 0 on success.
+@end deftypefun

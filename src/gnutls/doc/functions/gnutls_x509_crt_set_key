@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_key} (gnutls_x509_crt_t @var{crt}, gnutls_x509_privkey_t @var{key})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{key}: holds a private key
+
+This function will set the public parameters from the given
+private key to the certificate.
+
+To export the public key (i.e., the SubjectPublicKeyInfo part), check
+@code{gnutls_pubkey_import_x509()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

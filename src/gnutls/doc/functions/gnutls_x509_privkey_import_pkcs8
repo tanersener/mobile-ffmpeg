@@ -1,0 +1,35 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_import_pkcs8} (gnutls_x509_privkey_t @var{key}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, const char * @var{password}, unsigned int @var{flags})
+@var{key}: The data to store the parsed key
+
+@var{data}: The DER or PEM encoded key.
+
+@var{format}: One of DER or PEM
+
+@var{password}: the password to decrypt the key (if it is encrypted).
+
+@var{flags}: 0 if encrypted or GNUTLS_PKCS_PLAIN if not encrypted.
+
+This function will convert the given DER or PEM encoded PKCS8 2.0
+encrypted key to the native gnutls_x509_privkey_t format. The
+output will be stored in  @code{key} .  Both RSA and DSA keys can be
+imported, and flags can only be used to indicate an unencrypted
+key.
+
+The  @code{password} can be either ASCII or UTF-8 in the default PBES2
+encryption schemas, or ASCII for the PKCS12 schemas.
+
+If the Certificate is PEM encoded it should have a header of
+"ENCRYPTED PRIVATE KEY", or "PRIVATE KEY". You only need to
+specify the flags if the key is DER encoded, since in that case
+the encryption status cannot be auto-detected.
+
+If the @code{GNUTLS_PKCS_PLAIN}  flag is specified and the supplied data
+are encrypted then @code{GNUTLS_E_DECRYPTION_FAILED}  is returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

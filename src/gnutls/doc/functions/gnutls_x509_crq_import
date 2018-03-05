@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_import} (gnutls_x509_crq_t @var{crq}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format})
+@var{crq}: The data to store the parsed certificate request.
+
+@var{data}: The DER or PEM encoded certificate.
+
+@var{format}: One of DER or PEM
+
+This function will convert the given DER or PEM encoded certificate
+request to a @code{gnutls_x509_crq_t}  type.  The output will be
+stored in  @code{crq} .
+
+If the Certificate is PEM encoded it should have a header of "NEW
+CERTIFICATE REQUEST".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

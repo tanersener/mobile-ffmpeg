@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_load_file} (const char * @var{filename}, gnutls_datum_t * @var{data})
+@var{filename}: the name of the file to load
+
+@var{data}: Where the file will be stored
+
+This function will load a file into a datum. The data are
+zero terminated but the terminating null is not included in length.
+The returned data are allocated using @code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+Since 3.1.0
+@end deftypefun

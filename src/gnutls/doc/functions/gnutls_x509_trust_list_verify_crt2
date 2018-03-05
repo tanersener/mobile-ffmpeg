@@ -1,0 +1,56 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_trust_list_verify_crt2} (gnutls_x509_trust_list_t @var{list}, gnutls_x509_crt_t * @var{cert_list}, unsigned int @var{cert_list_size}, gnutls_typed_vdata_st * @var{data}, unsigned int @var{elements}, unsigned int @var{flags}, unsigned int * @var{voutput}, gnutls_verify_output_function @var{func})
+@var{list}: The list
+
+@var{cert_list}: is the certificate list to be verified
+
+@var{cert_list_size}: is the certificate list size
+
+@var{data}: an array of typed data
+
+@var{elements}: the number of data elements
+
+@var{flags}: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+
+@var{voutput}: will hold the certificate verification output.
+
+@var{func}: If non-null will be called on each chain element verification with the output.
+
+This function will attempt to verify the given certificate chain and return
+its status. The  @code{voutput} parameter will hold an OR'ed sequence of
+@code{gnutls_certificate_status_t}  flags.
+
+When a certificate chain of  @code{cert_list_size} with more than one certificates is
+provided, the verification status will apply to the first certificate in the chain
+that failed verification. The verification process starts from the end of the chain
+(from CA to end certificate). The first certificate in the chain must be the end-certificate
+while the rest of the members may be sorted or not.
+
+Additionally a certificate verification profile can be specified
+from the ones in @code{gnutls_certificate_verification_profiles_t}  by
+ORing the result of @code{GNUTLS_PROFILE_TO_VFLAGS()}  to the verification
+flags.
+
+Additional verification parameters are possible via the  @code{data} types; the
+acceptable types are @code{GNUTLS_DT_DNS_HOSTNAME}  and @code{GNUTLS_DT_KEY_PURPOSE_OID} .
+The former accepts as data a null-terminated hostname, and the latter a null-terminated
+object identifier (e.g., @code{GNUTLS_KP_TLS_WWW_SERVER} ).
+If a DNS hostname is provided then this function will compare
+the hostname in the end certificate against the given. If names do not match the
+@code{GNUTLS_CERT_UNEXPECTED_OWNER}  status flag will be set. In addition it
+will consider certificates provided with @code{gnutls_x509_trust_list_add_named_crt()} .
+
+If a key purpose OID is provided and the end-certificate contains the extended key
+usage PKIX extension, it will be required to match the provided OID
+or be marked for any purpose, otherwise verification will fail with 
+@code{GNUTLS_CERT_PURPOSE_MISMATCH}  status.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. Note that verification failure will not result to an
+error code, only  @code{voutput} will be updated.
+
+@strong{Since:} 3.3.8
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_rnd} (gnutls_rnd_level_t @var{level}, void * @var{data}, size_t @var{len})

@@ -1,0 +1,125 @@
+@node Using GnuTLS as a cryptographic library
+@chapter Using GnuTLS as a cryptographic library
+
+@acronym{GnuTLS} is not a low-level cryptographic library, i.e., 
+it does not provide access to basic cryptographic primitives. However
+it abstracts the internal cryptographic back-end (see @ref{Cryptographic Backend}),
+providing symmetric crypto, hash and HMAC algorithms, as well access
+to the random number generation. For a low-level crypto API the usage of nettle
+@footnote{See @uref{http://www.lysator.liu.se/~nisse/nettle/}.} library is recommended.
+
+@menu
+* Symmetric algorithms::
+* Public key algorithms::
+* Hash and MAC functions::
+* Random number generation::
+* Overriding algorithms::
+@end menu
+
+@node Symmetric algorithms
+@section Symmetric algorithms
+@cindex symmetric algorithms
+@cindex symmetric cryptography
+
+The available functions to access symmetric crypto algorithms operations
+are shown below. The supported algorithms are the algorithms required by the TLS protocol.
+They are listed in @ref{gnutls_cipher_algorithm_t}.
+
+@showenumdesc{gnutls_cipher_algorithm_t,The supported ciphers.}
+
+@showfuncE{gnutls_cipher_init,gnutls_cipher_encrypt2,gnutls_cipher_decrypt2,gnutls_cipher_set_iv,gnutls_cipher_deinit}
+
+@showfuncB{gnutls_cipher_add_auth,gnutls_cipher_tag}
+While the latter two functions allow the same API can be used with authenticated encryption ciphers, 
+it is recommended to use the following functions which are solely for AEAD ciphers. The latter
+API is designed to be simple to use and also hard to misuse, by handling the tag verification
+and addition in transparent way.
+
+@showfuncD{gnutls_aead_cipher_init,gnutls_aead_cipher_encrypt,gnutls_aead_cipher_decrypt,gnutls_aead_cipher_deinit}
+
+@node Public key algorithms
+@section Public key algorithms
+@cindex public key algorithms
+
+Public key cryptography algorithms such as RSA, DSA and ECDSA, can be
+accessed using the abstract key API in @ref{Abstract key types}. This
+is a high level API with the advantage of transparently handling keys
+in memory and keys present in smart cards.
+
+@subsection PKCS #7 signing
+@cindex PKCS #7
+@cindex file signing
+
+The PKCS #7 format is common format used for digital signatures. It allows to sign
+by embedding the data into the signature, or creating detached signatures of the data,
+including a timestamp, additional certificates etc. In certain cases this format is also
+used to transport lists of certificates and CRLs.
+
+The basic functions to initialize, deinitialize, import, export or print information
+about a PKCS #7 structure are shown below.
+@showfuncE{gnutls_pkcs7_init,gnutls_pkcs7_deinit,gnutls_pkcs7_export2,gnutls_pkcs7_import,gnutls_pkcs7_print}
+
+The following functions allow the verification of a structure using either a trust list, or
+individual certificates. The @funcref{gnutls_pkcs7_sign} function is the data signing function.
+
+@showfuncB{gnutls_pkcs7_verify_direct,gnutls_pkcs7_verify}
+@showfuncdesc{gnutls_pkcs7_sign}
+
+@showenumdesc{gnutls_pkcs7_sign_flags,Flags applicable to gnutls_pkcs7_sign()}
+
+Other helper functions which allow to access the signatures, or certificates attached
+in the structure are listed below.
+
+@showfuncF{gnutls_pkcs7_get_signature_count,gnutls_pkcs7_get_signature_info,gnutls_pkcs7_get_crt_count,gnutls_pkcs7_get_crt_raw2,gnutls_pkcs7_get_crl_count,gnutls_pkcs7_get_crl_raw2}
+
+To append certificates, or CRLs in the structure the following functions are provided.
+@showfuncD{gnutls_pkcs7_set_crt_raw,gnutls_pkcs7_set_crt,gnutls_pkcs7_set_crl_raw,gnutls_pkcs7_set_crl}
+
+@node Hash and MAC functions
+@section Hash and MAC functions
+@cindex hash functions
+@cindex HMAC functions
+@cindex MAC functions
+
+The available operations to access hash functions and hash-MAC (HMAC) algorithms
+are shown below. HMAC algorithms provided keyed hash functionality. The supported MAC and HMAC
+algorithms are listed in @ref{gnutls_mac_algorithm_t}. Note that, despite the @code{hmac} part 
+in the name of the MAC functions listed below, they can be used either for HMAC or MAC operations.
+
+@showenumdesc{gnutls_mac_algorithm_t,The supported MAC and HMAC algorithms.}
+
+@showfuncF{gnutls_hmac_init,gnutls_hmac,gnutls_hmac_output,gnutls_hmac_deinit,gnutls_hmac_get_len,gnutls_hmac_fast}
+
+The available functions to access hash functions are shown below. The supported hash functions
+are shown in @ref{gnutls_digest_algorithm_t}.
+
+@showfuncF{gnutls_hash_init,gnutls_hash,gnutls_hash_output,gnutls_hash_deinit,gnutls_hash_get_len,gnutls_hash_fast}
+@showfuncA{gnutls_fingerprint}
+
+@showenumdesc{gnutls_digest_algorithm_t,The supported hash algorithms.}
+
+@node Random number generation
+@section Random number generation
+@cindex random numbers
+
+Access to the random number generator is provided using the @funcref{gnutls_rnd}
+function. It allows obtaining random data of various levels.
+
+@showenumdesc{gnutls_rnd_level_t,The random number levels.}
+@showfuncdesc{gnutls_rnd}
+
+@node Overriding algorithms
+@section Overriding algorithms
+@cindex overriding algorithms
+
+In systems which provide a hardware accelerated cipher implementation
+that is not directly supported by GnuTLS, it is possible to utilize it.
+There are functions which allow overriding the default cipher, digest and MAC
+implementations. Those are described below.
+
+To override public key operations see @ref{Abstract private keys}.
+
+@showfuncdesc{gnutls_crypto_register_cipher}
+@showfuncdesc{gnutls_crypto_register_aead_cipher}
+@showfuncdesc{gnutls_crypto_register_mac}
+@showfuncdesc{gnutls_crypto_register_digest}

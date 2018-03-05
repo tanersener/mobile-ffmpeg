@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_srtp_set_mki} (gnutls_session_t @var{session}, const gnutls_datum_t * @var{mki})

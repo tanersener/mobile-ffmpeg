@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_error_is_fatal} (int @var{error})

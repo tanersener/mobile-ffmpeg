@@ -1,0 +1,37 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_get_cert_id} (gnutls_ocsp_req_t @var{req}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number})
+@var{req}: should contain a @code{gnutls_ocsp_req_t}  type
+
+@var{indx}: Specifies which extension OID to get. Use (0) to get the first one.
+
+@var{digest}: output variable with @code{gnutls_digest_algorithm_t}  hash algorithm
+
+@var{issuer_name_hash}: output buffer with hash of issuer's DN
+
+@var{issuer_key_hash}: output buffer with hash of issuer's public key
+
+@var{serial_number}: output buffer with serial number of certificate to check
+
+This function will return the certificate information of the
+ @code{indx} 'ed request in the OCSP request.  The information returned
+corresponds to the CertID structure:
+
+<informalexample><programlisting>
+CertID	  ::=     SEQUENCE @{
+hashAlgorithm       AlgorithmIdentifier,
+issuerNameHash      OCTET STRING, -- Hash of Issuer's DN
+issuerKeyHash       OCTET STRING, -- Hash of Issuers public key
+serialNumber	CertificateSerialNumber @}
+</programlisting></informalexample>
+
+Each of the pointers to output variables may be NULL to indicate
+that the caller is not interested in that value.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.  If you have reached the last
+CertID available @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be
+returned.
+@end deftypefun

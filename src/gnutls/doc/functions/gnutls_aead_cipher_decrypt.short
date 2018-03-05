@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_aead_cipher_decrypt} (gnutls_aead_cipher_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len}, const void * @var{auth}, size_t @var{auth_len}, size_t @var{tag_size}, const void * @var{ctext}, size_t @var{ctext_len}, void * @var{ptext}, size_t * @var{ptext_len})

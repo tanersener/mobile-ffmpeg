@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_print} (gnutls_pubkey_t @var{pubkey}, gnutls_certificate_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@var{pubkey}: The data to be printed
+
+@var{format}: Indicate the format to use
+
+@var{out}: Newly allocated datum with null terminated string.
+
+This function will pretty print public key information, suitable for
+display to a human.
+
+Only @code{GNUTLS_CRT_PRINT_FULL}  and @code{GNUTLS_CRT_PRINT_FULL_NUMBERS} 
+are implemented.
+
+The output  @code{out} needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.5
+@end deftypefun

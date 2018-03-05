@@ -1,0 +1,1622 @@
+This is gnutls-guile.info, produced by makeinfo version 6.3 from
+gnutls-guile.texi.
+
+This manual is last updated 28 March 2017 for version 3.5.18 of GnuTLS.
+
+Copyright (C) 2001-2012, 2014, 2016 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, no Front-Cover Texts, and
+     no Back-Cover Texts.  A copy of the license is included in the
+     section entitled "GNU Free Documentation License".
+INFO-DIR-SECTION Software libraries
+START-INFO-DIR-ENTRY
+* GnuTLS-Guile: (gnutls-guile).		GNU Transport Layer Security Library. Guile bindings.
+END-INFO-DIR-ENTRY
+
+
+File: gnutls-guile.info,  Node: Top,  Next: Preface,  Up: (dir)
+
+GnuTLS-Guile
+************
+
+This manual is last updated 28 March 2017 for version 3.5.18 of GnuTLS.
+
+Copyright (C) 2001-2012, 2014, 2016 Free Software Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, no Front-Cover Texts, and
+     no Back-Cover Texts.  A copy of the license is included in the
+     section entitled "GNU Free Documentation License".
+
+* Menu:
+
+* Preface::                     Preface.
+* Guile Preparations::          Note on installation and environment.
+* Guile API Conventions::       Naming conventions and other idiosyncrasies.
+* Guile Examples::              Quick start.
+* Guile Reference::             The Scheme GnuTLS programming interface.
+
+* Copying Information::         You can copy and modify this manual.
+* Procedure Index::
+* Concept Index::
+
+
+File: gnutls-guile.info,  Node: Preface,  Next: Guile Preparations,  Prev: Top,  Up: Top
+
+1 Preface
+*********
+
+This manual describes the GNU Guile (http://www.gnu.org/software/guile/)
+Scheme programming interface to GnuTLS, which is distributed as part of
+GnuTLS (http://gnutls.org).  The reader is assumed to have basic
+knowledge of the protocol and library.  Details missing from this
+chapter may be found in Function reference, of the C API reference.
+
+At this stage, not all the C functions are available from Scheme, but a
+large subset thereof is available.
+
+
+File: gnutls-guile.info,  Node: Guile Preparations,  Next: Guile API Conventions,  Prev: Preface,  Up: Top
+
+2 Guile Preparations
+********************
+
+The GnuTLS Guile bindings are available for Guile's 2.0 stable series,
+as well as the forthcoming 2.2 series and the legacy 1.8 series.
+
+By default they are installed under the GnuTLS installation directory,
+typically '/usr/local/share/guile/site/').  Normally Guile will not find
+the module there without help.  You may experience something like this:
+
+     $ guile
+     ...
+     scheme@(guile-user)> (use-modules (gnutls))
+     ERROR: no code for module (gnutls)
+
+There are two ways to solve this.  The first is to make sure that when
+building GnuTLS, the Guile bindings will be installed in the same place
+where Guile looks.  You may do this by using the '--with-guile-site-dir'
+parameter as follows:
+
+     $ ./configure --with-guile-site-dir=no
+
+This will instruct GnuTLS to attempt to install the Guile bindings where
+Guile will look for them.  It will use 'guile-config info pkgdatadir' to
+learn the path to use.
+
+If Guile was installed into '/usr', you may also install GnuTLS using
+the same prefix:
+
+     $ ./configure --prefix=/usr
+
+If you want to specify the path to install the Guile bindings you can
+also specify the path directly:
+
+     $ ./configure --with-guile-site-dir=/opt/guile/share/guile/site
+
+The second solution requires some more work but may be easier to use if
+you do not have system administrator rights to your machine.  You need
+to instruct Guile so that it finds the GnuTLS Guile bindings.  Either
+use the 'GUILE_LOAD_PATH' environment variable as follows:
+
+     $ GUILE_LOAD_PATH="/usr/local/share/guile/site:$GUILE_LOAD_PATH" guile
+     scheme@(guile-user)> (use-modules (gnutls))
+     scheme@(guile-user)>
+
+Alternatively, you can modify Guile's '%load-path' variable (*note
+Guile's run-time options: (guile)Build Config.).
+
+At this point, you might get an error regarding 'guile-gnutls-v-2'
+similar to:
+
+     gnutls.scm:361:1: In procedure dynamic-link in expression (load-extension "guile-gnutls-v-2" "scm_init_gnutls"):
+     gnutls.scm:361:1: file: "guile-gnutls-v-2", message: "guile-gnutls-v-2.so: cannot open shared object file: No such file or directory"
+
+In this case, you will need to modify the run-time linker path, for
+example as follows:
+
+     $ LD_LIBRARY_PATH=/usr/local/lib GUILE_LOAD_PATH=/usr/local/share/guile/site guile
+     scheme@(guile-user)> (use-modules (gnutls))
+     scheme@(guile-user)>
+
+To check that you got the intended GnuTLS library version, you may print
+the version number of the loaded library as follows:
+
+     $ guile
+     scheme@(guile-user)> (use-modules (gnutls))
+     scheme@(guile-user)> (gnutls-version)
+     "3.5.18"
+     scheme@(guile-user)>
+
+
+File: gnutls-guile.info,  Node: Guile API Conventions,  Next: Guile Examples,  Prev: Guile Preparations,  Up: Top
+
+3 Guile API Conventions
+***********************
+
+This chapter details the conventions used by Guile API, as well as
+specificities of the mapping of the C API to Scheme.
+
+* Menu:
+
+* Enumerates and Constants::      Representation of C-side constants.
+* Procedure Names::               Naming conventions.
+* Representation of Binary Data:: Binary data buffers.
+* Input and Output::              Input and output.
+* Exception Handling::            Exceptions.
+
+
+File: gnutls-guile.info,  Node: Enumerates and Constants,  Next: Procedure Names,  Up: Guile API Conventions
+
+3.1 Enumerates and Constants
+============================
+
+Lots of enumerates and constants are used in the GnuTLS C API. For each
+C enumerate type, a disjoint Scheme type is used--thus, enumerate values
+and constants are not represented by Scheme symbols nor by integers.
+This makes it impossible to use an enumerate value of the wrong type on
+the Scheme side: such errors are automatically detected by
+type-checking.
+
+The enumerate values are bound to variables exported by the '(gnutls)'
+module.  These variables are named according to the following
+convention:
+
+   * All variable names are lower-case; the underscore '_' character
+     used in the C API is replaced by hyphen '-'.
+   * All variable names are prepended by the name of the enumerate type
+     and the slash '/' character.
+   * In some cases, the variable name is made more explicit than the one
+     of the C API, e.g., by avoid abbreviations.
+
+Consider for instance this C-side enumerate:
+
+     typedef enum
+     {
+       GNUTLS_CRD_CERTIFICATE = 1,
+       GNUTLS_CRD_ANON,
+       GNUTLS_CRD_SRP,
+       GNUTLS_CRD_PSK
+     } gnutls_credentials_type_t;
+
+The corresponding Scheme values are bound to the following variables
+exported by the '(gnutls)' module:
+
+     credentials/certificate
+     credentials/anonymous
+     credentials/srp
+     credentials/psk
+
+Hopefully, most variable names can be deduced from this convention.
+
+Scheme-side "enumerate" values can be compared using 'eq?' (*note
+equality predicates: (guile)Equality.).  Consider the following example:
+
+     (let ((session (make-session connection-end/client)))
+
+       ;;
+       ;; ...
+       ;;
+
+       ;; Check the ciphering algorithm currently used by SESSION.
+       (if (eq? cipher/arcfour (session-cipher session))
+           (format #t "We're using the ARCFOUR algorithm")))
+
+In addition, all enumerate values can be converted to a human-readable
+string, in a type-specific way.  For instance, '(cipher->string
+cipher/arcfour)' yields '"ARCFOUR 128"', while '(key-usage->string
+key-usage/digital-signature)' yields '"digital-signature"'.  Note that
+these strings may not be sufficient for use in a user interface since
+they are fairly concise and not internationalized.
+
+
+File: gnutls-guile.info,  Node: Procedure Names,  Next: Representation of Binary Data,  Prev: Enumerates and Constants,  Up: Guile API Conventions
+
+3.2 Procedure Names
+===================
+
+Unlike C functions in GnuTLS, the corresponding Scheme procedures are
+named in a way that is close to natural English.  Abbreviations are also
+avoided.  For instance, the Scheme procedure corresponding to
+'gnutls_certificate_set_dh_params' is named
+'set-certificate-credentials-dh-parameters!'.  The 'gnutls_' prefix is
+always omitted from variable names since a similar effect can be
+achieved using Guile's nifty binding renaming facilities, should it be
+needed (*note (guile)Using Guile Modules::).
+
+Often Scheme procedure names differ from C function names in a way that
+makes it clearer what objects they operate on.  For example, the Scheme
+procedure named 'set-session-transport-port!' corresponds to
+'gnutls_transport_set_ptr', making it clear that this procedure applies
+to session.
+
+
+File: gnutls-guile.info,  Node: Representation of Binary Data,  Next: Input and Output,  Prev: Procedure Names,  Up: Guile API Conventions
+
+3.3 Representation of Binary Data
+=================================
+
+Many procedures operate on binary data.  For instance,
+'pkcs3-import-dh-parameters' expects binary data as input.
+
+Binary data is represented on the Scheme side using bytevectors (*note
+(guile)Bytevectors::).  Homogeneous vectors such as SRFI-4 'u8vector's
+can also be used(1).
+
+As an example, generating and then exporting Diffie-Hellman parameters
+in the PEM format can be done as follows:
+
+     (let* ((dh  (make-dh-parameters 1024))
+            (pem (pkcs3-export-dh-parameters dh
+                                             x509-certificate-format/pem)))
+       (call-with-output-file "some-file.pem"
+         (lambda (port)
+           (uniform-vector-write pem port))))
+
+   ---------- Footnotes ----------
+
+   (1) Historically, SRFI-4 'u8vector's are the closest thing to
+bytevectors that Guile 1.8 and earlier supported.
+
+
+File: gnutls-guile.info,  Node: Input and Output,  Next: Exception Handling,  Prev: Representation of Binary Data,  Up: Guile API Conventions
+
+3.4 Input and Output
+====================
+
+The underlying transport of a TLS session can be any Scheme input/output
+port (*note (guile)Ports and File Descriptors::).  This has to be
+specified using 'set-session-transport-port!'.
+
+However, for better performance, a raw file descriptor can be specified,
+using 'set-session-transport-fd!'.  For instance, if the transport layer
+is a socket port over an OS-provided socket, you can use the
+'port->fdes' or 'fileno' procedure to obtain the underlying file
+descriptor and pass it to 'set-session-transport-fd!' (*note
+'port->fdes' and 'fileno': (guile)Ports and File Descriptors.).  This
+would work as follows:
+
+     (let ((socket (socket PF_INET SOCK_STREAM 0))
+           (session (make-session connection-end/client)))
+
+       ;;
+       ;; Establish a TCP connection...
+       ;;
+
+       ;; Use the file descriptor that underlies SOCKET.
+       (set-session-transport-fd! session (fileno socket)))
+
+Once a TLS session is established, data can be communicated through it
+(i.e., _via_ the TLS record layer) using the port returned by
+'session-record-port':
+
+     (let ((session (make-session connection-end/client)))
+
+       ;;
+       ;; Initialize the various parameters of SESSION, set up
+       ;; a network connection, etc.
+       ;;
+
+       (let ((i/o (session-record-port session)))
+         (display "Hello peer!" i/o)
+         (let ((greetings (read i/o)))
+
+           ;; ...
+
+           (bye session close-request/rdwr))))
+
+Note that each write to the session record port leads to the
+transmission of an encrypted TLS "Application Data" packet.  In the
+above example, we create an Application Data packet for the 11 bytes for
+the string that we write.  This is not efficient both in terms of CPU
+usage and bandwidth (each packet adds at least 5 bytes of overhead and
+can lead to one 'write' system call), so we recommend that applications
+do their own buffering.
+
+A lower-level I/O API is provided by 'record-send' and 'record-receive!'
+which take a bytevector (or a SRFI-4 vector) to represent the data sent
+or received.  While it might improve performance, it is much less
+convenient than the session record port and should rarely be needed.
+
+
+File: gnutls-guile.info,  Node: Exception Handling,  Prev: Input and Output,  Up: Guile API Conventions
+
+3.5 Exception Handling
+======================
+
+GnuTLS errors are implemented as Scheme exceptions (*note exceptions in
+Guile: (guile)Exceptions.).  Each time a GnuTLS function returns an
+error, an exception with key 'gnutls-error' is raised.  The additional
+arguments that are thrown include an error code and the name of the
+GnuTLS procedure that raised the exception.  The error code is pretty
+much like an enumerate value: it is one of the 'error/' variables
+exported by the '(gnutls)' module (*note Enumerates and Constants::).
+Exceptions can be turned into error messages using the 'error->string'
+procedure.
+
+The following examples illustrates how GnuTLS exceptions can be handled:
+
+     (let ((session (make-session connection-end/server)))
+
+       ;;
+       ;; ...
+       ;;
+
+       (catch 'gnutls-error
+         (lambda ()
+           (handshake session))
+         (lambda (key err function . currently-unused)
+           (format (current-error-port)
+                   "a GnuTLS error was raised by `~a': ~a~%"
+                   function (error->string err)))))
+
+Again, error values can be compared using 'eq?':
+
+         ;; `gnutls-error' handler.
+         (lambda (key err function . currently-unused)
+           (if (eq? err error/fatal-alert-received)
+               (format (current-error-port)
+                       "a fatal alert was caught!~%")
+               (format (current-error-port)
+                       "something bad happened: ~a~%"
+                       (error->string err))))
+
+Note that the 'catch' handler is currently passed only 3 arguments but
+future versions might provide it with additional arguments.  Thus, it
+must be prepared to handle more than 3 arguments, as in this example.
+
+
+File: gnutls-guile.info,  Node: Guile Examples,  Next: Guile Reference,  Prev: Guile API Conventions,  Up: Top
+
+4 Guile Examples
+****************
+
+This chapter provides examples that illustrate common use cases.
+
+* Menu:
+
+* Anonymous Authentication Guile Example::    Simplest client and server.
+
+
+File: gnutls-guile.info,  Node: Anonymous Authentication Guile Example,  Up: Guile Examples
+
+4.1 Anonymous Authentication Guile Example
+==========================================
+
+"Anonymous authentication" is very easy to use.  No certificates are
+needed by the communicating parties.  Yet, it allows them to benefit
+from end-to-end encryption and integrity checks.
+
+The client-side code would look like this (assuming SOME-SOCKET is bound
+to an open socket port):
+
+     ;; Client-side.
+
+     (let ((client (make-session connection-end/client)))
+       ;; Use the default settings.
+       (set-session-default-priority! client)
+
+       ;; Don't use certificate-based authentication.
+       (set-session-certificate-type-priority! client '())
+
+       ;; Request the "anonymous Diffie-Hellman" key exchange method.
+       (set-session-kx-priority! client (list kx/anon-dh))
+
+       ;; Specify the underlying socket.
+       (set-session-transport-fd! client (fileno some-socket))
+
+       ;; Create anonymous credentials.
+       (set-session-credentials! client
+                                 (make-anonymous-client-credentials))
+
+       ;; Perform the TLS handshake with the server.
+       (handshake client)
+
+       ;; Send data over the TLS record layer.
+       (write "hello, world!" (session-record-port client))
+
+       ;; Terminate the TLS session.
+       (bye client close-request/rdwr))
+
+The corresponding server would look like this (again, assuming
+SOME-SOCKET is bound to a socket port):
+
+     ;; Server-side.
+
+     (let ((server (make-session connection-end/server)))
+       (set-session-default-priority! server)
+       (set-session-certificate-type-priority! server '())
+       (set-session-kx-priority! server (list kx/anon-dh))
+
+       ;; Specify the underlying transport socket.
+       (set-session-transport-fd! server (fileno some-socket))
+
+       ;; Create anonymous credentials.
+       (let ((cred (make-anonymous-server-credentials))
+             (dh-params (make-dh-parameters 1024)))
+         ;; Note: DH parameter generation can take some time.
+         (set-anonymous-server-dh-parameters! cred dh-params)
+         (set-session-credentials! server cred))
+
+       ;; Perform the TLS handshake with the client.
+       (handshake server)
+
+       ;; Receive data over the TLS record layer.
+       (let ((message (read (session-record-port server))))
+         (format #t "received the following message: ~a~%"
+                 message)
+
+         (bye server close-request/rdwr)))
+
+This is it!
+
+
+File: gnutls-guile.info,  Node: Guile Reference,  Next: Copying Information,  Prev: Guile Examples,  Up: Top
+
+5 Guile Reference
+*****************
+
+This chapter lists the GnuTLS Scheme procedures exported by the
+'(gnutls)' module (*note (guile)The Guile module system::).
+
+ -- Scheme Procedure: set-log-level! level
+     Enable GnuTLS logging up to LEVEL (an integer).
+
+ -- Scheme Procedure: set-log-procedure! proc
+     Use PROC (a two-argument procedure) as the global GnuTLS log
+     procedure.
+
+ -- Scheme Procedure: set-certificate-credentials-openpgp-keys! cred pub
+          sec
+     Use certificate PUB and secret key SEC in certificate credentials
+     CRED.
+
+ -- Scheme Procedure: openpgp-keyring-contains-key-id? keyring id
+     Return '#f' if key ID ID is in KEYRING, '#f' otherwise.
+
+ -- Scheme Procedure: import-openpgp-keyring data format
+     Import DATA (a u8vector) according to FORMAT and return the
+     imported keyring.
+
+ -- Scheme Procedure: openpgp-certificate-usage key
+     Return a list of values denoting the key usage of KEY.
+
+ -- Scheme Procedure: openpgp-certificate-version key
+     Return the version of the OpenPGP message format (RFC2440) honored
+     by KEY.
+
+ -- Scheme Procedure: openpgp-certificate-algorithm key
+     Return two values: the certificate algorithm used by KEY and the
+     number of bits used.
+
+ -- Scheme Procedure: openpgp-certificate-names key
+     Return the list of names for KEY.
+
+ -- Scheme Procedure: openpgp-certificate-name key index
+     Return the INDEXth name of KEY.
+
+ -- Scheme Procedure: openpgp-certificate-fingerprint key
+     Return a new u8vector denoting the fingerprint of KEY.
+
+ -- Scheme Procedure: openpgp-certificate-fingerprint! key fpr
+     Store in FPR (a u8vector) the fingerprint of KEY.  Return the
+     number of bytes stored in FPR.
+
+ -- Scheme Procedure: openpgp-certificate-id! key id
+     Store the ID (an 8 byte sequence) of certificate KEY in ID (a
+     u8vector).
+
+ -- Scheme Procedure: openpgp-certificate-id key
+     Return the ID (an 8-element u8vector) of certificate KEY.
+
+ -- Scheme Procedure: import-openpgp-private-key data format [pass]
+     Return a new OpenPGP private key object resulting from the import
+     of DATA (a uniform array) according to FORMAT.  Optionally, a
+     passphrase may be provided.
+
+ -- Scheme Procedure: import-openpgp-certificate data format
+     Return a new OpenPGP certificate object resulting from the import
+     of DATA (a uniform array) according to FORMAT.
+
+ -- Scheme Procedure: x509-certificate-subject-alternative-name cert
+          index
+     Return two values: the alternative name type for CERT (i.e., one of
+     the 'x509-subject-alternative-name/' values) and the actual subject
+     alternative name (a string) at INDEX.  Both values are '#f' if no
+     alternative name is available at INDEX.
+
+ -- Scheme Procedure: x509-certificate-subject-key-id cert
+     Return the subject key ID (a u8vector) for CERT.
+
+ -- Scheme Procedure: x509-certificate-authority-key-id cert
+     Return the key ID (a u8vector) of the X.509 certificate authority
+     of CERT.
+
+ -- Scheme Procedure: x509-certificate-key-id cert
+     Return a statistically unique ID (a u8vector) for CERT that depends
+     on its public key parameters.  This is normally a 20-byte SHA-1
+     hash.
+
+ -- Scheme Procedure: x509-certificate-version cert
+     Return the version of CERT.
+
+ -- Scheme Procedure: x509-certificate-key-usage cert
+     Return the key usage of CERT (i.e., a list of 'key-usage/' values),
+     or the empty list if CERT does not contain such information.
+
+ -- Scheme Procedure: x509-certificate-public-key-algorithm cert
+     Return two values: the public key algorithm (i.e., one of the
+     'pk-algorithm/' values) of CERT and the number of bits used.
+
+ -- Scheme Procedure: x509-certificate-signature-algorithm cert
+     Return the signature algorithm used by CERT (i.e., one of the
+     'sign-algorithm/' values).
+
+ -- Scheme Procedure: x509-certificate-matches-hostname? cert hostname
+     Return true if CERT matches HOSTNAME, a string denoting a DNS host
+     name.  This is the basic implementation of RFC 2818
+     (http://tools.ietf.org/html/rfc2818) (aka.  HTTPS).
+
+ -- Scheme Procedure: x509-certificate-issuer-dn-oid cert index
+     Return the OID (a string) at INDEX from CERT's issuer DN. Return
+     '#f' if no OID is available at INDEX.
+
+ -- Scheme Procedure: x509-certificate-dn-oid cert index
+     Return OID (a string) at INDEX from CERT.  Return '#f' if no OID is
+     available at INDEX.
+
+ -- Scheme Procedure: x509-certificate-issuer-dn cert
+     Return the distinguished name (DN) of X.509 certificate CERT.
+
+ -- Scheme Procedure: x509-certificate-dn cert
+     Return the distinguished name (DN) of X.509 certificate CERT.  The
+     form of the DN is as described in RFC 2253
+     (http://tools.ietf.org/html/rfc2253).
+
+ -- Scheme Procedure: pkcs8-import-x509-private-key data format [pass
+          [encrypted]]
+     Return a new X.509 private key object resulting from the import of
+     DATA (a uniform array) according to FORMAT.  Optionally, if PASS is
+     not '#f', it should be a string denoting a passphrase.  ENCRYPTED
+     tells whether the private key is encrypted ('#t' by default).
+
+ -- Scheme Procedure: import-x509-private-key data format
+     Return a new X.509 private key object resulting from the import of
+     DATA (a uniform array) according to FORMAT.
+
+ -- Scheme Procedure: import-x509-certificate data format
+     Return a new X.509 certificate object resulting from the import of
+     DATA (a uniform array) according to FORMAT.
+
+ -- Scheme Procedure: server-session-psk-username session
+     Return the username associated with PSK server session SESSION.
+
+ -- Scheme Procedure: set-psk-client-credentials! cred username key
+          key-format
+     Set the client credentials for CRED, a PSK client credentials
+     object.
+
+ -- Scheme Procedure: make-psk-client-credentials
+     Return a new PSK client credentials object.
+
+ -- Scheme Procedure: set-psk-server-credentials-file! cred file
+     Use FILE as the password file for PSK server credentials CRED.
+
+ -- Scheme Procedure: make-psk-server-credentials
+     Return new PSK server credentials.
+
+ -- Scheme Procedure: peer-certificate-status session
+     Verify the peer certificate for SESSION and return a list of
+     'certificate-status' values (such as 'certificate-status/revoked'),
+     or the empty list if the certificate is valid.
+
+ -- Scheme Procedure: set-certificate-credentials-verify-flags! cred
+          [flags...]
+     Set the certificate verification flags to FLAGS, a series of
+     'certificate-verify' values.
+
+ -- Scheme Procedure: set-certificate-credentials-verify-limits! cred
+          max-bits max-depth
+     Set the verification limits of 'peer-certificate-status' for
+     certificate credentials CRED to MAX_BITS bits for an acceptable
+     certificate and MAX_DEPTH as the maximum depth of a certificate
+     chain.
+
+ -- Scheme Procedure: set-certificate-credentials-x509-keys! cred certs
+          privkey
+     Have certificate credentials CRED use the X.509 certificates listed
+     in CERTS and X.509 private key PRIVKEY.
+
+ -- Scheme Procedure: set-certificate-credentials-x509-key-data! cred
+          cert key format
+     Use X.509 certificate CERT and private key KEY, both uniform arrays
+     containing the X.509 certificate and key in format FORMAT, for
+     certificate credentials CRED.
+
+ -- Scheme Procedure: set-certificate-credentials-x509-crl-data! cred
+          data format
+     Use DATA (a uniform array) as the X.509 CRL (certificate revocation
+     list) database for CRED.  On success, return the number of CRLs
+     processed.
+
+ -- Scheme Procedure: set-certificate-credentials-x509-trust-data! cred
+          data format
+     Use DATA (a uniform array) as the X.509 trust database for CRED.
+     On success, return the number of certificates processed.
+
+ -- Scheme Procedure: set-certificate-credentials-x509-crl-file! cred
+          file format
+     Use FILE as the X.509 CRL (certificate revocation list) file for
+     certificate credentials CRED.  On success, return the number of
+     CRLs processed.
+
+ -- Scheme Procedure: set-certificate-credentials-x509-trust-file! cred
+          file format
+     Use FILE as the X.509 trust file for certificate credentials CRED.
+     On success, return the number of certificates processed.
+
+ -- Scheme Procedure: set-certificate-credentials-x509-key-files! cred
+          cert-file key-file format
+     Use FILE as the password file for PSK server credentials CRED.
+
+ -- Scheme Procedure: set-certificate-credentials-dh-parameters! cred
+          dh-params
+     Use Diffie-Hellman parameters DH_PARAMS for certificate credentials
+     CRED.
+
+ -- Scheme Procedure: make-certificate-credentials
+     Return new certificate credentials (i.e., for use with either X.509
+     or OpenPGP certificates.
+
+ -- Scheme Procedure: set-anonymous-server-dh-parameters! cred dh-params
+     Set the Diffie-Hellman parameters of anonymous server credentials
+     CRED.
+
+ -- Scheme Procedure: make-anonymous-client-credentials
+     Return anonymous client credentials.
+
+ -- Scheme Procedure: make-anonymous-server-credentials
+     Return anonymous server credentials.
+
+ -- Scheme Procedure: set-session-dh-prime-bits! session bits
+     Use BITS DH prime bits for SESSION.
+
+ -- Scheme Procedure: pkcs3-export-dh-parameters dh-params format
+     Export Diffie-Hellman parameters DH_PARAMS in PKCS3 format
+     according for FORMAT (an 'x509-certificate-format' value).  Return
+     a 'u8vector' containing the result.
+
+ -- Scheme Procedure: pkcs3-import-dh-parameters array format
+     Import Diffie-Hellman parameters in PKCS3 format (further specified
+     by FORMAT, an 'x509-certificate-format' value) from ARRAY (a
+     homogeneous array) and return a new 'dh-params' object.
+
+ -- Scheme Procedure: make-dh-parameters bits
+     Return new Diffie-Hellman parameters.
+
+ -- Scheme Procedure: set-session-transport-port! session port
+     Use PORT as the input/output port for SESSION.
+
+ -- Scheme Procedure: set-session-transport-fd! session fd
+     Use file descriptor FD as the underlying transport for SESSION.
+
+ -- Scheme Procedure: session-record-port session
+     Return a read-write port that may be used to communicate over
+     SESSION.  All invocations of 'session-port' on a given session
+     return the same object (in the sense of 'eq?').
+
+ -- Scheme Procedure: record-receive! session array
+     Receive data from SESSION into ARRAY, a uniform homogeneous array.
+     Return the number of bytes actually received.
+
+ -- Scheme Procedure: record-send session array
+     Send the record constituted by ARRAY through SESSION.
+
+ -- Scheme Procedure: set-session-server-name! session type name
+     For a client, this procedure provides a way to inform the server
+     that it is known under NAME, via the 'SERVER NAME' TLS extension.
+     TYPE must be a 'server-name-type' value, SERVER-NAME-TYPE/DNS for
+     DNS names.
+
+ -- Scheme Procedure: set-session-credentials! session cred
+     Use CRED as SESSION's credentials.
+
+ -- Scheme Procedure: cipher-suite->string kx cipher mac
+     Return the name of the given cipher suite.
+
+ -- Scheme Procedure: set-session-priorities! session priorities
+     Have SESSION use the given PRIORITIES for the ciphers, key exchange
+     methods, MACs and compression methods.  PRIORITIES must be a string
+     (*note (gnutls)Priority Strings::).  When PRIORITIES cannot be
+     parsed, an 'error/invalid-request' error is raised, with an extra
+     argument indication the position of the error.
+
+ -- Scheme Procedure: set-session-default-priority! session
+     Have SESSION use the default priorities.
+
+ -- Scheme Procedure: set-server-session-certificate-request! session
+          request
+     Tell how SESSION, a server-side session, should deal with
+     certificate requests.  REQUEST should be either
+     'certificate-request/request' or 'certificate-request/require'.
+
+ -- Scheme Procedure: session-our-certificate-chain session
+     Return our certificate chain for SESSION (as sent to the peer) in
+     raw format (a u8vector).  In the case of OpenPGP there is exactly
+     one certificate.  Return the empty list if no certificate was used.
+
+ -- Scheme Procedure: session-peer-certificate-chain session
+     Return the a list of certificates in raw format (u8vectors) where
+     the first one is the peer's certificate.  In the case of OpenPGP,
+     there is always exactly one certificate.  In the case of X.509,
+     subsequent certificates indicate form a certificate chain.  Return
+     the empty list if no certificate was sent.
+
+ -- Scheme Procedure: session-client-authentication-type session
+     Return the client authentication type (a 'credential-type' value)
+     used in SESSION.
+
+ -- Scheme Procedure: session-server-authentication-type session
+     Return the server authentication type (a 'credential-type' value)
+     used in SESSION.
+
+ -- Scheme Procedure: session-authentication-type session
+     Return the authentication type (a 'credential-type' value) used by
+     SESSION.
+
+ -- Scheme Procedure: session-protocol session
+     Return the protocol used by SESSION.
+
+ -- Scheme Procedure: session-certificate-type session
+     Return SESSION's certificate type.
+
+ -- Scheme Procedure: session-compression-method session
+     Return SESSION's compression method.
+
+ -- Scheme Procedure: session-mac session
+     Return SESSION's MAC.
+
+ -- Scheme Procedure: session-kx session
+     Return SESSION's kx.
+
+ -- Scheme Procedure: session-cipher session
+     Return SESSION's cipher.
+
+ -- Scheme Procedure: alert-send session level alert
+     Send ALERT via SESSION.
+
+ -- Scheme Procedure: alert-get session
+     Get an aleter from SESSION.
+
+ -- Scheme Procedure: rehandshake session
+     Perform a re-handshaking for SESSION.
+
+ -- Scheme Procedure: handshake session
+     Perform a handshake for SESSION.
+
+ -- Scheme Procedure: bye session how
+     Close SESSION according to HOW.
+
+ -- Scheme Procedure: make-session end
+     Return a new session for connection end END, either
+     'connection-end/server' or 'connection-end/client'.
+
+ -- Scheme Procedure: gnutls-version
+     Return a string denoting the version number of the underlying
+     GnuTLS library, e.g., '"1.7.2"'.
+
+ -- Scheme Procedure: openpgp-keyring? obj
+     Return true if OBJ is of type 'openpgp-keyring'.
+
+ -- Scheme Procedure: openpgp-private-key? obj
+     Return true if OBJ is of type 'openpgp-private-key'.
+
+ -- Scheme Procedure: openpgp-certificate? obj
+     Return true if OBJ is of type 'openpgp-certificate'.
+
+ -- Scheme Procedure: x509-private-key? obj
+     Return true if OBJ is of type 'x509-private-key'.
+
+ -- Scheme Procedure: x509-certificate? obj
+     Return true if OBJ is of type 'x509-certificate'.
+
+ -- Scheme Procedure: psk-client-credentials? obj
+     Return true if OBJ is of type 'psk-client-credentials'.
+
+ -- Scheme Procedure: psk-server-credentials? obj
+     Return true if OBJ is of type 'psk-server-credentials'.
+
+ -- Scheme Procedure: srp-client-credentials? obj
+     Return true if OBJ is of type 'srp-client-credentials'.
+
+ -- Scheme Procedure: srp-server-credentials? obj
+     Return true if OBJ is of type 'srp-server-credentials'.
+
+ -- Scheme Procedure: certificate-credentials? obj
+     Return true if OBJ is of type 'certificate-credentials'.
+
+ -- Scheme Procedure: dh-parameters? obj
+     Return true if OBJ is of type 'dh-parameters'.
+
+ -- Scheme Procedure: anonymous-server-credentials? obj
+     Return true if OBJ is of type 'anonymous-server-credentials'.
+
+ -- Scheme Procedure: anonymous-client-credentials? obj
+     Return true if OBJ is of type 'anonymous-client-credentials'.
+
+ -- Scheme Procedure: session? obj
+     Return true if OBJ is of type 'session'.
+
+ -- Scheme Procedure: openpgp-certificate-format->string enumval
+     Return a string describing ENUMVAL, a 'openpgp-certificate-format'
+     value.
+
+ -- Scheme Procedure: error->string enumval
+     Return a string describing ENUMVAL, a 'error' value.
+
+ -- Scheme Procedure: certificate-verify->string enumval
+     Return a string describing ENUMVAL, a 'certificate-verify' value.
+
+ -- Scheme Procedure: key-usage->string enumval
+     Return a string describing ENUMVAL, a 'key-usage' value.
+
+ -- Scheme Procedure: psk-key-format->string enumval
+     Return a string describing ENUMVAL, a 'psk-key-format' value.
+
+ -- Scheme Procedure: server-name-type->string enumval
+     Return a string describing ENUMVAL, a 'server-name-type' value.
+
+ -- Scheme Procedure: sign-algorithm->string enumval
+     Return a string describing ENUMVAL, a 'sign-algorithm' value.
+
+ -- Scheme Procedure: pk-algorithm->string enumval
+     Return a string describing ENUMVAL, a 'pk-algorithm' value.
+
+ -- Scheme Procedure: x509-subject-alternative-name->string enumval
+     Return a string describing ENUMVAL, a
+     'x509-subject-alternative-name' value.
+
+ -- Scheme Procedure: x509-certificate-format->string enumval
+     Return a string describing ENUMVAL, a 'x509-certificate-format'
+     value.
+
+ -- Scheme Procedure: certificate-type->string enumval
+     Return a string describing ENUMVAL, a 'certificate-type' value.
+
+ -- Scheme Procedure: protocol->string enumval
+     Return a string describing ENUMVAL, a 'protocol' value.
+
+ -- Scheme Procedure: close-request->string enumval
+     Return a string describing ENUMVAL, a 'close-request' value.
+
+ -- Scheme Procedure: certificate-request->string enumval
+     Return a string describing ENUMVAL, a 'certificate-request' value.
+
+ -- Scheme Procedure: certificate-status->string enumval
+     Return a string describing ENUMVAL, a 'certificate-status' value.
+
+ -- Scheme Procedure: handshake-description->string enumval
+     Return a string describing ENUMVAL, a 'handshake-description'
+     value.
+
+ -- Scheme Procedure: alert-description->string enumval
+     Return a string describing ENUMVAL, a 'alert-description' value.
+
+ -- Scheme Procedure: alert-level->string enumval
+     Return a string describing ENUMVAL, a 'alert-level' value.
+
+ -- Scheme Procedure: connection-end->string enumval
+     Return a string describing ENUMVAL, a 'connection-end' value.
+
+ -- Scheme Procedure: compression-method->string enumval
+     Return a string describing ENUMVAL, a 'compression-method' value.
+
+ -- Scheme Procedure: digest->string enumval
+     Return a string describing ENUMVAL, a 'digest' value.
+
+ -- Scheme Procedure: mac->string enumval
+     Return a string describing ENUMVAL, a 'mac' value.
+
+ -- Scheme Procedure: credentials->string enumval
+     Return a string describing ENUMVAL, a 'credentials' value.
+
+ -- Scheme Procedure: params->string enumval
+     Return a string describing ENUMVAL, a 'params' value.
+
+ -- Scheme Procedure: kx->string enumval
+     Return a string describing ENUMVAL, a 'kx' value.
+
+ -- Scheme Procedure: cipher->string enumval
+     Return a string describing ENUMVAL, a 'cipher' value.
+
+
+File: gnutls-guile.info,  Node: Copying Information,  Next: Procedure Index,  Prev: Guile Reference,  Up: Top
+
+Appendix A Copying Information
+******************************
+
+GNU Free Documentation License
+==============================
+
+                     Version 1.3, 3 November 2008
+
+     Copyright (C) 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+     <http://fsf.org/>
+
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+
+  0. PREAMBLE
+
+     The purpose of this License is to make a manual, textbook, or other
+     functional and useful document "free" in the sense of freedom: to
+     assure everyone the effective freedom to copy and redistribute it,
+     with or without modifying it, either commercially or
+     noncommercially.  Secondarily, this License preserves for the
+     author and publisher a way to get credit for their work, while not
+     being considered responsible for modifications made by others.
+
+     This License is a kind of "copyleft", which means that derivative
+     works of the document must themselves be free in the same sense.
+     It complements the GNU General Public License, which is a copyleft
+     license designed for free software.
+
+     We have designed this License in order to use it for manuals for
+     free software, because free software needs free documentation: a
+     free program should come with manuals providing the same freedoms
+     that the software does.  But this License is not limited to
+     software manuals; it can be used for any textual work, regardless
+     of subject matter or whether it is published as a printed book.  We
+     recommend this License principally for works whose purpose is
+     instruction or reference.
+
+  1. APPLICABILITY AND DEFINITIONS
+
+     This License applies to any manual or other work, in any medium,
+     that contains a notice placed by the copyright holder saying it can
+     be distributed under the terms of this License.  Such a notice
+     grants a world-wide, royalty-free license, unlimited in duration,
+     to use that work under the conditions stated herein.  The
+     "Document", below, refers to any such manual or work.  Any member
+     of the public is a licensee, and is addressed as "you".  You accept
+     the license if you copy, modify or distribute the work in a way
+     requiring permission under copyright law.
+
+     A "Modified Version" of the Document means any work containing the
+     Document or a portion of it, either copied verbatim, or with
+     modifications and/or translated into another language.
+
+     A "Secondary Section" is a named appendix or a front-matter section
+     of the Document that deals exclusively with the relationship of the
+     publishers or authors of the Document to the Document's overall
+     subject (or to related matters) and contains nothing that could
+     fall directly within that overall subject.  (Thus, if the Document
+     is in part a textbook of mathematics, a Secondary Section may not
+     explain any mathematics.)  The relationship could be a matter of
+     historical connection with the subject or with related matters, or
+     of legal, commercial, philosophical, ethical or political position
+     regarding them.
+
+     The "Invariant Sections" are certain Secondary Sections whose
+     titles are designated, as being those of Invariant Sections, in the
+     notice that says that the Document is released under this License.
+     If a section does not fit the above definition of Secondary then it
+     is not allowed to be designated as Invariant.  The Document may
+     contain zero Invariant Sections.  If the Document does not identify
+     any Invariant Sections then there are none.
+
+     The "Cover Texts" are certain short passages of text that are
+     listed, as Front-Cover Texts or Back-Cover Texts, in the notice
+     that says that the Document is released under this License.  A
+     Front-Cover Text may be at most 5 words, and a Back-Cover Text may
+     be at most 25 words.
+
+     A "Transparent" copy of the Document means a machine-readable copy,
+     represented in a format whose specification is available to the
+     general public, that is suitable for revising the document
+     straightforwardly with generic text editors or (for images composed
+     of pixels) generic paint programs or (for drawings) some widely
+     available drawing editor, and that is suitable for input to text
+     formatters or for automatic translation to a variety of formats
+     suitable for input to text formatters.  A copy made in an otherwise
+     Transparent file format whose markup, or absence of markup, has
+     been arranged to thwart or discourage subsequent modification by
+     readers is not Transparent.  An image format is not Transparent if
+     used for any substantial amount of text.  A copy that is not
+     "Transparent" is called "Opaque".
+
+     Examples of suitable formats for Transparent copies include plain
+     ASCII without markup, Texinfo input format, LaTeX input format,
+     SGML or XML using a publicly available DTD, and standard-conforming
+     simple HTML, PostScript or PDF designed for human modification.
+     Examples of transparent image formats include PNG, XCF and JPG.
+     Opaque formats include proprietary formats that can be read and
+     edited only by proprietary word processors, SGML or XML for which
+     the DTD and/or processing tools are not generally available, and
+     the machine-generated HTML, PostScript or PDF produced by some word
+     processors for output purposes only.
+
+     The "Title Page" means, for a printed book, the title page itself,
+     plus such following pages as are needed to hold, legibly, the
+     material this License requires to appear in the title page.  For
+     works in formats which do not have any title page as such, "Title
+     Page" means the text near the most prominent appearance of the
+     work's title, preceding the beginning of the body of the text.
+
+     The "publisher" means any person or entity that distributes copies
+     of the Document to the public.
+
+     A section "Entitled XYZ" means a named subunit of the Document
+     whose title either is precisely XYZ or contains XYZ in parentheses
+     following text that translates XYZ in another language.  (Here XYZ
+     stands for a specific section name mentioned below, such as
+     "Acknowledgements", "Dedications", "Endorsements", or "History".)
+     To "Preserve the Title" of such a section when you modify the
+     Document means that it remains a section "Entitled XYZ" according
+     to this definition.
+
+     The Document may include Warranty Disclaimers next to the notice
+     which states that this License applies to the Document.  These
+     Warranty Disclaimers are considered to be included by reference in
+     this License, but only as regards disclaiming warranties: any other
+     implication that these Warranty Disclaimers may have is void and
+     has no effect on the meaning of this License.
+
+  2. VERBATIM COPYING
+
+     You may copy and distribute the Document in any medium, either
+     commercially or noncommercially, provided that this License, the
+     copyright notices, and the license notice saying this License
+     applies to the Document are reproduced in all copies, and that you
+     add no other conditions whatsoever to those of this License.  You
+     may not use technical measures to obstruct or control the reading
+     or further copying of the copies you make or distribute.  However,
+     you may accept compensation in exchange for copies.  If you
+     distribute a large enough number of copies you must also follow the
+     conditions in section 3.
+
+     You may also lend copies, under the same conditions stated above,
+     and you may publicly display copies.
+
+  3. COPYING IN QUANTITY
+
+     If you publish printed copies (or copies in media that commonly
+     have printed covers) of the Document, numbering more than 100, and
+     the Document's license notice requires Cover Texts, you must
+     enclose the copies in covers that carry, clearly and legibly, all
+     these Cover Texts: Front-Cover Texts on the front cover, and
+     Back-Cover Texts on the back cover.  Both covers must also clearly
+     and legibly identify you as the publisher of these copies.  The
+     front cover must present the full title with all words of the title
+     equally prominent and visible.  You may add other material on the
+     covers in addition.  Copying with changes limited to the covers, as
+     long as they preserve the title of the Document and satisfy these
+     conditions, can be treated as verbatim copying in other respects.
+
+     If the required texts for either cover are too voluminous to fit
+     legibly, you should put the first ones listed (as many as fit
+     reasonably) on the actual cover, and continue the rest onto
+     adjacent pages.
+
+     If you publish or distribute Opaque copies of the Document
+     numbering more than 100, you must either include a machine-readable
+     Transparent copy along with each Opaque copy, or state in or with
+     each Opaque copy a computer-network location from which the general
+     network-using public has access to download using public-standard
+     network protocols a complete Transparent copy of the Document, free
+     of added material.  If you use the latter option, you must take
+     reasonably prudent steps, when you begin distribution of Opaque
+     copies in quantity, to ensure that this Transparent copy will
+     remain thus accessible at the stated location until at least one
+     year after the last time you distribute an Opaque copy (directly or
+     through your agents or retailers) of that edition to the public.
+
+     It is requested, but not required, that you contact the authors of
+     the Document well before redistributing any large number of copies,
+     to give them a chance to provide you with an updated version of the
+     Document.
+
+  4. MODIFICATIONS
+
+     You may copy and distribute a Modified Version of the Document
+     under the conditions of sections 2 and 3 above, provided that you
+     release the Modified Version under precisely this License, with the
+     Modified Version filling the role of the Document, thus licensing
+     distribution and modification of the Modified Version to whoever
+     possesses a copy of it.  In addition, you must do these things in
+     the Modified Version:
+
+       A. Use in the Title Page (and on the covers, if any) a title
+          distinct from that of the Document, and from those of previous
+          versions (which should, if there were any, be listed in the
+          History section of the Document).  You may use the same title
+          as a previous version if the original publisher of that
+          version gives permission.
+
+       B. List on the Title Page, as authors, one or more persons or
+          entities responsible for authorship of the modifications in
+          the Modified Version, together with at least five of the
+          principal authors of the Document (all of its principal
+          authors, if it has fewer than five), unless they release you
+          from this requirement.
+
+       C. State on the Title page the name of the publisher of the
+          Modified Version, as the publisher.
+
+       D. Preserve all the copyright notices of the Document.
+
+       E. Add an appropriate copyright notice for your modifications
+          adjacent to the other copyright notices.
+
+       F. Include, immediately after the copyright notices, a license
+          notice giving the public permission to use the Modified
+          Version under the terms of this License, in the form shown in
+          the Addendum below.
+
+       G. Preserve in that license notice the full lists of Invariant
+          Sections and required Cover Texts given in the Document's
+          license notice.
+
+       H. Include an unaltered copy of this License.
+
+       I. Preserve the section Entitled "History", Preserve its Title,
+          and add to it an item stating at least the title, year, new
+          authors, and publisher of the Modified Version as given on the
+          Title Page.  If there is no section Entitled "History" in the
+          Document, create one stating the title, year, authors, and
+          publisher of the Document as given on its Title Page, then add
+          an item describing the Modified Version as stated in the
+          previous sentence.
+
+       J. Preserve the network location, if any, given in the Document
+          for public access to a Transparent copy of the Document, and
+          likewise the network locations given in the Document for
+          previous versions it was based on.  These may be placed in the
+          "History" section.  You may omit a network location for a work
+          that was published at least four years before the Document
+          itself, or if the original publisher of the version it refers
+          to gives permission.
+
+       K. For any section Entitled "Acknowledgements" or "Dedications",
+          Preserve the Title of the section, and preserve in the section
+          all the substance and tone of each of the contributor
+          acknowledgements and/or dedications given therein.
+
+       L. Preserve all the Invariant Sections of the Document, unaltered
+          in their text and in their titles.  Section numbers or the
+          equivalent are not considered part of the section titles.
+
+       M. Delete any section Entitled "Endorsements".  Such a section
+          may not be included in the Modified Version.
+
+       N. Do not retitle any existing section to be Entitled
+          "Endorsements" or to conflict in title with any Invariant
+          Section.
+
+       O. Preserve any Warranty Disclaimers.
+
+     If the Modified Version includes new front-matter sections or
+     appendices that qualify as Secondary Sections and contain no
+     material copied from the Document, you may at your option designate
+     some or all of these sections as invariant.  To do this, add their
+     titles to the list of Invariant Sections in the Modified Version's
+     license notice.  These titles must be distinct from any other
+     section titles.
+
+     You may add a section Entitled "Endorsements", provided it contains
+     nothing but endorsements of your Modified Version by various
+     parties--for example, statements of peer review or that the text
+     has been approved by an organization as the authoritative
+     definition of a standard.
+
+     You may add a passage of up to five words as a Front-Cover Text,
+     and a passage of up to 25 words as a Back-Cover Text, to the end of
+     the list of Cover Texts in the Modified Version.  Only one passage
+     of Front-Cover Text and one of Back-Cover Text may be added by (or
+     through arrangements made by) any one entity.  If the Document
+     already includes a cover text for the same cover, previously added
+     by you or by arrangement made by the same entity you are acting on
+     behalf of, you may not add another; but you may replace the old
+     one, on explicit permission from the previous publisher that added
+     the old one.
+
+     The author(s) and publisher(s) of the Document do not by this
+     License give permission to use their names for publicity for or to
+     assert or imply endorsement of any Modified Version.
+
+  5. COMBINING DOCUMENTS
+
+     You may combine the Document with other documents released under
+     this License, under the terms defined in section 4 above for
+     modified versions, provided that you include in the combination all
+     of the Invariant Sections of all of the original documents,
+     unmodified, and list them all as Invariant Sections of your
+     combined work in its license notice, and that you preserve all
+     their Warranty Disclaimers.
+
+     The combined work need only contain one copy of this License, and
+     multiple identical Invariant Sections may be replaced with a single
+     copy.  If there are multiple Invariant Sections with the same name
+     but different contents, make the title of each such section unique
+     by adding at the end of it, in parentheses, the name of the
+     original author or publisher of that section if known, or else a
+     unique number.  Make the same adjustment to the section titles in
+     the list of Invariant Sections in the license notice of the
+     combined work.
+
+     In the combination, you must combine any sections Entitled
+     "History" in the various original documents, forming one section
+     Entitled "History"; likewise combine any sections Entitled
+     "Acknowledgements", and any sections Entitled "Dedications".  You
+     must delete all sections Entitled "Endorsements."
+
+  6. COLLECTIONS OF DOCUMENTS
+
+     You may make a collection consisting of the Document and other
+     documents released under this License, and replace the individual
+     copies of this License in the various documents with a single copy
+     that is included in the collection, provided that you follow the
+     rules of this License for verbatim copying of each of the documents
+     in all other respects.
+
+     You may extract a single document from such a collection, and
+     distribute it individually under this License, provided you insert
+     a copy of this License into the extracted document, and follow this
+     License in all other respects regarding verbatim copying of that
+     document.
+
+  7. AGGREGATION WITH INDEPENDENT WORKS
+
+     A compilation of the Document or its derivatives with other
+     separate and independent documents or works, in or on a volume of a
+     storage or distribution medium, is called an "aggregate" if the
+     copyright resulting from the compilation is not used to limit the
+     legal rights of the compilation's users beyond what the individual
+     works permit.  When the Document is included in an aggregate, this
+     License does not apply to the other works in the aggregate which
+     are not themselves derivative works of the Document.
+
+     If the Cover Text requirement of section 3 is applicable to these
+     copies of the Document, then if the Document is less than one half
+     of the entire aggregate, the Document's Cover Texts may be placed
+     on covers that bracket the Document within the aggregate, or the
+     electronic equivalent of covers if the Document is in electronic
+     form.  Otherwise they must appear on printed covers that bracket
+     the whole aggregate.
+
+  8. TRANSLATION
+
+     Translation is considered a kind of modification, so you may
+     distribute translations of the Document under the terms of section
+     4.  Replacing Invariant Sections with translations requires special
+     permission from their copyright holders, but you may include
+     translations of some or all Invariant Sections in addition to the
+     original versions of these Invariant Sections.  You may include a
+     translation of this License, and all the license notices in the
+     Document, and any Warranty Disclaimers, provided that you also
+     include the original English version of this License and the
+     original versions of those notices and disclaimers.  In case of a
+     disagreement between the translation and the original version of
+     this License or a notice or disclaimer, the original version will
+     prevail.
+
+     If a section in the Document is Entitled "Acknowledgements",
+     "Dedications", or "History", the requirement (section 4) to
+     Preserve its Title (section 1) will typically require changing the
+     actual title.
+
+  9. TERMINATION
+
+     You may not copy, modify, sublicense, or distribute the Document
+     except as expressly provided under this License.  Any attempt
+     otherwise to copy, modify, sublicense, or distribute it is void,
+     and will automatically terminate your rights under this License.
+
+     However, if you cease all violation of this License, then your
+     license from a particular copyright holder is reinstated (a)
+     provisionally, unless and until the copyright holder explicitly and
+     finally terminates your license, and (b) permanently, if the
+     copyright holder fails to notify you of the violation by some
+     reasonable means prior to 60 days after the cessation.
+
+     Moreover, your license from a particular copyright holder is
+     reinstated permanently if the copyright holder notifies you of the
+     violation by some reasonable means, this is the first time you have
+     received notice of violation of this License (for any work) from
+     that copyright holder, and you cure the violation prior to 30 days
+     after your receipt of the notice.
+
+     Termination of your rights under this section does not terminate
+     the licenses of parties who have received copies or rights from you
+     under this License.  If your rights have been terminated and not
+     permanently reinstated, receipt of a copy of some or all of the
+     same material does not give you any rights to use it.
+
+  10. FUTURE REVISIONS OF THIS LICENSE
+
+     The Free Software Foundation may publish new, revised versions of
+     the GNU Free Documentation License from time to time.  Such new
+     versions will be similar in spirit to the present version, but may
+     differ in detail to address new problems or concerns.  See
+     <http://www.gnu.org/copyleft/>.
+
+     Each version of the License is given a distinguishing version
+     number.  If the Document specifies that a particular numbered
+     version of this License "or any later version" applies to it, you
+     have the option of following the terms and conditions either of
+     that specified version or of any later version that has been
+     published (not as a draft) by the Free Software Foundation.  If the
+     Document does not specify a version number of this License, you may
+     choose any version ever published (not as a draft) by the Free
+     Software Foundation.  If the Document specifies that a proxy can
+     decide which future versions of this License can be used, that
+     proxy's public statement of acceptance of a version permanently
+     authorizes you to choose that version for the Document.
+
+  11. RELICENSING
+
+     "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
+     World Wide Web server that publishes copyrightable works and also
+     provides prominent facilities for anybody to edit those works.  A
+     public wiki that anybody can edit is an example of such a server.
+     A "Massive Multiauthor Collaboration" (or "MMC") contained in the
+     site means any set of copyrightable works thus published on the MMC
+     site.
+
+     "CC-BY-SA" means the Creative Commons Attribution-Share Alike 3.0
+     license published by Creative Commons Corporation, a not-for-profit
+     corporation with a principal place of business in San Francisco,
+     California, as well as future copyleft versions of that license
+     published by that same organization.
+
+     "Incorporate" means to publish or republish a Document, in whole or
+     in part, as part of another Document.
+
+     An MMC is "eligible for relicensing" if it is licensed under this
+     License, and if all works that were first published under this
+     License somewhere other than this MMC, and subsequently
+     incorporated in whole or in part into the MMC, (1) had no cover
+     texts or invariant sections, and (2) were thus incorporated prior
+     to November 1, 2008.
+
+     The operator of an MMC Site may republish an MMC contained in the
+     site under CC-BY-SA on the same site at any time before August 1,
+     2009, provided the MMC is eligible for relicensing.
+
+ADDENDUM: How to use this License for your documents
+====================================================
+
+To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and license
+notices just after the title page:
+
+       Copyright (C)  YEAR  YOUR NAME.
+       Permission is granted to copy, distribute and/or modify this document
+       under the terms of the GNU Free Documentation License, Version 1.3
+       or any later version published by the Free Software Foundation;
+       with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
+       Texts.  A copy of the license is included in the section entitled ``GNU
+       Free Documentation License''.
+
+If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
+replace the "with...Texts." line with this:
+
+         with the Invariant Sections being LIST THEIR TITLES, with
+         the Front-Cover Texts being LIST, and with the Back-Cover Texts
+         being LIST.
+
+If you have Invariant Sections without Cover Texts, or some other
+combination of the three, merge those two alternatives to suit the
+situation.
+
+If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of free
+software license, such as the GNU General Public License, to permit
+their use in free software.
+
+
+File: gnutls-guile.info,  Node: Procedure Index,  Next: Concept Index,  Prev: Copying Information,  Up: Top
+
+Procedure Index
+***************
+
+ [index ]
+* Menu:
+
+* alert-description->string:             Guile Reference.     (line 449)
+* alert-get:                             Guile Reference.     (line 335)
+* alert-level->string:                   Guile Reference.     (line 452)
+* alert-send:                            Guile Reference.     (line 332)
+* anonymous-client-credentials?:         Guile Reference.     (line 391)
+* anonymous-server-credentials?:         Guile Reference.     (line 388)
+* bye:                                   Guile Reference.     (line 344)
+* certificate-credentials?:              Guile Reference.     (line 382)
+* certificate-request->string:           Guile Reference.     (line 439)
+* certificate-status->string:            Guile Reference.     (line 442)
+* certificate-type->string:              Guile Reference.     (line 430)
+* certificate-verify->string:            Guile Reference.     (line 404)
+* cipher->string:                        Guile Reference.     (line 476)
+* cipher-suite->string:                  Guile Reference.     (line 271)
+* close-request->string:                 Guile Reference.     (line 436)
+* compression-method->string:            Guile Reference.     (line 458)
+* connection-end->string:                Guile Reference.     (line 455)
+* credentials->string:                   Guile Reference.     (line 467)
+* dh-parameters?:                        Guile Reference.     (line 385)
+* digest->string:                        Guile Reference.     (line 461)
+* error->string:                         Exception Handling.  (line   6)
+* error->string <1>:                     Guile Reference.     (line 401)
+* gnutls-version:                        Guile Reference.     (line 351)
+* handshake:                             Guile Reference.     (line 341)
+* handshake-description->string:         Guile Reference.     (line 445)
+* import-openpgp-certificate:            Guile Reference.     (line  64)
+* import-openpgp-keyring:                Guile Reference.     (line  24)
+* import-openpgp-private-key:            Guile Reference.     (line  59)
+* import-x509-certificate:               Guile Reference.     (line 134)
+* import-x509-private-key:               Guile Reference.     (line 130)
+* key-usage->string:                     Guile Reference.     (line 407)
+* kx->string:                            Guile Reference.     (line 473)
+* mac->string:                           Guile Reference.     (line 464)
+* make-anonymous-client-credentials:     Guile Reference.     (line 222)
+* make-anonymous-server-credentials:     Guile Reference.     (line 225)
+* make-certificate-credentials:          Guile Reference.     (line 214)
+* make-dh-parameters:                    Representation of Binary Data.
+                                                              (line  16)
+* make-dh-parameters <1>:                Guile Reference.     (line 241)
+* make-psk-client-credentials:           Guile Reference.     (line 146)
+* make-psk-server-credentials:           Guile Reference.     (line 152)
+* make-session:                          Guile Reference.     (line 347)
+* openpgp-certificate-algorithm:         Guile Reference.     (line  35)
+* openpgp-certificate-fingerprint:       Guile Reference.     (line  45)
+* openpgp-certificate-fingerprint!:      Guile Reference.     (line  48)
+* openpgp-certificate-format->string:    Guile Reference.     (line 397)
+* openpgp-certificate-id:                Guile Reference.     (line  56)
+* openpgp-certificate-id!:               Guile Reference.     (line  52)
+* openpgp-certificate-name:              Guile Reference.     (line  42)
+* openpgp-certificate-names:             Guile Reference.     (line  39)
+* openpgp-certificate-usage:             Guile Reference.     (line  28)
+* openpgp-certificate-version:           Guile Reference.     (line  31)
+* openpgp-certificate?:                  Guile Reference.     (line 361)
+* openpgp-keyring-contains-key-id?:      Guile Reference.     (line  21)
+* openpgp-keyring?:                      Guile Reference.     (line 355)
+* openpgp-private-key?:                  Guile Reference.     (line 358)
+* params->string:                        Guile Reference.     (line 470)
+* peer-certificate-status:               Guile Reference.     (line 155)
+* pk-algorithm->string:                  Guile Reference.     (line 419)
+* pkcs3-export-dh-parameters:            Representation of Binary Data.
+                                                              (line  16)
+* pkcs3-export-dh-parameters <1>:        Guile Reference.     (line 231)
+* pkcs3-import-dh-parameters:            Guile Reference.     (line 236)
+* pkcs8-import-x509-private-key:         Guile Reference.     (line 123)
+* protocol->string:                      Guile Reference.     (line 433)
+* psk-client-credentials?:               Guile Reference.     (line 370)
+* psk-key-format->string:                Guile Reference.     (line 410)
+* psk-server-credentials?:               Guile Reference.     (line 373)
+* record-receive!:                       Input and Output.    (line  55)
+* record-receive! <1>:                   Guile Reference.     (line 255)
+* record-send:                           Input and Output.    (line  55)
+* record-send <1>:                       Guile Reference.     (line 259)
+* rehandshake:                           Guile Reference.     (line 338)
+* server-name-type->string:              Guile Reference.     (line 413)
+* server-session-psk-username:           Guile Reference.     (line 138)
+* session-authentication-type:           Guile Reference.     (line 310)
+* session-certificate-type:              Guile Reference.     (line 317)
+* session-cipher:                        Enumerates and Constants.
+                                                              (line  47)
+* session-cipher <1>:                    Guile Reference.     (line 329)
+* session-client-authentication-type:    Guile Reference.     (line 302)
+* session-compression-method:            Guile Reference.     (line 320)
+* session-kx:                            Guile Reference.     (line 326)
+* session-mac:                           Guile Reference.     (line 323)
+* session-our-certificate-chain:         Guile Reference.     (line 290)
+* session-peer-certificate-chain:        Guile Reference.     (line 295)
+* session-protocol:                      Guile Reference.     (line 314)
+* session-record-port:                   Input and Output.    (line  28)
+* session-record-port <1>:               Guile Reference.     (line 250)
+* session-server-authentication-type:    Guile Reference.     (line 306)
+* session?:                              Guile Reference.     (line 394)
+* set-anonymous-server-dh-parameters!:   Guile Reference.     (line 218)
+* set-certificate-credentials-dh-parameters!: Guile Reference.
+                                                              (line 209)
+* set-certificate-credentials-openpgp-keys!: Guile Reference. (line  16)
+* set-certificate-credentials-verify-flags!: Guile Reference. (line 160)
+* set-certificate-credentials-verify-limits!: Guile Reference.
+                                                              (line 165)
+* set-certificate-credentials-x509-crl-data!: Guile Reference.
+                                                              (line 183)
+* set-certificate-credentials-x509-crl-file!: Guile Reference.
+                                                              (line 194)
+* set-certificate-credentials-x509-key-data!: Guile Reference.
+                                                              (line 177)
+* set-certificate-credentials-x509-key-files!: Guile Reference.
+                                                              (line 205)
+* set-certificate-credentials-x509-keys!: Guile Reference.    (line 172)
+* set-certificate-credentials-x509-trust-data!: Guile Reference.
+                                                              (line 189)
+* set-certificate-credentials-x509-trust-file!: Guile Reference.
+                                                              (line 200)
+* set-log-level!:                        Guile Reference.     (line   9)
+* set-log-procedure!:                    Guile Reference.     (line  12)
+* set-psk-client-credentials!:           Guile Reference.     (line 141)
+* set-psk-server-credentials-file!:      Guile Reference.     (line 149)
+* set-server-session-certificate-request!: Guile Reference.   (line 284)
+* set-session-credentials!:              Guile Reference.     (line 268)
+* set-session-default-priority!:         Guile Reference.     (line 281)
+* set-session-dh-prime-bits!:            Guile Reference.     (line 228)
+* set-session-priorities!:               Guile Reference.     (line 274)
+* set-session-server-name!:              Guile Reference.     (line 262)
+* set-session-transport-fd!:             Input and Output.    (line   6)
+* set-session-transport-fd! <1>:         Guile Reference.     (line 247)
+* set-session-transport-port!:           Input and Output.    (line   6)
+* set-session-transport-port! <1>:       Guile Reference.     (line 244)
+* sign-algorithm->string:                Guile Reference.     (line 416)
+* srp-client-credentials?:               Guile Reference.     (line 376)
+* srp-server-credentials?:               Guile Reference.     (line 379)
+* x509-certificate-authority-key-id:     Guile Reference.     (line  78)
+* x509-certificate-dn:                   Guile Reference.     (line 118)
+* x509-certificate-dn-oid:               Guile Reference.     (line 111)
+* x509-certificate-format->string:       Guile Reference.     (line 426)
+* x509-certificate-issuer-dn:            Guile Reference.     (line 115)
+* x509-certificate-issuer-dn-oid:        Guile Reference.     (line 107)
+* x509-certificate-key-id:               Guile Reference.     (line  82)
+* x509-certificate-key-usage:            Guile Reference.     (line  90)
+* x509-certificate-matches-hostname?:    Guile Reference.     (line 102)
+* x509-certificate-public-key-algorithm: Guile Reference.     (line  94)
+* x509-certificate-signature-algorithm:  Guile Reference.     (line  98)
+* x509-certificate-subject-alternative-name: Guile Reference. (line  68)
+* x509-certificate-subject-key-id:       Guile Reference.     (line  75)
+* x509-certificate-version:              Guile Reference.     (line  87)
+* x509-certificate?:                     Guile Reference.     (line 367)
+* x509-private-key?:                     Guile Reference.     (line 364)
+* x509-subject-alternative-name->string: Guile Reference.     (line 422)
+
+
+File: gnutls-guile.info,  Node: Concept Index,  Prev: Procedure Index,  Up: Top
+
+Concept Index
+*************
+
+ [index ]
+* Menu:
+
+* buffering:                             Input and Output.     (line 47)
+* bytevectors:                           Representation of Binary Data.
+                                                               (line  9)
+* constant:                              Enumerates and Constants.
+                                                               (line  6)
+* enumerate:                             Enumerates and Constants.
+                                                               (line  6)
+* errors:                                Exception Handling.   (line  6)
+* exceptions:                            Exception Handling.   (line  6)
+* FDL, GNU Free Documentation License:   Copying Information.  (line  6)
+* gnutls-error:                          Exception Handling.   (line  6)
+* homogeneous vector:                    Representation of Binary Data.
+                                                               (line  9)
+* SRFI-4:                                Representation of Binary Data.
+                                                               (line  9)
+
+
+
+Tag Table:
+Node: Top789
+Node: Preface1848
+Node: Guile Preparations2414
+Node: Guile API Conventions5188
+Node: Enumerates and Constants5762
+Node: Procedure Names8087
+Node: Representation of Binary Data9070
+Ref: Representation of Binary Data-Footnote-19995
+Node: Input and Output10111
+Node: Exception Handling12456
+Node: Guile Examples14284
+Node: Anonymous Authentication Guile Example14583
+Node: Guile Reference17100
+Node: Copying Information36120
+Node: Procedure Index61306
+Node: Concept Index71974
+
+End Tag Table

@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_get_preferred_hash_algorithm} (gnutls_pubkey_t @var{key}, gnutls_digest_algorithm_t *         @var{hash}, unsigned int * @var{mand})
+@var{key}: Holds the certificate
+
+@var{hash}: The result of the call with the hash algorithm used for signature
+
+@var{mand}: If non zero it means that the algorithm MUST use this hash. May be NULL.
+
+This function will read the certificate and return the appropriate digest
+algorithm to use for signing with this certificate. Some certificates (i.e.
+DSA might not be able to sign without the preferred algorithm).
+
+To get the signature algorithm instead of just the hash use @code{gnutls_pk_to_sign()} 
+with the algorithm of the certificate/key and the provided  @code{hash} .
+
+@strong{Returns:} the 0 if the hash algorithm is found. A negative error code is
+returned on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun

@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_issuer} (gnutls_x509_crt_t @var{cert}, gnutls_x509_dn_t * @var{dn})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{dn}: output variable with pointer to uint8_t DN
+
+Return the Certificate's Issuer DN as a @code{gnutls_x509_dn_t}  data type,
+that can be decoded using @code{gnutls_x509_dn_get_rdn_ava()} . 
+
+Note that  @code{dn} should be treated as constant. Because it points 
+into the  @code{cert} object, you should not use  @code{dn} after  @code{cert} is
+deallocated.
+
+@strong{Returns:} Returns 0 on success, or an error code.
+@end deftypefun

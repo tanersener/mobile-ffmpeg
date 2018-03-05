@@ -1,0 +1,51 @@
+
+
+@c gnutls_certificate_verify_flags
+@table @code
+@item GNUTLS_@-VERIFY_@-DISABLE_@-CA_@-SIGN
+If set a signer does not have to be
+a certificate authority. This flag should normally be disabled,
+unless you know what this means.
+@item GNUTLS_@-VERIFY_@-DO_@-NOT_@-ALLOW_@-SAME
+If a certificate is not signed by
+anyone trusted but exists in the trusted CA list do not treat it
+as trusted.
+@item GNUTLS_@-VERIFY_@-ALLOW_@-ANY_@-X509_@-V1_@-CA_@-CRT
+Allow CA certificates that
+have version 1 (both root and intermediate). This might be
+dangerous since those haven't the basicConstraints
+extension. 
+@item GNUTLS_@-VERIFY_@-ALLOW_@-SIGN_@-RSA_@-MD2
+Allow certificates to be signed
+using the broken MD2 algorithm.
+@item GNUTLS_@-VERIFY_@-ALLOW_@-SIGN_@-RSA_@-MD5
+Allow certificates to be signed
+using the broken MD5 algorithm.
+@item GNUTLS_@-VERIFY_@-DISABLE_@-TIME_@-CHECKS
+Disable checking of activation
+and expiration validity periods of certificate chains. Don't set
+this unless you understand the security implications.
+@item GNUTLS_@-VERIFY_@-DISABLE_@-TRUSTED_@-TIME_@-CHECKS
+If set a signer in the trusted
+list is never checked for expiration or activation.
+@item GNUTLS_@-VERIFY_@-DO_@-NOT_@-ALLOW_@-X509_@-V1_@-CA_@-CRT
+Do not allow trusted CA
+certificates that have version 1.  This option is to be used
+to deprecate all certificates of version 1.
+@item GNUTLS_@-VERIFY_@-DISABLE_@-CRL_@-CHECKS
+Disable checking for validity
+using certificate revocation lists or the available OCSP data.
+@item GNUTLS_@-VERIFY_@-ALLOW_@-UNSORTED_@-CHAIN
+A certificate chain is tolerated
+if unsorted (the case with many TLS servers out there). This is the
+default since GnuTLS 3.1.4.
+@item GNUTLS_@-VERIFY_@-DO_@-NOT_@-ALLOW_@-UNSORTED_@-CHAIN
+Do not tolerate an unsorted
+certificate chain.
+@item GNUTLS_@-VERIFY_@-DO_@-NOT_@-ALLOW_@-WILDCARDS
+When including a hostname
+check in the verification, do not consider any wildcards.
+@item GNUTLS_@-VERIFY_@-USE_@-TLS1_@-RSA
+This indicates that a (raw) RSA signature is provided
+as in the TLS 1.0 protocol. Not all functions accept this flag.
+@end table

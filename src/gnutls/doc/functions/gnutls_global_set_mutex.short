@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_global_set_mutex} (mutex_init_func @var{init}, mutex_deinit_func @var{deinit}, mutex_lock_func @var{lock}, mutex_unlock_func @var{unlock})

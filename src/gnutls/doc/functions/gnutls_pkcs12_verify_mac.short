@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs12_verify_mac} (gnutls_pkcs12_t @var{pkcs12}, const char * @var{pass})

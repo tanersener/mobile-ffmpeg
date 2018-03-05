@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_hex2bin} (const char * @var{hex_data}, size_t @var{hex_size}, void * @var{bin_data}, size_t * @var{bin_size})
+@var{hex_data}: string with data in hex format
+
+@var{hex_size}: size of hex data
+
+@var{bin_data}: output array with binary data
+
+@var{bin_size}: when calling should hold maximum size of  @code{bin_data} ,
+on return will hold actual length of  @code{bin_data} .
+
+Convert a buffer with hex data to binary data. This function
+unlike @code{gnutls_hex_decode()}  can parse hex data with separators
+between numbers. That is, it ignores any non-hex characters.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun

@@ -1,0 +1,10 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_crq_deinit} (gnutls_x509_crq_t @var{crq})
+@var{crq}: the type to be deinitialized
+
+This function will deinitialize a PKCS@code{10}  certificate request
+structure.
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_heartbeat_allowed} (gnutls_session_t @var{session}, unsigned int @var{type})

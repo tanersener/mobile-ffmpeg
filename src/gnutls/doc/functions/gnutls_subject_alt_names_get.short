@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_subject_alt_names_get} (gnutls_subject_alt_names_t @var{sans}, unsigned int @var{seq}, unsigned int * @var{san_type}, gnutls_datum_t * @var{san}, gnutls_datum_t * @var{othername_oid})

@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_pcert_deinit} (gnutls_pcert_st * @var{pcert})

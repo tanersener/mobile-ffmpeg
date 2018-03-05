@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_number} (gnutls_x509_crl_t @var{crl}, void * @var{ret}, size_t * @var{ret_size}, unsigned int * @var{critical})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+@var{ret}: The place where the number will be copied
+
+@var{ret_size}: Holds the size of the result field.
+
+@var{critical}: will be non-zero if the extension is marked as critical
+(may be null)
+
+This function will return the CRL number extension.  This is
+obtained by the CRL Number extension field (2.5.29.20).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code in case of an error.
+
+@strong{Since:} 2.8.0
+@end deftypefun

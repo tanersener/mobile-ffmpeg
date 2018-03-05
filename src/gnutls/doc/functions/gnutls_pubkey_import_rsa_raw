@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_rsa_raw} (gnutls_pubkey_t @var{key}, const gnutls_datum_t * @var{m}, const gnutls_datum_t * @var{e})
+@var{key}: The key
+
+@var{m}: holds the modulus
+
+@var{e}: holds the public exponent
+
+This function will replace the parameters in the given structure.
+The new parameters should be stored in the appropriate
+gnutls_datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an negative error code.
+
+@strong{Since:} 2.12.0
+@end deftypefun

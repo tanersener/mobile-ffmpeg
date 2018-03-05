@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_set_authority_key_id} (gnutls_x509_crt_t @var{cert}, const void * @var{id}, size_t @var{id_size})

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_list_verify} (const gnutls_x509_crt_t * @var{cert_list}, unsigned @var{cert_list_length}, const gnutls_x509_crt_t * @var{CA_list}, unsigned @var{CA_list_length}, const gnutls_x509_crl_t * @var{CRL_list}, unsigned @var{CRL_list_length}, unsigned int @var{flags}, unsigned int * @var{verify})

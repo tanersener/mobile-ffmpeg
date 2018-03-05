@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_hash_get_len} (gnutls_digest_algorithm_t @var{algorithm})
+@var{algorithm}: the hash algorithm to use
+
+This function will return the length of the output data
+of the given hash algorithm.
+
+@strong{Returns:} The length or zero on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun

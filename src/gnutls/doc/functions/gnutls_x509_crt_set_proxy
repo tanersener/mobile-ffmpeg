@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_proxy} (gnutls_x509_crt_t @var{crt}, int @var{pathLenConstraint}, const char * @var{policyLanguage}, const char * @var{policy}, size_t @var{sizeof_policy})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{pathLenConstraint}: non-negative error codes indicate maximum length of path,
+and negative error codes indicate that the pathLenConstraints field should
+not be present.
+
+@var{policyLanguage}: OID describing the language of  @code{policy} .
+
+@var{policy}: uint8_t byte array with policy language, can be @code{NULL} 
+
+@var{sizeof_policy}: size of  @code{policy} .
+
+This function will set the proxyCertInfo extension.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

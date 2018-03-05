@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_safe_renegotiation_status} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Can be used to check whether safe renegotiation is being used
+in the current session.
+
+@strong{Returns:} 0 when safe renegotiation is not used and non (0) when
+safe renegotiation is used.
+
+@strong{Since:} 2.10.0
+@end deftypefun

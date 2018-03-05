@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_db_set_remove_function} (gnutls_session_t @var{session}, gnutls_db_remove_func @var{rem_func})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{rem_func}: is the function.
+
+Sets the function that will be used to remove data from the
+resumed sessions database. This function must return 0 on success.
+
+The first argument to  @code{rem_func} will be null unless
+@code{gnutls_db_set_ptr()}  has been called.
+@end deftypefun

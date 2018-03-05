@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_x509_trust_file} (gnutls_certificate_credentials_t            @var{cred}, const char * @var{cafile}, gnutls_x509_crt_fmt_t @var{type})
+@var{cred}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{cafile}: is a file containing the list of trusted CAs (DER or PEM list)
+
+@var{type}: is PEM or DER
+
+This function adds the trusted CAs in order to verify client or
+server certificates. In case of a client this is not required to
+be called if the certificates are not verified using
+@code{gnutls_certificate_verify_peers2()} .  This function may be called
+multiple times.
+
+In case of a server the names of the CAs set here will be sent to
+the client if a certificate request is sent. This can be disabled
+using @code{gnutls_certificate_send_x509_rdn_sequence()} .
+
+This function can also accept URLs. In that case it
+will import all certificates that are marked as trusted. Note
+that the supported URLs are the ones indicated by @code{gnutls_url_is_supported()} .
+
+@strong{Returns:} the number of certificates processed
+@end deftypefun

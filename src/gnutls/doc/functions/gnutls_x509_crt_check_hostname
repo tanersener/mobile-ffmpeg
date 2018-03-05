@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_x509_crt_check_hostname} (gnutls_x509_crt_t @var{cert}, const char * @var{hostname})
+@var{cert}: should contain an gnutls_x509_crt_t type
+
+@var{hostname}: A null terminated string that contains a DNS name
+
+This function will check if the given certificate's subject matches
+the given hostname.  This is a basic implementation of the matching
+described in RFC6125, and takes into account wildcards,
+and the DNSName/IPAddress subject alternative name PKIX extension.
+
+For details see also @code{gnutls_x509_crt_check_hostname2()} .
+
+@strong{Returns:} non-zero for a successful match, and zero on failure.
+@end deftypefun

@@ -1,0 +1,35 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_sign} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_t @var{signer}, gnutls_privkey_t @var{signer_key}, const gnutls_datum_t * @var{data}, gnutls_pkcs7_attrs_t @var{signed_attrs}, gnutls_pkcs7_attrs_t @var{unsigned_attrs}, gnutls_digest_algorithm_t @var{dig}, unsigned @var{flags})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+@var{signer}: the certificate to sign the structure
+
+@var{signer_key}: the key to sign the structure
+
+@var{data}: The data to be signed or @code{NULL}  if the data are already embedded
+
+@var{signed_attrs}: Any additional attributes to be included in the signed ones (or @code{NULL} )
+
+@var{unsigned_attrs}: Any additional attributes to be included in the unsigned ones (or @code{NULL} )
+
+@var{dig}: The digest algorithm to use for signing
+
+@var{flags}: Should be zero or one of @code{GNUTLS_PKCS7}  flags
+
+This function will add a signature in the provided PKCS @code{7}  structure
+for the provided data. Multiple signatures can be made with different
+signers.
+
+The available flags are:
+@code{GNUTLS_PKCS7_EMBED_DATA} , @code{GNUTLS_PKCS7_INCLUDE_TIME} , @code{GNUTLS_PKCS7_INCLUDE_CERT} ,
+and @code{GNUTLS_PKCS7_WRITE_SPKI} . They are explained in the @code{gnutls_pkcs7_sign_flags} 
+definition.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.2
+@end deftypefun

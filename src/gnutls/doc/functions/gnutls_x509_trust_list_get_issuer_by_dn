@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_trust_list_get_issuer_by_dn} (gnutls_x509_trust_list_t @var{list}, const gnutls_datum_t * @var{dn}, gnutls_x509_crt_t * @var{issuer}, unsigned int @var{flags})
+@var{list}: The list
+
+@var{dn}: is the issuer's DN
+
+@var{issuer}: Will hold the issuer if any. Should be deallocated after use.
+
+@var{flags}: Use zero
+
+This function will find the issuer with the given name, and
+return a copy of the issuer, which must be freed using @code{gnutls_x509_crt_deinit()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.0
+@end deftypefun

@@ -1,0 +1,1302 @@
+
+@subheading gnutls_certificate_get_openpgp_crt
+@anchor{gnutls_certificate_get_openpgp_crt}
+@deftypefun {int} {gnutls_certificate_get_openpgp_crt} (gnutls_certificate_credentials_t @var{res}, unsigned @var{index}, gnutls_openpgp_crt_t ** @var{crt_list}, unsigned * @var{crt_list_size})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{index}: The index of the certificate list to obtain.
+
+@var{crt_list}: Where to store the certificate list.
+
+@var{crt_list_size}: -- undescribed --
+
+Obtains a X.509 certificate list that has been stored in  @code{res} with one of
+@code{gnutls_certificate_set_openpgp_key()} ,
+@code{gnutls_certificate_set_openpgp_key_file()} ,
+@code{gnutls_certificate_set_openpgp_key_file2()} ,
+@code{gnutls_certificate_set_openpgp_key_mem()} , or
+@code{gnutls_certificate_set_openpgp_key_mem2()} .  Each certificate in the
+returned certificate list must be deallocated with
+@code{gnutls_openpgp_crt_deinit()} , and the list itself must be freed with
+@code{gnutls_free()} .
+
+If there is no certificate with the given index,
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned. If the certificate
+with the given index is not a X.509 certificate, @code{GNUTLS_E_INVALID_REQUEST} 
+is returned.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_certificate_get_openpgp_key
+@anchor{gnutls_certificate_get_openpgp_key}
+@deftypefun {int} {gnutls_certificate_get_openpgp_key} (gnutls_certificate_credentials_t @var{res}, unsigned @var{index}, gnutls_openpgp_privkey_t * @var{key})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{index}: The index of the key to obtain.
+
+@var{key}: Location to store the key.
+
+Obtains a OpenPGP private key that has been stored in  @code{res} with one of
+@code{gnutls_certificate_set_openpgp_key()} ,
+@code{gnutls_certificate_set_openpgp_key_file()} ,
+@code{gnutls_certificate_set_openpgp_key_file2()} ,
+@code{gnutls_certificate_set_openpgp_key_mem()} , or
+@code{gnutls_certificate_set_openpgp_key_mem2()} .
+The returned key must be deallocated with @code{gnutls_openpgp_privkey_deinit()} 
+when no longer needed.
+
+If there is no key with the given index,
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned. If the key with the
+given index is not a X.509 key, @code{GNUTLS_E_INVALID_REQUEST}  is returned.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_certificate_set_openpgp_key
+@anchor{gnutls_certificate_set_openpgp_key}
+@deftypefun {int} {gnutls_certificate_set_openpgp_key} (gnutls_certificate_credentials_t @var{res}, gnutls_openpgp_crt_t @var{crt}, gnutls_openpgp_privkey_t @var{pkey})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{crt}: contains an openpgp public key
+
+@var{pkey}: is an openpgp private key
+
+This function sets a certificate/private key pair in the
+gnutls_certificate_credentials_t type.  This function may be
+called more than once (in case multiple keys/certificates exist
+for the server).
+
+Note that this function requires that the preferred key ids have
+been set and be used. See @code{gnutls_openpgp_crt_set_preferred_key_id()} .
+Otherwise the master key will be used.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun
+
+@subheading gnutls_certificate_set_openpgp_key_file
+@anchor{gnutls_certificate_set_openpgp_key_file}
+@deftypefun {int} {gnutls_certificate_set_openpgp_key_file} (gnutls_certificate_credentials_t      @var{res}, const char * @var{certfile}, const char * @var{keyfile}, gnutls_openpgp_crt_fmt_t @var{format})
+@var{res}: the destination context to save the data.
+
+@var{certfile}: the file that contains the public key.
+
+@var{keyfile}: the file that contains the secret key.
+
+@var{format}: the format of the keys
+
+This function is used to load OpenPGP keys into the GnuTLS
+credentials structure. The file should contain at least one valid non encrypted subkey.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_certificate_set_openpgp_key_file2
+@anchor{gnutls_certificate_set_openpgp_key_file2}
+@deftypefun {int} {gnutls_certificate_set_openpgp_key_file2} (gnutls_certificate_credentials_t       @var{res}, const char * @var{certfile}, const char * @var{keyfile}, const char * @var{subkey_id}, gnutls_openpgp_crt_fmt_t @var{format})
+@var{res}: the destination context to save the data.
+
+@var{certfile}: the file that contains the public key.
+
+@var{keyfile}: the file that contains the secret key.
+
+@var{subkey_id}: a hex encoded subkey id
+
+@var{format}: the format of the keys
+
+This function is used to load OpenPGP keys into the GnuTLS credential 
+structure. The file should contain at least one valid non encrypted subkey.
+
+The special keyword "auto" is also accepted as  @code{subkey_id} .  In that
+case the @code{gnutls_openpgp_crt_get_auth_subkey()}  will be used to
+retrieve the subkey.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_certificate_set_openpgp_key_mem
+@anchor{gnutls_certificate_set_openpgp_key_mem}
+@deftypefun {int} {gnutls_certificate_set_openpgp_key_mem} (gnutls_certificate_credentials_t            @var{res}, const gnutls_datum_t * @var{cert}, const gnutls_datum_t * @var{key}, gnutls_openpgp_crt_fmt_t @var{format})
+@var{res}: the destination context to save the data.
+
+@var{cert}: the datum that contains the public key.
+
+@var{key}: the datum that contains the secret key.
+
+@var{format}: the format of the keys
+
+This function is used to load OpenPGP keys into the GnuTLS credential 
+structure. The datum should contain at least one valid non encrypted subkey.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_certificate_set_openpgp_key_mem2
+@anchor{gnutls_certificate_set_openpgp_key_mem2}
+@deftypefun {int} {gnutls_certificate_set_openpgp_key_mem2} (gnutls_certificate_credentials_t      @var{res}, const gnutls_datum_t * @var{cert}, const gnutls_datum_t * @var{key}, const char * @var{subkey_id}, gnutls_openpgp_crt_fmt_t @var{format})
+@var{res}: the destination context to save the data.
+
+@var{cert}: the datum that contains the public key.
+
+@var{key}: the datum that contains the secret key.
+
+@var{subkey_id}: a hex encoded subkey id
+
+@var{format}: the format of the keys
+
+This function is used to load OpenPGP keys into the GnuTLS
+credentials structure. The datum should contain at least one valid non encrypted subkey.
+
+The special keyword "auto" is also accepted as  @code{subkey_id} .  In that
+case the @code{gnutls_openpgp_crt_get_auth_subkey()}  will be used to
+retrieve the subkey.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_certificate_set_openpgp_keyring_file
+@anchor{gnutls_certificate_set_openpgp_keyring_file}
+@deftypefun {int} {gnutls_certificate_set_openpgp_keyring_file} (gnutls_certificate_credentials_t @var{c}, const char * @var{file}, gnutls_openpgp_crt_fmt_t @var{format})
+@var{c}: A certificate credentials structure
+
+@var{file}: filename of the keyring.
+
+@var{format}: format of keyring.
+
+The function is used to set keyrings that will be used internally
+by various OpenPGP functions. For example to find a key when it
+is needed for an operations. The keyring will also be used at the
+verification functions.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_certificate_set_openpgp_keyring_mem
+@anchor{gnutls_certificate_set_openpgp_keyring_mem}
+@deftypefun {int} {gnutls_certificate_set_openpgp_keyring_mem} (gnutls_certificate_credentials_t         @var{c}, const uint8_t * @var{data}, size_t @var{dlen}, gnutls_openpgp_crt_fmt_t @var{format})
+@var{c}: A certificate credentials structure
+
+@var{data}: buffer with keyring data.
+
+@var{dlen}: length of data buffer.
+
+@var{format}: the format of the keyring
+
+The function is used to set keyrings that will be used internally
+by various OpenPGP functions. For example to find a key when it
+is needed for an operations. The keyring will also be used at the
+verification functions.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_check_email
+@anchor{gnutls_openpgp_crt_check_email}
+@deftypefun {int} {gnutls_openpgp_crt_check_email} (gnutls_openpgp_crt_t @var{key}, const char * @var{email}, unsigned @var{flags})
+@var{key}: should contain a @code{gnutls_openpgp_crt_t}  type
+
+@var{email}: A null terminated string that contains an RFC822 address (email)
+
+@var{flags}: gnutls_certificate_verify_flags
+
+This function will check if the given key's owner matches the
+given email address. 
+
+@strong{Returns:} non-zero for a successful match, and zero on failure.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_check_hostname
+@anchor{gnutls_openpgp_crt_check_hostname}
+@deftypefun {int} {gnutls_openpgp_crt_check_hostname} (gnutls_openpgp_crt_t @var{key}, const char * @var{hostname})
+@var{key}: should contain a @code{gnutls_openpgp_crt_t}  type
+
+@var{hostname}: A null terminated string that contains a DNS name
+
+This function will check if the given key's owner matches the
+given hostname. This is a basic implementation of the matching
+described in RFC2818 (HTTPS), which takes into account wildcards.
+
+@strong{Returns:} non-zero for a successful match, and zero on failure.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_check_hostname2
+@anchor{gnutls_openpgp_crt_check_hostname2}
+@deftypefun {int} {gnutls_openpgp_crt_check_hostname2} (gnutls_openpgp_crt_t @var{key}, const char * @var{hostname}, unsigned @var{flags})
+@var{key}: should contain a @code{gnutls_openpgp_crt_t}  type
+
+@var{hostname}: A null terminated string that contains a DNS name
+
+@var{flags}: gnutls_certificate_verify_flags
+
+This function will check if the given key's owner matches the
+given hostname. 
+
+Unless, the flag @code{GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS}  is specified,
+wildcards are only considered if the domain name consists of three
+components or more, and the wildcard starts at the leftmost position.
+
+@strong{Returns:} non-zero for a successful match, and zero on failure.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_deinit
+@anchor{gnutls_openpgp_crt_deinit}
+@deftypefun {void} {gnutls_openpgp_crt_deinit} (gnutls_openpgp_crt_t @var{key})
+@var{key}: A pointer to the type to be initialized
+
+This function will deinitialize a key structure.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_export
+@anchor{gnutls_openpgp_crt_export}
+@deftypefun {int} {gnutls_openpgp_crt_export} (gnutls_openpgp_crt_t @var{key}, gnutls_openpgp_crt_fmt_t @var{format}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{key}: Holds the key.
+
+@var{format}: One of gnutls_openpgp_crt_fmt_t elements.
+
+@var{output_data}: will contain the raw or base64 encoded key
+
+@var{output_data_size}: holds the size of output_data (and will
+be replaced by the actual size of parameters)
+
+This function will convert the given key to RAW or Base64 format.
+If the buffer provided is not long enough to hold the output, then
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will be returned.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_export2
+@anchor{gnutls_openpgp_crt_export2}
+@deftypefun {int} {gnutls_openpgp_crt_export2} (gnutls_openpgp_crt_t @var{key}, gnutls_openpgp_crt_fmt_t @var{format}, gnutls_datum_t * @var{out})
+@var{key}: Holds the key.
+
+@var{format}: One of gnutls_openpgp_crt_fmt_t elements.
+
+@var{out}: will contain the raw or base64 encoded key
+
+This function will convert the given key to RAW or Base64 format.
+The output buffer is allocated using @code{gnutls_malloc()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+@strong{Since:} 3.1.3
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_auth_subkey
+@anchor{gnutls_openpgp_crt_get_auth_subkey}
+@deftypefun {int} {gnutls_openpgp_crt_get_auth_subkey} (gnutls_openpgp_crt_t @var{crt}, gnutls_openpgp_keyid_t @var{keyid}, unsigned int @var{flag})
+@var{crt}: the structure that contains the OpenPGP public key.
+
+@var{keyid}: the struct to save the keyid.
+
+@var{flag}: Non-zero indicates that a valid subkey is always returned.
+
+Returns the 64-bit keyID of the first valid OpenPGP subkey marked
+for authentication.  If flag is non-zero and no authentication
+subkey exists, then a valid subkey will be returned even if it is
+not marked for authentication.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_creation_time
+@anchor{gnutls_openpgp_crt_get_creation_time}
+@deftypefun {time_t} {gnutls_openpgp_crt_get_creation_time} (gnutls_openpgp_crt_t @var{key})
+@var{key}: the structure that contains the OpenPGP public key.
+
+Get key creation time.
+
+@strong{Returns:} the timestamp when the OpenPGP key was created.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_expiration_time
+@anchor{gnutls_openpgp_crt_get_expiration_time}
+@deftypefun {time_t} {gnutls_openpgp_crt_get_expiration_time} (gnutls_openpgp_crt_t @var{key})
+@var{key}: the structure that contains the OpenPGP public key.
+
+Get key expiration time.  A value of '0' means that the key doesn't
+expire at all.
+
+@strong{Returns:} the time when the OpenPGP key expires.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_fingerprint
+@anchor{gnutls_openpgp_crt_get_fingerprint}
+@deftypefun {int} {gnutls_openpgp_crt_get_fingerprint} (gnutls_openpgp_crt_t @var{key}, void * @var{fpr}, size_t * @var{fprlen})
+@var{key}: the raw data that contains the OpenPGP public key.
+
+@var{fpr}: the buffer to save the fingerprint, must hold at least 20 bytes.
+
+@var{fprlen}: the integer to save the length of the fingerprint.
+
+Get key fingerprint.  Depending on the algorithm, the fingerprint
+can be 16 or 20 bytes.
+
+@strong{Returns:} On success, 0 is returned.  Otherwise, an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_key_id
+@anchor{gnutls_openpgp_crt_get_key_id}
+@deftypefun {int} {gnutls_openpgp_crt_get_key_id} (gnutls_openpgp_crt_t @var{key}, gnutls_openpgp_keyid_t @var{keyid})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{keyid}: the buffer to save the keyid.
+
+Get key id string.
+
+@strong{Returns:} the 64-bit keyID of the OpenPGP key.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_key_usage
+@anchor{gnutls_openpgp_crt_get_key_usage}
+@deftypefun {int} {gnutls_openpgp_crt_get_key_usage} (gnutls_openpgp_crt_t @var{key}, unsigned int * @var{key_usage})
+@var{key}: should contain a gnutls_openpgp_crt_t type
+
+@var{key_usage}: where the key usage bits will be stored
+
+This function will return certificate's key usage, by checking the
+key algorithm. The key usage value will ORed values of the:
+@code{GNUTLS_KEY_DIGITAL_SIGNATURE} , @code{GNUTLS_KEY_KEY_ENCIPHERMENT} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_name
+@anchor{gnutls_openpgp_crt_get_name}
+@deftypefun {int} {gnutls_openpgp_crt_get_name} (gnutls_openpgp_crt_t @var{key}, int @var{idx}, char * @var{buf}, size_t * @var{sizeof_buf})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{idx}: the index of the ID to extract
+
+@var{buf}: a pointer to a structure to hold the name, may be @code{NULL} 
+to only get the  @code{sizeof_buf} .
+
+@var{sizeof_buf}: holds the maximum size of  @code{buf} , on return hold the
+actual/required size of  @code{buf} .
+
+Extracts the userID from the parsed OpenPGP key.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, and if the index of the ID
+does not exist @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} , or an
+error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_pk_algorithm
+@anchor{gnutls_openpgp_crt_get_pk_algorithm}
+@deftypefun {gnutls_pk_algorithm_t} {gnutls_openpgp_crt_get_pk_algorithm} (gnutls_openpgp_crt_t @var{key}, unsigned int * @var{bits})
+@var{key}: is an OpenPGP key
+
+@var{bits}: if bits is non null it will hold the size of the parameters' in bits
+
+This function will return the public key algorithm of an OpenPGP
+certificate.
+
+If bits is non null, it should have enough size to hold the parameters
+size in bits. For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public exponent.
+
+@strong{Returns:} a member of the @code{gnutls_pk_algorithm_t}  enumeration on
+success, or GNUTLS_PK_UNKNOWN on error.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_pk_dsa_raw
+@anchor{gnutls_openpgp_crt_get_pk_dsa_raw}
+@deftypefun {int} {gnutls_openpgp_crt_get_pk_dsa_raw} (gnutls_openpgp_crt_t @var{crt}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y})
+@var{crt}: Holds the certificate
+
+@var{p}: will hold the p
+
+@var{q}: will hold the q
+
+@var{g}: will hold the g
+
+@var{y}: will hold the y
+
+This function will export the DSA public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_pk_rsa_raw
+@anchor{gnutls_openpgp_crt_get_pk_rsa_raw}
+@deftypefun {int} {gnutls_openpgp_crt_get_pk_rsa_raw} (gnutls_openpgp_crt_t @var{crt}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e})
+@var{crt}: Holds the certificate
+
+@var{m}: will hold the modulus
+
+@var{e}: will hold the public exponent
+
+This function will export the RSA public key's parameters found in
+the given structure.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_preferred_key_id
+@anchor{gnutls_openpgp_crt_get_preferred_key_id}
+@deftypefun {int} {gnutls_openpgp_crt_get_preferred_key_id} (gnutls_openpgp_crt_t @var{key}, gnutls_openpgp_keyid_t @var{keyid})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{keyid}: the struct to save the keyid.
+
+Get preferred key id.  If it hasn't been set it returns
+@code{GNUTLS_E_INVALID_REQUEST} .
+
+@strong{Returns:} the 64-bit preferred keyID of the OpenPGP key.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_revoked_status
+@anchor{gnutls_openpgp_crt_get_revoked_status}
+@deftypefun {int} {gnutls_openpgp_crt_get_revoked_status} (gnutls_openpgp_crt_t @var{key})
+@var{key}: the structure that contains the OpenPGP public key.
+
+Get revocation status of key.
+
+@strong{Returns:} true (1) if the key has been revoked, or false (0) if it
+has not.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_count
+@anchor{gnutls_openpgp_crt_get_subkey_count}
+@deftypefun {int} {gnutls_openpgp_crt_get_subkey_count} (gnutls_openpgp_crt_t @var{key})
+@var{key}: is an OpenPGP key
+
+This function will return the number of subkeys present in the
+given OpenPGP certificate.
+
+@strong{Returns:} the number of subkeys, or a negative error code on error.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_creation_time
+@anchor{gnutls_openpgp_crt_get_subkey_creation_time}
+@deftypefun {time_t} {gnutls_openpgp_crt_get_subkey_creation_time} (gnutls_openpgp_crt_t @var{key}, unsigned int @var{idx})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{idx}: the subkey index
+
+Get subkey creation time.
+
+@strong{Returns:} the timestamp when the OpenPGP sub-key was created.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_expiration_time
+@anchor{gnutls_openpgp_crt_get_subkey_expiration_time}
+@deftypefun {time_t} {gnutls_openpgp_crt_get_subkey_expiration_time} (gnutls_openpgp_crt_t @var{key}, unsigned int @var{idx})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{idx}: the subkey index
+
+Get subkey expiration time.  A value of '0' means that the key
+doesn't expire at all.
+
+@strong{Returns:} the time when the OpenPGP key expires.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_fingerprint
+@anchor{gnutls_openpgp_crt_get_subkey_fingerprint}
+@deftypefun {int} {gnutls_openpgp_crt_get_subkey_fingerprint} (gnutls_openpgp_crt_t @var{key}, unsigned int @var{idx}, void * @var{fpr}, size_t * @var{fprlen})
+@var{key}: the raw data that contains the OpenPGP public key.
+
+@var{idx}: the subkey index
+
+@var{fpr}: the buffer to save the fingerprint, must hold at least 20 bytes.
+
+@var{fprlen}: the integer to save the length of the fingerprint.
+
+Get key fingerprint of a subkey.  Depending on the algorithm, the
+fingerprint can be 16 or 20 bytes.
+
+@strong{Returns:} On success, 0 is returned.  Otherwise, an error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_id
+@anchor{gnutls_openpgp_crt_get_subkey_id}
+@deftypefun {int} {gnutls_openpgp_crt_get_subkey_id} (gnutls_openpgp_crt_t @var{key}, unsigned int @var{idx}, gnutls_openpgp_keyid_t @var{keyid})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{idx}: the subkey index
+
+@var{keyid}: the buffer to save the keyid.
+
+Get the subkey's key-id.
+
+@strong{Returns:} the 64-bit keyID of the OpenPGP key.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_idx
+@anchor{gnutls_openpgp_crt_get_subkey_idx}
+@deftypefun {int} {gnutls_openpgp_crt_get_subkey_idx} (gnutls_openpgp_crt_t @var{key}, const gnutls_openpgp_keyid_t @var{keyid})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{keyid}: the keyid.
+
+Get subkey's index.
+
+@strong{Returns:} the index of the subkey or a negative error value.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_pk_algorithm
+@anchor{gnutls_openpgp_crt_get_subkey_pk_algorithm}
+@deftypefun {gnutls_pk_algorithm_t} {gnutls_openpgp_crt_get_subkey_pk_algorithm} (gnutls_openpgp_crt_t @var{key}, unsigned int @var{idx}, unsigned int * @var{bits})
+@var{key}: is an OpenPGP key
+
+@var{idx}: is the subkey index
+
+@var{bits}: if bits is non null it will hold the size of the parameters' in bits
+
+This function will return the public key algorithm of a subkey of an OpenPGP
+certificate.
+
+If bits is non null, it should have enough size to hold the
+parameters size in bits.  For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public exponent.
+
+@strong{Returns:} a member of the @code{gnutls_pk_algorithm_t}  enumeration on
+success, or GNUTLS_PK_UNKNOWN on error.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_pk_dsa_raw
+@anchor{gnutls_openpgp_crt_get_subkey_pk_dsa_raw}
+@deftypefun {int} {gnutls_openpgp_crt_get_subkey_pk_dsa_raw} (gnutls_openpgp_crt_t @var{crt}, unsigned int @var{idx}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y})
+@var{crt}: Holds the certificate
+
+@var{idx}: Is the subkey index
+
+@var{p}: will hold the p
+
+@var{q}: will hold the q
+
+@var{g}: will hold the g
+
+@var{y}: will hold the y
+
+This function will export the DSA public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_pk_rsa_raw
+@anchor{gnutls_openpgp_crt_get_subkey_pk_rsa_raw}
+@deftypefun {int} {gnutls_openpgp_crt_get_subkey_pk_rsa_raw} (gnutls_openpgp_crt_t @var{crt}, unsigned int @var{idx}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e})
+@var{crt}: Holds the certificate
+
+@var{idx}: Is the subkey index
+
+@var{m}: will hold the modulus
+
+@var{e}: will hold the public exponent
+
+This function will export the RSA public key's parameters found in
+the given structure.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_revoked_status
+@anchor{gnutls_openpgp_crt_get_subkey_revoked_status}
+@deftypefun {int} {gnutls_openpgp_crt_get_subkey_revoked_status} (gnutls_openpgp_crt_t @var{key}, unsigned int @var{idx})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{idx}: is the subkey index
+
+Get subkey revocation status.  A negative error code indicates an error.
+
+@strong{Returns:} true (1) if the key has been revoked, or false (0) if it
+has not.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_subkey_usage
+@anchor{gnutls_openpgp_crt_get_subkey_usage}
+@deftypefun {int} {gnutls_openpgp_crt_get_subkey_usage} (gnutls_openpgp_crt_t @var{key}, unsigned int @var{idx}, unsigned int * @var{key_usage})
+@var{key}: should contain a gnutls_openpgp_crt_t type
+
+@var{idx}: the subkey index
+
+@var{key_usage}: where the key usage bits will be stored
+
+This function will return certificate's key usage, by checking the
+key algorithm.  The key usage value will ORed values of
+@code{GNUTLS_KEY_DIGITAL_SIGNATURE}  or @code{GNUTLS_KEY_KEY_ENCIPHERMENT} .
+
+A negative error code may be returned in case of parsing error.
+
+@strong{Returns:} key usage value.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_get_version
+@anchor{gnutls_openpgp_crt_get_version}
+@deftypefun {int} {gnutls_openpgp_crt_get_version} (gnutls_openpgp_crt_t @var{key})
+@var{key}: the structure that contains the OpenPGP public key.
+
+Extract the version of the OpenPGP key.
+
+@strong{Returns:} the version number is returned, or a negative error code on errors.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_import
+@anchor{gnutls_openpgp_crt_import}
+@deftypefun {int} {gnutls_openpgp_crt_import} (gnutls_openpgp_crt_t @var{key}, const gnutls_datum_t * @var{data}, gnutls_openpgp_crt_fmt_t @var{format})
+@var{key}: The structure to store the parsed key.
+
+@var{data}: The RAW or BASE64 encoded key.
+
+@var{format}: One of gnutls_openpgp_crt_fmt_t elements.
+
+This function will convert the given RAW or Base64 encoded key to
+the native @code{gnutls_openpgp_crt_t}  format. The output will be stored
+in 'key'.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_init
+@anchor{gnutls_openpgp_crt_init}
+@deftypefun {int} {gnutls_openpgp_crt_init} (gnutls_openpgp_crt_t * @var{key})
+@var{key}: A pointer to the type to be initialized
+
+This function will initialize an OpenPGP key structure.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_print
+@anchor{gnutls_openpgp_crt_print}
+@deftypefun {int} {gnutls_openpgp_crt_print} (gnutls_openpgp_crt_t @var{cert}, gnutls_certificate_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@var{cert}: The structure to be printed
+
+@var{format}: Indicate the format to use
+
+@var{out}: Newly allocated datum with (0) terminated string.
+
+This function will pretty print an OpenPGP certificate, suitable
+for display to a human.
+
+The format should be (0) for future compatibility.
+
+The output  @code{out} needs to be deallocate using @code{gnutls_free()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_set_preferred_key_id
+@anchor{gnutls_openpgp_crt_set_preferred_key_id}
+@deftypefun {int} {gnutls_openpgp_crt_set_preferred_key_id} (gnutls_openpgp_crt_t @var{key}, const gnutls_openpgp_keyid_t @var{keyid})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{keyid}: the selected keyid
+
+This allows setting a preferred key id for the given certificate.
+This key will be used by functions that involve key handling.
+
+If the provided  @code{keyid} is @code{NULL}  then the master key is
+set as preferred.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_verify_ring
+@anchor{gnutls_openpgp_crt_verify_ring}
+@deftypefun {int} {gnutls_openpgp_crt_verify_ring} (gnutls_openpgp_crt_t @var{key}, gnutls_openpgp_keyring_t @var{keyring}, unsigned int @var{flags}, unsigned int * @var{verify})
+@var{key}: the structure that holds the key.
+
+@var{keyring}: holds the keyring to check against
+
+@var{flags}: unused (should be 0)
+
+@var{verify}: will hold the certificate verification output.
+
+Verify all signatures in the key, using the given set of keys
+(keyring).
+
+The key verification output will be put in  @code{verify} and will be one
+or more of the @code{gnutls_certificate_status_t}  enumerated elements
+bitwise or'd.
+
+Note that this function does not verify using any "web of trust".
+You may use GnuPG for that purpose, or any other external PGP
+application.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_crt_verify_self
+@anchor{gnutls_openpgp_crt_verify_self}
+@deftypefun {int} {gnutls_openpgp_crt_verify_self} (gnutls_openpgp_crt_t @var{key}, unsigned int @var{flags}, unsigned int * @var{verify})
+@var{key}: the structure that holds the key.
+
+@var{flags}: unused (should be 0)
+
+@var{verify}: will hold the key verification output.
+
+Verifies the self signature in the key.  The key verification
+output will be put in  @code{verify} and will be one or more of the
+gnutls_certificate_status_t enumerated elements bitwise or'd.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_keyring_check_id
+@anchor{gnutls_openpgp_keyring_check_id}
+@deftypefun {int} {gnutls_openpgp_keyring_check_id} (gnutls_openpgp_keyring_t @var{ring}, const gnutls_openpgp_keyid_t @var{keyid}, unsigned int @var{flags})
+@var{ring}: holds the keyring to check against
+
+@var{keyid}: will hold the keyid to check for.
+
+@var{flags}: unused (should be 0)
+
+Check if a given key ID exists in the keyring.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success (if keyid exists) and a
+negative error code on failure.
+@end deftypefun
+
+@subheading gnutls_openpgp_keyring_deinit
+@anchor{gnutls_openpgp_keyring_deinit}
+@deftypefun {void} {gnutls_openpgp_keyring_deinit} (gnutls_openpgp_keyring_t @var{keyring})
+@var{keyring}: A pointer to the type to be initialized
+
+This function will deinitialize a keyring structure.
+@end deftypefun
+
+@subheading gnutls_openpgp_keyring_get_crt
+@anchor{gnutls_openpgp_keyring_get_crt}
+@deftypefun {int} {gnutls_openpgp_keyring_get_crt} (gnutls_openpgp_keyring_t @var{ring}, unsigned int @var{idx}, gnutls_openpgp_crt_t * @var{cert})
+@var{ring}: Holds the keyring.
+
+@var{idx}: the index of the certificate to export
+
+@var{cert}: An uninitialized @code{gnutls_openpgp_crt_t}  type
+
+This function will extract an OpenPGP certificate from the given
+keyring.  If the index given is out of range
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned. The
+returned structure needs to be deinited.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_keyring_get_crt_count
+@anchor{gnutls_openpgp_keyring_get_crt_count}
+@deftypefun {int} {gnutls_openpgp_keyring_get_crt_count} (gnutls_openpgp_keyring_t @var{ring})
+@var{ring}: is an OpenPGP key ring
+
+This function will return the number of OpenPGP certificates
+present in the given keyring.
+
+@strong{Returns:} the number of subkeys, or a negative error code on error.
+@end deftypefun
+
+@subheading gnutls_openpgp_keyring_import
+@anchor{gnutls_openpgp_keyring_import}
+@deftypefun {int} {gnutls_openpgp_keyring_import} (gnutls_openpgp_keyring_t @var{keyring}, const gnutls_datum_t * @var{data}, gnutls_openpgp_crt_fmt_t @var{format})
+@var{keyring}: The structure to store the parsed key.
+
+@var{data}: The RAW or BASE64 encoded keyring.
+
+@var{format}: One of @code{gnutls_openpgp_keyring_fmt}  elements.
+
+This function will convert the given RAW or Base64 encoded keyring
+to the native @code{gnutls_openpgp_keyring_t}  format.  The output will be
+stored in 'keyring'.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_keyring_init
+@anchor{gnutls_openpgp_keyring_init}
+@deftypefun {int} {gnutls_openpgp_keyring_init} (gnutls_openpgp_keyring_t * @var{keyring})
+@var{keyring}: A pointer to the type to be initialized
+
+This function will initialize an keyring structure.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_deinit
+@anchor{gnutls_openpgp_privkey_deinit}
+@deftypefun {void} {gnutls_openpgp_privkey_deinit} (gnutls_openpgp_privkey_t @var{key})
+@var{key}: A pointer to the type to be initialized
+
+This function will deinitialize a key structure.
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_export
+@anchor{gnutls_openpgp_privkey_export}
+@deftypefun {int} {gnutls_openpgp_privkey_export} (gnutls_openpgp_privkey_t @var{key}, gnutls_openpgp_crt_fmt_t @var{format}, const char * @var{password}, unsigned int @var{flags}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{key}: Holds the key.
+
+@var{format}: One of gnutls_openpgp_crt_fmt_t elements.
+
+@var{password}: the password that will be used to encrypt the key. (unused for now)
+
+@var{flags}: (0) for future compatibility
+
+@var{output_data}: will contain the key base64 encoded or raw
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will convert the given key to RAW or Base64 format.
+If the buffer provided is not long enough to hold the output, then
+GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_export2
+@anchor{gnutls_openpgp_privkey_export2}
+@deftypefun {int} {gnutls_openpgp_privkey_export2} (gnutls_openpgp_privkey_t @var{key}, gnutls_openpgp_crt_fmt_t @var{format}, const char * @var{password}, unsigned int @var{flags}, gnutls_datum_t * @var{out})
+@var{key}: Holds the key.
+
+@var{format}: One of gnutls_openpgp_crt_fmt_t elements.
+
+@var{password}: the password that will be used to encrypt the key. (unused for now)
+
+@var{flags}: (0) for future compatibility
+
+@var{out}: will contain the raw or based64 encoded key
+
+This function will convert the given key to RAW or Base64 format.
+The output buffer is allocated using @code{gnutls_malloc()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+@strong{Since:} 3.1.3
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_export_dsa_raw
+@anchor{gnutls_openpgp_privkey_export_dsa_raw}
+@deftypefun {int} {gnutls_openpgp_privkey_export_dsa_raw} (gnutls_openpgp_privkey_t @var{pkey}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{x})
+@var{pkey}: Holds the certificate
+
+@var{p}: will hold the p
+
+@var{q}: will hold the q
+
+@var{g}: will hold the g
+
+@var{y}: will hold the y
+
+@var{x}: will hold the x
+
+This function will export the DSA private key's parameters found in
+the given certificate.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_export_rsa_raw
+@anchor{gnutls_openpgp_privkey_export_rsa_raw}
+@deftypefun {int} {gnutls_openpgp_privkey_export_rsa_raw} (gnutls_openpgp_privkey_t @var{pkey}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e}, gnutls_datum_t * @var{d}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{u})
+@var{pkey}: Holds the certificate
+
+@var{m}: will hold the modulus
+
+@var{e}: will hold the public exponent
+
+@var{d}: will hold the private exponent
+
+@var{p}: will hold the first prime (p)
+
+@var{q}: will hold the second prime (q)
+
+@var{u}: will hold the coefficient
+
+This function will export the RSA private key's parameters found in
+the given structure.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_export_subkey_dsa_raw
+@anchor{gnutls_openpgp_privkey_export_subkey_dsa_raw}
+@deftypefun {int} {gnutls_openpgp_privkey_export_subkey_dsa_raw} (gnutls_openpgp_privkey_t @var{pkey}, unsigned int @var{idx}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{x})
+@var{pkey}: Holds the certificate
+
+@var{idx}: Is the subkey index
+
+@var{p}: will hold the p
+
+@var{q}: will hold the q
+
+@var{g}: will hold the g
+
+@var{y}: will hold the y
+
+@var{x}: will hold the x
+
+This function will export the DSA private key's parameters found
+in the given certificate.  The new parameters will be allocated
+using @code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_export_subkey_rsa_raw
+@anchor{gnutls_openpgp_privkey_export_subkey_rsa_raw}
+@deftypefun {int} {gnutls_openpgp_privkey_export_subkey_rsa_raw} (gnutls_openpgp_privkey_t @var{pkey}, unsigned int @var{idx}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e}, gnutls_datum_t * @var{d}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{u})
+@var{pkey}: Holds the certificate
+
+@var{idx}: Is the subkey index
+
+@var{m}: will hold the modulus
+
+@var{e}: will hold the public exponent
+
+@var{d}: will hold the private exponent
+
+@var{p}: will hold the first prime (p)
+
+@var{q}: will hold the second prime (q)
+
+@var{u}: will hold the coefficient
+
+This function will export the RSA private key's parameters found in
+the given structure.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_fingerprint
+@anchor{gnutls_openpgp_privkey_get_fingerprint}
+@deftypefun {int} {gnutls_openpgp_privkey_get_fingerprint} (gnutls_openpgp_privkey_t @var{key}, void * @var{fpr}, size_t * @var{fprlen})
+@var{key}: the raw data that contains the OpenPGP secret key.
+
+@var{fpr}: the buffer to save the fingerprint, must hold at least 20 bytes.
+
+@var{fprlen}: the integer to save the length of the fingerprint.
+
+Get the fingerprint of the OpenPGP key. Depends on the
+algorithm, the fingerprint can be 16 or 20 bytes.
+
+@strong{Returns:} On success, 0 is returned, or an error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_key_id
+@anchor{gnutls_openpgp_privkey_get_key_id}
+@deftypefun {int} {gnutls_openpgp_privkey_get_key_id} (gnutls_openpgp_privkey_t @var{key}, gnutls_openpgp_keyid_t @var{keyid})
+@var{key}: the structure that contains the OpenPGP secret key.
+
+@var{keyid}: the buffer to save the keyid.
+
+Get key-id.
+
+@strong{Returns:} the 64-bit keyID of the OpenPGP key.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_pk_algorithm
+@anchor{gnutls_openpgp_privkey_get_pk_algorithm}
+@deftypefun {gnutls_pk_algorithm_t} {gnutls_openpgp_privkey_get_pk_algorithm} (gnutls_openpgp_privkey_t @var{key}, unsigned int * @var{bits})
+@var{key}: is an OpenPGP key
+
+@var{bits}: if bits is non null it will hold the size of the parameters' in bits
+
+This function will return the public key algorithm of an OpenPGP
+certificate.
+
+If bits is non null, it should have enough size to hold the parameters
+size in bits. For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public exponent.
+
+@strong{Returns:} a member of the @code{gnutls_pk_algorithm_t}  enumeration on
+success, or a negative error code on error.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_preferred_key_id
+@anchor{gnutls_openpgp_privkey_get_preferred_key_id}
+@deftypefun {int} {gnutls_openpgp_privkey_get_preferred_key_id} (gnutls_openpgp_privkey_t @var{key}, gnutls_openpgp_keyid_t @var{keyid})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{keyid}: the struct to save the keyid.
+
+Get the preferred key-id for the key.
+
+@strong{Returns:} the 64-bit preferred keyID of the OpenPGP key, or if it
+hasn't been set it returns @code{GNUTLS_E_INVALID_REQUEST} .
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_revoked_status
+@anchor{gnutls_openpgp_privkey_get_revoked_status}
+@deftypefun {int} {gnutls_openpgp_privkey_get_revoked_status} (gnutls_openpgp_privkey_t @var{key})
+@var{key}: the structure that contains the OpenPGP private key.
+
+Get revocation status of key.
+
+@strong{Returns:} true (1) if the key has been revoked, or false (0) if it
+has not, or a negative error code indicates an error.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_subkey_count
+@anchor{gnutls_openpgp_privkey_get_subkey_count}
+@deftypefun {int} {gnutls_openpgp_privkey_get_subkey_count} (gnutls_openpgp_privkey_t @var{key})
+@var{key}: is an OpenPGP key
+
+This function will return the number of subkeys present in the
+given OpenPGP certificate.
+
+@strong{Returns:} the number of subkeys, or a negative error code on error.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_subkey_creation_time
+@anchor{gnutls_openpgp_privkey_get_subkey_creation_time}
+@deftypefun {time_t} {gnutls_openpgp_privkey_get_subkey_creation_time} (gnutls_openpgp_privkey_t       @var{key}, unsigned int @var{idx})
+@var{key}: the structure that contains the OpenPGP private key.
+
+@var{idx}: the subkey index
+
+Get subkey creation time.
+
+@strong{Returns:} the timestamp when the OpenPGP key was created.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_subkey_expiration_time
+@anchor{gnutls_openpgp_privkey_get_subkey_expiration_time}
+@deftypefun {time_t} {gnutls_openpgp_privkey_get_subkey_expiration_time} (gnutls_openpgp_privkey_t         @var{key}, unsigned int @var{idx})
+@var{key}: the structure that contains the OpenPGP private key.
+
+@var{idx}: the subkey index
+
+Get subkey expiration time.  A value of '0' means that the key
+doesn't expire at all.
+
+@strong{Returns:} the time when the OpenPGP key expires.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_subkey_fingerprint
+@anchor{gnutls_openpgp_privkey_get_subkey_fingerprint}
+@deftypefun {int} {gnutls_openpgp_privkey_get_subkey_fingerprint} (gnutls_openpgp_privkey_t @var{key}, unsigned int @var{idx}, void * @var{fpr}, size_t * @var{fprlen})
+@var{key}: the raw data that contains the OpenPGP secret key.
+
+@var{idx}: the subkey index
+
+@var{fpr}: the buffer to save the fingerprint, must hold at least 20 bytes.
+
+@var{fprlen}: the integer to save the length of the fingerprint.
+
+Get the fingerprint of an OpenPGP subkey.  Depends on the
+algorithm, the fingerprint can be 16 or 20 bytes.
+
+@strong{Returns:} On success, 0 is returned, or an error code.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_subkey_id
+@anchor{gnutls_openpgp_privkey_get_subkey_id}
+@deftypefun {int} {gnutls_openpgp_privkey_get_subkey_id} (gnutls_openpgp_privkey_t @var{key}, unsigned int @var{idx}, gnutls_openpgp_keyid_t @var{keyid})
+@var{key}: the structure that contains the OpenPGP secret key.
+
+@var{idx}: the subkey index
+
+@var{keyid}: the buffer to save the keyid.
+
+Get the key-id for the subkey.
+
+@strong{Returns:} the 64-bit keyID of the OpenPGP key.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_subkey_idx
+@anchor{gnutls_openpgp_privkey_get_subkey_idx}
+@deftypefun {int} {gnutls_openpgp_privkey_get_subkey_idx} (gnutls_openpgp_privkey_t @var{key}, const gnutls_openpgp_keyid_t @var{keyid})
+@var{key}: the structure that contains the OpenPGP private key.
+
+@var{keyid}: the keyid.
+
+Get index of subkey.
+
+@strong{Returns:} the index of the subkey or a negative error value.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_subkey_pk_algorithm
+@anchor{gnutls_openpgp_privkey_get_subkey_pk_algorithm}
+@deftypefun {gnutls_pk_algorithm_t} {gnutls_openpgp_privkey_get_subkey_pk_algorithm} (gnutls_openpgp_privkey_t             @var{key}, unsigned int @var{idx}, unsigned int * @var{bits})
+@var{key}: is an OpenPGP key
+
+@var{idx}: is the subkey index
+
+@var{bits}: if bits is non null it will hold the size of the parameters' in bits
+
+This function will return the public key algorithm of a subkey of an OpenPGP
+certificate.
+
+If bits is non null, it should have enough size to hold the parameters
+size in bits. For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public exponent.
+
+@strong{Returns:} a member of the @code{gnutls_pk_algorithm_t}  enumeration on
+success, or a negative error code on error.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_get_subkey_revoked_status
+@anchor{gnutls_openpgp_privkey_get_subkey_revoked_status}
+@deftypefun {int} {gnutls_openpgp_privkey_get_subkey_revoked_status} (gnutls_openpgp_privkey_t        @var{key}, unsigned int @var{idx})
+@var{key}: the structure that contains the OpenPGP private key.
+
+@var{idx}: is the subkey index
+
+Get revocation status of key.
+
+@strong{Returns:} true (1) if the key has been revoked, or false (0) if it
+has not, or a negative error code indicates an error.
+
+@strong{Since:} 2.4.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_import
+@anchor{gnutls_openpgp_privkey_import}
+@deftypefun {int} {gnutls_openpgp_privkey_import} (gnutls_openpgp_privkey_t @var{key}, const gnutls_datum_t * @var{data}, gnutls_openpgp_crt_fmt_t @var{format}, const char * @var{password}, unsigned int @var{flags})
+@var{key}: The structure to store the parsed key.
+
+@var{data}: The RAW or BASE64 encoded key.
+
+@var{format}: One of @code{gnutls_openpgp_crt_fmt_t}  elements.
+
+@var{password}: not used for now
+
+@var{flags}: should be (0)
+
+This function will convert the given RAW or Base64 encoded key to
+the native gnutls_openpgp_privkey_t format.  The output will be
+stored in 'key'.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_init
+@anchor{gnutls_openpgp_privkey_init}
+@deftypefun {int} {gnutls_openpgp_privkey_init} (gnutls_openpgp_privkey_t * @var{key})
+@var{key}: A pointer to the type to be initialized
+
+This function will initialize an OpenPGP key structure.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_sec_param
+@anchor{gnutls_openpgp_privkey_sec_param}
+@deftypefun {gnutls_sec_param_t} {gnutls_openpgp_privkey_sec_param} (gnutls_openpgp_privkey_t @var{key})
+@var{key}: a key structure
+
+This function will return the security parameter appropriate with
+this private key.
+
+@strong{Returns:} On success, a valid security parameter is returned otherwise
+@code{GNUTLS_SEC_PARAM_UNKNOWN}  is returned.
+
+@strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_set_preferred_key_id
+@anchor{gnutls_openpgp_privkey_set_preferred_key_id}
+@deftypefun {int} {gnutls_openpgp_privkey_set_preferred_key_id} (gnutls_openpgp_privkey_t @var{key}, const gnutls_openpgp_keyid_t          @var{keyid})
+@var{key}: the structure that contains the OpenPGP public key.
+
+@var{keyid}: the selected keyid
+
+This allows setting a preferred key id for the given certificate.
+This key will be used by functions that involve key handling.
+
+If the provided  @code{keyid} is @code{NULL}  then the master key is
+set as preferred.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun
+
+@subheading gnutls_openpgp_set_recv_key_function
+@anchor{gnutls_openpgp_set_recv_key_function}
+@deftypefun {void} {gnutls_openpgp_set_recv_key_function} (gnutls_session_t @var{session}, gnutls_openpgp_recv_key_func @var{func})
+@var{session}: a TLS session
+
+@var{func}: the callback
+
+This function will set a key retrieval function for OpenPGP keys. This
+callback is only useful in server side, and will be used if the peer
+sent a key fingerprint instead of a full key.
+
+The retrieved key must be allocated using @code{gnutls_malloc()} .
+@end deftypefun
+

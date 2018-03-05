@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_store_commitment} (const char * @var{db_name}, gnutls_tdb_t @var{tdb}, const char * @var{host}, const char * @var{service}, gnutls_digest_algorithm_t @var{hash_algo}, const gnutls_datum_t * @var{hash}, time_t @var{expiration}, unsigned int @var{flags})

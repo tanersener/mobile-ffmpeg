@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_pkcs7_get_embedded_data_oid} (gnutls_pkcs7_t @var{pkcs7})

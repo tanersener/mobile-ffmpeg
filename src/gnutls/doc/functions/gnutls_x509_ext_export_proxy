@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_export_proxy} (int @var{pathLenConstraint}, const char * @var{policyLanguage}, const char * @var{policy}, size_t @var{sizeof_policy}, gnutls_datum_t * @var{ext})
+@var{pathLenConstraint}: A negative value will remove the path length constraint,
+while non-negative values will be set as the length of the pathLenConstraints field.
+
+@var{policyLanguage}: OID describing the language of  @code{policy} .
+
+@var{policy}: uint8_t byte array with policy language, can be @code{NULL} 
+
+@var{sizeof_policy}: size of  @code{policy} .
+
+@var{ext}: The DER-encoded extension data; must be freed using @code{gnutls_free()} .
+
+This function will convert the parameters provided to a proxyCertInfo extension.
+
+The  @code{ext} data will be allocated using @code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

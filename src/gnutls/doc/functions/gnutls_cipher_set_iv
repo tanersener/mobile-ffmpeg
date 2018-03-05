@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {void} {gnutls_cipher_set_iv} (gnutls_cipher_hd_t @var{handle}, void * @var{iv}, size_t @var{ivlen})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{iv}: the IV to set
+
+@var{ivlen}: the length of the IV
+
+This function will set the IV to be used for the next
+encryption block.
+
+@strong{Since:} 3.0
+@end deftypefun

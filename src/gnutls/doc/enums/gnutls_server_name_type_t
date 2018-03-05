@@ -1,0 +1,7 @@
+
+
+@c gnutls_server_name_type_t
+@table @code
+@item GNUTLS_@-NAME_@-DNS
+Domain Name System name type.
+@end table

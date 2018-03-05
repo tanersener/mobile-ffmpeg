@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_cipher_tag} (gnutls_cipher_hd_t @var{handle}, void * @var{tag}, size_t @var{tag_size})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{tag}: will hold the tag
+
+@var{tag_size}: the length of the tag to return
+
+This function operates on authenticated encryption with
+associated data (AEAD) ciphers and will return the
+output tag.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.0
+@end deftypefun

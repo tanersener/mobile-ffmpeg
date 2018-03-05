@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_token_get_flags} (const char * @var{url}, unsigned int * @var{flags})

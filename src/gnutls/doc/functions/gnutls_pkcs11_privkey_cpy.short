@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_privkey_cpy} (gnutls_pkcs11_privkey_t @var{dst}, gnutls_pkcs11_privkey_t @var{src})

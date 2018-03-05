@@ -1,0 +1,1 @@
+@item @var{dane_query_status_t} @ref{dane_query_status} (dane_query_t @var{q})

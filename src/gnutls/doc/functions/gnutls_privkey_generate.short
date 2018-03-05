@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_generate} (gnutls_privkey_t @var{pkey}, gnutls_pk_algorithm_t @var{algo}, unsigned int @var{bits}, unsigned int @var{flags})

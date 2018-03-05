@@ -1,0 +1,43 @@
+
+
+
+
+@deftypefun {int} {gnutls_prf} (gnutls_session_t @var{session}, size_t @var{label_size}, const char * @var{label}, int @var{server_random_first}, size_t @var{extra_size}, const char * @var{extra}, size_t @var{outsize}, char * @var{out})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{label_size}: length of the  @code{label} variable.
+
+@var{label}: label used in PRF computation, typically a short string.
+
+@var{server_random_first}: non-zero if server random field should be first in seed
+
+@var{extra_size}: length of the  @code{extra} variable.
+
+@var{extra}: optional extra data to seed the PRF with.
+
+@var{outsize}: size of pre-allocated output buffer to hold the output.
+
+@var{out}: pre-allocated buffer to hold the generated data.
+
+Applies the TLS Pseudo-Random-Function (PRF) on the master secret
+and the provided data, seeded with the client and server random fields.
+For the key expansion specified in RFC5705 see @code{gnutls_prf_rfc5705()} .
+
+The  @code{label} variable usually contains a string denoting the purpose
+for the generated data.  The  @code{server_random_first} indicates whether
+the client random field or the server random field should be first
+in the seed.  Non-zero indicates that the server random field is first,
+0 that the client random field is first.
+
+The  @code{extra} variable can be used to add more data to the seed, after
+the random variables.  It can be used to make sure the
+generated output is strongly connected to some additional data
+(e.g., a string used in user authentication).
+
+The output is placed in  @code{out} , which must be pre-allocated.
+
+@strong{Note:} This function produces identical output with @code{gnutls_prf_rfc5705()} 
+when  @code{server_random_first} is set to 0 and  @code{extra} is @code{NULL} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_name_constraints_get_permitted} (gnutls_x509_name_constraints_t @var{nc}, unsigned @var{idx}, unsigned * @var{type}, gnutls_datum_t * @var{name})

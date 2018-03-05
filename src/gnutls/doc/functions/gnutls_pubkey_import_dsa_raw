@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_dsa_raw} (gnutls_pubkey_t @var{key}, const gnutls_datum_t * @var{p}, const gnutls_datum_t * @var{q}, const gnutls_datum_t * @var{g}, const gnutls_datum_t * @var{y})
+@var{key}: The structure to store the parsed key
+
+@var{p}: holds the p
+
+@var{q}: holds the q
+
+@var{g}: holds the g
+
+@var{y}: holds the y
+
+This function will convert the given DSA raw parameters to the
+native @code{gnutls_pubkey_t}  format.  The output will be stored
+in  @code{key} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

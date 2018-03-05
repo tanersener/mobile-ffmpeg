@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_memcmp} (const void * @var{s1}, const void * @var{s2}, size_t @var{n})
+@var{s1}: the first address to compare
+
+@var{s2}: the second address to compare
+
+@var{n}: the size of memory to compare
+
+This function will operate similarly to @code{memcmp()} , but will operate
+on time that depends only on the size of the string. That is will
+not return early if the strings don't match on the first byte.
+
+@strong{Returns:} non zero on difference and zero if the buffers are identical.
+
+@strong{Since:} 3.4.0
+@end deftypefun

@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_export_basic_constraints} (unsigned int @var{ca}, int @var{pathlen}, gnutls_datum_t * @var{ext})
+@var{ca}: non-zero for a CA
+
+@var{pathlen}: The path length constraint (set to -1 for no constraint)
+
+@var{ext}: The DER-encoded extension data; must be freed using @code{gnutls_free()} .
+
+This function will convert the parameters provided to a basic constraints
+DER encoded extension (2.5.29.19).
+The  @code{ext} data will be allocated using
+@code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

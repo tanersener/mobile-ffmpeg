@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {void} {gnutls_dtls_prestate_set} (gnutls_session_t @var{session}, gnutls_dtls_prestate_st * @var{prestate})
+@var{session}: a new session
+
+@var{prestate}: contains the client's prestate
+
+This function will associate the prestate acquired by
+the cookie authentication with the client, with the newly 
+established session.
+
+This functions must be called after a successful @code{gnutls_dtls_cookie_verify()} 
+and should be succeeded by the actual DTLS handshake using @code{gnutls_handshake()} .
+
+@strong{Since:} 3.0
+@end deftypefun

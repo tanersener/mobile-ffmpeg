@@ -1,0 +1,518 @@
+@node Internal architecture of GnuTLS
+@chapter Internal Architecture of GnuTLS
+@cindex internal architecture
+
+This chapter is to give a brief description of the
+way @acronym{GnuTLS} works. The focus is to give an idea
+to potential developers and those who want to know what
+happens inside the black box.
+
+@menu
+* The TLS Protocol::
+* TLS Handshake Protocol::
+* TLS Authentication Methods::
+* TLS Extension Handling::
+* Cryptographic Backend::
+@end menu
+
+@node The TLS Protocol
+@section The TLS Protocol
+The main use case for the TLS protocol is shown in @ref{fig-client-server}.
+A user of a library implementing the protocol expects no less than this functionality,
+i.e., to be able to set parameters such as the accepted security level, perform a
+negotiation with the peer and be able to exchange data.
+
+@float Figure,fig-client-server
+@image{gnutls-client-server-use-case,9cm}
+@caption{TLS protocol use case.}
+@end float
+
+@node TLS Handshake Protocol
+@section TLS Handshake Protocol
+The @acronym{GnuTLS} handshake protocol is implemented as a state
+machine that waits for input or returns immediately when the non-blocking
+transport layer functions are used. The main idea is shown in @ref{fig-gnutls-handshake}.
+
+@float Figure,fig-gnutls-handshake
+@image{gnutls-handshake-state,9cm}
+@caption{GnuTLS handshake state machine.}
+@end float
+
+Also the way the input is processed varies per ciphersuite. Several 
+implementations of the internal handlers are available and 
+@funcref{gnutls_handshake} only multiplexes the input to the appropriate 
+handler. For example a @acronym{PSK} ciphersuite has a different 
+implementation of the @code{process_client_key_exchange} than a
+certificate ciphersuite. We illustrate the idea in @ref{fig-gnutls-handshake-sequence}.
+
+@float Figure,fig-gnutls-handshake-sequence
+@image{gnutls-handshake-sequence,12cm}
+@caption{GnuTLS handshake process sequence.}
+@end float
+
+@node TLS Authentication Methods
+@section TLS Authentication Methods
+In @acronym{GnuTLS} authentication methods can be implemented quite
+easily.  Since the required changes to add a new authentication method
+affect only the handshake protocol, a simple interface is used. An
+authentication method needs to implement the functions shown below.
+
+@verbatim
+typedef struct 
+{
+  const char *name;
+  int (*gnutls_generate_server_certificate) (gnutls_session_t, gnutls_buffer_st*);
+  int (*gnutls_generate_client_certificate) (gnutls_session_t, gnutls_buffer_st*);
+  int (*gnutls_generate_server_kx) (gnutls_session_t, gnutls_buffer_st*);
+  int (*gnutls_generate_client_kx) (gnutls_session_t, gnutls_buffer_st*);
+  int (*gnutls_generate_client_cert_vrfy) (gnutls_session_t, gnutls_buffer_st *);
+  int (*gnutls_generate_server_certificate_request) (gnutls_session_t,
+                                                     gnutls_buffer_st *);
+
+  int (*gnutls_process_server_certificate) (gnutls_session_t, opaque *,
+                                            size_t);
+  int (*gnutls_process_client_certificate) (gnutls_session_t, opaque *,
+                                            size_t);
+  int (*gnutls_process_server_kx) (gnutls_session_t, opaque *, size_t);
+  int (*gnutls_process_client_kx) (gnutls_session_t, opaque *, size_t);
+  int (*gnutls_process_client_cert_vrfy) (gnutls_session_t, opaque *, size_t);
+  int (*gnutls_process_server_certificate_request) (gnutls_session_t,
+                                                    opaque *, size_t);
+} mod_auth_st;
+@end verbatim
+
+Those functions are responsible for the
+interpretation of the handshake protocol messages. It is common for such
+functions to read data from one or more @code{credentials_t}
+structures@footnote{such as the
+@code{gnutls_certificate_credentials_t} structures} and write data,
+such as certificates, usernames etc. to @code{auth_info_t} structures.
+
+
+Simple examples of existing authentication methods can be seen in
+@code{auth/@-psk.c} for PSK ciphersuites and @code{auth/@-srp.c} for SRP
+ciphersuites. After implementing these functions the structure holding
+its pointers has to be registered in @code{gnutls_@-algorithms.c} in the
+@code{_gnutls_@-kx_@-algorithms} structure.
+
+@node TLS Extension Handling
+@section TLS Extension Handling
+As with authentication methods, the TLS extensions handlers can be
+implemented using the interface shown below.
+
+@verbatim
+typedef int (*gnutls_ext_recv_func) (gnutls_session_t session,
+                                     const unsigned char *data, size_t len);
+typedef int (*gnutls_ext_send_func) (gnutls_session_t session,
+                                     gnutls_buffer_st *extdata);
+@end verbatim
+
+Here there are two functions, one for receiving the extension data
+and one for sending. These functions have to check internally whether
+they operate in client or server side. 
+
+A simple example of an extension handler can be seen in
+@code{ext/@-srp.c} in GnuTLS' source code. After implementing these functions, 
+together with the extension number they handle, they have to be registered 
+using @funcintref{_gnutls_ext_register} in
+@code{gnutls_extensions.c} typically within @funcintref{_gnutls_ext_init}.
+
+@subheading Adding a new TLS extension
+
+Adding support for a new TLS extension is done from time to time, and
+the process to do so is not difficult.  Here are the steps you need to
+follow if you wish to do this yourself.  For sake of discussion, let's
+consider adding support for the hypothetical TLS extension
+@code{foobar}. The following section is about adding an extension to GnuTLS,
+for custom application extensions you should check the exported functions
+@funcref{gnutls_session_ext_register} or @funcref{gnutls_ext_register}.
+
+@subsubheading Add @code{configure} option like @code{--enable-foobar} or @code{--disable-foobar}.
+
+This step is useful when the extension code is large and it might be desirable
+to disable the extension under some circumstances. Otherwise it can be safely
+skipped.
+
+Whether to chose enable or disable depends on whether you intend to make the extension be
+enabled by default.  Look at existing checks (i.e., SRP, authz) for
+how to model the code.  For example:
+
+@example
+AC_MSG_CHECKING([whether to disable foobar support])
+AC_ARG_ENABLE(foobar,
+	AS_HELP_STRING([--disable-foobar],
+		[disable foobar support]),
+	ac_enable_foobar=no)
+if test x$ac_enable_foobar != xno; then
+ AC_MSG_RESULT(no)
+ AC_DEFINE(ENABLE_FOOBAR, 1, [enable foobar])
+else
+ ac_full=0
+ AC_MSG_RESULT(yes)
+fi
+AM_CONDITIONAL(ENABLE_FOOBAR, test "$ac_enable_foobar" != "no")
+@end example
+
+These lines should go in @code{m4/hooks.m4}.
+
+@subsubheading Add IANA extension value to @code{extensions_t} in @code{gnutls_int.h}.
+
+A good name for the value would be GNUTLS_EXTENSION_FOOBAR.  Check
+with @url{http://www.iana.org/assignments/tls-extensiontype-values}
+for allocated values.  For experiments, you could pick a number but
+remember that some consider it a bad idea to deploy such modified
+version since it will lead to interoperability problems in the future
+when the IANA allocates that number to someone else, or when the
+foobar protocol is allocated another number.
+
+@subsubheading Add an entry to @code{_gnutls_extensions} in @code{gnutls_extensions.c}.
+
+A typical entry would be:
+
+@example
+  int ret;
+
+#if ENABLE_FOOBAR
+  ret = _gnutls_ext_register (&foobar_ext);
+  if (ret != GNUTLS_E_SUCCESS)
+    return ret;
+#endif
+@end example
+
+Most likely you'll need to add an @code{#include "ext/@-foobar.h"}, that
+will contain something like
+like:
+@example
+  extension_entry_st foobar_ext = @{
+    .name = "FOOBAR",
+    .type = GNUTLS_EXTENSION_FOOBAR,
+    .parse_type = GNUTLS_EXT_TLS,
+    .recv_func = _foobar_recv_params,
+    .send_func = _foobar_send_params,
+    .pack_func = _foobar_pack,
+    .unpack_func = _foobar_unpack,
+    .deinit_func = NULL
+  @}
+@end example
+
+The GNUTLS_EXTENSION_FOOBAR is the integer value you added to
+@code{gnutls_int.h} earlier.  In this structure you specify the
+functions to read the extension from the hello message, the function
+to send the reply to, and two more functions to pack and unpack from
+stored session data (e.g. when resumming a session). The @code{deinit} function
+will be called to deinitialize the extension's private parameters, if any.
+
+Note that the conditional @code{ENABLE_FOOBAR} definition should only be 
+used if step 1 with the @code{configure} options has taken place.
+
+@subsubheading Add new files that implement the extension.
+
+The functions you are responsible to add are those mentioned in the
+previous step.  They should be added in a file such as @code{ext/@-foobar.c} 
+and headers should be placed in @code{ext/@-foobar.h}.
+As a starter, you could add this:
+
+@example
+int
+_foobar_recv_params (gnutls_session_t session, const opaque * data,
+                     size_t data_size)
+@{
+  return 0;
+@}
+
+int
+_foobar_send_params (gnutls_session_t session, gnutls_buffer_st* data)
+@{
+  return 0;
+@}
+
+int
+_foobar_pack (extension_priv_data_t epriv, gnutls_buffer_st * ps)
+@{
+   /* Append the extension's internal state to buffer */
+   return 0;
+@}
+
+int
+_foobar_unpack (gnutls_buffer_st * ps, extension_priv_data_t * epriv)
+@{
+   /* Read the internal state from buffer */
+   return 0;
+@}
+@end example
+
+The @funcintref{_foobar_recv_params} function is responsible for
+parsing incoming extension data (both in the client and server).
+
+The @funcintref{_foobar_send_params} function is responsible for
+sending extension data (both in the client and server).
+
+If you receive length fields that don't match, return
+@code{GNUTLS_E_@-UNEXPECTED_@-PACKET_@-LENGTH}.  If you receive invalid
+data, return @code{GNUTLS_E_@-RECEIVED_@-ILLEGAL_@-PARAMETER}.  You can use
+other error codes from the list in @ref{Error codes}.  Return 0 on success.
+
+An extension typically stores private information in the @code{session}
+data for later usage. That can be done using the functions 
+@funcintref{_gnutls_ext_set_session_data} and
+@funcintref{_gnutls_ext_get_session_data}. You can check simple examples
+at @code{ext/@-max_@-record.c} and @code{ext/@-server_@-name.c} extensions.
+That private information can be saved and restored across session 
+resumption if the following functions are set:
+
+The @funcintref{_foobar_pack} function is responsible for packing
+internal extension data to save them in the session resumption storage.
+
+The @funcintref{_foobar_unpack} function is responsible for
+restoring session data from the session resumption storage.
+
+Recall that both the client and server, send and receive
+parameters, and your code most likely will need to do different things
+depending on which mode it is in.  It may be useful to make this
+distinction explicit in the code.  Thus, for example, a better
+template than above would be:
+
+@example
+int
+_gnutls_foobar_recv_params (gnutls_session_t session,
+                            const opaque * data,
+                            size_t data_size)
+@{
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    return foobar_recv_client (session, data, data_size);
+  else
+    return foobar_recv_server (session, data, data_size);
+@}
+
+int
+_gnutls_foobar_send_params (gnutls_session_t session,
+                            gnutls_buffer_st * data)
+@{
+  if (session->security_parameters.entity == GNUTLS_CLIENT)
+    return foobar_send_client (session, data);
+  else
+    return foobar_send_server (session, data);
+@}
+@end example
+
+The functions used would be declared as @code{static} functions, of
+the appropriate prototype, in the same file.
+When adding the files, you'll need to add them to @code{ext/@-Makefile.am}
+as well, for example:
+
+@example
+if ENABLE_FOOBAR
+libgnutls_ext_la_SOURCES += ext/foobar.c ext/foobar.h
+endif
+@end example
+
+@subsubheading Add API functions to enable/disable the extension.
+
+It might be desirable to allow users of the extension to
+request use of the extension, or set extension specific data.  
+This can be implemented by adding extension specific function calls
+that can be added to @code{includes/@-gnutls/@-gnutls.h},
+as long as the LGPLv2.1+ applies.
+The implementation of the function should lie in the @code{ext/@-foobar.c} file.
+
+To make the API available in the shared library you need to add the
+symbol in @code{lib/@-libgnutls.map}, so that the symbol
+is exported properly.
+
+When writing GTK-DOC style documentation for your new APIs, don't
+forget to add @code{Since:} tags to indicate the GnuTLS version the
+API was introduced in.
+
+@subsubheading Heartbeat extension.
+
+One such extension is HeartBeat protocol (RFC6520:
+@url{https://tools.ietf.org/html/rfc6520}) implementation. To enable
+it use option --heartbeat with example client and server supplied with
+gnutls:
+
+@example
+./doc/credentials/gnutls-http-serv --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 \
+    --heartbeat --echo
+./src/gnutls-cli --priority "NORMAL:-CIPHER-ALL:+NULL" -d 100 localhost -p 5556 \
+    --insecure --heartbeat
+@end example
+
+After that pasting
+@example
+**HEARTBEAT**
+@end example
+command into gnutls-cli will trigger corresponding command on the server and it will send HeartBeat Request with random length to client.
+
+Another way is to run capabilities check with:
+
+@example
+./doc/credentials/gnutls-http-serv -d 100 --heartbeat
+./src/gnutls-cli-debug localhost -p 5556
+@end example
+
+@subheading Adding a new Supplemental Data Handshake Message
+
+TLS handshake extensions allow to send so called supplemental data
+handshake messages @xcite{RFC4680}. This short section explains how to 
+implement a supplemental data handshake message for a given TLS extension.
+
+First of all, modify your extension @code{foobar} in the way, to instruct
+the handshake process to send and receive supplemental data, as shown below.
+
+@example
+int
+_gnutls_foobar_recv_params (gnutls_session_t session, const opaque * data,
+                                 size_t _data_size)
+@{
+   ...
+   gnutls_supplemental_recv(session, 1);
+   ...
+@}
+
+int
+_gnutls_foobar_send_params (gnutls_session_t session, gnutls_buffer_st *extdata)
+@{
+   ...
+   gnutls_supplemental_send(session, 1);
+   ...
+@}
+@end example
+
+Furthermore you'll need two new functions @funcintref{_foobar_supp_recv_params}
+and @funcintref{_foobar_supp_send_params}, which must conform to the following 
+prototypes.
+
+@example
+typedef int (*gnutls_supp_recv_func)(gnutls_session_t session,
+                                     const unsigned char *data,
+                                     size_t data_size);
+typedef int (*gnutls_supp_send_func)(gnutls_session_t session,
+                                     gnutls_buffer_t buf);
+@end example
+
+The following example code shows how to send a
+``Hello World'' string in the supplemental data handshake message.
+
+@example
+int 
+_foobar_supp_recv_params(gnutls_session_t session, const opaque *data, size_t _data_size)
+@{
+   uint8_t len = _data_size;
+   unsigned char *msg;
+
+   msg = gnutls_malloc(len);
+   if (msg == NULL) return GNUTLS_E_MEMORY_ERROR;
+
+   memcpy(msg, data, len);
+   msg[len]='\0';
+
+   /* do something with msg */
+   gnutls_free(msg);
+
+   return len;
+@}
+
+int 
+_foobar_supp_send_params(gnutls_session_t session, gnutls_buffer_t buf)
+@{
+   unsigned char *msg = "hello world";
+   int len = strlen(msg);
+
+   if (gnutls_buffer_append_data(buf, msg, len) < 0)
+       abort();
+
+   return len;
+@}
+@end example
+
+Afterwards, register the new supplemental data using @funcref{gnutls_session_supplemental_register},
+or @funcref{gnutls_supplemental_register} at some point in your program.
+
+@node Cryptographic Backend
+@section Cryptographic Backend
+
+Today most new processors, either for embedded or desktop systems
+include either instructions  intended to speed up cryptographic operations,
+or a co-processor with cryptographic capabilities. Taking advantage of 
+those is a challenging task for every cryptographic  application or 
+library. GnuTLS handles the cryptographic provider in a modular
+way, following a layered approach to access
+cryptographic operations as in @ref{fig-crypto-layers}.
+
+@float Figure,fig-crypto-layers
+@image{gnutls-crypto-layers,12cm}
+@caption{GnuTLS cryptographic back-end design.}
+@end float
+
+The TLS layer uses a cryptographic provider layer, that will in turn either 
+use the default crypto provider -- a software crypto library, or use an external
+crypto provider, if available in the local system. The reason of handling
+the external cryptographic provider in GnuTLS and not delegating it to
+the cryptographic libraries, is that none of the supported cryptographic
+libraries support @code{/dev/crypto} or CPU-optimized cryptography in
+an efficient way.
+
+@subheading Cryptographic library layer
+The Cryptographic library layer, currently supports only
+libnettle. Older versions of GnuTLS used to support libgcrypt,
+but it was switched with nettle mainly for performance reasons@footnote{See
+@url{http://lists.gnu.org/archive/html/gnutls-devel/2011-02/msg00079.html}.}
+and secondary because it is a simpler library to use.
+In the future other cryptographic libraries might be supported as well.
+
+@subheading External cryptography provider
+Systems that include a cryptographic co-processor, typically come with
+kernel drivers to utilize the operations from software. For this reason 
+GnuTLS provides a layer where each individual algorithm used can be replaced
+by another implementation, i.e., the one provided by the driver. The
+FreeBSD, OpenBSD and Linux kernels@footnote{Check @url{http://home.gna.org/cryptodev-linux/} 
+for the Linux kernel implementation of @code{/dev/crypto}.} include already 
+a number of hardware assisted implementations, and also provide an interface 
+to access them, called @code{/dev/crypto}.
+GnuTLS will take advantage of this interface if compiled with special
+options. That is because in most systems where hardware-assisted 
+cryptographic operations are not available, using this interface might 
+actually harm performance.
+
+In systems that include cryptographic instructions with the CPU's
+instructions set, using the kernel interface will introduce an
+unneeded layer. For this reason GnuTLS includes such optimizations
+found in popular processors such as the AES-NI or VIA PADLOCK instruction sets.
+This is achieved using a mechanism that detects CPU capabilities and
+overrides parts of crypto back-end at runtime.
+The next section discusses the registration of a detected algorithm
+optimization. For more information please consult the @acronym{GnuTLS}
+source code in @code{lib/accelerated/}.
+
+@subsubheading Overriding specific algorithms
+When an optimized implementation of a single algorithm is available,
+say a hardware assisted version of @acronym{AES-CBC} then the
+following functions, from @code{crypto.h}, can 
+be used to register those algorithms.
+
+@itemize
+
+@item @funcref{gnutls_crypto_register_cipher}:
+To register a cipher algorithm.
+
+@item @funcref{gnutls_crypto_register_aead_cipher}:
+To register an AEAD cipher algorithm.
+
+@item @funcref{gnutls_crypto_register_mac}:
+To register a MAC algorithm.
+
+@item @funcref{gnutls_crypto_register_digest}:
+To register a hash algorithm.
+
+@end itemize
+
+Those registration functions will only replace the specified algorithm
+and leave the rest of subsystem intact.
+
+
+@subheading Protecting keys through isolation
+
+For asymmetric or public keys, GnuTLS supports PKCS #11 which allows
+operation without access to long term keys, in addition to CPU offloading.
+For more information see @ref{Hardware security modules and abstract key types}.
+

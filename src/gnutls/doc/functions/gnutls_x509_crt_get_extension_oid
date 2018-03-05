@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_extension_oid} (gnutls_x509_crt_t @var{cert}, unsigned @var{indx}, void * @var{oid}, size_t * @var{oid_size})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{indx}: Specifies which extension OID to send. Use (0) to get the first one.
+
+@var{oid}: a pointer to a structure to hold the OID (may be null)
+
+@var{oid_size}: initially holds the size of  @code{oid} 
+
+This function will return the requested extension OID in the certificate.
+The extension OID will be stored as a string in the provided buffer.
+
+The  @code{oid} returned will be null terminated, although  @code{oid_size} will not
+account for the trailing null.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.  If you have reached the
+last extension available @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+will be returned.
+@end deftypefun

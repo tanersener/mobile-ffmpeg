@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_get_crl_raw} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{indx}, void * @var{crl}, size_t * @var{crl_size})
+@var{pkcs7}: The pkcs7 type
+
+@var{indx}: contains the index of the crl to extract
+
+@var{crl}: the contents of the crl will be copied there (may be null)
+
+@var{crl_size}: should hold the size of the crl
+
+This function will return a crl of the PKCS7 or RFC2630 crl set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.  If the provided buffer is not long enough,
+then  @code{crl_size} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  is
+returned.  After the last crl has been read
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+@end deftypefun

@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_key_purpose_deinit} (gnutls_x509_key_purposes_t @var{p})
+@var{p}: The key purposes
+
+This function will deinitialize a key purposes type.
+
+@strong{Since:} 3.3.0
+@end deftypefun

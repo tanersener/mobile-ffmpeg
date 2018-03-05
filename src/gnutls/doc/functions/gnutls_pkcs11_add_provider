@@ -1,0 +1,22 @@
+
+
+
+@deftypefun {int} {gnutls_pkcs11_add_provider} (const char * @var{name}, const char * @var{params})
+@var{name}: The filename of the module
+
+@var{params}: should be NULL or a known string (see description)
+
+This function will load and add a PKCS 11 module to the module
+list used in gnutls. After this function is called the module will
+be used for PKCS 11 operations.
+
+When loading a module to be used for certificate verification,
+use the string 'trusted' as  @code{params} .
+
+Note that this function is not thread safe.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

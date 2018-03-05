@@ -1,0 +1,1 @@
+@item @var{size_t} @ref{gnutls_est_record_overhead_size} (gnutls_protocol_t @var{version}, gnutls_cipher_algorithm_t @var{cipher}, gnutls_mac_algorithm_t @var{mac}, gnutls_compression_method_t @var{comp}, unsigned int @var{flags})

@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_tlsfeatures_deinit} (gnutls_x509_tlsfeatures_t @var{f})
+@var{f}: The TLS features
+
+This function will deinitialize a X.509 TLS features extension structure
+
+@strong{Since:} 3.5.1
+@end deftypefun

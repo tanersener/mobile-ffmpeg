@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_set_crl_raw} (gnutls_pkcs7_t @var{pkcs7}, const gnutls_datum_t * @var{crl})
+@var{pkcs7}: The pkcs7 type
+
+@var{crl}: the DER encoded crl to be added
+
+This function will add a crl to the PKCS7 or RFC2630 crl set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

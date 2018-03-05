@@ -1,0 +1,341 @@
+
+@subheading dane_cert_type_name
+@anchor{dane_cert_type_name}
+@deftypefun {const char *} {dane_cert_type_name} (dane_cert_type_t @var{type})
+@var{type}: is a DANE match type
+
+Convert a @code{dane_cert_type_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified
+type, or @code{NULL} .
+@end deftypefun
+
+@subheading dane_cert_usage_name
+@anchor{dane_cert_usage_name}
+@deftypefun {const char *} {dane_cert_usage_name} (dane_cert_usage_t @var{usage})
+@var{usage}: -- undescribed --
+
+Convert a @code{dane_cert_usage_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified
+type, or @code{NULL} .
+@end deftypefun
+
+@subheading dane_match_type_name
+@anchor{dane_match_type_name}
+@deftypefun {const char *} {dane_match_type_name} (dane_match_type_t @var{type})
+@var{type}: is a DANE match type
+
+Convert a @code{dane_match_type_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified
+type, or @code{NULL} .
+@end deftypefun
+
+@subheading dane_query_data
+@anchor{dane_query_data}
+@deftypefun {int} {dane_query_data} (dane_query_t @var{q}, unsigned int @var{idx}, unsigned int * @var{usage}, unsigned int * @var{type}, unsigned int * @var{match}, gnutls_datum_t * @var{data})
+@var{q}: The query result structure
+
+@var{idx}: The index of the query response.
+
+@var{usage}: The certificate usage (see @code{dane_cert_usage_t} )
+
+@var{type}: The certificate type (see @code{dane_cert_type_t} )
+
+@var{match}: The DANE matching type (see @code{dane_match_type_t} )
+
+@var{data}: The DANE data.
+
+This function will provide the DANE data from the query
+response.
+
+@strong{Returns:} On success, @code{DANE_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading dane_query_deinit
+@anchor{dane_query_deinit}
+@deftypefun {void} {dane_query_deinit} (dane_query_t @var{q})
+@var{q}: The structure to be deinitialized
+
+This function will deinitialize a DANE query result structure.
+@end deftypefun
+
+@subheading dane_query_entries
+@anchor{dane_query_entries}
+@deftypefun {unsigned int} {dane_query_entries} (dane_query_t @var{q})
+@var{q}: The query result structure
+
+This function will return the number of entries in a query.
+
+@strong{Returns:} The number of entries.
+@end deftypefun
+
+@subheading dane_query_status
+@anchor{dane_query_status}
+@deftypefun {dane_query_status_t} {dane_query_status} (dane_query_t @var{q})
+@var{q}: The query result structure
+
+This function will return the status of the query response.
+See @code{dane_query_status_t}  for the possible types.
+
+@strong{Returns:} The status type.
+@end deftypefun
+
+@subheading dane_query_tlsa
+@anchor{dane_query_tlsa}
+@deftypefun {int} {dane_query_tlsa} (dane_state_t @var{s}, dane_query_t * @var{r}, const char * @var{host}, const char * @var{proto}, unsigned int @var{port})
+@var{s}: The DANE state structure
+
+@var{r}: A structure to place the result
+
+@var{host}: The host name to resolve.
+
+@var{proto}: The protocol type (tcp, udp, etc.)
+
+@var{port}: The service port number (eg. 443).
+
+This function will query the DNS server for the TLSA (DANE)
+data for the given host.
+
+@strong{Returns:} On success, @code{DANE_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading dane_query_to_raw_tlsa
+@anchor{dane_query_to_raw_tlsa}
+@deftypefun {int} {dane_query_to_raw_tlsa} (dane_query_t @var{q}, unsigned int * @var{data_entries}, char *** @var{dane_data}, int ** @var{dane_data_len}, int * @var{secure}, int * @var{bogus})
+@var{q}: The query result structure
+
+@var{data_entries}: Pointer set to the number of entries in the query
+
+@var{dane_data}: Pointer to contain an array of DNS rdata items, terminated with a NULL pointer;
+caller must guarantee that the referenced data remains
+valid until @code{dane_query_deinit()}  is called.
+
+@var{dane_data_len}: Pointer to contain the length n bytes of the dane_data items
+
+@var{secure}: Pointer set true if the result is validated securely, false if
+validation failed or the domain queried has no security info
+
+@var{bogus}: Pointer set true if the result was not secure due to a security failure
+
+This function will provide the DANE data from the query
+response.
+
+The pointers dane_data and dane_data_len are allocated with @code{gnutls_malloc()} 
+to contain the data from the query result structure (individual
+ @code{dane_data} items simply point to the original data and are not allocated separately).
+The returned  @code{dane_data} are only valid during the lifetime of  @code{q} .
+
+@strong{Returns:} On success, @code{DANE_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading dane_raw_tlsa
+@anchor{dane_raw_tlsa}
+@deftypefun {int} {dane_raw_tlsa} (dane_state_t @var{s}, dane_query_t * @var{r}, char *const * @var{dane_data}, const int * @var{dane_data_len}, int @var{secure}, int @var{bogus})
+@var{s}: The DANE state structure
+
+@var{r}: A structure to place the result
+
+@var{dane_data}: array of DNS rdata items, terminated with a NULL pointer;
+caller must guarantee that the referenced data remains
+valid until @code{dane_query_deinit()}  is called.
+
+@var{dane_data_len}: the length n bytes of the dane_data items
+
+@var{secure}: true if the result is validated securely, false if
+validation failed or the domain queried has no security info
+
+@var{bogus}: if the result was not secure (secure = 0) due to a security failure,
+and the result is due to a security failure, bogus is true.
+
+This function will fill in the TLSA (DANE) structure from
+the given raw DNS record data. The  @code{dane_data} must be valid
+during the lifetime of the query.
+
+@strong{Returns:} On success, @code{DANE_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading dane_state_deinit
+@anchor{dane_state_deinit}
+@deftypefun {void} {dane_state_deinit} (dane_state_t @var{s})
+@var{s}: The structure to be deinitialized
+
+This function will deinitialize a DANE query structure.
+@end deftypefun
+
+@subheading dane_state_init
+@anchor{dane_state_init}
+@deftypefun {int} {dane_state_init} (dane_state_t * @var{s}, unsigned int @var{flags})
+@var{s}: The structure to be initialized
+
+@var{flags}: flags from the @code{dane_state_flags}  enumeration
+
+This function will initialize the backend resolver. It is
+intended to be used in scenarios where multiple resolvings
+occur, to optimize against multiple re-initializations.
+
+@strong{Returns:} On success, @code{DANE_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading dane_state_set_dlv_file
+@anchor{dane_state_set_dlv_file}
+@deftypefun {int} {dane_state_set_dlv_file} (dane_state_t @var{s}, const char * @var{file})
+@var{s}: The structure to be deinitialized
+
+@var{file}: The file holding the DLV keys.
+
+This function will set a file with trusted keys
+for DLV (DNSSEC Lookaside Validation).
+@end deftypefun
+
+@subheading dane_strerror
+@anchor{dane_strerror}
+@deftypefun {const char *} {dane_strerror} (int @var{error})
+@var{error}: is a DANE error code, a negative error code
+
+This function is similar to strerror.  The difference is that it
+accepts an error number returned by a gnutls function; In case of
+an unknown error a descriptive string is sent instead of @code{NULL} .
+
+Error codes are always a negative error code.
+
+@strong{Returns:} A string explaining the DANE error message.
+@end deftypefun
+
+@subheading dane_verification_status_print
+@anchor{dane_verification_status_print}
+@deftypefun {int} {dane_verification_status_print} (unsigned int @var{status}, gnutls_datum_t * @var{out}, unsigned int @var{flags})
+@var{status}: The status flags to be printed
+
+@var{out}: Newly allocated datum with (0) terminated string.
+
+@var{flags}: should be zero
+
+This function will pretty print the status of a verification
+process -- eg. the one obtained by @code{dane_verify_crt()} .
+
+The output  @code{out} needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading dane_verify_crt
+@anchor{dane_verify_crt}
+@deftypefun {int} {dane_verify_crt} (dane_state_t @var{s}, const gnutls_datum_t * @var{chain}, unsigned @var{chain_size}, gnutls_certificate_type_t @var{chain_type}, const char * @var{hostname}, const char * @var{proto}, unsigned int @var{port}, unsigned int @var{sflags}, unsigned int @var{vflags}, unsigned int * @var{verify})
+@var{s}: A DANE state structure (may be NULL)
+
+@var{chain}: A certificate chain
+
+@var{chain_size}: The size of the chain
+
+@var{chain_type}: The type of the certificate chain
+
+@var{hostname}: The hostname associated with the chain
+
+@var{proto}: The protocol of the service connecting (e.g. tcp)
+
+@var{port}: The port of the service connecting (e.g. 443)
+
+@var{sflags}: Flags for the initialization of  @code{s} (if NULL)
+
+@var{vflags}: Verification flags; an OR'ed list of @code{dane_verify_flags_t} .
+
+@var{verify}: An OR'ed list of @code{dane_verify_status_t} .
+
+This function will verify the given certificate chain against the
+CA constrains and/or the certificate available via DANE.
+If no information via DANE can be obtained the flag @code{DANE_VERIFY_NO_DANE_INFO} 
+is set. If a DNSSEC signature is not available for the DANE
+record then the verify flag @code{DANE_VERIFY_NO_DNSSEC_DATA}  is set.
+
+Due to the many possible options of DANE, there is no single threat
+model countered. When notifying the user about DANE verification results
+it may be better to mention: DANE verification did not reject the certificate,
+rather than mentioning a successful DANE verication.
+
+Note that this function is designed to be run in addition to
+PKIX - certificate chain - verification. To be run independently
+the @code{DANE_VFLAG_ONLY_CHECK_EE_USAGE}  flag should be specified; 
+then the function will check whether the key of the peer matches the
+key advertized in the DANE entry.
+
+@strong{Returns:} a negative error code on error and @code{DANE_E_SUCCESS}  (0)
+when the DANE entries were successfully parsed, irrespective of
+whether they were verified (see  @code{verify} for that information). If
+no usable entries were encountered @code{DANE_E_REQUESTED_DATA_NOT_AVAILABLE} 
+will be returned.
+@end deftypefun
+
+@subheading dane_verify_crt_raw
+@anchor{dane_verify_crt_raw}
+@deftypefun {int} {dane_verify_crt_raw} (dane_state_t @var{s}, const gnutls_datum_t * @var{chain}, unsigned @var{chain_size}, gnutls_certificate_type_t @var{chain_type}, dane_query_t @var{r}, unsigned int @var{sflags}, unsigned int @var{vflags}, unsigned int * @var{verify})
+@var{s}: A DANE state structure (may be NULL)
+
+@var{chain}: A certificate chain
+
+@var{chain_size}: The size of the chain
+
+@var{chain_type}: The type of the certificate chain
+
+@var{r}: DANE data to check against
+
+@var{sflags}: Flags for the initialization of  @code{s} (if NULL)
+
+@var{vflags}: Verification flags; an OR'ed list of @code{dane_verify_flags_t} .
+
+@var{verify}: An OR'ed list of @code{dane_verify_status_t} .
+
+This is the low-level function of @code{dane_verify_crt()} . See the
+high level function for documentation.
+
+This function does not perform any resolving, it utilizes
+cached entries from  @code{r} .
+
+@strong{Returns:} a negative error code on error and @code{DANE_E_SUCCESS}  (0)
+when the DANE entries were successfully parsed, irrespective of
+whether they were verified (see  @code{verify} for that information). If
+no usable entries were encountered @code{DANE_E_REQUESTED_DATA_NOT_AVAILABLE} 
+will be returned.
+@end deftypefun
+
+@subheading dane_verify_session_crt
+@anchor{dane_verify_session_crt}
+@deftypefun {int} {dane_verify_session_crt} (dane_state_t @var{s}, gnutls_session_t @var{session}, const char * @var{hostname}, const char * @var{proto}, unsigned int @var{port}, unsigned int @var{sflags}, unsigned int @var{vflags}, unsigned int * @var{verify})
+@var{s}: A DANE state structure (may be NULL)
+
+@var{session}: A gnutls session
+
+@var{hostname}: The hostname associated with the chain
+
+@var{proto}: The protocol of the service connecting (e.g. tcp)
+
+@var{port}: The port of the service connecting (e.g. 443)
+
+@var{sflags}: Flags for the initialization of  @code{s} (if NULL)
+
+@var{vflags}: Verification flags; an OR'ed list of @code{dane_verify_flags_t} .
+
+@var{verify}: An OR'ed list of @code{dane_verify_status_t} .
+
+This function will verify session's certificate chain against the
+CA constrains and/or the certificate available via DANE.
+See @code{dane_verify_crt()}  for more information.
+
+This will not verify the chain for validity; unless the DANE
+verification is restricted to end certificates, this must be
+be performed separately using @code{gnutls_certificate_verify_peers3()} .
+
+@strong{Returns:} a negative error code on error and @code{DANE_E_SUCCESS}  (0)
+when the DANE entries were successfully parsed, irrespective of
+whether they were verified (see  @code{verify} for that information). If
+no usable entries were encountered @code{DANE_E_REQUESTED_DATA_NOT_AVAILABLE} 
+will be returned.
+@end deftypefun
+

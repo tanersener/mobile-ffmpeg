@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {void} {gnutls_global_set_mutex} (mutex_init_func @var{init}, mutex_deinit_func @var{deinit}, mutex_lock_func @var{lock}, mutex_unlock_func @var{unlock})
+@var{init}: mutex initialization function
+
+@var{deinit}: mutex deinitialization function
+
+@var{lock}: mutex locking function
+
+@var{unlock}: mutex unlocking function
+
+With this function you are allowed to override the default mutex
+locks used in some parts of gnutls and dependent libraries. This function
+should be used if you have complete control of your program and libraries.
+Do not call this function from a library, or preferably from any application
+unless really needed to. GnuTLS will use the appropriate locks for the running
+system.
+
+Note that since the move to implicit initialization of GnuTLS on library
+load, calling this function will deinitialize the library, and re-initialize
+it after the new locking functions are set.
+
+This function must be called prior to any other gnutls function.
+
+@strong{Since:} 2.12.0
+@end deftypefun

@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_import} (gnutls_x509_privkey_t @var{key}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format})
+@var{key}: The data to store the parsed key
+
+@var{data}: The DER or PEM encoded certificate.
+
+@var{format}: One of DER or PEM
+
+This function will convert the given DER or PEM encoded key to the
+native @code{gnutls_x509_privkey_t}  format. The output will be stored in
+ @code{key} .
+
+If the key is PEM encoded it should have a header that contains "PRIVATE
+KEY". Note that this function falls back to PKCS @code{8}  decoding without
+password, if the default format fails to import.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

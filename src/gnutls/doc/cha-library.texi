@@ -1,0 +1,158 @@
+@node Introduction to GnuTLS
+@chapter Introduction to GnuTLS
+
+In brief @acronym{GnuTLS} can be described as a library which offers an API
+to access secure communication protocols. These protocols provide
+privacy over insecure lines, and were designed to prevent
+eavesdropping, tampering, or message forgery.
+
+Technically @acronym{GnuTLS} is a portable ANSI C based library which
+implements the protocols ranging from SSL 3.0 to TLS 1.2 (see @ref{Introduction to TLS}, 
+for a detailed description of the protocols), accompanied
+with the required framework for authentication and public key
+infrastructure.  Important features of the @acronym{GnuTLS} library
+include:
+
+@itemize
+
+@item Support for TLS 1.2, TLS 1.1, TLS 1.0 and SSL 3.0 protocols.
+
+@item Support for Datagram TLS 1.0 and 1.2.
+
+@item Support for handling and verification of @acronym{X.509} and @acronym{OpenPGP} certificates.
+
+@item Support for password authentication using @acronym{TLS-SRP}.
+
+@item Support for keyed authentication using @acronym{TLS-PSK}.
+
+@item Support for TPM, @acronym{PKCS} #11 tokens and smart-cards.
+
+@end itemize
+
+The @acronym{GnuTLS} library consists of three independent parts, namely the ``TLS
+protocol part'', the ``Certificate part'', and the ``Cryptographic
+back-end'' part.  The ``TLS protocol part'' is the actual protocol
+implementation, and is entirely implemented within the
+@acronym{GnuTLS} library.  The ``Certificate part'' consists of the
+certificate parsing, and verification functions and it uses
+functionality from the
+libtasn1 library.
+The ``Cryptographic back-end'' is provided by the nettle
+and gmplib libraries.
+
+@menu
+* Downloading and installing::
+* Installing for a software distribution::
+* Document overview::
+@end menu
+
+@node Downloading and installing
+@section Downloading and installing
+@cindex installation
+@cindex download
+
+GnuTLS is available for download at:
+@url{http://www.gnutls.org/download.html}
+
+GnuTLS uses a development cycle where even minor version numbers
+indicate a stable release and a odd minor version number indicate a
+development release.  For example, GnuTLS 1.6.3 denote a stable
+release since 6 is even, and GnuTLS 1.7.11 denote a development
+release since 7 is odd.
+
+GnuTLS depends on @code{nettle} and @code{gmplib}, and you will need to install it
+before installing GnuTLS.  The @code{nettle} library is available from
+@url{http://www.lysator.liu.se/~nisse/nettle/}, while @code{gmplib} is available
+from @url{http://www.gmplib.org/}.
+Don't forget to verify the cryptographic signature after downloading
+source code packages.
+
+The package is then extracted, configured and built like many other
+packages that use Autoconf.  For detailed information on configuring
+and building it, refer to the @file{INSTALL} file that is part of the
+distribution archive.  Typically you invoke @code{./configure} and
+then @code{make check install}.  There are a number of compile-time
+parameters, as discussed below.
+
+Several parts of GnuTLS require ASN.1 functionality, which is provided by 
+a library called libtasn1.  A copy of libtasn1 is included in GnuTLS.  If you
+want to install it separately (e.g., to make it possibly to use
+libtasn1 in other programs), you can get it from
+@url{http://www.gnu.org/software/libtasn1/}.
+
+The compression library, @code{libz}, the PKCS #11 helper library @code{p11-kit},
+the TPM library @code{trousers}, as well as the IDN library @code{libidn}@footnote{Needed
+to use RFC6125 name comparison in internationalized domains.} are 
+optional dependencies. Check the README file in the distribution on how
+to obtain these libraries.
+
+A few @code{configure} options may be relevant, summarized below.
+They disable or enable particular features,
+to create a smaller library with only the required features.
+Note however, that although a smaller library is generated, the
+included programs are not guaranteed to compile if some of these
+options are given.
+
+@verbatim
+--disable-srp-authentication
+--disable-psk-authentication
+--disable-anon-authentication
+--disable-openpgp-authentication
+--disable-dhe
+--disable-ecdhe
+--disable-openssl-compatibility
+--disable-dtls-srtp-support
+--disable-alpn-support
+--disable-heartbeat-support
+--disable-libdane
+--without-p11-kit
+--without-tpm
+--without-zlib
+
+@end verbatim
+
+For the complete list, refer to the output from @code{configure --help}.
+
+@node Installing for a software distribution
+@section Installing for a software distribution
+@cindex installation
+
+When installing for a software distribution, it is often desirable to preconfigure
+GnuTLS with the system-wide paths and files. There two important configuration
+options, one sets the trust store in system, which are the CA certificates
+to be used by programs by default (if they don't override it), and the other sets
+to DNSSEC root key file used by unbound for DNSSEC verification.
+
+For the latter the following configuration option is available, and if not specified
+GnuTLS will try to auto-detect the location of that file.
+@verbatim
+--with-unbound-root-key-file
+
+@end verbatim
+
+To set the trust store the following options are available.
+@verbatim
+--with-default-trust-store-file
+--with-default-trust-store-dir
+--with-default-trust-store-pkcs11
+
+@end verbatim
+The first option is used to set a PEM file which contains a list of trusted certificates,
+while the second will read all certificates in the given path. The recommended option is
+the last, which allows to use a PKCS #11 trust policy module. That module not only
+provides the trusted certificates, but allows the categorization of them using purpose,
+e.g., CAs can be restricted for e-mail usage only, or administrative restrictions of CAs, for
+examples by restricting a CA to only issue certificates for a given DNS domain using NameConstraints.
+A publicly available PKCS #11 trust module is p11-kit's trust module@footnote{@url{http://p11-glue.freedesktop.org/doc/p11-kit/trust-module.html}}.
+
+@node Document overview
+@section Overview
+In this document we present an overview of the supported security protocols in @ref{Introduction to TLS}, and 
+continue by providing more information on the certificate authentication in @ref{Certificate authentication},
+and shared-key as well anonymous authentication in @ref{Shared-key and anonymous authentication}. We
+elaborate on certificate authentication by demonstrating advanced usage of the API in @ref{More on certificate authentication}.
+The core of the TLS library is presented in @ref{How to use GnuTLS in applications} and example
+applications are listed in @ref{GnuTLS application examples}.
+In @ref{Other included programs} the usage of few included programs that
+may assist debugging is presented. The last chapter is @ref{Internal architecture of GnuTLS} that
+provides a short introduction to GnuTLS' internal architecture.

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_crypto_register_mac} (gnutls_mac_algorithm_t @var{algorithm}, int @var{priority}, gnutls_mac_init_func @var{init}, gnutls_mac_setkey_func @var{setkey}, gnutls_mac_setnonce_func @var{setnonce}, gnutls_mac_hash_func @var{hash}, gnutls_mac_output_func @var{output}, gnutls_mac_deinit_func @var{deinit}, gnutls_mac_fast_func @var{hash_fast})

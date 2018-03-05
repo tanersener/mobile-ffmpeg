@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_key_purposes} (const gnutls_datum_t * @var{ext}, gnutls_x509_key_purposes_t @var{p}, unsigned int @var{flags})
+@var{ext}: The DER-encoded extension data
+
+@var{p}: The key purposes
+
+@var{flags}: should be zero
+
+This function will extract the key purposes in the provided DER-encoded
+ExtKeyUsageSyntax PKIX extension, to a @code{gnutls_x509_key_purposes_t}  type. 
+The data must be initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_get_status} (gnutls_ocsp_resp_t @var{resp})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+This function will return the status of a OCSP response, an
+@code{gnutls_ocsp_resp_status_t}  enumeration.
+
+@strong{Returns:} status of OCSP request as a @code{gnutls_ocsp_resp_status_t} , or
+a negative error code on error.
+@end deftypefun

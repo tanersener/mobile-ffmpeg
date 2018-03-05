@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {gnutls_pk_algorithm_t} {gnutls_pk_get_id} (const char * @var{name})
+@var{name}: is a string containing a public key algorithm name.
+
+Convert a string to a @code{gnutls_pk_algorithm_t}  value.  The names are
+compared in a case insensitive way.  For example,
+gnutls_pk_get_id("RSA") will return @code{GNUTLS_PK_RSA} .
+
+@strong{Returns:} a @code{gnutls_pk_algorithm_t}  id of the specified public key
+algorithm string, or @code{GNUTLS_PK_UNKNOWN}  on failures.
+
+@strong{Since:} 2.6.0
+@end deftypefun

@@ -1,0 +1,11 @@
+
+
+@c gnutls_pkcs11_url_type_t
+@table @code
+@item GNUTLS_@-PKCS11_@-URL_@-GENERIC
+A generic-purpose URL.
+@item GNUTLS_@-PKCS11_@-URL_@-LIB
+A URL that specifies the library used as well.
+@item GNUTLS_@-PKCS11_@-URL_@-LIB_@-VERSION
+A URL that specifies the library and its version.
+@end table

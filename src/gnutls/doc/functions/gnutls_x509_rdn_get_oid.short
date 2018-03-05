@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_rdn_get_oid} (const gnutls_datum_t * @var{idn}, unsigned @var{indx}, void * @var{buf}, size_t * @var{buf_size})

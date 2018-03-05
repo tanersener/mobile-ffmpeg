@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_dn} (gnutls_x509_crt_t @var{crt}, const char * @var{dn}, const char ** @var{err})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{dn}: a comma separated DN string (RFC4514)
+
+@var{err}: indicates the error position (if any)
+
+This function will set the DN on the provided certificate.
+The input string should be plain ASCII or UTF-8 encoded. On
+DN parsing error @code{GNUTLS_E_PARSING_ERROR}  is returned.
+
+Note that DNs are not expected to hold DNS information, and thus
+no automatic IDNA convertions are attempted when using this function.
+If that is required (e.g., store a domain in CN), process the corresponding
+input with @code{gnutls_idna_map()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

@@ -1,0 +1,27 @@
+
+
+
+@deftypefun {void} {gnutls_global_set_mem_functions} (gnutls_alloc_function @var{alloc_func}, gnutls_alloc_function @var{secure_alloc_func}, gnutls_is_secure_function @var{is_secure_func}, gnutls_realloc_function @var{realloc_func}, gnutls_free_function @var{free_func})
+@var{alloc_func}: it's the default memory allocation function. Like @code{malloc()} .
+
+@var{secure_alloc_func}: This is the memory allocation function that will be used for sensitive data.
+
+@var{is_secure_func}: a function that returns 0 if the memory given is not secure. May be NULL.
+
+@var{realloc_func}: A realloc function
+
+@var{free_func}: The function that frees allocated data. Must accept a NULL pointer.
+
+
+@strong{Deprecated:} since 3.3.0 it is no longer possible to replace the internally used 
+memory allocation functions
+
+This is the function where you set the memory allocation functions
+gnutls is going to use. By default the libc's allocation functions
+(@code{malloc()} , @code{free()} ), are used by gnutls, to allocate both sensitive
+and not sensitive data.  This function is provided to set the
+memory allocation functions to something other than the defaults
+
+This function must be called before @code{gnutls_global_init()}  is called.
+This function is not thread safe.
+@end deftypefun

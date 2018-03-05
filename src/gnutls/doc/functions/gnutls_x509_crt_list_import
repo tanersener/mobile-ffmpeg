@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_list_import} (gnutls_x509_crt_t * @var{certs}, unsigned int * @var{cert_max}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{certs}: Indicates where the parsed list will be copied to. Must not be initialized.
+
+@var{cert_max}: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
+
+@var{data}: The PEM encoded certificate.
+
+@var{format}: One of DER or PEM.
+
+@var{flags}: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
+
+This function will convert the given PEM encoded certificate list
+to the native gnutls_x509_crt_t format. The output will be stored
+in  @code{certs} .  They will be automatically initialized.
+
+The flag @code{GNUTLS_X509_CRT_LIST_IMPORT_FAIL_IF_EXCEED}  will cause
+import to fail if the certificates in the provided buffer are more
+than the available structures. The @code{GNUTLS_X509_CRT_LIST_FAIL_IF_UNSORTED} 
+flag will cause the function to fail if the provided list is not
+sorted from subject to issuer.
+
+If the Certificate is PEM encoded it should have a header of "X509
+CERTIFICATE", or "CERTIFICATE".
+
+@strong{Returns:} the number of certificates read or a negative error value.
+@end deftypefun

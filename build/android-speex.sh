@@ -33,7 +33,7 @@ LDFLAGS=$(android_get_ldflags "speex")
 
 OPTIONAL_CPU_SUPPORT=""
 if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86_64" ]; then
-    OPTIONAL_CPU_SUPPORT="--enable-sse"
+    OPTIONAL_CPU_SUPPORT="--enable-sse \\"
 fi
 
 cd $1/src/speex || exit 1
@@ -48,7 +48,7 @@ LDFLAGS=${LDFLAGS} \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
     --enable-static \
-    $OPTIONAL_CPU_SUPPORT \
+    ${OPTIONAL_CPU_SUPPORT}
     --disable-shared \
     --disable-binaries \
     --disable-fast-install \

@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_system_key_iter_deinit} (gnutls_system_key_iter_t @var{iter})
+@var{iter}: an iterator of system keys
+
+This function will deinitialize the iterator.
+
+@strong{Since:} 3.4.0
+@end deftypefun

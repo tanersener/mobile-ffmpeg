@@ -1,0 +1,47 @@
+<!-- ##### SECTION Title ##### -->
+gnutls_pk
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### VARIABLE crypto_pk_prio ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO decode_ber_digest_info ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION encode_ber_digest_info ##### -->
+<para>
+
+</para>
+
+@e: 
+@digest: 
+@output: 
+@Returns: 
+
+

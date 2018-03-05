@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_trust_list_add_trust_dir} (gnutls_x509_trust_list_t @var{list}, const char * @var{ca_dir}, const char * @var{crl_dir}, gnutls_x509_crt_fmt_t @var{type}, unsigned int @var{tl_flags}, unsigned int @var{tl_vflags})

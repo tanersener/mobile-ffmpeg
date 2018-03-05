@@ -1,0 +1,40 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_get_single} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number}, unsigned int * @var{cert_status}, time_t * @var{this_update}, time_t * @var{next_update}, time_t * @var{revocation_time}, unsigned int * @var{revocation_reason})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+@var{indx}: Specifies response number to get. Use (0) to get the first one.
+
+@var{digest}: output variable with @code{gnutls_digest_algorithm_t}  hash algorithm
+
+@var{issuer_name_hash}: output buffer with hash of issuer's DN
+
+@var{issuer_key_hash}: output buffer with hash of issuer's public key
+
+@var{serial_number}: output buffer with serial number of certificate to check
+
+@var{cert_status}: a certificate status, a @code{gnutls_ocsp_cert_status_t}  enum.
+
+@var{this_update}: time at which the status is known to be correct.
+
+@var{next_update}: when newer information will be available, or (time_t)-1 if unspecified
+
+@var{revocation_time}: when  @code{cert_status} is @code{GNUTLS_OCSP_CERT_REVOKED} , holds time of revocation.
+
+@var{revocation_reason}: revocation reason, a @code{gnutls_x509_crl_reason_t}  enum.
+
+This function will return the certificate information of the
+ @code{indx} 'ed response in the Basic OCSP Response  @code{resp} .  The
+information returned corresponds to the OCSP SingleResponse structure
+except the final singleExtensions.
+
+Each of the pointers to output variables may be NULL to indicate
+that the caller is not interested in that value.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.  If you have reached the last
+CertID available @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be
+returned.
+@end deftypefun

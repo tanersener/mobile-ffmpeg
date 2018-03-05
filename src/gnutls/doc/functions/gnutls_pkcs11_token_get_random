@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_token_get_random} (const char * @var{token_url}, void * @var{rnddata}, size_t @var{len})
+@var{token_url}: A PKCS @code{11}  URL specifying a token
+
+@var{rnddata}: A pointer to the memory area to be filled with random data
+
+@var{len}: The number of bytes of randomness to request
+
+This function will get random data from the given token.
+It will store rnddata and fill the memory pointed to by rnddata with
+len random bytes from the token.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

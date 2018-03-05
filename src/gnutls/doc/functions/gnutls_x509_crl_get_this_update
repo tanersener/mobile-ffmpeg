@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {time_t} {gnutls_x509_crl_get_this_update} (gnutls_x509_crl_t @var{crl})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+This function will return the time this CRL was issued.
+
+@strong{Returns:} when the CRL was issued, or (time_t)-1 on error.
+@end deftypefun

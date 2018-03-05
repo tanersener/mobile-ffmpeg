@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_privkey_export_url} (gnutls_pkcs11_privkey_t @var{key}, gnutls_pkcs11_url_type_t @var{detailed}, char ** @var{url})
+@var{key}: Holds the PKCS 11 key
+
+@var{detailed}: non zero if a detailed URL is required
+
+@var{url}: will contain an allocated url
+
+This function will export a URL identifying the given key.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

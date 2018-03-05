@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_obj_export3} (gnutls_pkcs11_obj_t @var{obj}, gnutls_x509_crt_fmt_t @var{fmt}, gnutls_datum_t * @var{out})

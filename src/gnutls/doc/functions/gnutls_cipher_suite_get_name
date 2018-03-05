@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_cipher_suite_get_name} (gnutls_kx_algorithm_t       @var{kx_algorithm}, gnutls_cipher_algorithm_t       @var{cipher_algorithm}, gnutls_mac_algorithm_t       @var{mac_algorithm})
+@var{kx_algorithm}: is a Key exchange algorithm
+
+@var{cipher_algorithm}: is a cipher algorithm
+
+@var{mac_algorithm}: is a MAC algorithm
+
+Note that the full cipher suite name must be prepended by TLS or
+SSL depending of the protocol in use.
+
+@strong{Returns:} a string that contains the name of a TLS cipher suite,
+specified by the given algorithms, or @code{NULL} .
+@end deftypefun

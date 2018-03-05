@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_privkey_export_pubkey} (gnutls_pkcs11_privkey_t @var{pkey}, gnutls_x509_crt_fmt_t @var{fmt}, gnutls_datum_t * @var{data}, unsigned int @var{flags})
+@var{pkey}: The private key
+
+@var{fmt}: the format of output params. PEM or DER.
+
+@var{data}: will hold the public key
+
+@var{flags}: should be zero
+
+This function will extract the public key (modulus and public
+exponent) from the private key specified by the  @code{url} private key.
+This public key will be stored in  @code{pubkey} in the format specified
+by  @code{fmt} .  @code{pubkey} should be deinitialized using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.3.7
+@end deftypefun

@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_tlsfeatures} (gnutls_x509_crq_t @var{crq}, gnutls_x509_tlsfeatures_t @var{features}, unsigned int @var{flags}, unsigned int * @var{critical})
+@var{crq}: -- undescribed --
+
+@var{features}: If the function succeeds, the
+features will be stored in this variable.
+
+@var{flags}: zero or @code{GNUTLS_EXT_FLAG_APPEND} 
+
+@var{critical}: the extension status
+
+This function will get the X.509 TLS features
+extension structure from the certificate request.
+The returned structure needs to be freed using
+@code{gnutls_x509_tlsfeatures_deinit()} .
+
+When the  @code{flags} is set to @code{GNUTLS_EXT_FLAG_APPEND} ,
+then if the  @code{features} structure is empty this function will behave
+identically as if the flag was not set. Otherwise if there are elements 
+in the  @code{features} structure then they will be merged with.
+
+Note that  @code{features} must be initialized prior to calling this function.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error value.
+
+@strong{Since:} 3.5.1
+@end deftypefun

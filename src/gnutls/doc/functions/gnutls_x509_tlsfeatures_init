@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_tlsfeatures_init} (gnutls_x509_tlsfeatures_t * @var{f})
+@var{f}: The TLS features
+
+This function will initialize a X.509 TLS features extension structure
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error value.
+
+@strong{Since:} 3.5.1
+@end deftypefun

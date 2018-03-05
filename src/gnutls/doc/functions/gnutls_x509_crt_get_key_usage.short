@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_key_usage} (gnutls_x509_crt_t @var{cert}, unsigned int * @var{key_usage}, unsigned int * @var{critical})

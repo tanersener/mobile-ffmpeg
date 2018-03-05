@@ -50,7 +50,7 @@ PKG_CONFIG_PATH=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype/lib/pkgcon
     --enable-static \
     --disable-shared \
     --disable-fast-install \
-    --disable-largefile \
+    --disable-rpath \
     --enable-iconv \
     --enable-libxml2 \
     --disable-docs \

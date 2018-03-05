@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {gnutls_digest_algorithm_t} {gnutls_digest_get_id} (const char * @var{name})
+@var{name}: is a digest algorithm name
+
+Convert a string to a @code{gnutls_digest_algorithm_t}  value.  The names are
+compared in a case insensitive way.
+
+@strong{Returns:} a @code{gnutls_digest_algorithm_t}  id of the specified MAC
+algorithm string, or @code{GNUTLS_DIG_UNKNOWN}  on failure.
+@end deftypefun

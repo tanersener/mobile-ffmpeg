@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_check_version} (const char * @var{req_version})

@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {void} {gnutls_pubkey_set_pin_function} (gnutls_pubkey_t @var{key}, gnutls_pin_callback_t @var{fn}, void * @var{userdata})
+@var{key}: A key of type @code{gnutls_pubkey_t} 
+
+@var{fn}: the callback
+
+@var{userdata}: data associated with the callback
+
+This function will set a callback function to be used when
+required to access the object. This function overrides any other
+global PIN functions.
+
+Note that this function must be called right after initialization
+to have effect.
+
+@strong{Since:} 3.1.0
+@end deftypefun

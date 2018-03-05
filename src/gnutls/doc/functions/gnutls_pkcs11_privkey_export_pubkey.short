@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_privkey_export_pubkey} (gnutls_pkcs11_privkey_t @var{pkey}, gnutls_x509_crt_fmt_t @var{fmt}, gnutls_datum_t * @var{data}, unsigned int @var{flags})

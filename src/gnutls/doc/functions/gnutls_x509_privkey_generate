@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_generate} (gnutls_x509_privkey_t @var{key}, gnutls_pk_algorithm_t @var{algo}, unsigned int @var{bits}, unsigned int @var{flags})
+@var{key}: an initialized key
+
+@var{algo}: is one of the algorithms in @code{gnutls_pk_algorithm_t} .
+
+@var{bits}: the size of the parameters to generate
+
+@var{flags}: Must be zero or flags from @code{gnutls_privkey_flags_t} .
+
+This function will generate a random private key. Note that this
+function must be called on an empty private key. The flag @code{GNUTLS_PRIVKEY_FLAG_PROVABLE} 
+instructs the key generation process to use algorithms like Shawe-Taylor
+which generate provable parameters out of a seed.
+
+Note that when generating an elliptic curve key, the curve
+can be substituted in the place of the bits parameter using the
+@code{GNUTLS_CURVE_TO_BITS()}  macro. The input to the macro is any curve from
+@code{gnutls_ecc_curve_t} .
+
+For DSA keys, if the subgroup size needs to be specified check
+the @code{GNUTLS_SUBGROUP_TO_BITS()}  macro.
+
+It is recommended to do not set the number of  @code{bits} directly, use @code{gnutls_sec_param_to_pk_bits()}  instead .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

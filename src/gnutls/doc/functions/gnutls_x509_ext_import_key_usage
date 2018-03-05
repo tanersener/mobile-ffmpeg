@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_key_usage} (const gnutls_datum_t * @var{ext}, unsigned int * @var{key_usage})
+@var{ext}: the DER encoded extension data
+
+@var{key_usage}: where the key usage bits will be stored
+
+This function will return certificate's key usage, by reading the DER
+data of the keyUsage X.509 extension (2.5.29.15). The key usage value will ORed
+values of the: @code{GNUTLS_KEY_DIGITAL_SIGNATURE} ,
+@code{GNUTLS_KEY_NON_REPUDIATION} , @code{GNUTLS_KEY_KEY_ENCIPHERMENT} ,
+@code{GNUTLS_KEY_DATA_ENCIPHERMENT} , @code{GNUTLS_KEY_KEY_AGREEMENT} ,
+@code{GNUTLS_KEY_KEY_CERT_SIGN} , @code{GNUTLS_KEY_CRL_SIGN} ,
+@code{GNUTLS_KEY_ENCIPHER_ONLY} , @code{GNUTLS_KEY_DECIPHER_ONLY} .
+
+@strong{Returns:} the certificate key usage, or a negative error code in case of
+parsing error.  If the certificate does not contain the keyUsage
+extension @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be
+returned.
+
+@strong{Since:} 3.3.0
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{dane_query_tlsa} (dane_state_t @var{s}, dane_query_t * @var{r}, const char * @var{host}, const char * @var{proto}, unsigned int @var{port})

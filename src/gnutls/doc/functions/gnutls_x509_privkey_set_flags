@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_privkey_set_flags} (gnutls_x509_privkey_t @var{key}, unsigned int @var{flags})
+@var{key}: A key of type @code{gnutls_x509_privkey_t} 
+
+@var{flags}: flags from the @code{gnutls_privkey_flags} 
+
+This function will set flags for the specified private key, after
+it is generated. Currently this is useful for the @code{GNUTLS_PRIVKEY_FLAG_EXPORT_COMPAT} 
+to allow exporting a "provable" private key in backwards compatible way.
+
+@strong{Since:} 3.5.0
+@end deftypefun

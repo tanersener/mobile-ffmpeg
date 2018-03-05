@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_get_signature_count} (gnutls_pkcs7_t @var{pkcs7})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+This function will return the number of signatures in the PKCS7
+structure.
+
+@strong{Returns:} On success, a positive number is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.3
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_set_key_usage} (gnutls_x509_crt_t @var{crt}, unsigned int @var{usage})

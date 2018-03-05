@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_cipher_add_auth} (gnutls_cipher_hd_t @var{handle}, const void * @var{ptext}, size_t @var{ptext_size})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{ptext}: the data to be authenticated
+
+@var{ptext_size}: the length of the data
+
+This function operates on authenticated encryption with
+associated data (AEAD) ciphers and authenticate the
+input data. This function can only be called once
+and before any encryption operations.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.0
+@end deftypefun

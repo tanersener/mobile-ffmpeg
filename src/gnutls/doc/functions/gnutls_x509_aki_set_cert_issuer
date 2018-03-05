@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_aki_set_cert_issuer} (gnutls_x509_aki_t @var{aki}, unsigned int @var{san_type}, const gnutls_datum_t * @var{san}, const char * @var{othername_oid}, const gnutls_datum_t * @var{serial})
+@var{aki}: The authority key ID
+
+@var{san_type}: the type of the name (of @code{gnutls_subject_alt_names_t} ), may be null
+
+@var{san}: The alternative name data
+
+@var{othername_oid}: The object identifier if  @code{san_type} is @code{GNUTLS_SAN_OTHERNAME} 
+
+@var{serial}: The authorityCertSerialNumber number (may be null)
+
+This function will set the authorityCertIssuer name and the authorityCertSerialNumber 
+to be stored in the  @code{aki} type. When storing multiple names, the serial
+should be set on the first call, and subsequent calls should use a @code{NULL}  serial.
+
+Since version 3.5.7 the @code{GNUTLS_SAN_RFC822NAME} , @code{GNUTLS_SAN_DNSNAME} , and
+@code{GNUTLS_SAN_OTHERNAME_XMPP}  are converted to ACE format when necessary.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

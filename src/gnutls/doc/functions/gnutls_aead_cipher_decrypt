@@ -1,0 +1,33 @@
+
+
+
+@deftypefun {int} {gnutls_aead_cipher_decrypt} (gnutls_aead_cipher_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len}, const void * @var{auth}, size_t @var{auth_len}, size_t @var{tag_size}, const void * @var{ctext}, size_t @var{ctext_len}, void * @var{ptext}, size_t * @var{ptext_len})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+@var{nonce}: the nonce to set
+
+@var{nonce_len}: The length of the nonce
+
+@var{auth}: the data to be authenticated
+
+@var{auth_len}: The length of the data
+
+@var{tag_size}: The size of the tag to use (use zero for the default)
+
+@var{ctext}: the data to decrypt
+
+@var{ctext_len}: the length of data to decrypt (includes tag size)
+
+@var{ptext}: the decrypted data
+
+@var{ptext_len}: the length of decrypted data (initially must hold the maximum available size)
+
+This function will decrypt the given data using the algorithm
+specified by the context. This function must be provided the whole
+data to be decrypted, including the tag, and will fail if the tag
+verification fails.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.4.0
+@end deftypefun

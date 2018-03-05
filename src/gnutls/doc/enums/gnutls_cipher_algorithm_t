@@ -1,0 +1,71 @@
+
+
+@c gnutls_cipher_algorithm_t
+@table @code
+@item GNUTLS_@-CIPHER_@-UNKNOWN
+Value to identify an unknown/unsupported algorithm.
+@item GNUTLS_@-CIPHER_@-NULL
+The NULL (identity) encryption algorithm.
+@item GNUTLS_@-CIPHER_@-ARCFOUR_@-128
+ARCFOUR stream cipher with 128-bit keys.
+@item GNUTLS_@-CIPHER_@-3DES_@-CBC
+3DES in CBC mode.
+@item GNUTLS_@-CIPHER_@-AES_@-128_@-CBC
+AES in CBC mode with 128-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-256_@-CBC
+AES in CBC mode with 256-bit keys.
+@item GNUTLS_@-CIPHER_@-ARCFOUR_@-40
+ARCFOUR stream cipher with 40-bit keys.
+@item GNUTLS_@-CIPHER_@-CAMELLIA_@-128_@-CBC
+Camellia in CBC mode with 128-bit keys.
+@item GNUTLS_@-CIPHER_@-CAMELLIA_@-256_@-CBC
+Camellia in CBC mode with 256-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-192_@-CBC
+AES in CBC mode with 192-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-128_@-GCM
+AES in GCM mode with 128-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-256_@-GCM
+AES in GCM mode with 256-bit keys.
+@item GNUTLS_@-CIPHER_@-CAMELLIA_@-192_@-CBC
+Camellia in CBC mode with 192-bit keys.
+@item GNUTLS_@-CIPHER_@-SALSA20_@-256
+Salsa20 with 256-bit keys.
+@item GNUTLS_@-CIPHER_@-ESTREAM_@-SALSA20_@-256
+Estream's Salsa20 variant with 256-bit keys.
+@item GNUTLS_@-CIPHER_@-CAMELLIA_@-128_@-GCM
+CAMELLIA in GCM mode with 128-bit keys.
+@item GNUTLS_@-CIPHER_@-CAMELLIA_@-256_@-GCM
+CAMELLIA in GCM mode with 256-bit keys.
+@item GNUTLS_@-CIPHER_@-RC2_@-40_@-CBC
+RC2 in CBC mode with 40-bit keys.
+@item GNUTLS_@-CIPHER_@-DES_@-CBC
+DES in CBC mode (56-bit keys).
+@item GNUTLS_@-CIPHER_@-AES_@-128_@-CCM
+AES in CCM mode with 128-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-256_@-CCM
+AES in CCM mode with 256-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-128_@-CCM_@-8
+AES in CCM mode with 64-bit tag and 128-bit keys.
+@item GNUTLS_@-CIPHER_@-AES_@-256_@-CCM_@-8
+AES in CCM mode with 64-bit tag and 256-bit keys.
+@item GNUTLS_@-CIPHER_@-CHACHA20_@-POLY1305
+The Chacha20 cipher with the Poly1305 authenticator (AEAD).
+@item GNUTLS_@-CIPHER_@-IDEA_@-PGP_@-CFB
+IDEA in CFB mode (placeholder - unsupported).
+@item GNUTLS_@-CIPHER_@-3DES_@-PGP_@-CFB
+3DES in CFB mode (placeholder - unsupported).
+@item GNUTLS_@-CIPHER_@-CAST5_@-PGP_@-CFB
+CAST5 in CFB mode (placeholder - unsupported).
+@item GNUTLS_@-CIPHER_@-BLOWFISH_@-PGP_@-CFB
+Blowfish in CFB mode (placeholder - unsupported).
+@item GNUTLS_@-CIPHER_@-SAFER_@-SK128_@-PGP_@-CFB
+Safer-SK in CFB mode with 128-bit keys (placeholder - unsupported).
+@item GNUTLS_@-CIPHER_@-AES128_@-PGP_@-CFB
+AES in CFB mode with 128-bit keys (placeholder - unsupported).
+@item GNUTLS_@-CIPHER_@-AES192_@-PGP_@-CFB
+AES in CFB mode with 192-bit keys (placeholder - unsupported).
+@item GNUTLS_@-CIPHER_@-AES256_@-PGP_@-CFB
+AES in CFB mode with 256-bit keys (placeholder - unsupported).
+@item GNUTLS_@-CIPHER_@-TWOFISH_@-PGP_@-CFB
+Twofish in CFB mode (placeholder - unsupported).
+@end table

@@ -1,0 +1,196 @@
+
+@subheading gnutls_dtls_cookie_send
+@anchor{gnutls_dtls_cookie_send}
+@deftypefun {int} {gnutls_dtls_cookie_send} (gnutls_datum_t * @var{key}, void * @var{client_data}, size_t @var{client_data_size}, gnutls_dtls_prestate_st * @var{prestate}, gnutls_transport_ptr_t @var{ptr}, gnutls_push_func @var{push_func})
+@var{key}: is a random key to be used at cookie generation
+
+@var{client_data}: contains data identifying the client (i.e. address)
+
+@var{client_data_size}: The size of client's data
+
+@var{prestate}: The previous cookie returned by @code{gnutls_dtls_cookie_verify()} 
+
+@var{ptr}: A transport pointer to be used by  @code{push_func} 
+
+@var{push_func}: A function that will be used to reply
+
+This function can be used to prevent denial of service
+attacks to a DTLS server by requiring the client to
+reply using a cookie sent by this function. That way
+it can be ensured that a client we allocated resources
+for (i.e. @code{gnutls_session_t} ) is the one that the 
+original incoming packet was originated from.
+
+This function must be called at the first incoming packet,
+prior to allocating any resources and must be succeeded
+by @code{gnutls_dtls_cookie_verify()} .
+
+@strong{Returns:} the number of bytes sent, or a negative error code.  
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_dtls_cookie_verify
+@anchor{gnutls_dtls_cookie_verify}
+@deftypefun {int} {gnutls_dtls_cookie_verify} (gnutls_datum_t * @var{key}, void * @var{client_data}, size_t @var{client_data_size}, void * @var{_msg}, size_t @var{msg_size}, gnutls_dtls_prestate_st * @var{prestate})
+@var{key}: is a random key to be used at cookie generation
+
+@var{client_data}: contains data identifying the client (i.e. address)
+
+@var{client_data_size}: The size of client's data
+
+@var{_msg}: An incoming message that initiates a connection.
+
+@var{msg_size}: The size of the message.
+
+@var{prestate}: The cookie of this client.
+
+This function will verify the received message for
+a valid cookie. If a valid cookie is returned then
+it should be associated with the session using
+@code{gnutls_dtls_prestate_set()} ;
+
+This function must be called after @code{gnutls_dtls_cookie_send()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.  
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_dtls_get_data_mtu
+@anchor{gnutls_dtls_get_data_mtu}
+@deftypefun {unsigned int} {gnutls_dtls_get_data_mtu} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function will return the actual maximum transfer unit for
+application data. I.e. DTLS headers are subtracted from the
+actual MTU which is set using @code{gnutls_dtls_set_mtu()} .
+
+@strong{Returns:} the maximum allowed transfer unit.
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_dtls_get_mtu
+@anchor{gnutls_dtls_get_mtu}
+@deftypefun {unsigned int} {gnutls_dtls_get_mtu} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function will return the MTU size as set with
+@code{gnutls_dtls_set_mtu()} . This is not the actual MTU
+of data you can transmit. Use @code{gnutls_dtls_get_data_mtu()} 
+for that reason.
+
+@strong{Returns:} the set maximum transfer unit.
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_dtls_get_timeout
+@anchor{gnutls_dtls_get_timeout}
+@deftypefun {unsigned int} {gnutls_dtls_get_timeout} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function will return the milliseconds remaining
+for a retransmission of the previously sent handshake
+message. This function is useful when DTLS is used in
+non-blocking mode, to estimate when to call @code{gnutls_handshake()} 
+if no packets have been received.
+
+@strong{Returns:} the remaining time in milliseconds.
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_dtls_prestate_set
+@anchor{gnutls_dtls_prestate_set}
+@deftypefun {void} {gnutls_dtls_prestate_set} (gnutls_session_t @var{session}, gnutls_dtls_prestate_st * @var{prestate})
+@var{session}: a new session
+
+@var{prestate}: contains the client's prestate
+
+This function will associate the prestate acquired by
+the cookie authentication with the client, with the newly 
+established session.
+
+This functions must be called after a successful @code{gnutls_dtls_cookie_verify()} 
+and should be succeeded by the actual DTLS handshake using @code{gnutls_handshake()} .
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_dtls_set_data_mtu
+@anchor{gnutls_dtls_set_data_mtu}
+@deftypefun {int} {gnutls_dtls_set_data_mtu} (gnutls_session_t @var{session}, unsigned int @var{mtu})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{mtu}: The maximum unencrypted transfer unit of the session
+
+This function will set the maximum size of the *unencrypted* records
+which will be sent over a DTLS session. It is equivalent to calculating
+the DTLS packet overhead with the current encryption parameters, and
+calling @code{gnutls_dtls_set_mtu()}  with that value. In particular, this means
+that you may need to call this function again after any negotiation or
+renegotiation, in order to ensure that the MTU is still sufficient to
+account for the new protocol overhead.
+
+In most cases you only need to call @code{gnutls_dtls_set_mtu()}  with
+the maximum MTU of your transport layer.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.
+
+@strong{Since:} 3.1
+@end deftypefun
+
+@subheading gnutls_dtls_set_mtu
+@anchor{gnutls_dtls_set_mtu}
+@deftypefun {void} {gnutls_dtls_set_mtu} (gnutls_session_t @var{session}, unsigned int @var{mtu})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{mtu}: The maximum transfer unit of the transport
+
+This function will set the maximum transfer unit of the transport
+that DTLS packets are sent over. Note that this should exclude
+the IP (or IPv6) and UDP headers. So for DTLS over IPv6 on an
+Ethernet device with MTU 1500, the DTLS MTU set with this function
+would be 1500 - 40 (IPV6 header) - 8 (UDP header) = 1452.
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_dtls_set_timeouts
+@anchor{gnutls_dtls_set_timeouts}
+@deftypefun {void} {gnutls_dtls_set_timeouts} (gnutls_session_t @var{session}, unsigned int @var{retrans_timeout}, unsigned int @var{total_timeout})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{retrans_timeout}: The time at which a retransmission will occur in milliseconds
+
+@var{total_timeout}: The time at which the connection will be aborted, in milliseconds.
+
+This function will set the timeouts required for the DTLS handshake
+protocol. The retransmission timeout is the time after which a
+message from the peer is not received, the previous messages will
+be retransmitted. The total timeout is the time after which the
+handshake will be aborted with @code{GNUTLS_E_TIMEDOUT} .
+
+The DTLS protocol recommends the values of 1 sec and 60 seconds
+respectively, and these are the default values.
+
+To disable retransmissions set a  @code{retrans_timeout} larger than the  @code{total_timeout} .
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_record_get_discarded
+@anchor{gnutls_record_get_discarded}
+@deftypefun {unsigned int} {gnutls_record_get_discarded} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Returns the number of discarded packets in a
+DTLS connection.
+
+@strong{Returns:} The number of discarded packets.
+
+@strong{Since:} 3.0
+@end deftypefun
+

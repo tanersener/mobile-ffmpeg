@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_supplemental_recv} (gnutls_session_t @var{session}, unsigned @var{do_recv_supplemental})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{do_recv_supplemental}: non-zero in order to expect supplemental data
+
+This function is to be called by an extension handler to
+instruct gnutls to attempt to receive supplemental data
+during the handshake process.
+
+@strong{Since:} 3.4.0
+@end deftypefun

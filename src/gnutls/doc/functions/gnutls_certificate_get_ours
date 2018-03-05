@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {const gnutls_datum_t *} {gnutls_certificate_get_ours} (gnutls_session_t @var{session})
+@var{session}: is a gnutls session
+
+Gets the certificate as sent to the peer in the last handshake.
+The certificate is in raw (DER) format.  No certificate
+list is being returned. Only the first certificate.
+
+@strong{Returns:} a pointer to a @code{gnutls_datum_t}  containing our
+certificate, or @code{NULL}  in case of an error or if no certificate
+was used.
+@end deftypefun

@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_db_check_entry} (gnutls_session_t @var{session}, gnutls_datum_t @var{session_entry})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{session_entry}: is the session data (not key)
+
+This function has no effect. 
+
+@strong{Returns:} Returns @code{GNUTLS_E_EXPIRED} , if the database entry has
+expired or 0 otherwise.
+@end deftypefun

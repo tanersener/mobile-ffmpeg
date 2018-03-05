@@ -1,0 +1,3835 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>openpgp: GnuTLS API Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="index.html" title="GnuTLS API Reference Manual">
+<link rel="up" href="intro.html" title="GnuTLS API Reference Manual">
+<link rel="prev" href="gnutls-x509.html" title="x509">
+<link rel="next" href="gnutls-crypto.html" title="crypto">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#gnutls-openpgp.description" class="shortcut">Description</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="intro.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="gnutls-x509.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="gnutls-crypto.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="gnutls-openpgp"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="gnutls-openpgp.top_of_page"></a>openpgp</span></h2>
+<p>openpgp</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="gnutls-openpgp.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-certificate-set-openpgp-key" title="gnutls_certificate_set_openpgp_key ()">gnutls_certificate_set_openpgp_key</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-certificate-set-openpgp-key-file" title="gnutls_certificate_set_openpgp_key_file ()">gnutls_certificate_set_openpgp_key_file</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-certificate-set-openpgp-key-file2" title="gnutls_certificate_set_openpgp_key_file2 ()">gnutls_certificate_set_openpgp_key_file2</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-certificate-set-openpgp-key-mem" title="gnutls_certificate_set_openpgp_key_mem ()">gnutls_certificate_set_openpgp_key_mem</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-certificate-set-openpgp-key-mem2" title="gnutls_certificate_set_openpgp_key_mem2 ()">gnutls_certificate_set_openpgp_key_mem2</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-certificate-set-openpgp-keyring-file" title="gnutls_certificate_set_openpgp_keyring_file ()">gnutls_certificate_set_openpgp_keyring_file</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-certificate-set-openpgp-keyring-mem" title="gnutls_certificate_set_openpgp_keyring_mem ()">gnutls_certificate_set_openpgp_keyring_mem</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-check-hostname" title="gnutls_openpgp_crt_check_hostname ()">gnutls_openpgp_crt_check_hostname</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-deinit" title="gnutls_openpgp_crt_deinit ()">gnutls_openpgp_crt_deinit</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-export" title="gnutls_openpgp_crt_export ()">gnutls_openpgp_crt_export</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-export2" title="gnutls_openpgp_crt_export2 ()">gnutls_openpgp_crt_export2</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-auth-subkey" title="gnutls_openpgp_crt_get_auth_subkey ()">gnutls_openpgp_crt_get_auth_subkey</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">time_t</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-creation-time" title="gnutls_openpgp_crt_get_creation_time ()">gnutls_openpgp_crt_get_creation_time</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">time_t</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-expiration-time" title="gnutls_openpgp_crt_get_expiration_time ()">gnutls_openpgp_crt_get_expiration_time</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-fingerprint" title="gnutls_openpgp_crt_get_fingerprint ()">gnutls_openpgp_crt_get_fingerprint</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-key-id" title="gnutls_openpgp_crt_get_key_id ()">gnutls_openpgp_crt_get_key_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-key-usage" title="gnutls_openpgp_crt_get_key_usage ()">gnutls_openpgp_crt_get_key_usage</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-name" title="gnutls_openpgp_crt_get_name ()">gnutls_openpgp_crt_get_name</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="returnvalue">gnutls_pk_algorithm_t</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-pk-algorithm" title="gnutls_openpgp_crt_get_pk_algorithm ()">gnutls_openpgp_crt_get_pk_algorithm</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-pk-dsa-raw" title="gnutls_openpgp_crt_get_pk_dsa_raw ()">gnutls_openpgp_crt_get_pk_dsa_raw</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-pk-rsa-raw" title="gnutls_openpgp_crt_get_pk_rsa_raw ()">gnutls_openpgp_crt_get_pk_rsa_raw</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-preferred-key-id" title="gnutls_openpgp_crt_get_preferred_key_id ()">gnutls_openpgp_crt_get_preferred_key_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-revoked-status" title="gnutls_openpgp_crt_get_revoked_status ()">gnutls_openpgp_crt_get_revoked_status</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-count" title="gnutls_openpgp_crt_get_subkey_count ()">gnutls_openpgp_crt_get_subkey_count</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">time_t</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-creation-time" title="gnutls_openpgp_crt_get_subkey_creation_time ()">gnutls_openpgp_crt_get_subkey_creation_time</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">time_t</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-expiration-time" title="gnutls_openpgp_crt_get_subkey_expiration_time ()">gnutls_openpgp_crt_get_subkey_expiration_time</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-fingerprint" title="gnutls_openpgp_crt_get_subkey_fingerprint ()">gnutls_openpgp_crt_get_subkey_fingerprint</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-id" title="gnutls_openpgp_crt_get_subkey_id ()">gnutls_openpgp_crt_get_subkey_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-idx" title="gnutls_openpgp_crt_get_subkey_idx ()">gnutls_openpgp_crt_get_subkey_idx</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="returnvalue">gnutls_pk_algorithm_t</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-pk-algorithm" title="gnutls_openpgp_crt_get_subkey_pk_algorithm ()">gnutls_openpgp_crt_get_subkey_pk_algorithm</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-pk-dsa-raw" title="gnutls_openpgp_crt_get_subkey_pk_dsa_raw ()">gnutls_openpgp_crt_get_subkey_pk_dsa_raw</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-pk-rsa-raw" title="gnutls_openpgp_crt_get_subkey_pk_rsa_raw ()">gnutls_openpgp_crt_get_subkey_pk_rsa_raw</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-revoked-status" title="gnutls_openpgp_crt_get_subkey_revoked_status ()">gnutls_openpgp_crt_get_subkey_revoked_status</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-subkey-usage" title="gnutls_openpgp_crt_get_subkey_usage ()">gnutls_openpgp_crt_get_subkey_usage</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-version" title="gnutls_openpgp_crt_get_version ()">gnutls_openpgp_crt_get_version</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-import" title="gnutls_openpgp_crt_import ()">gnutls_openpgp_crt_import</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-init" title="gnutls_openpgp_crt_init ()">gnutls_openpgp_crt_init</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-print" title="gnutls_openpgp_crt_print ()">gnutls_openpgp_crt_print</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-set-preferred-key-id" title="gnutls_openpgp_crt_set_preferred_key_id ()">gnutls_openpgp_crt_set_preferred_key_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-verify-ring" title="gnutls_openpgp_crt_verify_ring ()">gnutls_openpgp_crt_verify_ring</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-verify-self" title="gnutls_openpgp_crt_verify_self ()">gnutls_openpgp_crt_verify_self</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-keyring-check-id" title="gnutls_openpgp_keyring_check_id ()">gnutls_openpgp_keyring_check_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-keyring-deinit" title="gnutls_openpgp_keyring_deinit ()">gnutls_openpgp_keyring_deinit</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-keyring-get-crt" title="gnutls_openpgp_keyring_get_crt ()">gnutls_openpgp_keyring_get_crt</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-keyring-get-crt-count" title="gnutls_openpgp_keyring_get_crt_count ()">gnutls_openpgp_keyring_get_crt_count</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-keyring-import" title="gnutls_openpgp_keyring_import ()">gnutls_openpgp_keyring_import</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-keyring-init" title="gnutls_openpgp_keyring_init ()">gnutls_openpgp_keyring_init</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-deinit" title="gnutls_openpgp_privkey_deinit ()">gnutls_openpgp_privkey_deinit</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-export" title="gnutls_openpgp_privkey_export ()">gnutls_openpgp_privkey_export</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-export2" title="gnutls_openpgp_privkey_export2 ()">gnutls_openpgp_privkey_export2</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-export-dsa-raw" title="gnutls_openpgp_privkey_export_dsa_raw ()">gnutls_openpgp_privkey_export_dsa_raw</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-export-rsa-raw" title="gnutls_openpgp_privkey_export_rsa_raw ()">gnutls_openpgp_privkey_export_rsa_raw</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-export-subkey-dsa-raw" title="gnutls_openpgp_privkey_export_subkey_dsa_raw ()">gnutls_openpgp_privkey_export_subkey_dsa_raw</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-export-subkey-rsa-raw" title="gnutls_openpgp_privkey_export_subkey_rsa_raw ()">gnutls_openpgp_privkey_export_subkey_rsa_raw</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-fingerprint" title="gnutls_openpgp_privkey_get_fingerprint ()">gnutls_openpgp_privkey_get_fingerprint</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-key-id" title="gnutls_openpgp_privkey_get_key_id ()">gnutls_openpgp_privkey_get_key_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="returnvalue">gnutls_pk_algorithm_t</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-pk-algorithm" title="gnutls_openpgp_privkey_get_pk_algorithm ()">gnutls_openpgp_privkey_get_pk_algorithm</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-preferred-key-id" title="gnutls_openpgp_privkey_get_preferred_key_id ()">gnutls_openpgp_privkey_get_preferred_key_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-revoked-status" title="gnutls_openpgp_privkey_get_revoked_status ()">gnutls_openpgp_privkey_get_revoked_status</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-subkey-count" title="gnutls_openpgp_privkey_get_subkey_count ()">gnutls_openpgp_privkey_get_subkey_count</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">time_t</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-subkey-creation-time" title="gnutls_openpgp_privkey_get_subkey_creation_time ()">gnutls_openpgp_privkey_get_subkey_creation_time</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">time_t</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-subkey-expiration-time" title="gnutls_openpgp_privkey_get_subkey_expiration_time ()">gnutls_openpgp_privkey_get_subkey_expiration_time</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-subkey-fingerprint" title="gnutls_openpgp_privkey_get_subkey_fingerprint ()">gnutls_openpgp_privkey_get_subkey_fingerprint</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-subkey-id" title="gnutls_openpgp_privkey_get_subkey_id ()">gnutls_openpgp_privkey_get_subkey_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-subkey-idx" title="gnutls_openpgp_privkey_get_subkey_idx ()">gnutls_openpgp_privkey_get_subkey_idx</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="returnvalue">gnutls_pk_algorithm_t</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-subkey-pk-algorithm" title="gnutls_openpgp_privkey_get_subkey_pk_algorithm ()">gnutls_openpgp_privkey_get_subkey_pk_algorithm</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-get-subkey-revoked-status" title="gnutls_openpgp_privkey_get_subkey_revoked_status ()">gnutls_openpgp_privkey_get_subkey_revoked_status</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-import" title="gnutls_openpgp_privkey_import ()">gnutls_openpgp_privkey_import</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-init" title="gnutls_openpgp_privkey_init ()">gnutls_openpgp_privkey_init</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="gnutls-gnutls.html#gnutls-sec-param-t" title="enum gnutls_sec_param_t"><span class="returnvalue">gnutls_sec_param_t</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-sec-param" title="gnutls_openpgp_privkey_sec_param ()">gnutls_openpgp_privkey_sec_param</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-privkey-set-preferred-key-id" title="gnutls_openpgp_privkey_set_preferred_key_id ()">gnutls_openpgp_privkey_set_preferred_key_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<span class="c_punctuation">(</span><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-recv-key-func" title="gnutls_openpgp_recv_key_func ()">*gnutls_openpgp_recv_key_func</a><span class="c_punctuation">)</span> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-set-recv-key-function" title="gnutls_openpgp_set_recv_key_function ()">gnutls_openpgp_set_recv_key_function</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="gnutls-openpgp.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="gnutls-openpgp.html#GNUTLS-OPENPGP-KEYID-SIZE:CAPS" title="GNUTLS_OPENPGP_KEYID_SIZE">GNUTLS_OPENPGP_KEYID_SIZE</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="gnutls-openpgp.html#GNUTLS-OPENPGP-MASTER-KEYID-IDX:CAPS" title="GNUTLS_OPENPGP_MASTER_KEYID_IDX">GNUTLS_OPENPGP_MASTER_KEYID_IDX</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t">gnutls_openpgp_crt_fmt_t</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="gnutls-openpgp.description"></a><h2>Description</h2>
+<p>
+</p>
+</div>
+<div class="refsect1">
+<a name="gnutls-openpgp.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="gnutls-certificate-set-openpgp-key"></a><h3>gnutls_certificate_set_openpgp_key ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_certificate_set_openpgp_key (<em class="parameter"><code><span class="type">gnutls_certificate_credentials_t</span> res</code></em>,
+                                    <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> crt</code></em>,
+                                    <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> pkey</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_certificate_set_openpgp_key</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function sets a certificate/private key pair in the
+gnutls_certificate_credentials_t type.  This function may be
+called more than once (in case multiple keys/certificates exist
+for the server).</p>
+<p>Note that this function requires that the preferred key ids have
+been set and be used. See <a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-set-preferred-key-id" title="gnutls_openpgp_crt_set_preferred_key_id ()"><code class="function">gnutls_openpgp_crt_set_preferred_key_id()</code></a>.
+Otherwise the master key will be used.</p>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>res</p></td>
+<td class="parameter_description"><p>is a <span class="type">gnutls_certificate_credentials_t</span> type.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>crt</p></td>
+<td class="parameter_description"><p>contains an openpgp public key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>pkey</p></td>
+<td class="parameter_description"><p>is an openpgp private key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned,
+otherwise a negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-certificate-set-openpgp-key-file"></a><h3>gnutls_certificate_set_openpgp_key_file ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_certificate_set_openpgp_key_file
+                               (<em class="parameter"><code><span class="type">gnutls_certificate_credentials_t</span> res</code></em>,
+                                <em class="parameter"><code>const <span class="type">char</span> *certfile</code></em>,
+                                <em class="parameter"><code>const <span class="type">char</span> *keyfile</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_certificate_set_openpgp_key_file</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function is used to load OpenPGP keys into the GnuTLS
+credentials structure. The file should contain at least one valid non encrypted subkey.</p>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key-file.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>res</p></td>
+<td class="parameter_description"><p>the destination context to save the data.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>certfile</p></td>
+<td class="parameter_description"><p>the file that contains the public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyfile</p></td>
+<td class="parameter_description"><p>the file that contains the secret key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>the format of the keys</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key-file.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-certificate-set-openpgp-key-file2"></a><h3>gnutls_certificate_set_openpgp_key_file2 ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_certificate_set_openpgp_key_file2
+                               (<em class="parameter"><code><span class="type">gnutls_certificate_credentials_t</span> res</code></em>,
+                                <em class="parameter"><code>const <span class="type">char</span> *certfile</code></em>,
+                                <em class="parameter"><code>const <span class="type">char</span> *keyfile</code></em>,
+                                <em class="parameter"><code>const <span class="type">char</span> *subkey_id</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_certificate_set_openpgp_key_file2</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function is used to load OpenPGP keys into the GnuTLS credential 
+structure. The file should contain at least one valid non encrypted subkey.</p>
+<p>The special keyword "auto" is also accepted as <em class="parameter"><code>subkey_id</code></em>
+.  In that
+case the <a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-auth-subkey" title="gnutls_openpgp_crt_get_auth_subkey ()"><code class="function">gnutls_openpgp_crt_get_auth_subkey()</code></a> will be used to
+retrieve the subkey.</p>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key-file2.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>res</p></td>
+<td class="parameter_description"><p>the destination context to save the data.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>certfile</p></td>
+<td class="parameter_description"><p>the file that contains the public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyfile</p></td>
+<td class="parameter_description"><p>the file that contains the secret key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>subkey_id</p></td>
+<td class="parameter_description"><p>a hex encoded subkey id</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>the format of the keys</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key-file2.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-certificate-set-openpgp-key-mem"></a><h3>gnutls_certificate_set_openpgp_key_mem ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_certificate_set_openpgp_key_mem
+                               (<em class="parameter"><code><span class="type">gnutls_certificate_credentials_t</span> res</code></em>,
+                                <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *cert</code></em>,
+                                <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *key</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_certificate_set_openpgp_key_mem</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function is used to load OpenPGP keys into the GnuTLS credential 
+structure. The datum should contain at least one valid non encrypted subkey.</p>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key-mem.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>res</p></td>
+<td class="parameter_description"><p>the destination context to save the data.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cert</p></td>
+<td class="parameter_description"><p>the datum that contains the public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the datum that contains the secret key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>the format of the keys</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key-mem.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-certificate-set-openpgp-key-mem2"></a><h3>gnutls_certificate_set_openpgp_key_mem2 ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_certificate_set_openpgp_key_mem2
+                               (<em class="parameter"><code><span class="type">gnutls_certificate_credentials_t</span> res</code></em>,
+                                <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *cert</code></em>,
+                                <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *key</code></em>,
+                                <em class="parameter"><code>const <span class="type">char</span> *subkey_id</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_certificate_set_openpgp_key_mem2</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function is used to load OpenPGP keys into the GnuTLS
+credentials structure. The datum should contain at least one valid non encrypted subkey.</p>
+<p>The special keyword "auto" is also accepted as <em class="parameter"><code>subkey_id</code></em>
+.  In that
+case the <a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-get-auth-subkey" title="gnutls_openpgp_crt_get_auth_subkey ()"><code class="function">gnutls_openpgp_crt_get_auth_subkey()</code></a> will be used to
+retrieve the subkey.</p>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key-mem2.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>res</p></td>
+<td class="parameter_description"><p>the destination context to save the data.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cert</p></td>
+<td class="parameter_description"><p>the datum that contains the public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the datum that contains the secret key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>subkey_id</p></td>
+<td class="parameter_description"><p>a hex encoded subkey id</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>the format of the keys</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-key-mem2.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-certificate-set-openpgp-keyring-file"></a><h3>gnutls_certificate_set_openpgp_keyring_file ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_certificate_set_openpgp_keyring_file
+                               (<em class="parameter"><code><span class="type">gnutls_certificate_credentials_t</span> c</code></em>,
+                                <em class="parameter"><code>const <span class="type">char</span> *file</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_certificate_set_openpgp_keyring_file</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>The function is used to set keyrings that will be used internally
+by various OpenPGP functions. For example to find a key when it
+is needed for an operations. The keyring will also be used at the
+verification functions.</p>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-keyring-file.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>c</p></td>
+<td class="parameter_description"><p>A certificate credentials structure</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>file</p></td>
+<td class="parameter_description"><p>filename of the keyring.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>format of keyring.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-keyring-file.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-certificate-set-openpgp-keyring-mem"></a><h3>gnutls_certificate_set_openpgp_keyring_mem ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_certificate_set_openpgp_keyring_mem
+                               (<em class="parameter"><code><span class="type">gnutls_certificate_credentials_t</span> c</code></em>,
+                                <em class="parameter"><code>const unsigned <span class="type">char</span> *data</code></em>,
+                                <em class="parameter"><code><span class="type">size_t</span> dlen</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_certificate_set_openpgp_keyring_mem</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>The function is used to set keyrings that will be used internally
+by various OpenPGP functions. For example to find a key when it
+is needed for an operations. The keyring will also be used at the
+verification functions.</p>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-keyring-mem.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>c</p></td>
+<td class="parameter_description"><p>A certificate credentials structure</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>buffer with keyring data.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>dlen</p></td>
+<td class="parameter_description"><p>length of data buffer.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>the format of the keyring</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-certificate-set-openpgp-keyring-mem.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-check-hostname"></a><h3>gnutls_openpgp_crt_check_hostname ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_check_hostname (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                   <em class="parameter"><code>const <span class="type">char</span> *hostname</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_check_hostname</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will check if the given key's owner matches the
+given hostname. This is a basic implementation of the matching
+described in RFC2818 (HTTPS), which takes into account wildcards.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-check-hostname.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>hostname</p></td>
+<td class="parameter_description"><p>A null terminated string that contains a DNS name</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-check-hostname.returns"></a><h4>Returns</h4>
+<p> non-zero for a successful match, and zero on failure.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-deinit"></a><h3>gnutls_openpgp_crt_deinit ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+gnutls_openpgp_crt_deinit (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_deinit</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will deinitialize a key structure.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-deinit.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>A pointer to the type to be initialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-export"></a><h3>gnutls_openpgp_crt_export ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_export (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                           <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>,
+                           <em class="parameter"><code><span class="type">void</span> *output_data</code></em>,
+                           <em class="parameter"><code><span class="type">size_t</span> *output_data_size</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_export</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will convert the given key to RAW or Base64 format.
+If the buffer provided is not long enough to hold the output, then
+<a class="link" href="gnutls-gnutls.html#GNUTLS-E-SHORT-MEMORY-BUFFER:CAPS" title="GNUTLS_E_SHORT_MEMORY_BUFFER"><code class="literal">GNUTLS_E_SHORT_MEMORY_BUFFER</code></a> will be returned.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-export.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>Holds the key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>One of gnutls_openpgp_crt_fmt_t elements.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>output_data</p></td>
+<td class="parameter_description"><p>will contain the raw or base64 encoded key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>output_data_size</p></td>
+<td class="parameter_description"><p>holds the size of output_data (and will
+be replaced by the actual size of parameters)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-export.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-export2"></a><h3>gnutls_openpgp_crt_export2 ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_export2 (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                            <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>,
+                            <em class="parameter"><code><span class="type">gnutls_datum_t</span> *out</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_export2</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will convert the given key to RAW or Base64 format.
+The output buffer is allocated using <code class="function">gnutls_malloc()</code>.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-export2.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>Holds the key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>One of gnutls_openpgp_crt_fmt_t elements.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>out</p></td>
+<td class="parameter_description"><p>will contain the raw or base64 encoded key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-export2.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+<p class="since">Since: 3.1.3</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-auth-subkey"></a><h3>gnutls_openpgp_crt_get_auth_subkey ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_auth_subkey (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> crt</code></em>,
+                                    <em class="parameter"><code><span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>,
+                                    <em class="parameter"><code>unsigned <span class="type">int</span> flag</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_auth_subkey</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Returns the 64-bit keyID of the first valid OpenPGP subkey marked
+for authentication.  If flag is non-zero and no authentication
+subkey exists, then a valid subkey will be returned even if it is
+not marked for authentication.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-auth-subkey.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>crt</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the struct to save the keyid.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flag</p></td>
+<td class="parameter_description"><p>Non-zero indicates that a valid subkey is always returned.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-auth-subkey.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-creation-time"></a><h3>gnutls_openpgp_crt_get_creation_time ()</h3>
+<pre class="programlisting"><span class="returnvalue">time_t</span>
+gnutls_openpgp_crt_get_creation_time (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_creation_time</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get key creation time.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-creation-time.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-creation-time.returns"></a><h4>Returns</h4>
+<p> the timestamp when the OpenPGP key was created.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-expiration-time"></a><h3>gnutls_openpgp_crt_get_expiration_time ()</h3>
+<pre class="programlisting"><span class="returnvalue">time_t</span>
+gnutls_openpgp_crt_get_expiration_time
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_expiration_time</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get key expiration time.  A value of '0' means that the key doesn't
+expire at all.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-expiration-time.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-expiration-time.returns"></a><h4>Returns</h4>
+<p> the time when the OpenPGP key expires.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-fingerprint"></a><h3>gnutls_openpgp_crt_get_fingerprint ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_fingerprint (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                    <em class="parameter"><code><span class="type">void</span> *fpr</code></em>,
+                                    <em class="parameter"><code><span class="type">size_t</span> *fprlen</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_fingerprint</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get key fingerprint.  Depending on the algorithm, the fingerprint
+can be 16 or 20 bytes.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-fingerprint.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the raw data that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>fpr</p></td>
+<td class="parameter_description"><p>the buffer to save the fingerprint, must hold at least 20 bytes.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>fprlen</p></td>
+<td class="parameter_description"><p>the integer to save the length of the fingerprint.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-fingerprint.returns"></a><h4>Returns</h4>
+<p> On success, 0 is returned.  Otherwise, an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-key-id"></a><h3>gnutls_openpgp_crt_get_key_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_key_id (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                               <em class="parameter"><code><span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_key_id</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get key id string.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-key-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the buffer to save the keyid.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-key-id.returns"></a><h4>Returns</h4>
+<p> the 64-bit keyID of the OpenPGP key.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-key-usage"></a><h3>gnutls_openpgp_crt_get_key_usage ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_key_usage (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                  <em class="parameter"><code>unsigned <span class="type">int</span> *key_usage</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_key_usage</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return certificate's key usage, by checking the
+key algorithm. The key usage value will ORed values of the:
+<a class="link" href="gnutls-gnutls.html#GNUTLS-KEY-DIGITAL-SIGNATURE:CAPS" title="GNUTLS_KEY_DIGITAL_SIGNATURE"><code class="literal">GNUTLS_KEY_DIGITAL_SIGNATURE</code></a>, <a class="link" href="gnutls-gnutls.html#GNUTLS-KEY-KEY-ENCIPHERMENT:CAPS" title="GNUTLS_KEY_KEY_ENCIPHERMENT"><code class="literal">GNUTLS_KEY_KEY_ENCIPHERMENT</code></a>.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-key-usage.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>should contain a gnutls_openpgp_crt_t type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key_usage</p></td>
+<td class="parameter_description"><p>where the key usage bits will be stored</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-key-usage.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-name"></a><h3>gnutls_openpgp_crt_get_name ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_name (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                             <em class="parameter"><code><span class="type">int</span> idx</code></em>,
+                             <em class="parameter"><code><span class="type">char</span> *buf</code></em>,
+                             <em class="parameter"><code><span class="type">size_t</span> *sizeof_buf</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_name</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Extracts the userID from the parsed OpenPGP key.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-name.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the index of the ID to extract</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>buf</p></td>
+<td class="parameter_description"><p>a pointer to a structure to hold the name, may be <code class="literal">NULL</code>
+to only get the <em class="parameter"><code>sizeof_buf</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>sizeof_buf</p></td>
+<td class="parameter_description"><p>holds the maximum size of <em class="parameter"><code>buf</code></em>
+, on return hold the
+actual/required size of <em class="parameter"><code>buf</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-name.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, and if the index of the ID
+does not exist <a class="link" href="gnutls-gnutls.html#GNUTLS-E-REQUESTED-DATA-NOT-AVAILABLE:CAPS" title="GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE"><code class="literal">GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code></a>, or an
+error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-pk-algorithm"></a><h3>gnutls_openpgp_crt_get_pk_algorithm ()</h3>
+<pre class="programlisting"><a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="returnvalue">gnutls_pk_algorithm_t</span></a>
+gnutls_openpgp_crt_get_pk_algorithm (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                     <em class="parameter"><code>unsigned <span class="type">int</span> *bits</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_pk_algorithm</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return the public key algorithm of an OpenPGP
+certificate.</p>
+<p>If bits is non null, it should have enough size to hold the parameters
+size in bits. For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public exponent.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-pk-algorithm.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>is an OpenPGP key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>bits</p></td>
+<td class="parameter_description"><p>if bits is non null it will hold the size of the parameters' in bits</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-pk-algorithm.returns"></a><h4>Returns</h4>
+<p> a member of the <a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="type">gnutls_pk_algorithm_t</span></a> enumeration on
+success, or GNUTLS_PK_UNKNOWN on error.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-pk-dsa-raw"></a><h3>gnutls_openpgp_crt_get_pk_dsa_raw ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_pk_dsa_raw (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> crt</code></em>,
+                                   <em class="parameter"><code><span class="type">gnutls_datum_t</span> *p</code></em>,
+                                   <em class="parameter"><code><span class="type">gnutls_datum_t</span> *q</code></em>,
+                                   <em class="parameter"><code><span class="type">gnutls_datum_t</span> *g</code></em>,
+                                   <em class="parameter"><code><span class="type">gnutls_datum_t</span> *y</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_pk_dsa_raw</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will export the DSA public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+<code class="function">gnutls_malloc()</code> and will be stored in the appropriate datum.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-pk-dsa-raw.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>crt</p></td>
+<td class="parameter_description"><p>Holds the certificate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>p</p></td>
+<td class="parameter_description"><p>will hold the p</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>q</p></td>
+<td class="parameter_description"><p>will hold the q</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>g</p></td>
+<td class="parameter_description"><p>will hold the g</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>y</p></td>
+<td class="parameter_description"><p>will hold the y</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-pk-dsa-raw.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, otherwise a negative error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-pk-rsa-raw"></a><h3>gnutls_openpgp_crt_get_pk_rsa_raw ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_pk_rsa_raw (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> crt</code></em>,
+                                   <em class="parameter"><code><span class="type">gnutls_datum_t</span> *m</code></em>,
+                                   <em class="parameter"><code><span class="type">gnutls_datum_t</span> *e</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_pk_rsa_raw</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will export the RSA public key's parameters found in
+the given structure.  The new parameters will be allocated using
+<code class="function">gnutls_malloc()</code> and will be stored in the appropriate datum.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-pk-rsa-raw.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>crt</p></td>
+<td class="parameter_description"><p>Holds the certificate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>m</p></td>
+<td class="parameter_description"><p>will hold the modulus</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>e</p></td>
+<td class="parameter_description"><p>will hold the public exponent</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-pk-rsa-raw.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, otherwise a negative error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-preferred-key-id"></a><h3>gnutls_openpgp_crt_get_preferred_key_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_preferred_key_id
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_preferred_key_id</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get preferred key id.  If it hasn't been set it returns
+<a class="link" href="gnutls-gnutls.html#GNUTLS-E-INVALID-REQUEST:CAPS" title="GNUTLS_E_INVALID_REQUEST"><code class="literal">GNUTLS_E_INVALID_REQUEST</code></a>.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-preferred-key-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the struct to save the keyid.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-preferred-key-id.returns"></a><h4>Returns</h4>
+<p> the 64-bit preferred keyID of the OpenPGP key.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-revoked-status"></a><h3>gnutls_openpgp_crt_get_revoked_status ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_revoked_status (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_revoked_status</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get revocation status of key.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-revoked-status.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-revoked-status.returns"></a><h4>Returns</h4>
+<p> true (1) if the key has been revoked, or false (0) if it
+has not.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-count"></a><h3>gnutls_openpgp_crt_get_subkey_count ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_subkey_count (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_count</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return the number of subkeys present in the
+given OpenPGP certificate.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-count.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>is an OpenPGP key</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-count.returns"></a><h4>Returns</h4>
+<p> the number of subkeys, or a negative error code on error.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-creation-time"></a><h3>gnutls_openpgp_crt_get_subkey_creation_time ()</h3>
+<pre class="programlisting"><span class="returnvalue">time_t</span>
+gnutls_openpgp_crt_get_subkey_creation_time
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_creation_time</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get subkey creation time.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-creation-time.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-creation-time.returns"></a><h4>Returns</h4>
+<p> the timestamp when the OpenPGP sub-key was created.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-expiration-time"></a><h3>gnutls_openpgp_crt_get_subkey_expiration_time ()</h3>
+<pre class="programlisting"><span class="returnvalue">time_t</span>
+gnutls_openpgp_crt_get_subkey_expiration_time
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_expiration_time</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get subkey expiration time.  A value of '0' means that the key
+doesn't expire at all.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-expiration-time.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-expiration-time.returns"></a><h4>Returns</h4>
+<p> the time when the OpenPGP key expires.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-fingerprint"></a><h3>gnutls_openpgp_crt_get_subkey_fingerprint ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_subkey_fingerprint
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                <em class="parameter"><code><span class="type">void</span> *fpr</code></em>,
+                                <em class="parameter"><code><span class="type">size_t</span> *fprlen</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_fingerprint</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get key fingerprint of a subkey.  Depending on the algorithm, the
+fingerprint can be 16 or 20 bytes.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-fingerprint.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the raw data that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>fpr</p></td>
+<td class="parameter_description"><p>the buffer to save the fingerprint, must hold at least 20 bytes.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>fprlen</p></td>
+<td class="parameter_description"><p>the integer to save the length of the fingerprint.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-fingerprint.returns"></a><h4>Returns</h4>
+<p> On success, 0 is returned.  Otherwise, an error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-id"></a><h3>gnutls_openpgp_crt_get_subkey_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_subkey_id (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                  <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                  <em class="parameter"><code><span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_id</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get the subkey's key-id.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the buffer to save the keyid.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-id.returns"></a><h4>Returns</h4>
+<p> the 64-bit keyID of the OpenPGP key.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-idx"></a><h3>gnutls_openpgp_crt_get_subkey_idx ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_subkey_idx (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                   <em class="parameter"><code>const <span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_idx</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get subkey's index.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-idx.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the keyid.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-idx.returns"></a><h4>Returns</h4>
+<p> the index of the subkey or a negative error value.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-pk-algorithm"></a><h3>gnutls_openpgp_crt_get_subkey_pk_algorithm ()</h3>
+<pre class="programlisting"><a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="returnvalue">gnutls_pk_algorithm_t</span></a>
+gnutls_openpgp_crt_get_subkey_pk_algorithm
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> *bits</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_pk_algorithm</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return the public key algorithm of a subkey of an OpenPGP
+certificate.</p>
+<p>If bits is non null, it should have enough size to hold the
+parameters size in bits.  For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public exponent.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-pk-algorithm.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>is an OpenPGP key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>is the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>bits</p></td>
+<td class="parameter_description"><p>if bits is non null it will hold the size of the parameters' in bits</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-pk-algorithm.returns"></a><h4>Returns</h4>
+<p> a member of the <a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="type">gnutls_pk_algorithm_t</span></a> enumeration on
+success, or GNUTLS_PK_UNKNOWN on error.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-pk-dsa-raw"></a><h3>gnutls_openpgp_crt_get_subkey_pk_dsa_raw ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_subkey_pk_dsa_raw
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> crt</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *p</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *q</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *g</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *y</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_pk_dsa_raw</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will export the DSA public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+<code class="function">gnutls_malloc()</code> and will be stored in the appropriate datum.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-pk-dsa-raw.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>crt</p></td>
+<td class="parameter_description"><p>Holds the certificate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>Is the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>p</p></td>
+<td class="parameter_description"><p>will hold the p</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>q</p></td>
+<td class="parameter_description"><p>will hold the q</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>g</p></td>
+<td class="parameter_description"><p>will hold the g</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>y</p></td>
+<td class="parameter_description"><p>will hold the y</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-pk-dsa-raw.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, otherwise a negative error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-pk-rsa-raw"></a><h3>gnutls_openpgp_crt_get_subkey_pk_rsa_raw ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_subkey_pk_rsa_raw
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> crt</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *m</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *e</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_pk_rsa_raw</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will export the RSA public key's parameters found in
+the given structure.  The new parameters will be allocated using
+<code class="function">gnutls_malloc()</code> and will be stored in the appropriate datum.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-pk-rsa-raw.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>crt</p></td>
+<td class="parameter_description"><p>Holds the certificate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>Is the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>m</p></td>
+<td class="parameter_description"><p>will hold the modulus</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>e</p></td>
+<td class="parameter_description"><p>will hold the public exponent</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-pk-rsa-raw.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, otherwise a negative error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-revoked-status"></a><h3>gnutls_openpgp_crt_get_subkey_revoked_status ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_subkey_revoked_status
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_revoked_status</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get subkey revocation status.  A negative error code indicates an error.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-revoked-status.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>is the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-revoked-status.returns"></a><h4>Returns</h4>
+<p> true (1) if the key has been revoked, or false (0) if it
+has not.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-subkey-usage"></a><h3>gnutls_openpgp_crt_get_subkey_usage ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_subkey_usage (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                     <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                     <em class="parameter"><code>unsigned <span class="type">int</span> *key_usage</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_subkey_usage</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return certificate's key usage, by checking the
+key algorithm.  The key usage value will ORed values of
+<a class="link" href="gnutls-gnutls.html#GNUTLS-KEY-DIGITAL-SIGNATURE:CAPS" title="GNUTLS_KEY_DIGITAL_SIGNATURE"><code class="literal">GNUTLS_KEY_DIGITAL_SIGNATURE</code></a> or <a class="link" href="gnutls-gnutls.html#GNUTLS-KEY-KEY-ENCIPHERMENT:CAPS" title="GNUTLS_KEY_KEY_ENCIPHERMENT"><code class="literal">GNUTLS_KEY_KEY_ENCIPHERMENT</code></a>.</p>
+<p>A negative error code may be returned in case of parsing error.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-usage.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>should contain a gnutls_openpgp_crt_t type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key_usage</p></td>
+<td class="parameter_description"><p>where the key usage bits will be stored</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-subkey-usage.returns"></a><h4>Returns</h4>
+<p> key usage value.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-get-version"></a><h3>gnutls_openpgp_crt_get_version ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_get_version (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_get_version</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Extract the version of the OpenPGP key.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-version.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-get-version.returns"></a><h4>Returns</h4>
+<p> the version number is returned, or a negative error code on errors.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-import"></a><h3>gnutls_openpgp_crt_import ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_import (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                           <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *data</code></em>,
+                           <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_import</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will convert the given RAW or Base64 encoded key to
+the native <a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> format. The output will be stored
+in 'key'.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-import.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>The structure to store the parsed key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>The RAW or BASE64 encoded key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>One of gnutls_openpgp_crt_fmt_t elements.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-import.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-init"></a><h3>gnutls_openpgp_crt_init ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_init (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> *key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_init</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will initialize an OpenPGP key structure.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-init.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>A pointer to the type to be initialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-init.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-print"></a><h3>gnutls_openpgp_crt_print ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_print (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> cert</code></em>,
+                          <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-certificate-print-formats-t" title="enum gnutls_certificate_print_formats_t"><span class="type">gnutls_certificate_print_formats_t</span></a> format</code></em>,
+                          <em class="parameter"><code><span class="type">gnutls_datum_t</span> *out</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_print</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will pretty print an OpenPGP certificate, suitable
+for display to a human.</p>
+<p>The format should be (0) for future compatibility.</p>
+<p>The output <em class="parameter"><code>out</code></em>
+ needs to be deallocate using <code class="function">gnutls_free()</code>.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-print.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>cert</p></td>
+<td class="parameter_description"><p>The structure to be printed</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>Indicate the format to use</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>out</p></td>
+<td class="parameter_description"><p>Newly allocated datum with (0) terminated string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-print.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-set-preferred-key-id"></a><h3>gnutls_openpgp_crt_set_preferred_key_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_set_preferred_key_id
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                <em class="parameter"><code>const <span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_set_preferred_key_id</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This allows setting a preferred key id for the given certificate.
+This key will be used by functions that involve key handling.</p>
+<p>If the provided <em class="parameter"><code>keyid</code></em>
+ is <code class="literal">NULL</code> then the master key is
+set as preferred.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-set-preferred-key-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the selected keyid</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-set-preferred-key-id.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned,
+otherwise a negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-verify-ring"></a><h3>gnutls_openpgp_crt_verify_ring ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_verify_ring (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-keyring-t" title="gnutls_openpgp_keyring_t"><span class="type">gnutls_openpgp_keyring_t</span></a> keyring</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> flags</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> *verify</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_verify_ring</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Verify all signatures in the key, using the given set of keys
+(keyring).</p>
+<p>The key verification output will be put in <em class="parameter"><code>verify</code></em>
+ and will be one
+or more of the <a class="link" href="gnutls-gnutls.html#gnutls-certificate-status-t" title="enum gnutls_certificate_status_t"><span class="type">gnutls_certificate_status_t</span></a> enumerated elements
+bitwise or'd.</p>
+<p>Note that this function does not verify using any "web of trust".
+You may use GnuPG for that purpose, or any other external PGP
+application.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-verify-ring.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that holds the key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyring</p></td>
+<td class="parameter_description"><p>holds the keyring to check against</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>unused (should be 0)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>verify</p></td>
+<td class="parameter_description"><p>will hold the certificate verification output.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-verify-ring.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-verify-self"></a><h3>gnutls_openpgp_crt_verify_self ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_crt_verify_self (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> flags</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> *verify</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_crt_verify_self</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Verifies the self signature in the key.  The key verification
+output will be put in <em class="parameter"><code>verify</code></em>
+ and will be one or more of the
+gnutls_certificate_status_t enumerated elements bitwise or'd.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-verify-self.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that holds the key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>unused (should be 0)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>verify</p></td>
+<td class="parameter_description"><p>will hold the key verification output.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-verify-self.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-keyring-check-id"></a><h3>gnutls_openpgp_keyring_check_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_keyring_check_id (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-keyring-t" title="gnutls_openpgp_keyring_t"><span class="type">gnutls_openpgp_keyring_t</span></a> ring</code></em>,
+                                 <em class="parameter"><code>const <span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>,
+                                 <em class="parameter"><code>unsigned <span class="type">int</span> flags</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_keyring_check_id</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Check if a given key ID exists in the keyring.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-check-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>ring</p></td>
+<td class="parameter_description"><p>holds the keyring to check against</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>will hold the keyid to check for.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>unused (should be 0)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-check-id.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success (if keyid exists) and a
+negative error code on failure.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-keyring-deinit"></a><h3>gnutls_openpgp_keyring_deinit ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+gnutls_openpgp_keyring_deinit (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-keyring-t" title="gnutls_openpgp_keyring_t"><span class="type">gnutls_openpgp_keyring_t</span></a> keyring</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_keyring_deinit</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will deinitialize a keyring structure.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-deinit.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>keyring</p></td>
+<td class="parameter_description"><p>A pointer to the type to be initialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-keyring-get-crt"></a><h3>gnutls_openpgp_keyring_get_crt ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_keyring_get_crt (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-keyring-t" title="gnutls_openpgp_keyring_t"><span class="type">gnutls_openpgp_keyring_t</span></a> ring</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> *cert</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_keyring_get_crt</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will extract an OpenPGP certificate from the given
+keyring.  If the index given is out of range
+<a class="link" href="gnutls-gnutls.html#GNUTLS-E-REQUESTED-DATA-NOT-AVAILABLE:CAPS" title="GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE"><code class="literal">GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code></a> will be returned. The
+returned structure needs to be deinited.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-get-crt.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>ring</p></td>
+<td class="parameter_description"><p>Holds the keyring.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the index of the certificate to export</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cert</p></td>
+<td class="parameter_description"><p>An uninitialized <a class="link" href="gnutls-gnutls.html#gnutls-openpgp-crt-t" title="gnutls_openpgp_crt_t"><span class="type">gnutls_openpgp_crt_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-get-crt.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-keyring-get-crt-count"></a><h3>gnutls_openpgp_keyring_get_crt_count ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_keyring_get_crt_count (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-keyring-t" title="gnutls_openpgp_keyring_t"><span class="type">gnutls_openpgp_keyring_t</span></a> ring</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_keyring_get_crt_count</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return the number of OpenPGP certificates
+present in the given keyring.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-get-crt-count.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>ring</p></td>
+<td class="parameter_description"><p>is an OpenPGP key ring</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-get-crt-count.returns"></a><h4>Returns</h4>
+<p> the number of subkeys, or a negative error code on error.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-keyring-import"></a><h3>gnutls_openpgp_keyring_import ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_keyring_import (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-keyring-t" title="gnutls_openpgp_keyring_t"><span class="type">gnutls_openpgp_keyring_t</span></a> keyring</code></em>,
+                               <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *data</code></em>,
+                               <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_keyring_import</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will convert the given RAW or Base64 encoded keyring
+to the native <a class="link" href="gnutls-gnutls.html#gnutls-openpgp-keyring-t" title="gnutls_openpgp_keyring_t"><span class="type">gnutls_openpgp_keyring_t</span></a> format.  The output will be
+stored in 'keyring'.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-import.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>keyring</p></td>
+<td class="parameter_description"><p>The structure to store the parsed key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>The RAW or BASE64 encoded keyring.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>One of <span class="type">gnutls_openpgp_keyring_fmt</span> elements.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-import.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-keyring-init"></a><h3>gnutls_openpgp_keyring_init ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_keyring_init (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-keyring-t" title="gnutls_openpgp_keyring_t"><span class="type">gnutls_openpgp_keyring_t</span></a> *keyring</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_keyring_init</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will initialize an keyring structure.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-init.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>keyring</p></td>
+<td class="parameter_description"><p>A pointer to the type to be initialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-keyring-init.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-deinit"></a><h3>gnutls_openpgp_privkey_deinit ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+gnutls_openpgp_privkey_deinit (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_deinit</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will deinitialize a key structure.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-deinit.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>A pointer to the type to be initialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-export"></a><h3>gnutls_openpgp_privkey_export ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_export (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                               <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>,
+                               <em class="parameter"><code>const <span class="type">char</span> *password</code></em>,
+                               <em class="parameter"><code>unsigned <span class="type">int</span> flags</code></em>,
+                               <em class="parameter"><code><span class="type">void</span> *output_data</code></em>,
+                               <em class="parameter"><code><span class="type">size_t</span> *output_data_size</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_export</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will convert the given key to RAW or Base64 format.
+If the buffer provided is not long enough to hold the output, then
+GNUTLS_E_SHORT_MEMORY_BUFFER will be returned.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>Holds the key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>One of gnutls_openpgp_crt_fmt_t elements.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>password</p></td>
+<td class="parameter_description"><p>the password that will be used to encrypt the key. (unused for now)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>(0) for future compatibility</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>output_data</p></td>
+<td class="parameter_description"><p>will contain the key base64 encoded or raw</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>output_data_size</p></td>
+<td class="parameter_description"><p>holds the size of output_data (and will be
+replaced by the actual size of parameters)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-export2"></a><h3>gnutls_openpgp_privkey_export2 ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_export2 (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>,
+                                <em class="parameter"><code>const <span class="type">char</span> *password</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> flags</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *out</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_export2</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will convert the given key to RAW or Base64 format.
+The output buffer is allocated using <code class="function">gnutls_malloc()</code>.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export2.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>Holds the key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>One of gnutls_openpgp_crt_fmt_t elements.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>password</p></td>
+<td class="parameter_description"><p>the password that will be used to encrypt the key. (unused for now)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>(0) for future compatibility</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>out</p></td>
+<td class="parameter_description"><p>will contain the raw or based64 encoded key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export2.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+<p class="since">Since: 3.1.3</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-export-dsa-raw"></a><h3>gnutls_openpgp_privkey_export_dsa_raw ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_export_dsa_raw (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> pkey</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *p</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *q</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *g</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *y</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *x</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_export_dsa_raw</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will export the DSA private key's parameters found in
+the given certificate.  The new parameters will be allocated using
+<code class="function">gnutls_malloc()</code> and will be stored in the appropriate datum.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export-dsa-raw.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>pkey</p></td>
+<td class="parameter_description"><p>Holds the certificate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>p</p></td>
+<td class="parameter_description"><p>will hold the p</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>q</p></td>
+<td class="parameter_description"><p>will hold the q</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>g</p></td>
+<td class="parameter_description"><p>will hold the g</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>y</p></td>
+<td class="parameter_description"><p>will hold the y</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>x</p></td>
+<td class="parameter_description"><p>will hold the x</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export-dsa-raw.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, otherwise a negative error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-export-rsa-raw"></a><h3>gnutls_openpgp_privkey_export_rsa_raw ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_export_rsa_raw (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> pkey</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *m</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *e</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *d</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *p</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *q</code></em>,
+                                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *u</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_export_rsa_raw</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will export the RSA private key's parameters found in
+the given structure.  The new parameters will be allocated using
+<code class="function">gnutls_malloc()</code> and will be stored in the appropriate datum.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export-rsa-raw.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>pkey</p></td>
+<td class="parameter_description"><p>Holds the certificate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>m</p></td>
+<td class="parameter_description"><p>will hold the modulus</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>e</p></td>
+<td class="parameter_description"><p>will hold the public exponent</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>d</p></td>
+<td class="parameter_description"><p>will hold the private exponent</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>p</p></td>
+<td class="parameter_description"><p>will hold the first prime (p)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>q</p></td>
+<td class="parameter_description"><p>will hold the second prime (q)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>u</p></td>
+<td class="parameter_description"><p>will hold the coefficient</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export-rsa-raw.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, otherwise a negative error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-export-subkey-dsa-raw"></a><h3>gnutls_openpgp_privkey_export_subkey_dsa_raw ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_export_subkey_dsa_raw
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> pkey</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *p</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *q</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *g</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *y</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *x</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_export_subkey_dsa_raw</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will export the DSA private key's parameters found
+in the given certificate.  The new parameters will be allocated
+using <code class="function">gnutls_malloc()</code> and will be stored in the appropriate datum.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export-subkey-dsa-raw.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>pkey</p></td>
+<td class="parameter_description"><p>Holds the certificate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>Is the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>p</p></td>
+<td class="parameter_description"><p>will hold the p</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>q</p></td>
+<td class="parameter_description"><p>will hold the q</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>g</p></td>
+<td class="parameter_description"><p>will hold the g</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>y</p></td>
+<td class="parameter_description"><p>will hold the y</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>x</p></td>
+<td class="parameter_description"><p>will hold the x</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export-subkey-dsa-raw.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, otherwise a negative error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-export-subkey-rsa-raw"></a><h3>gnutls_openpgp_privkey_export_subkey_rsa_raw ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_export_subkey_rsa_raw
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> pkey</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *m</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *e</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *d</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *p</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *q</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *u</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_export_subkey_rsa_raw</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will export the RSA private key's parameters found in
+the given structure.  The new parameters will be allocated using
+<code class="function">gnutls_malloc()</code> and will be stored in the appropriate datum.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export-subkey-rsa-raw.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>pkey</p></td>
+<td class="parameter_description"><p>Holds the certificate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>Is the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>m</p></td>
+<td class="parameter_description"><p>will hold the modulus</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>e</p></td>
+<td class="parameter_description"><p>will hold the public exponent</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>d</p></td>
+<td class="parameter_description"><p>will hold the private exponent</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>p</p></td>
+<td class="parameter_description"><p>will hold the first prime (p)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>q</p></td>
+<td class="parameter_description"><p>will hold the second prime (q)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>u</p></td>
+<td class="parameter_description"><p>will hold the coefficient</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-export-subkey-rsa-raw.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, otherwise a negative error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-fingerprint"></a><h3>gnutls_openpgp_privkey_get_fingerprint ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_get_fingerprint
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code><span class="type">void</span> *fpr</code></em>,
+                                <em class="parameter"><code><span class="type">size_t</span> *fprlen</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_fingerprint</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get the fingerprint of the OpenPGP key. Depends on the
+algorithm, the fingerprint can be 16 or 20 bytes.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-fingerprint.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the raw data that contains the OpenPGP secret key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>fpr</p></td>
+<td class="parameter_description"><p>the buffer to save the fingerprint, must hold at least 20 bytes.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>fprlen</p></td>
+<td class="parameter_description"><p>the integer to save the length of the fingerprint.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-fingerprint.returns"></a><h4>Returns</h4>
+<p> On success, 0 is returned, or an error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-key-id"></a><h3>gnutls_openpgp_privkey_get_key_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_get_key_id (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                   <em class="parameter"><code><span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_key_id</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get key-id.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-key-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP secret key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the buffer to save the keyid.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-key-id.returns"></a><h4>Returns</h4>
+<p> the 64-bit keyID of the OpenPGP key.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-pk-algorithm"></a><h3>gnutls_openpgp_privkey_get_pk_algorithm ()</h3>
+<pre class="programlisting"><a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="returnvalue">gnutls_pk_algorithm_t</span></a>
+gnutls_openpgp_privkey_get_pk_algorithm
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> *bits</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_pk_algorithm</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return the public key algorithm of an OpenPGP
+certificate.</p>
+<p>If bits is non null, it should have enough size to hold the parameters
+size in bits. For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public exponent.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-pk-algorithm.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>is an OpenPGP key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>bits</p></td>
+<td class="parameter_description"><p>if bits is non null it will hold the size of the parameters' in bits</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-pk-algorithm.returns"></a><h4>Returns</h4>
+<p> a member of the <a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="type">gnutls_pk_algorithm_t</span></a> enumeration on
+success, or a negative error code on error.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-preferred-key-id"></a><h3>gnutls_openpgp_privkey_get_preferred_key_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_get_preferred_key_id
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_preferred_key_id</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get the preferred key-id for the key.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-preferred-key-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the struct to save the keyid.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-preferred-key-id.returns"></a><h4>Returns</h4>
+<p> the 64-bit preferred keyID of the OpenPGP key, or if it
+hasn't been set it returns <a class="link" href="gnutls-gnutls.html#GNUTLS-E-INVALID-REQUEST:CAPS" title="GNUTLS_E_INVALID_REQUEST"><code class="literal">GNUTLS_E_INVALID_REQUEST</code></a>.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-revoked-status"></a><h3>gnutls_openpgp_privkey_get_revoked_status ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_get_revoked_status
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_revoked_status</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get revocation status of key.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-revoked-status.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP private key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-revoked-status.returns"></a><h4>Returns</h4>
+<p> true (1) if the key has been revoked, or false (0) if it
+has not, or a negative error code indicates an error.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-subkey-count"></a><h3>gnutls_openpgp_privkey_get_subkey_count ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_get_subkey_count
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_subkey_count</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return the number of subkeys present in the
+given OpenPGP certificate.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-count.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>is an OpenPGP key</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-count.returns"></a><h4>Returns</h4>
+<p> the number of subkeys, or a negative error code on error.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-subkey-creation-time"></a><h3>gnutls_openpgp_privkey_get_subkey_creation_time ()</h3>
+<pre class="programlisting"><span class="returnvalue">time_t</span>
+gnutls_openpgp_privkey_get_subkey_creation_time
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_subkey_creation_time</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get subkey creation time.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-creation-time.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP private key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-creation-time.returns"></a><h4>Returns</h4>
+<p> the timestamp when the OpenPGP key was created.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-subkey-expiration-time"></a><h3>gnutls_openpgp_privkey_get_subkey_expiration_time ()</h3>
+<pre class="programlisting"><span class="returnvalue">time_t</span>
+gnutls_openpgp_privkey_get_subkey_expiration_time
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_subkey_expiration_time</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get subkey expiration time.  A value of '0' means that the key
+doesn't expire at all.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-expiration-time.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP private key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-expiration-time.returns"></a><h4>Returns</h4>
+<p> the time when the OpenPGP key expires.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-subkey-fingerprint"></a><h3>gnutls_openpgp_privkey_get_subkey_fingerprint ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_get_subkey_fingerprint
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                <em class="parameter"><code><span class="type">void</span> *fpr</code></em>,
+                                <em class="parameter"><code><span class="type">size_t</span> *fprlen</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_subkey_fingerprint</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get the fingerprint of an OpenPGP subkey.  Depends on the
+algorithm, the fingerprint can be 16 or 20 bytes.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-fingerprint.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the raw data that contains the OpenPGP secret key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>fpr</p></td>
+<td class="parameter_description"><p>the buffer to save the fingerprint, must hold at least 20 bytes.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>fprlen</p></td>
+<td class="parameter_description"><p>the integer to save the length of the fingerprint.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-fingerprint.returns"></a><h4>Returns</h4>
+<p> On success, 0 is returned, or an error code.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-subkey-id"></a><h3>gnutls_openpgp_privkey_get_subkey_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_get_subkey_id (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                      <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                      <em class="parameter"><code><span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_subkey_id</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get the key-id for the subkey.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP secret key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the buffer to save the keyid.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-id.returns"></a><h4>Returns</h4>
+<p> the 64-bit keyID of the OpenPGP key.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-subkey-idx"></a><h3>gnutls_openpgp_privkey_get_subkey_idx ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_get_subkey_idx (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                       <em class="parameter"><code>const <span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_subkey_idx</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get index of subkey.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-idx.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP private key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the keyid.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-idx.returns"></a><h4>Returns</h4>
+<p> the index of the subkey or a negative error value.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-subkey-pk-algorithm"></a><h3>gnutls_openpgp_privkey_get_subkey_pk_algorithm ()</h3>
+<pre class="programlisting"><a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="returnvalue">gnutls_pk_algorithm_t</span></a>
+gnutls_openpgp_privkey_get_subkey_pk_algorithm
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> *bits</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_subkey_pk_algorithm</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return the public key algorithm of a subkey of an OpenPGP
+certificate.</p>
+<p>If bits is non null, it should have enough size to hold the parameters
+size in bits. For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public exponent.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-pk-algorithm.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>is an OpenPGP key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>is the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>bits</p></td>
+<td class="parameter_description"><p>if bits is non null it will hold the size of the parameters' in bits</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-pk-algorithm.returns"></a><h4>Returns</h4>
+<p> a member of the <a class="link" href="gnutls-gnutls.html#gnutls-pk-algorithm-t" title="enum gnutls_pk_algorithm_t"><span class="type">gnutls_pk_algorithm_t</span></a> enumeration on
+success, or a negative error code on error.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-get-subkey-revoked-status"></a><h3>gnutls_openpgp_privkey_get_subkey_revoked_status ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_get_subkey_revoked_status
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_get_subkey_revoked_status</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>Get revocation status of key.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-revoked-status.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP private key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>idx</p></td>
+<td class="parameter_description"><p>is the subkey index</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-get-subkey-revoked-status.returns"></a><h4>Returns</h4>
+<p> true (1) if the key has been revoked, or false (0) if it
+has not, or a negative error code indicates an error.</p>
+</div>
+<p class="since">Since: 2.4.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-import"></a><h3>gnutls_openpgp_privkey_import ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_import (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                               <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *data</code></em>,
+                               <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> format</code></em>,
+                               <em class="parameter"><code>const <span class="type">char</span> *password</code></em>,
+                               <em class="parameter"><code>unsigned <span class="type">int</span> flags</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_import</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will convert the given RAW or Base64 encoded key to
+the native gnutls_openpgp_privkey_t format.  The output will be
+stored in 'key'.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-import.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>The structure to store the parsed key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>The RAW or BASE64 encoded key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>One of <a class="link" href="gnutls-openpgp.html#gnutls-openpgp-crt-fmt-t" title="enum gnutls_openpgp_crt_fmt_t"><span class="type">gnutls_openpgp_crt_fmt_t</span></a> elements.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>password</p></td>
+<td class="parameter_description"><p>not used for now</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>should be (0)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-import.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-init"></a><h3>gnutls_openpgp_privkey_init ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_init (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> *key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_init</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will initialize an OpenPGP key structure.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-init.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>A pointer to the type to be initialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-init.returns"></a><h4>Returns</h4>
+<p> <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> on success, or an error code.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-sec-param"></a><h3>gnutls_openpgp_privkey_sec_param ()</h3>
+<pre class="programlisting"><a class="link" href="gnutls-gnutls.html#gnutls-sec-param-t" title="enum gnutls_sec_param_t"><span class="returnvalue">gnutls_sec_param_t</span></a>
+gnutls_openpgp_privkey_sec_param (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_sec_param</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will return the security parameter appropriate with
+this private key.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-sec-param.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>a key structure</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-sec-param.returns"></a><h4>Returns</h4>
+<p> On success, a valid security parameter is returned otherwise
+<a class="link" href="gnutls-gnutls.html#GNUTLS-SEC-PARAM-UNKNOWN:CAPS"><code class="literal">GNUTLS_SEC_PARAM_UNKNOWN</code></a> is returned.</p>
+</div>
+<p class="since">Since: 2.12.0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-privkey-set-preferred-key-id"></a><h3>gnutls_openpgp_privkey_set_preferred_key_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_openpgp_privkey_set_preferred_key_id
+                               (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-openpgp-privkey-t" title="gnutls_openpgp_privkey_t"><span class="type">gnutls_openpgp_privkey_t</span></a> key</code></em>,
+                                <em class="parameter"><code>const <span class="type">gnutls_openpgp_keyid_t</span> keyid</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_privkey_set_preferred_key_id</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This allows setting a preferred key id for the given certificate.
+This key will be used by functions that involve key handling.</p>
+<p>If the provided <em class="parameter"><code>keyid</code></em>
+ is <code class="literal">NULL</code> then the master key is
+set as preferred.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-set-preferred-key-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>the structure that contains the OpenPGP public key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyid</p></td>
+<td class="parameter_description"><p>the selected keyid</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-privkey-set-preferred-key-id.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned,
+otherwise a negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-recv-key-func"></a><h3>gnutls_openpgp_recv_key_func ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+<span class="c_punctuation">(</span>*gnutls_openpgp_recv_key_func<span class="c_punctuation">)</span> (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-session-t" title="gnutls_session_t"><span class="type">gnutls_session_t</span></a> session</code></em>,
+                                 <em class="parameter"><code>const unsigned <span class="type">char</span> *keyfpr</code></em>,
+                                 <em class="parameter"><code>unsigned <span class="type">int</span> keyfpr_length</code></em>,
+                                 <em class="parameter"><code><span class="type">gnutls_datum_t</span> *key</code></em>);</pre>
+<p>A callback of this type is used to retrieve OpenPGP keys.  Only
+useful on the server, and will only be used if the peer send a key
+fingerprint instead of a full key.  See also
+<a class="link" href="gnutls-openpgp.html#gnutls-openpgp-set-recv-key-function" title="gnutls_openpgp_set_recv_key_function ()"><code class="function">gnutls_openpgp_set_recv_key_function()</code></a>.</p>
+<p>The variable <em class="parameter"><code>key</code></em>
+ must be allocated using <code class="function">gnutls_malloc()</code>.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-recv-key-func.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>session</p></td>
+<td class="parameter_description"><p>a TLS session</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyfpr</p></td>
+<td class="parameter_description"><p>key fingerprint</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>keyfpr_length</p></td>
+<td class="parameter_description"><p>length of key fingerprint</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>key</p></td>
+<td class="parameter_description"><p>output key.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-openpgp-recv-key-func.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (zero) is returned,
+otherwise an error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-set-recv-key-function"></a><h3>gnutls_openpgp_set_recv_key_function ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+gnutls_openpgp_set_recv_key_function (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-session-t" title="gnutls_session_t"><span class="type">gnutls_session_t</span></a> session</code></em>,
+                                      <em class="parameter"><code><a class="link" href="gnutls-openpgp.html#gnutls-openpgp-recv-key-func" title="gnutls_openpgp_recv_key_func ()"><span class="type">gnutls_openpgp_recv_key_func</span></a> func</code></em>);</pre>
+<div class="warning"><p><code class="literal">gnutls_openpgp_set_recv_key_function</code> is deprecated and should not be used in newly-written code.</p></div>
+<p>This function will set a key retrieval function for OpenPGP keys. This
+callback is only useful in server side, and will be used if the peer
+sent a key fingerprint instead of a full key.</p>
+<p>The retrieved key must be allocated using <code class="function">gnutls_malloc()</code>.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-set-recv-key-function.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>session</p></td>
+<td class="parameter_description"><p>a TLS session</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>func</p></td>
+<td class="parameter_description"><p>the callback</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+<div class="refsect1">
+<a name="gnutls-openpgp.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="GNUTLS-OPENPGP-KEYID-SIZE:CAPS"></a><h3>GNUTLS_OPENPGP_KEYID_SIZE</h3>
+<pre class="programlisting">#define GNUTLS_OPENPGP_KEYID_SIZE 8
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="GNUTLS-OPENPGP-MASTER-KEYID-IDX:CAPS"></a><h3>GNUTLS_OPENPGP_MASTER_KEYID_IDX</h3>
+<pre class="programlisting">#define GNUTLS_OPENPGP_MASTER_KEYID_IDX INT_MAX
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-openpgp-crt-fmt-t"></a><h3>enum gnutls_openpgp_crt_fmt_t</h3>
+<p>Enumeration of different OpenPGP key formats.</p>
+<div class="refsect3">
+<a name="gnutls-openpgp-crt-fmt-t.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OPENPGP-FMT-RAW:CAPS"></a>GNUTLS_OPENPGP_FMT_RAW</p></td>
+<td class="enum_member_description">
+<p>OpenPGP certificate in raw format.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OPENPGP-FMT-BASE64:CAPS"></a>GNUTLS_OPENPGP_FMT_BASE64</p></td>
+<td class="enum_member_description">
+<p>OpenPGP certificate in base64 format.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>Generated by GTK-Doc V1.25</div>
+</body>
+</html>

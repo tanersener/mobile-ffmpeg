@@ -1,0 +1,116 @@
+/* Categories of Unicode characters.  */
+struct named_category { int name; unsigned int category_index; };
+%struct-type
+%ignore-case
+%language=ANSI-C
+%define hash-function-name general_category_hash
+%define lookup-function-name uc_general_category_lookup
+%readonly-tables
+%global-table
+%define word-array-name general_category_names
+%pic
+%define string-pool-name general_category_stringpool
+%%
+L, UC_CATEGORY_INDEX_L
+LC, UC_CATEGORY_INDEX_LC
+Lu, UC_CATEGORY_INDEX_Lu
+Ll, UC_CATEGORY_INDEX_Ll
+Lt, UC_CATEGORY_INDEX_Lt
+Lm, UC_CATEGORY_INDEX_Lm
+Lo, UC_CATEGORY_INDEX_Lo
+M, UC_CATEGORY_INDEX_M
+Mn, UC_CATEGORY_INDEX_Mn
+Mc, UC_CATEGORY_INDEX_Mc
+Me, UC_CATEGORY_INDEX_Me
+N, UC_CATEGORY_INDEX_N
+Nd, UC_CATEGORY_INDEX_Nd
+Nl, UC_CATEGORY_INDEX_Nl
+No, UC_CATEGORY_INDEX_No
+P, UC_CATEGORY_INDEX_P
+Pc, UC_CATEGORY_INDEX_Pc
+Pd, UC_CATEGORY_INDEX_Pd
+Ps, UC_CATEGORY_INDEX_Ps
+Pe, UC_CATEGORY_INDEX_Pe
+Pi, UC_CATEGORY_INDEX_Pi
+Pf, UC_CATEGORY_INDEX_Pf
+Po, UC_CATEGORY_INDEX_Po
+S, UC_CATEGORY_INDEX_S
+Sm, UC_CATEGORY_INDEX_Sm
+Sc, UC_CATEGORY_INDEX_Sc
+Sk, UC_CATEGORY_INDEX_Sk
+So, UC_CATEGORY_INDEX_So
+Z, UC_CATEGORY_INDEX_Z
+Zs, UC_CATEGORY_INDEX_Zs
+Zl, UC_CATEGORY_INDEX_Zl
+Zp, UC_CATEGORY_INDEX_Zp
+C, UC_CATEGORY_INDEX_C
+Cc, UC_CATEGORY_INDEX_Cc
+Cf, UC_CATEGORY_INDEX_Cf
+Cs, UC_CATEGORY_INDEX_Cs
+Co, UC_CATEGORY_INDEX_Co
+Cn, UC_CATEGORY_INDEX_Cn
+Letter, UC_CATEGORY_INDEX_L
+Cased Letter, UC_CATEGORY_INDEX_LC
+CasedLetter, UC_CATEGORY_INDEX_LC
+Uppercase Letter, UC_CATEGORY_INDEX_Lu
+UppercaseLetter, UC_CATEGORY_INDEX_Lu
+Lowercase Letter, UC_CATEGORY_INDEX_Ll
+LowercaseLetter, UC_CATEGORY_INDEX_Ll
+Titlecase Letter, UC_CATEGORY_INDEX_Lt
+TitlecaseLetter, UC_CATEGORY_INDEX_Lt
+Modifier Letter, UC_CATEGORY_INDEX_Lm
+ModifierLetter, UC_CATEGORY_INDEX_Lm
+Other Letter, UC_CATEGORY_INDEX_Lo
+OtherLetter, UC_CATEGORY_INDEX_Lo
+Mark, UC_CATEGORY_INDEX_M
+Nonspacing Mark, UC_CATEGORY_INDEX_Mn
+NonspacingMark, UC_CATEGORY_INDEX_Mn
+Spacing Mark, UC_CATEGORY_INDEX_Mc
+SpacingMark, UC_CATEGORY_INDEX_Mc
+Enclosing Mark, UC_CATEGORY_INDEX_Me
+EnclosingMark, UC_CATEGORY_INDEX_Me
+Number, UC_CATEGORY_INDEX_N
+Decimal Number, UC_CATEGORY_INDEX_Nd
+DecimalNumber, UC_CATEGORY_INDEX_Nd
+Letter Number, UC_CATEGORY_INDEX_Nl
+LetterNumber, UC_CATEGORY_INDEX_Nl
+Other Number, UC_CATEGORY_INDEX_No
+OtherNumber, UC_CATEGORY_INDEX_No
+Punctuation, UC_CATEGORY_INDEX_P
+Connector Punctuation, UC_CATEGORY_INDEX_Pc
+ConnectorPunctuation, UC_CATEGORY_INDEX_Pc
+Dash Punctuation, UC_CATEGORY_INDEX_Pd
+DashPunctuation, UC_CATEGORY_INDEX_Pd
+Open Punctuation, UC_CATEGORY_INDEX_Ps
+OpenPunctuation, UC_CATEGORY_INDEX_Ps
+Close Punctuation, UC_CATEGORY_INDEX_Pe
+ClosePunctuation, UC_CATEGORY_INDEX_Pe
+Initial Punctuation, UC_CATEGORY_INDEX_Pi
+InitialPunctuation, UC_CATEGORY_INDEX_Pi
+Final Punctuation, UC_CATEGORY_INDEX_Pf
+FinalPunctuation, UC_CATEGORY_INDEX_Pf
+Other Punctuation, UC_CATEGORY_INDEX_Po
+OtherPunctuation, UC_CATEGORY_INDEX_Po
+Symbol, UC_CATEGORY_INDEX_S
+Math Symbol, UC_CATEGORY_INDEX_Sm
+MathSymbol, UC_CATEGORY_INDEX_Sm
+Currency Symbol, UC_CATEGORY_INDEX_Sc
+CurrencySymbol, UC_CATEGORY_INDEX_Sc
+Modifier Symbol, UC_CATEGORY_INDEX_Sk
+ModifierSymbol, UC_CATEGORY_INDEX_Sk
+Other Symbol, UC_CATEGORY_INDEX_So
+OtherSymbol, UC_CATEGORY_INDEX_So
+Separator, UC_CATEGORY_INDEX_Z
+Space Separator, UC_CATEGORY_INDEX_Zs
+SpaceSeparator, UC_CATEGORY_INDEX_Zs
+Line Separator, UC_CATEGORY_INDEX_Zl
+LineSeparator, UC_CATEGORY_INDEX_Zl
+Paragraph Separator, UC_CATEGORY_INDEX_Zp
+ParagraphSeparator, UC_CATEGORY_INDEX_Zp
+Other, UC_CATEGORY_INDEX_C
+Control, UC_CATEGORY_INDEX_Cc
+Format, UC_CATEGORY_INDEX_Cf
+Surrogate, UC_CATEGORY_INDEX_Cs
+Private Use, UC_CATEGORY_INDEX_Co
+PrivateUse, UC_CATEGORY_INDEX_Co
+Unassigned, UC_CATEGORY_INDEX_Cn

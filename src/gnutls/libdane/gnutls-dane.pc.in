@@ -1,0 +1,24 @@
+# Process this file with autoconf to produce a pkg-config metadata file.
+
+# Copyright (C) 2004-2012 Free Software Foundation, Inc.
+
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.  This file is offered as-is,
+# without any warranty.
+
+# Author: Nikos Mavrogiannopoulos
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: GnuTLS-DANE
+Description: DANE security library for the GNU system
+URL: http://www.gnu.org/software/gnutls/
+Version: @VERSION@
+Libs: -L${libdir} -lgnutls-dane
+Libs.private: @UNBOUND_LIBS@
+Requires.private: gnutls
+Cflags: -I${includedir}

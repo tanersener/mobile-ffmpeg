@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_cipher_add_auth} (gnutls_cipher_hd_t @var{handle}, const void * @var{ptext}, size_t @var{ptext_size})

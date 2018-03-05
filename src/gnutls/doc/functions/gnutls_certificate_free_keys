@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_certificate_free_keys} (gnutls_certificate_credentials_t @var{sc})
+@var{sc}: is a @code{gnutls_certificate_credentials_t}  type.
+
+This function will delete all the keys and the certificates associated
+with the given credentials. This function must not be called when a
+TLS negotiation that uses the credentials is in progress.
+@end deftypefun

@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {unsigned int} {gnutls_record_get_discarded} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Returns the number of discarded packets in a
+DTLS connection.
+
+@strong{Returns:} The number of discarded packets.
+
+@strong{Since:} 3.0
+@end deftypefun

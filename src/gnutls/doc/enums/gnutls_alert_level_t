@@ -1,0 +1,9 @@
+
+
+@c gnutls_alert_level_t
+@table @code
+@item GNUTLS_@-AL_@-WARNING
+Alert of warning severity.
+@item GNUTLS_@-AL_@-FATAL
+Alert of fatal severity.
+@end table

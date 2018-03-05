@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {ssize_t} {gnutls_record_set_max_size} (gnutls_session_t @var{session}, size_t @var{size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{size}: is the new size
+
+This function sets the maximum record packet size in this
+connection.  This property can only be set to clients.  The server
+may choose not to accept the requested size.
+
+Acceptable values are 512(=2^9), 1024(=2^10), 2048(=2^11) and
+4096(=2^12).  The requested record size does get in effect
+immediately only while sending data. The receive part will take
+effect after a successful handshake.
+
+This function uses a TLS extension called 'max record size'.  Not
+all TLS implementations use or even understand this extension.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun

@@ -1,0 +1,17 @@
+
+
+@c gnutls_pk_algorithm_t
+@table @code
+@item GNUTLS_@-PK_@-UNKNOWN
+Unknown public-key algorithm.
+@item GNUTLS_@-PK_@-RSA
+RSA public-key algorithm.
+@item GNUTLS_@-PK_@-DSA
+DSA public-key algorithm.
+@item GNUTLS_@-PK_@-DH
+Diffie-Hellman algorithm. Used to generate parameters.
+@item GNUTLS_@-PK_@-ECDSA
+Elliptic curve algorithm. These parameters are compatible with the ECDSA and ECDH algorithm.
+@item GNUTLS_@-PK_@-ECDHX
+Elliptic curve algorithm, restricted to ECDH as per rfc7748.
+@end table

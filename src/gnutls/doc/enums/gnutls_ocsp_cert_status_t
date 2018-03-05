@@ -1,0 +1,12 @@
+
+
+@c gnutls_ocsp_cert_status_t
+@table @code
+@item GNUTLS_@-OCSP_@-CERT_@-GOOD
+Positive response to status inquiry.
+@item GNUTLS_@-OCSP_@-CERT_@-REVOKED
+Certificate has been revoked.
+@item GNUTLS_@-OCSP_@-CERT_@-UNKNOWN
+The responder doesn't know about the
+certificate.
+@end table

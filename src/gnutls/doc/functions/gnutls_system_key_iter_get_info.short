@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_system_key_iter_get_info} (gnutls_system_key_iter_t * @var{iter}, unsigned @var{cert_type}, char ** @var{cert_url}, char ** @var{key_url}, char ** @var{label}, gnutls_datum_t * @var{der}, unsigned int @var{flags})

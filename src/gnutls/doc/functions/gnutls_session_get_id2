@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_get_id2} (gnutls_session_t @var{session}, gnutls_datum_t * @var{session_id})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{session_id}: will point to the session ID.
+
+Returns the current session ID. The returned data should be
+treated as constant.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.1.4
+@end deftypefun

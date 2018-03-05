@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_pkcs11_crt_is_known} (const char * @var{url}, gnutls_x509_crt_t @var{cert}, unsigned int @var{flags})

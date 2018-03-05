@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_crt_serial} (gnutls_x509_crl_t @var{crl}, unsigned @var{indx}, unsigned char * @var{serial}, size_t * @var{serial_size}, time_t * @var{t})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+@var{indx}: the index of the certificate to extract (starting from 0)
+
+@var{serial}: where the serial number will be copied
+
+@var{serial_size}: initially holds the size of serial
+
+@var{t}: if non null, will hold the time this certificate was revoked
+
+This function will retrieve the serial number of the specified, by
+the index, revoked certificate.
+
+Note that this function will have performance issues in large sequences
+of revoked certificates. In that case use @code{gnutls_x509_crl_iter_crt_serial()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

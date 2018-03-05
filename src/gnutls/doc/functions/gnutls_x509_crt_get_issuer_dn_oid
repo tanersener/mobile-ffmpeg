@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_issuer_dn_oid} (gnutls_x509_crt_t @var{cert}, unsigned @var{indx}, void * @var{oid}, size_t * @var{oid_size})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{indx}: This specifies which OID to return. Use (0) to get the first one.
+
+@var{oid}: a pointer to a buffer to hold the OID (may be null)
+
+@var{oid_size}: initially holds the size of  @code{oid} 
+
+This function will extract the OIDs of the name of the Certificate
+issuer specified by the given index.
+
+If  @code{oid} is null then only the size will be filled. The  @code{oid} returned will be null terminated, although  @code{oid_size} will not
+account for the trailing null.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is not
+long enough, and in that case the  @code{buf_size} will be updated with
+the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there 
+are no data in the current index. On success 0 is returned.
+@end deftypefun

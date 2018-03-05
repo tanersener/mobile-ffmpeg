@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_req_get_nonce} (gnutls_ocsp_req_t @var{req}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})

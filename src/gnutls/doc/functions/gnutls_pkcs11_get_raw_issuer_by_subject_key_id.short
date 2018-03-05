@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_get_raw_issuer_by_subject_key_id} (const char * @var{url}, const gnutls_datum_t * @var{dn}, const gnutls_datum_t * @var{spki}, gnutls_datum_t * @var{issuer}, gnutls_x509_crt_fmt_t @var{fmt}, unsigned int @var{flags})

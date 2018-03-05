@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {void} {gnutls_pkcs11_privkey_set_pin_function} (gnutls_pkcs11_privkey_t @var{key}, gnutls_pin_callback_t @var{fn}, void * @var{userdata})
+@var{key}: The private key
+
+@var{fn}: the callback
+
+@var{userdata}: data associated with the callback
+
+This function will set a callback function to be used when
+required to access the object. This function overrides the global
+set using @code{gnutls_pkcs11_set_pin_function()} .
+
+@strong{Since:} 3.1.0
+@end deftypefun

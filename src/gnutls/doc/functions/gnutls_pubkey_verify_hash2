@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_verify_hash2} (gnutls_pubkey_t @var{key}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{hash}, const gnutls_datum_t * @var{signature})
+@var{key}: Holds the public key
+
+@var{algo}: The signature algorithm used
+
+@var{flags}: Zero or an OR list of @code{gnutls_certificate_verify_flags} 
+
+@var{hash}: holds the hash digest to be verified
+
+@var{signature}: contains the signature
+
+This function will verify the given signed digest, using the
+parameters from the public key. Note that unlike @code{gnutls_privkey_sign_hash()} ,
+this function accepts a signature algorithm instead of a digest algorithm.
+You can use @code{gnutls_pk_to_sign()}  to get the appropriate value.
+
+@strong{Returns:} In case of a verification failure @code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  
+is returned, and zero or positive code on success.
+
+@strong{Since:} 3.0
+@end deftypefun

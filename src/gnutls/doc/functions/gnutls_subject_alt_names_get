@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_subject_alt_names_get} (gnutls_subject_alt_names_t @var{sans}, unsigned int @var{seq}, unsigned int * @var{san_type}, gnutls_datum_t * @var{san}, gnutls_datum_t * @var{othername_oid})
+@var{sans}: The alternative names
+
+@var{seq}: The index of the name to get
+
+@var{san_type}: Will hold the type of the name (of @code{gnutls_subject_alt_names_t} )
+
+@var{san}: The alternative name data (should be treated as constant)
+
+@var{othername_oid}: The object identifier if  @code{san_type} is @code{GNUTLS_SAN_OTHERNAME}  (should be treated as constant)
+
+This function will return a specific alternative name as stored in
+the  @code{sans} type. The returned values should be treated as constant
+and valid for the lifetime of  @code{sans} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+if the index is out of bounds, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

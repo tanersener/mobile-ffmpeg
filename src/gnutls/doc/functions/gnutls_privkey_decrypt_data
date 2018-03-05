@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_decrypt_data} (gnutls_privkey_t @var{key}, unsigned int @var{flags}, const gnutls_datum_t * @var{ciphertext}, gnutls_datum_t * @var{plaintext})
+@var{key}: Holds the key
+
+@var{flags}: zero for now
+
+@var{ciphertext}: holds the data to be decrypted
+
+@var{plaintext}: will contain the decrypted data, allocated with @code{gnutls_malloc()} 
+
+This function will decrypt the given data using the algorithm
+supported by the private key.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

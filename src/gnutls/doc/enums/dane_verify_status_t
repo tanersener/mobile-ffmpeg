@@ -1,0 +1,11 @@
+
+
+@c dane_verify_status_t
+@table @code
+@item DANE_@-VERIFY_@-CA_@-CONSTRAINTS_@-VIOLATED
+The CA constraints were violated.
+@item DANE_@-VERIFY_@-CERT_@-DIFFERS
+The certificate obtained via DNS differs.
+@item DANE_@-VERIFY_@-UNKNOWN_@-DANE_@-INFO
+No known DANE data was found in the DNS record.
+@end table

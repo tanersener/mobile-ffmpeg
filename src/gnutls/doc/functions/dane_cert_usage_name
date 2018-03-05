@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {const char *} {dane_cert_usage_name} (dane_cert_usage_t @var{usage})
+@var{usage}: -- undescribed --
+
+Convert a @code{dane_cert_usage_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified
+type, or @code{NULL} .
+@end deftypefun

@@ -1,0 +1,184 @@
+@node Upgrading from previous versions
+@appendix Upgrading from previous versions
+@cindex upgrading
+
+The GnuTLS library typically maintains binary and source code compatibility
+across versions. The releases that have the major version increased
+break binary compatibility but source compatibility is provided.
+This section lists exceptional cases where changes to existing code are
+required due to library changes.
+
+@heading Upgrading to 2.12.x from previous versions
+
+GnuTLS 2.12.x is binary compatible with previous versions but changes the
+semantics of @funcintref{gnutls_transport_set_lowat}, which might cause breakage
+in applications that relied on its default value be 1. Two fixes
+are proposed:
+@itemize
+@item  Quick fix. Explicitly call @code{gnutls_transport_set_lowat (session, 1);}
+after @funcref{gnutls_init}.
+@item Long term fix. Because later versions of gnutls abolish the functionality 
+of using the system call @funcintref{select} to check for gnutls pending data, the 
+function @funcref{gnutls_record_check_pending} has to be used to achieve the same 
+functionality as described in @ref{Asynchronous operation}.
+@end itemize
+
+@heading Upgrading to 3.0.x from 2.12.x
+
+GnuTLS 3.0.x is source compatible with previous versions except for the functions
+listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item @funcintref{gnutls_transport_set_lowat} @tab
+To replace its functionality the function @funcref{gnutls_record_check_pending} has to be used,
+as described in @ref{Asynchronous operation}
+
+@item @funcintref{gnutls_session_get_server_random},
+@funcintref{gnutls_session_get_client_random} 
+@tab 
+They are replaced by the safer function @funcref{gnutls_session_get_random}
+
+@item @funcintref{gnutls_session_get_master_secret} 
+@tab Replaced by the keying material exporters discussed in @ref{Deriving keys for other applications/protocols}
+
+@item @funcintref{gnutls_transport_set_global_errno}
+@tab Replaced by using the system's errno facility or @funcref{gnutls_transport_set_errno}.
+
+@item @funcintref{gnutls_x509_privkey_verify_data}
+@tab Replaced by @funcref{gnutls_pubkey_verify_data2}.
+
+@item @funcintref{gnutls_certificate_verify_peers}
+@tab Replaced by @funcref{gnutls_certificate_verify_peers2}.
+
+@item @funcintref{gnutls_psk_netconf_derive_key}
+@tab Removed. The key derivation function was never standardized.
+
+@item @funcintref{gnutls_session_set_finished_function}
+@tab Removed.
+
+@item @funcintref{gnutls_ext_register}
+@tab Removed. Extension registration API is now internal to allow easier changes in the API.
+
+@item @funcintref{gnutls_certificate_get_x509_crls}, @funcintref{gnutls_certificate_get_x509_cas}
+@tab Removed to allow updating the internal structures. Replaced by @funcref{gnutls_certificate_get_issuer}.
+
+@item @funcintref{gnutls_certificate_get_openpgp_keyring}
+@tab Removed.
+
+@item @funcintref{gnutls_ia_}
+@tab Removed. The inner application extensions were completely removed (they failed to be standardized).
+
+@end multitable
+
+@heading Upgrading to 3.1.x from 3.0.x
+
+GnuTLS 3.1.x is source and binary compatible with GnuTLS 3.0.x releases. Few
+functions have been deprecated and are listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item @funcintref{gnutls_pubkey_verify_hash} 
+@tab The function @funcref{gnutls_pubkey_verify_hash2} is provided and
+is functionally equivalent and safer to use.
+
+@item @funcintref{gnutls_pubkey_verify_data} 
+@tab The function @funcref{gnutls_pubkey_verify_data2} is provided and
+is functionally equivalent and safer to use.
+
+@end multitable
+
+@heading Upgrading to 3.2.x from 3.1.x
+
+GnuTLS 3.2.x is source and binary compatible with GnuTLS 3.1.x releases. Few
+functions have been deprecated and are listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item @funcintref{gnutls_privkey_sign_raw_data} 
+@tab The function @funcref{gnutls_privkey_sign_hash} is equivalent
+when the flag @code{GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA} is specified.
+
+@end multitable
+
+@heading Upgrading to 3.3.x from 3.2.x
+
+GnuTLS 3.3.x is source and binary compatible with GnuTLS 3.2.x releases;
+however there few changes in semantics which are listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item @funcintref{gnutls_global_init} 
+@tab No longer required. The library is initialized using a constructor.
+
+@item @funcintref{gnutls_global_deinit} 
+@tab No longer required. The library is deinitialized using a destructor.
+
+@end multitable
+
+@heading Upgrading to 3.4.x from 3.3.x
+
+GnuTLS 3.4.x is source compatible with GnuTLS 3.3.x releases;
+however, several deprecated functions were removed, and are listed below.
+
+@multitable @columnfractions .30 .60
+@headitem Old function @tab Replacement
+
+@item Priority string "NORMAL" has been modified
+@tab The following string emulates the 3.3.x behavior "NORMAL:+VERS-SSL3.0:+ARCFOUR-128:+DHE-DSS:+SIGN-DSA-SHA512:+SIGN-DSA-SHA256:+SIGN-DSA-SHA1"
+
+@item @funcintref{gnutls_certificate_client_set_retrieve_function},
+@funcintref{gnutls_certificate_server_set_retrieve_function}
+@tab @funcref{gnutls_certificate_set_retrieve_function}
+
+@item @funcintref{gnutls_certificate_set_rsa_export_params},
+@funcintref{gnutls_rsa_export_get_modulus_bits},
+@funcintref{gnutls_rsa_export_get_pubkey},
+@funcintref{gnutls_rsa_params_cpy},
+@funcintref{gnutls_rsa_params_deinit},
+@funcintref{gnutls_rsa_params_export_pkcs1},
+@funcintref{gnutls_rsa_params_export_raw},
+@funcintref{gnutls_rsa_params_generate2},
+@funcintref{gnutls_rsa_params_import_pkcs1},
+@funcintref{gnutls_rsa_params_import_raw},
+@funcintref{gnutls_rsa_params_init}
+@tab No replacement; the library does not support the RSA-EXPORT ciphersuites.
+
+@item @funcintref{gnutls_pubkey_verify_hash},
+@tab @funcref{gnutls_pubkey_verify_hash2}.
+
+@item @funcintref{gnutls_pubkey_verify_data},
+@tab @funcref{gnutls_pubkey_verify_data2}.
+
+@item @funcintref{gnutls_x509_crt_get_verify_algorithm},
+@tab No replacement; a similar function is @funcref{gnutls_x509_crt_get_signature_algorithm}.
+
+@item @funcintref{gnutls_pubkey_get_verify_algorithm},
+@tab No replacement; a similar function is @funcref{gnutls_pubkey_get_preferred_hash_algorithm}.
+
+@item @funcintref{gnutls_certificate_type_set_priority},
+@funcintref{gnutls_cipher_set_priority},
+@funcintref{gnutls_compression_set_priority},
+@funcintref{gnutls_kx_set_priority},
+@funcintref{gnutls_mac_set_priority},
+@funcintref{gnutls_protocol_set_priority}
+@tab @funcref{gnutls_priority_set_direct}.
+
+@item @funcintref{gnutls_sign_callback_get},
+@funcintref{gnutls_sign_callback_set}
+@tab @funcref{gnutls_privkey_import_ext3}
+
+@item @funcintref{gnutls_x509_crt_verify_hash}
+@tab @funcref{gnutls_pubkey_verify_hash2}
+
+@item @funcintref{gnutls_x509_crt_verify_data}
+@tab @funcref{gnutls_pubkey_verify_data2}
+
+@item @funcintref{gnutls_privkey_sign_raw_data}
+@tab @funcref{gnutls_privkey_sign_hash} with the flag GNUTLS_PRIVKEY_SIGN_FLAG_TLS1_RSA
+
+@end multitable

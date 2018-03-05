@@ -1,0 +1,33 @@
+
+
+
+
+@deftypefun {int} {gnutls_system_key_iter_get_info} (gnutls_system_key_iter_t * @var{iter}, unsigned @var{cert_type}, char ** @var{cert_url}, char ** @var{key_url}, char ** @var{label}, gnutls_datum_t * @var{der}, unsigned int @var{flags})
+@var{iter}: an iterator of the system keys (must be set to @code{NULL}  initially)
+
+@var{cert_type}: A value of gnutls_certificate_type_t which indicates the type of certificate to look for
+
+@var{cert_url}: The certificate URL of the pair (may be @code{NULL} )
+
+@var{key_url}: The key URL of the pair (may be @code{NULL} )
+
+@var{label}: The friendly name (if any) of the pair (may be @code{NULL} )
+
+@var{der}: if non-NULL the DER data of the certificate
+
+@var{flags}: should be zero
+
+This function will return on each call a certificate
+and key pair URLs, as well as a label associated with them,
+and the DER-encoded certificate. When the iteration is complete it will
+return @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} .
+
+Typically  @code{cert_type} should be @code{GNUTLS_CRT_X509} .
+
+All values set are allocated and must be cleared using @code{gnutls_free()} ,
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.0
+@end deftypefun

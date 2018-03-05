@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_get_raw_issuer_by_subject_key_id} (const char * @var{url}, const gnutls_datum_t * @var{dn}, const gnutls_datum_t * @var{spki}, gnutls_datum_t * @var{issuer}, gnutls_x509_crt_fmt_t @var{fmt}, unsigned int @var{flags})
+@var{url}: A PKCS 11 url identifying a token
+
+@var{dn}: is the DN to search for (may be @code{NULL} )
+
+@var{spki}: is the subject key ID to search for
+
+@var{issuer}: Will hold the issuer if any in an allocated buffer.
+
+@var{fmt}: The format of the exported issuer.
+
+@var{flags}: Use zero or flags from @code{GNUTLS_PKCS11_OBJ_FLAG} .
+
+This function will return the certificate with the given DN and  @code{spki} , if it
+is stored in the token. By default only marked as trusted issuers
+are retuned. If any issuer should be returned specify
+@code{GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_ANY}  in  @code{flags} .
+
+The name of the function includes issuer because it can
+be used to discover issuers of certificates.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.2
+@end deftypefun

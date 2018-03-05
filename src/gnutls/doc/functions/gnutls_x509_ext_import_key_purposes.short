@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_ext_import_key_purposes} (const gnutls_datum_t * @var{ext}, gnutls_x509_key_purposes_t @var{p}, unsigned int @var{flags})

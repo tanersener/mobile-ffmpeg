@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_set_key} (gnutls_certificate_credentials_t @var{res}, const char ** @var{names}, int @var{names_size}, gnutls_pcert_st * @var{pcert_list}, int @var{pcert_list_size}, gnutls_privkey_t @var{key})

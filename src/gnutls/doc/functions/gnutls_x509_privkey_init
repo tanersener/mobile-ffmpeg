@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_init} (gnutls_x509_privkey_t * @var{key})
+@var{key}: A pointer to the type to be initialized
+
+This function will initialize a private key type.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

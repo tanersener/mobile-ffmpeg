@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_global_set_audit_log_function} (gnutls_audit_log_func @var{log_func})

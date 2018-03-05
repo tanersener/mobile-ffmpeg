@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_pkcs11_set_pin_function} (gnutls_pin_callback_t @var{fn}, void * @var{userdata})
+@var{fn}: The PIN callback, a @code{gnutls_pin_callback_t()}  function.
+
+@var{userdata}: data to be supplied to callback
+
+This function will set a callback function to be used when a PIN is
+required for PKCS 11 operations.  See
+@code{gnutls_pin_callback_t()}  on how the callback should behave.
+
+@strong{Since:} 2.12.0
+@end deftypefun

@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {void} {gnutls_tdb_set_store_commitment_func} (gnutls_tdb_t @var{tdb}, gnutls_tdb_store_commitment_func        @var{cstore})
+@var{tdb}: The trust storage
+
+@var{cstore}: The commitment storage function
+
+This function will associate a commitment (hash) storage function with the
+trust storage structure. The function is of the following form.
+
+int gnutls_tdb_store_commitment_func(const char* db_name, const char* host,
+const char* service, time_t expiration,
+gnutls_digest_algorithm_t, const gnutls_datum_t* hash);
+
+The  @code{db_name} should be used to pass any private data to this function.
+@end deftypefun

@@ -1,0 +1,29 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_pkcs11_crt_is_known} (const char * @var{url}, gnutls_x509_crt_t @var{cert}, unsigned int @var{flags})
+@var{url}: A PKCS 11 url identifying a token
+
+@var{cert}: is the certificate to find issuer for
+
+@var{flags}: Use zero or flags from @code{GNUTLS_PKCS11_OBJ_FLAG} .
+
+This function will check whether the provided certificate is stored
+in the specified token. This is useful in combination with 
+@code{GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_TRUSTED}  or
+@code{GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED} ,
+to check whether a CA is present or a certificate is blacklisted in
+a trust PKCS @code{11}  module.
+
+This function can be used with a  @code{url} of "pkcs11:", and in that case all modules
+will be searched. To restrict the modules to the marked as trusted in p11-kit
+use the @code{GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE}  flag.
+
+Note that the flag @code{GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_DISTRUSTED}  is
+specific to p11-kit trust modules.
+
+@strong{Returns:} If the certificate exists non-zero is returned, otherwise zero.
+
+@strong{Since:} 3.3.0
+@end deftypefun

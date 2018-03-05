@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_get_crt_raw} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{indx}, void * @var{certificate}, size_t * @var{certificate_size})
+@var{pkcs7}: should contain a gnutls_pkcs7_t type
+
+@var{indx}: contains the index of the certificate to extract
+
+@var{certificate}: the contents of the certificate will be copied
+there (may be null)
+
+@var{certificate_size}: should hold the size of the certificate
+
+This function will return a certificate of the PKCS7 or RFC2630
+certificate set.
+
+After the last certificate has been read
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.  If the provided buffer is not long enough,
+then  @code{certificate_size} is updated and
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  is returned.
+@end deftypefun

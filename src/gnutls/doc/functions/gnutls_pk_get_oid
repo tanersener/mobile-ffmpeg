@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_pk_get_oid} (gnutls_pk_algorithm_t @var{algorithm})
+@var{algorithm}: is a public key algorithm
+
+Convert a @code{gnutls_pk_algorithm_t}  value to its object identifier string.
+
+@strong{Returns:} a pointer to a string that contains the object identifier of the
+specified public key algorithm, or @code{NULL} .
+
+@strong{Since:} 3.4.3
+@end deftypefun

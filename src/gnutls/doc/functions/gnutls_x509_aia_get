@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_aia_get} (gnutls_x509_aia_t @var{aia}, unsigned int @var{seq}, gnutls_datum_t * @var{oid}, unsigned * @var{san_type}, gnutls_datum_t * @var{san})
+@var{aia}: The authority info access
+
+@var{seq}: specifies the sequence number of the access descriptor (0 for the first one, 1 for the second etc.)
+
+@var{oid}: the type of available data; to be treated as constant.
+
+@var{san_type}: Will hold the type of the name of @code{gnutls_subject_alt_names_t}  (may be null).
+
+@var{san}: the access location name; to be treated as constant (may be null).
+
+This function reads from the Authority Information Access type.
+
+The  @code{seq} input parameter is used to indicate which member of the
+sequence the caller is interested in.  The first member is 0, the
+second member 1 and so on.  When the  @code{seq} value is out of bounds,
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned.
+
+Typically  @code{oid} is @code{GNUTLS_OID_AD_CAISSUERS}  or @code{GNUTLS_OID_AD_OCSP} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

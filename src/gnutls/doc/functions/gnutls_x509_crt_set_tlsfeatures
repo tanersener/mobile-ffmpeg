@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_tlsfeatures} (gnutls_x509_crt_t @var{crt}, gnutls_x509_tlsfeatures_t @var{features})
+@var{crt}: A X.509 certificate
+
+@var{features}: If the function succeeds, the
+features will be added to the certificate.
+
+This function will set the certificates
+X.509 TLS extension from the given structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error value.
+
+@strong{Since:} 3.5.1
+@end deftypefun

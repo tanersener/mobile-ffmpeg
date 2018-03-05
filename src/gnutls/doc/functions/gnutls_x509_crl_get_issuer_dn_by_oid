@@ -1,0 +1,34 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_issuer_dn_by_oid} (gnutls_x509_crl_t @var{crl}, const char * @var{oid}, unsigned @var{indx}, unsigned int @var{raw_flag}, void * @var{buf}, size_t * @var{sizeof_buf})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{oid}: holds an Object Identified in null terminated string
+
+@var{indx}: In case multiple same OIDs exist in the RDN, this specifies which to send. Use (0) to get the first one.
+
+@var{raw_flag}: If non-zero returns the raw DER data of the DN part.
+
+@var{buf}: a pointer to a structure to hold the peer's name (may be null)
+
+@var{sizeof_buf}: initially holds the size of  @code{buf} 
+
+This function will extract the part of the name of the CRL issuer
+specified by the given OID. The output will be encoded as described
+in RFC4514. The output string will be ASCII or UTF-8 encoded,
+depending on the certificate data.
+
+Some helper macros with popular OIDs can be found in gnutls/x509.h
+If raw flag is (0), this function will only return known OIDs as
+text. Other OIDs will be DER encoded, as described in RFC4514 -- in
+hex format with a '#' prefix.  You can check about known OIDs
+using @code{gnutls_x509_dn_oid_known()} .
+
+If buf is null then only the size will be filled.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is
+not long enough, and in that case the sizeof_buf will be updated
+with the required size, and 0 on success.
+@end deftypefun

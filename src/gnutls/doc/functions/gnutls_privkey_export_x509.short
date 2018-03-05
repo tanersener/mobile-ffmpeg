@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_export_x509} (gnutls_privkey_t @var{pkey}, gnutls_x509_privkey_t * @var{key})

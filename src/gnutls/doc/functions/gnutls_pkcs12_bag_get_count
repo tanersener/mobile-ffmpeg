@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_get_count} (gnutls_pkcs12_bag_t @var{bag})
+@var{bag}: The bag
+
+This function will return the number of the elements within the bag.
+
+@strong{Returns:} Number of elements in bag, or an negative error code on
+error.
+@end deftypefun

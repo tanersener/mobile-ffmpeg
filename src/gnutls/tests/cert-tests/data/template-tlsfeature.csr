@@ -1,0 +1,63 @@
+PKCS #10 Certificate Request Information:
+	Version: 1
+	Subject: pseudonym=jackal,title=Dr.,UID=clauper,C=GR,ST=Attiki,O=Koko inc.,OU=sleeping dept.,CN=Cindy Lauper
+	Subject Public Key Algorithm: RSA
+	Algorithm Security Level: Low (1024 bits)
+		Modulus (bits 1024):
+			00:a5:c6:ce:75:43:84:bf:64:9e:02:27:13:f1:03:59
+			f7:79:2d:92:ed:7c:2f:50:a4:03:f1:2d:79:b9:86:8b
+			05:7e:3a:bb:44:aa:af:84:cf:13:98:1e:1c:4a:38:f7
+			33:2d:7a:9f:72:d4:6b:6d:26:b0:31:37:70:10:fb:42
+			e9:d8:9d:18:65:7e:19:49:fc:05:96:04:68:83:1e:77
+			86:bf:ed:f5:e5:12:3b:13:fe:33:18:9c:1a:7a:1d:69
+			af:47:02:60:7a:1f:b9:e8:cf:db:c8:34:30:51:96:3d
+			8c:96:5c:00:bc:61:de:08:0f:b1:36:21:7f:a9:00:e3
+			05
+		Exponent (bits 24):
+			01:00:01
+	Signature Algorithm: RSA-SHA256
+	Attributes:
+		Extensions:
+			Subject Alternative Name (not critical):
+				DNSname: www.none.org
+				DNSname: www.morethanone.org
+				DNSname: www.evenmorethanone.org
+				IPAddress: 192.168.1.1
+				RFC822Name: none@none.org
+				RFC822Name: where@none.org
+			Basic Constraints (critical):
+				Certificate Authority (CA): TRUE
+			Key Purpose (critical):
+				OCSP signing.
+			Key Usage (critical):
+				Digital signature.
+				Certificate signing.
+			TLS Features (not critical):
+				OCSP Status Request(5)
+				17
+Other Information:
+	Public Key ID:
+		sha1:5d40adf0ce9440958b7e99941d925422ca72365f
+		sha256:472f7ef457b70a57a585094b285fdaef7ad72553495701ecd4f2a6dcb477b50e
+	Public Key PIN:
+		pin-sha256:Ry9+9Fe3ClelhQlLKF/a73rXJVNJVwHs1PKm3LR3tQ4=
+
+Self signature: verified
+
+-----BEGIN NEW CERTIFICATE REQUEST-----
+MIICrDCCAhUCAQAwgZoxFTATBgNVBAMTDENpbmR5IExhdXBlcjEXMBUGA1UECxMO
+c2xlZXBpbmcgZGVwdC4xEjAQBgNVBAoTCUtva28gaW5jLjEPMA0GA1UECBMGQXR0
+aWtpMQswCQYDVQQGEwJHUjEXMBUGCgmSJomT8ixkAQETB2NsYXVwZXIxDDAKBgNV
+BAwTA0RyLjEPMA0GA1UEQRMGamFja2FsMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCB
+iQKBgQClxs51Q4S/ZJ4CJxPxA1n3eS2S7XwvUKQD8S15uYaLBX46u0Sqr4TPE5ge
+HEo49zMtep9y1GttJrAxN3AQ+0Lp2J0YZX4ZSfwFlgRogx53hr/t9eUSOxP+Mxic
+Gnodaa9HAmB6H7noz9vINDBRlj2MllwAvGHeCA+xNiF/qQDjBQIDAQABoIHQMIHN
+BgkqhkiG9w0BCQ4xgb8wgbwwagYDVR0RBGMwYYIMd3d3Lm5vbmUub3JnghN3d3cu
+bW9yZXRoYW5vbmUub3Jnghd3d3cuZXZlbm1vcmV0aGFub25lLm9yZ4cEwKgBAYEN
+bm9uZUBub25lLm9yZ4EOd2hlcmVAbm9uZS5vcmcwDwYDVR0TAQH/BAUwAwEB/zAW
+BgNVHSUBAf8EDDAKBggrBgEFBQcDCTAPBgNVHQ8BAf8EBQMDB4QAMBQGCCsGAQUF
+BwEYBAgwBgIBBQIBETANBgkqhkiG9w0BAQsFAAOBgQBp5DB6ksTU78tli6cYkxB4
+DRPIGOhL87o4gpsOQNSS61ECYTf2wxGqPA1sM/8syNn0hU1hGVqZG2ydYmR6PxkO
+/FfKNmxI5+cRA8oKk6zNhu42tll3NLFbYZV9cp8+JpBQMLBIXxU23UggnsxoVrks
+C1I6oDxIq5kDixlWKnaMGA==
+-----END NEW CERTIFICATE REQUEST-----

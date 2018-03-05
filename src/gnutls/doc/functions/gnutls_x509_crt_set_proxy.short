@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_set_proxy} (gnutls_x509_crt_t @var{crt}, int @var{pathLenConstraint}, const char * @var{policyLanguage}, const char * @var{policy}, size_t @var{sizeof_policy})

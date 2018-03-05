@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_get_id} (gnutls_session_t @var{session}, void * @var{session_id}, size_t * @var{session_id_size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{session_id}: is a pointer to space to hold the session id.
+
+@var{session_id_size}: initially should contain the maximum  @code{session_id} size and will be updated.
+
+Returns the current session ID. This can be used if you want to
+check if the next session you tried to resume was actually
+resumed.  That is because resumed sessions share the same session ID
+with the original session.
+
+The session ID is selected by the server, that identify the
+current session.  In all supported TLS protocols, the session id
+is less than @code{GNUTLS_MAX_SESSION_ID_SIZE} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+@end deftypefun

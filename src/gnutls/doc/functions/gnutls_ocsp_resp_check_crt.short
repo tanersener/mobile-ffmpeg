@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_resp_check_crt} (gnutls_ocsp_resp_t @var{resp}, unsigned int @var{indx}, gnutls_x509_crt_t @var{crt})

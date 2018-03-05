@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {void} {gnutls_memset} (void * @var{data}, int @var{c}, size_t @var{size})
+@var{data}: the memory to set
+
+@var{c}: the constant byte to fill the memory with
+
+@var{size}: the size of memory
+
+This function will operate similarly to @code{memset()} , but will
+not be optimized out by the compiler.
+
+@strong{Returns:} void.
+
+@strong{Since:} 3.4.0
+@end deftypefun

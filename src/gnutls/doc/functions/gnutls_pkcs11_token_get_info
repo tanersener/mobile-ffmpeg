@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_token_get_info} (const char * @var{url}, gnutls_pkcs11_token_info_t @var{ttype}, void * @var{output}, size_t * @var{output_size})
+@var{url}: should contain a PKCS 11 URL
+
+@var{ttype}: Denotes the type of information requested
+
+@var{output}: where output will be stored
+
+@var{output_size}: contains the maximum size of the output and will be overwritten with actual
+
+This function will return information about the PKCS 11 token such
+as the label, id, etc.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
+on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun

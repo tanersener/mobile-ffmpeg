@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_alpn_get_selected_protocol} (gnutls_session_t @var{session}, gnutls_datum_t * @var{protocol})

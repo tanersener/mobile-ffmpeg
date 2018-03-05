@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_session_set_premaster} (gnutls_session_t @var{session}, unsigned int @var{entity}, gnutls_protocol_t @var{version}, gnutls_kx_algorithm_t @var{kx}, gnutls_cipher_algorithm_t @var{cipher}, gnutls_mac_algorithm_t @var{mac}, gnutls_compression_method_t @var{comp}, const gnutls_datum_t * @var{master}, const gnutls_datum_t * @var{session_id})

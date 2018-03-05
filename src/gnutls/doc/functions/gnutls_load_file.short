@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_load_file} (const char * @var{filename}, gnutls_datum_t * @var{data})

@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {gnutls_pk_algorithm_t} {gnutls_ecc_curve_get_pk} (gnutls_ecc_curve_t @var{curve})
+@var{curve}: is an ECC curve
+
+
+@strong{Returns:} the public key algorithm associated with the named curve or @code{GNUTLS_PK_UNKNOWN} .
+
+@strong{Since:} 3.5.0
+@end deftypefun

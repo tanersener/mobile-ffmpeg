@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_ocsp_resp_deinit} (gnutls_ocsp_resp_t @var{resp})

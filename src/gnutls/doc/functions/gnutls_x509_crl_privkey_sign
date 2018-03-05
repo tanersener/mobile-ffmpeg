@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_privkey_sign} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_t @var{issuer}, gnutls_privkey_t @var{issuer_key}, gnutls_digest_algorithm_t @var{dig}, unsigned int @var{flags})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{issuer}: is the certificate of the certificate issuer
+
+@var{issuer_key}: holds the issuer's private key
+
+@var{dig}: The message digest to use. GNUTLS_DIG_SHA256 is the safe choice unless you know what you're doing.
+
+@var{flags}: must be 0
+
+This function will sign the CRL with the issuer's private key, and
+will copy the issuer's information into the CRL.
+
+This must be the last step in a certificate CRL since all
+the previously set parameters are now signed.
+
+A known limitation of this function is, that a newly-signed CRL will not
+be fully functional (e.g., for signature verification), until it
+is exported an re-imported.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+Since 2.12.0
+@end deftypefun

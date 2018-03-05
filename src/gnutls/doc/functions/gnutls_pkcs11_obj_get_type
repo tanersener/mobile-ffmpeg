@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_pkcs11_obj_type_t} {gnutls_pkcs11_obj_get_type} (gnutls_pkcs11_obj_t @var{obj})
+@var{obj}: Holds the PKCS 11 object
+
+This function will return the type of the object being
+stored in the structure.
+
+@strong{Returns:} The type of the object
+
+@strong{Since:} 2.12.0
+@end deftypefun

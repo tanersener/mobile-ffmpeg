@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_pem_base64_decode} (const char * @var{header}, const gnutls_datum_t * @var{b64_data}, unsigned char * @var{result}, size_t * @var{result_size})
+@var{header}: A null terminated string with the PEM header (eg. CERTIFICATE)
+
+@var{b64_data}: contain the encoded data
+
+@var{result}: the place where decoded data will be copied
+
+@var{result_size}: holds the size of the result
+
+This function will decode the given encoded data.  If the header
+given is non null this function will search for "-----BEGIN header"
+and decode only this part.  Otherwise it will decode the first PEM
+packet found.
+
+@strong{Returns:} On success @code{GNUTLS_E_SUCCESS}  (0) is returned,
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  is returned if the buffer given is
+not long enough, or 0 on success.
+@end deftypefun

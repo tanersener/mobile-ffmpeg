@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_get_pk_algorithm} (gnutls_x509_privkey_t @var{key})
+@var{key}: should contain a @code{gnutls_x509_privkey_t}  type
+
+This function will return the public key algorithm of a private
+key.
+
+@strong{Returns:} a member of the @code{gnutls_pk_algorithm_t}  enumeration on
+success, or a negative error code on error.
+@end deftypefun

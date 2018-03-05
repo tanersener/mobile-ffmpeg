@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crl_get_issuer_dn_by_oid} (gnutls_x509_crl_t @var{crl}, const char * @var{oid}, unsigned @var{indx}, unsigned int @var{raw_flag}, void * @var{buf}, size_t * @var{sizeof_buf})

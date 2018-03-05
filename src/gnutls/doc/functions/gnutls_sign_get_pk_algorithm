@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_pk_algorithm_t} {gnutls_sign_get_pk_algorithm} (gnutls_sign_algorithm_t @var{sign})
+@var{sign}: is a signature algorithm
+
+This function returns the public key algorithm corresponding to
+the given signature algorithms.
+
+@strong{Since:} 3.1.1
+
+@strong{Returns:} return a @code{gnutls_pk_algorithm_t}  value, or @code{GNUTLS_PK_UNKNOWN}  on error.
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_set_proxy_dn} (gnutls_x509_crt_t @var{crt}, gnutls_x509_crt_t @var{eecrt}, unsigned int @var{raw_flag}, const void * @var{name}, unsigned int @var{sizeof_name})

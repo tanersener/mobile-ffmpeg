@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_hmac} (gnutls_hmac_hd_t @var{handle}, const void * @var{ptext}, size_t @var{ptext_len})
+@var{handle}: is a @code{gnutls_hmac_hd_t}  type
+
+@var{ptext}: the data to hash
+
+@var{ptext_len}: the length of data to hash
+
+This function will hash the given data using the algorithm
+specified by the context.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_x509_crq_deinit} (gnutls_x509_crq_t @var{crq})

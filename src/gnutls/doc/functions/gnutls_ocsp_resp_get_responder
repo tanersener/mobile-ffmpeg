@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_get_responder} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{dn})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+@var{dn}: newly allocated buffer with name
+
+This function will extract the name of the Basic OCSP Response in
+the provided buffer. The name will be in the form
+"C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output string
+will be ASCII or UTF-8 encoded, depending on the certificate data.
+
+If the responder ID is not a name but a hash, this function
+will return zero and the  @code{dn} elements will be set to @code{NULL} .
+
+The caller needs to deallocate memory by calling @code{gnutls_free()}  on
+ @code{dn} ->data.
+
+This function does not output a fully RFC4514 compliant string, if
+that is required see @code{gnutls_ocsp_resp_get_responder2()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned. When no data exist it will
+return success and set  @code{dn} elements to zero.
+@end deftypefun

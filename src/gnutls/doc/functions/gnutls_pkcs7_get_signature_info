@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_get_signature_info} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{idx}, gnutls_pkcs7_signature_info_st * @var{info})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+@var{idx}: the index of the signature info to check
+
+@var{info}: will contain the output signature
+
+This function will return information about the signature identified
+by idx in the provided PKCS @code{7}  structure. The information should be
+deinitialized using @code{gnutls_pkcs7_signature_info_deinit()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.2
+@end deftypefun

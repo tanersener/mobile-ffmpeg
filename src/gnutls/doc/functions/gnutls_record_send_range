@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {ssize_t} {gnutls_record_send_range} (gnutls_session_t @var{session}, const void * @var{data}, size_t @var{data_size}, const gnutls_range_st * @var{range})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data}: contains the data to send.
+
+@var{data_size}: is the length of the data.
+
+@var{range}: is the range of lengths in which the real data length must be hidden.
+
+This function operates like @code{gnutls_record_send()}  but, while
+@code{gnutls_record_send()}  adds minimal padding to each TLS record,
+this function uses the TLS extra-padding feature to conceal the real
+data size within the range of lengths provided.
+Some TLS sessions do not support extra padding (e.g. stream ciphers in standard
+TLS or SSL3 sessions). To know whether the current session supports extra
+padding, and hence length hiding, use the @code{gnutls_record_can_use_length_hiding()} 
+function.
+
+@strong{Note:} This function currently is only limited to blocking sockets.
+
+@strong{Returns:} The number of bytes sent (that is data_size in a successful invocation),
+or a negative error code.
+@end deftypefun

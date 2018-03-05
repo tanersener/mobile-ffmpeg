@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_set_data} (gnutls_session_t @var{session}, const void * @var{session_data}, size_t @var{session_data_size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{session_data}: is a pointer to space to hold the session.
+
+@var{session_data_size}: is the session's size
+
+Sets all session parameters, in order to resume a previously
+established session.  The session data given must be the one
+returned by @code{gnutls_session_get_data()} .  This function should be
+called before @code{gnutls_handshake()} .
+
+Keep in mind that session resuming is advisory. The server may
+choose not to resume the session, thus a full handshake will be
+performed.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+@end deftypefun

@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_rdn_get_by_oid} (const gnutls_datum_t * @var{idn}, const char * @var{oid}, unsigned @var{indx}, unsigned int @var{raw_flag}, void * @var{buf}, size_t * @var{buf_size})
+@var{idn}: should contain a DER encoded RDN sequence
+
+@var{oid}: an Object Identifier
+
+@var{indx}: In case multiple same OIDs exist in the RDN indicates which
+to send. Use 0 for the first one.
+
+@var{raw_flag}: If non-zero then the raw DER data are returned.
+
+@var{buf}: a pointer to a structure to hold the peer's name
+
+@var{buf_size}: holds the size of  @code{buf} 
+
+This function will return the name of the given Object identifier,
+of the RDN sequence.  The name will be encoded using the rules
+from RFC4514.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, or
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  is returned and * @code{buf_size} is
+updated if the provided buffer is not long enough, otherwise a
+negative error value.
+@end deftypefun

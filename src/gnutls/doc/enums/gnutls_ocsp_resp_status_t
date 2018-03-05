@@ -1,0 +1,17 @@
+
+
+@c gnutls_ocsp_resp_status_t
+@table @code
+@item GNUTLS_@-OCSP_@-RESP_@-SUCCESSFUL
+Response has valid confirmations.
+@item GNUTLS_@-OCSP_@-RESP_@-MALFORMEDREQUEST
+Illegal confirmation request
+@item GNUTLS_@-OCSP_@-RESP_@-INTERNALERROR
+Internal error in issuer
+@item GNUTLS_@-OCSP_@-RESP_@-TRYLATER
+Try again later
+@item GNUTLS_@-OCSP_@-RESP_@-SIGREQUIRED
+Must sign the request
+@item GNUTLS_@-OCSP_@-RESP_@-UNAUTHORIZED
+Request unauthorized
+@end table

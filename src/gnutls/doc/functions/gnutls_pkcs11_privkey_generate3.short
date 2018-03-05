@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_privkey_generate3} (const char * @var{url}, gnutls_pk_algorithm_t @var{pk}, unsigned int @var{bits}, const char * @var{label}, const gnutls_datum_t * @var{cid}, gnutls_x509_crt_fmt_t @var{fmt}, gnutls_datum_t * @var{pubkey}, unsigned int @var{key_usage}, unsigned int @var{flags})

@@ -1,0 +1,759 @@
+@node Introduction to TLS
+@chapter Introduction to @acronym{TLS} and @acronym{DTLS}
+
+@acronym{TLS} stands for ``Transport Layer Security'' and is the
+successor of SSL, the Secure Sockets Layer protocol @xcite{SSL3}
+designed by Netscape.  @acronym{TLS} is an Internet protocol, defined
+by @acronym{IETF}@footnote{IETF, or Internet Engineering Task Force,
+is a large open international community of network designers,
+operators, vendors, and researchers concerned with the evolution of
+the Internet architecture and the smooth operation of the Internet.
+It is open to any interested individual.}, described in @xcite{RFC5246}.  
+The protocol provides
+confidentiality, and authentication layers over any reliable transport
+layer.  The description, above, refers to @acronym{TLS} 1.0 but applies
+to all other TLS versions as the differences between the protocols are not major.  
+
+The @acronym{DTLS} protocol, or ``Datagram @acronym{TLS}'' @xcite{RFC4347} is a
+protocol with identical goals as @acronym{TLS}, but can operate
+under unreliable transport layers such as @acronym{UDP}. The
+discussions below apply to this protocol as well, except when
+noted otherwise.
+
+@menu
+* TLS layers::
+* The transport layer::
+* The TLS record protocol::
+* The TLS Alert Protocol::
+* The TLS Handshake Protocol::
+* TLS Extensions::
+* How to use TLS in application protocols::
+* On SSL 2 and older protocols::
+@end menu
+
+@node TLS layers
+@section TLS Layers
+@cindex TLS layers
+
+@acronym{TLS} is a layered protocol, and consists of the record
+protocol, the handshake protocol and the alert protocol. The record
+protocol is to serve all other protocols and is above the transport
+layer.  The record protocol offers symmetric encryption, data
+authenticity, and optionally compression.
+The alert protocol offers some signaling to the other protocols. It
+can help informing the peer for the cause of failures and other error
+conditions.  @xref{The Alert Protocol}, for more information.  The
+alert protocol is above the record protocol.
+
+The handshake protocol is responsible for the security parameters'
+negotiation, the initial key exchange and authentication.  
+@xref{The Handshake Protocol}, for more information about the handshake
+protocol.  The protocol layering in TLS is shown in @ref{fig-tls-layers}.
+
+@float Figure,fig-tls-layers
+@image{gnutls-layers,12cm}
+@caption{The TLS protocol layers.}
+@end float
+
+@node The transport layer
+@section The Transport Layer
+@cindex transport protocol
+@cindex transport layer
+
+@acronym{TLS} is not limited to any transport layer and can be used
+above any transport layer, as long as it is a reliable one.  @acronym{DTLS}
+can be used over reliable and unreliable transport layers.
+@acronym{GnuTLS} supports TCP and UDP layers transparently using
+the Berkeley sockets API. However, any transport layer can be used
+by providing callbacks for @acronym{GnuTLS} to access the transport layer 
+(for details see @ref{Setting up the transport layer}).
+
+@node The TLS record protocol
+@section The TLS record protocol
+@cindex record protocol
+
+The record protocol is the secure communications provider. Its purpose
+is to encrypt, authenticate and ---optionally--- compress packets.
+The record layer functions can be called at any time after
+the handshake process is finished, when there is need to receive
+or send data. In @acronym{DTLS} however, due to re-transmission
+timers used in the handshake out-of-order handshake data might
+be received for some time (maximum 60 seconds) after the handshake
+process is finished. 
+
+The functions to access the record protocol are limited to send
+and receive functions, which might, given 
+the importance of this protocol in @acronym{TLS}, seem awkward.  This is because 
+the record protocol's parameters are all set by the handshake protocol.
+The record protocol initially starts with NULL parameters, which means
+no encryption, and no MAC is used. Encryption and authentication begin
+just after the handshake protocol has finished.
+
+@menu
+* Encryption algorithms used in the record layer::
+* Compression algorithms used in the record layer::
+* Weaknesses and countermeasures::
+* On Record Padding::
+@end menu
+
+@node Encryption algorithms used in the record layer
+@subsection Encryption algorithms used in the record layer
+@cindex symmetric encryption algorithms
+
+Confidentiality in the record layer is achieved by using symmetric
+ciphers like @code{AES} or @code{CHACHA20}.  Ciphers are encryption algorithms 
+that use a single, secret, key to encrypt and decrypt data. Early
+versions of TLS separated between block and stream ciphers and had
+message authentication plugged in to them by the protocol, though later 
+versions switched to using authenticated-encryption (AEAD) ciphers. The AEAD
+ciphers are defined to combine encryption and authentication, and as such
+they are not only more efficient, as the primitives used are designed to
+interoperate nicely, but they are also known to interoperate in a secure
+way.
+
+The supported in @acronym{GnuTLS} ciphers and MAC algorithms are shown in @ref{tab:ciphers} and
+@ref{tab:macs}.
+
+@float Table,tab:ciphers
+@multitable @columnfractions .20 .20 .60
+@headitem Algorithm @tab Type @tab Description
+@item AES-128-GCM, AES-256-GCM @tab
+AEAD @tab
+This is the AES algorithm in the authenticated encryption GCM mode.
+This mode combines message authentication and encryption and can
+be extremely fast on CPUs that support hardware acceleration.
+
+@item AES-128-CCM, AES-256-CCM @tab
+AEAD @tab
+This is the AES algorithm in the authenticated encryption CCM mode.
+This mode combines message authentication and encryption and is
+often used by systems without AES or GCM acceleration support.
+
+@item AES-128-CCM-8, AES-256-CCM-8 @tab
+AEAD @tab
+This is the AES algorithm in the authenticated encryption CCM mode
+with a truncated to 64-bit authentication tag. This mode is for
+communication with restricted systems.
+
+@item CAMELLIA-128-GCM, CAMELLIA-256-GCM @tab
+AEAD @tab
+This is the CAMELLIA algorithm in the authenticated encryption GCM mode.
+
+@item CHACHA20-POLY1305 @tab
+AEAD @tab
+CHACHA20-POLY1305 is an authenticated encryption algorithm based on CHACHA20 cipher and
+POLY1305 MAC. CHACHA20 is a refinement of SALSA20 algorithm, an approved cipher by
+the European ESTREAM project. POLY1305 is Wegman-Carter, one-time authenticator. The
+combination provides a fast stream cipher suitable for systems where a hardware AES
+accelerator is not available.
+
+@item AES-128-CBC, AES-256-CBC @tab
+Legacy (block) @tab
+AES or RIJNDAEL is the block cipher algorithm that replaces the old
+DES algorithm.  It has 128 bits block size and is used in CBC mode.
+
+@item CAMELLIA-128-CBC, CAMELLIA-256-CBC @tab
+Legacy (block) @tab
+This is an 128-bit block cipher developed by Mitsubishi and NTT. It
+is one of the approved ciphers of the European NESSIE and Japanese
+CRYPTREC projects.
+
+@item 3DES-CBC @tab
+Legacy (block) @tab
+This is the DES block cipher algorithm used with triple
+encryption (EDE). Has 64 bits block size and is used in CBC mode.
+
+@item ARCFOUR-128 @tab
+Legacy (stream) @tab
+ARCFOUR-128 is a compatible algorithm with RSA's RC4 algorithm, which is considered to be a trade
+secret. It is a considered to be broken, and is only used for compatibility
+purposed. For this reason it is not enabled by default.
+
+@end multitable
+@caption{Supported ciphers in TLS.}
+@end float
+
+
+@float Table,tab:macs
+@multitable @columnfractions .20 .70
+@headitem Algorithm @tab Description
+@item MAC-MD5 @tab
+This is an HMAC based on MD5 a cryptographic hash algorithm designed 
+by Ron Rivest. Outputs 128 bits of data.
+
+@item MAC-SHA1 @tab
+An HMAC based on the SHA1 cryptographic hash algorithm 
+designed by NSA. Outputs 160 bits of data.
+
+@item MAC-SHA256 @tab
+An HMAC based on SHA2-256. Outputs 256 bits of data.
+
+@item MAC-SHA384 @tab
+An HMAC based on SHA2-384. Outputs 384 bits of data.
+
+@item MAC-AEAD @tab
+This indicates that an authenticated encryption algorithm, such as
+GCM, is in use.
+
+@end multitable
+@caption{Supported MAC algorithms in TLS.}
+@end float
+
+
+@node Compression algorithms used in the record layer
+@subsection Compression algorithms used in the record layer
+@cindex compression algorithms
+
+The TLS record layer also supports compression.  The algorithms
+implemented in @acronym{GnuTLS} can be found in the table below.
+The included algorithms perform really good when text, or other
+compressible data are to be transferred, but offer nothing on already
+compressed data, such as compressed images, zipped archives etc.
+These compression algorithms, may be useful in high bandwidth TLS
+tunnels, and in cases where network usage has to be minimized. It
+should be noted however that compression increases latency.
+
+The record layer compression in @acronym{GnuTLS} is implemented based
+on @xcite{RFC3749}. The supported algorithms are shown below.
+
+@showenumdesc{gnutls_compression_method_t,Supported compression algorithms}
+
+Note that compression enables attacks such as traffic analysis, or even
+plaintext recovery under certain circumstances. To avoid some of these
+attacks GnuTLS allows each record to be compressed independently (i.e.,
+stateless compression), by using the "%STATELESS_COMPRESSION" priority string,
+in order to be used in cases where the attacker controlled data are
+pt in separate records.
+
+@node Weaknesses and countermeasures
+@subsection Weaknesses and countermeasures
+
+Some weaknesses that may affect the security of the record layer have
+been found in @acronym{TLS} 1.0 protocol. These weaknesses can be
+exploited by active attackers, and exploit the facts that
+
+@enumerate
+
+@item
+@acronym{TLS} has separate alerts for ``decryption_failed'' and
+``bad_record_mac''
+
+@item
+The decryption failure reason can be detected by timing the response
+time.
+
+@item
+The IV for CBC encrypted packets is the last block of the previous
+encrypted packet.
+
+@end enumerate
+
+Those weaknesses were solved in @acronym{TLS} 1.1 @xcite{RFC4346}
+which is implemented in @acronym{GnuTLS}. For this reason we suggest
+to always negotiate the highest supported TLS version with the 
+peer@footnote{If this is not possible then please consult @ref{Interoperability}.}.
+For a detailed discussion of the issues see the archives of the TLS 
+Working Group mailing list and @xcite{CBCATT}.
+
+@node On Record Padding
+@subsection On record padding
+@cindex record padding
+@cindex bad_record_mac
+
+The TLS protocol allows for extra padding of records in CBC ciphers, to prevent
+statistical analysis based on the length of exchanged messages (see @xcite{RFC5246} section 6.2.3.2).  
+GnuTLS appears to be one of few implementations that take advantage of this feature: 
+the user can provide some plaintext data with a range of lengths she wishes to hide,
+and GnuTLS adds extra padding to make sure the attacker cannot tell the real plaintext
+length is in a range smaller than the user-provided one.
+Use @funcref{gnutls_record_send_range} to send length-hidden messages and
+@funcref{gnutls_record_can_use_length_hiding} to check whether the current
+session supports length hiding. Using the standard @funcref{gnutls_record_send}
+will only add minimal padding.
+
+The TLS implementation in the Symbian operating system, frequently
+used by Nokia and Sony-Ericsson mobile phones, cannot handle
+non-minimal record padding.  What happens when one of these clients
+handshake with a GnuTLS server is that the client will fail to compute
+the correct MAC for the record.  The client sends a TLS alert
+(@code{bad_record_mac}) and disconnects.  Typically this will result
+in error messages such as 'A TLS fatal alert has been received', 'Bad
+record MAC', or both, on the GnuTLS server side.
+
+If compatibility with such devices is a concern, not sending length-hidden messages
+solves the problem by using minimal padding.
+
+If you implement an application that has a configuration file, we
+recommend that you make it possible for users or administrators to
+specify a GnuTLS protocol priority string, which is used by your
+application via @funcref{gnutls_priority_set}.  To allow the best
+flexibility, make it possible to have a different priority string for
+different incoming IP addresses.
+
+
+@node The TLS Alert Protocol
+@section The TLS alert protocol
+@anchor{The Alert Protocol}
+@cindex alert protocol
+
+The alert protocol is there to allow signals to be sent between peers.
+These signals are mostly used to inform the peer about the cause of a
+protocol failure. Some of these signals are used internally by the
+protocol and the application protocol does not have to cope with them
+(e.g. @code{GNUTLS_@-A_@-CLOSE_@-NOTIFY}), and others refer to the
+application protocol solely (e.g. @code{GNUTLS_@-A_@-USER_@-CANCELLED}).  An
+alert signal includes a level indication which may be either fatal or
+warning. Fatal alerts always terminate the current connection, and
+prevent future re-negotiations using the current session ID. All alert
+messages are summarized in the table below.
+
+The alert messages are protected by the record protocol, thus the
+information that is included does not leak. You must take extreme care
+for the alert information not to leak to a possible attacker, via
+public log files etc. 
+
+@include alerts.texi
+
+@node The TLS Handshake Protocol
+@section The TLS handshake protocol
+@anchor{The Handshake Protocol}
+@cindex handshake protocol
+
+The handshake protocol is responsible for the ciphersuite negotiation,
+the initial key exchange, and the authentication of the two peers.
+This is fully controlled by the application layer, thus your program
+has to set up the required parameters. The main handshake function
+is @funcref{gnutls_handshake}. In the next paragraphs we elaborate on 
+the handshake protocol, i.e., the ciphersuite negotiation.
+
+
+@menu
+* TLS Cipher Suites::           TLS session parameters.
+* Authentication::              TLS authentication.
+* Client Authentication::       Requesting a certificate from the client.
+* Resuming Sessions::           Reusing previously established keys.
+@end menu
+
+
+@node TLS Cipher Suites
+@subsection TLS ciphersuites
+
+The handshake protocol of @acronym{TLS} negotiates cipher suites of
+a special form illustrated by the @code{TLS_DHE_RSA_WITH_3DES_CBC_SHA} cipher suite name.  A typical cipher
+suite contains these parameters:
+
+@itemize
+
+@item The key exchange algorithm.
+@code{DHE_RSA} in the example.
+
+@item The Symmetric encryption algorithm and mode
+@code{3DES_CBC} in this example.
+
+@item The MAC@footnote{MAC stands for Message Authentication Code. It can be described as a keyed hash algorithm. See RFC2104.} algorithm used for authentication.
+@code{MAC_SHA} is used in the above example.
+
+@end itemize
+
+The cipher suite negotiated in the handshake protocol will affect the
+record protocol, by enabling encryption and data authentication.  Note
+that you should not over rely on @acronym{TLS} to negotiate the
+strongest available cipher suite. Do not enable ciphers and algorithms
+that you consider weak.
+
+All the supported ciphersuites are listed in @ref{ciphersuites}.
+
+@node Authentication
+@subsection Authentication
+
+The key exchange algorithms of the @acronym{TLS} protocol offer
+authentication, which is a prerequisite for a secure connection. 
+The available authentication methods in @acronym{GnuTLS} follow.
+
+@itemize
+
+@item Certificate authentication: Authenticated key exchange using public key infrastructure and certificates (X.509 or OpenPGP).
+@item @acronym{SRP} authentication: Authenticated key exchange using a password.
+@item @acronym{PSK} authentication: Authenticated key exchange using a pre-shared key.
+@item Anonymous authentication: Key exchange without peer authentication.
+
+@end itemize
+
+@node Client Authentication
+@subsection Client authentication
+@cindex client certificate authentication
+
+In the case of ciphersuites that use certificate authentication, the
+authentication of the client is optional in @acronym{TLS}.  A server
+may request a certificate from the client using the
+@funcref{gnutls_certificate_server_set_request} function. We elaborate 
+in @ref{Certificate credentials}.
+
+@node Resuming Sessions
+@subsection Resuming sessions
+@anchor{resume}
+@cindex resuming sessions
+@cindex session resumption
+
+The TLS handshake process performs expensive calculations
+and a busy server might easily be put under load. To 
+reduce the load, session resumption may be used. This
+is a feature of the @acronym{TLS} protocol which allows a
+client to connect to a server after a successful handshake, without
+the expensive calculations.  This is achieved by re-using the previously
+established keys, meaning the server needs to store the state of established
+connections (unless session tickets are used -- @ref{Session tickets}).
+
+Session resumption is an integral part of @acronym{GnuTLS}, and 
+@ref{Session resumption}, @ref{ex-resume-client} illustrate typical 
+uses of it.
+
+@node TLS Extensions
+@section TLS extensions
+@cindex TLS extensions
+
+A number of extensions to the @acronym{TLS} protocol have been
+proposed mainly in @xcite{TLSEXT}. The extensions supported
+in @acronym{GnuTLS} are discussed in the subsections that follow.
+
+@menu
+* Maximum fragment length negotiation::
+* Server name indication::
+* Session tickets::
+* HeartBeat::
+* Safe renegotiation::
+* OCSP status request::
+* SRTP::
+* False Start::
+* Application Layer Protocol Negotiation (ALPN)::
+* Extensions and Supplemental Data::
+@end menu
+
+@node Maximum fragment length negotiation
+@subsection Maximum fragment length negotiation
+@cindex TLS extensions
+@cindex maximum fragment length
+
+This extension allows a @acronym{TLS} implementation to negotiate a
+smaller value for record packet maximum length. This extension may be
+useful to clients with constrained capabilities. The functions shown
+below can be used to control this extension.
+
+@showfuncB{gnutls_record_get_max_size,gnutls_record_set_max_size}
+
+@node Server name indication
+@subsection Server name indication
+@anchor{serverind}
+@cindex TLS extensions
+@cindex server name indication
+
+A common problem in @acronym{HTTPS} servers is the fact that the
+@acronym{TLS} protocol is not aware of the hostname that a client
+connects to, when the handshake procedure begins. For that reason the
+@acronym{TLS} server has no way to know which certificate to send.
+
+This extension solves that problem within the @acronym{TLS} protocol,
+and allows a client to send the HTTP hostname before the handshake
+begins within the first handshake packet.  The functions
+@funcref{gnutls_server_name_set} and @funcref{gnutls_server_name_get} can be
+used to enable this extension, or to retrieve the name sent by a
+client.
+
+@showfuncB{gnutls_server_name_set,gnutls_server_name_get}
+
+@node Session tickets
+@subsection Session tickets
+@cindex TLS extensions
+@cindex session tickets
+@cindex tickets
+
+To resume a TLS session, the server normally stores session parameters.  This
+complicates deployment, and can be avoided by delegating the storage
+to the client. Because session parameters are sensitive they are encrypted
+and authenticated with a key only known to the server and then sent to the
+client. The Session Tickets extension is described in RFC 5077 @xcite{TLSTKT}.
+
+A disadvantage of session tickets is that they eliminate the effects of
+forward secrecy when a server uses the same key for long time. That is,
+the secrecy of all sessions on a server using tickets depends on the ticket
+key being kept secret. For that reason server keys should be rotated and discarded
+regularly.
+
+Since version 3.1.3 GnuTLS clients transparently support session tickets,
+unless forward secrecy is explicitly requested (with the PFS priority string).
+
+@node HeartBeat
+@subsection HeartBeat
+@cindex TLS extensions
+@cindex heartbeat
+
+This is a TLS extension that allows to ping and receive confirmation from the peer,
+and is described in @xcite{RFC6520}. The extension is disabled by default and
+@funcref{gnutls_heartbeat_enable} can be used to enable it. A policy
+may be negotiated to only allow sending heartbeat messages or sending and receiving.
+The current session policy can be checked with @funcref{gnutls_heartbeat_allowed}. 
+The requests coming from the peer result to @code{GNUTLS_@-E_@-HEARTBEAT_@-PING_@-RECEIVED}
+being returned from the receive function. Ping requests to peer can be send via
+@funcref{gnutls_heartbeat_ping}. 
+
+@showfuncB{gnutls_heartbeat_allowed,gnutls_heartbeat_enable}
+
+@showfuncD{gnutls_heartbeat_ping,gnutls_heartbeat_pong,gnutls_heartbeat_set_timeouts,gnutls_heartbeat_get_timeout}
+
+@node Safe renegotiation
+@subsection Safe renegotiation
+@cindex renegotiation
+@cindex safe renegotiation
+
+TLS gives the option to two communicating parties to renegotiate
+and update their security parameters. One useful example of this feature
+was for a client to initially connect using anonymous negotiation to a
+server, and the renegotiate using some authenticated ciphersuite. This occurred
+to avoid having the client sending its credentials in the clear.
+
+However this renegotiation, as initially designed would not ensure that
+the party one is renegotiating is the same as the one in the initial negotiation.
+For example one server could forward all renegotiation traffic to an other
+server who will see this traffic as an initial negotiation attempt.
+
+This might be seen as a valid design decision, but it seems it was
+not widely known or understood, thus today some application protocols use the TLS
+renegotiation feature in a manner that enables a malicious server to insert
+content of his choice in the beginning of a TLS session.
+
+The most prominent vulnerability was with HTTPS. There servers request
+a renegotiation to enforce an anonymous user to use a certificate in order
+to access certain parts of a web site.  The
+attack works by having the attacker simulate a client and connect to a
+server, with server-only authentication, and send some data intended
+to cause harm.  The server will then require renegotiation from him
+in order to perform the request. 
+When the proper client attempts to contact the server,
+the attacker hijacks that connection and forwards traffic to
+the initial server that requested renegotiation.  The
+attacker will not be able to read the data exchanged between the
+client and the server.  However, the server will (incorrectly) assume
+that the initial request sent by the attacker was sent by the now authenticated
+client.  The result is a prefix plain-text injection attack.
+
+The above is just one example.  Other vulnerabilities exists that do
+not rely on the TLS renegotiation to change the client's authenticated
+status (either TLS or application layer).
+
+While fixing these application protocols and implementations would be
+one natural reaction, an extension to TLS has been designed that
+cryptographically binds together any renegotiated handshakes with the
+initial negotiation.  When the extension is used, the attack is
+detected and the session can be terminated.  The extension is
+specified in @xcite{RFC5746}.
+
+GnuTLS supports the safe renegotiation extension.  The default
+behavior is as follows.  Clients will attempt to negotiate the safe
+renegotiation extension when talking to servers.  Servers will accept
+the extension when presented by clients.  Clients and servers will
+permit an initial handshake to complete even when the other side does
+not support the safe renegotiation extension.  Clients and servers
+will refuse renegotiation attempts when the extension has not been
+negotiated.
+
+Note that permitting clients to connect to servers when the safe
+renegotiation extension is not enabled, is open up for attacks.
+Changing this default behavior would prevent interoperability against
+the majority of deployed servers out there.  We will reconsider this
+default behavior in the future when more servers have been upgraded.
+Note that it is easy to configure clients to always require the safe
+renegotiation extension from servers.
+
+To modify the default behavior, we have introduced some new priority
+strings (see @ref{Priority Strings}).  
+The @code{%UNSAFE_RENEGOTIATION} priority string permits
+(re-)handshakes even when the safe renegotiation extension was not
+negotiated. The default behavior is @code{%PARTIAL_RENEGOTIATION} that will
+prevent renegotiation with clients and servers not supporting the
+extension. This is secure for servers but leaves clients vulnerable
+to some attacks, but this is a trade-off between security and compatibility
+with old servers. The @code{%SAFE_RENEGOTIATION} priority string makes
+clients and servers require the extension for every handshake. The latter
+is the most secure option for clients, at the cost of not being able
+to connect to legacy servers. Servers will also deny clients that
+do not support the extension from connecting.
+
+It is possible to disable use of the extension completely, in both
+clients and servers, by using the @code{%DISABLE_SAFE_RENEGOTIATION}
+priority string however we strongly recommend you to only do this for
+debugging and test purposes.
+
+The default values if the flags above are not specified are:
+@table @code
+
+@item Server:
+%PARTIAL_RENEGOTIATION
+
+@item Client:
+%PARTIAL_RENEGOTIATION
+
+@end table
+
+For applications we have introduced a new API related to safe
+renegotiation.  The @funcref{gnutls_safe_renegotiation_status} function is
+used to check if the extension has been negotiated on a session, and
+can be used both by clients and servers.
+
+@node OCSP status request
+@subsection OCSP status request
+@cindex OCSP status request
+@cindex Certificate status request
+
+The Online Certificate Status Protocol (OCSP) is a protocol that allows the
+client to verify the server certificate for revocation without messing with
+certificate revocation lists. Its drawback is that it requires the client
+to connect to the server's CA OCSP server and request the status of the
+certificate. This extension however, enables a TLS server to include
+its CA OCSP server response in the handshake. That is an HTTPS server
+may periodically run @code{ocsptool} (see @ref{ocsptool Invocation}) to obtain
+its certificate revocation status and serve it to the clients. That
+way a client avoids an additional connection to the OCSP server.
+
+See @ref{OCSP stapling} for further information.
+
+Since version 3.1.3 GnuTLS clients transparently support the certificate status
+request.
+
+@node SRTP
+@subsection SRTP
+@cindex SRTP
+@cindex Secure RTP
+
+The TLS protocol was extended in @xcite{RFC5764} to provide keying material to the
+Secure RTP (SRTP) protocol. The SRTP protocol provides an encapsulation of encrypted
+data that is optimized for voice data. With the SRTP TLS extension two peers can
+negotiate keys using TLS or DTLS and obtain keying material for use with SRTP. The
+available SRTP profiles are listed below.
+
+@showenumdesc{gnutls_srtp_profile_t,Supported SRTP profiles}
+
+To enable use the following functions.
+
+@showfuncB{gnutls_srtp_set_profile,gnutls_srtp_set_profile_direct}
+
+To obtain the negotiated keys use the function below.
+
+@showfuncdesc{gnutls_srtp_get_keys}
+
+Other helper functions are listed below.
+
+@showfuncC{gnutls_srtp_get_selected_profile,gnutls_srtp_get_profile_name,gnutls_srtp_get_profile_id}
+
+@node False Start
+@subsection False Start
+@cindex False Start
+@cindex TLS False Start
+
+The TLS protocol was extended in @xcite{draft-ietf-tls-falsestart-01} to allow the client
+to send data to server in a single round trip. This change however operates on the borderline
+of the TLS protocol security guarrantees and should be used for the cases where the reduced
+latency outperforms the risk of an adversary intercepting the transferred data. In GnuTLS
+applications can use the @acronym{GNUTLS_ENABLE_FALSE_START} as option to @funcref{gnutls_init}
+to request an early return of the @funcref{gnutls_handshake} function. After that early
+return the application is expected to transfer any data to be piggybacked on the last handshake
+message.
+
+After handshake's early termination, the application is expected to transmit
+data using @funcref{gnutls_record_send}, and call @funcref{gnutls_record_recv} on
+any received data as soon, to ensure that handshake completes timely. That is, especially
+relevant for applications which set an explicit time limit for the handshake process
+via @funcref{gnutls_handshake_set_timeout}.
+
+Note however, that the API ensures that the early return will not happen
+if the false start requirements are not satisfied. That is, on ciphersuites which are not
+whitelisted for false start or on insufficient key sizes, the handshake
+process will complete properly (i.e., no early return). To verify that false start was used you
+may use @funcref{gnutls_session_get_flags} and check for the @acronym{GNUTLS_SFLAGS_FALSE_START}
+flag. For GnuTLS the false start is whitelisted for the following
+key exchange methods (see @xcite{draft-ietf-tls-falsestart-01} for rationale)
+@itemize
+@item DHE
+@item ECDHE
+@end itemize
+but only when the negotiated parameters exceed @code{GNUTLS_SEC_PARAM_HIGH}
+--see @ref{tab:key-sizes}, and when under (D)TLS 1.2 or later.
+
+@node Application Layer Protocol Negotiation (ALPN)
+@subsection Application Layer Protocol Negotiation (ALPN)
+@cindex ALPN
+@cindex Application Layer Protocol Negotiation
+
+The TLS protocol was extended in @code{RFC7301} 
+to provide the application layer a method of
+negotiating the application protocol version. This allows for negotiation
+of the application protocol during the TLS handshake, thus reducing
+round-trips. The application protocol is described by an opaque
+string. To enable, use the following functions.
+
+@showfuncB{gnutls_alpn_set_protocols,gnutls_alpn_get_selected_protocol}
+
+Note that these functions are intended to be used with protocols that are
+registered in the Application Layer Protocol Negotiation IANA registry. While
+you can use them for other protocols (at the risk of collisions), it is preferable
+to register them.
+
+@node Extensions and Supplemental Data
+@subsection Extensions and Supplemental Data
+@cindex Supplemental data
+
+It is possible to transfer supplemental data during the TLS handshake, following
+@xcite{RFC4680}. This is for "custom" protocol modifications for applications which
+may want to transfer additional data (e.g. additional authentication messages). Such
+an exchange requires a custom extension to be registered. 
+The provided API for this functionality is low-level and described in @ref{TLS Extension Handling}.
+
+@include sec-tls-app.texi
+
+@node On SSL 2 and older protocols
+@section On SSL 2 and older protocols
+@cindex SSL 2
+
+One of the initial decisions in the @acronym{GnuTLS} development was
+to implement the known security protocols for the transport layer.
+Initially @acronym{TLS} 1.0 was implemented since it was the latest at
+that time, and was considered to be the most advanced in security
+properties.  Later the @acronym{SSL} 3.0 protocol was implemented
+since it is still the only protocol supported by several servers and
+there are no serious security vulnerabilities known.
+
+One question that may arise is why we didn't implement @acronym{SSL}
+2.0 in the library.  There are several reasons, most important being
+that it has serious security flaws, unacceptable for a modern security
+library.  Other than that, this protocol is barely used by anyone
+these days since it has been deprecated since 1996.  The security
+problems in @acronym{SSL} 2.0 include:
+
+@itemize
+
+@item Message integrity compromised.
+The @acronym{SSLv2} message authentication uses the MD5 function, and
+is insecure.
+
+@item Man-in-the-middle attack.
+There is no protection of the handshake in @acronym{SSLv2}, which
+permits a man-in-the-middle attack.
+
+@item Truncation attack.
+@acronym{SSLv2} relies on TCP FIN to close the session, so the
+attacker can forge a TCP FIN, and the peer cannot tell if it was a
+legitimate end of data or not.
+
+@item Weak message integrity for export ciphers.
+The cryptographic keys in @acronym{SSLv2} are used for both message
+authentication and encryption, so if weak encryption schemes are
+negotiated (say 40-bit keys) the message authentication code uses the
+same weak key, which isn't necessary.
+
+@end itemize
+
+@cindex PCT
+Other protocols such as Microsoft's @acronym{PCT} 1 and @acronym{PCT}
+2 were not implemented because they were also abandoned and deprecated
+by @acronym{SSL} 3.0 and later @acronym{TLS} 1.0.
+
+

@@ -1,0 +1,41 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_ocsp_status_request_function2} (gnutls_certificate_credentials_t @var{sc}, unsigned @var{idx}, gnutls_status_request_ocsp_func @var{ocsp_func}, void * @var{ptr})
+@var{sc}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{idx}: is a certificate index as returned by @code{gnutls_certificate_set_key()}  and friends
+
+@var{ocsp_func}: function pointer to OCSP status request callback.
+
+@var{ptr}: opaque pointer passed to callback function
+
+This function is to be used by server to register a callback to
+provide OCSP status requests that correspond to the indexed certificate chain
+from the client.  The callback will be invoked if the client supplied a 
+status-request OCSP extension.
+
+The callback function prototype is:
+
+typedef int (*gnutls_status_request_ocsp_func)
+(gnutls_session_t session, void *ptr, gnutls_datum_t *ocsp_response);
+
+The callback will be invoked if the client requests an OCSP certificate
+status.  The callback may return @code{GNUTLS_E_NO_CERTIFICATE_STATUS} , if
+there is no recent OCSP response. If the callback returns @code{GNUTLS_E_SUCCESS} ,
+it is expected to have the  @code{ocsp_response} field set with a valid (DER-encoded)
+OCSP response. The response must be a value allocated using @code{gnutls_malloc()} ,
+and will be deinitialized by the caller.
+
+@strong{Note:} the ability to set multiple OCSP responses per credential
+structure via the index  @code{idx} was added in version 3.5.6. To keep
+backwards compatibility, it requires using @code{gnutls_certificate_set_flags()} 
+with the @code{GNUTLS_CERTIFICATE_API_V2}  flag to make the set certificate
+functions return an index usable by this function.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+@strong{Since:} 3.5.5
+@end deftypefun

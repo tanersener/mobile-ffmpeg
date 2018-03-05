@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_key_purpose_oid} (gnutls_x509_crq_t @var{crq}, const void * @var{oid}, unsigned int @var{critical})
+@var{crq}: a certificate of type @code{gnutls_x509_crq_t} 
+
+@var{oid}: a pointer to a null-terminated string that holds the OID
+
+@var{critical}: Whether this extension will be critical or not
+
+This function will set the key purpose OIDs of the Certificate.
+These are stored in the Extended Key Usage extension (2.5.29.37)
+See the GNUTLS_KP_* definitions for human readable names.
+
+Subsequent calls to this function will append OIDs to the OID list.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.8.0
+@end deftypefun

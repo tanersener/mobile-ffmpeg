@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_obj_get_exts} (gnutls_pkcs11_obj_t @var{obj}, gnutls_x509_ext_st ** @var{exts}, unsigned int * @var{exts_size}, unsigned int @var{flags})
+@var{obj}: should contain a @code{gnutls_pkcs11_obj_t}  type
+
+@var{exts}: a pointer to a @code{gnutls_x509_ext_st}  pointer
+
+@var{exts_size}: will be updated with the number of  @code{exts} 
+
+@var{flags}: Or sequence of @code{GNUTLS_PKCS11_OBJ_} * flags 
+
+This function will return information about attached extensions
+that associate to the provided object (which should be a certificate).
+The extensions are the attached p11-kit trust module extensions.
+
+Each element of  @code{exts} must be deinitialized using @code{gnutls_x509_ext_deinit()} 
+while  @code{exts} should be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
+
+@strong{Since:} 3.3.8
+@end deftypefun

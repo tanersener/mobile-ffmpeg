@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_subject_alt_names_init} (gnutls_subject_alt_names_t * @var{sans})
+@var{sans}: The alternative names
+
+This function will initialize an alternative names structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

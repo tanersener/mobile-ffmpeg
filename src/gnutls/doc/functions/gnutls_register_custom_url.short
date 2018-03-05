@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_register_custom_url} (const gnutls_custom_url_st * @var{st})

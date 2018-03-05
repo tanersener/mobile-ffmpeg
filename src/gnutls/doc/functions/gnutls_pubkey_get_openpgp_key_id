@@ -1,0 +1,32 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_get_openpgp_key_id} (gnutls_pubkey_t @var{key}, unsigned int @var{flags}, unsigned char * @var{output_data}, size_t * @var{output_data_size}, unsigned int * @var{subkey})
+@var{key}: Holds the public key
+
+@var{flags}: should be 0 or @code{GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT} 
+
+@var{output_data}: will contain the key ID
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+@var{subkey}: Will be non zero if the key ID corresponds to a subkey
+
+This function returns the OpenPGP key ID of the corresponding key.
+The key is a unique ID that depends on the public
+key parameters. 
+
+If the flag @code{GNUTLS_PUBKEY_GET_OPENPGP_FINGERPRINT}  is specified
+this function returns the fingerprint of the master key.
+
+If the buffer provided is not long enough to hold the output, then
+*output_data_size is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will
+be returned.  The output is @code{GNUTLS_OPENPGP_KEYID_SIZE}  bytes long.
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+
+@strong{Since:} 3.0
+@end deftypefun

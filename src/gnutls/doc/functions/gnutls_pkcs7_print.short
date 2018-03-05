@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs7_print} (gnutls_pkcs7_t @var{pkcs7}, gnutls_certificate_print_formats_t @var{format}, gnutls_datum_t * @var{out})

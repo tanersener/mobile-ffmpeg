@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_encrypt_data} (gnutls_pubkey_t @var{key}, unsigned int @var{flags}, const gnutls_datum_t * @var{plaintext}, gnutls_datum_t * @var{ciphertext})

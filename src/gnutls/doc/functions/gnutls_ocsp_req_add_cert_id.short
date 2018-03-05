@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_req_add_cert_id} (gnutls_ocsp_req_t @var{req}, gnutls_digest_algorithm_t @var{digest}, const gnutls_datum_t * @var{issuer_name_hash}, const gnutls_datum_t * @var{issuer_key_hash}, const gnutls_datum_t * @var{serial_number})

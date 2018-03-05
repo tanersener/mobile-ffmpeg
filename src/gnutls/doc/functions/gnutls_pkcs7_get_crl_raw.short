@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs7_get_crl_raw} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{indx}, void * @var{crl}, size_t * @var{crl_size})

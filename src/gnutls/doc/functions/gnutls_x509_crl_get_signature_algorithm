@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_signature_algorithm} (gnutls_x509_crl_t @var{crl})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+This function will return a value of the @code{gnutls_sign_algorithm_t} 
+enumeration that is the signature algorithm.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

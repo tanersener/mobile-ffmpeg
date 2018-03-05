@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_dtls_set_data_mtu} (gnutls_session_t @var{session}, unsigned int @var{mtu})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{mtu}: The maximum unencrypted transfer unit of the session
+
+This function will set the maximum size of the *unencrypted* records
+which will be sent over a DTLS session. It is equivalent to calculating
+the DTLS packet overhead with the current encryption parameters, and
+calling @code{gnutls_dtls_set_mtu()}  with that value. In particular, this means
+that you may need to call this function again after any negotiation or
+renegotiation, in order to ensure that the MTU is still sufficient to
+account for the new protocol overhead.
+
+In most cases you only need to call @code{gnutls_dtls_set_mtu()}  with
+the maximum MTU of your transport layer.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.
+
+@strong{Since:} 3.1
+@end deftypefun

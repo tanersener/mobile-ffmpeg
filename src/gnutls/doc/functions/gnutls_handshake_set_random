@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_handshake_set_random} (gnutls_session_t @var{session}, const gnutls_datum_t * @var{random})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{random}: a random value of 32-bytes
+
+This function will explicitly set the server or client hello 
+random value in the subsequent TLS handshake. The random value 
+should be a 32-byte value.
+
+Note that this function should not normally be used as gnutls
+will select automatically a random value for the handshake.
+
+This function should not be used when resuming a session.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+Since 3.1.9
+@end deftypefun

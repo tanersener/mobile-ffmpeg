@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_import_x509_raw} (gnutls_pubkey_t @var{pkey}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})

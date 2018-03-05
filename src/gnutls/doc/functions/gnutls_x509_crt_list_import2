@@ -1,0 +1,29 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_list_import2} (gnutls_x509_crt_t ** @var{certs}, unsigned int * @var{size}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{certs}: Will hold the parsed certificate list.
+
+@var{size}: It will contain the size of the list.
+
+@var{data}: The PEM encoded certificate.
+
+@var{format}: One of DER or PEM.
+
+@var{flags}: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
+
+This function will convert the given PEM encoded certificate list
+to the native gnutls_x509_crt_t format. The output will be stored
+in  @code{certs} which will allocated and initialized.
+
+If the Certificate is PEM encoded it should have a header of "X509
+CERTIFICATE", or "CERTIFICATE".
+
+To deinitialize  @code{certs} , you need to deinitialize each crt structure
+independently, and use @code{gnutls_free()}  at
+
+@strong{Returns:} the number of certificates read or a negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

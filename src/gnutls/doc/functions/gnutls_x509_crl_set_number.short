@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crl_set_number} (gnutls_x509_crl_t @var{crl}, const void * @var{nr}, size_t @var{nr_size})

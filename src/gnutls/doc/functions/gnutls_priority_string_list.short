@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_priority_string_list} (unsigned @var{iter}, unsigned int @var{flags})

@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_encrypt_data} (gnutls_pubkey_t @var{key}, unsigned int @var{flags}, const gnutls_datum_t * @var{plaintext}, gnutls_datum_t * @var{ciphertext})
+@var{key}: Holds the public key
+
+@var{flags}: should be 0 for now
+
+@var{plaintext}: The data to be encrypted
+
+@var{ciphertext}: contains the encrypted data
+
+This function will encrypt the given data, using the public
+key. On success the  @code{ciphertext} will be allocated using @code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

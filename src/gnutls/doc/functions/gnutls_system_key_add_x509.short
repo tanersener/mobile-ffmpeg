@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_system_key_add_x509} (gnutls_x509_crt_t @var{crt}, gnutls_x509_privkey_t @var{privkey}, const char * @var{label}, char ** @var{cert_url}, char ** @var{key_url})

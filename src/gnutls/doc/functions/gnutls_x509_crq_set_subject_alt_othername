@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_subject_alt_othername} (gnutls_x509_crq_t @var{crq}, const char * @var{oid}, const void * @var{data}, unsigned int @var{data_size}, unsigned int @var{flags})
+@var{crq}: a certificate request of type @code{gnutls_x509_crq_t} 
+
+@var{oid}: is the othername OID
+
+@var{data}: The data to be set
+
+@var{data_size}: The size of data to be set
+
+@var{flags}: @code{GNUTLS_FSAN_SET}  to clear previous data or
+@code{GNUTLS_FSAN_APPEND}  to append.
+
+This function will set the subject alternative name certificate
+extension.  It can set the following types:
+
+The values set must be binary values and must be properly DER encoded.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.5.0
+@end deftypefun

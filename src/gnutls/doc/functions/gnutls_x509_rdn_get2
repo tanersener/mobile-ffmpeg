@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_rdn_get2} (const gnutls_datum_t * @var{idn}, gnutls_datum_t * @var{str}, unsigned @var{flags})
+@var{idn}: should contain a DER encoded RDN sequence
+
+@var{str}: -- undescribed --
+
+@var{flags}: -- undescribed --
+
+This function will return the name of the given RDN sequence.  The
+name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
+RFC4514.
+
+When the flag @code{GNUTLS_X509_DN_FLAG_COMPAT}  is specified, the output
+format will match the format output by previous to 3.5.6 versions of GnuTLS
+which was not not fully RFC4514-compliant.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, or
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  is returned and * @code{buf_size} is
+updated if the provided buffer is not long enough, otherwise a
+negative error value.
+@end deftypefun

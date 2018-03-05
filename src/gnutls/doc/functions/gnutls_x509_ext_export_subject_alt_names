@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_export_subject_alt_names} (gnutls_subject_alt_names_t @var{sans}, gnutls_datum_t * @var{ext})
+@var{sans}: The alternative names
+
+@var{ext}: The DER-encoded extension data; must be freed using @code{gnutls_free()} .
+
+This function will convert the provided alternative names structure to a
+DER-encoded SubjectAltName PKIX extension. The output data in  @code{ext} will be allocated using
+@code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

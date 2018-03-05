@@ -1,0 +1,38 @@
+
+
+
+
+@deftypefun {int} {gnutls_prf_raw} (gnutls_session_t @var{session}, size_t @var{label_size}, const char * @var{label}, size_t @var{seed_size}, const char * @var{seed}, size_t @var{outsize}, char * @var{out})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{label_size}: length of the  @code{label} variable.
+
+@var{label}: label used in PRF computation, typically a short string.
+
+@var{seed_size}: length of the  @code{seed} variable.
+
+@var{seed}: optional extra data to seed the PRF with.
+
+@var{outsize}: size of pre-allocated output buffer to hold the output.
+
+@var{out}: pre-allocated buffer to hold the generated data.
+
+Apply the TLS Pseudo-Random-Function (PRF) on the master secret
+and the provided data.
+
+The  @code{label} variable usually contains a string denoting the purpose
+for the generated data.  The  @code{seed} usually contains data such as the
+client and server random, perhaps together with some additional
+data that is added to guarantee uniqueness of the output for a
+particular purpose.
+
+Because the output is not guaranteed to be unique for a particular
+session unless  @code{seed} includes the client random and server random
+fields (the PRF would output the same data on another connection
+resumed from the first one), it is not recommended to use this
+function directly.  The @code{gnutls_prf()}  function seeds the PRF with the
+client and server random fields directly, and is recommended if you
+want to generate pseudo random data unique for each session.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun

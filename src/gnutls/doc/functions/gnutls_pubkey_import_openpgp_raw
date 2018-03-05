@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_openpgp_raw} (gnutls_pubkey_t @var{pkey}, const gnutls_datum_t * @var{data}, gnutls_openpgp_crt_fmt_t @var{format}, const gnutls_openpgp_keyid_t @var{keyid}, unsigned int @var{flags})
+@var{pkey}: The public key
+
+@var{data}: The public key data to be imported
+
+@var{format}: The format of the public key
+
+@var{keyid}: The key id to use (optional)
+
+@var{flags}: Should be zero
+
+This function will import the given public key to the abstract
+@code{gnutls_pubkey_t}  type. 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.3
+@end deftypefun

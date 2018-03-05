@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_copy_pubkey} (const char * @var{token_url}, gnutls_pubkey_t @var{pubkey}, const char * @var{label}, const gnutls_datum_t * @var{cid}, unsigned int @var{key_usage}, unsigned int @var{flags})
+@var{token_url}: A PKCS @code{11}  URL specifying a token
+
+@var{pubkey}: The public key to copy
+
+@var{label}: The name to be used for the stored data
+
+@var{cid}: The CKA_ID to set for the object -if NULL, the ID will be derived from the public key
+
+@var{key_usage}: One of GNUTLS_KEY_*
+
+@var{flags}: One of GNUTLS_PKCS11_OBJ_FLAG_*
+
+This function will copy a public key object into a PKCS @code{11}  token specified by
+a URL. Valid flags to mark the key: @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED} ,
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_SENSITIVE} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_PRIVATE} ,
+@code{GNUTLS_PKCS11_OBJ_FLAG_MARK_CA} , @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.6
+@end deftypefun

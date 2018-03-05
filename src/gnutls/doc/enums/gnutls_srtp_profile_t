@@ -1,0 +1,13 @@
+
+
+@c gnutls_srtp_profile_t
+@table @code
+@item GNUTLS_@-SRTP_@-AES128_@-CM_@-HMAC_@-SHA1_@-80
+128 bit AES with a 80 bit HMAC-SHA1
+@item GNUTLS_@-SRTP_@-AES128_@-CM_@-HMAC_@-SHA1_@-32
+128 bit AES with a 32 bit HMAC-SHA1
+@item GNUTLS_@-SRTP_@-NULL_@-HMAC_@-SHA1_@-80
+NULL cipher with a 80 bit HMAC-SHA1
+@item GNUTLS_@-SRTP_@-NULL_@-HMAC_@-SHA1_@-32
+NULL cipher with a 32 bit HMAC-SHA1
+@end table

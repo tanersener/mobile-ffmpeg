@@ -1,0 +1,88 @@
+#!/bin/sh
+
+# Copyright (C) 2014 Red Hat, Inc.
+#
+# Author: Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+#set -e
+
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+DIFF="${DIFF:-diff}"
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+fi
+
+OUTFILE=out.$$.tmp
+OUTFILE2=out2.$$.tmp
+
+. ${srcdir}/../scripts/common.sh
+
+check_for_datefudge
+
+${VALGRIND} "${CERTTOOL}" --inder --crq-info --infile "${srcdir}/data/csr-invalid.der" >"${OUTFILE}" 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Invalid crq decoding failed"
+	exit ${rc}
+fi
+
+grep "error: get_key_id" "${OUTFILE}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "crq decoding didn't fail as expected"
+	exit 1
+fi
+
+rm -f "${OUTFILE}"
+
+# check whether the honor_crq_extension option works
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-request \
+		--load-privkey "${srcdir}/data/template-test.key" \
+		--template "${srcdir}/templates/template-tlsfeature.tmpl" \
+		--outfile $OUTFILE 2>/dev/null
+
+datefudge -s "2007-04-22" \
+	"${CERTTOOL}" --generate-certificate \
+		--load-ca-privkey "${srcdir}/data/template-test.key" \
+		--load-ca-certificate "${srcdir}/data/template-tlsfeature.pem" \
+		--load-request="$OUTFILE" \
+		--template "${srcdir}/templates/template-crq.tmpl" \
+		--outfile "${OUTFILE2}" 2>/dev/null
+
+${DIFF} "${srcdir}/data/template-crq.pem" "${OUTFILE2}" >/dev/null 2>&1
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Certificate request generation failed"
+	echo $OUTFILE2
+	exit ${rc}
+fi
+
+rm -f "${OUTFILE}" "${OUTFILE2}"
+
+exit 0

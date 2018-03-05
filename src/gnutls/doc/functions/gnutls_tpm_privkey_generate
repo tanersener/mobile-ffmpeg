@@ -1,0 +1,40 @@
+
+
+
+
+@deftypefun {int} {gnutls_tpm_privkey_generate} (gnutls_pk_algorithm_t @var{pk}, unsigned int @var{bits}, const char * @var{srk_password}, const char * @var{key_password}, gnutls_tpmkey_fmt_t @var{format}, gnutls_x509_crt_fmt_t @var{pub_format}, gnutls_datum_t * @var{privkey}, gnutls_datum_t * @var{pubkey}, unsigned int @var{flags})
+@var{pk}: the public key algorithm
+
+@var{bits}: the security bits
+
+@var{srk_password}: a password to protect the exported key (optional)
+
+@var{key_password}: the password for the TPM (optional)
+
+@var{format}: the format of the private key
+
+@var{pub_format}: the format of the public key
+
+@var{privkey}: the generated key
+
+@var{pubkey}: the corresponding public key (may be null)
+
+@var{flags}: should be a list of GNUTLS_TPM_* flags
+
+This function will generate a private key in the TPM
+chip. The private key will be generated within the chip
+and will be exported in a wrapped with TPM's master key
+form. Furthermore the wrapped key can be protected with
+the provided  @code{password} .
+
+Note that bits in TPM is quantized value. If the input value
+is not one of the allowed values, then it will be quantized to
+one of 512, 1024, 2048, 4096, 8192 and 16384.
+
+Allowed flags are:
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_aki_get_cert_issuer} (gnutls_x509_aki_t @var{aki}, unsigned int @var{seq}, unsigned int * @var{san_type}, gnutls_datum_t * @var{san}, gnutls_datum_t * @var{othername_oid}, gnutls_datum_t * @var{serial})
+@var{aki}: The authority key ID
+
+@var{seq}: The index of the name to get
+
+@var{san_type}: Will hold the type of the name (of @code{gnutls_subject_alt_names_t} )
+
+@var{san}: The alternative name data
+
+@var{othername_oid}: The object identifier if  @code{san_type} is @code{GNUTLS_SAN_OTHERNAME} 
+
+@var{serial}: The authorityCertSerialNumber number
+
+This function will return a specific authorityCertIssuer name as stored in
+the  @code{aki} type, as well as the authorityCertSerialNumber. All the returned
+values should be treated as constant, and may be set to @code{NULL}  when are not required.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+if the index is out of bounds, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

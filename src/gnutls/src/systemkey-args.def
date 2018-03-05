@@ -1,0 +1,51 @@
+AutoGen Definitions options;
+prog-name     = systemkey-tool;
+prog-title    = "GnuTLS system key tool";
+prog-desc     = "Program to handle system keys.\n";
+detail    = "Program that allows handling user keys as stored in the system in a uniform way.";
+short-usage   = "systemkey-tool [options]\nsystemkey-tool --help for usage instructions.\n";
+explain       = "";
+
+#define  OUTFILE_OPT   1
+#define  INFILE_OPT   1
+#include args-std.def
+
+flag = {
+    name      = list;
+    descrip   = "Lists all stored keys.";
+    doc = "";
+};
+
+flag = {
+    name      = delete;
+    arg-type  = string;
+    arg-name  = "url";
+    descrip   = "Delete the key identified by the given URL.";
+    doc      = "";
+};
+
+flag = {
+    name      = inder;
+    descrip   = "Use the DER format for keys.";
+    disabled;
+    disable   = "no";
+    doc       = "The input files will be assumed to be in DER format.";
+};
+
+flag = {
+    name      = outder;
+    descrip   = "Use DER format for output keys";
+    disabled;
+    disable   = "no";
+    doc       = "The output will be in DER format.";
+};
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+    p11tool (1), certtool (1)
+_EOT_;
+};
+
+

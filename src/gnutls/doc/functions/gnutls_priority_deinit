@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_priority_deinit} (gnutls_priority_t @var{priority_cache})
+@var{priority_cache}: is a @code{gnutls_prioritity_t}  type.
+
+Deinitializes the priority cache.
+@end deftypefun

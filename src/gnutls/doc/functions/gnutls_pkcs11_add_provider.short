@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_add_provider} (const char * @var{name}, const char * @var{params})

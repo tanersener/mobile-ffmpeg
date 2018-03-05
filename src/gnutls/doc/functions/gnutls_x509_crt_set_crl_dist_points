@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_crl_dist_points} (gnutls_x509_crt_t @var{crt}, gnutls_x509_subject_alt_name_t @var{type}, const void * @var{data_string}, unsigned int @var{reason_flags})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{type}: is one of the gnutls_x509_subject_alt_name_t enumerations
+
+@var{data_string}: The data to be set
+
+@var{reason_flags}: revocation reasons
+
+This function will set the CRL distribution points certificate extension.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

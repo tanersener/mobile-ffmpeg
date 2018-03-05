@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_fips140_mode_enabled} ( @var{void})

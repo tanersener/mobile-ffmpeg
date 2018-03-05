@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_export_ecc_raw} (gnutls_privkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{k})
+@var{key}: Holds the public key
+
+@var{curve}: will hold the curve
+
+@var{x}: will hold the x coordinate
+
+@var{y}: will hold the y coordinate
+
+@var{k}: will hold the private key
+
+This function will export the ECC private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.3.0
+@end deftypefun

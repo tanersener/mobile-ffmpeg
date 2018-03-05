@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {dane_raw_tlsa} (dane_state_t @var{s}, dane_query_t * @var{r}, char *const * @var{dane_data}, const int * @var{dane_data_len}, int @var{secure}, int @var{bogus})
+@var{s}: The DANE state structure
+
+@var{r}: A structure to place the result
+
+@var{dane_data}: array of DNS rdata items, terminated with a NULL pointer;
+caller must guarantee that the referenced data remains
+valid until @code{dane_query_deinit()}  is called.
+
+@var{dane_data_len}: the length n bytes of the dane_data items
+
+@var{secure}: true if the result is validated securely, false if
+validation failed or the domain queried has no security info
+
+@var{bogus}: if the result was not secure (secure = 0) due to a security failure,
+and the result is due to a security failure, bogus is true.
+
+This function will fill in the TLSA (DANE) structure from
+the given raw DNS record data. The  @code{dane_data} must be valid
+during the lifetime of the query.
+
+@strong{Returns:} On success, @code{DANE_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

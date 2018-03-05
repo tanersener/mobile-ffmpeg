@@ -1,0 +1,541 @@
+
+@subheading gnutls_pkcs7_add_attr
+@anchor{gnutls_pkcs7_add_attr}
+@deftypefun {int} {gnutls_pkcs7_add_attr} (gnutls_pkcs7_attrs_t * @var{list}, const char * @var{oid}, gnutls_datum_t * @var{data}, unsigned @var{flags})
+@var{list}: A list of existing attributes or pointer to @code{NULL}  for the first one
+
+@var{oid}: the OID of the attribute to be set
+
+@var{data}: the raw (DER-encoded) data of the attribute to be set
+
+@var{flags}: zero or @code{GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING} 
+
+This function will set a PKCS @code{7}  attribute in the provided list.
+If this function fails, the previous list would be deallocated.
+
+Note that any attributes set with this function must either be
+DER or BER encoded, unless a special flag is present.
+
+@strong{Returns:} On success, the new list head, otherwise @code{NULL} .
+
+@strong{Since:} 3.4.2
+@end deftypefun
+
+@subheading gnutls_pkcs7_attrs_deinit
+@anchor{gnutls_pkcs7_attrs_deinit}
+@deftypefun {void} {gnutls_pkcs7_attrs_deinit} (gnutls_pkcs7_attrs_t @var{list})
+@var{list}: A list of existing attributes
+
+This function will clear a PKCS @code{7}  attribute list.
+
+@strong{Since:} 3.4.2
+@end deftypefun
+
+@subheading gnutls_pkcs7_deinit
+@anchor{gnutls_pkcs7_deinit}
+@deftypefun {void} {gnutls_pkcs7_deinit} (gnutls_pkcs7_t @var{pkcs7})
+@var{pkcs7}: the type to be deinitialized
+
+This function will deinitialize a PKCS7 type.
+@end deftypefun
+
+@subheading gnutls_pkcs7_delete_crl
+@anchor{gnutls_pkcs7_delete_crl}
+@deftypefun {int} {gnutls_pkcs7_delete_crl} (gnutls_pkcs7_t @var{pkcs7}, int @var{indx})
+@var{pkcs7}: The pkcs7 type
+
+@var{indx}: the index of the crl to delete
+
+This function will delete a crl from a PKCS7 or RFC2630 crl set.
+Index starts from 0. Returns 0 on success.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_delete_crt
+@anchor{gnutls_pkcs7_delete_crt}
+@deftypefun {int} {gnutls_pkcs7_delete_crt} (gnutls_pkcs7_t @var{pkcs7}, int @var{indx})
+@var{pkcs7}: The pkcs7 type
+
+@var{indx}: the index of the certificate to delete
+
+This function will delete a certificate from a PKCS7 or RFC2630
+certificate set.  Index starts from 0. Returns 0 on success.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_export
+@anchor{gnutls_pkcs7_export}
+@deftypefun {int} {gnutls_pkcs7_export} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_fmt_t @var{format}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{pkcs7}: The pkcs7 type
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{output_data}: will contain a structure PEM or DER encoded
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will export the pkcs7 structure to DER or PEM format.
+
+If the buffer provided is not long enough to hold the output, then
+* @code{output_data_size} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER} 
+will be returned.
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN PKCS7".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_export2
+@anchor{gnutls_pkcs7_export2}
+@deftypefun {int} {gnutls_pkcs7_export2} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_fmt_t @var{format}, gnutls_datum_t * @var{out})
+@var{pkcs7}: The pkcs7 type
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{out}: will contain a structure PEM or DER encoded
+
+This function will export the pkcs7 structure to DER or PEM format.
+
+The output buffer is allocated using @code{gnutls_malloc()} .
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN PKCS7".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.3
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_attr
+@anchor{gnutls_pkcs7_get_attr}
+@deftypefun {int} {gnutls_pkcs7_get_attr} (gnutls_pkcs7_attrs_t @var{list}, unsigned @var{idx}, char ** @var{oid}, gnutls_datum_t * @var{data}, unsigned @var{flags})
+@var{list}: A list of existing attributes or @code{NULL}  for the first one
+
+@var{idx}: the index of the attribute to get
+
+@var{oid}: the OID of the attribute (read-only)
+
+@var{data}: the raw data of the attribute
+
+@var{flags}: zero or @code{GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING} 
+
+This function will get a PKCS @code{7}  attribute from the provided list.
+The OID is a constant string, but data will be allocated and must be
+deinitialized by the caller.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned
+if there are no data in the current index.
+
+@strong{Since:} 3.4.2
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_crl_count
+@anchor{gnutls_pkcs7_get_crl_count}
+@deftypefun {int} {gnutls_pkcs7_get_crl_count} (gnutls_pkcs7_t @var{pkcs7})
+@var{pkcs7}: The pkcs7 type
+
+This function will return the number of certificates in the PKCS7
+or RFC2630 crl set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_crl_raw
+@anchor{gnutls_pkcs7_get_crl_raw}
+@deftypefun {int} {gnutls_pkcs7_get_crl_raw} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{indx}, void * @var{crl}, size_t * @var{crl_size})
+@var{pkcs7}: The pkcs7 type
+
+@var{indx}: contains the index of the crl to extract
+
+@var{crl}: the contents of the crl will be copied there (may be null)
+
+@var{crl_size}: should hold the size of the crl
+
+This function will return a crl of the PKCS7 or RFC2630 crl set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.  If the provided buffer is not long enough,
+then  @code{crl_size} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  is
+returned.  After the last crl has been read
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_crl_raw2
+@anchor{gnutls_pkcs7_get_crl_raw2}
+@deftypefun {int} {gnutls_pkcs7_get_crl_raw2} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{indx}, gnutls_datum_t * @var{crl})
+@var{pkcs7}: The pkcs7 type
+
+@var{indx}: contains the index of the crl to extract
+
+@var{crl}: will contain the contents of the CRL in an allocated buffer
+
+This function will return a DER encoded CRL of the PKCS7 or RFC2630 crl set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.  After the last crl has been read
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+
+@strong{Since:} 3.4.2
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_crt_count
+@anchor{gnutls_pkcs7_get_crt_count}
+@deftypefun {int} {gnutls_pkcs7_get_crt_count} (gnutls_pkcs7_t @var{pkcs7})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+This function will return the number of certificates in the PKCS7
+or RFC2630 certificate set.
+
+@strong{Returns:} On success, a positive number is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_crt_raw
+@anchor{gnutls_pkcs7_get_crt_raw}
+@deftypefun {int} {gnutls_pkcs7_get_crt_raw} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{indx}, void * @var{certificate}, size_t * @var{certificate_size})
+@var{pkcs7}: should contain a gnutls_pkcs7_t type
+
+@var{indx}: contains the index of the certificate to extract
+
+@var{certificate}: the contents of the certificate will be copied
+there (may be null)
+
+@var{certificate_size}: should hold the size of the certificate
+
+This function will return a certificate of the PKCS7 or RFC2630
+certificate set.
+
+After the last certificate has been read
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.  If the provided buffer is not long enough,
+then  @code{certificate_size} is updated and
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  is returned.
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_crt_raw2
+@anchor{gnutls_pkcs7_get_crt_raw2}
+@deftypefun {int} {gnutls_pkcs7_get_crt_raw2} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{indx}, gnutls_datum_t * @var{cert})
+@var{pkcs7}: should contain a gnutls_pkcs7_t type
+
+@var{indx}: contains the index of the certificate to extract
+
+@var{cert}: will hold the contents of the certificate; must be deallocated with @code{gnutls_free()} 
+
+This function will return a certificate of the PKCS7 or RFC2630
+certificate set.
+
+After the last certificate has been read
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.  If the provided buffer is not long enough,
+then  @code{certificate_size} is updated and
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  is returned.
+
+@strong{Since:} 3.4.2
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_embedded_data
+@anchor{gnutls_pkcs7_get_embedded_data}
+@deftypefun {int} {gnutls_pkcs7_get_embedded_data} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{flags}, gnutls_datum_t * @var{data})
+@var{pkcs7}: should contain a gnutls_pkcs7_t type
+
+@var{flags}: must be zero or @code{GNUTLS_PKCS7_EDATA_GET_RAW} 
+
+@var{data}: will hold the embedded data in the provided structure
+
+This function will return the data embedded in the signature of
+the PKCS7 structure. If no data are available then
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+
+The returned data must be de-allocated using @code{gnutls_free()} .
+
+Note, that this function returns the exact same data that are
+authenticated. If the @code{GNUTLS_PKCS7_EDATA_GET_RAW}  flag is provided,
+the returned data will be including the wrapping tag/value as
+they are encoded in the structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.8
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_embedded_data_oid
+@anchor{gnutls_pkcs7_get_embedded_data_oid}
+@deftypefun {const char *} {gnutls_pkcs7_get_embedded_data_oid} (gnutls_pkcs7_t @var{pkcs7})
+@var{pkcs7}: should contain a gnutls_pkcs7_t type
+
+This function will return the OID of the data embedded in the signature of
+the PKCS7 structure. If no data are available then @code{NULL}  will be
+returned. The returned value will be valid during the lifetime
+of the  @code{pkcs7} structure.
+
+@strong{Returns:} On success, a pointer to an OID string, @code{NULL}  on error.
+
+@strong{Since:} 3.5.5
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_signature_count
+@anchor{gnutls_pkcs7_get_signature_count}
+@deftypefun {int} {gnutls_pkcs7_get_signature_count} (gnutls_pkcs7_t @var{pkcs7})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+This function will return the number of signatures in the PKCS7
+structure.
+
+@strong{Returns:} On success, a positive number is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.3
+@end deftypefun
+
+@subheading gnutls_pkcs7_get_signature_info
+@anchor{gnutls_pkcs7_get_signature_info}
+@deftypefun {int} {gnutls_pkcs7_get_signature_info} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{idx}, gnutls_pkcs7_signature_info_st * @var{info})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+@var{idx}: the index of the signature info to check
+
+@var{info}: will contain the output signature
+
+This function will return information about the signature identified
+by idx in the provided PKCS @code{7}  structure. The information should be
+deinitialized using @code{gnutls_pkcs7_signature_info_deinit()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.2
+@end deftypefun
+
+@subheading gnutls_pkcs7_import
+@anchor{gnutls_pkcs7_import}
+@deftypefun {int} {gnutls_pkcs7_import} (gnutls_pkcs7_t @var{pkcs7}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format})
+@var{pkcs7}: The data to store the parsed PKCS7.
+
+@var{data}: The DER or PEM encoded PKCS7.
+
+@var{format}: One of DER or PEM
+
+This function will convert the given DER or PEM encoded PKCS7 to
+the native @code{gnutls_pkcs7_t}  format.  The output will be stored in
+ @code{pkcs7} .
+
+If the PKCS7 is PEM encoded it should have a header of "PKCS7".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_init
+@anchor{gnutls_pkcs7_init}
+@deftypefun {int} {gnutls_pkcs7_init} (gnutls_pkcs7_t * @var{pkcs7})
+@var{pkcs7}: A pointer to the type to be initialized
+
+This function will initialize a PKCS7 structure. PKCS7 structures
+usually contain lists of X.509 Certificates and X.509 Certificate
+revocation lists.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_print
+@anchor{gnutls_pkcs7_print}
+@deftypefun {int} {gnutls_pkcs7_print} (gnutls_pkcs7_t @var{pkcs7}, gnutls_certificate_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@var{pkcs7}: The PKCS7 struct to be printed
+
+@var{format}: Indicate the format to use
+
+@var{out}: Newly allocated datum with null terminated string.
+
+This function will pretty print a signed PKCS @code{7}  structure, suitable for
+display to a human.
+
+Currently the supported formats are @code{GNUTLS_CRT_PRINT_FULL}  and
+@code{GNUTLS_CRT_PRINT_COMPACT} .
+
+The output  @code{out} needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_set_crl
+@anchor{gnutls_pkcs7_set_crl}
+@deftypefun {int} {gnutls_pkcs7_set_crl} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crl_t @var{crl})
+@var{pkcs7}: The pkcs7 type
+
+@var{crl}: the DER encoded crl to be added
+
+This function will add a parsed CRL to the PKCS7 or RFC2630 crl
+set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_set_crl_raw
+@anchor{gnutls_pkcs7_set_crl_raw}
+@deftypefun {int} {gnutls_pkcs7_set_crl_raw} (gnutls_pkcs7_t @var{pkcs7}, const gnutls_datum_t * @var{crl})
+@var{pkcs7}: The pkcs7 type
+
+@var{crl}: the DER encoded crl to be added
+
+This function will add a crl to the PKCS7 or RFC2630 crl set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_set_crt
+@anchor{gnutls_pkcs7_set_crt}
+@deftypefun {int} {gnutls_pkcs7_set_crt} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_t @var{crt})
+@var{pkcs7}: The pkcs7 type
+
+@var{crt}: the certificate to be copied.
+
+This function will add a parsed certificate to the PKCS7 or
+RFC2630 certificate set.  This is a wrapper function over
+@code{gnutls_pkcs7_set_crt_raw()}  .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_set_crt_raw
+@anchor{gnutls_pkcs7_set_crt_raw}
+@deftypefun {int} {gnutls_pkcs7_set_crt_raw} (gnutls_pkcs7_t @var{pkcs7}, const gnutls_datum_t * @var{crt})
+@var{pkcs7}: The pkcs7 type
+
+@var{crt}: the DER encoded certificate to be added
+
+This function will add a certificate to the PKCS7 or RFC2630
+certificate set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun
+
+@subheading gnutls_pkcs7_sign
+@anchor{gnutls_pkcs7_sign}
+@deftypefun {int} {gnutls_pkcs7_sign} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_t @var{signer}, gnutls_privkey_t @var{signer_key}, const gnutls_datum_t * @var{data}, gnutls_pkcs7_attrs_t @var{signed_attrs}, gnutls_pkcs7_attrs_t @var{unsigned_attrs}, gnutls_digest_algorithm_t @var{dig}, unsigned @var{flags})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+@var{signer}: the certificate to sign the structure
+
+@var{signer_key}: the key to sign the structure
+
+@var{data}: The data to be signed or @code{NULL}  if the data are already embedded
+
+@var{signed_attrs}: Any additional attributes to be included in the signed ones (or @code{NULL} )
+
+@var{unsigned_attrs}: Any additional attributes to be included in the unsigned ones (or @code{NULL} )
+
+@var{dig}: The digest algorithm to use for signing
+
+@var{flags}: Should be zero or one of @code{GNUTLS_PKCS7}  flags
+
+This function will add a signature in the provided PKCS @code{7}  structure
+for the provided data. Multiple signatures can be made with different
+signers.
+
+The available flags are:
+@code{GNUTLS_PKCS7_EMBED_DATA} , @code{GNUTLS_PKCS7_INCLUDE_TIME} , @code{GNUTLS_PKCS7_INCLUDE_CERT} ,
+and @code{GNUTLS_PKCS7_WRITE_SPKI} . They are explained in the @code{gnutls_pkcs7_sign_flags} 
+definition.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.2
+@end deftypefun
+
+@subheading gnutls_pkcs7_signature_info_deinit
+@anchor{gnutls_pkcs7_signature_info_deinit}
+@deftypefun {void} {gnutls_pkcs7_signature_info_deinit} (gnutls_pkcs7_signature_info_st * @var{info})
+@var{info}: should point to a @code{gnutls_pkcs7_signature_info_st}  structure
+
+This function will deinitialize any allocated value in the
+provided @code{gnutls_pkcs7_signature_info_st} .
+
+@strong{Since:} 3.4.2
+@end deftypefun
+
+@subheading gnutls_pkcs7_verify
+@anchor{gnutls_pkcs7_verify}
+@deftypefun {int} {gnutls_pkcs7_verify} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_trust_list_t @var{tl}, gnutls_typed_vdata_st * @var{vdata}, unsigned int @var{vdata_size}, unsigned @var{idx}, const gnutls_datum_t * @var{data}, unsigned @var{flags})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+@var{tl}: A list of trusted certificates
+
+@var{vdata}: an array of typed data
+
+@var{vdata_size}: the number of data elements
+
+@var{idx}: the index of the signature info to check
+
+@var{data}: The data to be verified or @code{NULL} 
+
+@var{flags}: Zero or an OR list of @code{gnutls_certificate_verify_flags} 
+
+This function will verify the provided data against the signature
+present in the SignedData of the PKCS @code{7}  structure. If the data
+provided are NULL then the data in the encapsulatedContent field
+will be used instead.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. A verification error results to a
+@code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  and the lack of encapsulated data
+to verify to a @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} .
+
+@strong{Since:} 3.4.2
+@end deftypefun
+
+@subheading gnutls_pkcs7_verify_direct
+@anchor{gnutls_pkcs7_verify_direct}
+@deftypefun {int} {gnutls_pkcs7_verify_direct} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_t @var{signer}, unsigned @var{idx}, const gnutls_datum_t * @var{data}, unsigned @var{flags})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+@var{signer}: the certificate believed to have signed the structure
+
+@var{idx}: the index of the signature info to check
+
+@var{data}: The data to be verified or @code{NULL} 
+
+@var{flags}: Zero or an OR list of @code{gnutls_certificate_verify_flags} 
+
+This function will verify the provided data against the signature
+present in the SignedData of the PKCS @code{7}  structure. If the data
+provided are NULL then the data in the encapsulatedContent field
+will be used instead.
+
+Note that, unlike @code{gnutls_pkcs7_verify()}  this function does not
+verify the key purpose of the signer. It is expected for the caller
+to verify the intended purpose of the @code{signer}  -e.g., via @code{gnutls_x509_crt_get_key_purpose_oid()} ,
+or @code{gnutls_x509_crt_check_key_purpose()} .
+
+Note also, that since GnuTLS 3.5.6 this function introduces checks in the
+end certificate ( @code{signer} ), including time checks and key usage checks.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. A verification error results to a
+@code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  and the lack of encapsulated data
+to verify to a @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} .
+
+@strong{Since:} 3.4.2
+@end deftypefun
+

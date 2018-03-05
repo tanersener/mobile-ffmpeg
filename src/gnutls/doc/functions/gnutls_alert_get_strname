@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_alert_get_strname} (gnutls_alert_description_t @var{alert})
+@var{alert}: is an alert number.
+
+This function will return a string of the name of the alert.
+
+@strong{Returns:} string corresponding to @code{gnutls_alert_description_t}  value.
+
+@strong{Since:} 3.0
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_sign_algorithm_get_client} (gnutls_session_t @var{session})

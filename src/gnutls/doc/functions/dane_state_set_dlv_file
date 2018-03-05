@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {dane_state_set_dlv_file} (dane_state_t @var{s}, const char * @var{file})
+@var{s}: The structure to be deinitialized
+
+@var{file}: The file holding the DLV keys.
+
+This function will set a file with trusted keys
+for DLV (DNSSEC Lookaside Validation).
+@end deftypefun

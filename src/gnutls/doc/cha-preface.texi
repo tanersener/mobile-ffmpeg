@@ -1,0 +1,26 @@
+@node Preface
+@chapter Preface
+
+This document demonstrates and explains the @acronym{GnuTLS}
+library API.  A brief introduction to the protocols and the technology
+involved is also included so that an application programmer can
+better understand the @acronym{GnuTLS} purpose and actual offerings.
+Even if @acronym{GnuTLS} is a typical library software, it operates
+over several security and cryptographic protocols which require the
+programmer to make careful and correct usage of them. Otherwise it
+is likely to only obtain a false sense of security.
+The term of security is very broad even if restricted to computer
+software, and cannot be confined to a single cryptographic
+library.  For that reason, do not consider any program secure just
+because it uses @acronym{GnuTLS}; there are several ways to compromise
+a program or a communication line and @acronym{GnuTLS} only helps with
+some of them.
+
+Although this document tries to be self contained, basic network
+programming and public key infrastructure (PKI) knowledge is assumed 
+in most of it. A good introduction to networking can be found 
+in @xcite{STEVENS}, to public key infrastructure in @xcite{GUTPKI}
+and to security engineering in @xcite{ANDERSON}.
+
+Updated versions of the @acronym{GnuTLS} software and this document
+will be available from @url{http://www.gnutls.org/}.

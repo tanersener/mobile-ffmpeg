@@ -1,0 +1,2194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ocsp: GnuTLS API Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="index.html" title="GnuTLS API Reference Manual">
+<link rel="up" href="intro.html" title="GnuTLS API Reference Manual">
+<link rel="prev" href="gnutls-pkcs12.html" title="pkcs12">
+<link rel="next" href="gnutls-dtls.html" title="dtls">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#gnutls-ocsp.description" class="shortcut">Description</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="intro.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="gnutls-pkcs12.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="gnutls-dtls.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="gnutls-ocsp"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="gnutls-ocsp.top_of_page"></a>ocsp</span></h2>
+<p>ocsp</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="gnutls-ocsp.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-add-cert" title="gnutls_ocsp_req_add_cert ()">gnutls_ocsp_req_add_cert</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-add-cert-id" title="gnutls_ocsp_req_add_cert_id ()">gnutls_ocsp_req_add_cert_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-deinit" title="gnutls_ocsp_req_deinit ()">gnutls_ocsp_req_deinit</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-export" title="gnutls_ocsp_req_export ()">gnutls_ocsp_req_export</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-get-cert-id" title="gnutls_ocsp_req_get_cert_id ()">gnutls_ocsp_req_get_cert_id</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-get-extension" title="gnutls_ocsp_req_get_extension ()">gnutls_ocsp_req_get_extension</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-get-nonce" title="gnutls_ocsp_req_get_nonce ()">gnutls_ocsp_req_get_nonce</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-get-version" title="gnutls_ocsp_req_get_version ()">gnutls_ocsp_req_get_version</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-import" title="gnutls_ocsp_req_import ()">gnutls_ocsp_req_import</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-init" title="gnutls_ocsp_req_init ()">gnutls_ocsp_req_init</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-print" title="gnutls_ocsp_req_print ()">gnutls_ocsp_req_print</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-randomize-nonce" title="gnutls_ocsp_req_randomize_nonce ()">gnutls_ocsp_req_randomize_nonce</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-set-extension" title="gnutls_ocsp_req_set_extension ()">gnutls_ocsp_req_set_extension</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-set-nonce" title="gnutls_ocsp_req_set_nonce ()">gnutls_ocsp_req_set_nonce</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-check-crt" title="gnutls_ocsp_resp_check_crt ()">gnutls_ocsp_resp_check_crt</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-deinit" title="gnutls_ocsp_resp_deinit ()">gnutls_ocsp_resp_deinit</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-export" title="gnutls_ocsp_resp_export ()">gnutls_ocsp_resp_export</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-certs" title="gnutls_ocsp_resp_get_certs ()">gnutls_ocsp_resp_get_certs</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-extension" title="gnutls_ocsp_resp_get_extension ()">gnutls_ocsp_resp_get_extension</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-nonce" title="gnutls_ocsp_resp_get_nonce ()">gnutls_ocsp_resp_get_nonce</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">time_t</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-produced" title="gnutls_ocsp_resp_get_produced ()">gnutls_ocsp_resp_get_produced</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-responder" title="gnutls_ocsp_resp_get_responder ()">gnutls_ocsp_resp_get_responder</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-response" title="gnutls_ocsp_resp_get_response ()">gnutls_ocsp_resp_get_response</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-signature" title="gnutls_ocsp_resp_get_signature ()">gnutls_ocsp_resp_get_signature</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-signature-algorithm" title="gnutls_ocsp_resp_get_signature_algorithm ()">gnutls_ocsp_resp_get_signature_algorithm</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-single" title="gnutls_ocsp_resp_get_single ()">gnutls_ocsp_resp_get_single</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-status" title="gnutls_ocsp_resp_get_status ()">gnutls_ocsp_resp_get_status</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-get-version" title="gnutls_ocsp_resp_get_version ()">gnutls_ocsp_resp_get_version</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-import" title="gnutls_ocsp_resp_import ()">gnutls_ocsp_resp_import</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-init" title="gnutls_ocsp_resp_init ()">gnutls_ocsp_resp_init</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-print" title="gnutls_ocsp_resp_print ()">gnutls_ocsp_resp_print</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-verify" title="gnutls_ocsp_resp_verify ()">gnutls_ocsp_resp_verify</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-verify-direct" title="gnutls_ocsp_resp_verify_direct ()">gnutls_ocsp_resp_verify_direct</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="gnutls-ocsp.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#GNUTLS-OCSP-NONCE:CAPS" title="GNUTLS_OCSP_NONCE">GNUTLS_OCSP_NONCE</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-cert-status-t" title="enum gnutls_ocsp_cert_status_t">gnutls_ocsp_cert_status_t</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-print-formats-t" title="enum gnutls_ocsp_print_formats_t">gnutls_ocsp_print_formats_t</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">struct</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-int" title="struct gnutls_ocsp_req_int">gnutls_ocsp_req_int</a></td>
+</tr>
+<tr>
+<td class="typedef_keyword">typedef</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t">gnutls_ocsp_req_t</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">struct</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-int" title="struct gnutls_ocsp_resp_int">gnutls_ocsp_resp_int</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-status-t" title="enum gnutls_ocsp_resp_status_t">gnutls_ocsp_resp_status_t</a></td>
+</tr>
+<tr>
+<td class="typedef_keyword">typedef</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t">gnutls_ocsp_resp_t</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-verify-reason-t" title="enum gnutls_ocsp_verify_reason_t">gnutls_ocsp_verify_reason_t</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="gnutls-ocsp.html#gnutls-x509-crl-reason-t" title="enum gnutls_x509_crl_reason_t">gnutls_x509_crl_reason_t</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="gnutls-ocsp.description"></a><h2>Description</h2>
+<p>
+</p>
+</div>
+<div class="refsect1">
+<a name="gnutls-ocsp.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-add-cert"></a><h3>gnutls_ocsp_req_add_cert ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_add_cert (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                          <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-digest-algorithm-t" title="enum gnutls_digest_algorithm_t"><span class="type">gnutls_digest_algorithm_t</span></a> digest</code></em>,
+                          <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-x509-crt-t" title="gnutls_x509_crt_t"><span class="type">gnutls_x509_crt_t</span></a> issuer</code></em>,
+                          <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-x509-crt-t" title="gnutls_x509_crt_t"><span class="type">gnutls_x509_crt_t</span></a> cert</code></em>);</pre>
+<p>This function will add another request to the OCSP request for a
+particular certificate.  The issuer name hash, issuer key hash, and
+serial number fields is populated as follows.  The issuer name and
+the serial number is taken from <em class="parameter"><code>cert</code></em>
+.  The issuer key is taken
+from <em class="parameter"><code>issuer</code></em>
+.  The hashed values will be hashed using the <em class="parameter"><code>digest</code></em>
+
+algorithm, normally <a class="link" href="gnutls-gnutls.html#GNUTLS-DIG-SHA1:CAPS"><code class="literal">GNUTLS_DIG_SHA1</code></a>.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-add-cert.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>digest</p></td>
+<td class="parameter_description"><p>hash algorithm, a <a class="link" href="gnutls-gnutls.html#gnutls-digest-algorithm-t" title="enum gnutls_digest_algorithm_t"><span class="type">gnutls_digest_algorithm_t</span></a> value</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>issuer</p></td>
+<td class="parameter_description"><p>issuer of <em class="parameter"><code>subject</code></em>
+certificate</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cert</p></td>
+<td class="parameter_description"><p>certificate to request status for</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-add-cert.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-add-cert-id"></a><h3>gnutls_ocsp_req_add_cert_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_add_cert_id (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                             <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-digest-algorithm-t" title="enum gnutls_digest_algorithm_t"><span class="type">gnutls_digest_algorithm_t</span></a> digest</code></em>,
+                             <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *issuer_name_hash</code></em>,
+                             <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *issuer_key_hash</code></em>,
+                             <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *serial_number</code></em>);</pre>
+<p>This function will add another request to the OCSP request for a
+particular certificate having the issuer name hash of
+<em class="parameter"><code>issuer_name_hash</code></em>
+ and issuer key hash of <em class="parameter"><code>issuer_key_hash</code></em>
+ (both
+hashed using <em class="parameter"><code>digest</code></em>
+) and serial number <em class="parameter"><code>serial_number</code></em>
+.</p>
+<p>The information needed corresponds to the CertID structure:</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2
+3
+4
+5</pre></td>
+        <td class="listing_code"><pre class="programlisting">CertID	  <span class="gtkdoc opt">::=</span>     SEQUENCE <span class="gtkdoc opt">{</span>
+hashAlgorithm       AlgorithmIdentifier<span class="gtkdoc opt">,</span>
+issuerNameHash      OCTET STRING<span class="gtkdoc opt">, --</span> Hash of Issuer<span class="string">'s DN</span>
+<span class="string">issuerKeyHash       OCTET STRING, -- Hash of Issuers public key</span>
+<span class="string">serialNumber	CertificateSerialNumber }</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="refsect3">
+<a name="gnutls-ocsp-req-add-cert-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>digest</p></td>
+<td class="parameter_description"><p>hash algorithm, a <a class="link" href="gnutls-gnutls.html#gnutls-digest-algorithm-t" title="enum gnutls_digest_algorithm_t"><span class="type">gnutls_digest_algorithm_t</span></a> value</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>issuer_name_hash</p></td>
+<td class="parameter_description"><p>hash of issuer's DN</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>issuer_key_hash</p></td>
+<td class="parameter_description"><p>hash of issuer's public key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>serial_number</p></td>
+<td class="parameter_description"><p>serial number of certificate to check</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-add-cert-id.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-deinit"></a><h3>gnutls_ocsp_req_deinit ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+gnutls_ocsp_req_deinit (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>);</pre>
+<p>This function will deinitialize a OCSP request structure.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-deinit.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>The data to be deinitialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-export"></a><h3>gnutls_ocsp_req_export ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_export (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                        <em class="parameter"><code><span class="type">gnutls_datum_t</span> *data</code></em>);</pre>
+<p>This function will export the OCSP request to DER format.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-export.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>Holds the OCSP request</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>newly allocate buffer holding DER encoded OCSP request</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-export.returns"></a><h4>Returns</h4>
+<p> In case of failure a negative error code will be
+returned, and 0 on success.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-get-cert-id"></a><h3>gnutls_ocsp_req_get_cert_id ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_get_cert_id (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                             <em class="parameter"><code><span class="type">unsigned </span> indx</code></em>,
+                             <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-digest-algorithm-t" title="enum gnutls_digest_algorithm_t"><span class="type">gnutls_digest_algorithm_t</span></a> *digest</code></em>,
+                             <em class="parameter"><code><span class="type">gnutls_datum_t</span> *issuer_name_hash</code></em>,
+                             <em class="parameter"><code><span class="type">gnutls_datum_t</span> *issuer_key_hash</code></em>,
+                             <em class="parameter"><code><span class="type">gnutls_datum_t</span> *serial_number</code></em>);</pre>
+<p>This function will return the certificate information of the
+<em class="parameter"><code>indx</code></em>
+'ed request in the OCSP request.  The information returned
+corresponds to the CertID structure:</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2
+3
+4
+5</pre></td>
+        <td class="listing_code"><pre class="programlisting">CertID	  <span class="gtkdoc opt">::=</span>     SEQUENCE <span class="gtkdoc opt">{</span>
+hashAlgorithm       AlgorithmIdentifier<span class="gtkdoc opt">,</span>
+issuerNameHash      OCTET STRING<span class="gtkdoc opt">, --</span> Hash of Issuer<span class="string">'s DN</span>
+<span class="string">issuerKeyHash       OCTET STRING, -- Hash of Issuers public key</span>
+<span class="string">serialNumber	CertificateSerialNumber }</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p>Each of the pointers to output variables may be NULL to indicate
+that the caller is not interested in that value.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-get-cert-id.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>indx</p></td>
+<td class="parameter_description"><p>Specifies which extension OID to get. Use (0) to get the first one.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>digest</p></td>
+<td class="parameter_description"><p>output variable with <a class="link" href="gnutls-gnutls.html#gnutls-digest-algorithm-t" title="enum gnutls_digest_algorithm_t"><span class="type">gnutls_digest_algorithm_t</span></a> hash algorithm</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>issuer_name_hash</p></td>
+<td class="parameter_description"><p>output buffer with hash of issuer's DN</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>issuer_key_hash</p></td>
+<td class="parameter_description"><p>output buffer with hash of issuer's public key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>serial_number</p></td>
+<td class="parameter_description"><p>output buffer with serial number of certificate to check</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-get-cert-id.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.  If you have reached the last
+CertID available <a class="link" href="gnutls-gnutls.html#GNUTLS-E-REQUESTED-DATA-NOT-AVAILABLE:CAPS" title="GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE"><code class="literal">GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code></a> will be
+returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-get-extension"></a><h3>gnutls_ocsp_req_get_extension ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_get_extension (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                               <em class="parameter"><code><span class="type">unsigned </span> indx</code></em>,
+                               <em class="parameter"><code><span class="type">gnutls_datum_t</span> *oid</code></em>,
+                               <em class="parameter"><code>unsigned <span class="type">int</span> *critical</code></em>,
+                               <em class="parameter"><code><span class="type">gnutls_datum_t</span> *data</code></em>);</pre>
+<p>This function will return all information about the requested
+extension in the OCSP request.  The information returned is the
+OID, the critical flag, and the data itself.  The extension OID
+will be stored as a string.  Any of <em class="parameter"><code>oid</code></em>
+, <em class="parameter"><code>critical</code></em>
+, and <em class="parameter"><code>data</code></em>
+ may
+be NULL which means that the caller is not interested in getting
+that information back.</p>
+<p>The caller needs to deallocate memory by calling <code class="function">gnutls_free()</code> on
+<em class="parameter"><code>oid-&gt;data</code></em>
+ and <em class="parameter"><code>data-&gt;data</code></em>
+.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-get-extension.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>indx</p></td>
+<td class="parameter_description"><p>Specifies which extension OID to get. Use (0) to get the first one.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>oid</p></td>
+<td class="parameter_description"><p>will hold newly allocated buffer with OID of extension, may be NULL</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>critical</p></td>
+<td class="parameter_description"><p>output variable with critical flag, may be NULL.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>will hold newly allocated buffer with extension data, may be NULL</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-get-extension.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.  If you have reached the last
+extension available <a class="link" href="gnutls-gnutls.html#GNUTLS-E-REQUESTED-DATA-NOT-AVAILABLE:CAPS" title="GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE"><code class="literal">GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code></a> will
+be returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-get-nonce"></a><h3>gnutls_ocsp_req_get_nonce ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_get_nonce (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                           <em class="parameter"><code>unsigned <span class="type">int</span> *critical</code></em>,
+                           <em class="parameter"><code><span class="type">gnutls_datum_t</span> *nonce</code></em>);</pre>
+<p>This function will return the OCSP request nonce extension data.</p>
+<p>The caller needs to deallocate memory by calling <code class="function">gnutls_free()</code> on
+<em class="parameter"><code>nonce-&gt;data</code></em>
+.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-get-nonce.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>critical</p></td>
+<td class="parameter_description"><p>whether nonce extension is marked critical, or NULL</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>nonce</p></td>
+<td class="parameter_description"><p>will hold newly allocated buffer with nonce data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-get-nonce.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-get-version"></a><h3>gnutls_ocsp_req_get_version ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_get_version (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>);</pre>
+<p>This function will return the version of the OCSP request.
+Typically this is always 1 indicating version 1.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-get-version.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-get-version.returns"></a><h4>Returns</h4>
+<p> version of OCSP request, or a negative error code on error.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-import"></a><h3>gnutls_ocsp_req_import ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_import (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                        <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *data</code></em>);</pre>
+<p>This function will convert the given DER encoded OCSP request to
+the native <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> format. The output will be stored in
+<em class="parameter"><code>req</code></em>
+.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-import.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>The data to store the parsed request.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>DER encoded OCSP request.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-import.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-init"></a><h3>gnutls_ocsp_req_init ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_init (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> *req</code></em>);</pre>
+<p>This function will initialize an OCSP request structure.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-init.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>A pointer to the type to be initialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-init.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-print"></a><h3>gnutls_ocsp_req_print ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_print (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                       <em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-print-formats-t" title="enum gnutls_ocsp_print_formats_t"><span class="type">gnutls_ocsp_print_formats_t</span></a> format</code></em>,
+                       <em class="parameter"><code><span class="type">gnutls_datum_t</span> *out</code></em>);</pre>
+<p>This function will pretty print a OCSP request, suitable for
+display to a human.</p>
+<p>If the format is <a class="link" href="gnutls-ocsp.html#GNUTLS-OCSP-PRINT-FULL:CAPS"><code class="literal">GNUTLS_OCSP_PRINT_FULL</code></a> then all fields of the
+request will be output, on multiple lines.</p>
+<p>The output <em class="parameter"><code>out-&gt;data</code></em>
+ needs to be deallocate using <code class="function">gnutls_free()</code>.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-print.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>The data to be printed</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>Indicate the format to use</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>out</p></td>
+<td class="parameter_description"><p>Newly allocated datum with (0) terminated string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-print.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-randomize-nonce"></a><h3>gnutls_ocsp_req_randomize_nonce ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_randomize_nonce (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>);</pre>
+<p>This function will add or update an nonce extension to the OCSP
+request with a newly generated random value.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-randomize-nonce.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-randomize-nonce.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-set-extension"></a><h3>gnutls_ocsp_req_set_extension ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_set_extension (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                               <em class="parameter"><code>const <span class="type">char</span> *oid</code></em>,
+                               <em class="parameter"><code>unsigned <span class="type">int</span> critical</code></em>,
+                               <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *data</code></em>);</pre>
+<p>This function will add an extension to the OCSP request.  Calling
+this function multiple times for the same OID will overwrite values
+from earlier calls.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-set-extension.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>oid</p></td>
+<td class="parameter_description"><p>buffer with OID of extension as a string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>critical</p></td>
+<td class="parameter_description"><p>critical flag, normally false.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>the extension data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-set-extension.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-set-nonce"></a><h3>gnutls_ocsp_req_set_nonce ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_req_set_nonce (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> req</code></em>,
+                           <em class="parameter"><code>unsigned <span class="type">int</span> critical</code></em>,
+                           <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *nonce</code></em>);</pre>
+<p>This function will add an nonce extension to the OCSP request.
+Calling this function multiple times will overwrite values from
+earlier calls.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-set-nonce.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>req</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-req-t" title="gnutls_ocsp_req_t"><span class="type">gnutls_ocsp_req_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>critical</p></td>
+<td class="parameter_description"><p>critical flag, normally false.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>nonce</p></td>
+<td class="parameter_description"><p>the nonce data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-req-set-nonce.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-check-crt"></a><h3>gnutls_ocsp_resp_check_crt ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_check_crt (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                            <em class="parameter"><code>unsigned <span class="type">int</span> indx</code></em>,
+                            <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-x509-crt-t" title="gnutls_x509_crt_t"><span class="type">gnutls_x509_crt_t</span></a> crt</code></em>);</pre>
+<p>This function will check whether the OCSP response
+is about the provided certificate.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-check-crt.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>indx</p></td>
+<td class="parameter_description"><p>Specifies response number to get. Use (0) to get the first one.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>crt</p></td>
+<td class="parameter_description"><p>The certificate to check</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-check-crt.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.  </p>
+</div>
+<p class="since">Since: 3.1.3</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-deinit"></a><h3>gnutls_ocsp_resp_deinit ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+gnutls_ocsp_resp_deinit (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>);</pre>
+<p>This function will deinitialize a OCSP response structure.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-deinit.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>The data to be deinitialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-export"></a><h3>gnutls_ocsp_resp_export ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_export (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                         <em class="parameter"><code><span class="type">gnutls_datum_t</span> *data</code></em>);</pre>
+<p>This function will export the OCSP response to DER format.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-export.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>Holds the OCSP response</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>newly allocate buffer holding DER encoded OCSP response</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-export.returns"></a><h4>Returns</h4>
+<p> In case of failure a negative error code will be
+returned, and 0 on success.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-certs"></a><h3>gnutls_ocsp_resp_get_certs ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_certs (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                            <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-x509-crt-t" title="gnutls_x509_crt_t"><span class="type">gnutls_x509_crt_t</span></a> **certs</code></em>,
+                            <em class="parameter"><code><span class="type">size_t</span> *ncerts</code></em>);</pre>
+<p>This function will extract the X.509 certificates found in the
+Basic OCSP Response.  The <em class="parameter"><code>certs</code></em>
+ output variable will hold a newly
+allocated zero-terminated array with X.509 certificates.</p>
+<p>Every certificate in the array needs to be de-allocated with
+<a class="link" href="gnutls-x509.html#gnutls-x509-crt-deinit" title="gnutls_x509_crt_deinit ()"><code class="function">gnutls_x509_crt_deinit()</code></a> and the array itself must be freed using
+<code class="function">gnutls_free()</code>.</p>
+<p>Both the <em class="parameter"><code>certs</code></em>
+ and <em class="parameter"><code>ncerts</code></em>
+ variables may be NULL.  Then the
+function will work as normal but will not return the NULL:d
+information.  This can be used to get the number of certificates
+only, or to just get the certificate array without its size.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-certs.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>certs</p></td>
+<td class="parameter_description"><p>newly allocated array with <a class="link" href="gnutls-gnutls.html#gnutls-x509-crt-t" title="gnutls_x509_crt_t"><span class="type">gnutls_x509_crt_t</span></a> certificates</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ncerts</p></td>
+<td class="parameter_description"><p>output variable with number of allocated certs.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-certs.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-extension"></a><h3>gnutls_ocsp_resp_get_extension ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_extension (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                                <em class="parameter"><code><span class="type">unsigned </span> indx</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *oid</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> *critical</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *data</code></em>);</pre>
+<p>This function will return all information about the requested
+extension in the OCSP response.  The information returned is the
+OID, the critical flag, and the data itself.  The extension OID
+will be stored as a string.  Any of <em class="parameter"><code>oid</code></em>
+, <em class="parameter"><code>critical</code></em>
+, and <em class="parameter"><code>data</code></em>
+ may
+be NULL which means that the caller is not interested in getting
+that information back.</p>
+<p>The caller needs to deallocate memory by calling <code class="function">gnutls_free()</code> on
+<em class="parameter"><code>oid-&gt;data</code></em>
+ and <em class="parameter"><code>data-&gt;data</code></em>
+.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-extension.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>indx</p></td>
+<td class="parameter_description"><p>Specifies which extension OID to get. Use (0) to get the first one.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>oid</p></td>
+<td class="parameter_description"><p>will hold newly allocated buffer with OID of extension, may be NULL</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>critical</p></td>
+<td class="parameter_description"><p>output variable with critical flag, may be NULL.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>will hold newly allocated buffer with extension data, may be NULL</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-extension.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.  If you have reached the last
+extension available <a class="link" href="gnutls-gnutls.html#GNUTLS-E-REQUESTED-DATA-NOT-AVAILABLE:CAPS" title="GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE"><code class="literal">GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code></a> will
+be returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-nonce"></a><h3>gnutls_ocsp_resp_get_nonce ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_nonce (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                            <em class="parameter"><code>unsigned <span class="type">int</span> *critical</code></em>,
+                            <em class="parameter"><code><span class="type">gnutls_datum_t</span> *nonce</code></em>);</pre>
+<p>This function will return the Basic OCSP Response nonce extension
+data.</p>
+<p>The caller needs to deallocate memory by calling <code class="function">gnutls_free()</code> on
+<em class="parameter"><code>nonce-&gt;data</code></em>
+.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-nonce.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>critical</p></td>
+<td class="parameter_description"><p>whether nonce extension is marked critical</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>nonce</p></td>
+<td class="parameter_description"><p>will hold newly allocated buffer with nonce data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-nonce.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-produced"></a><h3>gnutls_ocsp_resp_get_produced ()</h3>
+<pre class="programlisting"><span class="returnvalue">time_t</span>
+gnutls_ocsp_resp_get_produced (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>);</pre>
+<p>This function will return the time when the OCSP response was
+signed.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-produced.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-produced.returns"></a><h4>Returns</h4>
+<p> signing time, or (time_t)-1 on error.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-responder"></a><h3>gnutls_ocsp_resp_get_responder ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_responder (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *dn</code></em>);</pre>
+<p>This function will extract the name of the Basic OCSP Response in
+the provided buffer. The name will be in the form
+"C=xxxx,O=yyyy,CN=zzzz" as described in RFC2253. The output string
+will be ASCII or UTF-8 encoded, depending on the certificate data.</p>
+<p>If the responder ID is not a name but a hash, this function
+will return zero and the <em class="parameter"><code>dn</code></em>
+ elements will be set to <code class="literal">NULL</code>.</p>
+<p>The caller needs to deallocate memory by calling <code class="function">gnutls_free()</code> on
+<em class="parameter"><code>dn-&gt;data</code></em>
+.</p>
+<p>This function does not output a fully RFC4514 compliant string, if
+that is required see <code class="function">gnutls_ocsp_resp_get_responder2()</code>.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-responder.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>dn</p></td>
+<td class="parameter_description"><p>newly allocated buffer with name</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-responder.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned. When no data exist it will
+return success and set <em class="parameter"><code>dn</code></em>
+elements to zero.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-response"></a><h3>gnutls_ocsp_resp_get_response ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_response (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                               <em class="parameter"><code><span class="type">gnutls_datum_t</span> *response_type_oid</code></em>,
+                               <em class="parameter"><code><span class="type">gnutls_datum_t</span> *response</code></em>);</pre>
+<p>This function will extract the response type OID in and the
+response data from an OCSP response.  Normally the
+<em class="parameter"><code>response_type_oid</code></em>
+ is always "1.3.6.1.5.5.7.48.1.1" which means the
+<em class="parameter"><code>response</code></em>
+ should be decoded as a Basic OCSP Response, but
+technically other response types could be used.</p>
+<p>This function is typically only useful when you want to extract the
+response type OID of an response for diagnostic purposes.
+Otherwise <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-import" title="gnutls_ocsp_resp_import ()"><code class="function">gnutls_ocsp_resp_import()</code></a> will decode the basic OCSP
+response part and the caller need not worry about that aspect.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-response.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>response_type_oid</p></td>
+<td class="parameter_description"><p>newly allocated output buffer with response type OID</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>response</p></td>
+<td class="parameter_description"><p>newly allocated output buffer with DER encoded response</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-response.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-signature"></a><h3>gnutls_ocsp_resp_get_signature ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_signature (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                                <em class="parameter"><code><span class="type">gnutls_datum_t</span> *sig</code></em>);</pre>
+<p>This function will extract the signature field of a OCSP response.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-signature.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>sig</p></td>
+<td class="parameter_description"><p>newly allocated output buffer with signature data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-signature.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-signature-algorithm"></a><h3>gnutls_ocsp_resp_get_signature_algorithm ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_signature_algorithm
+                               (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>);</pre>
+<p>This function will return a value of the <a class="link" href="gnutls-gnutls.html#gnutls-sign-algorithm-t" title="enum gnutls_sign_algorithm_t"><span class="type">gnutls_sign_algorithm_t</span></a>
+enumeration that is the signature algorithm that has been used to
+sign the OCSP response.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-signature-algorithm.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-signature-algorithm.returns"></a><h4>Returns</h4>
+<p> a <a class="link" href="gnutls-gnutls.html#gnutls-sign-algorithm-t" title="enum gnutls_sign_algorithm_t"><span class="type">gnutls_sign_algorithm_t</span></a> value, or a negative error code
+on error.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-single"></a><h3>gnutls_ocsp_resp_get_single ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_single (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                             <em class="parameter"><code><span class="type">unsigned </span> indx</code></em>,
+                             <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-digest-algorithm-t" title="enum gnutls_digest_algorithm_t"><span class="type">gnutls_digest_algorithm_t</span></a> *digest</code></em>,
+                             <em class="parameter"><code><span class="type">gnutls_datum_t</span> *issuer_name_hash</code></em>,
+                             <em class="parameter"><code><span class="type">gnutls_datum_t</span> *issuer_key_hash</code></em>,
+                             <em class="parameter"><code><span class="type">gnutls_datum_t</span> *serial_number</code></em>,
+                             <em class="parameter"><code>unsigned <span class="type">int</span> *cert_status</code></em>,
+                             <em class="parameter"><code><span class="type">time_t</span> *this_update</code></em>,
+                             <em class="parameter"><code><span class="type">time_t</span> *next_update</code></em>,
+                             <em class="parameter"><code><span class="type">time_t</span> *revocation_time</code></em>,
+                             <em class="parameter"><code>unsigned <span class="type">int</span> *revocation_reason</code></em>);</pre>
+<p>This function will return the certificate information of the
+<em class="parameter"><code>indx</code></em>
+'ed response in the Basic OCSP Response <em class="parameter"><code>resp</code></em>
+.  The
+information returned corresponds to the OCSP SingleResponse structure
+except the final singleExtensions.</p>
+<p>Each of the pointers to output variables may be NULL to indicate
+that the caller is not interested in that value.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-single.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>indx</p></td>
+<td class="parameter_description"><p>Specifies response number to get. Use (0) to get the first one.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>digest</p></td>
+<td class="parameter_description"><p>output variable with <a class="link" href="gnutls-gnutls.html#gnutls-digest-algorithm-t" title="enum gnutls_digest_algorithm_t"><span class="type">gnutls_digest_algorithm_t</span></a> hash algorithm</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>issuer_name_hash</p></td>
+<td class="parameter_description"><p>output buffer with hash of issuer's DN</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>issuer_key_hash</p></td>
+<td class="parameter_description"><p>output buffer with hash of issuer's public key</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>serial_number</p></td>
+<td class="parameter_description"><p>output buffer with serial number of certificate to check</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>cert_status</p></td>
+<td class="parameter_description"><p>a certificate status, a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-cert-status-t" title="enum gnutls_ocsp_cert_status_t"><span class="type">gnutls_ocsp_cert_status_t</span></a> enum.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>this_update</p></td>
+<td class="parameter_description"><p>time at which the status is known to be correct.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>next_update</p></td>
+<td class="parameter_description"><p>when newer information will be available, or (time_t)-1 if unspecified</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>revocation_time</p></td>
+<td class="parameter_description"><p>when <em class="parameter"><code>cert_status</code></em>
+is <a class="link" href="gnutls-ocsp.html#GNUTLS-OCSP-CERT-REVOKED:CAPS"><code class="literal">GNUTLS_OCSP_CERT_REVOKED</code></a>, holds time of revocation.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>revocation_reason</p></td>
+<td class="parameter_description"><p>revocation reason, a <a class="link" href="gnutls-ocsp.html#gnutls-x509-crl-reason-t" title="enum gnutls_x509_crl_reason_t"><span class="type">gnutls_x509_crl_reason_t</span></a> enum.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-single.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error code is returned.  If you have reached the last
+CertID available <a class="link" href="gnutls-gnutls.html#GNUTLS-E-REQUESTED-DATA-NOT-AVAILABLE:CAPS" title="GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE"><code class="literal">GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</code></a> will be
+returned.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-status"></a><h3>gnutls_ocsp_resp_get_status ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_status (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>);</pre>
+<p>This function will return the status of a OCSP response, an
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-status-t" title="enum gnutls_ocsp_resp_status_t"><span class="type">gnutls_ocsp_resp_status_t</span></a> enumeration.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-status.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-status.returns"></a><h4>Returns</h4>
+<p> status of OCSP request as a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-status-t" title="enum gnutls_ocsp_resp_status_t"><span class="type">gnutls_ocsp_resp_status_t</span></a>, or
+a negative error code on error.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-get-version"></a><h3>gnutls_ocsp_resp_get_version ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_get_version (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>);</pre>
+<p>This function will return the version of the Basic OCSP Response.
+Typically this is always 1 indicating version 1.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-version.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-get-version.returns"></a><h4>Returns</h4>
+<p> version of Basic OCSP response, or a negative error code
+on error.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-import"></a><h3>gnutls_ocsp_resp_import ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_import (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                         <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *data</code></em>);</pre>
+<p>This function will convert the given DER encoded OCSP response to
+the native <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> format.  It also decodes the Basic
+OCSP Response part, if any.  The output will be stored in <em class="parameter"><code>resp</code></em>
+.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-import.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>The data to store the parsed response.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>data</p></td>
+<td class="parameter_description"><p>DER encoded OCSP response.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-import.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-init"></a><h3>gnutls_ocsp_resp_init ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_init (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> *resp</code></em>);</pre>
+<p>This function will initialize an OCSP response structure.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-init.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>A pointer to the type to be initialized</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-init.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-print"></a><h3>gnutls_ocsp_resp_print ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_print (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                        <em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-print-formats-t" title="enum gnutls_ocsp_print_formats_t"><span class="type">gnutls_ocsp_print_formats_t</span></a> format</code></em>,
+                        <em class="parameter"><code><span class="type">gnutls_datum_t</span> *out</code></em>);</pre>
+<p>This function will pretty print a OCSP response, suitable for
+display to a human.</p>
+<p>If the format is <a class="link" href="gnutls-ocsp.html#GNUTLS-OCSP-PRINT-FULL:CAPS"><code class="literal">GNUTLS_OCSP_PRINT_FULL</code></a> then all fields of the
+response will be output, on multiple lines.</p>
+<p>The output <em class="parameter"><code>out-&gt;data</code></em>
+ needs to be deallocate using <code class="function">gnutls_free()</code>.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-print.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>The data to be printed</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>format</p></td>
+<td class="parameter_description"><p>Indicate the format to use</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>out</p></td>
+<td class="parameter_description"><p>Newly allocated datum with (0) terminated string.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-print.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-verify"></a><h3>gnutls_ocsp_resp_verify ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_verify (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                         <em class="parameter"><code><a class="link" href="gnutls-x509.html#gnutls-x509-trust-list-t" title="gnutls_x509_trust_list_t"><span class="type">gnutls_x509_trust_list_t</span></a> trustlist</code></em>,
+                         <em class="parameter"><code>unsigned <span class="type">int</span> *verify</code></em>,
+                         <em class="parameter"><code>unsigned <span class="type">int</span> flags</code></em>);</pre>
+<p>Verify signature of the Basic OCSP Response against the public key
+in the certificate of a trusted signer.  The <em class="parameter"><code>trustlist</code></em>
+ should be
+populated with trust anchors.  The function will extract the signer
+certificate from the Basic OCSP Response and will verify it against
+the <em class="parameter"><code>trustlist</code></em>
+.  A trusted signer is a certificate that is either
+in <em class="parameter"><code>trustlist</code></em>
+, or it is signed directly by a certificate in
+<em class="parameter"><code>trustlist</code></em>
+ and has the id-ad-ocspSigning Extended Key Usage bit
+set.</p>
+<p>The output <em class="parameter"><code>verify</code></em>
+ variable will hold verification status codes
+(e.g., <a class="link" href="gnutls-ocsp.html#GNUTLS-OCSP-VERIFY-SIGNER-NOT-FOUND:CAPS"><code class="literal">GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND</code></a>,
+<a class="link" href="gnutls-ocsp.html#GNUTLS-OCSP-VERIFY-INSECURE-ALGORITHM:CAPS"><code class="literal">GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM</code></a>) which are only valid if the
+function returned <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a>.</p>
+<p>Note that the function returns <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> even when
+verification failed.  The caller must always inspect the <em class="parameter"><code>verify</code></em>
+
+variable to find out the verification status.</p>
+<p>The <em class="parameter"><code>flags</code></em>
+ variable should be 0 for now.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-verify.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>trustlist</p></td>
+<td class="parameter_description"><p>trust anchors as a <a class="link" href="gnutls-x509.html#gnutls-x509-trust-list-t" title="gnutls_x509_trust_list_t"><span class="type">gnutls_x509_trust_list_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>verify</p></td>
+<td class="parameter_description"><p>output variable with verification status, an <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-verify-reason-t" title="enum gnutls_ocsp_verify_reason_t"><span class="type">gnutls_ocsp_verify_reason_t</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>verification flags from <a class="link" href="gnutls-x509.html#gnutls-certificate-verify-flags" title="enum gnutls_certificate_verify_flags"><span class="type">gnutls_certificate_verify_flags</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-verify.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-verify-direct"></a><h3>gnutls_ocsp_resp_verify_direct ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+gnutls_ocsp_resp_verify_direct (<em class="parameter"><code><a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> resp</code></em>,
+                                <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-x509-crt-t" title="gnutls_x509_crt_t"><span class="type">gnutls_x509_crt_t</span></a> issuer</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> *verify</code></em>,
+                                <em class="parameter"><code>unsigned <span class="type">int</span> flags</code></em>);</pre>
+<p>Verify signature of the Basic OCSP Response against the public key
+in the <em class="parameter"><code>issuer</code></em>
+ certificate.</p>
+<p>The output <em class="parameter"><code>verify</code></em>
+ variable will hold verification status codes
+(e.g., <a class="link" href="gnutls-ocsp.html#GNUTLS-OCSP-VERIFY-SIGNER-NOT-FOUND:CAPS"><code class="literal">GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND</code></a>,
+<a class="link" href="gnutls-ocsp.html#GNUTLS-OCSP-VERIFY-INSECURE-ALGORITHM:CAPS"><code class="literal">GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM</code></a>) which are only valid if the
+function returned <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a>.</p>
+<p>Note that the function returns <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> even when
+verification failed.  The caller must always inspect the <em class="parameter"><code>verify</code></em>
+
+variable to find out the verification status.</p>
+<p>The <em class="parameter"><code>flags</code></em>
+ variable should be 0 for now.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-verify-direct.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>resp</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-t" title="gnutls_ocsp_resp_t"><span class="type">gnutls_ocsp_resp_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>issuer</p></td>
+<td class="parameter_description"><p>certificate believed to have signed the response</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>verify</p></td>
+<td class="parameter_description"><p>output variable with verification status, an <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-verify-reason-t" title="enum gnutls_ocsp_verify_reason_t"><span class="type">gnutls_ocsp_verify_reason_t</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>flags</p></td>
+<td class="parameter_description"><p>verification flags from <a class="link" href="gnutls-x509.html#gnutls-certificate-verify-flags" title="enum gnutls_certificate_verify_flags"><span class="type">gnutls_certificate_verify_flags</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-verify-direct.returns"></a><h4>Returns</h4>
+<p> On success, <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" title="GNUTLS_E_SUCCESS"><code class="literal">GNUTLS_E_SUCCESS</code></a> (0) is returned, otherwise a
+negative error value.</p>
+</div>
+</div>
+</div>
+<div class="refsect1">
+<a name="gnutls-ocsp.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="GNUTLS-OCSP-NONCE:CAPS"></a><h3>GNUTLS_OCSP_NONCE</h3>
+<pre class="programlisting">#define GNUTLS_OCSP_NONCE "1.3.6.1.5.5.7.48.1.2"
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-cert-status-t"></a><h3>enum gnutls_ocsp_cert_status_t</h3>
+<p>Enumeration of different OCSP response certificate status codes.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-cert-status-t.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-CERT-GOOD:CAPS"></a>GNUTLS_OCSP_CERT_GOOD</p></td>
+<td class="enum_member_description">
+<p>Positive response to status inquiry.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-CERT-REVOKED:CAPS"></a>GNUTLS_OCSP_CERT_REVOKED</p></td>
+<td class="enum_member_description">
+<p>Certificate has been revoked.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-CERT-UNKNOWN:CAPS"></a>GNUTLS_OCSP_CERT_UNKNOWN</p></td>
+<td class="enum_member_description">
+<p>The responder doesn't know about the
+  certificate.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-print-formats-t"></a><h3>enum gnutls_ocsp_print_formats_t</h3>
+<p>Enumeration of different OCSP printing variants.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-print-formats-t.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-PRINT-FULL:CAPS"></a>GNUTLS_OCSP_PRINT_FULL</p></td>
+<td class="enum_member_description">
+<p>Full information about OCSP request/response.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-PRINT-COMPACT:CAPS"></a>GNUTLS_OCSP_PRINT_COMPACT</p></td>
+<td class="enum_member_description">
+<p>More compact information about OCSP request/response.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-int"></a><h3>struct gnutls_ocsp_req_int</h3>
+<pre class="programlisting">struct gnutls_ocsp_req_int;</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-req-t"></a><h3>gnutls_ocsp_req_t</h3>
+<pre class="programlisting">typedef struct gnutls_ocsp_req_int *gnutls_ocsp_req_t;
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-int"></a><h3>struct gnutls_ocsp_resp_int</h3>
+<pre class="programlisting">struct gnutls_ocsp_resp_int;</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-status-t"></a><h3>enum gnutls_ocsp_resp_status_t</h3>
+<p>Enumeration of different OCSP response status codes.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-resp-status-t.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-RESP-SUCCESSFUL:CAPS"></a>GNUTLS_OCSP_RESP_SUCCESSFUL</p></td>
+<td class="enum_member_description">
+<p>Response has valid confirmations.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-RESP-MALFORMEDREQUEST:CAPS"></a>GNUTLS_OCSP_RESP_MALFORMEDREQUEST</p></td>
+<td class="enum_member_description">
+<p>Illegal confirmation request</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-RESP-INTERNALERROR:CAPS"></a>GNUTLS_OCSP_RESP_INTERNALERROR</p></td>
+<td class="enum_member_description">
+<p>Internal error in issuer</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-RESP-TRYLATER:CAPS"></a>GNUTLS_OCSP_RESP_TRYLATER</p></td>
+<td class="enum_member_description">
+<p>Try again later</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-RESP-SIGREQUIRED:CAPS"></a>GNUTLS_OCSP_RESP_SIGREQUIRED</p></td>
+<td class="enum_member_description">
+<p>Must sign the request</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-RESP-UNAUTHORIZED:CAPS"></a>GNUTLS_OCSP_RESP_UNAUTHORIZED</p></td>
+<td class="enum_member_description">
+<p>Request unauthorized</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-resp-t"></a><h3>gnutls_ocsp_resp_t</h3>
+<pre class="programlisting">typedef struct gnutls_ocsp_resp_int *gnutls_ocsp_resp_t;
+</pre>
+<p>
+</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-ocsp-verify-reason-t"></a><h3>enum gnutls_ocsp_verify_reason_t</h3>
+<p>Enumeration of OCSP verify status codes, used by
+<a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-verify" title="gnutls_ocsp_resp_verify ()"><code class="function">gnutls_ocsp_resp_verify()</code></a> and <a class="link" href="gnutls-ocsp.html#gnutls-ocsp-resp-verify-direct" title="gnutls_ocsp_resp_verify_direct ()"><code class="function">gnutls_ocsp_resp_verify_direct()</code></a>.</p>
+<div class="refsect3">
+<a name="gnutls-ocsp-verify-reason-t.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-VERIFY-SIGNER-NOT-FOUND:CAPS"></a>GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND</p></td>
+<td class="enum_member_description">
+<p>Signer cert not found.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-VERIFY-SIGNER-KEYUSAGE-ERROR:CAPS"></a>GNUTLS_OCSP_VERIFY_SIGNER_KEYUSAGE_ERROR</p></td>
+<td class="enum_member_description">
+<p>Signer keyusage bits incorrect.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-VERIFY-UNTRUSTED-SIGNER:CAPS"></a>GNUTLS_OCSP_VERIFY_UNTRUSTED_SIGNER</p></td>
+<td class="enum_member_description">
+<p>Signer is not trusted.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-VERIFY-INSECURE-ALGORITHM:CAPS"></a>GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM</p></td>
+<td class="enum_member_description">
+<p>Signature using insecure algorithm.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-VERIFY-SIGNATURE-FAILURE:CAPS"></a>GNUTLS_OCSP_VERIFY_SIGNATURE_FAILURE</p></td>
+<td class="enum_member_description">
+<p>Signature mismatch.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-VERIFY-CERT-NOT-ACTIVATED:CAPS"></a>GNUTLS_OCSP_VERIFY_CERT_NOT_ACTIVATED</p></td>
+<td class="enum_member_description">
+<p>Signer cert is not yet activated.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-OCSP-VERIFY-CERT-EXPIRED:CAPS"></a>GNUTLS_OCSP_VERIFY_CERT_EXPIRED</p></td>
+<td class="enum_member_description">
+<p>Signer cert has expired.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="gnutls-x509-crl-reason-t"></a><h3>enum gnutls_x509_crl_reason_t</h3>
+<p>Enumeration of different reason codes.  Note that this
+corresponds to the CRLReason ASN.1 enumeration type, and not the
+ReasonFlags ASN.1 bit string.</p>
+<div class="refsect3">
+<a name="gnutls-x509-crl-reason-t.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-UNSPECIFIED:CAPS"></a>GNUTLS_X509_CRLREASON_UNSPECIFIED</p></td>
+<td class="enum_member_description">
+<p>Unspecified reason.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-KEYCOMPROMISE:CAPS"></a>GNUTLS_X509_CRLREASON_KEYCOMPROMISE</p></td>
+<td class="enum_member_description">
+<p>Private key compromised.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-CACOMPROMISE:CAPS"></a>GNUTLS_X509_CRLREASON_CACOMPROMISE</p></td>
+<td class="enum_member_description">
+<p>CA compromised.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-AFFILIATIONCHANGED:CAPS"></a>GNUTLS_X509_CRLREASON_AFFILIATIONCHANGED</p></td>
+<td class="enum_member_description">
+<p>Affiliation has changed.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-SUPERSEDED:CAPS"></a>GNUTLS_X509_CRLREASON_SUPERSEDED</p></td>
+<td class="enum_member_description">
+<p>Certificate superseded.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-CESSATIONOFOPERATION:CAPS"></a>GNUTLS_X509_CRLREASON_CESSATIONOFOPERATION</p></td>
+<td class="enum_member_description">
+<p>Operation has ceased.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-CERTIFICATEHOLD:CAPS"></a>GNUTLS_X509_CRLREASON_CERTIFICATEHOLD</p></td>
+<td class="enum_member_description">
+<p>Certificate is on hold.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-REMOVEFROMCRL:CAPS"></a>GNUTLS_X509_CRLREASON_REMOVEFROMCRL</p></td>
+<td class="enum_member_description">
+<p>Will be removed from delta CRL.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-PRIVILEGEWITHDRAWN:CAPS"></a>GNUTLS_X509_CRLREASON_PRIVILEGEWITHDRAWN</p></td>
+<td class="enum_member_description">
+<p>Privilege withdrawn.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="GNUTLS-X509-CRLREASON-AACOMPROMISE:CAPS"></a>GNUTLS_X509_CRLREASON_AACOMPROMISE</p></td>
+<td class="enum_member_description">
+<p>AA compromised.</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>Generated by GTK-Doc V1.25</div>
+</body>
+</html>

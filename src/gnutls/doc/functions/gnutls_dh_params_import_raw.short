@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_dh_params_import_raw} (gnutls_dh_params_t @var{dh_params}, const gnutls_datum_t * @var{prime}, const gnutls_datum_t * @var{generator})

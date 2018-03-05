@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {void *} {gnutls_db_get_ptr} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Get db function pointer.
+
+@strong{Returns:} the pointer that will be sent to db store, retrieve and
+delete functions, as the first argument.
+@end deftypefun

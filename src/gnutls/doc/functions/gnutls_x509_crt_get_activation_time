@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {time_t} {gnutls_x509_crt_get_activation_time} (gnutls_x509_crt_t @var{cert})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+This function will return the time this Certificate was or will be
+activated.
+
+@strong{Returns:} activation time, or (time_t)-1 on error.
+@end deftypefun

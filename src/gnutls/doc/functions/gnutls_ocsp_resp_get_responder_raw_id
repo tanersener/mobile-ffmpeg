@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_get_responder_raw_id} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{type}, gnutls_datum_t * @var{raw})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+@var{type}: should be @code{GNUTLS_OCSP_RESP_ID_KEY}  or @code{GNUTLS_OCSP_RESP_ID_DN} 
+
+@var{raw}: newly allocated buffer with the raw ID
+
+This function will extract the raw key (or DN) ID of the Basic OCSP Response in
+the provided buffer. If the responder ID is not a key ID then
+this function will return @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} .
+
+The caller needs to deallocate memory by calling @code{gnutls_free()}  on
+ @code{dn} ->data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.
+@end deftypefun

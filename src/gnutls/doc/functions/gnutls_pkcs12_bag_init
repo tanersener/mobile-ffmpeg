@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_init} (gnutls_pkcs12_bag_t * @var{bag})
+@var{bag}: A pointer to the type to be initialized
+
+This function will initialize a PKCS12 bag structure. PKCS12 Bags
+usually contain private keys, lists of X.509 Certificates and X.509
+Certificate revocation lists.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

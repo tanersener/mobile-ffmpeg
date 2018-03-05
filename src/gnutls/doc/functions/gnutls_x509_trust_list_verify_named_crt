@@ -1,0 +1,35 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_trust_list_verify_named_crt} (gnutls_x509_trust_list_t @var{list}, gnutls_x509_crt_t @var{cert}, const void * @var{name}, size_t @var{name_size}, unsigned int @var{flags}, unsigned int * @var{voutput}, gnutls_verify_output_function @var{func})
+@var{list}: The list
+
+@var{cert}: is the certificate to be verified
+
+@var{name}: is the certificate's name
+
+@var{name_size}: is the certificate's name size
+
+@var{flags}: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+
+@var{voutput}: will hold the certificate verification output.
+
+@var{func}: If non-null will be called on each chain element verification with the output.
+
+This function will try to find a certificate that is associated with the provided
+name --see @code{gnutls_x509_trust_list_add_named_crt()} . If a match is found the
+certificate is considered valid. In addition to that this function will also 
+check CRLs. The  @code{voutput} parameter will hold an OR'ed sequence of 
+@code{gnutls_certificate_status_t}  flags.
+
+Additionally a certificate verification profile can be specified
+from the ones in @code{gnutls_certificate_verification_profiles_t}  by
+ORing the result of @code{GNUTLS_PROFILE_TO_VFLAGS()}  to the verification
+flags.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0.0
+@end deftypefun

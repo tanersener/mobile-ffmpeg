@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_system_key_delete} (const char * @var{cert_url}, const char * @var{key_url})
+@var{cert_url}: the URL of the certificate
+
+@var{key_url}: the URL of the key
+
+This function will delete the key and certificate pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.0
+@end deftypefun

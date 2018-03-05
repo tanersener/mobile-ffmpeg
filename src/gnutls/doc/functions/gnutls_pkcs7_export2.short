@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs7_export2} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_fmt_t @var{format}, gnutls_datum_t * @var{out})

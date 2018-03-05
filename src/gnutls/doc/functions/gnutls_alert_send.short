@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_alert_send} (gnutls_session_t @var{session}, gnutls_alert_level_t @var{level}, gnutls_alert_description_t @var{desc})

@@ -1,0 +1,14 @@
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_decrypt} (gnutls_pkcs12_bag_t @var{bag}, const char * @var{pass})
+@var{bag}: The bag
+
+@var{pass}: The password used for encryption, must be ASCII.
+
+This function will decrypt the given encrypted bag and return 0 on
+success.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun

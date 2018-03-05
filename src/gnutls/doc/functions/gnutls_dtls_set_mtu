@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {void} {gnutls_dtls_set_mtu} (gnutls_session_t @var{session}, unsigned int @var{mtu})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{mtu}: The maximum transfer unit of the transport
+
+This function will set the maximum transfer unit of the transport
+that DTLS packets are sent over. Note that this should exclude
+the IP (or IPv6) and UDP headers. So for DTLS over IPv6 on an
+Ethernet device with MTU 1500, the DTLS MTU set with this function
+would be 1500 - 40 (IPV6 header) - 8 (UDP header) = 1452.
+
+@strong{Since:} 3.0
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_tpm_privkey_generate} (gnutls_pk_algorithm_t @var{pk}, unsigned int @var{bits}, const char * @var{srk_password}, const char * @var{key_password}, gnutls_tpmkey_fmt_t @var{format}, gnutls_x509_crt_fmt_t @var{pub_format}, gnutls_datum_t * @var{privkey}, gnutls_datum_t * @var{pubkey}, unsigned int @var{flags})

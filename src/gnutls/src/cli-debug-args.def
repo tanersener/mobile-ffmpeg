@@ -1,0 +1,112 @@
+AutoGen Definitions options;
+prog-name     = gnutls-cli-debug;
+prog-title    = "GnuTLS debug client";
+prog-desc     = "Simple client program to check TLS server capabilities.";
+short-usage   = "Usage: gnutls-cli-debug [options] hostname\n"
+                "gnutls-cli --help for usage instructions.\n";
+explain       = "";
+detail        = "TLS debug client. It sets up multiple TLS connections to 
+a server and queries its capabilities. It was created to assist in debugging 
+GnuTLS, but it might be useful to extract a TLS server's capabilities.
+It connects to a TLS server, performs tests and print the server's 
+capabilities. If called with the `-V' parameter more checks will be performed.
+Can be used to check for servers with special needs or bugs.";
+reorder-args;
+argument;
+
+#define  VERBOSE_OPT 1
+#include args-std.def
+
+flag = {
+    name      = port;
+    value     = p;
+    arg-type  = number;
+    arg-range = "0 -> 65536";
+    descrip   = "The port to connect to";
+    doc      = "";
+};
+
+flag = {
+    name      = app-proto;
+    aliases   = starttls-proto;
+};
+
+flag = {
+    name      = starttls-proto;
+    arg-type  = string;
+    descrip   = "The application protocol to be used to obtain the server's certificate (https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)";
+    doc      = "Specify the application layer protocol for STARTTLS. If the protocol is supported, gnutls-cli will proceed to the TLS negotiation.";
+};
+
+
+doc-section = {
+  ds-type   = 'SEE ALSO'; // or anything else
+  ds-format = 'texi';      // or texi or mdoc format
+  ds-text   = <<-_EOText_
+gnutls-cli(1), gnutls-serv(1)
+_EOText_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOF_
+@example
+$ gnutls-cli-debug localhost
+GnuTLS debug client 3.5.0
+Checking localhost:443
+                             for SSL 3.0 (RFC6101) support... yes
+                        whether we need to disable TLS 1.2... no
+                        whether we need to disable TLS 1.1... no
+                        whether we need to disable TLS 1.0... no
+                        whether %NO_EXTENSIONS is required... no
+                               whether %COMPAT is required... no
+                             for TLS 1.0 (RFC2246) support... yes
+                             for TLS 1.1 (RFC4346) support... yes
+                             for TLS 1.2 (RFC5246) support... yes
+                                  fallback from TLS 1.6 to... TLS1.2
+                        for RFC7507 inappropriate fallback... yes
+                                     for HTTPS server name... Local
+                               for certificate chain order... sorted
+                  for safe renegotiation (RFC5746) support... yes
+                     for Safe renegotiation support (SCSV)... no
+                    for encrypt-then-MAC (RFC7366) support... no
+                   for ext master secret (RFC7627) support... no
+                           for heartbeat (RFC6520) support... no
+                       for version rollback bug in RSA PMS... dunno
+                  for version rollback bug in Client Hello... no
+            whether the server ignores the RSA PMS version... yes
+whether small records (512 bytes) are tolerated on handshake... yes
+    whether cipher suites not in SSL 3.0 spec are accepted... yes
+whether a bogus TLS record version in the client hello is accepted... yes
+         whether the server understands TLS closure alerts... partially
+            whether the server supports session resumption... yes
+                      for anonymous authentication support... no
+                      for ephemeral Diffie-Hellman support... no
+                   for ephemeral EC Diffie-Hellman support... yes
+                    ephemeral EC Diffie-Hellman group info... SECP256R1
+                  for AES-128-GCM cipher (RFC5288) support... yes
+                  for AES-128-CCM cipher (RFC6655) support... no
+                for AES-128-CCM-8 cipher (RFC6655) support... no
+                  for AES-128-CBC cipher (RFC3268) support... yes
+             for CAMELLIA-128-GCM cipher (RFC6367) support... no
+             for CAMELLIA-128-CBC cipher (RFC5932) support... no
+                     for 3DES-CBC cipher (RFC2246) support... yes
+                  for ARCFOUR 128 cipher (RFC2246) support... yes
+                                       for MD5 MAC support... yes
+                                      for SHA1 MAC support... yes
+                                    for SHA256 MAC support... yes
+                              for ZLIB compression support... no
+                     for max record size (RFC6066) support... no
+                for OCSP status response (RFC6066) support... no
+              for OpenPGP authentication (RFC6091) support... no
+@end example
+
+You could also use the client to debug services with starttls capability.
+@example
+$ gnutls-cli-debug --starttls-proto smtp --port 25 localhost
+@end example
+
+_EOF_;
+};
+

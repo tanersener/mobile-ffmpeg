@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_idna_reverse_map} (const char * @var{input}, unsigned @var{ilen}, gnutls_datum_t * @var{out}, unsigned @var{flags})

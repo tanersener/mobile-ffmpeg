@@ -1,0 +1,176 @@
+<!-- ##### SECTION Title ##### -->
+main
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO BUFSIZE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO DEBUG_PKT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO DEF_BLOCKBITS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO DEF_BLOCKSIZE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO IS_UID_REV ##### -->
+<para>
+
+</para>
+
+@s: 
+
+
+<!-- ##### MACRO IS_UID_SIG ##### -->
+<para>
+
+</para>
+
+@s: 
+
+
+<!-- ##### MACRO KEY_CAN_AUTH ##### -->
+<para>
+
+</para>
+
+@a: 
+
+
+<!-- ##### MACRO KEY_CAN_ENCRYPT ##### -->
+<para>
+
+</para>
+
+@a: 
+
+
+<!-- ##### MACRO KEY_CAN_SIGN ##### -->
+<para>
+
+</para>
+
+@a: 
+
+
+<!-- ##### MACRO KEY_FPR_LEN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MAX_DIGEST_LEN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MAX_MPI_BITS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MAX_MPI_BYTES ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO cdk_calloc ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO cdk_free ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO cdk_malloc ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO cdk_realloc ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO cdk_salloc ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO cdk_strdup ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO map_gnutls_error ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO stristr ##### -->
+<para>
+
+</para>
+
+@haystack: 
+@needle: 
+
+

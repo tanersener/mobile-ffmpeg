@@ -1,0 +1,38 @@
+<!-- ##### SECTION Title ##### -->
+gnutls_state
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO CHECK_AUTH ##### -->
+<para>
+
+</para>
+
+@auth: 
+@ret: 
+
+
+<!-- ##### MACRO DEFAULT_CERT_TYPE ##### -->
+<para>
+
+</para>
+
+
+

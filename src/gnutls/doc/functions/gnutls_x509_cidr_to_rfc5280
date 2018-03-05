@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_cidr_to_rfc5280} (const char * @var{cidr}, gnutls_datum_t * @var{cidr_rfc5280})
+@var{cidr}: CIDR in RFC4632 format (IP/prefix), null-terminated
+
+@var{cidr_rfc5280}: CIDR range converted to RFC5280 format
+
+This function will convert text CIDR range with prefix (such as '10.0.0.0/8')
+to RFC5280 (IP address in network byte order followed by its network mask).
+Works for both IPv4 and IPv6.
+
+The resulting object is directly usable for IP name constraints usage,
+for example in functions @code{gnutls_x509_name_constraints_add_permitted} 
+or @code{gnutls_x509_name_constraints_add_excluded} .
+
+The data in datum needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.5.4
+@end deftypefun

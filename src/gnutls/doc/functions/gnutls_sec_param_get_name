@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_sec_param_get_name} (gnutls_sec_param_t @var{param})
+@var{param}: is a security parameter
+
+Convert a @code{gnutls_sec_param_t}  value to a string.
+
+@strong{Returns:} a pointer to a string that contains the name of the
+specified security level, or @code{NULL} .
+
+@strong{Since:} 2.12.0
+@end deftypefun

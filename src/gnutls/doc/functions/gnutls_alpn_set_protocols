@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_alpn_set_protocols} (gnutls_session_t @var{session}, const gnutls_datum_t * @var{protocols}, unsigned @var{protocols_size}, unsigned int @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{protocols}: is the protocol names to add.
+
+@var{protocols_size}: the number of protocols to add.
+
+@var{flags}: zero or a sequence of @code{gnutls_alpn_flags_t} 
+
+This function is to be used by both clients and servers, to declare
+the supported ALPN protocols, which are used during negotiation with peer.
+
+See @code{gnutls_alpn_flags_t}  description for the documentation of available
+flags.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+Since 3.2.0
+@end deftypefun

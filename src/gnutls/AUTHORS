@@ -1,0 +1,56 @@
+GnuTLS AUTHORS -- Information about the authors.
+Copyright (C) 2000-2012 Free Software Foundation, Inc.
+See the end for copying conditions.
+
+The copyright holder for GnuTLS is Free Software Foundation, Inc., 51
+Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+Simon Josefsson *simon [at] josefsson.org*
+Previous maintainer; draft TLS 1.2 support.
+
+Nikos Mavrogiannopoulos *nmav [at] gnutls.org*
+Original author and maintainer of GnuTLS.
+
+Fabio Fiorina *Fabio.Fiorina [at] alcatel.it*
+ASN.1 structures parser library (libtasn1).
+
+Timo Schulz *twoaday [at] freakmail.de*
+OpenPGP support (OpenCDK library).
+
+Andrew McDonald *andrew [at] mcdonald.org.uk*
+OpenSSL compatible interface.
+
+Ludovic Courtes *ludo [at] gnu.org*
+Guile bindings, OpenPGP bug fixes.
+
+Stefan Walter *stef [at] memberwebs.com*
+PKCS8 fix, PKCS #11 backend move to p11-kit.
+
+Yoshisato YANAGISAWA *yanagisawa [at] csg.is.titech.ac.jp*
+Initial Camellia-CBC support.
+
+Daiki Ueno *ueno [at] unixuser.org*
+TLS Session Ticket (RFC 5077) support,
+finished client-side TLS 1.2 support.
+
+Jonathan Bastien-Filiatrault *joe [at] x2a.org*
+Fix TLS-version checks.
+Redesign and implementation of the buffering layer.
+Initial DTLS implementation.
+
+Andy Polyakov *appro [at] openssl.org*
+AES-NI and Padlock assembler code (at lib/accelerated/intel/asm/)
+
+David Woodhouse *dwmw2 [at] infradead.org*
+DTLS 0.9 implementation.
+
+Martin Storjo *martin [at] martin.st*
+DTLS-SRTP support.
+
+Alessandro Ghedini *alessandro [at] ghedini.me*
+TLS Fallback SCSV support (RFC7507).
+
+----------------------------------------------------------------------
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.

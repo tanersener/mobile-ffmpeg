@@ -1,0 +1,22 @@
+
+
+
+@deftypefun {int} {gnutls_pkcs7_add_attr} (gnutls_pkcs7_attrs_t * @var{list}, const char * @var{oid}, gnutls_datum_t * @var{data}, unsigned @var{flags})
+@var{list}: A list of existing attributes or pointer to @code{NULL}  for the first one
+
+@var{oid}: the OID of the attribute to be set
+
+@var{data}: the raw (DER-encoded) data of the attribute to be set
+
+@var{flags}: zero or @code{GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING} 
+
+This function will set a PKCS @code{7}  attribute in the provided list.
+If this function fails, the previous list would be deallocated.
+
+Note that any attributes set with this function must either be
+DER or BER encoded, unless a special flag is present.
+
+@strong{Returns:} On success, the new list head, otherwise @code{NULL} .
+
+@strong{Since:} 3.4.2
+@end deftypefun

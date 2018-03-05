@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_global_set_log_level} (int @var{level})

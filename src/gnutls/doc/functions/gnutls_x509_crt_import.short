@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_import} (gnutls_x509_crt_t @var{cert}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format})

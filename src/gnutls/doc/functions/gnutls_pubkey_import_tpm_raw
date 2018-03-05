@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_tpm_raw} (gnutls_pubkey_t @var{pkey}, const gnutls_datum_t * @var{fdata}, gnutls_tpmkey_fmt_t @var{format}, const char * @var{srk_password}, unsigned int @var{flags})
+@var{pkey}: The public key
+
+@var{fdata}: The TPM key to be imported
+
+@var{format}: The format of the private key
+
+@var{srk_password}: The password for the SRK key (optional)
+
+@var{flags}: One of the GNUTLS_PUBKEY_* flags
+
+This function will import the public key from the provided TPM key
+structure.
+
+With respect to passwords the same as in
+@code{gnutls_pubkey_import_tpm_url()}  apply.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

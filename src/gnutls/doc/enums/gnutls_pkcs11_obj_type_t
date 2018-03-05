@@ -1,0 +1,19 @@
+
+
+@c gnutls_pkcs11_obj_type_t
+@table @code
+@item GNUTLS_@-PKCS11_@-OBJ_@-UNKNOWN
+Unknown PKCS11 object.
+@item GNUTLS_@-PKCS11_@-OBJ_@-X509_@-CRT
+X.509 certificate.
+@item GNUTLS_@-PKCS11_@-OBJ_@-PUBKEY
+Public key.
+@item GNUTLS_@-PKCS11_@-OBJ_@-PRIVKEY
+Private key.
+@item GNUTLS_@-PKCS11_@-OBJ_@-SECRET_@-KEY
+Secret key.
+@item GNUTLS_@-PKCS11_@-OBJ_@-DATA
+Data object.
+@item GNUTLS_@-PKCS11_@-OBJ_@-X509_@-CRT_@-EXTENSION
+X.509 certificate extension (supported by p11-kit trust module only).
+@end table

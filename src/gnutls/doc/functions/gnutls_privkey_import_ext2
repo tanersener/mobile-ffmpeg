@@ -1,0 +1,36 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_import_ext2} (gnutls_privkey_t @var{pkey}, gnutls_pk_algorithm_t @var{pk}, void * @var{userdata}, gnutls_privkey_sign_func @var{sign_fn}, gnutls_privkey_decrypt_func @var{decrypt_fn}, gnutls_privkey_deinit_func @var{deinit_fn}, unsigned int @var{flags})
+@var{pkey}: The private key
+
+@var{pk}: The public key algorithm
+
+@var{userdata}: private data to be provided to the callbacks
+
+@var{sign_fn}: callback for signature operations
+
+@var{decrypt_fn}: callback for decryption operations
+
+@var{deinit_fn}: a deinitialization function
+
+@var{flags}: Flags for the import
+
+This function will associate the given callbacks with the
+@code{gnutls_privkey_t}  type. At least one of the two callbacks
+must be non-null. If a deinitialization function is provided
+then flags is assumed to contain @code{GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE} .
+
+Note that the signing function is supposed to "raw" sign data, i.e.,
+without any hashing or preprocessing. In case of RSA the DigestInfo
+will be provided, and the signing function is expected to do the PKCS @code{1} 
+1.5 padding and the exponentiation.
+
+See also @code{gnutls_privkey_import_ext3()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1
+@end deftypefun

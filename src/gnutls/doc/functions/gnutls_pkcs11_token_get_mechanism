@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_token_get_mechanism} (const char * @var{url}, unsigned int @var{idx}, unsigned long * @var{mechanism})
+@var{url}: should contain a PKCS 11 URL
+
+@var{idx}: The index of the mechanism
+
+@var{mechanism}: The PKCS @code{11}  mechanism ID
+
+This function will return the names of the supported mechanisms
+by the token. It should be called with an increasing index until
+it return GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun

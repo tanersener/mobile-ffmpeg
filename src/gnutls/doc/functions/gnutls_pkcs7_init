@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_init} (gnutls_pkcs7_t * @var{pkcs7})
+@var{pkcs7}: A pointer to the type to be initialized
+
+This function will initialize a PKCS7 structure. PKCS7 structures
+usually contain lists of X.509 Certificates and X.509 Certificate
+revocation lists.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

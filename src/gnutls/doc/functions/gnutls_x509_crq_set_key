@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_key} (gnutls_x509_crq_t @var{crq}, gnutls_x509_privkey_t @var{key})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{key}: holds a private key
+
+This function will set the public parameters from the given private
+key to the request.  
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

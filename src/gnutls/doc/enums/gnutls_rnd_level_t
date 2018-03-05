@@ -1,0 +1,13 @@
+
+
+@c gnutls_rnd_level_t
+@table @code
+@item GNUTLS_@-RND_@-NONCE
+Non-predictable random number.  Fatal in parts
+of session if broken, i.e., vulnerable to statistical analysis.
+@item GNUTLS_@-RND_@-RANDOM
+Pseudo-random cryptographic random number.
+Fatal in session if broken.
+@item GNUTLS_@-RND_@-KEY
+Fatal in many sessions if broken.
+@end table

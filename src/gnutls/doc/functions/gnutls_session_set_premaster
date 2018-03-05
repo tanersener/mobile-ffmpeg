@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_set_premaster} (gnutls_session_t @var{session}, unsigned int @var{entity}, gnutls_protocol_t @var{version}, gnutls_kx_algorithm_t @var{kx}, gnutls_cipher_algorithm_t @var{cipher}, gnutls_mac_algorithm_t @var{mac}, gnutls_compression_method_t @var{comp}, const gnutls_datum_t * @var{master}, const gnutls_datum_t * @var{session_id})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{entity}: GNUTLS_SERVER or GNUTLS_CLIENT
+
+@var{version}: the TLS protocol version
+
+@var{kx}: the key exchange method
+
+@var{cipher}: the cipher
+
+@var{mac}: the MAC algorithm
+
+@var{comp}: the compression method
+
+@var{master}: the master key to use
+
+@var{session_id}: the session identifier
+
+This function sets the premaster secret in a session. This is
+a function intended for exceptional uses. Do not use this
+function unless you are implementing a legacy protocol.
+Use @code{gnutls_session_set_data()}  instead.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+@end deftypefun

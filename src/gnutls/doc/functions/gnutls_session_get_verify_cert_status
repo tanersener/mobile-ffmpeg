@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {unsigned int} {gnutls_session_get_verify_cert_status} (gnutls_session_t @var{session})
+@var{session}: is a gnutls session
+
+This function returns the status of the verification when initiated
+via auto-verification, i.e., by @code{gnutls_session_set_verify_cert2()}  or
+@code{gnutls_session_set_verify_cert()} . If no certificate verification
+was occurred then the return value would be set to ((unsigned int)-1).
+
+The certificate verification status is the same as in @code{gnutls_certificate_verify_peers()} .
+
+@strong{Returns:} the certificate verification status.
+
+@strong{Since:} 3.4.6
+@end deftypefun

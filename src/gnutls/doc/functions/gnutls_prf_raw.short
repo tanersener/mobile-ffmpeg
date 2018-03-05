@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_prf_raw} (gnutls_session_t @var{session}, size_t @var{label_size}, const char * @var{label}, size_t @var{seed_size}, const char * @var{seed}, size_t @var{outsize}, char * @var{out})

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_obj_get_exts} (gnutls_pkcs11_obj_t @var{obj}, gnutls_x509_ext_st ** @var{exts}, unsigned int * @var{exts_size}, unsigned int @var{flags})

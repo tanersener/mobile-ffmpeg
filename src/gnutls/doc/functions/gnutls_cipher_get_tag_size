@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_cipher_get_tag_size} (gnutls_cipher_algorithm_t @var{algorithm})
+@var{algorithm}: is an encryption algorithm
+
+
+@strong{Returns:} the tag size of the authenticated encryption algorithm.
+
+@strong{Since:} 3.2.2
+@end deftypefun

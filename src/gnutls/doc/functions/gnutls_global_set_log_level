@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {void} {gnutls_global_set_log_level} (int @var{level})
+@var{level}: it's an integer from 0 to 99.
+
+This is the function that allows you to set the log level.  The
+level is an integer between 0 and 9.  Higher values mean more
+verbosity. The default value is 0.  Larger values should only be
+used with care, since they may reveal sensitive information.
+
+Use a log level over 10 to enable all debugging options.
+@end deftypefun

@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_extension_oid} (gnutls_x509_crl_t @var{crl}, unsigned @var{indx}, void * @var{oid}, size_t * @var{sizeof_oid})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+@var{indx}: Specifies which extension OID to send, use (0) to get the first one.
+
+@var{oid}: a pointer to store the OID (may be null)
+
+@var{sizeof_oid}: initially holds the size of  @code{oid} 
+
+This function will return the requested extension OID in the CRL.
+The extension OID will be stored as a string in the provided
+buffer.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code in case of an error.  If your have reached the
+last extension available @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+will be returned.
+
+@strong{Since:} 2.8.0
+@end deftypefun

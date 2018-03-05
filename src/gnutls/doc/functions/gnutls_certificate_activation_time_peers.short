@@ -1,0 +1,1 @@
+@item @var{time_t} @ref{gnutls_certificate_activation_time_peers} (gnutls_session_t @var{session})

@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_export} (gnutls_pkcs12_t @var{pkcs12}, gnutls_x509_crt_fmt_t @var{format}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{pkcs12}: A pkcs12 type
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{output_data}: will contain a structure PEM or DER encoded
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will export the pkcs12 structure to DER or PEM format.
+
+If the buffer provided is not long enough to hold the output, then
+*output_data_size will be updated and GNUTLS_E_SHORT_MEMORY_BUFFER
+will be returned.
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN PKCS12".
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+@end deftypefun

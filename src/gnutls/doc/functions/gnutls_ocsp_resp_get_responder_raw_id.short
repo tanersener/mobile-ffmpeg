@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_resp_get_responder_raw_id} (gnutls_ocsp_resp_t @var{resp}, unsigned @var{type}, gnutls_datum_t * @var{raw})

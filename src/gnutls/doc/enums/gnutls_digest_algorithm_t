@@ -1,0 +1,33 @@
+
+
+@c gnutls_digest_algorithm_t
+@table @code
+@item GNUTLS_@-DIG_@-UNKNOWN
+Unknown hash algorithm.
+@item GNUTLS_@-DIG_@-NULL
+NULL hash algorithm (empty output).
+@item GNUTLS_@-DIG_@-MD5
+MD5 algorithm.
+@item GNUTLS_@-DIG_@-SHA1
+SHA-1 algorithm.
+@item GNUTLS_@-DIG_@-RMD160
+RMD160 algorithm.
+@item GNUTLS_@-DIG_@-MD2
+MD2 algorithm.
+@item GNUTLS_@-DIG_@-SHA256
+SHA-256 algorithm.
+@item GNUTLS_@-DIG_@-SHA384
+SHA-384 algorithm.
+@item GNUTLS_@-DIG_@-SHA512
+SHA-512 algorithm.
+@item GNUTLS_@-DIG_@-SHA224
+SHA-224 algorithm.
+@item GNUTLS_@-DIG_@-SHA3_@-224
+SHA3-224 algorithm.
+@item GNUTLS_@-DIG_@-SHA3_@-256
+SHA3-256 algorithm.
+@item GNUTLS_@-DIG_@-SHA3_@-384
+SHA3-384 algorithm.
+@item GNUTLS_@-DIG_@-SHA3_@-512
+SHA3-512 algorithm.
+@end table

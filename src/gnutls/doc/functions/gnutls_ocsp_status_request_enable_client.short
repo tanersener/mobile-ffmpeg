@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_status_request_enable_client} (gnutls_session_t @var{session}, gnutls_datum_t * @var{responder_id}, size_t @var{responder_id_size}, gnutls_datum_t * @var{extensions})

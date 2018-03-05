@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_set_known_dh_params} (gnutls_certificate_credentials_t @var{res}, gnutls_sec_param_t @var{sec_param})

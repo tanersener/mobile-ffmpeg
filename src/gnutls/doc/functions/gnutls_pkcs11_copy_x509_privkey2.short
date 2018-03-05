@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_copy_x509_privkey2} (const char * @var{token_url}, gnutls_x509_privkey_t @var{key}, const char * @var{label}, const gnutls_datum_t * @var{cid}, unsigned int @var{key_usage}, unsigned int @var{flags})

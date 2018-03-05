@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_set_friendly_name} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx}, const char * @var{name})
+@var{bag}: The bag
+
+@var{indx}: The bag's element to add the id
+
+@var{name}: the name
+
+This function will add the given key friendly name, to the
+specified, by the index, bag element. The name will be encoded as
+a 'Friendly name' bag attribute, which is usually used to set a
+user name to the local private key and the certificate pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. or a negative error code on error.
+@end deftypefun

@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {void} {gnutls_hmac_deinit} (gnutls_hmac_hd_t @var{handle}, void * @var{digest})
+@var{handle}: is a @code{gnutls_hmac_hd_t}  type
+
+@var{digest}: is the output value of the MAC
+
+This function will deinitialize all resources occupied by
+the given hmac context.
+
+@strong{Since:} 2.10.0
+@end deftypefun

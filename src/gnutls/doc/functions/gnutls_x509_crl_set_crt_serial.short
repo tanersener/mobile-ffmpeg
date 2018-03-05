@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crl_set_crt_serial} (gnutls_x509_crl_t @var{crl}, const void * @var{serial}, size_t @var{serial_size}, time_t @var{revocation_time})

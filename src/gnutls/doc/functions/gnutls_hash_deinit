@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {void} {gnutls_hash_deinit} (gnutls_hash_hd_t @var{handle}, void * @var{digest})
+@var{handle}: is a @code{gnutls_hash_hd_t}  type
+
+@var{digest}: is the output value of the hash
+
+This function will deinitialize all resources occupied by
+the given hash context.
+
+@strong{Since:} 2.10.0
+@end deftypefun

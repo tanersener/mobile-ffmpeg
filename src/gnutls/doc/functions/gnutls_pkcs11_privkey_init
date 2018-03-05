@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_privkey_init} (gnutls_pkcs11_privkey_t * @var{key})
+@var{key}: A pointer to the type to be initialized
+
+This function will initialize an private key structure. This
+structure can be used for accessing an underlying PKCS@code{11}  object.
+
+In versions of GnuTLS later than 3.5.11 the object is protected
+using locks and a single @code{gnutls_pkcs11_privkey_t}  can be re-used
+by many threads. However, for performance it is recommended to utilize
+one object per key per thread.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

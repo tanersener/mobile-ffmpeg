@@ -1,0 +1,1 @@
+@item @var{unsigned int} @ref{gnutls_sec_param_to_symmetric_bits} (gnutls_sec_param_t @var{param})

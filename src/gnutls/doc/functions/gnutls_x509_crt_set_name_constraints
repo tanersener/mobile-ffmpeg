@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_name_constraints} (gnutls_x509_crt_t @var{crt}, gnutls_x509_name_constraints_t @var{nc}, unsigned int @var{critical})
+@var{crt}: The certificate
+
+@var{nc}: The nameconstraints structure
+
+@var{critical}: whether this extension will be critical
+
+This function will set the provided name constraints to
+the certificate extension list. This extension is always
+marked as critical.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

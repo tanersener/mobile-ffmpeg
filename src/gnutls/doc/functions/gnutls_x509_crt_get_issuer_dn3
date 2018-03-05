@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_issuer_dn3} (gnutls_x509_crt_t @var{cert}, gnutls_datum_t * @var{dn}, unsigned @var{flags})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{dn}: a pointer to a structure to hold the name
+
+@var{flags}: zero or @code{GNUTLS_X509_DN_FLAG_COMPAT} 
+
+This function will allocate buffer and copy the name of issuer of the Certificate.
+The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+described in RFC4514. The output string will be ASCII or UTF-8
+encoded, depending on the certificate data.
+
+When the flag @code{GNUTLS_X509_DN_FLAG_COMPAT}  is specified, the output
+format will match the format output by previous to 3.5.6 versions of GnuTLS
+which was not not fully RFC4514-compliant.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.5.7
+@end deftypefun

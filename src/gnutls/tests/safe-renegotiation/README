@@ -1,0 +1,21 @@
+Testing safe renegotiation is relatively complex, here is a summary of
+what we test and what how we believe it should work.
+
+srn0.c:
+
+ This tests that the safe renegotiation extension is negotiated
+ properly by default on initial connections and on rehandshaked
+ connections.  Consequently, it also verifies that rehandshaked
+ connections work with the extension enabled.
+
+srn4.c:
+
+ This tests that clients without support for safe renegotiation is
+ able to handshake properly against a default GnuTLS server, but
+ that rehandshake will be refused by the server.
+
+srn5.c:
+ This tests that clients with support for safe renegotiation is able
+ to handshake properly against a server with no support for safe
+ renegotiation, but that the client will not be able to complete a
+ rehandshake.

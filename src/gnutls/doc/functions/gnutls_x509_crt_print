@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_print} (gnutls_x509_crt_t @var{cert}, gnutls_certificate_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@var{cert}: The data to be printed
+
+@var{format}: Indicate the format to use
+
+@var{out}: Newly allocated datum with null terminated string.
+
+This function will pretty print a X.509 certificate, suitable for
+display to a human.
+
+If the format is @code{GNUTLS_CRT_PRINT_FULL}  then all fields of the
+certificate will be output, on multiple lines.  The
+@code{GNUTLS_CRT_PRINT_ONELINE}  format will generate one line with some
+selected fields, which is useful for logging purposes.
+
+The output  @code{out} needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

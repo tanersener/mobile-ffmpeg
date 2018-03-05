@@ -1,0 +1,9 @@
+
+
+@c gnutls_ocsp_print_formats_t
+@table @code
+@item GNUTLS_@-OCSP_@-PRINT_@-FULL
+Full information about OCSP request/response.
+@item GNUTLS_@-OCSP_@-PRINT_@-COMPACT
+More compact information about OCSP request/response.
+@end table

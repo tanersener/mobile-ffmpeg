@@ -1,0 +1,7 @@
+
+
+@c gnutls_ext_flags_t
+@table @code
+@item GNUTLS_@-EXT_@-FLAG_@-OVERRIDE_@-INTERNAL
+If specified the extension registered will override the internal; this does not work with extensions existing prior to 3.5.12.
+@end table

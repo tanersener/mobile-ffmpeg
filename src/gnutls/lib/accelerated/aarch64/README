@@ -1,0 +1,4 @@
+The aarch64 implementations by Andy Polyakov are not part of the
+GnuTLS library, but are used with GnuTLS. Their license is included in
+../x86/license.txt.
+

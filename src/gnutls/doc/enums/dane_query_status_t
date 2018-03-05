@@ -1,0 +1,13 @@
+
+
+@c dane_query_status_t
+@table @code
+@item DANE_@-QUERY_@-UNKNOWN
+There was no query.
+@item DANE_@-QUERY_@-DNSSEC_@-VERIFIED
+The query was verified using DNSSEC.
+@item DANE_@-QUERY_@-BOGUS
+The query has wrong DNSSEC signature.
+@item DANE_@-QUERY_@-NO_@-DNSSEC
+The query has no DNSSEC data.
+@end table

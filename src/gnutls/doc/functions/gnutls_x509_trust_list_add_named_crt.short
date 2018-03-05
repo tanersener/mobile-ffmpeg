@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_trust_list_add_named_crt} (gnutls_x509_trust_list_t @var{list}, gnutls_x509_crt_t @var{cert}, const void * @var{name}, size_t @var{name_size}, unsigned int @var{flags})

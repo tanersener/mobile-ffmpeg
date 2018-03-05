@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_pkcs7_attrs_deinit} (gnutls_pkcs7_attrs_t @var{list})
+@var{list}: A list of existing attributes
+
+This function will clear a PKCS @code{7}  attribute list.
+
+@strong{Since:} 3.4.2
+@end deftypefun

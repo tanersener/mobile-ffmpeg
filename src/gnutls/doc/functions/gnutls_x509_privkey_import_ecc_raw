@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_import_ecc_raw} (gnutls_x509_privkey_t @var{key}, gnutls_ecc_curve_t @var{curve}, const gnutls_datum_t * @var{x}, const gnutls_datum_t * @var{y}, const gnutls_datum_t * @var{k})
+@var{key}: The data to store the parsed key
+
+@var{curve}: holds the curve
+
+@var{x}: holds the x
+
+@var{y}: holds the y
+
+@var{k}: holds the k
+
+This function will convert the given elliptic curve parameters to the
+native @code{gnutls_x509_privkey_t}  format.  The output will be stored
+in  @code{key} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {gnutls_privkey_type_t} {gnutls_privkey_get_type} (gnutls_privkey_t @var{key})
+@var{key}: should contain a @code{gnutls_privkey_t}  type
+
+This function will return the type of the private key. This is
+actually the type of the subsystem used to set this private key.
+
+@strong{Returns:} a member of the @code{gnutls_privkey_type_t}  enumeration on
+success, or a negative error code on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun

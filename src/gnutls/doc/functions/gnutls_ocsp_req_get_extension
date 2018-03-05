@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_get_extension} (gnutls_ocsp_req_t @var{req}, unsigned @var{indx}, gnutls_datum_t * @var{oid}, unsigned int * @var{critical}, gnutls_datum_t * @var{data})
+@var{req}: should contain a @code{gnutls_ocsp_req_t}  type
+
+@var{indx}: Specifies which extension OID to get. Use (0) to get the first one.
+
+@var{oid}: will hold newly allocated buffer with OID of extension, may be NULL
+
+@var{critical}: output variable with critical flag, may be NULL.
+
+@var{data}: will hold newly allocated buffer with extension data, may be NULL
+
+This function will return all information about the requested
+extension in the OCSP request.  The information returned is the
+OID, the critical flag, and the data itself.  The extension OID
+will be stored as a string.  Any of  @code{oid} ,  @code{critical} , and  @code{data} may
+be NULL which means that the caller is not interested in getting
+that information back.
+
+The caller needs to deallocate memory by calling @code{gnutls_free()}  on
+ @code{oid} ->data and  @code{data} ->data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.  If you have reached the last
+extension available @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will
+be returned.
+@end deftypefun

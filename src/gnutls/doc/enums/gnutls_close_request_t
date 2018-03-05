@@ -1,0 +1,9 @@
+
+
+@c gnutls_close_request_t
+@table @code
+@item GNUTLS_@-SHUT_@-RDWR
+Disallow further receives/sends.
+@item GNUTLS_@-SHUT_@-WR
+Disallow further sends.
+@end table

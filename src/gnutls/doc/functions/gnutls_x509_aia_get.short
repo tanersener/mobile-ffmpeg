@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_aia_get} (gnutls_x509_aia_t @var{aia}, unsigned int @var{seq}, gnutls_datum_t * @var{oid}, unsigned * @var{san_type}, gnutls_datum_t * @var{san})

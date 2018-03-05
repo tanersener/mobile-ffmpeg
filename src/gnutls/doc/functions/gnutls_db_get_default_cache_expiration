@@ -1,0 +1,8 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_db_get_default_cache_expiration} ( @var{void})
+
+Returns the expiration time (in seconds) of stored sessions for resumption. 
+@end deftypefun

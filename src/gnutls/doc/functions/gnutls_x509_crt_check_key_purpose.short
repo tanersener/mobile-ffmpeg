@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_x509_crt_check_key_purpose} (gnutls_x509_crt_t @var{cert}, const char * @var{purpose}, unsigned @var{flags})

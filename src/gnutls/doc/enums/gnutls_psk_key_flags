@@ -1,0 +1,9 @@
+
+
+@c gnutls_psk_key_flags
+@table @code
+@item GNUTLS_@-PSK_@-KEY_@-RAW
+PSK-key in raw format.
+@item GNUTLS_@-PSK_@-KEY_@-HEX
+PSK-key in hex format.
+@end table

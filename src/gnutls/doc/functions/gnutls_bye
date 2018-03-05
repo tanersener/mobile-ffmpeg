@@ -1,0 +1,36 @@
+
+
+
+
+@deftypefun {int} {gnutls_bye} (gnutls_session_t @var{session}, gnutls_close_request_t @var{how})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{how}: is an integer
+
+Terminates the current TLS/SSL connection. The connection should
+have been initiated using @code{gnutls_handshake()} .   @code{how} should be one
+of @code{GNUTLS_SHUT_RDWR} , @code{GNUTLS_SHUT_WR} .
+
+In case of @code{GNUTLS_SHUT_RDWR}  the TLS session gets
+terminated and further receives and sends will be disallowed.  If
+the return value is zero you may continue using the underlying
+transport layer. @code{GNUTLS_SHUT_RDWR}  sends an alert containing a close
+request and waits for the peer to reply with the same message.
+
+In case of @code{GNUTLS_SHUT_WR}  the TLS session gets terminated
+and further sends will be disallowed. In order to reuse the
+connection you should wait for an EOF from the peer.
+@code{GNUTLS_SHUT_WR}  sends an alert containing a close request.
+
+Note that not all implementations will properly terminate a TLS
+connection.  Some of them, usually for performance reasons, will
+terminate only the underlying transport layer, and thus not
+distinguishing between a malicious party prematurely terminating 
+the connection and normal termination. 
+
+This function may also return @code{GNUTLS_E_AGAIN}  or
+@code{GNUTLS_E_INTERRUPTED} ; cf.  @code{gnutls_record_get_direction()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code, see
+function documentation for entire semantics.
+@end deftypefun

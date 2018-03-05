@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_name_constraints_get_excluded} (gnutls_x509_name_constraints_t @var{nc}, unsigned @var{idx}, unsigned * @var{type}, gnutls_datum_t * @var{name})
+@var{nc}: the extracted name constraints
+
+@var{idx}: the index of the constraint
+
+@var{type}: the type of the constraint (of type gnutls_x509_subject_alt_name_t)
+
+@var{name}: the name in the constraint (of the specific type)
+
+This function will return an intermediate type containing
+the name constraints of the provided CA certificate. That
+structure can be used in combination with @code{gnutls_x509_name_constraints_check()} 
+to verify whether a server's name is in accordance with the constraints.
+
+The name should be treated as constant and valid for the lifetime of  @code{nc} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+if the extension is not present, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_crt_count} (gnutls_x509_crl_t @var{crl})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+This function will return the number of revoked certificates in the
+given CRL.
+
+@strong{Returns:} number of certificates, a negative error code on failure.
+@end deftypefun

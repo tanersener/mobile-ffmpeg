@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_handshake_set_max_packet_length} (gnutls_session_t @var{session}, size_t @var{max})

@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_certificate_server_set_request} (gnutls_session_t @var{session}, gnutls_certificate_request_t @var{req})

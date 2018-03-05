@@ -1,0 +1,1 @@
+@item @var{gnutls_sec_param_t} @ref{gnutls_x509_privkey_sec_param} (gnutls_x509_privkey_t @var{key})

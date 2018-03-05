@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_pk_rsa_raw} (gnutls_x509_crt_t @var{crt}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e})
+@var{crt}: Holds the certificate
+
+@var{m}: will hold the modulus
+
+@var{e}: will hold the public exponent
+
+This function will export the RSA public key's parameters found in
+the given structure.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+@end deftypefun

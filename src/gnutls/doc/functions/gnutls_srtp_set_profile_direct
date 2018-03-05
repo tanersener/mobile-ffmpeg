@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_srtp_set_profile_direct} (gnutls_session_t @var{session}, const char * @var{profiles}, const char ** @var{err_pos})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{profiles}: is a string that contains the supported SRTP profiles,
+separated by colons.
+
+@var{err_pos}: In case of an error this will have the position in the string the error occurred, may be NULL.
+
+This function is to be used by both clients and servers, to declare
+what SRTP profiles they support, to negotiate with the peer.
+
+@strong{Returns:} On syntax error @code{GNUTLS_E_INVALID_REQUEST}  is returned,
+@code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+Since 3.1.4
+@end deftypefun

@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {void} {gnutls_aead_cipher_deinit} (gnutls_aead_cipher_hd_t @var{handle})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+This function will deinitialize all resources occupied by the given
+authenticated-encryption context.
+
+@strong{Since:} 3.4.0
+@end deftypefun

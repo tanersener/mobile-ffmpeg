@@ -1,0 +1,11 @@
+
+
+@c gnutls_keyid_flags_t
+@table @code
+@item GNUTLS_@-KEYID_@-USE_@-SHA1
+Use SHA1 as the key ID algorithm (default).
+@item GNUTLS_@-KEYID_@-USE_@-SHA256
+Use SHA256 as the key ID algorithm.
+@item GNUTLS_@-KEYID_@-USE_@-BEST_@-KNOWN
+Use the best known algorithm to calculate key ID. Using that option will make your program behavior depend on the version of gnutls linked with. That option has a cap of 64-bytes key IDs.
+@end table

@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_subject_alt_name} (gnutls_x509_crq_t @var{crq}, gnutls_x509_subject_alt_name_t @var{nt}, const void * @var{data}, unsigned int @var{data_size}, unsigned int @var{flags})
+@var{crq}: a certificate request of type @code{gnutls_x509_crq_t} 
+
+@var{nt}: is one of the @code{gnutls_x509_subject_alt_name_t}  enumerations
+
+@var{data}: The data to be set
+
+@var{data_size}: The size of data to be set
+
+@var{flags}: @code{GNUTLS_FSAN_SET}  to clear previous data or
+@code{GNUTLS_FSAN_APPEND}  to append.
+
+This function will set the subject alternative name certificate
+extension.  It can set the following types:
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.8.0
+@end deftypefun

@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_pem_base64_encode2} (const char * @var{msg}, const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{result})
+@var{msg}: is a message to be put in the encoded header (may be @code{NULL} )
+
+@var{data}: contains the raw data
+
+@var{result}: will hold the newly allocated encoded data
+
+This function will convert the given data to printable data, using
+the base64 encoding.  This is the encoding used in PEM messages.
+This function will allocate the required memory to hold the encoded
+data.
+
+You should use @code{gnutls_free()}  to free the returned data.
+
+Note, that prior to GnuTLS 3.4.0 this function was available
+under the name @code{gnutls_pem_base64_encode_alloc()} . There is
+compatibility macro pointing to this function.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.4.0
+@end deftypefun

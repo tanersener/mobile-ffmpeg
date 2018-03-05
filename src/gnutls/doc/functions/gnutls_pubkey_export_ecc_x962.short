@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_export_ecc_x962} (gnutls_pubkey_t @var{key}, gnutls_datum_t * @var{parameters}, gnutls_datum_t * @var{ecpoint})

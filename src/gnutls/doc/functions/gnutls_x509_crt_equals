@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_x509_crt_equals} (gnutls_x509_crt_t @var{cert1}, gnutls_x509_crt_t @var{cert2})
+@var{cert1}: The first certificate
+
+@var{cert2}: The second certificate
+
+This function will compare two X.509 certificate structures.
+
+@strong{Returns:} On equality non-zero is returned, otherwise zero.
+
+@strong{Since:} 3.5.0
+@end deftypefun

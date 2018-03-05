@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_verify_data2} (gnutls_x509_crt_t @var{crt}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, const gnutls_datum_t * @var{signature})
+@var{crt}: Holds the certificate to verify with
+
+@var{algo}: The signature algorithm used
+
+@var{flags}: Zero or an OR list of @code{gnutls_certificate_verify_flags} 
+
+@var{data}: holds the signed data
+
+@var{signature}: contains the signature
+
+This function will verify the given signed data, using the
+parameters from the certificate.
+
+@strong{Returns:} In case of a verification failure @code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  
+is returned, @code{GNUTLS_E_EXPIRED}  or @code{GNUTLS_E_NOT_YET_ACTIVATED}  on expired
+or not yet activated certificate and zero or positive code on success.
+
+Note that since GnuTLS 3.5.6 this function introduces checks in the
+end certificate ( @code{crt} ), including time checks and key usage checks.
+
+@strong{Since:} 3.4.0
+@end deftypefun

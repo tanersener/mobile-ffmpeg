@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {void *} {gnutls_session_get_ptr} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Get user pointer for session.  Useful in callbacks.  This is the
+pointer set with @code{gnutls_session_set_ptr()} .
+
+@strong{Returns:} the user given pointer from the session structure, or
+@code{NULL}  if it was never set.
+@end deftypefun

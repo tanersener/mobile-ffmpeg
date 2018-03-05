@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_verify} (gnutls_x509_crq_t @var{crq}, unsigned int @var{flags})
+@var{crq}: is the crq to be verified
+
+@var{flags}: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+
+This function will verify self signature in the certificate
+request and return its status.
+
+@strong{Returns:} In case of a verification failure @code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  
+is returned, and zero or positive code on success.
+
+Since 2.12.0
+@end deftypefun

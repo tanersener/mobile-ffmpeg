@@ -1,0 +1,4 @@
+/.libs/
+*.o
+/Makefile
+*.lo

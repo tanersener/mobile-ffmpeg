@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_record_set_state} (gnutls_session_t @var{session}, unsigned @var{read}, unsigned char @var{seq_number[8]})
+@var{session}: is a @code{gnutls_session_t}  type
+
+@var{read}: if non-zero the read parameters are returned, otherwise the write
+
+@var{seq_number[8]}: -- undescribed --
+
+This function will set the sequence number in the current record state.
+This function is useful if sending and receiving are offloaded from
+gnutls. That is, if @code{gnutls_record_get_state()}  was used.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+Since 3.4.0
+@end deftypefun

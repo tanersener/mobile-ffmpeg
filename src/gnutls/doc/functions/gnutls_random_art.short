@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_random_art} (gnutls_random_art_t @var{type}, const char * @var{key_type}, unsigned int @var{key_size}, void * @var{fpr}, size_t @var{fpr_size}, gnutls_datum_t * @var{art})

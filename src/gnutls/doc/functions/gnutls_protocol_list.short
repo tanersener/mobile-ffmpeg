@@ -1,0 +1,1 @@
+@item @var{const gnutls_protocol_t *} @ref{gnutls_protocol_list} ( @var{void})

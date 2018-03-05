@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_pubkey} (gnutls_x509_crt_t @var{crt}, gnutls_pubkey_t @var{key})
+@var{crt}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{key}: holds a public key
+
+This function will set the public parameters from the given public
+key to the certificate. The  @code{key} can be deallocated after that.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

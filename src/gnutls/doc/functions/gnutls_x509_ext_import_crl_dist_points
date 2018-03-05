@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_crl_dist_points} (const gnutls_datum_t * @var{ext}, gnutls_x509_crl_dist_points_t @var{cdp}, unsigned int @var{flags})
+@var{ext}: the DER encoded extension data
+
+@var{cdp}: A pointer to an initialized CRL distribution points.
+
+@var{flags}: should be zero
+
+This function will extract the CRL distribution points extension (2.5.29.31) 
+and store it into the provided type.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

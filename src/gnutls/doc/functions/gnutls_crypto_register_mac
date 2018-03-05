@@ -1,0 +1,33 @@
+
+
+
+
+@deftypefun {int} {gnutls_crypto_register_mac} (gnutls_mac_algorithm_t @var{algorithm}, int @var{priority}, gnutls_mac_init_func @var{init}, gnutls_mac_setkey_func @var{setkey}, gnutls_mac_setnonce_func @var{setnonce}, gnutls_mac_hash_func @var{hash}, gnutls_mac_output_func @var{output}, gnutls_mac_deinit_func @var{deinit}, gnutls_mac_fast_func @var{hash_fast})
+@var{algorithm}: is the gnutls MAC identifier
+
+@var{priority}: is the priority of the algorithm
+
+@var{init}: A function which initializes the MAC
+
+@var{setkey}: A function which sets the key of the MAC
+
+@var{setnonce}: A function which sets the nonce for the mac (may be @code{NULL}  for common MAC algorithms)
+
+@var{hash}: Perform the hash operation
+
+@var{output}: Provide the output of the MAC
+
+@var{deinit}: A function which deinitializes the MAC
+
+@var{hash_fast}: Perform the MAC operation in one go
+
+This function will register a MAC algorithm to be used by gnutls.
+Any algorithm registered will override the included algorithms and
+by convention kernel implemented algorithms have priority of 90
+and CPU-assisted of 80.
+The algorithm with the lowest priority will be used by gnutls.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun

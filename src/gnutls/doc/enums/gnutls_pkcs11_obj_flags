@@ -1,0 +1,72 @@
+
+@subheading int
+@anchor{int}
+@deftypefun {typedef} {int} (* @var{gnutls_pkcs11_token_callback_t})
+@var{gnutls_pkcs11_token_callback_t}: -- undescribed --
+
+Token callback function. The callback will be used to ask the user
+to re-insert the token with given (null terminated) label.  The
+callback should return zero if token has been inserted by user and
+a negative error code otherwise.  It might be called multiple times
+if the token is not detected and the retry counter will be
+increased.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code
+on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun
+
+
+@c gnutls_pkcs11_obj_flags
+@table @code
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-LOGIN
+Force login in the token for the operation (seek+store). 
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-TRUSTED
+object marked as trusted (seek+store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-SENSITIVE
+object marked as sensitive -unexportable (store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-LOGIN_@-SO
+force login as a security officer in the token for the operation (seek+store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-PRIVATE
+marked as private -requires PIN to access (store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-NOT_@-PRIVATE
+marked as not private (store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-RETRIEVE_@-ANY
+When retrieving an object, do not set any requirements (store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-RETRIEVE_@-TRUSTED
+When retrieving an object, only retrieve the marked as trusted (alias to @code{GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED} ).
+In @code{gnutls_pkcs11_crt_is_known()}  it implies @code{GNUTLS_PKCS11_OBJ_FLAG_RETRIEVE_COMPARE}  if @code{GNUTLS_PKCS11_OBJ_FLAG_COMPARE_KEY}  is not given.
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-DISTRUSTED
+When writing an object, mark it as distrusted (store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-RETRIEVE_@-DISTRUSTED
+When retrieving an object, only retrieve the marked as distrusted (seek).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-COMPARE
+When checking an object's presence, fully compare it before returning any result (seek).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-PRESENT_@-IN_@-TRUSTED_@-MODULE
+The object must be present in a marked as trusted module (seek).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-CA
+Mark the object as a CA (seek+store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-KEY_@-WRAP
+Mark the generated key pair as wrapping and unwrapping keys (store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-COMPARE_@-KEY
+When checking an object's presence, compare the key before returning any result (seek).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-OVERWRITE_@-TRUSTMOD_@-EXT
+When an issuer is requested, override its extensions with the ones present in the trust module (seek).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-ALWAYS_@-AUTH
+Mark the key pair as requiring authentication (pin entry) before every operation (seek+store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-MARK_@-EXTRACTABLE
+Mark the key pair as being extractable (store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-NEVER_@-EXTRACTABLE
+If set, the object was never marked as extractable (store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-CRT
+When searching, restrict to certificates only (seek).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-WITH_@-PRIVKEY
+-- undescribed --
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-PUBKEY
+When searching, restrict to public key objects only (seek).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-NO_@-STORE_@-PUBKEY
+When generating a keypair don't store the public key (store).
+@item GNUTLS_@-PKCS11_@-OBJ_@-FLAG_@-PRIVKEY
+When searching, restrict to private key objects only (seek).
+@end table

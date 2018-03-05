@@ -1,0 +1,41 @@
+
+
+
+
+@deftypefun {int} {gnutls_store_pubkey} (const char * @var{db_name}, gnutls_tdb_t @var{tdb}, const char * @var{host}, const char * @var{service}, gnutls_certificate_type_t @var{cert_type}, const gnutls_datum_t * @var{cert}, time_t @var{expiration}, unsigned int @var{flags})
+@var{db_name}: A file specifying the stored keys (use NULL for the default)
+
+@var{tdb}: A storage structure or NULL to use the default
+
+@var{host}: The peer's name
+
+@var{service}: non-NULL if this key is specific to a service (e.g. http)
+
+@var{cert_type}: The type of the certificate
+
+@var{cert}: The data of the certificate
+
+@var{expiration}: The expiration time (use 0 to disable expiration)
+
+@var{flags}: should be 0.
+
+This function will store the provided (raw or DER-encoded) certificate to 
+the list of stored public keys. The key will be considered valid until 
+the provided expiration time.
+
+The  @code{store} variable if non-null specifies a custom backend for
+the storage of entries. If it is NULL then the
+default file backend will be used.
+
+Unless an alternative  @code{tdb} is provided, the storage format is a textual format
+consisting of a line for each host with fields separated by '|'. The contents of
+the fields are a format-identifier which is set to 'g0', the hostname that the
+rest of the data applies to, the numeric port or host name, the expiration
+time in seconds since the epoch (0 for no expiration), and a base64
+encoding of the raw (DER) public key information (SPKI) of the peer.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0.13
+@end deftypefun

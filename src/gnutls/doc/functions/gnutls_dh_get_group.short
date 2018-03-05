@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_dh_get_group} (gnutls_session_t @var{session}, gnutls_datum_t * @var{raw_gen}, gnutls_datum_t * @var{raw_prime})

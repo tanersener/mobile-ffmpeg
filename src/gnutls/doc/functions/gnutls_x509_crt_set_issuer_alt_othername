@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_issuer_alt_othername} (gnutls_x509_crt_t @var{crt}, const char * @var{oid}, const void * @var{data}, unsigned int @var{data_size}, unsigned int @var{flags})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{oid}: The other name OID
+
+@var{data}: The data to be set
+
+@var{data_size}: The size of data to be set
+
+@var{flags}: GNUTLS_FSAN_SET to clear previous data or GNUTLS_FSAN_APPEND to append. 
+
+This function will set an "othername" to the issuer alternative name certificate
+extension.
+
+The values set are set as binary values and are expected to have the proper DER encoding.
+For convenience the flags @code{GNUTLS_FSAN_ENCODE_OCTET_STRING}  and @code{GNUTLS_FSAN_ENCODE_UTF8_STRING} 
+can be used to encode the provided data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.5.0
+@end deftypefun

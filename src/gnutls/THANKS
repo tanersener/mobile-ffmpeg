@@ -1,0 +1,168 @@
+GnuTLS THANKS -- Acknowledgements.
+Copyright (C) 2005-2012 Free Software Foundation, Inc.
+Copyright (C) 2000, 2001, 2002, 2003, 2004 Nikos Mavrogiannopoulos
+See the end for copying conditions.
+
+Here is a list of people, who helped in GnuTLS development.  Please
+help us to keep it complete and free of errors.  We apologise to those
+whom we no doubt have forgotten.
+
+Werner Koch                     *wk [at] gnupg.org*
+Tarun Upadhyay                  *tarun [at] poboxes.com*
+Neil Spring                     *nspring [at] saavie.org*
+Paul Sheer                      *psheer [at] icon.co.za*
+Jon Nelson                      *jnelson [at] securepipe.com*
+Simon Josefsson                 *jas [at] extundo.com*
+Marco d'Itri                    *md [at] linux.it*
+Mike Siers                      *mikes [at] poliac.com*
+Marc Huber                      *Marc.Huber [at] web.de*
+Guillaume Morin                 *guillaume [at] morinfr.org*
+Jeff Johnson                    *jbj [at] redhat.com*
+David Taylor                    *dtaylor [at] swiftdsl.com.au*
+Ivo Timmermans                  *ivo [at] o2w.nl*
+Ian Peters                      *itp [at] ximian.com*
+Arne Thomassen                  *arne [at] arne-thomassen.de*
+Casey Marshall                  *rsdio [at] metastatic.org*
+Dimitri	Papadopoulos-Orfanos    *papadopo [at] shfj.cea.fr*
+Michael Heironimus              *mkh01 [at] earthlink.net*
+Niels Bjergstrom                *njb [at] chi-publishing.com*
+Robey Pointer                   *robey [at] danger.com*
+Simon Posnjak                   *simon.posnjak [at] cetrtapot.si*
+Gerrit P. Haase                 *gp [at] familiehaase.de*
+Yoann Vandoorselaere            *yoann [at] prelude-ids.org*
+Joe Orton                       *joe [at] manyfish.co.uk*
+Stéphane LOEUILLET              *stephane.loeuillet [at] tiscali.fr*
+Aleix Conchillo Flaque          *aleix [at] member.fsf.org*
+Martijn Koster                  *mak [at] greenhills.co.uk*
+Marcin Garski                   *mgarski [at] post.pl*
+Martin Lambers                  *marlam [at] web.de*
+Michael Ringe                   *Michael.Ringe [at] aachen.utimaco.de*
+Daniel Black                    *dragonheart [at] gentoo.org*
+Scott Bronson                   *bronson [at] rinspin.com*
+Rupert Kittinger                *rkit [at] mur.at*
+Eric Leblond                    *eleblond [at] inl.fr*
+Adam Langley                    *alangley [at] gmail.com*
+Sergey Lipnevich                *sergey [at] optimaltec.com*
+Mike Castle                     *dalgoda [at] ix.netcom.com*
+Thomas Klausner                 *tk [at] giga.or.at*
+Matthias Urlichs                *smurf [at] smurf.noris.de*
+Ralph Giles                     *giles [at] onlinegamegroup.com*
+Daniel Stenberg                 *daniel [at] haxx.se*
+Jouni Malinen                   *jkmaline [at] cc.hut.fi*
+Evgeny Legerov                  *admin [at] gleg.net*
+John Heiden                     *JHeiden [at] UTNet.UToledo.Edu*
+Andreas Metzler			*ametzler [at] bebt.de*
+Mario Lenz                      *mario.lenz [at] gmx.net*
+Jefferson Ogata                 *Jefferson.Ogata [at] noaa.gov*
+Sascha Ziemann                  *sascha.ziemann [at] secunet.com*
+Roman Bogorodskiy               *novel [at] FreeBSD.org*
+Robert Millan                   *rmillan [at] ackstorm.es*
+Kataja Kai                      *kai.kataja [at] op.fi*
+Georg Schwarz                   *georg.schwarz [at] freenet.de*
+Michael C. Vergallen            *mvergall [at] telenet.be*
+Andrey Nosenko                  *andrew.w.nosenko [at] gmail.com*
+Nate Nielsen                    *nielsen-list [at] memberwebs.com*
+Max Kellermann                  *max [at] duempel.org*
+Ludovic Courtès                 *ludovic.courtes [at] laas.fr*
+Paul Millar                     *p.millar [at] physics.gla.ac.uk*
+Pavlov Konstantin               *thresh [at] altlinux.ru*
+Matthias Wimmer                 *m [at] tthias.eu*
+Howard Chu                      *hyc [at] symas.com*
+Dennis Vshivkov                 *walrus [at] amur.ru*
+Kristofer T. Karas              *ktk [at] enterprise.bidmc.harvard.edu*
+Marc Haber                      *mh+debian-bugs [at] zugschlus.de*
+Tim Mooney			*tim [at] tim-the-enchanter.org*
+Daniel Kahn Gillmor             *dkg-debian.org [at] fifthhorseman.net*
+Rainer Gerhards                 *rgerhards [at] gmail.com*
+John Brooks			*aspecialj [at] gmail.com*
+Massimo Gaspari                 *massimo.gaspari [at] alice.it*
+Marc F. Clemente                *marc [at] mclemente.net*
+Daniel Dehennin                 *nebuchadnezzar [at] asgardr.info*
+martin f krafft                 *madduck [at] debian.org*
+Sam Varshavchik                 *mrsam [at] courier-mta.com*
+Tomas Mraz                      *tmraz [at] redhat.com*
+Matthias Koenig                 *mkoenig [at] suse.de*
+Christian Grothoff              *christian [at] grothoff.org*
+James Westby                    *jw+debian [at] jameswestby.net*
+Kevin Quick                     *quick [at] sparq.org*
+Arfrever Frehtes Taifersar Arahesis *arfrever.fta [at] gmail.com*
+Jonathan Manktelow              *jonathan [at] dyalog.com*
+Thomas Viehmann                 *tv [at] beamnet.de*
+Aaron Ucko                      *ucko [at] ncbi.nlm.nih.gov*
+Anton Lavrentiev                *lavr [at] ncbi.nlm.nih.gov*
+Martin von Gagern               *Martin.vGagern [at] gmx.net*
+Douglas E. Engert               *deengert [at] anl.gov*
+Dagobert Michelsen              *dam [at] opencsw.org*
+Tom G. Christensen              *tgc [at] jupiterrise.com*
+Peter Hendrickson               *pdh [at] wiredyne.com*
+Tim Kosse                       *tim.kosse [at] filezilla-project.org*
+Fabian Keil                     *fk [at] fabiankeil.de*
+Brad Hards                      *bradh [at] frogmouth.net*
+Daiki Ueno                      *ueno [at] unixuser.org*
+Tomas Hoger                     *thoger [at] redhat.com*
+Fabian Keil                     *fk [at] fabiankeil.de*
+Jason Pettiss                   *jpettiss [at] yahoo.com*
+Ilari Liusvaara                 *ilari.liusvaara [at] elisanet.fi*
+Steve Dispensa                  *dispensa [at] phonefactor.com*
+Vitaly Mayatskikh               *v.mayatskih [at] gmail.com*
+Claudio Saavedra                *csaavedra [at] igalia.com*
+Vincent Torri                   *vincent.torri [at] gmail.com*
+Sjoerd Simons                   *sjoerd.simons [at] collabora.co.uk*
+Micah Anderson			*micah [at] riseup.net*
+Michael Rommel			*rommel [at] layer-7.net*
+Mark Brand			*mabrand [at] mabrand.nl*
+Vitaly Kruglikov		*vitaly.kruglikov [at] palm.com*
+Kalle Olavi Niemitalo		*kon [at] iki.fi*
+Dash Shendy                     *admin [at] dash.za.net*
+Rickard Bellgrim                *rickard [at] opendnssec.org*
+Petr Písař                      *petr.pisar [at] atlas.cz*
+Dan Winship                     *danw [at] gnome.org*
+Jonathan Nieder                 *jrnider [at] gmail.com*
+J. Cameijo Cerdeira             *cerdeira [at] co.sapo.pt*
+Benjamin Hof                    *benjamin.hof [at] stusta.net*
+Vincent Untz                    *vuntz [at] gnome.org*
+Jan Misiak                      *fijam [at] archlinux.us*
+David Hoyt                      *hoyt6 [at] llnl.gov*
+Joseph Graham                   *joe [at] t67.eu*
+Eli Zaretskii                   *eliz [at] gnu.org*
+Patrick Pelletier               *code [at] funwithsoftware.org*
+Sean Buckheister                *s_buckhe [at] cs.uni-kl.de*
+Matthew Hall                    *mhall [at] mhcomputing.net*
+Lucas Fisher                    *lucas.fisher [at] gmail.com*
+Kikuchi Masashi                 *kikuchi [at] lepidum.co.jp*
+Bartosz Brachaczek              *b.brachaczek [at] gmail.com*
+Bernhard R. Link                *brlink [at] debian.org*
+Rob McMahon                     *robmcmahoncv [at] gmail.com*
+Mann Ern Kang                   *mann.ern.kang [at] gmail.com*
+Daniel Mierswa                  *impulze [at] impulze.org*
+B. Scott Michel                 *scottm [at] aero.org*
+Bruce Korb                      *bkorb [at] gnu.org*
+Nadhem Alfardan                 *Nadhem.Alfardan.2009 [at] live.rhul.ac.uk*
+Pino Toscano                    *pino [at] debian.org*
+Somchai Smythe                  *buraphalinuxserver [at] gmail.com*
+Cedric Arbogast                 *arbogast.cedric [at] gmail.com*
+Pavan Konjarla                  *pavan.konjarla [at] hp.com*
+Bill Randle                     *billr [at] neocat.org*
+Boyan Kasarov                   *bkasarov [at] gmail.com*
+Michael Weiser                  *michael [at] weiser.dinsnail.net*
+Emile van Bergen                *emile [at] e-advies.nl*
+David Marin Carreno             *davefx [at] gmail.com*
+Ruslan Ijbulatov (LRN)          *lrn1986 [at] gmail.com*
+Olga Smolenchuk                 *olyasib12 [at] gmail.com*
+Ilya Tumaykin                   *itumaykin [at] gmail.com*
+Frank Morgner                   *morgner [at] informatik.hu-berlin.de*
+Jason Spafford                  *nullprogrammer [at] gmail.com*
+Jared Wong                      *jaredlwong [at] gmail.com*
+Alexandre Bique                 *bique.alexandre [at] gmail.com*
+Alfredo Pironti                 *alfredo [at] pironti.eu*
+Raj Raman                       *rajramanca [at] gmail.com*
+Kurt Roeckx                     *kurt [at] roeckx.be*
+Attila Molnar                   *attilamolnar [at] hush.com*
+Giuseppe Scrivano               *gscrivano [at] gnu.org*
+Gustavo Zacarias                *gustavo [at] zacarias.com.ar*
+
+
+----------------------------------------------------------------------
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.

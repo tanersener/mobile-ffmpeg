@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_obj_import_url} (gnutls_pkcs11_obj_t @var{obj}, const char * @var{url}, unsigned int @var{flags})
+@var{obj}: The structure to store the object
+
+@var{url}: a PKCS 11 url identifying the key
+
+@var{flags}: Or sequence of GNUTLS_PKCS11_OBJ_* flags
+
+This function will "import" a PKCS 11 URL identifying an object (e.g. certificate)
+to the @code{gnutls_pkcs11_obj_t}  type. This does not involve any
+parsing (such as X.509 or OpenPGP) since the @code{gnutls_pkcs11_obj_t}  is
+format agnostic. Only data are transferred.
+
+If the flag @code{GNUTLS_PKCS11_OBJ_FLAG_OVERWRITE_TRUSTMOD_EXT}  is specified
+any certificate read, will have its extensions overwritten by any
+stapled extensions in the trust module.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

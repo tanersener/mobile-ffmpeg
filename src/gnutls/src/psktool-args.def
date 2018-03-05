@@ -1,0 +1,63 @@
+AutoGen Definitions options;
+prog-name     = psktool;
+prog-title    = "GnuTLS PSK tool";
+prog-desc     = "Program to create PSK parameters.\n";
+detail    = "Program  that generates random keys for use with TLS-PSK. The
+keys are stored in hexadecimal format in a key file.";
+short-usage   = "psktool [options]\npsktool --help for usage instructions.\n";
+explain       = "";
+
+#include args-std.def
+
+flag = {
+    name      = keysize;
+    value     = s;
+    arg-type  = number;
+    arg-range = "0 -> 512";
+    descrip   = "specify the key size in bytes";
+    doc = "";
+};
+
+flag = {
+    name      = username;
+    value     = u;
+    arg-type  = string;
+    descrip   = "specify a username";
+    doc = "";
+};
+
+flag = {
+    name      = passwd;
+    value     = p;
+    arg-type  = string;
+    descrip   = "specify a password file";
+    doc       = "";
+};
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+    gnutls-cli-debug (1), gnutls-serv (1), srptool (1), certtool (1)
+_EOT_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+To add a user 'psk_identity' in @file{passwd.psk} for use with GnuTLS run:
+@example
+$ ./psktool -u psk_identity -p passwd.psk
+Generating a random key for user 'psk_identity'
+Key stored to passwd.psk
+$ cat psks.txt
+psk_identity:88f3824b3e5659f52d00e959bacab954b6540344
+$
+@end example
+
+This command will create @file{passwd.psk} if it does not exist
+and will add user 'psk_identity' (you will also be prompted for a password). 
+_EOT_;
+};
+

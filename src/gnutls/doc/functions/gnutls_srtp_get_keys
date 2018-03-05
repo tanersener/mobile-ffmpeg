@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_srtp_get_keys} (gnutls_session_t @var{session}, void * @var{key_material}, unsigned int @var{key_material_size}, gnutls_datum_t * @var{client_key}, gnutls_datum_t * @var{client_salt}, gnutls_datum_t * @var{server_key}, gnutls_datum_t * @var{server_salt})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{key_material}: Space to hold the generated key material
+
+@var{key_material_size}: The maximum size of the key material
+
+@var{client_key}: The master client write key, pointing inside the key material
+
+@var{client_salt}: The master client write salt, pointing inside the key material
+
+@var{server_key}: The master server write key, pointing inside the key material
+
+@var{server_salt}: The master server write salt, pointing inside the key material
+
+This is a helper function to generate the keying material for SRTP.
+It requires the space of the key material to be pre-allocated (should be at least
+2x the maximum key size and salt size). The  @code{client_key} ,  @code{client_salt} ,  @code{server_key} and  @code{server_salt} are convenience datums that point inside the key material. They may
+be @code{NULL} .
+
+@strong{Returns:} On success the size of the key material is returned,
+otherwise, @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the buffer given is not 
+sufficient, or a negative error code.
+
+Since 3.1.4
+@end deftypefun

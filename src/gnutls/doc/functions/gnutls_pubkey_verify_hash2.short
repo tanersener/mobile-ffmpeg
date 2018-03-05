@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_verify_hash2} (gnutls_pubkey_t @var{key}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{hash}, const gnutls_datum_t * @var{signature})

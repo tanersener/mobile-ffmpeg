@@ -1,0 +1,1 @@
+@item @var{const gnutls_digest_algorithm_t *} @ref{gnutls_digest_list} ( @var{void})

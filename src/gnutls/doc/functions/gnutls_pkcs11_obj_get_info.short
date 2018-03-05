@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_obj_get_info} (gnutls_pkcs11_obj_t @var{obj}, gnutls_pkcs11_obj_info_t @var{itype}, void * @var{output}, size_t * @var{output_size})

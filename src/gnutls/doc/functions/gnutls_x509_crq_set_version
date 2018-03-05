@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_version} (gnutls_x509_crq_t @var{crq}, unsigned int @var{version})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{version}: holds the version number, for v1 Requests must be 1
+
+This function will set the version of the certificate request.  For
+version 1 requests this must be one.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

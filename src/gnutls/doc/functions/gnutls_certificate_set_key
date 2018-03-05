@@ -1,0 +1,38 @@
+
+
+
+@deftypefun {int} {gnutls_certificate_set_key} (gnutls_certificate_credentials_t @var{res}, const char ** @var{names}, int @var{names_size}, gnutls_pcert_st * @var{pcert_list}, int @var{pcert_list_size}, gnutls_privkey_t @var{key})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{names}: is an array of DNS name of the certificate (NULL if none)
+
+@var{names_size}: holds the size of the names list
+
+@var{pcert_list}: contains a certificate list (path) for the specified private key
+
+@var{pcert_list_size}: holds the size of the certificate list
+
+@var{key}: is a @code{gnutls_privkey_t}  key
+
+This function sets a certificate/private key pair in the
+gnutls_certificate_credentials_t type.  This function may be
+called more than once, in case multiple keys/certificates exist for
+the server.  For clients that want to send more than their own end-
+entity certificate (e.g., also an intermediate CA cert), the full
+certificate chain must be provided in  @code{pcert_list} .
+
+Note that the  @code{key} and the elements of  @code{pcert_list} will become part of the credentials 
+structure and must not be deallocated. They will be automatically deallocated 
+when the  @code{res} structure is deinitialized.
+
+If that function fails to load the  @code{res} structure is at an undefined state, it must
+not be reused to load other keys or certificates.
+
+Note that, this function by default returns zero on success and a negative value on error.
+Since 3.5.6, when the flag @code{GNUTLS_CERTIFICATE_API_V2}  is set using @code{gnutls_certificate_set_flags()} 
+it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+
+@strong{Returns:} On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
+
+@strong{Since:} 3.0
+@end deftypefun

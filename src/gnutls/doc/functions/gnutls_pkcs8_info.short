@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs8_info} (const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int * @var{schema}, unsigned int * @var{cipher}, void * @var{salt}, unsigned int * @var{salt_size}, unsigned int * @var{iter_count}, char ** @var{oid})

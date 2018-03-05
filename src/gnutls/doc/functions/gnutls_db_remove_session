@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_db_remove_session} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function will remove the current session data from the
+session database.  This will prevent future handshakes reusing
+these session data.  This function should be called if a session
+was terminated abnormally, and before @code{gnutls_deinit()}  is called.
+
+Normally @code{gnutls_deinit()}  will remove abnormally terminated
+sessions.
+@end deftypefun

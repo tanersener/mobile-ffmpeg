@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_srtp_get_mki} (gnutls_session_t @var{session}, gnutls_datum_t * @var{mki})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{mki}: will hold the MKI
+
+This function exports the negotiated Master Key Identifier,
+received by the peer if any. The returned value in  @code{mki} should be 
+treated as constant and valid only during the session's lifetime.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+Since 3.1.4
+@end deftypefun

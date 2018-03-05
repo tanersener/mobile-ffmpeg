@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_set_ocsp_status_request_function2} (gnutls_certificate_credentials_t @var{sc}, unsigned @var{idx}, gnutls_status_request_ocsp_func @var{ocsp_func}, void * @var{ptr})

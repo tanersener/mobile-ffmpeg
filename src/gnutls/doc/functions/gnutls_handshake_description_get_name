@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {const char     *} {gnutls_handshake_description_get_name} (gnutls_handshake_description_t         @var{type})
+@var{type}: is a handshake message description
+
+Convert a @code{gnutls_handshake_description_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified handshake
+message or @code{NULL} .
+@end deftypefun

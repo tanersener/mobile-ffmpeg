@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_aki_get_cert_issuer} (gnutls_x509_aki_t @var{aki}, unsigned int @var{seq}, unsigned int * @var{san_type}, gnutls_datum_t * @var{san}, gnutls_datum_t * @var{othername_oid}, gnutls_datum_t * @var{serial})

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_set_name_constraints} (gnutls_x509_crt_t @var{crt}, gnutls_x509_name_constraints_t @var{nc}, unsigned int @var{critical})

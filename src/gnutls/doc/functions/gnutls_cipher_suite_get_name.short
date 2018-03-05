@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_cipher_suite_get_name} (gnutls_kx_algorithm_t       @var{kx_algorithm}, gnutls_cipher_algorithm_t       @var{cipher_algorithm}, gnutls_mac_algorithm_t       @var{mac_algorithm})

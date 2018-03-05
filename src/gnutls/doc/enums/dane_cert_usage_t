@@ -1,0 +1,17 @@
+
+
+@c dane_cert_usage_t
+@table @code
+@item DANE_@-CERT_@-USAGE_@-CA
+CA constraint. The certificate/key
+presented must have signed the verified key.
+@item DANE_@-CERT_@-USAGE_@-EE
+The key or the certificate of the end
+entity.
+@item DANE_@-CERT_@-USAGE_@-LOCAL_@-CA
+The remote CA is local and possibly
+untrusted by the verifier.
+@item DANE_@-CERT_@-USAGE_@-LOCAL_@-EE
+The remote end-entity key is local
+and possibly untrusted by the verifier (not signed by a CA).
+@end table

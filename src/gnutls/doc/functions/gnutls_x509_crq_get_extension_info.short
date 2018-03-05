@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crq_get_extension_info} (gnutls_x509_crq_t @var{crq}, unsigned @var{indx}, void * @var{oid}, size_t * @var{sizeof_oid}, unsigned int * @var{critical})

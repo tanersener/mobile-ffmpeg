@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_session_supplemental_register} (gnutls_session_t @var{session}, const char * @var{name}, gnutls_supplemental_data_format_type_t @var{type}, gnutls_supp_recv_func @var{recv_func}, gnutls_supp_send_func @var{send_func}, unsigned @var{flags})

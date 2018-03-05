@@ -1,0 +1,7 @@
+
+
+@c gnutls_supplemental_data_format_type_t
+@table @code
+@item GNUTLS_@-SUPPLEMENTAL_@-UNKNOWN
+Unknown data format
+@end table

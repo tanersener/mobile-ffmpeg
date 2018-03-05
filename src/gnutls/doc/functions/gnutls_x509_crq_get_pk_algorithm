@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_pk_algorithm} (gnutls_x509_crq_t @var{crq}, unsigned int * @var{bits})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{bits}: if bits is non-@code{NULL}  it will hold the size of the parameters' in bits
+
+This function will return the public key algorithm of a PKCS@code{10} 
+certificate request.
+
+If bits is non-@code{NULL} , it should have enough size to hold the
+parameters size in bits.  For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public exponent.
+
+@strong{Returns:} a member of the @code{gnutls_pk_algorithm_t}  enumeration on
+success, or a negative error code on error.
+@end deftypefun

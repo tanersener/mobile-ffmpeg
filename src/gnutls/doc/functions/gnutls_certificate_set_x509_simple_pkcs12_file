@@ -1,0 +1,43 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_x509_simple_pkcs12_file} (gnutls_certificate_credentials_t @var{res}, const char * @var{pkcs12file}, gnutls_x509_crt_fmt_t @var{type}, const char * @var{password})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{pkcs12file}: filename of file containing PKCS@code{12}  blob.
+
+@var{type}: is PEM or DER of the  @code{pkcs12file} .
+
+@var{password}: optional password used to decrypt PKCS@code{12}  file, bags and keys.
+
+This function sets a certificate/private key pair and/or a CRL in
+the gnutls_certificate_credentials_t type.  This function may
+be called more than once (in case multiple keys/certificates exist
+for the server).
+
+PKCS@code{12}  files with a MAC, encrypted bags and PKCS @code{8} 
+private keys are supported. However,
+only password based security, and the same password for all
+operations, are supported.
+
+PKCS@code{12}  file may contain many keys and/or certificates, and this
+function will try to auto-detect based on the key ID the certificate
+and key pair to use. If the PKCS@code{12}  file contain the issuer of
+the selected certificate, it will be appended to the certificate
+to form a chain.
+
+If more than one private keys are stored in the PKCS@code{12}  file,
+then only one key will be read (and it is undefined which one).
+
+It is believed that the limitations of this function is acceptable
+for most usage, and that any more flexibility would introduce
+complexity that would make it harder to use this functionality at
+all.
+
+Note that, this function by default returns zero on success and a negative value on error.
+Since 3.5.6, when the flag @code{GNUTLS_CERTIFICATE_API_V2}  is set using @code{gnutls_certificate_set_flags()} 
+it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+
+@strong{Returns:} On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
+@end deftypefun

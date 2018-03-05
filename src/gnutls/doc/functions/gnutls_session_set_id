@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_set_id} (gnutls_session_t @var{session}, const gnutls_datum_t * @var{sid})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{sid}: the session identifier
+
+This function sets the session ID to be used in a client hello.
+This is a function intended for exceptional uses. Do not use this
+function unless you are implementing a custom protocol.
+
+To set session resumption parameters use @code{gnutls_session_set_data()}  instead.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.2.1
+@end deftypefun

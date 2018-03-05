@@ -1,0 +1,36 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_issuer_dn_by_oid} (gnutls_x509_crt_t @var{cert}, const char * @var{oid}, unsigned @var{indx}, unsigned int @var{raw_flag}, void * @var{buf}, size_t * @var{buf_size})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{oid}: holds an Object Identified in null terminated string
+
+@var{indx}: In case multiple same OIDs exist in the RDN, this specifies which to send. Use (0) to get the first one.
+
+@var{raw_flag}: If non-zero returns the raw DER data of the DN part.
+
+@var{buf}: a pointer to a structure to hold the name (may be null)
+
+@var{buf_size}: initially holds the size of  @code{buf} 
+
+This function will extract the part of the name of the Certificate
+issuer specified by the given OID. The output, if the raw flag is not
+used, will be encoded as described in RFC4514. Thus a string that is
+ASCII or UTF-8 encoded, depending on the certificate data.
+
+Some helper macros with popular OIDs can be found in gnutls/x509.h
+If raw flag is (0), this function will only return known OIDs as
+text. Other OIDs will be DER encoded, as described in RFC4514 --
+in hex format with a '#' prefix.  You can check about known OIDs
+using @code{gnutls_x509_dn_oid_known()} .
+
+If  @code{buf} is null then only the size will be filled. If the  @code{raw_flag} is not specified the output is always null terminated, although the
+ @code{buf_size} will not include the null character.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is not
+long enough, and in that case the  @code{buf_size} will be updated with
+the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if there 
+are no data in the current index. On success 0 is returned.
+@end deftypefun

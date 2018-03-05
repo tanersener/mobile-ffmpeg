@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {void} {gnutls_transport_set_int} (gnutls_session_t @var{session}, int @var{fd})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{fd}: is the socket descriptor for the connection.
+
+This function sets the first argument of the transport function, such
+as @code{send()}  and @code{recv()}  for the default callbacks using the
+system's socket API.
+
+This function is equivalent to calling @code{gnutls_transport_set_ptr()} 
+with the descriptor, but requires no casts.
+
+@strong{Since:} 3.1.9
+@end deftypefun

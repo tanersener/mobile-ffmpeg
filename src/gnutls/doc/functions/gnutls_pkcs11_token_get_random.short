@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_token_get_random} (const char * @var{token_url}, void * @var{rnddata}, size_t @var{len})

@@ -1,0 +1,33 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_add_cert_id} (gnutls_ocsp_req_t @var{req}, gnutls_digest_algorithm_t @var{digest}, const gnutls_datum_t * @var{issuer_name_hash}, const gnutls_datum_t * @var{issuer_key_hash}, const gnutls_datum_t * @var{serial_number})
+@var{req}: should contain a @code{gnutls_ocsp_req_t}  type
+
+@var{digest}: hash algorithm, a @code{gnutls_digest_algorithm_t}  value
+
+@var{issuer_name_hash}: hash of issuer's DN
+
+@var{issuer_key_hash}: hash of issuer's public key
+
+@var{serial_number}: serial number of certificate to check
+
+This function will add another request to the OCSP request for a
+particular certificate having the issuer name hash of
+ @code{issuer_name_hash} and issuer key hash of  @code{issuer_key_hash} (both
+hashed using  @code{digest} ) and serial number  @code{serial_number} .
+
+The information needed corresponds to the CertID structure:
+
+<informalexample><programlisting>
+CertID	  ::=     SEQUENCE @{
+hashAlgorithm       AlgorithmIdentifier,
+issuerNameHash      OCTET STRING, -- Hash of Issuer's DN
+issuerKeyHash       OCTET STRING, -- Hash of Issuers public key
+serialNumber	CertificateSerialNumber @}
+</programlisting></informalexample>
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.
+@end deftypefun

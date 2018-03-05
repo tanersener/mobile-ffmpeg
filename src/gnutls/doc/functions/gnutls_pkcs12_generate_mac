@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_generate_mac} (gnutls_pkcs12_t @var{pkcs12}, const char * @var{pass})
+@var{pkcs12}: A pkcs12 type
+
+@var{pass}: The password for the MAC
+
+This function will generate a MAC for the PKCS12 structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

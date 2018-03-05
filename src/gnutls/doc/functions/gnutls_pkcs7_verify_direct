@@ -1,0 +1,35 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_verify_direct} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_t @var{signer}, unsigned @var{idx}, const gnutls_datum_t * @var{data}, unsigned @var{flags})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+@var{signer}: the certificate believed to have signed the structure
+
+@var{idx}: the index of the signature info to check
+
+@var{data}: The data to be verified or @code{NULL} 
+
+@var{flags}: Zero or an OR list of @code{gnutls_certificate_verify_flags} 
+
+This function will verify the provided data against the signature
+present in the SignedData of the PKCS @code{7}  structure. If the data
+provided are NULL then the data in the encapsulatedContent field
+will be used instead.
+
+Note that, unlike @code{gnutls_pkcs7_verify()}  this function does not
+verify the key purpose of the signer. It is expected for the caller
+to verify the intended purpose of the @code{signer}  -e.g., via @code{gnutls_x509_crt_get_key_purpose_oid()} ,
+or @code{gnutls_x509_crt_check_key_purpose()} .
+
+Note also, that since GnuTLS 3.5.6 this function introduces checks in the
+end certificate ( @code{signer} ), including time checks and key usage checks.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. A verification error results to a
+@code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  and the lack of encapsulated data
+to verify to a @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} .
+
+@strong{Since:} 3.4.2
+@end deftypefun

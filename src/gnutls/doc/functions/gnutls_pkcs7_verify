@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_verify} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_trust_list_t @var{tl}, gnutls_typed_vdata_st * @var{vdata}, unsigned int @var{vdata_size}, unsigned @var{idx}, const gnutls_datum_t * @var{data}, unsigned @var{flags})
+@var{pkcs7}: should contain a @code{gnutls_pkcs7_t}  type
+
+@var{tl}: A list of trusted certificates
+
+@var{vdata}: an array of typed data
+
+@var{vdata_size}: the number of data elements
+
+@var{idx}: the index of the signature info to check
+
+@var{data}: The data to be verified or @code{NULL} 
+
+@var{flags}: Zero or an OR list of @code{gnutls_certificate_verify_flags} 
+
+This function will verify the provided data against the signature
+present in the SignedData of the PKCS @code{7}  structure. If the data
+provided are NULL then the data in the encapsulatedContent field
+will be used instead.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. A verification error results to a
+@code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  and the lack of encapsulated data
+to verify to a @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} .
+
+@strong{Since:} 3.4.2
+@end deftypefun

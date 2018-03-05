@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_verify_data2} (gnutls_pubkey_t @var{pubkey}, gnutls_sign_algorithm_t @var{algo}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, const gnutls_datum_t * @var{signature})
+@var{pubkey}: Holds the public key
+
+@var{algo}: The signature algorithm used
+
+@var{flags}: Zero or an OR list of @code{gnutls_certificate_verify_flags} 
+
+@var{data}: holds the signed data
+
+@var{signature}: contains the signature
+
+This function will verify the given signed data, using the
+parameters from the certificate.
+
+@strong{Returns:} In case of a verification failure @code{GNUTLS_E_PK_SIG_VERIFY_FAILED}  
+is returned, and zero or positive code on success. For known to be insecure
+signatures this function will return @code{GNUTLS_E_INSUFFICIENT_SECURITY}  unless
+the flag @code{GNUTLS_VERIFY_ALLOW_BROKEN}  is specified.
+
+@strong{Since:} 3.0
+@end deftypefun

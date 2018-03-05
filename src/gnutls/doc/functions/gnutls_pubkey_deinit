@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_pubkey_deinit} (gnutls_pubkey_t @var{key})
+@var{key}: The key to be deinitialized
+
+This function will deinitialize a public key structure.
+
+@strong{Since:} 2.12.0
+@end deftypefun

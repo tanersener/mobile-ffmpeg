@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {void} {gnutls_transport_set_errno_function} (gnutls_session_t @var{session}, gnutls_errno_func @var{errno_func})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{errno_func}: a callback function similar to @code{write()} 
+
+This is the function where you set a function to retrieve errno
+after a failed push or pull operation.
+
+ @code{errno_func} is of the form,
+int (*gnutls_errno_func)(gnutls_transport_ptr_t);
+and should return the errno.
+
+@strong{Since:} 2.12.0
+@end deftypefun

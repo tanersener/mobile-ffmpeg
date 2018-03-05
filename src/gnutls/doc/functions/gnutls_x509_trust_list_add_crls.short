@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_trust_list_add_crls} (gnutls_x509_trust_list_t @var{list}, const gnutls_x509_crl_t * @var{crl_list}, unsigned @var{crl_size}, unsigned int @var{flags}, unsigned int @var{verification_flags})

@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {unsigned int} {gnutls_sec_param_to_pk_bits} (gnutls_pk_algorithm_t @var{algo}, gnutls_sec_param_t @var{param})
+@var{algo}: is a public key algorithm
+
+@var{param}: is a security parameter
+
+When generating private and public key pairs a difficult question
+is which size of "bits" the modulus will be in RSA and the group size
+in DSA. The easy answer is 1024, which is also wrong. This function
+will convert a human understandable security parameter to an
+appropriate size for the specific algorithm.
+
+@strong{Returns:} The number of bits, or (0).
+
+@strong{Since:} 2.12.0
+@end deftypefun

@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_subject_unique_id} (gnutls_x509_crt_t @var{cert}, const void * @var{id}, size_t @var{id_size})
+@var{cert}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{id}: The unique ID
+
+@var{id_size}: Holds the size of the unique ID.
+
+This function will set the X.509 certificate's subject unique ID field.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.7
+@end deftypefun

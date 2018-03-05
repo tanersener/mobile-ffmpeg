@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_key_purpose_set} (gnutls_x509_key_purposes_t @var{p}, const char * @var{oid})
+@var{p}: The key purposes
+
+@var{oid}: The object identifier of the key purpose
+
+This function will store the specified key purpose in the
+purposes.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0), otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

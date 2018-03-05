@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {void} {gnutls_transport_get_int2} (gnutls_session_t @var{session}, int * @var{recv_int}, int * @var{send_int})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{recv_int}: will hold the value for the pull function
+
+@var{send_int}: will hold the value for the push function
+
+Used to get the arguments of the transport functions (like PUSH
+and PULL).  These should have been set using
+@code{gnutls_transport_set_int2()} .
+
+@strong{Since:} 3.1.9
+@end deftypefun

@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_export_crl_dist_points} (gnutls_x509_crl_dist_points_t @var{cdp}, gnutls_datum_t * @var{ext})
+@var{cdp}: A pointer to an initialized CRL distribution points.
+
+@var{ext}: The DER-encoded extension data; must be freed using @code{gnutls_free()} .
+
+This function will convert the provided policies, to a certificate policy
+DER encoded extension (2.5.29.31).
+
+The  @code{ext} data will be allocated using @code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

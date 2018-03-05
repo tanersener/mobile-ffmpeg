@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_policy_release} (struct gnutls_x509_policy_st * @var{policy})
+@var{policy}: a certificate policy
+
+This function will deinitialize all memory associated with the provided
+ @code{policy} . The policy is allocated using @code{gnutls_x509_crt_get_policy()} .
+
+@strong{Since:} 3.1.5
+@end deftypefun

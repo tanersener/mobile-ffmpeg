@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_psk_client_get_hint} (gnutls_session_t @var{session})
+@var{session}: is a gnutls session
+
+The PSK identity hint may give the client help in deciding which
+username to use.  This should only be called in case of PSK
+authentication and in case of a client.
+
+@strong{Returns:} the identity hint of the peer, or @code{NULL}  in case of an error.
+
+@strong{Since:} 2.4.0
+@end deftypefun

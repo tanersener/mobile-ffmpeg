@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_set_authority_info_access} (gnutls_x509_crt_t @var{crt}, int @var{what}, gnutls_datum_t * @var{data})

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_resp_init} (gnutls_ocsp_resp_t * @var{resp})

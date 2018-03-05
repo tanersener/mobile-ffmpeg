@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_sign_get_name} (gnutls_sign_algorithm_t @var{algorithm})
+@var{algorithm}: is a sign algorithm
+
+Convert a @code{gnutls_sign_algorithm_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified sign
+algorithm, or @code{NULL} .
+@end deftypefun

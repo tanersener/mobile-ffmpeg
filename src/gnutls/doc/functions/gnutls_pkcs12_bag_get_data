@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_get_data} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx}, gnutls_datum_t * @var{data})
+@var{bag}: The bag
+
+@var{indx}: The element of the bag to get the data from
+
+@var{data}: where the bag's data will be. Should be treated as constant.
+
+This function will return the bag's data. The data is a constant
+that is stored into the bag.  Should not be accessed after the bag
+is deleted.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

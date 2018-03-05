@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_get_crl_count} (gnutls_pkcs7_t @var{pkcs7})
+@var{pkcs7}: The pkcs7 type
+
+This function will return the number of certificates in the PKCS7
+or RFC2630 crl set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

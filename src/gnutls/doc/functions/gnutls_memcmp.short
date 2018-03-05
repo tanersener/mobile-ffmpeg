@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_memcmp} (const void * @var{s1}, const void * @var{s2}, size_t @var{n})

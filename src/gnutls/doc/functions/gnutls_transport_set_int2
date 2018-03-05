@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {void} {gnutls_transport_set_int2} (gnutls_session_t @var{session}, int @var{recv_fd}, int @var{send_fd})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{recv_fd}: is socket descriptor for the pull function
+
+@var{send_fd}: is socket descriptor for the push function
+
+This function sets the first argument of the transport functions,
+such as @code{send()}  and @code{recv()}  for the default callbacks using the
+system's socket API. With this function you can set two different
+descriptors for receiving and sending.
+
+This function is equivalent to calling @code{gnutls_transport_set_ptr2()} 
+with the descriptors, but requires no casts.
+
+@strong{Since:} 3.1.9
+@end deftypefun

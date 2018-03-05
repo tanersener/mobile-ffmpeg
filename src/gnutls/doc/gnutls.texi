@@ -1,0 +1,217 @@
+\input texinfo   @c -*-texinfo-*-
+@comment %**start of header
+@setfilename gnutls.info
+@include version.texi
+@settitle GnuTLS @value{VERSION}
+@c don't indent the paragraphs.
+@paragraphindent 0
+
+@c Unify some of the indices.
+@syncodeindex tp fn
+@syncodeindex pg cp
+
+@comment %**end of header
+@finalout
+@copying
+This manual is last updated @value{UPDATED} for version
+@value{VERSION} of GnuTLS.
+
+Copyright @copyright{} 2001-2018 Free Software Foundation, Inc.\\
+Copyright @copyright{} 2001-2018 Nikos Mavrogiannopoulos
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled ``GNU Free
+Documentation License''.
+@end quotation
+@end copying
+
+@dircategory Software libraries
+@direntry
+* GnuTLS: (gnutls).		GNU Transport Layer Security Library.
+@end direntry
+
+@dircategory System Administration
+@direntry
+* certtool: (gnutls)Invoking certtool.	Manipulate certificates and keys.
+* gnutls-serv: (gnutls)Invoking gnutls-serv.	GnuTLS test server.
+* gnutls-cli: (gnutls)Invoking gnutls-cli.	GnuTLS test client.
+* gnutls-cli-debug: (gnutls)Invoking gnutls-cli-debug.	GnuTLS debug client.
+* psktool: (gnutls)Invoking psktool.	Simple TLS-Pre-Shared-Keys manager.
+* srptool: (gnutls)Invoking srptool.	Simple SRP password tool.
+@end direntry
+
+@titlepage
+@title GnuTLS
+@subtitle Transport Layer Security Library for the GNU system
+@subtitle for version @value{VERSION}, @value{UPDATED}
+@sp 7
+@center @image{gnutls-logo,6cm,6cm}
+@author Nikos Mavrogiannopoulos
+@author Simon Josefsson (@email{bugs@@gnutls.org})
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@c reference to an internal function.
+@macro refint {func}
+@code{\func\}
+@end macro
+
+@macro xcite{ref}
+[@emph{\ref\}]
+@end macro
+
+@macro funcref{ref}
+@ref{\ref\}
+@end macro
+
+@macro funcintref{ref}
+@code{\ref\}
+@end macro
+
+@macro showfuncA{ref}
+@table @code
+@include functions/\ref\.short
+@end table
+@end macro
+
+@macro showfuncB{ref1,ref2}
+@table @code
+@include functions/\ref1\.short
+@include functions/\ref2\.short
+@end table
+@end macro
+
+@macro showfuncC{ref1,ref2,ref3}
+@table @code
+@include functions/\ref1\.short
+@include functions/\ref2\.short
+@include functions/\ref3\.short
+@end table
+@end macro
+
+@macro showfuncD{ref1,ref2,ref3,ref4}
+@table @code
+@include functions/\ref1\.short
+@include functions/\ref2\.short
+@include functions/\ref3\.short
+@include functions/\ref4\.short
+@end table
+@end macro
+
+@macro showfuncE{ref1,ref2,ref3,ref4,ref5}
+@table @code
+@include functions/\ref1\.short
+@include functions/\ref2\.short
+@include functions/\ref3\.short
+@include functions/\ref4\.short
+@include functions/\ref5\.short
+@end table
+@end macro
+
+@macro showfuncF{ref1,ref2,ref3,ref4,ref5,ref6}
+@table @code
+@include functions/\ref1\.short
+@include functions/\ref2\.short
+@include functions/\ref3\.short
+@include functions/\ref4\.short
+@include functions/\ref5\.short
+@include functions/\ref6\.short
+@end table
+@end macro
+
+@macro showfuncdesc{ref}
+@include functions/\ref\
+@end macro
+
+@macro showenumdesc{ref,cap}
+@float Figure,\ref\
+@include enums/\ref\
+@caption{\cap\}
+@end float
+@end macro
+
+@contents
+
+@ifnottex
+@node Top
+@top GnuTLS
+
+@insertcopying
+@end ifnottex
+
+@menu
+* Preface::
+* Introduction to GnuTLS::
+* Introduction to TLS::
+* Authentication methods::
+* Hardware security modules and abstract key types::
+* How to use GnuTLS in applications::
+* GnuTLS application examples::
+* Using GnuTLS as a cryptographic library::
+* Other included programs::
+* Internal architecture of GnuTLS::
+* Upgrading from previous versions::
+* Support::
+* Error codes::
+* Supported ciphersuites::
+* API reference::
+* Copying Information::
+* Bibliography::
+* Function and Data Index::
+* Concept Index::
+@c * @mybibnode{}::
+@end menu
+
+@include cha-preface.texi
+
+@include cha-library.texi
+
+@include cha-intro-tls.texi
+
+@include cha-auth.texi
+
+@include cha-tokens.texi
+
+@include cha-gtls-app.texi
+
+@include cha-gtls-examples.texi
+
+@include cha-crypto.texi
+
+@include cha-programs.texi
+
+@include cha-internals.texi
+
+@c appendices
+
+@include cha-upgrade.texi
+
+@include cha-support.texi
+
+@include cha-errors.texi
+
+@include cha-ciphersuites.texi
+
+@include cha-functions.texi
+
+@include cha-copying.texi
+
+@include cha-bib.texi
+
+@node Function and Data Index
+@unnumbered Function and Data Index
+
+@printindex fn
+
+@node Concept Index
+@unnumbered Concept Index
+
+@printindex cp
+
+@bye

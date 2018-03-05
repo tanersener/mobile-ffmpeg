@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_privkey_get_seed} (gnutls_x509_privkey_t @var{key}, gnutls_digest_algorithm_t * @var{digest}, void * @var{seed}, size_t * @var{seed_size})

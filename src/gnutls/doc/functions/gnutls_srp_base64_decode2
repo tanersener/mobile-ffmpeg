@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_srp_base64_decode2} (const gnutls_datum_t * @var{b64_data}, gnutls_datum_t * @var{result})
+@var{b64_data}: contains the encoded data
+
+@var{result}: the place where decoded data lie
+
+This function will decode the given encoded data. The decoded data
+will be allocated, and stored into result.  It will decode using
+the base64 algorithm as used in libsrp.
+
+You should use @code{gnutls_free()}  to free the returned data.
+
+Warning!  This base64 encoding is not the "standard" encoding, so
+do not use it for non-SRP purposes.
+
+@strong{Returns:} 0 on success, or an error code.
+@end deftypefun

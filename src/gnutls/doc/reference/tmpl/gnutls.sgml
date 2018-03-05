@@ -1,0 +1,4564 @@
+<!-- ##### SECTION Title ##### -->
+gnutls
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO GNUTLS_CIPHER_ARCFOUR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_CIPHER_RIJNDAEL_128_CBC ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_CIPHER_RIJNDAEL_256_CBC ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_CIPHER_RIJNDAEL_CBC ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_CLIENT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_DATAGRAM ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_DIG_SHA ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_AGAIN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_APPLICATION_ERROR_MAX ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_APPLICATION_ERROR_MIN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_DER_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_DER_OVERFLOW ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_ELEMENT_NOT_FOUND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_GENERIC_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_SYNTAX_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_TAG_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_TAG_IMPLICIT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_TYPE_ANY_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_VALUE_NOT_FOUND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ASN1_VALUE_NOT_VALID ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_BAD_COOKIE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_BASE64_DECODING_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_BASE64_ENCODING_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_CERTIFICATE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_CERTIFICATE_KEY_MISMATCH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_CERTIFICATE_LIST_UNSORTED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_COMPRESSION_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_CONSTRAINT_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_CRYPTODEV_DEVICE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_CRYPTODEV_IOCTL_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_CRYPTO_ALREADY_REGISTERED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_CRYPTO_INIT_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_DB_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_DECOMPRESSION_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_DECRYPTION_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_DH_PRIME_UNACCEPTABLE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ECC_NO_SUPPORTED_CURVES ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ECC_UNSUPPORTED_CURVE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ENCRYPTION_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ERROR_IN_FINISHED_PACKET ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_EXPIRED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_FATAL_ALERT_RECEIVED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_FILE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_GOT_APPLICATION_DATA ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_HANDSHAKE_TOO_LARGE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_HASH_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_HEARTBEAT_PING_RECEIVED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_HEARTBEAT_PONG_RECEIVED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_IA_VERIFY_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ILLEGAL_PARAMETER ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_ILLEGAL_SRP_USERNAME ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INCOMPATIBLE_CRYPTO_LIBRARY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INSUFFICIENT_CRED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INSUFFICIENT_CREDENTIALS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INSUFICIENT_CRED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INSUFICIENT_CREDENTIALS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INTERNAL_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INTERRUPTED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INVALID_PASSWORD ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INVALID_REQUEST ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_INVALID_SESSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_KEY_USAGE_VIOLATION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_LARGE_PACKET ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_LOCKING_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_MAC_VERIFY_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_MEMORY_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_MPI_PRINT_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_MPI_SCAN_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_NO_CERTIFICATE_FOUND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_NO_CERTIFICATE_STATUS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_NO_CIPHER_SUITES ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_NO_COMPRESSION_ALGORITHMS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_NO_PRIORITIES_WERE_SET ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_NO_TEMPORARY_DH_PARAMS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_NO_TEMPORARY_RSA_PARAMS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_OCSP_RESPONSE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_OPENPGP_GETKEY_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_OPENPGP_KEYRING_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_OPENPGP_SUBKEY_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_OPENPGP_UID_REVOKED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PARSING_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_ATTRIBUTE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_DATA_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_DEVICE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_KEY_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_LOAD_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_PIN_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_PIN_EXPIRED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_PIN_LOCKED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_REQUESTED_OBJECT_NOT_AVAILBLE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_SESSION_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_SIGNATURE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_SLOT_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_TOKEN_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_UNSUPPORTED_FEATURE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS11_USER_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PKCS1_WRONG_PAD ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PK_DECRYPTION_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PK_ENCRYPTION_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PK_SIGN_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PK_SIG_VERIFY_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PREMATURE_TERMINATION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PULL_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_PUSH_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_RANDOM_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_RECORD_LIMIT_REACHED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_REHANDSHAKE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_SAFE_RENEGOTIATION_FAILED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_SESSION_EOF ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_SHORT_MEMORY_BUFFER ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_SRP_PWD_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_SRP_PWD_PARSING_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_SUCCESS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_TIMEDOUT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_TOO_MANY_EMPTY_PACKETS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_TPM_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_TPM_KEY_NOT_FOUND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_TPM_KEY_PASSWORD_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_TPM_SESSION_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_TPM_SRK_PASSWORD_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_TPM_UNINITIALIZED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNEXPECTED_PACKET ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNEXPECTED_PACKET_LENGTH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNIMPLEMENTED_FEATURE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNKNOWN_ALGORITHM ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNKNOWN_CIPHER_SUITE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNKNOWN_CIPHER_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNKNOWN_HASH_ALGORITHM ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNKNOWN_PK_ALGORITHM ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNKNOWN_SRP_USERNAME ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNSUPPORTED_VERSION_PACKET ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_UNWANTED_ALGORITHM ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_USER_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_WARNING_ALERT_RECEIVED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_WARNING_IA_FPHF_RECEIVED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_WARNING_IA_IPHF_RECEIVED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_X509_CERTIFICATE_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_X509_UNKNOWN_SAN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_X509_UNSUPPORTED_EXTENSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_E_X509_UNSUPPORTED_OID ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_HB_LOCAL_ALLOWED_TO_SEND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_HB_PEER_ALLOWED_TO_SEND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_HB_PEER_NOT_ALLOWED_TO_SEND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_HEARTBEAT_WAIT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_KEY_CRL_SIGN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_KEY_DATA_ENCIPHERMENT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_KEY_DECIPHER_ONLY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_KEY_DIGITAL_SIGNATURE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_KEY_ENCIPHER_ONLY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_KEY_KEY_AGREEMENT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_KEY_KEY_CERT_SIGN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_KEY_KEY_ENCIPHERMENT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_KEY_NON_REPUDIATION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_MAC_SHA ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_MAX_ALGORITHM_NUM ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_MAX_SESSION_ID ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_NONBLOCK ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_NO_EXTENSIONS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_PIN_COUNT_LOW ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_PIN_FINAL_TRY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_PIN_SO ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_PIN_USER ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_PKCS11_PIN_WRONG ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_PK_ECC ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_SERVER ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_VERSION_MAJOR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_VERSION_MINOR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_VERSION_NUMBER ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_VERSION_PATCH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO HAVE_SSIZE_T ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### ENUM gnutls_alert_description_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_A_CLOSE_NOTIFY: 
+@GNUTLS_A_UNEXPECTED_MESSAGE: 
+@GNUTLS_A_BAD_RECORD_MAC: 
+@GNUTLS_A_DECRYPTION_FAILED: 
+@GNUTLS_A_RECORD_OVERFLOW: 
+@GNUTLS_A_DECOMPRESSION_FAILURE: 
+@GNUTLS_A_HANDSHAKE_FAILURE: 
+@GNUTLS_A_SSL3_NO_CERTIFICATE: 
+@GNUTLS_A_BAD_CERTIFICATE: 
+@GNUTLS_A_UNSUPPORTED_CERTIFICATE: 
+@GNUTLS_A_CERTIFICATE_REVOKED: 
+@GNUTLS_A_CERTIFICATE_EXPIRED: 
+@GNUTLS_A_CERTIFICATE_UNKNOWN: 
+@GNUTLS_A_ILLEGAL_PARAMETER: 
+@GNUTLS_A_UNKNOWN_CA: 
+@GNUTLS_A_ACCESS_DENIED: 
+@GNUTLS_A_DECODE_ERROR: 
+@GNUTLS_A_DECRYPT_ERROR: 
+@GNUTLS_A_EXPORT_RESTRICTION: 
+@GNUTLS_A_PROTOCOL_VERSION: 
+@GNUTLS_A_INSUFFICIENT_SECURITY: 
+@GNUTLS_A_INTERNAL_ERROR: 
+@GNUTLS_A_INAPPROPRIATE_FALLBACK: 
+@GNUTLS_A_USER_CANCELED: 
+@GNUTLS_A_NO_RENEGOTIATION: 
+@GNUTLS_A_UNSUPPORTED_EXTENSION: 
+@GNUTLS_A_CERTIFICATE_UNOBTAINABLE: 
+@GNUTLS_A_UNRECOGNIZED_NAME: 
+@GNUTLS_A_UNKNOWN_PSK_IDENTITY: 
+@GNUTLS_A_NO_APPLICATION_PROTOCOL: 
+
+<!-- ##### FUNCTION gnutls_alert_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_alert_get_name ##### -->
+<para>
+
+</para>
+
+@alert: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_alert_get_strname ##### -->
+<para>
+
+</para>
+
+@alert: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_alert_level_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_AL_WARNING: 
+@GNUTLS_AL_FATAL: 
+
+<!-- ##### FUNCTION gnutls_alert_send ##### -->
+<para>
+
+</para>
+
+@session: 
+@level: 
+@desc: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_alert_send_appropriate ##### -->
+<para>
+
+</para>
+
+@session: 
+@err: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_alloc_function ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_anon_allocate_client_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_anon_allocate_server_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_anon_free_client_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_anon_free_server_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_anon_set_params_function ##### -->
+<para>
+
+</para>
+
+@res: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_anon_set_server_dh_params ##### -->
+<para>
+
+</para>
+
+@res: 
+@dh_params: 
+
+
+<!-- ##### FUNCTION gnutls_anon_set_server_params_function ##### -->
+<para>
+
+</para>
+
+@res: 
+@func: 
+
+
+<!-- ##### USER_FUNCTION gnutls_audit_log_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+
+
+<!-- ##### FUNCTION gnutls_bye ##### -->
+<para>
+
+</para>
+
+@session: 
+@how: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_calloc_function ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_activation_time_peers ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_allocate_credentials ##### -->
+<para>
+
+</para>
+
+@res: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_client_get_request_status ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### STRUCT gnutls_certificate_credentials_st ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_certificate_expiration_time_peers ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_free_ca_names ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_free_cas ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_free_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_free_crls ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_free_keys ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_get_issuer ##### -->
+<para>
+
+</para>
+
+@sc: 
+@cert: 
+@issuer: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_get_ours ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_get_peers ##### -->
+<para>
+
+</para>
+
+@session: 
+@list_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_get_peers_subkey_id ##### -->
+<para>
+
+</para>
+
+@session: 
+@id: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_certificate_print_formats_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_CRT_PRINT_FULL: 
+@GNUTLS_CRT_PRINT_ONELINE: 
+@GNUTLS_CRT_PRINT_UNSIGNED_FULL: 
+@GNUTLS_CRT_PRINT_COMPACT: 
+@GNUTLS_CRT_PRINT_FULL_NUMBERS: 
+
+<!-- ##### ENUM gnutls_certificate_request_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_CERT_IGNORE: 
+@GNUTLS_CERT_REQUEST: 
+@GNUTLS_CERT_REQUIRE: 
+
+<!-- ##### FUNCTION gnutls_certificate_send_x509_rdn_sequence ##### -->
+<para>
+
+</para>
+
+@session: 
+@status: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_server_set_request ##### -->
+<para>
+
+</para>
+
+@session: 
+@req: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_dh_params ##### -->
+<para>
+
+</para>
+
+@res: 
+@dh_params: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_ocsp_status_request_file ##### -->
+<para>
+
+</para>
+
+@res: 
+@response_file: 
+@idx: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_ocsp_status_request_function ##### -->
+<para>
+
+</para>
+
+@res: 
+@ocsp_func: 
+@ptr: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_params_function ##### -->
+<para>
+
+</para>
+
+@res: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_pin_function ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@fn: 
+@userdata: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_retrieve_function ##### -->
+<para>
+
+</para>
+
+@cred: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_verify_flags ##### -->
+<para>
+
+</para>
+
+@res: 
+@flags: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_verify_function ##### -->
+<para>
+
+</para>
+
+@cred: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_verify_limits ##### -->
+<para>
+
+</para>
+
+@res: 
+@max_bits: 
+@max_depth: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_crl ##### -->
+<para>
+
+</para>
+
+@res: 
+@crl_list: 
+@crl_list_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_crl_file ##### -->
+<para>
+
+</para>
+
+@res: 
+@crlfile: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_crl_mem ##### -->
+<para>
+
+</para>
+
+@res: 
+@CRL: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_key ##### -->
+<para>
+
+</para>
+
+@res: 
+@cert_list: 
+@cert_list_size: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_key_file ##### -->
+<para>
+
+</para>
+
+@res: 
+@certfile: 
+@keyfile: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_key_mem ##### -->
+<para>
+
+</para>
+
+@res: 
+@cert: 
+@key: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_simple_pkcs12_file ##### -->
+<para>
+
+</para>
+
+@res: 
+@pkcs12file: 
+@type: 
+@password: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_simple_pkcs12_mem ##### -->
+<para>
+
+</para>
+
+@res: 
+@p12blob: 
+@type: 
+@password: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_system_trust ##### -->
+<para>
+
+</para>
+
+@cred: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_trust ##### -->
+<para>
+
+</para>
+
+@res: 
+@ca_list: 
+@ca_list_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_trust_file ##### -->
+<para>
+
+</para>
+
+@cred: 
+@cafile: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_set_x509_trust_mem ##### -->
+<para>
+
+</para>
+
+@res: 
+@ca: 
+@type: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_certificate_status_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_CERT_INVALID: 
+@GNUTLS_CERT_REVOKED: 
+@GNUTLS_CERT_SIGNER_NOT_FOUND: 
+@GNUTLS_CERT_SIGNER_NOT_CA: 
+@GNUTLS_CERT_INSECURE_ALGORITHM: 
+@GNUTLS_CERT_NOT_ACTIVATED: 
+@GNUTLS_CERT_EXPIRED: 
+@GNUTLS_CERT_SIGNATURE_FAILURE: 
+@GNUTLS_CERT_REVOCATION_DATA_SUPERSEDED: 
+@GNUTLS_CERT_UNEXPECTED_OWNER: 
+@GNUTLS_CERT_REVOCATION_DATA_ISSUED_IN_FUTURE: 
+@GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE: 
+@GNUTLS_CERT_MISMATCH: 
+@GNUTLS_CERT_PURPOSE_MISMATCH: 
+@GNUTLS_CERT_MISSING_OCSP_STATUS: 
+@GNUTLS_CERT_INVALID_OCSP_STATUS: 
+
+<!-- ##### FUNCTION gnutls_certificate_type_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_certificate_type_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_CRT_UNKNOWN: 
+@GNUTLS_CRT_X509: 
+@GNUTLS_CRT_OPENPGP: 
+@GNUTLS_CRT_RAW: 
+
+<!-- ##### FUNCTION gnutls_certificate_verification_status_print ##### -->
+<para>
+
+</para>
+
+@status: 
+@type: 
+@out: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_verify_peers2 ##### -->
+<para>
+
+</para>
+
+@session: 
+@status: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_certificate_verify_peers3 ##### -->
+<para>
+
+</para>
+
+@session: 
+@hostname: 
+@status: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_channel_binding_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_CB_TLS_UNIQUE: 
+
+<!-- ##### FUNCTION gnutls_check_version ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_cipher_algorithm_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_CIPHER_UNKNOWN: 
+@GNUTLS_CIPHER_NULL: 
+@GNUTLS_CIPHER_ARCFOUR_128: 
+@GNUTLS_CIPHER_3DES_CBC: 
+@GNUTLS_CIPHER_AES_128_CBC: 
+@GNUTLS_CIPHER_AES_256_CBC: 
+@GNUTLS_CIPHER_ARCFOUR_40: 
+@GNUTLS_CIPHER_CAMELLIA_128_CBC: 
+@GNUTLS_CIPHER_CAMELLIA_256_CBC: 
+@GNUTLS_CIPHER_AES_192_CBC: 
+@GNUTLS_CIPHER_AES_128_GCM: 
+@GNUTLS_CIPHER_AES_256_GCM: 
+@GNUTLS_CIPHER_CAMELLIA_192_CBC: 
+@GNUTLS_CIPHER_SALSA20_256: 
+@GNUTLS_CIPHER_ESTREAM_SALSA20_256: 
+@GNUTLS_CIPHER_CAMELLIA_128_GCM: 
+@GNUTLS_CIPHER_CAMELLIA_256_GCM: 
+@GNUTLS_CIPHER_RC2_40_CBC: 
+@GNUTLS_CIPHER_DES_CBC: 
+@GNUTLS_CIPHER_AES_128_CCM: 
+@GNUTLS_CIPHER_AES_256_CCM: 
+@GNUTLS_CIPHER_AES_128_CCM_8: 
+@GNUTLS_CIPHER_AES_256_CCM_8: 
+@GNUTLS_CIPHER_CHACHA20_POLY1305: 
+@GNUTLS_CIPHER_IDEA_PGP_CFB: 
+@GNUTLS_CIPHER_3DES_PGP_CFB: 
+@GNUTLS_CIPHER_CAST5_PGP_CFB: 
+@GNUTLS_CIPHER_BLOWFISH_PGP_CFB: 
+@GNUTLS_CIPHER_SAFER_SK128_PGP_CFB: 
+@GNUTLS_CIPHER_AES128_PGP_CFB: 
+@GNUTLS_CIPHER_AES192_PGP_CFB: 
+@GNUTLS_CIPHER_AES256_PGP_CFB: 
+@GNUTLS_CIPHER_TWOFISH_PGP_CFB: 
+
+<!-- ##### FUNCTION gnutls_cipher_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_get_name ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_suite_get_name ##### -->
+<para>
+
+</para>
+
+@kx_algorithm: 
+@cipher_algorithm: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_close_request_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_SHUT_RDWR: 
+@GNUTLS_SHUT_WR: 
+
+<!-- ##### FUNCTION gnutls_compression_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_compression_method_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_COMP_UNKNOWN: 
+@GNUTLS_COMP_NULL: 
+@GNUTLS_COMP_DEFLATE: 
+@GNUTLS_COMP_ZLIB: 
+
+<!-- ##### MACRO gnutls_cred_set ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION gnutls_credentials_set ##### -->
+<para>
+
+</para>
+
+@session: 
+@type: 
+@cred: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_credentials_type_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_CRD_CERTIFICATE: 
+@GNUTLS_CRD_ANON: 
+@GNUTLS_CRD_SRP: 
+@GNUTLS_CRD_PSK: 
+@GNUTLS_CRD_IA: 
+
+<!-- ##### FUNCTION gnutls_db_check_entry ##### -->
+<para>
+
+</para>
+
+@session: 
+@session_entry: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_db_get_ptr ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_db_remove_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_db_remove_session ##### -->
+<para>
+
+</para>
+
+@session: 
+
+
+<!-- ##### USER_FUNCTION gnutls_db_retr_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_db_set_cache_expiration ##### -->
+<para>
+
+</para>
+
+@session: 
+@seconds: 
+
+
+<!-- ##### FUNCTION gnutls_db_set_ptr ##### -->
+<para>
+
+</para>
+
+@session: 
+@ptr: 
+
+
+<!-- ##### FUNCTION gnutls_db_set_remove_function ##### -->
+<para>
+
+</para>
+
+@session: 
+@rem_func: 
+
+
+<!-- ##### FUNCTION gnutls_db_set_retrieve_function ##### -->
+<para>
+
+</para>
+
+@session: 
+@retr_func: 
+
+
+<!-- ##### FUNCTION gnutls_db_set_store_function ##### -->
+<para>
+
+</para>
+
+@session: 
+@store_func: 
+
+
+<!-- ##### USER_FUNCTION gnutls_db_store_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@key: 
+@data: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_deinit ##### -->
+<para>
+
+</para>
+
+@session: 
+
+
+<!-- ##### FUNCTION gnutls_dh_get_group ##### -->
+<para>
+
+</para>
+
+@session: 
+@raw_gen: 
+@raw_prime: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_get_peers_public_bits ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_get_prime_bits ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_get_pubkey ##### -->
+<para>
+
+</para>
+
+@session: 
+@raw_key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_get_secret_bits ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_params_cpy ##### -->
+<para>
+
+</para>
+
+@dst: 
+@src: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_params_deinit ##### -->
+<para>
+
+</para>
+
+@dh_params: 
+
+
+<!-- ##### FUNCTION gnutls_dh_params_export2_pkcs3 ##### -->
+<para>
+
+</para>
+
+@params: 
+@format: 
+@out: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_params_export_pkcs3 ##### -->
+<para>
+
+</para>
+
+@params: 
+@format: 
+@params_data: 
+@params_data_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_params_export_raw ##### -->
+<para>
+
+</para>
+
+@params: 
+@prime: 
+@generator: 
+@bits: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_params_generate2 ##### -->
+<para>
+
+</para>
+
+@params: 
+@bits: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_params_import_pkcs3 ##### -->
+<para>
+
+</para>
+
+@params: 
+@pkcs3_params: 
+@format: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_params_import_raw ##### -->
+<para>
+
+</para>
+
+@dh_params: 
+@prime: 
+@generator: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dh_params_init ##### -->
+<para>
+
+</para>
+
+@dh_params: 
+@Returns: 
+
+
+<!-- ##### STRUCT gnutls_dh_params_int ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF gnutls_dh_params_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_dh_set_prime_bits ##### -->
+<para>
+
+</para>
+
+@session: 
+@bits: 
+
+
+<!-- ##### ENUM gnutls_digest_algorithm_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_DIG_UNKNOWN: 
+@GNUTLS_DIG_NULL: 
+@GNUTLS_DIG_MD5: 
+@GNUTLS_DIG_SHA1: 
+@GNUTLS_DIG_RMD160: 
+@GNUTLS_DIG_MD2: 
+@GNUTLS_DIG_SHA256: 
+@GNUTLS_DIG_SHA384: 
+@GNUTLS_DIG_SHA512: 
+@GNUTLS_DIG_SHA224: 
+@GNUTLS_DIG_SHA3_224: 
+@GNUTLS_DIG_SHA3_256: 
+@GNUTLS_DIG_SHA3_384: 
+@GNUTLS_DIG_SHA3_512: 
+
+<!-- ##### ENUM gnutls_ecc_curve_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_ECC_CURVE_INVALID: 
+@GNUTLS_ECC_CURVE_SECP224R1: 
+@GNUTLS_ECC_CURVE_SECP256R1: 
+@GNUTLS_ECC_CURVE_SECP384R1: 
+@GNUTLS_ECC_CURVE_SECP521R1: 
+@GNUTLS_ECC_CURVE_SECP192R1: 
+@GNUTLS_ECC_CURVE_X25519: 
+
+<!-- ##### USER_FUNCTION gnutls_errno_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_error_is_fatal ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_fingerprint ##### -->
+<para>
+
+</para>
+
+@algo: 
+@data: 
+@result: 
+@result_size: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_free_function ##### -->
+<para>
+
+</para>
+
+@Param1: 
+
+
+<!-- ##### FUNCTION gnutls_global_deinit ##### -->
+<para>
+
+</para>
+
+@void: 
+
+
+<!-- ##### FUNCTION gnutls_global_init ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_global_set_audit_log_function ##### -->
+<para>
+
+</para>
+
+@log_func: 
+
+
+<!-- ##### FUNCTION gnutls_global_set_log_function ##### -->
+<para>
+
+</para>
+
+@log_func: 
+
+
+<!-- ##### FUNCTION gnutls_global_set_log_level ##### -->
+<para>
+
+</para>
+
+@level: 
+
+
+<!-- ##### FUNCTION gnutls_global_set_mem_functions ##### -->
+<para>
+
+</para>
+
+@alloc_func: 
+@secure_alloc_func: 
+@is_secure_func: 
+@realloc_func: 
+@free_func: 
+
+
+<!-- ##### FUNCTION gnutls_global_set_mutex ##### -->
+<para>
+
+</para>
+
+@init: 
+@deinit: 
+@lock: 
+@unlock: 
+
+
+<!-- ##### FUNCTION gnutls_global_set_time_function ##### -->
+<para>
+
+</para>
+
+@time_func: 
+
+
+<!-- ##### FUNCTION gnutls_handshake ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_handshake_description_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_HANDSHAKE_HELLO_REQUEST: 
+@GNUTLS_HANDSHAKE_CLIENT_HELLO: 
+@GNUTLS_HANDSHAKE_SERVER_HELLO: 
+@GNUTLS_HANDSHAKE_HELLO_VERIFY_REQUEST: 
+@GNUTLS_HANDSHAKE_NEW_SESSION_TICKET: 
+@GNUTLS_HANDSHAKE_CERTIFICATE_PKT: 
+@GNUTLS_HANDSHAKE_SERVER_KEY_EXCHANGE: 
+@GNUTLS_HANDSHAKE_CERTIFICATE_REQUEST: 
+@GNUTLS_HANDSHAKE_SERVER_HELLO_DONE: 
+@GNUTLS_HANDSHAKE_CERTIFICATE_VERIFY: 
+@GNUTLS_HANDSHAKE_CLIENT_KEY_EXCHANGE: 
+@GNUTLS_HANDSHAKE_FINISHED: 
+@GNUTLS_HANDSHAKE_CERTIFICATE_STATUS: 
+@GNUTLS_HANDSHAKE_SUPPLEMENTAL: 
+@GNUTLS_HANDSHAKE_CHANGE_CIPHER_SPEC: 
+@GNUTLS_HANDSHAKE_CLIENT_HELLO_V2: 
+
+<!-- ##### FUNCTION gnutls_handshake_get_last_in ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_handshake_get_last_out ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### MACRO gnutls_handshake_post_client_hello_func ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_handshake_set_max_packet_length ##### -->
+<para>
+
+</para>
+
+@session: 
+@max: 
+
+
+<!-- ##### FUNCTION gnutls_handshake_set_post_client_hello_function ##### -->
+<para>
+
+</para>
+
+@session: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_handshake_set_timeout ##### -->
+<para>
+
+</para>
+
+@session: 
+@ms: 
+
+
+<!-- ##### FUNCTION gnutls_heartbeat_allowed ##### -->
+<para>
+
+</para>
+
+@session: 
+@type: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_heartbeat_enable ##### -->
+<para>
+
+</para>
+
+@session: 
+@type: 
+
+
+<!-- ##### FUNCTION gnutls_heartbeat_get_timeout ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_heartbeat_ping ##### -->
+<para>
+
+</para>
+
+@session: 
+@data_size: 
+@max_tries: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_heartbeat_pong ##### -->
+<para>
+
+</para>
+
+@session: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_heartbeat_set_timeouts ##### -->
+<para>
+
+</para>
+
+@session: 
+@retrans_timeout: 
+@total_timeout: 
+
+
+<!-- ##### FUNCTION gnutls_hex2bin ##### -->
+<para>
+
+</para>
+
+@hex_data: 
+@hex_size: 
+@bin_data: 
+@bin_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_hex_decode ##### -->
+<para>
+
+</para>
+
+@hex_data: 
+@result: 
+@result_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_hex_encode ##### -->
+<para>
+
+</para>
+
+@data: 
+@result: 
+@result_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_init ##### -->
+<para>
+
+</para>
+
+@session: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_is_secure_function ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_key_generate ##### -->
+<para>
+
+</para>
+
+@key: 
+@key_size: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_kx_algorithm_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_KX_UNKNOWN: 
+@GNUTLS_KX_RSA: 
+@GNUTLS_KX_DHE_DSS: 
+@GNUTLS_KX_DHE_RSA: 
+@GNUTLS_KX_ANON_DH: 
+@GNUTLS_KX_SRP: 
+@GNUTLS_KX_RSA_EXPORT: 
+@GNUTLS_KX_SRP_RSA: 
+@GNUTLS_KX_SRP_DSS: 
+@GNUTLS_KX_PSK: 
+@GNUTLS_KX_DHE_PSK: 
+@GNUTLS_KX_ANON_ECDH: 
+@GNUTLS_KX_ECDHE_RSA: 
+@GNUTLS_KX_ECDHE_ECDSA: 
+@GNUTLS_KX_ECDHE_PSK: 
+@GNUTLS_KX_RSA_PSK: 
+
+<!-- ##### FUNCTION gnutls_kx_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_load_file ##### -->
+<para>
+
+</para>
+
+@filename: 
+@data: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_log_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+
+
+<!-- ##### ENUM gnutls_mac_algorithm_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_MAC_UNKNOWN: 
+@GNUTLS_MAC_NULL: 
+@GNUTLS_MAC_MD5: 
+@GNUTLS_MAC_SHA1: 
+@GNUTLS_MAC_RMD160: 
+@GNUTLS_MAC_MD2: 
+@GNUTLS_MAC_SHA256: 
+@GNUTLS_MAC_SHA384: 
+@GNUTLS_MAC_SHA512: 
+@GNUTLS_MAC_SHA224: 
+@GNUTLS_MAC_SHA3_224: 
+@GNUTLS_MAC_SHA3_256: 
+@GNUTLS_MAC_SHA3_384: 
+@GNUTLS_MAC_SHA3_512: 
+@GNUTLS_MAC_AEAD: 
+@GNUTLS_MAC_UMAC_96: 
+@GNUTLS_MAC_UMAC_128: 
+
+<!-- ##### FUNCTION gnutls_mac_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_ocsp_status_request_enable_client ##### -->
+<para>
+
+</para>
+
+@session: 
+@responder_id: 
+@responder_id_size: 
+@request_extensions: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_ocsp_status_request_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@response: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_ocsp_status_request_is_checked ##### -->
+<para>
+
+</para>
+
+@session: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### STRUCT gnutls_openpgp_crt_int ##### -->
+<para>
+
+</para>
+
+@knode: 
+@preferred_keyid: 
+@preferred_set: 
+
+<!-- ##### ENUM gnutls_openpgp_crt_status_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_OPENPGP_CERT: 
+@GNUTLS_OPENPGP_CERT_FINGERPRINT: 
+
+<!-- ##### TYPEDEF gnutls_openpgp_crt_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT gnutls_openpgp_keyring_int ##### -->
+<para>
+
+</para>
+
+@db: 
+
+<!-- ##### TYPEDEF gnutls_openpgp_keyring_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT gnutls_openpgp_privkey_int ##### -->
+<para>
+
+</para>
+
+@knode: 
+@preferred_keyid: 
+@preferred_set: 
+
+<!-- ##### TYPEDEF gnutls_openpgp_privkey_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_openpgp_send_cert ##### -->
+<para>
+
+</para>
+
+@session: 
+@status: 
+
+
+<!-- ##### ENUM gnutls_params_type_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_PARAMS_RSA_EXPORT: 
+@GNUTLS_PARAMS_DH: 
+@GNUTLS_PARAMS_ECDH: 
+
+<!-- ##### FUNCTION gnutls_pem_base64_decode ##### -->
+<para>
+
+</para>
+
+@header: 
+@b64_data: 
+@result: 
+@result_size: 
+@Returns: 
+
+
+<!-- ##### MACRO gnutls_pem_base64_decode_alloc ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_pem_base64_encode ##### -->
+<para>
+
+</para>
+
+@msg: 
+@data: 
+@result: 
+@result_size: 
+@Returns: 
+
+
+<!-- ##### MACRO gnutls_pem_base64_encode_alloc ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_perror ##### -->
+<para>
+
+</para>
+
+@error: 
+
+
+<!-- ##### USER_FUNCTION gnutls_pin_callback_t ##### -->
+<para>
+
+</para>
+
+@userdata: 
+@attempt: 
+@token_url: 
+@token_label: 
+@flags: 
+@pin: 
+@pin_max: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_pin_flag_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_PIN_USER: 
+@GNUTLS_PIN_SO: 
+@GNUTLS_PIN_FINAL_TRY: 
+@GNUTLS_PIN_COUNT_LOW: 
+@GNUTLS_PIN_CONTEXT_SPECIFIC: 
+@GNUTLS_PIN_WRONG: 
+
+<!-- ##### FUNCTION gnutls_pk_algorithm_get_name ##### -->
+<para>
+
+</para>
+
+@algorithm: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_pk_algorithm_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_PK_UNKNOWN: 
+@GNUTLS_PK_RSA: 
+@GNUTLS_PK_DSA: 
+@GNUTLS_PK_DH: 
+@GNUTLS_PK_ECDSA: 
+@GNUTLS_PK_ECDHX: 
+
+<!-- ##### FUNCTION gnutls_pk_bits_to_sec_param ##### -->
+<para>
+
+</para>
+
+@algo: 
+@bits: 
+@Returns: 
+
+
+<!-- ##### STRUCT gnutls_pkcs11_privkey_st ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF gnutls_pkcs11_privkey_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_prf ##### -->
+<para>
+
+</para>
+
+@session: 
+@label_size: 
+@label: 
+@server_random_first: 
+@extra_size: 
+@extra: 
+@outsize: 
+@out: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_prf_raw ##### -->
+<para>
+
+</para>
+
+@session: 
+@label_size: 
+@label: 
+@seed_size: 
+@seed: 
+@outsize: 
+@out: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_priority_certificate_type_list ##### -->
+<para>
+
+</para>
+
+@pcache: 
+@list: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_priority_compression_list ##### -->
+<para>
+
+</para>
+
+@pcache: 
+@list: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_priority_deinit ##### -->
+<para>
+
+</para>
+
+@priority_cache: 
+
+
+<!-- ##### FUNCTION gnutls_priority_ecc_curve_list ##### -->
+<para>
+
+</para>
+
+@pcache: 
+@list: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_priority_get_cipher_suite_index ##### -->
+<para>
+
+</para>
+
+@pcache: 
+@idx: 
+@sidx: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_priority_init ##### -->
+<para>
+
+</para>
+
+@priority_cache: 
+@priorities: 
+@err_pos: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_priority_protocol_list ##### -->
+<para>
+
+</para>
+
+@pcache: 
+@list: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_priority_set ##### -->
+<para>
+
+</para>
+
+@session: 
+@priority: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_priority_set_direct ##### -->
+<para>
+
+</para>
+
+@session: 
+@priorities: 
+@err_pos: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_priority_sign_list ##### -->
+<para>
+
+</para>
+
+@pcache: 
+@list: 
+@Returns: 
+
+
+<!-- ##### STRUCT gnutls_priority_st ##### -->
+<para>
+
+</para>
+
+@cipher: 
+@mac: 
+@kx: 
+@compression: 
+@protocol: 
+@cert_type: 
+@sign_algo: 
+@supported_ecc: 
+@no_extensions: 
+@no_ext_master_secret: 
+@allow_large_records: 
+@dumbfw: 
+@sr: 
+@min_record_version: 
+@server_precedence: 
+@allow_key_usage_violation: 
+@allow_server_key_usage_violation: 
+@allow_wrong_pms: 
+@no_tickets: 
+@no_etm: 
+@have_cbc: 
+@stateless_compression: 
+@additional_verify_flags: 
+@level: 
+@dh_prime_bits: 
+@fallback: 
+
+<!-- ##### TYPEDEF gnutls_priority_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM gnutls_privkey_type_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_PRIVKEY_X509: 
+@GNUTLS_PRIVKEY_OPENPGP: 
+@GNUTLS_PRIVKEY_PKCS11: 
+@GNUTLS_PRIVKEY_EXT: 
+
+<!-- ##### FUNCTION gnutls_protocol_get_name ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_protocol_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_SSL3: 
+@GNUTLS_TLS1_0: 
+@GNUTLS_TLS1: 
+@GNUTLS_TLS1_1: 
+@GNUTLS_TLS1_2: 
+@GNUTLS_DTLS0_9: 
+@GNUTLS_DTLS1_0: 
+@GNUTLS_DTLS1_2: 
+@GNUTLS_DTLS_VERSION_MIN: 
+@GNUTLS_DTLS_VERSION_MAX: 
+@GNUTLS_TLS_VERSION_MAX: 
+@GNUTLS_VERSION_UNKNOWN: 
+
+<!-- ##### FUNCTION gnutls_psk_allocate_client_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_psk_allocate_server_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_psk_client_get_hint ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_psk_free_client_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_psk_free_server_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### ENUM gnutls_psk_key_flags ##### -->
+<para>
+
+</para>
+
+@GNUTLS_PSK_KEY_RAW: 
+@GNUTLS_PSK_KEY_HEX: 
+
+<!-- ##### FUNCTION gnutls_psk_server_get_username ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_psk_set_client_credentials ##### -->
+<para>
+
+</para>
+
+@res: 
+@username: 
+@key: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_psk_set_client_credentials_function ##### -->
+<para>
+
+</para>
+
+@cred: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_psk_set_params_function ##### -->
+<para>
+
+</para>
+
+@res: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_psk_set_server_credentials_file ##### -->
+<para>
+
+</para>
+
+@res: 
+@password_file: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_psk_set_server_credentials_function ##### -->
+<para>
+
+</para>
+
+@cred: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_psk_set_server_credentials_hint ##### -->
+<para>
+
+</para>
+
+@res: 
+@hint: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_psk_set_server_dh_params ##### -->
+<para>
+
+</para>
+
+@res: 
+@dh_params: 
+
+
+<!-- ##### FUNCTION gnutls_psk_set_server_params_function ##### -->
+<para>
+
+</para>
+
+@res: 
+@func: 
+
+
+<!-- ##### USER_FUNCTION gnutls_pull_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Param3: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_pull_timeout_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@ms: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_push_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Param3: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_random_art ##### -->
+<para>
+
+</para>
+
+@type: 
+@key_type: 
+@key_size: 
+@fpr: 
+@fpr_size: 
+@art: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_random_art_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_RANDOM_ART_OPENSSH: 
+
+<!-- ##### MACRO gnutls_read ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### USER_FUNCTION gnutls_realloc_function ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Param2: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_record_check_pending ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_record_disable_padding ##### -->
+<para>
+
+</para>
+
+@session: 
+
+
+<!-- ##### FUNCTION gnutls_record_get_direction ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_record_get_max_size ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_record_recv ##### -->
+<para>
+
+</para>
+
+@session: 
+@data: 
+@data_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_record_recv_seq ##### -->
+<para>
+
+</para>
+
+@session: 
+@data: 
+@data_size: 
+@seq: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_record_send ##### -->
+<para>
+
+</para>
+
+@session: 
+@data: 
+@data_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_record_set_max_size ##### -->
+<para>
+
+</para>
+
+@session: 
+@size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_rehandshake ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### TYPEDEF gnutls_rsa_params_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_safe_renegotiation_status ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_sec_param_get_name ##### -->
+<para>
+
+</para>
+
+@param: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_sec_param_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_SEC_PARAM_UNKNOWN: 
+@GNUTLS_SEC_PARAM_INSECURE: 
+@GNUTLS_SEC_PARAM_EXPORT: 
+@GNUTLS_SEC_PARAM_VERY_WEAK: 
+@GNUTLS_SEC_PARAM_WEAK: 
+@GNUTLS_SEC_PARAM_LOW: 
+@GNUTLS_SEC_PARAM_LEGACY: 
+@GNUTLS_SEC_PARAM_MEDIUM: 
+@GNUTLS_SEC_PARAM_HIGH: 
+@GNUTLS_SEC_PARAM_ULTRA: 
+@GNUTLS_SEC_PARAM_FUTURE: 
+
+<!-- ##### FUNCTION gnutls_sec_param_to_pk_bits ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_server_name_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@data: 
+@data_length: 
+@type: 
+@indx: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_server_name_set ##### -->
+<para>
+
+</para>
+
+@session: 
+@type: 
+@name: 
+@name_length: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_server_name_type_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_NAME_DNS: 
+
+<!-- ##### FUNCTION gnutls_session_channel_binding ##### -->
+<para>
+
+</para>
+
+@session: 
+@cbtype: 
+@cb: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_get_data ##### -->
+<para>
+
+</para>
+
+@session: 
+@session_data: 
+@session_data_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_get_data2 ##### -->
+<para>
+
+</para>
+
+@session: 
+@data: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_get_id ##### -->
+<para>
+
+</para>
+
+@session: 
+@session_id: 
+@session_id_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_get_id2 ##### -->
+<para>
+
+</para>
+
+@session: 
+@session_id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_get_ptr ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_get_random ##### -->
+<para>
+
+</para>
+
+@session: 
+@client: 
+@server: 
+
+
+<!-- ##### STRUCT gnutls_session_int ##### -->
+<para>
+
+</para>
+
+@security_parameters: 
+@record_parameters: 
+@internals: 
+@key: 
+
+<!-- ##### FUNCTION gnutls_session_is_resumed ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_resumption_requested ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_set_premaster ##### -->
+<para>
+
+</para>
+
+@session: 
+@entity: 
+@version: 
+@kx: 
+@cipher: 
+@mac: 
+@comp: 
+@master: 
+@session_id: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_set_ptr ##### -->
+<para>
+
+</para>
+
+@session: 
+@ptr: 
+
+
+<!-- ##### TYPEDEF gnutls_session_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_session_ticket_enable_client ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_ticket_enable_server ##### -->
+<para>
+
+</para>
+
+@session: 
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_session_ticket_key_generate ##### -->
+<para>
+
+</para>
+
+@key: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_set_default_priority ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_sign_algorithm_get ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_sign_algorithm_get_requested ##### -->
+<para>
+
+</para>
+
+@session: 
+@indx: 
+@algo: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_sign_algorithm_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_SIGN_UNKNOWN: 
+@GNUTLS_SIGN_RSA_SHA1: 
+@GNUTLS_SIGN_RSA_SHA: 
+@GNUTLS_SIGN_DSA_SHA1: 
+@GNUTLS_SIGN_DSA_SHA: 
+@GNUTLS_SIGN_RSA_MD5: 
+@GNUTLS_SIGN_RSA_MD2: 
+@GNUTLS_SIGN_RSA_RMD160: 
+@GNUTLS_SIGN_RSA_SHA256: 
+@GNUTLS_SIGN_RSA_SHA384: 
+@GNUTLS_SIGN_RSA_SHA512: 
+@GNUTLS_SIGN_RSA_SHA224: 
+@GNUTLS_SIGN_DSA_SHA224: 
+@GNUTLS_SIGN_DSA_SHA256: 
+@GNUTLS_SIGN_ECDSA_SHA1: 
+@GNUTLS_SIGN_ECDSA_SHA224: 
+@GNUTLS_SIGN_ECDSA_SHA256: 
+@GNUTLS_SIGN_ECDSA_SHA384: 
+@GNUTLS_SIGN_ECDSA_SHA512: 
+@GNUTLS_SIGN_DSA_SHA384: 
+@GNUTLS_SIGN_DSA_SHA512: 
+@GNUTLS_SIGN_ECDSA_SHA3_224: 
+@GNUTLS_SIGN_ECDSA_SHA3_256: 
+@GNUTLS_SIGN_ECDSA_SHA3_384: 
+@GNUTLS_SIGN_ECDSA_SHA3_512: 
+@GNUTLS_SIGN_DSA_SHA3_224: 
+@GNUTLS_SIGN_DSA_SHA3_256: 
+@GNUTLS_SIGN_DSA_SHA3_384: 
+@GNUTLS_SIGN_DSA_SHA3_512: 
+@GNUTLS_SIGN_RSA_SHA3_224: 
+@GNUTLS_SIGN_RSA_SHA3_256: 
+@GNUTLS_SIGN_RSA_SHA3_384: 
+@GNUTLS_SIGN_RSA_SHA3_512: 
+
+<!-- ##### FUNCTION gnutls_srp_allocate_client_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srp_allocate_server_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srp_base64_decode ##### -->
+<para>
+
+</para>
+
+@b64_data: 
+@result: 
+@result_size: 
+@Returns: 
+
+
+<!-- ##### MACRO gnutls_srp_base64_decode_alloc ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srp_base64_encode ##### -->
+<para>
+
+</para>
+
+@data: 
+@result: 
+@result_size: 
+@Returns: 
+
+
+<!-- ##### MACRO gnutls_srp_base64_encode_alloc ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srp_free_client_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_srp_free_server_credentials ##### -->
+<para>
+
+</para>
+
+@sc: 
+
+
+<!-- ##### FUNCTION gnutls_srp_server_get_username ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srp_set_client_credentials ##### -->
+<para>
+
+</para>
+
+@res: 
+@username: 
+@password: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srp_set_client_credentials_function ##### -->
+<para>
+
+</para>
+
+@cred: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_srp_set_prime_bits ##### -->
+<para>
+
+</para>
+
+@session: 
+@bits: 
+
+
+<!-- ##### FUNCTION gnutls_srp_set_server_credentials_file ##### -->
+<para>
+
+</para>
+
+@res: 
+@password_file: 
+@password_conf_file: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srp_set_server_credentials_function ##### -->
+<para>
+
+</para>
+
+@cred: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_srp_verifier ##### -->
+<para>
+
+</para>
+
+@username: 
+@password: 
+@salt: 
+@generator: 
+@prime: 
+@res: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srtp_get_keys ##### -->
+<para>
+
+</para>
+
+@session: 
+@key_material: 
+@key_material_size: 
+@client_key: 
+@client_salt: 
+@server_key: 
+@server_salt: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srtp_get_mki ##### -->
+<para>
+
+</para>
+
+@session: 
+@mki: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srtp_get_profile_id ##### -->
+<para>
+
+</para>
+
+@name: 
+@profile: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srtp_get_profile_name ##### -->
+<para>
+
+</para>
+
+@profile: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srtp_get_selected_profile ##### -->
+<para>
+
+</para>
+
+@session: 
+@profile: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_srtp_profile_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_SRTP_AES128_CM_HMAC_SHA1_80: 
+@GNUTLS_SRTP_AES128_CM_HMAC_SHA1_32: 
+@GNUTLS_SRTP_NULL_HMAC_SHA1_80: 
+@GNUTLS_SRTP_NULL_HMAC_SHA1_32: 
+
+<!-- ##### FUNCTION gnutls_srtp_set_mki ##### -->
+<para>
+
+</para>
+
+@session: 
+@mki: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srtp_set_profile ##### -->
+<para>
+
+</para>
+
+@session: 
+@profile: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_srtp_set_profile_direct ##### -->
+<para>
+
+</para>
+
+@session: 
+@profiles: 
+@err_pos: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_store_commitment ##### -->
+<para>
+
+</para>
+
+@db_name: 
+@tdb: 
+@host: 
+@service: 
+@hash_algo: 
+@hash: 
+@expiration: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_store_pubkey ##### -->
+<para>
+
+</para>
+
+@db_name: 
+@tdb: 
+@host: 
+@service: 
+@cert_type: 
+@cert: 
+@expiration: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_strerror ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_supplemental_data_format_type_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_SUPPLEMENTAL_UNKNOWN: 
+
+<!-- ##### FUNCTION gnutls_tdb_deinit ##### -->
+<para>
+
+</para>
+
+@tdb: 
+
+
+<!-- ##### FUNCTION gnutls_tdb_init ##### -->
+<para>
+
+</para>
+
+@tdb: 
+@Returns: 
+
+
+<!-- ##### STRUCT gnutls_tdb_int ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_tdb_set_store_commitment_func ##### -->
+<para>
+
+</para>
+
+@tdb: 
+@cstore: 
+
+
+<!-- ##### FUNCTION gnutls_tdb_set_store_func ##### -->
+<para>
+
+</para>
+
+@tdb: 
+@store: 
+
+
+<!-- ##### FUNCTION gnutls_tdb_set_verify_func ##### -->
+<para>
+
+</para>
+
+@tdb: 
+@verify: 
+
+
+<!-- ##### USER_FUNCTION gnutls_tdb_store_commitment_func ##### -->
+<para>
+
+</para>
+
+@db_name: 
+@host: 
+@service: 
+@expiration: 
+@hash_algo: 
+@hash: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_tdb_store_func ##### -->
+<para>
+
+</para>
+
+@db_name: 
+@host: 
+@service: 
+@expiration: 
+@pubkey: 
+@Returns: 
+
+
+<!-- ##### TYPEDEF gnutls_tdb_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### USER_FUNCTION gnutls_tdb_verify_func ##### -->
+<para>
+
+</para>
+
+@db_name: 
+@host: 
+@service: 
+@pubkey: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_time_func ##### -->
+<para>
+
+</para>
+
+@t: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_transport_get_ptr ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_transport_get_ptr2 ##### -->
+<para>
+
+</para>
+
+@session: 
+@recv_ptr: 
+@send_ptr: 
+
+
+<!-- ##### TYPEDEF gnutls_transport_ptr_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_transport_set_errno ##### -->
+<para>
+
+</para>
+
+@session: 
+@err: 
+
+
+<!-- ##### FUNCTION gnutls_transport_set_errno_function ##### -->
+<para>
+
+</para>
+
+@session: 
+@errno_func: 
+
+
+<!-- ##### FUNCTION gnutls_transport_set_ptr ##### -->
+<para>
+
+</para>
+
+@session: 
+@ptr: 
+
+
+<!-- ##### FUNCTION gnutls_transport_set_ptr2 ##### -->
+<para>
+
+</para>
+
+@session: 
+@recv_ptr: 
+@send_ptr: 
+
+
+<!-- ##### FUNCTION gnutls_transport_set_pull_function ##### -->
+<para>
+
+</para>
+
+@session: 
+@pull_func: 
+
+
+<!-- ##### FUNCTION gnutls_transport_set_pull_timeout_function ##### -->
+<para>
+
+</para>
+
+@session: 
+@func: 
+
+
+<!-- ##### FUNCTION gnutls_transport_set_push_function ##### -->
+<para>
+
+</para>
+
+@session: 
+@push_func: 
+
+
+<!-- ##### FUNCTION gnutls_transport_set_vec_push_function ##### -->
+<para>
+
+</para>
+
+@session: 
+@vec_func: 
+
+
+<!-- ##### FUNCTION gnutls_url_is_supported ##### -->
+<para>
+
+</para>
+
+@url: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION gnutls_vec_push_func ##### -->
+<para>
+
+</para>
+
+@Param1: 
+@iov: 
+@iovcnt: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_verify_stored_pubkey ##### -->
+<para>
+
+</para>
+
+@db_name: 
+@tdb: 
+@host: 
+@service: 
+@cert_type: 
+@cert: 
+@flags: 
+@Returns: 
+
+
+<!-- ##### MACRO gnutls_write ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT gnutls_x509_crl_int ##### -->
+<para>
+
+</para>
+
+@crl: 
+@rcache: 
+@use_extensions: 
+@der: 
+@raw_issuer_dn: 
+
+<!-- ##### TYPEDEF gnutls_x509_crl_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT gnutls_x509_crq_int ##### -->
+<para>
+
+</para>
+
+@crq: 
+
+<!-- ##### TYPEDEF gnutls_x509_crq_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM gnutls_x509_crt_fmt_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_X509_FMT_DER: 
+@GNUTLS_X509_FMT_PEM: 
+
+<!-- ##### STRUCT gnutls_x509_crt_int ##### -->
+<para>
+
+</para>
+
+@cert: 
+@use_extensions: 
+@pin: 
+@raw_dn: 
+@raw_issuer_dn: 
+@raw_spki: 
+@der: 
+@san: 
+@ian: 
+@dn: 
+@idn: 
+
+<!-- ##### TYPEDEF gnutls_x509_crt_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT gnutls_x509_privkey_int ##### -->
+<para>
+
+</para>
+
+@params: 
+@pk_algorithm: 
+@key: 
+@pin: 
+
+<!-- ##### TYPEDEF gnutls_x509_privkey_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM gnutls_x509_subject_alt_name_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_SAN_DNSNAME: 
+@GNUTLS_SAN_RFC822NAME: 
+@GNUTLS_SAN_URI: 
+@GNUTLS_SAN_IPADDRESS: 
+@GNUTLS_SAN_OTHERNAME: 
+@GNUTLS_SAN_DN: 
+@GNUTLS_SAN_MAX: 
+@GNUTLS_SAN_OTHERNAME_XMPP: 
+@GNUTLS_SAN_OTHERNAME_KRB5PRINCIPAL: 
+
+<!-- ##### USER_FUNCTION mutex_deinit_func ##### -->
+<para>
+
+</para>
+
+@mutex: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION mutex_init_func ##### -->
+<para>
+
+</para>
+
+@mutex: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION mutex_lock_func ##### -->
+<para>
+
+</para>
+
+@mutex: 
+@Returns: 
+
+
+<!-- ##### USER_FUNCTION mutex_unlock_func ##### -->
+<para>
+
+</para>
+
+@mutex: 
+@Returns: 
+
+

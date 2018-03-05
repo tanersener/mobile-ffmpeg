@@ -1,0 +1,25 @@
+
+
+@c gnutls_pkcs11_obj_info_t
+@table @code
+@item GNUTLS_@-PKCS11_@-OBJ_@-ID_@-HEX
+The object ID in hex.
+@item GNUTLS_@-PKCS11_@-OBJ_@-LABEL
+The object label.
+@item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-LABEL
+The token's label.
+@item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-SERIAL
+The token's serial number.
+@item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-MANUFACTURER
+The token's manufacturer.
+@item GNUTLS_@-PKCS11_@-OBJ_@-TOKEN_@-MODEL
+The token's model.
+@item GNUTLS_@-PKCS11_@-OBJ_@-ID
+The object ID.
+@item GNUTLS_@-PKCS11_@-OBJ_@-LIBRARY_@-VERSION
+The library's version.
+@item GNUTLS_@-PKCS11_@-OBJ_@-LIBRARY_@-DESCRIPTION
+The library's description.
+@item GNUTLS_@-PKCS11_@-OBJ_@-LIBRARY_@-MANUFACTURER
+The library's manufacturer name.
+@end table

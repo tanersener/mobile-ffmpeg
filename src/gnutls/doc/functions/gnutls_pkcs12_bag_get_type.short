@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs12_bag_get_type} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx})

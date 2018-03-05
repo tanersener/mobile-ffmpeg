@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_import_tpm_url} (gnutls_pubkey_t @var{pkey}, const char * @var{url}, const char * @var{srk_password}, unsigned int @var{flags})

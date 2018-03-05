@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_ext_export_proxy} (int @var{pathLenConstraint}, const char * @var{policyLanguage}, const char * @var{policy}, size_t @var{sizeof_policy}, gnutls_datum_t * @var{ext})

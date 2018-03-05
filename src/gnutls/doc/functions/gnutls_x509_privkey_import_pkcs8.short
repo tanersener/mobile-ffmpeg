@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_privkey_import_pkcs8} (gnutls_x509_privkey_t @var{key}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, const char * @var{password}, unsigned int @var{flags})

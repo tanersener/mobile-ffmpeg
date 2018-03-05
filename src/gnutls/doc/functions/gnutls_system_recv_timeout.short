@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_system_recv_timeout} (gnutls_transport_ptr_t @var{ptr}, unsigned int @var{ms})

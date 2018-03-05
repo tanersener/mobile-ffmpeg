@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_aia_deinit} (gnutls_x509_aia_t @var{aia})
+@var{aia}: The authority info access
+
+This function will deinitialize an authority info access type.
+
+@strong{Since:} 3.3.0
+@end deftypefun

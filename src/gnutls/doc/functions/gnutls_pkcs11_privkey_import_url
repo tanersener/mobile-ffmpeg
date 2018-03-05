@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_privkey_import_url} (gnutls_pkcs11_privkey_t @var{pkey}, const char * @var{url}, unsigned int @var{flags})
+@var{pkey}: The private key
+
+@var{url}: a PKCS 11 url identifying the key
+
+@var{flags}: Or sequence of GNUTLS_PKCS11_OBJ_* flags
+
+This function will "import" a PKCS 11 URL identifying a private
+key to the @code{gnutls_pkcs11_privkey_t}  type. In reality since
+in most cases keys cannot be exported, the private key structure
+is being associated with the available operations on the token.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

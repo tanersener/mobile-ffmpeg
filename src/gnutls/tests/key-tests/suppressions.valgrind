@@ -1,0 +1,24 @@
+# suppressions -- Valgrind suppresion file for libgcrypt
+
+# Copyright (C) 2015 Red Hat, Inc.
+
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.
+
+{
+   <insert_a_suppression_name_here>
+   Memcheck:Addr4
+   fun:idna_to_ascii_4z
+   fun:idna_to_ascii_8z
+   fun:gnutls_x509_crt_check_email
+   ...
+}
+{
+   ld-uncond-jump
+   Memcheck:Cond
+   fun:index
+   fun:expand_dynamic_string_token
+   fun:fillin_rpath
+   ...
+}

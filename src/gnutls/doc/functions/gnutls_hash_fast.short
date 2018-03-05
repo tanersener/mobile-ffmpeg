@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_hash_fast} (gnutls_digest_algorithm_t @var{algorithm}, const void * @var{ptext}, size_t @var{ptext_len}, void * @var{digest})

@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_fingerprint} (gnutls_x509_crt_t @var{cert}, gnutls_digest_algorithm_t @var{algo}, void * @var{buf}, size_t * @var{buf_size})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{algo}: is a digest algorithm
+
+@var{buf}: a pointer to a structure to hold the fingerprint (may be null)
+
+@var{buf_size}: initially holds the size of  @code{buf} 
+
+This function will calculate and copy the certificate's fingerprint
+in the provided buffer. The fingerprint is a hash of the DER-encoded
+data of the certificate.
+
+If the buffer is null then only the size will be filled.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is
+not long enough, and in that case the *buf_size will be updated
+with the required size.  On success 0 is returned.
+@end deftypefun

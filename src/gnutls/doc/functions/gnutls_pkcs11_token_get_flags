@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_token_get_flags} (const char * @var{url}, unsigned int * @var{flags})
+@var{url}: should contain a PKCS 11 URL
+
+@var{flags}: The output flags (GNUTLS_PKCS11_TOKEN_*)
+
+This function will return information about the PKCS 11 token flags.
+
+The supported flags are: @code{GNUTLS_PKCS11_TOKEN_HW}  and @code{GNUTLS_PKCS11_TOKEN_TRUSTED} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun

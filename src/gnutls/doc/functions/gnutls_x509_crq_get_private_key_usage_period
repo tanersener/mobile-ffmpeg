@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_private_key_usage_period} (gnutls_x509_crq_t @var{crq}, time_t * @var{activation}, time_t * @var{expiration}, unsigned int * @var{critical})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{activation}: The activation time
+
+@var{expiration}: The expiration time
+
+@var{critical}: the extension status
+
+This function will return the expiration and activation
+times of the private key of the certificate.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+if the extension is not present, otherwise a negative error value.
+@end deftypefun

@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_srtp_set_mki} (gnutls_session_t @var{session}, const gnutls_datum_t * @var{mki})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{mki}: holds the MKI
+
+This function sets the Master Key Identifier, to be
+used by this session (if any).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+Since 3.1.4
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_dn_set_str} (gnutls_x509_dn_t @var{dn}, const char * @var{str}, const char ** @var{err})

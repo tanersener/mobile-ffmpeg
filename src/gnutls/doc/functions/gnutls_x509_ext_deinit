@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_ext_deinit} (gnutls_x509_ext_st * @var{ext})
+@var{ext}: The extensions structure
+
+This function will deinitialize an extensions structure.
+
+@strong{Since:} 3.3.8
+@end deftypefun

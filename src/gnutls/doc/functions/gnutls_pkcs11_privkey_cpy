@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_privkey_cpy} (gnutls_pkcs11_privkey_t @var{dst}, gnutls_pkcs11_privkey_t @var{src})
+@var{dst}: The destination key, which should be initialized.
+
+@var{src}: The source key
+
+This function will copy a private key from source to destination
+key. Destination has to be initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.0
+@end deftypefun

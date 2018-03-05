@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_cipher_init} (gnutls_cipher_hd_t * @var{handle}, gnutls_cipher_algorithm_t @var{cipher}, const gnutls_datum_t * @var{key}, const gnutls_datum_t * @var{iv})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{cipher}: the encryption algorithm to use
+
+@var{key}: the key to be used for encryption/decryption
+
+@var{iv}: the IV to use (if not applicable set NULL)
+
+This function will initialize the  @code{handle} context to be usable
+for encryption/decryption of data. This will effectively use the
+current crypto backend in use by gnutls or the cryptographic
+accelerator in use.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_hmac} (gnutls_hmac_hd_t @var{handle}, const void * @var{ptext}, size_t @var{ptext_len})

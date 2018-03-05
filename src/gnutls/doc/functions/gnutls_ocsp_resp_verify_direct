@@ -1,0 +1,29 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_verify_direct} (gnutls_ocsp_resp_t @var{resp}, gnutls_x509_crt_t @var{issuer}, unsigned int * @var{verify}, unsigned int @var{flags})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+@var{issuer}: certificate believed to have signed the response
+
+@var{verify}: output variable with verification status, an @code{gnutls_ocsp_verify_reason_t} 
+
+@var{flags}: verification flags, 0 for now.
+
+Verify signature of the Basic OCSP Response against the public key
+in the  @code{issuer} certificate.
+
+The output  @code{verify} variable will hold verification status codes
+(e.g., @code{GNUTLS_OCSP_VERIFY_SIGNER_NOT_FOUND} ,
+@code{GNUTLS_OCSP_VERIFY_INSECURE_ALGORITHM} ) which are only valid if the
+function returned @code{GNUTLS_E_SUCCESS} .
+
+Note that the function returns @code{GNUTLS_E_SUCCESS}  even when
+verification failed.  The caller must always inspect the  @code{verify} variable to find out the verification status.
+
+The  @code{flags} variable should be 0 for now.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

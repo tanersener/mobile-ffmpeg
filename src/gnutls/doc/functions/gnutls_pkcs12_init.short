@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs12_init} (gnutls_pkcs12_t * @var{pkcs12})

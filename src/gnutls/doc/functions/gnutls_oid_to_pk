@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_pk_algorithm_t} {gnutls_oid_to_pk} (const char * @var{oid})
+@var{oid}: is an object identifier
+
+Converts a textual object identifier to a @code{gnutls_pk_algorithm_t}  value.
+
+@strong{Returns:} a @code{gnutls_pk_algorithm_t}  id of the specified digest
+algorithm, or @code{GNUTLS_PK_UNKNOWN}  on failure.
+
+@strong{Since:} 3.4.3
+@end deftypefun

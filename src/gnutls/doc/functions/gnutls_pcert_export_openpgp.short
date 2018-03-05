@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pcert_export_openpgp} (gnutls_pcert_st * @var{pcert}, gnutls_openpgp_crt_t * @var{crt})

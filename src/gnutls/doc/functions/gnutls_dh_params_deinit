@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_dh_params_deinit} (gnutls_dh_params_t @var{dh_params})
+@var{dh_params}: The parameters
+
+This function will deinitialize the DH parameters type.
+@end deftypefun

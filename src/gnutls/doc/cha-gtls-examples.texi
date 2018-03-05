@@ -1,0 +1,293 @@
+@node GnuTLS application examples
+@chapter GnuTLS application examples
+@anchor{examples}
+@cindex example programs
+@cindex examples
+
+In this chapter several examples of real-world use cases are listed.
+The examples are simplified to promote readability and contain little or 
+no error checking.  
+
+@menu
+* Client examples::
+* Server examples::
+* OCSP example::
+* Miscellaneous examples::
+@end menu
+
+@node Client examples
+@section Client examples
+
+This section contains examples of @acronym{TLS} and @acronym{SSL}
+clients, using @acronym{GnuTLS}. Note that some of the examples require functions
+implemented by another example.
+
+@menu
+* Simple client example with X.509 certificate support::
+* Simple client example with SSH-style certificate verification::
+* Simple client example with anonymous authentication::
+* Simple Datagram TLS client example::
+* Obtaining session information::
+* Using a callback to select the certificate to use::
+* Verifying a certificate::
+* Client using a smart card with TLS::
+* Client with Resume capability example::
+* Simple client example with SRP authentication::
+* Legacy client example with X.509 certificate support::
+* Simple client example in C++::
+* Helper functions for TCP connections::
+* Helper functions for UDP connections::
+@end menu
+
+@node Simple client example with X.509 certificate support
+@subsection Simple client example with @acronym{X.509} certificate support
+@anchor{ex-verify}
+
+Let's assume now that we want to create a TCP client which
+communicates with servers that use @acronym{X.509} certificate authentication.
+The following client is a very simple @acronym{TLS} client, which uses
+the high level verification functions for certificates, but does not support session
+resumption.
+
+Note that this client utilizes functionality present in the latest GnuTLS
+version. For a reasonably portable version see @ref{Legacy client example with X.509 certificate support}.
+
+@verbatiminclude examples/ex-client-x509.c
+
+@node Simple client example with SSH-style certificate verification
+@subsection Simple client example with SSH-style certificate verification
+
+This is an alternative verification function that will use the
+X.509 certificate authorities for verification, but also assume an
+trust on first use (SSH-like) authentication system. That is the user is 
+prompted on unknown public keys and known public keys are considered 
+trusted.
+
+@verbatiminclude examples/ex-verify-ssh.c
+
+@node Simple client example with anonymous authentication
+@subsection Simple client example with anonymous authentication
+
+The simplest client using TLS is the one that doesn't do any
+authentication.  This means no external certificates or passwords are
+needed to set up the connection.  As could be expected, the connection
+is vulnerable to man-in-the-middle (active or redirection) attacks.
+However, the data are integrity protected and encrypted from
+passive eavesdroppers.
+
+Note that due to the vulnerable nature of this method very few public
+servers support it.
+
+@verbatiminclude examples/ex-client-anon.c
+
+
+@node Simple Datagram TLS client example
+@subsection Simple datagram @acronym{TLS} client example
+
+This is a client that uses @acronym{UDP} to connect to a
+server. This is the @acronym{DTLS} equivalent to the TLS example
+with X.509 certificates.
+
+@verbatiminclude examples/ex-client-dtls.c
+
+@node Obtaining session information
+@subsection Obtaining session information
+
+Most of the times it is desirable to know the security properties of
+the current established session.  This includes the underlying ciphers
+and the protocols involved.  That is the purpose of the following
+function.  Note that this function will print meaningful values only
+if called after a successful @funcref{gnutls_handshake}.
+
+@verbatiminclude examples/ex-session-info.c
+
+@node Using a callback to select the certificate to use
+@subsection Using a callback to select the certificate to use
+
+There are cases where a client holds several certificate and key
+pairs, and may not want to load all of them in the credentials
+structure.  The following example demonstrates the use of the
+certificate selection callback.
+
+@verbatiminclude examples/ex-cert-select.c
+
+@node Verifying a certificate
+@subsection Verifying a certificate
+@anchor{ex-verify2}
+
+An example is listed below which uses the high level verification
+functions to verify a given certificate list.
+
+@verbatiminclude examples/ex-verify.c
+
+@node Client using a smart card with TLS
+@subsection Using a smart card with TLS
+@anchor{ex-pkcs11-client}
+@cindex Smart card example
+
+This example will demonstrate how to load keys and certificates
+from a smart-card or any other @acronym{PKCS} #11 token, and 
+use it in a TLS connection.
+
+@verbatiminclude examples/ex-cert-select-pkcs11.c
+
+
+@node Client with Resume capability example
+@subsection Client with resume capability example
+@anchor{ex-resume-client}
+
+This is a modification of the simple client example. Here we
+demonstrate the use of session resumption. The client tries to connect
+once using @acronym{TLS}, close the connection and then try to
+establish a new connection using the previously negotiated data.
+
+@verbatiminclude examples/ex-client-resume.c
+
+
+@node Simple client example with SRP authentication
+@subsection Simple client example with @acronym{SRP} authentication
+
+The following client is a very simple @acronym{SRP} @acronym{TLS}
+client which connects to a server and authenticates using a
+@emph{username} and a @emph{password}. The server may authenticate
+itself using a certificate, and in that case it has to be verified.
+
+@verbatiminclude examples/ex-client-srp.c
+
+
+@node Legacy client example with X.509 certificate support
+@subsection Legacy client example with @acronym{X.509} certificate support
+@anchor{ex-verify-legacy}
+
+For applications that need to maintain compatibility with the GnuTLS 3.1.x
+library, this client example is identical to @ref{Simple client example with X.509 certificate support}
+but utilizes APIs that were available in GnuTLS 3.1.4. 
+
+@verbatiminclude examples/ex-client-x509-3.1.c
+
+
+@node Simple client example in C++
+@subsection Simple client example using the C++ API
+
+The following client is a simple example of a client client utilizing
+the GnuTLS C++ API.
+
+@verbatiminclude examples/ex-cxx.cpp
+
+@node Helper functions for TCP connections
+@subsection Helper functions for TCP connections
+
+Those helper function abstract away TCP connection handling from the
+other examples.  It is required to build some examples.
+
+@verbatiminclude examples/tcp.c
+
+@node Helper functions for UDP connections
+@subsection Helper functions for UDP connections
+
+The UDP helper functions abstract away UDP connection handling from the
+other examples.  It is required to build the examples using UDP.
+
+@verbatiminclude examples/udp.c
+
+@node Server examples
+@section Server examples
+
+This section contains examples of @acronym{TLS} and @acronym{SSL}
+servers, using @acronym{GnuTLS}.
+
+@menu
+* Echo server with X.509 authentication::
+* Echo server with SRP authentication::
+* Echo server with anonymous authentication::
+* DTLS echo server with X.509 authentication::
+@end menu
+
+@node Echo server with X.509 authentication
+@subsection Echo server with @acronym{X.509} authentication
+
+This example is a very simple echo server which supports
+@acronym{X.509} authentication.
+
+@verbatiminclude examples/ex-serv-x509.c
+
+@node Echo server with SRP authentication
+@subsection Echo server with @acronym{SRP} authentication
+
+This is a server which supports @acronym{SRP} authentication. It is
+also possible to combine this functionality with a certificate
+server. Here it is separate for simplicity.
+
+@verbatiminclude examples/ex-serv-srp.c
+
+@node Echo server with anonymous authentication
+@subsection Echo server with anonymous authentication
+
+This example server supports anonymous authentication, and could be
+used to serve the example client for anonymous authentication.
+
+@verbatiminclude examples/ex-serv-anon.c
+
+@node DTLS echo server with X.509 authentication
+@subsection DTLS echo server with @acronym{X.509} authentication
+
+This example is a very simple echo server using Datagram TLS and 
+@acronym{X.509} authentication.
+
+@verbatiminclude examples/ex-serv-dtls.c
+
+
+@node OCSP example
+@section OCSP example
+
+@anchor{Generate OCSP request}
+@subheading Generate @acronym{OCSP} request
+
+A small tool to generate OCSP requests.
+
+@verbatiminclude examples/ex-ocsp-client.c
+
+@node Miscellaneous examples
+@section Miscellaneous examples
+
+@menu
+* Checking for an alert::
+* X.509 certificate parsing example::
+* Listing the ciphersuites in a priority string::
+* PKCS12 structure generation example::
+@end menu
+
+@node Checking for an alert
+@subsection Checking for an alert
+
+This is a function that checks if an alert has been received in the
+current session.
+
+@verbatiminclude examples/ex-alert.c
+
+@node X.509 certificate parsing example
+@subsection @acronym{X.509} certificate parsing example
+@anchor{ex-x509-info}
+
+To demonstrate the @acronym{X.509} parsing capabilities an example program is
+listed below.  That program reads the peer's certificate, and prints
+information about it.
+
+@verbatiminclude examples/ex-x509-info.c
+
+@node Listing the ciphersuites in a priority string
+@subsection Listing the ciphersuites in a priority string
+
+This is a small program to list the enabled ciphersuites by a 
+priority string.
+
+@verbatiminclude examples/print-ciphersuites.c
+
+@node PKCS12 structure generation example
+@subsection PKCS #12 structure generation example
+
+This small program demonstrates the usage of the PKCS #12 API, by generating
+such a structure.
+
+@verbatiminclude examples/ex-pkcs12.c
+

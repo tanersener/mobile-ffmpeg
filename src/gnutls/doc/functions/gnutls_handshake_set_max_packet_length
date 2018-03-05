@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {void} {gnutls_handshake_set_max_packet_length} (gnutls_session_t @var{session}, size_t @var{max})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{max}: is the maximum number.
+
+This function will set the maximum size of all handshake messages.
+Handshakes over this size are rejected with
+@code{GNUTLS_E_HANDSHAKE_TOO_LARGE}  error code.  The default value is
+128kb which is typically large enough.  Set this to 0 if you do not
+want to set an upper limit.
+
+The reason for restricting the handshake message sizes are to
+limit Denial of Service attacks.
+
+Note that the maximum handshake size was increased to 128kb
+from 48kb in GnuTLS 3.5.5.
+@end deftypefun

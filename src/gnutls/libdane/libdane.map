@@ -1,0 +1,27 @@
+# libgnutls.map -- libgnutls linker version script.           -*- ld-script -*-
+
+DANE_0_0
+{
+  global:
+	dane_strerror;
+	dane_state_init;
+	dane_state_deinit;
+	dane_query_tlsa;
+	dane_query_status;
+	dane_query_entries;
+	dane_query_data;
+	dane_query_to_raw_tlsa;
+	dane_query_deinit;
+	dane_verify_session_crt;
+	dane_verify_crt;
+        dane_cert_type_name;
+	dane_match_type_name;
+	dane_cert_usage_name;
+	dane_verification_status_print;
+	dane_state_set_dlv_file;
+	dane_verify_crt_raw;
+	dane_raw_tlsa;
+  local:
+    *;
+};
+

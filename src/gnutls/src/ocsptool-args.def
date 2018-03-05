@@ -1,0 +1,272 @@
+AutoGen Definitions options;
+prog-name     = ocsptool;
+prog-title    = "GnuTLS OCSP tool";
+prog-desc     = "Program to handle OCSP request/responses.";
+detail    = "Ocsptool is a program that can parse and print information about
+OCSP requests/responses, generate requests and verify responses.
+";
+short-usage   = "ocsptool [options]\nocsptool --help for usage instructions.\n";
+explain       = "";
+
+#define  INFILE_OPT   1
+#define  OUTFILE_OPT  1
+#define  VERBOSE_OPT  1
+#include args-std.def
+
+flag = {
+    name      = ask;
+    arg-type  = string;
+    arg-name  = "server name|url";
+    arg-optional;
+    descrip   = "Ask an OCSP/HTTP server on a certificate validity";
+    flags-must = load-cert;
+    flags-must = load-issuer;
+    doc = "Connects to the specified HTTP OCSP server and queries on the validity of the loaded certificate.";
+};
+
+flag = {
+    name      = verify-response;
+    value     = e;
+    descrip   = "Verify response";
+    doc = "";
+};
+
+flag = {
+    name      = request-info;
+    value     = i;
+    descrip   = "Print information on a OCSP request";
+    doc = "";
+};
+
+flag = {
+    name      = response-info;
+    value     = j;
+    descrip   = "Print information on a OCSP response";
+    doc = "";
+};
+
+flag = {
+    name      = generate-request;
+    value     = q;
+    descrip   = "Generate an OCSP request";
+    doc = "";
+};
+
+flag = {
+    name      = nonce;
+    disabled  = yes;
+    disable   = "no";
+    descrip   = "Use (or not) a nonce to OCSP request";
+    doc = "";
+};
+
+flag = {
+    name      = load-issuer;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read issuer certificate from file";
+    doc = "";
+};
+
+flag = {
+    name      = load-cert;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read certificate to check from file";
+    doc = "";
+};
+
+flag = {
+    name      = load-trust;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read OCSP trust anchors from file";
+    flags-cant = load-signer;
+    doc = "";
+};
+
+flag = {
+    name      = load-signer;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read OCSP response signer from file";
+    flags-cant = load-trust;
+    doc = "";
+};
+
+flag = {
+    name      = inder;
+    disabled;
+    disable   = "no";
+    descrip   = "Use DER format for input certificates and private keys";
+    doc      = "";
+};
+
+flag = {
+    name      = load-request;
+    value     = Q;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read DER encoded OCSP request from file";
+    doc      = "";
+};
+
+flag = {
+    name      = load-response;
+    value     = S;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Read DER encoded OCSP response from file";
+    doc      = "";
+};
+
+flag = {
+    name      = ignore-errors;
+    descrip   = "Ignore any verification errors";
+    doc = "";
+};
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+    certtool (1)
+_EOT_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOF_
+@subheading Print information about an OCSP request
+
+To parse an OCSP request and print information about the content, the
+@code{-i} or @code{--request-info} parameter may be used as follows.
+The @code{-Q} parameter specify the name of the file containing the
+OCSP request, and it should contain the OCSP request in binary DER
+format.
+
+@example
+$ ocsptool -i -Q ocsp-request.der
+@end example
+
+The input file may also be sent to standard input like this:
+
+@example
+$ cat ocsp-request.der | ocsptool --request-info
+@end example
+
+@subheading Print information about an OCSP response
+
+Similar to parsing OCSP requests, OCSP responses can be parsed using
+the @code{-j} or @code{--response-info} as follows.
+
+@example
+$ ocsptool -j -Q ocsp-response.der
+$ cat ocsp-response.der | ocsptool --response-info
+@end example
+
+@subheading Generate an OCSP request
+
+The @code{-q} or @code{--generate-request} parameters are used to
+generate an OCSP request.  By default the OCSP request is written to
+standard output in binary DER format, but can be stored in a file
+using @code{--outfile}.  To generate an OCSP request the issuer of the
+certificate to check needs to be specified with @code{--load-issuer}
+and the certificate to check with @code{--load-cert}.  By default PEM
+format is used for these files, although @code{--inder} can be used to
+specify that the input files are in DER format.
+
+@example
+$ ocsptool -q --load-issuer issuer.pem --load-cert client.pem \
+           --outfile ocsp-request.der
+@end example
+
+When generating OCSP requests, the tool will add an OCSP extension
+containing a nonce.  This behaviour can be disabled by specifying
+@code{--no-nonce}.
+
+@subheading Verify signature in OCSP response
+
+To verify the signature in an OCSP response the @code{-e} or
+@code{--verify-response} parameter is used.  The tool will read an
+OCSP response in DER format from standard input, or from the file
+specified by @code{--load-response}.  The OCSP response is verified
+against a set of trust anchors, which are specified using
+@code{--load-trust}.  The trust anchors are concatenated certificates
+in PEM format.  The certificate that signed the OCSP response needs to
+be in the set of trust anchors, or the issuer of the signer
+certificate needs to be in the set of trust anchors and the OCSP
+Extended Key Usage bit has to be asserted in the signer certificate.
+
+@example
+$ ocsptool -e --load-trust issuer.pem \
+           --load-response ocsp-response.der
+@end example
+
+The tool will print status of verification.
+
+@subheading Verify signature in OCSP response against given certificate
+
+It is possible to override the normal trust logic if you know that a
+certain certificate is supposed to have signed the OCSP response, and
+you want to use it to check the signature.  This is achieved using
+@code{--load-signer} instead of @code{--load-trust}.  This will load
+one certificate and it will be used to verify the signature in the
+OCSP response.  It will not check the Extended Key Usage bit.
+
+@example
+$ ocsptool -e --load-signer ocsp-signer.pem \
+           --load-response ocsp-response.der
+@end example
+
+This approach is normally only relevant in two situations.  The first
+is when the OCSP response does not contain a copy of the signer
+certificate, so the @code{--load-trust} code would fail.  The second
+is if you want to avoid the indirect mode where the OCSP response
+signer certificate is signed by a trust anchor.
+
+@subheading Real-world example
+
+Here is an example of how to generate an OCSP request for a
+certificate and to verify the response.  For illustration we'll use
+the @code{blog.josefsson.org} host, which (as of writing) uses a
+certificate from CACert.  First we'll use @code{gnutls-cli} to get a
+copy of the server certificate chain.  The server is not required to
+send this information, but this particular one is configured to do so.
+
+@example
+$ echo | gnutls-cli -p 443 blog.josefsson.org --print-cert > chain.pem
+@end example
+
+Use a text editor on @code{chain.pem} to create three files for each
+separate certificates, called @code{cert.pem} for the first
+certificate for the domain itself, secondly @code{issuer.pem} for the
+intermediate certificate and @code{root.pem} for the final root
+certificate.
+
+The domain certificate normally contains a pointer to where the OCSP
+responder is located, in the Authority Information Access Information
+extension.  For example, from @code{certtool -i < cert.pem} there is
+this information:
+
+@example
+		Authority Information Access Information (not critical):
+			Access Method: 1.3.6.1.5.5.7.48.1 (id-ad-ocsp)
+			Access Location URI: http://ocsp.CAcert.org/
+@end example
+
+This means the CA support OCSP queries over HTTP.  We are now ready to
+create a OCSP request for the certificate.
+
+@example
+$ ocsptool --ask ocsp.CAcert.org --load-issuer issuer.pem \
+           --load-cert cert.pem --outfile ocsp-response.der
+@end example
+
+The request is sent via HTTP to the OCSP server address specified. If the
+address is omitted ocsptool will use the address stored in the certificate.
+
+_EOF_;
+};
+

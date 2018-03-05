@@ -1,0 +1,566 @@
+\input texinfo   @c -*-texinfo-*-
+@comment %**start of header
+@setfilename gnutls-guile.info
+@include version-guile.texi
+@settitle GnuTLS-Guile @value{VERSION}
+
+@c don't indent the paragraphs.
+@paragraphindent 0
+
+@c Unify some of the indices.
+@syncodeindex tp fn
+@syncodeindex pg cp
+
+@comment %**end of header
+@finalout
+@copying
+This manual is last updated @value{UPDATED} for version
+@value{VERSION} of GnuTLS.
+
+Copyright @copyright{} 2001-2012, 2014, 2016 Free Software Foundation, Inc.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+copy of the license is included in the section entitled ``GNU Free
+Documentation License''.
+@end quotation
+@end copying
+
+@dircategory Software libraries
+@direntry
+* GnuTLS-Guile: (gnutls-guile).		GNU Transport Layer Security Library. Guile bindings.
+@end direntry
+
+@titlepage
+@title GnuTLS-Guile
+@subtitle Guile binding for GNU TLS
+@subtitle for version @value{VERSION}, @value{UPDATED}
+@sp 7
+@image{gnutls-logo,6cm,6cm}
+@page
+@vskip 0pt plus 1filll
+@insertcopying
+@end titlepage
+
+@macro xcite{ref}
+[\ref\] (@pxref{Bibliography})
+@end macro
+
+@contents
+
+@node Top
+@top GnuTLS-Guile
+
+@insertcopying
+
+@menu
+* Preface::                     Preface.
+* Guile Preparations::          Note on installation and environment.
+* Guile API Conventions::       Naming conventions and other idiosyncrasies.
+* Guile Examples::              Quick start.
+* Guile Reference::             The Scheme GnuTLS programming interface.
+
+* Copying Information::         You can copy and modify this manual.
+* Procedure Index::
+* Concept Index::
+@end menu
+
+@node Preface
+@chapter Preface
+
+This manual describes the @uref{http://www.gnu.org/software/guile/,
+GNU Guile} Scheme programming interface to GnuTLS, which is distributed
+as part of @uref{http://gnutls.org,GnuTLS}.  The reader is
+assumed to have basic knowledge of the protocol and library.  Details
+missing from this chapter may be found in Function reference,
+of the C API reference.
+
+At this stage, not all the C functions are available from Scheme, but
+a large subset thereof is available.
+
+@c *********************************************************************
+@node Guile Preparations
+@chapter Guile Preparations
+
+The GnuTLS Guile bindings are available for Guile's 2.0 stable series,
+as well as the forthcoming 2.2 series and the legacy 1.8 series.
+
+By default they are installed under the GnuTLS installation directory,
+typically @file{/usr/local/share/guile/site/}).  Normally Guile
+will not find the module there without help.  You may experience
+something like this:
+
+@example
+$ guile
+@dots{}
+scheme@@(guile-user)> (use-modules (gnutls))
+ERROR: no code for module (gnutls)
+@end example
+
+There are two ways to solve this.  The first is to make sure that when
+building GnuTLS, the Guile bindings will be installed in the same
+place where Guile looks.  You may do this by using the
+@code{--with-guile-site-dir} parameter as follows:
+
+@example
+$ ./configure --with-guile-site-dir=no
+@end example
+
+This will instruct GnuTLS to attempt to install the Guile bindings
+where Guile will look for them.  It will use @code{guile-config info
+pkgdatadir} to learn the path to use.
+
+If Guile was installed into @code{/usr}, you may also install GnuTLS
+using the same prefix:
+
+@example
+$ ./configure --prefix=/usr
+@end example
+
+If you want to specify the path to install the Guile bindings you can
+also specify the path directly:
+
+@example
+$ ./configure --with-guile-site-dir=/opt/guile/share/guile/site
+@end example
+
+The second solution requires some more work but may be easier to use
+if you do not have system administrator rights to your machine.  You
+need to instruct Guile so that it finds the GnuTLS Guile bindings.
+Either use the @code{GUILE_LOAD_PATH} environment variable as follows:
+
+@example
+$ GUILE_LOAD_PATH="/usr/local/share/guile/site:$GUILE_LOAD_PATH" guile
+scheme@@(guile-user)> (use-modules (gnutls))
+scheme@@(guile-user)>
+@end example
+
+Alternatively, you can modify Guile's @code{%load-path} variable
+(@pxref{Build Config, Guile's run-time options,, guile, The GNU Guile
+Reference Manual}).
+
+At this point, you might get an error regarding
+@file{guile-gnutls-v-2} similar to:
+
+@example
+gnutls.scm:361:1: In procedure dynamic-link in expression (load-extension "guile-gnutls-v-2" "scm_init_gnutls"):
+gnutls.scm:361:1: file: "guile-gnutls-v-2", message: "guile-gnutls-v-2.so: cannot open shared object file: No such file or directory"
+@end example
+
+In this case, you will need to modify the run-time linker path, for
+example as follows:
+
+@example
+$ LD_LIBRARY_PATH=/usr/local/lib GUILE_LOAD_PATH=/usr/local/share/guile/site guile
+scheme@@(guile-user)> (use-modules (gnutls))
+scheme@@(guile-user)>
+@end example
+
+To check that you got the intended GnuTLS library version, you may
+print the version number of the loaded library as follows:
+
+@example
+$ guile
+scheme@@(guile-user)> (use-modules (gnutls))
+scheme@@(guile-user)> (gnutls-version)
+"@value{VERSION}"
+scheme@@(guile-user)>
+@end example
+
+
+@c *********************************************************************
+@node Guile API Conventions
+@chapter Guile API Conventions
+
+This chapter details the conventions used by Guile API, as well as
+specificities of the mapping of the C API to Scheme.
+
+@menu
+* Enumerates and Constants::      Representation of C-side constants.
+* Procedure Names::               Naming conventions.
+* Representation of Binary Data:: Binary data buffers.
+* Input and Output::              Input and output.
+* Exception Handling::            Exceptions.
+@end menu
+
+@node Enumerates and Constants
+@section Enumerates and Constants
+
+@cindex enumerate
+@cindex constant
+
+Lots of enumerates and constants are used in the GnuTLS C API.  For
+each C enumerate type, a disjoint Scheme type is used---thus,
+enumerate values and constants are not represented by Scheme symbols
+nor by integers.  This makes it impossible to use an enumerate value
+of the wrong type on the Scheme side: such errors are automatically
+detected by type-checking.
+
+The enumerate values are bound to variables exported by the
+@code{(gnutls)} module.  These variables
+are named according to the following convention:
+
+@itemize
+@item All variable names are lower-case; the underscore @code{_}
+character used in the C API is replaced by hyphen @code{-}.
+@item All variable names are prepended by the name of the enumerate
+type and the slash @code{/} character.
+@item In some cases, the variable name is made more explicit than the
+one of the C API, e.g., by avoid abbreviations.
+@end itemize
+
+Consider for instance this C-side enumerate:
+
+@example
+typedef enum
+@{
+  GNUTLS_CRD_CERTIFICATE = 1,
+  GNUTLS_CRD_ANON,
+  GNUTLS_CRD_SRP,
+  GNUTLS_CRD_PSK
+@} gnutls_credentials_type_t;
+@end example
+
+The corresponding Scheme values are bound to the following variables
+exported by the @code{(gnutls)} module:
+
+@example
+credentials/certificate
+credentials/anonymous
+credentials/srp
+credentials/psk
+@end example
+
+Hopefully, most variable names can be deduced from this convention.
+
+Scheme-side ``enumerate'' values can be compared using @code{eq?}
+(@pxref{Equality, equality predicates,, guile, The GNU Guile Reference
+Manual}).  Consider the following example:
+
+@findex session-cipher
+
+@example
+(let ((session (make-session connection-end/client)))
+
+  ;;
+  ;; ...
+  ;;
+
+  ;; Check the ciphering algorithm currently used by SESSION.
+  (if (eq? cipher/arcfour (session-cipher session))
+      (format #t "We're using the ARCFOUR algorithm")))
+@end example
+
+In addition, all enumerate values can be converted to a human-readable
+string, in a type-specific way.  For instance, @code{(cipher->string
+cipher/arcfour)} yields @code{"ARCFOUR 128"}, while
+@code{(key-usage->string key-usage/digital-signature)} yields
+@code{"digital-signature"}.  Note that these strings may not be
+sufficient for use in a user interface since they are fairly concise
+and not internationalized.
+
+
+@node Procedure Names
+@section Procedure Names
+
+Unlike C functions in GnuTLS, the corresponding Scheme procedures are
+named in a way that is close to natural English.  Abbreviations are
+also avoided.  For instance, the Scheme procedure corresponding to
+@code{gnutls_certificate_set_dh_params} is named
+@code{set-certificate-credentials-dh-parameters!}.  The @code{gnutls_}
+prefix is always omitted from variable names since a similar effect
+can be achieved using Guile's nifty binding renaming facilities,
+should it be needed (@pxref{Using Guile Modules,,, guile, The GNU
+Guile Reference Manual}).
+
+Often Scheme procedure names differ from C function names in a way
+that makes it clearer what objects they operate on.  For example, the
+Scheme procedure named @code{set-session-transport-port!} corresponds
+to @code{gnutls_transport_set_ptr}, making it clear that this
+procedure applies to session.
+
+@node Representation of Binary Data
+@section Representation of Binary Data
+
+Many procedures operate on binary data.  For instance,
+@code{pkcs3-import-dh-parameters} expects binary data as input.
+
+@cindex bytevectors
+@cindex SRFI-4
+@cindex homogeneous vector
+Binary data is represented on the Scheme side using bytevectors
+(@pxref{Bytevectors,,, guile, The GNU Guile Reference Manual}).
+Homogeneous vectors such as SRFI-4 @code{u8vector}s can also be
+used@footnote{Historically, SRFI-4 @code{u8vector}s are the closest
+thing to bytevectors that Guile 1.8 and earlier supported.}.
+
+As an example, generating and then exporting Diffie-Hellman parameters
+in the PEM format can be done as follows:
+
+@findex make-dh-parameters
+@findex pkcs3-export-dh-parameters
+@vindex x509-certificate-format/pem
+
+@example
+(let* ((dh  (make-dh-parameters 1024))
+       (pem (pkcs3-export-dh-parameters dh 
+                                        x509-certificate-format/pem)))
+  (call-with-output-file "some-file.pem"
+    (lambda (port)
+      (uniform-vector-write pem port))))
+@end example
+
+
+@node Input and Output
+@section Input and Output
+
+@findex set-session-transport-port!
+@findex set-session-transport-fd!
+
+The underlying transport of a TLS session can be any Scheme
+input/output port (@pxref{Ports and File Descriptors,,, guile, The GNU
+Guile Reference Manual}).  This has to be specified using
+@code{set-session-transport-port!}.
+
+However, for better performance, a raw file descriptor can be
+specified, using @code{set-session-transport-fd!}.  For instance, if
+the transport layer is a socket port over an OS-provided socket, you
+can use the @code{port->fdes} or @code{fileno} procedure to obtain the
+underlying file descriptor and pass it to
+@code{set-session-transport-fd!}  (@pxref{Ports and File Descriptors,
+@code{port->fdes} and @code{fileno},, guile, The GNU Guile Reference
+Manual}).  This would work as follows:
+
+@example
+(let ((socket (socket PF_INET SOCK_STREAM 0))
+      (session (make-session connection-end/client)))
+
+  ;;
+  ;; Establish a TCP connection...
+  ;;
+
+  ;; Use the file descriptor that underlies SOCKET.
+  (set-session-transport-fd! session (fileno socket)))
+@end example
+
+@findex session-record-port
+
+Once a TLS session is established, data can be communicated through it
+(i.e., @emph{via} the TLS record layer) using the port returned by
+@code{session-record-port}:
+
+@example
+(let ((session (make-session connection-end/client)))
+
+  ;;
+  ;; Initialize the various parameters of SESSION, set up
+  ;; a network connection, etc.
+  ;;
+
+  (let ((i/o (session-record-port session)))
+    (display "Hello peer!" i/o)
+    (let ((greetings (read i/o)))
+
+      ;; @dots{}
+
+      (bye session close-request/rdwr))))
+@end example
+
+@c See <http://bugs.gnu.org/22966> for details.
+@cindex buffering
+Note that each write to the session record port leads to the
+transmission of an encrypted TLS ``Application Data'' packet.  In the
+above example, we create an Application Data packet for the 11 bytes for
+the string that we write.  This is not efficient both in terms of CPU
+usage and bandwidth (each packet adds at least 5 bytes of overhead and
+can lead to one @code{write} system call), so we recommend that
+applications do their own buffering.
+
+@findex record-send
+@findex record-receive!
+
+A lower-level I/O API is provided by @code{record-send} and
+@code{record-receive!} which take a bytevector (or a SRFI-4 vector) to
+represent the data sent or received.  While it might improve
+performance, it is much less convenient than the session record port and
+should rarely be needed.
+
+
+@node Exception Handling
+@section Exception Handling
+
+@cindex exceptions
+@cindex errors
+@cindex @code{gnutls-error}
+@findex error->string
+
+GnuTLS errors are implemented as Scheme exceptions (@pxref{Exceptions,
+exceptions in Guile,, guile, The GNU Guile Reference Manual}).  Each
+time a GnuTLS function returns an error, an exception with key
+@code{gnutls-error} is raised.  The additional arguments that are
+thrown include an error code and the name of the GnuTLS procedure that
+raised the exception.  The error code is pretty much like an enumerate
+value: it is one of the @code{error/} variables exported by the
+@code{(gnutls)} module (@pxref{Enumerates and Constants}).  Exceptions
+can be turned into error messages using the @code{error->string}
+procedure.
+
+The following examples illustrates how GnuTLS exceptions can be
+handled:
+
+@example
+(let ((session (make-session connection-end/server)))
+
+  ;;
+  ;; ...
+  ;;
+
+  (catch 'gnutls-error
+    (lambda ()
+      (handshake session))
+    (lambda (key err function . currently-unused)
+      (format (current-error-port)
+              "a GnuTLS error was raised by `~a': ~a~%"
+              function (error->string err)))))
+@end example
+
+Again, error values can be compared using @code{eq?}:
+
+@example
+    ;; `gnutls-error' handler.
+    (lambda (key err function . currently-unused)
+      (if (eq? err error/fatal-alert-received)
+          (format (current-error-port)
+                  "a fatal alert was caught!~%")
+          (format (current-error-port)
+                  "something bad happened: ~a~%"
+                  (error->string err))))
+@end example
+
+Note that the @code{catch} handler is currently passed only 3
+arguments but future versions might provide it with additional
+arguments.  Thus, it must be prepared to handle more than 3 arguments,
+as in this example.
+
+
+@c *********************************************************************
+@node Guile Examples
+@chapter Guile Examples
+
+This chapter provides examples that illustrate common use cases.
+
+@menu
+* Anonymous Authentication Guile Example::    Simplest client and server.
+@end menu
+
+@node Anonymous Authentication Guile Example
+@section Anonymous Authentication Guile Example
+
+@dfn{Anonymous authentication} is very easy to use.  No certificates
+are needed by the communicating parties.  Yet, it allows them to
+benefit from end-to-end encryption and integrity checks.
+
+The client-side code would look like this (assuming @var{some-socket}
+is bound to an open socket port):
+
+@vindex connection-end/client
+@vindex kx/anon-dh
+@vindex close-request/rdwr
+
+@example
+;; Client-side.
+
+(let ((client (make-session connection-end/client)))
+  ;; Use the default settings.
+  (set-session-default-priority! client)
+
+  ;; Don't use certificate-based authentication.
+  (set-session-certificate-type-priority! client '())
+
+  ;; Request the "anonymous Diffie-Hellman" key exchange method.
+  (set-session-kx-priority! client (list kx/anon-dh))
+
+  ;; Specify the underlying socket.
+  (set-session-transport-fd! client (fileno some-socket))
+
+  ;; Create anonymous credentials.
+  (set-session-credentials! client
+                            (make-anonymous-client-credentials))
+
+  ;; Perform the TLS handshake with the server.
+  (handshake client)
+
+  ;; Send data over the TLS record layer.
+  (write "hello, world!" (session-record-port client))
+
+  ;; Terminate the TLS session.
+  (bye client close-request/rdwr))
+@end example
+
+The corresponding server would look like this (again, assuming
+@var{some-socket} is bound to a socket port):
+
+@vindex connection-end/server
+
+@example
+;; Server-side.
+
+(let ((server (make-session connection-end/server)))
+  (set-session-default-priority! server)
+  (set-session-certificate-type-priority! server '())
+  (set-session-kx-priority! server (list kx/anon-dh))
+
+  ;; Specify the underlying transport socket.
+  (set-session-transport-fd! server (fileno some-socket))
+
+  ;; Create anonymous credentials.
+  (let ((cred (make-anonymous-server-credentials))
+        (dh-params (make-dh-parameters 1024)))
+    ;; Note: DH parameter generation can take some time.
+    (set-anonymous-server-dh-parameters! cred dh-params)
+    (set-session-credentials! server cred))
+
+  ;; Perform the TLS handshake with the client.
+  (handshake server)
+
+  ;; Receive data over the TLS record layer.
+  (let ((message (read (session-record-port server))))
+    (format #t "received the following message: ~a~%"
+            message)
+
+    (bye server close-request/rdwr)))
+@end example
+
+This is it!
+
+
+@c *********************************************************************
+@node Guile Reference
+@chapter Guile Reference
+
+This chapter lists the GnuTLS Scheme procedures exported by the
+@code{(gnutls)} module (@pxref{The Guile module system,,, guile, The
+GNU Guile Reference Manual}).
+
+@include core.c.texi
+
+@c Local Variables:
+@c ispell-local-dictionary: "american"
+@c End:
+
+@include cha-copying.texi
+
+@node Procedure Index
+@unnumbered Procedure Index
+
+@printindex fn
+
+@node Concept Index
+@unnumbered Concept Index
+
+@printindex cp
+
+@bye

@@ -1,0 +1,37 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_export_pkcs8} (gnutls_x509_privkey_t @var{key}, gnutls_x509_crt_fmt_t @var{format}, const char * @var{password}, unsigned int @var{flags}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{key}: Holds the key
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{password}: the password that will be used to encrypt the key.
+
+@var{flags}: an ORed sequence of gnutls_pkcs_encrypt_flags_t
+
+@var{output_data}: will contain a private key PEM or DER encoded
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will export the private key to a PKCS8 structure.
+Both RSA and DSA keys can be exported. For DSA keys we use
+PKCS @code{11}  definitions. If the flags do not specify the encryption
+cipher, then the default 3DES (PBES2) will be used.
+
+The  @code{password} can be either ASCII or UTF-8 in the default PBES2
+encryption schemas, or ASCII for the PKCS12 schemas.
+
+If the buffer provided is not long enough to hold the output, then
+*output_data_size is updated and GNUTLS_E_SHORT_MEMORY_BUFFER will
+be returned.
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN ENCRYPTED PRIVATE KEY" or "BEGIN PRIVATE KEY" if
+encryption is not used.
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+@end deftypefun

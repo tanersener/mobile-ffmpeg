@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_signature_oid} (gnutls_x509_crt_t @var{cert}, char * @var{oid}, size_t * @var{oid_size})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{oid}: a pointer to a buffer to hold the OID (may be null)
+
+@var{oid_size}: initially holds the size of  @code{oid} 
+
+This function will return the OID of the signature algorithm
+that has been used to sign this certificate. This is function
+is useful in the case @code{gnutls_x509_crt_get_signature_algorithm()} 
+returned @code{GNUTLS_SIGN_UNKNOWN} .
+
+@strong{Returns:} zero or a negative error code on error.
+
+@strong{Since:} 3.5.0
+@end deftypefun

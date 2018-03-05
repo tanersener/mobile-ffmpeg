@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_mac_get_name} (gnutls_mac_algorithm_t @var{algorithm})
+@var{algorithm}: is a MAC algorithm
+
+Convert a @code{gnutls_mac_algorithm_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified MAC
+algorithm, or @code{NULL} .
+@end deftypefun

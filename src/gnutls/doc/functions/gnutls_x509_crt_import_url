@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_import_url} (gnutls_x509_crt_t @var{crt}, const char * @var{url}, unsigned int @var{flags})
+@var{crt}: A certificate of type @code{gnutls_x509_crt_t} 
+
+@var{url}: A PKCS 11 url
+
+@var{flags}: One of GNUTLS_PKCS11_OBJ_* flags for PKCS@code{11}  URLs or zero otherwise
+
+This function will import a certificate present in a PKCS@code{11}  token
+or any type of back-end that supports URLs.
+
+In previous versions of gnutls this function was named
+gnutls_x509_crt_import_pkcs11_url, and the old name is
+an alias to this one.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.0
+@end deftypefun

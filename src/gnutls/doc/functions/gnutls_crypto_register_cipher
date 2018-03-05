@@ -1,0 +1,38 @@
+
+
+
+
+@deftypefun {int} {gnutls_crypto_register_cipher} (gnutls_cipher_algorithm_t @var{algorithm}, int @var{priority}, gnutls_cipher_init_func @var{init}, gnutls_cipher_setkey_func @var{setkey}, gnutls_cipher_setiv_func @var{setiv}, gnutls_cipher_encrypt_func @var{encrypt}, gnutls_cipher_decrypt_func @var{decrypt}, gnutls_cipher_deinit_func @var{deinit})
+@var{algorithm}: is the gnutls algorithm identifier
+
+@var{priority}: is the priority of the algorithm
+
+@var{init}: A function which initializes the cipher
+
+@var{setkey}: A function which sets the key of the cipher
+
+@var{setiv}: A function which sets the nonce/IV of the cipher (non-AEAD)
+
+@var{encrypt}: A function which performs encryption (non-AEAD)
+
+@var{decrypt}: A function which performs decryption (non-AEAD)
+
+@var{deinit}: A function which deinitializes the cipher
+
+This function will register a cipher algorithm to be used by
+gnutls.  Any algorithm registered will override the included
+algorithms and by convention kernel implemented algorithms have
+priority of 90 and CPU-assisted of 80.  The algorithm with the lowest priority will be
+used by gnutls.
+
+In the case the registered init or setkey functions return @code{GNUTLS_E_NEED_FALLBACK} ,
+GnuTLS will attempt to use the next in priority registered cipher.
+
+The functions which are marked as non-AEAD they are not required when
+registering a cipher to be used with the new AEAD API introduced in
+GnuTLS 3.4.0. Internally GnuTLS uses the new AEAD API.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun

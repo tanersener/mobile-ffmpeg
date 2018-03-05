@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_crypto_register_digest} (gnutls_digest_algorithm_t @var{algorithm}, int @var{priority}, gnutls_digest_init_func @var{init}, gnutls_digest_hash_func @var{hash}, gnutls_digest_output_func @var{output}, gnutls_digest_deinit_func @var{deinit}, gnutls_digest_fast_func @var{hash_fast})

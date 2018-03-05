@@ -1,0 +1,29 @@
+
+
+@c gnutls_protocol_t
+@table @code
+@item GNUTLS_@-SSL3
+SSL version 3.0.
+@item GNUTLS_@-TLS1_@-0
+TLS version 1.0.
+@item GNUTLS_@-TLS1
+Same as @code{GNUTLS_TLS1_0} .
+@item GNUTLS_@-TLS1_@-1
+TLS version 1.1.
+@item GNUTLS_@-TLS1_@-2
+TLS version 1.2.
+@item GNUTLS_@-DTLS0_@-9
+DTLS version 0.9 (Cisco AnyConnect / OpenSSL 0.9.8e).
+@item GNUTLS_@-DTLS1_@-0
+DTLS version 1.0.
+@item GNUTLS_@-DTLS1_@-2
+DTLS version 1.2.
+@item GNUTLS_@-DTLS_@-VERSION_@-MIN
+-- undescribed --
+@item GNUTLS_@-DTLS_@-VERSION_@-MAX
+-- undescribed --
+@item GNUTLS_@-TLS_@-VERSION_@-MAX
+-- undescribed --
+@item GNUTLS_@-VERSION_@-UNKNOWN
+Unknown SSL/TLS version.
+@end table

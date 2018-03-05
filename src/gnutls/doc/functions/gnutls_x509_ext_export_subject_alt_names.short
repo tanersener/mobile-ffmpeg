@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_ext_export_subject_alt_names} (gnutls_subject_alt_names_t @var{sans}, gnutls_datum_t * @var{ext})

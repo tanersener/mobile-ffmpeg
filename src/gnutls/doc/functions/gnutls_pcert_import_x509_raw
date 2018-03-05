@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_pcert_import_x509_raw} (gnutls_pcert_st * @var{pcert}, const gnutls_datum_t * @var{cert}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{pcert}: The pcert structure
+
+@var{cert}: The raw certificate to be imported
+
+@var{format}: The format of the certificate
+
+@var{flags}: zero for now
+
+This convenience function will import the given certificate to a
+@code{gnutls_pcert_st}  structure. The structure must be deinitialized
+afterwards using @code{gnutls_pcert_deinit()} ;
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

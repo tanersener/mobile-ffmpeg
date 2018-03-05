@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {ssize_t} {gnutls_record_recv_packet} (gnutls_session_t @var{session}, gnutls_packet_t * @var{packet})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{packet}: the structure that will hold the packet data
+
+This is a lower-level function than @code{gnutls_record_recv()}  and allows
+to directly receive the whole decrypted packet. That avoids a
+memory copy, and is intended to be used by applications seeking high
+performance.
+
+The received packet is accessed using @code{gnutls_packet_get()}  and 
+must be deinitialized using @code{gnutls_packet_deinit()} . The returned
+packet will be @code{NULL}  if the return value is zero (EOF).
+
+@strong{Returns:} The number of bytes received and zero on EOF (for stream
+connections).  A negative error code is returned in case of an error.  
+
+@strong{Since:} 3.3.5
+@end deftypefun

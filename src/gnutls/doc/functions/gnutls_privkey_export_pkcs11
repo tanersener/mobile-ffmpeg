@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_export_pkcs11} (gnutls_privkey_t @var{pkey}, gnutls_pkcs11_privkey_t * @var{key})
+@var{pkey}: The private key
+
+@var{key}: Location for the key to be exported.
+
+Converts the given abstract private key to a @code{gnutls_pkcs11_privkey_t} 
+type. The key must be of type @code{GNUTLS_PRIVKEY_PKCS11} . The key
+returned in  @code{key} must be deinitialized with
+@code{gnutls_pkcs11_privkey_deinit()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.0
+@end deftypefun

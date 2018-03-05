@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_token_get_info} (const char * @var{url}, gnutls_pkcs11_token_info_t @var{ttype}, void * @var{output}, size_t * @var{output_size})

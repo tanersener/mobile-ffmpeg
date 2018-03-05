@@ -1,0 +1,70 @@
+<!-- ##### SECTION Title ##### -->
+heartbeat
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO HEARTBEAT_DEFAULT_POLICY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO HEARTBEAT_REQUEST ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO HEARTBEAT_RESPONSE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LOCAL_ALLOWED_TO_SEND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LOCAL_NOT_ALLOWED_TO_SEND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MAX_HEARTBEAT_LENGTH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### VARIABLE ext_mod_heartbeat ##### -->
+<para>
+
+</para>
+
+

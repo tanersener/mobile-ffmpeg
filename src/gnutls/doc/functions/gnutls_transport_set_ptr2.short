@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_transport_set_ptr2} (gnutls_session_t @var{session}, gnutls_transport_ptr_t @var{recv_ptr}, gnutls_transport_ptr_t @var{send_ptr})

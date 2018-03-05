@@ -1,0 +1,1 @@
+@item @var{int} @ref{dane_state_init} (dane_state_t * @var{s}, unsigned int @var{flags})

@@ -1,0 +1,48 @@
+<!-- ##### SECTION Title ##### -->
+gnutls_global
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### FUNCTION gnutls_crypto_deinit ##### -->
+<para>
+
+</para>
+
+@void: 
+
+
+<!-- ##### FUNCTION gnutls_crypto_init ##### -->
+<para>
+
+</para>
+
+@void: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_is_secure_memory ##### -->
+<para>
+
+</para>
+
+@mem: 
+@Returns: 
+
+

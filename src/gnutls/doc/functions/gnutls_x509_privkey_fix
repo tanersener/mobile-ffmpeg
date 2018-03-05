@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_fix} (gnutls_x509_privkey_t @var{key})
+@var{key}: a key
+
+This function will recalculate the secondary parameters in a key.
+In RSA keys, this can be the coefficient and exponent1,2.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

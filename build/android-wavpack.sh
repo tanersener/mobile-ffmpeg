@@ -26,18 +26,16 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "wavpack")
-CXXFLAGS=$(android_get_cxxflags "wavpack")
-LDFLAGS=$(android_get_ldflags "wavpack")
+export CFLAGS=$(android_get_cflags "wavpack")
+export CXXFLAGS=$(android_get_cxxflags "wavpack")
+export LDFLAGS=$(android_get_ldflags "wavpack")
 
 cd $1/src/wavpack || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/wavpack \
     --with-pic \
@@ -50,12 +48,9 @@ LDFLAGS=${LDFLAGS} \
     --disable-tests \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

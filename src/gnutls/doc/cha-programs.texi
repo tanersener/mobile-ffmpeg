@@ -1,0 +1,19 @@
+@node Other included programs
+@chapter Other included programs
+
+Included with @acronym{GnuTLS} are also a few command line tools that
+let you use the library for common tasks without writing an
+application.  The applications are discussed in this chapter.
+
+@menu
+* gnutls-cli Invocation::          Invoking gnutls-cli
+* gnutls-serv Invocation::         Invoking gnutls-serv
+* gnutls-cli-debug Invocation::    Invoking gnutls-cli-debug
+@end menu
+@c @include invoke-gnutls-cli.menu
+@c @include invoke-gnutls-serv.menu
+@c @include invoke-gnutls-cli-debug.menu
+
+@include invoke-gnutls-cli.texi
+@include invoke-gnutls-serv.texi
+@include invoke-gnutls-cli-debug.texi

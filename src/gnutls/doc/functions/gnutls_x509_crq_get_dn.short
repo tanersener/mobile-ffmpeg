@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crq_get_dn} (gnutls_x509_crq_t @var{crq}, char * @var{buf}, size_t * @var{buf_size})

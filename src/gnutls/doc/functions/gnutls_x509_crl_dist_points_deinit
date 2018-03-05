@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_crl_dist_points_deinit} (gnutls_x509_crl_dist_points_t @var{cdp})
+@var{cdp}: The CRL distribution points
+
+This function will deinitialize a CRL distribution points type.
+
+@strong{Since:} 3.3.0
+@end deftypefun

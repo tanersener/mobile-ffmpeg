@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {void} {gnutls_db_set_ptr} (gnutls_session_t @var{session}, void * @var{ptr})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{ptr}: is the pointer
+
+Sets the pointer that will be provided to db store, retrieve and
+delete functions, as the first argument.
+@end deftypefun

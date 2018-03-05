@@ -1,0 +1,21 @@
+
+
+@c gnutls_pkcs12_bag_type_t
+@table @code
+@item GNUTLS_@-BAG_@-EMPTY
+Empty PKCS-12 bag.
+@item GNUTLS_@-BAG_@-PKCS8_@-ENCRYPTED_@-KEY
+PKCS-12 bag with PKCS-8 encrypted key.
+@item GNUTLS_@-BAG_@-PKCS8_@-KEY
+PKCS-12 bag with PKCS-8 key.
+@item GNUTLS_@-BAG_@-CERTIFICATE
+PKCS-12 bag with certificate.
+@item GNUTLS_@-BAG_@-CRL
+PKCS-12 bag with CRL.
+@item GNUTLS_@-BAG_@-SECRET
+PKCS-12 bag with secret PKCS-9 keys.
+@item GNUTLS_@-BAG_@-ENCRYPTED
+Encrypted PKCS-12 bag.
+@item GNUTLS_@-BAG_@-UNKNOWN
+Unknown PKCS-12 bag.
+@end table

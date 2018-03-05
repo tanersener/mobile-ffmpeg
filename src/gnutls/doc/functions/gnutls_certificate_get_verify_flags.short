@@ -1,0 +1,1 @@
+@item @var{unsigned int} @ref{gnutls_certificate_get_verify_flags} (gnutls_certificate_credentials_t @var{res})

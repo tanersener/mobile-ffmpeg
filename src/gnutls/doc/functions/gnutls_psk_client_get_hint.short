@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_psk_client_get_hint} (gnutls_session_t @var{session})

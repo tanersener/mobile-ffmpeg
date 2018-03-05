@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_set_this_update} (gnutls_x509_crl_t @var{crl}, time_t @var{act_time})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{act_time}: The actual time
+
+This function will set the time this CRL was issued.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

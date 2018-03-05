@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_x509_crt_check_key_purpose} (gnutls_x509_crt_t @var{cert}, const char * @var{purpose}, unsigned @var{flags})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{purpose}: a key purpose OID (e.g., @code{GNUTLS_KP_CODE_SIGNING} )
+
+@var{flags}: zero or @code{GNUTLS_KP_FLAG_DISALLOW_ANY} 
+
+This function will check whether the given certificate matches
+the provided key purpose. If  @code{flags} contains @code{GNUTLS_KP_FLAG_ALLOW_ANY}  then
+it a certificate marked for any purpose will not match.
+
+@strong{Returns:} zero if the key purpose doesn't match, and non-zero otherwise.
+
+@strong{Since:} 3.5.6
+@end deftypefun

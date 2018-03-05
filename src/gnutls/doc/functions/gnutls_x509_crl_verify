@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_verify} (gnutls_x509_crl_t @var{crl}, const gnutls_x509_crt_t * @var{trusted_cas}, unsigned @var{tcas_size}, unsigned int @var{flags}, unsigned int * @var{verify})
+@var{crl}: is the crl to be verified
+
+@var{trusted_cas}: is a certificate list that is considered to be trusted one
+
+@var{tcas_size}: holds the number of CA certificates in CA_list
+
+@var{flags}: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+
+@var{verify}: will hold the crl verification output.
+
+This function will try to verify the given crl and return its verification status.
+See @code{gnutls_x509_crt_list_verify()}  for a detailed description of
+return values. Note that since GnuTLS 3.1.4 this function includes
+the time checks.
+
+Note that value in  @code{verify} is set only when the return value of this 
+function is success (i.e, failure to trust a CRL a certificate does not imply 
+a negative return value).
+
+Before GnuTLS 3.5.7 this function would return zero or a positive
+number on success.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0), otherwise a
+negative error value.
+@end deftypefun

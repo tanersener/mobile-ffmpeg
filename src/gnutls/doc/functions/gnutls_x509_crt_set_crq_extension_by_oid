@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_crq_extension_by_oid} (gnutls_x509_crt_t @var{crt}, gnutls_x509_crq_t @var{crq}, const char * @var{oid}, unsigned @var{flags})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{crq}: holds a certificate request
+
+@var{oid}: the object identifier of the OID to copy
+
+@var{flags}: should be zero
+
+This function will set the extension specify by  @code{oid} from the given request to the
+certificate.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.5.1
+@end deftypefun

@@ -1,0 +1,254 @@
+<!-- ##### SECTION Title ##### -->
+crypto
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### FUNCTION gnutls_cipher_add_auth ##### -->
+<para>
+
+</para>
+
+@handle: 
+@text: 
+@text_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_decrypt ##### -->
+<para>
+
+</para>
+
+@handle: 
+@ciphertext: 
+@ciphertextlen: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_decrypt2 ##### -->
+<para>
+
+</para>
+
+@handle: 
+@ciphertext: 
+@ciphertextlen: 
+@text: 
+@textlen: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_deinit ##### -->
+<para>
+
+</para>
+
+@handle: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_encrypt ##### -->
+<para>
+
+</para>
+
+@handle: 
+@text: 
+@textlen: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_encrypt2 ##### -->
+<para>
+
+</para>
+
+@handle: 
+@text: 
+@textlen: 
+@ciphertext: 
+@ciphertextlen: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_get_block_size ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### TYPEDEF gnutls_cipher_hd_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_cipher_init ##### -->
+<para>
+
+</para>
+
+@handle: 
+@cipher: 
+@key: 
+@iv: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_set_iv ##### -->
+<para>
+
+</para>
+
+@handle: 
+@iv: 
+@ivlen: 
+
+
+<!-- ##### FUNCTION gnutls_cipher_tag ##### -->
+<para>
+
+</para>
+
+@handle: 
+@tag: 
+@tag_size: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_hash ##### -->
+<para>
+
+</para>
+
+@handle: 
+@text: 
+@textlen: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_hash_deinit ##### -->
+<para>
+
+</para>
+
+@handle: 
+@digest: 
+
+
+<!-- ##### FUNCTION gnutls_hash_get_len ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### TYPEDEF gnutls_hash_hd_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_hash_init ##### -->
+<para>
+
+</para>
+
+@dig: 
+@algorithm: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_hash_output ##### -->
+<para>
+
+</para>
+
+@handle: 
+@digest: 
+
+
+<!-- ##### FUNCTION gnutls_hmac ##### -->
+<para>
+
+</para>
+
+@handle: 
+@text: 
+@textlen: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_hmac_deinit ##### -->
+<para>
+
+</para>
+
+@handle: 
+@digest: 
+
+
+<!-- ##### FUNCTION gnutls_hmac_get_len ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+
+<!-- ##### TYPEDEF gnutls_hmac_hd_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### FUNCTION gnutls_hmac_output ##### -->
+<para>
+
+</para>
+
+@handle: 
+@digest: 
+
+
+<!-- ##### FUNCTION gnutls_rnd ##### -->
+<para>
+
+</para>
+
+@level: 
+@data: 
+@len: 
+@Returns: 
+
+
+<!-- ##### ENUM gnutls_rnd_level_t ##### -->
+<para>
+
+</para>
+
+@GNUTLS_RND_NONCE: 
+@GNUTLS_RND_RANDOM: 
+@GNUTLS_RND_KEY: 
+

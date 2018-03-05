@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {void} {gnutls_handshake_set_post_client_hello_function} (gnutls_session_t @var{session}, gnutls_handshake_simple_hook_func @var{func})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{func}: is the function to be called
+
+This function will set a callback to be called after the client
+hello has been received (callback valid in server side only). This
+allows the server to adjust settings based on received extensions.
+
+Those settings could be ciphersuites, requesting certificate, or
+anything else except for version negotiation (this is done before
+the hello message is parsed).
+
+This callback must return 0 on success or a gnutls error code to
+terminate the handshake.
+
+Since GnuTLS 3.3.5 the callback is
+allowed to return @code{GNUTLS_E_AGAIN}  or @code{GNUTLS_E_INTERRUPTED}  to
+put the handshake on hold. In that case @code{gnutls_handshake()} 
+will return @code{GNUTLS_E_INTERRUPTED}  and can be resumed when needed.
+
+@strong{Warning:} You should not use this function to terminate the
+handshake based on client input unless you know what you are
+doing. Before the handshake is finished there is no way to know if
+there is a man-in-the-middle attack being performed.
+@end deftypefun

@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {void} {gnutls_packet_deinit} (gnutls_packet_t @var{packet})
+@var{packet}: is a pointer to a @code{gnutls_packet_st}  structure.
+
+This function will deinitialize all data associated with
+the received packet.
+
+@strong{Since:} 3.3.5
+@end deftypefun

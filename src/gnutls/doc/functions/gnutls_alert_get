@@ -1,0 +1,15 @@
+
+
+
+@deftypefun {gnutls_alert_description_t} {gnutls_alert_get} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function will return the last alert number received.  This
+function should be called when @code{GNUTLS_E_WARNING_ALERT_RECEIVED}  or
+@code{GNUTLS_E_FATAL_ALERT_RECEIVED}  errors are returned by a gnutls
+function.  The peer may send alerts if he encounters an error.
+If no alert has been received the returned value is undefined.
+
+@strong{Returns:} the last alert received, a
+@code{gnutls_alert_description_t}  value.
+@end deftypefun

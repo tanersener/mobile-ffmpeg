@@ -1,0 +1,11 @@
+
+
+@c gnutls_alpn_flags_t
+@table @code
+@item GNUTLS_@-ALPN_@-MANDATORY
+Require ALPN negotiation. The connection will be
+aborted if no matching ALPN protocol is found.
+@item GNUTLS_@-ALPN_@-SERVER_@-PRECEDENCE
+The choices set by the server
+will take precedence over the client's.
+@end table

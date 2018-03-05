@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_record_get_state} (gnutls_session_t @var{session}, unsigned @var{read}, gnutls_datum_t * @var{mac_key}, gnutls_datum_t * @var{IV}, gnutls_datum_t * @var{cipher_key}, unsigned char @var{seq_number[8]})
+@var{session}: is a @code{gnutls_session_t}  type
+
+@var{read}: if non-zero the read parameters are returned, otherwise the write
+
+@var{mac_key}: the key used for MAC (if a MAC is used)
+
+@var{IV}: the initialization vector or nonce used
+
+@var{cipher_key}: the cipher key
+
+@var{seq_number[8]}: -- undescribed --
+
+This function will return the parameters of the current record state.
+These are only useful to be provided to an external off-loading device
+or subsystem.
+
+In that case, to sync the state you must call @code{gnutls_record_set_state()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+
+Since 3.4.0
+@end deftypefun

@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_ecc_raw} (gnutls_pubkey_t @var{key}, gnutls_ecc_curve_t @var{curve}, const gnutls_datum_t * @var{x}, const gnutls_datum_t * @var{y})
+@var{key}: The structure to store the parsed key
+
+@var{curve}: holds the curve
+
+@var{x}: holds the x
+
+@var{y}: holds the y
+
+This function will convert the given elliptic curve parameters to a
+@code{gnutls_pubkey_t} .  The output will be stored in  @code{key} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

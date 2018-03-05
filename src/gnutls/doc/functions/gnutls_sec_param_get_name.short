@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_sec_param_get_name} (gnutls_sec_param_t @var{param})

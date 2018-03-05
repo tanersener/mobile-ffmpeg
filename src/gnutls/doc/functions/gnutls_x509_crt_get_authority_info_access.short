@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_authority_info_access} (gnutls_x509_crt_t @var{crt}, unsigned int @var{seq}, int @var{what}, gnutls_datum_t * @var{data}, unsigned int * @var{critical})

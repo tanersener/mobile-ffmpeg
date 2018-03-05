@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_raw_issuer_dn} (gnutls_x509_crl_t @var{crl}, gnutls_datum_t * @var{dn})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{dn}: will hold the starting point of the DN
+
+This function will return a pointer to the DER encoded DN structure
+and the length.
+
+@strong{Returns:} a negative error code on error, and (0) on success.
+
+@strong{Since:} 2.12.0
+@end deftypefun

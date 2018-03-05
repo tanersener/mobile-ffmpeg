@@ -1,0 +1,15 @@
+C Documentation Snarfing Modules
+--------------------------------
+
+This modules provide allow the extraction of Texinfo documentation
+strings from C files---this is usually referred to as ``doc snarfing''
+in Guile terms.
+
+They were stolen from Guile-Reader 0.3:
+
+  http://www.nongnu.org/guile-reader/
+
+It was only slightly modified.
+
+
+Ludovic Courtès <ludo@chbouib.org>.

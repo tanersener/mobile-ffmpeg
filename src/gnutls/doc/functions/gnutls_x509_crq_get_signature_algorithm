@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_signature_algorithm} (gnutls_x509_crq_t @var{crq})
+@var{crq}: should contain a @code{gnutls_x509_cr_t}  type
+
+This function will return a value of the @code{gnutls_sign_algorithm_t} 
+enumeration that is the signature algorithm that has been used to
+sign this certificate request.
+
+@strong{Returns:} a @code{gnutls_sign_algorithm_t}  value, or a negative error code on
+error.
+
+@strong{Since:} 3.4.0
+@end deftypefun

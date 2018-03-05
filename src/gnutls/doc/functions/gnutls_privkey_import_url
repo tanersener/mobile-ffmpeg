@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_import_url} (gnutls_privkey_t @var{key}, const char * @var{url}, unsigned int @var{flags})
+@var{key}: A key of type @code{gnutls_privkey_t} 
+
+@var{url}: A PKCS 11 url
+
+@var{flags}: should be zero
+
+This function will import a PKCS11 or TPM URL as a
+private key. The supported URL types can be checked
+using @code{gnutls_url_is_supported()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

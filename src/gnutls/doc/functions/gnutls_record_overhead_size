@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {size_t} {gnutls_record_overhead_size} (gnutls_session_t @var{session})
+@var{session}: is @code{gnutls_session_t} 
+
+This function will return the size in bytes of the overhead
+due to TLS (or DTLS) per record. On certain occasions
+(e.g., CBC ciphers) the returned value is the maximum
+possible overhead.
+
+@strong{Since:} 3.2.2
+@end deftypefun

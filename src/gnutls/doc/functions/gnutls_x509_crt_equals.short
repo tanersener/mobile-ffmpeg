@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_x509_crt_equals} (gnutls_x509_crt_t @var{cert1}, gnutls_x509_crt_t @var{cert2})

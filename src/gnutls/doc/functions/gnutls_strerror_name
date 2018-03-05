@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_strerror_name} (int @var{error})
+@var{error}: is an error returned by a gnutls function.
+
+Return the GnuTLS error code define as a string.  For example,
+gnutls_strerror_name (GNUTLS_E_DH_PRIME_UNACCEPTABLE) will return
+the string "GNUTLS_E_DH_PRIME_UNACCEPTABLE".
+
+@strong{Returns:} A string corresponding to the symbol name of the error
+code.
+
+@strong{Since:} 2.6.0
+@end deftypefun

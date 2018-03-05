@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_dh_params_export_raw} (gnutls_dh_params_t @var{params}, gnutls_datum_t * @var{prime}, gnutls_datum_t * @var{generator}, unsigned int * @var{bits})

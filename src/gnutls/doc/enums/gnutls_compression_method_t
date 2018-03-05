@@ -1,0 +1,13 @@
+
+
+@c gnutls_compression_method_t
+@table @code
+@item GNUTLS_@-COMP_@-UNKNOWN
+Unknown compression method.
+@item GNUTLS_@-COMP_@-NULL
+The NULL compression method (no compression).
+@item GNUTLS_@-COMP_@-DEFLATE
+The DEFLATE compression method from zlib.
+@item GNUTLS_@-COMP_@-ZLIB
+Same as @code{GNUTLS_COMP_DEFLATE} .
+@end table

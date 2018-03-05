@@ -1,0 +1,29 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_status_request_enable_client} (gnutls_session_t @var{session}, gnutls_datum_t * @var{responder_id}, size_t @var{responder_id_size}, gnutls_datum_t * @var{extensions})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{responder_id}: array with @code{gnutls_datum_t}  with DER data of responder id
+
+@var{responder_id_size}: number of members in  @code{responder_id} array
+
+@var{extensions}: a @code{gnutls_datum_t}  with DER encoded OCSP extensions
+
+This function is to be used by clients to request OCSP response
+from the server, using the "status_request" TLS extension.  Only
+OCSP status type is supported.
+
+The  @code{responder_id} array, its containing elements as well as
+the data of  @code{extensions} , must be allocated using @code{gnutls_malloc()} . They
+will be deinitialized on session cleanup.
+
+Due to the difficult semantics of the  @code{responder_id} and  @code{extensions} parameters, it is recommended to only call this function with these
+parameters set to @code{NULL} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+@strong{Since:} 3.1.3
+@end deftypefun

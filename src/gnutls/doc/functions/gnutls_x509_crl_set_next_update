@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_set_next_update} (gnutls_x509_crl_t @var{crl}, time_t @var{exp_time})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{exp_time}: The actual time
+
+This function will set the time this CRL will be updated.
+This is an optional value to be set on a CRL and this call
+can be omitted when generating a CRL.
+
+Prior to GnuTLS 3.5.7, setting a nextUpdate field was required
+in order to generate a CRL.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_openpgp_send_cert} (gnutls_session_t @var{session}, gnutls_openpgp_crt_status_t @var{status})

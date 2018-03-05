@@ -1,0 +1,15 @@
+
+
+
+@deftypefun {void} {gnutls_certificate_get_trust_list} (gnutls_certificate_credentials_t @var{res}, gnutls_x509_trust_list_t * @var{tlist})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{tlist}: Location where to store the trust list.
+
+Obtains the list of trusted certificates stored in  @code{res} and writes a
+pointer to it to the location  @code{tlist} . The pointer will point to memory
+internal to  @code{res} , and must not be deinitialized. It will be automatically
+deallocated when the  @code{res} structure is deinitialized.
+
+@strong{Since:} 3.4.0
+@end deftypefun

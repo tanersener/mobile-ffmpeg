@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_pubkey} (gnutls_x509_crq_t @var{crq}, gnutls_pubkey_t @var{key})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{key}: holds a public key
+
+This function will set the public parameters from the given public
+key to the request. The  @code{key} can be deallocated after that.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_verify} (gnutls_x509_crt_t @var{cert}, const gnutls_x509_crt_t * @var{CA_list}, unsigned @var{CA_list_length}, unsigned int @var{flags}, unsigned int * @var{verify})
+@var{cert}: is the certificate to be verified
+
+@var{CA_list}: is one certificate that is considered to be trusted one
+
+@var{CA_list_length}: holds the number of CA certificate in CA_list
+
+@var{flags}: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+
+@var{verify}: will hold the certificate verification output.
+
+This function will try to verify the given certificate and return
+its status. Note that a verification error does not imply a negative
+return status. In that case the  @code{verify} status is set.
+
+The details of the verification are the same
+as in @code{gnutls_x509_trust_list_verify_crt2()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

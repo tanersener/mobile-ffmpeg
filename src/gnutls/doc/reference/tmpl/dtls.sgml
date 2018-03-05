@@ -1,0 +1,131 @@
+<!-- ##### SECTION Title ##### -->
+dtls
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO GNUTLS_COOKIE_KEY_SIZE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### FUNCTION gnutls_dtls_cookie_send ##### -->
+<para>
+
+</para>
+
+@key: 
+@client_data: 
+@client_data_size: 
+@prestate: 
+@ptr: 
+@push_func: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dtls_cookie_verify ##### -->
+<para>
+
+</para>
+
+@key: 
+@client_data: 
+@client_data_size: 
+@_msg: 
+@msg_size: 
+@prestate: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dtls_get_data_mtu ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dtls_get_mtu ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dtls_get_timeout ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dtls_prestate_set ##### -->
+<para>
+
+</para>
+
+@session: 
+@prestate: 
+
+
+<!-- ##### FUNCTION gnutls_dtls_set_data_mtu ##### -->
+<para>
+
+</para>
+
+@session: 
+@mtu: 
+@Returns: 
+
+
+<!-- ##### FUNCTION gnutls_dtls_set_mtu ##### -->
+<para>
+
+</para>
+
+@session: 
+@mtu: 
+
+
+<!-- ##### FUNCTION gnutls_dtls_set_timeouts ##### -->
+<para>
+
+</para>
+
+@session: 
+@retrans_timeout: 
+@total_timeout: 
+
+
+<!-- ##### FUNCTION gnutls_record_get_discarded ##### -->
+<para>
+
+</para>
+
+@session: 
+@Returns: 
+
+

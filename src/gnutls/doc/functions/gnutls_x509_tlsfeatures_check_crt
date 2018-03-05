@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_x509_tlsfeatures_check_crt} (gnutls_x509_tlsfeatures_t @var{feat}, gnutls_x509_crt_t @var{cert})
+@var{feat}: a set of TLSFeatures
+
+@var{cert}: the certificate to be checked
+
+This function will check the provided certificate against the TLSFeatures
+set in  @code{feat} using the RFC7633 p.4.2.2 rules. It will check whether the certificate
+contains the features in  @code{feat} or a superset.
+
+@strong{Returns:} non-zero if the provided certificate complies, and zero otherwise.
+
+@strong{Since:} 3.5.1
+@end deftypefun

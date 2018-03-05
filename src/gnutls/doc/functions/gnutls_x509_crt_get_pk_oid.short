@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_pk_oid} (gnutls_x509_crt_t @var{cert}, char * @var{oid}, size_t * @var{oid_size})

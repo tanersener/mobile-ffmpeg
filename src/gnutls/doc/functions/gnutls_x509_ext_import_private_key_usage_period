@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_private_key_usage_period} (const gnutls_datum_t * @var{ext}, time_t * @var{activation}, time_t * @var{expiration})
+@var{ext}: the DER encoded extension data
+
+@var{activation}: Will hold the activation time
+
+@var{expiration}: Will hold the expiration time
+
+This function will return the expiration and activation
+times of the private key as written in the
+PKIX extension 2.5.29.16.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

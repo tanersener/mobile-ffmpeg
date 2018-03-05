@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_pk_ecc_raw} (gnutls_x509_crt_t @var{crt}, gnutls_ecc_curve_t * @var{curve}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y})

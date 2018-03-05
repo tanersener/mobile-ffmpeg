@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_aki_set_id} (gnutls_x509_aki_t @var{aki}, const gnutls_datum_t * @var{id})
+@var{aki}: The authority key ID
+
+@var{id}: the key identifier
+
+This function will set the keyIdentifier to be stored in the  @code{aki} type.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_pcert_list_import_x509_raw} (gnutls_pcert_st * @var{pcerts}, unsigned int * @var{pcert_max}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{pcerts}: The structures to store the parsed certificate. Must not be initialized.
+
+@var{pcert_max}: Initially must hold the maximum number of certs. It will be updated with the number of certs available.
+
+@var{data}: The certificates.
+
+@var{format}: One of DER or PEM.
+
+@var{flags}: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
+
+This function will convert the given PEM encoded certificate list
+to the native gnutls_x509_crt_t format. The output will be stored
+in  @code{certs} .  They will be automatically initialized.
+
+If the Certificate is PEM encoded it should have a header of "X509
+CERTIFICATE", or "CERTIFICATE".
+
+@strong{Returns:} the number of certificates read or a negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {const gnutls_ecc_curve_t *} {gnutls_ecc_curve_list} ( @var{void})
+
+Get the list of supported elliptic curves.
+
+This function is not thread safe.
+
+@strong{Returns:} Return a (0)-terminated list of @code{gnutls_ecc_curve_t} 
+integers indicating the available curves.
+@end deftypefun

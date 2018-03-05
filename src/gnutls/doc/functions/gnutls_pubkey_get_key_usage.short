@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_get_key_usage} (gnutls_pubkey_t @var{key}, unsigned int * @var{usage})

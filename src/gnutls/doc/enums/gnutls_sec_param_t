@@ -1,0 +1,27 @@
+
+
+@c gnutls_sec_param_t
+@table @code
+@item GNUTLS_@-SEC_@-PARAM_@-UNKNOWN
+Cannot be known
+@item GNUTLS_@-SEC_@-PARAM_@-INSECURE
+Less than 42 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-EXPORT
+42 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-VERY_@-WEAK
+64 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-WEAK
+72 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-LOW
+80 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-LEGACY
+96 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-MEDIUM
+112 bits of security (used to be @code{GNUTLS_SEC_PARAM_NORMAL} )
+@item GNUTLS_@-SEC_@-PARAM_@-HIGH
+128 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-ULTRA
+192 bits of security
+@item GNUTLS_@-SEC_@-PARAM_@-FUTURE
+256 bits of security
+@end table

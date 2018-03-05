@@ -1,0 +1,105 @@
+#!/bin/sh
+
+# Copyright (C) 2010-2012 Free Software Foundation, Inc.
+#
+# Author: Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+srcdir="${srcdir:-.}"
+SERV="${SERV:-../../src/gnutls-serv}"
+CLI="${CLI:-../../src/gnutls-cli}"
+DEBUG=""
+
+if ! test -x "${SERV}"; then
+	exit 77
+fi
+
+if ! test -x "${CLI}"; then
+	exit 77
+fi
+
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+fi
+
+if test "${WINDIR}" != ""; then
+	exit 77
+fi 
+
+SERV="${SERV} -q"
+
+. "${srcdir}/../scripts/common.sh"
+
+echo "Checking OpenPGP certificate verification"
+
+eval "${GETPORT}"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/data/srv-public-127.0.0.1-signed.gpg" --pgpkeyfile "${srcdir}/data/srv-secret.gpg"
+PID=$!
+wait_server ${PID}
+
+# give the server a chance to initialize
+
+#gnutls currently only considers PGP certificates verified only if
+#all user IDs in the certificate were signed.
+
+#"${CLI}" -p "${PORT}" 127.0.0.1 --pgpkeyring ca-public.gpg </dev/null >/dev/null || \
+#  fail "Connection to verified IP address should have succeeded! (error code $?)" $?
+
+${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.2 --priority NORMAL:+CTYPE-OPENPGP --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+	fail ${PID} "Connection to unrecognized IP address should have failed!"
+
+${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" localhost --priority NORMAL:+CTYPE-OPENPGP --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+	fail ${PID} "Connection to unverified (but present) 'localhost' should have failed!"
+
+kill ${PID}
+wait
+
+eval "${GETPORT}"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/data/srv-public-localhost-signed.gpg" --pgpkeyfile "${srcdir}/data/srv-secret.gpg"
+PID=$!
+wait_server ${PID}
+
+echo | ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.1 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+	fail ${PID} "Connection to unverified IP address should have failed! (error code $?)" $?
+
+${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.2 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+	fail ${PID} "Connection to unrecognized IP address should have failed!"
+
+#see reason above
+#"${CLI}" -p "${PORT}" localhost --pgpkeyring ca-public.gpg </dev/null >/dev/null || \
+#  fail ${PID} "Connection to verified 'localhost' should have succeded! (error code $?)" $?
+
+kill ${PID}
+wait
+
+eval "${GETPORT}"
+launch_server $$ --priority NORMAL:+CTYPE-OPENPGP --pgpcertfile "${srcdir}/data/srv-public-all-signed.gpg" --pgpkeyfile "${srcdir}/data/srv-secret.gpg"
+PID=$!
+wait_server ${PID}
+
+# give the server a chance to initialize
+echo | ${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.1 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 || \
+	fail ${PID} "Connection to signed PGP certificate should have succeeded! (error code $?)" $?
+
+${VALGRIND} "${CLI}" ${DEBUG} --priority NORMAL:+CTYPE-OPENPGP -p "${PORT}" 127.0.0.2 --pgpkeyring "${srcdir}/data/ca-public.gpg" </dev/null >/dev/null 2>&1 && \
+	fail ${PID} "Connection to unrecognized IP address should have failed!"
+
+kill ${PID}
+wait
+
+exit 0

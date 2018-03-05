@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_copy_pubkey} (const char * @var{token_url}, gnutls_pubkey_t @var{pubkey}, const char * @var{label}, const gnutls_datum_t * @var{cid}, unsigned int @var{key_usage}, unsigned int @var{flags})

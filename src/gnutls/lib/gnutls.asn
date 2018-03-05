@@ -1,0 +1,125 @@
+GNUTLS { }
+
+DEFINITIONS EXPLICIT TAGS ::=
+
+BEGIN
+
+-- This file contains parts of PKCS-1 structures and some stuff
+-- required for DSA keys.
+
+RSAPublicKey ::= SEQUENCE {
+        modulus                 INTEGER, -- n
+        publicExponent          INTEGER  -- e 
+}
+
+-- 
+-- Representation of RSA private key with information for the 
+-- CRT algorithm.
+--
+RSAPrivateKey ::= SEQUENCE {
+  version          INTEGER,
+  modulus          INTEGER, -- (Usually large) n
+  publicExponent   INTEGER, -- (Usually small) e
+  privateExponent  INTEGER, -- (Usually large) d
+  prime1           INTEGER, -- (Usually large) p
+  prime2           INTEGER, -- (Usually large) q
+  exponent1        INTEGER, -- (Usually large) d mod (p-1)
+  exponent2        INTEGER, -- (Usually large) d mod (q-1)
+  coefficient      INTEGER, -- (Usually large) (inverse of q) mod p
+  otherInfo	   RSAOtherInfo OPTIONAL
+}
+
+ProvableSeed ::= SEQUENCE {
+  algorithm OBJECT IDENTIFIER,
+  seed OCTET STRING
+}
+
+RSAOtherInfo ::= CHOICE {
+  otherPrimeInfos	OtherPrimeInfos, -- the hash algorithm OID used for FIPS186-4 generation
+  seed		    [1] ProvableSeed
+}
+
+OtherPrimeInfos ::= SEQUENCE SIZE(1..MAX) OF OtherPrimeInfo
+
+OtherPrimeInfo ::= SEQUENCE {
+  prime INTEGER,  -- ri
+  exponent INTEGER, -- di
+  coefficient INTEGER -- ti 
+}
+
+-- for signature calculation
+-- added by nmav
+
+AlgorithmIdentifier ::= SEQUENCE  {
+     algorithm               OBJECT IDENTIFIER,
+     parameters              ANY DEFINED BY algorithm OPTIONAL  
+}
+                                -- contains a value of the type
+                                -- registered for use with the
+                                -- algorithm object identifier value
+
+DigestInfo ::= SEQUENCE {
+     digestAlgorithm DigestAlgorithmIdentifier,
+     digest Digest 
+}
+
+DigestAlgorithmIdentifier ::= AlgorithmIdentifier
+
+Digest ::= OCTET STRING
+
+DSAPublicKey ::= INTEGER
+
+DSAParameters ::= SEQUENCE {
+        p                   INTEGER,
+        q                   INTEGER,
+        g                   INTEGER
+}
+
+DSASignatureValue ::= SEQUENCE {
+        r                   INTEGER,
+        s                   INTEGER
+}
+
+DSAPrivateKey ::= SEQUENCE {
+  version  INTEGER, -- should be zero
+  p        INTEGER,
+  q        INTEGER,
+  g        INTEGER,
+  Y        INTEGER, -- public
+  priv     INTEGER,
+  seed [1] ProvableSeed OPTIONAL
+}
+
+-- from PKCS#3
+DHParameter ::= SEQUENCE {
+  prime               INTEGER, -- p
+  base                INTEGER, -- g
+  privateValueLength  INTEGER OPTIONAL 
+}
+
+-- ECC from RFC5480
+ECPoint ::= OCTET STRING
+
+ECParameters ::= CHOICE {
+  namedCurve         OBJECT IDENTIFIER
+}
+
+ECPrivateKey ::= SEQUENCE {
+   Version       INTEGER, -- { ecPrivkeyVer1(1) }
+   privateKey    OCTET STRING,
+   parameters    [0] ECParameters OPTIONAL,
+   publicKey     [1] BIT STRING OPTIONAL
+}
+
+-- Structures used for the PKINIT othername variables
+PrincipalName   ::= SEQUENCE {
+        name-type       [0] INTEGER,
+        name-string     [1] SEQUENCE OF GeneralString
+}
+
+KRB5PrincipalName ::= SEQUENCE {
+	realm                   [0] GeneralString,
+	principalName           [1] PrincipalName
+}
+
+END

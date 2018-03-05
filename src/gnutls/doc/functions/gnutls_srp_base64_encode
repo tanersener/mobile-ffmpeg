@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_srp_base64_encode} (const gnutls_datum_t * @var{data}, char * @var{result}, size_t * @var{result_size})
+@var{data}: contain the raw data
+
+@var{result}: the place where base64 data will be copied
+
+@var{result_size}: holds the size of the result
+
+This function will convert the given data to printable data, using
+the base64 encoding, as used in the libsrp.  This is the encoding
+used in SRP password files.  If the provided buffer is not long
+enough GNUTLS_E_SHORT_MEMORY_BUFFER is returned.
+
+Warning!  This base64 encoding is not the "standard" encoding, so
+do not use it for non-SRP purposes.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the buffer given is not
+long enough, or 0 on success.
+@end deftypefun

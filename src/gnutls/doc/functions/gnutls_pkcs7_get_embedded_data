@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_get_embedded_data} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{flags}, gnutls_datum_t * @var{data})
+@var{pkcs7}: should contain a gnutls_pkcs7_t type
+
+@var{flags}: must be zero or @code{GNUTLS_PKCS7_EDATA_GET_RAW} 
+
+@var{data}: will hold the embedded data in the provided structure
+
+This function will return the data embedded in the signature of
+the PKCS7 structure. If no data are available then
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  will be returned.
+
+The returned data must be de-allocated using @code{gnutls_free()} .
+
+Note, that this function returns the exact same data that are
+authenticated. If the @code{GNUTLS_PKCS7_EDATA_GET_RAW}  flag is provided,
+the returned data will be including the wrapping tag/value as
+they are encoded in the structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.8
+@end deftypefun

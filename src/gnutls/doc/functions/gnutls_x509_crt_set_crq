@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_crq} (gnutls_x509_crt_t @var{crt}, gnutls_x509_crq_t @var{crq})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{crq}: holds a certificate request
+
+This function will set the name and public parameters as well as
+the extensions from the given certificate request to the certificate. 
+Only RSA keys are currently supported.
+
+Note that this function will only set the  @code{crq} if it is self
+signed and the signature is correct. See @code{gnutls_x509_crq_sign2()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

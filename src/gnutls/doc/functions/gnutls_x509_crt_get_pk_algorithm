@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_pk_algorithm} (gnutls_x509_crt_t @var{cert}, unsigned int * @var{bits})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{bits}: if bits is non null it will hold the size of the parameters' in bits
+
+This function will return the public key algorithm of an X.509
+certificate.
+
+If bits is non null, it should have enough size to hold the parameters
+size in bits. For RSA the bits returned is the modulus.
+For DSA the bits returned are of the public
+exponent.
+
+Unknown/unsupported algorithms are mapped to @code{GNUTLS_PK_UNKNOWN} .
+
+@strong{Returns:} a member of the @code{gnutls_pk_algorithm_t}  enumeration on
+success, or a negative error code on error.
+@end deftypefun

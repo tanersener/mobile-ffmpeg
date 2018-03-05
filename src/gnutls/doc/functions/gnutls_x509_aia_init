@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_aia_init} (gnutls_x509_aia_t * @var{aia})
+@var{aia}: The authority info access
+
+This function will initialize an authority info access type.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

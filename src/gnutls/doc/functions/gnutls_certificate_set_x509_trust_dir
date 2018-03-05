@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_x509_trust_dir} (gnutls_certificate_credentials_t @var{cred}, const char * @var{ca_dir}, gnutls_x509_crt_fmt_t @var{type})
+@var{cred}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{ca_dir}: is a directory containing the list of trusted CAs (DER or PEM list)
+
+@var{type}: is PEM or DER
+
+This function adds the trusted CAs present in the directory in order to 
+verify client or server certificates. This function is identical
+to @code{gnutls_certificate_set_x509_trust_file()}  but loads all certificates
+in a directory.
+
+@strong{Returns:} the number of certificates processed
+
+@strong{Since:} 3.3.6
+@end deftypefun

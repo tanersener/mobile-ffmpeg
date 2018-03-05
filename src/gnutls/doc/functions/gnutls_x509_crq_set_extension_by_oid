@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_extension_by_oid} (gnutls_x509_crq_t @var{crq}, const char * @var{oid}, const void * @var{buf}, size_t @var{sizeof_buf}, unsigned int @var{critical})
+@var{crq}: a certificate of type @code{gnutls_x509_crq_t} 
+
+@var{oid}: holds an Object Identifier in null terminated string
+
+@var{buf}: a pointer to a DER encoded data
+
+@var{sizeof_buf}: holds the size of  @code{buf} 
+
+@var{critical}: should be non-zero if the extension is to be marked as critical
+
+This function will set an the extension, by the specified OID, in
+the certificate request.  The extension data should be binary data DER
+encoded.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

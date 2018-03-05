@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_pkcs7_get_embedded_data_oid} (gnutls_pkcs7_t @var{pkcs7})
+@var{pkcs7}: should contain a gnutls_pkcs7_t type
+
+This function will return the OID of the data embedded in the signature of
+the PKCS7 structure. If no data are available then @code{NULL}  will be
+returned. The returned value will be valid during the lifetime
+of the  @code{pkcs7} structure.
+
+@strong{Returns:} On success, a pointer to an OID string, @code{NULL}  on error.
+
+@strong{Since:} 3.5.5
+@end deftypefun

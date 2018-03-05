@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_aead_cipher_init} (gnutls_aead_cipher_hd_t * @var{handle}, gnutls_cipher_algorithm_t @var{cipher}, const gnutls_datum_t * @var{key})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+@var{cipher}: the authenticated-encryption algorithm to use
+
+@var{key}: The key to be used for encryption
+
+This function will initialize an context that can be used for
+encryption/decryption of data. This will effectively use the
+current crypto backend in use by gnutls or the cryptographic
+accelerator in use.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.4.0
+@end deftypefun

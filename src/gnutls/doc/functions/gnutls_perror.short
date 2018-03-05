@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_perror} (int @var{error})

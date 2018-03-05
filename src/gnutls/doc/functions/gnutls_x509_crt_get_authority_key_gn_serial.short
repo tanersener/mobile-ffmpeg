@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_authority_key_gn_serial} (gnutls_x509_crt_t @var{cert}, unsigned int @var{seq}, void * @var{alt}, size_t * @var{alt_size}, unsigned int * @var{alt_type}, void * @var{serial}, size_t * @var{serial_size}, unsigned int * @var{critical})

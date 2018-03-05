@@ -1,0 +1,94 @@
+@multitable @columnfractions .55 .10 .30
+@anchor{tab:alerts}
+@headitem Alert @tab ID @tab Description
+@item GNUTLS_@-A_@-CLOSE_@-NOTIFY
+@tab 0
+@tab Close notify
+@item GNUTLS_@-A_@-UNEXPECTED_@-MESSAGE
+@tab 10
+@tab Unexpected message
+@item GNUTLS_@-A_@-BAD_@-RECORD_@-MAC
+@tab 20
+@tab Bad record MAC
+@item GNUTLS_@-A_@-DECRYPTION_@-FAILED
+@tab 21
+@tab Decryption failed
+@item GNUTLS_@-A_@-RECORD_@-OVERFLOW
+@tab 22
+@tab Record overflow
+@item GNUTLS_@-A_@-DECOMPRESSION_@-FAILURE
+@tab 30
+@tab Decompression failed
+@item GNUTLS_@-A_@-HANDSHAKE_@-FAILURE
+@tab 40
+@tab Handshake failed
+@item GNUTLS_@-A_@-SSL3_@-NO_@-CERTIFICATE
+@tab 41
+@tab No certificate (SSL 3.0)
+@item GNUTLS_@-A_@-BAD_@-CERTIFICATE
+@tab 42
+@tab Certificate is bad
+@item GNUTLS_@-A_@-UNSUPPORTED_@-CERTIFICATE
+@tab 43
+@tab Certificate is not supported
+@item GNUTLS_@-A_@-CERTIFICATE_@-REVOKED
+@tab 44
+@tab Certificate was revoked
+@item GNUTLS_@-A_@-CERTIFICATE_@-EXPIRED
+@tab 45
+@tab Certificate is expired
+@item GNUTLS_@-A_@-CERTIFICATE_@-UNKNOWN
+@tab 46
+@tab Unknown certificate
+@item GNUTLS_@-A_@-ILLEGAL_@-PARAMETER
+@tab 47
+@tab Illegal parameter
+@item GNUTLS_@-A_@-UNKNOWN_@-CA
+@tab 48
+@tab CA is unknown
+@item GNUTLS_@-A_@-ACCESS_@-DENIED
+@tab 49
+@tab Access was denied
+@item GNUTLS_@-A_@-DECODE_@-ERROR
+@tab 50
+@tab Decode error
+@item GNUTLS_@-A_@-DECRYPT_@-ERROR
+@tab 51
+@tab Decrypt error
+@item GNUTLS_@-A_@-EXPORT_@-RESTRICTION
+@tab 60
+@tab Export restriction
+@item GNUTLS_@-A_@-PROTOCOL_@-VERSION
+@tab 70
+@tab Error in protocol version
+@item GNUTLS_@-A_@-INSUFFICIENT_@-SECURITY
+@tab 71
+@tab Insufficient security
+@item GNUTLS_@-A_@-INTERNAL_@-ERROR
+@tab 80
+@tab Internal error
+@item GNUTLS_@-A_@-INAPPROPRIATE_@-FALLBACK
+@tab 86
+@tab Inappropriate fallback
+@item GNUTLS_@-A_@-USER_@-CANCELED
+@tab 90
+@tab User canceled
+@item GNUTLS_@-A_@-NO_@-RENEGOTIATION
+@tab 100
+@tab No renegotiation is allowed
+@item GNUTLS_@-A_@-UNSUPPORTED_@-EXTENSION
+@tab 110
+@tab An unsupported extension was sent
+@item GNUTLS_@-A_@-CERTIFICATE_@-UNOBTAINABLE
+@tab 111
+@tab Could not retrieve the specified certificate
+@item GNUTLS_@-A_@-UNRECOGNIZED_@-NAME
+@tab 112
+@tab The server name sent was not recognized
+@item GNUTLS_@-A_@-UNKNOWN_@-PSK_@-IDENTITY
+@tab 115
+@tab The SRP/PSK username is missing or not known
+@item GNUTLS_@-A_@-NO_@-APPLICATION_@-PROTOCOL
+@tab 120
+@tab No supported application protocol could be negotiated
+@end multitable

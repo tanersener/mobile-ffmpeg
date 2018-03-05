@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_obj_set_info} (gnutls_pkcs11_obj_t @var{obj}, gnutls_pkcs11_obj_info_t @var{itype}, const void * @var{data}, size_t @var{data_size}, unsigned @var{flags})
+@var{obj}: should contain a @code{gnutls_pkcs11_obj_t}  type
+
+@var{itype}: Denotes the type of information to be set
+
+@var{data}: the data to set
+
+@var{data_size}: the size of data
+
+@var{flags}: Or sequence of GNUTLS_PKCS11_OBJ_* flags
+
+This function will set attributes on the provided object.
+Available options for  @code{itype} are @code{GNUTLS_PKCS11_OBJ_LABEL} ,
+@code{GNUTLS_PKCS11_OBJ_ID_HEX} , and @code{GNUTLS_PKCS11_OBJ_ID} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
+
+@strong{Since:} 3.4.0
+@end deftypefun

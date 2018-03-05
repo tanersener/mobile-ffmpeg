@@ -1,0 +1,34 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_privkey_generate2} (const char * @var{url}, gnutls_pk_algorithm_t @var{pk}, unsigned int @var{bits}, const char * @var{label}, gnutls_x509_crt_fmt_t @var{fmt}, gnutls_datum_t * @var{pubkey}, unsigned int @var{flags})
+@var{url}: a token URL
+
+@var{pk}: the public key algorithm
+
+@var{bits}: the security bits
+
+@var{label}: a label
+
+@var{fmt}: the format of output params. PEM or DER
+
+@var{pubkey}: will hold the public key (may be @code{NULL} )
+
+@var{flags}: zero or an OR'ed sequence of @code{GNUTLS_PKCS11_OBJ_FLAGs} 
+
+This function will generate a private key in the specified
+by the  @code{url} token. The private key will be generate within
+the token and will not be exportable. This function will
+store the DER-encoded public key in the SubjectPublicKeyInfo format 
+in  @code{pubkey} . The  @code{pubkey} should be deinitialized using @code{gnutls_free()} .
+
+Note that when generating an elliptic curve key, the curve
+can be substituted in the place of the bits parameter using the
+@code{GNUTLS_CURVE_TO_BITS()}  macro.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.5
+@end deftypefun

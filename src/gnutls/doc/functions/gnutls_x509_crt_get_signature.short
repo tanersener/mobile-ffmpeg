@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_signature} (gnutls_x509_crt_t @var{cert}, char * @var{sig}, size_t * @var{sig_size})

@@ -1,0 +1,48 @@
+
+
+
+
+@deftypefun {int} {dane_verify_crt} (dane_state_t @var{s}, const gnutls_datum_t * @var{chain}, unsigned @var{chain_size}, gnutls_certificate_type_t @var{chain_type}, const char * @var{hostname}, const char * @var{proto}, unsigned int @var{port}, unsigned int @var{sflags}, unsigned int @var{vflags}, unsigned int * @var{verify})
+@var{s}: A DANE state structure (may be NULL)
+
+@var{chain}: A certificate chain
+
+@var{chain_size}: The size of the chain
+
+@var{chain_type}: The type of the certificate chain
+
+@var{hostname}: The hostname associated with the chain
+
+@var{proto}: The protocol of the service connecting (e.g. tcp)
+
+@var{port}: The port of the service connecting (e.g. 443)
+
+@var{sflags}: Flags for the initialization of  @code{s} (if NULL)
+
+@var{vflags}: Verification flags; an OR'ed list of @code{dane_verify_flags_t} .
+
+@var{verify}: An OR'ed list of @code{dane_verify_status_t} .
+
+This function will verify the given certificate chain against the
+CA constrains and/or the certificate available via DANE.
+If no information via DANE can be obtained the flag @code{DANE_VERIFY_NO_DANE_INFO} 
+is set. If a DNSSEC signature is not available for the DANE
+record then the verify flag @code{DANE_VERIFY_NO_DNSSEC_DATA}  is set.
+
+Due to the many possible options of DANE, there is no single threat
+model countered. When notifying the user about DANE verification results
+it may be better to mention: DANE verification did not reject the certificate,
+rather than mentioning a successful DANE verication.
+
+Note that this function is designed to be run in addition to
+PKIX - certificate chain - verification. To be run independently
+the @code{DANE_VFLAG_ONLY_CHECK_EE_USAGE}  flag should be specified; 
+then the function will check whether the key of the peer matches the
+key advertized in the DANE entry.
+
+@strong{Returns:} a negative error code on error and @code{DANE_E_SUCCESS}  (0)
+when the DANE entries were successfully parsed, irrespective of
+whether they were verified (see  @code{verify} for that information). If
+no usable entries were encountered @code{DANE_E_REQUESTED_DATA_NOT_AVAILABLE} 
+will be returned.
+@end deftypefun

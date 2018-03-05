@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_set_expiration_time} (gnutls_x509_crt_t @var{cert}, time_t @var{exp_time})

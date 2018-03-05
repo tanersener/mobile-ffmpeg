@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_range_split} (gnutls_session_t @var{session}, const gnutls_range_st * @var{orig}, gnutls_range_st * @var{next}, gnutls_range_st * @var{remainder})
+@var{session}: is a @code{gnutls_session_t}  type
+
+@var{orig}: is the original range provided by the user
+
+@var{next}: is the returned range that can be conveyed in a TLS record
+
+@var{remainder}: is the returned remaining range
+
+This function should be used when it is required to hide the length
+of very long data that cannot be directly provided to @code{gnutls_record_send_range()} .
+In that case this function should be called with the desired length
+hiding range in  @code{orig} . The returned  @code{next} value should then be used in
+the next call to @code{gnutls_record_send_range()}  with the partial data.
+That process should be repeated until  @code{remainder} is (0,0).
+
+@strong{Returns:} 0 in case splitting succeeds, non zero in case of error.
+Note that  @code{orig} is not changed, while the values of  @code{next} and  @code{remainder} are modified to store the resulting values.
+@end deftypefun

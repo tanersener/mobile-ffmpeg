@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_print} (gnutls_pkcs7_t @var{pkcs7}, gnutls_certificate_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@var{pkcs7}: The PKCS7 struct to be printed
+
+@var{format}: Indicate the format to use
+
+@var{out}: Newly allocated datum with null terminated string.
+
+This function will pretty print a signed PKCS @code{7}  structure, suitable for
+display to a human.
+
+Currently the supported formats are @code{GNUTLS_CRT_PRINT_FULL}  and
+@code{GNUTLS_CRT_PRINT_COMPACT} .
+
+The output  @code{out} needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

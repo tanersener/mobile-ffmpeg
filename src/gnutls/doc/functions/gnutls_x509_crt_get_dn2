@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_dn2} (gnutls_x509_crt_t @var{cert}, gnutls_datum_t * @var{dn})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{dn}: a pointer to a structure to hold the name
+
+This function will allocate buffer and copy the name of the Certificate.
+The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+described in RFC4514. The output string will be ASCII or UTF-8
+encoded, depending on the certificate data.
+
+This function does not output a fully RFC4514 compliant string, if
+that is required see @code{gnutls_x509_crt_get_dn3()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.10
+@end deftypefun

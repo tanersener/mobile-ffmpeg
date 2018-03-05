@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_import_pkcs11_url} (gnutls_privkey_t @var{key}, const char * @var{url})

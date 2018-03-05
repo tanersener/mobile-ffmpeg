@@ -1,0 +1,10 @@
+
+
+
+
+@deftypefun {void} {gnutls_perror} (int @var{error})
+@var{error}: is a GnuTLS error code, a negative error code
+
+This function is like @code{perror()} . The only difference is that it
+accepts an error number returned by a gnutls function.
+@end deftypefun

@@ -1,0 +1,21 @@
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_add_cert} (gnutls_ocsp_req_t @var{req}, gnutls_digest_algorithm_t @var{digest}, gnutls_x509_crt_t @var{issuer}, gnutls_x509_crt_t @var{cert})
+@var{req}: should contain a @code{gnutls_ocsp_req_t}  type
+
+@var{digest}: hash algorithm, a @code{gnutls_digest_algorithm_t}  value
+
+@var{issuer}: issuer of  @code{subject} certificate
+
+@var{cert}: certificate to request status for
+
+This function will add another request to the OCSP request for a
+particular certificate.  The issuer name hash, issuer key hash, and
+serial number fields is populated as follows.  The issuer name and
+the serial number is taken from  @code{cert} .  The issuer key is taken
+from  @code{issuer} .  The hashed values will be hashed using the  @code{digest} algorithm, normally @code{GNUTLS_DIG_SHA1} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.
+@end deftypefun

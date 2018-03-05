@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_cidr_to_rfc5280} (const char * @var{cidr}, gnutls_datum_t * @var{cidr_rfc5280})

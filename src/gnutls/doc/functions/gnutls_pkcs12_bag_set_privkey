@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_set_privkey} (gnutls_pkcs12_bag_t @var{bag}, gnutls_x509_privkey_t @var{privkey}, const char * @var{password}, unsigned @var{flags})
+@var{bag}: The bag
+
+@var{privkey}: the private key to be copied.
+
+@var{password}: the password to protect the key with (may be @code{NULL} )
+
+@var{flags}: should be one of @code{gnutls_pkcs_encrypt_flags_t}  elements bitwise or'd
+
+This function will insert the given private key into the
+bag. This is just a wrapper over @code{gnutls_pkcs12_bag_set_data()} .
+
+@strong{Returns:} the index of the added bag on success, or a negative
+value on failure.
+@end deftypefun

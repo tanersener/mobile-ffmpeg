@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_copy_attached_extension} (const char * @var{token_url}, gnutls_x509_crt_t @var{crt}, gnutls_datum_t * @var{data}, const char * @var{label}, unsigned int @var{flags})

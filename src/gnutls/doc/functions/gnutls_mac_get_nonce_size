@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {size_t} {gnutls_mac_get_nonce_size} (gnutls_mac_algorithm_t @var{algorithm})
+@var{algorithm}: is an encryption algorithm
+
+Returns the size of the nonce used by the MAC in TLS.
+
+@strong{Returns:} length (in bytes) of the given MAC nonce size, or 0.
+
+@strong{Since:} 3.2.0
+@end deftypefun

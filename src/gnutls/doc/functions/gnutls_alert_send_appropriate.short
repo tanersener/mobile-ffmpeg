@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_alert_send_appropriate} (gnutls_session_t @var{session}, int @var{err})

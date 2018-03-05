@@ -1,0 +1,59 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_simple_parse} (gnutls_pkcs12_t @var{p12}, const char * @var{password}, gnutls_x509_privkey_t * @var{key}, gnutls_x509_crt_t ** @var{chain}, unsigned int * @var{chain_len}, gnutls_x509_crt_t ** @var{extra_certs}, unsigned int * @var{extra_certs_len}, gnutls_x509_crl_t * @var{crl}, unsigned int @var{flags})
+@var{p12}: A pkcs12 type
+
+@var{password}: optional password used to decrypt the structure, bags and keys.
+
+@var{key}: a structure to store the parsed private key.
+
+@var{chain}: the corresponding to key certificate chain (may be @code{NULL} )
+
+@var{chain_len}: will be updated with the number of additional (may be @code{NULL} )
+
+@var{extra_certs}: optional pointer to receive an array of additional
+certificates found in the PKCS12 structure (may be @code{NULL} ).
+
+@var{extra_certs_len}: will be updated with the number of additional
+certs (may be @code{NULL} ).
+
+@var{crl}: an optional structure to store the parsed CRL (may be @code{NULL} ).
+
+@var{flags}: should be zero or one of GNUTLS_PKCS12_SP_*
+
+This function parses a PKCS12 structure in  @code{pkcs12} and extracts the
+private key, the corresponding certificate chain, any additional
+certificates and a CRL.
+
+The  @code{extra_certs} and  @code{extra_certs_len} parameters are optional
+and both may be set to @code{NULL} . If either is non-@code{NULL} , then both must
+be set. The value for  @code{extra_certs} is allocated
+using @code{gnutls_malloc()} .
+
+Encrypted PKCS12 bags and PKCS8 private keys are supported, but
+only with password based security and the same password for all
+operations.
+
+Note that a PKCS12 structure may contain many keys and/or certificates,
+and there is no way to identify which key/certificate pair you want.
+For this reason this function is useful for PKCS12 files that contain 
+only one key/certificate pair and/or one CRL.
+
+If the provided structure has encrypted fields but no password
+is provided then this function returns @code{GNUTLS_E_DECRYPTION_FAILED} .
+
+Note that normally the chain constructed does not include self signed
+certificates, to comply with TLS' requirements. If, however, the flag 
+@code{GNUTLS_PKCS12_SP_INCLUDE_SELF_SIGNED}  is specified then
+self signed certificates will be included in the chain.
+
+Prior to using this function the PKCS @code{12}  structure integrity must
+be verified using @code{gnutls_pkcs12_verify_mac()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

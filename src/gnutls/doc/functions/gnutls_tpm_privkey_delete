@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_tpm_privkey_delete} (const char * @var{url}, const char * @var{srk_password})
+@var{url}: the URL describing the key
+
+@var{srk_password}: a password for the SRK key
+
+This function will unregister the private key from the TPM
+chip. 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

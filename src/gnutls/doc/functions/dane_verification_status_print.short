@@ -1,0 +1,1 @@
+@item @var{int} @ref{dane_verification_status_print} (unsigned int @var{status}, gnutls_datum_t * @var{out}, unsigned int @var{flags})

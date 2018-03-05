@@ -1,0 +1,102 @@
+
+@subheading gnutls_tpm_get_registered
+@anchor{gnutls_tpm_get_registered}
+@deftypefun {int} {gnutls_tpm_get_registered} (gnutls_tpm_key_list_t * @var{list})
+@var{list}: a list to store the keys
+
+This function will get a list of stored keys in the TPM. The uuid
+of those keys
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun
+
+@subheading gnutls_tpm_key_list_deinit
+@anchor{gnutls_tpm_key_list_deinit}
+@deftypefun {void} {gnutls_tpm_key_list_deinit} (gnutls_tpm_key_list_t @var{list})
+@var{list}: a list of the keys
+
+This function will deinitialize the list of stored keys in the TPM.
+
+@strong{Since:} 3.1.0
+@end deftypefun
+
+@subheading gnutls_tpm_key_list_get_url
+@anchor{gnutls_tpm_key_list_get_url}
+@deftypefun {int} {gnutls_tpm_key_list_get_url} (gnutls_tpm_key_list_t @var{list}, unsigned int @var{idx}, char ** @var{url}, unsigned int @var{flags})
+@var{list}: a list of the keys
+
+@var{idx}: The index of the key (starting from zero)
+
+@var{url}: The URL to be returned
+
+@var{flags}: should be zero
+
+This function will return for each given index a URL of
+the corresponding key.
+If the provided index is out of bounds then @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+is returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun
+
+@subheading gnutls_tpm_privkey_delete
+@anchor{gnutls_tpm_privkey_delete}
+@deftypefun {int} {gnutls_tpm_privkey_delete} (const char * @var{url}, const char * @var{srk_password})
+@var{url}: the URL describing the key
+
+@var{srk_password}: a password for the SRK key
+
+This function will unregister the private key from the TPM
+chip. 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun
+
+@subheading gnutls_tpm_privkey_generate
+@anchor{gnutls_tpm_privkey_generate}
+@deftypefun {int} {gnutls_tpm_privkey_generate} (gnutls_pk_algorithm_t @var{pk}, unsigned int @var{bits}, const char * @var{srk_password}, const char * @var{key_password}, gnutls_tpmkey_fmt_t @var{format}, gnutls_x509_crt_fmt_t @var{pub_format}, gnutls_datum_t * @var{privkey}, gnutls_datum_t * @var{pubkey}, unsigned int @var{flags})
+@var{pk}: the public key algorithm
+
+@var{bits}: the security bits
+
+@var{srk_password}: a password to protect the exported key (optional)
+
+@var{key_password}: the password for the TPM (optional)
+
+@var{format}: the format of the private key
+
+@var{pub_format}: the format of the public key
+
+@var{privkey}: the generated key
+
+@var{pubkey}: the corresponding public key (may be null)
+
+@var{flags}: should be a list of GNUTLS_TPM_* flags
+
+This function will generate a private key in the TPM
+chip. The private key will be generated within the chip
+and will be exported in a wrapped with TPM's master key
+form. Furthermore the wrapped key can be protected with
+the provided  @code{password} .
+
+Note that bits in TPM is quantized value. If the input value
+is not one of the allowed values, then it will be quantized to
+one of 512, 1024, 2048, 4096, 8192 and 16384.
+
+Allowed flags are:
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun
+

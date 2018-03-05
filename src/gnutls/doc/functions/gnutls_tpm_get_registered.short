@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_tpm_get_registered} (gnutls_tpm_key_list_t * @var{list})

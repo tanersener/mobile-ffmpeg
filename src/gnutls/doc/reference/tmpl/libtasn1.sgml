@@ -1,0 +1,384 @@
+<!-- ##### SECTION Title ##### -->
+libtasn1
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO ASN1_API ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_ARRAY_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_CLASS_APPLICATION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_CLASS_CONTEXT_SPECIFIC ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_CLASS_PRIVATE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_CLASS_STRUCTURED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_CLASS_UNIVERSAL ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_DER_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_DER_OVERFLOW ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_ELEMENT_NOT_EMPTY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_ELEMENT_NOT_FOUND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_ERROR_TYPE_ANY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_FILE_NOT_FOUND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_GENERIC_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_IDENTIFIER_NOT_FOUND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_MAX_NAME_SIZE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_MEM_ALLOC_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_MEM_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_NAME_TOO_LONG ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_PRINT_ALL ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_PRINT_NAME ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_PRINT_NAME_TYPE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_PRINT_NAME_TYPE_VALUE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_SUCCESS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_SYNTAX_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_BIT_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_BMP_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_BOOLEAN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_ENUMERATED ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_ERROR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_GENERALIZEDTime ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_GENERALSTRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_IA5_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_IMPLICIT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_INTEGER ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_NULL ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_NUMERIC_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_OBJECT_ID ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_OCTET_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_PRINTABLE_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_SEQUENCE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_SET ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_TELETEX_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_UNIVERSAL_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_UTCTime ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_UTF8_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_TAG_VISIBLE_STRING ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_VALUE_NOT_FOUND ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_VALUE_NOT_VALID ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO ASN1_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### TYPEDEF asn1_node ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF asn1_node_st ##### -->
+<para>
+
+</para>
+
+

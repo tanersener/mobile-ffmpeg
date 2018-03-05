@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_export_ecc_raw} (gnutls_privkey_t @var{key}, gnutls_ecc_curve_t * @var{curve}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y}, gnutls_datum_t * @var{k})

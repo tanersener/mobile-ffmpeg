@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crq_get_pk_algorithm} (gnutls_x509_crq_t @var{crq}, unsigned int * @var{bits})

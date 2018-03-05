@@ -1,0 +1,33 @@
+
+
+
+
+@deftypefun {int} {dane_verify_crt_raw} (dane_state_t @var{s}, const gnutls_datum_t * @var{chain}, unsigned @var{chain_size}, gnutls_certificate_type_t @var{chain_type}, dane_query_t @var{r}, unsigned int @var{sflags}, unsigned int @var{vflags}, unsigned int * @var{verify})
+@var{s}: A DANE state structure (may be NULL)
+
+@var{chain}: A certificate chain
+
+@var{chain_size}: The size of the chain
+
+@var{chain_type}: The type of the certificate chain
+
+@var{r}: DANE data to check against
+
+@var{sflags}: Flags for the initialization of  @code{s} (if NULL)
+
+@var{vflags}: Verification flags; an OR'ed list of @code{dane_verify_flags_t} .
+
+@var{verify}: An OR'ed list of @code{dane_verify_status_t} .
+
+This is the low-level function of @code{dane_verify_crt()} . See the
+high level function for documentation.
+
+This function does not perform any resolving, it utilizes
+cached entries from  @code{r} .
+
+@strong{Returns:} a negative error code on error and @code{DANE_E_SUCCESS}  (0)
+when the DANE entries were successfully parsed, irrespective of
+whether they were verified (see  @code{verify} for that information). If
+no usable entries were encountered @code{DANE_E_REQUESTED_DATA_NOT_AVAILABLE} 
+will be returned.
+@end deftypefun

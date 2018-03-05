@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_pkcs11_set_pin_function} (gnutls_pin_callback_t @var{fn}, void * @var{userdata})

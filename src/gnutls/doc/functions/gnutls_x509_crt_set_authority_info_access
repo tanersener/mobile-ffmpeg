@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_authority_info_access} (gnutls_x509_crt_t @var{crt}, int @var{what}, gnutls_datum_t * @var{data})
+@var{crt}: Holds the certificate
+
+@var{what}: what data to get, a @code{gnutls_info_access_what_t}  type.
+
+@var{data}: output data to be freed with @code{gnutls_free()} .
+
+This function sets the Authority Information Access (AIA)
+extension, see RFC 5280 section 4.2.2.1 for more information.  
+
+The type of data stored in  @code{data} is specified via  @code{what} which
+should be @code{gnutls_info_access_what_t}  values.
+
+If  @code{what} is @code{GNUTLS_IA_OCSP_URI} ,  @code{data} will hold the OCSP URI.
+If  @code{what} is @code{GNUTLS_IA_CAISSUERS_URI} ,  @code{data} will hold the caIssuers
+URI.  
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

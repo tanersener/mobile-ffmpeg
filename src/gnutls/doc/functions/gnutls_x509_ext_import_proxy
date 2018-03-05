@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_proxy} (const gnutls_datum_t * @var{ext}, int * @var{pathlen}, char ** @var{policyLanguage}, char ** @var{policy}, size_t * @var{sizeof_policy})
+@var{ext}: the DER encoded extension data
+
+@var{pathlen}: pointer to output integer indicating path length (may be
+NULL), non-negative error codes indicate a present pCPathLenConstraint
+field and the actual value, -1 indicate that the field is absent.
+
+@var{policyLanguage}: output variable with OID of policy language
+
+@var{policy}: output variable with policy data
+
+@var{sizeof_policy}: output variable with size of policy data
+
+This function will return the information from a proxy certificate
+extension. It reads the ProxyCertInfo X.509 extension (1.3.6.1.5.5.7.1.14).
+The  @code{policyLanguage} and  @code{policy} values must be deinitialized using @code{gnutls_free()}  after use.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {const gnutls_digest_algorithm_t *} {gnutls_digest_list} ( @var{void})
+
+Get a list of hash (digest) algorithms supported by GnuTLS.
+
+This function is not thread safe.
+
+@strong{Returns:} Return a (0)-terminated list of @code{gnutls_digest_algorithm_t} 
+integers indicating the available digests.
+@end deftypefun

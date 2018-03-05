@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_export} (gnutls_pubkey_t @var{key}, gnutls_x509_crt_fmt_t @var{format}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{key}: Holds the certificate
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{output_data}: will contain a certificate PEM or DER encoded
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will export the public key to DER or PEM format.
+The contents of the exported data is the SubjectPublicKeyInfo
+X.509 structure.
+
+If the buffer provided is not long enough to hold the output, then
+*output_data_size is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will
+be returned.
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN CERTIFICATE".
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+
+@strong{Since:} 2.12.0
+@end deftypefun

@@ -1,0 +1,21 @@
+
+
+@c gnutls_privkey_flags_t
+@table @code
+@item GNUTLS_@-PRIVKEY_@-IMPORT_@-AUTO_@-RELEASE
+When importing a private key, automatically
+release it when the structure it was imported is released.
+@item GNUTLS_@-PRIVKEY_@-IMPORT_@-COPY
+Copy required values during import.
+@item GNUTLS_@-PRIVKEY_@-DISABLE_@-CALLBACKS
+The following flag disables call to PIN callbacks etc.
+Only relevant to TPM keys.
+@item GNUTLS_@-PRIVKEY_@-SIGN_@-FLAG_@-TLS1_@-RSA
+Make an RSA signature on the hashed data as in the TLS protocol.
+@item GNUTLS_@-PRIVKEY_@-FLAG_@-PROVABLE
+When generating a key involving prime numbers, use provable primes; a seed may be required.
+@item GNUTLS_@-PRIVKEY_@-FLAG_@-EXPORT_@-COMPAT
+Keys generated or imported as provable require an extended format which cannot be read by previous versions
+of gnutls or other applications. By setting this flag the key will be exported in a backwards compatible way,
+even if the information about the seed used will be lost.
+@end table

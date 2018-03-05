@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_cpy_crl_dist_points} (gnutls_x509_crt_t @var{dst}, gnutls_x509_crt_t @var{src})
+@var{dst}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{src}: the certificate where the dist points will be copied from
+
+This function will copy the CRL distribution points certificate
+extension, from the source to the destination certificate.
+This may be useful to copy from a CA certificate to issued ones.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

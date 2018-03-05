@@ -1,0 +1,1 @@
+@item @var{gnutls_protocol_t} @ref{gnutls_protocol_get_id} (const char * @var{name})

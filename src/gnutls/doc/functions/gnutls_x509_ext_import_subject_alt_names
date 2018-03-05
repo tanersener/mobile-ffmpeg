@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_subject_alt_names} (const gnutls_datum_t * @var{ext}, gnutls_subject_alt_names_t @var{sans}, unsigned int @var{flags})
+@var{ext}: The DER-encoded extension data
+
+@var{sans}: The alternative names
+
+@var{flags}: should be zero
+
+This function will export the alternative names in the provided DER-encoded
+SubjectAltName PKIX extension, to a @code{gnutls_subject_alt_names_t}  type.  @code{sans} must be initialized.
+
+This function will succeed even if there no subject alternative names
+in the structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

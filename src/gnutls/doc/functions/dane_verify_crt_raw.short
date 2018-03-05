@@ -1,0 +1,1 @@
+@item @var{int} @ref{dane_verify_crt_raw} (dane_state_t @var{s}, const gnutls_datum_t * @var{chain}, unsigned @var{chain_size}, gnutls_certificate_type_t @var{chain_type}, dane_query_t @var{r}, unsigned int @var{sflags}, unsigned int @var{vflags}, unsigned int * @var{verify})

@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_supplemental_register} (const char * @var{name}, gnutls_supplemental_data_format_type_t @var{type}, gnutls_supp_recv_func @var{recv_func}, gnutls_supp_send_func @var{send_func})
+@var{name}: the name of the supplemental data to register
+
+@var{type}: the type of the supplemental data format
+
+@var{recv_func}: the function to receive the data
+
+@var{send_func}: the function to send the data
+
+This function will register a new supplemental data type (rfc4680).
+The registered data will remain until @code{gnutls_global_deinit()} 
+is called. The provided  @code{type} must be an unassigned type in
+@code{gnutls_supplemental_data_format_type_t} . If the type is already
+registered or handled by GnuTLS internally @code{GNUTLS_E_ALREADY_REGISTERED} 
+will be returned.
+
+This function is not thread safe.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun

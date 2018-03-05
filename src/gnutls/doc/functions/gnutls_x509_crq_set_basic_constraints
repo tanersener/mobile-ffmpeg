@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_set_basic_constraints} (gnutls_x509_crq_t @var{crq}, unsigned int @var{ca}, int @var{pathLenConstraint})
+@var{crq}: a certificate request of type @code{gnutls_x509_crq_t} 
+
+@var{ca}: true(1) or false(0) depending on the Certificate authority status.
+
+@var{pathLenConstraint}: non-negative error codes indicate maximum length of path,
+and negative error codes indicate that the pathLenConstraints field should
+not be present.
+
+This function will set the basicConstraints certificate extension.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.8.0
+@end deftypefun

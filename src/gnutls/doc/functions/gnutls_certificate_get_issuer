@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_get_issuer} (gnutls_certificate_credentials_t @var{sc}, gnutls_x509_crt_t @var{cert}, gnutls_x509_crt_t * @var{issuer}, unsigned int @var{flags})
+@var{sc}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{cert}: is the certificate to find issuer for
+
+@var{issuer}: Will hold the issuer if any. Should be treated as constant.
+
+@var{flags}: Use zero or @code{GNUTLS_TL_GET_COPY} 
+
+This function will return the issuer of a given certificate.
+If the flag @code{GNUTLS_TL_GET_COPY}  is specified a copy of the issuer
+will be returned which must be freed using @code{gnutls_x509_crt_deinit()} .
+In that case the provided  @code{issuer} must not be initialized.
+
+As with @code{gnutls_x509_trust_list_get_issuer()}  this function requires
+the @code{GNUTLS_TL_GET_COPY}  flag in order to operate with PKCS@code{11}  trust
+lists in a thread-safe way. 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

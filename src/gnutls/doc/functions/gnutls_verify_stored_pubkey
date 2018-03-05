@@ -1,0 +1,43 @@
+
+
+
+
+@deftypefun {int} {gnutls_verify_stored_pubkey} (const char * @var{db_name}, gnutls_tdb_t @var{tdb}, const char * @var{host}, const char * @var{service}, gnutls_certificate_type_t @var{cert_type}, const gnutls_datum_t * @var{cert}, unsigned int @var{flags})
+@var{db_name}: A file specifying the stored keys (use NULL for the default)
+
+@var{tdb}: A storage structure or NULL to use the default
+
+@var{host}: The peer's name
+
+@var{service}: non-NULL if this key is specific to a service (e.g. http)
+
+@var{cert_type}: The type of the certificate
+
+@var{cert}: The raw (der) data of the certificate
+
+@var{flags}: should be 0.
+
+This function will try to verify the provided (raw or DER-encoded) certificate 
+using a list of stored public keys.  The  @code{service} field if non-NULL should
+be a port number.
+
+The  @code{retrieve} variable if non-null specifies a custom backend for
+the retrieval of entries. If it is NULL then the
+default file backend will be used. In POSIX-like systems the
+file backend uses the $HOME/.gnutls/known_hosts file.
+
+Note that if the custom storage backend is provided the
+retrieval function should return @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH} 
+if the host/service pair is found but key doesn't match,
+@code{GNUTLS_E_NO_CERTIFICATE_FOUND}  if no such host/service with
+the given key is found, and 0 if it was found. The storage
+function should return 0 on success.
+
+@strong{Returns:} If no associated public key is found
+then @code{GNUTLS_E_NO_CERTIFICATE_FOUND}  will be returned. If a key
+is found but does not match @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH} 
+is returned. On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, 
+or a negative error value on other errors.
+
+@strong{Since:} 3.0.13
+@end deftypefun

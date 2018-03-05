@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_issuer_unique_id} (gnutls_x509_crt_t @var{crt}, char * @var{buf}, size_t * @var{buf_size})

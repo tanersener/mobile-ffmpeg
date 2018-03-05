@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_set_ocsp_status_request_file} (gnutls_certificate_credentials_t @var{sc}, const char * @var{response_file}, unsigned @var{idx})

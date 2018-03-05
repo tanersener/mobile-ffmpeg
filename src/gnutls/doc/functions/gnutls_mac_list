@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {const gnutls_mac_algorithm_t *} {gnutls_mac_list} ( @var{void})
+
+Get a list of hash algorithms for use as MACs.  Note that not
+necessarily all MACs are supported in TLS cipher suites.  
+This function is not thread safe.
+
+@strong{Returns:} Return a (0)-terminated list of @code{gnutls_mac_algorithm_t} 
+integers indicating the available MACs.
+@end deftypefun

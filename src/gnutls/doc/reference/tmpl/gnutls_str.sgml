@@ -1,0 +1,131 @@
+<!-- ##### SECTION Title ##### -->
+gnutls_str
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO BUFFER_APPEND ##### -->
+<para>
+
+</para>
+
+@b: 
+@x: 
+@s: 
+
+
+<!-- ##### MACRO BUFFER_APPEND_NUM ##### -->
+<para>
+
+</para>
+
+@b: 
+@s: 
+
+
+<!-- ##### MACRO BUFFER_APPEND_PFX1 ##### -->
+<para>
+
+</para>
+
+@b: 
+@x: 
+@s: 
+
+
+<!-- ##### MACRO BUFFER_APPEND_PFX2 ##### -->
+<para>
+
+</para>
+
+@b: 
+@x: 
+@s: 
+
+
+<!-- ##### MACRO BUFFER_APPEND_PFX3 ##### -->
+<para>
+
+</para>
+
+@b: 
+@x: 
+@s: 
+
+
+<!-- ##### MACRO BUFFER_APPEND_PFX4 ##### -->
+<para>
+
+</para>
+
+@b: 
+@x: 
+@s: 
+
+
+<!-- ##### MACRO BUFFER_POP ##### -->
+<para>
+
+</para>
+
+@b: 
+@x: 
+@s: 
+
+
+<!-- ##### MACRO BUFFER_POP_DATUM ##### -->
+<para>
+
+</para>
+
+@b: 
+@o: 
+
+
+<!-- ##### MACRO BUFFER_POP_NUM ##### -->
+<para>
+
+</para>
+
+@b: 
+@o: 
+
+
+<!-- ##### MACRO MAX_CN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MAX_DN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO _ ##### -->
+<para>
+
+</para>
+
+@String: 
+
+

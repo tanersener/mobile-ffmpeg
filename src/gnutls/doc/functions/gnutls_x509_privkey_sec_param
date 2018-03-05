@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {gnutls_sec_param_t} {gnutls_x509_privkey_sec_param} (gnutls_x509_privkey_t @var{key})
+@var{key}: a key
+
+This function will return the security parameter appropriate with
+this private key.
+
+@strong{Returns:} On success, a valid security parameter is returned otherwise
+@code{GNUTLS_SEC_PARAM_UNKNOWN}  is returned.
+
+@strong{Since:} 2.12.0
+@end deftypefun

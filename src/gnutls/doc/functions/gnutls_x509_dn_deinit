@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_dn_deinit} (gnutls_x509_dn_t @var{dn})
+@var{dn}: a DN uint8_t object pointer.
+
+This function deallocates the DN object as returned by
+@code{gnutls_x509_dn_import()} .
+
+@strong{Since:} 2.4.0
+@end deftypefun

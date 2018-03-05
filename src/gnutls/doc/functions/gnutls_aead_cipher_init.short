@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_aead_cipher_init} (gnutls_aead_cipher_hd_t * @var{handle}, gnutls_cipher_algorithm_t @var{cipher}, const gnutls_datum_t * @var{key})

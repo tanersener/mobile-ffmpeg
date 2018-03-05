@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_verify_peers} (gnutls_session_t @var{session}, gnutls_typed_vdata_st * @var{data}, unsigned int @var{elements}, unsigned int * @var{status})

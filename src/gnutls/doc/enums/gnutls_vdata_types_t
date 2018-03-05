@@ -1,0 +1,18 @@
+
+
+@c gnutls_vdata_types_t
+@table @code
+@item GNUTLS_@-DT_@-UNKNOWN
+Unknown data type.
+@item GNUTLS_@-DT_@-DNS_@-HOSTNAME
+The data contain a null-terminated DNS hostname; the hostname will be 
+matched using the RFC6125 rules.
+@item GNUTLS_@-DT_@-KEY_@-PURPOSE_@-OID
+The data contain a null-terminated key purpose OID. It will be matched
+against the certificate's Extended Key Usage extension.
+@item GNUTLS_@-DT_@-RFC822NAME
+The data contain a null-terminated email address; the email will be
+matched against the RFC822Name field of the certificate, or the EMAIL DN component if the
+former isn't available. Prior to matching the email address will be converted to ACE
+(ASCII-compatible-encoding).
+@end table

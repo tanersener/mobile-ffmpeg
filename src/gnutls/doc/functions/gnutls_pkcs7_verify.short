@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs7_verify} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_trust_list_t @var{tl}, gnutls_typed_vdata_st * @var{vdata}, unsigned int @var{vdata_size}, unsigned @var{idx}, const gnutls_datum_t * @var{data}, unsigned @var{flags})

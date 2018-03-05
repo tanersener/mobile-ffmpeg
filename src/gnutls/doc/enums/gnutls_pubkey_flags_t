@@ -1,0 +1,10 @@
+
+
+@c gnutls_pubkey_flags_t
+@table @code
+@item GNUTLS_@-PUBKEY_@-DISABLE_@-CALLBACKS
+The following flag disables call to PIN callbacks. Only
+relevant to TPM keys.
+@item GNUTLS_@-PUBKEY_@-GET_@-OPENPGP_@-FINGERPRINT
+request an OPENPGP fingerprint instead of the default.
+@end table

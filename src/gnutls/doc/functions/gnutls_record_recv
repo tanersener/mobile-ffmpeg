@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {ssize_t} {gnutls_record_recv} (gnutls_session_t @var{session}, void * @var{data}, size_t @var{data_size})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data}: the buffer that the data will be read into
+
+@var{data_size}: the number of requested bytes
+
+This function has the similar semantics with @code{recv()} .  The only
+difference is that it accepts a GnuTLS session, and uses different
+error codes.
+In the special case that the peer requests a renegotiation, the
+caller will receive an error code of @code{GNUTLS_E_REHANDSHAKE} .  In case
+of a client, this message may be simply ignored, replied with an alert
+@code{GNUTLS_A_NO_RENEGOTIATION} , or replied with a new handshake,
+depending on the client's will. A server receiving this error code
+can only initiate a new handshake or terminate the session.
+
+If @code{EINTR}  is returned by the internal pull function (the default
+is @code{recv()} ) then @code{GNUTLS_E_INTERRUPTED}  will be returned.  If
+@code{GNUTLS_E_INTERRUPTED}  or @code{GNUTLS_E_AGAIN}  is returned, you must
+call this function again to get the data.  See also
+@code{gnutls_record_get_direction()} .
+
+@strong{Returns:} The number of bytes received and zero on EOF (for stream
+connections).  A negative error code is returned in case of an error.  
+The number of bytes received might be less than the requested  @code{data_size} .
+@end deftypefun

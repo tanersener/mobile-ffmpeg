@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_random_art} (gnutls_random_art_t @var{type}, const char * @var{key_type}, unsigned int @var{key_size}, void * @var{fpr}, size_t @var{fpr_size}, gnutls_datum_t * @var{art})
+@var{type}: The type of the random art (for now only @code{GNUTLS_RANDOM_ART_OPENSSH}  is supported)
+
+@var{key_type}: The type of the key (RSA, DSA etc.)
+
+@var{key_size}: The size of the key in bits
+
+@var{fpr}: The fingerprint of the key
+
+@var{fpr_size}: The size of the fingerprint
+
+@var{art}: The returned random art
+
+This function will convert a given fingerprint to an "artistic"
+image. The returned image is allocated using @code{gnutls_malloc()} , is
+null-terminated but art->size will not account the terminating null.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+@end deftypefun

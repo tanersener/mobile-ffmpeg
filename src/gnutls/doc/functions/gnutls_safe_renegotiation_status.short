@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_safe_renegotiation_status} (gnutls_session_t @var{session})

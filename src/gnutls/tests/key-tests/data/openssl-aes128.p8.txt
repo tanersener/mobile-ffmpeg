@@ -1,0 +1,7 @@
+PKCS #8 information:
+	Cipher: AES-128-CBC
+	Schema: PBES2-AES128-CBC (2.16.840.1.101.3.4.1.2)
+	Salt: 2fe159cbcb050867
+	Salt size: 8
+	Iteration count: 2048
+

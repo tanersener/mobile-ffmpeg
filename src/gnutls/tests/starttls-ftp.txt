@@ -1,0 +1,3 @@
+TIMEOUT 120
+FEAT '211-Extended features supported:\r\n LANG EN*\r\n AUTH TLS;TLS-C;SSL;TLS-P;\r\n211 END\r\n'
+AUTH '234 AUTH command ok. Expecting TLS Negotiation.\r\n'

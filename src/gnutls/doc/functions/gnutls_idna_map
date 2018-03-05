@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_idna_map} (const char * @var{input}, unsigned @var{ilen}, gnutls_datum_t * @var{out}, unsigned @var{flags})
+@var{input}: contain the UTF-8 formatted domain name
+
+@var{ilen}: the length of the provided string
+
+@var{out}: the result in an null-terminated allocated string
+
+@var{flags}: should be zero
+
+This function will convert the provided UTF-8 domain name, to
+its IDNA mapping in an allocated variable. Note that depending on the flags the used gnutls
+library was compiled with, the output of this function may vary (i.e.,
+may be IDNA2008, or IDNA2003).
+
+To force IDNA2008 specify the flag @code{GNUTLS_IDNA_FORCE_2008} . In
+the case GnuTLS is not compiled with the necessary dependencies,
+@code{GNUTLS_E_UNIMPLEMENTED_FEATURE}  will be returned to indicate that
+gnutls is unable to perform the requested conversion.
+
+Note also, that this function will return an empty string if an
+empty string is provided as input.
+
+@strong{Returns:} @code{GNUTLS_E_INVALID_UTF8_STRING}  on invalid UTF-8 data, or 0 on success.
+
+@strong{Since:} 3.5.8
+@end deftypefun

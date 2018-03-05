@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_encode_ber_digest_info} (gnutls_digest_algorithm_t @var{hash}, const gnutls_datum_t * @var{digest}, gnutls_datum_t * @var{output})
+@var{hash}: the hash algorithm that was used to get the digest
+
+@var{digest}: must contain the digest data
+
+@var{output}: will contain the allocated DigestInfo BER encoded data
+
+This function will encode the provided digest data, and its
+algorithm into an RSA PKCS@code{1}  1.5 DigestInfo structure. 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.5.0
+@end deftypefun

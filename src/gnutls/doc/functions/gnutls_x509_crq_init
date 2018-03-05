@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_init} (gnutls_x509_crq_t * @var{crq})
+@var{crq}: A pointer to the type to be initialized
+
+This function will initialize a PKCS@code{10}  certificate request
+structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

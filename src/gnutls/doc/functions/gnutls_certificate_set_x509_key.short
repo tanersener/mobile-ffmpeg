@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_set_x509_key} (gnutls_certificate_credentials_t @var{res}, gnutls_x509_crt_t * @var{cert_list}, int @var{cert_list_size}, gnutls_x509_privkey_t @var{key})

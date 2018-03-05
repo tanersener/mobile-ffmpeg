@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {char *} {gnutls_pkcs11_obj_flags_get_str} (unsigned int @var{flags})
+@var{flags}: holds the flags
+
+This function given an or-sequence of @code{GNUTLS_PKCS11_OBJ_FLAG_MARK} ,
+will return an allocated string with its description. The string
+needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} If flags is zero @code{NULL}  is returned, otherwise an allocated string.
+
+@strong{Since:} 3.3.7
+@end deftypefun

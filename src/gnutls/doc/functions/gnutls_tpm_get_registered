@@ -1,0 +1,14 @@
+
+
+
+@deftypefun {int} {gnutls_tpm_get_registered} (gnutls_tpm_key_list_t * @var{list})
+@var{list}: a list to store the keys
+
+This function will get a list of stored keys in the TPM. The uuid
+of those keys
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

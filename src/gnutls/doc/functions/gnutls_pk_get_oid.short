@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_pk_get_oid} (gnutls_pk_algorithm_t @var{algorithm})

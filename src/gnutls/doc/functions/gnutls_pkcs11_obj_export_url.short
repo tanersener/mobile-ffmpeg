@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_obj_export_url} (gnutls_pkcs11_obj_t @var{obj}, gnutls_pkcs11_url_type_t @var{detailed}, char ** @var{url})

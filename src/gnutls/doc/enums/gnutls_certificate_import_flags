@@ -1,0 +1,15 @@
+
+
+@c gnutls_certificate_import_flags
+@table @code
+@item GNUTLS_@-X509_@-CRT_@-LIST_@-IMPORT_@-FAIL_@-IF_@-EXCEED
+Fail if the
+certificates in the buffer are more than the space allocated for
+certificates. The error code will be @code{GNUTLS_E_SHORT_MEMORY_BUFFER} .
+@item GNUTLS_@-X509_@-CRT_@-LIST_@-FAIL_@-IF_@-UNSORTED
+Fail if the certificates
+in the buffer are not ordered starting from subject to issuer.
+The error code will be @code{GNUTLS_E_CERTIFICATE_LIST_UNSORTED} .
+@item GNUTLS_@-X509_@-CRT_@-LIST_@-SORT
+Sort the certificate chain if unsorted.
+@end table

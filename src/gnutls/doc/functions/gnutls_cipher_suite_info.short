@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_cipher_suite_info} (size_t @var{idx}, unsigned char * @var{cs_id}, gnutls_kx_algorithm_t * @var{kx}, gnutls_cipher_algorithm_t * @var{cipher}, gnutls_mac_algorithm_t * @var{mac}, gnutls_protocol_t * @var{min_version})

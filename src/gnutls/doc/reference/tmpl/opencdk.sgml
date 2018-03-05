@@ -1,0 +1,368 @@
+<!-- ##### SECTION Title ##### -->
+opencdk
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO CDK_KEY_USG_ENCR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO CDK_KEY_USG_SIGN ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MAX_CDK_DATA_PARTS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO MAX_CDK_PK_PARTS ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO OPENCDK_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO OPENCDK_VERSION_MAJOR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO OPENCDK_VERSION_MINOR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO OPENCDK_VERSION_PATCH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### STRUCT cdk_ctx_s ##### -->
+<para>
+
+</para>
+
+@cipher_algo: 
+@digest_algo: 
+@passphrase_cb: 
+@passphrase_cb_value: 
+
+<!-- ##### TYPEDEF cdk_ctx_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT cdk_desig_revoker_s ##### -->
+<para>
+
+</para>
+
+@next: 
+@r_class: 
+@algid: 
+@fpr: 
+
+<!-- ##### TYPEDEF cdk_desig_revoker_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM cdk_error_t ##### -->
+<para>
+
+</para>
+
+@CDK_EOF: 
+@CDK_Success: 
+@CDK_General_Error: 
+@CDK_File_Error: 
+@CDK_Bad_Sig: 
+@CDK_Inv_Packet: 
+@CDK_Inv_Algo: 
+@CDK_Not_Implemented: 
+@CDK_Armor_Error: 
+@CDK_Armor_CRC_Error: 
+@CDK_MPI_Error: 
+@CDK_Inv_Value: 
+@CDK_Error_No_Key: 
+@CDK_Chksum_Error: 
+@CDK_Time_Conflict: 
+@CDK_Zlib_Error: 
+@CDK_Weak_Key: 
+@CDK_Out_Of_Core: 
+@CDK_Wrong_Seckey: 
+@CDK_Bad_MDC: 
+@CDK_Inv_Mode: 
+@CDK_Error_No_Keyring: 
+@CDK_Wrong_Format: 
+@CDK_Inv_Packet_Ver: 
+@CDK_Too_Short: 
+@CDK_Unusable_Key: 
+@CDK_No_Data: 
+@CDK_No_Passphrase: 
+@CDK_Network_Error: 
+
+<!-- ##### STRUCT cdk_kbnode_s ##### -->
+<para>
+
+</para>
+
+@next: 
+@pkt: 
+@is_deleted: 
+@is_cloned: 
+
+<!-- ##### TYPEDEF cdk_kbnode_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM cdk_key_flags_t ##### -->
+<para>
+
+</para>
+
+@CDK_FLAG_KEY_REVOKED: 
+@CDK_FLAG_KEY_EXPIRED: 
+@CDK_FLAG_SIG_EXPIRED: 
+
+<!-- ##### STRUCT cdk_keydb_hd_s ##### -->
+<para>
+
+</para>
+
+@type: 
+@fp_ref: 
+@fp: 
+@name: 
+@secret: 
+@isopen: 
+
+<!-- ##### TYPEDEF cdk_keydb_hd_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT cdk_keydb_search_s ##### -->
+<para>
+
+</para>
+
+@off: 
+@type: 
+@cache: 
+@ncache: 
+@no_cache: 
+@idx: 
+@idx_name: 
+
+<!-- ##### TYPEDEF cdk_keydb_search_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT cdk_keygen_ctx_s ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### TYPEDEF cdk_keygen_ctx_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT cdk_keylist_s ##### -->
+<para>
+
+</para>
+
+@next: 
+@version: 
+@type: 
+
+<!-- ##### TYPEDEF cdk_keylist_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT cdk_listkey_s ##### -->
+<para>
+
+</para>
+
+@inp: 
+@db: 
+@type: 
+@t: 
+
+<!-- ##### TYPEDEF cdk_listkey_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM cdk_lit_format_t ##### -->
+<para>
+
+</para>
+
+@CDK_LITFMT_BINARY: 
+@CDK_LITFMT_TEXT: 
+@CDK_LITFMT_UNICODE: 
+
+<!-- ##### TYPEDEF cdk_mpi_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### ENUM cdk_packet_type_t ##### -->
+<para>
+
+</para>
+
+@CDK_PKT_RESERVED: 
+@CDK_PKT_PUBKEY_ENC: 
+@CDK_PKT_SIGNATURE: 
+@CDK_PKT_ONEPASS_SIG: 
+@CDK_PKT_SECRET_KEY: 
+@CDK_PKT_PUBLIC_KEY: 
+@CDK_PKT_SECRET_SUBKEY: 
+@CDK_PKT_COMPRESSED: 
+@CDK_PKT_MARKER: 
+@CDK_PKT_LITERAL: 
+@CDK_PKT_RING_TRUST: 
+@CDK_PKT_USER_ID: 
+@CDK_PKT_PUBLIC_SUBKEY: 
+@CDK_PKT_OLD_COMMENT: 
+@CDK_PKT_ATTRIBUTE: 
+@CDK_PKT_MDC: 
+
+<!-- ##### STRUCT cdk_prefitem_s ##### -->
+<para>
+
+</para>
+
+@type: 
+@value: 
+
+<!-- ##### TYPEDEF cdk_prefitem_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT cdk_s2k_s ##### -->
+<para>
+
+</para>
+
+@mode: 
+@hash_algo: 
+@salt: 
+@count: 
+
+<!-- ##### TYPEDEF cdk_s2k_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT cdk_stream_s ##### -->
+<para>
+
+</para>
+
+@filters: 
+@fmode: 
+@error: 
+@blkmode: 
+@fname: 
+@fp: 
+@fp_ref: 
+@cbs: 
+@cbs_hd: 
+
+<!-- ##### TYPEDEF cdk_stream_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT cdk_strlist_s ##### -->
+<para>
+
+</para>
+
+@next: 
+@d: 
+
+<!-- ##### TYPEDEF cdk_strlist_t ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### STRUCT cdk_subpkt_s ##### -->
+<para>
+
+</para>
+
+@next: 
+@size: 
+@type: 
+@d: 
+
+<!-- ##### TYPEDEF cdk_subpkt_t ##### -->
+<para>
+
+</para>
+
+

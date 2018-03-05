@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_token_init} (const char * @var{token_url}, const char * @var{so_pin}, const char * @var{label})
+@var{token_url}: A PKCS @code{11}  URL specifying a token
+
+@var{so_pin}: Security Officer's PIN
+
+@var{label}: A name to be used for the token
+
+This function will initialize (format) a token. If the token is
+at a factory defaults state the security officer's PIN given will be
+set to be the default. Otherwise it should match the officer's PIN.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

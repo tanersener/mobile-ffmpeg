@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_hmac_init} (gnutls_hmac_hd_t * @var{dig}, gnutls_mac_algorithm_t @var{algorithm}, const void * @var{key}, size_t @var{keylen})
+@var{dig}: is a @code{gnutls_hmac_hd_t}  type
+
+@var{algorithm}: the HMAC algorithm to use
+
+@var{key}: the key to be used for encryption
+
+@var{keylen}: the length of the key
+
+This function will initialize an context that can be used to
+produce a Message Authentication Code (MAC) of data.  This will
+effectively use the current crypto backend in use by gnutls or the
+cryptographic accelerator in use.
+
+Note that despite the name of this function, it can be used
+for other MAC algorithms than HMAC.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun

@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_set_crt} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_t @var{crt})
+@var{pkcs7}: The pkcs7 type
+
+@var{crt}: the certificate to be copied.
+
+This function will add a parsed certificate to the PKCS7 or
+RFC2630 certificate set.  This is a wrapper function over
+@code{gnutls_pkcs7_set_crt_raw()}  .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_sign_is_secure} (gnutls_sign_algorithm_t @var{algorithm})

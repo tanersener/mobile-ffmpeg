@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_hmac_init} (gnutls_hmac_hd_t * @var{dig}, gnutls_mac_algorithm_t @var{algorithm}, const void * @var{key}, size_t @var{keylen})

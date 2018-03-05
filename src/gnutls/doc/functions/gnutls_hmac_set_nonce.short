@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_hmac_set_nonce} (gnutls_hmac_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len})

@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_tpm_url} (gnutls_pubkey_t @var{pkey}, const char * @var{url}, const char * @var{srk_password}, unsigned int @var{flags})
+@var{pkey}: The public key
+
+@var{url}: The URL of the TPM key to be imported
+
+@var{srk_password}: The password for the SRK key (optional)
+
+@var{flags}: should be zero
+
+This function will import the given private key to the abstract
+@code{gnutls_privkey_t}  type. 
+
+Note that unless @code{GNUTLS_PUBKEY_DISABLE_CALLBACKS} 
+is specified, if incorrect (or NULL) passwords are given
+the PKCS11 callback functions will be used to obtain the
+correct passwords. Otherwise if the SRK password is wrong
+@code{GNUTLS_E_TPM_SRK_PASSWORD_ERROR}  is returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

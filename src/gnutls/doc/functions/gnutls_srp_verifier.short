@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_srp_verifier} (const char * @var{username}, const char * @var{password}, const gnutls_datum_t * @var{salt}, const gnutls_datum_t * @var{generator}, const gnutls_datum_t * @var{prime}, gnutls_datum_t * @var{res})

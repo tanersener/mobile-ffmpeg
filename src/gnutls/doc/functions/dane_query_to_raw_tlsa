@@ -1,0 +1,31 @@
+
+
+
+
+@deftypefun {int} {dane_query_to_raw_tlsa} (dane_query_t @var{q}, unsigned int * @var{data_entries}, char *** @var{dane_data}, int ** @var{dane_data_len}, int * @var{secure}, int * @var{bogus})
+@var{q}: The query result structure
+
+@var{data_entries}: Pointer set to the number of entries in the query
+
+@var{dane_data}: Pointer to contain an array of DNS rdata items, terminated with a NULL pointer;
+caller must guarantee that the referenced data remains
+valid until @code{dane_query_deinit()}  is called.
+
+@var{dane_data_len}: Pointer to contain the length n bytes of the dane_data items
+
+@var{secure}: Pointer set true if the result is validated securely, false if
+validation failed or the domain queried has no security info
+
+@var{bogus}: Pointer set true if the result was not secure due to a security failure
+
+This function will provide the DANE data from the query
+response.
+
+The pointers dane_data and dane_data_len are allocated with @code{gnutls_malloc()} 
+to contain the data from the query result structure (individual
+ @code{dane_data} items simply point to the original data and are not allocated separately).
+The returned  @code{dane_data} are only valid during the lifetime of  @code{q} .
+
+@strong{Returns:} On success, @code{DANE_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

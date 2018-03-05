@@ -1,0 +1,622 @@
+rsa-md5-collision README -- Information about rsa-md5-collision self tests.
+Copyright (C) 2006-2012 Free Software Foundation, Inc.
+See the end for copying conditions.
+
+This directory contains colliding X.509 certificates for different
+identities, from:
+
+http://www.win.tue.nl/hashclash/TargetCollidingCertificates/
+
+The certificates are used by a simple self-test script,
+rsa-md5-collision, that check to make sure that GnuTLS reject both
+certificate chains.
+
+Below is the e-mail exchanges with the authors where they agree to
+release the certificates under a permissive license, that allow the
+files to be included here.
+
+X-Hashcash: 1:22:061024:m.m.j.stevens@student.tue.nl::NIoLZwQj6TTZ4YZK:BUuA
+X-Hashcash: 1:22:061024:arjen.lenstra@epfl.ch::NgTq8sJW1QBlX/rv:g9Z
+From: Simon Josefsson <jas@extundo.com>
+To: "Weger\, B.M.M. de" <b.m.m.d.weger@TUE.nl>, m.m.j.stevens@student.tue.nl, arjen.lenstra@epfl.ch
+Subject: Re: target collisions and colliding certificates with different identities
+References: <DFA3206A564B80499B87B89B49BCD3135DC17A@EXCHANGE3.campus.tue.nl>
+OpenPGP: id=B565716F; url=http://josefsson.org/key.txt
+X-Draft-From: ("gmane.ietf.irtf.cfrg" 784)
+X-Hashcash: 1:22:061024:b.m.m.d.weger@tue.nl::aYYmnRc08nJKaUMk:6ddD
+Date: Tue, 24 Oct 2006 08:28:07 +0200
+In-Reply-To: <DFA3206A564B80499B87B89B49BCD3135DC17A@EXCHANGE3.campus.tue.nl>
+	(B. M. M. de Weger's message of "Mon\, 23 Oct 2006 23\:58\:21 +0200")
+Message-ID: <87ods2grd4.fsf@latte.josefsson.org>
+User-Agent: Gnus/5.110006 (No Gnus v0.6) Emacs/22.0.50 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Lines: 48
+Xref: localhost.localdomain rsa-md5:1
+
+Great work, thanks!
+
+I'd like to include your certificates in GnuTLS, a TLS implementation
+that supports X.509, as self-tests of the certificate verification
+logic.  Is this OK with you?
+
+Btw, Gnutls rejected the certificates, we already disable MD5 for
+verification purposes. :)
+
+For our legal department, I'd like a clarification of the license on
+the data, would you agree to release the certificates under the
+following license?
+
+     Copyright (c) 1996 Marc Stevens, Arjen K. Lenstra, Benne de Weger
+
+     Copying and distribution of this file, with or without modification,
+     are permitted in any medium without royalty provided the copyright
+     notice and this notice are preserved.
+
+Also, if any other authors contributed, they would have to agree to
+this license as well.  Are there other authors?
+
+Best regards, and thanks in advance,
+Simon
+
+"Weger, B.M.M. de" <b.m.m.d.weger@TUE.nl> writes:
+
+> Hi all,
+>
+> We announce:
+> - an example of a target collision for MD5; this means: 
+>   for two chosen messages m1 and m2 we have constructed 
+>   appendages b1 and b2 to make the messages collide 
+>   under MD5, i.e. MD5(m1||b1) = MD5(m2||b2);
+>   said differently: we can cause an MD5 collision for 
+>   any pair of distinct IHVs;
+> - an example of a pair of valid, unsuspicious X.509 
+>   certificates with distinct Distinguished Name fields, 
+>   but identical CA signatures; this example makes use 
+>   of the target collision.
+>
+> See http://www.win.tue.nl/hashclash/TargetCollidingCertificates/,
+> where the certificates and a more detailed announcement 
+> can be found.
+>
+> Marc Stevens
+> Arjen Lenstra
+> Benne de Weger
+Return-Path: <arjen.lenstra@epfl.ch>
+Received: from yxa.extundo.com ([unix socket])
+	by yxa-iv (Cyrus v2.1.18-IPv6-Debian-2.1.18-1+sarge2) with LMTP; Tue, 24 Oct 2006 08:32:12 +0200
+X-Sieve: CMU Sieve 2.2
+Received: from smtp1.epfl.ch (smtp1.epfl.ch [128.178.50.22])
+	by yxa.extundo.com (8.13.4/8.13.4/Debian-3sarge3) with SMTP id k9O6VvPx016489
+	for <jas@extundo.com>; Tue, 24 Oct 2006 08:31:57 +0200
+Received: (qmail 16665 invoked by uid 107); 24 Oct 2006 06:31:51 -0000
+Received: from mailav1.epfl.ch (128.178.50.190)
+  by smtp1.epfl.ch with SMTP; 24 Oct 2006 06:31:51 -0000
+Received: from (smtp2.epfl.ch [128.178.50.133]) by MAILAV1.epfl.ch with smtp
+	 id 3c76_55596730_6329_11db_9dfc_001143d18479;
+	Tue, 24 Oct 2006 08:31:51 +0200
+Received: from rex1.epfl.ch (128.178.50.178)
+  by smtp2.epfl.ch (AngelmatoPhylax SMTP proxy); Tue, 24 Oct 2006 08:31:51 +0200
+X-MimeOLE: Produced By Microsoft Exchange V6.5
+Content-class: urn:content-classes:message
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: RE: target collisions and colliding certificates with different identities
+Date: Tue, 24 Oct 2006 08:31:42 +0200
+Message-ID: <D449110BB7036C4297225E473599E77067DD0A@rex1.intranet.epfl.ch>
+In-Reply-To: <87ods2grd4.fsf@latte.josefsson.org>
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Thread-Topic: target collisions and colliding certificates with different identities
+Thread-Index: Acb3NZO8kzaCp7NPSV29z2Ydtt/p5gAAEyEg
+From: "Arjen Lenstra" <arjen.lenstra@epfl.ch>
+To: "Simon Josefsson" <jas@extundo.com>,
+        "Weger, B.M.M. de" <b.m.m.d.weger@TUE.nl>,
+        <m.m.j.stevens@student.tue.nl>
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00 autolearn=ham 
+	version=3.1.1
+X-Spam-Checker-Version: SpamAssassin 3.1.1 (2006-03-10) on yxa-iv
+X-Virus-Scanned: ClamAV version 0.88.2, clamav-milter version 0.88.2 on yxa.extundo.com
+X-Virus-Status: Clean
+Lines: 75
+Xref: localhost.localdomain rsa-md5:2
+
+Hi,
+Thanks!
+I can't speak for my coauthors, but it's all fine with me, though I find =
+the year in your proposed copyright statement a bit odd (I would have =
+expected 2006). There are no more authros involved.
+
+best regards, Arjen Lenstra
+
+----------------
+Arjen K. Lenstra   a k l @ e p f l . c h
+EPFL IC LACAL
+INJ 330 (B=E2timent INJ)
+Station 14
+CH-1015 Lausanne, Switzerland
+T=E9l: + 41 21 693 8101
+Fax: + 41 21 693 7550
+=20
+=20
+
+-----Original Message-----
+From: Simon Josefsson [mailto:jas@extundo.com]=20
+Sent: Tuesday, October 24, 2006 8:28 AM
+To: Weger, B.M.M. de; m.m.j.stevens@student.tue.nl; Arjen Lenstra
+Subject: Re: target collisions and colliding certificates with different =
+identities
+
+Great work, thanks!
+
+I'd like to include your certificates in GnuTLS, a TLS implementation
+that supports X.509, as self-tests of the certificate verification
+logic.  Is this OK with you?
+
+Btw, Gnutls rejected the certificates, we already disable MD5 for
+verification purposes. :)
+
+For our legal department, I'd like a clarification of the license on
+the data, would you agree to release the certificates under the
+following license?
+
+     Copyright (c) 1996 Marc Stevens, Arjen K. Lenstra, Benne de Weger
+
+     Copying and distribution of this file, with or without =
+modification,
+     are permitted in any medium without royalty provided the copyright
+     notice and this notice are preserved.
+
+Also, if any other authors contributed, they would have to agree to
+this license as well.  Are there other authors?
+
+Best regards, and thanks in advance,
+Simon
+
+"Weger, B.M.M. de" <b.m.m.d.weger@TUE.nl> writes:
+
+> Hi all,
+>
+> We announce:
+> - an example of a target collision for MD5; this means:=20
+>   for two chosen messages m1 and m2 we have constructed=20
+>   appendages b1 and b2 to make the messages collide=20
+>   under MD5, i.e. MD5(m1||b1) =3D MD5(m2||b2);
+>   said differently: we can cause an MD5 collision for=20
+>   any pair of distinct IHVs;
+> - an example of a pair of valid, unsuspicious X.509=20
+>   certificates with distinct Distinguished Name fields,=20
+>   but identical CA signatures; this example makes use=20
+>   of the target collision.
+>
+> See http://www.win.tue.nl/hashclash/TargetCollidingCertificates/,
+> where the certificates and a more detailed announcement=20
+> can be found.
+>
+> Marc Stevens
+> Arjen Lenstra
+> Benne de Weger
+From: Simon Josefsson <jas@extundo.com>
+To: "Arjen Lenstra" <arjen.lenstra@epfl.ch>
+Cc: "Weger\, B.M.M. de" <b.m.m.d.weger@TUE.nl>,  <m.m.j.stevens@student.tue.nl>
+Subject: Re: target collisions and colliding certificates with different identities
+References: <D449110BB7036C4297225E473599E77067DD0A@rex1.intranet.epfl.ch>
+OpenPGP: id=B565716F; url=http://josefsson.org/key.txt
+X-Draft-From: ("nnimap+yxa:INBOX.private.2006.10" 623)
+X-Hashcash: 1:22:061024:b.m.m.d.weger@tue.nl::pMR7JuXUTTt/Zjut:0aGD
+X-Hashcash: 1:22:061024:arjen.lenstra@epfl.ch::juw1iXMSKV62mZGj:CBbu
+X-Hashcash: 1:22:061024:m.m.j.stevens@student.tue.nl::SJdQwxRXP39Dw2C4:n6ia
+Date: Tue, 24 Oct 2006 08:43:59 +0200
+In-Reply-To: <D449110BB7036C4297225E473599E77067DD0A@rex1.intranet.epfl.ch>
+	(Arjen Lenstra's message of "Tue\, 24 Oct 2006 08\:31\:42 +0200")
+Message-ID: <87d58igqmo.fsf@latte.josefsson.org>
+User-Agent: Gnus/5.110006 (No Gnus v0.6) Emacs/22.0.50 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Lines: 80
+Xref: localhost.localdomain rsa-md5:3
+
+"Arjen Lenstra" <arjen.lenstra@epfl.ch> writes:
+
+> Hi,
+> Thanks!
+> I can't speak for my coauthors, but it's all fine with me, though I
+> find the year in your proposed copyright statement a bit odd (I
+> would have expected 2006). There are no more authros involved.
+
+Thanks.  Duh, I meant 2006, of course.  I'd appreciate if Marc and
+Benne also replied.
+
+/Simon
+
+> best regards, Arjen Lenstra
+>
+> ----------------
+> Arjen K. Lenstra   a k l @ e p f l . c h
+> EPFL IC LACAL
+> INJ 330 (Bâtiment INJ)
+> Station 14
+> CH-1015 Lausanne, Switzerland
+> Tél: + 41 21 693 8101
+> Fax: + 41 21 693 7550
+>  
+>  
+>
+> -----Original Message-----
+> From: Simon Josefsson [mailto:jas@extundo.com] 
+> Sent: Tuesday, October 24, 2006 8:28 AM
+> To: Weger, B.M.M. de; m.m.j.stevens@student.tue.nl; Arjen Lenstra
+> Subject: Re: target collisions and colliding certificates with different identities
+>
+> Great work, thanks!
+>
+> I'd like to include your certificates in GnuTLS, a TLS implementation
+> that supports X.509, as self-tests of the certificate verification
+> logic.  Is this OK with you?
+>
+> Btw, Gnutls rejected the certificates, we already disable MD5 for
+> verification purposes. :)
+>
+> For our legal department, I'd like a clarification of the license on
+> the data, would you agree to release the certificates under the
+> following license?
+>
+>      Copyright (c) 1996 Marc Stevens, Arjen K. Lenstra, Benne de Weger
+>
+>      Copying and distribution of this file, with or without modification,
+>      are permitted in any medium without royalty provided the copyright
+>      notice and this notice are preserved.
+>
+> Also, if any other authors contributed, they would have to agree to
+> this license as well.  Are there other authors?
+>
+> Best regards, and thanks in advance,
+> Simon
+>
+> "Weger, B.M.M. de" <b.m.m.d.weger@TUE.nl> writes:
+>
+>> Hi all,
+>>
+>> We announce:
+>> - an example of a target collision for MD5; this means: 
+>>   for two chosen messages m1 and m2 we have constructed 
+>>   appendages b1 and b2 to make the messages collide 
+>>   under MD5, i.e. MD5(m1||b1) = MD5(m2||b2);
+>>   said differently: we can cause an MD5 collision for 
+>>   any pair of distinct IHVs;
+>> - an example of a pair of valid, unsuspicious X.509 
+>>   certificates with distinct Distinguished Name fields, 
+>>   but identical CA signatures; this example makes use 
+>>   of the target collision.
+>>
+>> See http://www.win.tue.nl/hashclash/TargetCollidingCertificates/,
+>> where the certificates and a more detailed announcement 
+>> can be found.
+>>
+>> Marc Stevens
+>> Arjen Lenstra
+>> Benne de Weger
+Return-Path: <m.m.j.stevens@student.tue.nl>
+Received: from yxa.extundo.com ([unix socket])
+	by yxa-iv (Cyrus v2.1.18-IPv6-Debian-2.1.18-1+sarge2) with LMTP; Tue, 24 Oct 2006 09:23:28 +0200
+X-Sieve: CMU Sieve 2.2
+Received: from ipact2.infopact.nl (ipact2.infopact.nl [212.29.160.71])
+	by yxa.extundo.com (8.13.4/8.13.4/Debian-3sarge3) with ESMTP id k9O7NIbh023920
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
+	for <jas@extundo.com>; Tue, 24 Oct 2006 09:23:22 +0200
+Received: from ipact2.infopact.nl (localhost.localdomain [127.0.0.1])
+	by ipact2.infopact.nl (8.13.7/8.13.7) with ESMTP id k9O7NAZd008636
+	for <jas@extundo.com>; Tue, 24 Oct 2006 09:23:11 +0200
+Received: (from defang@localhost)
+	by ipact2.infopact.nl (8.13.7/8.13.7/Submit) id k9O7J939006762
+	for <jas@extundo.com>; Tue, 24 Oct 2006 09:19:09 +0200
+Received: from smtp.banaan.org (72-130-ftth.onsnet.nu [88.159.130.72])
+	by ipact2.infopact.nl (envelope-sender <m.m.j.stevens@student.tue.nl>) (MIMEDefang) with ESMTP id k9O7J72W006742; Tue, 24 Oct 2006 09:19:09 +0200 (CEST)
+Received: by smtp.banaan.org (Postfix, from userid 1018)
+	id DE1B689D80; Tue, 24 Oct 2006 09:19:06 +0200 (CEST)
+X-Spam-Checker-Version: SpamAssassin 3.1.1 (2006-03-10) on yxa-iv
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,FORGED_RCVD_HELO 
+	autolearn=ham version=3.1.1
+Received: from s478591 (cp688553-a.tilbu1.nb.home.nl [84.24.55.50])
+	by smtp.banaan.org (Postfix) with ESMTP id 5EE4889EF9;
+	Tue, 24 Oct 2006 09:18:57 +0200 (CEST)
+Message-ID: <03cf01c6f73c$a8923390$8702a8c0@s478591>
+From: "Marc Stevens" <m.m.j.stevens@student.tue.nl>
+To: "Simon Josefsson" <jas@extundo.com>,
+        "Arjen Lenstra" <arjen.lenstra@epfl.ch>
+Cc: "Weger, B.M.M. de" <b.m.m.d.weger@TUE.nl>
+References: <D449110BB7036C4297225E473599E77067DD0A@rex1.intranet.epfl.ch> <87d58igqmo.fsf@latte.josefsson.org>
+Subject: Re: target collisions and colliding certificates with different identities
+Date: Tue, 24 Oct 2006 09:18:50 +0200
+MIME-Version: 1.0
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
+	reply-type=original
+Content-Transfer-Encoding: 8bit
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 6.00.2900.2869
+X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2900.2962
+X-Scanned-By: MIMEDefang - SpamAssassin on 212.29.160.71
+X-Virus-Scanned: ClamAV version 0.88.2, clamav-milter version 0.88.2 on yxa.extundo.com
+X-Virus-Status: Clean
+Lines: 101
+Xref: localhost.localdomain rsa-md5:4
+
+Hi Simon,
+
+Thanks!
+I am also okay with the proposed license.
+
+Kind regards,
+    Marc
+
+----- Original Message ----- 
+From: "Simon Josefsson" <jas@extundo.com>
+To: "Arjen Lenstra" <arjen.lenstra@epfl.ch>
+Cc: "Weger, B.M.M. de" <b.m.m.d.weger@TUE.nl>; 
+<m.m.j.stevens@student.tue.nl>
+Sent: Tuesday, October 24, 2006 8:43 AM
+Subject: Re: target collisions and colliding certificates with different 
+identities
+
+
+> "Arjen Lenstra" <arjen.lenstra@epfl.ch> writes:
+>
+>> Hi,
+>> Thanks!
+>> I can't speak for my coauthors, but it's all fine with me, though I
+>> find the year in your proposed copyright statement a bit odd (I
+>> would have expected 2006). There are no more authros involved.
+>
+> Thanks.  Duh, I meant 2006, of course.  I'd appreciate if Marc and
+> Benne also replied.
+>
+> /Simon
+>
+>> best regards, Arjen Lenstra
+>>
+>> ----------------
+>> Arjen K. Lenstra   a k l @ e p f l . c h
+>> EPFL IC LACAL
+>> INJ 330 (Bâtiment INJ)
+>> Station 14
+>> CH-1015 Lausanne, Switzerland
+>> Tél: + 41 21 693 8101
+>> Fax: + 41 21 693 7550
+>>
+>>
+>>
+>> -----Original Message-----
+>> From: Simon Josefsson [mailto:jas@extundo.com]
+>> Sent: Tuesday, October 24, 2006 8:28 AM
+>> To: Weger, B.M.M. de; m.m.j.stevens@student.tue.nl; Arjen Lenstra
+>> Subject: Re: target collisions and colliding certificates with different 
+>> identities
+>>
+>> Great work, thanks!
+>>
+>> I'd like to include your certificates in GnuTLS, a TLS implementation
+>> that supports X.509, as self-tests of the certificate verification
+>> logic.  Is this OK with you?
+>>
+>> Btw, Gnutls rejected the certificates, we already disable MD5 for
+>> verification purposes. :)
+>>
+>> For our legal department, I'd like a clarification of the license on
+>> the data, would you agree to release the certificates under the
+>> following license?
+>>
+>>      Copyright (c) 1996 Marc Stevens, Arjen K. Lenstra, Benne de Weger
+>>
+>>      Copying and distribution of this file, with or without modification,
+>>      are permitted in any medium without royalty provided the copyright
+>>      notice and this notice are preserved.
+>>
+>> Also, if any other authors contributed, they would have to agree to
+>> this license as well.  Are there other authors?
+>>
+>> Best regards, and thanks in advance,
+>> Simon
+>>
+>> "Weger, B.M.M. de" <b.m.m.d.weger@TUE.nl> writes:
+>>
+>>> Hi all,
+>>>
+>>> We announce:
+>>> - an example of a target collision for MD5; this means:
+>>>   for two chosen messages m1 and m2 we have constructed
+>>>   appendages b1 and b2 to make the messages collide
+>>>   under MD5, i.e. MD5(m1||b1) = MD5(m2||b2);
+>>>   said differently: we can cause an MD5 collision for
+>>>   any pair of distinct IHVs;
+>>> - an example of a pair of valid, unsuspicious X.509
+>>>   certificates with distinct Distinguished Name fields,
+>>>   but identical CA signatures; this example makes use
+>>>   of the target collision.
+>>>
+>>> See http://www.win.tue.nl/hashclash/TargetCollidingCertificates/,
+>>> where the certificates and a more detailed announcement
+>>> can be found.
+>>>
+>>> Marc Stevens
+>>> Arjen Lenstra
+>>> Benne de Weger
+> 
+
+Return-Path: <b.m.m.d.weger@TUE.nl>
+Received: from yxa.extundo.com ([unix socket])
+	by yxa-iv (Cyrus v2.1.18-IPv6-Debian-2.1.18-1+sarge2) with LMTP; Tue, 24 Oct 2006 10:55:48 +0200
+X-Sieve: CMU Sieve 2.2
+Received: from mailhost.tue.nl (mailhost.tue.nl [131.155.2.19])
+	by yxa.extundo.com (8.13.4/8.13.4/Debian-3sarge3) with ESMTP id k9O8te8O005696
+	for <jas@extundo.com>; Tue, 24 Oct 2006 10:55:40 +0200
+Received: from localhost (localhost [127.0.0.1])
+	by mailhost.tue.nl (Postfix) with ESMTP id B6C745C297;
+	Tue, 24 Oct 2006 10:55:39 +0200 (CEST)
+X-Virus-Scanned: ClamAV version 0.88.2, clamav-milter version 0.88.2 on yxa.extundo.com
+X-Virus-Scanned: amavisd-new at tue.nl
+Received: from mailhost.tue.nl ([131.155.2.19])
+	by localhost (pastinakel.tue.nl [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 84pZYnFvD8HO; Tue, 24 Oct 2006 10:55:39 +0200 (CEST)
+Received: from EXCHANGE3.campus.tue.nl (xserver3.campus.tue.nl [131.155.6.6])
+	by mailhost.tue.nl (Postfix) with ESMTP id 1CFE55C293;
+	Tue, 24 Oct 2006 10:55:39 +0200 (CEST)
+X-MimeOLE: Produced By Microsoft Exchange V6.5
+Content-class: urn:content-classes:message
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Subject: RE: target collisions and colliding certificates with different identities
+Date: Tue, 24 Oct 2006 10:55:38 +0200
+Message-ID: <DFA3206A564B80499B87B89B49BCD3135DC263@EXCHANGE3.campus.tue.nl>
+In-Reply-To: <87d58igqmo.fsf@latte.josefsson.org>
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+Thread-Topic: target collisions and colliding certificates with different identities
+Thread-Index: Acb3N816trM39dt6Tmef1RZSgSRhMQAEdpog
+From: "Weger, B.M.M. de" <b.m.m.d.weger@TUE.nl>
+To: "Simon Josefsson" <jas@extundo.com>
+Cc: "Stevens, M.M.J." <M.M.J.Stevens@student.tue.nl>,
+        "Arjen Lenstra" <arjen.lenstra@epfl.ch>
+X-Spam-Status: No, score=-2.5 required=5.0 tests=AWL,BAYES_00 autolearn=ham 
+	version=3.1.1
+X-Spam-Checker-Version: SpamAssassin 3.1.1 (2006-03-10) on yxa-iv
+X-Virus-Status: Clean
+Lines: 123
+Xref: localhost.localdomain rsa-md5:5
+
+Hi Simon,
+
+When your software rejects any MD5 certificate I don't see why
+you would use our colliding ones, doesn't it mean that you'll=20
+have more explaining to do?
+But when you want it this way, it's fine with me too.
+
+Grtz,
+Benne
+
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+Technische Universiteit Eindhoven
+Coding & Crypto Groep
+Faculteit Wiskunde en Informatica
+Den Dolech 2
+Postbus 513
+5600 MB Eindhoven
+kamer:  HG 9.84
+tel.:   (040) 247 2704, bgg 5141
+e-mail: b.m.m.d.weger@tue.nl
+www:    http://www.win.tue.nl/~bdeweger
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+
+ =20
+
+> -----Original Message-----
+> From: Simon Josefsson [mailto:jas@extundo.com]=20
+> Sent: dinsdag 24 oktober 2006 8:44
+> To: Arjen Lenstra
+> Cc: Weger, B.M.M. de; Stevens, M.M.J.
+> Subject: Re: target collisions and colliding certificates=20
+> with different identities
+>=20
+> "Arjen Lenstra" <arjen.lenstra@epfl.ch> writes:
+>=20
+> > Hi,
+> > Thanks!
+> > I can't speak for my coauthors, but it's all fine with me, though I
+> > find the year in your proposed copyright statement a bit odd (I
+> > would have expected 2006). There are no more authros involved.
+>=20
+> Thanks.  Duh, I meant 2006, of course.  I'd appreciate if Marc and
+> Benne also replied.
+>=20
+> /Simon
+>=20
+> > best regards, Arjen Lenstra
+> >
+> > ----------------
+> > Arjen K. Lenstra   a k l @ e p f l . c h
+> > EPFL IC LACAL
+> > INJ 330 (B=E2timent INJ)
+> > Station 14
+> > CH-1015 Lausanne, Switzerland
+> > T=E9l: + 41 21 693 8101
+> > Fax: + 41 21 693 7550
+> > =20
+> > =20
+> >
+> > -----Original Message-----
+> > From: Simon Josefsson [mailto:jas@extundo.com]=20
+> > Sent: Tuesday, October 24, 2006 8:28 AM
+> > To: Weger, B.M.M. de; m.m.j.stevens@student.tue.nl; Arjen Lenstra
+> > Subject: Re: target collisions and colliding certificates=20
+> with different identities
+> >
+> > Great work, thanks!
+> >
+> > I'd like to include your certificates in GnuTLS, a TLS=20
+> implementation
+> > that supports X.509, as self-tests of the certificate=20
+> verification
+> > logic.  Is this OK with you?
+> >
+> > Btw, Gnutls rejected the certificates, we already disable MD5 for
+> > verification purposes. :)
+> >
+> > For our legal department, I'd like a clarification of the license on
+> > the data, would you agree to release the certificates under the
+> > following license?
+> >
+> >      Copyright (c) 1996 Marc Stevens, Arjen K. Lenstra,=20
+> Benne de Weger
+> >
+> >      Copying and distribution of this file, with or without=20
+> modification,
+> >      are permitted in any medium without royalty provided=20
+> the copyright
+> >      notice and this notice are preserved.
+> >
+> > Also, if any other authors contributed, they would have to agree to
+> > this license as well.  Are there other authors?
+> >
+> > Best regards, and thanks in advance,
+> > Simon
+> >
+> > "Weger, B.M.M. de" <b.m.m.d.weger@TUE.nl> writes:
+> >
+> >> Hi all,
+> >>
+> >> We announce:
+> >> - an example of a target collision for MD5; this means:=20
+> >>   for two chosen messages m1 and m2 we have constructed=20
+> >>   appendages b1 and b2 to make the messages collide=20
+> >>   under MD5, i.e. MD5(m1||b1) =3D MD5(m2||b2);
+> >>   said differently: we can cause an MD5 collision for=20
+> >>   any pair of distinct IHVs;
+> >> - an example of a pair of valid, unsuspicious X.509=20
+> >>   certificates with distinct Distinguished Name fields,=20
+> >>   but identical CA signatures; this example makes use=20
+> >>   of the target collision.
+> >>
+> >> See http://www.win.tue.nl/hashclash/TargetCollidingCertificates/,
+> >> where the certificates and a more detailed announcement=20
+> >> can be found.
+> >>
+> >> Marc Stevens
+> >> Arjen Lenstra
+> >> Benne de Weger
+>=20
+
+----------------------------------------------------------------------
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.

@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_export_ecc_x962} (gnutls_pubkey_t @var{key}, gnutls_datum_t * @var{parameters}, gnutls_datum_t * @var{ecpoint})
+@var{key}: Holds the public key
+
+@var{parameters}: DER encoding of an ANSI X9.62 parameters
+
+@var{ecpoint}: DER encoding of ANSI X9.62 ECPoint
+
+This function will export the ECC public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.3.0
+@end deftypefun

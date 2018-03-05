@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_set_crl} (gnutls_pkcs12_bag_t @var{bag}, gnutls_x509_crl_t @var{crl})
+@var{bag}: The bag
+
+@var{crl}: the CRL to be copied.
+
+This function will insert the given CRL into the
+bag. This is just a wrapper over @code{gnutls_pkcs12_bag_set_data()} .
+
+@strong{Returns:} the index of the added bag on success, or a negative error code
+on failure.
+@end deftypefun

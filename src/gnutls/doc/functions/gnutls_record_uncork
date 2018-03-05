@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_record_uncork} (gnutls_session_t @var{session}, unsigned int @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{flags}: Could be zero or @code{GNUTLS_RECORD_WAIT} 
+
+This resets the effect of @code{gnutls_record_cork()} , and flushes any pending
+data. If the @code{GNUTLS_RECORD_WAIT}  flag is specified then this
+function will block until the data is sent or a fatal error
+occurs (i.e., the function will retry on @code{GNUTLS_E_AGAIN}  and
+@code{GNUTLS_E_INTERRUPTED} ).
+
+If the flag @code{GNUTLS_RECORD_WAIT}  is not specified and the function
+is interrupted then the @code{GNUTLS_E_AGAIN}  or @code{GNUTLS_E_INTERRUPTED} 
+errors will be returned. To obtain the data left in the corked
+buffer use @code{gnutls_record_check_corked()} .
+
+@strong{Returns:} On success the number of transmitted data is returned, or 
+otherwise a negative error code. 
+
+@strong{Since:} 3.1.9
+@end deftypefun

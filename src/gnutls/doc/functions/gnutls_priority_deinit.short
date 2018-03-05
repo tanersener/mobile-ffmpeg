@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_priority_deinit} (gnutls_priority_t @var{priority_cache})

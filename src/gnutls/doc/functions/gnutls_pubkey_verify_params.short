@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_verify_params} (gnutls_pubkey_t @var{key})

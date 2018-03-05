@@ -1,0 +1,33 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_dn_by_oid} (gnutls_x509_crq_t @var{crq}, const char * @var{oid}, unsigned @var{indx}, unsigned int @var{raw_flag}, void * @var{buf}, size_t * @var{buf_size})
+@var{crq}: should contain a gnutls_x509_crq_t type
+
+@var{oid}: holds an Object Identifier in a null terminated string
+
+@var{indx}: In case multiple same OIDs exist in the RDN, this specifies
+which to get. Use (0) to get the first one.
+
+@var{raw_flag}: If non-zero returns the raw DER data of the DN part.
+
+@var{buf}: a pointer to a structure to hold the name (may be @code{NULL} )
+
+@var{buf_size}: initially holds the size of  @code{buf} 
+
+This function will extract the part of the name of the Certificate
+request subject, specified by the given OID. The output will be
+encoded as described in RFC2253. The output string will be ASCII
+or UTF-8 encoded, depending on the certificate data.
+
+Some helper macros with popular OIDs can be found in gnutls/x509.h
+If raw flag is (0), this function will only return known OIDs as
+text. Other OIDs will be DER encoded, as described in RFC2253 --
+in hex format with a '\#' prefix.  You can check about known OIDs
+using @code{gnutls_x509_dn_oid_known()} .
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is
+not long enough, and in that case the * @code{buf_size} will be
+updated with the required size.  On success 0 is returned.
+@end deftypefun

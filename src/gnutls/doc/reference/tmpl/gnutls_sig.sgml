@@ -1,0 +1,46 @@
+<!-- ##### SECTION Title ##### -->
+gnutls_sig
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### FUNCTION pk_hash_data ##### -->
+<para>
+
+</para>
+
+@pk: 
+@hash: 
+@params: 
+@data: 
+@digest: 
+@Returns: 
+
+
+<!-- ##### FUNCTION pk_prepare_hash ##### -->
+<para>
+
+</para>
+
+@pk: 
+@hash: 
+@output: 
+@Returns: 
+
+

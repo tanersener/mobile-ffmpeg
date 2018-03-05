@@ -1,0 +1,106 @@
+AutoGen Definitions options;
+prog-name     = srptool;
+prog-title    = "GnuTLS SRP tool";
+prog-desc     = "Simple program to create SRP parameters.\n";
+explain       = "";
+detail    = "Simple program that emulates the programs in the Stanford SRP (Secure
+Remote Password) libraries using GnuTLS.  It is intended for use in  places
+where you don't expect SRP authentication to be the used for system users.
+
+In  brief,  to use SRP you need to create two files. These are the password
+file that holds the users and the verifiers associated with  them  and  the
+configuration file to hold the group parameters (called tpasswd.conf).";
+
+short-usage   = "srptool [options]\nsrptool --help for usage instructions.\n";
+
+#include args-std.def
+
+flag = {
+    name      = index;
+    value     = i;
+    arg-type  = number;
+    arg-default = 1;
+    descrip   = "specify the index of the group parameters in tpasswd.conf to use";
+    doc = "";
+};
+
+flag = {
+    name      = username;
+    value     = u;
+    arg-type  = string;
+    descrip   = "specify a username";
+    doc = "";
+};
+
+flag = {
+    name      = passwd;
+    value     = p;
+    arg-type  = string;
+    descrip   = "specify a password file";
+    doc       = "";
+};
+
+flag = {
+    name      = salt;
+    value     = s;
+    arg-type  = number;
+    descrip   = "specify salt size";
+    doc = "";
+};
+
+flag = {
+    name      = verify;
+    descrip   = "just verify the password.";
+    doc       = "Verifies the password provided against the password file.";
+};
+
+flag = {
+    name      = passwd-conf;
+    value     = v;
+    arg-type  = string;
+    descrip   = "specify a password conf file.";
+    doc   = "Specify a filename or a PKCS #11 URL to read the CAs from.";
+};
+
+flag = {
+    name      = create-conf;
+    arg-type  = string;
+    descrip   = "Generate a password configuration file.";
+    doc   = "This generates a password configuration file (tpasswd.conf)
+containing the required for TLS parameters.";
+};
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+    gnutls-cli-debug (1), gnutls-serv (1), srptool (1), psktool (1), certtool (1)
+_EOT_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+To create @file{tpasswd.conf} which holds the g and n values for SRP protocol
+(generator and a large prime), run:
+@example
+$ srptool --create-conf /etc/tpasswd.conf
+@end example
+
+This command will create @file{/etc/tpasswd} and will add user 'test' (you
+will also be prompted for a password). Verifiers are stored by default
+in the way libsrp expects.
+@example
+$ srptool --passwd /etc/tpasswd --passwd-conf /etc/tpasswd.conf -u test
+@end example
+
+
+This command will check against a password. If the password matches
+the one in @file{/etc/tpasswd} you will get an ok.
+@example
+$ srptool --passwd /etc/tpasswd --passwd\-conf /etc/tpasswd.conf --verify -u test
+@end example
+_EOT_;
+};
+

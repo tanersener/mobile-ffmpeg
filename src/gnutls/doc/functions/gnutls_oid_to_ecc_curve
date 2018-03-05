@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {gnutls_ecc_curve_t} {gnutls_oid_to_ecc_curve} (const char * @var{oid})
+@var{oid}: is a curve's OID
+
+
+@strong{Returns:} return a @code{gnutls_ecc_curve_t}  value corresponding to
+the specified OID, or @code{GNUTLS_ECC_CURVE_INVALID}  on error.
+
+@strong{Since:} 3.4.3
+@end deftypefun

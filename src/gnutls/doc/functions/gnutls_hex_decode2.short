@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_hex_decode2} (const gnutls_datum_t * @var{hex_data}, gnutls_datum_t * @var{result})

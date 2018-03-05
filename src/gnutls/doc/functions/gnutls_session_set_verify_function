@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {void} {gnutls_session_set_verify_function} (gnutls_session_t @var{session}, gnutls_certificate_verify_function * @var{func})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{func}: is the callback function
+
+This function sets a callback to be called when peer's certificate
+has been received in order to verify it on receipt rather than
+doing after the handshake is completed. This overrides any callback
+set using @code{gnutls_certificate_set_verify_function()} .
+
+The callback's function prototype is:
+int (*callback)(gnutls_session_t);
+
+If the callback function is provided then gnutls will call it, in the
+handshake, just after the certificate message has been received.
+To verify or obtain the certificate the @code{gnutls_certificate_verify_peers2()} ,
+@code{gnutls_certificate_type_get()} , @code{gnutls_certificate_get_peers()}  functions
+can be used.
+
+The callback function should return 0 for the handshake to continue
+or non-zero to terminate.
+
+@strong{Since:} 3.4.6
+@end deftypefun

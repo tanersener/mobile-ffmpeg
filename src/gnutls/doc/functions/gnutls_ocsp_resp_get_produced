@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {time_t} {gnutls_ocsp_resp_get_produced} (gnutls_ocsp_resp_t @var{resp})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+This function will return the time when the OCSP response was
+signed.
+
+@strong{Returns:} signing time, or (time_t)-1 on error.
+@end deftypefun

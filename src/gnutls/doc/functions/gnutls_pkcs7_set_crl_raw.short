@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs7_set_crl_raw} (gnutls_pkcs7_t @var{pkcs7}, const gnutls_datum_t * @var{crl})

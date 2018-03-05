@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_heartbeat_ping} (gnutls_session_t @var{session}, size_t @var{data_size}, unsigned int @var{max_tries}, unsigned int @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data_size}: is the length of the ping payload.
+
+@var{max_tries}: if flags is @code{GNUTLS_HEARTBEAT_WAIT}  then this sets the number of retransmissions. Use zero for indefinite (until timeout).
+
+@var{flags}: if @code{GNUTLS_HEARTBEAT_WAIT}  then wait for pong or timeout instead of returning immediately.
+
+This function sends a ping to the peer. If the  @code{flags} is set
+to @code{GNUTLS_HEARTBEAT_WAIT}  then it waits for a reply from the peer.
+
+Note that it is highly recommended to use this function with the
+flag @code{GNUTLS_HEARTBEAT_WAIT} , or you need to handle retransmissions
+and timeouts manually.
+
+The total TLS data transmitted as part of the ping message are given by
+the following formula: MAX(16,  @code{data_size} )+@code{gnutls_record_overhead_size()} +3.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.1.2
+@end deftypefun

@@ -1,0 +1,36 @@
+%{
+typedef void (*option_set_func)(gnutls_priority_t);
+%}
+%language=ANSI-C
+%readonly-tables
+struct priority_options_st { const char *name; option_set_func func; };
+%%
+COMPAT, enable_compat
+DUMBFW, enable_dumbfw
+NO_EXTENSIONS, enable_no_extensions
+NO_TICKETS, enable_no_tickets
+NO_ETM, enable_no_etm
+NO_SESSION_HASH, enable_no_ext_master_secret
+STATELESS_COMPRESSION, enable_stateless_compression
+VERIFY_ALLOW_SIGN_RSA_MD5, enable_verify_allow_rsa_md5
+VERIFY_DISABLE_CRL_CHECKS, disable_crl_checks
+SSL3_RECORD_VERSION, enable_ssl3_record_version
+LATEST_RECORD_VERSION, enable_latest_record_version
+VERIFY_ALLOW_X509_V1_CA_CRT, dummy_func
+UNSAFE_RENEGOTIATION, enable_unsafe_renegotiation
+SAFE_RENEGOTIATION, enable_safe_renegotiation
+PARTIAL_RENEGOTIATION, enable_partial_safe_renegotiation
+DISABLE_SAFE_RENEGOTIATION, disable_safe_renegotiation
+FALLBACK_SCSV, enable_fallback_scsv
+DISABLE_WILDCARDS, disable_wildcards
+SERVER_PRECEDENCE, enable_server_precedence
+PROFILE_VERY_WEAK, enable_profile_very_weak
+PROFILE_LOW, enable_profile_low
+PROFILE_LEGACY, enable_profile_legacy
+PROFILE_MEDIUM, enable_profile_medium
+PROFILE_HIGH, enable_profile_high
+PROFILE_ULTRA, enable_profile_ultra
+PROFILE_SUITEB128, enable_profile_suiteb128
+PROFILE_SUITEB192, enable_profile_suiteb192
+NEW_PADDING, dummy_func
+DEBUG_ALLOW_KEY_USAGE_VIOLATIONS, enable_server_key_usage_violations

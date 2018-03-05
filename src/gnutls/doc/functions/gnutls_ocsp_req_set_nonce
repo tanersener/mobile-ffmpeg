@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_set_nonce} (gnutls_ocsp_req_t @var{req}, unsigned int @var{critical}, const gnutls_datum_t * @var{nonce})
+@var{req}: should contain a @code{gnutls_ocsp_req_t}  type
+
+@var{critical}: critical flag, normally false.
+
+@var{nonce}: the nonce data
+
+This function will add an nonce extension to the OCSP request.
+Calling this function multiple times will overwrite values from
+earlier calls.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.
+@end deftypefun

@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_srp_server_get_username} (gnutls_session_t @var{session})
+@var{session}: is a gnutls session
+
+This function will return the username of the peer.  This should
+only be called in case of SRP authentication and in case of a
+server.  Returns NULL in case of an error.
+
+@strong{Returns:} SRP username of the peer, or NULL in case of error.
+@end deftypefun

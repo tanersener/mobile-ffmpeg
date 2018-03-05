@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_session_get_flags} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function will return a series (ORed) of flags, applicable
+for the current session.
+
+This replaces individual informational functions such as
+@code{gnutls_safe_renegotiation_status()} , @code{gnutls_session_ext_master_secret_status()} ,
+etc.
+
+@strong{Returns:} An ORed sequence of flags (see @code{gnutls_session_flags_t} )
+
+@strong{Since:} 3.5.0
+@end deftypefun

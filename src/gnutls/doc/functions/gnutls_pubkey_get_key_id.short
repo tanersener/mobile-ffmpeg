@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_get_key_id} (gnutls_pubkey_t @var{key}, unsigned int @var{flags}, unsigned char * @var{output_data}, size_t * @var{output_data_size})

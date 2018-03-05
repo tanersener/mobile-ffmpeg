@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs12_generate_mac2} (gnutls_pkcs12_t @var{pkcs12}, gnutls_mac_algorithm_t @var{mac}, const char * @var{pass})

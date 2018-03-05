@@ -1,0 +1,29 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_crl_dist_points} (gnutls_x509_crt_t @var{cert}, unsigned int @var{seq}, void * @var{san}, size_t * @var{san_size}, unsigned int * @var{reason_flags}, unsigned int * @var{critical})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{seq}: specifies the sequence number of the distribution point (0 for the first one, 1 for the second etc.)
+
+@var{san}: is the place where the distribution point will be copied to
+
+@var{san_size}: holds the size of ret.
+
+@var{reason_flags}: Revocation reasons. An ORed sequence of flags from @code{gnutls_x509_crl_reason_flags_t} .
+
+@var{critical}: will be non-zero if the extension is marked as critical (may be null)
+
+This function retrieves the CRL distribution points (2.5.29.31),
+contained in the given certificate in the X509v3 Certificate
+Extensions.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  and updates  @code{ret_size} if
+ @code{ret_size} is not enough to hold the distribution point, or the
+type of the distribution point if everything was ok. The type is
+one of the enumerated @code{gnutls_x509_subject_alt_name_t} .  If the
+certificate does not have an Alternative name with the specified
+sequence number then @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is
+returned.
+@end deftypefun

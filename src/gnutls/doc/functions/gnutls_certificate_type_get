@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {gnutls_certificate_type_t} {gnutls_certificate_type_get} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+The certificate type is by default X.509, unless it is negotiated
+as a TLS extension.
+
+@strong{Returns:} the currently used @code{gnutls_certificate_type_t}  certificate
+type.
+@end deftypefun

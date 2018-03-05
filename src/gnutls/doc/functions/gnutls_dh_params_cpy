@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_dh_params_cpy} (gnutls_dh_params_t @var{dst}, gnutls_dh_params_t @var{src})
+@var{dst}: Is the destination parameters, which should be initialized.
+
+@var{src}: Is the source parameters
+
+This function will copy the DH parameters structure from source
+to destination. The destination should be already initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun

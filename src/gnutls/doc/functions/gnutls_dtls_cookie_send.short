@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_dtls_cookie_send} (gnutls_datum_t * @var{key}, void * @var{client_data}, size_t @var{client_data_size}, gnutls_dtls_prestate_st * @var{prestate}, gnutls_transport_ptr_t @var{ptr}, gnutls_push_func @var{push_func})

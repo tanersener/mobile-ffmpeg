@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_get_x509_key} (gnutls_certificate_credentials_t @var{res}, unsigned @var{index}, gnutls_x509_privkey_t * @var{key})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{index}: The index of the key to obtain.
+
+@var{key}: Location to store the key.
+
+Obtains a X.509 private key that has been stored in  @code{res} with one of
+@code{gnutls_certificate_set_x509_key()} , @code{gnutls_certificate_set_key()} ,
+@code{gnutls_certificate_set_x509_key_file()} ,
+@code{gnutls_certificate_set_x509_key_file2()} ,
+@code{gnutls_certificate_set_x509_key_mem()} , or
+@code{gnutls_certificate_set_x509_key_mem2()} . The returned key must be deallocated
+with @code{gnutls_x509_privkey_deinit()}  when no longer needed.
+
+The  @code{index} matches the return value of @code{gnutls_certificate_set_x509_key()}  and friends
+functions, when the @code{GNUTLS_CERTIFICATE_API_V2}  flag is set.
+
+If there is no key with the given index,
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned. If the key with the
+given index is not a X.509 key, @code{GNUTLS_E_INVALID_REQUEST}  is returned.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun

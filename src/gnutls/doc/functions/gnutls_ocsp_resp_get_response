@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_get_response} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{response_type_oid}, gnutls_datum_t * @var{response})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+@var{response_type_oid}: newly allocated output buffer with response type OID
+
+@var{response}: newly allocated output buffer with DER encoded response
+
+This function will extract the response type OID in and the
+response data from an OCSP response.  Normally the
+ @code{response_type_oid} is always "1.3.6.1.5.5.7.48.1.1" which means the
+ @code{response} should be decoded as a Basic OCSP Response, but
+technically other response types could be used.
+
+This function is typically only useful when you want to extract the
+response type OID of an response for diagnostic purposes.
+Otherwise @code{gnutls_ocsp_resp_import()}  will decode the basic OCSP
+response part and the caller need not worry about that aspect.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

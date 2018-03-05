@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_req_init} (gnutls_ocsp_req_t * @var{req})

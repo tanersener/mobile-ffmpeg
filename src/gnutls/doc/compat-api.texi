@@ -1,0 +1,122 @@
+
+@subheading gnutls_global_set_mem_functions
+@anchor{gnutls_global_set_mem_functions}
+@deftypefun {void} {gnutls_global_set_mem_functions} (gnutls_alloc_function @var{alloc_func}, gnutls_alloc_function @var{secure_alloc_func}, gnutls_is_secure_function @var{is_secure_func}, gnutls_realloc_function @var{realloc_func}, gnutls_free_function @var{free_func})
+@var{alloc_func}: it's the default memory allocation function. Like @code{malloc()} .
+
+@var{secure_alloc_func}: This is the memory allocation function that will be used for sensitive data.
+
+@var{is_secure_func}: a function that returns 0 if the memory given is not secure. May be NULL.
+
+@var{realloc_func}: A realloc function
+
+@var{free_func}: The function that frees allocated data. Must accept a NULL pointer.
+
+
+@strong{Deprecated:} since 3.3.0 it is no longer possible to replace the internally used 
+memory allocation functions
+
+This is the function where you set the memory allocation functions
+gnutls is going to use. By default the libc's allocation functions
+(@code{malloc()} , @code{free()} ), are used by gnutls, to allocate both sensitive
+and not sensitive data.  This function is provided to set the
+memory allocation functions to something other than the defaults
+
+This function must be called before @code{gnutls_global_init()}  is called.
+This function is not thread safe.
+@end deftypefun
+
+@subheading gnutls_openpgp_privkey_sign_hash
+@anchor{gnutls_openpgp_privkey_sign_hash}
+@deftypefun {int} {gnutls_openpgp_privkey_sign_hash} (gnutls_openpgp_privkey_t @var{key}, const gnutls_datum_t * @var{hash}, gnutls_datum_t * @var{signature})
+@var{key}: Holds the key
+
+@var{hash}: holds the data to be signed
+
+@var{signature}: will contain newly allocated signature
+
+This function will sign the given hash using the private key.  You
+should use @code{gnutls_openpgp_privkey_set_preferred_key_id()}  before
+calling this function to set the subkey to use.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Deprecated:} Use @code{gnutls_privkey_sign_hash()}  instead.
+@end deftypefun
+
+@subheading gnutls_x509_crl_sign
+@anchor{gnutls_x509_crl_sign}
+@deftypefun {int} {gnutls_x509_crl_sign} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_t @var{issuer}, gnutls_x509_privkey_t @var{issuer_key})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{issuer}: is the certificate of the certificate issuer
+
+@var{issuer_key}: holds the issuer's private key
+
+This function is the same a @code{gnutls_x509_crl_sign2()}  with no flags, and
+SHA1 as the hash algorithm.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Deprecated:} Use @code{gnutls_x509_crl_privkey_sign()} .
+@end deftypefun
+
+@subheading gnutls_x509_crq_sign
+@anchor{gnutls_x509_crq_sign}
+@deftypefun {int} {gnutls_x509_crq_sign} (gnutls_x509_crq_t @var{crq}, gnutls_x509_privkey_t @var{key})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{key}: holds a private key
+
+This function is the same a @code{gnutls_x509_crq_sign2()}  with no flags,
+and SHA1 as the hash algorithm.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Deprecated:} Use @code{gnutls_x509_crq_privkey_sign()}  instead.
+@end deftypefun
+
+@subheading gnutls_x509_crt_get_preferred_hash_algorithm
+@anchor{gnutls_x509_crt_get_preferred_hash_algorithm}
+@deftypefun {int} {gnutls_x509_crt_get_preferred_hash_algorithm} (gnutls_x509_crt_t @var{crt}, gnutls_digest_algorithm_t *           @var{hash}, unsigned int * @var{mand})
+@var{crt}: Holds the certificate
+
+@var{hash}: The result of the call with the hash algorithm used for signature
+
+@var{mand}: If non-zero it means that the algorithm MUST use this hash. May be NULL.
+
+This function will read the certificate and return the appropriate digest
+algorithm to use for signing with this certificate. Some certificates (i.e.
+DSA might not be able to sign without the preferred algorithm).
+
+@strong{Deprecated:} Please use @code{gnutls_pubkey_get_preferred_hash_algorithm()} .
+
+@strong{Returns:} the 0 if the hash algorithm is found. A negative error code is
+returned on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_x509_privkey_sign_hash
+@anchor{gnutls_x509_privkey_sign_hash}
+@deftypefun {int} {gnutls_x509_privkey_sign_hash} (gnutls_x509_privkey_t @var{key}, const gnutls_datum_t * @var{hash}, gnutls_datum_t * @var{signature})
+@var{key}: a key
+
+@var{hash}: holds the data to be signed
+
+@var{signature}: will contain newly allocated signature
+
+This function will sign the given hash using the private key. Do not
+use this function directly unless you know what it is. Typical signing
+requires the data to be hashed and stored in special formats 
+(e.g. BER Digest-Info for RSA).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+Deprecated in: 2.12.0
+@end deftypefun
+

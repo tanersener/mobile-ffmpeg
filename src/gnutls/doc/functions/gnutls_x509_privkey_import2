@@ -1,0 +1,29 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_import2} (gnutls_x509_privkey_t @var{key}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, const char * @var{password}, unsigned int @var{flags})
+@var{key}: The data to store the parsed key
+
+@var{data}: The DER or PEM encoded key.
+
+@var{format}: One of DER or PEM
+
+@var{password}: A password (optional)
+
+@var{flags}: an ORed sequence of gnutls_pkcs_encrypt_flags_t
+
+This function will import the given DER or PEM encoded key, to 
+the native @code{gnutls_x509_privkey_t}  format, irrespective of the
+input format. The input format is auto-detected.
+
+The supported formats are basic unencrypted key, PKCS8, PKCS12,
+and the openssl format.
+
+If the provided key is encrypted but no password was given, then
+@code{GNUTLS_E_DECRYPTION_FAILED}  is returned. Since GnuTLS 3.4.0 this
+function will utilize the PIN callbacks if any.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

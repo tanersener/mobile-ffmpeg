@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {void} {gnutls_handshake_set_private_extensions} (gnutls_session_t @var{session}, int @var{allow})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{allow}: is an integer (0 or 1)
+
+This function will enable or disable the use of private cipher
+suites (the ones that start with 0xFF).  By default or if  @code{allow} is 0 then these cipher suites will not be advertised nor used.
+
+Currently GnuTLS does not include such cipher-suites or
+compression algorithms.
+
+Enabling the private ciphersuites when talking to other than
+gnutls servers and clients may cause interoperability problems.
+@end deftypefun

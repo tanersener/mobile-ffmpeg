@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_req_get_cert_id} (gnutls_ocsp_req_t @var{req}, unsigned @var{indx}, gnutls_digest_algorithm_t * @var{digest}, gnutls_datum_t * @var{issuer_name_hash}, gnutls_datum_t * @var{issuer_key_hash}, gnutls_datum_t * @var{serial_number})

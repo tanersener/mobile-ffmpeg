@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_import_openpgp_raw} (gnutls_privkey_t @var{pkey}, const gnutls_datum_t * @var{data}, gnutls_openpgp_crt_fmt_t @var{format}, const gnutls_openpgp_keyid_t @var{keyid}, const char * @var{password})
+@var{pkey}: The private key
+
+@var{data}: The private key data to be imported
+
+@var{format}: The format of the private key
+
+@var{keyid}: The key id to use (optional)
+
+@var{password}: A password (optional)
+
+This function will import the given private key to the abstract
+@code{gnutls_privkey_t}  type. 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

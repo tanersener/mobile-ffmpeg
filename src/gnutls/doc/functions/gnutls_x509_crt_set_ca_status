@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_ca_status} (gnutls_x509_crt_t @var{crt}, unsigned int @var{ca})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{ca}: true(1) or false(0). Depending on the Certificate authority status.
+
+This function will set the basicConstraints certificate extension.
+Use @code{gnutls_x509_crt_set_basic_constraints()}  if you want to control
+the pathLenConstraint field too.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_init} (unsigned int @var{flags}, const char * @var{deprecated_config_file})
+@var{flags}: An ORed sequence of @code{GNUTLS_PKCS11_FLAG_} *
+
+@var{deprecated_config_file}: either NULL or the location of a deprecated
+configuration file
+
+This function will initialize the PKCS 11 subsystem in gnutls. It will
+read configuration files if @code{GNUTLS_PKCS11_FLAG_AUTO}  is used or allow
+you to independently load PKCS 11 modules using @code{gnutls_pkcs11_add_provider()} 
+if @code{GNUTLS_PKCS11_FLAG_MANUAL}  is specified.
+
+You don't need to call this function since GnuTLS 3.3.0 because it is being called
+during the first request PKCS 11 operation. That call will assume the @code{GNUTLS_PKCS11_FLAG_AUTO} 
+flag. If another flags are required then it must be called independently
+prior to any PKCS 11 operation.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

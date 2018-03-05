@@ -1,0 +1,265 @@
+@node Bibliography
+@unnumbered Bibliography
+
+@table @asis
+
+@item @anchor{CBCATT}[CBCATT]
+Bodo Moeller, "Security of CBC Ciphersuites in SSL/TLS: Problems and
+Countermeasures", 2002, available from
+@url{http://www.openssl.org/~bodo/tls-cbc.txt}.
+
+@item @anchor{GPGH}[GPGH]
+Mike Ashley, "The GNU Privacy Handbook", 2002, available from
+@url{http://www.gnupg.org/gph/en/manual.pdf}.
+
+@item @anchor{GUTPKI}[GUTPKI]
+Peter Gutmann, "Everything you never wanted to know about PKI but were
+forced to find out", Available from
+@url{http://www.cs.auckland.ac.nz/~pgut001/}.
+
+@item @anchor{KEYPIN}[KEYPIN]
+Chris Evans and Chris Palmer, "Public Key Pinning Extension for HTTP", 
+Available from @url{http://tools.ietf.org/html/draft-ietf-websec-key-pinning-01}.
+
+@item @anchor{NISTSP80057}[NISTSP80057]
+NIST Special Publication 800-57, "Recommendation for Key Management -
+Part 1: General (Revised)", March 2007, available from
+@url{http://csrc.nist.gov/publications/nistpubs/800-57/sp800-57-Part1-revised2_Mar08-2007.pdf}.
+
+@item @anchor{RFC7413}[RFC7413]
+Y. Cheng and J. Chu and S. Radhakrishnan and A. Jain, "TCP Fast Open",
+December 2014, Available from
+@url{http://www.ietf.org/rfc/rfc7413.txt}.
+
+@item @anchor{RFC6125}[RFC6125]
+Peter Saint-Andre and Jeff Hodges, "Representation and Verification of Domain-Based Application Service Identity within Internet Public Key Infrastructure Using X.509 (PKIX) Certificates in the Context of Transport Layer Security (TLS)",
+March 2011, Available from
+@url{http://www.ietf.org/rfc/rfc6125.txt}.
+
+@item @anchor{RFC7685}[RFC7685]
+Adam Langley, "A Transport Layer Security (TLS) ClientHello Padding Extension",
+October 2015, Available from
+@url{http://www.ietf.org/rfc/rfc7685.txt}.
+
+@item @anchor{RFC7613}[RFC7613]
+Peter Saint-Andre and Alexey Melnikov, "Preparation, Enforcement, and Comparison of Internationalized Strings Representing Usernames and Passwords",
+August 2015, Available from
+@url{http://www.ietf.org/rfc/rfc7613.txt}.
+
+@item @anchor{RFC2246}[RFC2246]
+Tim Dierks and Christopher Allen, "The TLS Protocol Version 1.0",
+January 1999, Available from
+@url{http://www.ietf.org/rfc/rfc2246.txt}.
+
+@item @anchor{RFC6083}[RFC6083]
+M. Tuexen and R. Seggelmann and E. Rescorla, "Datagram Transport Layer Security (DTLS) for Stream Control Transmission Protocol (SCTP)",
+January 2011, Available from
+@url{http://www.ietf.org/rfc/rfc6083.txt}.
+
+@item @anchor{RFC4418}[RFC4418]
+Ted Krovetz, "UMAC: Message Authentication Code using Universal Hashing",
+March 2006, Available from
+@url{http://www.ietf.org/rfc/rfc4418.txt}.
+
+@item @anchor{RFC4680}[RFC4680]
+S. Santesson, "TLS Handshake Message for Supplemental Data",
+September 2006, Available from
+@url{http://www.ietf.org/rfc/rfc4680.txt}.
+
+@item @anchor{RFC7633}[RFC7633]
+P. Hallam-Baker, "X.509v3 Transport Layer Security (TLS) Feature Extension",
+October 2015, Available from
+@url{http://www.ietf.org/rfc/rfc7633.txt}.
+
+@item @anchor{RFC7919}[RFC7919]
+D. Gillmor, "Negotiated Finite Field Diffie-Hellman Ephemeral Parameters for Transport Layer Security (TLS)",
+August 2016, Available from
+@url{http://www.ietf.org/rfc/rfc7919.txt}.
+
+@item @anchor{RFC4514}[RFC4514]
+Kurt D.  Zeilenga, "Lightweight Directory Access Protocol (LDAP): String Representation of Distinguished Names",
+June 2006, Available from
+@url{http://www.ietf.org/rfc/rfc4513.txt}.
+
+@item @anchor{RFC4346}[RFC4346]
+Tim Dierks and Eric Rescorla, "The TLS Protocol Version 1.1", Match
+2006, Available from @url{http://www.ietf.org/rfc/rfc4346.txt}.
+
+@item @anchor{RFC4347}[RFC4347]
+Eric Rescorla and Nagendra Modadugu, "Datagram Transport Layer Security", April
+2006, Available from @url{http://www.ietf.org/rfc/rfc4347.txt}.
+
+@item @anchor{RFC5246}[RFC5246]
+Tim Dierks and Eric Rescorla, "The TLS Protocol Version 1.2", August
+2008, Available from @url{http://www.ietf.org/rfc/rfc5246.txt}.
+
+@item @anchor{RFC2440}[RFC2440]
+Jon Callas, Lutz Donnerhacke, Hal Finney and Rodney Thayer, "OpenPGP
+Message Format", November 1998, Available from
+@url{http://www.ietf.org/rfc/rfc2440.txt}.
+
+@item @anchor{RFC4880}[RFC4880]
+Jon Callas, Lutz Donnerhacke, Hal Finney, David Shaw and Rodney
+Thayer, "OpenPGP Message Format", November 2007, Available from
+@url{http://www.ietf.org/rfc/rfc4880.txt}.
+
+@item @anchor{RFC4211}[RFC4211]
+J. Schaad, "Internet X.509 Public Key Infrastructure Certificate
+Request Message Format (CRMF)", September 2005, Available from
+@url{http://www.ietf.org/rfc/rfc4211.txt}.
+
+@item @anchor{RFC2817}[RFC2817]
+Rohit Khare and Scott Lawrence, "Upgrading to TLS Within HTTP/1.1",
+May 2000, Available from @url{http://www.ietf.org/rfc/rfc2817.txt}
+
+@item @anchor{RFC2818}[RFC2818]
+Eric Rescorla, "HTTP Over TLS", May 2000, Available from
+@url{http://www.ietf/rfc/rfc2818.txt}.
+
+@item @anchor{RFC2945}[RFC2945]
+Tom Wu, "The SRP Authentication and Key Exchange System", September
+2000, Available from @url{http://www.ietf.org/rfc/rfc2945.txt}.
+
+@item @anchor{RFC7301}[RFC7301]
+S. Friedl, A. Popov, A. Langley, E. Stephan, "Transport Layer Security (TLS) Application-Layer Protocol Negotiation Extension",
+July 2014, Available from @url{http://www.ietf.org/rfc/rfc7301.txt}.
+
+@item @anchor{RFC2986}[RFC2986]
+Magnus Nystrom and Burt Kaliski, "PKCS 10 v1.7: Certification Request
+Syntax Specification", November 2000, Available from
+@url{http://www.ietf.org/rfc/rfc2986.txt}.
+
+@item @anchor{PKIX}[PKIX]
+D. Cooper, S. Santesson, S. Farrel, S. Boeyen, R. Housley, W. Polk,
+"Internet X.509 Public Key Infrastructure Certificate and Certificate
+Revocation List (CRL) Profile", May 2008, available from
+@url{http://www.ietf.org/rfc/rfc5280.txt}.
+
+@item @anchor{RFC3749}[RFC3749]
+Scott Hollenbeck, "Transport Layer Security Protocol Compression
+Methods", May 2004, available from
+@url{http://www.ietf.org/rfc/rfc3749.txt}.
+
+@item @anchor{RFC3820}[RFC3820]
+Steven Tuecke, Von Welch, Doug Engert, Laura Pearlman, and Mary
+Thompson, "Internet X.509 Public Key Infrastructure (PKI) Proxy
+Certificate Profile", June 2004, available from
+@url{http://www.ietf.org/rfc/rfc3820}.
+
+@item @anchor{RFC6520}[RFC6520]
+R. Seggelmann, M. Tuexen, and M. Williams, "Transport Layer Security (TLS) and
+Datagram Transport Layer Security (DTLS) Heartbeat Extension", February 2012, available from
+@url{http://www.ietf.org/rfc/rfc6520}.
+
+
+@item @anchor{RFC5746}[RFC5746]
+E. Rescorla, M. Ray, S. Dispensa, and N. Oskov, "Transport Layer
+Security (TLS) Renegotiation Indication Extension", February 2010,
+available from @url{http://www.ietf.org/rfc/rfc5746}.
+
+@item @anchor{RFC5280}[RFC5280]
+D. Cooper, S. Santesson, S. Farrell, S. Boeyen, R. Housley, and
+W. Polk, "Internet X.509 Public Key Infrastructure Certificate and
+Certificate Revocation List (CRL) Profile", May 2008, available from
+@url{http://www.ietf.org/rfc/rfc5280}.
+
+@item @anchor{TLSTKT}[TLSTKT]
+Joseph Salowey, Hao Zhou, Pasi Eronen, Hannes Tschofenig, "Transport
+Layer Security (TLS) Session Resumption without Server-Side State",
+January 2008, available from @url{http://www.ietf.org/rfc/rfc5077}.
+
+@item @anchor{PKCS12}[PKCS12]
+RSA Laboratories, "PKCS 12 v1.0: Personal Information Exchange
+Syntax", June 1999, Available from @url{http://www.rsa.com}.
+
+@item @anchor{PKCS11}[PKCS11]
+RSA Laboratories, "PKCS #11 Base Functionality v2.30: Cryptoki – Draft 4",
+July 2009, Available from @url{http://www.rsa.com}.
+
+@item @anchor{RESCORLA}[RESCORLA]
+Eric Rescorla, "SSL and TLS: Designing and Building Secure Systems",
+2001
+
+@item @anchor{SELKEY}[SELKEY]
+Arjen Lenstra and Eric Verheul, "Selecting Cryptographic Key Sizes",
+2003, available from @url{http://www.win.tue.nl/~klenstra/key.pdf}.
+
+@item @anchor{SSL3}[SSL3]
+Alan Freier, Philip Karlton and Paul Kocher, "The Secure Sockets Layer (SSL) Protocol Version 3.0",
+August 2011, Available from @url{http://www.ietf.org/rfc/rfc6101.txt}.
+
+@item @anchor{STEVENS}[STEVENS]
+Richard Stevens, "UNIX Network Programming, Volume 1", Prentice Hall
+PTR, January 1998
+
+@item @anchor{TLSEXT}[TLSEXT]
+Simon Blake-Wilson, Magnus Nystrom, David Hopwood, Jan Mikkelsen and
+Tim Wright, "Transport Layer Security (TLS) Extensions", June 2003,
+Available from @url{http://www.ietf.org/rfc/rfc3546.txt}.
+
+@item @anchor{TLSPGP}[TLSPGP]
+Nikos Mavrogiannopoulos, "Using OpenPGP keys for TLS authentication",
+January 2011. Available from
+@url{http://www.ietf.org/rfc/rfc6091.txt}.
+
+@item @anchor{TLSSRP}[TLSSRP]
+David Taylor, Trevor Perrin, Tom Wu and Nikos Mavrogiannopoulos,
+"Using SRP for TLS Authentication", November 2007. Available from
+@url{http://www.ietf.org/rfc/rfc5054.txt}.
+
+@item @anchor{TLSPSK}[TLSPSK]
+Pasi Eronen and Hannes Tschofenig, "Pre-shared key Ciphersuites for
+TLS", December 2005, Available from
+@url{http://www.ietf.org/rfc/rfc4279.txt}.
+
+@item @anchor{TOMSRP}[TOMSRP]
+Tom Wu, "The Stanford SRP Authentication Project", Available at
+@url{http://srp.stanford.edu/}.
+
+@item @anchor{WEGER}[WEGER]
+Arjen Lenstra and Xiaoyun Wang and Benne de Weger, "Colliding X.509
+Certificates", Cryptology ePrint Archive, Report 2005/067, Available
+at @url{http://eprint.iacr.org/}.
+
+@item @anchor{ECRYPT}[ECRYPT]
+European Network of Excellence in Cryptology II, "ECRYPT II Yearly
+Report on Algorithms and Keysizes (2009-2010)", Available
+at @url{http://www.ecrypt.eu.org/documents/D.SPA.13.pdf}.
+
+@item @anchor{RFC5056}[RFC5056]
+N. Williams, "On the Use of Channel Bindings to Secure Channels",
+November 2007, available from @url{http://www.ietf.org/rfc/rfc5056}.
+
+@item @anchor{RFC5929}[RFC5929]
+J. Altman, N. Williams, L. Zhu, "Channel Bindings for TLS", July 2010,
+available from @url{http://www.ietf.org/rfc/rfc5929}.
+
+@item @anchor{PKCS11URI}[PKCS11URI]
+J. Pechanec, D. Moffat, "The PKCS#11 URI Scheme", April 2015,
+available from @url{http://www.ietf.org/rfc/rfc7512}.
+
+@item @anchor{TPMURI}[TPMURI]
+C. Latze, N. Mavrogiannopoulos, "The TPMKEY URI Scheme", January 2013,
+Work in progress, available from @url{http://tools.ietf.org/html/draft-mavrogiannopoulos-tpmuri-01}.
+
+@item @anchor{ANDERSON}[ANDERSON]
+R. J. Anderson, "Security Engineering: A Guide to Building Dependable Distributed Systems", 
+John Wiley \& Sons, Inc., 2001.
+
+@item @anchor{RFC4821}[RFC4821]
+M. Mathis, J. Heffner, "Packetization Layer Path MTU Discovery", March 2007,
+available from @url{http://www.ietf.org/rfc/rfc4821.txt}.
+
+@item @anchor{RFC2560}[RFC2560]
+M. Myers et al, "X.509 Internet Public Key Infrastructure Online
+Certificate Status Protocol - OCSP", June 1999, Available from
+@url{http://www.ietf.org/rfc/rfc2560.txt}.
+
+@item @anchor{RIVESTCRL}[RIVESTCRL]
+R. L. Rivest, "Can We Eliminate Certificate Revocation Lists?",
+Proceedings of Financial Cryptography '98; Springer Lecture Notes in
+Computer Science No. 1465 (Rafael Hirschfeld, ed.), February 1998),
+pages 178--183, available from
+@url{http://people.csail.mit.edu/rivest/Rivest-CanWeEliminateCertificateRevocationLists.pdf}.
+
+@end table

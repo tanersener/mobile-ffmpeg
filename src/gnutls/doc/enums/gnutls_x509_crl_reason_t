@@ -1,0 +1,25 @@
+
+
+@c gnutls_x509_crl_reason_t
+@table @code
+@item GNUTLS_@-X509_@-CRLREASON_@-UNSPECIFIED
+Unspecified reason.
+@item GNUTLS_@-X509_@-CRLREASON_@-KEYCOMPROMISE
+Private key compromised.
+@item GNUTLS_@-X509_@-CRLREASON_@-CACOMPROMISE
+CA compromised.
+@item GNUTLS_@-X509_@-CRLREASON_@-AFFILIATIONCHANGED
+Affiliation has changed.
+@item GNUTLS_@-X509_@-CRLREASON_@-SUPERSEDED
+Certificate superseded.
+@item GNUTLS_@-X509_@-CRLREASON_@-CESSATIONOFOPERATION
+Operation has ceased.
+@item GNUTLS_@-X509_@-CRLREASON_@-CERTIFICATEHOLD
+Certificate is on hold.
+@item GNUTLS_@-X509_@-CRLREASON_@-REMOVEFROMCRL
+Will be removed from delta CRL.
+@item GNUTLS_@-X509_@-CRLREASON_@-PRIVILEGEWITHDRAWN
+Privilege withdrawn.
+@item GNUTLS_@-X509_@-CRLREASON_@-AACOMPROMISE
+AA compromised.
+@end table

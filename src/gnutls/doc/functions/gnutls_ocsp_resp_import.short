@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_resp_import} (gnutls_ocsp_resp_t @var{resp}, const gnutls_datum_t * @var{data})

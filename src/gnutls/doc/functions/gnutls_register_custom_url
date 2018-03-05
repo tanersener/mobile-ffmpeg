@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_register_custom_url} (const gnutls_custom_url_st * @var{st})
+@var{st}: A @code{gnutls_custom_url_st}  structure
+
+Register a custom URL. This will affect the following functions:
+@code{gnutls_url_is_supported()} , @code{gnutls_privkey_import_url()} ,
+gnutls_pubkey_import_url, @code{gnutls_x509_crt_import_url()}  
+and all functions that depend on
+them, e.g., @code{gnutls_certificate_set_x509_key_file2()} .
+
+The provided structure and callback functions must be valid throughout
+the lifetime of the process. The registration of an existing URL type
+will fail with @code{GNUTLS_E_INVALID_REQUEST} . Since GnuTLS 3.5.0 this function
+can be used to override the builtin URLs.
+
+This function is not thread safe.
+
+@strong{Returns:} returns zero if the given structure was imported or a negative value otherwise.
+
+@strong{Since:} 3.4.0
+@end deftypefun

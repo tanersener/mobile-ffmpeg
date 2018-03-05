@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_x509_trust_mem} (gnutls_certificate_credentials_t @var{res}, const gnutls_datum_t * @var{ca}, gnutls_x509_crt_fmt_t @var{type})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{ca}: is a list of trusted CAs or a DER certificate
+
+@var{type}: is DER or PEM
+
+This function adds the trusted CAs in order to verify client or
+server certificates. In case of a client this is not required to be
+called if the certificates are not verified using
+@code{gnutls_certificate_verify_peers2()} .  This function may be called
+multiple times.
+
+In case of a server the CAs set here will be sent to the client if
+a certificate request is sent. This can be disabled using
+@code{gnutls_certificate_send_x509_rdn_sequence()} .
+
+@strong{Returns:} the number of certificates processed or a negative error code
+on error.
+@end deftypefun

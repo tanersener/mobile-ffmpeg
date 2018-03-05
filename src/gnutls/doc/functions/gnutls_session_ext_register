@@ -1,0 +1,42 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_ext_register} (gnutls_session_t @var{session}, const char * @var{name}, int @var{type}, gnutls_ext_parse_type_t @var{parse_type}, gnutls_ext_recv_func @var{recv_func}, gnutls_ext_send_func @var{send_func}, gnutls_ext_deinit_data_func @var{deinit_func}, gnutls_ext_pack_func @var{pack_func}, gnutls_ext_unpack_func @var{unpack_func}, unsigned @var{flags})
+@var{session}: the session for which this extension will be set
+
+@var{name}: the name of the extension to register
+
+@var{type}: the numeric id of the extension
+
+@var{parse_type}: the parse type of the extension (see gnutls_ext_parse_type_t)
+
+@var{recv_func}: a function to receive the data
+
+@var{send_func}: a function to send the data
+
+@var{deinit_func}: a function deinitialize any private data
+
+@var{pack_func}: a function which serializes the extension's private data (used on session packing for resumption)
+
+@var{unpack_func}: a function which will deserialize the extension's private data
+
+@var{flags}: must be zero or flags from @code{gnutls_ext_flags_t} 
+
+This function will register a new extension type. The extension will be
+only usable within the registered session. If the extension type
+is already registered then @code{GNUTLS_E_ALREADY_REGISTERED}  will be returned,
+unless the flag @code{GNUTLS_EXT_FLAG_OVERRIDE_INTERNAL}  is specified. The latter
+flag when specified can be used to override certain extensions introduced
+after 3.5.12. It is expected to be used by applications which handle
+custom extensions that are not currently supported in GnuTLS, but direct
+support for them may be added in the future.
+
+Each registered extension can store temporary data into the gnutls_session_t
+structure using @code{gnutls_ext_set_data()} , and they can be retrieved using
+@code{gnutls_ext_get_data()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.5.5
+@end deftypefun

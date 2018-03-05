@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_certificate_set_retrieve_function2} (gnutls_certificate_credentials_t @var{cred}, gnutls_certificate_retrieve_function2 * @var{func})

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_dn_get_rdn_ava} (gnutls_x509_dn_t @var{dn}, int @var{irdn}, int @var{iava}, gnutls_x509_ava_st * @var{ava})

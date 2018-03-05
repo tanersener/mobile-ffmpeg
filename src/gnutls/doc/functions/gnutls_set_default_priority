@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_set_default_priority} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Sets the default priority on the ciphers, key exchange methods,
+macs and compression methods. For more fine-tuning you could
+use @code{gnutls_priority_set_direct()}  or @code{gnutls_priority_set()}  instead.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun

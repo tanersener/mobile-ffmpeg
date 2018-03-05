@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_dn} (gnutls_x509_crt_t @var{cert}, char * @var{buf}, size_t * @var{buf_size})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{buf}: a pointer to a structure to hold the name (may be null)
+
+@var{buf_size}: initially holds the size of  @code{buf} 
+
+This function will copy the name of the Certificate in the provided
+buffer. The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+described in RFC4514. The output string will be ASCII or UTF-8
+encoded, depending on the certificate data.
+
+If  @code{buf} is null then only the size will be filled. 
+
+This function does not output a fully RFC4514 compliant string, if
+that is required see @code{gnutls_x509_crt_get_dn3()} .
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is not
+long enough, and in that case the  @code{buf_size} will be updated
+with the required size. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  if
+the DN does not exist, or another error value on error. On success 0 is returned.
+@end deftypefun

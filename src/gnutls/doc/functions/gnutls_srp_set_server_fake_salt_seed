@@ -1,0 +1,35 @@
+
+
+
+
+@deftypefun {void} {gnutls_srp_set_server_fake_salt_seed} (gnutls_srp_server_credentials_t @var{cred}, const gnutls_datum_t * @var{seed}, unsigned int @var{salt_length})
+@var{cred}: is a @code{gnutls_srp_server_credentials_t}  type
+
+@var{seed}: is the seed data, only needs to be valid until the function
+returns; size of the seed must be greater than zero
+
+@var{salt_length}: is the length of the generated fake salts
+
+This function sets the seed that is used to generate salts for
+invalid (non-existent) usernames.
+
+In order to prevent attackers from guessing valid usernames,
+when a user does not exist gnutls generates a salt and a verifier
+and proceeds with the protocol as usual.
+The authentication will ultimately fail, but the client cannot tell
+whether the username is valid (exists) or invalid.
+
+If an attacker learns the seed, given a salt (which is part of the
+handshake) which was generated when the seed was in use, it can tell
+whether or not the authentication failed because of an unknown username.
+This seed cannot be used to reveal application data or passwords.
+
+ @code{salt_length} should represent the salt length your application uses.
+Generating fake salts longer than 20 bytes is not supported.
+
+By default the seed is a random value, different each time a
+@code{gnutls_srp_server_credentials_t}  is allocated and fake salts are
+16 bytes long.
+
+@strong{Since:} 3.3.0
+@end deftypefun

@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_set_bag} (gnutls_pkcs12_t @var{pkcs12}, gnutls_pkcs12_bag_t @var{bag})
+@var{pkcs12}: should contain a gnutls_pkcs12_t type
+
+@var{bag}: An initialized bag
+
+This function will insert a Bag into the PKCS12 structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

@@ -1,0 +1,157 @@
+@node Shared-key and anonymous authentication
+@section Shared-key and anonymous authentication
+
+In addition to certificate authentication, the TLS protocol may be
+used with password, shared-key and anonymous authentication methods.
+The rest of this chapter discusses details of these methods.
+
+@menu
+* SRP authentication::
+* PSK authentication::
+* Anonymous authentication::
+@end menu
+
+@node SRP authentication
+@subsection SRP authentication
+
+@menu
+* Authentication using SRP::
+* srptool Invocation::             Invoking srptool
+@end menu
+
+@node Authentication using SRP
+@subsubsection Authentication using @acronym{SRP}
+@cindex SRP authentication
+
+@acronym{GnuTLS} supports authentication via the Secure Remote Password 
+or @acronym{SRP} protocol (see @xcite{RFC2945,TOMSRP} for a description).
+The @acronym{SRP} key exchange is an extension to the
+@acronym{TLS} protocol, and it provides an authenticated with a 
+password key exchange. The peers can be identified using a single password, 
+or there can be combinations where the client is authenticated using @acronym{SRP}
+and the server using a certificate.
+
+The advantage of @acronym{SRP} authentication, over other proposed
+secure password authentication schemes, is that @acronym{SRP} is not
+susceptible to off-line dictionary attacks.
+Moreover, SRP does not require the server to hold the user's password.
+This kind of protection is similar to the one used traditionally in the @acronym{UNIX}
+@file{/etc/passwd} file, where the contents of this file did not cause
+harm to the system security if they were revealed.  The @acronym{SRP}
+needs instead of the plain password something called a verifier, which
+is calculated using the user's password, and if stolen cannot be used
+to impersonate the user. 
+@c The Stanford @acronym{SRP} libraries, include a PAM module that synchronizes
+@c the system's users passwords with the @acronym{SRP} password
+@c files. That way @acronym{SRP} authentication could be used for all users
+@c of a system.
+
+Typical conventions in SRP are a password file, called @file{tpasswd} that 
+holds the SRP verifiers (encoded passwords) and another file, @file{tpasswd.conf},
+which holds the allowed SRP parameters.  The included in GnuTLS helper 
+follow those conventions. The srptool program, discussed in the next section
+is a tool to manipulate the SRP parameters.
+
+The implementation in @acronym{GnuTLS} is based on @xcite{TLSSRP}. The
+supported key exchange methods are shown below.
+
+@table @code
+
+@item SRP:
+Authentication using the @acronym{SRP} protocol.
+
+@item SRP_DSS:
+Client authentication using the @acronym{SRP} protocol. Server is
+authenticated using a certificate with DSA parameters.
+
+@item SRP_RSA:
+Client authentication using the @acronym{SRP} protocol. Server is
+authenticated using a certificate with RSA parameters.
+
+@end table
+
+
+@showfuncdesc{gnutls_srp_verifier}
+
+@showfuncB{gnutls_srp_base64_encode2,gnutls_srp_base64_decode2}
+
+@include invoke-srptool.texi
+
+@node PSK authentication
+@subsection PSK authentication
+
+@menu
+* Authentication using PSK::
+* psktool Invocation::             Invoking psktool
+@end menu
+
+@node Authentication using PSK
+@subsubsection Authentication using @acronym{PSK}
+@cindex PSK authentication
+
+Authentication using Pre-shared keys is a method to authenticate using
+usernames and binary keys. This protocol avoids making use of public
+key infrastructure and expensive calculations, thus it is suitable for
+constraint clients.
+
+The implementation in @acronym{GnuTLS} is based on @xcite{TLSPSK}.  
+The supported @acronym{PSK} key exchange methods are:
+
+@table @code
+
+@item PSK:
+Authentication using the @acronym{PSK} protocol.
+
+@item DHE-PSK:
+Authentication using the @acronym{PSK} protocol and Diffie-Hellman key
+exchange.  This method offers perfect forward secrecy.
+
+@item ECDHE-PSK:
+Authentication using the @acronym{PSK} protocol and Elliptic curve Diffie-Hellman key
+exchange.  This method offers perfect forward secrecy.
+
+@item RSA-PSK:
+Authentication using the @acronym{PSK} protocol for the client and an RSA certificate
+for the server.
+
+@end table
+
+
+Helper functions to generate and maintain @acronym{PSK} keys are also included
+in @acronym{GnuTLS}.
+
+@showfuncC{gnutls_key_generate,gnutls_hex_encode,gnutls_hex_decode}
+
+@include invoke-psktool.texi
+
+@node Anonymous authentication
+@subsection Anonymous authentication
+@cindex anonymous authentication
+
+The anonymous key exchange offers encryption without any
+indication of the peer's identity.  This kind of authentication
+is vulnerable to a man in the middle attack, but can be
+used even if there is no prior communication or shared trusted parties 
+with the peer. It is useful to establish a session over which certificate
+authentication will occur in order to hide the indentities of the participants
+from passive eavesdroppers.
+
+Unless in the above case, it is not recommended to use anonymous authentication. 
+In the cases where there is no prior communication with the peers, 
+an alternative with better properties, such as key continuity, is trust on first use
+(see @ref{Verifying a certificate using trust on first use authentication}).
+
+The available key exchange algorithms for anonymous authentication are
+shown below, but note that few public servers support them, and they 
+have to be explicitly enabled.
+
+@table @code
+
+@item ANON_DH:
+This algorithm exchanges Diffie-Hellman parameters.
+
+@item ANON_ECDH:
+This algorithm exchanges elliptic curve Diffie-Hellman parameters. It is more 
+efficient than ANON_DH on equivalent security levels.
+
+@end table

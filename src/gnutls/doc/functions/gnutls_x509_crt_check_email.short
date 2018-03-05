@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_x509_crt_check_email} (gnutls_x509_crt_t @var{cert}, const char * @var{email}, unsigned int @var{flags})

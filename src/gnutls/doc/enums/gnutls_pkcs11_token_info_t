@@ -1,0 +1,15 @@
+
+
+@c gnutls_pkcs11_token_info_t
+@table @code
+@item GNUTLS_@-PKCS11_@-TOKEN_@-LABEL
+The token's label (string)
+@item GNUTLS_@-PKCS11_@-TOKEN_@-SERIAL
+The token's serial number (string)
+@item GNUTLS_@-PKCS11_@-TOKEN_@-MANUFACTURER
+The token's manufacturer (string)
+@item GNUTLS_@-PKCS11_@-TOKEN_@-MODEL
+The token's model (string)
+@item GNUTLS_@-PKCS11_@-TOKEN_@-MODNAME
+The token's module name (string - since 3.4.3)
+@end table

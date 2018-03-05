@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_x509_crl} (gnutls_certificate_credentials_t @var{res}, gnutls_x509_crl_t * @var{crl_list}, int @var{crl_list_size})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{crl_list}: is a list of trusted CRLs. They should have been verified before.
+
+@var{crl_list_size}: holds the size of the crl_list
+
+This function adds the trusted CRLs in order to verify client or
+server certificates.  In case of a client this is not required to
+be called if the certificates are not verified using
+@code{gnutls_certificate_verify_peers2()} .  This function may be called
+multiple times.
+
+@strong{Returns:} number of CRLs processed, or a negative error code on error.
+
+@strong{Since:} 2.4.0
+@end deftypefun

@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {void} {gnutls_certificate_set_verify_limits} (gnutls_certificate_credentials_t @var{res}, unsigned int @var{max_bits}, unsigned int @var{max_depth})
+@var{res}: is a gnutls_certificate_credentials type
+
+@var{max_bits}: is the number of bits of an acceptable certificate (default 8200)
+
+@var{max_depth}: is maximum depth of the verification of a certificate chain (default 5)
+
+This function will set some upper limits for the default
+verification function, @code{gnutls_certificate_verify_peers2()} , to avoid
+denial of service attacks.  You can set them to zero to disable
+limits.
+@end deftypefun

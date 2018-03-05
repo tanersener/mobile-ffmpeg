@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_pk_algorithm_get_name} (gnutls_pk_algorithm_t @var{algorithm})
+@var{algorithm}: is a pk algorithm
+
+Convert a @code{gnutls_pk_algorithm_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified public
+key algorithm, or @code{NULL} .
+@end deftypefun

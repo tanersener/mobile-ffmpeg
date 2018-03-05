@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_mac_info} (gnutls_pkcs12_t @var{pkcs12}, unsigned int * @var{mac}, void * @var{salt}, unsigned int * @var{salt_size}, unsigned int * @var{iter_count}, char ** @var{oid})
+@var{pkcs12}: A pkcs12 type
+
+@var{mac}: the MAC algorithm used as @code{gnutls_mac_algorithm_t} 
+
+@var{salt}: the salt used for string to key (if non-NULL then  @code{salt_size} initially holds its size)
+
+@var{salt_size}: string to key salt size
+
+@var{iter_count}: string to key iteration count
+
+@var{oid}: if non-NULL it will contain an allocated null-terminated variable with the OID
+
+This function will provide information on the MAC algorithm used
+in a PKCS @code{12}  structure. If the structure algorithms
+are unknown the code @code{GNUTLS_E_UNKNOWN_HASH_ALGORITHM}  will be returned,
+and only  @code{oid} , will be set. That is,  @code{oid} will be set on structures
+with a MAC whether supported or not. It must be deinitialized using @code{gnutls_free()} .
+The other variables are only set on supported structures.
+
+@strong{Returns:} @code{GNUTLS_E_INVALID_REQUEST}  if the provided structure doesn't contain a MAC,
+@code{GNUTLS_E_UNKNOWN_HASH_ALGORITHM}  if the structure's MAC isn't supported, or
+another negative error code in case of a failure. Zero on success.
+@end deftypefun

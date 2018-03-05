@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_cipher_get_block_size} (gnutls_cipher_algorithm_t @var{algorithm})
+@var{algorithm}: is an encryption algorithm
+
+
+@strong{Returns:} the block size of the encryption algorithm.
+
+@strong{Since:} 2.10.0
+@end deftypefun

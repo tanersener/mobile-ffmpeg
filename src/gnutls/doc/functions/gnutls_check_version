@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_check_version} (const char * @var{req_version})
+@var{req_version}: version string to compare with, or @code{NULL} .
+
+Check the GnuTLS Library version against the provided string.
+See @code{GNUTLS_VERSION}  for a suitable  @code{req_version} string.
+
+See also @code{gnutls_check_version_numeric()} , which provides this
+functionality as a macro.
+
+@strong{Returns:} Check that the version of the library is at
+minimum the one given as a string in  @code{req_version} and return the
+actual version string of the library; return @code{NULL}  if the
+condition is not met.  If @code{NULL}  is passed to this function no
+check is done and only the version string is returned.
+@end deftypefun

@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_check_crt} (gnutls_ocsp_resp_t @var{resp}, unsigned int @var{indx}, gnutls_x509_crt_t @var{crt})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+@var{indx}: Specifies response number to get. Use (0) to get the first one.
+
+@var{crt}: The certificate to check
+
+This function will check whether the OCSP response
+is about the provided certificate.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.  
+
+@strong{Since:} 3.1.3
+@end deftypefun

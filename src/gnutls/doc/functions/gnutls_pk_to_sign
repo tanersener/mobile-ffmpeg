@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_sign_algorithm_t} {gnutls_pk_to_sign} (gnutls_pk_algorithm_t @var{pk}, gnutls_digest_algorithm_t @var{hash})
+@var{pk}: is a public key algorithm
+
+@var{hash}: a hash algorithm
+
+This function maps public key and hash algorithms combinations
+to signature algorithms.
+
+@strong{Returns:} return a @code{gnutls_sign_algorithm_t}  value, or @code{GNUTLS_SIGN_UNKNOWN}  on error.
+@end deftypefun

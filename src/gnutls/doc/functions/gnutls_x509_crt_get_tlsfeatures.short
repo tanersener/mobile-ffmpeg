@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_tlsfeatures} (gnutls_x509_crt_t @var{crt}, gnutls_x509_tlsfeatures_t @var{features}, unsigned int @var{flags}, unsigned int * @var{critical})

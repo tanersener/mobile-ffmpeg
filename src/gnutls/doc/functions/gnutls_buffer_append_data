@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_buffer_append_data} (gnutls_buffer_t @var{dest}, const void * @var{data}, size_t @var{data_size})
+@var{dest}: the buffer to append to
+
+@var{data}: the data
+
+@var{data_size}: the size of  @code{data} 
+
+Appends the provided  @code{data} to the destination buffer.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun

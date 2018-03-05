@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {size_t} {gnutls_record_discard_queued} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function discards all queued to be sent packets in a TLS or DTLS session.
+These are the packets queued after an interrupted @code{gnutls_record_send()} .
+
+@strong{Returns:} The number of bytes discarded.
+
+@strong{Since:} 3.4.0
+@end deftypefun

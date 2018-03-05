@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_set_crt_raw} (gnutls_pkcs7_t @var{pkcs7}, const gnutls_datum_t * @var{crt})
+@var{pkcs7}: The pkcs7 type
+
+@var{crt}: the DER encoded certificate to be added
+
+This function will add a certificate to the PKCS7 or RFC2630
+certificate set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

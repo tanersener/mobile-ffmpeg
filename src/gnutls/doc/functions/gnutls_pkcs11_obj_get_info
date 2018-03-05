@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_obj_get_info} (gnutls_pkcs11_obj_t @var{obj}, gnutls_pkcs11_obj_info_t @var{itype}, void * @var{output}, size_t * @var{output_size})
+@var{obj}: should contain a @code{gnutls_pkcs11_obj_t}  type
+
+@var{itype}: Denotes the type of information requested
+
+@var{output}: where output will be stored
+
+@var{output_size}: contains the maximum size of the output and will be overwritten with actual
+
+This function will return information about the PKCS11 certificate
+such as the label, id as well as token information where the key is
+stored. When output is text it returns null terminated string
+although  @code{output_size} contains the size of the actual data only.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun

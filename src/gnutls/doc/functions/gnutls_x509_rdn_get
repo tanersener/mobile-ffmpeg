@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_rdn_get} (const gnutls_datum_t * @var{idn}, char * @var{buf}, size_t * @var{buf_size})
+@var{idn}: should contain a DER encoded RDN sequence
+
+@var{buf}: a pointer to a structure to hold the peer's name
+
+@var{buf_size}: holds the size of  @code{buf} 
+
+This function will return the name of the given RDN sequence.  The
+name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in
+RFC4514.
+
+This function does not output a fully RFC4514 compliant string, if
+that is required see @code{gnutls_x509_rdn_get2()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, or
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  is returned and * @code{buf_size} is
+updated if the provided buffer is not long enough, otherwise a
+negative error value.
+@end deftypefun

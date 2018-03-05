@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_trust_list_remove_trust_file} (gnutls_x509_trust_list_t @var{list}, const char * @var{ca_file}, gnutls_x509_crt_fmt_t @var{type})
+@var{list}: The list
+
+@var{ca_file}: A file containing a list of CAs
+
+@var{type}: The format of the certificates
+
+This function will remove the given certificate authorities
+from the trusted list, and add them into a black list when needed. 
+PKCS 11 URLs are also accepted, instead
+of files, by this function.
+
+See also @code{gnutls_x509_trust_list_remove_cas()} .
+
+@strong{Returns:} The number of added elements is returned.
+
+@strong{Since:} 3.1.10
+@end deftypefun

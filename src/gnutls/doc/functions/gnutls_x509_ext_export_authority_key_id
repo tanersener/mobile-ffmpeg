@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_export_authority_key_id} (gnutls_x509_aki_t @var{aki}, gnutls_datum_t * @var{ext})
+@var{aki}: An initialized authority key identifier
+
+@var{ext}: The DER-encoded extension data; must be freed using @code{gnutls_free()} .
+
+This function will convert the provided key identifier to a
+DER-encoded PKIX AuthorityKeyIdentifier extension. 
+The output data in  @code{ext} will be allocated using
+@code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

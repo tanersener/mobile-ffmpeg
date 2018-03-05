@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_aki_deinit} (gnutls_x509_aki_t @var{aki})
+@var{aki}: The authority key identifier type
+
+This function will deinitialize an authority key identifier.
+
+@strong{Since:} 3.3.0
+@end deftypefun

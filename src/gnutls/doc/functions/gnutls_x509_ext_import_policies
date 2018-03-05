@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_policies} (const gnutls_datum_t * @var{ext}, gnutls_x509_policies_t @var{policies}, unsigned int @var{flags})
+@var{ext}: the DER encoded extension data
+
+@var{policies}: A pointer to an initialized policies.
+
+@var{flags}: should be zero
+
+This function will extract the certificate policy extension (2.5.29.32) 
+and store it the provided policies.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{ssize_t} @ref{gnutls_record_recv_seq} (gnutls_session_t @var{session}, void * @var{data}, size_t @var{data_size}, unsigned char * @var{seq})

@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_get_attr} (gnutls_pkcs7_attrs_t @var{list}, unsigned @var{idx}, char ** @var{oid}, gnutls_datum_t * @var{data}, unsigned @var{flags})
+@var{list}: A list of existing attributes or @code{NULL}  for the first one
+
+@var{idx}: the index of the attribute to get
+
+@var{oid}: the OID of the attribute (read-only)
+
+@var{data}: the raw data of the attribute
+
+@var{flags}: zero or @code{GNUTLS_PKCS7_ATTR_ENCODE_OCTET_STRING} 
+
+This function will get a PKCS @code{7}  attribute from the provided list.
+The OID is a constant string, but data will be allocated and must be
+deinitialized by the caller.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned
+if there are no data in the current index.
+
+@strong{Since:} 3.4.2
+@end deftypefun

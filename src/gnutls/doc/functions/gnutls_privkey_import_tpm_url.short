@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_import_tpm_url} (gnutls_privkey_t @var{pkey}, const char * @var{url}, const char * @var{srk_password}, const char * @var{key_password}, unsigned int @var{flags})

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_srp_base64_decode} (const gnutls_datum_t * @var{b64_data}, char * @var{result}, size_t * @var{result_size})

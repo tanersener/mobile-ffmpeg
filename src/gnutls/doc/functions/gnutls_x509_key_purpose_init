@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_key_purpose_init} (gnutls_x509_key_purposes_t * @var{p})
+@var{p}: The key purposes
+
+This function will initialize an alternative names type.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

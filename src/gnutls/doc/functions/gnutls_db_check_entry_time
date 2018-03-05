@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {time_t} {gnutls_db_check_entry_time} (gnutls_datum_t * @var{entry})
+@var{entry}: is a pointer to a @code{gnutls_datum_t}  type.
+
+This function returns the time that this entry was active.
+It can be used for database entry expiration.
+
+@strong{Returns:} The time this entry was created, or zero on error.
+@end deftypefun

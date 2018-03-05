@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_set_number} (gnutls_x509_crl_t @var{crl}, const void * @var{nr}, size_t @var{nr_size})
+@var{crl}: a CRL of type @code{gnutls_x509_crl_t} 
+
+@var{nr}: The CRL number
+
+@var{nr_size}: Holds the size of the nr field.
+
+This function will set the CRL's number extension. This
+is to be used as a unique and monotonic number assigned to
+the CRL by the authority.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.8.0
+@end deftypefun

@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_privkey_generate} (const char * @var{url}, gnutls_pk_algorithm_t @var{pk}, unsigned int @var{bits}, const char * @var{label}, unsigned int @var{flags})
+@var{url}: a token URL
+
+@var{pk}: the public key algorithm
+
+@var{bits}: the security bits
+
+@var{label}: a label
+
+@var{flags}: should be zero
+
+This function will generate a private key in the specified
+by the  @code{url} token. The private key will be generate within
+the token and will not be exportable.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

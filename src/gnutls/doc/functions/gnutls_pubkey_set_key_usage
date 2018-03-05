@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_set_key_usage} (gnutls_pubkey_t @var{key}, unsigned int @var{usage})
+@var{key}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{usage}: an ORed sequence of the GNUTLS_KEY_* elements.
+
+This function will set the key usage flags of the public key. This
+is only useful if the key is to be exported to a certificate or
+certificate request.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

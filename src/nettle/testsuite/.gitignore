@@ -1,0 +1,3 @@
+*.o.d
+/Makefile
+/sha1-huge-test

@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {void} {gnutls_global_set_time_function} (gnutls_time_func @var{time_func})
+@var{time_func}: it's the system time function, a @code{gnutls_time_func()}  callback.
+
+This is the function where you can override the default system time
+function.  The application provided function should behave the same
+as the standard function.
+
+@strong{Since:} 2.12.0
+@end deftypefun

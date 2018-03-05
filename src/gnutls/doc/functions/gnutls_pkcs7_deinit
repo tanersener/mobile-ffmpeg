@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_pkcs7_deinit} (gnutls_pkcs7_t @var{pkcs7})
+@var{pkcs7}: the type to be deinitialized
+
+This function will deinitialize a PKCS7 type.
+@end deftypefun

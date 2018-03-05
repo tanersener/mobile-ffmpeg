@@ -1,0 +1,1 @@
+@item @var{char *} @ref{gnutls_pkcs11_obj_flags_get_str} (unsigned int @var{flags})

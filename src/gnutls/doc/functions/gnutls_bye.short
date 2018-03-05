@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_bye} (gnutls_session_t @var{session}, gnutls_close_request_t @var{how})

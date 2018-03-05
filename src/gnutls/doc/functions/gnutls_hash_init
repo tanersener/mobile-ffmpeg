@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_hash_init} (gnutls_hash_hd_t * @var{dig}, gnutls_digest_algorithm_t @var{algorithm})
+@var{dig}: is a @code{gnutls_hash_hd_t}  type
+
+@var{algorithm}: the hash algorithm to use
+
+This function will initialize an context that can be used to
+produce a Message Digest of data.  This will effectively use the
+current crypto backend in use by gnutls or the cryptographic
+accelerator in use.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun

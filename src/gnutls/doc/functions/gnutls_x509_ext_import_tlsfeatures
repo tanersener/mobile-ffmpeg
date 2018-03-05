@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_tlsfeatures} (const gnutls_datum_t * @var{ext}, gnutls_x509_tlsfeatures_t @var{f}, unsigned int @var{flags})
+@var{ext}: The DER-encoded extension data
+
+@var{f}: The features structure
+
+@var{flags}: zero or @code{GNUTLS_EXT_FLAG_APPEND} 
+
+This function will export the features in the provided DER-encoded
+TLS Features PKIX extension, to a @code{gnutls_x509_tlsfeatures_t}  type.  @code{f} must be initialized.
+
+When the  @code{flags} is set to @code{GNUTLS_EXT_FLAG_APPEND} ,
+then if the  @code{features} structure is empty this function will behave
+identically as if the flag was not set. Otherwise if there are elements 
+in the  @code{features} structure then they will be merged with.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.5.1
+@end deftypefun

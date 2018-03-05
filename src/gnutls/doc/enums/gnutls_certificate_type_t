@@ -1,0 +1,13 @@
+
+
+@c gnutls_certificate_type_t
+@table @code
+@item GNUTLS_@-CRT_@-UNKNOWN
+Unknown certificate type.
+@item GNUTLS_@-CRT_@-X509
+X.509 Certificate.
+@item GNUTLS_@-CRT_@-OPENPGP
+OpenPGP certificate.
+@item GNUTLS_@-CRT_@-RAW
+Raw public key (SubjectPublicKey)
+@end table

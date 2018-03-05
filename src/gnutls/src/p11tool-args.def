@@ -1,0 +1,531 @@
+AutoGen Definitions options;
+prog-name     = p11tool;
+prog-title    = "GnuTLS PKCS #11 tool";
+prog-desc     = "Program to handle PKCS #11 smart cards and security modules.\n";
+detail    = "Program that allows operations on PKCS #11 smart cards
+and security modules. 
+
+To use PKCS #11 tokens with GnuTLS the p11-kit configuration files need to be setup.
+That is create a .module file in /etc/pkcs11/modules with the contents 'module: /path/to/pkcs11.so'.
+Alternatively the configuration file /etc/gnutls/pkcs11.conf has to exist and contain a number
+of lines of the form 'load=/usr/lib/opensc-pkcs11.so'.
+
+You can provide the PIN to be used for the PKCS #11 operations with the environment variables
+GNUTLS_PIN and GNUTLS_SO_PIN.
+";
+
+short-usage   = "p11tool [options] [url]\np11tool --help for usage instructions.\n";
+explain       = "";
+reorder-args;
+argument = "[url]";
+
+flag = {
+    name = token_related_options;
+    documentation;
+    descrip = "Tokens";
+};
+
+flag = {
+    name      = list-tokens;
+    descrip   = "List all available tokens";
+    doc = "";
+};
+
+flag = {
+    name      = list-token-urls;
+    descrip   = "List the URLs available tokens";
+    doc = "This is a more compact version of --list-tokens.";
+};
+
+flag = {
+    name      = list-mechanisms;
+    descrip   = "List all available mechanisms in a token";
+    doc = "";
+};
+
+flag = {
+    name      = initialize;
+    descrip   = "Initializes a PKCS #11 token";
+    doc = "";
+};
+
+flag = {
+    name      = initialize-pin;
+    descrip   = "Initializes/Resets a PKCS #11 token user PIN";
+    doc = "";
+};
+
+flag = {
+    name      = initialize-so-pin;
+    descrip   = "Initializes/Resets a PKCS #11 token security officer PIN";
+    doc = "";
+};
+
+flag = {
+    name      = set-pin;
+    arg-type  = string;
+    descrip   = "Specify the PIN to use on token operations";
+    doc      = "Alternatively the GNUTLS_PIN environment variable may be used.";
+};
+
+flag = {
+    name      = set-so-pin;
+    arg-type  = string;
+    descrip   = "Specify the Security Officer's PIN to use on token initialization";
+    doc      = "Alternatively the GNUTLS_SO_PIN environment variable may be used.";
+};
+
+flag = {
+    name = object_list_related_options;
+    documentation;
+    descrip = "Object listing";
+};
+
+flag = {
+    name      = list-all;
+    descrip   = "List all available objects in a token";
+    doc = "";
+};
+
+flag = {
+    name      = list-all-certs;
+    descrip   = "List all available certificates in a token";
+    doc = "";
+};
+
+flag = {
+    name      = list-certs;
+    descrip   = "List all certificates that have an associated private key";
+    doc = "";
+};
+
+flag = {
+    name      = list-all-privkeys;
+    descrip   = "List all available private keys in a token";
+    doc = "Lists all the private keys in a token that match the specified URL.";
+};
+
+flag = {
+    name      = list-privkeys;
+    aliases   = list-all-privkeys;
+};
+
+flag = {
+    name      = list-keys;
+    aliases   = list-all-privkeys;
+};
+
+flag = {
+    name      = list-all-trusted;
+    descrip   = "List all available certificates marked as trusted";
+    doc = "";
+};
+
+flag = {
+    name      = export;
+    descrip   = "Export the object specified by the URL";
+    doc = "";
+    flags-cant = export-stapled;
+    flags-cant = export-chain;
+    flags-cant = export-pubkey;
+};
+
+flag = {
+    name      = export-stapled;
+    descrip   = "Export the certificate object specified by the URL";
+    doc = "Exports the certificate specified by the URL while including any attached extensions to it.
+Since attached extensions are a p11-kit extension, this option is only
+available on p11-kit registered trust modules.";
+    flags-cant = export;
+    flags-cant = export-chain;
+    flags-cant = export-pubkey;
+};
+
+flag = {
+    name      = export-chain;
+    descrip   = "Export the certificate specified by the URL and its chain of trust";
+    doc = "Exports the certificate specified by the URL and generates its chain of trust based on the stored certificates in the module.";
+    flags-cant = export-stapled;
+    flags-cant = export;
+    flags-cant = export-pubkey;
+};
+
+flag = {
+    name      = export-pubkey;
+    descrip   = "Export the public key for a private key";
+    doc = "Exports the public key for the specified private key";
+    flags-cant = export-stapled;
+    flags-cant = export;
+    flags-cant = export-chain;
+};
+
+flag = {
+    name      = info;
+    descrip   = "List information on an available object in a token";
+    doc = "";
+};
+
+flag = {
+    name      = trusted;
+    aliases   = mark-trusted;
+};
+
+flag = {
+    name      = distrusted;
+    aliases   = mark-distrusted;
+};
+
+flag = {
+    name = keygen_related_options;
+    documentation;
+    descrip = "Key generation";
+};
+
+flag = {
+    name      = generate-rsa;
+    descrip   = "Generate an RSA private-public key pair";
+    doc = "Generates an RSA private-public key pair on the specified token.
+Should be combined with --sec-param or --bits.";
+};
+
+flag = {
+    name      = generate-dsa;
+    descrip   = "Generate a DSA private-public key pair";
+    doc = "Generates a DSA private-public key pair on the specified token.
+Should be combined with --sec-param or --bits.";
+};
+
+flag = {
+    name      = generate-ecc;
+    descrip   = "Generate an ECDSA private-public key pair";
+    doc = "Generates an ECDSA private-public key pair on the specified token.
+Should be combined with --curve, --sec-param or --bits.";
+};
+
+flag = {
+    name      = bits;
+    arg-type  = number;
+    descrip   = "Specify the number of bits for the key generate";
+    doc      = "For applications which have no key-size restrictions the
+--sec-param option is recommended, as the sec-param levels will adapt
+to the acceptable security levels with the new versions of gnutls.";
+};
+
+flag = {
+    name      = curve;
+    arg-type  = string;
+    descrip   = "Specify the curve used for EC key generation";
+    doc      = "Supported values are secp192r1, secp224r1, secp256r1, secp384r1 and secp521r1.";
+};
+
+flag = {
+    name      = sec-param;
+    arg-type  = string;
+    arg-name  = "Security parameter";
+    descrip   = "Specify the security level";
+    doc      = "This is alternative to the bits option. Available options are [low, legacy, medium, high, ultra].";
+};
+
+flag = {
+    name = write_object_related_options;
+    documentation;
+    descrip = "Writing objects";
+};
+
+flag = {
+    name      = set-id;
+    descrip   = "Set the CKA_ID (in hex) for the specified by the URL object";
+    doc = "Modifies or sets the CKA_ID in the specified by the URL object. The ID should be specified in hexadecimal format without a '0x' prefix.";
+    arg-type  = string;
+    flags_cant = write;
+};
+
+flag = {
+    name      = set-label;
+    descrip   = "Set the CKA_LABEL for the specified by the URL object";
+    doc = "Modifies or sets the CKA_LABEL in the specified by the URL object";
+    arg-type  = string;
+    flags_cant = write;
+    flags_cant = set-id;
+};
+
+flag = {
+    name      = write;
+    descrip   = "Writes the loaded objects to a PKCS #11 token";
+    doc = "It can be used to write private, public keys, certificates or secret keys to a token. Must be combined with
+    one of --load-privkey, --load-pubkey, --load-certificate option.";
+};
+
+flag = {
+    name      = delete;
+    descrip   = "Deletes the objects matching the given PKCS #11 URL";
+    doc = "";
+};
+
+flag = {
+    name      = label;
+    arg-type  = string;
+    descrip   = "Sets a label for the write operation";
+    doc       = "";
+};
+
+flag = {
+    name      = id;
+    arg-type  = string;
+    descrip   = "Sets an ID for the write operation";
+    doc       = "Sets the CKA_ID to be set by the write operation. The ID should be specified in hexadecimal format without a '0x' prefix.";
+};
+
+flag = {
+    name      = mark-wrap;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the generated key to be a wrapping key";
+    doc = "Marks the generated key with the CKA_WRAP flag.";
+};
+
+flag = {
+    name      = mark-trusted;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the object to be written as trusted";
+    doc = "Marks the object to be generated/written with the CKA_TRUST flag.";
+    flags_cant = mark-distrusted;
+};
+
+flag = {
+    name      = mark-distrusted;
+    descrip   = "When retrieving objects, it requires the objects to be distrusted (blacklisted)";
+    doc = "Ensures that the objects retrieved have the CKA_X_TRUST flag.
+This is p11-kit trust module extension, thus this flag is only valid with
+p11-kit registered trust modules.";
+    flags_cant = mark-trusted;
+};
+
+flag = {
+    name      = mark-decrypt;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the object to be written for decryption";
+    doc = "Marks the object to be generated/written with the CKA_DECRYPT flag set to true.";
+};
+
+flag = {
+    name      = mark-sign;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the object to be written for signature generation";
+    doc = "Marks the object to be generated/written with the CKA_SIGN flag set to true.";
+};
+
+flag = {
+    name      = mark-ca;
+    disable   = "no";
+    disabled;
+    descrip   = "Marks the object to be written as a CA";
+    doc = "Marks the object to be generated/written with the CKA_CERTIFICATE_CATEGORY as CA.";
+};
+
+flag = {
+    name      = mark-private;
+    disable   = "no";
+    descrip   = "Marks the object to be written as private";
+    doc = "Marks the object to be generated/written with the CKA_PRIVATE flag. The written object will require a PIN to be used.";
+};
+
+flag = {
+    name      = ca;
+    aliases   = mark-ca;
+};
+
+flag = {
+    name      = private;
+    aliases   = mark-private;
+};
+
+flag = {
+    name      = secret-key;
+    arg-type  = string;
+    descrip   = "Provide a hex encoded secret key";
+    doc   = "This secret key will be written to the module if --write is specified.";
+};
+
+flag = {
+    name      = load-privkey;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Private key file to use";
+    doc      = "";
+};
+
+flag = {
+    name      = load-pubkey;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Public key file to use";
+    doc      = "";
+};
+
+flag = {
+    name      = load-certificate;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Certificate file to use";
+    doc      = "";
+};
+
+flag = {
+    name = other_options;
+    documentation;
+    descrip = "Other options";
+};
+
+#define  OUTFILE_OPT   1
+#include args-std.def
+
+flag = {
+    name      = login;
+    descrip   = "Force (user) login to token";
+    disabled;
+    disable   = "no";
+    doc       = "";
+};
+
+flag = {
+    name      = so-login;
+    descrip   = "Force security officer login to token";
+    disabled;
+    disable   = "no";
+    doc       = "Forces login to the token as security officer (admin).";
+};
+
+flag = {
+    name      = admin-login;
+    aliases   = so-login;
+};
+
+flag = {
+    name      = test-sign;
+    descrip   = "Tests the signature operation of the provided object";
+    doc = "It can be used to test the correct operation of the signature operation.
+If both a private and a public key are available this operation will sign and verify
+the signed data.";
+};
+
+flag = {
+    name      = generate-random;
+    descrip   = "Generate random data";
+    arg-type  = number;
+    doc = "Asks the token to generate a number of bytes of random bytes.";
+};
+
+flag = {
+    name      = pkcs8;
+    value     = 8;
+    descrip   = "Use PKCS #8 format for private keys";
+    doc      = "";
+};
+
+flag = {
+    name      = inder;
+    descrip   = "Use DER/RAW format for input";
+    disabled;
+    disable   = "no";
+    doc      = "Use DER/RAW format for input certificates and private keys.";
+};
+
+flag = {
+    name      = inraw;
+    aliases   = inder;
+};
+
+flag = {
+    name      = outder;
+    descrip   = "Use DER format for output certificates, private keys, and DH parameters";
+    disabled;
+    disable   = "no";
+    doc       = "The output will be in DER or RAW format.";
+};
+
+flag = {
+    name      = outraw;
+    aliases   = outder;
+};
+
+flag = {
+    name      = provider;
+    arg-type  = file;
+    descrip   = "Specify the PKCS #11 provider library";
+    doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
+};
+
+flag = {
+    name      = detailed-url;
+    descrip   = "Print detailed URLs";
+    disabled;
+    disable   = "no";
+    doc   = "";
+};
+
+flag = {
+    name      = only-urls;
+    descrip   = "Print a compact listing using only the URLs";
+    doc   = "";
+};
+
+flag = {
+    name      = batch;
+    descrip   = "Disable all interaction with the tool";
+    doc = "In batch mode there will be no prompts, all parameters need to be specified on command line.";
+};
+
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+    certtool (1)
+_EOT_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+To view all tokens in your system use:
+@example
+$ p11tool --list-tokens
+@end example
+
+To view all objects in a token use:
+@example
+$ p11tool --login --list-all "pkcs11:TOKEN-URL"
+@end example
+
+To store a private key and a certificate in a token run:
+@example
+$ p11tool --login --write "pkcs11:URL" --load-privkey key.pem \
+          --label "Mykey"
+$ p11tool --login --write "pkcs11:URL" --load-certificate cert.pem \
+          --label "Mykey"
+@end example
+Note that some tokens require the same label to be used for the certificate
+and its corresponding private key.
+
+To generate an RSA private key inside the token use:
+@example
+$ p11tool --login --generate-rsa --bits 1024 --label "MyNewKey" \
+          --outfile MyNewKey.pub "pkcs11:TOKEN-URL"
+@end example
+The bits parameter in the above example is explicitly set because some
+tokens only support limited choices in the bit length. The output file is the
+corresponding public key. This key can be used to general a certificate
+request with certtool.
+@example
+certtool --generate-request --load-privkey "pkcs11:KEY-URL" \
+   --load-pubkey MyNewKey.pub --outfile request.pem
+@end example
+
+_EOT_;
+};
+

@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_token_set_pin} (const char * @var{token_url}, const char * @var{oldpin}, const char * @var{newpin}, unsigned int @var{flags})
+@var{token_url}: A PKCS @code{11}  URL specifying a token
+
+@var{oldpin}: old user's PIN
+
+@var{newpin}: new user's PIN
+
+@var{flags}: one of @code{gnutls_pin_flag_t} .
+
+This function will modify or set a user's PIN for the given token. 
+If it is called to set a user pin for first time the oldpin must
+be NULL.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

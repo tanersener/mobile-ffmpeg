@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {dane_state_deinit} (dane_state_t @var{s})
+@var{s}: The structure to be deinitialized
+
+This function will deinitialize a DANE query structure.
+@end deftypefun

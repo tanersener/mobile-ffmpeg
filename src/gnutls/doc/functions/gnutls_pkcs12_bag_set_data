@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_set_data} (gnutls_pkcs12_bag_t @var{bag}, gnutls_pkcs12_bag_type_t @var{type}, const gnutls_datum_t * @var{data})
+@var{bag}: The bag
+
+@var{type}: The data's type
+
+@var{data}: the data to be copied.
+
+This function will insert the given data of the given type into
+the bag.
+
+@strong{Returns:} the index of the added bag on success, or a negative
+value on error.
+@end deftypefun

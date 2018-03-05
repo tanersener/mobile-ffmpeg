@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs12_bag_set_crt} (gnutls_pkcs12_bag_t @var{bag}, gnutls_x509_crt_t @var{crt})

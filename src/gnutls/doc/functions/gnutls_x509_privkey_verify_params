@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_verify_params} (gnutls_x509_privkey_t @var{key})
+@var{key}: a key
+
+This function will verify the private key parameters.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

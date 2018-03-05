@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_proxy} (gnutls_x509_crt_t @var{cert}, unsigned int * @var{critical}, int * @var{pathlen}, char ** @var{policyLanguage}, char ** @var{policy}, size_t * @var{sizeof_policy})

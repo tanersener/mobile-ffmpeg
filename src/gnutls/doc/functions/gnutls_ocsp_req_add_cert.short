@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_req_add_cert} (gnutls_ocsp_req_t @var{req}, gnutls_digest_algorithm_t @var{digest}, gnutls_x509_crt_t @var{issuer}, gnutls_x509_crt_t @var{cert})

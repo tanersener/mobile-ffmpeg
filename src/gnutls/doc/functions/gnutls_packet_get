@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {void} {gnutls_packet_get} (gnutls_packet_t @var{packet}, gnutls_datum_t * @var{data}, unsigned char * @var{sequence})
+@var{packet}: is a @code{gnutls_packet_t}  type.
+
+@var{data}: will contain the data present in the  @code{packet} structure (may be @code{NULL} )
+
+@var{sequence}: the 8-bytes of the packet sequence number (may be @code{NULL} )
+
+This function returns the data and sequence number associated with
+the received packet.
+
+@strong{Since:} 3.3.5
+@end deftypefun

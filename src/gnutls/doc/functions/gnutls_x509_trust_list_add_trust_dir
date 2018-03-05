@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_trust_list_add_trust_dir} (gnutls_x509_trust_list_t @var{list}, const char * @var{ca_dir}, const char * @var{crl_dir}, gnutls_x509_crt_fmt_t @var{type}, unsigned int @var{tl_flags}, unsigned int @var{tl_vflags})
+@var{list}: The list
+
+@var{ca_dir}: A directory containing the CAs (optional)
+
+@var{crl_dir}: A directory containing a list of CRLs (optional)
+
+@var{type}: The format of the certificates
+
+@var{tl_flags}: flags from @code{gnutls_trust_list_flags_t} 
+
+@var{tl_vflags}: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
+
+This function will add the given certificate authorities
+to the trusted list. Only directories are accepted by
+this function.
+
+@strong{Returns:} The number of added elements is returned.
+
+@strong{Since:} 3.3.6
+@end deftypefun

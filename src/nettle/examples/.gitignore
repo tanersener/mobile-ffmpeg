@@ -1,0 +1,16 @@
+*.o.d
+/Makefile
+/random-prime
+/rsa-decrypt
+/rsa-encrypt
+/rsa-keygen
+/rsa-sign
+/rsa-verify
+/base16dec
+/base16enc
+/base64dec
+/base64enc
+/ecc-benchmark
+/eratosthenes
+/hogweed-benchmark
+/nettle-benchmark

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_buffer_append_data} (gnutls_buffer_t @var{dest}, const void * @var{data}, size_t @var{data_size})

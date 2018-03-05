@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_verify_seed} (gnutls_privkey_t @var{key}, gnutls_digest_algorithm_t @var{digest}, const void * @var{seed}, size_t @var{seed_size})

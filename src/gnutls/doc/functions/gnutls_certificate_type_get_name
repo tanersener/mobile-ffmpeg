@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_certificate_type_get_name} (gnutls_certificate_type_t           @var{type})
+@var{type}: is a certificate type
+
+Convert a @code{gnutls_certificate_type_t}  type to a string.
+
+@strong{Returns:} a string that contains the name of the specified
+certificate type, or @code{NULL}  in case of unknown types.
+@end deftypefun

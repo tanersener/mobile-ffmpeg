@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crl_dist_points_init} (gnutls_x509_crl_dist_points_t * @var{cdp})

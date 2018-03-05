@@ -1,0 +1,43 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_x509_key_file} (gnutls_certificate_credentials_t @var{res}, const char * @var{certfile}, const char * @var{keyfile}, gnutls_x509_crt_fmt_t @var{type})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{certfile}: is a file that containing the certificate list (path) for
+the specified private key, in PKCS7 format, or a list of certificates
+
+@var{keyfile}: is a file that contains the private key
+
+@var{type}: is PEM or DER
+
+This function sets a certificate/private key pair in the
+gnutls_certificate_credentials_t type.  This function may be
+called more than once, in case multiple keys/certificates exist for
+the server.  For clients that need to send more than its own end
+entity certificate, e.g., also an intermediate CA cert, then the
+ @code{certfile} must contain the ordered certificate chain.
+
+Note that the names in the certificate provided will be considered
+when selecting the appropriate certificate to use (in case of multiple
+certificate/key pairs).
+
+This function can also accept URLs at  @code{keyfile} and  @code{certfile} . In that case it
+will use the private key and certificate indicated by the URLs. Note
+that the supported URLs are the ones indicated by @code{gnutls_url_is_supported()} .
+
+In case the  @code{certfile} is provided as a PKCS @code{11}  URL, then the certificate, and its
+present issuers in the token are imported (i.e., forming the required trust chain).
+
+If that function fails to load the  @code{res} structure is at an undefined state, it must
+not be reused to load other keys or certificates.
+
+Note that, this function by default returns zero on success and a negative value on error.
+Since 3.5.6, when the flag @code{GNUTLS_CERTIFICATE_API_V2}  is set using @code{gnutls_certificate_set_flags()} 
+it returns an index (greater or equal to zero). That index can be used to other functions to refer to the added key-pair.
+
+@strong{Returns:} On success this functions returns zero, and otherwise a negative value on error (see above for modifying that behavior).
+
+@strong{Since:} 3.1.11
+@end deftypefun

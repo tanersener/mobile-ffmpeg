@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crl_get_issuer_dn3} (gnutls_x509_crl_t @var{crl}, gnutls_datum_t * @var{dn}, unsigned @var{flags})

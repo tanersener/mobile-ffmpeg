@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_verify_seed} (gnutls_privkey_t @var{key}, gnutls_digest_algorithm_t @var{digest}, const void * @var{seed}, size_t @var{seed_size})
+@var{key}: should contain a @code{gnutls_privkey_t}  type
+
+@var{digest}: it contains the digest algorithm used for key generation (if applicable)
+
+@var{seed}: the seed of the key to be checked with
+
+@var{seed_size}: holds the size of  @code{seed} 
+
+This function will verify that the given private key was generated from
+the provided seed.
+
+@strong{Returns:} In case of a verification failure @code{GNUTLS_E_PRIVKEY_VERIFICATION_ERROR} 
+is returned, and zero or positive code on success.
+
+@strong{Since:} 3.5.0
+@end deftypefun

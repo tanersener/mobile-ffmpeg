@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_raw_issuer_dn} (gnutls_x509_crt_t @var{cert}, gnutls_datum_t * @var{dn})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{dn}: will hold the starting point of the DN
+
+This function will return a pointer to the DER encoded DN structure
+and the length. This points to allocated data that must be free'd using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.or a negative error code on error.
+@end deftypefun

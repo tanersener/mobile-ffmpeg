@@ -1,0 +1,165 @@
+AutoGen Definitions options;
+prog-name     = tpmtool;
+prog-title    = "GnuTLS TPM tool";
+prog-desc     = "Program to handle TPM as a cryptographic device.\n";
+detail    = "Program that allows handling cryptographic data from the TPM chip.";
+short-usage   = "tpmtool [options]\ntpmtool --help for usage instructions.\n";
+explain       = "";
+
+#define  OUTFILE_OPT   1
+#define  INFILE_OPT   1
+#include args-std.def
+
+flag = {
+    name      = generate-rsa;
+    descrip   = "Generate an RSA private-public key pair";
+    doc = "Generates an RSA private-public key pair in the TPM chip. 
+The key may be stored in file system and protected by a PIN, or stored (registered)
+in the TPM chip flash.";
+};
+
+flag = {
+    name      = register;
+    descrip   = "Any generated key will be registered in the TPM";
+    flags_must = generate-rsa;
+    doc = "";
+};
+
+flag = {
+    name      = signing;
+    descrip   = "Any generated key will be a signing key";
+    flags_must = generate-rsa;
+    flags_cant = legacy;
+    doc = "";
+};
+
+flag = {
+    name      = legacy;
+    descrip   = "Any generated key will be a legacy key";
+    flags_must = generate-rsa;
+    flags_cant = signing;
+    doc = "";
+};
+
+flag = {
+    name      = user;
+    descrip   = "Any registered key will be a user key";
+    flags_must = register;
+    flags_cant = system;
+    doc = "The generated key will be stored in a user specific persistent storage.";
+};
+
+flag = {
+    name      = system;
+    descrip   = "Any registered key will be a system key";
+    flags_must = register;
+    flags_cant = user;
+    doc = "The generated key will be stored in system persistent storage.";
+};
+
+
+flag = {
+    name      = pubkey;
+    arg-type  = string;
+    arg-name  = "url";
+    descrip   = "Prints the public key of the provided key";
+    doc = "";
+};
+
+flag = {
+    name      = list;
+    descrip   = "Lists all stored keys in the TPM";
+    doc = "";
+};
+
+flag = {
+    name      = delete;
+    arg-type  = string;
+    arg-name  = "url";
+    descrip   = "Delete the key identified by the given URL (UUID).";
+    doc      = "";
+};
+
+flag = {
+    name      = test-sign;
+    arg-type  = string;
+    arg-name  = "url";
+    descrip   = "Tests the signature operation of the provided object";
+    doc = "It can be used to test the correct operation of the signature operation.
+This operation will sign and verify the signed data.";
+};
+
+flag = {
+    name      = sec-param;
+    arg-type  = string;
+    arg-name  = "Security parameter";
+    descrip   = "Specify the security level [low, legacy, medium, high, ultra].";
+    doc      = "This is alternative to the bits option. Note however that the
+values allowed by the TPM chip are quantized and given values may be rounded up.";
+};
+
+flag = {
+    name      = bits;
+    arg-type  = number;
+    descrip   = "Specify the number of bits for key generate";
+    doc      = "";
+};
+
+flag = {
+    name      = inder;
+    descrip   = "Use the DER format for keys.";
+    disabled;
+    disable   = "no";
+    doc       = "The input files will be assumed to be in the portable
+DER format of TPM. The default format is a custom format used by various
+TPM tools";
+};
+
+flag = {
+    name      = outder;
+    descrip   = "Use DER format for output keys";
+    disabled;
+    disable   = "no";
+    doc       = "The output will be in the TPM portable DER format.";
+};
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+    p11tool (1), certtool (1)
+_EOT_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+To generate a key that is to be stored in file system use:
+@example
+$ tpmtool --generate-rsa --bits 2048 --outfile tpmkey.pem
+@end example
+
+To generate a key that is to be stored in TPM's flash use:
+@example
+$ tpmtool --generate-rsa --bits 2048 --register --user
+@end example
+
+To get the public key of a TPM key use:
+@example
+$ tpmtool --pubkey tpmkey:uuid=58ad734b-bde6-45c7-89d8-756a55ad1891;storage=user \
+          --outfile pubkey.pem
+@end example
+
+or if the key is stored in the file system:
+@example
+$ tpmtool --pubkey tpmkey:file=tmpkey.pem --outfile pubkey.pem
+@end example
+
+To list all keys stored in TPM use:
+@example
+$ tpmtool --list
+@end example
+_EOT_;
+};
+

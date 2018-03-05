@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_import_privkey} (gnutls_pubkey_t @var{key}, gnutls_privkey_t @var{pkey}, unsigned int @var{usage}, unsigned int @var{flags})

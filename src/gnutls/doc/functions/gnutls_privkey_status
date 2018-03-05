@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_status} (gnutls_privkey_t @var{key})
+@var{key}: Holds the key
+
+Checks the status of the private key token. This function
+is an actual wrapper over @code{gnutls_pkcs11_privkey_status()} , and
+if the private key is a PKCS @code{11}  token it will check whether
+it is inserted or not.
+
+@strong{Returns:} this function will return non-zero if the token 
+holding the private key is still available (inserted), and zero otherwise.
+
+@strong{Since:} 3.1.10
+@end deftypefun

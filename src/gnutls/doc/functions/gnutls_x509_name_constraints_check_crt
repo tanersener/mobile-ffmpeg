@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_x509_name_constraints_check_crt} (gnutls_x509_name_constraints_t @var{nc}, gnutls_x509_subject_alt_name_t @var{type}, gnutls_x509_crt_t @var{cert})
+@var{nc}: the extracted name constraints
+
+@var{type}: the type of the constraint to check (of type gnutls_x509_subject_alt_name_t)
+
+@var{cert}: the certificate to be checked
+
+This function will check the provided certificate names against the constraints in
+ @code{nc} using the RFC5280 rules. It will traverse all the certificate's names and
+alternative names.
+
+Currently this function is limited to DNS
+names and emails (of type @code{GNUTLS_SAN_DNSNAME}  and @code{GNUTLS_SAN_RFC822NAME} ).
+
+@strong{Returns:} zero if the provided name is not acceptable, and non-zero otherwise.
+
+@strong{Since:} 3.3.0
+@end deftypefun

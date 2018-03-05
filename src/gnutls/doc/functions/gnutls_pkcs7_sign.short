@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs7_sign} (gnutls_pkcs7_t @var{pkcs7}, gnutls_x509_crt_t @var{signer}, gnutls_privkey_t @var{signer_key}, const gnutls_datum_t * @var{data}, gnutls_pkcs7_attrs_t @var{signed_attrs}, gnutls_pkcs7_attrs_t @var{unsigned_attrs}, gnutls_digest_algorithm_t @var{dig}, unsigned @var{flags})

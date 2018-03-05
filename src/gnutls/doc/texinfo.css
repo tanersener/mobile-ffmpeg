@@ -1,0 +1,94 @@
+body { 
+	margin: 2%;
+	padding: 0 5%;
+	background: #ffffff;
+}
+h1,h2,h3,h4,h5 {
+    font-weight: bold;
+    padding: 5px 5px 5px 5px;
+    background-color: #c2e0ff;
+    color: #336699;
+}
+h1 {
+    padding: 2em 2em 2em 5%;
+    color: white;
+    background: #336699;
+    text-align: center;
+    letter-spacing: 3px;
+}
+h2 { text-decoration: underline; }
+pre {
+  margin: 0 5%;
+  padding: 0.5em;
+}
+pre.example,pre.verbatim {
+  padding-bottom: 1em;
+
+  border: solid #c2e0ff;
+  background: #f0faff;
+  border-width: 1px 1px 1px 5px;
+  margin: 1em auto;
+  width: 90%;
+}
+
+div.node {
+  margin: 0 -5% 0 -2%;
+  padding: 0.5em 0.5em;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
+}
+dd, li {
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
+}
+div.float {
+
+  margin-bottom: 0.5em;
+  text-align: center;
+}
+
+table {
+  text-align: left;
+  margin-left:auto;
+  margin-right:auto;
+  border-spacing: 7px;
+  width: 50%;
+}
+
+th {
+  padding: 0;
+  color: #336699;
+  background-color: #c2e0ff;
+  border: solid #000000;
+  border-width: 0px;
+  margin: 1em auto;
+  text-align: center;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+td {
+  padding: 0;
+  border: solid #000000;
+  background-color: #f0faff;
+  border-width: 0px;
+  margin: 1em auto;
+  text-align: left;
+  margin-left:auto;
+  margin-right:auto;
+  padding-left: 1em;
+}
+
+dl {
+  text-align: left;
+  margin-left:auto;
+  margin-right:auto;
+  width: 50%;
+
+  padding-left: 1em;
+  border: solid #c2e0ff;
+  background: #f0faff;
+  border-width: 5px 1px 1px 1px;
+  margin: 1em auto;
+}

@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_x509_crl_check_issuer} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_t @var{issuer})

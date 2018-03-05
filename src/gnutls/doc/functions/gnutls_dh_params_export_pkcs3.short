@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_dh_params_export_pkcs3} (gnutls_dh_params_t @var{params}, gnutls_x509_crt_fmt_t @var{format}, unsigned char * @var{params_data}, size_t * @var{params_data_size})

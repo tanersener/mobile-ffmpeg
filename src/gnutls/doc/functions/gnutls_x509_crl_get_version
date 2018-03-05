@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_version} (gnutls_x509_crl_t @var{crl})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+This function will return the version of the specified CRL.
+
+@strong{Returns:} The version number, or a negative error code on error.
+@end deftypefun

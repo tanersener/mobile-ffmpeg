@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_hex_encode} (const gnutls_datum_t * @var{data}, char * @var{result}, size_t * @var{result_size})
+@var{data}: contain the raw data
+
+@var{result}: the place where hex data will be copied
+
+@var{result_size}: holds the size of the result
+
+This function will convert the given data to printable data, using
+the hex encoding, as used in the PSK password files.
+
+Note that the size of the result includes the null terminator.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the buffer given is not
+long enough, or 0 on success.
+@end deftypefun

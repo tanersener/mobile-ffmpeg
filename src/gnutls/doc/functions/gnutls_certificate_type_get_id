@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {gnutls_certificate_type_t} {gnutls_certificate_type_get_id} (const char * @var{name})
+@var{name}: is a certificate type name
+
+The names are compared in a case insensitive way.
+
+@strong{Returns:} a @code{gnutls_certificate_type_t}  for the specified in a
+string certificate type, or @code{GNUTLS_CRT_UNKNOWN}  on error.
+@end deftypefun

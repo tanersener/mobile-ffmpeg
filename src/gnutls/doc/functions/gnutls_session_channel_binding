@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_channel_binding} (gnutls_session_t @var{session}, gnutls_channel_binding_t @var{cbtype}, gnutls_datum_t * @var{cb})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{cbtype}: an @code{gnutls_channel_binding_t}  enumeration type
+
+@var{cb}: output buffer array with data
+
+Extract given channel binding data of the  @code{cbtype} (e.g.,
+@code{GNUTLS_CB_TLS_UNIQUE} ) type.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success,
+@code{GNUTLS_E_UNIMPLEMENTED_FEATURE}  if the  @code{cbtype} is unsupported,
+@code{GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE}  if the data is not
+currently available, or an error code.
+
+@strong{Since:} 2.12.0
+@end deftypefun

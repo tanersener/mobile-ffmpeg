@@ -1,0 +1,11 @@
+
+
+@c dane_match_type_t
+@table @code
+@item DANE_@-MATCH_@-EXACT
+The full content.
+@item DANE_@-MATCH_@-SHA2_@-256
+A SHA-256 hash of the content.
+@item DANE_@-MATCH_@-SHA2_@-512
+A SHA-512 hash of the content.
+@end table

@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_aia_set} (gnutls_x509_aia_t @var{aia}, const char * @var{oid}, unsigned @var{san_type}, const gnutls_datum_t * @var{san})
+@var{aia}: The authority info access
+
+@var{oid}: the type of data.
+
+@var{san_type}: The type of the name (of @code{gnutls_subject_alt_names_t} )
+
+@var{san}: The alternative name data
+
+This function will store the specified alternative name in
+the  @code{aia} type. 
+
+Typically the value for  @code{oid} should be @code{GNUTLS_OID_AD_OCSP} , or
+@code{GNUTLS_OID_AD_CAISSUERS} .
+
+Since version 3.5.7 the @code{GNUTLS_SAN_RFC822NAME} , and @code{GNUTLS_SAN_DNSNAME} ,
+are converted to ACE format when necessary.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0), otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

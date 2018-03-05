@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_tpm_key_list_deinit} (gnutls_tpm_key_list_t @var{list})
+@var{list}: a list of the keys
+
+This function will deinitialize the list of stored keys in the TPM.
+
+@strong{Since:} 3.1.0
+@end deftypefun

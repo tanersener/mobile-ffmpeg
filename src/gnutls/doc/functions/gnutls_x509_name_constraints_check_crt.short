@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_x509_name_constraints_check_crt} (gnutls_x509_name_constraints_t @var{nc}, gnutls_x509_subject_alt_name_t @var{type}, gnutls_x509_crt_t @var{cert})

@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_x509_tlsfeatures_check_crt} (gnutls_x509_tlsfeatures_t @var{feat}, gnutls_x509_crt_t @var{cert})

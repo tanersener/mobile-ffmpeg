@@ -1,0 +1,29 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_subject_alt_name} (gnutls_x509_crt_t @var{crt}, gnutls_x509_subject_alt_name_t @var{type}, const void * @var{data}, unsigned int @var{data_size}, unsigned int @var{flags})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{type}: is one of the gnutls_x509_subject_alt_name_t enumerations
+
+@var{data}: The data to be set
+
+@var{data_size}: The size of data to be set
+
+@var{flags}: GNUTLS_FSAN_SET to clear previous data or GNUTLS_FSAN_APPEND to append. 
+
+This function will set the subject alternative name certificate
+extension. It can set the following types: @code{GNUTLS_SAN_DNSNAME}  as a text string,
+@code{GNUTLS_SAN_RFC822NAME}  as a text string, @code{GNUTLS_SAN_URI}  as a text string,
+@code{GNUTLS_SAN_IPADDRESS}  as a binary IP address (4 or 16 bytes),
+@code{GNUTLS_SAN_OTHERNAME_XMPP}  as a UTF8 string (since 3.5.0).
+
+Since version 3.5.7 the @code{GNUTLS_SAN_RFC822NAME} , @code{GNUTLS_SAN_DNSNAME} , and
+@code{GNUTLS_SAN_OTHERNAME_XMPP}  are converted to ACE format when necessary.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.6.0
+@end deftypefun

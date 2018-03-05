@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_verification_status_print} (unsigned int @var{status}, gnutls_certificate_type_t           @var{type}, gnutls_datum_t * @var{out}, unsigned int @var{flags})
+@var{status}: The status flags to be printed
+
+@var{type}: The certificate type
+
+@var{out}: Newly allocated datum with (0) terminated string.
+
+@var{flags}: should be zero
+
+This function will pretty print the status of a verification
+process -- eg. the one obtained by @code{gnutls_certificate_verify_peers3()} .
+
+The output  @code{out} needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.4
+@end deftypefun

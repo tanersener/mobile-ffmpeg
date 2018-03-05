@@ -1,0 +1,13 @@
+
+
+@c gnutls_pkcs7_sign_flags
+@table @code
+@item GNUTLS_@-PKCS7_@-EMBED_@-DATA
+The signed data will be embedded in the structure.
+@item GNUTLS_@-PKCS7_@-INCLUDE_@-TIME
+The signing time will be included in the structure.
+@item GNUTLS_@-PKCS7_@-INCLUDE_@-CERT
+The signer's certificate will be included in the cert list.
+@item GNUTLS_@-PKCS7_@-WRITE_@-SPKI
+Use the signer's key identifier instead of name.
+@end table

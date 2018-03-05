@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_set_version} (gnutls_x509_crl_t @var{crl}, unsigned int @var{version})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{version}: holds the version number. For CRLv1 crls must be 1.
+
+This function will set the version of the CRL. This
+must be one for CRL version 1, and so on. The CRLs generated
+by gnutls should have a version number of 2.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

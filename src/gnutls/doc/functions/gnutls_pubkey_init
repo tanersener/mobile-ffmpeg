@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_init} (gnutls_pubkey_t * @var{key})
+@var{key}: A pointer to the type to be initialized
+
+This function will initialize a public key.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

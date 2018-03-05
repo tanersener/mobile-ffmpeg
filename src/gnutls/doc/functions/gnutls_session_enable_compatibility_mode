@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {void} {gnutls_session_enable_compatibility_mode} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function can be used to disable certain (security) features in
+TLS in order to maintain maximum compatibility with buggy
+clients. Because several trade-offs with security are enabled,
+if required they will be reported through the audit subsystem.
+
+Normally only servers that require maximum compatibility with
+everything out there, need to call this function.
+
+Note that this function must be called after any call to gnutls_priority
+functions.
+@end deftypefun

@@ -1,0 +1,11 @@
+
+
+@c gnutls_certificate_request_t
+@table @code
+@item GNUTLS_@-CERT_@-IGNORE
+Ignore certificate.
+@item GNUTLS_@-CERT_@-REQUEST
+Request certificate.
+@item GNUTLS_@-CERT_@-REQUIRE
+Require certificate.
+@end table

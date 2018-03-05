@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {void} {gnutls_tdb_set_verify_func} (gnutls_tdb_t @var{tdb}, gnutls_tdb_verify_func @var{verify})
+@var{tdb}: The trust storage
+
+@var{verify}: The verification function
+
+This function will associate a retrieval function with the
+trust storage structure. The function is of the following form.
+
+int gnutls_tdb_verify_func(const char* db_name, const char* host,
+const char* service, const gnutls_datum_t* pubkey);
+
+The verify function should return zero on a match, @code{GNUTLS_E_CERTIFICATE_KEY_MISMATCH} 
+if there is a mismatch and any other negative error code otherwise.
+
+The  @code{db_name} should be used to pass any private data to this function.
+@end deftypefun

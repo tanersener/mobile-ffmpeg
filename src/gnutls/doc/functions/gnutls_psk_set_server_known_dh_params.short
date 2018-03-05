@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_psk_set_server_known_dh_params} (gnutls_psk_server_credentials_t @var{res}, gnutls_sec_param_t @var{sec_param})

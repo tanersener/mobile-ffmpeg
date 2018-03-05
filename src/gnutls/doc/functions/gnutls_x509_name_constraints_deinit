@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_name_constraints_deinit} (gnutls_x509_name_constraints_t @var{nc})
+@var{nc}: The nameconstraints
+
+This function will deinitialize a name constraints type.
+
+@strong{Since:} 3.3.0
+@end deftypefun

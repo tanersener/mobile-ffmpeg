@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_trust_list_verify_crt} (gnutls_x509_trust_list_t @var{list}, gnutls_x509_crt_t * @var{cert_list}, unsigned int @var{cert_list_size}, unsigned int @var{flags}, unsigned int * @var{voutput}, gnutls_verify_output_function @var{func})

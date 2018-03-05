@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_pkcs_schema_get_oid} (unsigned int @var{schema})
+@var{schema}: Holds the PKCS @code{12}  or PBES2 schema (@code{gnutls_pkcs_encrypt_flags_t} )
+
+This function will return the object identifier of the
+PKCS12 or PBES2 schema.
+
+@strong{Returns:} a constrant string or @code{NULL}  on error.
+
+@strong{Since:} 3.4.0
+@end deftypefun

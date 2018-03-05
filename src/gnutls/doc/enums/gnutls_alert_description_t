@@ -1,0 +1,70 @@
+
+
+@c gnutls_alert_description_t
+@table @code
+@item GNUTLS_@-A_@-CLOSE_@-NOTIFY
+Close notify.
+@item GNUTLS_@-A_@-UNEXPECTED_@-MESSAGE
+Unexpected message.
+@item GNUTLS_@-A_@-BAD_@-RECORD_@-MAC
+Bad record MAC.
+@item GNUTLS_@-A_@-DECRYPTION_@-FAILED
+Decryption failed.
+@item GNUTLS_@-A_@-RECORD_@-OVERFLOW
+Record overflow.
+@item GNUTLS_@-A_@-DECOMPRESSION_@-FAILURE
+Decompression failed.
+@item GNUTLS_@-A_@-HANDSHAKE_@-FAILURE
+Handshake failed.
+@item GNUTLS_@-A_@-SSL3_@-NO_@-CERTIFICATE
+No certificate.
+@item GNUTLS_@-A_@-BAD_@-CERTIFICATE
+Certificate is bad.
+@item GNUTLS_@-A_@-UNSUPPORTED_@-CERTIFICATE
+Certificate is not supported.
+@item GNUTLS_@-A_@-CERTIFICATE_@-REVOKED
+Certificate was revoked.
+@item GNUTLS_@-A_@-CERTIFICATE_@-EXPIRED
+Certificate is expired.
+@item GNUTLS_@-A_@-CERTIFICATE_@-UNKNOWN
+Unknown certificate.
+@item GNUTLS_@-A_@-ILLEGAL_@-PARAMETER
+Illegal parameter.
+@item GNUTLS_@-A_@-UNKNOWN_@-CA
+CA is unknown.
+@item GNUTLS_@-A_@-ACCESS_@-DENIED
+Access was denied.
+@item GNUTLS_@-A_@-DECODE_@-ERROR
+Decode error.
+@item GNUTLS_@-A_@-DECRYPT_@-ERROR
+Decrypt error.
+@item GNUTLS_@-A_@-EXPORT_@-RESTRICTION
+Export restriction.
+@item GNUTLS_@-A_@-PROTOCOL_@-VERSION
+Error in protocol version.
+@item GNUTLS_@-A_@-INSUFFICIENT_@-SECURITY
+Insufficient security.
+@item GNUTLS_@-A_@-INTERNAL_@-ERROR
+Internal error.
+@item GNUTLS_@-A_@-INAPPROPRIATE_@-FALLBACK
+Inappropriate fallback,
+@item GNUTLS_@-A_@-USER_@-CANCELED
+User canceled.
+@item GNUTLS_@-A_@-NO_@-RENEGOTIATION
+No renegotiation is allowed.
+@item GNUTLS_@-A_@-UNSUPPORTED_@-EXTENSION
+An unsupported extension was
+sent.
+@item GNUTLS_@-A_@-CERTIFICATE_@-UNOBTAINABLE
+Could not retrieve the
+specified certificate.
+@item GNUTLS_@-A_@-UNRECOGNIZED_@-NAME
+The server name sent was not
+recognized.
+@item GNUTLS_@-A_@-UNKNOWN_@-PSK_@-IDENTITY
+The SRP/PSK username is missing
+or not known.
+@item GNUTLS_@-A_@-NO_@-APPLICATION_@-PROTOCOL
+The ALPN protocol requested is
+not supported by the peer.
+@end table

@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_session_get_flags} (gnutls_session_t @var{session})

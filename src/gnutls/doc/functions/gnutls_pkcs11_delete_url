@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_delete_url} (const char * @var{object_url}, unsigned int @var{flags})
+@var{object_url}: The URL of the object to delete.
+
+@var{flags}: One of GNUTLS_PKCS11_OBJ_* flags
+
+This function will delete objects matching the given URL.
+Note that not all tokens support the delete operation.
+
+@strong{Returns:} On success, the number of objects deleted is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

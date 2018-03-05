@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_certificate_set_verify_limits} (gnutls_certificate_credentials_t @var{res}, unsigned int @var{max_bits}, unsigned int @var{max_depth})

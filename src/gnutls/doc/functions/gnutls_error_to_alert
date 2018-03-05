@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_error_to_alert} (int @var{err}, int * @var{level})
+@var{err}: is a negative integer
+
+@var{level}: the alert level will be stored there
+
+Get an alert depending on the error code returned by a gnutls
+function.  All alerts sent by this function should be considered
+fatal.  The only exception is when  @code{err} is @code{GNUTLS_E_REHANDSHAKE} ,
+where a warning alert should be sent to the peer indicating that no
+renegotiation will be performed.
+
+If there is no mapping to a valid alert the alert to indicate
+internal error is returned.
+
+@strong{Returns:} the alert code to use for a particular error code.
+@end deftypefun

@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {void} {gnutls_dh_set_prime_bits} (gnutls_session_t @var{session}, unsigned int @var{bits})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{bits}: is the number of bits
+
+This function sets the number of bits, for use in a Diffie-Hellman
+key exchange.  This is used both in DH ephemeral and DH anonymous
+cipher suites.  This will set the minimum size of the prime that
+will be used for the handshake.
+
+In the client side it sets the minimum accepted number of bits.  If
+a server sends a prime with less bits than that
+@code{GNUTLS_E_DH_PRIME_UNACCEPTABLE}  will be returned by the handshake.
+
+Note that this function will warn via the audit log for value that
+are believed to be weak.
+
+The function has no effect in server side.
+
+Note that since 3.1.7 this function is deprecated. The minimum
+number of bits is set by the priority string level.
+Also this function must be called after @code{gnutls_priority_set_direct()} 
+or the set value may be overridden by the selected priority options.
+@end deftypefun

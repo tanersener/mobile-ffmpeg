@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {void} {gnutls_dtls_set_timeouts} (gnutls_session_t @var{session}, unsigned int @var{retrans_timeout}, unsigned int @var{total_timeout})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{retrans_timeout}: The time at which a retransmission will occur in milliseconds
+
+@var{total_timeout}: The time at which the connection will be aborted, in milliseconds.
+
+This function will set the timeouts required for the DTLS handshake
+protocol. The retransmission timeout is the time after which a
+message from the peer is not received, the previous messages will
+be retransmitted. The total timeout is the time after which the
+handshake will be aborted with @code{GNUTLS_E_TIMEDOUT} .
+
+The DTLS protocol recommends the values of 1 sec and 60 seconds
+respectively, and these are the default values.
+
+To disable retransmissions set a  @code{retrans_timeout} larger than the  @code{total_timeout} .
+
+@strong{Since:} 3.0
+@end deftypefun

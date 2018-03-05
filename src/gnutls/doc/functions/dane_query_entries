@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {unsigned int} {dane_query_entries} (dane_query_t @var{q})
+@var{q}: The query result structure
+
+This function will return the number of entries in a query.
+
+@strong{Returns:} The number of entries.
+@end deftypefun

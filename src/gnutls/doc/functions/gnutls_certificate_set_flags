@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_certificate_set_flags} (gnutls_certificate_credentials_t @var{res}, unsigned int @var{flags})
+@var{res}: is a gnutls_certificate_credentials_t type
+
+@var{flags}: are the flags of @code{gnutls_certificate_flags}  type
+
+This function will set flags to tweak the operation of
+the credentials structure. See the @code{gnutls_certificate_flags}  enumerations
+for more information on the available flags. 
+
+@strong{Since:} 3.4.7
+@end deftypefun

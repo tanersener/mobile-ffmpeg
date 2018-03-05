@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {time_t} {gnutls_certificate_expiration_time_peers} (gnutls_session_t @var{session})
+@var{session}: is a gnutls session
+
+This function will return the peer's certificate expiration time.
+
+@strong{Returns:} (time_t)-1 on error.
+
+@strong{Deprecated:} @code{gnutls_certificate_verify_peers2()}  now verifies expiration times.
+@end deftypefun

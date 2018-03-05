@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_export} (gnutls_ocsp_resp_t @var{resp}, gnutls_datum_t * @var{data})
+@var{resp}: Holds the OCSP response
+
+@var{data}: newly allocate buffer holding DER encoded OCSP response
+
+This function will export the OCSP response to DER format.
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+@end deftypefun

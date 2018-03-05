@@ -1,0 +1,38 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_verify_peers} (gnutls_session_t @var{session}, gnutls_typed_vdata_st * @var{data}, unsigned int @var{elements}, unsigned int * @var{status})
+@var{session}: is a gnutls session
+
+@var{data}: an array of typed data
+
+@var{elements}: the number of data elements
+
+@var{status}: is the output of the verification
+
+This function will verify the peer's certificate and store the
+status in the  @code{status} variable as a bitwise or'd gnutls_certificate_status_t
+values or zero if the certificate is trusted. Note that value in  @code{status} is set only when the return value of this function is success (i.e, failure 
+to trust a certificate does not imply a negative return value).
+The default verification flags used by this function can be overridden
+using @code{gnutls_certificate_set_verify_flags()} . See the documentation
+of @code{gnutls_certificate_verify_peers2()}  for details in the verification process.
+
+The acceptable  @code{data} types are @code{GNUTLS_DT_DNS_HOSTNAME} , @code{GNUTLS_DT_RFC822NAME}  and @code{GNUTLS_DT_KEY_PURPOSE_OID} .
+The former two accept as data a null-terminated hostname or email address, and the latter a null-terminated
+object identifier (e.g., @code{GNUTLS_KP_TLS_WWW_SERVER} ).
+
+If a DNS hostname is provided then this function will compare
+the hostname in the certificate against the given. If names do not match the 
+@code{GNUTLS_CERT_UNEXPECTED_OWNER}  status flag will be set.
+If a key purpose OID is provided and the end-certificate contains the extended key
+usage PKIX extension, it will be required to be have the provided key purpose 
+or be marked for any purpose, otherwise verification status will have the
+@code{GNUTLS_CERT_SIGNER_CONSTRAINTS_FAILURE}  flag set.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) when the validation is performed, or a negative error code otherwise.
+A sucessful error code means that the  @code{status} parameter must be checked to obtain the validation status.
+
+@strong{Since:} 3.3.0
+@end deftypefun

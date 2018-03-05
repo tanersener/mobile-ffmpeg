@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_export} (gnutls_x509_privkey_t @var{key}, gnutls_x509_crt_fmt_t @var{format}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{key}: Holds the key
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{output_data}: will contain a private key PEM or DER encoded
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will export the private key to a PKCS1 structure for
+RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
+the same format with the parameters used by openssl.
+
+If the buffer provided is not long enough to hold the output, then
+* @code{output_data_size} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER} 
+will be returned.
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN RSA PRIVATE KEY".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

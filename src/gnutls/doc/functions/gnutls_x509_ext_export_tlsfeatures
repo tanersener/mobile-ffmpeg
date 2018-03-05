@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_export_tlsfeatures} (gnutls_x509_tlsfeatures_t @var{f}, gnutls_datum_t * @var{ext})
+@var{f}: The features structure
+
+@var{ext}: The DER-encoded extension data; must be freed using @code{gnutls_free()} .
+
+This function will convert the provided TLS features structure structure to a
+DER-encoded TLS features PKIX extension. The output data in  @code{ext} will be allocated using
+@code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.5.1
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_status} (gnutls_privkey_t @var{key})

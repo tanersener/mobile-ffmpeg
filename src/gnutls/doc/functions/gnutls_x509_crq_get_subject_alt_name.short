@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crq_get_subject_alt_name} (gnutls_x509_crq_t @var{crq}, unsigned int @var{seq}, void * @var{ret}, size_t * @var{ret_size}, unsigned int * @var{ret_type}, unsigned int * @var{critical})

@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_ticket_key_generate} (gnutls_datum_t * @var{key})
+@var{key}: is a pointer to a @code{gnutls_datum_t}  which will contain a newly
+created key.
+
+Generate a random key to encrypt security parameters within
+SessionTicket.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, or an
+error code.
+
+@strong{Since:} 2.10.0
+@end deftypefun

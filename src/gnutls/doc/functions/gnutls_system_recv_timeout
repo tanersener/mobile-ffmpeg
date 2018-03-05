@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_system_recv_timeout} (gnutls_transport_ptr_t @var{ptr}, unsigned int @var{ms})
+@var{ptr}: A gnutls_transport_ptr_t pointer
+
+@var{ms}: The number of milliseconds to wait.
+
+Wait for data to be received from the provided socket ( @code{ptr} ) within a
+timeout period in milliseconds, using @code{select()}  on the provided  @code{ptr} .
+
+This function is provided as a helper for constructing custom
+callbacks for @code{gnutls_transport_set_pull_timeout_function()} ,
+which can be used if you rely on socket file descriptors.
+
+Returns -1 on error, 0 on timeout, positive value if data are available for reading.
+
+@strong{Since:} 3.4.0
+@end deftypefun

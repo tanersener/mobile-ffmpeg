@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_dh_params_import_dsa} (gnutls_dh_params_t @var{dh_params}, gnutls_x509_privkey_t @var{key})
+@var{dh_params}: The parameters
+
+@var{key}: holds a DSA private key
+
+This function will import the prime and generator of the DSA key for use 
+in the Diffie-Hellman key exchange.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun

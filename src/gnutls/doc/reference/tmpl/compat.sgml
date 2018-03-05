@@ -1,0 +1,224 @@
+<!-- ##### SECTION Title ##### -->
+compat
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO GNUTLS_A_MISSING_SRP_USERNAME ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_A_UNKNOWN_SRP_USERNAME ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_OPENPGP_KEY ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_OPENPGP_KEY_FINGERPRINT ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_X509_CRT_FULL ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_X509_CRT_ONELINE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO GNUTLS_X509_CRT_UNSIGNED_FULL ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBGNUTLS_EXTRA_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBGNUTLS_VERSION ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBGNUTLS_VERSION_MAJOR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBGNUTLS_VERSION_MINOR ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBGNUTLS_VERSION_NUMBER ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO LIBGNUTLS_VERSION_PATCH ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### TYPEDEF _GNUTLS_GCC_ATTR_DEPRECATED ##### -->
+<para>
+
+</para>
+
+
+<!-- ##### MACRO gnutls_openpgp_crt_get_id ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_check_hostname ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_deinit ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_export ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_get_creation_time ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_get_expiration_time ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_get_fingerprint ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_get_id ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_get_key_usage ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_get_name ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_get_pk_algorithm ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_get_version ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_import ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_key_init ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### MACRO gnutls_openpgp_send_key ##### -->
+<para>
+
+</para>
+
+
+

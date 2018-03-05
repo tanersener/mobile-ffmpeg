@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_policies_deinit} (gnutls_x509_policies_t @var{policies})
+@var{policies}: The authority key identifier
+
+This function will deinitialize an authority key identifier type.
+
+@strong{Since:} 3.3.0
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_token_get_url} (unsigned int @var{seq}, gnutls_pkcs11_url_type_t @var{detailed}, char ** @var{url})

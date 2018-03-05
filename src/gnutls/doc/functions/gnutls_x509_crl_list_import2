@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_list_import2} (gnutls_x509_crl_t ** @var{crls}, unsigned int * @var{size}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{crls}: Will contain the parsed crl list.
+
+@var{size}: It will contain the size of the list.
+
+@var{data}: The PEM encoded CRL.
+
+@var{format}: One of DER or PEM.
+
+@var{flags}: must be (0) or an OR'd sequence of gnutls_certificate_import_flags.
+
+This function will convert the given PEM encoded CRL list
+to the native gnutls_x509_crl_t format. The output will be stored
+in  @code{crls} .  They will be automatically initialized.
+
+If the Certificate is PEM encoded it should have a header of "X509
+CRL".
+
+@strong{Returns:} the number of certificates read or a negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {size_t} {gnutls_est_record_overhead_size} (gnutls_protocol_t @var{version}, gnutls_cipher_algorithm_t @var{cipher}, gnutls_mac_algorithm_t @var{mac}, gnutls_compression_method_t @var{comp}, unsigned int @var{flags})
+@var{version}: is a @code{gnutls_protocol_t}  value
+
+@var{cipher}: is a @code{gnutls_cipher_algorithm_t}  value
+
+@var{mac}: is a @code{gnutls_mac_algorithm_t}  value
+
+@var{comp}: is a @code{gnutls_compression_method_t}  value
+
+@var{flags}: must be zero
+
+This function will return the set size in bytes of the overhead
+due to TLS (or DTLS) per record.
+
+Note that this function may provide inacurate values when TLS
+extensions that modify the record format are negotiated. In these
+cases a more accurate value can be obtained using @code{gnutls_record_overhead_size()}  
+after a completed handshake.
+
+@strong{Since:} 3.2.2
+@end deftypefun

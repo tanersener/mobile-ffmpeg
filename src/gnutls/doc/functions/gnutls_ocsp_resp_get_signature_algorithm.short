@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_resp_get_signature_algorithm} (gnutls_ocsp_resp_t @var{resp})

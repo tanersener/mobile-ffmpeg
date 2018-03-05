@@ -1,0 +1,1 @@
+@item @var{const char     *} @ref{gnutls_handshake_description_get_name} (gnutls_handshake_description_t         @var{type})

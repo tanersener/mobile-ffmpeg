@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_import_ecc_raw} (gnutls_privkey_t @var{key}, gnutls_ecc_curve_t @var{curve}, const gnutls_datum_t * @var{x}, const gnutls_datum_t * @var{y}, const gnutls_datum_t * @var{k})

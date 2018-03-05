@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_handshake_set_post_client_hello_function} (gnutls_session_t @var{session}, gnutls_handshake_simple_hook_func @var{func})

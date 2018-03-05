@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_ecc_curve_t} {gnutls_ecc_curve_get_id} (const char * @var{name})
+@var{name}: is a curve name
+
+The names are compared in a case insensitive way.
+
+@strong{Returns:} return a @code{gnutls_ecc_curve_t}  value corresponding to
+the specified curve, or @code{GNUTLS_ECC_CURVE_INVALID}  on error.
+
+@strong{Since:} 3.4.3
+@end deftypefun

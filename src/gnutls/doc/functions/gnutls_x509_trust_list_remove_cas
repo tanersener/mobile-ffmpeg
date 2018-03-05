@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_trust_list_remove_cas} (gnutls_x509_trust_list_t @var{list}, const gnutls_x509_crt_t * @var{clist}, unsigned @var{clist_size})
+@var{list}: The list
+
+@var{clist}: A list of CAs
+
+@var{clist_size}: The length of the CA list
+
+This function will remove the given certificate authorities
+from the trusted list.
+
+Note that this function can accept certificates and authorities
+not yet known. In that case they will be kept in a separate
+black list that will be used during certificate verification.
+Unlike @code{gnutls_x509_trust_list_add_cas()}  there is no deinitialization
+restriction for  certificate list provided in this function.
+
+@strong{Returns:} The number of removed elements is returned.
+
+@strong{Since:} 3.1.10
+@end deftypefun

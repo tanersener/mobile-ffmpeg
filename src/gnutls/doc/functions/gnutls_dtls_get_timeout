@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {unsigned int} {gnutls_dtls_get_timeout} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function will return the milliseconds remaining
+for a retransmission of the previously sent handshake
+message. This function is useful when DTLS is used in
+non-blocking mode, to estimate when to call @code{gnutls_handshake()} 
+if no packets have been received.
+
+@strong{Returns:} the remaining time in milliseconds.
+
+@strong{Since:} 3.0
+@end deftypefun

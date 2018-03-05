@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {void} {gnutls_pkcs11_set_token_function} (gnutls_pkcs11_token_callback_t @var{fn}, void * @var{userdata})
+@var{fn}: The token callback
+
+@var{userdata}: data to be supplied to callback
+
+This function will set a callback function to be used when a token
+needs to be inserted to continue PKCS 11 operations.
+
+@strong{Since:} 2.12.0
+@end deftypefun

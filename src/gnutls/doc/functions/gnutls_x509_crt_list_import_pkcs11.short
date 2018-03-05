@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_list_import_pkcs11} (gnutls_x509_crt_t * @var{certs}, unsigned int @var{cert_max}, gnutls_pkcs11_obj_t * const @var{objs}, unsigned int @var{flags})

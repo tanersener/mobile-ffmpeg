@@ -1,0 +1,32 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_verify_peers3} (gnutls_session_t @var{session}, const char * @var{hostname}, unsigned int * @var{status})
+@var{session}: is a gnutls session
+
+@var{hostname}: is the expected name of the peer; may be @code{NULL} 
+
+@var{status}: is the output of the verification
+
+This function will verify the peer's certificate and store the
+status in the  @code{status} variable as a bitwise or'd gnutls_certificate_status_t
+values or zero if the certificate is trusted. Note that value in  @code{status} is set only when the return value of this function is success (i.e, failure 
+to trust a certificate does not imply a negative return value).
+The default verification flags used by this function can be overridden
+using @code{gnutls_certificate_set_verify_flags()} . See the documentation
+of @code{gnutls_certificate_verify_peers2()}  for details in the verification process.
+
+If the  @code{hostname} provided is non-NULL then this function will compare
+the hostname in the certificate against it. The comparison will follow
+the RFC6125 recommendations. If names do not match the
+@code{GNUTLS_CERT_UNEXPECTED_OWNER}  status flag will be set.
+
+In order to verify the purpose of the end-certificate (by checking the extended
+key usage), use @code{gnutls_certificate_verify_peers()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) when the validation is performed, or a negative error code otherwise.
+A sucessful error code means that the  @code{status} parameter must be checked to obtain the validation status.
+
+@strong{Since:} 3.1.4
+@end deftypefun

@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_fingerprint} (gnutls_digest_algorithm_t @var{algo}, const gnutls_datum_t * @var{data}, void * @var{result}, size_t * @var{result_size})
+@var{algo}: is a digest algorithm
+
+@var{data}: is the data
+
+@var{result}: is the place where the result will be copied (may be null).
+
+@var{result_size}: should hold the size of the result. The actual size
+of the returned result will also be copied there.
+
+This function will calculate a fingerprint (actually a hash), of
+the given data.  The result is not printable data.  You should
+convert it to hex, or to something else printable.
+
+This is the usual way to calculate a fingerprint of an X.509 DER
+encoded certificate.  Note however that the fingerprint of an
+OpenPGP certificate is not just a hash and cannot be calculated with this
+function.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+@end deftypefun

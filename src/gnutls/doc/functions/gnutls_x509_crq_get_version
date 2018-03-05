@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_version} (gnutls_x509_crq_t @var{crq})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+This function will return the version of the specified Certificate
+request.
+
+@strong{Returns:} version of certificate request, or a negative error code on
+error.
+@end deftypefun

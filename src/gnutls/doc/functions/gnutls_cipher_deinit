@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {void} {gnutls_cipher_deinit} (gnutls_cipher_hd_t @var{handle})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+This function will deinitialize all resources occupied by the given
+encryption context.
+
+@strong{Since:} 2.10.0
+@end deftypefun

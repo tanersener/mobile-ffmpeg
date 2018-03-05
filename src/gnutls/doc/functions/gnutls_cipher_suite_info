@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_cipher_suite_info} (size_t @var{idx}, unsigned char * @var{cs_id}, gnutls_kx_algorithm_t * @var{kx}, gnutls_cipher_algorithm_t * @var{cipher}, gnutls_mac_algorithm_t * @var{mac}, gnutls_protocol_t * @var{min_version})
+@var{idx}: index of cipher suite to get information about, starts on 0.
+
+@var{cs_id}: output buffer with room for 2 bytes, indicating cipher suite value
+
+@var{kx}: output variable indicating key exchange algorithm, or @code{NULL} .
+
+@var{cipher}: output variable indicating cipher, or @code{NULL} .
+
+@var{mac}: output variable indicating MAC algorithm, or @code{NULL} .
+
+@var{min_version}: output variable indicating TLS protocol version, or @code{NULL} .
+
+Get information about supported cipher suites.  Use the function
+iteratively to get information about all supported cipher suites.
+Call with idx=0 to get information about first cipher suite, then
+idx=1 and so on until the function returns NULL.
+
+@strong{Returns:} the name of  @code{idx} cipher suite, and set the information
+about the cipher suite in the output variables.  If  @code{idx} is out of
+bounds, @code{NULL}  is returned.
+@end deftypefun

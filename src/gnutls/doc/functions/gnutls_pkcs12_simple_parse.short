@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs12_simple_parse} (gnutls_pkcs12_t @var{p12}, const char * @var{password}, gnutls_x509_privkey_t * @var{key}, gnutls_x509_crt_t ** @var{chain}, unsigned int * @var{chain_len}, gnutls_x509_crt_t ** @var{extra_certs}, unsigned int * @var{extra_certs_len}, gnutls_x509_crl_t * @var{crl}, unsigned int @var{flags})

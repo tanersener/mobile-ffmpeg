@@ -1,0 +1,4 @@
+The AES-NI and Padlock implementations by Andy Polyakov are not part of the
+GnuTLS library, but are used with GnuTLS. Their license is included in
+license.txt.
+

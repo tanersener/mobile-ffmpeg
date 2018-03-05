@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_protocol_get_name} (gnutls_protocol_t @var{version})

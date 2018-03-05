@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_proxy_dn} (gnutls_x509_crt_t @var{crt}, gnutls_x509_crt_t @var{eecrt}, unsigned int @var{raw_flag}, const void * @var{name}, unsigned int @var{sizeof_name})
+@var{crt}: a gnutls_x509_crt_t type with the new proxy cert
+
+@var{eecrt}: the end entity certificate that will be issuing the proxy
+
+@var{raw_flag}: must be 0, or 1 if the CN is DER encoded
+
+@var{name}: a pointer to the CN name, may be NULL (but MUST then be added later)
+
+@var{sizeof_name}: holds the size of  @code{name} 
+
+This function will set the subject in  @code{crt} to the end entity's
+ @code{eecrt} subject name, and add a single Common Name component  @code{name} of size  @code{sizeof_name} .  This corresponds to the required proxy
+certificate naming style.  Note that if  @code{name} is @code{NULL} , you MUST
+set it later by using @code{gnutls_x509_crt_set_dn_by_oid()}  or similar.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

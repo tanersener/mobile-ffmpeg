@@ -1,0 +1,1 @@
+@item @var{time_t} @ref{gnutls_db_check_entry_time} (gnutls_datum_t * @var{entry})

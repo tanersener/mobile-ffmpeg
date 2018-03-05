@@ -1,0 +1,38 @@
+
+
+
+@deftypefun {void} {gnutls_transport_set_fastopen} (gnutls_session_t @var{session}, int @var{fd}, struct sockaddr * @var{connect_addr}, socklen_t @var{connect_addrlen}, unsigned int @var{flags})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{fd}: is the session's socket descriptor
+
+@var{connect_addr}: is the address we want to connect to
+
+@var{connect_addrlen}: is the length of  @code{connect_addr} 
+
+@var{flags}: must be zero
+
+Enables TCP Fast Open (TFO) for the specified TLS client session.
+That means that TCP connection establishment and the transmission
+of the first TLS client hello packet are combined. The
+peer's address must be  specified in  @code{connect_addr} and  @code{connect_addrlen} ,
+and the socket specified by  @code{fd} should not be connected.
+
+TFO only works for TCP sockets of type AF_INET and AF_INET6.
+If the OS doesn't support TCP fast open this function will result
+to gnutls using @code{connect()}  transparently during the first write.
+
+@strong{Note:} This function overrides all the transport callback functions.
+If this is undesirable, TCP Fast Open must be implemented on the user
+callback functions without calling this function. When using
+this function, transport callbacks must not be set, and 
+@code{gnutls_transport_set_ptr()}  or @code{gnutls_transport_set_int()} 
+must not be called.
+
+On GNU/Linux TFO has to be enabled at the system layer, that is
+in /proc/sys/net/ipv4/tcp_fastopen, bit 0 has to be set.
+
+This function has no effect on server sessions.
+
+@strong{Since:} 3.5.3
+@end deftypefun

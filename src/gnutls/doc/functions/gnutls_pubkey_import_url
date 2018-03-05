@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_url} (gnutls_pubkey_t @var{key}, const char * @var{url}, unsigned int @var{flags})
+@var{key}: A key of type @code{gnutls_pubkey_t} 
+
+@var{url}: A PKCS 11 url
+
+@var{flags}: One of GNUTLS_PKCS11_OBJ_* flags
+
+This function will import a public key from the provided URL.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

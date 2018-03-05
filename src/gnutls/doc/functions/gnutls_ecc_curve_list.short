@@ -1,0 +1,1 @@
+@item @var{const gnutls_ecc_curve_t *} @ref{gnutls_ecc_curve_list} ( @var{void})

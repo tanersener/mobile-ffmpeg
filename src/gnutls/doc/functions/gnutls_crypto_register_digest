@@ -1,0 +1,29 @@
+
+
+
+
+@deftypefun {int} {gnutls_crypto_register_digest} (gnutls_digest_algorithm_t @var{algorithm}, int @var{priority}, gnutls_digest_init_func @var{init}, gnutls_digest_hash_func @var{hash}, gnutls_digest_output_func @var{output}, gnutls_digest_deinit_func @var{deinit}, gnutls_digest_fast_func @var{hash_fast})
+@var{algorithm}: is the gnutls digest identifier
+
+@var{priority}: is the priority of the algorithm
+
+@var{init}: A function which initializes the digest
+
+@var{hash}: Perform the hash operation
+
+@var{output}: Provide the output of the digest
+
+@var{deinit}: A function which deinitializes the digest
+
+@var{hash_fast}: Perform the digest operation in one go
+
+This function will register a digest algorithm to be used by gnutls.
+Any algorithm registered will override the included algorithms and
+by convention kernel implemented algorithms have priority of 90
+and CPU-assisted of 80.
+The algorithm with the lowest priority will be used by gnutls.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun

@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {void} {gnutls_anon_set_server_dh_params} (gnutls_anon_server_credentials_t @var{res}, gnutls_dh_params_t @var{dh_params})
+@var{res}: is a gnutls_anon_server_credentials_t type
+
+@var{dh_params}: The Diffie-Hellman parameters.
+
+This function will set the Diffie-Hellman parameters for an
+anonymous server to use.  These parameters will be used in
+Anonymous Diffie-Hellman cipher suites.
+@end deftypefun

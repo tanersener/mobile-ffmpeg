@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_priority_init} (gnutls_priority_t * @var{priority_cache}, const char * @var{priorities}, const char ** @var{err_pos})

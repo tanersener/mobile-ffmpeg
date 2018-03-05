@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_dh_params_generate2} (gnutls_dh_params_t @var{dparams}, unsigned int @var{bits})
+@var{dparams}: The parameters
+
+@var{bits}: is the prime's number of bits
+
+This function will generate a new pair of prime and generator for use in
+the Diffie-Hellman key exchange. This may take long time.
+
+It is recommended not to set the number of bits directly, but 
+use @code{gnutls_sec_param_to_pk_bits()}  instead.
+Also note that the DH parameters are only useful to servers.
+Since clients use the parameters sent by the server, it's of
+no use to call this in client side.
+
+The parameters generated are of the DSA form. It also is possible
+to generate provable parameters (following the Shawe-Taylor
+algorithm), using @code{gnutls_x509_privkey_generate2()}  with DSA option
+and the @code{GNUTLS_PRIVKEY_FLAG_PROVABLE}  flag set. These can the
+be imported with @code{gnutls_dh_params_import_dsa()} .
+
+It is no longer recommended for applications to generate parameters.
+See the "Parameter generation" section in the manual.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun

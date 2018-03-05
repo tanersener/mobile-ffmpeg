@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_set_x509_key_file2} (gnutls_certificate_credentials_t @var{res}, const char * @var{certfile}, const char * @var{keyfile}, gnutls_x509_crt_fmt_t @var{type}, const char * @var{pass}, unsigned int @var{flags})

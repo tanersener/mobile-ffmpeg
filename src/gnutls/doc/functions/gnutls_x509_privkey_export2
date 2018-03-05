@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_export2} (gnutls_x509_privkey_t @var{key}, gnutls_x509_crt_fmt_t @var{format}, gnutls_datum_t * @var{out})
+@var{key}: Holds the key
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{out}: will contain a private key PEM or DER encoded
+
+This function will export the private key to a PKCS1 structure for
+RSA keys, or an integer sequence for DSA keys.  The DSA keys are in
+the same format with the parameters used by openssl.
+
+The output buffer is allocated using @code{gnutls_malloc()} .
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN RSA PRIVATE KEY".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+Since 3.1.3
+@end deftypefun

@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_import_pkcs11} (gnutls_privkey_t @var{pkey}, gnutls_pkcs11_privkey_t @var{key}, unsigned int @var{flags})
+@var{pkey}: The private key
+
+@var{key}: The private key to be imported
+
+@var{flags}: Flags for the import
+
+This function will import the given private key to the abstract
+@code{gnutls_privkey_t}  type.
+
+The @code{gnutls_pkcs11_privkey_t}  object must not be deallocated
+during the lifetime of this structure.
+
+ @code{flags} might be zero or one of @code{GNUTLS_PRIVKEY_IMPORT_AUTO_RELEASE} 
+and @code{GNUTLS_PRIVKEY_IMPORT_COPY} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

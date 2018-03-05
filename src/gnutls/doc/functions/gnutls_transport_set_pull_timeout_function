@@ -1,0 +1,40 @@
+
+
+
+
+@deftypefun {void} {gnutls_transport_set_pull_timeout_function} (gnutls_session_t @var{session}, gnutls_pull_timeout_func @var{func})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{func}: a callback function
+
+This is the function where you set a function for gnutls to know
+whether data are ready to be received. It should wait for data a
+given time frame in milliseconds. The callback should return 0 on 
+timeout, a positive number if data can be received, and -1 on error.
+You'll need to override this function if @code{select()}  is not suitable
+for the provided transport calls.
+
+As with @code{select()} , if the timeout value is zero the callback should return
+zero if no data are immediately available. The special value
+@code{GNUTLS_INDEFINITE_TIMEOUT}  indicates that the callback should wait indefinitely
+for data.
+
+ @code{gnutls_pull_timeout_func} is of the form,
+int (*gnutls_pull_timeout_func)(gnutls_transport_ptr_t, unsigned int ms);
+
+This callback is necessary when @code{gnutls_handshake_set_timeout()}  or 
+@code{gnutls_record_set_timeout()}  are set, and for calculating the DTLS mode
+timeouts.
+
+In short, this callback should be set when a custom pull function is
+registered. The callback will not be used when the session is in TLS mode with
+non-blocking sockets. That is, when @code{GNUTLS_NONBLOCK}  is specified for a TLS
+session in @code{gnutls_init()} . For compatibility with future GnuTLS versions
+it is recommended to always set this function when a custom pull function
+is registered.
+
+The helper function @code{gnutls_system_recv_timeout()}  is provided to
+simplify writing callbacks. 
+
+@strong{Since:} 3.0
+@end deftypefun

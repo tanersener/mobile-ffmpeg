@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs7_get_crl_raw2} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{indx}, gnutls_datum_t * @var{crl})

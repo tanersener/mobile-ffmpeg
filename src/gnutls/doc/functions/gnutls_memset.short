@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_memset} (void * @var{data}, int @var{c}, size_t @var{size})

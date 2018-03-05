@@ -1,0 +1,1 @@
+@item @var{unsigned int} @ref{gnutls_sec_param_to_pk_bits} (gnutls_pk_algorithm_t @var{algo}, gnutls_sec_param_t @var{param})

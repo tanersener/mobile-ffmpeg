@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {const gnutls_sign_algorithm_t *} {gnutls_sign_list} ( @var{void})
+
+Get a list of supported public key signature algorithms.
+
+@strong{Returns:} a (0)-terminated list of @code{gnutls_sign_algorithm_t} 
+integers indicating the available ciphers.
+@end deftypefun

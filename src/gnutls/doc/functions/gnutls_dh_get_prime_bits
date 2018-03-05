@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_dh_get_prime_bits} (gnutls_session_t @var{session})
+@var{session}: is a gnutls session
+
+This function will return the bits of the prime used in the last
+Diffie-Hellman key exchange with the peer.  Should be used for both
+anonymous and ephemeral Diffie-Hellman.  Note that some ciphers,
+like RSA and DSA without DHE, do not use a Diffie-Hellman key
+exchange, and then this function will return 0.
+
+@strong{Returns:} The Diffie-Hellman bit strength is returned, or 0 if no
+Diffie-Hellman key exchange was done, or a negative error code on
+failure.
+@end deftypefun

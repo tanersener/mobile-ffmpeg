@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs12_bag_set_privkey} (gnutls_pkcs12_bag_t @var{bag}, gnutls_x509_privkey_t @var{privkey}, const char * @var{password}, unsigned @var{flags})

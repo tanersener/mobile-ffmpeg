@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_key_purpose_oid} (gnutls_x509_crt_t @var{cert}, unsigned @var{indx}, void * @var{oid}, size_t * @var{oid_size}, unsigned int * @var{critical})

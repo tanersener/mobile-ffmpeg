@@ -1,0 +1,8 @@
+# List of source files which contain translatable strings.
+lib/alert.c
+lib/errors.c
+lib/openpgp/output.c
+lib/x509/ocsp_output.c
+lib/x509/output.c
+libdane/dane.c
+libdane/errors.c

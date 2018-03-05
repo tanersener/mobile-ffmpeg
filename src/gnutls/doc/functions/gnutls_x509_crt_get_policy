@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_policy} (gnutls_x509_crt_t @var{crt}, unsigned @var{indx}, struct gnutls_x509_policy_st * @var{policy}, unsigned int * @var{critical})
+@var{crt}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{indx}: This specifies which policy to return. Use (0) to get the first one.
+
+@var{policy}: A pointer to a policy structure.
+
+@var{critical}: will be non-zero if the extension is marked as critical
+
+This function will extract the certificate policy (extension 2.5.29.32) 
+specified by the given index. 
+
+The policy returned by this function must be deinitialized by using
+@code{gnutls_x509_policy_release()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+if the extension is not present, otherwise a negative error value.
+
+@strong{Since:} 3.1.5
+@end deftypefun

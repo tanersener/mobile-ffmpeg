@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_alpn_get_selected_protocol} (gnutls_session_t @var{session}, gnutls_datum_t * @var{protocol})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{protocol}: will hold the protocol name
+
+This function allows you to get the negotiated protocol name. The
+returned protocol should be treated as opaque, constant value and
+only valid during the session life.
+
+The selected protocol is the first supported by the list sent
+by the client.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+Since 3.2.0
+@end deftypefun

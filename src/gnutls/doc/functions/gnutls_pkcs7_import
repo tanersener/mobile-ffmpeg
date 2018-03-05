@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_import} (gnutls_pkcs7_t @var{pkcs7}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format})
+@var{pkcs7}: The data to store the parsed PKCS7.
+
+@var{data}: The DER or PEM encoded PKCS7.
+
+@var{format}: One of DER or PEM
+
+This function will convert the given DER or PEM encoded PKCS7 to
+the native @code{gnutls_pkcs7_t}  format.  The output will be stored in
+ @code{pkcs7} .
+
+If the PKCS7 is PEM encoded it should have a header of "PKCS7".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

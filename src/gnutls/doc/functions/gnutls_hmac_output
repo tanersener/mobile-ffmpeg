@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {void} {gnutls_hmac_output} (gnutls_hmac_hd_t @var{handle}, void * @var{digest})
+@var{handle}: is a @code{gnutls_hmac_hd_t}  type
+
+@var{digest}: is the output value of the MAC
+
+This function will output the current MAC value
+and reset the state of the MAC.
+
+@strong{Since:} 2.10.0
+@end deftypefun

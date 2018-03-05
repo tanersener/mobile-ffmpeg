@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_db_set_store_function} (gnutls_session_t @var{session}, gnutls_db_store_func @var{store_func})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{store_func}: is the function
+
+Sets the function that will be used to store data in the resumed
+sessions database. This function must return 0 on success.
+
+The first argument to  @code{store_func} will be null unless
+@code{gnutls_db_set_ptr()}  has been called.
+@end deftypefun

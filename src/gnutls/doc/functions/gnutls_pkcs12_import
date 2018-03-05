@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_import} (gnutls_pkcs12_t @var{pkcs12}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})
+@var{pkcs12}: The data to store the parsed PKCS12.
+
+@var{data}: The DER or PEM encoded PKCS12.
+
+@var{format}: One of DER or PEM
+
+@var{flags}: an ORed sequence of gnutls_privkey_pkcs8_flags
+
+This function will convert the given DER or PEM encoded PKCS12
+to the native gnutls_pkcs12_t format. The output will be stored in 'pkcs12'.
+
+If the PKCS12 is PEM encoded it should have a header of "PKCS12".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

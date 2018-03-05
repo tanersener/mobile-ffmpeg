@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_print} (gnutls_ocsp_req_t @var{req}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@var{req}: The data to be printed
+
+@var{format}: Indicate the format to use
+
+@var{out}: Newly allocated datum with (0) terminated string.
+
+This function will pretty print a OCSP request, suitable for
+display to a human.
+
+If the format is @code{GNUTLS_OCSP_PRINT_FULL}  then all fields of the
+request will be output, on multiple lines.
+
+The output  @code{out} ->data needs to be deallocate using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

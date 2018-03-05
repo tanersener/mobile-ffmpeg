@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_basic_constraints} (gnutls_x509_crt_t @var{cert}, unsigned int * @var{critical}, unsigned int * @var{ca}, int * @var{pathlen})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{critical}: will be non-zero if the extension is marked as critical
+
+@var{ca}: pointer to output integer indicating CA status, may be NULL,
+value is 1 if the certificate CA flag is set, 0 otherwise.
+
+@var{pathlen}: pointer to output integer indicating path length (may be
+NULL), non-negative error codes indicate a present pathLenConstraint
+field and the actual value, -1 indicate that the field is absent.
+
+This function will read the certificate's basic constraints, and
+return the certificates CA status.  It reads the basicConstraints
+X.509 extension (2.5.29.19).
+
+@strong{Returns:} If the certificate is a CA a positive value will be
+returned, or (0) if the certificate does not have CA flag set.  A
+negative error code may be returned in case of errors.  If the
+certificate does not contain the basicConstraints extension
+GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE will be returned.
+@end deftypefun

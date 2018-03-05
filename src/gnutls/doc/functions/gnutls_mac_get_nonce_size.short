@@ -1,0 +1,1 @@
+@item @var{size_t} @ref{gnutls_mac_get_nonce_size} (gnutls_mac_algorithm_t @var{algorithm})

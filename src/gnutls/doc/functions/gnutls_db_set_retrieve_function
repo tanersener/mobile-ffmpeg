@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {void} {gnutls_db_set_retrieve_function} (gnutls_session_t @var{session}, gnutls_db_retr_func @var{retr_func})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{retr_func}: is the function.
+
+Sets the function that will be used to retrieve data from the
+resumed sessions database.  This function must return a
+gnutls_datum_t containing the data on success, or a gnutls_datum_t
+containing null and 0 on failure.
+
+The datum's data must be allocated using the function
+@code{gnutls_malloc()} .
+
+The first argument to  @code{retr_func} will be null unless
+@code{gnutls_db_set_ptr()}  has been called.
+@end deftypefun

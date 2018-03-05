@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_cipher_decrypt2} (gnutls_cipher_hd_t @var{handle}, const void * @var{ctext}, size_t @var{ctext_len}, void * @var{ptext}, size_t @var{ptext_len})

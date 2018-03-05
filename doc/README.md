@@ -65,6 +65,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 
+#### gnutls
+
+gnutls is licensed under the LGPL v2.1. Source code, under gnutls folder, is not modified and includes all files from original v3.5.18 release.
+
 #### lame
 
 lame is licensed under the LGPL v2.0. Source code, under lame folder, is not modified and includes all files from original v3.100 release.

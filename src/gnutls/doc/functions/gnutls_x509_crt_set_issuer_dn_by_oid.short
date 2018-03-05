@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_set_issuer_dn_by_oid} (gnutls_x509_crt_t @var{crt}, const char * @var{oid}, unsigned int @var{raw_flag}, const void * @var{name}, unsigned int @var{sizeof_name})

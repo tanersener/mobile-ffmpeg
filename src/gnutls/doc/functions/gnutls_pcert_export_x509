@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_pcert_export_x509} (gnutls_pcert_st * @var{pcert}, gnutls_x509_crt_t * @var{crt})
+@var{pcert}: The pcert structure.
+
+@var{crt}: An initialized @code{gnutls_x509_crt_t} .
+
+Converts the given @code{gnutls_pcert_t}  type into a @code{gnutls_x509_crt_t} .
+This function only works if the type of  @code{pcert} is @code{GNUTLS_CRT_X509} .
+When successful, the value written to  @code{crt} must be freed with
+@code{gnutls_x509_crt_deinit()}  when no longer needed.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.0
+@end deftypefun

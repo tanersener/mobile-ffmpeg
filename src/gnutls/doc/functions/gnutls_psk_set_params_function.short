@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_psk_set_params_function} (gnutls_psk_server_credentials_t @var{res}, gnutls_params_function * @var{func})

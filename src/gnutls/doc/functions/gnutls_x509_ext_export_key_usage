@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_export_key_usage} (unsigned int @var{usage}, gnutls_datum_t * @var{ext})
+@var{usage}: an ORed sequence of the GNUTLS_KEY_* elements.
+
+@var{ext}: The DER-encoded extension data; must be freed using @code{gnutls_free()} .
+
+This function will convert the keyUsage bit string to a DER
+encoded PKIX extension. The  @code{ext} data will be allocated using
+@code{gnutls_malloc()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

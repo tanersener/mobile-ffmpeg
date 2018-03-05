@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_sign2} (gnutls_x509_crt_t @var{crt}, gnutls_x509_crt_t @var{issuer}, gnutls_x509_privkey_t @var{issuer_key}, gnutls_digest_algorithm_t @var{dig}, unsigned int @var{flags})

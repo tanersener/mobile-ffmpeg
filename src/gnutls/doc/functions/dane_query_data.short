@@ -1,0 +1,1 @@
+@item @var{int} @ref{dane_query_data} (dane_query_t @var{q}, unsigned int @var{idx}, unsigned int * @var{usage}, unsigned int * @var{type}, unsigned int * @var{match}, gnutls_datum_t * @var{data})

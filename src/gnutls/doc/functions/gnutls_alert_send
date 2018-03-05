@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_alert_send} (gnutls_session_t @var{session}, gnutls_alert_level_t @var{level}, gnutls_alert_description_t @var{desc})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{level}: is the level of the alert
+
+@var{desc}: is the alert description
+
+This function will send an alert to the peer in order to inform
+him of something important (eg. his Certificate could not be verified).
+If the alert level is Fatal then the peer is expected to close the
+connection, otherwise he may ignore the alert and continue.
+
+The error code of the underlying record send function will be
+returned, so you may also receive @code{GNUTLS_E_INTERRUPTED}  or
+@code{GNUTLS_E_AGAIN}  as well.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+@end deftypefun

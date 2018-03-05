@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_session_get_data2} (gnutls_session_t @var{session}, gnutls_datum_t * @var{data})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{data}: is a pointer to a datum that will hold the session.
+
+Returns all session parameters needed to be stored to support resumption.
+The client should call this, and store the returned session data. A session
+may be resumed later by calling @code{gnutls_session_set_data()} .  
+
+The returned  @code{data} are allocated and must be released using @code{gnutls_free()} .
+
+This function will fail if called prior to handshake completion. In
+case of false start TLS, the handshake completes only after data have
+been successfully received from the peer.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+@end deftypefun

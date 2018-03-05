@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pcert_import_x509_raw} (gnutls_pcert_st * @var{pcert}, const gnutls_datum_t * @var{cert}, gnutls_x509_crt_fmt_t @var{format}, unsigned int @var{flags})

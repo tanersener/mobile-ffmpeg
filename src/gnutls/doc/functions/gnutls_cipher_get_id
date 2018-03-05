@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {gnutls_cipher_algorithm_t} {gnutls_cipher_get_id} (const char * @var{name})
+@var{name}: is a cipher algorithm name
+
+The names are compared in a case insensitive way.
+
+@strong{Returns:} return a @code{gnutls_cipher_algorithm_t}  value corresponding to
+the specified cipher, or @code{GNUTLS_CIPHER_UNKNOWN}  on error.
+@end deftypefun

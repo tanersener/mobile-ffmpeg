@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_dn} (gnutls_x509_crq_t @var{crq}, char * @var{buf}, size_t * @var{buf_size})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{buf}: a pointer to a structure to hold the name (may be @code{NULL} )
+
+@var{buf_size}: initially holds the size of  @code{buf} 
+
+This function will copy the name of the Certificate request subject
+to the provided buffer.  The name will be in the form
+"C=xxxx,O=yyyy,CN=zzzz" as described in RFC 2253. The output string
+ @code{buf} will be ASCII or UTF-8 encoded, depending on the certificate
+data.
+
+This function does not output a fully RFC4514 compliant string, if
+that is required see @code{gnutls_x509_crq_get_dn3()} .
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is not
+long enough, and in that case the * @code{buf_size} will be updated with
+the required size.  On success 0 is returned.
+@end deftypefun

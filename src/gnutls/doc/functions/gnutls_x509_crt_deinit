@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_crt_deinit} (gnutls_x509_crt_t @var{cert})
+@var{cert}: The data to be deinitialized
+
+This function will deinitialize a certificate structure.
+@end deftypefun

@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_ocsp_req_deinit} (gnutls_ocsp_req_t @var{req})
+@var{req}: The data to be deinitialized
+
+This function will deinitialize a OCSP request structure.
+@end deftypefun

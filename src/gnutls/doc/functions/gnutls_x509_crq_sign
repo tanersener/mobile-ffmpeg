@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_sign} (gnutls_x509_crq_t @var{crq}, gnutls_x509_privkey_t @var{key})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{key}: holds a private key
+
+This function is the same a @code{gnutls_x509_crq_sign2()}  with no flags,
+and SHA1 as the hash algorithm.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Deprecated:} Use @code{gnutls_x509_crq_privkey_sign()}  instead.
+@end deftypefun

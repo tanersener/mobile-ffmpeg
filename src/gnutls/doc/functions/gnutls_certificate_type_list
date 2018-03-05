@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {const gnutls_certificate_type_t *} {gnutls_certificate_type_list} ( @var{void})
+
+Get a list of certificate types.
+
+@strong{Returns:} a (0)-terminated list of @code{gnutls_certificate_type_t} 
+integers indicating the available certificate types.
+@end deftypefun

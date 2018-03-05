@@ -46,7 +46,6 @@ LDFLAGS=${LDFLAGS} \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
-    --disable-largefile \
     --disable-mmap \
     --host=${TARGET_HOST} || exit 1
 

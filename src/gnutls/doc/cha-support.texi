@@ -1,0 +1,172 @@
+@node Support
+@appendix Support
+
+@menu
+* Getting help::
+* Commercial Support::
+* Bug Reports::
+* Contributing::
+* Certification::
+@end menu
+
+@node Getting help
+@section Getting Help
+
+A mailing list where users may help each other exists, and you can
+reach it by sending e-mail to @email{gnutls-help@@gnutls.org}.  Archives
+of the mailing list discussions, and an interface to manage
+subscriptions, is available through the World Wide Web at
+@url{http://lists.gnutls.org/pipermail/gnutls-help/}.
+
+A mailing list for developers are also available, see
+@url{http://www.gnutls.org/lists.html}.
+Bug reports should be sent to @email{bugs@@gnutls.org}, see
+@ref{Bug Reports}.
+
+@node Commercial Support
+@section Commercial Support
+
+Commercial support is available for users of GnuTLS.  The kind of
+support that can be purchased may include:
+
+@itemize
+
+@item Implement new features.
+Such as a new TLS extension.
+
+@item Port GnuTLS to new platforms.
+This could include porting to an embedded platforms that may need
+memory or size optimization.
+
+@item Integrating TLS as a security environment in your existing project.
+
+@item System design of components related to TLS.
+
+@end itemize
+
+If you are interested, please write to:
+
+@verbatim
+Simon Josefsson Datakonsult
+Hagagatan 24
+113 47 Stockholm
+Sweden
+
+E-mail: simon@josefsson.org
+@end verbatim
+
+If your company provides support related to GnuTLS and would like to
+be mentioned here, contact the authors.
+
+
+@node Bug Reports
+@section Bug Reports
+@cindex reporting bugs
+
+If you think you have found a bug in GnuTLS, please investigate it and
+report it.
+
+@itemize @bullet
+
+@item Please make sure that the bug is really in GnuTLS, and
+preferably also check that it hasn't already been fixed in the latest
+version.
+
+@item You have to send us a test case that makes it possible for us to
+reproduce the bug.
+
+@item You also have to explain what is wrong; if you get a crash, or
+if the results printed are not good and in that case, in what way.
+Make sure that the bug report includes all information you would need
+to fix this kind of bug for someone else.
+
+@end itemize
+
+Please make an effort to produce a self-contained report, with
+something definite that can be tested or debugged.  Vague queries or
+piecemeal messages are difficult to act on and don't help the
+development effort.
+
+If your bug report is good, we will do our best to help you to get a
+corrected version of the software; if the bug report is poor, we won't
+do anything about it (apart from asking you to send better bug
+reports).
+
+If you think something in this manual is unclear, or downright
+incorrect, or if the language needs to be improved, please also send a
+note.
+
+Send your bug report to:
+
+@center @samp{bugs@@gnutls.org}
+
+@node Contributing
+@section Contributing
+@cindex contributing
+@cindex hacking
+
+If you want to submit a patch for inclusion -- from solving a typo you
+discovered, up to adding support for a new feature -- you should
+submit it as a bug report, using the process in @ref{Bug Reports}.  There are some
+things that you can do to increase the chances for it to be included
+in the official package.
+
+Unless your patch is very small (say, under 10 lines) we require that
+you assign the copyright of your work to the Free Software Foundation.
+This is to protect the freedom of the project.  If you have not
+already signed papers, we will send you the necessary information when
+you submit your contribution.
+
+For contributions that doesn't consist of actual programming code, the
+only guidelines are common sense.  
+For code contributions, a number of style guides will help you:
+
+@itemize @bullet
+
+@item Coding Style.
+Follow the GNU Standards document.
+@c (@pxref{top, GNU Coding Standards,,standards}).
+
+If you normally code using another coding standard, there is no
+problem, but you should use @samp{indent} to reformat the code
+@c (@pxref{top, GNU Indent,, indent}) 
+before submitting your work.
+
+@item Use the unified diff format @samp{diff -u}.
+
+@item Return errors.
+No reason whatsoever should abort the execution of the library.  Even
+memory allocation errors, e.g. when malloc return NULL, should work
+although result in an error code.
+
+@item Design with thread safety in mind.
+Don't use global variables.  Don't even write to per-handle global
+variables unless the documented behaviour of the function you write is
+to write to the per-handle global variable.
+
+@item Avoid using the C math library.
+It causes problems for embedded implementations, and in most
+situations it is very easy to avoid using it.
+
+@item Document your functions.
+Use comments before each function headers, that, if properly
+formatted, are extracted into Texinfo manuals and GTK-DOC web pages.
+
+@item Supply a ChangeLog and NEWS entries, where appropriate.
+
+@end itemize
+
+@node Certification
+@section Certification
+@cindex certification
+
+Many cryptographic libraries claim certifications from national or international bodies. These certifications are tied on a specific (and often restricted) version of the library or a 
+specific product using the library, and typically in the case of software they assure that the algorithms implemented are correct. The major certifications known are:
+@itemize
+@item USA's FIPS 140-2 at Level 1 which certifies that approved algorithms are used (see @url{http://en.wikipedia.org/wiki/FIPS_140-2});
+@item Common Criteria for Information Technology Security Evaluation (CC), an international standard for verification of elaborate security claims (see @url{http://en.wikipedia.org/wiki/Common_Criteria}).
+@end itemize
+
+Obtaining such a certification is an expensive and elaborate job that has no immediate value for a continuously developed free software library (as the certification is tied to the
+particular version tested). While, as a free software project, we are not actively pursuing this kind of certification, GnuTLS has been FIPS-140-2 certified in several systems by
+third parties. If you are, interested, see @ref{Commercial Support}.

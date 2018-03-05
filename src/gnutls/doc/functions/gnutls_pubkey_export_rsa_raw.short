@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_export_rsa_raw} (gnutls_pubkey_t @var{key}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e})

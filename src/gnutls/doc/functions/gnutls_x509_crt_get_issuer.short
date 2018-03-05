@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_issuer} (gnutls_x509_crt_t @var{cert}, gnutls_x509_dn_t * @var{dn})

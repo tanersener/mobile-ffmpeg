@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_pin_callback_t} {gnutls_pkcs11_get_pin_function} (void ** @var{userdata})
+@var{userdata}: data to be supplied to callback
+
+This function will return the callback function set using
+@code{gnutls_pkcs11_set_pin_function()} .
+
+@strong{Returns:} The function set or NULL otherwise.
+
+@strong{Since:} 3.1.0
+@end deftypefun

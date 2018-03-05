@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_dh_params_import_raw2} (gnutls_dh_params_t @var{dh_params}, const gnutls_datum_t * @var{prime}, const gnutls_datum_t * @var{generator}, unsigned @var{key_bits})
+@var{dh_params}: The parameters
+
+@var{prime}: holds the new prime
+
+@var{generator}: holds the new generator
+
+@var{key_bits}: the private key bits (set to zero when unknown)
+
+This function will replace the pair of prime and generator for use
+in the Diffie-Hellman key exchange.  The new parameters should be
+stored in the appropriate gnutls_datum.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun

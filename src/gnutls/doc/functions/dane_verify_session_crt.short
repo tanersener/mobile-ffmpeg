@@ -1,0 +1,1 @@
+@item @var{int} @ref{dane_verify_session_crt} (dane_state_t @var{s}, gnutls_session_t @var{session}, const char * @var{hostname}, const char * @var{proto}, unsigned int @var{port}, unsigned int @var{sflags}, unsigned int @var{vflags}, unsigned int * @var{verify})

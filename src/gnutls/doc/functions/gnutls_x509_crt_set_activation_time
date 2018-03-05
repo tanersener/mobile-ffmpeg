@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_activation_time} (gnutls_x509_crt_t @var{cert}, time_t @var{act_time})
+@var{cert}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{act_time}: The actual time
+
+This function will set the time this Certificate was or will be
+activated.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

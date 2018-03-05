@@ -1,0 +1,39 @@
+
+
+@c gnutls_mac_algorithm_t
+@table @code
+@item GNUTLS_@-MAC_@-UNKNOWN
+Unknown MAC algorithm.
+@item GNUTLS_@-MAC_@-NULL
+NULL MAC algorithm (empty output).
+@item GNUTLS_@-MAC_@-MD5
+HMAC-MD5 algorithm.
+@item GNUTLS_@-MAC_@-SHA1
+HMAC-SHA-1 algorithm.
+@item GNUTLS_@-MAC_@-RMD160
+HMAC-RMD160 algorithm.
+@item GNUTLS_@-MAC_@-MD2
+HMAC-MD2 algorithm.
+@item GNUTLS_@-MAC_@-SHA256
+HMAC-SHA-256 algorithm.
+@item GNUTLS_@-MAC_@-SHA384
+HMAC-SHA-384 algorithm.
+@item GNUTLS_@-MAC_@-SHA512
+HMAC-SHA-512 algorithm.
+@item GNUTLS_@-MAC_@-SHA224
+HMAC-SHA-224 algorithm.
+@item GNUTLS_@-MAC_@-SHA3_@-224
+-- undescribed --
+@item GNUTLS_@-MAC_@-SHA3_@-256
+-- undescribed --
+@item GNUTLS_@-MAC_@-SHA3_@-384
+-- undescribed --
+@item GNUTLS_@-MAC_@-SHA3_@-512
+-- undescribed --
+@item GNUTLS_@-MAC_@-AEAD
+MAC implicit through AEAD cipher.
+@item GNUTLS_@-MAC_@-UMAC_@-96
+The UMAC-96 MAC algorithm.
+@item GNUTLS_@-MAC_@-UMAC_@-128
+The UMAC-128 MAC algorithm.
+@end table

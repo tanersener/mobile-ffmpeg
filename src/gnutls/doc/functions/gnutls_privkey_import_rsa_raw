@@ -1,0 +1,30 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_import_rsa_raw} (gnutls_privkey_t @var{key}, const gnutls_datum_t * @var{m}, const gnutls_datum_t * @var{e}, const gnutls_datum_t * @var{d}, const gnutls_datum_t * @var{p}, const gnutls_datum_t * @var{q}, const gnutls_datum_t * @var{u}, const gnutls_datum_t * @var{e1}, const gnutls_datum_t * @var{e2})
+@var{key}: The structure to store the parsed key
+
+@var{m}: holds the modulus
+
+@var{e}: holds the public exponent
+
+@var{d}: holds the private exponent
+
+@var{p}: holds the first prime (p)
+
+@var{q}: holds the second prime (q)
+
+@var{u}: holds the coefficient (optional)
+
+@var{e1}: holds e1 = d mod (p-1) (optional)
+
+@var{e2}: holds e2 = d mod (q-1) (optional)
+
+This function will convert the given RSA raw parameters to the
+native @code{gnutls_privkey_t}  format.  The output will be stored in
+ @code{key} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

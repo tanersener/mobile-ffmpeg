@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_print} (gnutls_x509_crl_t @var{crl}, gnutls_certificate_print_formats_t @var{format}, gnutls_datum_t * @var{out})
+@var{crl}: The data to be printed
+
+@var{format}: Indicate the format to use
+
+@var{out}: Newly allocated datum with null terminated string.
+
+This function will pretty print a X.509 certificate revocation
+list, suitable for display to a human.
+
+The output  @code{out} needs to be deallocated using @code{gnutls_free()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

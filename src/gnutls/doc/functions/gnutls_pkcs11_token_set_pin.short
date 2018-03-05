@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_token_set_pin} (const char * @var{token_url}, const char * @var{oldpin}, const char * @var{newpin}, unsigned int @var{flags})

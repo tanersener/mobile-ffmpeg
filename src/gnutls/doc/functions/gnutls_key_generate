@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_key_generate} (gnutls_datum_t * @var{key}, unsigned int @var{key_size})
+@var{key}: is a pointer to a @code{gnutls_datum_t}  which will contain a newly
+created key
+
+@var{key_size}: the number of bytes of the key
+
+Generates a random key of  @code{key_size} bytes.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, or an
+error code.
+
+@strong{Since:} 3.0
+@end deftypefun

@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_get_signature_algorithm} (gnutls_ocsp_resp_t @var{resp})
+@var{resp}: should contain a @code{gnutls_ocsp_resp_t}  type
+
+This function will return a value of the @code{gnutls_sign_algorithm_t} 
+enumeration that is the signature algorithm that has been used to
+sign the OCSP response.
+
+@strong{Returns:} a @code{gnutls_sign_algorithm_t}  value, or a negative error code
+on error.
+@end deftypefun

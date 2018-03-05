@@ -1,0 +1,33 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_authority_key_gn_serial} (gnutls_x509_crl_t @var{crl}, unsigned int @var{seq}, void * @var{alt}, size_t * @var{alt_size}, unsigned int * @var{alt_type}, void * @var{serial}, size_t * @var{serial_size}, unsigned int * @var{critical})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+@var{seq}: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+
+@var{alt}: is the place where the alternative name will be copied to
+
+@var{alt_size}: holds the size of alt.
+
+@var{alt_type}: holds the type of the alternative name (one of gnutls_x509_subject_alt_name_t).
+
+@var{serial}: buffer to store the serial number (may be null)
+
+@var{serial_size}: Holds the size of the serial field (may be null)
+
+@var{critical}: will be non-zero if the extension is marked as critical (may be null)
+
+This function will return the X.509 authority key
+identifier when stored as a general name (authorityCertIssuer) 
+and serial number.
+
+Because more than one general names might be stored
+ @code{seq} can be used as a counter to request them all until 
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned.
+
+@strong{Returns:} Returns 0 on success, or an error code.
+
+@strong{Since:} 3.0
+@end deftypefun

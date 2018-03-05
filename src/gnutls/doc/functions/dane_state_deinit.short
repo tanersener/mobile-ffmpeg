@@ -1,0 +1,1 @@
+@item @var{void} @ref{dane_state_deinit} (dane_state_t @var{s})

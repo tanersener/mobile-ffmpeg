@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_priority_mac_list} (gnutls_priority_t @var{pcache}, const unsigned int ** @var{list})
+@var{pcache}: is a @code{gnutls_prioritity_t}  type.
+
+@var{list}: will point to an integer list
+
+Get a list of available MAC algorithms in the priority
+structure. 
+
+@strong{Returns:} the number of curves, or an error code.
+
+@strong{Since:} 3.2.3
+@end deftypefun

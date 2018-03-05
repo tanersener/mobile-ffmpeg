@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_hash_init} (gnutls_hash_hd_t * @var{dig}, gnutls_digest_algorithm_t @var{algorithm})

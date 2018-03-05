@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_obj_set_info} (gnutls_pkcs11_obj_t @var{obj}, gnutls_pkcs11_obj_info_t @var{itype}, const void * @var{data}, size_t @var{data_size}, unsigned @var{flags})

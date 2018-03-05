@@ -1,0 +1,291 @@
+# suppressions -- Valgrind suppresion file for libgcrypt
+
+# Copyright (C) 2008-2012 Free Software Foundation, Inc.
+
+# Copying and distribution of this file, with or without modification,
+# are permitted in any medium without royalty provided the copyright
+# notice and this notice are preserved.
+
+{
+   zlib inflateInit
+   Memcheck:Cond
+   fun:inflateReset2
+   fun:inflateInit2_
+   fun:_gnutls_comp_init
+   fun:_gnutls_init_record_state
+   fun:_gnutls_epoch_set_keys
+   fun:_gnutls_write_connection_state_init
+   fun:_gnutls_send_handshake_final
+}
+
+{
+   libgcrypt1
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_module_add
+   fun:gcry_pk_register_default
+   fun:_gcry_pk_init
+   fun:global_init
+   fun:_gcry_check_version
+   fun:gcry_check_version
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt1-new
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_module_add
+   fun:pk_register_default
+   fun:_gcry_pk_init
+   fun:global_init
+   fun:_gcry_check_version
+   fun:gcry_check_version
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt2
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_module_add
+   fun:gcry_md_register_default
+   fun:_gcry_md_init
+   fun:global_init
+   fun:_gcry_check_version
+   fun:gcry_check_version
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt2-new
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_module_add
+   fun:md_register_default
+   fun:_gcry_md_init
+   fun:global_init
+   fun:_gcry_check_version
+   fun:gcry_check_version
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt3
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_module_add
+   fun:gcry_cipher_register_default
+   fun:_gcry_cipher_init
+   fun:global_init
+   fun:_gcry_check_version
+   fun:gcry_check_version
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt3-new
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_module_add
+   fun:cipher_register_default
+   fun:_gcry_cipher_init
+   fun:global_init
+   fun:_gcry_check_version
+   fun:gcry_check_version
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt4
+   Memcheck:Leak
+   fun:malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_xmalloc
+   fun:_gcry_xcalloc
+   fun:initialize
+   fun:_gcry_randomize
+   fun:gcry_randomize
+   fun:gc_pseudo_random
+   fun:_gnutls_rnd_init
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt5
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_xmalloc
+   fun:_gcry_xcalloc
+   fun:initialize
+   fun:_gcry_randomize
+   fun:gcry_randomize
+   fun:gc_pseudo_random
+   fun:_gnutls_rnd_init
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt6
+   Memcheck:Leak
+   fun:malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_xmalloc
+   fun:_gcry_xcalloc
+   fun:initialize
+   fun:_gcry_create_nonce
+   fun:gcry_create_nonce
+   fun:wrap_gcry_rnd_init
+   fun:_gnutls_rnd_init
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt7
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_xmalloc
+   fun:_gcry_xcalloc
+   fun:initialize
+   fun:_gcry_create_nonce
+   fun:gcry_create_nonce
+   fun:wrap_gcry_rnd_init
+   fun:_gnutls_rnd_init
+   fun:gnutls_global_init
+}
+
+{
+   libgcrypt7-new
+   Memcheck:Leak
+   fun:malloc
+   fun:_gcry_private_malloc
+   fun:do_malloc
+   fun:_gcry_malloc
+   fun:_gcry_xmalloc
+   fun:_gcry_xcalloc
+   fun:initialize
+   fun:_gcry_rngcsprng_create_nonce
+   fun:_gcry_create_nonce
+   fun:gcry_create_nonce
+   fun:wrap_gcry_rnd_init
+   fun:_gnutls_rnd_init
+   fun:gnutls_global_init
+}
+
+{
+   ignore p11 leaks
+   Memcheck:Leak
+   fun:calloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:p11_kit_initialize_registered
+   fun:gnutls_pkcs11_init
+   fun:gnutls_global_init
+}
+
+{
+   ignore p11 leaks2
+   Memcheck:Leak
+   fun:malloc
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   obj:*
+   fun:p11_kit_module_initialize
+   fun:gnutls_pkcs11_add_provider
+}
+
+{
+   nettle memxor3
+   Memcheck:Addr8
+   fun:memxor3
+   obj:*
+}
+
+{
+   nettle memxor
+   Memcheck:Addr8
+   fun:memxor
+   obj:*
+}
+
+{
+   memxor_different_alignment
+   Memcheck:Addr8
+   fun:memxor_different_alignment
+   obj:*
+}
+
+{
+   libidn-strlen
+   Memcheck:Addr4
+   fun:idna_to_ascii_4z
+   fun:idna_to_ascii_8z
+   fun:gnutls_x509_crt_check_hostname2
+   ...
+}
+
+{
+   libidn-strlen2
+   Memcheck:Addr4
+   fun:idna_to_ascii_4z
+   fun:idna_to_ascii_8z
+   fun:gnutls_server_name_set
+   ...
+}
+
+{
+   libidn-strlen2
+   Memcheck:Addr4
+   fun:idna_to_ascii_4z
+   fun:idna_to_ascii_8z
+   fun:gnutls_server_name_get
+   ...
+}
+
+{
+   bash leak
+   Memcheck:Leak
+   match-leak-kinds: definite
+   fun:malloc
+   fun:xmalloc
+   fun:set_default_locale
+   fun:main
+}
+{
+   ld-uncond-jump
+   Memcheck:Cond
+   fun:index
+   fun:expand_dynamic_string_token
+   fun:fillin_rpath
+   ...
+}

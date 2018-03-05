@@ -1,0 +1,9 @@
+
+
+@c gnutls_openpgp_crt_status_t
+@table @code
+@item GNUTLS_@-OPENPGP_@-CERT
+Send entire certificate.
+@item GNUTLS_@-OPENPGP_@-CERT_@-FINGERPRINT
+Send only certificate fingerprint.
+@end table

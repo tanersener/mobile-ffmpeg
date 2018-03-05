@@ -1,0 +1,31 @@
+
+
+
+@deftypefun {int} {gnutls_dtls_cookie_send} (gnutls_datum_t * @var{key}, void * @var{client_data}, size_t @var{client_data_size}, gnutls_dtls_prestate_st * @var{prestate}, gnutls_transport_ptr_t @var{ptr}, gnutls_push_func @var{push_func})
+@var{key}: is a random key to be used at cookie generation
+
+@var{client_data}: contains data identifying the client (i.e. address)
+
+@var{client_data_size}: The size of client's data
+
+@var{prestate}: The previous cookie returned by @code{gnutls_dtls_cookie_verify()} 
+
+@var{ptr}: A transport pointer to be used by  @code{push_func} 
+
+@var{push_func}: A function that will be used to reply
+
+This function can be used to prevent denial of service
+attacks to a DTLS server by requiring the client to
+reply using a cookie sent by this function. That way
+it can be ensured that a client we allocated resources
+for (i.e. @code{gnutls_session_t} ) is the one that the 
+original incoming packet was originated from.
+
+This function must be called at the first incoming packet,
+prior to allocating any resources and must be succeeded
+by @code{gnutls_dtls_cookie_verify()} .
+
+@strong{Returns:} the number of bytes sent, or a negative error code.  
+
+@strong{Since:} 3.0
+@end deftypefun

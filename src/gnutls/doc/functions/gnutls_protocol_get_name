@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_protocol_get_name} (gnutls_protocol_t @var{version})
+@var{version}: is a (gnutls) version number
+
+Convert a @code{gnutls_protocol_t}  value to a string.
+
+@strong{Returns:} a string that contains the name of the specified TLS
+version (e.g., "TLS1.0"), or @code{NULL} .
+@end deftypefun

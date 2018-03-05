@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_get_nonce} (gnutls_ocsp_req_t @var{req}, unsigned int * @var{critical}, gnutls_datum_t * @var{nonce})
+@var{req}: should contain a @code{gnutls_ocsp_req_t}  type
+
+@var{critical}: whether nonce extension is marked critical, or NULL
+
+@var{nonce}: will hold newly allocated buffer with nonce data
+
+This function will return the OCSP request nonce extension data.
+
+The caller needs to deallocate memory by calling @code{gnutls_free()}  on
+ @code{nonce} ->data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.
+@end deftypefun

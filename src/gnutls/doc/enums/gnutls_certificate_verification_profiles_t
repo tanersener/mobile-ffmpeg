@@ -1,0 +1,29 @@
+
+
+@c gnutls_certificate_verification_profiles_t
+@table @code
+@item GNUTLS_@-PROFILE_@-VERY_@-WEAK
+A verification profile that
+corresponds to  @code{GNUTLS_SEC_PARAM_VERY_WEAK} (64 bits)
+@item GNUTLS_@-PROFILE_@-LOW
+A verification profile that
+corresponds to  @code{GNUTLS_SEC_PARAM_LOW} (80 bits)
+@item GNUTLS_@-PROFILE_@-LEGACY
+A verification profile that
+corresponds to  @code{GNUTLS_SEC_PARAM_LEGACY} (96 bits)
+@item GNUTLS_@-PROFILE_@-MEDIUM
+A verification profile that
+corresponds to  @code{GNUTLS_SEC_PARAM_MEDIUM} (112 bits)
+@item GNUTLS_@-PROFILE_@-HIGH
+A verification profile that
+corresponds to  @code{GNUTLS_SEC_PARAM_HIGH} (128 bits)
+@item GNUTLS_@-PROFILE_@-ULTRA
+A verification profile that
+corresponds to  @code{GNUTLS_SEC_PARAM_ULTRA} (256 bits)
+@item GNUTLS_@-PROFILE_@-SUITEB128
+A verification profile that
+applies the SUITEB128 rules
+@item GNUTLS_@-PROFILE_@-SUITEB192
+A verification profile that
+applies the SUITEB192 rules
+@end table

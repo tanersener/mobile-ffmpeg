@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_import_x509_raw} (gnutls_privkey_t @var{pkey}, const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, const char * @var{password}, unsigned int @var{flags})
+@var{pkey}: The private key
+
+@var{data}: The private key data to be imported
+
+@var{format}: The format of the private key
+
+@var{password}: A password (optional)
+
+@var{flags}: an ORed sequence of gnutls_pkcs_encrypt_flags_t
+
+This function will import the given private key to the abstract
+@code{gnutls_privkey_t}  type. 
+
+The supported formats are basic unencrypted key, PKCS8, PKCS12, 
+and the openssl format.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_transport_get_ptr2} (gnutls_session_t @var{session}, gnutls_transport_ptr_t * @var{recv_ptr}, gnutls_transport_ptr_t * @var{send_ptr})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{recv_ptr}: will hold the value for the pull function
+
+@var{send_ptr}: will hold the value for the push function
+
+Used to get the arguments of the transport functions (like PUSH
+and PULL).  These should have been set using
+@code{gnutls_transport_set_ptr2()} .
+@end deftypefun

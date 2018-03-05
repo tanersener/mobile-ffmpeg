@@ -1,0 +1,32 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_extension_info} (gnutls_x509_crq_t @var{crq}, unsigned @var{indx}, void * @var{oid}, size_t * @var{sizeof_oid}, unsigned int * @var{critical})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{indx}: Specifies which extension number to get. Use (0) to get the first one.
+
+@var{oid}: a pointer to store the OID
+
+@var{sizeof_oid}: initially holds the maximum size of  @code{oid} , on return
+holds actual size of  @code{oid} .
+
+@var{critical}: output variable with critical flag, may be NULL.
+
+This function will return the requested extension OID in the
+certificate, and the critical flag for it.  The extension OID will
+be stored as a string in the provided buffer.  Use
+@code{gnutls_x509_crq_get_extension_data()}  to extract the data.
+
+If the buffer provided is not long enough to hold the output, then
+* @code{sizeof_oid} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will be
+returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code in case of an error.  If your have reached the
+last extension available @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+will be returned.
+
+@strong{Since:} 2.8.0
+@end deftypefun

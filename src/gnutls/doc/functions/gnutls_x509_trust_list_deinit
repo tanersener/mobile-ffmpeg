@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_trust_list_deinit} (gnutls_x509_trust_list_t @var{list}, unsigned int @var{all})
+@var{list}: The list to be deinitialized
+
+@var{all}: if non-zero it will deinitialize all the certificates and CRLs contained in the structure.
+
+This function will deinitialize a trust list. Note that the
+ @code{all} flag should be typically non-zero unless you have specified
+your certificates using @code{gnutls_x509_trust_list_add_cas()}  and you
+want to prevent them from being deinitialized by this function.
+
+@strong{Since:} 3.0.0
+@end deftypefun

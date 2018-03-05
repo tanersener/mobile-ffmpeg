@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_ext_import_basic_constraints} (const gnutls_datum_t * @var{ext}, unsigned int * @var{ca}, int * @var{pathlen})
+@var{ext}: the DER encoded extension data
+
+@var{ca}: will be non zero if the CA status is true
+
+@var{pathlen}: the path length constraint; will be set to -1 for no limit
+
+This function will return the CA status and path length constraint
+as written in the PKIX extension 2.5.29.19.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

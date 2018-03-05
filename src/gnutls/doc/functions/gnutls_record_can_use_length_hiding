@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_record_can_use_length_hiding} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+If the session supports length-hiding padding, you can
+invoke @code{gnutls_range_send_message()}  to send a message whose
+length is hidden in the given range. If the session does not
+support length hiding padding, you can use the standard
+@code{gnutls_record_send()}  function, or @code{gnutls_range_send_message()} 
+making sure that the range is the same as the length of the
+message you are trying to send.
+
+@strong{Returns:} true (1) if the current session supports length-hiding
+padding, false (0) if the current session does not.
+@end deftypefun

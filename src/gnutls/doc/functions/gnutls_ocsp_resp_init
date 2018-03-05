@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_resp_init} (gnutls_ocsp_resp_t * @var{resp})
+@var{resp}: A pointer to the type to be initialized
+
+This function will initialize an OCSP response structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

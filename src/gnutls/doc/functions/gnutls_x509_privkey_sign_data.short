@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_privkey_sign_data} (gnutls_x509_privkey_t @var{key}, gnutls_digest_algorithm_t @var{digest}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, void * @var{signature}, size_t * @var{signature_size})

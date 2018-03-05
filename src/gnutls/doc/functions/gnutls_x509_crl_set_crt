@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_set_crt} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_t @var{crt}, time_t @var{revocation_time})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t}  with the revoked certificate
+
+@var{revocation_time}: The time this certificate was revoked
+
+This function will set a revoked certificate's serial number to the CRL.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

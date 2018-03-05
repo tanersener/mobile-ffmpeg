@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_dh_get_peers_public_bits} (gnutls_session_t @var{session})
+@var{session}: is a gnutls session
+
+Get the Diffie-Hellman public key bit size.  Can be used for both
+anonymous and ephemeral Diffie-Hellman.
+
+@strong{Returns:} The public key bit size used in the last Diffie-Hellman
+key exchange with the peer, or a negative error code in case of error.
+@end deftypefun

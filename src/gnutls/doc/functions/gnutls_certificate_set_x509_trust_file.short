@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_set_x509_trust_file} (gnutls_certificate_credentials_t            @var{cred}, const char * @var{cafile}, gnutls_x509_crt_fmt_t @var{type})

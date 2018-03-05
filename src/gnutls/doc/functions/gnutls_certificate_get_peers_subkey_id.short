@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_get_peers_subkey_id} (gnutls_session_t @var{session}, gnutls_datum_t * @var{id})

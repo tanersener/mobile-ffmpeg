@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_list_import_pkcs11} (gnutls_x509_crt_t * @var{certs}, unsigned int @var{cert_max}, gnutls_pkcs11_obj_t * const @var{objs}, unsigned int @var{flags})
+@var{certs}: A list of certificates of type @code{gnutls_x509_crt_t} 
+
+@var{cert_max}: The maximum size of the list
+
+@var{objs}: A list of PKCS 11 objects
+
+@var{flags}: 0 for now
+
+This function will import a PKCS 11 certificate list to a list of 
+@code{gnutls_x509_crt_t}  type. These must not be initialized.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

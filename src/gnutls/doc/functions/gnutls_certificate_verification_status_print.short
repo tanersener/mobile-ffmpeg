@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_verification_status_print} (unsigned int @var{status}, gnutls_certificate_type_t           @var{type}, gnutls_datum_t * @var{out}, unsigned int @var{flags})

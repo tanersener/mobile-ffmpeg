@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_get_x509_key} (gnutls_certificate_credentials_t @var{res}, unsigned @var{index}, gnutls_x509_privkey_t * @var{key})

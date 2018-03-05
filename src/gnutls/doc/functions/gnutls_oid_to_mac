@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {gnutls_mac_algorithm_t} {gnutls_oid_to_mac} (const char * @var{oid})
+@var{oid}: is an object identifier
+
+Converts a textual object identifier typically from PKCS@code{5}  values to a @code{gnutls_mac_algorithm_t}  value.
+
+@strong{Returns:} a @code{gnutls_mac_algorithm_t}  id of the specified digest
+algorithm, or @code{GNUTLS_MAC_UNKNOWN}  on failure.
+
+@strong{Since:} 3.5.4
+@end deftypefun

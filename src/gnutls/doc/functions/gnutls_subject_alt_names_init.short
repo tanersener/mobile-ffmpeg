@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_subject_alt_names_init} (gnutls_subject_alt_names_t * @var{sans})

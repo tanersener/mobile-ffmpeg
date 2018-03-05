@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_x509_crt_equals2} (gnutls_x509_crt_t @var{cert1}, gnutls_datum_t * @var{der})
+@var{cert1}: The first certificate
+
+@var{der}: A DER encoded certificate
+
+This function will compare an X.509 certificate structures, with DER
+encoded certificate data.
+
+@strong{Returns:} On equality non-zero is returned, otherwise zero.
+
+@strong{Since:} 3.5.0
+@end deftypefun

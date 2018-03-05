@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crl_iter_crt_serial} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crl_iter_t * @var{iter}, unsigned char * @var{serial}, size_t * @var{serial_size}, time_t * @var{t})

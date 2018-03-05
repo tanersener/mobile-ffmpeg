@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_init} (gnutls_pkcs12_t * @var{pkcs12})
+@var{pkcs12}: A pointer to the type to be initialized
+
+This function will initialize a PKCS12 type. PKCS12 structures
+usually contain lists of X.509 Certificates and X.509 Certificate
+revocation lists.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

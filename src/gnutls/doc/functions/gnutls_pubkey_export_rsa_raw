@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_export_rsa_raw} (gnutls_pubkey_t @var{key}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e})
+@var{key}: Holds the certificate
+
+@var{m}: will hold the modulus (may be @code{NULL} )
+
+@var{e}: will hold the public exponent (may be @code{NULL} )
+
+This function will export the RSA public key's parameters found in
+the given structure.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+This function allows for @code{NULL}  parameters since 3.4.1.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.3.0
+@end deftypefun

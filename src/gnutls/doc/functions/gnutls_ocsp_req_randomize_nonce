@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_randomize_nonce} (gnutls_ocsp_req_t @var{req})
+@var{req}: should contain a @code{gnutls_ocsp_req_t}  type
+
+This function will add or update an nonce extension to the OCSP
+request with a newly generated random value.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error code is returned.
+@end deftypefun

@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_version} (gnutls_x509_crt_t @var{crt}, unsigned int @var{version})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{version}: holds the version number. For X.509v1 certificates must be 1.
+
+This function will set the version of the certificate.  This must
+be one for X.509 version 1, and so on.  Plain certificates without
+extensions must have version set to one.
+
+To create well-formed certificates, you must specify version 3 if
+you use any certificate extensions.  Extensions are created by
+functions such as @code{gnutls_x509_crt_set_subject_alt_name()} 
+or @code{gnutls_x509_crt_set_key_usage()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

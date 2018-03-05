@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_privkey} (gnutls_pubkey_t @var{key}, gnutls_privkey_t @var{pkey}, unsigned int @var{usage}, unsigned int @var{flags})
+@var{key}: The public key
+
+@var{pkey}: The private key
+
+@var{usage}: GNUTLS_KEY_* key usage flags.
+
+@var{flags}: should be zero
+
+Imports the public key from a private.  This function will import
+the given public key to the abstract @code{gnutls_pubkey_t}  type.
+
+Note that in certain keys this operation may not be possible, e.g.,
+in other than RSA PKCS@code{11}  keys.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

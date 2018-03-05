@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_copy_x509_crt} (const char * @var{token_url}, gnutls_x509_crt_t @var{crt}, const char * @var{label}, unsigned int @var{flags})

@@ -1,0 +1,1 @@
+@item @var{void} @ref{dane_query_deinit} (dane_query_t @var{q})

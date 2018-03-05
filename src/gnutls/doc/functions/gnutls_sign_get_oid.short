@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_sign_get_oid} (gnutls_sign_algorithm_t @var{sign})

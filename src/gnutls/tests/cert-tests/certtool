@@ -1,0 +1,109 @@
+#!/bin/sh
+
+# Copyright (C) 2014 Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+#set -e
+
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+DIFF="${DIFF:-diff -b -B}"
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND}"
+fi
+
+#check whether "funny" spaces can be interpreted
+id=`${VALGRIND} "${CERTTOOL}" --key-id --infile "${srcdir}/data/funny-spacing.pem" --hash sha1| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3"; then
+	echo "Key-ID1 doesn't match the expected: ${id}"
+	exit 1
+fi
+
+id=`${VALGRIND} "${CERTTOOL}" --key-id --infile "${srcdir}/data/funny-spacing.pem"| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3"; then
+	echo "Default key-ID1 doesn't match the expected; did the defaults change? ID: ${id}"
+	exit 1
+fi
+
+id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/data/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha1| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "1e09d707d4e3651b84dcb6c68a828d2affef7ec3"; then
+	echo "Key-ID2 doesn't match the expected: ${id}"
+	exit 1
+fi
+
+id=`"${CERTTOOL}" --pubkey-info <"${srcdir}/data/funny-spacing.pem"|"${CERTTOOL}" --key-id --hash sha256| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "118e72e3655150c895ecbd19b3634179fb4a87c7a25abefcb11f5d66661d5a4d"; then
+	echo "Key-ID3 doesn't match the expected: ${id}"
+	exit 1
+fi
+
+#fingerprint
+id=`${VALGRIND} "${CERTTOOL}" --fingerprint --infile "${srcdir}/data/funny-spacing.pem"| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "8f735c5ddefd723f59b6a3bb2ac0522470c0182f"; then
+	echo "Fingerprint doesn't match the expected: 3"
+	exit 1
+fi
+
+id=`${VALGRIND} "${CERTTOOL}" --fingerprint --hash sha256 --infile "${srcdir}/data/funny-spacing.pem"| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "fc5b45b20c489393a457f177572920ac40bacba9d25cea51200822271eaf7d1f"; then
+	echo "Fingerprint doesn't match the expected: 4"
+	exit 1
+fi
+
+id=`${VALGRIND} "${CERTTOOL}" --fingerprint --hash sha512 --infile "${srcdir}/data/funny-spacing.pem"| tr -d '\r'`
+rc=$?
+
+if test "${id}" != "c4880390506a849cd2d8289fb8aea8c189e635aff1054faba58658a0f107472b725672c10d2f7f4ca360528b9433db278f544846e5613f9cd4cb4aa2f56a7894"; then
+	echo "Fingerprint doesn't match the expected: 5"
+	exit 1
+fi
+
+export TZ="UTC"
+
+. ${srcdir}/../scripts/common.sh
+
+check_for_datefudge
+
+cat "${srcdir}/../certs/cert-ecc256.pem" "${srcdir}/../certs/ca-cert-ecc.pem"|datefudge "2012-11-22" \
+${VALGRIND} "${CERTTOOL}" --verify-chain
+rc=$?
+
+if test "${rc}" != "0"; then
+	echo "There was an issue verifying the chain"
+	exit 1
+fi
+
+
+exit 0

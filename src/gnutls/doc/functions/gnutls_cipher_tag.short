@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_cipher_tag} (gnutls_cipher_hd_t @var{handle}, void * @var{tag}, size_t @var{tag_size})

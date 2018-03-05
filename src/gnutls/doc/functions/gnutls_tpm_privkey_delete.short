@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_tpm_privkey_delete} (const char * @var{url}, const char * @var{srk_password})

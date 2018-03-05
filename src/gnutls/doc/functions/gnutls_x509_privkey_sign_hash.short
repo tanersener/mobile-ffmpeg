@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_privkey_sign_hash} (gnutls_x509_privkey_t @var{key}, const gnutls_datum_t * @var{hash}, gnutls_datum_t * @var{signature})

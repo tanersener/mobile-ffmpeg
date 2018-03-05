@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs7_get_signature_info} (gnutls_pkcs7_t @var{pkcs7}, unsigned @var{idx}, gnutls_pkcs7_signature_info_st * @var{info})

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_dh_params_generate2} (gnutls_dh_params_t @var{dparams}, unsigned int @var{bits})

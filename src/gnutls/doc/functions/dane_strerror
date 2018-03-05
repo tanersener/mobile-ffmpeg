@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {const char *} {dane_strerror} (int @var{error})
+@var{error}: is a DANE error code, a negative error code
+
+This function is similar to strerror.  The difference is that it
+accepts an error number returned by a gnutls function; In case of
+an unknown error a descriptive string is sent instead of @code{NULL} .
+
+Error codes are always a negative error code.
+
+@strong{Returns:} A string explaining the DANE error message.
+@end deftypefun

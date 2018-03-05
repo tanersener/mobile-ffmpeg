@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pem_base64_decode} (const char * @var{header}, const gnutls_datum_t * @var{b64_data}, unsigned char * @var{result}, size_t * @var{result_size})

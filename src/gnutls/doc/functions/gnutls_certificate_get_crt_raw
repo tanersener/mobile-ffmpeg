@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_get_crt_raw} (gnutls_certificate_credentials_t @var{sc}, unsigned @var{idx1}, unsigned @var{idx2}, gnutls_datum_t * @var{cert})
+@var{sc}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{idx1}: the index of the certificate chain if multiple are present
+
+@var{idx2}: the index of the certificate in the chain. Zero gives the server's certificate.
+
+@var{cert}: Will hold the DER encoded certificate.
+
+This function will return the DER encoded certificate of the
+server or any other certificate on its certificate chain (based on  @code{idx2} ).
+The returned data should be treated as constant and only accessible during the lifetime
+of  @code{sc} . The  @code{idx1} matches the value @code{gnutls_certificate_set_x509_key()}  and friends
+functions.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. In case the indexes are out of bounds @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+is returned.
+
+@strong{Since:} 3.2.5
+@end deftypefun

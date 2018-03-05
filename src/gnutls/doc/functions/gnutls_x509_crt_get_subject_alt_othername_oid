@@ -1,0 +1,35 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_subject_alt_othername_oid} (gnutls_x509_crt_t @var{cert}, unsigned int @var{seq}, void * @var{oid}, size_t * @var{oid_size})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{seq}: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+
+@var{oid}: is the place where the otherName OID will be copied to
+
+@var{oid_size}: holds the size of ret.
+
+This function will extract the type OID of an otherName Subject
+Alternative Name, contained in the given certificate, and return
+the type as an enumerated element.
+
+This function is only useful if
+@code{gnutls_x509_crt_get_subject_alt_name()}  returned
+@code{GNUTLS_SAN_OTHERNAME} .
+
+If  @code{oid} is null then only the size will be filled. The  @code{oid} returned will be null terminated, although  @code{oid_size} will not
+account for the trailing null.
+
+@strong{Returns:} the alternative subject name type on success, one of the
+enumerated gnutls_x509_subject_alt_name_t.  For supported OIDs, it
+will return one of the virtual (GNUTLS_SAN_OTHERNAME_*) types,
+e.g. @code{GNUTLS_SAN_OTHERNAME_XMPP} , and @code{GNUTLS_SAN_OTHERNAME}  for
+unknown OIDs.  It will return @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if
+ @code{ian_size} is not large enough to hold the value.  In that case
+ @code{ian_size} will be updated with the required size.  If the
+certificate does not have an Alternative name with the specified
+sequence number and with the otherName type then
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned.
+@end deftypefun

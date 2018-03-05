@@ -1,0 +1,3 @@
+TIMEOUT 120
+'' '"IMPLEMENTATION" "Dovecot Pigeonhole"\r\n"SIEVE" "fileinto reject envelope encoded-character vacation subaddress comparator-i;ascii-numeric relational regex imap4flags copy include variables body enotify environment mailbox date"\r\n"NOTIFY" "mailto"\r\n"SASL" "PLAIN LOGIN"\r\n"STARTTLS"\r\n"VERSION" "1.0"r\nOK "Dovecot ready."\r\n'
+STARTTLS 'OK "Begin TLS negotiation now."\r\n'

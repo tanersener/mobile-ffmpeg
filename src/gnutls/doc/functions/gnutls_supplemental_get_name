@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {const char     *} {gnutls_supplemental_get_name} (gnutls_supplemental_data_format_type_t       @var{type})
+@var{type}: is a supplemental data format type
+
+Convert a @code{gnutls_supplemental_data_format_type_t}  value to a
+string.
+
+@strong{Returns:} a string that contains the name of the specified
+supplemental data format type, or @code{NULL}  for unknown types.
+@end deftypefun

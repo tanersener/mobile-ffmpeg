@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_delete_url} (const char * @var{object_url}, unsigned int @var{flags})

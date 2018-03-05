@@ -1,0 +1,125 @@
+@node API reference
+@appendix API reference
+@cindex API reference
+
+@menu
+* Core TLS API::
+* Datagram TLS API::
+* X509 certificate API::
+* PKCS 7 API::
+* OCSP API::
+* PKCS 12 API::
+* PKCS 11 API::
+* TPM API::
+* Abstract key API::
+* Socket specific API::
+* DANE API::
+* Cryptographic API::
+* Compatibility API::
+@end menu
+
+@node Core TLS API
+@section Core TLS API
+
+The prototypes for the following functions lie in
+@file{gnutls/gnutls.h}.
+
+@include gnutls-api.texi
+
+@node Datagram TLS API
+@section Datagram TLS API
+
+The prototypes for the following functions lie in
+@file{gnutls/dtls.h}.
+
+@include dtls-api.texi
+
+@node X509 certificate API
+@section @acronym{X.509} certificate API
+@cindex X.509 Functions
+
+The following functions are to be used for @acronym{X.509} certificate handling.
+Their prototypes lie in @file{gnutls/x509.h}.
+
+@include x509-api.texi
+
+@node PKCS 7 API
+@section @acronym{PKCS} 7 API
+
+The following functions are to be used for PKCS 7 structures handling.
+Their prototypes lie in @file{gnutls/pkcs7.h}.
+
+@include pkcs7-api.texi
+
+@node OCSP API
+@section @acronym{OCSP} API
+@cindex OCSP Functions
+
+The following functions are for @acronym{OCSP} certificate status
+checking.  Their prototypes lie in @file{gnutls/ocsp.h}.
+
+@include ocsp-api.texi
+
+@node PKCS 12 API
+@section PKCS 12 API
+
+The following functions are to be used for PKCS 12 handling.
+Their prototypes lie in @file{gnutls/pkcs12.h}.
+
+@include pkcs12-api.texi
+
+@node PKCS 11 API
+@section Hardware token via PKCS 11 API
+
+The following functions are to be used for PKCS 11 handling.
+Their prototypes lie in @file{gnutls/pkcs11.h}.
+
+@include pkcs11-api.texi
+
+@node TPM API
+@section TPM API
+
+The following functions are to be used for TPM handling.
+Their prototypes lie in @file{gnutls/tpm.h}.
+
+@include tpm-api.texi
+
+@node Abstract key API
+@section Abstract key API
+
+The following functions are to be used for abstract key handling.
+Their prototypes lie in @file{gnutls/abstract.h}.
+
+@include abstract-api.texi
+
+@node Socket specific API
+@section Socket specific API
+
+The prototypes for the following functions lie in
+@file{gnutls/socket.h}.
+@include socket-api.texi
+
+@node DANE API
+@section DANE API
+
+The following functions are to be used for DANE certificate verification.
+Their prototypes lie in @file{gnutls/dane.h}. Note that you need to link
+with the @code{libgnutls-dane} library to use them.
+
+@include dane-api.texi
+
+@node Cryptographic API
+@section Cryptographic API
+
+The following functions are to be used for low-level cryptographic operations.
+Their prototypes lie in @file{gnutls/crypto.h}.
+
+@include crypto-api.texi
+
+@node Compatibility API
+@section Compatibility API
+
+The following functions are carried over from old GnuTLS released. They might be removed at a later version.
+Their prototypes lie in @file{gnutls/compat.h}.
+
+@include compat-api.texi

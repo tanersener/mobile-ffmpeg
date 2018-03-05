@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_key_usage} (gnutls_x509_crt_t @var{crt}, unsigned int @var{usage})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{usage}: an ORed sequence of the GNUTLS_KEY_* elements.
+
+This function will set the keyUsage certificate extension.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

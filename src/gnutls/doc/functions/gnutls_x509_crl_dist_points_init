@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_dist_points_init} (gnutls_x509_crl_dist_points_t * @var{cdp})
+@var{cdp}: The CRL distribution points
+
+This function will initialize a CRL distribution points type.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

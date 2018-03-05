@@ -1,0 +1,230 @@
+AutoGen Definitions options;
+prog-name     = danetool;
+prog-title    = "GnuTLS DANE tool";
+prog-desc     = "Generate DANE TLSA RR entries.";
+detail    = "Tool to generate and check DNS resource records for the DANE protocol.";
+short-usage   = "danetool --[tlsa-rr|check] [options]
+danetool --help for additional usage instructions.\n";
+explain       = "";
+
+#define  INFILE_OPT    0
+#define  OUTFILE_OPT   1
+#define  VERBOSE_OPT 1
+#include args-std.def
+
+flag = {
+    name      = load-pubkey;
+    descrip   = "Loads a public key file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = load-certificate;
+    descrip   = "Loads a certificate file";
+    arg-type  = string;
+    doc = "This can be either a file or a PKCS #11 URL";
+};
+
+flag = {
+    name      = dlv;
+    descrip   = "Sets a DLV file";
+    arg-type  = string;
+    doc = "This sets a DLV file to be used for DNSSEC verification.";
+};
+
+flag = {
+    name      = hash;
+    arg-type  = string;
+    descrip   = "Hash algorithm to use for signing";
+    doc = "Available hash functions are SHA1, RMD160, SHA256, SHA384, SHA512.";
+};
+
+flag = {
+    name      = check;
+    arg-type  = string;
+    descrip   = "Check a host's DANE TLSA entry";
+    doc = "Obtains the DANE TLSA entry from the given hostname and prints information. Note that the actual certificate of the host can be provided using --load-certificate, otherwise danetool will connect to the server to obtain it. The exit code on verification success will be zero.";
+};
+
+flag = {
+    name      = check-ee;
+    descrip   = "Check only the end-entity's certificate";
+    doc = "Checks the end-entity's certificate only. Trust anchors or CAs are not considered.";
+};
+
+flag = {
+    name      = check-ca;
+    descrip   = "Check only the CA's certificate";
+    doc = "Checks the trust anchor's and CA's certificate only. End-entities are not considered.";
+};
+
+flag = {
+    name      = tlsa-rr;
+    descrip   = "Print the DANE RR data on a certificate or public key";
+    flags_must = host;
+    doc = "This command prints the DANE RR data needed to enable DANE on a DNS server.";
+};
+
+flag = {
+    name      = host;
+    descrip   = "Specify the hostname to be used in the DANE RR";
+    arg-type  = string;
+    arg-name  = "Hostname";
+    doc = "This command sets the hostname for the DANE RR.";
+};
+
+flag = {
+    name      = proto;
+    descrip   = "The protocol set for DANE data (tcp, udp etc.)";
+    arg-type  = string;
+    arg-name  = "Protocol";
+    doc = "This command specifies the protocol for the service set in the DANE data.";
+};
+
+flag = {
+    name      = port;
+    arg-type  = string;
+    descrip   = "The port or service to connect to, for DANE data";
+    default-value = "443";
+    doc      = "";
+};
+
+flag = {
+    name      = app-proto;
+    aliases   = starttls-proto;
+};
+
+flag = {
+    name      = starttls-proto;
+    descrip   = "The application protocol to be used to obtain the server's certificate (https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)";
+    arg-type  = string;
+    doc = "When the server's certificate isn't provided danetool will connect to the server to obtain the certificate. In that case it is required to know the protocol to talk with the server prior to initiating the TLS handshake.";
+};
+
+flag = {
+    name      = ca;
+    descrip   = "Whether the provided certificate or public key is a Certificate Authority";
+    doc      = "Marks the DANE RR as a CA certificate if specified.";
+};
+
+flag = {
+    name      = x509;
+    descrip   = "Use the hash of the X.509 certificate, rather than the public key";
+    doc      = "This option forces the generated record to contain the hash of the full X.509 certificate. By default only the hash of the public key is used.";
+};
+
+flag = {
+    name      = local;
+    aliases   = domain;
+};
+
+flag = {
+    name      = domain;
+    descrip   = "The provided certificate or public key is issued by the local domain";
+    enabled;
+    disable   = "no";
+    doc      = "DANE distinguishes certificates and public keys offered via the DNSSEC to trusted and local entities. This flag indicates that this is a domain-issued certificate, meaning that there could be no CA involved.";
+};
+
+flag = {
+    name      = local-dns;
+    descrip   = "Use the local DNS server for DNSSEC resolving";
+    disabled;
+    disable   = "no";
+    doc       = "This option will use the local DNS server for DNSSEC.
+This is disabled by default due to many servers not allowing DNSSEC.";
+};
+
+flag = {
+    name      = insecure;
+    descrip   = "Do not verify any DNSSEC signature";
+    doc = "Ignores any DNSSEC signature verification results.";
+};
+
+flag = {
+    name      = inder;
+    descrip   = "Use DER format for input certificates and private keys";
+    disabled;
+    disable   = "no";
+    doc       = "The input files will be assumed to be in DER or RAW format. 
+Unlike options that in PEM input would allow multiple input data (e.g. multiple 
+certificates), when reading in DER format a single data structure is read.";
+};
+
+flag = {
+    name      = inraw;
+    aliases   = inder;
+};
+
+flag = {
+    name      = print-raw;
+    descrip   = "Print the received DANE data in raw format";
+    disabled;
+    disable   = "no";
+    doc = "This option will print the received DANE data.";
+};
+
+flag = {
+    name      = quiet;
+    descrip   = "Suppress several informational messages";
+    doc      = "In that case on the exit code can be used as an indication of verification success";
+};
+
+
+
+doc-section = {
+  ds-type = 'SEE ALSO';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+    certtool (1)
+_EOT_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOT_
+@subheading DANE TLSA RR generation
+
+To create a DANE TLSA resource record for a certificate (or public key) 
+that was issued localy and may or may not be signed by a CA use the following command.
+@example
+$ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem
+@end example
+
+To create a DANE TLSA resource record for a CA signed certificate, which will
+be marked as such use the following command.
+@example
+$ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem \
+  --no-domain
+@end example
+
+The former is useful to add in your DNS entry even if your certificate is signed 
+by a CA. That way even users who do not trust your CA will be able to verify your
+certificate using DANE.
+
+In order to create a record for the CA signer of your certificate use the following.
+@example
+$ danetool --tlsa-rr --host www.example.com --load-certificate cert.pem \
+  --ca --no-domain
+@end example
+
+To read a server's DANE TLSA entry, use:
+@example
+$ danetool --check www.example.com --proto tcp --port 443
+@end example
+
+To verify an HTTPS server's DANE TLSA entry, use:
+@example
+$ danetool --check www.example.com --proto tcp --port 443 --load-certificate chain.pem
+@end example
+
+To verify an SMTP server's DANE TLSA entry, use:
+@example
+$ danetool --check www.example.com --proto tcp --starttls-proto=smtp --load-certificate chain.pem
+@end example
+_EOT_;
+};
+
+

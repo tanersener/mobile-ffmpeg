@@ -1,0 +1,37 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_list_verify} (const gnutls_x509_crt_t * @var{cert_list}, unsigned @var{cert_list_length}, const gnutls_x509_crt_t * @var{CA_list}, unsigned @var{CA_list_length}, const gnutls_x509_crl_t * @var{CRL_list}, unsigned @var{CRL_list_length}, unsigned int @var{flags}, unsigned int * @var{verify})
+@var{cert_list}: is the certificate list to be verified
+
+@var{cert_list_length}: holds the number of certificate in cert_list
+
+@var{CA_list}: is the CA list which will be used in verification
+
+@var{CA_list_length}: holds the number of CA certificate in CA_list
+
+@var{CRL_list}: holds a list of CRLs.
+
+@var{CRL_list_length}: the length of CRL list.
+
+@var{flags}: Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.
+
+@var{verify}: will hold the certificate verification output.
+
+
+This function will try to verify the given certificate list and
+return its status. The details of the verification are the same
+as in @code{gnutls_x509_trust_list_verify_crt2()} .
+
+You must check the peer's name in order to check if the verified
+certificate belongs to the actual peer.
+
+The certificate verification output will be put in  @code{verify} and will
+be one or more of the gnutls_certificate_status_t enumerated
+elements bitwise or'd.  For a more detailed verification status use
+@code{gnutls_x509_crt_verify()}  per list element.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

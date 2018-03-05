@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_packet_get} (gnutls_packet_t @var{packet}, gnutls_datum_t * @var{data}, unsigned char * @var{sequence})

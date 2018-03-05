@@ -1,0 +1,35 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_get_x509_crt} (gnutls_certificate_credentials_t @var{res}, unsigned @var{index}, gnutls_x509_crt_t ** @var{crt_list}, unsigned * @var{crt_list_size})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{index}: The index of the certificate list to obtain.
+
+@var{crt_list}: Where to store the certificate list.
+
+@var{crt_list_size}: Will hold the number of certificates.
+
+Obtains a X.509 certificate list that has been stored in  @code{res} with one of
+@code{gnutls_certificate_set_x509_key()} , @code{gnutls_certificate_set_key()} ,
+@code{gnutls_certificate_set_x509_key_file()} ,
+@code{gnutls_certificate_set_x509_key_file2()} ,
+@code{gnutls_certificate_set_x509_key_mem()} , or
+@code{gnutls_certificate_set_x509_key_mem2()} . Each certificate in the returned
+certificate list must be deallocated with @code{gnutls_x509_crt_deinit()} , and the
+list itself must be freed with @code{gnutls_free()} .
+
+The  @code{index} matches the return value of @code{gnutls_certificate_set_x509_key()}  and friends
+functions, when the @code{GNUTLS_CERTIFICATE_API_V2}  flag is set.
+
+If there is no certificate with the given index,
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned. If the certificate
+with the given index is not a X.509 certificate, @code{GNUTLS_E_INVALID_REQUEST} 
+is returned. The returned certificates must be deinitialized after
+use, and the  @code{crt_list} pointer must be freed using @code{gnutls_free()} .
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success, or a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun

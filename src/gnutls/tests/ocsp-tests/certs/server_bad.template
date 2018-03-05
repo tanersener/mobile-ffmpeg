@@ -1,0 +1,9 @@
+# static serial so the OCSP DB does not need to be changed
+serial=3
+cn=localhost
+tls_www_server
+signing_key
+encryption_key
+dns_name="localhost"
+activation_date = "2016-03-29 16:21:42"
+expiration_date = "2026-03-29 16:24:41"

@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs7_delete_crt} (gnutls_pkcs7_t @var{pkcs7}, int @var{indx})
+@var{pkcs7}: The pkcs7 type
+
+@var{indx}: the index of the certificate to delete
+
+This function will delete a certificate from a PKCS7 or RFC2630
+certificate set.  Index starts from 0. Returns 0 on success.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

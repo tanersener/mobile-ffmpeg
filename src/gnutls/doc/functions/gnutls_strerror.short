@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_strerror} (int @var{error})

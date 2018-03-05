@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_trust_list_add_system_trust} (gnutls_x509_trust_list_t @var{list}, unsigned int @var{tl_flags}, unsigned int @var{tl_vflags})
+@var{list}: The structure of the list
+
+@var{tl_flags}: GNUTLS_TL_*
+
+@var{tl_vflags}: gnutls_certificate_verify_flags if flags specifies GNUTLS_TL_VERIFY_CRL
+
+This function adds the system's default trusted certificate
+authorities to the trusted list. Note that on unsupported systems
+this function returns @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
+
+This function implies the flag @code{GNUTLS_TL_NO_DUPLICATES} .
+
+@strong{Returns:} The number of added elements or a negative error code on error.
+
+@strong{Since:} 3.1
+@end deftypefun

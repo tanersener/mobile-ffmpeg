@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_ocsp_resp_deinit} (gnutls_ocsp_resp_t @var{resp})
+@var{resp}: The data to be deinitialized
+
+This function will deinitialize a OCSP response structure.
+@end deftypefun

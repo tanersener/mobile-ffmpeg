@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_session_channel_binding} (gnutls_session_t @var{session}, gnutls_channel_binding_t @var{cbtype}, gnutls_datum_t * @var{cb})

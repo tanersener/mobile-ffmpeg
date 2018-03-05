@@ -1,0 +1,24 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_import_openssl} (gnutls_x509_privkey_t @var{key}, const gnutls_datum_t * @var{data}, const char * @var{password})
+@var{key}: The data to store the parsed key
+
+@var{data}: The DER or PEM encoded key.
+
+@var{password}: the password to decrypt the key (if it is encrypted).
+
+This function will convert the given PEM encrypted to 
+the native gnutls_x509_privkey_t format. The
+output will be stored in  @code{key} .  
+
+The  @code{password} should be in ASCII. If the password is not provided
+or wrong then @code{GNUTLS_E_DECRYPTION_FAILED}  will be returned.
+
+If the Certificate is PEM encoded it should have a header of
+"PRIVATE KEY" and the "DEK-Info" header. 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

@@ -144,11 +144,17 @@ android_prepare_toolchain_paths() {
     TARGET_HOST=$(android_get_target_host)
     
     export AR=${TARGET_HOST}-ar
-    export AS=${TARGET_HOST}-gcc
+    export AS=${TARGET_HOST}-as
     export CC=${TARGET_HOST}-gcc
     export CXX=${TARGET_HOST}-g++
     export LD=${TARGET_HOST}-ld
     export RANLIB=${TARGET_HOST}-ranlib
     export STRIP=${TARGET_HOST}-strip
+
+    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig"
+
+    if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
+        mkdir ${INSTALL_PKG_CONFIG_DIR}
+    fi
 }
 

@@ -1,0 +1,118 @@
+@node Authentication methods
+@chapter Authentication methods
+@cindex authentication methods
+
+The initial key exchange of the TLS protocol performs authentication
+of the peers. In typical scenarios the server is authenticated to
+the client, and optionally the client to the server.
+
+While many associate TLS with X.509 certificates and public key
+authentication, the protocol supports various authentication methods,
+including pre-shared keys, and passwords. In this chapter a description
+of the existing authentication methods is provided, as well as some
+guidance on which use-cases each method can be used at.
+
+@menu
+* Certificate authentication::
+* More on certificate authentication::
+* Shared-key and anonymous authentication::
+* Selecting an appropriate authentication method::
+@end menu
+
+@include cha-cert-auth.texi
+
+@include cha-cert-auth2.texi
+
+@include cha-shared-key.texi
+
+@node Selecting an appropriate authentication method
+@section Selecting an appropriate authentication method
+
+This section provides some guidance on how to use the available authentication
+methods in @acronym{GnuTLS} in various scenarios.
+
+@subsection Two peers with an out-of-band channel
+
+Let's consider two peers who need to communicate over an untrusted channel
+(the Internet), but have an out-of-band channel available. The latter
+channel is considered safe from eavesdropping and message modification and thus
+can be used for an initial bootstrapping of the protocol. The options 
+available are:
+@itemize
+@item Pre-shared keys (see @ref{PSK authentication}). The server and a
+client communicate a shared randomly generated key over the trusted
+channel and use it to negotiate further sessions over the untrusted channel.
+
+@item Passwords (see @ref{SRP authentication}). The client communicates
+to the server its username and password of choice and uses it to
+negotiate further sessions over the untrusted channel.
+
+@item Public keys (see @ref{Certificate authentication}). The client 
+and the server exchange their public keys (or fingerprints of them)
+over the trusted channel. 
+On future sessions over the untrusted channel they verify the key
+being the same (similar to @ref{Verifying a certificate using trust on first use
+authentication}).
+@end itemize
+
+Provided that the out-of-band channel is trusted all of the above provide
+a similar level of protection. An out-of-band channel may be the initial
+bootstrapping of a user's PC in a corporate environment, in-person
+communication, communication over an alternative network (e.g. the phone
+network), etc.
+
+@subsection Two peers without an out-of-band channel
+
+When an out-of-band channel is not available a peer cannot be reliably
+authenticated. What can be done, however, is to allow some form of
+registration of users connecting for the first time and ensure that their
+keys remain the same after that initial connection. This is termed
+key continuity or trust on first use (TOFU).
+
+The available option is to use public key authentication (see @ref{Certificate authentication}). 
+The client and the server store each other's public keys (or fingerprints of them)
+and associate them with their identity.
+On future sessions over the untrusted channel they verify the keys
+being the same (see @ref{Verifying a certificate using trust on first use
+authentication}).
+
+To mitigate the uncertainty of the information exchanged in the first 
+connection other channels over the Internet may be used, e.g., @acronym{DNSSEC}
+(see @ref{Verifying a certificate using DANE}).
+
+@subsection Two peers and a trusted third party
+
+When a trusted third party is available (or a certificate authority) 
+the most suitable option is to use 
+certificate authentication (see @ref{Certificate authentication}). 
+The client and the server obtain certificates that associate their identity
+and public keys using a digital signature by the trusted party and use 
+them to on the subsequent communications with each other. 
+Each party verifies the peer's certificate using the trusted third party's 
+signature. The parameters of the third party's signature are present
+in its certificate which must be available to all communicating parties.
+
+While the above is the typical authentication method for servers in the
+Internet by using the commercial CAs, the users that act as clients in the
+protocol rarely possess such certificates. In that case a hybrid method
+can be used where the server is authenticated by the client using the
+commercial CAs and the client is authenticated based on some information
+the client provided over the initial server-authenticated channel. The
+available options are:
+@itemize
+@item Passwords (see @ref{SRP authentication}). The client communicates
+to the server its username and password of choice on the initial
+server-authenticated connection and uses it to negotiate further sessions. 
+This is possible because the SRP protocol allows for the server to be 
+authenticated using a certificate and the client using the
+password.
+
+@item Public keys (see @ref{Certificate authentication}). The client 
+sends its public key to the server (or a fingerprint of it) over the
+initial server-authenticated connection. 
+On future sessions the client verifies the server using the third party
+certificate and the server verifies that the client's public key remained 
+the same (see @ref{Verifying a certificate using trust on first use
+authentication}).
+@end itemize
+

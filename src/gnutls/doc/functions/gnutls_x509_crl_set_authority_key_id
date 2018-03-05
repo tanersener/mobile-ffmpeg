@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_set_authority_key_id} (gnutls_x509_crl_t @var{crl}, const void * @var{id}, size_t @var{id_size})
+@var{crl}: a CRL of type @code{gnutls_x509_crl_t} 
+
+@var{id}: The key ID
+
+@var{id_size}: Holds the size of the serial field.
+
+This function will set the CRL's authority key ID extension.  Only
+the keyIdentifier field can be set with this function. This may
+be used by an authority that holds multiple private keys, to distinguish
+the used key.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.8.0
+@end deftypefun

@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_privkey_sign} (gnutls_x509_crq_t @var{crq}, gnutls_privkey_t @var{key}, gnutls_digest_algorithm_t @var{dig}, unsigned int @var{flags})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{key}: holds a private key
+
+@var{dig}: The message digest to use, i.e., @code{GNUTLS_DIG_SHA1} 
+
+@var{flags}: must be 0
+
+This function will sign the certificate request with a private key.
+This must be the same key as the one used in
+@code{gnutls_x509_crt_set_key()}  since a certificate request is self
+signed.
+
+This must be the last step in a certificate request generation
+since all the previously set parameters are now signed.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+@code{GNUTLS_E_ASN1_VALUE_NOT_FOUND}  is returned if you didn't set all
+information in the certificate request (e.g., the version using
+@code{gnutls_x509_crq_set_version()} ).
+
+@strong{Since:} 2.12.0
+@end deftypefun

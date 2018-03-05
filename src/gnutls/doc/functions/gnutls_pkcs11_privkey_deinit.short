@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_pkcs11_privkey_deinit} (gnutls_pkcs11_privkey_t @var{key})

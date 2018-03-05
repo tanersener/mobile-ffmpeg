@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_range_split} (gnutls_session_t @var{session}, const gnutls_range_st * @var{orig}, gnutls_range_st * @var{next}, gnutls_range_st * @var{remainder})

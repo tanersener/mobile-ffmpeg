@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_session_get_id2} (gnutls_session_t @var{session}, gnutls_datum_t * @var{session_id})

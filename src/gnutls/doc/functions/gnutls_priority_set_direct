@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_priority_set_direct} (gnutls_session_t @var{session}, const char * @var{priorities}, const char ** @var{err_pos})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{priorities}: is a string describing priorities
+
+@var{err_pos}: In case of an error this will have the position in the string the error occurred
+
+Sets the priorities to use on the ciphers, key exchange methods,
+macs and compression methods.  This function avoids keeping a
+priority cache and is used to directly set string priorities to a
+TLS session.  For documentation check the @code{gnutls_priority_init()} .
+
+To simply use a reasonable default, consider using @code{gnutls_set_default_priority()} .
+
+@strong{Returns:} On syntax error @code{GNUTLS_E_INVALID_REQUEST}  is returned,
+@code{GNUTLS_E_SUCCESS}  on success, or an error code.
+@end deftypefun

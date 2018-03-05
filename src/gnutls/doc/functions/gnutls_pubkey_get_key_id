@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_get_key_id} (gnutls_pubkey_t @var{key}, unsigned int @var{flags}, unsigned char * @var{output_data}, size_t * @var{output_data_size})
+@var{key}: Holds the public key
+
+@var{flags}: should be one of the flags from @code{gnutls_keyid_flags_t} 
+
+@var{output_data}: will contain the key ID
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will return a unique ID that depends on the public
+key parameters. This ID can be used in checking whether a
+certificate corresponds to the given public key.
+
+If the buffer provided is not long enough to hold the output, then
+*output_data_size is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will
+be returned.  The output will normally be a SHA-1 hash output,
+which is 20 bytes.
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+
+@strong{Since:} 2.12.0
+@end deftypefun

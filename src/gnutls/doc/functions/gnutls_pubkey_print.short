@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_print} (gnutls_pubkey_t @var{pubkey}, gnutls_certificate_print_formats_t @var{format}, gnutls_datum_t * @var{out})

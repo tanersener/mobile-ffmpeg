@@ -1,0 +1,4 @@
+TIMEOUT 120
+'' '220 mail.example.net Dovecot ready.\r\n'
+LHLO '250-mail.example.net\r\n250-8BITMIME\r\n250-ENHANCEDSTATUSCODES\r\n250-STARTTLS\r\n250 PIPELINING\r\n'
+STARTTLS '220 2.0.0 Ready to start TLS\r\n'

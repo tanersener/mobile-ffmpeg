@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_idna_reverse_map} (const char * @var{input}, unsigned @var{ilen}, gnutls_datum_t * @var{out}, unsigned @var{flags})
+@var{input}: contain the ACE (IDNA) formatted domain name
+
+@var{ilen}: the length of the provided string
+
+@var{out}: the result in an null-terminated allocated UTF-8 string
+
+@var{flags}: should be zero
+
+This function will convert an ACE (ASCII-encoded) domain name to a UTF-8 domain name.
+
+If GnuTLS is compiled without IDNA support, then this function
+will return @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} .
+
+Note also, that this function will return an empty string if an
+empty string is provided as input.
+
+@strong{Returns:} A negative error code on error, or 0 on success.
+
+@strong{Since:} 3.5.8
+@end deftypefun

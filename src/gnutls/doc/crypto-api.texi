@@ -1,0 +1,722 @@
+
+@subheading gnutls_aead_cipher_decrypt
+@anchor{gnutls_aead_cipher_decrypt}
+@deftypefun {int} {gnutls_aead_cipher_decrypt} (gnutls_aead_cipher_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len}, const void * @var{auth}, size_t @var{auth_len}, size_t @var{tag_size}, const void * @var{ctext}, size_t @var{ctext_len}, void * @var{ptext}, size_t * @var{ptext_len})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+@var{nonce}: the nonce to set
+
+@var{nonce_len}: The length of the nonce
+
+@var{auth}: the data to be authenticated
+
+@var{auth_len}: The length of the data
+
+@var{tag_size}: The size of the tag to use (use zero for the default)
+
+@var{ctext}: the data to decrypt
+
+@var{ctext_len}: the length of data to decrypt (includes tag size)
+
+@var{ptext}: the decrypted data
+
+@var{ptext_len}: the length of decrypted data (initially must hold the maximum available size)
+
+This function will decrypt the given data using the algorithm
+specified by the context. This function must be provided the whole
+data to be decrypted, including the tag, and will fail if the tag
+verification fails.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_aead_cipher_deinit
+@anchor{gnutls_aead_cipher_deinit}
+@deftypefun {void} {gnutls_aead_cipher_deinit} (gnutls_aead_cipher_hd_t @var{handle})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+This function will deinitialize all resources occupied by the given
+authenticated-encryption context.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_aead_cipher_encrypt
+@anchor{gnutls_aead_cipher_encrypt}
+@deftypefun {int} {gnutls_aead_cipher_encrypt} (gnutls_aead_cipher_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len}, const void * @var{auth}, size_t @var{auth_len}, size_t @var{tag_size}, const void * @var{ptext}, size_t @var{ptext_len}, void * @var{ctext}, size_t * @var{ctext_len})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+@var{nonce}: the nonce to set
+
+@var{nonce_len}: The length of the nonce
+
+@var{auth}: the data to be authenticated
+
+@var{auth_len}: The length of the data
+
+@var{tag_size}: The size of the tag to use (use zero for the default)
+
+@var{ptext}: the data to encrypt
+
+@var{ptext_len}: The length of data to encrypt
+
+@var{ctext}: the encrypted data
+
+@var{ctext_len}: the length of encrypted data (initially must hold the maximum available size, including space for tag)
+
+This function will encrypt the given data using the algorithm
+specified by the context. The output data will contain the
+authentication tag.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_aead_cipher_init
+@anchor{gnutls_aead_cipher_init}
+@deftypefun {int} {gnutls_aead_cipher_init} (gnutls_aead_cipher_hd_t * @var{handle}, gnutls_cipher_algorithm_t @var{cipher}, const gnutls_datum_t * @var{key})
+@var{handle}: is a @code{gnutls_aead_cipher_hd_t}  type.
+
+@var{cipher}: the authenticated-encryption algorithm to use
+
+@var{key}: The key to be used for encryption
+
+This function will initialize an context that can be used for
+encryption/decryption of data. This will effectively use the
+current crypto backend in use by gnutls or the cryptographic
+accelerator in use.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_cipher_add_auth
+@anchor{gnutls_cipher_add_auth}
+@deftypefun {int} {gnutls_cipher_add_auth} (gnutls_cipher_hd_t @var{handle}, const void * @var{ptext}, size_t @var{ptext_size})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{ptext}: the data to be authenticated
+
+@var{ptext_size}: the length of the data
+
+This function operates on authenticated encryption with
+associated data (AEAD) ciphers and authenticate the
+input data. This function can only be called once
+and before any encryption operations.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_cipher_decrypt
+@anchor{gnutls_cipher_decrypt}
+@deftypefun {int} {gnutls_cipher_decrypt} (gnutls_cipher_hd_t @var{handle}, void * @var{ctext}, size_t @var{ctext_len})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{ctext}: the data to decrypt
+
+@var{ctext_len}: the length of data to decrypt
+
+This function will decrypt the given data using the algorithm
+specified by the context.
+
+Note that in AEAD ciphers, this will not check the tag. You will
+need to compare the tag sent with the value returned from @code{gnutls_cipher_tag()} .
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_cipher_decrypt2
+@anchor{gnutls_cipher_decrypt2}
+@deftypefun {int} {gnutls_cipher_decrypt2} (gnutls_cipher_hd_t @var{handle}, const void * @var{ctext}, size_t @var{ctext_len}, void * @var{ptext}, size_t @var{ptext_len})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{ctext}: the data to decrypt
+
+@var{ctext_len}: the length of data to decrypt
+
+@var{ptext}: the decrypted data
+
+@var{ptext_len}: the available length for decrypted data
+
+This function will decrypt the given data using the algorithm
+specified by the context. For block ciphers the  @code{ctext_len} must be
+a multiple of the block size. For the supported ciphers the plaintext
+data length will equal the ciphertext size.
+
+Note that in AEAD ciphers, this will not check the tag. You will
+need to compare the tag sent with the value returned from @code{gnutls_cipher_tag()} .
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_cipher_deinit
+@anchor{gnutls_cipher_deinit}
+@deftypefun {void} {gnutls_cipher_deinit} (gnutls_cipher_hd_t @var{handle})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+This function will deinitialize all resources occupied by the given
+encryption context.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_cipher_encrypt
+@anchor{gnutls_cipher_encrypt}
+@deftypefun {int} {gnutls_cipher_encrypt} (gnutls_cipher_hd_t @var{handle}, void * @var{ptext}, size_t @var{ptext_len})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{ptext}: the data to encrypt
+
+@var{ptext_len}: the length of data to encrypt
+
+This function will encrypt the given data using the algorithm
+specified by the context.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_cipher_encrypt2
+@anchor{gnutls_cipher_encrypt2}
+@deftypefun {int} {gnutls_cipher_encrypt2} (gnutls_cipher_hd_t @var{handle}, const void * @var{ptext}, size_t @var{ptext_len}, void * @var{ctext}, size_t @var{ctext_len})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{ptext}: the data to encrypt
+
+@var{ptext_len}: the length of data to encrypt
+
+@var{ctext}: the encrypted data
+
+@var{ctext_len}: the available length for encrypted data
+
+This function will encrypt the given data using the algorithm
+specified by the context. For block ciphers the  @code{ptext_len} must be
+a multiple of the block size. For the supported ciphers the encrypted
+data length will equal the plaintext size.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_cipher_get_block_size
+@anchor{gnutls_cipher_get_block_size}
+@deftypefun {unsigned} {gnutls_cipher_get_block_size} (gnutls_cipher_algorithm_t @var{algorithm})
+@var{algorithm}: is an encryption algorithm
+
+
+@strong{Returns:} the block size of the encryption algorithm.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_cipher_get_iv_size
+@anchor{gnutls_cipher_get_iv_size}
+@deftypefun {unsigned} {gnutls_cipher_get_iv_size} (gnutls_cipher_algorithm_t @var{algorithm})
+@var{algorithm}: is an encryption algorithm
+
+Get block size for encryption algorithm.
+
+@strong{Returns:} block size for encryption algorithm.
+
+@strong{Since:} 3.2.0
+@end deftypefun
+
+@subheading gnutls_cipher_get_tag_size
+@anchor{gnutls_cipher_get_tag_size}
+@deftypefun {unsigned} {gnutls_cipher_get_tag_size} (gnutls_cipher_algorithm_t @var{algorithm})
+@var{algorithm}: is an encryption algorithm
+
+
+@strong{Returns:} the tag size of the authenticated encryption algorithm.
+
+@strong{Since:} 3.2.2
+@end deftypefun
+
+@subheading gnutls_cipher_init
+@anchor{gnutls_cipher_init}
+@deftypefun {int} {gnutls_cipher_init} (gnutls_cipher_hd_t * @var{handle}, gnutls_cipher_algorithm_t @var{cipher}, const gnutls_datum_t * @var{key}, const gnutls_datum_t * @var{iv})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{cipher}: the encryption algorithm to use
+
+@var{key}: the key to be used for encryption/decryption
+
+@var{iv}: the IV to use (if not applicable set NULL)
+
+This function will initialize the  @code{handle} context to be usable
+for encryption/decryption of data. This will effectively use the
+current crypto backend in use by gnutls or the cryptographic
+accelerator in use.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_cipher_set_iv
+@anchor{gnutls_cipher_set_iv}
+@deftypefun {void} {gnutls_cipher_set_iv} (gnutls_cipher_hd_t @var{handle}, void * @var{iv}, size_t @var{ivlen})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{iv}: the IV to set
+
+@var{ivlen}: the length of the IV
+
+This function will set the IV to be used for the next
+encryption block.
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_cipher_tag
+@anchor{gnutls_cipher_tag}
+@deftypefun {int} {gnutls_cipher_tag} (gnutls_cipher_hd_t @var{handle}, void * @var{tag}, size_t @var{tag_size})
+@var{handle}: is a @code{gnutls_cipher_hd_t}  type
+
+@var{tag}: will hold the tag
+
+@var{tag_size}: the length of the tag to return
+
+This function operates on authenticated encryption with
+associated data (AEAD) ciphers and will return the
+output tag.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 3.0
+@end deftypefun
+
+@subheading gnutls_crypto_register_aead_cipher
+@anchor{gnutls_crypto_register_aead_cipher}
+@deftypefun {int} {gnutls_crypto_register_aead_cipher} (gnutls_cipher_algorithm_t @var{algorithm}, int @var{priority}, gnutls_cipher_init_func @var{init}, gnutls_cipher_setkey_func @var{setkey}, gnutls_cipher_aead_encrypt_func @var{aead_encrypt}, gnutls_cipher_aead_decrypt_func @var{aead_decrypt}, gnutls_cipher_deinit_func @var{deinit})
+@var{algorithm}: is the gnutls AEAD cipher identifier
+
+@var{priority}: is the priority of the algorithm
+
+@var{init}: A function which initializes the cipher
+
+@var{setkey}: A function which sets the key of the cipher
+
+@var{aead_encrypt}: Perform the AEAD encryption
+
+@var{aead_decrypt}: Perform the AEAD decryption
+
+@var{deinit}: A function which deinitializes the cipher
+
+This function will register a cipher algorithm to be used by
+gnutls.  Any algorithm registered will override the included
+algorithms and by convention kernel implemented algorithms have
+priority of 90 and CPU-assisted of 80.  The algorithm with the lowest priority will be
+used by gnutls.
+
+In the case the registered init or setkey functions return @code{GNUTLS_E_NEED_FALLBACK} ,
+GnuTLS will attempt to use the next in priority registered cipher.
+
+The functions registered will be used with the new AEAD API introduced in
+GnuTLS 3.4.0. Internally GnuTLS uses the new AEAD API.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_crypto_register_cipher
+@anchor{gnutls_crypto_register_cipher}
+@deftypefun {int} {gnutls_crypto_register_cipher} (gnutls_cipher_algorithm_t @var{algorithm}, int @var{priority}, gnutls_cipher_init_func @var{init}, gnutls_cipher_setkey_func @var{setkey}, gnutls_cipher_setiv_func @var{setiv}, gnutls_cipher_encrypt_func @var{encrypt}, gnutls_cipher_decrypt_func @var{decrypt}, gnutls_cipher_deinit_func @var{deinit})
+@var{algorithm}: is the gnutls algorithm identifier
+
+@var{priority}: is the priority of the algorithm
+
+@var{init}: A function which initializes the cipher
+
+@var{setkey}: A function which sets the key of the cipher
+
+@var{setiv}: A function which sets the nonce/IV of the cipher (non-AEAD)
+
+@var{encrypt}: A function which performs encryption (non-AEAD)
+
+@var{decrypt}: A function which performs decryption (non-AEAD)
+
+@var{deinit}: A function which deinitializes the cipher
+
+This function will register a cipher algorithm to be used by
+gnutls.  Any algorithm registered will override the included
+algorithms and by convention kernel implemented algorithms have
+priority of 90 and CPU-assisted of 80.  The algorithm with the lowest priority will be
+used by gnutls.
+
+In the case the registered init or setkey functions return @code{GNUTLS_E_NEED_FALLBACK} ,
+GnuTLS will attempt to use the next in priority registered cipher.
+
+The functions which are marked as non-AEAD they are not required when
+registering a cipher to be used with the new AEAD API introduced in
+GnuTLS 3.4.0. Internally GnuTLS uses the new AEAD API.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_crypto_register_digest
+@anchor{gnutls_crypto_register_digest}
+@deftypefun {int} {gnutls_crypto_register_digest} (gnutls_digest_algorithm_t @var{algorithm}, int @var{priority}, gnutls_digest_init_func @var{init}, gnutls_digest_hash_func @var{hash}, gnutls_digest_output_func @var{output}, gnutls_digest_deinit_func @var{deinit}, gnutls_digest_fast_func @var{hash_fast})
+@var{algorithm}: is the gnutls digest identifier
+
+@var{priority}: is the priority of the algorithm
+
+@var{init}: A function which initializes the digest
+
+@var{hash}: Perform the hash operation
+
+@var{output}: Provide the output of the digest
+
+@var{deinit}: A function which deinitializes the digest
+
+@var{hash_fast}: Perform the digest operation in one go
+
+This function will register a digest algorithm to be used by gnutls.
+Any algorithm registered will override the included algorithms and
+by convention kernel implemented algorithms have priority of 90
+and CPU-assisted of 80.
+The algorithm with the lowest priority will be used by gnutls.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_crypto_register_mac
+@anchor{gnutls_crypto_register_mac}
+@deftypefun {int} {gnutls_crypto_register_mac} (gnutls_mac_algorithm_t @var{algorithm}, int @var{priority}, gnutls_mac_init_func @var{init}, gnutls_mac_setkey_func @var{setkey}, gnutls_mac_setnonce_func @var{setnonce}, gnutls_mac_hash_func @var{hash}, gnutls_mac_output_func @var{output}, gnutls_mac_deinit_func @var{deinit}, gnutls_mac_fast_func @var{hash_fast})
+@var{algorithm}: is the gnutls MAC identifier
+
+@var{priority}: is the priority of the algorithm
+
+@var{init}: A function which initializes the MAC
+
+@var{setkey}: A function which sets the key of the MAC
+
+@var{setnonce}: A function which sets the nonce for the mac (may be @code{NULL}  for common MAC algorithms)
+
+@var{hash}: Perform the hash operation
+
+@var{output}: Provide the output of the MAC
+
+@var{deinit}: A function which deinitializes the MAC
+
+@var{hash_fast}: Perform the MAC operation in one go
+
+This function will register a MAC algorithm to be used by gnutls.
+Any algorithm registered will override the included algorithms and
+by convention kernel implemented algorithms have priority of 90
+and CPU-assisted of 80.
+The algorithm with the lowest priority will be used by gnutls.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.0
+@end deftypefun
+
+@subheading gnutls_decode_ber_digest_info
+@anchor{gnutls_decode_ber_digest_info}
+@deftypefun {int} {gnutls_decode_ber_digest_info} (const gnutls_datum_t * @var{info}, gnutls_digest_algorithm_t * @var{hash}, unsigned char * @var{digest}, unsigned int * @var{digest_size})
+@var{info}: an RSA BER encoded DigestInfo structure
+
+@var{hash}: will contain the hash algorithm of the structure
+
+@var{digest}: will contain the hash output of the structure
+
+@var{digest_size}: will contain the hash size of the structure; initially must hold the maximum size of  @code{digest} 
+
+This function will parse an RSA PKCS@code{1}  1.5 DigestInfo structure
+and report the hash algorithm used as well as the digest data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.5.0
+@end deftypefun
+
+@subheading gnutls_encode_ber_digest_info
+@anchor{gnutls_encode_ber_digest_info}
+@deftypefun {int} {gnutls_encode_ber_digest_info} (gnutls_digest_algorithm_t @var{hash}, const gnutls_datum_t * @var{digest}, gnutls_datum_t * @var{output})
+@var{hash}: the hash algorithm that was used to get the digest
+
+@var{digest}: must contain the digest data
+
+@var{output}: will contain the allocated DigestInfo BER encoded data
+
+This function will encode the provided digest data, and its
+algorithm into an RSA PKCS@code{1}  1.5 DigestInfo structure. 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.5.0
+@end deftypefun
+
+@subheading gnutls_hash
+@anchor{gnutls_hash}
+@deftypefun {int} {gnutls_hash} (gnutls_hash_hd_t @var{handle}, const void * @var{ptext}, size_t @var{ptext_len})
+@var{handle}: is a @code{gnutls_hash_hd_t}  type
+
+@var{ptext}: the data to hash
+
+@var{ptext_len}: the length of data to hash
+
+This function will hash the given data using the algorithm
+specified by the context.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hash_deinit
+@anchor{gnutls_hash_deinit}
+@deftypefun {void} {gnutls_hash_deinit} (gnutls_hash_hd_t @var{handle}, void * @var{digest})
+@var{handle}: is a @code{gnutls_hash_hd_t}  type
+
+@var{digest}: is the output value of the hash
+
+This function will deinitialize all resources occupied by
+the given hash context.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hash_fast
+@anchor{gnutls_hash_fast}
+@deftypefun {int} {gnutls_hash_fast} (gnutls_digest_algorithm_t @var{algorithm}, const void * @var{ptext}, size_t @var{ptext_len}, void * @var{digest})
+@var{algorithm}: the hash algorithm to use
+
+@var{ptext}: the data to hash
+
+@var{ptext_len}: the length of data to hash
+
+@var{digest}: is the output value of the hash
+
+This convenience function will hash the given data and return output
+on a single call.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hash_get_len
+@anchor{gnutls_hash_get_len}
+@deftypefun {unsigned} {gnutls_hash_get_len} (gnutls_digest_algorithm_t @var{algorithm})
+@var{algorithm}: the hash algorithm to use
+
+This function will return the length of the output data
+of the given hash algorithm.
+
+@strong{Returns:} The length or zero on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hash_init
+@anchor{gnutls_hash_init}
+@deftypefun {int} {gnutls_hash_init} (gnutls_hash_hd_t * @var{dig}, gnutls_digest_algorithm_t @var{algorithm})
+@var{dig}: is a @code{gnutls_hash_hd_t}  type
+
+@var{algorithm}: the hash algorithm to use
+
+This function will initialize an context that can be used to
+produce a Message Digest of data.  This will effectively use the
+current crypto backend in use by gnutls or the cryptographic
+accelerator in use.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hash_output
+@anchor{gnutls_hash_output}
+@deftypefun {void} {gnutls_hash_output} (gnutls_hash_hd_t @var{handle}, void * @var{digest})
+@var{handle}: is a @code{gnutls_hash_hd_t}  type
+
+@var{digest}: is the output value of the hash
+
+This function will output the current hash value
+and reset the state of the hash.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hmac
+@anchor{gnutls_hmac}
+@deftypefun {int} {gnutls_hmac} (gnutls_hmac_hd_t @var{handle}, const void * @var{ptext}, size_t @var{ptext_len})
+@var{handle}: is a @code{gnutls_hmac_hd_t}  type
+
+@var{ptext}: the data to hash
+
+@var{ptext_len}: the length of data to hash
+
+This function will hash the given data using the algorithm
+specified by the context.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hmac_deinit
+@anchor{gnutls_hmac_deinit}
+@deftypefun {void} {gnutls_hmac_deinit} (gnutls_hmac_hd_t @var{handle}, void * @var{digest})
+@var{handle}: is a @code{gnutls_hmac_hd_t}  type
+
+@var{digest}: is the output value of the MAC
+
+This function will deinitialize all resources occupied by
+the given hmac context.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hmac_fast
+@anchor{gnutls_hmac_fast}
+@deftypefun {int} {gnutls_hmac_fast} (gnutls_mac_algorithm_t @var{algorithm}, const void * @var{key}, size_t @var{keylen}, const void * @var{ptext}, size_t @var{ptext_len}, void * @var{digest})
+@var{algorithm}: the hash algorithm to use
+
+@var{key}: the key to use
+
+@var{keylen}: the length of the key
+
+@var{ptext}: the data to hash
+
+@var{ptext_len}: the length of data to hash
+
+@var{digest}: is the output value of the hash
+
+This convenience function will hash the given data and return output
+on a single call.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hmac_get_len
+@anchor{gnutls_hmac_get_len}
+@deftypefun {unsigned} {gnutls_hmac_get_len} (gnutls_mac_algorithm_t @var{algorithm})
+@var{algorithm}: the hmac algorithm to use
+
+This function will return the length of the output data
+of the given hmac algorithm.
+
+@strong{Returns:} The length or zero on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hmac_init
+@anchor{gnutls_hmac_init}
+@deftypefun {int} {gnutls_hmac_init} (gnutls_hmac_hd_t * @var{dig}, gnutls_mac_algorithm_t @var{algorithm}, const void * @var{key}, size_t @var{keylen})
+@var{dig}: is a @code{gnutls_hmac_hd_t}  type
+
+@var{algorithm}: the HMAC algorithm to use
+
+@var{key}: the key to be used for encryption
+
+@var{keylen}: the length of the key
+
+This function will initialize an context that can be used to
+produce a Message Authentication Code (MAC) of data.  This will
+effectively use the current crypto backend in use by gnutls or the
+cryptographic accelerator in use.
+
+Note that despite the name of this function, it can be used
+for other MAC algorithms than HMAC.
+
+@strong{Returns:} Zero or a negative error code on error.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hmac_output
+@anchor{gnutls_hmac_output}
+@deftypefun {void} {gnutls_hmac_output} (gnutls_hmac_hd_t @var{handle}, void * @var{digest})
+@var{handle}: is a @code{gnutls_hmac_hd_t}  type
+
+@var{digest}: is the output value of the MAC
+
+This function will output the current MAC value
+and reset the state of the MAC.
+
+@strong{Since:} 2.10.0
+@end deftypefun
+
+@subheading gnutls_hmac_set_nonce
+@anchor{gnutls_hmac_set_nonce}
+@deftypefun {void} {gnutls_hmac_set_nonce} (gnutls_hmac_hd_t @var{handle}, const void * @var{nonce}, size_t @var{nonce_len})
+@var{handle}: is a @code{gnutls_hmac_hd_t}  type
+
+@var{nonce}: the data to set as nonce
+
+@var{nonce_len}: the length of data
+
+This function will set the nonce in the MAC algorithm.
+
+@strong{Since:} 3.2.0
+@end deftypefun
+
+@subheading gnutls_mac_get_nonce_size
+@anchor{gnutls_mac_get_nonce_size}
+@deftypefun {size_t} {gnutls_mac_get_nonce_size} (gnutls_mac_algorithm_t @var{algorithm})
+@var{algorithm}: is an encryption algorithm
+
+Returns the size of the nonce used by the MAC in TLS.
+
+@strong{Returns:} length (in bytes) of the given MAC nonce size, or 0.
+
+@strong{Since:} 3.2.0
+@end deftypefun
+
+@subheading gnutls_rnd
+@anchor{gnutls_rnd}
+@deftypefun {int} {gnutls_rnd} (gnutls_rnd_level_t @var{level}, void * @var{data}, size_t @var{len})
+@var{level}: a security level
+
+@var{data}: place to store random bytes
+
+@var{len}: The requested size
+
+This function will generate random data and store it to output
+buffer.
+
+This function is thread-safe and also fork-safe.
+
+@strong{Returns:} Zero on success, or a negative error code on error.
+
+@strong{Since:} 2.12.0
+@end deftypefun
+
+@subheading gnutls_rnd_refresh
+@anchor{gnutls_rnd_refresh}
+@deftypefun {void} {gnutls_rnd_refresh} ( @var{void})
+
+This function refreshes the random generator state.
+That is the current precise time, CPU usage, and
+other values are input into its state.
+
+On a slower rate input from /dev/urandom is mixed too.
+
+@strong{Since:} 3.1.7
+@end deftypefun
+

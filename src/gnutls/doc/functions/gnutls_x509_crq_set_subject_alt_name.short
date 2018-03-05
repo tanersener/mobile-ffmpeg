@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crq_set_subject_alt_name} (gnutls_x509_crq_t @var{crq}, gnutls_x509_subject_alt_name_t @var{nt}, const void * @var{data}, unsigned int @var{data_size}, unsigned int @var{flags})

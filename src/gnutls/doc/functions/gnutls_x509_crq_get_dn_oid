@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_get_dn_oid} (gnutls_x509_crq_t @var{crq}, unsigned @var{indx}, void * @var{oid}, size_t * @var{sizeof_oid})
+@var{crq}: should contain a gnutls_x509_crq_t type
+
+@var{indx}: Specifies which DN OID to get. Use (0) to get the first one.
+
+@var{oid}: a pointer to a structure to hold the name (may be @code{NULL} )
+
+@var{sizeof_oid}: initially holds the size of  @code{oid} 
+
+This function will extract the requested OID of the name of the
+certificate request subject, specified by the given index.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is
+not long enough, and in that case the * @code{sizeof_oid} will be
+updated with the required size.  On success 0 is returned.
+@end deftypefun

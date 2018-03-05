@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_import_tpm_raw} (gnutls_privkey_t @var{pkey}, const gnutls_datum_t * @var{fdata}, gnutls_tpmkey_fmt_t @var{format}, const char * @var{srk_password}, const char * @var{key_password}, unsigned int @var{flags})
+@var{pkey}: The private key
+
+@var{fdata}: The TPM key to be imported
+
+@var{format}: The format of the private key
+
+@var{srk_password}: The password for the SRK key (optional)
+
+@var{key_password}: A password for the key (optional)
+
+@var{flags}: should be zero
+
+This function will import the given private key to the abstract
+@code{gnutls_privkey_t}  type. 
+
+With respect to passwords the same as in @code{gnutls_privkey_import_tpm_url()}  apply.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

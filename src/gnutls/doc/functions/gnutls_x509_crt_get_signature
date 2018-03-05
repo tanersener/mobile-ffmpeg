@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_signature} (gnutls_x509_crt_t @var{cert}, char * @var{sig}, size_t * @var{sig_size})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{sig}: a pointer where the signature part will be copied (may be null).
+
+@var{sig_size}: initially holds the size of  @code{sig} 
+
+This function will extract the signature field of a certificate.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

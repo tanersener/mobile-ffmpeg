@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_dn_init} (gnutls_x509_dn_t * @var{dn})
+@var{dn}: the object to be initialized
+
+This function initializes a @code{gnutls_x509_dn_t}  type.
+
+The object returned must be deallocated using
+@code{gnutls_x509_dn_deinit()} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.4.0
+@end deftypefun

@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_copy_attached_extension} (const char * @var{token_url}, gnutls_x509_crt_t @var{crt}, gnutls_datum_t * @var{data}, const char * @var{label}, unsigned int @var{flags})
+@var{token_url}: A PKCS @code{11}  URL specifying a token
+
+@var{crt}: An X.509 certificate object
+
+@var{data}: the attached extension
+
+@var{label}: A name to be used for the attached extension (may be @code{NULL} )
+
+@var{flags}: One of GNUTLS_PKCS11_OBJ_FLAG_*
+
+This function will copy an the attached extension in  @code{data} for
+the certificate provided in  @code{crt} in the PKCS @code{11}  token specified
+by the URL (typically a trust module). The extension must be in
+RFC5280 Extension format.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.3.8
+@end deftypefun

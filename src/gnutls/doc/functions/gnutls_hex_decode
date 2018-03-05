@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_hex_decode} (const gnutls_datum_t * @var{hex_data}, void * @var{result}, size_t * @var{result_size})
+@var{hex_data}: contain the encoded data
+
+@var{result}: the place where decoded data will be copied
+
+@var{result_size}: holds the size of the result
+
+This function will decode the given encoded data, using the hex
+encoding used by PSK password files.
+
+Initially  @code{result_size} must hold the maximum size available in
+ @code{result} , and on return it will contain the number of bytes written.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the buffer given is not
+long enough, @code{GNUTLS_E_PARSING_ERROR}  on invalid hex data, or 0 on success.
+@end deftypefun

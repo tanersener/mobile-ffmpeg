@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_srp_base64_encode2} (const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{result})
+@var{data}: contains the raw data
+
+@var{result}: will hold the newly allocated encoded data
+
+This function will convert the given data to printable data, using
+the base64 encoding.  This is the encoding used in SRP password
+files.  This function will allocate the required memory to hold
+the encoded data.
+
+You should use @code{gnutls_free()}  to free the returned data.
+
+Warning!  This base64 encoding is not the "standard" encoding, so
+do not use it for non-SRP purposes.
+
+@strong{Returns:} 0 on success, or an error code.
+@end deftypefun

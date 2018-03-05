@@ -1,0 +1,36 @@
+
+
+
+
+@deftypefun {int} {gnutls_store_commitment} (const char * @var{db_name}, gnutls_tdb_t @var{tdb}, const char * @var{host}, const char * @var{service}, gnutls_digest_algorithm_t @var{hash_algo}, const gnutls_datum_t * @var{hash}, time_t @var{expiration}, unsigned int @var{flags})
+@var{db_name}: A file specifying the stored keys (use NULL for the default)
+
+@var{tdb}: A storage structure or NULL to use the default
+
+@var{host}: The peer's name
+
+@var{service}: non-NULL if this key is specific to a service (e.g. http)
+
+@var{hash_algo}: The hash algorithm type
+
+@var{hash}: The raw hash
+
+@var{expiration}: The expiration time (use 0 to disable expiration)
+
+@var{flags}: should be 0 or @code{GNUTLS_SCOMMIT_FLAG_ALLOW_BROKEN} .
+
+This function will store the provided hash commitment to 
+the list of stored public keys. The key with the given
+hash will be considered valid until the provided expiration time.
+
+The  @code{store} variable if non-null specifies a custom backend for
+the storage of entries. If it is NULL then the
+default file backend will be used.
+
+Note that this function is not thread safe with the default backend.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

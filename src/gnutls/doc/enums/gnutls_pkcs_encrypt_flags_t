@@ -1,0 +1,27 @@
+
+
+@c gnutls_pkcs_encrypt_flags_t
+@table @code
+@item GNUTLS_@-PKCS_@-PLAIN
+Unencrypted private key.
+@item GNUTLS_@-PKCS_@-PKCS12_@-3DES
+PKCS-12 3DES.
+@item GNUTLS_@-PKCS_@-PKCS12_@-ARCFOUR
+PKCS-12 ARCFOUR.
+@item GNUTLS_@-PKCS_@-PKCS12_@-RC2_@-40
+PKCS-12 RC2-40.
+@item GNUTLS_@-PKCS_@-PBES2_@-3DES
+PBES2 3DES.
+@item GNUTLS_@-PKCS_@-PBES2_@-AES_@-128
+PBES2 AES-128.
+@item GNUTLS_@-PKCS_@-PBES2_@-AES_@-192
+PBES2 AES-192.
+@item GNUTLS_@-PKCS_@-PBES2_@-AES_@-256
+PBES2 AES-256.
+@item GNUTLS_@-PKCS_@-NULL_@-PASSWORD
+Some schemas distinguish between an empty and a NULL password.
+@item GNUTLS_@-PKCS_@-PBES2_@-DES
+PBES2 single DES.
+@item GNUTLS_@-PKCS_@-PBES1_@-DES_@-MD5
+-- undescribed --
+@end table

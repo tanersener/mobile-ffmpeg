@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {gnutls_dh_params_init} (gnutls_dh_params_t * @var{dh_params})
+@var{dh_params}: The parameters
+
+This function will initialize the DH parameters type.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun

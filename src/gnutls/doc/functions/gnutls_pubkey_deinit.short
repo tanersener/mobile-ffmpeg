@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_pubkey_deinit} (gnutls_pubkey_t @var{key})

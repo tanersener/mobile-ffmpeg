@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_name_constraints_init} (gnutls_x509_name_constraints_t * @var{nc})
+@var{nc}: The nameconstraints
+
+This function will initialize a name constraints type.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

@@ -1,0 +1,498 @@
+AutoGen Definitions options;
+prog-name     = gnutls-cli;
+prog-title    = "GnuTLS client";
+prog-desc     = "Simple client program to set up a TLS connection.";
+short-usage   = "Usage: gnutls-cli [options] hostname\ngnutls-cli --help for usage instructions.\n";
+explain       = "";
+detail        = "Simple client program to set up a TLS connection to some other computer. 
+It sets up a TLS connection and forwards data from the standard input to the secured socket and vice versa.";
+reorder-args;
+argument = "[hostname]";
+
+#define  VERBOSE_OPT 1
+#include args-std.def
+
+flag = {
+    name      = tofu;
+    descrip   = "Enable trust on first use authentication";
+    disabled;
+    disable   = "no";
+    doc       = "This option will, in addition to certificate authentication, perform authentication
+based on previously seen public keys, a model similar to SSH authentication. Note that when tofu 
+is specified (PKI) and DANE authentication will become advisory to assist the public key acceptance
+process.";
+};
+
+flag = {
+    name      = strict-tofu;
+    descrip   = "Fail to connect if a known certificate has changed";
+    disabled;
+    disable   = "no";
+    doc       = "This option will perform authentication as with option --tofu; however, while --tofu asks whether to trust a changed public key, this option will fail in case of public key changes.";
+};
+
+flag = {
+    name      = dane;
+    descrip   = "Enable DANE certificate verification (DNSSEC)";
+    disabled;
+    disable   = "no";
+    doc       = "This option will, in addition to certificate authentication using 
+the trusted CAs, verify the server certificates using on the DANE information
+available via DNSSEC.";
+};
+
+flag = {
+    name      = local-dns;
+    descrip   = "Use the local DNS server for DNSSEC resolving";
+    disabled;
+    disable   = "no";
+    doc       = "This option will use the local DNS server for DNSSEC.
+This is disabled by default due to many servers not allowing DNSSEC.";
+};
+
+flag = {
+    name      = ca-verification;
+    descrip   = "Enable CA certificate verification";
+    enabled;
+    disable   = "no";
+    doc       = "This option can be used to enable or disable CA certificate verification. It is to be used with the --dane or --tofu options.";
+};
+
+flag = {
+    name      = ocsp;
+    descrip   = "Enable OCSP certificate verification";
+    disabled;
+    disable   = "no";
+    doc       = "This option will enable verification of the peer's certificate using ocsp";
+};
+
+flag = {
+    name      = resume;
+    value     = r;
+    descrip   = "Establish a session and resume";
+    doc       = "Connect, establish a session, reconnect and resume.";
+};
+
+flag = {
+    name      = rehandshake;
+    value     = e;
+    descrip   = "Establish a session and rehandshake";
+    doc       = "Connect, establish a session and rehandshake immediately.";
+};
+
+flag = {
+    name      = sni-hostname;
+    descrip   = "Server's hostname for server name indication extension";
+    arg-type  = string;
+    doc      = "Set explicitly the server name used in the TLS server name indication extension. That is useful when testing with servers setup on different DNS name than the intended. If not specified, the provided hostname is used.";
+};
+
+flag = {
+    name      = starttls;
+    value     = s;
+    descrip   = "Connect, establish a plain session and start TLS";
+    doc       = "The TLS session will be initiated when EOF or a SIGALRM is received.";
+};
+
+flag = {
+    name      = app-proto;
+    aliases   = starttls-proto;
+};
+
+flag = {
+    name      = starttls-proto;
+    descrip   = "The application protocol to be used to obtain the server's certificate (https, ftp, smtp, imap, ldap, xmpp, lmtp, pop3, nntp, sieve, postgres)";
+    arg-type  = string;
+    doc       = "Specify the application layer protocol for STARTTLS. If the protocol is supported, gnutls-cli will proceed to the TLS negotiation.";
+    flags-cant = starttls;
+};
+
+flag = {
+    name      = udp;
+    value     = u;
+    descrip   = "Use DTLS (datagram TLS) over UDP";
+    doc      = "";
+};
+
+flag = {
+    name      = mtu;
+    arg-type  = number;
+    arg-range = "0->17000";
+    descrip   = "Set MTU for datagram TLS";
+    doc      = "";
+};
+
+flag = {
+    name      = crlf;
+    descrip   = "Send CR LF instead of LF";
+    doc      = "";
+};
+
+flag = {
+    name      = fastopen;
+    descrip   = "Enable TCP Fast Open";
+    doc      = "";
+};
+
+flag = {
+    name      = x509fmtder;
+    descrip   = "Use DER format for certificates to read from";
+    doc      = "";
+};
+
+flag = {
+    name      = fingerprint;
+    value     = f;
+    descrip   = "Send the openpgp fingerprint, instead of the key";
+    doc      = "";
+};
+
+flag = {
+    name      = print-cert;
+    descrip   = "Print peer's certificate in PEM format";
+    doc      = "";
+};
+
+flag = {
+    name      = save-cert;
+    arg-type  = string;
+    descrip   = "Save the peer's certificate chain in the specified file in PEM format";
+    doc      = "";
+};
+
+flag = {
+    name      = save-ocsp;
+    arg-type  = string;
+    descrip   = "Save the peer's OCSP status response in the provided file";
+    doc      = "";
+};
+
+flag = {
+    name      = dh-bits;
+    arg-type  = number;
+    descrip   = "The minimum number of bits allowed for DH";
+    doc      = "This option sets the minimum number of bits allowed for a Diffie-Hellman key exchange. You may want to lower the default value if the peer sends a weak prime and you get an connection error with unacceptable prime.";
+};
+
+flag = {
+    name      = priority;
+    arg-type  = string;
+    descrip   = "Priorities string";
+    doc      = "TLS algorithms and protocols to enable. You can
+use predefined sets of ciphersuites such as PERFORMANCE,
+NORMAL, PFS, SECURE128, SECURE256. The default is NORMAL.
+
+Check  the  GnuTLS  manual  on  section  ``Priority strings'' for more
+information on the allowed keywords";
+};
+
+flag = {
+    name      = x509cafile;
+    arg-type  = string;
+    descrip   = "Certificate file or PKCS #11 URL to use";
+    doc      = "";
+};
+
+flag = {
+    name      = x509crlfile;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "CRL file to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pgpkeyfile;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "PGP Key file to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pgpkeyring;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "PGP Key ring file to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pgpcertfile;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "PGP Public Key (certificate) file to use";
+    doc      = "";
+    flags-must = pgpkeyfile;
+};
+
+flag = {
+    name      = x509keyfile;
+    arg-type  = string;
+    descrip   = "X.509 key file or PKCS #11 URL to use";
+    doc      = "";
+};
+
+flag = {
+    name      = x509certfile;
+    arg-type  = string;
+    descrip   = "X.509 Certificate file or PKCS #11 URL to use";
+    doc      = "";
+    flags-must = x509keyfile;
+};
+
+flag = {
+    name      = pgpsubkey;
+    arg-type  = string;
+    descrip   = "PGP subkey to use (hex or auto)";
+    doc      = "";
+};
+
+flag = {
+    name      = srpusername;
+    arg-type  = string;
+    descrip   = "SRP username to use";
+    doc      = "";
+};
+
+flag = {
+    name      = srppasswd;
+    arg-type  = string;
+    descrip   = "SRP password to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pskusername;
+    arg-type  = string;
+    descrip   = "PSK username to use";
+    doc      = "";
+};
+
+flag = {
+    name      = pskkey;
+    arg-type  = string;
+    descrip   = "PSK key (in hex) to use";
+    doc      = "";
+};
+
+
+flag = {
+    name      = port;
+    value     = p;
+    arg-type  = string;
+    descrip   = "The port or service to connect to";
+    doc      = "";
+};
+
+flag = {
+    name      = insecure;
+    descrip   = "Don't abort program if server certificate can't be validated";
+    doc      = "";
+};
+
+flag = {
+    name      = ranges;
+    descrip   = "Use length-hiding padding to prevent traffic analysis";
+    doc      = "When possible (e.g., when using CBC ciphersuites), use length-hiding padding to prevent traffic analysis.";
+};
+
+flag = {
+    name      = benchmark-ciphers;
+    descrip   = "Benchmark individual ciphers";
+    doc      = "By default the benchmarked ciphers will utilize any capabilities of the local CPU to improve performance. To test against the raw software implementation set the environment variable GNUTLS_CPUID_OVERRIDE to 0x1.";
+};
+
+flag = {
+    name      = benchmark-tls-kx;
+    descrip   = "Benchmark TLS key exchange methods";
+    doc      = "";
+};
+
+flag = {
+    name      = benchmark-tls-ciphers;
+    descrip   = "Benchmark TLS ciphers";
+    doc      = "By default the benchmarked ciphers will utilize any capabilities of the local CPU to improve performance. To test against the raw software implementation set the environment variable GNUTLS_CPUID_OVERRIDE to 0x1.";
+};
+
+flag = {
+    name      = list;
+    value     = l;
+    descrip   = "Print a list of the supported algorithms and modes";
+    doc      = "Print a list of the supported algorithms and modes. If a priority string is given then only the enabled ciphersuites are shown.";
+    flags-cant = port;
+};
+
+flag = {
+    name      = priority-list;
+    descrip   = "Print a list of the supported priority strings";
+    doc      = "Print a list of the supported priority strings. The ciphersuites corresponding to each priority string can be examined using -l -p.";
+};
+
+flag = {
+    name      = noticket;
+    descrip   = "Don't allow session tickets";
+    doc      = "";
+};
+
+flag = {
+    name      = srtp_profiles;
+    arg-type  = string;
+    descrip   = "Offer SRTP profiles";
+    doc       = "";
+};
+
+flag = {
+    name      = alpn;
+    arg-type  = string;
+    descrip   = "Application layer protocol";
+    max       = NOLIMIT;  /* occurrence limit (none)     */
+    stack-arg;            /* save opt args in a stack    */
+    doc      = "This option will set and enable the Application Layer Protocol Negotiation  (ALPN) in the TLS protocol.";
+};
+
+flag = {
+    name      = heartbeat;
+    value     = b;
+    descrip   = "Activate heartbeat support";
+    doc      = "";
+};
+
+flag = {
+    name      = recordsize;
+    arg-type  = number;
+    arg-range = "0->4096";
+    descrip   = "The maximum record size to advertize";
+    doc      = "";
+};
+
+flag = {
+    name      = disable-sni;
+    descrip   = "Do not send a Server Name Indication (SNI)";
+    doc      = "";
+};
+
+flag = {
+    name      = disable-extensions;
+    descrip   = "Disable all the TLS extensions";
+    doc      = "This option disables all TLS extensions. Deprecated option. Use the priority string.";
+};
+
+flag = {
+    name      = inline-commands;
+    descrip   = "Inline commands of the form ^<cmd>^";
+    doc       = "Enable inline commands of the form ^<cmd>^. The inline commands are expected to be in a line by themselves. The available commands are: resume and renegotiate.";
+};
+
+flag = {
+    name      = inline-commands-prefix;
+    arg-type  = string;
+    descrip   = "Change the default delimiter for inline commands.";
+    doc       = "Change the default delimiter (^) used for inline commands. The delimiter is expected to be a single US-ASCII character (octets 0 - 127). This option is only relevant if inline commands are enabled via the inline-commands option";
+};
+
+flag = {
+    name      = provider;
+    arg-type  = file;
+    file-exists = yes;
+    descrip   = "Specify the PKCS #11 provider library";
+    doc      = "This will override the default options in /etc/gnutls/pkcs11.conf";
+};
+
+flag = {
+    name      = fips140-mode;
+    descrip   = "Reports the status of the FIPS140-2 mode in gnutls library";
+    doc      = "";
+};
+
+doc-section = {
+  ds-type   = 'SEE ALSO'; // or anything else
+  ds-format = 'texi';      // or texi or mdoc format
+  ds-text   = <<-_EOF_
+gnutls-cli-debug(1), gnutls-serv(1)
+_EOF_;
+};
+
+doc-section = {
+  ds-type = 'EXAMPLES';
+  ds-format = 'texi';
+  ds-text   = <<-_EOF_
+@subheading Connecting using PSK authentication
+To connect to a server using PSK authentication, you need to enable the choice of PSK by using a cipher priority parameter such as in the example below. 
+@example
+$ ./gnutls-cli -p 5556 localhost --pskusername psk_identity \
+    --pskkey 88f3824b3e5659f52d00e959bacab954b6540344 \
+    --priority NORMAL:-KX-ALL:+ECDHE-PSK:+DHE-PSK:+PSK
+Resolving 'localhost'...
+Connecting to '127.0.0.1:5556'...
+- PSK authentication.
+- Version: TLS1.1
+- Key Exchange: PSK
+- Cipher: AES-128-CBC
+- MAC: SHA1
+- Compression: NULL
+- Handshake was completed
+    
+- Simple Client Mode:
+@end example
+By keeping the --pskusername parameter and removing the --pskkey parameter, it will query only for the password during the handshake. 
+
+@subheading Connecting to STARTTLS services
+
+You could also use the client to connect to services with starttls capability.
+@example
+$ gnutls-cli --starttls-proto smtp --port 25 localhost
+@end example
+
+@subheading Listing ciphersuites in a priority string
+To list the ciphersuites in a priority string:
+@example
+$ ./gnutls-cli --priority SECURE192 -l
+Cipher suites for SECURE192
+TLS_ECDHE_ECDSA_AES_256_CBC_SHA384         0xc0, 0x24	TLS1.2
+TLS_ECDHE_ECDSA_AES_256_GCM_SHA384         0xc0, 0x2e	TLS1.2
+TLS_ECDHE_RSA_AES_256_GCM_SHA384           0xc0, 0x30	TLS1.2
+TLS_DHE_RSA_AES_256_CBC_SHA256             0x00, 0x6b	TLS1.2
+TLS_DHE_DSS_AES_256_CBC_SHA256             0x00, 0x6a	TLS1.2
+TLS_RSA_AES_256_CBC_SHA256                 0x00, 0x3d	TLS1.2
+
+Certificate types: CTYPE-X.509
+Protocols: VERS-TLS1.2, VERS-TLS1.1, VERS-TLS1.0, VERS-SSL3.0, VERS-DTLS1.0
+Compression: COMP-NULL
+Elliptic curves: CURVE-SECP384R1, CURVE-SECP521R1
+PK-signatures: SIGN-RSA-SHA384, SIGN-ECDSA-SHA384, SIGN-RSA-SHA512, SIGN-ECDSA-SHA512
+@end example
+
+@subheading Connecting using a PKCS #11 token
+To connect to a server using a certificate and a private key present in a PKCS #11 token you 
+need to substitute the PKCS 11 URLs in the x509certfile and x509keyfile parameters.
+
+Those can be found using "p11tool --list-tokens" and then listing all the objects in the
+needed token, and using the appropriate.
+@example
+$ p11tool --list-tokens
+
+Token 0:
+	URL: pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test
+	Label: Test
+	Manufacturer: EnterSafe
+	Model: PKCS15
+	Serial: 1234
+
+$ p11tool --login --list-certs "pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test"
+
+Object 0:
+	URL: pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;type=cert
+	Type: X.509 Certificate
+	Label: client
+	ID: 2a:97:0d:58:d1:51:3c:23:07:ae:4e:0d:72:26:03:7d:99:06:02:6a
+
+$ MYCERT="pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;type=cert"
+$ MYKEY="pkcs11:model=PKCS15;manufacturer=MyMan;serial=1234;token=Test;object=client;type=private"
+$ export MYCERT MYKEY
+
+$ gnutls-cli www.example.com --x509keyfile $MYKEY --x509certfile $MYCERT
+@end example
+Notice that the private key only differs from the certificate in the type.
+_EOF_;
+};

@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_get_seed} (gnutls_x509_privkey_t @var{key}, gnutls_digest_algorithm_t * @var{digest}, void * @var{seed}, size_t * @var{seed_size})
+@var{key}: should contain a @code{gnutls_x509_privkey_t}  type
+
+@var{digest}: if non-NULL it will contain the digest algorithm used for key generation (if applicable)
+
+@var{seed}: where seed will be copied to
+
+@var{seed_size}: originally holds the size of  @code{seed} , will be updated with actual size
+
+This function will return the seed that was used to generate the
+given private key. That function will succeed only if the key was generated
+as a provable key.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.5.0
+@end deftypefun

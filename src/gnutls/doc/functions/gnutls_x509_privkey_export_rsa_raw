@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_privkey_export_rsa_raw} (gnutls_x509_privkey_t @var{key}, gnutls_datum_t * @var{m}, gnutls_datum_t * @var{e}, gnutls_datum_t * @var{d}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{u})
+@var{key}: a key
+
+@var{m}: will hold the modulus
+
+@var{e}: will hold the public exponent
+
+@var{d}: will hold the private exponent
+
+@var{p}: will hold the first prime (p)
+
+@var{q}: will hold the second prime (q)
+
+@var{u}: will hold the coefficient
+
+This function will export the RSA private key's parameters found
+in the given structure. The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

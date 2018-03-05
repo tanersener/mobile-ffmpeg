@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_alert_get_name} (gnutls_alert_description_t @var{alert})

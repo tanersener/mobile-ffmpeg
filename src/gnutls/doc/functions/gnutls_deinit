@@ -1,0 +1,11 @@
+
+
+
+
+@deftypefun {void} {gnutls_deinit} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function clears all buffers associated with the  @code{session} .
+This function will also remove session data from the session
+database if the session was terminated abnormally.
+@end deftypefun

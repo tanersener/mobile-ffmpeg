@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_set_dn_by_oid} (gnutls_x509_crt_t @var{crt}, const char * @var{oid}, unsigned int @var{raw_flag}, const void * @var{name}, unsigned int @var{sizeof_name})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{oid}: holds an Object Identifier in a null terminated string
+
+@var{raw_flag}: must be 0, or 1 if the data are DER encoded
+
+@var{name}: a pointer to the name
+
+@var{sizeof_name}: holds the size of  @code{name} 
+
+This function will set the part of the name of the Certificate
+subject, specified by the given OID. The input string should be
+ASCII or UTF-8 encoded.
+
+Some helper macros with popular OIDs can be found in gnutls/x509.h
+With this function you can only set the known OIDs. You can test
+for known OIDs using @code{gnutls_x509_dn_oid_known()} . For OIDs that are
+not known (by gnutls) you should properly DER encode your data,
+and call this function with  @code{raw_flag} set.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

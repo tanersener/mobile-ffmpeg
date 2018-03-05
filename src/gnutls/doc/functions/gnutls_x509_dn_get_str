@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_dn_get_str} (gnutls_x509_dn_t @var{dn}, gnutls_datum_t * @var{str})
+@var{dn}: a pointer to DN
+
+@var{str}: a datum that will hold the name
+
+This function will allocate buffer and copy the name in the provided DN.
+The name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as
+described in RFC4514. The output string will be ASCII or UTF-8
+encoded, depending on the certificate data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.4.2
+@end deftypefun

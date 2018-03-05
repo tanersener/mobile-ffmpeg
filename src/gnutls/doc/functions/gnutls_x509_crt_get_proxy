@@ -1,0 +1,25 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_proxy} (gnutls_x509_crt_t @var{cert}, unsigned int * @var{critical}, int * @var{pathlen}, char ** @var{policyLanguage}, char ** @var{policy}, size_t * @var{sizeof_policy})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{critical}: will be non-zero if the extension is marked as critical
+
+@var{pathlen}: pointer to output integer indicating path length (may be
+NULL), non-negative error codes indicate a present pCPathLenConstraint
+field and the actual value, -1 indicate that the field is absent.
+
+@var{policyLanguage}: output variable with OID of policy language
+
+@var{policy}: output variable with policy data
+
+@var{sizeof_policy}: output variable size of policy data
+
+This function will get information from a proxy certificate.  It
+reads the ProxyCertInfo X.509 extension (1.3.6.1.5.5.7.1.14).
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+@end deftypefun

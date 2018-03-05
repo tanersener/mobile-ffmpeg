@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_x509_name_constraints_deinit} (gnutls_x509_name_constraints_t @var{nc})

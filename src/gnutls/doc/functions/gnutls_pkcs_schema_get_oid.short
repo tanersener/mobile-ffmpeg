@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_pkcs_schema_get_oid} (unsigned int @var{schema})

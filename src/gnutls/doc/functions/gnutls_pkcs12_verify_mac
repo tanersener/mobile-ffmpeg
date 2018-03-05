@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_verify_mac} (gnutls_pkcs12_t @var{pkcs12}, const char * @var{pass})
+@var{pkcs12}: should contain a gnutls_pkcs12_t type
+
+@var{pass}: The password for the MAC
+
+This function will verify the MAC for the PKCS12 structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

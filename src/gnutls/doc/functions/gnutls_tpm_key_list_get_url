@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_tpm_key_list_get_url} (gnutls_tpm_key_list_t @var{list}, unsigned int @var{idx}, char ** @var{url}, unsigned int @var{flags})
+@var{list}: a list of the keys
+
+@var{idx}: The index of the key (starting from zero)
+
+@var{url}: The URL to be returned
+
+@var{flags}: should be zero
+
+This function will return for each given index a URL of
+the corresponding key.
+If the provided index is out of bounds then @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+is returned.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.1.0
+@end deftypefun

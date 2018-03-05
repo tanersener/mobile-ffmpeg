@@ -1,0 +1,17 @@
+
+
+
+
+@deftypefun {gnutls_handshake_description_t} {gnutls_handshake_get_last_out} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function is only useful to check where the last performed
+handshake failed.  If the previous handshake succeed or was not
+performed at all then no meaningful value will be returned.
+
+Check @code{gnutls_handshake_description_t}  in gnutls.h for the
+available handshake descriptions.
+
+@strong{Returns:} the last handshake message type sent, a
+@code{gnutls_handshake_description_t} .
+@end deftypefun

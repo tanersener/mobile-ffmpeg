@@ -1,0 +1,27 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crq_export} (gnutls_x509_crq_t @var{crq}, gnutls_x509_crt_fmt_t @var{format}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{crq}: should contain a @code{gnutls_x509_crq_t}  type
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{output_data}: will contain a certificate request PEM or DER encoded
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will export the certificate request to a PEM or DER
+encoded PKCS10 structure.
+
+If the buffer provided is not long enough to hold the output, then
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  will be returned and
+* @code{output_data_size} will be updated.
+
+If the structure is PEM encoded, it will have a header of "BEGIN
+NEW CERTIFICATE REQUEST".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

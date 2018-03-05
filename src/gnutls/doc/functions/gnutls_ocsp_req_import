@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_ocsp_req_import} (gnutls_ocsp_req_t @var{req}, const gnutls_datum_t * @var{data})
+@var{req}: The data to store the parsed request.
+
+@var{data}: DER encoded OCSP request.
+
+This function will convert the given DER encoded OCSP request to
+the native @code{gnutls_ocsp_req_t}  format. The output will be stored in
+ @code{req} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

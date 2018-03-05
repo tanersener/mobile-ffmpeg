@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_trust_list_init} (gnutls_x509_trust_list_t * @var{list}, unsigned int @var{size})
+@var{list}: A pointer to the type to be initialized
+
+@var{size}: The size of the internal hash table. Use (0) for default size.
+
+This function will initialize an X.509 trust list structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0.0
+@end deftypefun

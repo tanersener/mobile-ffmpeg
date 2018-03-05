@@ -1,0 +1,23 @@
+
+
+@c gnutls_x509_subject_alt_name_t
+@table @code
+@item GNUTLS_@-SAN_@-DNSNAME
+DNS-name SAN.
+@item GNUTLS_@-SAN_@-RFC822NAME
+E-mail address SAN.
+@item GNUTLS_@-SAN_@-URI
+URI SAN.
+@item GNUTLS_@-SAN_@-IPADDRESS
+IP address SAN.
+@item GNUTLS_@-SAN_@-OTHERNAME
+OtherName SAN.
+@item GNUTLS_@-SAN_@-DN
+DN SAN.
+@item GNUTLS_@-SAN_@-MAX
+-- undescribed --
+@item GNUTLS_@-SAN_@-OTHERNAME_@-XMPP
+Virtual SAN, used by certain functions for convenience.
+@item GNUTLS_@-SAN_@-OTHERNAME_@-KRB5PRINCIPAL
+Virtual SAN, used by certain functions for convenience.
+@end table

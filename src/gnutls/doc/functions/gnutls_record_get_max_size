@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {size_t} {gnutls_record_get_max_size} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Get the record size.  The maximum record size is negotiated by the
+client after the first handshake message.
+
+@strong{Returns:} The maximum record packet size in this connection.
+@end deftypefun

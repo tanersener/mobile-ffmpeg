@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_x509_crl_file} (gnutls_certificate_credentials_t @var{res}, const char * @var{crlfile}, gnutls_x509_crt_fmt_t @var{type})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{crlfile}: is a file containing the list of verified CRLs (DER or PEM list)
+
+@var{type}: is PEM or DER
+
+This function adds the trusted CRLs in order to verify client or server
+certificates.  In case of a client this is not required
+to be called if the certificates are not verified using
+@code{gnutls_certificate_verify_peers2()} .
+This function may be called multiple times.
+
+@strong{Returns:} number of CRLs processed or a negative error code on error.
+@end deftypefun

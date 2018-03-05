@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_ocsp_req_print} (gnutls_ocsp_req_t @var{req}, gnutls_ocsp_print_formats_t @var{format}, gnutls_datum_t * @var{out})

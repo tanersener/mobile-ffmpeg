@@ -1,0 +1,128 @@
+#!/bin/sh
+
+# Copyright (C) 2015 Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+#set -e
+
+export TZ="UTC"
+
+srcdir="${srcdir:-.}"
+CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
+DIFF="${DIFF:-diff}"
+
+if ! test -x "${CERTTOOL}"; then
+	exit 77
+fi
+
+if ! test -z "${VALGRIND}"; then
+	VALGRIND="${LIBTOOL:-libtool} --mode=execute ${VALGRIND} --error-exitcode=15"
+fi
+
+OUTFILE=out-crl.$$.tmp
+INFOFILE=out-crl-info.$$.tmp
+OUTFILE2=out2-crl.$$.tmp
+TMPFILE=crl.$$.tmpl
+
+echo "crl_next_update = 43" >$TMPFILE
+echo "crl_number = 7" >>$TMPFILE
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-certificate "${srcdir}/data/ca-certs.pem" --template \
+	"${TMPFILE}" >${OUTFILE} 2>${INFOFILE}
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "CRL generation failed"
+	exit ${rc}
+fi
+
+grep "Revoked certificates (152)" "${INFOFILE}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL generation didn't succeed as expected"
+	exit 1
+fi
+
+# check appending a certificate
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-crl "${OUTFILE}" --load-certificate "${srcdir}/data/cert-ecc256.pem" --template \
+	"${TMPFILE}" -d 9 >${OUTFILE2} 2>${INFOFILE}
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "CRL appending failed"
+	exit ${rc}
+fi
+
+grep "Revoked certificates (153)" "${INFOFILE}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL appending didn't succeed as expected"
+	exit 1
+fi
+
+grep "Serial Number (hex): 07" "${INFOFILE}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL appending didn't succeed as expected (2)"
+	exit 1
+fi
+
+# check the dates
+
+echo "crl_this_update_date = \"2004-03-29 16:21:42\"" >$TMPFILE
+echo "crl_next_update_date = \"2006-03-29 13:21:42\"" >>$TMPFILE
+echo "crl_number = 8" >>$TMPFILE
+echo "crl_revocation_date = \"2003-02-01 10:00:00\"" >>$TMPFILE
+
+${VALGRIND} "${CERTTOOL}" --generate-crl --load-ca-privkey "${srcdir}/data/template-test.key"  --load-ca-certificate \
+	"${srcdir}/data/template-test.pem" --load-certificate "${srcdir}/data/cert-ecc256.pem" --template \
+	"${TMPFILE}" -d 9 >${OUTFILE2} 2>${INFOFILE}
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "CRL date setting failed"
+	exit ${rc}
+fi
+
+grep "Revoked at: Sat Feb 01 10:00:00 UTC 2003" "${INFOFILE}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL date setting didn't succeed as expected"
+	exit 1
+fi
+
+grep "Issued: Mon Mar 29 16:21:42 UTC 2004" "${INFOFILE}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL date setting didn't succeed as expected (2)"
+	exit 1
+fi
+
+grep "Next at: Wed Mar 29 13:21:42 UTC 2006" "${INFOFILE}" >/dev/null 2>&1
+if test "$?" != "0"; then
+	echo "CRL date setting didn't succeed as expected (3)"
+	exit 1
+fi
+
+rm -f "${OUTFILE}"
+rm -f "${INFOFILE}"
+rm -f "${OUTFILE2}"
+rm -f "${TMPFILE}"
+
+exit 0

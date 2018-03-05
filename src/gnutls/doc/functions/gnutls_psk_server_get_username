@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_psk_server_get_username} (gnutls_session_t @var{session})
+@var{session}: is a gnutls session
+
+This should only be called in case of PSK authentication and in
+case of a server.
+
+@strong{Returns:} the username of the peer, or @code{NULL}  in case of an error.
+@end deftypefun

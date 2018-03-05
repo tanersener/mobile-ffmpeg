@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_policies_get} (gnutls_x509_policies_t @var{policies}, unsigned int @var{seq}, struct gnutls_x509_policy_st * @var{policy})
+@var{policies}: The policies
+
+@var{seq}: The index of the name to get
+
+@var{policy}: Will hold the policy
+
+This function will return a specific policy as stored in
+the  @code{policies} type. The returned values should be treated as constant
+and valid for the lifetime of  @code{policies} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+if the index is out of bounds, otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

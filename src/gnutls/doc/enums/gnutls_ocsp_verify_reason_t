@@ -1,0 +1,19 @@
+
+
+@c gnutls_ocsp_verify_reason_t
+@table @code
+@item GNUTLS_@-OCSP_@-VERIFY_@-SIGNER_@-NOT_@-FOUND
+Signer cert not found.
+@item GNUTLS_@-OCSP_@-VERIFY_@-SIGNER_@-KEYUSAGE_@-ERROR
+Signer keyusage bits incorrect.
+@item GNUTLS_@-OCSP_@-VERIFY_@-UNTRUSTED_@-SIGNER
+Signer is not trusted.
+@item GNUTLS_@-OCSP_@-VERIFY_@-INSECURE_@-ALGORITHM
+Signature using insecure algorithm.
+@item GNUTLS_@-OCSP_@-VERIFY_@-SIGNATURE_@-FAILURE
+Signature mismatch.
+@item GNUTLS_@-OCSP_@-VERIFY_@-CERT_@-NOT_@-ACTIVATED
+Signer cert is not yet activated.
+@item GNUTLS_@-OCSP_@-VERIFY_@-CERT_@-EXPIRED
+Signer cert has expired.
+@end table

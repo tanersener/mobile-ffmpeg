@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {unsigned int} {gnutls_sec_param_to_symmetric_bits} (gnutls_sec_param_t @var{param})
+@var{param}: is a security parameter
+
+This function will return the number of bits that correspond to
+symmetric cipher strength for the given security parameter.
+
+@strong{Returns:} The number of bits, or (0).
+
+@strong{Since:} 3.3.0
+@end deftypefun

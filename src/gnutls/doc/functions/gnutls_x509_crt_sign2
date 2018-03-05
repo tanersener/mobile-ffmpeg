@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_sign2} (gnutls_x509_crt_t @var{crt}, gnutls_x509_crt_t @var{issuer}, gnutls_x509_privkey_t @var{issuer_key}, gnutls_digest_algorithm_t @var{dig}, unsigned int @var{flags})
+@var{crt}: a certificate of type @code{gnutls_x509_crt_t} 
+
+@var{issuer}: is the certificate of the certificate issuer
+
+@var{issuer_key}: holds the issuer's private key
+
+@var{dig}: The message digest to use, @code{GNUTLS_DIG_SHA256}  is a safe choice
+
+@var{flags}: must be 0
+
+This function will sign the certificate with the issuer's private key, and
+will copy the issuer's information into the certificate.
+
+This must be the last step in a certificate generation since all
+the previously set parameters are now signed.
+
+A known limitation of this function is, that a newly-signed certificate will not
+be fully functional (e.g., for signature verification), until it
+is exported an re-imported.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {gnutls_compression_method_t} {gnutls_compression_get} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Get currently used compression algorithm.
+
+@strong{Returns:} the currently used compression method, a
+@code{gnutls_compression_method_t}  value.
+@end deftypefun

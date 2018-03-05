@@ -1,0 +1,78 @@
+PKCS #10 Certificate Request Information:
+	Version: 1
+	Subject: UID=clauper,C=GR,ST=Attiki,O=Koko inc.,OU=sleeping dept.,CN=Cindy Lauper
+	Subject Public Key Algorithm: RSA
+		Modulus (bits 1024):
+			00:a5:c6:ce:75:43:84:bf:64:9e:02:27:13:f1:03:59
+			f7:79:2d:92:ed:7c:2f:50:a4:03:f1:2d:79:b9:86:8b
+			05:7e:3a:bb:44:aa:af:84:cf:13:98:1e:1c:4a:38:f7
+			33:2d:7a:9f:72:d4:6b:6d:26:b0:31:37:70:10:fb:42
+			e9:d8:9d:18:65:7e:19:49:fc:05:96:04:68:83:1e:77
+			86:bf:ed:f5:e5:12:3b:13:fe:33:18:9c:1a:7a:1d:69
+			af:47:02:60:7a:1f:b9:e8:cf:db:c8:34:30:51:96:3d
+			8c:96:5c:00:bc:61:de:08:0f:b1:36:21:7f:a9:00:e3
+			05
+		Exponent (bits 24):
+			01:00:01
+	Signature Algorithm: RSA-SHA256
+	Attributes:
+		Extensions:
+			Unknown extension 1.2.3.4 (not critical):
+				ASCII: ...........
+				Hexdump: 0001020304050607aaabcd
+			Unknown extension 5.6.7.8 (not critical):
+				ASCII: ...........
+				Hexdump: 0001020304050607aaabcd
+			Unknown extension 1.2.3.4.5.6.7 (not critical):
+				ASCII: .4.Z.e.'.~.G....
+				Hexdump: 1d34cd5ad065dc27c17e9447b0aaaca7
+			Unknown extension 1.2.3.4294967295.7 (not critical):
+				ASCII: ...A?....J.K..l|...4..~.L..&.ap.E........}!'...s.....b=...K..6Sb.4.Z.e.'.~.G....
+				Hexdump: 178f0e413f041cc9d64af64bf3b66c7ceac6fa34a4d77ed64c968b26c761709445f40d9ca0a00091af7d212789c00b7387b1d0d7ab623dd4029d4b86db3653621d34cd5ad065dc27c17e9447b0aaaca7
+			Unknown extension 1.2.6710656.7 (not critical):
+				ASCII: .J.K..l|...4..~.L..&.ap.E........}!'...s.....b=...K..6Sb.4.Z.e.'.~.G....
+				Hexdump: d64af64bf3b66c7ceac6fa34a4d77ed64c968b26c761709445f40d9ca0a00091af7d212789c00b7387b1d0d7ab623dd4029d4b86db3653621d34cd5ad065dc27c17e9447b0aaaca7
+			Unknown extension 0.24.1.5 (not critical):
+				ASCII: ......
+				Hexdump: 0404cafebeaf
+			Unknown extension 2.34.11.12.13.14.15.16.17.1.5 (critical):
+				ASCII: ..
+				Hexdump: cafe
+			Unknown extension 0.24.1.5.1 (critical):
+				ASCII: ........
+				Hexdump: 0406beafcafefafa
+			Basic Constraints (critical):
+				Certificate Authority (CA): FALSE
+			Key Purpose (critical):
+				Email protection.
+			Key Usage (critical):
+				Digital signature.
+Other Information:
+	Public Key ID:
+		sha1:5d40adf0ce9440958b7e99941d925422ca72365f
+		sha256:472f7ef457b70a57a585094b285fdaef7ad72553495701ecd4f2a6dcb477b50e
+	Public Key PIN:
+		pin-sha256:Ry9+9Fe3ClelhQlLKF/a73rXJVNJVwHs1PKm3LR3tQ4=
+
+Self signature: verified
+
+-----BEGIN NEW CERTIFICATE REQUEST-----
+MIIDOjCCAqMCAQAwezEVMBMGA1UEAxMMQ2luZHkgTGF1cGVyMRcwFQYDVQQLEw5z
+bGVlcGluZyBkZXB0LjESMBAGA1UEChMJS29rbyBpbmMuMQ8wDQYDVQQIEwZBdHRp
+a2kxCzAJBgNVBAYTAkdSMRcwFQYKCZImiZPyLGQBARMHY2xhdXBlcjCBnzANBgkq
+hkiG9w0BAQEFAAOBjQAwgYkCgYEApcbOdUOEv2SeAicT8QNZ93ktku18L1CkA/Et
+ebmGiwV+OrtEqq+EzxOYHhxKOPczLXqfctRrbSawMTdwEPtC6didGGV+GUn8BZYE
+aIMed4a/7fXlEjsT/jMYnBp6HWmvRwJgeh+56M/byDQwUZY9jJZcALxh3ggPsTYh
+f6kA4wUCAwEAAaCCAX0wggF5BgkqhkiG9w0BCQ4xggFqMIIBZjASBgMqAwQECwAB
+AgMEBQYHqqvNMBIGA84HCAQLAAECAwQFBgeqq80wGgYGKgMEBQYHBBAdNM1a0GXc
+J8F+lEewqqynMFwGCCoDj////38HBFAXjw5BPwQcydZK9kvztmx86sb6NKTXftZM
+losmx2FwlEX0DZygoACRr30hJ4nAC3OHsdDXq2I91AKdS4bbNlNiHTTNWtBl3CfB
+fpRHsKqspzBSBgYqg5nLAAcESNZK9kvztmx86sb6NKTXftZMlosmx2FwlEX0DZyg
+oACRr30hJ4nAC3OHsdDXq2I91AKdS4bbNlNiHTTNWtBl3CfBfpRHsKqspzANBgMY
+AQUEBgQEyv6+rzATBgpyCwwNDg8QEQEFAQH/BALK/jATBgQYAQUBAQH/BAgEBr6v
+yv76+jAMBgNVHRMBAf8EAjAAMBYGA1UdJQEB/wQMMAoGCCsGAQUFBwMEMA8GA1Ud
+DwEB/wQFAwMHgAAwDQYJKoZIhvcNAQELBQADgYEAOGlrPFk5kGvLTJJCBb/uLMGU
+0Hus+/V3UqPJ9xalLG+gt5qAWxnDa6Uj3xhWdrGqgeA10Rru7WeoCKGTsZS7pVoz
+i/42Rlwr5SmolxMo6iEOc5YtkLvhHhP5GENuf6kXimfHeSRmEbkrT3T8LIPj5ep1
+ZxrmGlCiGZHBv1wjl74=
+-----END NEW CERTIFICATE REQUEST-----

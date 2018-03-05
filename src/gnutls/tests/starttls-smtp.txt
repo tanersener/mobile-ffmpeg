@@ -1,0 +1,3 @@
+'' '220 int.example.com ESMTP Sendmail 8.14.4/8.14.4; Mon, 22 Aug 2016 03:08:09-0400\r\n'
+TIMEOUT 120
+EHLO '250-int-example.com Hello [10.40.3.7], pleased to meet you\r\n250-ENHANCEDSTATUSCODES\r\n250-STARTTLS\r\n250 HELP\r\n' STARTTLS '220 2.0.0 Ready to start TLS\r\n'

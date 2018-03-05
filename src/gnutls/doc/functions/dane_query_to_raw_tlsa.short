@@ -1,0 +1,1 @@
+@item @var{int} @ref{dane_query_to_raw_tlsa} (dane_query_t @var{q}, unsigned int * @var{data_entries}, char *** @var{dane_data}, int ** @var{dane_data_len}, int * @var{secure}, int * @var{bogus})

@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_x509_aia_deinit} (gnutls_x509_aia_t @var{aia})

@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pkcs11_privkey_init} (gnutls_pkcs11_privkey_t * @var{key})

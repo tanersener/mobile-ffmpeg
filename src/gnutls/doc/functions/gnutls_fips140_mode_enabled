@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_fips140_mode_enabled} ( @var{void})
+
+Checks whether this library is in FIPS140 mode.
+
+@strong{Returns:} return non-zero if true or zero if false.
+
+@strong{Since:} 3.3.0
+@end deftypefun

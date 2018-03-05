@@ -1,0 +1,32 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs8_info} (const gnutls_datum_t * @var{data}, gnutls_x509_crt_fmt_t @var{format}, unsigned int * @var{schema}, unsigned int * @var{cipher}, void * @var{salt}, unsigned int * @var{salt_size}, unsigned int * @var{iter_count}, char ** @var{oid})
+@var{data}: Holds the PKCS @code{8}  data
+
+@var{format}: the format of the PKCS @code{8}  data
+
+@var{schema}: indicate the schema as one of @code{gnutls_pkcs_encrypt_flags_t} 
+
+@var{cipher}: the cipher used as @code{gnutls_cipher_algorithm_t} 
+
+@var{salt}: PBKDF2 salt (if non-NULL then  @code{salt_size} initially holds its size)
+
+@var{salt_size}: PBKDF2 salt size
+
+@var{iter_count}: PBKDF2 iteration count
+
+@var{oid}: if non-NULL it will contain an allocated null-terminated variable with the OID
+
+This function will provide information on the algorithms used
+in a particular PKCS @code{8}  structure. If the structure algorithms
+are unknown the code @code{GNUTLS_E_UNKNOWN_CIPHER_TYPE}  will be returned,
+and only  @code{oid} , will be set. That is,  @code{oid} will be set on encrypted PKCS @code{8} 
+structures whether supported or not. It must be deinitialized using @code{gnutls_free()} .
+The other variables are only set on supported structures.
+
+@strong{Returns:} @code{GNUTLS_E_INVALID_REQUEST}  if the provided structure isn't an encrypted key,
+@code{GNUTLS_E_UNKNOWN_CIPHER_TYPE}  if the structure's encryption isn't supported, or
+another negative error code in case of a failure. Zero on success.
+@end deftypefun

@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_tdb_deinit} (gnutls_tdb_t @var{tdb})
+@var{tdb}: The structure to be deinitialized
+
+This function will deinitialize a public key trust storage structure.
+@end deftypefun

@@ -1,0 +1,14 @@
+
+
+
+
+@deftypefun {unsigned int} {gnutls_certificate_get_verify_flags} (gnutls_certificate_credentials_t @var{res})
+@var{res}: is a gnutls_certificate_credentials_t type
+
+Returns the verification flags set with
+@code{gnutls_certificate_set_verify_flags()} .
+
+@strong{Returns:} The certificate verification flags used by  @code{res} .
+
+@strong{Since:} 3.4.0
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_tdb_set_verify_func} (gnutls_tdb_t @var{tdb}, gnutls_tdb_verify_func @var{verify})

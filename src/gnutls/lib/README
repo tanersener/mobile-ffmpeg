@@ -1,0 +1,13 @@
+ext/         -> Implementation of TLS extensions
+auth/        -> Implementation of TLS authentication methods (DHE, SRP etc.)
+accelerated/ -> Implementation of cipher acceleration
+
+Certificate support:
+x509/        -> Implementation of GnuTLS X.509 certificate support (and more)
+openpgp/     -> Implementation of GnuTLS openpgp support
+opencdk/     -> Implementation of low level openpgp packet parsing
+minitasn1    -> ASN.1 structure parsing library
+
+Crypto backends:
+nettle/ ->   -> The nettle crypto back-end
+gcrypt/ ->   -> The libgcrypt crypto back-end

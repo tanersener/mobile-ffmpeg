@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_x509_system_trust} (gnutls_certificate_credentials_t       @var{cred})
+@var{cred}: is a @code{gnutls_certificate_credentials_t}  type.
+
+This function adds the system's default trusted CAs in order to
+verify client or server certificates.
+
+In the case the system is currently unsupported @code{GNUTLS_E_UNIMPLEMENTED_FEATURE} 
+is returned.
+
+@strong{Returns:} the number of certificates processed or a negative error code
+on error.
+
+@strong{Since:} 3.0.20
+@end deftypefun

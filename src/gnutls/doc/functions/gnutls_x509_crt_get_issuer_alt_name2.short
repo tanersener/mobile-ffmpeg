@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_issuer_alt_name2} (gnutls_x509_crt_t @var{cert}, unsigned int @var{seq}, void * @var{ian}, size_t * @var{ian_size}, unsigned int * @var{ian_type}, unsigned int * @var{critical})

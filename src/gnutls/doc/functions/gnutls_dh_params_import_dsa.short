@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_dh_params_import_dsa} (gnutls_dh_params_t @var{dh_params}, gnutls_x509_privkey_t @var{key})

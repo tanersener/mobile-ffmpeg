@@ -1,0 +1,41 @@
+<!-- ##### SECTION Title ##### -->
+stream
+
+<!-- ##### SECTION Short_Description ##### -->
+
+
+<!-- ##### SECTION Long_Description ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION See_Also ##### -->
+<para>
+
+</para>
+
+<!-- ##### SECTION Stability_Level ##### -->
+
+
+<!-- ##### SECTION Image ##### -->
+
+
+<!-- ##### MACRO STREAM_BUFSIZE ##### -->
+<para>
+
+</para>
+
+
+
+<!-- ##### USER_FUNCTION filter_fnct_t ##### -->
+<para>
+
+</para>
+
+@uint8_t: 
+@ctl: 
+@in: 
+@out: 
+@Returns: 
+
+

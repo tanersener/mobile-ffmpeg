@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_policies_set} (gnutls_x509_policies_t @var{policies}, const struct gnutls_x509_policy_st * @var{policy})
+@var{policies}: An initialized policies
+
+@var{policy}: Contains the policy to set
+
+This function will store the specified policy in
+the provided  @code{policies} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0), otherwise a negative error value.
+
+@strong{Since:} 3.3.0
+@end deftypefun

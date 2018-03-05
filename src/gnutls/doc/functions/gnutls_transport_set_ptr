@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {void} {gnutls_transport_set_ptr} (gnutls_session_t @var{session}, gnutls_transport_ptr_t @var{ptr})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{ptr}: is the value.
+
+Used to set the first argument of the transport function (for push
+and pull callbacks). In berkeley style sockets this function will set the
+connection descriptor.
+@end deftypefun

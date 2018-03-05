@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_ext_get_name} (unsigned int @var{ext})
+@var{ext}: is a TLS extension numeric ID
+
+Convert a TLS extension numeric ID to a printable string.
+
+@strong{Returns:} a pointer to a string that contains the name of the
+specified cipher, or @code{NULL} .
+@end deftypefun

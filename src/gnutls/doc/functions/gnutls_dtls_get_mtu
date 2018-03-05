@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {unsigned int} {gnutls_dtls_get_mtu} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+This function will return the MTU size as set with
+@code{gnutls_dtls_set_mtu()} . This is not the actual MTU
+of data you can transmit. Use @code{gnutls_dtls_get_data_mtu()} 
+for that reason.
+
+@strong{Returns:} the set maximum transfer unit.
+
+@strong{Since:} 3.0
+@end deftypefun

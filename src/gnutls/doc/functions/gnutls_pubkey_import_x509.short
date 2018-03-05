@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_pubkey_import_x509} (gnutls_pubkey_t @var{key}, gnutls_x509_crt_t @var{crt}, unsigned int @var{flags})

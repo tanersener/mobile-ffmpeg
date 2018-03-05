@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_set_crt} (gnutls_pkcs12_bag_t @var{bag}, gnutls_x509_crt_t @var{crt})
+@var{bag}: The bag
+
+@var{crt}: the certificate to be copied.
+
+This function will insert the given certificate into the
+bag. This is just a wrapper over @code{gnutls_pkcs12_bag_set_data()} .
+
+@strong{Returns:} the index of the added bag on success, or a negative
+value on failure.
+@end deftypefun

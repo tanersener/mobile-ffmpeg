@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_srtp_get_profile_name} (gnutls_srtp_profile_t @var{profile})
+@var{profile}: The profile to look up a string for
+
+This function allows you to get the corresponding name for a
+SRTP protection profile.
+
+@strong{Returns:} On success, the name of a SRTP profile as a string,
+otherwise NULL.
+
+Since 3.1.4
+@end deftypefun

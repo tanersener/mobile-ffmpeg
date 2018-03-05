@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_set_x509_trust} (gnutls_certificate_credentials_t @var{res}, gnutls_x509_crt_t * @var{ca_list}, int @var{ca_list_size})
+@var{res}: is a @code{gnutls_certificate_credentials_t}  type.
+
+@var{ca_list}: is a list of trusted CAs
+
+@var{ca_list_size}: holds the size of the CA list
+
+This function adds the trusted CAs in order to verify client
+or server certificates. In case of a client this is not required
+to be called if the certificates are not verified using
+@code{gnutls_certificate_verify_peers2()} .
+This function may be called multiple times.
+
+In case of a server the CAs set here will be sent to the client if
+a certificate request is sent. This can be disabled using
+@code{gnutls_certificate_send_x509_rdn_sequence()} .
+
+@strong{Returns:} the number of certificates processed or a negative error code
+on error.
+
+@strong{Since:} 2.4.0
+@end deftypefun

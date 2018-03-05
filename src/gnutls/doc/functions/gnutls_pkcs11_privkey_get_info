@@ -1,0 +1,20 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs11_privkey_get_info} (gnutls_pkcs11_privkey_t @var{pkey}, gnutls_pkcs11_obj_info_t @var{itype}, void * @var{output}, size_t * @var{output_size})
+@var{pkey}: should contain a @code{gnutls_pkcs11_privkey_t}  type
+
+@var{itype}: Denotes the type of information requested
+
+@var{output}: where output will be stored
+
+@var{output_size}: contains the maximum size of the output and will be overwritten with actual
+
+This function will return information about the PKCS 11 private key such
+as the label, id as well as token information where the key is stored. When
+output is text it returns null terminated string although @code{output_size}  contains
+the size of the actual data only.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  (0) on success or a negative error code on error.
+@end deftypefun

@@ -1,0 +1,37 @@
+
+
+@c gnutls_handshake_description_t
+@table @code
+@item GNUTLS_@-HANDSHAKE_@-HELLO_@-REQUEST
+Hello request.
+@item GNUTLS_@-HANDSHAKE_@-CLIENT_@-HELLO
+Client hello.
+@item GNUTLS_@-HANDSHAKE_@-SERVER_@-HELLO
+Server hello.
+@item GNUTLS_@-HANDSHAKE_@-HELLO_@-VERIFY_@-REQUEST
+DTLS Hello verify request.
+@item GNUTLS_@-HANDSHAKE_@-NEW_@-SESSION_@-TICKET
+New session ticket.
+@item GNUTLS_@-HANDSHAKE_@-CERTIFICATE_@-PKT
+Certificate packet.
+@item GNUTLS_@-HANDSHAKE_@-SERVER_@-KEY_@-EXCHANGE
+Server key exchange.
+@item GNUTLS_@-HANDSHAKE_@-CERTIFICATE_@-REQUEST
+Certificate request.
+@item GNUTLS_@-HANDSHAKE_@-SERVER_@-HELLO_@-DONE
+Server hello done.
+@item GNUTLS_@-HANDSHAKE_@-CERTIFICATE_@-VERIFY
+Certificate verify.
+@item GNUTLS_@-HANDSHAKE_@-CLIENT_@-KEY_@-EXCHANGE
+Client key exchange.
+@item GNUTLS_@-HANDSHAKE_@-FINISHED
+Finished.
+@item GNUTLS_@-HANDSHAKE_@-CERTIFICATE_@-STATUS
+Certificate status (OCSP).
+@item GNUTLS_@-HANDSHAKE_@-SUPPLEMENTAL
+Supplemental.
+@item GNUTLS_@-HANDSHAKE_@-CHANGE_@-CIPHER_@-SPEC
+Change Cipher Spec.
+@item GNUTLS_@-HANDSHAKE_@-CLIENT_@-HELLO_@-V2
+SSLv2 Client Hello.
+@end table

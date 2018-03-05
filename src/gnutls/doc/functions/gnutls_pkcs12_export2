@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_export2} (gnutls_pkcs12_t @var{pkcs12}, gnutls_x509_crt_fmt_t @var{format}, gnutls_datum_t * @var{out})
+@var{pkcs12}: A pkcs12 type
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{out}: will contain a structure PEM or DER encoded
+
+This function will export the pkcs12 structure to DER or PEM format.
+
+The output buffer is allocated using @code{gnutls_malloc()} .
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN PKCS12".
+
+@strong{Returns:} In case of failure a negative error code will be
+returned, and 0 on success.
+
+@strong{Since:} 3.1.3
+@end deftypefun

@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {gnutls_ecc_curve_get_size} (gnutls_ecc_curve_t @var{curve})
+@var{curve}: is an ECC curve
+
+
+@strong{Returns:} the size in bytes of the curve or 0 on failure.
+
+@strong{Since:} 3.0
+@end deftypefun

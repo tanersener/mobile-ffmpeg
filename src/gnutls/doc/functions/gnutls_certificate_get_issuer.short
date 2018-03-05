@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_get_issuer} (gnutls_certificate_credentials_t @var{sc}, gnutls_x509_crt_t @var{cert}, gnutls_x509_crt_t * @var{issuer}, unsigned int @var{flags})

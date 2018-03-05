@@ -1,0 +1,37 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_subject_alt_name} (gnutls_x509_crt_t @var{cert}, unsigned int @var{seq}, void * @var{san}, size_t * @var{san_size}, unsigned int * @var{critical})
+@var{cert}: should contain a @code{gnutls_x509_crt_t}  type
+
+@var{seq}: specifies the sequence number of the alt name (0 for the first one, 1 for the second etc.)
+
+@var{san}: is the place where the alternative name will be copied to
+
+@var{san_size}: holds the size of san.
+
+@var{critical}: will be non-zero if the extension is marked as critical (may be null)
+
+This function retrieves the Alternative Name (2.5.29.17), contained
+in the given certificate in the X509v3 Certificate Extensions.
+
+When the SAN type is otherName, it will extract the data in the
+otherName's value field, and @code{GNUTLS_SAN_OTHERNAME}  is returned.
+You may use @code{gnutls_x509_crt_get_subject_alt_othername_oid()}  to get
+the corresponding OID and the "virtual" SAN types (e.g.,
+@code{GNUTLS_SAN_OTHERNAME_XMPP} ).
+
+If an otherName OID is known, the data will be decoded.  Otherwise
+the returned data will be DER encoded, and you will have to decode
+it yourself.  Currently, only the RFC 3920 id-on-xmppAddr SAN is
+recognized.
+
+@strong{Returns:} the alternative subject name type on success, one of the
+enumerated @code{gnutls_x509_subject_alt_name_t} .  It will return
+@code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if  @code{san_size} is not large enough to
+hold the value.  In that case  @code{san_size} will be updated with the
+required size.  If the certificate does not have an Alternative
+name with the specified sequence number then
+@code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE}  is returned.
+@end deftypefun

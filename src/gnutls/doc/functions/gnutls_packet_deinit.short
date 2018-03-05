@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_packet_deinit} (gnutls_packet_t @var{packet})

@@ -26,13 +26,15 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
 COMMON_CFLAGS=$(android_get_cflags "libxml2")
 COMMON_CXXFLAGS=$(android_get_cxxflags "libxml2")
 COMMON_LDFLAGS=$(android_get_ldflags "libxml2")
-CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/include"
-CXXFLAGS="$COMMON_CXXFLAGS"
-LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/lib"
+
+export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/include"
+export CXXFLAGS="$COMMON_CXXFLAGS"
+export LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/lib"
 
 cd $1/src/libxml2 || exit 1
 
@@ -44,9 +46,6 @@ make clean
 # #error "LONG_BIT definition appears wrong for platform (bad gcc/glibc config?)."
 #
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2 \
     --with-pic \
@@ -60,12 +59,9 @@ LDFLAGS=${LDFLAGS} \
     --disable-fast-install \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

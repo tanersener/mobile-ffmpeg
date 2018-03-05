@@ -1,0 +1,18 @@
+
+
+
+
+@deftypefun {int} {gnutls_pkcs12_bag_get_key_id} (gnutls_pkcs12_bag_t @var{bag}, unsigned @var{indx}, gnutls_datum_t * @var{id})
+@var{bag}: The bag
+
+@var{indx}: The bag's element to add the id
+
+@var{id}: where the ID will be copied (to be treated as const)
+
+This function will return the key ID, of the specified bag element.
+The key ID is usually used to distinguish the local private key and
+the certificate pair.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value. or a negative error code on error.
+@end deftypefun

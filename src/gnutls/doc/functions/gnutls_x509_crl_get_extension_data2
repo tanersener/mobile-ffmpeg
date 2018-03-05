@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_extension_data2} (gnutls_x509_crl_t @var{crl}, unsigned @var{indx}, gnutls_datum_t * @var{data})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+@var{indx}: Specifies which extension OID to read. Use (0) to get the first one.
+
+@var{data}: will contain the extension DER-encoded data
+
+This function will return the requested by the index extension data in the
+certificate revocation list.  The extension data will be allocated using
+@code{gnutls_malloc()} .
+
+Use @code{gnutls_x509_crt_get_extension_info()}  to extract the OID.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.  If you have reached the
+last extension available @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+will be returned.
+@end deftypefun

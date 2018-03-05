@@ -1,0 +1,34 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_dn_get_rdn_ava} (gnutls_x509_dn_t @var{dn}, int @var{irdn}, int @var{iava}, gnutls_x509_ava_st * @var{ava})
+@var{dn}: a pointer to DN
+
+@var{irdn}: index of RDN
+
+@var{iava}: index of AVA.
+
+@var{ava}: Pointer to structure which will hold output information.
+
+Get pointers to data within the DN. The format of the  @code{ava} structure
+is shown below.
+
+struct gnutls_x509_ava_st @{
+gnutls_datum_t oid;
+gnutls_datum_t value;
+unsigned long value_tag;
+@};
+
+The X.509 distinguished name is a sequence of sequences of strings
+and this is what the  @code{irdn} and  @code{iava} indexes model.
+
+Note that  @code{ava} will contain pointers into the  @code{dn} structure which
+in turns points to the original certificate. Thus you should not
+modify any data or deallocate any of those.
+
+This is a low-level function that requires the caller to do the
+value conversions when necessary (e.g. from UCS-2).
+
+@strong{Returns:} Returns 0 on success, or an error code.
+@end deftypefun

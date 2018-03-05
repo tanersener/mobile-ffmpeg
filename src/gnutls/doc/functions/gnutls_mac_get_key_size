@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {size_t} {gnutls_mac_get_key_size} (gnutls_mac_algorithm_t @var{algorithm})
+@var{algorithm}: is an encryption algorithm
+
+Returns the size of the MAC key used in TLS. 
+
+@strong{Returns:} length (in bytes) of the given MAC key size, or 0 if the
+given MAC algorithm is invalid.
+@end deftypefun

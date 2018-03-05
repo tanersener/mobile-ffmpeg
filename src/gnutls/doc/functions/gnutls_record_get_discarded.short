@@ -1,0 +1,1 @@
+@item @var{unsigned int} @ref{gnutls_record_get_discarded} (gnutls_session_t @var{session})

@@ -1,0 +1,76 @@
+#!/bin/sh
+
+# Copyright (C) 2016 Nikos Mavrogiannopoulos
+#
+# This file is part of GnuTLS.
+#
+# GnuTLS is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3 of the License, or (at
+# your option) any later version.
+#
+# GnuTLS is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GnuTLS; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+#set -e
+
+srcdir="${srcdir:-.}"
+OCSPTOOL="${OCSPTOOL:-../../src/ocsptool${EXEEXT}}"
+DIFF="${DIFF:-diff}"
+
+if ! test -x "${OCSPTOOL}"; then
+	exit 77
+fi
+
+export TZ="UTC"
+
+# Check for datefudge
+TSTAMP=`datefudge "2006-09-23" date -u +%s || true`
+if test "$TSTAMP" != "1158969600"; then
+	echo $TSTAMP
+	echo "You need datefudge to run this test"
+	exit 77
+fi
+
+# Note that in rare cases this test may fail because the
+# time set using datefudge could have changed since the generation
+# (if example the system was busy)
+
+datefudge -s "2016-04-22" \
+	"${OCSPTOOL}" -e --load-signer "${srcdir}/certs/ca.pem" --infile "${srcdir}/response1.der"
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 1 - OCSP signed by CA - failed"
+	exit ${rc}
+fi
+
+datefudge -s "2016-04-22" \
+	"${OCSPTOOL}" -e --load-signer "${srcdir}/certs/ocsp-server.pem" --infile "${srcdir}/response2.der"
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 2 - OCSP signed by delegated cert - failed"
+	exit ${rc}
+fi
+
+datefudge -s "2016-04-22" \
+	"${OCSPTOOL}" -e --load-signer "${srcdir}/certs/ca.pem" --infile "${srcdir}/response2.der" -d 4
+rc=$?
+
+# We're done.
+if test "${rc}" != "0"; then
+	echo "Test 3 - OCSP signed by delegated cert - failed"
+	exit ${rc}
+fi
+
+
+exit 0

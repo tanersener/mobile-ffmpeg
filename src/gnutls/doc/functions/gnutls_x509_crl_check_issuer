@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {unsigned} {gnutls_x509_crl_check_issuer} (gnutls_x509_crl_t @var{crl}, gnutls_x509_crt_t @var{issuer})
+@var{crl}: is the CRL to be checked
+
+@var{issuer}: is the certificate of a possible issuer
+
+This function will check if the given CRL was issued by the given
+issuer certificate.  
+
+@strong{Returns:} true (1) if the given CRL was issued by the given issuer, 
+and false (0) if not.
+@end deftypefun

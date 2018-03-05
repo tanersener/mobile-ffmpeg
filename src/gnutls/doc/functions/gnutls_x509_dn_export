@@ -1,0 +1,26 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_dn_export} (gnutls_x509_dn_t @var{dn}, gnutls_x509_crt_fmt_t @var{format}, void * @var{output_data}, size_t * @var{output_data_size})
+@var{dn}: Holds the uint8_t DN object
+
+@var{format}: the format of output params. One of PEM or DER.
+
+@var{output_data}: will contain a DN PEM or DER encoded
+
+@var{output_data_size}: holds the size of output_data (and will be
+replaced by the actual size of parameters)
+
+This function will export the DN to DER or PEM format.
+
+If the buffer provided is not long enough to hold the output, then
+* @code{output_data_size} is updated and @code{GNUTLS_E_SHORT_MEMORY_BUFFER} 
+will be returned.
+
+If the structure is PEM encoded, it will have a header
+of "BEGIN NAME".
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

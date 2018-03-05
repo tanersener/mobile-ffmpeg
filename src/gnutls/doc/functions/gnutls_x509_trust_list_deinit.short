@@ -1,0 +1,1 @@
+@item @var{void} @ref{gnutls_x509_trust_list_deinit} (gnutls_x509_trust_list_t @var{list}, unsigned int @var{all})

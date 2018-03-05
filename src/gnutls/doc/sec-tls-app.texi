@@ -1,0 +1,128 @@
+@node How to use TLS in application protocols
+@section How to use @acronym{TLS} in application protocols
+
+This chapter is intended to provide some hints on how to use
+@acronym{TLS} over simple custom made application protocols.  The
+discussion below mainly refers to the @acronym{TCP/IP} transport layer
+but may be extended to other ones too.
+
+@menu
+* Separate ports::
+* Upward negotiation::
+@end menu
+
+@node Separate ports
+@subsection Separate ports
+
+Traditionally @acronym{SSL} was used in application protocols by
+assigning a new port number for the secure services. By doing this two
+separate ports were assigned, one for the non-secure sessions, and one
+for the secure sessions. This method ensures that if a user requests a
+secure session then the client will attempt to connect to the secure port
+and fail otherwise. The only possible attack with this method is to perform
+a denial of service attack. The most famous example of this method is
+``HTTP over TLS'' or @acronym{HTTPS} protocol @xcite{RFC2818}.
+
+Despite its wide use, this method has several issues. This
+approach starts the @acronym{TLS} Handshake procedure just after the
+client connects on the ---so called--- secure port.  That way the
+@acronym{TLS} protocol does not know anything about the client, and
+popular methods like the host advertising in HTTP do not
+work@footnote{See also the Server Name Indication extension on
+@ref{serverind}.}.  There is no way for the client to say ``I
+connected to YYY server'' before the Handshake starts, so the server
+cannot possibly know which certificate to use.
+
+Other than that it requires two separate ports to run a single
+service, which is unnecessary complication. Due to the fact that there
+is a limitation on the available privileged ports, this approach was
+soon deprecated in favor of upward negotiation.
+
+@node Upward negotiation
+@subsection Upward negotiation
+
+Other application protocols@footnote{See LDAP, IMAP etc.}  use a
+different approach to enable the secure layer.  They use something
+often called as the ``TLS upgrade'' method. This method is quite tricky but it
+is more flexible. The idea is to extend the application protocol to
+have a ``STARTTLS'' request, whose purpose it to start the TLS
+protocols just after the client requests it.  This approach
+does not require any extra port to be reserved.
+There is even an extension to HTTP protocol to support 
+this method @xcite{RFC2817}.
+
+The tricky part, in this method, is that the ``STARTTLS'' request is
+sent in the clear, thus is vulnerable to modifications.  A typical
+attack is to modify the messages in a way that the client is fooled
+and thinks that the server does not have the ``STARTTLS'' capability.
+See a typical conversation of a hypothetical protocol:
+
+@quotation
+(client connects to the server)
+
+CLIENT: HELLO I'M MR. XXX
+
+SERVER: NICE TO MEET YOU XXX
+
+CLIENT: PLEASE START TLS
+
+SERVER: OK
+
+*** TLS STARTS
+
+CLIENT: HERE ARE SOME CONFIDENTIAL DATA
+@end quotation
+
+And an example of a conversation where someone is acting
+in between:
+
+@quotation
+(client connects to the server)
+
+CLIENT: HELLO I'M MR. XXX
+
+SERVER: NICE TO MEET YOU XXX
+
+CLIENT: PLEASE START TLS
+
+(here someone inserts this message)
+
+SERVER: SORRY I DON'T HAVE THIS CAPABILITY
+
+CLIENT: HERE ARE SOME CONFIDENTIAL DATA
+@end quotation
+
+As you can see above the client was fooled, and was na@"ive enough to
+send the confidential data in the clear, despite the server telling the
+client that it does not support ``STARTTLS''.
+
+How do we avoid the above attack? As you may have already noticed this
+situation is easy to avoid.  The client has to ask the user before it
+connects whether the user requests @acronym{TLS} or not.  If the user
+answered that he certainly wants the secure layer the last
+conversation should be:
+
+@quotation
+(client connects to the server)
+
+CLIENT: HELLO I'M MR. XXX
+
+SERVER: NICE TO MEET YOU XXX
+
+CLIENT: PLEASE START TLS
+
+(here someone inserts this message)
+
+SERVER: SORRY I DON'T HAVE THIS CAPABILITY
+
+CLIENT: BYE
+
+(the client notifies the user that the secure connection was not possible)
+@end quotation
+
+This method, if implemented properly, is far better than the
+traditional method, and the security properties remain the same, since
+only denial of service is possible. The benefit is that the server may
+request additional data before the @acronym{TLS} Handshake protocol
+starts, in order to send the correct certificate, use the correct
+password file, or anything else!

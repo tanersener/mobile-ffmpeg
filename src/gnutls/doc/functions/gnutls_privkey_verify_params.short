@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_privkey_verify_params} (gnutls_privkey_t @var{key})

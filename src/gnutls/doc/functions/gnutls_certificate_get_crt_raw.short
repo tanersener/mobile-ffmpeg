@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_certificate_get_crt_raw} (gnutls_certificate_credentials_t @var{sc}, unsigned @var{idx1}, unsigned @var{idx2}, gnutls_datum_t * @var{cert})

@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {gnutls_transport_ptr_t} {gnutls_transport_get_ptr} (gnutls_session_t @var{session})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+Used to get the first argument of the transport function (like
+PUSH and PULL).  This must have been set using
+@code{gnutls_transport_set_ptr()} .
+
+@strong{Returns:} The first argument of the transport function.
+@end deftypefun

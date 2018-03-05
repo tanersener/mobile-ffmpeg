@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {int} {gnutls_pubkey_import_ecc_x962} (gnutls_pubkey_t @var{key}, const gnutls_datum_t * @var{parameters}, const gnutls_datum_t * @var{ecpoint})
+@var{key}: The structure to store the parsed key
+
+@var{parameters}: DER encoding of an ANSI X9.62 parameters
+
+@var{ecpoint}: DER encoding of ANSI X9.62 ECPoint
+
+This function will convert the given elliptic curve parameters to a
+@code{gnutls_pubkey_t} .  The output will be stored in  @code{key} .
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 3.0
+@end deftypefun

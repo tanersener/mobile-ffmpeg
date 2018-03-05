@@ -1,0 +1,11 @@
+
+
+@c gnutls_tpmkey_fmt_t
+@table @code
+@item GNUTLS_@-TPMKEY_@-FMT_@-RAW
+The portable data format.
+@item GNUTLS_@-TPMKEY_@-FMT_@-DER
+An alias for the raw format.
+@item GNUTLS_@-TPMKEY_@-FMT_@-CTK_@-PEM
+A custom data format used by some TPM tools.
+@end table

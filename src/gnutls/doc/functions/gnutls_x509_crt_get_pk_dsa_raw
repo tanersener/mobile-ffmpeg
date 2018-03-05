@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_pk_dsa_raw} (gnutls_x509_crt_t @var{crt}, gnutls_datum_t * @var{p}, gnutls_datum_t * @var{q}, gnutls_datum_t * @var{g}, gnutls_datum_t * @var{y})
+@var{crt}: Holds the certificate
+
+@var{p}: will hold the p
+
+@var{q}: will hold the q
+
+@var{g}: will hold the g
+
+@var{y}: will hold the y
+
+This function will export the DSA public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+@end deftypefun

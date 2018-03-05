@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_pkcs12_bag_deinit} (gnutls_pkcs12_bag_t @var{bag})
+@var{bag}: A pointer to the type to be initialized
+
+This function will deinitialize a PKCS12 Bag structure.
+@end deftypefun

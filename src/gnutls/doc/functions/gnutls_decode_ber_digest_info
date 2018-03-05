@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_decode_ber_digest_info} (const gnutls_datum_t * @var{info}, gnutls_digest_algorithm_t * @var{hash}, unsigned char * @var{digest}, unsigned int * @var{digest_size})
+@var{info}: an RSA BER encoded DigestInfo structure
+
+@var{hash}: will contain the hash algorithm of the structure
+
+@var{digest}: will contain the hash output of the structure
+
+@var{digest_size}: will contain the hash size of the structure; initially must hold the maximum size of  @code{digest} 
+
+This function will parse an RSA PKCS@code{1}  1.5 DigestInfo structure
+and report the hash algorithm used as well as the digest data.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+
+@strong{Since:} 3.5.0
+@end deftypefun

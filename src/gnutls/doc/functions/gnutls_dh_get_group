@@ -1,0 +1,23 @@
+
+
+
+
+@deftypefun {int} {gnutls_dh_get_group} (gnutls_session_t @var{session}, gnutls_datum_t * @var{raw_gen}, gnutls_datum_t * @var{raw_prime})
+@var{session}: is a gnutls session
+
+@var{raw_gen}: will hold the generator.
+
+@var{raw_prime}: will hold the prime.
+
+This function will return the group parameters used in the last
+Diffie-Hellman key exchange with the peer.  These are the prime and
+the generator used.  This function should be used for both
+anonymous and ephemeral Diffie-Hellman.  The output parameters must
+be freed with @code{gnutls_free()} .
+
+Note, that the prime and generator are exported as non-negative
+integers and may include a leading zero byte.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise
+an error code is returned.
+@end deftypefun

@@ -1,0 +1,1 @@
+@item @var{unsigned} @ref{gnutls_hmac_get_len} (gnutls_mac_algorithm_t @var{algorithm})

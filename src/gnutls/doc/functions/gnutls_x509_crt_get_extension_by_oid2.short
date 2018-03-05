@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_crt_get_extension_by_oid2} (gnutls_x509_crt_t @var{cert}, const char * @var{oid}, unsigned @var{indx}, gnutls_datum_t * @var{output}, unsigned int * @var{critical})

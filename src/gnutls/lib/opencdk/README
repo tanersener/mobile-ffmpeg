@@ -1,0 +1,5 @@
+This is a stripped down mirror of the files in OpenCDK
+src/. To avoid to link proc-packets.c, dummy.c is included.
+
+In Makefile.am libminiopencdk_la_SOURCES contains the list
+of all needed files.

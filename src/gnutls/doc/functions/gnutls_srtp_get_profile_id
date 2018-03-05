@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {int} {gnutls_srtp_get_profile_id} (const char * @var{name}, gnutls_srtp_profile_t * @var{profile})
+@var{name}: The name of the profile to look up
+
+@var{profile}: Will hold the profile id
+
+This function allows you to look up a profile based on a string.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned,
+otherwise a negative error code is returned.
+
+Since 3.1.4
+@end deftypefun

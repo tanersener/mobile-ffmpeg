@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_x509_dn_init} (gnutls_x509_dn_t * @var{dn})

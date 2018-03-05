@@ -1,0 +1,22 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_get_dn_oid} (gnutls_x509_crl_t @var{crl}, unsigned @var{indx}, void * @var{oid}, size_t * @var{sizeof_oid})
+@var{crl}: should contain a gnutls_x509_crl_t type
+
+@var{indx}: Specifies which DN OID to send. Use (0) to get the first one.
+
+@var{oid}: a pointer to store the OID (may be null)
+
+@var{sizeof_oid}: initially holds the size of 'oid'
+
+This function will extract the requested OID of the name of the CRL
+issuer, specified by the given index.
+
+If oid is null then only the size will be filled.
+
+@strong{Returns:} @code{GNUTLS_E_SHORT_MEMORY_BUFFER}  if the provided buffer is
+not long enough, and in that case the sizeof_oid will be updated
+with the required size.  On success 0 is returned.
+@end deftypefun

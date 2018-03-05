@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_get_pk_ecc_raw} (gnutls_x509_crt_t @var{crt}, gnutls_ecc_curve_t * @var{curve}, gnutls_datum_t * @var{x}, gnutls_datum_t * @var{y})
+@var{crt}: Holds the certificate
+
+@var{curve}: will hold the curve
+
+@var{x}: will hold x
+
+@var{y}: will hold y
+
+This function will export the ECC public key's parameters found in
+the given certificate.  The new parameters will be allocated using
+@code{gnutls_malloc()}  and will be stored in the appropriate datum.
+
+@strong{Returns:} @code{GNUTLS_E_SUCCESS}  on success, otherwise a negative error code.
+
+@strong{Since:} 3.4.1
+@end deftypefun

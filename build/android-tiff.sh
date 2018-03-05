@@ -23,10 +23,11 @@ fi
 # ENABLE COMMON FUNCTIONS
 . $1/build/common.sh
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "tiff")
-CXXFLAGS=$(android_get_cxxflags "tiff")
-LDFLAGS=$(android_get_ldflags "tiff")
+export CFLAGS=$(android_get_cflags "tiff")
+export CXXFLAGS=$(android_get_cxxflags "tiff")
+export LDFLAGS=$(android_get_ldflags "tiff")
 
 # MANUALLY PREPARING PATHS AND TOOLS
 export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin
@@ -37,14 +38,12 @@ export CXX=${TARGET_HOST}-clang++
 export LD=${TARGET_HOST}-ld
 export RANLIB=${TARGET_HOST}-ranlib
 export STRIP=${TARGET_HOST}-strip
+export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig"
 
 cd $1/src/tiff || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/tiff \
     --with-pic \
@@ -57,12 +56,9 @@ LDFLAGS=${LDFLAGS} \
     --disable-maintainer-mode \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
-#make install || exit 1
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
+make install || exit 1

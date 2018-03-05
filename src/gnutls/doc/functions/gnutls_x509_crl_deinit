@@ -1,0 +1,9 @@
+
+
+
+
+@deftypefun {void} {gnutls_x509_crl_deinit} (gnutls_x509_crl_t @var{crl})
+@var{crl}: The data to be deinitialized
+
+This function will deinitialize a CRL structure.
+@end deftypefun

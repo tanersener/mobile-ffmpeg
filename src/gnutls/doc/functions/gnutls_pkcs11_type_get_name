@@ -1,0 +1,16 @@
+
+
+
+
+@deftypefun {const char *} {gnutls_pkcs11_type_get_name} (gnutls_pkcs11_obj_type_t @var{type})
+@var{type}: Holds the PKCS 11 object type, a @code{gnutls_pkcs11_obj_type_t} .
+
+This function will return a human readable description of the
+PKCS11 object type  @code{obj} .  It will return "Unknown" for unknown
+types.
+
+@strong{Returns:} human readable string labeling the PKCS11 object type
+ @code{type} .
+
+@strong{Since:} 2.12.0
+@end deftypefun

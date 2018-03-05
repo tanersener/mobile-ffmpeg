@@ -1,0 +1,21 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crl_dist_points_get} (gnutls_x509_crl_dist_points_t @var{cdp}, unsigned int @var{seq}, unsigned int * @var{type}, gnutls_datum_t * @var{san}, unsigned int * @var{reasons})
+@var{cdp}: The CRL distribution points
+
+@var{seq}: specifies the sequence number of the distribution point (0 for the first one, 1 for the second etc.)
+
+@var{type}: The name type of the corresponding name (gnutls_x509_subject_alt_name_t)
+
+@var{san}: The distribution point names (to be treated as constant)
+
+@var{reasons}: Revocation reasons. An ORed sequence of flags from @code{gnutls_x509_crl_reason_flags_t} .
+
+This function retrieves the individual CRL distribution points (2.5.29.31),
+contained in provided type. 
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, @code{GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE} 
+if the index is out of bounds, otherwise a negative error value.
+@end deftypefun

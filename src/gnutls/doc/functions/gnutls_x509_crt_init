@@ -1,0 +1,12 @@
+
+
+
+
+@deftypefun {int} {gnutls_x509_crt_init} (gnutls_x509_crt_t * @var{cert})
+@var{cert}: A pointer to the type to be initialized
+
+This function will initialize an X.509 certificate structure.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+@end deftypefun

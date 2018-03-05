@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {void} {gnutls_global_set_log_function} (gnutls_log_func @var{log_func})
+@var{log_func}: it's a log function
+
+This is the function where you set the logging function gnutls is
+going to use.  This function only accepts a character array.
+Normally you may not use this function since it is only used for
+debugging purposes.
+
+ @code{gnutls_log_func} is of the form,
+void (*gnutls_log_func)( int level, const char*);
+@end deftypefun

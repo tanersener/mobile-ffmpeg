@@ -1,0 +1,15 @@
+
+
+
+
+@deftypefun {const gnutls_pk_algorithm_t *} {gnutls_pk_list} ( @var{void})
+
+Get a list of supported public key algorithms.
+
+This function is not thread safe.
+
+@strong{Returns:} a (0)-terminated list of @code{gnutls_pk_algorithm_t}  integers
+indicating the available ciphers.
+
+@strong{Since:} 2.6.0
+@end deftypefun

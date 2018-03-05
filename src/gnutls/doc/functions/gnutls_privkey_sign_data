@@ -1,0 +1,28 @@
+
+
+
+
+@deftypefun {int} {gnutls_privkey_sign_data} (gnutls_privkey_t @var{signer}, gnutls_digest_algorithm_t @var{hash}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, gnutls_datum_t * @var{signature})
+@var{signer}: Holds the key
+
+@var{hash}: should be a digest algorithm
+
+@var{flags}: Zero or one of @code{gnutls_privkey_flags_t} 
+
+@var{data}: holds the data to be signed
+
+@var{signature}: will contain the signature allocated with @code{gnutls_malloc()} 
+
+This function will sign the given data using a signature algorithm
+supported by the private key. Signature algorithms are always used
+together with a hash functions.  Different hash functions may be
+used for the RSA algorithm, but only the SHA family for the DSA keys.
+
+You may use @code{gnutls_pubkey_get_preferred_hash_algorithm()}  to determine
+the hash algorithm.
+
+@strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
+negative error value.
+
+@strong{Since:} 2.12.0
+@end deftypefun

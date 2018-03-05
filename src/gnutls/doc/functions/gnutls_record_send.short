@@ -1,0 +1,1 @@
+@item @var{ssize_t} @ref{gnutls_record_send} (gnutls_session_t @var{session}, const void * @var{data}, size_t @var{data_size})

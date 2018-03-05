@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {int} {gnutls_certificate_client_get_request_status} (gnutls_session_t @var{session})
+@var{session}: is a gnutls session
+
+Get whether client certificate was requested on the last
+handshake or not.
+
+@strong{Returns:} 0 if the peer (server) did not request client
+authentication or 1 otherwise.
+@end deftypefun

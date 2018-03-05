@@ -1,0 +1,1 @@
+@item @var{int} @ref{gnutls_dh_params_cpy} (gnutls_dh_params_t @var{dst}, gnutls_dh_params_t @var{src})

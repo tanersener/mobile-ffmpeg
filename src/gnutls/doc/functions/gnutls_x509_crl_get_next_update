@@ -1,0 +1,13 @@
+
+
+
+
+@deftypefun {time_t} {gnutls_x509_crl_get_next_update} (gnutls_x509_crl_t @var{crl})
+@var{crl}: should contain a @code{gnutls_x509_crl_t}  type
+
+This function will return the time the next CRL will be issued.
+This field is optional in a CRL so it might be normal to get an
+error instead.
+
+@strong{Returns:} when the next CRL will be issued, or (time_t)-1 on error.
+@end deftypefun

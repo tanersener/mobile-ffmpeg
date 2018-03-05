@@ -1,0 +1,19 @@
+
+
+
+
+@deftypefun {void} {gnutls_heartbeat_set_timeouts} (gnutls_session_t @var{session}, unsigned int @var{retrans_timeout}, unsigned int @var{total_timeout})
+@var{session}: is a @code{gnutls_session_t}  type.
+
+@var{retrans_timeout}: The time at which a retransmission will occur in milliseconds
+
+@var{total_timeout}: The time at which the connection will be aborted, in milliseconds.
+
+This function will override the timeouts for the DTLS heartbeat
+protocol. The retransmission timeout is the time after which a
+message from the peer is not received, the previous request will
+be retransmitted. The total timeout is the time after which the
+handshake will be aborted with @code{GNUTLS_E_TIMEDOUT} .
+
+@strong{Since:} 3.1.2
+@end deftypefun

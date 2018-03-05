@@ -1,0 +1,1 @@
+@item @var{const char *} @ref{gnutls_pkcs11_type_get_name} (gnutls_pkcs11_obj_type_t @var{type})
