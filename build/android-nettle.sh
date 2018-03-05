@@ -26,6 +26,7 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
 COMMON_CFLAGS=$(android_get_cflags "nettle")
 COMMON_LDFLAGS=$(android_get_ldflags "nettle")
@@ -53,8 +54,7 @@ make clean
     --disable-shared \
     --disable-openssl \
     --disable-gcov \
-    --disable-documentation \
-    ${OPTIONAL_CPU_SUPPORT} \
+    --disable-documentation ${OPTIONAL_CPU_SUPPORT} \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(nproc) || exit 1

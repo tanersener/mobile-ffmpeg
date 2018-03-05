@@ -26,18 +26,16 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "jpeg")
-CXXFLAGS=$(android_get_cxxflags "jpeg")
-LDFLAGS=$(android_get_ldflags "jpeg")
+export CFLAGS=$(android_get_cflags "jpeg")
+export CXXFLAGS=$(android_get_cxxflags "jpeg")
+export LDFLAGS=$(android_get_ldflags "jpeg")
 
 cd $1/src/jpeg || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/jpeg \
     --with-pic \
@@ -48,12 +46,9 @@ LDFLAGS=${LDFLAGS} \
     --disable-maintainer-mode \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

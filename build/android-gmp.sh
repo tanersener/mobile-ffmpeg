@@ -26,6 +26,7 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
 export CFLAGS=$(android_get_cflags "gmp")
 export CXXFLAGS=$(android_get_cxxflags "gmp")

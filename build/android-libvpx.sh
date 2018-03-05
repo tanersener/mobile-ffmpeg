@@ -26,10 +26,11 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "libvpx")
-CXXFLAGS=$(android_get_cxxflags "libvpx")
-LDFLAGS=$(android_get_ldflags "libvpx")
+export CFLAGS=$(android_get_cflags "libvpx")
+export CXXFLAGS=$(android_get_cxxflags "libvpx")
+export LDFLAGS=$(android_get_ldflags "libvpx")
 
 OPTIONAL_CPU_SUPPORT=""
 case ${ARCH} in
@@ -83,12 +84,9 @@ make clean
     --disable-shared \
     --enable-small || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

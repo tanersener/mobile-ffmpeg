@@ -52,6 +52,7 @@ make clean
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
     --with-zlib \
     --with-iconv \
+    --with-sax1 \
     --without-python \
     --without-debug \
     --enable-static \
@@ -62,6 +63,6 @@ make clean
 make -j$(nproc) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+cp libxml-2.0.pc ${INSTALL_PKG_CONFIG_DIR}
 
 make install || exit 1

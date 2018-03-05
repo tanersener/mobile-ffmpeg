@@ -26,23 +26,17 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "libass")
-CXXFLAGS=$(android_get_cxxflags "libass")
-LDFLAGS=$(android_get_ldflags "libass")
+export CFLAGS=$(android_get_cflags "libass")
+export CXXFLAGS=$(android_get_cxxflags "libass")
+export LDFLAGS=$(android_get_ldflags "libass")
+export PKG_CONFIG_PATH=${INSTALL_PKG_CONFIG_DIR}
 
 cd $1/src/libass || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
-PKG_CONFIG_PATH=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/fontconfig/lib/pkgconfig:\
-${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype/lib/pkgconfig:\
-${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/fribidi/lib/pkgconfig:\
-${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid/lib/pkgconfig:\
-${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2/lib/pkgconfig \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libass \
     --with-pic \
@@ -54,12 +48,9 @@ ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2/lib/pkgconfig \
     --disable-profile \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

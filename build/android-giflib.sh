@@ -26,22 +26,20 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
 COMMON_CFLAGS=$(android_get_cflags "giflib")
-CXXFLAGS=$(android_get_cxxflags "giflib")
-LDFLAGS=$(android_get_ldflags "giflib")
-CFLAGS="${COMMON_CFLAGS} -DS_IREAD=S_IRUSR -DS_IWRITE=S_IWUSR"
+COMMON_CXXFLAGS=$(android_get_cxxflags "giflib")
+COMMON_LDFLAGS=$(android_get_ldflags "giflib")
+
+export CFLAGS="${COMMON_CFLAGS} -DS_IREAD=S_IRUSR -DS_IWRITE=S_IWUSR"
+export CXXFLAGS="${COMMON_CXXFLAGS}"
+export LDFLAGS="${COMMON_LDFLAGS}"
 
 cd $1/src/giflib || exit 1
 
-echo $CXXFLAGS
-echo $CFLAGS
-
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/giflib \
     --with-pic \
@@ -51,12 +49,6 @@ LDFLAGS=${LDFLAGS} \
     --disable-fast-install \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make install || exit 1

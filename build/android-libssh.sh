@@ -26,6 +26,7 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
 CFLAGS=$(android_get_cflags "libssh")
 CXXFLAGS=$(android_get_cxxflags "libssh")

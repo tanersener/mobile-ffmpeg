@@ -26,18 +26,16 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "shine")
-CXXFLAGS=$(android_get_cxxflags "shine")
-LDFLAGS=$(android_get_ldflags "shine")
+export CFLAGS=$(android_get_cflags "shine")
+export CXXFLAGS=$(android_get_cxxflags "shine")
+export LDFLAGS=$(android_get_ldflags "shine")
 
 cd $1/src/shine || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/shine \
     --with-pic \
@@ -47,12 +45,9 @@ LDFLAGS=${LDFLAGS} \
     --disable-fast-install \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

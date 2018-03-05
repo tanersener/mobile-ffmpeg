@@ -26,18 +26,16 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "lame")
-CXXFLAGS=$(android_get_cxxflags "lame")
-LDFLAGS=$(android_get_ldflags "lame")
+export CFLAGS=$(android_get_cflags "lame")
+export CXXFLAGS=$(android_get_cxxflags "lame")
+export LDFLAGS=$(android_get_ldflags "lame")
 
 cd $1/src/lame || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/lame \
     --with-pic \
@@ -52,12 +50,6 @@ LDFLAGS=${LDFLAGS} \
     --disable-gtktest \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make install || exit 1

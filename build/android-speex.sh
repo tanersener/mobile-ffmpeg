@@ -26,40 +26,34 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "speex")
-CXXFLAGS=$(android_get_cxxflags "speex")
-LDFLAGS=$(android_get_ldflags "speex")
+export CFLAGS=$(android_get_cflags "speex")
+export CXXFLAGS=$(android_get_cxxflags "speex")
+export LDFLAGS=$(android_get_ldflags "speex")
 
 OPTIONAL_CPU_SUPPORT=""
 if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86_64" ]; then
-    OPTIONAL_CPU_SUPPORT="--enable-sse \\"
+    OPTIONAL_CPU_SUPPORT="--enable-sse"
 fi
 
 cd $1/src/speex || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/speex \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
-    --enable-static \
-    ${OPTIONAL_CPU_SUPPORT}
+    --enable-static ${OPTIONAL_CPU_SUPPORT} \
     --disable-shared \
     --disable-binaries \
     --disable-fast-install \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

@@ -49,14 +49,18 @@ export CXX=g++
 export LD=ld
 export RANLIB=ranlib
 export STRIP=strip
+export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig"
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
 TARGET_MACHINE=$(android_get_target_machine)
 COMMON_CFLAGS=$(android_get_cflags "openssl")
-CXXFLAGS=$(android_get_cxxflags "openssl")
-LDFLAGS=$(android_get_ldflags "openssl")
+COMMON_CXXFLAGS=$(android_get_cxxflags "openssl")
+COMMON_LDFLAGS=$(android_get_ldflags "openssl")
 
-CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/lib/gcc/${TARGET_HOST}/4.9.x/include"
+export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/lib/gcc/${TARGET_HOST}/4.9.x/include"
+export CXXFLAGS="${COMMON_CXXFLAGS}"
+export LDFLAGS="${COMMON_LDFLAGS}"
 
 export _ANDROID_EABI="mobile-ffmpeg-${ARCH}"
 export _ANDROID_ARCH="arm-${ARCH}"
@@ -98,5 +102,10 @@ perl -pi -e 's/install: all install_docs install_sw/install: install_docs instal
      --openssldir=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/openssl || exit 1
 
 make depend || exit 1
+
 make all || exit 1
+
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

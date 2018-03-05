@@ -26,6 +26,7 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
 CFLAGS=$(android_get_cflags "soxr")
 CXXFLAGS=$(android_get_cxxflags "soxr")
@@ -34,10 +35,10 @@ LDFLAGS=$(android_get_ldflags "soxr")
 cd $1/src/soxr || exit 1
 
 if [ -d "build" ]; then
-    rm -rf build;
+    rm -rf build
 fi
 
-mkdir build;
+mkdir build
 cd build
 
 cmake -Wno-dev \
@@ -60,5 +61,8 @@ cmake -Wno-dev \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
 make -j$(nproc) || exit 1
+
+# MANUALLY COPY PKG-CONFIG FILES
+cp src/*.pc ${INSTALL_PKG_CONFIG_DIR}
 
 make install || exit 1

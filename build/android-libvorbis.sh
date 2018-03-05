@@ -26,18 +26,16 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "libvorbis")
-CXXFLAGS=$(android_get_cxxflags "libvorbis")
-LDFLAGS=$(android_get_ldflags "libvorbis")
+export CFLAGS=$(android_get_cflags "libvorbis")
+export CXXFLAGS=$(android_get_cxxflags "libvorbis")
+export LDFLAGS=$(android_get_ldflags "libvorbis")
 
 cd $1/src/libvorbis || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis \
     --with-pic \
@@ -52,12 +50,11 @@ LDFLAGS=${LDFLAGS} \
     --disable-oggtest \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp vorbisenc.pc ${INSTALL_PKG_CONFIG_DIR}
+cp vorbisfile.pc ${INSTALL_PKG_CONFIG_DIR}
+cp vorbis.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

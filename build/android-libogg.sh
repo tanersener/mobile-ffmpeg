@@ -26,18 +26,16 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "libogg")
-CXXFLAGS=$(android_get_cxxflags "libogg")
-LDFLAGS=$(android_get_ldflags "libogg")
+export CFLAGS=$(android_get_cflags "libogg")
+export CXXFLAGS=$(android_get_cxxflags "libogg")
+export LDFLAGS=$(android_get_ldflags "libogg")
 
 cd $1/src/libogg || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libogg \
     --with-pic \
@@ -47,12 +45,9 @@ LDFLAGS=${LDFLAGS} \
     --disable-fast-install \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp ogg.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

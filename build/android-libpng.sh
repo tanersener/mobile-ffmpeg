@@ -26,10 +26,11 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "libpng")
-CXXFLAGS=$(android_get_cxxflags "libpng")
-LDFLAGS=$(android_get_ldflags "libpng")
+export CFLAGS=$(android_get_cflags "libpng")
+export CXXFLAGS=$(android_get_cxxflags "libpng")
+export LDFLAGS=$(android_get_ldflags "libpng")
 
 OPTIONAL_CPU_SUPPORT=""
 if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86_64" ]; then
@@ -43,9 +44,6 @@ cd $1/src/libpng || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libpng \
     --with-pic \
@@ -55,16 +53,12 @@ LDFLAGS=${LDFLAGS} \
     --disable-fast-install \
     --disable-unversioned-libpng-pc \
     --disable-unversioned-libpng-config \
-    --enable-hardware-optimizations \
-    $OPTIONAL_CPU_SUPPORT \
+    --enable-hardware-optimizations ${OPTIONAL_CPU_SUPPORT} \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

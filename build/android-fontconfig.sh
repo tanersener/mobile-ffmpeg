@@ -26,25 +26,24 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
 COMMON_CFLAGS=$(android_get_cflags "fontconfig")
-CXXFLAGS=$(android_get_cxxflags "fontconfig")
 COMMON_LDFLAGS=$(android_get_ldflags "fontconfig")
 
-CFLAGS="$COMMON_CFLAGS -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid/include"
-LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid/lib"
+export CFLAGS="$COMMON_CFLAGS -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid/include"
+export CXXFLAGS=$(android_get_cxxflags "fontconfig")
+export LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid/lib"
+export PKG_CONFIG_PATH=${INSTALL_PKG_CONFIG_DIR}
 
 cd $1/src/fontconfig || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
-PKG_CONFIG_PATH=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype/lib/pkgconfig:${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2/lib/pkgconfig:${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid/lib/pkgconfig \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/fontconfig \
     --with-pic \
+    --with-pkgconfigdir=${INSTALL_PKG_CONFIG_DIR} \
     --with-libiconv-includes=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/include \
     --with-libiconv-lib=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/lib \
     --enable-static \
@@ -56,12 +55,6 @@ PKG_CONFIG_PATH=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype/lib/pkgcon
     --disable-docs \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make install || exit 1

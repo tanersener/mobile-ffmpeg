@@ -26,21 +26,17 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-COMMON_CFLAGS=$(android_get_cflags "libtheora")
-COMMON_CXXFLAGS=$(android_get_cxxflags "libtheora")
-COMMON_LDFLAGS=$(android_get_ldflags "libtheora")
-CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libogg/include -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis/include"
-CXXFLAGS="$COMMON_CXXFLAGS"
-LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libogg/lib -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis/lib"
+export CFLAGS=$(android_get_cflags "libtheora")
+export CXXFLAGS=$(android_get_cxxflags "libtheora")
+export LDFLAGS=$(android_get_ldflags "libtheora")
+export PKG_CONFIG_PATH=${INSTALL_PKG_CONFIG_DIR}
 
 cd $1/src/libtheora || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libtheora \
     --with-pic \
@@ -53,12 +49,11 @@ LDFLAGS=${LDFLAGS} \
     --enable-valgrind-testing \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp theoradec.pc ${INSTALL_PKG_CONFIG_DIR}
+cp theoraenc.pc ${INSTALL_PKG_CONFIG_DIR}
+cp theora.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1

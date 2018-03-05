@@ -26,18 +26,16 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-CFLAGS=$(android_get_cflags "freetype")
-CXXFLAGS=$(android_get_cxxflags "freetype")
-LDFLAGS=$(android_get_ldflags "freetype")
+export CFLAGS=$(android_get_cflags "freetype")
+export CXXFLAGS=$(android_get_cxxflags "freetype")
+export LDFLAGS=$(android_get_ldflags "freetype")
 
 cd $1/src/freetype || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/freetype \
     --with-pic \
@@ -49,12 +47,9 @@ LDFLAGS=${LDFLAGS} \
     --disable-mmap \
     --host=${TARGET_HOST} || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
+# MANUALLY COPY PKG-CONFIG FILES
+cp ./builds/unix/*.pc ${INSTALL_PKG_CONFIG_DIR}
+
 make install || exit 1
