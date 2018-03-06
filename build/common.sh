@@ -96,6 +96,9 @@ android_get_cflags() {
 
 android_get_cxxflags() {
     case $1 in
+        gnutls)
+            echo "-nostdi -std=c++11 -fno-exceptions -fno-rtti"
+        ;;
         opencore-amr)
             echo ""
         ;;

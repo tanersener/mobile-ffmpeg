@@ -1,2 +1,4 @@
 /.deps/
 /Makefile
+/.libs/
+*.la

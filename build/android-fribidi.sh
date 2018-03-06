@@ -50,6 +50,6 @@ make clean
 make -j$(nproc) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+cp ./*.pc ${INSTALL_PKG_CONFIG_DIR}
 
 make install || exit 1

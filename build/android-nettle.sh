@@ -50,8 +50,8 @@ make clean
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/nettle \
     --enable-pic \
     --enable-static \
-    --enable-mini-gmp \
     --disable-shared \
+    --disable-mini-gmp \
     --disable-openssl \
     --disable-gcov \
     --disable-documentation ${OPTIONAL_CPU_SUPPORT} \
@@ -60,6 +60,6 @@ make clean
 make -j$(nproc) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp *.pc ${INSTALL_PKG_CONFIG_DIR}
+cp ./*.pc ${INSTALL_PKG_CONFIG_DIR}
 
 make install || exit 1
