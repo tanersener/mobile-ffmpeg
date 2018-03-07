@@ -1,5 +1,25 @@
 #!/bin/bash
 
+create_libxml2_package_config() {
+    local LIBXML2_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/libxml-2.0.pc" << EOF
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+modules=1
+
+Name: libXML
+Version: ${LIBXML2_VERSION}
+Description: libXML library version2.
+Requires: libiconv
+Libs: -L\${libdir} -lxml2
+Libs.private:   -lz -lm
+Cflags: -I\${includedir} -I\${includedir}/libxml2
+EOF
+}
+
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -23,18 +43,14 @@ fi
 # ENABLE COMMON FUNCTIONS
 . $1/build/common.sh
 
-# PREPARING PATHS
+# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 android_prepare_toolchain_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-COMMON_CFLAGS=$(android_get_cflags "libxml2")
-COMMON_CXXFLAGS=$(android_get_cxxflags "libxml2")
-COMMON_LDFLAGS=$(android_get_ldflags "libxml2")
-
-export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/include"
-export CXXFLAGS="$COMMON_CXXFLAGS"
-export LDFLAGS="$COMMON_LDFLAGS -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/lib"
+export CFLAGS=$(android_get_cflags "libxml2")
+export CXXFLAGS=$(android_get_cxxflags "libxml2")
+export LDFLAGS=$(android_get_ldflags "libxml2")
 
 cd $1/src/libxml2 || exit 1
 
@@ -51,7 +67,7 @@ make clean
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
     --with-zlib \
-    --with-iconv \
+    --with-iconv=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv \
     --with-sax1 \
     --without-python \
     --without-debug \
@@ -62,7 +78,7 @@ make clean
 
 make -j$(nproc) || exit 1
 
-# MANUALLY COPY PKG-CONFIG FILES
-cp libxml-2.0.pc ${INSTALL_PKG_CONFIG_DIR}
+# CREATE PACKAGE CONFIG MANUALLY
+create_libxml2_package_config "2.9.7"
 
 make install || exit 1

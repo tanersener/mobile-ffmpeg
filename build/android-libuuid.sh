@@ -1,5 +1,23 @@
 #!/bin/bash
 
+create_uuid_package_config() {
+    local UUID_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libuuid
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: uuid
+Description: Universally unique id library
+Version: ${UUID_VERSION}
+Requires:
+Cflags: -I\${includedir}
+Libs: -L\${libdir} -luuid
+EOF
+}
+
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -23,7 +41,7 @@ fi
 # ENABLE COMMON FUNCTIONS
 . $1/build/common.sh
 
-# PREPARING PATHS
+# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 android_prepare_toolchain_paths
 
 # PREPARING FLAGS
@@ -47,7 +65,7 @@ make clean
 
 make -j$(nproc) || exit 1
 
-# MANUALLY COPY PKG-CONFIG FILES
-cp ./*.pc ${INSTALL_PKG_CONFIG_DIR}
+# AUTO-GENERATED PKG-CONFIG FILE IS WRONG. CREATING IT MANUALLY
+create_uuid_package_config "1.0.3"
 
 make install || exit 1

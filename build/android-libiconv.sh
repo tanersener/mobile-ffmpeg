@@ -1,5 +1,24 @@
 #!/bin/bash
 
+create_libiconv_package_config() {
+    local LIB_ICONV_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" << EOF
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: libiconv
+Description: Character set conversion library
+Version: ${LIB_ICONV_VERSION}
+
+Requires:
+Libs: -L\${libdir} -liconv -lcharset
+Cflags: -I\${includedir}
+EOF
+}
+
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -23,7 +42,7 @@ fi
 # ENABLE COMMON FUNCTIONS
 . $1/build/common.sh
 
-# PREPARING PATHS
+# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 android_prepare_toolchain_paths
 
 # PREPARING FLAGS
@@ -47,5 +66,8 @@ make clean
     --host=${TARGET_HOST} || exit 1
 
 make -j$(nproc) || exit 1
+
+# CREATE PACKAGE CONFIG MANUALLY
+create_libiconv_package_config "1.15"
 
 make install || exit 1

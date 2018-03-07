@@ -1,5 +1,24 @@
 #!/bin/bash
 
+create_giflib_package_config() {
+    local GIFLIB_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/giflib.pc" << EOF
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/giflib
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: giflib
+Description: gif library
+Version: ${GIFLIB_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lgif
+Cflags: -I\${includedir}
+EOF
+}
+
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -23,18 +42,15 @@ fi
 # ENABLE COMMON FUNCTIONS
 . $1/build/common.sh
 
-# PREPARING PATHS
+# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 android_prepare_toolchain_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-COMMON_CFLAGS=$(android_get_cflags "giflib")
-COMMON_CXXFLAGS=$(android_get_cxxflags "giflib")
-COMMON_LDFLAGS=$(android_get_ldflags "giflib")
+export CFLAGS=$(android_get_cflags "giflib")" -DS_IREAD=S_IRUSR -DS_IWRITE=S_IWUSR"
+export CXXFLAGS=$(android_get_cxxflags "giflib")
+export LDFLAGS=$(android_get_ldflags "giflib")
 
-export CFLAGS="${COMMON_CFLAGS} -DS_IREAD=S_IRUSR -DS_IWRITE=S_IWUSR"
-export CXXFLAGS="${COMMON_CXXFLAGS}"
-export LDFLAGS="${COMMON_LDFLAGS}"
 
 cd $1/src/giflib || exit 1
 
@@ -50,5 +66,8 @@ make clean
     --host=${TARGET_HOST} || exit 1
 
 make -j$(nproc) || exit 1
+
+# CREATE PACKAGE CONFIG MANUALLY
+create_giflib_package_config "5.1.4"
 
 make install || exit 1

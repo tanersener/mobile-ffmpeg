@@ -28,12 +28,10 @@ android_prepare_toolchain_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
-COMMON_CFLAGS=$(android_get_cflags "nettle")
-COMMON_LDFLAGS=$(android_get_ldflags "nettle")
-
-export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/gmp/include"
+export CFLAGS=$(android_get_cflags "nettle")
 export CXXFLAGS=$(android_get_cxxflags "nettle")
-export LDFLAGS="${COMMON_LDFLAGS} -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/gmp/lib"
+export LDFLAGS=$(android_get_ldflags "nettle")
+export PKG_CONFIG_PATH="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig"
 
 OPTIONAL_CPU_SUPPORT=""
 if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86_64" ]; then

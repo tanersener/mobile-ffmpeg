@@ -49,56 +49,78 @@ fi
 # PREPARING PATHS
 android_prepare_toolchain_paths
 
+# PREPARING FLAGS
 TARGET_HOST=$(android_get_target_host)
 TARGET_MACHINE=$(android_get_target_machine)
 COMMON_CFLAGS=$(android_get_cflags "ffmpeg")
-CXXFLAGS=$(android_get_cxxflags "ffmpeg")
 COMMON_LDFLAGS=$(android_get_ldflags "ffmpeg")
+export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
-CFLAGS="${COMMON_CFLAGS} \
--I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/openssl/include \
--I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/include \
--I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/lame/include \
--I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2/include \
--I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libtheora/include \
-$(pkg-config --cflags ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/wavpack/lib/pkgconfig/wavpack.pc) \
-$(pkg-config --cflags ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libogg/lib/pkgconfig/ogg.pc) \
-$(pkg-config --cflags ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvpx/lib/pkgconfig/vpx.pc) \
-$(pkg-config --cflags ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/opencore-amr/lib/pkgconfig/opencore-amrnb.pc) \
-$(pkg-config --cflags ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/opencore-amr/lib/pkgconfig/opencore-amrwb.pc)"
-LDFLAGS="${COMMON_LDLAGS} \
--L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/openssl/lib \
--L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/lib \
--L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/lame/lib \
--L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2/lib \
--L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libtheora/lib \
--L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis/lib \
-$(pkg-config --libs ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/wavpack/lib/pkgconfig/wavpack.pc) \
-$(pkg-config --libs ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libogg/lib/pkgconfig/ogg.pc) \
-$(pkg-config --libs ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvpx/lib/pkgconfig/vpx.pc) \
-$(pkg-config --libs ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/opencore-amr/lib/pkgconfig/opencore-amrnb.pc) \
-$(pkg-config --libs ${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/opencore-amr/lib/pkgconfig/opencore-amrwb.pc) \
--L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${ARCH}/usr/lib -lm -landroid -lvorbisenc -lvorbisfile"
+export CFLAGS="${COMMON_CFLAGS} \
+$(${HOST_PKG_CONFIG_PATH} --cflags gmp) \
+$(${HOST_PKG_CONFIG_PATH} --cflags gnutls) \
+$(${HOST_PKG_CONFIG_PATH} --cflags libiconv) \
+$(${HOST_PKG_CONFIG_PATH} --cflags fontconfig) \
+$(${HOST_PKG_CONFIG_PATH} --cflags freetype2) \
+$(${HOST_PKG_CONFIG_PATH} --cflags fribidi) \
+$(${HOST_PKG_CONFIG_PATH} --cflags libass) \
+$(${HOST_PKG_CONFIG_PATH} --cflags libmp3lame) \
+$(${HOST_PKG_CONFIG_PATH} --cflags libpng) \
+$(${HOST_PKG_CONFIG_PATH} --cflags libwebp) \
+$(${HOST_PKG_CONFIG_PATH} --cflags libxml-2.0) \
+$(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrnb) \
+$(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrwb) \
+$(${HOST_PKG_CONFIG_PATH} --cflags shine) \
+$(${HOST_PKG_CONFIG_PATH} --cflags soxr) \
+$(${HOST_PKG_CONFIG_PATH} --cflags speex) \
+$(${HOST_PKG_CONFIG_PATH} --cflags theora) \
+$(${HOST_PKG_CONFIG_PATH} --cflags uuid) \
+$(${HOST_PKG_CONFIG_PATH} --cflags vorbis) \
+$(${HOST_PKG_CONFIG_PATH} --cflags vpx) \
+$(${HOST_PKG_CONFIG_PATH} --cflags wavpack) \
+$(${HOST_PKG_CONFIG_PATH} --cflags zlib) \
+";
 
-export PKG_CONFIG_PATH="/tmp/config"
-export PKG_CONFIG_LIBDIR="/tmp/config"
+export CXXFLAGS=$(android_get_cxxflags "ffmpeg")
+
+export LDFLAGS="${COMMON_LDFLAGS} \
+$(${HOST_PKG_CONFIG_PATH} --libs --static gmp) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static gnutls) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static libiconv) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static fontconfig) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static freetype2) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static fribidi) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static libass) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static libmp3lame) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static libpng) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static libwebp) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static libxml-2.0) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrnb) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrwb) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static shine) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static soxr) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static speex) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static theora) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static uuid) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static vorbis) \
+$(${HOST_PKG_CONFIG_PATH} --libs vpx) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static wavpack) \
+$(${HOST_PKG_CONFIG_PATH} --libs --static zlib) \
+-L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${ARCH}/usr/lib -landroid"
 
 cd $1/src/ffmpeg || exit 1
 
 make clean
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 ./configure \
     --cross-prefix=${TARGET_HOST}- \
     --sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/ffmpeg \
+    --pkgconfigdir="${INSTALL_PKG_CONFIG_DIR}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --extra-ldflags="${LDFLAGS}" \
-    --extra-libs="-liconv -lxml2" \
     --enable-version3 \
     --arch=${ARCH} \
     --cpu=${TARGET_MACHINE} \
@@ -107,19 +129,19 @@ LDFLAGS=${LDFLAGS} \
     --enable-pic \
     --enable-asm \
     --enable-jni \
-    -- enable-avresample \
+    --enable-avresample \
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
-    --disable-ffprobe \
+    --disable-ffmpeg \
     --disable-ffplay \
+    --disable-ffprobe \
     --disable-ffserver \
     --disable-doc \
     --disable-htmlpages \
     --disable-manpages \
     --disable-podpages \
     --disable-txtpages \
-    --enable-network \
     --enable-inline-asm \
 	--enable-neon \
 	--enable-thumb \
@@ -127,24 +149,26 @@ LDFLAGS=${LDFLAGS} \
 	--enable-small  \
     --enable-static \
     --disable-shared \
+    --enable-gmp \
     --enable-iconv \
-    --enable-libvorbis \
+    --enable-libass \
+    --enable-libfontconfig \
+    --enable-libfreetype \
+    --enable-libfribidi \
     --enable-libmp3lame \
     --enable-libopencore-amrnb \
     --enable-libopencore-amrwb \
+    --enable-libshine \
+    --enable-libspeex \
+    --enable-libtheora \
+    --enable-libvorbis \
     --enable-libvpx \
     --enable-libwavpack \
-    --enable-libtheora \
+    --enable-libwebp \
+    --enable-libxml2 \
     --enable-mediacodec \
-    --enable-openssl \
     --enable-zlib || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
-#make -j$(nproc) || exit 1
+make -j$(nproc) || exit 1
 
-CFLAGS=${CFLAGS} \
-CXXFLAGS=${CXXFLAGS} \
-LDFLAGS=${LDFLAGS} \
 #make install || exit 1

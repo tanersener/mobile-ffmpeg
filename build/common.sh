@@ -109,7 +109,7 @@ android_get_cxxflags() {
 }
 
 android_get_common_linked_libraries() {
-    echo "-lc -lm -ldl -llog -pie -pthread -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/lib"
+    echo "-lc -lm -ldl -llog -pie -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/lib"
 }
 
 android_get_size_optimization_ldflags() {
@@ -141,6 +141,25 @@ android_get_ldflags() {
     echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS}"
 }
 
+create_zlib_package_config() {
+    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+
+    cat > "${ZLIB_PACKAGE_CONFIG_PATH}" << EOF
+prefix=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr
+exec_prefix=\${prefix}
+libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${ARCH}/usr/lib
+includedir=\${prefix}/include
+
+Name: zlib
+Description: zlib compression library
+Version: ${ZLIB_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lz
+Cflags: -I\${includedir}
+EOF
+}
+
 android_prepare_toolchain_paths() {
     export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin
 
@@ -155,9 +174,15 @@ android_prepare_toolchain_paths() {
     export STRIP=${TARGET_HOST}-strip
 
     export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig"
+    export ZLIB_PACKAGE_CONFIG_PATH="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig/zlib.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
         mkdir ${INSTALL_PKG_CONFIG_DIR}
     fi
+
+    if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
+        create_zlib_package_config
+    fi
+
 }
 

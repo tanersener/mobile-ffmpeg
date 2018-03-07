@@ -1,5 +1,24 @@
 #!/bin/bash
 
+create_libwebp_package_config() {
+    local LIB_WEBP_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libwebp
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: libwebp
+Description: webp codec library
+Version: ${LIB_WEBP_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lwebp -lwebpdecoder -lwebpdemux
+Cflags: -I\${includedir}
+EOF
+}
+
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -23,7 +42,7 @@ fi
 # ENABLE COMMON FUNCTIONS
 . $1/build/common.sh
 
-# PREPARING PATHS
+# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 android_prepare_toolchain_paths
 
 # PREPARING FLAGS
@@ -68,5 +87,8 @@ cmake -Wno-dev \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
 make -j$(nproc) || exit 1
+
+# CREATE PACKAGE CONFIG MANUALLY
+create_libwebp_package_config "0.6.1"
 
 make install || exit 1
