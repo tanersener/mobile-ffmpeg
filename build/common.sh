@@ -67,7 +67,7 @@ android_get_app_specific_cflags() {
 
     APP_FLAGS=""
     case $1 in
-        libwebp | openssl)
+        libwebp)
             APP_FLAGS=""
         ;;
         ffmpeg | shine)
