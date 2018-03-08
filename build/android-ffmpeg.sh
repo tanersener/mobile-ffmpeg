@@ -171,4 +171,4 @@ make clean
 
 make -j$(nproc) || exit 1
 
-#make install || exit 1
+make install || exit 1

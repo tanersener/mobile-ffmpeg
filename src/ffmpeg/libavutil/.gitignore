@@ -1,1 +1,7 @@
 /avconfig.h
+*.o
+*.d
+*.a
+*.pc
+/ffversion.h
+/libavutil.version

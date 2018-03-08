@@ -1,0 +1,5 @@
+*.d
+*.o
+*.a
+*.pc
+/libswscale.version

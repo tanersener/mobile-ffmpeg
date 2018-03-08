@@ -1,1 +1,6 @@
 /bsf_list.c
+*.o
+*.d
+*.a
+*.pc
+/libavcodec.version

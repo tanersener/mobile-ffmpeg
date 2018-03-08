@@ -1,1 +1,6 @@
 /protocol_list.c
+*.d
+*.o
+*.a
+*.pc
+/libavformat.version
