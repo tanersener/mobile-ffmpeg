@@ -1,5 +1,25 @@
 #!/bin/bash
 
+create_gnutls_package_config() {
+    local GNUTLS_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" << EOF
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/gnutls
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: gnutls
+Description: GNU TLS Implementation
+
+Version: ${GNUTLS_VERSION}
+Requires: nettle, hogweed, zlib
+Cflags: -I\${includedir}
+Libs: -L\${libdir} -lgnutls
+Libs.private: -lgmp
+EOF
+}
+
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -63,8 +83,7 @@ make clean
 
 make -j$(nproc) || exit 1
 
-# MANUALLY COPY PKG-CONFIG FILES
-cp ./lib/gnutls.pc ${INSTALL_PKG_CONFIG_DIR}
-cp ./libdane/gnutls-dane.pc ${INSTALL_PKG_CONFIG_DIR}
+# CREATE PACKAGE CONFIG MANUALLY
+create_gnutls_package_config "3.5.18"
 
 make install || exit 1

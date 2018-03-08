@@ -65,6 +65,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 
+#### gmp
+
+gmp is licensed under the LGPL v3.0. Source code, under gmp folder, is not modified and includes all files from original v6.1.2 release.
+
 #### gnutls
 
 gnutls is licensed under the LGPL v2.1. Source code, under gnutls folder, is not modified and includes all files from original v3.5.18 release.
@@ -364,6 +368,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+#### nettle
+
+nettle is licensed under the LGPL v3.0. Source code, under nettle folder, is not modified and includes all files from original v3.4 release.
 
 #### opencore-amr
 

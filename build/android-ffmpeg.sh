@@ -71,7 +71,6 @@ $(${HOST_PKG_CONFIG_PATH} --cflags libxml-2.0) \
 $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrnb) \
 $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrwb) \
 $(${HOST_PKG_CONFIG_PATH} --cflags shine) \
-$(${HOST_PKG_CONFIG_PATH} --cflags soxr) \
 $(${HOST_PKG_CONFIG_PATH} --cflags speex) \
 $(${HOST_PKG_CONFIG_PATH} --cflags theora) \
 $(${HOST_PKG_CONFIG_PATH} --cflags uuid) \
@@ -98,7 +97,6 @@ $(${HOST_PKG_CONFIG_PATH} --libs --static libxml-2.0) \
 $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrnb) \
 $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrwb) \
 $(${HOST_PKG_CONFIG_PATH} --libs --static shine) \
-$(${HOST_PKG_CONFIG_PATH} --libs --static soxr) \
 $(${HOST_PKG_CONFIG_PATH} --libs --static speex) \
 $(${HOST_PKG_CONFIG_PATH} --libs --static theora) \
 $(${HOST_PKG_CONFIG_PATH} --libs --static uuid) \
@@ -150,6 +148,7 @@ make clean
     --enable-static \
     --disable-shared \
     --enable-gmp \
+    --enable-gnutls \
     --enable-iconv \
     --enable-libass \
     --enable-libfontconfig \

@@ -1,5 +1,43 @@
 #!/bin/bash
 
+get_library_name() {
+    case $1 in
+        0) echo "fontconfig" ;;
+        1) echo "freetype" ;;
+        2) echo "fribidi" ;;
+        3) echo "gmp" ;;
+        4) echo "gnutls" ;;
+        5) echo "lame" ;;
+        6) echo "libass" ;;
+        7) echo "libiconv" ;;
+        8) echo "libtheora" ;;
+        9) echo "libvorbis" ;;
+        10) echo "libvpx" ;;
+        11) echo "libwebp" ;;
+        12) echo "libxml2" ;;
+        13) echo "opencore-amr" ;;
+        14) echo "shine" ;;
+        15) echo "speex" ;;
+        16) echo "wavpack" ;;
+        17) echo "giflib" ;;
+        18) echo "jpeg" ;;
+        19) echo "libogg" ;;
+        20) echo "libpng" ;;
+        21) echo "libuuid" ;;
+        22) echo "nettle" ;;
+        23) echo "tiff" ;;
+    esac
+}
+
+get_platform_name() {
+    case $1 in
+        0) echo "arm" ;;
+        1) echo "arm64" ;;
+        2) echo "x86" ;;
+        3) echo "x86_64" ;;
+    esac
+}
+
 android_get_target_host() {
     case ${ARCH} in
         arm)
@@ -186,3 +224,6 @@ android_prepare_toolchain_paths() {
 
 }
 
+android_create_toolchain() {
+    ${ANDROID_NDK_ROOT}/build/tools/make_standalone_toolchain.py --arch ${ARCH} --api ${API} --stl libc++ --install-dir "${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-"${ARCH}
+}
