@@ -12,7 +12,7 @@ pkg-config (ffmpeg requires)
 ffmpeg-3.4.2
 
 fontconfig-2.12.93 (depends libuuid, libxml2, libiconv, freetype)
-freetype-2.9
+freetype-2.9 (depends libpng)
 fribidi-1.0.1
 gmp-6.1.2
 gnutls-3.5.18 (depends nettle, gmp, iconv)

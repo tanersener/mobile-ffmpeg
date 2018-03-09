@@ -31,12 +31,14 @@ LIBRARY_LIBPNG=20
 LIBRARY_LIBUUID=21
 LIBRARY_NETTLE=22
 LIBRARY_TIFF=23
+LIBRARY_ZLIB=24
+LIBRARY_MEDIA_CODEC=25
 
 # ENABLE PLATFORMS
-ENABLED_PLATFORMS=(1 1 1 1)
+ENABLED_PLATFORMS=(1 0 0 0)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -67,6 +69,12 @@ display_help() {
     echo -e "Libraries:"
 
     echo -e "  --full\t\t\tenables all external libraries\n"
+
+    echo -e "  --enable-android-media-codec\tbuild with built-in media codec"
+    echo -e "  --disable-android-media-codec\tbuild without built-in media codec\n"
+
+    echo -e "  --enable-android-zlib\t\tbuild with built-in zlib"
+    echo -e "  --disable-android-zlib\tbuild without built-in zlib\n"
 
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig"
     echo -e "  --disable-fontconfig\t\tbuild without fontconfig\n"
@@ -130,6 +138,12 @@ disable_library() {
 
 set_library() {
     case $1 in
+        android-media-codec)
+            ENABLED_LIBRARIES[LIBRARY_MEDIA_CODEC]=$2
+        ;;
+        android-zlib)
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+        ;;
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
@@ -139,6 +153,7 @@ set_library() {
         ;;
         freetype)
             ENABLED_LIBRARIES[LIBRARY_FREETYPE]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
         ;;
         fribidi)
             ENABLED_LIBRARIES[LIBRARY_FRIBIDI]=$2
@@ -257,6 +272,20 @@ print_enabled_libraries() {
     echo -n "Libraries: "
 
     let enabled=0;
+
+    # FIRST BUILT-IN LIBRARIES
+    for library in {24..25}
+    do
+        if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
+            if [[ $enabled -ge 1 ]]; then
+                echo -n ", "
+            fi
+            echo -n $(get_library_name $library)
+            enabled=$(($enabled + 1));
+        fi
+    done
+
+    # THEN EXTERNAL LIBRARIES
     for library in {0..16}
     do
         if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
@@ -276,7 +305,7 @@ print_enabled_libraries() {
 }
 
 enable_all_libraries() {
-    for library in {0..16}
+    for library in {0..25}
     do
         ENABLED_LIBRARIES[$library]=1
     done
@@ -308,7 +337,7 @@ do
             enable_all_libraries
 	    ;;
         --enable-*)
-            ENABLED_FLAG=`echo $1 | sed -e 's/^--.*-//g'`
+            ENABLED_FLAG=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
             case ${ENABLED_FLAG} in
                 arm | arm64 | x86 | x86_64)
@@ -320,7 +349,7 @@ do
             esac
 	    ;;
         --disable-*)
-            DISABLED_FLAG=`echo $1 | sed -e 's/^--.*-//g'`
+            DISABLED_FLAG=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
             case ${DISABLED_FLAG} in
                 arm | arm64 | x86 | x86_64)

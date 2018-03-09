@@ -1,5 +1,56 @@
 #!/bin/bash
 
+create_libvorbis_package_config() {
+    local LIBVORBIS_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/vorbis.pc" << EOF
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: vorbis
+Description: vorbis is the primary Ogg Vorbis library
+Version: ${LIBVORBIS_VERSION}
+
+Requires: ogg
+Libs: -L\${libdir} -lvorbis -lm
+Cflags: -I\${includedir}
+EOF
+
+cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisenc.pc" << EOF
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: vorbisenc
+Description: vorbisenc is a library that provides a convenient API for setting up an encoding environment using libvorbis
+Version: ${LIBVORBIS_VERSION}
+
+Requires: vorbis
+Conflicts:
+Libs: -L\${libdir} -lvorbisenc
+Cflags: -I\${includedir}
+EOF
+
+cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisfile.pc" << EOF
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: vorbisfile
+Description: vorbisfile is a library that provides a convenient high-level API for decoding and basic manipulation of all Vorbis I audio streams
+Version: ${LIBVORBIS_VERSION}
+
+Requires: vorbis
+Conflicts:
+Libs: -L\${libdir} -lvorbisfile
+Cflags: -I\${includedir}
+EOF
+}
+
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -52,9 +103,7 @@ make clean
 
 make -j$(nproc) || exit 1
 
-# MANUALLY COPY PKG-CONFIG FILES
-cp vorbisenc.pc ${INSTALL_PKG_CONFIG_DIR}
-cp vorbisfile.pc ${INSTALL_PKG_CONFIG_DIR}
-cp vorbis.pc ${INSTALL_PKG_CONFIG_DIR}
+# CREATE PACKAGE CONFIG MANUALLY
+create_libvorbis_package_config "1.3.5"
 
 make install || exit 1

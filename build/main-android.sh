@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ -z $1 ]]; then
-    echo "usage: $0 <enabled libraries>"
+    echo "usage: $0 <enabled libraries list>"
     exit 1
 fi
 
@@ -28,7 +28,8 @@ fi
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/common.sh
 
-echo -e "\nBuilding for $ARCH on API level $API\n"
+echo -e "\nBuilding $ARCH platform on API level $API\n"
+echo -e "\nINFO: Starting new build for $ARCH on API level $API at "$(date)"\n">> ${BASEDIR}/build.log
 INSTALL_BASE="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}"
 
 # CLEANING EXISTING PACKAGE CONFIG DIRECTORY
@@ -40,12 +41,15 @@ else
     mkdir -p ${PKG_CONFIG_DIRECTORY} || exit 1
 fi
 
+# BUILDING EXTERNAL LIBRARIES
 enabled_library_list=()
 for library in {1..24}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
         enabled_library_list+=(${ENABLED_LIBRARY})
+
+        echo -e "INFO: Enabled library ${ENABLED_LIBRARY}" >> ${BASEDIR}/build.log
     fi
 done
 
@@ -57,42 +61,47 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
         case $library in
             fontconfig)
                 if [ ! -z $OK_libuuid ] && [ ! -z $OK_libxml2 ] && [ ! -z $OK_libiconv ] && [ ! -z $OK_freetype ]; then
-                    run 1
+                    run=1
+                fi
+            ;;
+            freetype)
+                if [ ! -z $OK_libpng ]; then
+                    run=1
                 fi
             ;;
             gnutls)
                 if [ ! -z $OK_nettle ] && [ ! -z $OK_gmp ] && [ ! -z $OK_libiconv ]; then
-                    run 1
+                    run=1
                 fi
             ;;
             lame)
                 if [ ! -z $OK_libiconv ]; then
-                    run 1
+                    run=1
                 fi
             ;;
             libass)
                 if [ ! -z $OK_libuuid ] && [ ! -z $OK_libxml2 ] && [ ! -z $OK_libiconv ] && [ ! -z $OK_freetype ] && [ ! -z $OK_fribidi ] && [ ! -z $OK_fontconfig ]; then
-                    run 1
+                    run=1
                 fi
             ;;
             libtheora)
                 if [ ! -z $OK_libvorbis ] && [ ! -z $OK_libogg ]; then
-                    run 1
+                    run=1
                 fi
             ;;
             libvorbis)
                 if [ ! -z $OK_libogg ]; then
-                    run 1
+                    run=1
                 fi
             ;;
             libwebp)
                 if [ ! -z $OK_giflib ] && [ ! -z $OK_jpeg ] && [ ! -z $OK_libpng ] && [ ! -z $OK_tiff ]; then
-                    run 1
+                    run=1
                 fi
             ;;
             libxml2)
                 if [ ! -z $OK_libiconv ]; then
-                    run 1
+                    run=1
                 fi
             ;;
             *)
@@ -100,10 +109,14 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
             ;;
         esac
 
-        if [[ $run -eq 1 ]]; then
+        CONTROL=$(echo "OK_${library}" | sed "s/\-/\_/g")
+
+        if [[ $run -eq 1 ]] && [ -z ${!CONTROL} ]; then
             ENABLED_LIBRARY_PATH="${INSTALL_BASE}/${library}"
 
-            echo -n "${library}:"
+            echo -e "\nINFO: Building $library\n" >> ${BASEDIR}/build.log
+
+            echo -n "${library}: "
 
             if [ -d ${ENABLED_LIBRARY_PATH} ]; then
                 rm -rf ${INSTALL_BASE}/${library} || exit 1
@@ -111,17 +124,24 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 
             SCRIPT_PATH="$BASEDIR/build/android-${library}.sh"
 
+            cd ${BASEDIR}
+
             # BUILD EACH LIBRARY ALONE FIRST
-            SCRIPT_PATH ${BASEDIR} 1>>build.log 2>>build.log
+            ${SCRIPT_PATH} ${BASEDIR} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
             if [ $? -eq 0 ]; then
-                $((completed++))
-                declare "OK_$library=1"
-                echo " ok"
+                (( completed+=1 ))
+                declare "$CONTROL=1"
+                echo "ok"
             else
-                echo " failed"
+                echo "failed"
                 exit 1
             fi
+        else
+            echo -e "\nINFO: Skipping $library, run=$run, completed=${!CONTROL}\n" >> ${BASEDIR}/build.log
         fi
     done
 done
+
+# BUILDING FFMPEG
+. ${BASEDIR}/build/android-ffmpeg.sh "$@"

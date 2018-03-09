@@ -21,3 +21,4 @@
 /config.log
 /config.m4
 /config.status
+*.tmp

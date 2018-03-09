@@ -26,6 +26,8 @@ get_library_name() {
         21) echo "libuuid" ;;
         22) echo "nettle" ;;
         23) echo "tiff" ;;
+        24) echo "android-zlib" ;;
+        25) echo "android-media-codec" ;;
     esac
 }
 
