@@ -10,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -33,18 +33,18 @@ export CXXFLAGS=$(android_get_cxxflags "speex")
 export LDFLAGS=$(android_get_ldflags "speex")
 
 OPTIONAL_CPU_SUPPORT=""
-if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86_64" ]; then
+if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86-64" ]; then
     OPTIONAL_CPU_SUPPORT="--enable-sse"
 fi
 
 cd $1/src/speex || exit 1
 
-make clean
+make distclean
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/speex \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/speex \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
     --enable-static ${OPTIONAL_CPU_SUPPORT} \
     --disable-shared \
     --disable-binaries \

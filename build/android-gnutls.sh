@@ -4,7 +4,7 @@ create_gnutls_package_config() {
     local GNUTLS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/gnutls
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gnutls
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -30,7 +30,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -52,19 +52,19 @@ COMMON_CFLAGS=$(android_get_cflags "gnutls")
 COMMON_CXXFLAGS=$(android_get_cxxflags "gnutls")
 COMMON_LDFLAGS=$(android_get_ldflags "gnutls")
 
-export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/include -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/gmp/include"
+export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv/include -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gmp/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
-export LDFLAGS="${COMMON_LDFLAGS} -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv/lib -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/gmp/lib"
-export PKG_CONFIG_PATH="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig"
+export LDFLAGS="${COMMON_LDFLAGS} -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv/lib -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gmp/lib"
+export PKG_CONFIG_PATH="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/pkgconfig"
 
 cd $1/src/gnutls || exit 1
 
-make clean
+make distclean
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/gnutls \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gnutls \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
     --with-included-libtasn1 \
     --with-included-unistring \
     --without-idn \

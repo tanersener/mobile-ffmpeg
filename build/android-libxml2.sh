@@ -4,7 +4,7 @@ create_libxml2_package_config() {
     local LIBXML2_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libxml-2.0.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libxml2
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -30,7 +30,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -54,7 +54,7 @@ export LDFLAGS=$(android_get_ldflags "libxml2")
 
 cd $1/src/libxml2 || exit 1
 
-make clean
+make distclean
 
 # NOTE THAT PYTHON IS DISABLED DUE TO THE FOLLOWING ERROR
 #
@@ -63,11 +63,11 @@ make clean
 #
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libxml2 \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libxml2 \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
     --with-zlib \
-    --with-iconv=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv \
+    --with-iconv=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv \
     --with-sax1 \
     --without-python \
     --without-debug \

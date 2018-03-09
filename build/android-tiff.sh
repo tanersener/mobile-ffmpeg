@@ -10,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -30,7 +30,7 @@ export CXXFLAGS=$(android_get_cxxflags "tiff")
 export LDFLAGS=$(android_get_ldflags "tiff")
 
 # MANUALLY PREPARING PATHS AND TOOLS
-export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin
+export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/bin
 export AR=${TARGET_HOST}-ar
 export AS=${TARGET_HOST}-clang
 export CC=${TARGET_HOST}-clang
@@ -38,18 +38,18 @@ export CXX=${TARGET_HOST}-clang++
 export LD=${TARGET_HOST}-ld
 export RANLIB=${TARGET_HOST}-ranlib
 export STRIP=${TARGET_HOST}-strip
-export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig"
+export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/pkgconfig"
 
 cd $1/src/tiff || exit 1
 
-make clean
+make distclean
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/tiff \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/tiff \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
-    --with-jpeg-include-dir=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/jpeg/include \
-    --with-jpeg-lib-dir=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/jpeg/lib \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
+    --with-jpeg-include-dir=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/jpeg/include \
+    --with-jpeg-lib-dir=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/jpeg/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

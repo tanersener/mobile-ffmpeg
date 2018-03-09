@@ -10,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -35,10 +35,10 @@ export PKG_CONFIG_PATH=${INSTALL_PKG_CONFIG_DIR}
 
 cd $1/src/libtheora || exit 1
 
-make clean
+make distclean
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libtheora \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libtheora \
     --with-pic \
     --enable-static \
     --disable-shared \

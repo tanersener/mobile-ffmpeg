@@ -36,7 +36,7 @@ get_platform_name() {
         0) echo "arm" ;;
         1) echo "arm64" ;;
         2) echo "x86" ;;
-        3) echo "x86_64" ;;
+        3) echo "x86-64" ;;
     esac
 }
 
@@ -51,14 +51,14 @@ android_get_target_host() {
         x86)
             echo "i686-linux-android"
         ;;
-        x86_64)
+        x86-64)
             echo "x86_64-linux-android"
         ;;
     esac
 }
 
 android_get_common_includes() {
-    echo "-I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/local/include"
+    echo "-I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot/usr/local/include -I${ANDROID_NDK_ROOT}/sources/android/cpufeatures"
 }
 
 android_get_common_cflags() {
@@ -71,12 +71,12 @@ android_get_arch_specific_cflags() {
             echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-march=armv8-a -mfpu=neon -mfloat-abi=softfp"
+            echo "-march=armv8-a"
         ;;
         x86)
             echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32"
         ;;
-        x86_64)
+        x86-64)
             echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel"
         ;;
     esac
@@ -93,7 +93,7 @@ android_get_size_optimization_cflags() {
                 ARCH_OPTIMIZATION="-Os -finline-limit=64"
             fi
         ;;
-        x86 | x86_64)
+        x86 | x86-64)
             ARCH_OPTIMIZATION="-O2 -finline-limit=300"
         ;;
     esac
@@ -149,11 +149,25 @@ android_get_cxxflags() {
 }
 
 android_get_common_linked_libraries() {
-    echo "-lc -lm -ldl -llog -pie -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/lib"
+    case $1 in
+        libvpx)
+            echo "-lc -lm -pie -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/lib"
+        ;;
+        *)
+            echo "-lc -lm -ldl -llog -pie -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/lib"
+        ;;
+    esac
 }
 
 android_get_size_optimization_ldflags() {
-    echo "-Wl,--gc-sections,--icf=safe"
+    case ${ARCH} in
+        arm64)
+            echo "-Wl,--gc-sections"
+        ;;
+        *)
+            echo "-Wl,--gc-sections,--icf=safe"
+        ;;
+    esac
 }
 
 android_get_arch_specific_ldflags() {
@@ -162,32 +176,32 @@ android_get_arch_specific_ldflags() {
             echo "-march=armv7-a -Wl,--fix-cortex-a8"
         ;;
         arm64)
-            echo "-march=armv8-a -Wl"
+            echo "-march=armv8-a"
         ;;
         x86)
-            echo "-march=i686 -Wl"
+            echo "-march=i686"
         ;;
-        x86_64)
-            echo "-march=x86-64 -Wl"
+        x86-64)
+            echo "-march=x86-64"
         ;;
     esac
 }
 
 android_get_ldflags() {
     ARCH_FLAGS=$(android_get_arch_specific_ldflags);
-    OPTIMIZATION_FLAGS=$(android_get_size_optimization_ldflags $1);
-    COMMON_LINKED_LIBS=$(android_get_common_linked_libraries);
+    OPTIMIZATION_FLAGS=$(android_get_size_optimization_ldflags);
+    COMMON_LINKED_LIBS=$(android_get_common_linked_libraries $1);
 
     echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS}"
 }
 
 create_zlib_package_config() {
-    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
     cat > "${ZLIB_PACKAGE_CONFIG_PATH}" << EOF
-prefix=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr
+prefix=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot/usr
 exec_prefix=\${prefix}
-libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${ARCH}/usr/lib
+libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${ARCH//-/_}/usr/lib
 includedir=\${prefix}/include
 
 Name: zlib
@@ -201,7 +215,7 @@ EOF
 }
 
 android_prepare_toolchain_paths() {
-    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin
+    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/bin
 
     TARGET_HOST=$(android_get_target_host)
     
@@ -213,8 +227,8 @@ android_prepare_toolchain_paths() {
     export RANLIB=${TARGET_HOST}-ranlib
     export STRIP=${TARGET_HOST}-strip
 
-    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig"
-    export ZLIB_PACKAGE_CONFIG_PATH="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/pkgconfig/zlib.pc"
+    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/pkgconfig"
+    export ZLIB_PACKAGE_CONFIG_PATH="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/pkgconfig/zlib.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
         mkdir ${INSTALL_PKG_CONFIG_DIR}
@@ -223,9 +237,8 @@ android_prepare_toolchain_paths() {
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
         create_zlib_package_config
     fi
-
 }
 
 android_create_toolchain() {
-    ${ANDROID_NDK_ROOT}/build/tools/make_standalone_toolchain.py --arch ${ARCH} --api ${API} --stl libc++ --install-dir "${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-"${ARCH}
+    ${ANDROID_NDK_ROOT}/build/tools/make_standalone_toolchain.py --arch ${ARCH//-/_} --api ${API} --stl libc++ --install-dir "${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-"${ARCH//-/_}
 }

@@ -4,7 +4,7 @@ create_libwebp_package_config() {
     local LIB_WEBP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libwebp
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libwebp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -29,7 +29,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -65,25 +65,25 @@ cmake -Wno-dev \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
     -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \
-    -DCMAKE_SYSROOT="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot" \
-    -DCMAKE_FIND_ROOT_PATH="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot" \
+    -DCMAKE_SYSROOT="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot" \
+    -DCMAKE_FIND_ROOT_PATH="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libwebp" \
+    -DCMAKE_INSTALL_PREFIX="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libwebp" \
     -DCMAKE_SYSTEM_NAME=Generic \
-    -DCMAKE_C_COMPILER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin/$CC" \
-    -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin/$LD" \
-    -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/bin/$AR" \
-    -DGIF_INCLUDE_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/giflib/include" \
-    -DGIF_LIBRARY="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/giflib/lib" \
-    -DJPEG_INCLUDE_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/jpeg/include" \
-    -DJPEG_LIBRARY="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/jpeg/lib" \
-    -DPNG_PNG_INCLUDE_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libpng/include" \
-    -DPNG_LIBRARY="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libpng/lib" \
-    -DTIFF_INCLUDE_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/tiff/include" \
-    -DTIFF_LIBRARY="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/tiff/lib" \
-    -DZLIB_INCLUDE_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot/usr/include" \
-    -DZLIB_LIBRARY="${ANDROID_NDK_ROOT}/platform/android-${API}/arch-${ARCH}/usr/lib" \
-    -DCMAKE_SYSTEM_PROCESSOR=${ARCH} \
+    -DCMAKE_C_COMPILER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/bin/$CC" \
+    -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/bin/$LD" \
+    -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/bin/$AR" \
+    -DGIF_INCLUDE_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/giflib/include" \
+    -DGIF_LIBRARY="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/giflib/lib" \
+    -DJPEG_INCLUDE_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/jpeg/include" \
+    -DJPEG_LIBRARY="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/jpeg/lib" \
+    -DPNG_PNG_INCLUDE_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libpng/include" \
+    -DPNG_LIBRARY="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libpng/lib" \
+    -DTIFF_INCLUDE_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/tiff/include" \
+    -DTIFF_LIBRARY="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/tiff/lib" \
+    -DZLIB_INCLUDE_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot/usr/include" \
+    -DZLIB_LIBRARY="${ANDROID_NDK_ROOT}/platform/android-${API}/arch-${ARCH//-/_}/usr/lib" \
+    -DCMAKE_SYSTEM_PROCESSOR=${ARCH//-/_} \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
 make -j$(nproc) || exit 1

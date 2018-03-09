@@ -4,7 +4,7 @@ create_libvorbis_package_config() {
     local LIBVORBIS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/vorbis.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -19,7 +19,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisenc.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -35,7 +35,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisfile.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -61,7 +61,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -85,14 +85,14 @@ export LDFLAGS=$(android_get_ldflags "libvorbis")
 
 cd $1/src/libvorbis || exit 1
 
-make clean
+make distclean
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvorbis \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvorbis \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
-    --with-ogg-includes=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libogg/include \
-    --with-ogg-libraries=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libogg/lib \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
+    --with-ogg-includes=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libogg/include \
+    --with-ogg-libraries=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libogg/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

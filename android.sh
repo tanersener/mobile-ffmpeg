@@ -35,7 +35,7 @@ LIBRARY_ZLIB=24
 LIBRARY_MEDIA_CODEC=25
 
 # ENABLE PLATFORMS
-ENABLED_PLATFORMS=(1 0 0 0)
+ENABLED_PLATFORMS=(0 0 1 0)
 
 # ENABLE LIBRARIES
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -64,7 +64,7 @@ display_help() {
     echo -e "  --disable-arm\t\tdo not build arm platform"
     echo -e "  --disable-arm64\tdo not build arm64 platform"
     echo -e "  --disable-x86\t\tdo not build x86 platform"
-    echo -e "  --disable-x86_64\tdo not build x86_64 platform\n"
+    echo -e "  --disable-x86-64\tdo not build x86-64 platform\n"
 
     echo -e "Libraries:"
 
@@ -240,7 +240,7 @@ set_platform() {
         x86)
             ENABLED_PLATFORMS[PLATFORM_X86]=$2
         ;;
-        x86_64)
+        x86-64)
             ENABLED_PLATFORMS[PLATFORM_X86_64]=$2
         ;;
     esac
@@ -304,13 +304,6 @@ print_enabled_libraries() {
     fi
 }
 
-enable_all_libraries() {
-    for library in {0..25}
-    do
-        ENABLED_LIBRARIES[$library]=1
-    done
-}
-
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/common.sh
 
@@ -334,13 +327,16 @@ do
             exit 0
 	    ;;
 	    --full)
-            enable_all_libraries
+            for library in {0..25}
+            do
+                enabled_library_list+=($(get_library_name $library))
+            done
 	    ;;
         --enable-*)
             ENABLED_FLAG=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
             case ${ENABLED_FLAG} in
-                arm | arm64 | x86 | x86_64)
+                arm | arm64 | x86 | x86-64)
                     enable_platform ${ENABLED_FLAG}
                 ;;
                 *)
@@ -352,7 +348,7 @@ do
             DISABLED_FLAG=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
             case ${DISABLED_FLAG} in
-                arm | arm64 | x86 | x86_64)
+                arm | arm64 | x86 | x86-64)
                     disable_platform ${DISABLED_FLAG}
                 ;;
                 *)

@@ -10,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -33,21 +33,21 @@ export CXXFLAGS=$(android_get_cxxflags "libpng")
 export LDFLAGS=$(android_get_ldflags "libpng")
 
 OPTIONAL_CPU_SUPPORT=""
-if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86_64" ]; then
+if [ ${ARCH//-/_} == "x86" ] || [ ${ARCH//-/_} == "x86_64" ]; then
     OPTIONAL_CPU_SUPPORT="--enable-sse"
 fi
-if [ ${ARCH} == "arm" ] || [ ${ARCH} == "arm64" ]; then
+if [ ${ARCH//-/_} == "arm" ] || [ ${ARCH//-/_} == "arm64" ]; then
     OPTIONAL_CPU_SUPPORT="--enable-arm-neon"
 fi
 
 cd $1/src/libpng || exit 1
 
-make clean
+make distclean
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libpng \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libpng \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

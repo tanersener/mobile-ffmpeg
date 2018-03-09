@@ -10,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -30,7 +30,7 @@ fi
 
 echo -e "\nBuilding $ARCH platform on API level $API\n"
 echo -e "\nINFO: Starting new build for $ARCH on API level $API at "$(date)"\n">> ${BASEDIR}/build.log
-INSTALL_BASE="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}"
+INSTALL_BASE="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}"
 
 # CLEANING EXISTING PACKAGE CONFIG DIRECTORY
 PKG_CONFIG_DIRECTORY="${INSTALL_BASE}/pkgconfig"

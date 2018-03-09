@@ -11,7 +11,7 @@ android_get_target_machine() {
         x86)
             echo "i686"
         ;;
-        x86_64)
+        x86-64)
             echo "x86_64"
         ;;
     esac
@@ -27,7 +27,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -194,24 +194,24 @@ do
     fi
 done
 
-LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${ARCH}/usr/lib"
+LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${ARCH//-/_}/usr/lib"
 
 cd ${BASEDIR}/src/ffmpeg || exit 1
 
 echo -n -e "\nffmpeg: "
 
-make clean
+make distclean
 
 ./configure \
     --cross-prefix="${TARGET_HOST}-" \
-    --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot" \
-    --prefix="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/ffmpeg" \
+    --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot" \
+    --prefix="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/ffmpeg" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --extra-ldflags="${LDFLAGS}" \
     --enable-version3 \
-    --arch="${ARCH}" \
+    --arch="${ARCH//-/_}" \
     --cpu="${TARGET_MACHINE}" \
     --target-os=android \
 	--enable-cross-compile \

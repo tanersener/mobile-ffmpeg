@@ -10,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -32,35 +32,45 @@ export CFLAGS=$(android_get_cflags "libvpx")
 export CXXFLAGS=$(android_get_cxxflags "libvpx")
 export LDFLAGS=$(android_get_ldflags "libvpx")
 
-OPTIONAL_CPU_SUPPORT=""
+SUPPORTED_ARCH=""
 case ${ARCH} in
     arm)
-        SUPPORTED_CPU="armv7"
+        SUPPORTED_ARCH="armv7"
     ;;
     *)
-        SUPPORTED_CPU="${ARCH}"
+        SUPPORTED_ARCH="${ARCH//-/_}"
     ;;
 esac
 
 cd $1/src/libvpx || exit 1
 
-make clean
+make distclean
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libvpx \
-    --target="${SUPPORTED_CPU}-android-gcc" \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvpx \
+    --target="${SUPPORTED_ARCH}-android-gcc" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
+    --as=yasm \
     --log=yes \
-    --enable-optimizations \
+    --enable-libs \
+    --enable-install-libs \
     --enable-pic \
-    --disable-ccache \
-    --enable-thumb \
+    --enable-optimizations \
+    --enable-better-hw-compatibility \
+    --enable-runtime-cpu-detect \
+    --enable-vp8 \
+    --enable-vp9 \
+    --enable-multithread \
+    --enable-spatial-resampling \
+    --enable-runtime-cpu-detect \
+    --enable-small \
+    --enable-static \
+    --disable-shared \
     --disable-debug \
     --disable-gprof \
     --disable-gcov \
-    --enable-libs \
-    --enable-install-libs \
+    --disable-ccache \
     --disable-install-bins \
     --disable-install-srcs \
     --disable-install-docs \
@@ -70,19 +80,9 @@ make clean
     --disable-unit-tests \
     --disable-decode-perf-tests \
     --disable-encode-perf-tests \
-    --sdk-path=${ANDROID_NDK_ROOT} \
     --disable-codec-srcs \
     --disable-debug-libs \
-    --enable-better-hw-compatibility \
-    --enable-vp8 \
-    --enable-vp9 \
-    --disable-internal-stats \
-    --enable-multithread \
-    --enable-spatial-resampling \
-    --enable-runtime-cpu-detect \
-    --enable-static \
-    --disable-shared \
-    --enable-small || exit 1
+    --disable-internal-stats || exit 1
 
 make -j$(nproc) || exit 1
 

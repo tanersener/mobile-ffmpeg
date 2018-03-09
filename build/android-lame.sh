@@ -4,7 +4,7 @@ create_libmp3lame_package_config() {
     local LAME_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libmp3lame.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/lame
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/lame
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -29,7 +29,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH} ]]; then
+if [[ -z ${ARCH//-/_} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -53,13 +53,13 @@ export LDFLAGS=$(android_get_ldflags "lame")
 
 cd $1/src/lame || exit 1
 
-make clean
+make distclean
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/lame \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/lame \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH}/sysroot \
-    --with-libiconv-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH}/libiconv \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
+    --with-libiconv-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
