@@ -33,9 +33,9 @@ prepare_toolchain_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-export CFLAGS=$(get_cflags "libvpx")
+export CFLAGS="$(get_cflags "libvpx") -I${ANDROID_NDK_ROOT}/sources/android/cpufeatures"
 export CXXFLAGS=$(get_cxxflags "libvpx")
-export LDFLAGS=$(get_ldflags "libvpx")
+export LDFLAGS="$(get_ldflags "libvpx") -L${ANDROID_NDK_ROOT}/sources/android/cpufeatures -lcpufeatures"
 
 TARGET_CPU=""
 DISABLE_NEON_FLAG=""
@@ -57,6 +57,9 @@ case ${ARCH} in
 esac
 
 cd ${BASEDIR}/src/libvpx || exit 1
+
+# build cpu-features
+build_cpufeatures
 
 make distclean 2>/dev/null 1>/dev/null
 

@@ -138,6 +138,7 @@ do
             libvpx)
                 CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags vpx)"
                 LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs vpx)"
+                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static cpufeatures)"
                 CONFIGURE_POSTFIX+=" --enable-libvpx"
             ;;
             libwebp)
@@ -231,11 +232,14 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-pic \
     --enable-asm \
     --enable-jni \
-    --enable-avresample \
+	--enable-inline-asm \
+	--enable-optimizations \
+	--enable-small  \
+    --enable-static \
+    --enable-ffmpeg \
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
-    --enable-ffmpeg \
     --disable-ffplay \
     --disable-ffprobe \
     --disable-ffserver \
@@ -245,10 +249,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-podpages \
     --disable-txtpages \
 	${NEON_FLAG} \
-	--enable-inline-asm \
-	--enable-optimizations \
-	--enable-small  \
-    --enable-static \
     --disable-shared \
     --disable-xlib \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log

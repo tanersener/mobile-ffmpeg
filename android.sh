@@ -36,7 +36,7 @@ LIBRARY_ZLIB=24
 LIBRARY_MEDIA_CODEC=25
 
 # ENABLE ARCH
-ENABLED_ARCHITECTURES=(1 1 1 1 1)
+ENABLED_ARCHITECTURES=(1 0 0 0 0)
 
 # ENABLE LIBRARIES
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -63,10 +63,10 @@ display_help() {
     echo -e "Platforms:"
 
     echo -e "  --disable-arm-v7a\t\tdo not build arm-v7a platform"
-    echo -e "  --disable-arm-v7a-neon\t\tdo not build arm-v7a-neon platform"
-    echo -e "  --disable-arm64-v8a\tdo not build arm64-v8a platform"
-    echo -e "  --disable-x86\t\tdo not build x86 platform"
-    echo -e "  --disable-x86-64\tdo not build x86-64 platform\n"
+    echo -e "  --disable-arm-v7a-neon\tdo not build arm-v7a-neon platform"
+    echo -e "  --disable-arm64-v8a\t\tdo not build arm64-v8a platform"
+    echo -e "  --disable-x86\t\t\tdo not build x86 platform"
+    echo -e "  --disable-x86-64\t\tdo not build x86-64 platform\n"
 
     echo -e "Libraries:"
 
@@ -149,9 +149,8 @@ set_library() {
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBXML2]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
-            ENABLED_LIBRARIES[LIBRARY_FREETYPE]=$2
+            set_library "libxml2" $2
+            set_library "freetype" $2
         ;;
         freetype)
             ENABLED_LIBRARIES[LIBRARY_FREETYPE]=$2
@@ -166,29 +165,29 @@ set_library() {
         gnutls)
             ENABLED_LIBRARIES[LIBRARY_GNUTLS]=$2
             ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
-            ENABLED_LIBRARIES[LIBRARY_GMP]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+            set_library "gmp" $2
+            set_library "libiconv" $2
         ;;
         lame)
             ENABLED_LIBRARIES[LIBRARY_LAME]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+            set_library "libiconv" $2
         ;;
         libass)
             ENABLED_LIBRARIES[LIBRARY_LIBASS]=$2
-            ENABLED_LIBRARIES[LIBRARY_FREETYPE]=$2
-            ENABLED_LIBRARIES[LIBRARY_FRIBIDI]=$2
-            ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+            set_library "freetype" $2
+            set_library "fribidi" $2
+            set_library "fontconfig" $2
+            set_library "libiconv" $2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBXML2]=$2
+            set_library "libxml2" $2
         ;;
         libiconv)
             ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
         ;;
         libtheora)
             ENABLED_LIBRARIES[LIBRARY_LIBTHEORA]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBVORBIS]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBOGG]=$2
+            set_library "libvorbis" $2
         ;;
         libvorbis)
             ENABLED_LIBRARIES[LIBRARY_LIBVORBIS]=$2
@@ -206,7 +205,7 @@ set_library() {
         ;;
         libxml2)
             ENABLED_LIBRARIES[LIBRARY_LIBXML2]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+            set_library "libiconv" $2
         ;;
         opencore-amr)
             ENABLED_LIBRARIES[LIBRARY_OPENCOREAMR]=$2
