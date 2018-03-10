@@ -1,30 +1,5 @@
 #!/bin/bash
 
-create_fontconfig_package_config() {
-    local FONTCONFIG_VERSION="$1"
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/fontconfig.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/fontconfig
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
-includedir=\${prefix}/include
-sysconfdir=\${prefix}/etc
-localstatedir=\${prefix}/var
-PACKAGE=fontconfig
-confdir=\${sysconfdir}/fonts
-cachedir=\${localstatedir}/cache/\${PACKAGE}
-
-Name: Fontconfig
-Description: Font configuration and customization library
-Version: ${FONTCONFIG_VERSION}
-Requires:  freetype2 >= 21.0.15, uuid, libxml-2.0 >= 2.6
-Requires.private:
-Libs: -L\${libdir} -lfontconfig
-Libs.private:
-Cflags: -I\${includedir}
-EOF
-}
-
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -35,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH//-/_} ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -45,22 +20,27 @@ if [[ -z ${API} ]]; then
     exit 1
 fi
 
+if [[ -z ${BASEDIR} ]]; then
+    echo "BASEDIR not defined"
+    exit 1
+fi
+
 # ENABLE COMMON FUNCTIONS
-. $1/build/common.sh
+. ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-android_prepare_toolchain_paths
+prepare_toolchain_paths
 
 # PREPARING FLAGS
-TARGET_HOST=$(android_get_target_host)
-export CFLAGS=$(android_get_cflags "fontconfig")
-export CXXFLAGS=$(android_get_cxxflags "fontconfig")
-export LDFLAGS=$(android_get_ldflags "fontconfig")
+TARGET_HOST=$(get_target_host)
+export CFLAGS=$(get_cflags "fontconfig")
+export CXXFLAGS=$(get_cxxflags "fontconfig")
+export LDFLAGS=$(get_ldflags "fontconfig")
 export PKG_CONFIG_PATH=${INSTALL_PKG_CONFIG_DIR}
 
-cd $1/src/fontconfig || exit 1
+cd ${BASEDIR}/src/fontconfig || exit 1
 
-make distclean
+make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/fontconfig \

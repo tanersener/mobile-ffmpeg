@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# PLATFORM INDEXES
-PLATFORM_ARM=0
-PLATFORM_ARM64=1
-PLATFORM_X86=2
-PLATFORM_X86_64=3
+# ARCH INDEXES
+ARCH_ARM_V7A=0
+ARCH_ARM_V7A_NEON=1
+ARCH_ARM64_V8A=2
+ARCH_X86=3
+ARCH_X86_64=4
 
 # LIBRARY INDEXES
 LIBRARY_FONTCONFIG=0
@@ -34,8 +35,8 @@ LIBRARY_TIFF=23
 LIBRARY_ZLIB=24
 LIBRARY_MEDIA_CODEC=25
 
-# ENABLE PLATFORMS
-ENABLED_PLATFORMS=(0 0 1 0)
+# ENABLE ARCH
+ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -48,7 +49,7 @@ export API=21
 display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
-    echo -e "\n'"$COMMAND"' builds ffmpeg for Android platform. By default four Android ABIs (arm, arm64, x86 and x86_64) are built without any external libraries enabled. Use options to disable unwanted ABIS and/or enable needed external libraries.\n"
+    echo -e "\n'"$COMMAND"' builds ffmpeg for Android platform. By default five Android ABIs (armeabi-v7a, armeabi-v7a-neon, arm64-v8a, x86 and x86_64) are built without any external libraries enabled. Options can be used to disable unwanted ABIS and/or enable needed external libraries.\n"
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"   
 
@@ -61,8 +62,9 @@ display_help() {
 
     echo -e "Platforms:"
 
-    echo -e "  --disable-arm\t\tdo not build arm platform"
-    echo -e "  --disable-arm64\tdo not build arm64 platform"
+    echo -e "  --disable-arm-v7a\t\tdo not build arm-v7a platform"
+    echo -e "  --disable-arm-v7a-neon\t\tdo not build arm-v7a-neon platform"
+    echo -e "  --disable-arm64-v8a\tdo not build arm64-v8a platform"
     echo -e "  --disable-x86\t\tdo not build x86 platform"
     echo -e "  --disable-x86-64\tdo not build x86-64 platform\n"
 
@@ -221,42 +223,45 @@ set_library() {
     esac
 }
 
-enable_platform() {
-    set_platform $1 1
+enable_arch() {
+    set_arch $1 1
 }
 
-disable_platform() {
-    set_platform $1 0
+disable_arch() {
+    set_arch $1 0
 }
 
-set_platform() {
+set_arch() {
     case $1 in
-        arm)
-            ENABLED_PLATFORMS[PLATFORM_ARM]=$2
+        arm-v7a)
+            ENABLED_ARCHITECTURES[ARCH_ARM_V7A]=$2
         ;;
-        arm64)
-            ENABLED_PLATFORMS[PLATFORM_ARM64]=$2
+        arm-v7a-neon)
+            ENABLED_ARCHITECTURES[ARCH_ARM_V7A_NEON]=$2
+        ;;
+        arm64-v8a)
+            ENABLED_ARCHITECTURES[ARCH_ARM64_V8A]=$2
         ;;
         x86)
-            ENABLED_PLATFORMS[PLATFORM_X86]=$2
+            ENABLED_ARCHITECTURES[ARCH_X86]=$2
         ;;
         x86-64)
-            ENABLED_PLATFORMS[PLATFORM_X86_64]=$2
+            ENABLED_ARCHITECTURES[ARCH_X86_64]=$2
         ;;
     esac
 }
 
-print_enabled_platforms() {
-    echo -n "Platforms: "
+print_enabled_architectures() {
+    echo -n "Architectures: "
 
     let enabled=0;
-    for platform in {0..3}
+    for print_arch in {0..4}
     do
-        if [[ ENABLED_PLATFORMS[$platform] -eq 1 ]]; then
+        if [[ ENABLED_ARCHITECTURES[$print_arch] -eq 1 ]]; then
             if [[ $enabled -ge 1 ]]; then
                 echo -n ", "
             fi
-            echo -n $(get_platform_name $platform)
+            echo -n $(get_arch_name $print_arch)
             enabled=$(($enabled + 1));
         fi
     done
@@ -305,7 +310,7 @@ print_enabled_libraries() {
 }
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/common.sh
+. ${BASEDIR}/build/android-common.sh
 
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     echo "ANDROID_NDK_ROOT not defined"
@@ -336,8 +341,8 @@ do
             ENABLED_FLAG=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
             case ${ENABLED_FLAG} in
-                arm | arm64 | x86 | x86-64)
-                    enable_platform ${ENABLED_FLAG}
+                arm-v7a | arm-v7a-neon | arm64-v8a | x86 | x86-64)
+                    enable_arch ${ENABLED_FLAG}
                 ;;
                 *)
                     enabled_library_list+=(${ENABLED_FLAG})
@@ -348,8 +353,8 @@ do
             DISABLED_FLAG=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
             case ${DISABLED_FLAG} in
-                arm | arm64 | x86 | x86-64)
-                    disable_platform ${DISABLED_FLAG}
+                arm-v7a | arm-v7a-neon | arm64-v8a | x86 | x86-64)
+                    disable_arch ${DISABLED_FLAG}
                 ;;
                 *)
                     disabled_library_list+=(${DISABLED_FLAG})
@@ -372,13 +377,17 @@ do
     enable_library ${enabled_library}
 done
 
-print_enabled_platforms
+print_enabled_architectures
 print_enabled_libraries
 
-for platform in {0..3}
+for run_arch in {0..4}
 do
-    if [[ ENABLED_PLATFORMS[$platform] -eq 1 ]]; then
-        export ARCH=$(get_platform_name $platform)
+    if [[ ENABLED_ARCHITECTURES[$run_arch] -eq 1 ]]; then
+        export ARCH=$(get_arch_name $run_arch)
+        export TOOLCHAIN=$(get_toolchain)
+        export TOOLCHAIN_ARCH=$(get_toolchain_arch)
+
+        create_toolchain
 
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}"
     fi

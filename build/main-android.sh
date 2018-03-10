@@ -10,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH//-/_} ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -26,7 +26,7 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/common.sh
+. ${BASEDIR}/build/android-common.sh
 
 echo -e "\nBuilding $ARCH platform on API level $API\n"
 echo -e "\nINFO: Starting new build for $ARCH on API level $API at "$(date)"\n">> ${BASEDIR}/build.log

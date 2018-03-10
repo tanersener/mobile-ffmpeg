@@ -10,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH//-/_} ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -20,35 +20,49 @@ if [[ -z ${API} ]]; then
     exit 1
 fi
 
-# ENABLE COMMON FUNCTIONS
-. $1/build/common.sh
+if [[ -z ${BASEDIR} ]]; then
+    echo "BASEDIR not defined"
+    exit 1
+fi
 
-# PREPARING PATHS
-android_prepare_toolchain_paths
+# ENABLE COMMON FUNCTIONS
+. ${BASEDIR}/build/android-common.sh
+
+# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+prepare_toolchain_paths
 
 # PREPARING FLAGS
-TARGET_HOST=$(android_get_target_host)
-export CFLAGS=$(android_get_cflags "libvpx")
-export CXXFLAGS=$(android_get_cxxflags "libvpx")
-export LDFLAGS=$(android_get_ldflags "libvpx")
+TARGET_HOST=$(get_target_host)
+export CFLAGS=$(get_cflags "libvpx")
+export CXXFLAGS=$(get_cxxflags "libvpx")
+export LDFLAGS=$(get_ldflags "libvpx")
 
-SUPPORTED_ARCH=""
+TARGET_CPU=""
+DISABLE_NEON_FLAG=""
 case ${ARCH} in
-    arm)
-        SUPPORTED_ARCH="armv7"
+    arm-v7a)
+        TARGET_CPU="armv7"
+        DISABLE_NEON_FLAG="--disable-neon"
+    ;;
+    arm-v7a-neon)
+        TARGET_CPU="armv7"
+        # NEON IS ENABLED BY --enable-runtime-cpu-detect
+    ;;
+    arm64-v8a)
+        TARGET_CPU="arm64"
     ;;
     *)
-        SUPPORTED_ARCH="${ARCH//-/_}"
+        TARGET_CPU="${ARCH//-/_}"
     ;;
 esac
 
-cd $1/src/libvpx || exit 1
+cd ${BASEDIR}/src/libvpx || exit 1
 
-make distclean
+make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvpx \
-    --target="${SUPPORTED_ARCH}-android-gcc" \
+    --target="${TARGET_CPU}-android-gcc" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --as=yasm \
@@ -59,6 +73,7 @@ make distclean
     --enable-optimizations \
     --enable-better-hw-compatibility \
     --enable-runtime-cpu-detect \
+    ${DISABLE_NEON_FLAG} \
     --enable-vp8 \
     --enable-vp9 \
     --enable-multithread \

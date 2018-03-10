@@ -10,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH//-/_} ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -20,26 +20,31 @@ if [[ -z ${API} ]]; then
     exit 1
 fi
 
-# ENABLE COMMON FUNCTIONS
-. $1/build/common.sh
+if [[ -z ${BASEDIR} ]]; then
+    echo "BASEDIR not defined"
+    exit 1
+fi
 
-# PREPARING PATHS
-android_prepare_toolchain_paths
+# ENABLE COMMON FUNCTIONS
+. ${BASEDIR}/build/android-common.sh
+
+# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+prepare_toolchain_paths
 
 # PREPARING FLAGS
-TARGET_HOST=$(android_get_target_host)
-export CFLAGS=$(android_get_cflags "jpeg")
-export CXXFLAGS=$(android_get_cxxflags "jpeg")
-export LDFLAGS=$(android_get_ldflags "jpeg")
+TARGET_HOST=$(get_target_host)
+export CFLAGS=$(get_cflags "jpeg")
+export CXXFLAGS=$(get_cxxflags "jpeg")
+export LDFLAGS=$(get_ldflags "jpeg")
 
-cd $1/src/jpeg || exit 1
+cd ${BASEDIR}/src/jpeg || exit 1
 
-make distclean
+make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/jpeg \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

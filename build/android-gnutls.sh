@@ -1,25 +1,5 @@
 #!/bin/bash
 
-create_gnutls_package_config() {
-    local GNUTLS_VERSION="$1"
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gnutls
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
-includedir=\${prefix}/include
-
-Name: gnutls
-Description: GNU TLS Implementation
-
-Version: ${GNUTLS_VERSION}
-Requires: nettle, hogweed, zlib
-Cflags: -I\${includedir}
-Libs: -L\${libdir} -lgnutls
-Libs.private: -lgmp
-EOF
-}
-
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -30,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH//-/_} ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -40,31 +20,36 @@ if [[ -z ${API} ]]; then
     exit 1
 fi
 
-# ENABLE COMMON FUNCTIONS
-. $1/build/common.sh
+if [[ -z ${BASEDIR} ]]; then
+    echo "BASEDIR not defined"
+    exit 1
+fi
 
-# PREPARING PATHS
-android_prepare_toolchain_paths
+# ENABLE COMMON FUNCTIONS
+. ${BASEDIR}/build/android-common.sh
+
+# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+prepare_toolchain_paths
 
 # PREPARING FLAGS
-TARGET_HOST=$(android_get_target_host)
-COMMON_CFLAGS=$(android_get_cflags "gnutls")
-COMMON_CXXFLAGS=$(android_get_cxxflags "gnutls")
-COMMON_LDFLAGS=$(android_get_ldflags "gnutls")
+TARGET_HOST=$(get_target_host)
+COMMON_CFLAGS=$(get_cflags "gnutls")
+COMMON_CXXFLAGS=$(get_cxxflags "gnutls")
+COMMON_LDFLAGS=$(get_ldflags "gnutls")
 
 export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv/include -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gmp/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
 export LDFLAGS="${COMMON_LDFLAGS} -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv/lib -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gmp/lib"
 export PKG_CONFIG_PATH="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/pkgconfig"
 
-cd $1/src/gnutls || exit 1
+cd ${BASEDIR}/src/gnutls || exit 1
 
-make distclean
+make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gnutls \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --with-included-libtasn1 \
     --with-included-unistring \
     --without-idn \

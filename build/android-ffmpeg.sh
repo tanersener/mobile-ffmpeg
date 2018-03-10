@@ -1,22 +1,5 @@
 #!/bin/bash
 
-android_get_target_machine() {
-    case ${ARCH} in
-        arm)
-            echo "armv7-a"
-        ;;
-        arm64)
-            echo "aarch64"
-        ;;
-        x86)
-            echo "i686"
-        ;;
-        x86-64)
-            echo "x86_64"
-        ;;
-    esac
-}
-
 if [[ -z $1 ]]; then
     echo "usage: $0 <enabled libraries list>"
     exit 1
@@ -27,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH//-/_} ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -49,18 +32,48 @@ if [ -z ${HOST_PKG_CONFIG_PATH} ]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/common.sh
+. ${BASEDIR}/build/android-common.sh
 
-# PREPARING PATHS
-android_prepare_toolchain_paths
+# PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
+prepare_toolchain_paths
 
 # PREPARING FLAGS
-TARGET_HOST=$(android_get_target_host)
-TARGET_MACHINE=$(android_get_target_machine)
-CFLAGS=$(android_get_cflags "ffmpeg")
-CXXFLAGS=$(android_get_cxxflags "ffmpeg")
-LDFLAGS=$(android_get_ldflags "ffmpeg")
+TARGET_HOST=$(get_target_host)
+CFLAGS=$(get_cflags "ffmpeg")
+CXXFLAGS=$(get_cxxflags "ffmpeg")
+LDFLAGS=$(get_ldflags "ffmpeg")
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+
+TARGET_CPU=""
+TARGET_ARCH=""
+NEON_FLAG=""
+case ${ARCH} in
+    arm-v7a)
+        TARGET_CPU="armv7-a"
+        TARGET_ARCH="armv7-a"
+        NEON_FLAG="	--disable-neon"
+    ;;
+    arm-v7a-neon)
+        TARGET_CPU="armv7-a"
+        TARGET_ARCH="armv7-a"
+        NEON_FLAG="	--enable-neon"
+    ;;
+    arm64-v8a)
+        TARGET_CPU="armv8-a"
+        TARGET_ARCH="aarch64"
+        NEON_FLAG="	--enable-neon"
+    ;;
+    x86)
+        TARGET_CPU="i686"
+        TARGET_ARCH="i686"
+        NEON_FLAG="	--disable-neon"
+    ;;
+    x86-64)
+        TARGET_CPU="x86_64"
+        TARGET_ARCH="x86_64"
+        NEON_FLAG="	--disable-neon"
+    ;;
+esac
 
 CONFIGURE_POSTFIX=""
 
@@ -194,25 +207,25 @@ do
     fi
 done
 
-LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${ARCH//-/_}/usr/lib"
+LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
 cd ${BASEDIR}/src/ffmpeg || exit 1
 
 echo -n -e "\nffmpeg: "
 
-make distclean
+make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --cross-prefix="${TARGET_HOST}-" \
-    --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot" \
+    --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
     --prefix="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/ffmpeg" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --extra-ldflags="${LDFLAGS}" \
     --enable-version3 \
-    --arch="${ARCH//-/_}" \
-    --cpu="${TARGET_MACHINE}" \
+    --arch="${TARGET_ARCH}" \
+    --cpu="${TARGET_CPU}" \
     --target-os=android \
 	--enable-cross-compile \
     --enable-pic \
@@ -231,9 +244,8 @@ make distclean
     --disable-manpages \
     --disable-podpages \
     --disable-txtpages \
-    --enable-inline-asm \
-	--enable-neon \
-	--enable-thumb \
+	${NEON_FLAG} \
+	--enable-inline-asm \
 	--enable-optimizations \
 	--enable-small  \
     --enable-static \

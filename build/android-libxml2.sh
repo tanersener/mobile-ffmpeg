@@ -1,25 +1,5 @@
 #!/bin/bash
 
-create_libxml2_package_config() {
-    local LIBXML2_VERSION="$1"
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/libxml-2.0.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libxml2
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
-includedir=\${prefix}/include
-modules=1
-
-Name: libXML
-Version: ${LIBXML2_VERSION}
-Description: libXML library version2.
-Requires: libiconv
-Libs: -L\${libdir} -lxml2
-Libs.private:   -lz -lm
-Cflags: -I\${includedir} -I\${includedir}/libxml2
-EOF
-}
-
 if [[ -z $1 ]]; then
     echo "usage: $0 <mobile ffmpeg base directory>"
     exit 1
@@ -30,7 +10,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-if [[ -z ${ARCH//-/_} ]]; then
+if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
@@ -40,21 +20,26 @@ if [[ -z ${API} ]]; then
     exit 1
 fi
 
+if [[ -z ${BASEDIR} ]]; then
+    echo "BASEDIR not defined"
+    exit 1
+fi
+
 # ENABLE COMMON FUNCTIONS
-. $1/build/common.sh
+. ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-android_prepare_toolchain_paths
+prepare_toolchain_paths
 
 # PREPARING FLAGS
-TARGET_HOST=$(android_get_target_host)
-export CFLAGS=$(android_get_cflags "libxml2")
-export CXXFLAGS=$(android_get_cxxflags "libxml2")
-export LDFLAGS=$(android_get_ldflags "libxml2")
+TARGET_HOST=$(get_target_host)
+export CFLAGS=$(get_cflags "libxml2")
+export CXXFLAGS=$(get_cxxflags "libxml2")
+export LDFLAGS=$(get_ldflags "libxml2")
 
-cd $1/src/libxml2 || exit 1
+cd ${BASEDIR}/src/libxml2 || exit 1
 
-make distclean
+make distclean 2>/dev/null 1>/dev/null
 
 # NOTE THAT PYTHON IS DISABLED DUE TO THE FOLLOWING ERROR
 #
@@ -65,7 +50,7 @@ make distclean
 ./configure \
     --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libxml2 \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${ARCH//-/_}/sysroot \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --with-zlib \
     --with-iconv=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv \
     --with-sax1 \
