@@ -36,7 +36,7 @@ LIBRARY_ZLIB=24
 LIBRARY_MEDIA_CODEC=25
 
 # ENABLE ARCH
-ENABLED_ARCHITECTURES=(1 0 0 0 0)
+ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -135,7 +135,7 @@ enable_library() {
 }
 
 disable_library() {
-        set_library $1 0
+    set_library $1 0
 }
 
 set_library() {
@@ -219,6 +219,11 @@ set_library() {
         wavpack)
             ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
         ;;
+        giflib | jpeg | libogg | libpng | libuuid | nettle | tiff)
+        ;;
+        *)
+            print_unknown_platform_library $1
+        ;;
     esac
 }
 
@@ -248,6 +253,16 @@ set_arch() {
             ENABLED_ARCHITECTURES[ARCH_X86_64]=$2
         ;;
     esac
+}
+
+print_unknown_option() {
+    echo -e "Unknown option \"$1\".\nSee $0 --help for available options."
+    exit 1
+}
+
+print_unknown_platform_library() {
+    echo -e "Unknown platform/library \"$1\".\nSee $0 --help for available platforms and libraries."
+    exit 1
 }
 
 print_enabled_architectures() {
@@ -360,6 +375,9 @@ do
                 ;;
             esac
 	    ;;
+	    *)
+	        print_unknown_option $1
+	    ;;
     esac
     shift
 done;
@@ -389,5 +407,12 @@ do
         create_toolchain
 
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}"
+
+        # CLEAR FLAGS
+        for library in {1..26}
+        do
+            library_name=$(get_library_name $((library - 1)))
+            unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
+        done
     fi
 done

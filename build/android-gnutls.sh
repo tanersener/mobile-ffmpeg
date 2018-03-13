@@ -29,7 +29,7 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-prepare_toolchain_paths
+set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
@@ -37,17 +37,17 @@ COMMON_CFLAGS=$(get_cflags "gnutls")
 COMMON_CXXFLAGS=$(get_cxxflags "gnutls")
 COMMON_LDFLAGS=$(get_ldflags "gnutls")
 
-export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv/include -I${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gmp/include"
+export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libiconv/include -I${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/gmp/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
-export LDFLAGS="${COMMON_LDFLAGS} -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv/lib -L${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gmp/lib"
-export PKG_CONFIG_PATH="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/pkgconfig"
+export LDFLAGS="${COMMON_LDFLAGS} -L${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libiconv/lib -L${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/gmp/lib"
+export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/gnutls || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gnutls \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/gnutls \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --with-included-libtasn1 \

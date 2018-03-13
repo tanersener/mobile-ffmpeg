@@ -29,20 +29,21 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-prepare_toolchain_paths
+set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags "fribidi")
 export CXXFLAGS=$(get_cxxflags "fribidi")
 export LDFLAGS=$(get_ldflags "fribidi")
+export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/fribidi || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/fribidi \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/fribidi \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --enable-static \

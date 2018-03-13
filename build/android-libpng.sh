@@ -29,28 +29,34 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-prepare_toolchain_paths
+set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags "libpng")
 export CXXFLAGS=$(get_cxxflags "libpng")
 export LDFLAGS=$(get_ldflags "libpng")
+export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
-OPTIONAL_CPU_SUPPORT=""
-if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86-64" ]; then
-    OPTIONAL_CPU_SUPPORT="--enable-sse"
-fi
-if [ ${ARCH} == "arm-v7a-neon" ] || [ ${ARCH} == "arm64-v8a" ]; then
-    OPTIONAL_CPU_SUPPORT="--enable-arm-neon"
-fi
+CPU_SPECIFIC_OPTIONS=""
+case ${ARCH} in
+    x86 | x86-64)
+        CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations --enable-sse"
+    ;;
+    arm-v7a-neon | arm64-v8a)
+        CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations --enable-arm-neon"
+    ;;
+    arm-v7a)
+        CPU_SPECIFIC_OPTIONS="--disable-arm-neon"
+    ;;
+esac
 
 cd ${BASEDIR}/src/libpng || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libpng \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libpng \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --enable-static \
@@ -58,7 +64,7 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-fast-install \
     --disable-unversioned-libpng-pc \
     --disable-unversioned-libpng-config \
-    --enable-hardware-optimizations ${OPTIONAL_CPU_SUPPORT} \
+    ${CPU_SPECIFIC_OPTIONS} \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(nproc) || exit 1

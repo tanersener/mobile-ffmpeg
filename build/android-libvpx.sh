@@ -29,13 +29,14 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-prepare_toolchain_paths
+set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
 export CFLAGS="$(get_cflags "libvpx") -I${ANDROID_NDK_ROOT}/sources/android/cpufeatures"
 export CXXFLAGS=$(get_cxxflags "libvpx")
 export LDFLAGS="$(get_ldflags "libvpx") -L${ANDROID_NDK_ROOT}/sources/android/cpufeatures -lcpufeatures"
+export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
 DISABLE_NEON_FLAG=""
@@ -52,7 +53,7 @@ case ${ARCH} in
         TARGET_CPU="arm64"
     ;;
     *)
-        TARGET_CPU="${ARCH//-/_}"
+        TARGET_CPU="$(get_target_build ${ARCH})"
     ;;
 esac
 
@@ -64,7 +65,7 @@ build_cpufeatures
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvpx \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libvpx \
     --target="${TARGET_CPU}-android-gcc" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \

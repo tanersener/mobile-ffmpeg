@@ -29,13 +29,14 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-prepare_toolchain_paths
+set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags "libxml2")
 export CXXFLAGS=$(get_cxxflags "libxml2")
 export LDFLAGS=$(get_ldflags "libxml2")
+export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/libxml2 || exit 1
 
@@ -48,11 +49,11 @@ make distclean 2>/dev/null 1>/dev/null
 #
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libxml2 \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libxml2 \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --with-zlib \
-    --with-iconv=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv \
+    --with-iconv=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libiconv \
     --with-sax1 \
     --without-python \
     --without-debug \

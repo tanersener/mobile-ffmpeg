@@ -29,24 +29,25 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-prepare_toolchain_paths
+set_toolchain_gcc_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags "libvorbis")
 export CXXFLAGS=$(get_cxxflags "libvorbis")
 export LDFLAGS=$(get_ldflags "libvorbis")
+export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/libvorbis || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvorbis \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libvorbis \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
-    --with-ogg-includes=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libogg/include \
-    --with-ogg-libraries=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libogg/lib \
+    --with-ogg-includes=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libogg/include \
+    --with-ogg-libraries=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libogg/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

@@ -35,7 +35,7 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-prepare_toolchain_paths
+set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
@@ -219,7 +219,7 @@ make distclean 2>/dev/null 1>/dev/null
 ./configure \
     --cross-prefix="${TARGET_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
-    --prefix="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/ffmpeg" \
+    --prefix="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/ffmpeg" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \

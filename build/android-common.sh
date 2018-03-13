@@ -75,6 +75,26 @@ get_toolchain() {
     esac
 }
 
+get_target_build() {
+    case ${ARCH} in
+        arm-v7a)
+            echo "arm"
+        ;;
+        arm-v7a-neon)
+            echo "arm/neon"
+        ;;
+        arm64-v8a)
+            echo "arm64"
+        ;;
+        x86)
+            echo "x86"
+        ;;
+        x86-64)
+            echo "x86_64"
+        ;;
+    esac
+}
+
 get_toolchain_arch() {
     case ${ARCH} in
         arm-v7a | arm-v7a-neon)
@@ -132,7 +152,12 @@ get_size_optimization_cflags() {
             fi
         ;;
         x86 | x86-64)
-            ARCH_OPTIMIZATION="-O2 -finline-limit=300"
+            if [[ $1 -eq libvpx ]]; then
+                ARCH_OPTIMIZATION="-O2"
+            else
+                ARCH_OPTIMIZATION="-O2 -finline-limit=300"
+            fi
+
         ;;
     esac
 
@@ -149,13 +174,10 @@ get_app_specific_cflags() {
             APP_FLAGS=""
         ;;
         ffmpeg | shine)
-            APP_FLAGS="-Wno-psabi -Wno-unused-but-set-variable -Wno-unused-function"
-        ;;
-        tiff)
-            APP_FLAGS="-std=c99"
+            APP_FLAGS="-Wno-unused-function"
         ;;
         *)
-            APP_FLAGS="-std=c99 -Wno-psabi -Wno-unused-but-set-variable -Wno-unused-function"
+            APP_FLAGS="-std=c99 -Wno-unused-function"
         ;;
     esac
 
@@ -240,7 +262,7 @@ create_fontconfig_package_config() {
     local FONTCONFIG_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/fontconfig.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/fontconfig
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/fontconfig
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -265,7 +287,7 @@ create_freetype_package_config() {
     local FREETYPE_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/freetype2.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/freetype
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/freetype
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -286,7 +308,7 @@ create_giflib_package_config() {
     local GIFLIB_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/giflib.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/giflib
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/giflib
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -305,7 +327,7 @@ create_gmp_package_config() {
     local GMP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gmp.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gmp
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/gmp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -324,7 +346,7 @@ create_gnutls_package_config() {
     local GNUTLS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gnutls
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/gnutls
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -344,7 +366,7 @@ create_libmp3lame_package_config() {
     local LAME_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libmp3lame.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/lame
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/lame
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -363,7 +385,7 @@ create_libiconv_package_config() {
     local LIB_ICONV_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libiconv
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libiconv
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -382,7 +404,7 @@ create_libvorbis_package_config() {
     local LIBVORBIS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/vorbis.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvorbis
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -397,7 +419,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisenc.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvorbis
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -413,7 +435,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisfile.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libvorbis
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -433,7 +455,7 @@ create_libwebp_package_config() {
     local LIB_WEBP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libwebp
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libwebp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -452,7 +474,7 @@ create_libxml2_package_config() {
     local LIBXML2_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libxml-2.0.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libxml2
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libxml2
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -472,7 +494,7 @@ create_uuid_package_config() {
     local UUID_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/libuuid
+prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libuuid
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -522,20 +544,45 @@ Cflags: -I\${includedir}
 EOF
 }
 
-prepare_toolchain_paths() {
+set_toolchain_clang_paths() {
     export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin
 
     TARGET_HOST=$(get_target_host)
     
     export AR=${TARGET_HOST}-ar
     export AS=${TARGET_HOST}-as
-    export CC=${TARGET_HOST}-gcc
-    export CXX=${TARGET_HOST}-g++
+    export CC=${TARGET_HOST}-clang
+    export CXX=${TARGET_HOST}-clang++
     export LD=${TARGET_HOST}-ld
     export RANLIB=${TARGET_HOST}-ranlib
     export STRIP=${TARGET_HOST}-strip
 
-    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/pkgconfig"
+    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/pkgconfig"
+    export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
+
+    if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
+        mkdir -p ${INSTALL_PKG_CONFIG_DIR}
+    fi
+
+    if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
+        create_zlib_package_config
+    fi
+}
+
+set_toolchain_gcc_paths() {
+    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin
+
+    TARGET_HOST=$(get_target_host)
+
+    export AR=${TARGET_HOST}-ar
+    export AS=${TARGET_HOST}-as
+    export CC=${TARGET_HOST}-gcc
+    export CXX=${TARGET_HOST}-gcc++
+    export LD=${TARGET_HOST}-ld
+    export RANLIB=${TARGET_HOST}-ranlib
+    export STRIP=${TARGET_HOST}-strip
+
+    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then

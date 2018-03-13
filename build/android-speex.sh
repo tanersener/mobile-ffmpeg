@@ -29,13 +29,14 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-prepare_toolchain_paths
+set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags "speex")
 export CXXFLAGS=$(get_cxxflags "speex")
 export LDFLAGS=$(get_ldflags "speex")
+export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 OPTIONAL_CPU_SUPPORT=""
 if [ ${ARCH} == "x86" ] || [ ${ARCH} == "x86-64" ]; then
@@ -47,7 +48,7 @@ cd ${BASEDIR}/src/speex || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/speex \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/speex \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --enable-static ${OPTIONAL_CPU_SUPPORT} \

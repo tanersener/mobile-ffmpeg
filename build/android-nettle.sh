@@ -29,14 +29,14 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-prepare_toolchain_paths
+set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags "nettle")
 export CXXFLAGS=$(get_cxxflags "nettle")
 export LDFLAGS=$(get_ldflags "nettle")
-export PKG_CONFIG_PATH="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/pkgconfig"
+export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 OPTIONAL_CPU_SUPPORT=""
 case ${ARCH} in
@@ -53,11 +53,11 @@ cd ${BASEDIR}/src/nettle || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/nettle \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/nettle \
     --enable-pic \
     --enable-static \
-    --with-include-path=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gmp/include \
-    --with-lib-path=${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}/gmp/lib \
+    --with-include-path=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/gmp/include \
+    --with-lib-path=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/gmp/lib \
     --disable-shared \
     --disable-mini-gmp \
     --disable-assembler \

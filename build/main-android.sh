@@ -30,7 +30,7 @@ fi
 
 echo -e "\nBuilding $ARCH platform on API level $API\n"
 echo -e "\nINFO: Starting new build for $ARCH on API level $API at "$(date)"\n">> ${BASEDIR}/build.log
-INSTALL_BASE="${ANDROID_NDK_ROOT}/prebuilt/android-${ARCH//-/_}"
+INSTALL_BASE="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})"
 
 # CLEANING EXISTING PACKAGE CONFIG DIRECTORY
 PKG_CONFIG_DIRECTORY="${INSTALL_BASE}/pkgconfig"
