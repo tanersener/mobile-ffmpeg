@@ -236,13 +236,15 @@ make distclean 2>/dev/null 1>/dev/null
 	--enable-optimizations \
 	--enable-small  \
     --enable-static \
-    --enable-ffmpeg \
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
+    --disable-ffmpeg \
     --disable-ffplay \
     --disable-ffprobe \
     --disable-ffserver \
+    --disable-videotoolbox \
+	--disable-swscale \
     --disable-doc \
     --disable-htmlpages \
     --disable-manpages \
@@ -266,6 +268,14 @@ if [ $? -ne 0 ]; then
 fi
 
 make install 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+
+if [ $? -ne 0 ]; then
+    echo "failed"
+    exit 1
+fi
+
+# MANUALLY ADD CONFIG HEADER
+cp -f ${BASEDIR}/src/ffmpeg/config.h ${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/ffmpeg/include
 
 if [ $? -eq 0 ]; then
     echo "ok"
