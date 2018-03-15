@@ -1,44 +1,86 @@
 # mobile-ffmpeg
-Source code & scripts to build ffmpeg for Android and IOS platform
+Source code & scripts to build FFmpeg for Android and IOS platform
 
+#### Features
+- Supports both Android and IOS
+- Can be customized to support a specific platform and/or library
+- Licensed under LGPL 3.0
 
-Compiler
---------------------
-gcc 5.4
-cmake version 3.10.2
-gperf (fontconfig requires)
-pkg-config (ffmpeg requires)
+#### Architectures
+##### Android
+- arm-v7a
+- arm-v7a-neon
+- arm64-v8a
+- x86
+- x86_64
 
-ffmpeg-3.4.2
+##### IOS
+- arm-v7
+- arm-v7s
+- arm64-v8a
+- x86_64
 
-fontconfig-2.12.93 (depends libuuid, libxml2, libiconv, freetype)
-freetype-2.9 (depends libpng)
-fribidi-1.0.1
-gmp-6.1.2
-gnutls-3.5.18 (depends nettle, gmp, iconv)
-libiconv-1.15
-lame-3.100 (depends iconv)
-libass-0.14.0 (depends freetype, fribidi, fontconfig, libiconv, libuuid, libxml2)
-libtheora-1.1.1 (depends ogg, vorbis)
-libvorbis-1.3.5 (depends libogg)
-libvpx-1.7.0
-libwebp-0.6.1 (depends giflib, libjpeg, libpng, tifflib)
-libxml2-2.9.7 (depends libiconv)
-opencore-amr-0.1.5
-shine-3.1.1
-speex-1.2.0
-wavpack-5.1.0
+#### FFmpeg Support
+This repository contains FFmpeg version 3.4.2 with support for the following external libraries.
 
+- fontconfig
+- freetype
+- fribidi
+- gmp
+- gnutls
+- libiconv
+- lame
+- libass
+- libtheora
+- libvorbis
+- libvpx
+- libwebp
+- libxml2
+- opencore-amr
+- shine
+- speex
+- wavpack
 
-Supplementary packages
---------------------
-giflib-5.1.4
-libjpeg-v9c
-libogg-1.3.3
-libpng-1.6.34
-libuuid-1.0.3
-nettle-3.4 (depends gmp)
-tiff-4.0.9 (depends jpeg)
+External libraries and their dependencies are explained in the [External Libraries](doc/EXTERNAL_LIBRARIES.md) page.
 
-LICENSE
---------------------
+#### Motivation
+
+Github includes many repositories which include instructions to build FFmpeg from source.
+Most of them are platform specific and include instructions to build only one mobile platform, either Android or IOS.
+Furthermore, majority of them mainly focuses on building FFmpeg only.
+External libraries required are not covered.
+
+Some repositories are licensed under GPL and bound you to open your source code if you distribute your application.
+
+This repository aims to fill this gap and help everyone who needs to use FFmpeg on both mobile platforms with support
+for external libraries without any GPL restrictions.
+
+#### Prerequisites
+
+- gcc required by freetype
+- cmake v3.9.x or later required by libwebp
+- gperf required by fontconfig
+- pkg-config required by freetype and ffmpeg
+
+##### Android
+
+Android NDK is required to build Android platform
+
+##### IOS
+
+XCode is required to build IOS platform
+
+#### Usage
+
+Use `android.sh` to build FFmpeg for Android. Visit [ANDROID](doc/ANDROID.md) page for all build options.
+
+#### LICENSE
+
+Files provided by this project are licensed under the LGPL v3.0.
+Source code of external libraries, FFmpeg and other supported libraries, is included with their individual licenses.
+
+Visit [LICENSE](doc/LICENSE.md) page for the details.
+
+#### See Also
+
+- [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)

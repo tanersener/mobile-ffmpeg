@@ -49,7 +49,7 @@ export API=21
 display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
-    echo -e "\n'"$COMMAND"' builds ffmpeg for Android platform. By default five Android ABIs (armeabi-v7a, armeabi-v7a-neon, arm64-v8a, x86 and x86_64) are built without any external libraries enabled. Options can be used to disable unwanted ABIS and/or enable needed external libraries.\n"
+    echo -e "\n'"$COMMAND"' builds FFmpeg for Android platform. By default five Android ABIs (armeabi-v7a, armeabi-v7a-neon, arm64-v8a, x86 and x86_64) are built without any external libraries enabled. Options can be used to disable unwanted ABIS and/or enable needed external libraries.\n"
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"   
 
