@@ -3,3 +3,6 @@
 *.a
 *.pc
 /libswresample.version
+/libswresample.so
+/libswresample.so.2
+/libswresample.ver

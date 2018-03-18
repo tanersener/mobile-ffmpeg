@@ -18,6 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/* CHANGES 03.2018 Taner Sener
+ * --------------------------------------------------------
+ * - Unused headers removed
+ */
+
 #include <stdint.h>
 
 #include "ffmpeg.h"

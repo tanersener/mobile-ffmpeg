@@ -19,6 +19,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/* CHANGES 03.2018 Taner Sener
+ * --------------------------------------------------------
+ * - print_all_libs_info function and PRINT_LIB_INFO define removed
+ * - Unused headers removed
+ * - Parentheses placed around assignments in condition to prevent -Wparentheses warning
+ */
+
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -202,7 +209,7 @@ void show_help_children(const AVClass *class, int flags)
         printf("\n");
     }
 
-    while (child = av_opt_child_class_next(class, child))
+    while ((child = av_opt_child_class_next(class, child)))
         show_help_children(child, flags);
 }
 
@@ -1625,7 +1632,7 @@ int show_colors(void *optctx, const char *opt, const char *arg)
 
     printf("%-32s #RRGGBB\n", "name");
 
-    for (i = 0; name = av_get_known_color_name(i, &rgb); i++)
+    for (i = 0; (name = av_get_known_color_name(i, &rgb)); i++)
         printf("%-32s #%02x%02x%02x\n", name, rgb[0], rgb[1], rgb[2]);
 
     return 0;
@@ -1976,7 +1983,7 @@ AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
         break;
     }
 
-    while (t = av_dict_get(opts, "", t, AV_DICT_IGNORE_SUFFIX)) {
+    while ((t = av_dict_get(opts, "", t, AV_DICT_IGNORE_SUFFIX))) {
         char *p = strchr(t->key, ':');
 
         /* check stream specification in opt name */

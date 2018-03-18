@@ -3,7 +3,7 @@ This project contains source code of FFmpeg and the following libraries.
 #### External Libraries
 
 These libraries are supported by FFmpeg and needs to be compiled before FFmpeg.
-Below you can find their versions and dependencies.
+Below you can find their respective versions and dependencies.
 
 - fontconfig v2.12.93
     - depends libuuid, libxml2, libiconv, freetype

@@ -148,3 +148,5 @@ done
 
 # BUILDING FFMPEG
 . ${BASEDIR}/build/android-ffmpeg.sh "$@"
+
+echo -e "\nINFO: Completed build for $ARCH on API level $API at "$(date)"\n">> ${BASEDIR}/build.log

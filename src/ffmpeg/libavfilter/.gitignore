@@ -3,3 +3,6 @@
 *.a
 *.pc
 /libavfilter.version
+/libavfilter.so
+/libavfilter.so.6
+/libavfilter.ver

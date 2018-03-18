@@ -3,3 +3,6 @@
 *.a
 *.pc
 /libavdevice.version
+/libavdevice.so
+/libavdevice.so.57
+/libavdevice.ver

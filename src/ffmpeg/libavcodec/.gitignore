@@ -4,3 +4,6 @@
 *.a
 *.pc
 /libavcodec.version
+/libavcodec.so
+/libavcodec.so.57
+/libavcodec.ver

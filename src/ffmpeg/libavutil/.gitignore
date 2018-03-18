@@ -5,3 +5,6 @@
 *.pc
 /ffversion.h
 /libavutil.version
+/libavutil.so
+/libavutil.so.55
+/libavutil.ver

@@ -19,6 +19,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/* CHANGES 03.2018 Taner Sener
+ * --------------------------------------------------------
+ * - Unused headers removed
+ */
+
 #ifndef FFTOOLS_CMDUTILS_H
 #define FFTOOLS_CMDUTILS_H
 

@@ -18,6 +18,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/* CHANGES 03.2018 Taner Sener
+ * --------------------------------------------------------
+ * - Parentheses placed around assignments in condition to prevent -Wparentheses warning
+ */
+
 #include <stdint.h>
 
 #include "ffmpeg.h"
@@ -305,7 +310,7 @@ static int opt_map(void *optctx, const char *opt, const char *arg)
         return AVERROR(ENOMEM);
 
     /* parse sync stream first, just pick first matching stream */
-    if (sync = strchr(map, ',')) {
+    if ((sync = strchr(map, ','))) {
         *sync = 0;
         sync_file_idx = strtol(sync + 1, &sync, 0);
         if (sync_file_idx >= nb_input_files || sync_file_idx < 0) {
@@ -339,7 +344,7 @@ static int opt_map(void *optctx, const char *opt, const char *arg)
             exit_program(1);
         }
     } else {
-        if (allow_unused = strchr(map, '?'))
+        if ((allow_unused = strchr(map, '?')))
             *allow_unused = 0;
         file_idx = strtol(map, &p, 0);
         if (file_idx >= nb_input_files || file_idx < 0) {
@@ -457,7 +462,7 @@ static int opt_map_channel(void *optctx, const char *opt, const char *arg)
         exit_program(1);
     }
     /* allow trailing ? to map_channel */
-    if (allow_unused = strchr(mapchan, '?'))
+    if ((allow_unused = strchr(mapchan, '?')))
         *allow_unused = 0;
     if (m->channel_idx < 0 || m->channel_idx >= st->codecpar->channels) {
         if (allow_unused) {
@@ -2271,9 +2276,9 @@ static int open_output_file(OptionsContext *o, const char *filename)
                     if (subtitle_codec_name ||
                         input_props & output_props ||
                         // Map dvb teletext which has neither property to any output subtitle encoder
-                        input_descriptor && output_descriptor &&
+                        (input_descriptor && output_descriptor &&
                         (!input_descriptor->props ||
-                         !output_descriptor->props)) {
+                         !output_descriptor->props))) {
                         new_subtitle_stream(o, oc, i);
                         break;
                     }

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.github.tanersener.mobileffmpeg">
+    package="com.arthenica.mobileffmpeg">
 
     <application
         android:allowBackup="true"

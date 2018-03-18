@@ -4,3 +4,6 @@
 *.a
 *.pc
 /libavformat.version
+/libavformat.so
+/libavformat.so.57
+/libavformat.ver

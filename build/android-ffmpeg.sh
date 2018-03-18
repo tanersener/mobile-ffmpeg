@@ -235,7 +235,7 @@ make distclean 2>/dev/null 1>/dev/null
 	--enable-inline-asm \
 	--enable-optimizations \
 	--enable-small  \
-    --enable-static \
+    --enable-shared \
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
@@ -251,7 +251,7 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-podpages \
     --disable-txtpages \
 	${NEON_FLAG} \
-    --disable-shared \
+    --disable-static \
     --disable-xlib \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 

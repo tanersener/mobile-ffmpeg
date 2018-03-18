@@ -16,6 +16,13 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/* CHANGES 03.2018 Taner Sener
+ * --------------------------------------------------------
+ * - mid_pred copied from libavcodec/mathops.h
+ * - ff_dlog copied from libavutil/internal.h
+ * - SWS_BILINEAR and SWS_BITEXACT definitions copied from libswscale/swscale.h
+ */
+
 #ifndef FFTOOLS_FFMPEG_H
 #define FFTOOLS_FFMPEG_H
 

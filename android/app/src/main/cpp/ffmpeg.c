@@ -23,6 +23,11 @@
  * multimedia converter based on the FFmpeg libraries
  */
 
+/* CHANGES 03.2018 Taner Sener
+ * --------------------------------------------------------
+ * - Unused headers removed
+ */
+
 #include "config.h"
 #include <ctype.h>
 #include <string.h>
