@@ -1,5 +1,5 @@
 # mobile-ffmpeg
-Source code & scripts to build FFmpeg for Android and IOS platform
+Source code and scripts to build FFmpeg for Android and IOS platform
 
 ### Features
 - Supports both Android and IOS
