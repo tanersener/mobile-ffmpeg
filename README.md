@@ -41,7 +41,7 @@ This repository contains FFmpeg version 3.4.2 with support for the following ext
 - speex
 - wavpack
 
-Supported libraries and their dependencies are explained in the [Supported Libraries](wiki/Supported-Libraries) wiki page.
+Supported libraries and their dependencies are explained in the [[Supported Libraries|wiki/Supported-Libraries]] wiki page.
 
 ### Motivation
 
