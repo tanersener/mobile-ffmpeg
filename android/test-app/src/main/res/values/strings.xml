@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MobileFFmpegTest</string>
+    <string name="run_button_text">Run</string>
+</resources>

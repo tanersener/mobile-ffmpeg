@@ -17,37 +17,25 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOBILEFFMPEG_H
-#define MOBILEFFMPEG_H
+#ifndef MOBILEFFMPEG_ABIDETECT_H
+#define MOBILEFFMPEG_ABIDETECT_H
 
-#include <string>
 #include <jni.h>
-#include <android/log.h>
-
-#include "libavutil/ffversion.h"
 #include "log.h"
 
-#define MOBILE_FFMPEG_VERSION "1.0"
+#define ABI_ARMV7A_NEON "armeabi-v7a-neon"
+#define ABI_ARMV7A "armeabi-v7a"
+#define ABI_ARM "armeabi"
+#define ABI_X86 "x86"
+#define ABI_X86_64 "x86_64"
+#define ABI_ARM64_V8A "arm64-v8a"
+#define ABI_UNKNOWN "unknown"
 
 /*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    getFFmpegVersion
+ * Class:     com_arthenica_mobileffmpeg_AbiDetect
+ * Method:    getAbi
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion(JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEnv *, jclass);
 
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    getVersion
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIEnv *, jclass);
-
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    execute
- * Signature: ([Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *, jclass, jobjectArray);
-
-#endif /* MOBILEFFMPEG_H */
+#endif /* MOBILEFFMPEG_ABIDETECT_H */

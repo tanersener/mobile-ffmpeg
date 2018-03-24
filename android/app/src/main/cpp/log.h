@@ -17,29 +17,17 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.arthenica.mobileffmpeg;
+#ifndef MOBILEFFMPEG_LOG_H
+#define MOBILEFFMPEG_LOG_H
 
-/**
- * <p>Base class for FFmpeg operations.
- *
- * @author Taner Sener
- */
-public class FFmpeg {
+#include <android/log.h>
 
-    static {
-        Abi abi = Abi.from(AbiDetect.getAbi());
+#define LIB_NAME "mobile-ffmpeg"
 
-        if (abi == Abi.ABI_ARMV7A_NEON) {
-            System.loadLibrary("mobileffmpeg-armv7a-neon");
-        } else {
-            System.loadLibrary("mobileffmpeg");
-        }
-    }
+#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LIB_NAME, __VA_ARGS__)
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LIB_NAME, __VA_ARGS__)
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LIB_NAME, __VA_ARGS__)
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LIB_NAME, __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LIB_NAME, __VA_ARGS__)
 
-    public native static String getFFmpegVersion();
-
-    public native static String getVersion();
-
-    public native static int execute(final String ... arguments);
-
-}
+#endif /* MOBILEFFMPEG_LOG_H */

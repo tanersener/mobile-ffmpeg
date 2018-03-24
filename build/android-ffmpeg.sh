@@ -66,7 +66,9 @@ case ${ARCH} in
     x86)
         TARGET_CPU="i686"
         TARGET_ARCH="i686"
-        NEON_FLAG="	--disable-neon"
+
+        # asm disabled due to this ticker https://trac.ffmpeg.org/ticket/4928
+        NEON_FLAG="	--disable-neon --disable-asm"
     ;;
     x86-64)
         TARGET_CPU="x86_64"

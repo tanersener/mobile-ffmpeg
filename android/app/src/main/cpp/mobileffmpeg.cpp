@@ -19,13 +19,25 @@
 
 #include "mobileffmpeg.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    // forward declaration for ffmpeg.c
+    int execute(int argc, char **argv);
+
+#ifdef __cplusplus
+}
+#endif
+
 static const char *className = "com/arthenica/mobileffmpeg/FFmpeg";
+
+static char *libName= "mobile-ffmpeg";
 
 static JNINativeMethod methods[] = {
   {"getFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion},
   {"getVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion},
-  {"getABI", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getABI},
-  {"execute", "([Ljava/lang/String;)Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_execute},
+  {"execute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_execute},
 };
 
 jint JNI_OnLoad(JavaVM* vm, void* reserved) {
@@ -41,7 +53,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved) {
         return JNI_FALSE;
     }
 
-    if (env->RegisterNatives(clazz, methods, 4) < 0) {
+    if (env->RegisterNatives(clazz, methods, 3) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s", className);
         return JNI_FALSE;
     }
@@ -69,52 +81,33 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIE
 
 /*
  * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    getABI
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getABI(JNIEnv* env, jclass object) {
-    #if defined(__arm__)
-        #if defined(__ARM_ARCH_7A__)
-            #if defined(__ARM_NEON__)
-                return env->NewStringUTF(ABI_ARMV7A_NEON);
-            #else
-                return env->NewStringUTF(ABI_ARMV7A);
-            #endif
-        #else
-            return env->NewStringUTF(ABI_ARM);
-        #endif
-    #elif defined(__i386__)
-        return env->NewStringUTF(ABI_X86);
-    #elif defined(__x86_64__)
-        return env->NewStringUTF(ABI_X86_64);
-    #elif defined(__aarch64__)
-        return env->NewStringUTF(ABI_ARM64_V8A);
-    #else
-        return env->NewStringUTF(ABI_UNKNOWN);
-    #endif
-}
-
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
  * Method:    execute
- * Signature: ([Ljava/lang/String;)Ljava/lang/String;
+ * Signature: ([Ljava/lang/String;)I
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv* env, jclass object, jobjectArray stringArray) {
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv* env, jclass object, jobjectArray stringArray) {
     int stringCount = env->GetArrayLength(stringArray);
-    std::string argv("");
 
-    for (int i=0; i<stringCount; i++) {
+    // PREPARE
+    char **argv = (char **)malloc(sizeof(char*) * (stringCount + 1));
+    argv[0] = (char *) malloc(strlen(libName) + 1);
+    strcpy(argv[0], libName);
+    for (int i = 0; i < stringCount; i++) {
         jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
-        const char* rawString = env->GetStringUTFChars(string, 0);
-
-        if (i != 0) {
-            argv.append(" ");
-        }
-        argv.append(rawString);
-
-        env->ReleaseStringUTFChars(string, rawString);
+        argv[i + 1] = (char*) env->GetStringUTFChars(string, 0);
         env->DeleteLocalRef(string);
     }
 
-    return env->NewStringUTF(argv.c_str());
+    // RUN
+    int retCode = execute(stringCount + 1, argv);
+
+    // CLEANUP
+    for (int i = 0; i < stringCount; i++) {
+        jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
+        env->ReleaseStringUTFChars(string, argv[i + 1]);
+        env->DeleteLocalRef(string);
+    }
+    free(argv[0]);
+    free(argv);
+
+    return retCode;
 }

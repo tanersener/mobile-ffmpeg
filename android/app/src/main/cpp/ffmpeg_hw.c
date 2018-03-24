@@ -16,6 +16,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/* CHANGES 03.2018 Taner Sener
+ * --------------------------------------------------------
+ * - av_log calls replaced with LOGX
+ */
+
 #include <string.h>
 
 #include "libavutil/avstring.h"
@@ -203,12 +208,12 @@ done:
     av_dict_free(&options);
     return err;
 invalid:
-    av_log(NULL, AV_LOG_ERROR,
+    LOGE(
            "Invalid device specification \"%s\": %s\n", arg, errmsg);
     err = AVERROR(EINVAL);
     goto done;
 fail:
-    av_log(NULL, AV_LOG_ERROR,
+    LOGE(
            "Device creation failed: %d.\n", err);
     av_buffer_unref(&device_ref);
     goto done;
@@ -296,7 +301,7 @@ int hw_device_setup_for_decode(InputStream *ist)
     }
 
     if (!dev) {
-        av_log(ist->dec_ctx, AV_LOG_WARNING, "No device available "
+        LOGW("No device available "
                "for decoder (device type %s for codec %s).\n",
                av_hwdevice_get_type_name(type), ist->dec->name);
         return 0;
@@ -318,7 +323,7 @@ int hw_device_setup_for_encode(OutputStream *ost)
     if (type != AV_HWDEVICE_TYPE_NONE) {
         dev = hw_device_get_by_type(type);
         if (!dev) {
-            av_log(ost->enc_ctx, AV_LOG_WARNING, "No device available "
+            LOGW("No device available "
                    "for encoder (device type %s for codec %s).\n",
                    av_hwdevice_get_type_name(type), ost->enc->name);
             return 0;
@@ -353,7 +358,7 @@ static int hwaccel_retrieve_data(AVCodecContext *avctx, AVFrame *input)
 
     err = av_hwframe_transfer_data(output, input, 0);
     if (err < 0) {
-        av_log(avctx, AV_LOG_ERROR, "Failed to transfer data to "
+        LOGE("Failed to transfer data to "
                "output frame: %d.\n", err);
         goto fail;
     }

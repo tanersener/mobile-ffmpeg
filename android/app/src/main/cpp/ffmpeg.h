@@ -18,19 +18,23 @@
 
 /* CHANGES 03.2018 Taner Sener
  * --------------------------------------------------------
+ * - Include guards renamed
+ * - log.h included
  * - mid_pred copied from libavcodec/mathops.h
  * - ff_dlog copied from libavutil/internal.h
  * - SWS_BILINEAR and SWS_BITEXACT definitions copied from libswscale/swscale.h
  */
 
-#ifndef FFTOOLS_FFMPEG_H
-#define FFTOOLS_FFMPEG_H
+#ifndef MOBILEFFMPEG_FFMPEG_H
+#define MOBILEFFMPEG_FFMPEG_H
 
 #include "config.h"
 
 #include <stdint.h>
 #include <stdio.h>
 #include <signal.h>
+
+#include "log.h"
 
 #if HAVE_PTHREADS
 #include <pthread.h>
@@ -80,9 +84,9 @@ static inline av_const int mid_pred(int a, int b, int c)
 #define SWS_BITEXACT          0x80000
 
 #ifdef DEBUG
-#   define ff_dlog(ctx, ...) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__)
+#   define ff_dlog(ctx, ...) LOGD(__VA_ARGS__)
 #else
-#   define ff_dlog(ctx, ...) do { if (0) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__); } while (0)
+#   define ff_dlog(ctx, ...) do { if (0) LOGD(__VA_ARGS__); } while (0)
 #endif
 
 #define VSYNC_AUTO       -1
@@ -712,4 +716,4 @@ int hw_device_setup_for_encode(OutputStream *ost);
 
 int hwaccel_decode_init(AVCodecContext *avctx);
 
-#endif /* FFTOOLS_FFMPEG_H */
+#endif /* MOBILEFFMPEG_FFMPEG_H */

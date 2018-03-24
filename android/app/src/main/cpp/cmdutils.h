@@ -21,11 +21,13 @@
 
 /* CHANGES 03.2018 Taner Sener
  * --------------------------------------------------------
+ * - Include guards renamed
+ * - log.h included
  * - Unused headers removed
  */
 
-#ifndef FFTOOLS_CMDUTILS_H
-#define FFTOOLS_CMDUTILS_H
+#ifndef MOBILEFFMPEG_CMDUTILS_H
+#define MOBILEFFMPEG_CMDUTILS_H
 
 #include <stdint.h>
 
@@ -33,6 +35,7 @@
 #include "libavcodec/avcodec.h"
 #include "libavfilter/avfilter.h"
 #include "libavformat/avformat.h"
+#include "log.h"
 
 #ifdef _WIN32
 #undef main /* We don't want SDL to override our main() */
@@ -663,4 +666,4 @@ void *grow_array(void *array, int elem_size, int *size, int new_size);
 
 double get_rotation(AVStream *st);
 
-#endif /* FFTOOLS_CMDUTILS_H */
+#endif /* MOBILEFFMPEG_CMDUTILS_H */

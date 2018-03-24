@@ -17,26 +17,17 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.arthenica.mobileffmpeg;
+#ifndef MOBILEFFMPEG_EXCEPTION_H
+#define MOBILEFFMPEG_EXCEPTION_H
 
-public enum ABI {
+#include <stdio.h>
+#include <setjmp.h>
 
-    ABI_ARMV7A_NEON("armeabi-v7a-neon"),
-    ABI_ARMV7A("armeabi-v7a"),
-    ABI_ARM("armeabi"),
-    ABI_X86("x86"),
-    ABI_X86_64("x86_64"),
-    ABI_ARM64_V8A("arm64-v8a"),
-    ABI_UNKNOWN("unknown");
+jmp_buf ex_buf__;
 
-    private String value;
+#define TRY do{ if( !setjmp(ex_buf__) ){
+#define CATCH } else {
+#define ETRY } }while(0)
+#define THROW longjmp(ex_buf__, 1)
 
-    ABI(final String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-}
+#endif // MOBILEFFMPEG_EXCEPTION_H

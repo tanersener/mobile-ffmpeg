@@ -13,33 +13,24 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Base class for FFmpeg operations.
+ * <p>Detects ABI using Android's <code>cpufeatures</code> library. This is crucial in order to
+ * load the correct .so files for MobileFFmpeg.
  *
  * @author Taner Sener
  */
-public class FFmpeg {
+public class AbiDetect {
 
     static {
-        Abi abi = Abi.from(AbiDetect.getAbi());
-
-        if (abi == Abi.ABI_ARMV7A_NEON) {
-            System.loadLibrary("mobileffmpeg-armv7a-neon");
-        } else {
-            System.loadLibrary("mobileffmpeg");
-        }
+        System.loadLibrary("abidetect");
     }
 
-    public native static String getFFmpegVersion();
-
-    public native static String getVersion();
-
-    public native static int execute(final String ... arguments);
+    public native static String getAbi();
 
 }

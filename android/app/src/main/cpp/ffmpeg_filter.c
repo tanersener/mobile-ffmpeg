@@ -21,6 +21,7 @@
 /* CHANGES 03.2018 Taner Sener
  * --------------------------------------------------------
  * - Unused headers removed
+ * - av_log calls replaced with LOGX
  */
 
 #include <stdint.h>
@@ -81,7 +82,7 @@ enum AVPixelFormat choose_pixel_fmt(AVStream *st, AVCodecContext *enc_ctx, AVCod
         }
         if (*p == AV_PIX_FMT_NONE) {
             if (target != AV_PIX_FMT_NONE)
-                av_log(NULL, AV_LOG_WARNING,
+                LOGW(
                        "Incompatible pixel format '%s' for codec '%s', auto-selecting format '%s'\n",
                        av_get_pix_fmt_name(target),
                        codec->name,
@@ -102,9 +103,9 @@ void choose_sample_fmt(AVStream *st, AVCodec *codec)
         }
         if (*p == -1) {
             if((codec->capabilities & AV_CODEC_CAP_LOSSLESS) && av_get_sample_fmt_name(st->codecpar->format) > av_get_sample_fmt_name(codec->sample_fmts[0]))
-                av_log(NULL, AV_LOG_ERROR, "Conversion will not be lossless.\n");
+                LOGE("Conversion will not be lossless.\n");
             if(av_get_sample_fmt_name(st->codecpar->format))
-            av_log(NULL, AV_LOG_WARNING,
+            LOGW(
                    "Incompatible sample format '%s' for codec '%s', auto-selecting format '%s'\n",
                    av_get_sample_fmt_name(st->codecpar->format),
                    codec->name,
@@ -260,7 +261,7 @@ static void init_input_filter(FilterGraph *fg, AVFilterInOut *in)
 
     // TODO: support other filter types
     if (type != AVMEDIA_TYPE_VIDEO && type != AVMEDIA_TYPE_AUDIO) {
-        av_log(NULL, AV_LOG_FATAL, "Only video and audio filters supported "
+        LOGE("Only video and audio filters supported "
                "currently.\n");
         exit_program(1);
     }
@@ -272,7 +273,7 @@ static void init_input_filter(FilterGraph *fg, AVFilterInOut *in)
         int file_idx = strtol(in->name, &p, 0);
 
         if (file_idx < 0 || file_idx >= nb_input_files) {
-            av_log(NULL, AV_LOG_FATAL, "Invalid file index %d in filtergraph description %s.\n",
+            LOGE("Invalid file index %d in filtergraph description %s.\n",
                    file_idx, fg->graph_desc);
             exit_program(1);
         }
@@ -290,7 +291,7 @@ static void init_input_filter(FilterGraph *fg, AVFilterInOut *in)
             }
         }
         if (!st) {
-            av_log(NULL, AV_LOG_FATAL, "Stream specifier '%s' in filtergraph description %s "
+            LOGE("Stream specifier '%s' in filtergraph description %s "
                    "matches no streams.\n", p, fg->graph_desc);
             exit_program(1);
         }
@@ -303,7 +304,7 @@ static void init_input_filter(FilterGraph *fg, AVFilterInOut *in)
                 break;
         }
         if (i == nb_input_streams) {
-            av_log(NULL, AV_LOG_FATAL, "Cannot find a matching stream for "
+            LOGE("Cannot find a matching stream for "
                    "unlabeled input pad %d on filter %s\n", in->pad_idx,
                    in->filter_ctx->name);
             exit_program(1);
@@ -388,7 +389,7 @@ static int insert_trim(int64_t start_time, int64_t duration,
 
     trim = avfilter_get_by_name(name);
     if (!trim) {
-        av_log(NULL, AV_LOG_ERROR, "%s filter not present, cannot limit "
+        LOGE("%s filter not present, cannot limit "
                "recording time.\n", name);
         return AVERROR_FILTER_NOT_FOUND;
     }
@@ -406,7 +407,7 @@ static int insert_trim(int64_t start_time, int64_t duration,
                                 AV_OPT_SEARCH_CHILDREN);
     }
     if (ret < 0) {
-        av_log(ctx, AV_LOG_ERROR, "Error configuring the %s filter", name);
+        LOGE("Error configuring the %s filter", name);
         return ret;
     }
 
@@ -562,7 +563,7 @@ static int configure_output_audio_filter(FilterGraph *fg, OutputFilter *ofilter,
 #define AUTO_INSERT_FILTER(opt_name, filter_name, arg) do {                 \
     AVFilterContext *filt_ctx;                                              \
                                                                             \
-    av_log(NULL, AV_LOG_INFO, opt_name " is forwarded to lavfi "            \
+    LOGI(opt_name " is forwarded to lavfi "            \
            "similarly to -af " filter_name "=%s.\n", arg);                  \
                                                                             \
     ret = avfilter_graph_create_filter(&filt_ctx,                           \
@@ -670,7 +671,7 @@ static int configure_output_audio_filter(FilterGraph *fg, OutputFilter *ofilter,
 int configure_output_filter(FilterGraph *fg, OutputFilter *ofilter, AVFilterInOut *out)
 {
     if (!ofilter->ost) {
-        av_log(NULL, AV_LOG_FATAL, "Filter %s has an unconnected output\n", ofilter->name);
+        LOGE("Filter %s has an unconnected output\n", ofilter->name);
         exit_program(1);
     }
 
@@ -689,7 +690,7 @@ void check_filter_outputs(void)
         for (n = 0; n < filtergraphs[i]->nb_outputs; n++) {
             OutputFilter *output = filtergraphs[i]->outputs[n];
             if (!output->ost) {
-                av_log(NULL, AV_LOG_FATAL, "Filter %s has an unconnected output\n", output->name);
+                LOGE("Filter %s has an unconnected output\n", output->name);
                 exit_program(1);
             }
         }
@@ -717,7 +718,7 @@ static int sub2video_prepare(InputStream *ist, InputFilter *ifilter)
             w = FFMAX(w, 720);
             h = FFMAX(h, 576);
         }
-        av_log(avf, AV_LOG_INFO, "sub2video: using %dx%d canvas\n", w, h);
+        LOGI("sub2video: using %dx%d canvas\n", w, h);
     }
     ist->sub2video.w = ifilter->width  = w;
     ist->sub2video.h = ifilter->height = h;
@@ -759,7 +760,7 @@ static int configure_input_video_filter(FilterGraph *fg, InputFilter *ifilter,
     par->format = AV_PIX_FMT_NONE;
 
     if (ist->dec_ctx->codec_type == AVMEDIA_TYPE_AUDIO) {
-        av_log(NULL, AV_LOG_ERROR, "Cannot connect video filter to audio input\n");
+        LOGE("Cannot connect video filter to audio input\n");
         ret = AVERROR(EINVAL);
         goto fail;
     }
@@ -872,7 +873,7 @@ static int configure_input_audio_filter(FilterGraph *fg, InputFilter *ifilter,
     int64_t tsoffset = 0;
 
     if (ist->dec_ctx->codec_type != AVMEDIA_TYPE_AUDIO) {
-        av_log(NULL, AV_LOG_ERROR, "Cannot connect audio filter to non audio input\n");
+        LOGE("Cannot connect audio filter to non audio input\n");
         return AVERROR(EINVAL);
     }
 
@@ -898,7 +899,7 @@ static int configure_input_audio_filter(FilterGraph *fg, InputFilter *ifilter,
 #define AUTO_INSERT_FILTER_INPUT(opt_name, filter_name, arg) do {                 \
     AVFilterContext *filt_ctx;                                              \
                                                                             \
-    av_log(NULL, AV_LOG_INFO, opt_name " is forwarded to lavfi "            \
+    LOGI(opt_name " is forwarded to lavfi "            \
            "similarly to -af " filter_name "=%s.\n", arg);                  \
                                                                             \
     snprintf(name, sizeof(name), "graph_%d_%s_in_%d_%d",      \
@@ -943,7 +944,7 @@ static int configure_input_audio_filter(FilterGraph *fg, InputFilter *ifilter,
     if (audio_volume != 256) {
         char args[256];
 
-        av_log(NULL, AV_LOG_WARNING, "-vol has been deprecated. Use the volume "
+        LOGW("-vol has been deprecated. Use the volume "
                "audio filter instead.\n");
 
         snprintf(args, sizeof(args), "%f", audio_volume / 256.);
@@ -973,7 +974,7 @@ static int configure_input_filter(FilterGraph *fg, InputFilter *ifilter,
                                   AVFilterInOut *in)
 {
     if (!ifilter->ist->dec) {
-        av_log(NULL, AV_LOG_ERROR,
+        LOGE(
                "No decoder for stream #%d:%d, filtering impossible\n",
                ifilter->ist->file_index, ifilter->ist->st->index);
         return AVERROR_DECODER_NOT_FOUND;
@@ -1078,7 +1079,7 @@ int configure_filtergraph(FilterGraph *fg)
         } else {
             num_inputs = "1";
         }
-        av_log(NULL, AV_LOG_ERROR, "Simple filtergraph '%s' was expected "
+        LOGE("Simple filtergraph '%s' was expected "
                "to have exactly 1 input and 1 output."
                " However, it had %s input(s) and %s output(s)."
                " Please adjust, or use a complex filtergraph (-filter_complex) instead.\n",
@@ -1124,7 +1125,7 @@ int configure_filtergraph(FilterGraph *fg)
         if (!ost->enc) {
             /* identical to the same check in ffmpeg.c, needed because
                complex filter graphs are initialized earlier */
-            av_log(NULL, AV_LOG_ERROR, "Encoder (codec %s) not found for output stream #%d:%d\n",
+            LOGE("Encoder (codec %s) not found for output stream #%d:%d\n",
                      avcodec_get_name(ost->st->codecpar->codec_id), ost->file_index, ost->index);
             ret = AVERROR(EINVAL);
             goto fail;

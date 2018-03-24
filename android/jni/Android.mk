@@ -15,18 +15,37 @@ include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := mobileffmpeg
-LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg.cpp $(MY_PATH)/cmdutils.c $(MY_PATH)/ffmpeg.c $(MY_PATH)/ffmpeg_opt.c $(MY_PATH)/ffmpeg_hw.c $(MY_PATH)/ffmpeg_filter.c
-LOCAL_CFLAGS := -I$(NDK_ROOT)/prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
+LOCAL_MODULE := abidetect
+LOCAL_SRC_FILES := $(MY_PATH)/abidetect.cpp
+LOCAL_CFLAGS := -Wall -Wextra -Werror -I$(NDK_ROOT)/prebuilt/android-$(TARGET_ARCH)/ffmpeg/include -I$(NDK_ROOT)/sources/android/cpufeatures
 LOCAL_LDLIBS := -llog -lz -landroid
-LOCAL_SHARED_LIBRARIES := cpufeatures libavfilter libavformat libavcodec libavutil libswresample libavdevice
+LOCAL_SHARED_LIBRARIES := cpufeatures
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
-    LOCAL_SHARED_LIBRARIES += libavfilter-neon libavformat-neon libavcodec-neon libavutil-neon libswresample-neon libavdevice-neon
     LOCAL_ARM_NEON := true
 endif
 include $(BUILD_SHARED_LIBRARY)
 
-$(call import-module, ffmpeg)
+include $(CLEAR_VARS)
+LOCAL_ARM_MODE := $(MY_ARM_MODE)
+LOCAL_MODULE := mobileffmpeg
+LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg.cpp $(MY_PATH)/cmdutils.c $(MY_PATH)/ffmpeg.c $(MY_PATH)/ffmpeg_opt.c $(MY_PATH)/ffmpeg_hw.c $(MY_PATH)/ffmpeg_filter.c
+LOCAL_CFLAGS := -I$(NDK_ROOT)/prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
+LOCAL_LDLIBS := -llog -lz -landroid
+LOCAL_SHARED_LIBRARIES := libavfilter libavformat libavcodec libavutil libswresample libavdevice
+include $(BUILD_SHARED_LIBRARY)
+
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+    include $(CLEAR_VARS)
+    LOCAL_ARM_MODE := $(MY_ARM_MODE)
+    LOCAL_MODULE := mobileffmpeg-armv7a-neon
+    LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg.cpp $(MY_PATH)/cmdutils.c $(MY_PATH)/ffmpeg.c $(MY_PATH)/ffmpeg_opt.c $(MY_PATH)/ffmpeg_hw.c $(MY_PATH)/ffmpeg_filter.c
+    LOCAL_CFLAGS := -I$(NDK_ROOT)/prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
+    LOCAL_LDLIBS := -llog -lz -landroid
+    LOCAL_SHARED_LIBRARIES := libavfilter-neon libavformat libavcodec libavutil libswresample libavdevice
+    LOCAL_ARM_NEON := true
+    include $(BUILD_SHARED_LIBRARY)
+
     $(call import-module, ffmpeg/neon)
 endif
+
+$(call import-module, ffmpeg)
