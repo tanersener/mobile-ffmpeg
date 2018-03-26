@@ -21,6 +21,7 @@
 #define MOBILEFFMPEG_H
 
 #include <string>
+#include <vector>
 #include <jni.h>
 #include <android/log.h>
 

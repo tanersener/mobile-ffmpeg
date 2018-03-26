@@ -29,6 +29,7 @@
  * - av_log calls replaced with LOGX
  * - main() function renamed as execute()
  * - TRY/CATCH implemented inside execute
+ * - cleanup() method added
  */
 
 #include "config.h"
@@ -4768,6 +4769,30 @@ static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 {
 }
 
+void cleanup() {
+    run_as_daemon  = 0;
+    nb_frames_dup = 0;
+    dup_warning = 1000;
+    nb_frames_drop = 0;
+
+    want_sdp = 1;
+
+    progress_avio = NULL;
+
+    input_streams = NULL;
+    nb_input_streams = 0;
+    input_files = NULL;
+    nb_input_files = 0;
+
+    output_streams = NULL;
+    nb_output_streams = 0;
+    output_files = NULL;
+    nb_output_files = 0;
+
+    filtergraphs = NULL;
+    nb_filtergraphs = 0;
+}
+
 int execute(int argc, char **argv) {
     int i, ret;
     int64_t ti;
@@ -4847,8 +4872,13 @@ int execute(int argc, char **argv) {
         exit_program(received_nb_signals ? 255 : main_return_code);
 
     } CATCH {
+        // CATCHING EXIT REQUEST
+        // NOTHING TO LOG
     }
     ETRY;
+
+    // CLEANING STATIC VARIABLES
+    cleanup();
 
     return main_return_code;
 }

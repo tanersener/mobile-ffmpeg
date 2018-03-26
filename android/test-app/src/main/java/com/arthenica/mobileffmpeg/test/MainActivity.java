@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     public void runFFmpeg(View view) {
         EditText editText = findViewById(R.id.commandText);
         String command = editText.getText().toString();
-        int returnCode = FFmpeg.execute(command.split(" "));
+        String[] split = command.split(" ");
+        int returnCode = FFmpeg.execute(split);
         setResult((returnCode == 0)?"Success":"Process completed with rc=" + returnCode);
     }
 

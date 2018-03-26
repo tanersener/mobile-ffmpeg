@@ -32,7 +32,7 @@ extern "C" {
 
 static const char *className = "com/arthenica/mobileffmpeg/FFmpeg";
 
-static char *libName= "mobile-ffmpeg";
+static const char *libName= "mobile-ffmpeg";
 
 static JNINativeMethod methods[] = {
   {"getFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion},
@@ -87,26 +87,31 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIE
 JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv* env, jclass object, jobjectArray stringArray) {
     int stringCount = env->GetArrayLength(stringArray);
 
-    // PREPARE
-    char **argv = (char **)malloc(sizeof(char*) * (stringCount + 1));
-    argv[0] = (char *) malloc(strlen(libName) + 1);
-    strcpy(argv[0], libName);
+    // EXTRACT
+    std::vector<std::string> arguments;
+    arguments.push_back(std::string(libName));
     for (int i = 0; i < stringCount; i++) {
         jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
-        argv[i + 1] = (char*) env->GetStringUTFChars(string, 0);
+        const char* argument = env->GetStringUTFChars(string, 0);
+        if (strlen(argument) > 0) {
+            arguments.push_back(std::string(argument));
+        }
+        env->ReleaseStringUTFChars(string, argument);
         env->DeleteLocalRef(string);
+    }
+
+    // PREPARE
+    char **argv = (char **)malloc(sizeof(char*) * (arguments.size()));
+    int index = 0;
+    for (std::vector<std::string>::iterator it = arguments.begin() ; it != arguments.end(); it++, index++) {
+        argv[index] = (char *) it->c_str();
     }
 
     // RUN
-    int retCode = execute(stringCount + 1, argv);
+    int retCode = execute(stringCount, argv);
 
     // CLEANUP
-    for (int i = 0; i < stringCount; i++) {
-        jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
-        env->ReleaseStringUTFChars(string, argv[i + 1]);
-        env->DeleteLocalRef(string);
-    }
-    free(argv[0]);
+    arguments.clear();
     free(argv);
 
     return retCode;
