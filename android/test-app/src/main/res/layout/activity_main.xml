@@ -12,7 +12,7 @@
         android:id="@+id/commandText"
         android:layout_width="311dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="88dp"
+        android:layout_marginTop="36dp"
         android:ems="10"
         android:inputType="textPersonName"
         android:labelFor="@id/commandText"
@@ -22,28 +22,47 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/resultText"
-        android:layout_width="300dp"
-        android:layout_height="79dp"
-        android:layout_marginBottom="172dp"
+        android:id="@+id/statusText"
+        android:layout_width="306dp"
+        android:layout_height="54dp"
+        android:layout_marginBottom="268dp"
         android:ems="10"
         android:enabled="false"
         android:inputType="textMultiLine"
-        android:labelFor="@id/resultText"
+        android:labelFor="@id/statusText"
+        android:textAlignment="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/runButton"
-        android:layout_width="wrap_content"
+        android:layout_width="81dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:onClick="runFFmpeg"
         android:text="@string/run_button_text"
-        app:layout_constraintBottom_toTopOf="@+id/resultText"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/statusText"
+        app:layout_constraintEnd_toStartOf="@+id/asyncRunButton"
+        app:layout_constraintHorizontal_bias="0.605"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/commandText"
-        app:layout_constraintVertical_bias="0.541" />
+        app:layout_constraintVertical_bias="0.491" />
+
+    <Button
+        android:id="@+id/asyncRunButton"
+        android:layout_width="114dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="72dp"
+        android:layout_marginTop="8dp"
+        android:onClick="runFFmpegAsync"
+        android:text="@string/run_async_button_text"
+        app:layout_constraintBottom_toTopOf="@+id/statusText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/commandText"
+        app:layout_constraintVertical_bias="0.488" />
 
 </android.support.constraint.ConstraintLayout>
