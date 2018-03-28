@@ -3,3 +3,6 @@
 *.a
 *.pc
 /libswscale.version
+/libswscale.so
+/libswscale.so.4
+/libswscale.ver

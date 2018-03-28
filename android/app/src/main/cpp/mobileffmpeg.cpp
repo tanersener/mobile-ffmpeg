@@ -30,31 +30,28 @@ extern "C" {
 }
 #endif
 
-static const char *className = "com/arthenica/mobileffmpeg/FFmpeg";
-
-static const char *libName= "mobile-ffmpeg";
-
-static JNINativeMethod methods[] = {
+const char *ffmpegClassName = "com/arthenica/mobileffmpeg/FFmpeg";
+JNINativeMethod ffmpegMethods[] = {
   {"getFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion},
   {"getVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion},
-  {"execute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_execute},
+  {"execute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_execute}
 };
 
-jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+jint JNI_OnLoad(JavaVM* vm, void*) {
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-        LOGE("OnLoad failed to GetEnv for class %s.", className);
+        LOGE("OnLoad failed to GetEnv for class %s.", ffmpegClassName);
         return JNI_FALSE;
     }
 
-    jclass clazz = env->FindClass(className);
-    if (clazz == NULL) {
-        LOGE("OnLoad failed to FindClass %s", className);
+    jclass ffmpegClass = env->FindClass(ffmpegClassName);
+    if (ffmpegClass == NULL) {
+        LOGE("OnLoad failed to FindClass %s.", ffmpegClassName);
         return JNI_FALSE;
     }
 
-    if (env->RegisterNatives(clazz, methods, 3) < 0) {
-        LOGE("OnLoad failed to RegisterNatives for class %s", className);
+    if (env->RegisterNatives(ffmpegClass, ffmpegMethods, 3) < 0) {
+        LOGE("OnLoad failed to RegisterNatives for class %s.", ffmpegClassName);
         return JNI_FALSE;
     }
 
@@ -89,7 +86,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv* en
 
     // EXTRACT
     std::vector<std::string> arguments;
-    arguments.push_back(std::string(libName));
+    arguments.push_back(std::string(LIB_NAME));
     for (int i = 0; i < stringCount; i++) {
         jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
         const char* argument = env->GetStringUTFChars(string, 0);

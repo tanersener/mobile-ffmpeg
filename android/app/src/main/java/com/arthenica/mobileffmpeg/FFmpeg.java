@@ -41,6 +41,8 @@ public class FFmpeg {
     static {
         Abi abi = Abi.from(AbiDetect.getAbi());
 
+        Log.enableCollectingStdOutErr();
+
         /*
          * NEON supported arm-v7a library has a different name
          */
@@ -117,6 +119,7 @@ public class FFmpeg {
      */
     public static void shutdown() {
         asynchronousTaskService.shutdown();
+        Log.disableCollectingStdOutErr();
     }
 
 }

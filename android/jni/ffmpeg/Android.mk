@@ -38,3 +38,9 @@ LOCAL_ARM_MODE := $(MY_ARM_MODE)
 LOCAL_MODULE := libswresample
 LOCAL_SRC_FILES := $(MY_FFMPEG_LIB)/libswresample.so
 include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_ARM_MODE := $(MY_ARM_MODE)
+LOCAL_MODULE := libswscale
+LOCAL_SRC_FILES := $(MY_FFMPEG_LIB)/libswscale.so
+include $(PREBUILT_SHARED_LIBRARY)

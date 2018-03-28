@@ -84,9 +84,9 @@ static inline av_const int mid_pred(int a, int b, int c)
 #define SWS_BITEXACT          0x80000
 
 #ifdef DEBUG
-#   define ff_dlog(ctx, ...) LOGD(__VA_ARGS__)
+#   define ff_dlog(ctx, ...) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__)
 #else
-#   define ff_dlog(ctx, ...) do { if (0) LOGD(__VA_ARGS__); } while (0)
+#   define ff_dlog(ctx, ...) do { if (0) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__); } while (0)
 #endif
 
 #define VSYNC_AUTO       -1

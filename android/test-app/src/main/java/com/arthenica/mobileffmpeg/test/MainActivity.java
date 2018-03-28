@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
                 file.delete();
             }
 
-            String script = Slideshow.generate(getFilesDir(), image1, image2, image3, video);
+            String script = Slideshow.generateScript(getFilesDir(), image1, image2, image3, video);
             Log.d(TAG, script);
             FFmpeg.executeAsync(new Function<Integer, Void>() {
 

@@ -20,6 +20,10 @@
 #ifndef MOBILEFFMPEG_LOG_H
 #define MOBILEFFMPEG_LOG_H
 
+#include <stdio.h>
+#include <pthread.h>
+#include <unistd.h>
+#include <jni.h>
 #include <android/log.h>
 
 #define LIB_NAME "mobile-ffmpeg"
@@ -29,5 +33,19 @@
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LIB_NAME, __VA_ARGS__)
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LIB_NAME, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LIB_NAME, __VA_ARGS__)
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Log
+ * Method:    startNativeCollector
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_startNativeCollector(JNIEnv *, jobject);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Log
+ * Method:    stopNativeCollector
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_stopNativeCollector(JNIEnv *, jobject);
 
 #endif /* MOBILEFFMPEG_LOG_H */

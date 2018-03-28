@@ -20,27 +20,26 @@
 #include "cpu-features.h"
 #include "abidetect.h"
 
-static const char *className = "com/arthenica/mobileffmpeg/AbiDetect";
-
-static JNINativeMethod methods[] = {
+const char *abiDetectClassName = "com/arthenica/mobileffmpeg/AbiDetect";
+JNINativeMethod abiDetectMethods[] = {
   {"getAbi", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi}
 };
 
 jint JNI_OnLoad(JavaVM* vm, void*) {
     JNIEnv* env;
     if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-        LOGE("OnLoad failed to GetEnv for class %s.", className);
+        LOGE("OnLoad failed to GetEnv for class %s.", abiDetectClassName);
         return JNI_FALSE;
     }
 
-    jclass clazz = env->FindClass(className);
-    if (clazz == NULL) {
-        LOGE("OnLoad failed to FindClass %s", className);
+    jclass abiDetectClass = env->FindClass(abiDetectClassName);
+    if (abiDetectClass == NULL) {
+        LOGE("OnLoad failed to FindClass %s.", abiDetectClassName);
         return JNI_FALSE;
     }
 
-    if (env->RegisterNatives(clazz, methods, 1) < 0) {
-        LOGE("OnLoad failed to RegisterNatives for class %s", className);
+    if (env->RegisterNatives(abiDetectClass, abiDetectMethods, 1) < 0) {
+        LOGE("OnLoad failed to RegisterNatives for class %s.", abiDetectClassName);
         return JNI_FALSE;
     }
 
