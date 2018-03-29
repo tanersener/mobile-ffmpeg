@@ -24,6 +24,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -47,10 +49,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
-        commandText = findViewById(R.id.commandText);
-        statusText = findViewById(R.id.statusText);
+        final ViewPager viewPager = findViewById(R.id.pager);
+
+        final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), this, 2);
+        viewPager.setAdapter(adapter);
+
+        final TabLayout tabLayout = findViewById(R.id.tabLayout);
+        tabLayout.setupWithViewPager(viewPager);
+
+//        commandText = findViewById(R.id.commandText);
+//        statusText = findViewById(R.id.statusText);
         asyncStatus = null;
     }
 
@@ -83,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
                 if (asyncStatus != null) {
                     setStatus(asyncStatus);
                     handler.removeCallbacks(this);
+                } else {
+                    handler.postDelayed(this, 1000);
                 }
             }
         };
@@ -119,6 +132,8 @@ public class MainActivity extends AppCompatActivity {
                 if (asyncStatus != null) {
                     setStatus(asyncStatus);
                     handler.removeCallbacks(this);
+                } else {
+                    handler.postDelayed(this, 1000);
                 }
             }
         };
@@ -134,8 +149,6 @@ public class MainActivity extends AppCompatActivity {
                 file.delete();
             }
 
-            String script = Slideshow.generateScript(getFilesDir(), image1, image2, image3, video);
-            Log.d(TAG, script);
             FFmpeg.executeAsync(new Function<Integer, Void>() {
 
                 @Override
@@ -143,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
                     asyncStatus = (returnCode == 0)?"Success":"Async process completed with rc=" + returnCode;
                     return null;
                 }
-            }, script.split(" "));
+            }, Slideshow.generateScript(getFilesDir(), image1, image2, image3, video).split(" "));
         } catch (IOException e) {
             Log.e(TAG, "Creating slideshow failed", e);
             Toast.makeText(this, "", Toast.LENGTH_SHORT).show();

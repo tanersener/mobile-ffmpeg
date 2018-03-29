@@ -105,7 +105,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv* en
     }
 
     // RUN
-    int retCode = execute(stringCount, argv);
+    int retCode = execute(arguments.size(), argv);
 
     // CLEANUP
     arguments.clear();

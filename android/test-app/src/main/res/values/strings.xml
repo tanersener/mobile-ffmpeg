@@ -2,4 +2,7 @@
     <string name="app_name">MobileFFmpegTest</string>
     <string name="run_button_text">Run</string>
     <string name="run_async_button_text">Run Async</string>
+    <string name="button_create_slideshow_text">Create</string>
+    <string name="command_tab">Command</string>
+    <string name="slideshow_tab">Slideshow</string>
 </resources>
