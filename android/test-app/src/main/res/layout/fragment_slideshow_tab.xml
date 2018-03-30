@@ -7,18 +7,26 @@
     tools:context=".SlideshowTabFragment">
 
     <Button
-        android:id="@+id/createSlideshowButton"
+        android:id="@+id/slideshowCreateButton"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginEnd="130dp"
-        android:layout_marginStart="130dp"
-        android:layout_weight="1"
-        android:text="Create" />
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/button_create_slideshow_text" />
+
+    <Button
+        android:id="@+id/slideshowPlayButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="30dp"
+        android:text="@string/button_play_slideshow_text" />
 
     <VideoView
         android:id="@+id/videoView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="30dp"
-        android:layout_weight="1" />
+        android:layout_margin="30dp" />
 </LinearLayout>

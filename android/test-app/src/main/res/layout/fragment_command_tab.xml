@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,55 +9,40 @@
     <EditText
         android:id="@+id/commandText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="30dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:labelFor="@+id/runButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.506"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="40dp"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="30dp"
+        android:hint="@string/command_text_hint"
+        android:inputType="text" />
 
     <Button
         android:id="@+id/runButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
         android:layout_marginEnd="130dp"
         android:layout_marginStart="130dp"
-        android:text="@string/run_button_text"
-        app:layout_constraintBottom_toTopOf="@+id/statusText"
-        app:layout_constraintEnd_toStartOf="@+id/asyncRunButton"
-        app:layout_constraintHorizontal_bias="0.605"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/commandText"
-        app:layout_constraintVertical_bias="0.491" />
+        android:text="@string/run_button_text" />
 
     <Button
-        android:id="@+id/asyncRunButton"
+        android:id="@+id/runAsyncButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginEnd="100dp"
         android:layout_marginStart="100dp"
-        android:layout_marginTop="30dp"
-        android:text="@string/run_async_button_text"
-        app:layout_constraintBottom_toTopOf="@+id/statusText"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/commandText"
-        app:layout_constraintVertical_bias="0.488" />
+        android:text="@string/run_async_button_text" />
 
-    <EditText
-        android:id="@+id/statusText"
+    <TextView
+        android:id="@+id/logText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="30dp"
-        android:ems="10"
-        android:enabled="false"
-        android:inputType="textMultiLine"
-        android:labelFor="@+id/asyncRunButton"
-        android:textAlignment="center"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
+        android:layout_marginBottom="30dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
+        android:overScrollMode="ifContentScrolls"
+        android:scrollbars="vertical"
+        android:gravity="bottom"/>
 </LinearLayout>

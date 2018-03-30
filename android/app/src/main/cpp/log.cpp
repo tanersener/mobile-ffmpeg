@@ -48,7 +48,7 @@ jint JNI_OnLoad(JavaVM* vm, void*) {
         return JNI_FALSE;
     }
 
-    logMethod = jniEnv->GetStaticMethodID(clazz, "log", "(Ljava/lang/String;)V");
+    logMethod = jniEnv->GetStaticMethodID(clazz, "log", "([B)V");
     if (logMethod == NULL) {
         LOGE("OnLoad thread failed to GetMethodID for %s.", "log");
         globalVm->DetachCurrentThread();
@@ -66,8 +66,8 @@ jint JNI_OnLoad(JavaVM* vm, void*) {
 }
 
 static void *logThreadFunction(void*) {
-    ssize_t readSize;
-    char buffer[128];
+    int readSize;
+    char buffer[512];
 
     JNIEnv *jniEnv;
     jint getEnvRc = globalVm->GetEnv(reinterpret_cast<void**>(&jniEnv), JNI_VERSION_1_6);
@@ -85,16 +85,17 @@ static void *logThreadFunction(void*) {
 
     LOGI("Native log thread started.");
 
-    while(logThreadEnabled && ((readSize = read(pipeFd[0], buffer, sizeof(buffer) - 1)) > 0)) {
+    while(logThreadEnabled && ((readSize = (int)read(pipeFd[0], buffer, sizeof(buffer) - 1)) > 0)) {
         if (readSize > 0) {
             if (buffer[readSize - 1] == '\n') {
                 readSize--;
             }
             buffer[readSize] = 0;  /* add null-terminator */
 
-            jstring message = (jstring) jniEnv->NewStringUTF(buffer);
-            jniEnv->CallStaticVoidMethod(logClass, logMethod, message);
-            jniEnv->DeleteLocalRef(message);
+            jbyteArray byteArray = (jbyteArray) jniEnv->NewByteArray(readSize);
+            jniEnv->SetByteArrayRegion(byteArray, 0, readSize, (jbyte *)buffer);
+            jniEnv->CallStaticVoidMethod(logClass, logMethod, byteArray);
+            jniEnv->DeleteLocalRef(byteArray);
         }
     }
 

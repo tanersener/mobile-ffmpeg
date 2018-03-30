@@ -39,10 +39,10 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0: {
-                return new CommandTabFragment();
+                return CommandTabFragment.newInstance(context);
             }
             case 1: {
-                return new SlideshowTabFragment();
+                return SlideshowTabFragment.newInstance(context);
             }
             default: {
                 return null;

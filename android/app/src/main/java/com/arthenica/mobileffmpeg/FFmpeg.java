@@ -52,6 +52,8 @@ public class FFmpeg {
             System.loadLibrary("mobileffmpeg");
         }
 
+        android.util.Log.i(Log.TAG, "Loaded mobile-ffmpeg-" + abi.getValue() + "-" + getVersion());
+
         asynchronousTaskService = new AsynchronousTaskService();
     }
 

@@ -19,18 +19,15 @@
 
 package com.arthenica.mobileffmpeg;
 
+import android.arch.core.util.Function;
+
 public class Log {
 
     public static final String TAG = "mobile-ffmpeg";
 
-    protected static boolean enableCollectLogMode;
-
-    protected static StringBuilder collectedLog;
+    private static Function<byte[], Void> callbackFunction;
 
     static {
-        enableCollectLogMode = false;
-        collectedLog = new StringBuilder();
-
         System.loadLibrary("ffmpeglog");
     }
 
@@ -42,23 +39,15 @@ public class Log {
         stopNativeCollector();
     }
 
-    public static void enableCollectLogMode() {
-        enableCollectLogMode = true;
+    public static void enableCallbackFunction(final Function<byte[], Void> newCallbackFunction) {
+        callbackFunction = newCallbackFunction;
     }
 
-    public static void cleanCollectedLog() {
-        collectedLog = new StringBuilder();
-    }
-
-    public static String getCollectedLog() {
-        return collectedLog.toString();
-    }
-
-    public static void log(final String logMessage) {
-        if (enableCollectLogMode) {
-            collectedLog.append(logMessage);
+    public static void log(final byte[] logMessage) {
+        if (callbackFunction != null) {
+            callbackFunction.apply(logMessage);
         } else {
-            android.util.Log.d(TAG, logMessage);
+            android.util.Log.d(TAG, new String(logMessage));
         }
     }
 
