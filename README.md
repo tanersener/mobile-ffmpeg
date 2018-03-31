@@ -62,6 +62,10 @@ XCode is required to build IOS platform
 
 Use `android.sh` to build FFmpeg for Android. Visit [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) wiki page for all build options.
 
+### TODO
+
+Add sample image copyright info to WiKi
+
 ### LICENSE
 
 Files provided by this project are licensed under the LGPL v3.0.
