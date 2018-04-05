@@ -54,7 +54,7 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-mmap \
     --host=${TARGET_HOST} || exit 1
 
-make -j$(nproc) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_freetype_package_config "22.0.16"

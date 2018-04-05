@@ -262,7 +262,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-make -j$(nproc) 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
 if [ $? -ne 0 ]; then
     echo "failed"

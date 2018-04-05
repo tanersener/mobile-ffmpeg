@@ -1,5 +1,13 @@
 #!/bin/bash
 
+get_cpu_count() {
+    if [ "$(uname)" == "Darwin" ]; then
+        echo $(sysctl -n hw.physicalcpu)
+    else
+        echo $(nproc)
+    fi
+}
+
 get_library_name() {
     case $1 in
         0) echo "fontconfig" ;;

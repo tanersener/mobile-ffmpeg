@@ -73,7 +73,7 @@ cmake -Wno-dev \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_target_build ${ARCH}) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
-make -j$(nproc) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_libwebp_package_config "0.6.1"

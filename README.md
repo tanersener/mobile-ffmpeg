@@ -49,6 +49,7 @@ Supported libraries and their dependencies are explained in the [Supported Libra
 - cmake v3.9.x or later required by libwebp
 - gperf required by fontconfig
 - pkg-config required by freetype and ffmpeg
+- Command Line Tools, go to https://developer.apple.com/download/more/ MacOS
 
 #### Android
 
@@ -63,6 +64,7 @@ XCode is required to build IOS platform
 Use `android.sh` to build FFmpeg for Android. Visit [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) wiki page for all build options.
 
 ### TODO
+fix - fribidi,gnutls on Mac OS
 
 Add sample image copyright info to WiKi
 

@@ -51,7 +51,7 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-fast-install \
     --host=${TARGET_HOST} || exit 1
 
-make -j$(nproc) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # AUTO-GENERATED PKG-CONFIG FILE IS WRONG. CREATING IT MANUALLY
 create_uuid_package_config "1.0.3"
