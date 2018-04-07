@@ -125,12 +125,12 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 rm -rf ${INSTALL_BASE}/${library} || exit 1
             fi
 
-            SCRIPT_PATH="$BASEDIR/build/android-${library}.sh"
+            SCRIPT_PATH="${BASEDIR}/build/android-${library}.sh"
 
             cd ${BASEDIR}
 
             # BUILD EACH LIBRARY ALONE FIRST
-            ${SCRIPT_PATH} ${BASEDIR} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+            ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
             if [ $? -eq 0 ]; then
                 (( completed+=1 ))

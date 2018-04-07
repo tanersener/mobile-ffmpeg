@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [[ -z $1 ]]; then
-    echo "usage: $0 <enabled libraries list>"
-    exit 1
-fi
-
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     echo "ANDROID_NDK_ROOT not defined"
     exit 1
