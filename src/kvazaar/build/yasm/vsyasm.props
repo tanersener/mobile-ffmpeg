@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup
+    Condition="'$(YASMBeforeTargets)' == '' and '$(YASMAfterTargets)' == '' and '$(ConfigurationType)' != 'Makefile'">
+    <YASMBeforeTargets>Midl</YASMBeforeTargets>
+    <YASMAfterTargets>CustomBuild</YASMAfterTargets>
+  </PropertyGroup>
+  <PropertyGroup>
+    <YASMDependsOn
+      Condition="'$(ConfigurationType)' != 'Makefile'">_SelectedFiles;$(YASMDependsOn)</YASMDependsOn>
+  </PropertyGroup>
+  <!-- Object format name for vsyasm must be in lower case. -->
+  <PropertyGroup Condition="'$(Platform)' == 'Win32'">
+    <YASMFormat>win32</YASMFormat>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
+    <YASMFormat>win64</YASMFormat>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <YASM>
+      <Debug>False</Debug>
+      <ObjectFile>$(IntDir)</ObjectFile>
+      <PreProc>0</PreProc>
+      <Parser>0</Parser>
+      <CommandLineTemplate>vsyasm.exe -Xvc -f $(YASMFormat) [AllOptions] [AdditionalOptions] [Inputs]</CommandLineTemplate>
+      <Outputs>%(ObjectFile)</Outputs>
+      <ExecutionDescription>Assembling %(Filename)%(Extension)</ExecutionDescription>
+      <ShowOnlyRuleProperties>false</ShowOnlyRuleProperties>
+    </YASM>
+  </ItemDefinitionGroup>
+</Project>

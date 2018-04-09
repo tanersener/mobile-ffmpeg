@@ -74,7 +74,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..26}
+for library in {1..27}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -106,6 +106,11 @@ do
                 CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags gnutls)"
                 LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static gnutls)"
                 CONFIGURE_POSTFIX+=" --enable-gnutls"
+            ;;
+            kvazaar)
+                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags kvazaar)"
+                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static kvazaar)"
+                CONFIGURE_POSTFIX+=" --enable-libkvazaar"
             ;;
             lame)
                 CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libmp3lame)"
@@ -199,7 +204,7 @@ do
             ;;
         esac
     else
-        if [[ ${library} -eq 25 ]]; then
+        if [[ ${library} -eq 26 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi

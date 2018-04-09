@@ -1,0 +1,426 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Control">
+      <UniqueIdentifier>{c7f0ebb9-e5c1-479d-bb12-c2403f551ae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Bitstream">
+      <UniqueIdentifier>{2d160ce0-596b-4f8c-ae61-1ddd5ccbe1ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Compression">
+      <UniqueIdentifier>{871a51e7-0a11-4870-ad93-0809af9a2412}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reconstruction">
+      <UniqueIdentifier>{8a1eee84-49e9-4e2d-9681-a23a774cdb18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Optimization">
+      <UniqueIdentifier>{1dce39e5-50a3-4cd7-adfa-6d382446debd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Optimization\strategies">
+      <UniqueIdentifier>{aa218f1d-2e13-425d-80a7-3f4d74076c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Optimization\strategies\generic">
+      <UniqueIdentifier>{e4e77a4f-e708-4b11-9ba7-9d2b746e3f5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Optimization\strategies\sse2">
+      <UniqueIdentifier>{0c7b7451-4b19-443f-b51c-588e63bb4c93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Optimization\strategies\sse41">
+      <UniqueIdentifier>{2b47e32d-3fee-4a34-a4cb-8453b769b1b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Optimization\strategies\altivec">
+      <UniqueIdentifier>{770e42cd-56bc-4377-af83-c14872722ed2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Optimization\strategies\avx2">
+      <UniqueIdentifier>{4ffb5d27-c5bb-44d5-a935-fa93066a259e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Optimization\strategies\x86_asm">
+      <UniqueIdentifier>{d0ce7d00-30c6-4e8a-b96e-51e13cb038ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CABAC">
+      <UniqueIdentifier>{c696e039-5ba4-48ab-845d-cfe1a5713525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Extras">
+      <UniqueIdentifier>{7b258ce6-90d8-4e47-ab43-babda9eefbd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data structures">
+      <UniqueIdentifier>{f4560af3-b3b4-47b4-b401-908f2d279847}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Threading">
+      <UniqueIdentifier>{63c21cb2-b379-4d38-bcb8-173786c2466d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\strategies\strategies-nal.c">
+      <Filter>Optimization\strategies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\strategies-picture.c">
+      <Filter>Optimization\strategies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\nal-generic.c">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\picture-generic.c">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\altivec\picture-altivec.c">
+      <Filter>Optimization\strategies\altivec</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\sse41\picture-sse41.c">
+      <Filter>Optimization\strategies\sse41</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\sse2\picture-sse2.c">
+      <Filter>Optimization\strategies\sse2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\picture-avx2.c">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\x86_asm\picture-x86-asm.c">
+      <Filter>Optimization\strategies\x86_asm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\dct-avx2.c">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\dct-generic.c">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\strategies-dct.c">
+      <Filter>Optimization\strategies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\strategies-ipol.c">
+      <Filter>Optimization\strategies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\ipol-avx2.c">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\ipol-generic.c">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\strategies-quant.c">
+      <Filter>Optimization\strategies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\quant-generic.c">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\quant-avx2.c">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\strategies-intra.c">
+      <Filter>Optimization\strategies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\intra-generic.c">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\intra-avx2.c">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\search.c">
+      <Filter>Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\search_inter.c">
+      <Filter>Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\search_intra.c">
+      <Filter>Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\encoderstate.c">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\encoder.c">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\encoder_state-ctors_dtors.c">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\encoder_state-geometry.c">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cabac.c">
+      <Filter>CABAC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\context.c">
+      <Filter>CABAC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\bitstream.c">
+      <Filter>CABAC</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cfg.c">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\filter.c">
+      <Filter>Reconstruction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extras\getopt.c">
+      <Filter>Extras</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\videoframe.c">
+      <Filter>Data structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cu.c">
+      <Filter>Data structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\image.c">
+      <Filter>Data structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imagelist.c">
+      <Filter>Data structures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rdo.c">
+      <Filter>Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\inter.c">
+      <Filter>Reconstruction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\intra.c">
+      <Filter>Reconstruction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\kvazaar.c">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\input_frame_buffer.c">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\nal.c">
+      <Filter>Bitstream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rate_control.c">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sao.c">
+      <Filter>Reconstruction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategyselector.c">
+      <Filter>Optimization</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\transform.c">
+      <Filter>Reconstruction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tables.c">
+      <Filter>Reconstruction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\scalinglist.c">
+      <Filter>Reconstruction</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\threadqueue.c">
+      <Filter>Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\encoder_state-bitstream.c">
+      <Filter>Bitstream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\encode_coding_tree.c">
+      <Filter>Bitstream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\strategies-sao.c">
+      <Filter>Optimization\strategies</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\sao-generic.c">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\sao-avx2.c">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extras\libmd5.c" />
+    <ClCompile Include="..\..\src\extras\crypto.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\bitstream.h">
+      <Filter>CABAC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\cabac.h">
+      <Filter>CABAC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\context.h">
+      <Filter>CABAC</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\cfg.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\encoder.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\encoder_state-ctors_dtors.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\encoder_state-geometry.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\encoderstate.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\input_frame_buffer.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\rate_control.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\threads.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\threadqueue.h">
+      <Filter>Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\kvazaar.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\kvazaar_internal.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\videoframe.h">
+      <Filter>Data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\cu.h">
+      <Filter>Data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\image.h">
+      <Filter>Data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imagelist.h">
+      <Filter>Data structures</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extras\getopt.h">
+      <Filter>Extras</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\filter.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\inter.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\intra.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sao.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scalinglist.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\tables.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\transform.h">
+      <Filter>Reconstruction</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\global.h" />
+    <ClInclude Include="..\..\src\checkpoint.h" />
+    <ClInclude Include="..\..\src\strategyselector.h">
+      <Filter>Optimization</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\search_intra.h">
+      <Filter>Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\search.h">
+      <Filter>Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\search_inter.h">
+      <Filter>Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\nal.h">
+      <Filter>Bitstream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\rdo.h">
+      <Filter>Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\strategies-common.h">
+      <Filter>Optimization\strategies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\strategies-dct.h">
+      <Filter>Optimization\strategies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\strategies-intra.h">
+      <Filter>Optimization\strategies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\strategies-ipol.h">
+      <Filter>Optimization\strategies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\strategies-nal.h">
+      <Filter>Optimization\strategies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\strategies-picture.h">
+      <Filter>Optimization\strategies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\strategies-quant.h">
+      <Filter>Optimization\strategies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\x86_asm\picture-x86-asm.h">
+      <Filter>Optimization\strategies\x86_asm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\x86_asm\picture-x86-asm-sad.h">
+      <Filter>Optimization\strategies\x86_asm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\x86_asm\picture-x86-asm-satd.h">
+      <Filter>Optimization\strategies\x86_asm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\sse41\picture-sse41.h">
+      <Filter>Optimization\strategies\sse41</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\sse2\picture-sse2.h">
+      <Filter>Optimization\strategies\sse2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\generic\dct-generic.h">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\generic\intra-generic.h">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\generic\ipol-generic.h">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\generic\nal-generic.h">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\generic\picture-generic.h">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\generic\quant-generic.h">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\avx2\dct-avx2.h">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\avx2\intra-avx2.h">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\avx2\ipol-avx2.h">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\avx2\picture-avx2.h">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\avx2\quant-avx2.h">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\altivec\picture-altivec.h">
+      <Filter>Optimization\strategies\altivec</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\encoder_state-bitstream.h">
+      <Filter>Bitstream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\encode_coding_tree.h">
+      <Filter>Bitstream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\kvz_math.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-sao.h">
+      <Filter>Optimization\strategies</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\generic\sao-generic.h">
+      <Filter>Optimization\strategies\generic</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strategies\avx2\sao-avx2.h">
+      <Filter>Optimization\strategies\avx2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extras\libmd5.h" />
+    <ClInclude Include="..\..\src\extras\crypto.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <YASM Include="..\..\src\extras\x86inc.asm">
+      <Filter>Extras</Filter>
+    </YASM>
+    <YASM Include="..\..\src\strategies\x86_asm\picture-x86-asm-sad.asm">
+      <Filter>Optimization\strategies\x86_asm</Filter>
+    </YASM>
+    <YASM Include="..\..\src\strategies\x86_asm\picture-x86-asm-satd.asm">
+      <Filter>Optimization\strategies\x86_asm</Filter>
+    </YASM>
+  </ItemGroup>
+</Project>

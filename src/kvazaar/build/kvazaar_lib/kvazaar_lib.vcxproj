@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EEA3BDD1-8A08-41C1-BA57-E05D5C2CD8FF}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>kvazaar_lib</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Project="..\yasm\vsyasm.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\C_Properties.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="..\C_Properties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\C_Properties.props" />
+    <Import Project="..\Release_Optimizations.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="..\C_Properties.props" />
+    <Import Project="..\Release_Optimizations.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)-$(Configuration)-libs\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)$(Platform)-$(Configuration)-libs\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Platform)-$(Configuration)-libs\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)-$(Configuration)-libs\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <YASM />
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\pthreads.2\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pthreadVC2.lib</AdditionalDependencies>
+    </Lib>
+    <YASM>
+      <Defines>ARCH_X86_64=1;%(Defines)</Defines>
+    </YASM>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <YASM>
+      <Defines>ARCH_X86_64=0;PREFIX</Defines>
+    </YASM>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\pthreads.2\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pthreadVC2.lib</AdditionalDependencies>
+    </Lib>
+    <ClCompile>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <YASM>
+      <Defines>ARCH_X86_64=0;PREFIX</Defines>
+    </YASM>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\pthreads.2\lib\x86</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pthreadVC2.lib</AdditionalDependencies>
+    </Lib>
+    <ClCompile>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <YASM>
+      <Defines>ARCH_X86_64=1;%(Defines)</Defines>
+    </YASM>
+    <Lib>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\..\pthreads.2\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>pthreadVC2.lib</AdditionalDependencies>
+    </Lib>
+    <ClCompile>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\extras\crypto.cpp" />
+    <ClCompile Include="..\..\src\extras\libmd5.c" />
+    <ClCompile Include="..\..\src\input_frame_buffer.c" />
+    <ClCompile Include="..\..\src\kvazaar.c" />
+    <ClCompile Include="..\..\src\bitstream.c" />
+    <ClCompile Include="..\..\src\cabac.c" />
+    <ClCompile Include="..\..\src\cfg.c" />
+    <ClCompile Include="..\..\src\context.c" />
+    <ClCompile Include="..\..\src\cu.c" />
+    <ClCompile Include="..\..\src\encoder.c" />
+    <ClCompile Include="..\..\src\encoderstate.c" />
+    <ClCompile Include="..\..\src\encoder_state-bitstream.c" />
+    <ClCompile Include="..\..\src\encoder_state-ctors_dtors.c" />
+    <ClCompile Include="..\..\src\encoder_state-geometry.c" />
+    <ClCompile Include="..\..\src\encode_coding_tree.c" />
+    <ClCompile Include="..\..\src\extras\getopt.c" />
+    <ClCompile Include="..\..\src\filter.c" />
+    <ClCompile Include="..\..\src\image.c" />
+    <ClCompile Include="..\..\src\imagelist.c" />
+    <ClCompile Include="..\..\src\inter.c" />
+    <ClCompile Include="..\..\src\intra.c" />
+    <ClCompile Include="..\..\src\nal.c" />
+    <ClCompile Include="..\..\src\rate_control.c" />
+    <ClCompile Include="..\..\src\rdo.c" />
+    <ClCompile Include="..\..\src\sao.c" />
+    <ClCompile Include="..\..\src\scalinglist.c" />
+    <ClCompile Include="..\..\src\search.c" />
+    <ClCompile Include="..\..\src\search_inter.c" />
+    <ClCompile Include="..\..\src\search_intra.c" />
+    <ClCompile Include="..\..\src\strategies\avx2\intra-avx2.c">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\quant-avx2.c">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\sao-avx2.c">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\intra-generic.c" />
+    <ClCompile Include="..\..\src\strategies\generic\quant-generic.c" />
+    <ClCompile Include="..\..\src\strategies\generic\sao-generic.c" />
+    <ClCompile Include="..\..\src\strategies\strategies-intra.c" />
+    <ClCompile Include="..\..\src\strategies\strategies-quant.c" />
+    <ClInclude Include="..\..\src\checkpoint.h" />
+    <ClInclude Include="..\..\src\cu.h" />
+    <ClInclude Include="..\..\src\extras\crypto.h" />
+    <ClInclude Include="..\..\src\extras\libmd5.h" />
+    <ClInclude Include="..\..\src\image.h" />
+    <ClInclude Include="..\..\src\imagelist.h" />
+    <ClCompile Include="..\..\src\strategies\altivec\picture-altivec.c" />
+    <ClCompile Include="..\..\src\strategies\avx2\dct-avx2.c">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\ipol-avx2.c">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\avx2\picture-avx2.c">
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strategies\generic\dct-generic.c" />
+    <ClCompile Include="..\..\src\strategies\generic\ipol-generic.c" />
+    <ClCompile Include="..\..\src\strategies\generic\nal-generic.c" />
+    <ClCompile Include="..\..\src\strategies\generic\picture-generic.c" />
+    <ClCompile Include="..\..\src\strategies\sse2\picture-sse2.c" />
+    <ClCompile Include="..\..\src\strategies\sse41\picture-sse41.c" />
+    <ClCompile Include="..\..\src\strategies\strategies-dct.c" />
+    <ClCompile Include="..\..\src\strategies\strategies-ipol.c" />
+    <ClCompile Include="..\..\src\strategies\strategies-nal.c" />
+    <ClCompile Include="..\..\src\strategies\strategies-picture.c" />
+    <ClCompile Include="..\..\src\strategies\strategies-sao.c" />
+    <ClCompile Include="..\..\src\strategies\x86_asm\picture-x86-asm.c" />
+    <ClCompile Include="..\..\src\videoframe.c" />
+    <ClInclude Include="..\..\src\encoder_state-bitstream.h" />
+    <ClInclude Include="..\..\src\encoder_state-ctors_dtors.h" />
+    <ClInclude Include="..\..\src\encoder_state-geometry.h" />
+    <ClInclude Include="..\..\src\encode_coding_tree.h" />
+    <ClCompile Include="..\..\src\strategyselector.c" />
+    <ClCompile Include="..\..\src\tables.c" />
+    <ClCompile Include="..\..\src\threadqueue.c" />
+    <ClCompile Include="..\..\src\transform.c" />
+    <ClInclude Include="..\..\src\input_frame_buffer.h" />
+    <ClInclude Include="..\..\src\kvazaar_internal.h" />
+    <ClInclude Include="..\..\src\kvz_math.h" />
+    <ClInclude Include="..\..\src\search_inter.h" />
+    <ClInclude Include="..\..\src\search_intra.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\intra-avx2.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\sao-avx2.h" />
+    <ClInclude Include="..\..\src\strategies\generic\intra-generic.h" />
+    <ClInclude Include="..\..\src\strategies\generic\sao-generic.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-common.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\quant-avx2.h" />
+    <ClInclude Include="..\..\src\strategies\generic\quant-generic.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-intra.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-quant.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\bitstream.h" />
+    <ClInclude Include="..\..\src\cabac.h" />
+    <ClInclude Include="..\..\src\cfg.h" />
+    <ClInclude Include="..\..\src\context.h" />
+    <ClInclude Include="..\..\src\encoder.h" />
+    <ClInclude Include="..\..\src\encoderstate.h" />
+    <ClInclude Include="..\..\src\extras\getopt.h" />
+    <ClInclude Include="..\..\src\filter.h" />
+    <ClInclude Include="..\..\src\global.h" />
+    <ClInclude Include="..\..\src\inter.h" />
+    <ClInclude Include="..\..\src\intra.h" />
+    <ClInclude Include="..\..\src\kvazaar.h" />
+    <ClInclude Include="..\..\src\nal.h" />
+    <ClInclude Include="..\..\src\rate_control.h" />
+    <ClInclude Include="..\..\src\rdo.h" />
+    <ClInclude Include="..\..\src\sao.h" />
+    <ClInclude Include="..\..\src\scalinglist.h" />
+    <ClInclude Include="..\..\src\search.h" />
+    <ClInclude Include="..\..\src\strategies\altivec\picture-altivec.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\dct-avx2.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\ipol-avx2.h" />
+    <ClInclude Include="..\..\src\strategies\avx2\picture-avx2.h" />
+    <ClInclude Include="..\..\src\strategies\generic\dct-generic.h" />
+    <ClInclude Include="..\..\src\strategies\generic\ipol-generic.h" />
+    <ClInclude Include="..\..\src\strategies\generic\nal-generic.h" />
+    <ClInclude Include="..\..\src\strategies\generic\picture-generic.h" />
+    <ClInclude Include="..\..\src\strategies\sse2\picture-sse2.h" />
+    <ClInclude Include="..\..\src\strategies\sse41\picture-sse41.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-dct.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-ipol.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-nal.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-picture.h" />
+    <ClInclude Include="..\..\src\strategies\strategies-sao.h" />
+    <ClInclude Include="..\..\src\strategies\x86_asm\picture-x86-asm-sad.h" />
+    <ClInclude Include="..\..\src\strategies\x86_asm\picture-x86-asm-satd.h" />
+    <ClInclude Include="..\..\src\strategies\x86_asm\picture-x86-asm.h" />
+    <ClInclude Include="..\..\src\strategyselector.h" />
+    <ClInclude Include="..\..\src\tables.h" />
+    <ClInclude Include="..\..\src\threadqueue.h" />
+    <ClInclude Include="..\..\src\threads.h" />
+    <ClInclude Include="..\..\src\transform.h" />
+    <ClInclude Include="..\..\src\videoframe.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <YASM Include="..\..\src\extras\x86inc.asm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </YASM>
+    <YASM Include="..\..\src\strategies\x86_asm\picture-x86-asm-sad.asm" />
+    <YASM Include="..\..\src\strategies\x86_asm\picture-x86-asm-satd.asm" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\yasm\vsyasm.targets" />
+  </ImportGroup>
+</Project>

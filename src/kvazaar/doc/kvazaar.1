@@ -1,0 +1,301 @@
+.TH KVAZAAR "1" "November 2017" "kvazaar v1.2.0" "User Commands"
+.SH NAME
+kvazaar \- open source HEVC encoder
+.SH SYNOPSIS
+\fBkvazaar \fR\-i <input> \-\-input\-res <width>x<height> \-o <output>
+.SH DESCRIPTION
+.TP
+\fB\-i\fR, \fB\-\-input               
+Input file
+.TP
+\fB\-\-input\-res <res>     
+Input resolution [auto]
+auto: detect from file name
+<int>x<int>: width times height
+.TP
+\fB\-o\fR, \fB\-\-output              
+Output file
+
+.SS "Presets:"
+.TP
+\fB\-\-preset=<preset>     
+Set options to a preset [medium]
+    \- ultrafast, superfast, veryfast, faster,
+      fast, medium, slow, slower, veryslow
+      placebo
+
+.SS "Input:"
+.TP
+\fB\-n\fR, \fB\-\-frames <integer>    
+Number of frames to code [all]
+.TP
+\fB\-\-seek <integer>      
+First frame to code [0]
+.TP
+\fB\-\-input\-fps <num>/<denom>
+Framerate of the input video [25.0]
+.TP
+\fB\-\-source\-scan\-type <string>
+Set source scan type [progressive].
+    \- progressive: progressive scan
+    \- tff: top field first
+    \- bff: bottom field first
+.TP
+\fB\-\-input\-format        
+P420 or P400
+.TP
+\fB\-\-input\-bitdepth      
+8\-16
+.TP
+\fB\-\-loop\-input          
+Re\-read input file forever
+
+.SS "Options:"
+.TP
+\fB\-\-help                
+Print this help message and exit
+.TP
+\fB\-\-version             
+Print version information and exit
+.TP
+\fB\-\-aud                 
+Use access unit delimiters
+.TP
+\fB\-\-debug <string>      
+Output encoders reconstruction.
+.TP
+\fB\-\-cpuid <integer>     
+Disable runtime cpu optimizations with value 0.
+.TP
+\fB\-\-hash                
+Decoded picture hash [checksum]
+    \- none: 0 bytes
+    \- checksum: 18 bytes
+    \- md5: 56 bytes
+.TP
+\fB\-\-no\-psnr             
+Don't calculate PSNR for frames
+.TP
+\fB\-\-no\-info             
+Don't add encoder info SEI.
+
+.SS "Video structure:"
+.TP
+\fB\-q\fR, \fB\-\-qp <integer>        
+Quantization Parameter [32]
+.TP
+\fB\-p\fR, \fB\-\-period <integer>    
+Period of intra pictures [0]
+\- 0: only first picture is intra
+\- 1: all pictures are intra
+\- 2\-N: every Nth picture is intra
+.TP
+\fB\-\-vps\-period <integer>
+Specify how often the video parameter set is
+re\-sent. [0]
+    \- 0: only send VPS with the first frame
+    \- N: send VPS with every Nth intra frame
+.TP
+\fB\-r\fR, \fB\-\-ref <integer>       
+Reference frames, range 1..15 [3]
+.TP
+\fB\-\-gop <string>        
+Definition of GOP structure [0]
+    \- 0: disabled
+    \- 8: B\-frame pyramid of length 8
+    \- lp\-<string>: lp\-gop definition
+          (e.g. lp\-g8d4t2, see README)
+.TP
+\fB\-\-cqmfile <string>    
+Custom Quantization Matrices from a file
+.TP
+\fB\-\-bitrate <integer>   
+Target bitrate. [0]
+    \- 0: disable rate\-control
+    \- N: target N bits per second
+.TP
+\fB\-\-lossless            
+Use lossless coding
+.TP
+\fB\-\-mv\-constraint       
+Constrain movement vectors
+    \- none: no constraint
+    \- frametile: constrain within the tile
+    \- frametilemargin: constrain even more
+.TP
+\fB\-\-roi <string>        
+Use a delta QP map for region of interest
+    Read an array of delta QP values from
+    a file, where the first two values are the
+    width and height, followed by width*height
+    delta QP values in raster order.
+    The delta QP map can be any size or aspect
+    ratio, and will be mapped to LCU's.
+.TP
+\fB\-\-(no\-)erp\-aqp        
+Use adaptive QP for 360 video with
+equirectangular projection
+
+.SS "Compression tools:"
+.TP
+\fB\-\-deblock [<beta:tc>] 
+Deblocking
+      \- beta: between \-6 and 6
+      \- tc: between \-6 and 6
+.TP
+\fB\-\-(no\-)sao            
+Sample Adaptive Offset
+.TP
+\fB\-\-(no\-)rdoq           
+Rate\-Distortion Optimized Quantization
+.TP
+\fB\-\-(no\-)signhide       
+Sign Hiding
+.TP
+\fB\-\-(no\-)smp            
+Symmetric Motion Partition
+.TP
+\fB\-\-(no\-)amp            
+Asymmetric Motion Partition
+.TP
+\fB\-\-rd <integer>        
+Intra mode search complexity
+    \- 0: skip intra if inter is good enough
+    \- 1: rough intra mode search with SATD
+    \- 2: refine intra mode search with SSE
+.TP
+\fB\-\-(no\-)mv\-rdo         
+Rate\-Distortion Optimized motion vector costs
+.TP
+\fB\-\-(no\-)full\-intra\-search
+                            
+Try all intra modes during rough search.
+.TP
+\fB\-\-(no\-)transform\-skip 
+Transform skip
+.TP
+\fB\-\-me <string>         
+Integer motion estimation
+    \- hexbs: Hexagon Based Search
+    \- tz:    Test Zone Search
+    \- full:  Full Search
+    \- full8, full16, full32, full64
+.TP
+\fB\-\-subme <integer>     
+Set fractional pixel motion estimation level
+    \- 0: only integer motion estimation
+    \- 1: + 1/2\-pixel horizontal and vertical
+    \- 2: + 1/2\-pixel diagonal
+    \- 3: + 1/4\-pixel horizontal and vertical
+    \- 4: + 1/4\-pixel diagonal
+.TP
+\fB\-\-pu\-depth\-inter <int>\-<int>
+                            
+Range for sizes for inter predictions
+    \- 0, 1, 2, 3: from 64x64 to 8x8
+.TP
+\fB\-\-pu\-depth\-intra <int>\-<int>
+Range for sizes for intra predictions
+    \- 0, 1, 2, 3, 4: from 64x64 to 4x4
+.TP
+\fB\-\-(no\-)bipred         
+Bi\-prediction
+.TP
+\fB\-\-(no\-)cu\-split\-termination
+                            
+CU split search termination condition
+    \- off: Never terminate cu\-split search
+    \- zero: Terminate with zero residual
+.TP
+\fB\-\-(no\-)me\-early\-termination
+ME early termination condition
+    \- off: Don't terminate early
+    \- on: Terminate early
+    \- sensitive: Terminate even earlier
+.TP
+\fB\-\-(no\-)implicit\-rdpcm 
+Implicit residual DPCM
+Currently only supported with lossless coding.
+.TP
+\fB\-\-(no\-)tmvp           
+Temporal Motion Vector Prediction
+.TP
+\fB\-\-(no\-)rdoq\-skip      
+Skips RDOQ for 4x4 blocks
+
+.SS "Parallel processing:"
+.TP
+\fB\-\-threads <integer>   
+Number of threads to use [auto]
+    \- 0: process everything with main thread
+    \- N: use N threads for encoding
+    \- auto: select based on number of cores
+.TP
+\fB\-\-owf <integer>       
+Frame parallelism [auto]
+    \- N: Process N\-1 frames at a time
+    \- auto: Select automatically
+.TP
+\fB\-\-(no\-)wpp            
+Wavefront parallel processing [enabled]
+Enabling tiles automatically disables WPP.
+To enable WPP with tiles, re\-enable it after
+enabling tiles.
+.TP
+\fB\-\-tiles <int>x<int>   
+Split picture into width x height uniform tiles.
+.TP
+\fB\-\-tiles\-width\-split <string>|u<int>
+Specifies a comma separated list of pixel
+positions of tiles columns separation coordinates.
+Can also be u followed by and a single int n,
+in which case it produces columns of uniform width.
+.TP
+\fB\-\-tiles\-height\-split <string>|u<int>
+Specifies a comma separated list of pixel
+positions of tiles rows separation coordinates.
+Can also be u followed by and a single int n,
+in which case it produces rows of uniform height.
+.TP
+\fB\-\-slices <string>     
+Control how slices are used
+    \- tiles: put tiles in independent slices
+    \- wpp: put rows in dependent slices
+    \- tiles+wpp: do both
+
+.SS "Video Usability Information:"
+.TP
+\fB\-\-sar <width:height>  
+Specify Sample Aspect Ratio
+.TP
+\fB\-\-overscan <string>   
+Specify crop overscan setting [undef]
+    \- undef, show, crop
+.TP
+\fB\-\-videoformat <string>
+Specify video format [undef]
+    \- component, pal, ntsc, secam, mac, undef
+.TP
+\fB\-\-range <string>      
+Specify color range [tv]
+    \- tv, pc
+.TP
+\fB\-\-colorprim <string>  
+Specify color primaries [undef]
+    \- undef, bt709, bt470m, bt470bg,
+      smpte170m, smpte240m, film, bt2020
+.TP
+\fB\-\-transfer <string>   
+Specify transfer characteristics [undef]
+    \- undef, bt709, bt470m, bt470bg,
+      smpte170m, smpte240m, linear, log100,
+      log316, iec61966\-2\-4, bt1361e,
+      iec61966\-2\-1, bt2020\-10, bt2020\-12
+.TP
+\fB\-\-colormatrix <string>
+Specify color matrix setting [undef]
+    \- undef, bt709, fcc, bt470bg, smpte170m,
+      smpte240m, GBR, YCgCo, bt2020nc, bt2020c
+.TP
+\fB\-\-chromaloc <integer> 
+Specify chroma sample location (0 to 5) [0]

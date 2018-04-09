@@ -27,15 +27,16 @@ get_library_name() {
         14) echo "shine" ;;
         15) echo "speex" ;;
         16) echo "wavpack" ;;
-        17) echo "giflib" ;;
-        18) echo "jpeg" ;;
-        19) echo "libogg" ;;
-        20) echo "libpng" ;;
-        21) echo "libuuid" ;;
-        22) echo "nettle" ;;
-        23) echo "tiff" ;;
-        24) echo "android-zlib" ;;
-        25) echo "android-media-codec" ;;
+        17) echo "kvazaar" ;;
+        18) echo "giflib" ;;
+        19) echo "jpeg" ;;
+        20) echo "libogg" ;;
+        21) echo "libpng" ;;
+        22) echo "libuuid" ;;
+        23) echo "nettle" ;;
+        24) echo "tiff" ;;
+        25) echo "android-zlib" ;;
+        26) echo "android-media-codec" ;;
     esac
 }
 
@@ -183,6 +184,9 @@ get_app_specific_cflags() {
         ;;
         ffmpeg | shine)
             APP_FLAGS="-Wno-unused-function"
+        ;;
+        kvazaar)
+            APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
         *)
             APP_FLAGS="-std=c99 -Wno-unused-function"

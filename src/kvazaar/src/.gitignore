@@ -1,0 +1,8 @@
+/.libs/
+/.deps/
+*.o
+*.lo
+*.la
+/Makefile
+*.pc
+/kvazaar

@@ -1,10 +1,5 @@
 #!/bin/bash
 
-if [[ -z $1 ]]; then
-    echo "usage: $0 <enabled libraries list>"
-    exit 1
-fi
-
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     echo "ANDROID_NDK_ROOT not defined"
     exit 1
@@ -43,7 +38,7 @@ fi
 
 # BUILDING EXTERNAL LIBRARIES
 enabled_library_list=()
-for library in {1..24}
+for library in {1..25}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))

@@ -25,21 +25,22 @@ LIBRARY_OPENCOREAMR=13
 LIBRARY_SHINE=14
 LIBRARY_SPEEX=15
 LIBRARY_WAVPACK=16
-LIBRARY_GIFLIB=17
-LIBRARY_JPEG=18
-LIBRARY_LIBOGG=19
-LIBRARY_LIBPNG=20
-LIBRARY_LIBUUID=21
-LIBRARY_NETTLE=22
-LIBRARY_TIFF=23
-LIBRARY_ZLIB=24
-LIBRARY_MEDIA_CODEC=25
+LIBRARY_KVAZAAR=17
+LIBRARY_GIFLIB=18
+LIBRARY_JPEG=19
+LIBRARY_LIBOGG=20
+LIBRARY_LIBPNG=21
+LIBRARY_LIBUUID=22
+LIBRARY_NETTLE=23
+LIBRARY_TIFF=24
+LIBRARY_ZLIB=25
+LIBRARY_MEDIA_CODEC=26
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -92,6 +93,9 @@ display_help() {
 
     echo -e "  --enable-gmp\t\t\tbuild with gmp"
     echo -e "  --disable-gmp\t\t\tbuild without gmp\n"
+
+    echo -e "  --enable-kvazaar\t\tbuild with kvazaar"
+    echo -e "  --disable-kvazaar\t\tbuild without kvazaar\n"
 
     echo -e "  --enable-lame\t\t\tbuild with lame"
     echo -e "  --disable-lame\t\tbuild without lame\n"
@@ -167,6 +171,9 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
             set_library "gmp" $2
             set_library "libiconv" $2
+        ;;
+        kvazaar)
+            ENABLED_LIBRARIES[LIBRARY_KVAZAAR]=$2
         ;;
         lame)
             ENABLED_LIBRARIES[LIBRARY_LAME]=$2
@@ -293,7 +300,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {24..25}
+    for library in {25..26}
     do
         if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
             if [[ $enabled -ge 1 ]]; then
@@ -305,7 +312,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..16}
+    for library in {0..17}
     do
         if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
             if [[ $enabled -ge 1 ]]; then
@@ -346,7 +353,7 @@ do
             exit 0
 	    ;;
 	    --full)
-            for library in {0..25}
+            for library in {0..26}
             do
                 enabled_library_list+=($(get_library_name $library))
             done
@@ -409,7 +416,7 @@ do
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}"
 
         # CLEAR FLAGS
-        for library in {1..26}
+        for library in {1..27}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

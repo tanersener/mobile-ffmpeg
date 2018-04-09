@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{3CD1C68B-542C-46D8-9B8A-6C91C5A3F312}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>kvazaar_tests</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="..\C_Properties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="..\C_Properties.props" />
+    <Import Project="..\Release_Optimizations.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="..\C_Properties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="..\C_Properties.props" />
+    <Import Project="..\Release_Optimizations.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PostBuildEvent />
+    <ClCompile>
+      <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <PostBuildEvent>
+      <Command>$(TargetPath)</Command>
+    </PostBuildEvent>
+    <ClCompile>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <PostBuildEvent>
+      <Command>$(TargetPath)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PostBuildEvent>
+      <Command>$(TargetPath)</Command>
+    </PostBuildEvent>
+    <ClCompile>
+      <DisableSpecificWarnings>4127;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\kvazaar_lib\kvazaar_lib.vcxproj">
+      <Project>{eea3bdd1-8a08-41c1-ba57-e05d5c2cd8ff}</Project>
+      <Private>false</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\tests\coeff_sum_tests.c" />
+    <ClCompile Include="..\..\tests\dct_tests.c" />
+    <ClCompile Include="..\..\tests\test_strategies.c" />
+    <ClCompile Include="..\..\tests\intra_sad_tests.c" />
+    <ClCompile Include="..\..\tests\mv_cand_tests.c" />
+    <ClCompile Include="..\..\tests\sad_tests.c" />
+    <ClCompile Include="..\..\tests\satd_tests.c" />
+    <ClCompile Include="..\..\tests\speed_tests.c" />
+    <ClCompile Include="..\..\tests\tests_main.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\tests\test_strategies.h" />
+    <ClInclude Include="..\..\tests\sad_tests.h" />
+    <ClInclude Include="..\..\tests\satd_tests.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
