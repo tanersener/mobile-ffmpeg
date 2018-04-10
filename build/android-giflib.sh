@@ -38,7 +38,7 @@ cd ${BASEDIR}/src/giflib || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/giflib \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/giflib \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --enable-static \

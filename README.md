@@ -1,4 +1,4 @@
-# mobile-ffmpeg
+# MobileFFmpeg
 Source code and scripts to build FFmpeg for Android and IOS platform
 
 ### Features
@@ -15,9 +15,10 @@ Source code and scripts to build FFmpeg for Android and IOS platform
 - x86_64
 
 #### IOS
-- arm-v7
-- arm-v7s
-- arm64-v8a
+- armv7
+- armv7s
+- arm64
+- i386
 - x86_64
 
 ### FFmpeg Support
@@ -52,7 +53,7 @@ Supported libraries and their dependencies are explained in the [Supported Libra
 - pkg-config required by freetype and ffmpeg
 - export PATH=${PATH}:/usr/local/opt/gettext/bin by gnutls
 - libtool for gnutls on macOS
-- Command Line Tools, go to https://developer.apple.com/download/more/ MacOS
+- curl fos IOS
 
 #### Android
 
@@ -60,7 +61,7 @@ Android NDK is required to build Android platform
 
 #### IOS
 
-XCode is required to build IOS platform
+XCode is required to build IOS platform. Command Line Tools, go to https://developer.apple.com/download/more/ MacOS
 
 ### Usage
 

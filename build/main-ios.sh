@@ -1,17 +1,22 @@
 #!/bin/bash
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
-    exit 1
-fi
-
 if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
 
-if [[ -z ${API} ]]; then
-    echo "API not defined"
+if [[ -z ${IOS_MIN_VERSION} ]]; then
+    echo "IOS_MIN_VERSION not defined"
+    exit 1
+fi
+
+if [[ -z ${TARGET_SDK} ]]; then
+    echo "TARGET_SDK not defined"
+    exit 1
+fi
+
+if [[ -z ${SDK_PATH} ]]; then
+    echo "SDK_PATH not defined"
     exit 1
 fi
 
@@ -21,11 +26,11 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/android-common.sh
+. ${BASEDIR}/build/ios-common.sh
 
-echo -e "\nBuilding ${ARCH} platform on API level ${API}\n"
-echo -e "\nINFO: Starting new build for ${ARCH} on API level ${API} at "$(date)"\n">> ${BASEDIR}/build.log
-INSTALL_BASE="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)"
+echo -e "\nBuilding ${ARCH} platform for target ${TARGET_SDK}\n"
+echo -e "\nINFO: Starting new build for ${ARCH} on target ${TARGET_SDK} at "$(date)"\n">> ${BASEDIR}/build.log
+INSTALL_BASE="${BASEDIR}/prebuilt/ios-$(get_target_host)"
 
 # CLEANING EXISTING PACKAGE CONFIG DIRECTORY
 PKG_CONFIG_DIRECTORY="${INSTALL_BASE}/pkgconfig"
@@ -120,7 +125,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 rm -rf ${INSTALL_BASE}/${library} || exit 1
             fi
 
-            SCRIPT_PATH="${BASEDIR}/build/android-${library}.sh"
+            SCRIPT_PATH="${BASEDIR}/build/ios-${library}.sh"
 
             cd ${BASEDIR}
 
@@ -142,6 +147,6 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 done
 
 # BUILDING FFMPEG
-. ${BASEDIR}/build/android-ffmpeg.sh "$@"
+. ${BASEDIR}/build/ios-ffmpeg.sh "$@"
 
-echo -e "\nINFO: Completed build for ${ARCH} on API level ${API} at "$(date)"\n">> ${BASEDIR}/build.log
+echo -e "\nINFO: Completed build for ${ARCH} on target ${TARGET_SDK} at "$(date)"\n">> ${BASEDIR}/build.log

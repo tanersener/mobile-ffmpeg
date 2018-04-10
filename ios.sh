@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # ARCH INDEXES
-ARCH_ARM_V7A=0
-ARCH_ARM_V7A_NEON=1
-ARCH_ARM64_V8A=2
-ARCH_X86=3
+ARCH_ARMV7=0
+ARCH_ARMV7S=1
+ARCH_ARM64=2
+ARCH_I386=3
 ARCH_X86_64=4
 
 # LIBRARY INDEXES
@@ -33,26 +33,24 @@ LIBRARY_LIBPNG=21
 LIBRARY_LIBUUID=22
 LIBRARY_NETTLE=23
 LIBRARY_TIFF=24
-LIBRARY_ZLIB=25
-LIBRARY_MEDIA_CODEC=26
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
-# USING API LEVEL 21 / Android 5.0 (LOLLIPOP)
-export API=21
+# MIN VERSION IOS7
+export IOS_MIN_VERSION=7.0
 
 display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
-    echo -e "\n'"$COMMAND"' builds FFmpeg for Android platform. By default five Android ABIs (armeabi-v7a, armeabi-v7a-neon, arm64-v8a, x86 and x86_64) are built without any external libraries enabled. Options can be used to disable ABIs and/or enable external libraries.\n"
+    echo -e "\n'"$COMMAND"' builds FFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries.\n"
 
-    echo -e "Usage: ./"$COMMAND" [OPTION]...\n"   
+    echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
     echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
@@ -63,17 +61,15 @@ display_help() {
 
     echo -e "Platforms:"
 
-    echo -e "  --disable-arm-v7a\t\tdo not build arm-v7a platform"
-    echo -e "  --disable-arm-v7a-neon\tdo not build arm-v7a-neon platform"
-    echo -e "  --disable-arm64-v8a\t\tdo not build arm64-v8a platform"
-    echo -e "  --disable-x86\t\t\tdo not build x86 platform"
+    echo -e "  --disable-armv7\t\tdo not build armv7 platform"
+    echo -e "  --disable-armv7s\t\tdo not build armv7s platform"
+    echo -e "  --disable-arm64\t\tdo not build arm64 platform"
+    echo -e "  --disable-i386\t\tdo not build i386 platform"
     echo -e "  --disable-x86-64\t\tdo not build x86-64 platform\n"
 
     echo -e "Libraries:"
 
     echo -e "  --full\t\t\tenables all external libraries"
-    echo -e "  --enable-android-media-codec\tbuild with built-in media codec"
-    echo -e "  --enable-android-zlib\t\tbuild with built-in zlib"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig"
     echo -e "  --enable-freetype\t\tbuild with freetype"
     echo -e "  --enable-fribidi\t\tbuild with fribidi"
@@ -100,12 +96,6 @@ enable_library() {
 
 set_library() {
     case $1 in
-        android-media-codec)
-            ENABLED_LIBRARIES[LIBRARY_MEDIA_CODEC]=$2
-        ;;
-        android-zlib)
-            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
-        ;;
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
@@ -196,17 +186,17 @@ disable_arch() {
 
 set_arch() {
     case $1 in
-        arm-v7a)
-            ENABLED_ARCHITECTURES[ARCH_ARM_V7A]=$2
+        armv7)
+            ENABLED_ARCHITECTURES[ARCH_ARMV7]=$2
         ;;
-        arm-v7a-neon)
-            ENABLED_ARCHITECTURES[ARCH_ARM_V7A_NEON]=$2
+        armv7s)
+            ENABLED_ARCHITECTURES[ARCH_ARMV7S]=$2
         ;;
-        arm64-v8a)
-            ENABLED_ARCHITECTURES[ARCH_ARM64_V8A]=$2
+        arm64)
+            ENABLED_ARCHITECTURES[ARCH_ARM64]=$2
         ;;
-        x86)
-            ENABLED_ARCHITECTURES[ARCH_X86]=$2
+        i386)
+            ENABLED_ARCHITECTURES[ARCH_I386]=$2
         ;;
         x86-64)
             ENABLED_ARCHITECTURES[ARCH_X86_64]=$2
@@ -258,20 +248,6 @@ print_enabled_libraries() {
     echo -n "Libraries: "
 
     let enabled=0;
-
-    # FIRST BUILT-IN LIBRARIES
-    for library in {25..26}
-    do
-        if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
-            if [[ ${enabled} -ge 1 ]]; then
-                echo -n ", "
-            fi
-            echo -n $(get_library_name $library)
-            enabled=$((${enabled} + 1));
-        fi
-    done
-
-    # THEN EXTERNAL LIBRARIES
     for library in {0..17}
     do
         if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
@@ -291,7 +267,7 @@ print_enabled_libraries() {
 }
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/android-common.sh
+. ${BASEDIR}/build/ios-common.sh
 
 while [ ! $# -eq 0 ]
 do
@@ -302,7 +278,7 @@ do
             exit 0
 	    ;;
 	    --full)
-            for library in {0..26}
+            for library in {0..24}
             do
                 enable_library $(get_library_name $library)
             done
@@ -324,12 +300,7 @@ do
     shift
 done;
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
-    exit 1
-fi
-
-echo -e "Building mobile-ffmpeg for Android\n"
+echo -e "Building mobile-ffmpeg for IOS\n"
 
 print_enabled_architectures
 print_enabled_libraries
@@ -338,15 +309,13 @@ for run_arch in {0..4}
 do
     if [[ ENABLED_ARCHITECTURES[$run_arch] -eq 1 ]]; then
         export ARCH=$(get_arch_name $run_arch)
-        export TOOLCHAIN=$(get_toolchain)
-        export TOOLCHAIN_ARCH=$(get_toolchain_arch)
+        export TARGET_SDK=$(get_target_sdk $run_arch)
+        export SDK_PATH=$(get_sdk_path)
 
-        create_toolchain
-
-        . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}"
+        . ${BASEDIR}/build/main-ios.sh "${ENABLED_LIBRARIES[@]}"
 
         # CLEAR FLAGS
-        for library in {1..27}
+        for library in {1..25}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

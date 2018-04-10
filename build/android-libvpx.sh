@@ -48,7 +48,7 @@ case ${ARCH} in
         TARGET_CPU="arm64"
     ;;
     *)
-        TARGET_CPU="$(get_target_build ${ARCH})"
+        TARGET_CPU="$(get_target_build)"
     ;;
 esac
 
@@ -60,7 +60,7 @@ build_cpufeatures
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libvpx \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvpx \
     --target="${TARGET_CPU}-android-gcc" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \

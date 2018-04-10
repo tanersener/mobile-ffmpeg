@@ -1,17 +1,22 @@
 #!/bin/bash
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
-    exit 1
-fi
-
 if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
 
-if [[ -z ${API} ]]; then
-    echo "API not defined"
+if [[ -z ${IOS_MIN_VERSION} ]]; then
+    echo "IOS_MIN_VERSION not defined"
+    exit 1
+fi
+
+if [[ -z ${TARGET_SDK} ]]; then
+    echo "TARGET_SDK not defined"
+    exit 1
+fi
+
+if [[ -z ${SDK_PATH} ]]; then
+    echo "SDK_PATH not defined"
     exit 1
 fi
 
@@ -28,29 +33,26 @@ set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-export CFLAGS=$(get_cflags "libass")
-export CXXFLAGS=$(get_cxxflags "libass")
-export LDFLAGS=$(get_ldflags "libass")
-export PKG_CONFIG_PATH=${INSTALL_PKG_CONFIG_DIR}
+export CFLAGS=$(get_cflags "libogg")
+export CXXFLAGS=$(get_cxxflags "libogg")
+export LDFLAGS=$(get_ldflags "libogg")
 
-cd ${BASEDIR}/src/libass || exit 1
+cd ${BASEDIR}/src/libogg || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libass \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libogg \
     --with-pic \
+    --with-sysroot=${SDK_PATH} \
     --enable-static \
     --disable-shared \
-    --disable-harfbuzz \
     --disable-fast-install \
-    --disable-test \
-    --disable-profile \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp ./*.pc ${INSTALL_PKG_CONFIG_DIR}
+cp ogg.pc ${INSTALL_PKG_CONFIG_DIR}
 
 make install || exit 1

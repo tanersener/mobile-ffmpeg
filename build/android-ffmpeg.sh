@@ -221,7 +221,7 @@ make distclean 2>/dev/null 1>/dev/null
 ./configure \
     --cross-prefix="${TARGET_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
-    --prefix="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/ffmpeg" \
+    --prefix="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/ffmpeg" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
@@ -277,7 +277,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # MANUALLY ADD CONFIG HEADER
-cp -f ${BASEDIR}/src/ffmpeg/config.h ${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/ffmpeg/include
+cp -f ${BASEDIR}/src/ffmpeg/config.h ${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/ffmpeg/include
 
 if [ $? -eq 0 ]; then
     echo "ok"

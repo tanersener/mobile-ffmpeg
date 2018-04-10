@@ -35,116 +35,87 @@ get_library_name() {
         22) echo "libuuid" ;;
         23) echo "nettle" ;;
         24) echo "tiff" ;;
-        25) echo "android-zlib" ;;
-        26) echo "android-media-codec" ;;
     esac
 }
 
 get_arch_name() {
     case $1 in
-        0) echo "arm-v7a" ;;
-        1) echo "arm-v7a-neon" ;;
-        2) echo "arm64-v8a" ;;
-        3) echo "x86" ;;
+        0) echo "armv7" ;;
+        1) echo "armv7s" ;;
+        2) echo "arm64" ;;
+        3) echo "i386" ;;
         4) echo "x86-64" ;;
     esac
 }
 
 get_target_host() {
-    case ${ARCH} in
-        arm-v7a | arm-v7a-neon)
-            echo "arm-linux-androideabi"
-        ;;
-        arm64-v8a)
-            echo "aarch64-linux-android"
-        ;;
-        x86)
-            echo "i686-linux-android"
-        ;;
-        x86-64)
-            echo "x86_64-linux-android"
-        ;;
-    esac
+    echo "$(get_target_arch)-apple-darwin"
 }
 
-get_toolchain() {
+get_target_arch() {
     case ${ARCH} in
-        arm-v7a | arm-v7a-neon)
-            echo "arm"
+        armv7 | armv7s | i386)
+            echo "${ARCH}"
         ;;
-        arm64-v8a)
+        arm64)
             echo "aarch64"
         ;;
-        x86)
-            echo "i686"
-        ;;
         x86-64)
             echo "x86_64"
         ;;
     esac
 }
 
-get_target_build() {
+get_target_sdk() {
+    echo "-target $(get_target_arch)-apple-ios${IOS_MIN_VERSION}"
+}
+
+get_sdk_name() {
     case ${ARCH} in
-        arm-v7a)
-            echo "arm"
+        armv7 | armv7s | arm64)
+            echo "iphoneos"
         ;;
-        arm-v7a-neon)
-            echo "arm/neon"
-        ;;
-        arm64-v8a)
-            echo "arm64"
-        ;;
-        x86)
-            echo "x86"
-        ;;
-        x86-64)
-            echo "x86_64"
+        i386 | x86-64)
+            echo "iphonesimulator"
         ;;
     esac
 }
 
-get_toolchain_arch() {
+get_sdk_path() {
+    echo "$(xcrun --sdk $(get_sdk_name) --show-sdk-path)"
+}
+
+get_min_version_cflags() {
     case ${ARCH} in
-        arm-v7a | arm-v7a-neon)
-            echo "arm"
+        armv7 | armv7s | arm64)
+            echo "-miphoneos-version-min=${IOS_MIN_VERSION}"
         ;;
-        arm64-v8a)
-            echo "arm64"
-        ;;
-        x86)
-            echo "x86"
-        ;;
-        x86-64)
-            echo "x86_64"
+        i386 | x86-64)
+            echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
         ;;
     esac
-}
-
-get_common_includes() {
-    echo "-I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/local/include"
 }
 
 get_common_cflags() {
-    echo "-fstrict-aliasing -fPIE -fPIC -DANDROID -D__ANDROID_API__=${API}"
+    echo "-fstrict-aliasing -DIOS -isysroot ${SDK_PATH}"
 }
 
 get_arch_specific_cflags() {
     case ${ARCH} in
-        arm-v7a)
-            echo "-march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp"
+        armv7)
+            echo "-arch=armv7 -cpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
         ;;
-        arm-v7a-neon)
-            echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp"
+        armv7s)
+            echo "-arch=armv7s -cpu=generic -mfpu=neon -mfloat-abi=softfp"
         ;;
-        arm64-v8a)
-            echo "-march=armv8-a"
+        arm64)
+            echo "-arch=aarch64 -cpu=generic"
         ;;
         x86)
-            echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32"
+            echo "-arch=i386 -cpu=generic -mtune=intel -mssse3 -mfpmath=sse -m32"
         ;;
         x86-64)
-            echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel"
+            echo "-arch=x86-64 -cpu=generic -msse4.2 -mpopcnt -m64 -mtune=intel"
         ;;
     esac
 }
@@ -153,14 +124,14 @@ get_size_optimization_cflags() {
 
     ARCH_OPTIMIZATION=""
     case ${ARCH} in
-        arm-v7a | arm-v7a-neon | arm64-v8a)
+        armv7 | armv7s | arm64)
             if [[ $1 -eq libwebp ]]; then
                 ARCH_OPTIMIZATION="-Os"
             else
                 ARCH_OPTIMIZATION="-Os -finline-limit=64"
             fi
         ;;
-        x86 | x86-64)
+        i386 | x86-64)
             if [[ $1 -eq libvpx ]]; then
                 ARCH_OPTIMIZATION="-O2"
             else
@@ -201,9 +172,9 @@ get_cflags() {
     APP_FLAGS=$(get_app_specific_cflags $1);
     COMMON_FLAGS=$(get_common_cflags);
     OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1);
-    COMMON_INCLUDES=$(get_common_includes);
+    MIN_VERSION_FLAGS=$(get_min_version_cflags);
 
-    echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_INCLUDES}"
+    echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${MIN_VERSION_FLAGS}"
 }
 
 get_cxxflags() {
@@ -221,22 +192,12 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-    case $1 in
-        ffmpeg)
-            echo "-lc -lm -ldl -llog -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/lib"
-        ;;
-        libvpx)
-            echo "-lc -lm -pie -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/lib"
-        ;;
-        *)
-            echo "-lc -lm -ldl -llog -pie -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/lib"
-        ;;
-    esac
+    echo ""
 }
 
 get_size_optimization_ldflags() {
     case ${ARCH} in
-        arm64-v8a)
+        arm64)
             echo "-Wl,--gc-sections"
         ;;
         *)
@@ -247,20 +208,20 @@ get_size_optimization_ldflags() {
 
 get_arch_specific_ldflags() {
     case ${ARCH} in
-        arm-v7a)
-            echo "-march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp -Wl,--fix-cortex-a8"
+        armv7)
+            echo "-march=armv7 -cpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
         ;;
-        arm-v7a-neon)
-            echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
+        armv7s)
+            echo "-arch=armv7s -cpu=generic -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
         ;;
-        arm64-v8a)
-            echo "-march=armv8-a"
+        arm64)
+            echo "-arch=aarch64"
         ;;
-        x86)
-            echo "-march=i686"
+        i386)
+            echo "-arch=i386"
         ;;
         x86-64)
-            echo "-march=x86-64"
+            echo "-arch=x86-64"
         ;;
     esac
 }
@@ -277,7 +238,7 @@ create_fontconfig_package_config() {
     local FONTCONFIG_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/fontconfig.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/fontconfig
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/fontconfig
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -302,7 +263,7 @@ create_freetype_package_config() {
     local FREETYPE_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/freetype2.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/freetype
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/freetype
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -323,7 +284,7 @@ create_giflib_package_config() {
     local GIFLIB_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/giflib.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/giflib
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/giflib
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -342,7 +303,7 @@ create_gmp_package_config() {
     local GMP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gmp.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/gmp
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -361,7 +322,7 @@ create_gnutls_package_config() {
     local GNUTLS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/gnutls
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/gnutls
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -381,7 +342,7 @@ create_libmp3lame_package_config() {
     local LAME_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libmp3lame.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/lame
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/lame
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -400,7 +361,7 @@ create_libiconv_package_config() {
     local LIB_ICONV_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libiconv
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -419,7 +380,7 @@ create_libvorbis_package_config() {
     local LIBVORBIS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/vorbis.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvorbis
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -434,7 +395,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisenc.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvorbis
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -450,7 +411,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisfile.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvorbis
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -470,7 +431,7 @@ create_libwebp_package_config() {
     local LIB_WEBP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libwebp
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libwebp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -489,7 +450,7 @@ create_libxml2_package_config() {
     local LIBXML2_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libxml-2.0.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libxml2
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libxml2
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -509,7 +470,7 @@ create_uuid_package_config() {
     local UUID_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libuuid
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libuuid
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -523,56 +484,21 @@ Libs: -L\${libdir} -luuid
 EOF
 }
 
-create_zlib_package_config() {
-    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr
-exec_prefix=\${prefix}
-libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib
-includedir=\${prefix}/include
-
-Name: zlib
-Description: zlib compression library
-Version: ${ZLIB_VERSION}
-
-Requires:
-Libs: -L\${libdir} -lz
-Cflags: -I\${includedir}
-EOF
-}
-
-create_cpufeatures_package_config() {
-    cat > "${INSTALL_PKG_CONFIG_DIR}/cpufeatures.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/sources/android/cpufeatures
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}
-includedir=\${prefix}
-
-Name: cpufeatures
-Description: cpu features Android utility
-Version: 1.${API}
-
-Requires:
-Libs: -L\${libdir} -lcpufeatures
-Cflags: -I\${includedir}
-EOF
-}
-
 set_toolchain_clang_paths() {
-    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin
+    (curl -L https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl \
+			-o /tmp/gas-preprocessor.pl && chmod +x /tmp/gas-preprocessor.pl) || exit 1
 
     TARGET_HOST=$(get_target_host)
     
-    export AR=${TARGET_HOST}-ar
-    export AS=${TARGET_HOST}-as
-    export CC=${TARGET_HOST}-clang
-    export CXX=${TARGET_HOST}-clang++
-    export LD=${TARGET_HOST}-ld
-    export RANLIB=${TARGET_HOST}-ranlib
-    export STRIP=${TARGET_HOST}-strip
+    export AR="$(xcrun --sdk $(get_sdk_name) -f ar)"
+    export CC="$(xcrun --sdk $(get_sdk_name) -f clang)"
+    export CXX="$(xcrun --sdk $(get_sdk_name) -f clang++)"
+    export AS="/tmp/gas-preprocessor.pl -arch $(get_target_arch) -as-type clang -- ${CC}"
+    export LD="$(xcrun --sdk $(get_sdk_name) -f ld)"
+    export RANLIB="$(xcrun --sdk $(get_sdk_name) -f ranlib)"
+    export STRIP="$(xcrun --sdk $(get_sdk_name) -f strip)"
 
-    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/pkgconfig"
+    export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/ios-$(get_target_host)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
@@ -582,52 +508,4 @@ set_toolchain_clang_paths() {
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
         create_zlib_package_config
     fi
-}
-
-set_toolchain_gcc_paths() {
-    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin
-
-    TARGET_HOST=$(get_target_host)
-
-    export AR=${TARGET_HOST}-ar
-    export AS=${TARGET_HOST}-as
-    export CC=${TARGET_HOST}-gcc
-    export CXX=${TARGET_HOST}-gcc++
-    export LD=${TARGET_HOST}-ld
-    export RANLIB=${TARGET_HOST}-ranlib
-    export STRIP=${TARGET_HOST}-strip
-
-    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/pkgconfig"
-    export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
-
-    if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
-        mkdir -p ${INSTALL_PKG_CONFIG_DIR}
-    fi
-
-    if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
-        create_zlib_package_config
-    fi
-}
-
-create_toolchain() {
-    local TOOLCHAIN_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-"${TOOLCHAIN}
-
-    if [ ! -d ${TOOLCHAIN_DIR} ]; then
-        ${ANDROID_NDK_ROOT}/build/tools/make_standalone_toolchain.py --arch ${TOOLCHAIN_ARCH} --api ${API} --stl libc++ --install-dir ${TOOLCHAIN_DIR} || exit 1
-    fi
-}
-
-build_cpufeatures() {
-
-    # CLEAN FIRST
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a
-    rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so
-
-    # THEN BUILD AGAIN
-    ${TARGET_HOST}-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o
-    ${TARGET_HOST}-ar rcs ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o
-    ${TARGET_HOST}-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so
-
-    create_cpufeatures_package_config
 }

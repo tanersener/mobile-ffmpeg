@@ -38,11 +38,11 @@ cd ${BASEDIR}/src/libvorbis || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libvorbis \
+    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvorbis \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
-    --with-ogg-includes=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libogg/include \
-    --with-ogg-libraries=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build ${ARCH})/libogg/lib \
+    --with-ogg-includes=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libogg/include \
+    --with-ogg-libraries=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libogg/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
