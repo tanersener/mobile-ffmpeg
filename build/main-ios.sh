@@ -28,8 +28,8 @@ fi
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/ios-common.sh
 
-echo -e "\nBuilding ${ARCH} platform for target ${TARGET_SDK}\n"
-echo -e "\nINFO: Starting new build for ${ARCH} on target ${TARGET_SDK} at "$(date)"\n">> ${BASEDIR}/build.log
+echo -e "\nBuilding ${ARCH} platform\n"
+echo -e "\nINFO: Starting new build for ${ARCH} at "$(date)"\n">> ${BASEDIR}/build.log
 INSTALL_BASE="${BASEDIR}/prebuilt/ios-$(get_target_host)"
 
 # CLEANING EXISTING PACKAGE CONFIG DIRECTORY
@@ -149,4 +149,4 @@ done
 # BUILDING FFMPEG
 . ${BASEDIR}/build/ios-ffmpeg.sh "$@"
 
-echo -e "\nINFO: Completed build for ${ARCH} on target ${TARGET_SDK} at "$(date)"\n">> ${BASEDIR}/build.log
+echo -e "\nINFO: Completed build for ${ARCH} at "$(date)"\n">> ${BASEDIR}/build.log

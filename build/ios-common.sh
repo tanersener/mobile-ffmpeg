@@ -67,7 +67,7 @@ get_target_arch() {
 }
 
 get_target_sdk() {
-    echo "-target $(get_target_arch)-apple-ios${IOS_MIN_VERSION}"
+    echo "$(get_target_arch)-apple-ios${IOS_MIN_VERSION}"
 }
 
 get_sdk_name() {
@@ -96,6 +96,10 @@ get_min_version_cflags() {
     esac
 }
 
+get_common_includes() {
+    echo "-I${SDK_PATH}/usr/include"
+}
+
 get_common_cflags() {
     echo "-fstrict-aliasing -DIOS -isysroot ${SDK_PATH}"
 }
@@ -103,19 +107,19 @@ get_common_cflags() {
 get_arch_specific_cflags() {
     case ${ARCH} in
         armv7)
-            echo "-arch=armv7 -cpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
+            echo "-target $(get_target_host) -march=armv7 -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
         ;;
         armv7s)
-            echo "-arch=armv7s -cpu=generic -mfpu=neon -mfloat-abi=softfp"
+            echo "-target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-arch=aarch64 -cpu=generic"
+            echo "-target $(get_target_host) -march=aarch64 -mcpu=generic"
         ;;
         x86)
-            echo "-arch=i386 -cpu=generic -mtune=intel -mssse3 -mfpmath=sse -m32"
+            echo "-target $(get_target_host) -march=i386 -mcpu=generic -mtune=intel -mssse3 -mfpmath=sse -m32"
         ;;
         x86-64)
-            echo "-arch=x86-64 -cpu=generic -msse4.2 -mpopcnt -m64 -mtune=intel"
+            echo "-target $(get_target_host) -march=x86-64 -mcpu=generic -msse4.2 -mpopcnt -m64 -mtune=intel"
         ;;
     esac
 }
@@ -141,9 +145,7 @@ get_size_optimization_cflags() {
         ;;
     esac
 
-    LIB_OPTIMIZATION=""
-
-    echo "${ARCH_OPTIMIZATION} ${LIB_OPTIMIZATION}"
+    echo "${ARCH_OPTIMIZATION}"
 }
 
 get_app_specific_cflags() {
@@ -173,8 +175,9 @@ get_cflags() {
     COMMON_FLAGS=$(get_common_cflags);
     OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1);
     MIN_VERSION_FLAGS=$(get_min_version_cflags);
+    COMMON_INCLUDES=$(get_common_includes);
 
-    echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${MIN_VERSION_FLAGS}"
+    echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${MIN_VERSION_FLAGS} ${COMMON_INCLUDES}"
 }
 
 get_cxxflags() {
@@ -192,16 +195,16 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-    echo ""
+    echo "-L${SDK_PATH}/usr/lib"
 }
 
 get_size_optimization_ldflags() {
     case ${ARCH} in
         arm64)
-            echo "-Wl,--gc-sections"
+            echo ""
         ;;
         *)
-            echo "-Wl,--gc-sections,--icf=safe"
+            echo ""
         ;;
     esac
 }
@@ -209,19 +212,19 @@ get_size_optimization_ldflags() {
 get_arch_specific_ldflags() {
     case ${ARCH} in
         armv7)
-            echo "-march=armv7 -cpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
+            echo "-march=armv7 -mfpu=neon -mfloat-abi=softfp"
         ;;
         armv7s)
-            echo "-arch=armv7s -cpu=generic -mfpu=neon -mfloat-abi=softfp -Wl,--fix-cortex-a8"
+            echo "-march=armv7s -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-arch=aarch64"
+            echo "-march=aarch64"
         ;;
         i386)
-            echo "-arch=i386"
+            echo "-march=i386"
         ;;
         x86-64)
-            echo "-arch=x86-64"
+            echo "-march=x86-64"
         ;;
     esac
 }
@@ -484,9 +487,30 @@ Libs: -L\${libdir} -luuid
 EOF
 }
 
+create_zlib_package_config() {
+    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${SDK_PATH}/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
+prefix=${SDK_PATH}/usr
+exec_prefix=\${prefix}
+libdir=\${exec_dir}/lib
+includedir=\${prefix}/include
+
+Name: zlib
+Description: zlib compression library
+Version: ${ZLIB_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lz
+Cflags: -I\${includedir}
+EOF
+}
+
 set_toolchain_clang_paths() {
-    (curl -L https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl \
-			-o /tmp/gas-preprocessor.pl && chmod +x /tmp/gas-preprocessor.pl) || exit 1
+    if [ ! -f /tmp/gas-preprocessor.pl ]; then
+        (curl -L https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl \
+                -o /tmp/gas-preprocessor.pl && chmod +x /tmp/gas-preprocessor.pl) || exit 1
+    fi
 
     TARGET_HOST=$(get_target_host)
     

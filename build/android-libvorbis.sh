@@ -31,7 +31,6 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags "libvorbis")
 export CXXFLAGS=$(get_cxxflags "libvorbis")
 export LDFLAGS=$(get_ldflags "libvorbis")
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/libvorbis || exit 1
 

@@ -309,7 +309,7 @@ for run_arch in {0..4}
 do
     if [[ ENABLED_ARCHITECTURES[$run_arch] -eq 1 ]]; then
         export ARCH=$(get_arch_name $run_arch)
-        export TARGET_SDK=$(get_target_sdk $run_arch)
+        export TARGET_SDK=$(get_target_sdk)
         export SDK_PATH=$(get_sdk_path)
 
         . ${BASEDIR}/build/main-ios.sh "${ENABLED_LIBRARIES[@]}"
