@@ -107,19 +107,19 @@ get_common_cflags() {
 get_arch_specific_cflags() {
     case ${ARCH} in
         armv7)
-            echo "-target $(get_target_host) -march=armv7 -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7 -target $(get_target_host) -march=armv7 -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
         ;;
         armv7s)
-            echo "-target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-target $(get_target_host) -march=aarch64 -mcpu=generic"
+            echo "-arch aarch64 -target $(get_target_host) -march=aarch64 -mcpu=generic"
         ;;
         x86)
-            echo "-target $(get_target_host) -march=i386 -mcpu=generic -mtune=intel -mssse3 -mfpmath=sse -m32"
+            echo "-arch i386 -target $(get_target_host) -march=i386 -mcpu=generic -mtune=intel -mssse3 -mfpmath=sse -m32"
         ;;
         x86-64)
-            echo "-target $(get_target_host) -march=x86-64 -mcpu=generic -msse4.2 -mpopcnt -m64 -mtune=intel"
+            echo "-arch x86-64 -target $(get_target_host) -march=x86-64 -mcpu=generic -msse4.2 -mpopcnt -m64 -mtune=intel"
         ;;
     esac
 }
@@ -198,33 +198,26 @@ get_common_linked_libraries() {
     echo "-L${SDK_PATH}/usr/lib"
 }
 
-get_size_optimization_ldflags() {
-    case ${ARCH} in
-        arm64)
-            echo ""
-        ;;
-        *)
-            echo ""
-        ;;
-    esac
+get_common_ldflags() {
+    echo "-isysroot ${SDK_PATH}"
 }
 
 get_arch_specific_ldflags() {
     case ${ARCH} in
         armv7)
-            echo "-march=armv7 -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp"
         ;;
         armv7s)
-            echo "-march=armv7s -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-march=aarch64"
+            echo "-arch aarch64 -march=aarch64"
         ;;
         i386)
-            echo "-march=i386"
+            echo "-arch i386 -march=i386"
         ;;
         x86-64)
-            echo "-march=x86-64"
+            echo "-arch x86-64 -march=x86-64"
         ;;
     esac
 }
@@ -232,9 +225,9 @@ get_arch_specific_ldflags() {
 get_ldflags() {
     ARCH_FLAGS=$(get_arch_specific_ldflags);
     OPTIMIZATION_FLAGS=$(get_size_optimization_ldflags);
-    COMMON_LINKED_LIBS=$(get_common_linked_libraries $1);
+    COMMON_FLAGS=$(get_common_ldflags);
 
-    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS}"
+    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_FLAGS}"
 }
 
 create_fontconfig_package_config() {
