@@ -1,17 +1,22 @@
 #!/bin/bash
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
-    exit 1
-fi
-
 if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
 
-if [[ -z ${API} ]]; then
-    echo "API not defined"
+if [[ -z ${IOS_MIN_VERSION} ]]; then
+    echo "IOS_MIN_VERSION not defined"
+    exit 1
+fi
+
+if [[ -z ${TARGET_SDK} ]]; then
+    echo "TARGET_SDK not defined"
+    exit 1
+fi
+
+if [[ -z ${SDK_PATH} ]]; then
+    echo "SDK_PATH not defined"
     exit 1
 fi
 
@@ -21,7 +26,7 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/android-common.sh
+. ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 set_toolchain_clang_paths
@@ -32,25 +37,41 @@ COMMON_CFLAGS=$(get_cflags "gnutls")
 COMMON_CXXFLAGS=$(get_cxxflags "gnutls")
 COMMON_LDFLAGS=$(get_ldflags "gnutls")
 
-export CFLAGS="${COMMON_CFLAGS} -I${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libiconv/include -I${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/gmp/include"
+export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/include -I${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
-export LDFLAGS="${COMMON_LDFLAGS} -L${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libiconv/lib -L${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/gmp/lib"
+export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/lib -L${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/lib"
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+
+HARDWARE_ACCELERATION=""
+case ${ARCH} in
+    arm64)
+
+        # HARDWARE ACCELERATION IS DISABLED DUE TO THE FOLLOWING ERROR
+        #
+        #   elf/sha1-armv8.s:1270:1: error: unknown directive
+        #  .inst 0x5e280803
+        HARDWARE_ACCELERATION="--disable-hardware-acceleration"
+    ;;
+    *)
+        HARDWARE_ACCELERATION="--enable-hardware-acceleration"
+    ;;
+esac
 
 cd ${BASEDIR}/src/gnutls || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/gnutls \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/gnutls \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
+    --with-sysroot=${SDK_PATH} \
     --with-included-libtasn1 \
     --with-included-unistring \
     --without-idn \
     --without-libidn2 \
     --without-p11-kit \
     --enable-openssl-compatibility \
+    ${HARDWARE_ACCELERATION} \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

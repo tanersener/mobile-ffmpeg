@@ -1,17 +1,22 @@
 #!/bin/bash
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
-    exit 1
-fi
-
 if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
 
-if [[ -z ${API} ]]; then
-    echo "API not defined"
+if [[ -z ${IOS_MIN_VERSION} ]]; then
+    echo "IOS_MIN_VERSION not defined"
+    exit 1
+fi
+
+if [[ -z ${TARGET_SDK} ]]; then
+    echo "TARGET_SDK not defined"
+    exit 1
+fi
+
+if [[ -z ${SDK_PATH} ]]; then
+    echo "SDK_PATH not defined"
     exit 1
 fi
 
@@ -21,46 +26,41 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/android-common.sh
+. ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 set_toolchain_clang_paths
 
 # PREPARING FLAGS
-export CFLAGS="$(get_cflags "libvpx") -I${ANDROID_NDK_ROOT}/sources/android/cpufeatures"
+export CFLAGS=$(get_cflags "libvpx")
 export CXXFLAGS=$(get_cxxflags "libvpx")
-export LDFLAGS="$(get_ldflags "libvpx") -L${ANDROID_NDK_ROOT}/sources/android/cpufeatures -lcpufeatures"
+export LDFLAGS=$(get_ldflags "libvpx")
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
-TARGET_CPU=""
-DISABLE_NEON_FLAG=""
+TARGET_ARCH=""
+NEON=""
 case ${ARCH} in
-    arm-v7a)
-        TARGET_CPU="armv7"
-        DISABLE_NEON_FLAG="--disable-neon"
+    armv7 | armv7s)
+        NEON="--enable-neon --enable-neon-asm"
+        TARGET_ARCH="$(get_target_arch)"
     ;;
-    arm-v7a-neon)
-        TARGET_CPU="armv7"
-        # NEON IS ENABLED BY --enable-runtime-cpu-detect
-    ;;
-    arm64-v8a)
-        TARGET_CPU="arm64"
+    arm64)
+        NEON="--enable-neon"
+        TARGET_ARCH="arm64"
     ;;
     *)
-        TARGET_CPU="$(get_target_build)"
+        NEON="--disable-neon --disable-neon-asm"
+        TARGET_ARCH="$(get_target_arch)"
     ;;
 esac
 
 cd ${BASEDIR}/src/libvpx || exit 1
 
-# build cpu-features
-build_cpufeatures
-
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvpx \
-    --target="${TARGET_CPU}-android-gcc" \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvpx \
+    --target="${TARGET_ARCH}-darwin-gcc" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --as=yasm \
@@ -70,13 +70,12 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-pic \
     --enable-optimizations \
     --enable-better-hw-compatibility \
-    --enable-runtime-cpu-detect \
-    ${DISABLE_NEON_FLAG} \
+    --disable-runtime-cpu-detect \
+    ${NEON} \
     --enable-vp8 \
     --enable-vp9 \
     --enable-multithread \
     --enable-spatial-resampling \
-    --enable-runtime-cpu-detect \
     --enable-small \
     --enable-static \
     --disable-shared \

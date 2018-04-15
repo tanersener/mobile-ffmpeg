@@ -35,6 +35,7 @@ get_library_name() {
         22) echo "libuuid" ;;
         23) echo "nettle" ;;
         24) echo "tiff" ;;
+        25) echo "ios-zlib" ;;
     esac
 }
 
@@ -54,14 +55,14 @@ get_target_host() {
 
 get_target_arch() {
     case ${ARCH} in
-        armv7 | armv7s | i386)
-            echo "${ARCH}"
-        ;;
         arm64)
             echo "aarch64"
         ;;
         x86-64)
             echo "x86_64"
+        ;;
+        *)
+            echo "${ARCH}"
         ;;
     esac
 }
@@ -113,7 +114,7 @@ get_arch_specific_cflags() {
             echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-arch aarch64 -target $(get_target_host) -march=aarch64 -mcpu=generic"
+            echo "-arch arm64 -target $(get_target_host) -march=armv8a -mcpu=generic"
         ;;
         x86)
             echo "-arch i386 -target $(get_target_host) -march=i386 -mcpu=generic -mtune=intel -mssse3 -mfpmath=sse -m32"
@@ -183,7 +184,7 @@ get_cflags() {
 get_cxxflags() {
     case $1 in
         gnutls)
-            echo "-nostdi -std=c++11 -fno-exceptions -fno-rtti"
+            echo "-std=c++11 -fno-rtti"
         ;;
         opencore-amr)
             echo ""
@@ -211,7 +212,7 @@ get_arch_specific_ldflags() {
             echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-arch aarch64 -march=aarch64"
+            echo "-arch arm64 -march=armv8a"
         ;;
         i386)
             echo "-arch i386 -march=i386"
@@ -486,7 +487,7 @@ create_zlib_package_config() {
     cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
 prefix=${SDK_PATH}/usr
 exec_prefix=\${prefix}
-libdir=\${exec_dir}/lib
+libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
 
 Name: zlib

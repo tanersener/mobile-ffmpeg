@@ -33,12 +33,13 @@ LIBRARY_LIBPNG=21
 LIBRARY_LIBUUID=22
 LIBRARY_NETTLE=23
 LIBRARY_TIFF=24
+LIBRARY_ZLIB=25
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -70,6 +71,7 @@ display_help() {
     echo -e "Libraries:"
 
     echo -e "  --full\t\t\tenables all external libraries"
+    echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig"
     echo -e "  --enable-freetype\t\tbuild with freetype"
     echo -e "  --enable-fribidi\t\tbuild with fribidi"
@@ -96,6 +98,9 @@ enable_library() {
 
 set_library() {
     case $1 in
+        ios-zlib)
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+        ;;
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
@@ -248,6 +253,20 @@ print_enabled_libraries() {
     echo -n "Libraries: "
 
     let enabled=0;
+
+    # FIRST BUILT-IN LIBRARIES
+    for library in {25..26}
+    do
+        if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
+            if [[ ${enabled} -ge 1 ]]; then
+                echo -n ", "
+            fi
+            echo -n $(get_library_name $library)
+            enabled=$((${enabled} + 1));
+        fi
+    done
+
+    # THEN EXTERNAL LIBRARIES
     for library in {0..17}
     do
         if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
@@ -278,7 +297,7 @@ do
             exit 0
 	    ;;
 	    --full)
-            for library in {0..24}
+            for library in {0..25}
             do
                 enable_library $(get_library_name $library)
             done
@@ -315,7 +334,7 @@ do
         . ${BASEDIR}/build/main-ios.sh "${ENABLED_LIBRARIES[@]}"
 
         # CLEAR FLAGS
-        for library in {1..25}
+        for library in {1..26}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

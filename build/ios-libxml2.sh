@@ -1,17 +1,22 @@
 #!/bin/bash
 
-if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
-    exit 1
-fi
-
 if [[ -z ${ARCH} ]]; then
     echo "ARCH not defined"
     exit 1
 fi
 
-if [[ -z ${API} ]]; then
-    echo "API not defined"
+if [[ -z ${IOS_MIN_VERSION} ]]; then
+    echo "IOS_MIN_VERSION not defined"
+    exit 1
+fi
+
+if [[ -z ${TARGET_SDK} ]]; then
+    echo "TARGET_SDK not defined"
+    exit 1
+fi
+
+if [[ -z ${SDK_PATH} ]]; then
+    echo "SDK_PATH not defined"
     exit 1
 fi
 
@@ -21,7 +26,7 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/android-common.sh
+. ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 set_toolchain_clang_paths
@@ -37,18 +42,12 @@ cd ${BASEDIR}/src/libxml2 || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# NOTE THAT PYTHON IS DISABLED DUE TO THE FOLLOWING ERROR
-#
-# .../android-sdk/ndk-bundle/toolchains/mobile-ffmpeg-arm/include/python2.7/pyport.h:1029:2: error: #error "LONG_BIT definition appears wrong for platform (bad gcc/glibc config?)."
-# #error "LONG_BIT definition appears wrong for platform (bad gcc/glibc config?)."
-#
-
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libxml2 \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libxml2 \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
+    --with-sysroot=${SDK_PATH} \
     --with-zlib \
-    --with-iconv=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libiconv \
+    --with-iconv=${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv \
     --with-sax1 \
     --without-python \
     --without-debug \

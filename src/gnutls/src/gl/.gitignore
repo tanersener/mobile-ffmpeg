@@ -21,3 +21,4 @@
 /unistd.h
 /warn-on-use.h
 /wchar.h
+/stdalign.h

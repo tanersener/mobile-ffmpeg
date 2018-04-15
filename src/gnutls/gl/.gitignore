@@ -20,3 +20,5 @@
 /unistd.h
 /warn-on-use.h
 /wchar.h
+/byteswap.h
+/stdalign.h
