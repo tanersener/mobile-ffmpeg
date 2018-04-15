@@ -224,10 +224,10 @@ get_arch_specific_ldflags() {
 
 get_ldflags() {
     ARCH_FLAGS=$(get_arch_specific_ldflags);
-    OPTIMIZATION_FLAGS=$(get_size_optimization_ldflags);
+    LINKED_LIBRARIES=$(get_common_linked_libraries);
     COMMON_FLAGS=$(get_common_ldflags);
 
-    echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_FLAGS}"
+    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS}"
 }
 
 create_fontconfig_package_config() {
