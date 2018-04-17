@@ -37,20 +37,24 @@ export CXXFLAGS=$(get_cxxflags "libvpx")
 export LDFLAGS=$(get_ldflags "libvpx")
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
-TARGET_ARCH=""
+TARGET=""
 NEON=""
 case ${ARCH} in
     armv7 | armv7s)
         NEON="--enable-neon --enable-neon-asm"
-        TARGET_ARCH="$(get_target_arch)"
+        TARGET="$(get_target_arch)-darwin-gcc"
     ;;
     arm64)
         NEON="--enable-neon"
-        TARGET_ARCH="arm64"
+        TARGET="arm64-darwin-gcc"
     ;;
-    *)
+    i386)
         NEON="--disable-neon --disable-neon-asm"
-        TARGET_ARCH="$(get_target_arch)"
+        TARGET="x86-iphonesimulator-gcc"
+    ;;
+    x86-64)
+        NEON="--disable-neon --disable-neon-asm"
+        TARGET="x86_64-iphonesimulator-gcc"
     ;;
 esac
 
@@ -60,7 +64,7 @@ make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvpx \
-    --target="${TARGET_ARCH}-darwin-gcc" \
+    --target="${TARGET}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --as=yasm \

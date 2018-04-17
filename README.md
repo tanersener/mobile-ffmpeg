@@ -50,6 +50,7 @@ Supported libraries and their dependencies are explained in the [Supported Libra
 - gcc required by freetype
 - cmake v3.9.x or later required by libwebp
 - gperf required by fontconfig
+- yasm required for libvpx
 - pkg-config required by freetype and ffmpeg
 - export PATH=${PATH}:/usr/local/opt/gettext/bin by gnutls
 - libtool for gnutls on macOS

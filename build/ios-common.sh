@@ -116,11 +116,11 @@ get_arch_specific_cflags() {
         arm64)
             echo "-arch arm64 -target $(get_target_host) -march=armv8a -mcpu=generic"
         ;;
-        x86)
-            echo "-arch i386 -target $(get_target_host) -march=i386 -mcpu=generic -mtune=intel -mssse3 -mfpmath=sse -m32"
+        i386)
+            echo "-arch i386 -target $(get_target_host) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32"
         ;;
         x86-64)
-            echo "-arch x86-64 -target $(get_target_host) -march=x86-64 -mcpu=generic -msse4.2 -mpopcnt -m64 -mtune=intel"
+            echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel"
         ;;
     esac
 }
@@ -218,7 +218,7 @@ get_arch_specific_ldflags() {
             echo "-arch i386 -march=i386"
         ;;
         x86-64)
-            echo "-arch x86-64 -march=x86-64"
+            echo "-arch x86_64 -march=x86-64"
         ;;
     esac
 }
@@ -503,7 +503,7 @@ EOF
 set_toolchain_clang_paths() {
     if [ ! -f /tmp/gas-preprocessor.pl ]; then
         (curl -L https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl \
-                -o /tmp/gas-preprocessor.pl && chmod +x /tmp/gas-preprocessor.pl) || exit 1
+                -o /tmp/gas-preprocessor.pl 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log && chmod +x /tmp/gas-preprocessor.pl) || exit 1
     fi
 
     TARGET_HOST=$(get_target_host)
