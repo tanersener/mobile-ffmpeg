@@ -230,6 +230,7 @@ make distclean 2>/dev/null 1>/dev/null
     --arch="${TARGET_ARCH}" \
     --cpu="${TARGET_CPU}" \
     --target-os=android \
+    ${NEON_FLAG} \
     --enable-cross-compile \
     --enable-pic \
     --enable-asm \
@@ -252,7 +253,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-manpages \
     --disable-podpages \
     --disable-txtpages \
-    ${NEON_FLAG} \
     --disable-static \
     --disable-xlib \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log

@@ -229,6 +229,12 @@ make distclean 2>/dev/null 1>/dev/null
     --arch="${TARGET_ARCH}" \
     --cpu="${TARGET_CPU}" \
     --target-os=darwin \
+    --ar="${AR}" \
+    --cc="${CC}" \
+    --cxx="${CXX}" \
+    --as="${AS}" \
+    --ranlib="${RANLIB}" \
+    --strip="${STRIP}" \
     ${NEON_FLAG} \
     --enable-cross-compile \
     --enable-pic \

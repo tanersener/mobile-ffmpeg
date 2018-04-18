@@ -6,3 +6,4 @@
 /libavfilter.so
 /libavfilter.so.6
 /libavfilter.ver
+*.dylib

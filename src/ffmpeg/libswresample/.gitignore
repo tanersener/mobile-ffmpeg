@@ -6,3 +6,4 @@
 /libswresample.so
 /libswresample.so.2
 /libswresample.ver
+*.dylib

@@ -6,3 +6,4 @@
 /libavdevice.so
 /libavdevice.so.57
 /libavdevice.ver
+*.dylib

@@ -102,7 +102,7 @@ get_common_includes() {
 }
 
 get_common_cflags() {
-    echo "-fstrict-aliasing -DIOS -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing -fembed-bitcode-marker -DIOS -isysroot ${SDK_PATH}"
 }
 
 get_arch_specific_cflags() {
@@ -187,7 +187,7 @@ get_cxxflags() {
             echo "-std=c++11 -fno-rtti"
         ;;
         opencore-amr)
-            echo ""
+            echo "-fno-rtti"
         ;;
         *)
             echo "-std=c++11 -fno-exceptions -fno-rtti"
@@ -511,7 +511,17 @@ set_toolchain_clang_paths() {
     export AR="$(xcrun --sdk $(get_sdk_name) -f ar)"
     export CC="$(xcrun --sdk $(get_sdk_name) -f clang)"
     export CXX="$(xcrun --sdk $(get_sdk_name) -f clang++)"
-    export AS="/tmp/gas-preprocessor.pl -arch $(get_target_arch) -as-type clang -- ${CC}"
+    case ${ARCH} in
+        armv7 | armv7s)
+            export AS="/tmp/gas-preprocessor.pl -arch arm -- ${CC}"
+        ;;
+        arm64)
+            export AS="/tmp/gas-preprocessor.pl -arch aarch64 -- ${CC}"
+        ;;
+        *)
+            export AS="${CC}"
+        ;;
+    esac
     export LD="$(xcrun --sdk $(get_sdk_name) -f ld)"
     export RANLIB="$(xcrun --sdk $(get_sdk_name) -f ranlib)"
     export STRIP="$(xcrun --sdk $(get_sdk_name) -f strip)"

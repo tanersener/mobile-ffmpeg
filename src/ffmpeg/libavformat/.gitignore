@@ -7,3 +7,4 @@
 /libavformat.so
 /libavformat.so.57
 /libavformat.ver
+*.dylib
