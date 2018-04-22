@@ -36,7 +36,16 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags "opencore-amr")
 export CXXFLAGS=$(get_cxxflags "opencore-amr")
 export LDFLAGS=$(get_ldflags "opencore-amr")
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+
+# OVERRIDE CXX
+case ${ARCH} in
+	x86-64)
+		export CXX="xcrun --sdk $(get_sdk_name) clang++ -arch x86_64"
+	;;
+	*)
+		export CXX="xcrun --sdk $(get_sdk_name) clang++ -arch ${ARCH}"
+	;;
+esac
 
 cd ${BASEDIR}/src/opencore-amr || exit 1
 

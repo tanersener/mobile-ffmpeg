@@ -102,7 +102,7 @@ get_common_includes() {
 }
 
 get_common_cflags() {
-    echo "-fstrict-aliasing -fembed-bitcode-marker -DIOS -isysroot ${SDK_PATH}"
+    echo "-fstrict-aliasing -fembed-bitcode -DIOS -isysroot ${SDK_PATH}"
 }
 
 get_arch_specific_cflags() {
@@ -184,13 +184,13 @@ get_cflags() {
 get_cxxflags() {
     case $1 in
         gnutls)
-            echo "-std=c++11 -fno-rtti"
+            echo "-std=c++11 -fno-rtti -fembed-bitcode"
         ;;
         opencore-amr)
-            echo "-fno-rtti"
+            echo "-fno-rtti -fembed-bitcode"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti"
+            echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode"
         ;;
     esac
 }

@@ -31,7 +31,6 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags "opencore-amr")
 export CXXFLAGS=$(get_cxxflags "opencore-amr")
 export LDFLAGS=$(get_ldflags "opencore-amr")
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/opencore-amr || exit 1
 
