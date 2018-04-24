@@ -51,6 +51,7 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-fast-install \
     --disable-test \
     --disable-profile \
+    --disable-coretext \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1

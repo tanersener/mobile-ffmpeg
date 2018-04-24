@@ -66,7 +66,7 @@ make distclean 2>/dev/null 1>/dev/null
 
 make -j$(get_cpu_count) || exit 1
 
-# MANUALLY COPY PKG-CONFIG FILES
-cp ./*.pc ${INSTALL_PKG_CONFIG_DIR}
+# CREATE PACKAGE CONFIG MANUALLY
+create_libpng_package_config "1.6.34"
 
 make install || exit 1

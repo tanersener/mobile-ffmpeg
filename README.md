@@ -54,7 +54,7 @@ Supported libraries and their dependencies are explained in the [Supported Libra
 - pkg-config required by freetype and ffmpeg
 - export PATH=${PATH}:/usr/local/opt/gettext/bin by gnutls
 - libtool for gnutls on macOS
-- curl fos IOS
+- curl, lipo for IOS
 
 #### Android
 

@@ -38,10 +38,10 @@ cd ${BASEDIR}/src/lame || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/lame \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/lame \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
-    --with-libiconv-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libiconv \
+    --with-libiconv-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

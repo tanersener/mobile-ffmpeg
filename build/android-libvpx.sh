@@ -59,7 +59,7 @@ build_cpufeatures
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvpx \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libvpx \
     --target="${TARGET_CPU}-android-gcc" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \

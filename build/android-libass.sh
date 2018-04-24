@@ -38,7 +38,7 @@ cd ${BASEDIR}/src/libass || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libass \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libass \
     --with-pic \
     --enable-static \
     --disable-shared \

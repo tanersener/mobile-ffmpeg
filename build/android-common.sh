@@ -277,7 +277,7 @@ create_fontconfig_package_config() {
     local FONTCONFIG_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/fontconfig.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/fontconfig
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/fontconfig
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -302,7 +302,7 @@ create_freetype_package_config() {
     local FREETYPE_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/freetype2.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/freetype
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/freetype
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -323,7 +323,7 @@ create_giflib_package_config() {
     local GIFLIB_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/giflib.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/giflib
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/giflib
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -342,7 +342,7 @@ create_gmp_package_config() {
     local GMP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gmp.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/gmp
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/gmp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -361,7 +361,7 @@ create_gnutls_package_config() {
     local GNUTLS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/gnutls
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/gnutls
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -381,7 +381,7 @@ create_libmp3lame_package_config() {
     local LAME_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libmp3lame.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/lame
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/lame
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -400,7 +400,7 @@ create_libiconv_package_config() {
     local LIB_ICONV_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libiconv
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -419,7 +419,7 @@ create_libvorbis_package_config() {
     local LIBVORBIS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/vorbis.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvorbis
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -434,7 +434,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisenc.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvorbis
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -450,7 +450,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisfile.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libvorbis
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -470,7 +470,7 @@ create_libwebp_package_config() {
     local LIB_WEBP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libwebp
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libwebp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -489,7 +489,7 @@ create_libxml2_package_config() {
     local LIBXML2_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libxml-2.0.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libxml2
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libxml2
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -509,7 +509,7 @@ create_uuid_package_config() {
     local UUID_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libuuid
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libuuid
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -572,7 +572,7 @@ set_toolchain_clang_paths() {
     export RANLIB=${TARGET_HOST}-ranlib
     export STRIP=${TARGET_HOST}-strip
 
-    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/pkgconfig"
+    export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
@@ -597,7 +597,7 @@ set_toolchain_gcc_paths() {
     export RANLIB=${TARGET_HOST}-ranlib
     export STRIP=${TARGET_HOST}-strip
 
-    export INSTALL_PKG_CONFIG_DIR="${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/pkgconfig"
+    export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then

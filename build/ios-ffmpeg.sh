@@ -39,9 +39,8 @@ set_toolchain_clang_paths
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-CFLAGS=$(get_cflags "ffmpeg")
-CXXFLAGS=$(get_cxxflags "ffmpeg")
-LDFLAGS=$(get_ldflags "ffmpeg")
+FFMPEG_CFLAGS=""
+FFMPEG_LDFLAGS=""
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
@@ -86,119 +85,119 @@ do
 
         case $ENABLED_LIBRARY in
             fontconfig)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags fontconfig)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static fontconfig)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags fontconfig)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static fontconfig)"
                 CONFIGURE_POSTFIX+=" --enable-libfontconfig"
             ;;
             freetype)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags freetype2)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static freetype2)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags freetype2)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static freetype2)"
                 CONFIGURE_POSTFIX+=" --enable-libfreetype"
             ;;
             fribidi)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags fribidi)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static fribidi)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags fribidi)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static fribidi)"
                 CONFIGURE_POSTFIX+=" --enable-libfribidi"
             ;;
             gmp)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags gmp)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static gmp)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags gmp)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static gmp)"
                 CONFIGURE_POSTFIX+=" --enable-gmp"
             ;;
             gnutls)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags gnutls)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static gnutls)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags gnutls)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static gnutls)"
                 CONFIGURE_POSTFIX+=" --enable-gnutls"
             ;;
             kvazaar)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags kvazaar)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static kvazaar)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags kvazaar)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static kvazaar)"
                 CONFIGURE_POSTFIX+=" --enable-libkvazaar"
             ;;
             lame)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libmp3lame)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libmp3lame)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libmp3lame)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libmp3lame)"
                 CONFIGURE_POSTFIX+=" --enable-libmp3lame"
             ;;
             libass)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libass)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libass)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libass)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libass)"
                 CONFIGURE_POSTFIX+=" --enable-libass"
             ;;
             libiconv)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libiconv)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libiconv)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libiconv)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libiconv)"
                 CONFIGURE_POSTFIX+=" --enable-iconv"
             ;;
             libtheora)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags theora)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static theora)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags theora)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static theora)"
                 CONFIGURE_POSTFIX+=" --enable-libtheora"
             ;;
             libvorbis)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags vorbis)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static vorbis)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags vorbis)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static vorbis)"
                 CONFIGURE_POSTFIX+=" --enable-libvorbis"
             ;;
             libvpx)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags vpx)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs vpx)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags vpx)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs vpx)"
                 CONFIGURE_POSTFIX+=" --enable-libvpx"
             ;;
             libwebp)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libwebp)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libwebp)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libwebp)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libwebp)"
                 CONFIGURE_POSTFIX+=" --enable-libwebp"
             ;;
             libxml2)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libxml-2.0)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libxml-2.0)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libxml-2.0)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libxml-2.0)"
                 CONFIGURE_POSTFIX+=" --enable-libxml2"
             ;;
             opencore-amr)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrnb)"
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrwb)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrnb)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrwb)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrnb)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrwb)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrnb)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrwb)"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
             shine)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags shine)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static shine)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags shine)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static shine)"
                 CONFIGURE_POSTFIX+=" --enable-libshine"
             ;;
             speex)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags speex)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static speex)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags speex)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static speex)"
                 CONFIGURE_POSTFIX+=" --enable-libspeex"
             ;;
             wavpack)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags wavpack)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static wavpack)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags wavpack)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static wavpack)"
                 CONFIGURE_POSTFIX+=" --enable-libwavpack"
             ;;
             libogg)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags ogg)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static ogg)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags ogg)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static ogg)"
             ;;
             libpng)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libpng)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libpng)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libpng)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libpng)"
             ;;
             libuuid)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags uuid)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static uuid)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags uuid)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static uuid)"
             ;;
             nettle)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags nettle)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static nettle)"
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags hogweed)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static hogweed)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags nettle)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static nettle)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags hogweed)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static hogweed)"
             ;;
             ios-zlib)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags zlib)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static zlib)"
+                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags zlib)"
+                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static zlib)"
                 CONFIGURE_POSTFIX+=" --enable-zlib"
             ;;
         esac
@@ -208,6 +207,24 @@ do
         fi
     fi
 done
+
+# CFLAGS PARTS
+ARCH_CFLAGS=$(get_arch_specific_cflags);
+APP_CFLAGS=$(get_app_specific_cflags "ffmpeg");
+COMMON_CFLAGS=$(get_common_cflags);
+OPTIMIZATION_CFLAGS=$(get_size_optimization_cflags "ffmpeg");
+MIN_VERSION_CFLAGS=$(get_min_version_cflags);
+COMMON_INCLUDES=$(get_common_includes);
+
+# LDFLAGS PARTS
+ARCH_LDFLAGS=$(get_arch_specific_ldflags);
+LINKED_LIBRARIES=$(get_common_linked_libraries);
+COMMON_LDFLAGS=$(get_common_ldflags);
+
+# REORDERED FLAGS
+CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS} ${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
+CXXFLAGS=$(get_cxxflags "ffmpeg")
+LDFLAGS="${ARCH_LDFLAGS} ${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS}"
 
 cd ${BASEDIR}/src/ffmpeg || exit 1
 

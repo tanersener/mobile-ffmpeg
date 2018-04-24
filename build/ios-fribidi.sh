@@ -46,6 +46,7 @@ make distclean 2>/dev/null 1>/dev/null
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/fribidi \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
+    --without-glib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

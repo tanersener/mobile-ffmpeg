@@ -1,7 +1,7 @@
 LOCAL_PATH := $(call my-dir)
 
 MY_ARM_MODE := arm
-MY_FFMPEG_LIB := $(NDK_ROOT)/prebuilt/android-$(TARGET_ARCH)/ffmpeg/lib
+MY_FFMPEG_LIB := $(LOCAL_PATH)/../../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/lib
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)

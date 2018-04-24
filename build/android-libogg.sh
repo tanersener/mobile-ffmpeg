@@ -37,7 +37,7 @@ cd ${BASEDIR}/src/libogg || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libogg \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libogg \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --enable-static \

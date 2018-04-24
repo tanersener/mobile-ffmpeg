@@ -32,7 +32,14 @@ fi
 set_toolchain_clang_paths
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+case ${ARCH} in
+    i386)
+        TARGET_HOST="x86-apple-darwin"
+    ;;
+    *)
+        TARGET_HOST=$(get_target_host)
+    ;;
+esac
 export CFLAGS=$(get_cflags "gmp")
 export CXXFLAGS=$(get_cxxflags "gmp")
 export LDFLAGS=$(get_ldflags "gmp")
@@ -50,6 +57,7 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-shared \
     --disable-assembly \
     --disable-fast-install \
+    --disable-maintainer-mode \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1

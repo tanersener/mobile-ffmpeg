@@ -102,7 +102,14 @@ get_common_includes() {
 }
 
 get_common_cflags() {
-    echo "-fstrict-aliasing -fembed-bitcode -DIOS -isysroot ${SDK_PATH}"
+    case ${ARCH} in
+        i386 | x86-64)
+            echo "-fstrict-aliasing -DIOS -isysroot ${SDK_PATH}"
+        ;;
+        *)
+            echo "-fstrict-aliasing -fembed-bitcode -DIOS -isysroot ${SDK_PATH}"
+        ;;
+    esac
 }
 
 get_arch_specific_cflags() {
@@ -131,16 +138,16 @@ get_size_optimization_cflags() {
     case ${ARCH} in
         armv7 | armv7s | arm64)
             if [[ $1 -eq libwebp ]]; then
-                ARCH_OPTIMIZATION="-Os"
+                ARCH_OPTIMIZATION="-Os -Wno-ignored-optimization-argument"
             else
-                ARCH_OPTIMIZATION="-Os -finline-limit=64"
+                ARCH_OPTIMIZATION="-Os -finline-limit=64 -Wno-ignored-optimization-argument"
             fi
         ;;
         i386 | x86-64)
             if [[ $1 -eq libvpx ]]; then
-                ARCH_OPTIMIZATION="-O2"
+                ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
             else
-                ARCH_OPTIMIZATION="-O2 -finline-limit=300"
+                ARCH_OPTIMIZATION="-O2 -finline-limit=300 -Wno-ignored-optimization-argument"
             fi
 
         ;;
@@ -270,7 +277,7 @@ URL: https://freetype.org
 Description: A free, high-quality, and portable font engine.
 Version: ${FREETYPE_VERSION}
 Requires: libpng
-Requires.private: zlib
+Requires.private:
 Libs: -L\${libdir} -lfreetype
 Libs.private:
 Cflags: -I\${includedir}/freetype2
@@ -328,7 +335,7 @@ Name: gnutls
 Description: GNU TLS Implementation
 
 Version: ${GNUTLS_VERSION}
-Requires: nettle, hogweed, zlib
+Requires: nettle, hogweed
 Cflags: -I\${includedir}
 Libs: -L\${libdir} -lgnutls
 Libs.private: -lgmp
@@ -370,6 +377,24 @@ Version: ${LIB_ICONV_VERSION}
 Requires:
 Libs: -L\${libdir} -liconv -lcharset
 Cflags: -I\${includedir}
+EOF
+}
+
+create_libpng_package_config() {
+    local LIBPNG_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/libpng.pc" << EOF
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libpng
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: libpng
+Description: Loads and saves PNG files
+Version: ${LIBPNG_VERSION}
+Requires:
+Cflags: -I\${includedir}
+Libs: -L\${libdir} -lpng
 EOF
 }
 

@@ -44,11 +44,11 @@ make distclean 2>/dev/null 1>/dev/null
 #
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libxml2 \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libxml2 \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --with-zlib \
-    --with-iconv=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/libiconv \
+    --with-iconv=${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv \
     --with-sax1 \
     --without-python \
     --without-debug \

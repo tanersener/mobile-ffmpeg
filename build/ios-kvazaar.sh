@@ -32,7 +32,14 @@ fi
 set_toolchain_clang_paths
 
 # PREPARING FLAGS
-TARGET_HOST=$(get_target_host)
+case ${ARCH} in
+    i386)
+        TARGET_HOST="x86-apple-darwin"
+    ;;
+    *)
+        TARGET_HOST=$(get_target_host)
+    ;;
+esac
 export CFLAGS=$(get_cflags "kvazaar")
 export CXXFLAGS=$(get_cxxflags "kvazaar")
 export LDFLAGS=$(get_ldflags "kvazaar")

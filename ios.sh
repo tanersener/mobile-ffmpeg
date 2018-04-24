@@ -109,7 +109,8 @@ set_library() {
         ;;
         freetype)
             ENABLED_LIBRARIES[LIBRARY_FREETYPE]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+            set_library "libpng" $2
         ;;
         fribidi)
             ENABLED_LIBRARIES[LIBRARY_FRIBIDI]=$2
@@ -120,6 +121,7 @@ set_library() {
         gnutls)
             ENABLED_LIBRARIES[LIBRARY_GNUTLS]=$2
             ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
             set_library "gmp" $2
             set_library "libiconv" $2
         ;;
@@ -142,6 +144,10 @@ set_library() {
         libiconv)
             ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
         ;;
+        libpng)
+            ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+        ;;
         libtheora)
             ENABLED_LIBRARIES[LIBRARY_LIBTHEORA]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBOGG]=$2
@@ -158,8 +164,8 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_LIBWEBP]=$2
             ENABLED_LIBRARIES[LIBRARY_GIFLIB]=$2
             ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
             ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+            set_library "libpng" $2
         ;;
         libxml2)
             ENABLED_LIBRARIES[LIBRARY_LIBXML2]=$2
@@ -324,6 +330,8 @@ echo -e "Building mobile-ffmpeg for IOS\n"
 print_enabled_architectures
 print_enabled_libraries
 
+TARGET_ARCH_LIST=()
+
 for run_arch in {0..4}
 do
     if [[ ENABLED_ARCHITECTURES[$run_arch] -eq 1 ]]; then
@@ -333,6 +341,9 @@ do
 
         . ${BASEDIR}/build/main-ios.sh "${ENABLED_LIBRARIES[@]}"
 
+        TARGET_ARCH=$(get_target_arch)
+        TARGET_ARCH_LIST+=(${TARGET_ARCH})
+
         # CLEAR FLAGS
         for library in {1..26}
         do
@@ -341,3 +352,33 @@ do
         done
     fi
 done
+
+mkdir -p ${BASEDIR}/prebuilt/universal/lib
+
+FFMPEG_LIBS="libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale"
+
+if [ ! -z ${TARGET_ARCH_LIST} ]; then
+
+    echo -e -n "\n\nCreating fat-binary under prebuilt/universal: "
+
+    # CLEANING OLD BINARIES
+    rm -f ${BASEDIR}/prebuilt/universal/lib/*.dylib
+
+    for FFMPEG_LIB in ${FFMPEG_LIBS}
+    do
+        LIPO_COMMAND="lipo -create"
+
+        for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
+        do
+            LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/${FFMPEG_LIB}.dylib"
+        done
+
+        LIPO_COMMAND+=" -output ${BASEDIR}/prebuilt/universal/lib/${FFMPEG_LIB}.dylib"
+
+        ${LIPO_COMMAND} >> ${BASEDIR}/build.log || exit 1
+
+        echo -e "Created fat-binary ${FFMPEG_LIB} successfully.\n" >> ${BASEDIR}/build.log
+    done
+
+    echo -e "ok\n"
+fi

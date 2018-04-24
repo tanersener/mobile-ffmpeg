@@ -48,11 +48,11 @@ cd ${BASEDIR}/src/nettle || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/nettle \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/nettle \
     --enable-pic \
     --enable-static \
-    --with-include-path=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/gmp/include \
-    --with-lib-path=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/gmp/lib \
+    --with-include-path=${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/include \
+    --with-lib-path=${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/lib \
     --disable-shared \
     --disable-mini-gmp \
     --disable-assembler \

@@ -37,11 +37,11 @@ cd ${BASEDIR}/src/tiff || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/tiff \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/tiff \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
-    --with-jpeg-include-dir=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/jpeg/include \
-    --with-jpeg-lib-dir=${ANDROID_NDK_ROOT}/prebuilt/android-$(get_target_build)/jpeg/lib \
+    --with-jpeg-include-dir=${BASEDIR}/prebuilt/android-$(get_target_build)/jpeg/include \
+    --with-jpeg-lib-dir=${BASEDIR}/prebuilt/android-$(get_target_build)/jpeg/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
