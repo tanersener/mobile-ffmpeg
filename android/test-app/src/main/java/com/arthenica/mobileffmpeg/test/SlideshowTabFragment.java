@@ -172,7 +172,7 @@ public class SlideshowTabFragment extends Fragment {
                 @Override
                 public Void apply(Integer returnCode) {
                     progressDialog.cancel();
-                    Log.e(TAG, "Create completed");
+                    Log.i(TAG, "Create completed");
                     asyncResult = String.valueOf(returnCode);
                     return null;
                 }

@@ -118,7 +118,7 @@ public class CommandTabFragment extends Fragment {
         waitForLogs(logSync);
 
         int returnCode = FFmpeg.execute(split);
-        android.util.Log.d(MainActivity.TAG, String.format("Process exited with rc %d.", returnCode));
+        android.util.Log.i(MainActivity.TAG, String.format("Process exited with rc %d.", returnCode));
         Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
         logSync.countDown();
     }
@@ -135,7 +135,7 @@ public class CommandTabFragment extends Fragment {
 
             @Override
             public Void apply(Integer returnCode) {
-                android.util.Log.d(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
+                android.util.Log.i(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
                 logSync.countDown();
                 return null;
             }

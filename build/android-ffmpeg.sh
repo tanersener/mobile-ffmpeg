@@ -46,17 +46,17 @@ case ${ARCH} in
     arm-v7a)
         TARGET_CPU="armv7-a"
         TARGET_ARCH="armv7-a"
-        NEON_FLAG="	--disable-neon"
+        NEON_FLAG="	--disable-neon --enable-asm"
     ;;
     arm-v7a-neon)
         TARGET_CPU="armv7-a"
         TARGET_ARCH="armv7-a"
-        NEON_FLAG="	--enable-neon"
+        NEON_FLAG="	--enable-neon --enable-asm"
     ;;
     arm64-v8a)
         TARGET_CPU="armv8-a"
         TARGET_ARCH="aarch64"
-        NEON_FLAG="	--enable-neon"
+        NEON_FLAG="	--enable-neon --enable-asm"
     ;;
     x86)
         TARGET_CPU="i686"
@@ -68,7 +68,7 @@ case ${ARCH} in
     x86-64)
         TARGET_CPU="x86_64"
         TARGET_ARCH="x86_64"
-        NEON_FLAG="	--disable-neon"
+        NEON_FLAG="	--disable-neon --enable-asm"
     ;;
 esac
 
@@ -233,7 +233,6 @@ make distclean 2>/dev/null 1>/dev/null
     ${NEON_FLAG} \
     --enable-cross-compile \
     --enable-pic \
-    --enable-asm \
     --enable-jni \
     --enable-inline-asm \
     --enable-optimizations \
