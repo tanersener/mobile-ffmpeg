@@ -25,20 +25,20 @@ JNINativeMethod abiDetectMethods[] = {
   {"getAbi", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi}
 };
 
-jint JNI_OnLoad(JavaVM* vm, void*) {
-    JNIEnv* env;
-    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env;
+    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK) {
         LOGE("OnLoad failed to GetEnv for class %s.", abiDetectClassName);
         return JNI_FALSE;
     }
 
-    jclass abiDetectClass = env->FindClass(abiDetectClassName);
+    jclass abiDetectClass = (*env)->FindClass(env, abiDetectClassName);
     if (abiDetectClass == NULL) {
         LOGE("OnLoad failed to FindClass %s.", abiDetectClassName);
         return JNI_FALSE;
     }
 
-    if (env->RegisterNatives(abiDetectClass, abiDetectMethods, 1) < 0) {
+    if ((*env)->RegisterNatives(env, abiDetectClass, abiDetectMethods, 1) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.", abiDetectClassName);
         return JNI_FALSE;
     }
@@ -51,7 +51,7 @@ jint JNI_OnLoad(JavaVM* vm, void*) {
  * Method:    getAbi
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEnv* env, jclass) {
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEnv *env, jclass object) {
     AndroidCpuFamily family = android_getCpuFamily();
 
     if (family == ANDROID_CPU_FAMILY_ARM) {
@@ -59,21 +59,21 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEn
 
         if (features & ANDROID_CPU_ARM_FEATURE_ARMv7) {
             if (features & ANDROID_CPU_ARM_FEATURE_NEON) {
-                return env->NewStringUTF(ABI_ARMV7A_NEON);
+                return (*env)->NewStringUTF(env, ABI_ARMV7A_NEON);
             } else {
-                return env->NewStringUTF(ABI_ARMV7A);
+                return (*env)->NewStringUTF(env, ABI_ARMV7A);
             }
         } else {
-            return env->NewStringUTF(ABI_ARM);
+            return (*env)->NewStringUTF(env, ABI_ARM);
         }
 
     } else if (family == ANDROID_CPU_FAMILY_ARM64) {
-        return env->NewStringUTF(ABI_ARM64_V8A);
+        return (*env)->NewStringUTF(env, ABI_ARM64_V8A);
     } else if (family == ANDROID_CPU_FAMILY_X86) {
-        return env->NewStringUTF(ABI_X86);
+        return (*env)->NewStringUTF(env, ABI_X86);
     } else if (family == ANDROID_CPU_FAMILY_X86_64) {
-        return env->NewStringUTF(ABI_X86_64);
+        return (*env)->NewStringUTF(env, ABI_X86_64);
     } else {
-        return env->NewStringUTF(ABI_UNKNOWN);
+        return (*env)->NewStringUTF(env, ABI_UNKNOWN);
     }
 }

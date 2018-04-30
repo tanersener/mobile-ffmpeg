@@ -19,16 +19,8 @@
 
 #include "mobileffmpeg.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-    // forward declaration for ffmpeg.c
-    int execute(int argc, char **argv);
-
-#ifdef __cplusplus
-}
-#endif
+// forward declaration for ffmpeg.c
+int execute(int argc, char **argv);
 
 const char *ffmpegClassName = "com/arthenica/mobileffmpeg/FFmpeg";
 JNINativeMethod ffmpegMethods[] = {
@@ -37,20 +29,20 @@ JNINativeMethod ffmpegMethods[] = {
   {"execute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_execute}
 };
 
-jint JNI_OnLoad(JavaVM* vm, void*) {
-    JNIEnv* env;
-    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env;
+    if ((*vm)->GetEnv(vm, (void**)(&env), JNI_VERSION_1_6) != JNI_OK) {
         LOGE("OnLoad failed to GetEnv for class %s.", ffmpegClassName);
         return JNI_FALSE;
     }
 
-    jclass ffmpegClass = env->FindClass(ffmpegClassName);
+    jclass ffmpegClass = (*env)->FindClass(env, ffmpegClassName);
     if (ffmpegClass == NULL) {
         LOGE("OnLoad failed to FindClass %s.", ffmpegClassName);
         return JNI_FALSE;
     }
 
-    if (env->RegisterNatives(ffmpegClass, ffmpegMethods, 3) < 0) {
+    if ((*env)->RegisterNatives(env, ffmpegClass, ffmpegMethods, 3) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.", ffmpegClassName);
         return JNI_FALSE;
     }
@@ -63,8 +55,8 @@ jint JNI_OnLoad(JavaVM* vm, void*) {
  * Method:    getFFmpegVersion
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion(JNIEnv* env, jclass object) {
-    return env->NewStringUTF(FFMPEG_VERSION);
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion(JNIEnv *env, jclass object) {
+    return (*env)->NewStringUTF(env, FFMPEG_VERSION);
 }
 
 /*
@@ -72,8 +64,8 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersio
  * Method:    getVersion
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIEnv* env, jclass object) {
-    return env->NewStringUTF(MOBILE_FFMPEG_VERSION);
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIEnv *env, jclass object) {
+    return (*env)->NewStringUTF(env, MOBILE_FFMPEG_VERSION);
 }
 
 /*
@@ -81,34 +73,46 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIE
  * Method:    execute
  * Signature: ([Ljava/lang/String;)I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv* env, jclass object, jobjectArray stringArray) {
-    int stringCount = env->GetArrayLength(stringArray);
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *env, jclass object, jobjectArray stringArray) {
+    jstring *tempArray = NULL;
+    int argumentCount = 1;
+    char **argv = NULL;
 
-    // EXTRACT
-    std::vector<std::string> arguments;
-    arguments.push_back(std::string(LIB_NAME));
-    for (int i = 0; i < stringCount; i++) {
-        jstring string = (jstring) (env->GetObjectArrayElement(stringArray, i));
-        const char* argument = env->GetStringUTFChars(string, 0);
-        if (strlen(argument) > 0) {
-            arguments.push_back(std::string(argument));
-        }
-        env->ReleaseStringUTFChars(string, argument);
-        env->DeleteLocalRef(string);
+    if (stringArray != NULL) {
+        int programArgumentCount = (*env)->GetArrayLength(env, stringArray);
+        argumentCount = programArgumentCount + 1;
+
+        tempArray = (jstring *) malloc(sizeof(jstring) * programArgumentCount);
     }
 
+    /* PRESERVING USAGE FORMAT
+     *
+     * ffmpeg <arguments>
+     */
+    argv = (char **)malloc(sizeof(char*) * (argumentCount));
+    argv[0] = (char *)malloc(sizeof(char) * (strlen(LIB_NAME) + 1));
+    strcpy(argv[0], LIB_NAME);
+
     // PREPARE
-    char **argv = (char **)malloc(sizeof(char*) * (arguments.size()));
-    int index = 0;
-    for (std::vector<std::string>::iterator it = arguments.begin() ; it != arguments.end(); it++, index++) {
-        argv[index] = (char *) it->c_str();
+    if (stringArray != NULL) {
+        for (int i = 0; i < (argumentCount - 1); i++) {
+            tempArray[i] = (jstring) (*env)->GetObjectArrayElement(env, stringArray, i);
+            argv[i + 1] = (char *) (*env)->GetStringUTFChars(env, tempArray[i], 0);
+        }
     }
 
     // RUN
-    int retCode = execute(arguments.size(), argv);
+    int retCode = execute(argumentCount, argv);
 
     // CLEANUP
-    arguments.clear();
+    if (tempArray != NULL) {
+        for (int i = 0; i < (argumentCount - 1); i++) {
+            (*env)->ReleaseStringUTFChars(env, tempArray[i], argv[i + 1]);
+        }
+
+        free(tempArray);
+    }
+    free(argv[0]);
     free(argv);
 
     return retCode;

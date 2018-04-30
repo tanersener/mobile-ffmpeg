@@ -19,13 +19,13 @@
 
 #include "log.h"
 
-static JavaVM* globalVm;
+static JavaVM *globalVm;
 static jclass logClass;
 static jmethodID logMethod;
 
 static int pipeFd[2];
 static pthread_t logThread;
-static bool logThreadEnabled = true;
+static int logThreadEnabled = 1;
 
 const char *logClassName = "com/arthenica/mobileffmpeg/Log";
 JNINativeMethod logMethods[] = {
@@ -33,51 +33,51 @@ JNINativeMethod logMethods[] = {
     {"stopNativeCollector", "()I", (void*) Java_com_arthenica_mobileffmpeg_Log_stopNativeCollector}
 };
 
-jint JNI_OnLoad(JavaVM* vm, void*) {
-    JNIEnv *jniEnv;
-    if (vm->GetEnv(reinterpret_cast<void**>(&jniEnv), JNI_VERSION_1_6) != JNI_OK) {
+jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+    JNIEnv *env;
+    if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK) {
         LOGE("OnLoad failed to GetEnv for class %s.", logClassName);
         return JNI_FALSE;
     }
 
-    jniEnv->GetJavaVM(&globalVm);
+    (*env)->GetJavaVM(env, &globalVm);
 
-    jclass clazz = jniEnv->FindClass(logClassName);
+    jclass clazz = (*env)->FindClass(env, logClassName);
     if (clazz == NULL) {
         LOGE("OnLoad failed to FindClass %s.", logClassName);
         return JNI_FALSE;
     }
 
-    logMethod = jniEnv->GetStaticMethodID(clazz, "log", "([B)V");
+    logMethod = (*env)->GetStaticMethodID(env, clazz, "log", "([B)V");
     if (logMethod == NULL) {
         LOGE("OnLoad thread failed to GetMethodID for %s.", "log");
-        globalVm->DetachCurrentThread();
+        (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
 
-    if (jniEnv->RegisterNatives(clazz, logMethods, 2) < 0) {
+    if ((*env)->RegisterNatives(env, clazz, logMethods, 2) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.", logClassName);
         return JNI_FALSE;
     }
 
-    logClass = reinterpret_cast<jclass>(jniEnv->NewGlobalRef(clazz));
+    logClass = (jclass) ((*env)->NewGlobalRef(env, clazz));
 
     return JNI_VERSION_1_6;
 }
 
-static void *logThreadFunction(void*) {
+static void *logThreadFunction() {
     int readSize;
     char buffer[512];
 
-    JNIEnv *jniEnv;
-    jint getEnvRc = globalVm->GetEnv(reinterpret_cast<void**>(&jniEnv), JNI_VERSION_1_6);
+    JNIEnv *env;
+    jint getEnvRc = (*globalVm)->GetEnv(globalVm, (void**) &env, JNI_VERSION_1_6);
     if (getEnvRc != JNI_OK) {
         if (getEnvRc != JNI_EDETACHED) {
             LOGE("Log thread failed to GetEnv for class %s with rc %d.", logClassName, getEnvRc);
             return JNI_FALSE;
         }
 
-        if (globalVm->AttachCurrentThread(&jniEnv, NULL) != 0) {
+        if ((*globalVm)->AttachCurrentThread(globalVm, &env, NULL) != 0) {
             LOGE("Log thread failed to AttachCurrentThread for class %s.", logClassName);
             return JNI_FALSE;
         }
@@ -92,14 +92,14 @@ static void *logThreadFunction(void*) {
             }
             buffer[readSize] = 0;  /* add null-terminator */
 
-            jbyteArray byteArray = (jbyteArray) jniEnv->NewByteArray(readSize);
-            jniEnv->SetByteArrayRegion(byteArray, 0, readSize, (jbyte *)buffer);
-            jniEnv->CallStaticVoidMethod(logClass, logMethod, byteArray);
-            jniEnv->DeleteLocalRef(byteArray);
+            jbyteArray byteArray = (jbyteArray) (*env)->NewByteArray(env, readSize);
+            (*env)->SetByteArrayRegion(env, byteArray, 0, readSize, (jbyte *)buffer);
+            (*env)->CallStaticVoidMethod(env, logClass, logMethod, byteArray);
+            (*env)->DeleteLocalRef(env, byteArray);
         }
     }
 
-    globalVm->DetachCurrentThread();
+    (*globalVm)->DetachCurrentThread(globalVm);
 
     LOGI("Native log thread stopped.");
 
@@ -111,7 +111,7 @@ static void *logThreadFunction(void*) {
  * Method:    startNativeCollector
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_startNativeCollector(JNIEnv *, jobject) {
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_startNativeCollector(JNIEnv *env, jobject object) {
 
     /* make stdout line-buffered and stderr unbuffered */
     setvbuf(stdout, 0, _IOLBF, 0);
@@ -137,8 +137,8 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_startNativeCollector(
  * Method:    stopNativeCollector
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_stopNativeCollector(JNIEnv *, jobject) {
-    logThreadEnabled = false;
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_stopNativeCollector(JNIEnv *env, jobject object) {
+    logThreadEnabled = 0;
 
     printf("Stopping native log thread\n");
 

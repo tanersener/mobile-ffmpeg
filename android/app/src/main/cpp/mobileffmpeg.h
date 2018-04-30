@@ -20,8 +20,8 @@
 #ifndef MOBILEFFMPEG_H
 #define MOBILEFFMPEG_H
 
-#include <string>
-#include <vector>
+#include <string.h>
+#include <stdlib.h>
 #include <jni.h>
 #include <android/log.h>
 

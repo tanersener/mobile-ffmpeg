@@ -23,7 +23,8 @@
  * --------------------------------------------------------
  * - Unused headers removed
  * - Parentheses placed around assignments in condition to prevent -Wparentheses warning
- * - exit_program updated with THROW, disabling exit
+ * - exit_program updated with longjmp, disabling exit
+ * - argc validation added for optional arguments inside split_commandline
  */
 
 #include <string.h>
@@ -139,9 +140,9 @@ void exit_program(int ret)
     if (program_exit)
         program_exit(ret);
 
-    // exit disabled and replaced with THROW
+    // exit disabled and replaced with longjmp
     // exit(ret);
-    THROW;
+    longjmp(ex_buf__, ret);;
 }
 
 double parse_number_or_die(const char *context, const char *numstr, int type,
@@ -808,7 +809,11 @@ do {                                                                           \
         if (po->name) {
             if (po->flags & OPT_EXIT) {
                 /* optional argument, e.g. -h */
-                arg = argv[optindex++];
+                if (optindex < argc) {
+                    arg = argv[optindex++];
+                } else {
+                    arg = "";
+                }
             } else if (po->flags & HAS_ARG) {
                 GET_ARG(arg);
             } else {

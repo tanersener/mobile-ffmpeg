@@ -27,7 +27,7 @@
  * --------------------------------------------------------
  * - Unused headers removed
  * - main() function renamed as execute()
- * - TRY/CATCH implemented inside execute
+ * - exit_program implemented with setjmp
  * - cleanup() method added
  */
 
@@ -4802,7 +4802,10 @@ int execute(int argc, char **argv) {
     int i, ret;
     int64_t ti;
 
-    TRY {
+    int savedCode = setjmp(ex_buf__);
+    if (savedCode == 0) {
+
+        cleanup();
 
         init_dynload();
 
@@ -4870,14 +4873,10 @@ int execute(int argc, char **argv) {
             exit_program(69);
 
         exit_program(received_nb_signals ? 255 : main_return_code);
-    } CATCH {
-        // CATCHING EXIT REQUEST
-        // NOTHING TO LOG
-    }
-    ETRY;
 
-    // CLEANING STATIC VARIABLES
-    cleanup();
+    } else {
+        main_return_code = (savedCode == 1)?0:1;
+    }
 
     return main_return_code;
 }
