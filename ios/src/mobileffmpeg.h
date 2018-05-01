@@ -22,32 +22,16 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <jni.h>
 
 #include "libavutil/ffversion.h"
 #include "log.h"
 
 #define MOBILE_FFMPEG_VERSION "1.0"
 
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    getFFmpegVersion
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion(JNIEnv *, jclass);
+const char *mobileffmpeg_getFFmpegVersion();
 
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    getVersion
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIEnv *, jclass);
+const char *mobileffmpeg_getVersion();
 
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    execute
- * Signature: ([Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *, jclass, jobjectArray);
+int mobileffmpeg_execute(int argc, char **argv);
 
 #endif /* MOBILEFFMPEG_H */

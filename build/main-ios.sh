@@ -149,4 +149,7 @@ done
 # BUILDING FFMPEG
 . ${BASEDIR}/build/ios-ffmpeg.sh "$@"
 
+# BUILDING MOBILE FFMPEG
+. ${BASEDIR}/build/ios-mobile-ffmpeg.sh
+
 echo -e "\nINFO: Completed build for ${ARCH} at "$(date)"\n">> ${BASEDIR}/build.log

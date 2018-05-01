@@ -140,7 +140,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_startNativeCollector(
 JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_stopNativeCollector(JNIEnv *env, jobject object) {
     logThreadEnabled = 0;
 
-    printf("Stopping native log thread\n");
+    LOGI("Stopping native log thread\n");
 
     return 0;
 }

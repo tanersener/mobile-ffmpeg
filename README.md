@@ -64,6 +64,8 @@ Android NDK is required to build Android platform
 
 XCode is required to build IOS platform. Command Line Tools, go to https://developer.apple.com/download/more/ MacOS
 
+autoconf automake libtool
+
 ### Usage
 
 Use `android.sh` to build FFmpeg for Android. Visit [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) wiki page for all build options.

@@ -353,17 +353,18 @@ do
     fi
 done
 
-mkdir -p ${BASEDIR}/prebuilt/universal/lib
+mkdir -p ${BASEDIR}/prebuilt/ios-universal/lib
 
 FFMPEG_LIBS="libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale"
 
 if [ ! -z ${TARGET_ARCH_LIST} ]; then
 
-    echo -e -n "\n\nCreating fat-binary under prebuilt/universal: "
+    echo -e -n "\n\nCreating fat-binary under prebuilt/ios-universal: "
 
     # CLEANING OLD BINARIES
-    rm -f ${BASEDIR}/prebuilt/universal/lib/*.dylib
+    rm -f ${BASEDIR}/prebuilt/ios-universal/lib/*.dylib
 
+    # BUILDING FFMPEG FAT BINARY
     for FFMPEG_LIB in ${FFMPEG_LIBS}
     do
         LIPO_COMMAND="lipo -create"
@@ -373,12 +374,60 @@ if [ ! -z ${TARGET_ARCH_LIST} ]; then
             LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/${FFMPEG_LIB}.dylib"
         done
 
-        LIPO_COMMAND+=" -output ${BASEDIR}/prebuilt/universal/lib/${FFMPEG_LIB}.dylib"
+        LIPO_COMMAND+=" -output ${BASEDIR}/prebuilt/ios-universal/lib/${FFMPEG_LIB}.dylib"
 
         ${LIPO_COMMAND} >> ${BASEDIR}/build.log || exit 1
 
         echo -e "Created fat-binary ${FFMPEG_LIB} successfully.\n" >> ${BASEDIR}/build.log
     done
+
+    # BUILDING MOBILE FFMPEG FAT BINARY
+    LIPO_COMMAND="lipo -create"
+
+    for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
+    do
+        LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.dylib"
+    done
+
+    LIPO_COMMAND+=" -output ${BASEDIR}/prebuilt/ios-universal/lib/libmobileffmpeg.dylib"
+
+    ${LIPO_COMMAND} >> ${BASEDIR}/build.log || exit 1
+
+    # BUILDING HEADERS
+    rm -rf ${BASEDIR}/prebuilt/ios-universal/include
+    mkdir -p ${BASEDIR}/prebuilt/ios-universal/include
+
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/mobile-ffmpeg/include/* ${BASEDIR}/prebuilt/ios-universal/include
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavcodec ${BASEDIR}/prebuilt/ios-universal/include
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavdevice ${BASEDIR}/prebuilt/ios-universal/include
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavfilter ${BASEDIR}/prebuilt/ios-universal/include
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavformat ${BASEDIR}/prebuilt/ios-universal/include
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavutil ${BASEDIR}/prebuilt/ios-universal/include
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libswresample ${BASEDIR}/prebuilt/ios-universal/include
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libswscale ${BASEDIR}/prebuilt/ios-universal/include
+
+    echo -e "Created fat-binary libmobileffmpeg successfully.\n" >> ${BASEDIR}/build.log
+
+    echo -e "ok\n"
+
+    echo -e -n "\nCreating mobileffmpeg.framework under prebuilt/ios-framework: "
+
+    MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${BASEDIR}/prebuilt/ios-universal/include/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+
+    # BUILDING FRAMEWORK
+    FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-framework/mobileffmpeg.framework
+
+    rm -rf ${FRAMEWORK_PATH}
+    mkdir -p ${FRAMEWORK_PATH}/Versions/${MOBILE_FFMPEG_VERSION}/Headers
+
+    cp -r ${BASEDIR}/prebuilt/ios-universal/include ${FRAMEWORK_PATH}/Versions/${MOBILE_FFMPEG_VERSION}/Headers
+    cp ${BASEDIR}/prebuilt/ios-universal/lib/libmobileffmpeg.dylib ${FRAMEWORK_PATH}/Versions/${MOBILE_FFMPEG_VERSION}/mobileffmpeg
+
+    ln -s ${MOBILE_FFMPEG_VERSION} ${FRAMEWORK_PATH}/Versions/Current
+    ln -s Versions/Current/Headers ${FRAMEWORK_PATH}/Headers
+    ln -s Versions/Current/mobileffmpeg ${FRAMEWORK_PATH}/mobileffmpeg
+
+    echo -e "Created mobile-ffmpeg.framework successfully.\n" >> ${BASEDIR}/build.log
 
     echo -e "ok\n"
 fi

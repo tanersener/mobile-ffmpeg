@@ -1,2 +1,3 @@
 *.log
 /prebuilt/
+*.DS_Store

@@ -169,6 +169,9 @@ get_app_specific_cflags() {
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
+        mobile-ffmpeg)
+            APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable"
+        ;;
         *)
             APP_FLAGS="-std=c99 -Wno-unused-function"
         ;;
@@ -535,6 +538,7 @@ set_toolchain_clang_paths() {
     
     export AR="$(xcrun --sdk $(get_sdk_name) -f ar)"
     export CC="$(xcrun --sdk $(get_sdk_name) -f clang)"
+    export OBJC="$(xcrun --sdk $(get_sdk_name) -f clang)"
     export CXX="$(xcrun --sdk $(get_sdk_name) -f clang++)"
     case ${ARCH} in
         armv7 | armv7s)
