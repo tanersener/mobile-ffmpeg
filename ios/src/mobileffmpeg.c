@@ -22,11 +22,11 @@
 // forward declaration for ffmpeg.c
 int execute(int argc, char **argv);
 
-const char *mobileffmpeg_getFFmpegVersion() {
+const char *mobileffmpeg_getFFmpegVersion(void) {
     return FFMPEG_VERSION;
 }
 
-const char *mobileffmpeg_getVersion() {
+const char *mobileffmpeg_getVersion(void) {
     return MOBILE_FFMPEG_VERSION;
 }
 

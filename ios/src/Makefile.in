@@ -98,7 +98,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(include_HEADERS) \
-	$(noinst_HEADERS) $(am__DIST_COMMON)
+	$(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
@@ -132,12 +132,13 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libmobileffmpeg_la_DEPENDENCIES =
-am_libmobileffmpeg_la_OBJECTS = libmobileffmpeg_la-cmdutils.lo \
-	libmobileffmpeg_la-exception.lo libmobileffmpeg_la-ffmpeg.lo \
+am_libmobileffmpeg_la_OBJECTS = libmobileffmpeg_la-archdetect.lo \
+	libmobileffmpeg_la-cmdutils.lo libmobileffmpeg_la-exception.lo \
+	libmobileffmpeg_la-ffmpeg.lo \
 	libmobileffmpeg_la-ffmpeg_filter.lo \
 	libmobileffmpeg_la-ffmpeg_hw.lo \
 	libmobileffmpeg_la-ffmpeg_opt.lo \
-	libmobileffmpeg_la-log-thread.lo libmobileffmpeg_la-log.lo \
+	libmobileffmpeg_la-log_thread.lo libmobileffmpeg_la-log.lo \
 	libmobileffmpeg_la-mobileffmpeg.lo
 libmobileffmpeg_la_OBJECTS = $(am_libmobileffmpeg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -163,14 +164,15 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/libmobileffmpeg_la-cmdutils.Plo \
+am__depfiles_remade = ./$(DEPDIR)/libmobileffmpeg_la-archdetect.Plo \
+	./$(DEPDIR)/libmobileffmpeg_la-cmdutils.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-exception.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-ffmpeg.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_filter.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_hw.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_opt.Plo \
-	./$(DEPDIR)/libmobileffmpeg_la-log-thread.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-log.Plo \
+	./$(DEPDIR)/libmobileffmpeg_la-log_thread.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-mobileffmpeg.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -216,7 +218,7 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-HEADERS = $(include_HEADERS) $(noinst_HEADERS)
+HEADERS = $(include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -362,29 +364,29 @@ top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libmobileffmpeg.la
 libmobileffmpeg_la_LIBADD = @FFMPEG_LIBS@
 libmobileffmpeg_la_SOURCES = \
+    archdetect.m \
     cmdutils.c \
     exception.c \
     ffmpeg.c \
     ffmpeg_filter.c \
     ffmpeg_hw.c \
     ffmpeg_opt.c \
-    log-thread.c \
+    log_thread.c \
     log.m \
     mobileffmpeg.c
 
 include_HEADERS = \
+    archdetect.h \
     ffmpeg.h \
-    mobileffmpeg.h
+    mobileffmpeg.h \
+	cmdutils.h \
+	exception.h \
+	log.h
 
 libmobileffmpeg_la_CFLAGS = $(CFLAGS)
 libmobileffmpeg_la_OBJCFLAGS = $(CFLAGS)
 libmobileffmpeg_la_CXXFLAGS = $(CXXFLAGS)
 libmobileffmpeg_la_LDFLAGS = $(LDFLAGS)
-noinst_HEADERS = \
-	cmdutils.h \
-	exception.h \
-	log.h
-
 all: all-am
 
 .SUFFIXES:
@@ -463,14 +465,15 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-archdetect.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-cmdutils.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-exception.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-ffmpeg.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_filter.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_hw.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_opt.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-log-thread.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-log.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-log_thread.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-mobileffmpeg.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -545,12 +548,12 @@ libmobileffmpeg_la-ffmpeg_opt.lo: ffmpeg_opt.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_CFLAGS) $(CFLAGS) -c -o libmobileffmpeg_la-ffmpeg_opt.lo `test -f 'ffmpeg_opt.c' || echo '$(srcdir)/'`ffmpeg_opt.c
 
-libmobileffmpeg_la-log-thread.lo: log-thread.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_CFLAGS) $(CFLAGS) -MT libmobileffmpeg_la-log-thread.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-log-thread.Tpo -c -o libmobileffmpeg_la-log-thread.lo `test -f 'log-thread.c' || echo '$(srcdir)/'`log-thread.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmobileffmpeg_la-log-thread.Tpo $(DEPDIR)/libmobileffmpeg_la-log-thread.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='log-thread.c' object='libmobileffmpeg_la-log-thread.lo' libtool=yes @AMDEPBACKSLASH@
+libmobileffmpeg_la-log_thread.lo: log_thread.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_CFLAGS) $(CFLAGS) -MT libmobileffmpeg_la-log_thread.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-log_thread.Tpo -c -o libmobileffmpeg_la-log_thread.lo `test -f 'log_thread.c' || echo '$(srcdir)/'`log_thread.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmobileffmpeg_la-log_thread.Tpo $(DEPDIR)/libmobileffmpeg_la-log_thread.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='log_thread.c' object='libmobileffmpeg_la-log_thread.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_CFLAGS) $(CFLAGS) -c -o libmobileffmpeg_la-log-thread.lo `test -f 'log-thread.c' || echo '$(srcdir)/'`log-thread.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_CFLAGS) $(CFLAGS) -c -o libmobileffmpeg_la-log_thread.lo `test -f 'log_thread.c' || echo '$(srcdir)/'`log_thread.c
 
 libmobileffmpeg_la-mobileffmpeg.lo: mobileffmpeg.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_CFLAGS) $(CFLAGS) -MT libmobileffmpeg_la-mobileffmpeg.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-mobileffmpeg.Tpo -c -o libmobileffmpeg_la-mobileffmpeg.lo `test -f 'mobileffmpeg.c' || echo '$(srcdir)/'`mobileffmpeg.c
@@ -582,6 +585,13 @@ libmobileffmpeg_la-mobileffmpeg.lo: mobileffmpeg.c
 @AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(AM_V_OBJC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepOBJC_FALSE@	DEPDIR=$(DEPDIR) $(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepOBJC_FALSE@	$(AM_V_OBJC@am__nodep@)$(LTOBJCCOMPILE) -c -o $@ $<
+
+libmobileffmpeg_la-archdetect.lo: archdetect.m
+@am__fastdepOBJC_TRUE@	$(AM_V_OBJC)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -MT libmobileffmpeg_la-archdetect.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-archdetect.Tpo -c -o libmobileffmpeg_la-archdetect.lo `test -f 'archdetect.m' || echo '$(srcdir)/'`archdetect.m
+@am__fastdepOBJC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmobileffmpeg_la-archdetect.Tpo $(DEPDIR)/libmobileffmpeg_la-archdetect.Plo
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(AM_V_OBJC)source='archdetect.m' object='libmobileffmpeg_la-archdetect.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	DEPDIR=$(DEPDIR) $(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepOBJC_FALSE@	$(AM_V_OBJC@am__nodep@)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -c -o libmobileffmpeg_la-archdetect.lo `test -f 'archdetect.m' || echo '$(srcdir)/'`archdetect.m
 
 libmobileffmpeg_la-log.lo: log.m
 @am__fastdepOBJC_TRUE@	$(AM_V_OBJC)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -MT libmobileffmpeg_la-log.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-log.Tpo -c -o libmobileffmpeg_la-log.lo `test -f 'log.m' || echo '$(srcdir)/'`log.m
@@ -745,14 +755,15 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/libmobileffmpeg_la-cmdutils.Plo
+		-rm -f ./$(DEPDIR)/libmobileffmpeg_la-archdetect.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-cmdutils.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-exception.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ffmpeg.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_filter.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_hw.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_opt.Plo
-	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-log-thread.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-log.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-log_thread.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-mobileffmpeg.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -799,14 +810,15 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/libmobileffmpeg_la-cmdutils.Plo
+		-rm -f ./$(DEPDIR)/libmobileffmpeg_la-archdetect.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-cmdutils.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-exception.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ffmpeg.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_filter.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_hw.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ffmpeg_opt.Plo
-	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-log-thread.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-log.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-log_thread.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-mobileffmpeg.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic

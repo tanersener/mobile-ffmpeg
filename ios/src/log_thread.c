@@ -55,7 +55,7 @@ static void *logThreadFunction() {
     return 0;
 }
 
-int startNativeCollector() {
+int startNativeCollector(void) {
 
     /* make stdout line-buffered and stderr unbuffered */
     setvbuf(stdout, 0, _IOLBF, 0);
@@ -76,7 +76,7 @@ int startNativeCollector() {
     return 0;
 }
 
-int stopNativeCollector() {
+int stopNativeCollector(void) {
     logThreadEnabled = 0;
 
     LOGI("Stopping native log thread\n");

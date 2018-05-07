@@ -33,7 +33,7 @@ void LOGW(const char *message, ...) __attribute__((format(printf, 1, 2)));
 void LOGE(const char *message, ...) __attribute__((format(printf, 1, 2)));
 
 void set_log_callback(void (*cb)(const char *));
-int startNativeCollector();
-int stopNativeCollector();
+int startNativeCollector(void);
+int stopNativeCollector(void);
 
 #endif /* MOBILEFFMPEG_LOG_H */

@@ -17,21 +17,21 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOBILEFFMPEG_H
-#define MOBILEFFMPEG_H
+#ifndef MOBILEFFMPEG_ARCHDETECT_H
+#define MOBILEFFMPEG_ARCHDETECT_H
 
-#include <string.h>
-#include <stdlib.h>
-
-#include "libavutil/ffversion.h"
 #include "log.h"
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <mach/machine.h>
 
-#define MOBILE_FFMPEG_VERSION "1.0"
+#define MF_ARCH_ARMV7 "armv7"
+#define MF_ARCH_ARMV7S "armv7s"
+#define MF_ARCH_ARM64 "arm64"
+#define MF_ARCH_I386 "i386"
+#define MF_ARCH_X86_64 "x86_64"
+#define MF_ABI_UNKNOWN "unknown"
 
-const char *mobileffmpeg_getFFmpegVersion(void);
+const char *getArch(void);
 
-const char *mobileffmpeg_getVersion(void);
-
-int mobileffmpeg_execute(int argc, char **argv);
-
-#endif /* MOBILEFFMPEG_H */
+#endif /* MOBILEFFMPEG_ARCHDETECT_H */

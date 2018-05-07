@@ -291,6 +291,41 @@ print_enabled_libraries() {
     fi
 }
 
+build_info_plist() {
+    local FILE_PATH="$1"
+    local FRAMEWORK_NAME="$2"
+    local FRAMEWORK_ID="$3"
+    local FRAMEWORK_SHORT_VERSION="$4"
+    local FRAMEWORK_VERSION="$5"
+
+    cat > ${FILE_PATH} <<EOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleExecutable</key>
+	<string>${FRAMEWORK_NAME}</string>
+	<key>CFBundleIdentifier</key>
+	<string>${FRAMEWORK_ID}</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>${FRAMEWORK_NAME}</string>
+	<key>CFBundlePackageType</key>
+	<string>FMWK</string>
+	<key>CFBundleShortVersionString</key>
+	<string>${FRAMEWORK_SHORT_VERSION}</string>
+	<key>CFBundleVersion</key>
+	<string>${FRAMEWORK_VERSION}</string>
+	<key>NSPrincipalClass</key>
+	<string></string>
+</dict>
+</plist>
+EOF
+}
+
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/ios-common.sh
 
@@ -353,16 +388,22 @@ do
     fi
 done
 
-mkdir -p ${BASEDIR}/prebuilt/ios-universal/lib
-
 FFMPEG_LIBS="libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale"
 
 if [ ! -z ${TARGET_ARCH_LIST} ]; then
 
     echo -e -n "\n\nCreating fat-binary under prebuilt/ios-universal: "
 
-    # CLEANING OLD BINARIES
-    rm -f ${BASEDIR}/prebuilt/ios-universal/lib/*.dylib
+    FFMPEG_UNIVERSAL=${BASEDIR}/prebuilt/ios-universal/ffmpeg-universal
+    MOBILE_FFMPEG_UNIVERSAL=${BASEDIR}/prebuilt/ios-universal/mobile-ffmpeg-universal
+
+    # BUILDING UNIVERSAL LIBRARIES
+    rm -rf ${BASEDIR}/prebuilt/ios-universal
+
+    mkdir -p ${FFMPEG_UNIVERSAL}/include
+    mkdir -p ${FFMPEG_UNIVERSAL}/lib
+    mkdir -p ${MOBILE_FFMPEG_UNIVERSAL}/include
+    mkdir -p ${MOBILE_FFMPEG_UNIVERSAL}/lib
 
     # BUILDING FFMPEG FAT BINARY
     for FFMPEG_LIB in ${FFMPEG_LIBS}
@@ -374,7 +415,7 @@ if [ ! -z ${TARGET_ARCH_LIST} ]; then
             LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/${FFMPEG_LIB}.dylib"
         done
 
-        LIPO_COMMAND+=" -output ${BASEDIR}/prebuilt/ios-universal/lib/${FFMPEG_LIB}.dylib"
+        LIPO_COMMAND+=" -output ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.dylib"
 
         ${LIPO_COMMAND} >> ${BASEDIR}/build.log || exit 1
 
@@ -389,43 +430,82 @@ if [ ! -z ${TARGET_ARCH_LIST} ]; then
         LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.dylib"
     done
 
-    LIPO_COMMAND+=" -output ${BASEDIR}/prebuilt/ios-universal/lib/libmobileffmpeg.dylib"
+    LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.dylib"
 
     ${LIPO_COMMAND} >> ${BASEDIR}/build.log || exit 1
 
-    # BUILDING HEADERS
-    rm -rf ${BASEDIR}/prebuilt/ios-universal/include
-    mkdir -p ${BASEDIR}/prebuilt/ios-universal/include
-
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/mobile-ffmpeg/include/* ${BASEDIR}/prebuilt/ios-universal/include
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavcodec ${BASEDIR}/prebuilt/ios-universal/include
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavdevice ${BASEDIR}/prebuilt/ios-universal/include
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavfilter ${BASEDIR}/prebuilt/ios-universal/include
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavformat ${BASEDIR}/prebuilt/ios-universal/include
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libavutil ${BASEDIR}/prebuilt/ios-universal/include
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libswresample ${BASEDIR}/prebuilt/ios-universal/include
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/libswscale ${BASEDIR}/prebuilt/ios-universal/include
+    # COPYING HEADERS
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/* ${FFMPEG_UNIVERSAL}/include
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include
 
     echo -e "Created fat-binary libmobileffmpeg successfully.\n" >> ${BASEDIR}/build.log
 
     echo -e "ok\n"
 
+    # BUILDING MOBILE FFMPEG FRAMEWORK
     echo -e -n "\nCreating mobileffmpeg.framework under prebuilt/ios-framework: "
 
-    MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${BASEDIR}/prebuilt/ios-universal/include/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+    MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${MOBILE_FFMPEG_UNIVERSAL}/include/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
-    # BUILDING FRAMEWORK
     FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-framework/mobileffmpeg.framework
 
     rm -rf ${FRAMEWORK_PATH}
-    mkdir -p ${FRAMEWORK_PATH}/Versions/${MOBILE_FFMPEG_VERSION}/Headers
+    mkdir -p ${FRAMEWORK_PATH}/Headers
 
-    cp -r ${BASEDIR}/prebuilt/ios-universal/include ${FRAMEWORK_PATH}/Versions/${MOBILE_FFMPEG_VERSION}/Headers
-    cp ${BASEDIR}/prebuilt/ios-universal/lib/libmobileffmpeg.dylib ${FRAMEWORK_PATH}/Versions/${MOBILE_FFMPEG_VERSION}/mobileffmpeg
+    cp -r ${MOBILE_FFMPEG_UNIVERSAL}/include/* ${FRAMEWORK_PATH}/Headers
+    cp ${FFMPEG_UNIVERSAL}/include/config.h ${FRAMEWORK_PATH}/Headers
+    cp ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.dylib ${FRAMEWORK_PATH}/mobileffmpeg
+    cp ${BASEDIR}/LICENSE ${FRAMEWORK_PATH}
 
-    ln -s ${MOBILE_FFMPEG_VERSION} ${FRAMEWORK_PATH}/Versions/Current
-    ln -s Versions/Current/Headers ${FRAMEWORK_PATH}/Headers
-    ln -s Versions/Current/mobileffmpeg ${FRAMEWORK_PATH}/mobileffmpeg
+    build_info_plist "${FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
+
+    install_name_tool -id @rpath/mobileffmpeg.framework/mobileffmpeg ${FRAMEWORK_PATH}/mobileffmpeg
+
+    # BUILDING SUB FRAMEWORKS
+
+    for FFMPEG_LIB in ${FFMPEG_LIBS}
+    do
+        FFMPEG_LIB_UPPERCASE=$(echo ${FFMPEG_LIB} | tr '[a-z]' '[A-Z]')
+
+        FFMPEG_LIB_MAJOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR" ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR//g;s/\ //g")
+        FFMPEG_LIB_MINOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR" ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR//g;s/\ //g")
+        FFMPEG_LIB_MICRO=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO" ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/version.h | sed "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO//g;s/\ //g")
+
+        FFMPEG_LIB_VERSION="${FFMPEG_LIB_MAJOR}.${FFMPEG_LIB_MINOR}.${FFMPEG_LIB_MICRO}"
+
+        FFMPEG_LIB_FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-framework/${FFMPEG_LIB}.framework
+
+        rm -rf ${FFMPEG_LIB_FRAMEWORK_PATH}
+        mkdir -p ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers
+
+        cp -r ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/* ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers
+        cp ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.dylib ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}
+        cp ${BASEDIR}/LICENSE ${FFMPEG_LIB_FRAMEWORK_PATH}
+
+        build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.mobileffmpeg.FFmpeg${FFMPEG_LIB}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
+
+        install_name_tool -id @rpath/${FFMPEG_LIB}.framework/${FFMPEG_LIB} ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}
+    done
+
+    # FIXING PATHS
+    ALL_LIBS=("${FFMPEG_LIBS[@]}")
+    ALL_LIBS+=" mobileffmpeg"
+
+    for ONE_LIB in ${ALL_LIBS}
+    do
+        for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
+        do
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.dylib @rpath/mobileffmpeg.framework/mobileffmpeg ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavcodec.57.dylib @rpath/libavcodec.framework/libavcodec ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavdevice.57.dylib @rpath/libavdevice.framework/libavdevice ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavfilter.6.dylib @rpath/libavfilter.framework/libavfilter ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavformat.57.dylib @rpath/libavformat.framework/libavformat ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswresample.2.dylib @rpath/libswresample.framework/libswresample ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswscale.4.dylib @rpath/libswscale.framework/libswscale ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavutil.55.dylib @rpath/libavutil.framework/libavutil ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+        done
+    done
 
     echo -e "Created mobile-ffmpeg.framework successfully.\n" >> ${BASEDIR}/build.log
 
