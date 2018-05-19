@@ -28,9 +28,9 @@
 
 #define MOBILE_FFMPEG_VERSION "1.0"
 
-const char *mobileffmpeg_getFFmpegVersion(void);
+const char *mobileffmpeg_get_ffmpeg_version(void);
 
-const char *mobileffmpeg_getVersion(void);
+const char *mobileffmpeg_get_version(void);
 
 int mobileffmpeg_execute(int argc, char **argv);
 

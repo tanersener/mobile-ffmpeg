@@ -32,6 +32,6 @@
 #define MF_ARCH_X86_64 "x86_64"
 #define MF_ABI_UNKNOWN "unknown"
 
-const char *getArch(void);
+const char *mobileffmpeg_get_arch(void);
 
 #endif /* MOBILEFFMPEG_ARCHDETECT_H */

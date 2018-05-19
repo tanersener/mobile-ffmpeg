@@ -26,14 +26,10 @@
 
 #define LIB_NAME "mobile-ffmpeg"
 
-void LOGV(const char *message, ...) __attribute__((format(printf, 1, 2)));
-void LOGD(const char *message, ...) __attribute__((format(printf, 1, 2)));
-void LOGI(const char *message, ...) __attribute__((format(printf, 1, 2)));
-void LOGW(const char *message, ...) __attribute__((format(printf, 1, 2)));
-void LOGE(const char *message, ...) __attribute__((format(printf, 1, 2)));
-
-void set_log_callback(void (*cb)(const char *));
-int startNativeCollector(void);
-int stopNativeCollector(void);
+void logv(const char *message, ...) __attribute__((format(printf, 1, 2)));
+void logd(const char *message, ...) __attribute__((format(printf, 1, 2)));
+void logi(const char *message, ...) __attribute__((format(printf, 1, 2)));
+void logw(const char *message, ...) __attribute__((format(printf, 1, 2)));
+void loge(const char *message, ...) __attribute__((format(printf, 1, 2)));
 
 #endif /* MOBILEFFMPEG_LOG_H */

@@ -10,7 +10,6 @@ libmobileffmpeg_la_SOURCES = \
     ffmpeg_filter.c \
     ffmpeg_hw.c \
     ffmpeg_opt.c \
-    log_thread.c \
     log.m \
     mobileffmpeg.c
 

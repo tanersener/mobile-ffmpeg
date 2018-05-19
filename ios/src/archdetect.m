@@ -21,7 +21,7 @@
 
 #import <Foundation/Foundation.h>
 
-const char *getArch(void) {
+const char *mobileffmpeg_get_arch(void) {
       NSMutableString *cpu = [[NSMutableString alloc] init];
       size_t size;
       cpu_type_t type;
