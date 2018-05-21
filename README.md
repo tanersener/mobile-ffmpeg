@@ -43,7 +43,7 @@ This repository contains FFmpeg version 3.4.2 with support for the following ext
 - speex
 - wavpack
 
-Supported libraries and their dependencies are explained in the [Supported Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/Supported-Libraries) wiki page.
+Supported libraries and their dependencies are explained in the [Supported Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/Supported-Libraries) page.
 
 ### Prerequisites
 
@@ -58,7 +58,7 @@ Supported libraries and their dependencies are explained in the [Supported Libra
 
 #### Android
 
-Android NDK is required to build Android platform
+Android NDK and gradle is required to build Android platform
 
 #### IOS
 
