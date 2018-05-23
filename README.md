@@ -68,7 +68,9 @@ autoconf automake libtool
 
 ### Usage
 
-Use `android.sh` to build FFmpeg for Android. Visit [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) wiki page for all build options.
+Use `android.sh` to build FFmpeg for Android. Visit [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) page for all build options.
+
+### Known Issues
 
 ### TODO
 
@@ -79,7 +81,11 @@ Add sample image copyright info to WiKi
 Files provided by this project are licensed under the LGPL v3.0.
 Source code of external libraries, FFmpeg and other supported libraries, is included with their individual licenses.
 
-Visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) wiki page for the details.
+Visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
+
+### CONTRIBUTING
+
+Feel free to submit issues or pull requests.
 
 ### See Also
 
