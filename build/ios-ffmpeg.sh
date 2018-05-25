@@ -26,7 +26,7 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 HOST_PKG_CONFIG_PATH=`type pkg-config 2>/dev/null | sed 's/.*is //g'`
-if [ -z ${HOST_PKG_CONFIG_PATH} ]; then
+if [[ -z ${HOST_PKG_CONFIG_PATH} ]]; then
     echo "pkg-config not found"
     exit 1
 fi

@@ -390,7 +390,7 @@ done
 
 FFMPEG_LIBS="libavcodec libavdevice libavfilter libavformat libavutil libswresample libswscale"
 
-if [ ! -z ${TARGET_ARCH_LIST} ]; then
+if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
     echo -e -n "\n\nCreating fat-binary under prebuilt/ios-universal: "
 
@@ -438,7 +438,7 @@ if [ ! -z ${TARGET_ARCH_LIST} ]; then
     cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/* ${FFMPEG_UNIVERSAL}/include
     cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include
 
-    echo -e "Created fat-binary libmobileffmpeg successfully.\n" >> ${BASEDIR}/build.log
+    echo -e "Created fat-binary mobileffmpeg successfully.\n" >> ${BASEDIR}/build.log
 
     echo -e "ok\n"
 

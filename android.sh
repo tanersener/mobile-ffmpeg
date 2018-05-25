@@ -290,6 +290,23 @@ print_enabled_libraries() {
     fi
 }
 
+build_application_mk() {
+    rm -f ${BASEDIR}/android/jni/Application.mk
+
+    cat > "${BASEDIR}/android/jni/Application.mk" << EOF
+APP_OPTIM := release
+
+APP_ABI := ${ANDROID_ARCHITECTURES}
+
+APP_STL := c++_shared
+
+APP_PLATFORM := android-21
+
+APP_CFLAGS := -O3 -DANDROID -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable
+EOF
+}
+
+
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
@@ -331,6 +348,13 @@ fi
 
 echo -e "Building mobile-ffmpeg for Android\n"
 
+if [[ ENABLED_ARCHITECTURES[0] -eq 0 ]] && [[ ENABLED_ARCHITECTURES[1] -eq 1 ]]; then
+    ENABLED_ARCHITECTURES[0]=1
+
+    echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n"
+    echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n" 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+fi
+
 print_enabled_architectures
 print_enabled_libraries
 
@@ -341,9 +365,9 @@ do
         export TOOLCHAIN=$(get_toolchain)
         export TOOLCHAIN_ARCH=$(get_toolchain_arch)
 
-        create_toolchain
+        create_toolchain || exit 1
 
-        . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}"
+        . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
         # CLEAR FLAGS
         for library in {1..27}
@@ -353,3 +377,59 @@ do
         done
     fi
 done
+
+rm -f ${BASEDIR}/android/build/.neon
+ANDROID_ARCHITECTURES=""
+if [[ ENABLED_ARCHITECTURES[1] -eq 1 ]]; then
+    ANDROID_ARCHITECTURES+="$(get_android_arch 0) "
+    cat > "${BASEDIR}/android/build/.neon" << EOF
+EOF
+elif [[ ENABLED_ARCHITECTURES[0] -eq 1 ]]; then
+    ANDROID_ARCHITECTURES+="$(get_android_arch 0) "
+fi
+if [[ ENABLED_ARCHITECTURES[2] -eq 1 ]]; then
+    ANDROID_ARCHITECTURES+="$(get_android_arch 2) "
+fi
+if [[ ENABLED_ARCHITECTURES[3] -eq 1 ]]; then
+    ANDROID_ARCHITECTURES+="$(get_android_arch 3) "
+fi
+if [[ ENABLED_ARCHITECTURES[4] -eq 1 ]]; then
+    ANDROID_ARCHITECTURES+="$(get_android_arch 4) "
+fi
+
+if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
+
+    echo -e -n "\n\nCreating Android archive under prebuilt/android-aar: "
+
+    build_application_mk
+
+    MOBILE_FFMPEG_AAR=${BASEDIR}/prebuilt/android-aar/mobile-ffmpeg
+
+    # BUILDING ANDROID ARCHIVE LIBRARY
+    rm -rf ${BASEDIR}/prebuilt/android-aar
+    rm -rf ${BASEDIR}/android/libs
+
+    mkdir -p ${MOBILE_FFMPEG_AAR}
+
+    cd ${BASEDIR}/android
+
+    ${ANDROID_NDK_ROOT}/ndk-build 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+
+    if [ $? -ne 0 ]; then
+        echo -e "failed\n"
+        exit 1
+    fi
+
+    gradle clean build 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+
+    if [ $? -ne 0 ]; then
+        echo -e "failed\n"
+        exit 1
+    fi
+
+    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-1.0.aar ${MOBILE_FFMPEG_AAR} || exit 1
+
+    echo -e "Created mobile-ffmpeg Android archive successfully.\n" >> ${BASEDIR}/build.log
+
+    echo -e "ok\n"
+fi

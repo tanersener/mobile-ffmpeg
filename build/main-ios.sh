@@ -60,47 +60,47 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
         let run=0
         case $library in
             fontconfig)
-                if [ ! -z $OK_libuuid ] && [ ! -z $OK_libxml2 ] && [ ! -z $OK_libiconv ] && [ ! -z $OK_freetype ]; then
+                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_libxml2 ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]]; then
                     run=1
                 fi
             ;;
             freetype)
-                if [ ! -z $OK_libpng ]; then
+                if [[ ! -z $OK_libpng ]]; then
                     run=1
                 fi
             ;;
             gnutls)
-                if [ ! -z $OK_nettle ] && [ ! -z $OK_gmp ] && [ ! -z $OK_libiconv ]; then
+                if [[ ! -z $OK_nettle ]] && [[ ! -z $OK_gmp ]] && [[ ! -z $OK_libiconv ]]; then
                     run=1
                 fi
             ;;
             lame)
-                if [ ! -z $OK_libiconv ]; then
+                if [[ ! -z $OK_libiconv ]]; then
                     run=1
                 fi
             ;;
             libass)
-                if [ ! -z $OK_libuuid ] && [ ! -z $OK_libxml2 ] && [ ! -z $OK_libiconv ] && [ ! -z $OK_freetype ] && [ ! -z $OK_fribidi ] && [ ! -z $OK_fontconfig ]; then
+                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_libxml2 ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]]; then
                     run=1
                 fi
             ;;
             libtheora)
-                if [ ! -z $OK_libvorbis ] && [ ! -z $OK_libogg ]; then
+                if [[ ! -z $OK_libvorbis ]] && [[ ! -z $OK_libogg ]]; then
                     run=1
                 fi
             ;;
             libvorbis)
-                if [ ! -z $OK_libogg ]; then
+                if [[ ! -z $OK_libogg ]]; then
                     run=1
                 fi
             ;;
             libwebp)
-                if [ ! -z $OK_giflib ] && [ ! -z $OK_jpeg ] && [ ! -z $OK_libpng ] && [ ! -z $OK_tiff ]; then
+                if [[ ! -z $OK_giflib ]] && [[ ! -z $OK_jpeg ]] && [[ ! -z $OK_libpng ]] && [[ ! -z $OK_tiff ]]; then
                     run=1
                 fi
             ;;
             libxml2)
-                if [ ! -z $OK_libiconv ]; then
+                if [[ ! -z $OK_libiconv ]]; then
                     run=1
                 fi
             ;;
@@ -111,7 +111,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 
         CONTROL=$(echo "OK_${library}" | sed "s/\-/\_/g")
 
-        if [[ $run -eq 1 ]] && [ -z ${!CONTROL} ]; then
+        if [ $run -eq 1 ] && [[ -z ${!CONTROL} ]]; then
             ENABLED_LIBRARY_PATH="${INSTALL_BASE}/${library}"
 
             echo -e "\nINFO: Building $library with the following environment variables\n" >> ${BASEDIR}/build.log
@@ -147,9 +147,9 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 done
 
 # BUILDING FFMPEG
-. ${BASEDIR}/build/ios-ffmpeg.sh "$@"
+. ${BASEDIR}/build/ios-ffmpeg.sh "$@" || exit 1
 
 # BUILDING MOBILE FFMPEG
-. ${BASEDIR}/build/ios-mobile-ffmpeg.sh
+. ${BASEDIR}/build/ios-mobile-ffmpeg.sh || exit 1
 
 echo -e "\nINFO: Completed build for ${ARCH} at "$(date)"\n">> ${BASEDIR}/build.log

@@ -16,9 +16,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    externalNativeBuild {
-        ndkBuild {
-            path '../jni/Android.mk'
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["../libs"]
         }
     }
 

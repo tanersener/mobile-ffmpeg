@@ -46,13 +46,22 @@ public class FFmpeg {
         /*
          * NEON supported arm-v7a library has a different name
          */
+        boolean nativeLibraryLoaded = false;
         if (abi == Abi.ABI_ARMV7A_NEON) {
-            System.loadLibrary("mobileffmpeg-armv7a-neon");
-        } else {
-            System.loadLibrary("mobileffmpeg");
+            try {
+                System.loadLibrary("mobileffmpeg-armv7a-neon");
+                android.util.Log.i(Log.TAG, "Loaded mobile-ffmpeg-" + abi.getValue() + "-" + getVersion());
+                nativeLibraryLoaded = true;
+            } catch (Exception e) {
+                android.util.Log.i(Log.TAG, "NEON supported mobile-ffmpeg armv7a library not found. Loading default armv7a library.", e);
+            }
         }
 
-        android.util.Log.i(Log.TAG, "Loaded mobile-ffmpeg-" + abi.getValue() + "-" + getVersion());
+        if (!nativeLibraryLoaded) {
+            System.loadLibrary("mobileffmpeg");
+
+            android.util.Log.i(Log.TAG, "Loaded mobile-ffmpeg-" + abi.getValue() + "-" + getVersion());
+        }
 
         asynchronousTaskService = new AsynchronousTaskService();
     }

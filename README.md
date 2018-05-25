@@ -1,29 +1,32 @@
 # MobileFFmpeg
 Source code and scripts to build FFmpeg for Android and IOS platform
 
-### Features
-- Supports both Android and IOS
-- Can be customized to support a specific platform and/or library
+### 1. Features
+- Builds both Android and IOS
+- Supports 18 external libraries and 10 architectures in total
+- Exposes FFmpeg capabilities both directly and through MobileFFmpeg wrapper library
+- Creates shared libraries (.so for Android, .dylib for IOS)
 - Licensed under LGPL 3.0
-
-### Architectures
-#### Android
+#### 1.1 Android
+- Creates Android archive with .aar extension
+#### 1.2 IOS
+- Creates IOS dynamic universal (fat) library
+- Creates IOS dynamic framework for IOS 8 or later
+### 2. Architectures
+#### 2.1 Android
 - arm-v7a
 - arm-v7a-neon
 - arm64-v8a
 - x86
 - x86_64
-
-#### IOS
+#### 2.2 IOS
 - armv7
 - armv7s
 - arm64
 - i386
 - x86_64
-
-### FFmpeg Support
-This repository contains FFmpeg version 3.4.2 with support for the following external libraries.
-
+### 3. FFmpeg Support
+This repository branch contains FFmpeg version 3.4.2 with support for the following external libraries.
 - fontconfig
 - freetype
 - fribidi
@@ -43,50 +46,62 @@ This repository contains FFmpeg version 3.4.2 with support for the following ext
 - speex
 - wavpack
 
-Supported libraries and their dependencies are explained in the [Supported Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/Supported-Libraries) page.
+External libraries and their dependencies are explained in the [External Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/External-Libraries) page.
+### 4. Using
+\* You can use prebuilt library binaries from the following locations
+### 4.1 Android
+### 4.2 IOS
 
-### Prerequisites
+### 5. Building
+- pkg-config required by freetype and ffmpeg
 
 - gcc required by freetype
 - cmake v3.9.x or later required by libwebp
 - gperf required by fontconfig
 - yasm required for libvpx
-- pkg-config required by freetype and ffmpeg
-- export PATH=${PATH}:/usr/local/opt/gettext/bin by gnutls
-- libtool for gnutls on macOS
-- curl, lipo for IOS
 
-#### Android
+
+#### 4.1 Android
 
 Android NDK and gradle is required to build Android platform
 
-#### IOS
+#### 4.2 IOS
 
 XCode is required to build IOS platform. Command Line Tools, go to https://developer.apple.com/download/more/ MacOS
 
 autoconf automake libtool
 
-### Usage
+- export PATH=${PATH}:/usr/local/opt/gettext/bin by gnutls
+- curl, lipo for IOS
 
-Use `android.sh` to build FFmpeg for Android. Visit [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) page for all build options.
+\* Use `android.sh` to build FFmpeg for Android. Visit [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) page for all build options.
 
-### Known Issues
+### 6. API
 
-### TODO
+\* MobileFFmpeg API defines
 
-Add sample image copyright info to WiKi
+### 7. Known Issues
 
-### LICENSE
+- On very few occasions, top level build scripts fail to build one of the external libraries randomly. When the details are analyzed it is seen that compilation fails due to not-existing cpu specific instructions.
+Somehow cleaning the previous architecture build fails and this breaks the new compilation for that library. When the top level script is run again the error disappears.
+It wasn't possible to find the exact cause of this issue since it happens rarely and disappears on the next run.
 
-Files provided by this project are licensed under the LGPL v3.0.
-Source code of external libraries, FFmpeg and other supported libraries, is included with their individual licenses.
+### 8. License
 
-Visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
+This project is licensed under the LGPL v3.0.
 
-### CONTRIBUTING
+Source code of FFmpeg and external libraries is included in compliance with their individual licenses.
 
-Feel free to submit issues or pull requests.
+Digital assets used in test applications are published in the public domain.
 
-### See Also
+Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
+
+### 9. Contributing
+
+This project is stable but far from complete. If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. Any help is appreciated.
+
+### 10 See Also
 
 - [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)
+
+**PS**: Asterisk (*) denotes ongoing work
