@@ -382,6 +382,7 @@ rm -f ${BASEDIR}/android/build/.neon
 ANDROID_ARCHITECTURES=""
 if [[ ENABLED_ARCHITECTURES[1] -eq 1 ]]; then
     ANDROID_ARCHITECTURES+="$(get_android_arch 0) "
+    mkdir -p ${BASEDIR}/android/build
     cat > "${BASEDIR}/android/build/.neon" << EOF
 EOF
 elif [[ ENABLED_ARCHITECTURES[0] -eq 1 ]]; then
@@ -413,7 +414,7 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
 
     cd ${BASEDIR}/android
 
-    ${ANDROID_NDK_ROOT}/ndk-build 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+    ${ANDROID_NDK_ROOT}/ndk-build -B 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
 
     if [ $? -ne 0 ]; then
         echo -e "failed\n"

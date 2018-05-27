@@ -39,9 +39,12 @@ public class FFmpeg {
     protected static AsynchronousTaskService asynchronousTaskService;
 
     static {
-        Abi abi = Abi.from(AbiDetect.getAbi());
+        final Abi abi = Abi.from(AbiDetect.getAbi());
+        String abiName = abi.getValue();
 
         Log.enableCollectingStdOutErr();
+
+        android.util.Log.i(Log.TAG, "Loading mobile-ffmpeg.");
 
         /*
          * NEON supported arm-v7a library has a different name
@@ -50,17 +53,18 @@ public class FFmpeg {
         if (abi == Abi.ABI_ARMV7A_NEON) {
             try {
                 System.loadLibrary("mobileffmpeg-armv7a-neon");
-                android.util.Log.i(Log.TAG, "Loaded mobile-ffmpeg-" + abi.getValue() + "-" + getVersion());
+                android.util.Log.i(Log.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", abiName, getVersion()));
                 nativeLibraryLoaded = true;
-            } catch (Exception e) {
-                android.util.Log.i(Log.TAG, "NEON supported mobile-ffmpeg armv7a library not found. Loading default armv7a library.", e);
+            } catch (UnsatisfiedLinkError e) {
+                android.util.Log.i(Log.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
+                abiName = Abi.ABI_ARMV7A.getValue();
             }
         }
 
         if (!nativeLibraryLoaded) {
             System.loadLibrary("mobileffmpeg");
 
-            android.util.Log.i(Log.TAG, "Loaded mobile-ffmpeg-" + abi.getValue() + "-" + getVersion());
+            android.util.Log.i(Log.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", abiName, getVersion()));
         }
 
         asynchronousTaskService = new AsynchronousTaskService();

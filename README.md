@@ -59,7 +59,7 @@ External libraries and their dependencies are explained in the [External Librari
 - cmake v3.9.x or later required by libwebp
 - gperf required by fontconfig
 - yasm required for libvpx
-
+- makeinfo (texinfo) required by gmp
 
 #### 4.1 Android
 
