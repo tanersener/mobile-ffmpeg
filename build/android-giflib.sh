@@ -37,6 +37,11 @@ cd ${BASEDIR}/src/giflib || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
+# RECONFIGURING IF REQUESTED
+if [[ ${RECONF_giflib} -eq 1 ]]; then
+    autoreconf --force --install
+fi
+
 ./configure \
     --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/giflib \
     --with-pic \

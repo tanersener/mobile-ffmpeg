@@ -61,6 +61,11 @@ cd ${BASEDIR}/src/gnutls || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
+# RECONFIGURING IF REQUESTED
+if [[ ${RECONF_gnutls} -eq 1 ]]; then
+    autoreconf --force --install
+fi
+
 ./configure \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/gnutls \
     --with-pic \

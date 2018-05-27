@@ -46,6 +46,12 @@ export BASEDIR=$(pwd)
 # MIN VERSION IOS7
 export IOS_MIN_VERSION=7.0
 
+get_mobile_ffmpeg_version() {
+    local MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+
+    echo ${MOBILE_FFMPEG_VERSION}
+}
+
 display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
@@ -89,7 +95,27 @@ display_help() {
     echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr"
     echo -e "  --enable-shine\t\tbuild with shine"
     echo -e "  --enable-speex\t\tbuild with speex"
-    echo -e "  --enable-wavpack\t\tbuild with wavpack"s
+    echo -e "  --enable-wavpack\t\tbuild with wavpack"
+    echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY\n"
+}
+
+display_version() {
+    COMMAND=`echo $0 | sed -e 's/\.\///g'`
+
+    echo -e "\
+$COMMAND $(get_mobile_ffmpeg_version)\n\
+Copyright (c) 2018 Taner Sener\n\
+License LGPLv3.0: GNU LGPL version 3 or later\n\
+<https://www.gnu.org/licenses/lgpl-3.0.en.html>\n\
+This is free software: you can redistribute it and/or modify it under the terms of the \
+GNU Lesser General Public License as published by the Free Software Foundation, \
+either version 3 of the License, or (at your option) any later version."
+}
+
+reconf_library() {
+    RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
+
+    export ${RECONF_VARIABLE}=1
 }
 
 enable_library() {
@@ -239,7 +265,7 @@ print_enabled_architectures() {
     let enabled=0;
     for print_arch in {0..4}
     do
-        if [[ ENABLED_ARCHITECTURES[$print_arch] -eq 1 ]]; then
+        if [[ ${ENABLED_ARCHITECTURES[$print_arch]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
                 echo -n ", "
             fi
@@ -263,7 +289,7 @@ print_enabled_libraries() {
     # FIRST BUILT-IN LIBRARIES
     for library in {25..26}
     do
-        if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
+        if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
                 echo -n ", "
             fi
@@ -275,7 +301,7 @@ print_enabled_libraries() {
     # THEN EXTERNAL LIBRARIES
     for library in {0..17}
     do
-        if [[ ENABLED_LIBRARIES[$library] -eq 1 ]]; then
+        if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
                 echo -n ", "
             fi
@@ -333,9 +359,18 @@ while [ ! $# -eq 0 ]
 do
 
     case $1 in
-	    --help)
+	    -h | --help)
             display_help
             exit 0
+	    ;;
+	    -V | --version)
+            display_version
+            exit 0
+	    ;;
+        --reconf-*)
+            CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
+
+            reconf_library ${CONF_LIBRARY}
 	    ;;
 	    --full)
             for library in {0..25}
@@ -369,7 +404,7 @@ TARGET_ARCH_LIST=()
 
 for run_arch in {0..4}
 do
-    if [[ ENABLED_ARCHITECTURES[$run_arch] -eq 1 ]]; then
+    if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
         export ARCH=$(get_arch_name $run_arch)
         export TARGET_SDK=$(get_target_sdk)
         export SDK_PATH=$(get_sdk_path)

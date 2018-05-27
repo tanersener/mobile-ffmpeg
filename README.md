@@ -60,6 +60,7 @@ External libraries and their dependencies are explained in the [External Librari
 - gperf required by fontconfig
 - yasm required for libvpx
 - makeinfo (texinfo) required by gmp
+- autoreconf optional
 
 #### 4.1 Android
 
@@ -69,7 +70,7 @@ Android NDK and gradle is required to build Android platform
 
 XCode is required to build IOS platform. Command Line Tools, go to https://developer.apple.com/download/more/ MacOS
 
-autoconf automake libtool
+autoconf automake libtool - both
 
 - export PATH=${PATH}:/usr/local/opt/gettext/bin by gnutls
 - curl, lipo for IOS
@@ -85,6 +86,20 @@ autoconf automake libtool
 - On very few occasions, top level build scripts fail to build one of the external libraries randomly. When the details are analyzed it is seen that compilation fails due to not-existing cpu specific instructions.
 Somehow cleaning the previous architecture build fails and this breaks the new compilation for that library. When the top level script is run again the error disappears.
 It wasn't possible to find the exact cause of this issue since it happens rarely and disappears on the next run.
+
+- configure.ac:7: error: version mismatch.  This is Automake 1.15.1,
+  configure.ac:7: but the definition used by this AM_INIT_AUTOMAKE
+  configure.ac:7: comes from Automake 1.15.  You should recreate
+  configure.ac:7: aclocal.m4 with aclocal and run automake again.
+  WARNING: 'automake-1.15' is probably too old.
+           You should only need it if you modified 'Makefile.am' or
+           'configure.ac' or m4 files included by 'configure.ac'.
+           The 'automake' program is part of the GNU Automake package:
+           <http://www.gnu.org/software/automake>
+           It also requires GNU Autoconf, GNU m4 and Perl in order to run:
+           <http://www.gnu.org/software/autoconf>
+           <http://www.gnu.org/software/m4/>
+           <http://www.perl.org/>
 
 ### 8. License
 

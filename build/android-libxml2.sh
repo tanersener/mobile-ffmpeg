@@ -43,6 +43,11 @@ make distclean 2>/dev/null 1>/dev/null
 # #error "LONG_BIT definition appears wrong for platform (bad gcc/glibc config?)."
 #
 
+# RECONFIGURING IF REQUESTED
+if [[ ${RECONF_libxml2} -eq 1 ]]; then
+    autoreconf --force --install
+fi
+
 ./configure \
     --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libxml2 \
     --with-pic \
