@@ -55,7 +55,9 @@ get_mobile_ffmpeg_version() {
 display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
-    echo -e "\n'"$COMMAND"' builds FFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries.\n"
+    echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built \
+without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. \
+When compilation ends a universal fat binary and an IOS framework is created with enabled architectures inside.\n"
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
