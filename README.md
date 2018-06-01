@@ -12,6 +12,7 @@ Source code and scripts to build FFmpeg for Android and IOS platform
 #### 1.2 IOS
 - Creates IOS dynamic universal (fat) library
 - Creates IOS dynamic framework for IOS 8 or later
+
 ### 2. Architectures
 #### 2.1 Android
 - arm-v7a
@@ -25,8 +26,8 @@ Source code and scripts to build FFmpeg for Android and IOS platform
 - arm64
 - i386
 - x86_64
-### 3. Support
-#### 3.1 FFmpeg
+
+### 3. FFmpeg Support
 This repository branch contains FFmpeg version 3.4.2 with support for the following external libraries.
 - fontconfig
 - freetype
@@ -48,11 +49,7 @@ This repository branch contains FFmpeg version 3.4.2 with support for the follow
 - wavpack
 
 External libraries and their dependencies are explained in the [External Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/External-Libraries) page.
-#### 3.2 Android
-- Android SDK 5.0 Lollipop (API Level 21) or later
-- Android NDK r16b or later
-#### 3.3 IOS
-- IOS SDK 7.0 or later
+
 ### 4. Using
 \* TODO
 
@@ -83,11 +80,9 @@ After a successful build, compiled FFmpeg and MobileFFmpeg libraries can be foun
 Both `android.sh` and `ios.sh` can be customized to override default settings. Wiki pages for
 [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) and
 [ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) include all available build options.
-
 ##### 5.2.1 Android
 >export ANDROID_NDK_ROOT=\<Android NDK Path\><br>
 >./android.sh
-
 ##### 5.2.2 IOS
 >./ios.sh
 
