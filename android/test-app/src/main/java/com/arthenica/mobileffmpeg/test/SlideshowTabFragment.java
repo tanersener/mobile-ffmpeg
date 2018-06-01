@@ -40,8 +40,6 @@ import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.arthenica.mobileffmpeg.FFmpeg;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -167,7 +165,7 @@ public class SlideshowTabFragment extends Fragment {
             handler.postDelayed(runnable, 1000);
 
             String script = Slideshow.generateScript(context.getFilesDir(), image1, image2, image3, file.getName());
-            FFmpeg.executeAsync(new Function<Integer, Void>() {
+            MainActivity.executeAsync(new Function<Integer, Void>() {
 
                 @Override
                 public Void apply(Integer returnCode) {

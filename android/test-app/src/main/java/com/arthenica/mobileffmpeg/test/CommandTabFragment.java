@@ -131,7 +131,7 @@ public class CommandTabFragment extends Fragment {
         clearLog();
         waitForLogs(logSync);
 
-        FFmpeg.executeAsync(new Function<Integer, Void>() {
+        MainActivity.executeAsync(new Function<Integer, Void>() {
 
             @Override
             public Void apply(Integer returnCode) {

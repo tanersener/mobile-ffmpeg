@@ -19,15 +19,22 @@
 
 package com.arthenica.mobileffmpeg.test;
 
+import android.arch.core.util.Function;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.arthenica.mobileffmpeg.FFmpeg;
+import com.arthenica.mobileffmpeg.util.AsynchronousTaskService;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "mobile-ffmpeg-test";
+
+    protected static AsynchronousTaskService asynchronousTaskService = new AsynchronousTaskService();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +46,28 @@ public class MainActivity extends AppCompatActivity {
 
         final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), this, 2);
         viewPager.setAdapter(adapter);
+    }
+
+    /**
+     * <p>Starts a new asynchronous FFmpeg operation with arguments provided.
+     *
+     * @param callbackFunction callback function to receive result of this execution
+     * @param arguments FFmpeg command options/arguments
+     * @return <code>Future</code> instance of asynchronous operation started
+     */
+    public static Future executeAsync(final Function<Integer, Void> callbackFunction, final String ... arguments) {
+        return asynchronousTaskService.runAsynchronously(new Callable<Integer>() {
+
+            @Override
+            public Integer call() {
+                int returnCode = FFmpeg.execute(arguments);
+                if (callbackFunction != null) {
+                    callbackFunction.apply(returnCode);
+                }
+
+                return returnCode;
+            }
+        });
     }
 
     @Override

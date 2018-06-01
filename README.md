@@ -4,7 +4,7 @@ Source code and scripts to build FFmpeg for Android and IOS platform
 ### 1. Features
 - Builds both Android and IOS
 - Supports 18 external libraries and 10 architectures in total
-- Exposes FFmpeg capabilities both directly and through MobileFFmpeg wrapper library
+- Exposes FFmpeg capabilities both directly from FFmpeg libraries and through MobileFFmpeg wrapper library
 - Creates shared libraries (.so for Android, .dylib for IOS)
 - Licensed under LGPL 3.0
 #### 1.1 Android
@@ -25,7 +25,8 @@ Source code and scripts to build FFmpeg for Android and IOS platform
 - arm64
 - i386
 - x86_64
-### 3. FFmpeg Support
+### 3. Support
+#### 3.1 FFmpeg
 This repository branch contains FFmpeg version 3.4.2 with support for the following external libraries.
 - fontconfig
 - freetype
@@ -47,61 +48,54 @@ This repository branch contains FFmpeg version 3.4.2 with support for the follow
 - wavpack
 
 External libraries and their dependencies are explained in the [External Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/External-Libraries) page.
+#### 3.2 Android
+- Android SDK 5.0 Lollipop (API Level 21) or later
+- Android NDK r16b or later
+#### 3.3 IOS
+- IOS SDK 7.0 or later
 ### 4. Using
-\* You can use prebuilt library binaries from the following locations
-### 4.1 Android
-### 4.2 IOS
+\* TODO
 
 ### 5. Building
-- pkg-config required by freetype and ffmpeg
+#### 5.1 Prerequisites
+1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
+Some of them are not mandatory for the default settings.
+Please refer to [Android Requirements](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Requirements) or
+[IOS Requirements](https://github.com/tanersener/mobile-ffmpeg/wiki/IOS-Requirements) for the details.
 
-- gcc required by freetype
-- cmake v3.9.x or later required by libwebp
-- gperf required by fontconfig
-- yasm required for libvpx
-- makeinfo (texinfo) required by gmp
-- autoreconf optional
+>autoconf automake libtool pkg-config gcc cmake gperf yasm texinfo
 
-#### 4.1 Android
+2. Android builds require these additional packages.
+- **Android SDK 5.0 Lollipop (API Level 21)** or later
+- **Android NDK r16b** or later with LLDB and CMake
+- **gradle 4.4** or later
 
-Android NDK and gradle is required to build Android platform
+3. IOS builds need these extra packages and tools.
+- **IOS SDK 7.0.x** or later
+- **Xcode 8.x** or later
+- **Command Line Tools**
+- **curl** and **lipo** utilities
 
-#### 4.2 IOS
+#### 5.2 Build Scripts
+Use `android.sh` and `ios.sh` to build MobileFFmpeg for each platform.
+After a successful build, compiled FFmpeg and MobileFFmpeg libraries can be found under `prebuilt` directory.
 
-XCode is required to build IOS platform. Command Line Tools, go to https://developer.apple.com/download/more/ MacOS
+Both `android.sh` and `ios.sh` can be customized to override default settings. Wiki pages for
+[android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) and
+[ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) include all available build options.
 
-autoconf automake libtool - both
+##### 5.2.1 Android
+>export ANDROID_NDK_ROOT=\<Android NDK Path\><br>
+>./android.sh
 
-- export PATH=${PATH}:/usr/local/opt/gettext/bin by gnutls
-- curl, lipo for IOS
-
-\* Use `android.sh` to build FFmpeg for Android. Visit [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) page for all build options.
+##### 5.2.2 IOS
+>./ios.sh
 
 ### 6. API
 
-\* MobileFFmpeg API defines
+\* TODO
 
-### 7. Known Issues
-
-- On very few occasions, top level build scripts fail to build one of the external libraries randomly. When the details are analyzed it is seen that compilation fails due to not-existing cpu specific instructions.
-Somehow cleaning the previous architecture build fails and this breaks the new compilation for that library. When the top level script is run again the error disappears.
-It wasn't possible to find the exact cause of this issue since it happens rarely and disappears on the next run.
-
-- configure.ac:7: error: version mismatch.  This is Automake 1.15.1,
-  configure.ac:7: but the definition used by this AM_INIT_AUTOMAKE
-  configure.ac:7: comes from Automake 1.15.  You should recreate
-  configure.ac:7: aclocal.m4 with aclocal and run automake again.
-  WARNING: 'automake-1.15' is probably too old.
-           You should only need it if you modified 'Makefile.am' or
-           'configure.ac' or m4 files included by 'configure.ac'.
-           The 'automake' program is part of the GNU Automake package:
-           <http://www.gnu.org/software/automake>
-           It also requires GNU Autoconf, GNU m4 and Perl in order to run:
-           <http://www.gnu.org/software/autoconf>
-           <http://www.gnu.org/software/m4/>
-           <http://www.perl.org/>
-
-### 8. License
+### 7. License
 
 This project is licensed under the LGPL v3.0.
 
@@ -111,12 +105,10 @@ Digital assets used in test applications are published in the public domain.
 
 Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
 
-### 9. Contributing
+### 8. Contributing
 
 This project is stable but far from complete. If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. Any help is appreciated.
 
-### 10 See Also
+### 9 See Also
 
 - [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)
-
-**PS**: Asterisk (*) denotes ongoing work
