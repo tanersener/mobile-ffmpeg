@@ -104,6 +104,7 @@ Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License)
 
 This project is stable but far from complete. If you have any recommendations or ideas to improve it, please feel free to submit issues or pull requests. Any help is appreciated.
 
-### 9 See Also
+### 9. See Also
 
+- [FFmpeg API Documentation](https://ffmpeg.org/doxygen/3.4/index.html)
 - [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)
