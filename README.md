@@ -56,11 +56,12 @@ External libraries and their dependencies are explained in the [External Librari
 ### 5. Building
 #### 5.1 Prerequisites
 1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
-Some of them are not mandatory for the default settings.
-Please refer to [Android Requirements](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Requirements) or
-[IOS Requirements](https://github.com/tanersener/mobile-ffmpeg/wiki/IOS-Requirements) for the details.
-
->autoconf automake libtool pkg-config gcc cmake gperf yasm texinfo
+```
+autoconf automake libtool pkg-config gcc cmake gperf yasm texinfo
+```
+Some of these packages are not mandatory for the default build.
+Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Prerequisites) and
+[IOS Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/IOS-Prerequisites) for the details.
 
 2. Android builds require these additional packages.
 - **Android SDK 5.0 Lollipop (API Level 21)** or later
@@ -77,14 +78,18 @@ Please refer to [Android Requirements](https://github.com/tanersener/mobile-ffmp
 Use `android.sh` and `ios.sh` to build MobileFFmpeg for each platform.
 After a successful build, compiled FFmpeg and MobileFFmpeg libraries can be found under `prebuilt` directory.
 
-Both `android.sh` and `ios.sh` can be customized to override default settings. Wiki pages for
+Both `android.sh` and `ios.sh` can be customized to override default settings,
 [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) and
-[ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) include all available build options.
+[ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) wiki pages include all available build options.
 ##### 5.2.1 Android
->export ANDROID_NDK_ROOT=\<Android NDK Path\><br>
->./android.sh
+```
+export ANDROID_NDK_ROOT=<Android NDK Path>
+./android.sh
+```
 ##### 5.2.2 IOS
->./ios.sh
+```
+./ios.sh
+```
 
 ### 6. API
 

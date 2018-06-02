@@ -26,12 +26,22 @@
 #include <jni.h>
 #include <android/log.h>
 
+/** Defines tag used for Android logging. */
 #define LIB_NAME "mobile-ffmpeg"
 
+/** Verbose Android logging macro. */
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LIB_NAME, __VA_ARGS__)
+
+/** Debug Android logging macro. */
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LIB_NAME, __VA_ARGS__)
+
+/** Info Android logging macro. */
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LIB_NAME, __VA_ARGS__)
+
+/** Warn Android logging macro. */
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LIB_NAME, __VA_ARGS__)
+
+/** Error Android logging macro. */
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LIB_NAME, __VA_ARGS__)
 
 /*

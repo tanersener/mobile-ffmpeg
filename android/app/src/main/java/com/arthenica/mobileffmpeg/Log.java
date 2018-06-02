@@ -21,8 +21,24 @@ package com.arthenica.mobileffmpeg;
 
 import android.arch.core.util.Function;
 
+/**
+ * <p>This class is used to process stdout and stderr logs from native libraries.
+ *
+ * <p>By default stdout and stderr is redirected to <code>/dev/null</code> in Android. This class
+ * redirects these streams to Logcat in order to view logs printed by FFmpeg native libraries.
+ *
+ * <p>Alternatively, it is possible not to print messages to Logcat and pass them to a callback
+ * function. This function can decide whether to print these logs or ignore them according to its
+ * own rules.
+ *
+ * @author Taner Sener
+ * @since v1.0
+ */
 public class Log {
 
+    /**
+     * Defines tag used for logging.
+     */
     public static final String TAG = "mobile-ffmpeg";
 
     private static Function<byte[], Void> callbackFunction;
@@ -31,18 +47,41 @@ public class Log {
         System.loadLibrary("ffmpeglog");
     }
 
+    /**
+     * Default constructor hidden.
+     */
+    private Log() {
+    }
+
+    /**
+     * <p>Enables redirecting stdout and stderr.
+     */
     public static void enableCollectingStdOutErr() {
         startNativeCollector();
     }
 
+    /**
+     * <p>Disables redirecting stdout and stderr.
+     */
     public static void disableCollectingStdOutErr() {
         stopNativeCollector();
     }
 
+    /**
+     * <p>Sets a callback function to receive logs from FFmpeg native libraries.
+     *
+     * @param newCallbackFunction callback to receive logs
+     */
     public static void enableCallbackFunction(final Function<byte[], Void> newCallbackFunction) {
         callbackFunction = newCallbackFunction;
     }
 
+    /**
+     * <p>Main method called by JNI part to redirect log messages. It is not designed to be called
+     * manually by Java classes.
+     *
+     * @param logMessage log message
+     */
     public static void log(final byte[] logMessage) {
         if (callbackFunction != null) {
             callbackFunction.apply(logMessage);
@@ -51,8 +90,18 @@ public class Log {
         }
     }
 
+    /**
+     * <p>Starts native log collector.
+     *
+     * @return zero on success, non-zero if an error occurs
+     */
     public static native int startNativeCollector();
 
+    /**
+     * <p>Stops native log collector.
+     *
+     * @return zero on success, non-zero if an error occurs
+     */
     public static native int stopNativeCollector();
 
 }

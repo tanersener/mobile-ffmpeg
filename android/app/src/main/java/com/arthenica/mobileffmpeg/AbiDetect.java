@@ -20,10 +20,11 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Detects ABI using Android's <code>cpufeatures</code> library. This is crucial in order to
- * load the correct .so files for MobileFFmpeg.
+ * <p>This class is used to detect running ABI name using Android's <code>cpufeatures</code>
+ * library.
  *
  * @author Taner Sener
+ * @since v1.0
  */
 public class AbiDetect {
 
@@ -31,6 +32,17 @@ public class AbiDetect {
         System.loadLibrary("abidetect");
     }
 
+    /**
+     * Default constructor hidden.
+     */
+    private AbiDetect() {
+    }
+
+    /**
+     * <p>Returns running ABI name.
+     *
+     * @return running ABI name
+     */
     public native static String getAbi();
 
 }

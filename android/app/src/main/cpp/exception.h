@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <setjmp.h>
 
+/** Holds information to implement exception handling. */
 jmp_buf ex_buf__;
 
 #endif // MOBILEFFMPEG_EXCEPTION_H

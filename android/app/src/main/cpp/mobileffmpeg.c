@@ -19,16 +19,26 @@
 
 #include "mobileffmpeg.h"
 
-// forward declaration for ffmpeg.c
+/** Forward declaration for function defined in ffmpeg.c */
 int execute(int argc, char **argv);
 
+/** Full name of the Java class that owns native functions in this file. */
 const char *ffmpegClassName = "com/arthenica/mobileffmpeg/FFmpeg";
+
+/** Prototypes of native functions defined by this file. */
 JNINativeMethod ffmpegMethods[] = {
   {"getFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion},
   {"getVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion},
   {"execute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_execute}
 };
 
+/**
+ * Called when 'mobileffmpeg' native library is loaded.
+ *
+ * \param vm pointer to the running virtual machine
+ * \param reserved reserved
+ * \return JNI version needed by 'mobileffmpeg' library
+ */
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     if ((*vm)->GetEnv(vm, (void**)(&env), JNI_VERSION_1_6) != JNI_OK) {
@@ -50,28 +60,35 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    getFFmpegVersion
- * Signature: ()Ljava/lang/String;
+/**
+ * Returns FFmpeg version bundled within the library.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ * \return FFmpeg version string
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion(JNIEnv *env, jclass object) {
     return (*env)->NewStringUTF(env, FFMPEG_VERSION);
 }
 
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    getVersion
- * Signature: ()Ljava/lang/String;
+/**
+ * Returns MobileFFmpeg library version.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ * \return MobileFFmpeg version string
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIEnv *env, jclass object) {
     return (*env)->NewStringUTF(env, MOBILE_FFMPEG_VERSION);
 }
 
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    execute
- * Signature: ([Ljava/lang/String;)I
+/**
+ * Synchronously executes FFmpeg command with arguments provided.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ * \param stringArray reference to the object holding FFmpeg command arguments
+ * \return zero on successful execution, non-zero on error
  */
 JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *env, jclass object, jobjectArray stringArray) {
     jstring *tempArray = NULL;

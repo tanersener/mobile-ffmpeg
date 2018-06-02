@@ -20,6 +20,11 @@
 #include "log.h"
 #import <Foundation/Foundation.h>
 
+/**
+ * Verbose logging function.
+ *
+ * \param message log message
+ */
 void logv(const char *message,...) {
     va_list args;
     va_start(args, message);
@@ -27,6 +32,11 @@ void logv(const char *message,...) {
     va_end(args);
 }
 
+/**
+ * Debug logging function.
+ *
+ * \param message log message
+ */
 void logd(const char *message,...) {
     va_list args;
     va_start(args, message);
@@ -34,6 +44,11 @@ void logd(const char *message,...) {
     va_end(args);
 }
 
+/**
+ * Info logging function.
+ *
+ * \param message log message
+ */
 void logi(const char *message,...) {
     va_list args;
     va_start(args, message);
@@ -41,6 +56,11 @@ void logi(const char *message,...) {
     va_end(args);
 }
 
+/**
+ * Warn logging function.
+ *
+ * \param message log message
+ */
 void logw(const char *message,...) {
     va_list args;
     va_start(args, message);
@@ -48,6 +68,11 @@ void logw(const char *message,...) {
     va_end(args);
 }
 
+/**
+ * Error logging function.
+ *
+ * \param message log message
+ */
 void loge(const char *message,...) {
     va_list args;
     va_start(args, message);

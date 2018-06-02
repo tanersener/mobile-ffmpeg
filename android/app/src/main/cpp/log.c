@@ -19,20 +19,40 @@
 
 #include "log.h"
 
+/** Global reference to the virtual machine running */
 static JavaVM *globalVm;
+
+/** Global reference of Log class in Java side */
 static jclass logClass;
+
+/** Global reference of forward log method in Java side */
 static jmethodID logMethod;
 
+/** file descriptor of the pipe created */
 static int pipeFd[2];
+
+/** log collector thread variable */
 static pthread_t logThread;
+
+/** Holds whether log collector thread is enabled or not */
 static int logThreadEnabled = 1;
 
+/** Full name of the Java class that owns native functions in this file. */
 const char *logClassName = "com/arthenica/mobileffmpeg/Log";
+
+/** Prototypes of native functions defined by this file. */
 JNINativeMethod logMethods[] = {
     {"startNativeCollector", "()I", (void*) Java_com_arthenica_mobileffmpeg_Log_startNativeCollector},
     {"stopNativeCollector", "()I", (void*) Java_com_arthenica_mobileffmpeg_Log_stopNativeCollector}
 };
 
+/**
+ * Called when 'ffmpeglog' native library is loaded.
+ *
+ * \param vm pointer to the running virtual machine
+ * \param reserved reserved
+ * \return JNI version needed by 'ffmpeglog' library
+ */
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK) {
@@ -65,6 +85,9 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
+/**
+ * Native log collector main thread function.
+ */
 static void *logThreadFunction() {
     int readSize;
     char buffer[512];
@@ -106,10 +129,13 @@ static void *logThreadFunction() {
     return 0;
 }
 
-/*
- * Class:     com_arthenica_mobileffmpeg_Log
- * Method:    startNativeCollector
- * Signature: ()I
+/**
+ * Starts native log collector. Native log collector creates a pipe and redirects stdout and stderr to it. Then starts
+ * a thread, reads data written to this pipe and forwards it to the Java side.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the object on which this method is invoked
+ * \return zero on success, non-zero if an error occurs
  */
 JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_startNativeCollector(JNIEnv *env, jobject object) {
 
@@ -132,10 +158,13 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_startNativeCollector(
     return 0;
 }
 
-/*
- * Class:     com_arthenica_mobileffmpeg_Log
- * Method:    stopNativeCollector
- * Signature: ()I
+/**
+ * Initiates a stop request for native log collector thread. Please note that when this function returns collector
+ * thread might be still alive.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the object on which this method is invoked
+ * \return zero on success, non-zero if an error occurs
  */
 JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_stopNativeCollector(JNIEnv *env, jobject object) {
     logThreadEnabled = 0;

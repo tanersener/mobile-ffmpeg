@@ -23,12 +23,25 @@
 #include <jni.h>
 #include "log.h"
 
+/** Represents armeabi-v7a ABI with NEON support. */
 #define ABI_ARMV7A_NEON "armeabi-v7a-neon"
+
+/** Represents armeabi-v7a ABI. */
 #define ABI_ARMV7A "armeabi-v7a"
+
+/** Represents armeabi ABI. */
 #define ABI_ARM "armeabi"
+
+/** Represents x86 ABI. */
 #define ABI_X86 "x86"
+
+/** Represents x86_64 ABI. */
 #define ABI_X86_64 "x86_64"
+
+/** Represents arm64-v8a ABI. */
 #define ABI_ARM64_V8A "arm64-v8a"
+
+/** Represents not supported ABIs. */
 #define ABI_UNKNOWN "unknown"
 
 /*

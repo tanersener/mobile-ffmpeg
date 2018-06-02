@@ -24,12 +24,42 @@
 #include <pthread.h>
 #include <unistd.h>
 
+/** Identifier used for IOS logging. */
 #define LIB_NAME "mobile-ffmpeg"
 
+/**
+ * Verbose logging function.
+ *
+ * \param message log message
+ */
 void logv(const char *message, ...) __attribute__((format(printf, 1, 2)));
+
+/**
+ * Debug logging function.
+ *
+ * \param message log message
+ */
 void logd(const char *message, ...) __attribute__((format(printf, 1, 2)));
+
+/**
+ * Info logging function.
+ *
+ * \param message log message
+ */
 void logi(const char *message, ...) __attribute__((format(printf, 1, 2)));
+
+/**
+ * Warn logging function.
+ *
+ * \param message log message
+ */
 void logw(const char *message, ...) __attribute__((format(printf, 1, 2)));
+
+/**
+ * Error logging function.
+ *
+ * \param message log message
+ */
 void loge(const char *message, ...) __attribute__((format(printf, 1, 2)));
 
 #endif /* MOBILEFFMPEG_LOG_H */

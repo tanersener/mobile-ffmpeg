@@ -19,4 +19,5 @@
 
 #include "exception.h"
 
+/** Holds information to implement exception handling. */
 jmp_buf ex_buf__;

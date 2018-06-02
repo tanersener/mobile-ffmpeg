@@ -20,17 +20,23 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Base class for FFmpeg operations.
- *
- * <p>Note that before terminating {@link #shutdown()} method must be called.
+ * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
+ * FFmpeg commands.
+ * <pre>
+ *      int rc = FFmpeg.execute("-i", "file1.mp4", "-c:v", "libxvid", "file1.avi");
+ *      Log.i(Log.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
+ * </pre>
+ * <p>Note that it is recommended to call {@link #shutdown()} method before terminating your
+ * Android app.
  *
  * @author Taner Sener
+ * @since v1.0
  */
 public class FFmpeg {
 
     static {
         final Abi abi = Abi.from(AbiDetect.getAbi());
-        String abiName = abi.getValue();
+        String abiName = abi.getName();
 
         Log.enableCollectingStdOutErr();
 
@@ -47,7 +53,7 @@ public class FFmpeg {
                 nativeLibraryLoaded = true;
             } catch (UnsatisfiedLinkError e) {
                 android.util.Log.i(Log.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
-                abiName = Abi.ABI_ARMV7A.getValue();
+                abiName = Abi.ABI_ARMV7A.getName();
             }
         }
 
@@ -56,6 +62,12 @@ public class FFmpeg {
 
             android.util.Log.i(Log.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", abiName, getVersion()));
         }
+    }
+
+    /**
+     * Default constructor hidden.
+     */
+    private FFmpeg() {
     }
 
     /**
@@ -81,10 +93,18 @@ public class FFmpeg {
     public native static int execute(final String ... arguments);
 
     /**
-     * <p>Disables collecting stdout and stderr.
+     * <p>Shuts down library capabilities.
      */
     public static void shutdown() {
         Log.disableCollectingStdOutErr();
+    }
+
+    /**
+     * <p>Overrides default {@link Object#finalize()} method.
+     */
+    @Override
+    protected void finalize() {
+        shutdown();
     }
 
 }

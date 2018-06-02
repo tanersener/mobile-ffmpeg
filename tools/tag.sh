@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+# Creates a new tag on the current branch
+#
 
 if [ $# -ne 1 ];
 then

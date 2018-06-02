@@ -20,11 +20,21 @@
 #include "cpu-features.h"
 #include "abidetect.h"
 
+/** Full name of the Java class that owns native functions in this file. */
 const char *abiDetectClassName = "com/arthenica/mobileffmpeg/AbiDetect";
+
+/** Prototypes of native functions defined by this file. */
 JNINativeMethod abiDetectMethods[] = {
   {"getAbi", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi}
 };
 
+/**
+ * Called when 'abidetect' native library is loaded.
+ *
+ * \param vm pointer to the running virtual machine
+ * \param reserved reserved
+ * \return JNI version needed by 'abidetect' library
+ */
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK) {
@@ -46,10 +56,12 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-/*
- * Class:     com_arthenica_mobileffmpeg_AbiDetect
- * Method:    getAbi
- * Signature: ()Ljava/lang/String;
+/**
+ * Returns running ABI name.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ * \return running ABI name as UTF string
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEnv *env, jclass object) {
     AndroidCpuFamily family = android_getCpuFamily();

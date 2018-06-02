@@ -20,48 +20,92 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>Android ABI helper enum.
+ * <p>Helper enumeration type for Android ABIs; includes only supported ABIs.
  *
  * @author Taner Sener
+ * @since v1.0
  */
 public enum Abi {
 
+    /**
+     * Represents armeabi-v7a ABI with NEON support
+     */
     ABI_ARMV7A_NEON("armeabi-v7a-neon"),
+
+    /**
+     * Represents armeabi-v7a ABI
+     */
     ABI_ARMV7A("armeabi-v7a"),
+
+    /**
+     * Represents armeabi ABI
+     */
     ABI_ARM("armeabi"),
+
+    /**
+     * Represents x86 ABI
+     */
     ABI_X86("x86"),
+
+    /**
+     * Represents x86_64 ABI
+     */
     ABI_X86_64("x86_64"),
+
+    /**
+     * Represents arm64-v8a ABI
+     */
     ABI_ARM64_V8A("arm64-v8a"),
+
+    /**
+     * Represents not supported ABIs
+     */
     ABI_UNKNOWN("unknown");
 
-    private String value;
+    private String name;
 
-    public static Abi from(final String value) {
-        if (value == null) {
+    /**
+     * <p>Returns enumeration defined by ABI name.
+     *
+     * @param abiName ABI name
+     * @return enumeration defined by ABI name
+     */
+    public static Abi from(final String abiName) {
+        if (abiName == null) {
             return ABI_UNKNOWN;
-        } else if (value.equals(ABI_ARM.getValue())) {
+        } else if (abiName.equals(ABI_ARM.getName())) {
             return ABI_ARM;
-        } else if (value.equals(ABI_ARMV7A.getValue())) {
+        } else if (abiName.equals(ABI_ARMV7A.getName())) {
             return ABI_ARMV7A;
-        } else if (value.equals(ABI_ARMV7A_NEON.getValue())) {
+        } else if (abiName.equals(ABI_ARMV7A_NEON.getName())) {
             return ABI_ARMV7A_NEON;
-        } else if (value.equals(ABI_ARM64_V8A.getValue())) {
+        } else if (abiName.equals(ABI_ARM64_V8A.getName())) {
             return ABI_ARM64_V8A;
-        } else if (value.equals(ABI_X86.getValue())) {
+        } else if (abiName.equals(ABI_X86.getName())) {
             return ABI_X86;
-        } else if (value.equals(ABI_X86_64.getValue())) {
+        } else if (abiName.equals(ABI_X86_64.getName())) {
             return ABI_X86_64;
         } else {
             return ABI_UNKNOWN;
         }
     }
 
-    public String getValue() {
-        return value;
+    /**
+     * Returns ABI name as defined in Android NDK documentation.
+     *
+     * @return ABI name
+     */
+    public String getName() {
+        return name;
     }
 
-    Abi(final String value) {
-        this.value = value;
+    /**
+     * Creates new enum.
+     *
+     * @param abiName ABI name
+     */
+    Abi(final String abiName) {
+        this.name = abiName;
     }
 
 }

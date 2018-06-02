@@ -32,6 +32,19 @@ android {
     }
 }
 
+task javadoc(type: Javadoc) {
+    title = 'MobileFFmpeg'
+    destinationDir = file("${projectDir}/../../doc/android/javadoc")
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    source = android.sourceSets.main.java.srcDirs
+}
+
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompile.classpath.files
+    })
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'

@@ -19,17 +19,34 @@
 
 #include "mobileffmpeg.h"
 
-// forward declaration for ffmpeg.c
+/** Forward declaration for function defined in ffmpeg.c */
 int execute(int argc, char **argv);
 
+/**
+ * Returns FFmpeg version bundled within the library.
+ *
+ * \return FFmpeg version string
+ */
 const char *mobileffmpeg_get_ffmpeg_version(void) {
     return FFMPEG_VERSION;
 }
 
+/**
+ * Returns MobileFFmpeg library version.
+ *
+ * \return MobileFFmpeg version string
+ */
 const char *mobileffmpeg_get_version(void) {
     return MOBILE_FFMPEG_VERSION;
 }
 
+/**
+ * Synchronously executes FFmpeg command with arguments provided.
+ *
+ * \param argc argument count
+ * \param argv arguments pointer
+ * \return zero on successful execution, non-zero on error
+ */
 int mobileffmpeg_execute(int argc, char **argv) {
     int argumentCount = 1;
     char **newArgv = NULL;

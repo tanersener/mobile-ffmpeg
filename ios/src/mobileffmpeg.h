@@ -26,6 +26,7 @@
 #include "libavutil/ffversion.h"
 #include "log.h"
 
+/** Library version string */
 #define MOBILE_FFMPEG_VERSION "1.0"
 
 const char *mobileffmpeg_get_ffmpeg_version(void);

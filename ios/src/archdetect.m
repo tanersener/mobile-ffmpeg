@@ -21,6 +21,11 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ * Returns running architecture name.
+ *
+ * \return running architecture name as UTF-8 string
+ */
 const char *mobileffmpeg_get_arch(void) {
       NSMutableString *cpu = [[NSMutableString alloc] init];
       size_t size;
