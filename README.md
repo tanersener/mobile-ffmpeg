@@ -51,7 +51,40 @@ This repository branch contains FFmpeg version 3.4.2 with support for the follow
 External libraries and their dependencies are explained in the [External Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/External-Libraries) page.
 
 ### 4. Using
-\* TODO
+#### 4.1 Android
+Import `mobile-ffmpeg-1.0.aar` into your project and use the following source code.
+```
+    import com.arthenica.mobileffmpeg.FFmpeg;
+
+    int rc = FFmpeg.execute("-i", "file1.mp4", "-c:v", "libxvid", "file1.avi");
+    Log.i(Log.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
+```
+#### 4.2 IOS
+Use MobileFFmpeg in your project by adding all IOS frameworks from `prebuilt/ios-framework` or 
+by adding all ffmpeg and mobile-ffmpeg dylibs with headers from `prebuilt/ios-universal`.
+
+Then run the following Objective-C source code.
+```
+    #import <mobileffmpeg/mobileffmpeg.h>
+
+    NSString* command = @"-i file1.mp4 -c:v libxvid file1.avi";
+    NSArray* commandArray = [command componentsSeparatedByString:@" "];
+    char **arguments = (char **)malloc(sizeof(char*) * ([commandArray count]));
+    for (int i=0; i < [commandArray count]; i++) {
+        NSString *argument = [commandArray objectAtIndex:i];
+        arguments[i] = (char *) [argument UTF8String];
+    }
+
+    int result = mobileffmpeg_execute((int) [commandArray count], arguments);
+
+    NSLog(@"Process exited with rc %d\n", result);
+    
+    free(arguments);
+```
+#### 4.3 Test Application
+You can see how MobileFFmpeg is used inside an application by running test applications in this repository.
+There is an Android test application under the `android/test-app` folder and an IOS test application under the 
+`ios/test-app` folder. 
 
 ### 5. Building
 #### 5.1 Prerequisites
