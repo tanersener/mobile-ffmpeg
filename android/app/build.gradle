@@ -34,7 +34,7 @@ android {
 
 task javadoc(type: Javadoc) {
     title = 'MobileFFmpeg'
-    destinationDir = file("${projectDir}/../../doc/android/javadoc")
+    destinationDir = file("${projectDir}/../../docs/android/javadoc")
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
     source = android.sourceSets.main.java.srcDirs
 }

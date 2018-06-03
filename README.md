@@ -60,8 +60,8 @@ Import `mobile-ffmpeg-1.0.aar` into your project and use the following source co
     Log.i(Log.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
 ```
 #### 4.2 IOS
-Use MobileFFmpeg in your project by adding all IOS frameworks from `prebuilt/ios-framework` or 
-by adding all ffmpeg and mobile-ffmpeg dylibs with headers from `prebuilt/ios-universal`.
+Use MobileFFmpeg in your project by adding all IOS frameworks from `prebuilt/ios-framework` path or 
+by adding all `ffmpeg` and `mobile-ffmpeg` dylibs with headers from folders inside `prebuilt/ios-universal`.
 
 Then run the following Objective-C source code.
 ```
