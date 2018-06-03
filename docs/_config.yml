@@ -1,1 +1,14 @@
-theme: jekyll-theme-cayman
+# main section
+title: mobile-ffmpeg
+baseurl: ""
+locale: "en"
+theme: jekyll-theme-minimal
+markdown: kramdown
+
+# github section
+show_downloads: true
+github:
+  zip_url:
+  tar_url: 
+  owner_name: Taner Sener
+  owner_url: https://github.com/tanersener
