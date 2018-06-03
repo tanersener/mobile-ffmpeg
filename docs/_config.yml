@@ -1,6 +1,6 @@
 # main section
 title: mobile-ffmpeg
-baseurl: ""
+baseurl: "/mobile-ffmpeg"
 locale: "en"
 theme: jekyll-theme-minimal
 markdown: kramdown
