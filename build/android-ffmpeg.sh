@@ -41,34 +41,34 @@ export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
 TARGET_ARCH=""
-NEON_FLAG=""
+ASM_FLAGS=""
 case ${ARCH} in
     arm-v7a)
         TARGET_CPU="armv7-a"
         TARGET_ARCH="armv7-a"
-        NEON_FLAG="	--disable-neon --enable-asm"
+        ASM_FLAGS="	--disable-neon --enable-asm --enable-inline-asm"
     ;;
     arm-v7a-neon)
         TARGET_CPU="armv7-a"
         TARGET_ARCH="armv7-a"
-        NEON_FLAG="	--enable-neon --enable-asm"
+        ASM_FLAGS="	--enable-neon --enable-asm --enable-inline-asm"
     ;;
     arm64-v8a)
         TARGET_CPU="armv8-a"
         TARGET_ARCH="aarch64"
-        NEON_FLAG="	--enable-neon --enable-asm"
+        ASM_FLAGS="	--enable-neon --enable-asm --enable-inline-asm"
     ;;
     x86)
         TARGET_CPU="i686"
         TARGET_ARCH="i686"
 
         # asm disabled due to this ticker https://trac.ffmpeg.org/ticket/4928
-        NEON_FLAG="	--disable-neon --disable-asm"
+        ASM_FLAGS="	--disable-neon --disable-asm --disable-inline-asm"
     ;;
     x86-64)
         TARGET_CPU="x86_64"
         TARGET_ARCH="x86_64"
-        NEON_FLAG="	--disable-neon --enable-asm"
+        ASM_FLAGS="	--disable-neon --enable-asm --enable-inline-asm"
     ;;
 esac
 
@@ -230,11 +230,10 @@ make distclean 2>/dev/null 1>/dev/null
     --arch="${TARGET_ARCH}" \
     --cpu="${TARGET_CPU}" \
     --target-os=android \
-    ${NEON_FLAG} \
+    ${ASM_FLAGS} \
     --enable-cross-compile \
     --enable-pic \
     --enable-jni \
-    --enable-inline-asm \
     --enable-optimizations \
     --enable-small  \
     --enable-swscale \
