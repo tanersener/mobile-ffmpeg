@@ -50,9 +50,9 @@
 #include "avio_internal.h"
 #include "spdif.h"
 #include "libavcodec/ac3.h"
+#include "libavcodec/adts_parser.h"
 #include "libavcodec/dca.h"
 #include "libavcodec/dca_syncwords.h"
-#include "libavcodec/aacadtsdec.h"
 #include "libavutil/opt.h"
 
 typedef struct IEC61937Context {
@@ -118,7 +118,8 @@ static int spdif_header_eac3(AVFormatContext *s, AVPacket *pkt)
     static const uint8_t eac3_repeat[4] = {6, 3, 2, 1};
     int repeat = 1;
 
-    if ((pkt->data[4] & 0xc0) != 0xc0) /* fscod */
+    int bsid = pkt->data[5] >> 3;
+    if (bsid > 10 && (pkt->data[4] & 0xc0) != 0xc0) /* fscod */
         repeat = eac3_repeat[(pkt->data[4] & 0x30) >> 4]; /* numblkscod */
 
     ctx->hd_buf = av_fast_realloc(ctx->hd_buf, &ctx->hd_buf_size, ctx->hd_buf_filled + pkt->size);
@@ -349,19 +350,18 @@ static int spdif_header_mpeg(AVFormatContext *s, AVPacket *pkt)
 static int spdif_header_aac(AVFormatContext *s, AVPacket *pkt)
 {
     IEC61937Context *ctx = s->priv_data;
-    AACADTSHeaderInfo hdr;
-    GetBitContext gbc;
+    uint32_t samples;
+    uint8_t frames;
     int ret;
 
-    init_get_bits(&gbc, pkt->data, AAC_ADTS_HEADER_SIZE * 8);
-    ret = avpriv_aac_parse_header(&gbc, &hdr);
+    ret = av_adts_header_parse(pkt->data, &samples, &frames);
     if (ret < 0) {
         av_log(s, AV_LOG_ERROR, "Wrong AAC file format\n");
-        return AVERROR_INVALIDDATA;
+        return ret;
     }
 
-    ctx->pkt_offset = hdr.samples << 2;
-    switch (hdr.num_aac_frames) {
+    ctx->pkt_offset = samples << 2;
+    switch (frames) {
     case 1:
         ctx->data_type = IEC61937_MPEG2_AAC;
         break;
@@ -373,7 +373,7 @@ static int spdif_header_aac(AVFormatContext *s, AVPacket *pkt)
         break;
     default:
         av_log(s, AV_LOG_ERROR,
-               "%"PRIu32" samples in AAC frame not supported\n", hdr.samples);
+               "%"PRIu32" samples in AAC frame not supported\n", samples);
         return AVERROR(EINVAL);
     }
     //TODO Data type dependent info (LC profile/SBR)

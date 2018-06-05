@@ -12,9 +12,13 @@
 
 #include "./example_util.h"
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include "webp/mux_types.h"
+#include "../imageio/imageio_util.h"
 
 //------------------------------------------------------------------------------
 // String parsing
@@ -55,4 +59,69 @@ float ExUtilGetFloat(const char* const v, int* const error) {
             (v != NULL) ? v : "(null)");
   }
   return f;
+}
+
+//------------------------------------------------------------------------------
+
+static void ResetCommandLineArguments(int argc, const char* argv[],
+                                      CommandLineArguments* const args) {
+  assert(args != NULL);
+  args->argc_ = argc;
+  args->argv_ = argv;
+  args->own_argv_ = 0;
+  WebPDataInit(&args->argv_data_);
+}
+
+void ExUtilDeleteCommandLineArguments(CommandLineArguments* const args) {
+  if (args != NULL) {
+    if (args->own_argv_) {
+      free((void*)args->argv_);
+      WebPDataClear(&args->argv_data_);
+    }
+    ResetCommandLineArguments(0, NULL, args);
+  }
+}
+
+#define MAX_ARGC 16384
+int ExUtilInitCommandLineArguments(int argc, const char* argv[],
+                                   CommandLineArguments* const args) {
+  if (args == NULL || argv == NULL) return 0;
+  ResetCommandLineArguments(argc, argv, args);
+  if (argc == 1 && argv[0][0] != '-') {
+    char* cur;
+    const char sep[] = " \t\r\n\f\v";
+    if (!ExUtilReadFileToWebPData(argv[0], &args->argv_data_)) {
+      return 0;
+    }
+    args->own_argv_ = 1;
+    args->argv_ = (const char**)malloc(MAX_ARGC * sizeof(*args->argv_));
+    if (args->argv_ == NULL) return 0;
+
+    argc = 0;
+    for (cur = strtok((char*)args->argv_data_.bytes, sep);
+         cur != NULL;
+         cur = strtok(NULL, sep)) {
+      if (argc == MAX_ARGC) {
+        fprintf(stderr, "ERROR: Arguments limit %d reached\n", MAX_ARGC);
+        return 0;
+      }
+      assert(strlen(cur) != 0);
+      args->argv_[argc++] = cur;
+    }
+    args->argc_ = argc;
+  }
+  return 1;
+}
+
+//------------------------------------------------------------------------------
+
+int ExUtilReadFileToWebPData(const char* const filename,
+                             WebPData* const webp_data) {
+  const uint8_t* data;
+  size_t size;
+  if (webp_data == NULL) return 0;
+  if (!ImgIoUtilReadFile(filename, &data, &size)) return 0;
+  webp_data->bytes = data;
+  webp_data->size = size;
+  return 1;
 }

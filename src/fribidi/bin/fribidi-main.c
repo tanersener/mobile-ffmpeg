@@ -31,13 +31,9 @@
 
 #include <fribidi.h>
 #include <fribidi-deprecated.h>
-#if FRIBIDI_CHARSETS+0
-#else
-# include <fribidi-char-sets.h>
-#endif /* !FRIBIDI_CHARSETS */
 
 #include <stdio.h>
-#if STDC_HEADERS+0
+#ifdef STDC_HEADERS
 # include <stdlib.h>
 # include <stddef.h>
 #else
@@ -45,14 +41,14 @@
 #  include <stdlib.h>
 # endif
 #endif
-#if HAVE_STRING_H+0
+#ifdef HAVE_STRING_H
 # if STDC_HEADERS && HAVE_MEMORY_H
 # else
 #  include <memory.h>
 # endif
 # include <string.h>
 #endif
-#if HAVE_STRINGS_H+0
+#ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
 

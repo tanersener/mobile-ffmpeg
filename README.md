@@ -28,25 +28,26 @@ Source code and scripts to build FFmpeg for Android and IOS platform
 - x86_64
 
 ### 3. FFmpeg Support
-This repository branch contains FFmpeg version 3.4.2 with support for the following external libraries.
-- fontconfig
-- freetype
-- fribidi
-- gmp
-- gnutls
-- kvazaar
-- libiconv
-- lame
-- libass
-- libtheora
-- libvorbis
-- libvpx
-- libwebp
-- libxml2
-- opencore-amr
-- shine
-- speex
-- wavpack
+This repository branch contains FFmpeg version 4.0 patched according to (http://ffmpeg.org/pipermail/ffmpeg-devel/2018-April/229129.html) 
+with support for the following external libraries.
+- fontconfig v2.13.0
+- freetype v2.9
+- fribidi v1.0.3
+- gmp v6.1.2
+- gnutls v3.5.18
+- kvazaar v1.2.0
+- libiconv v1.15
+- lame v3.100
+- libass v0.14.0
+- libtheora v1.1.1
+- libvorbis v1.3.6
+- libvpx v1.7.0
+- libwebp v1.0.0
+- libxml2 v2.9.8
+- opencore-amr v0.1.5
+- shine v3.1.1
+- speex v1.2.0
+- wavpack v5.1.0
 
 External libraries and their dependencies are explained in the [External Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/External-Libraries) page.
 

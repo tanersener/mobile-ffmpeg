@@ -70,6 +70,7 @@
     <function name="HTML_PI_NODE" link="libxml2-HTMLtree.html#HTML_PI_NODE"/>
     <function name="HTML_PRESERVE_NODE" link="libxml2-HTMLtree.html#HTML_PRESERVE_NODE"/>
     <function name="HTML_TEXT_NODE" link="libxml2-HTMLtree.html#HTML_TEXT_NODE"/>
+    <function name="ICU_PIVOT_BUF_SIZE" link="libxml2-encoding.html#ICU_PIVOT_BUF_SIZE"/>
     <function name="INPUT_CHUNK" link="libxml2-parserInternals.html#INPUT_CHUNK"/>
     <function name="INVALID_SOCKET" link="libxml2-nanoftp.html#INVALID_SOCKET"/>
     <function name="IS_ASCII_DIGIT" link="libxml2-parserInternals.html#IS_ASCII_DIGIT"/>
@@ -2389,6 +2390,7 @@
     <function name="xmlHashCopy ()" link="libxml2-hash.html#xmlHashCopy"/>
     <function name="xmlHashCreate ()" link="libxml2-hash.html#xmlHashCreate"/>
     <function name="xmlHashCreateDict ()" link="libxml2-hash.html#xmlHashCreateDict"/>
+    <function name="xmlHashDefaultDeallocator ()" link="libxml2-hash.html#xmlHashDefaultDeallocator"/>
     <function name="xmlHashFree ()" link="libxml2-hash.html#xmlHashFree"/>
     <function name="xmlHashLookup ()" link="libxml2-hash.html#xmlHashLookup"/>
     <function name="xmlHashLookup2 ()" link="libxml2-hash.html#xmlHashLookup2"/>

@@ -1,4 +1,6 @@
 
+SUBDIRS = unicode-conformance
+
 TESTS_ENVIRONMENT = \
 	srcdir=${srcdir}; export srcdir; \
 	top_builddir=${top_builddir}; export top_builddir; \
@@ -15,6 +17,8 @@ TEST_DATAS = \
 	test_CapRTL_explicit.reference \
 	test_CapRTL_implicit.input \
 	test_CapRTL_implicit.reference \
+	test_CapRTL_isolate.input \
+	test_CapRTL_isolate.reference \
 	test_ISO8859-8_hebrew.input \
 	test_ISO8859-8_hebrew.reference \
 	test_UTF-8_persian.input \

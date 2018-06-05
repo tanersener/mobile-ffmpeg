@@ -1,3 +1,735 @@
+commit b254a4c06e449dcaf4e3356f7904f4e6cd19910c
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed May 16 20:46:45 2018 +0300
+
+    Updated NEWS file.
+
+ NEWS | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+commit a44e063b4ff1006a3af97d115f39c31e49f22f49
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed May 16 20:41:01 2018 +0300
+
+    Bumped version to v1.0.3
+
+ configure.ac | 2 +-
+ meson.build  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit 47ed4eb33d11ff132d698decd24be4e16ff55c60
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Mar 21 06:47:43 2018 +0200
+
+    Fixed uninitialized memory access. Issue #58.
+
+ lib/fribidi-char-sets-cap-rtl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 5e8bad36675a59da2e32f3b37a6d85921082b3a7
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Mon Mar 19 21:28:07 2018 +0200
+
+    Fixed compilation errors in debug mode
+
+ lib/fribidi-bidi.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+commit 18c5c4c7ac2a2e1a45ce8b8868d3018493314485
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Mar 19 10:39:29 2018 +0200
+
+    Update .travis.yml
+
+ .travis.yml | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+commit 095d88503194e81059ab81d04b849d9245899dfa
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Mar 19 10:38:27 2018 +0200
+
+    Revert "Add an option to disable building documentation"
+
+    This reverts commit 21b18b07c0b57fbaff15b622df80408cf8936809.
+
+    This made installing man pages when building from release tarballs
+    require c2man, which wasn’t the case before.
+
+    Fixes https://github.com/fribidi/fribidi/issues/72
+
+ configure.ac    | 13 -------------
+ doc/Makefile.am |  6 ++----
+ 2 files changed, 2 insertions(+), 17 deletions(-)
+
+commit 56e07baaea0dd92667753ebb6a29f5354c9256b9
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Mar 19 14:48:41 2018 +0200
+
+    Add test_CapRTL_isolate.* to test/Makefile.am
+
+    Fixes https://github.com/fribidi/fribidi/issues/74
+
+ test/Makefile.am | 2 ++
+ 1 file changed, 2 insertions(+)
+
+commit f2c9d50722cb60d0cdec3b1bafba9029770e86b4
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sun Mar 18 21:07:21 2018 +0200
+
+    Version 1.0.2 release update
+
+ NEWS         | 9 +++++++++
+ configure.ac | 2 +-
+ meson.build  | 2 +-
+ 3 files changed, 11 insertions(+), 2 deletions(-)
+
+commit d3c2496ce64b0e09f9e6dc593dd2d931d2d18839
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sun Mar 18 20:50:31 2018 +0200
+
+    Made the README and the HISTORY more up to date.
+
+ HISTORY   | 25 ++++++++++---------------
+ README.md | 20 +++++++-------------
+ 2 files changed, 17 insertions(+), 28 deletions(-)
+
+commit 31e6d29c33dd400d14992df0905baae31dcd32be
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sun Mar 11 00:38:53 2018 +0200
+
+    GLib is gone
+
+ test/unicode-conformance/Makefile.am | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+commit 1d377ae54d9f4426a147f016b9f83a34fc6397ab
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sun Mar 11 00:20:04 2018 +0200
+
+    Fix memory leaks
+
+ test/unicode-conformance/BidiCharacterTest.c | 23 ++++++++++++++++-------
+ test/unicode-conformance/BidiTest.c          |  1 +
+ 2 files changed, 17 insertions(+), 7 deletions(-)
+
+commit 3a903a31385127925493c14921a89188fa553037
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sat Mar 10 23:20:17 2018 +0200
+
+    Rename autotools test executables as well
+
+ test/unicode-conformance/Makefile.am | 6 +++---
+ test/unicode-conformance/run.tests   | 4 ++--
+ 2 files changed, 5 insertions(+), 5 deletions(-)
+
+commit 90788a778db2b485ac3848d0e6df0e4996546ccb
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sat Mar 10 18:44:47 2018 +0200
+
+    Rename test.c and test-character.c to match unicode test names
+
+ test/unicode-conformance/{test-character.c => BidiCharacterTest.c} | 0
+ test/unicode-conformance/{test.c => BidiTest.c}                    | 0
+ test/unicode-conformance/Makefile.am                               |
+ 4 ++--
+ test/unicode-conformance/meson.build                               |
+ 4 ++--
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+commit d452bd553e076d0a542ad65c6ecfd9ba310607b9
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sat Mar 10 18:38:36 2018 +0200
+
+    Two test fixes for meson.
+
+    * Added the isolate test to the test suite.
+    * Fixed CR/LF problem in test-runner.py on Windows when working
+      out of git. (Reference files contain CRLF).
+
+ test/meson.build    | 1 +
+ test/test-runner.py | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+commit 03ba9fc5358bb3dd78c4e8708abefaad106475d0
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sat Mar 10 18:37:47 2018 +0200
+
+    Remove glib dependancy from test.c and test-character.c .
+
+ configure.ac                              |  20 ---
+ meson_options.txt                         |   2 -
+ test/unicode-conformance/Makefile.am      |   2 -
+ test/unicode-conformance/meson.build      |  31 ++--
+ test/unicode-conformance/test-character.c | 218
+ ++++++++++++++++-----------
+ test/unicode-conformance/test.c           | 242
+ +++++++++++++++++++-----------
+ 6 files changed, 299 insertions(+), 216 deletions(-)
+
+commit 565f83a13099dfdcec083f4d3e5293df4ed36e63
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Feb 27 11:00:25 2018 +0200
+
+    Fix memory leak
+
+ lib/fribidi-deprecated.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+commit 40c0533c16c9af6d05eabc49430176b869b71ddd
+Author: Tim-Philipp Müller <tim@centricular.com>
+Date:   Tue Feb 20 11:37:15 2018 +0000
+
+    meson: fix docs install
+
+    Follow-up fix to commit c8ad556. The .def file contains all
+    exported symbols including exported variables. The autotools
+    docs build only installs man pages for the functions however,
+    so we need to special-case the two variable names if we don't
+    want to pass '-v' to c2man to create man pages for the exported
+    symbols as well.
+
+ doc/meson.build | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+commit c7bd1d06850b921ddc6330746e8fee475a202b88
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Tue Feb 27 12:32:37 2018 +0800
+
+    test-runner.py: Fix running on Visual Studio builds
+
+    On Windows, since we need to be able to find the fribidi DLL when
+    running the tests that make use of fribidi.exe (which is in
+    $(builddir)\bin), we need to prepend $(builddir)\lib into %PATH%
+    so that
+    we can load the fribidi DLL that we just built when running
+    fribidi.exe.
+
+    Also, as Visual Studio builds are run in standard Windows cmd.exe
+    consoles,
+    we need to take account of the output line endings, which are '\r\n',
+    versus '\n' on *NIX builds.  Since the reference files are in various
+    encodings (hence we need to deal with binary comparison), we can't
+    just use
+    universal_newlines when doing subprocess.check_output(), as that will
+    put us into text mode.
+
+    Finally, fix a typo in the error message when the output and reference
+    don't match.
+
+ test/test-runner.py | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+commit 3d81debadb301b499457afb52b772df64a03724c
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Tue Feb 27 12:30:50 2018 +0800
+
+    gen-brackets-tab.c: Declare variables at top-of-block
+
+    This is the only change that is required for fribidi to build
+    on pre-C99
+    compilers.
+
+ gen.tab/gen-brackets-tab.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+commit 8c659598253c5427692102fb5f791b8dbf209191
+Author: Chun-wei Fan <fanchunwei@src.gnome.org>
+Date:   Tue Feb 27 12:27:50 2018 +0800
+
+    packtab.c: Don't use pow as variable name
+
+    Visual Studio does not like one using pow as a variable name, as it is
+    a commonly-used function, as the headers that declare the pow()
+    prototype
+    get pulled in during the build.
+
+ gen.tab/packtab.c | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
+
+commit 4eff082587cecb123400c6cced2a839b27aaf463
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Fri Feb 23 17:06:55 2018 +0200
+
+    Added some more thanks!
+
+ THANKS | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+commit a44e7c8e279e6ec0387e6ec5ac2f03b4e25b181b
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Fri Feb 23 17:03:27 2018 +0200
+
+    Updated THANKS file.
+
+ THANKS | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+commit c4ec5e9941aaceb872f05b26d8002d55213a75be
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Fri Feb 23 14:29:19 2018 +0200
+
+    Update AUTHORS file to reflect the current state more accurately.
+
+ AUTHORS | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
+
+commit c8ad55672b4dd5dc42ff794a090b285e7081682e
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Feb 20 00:11:49 2018 +0200
+
+    Use same c2man options in meson as in autotools
+
+    Otherwise we end with different set of man pages.
+
+ doc/meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit a57ef60d2353645a6dd24696a0bbecda2c5089df
+Author: Dov <dov@grozen.mynet>
+Date:   Tue Feb 20 00:06:09 2018 +0200
+
+    Added info to README file about commercial licensing options.
+
+ README.md | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+commit 140011c8bd37b773675f549190110f7f866656a0
+Merge: 0f175c0 8aec549
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Mon Feb 19 23:59:20 2018 +0200
+
+    Merge pull request #62 from tp-m/meson
+
+    Add support for building with the Meson build system
+
+commit 8aec5499f00249dd1d4c5b8e70f23c5ef09edf76
+Author: Tim-Philipp Müller <tim@centricular.com>
+Date:   Mon Feb 19 11:37:59 2018 +0000
+
+    build: dist Meson build files in autotools tarball
+
+ Makefile.am | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+commit c798603676d7ed7a6537cbce26828cad6152089b
+Author: Tim-Philipp Müller <tim@centricular.com>
+Date:   Mon Feb 19 01:00:11 2018 +0000
+
+    meson: fix build with msvc
+
+    Wouldn't link bin/fribidi because fribidi_version_info
+    was not linked properly due to missing dllimport which
+    is mandatory for variables (but not functions).
+
+ lib/fribidi-common.h | 10 ++++++++++
+ meson.build          |  2 +-
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+commit 38afc684fc7ddcf5393e7a6e985ac9e6acbcc783
+Author: Tim-Philipp Müller <tim@centricular.com>
+Date:   Mon Feb 19 00:35:41 2018 +0000
+
+    fribidi-config: add define for when fribidi was built with MSVC
+
+    Useful later for deciding whether to use dllimport or not.
+
+ configure.ac            | 3 +++
+ lib/fribidi-config.h.in | 3 +++
+ lib/meson.build         | 6 ++++++
+ 3 files changed, 12 insertions(+)
+
+commit a991b009b11fb791a9217af23659b092eb45377e
+Author: Tim-Philipp Müller <tim@centricular.com>
+Date:   Fri Feb 16 00:09:33 2018 +0000
+
+    Add support for building with the Meson build system
+
+    The Meson build system is being adopted by projects
+    such as GNOME, GTK, GStreamer, and there is support
+    for it in Pango as well.
+
+    Having support for building with Meson in fribidi
+    would facilitate builds of GTK, Pango, etc. via
+    Meson's subproject support.
+
+    Meson also supports builds on Windows with MSVC.
+
+    Cross-compilation is of course also supported, but
+    has not been tested yet for this build.
+
+    Try with:
+
+     $ meson --prefix=/tmp/prefix builddir
+     $ ninja -C builddir
+     $ ninja -C builddir test
+     $ ninja -C builddir install
+
+    Build time comparison:
+
+     - autotools: 18 seconds
+     - meson: 4 seconds
+
+    http://mesonbuild.com for more information.
+
+ bin/meson.build                      |  27 ++++++++++
+ doc/meson.build                      |  39 ++++++++++++++
+ gen.tab/meson.build                  |  79 +++++++++++++++++++++++++++
+ lib/meson.build                      |  75 ++++++++++++++++++++++++++
+ meson.build                          | 100
+ +++++++++++++++++++++++++++++++++++
+ meson_options.txt                    |   6 +++
+ test/meson.build                     |  20 +++++++
+ test/test-runner.py                  |  25 +++++++++
+ test/unicode-conformance/meson.build |  19 +++++++
+ 9 files changed, 390 insertions(+)
+
+commit 4c97999ad09f683560bfdf69b4539558401cad41
+Author: Tim-Philipp Müller <tim@centricular.com>
+Date:   Sat Feb 17 13:06:50 2018 +0000
+
+    Fix build with DEBUG defined
+
+    Move up the struct declaration so we can use it
+    in the DEBUG block.
+
+    fribidi-bidi.c:264:33: error: unknown type name
+    ‘FriBidiPairingNode’; did you mean ‘FriBidiParType’?
+    static void print_pairing_nodes(FriBidiPairingNode *nodes)
+
+ lib/fribidi-bidi.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+commit 536796c40916a781af745b60dbfe9f25cda4431a
+Author: Tim-Philipp Müller <tim@centricular.com>
+Date:   Sat Feb 17 21:25:51 2018 +0000
+
+    lib: decorate fribidi_version_info with FRIBIDI_ENTRY
+
+    ... and map FRIBIDI_ENTRY to extern if it's undefined
+    instead of nothing.
+
+    This is useful for when symbol visibility is controlled
+    via FRIBIDI_ENTRY as in the Meson build.
+
+ lib/fribidi-common.h | 2 +-
+ lib/fribidi.h        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit 0f175c07db4afb380df19d606687f8c1f63523d9
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Wed Feb 14 21:16:37 2018 +0200
+
+    Drop FRIBIDI_NAMESPACE and its variants
+
+    Fixes https://github.com/fribidi/fribidi/issues/60
+
+ gen.tab/gen-unicode-version.c     |  6 ------
+ lib/bidi-types.h                  |  1 -
+ lib/common.h                      |  7 -------
+ lib/fribidi-arabic.h              |  1 -
+ lib/fribidi-bidi-types.h          |  3 ---
+ lib/fribidi-bidi.h                |  3 ---
+ lib/fribidi-brackets.h            |  4 +---
+ lib/fribidi-char-sets-cap-rtl.h   |  3 ---
+ lib/fribidi-char-sets-cp1255.h    |  2 --
+ lib/fribidi-char-sets-cp1256.h    |  2 --
+ lib/fribidi-char-sets-iso8859-6.h |  2 --
+ lib/fribidi-char-sets-iso8859-8.h |  2 --
+ lib/fribidi-char-sets-utf8.h      |  2 --
+ lib/fribidi-char-sets.h           |  6 ------
+ lib/fribidi-common.h              |  6 ------
+ lib/fribidi-deprecated.h          | 10 ----------
+ lib/fribidi-joining-types.h       |  3 ---
+ lib/fribidi-joining.h             |  1 -
+ lib/fribidi-mirroring.h           |  2 --
+ lib/fribidi-shape.h               |  1 -
+ lib/fribidi-unicode.h             |  1 -
+ lib/fribidi.h                     |  1 -
+ lib/joining-types.h               |  1 -
+ lib/run.h                         |  6 ------
+ 24 files changed, 1 insertion(+), 75 deletions(-)
+
+commit fb7cad2883a0f7e84144101b8ac7df2992ae2726
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Wed Feb 14 21:06:06 2018 +0200
+
+    Fold charset into lib
+
+    Now “make -C lib” works.
+
+ Makefile.am                                    |  2 +-
+ bin/Makefile.am                                |  3 +--
+ charset/Headers.mk                             |  8 ------
+ charset/Makefile.am                            | 36
+ --------------------------
+ configure.ac                                   |  1 -
+ doc/Makefile.am                                |  6 -----
+ gen.tab/Makefile.am                            |  3 +--
+ lib/Headers.mk                                 |  2 ++
+ lib/Makefile.am                                | 20 +++++++++-----
+ {charset => lib}/fribidi-char-sets-cap-rtl.c   |  0
+ {charset => lib}/fribidi-char-sets-cap-rtl.h   |  0
+ {charset => lib}/fribidi-char-sets-cp1255.c    |  0
+ {charset => lib}/fribidi-char-sets-cp1255.h    |  0
+ {charset => lib}/fribidi-char-sets-cp1256.c    |  0
+ {charset => lib}/fribidi-char-sets-cp1256.h    |  0
+ {charset => lib}/fribidi-char-sets-iso8859-6.c |  0
+ {charset => lib}/fribidi-char-sets-iso8859-6.h |  0
+ {charset => lib}/fribidi-char-sets-iso8859-8.c |  0
+ {charset => lib}/fribidi-char-sets-iso8859-8.h |  0
+ {charset => lib}/fribidi-char-sets-list.h      |  0
+ {charset => lib}/fribidi-char-sets-utf8.c      |  0
+ {charset => lib}/fribidi-char-sets-utf8.h      |  0
+ {charset => lib}/fribidi-char-sets.c           |  0
+ {charset => lib}/fribidi-char-sets.h           |  0
+ lib/fribidi.def                                |  3 +++
+ 25 files changed, 21 insertions(+), 63 deletions(-)
+
+commit 3a6e357de2816951b0152a802c560e2ad6705e7c
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Wed Feb 14 20:56:22 2018 +0200
+
+    Drop --disable-charsets
+
+ bin/Makefile.am     | 10 +---------
+ bin/fribidi-main.c  |  4 ----
+ charset/Makefile.am |  8 --------
+ configure.ac        | 10 ----------
+ doc/Makefile.am     |  4 ----
+ lib/Makefile.am     |  4 ----
+ lib/fribidi.c       |  4 ----
+ lib/fribidi.h       |  6 +-----
+ 8 files changed, 2 insertions(+), 48 deletions(-)
+
+commit bc49222a611376a93845e7596990a8ff43853582
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Wed Feb 14 19:55:44 2018 +0200
+
+    Fix --disable-deprecated and --disable-charsets
+
+    I think I broke them in a7cf35b510dca601421ae36b14446bc800c44731.
+
+    Fixes https://github.com/fribidi/fribidi/issues/58
+
+ configure.ac            | 16 ++++++----------
+ lib/common.h            |  4 +++-
+ lib/fribidi-config.h.in |  3 ---
+ 3 files changed, 9 insertions(+), 14 deletions(-)
+
+commit 8c3e992dbf7d9afdba3fa9ed220270228d3a7e82
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Fri Feb 16 00:54:55 2018 +0200
+
+    CVS is long dead and buried [ci skip]
+
+ .cvsignore         | 20 --------------------
+ bin/.cvsignore     |  2 --
+ doc/.cvsignore     |  4 ----
+ gen.tab/.cvsignore |  3 ---
+ lib/.cvsignore     |  3 ---
+ 5 files changed, 32 deletions(-)
+
+commit da35841c11da95043aa97c5e507ac9f193c04e2e
+Author: Ting-Wei Lan <lantw@src.gnome.org>
+Date:   Fri Feb 16 02:44:55 2018 +0800
+
+    Fix documentation installation on FreeBSD
+
+    POSIX says the number after 'head -n' should be a positive interger.
+
+ doc/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 283e594570d8d0e46b095f6ee3426e2d06b19c28
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Feb 13 11:15:20 2018 +0200
+
+    Show all logs on failure
+
+ .travis.yml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+commit fcc2d40c6f67be7cd70ebfc5d4f732c088aa6e9d
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Feb 6 00:04:31 2018 +0200
+
+    Build c2man on Travis
+
+ .ci/build-c2man.sh | 17 +++++++++++++++++
+ .travis.yml        |  8 +++++++-
+ 2 files changed, 24 insertions(+), 1 deletion(-)
+
+commit 21b18b07c0b57fbaff15b622df80408cf8936809
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Mon Feb 5 22:58:31 2018 +0200
+
+    Add an option to disable building documentation
+
+    Fixes https://github.com/fribidi/fribidi/issues/8
+
+ configure.ac    | 13 +++++++++++++
+ doc/Makefile.am |  6 ++++--
+ 2 files changed, 17 insertions(+), 2 deletions(-)
+
+commit df7252be3fd94ceae8141a09ee86421fdd8b3b7e
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Feb 13 02:17:04 2018 +0200
+
+    Make the rules for generated files look nicer
+
+    Avoid the scary “… it may take up to a few minutes” messages,
+    it seems
+    to take fraction of the second on this not-super-fast machine.
+
+ gen.tab/Makefile.am              | 14 +++++++-------
+ gen.tab/gen-arabic-shaping-tab.c |  3 ---
+ gen.tab/gen-bidi-type-tab.c      |  3 ---
+ gen.tab/gen-brackets-tab.c       |  3 ---
+ gen.tab/gen-brackets-type-tab.c  |  3 ---
+ gen.tab/gen-joining-type-tab.c   |  3 ---
+ gen.tab/gen-mirroring-tab.c      |  3 ---
+ gen.tab/gen-unicode-version.c    |  2 --
+ 8 files changed, 7 insertions(+), 27 deletions(-)
+
+commit a7cf35b510dca601421ae36b14446bc800c44731
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Tue Feb 13 02:05:33 2018 +0200
+
+    Drop the rest of #if FOO+0
+
+    https://bugzilla.gnome.org/show_bug.cgi?id=792481#c12
+
+ bin/fribidi-benchmark.c          | 10 +++++-----
+ bin/fribidi-main.c               |  8 ++++----
+ gen.tab/gen-arabic-shaping-tab.c |  6 +++---
+ gen.tab/gen-bidi-type-tab.c      |  6 +++---
+ gen.tab/gen-brackets-tab.c       |  6 +++---
+ gen.tab/gen-brackets-type-tab.c  |  6 +++---
+ gen.tab/gen-joining-type-tab.c   |  6 +++---
+ gen.tab/gen-mirroring-tab.c      |  6 +++---
+ gen.tab/gen-unicode-version.c    |  6 +++---
+ gen.tab/packtab.c                |  8 ++++----
+ lib/bidi-types.h                 |  2 +-
+ lib/common.h                     |  8 ++++----
+ lib/debug.h                      |  2 +-
+ lib/fribidi-arabic.c             |  2 +-
+ lib/fribidi-bidi-types.c         |  2 +-
+ lib/fribidi-bidi.c               |  2 +-
+ lib/fribidi-joining-types.c      |  2 +-
+ lib/fribidi-joining.c            |  2 +-
+ lib/fribidi-run.c                |  2 +-
+ lib/fribidi.c                    | 10 +++++-----
+ lib/fribidi.h                    |  2 +-
+ lib/joining-types.h              |  2 +-
+ lib/run.h                        |  2 +-
+ 23 files changed, 54 insertions(+), 54 deletions(-)
+
+commit 8576118c37c8fd0b03f18ba1e56cedbcd5bd658d
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sun Feb 11 00:49:13 2018 +0200
+
+    Replace bootstrap with simpler autogen.sh
+
+    Copied from HarfBuzz but removed the parts we don’t need.
+
+    Fixes the rest of https://github.com/fribidi/fribidi/issues/35
+
+ .travis.yml |   5 +-
+ Makefile.am |   2 +-
+ README.md   |   2 +-
+ autogen.sh  |  35 ++++++++++++++
+ bootstrap   | 154
+ ------------------------------------------------------------
+ 5 files changed, 38 insertions(+), 160 deletions(-)
+
+commit 3b5baaebf3dead4d2c1ed7a04278cc58b8c3fc85
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sun Feb 11 00:39:44 2018 +0200
+
+    Move fribidi-vs-unicode to test dir
+
+ Makefile.am                                                            |
+ 2 +-
+ configure.ac                                                           |
+ 2 +-
+ test/Makefile.am                                                       |
+ 2 ++
+ {fribidi-vs-unicode => test/unicode-conformance}/BidiCharacterTest.txt
+ | 0
+ {fribidi-vs-unicode => test/unicode-conformance}/BidiTest.txt
+ | 0
+ {fribidi-vs-unicode => test/unicode-conformance}/Makefile.am           |
+ 0
+ {fribidi-vs-unicode => test/unicode-conformance}/run.tests             |
+ 0
+ {fribidi-vs-unicode => test/unicode-conformance}/test-character.c
+ | 0
+ {fribidi-vs-unicode => test/unicode-conformance}/test.c                |
+ 0
+ 9 files changed, 4 insertions(+), 2 deletions(-)
+
+commit f137dd34258f7f10c482d32520bcb2a323b0ec71
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Fri Feb 9 13:09:44 2018 -0600
+
+    Try fixing parallel build from git checkout
+
+    Fixes https://github.com/fribidi/fribidi/issues/52
+
+ gen.tab/Makefile.am | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+commit 4ae5000b6633af8f2be9f2d5133e72c48b6360c5
+Author: Behdad Esfahbod <behdad@behdad.org>
+Date:   Sun Jan 28 11:43:11 2018 -0800
+
+    Remove notes.org
+
+ notes.org | 318
+ --------------------------------------------------------------
+ 1 file changed, 318 deletions(-)
+
+commit 544b56553b94a2425f52f4b6c29f0a9abe403161
+Merge: c301aae 751fca5
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sun Feb 4 21:42:11 2018 +0200
+
+    Merge pull request #48 from khaledhosny/version
+
+    Keep micro version in full version even if 0
+
+commit 751fca5eb33a210c0c1d60300935e2c2fb4f6efb
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Sun Feb 4 21:37:56 2018 +0200
+
+    Keep micro version in full version even if 0
+
+    This is more consistent and matches pretty much every other autotools
+    setup.
+
+ configure.ac | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+commit c301aaedcc9615c6c2660409b26cf6bfb6488321
+Author: Dov <dov@grozen.mynet>
+Date:   Sun Feb 4 20:53:47 2018 +0200
+
+    Release 1.0.1
+
+ NEWS         | 5 +++++
+ configure.ac | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+commit 764b89c98fdf310a2a4108cbdd60e4af25cc549f
+Author: Dov <dov@grozen.mynet>
+Date:   Sun Feb 4 20:53:30 2018 +0200
+
+    Fix of minor reference error.
+
+ README.md                           | 2 +-
+ test/test_CapRTL_explicit.reference | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
 commit e478f92986d7a3abfe2de4b521f0b710e96fe332
 Merge: 2faadd5 9b55304
 Author: Dov Grobgeld <dov.grobgeld@gmail.com>

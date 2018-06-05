@@ -54,6 +54,7 @@ fi
     --with-png \
     --with-sysroot=${SDK_PATH} \
     --without-harfbuzz \
+    --without-bzip2 \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

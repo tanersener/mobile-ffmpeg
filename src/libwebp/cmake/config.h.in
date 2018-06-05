@@ -103,9 +103,6 @@
 /* Version number of package */
 #cmakedefine VERSION "@VERSION@"
 
-/* Enable experimental code */
-#cmakedefine WEBP_EXPERIMENTAL_FEATURES 1
-
 /* Set to 1 if AVX2 is supported */
 #cmakedefine WEBP_HAVE_AVX2 1
 

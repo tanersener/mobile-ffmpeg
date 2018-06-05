@@ -49,6 +49,7 @@ fi
     --with-png \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --without-harfbuzz \
+    --without-bzip2 \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

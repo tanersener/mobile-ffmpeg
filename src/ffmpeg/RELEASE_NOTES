@@ -1,13 +1,13 @@
 
-              ┌───────────────────────────────────────┐
-              │ RELEASE NOTES for FFmpeg 3.4 "Cantor" │
-              └───────────────────────────────────────┘
+              ┌───────────────────────────────────┐
+              │ RELEASE NOTES for FFmpeg 4.0 "Wu" │
+              └───────────────────────────────────┘
 
-   The FFmpeg Project proudly presents FFmpeg 3.4 "Cantor", about 6
-   months after the release of FFmpeg 3.3.
+   The FFmpeg Project proudly presents FFmpeg 4.0 "Wu", about 6
+   months after the release of FFmpeg 3.4.
 
    A complete Changelog is available at the root of the project, and the
-   complete Git history on http://source.ffmpeg.org.
+   complete Git history on https://git.ffmpeg.org/gitweb/ffmpeg.git
 
    We hope you will like this release as much as we enjoyed working on it, and
    as usual, if you have any questions about it, or any FFmpeg related topic,

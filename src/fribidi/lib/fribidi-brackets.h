@@ -37,7 +37,6 @@
 
 #include "fribidi-begindecls.h"
 
-#define fribidi_get_bracket FRIBIDI_NAMESPACE(get_bracket)
 /* fribidi_get_bracket - get bracketed character
  *
  * This function finds the bracketed equivalent of a character as defined in
@@ -57,8 +56,7 @@ FRIBIDI_ENTRY FriBidiBracketType fribidi_get_bracket (
   FriBidiChar ch		    /* input character */
 );
 
-#define fribidi_get_brackets FRIBIDI_NAMESPACE(get_brackets)
-/* fribidi_get_brackets - get bracketed characters
+/* fribidi_get_bracket_types - get bracketed characters
  *
  * This function finds the bracketed characters of an string of characters.
  * See fribidi_get_bracket() for more information about the bracketed

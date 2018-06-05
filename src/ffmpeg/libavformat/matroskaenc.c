@@ -953,78 +953,79 @@ static int mkv_write_video_color(AVIOContext *pb, AVCodecParameters *par, AVStre
     return 0;
 }
 
-static int mkv_write_video_projection(AVFormatContext *s, AVIOContext *pb, AVStream *st)
+static int mkv_write_video_projection(AVFormatContext *s, AVIOContext *pb,
+                                      AVStream *st)
 {
+    AVIOContext b;
+    AVIOContext *dyn_cp;
     int side_data_size = 0;
+    int ret, projection_size;
+    uint8_t *projection_ptr;
+    uint8_t private[20];
+
     const AVSphericalMapping *spherical =
-        (const AVSphericalMapping*) av_stream_get_side_data(st, AV_PKT_DATA_SPHERICAL,
+        (const AVSphericalMapping *)av_stream_get_side_data(st, AV_PKT_DATA_SPHERICAL,
                                                             &side_data_size);
 
-    if (side_data_size) {
-        AVIOContext *dyn_cp;
-        uint8_t *projection_ptr;
-        int ret, projection_size;
+    if (!side_data_size)
+        return 0;
 
-        ret = avio_open_dyn_buf(&dyn_cp);
-        if (ret < 0)
-            return ret;
+    ret = avio_open_dyn_buf(&dyn_cp);
+    if (ret < 0)
+        return ret;
 
-        switch (spherical->projection) {
-        case AV_SPHERICAL_EQUIRECTANGULAR:
-            put_ebml_uint(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONTYPE,
-                          MATROSKA_VIDEO_PROJECTION_TYPE_EQUIRECTANGULAR);
-            break;
-        case AV_SPHERICAL_EQUIRECTANGULAR_TILE:
-        {
-            AVIOContext b;
-            uint8_t private[20];
-            ffio_init_context(&b, private, sizeof(private),
-                              1, NULL, NULL, NULL, NULL);
-            put_ebml_uint(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONTYPE,
-                          MATROSKA_VIDEO_PROJECTION_TYPE_EQUIRECTANGULAR);
-            avio_wb32(&b, 0); // version + flags
-            avio_wb32(&b, spherical->bound_top);
-            avio_wb32(&b, spherical->bound_bottom);
-            avio_wb32(&b, spherical->bound_left);
-            avio_wb32(&b, spherical->bound_right);
-            put_ebml_binary(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPRIVATE, private, sizeof(private));
-            break;
-        }
-        case AV_SPHERICAL_CUBEMAP:
-        {
-            AVIOContext b;
-            uint8_t private[12];
-            ffio_init_context(&b, private, sizeof(private),
-                              1, NULL, NULL, NULL, NULL);
-            put_ebml_uint(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONTYPE,
-                          MATROSKA_VIDEO_PROJECTION_TYPE_CUBEMAP);
-            avio_wb32(&b, 0); // version + flags
-            avio_wb32(&b, 0); // layout
-            avio_wb32(&b, spherical->padding);
-            put_ebml_binary(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPRIVATE, private, sizeof(private));
-            break;
-        }
-        default:
-            av_log(s, AV_LOG_WARNING, "Unknown projection type\n");
-            goto end;
-        }
+    switch (spherical->projection) {
+    case AV_SPHERICAL_EQUIRECTANGULAR:
+        put_ebml_uint(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONTYPE,
+                      MATROSKA_VIDEO_PROJECTION_TYPE_EQUIRECTANGULAR);
+        break;
+    case AV_SPHERICAL_EQUIRECTANGULAR_TILE:
+        ffio_init_context(&b, private, 20, 1, NULL, NULL, NULL, NULL);
+        put_ebml_uint(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONTYPE,
+                      MATROSKA_VIDEO_PROJECTION_TYPE_EQUIRECTANGULAR);
+        avio_wb32(&b, 0); // version + flags
+        avio_wb32(&b, spherical->bound_top);
+        avio_wb32(&b, spherical->bound_bottom);
+        avio_wb32(&b, spherical->bound_left);
+        avio_wb32(&b, spherical->bound_right);
+        put_ebml_binary(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPRIVATE,
+                        private, avio_tell(&b));
+        break;
+    case AV_SPHERICAL_CUBEMAP:
+        ffio_init_context(&b, private, 12, 1, NULL, NULL, NULL, NULL);
+        put_ebml_uint(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONTYPE,
+                      MATROSKA_VIDEO_PROJECTION_TYPE_CUBEMAP);
+        avio_wb32(&b, 0); // version + flags
+        avio_wb32(&b, 0); // layout
+        avio_wb32(&b, spherical->padding);
+        put_ebml_binary(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPRIVATE,
+                        private, avio_tell(&b));
+        break;
+    default:
+        av_log(s, AV_LOG_WARNING, "Unknown projection type\n");
+        goto end;
+    }
 
-        if (spherical->yaw)
-            put_ebml_float(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPOSEYAW,   (double)spherical->yaw   / (1 << 16));
-        if (spherical->pitch)
-            put_ebml_float(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPOSEPITCH, (double)spherical->pitch / (1 << 16));
-        if (spherical->roll)
-            put_ebml_float(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPOSEROLL,  (double)spherical->roll  / (1 << 16));
+    if (spherical->yaw)
+        put_ebml_float(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPOSEYAW,
+                       (double) spherical->yaw   / (1 << 16));
+    if (spherical->pitch)
+        put_ebml_float(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPOSEPITCH,
+                       (double) spherical->pitch / (1 << 16));
+    if (spherical->roll)
+        put_ebml_float(dyn_cp, MATROSKA_ID_VIDEOPROJECTIONPOSEROLL,
+                       (double) spherical->roll  / (1 << 16));
 
 end:
-        projection_size = avio_close_dyn_buf(dyn_cp, &projection_ptr);
-        if (projection_size) {
-            ebml_master projection = start_ebml_master(pb, MATROSKA_ID_VIDEOPROJECTION, projection_size);
-            avio_write(pb, projection_ptr, projection_size);
-            end_ebml_master(pb, projection);
-        }
-        av_freep(&projection_ptr);
+    projection_size = avio_close_dyn_buf(dyn_cp, &projection_ptr);
+    if (projection_size) {
+        ebml_master projection = start_ebml_master(pb,
+                                                   MATROSKA_ID_VIDEOPROJECTION,
+                                                   projection_size);
+        avio_write(pb, projection_ptr, projection_size);
+        end_ebml_master(pb, projection);
     }
+    av_freep(&projection_ptr);
 
     return 0;
 }
@@ -1858,25 +1859,7 @@ static int mkv_write_header(AVFormatContext *s)
         av_dict_get(s->metadata, "alpha_mode", NULL, 0))
         version = 4;
 
-    if (s->nb_streams > MAX_TRACKS) {
-        av_log(s, AV_LOG_ERROR,
-               "At most %d streams are supported for muxing in Matroska\n",
-               MAX_TRACKS);
-        return AVERROR(EINVAL);
-    }
-
     for (i = 0; i < s->nb_streams; i++) {
-        if (s->streams[i]->codecpar->codec_id == AV_CODEC_ID_ATRAC3 ||
-            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_COOK ||
-            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_RA_288 ||
-            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_SIPR ||
-            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_RV10 ||
-            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_RV20) {
-            av_log(s, AV_LOG_ERROR,
-                   "The Matroska muxer does not yet support muxing %s\n",
-                   avcodec_get_name(s->streams[i]->codecpar->codec_id));
-            return AVERROR_PATCHWELCOME;
-        }
         if (s->streams[i]->codecpar->codec_id == AV_CODEC_ID_OPUS ||
             av_dict_get(s->streams[i]->metadata, "stereo_mode", NULL, 0) ||
             av_dict_get(s->streams[i]->metadata, "alpha_mode", NULL, 0))
@@ -2018,6 +2001,8 @@ static int mkv_write_header(AVFormatContext *s)
     }
     if ((pb->seekable & AVIO_SEEKABLE_NORMAL) && mkv->reserve_cues_space) {
         mkv->cues_pos = avio_tell(pb);
+        if (mkv->reserve_cues_space == 1)
+            mkv->reserve_cues_space++;
         put_ebml_void(pb, mkv->reserve_cues_space);
     }
 
@@ -2658,6 +2643,27 @@ static int mkv_query_codec(enum AVCodecID codec_id, int std_compliance)
 static int mkv_init(struct AVFormatContext *s)
 {
     int i;
+
+    if (s->nb_streams > MAX_TRACKS) {
+        av_log(s, AV_LOG_ERROR,
+               "At most %d streams are supported for muxing in Matroska\n",
+               MAX_TRACKS);
+        return AVERROR(EINVAL);
+    }
+
+    for (i = 0; i < s->nb_streams; i++) {
+        if (s->streams[i]->codecpar->codec_id == AV_CODEC_ID_ATRAC3 ||
+            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_COOK ||
+            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_RA_288 ||
+            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_SIPR ||
+            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_RV10 ||
+            s->streams[i]->codecpar->codec_id == AV_CODEC_ID_RV20) {
+            av_log(s, AV_LOG_ERROR,
+                   "The Matroska muxer does not yet support muxing %s\n",
+                   avcodec_get_name(s->streams[i]->codecpar->codec_id));
+            return AVERROR_PATCHWELCOME;
+        }
+    }
 
     if (s->avoid_negative_ts < 0) {
         s->avoid_negative_ts = 1;

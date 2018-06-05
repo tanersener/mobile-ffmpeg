@@ -187,11 +187,11 @@ static void Help(void) {
   printf("  -min_psnr <float> ... minimum per-frame PSNR\n");
   printf("  -raw_comparison ..... if this flag is not used, RGB is\n");
   printf("                        premultiplied before comparison\n");
-#ifdef WEBP_EXPERIMENTAL_FEATURES
-  printf("  -max_diff <int> ..... maximum allowed difference per channel "
-         "                        between corresponding pixels in subsequent"
+  printf("  -max_diff <int> ..... maximum allowed difference per channel\n"
+         "                        between corresponding pixels in subsequent\n"
          "                        frames\n");
-#endif
+  printf("  -h .................. this help\n");
+  printf("  -version ............ print version number and exit\n");
 }
 
 int main(int argc, const char* argv[]) {
@@ -206,11 +206,6 @@ int main(int argc, const char* argv[]) {
   int i, c;
   const char* files[2] = { NULL, NULL };
   AnimatedImage images[2];
-
-  if (argc < 3) {
-    Help();
-    return -1;
-  }
 
   for (c = 1; c < argc; ++c) {
     int parse_error = 0;
@@ -236,7 +231,6 @@ int main(int argc, const char* argv[]) {
       }
     } else if (!strcmp(argv[c], "-raw_comparison")) {
       premultiply = 0;
-#ifdef WEBP_EXPERIMENTAL_FEATURES
     } else if (!strcmp(argv[c], "-max_diff")) {
       if (c < argc - 1) {
         const char* const v = argv[++c];
@@ -250,7 +244,18 @@ int main(int argc, const char* argv[]) {
       } else {
         parse_error = 1;
       }
-#endif
+    } else if (!strcmp(argv[c], "-h") || !strcmp(argv[c], "-help")) {
+      Help();
+      return 0;
+    } else if (!strcmp(argv[c], "-version")) {
+      int dec_version, demux_version;
+      GetAnimatedImageVersions(&dec_version, &demux_version);
+      printf("WebP Decoder version: %d.%d.%d\nWebP Demux version: %d.%d.%d\n",
+             (dec_version >> 16) & 0xff, (dec_version >> 8) & 0xff,
+             (dec_version >> 0) & 0xff,
+             (demux_version >> 16) & 0xff, (demux_version >> 8) & 0xff,
+             (demux_version >> 0) & 0xff);
+      return 0;
     } else {
       if (!got_input1) {
         files[0] = argv[c];
@@ -267,6 +272,12 @@ int main(int argc, const char* argv[]) {
       return -1;
     }
   }
+  if (argc < 3) {
+    Help();
+    return -1;
+  }
+
+
   if (!got_input2) {
     Help();
     return -1;

@@ -230,6 +230,10 @@ static int fixup_vorbis_headers(AVFormatContext *as,
 
     len = priv->len[0] + priv->len[1] + priv->len[2];
     buf_len = len + len / 255 + 64;
+
+    if (*buf)
+        return AVERROR_INVALIDDATA;
+
     ptr = *buf = av_realloc(NULL, buf_len);
     if (!ptr)
         return AVERROR(ENOMEM);
@@ -317,7 +321,7 @@ static int vorbis_header(AVFormatContext *s, int idx)
     if (priv->packet[pkt_type >> 1])
         return AVERROR_INVALIDDATA;
     if (pkt_type > 1 && !priv->packet[0] || pkt_type > 3 && !priv->packet[1])
-        return AVERROR_INVALIDDATA;
+        return priv->vp ? 0 : AVERROR_INVALIDDATA;
 
     priv->len[pkt_type >> 1]    = os->psize;
     priv->packet[pkt_type >> 1] = av_mallocz(os->psize);

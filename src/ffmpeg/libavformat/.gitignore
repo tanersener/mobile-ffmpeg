@@ -8,3 +8,5 @@
 /libavformat.so.57
 /libavformat.ver
 *.dylib
+/demuxer_list.c
+/muxer_list.c

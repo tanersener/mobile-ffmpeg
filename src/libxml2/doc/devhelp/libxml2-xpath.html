@@ -501,15 +501,15 @@ The content of this structure is not made public by the API.
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>obj</tt></i>:</span></td><td>the object to free</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlXPathInit"/>xmlXPathInit ()</h3><pre class="programlisting">void	xmlXPathInit			(void)<br/>
-</pre><p>Initialize the XPath environment</p>
+</pre><p>Initialize the XPath environment Does nothing but must be kept as public function.</p>
 </div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlXPathIsInf"/>xmlXPathIsInf ()</h3><pre class="programlisting">int	xmlXPathIsInf			(double val)<br/>
-</pre><p>Provides a portable isinf() function to detect whether a double is a +Infinite or -Infinite. Based on trio code http://sourceforge.net/projects/ctrio/</p>
-<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>val</tt></i>:</span></td><td>a double value</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>1 vi the value is +Infinite, -1 if -Infinite, 0 otherwise</td></tr></tbody></table></div></div>
+</pre><p/>
+<div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>val</tt></i>:</span></td><td>a double value</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>1 if the value is +Infinite, -1 if -Infinite, 0 otherwise</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlXPathIsNaN"/>xmlXPathIsNaN ()</h3><pre class="programlisting">int	xmlXPathIsNaN			(double val)<br/>
-</pre><p>Provides a portable isnan() function to detect whether a double is a NotaNumber. Based on trio code http://sourceforge.net/projects/ctrio/</p>
+</pre><p/>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>val</tt></i>:</span></td><td>a double value</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>1 if the value is a NaN, 0 otherwise</td></tr></tbody></table></div></div>
         <hr/>
         <div class="refsect2" lang="en"><h3><a name="xmlXPathNewContext"/>xmlXPathNewContext ()</h3><pre class="programlisting"><a href="libxml2-xpath.html#xmlXPathContextPtr">xmlXPathContextPtr</a>	xmlXPathNewContext	(<a href="libxml2-tree.html#xmlDocPtr">xmlDocPtr</a> doc)<br/>

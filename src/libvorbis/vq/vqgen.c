@@ -10,8 +10,7 @@
  *                                                                  *
  ********************************************************************
 
- function: train a VQ codebook 
- last mod: $Id: vqgen.c 16037 2009-05-26 21:10:58Z xiphmont $
+ function: train a VQ codebook
 
  ********************************************************************/
 
@@ -32,13 +31,13 @@
 #include "vqgen.h"
 #include "bookutil.h"
 
-/* Codebook generation happens in two steps: 
+/* Codebook generation happens in two steps:
 
    1) Train the codebook with data collected from the encoder: We use
    one of a few error metrics (which represent the distance between a
    given data point and a candidate point in the training set) to
    divide the training set up into cells representing roughly equal
-   probability of occurring. 
+   probability of occurring.
 
    2) Generate the codebook and auxiliary data from the trained data set
 */
@@ -110,7 +109,7 @@ void vqgen_cellmetric(vqgen *v){
         if(this>0){
           if(v->assigned[k] && (localmin==-1 || this<localmin))
             localmin=this;
-        }else{        
+        }else{
           if(k<j){
             dup++;
             break;
@@ -124,7 +123,7 @@ void vqgen_cellmetric(vqgen *v){
       unused++;
       continue;
     }
-    
+
     localmin=v->max[j]+localmin/2; /* this gives us rough diameter */
     if(min==-1 || localmin<min)min=localmin;
     if(max==-1 || localmin>max)max=localmin;
@@ -143,7 +142,7 @@ void vqgen_cellmetric(vqgen *v){
   for(i=0;i<count;i++)
     fprintf(cells,"%g\n",spacings[i]);
   fclose(cells);
-#endif            
+#endif
 
 }
 
@@ -173,7 +172,7 @@ void vqgen_quantize(vqgen *v,quant_meta *q){
   int j,k;
 
   mindel=maxdel=_now(v,0)[0];
-  
+
   for(j=0;j<v->entries;j++){
     float last=0.f;
     for(k=0;k<v->elements;k++){
@@ -201,7 +200,7 @@ void vqgen_quantize(vqgen *v,quant_meta *q){
     for(k=0;k<v->elements;k++){
       float val=_now(v,j)[k];
       float now=rint((val-last-mindel)/delta);
-      
+
       _now(v,j)[k]=now;
       if(now<0){
         /* be paranoid; this should be impossible */
@@ -282,7 +281,7 @@ void vqgen_addpoint(vqgen *v, float *p,float *a){
 
   memcpy(_point(v,v->points),p,sizeof(float)*v->elements);
   if(v->aux)memcpy(_point(v,v->points)+v->elements,a,sizeof(float)*v->aux);
- 
+
   /* quantize to the density mesh if it's selected */
   if(v->mindist>0.f){
     /* quantize to the mesh */
@@ -355,7 +354,7 @@ float vqgen_iterate(vqgen *v,int biasp){
    sprintf(buff,"bias%d.m",v->it);
    bias=fopen(buff,"w");
  #endif
- 
+
 
   if(v->entries<2){
     fprintf(stderr,"generation requires at least two entries\n");
@@ -384,9 +383,9 @@ float vqgen_iterate(vqgen *v,int biasp){
       float secondmetric=v->metric_func(v,_now(v,1),ppt)+v->bias[1];
       long   firstentry=0;
       long   secondentry=1;
-      
+
       if(!(i&0xff))spinnit("biasing... ",v->points+v->points+v->entries-i);
-      
+
       if(firstmetric>secondmetric){
         float temp=firstmetric;
         firstmetric=secondmetric;
@@ -394,7 +393,7 @@ float vqgen_iterate(vqgen *v,int biasp){
         firstentry=1;
         secondentry=0;
       }
-      
+
       for(j=2;j<v->entries;j++){
         float thismetric=v->metric_func(v,_now(v,j),ppt)+v->bias[j];
         if(thismetric<secondmetric){
@@ -409,14 +408,14 @@ float vqgen_iterate(vqgen *v,int biasp){
           }
         }
       }
-      
+
       j=firstentry;
       for(j=0;j<v->entries;j++){
-        
+
         float thismetric,localmetric;
         float *nearbiasptr=nearbias+desired2*j;
         long k=nearcount[j];
-        
+
         localmetric=v->metric_func(v,_now(v,j),ppt);
         /* 'thismetric' is to be the bias value necessary in the current
            arrangement for entry j to capture point i */
@@ -427,11 +426,11 @@ float vqgen_iterate(vqgen *v,int biasp){
           /* use the primary entry as the threshhold */
           thismetric=firstmetric-localmetric;
         }
-        
+
         /* support the idea of 'minimum distance'... if we want the
            cells in a codebook to be roughly some minimum size (as with
            the low resolution residue books) */
-        
+
         /* a cute two-stage delayed sorting hack */
         if(k<desired){
           nearbiasptr[k]=thismetric;
@@ -440,7 +439,7 @@ float vqgen_iterate(vqgen *v,int biasp){
             spinnit("biasing... ",v->points+v->points+v->entries-i);
             qsort(nearbiasptr,desired,sizeof(float),directdsort);
           }
-          
+
         }else if(thismetric>nearbiasptr[desired-1]){
           nearbiasptr[k]=thismetric;
           k++;
@@ -453,14 +452,14 @@ float vqgen_iterate(vqgen *v,int biasp){
         nearcount[j]=k;
       }
     }
-    
+
     /* inflate/deflate */
-    
+
     for(i=0;i<v->entries;i++){
       float *nearbiasptr=nearbias+desired2*i;
-      
+
       spinnit("biasing... ",v->points+v->entries-i);
-      
+
       /* due to the delayed sorting, we likely need to finish it off....*/
       if(nearcount[i]>desired)
         qsort(nearbiasptr,nearcount[i],sizeof(float),directdsort);
@@ -468,7 +467,7 @@ float vqgen_iterate(vqgen *v,int biasp){
       v->bias[i]=nearbiasptr[desired-1];
 
     }
-  }else{ 
+  }else{
     memset(v->bias,0,v->entries*sizeof(float));
   }
 
@@ -489,7 +488,7 @@ float vqgen_iterate(vqgen *v,int biasp){
     }
 
     j=firstentry;
-      
+
 #ifdef NOISY
     fprintf(cells,"%g %g\n%g %g\n\n",
           _now(v,j)[0],_now(v,j)[1],
@@ -553,7 +552,7 @@ float vqgen_iterate(vqgen *v,int biasp){
   fprintf(stderr,": dist %g(%g) metric error=%g \n",
           asserror,fdesired,meterror/v->points);
   v->it++;
-  
+
   free(new);
   free(nearcount);
   free(nearbias);

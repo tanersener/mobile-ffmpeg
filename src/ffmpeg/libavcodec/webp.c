@@ -1335,6 +1335,7 @@ static int vp8_lossy_decode_frame(AVCodecContext *avctx, AVFrame *p,
     if (!s->initialized) {
         ff_vp8_decode_init(avctx);
         s->initialized = 1;
+        s->v.actually_webp = 1;
     }
     avctx->pix_fmt = s->has_alpha ? AV_PIX_FMT_YUVA420P : AV_PIX_FMT_YUV420P;
     s->lossless = 0;
@@ -1504,7 +1505,7 @@ static int webp_decode_frame(AVCodecContext *avctx, void *data, int *got_frame,
             }
 
             bytestream2_seek(&exif_gb, ifd_offset, SEEK_SET);
-            if (avpriv_exif_decode_ifd(avctx, &exif_gb, le, 0, &exif_metadata) < 0) {
+            if (ff_exif_decode_ifd(avctx, &exif_gb, le, 0, &exif_metadata) < 0) {
                 av_log(avctx, AV_LOG_ERROR, "error decoding Exif data\n");
                 goto exif_end;
             }

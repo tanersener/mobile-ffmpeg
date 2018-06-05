@@ -121,12 +121,6 @@ struct AVFormatInternal {
     int avoid_negative_ts_use_pts;
 
     /**
-     * Whether or not a header has already been written
-     */
-    int header_written;
-    int write_header_ret;
-
-    /**
      * Timestamp of the end of the shortest stream.
      */
     int64_t shortest_end;
@@ -196,6 +190,8 @@ struct AVStreamInternal {
      * Whether the internal avctx needs to be updated from codecpar (after a late change to codecpar)
      */
     int need_context_update;
+
+    FFFrac *priv_pts;
 };
 
 #ifdef __GNUC__
@@ -302,6 +298,42 @@ void ff_put_v(AVIOContext *bc, uint64_t val);
  *         final \\0
  */
 int ff_get_line(AVIOContext *s, char *buf, int maxlen);
+
+/**
+ * Same as ff_get_line but strip the white-space characters in the text tail
+ *
+ * @param s the read-only AVIOContext
+ * @param buf buffer to store the read line
+ * @param maxlen size of the buffer
+ * @return the length of the string written in the buffer
+ */
+int ff_get_chomp_line(AVIOContext *s, char *buf, int maxlen);
+
+/**
+ * Read a whole line of text from AVIOContext to an AVBPrint buffer. Stop
+ * reading after reaching a \\r, a \\n, a \\r\\n, a \\0 or EOF.  The line
+ * ending characters are NOT included in the buffer, but they are skipped on
+ * the input.
+ *
+ * @param s the read-only AVIOContext
+ * @param bp the AVBPrint buffer
+ * @return the length of the read line, not including the line endings,
+ *         negative on error.
+ */
+int64_t ff_read_line_to_bprint(AVIOContext *s, AVBPrint *bp);
+
+/**
+ * Read a whole line of text from AVIOContext to an AVBPrint buffer overwriting
+ * its contents. Stop reading after reaching a \\r, a \\n, a \\r\\n, a \\0 or
+ * EOF. The line ending characters are NOT included in the buffer, but they
+ * are skipped on the input.
+ *
+ * @param s the read-only AVIOContext
+ * @param bp the AVBPrint buffer
+ * @return the length of the read line not including the line endings,
+ *         negative on error, or if the buffer becomes truncated.
+ */
+int64_t ff_read_line_to_bprint_overwrite(AVIOContext *s, AVBPrint *bp);
 
 #define SPACE_CHARS " \t\r\n"
 
@@ -545,8 +577,11 @@ static inline int ff_rename(const char *oldpath, const char *newpath, void *logc
     int ret = 0;
     if (rename(oldpath, newpath) == -1) {
         ret = AVERROR(errno);
-        if (logctx)
-            av_log(logctx, AV_LOG_ERROR, "failed to rename file %s to %s\n", oldpath, newpath);
+        if (logctx) {
+            char err[AV_ERROR_MAX_STRING_SIZE] = {0};
+            av_make_error_string(err, AV_ERROR_MAX_STRING_SIZE, ret);
+            av_log(logctx, AV_LOG_ERROR, "failed to rename file %s to %s: %s\n", oldpath, newpath, err);
+        }
     }
     return ret;
 }
@@ -554,6 +589,8 @@ static inline int ff_rename(const char *oldpath, const char *newpath, void *logc
 /**
  * Allocate extradata with additional AV_INPUT_BUFFER_PADDING_SIZE at end
  * which is always set to 0.
+ *
+ * Previously allocated extradata in par will be freed.
  *
  * @param size size of extradata
  * @return 0 if OK, AVERROR_xxx on error
@@ -623,6 +660,14 @@ int ff_format_output_open(AVFormatContext *s, const char *url, AVDictionary **op
 void ff_format_io_close(AVFormatContext *s, AVIOContext **pb);
 
 /**
+ * Utility function to check if the file uses http or https protocol
+ *
+ * @param s AVFormatContext
+ * @param filename URL or file name to open for writing
+ */
+int ff_is_http_proto(char *filename);
+
+/**
  * Parse creation_time in AVFormatContext metadata if exists and warn if the
  * parsing fails.
  *
@@ -684,5 +729,56 @@ int ff_bprint_to_codecpar_extradata(AVCodecParameters *par, struct AVBPrint *buf
  */
 int ff_interleaved_peek(AVFormatContext *s, int stream,
                         AVPacket *pkt, int add_offset);
+
+
+int ff_lock_avformat(void);
+int ff_unlock_avformat(void);
+
+/**
+ * Set AVFormatContext url field to the provided pointer. The pointer must
+ * point to a valid string. The existing url field is freed if necessary. Also
+ * set the legacy filename field to the same string which was provided in url.
+ */
+void ff_format_set_url(AVFormatContext *s, char *url);
+
+#define FF_PACKETLIST_FLAG_REF_PACKET (1 << 0) /**< Create a new reference for the packet instead of
+                                                    transferring the ownership of the existing one to the
+                                                    list. */
+
+/**
+ * Append an AVPacket to the list.
+ *
+ * @param head  List head element
+ * @param tail  List tail element
+ * @param pkt   The packet being appended
+ * @param flags Any combination of FF_PACKETLIST_FLAG_* flags
+ * @return 0 on success, negative AVERROR value on failure. On failure,
+           the list is unchanged
+ */
+int ff_packet_list_put(AVPacketList **head, AVPacketList **tail,
+                       AVPacket *pkt, int flags);
+
+/**
+ * Remove the oldest AVPacket in the list and return it.
+ *
+ * @note The pkt will be overwritten completely. The caller owns the
+ *       packet and must unref it by itself.
+ *
+ * @param head List head element
+ * @param tail List tail element
+ * @param pkt  Pointer to an initialized AVPacket struct
+ */
+int ff_packet_list_get(AVPacketList **head, AVPacketList **tail,
+                       AVPacket *pkt);
+
+/**
+ * Wipe the list and unref all the packets in it.
+ *
+ * @param head List head element
+ * @param tail List tail element
+ */
+void ff_packet_list_free(AVPacketList **head, AVPacketList **tail);
+
+void avpriv_register_devices(const AVOutputFormat * const o[], const AVInputFormat * const i[]);
 
 #endif /* AVFORMAT_INTERNAL_H */

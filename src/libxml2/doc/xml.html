@@ -709,6 +709,54 @@ to the <a href="http://git.gnome.org/browse/libxml2/">GIT</a> code base.</p>
 
 <p>Here is the list of public releases:</p>
 
+<h3>v2.9.8: Mar 05 2018</h3>
+<ul>
+  <li>Portability:<br/>
+  python: remove single use of _PyVerify_fd (Patrick Welche),<br/>
+  Build more test executables on Windows/MSVC (Nick Wellnhofer),<br/>
+  Stop including ansidecl.h (Nick Wellnhofer),<br/>
+  Fix libz and liblzma detection (Nick Wellnhofer),<br/>
+  Revert "Compile testapi with -Wno-unused-function" (Nick Wellnhofer)<br/>
+  </li>
+
+  <li>Bug Fixes:<br/>
+  Fix xmlParserEntityCheck (Nick Wellnhofer),<br/>
+  Halt parser in case of encoding error (Nick Wellnhofer),<br/>
+  Clear entity content in case of errors (Nick Wellnhofer),<br/>
+  Change calls to xmlCharEncInput to set flush false when not final call. Having flush incorrectly set to true causes errors for ICU. (Joel Hockey),<br/>
+  Fix buffer over-read in xmlParseNCNameComplex (Nick Wellnhofer),<br/>
+  Fix ICU library filenames on Windows/MSVC (Nick Wellnhofer),<br/>
+  Fix xmlXPathIsNaN broken by recent commit (Nick Wellnhofer),<br/>
+  Fix -Wenum-compare warnings (Nick Wellnhofer),<br/>
+  Fix callback signature in testapi.c (Nick Wellnhofer),<br/>
+  Fix unused parameter warning without ICU (Nick Wellnhofer),<br/>
+  Fix IO callback signatures (Nick Wellnhofer),<br/>
+  Fix misc callback signatures (Nick Wellnhofer),<br/>
+  Fix list callback signatures (Nick Wellnhofer),<br/>
+  Fix hash callback signatures (Nick Wellnhofer),<br/>
+  Refactor name and type signature for xmlNop (Vlad Tsyrklevich),<br/>
+  Fixed ICU to set flush correctly and provide pivot buffer. (Joel Hockey),<br/>
+  Skip EBCDIC tests if EBCDIC isn't supported (Nick Wellnhofer)<br/>
+  </li>
+
+  <li>Improvements:<br/>
+  Disable pointer-overflow UBSan checks under Travis (Nick Wellnhofer),<br/>
+  Improve handling of context input_id (Daniel Veillard),<br/>
+  Add resource file to Windows DLL (ccpaging),<br/>
+  Run Travis tests with -Werror (Nick Wellnhofer),<br/>
+  Build with "-Wall -Wextra" (Nick Wellnhofer),<br/>
+  Fix -Wtautological-pointer-compare warnings (Nick Wellnhofer),<br/>
+  Remove unused AC_CHECKs (Nick Wellnhofer),<br/>
+  Update information about contributing (Nick Wellnhofer),<br/>
+  Fix -Wmisleading-indentation warnings (Nick Wellnhofer),<br/>
+  Don't touch CFLAGS in configure.ac (Nick Wellnhofer),<br/>
+  Ignore function pointer cast warnings (Nick Wellnhofer),<br/>
+  Simplify XPath NaN, inf and -0 handling (Nick Wellnhofer),<br/>
+  Introduce xmlPosixStrdup and update xmlMemStrdup (Nick Wellnhofer),<br/>
+  Add test for ICU flush and pivot buffer (Nick Wellnhofer),<br/>
+  Compile testapi with -Wno-unused-function (Nick Wellnhofer)<br/>
+  </li>
+</ul>
 <h3>2.9.7: Nov 02 2017</h3>
 <ul>
   <li>Documentation:<br/>

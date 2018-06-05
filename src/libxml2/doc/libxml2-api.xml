@@ -390,6 +390,7 @@
      <summary>interface for the encoding conversion functions</summary>
      <description>interface for the encoding conversion functions needed for XML basic encoding and iconv() support.  Related specs are rfc2044        (UTF-8 and UTF-16) F. Yergeau Alis Technologies [ISO-10646]    UTF-8 and UTF-16 in Annexes [ISO-8859-1]   ISO Latin-1 characters codes. [UNICODE]      The Unicode Consortium, &quot;The Unicode Standard -- Worldwide Character Encoding -- Version 1.0&quot;, Addison- Wesley, Volume 1, 1991, Volume 2, 1992.  UTF-8 is described in Unicode Technical Report #4. [US-ASCII]     Coded Character Set--7-bit American Standard Code for Information Interchange, ANSI X3.4-1986. </description>
      <author>Daniel Veillard </author>
+     <exports symbol='ICU_PIVOT_BUF_SIZE' type='macro'/>
      <exports symbol='XML_CHAR_ENCODING_UCS4LE' type='enum'/>
      <exports symbol='XML_CHAR_ENCODING_ERROR' type='enum'/>
      <exports symbol='XML_CHAR_ENCODING_8859_5' type='enum'/>
@@ -573,6 +574,7 @@
      <exports symbol='xmlHashCopy' type='function'/>
      <exports symbol='xmlHashScanFull3' type='function'/>
      <exports symbol='xmlHashUpdateEntry3' type='function'/>
+     <exports symbol='xmlHashDefaultDeallocator' type='function'/>
      <exports symbol='xmlHashLookup3' type='function'/>
      <exports symbol='xmlHashLookup2' type='function'/>
      <exports symbol='xmlHashRemoveEntry' type='function'/>
@@ -3878,6 +3880,8 @@
     <macro name='HTML_TEXT_NODE' file='HTMLtree'>
       <info>Macro. A text node in a HTML document is really implemented the same way as a text node in an XML document.</info>
     </macro>
+    <macro name='ICU_PIVOT_BUF_SIZE' file='encoding'>
+    </macro>
     <macro name='INPUT_CHUNK' file='parserInternals'>
       <info>The parser tries to always have that amount of input ready. One of the point is providing context when reporting errors.</info>
     </macro>
@@ -5961,6 +5965,9 @@ if necessary or NULL'/>
     <struct name='uconv_t' file='encoding' type='struct _uconv_t'>
       <field name='uconv' type='UConverter *' info=' for conversion between an encoding and UTF-16'/>
       <field name='utf8' type='UConverter *' info=' for conversion between UTF-8 and UTF-16'/>
+      <field name='pivot_buf' type='UCharpivot_buf[ICU_PIVOT_BUF_SIZE]' info=''/>
+      <field name='pivot_source' type='UChar *' info=''/>
+      <field name='pivot_target' type='UChar *' info=''/>
     </struct>
     <typedef name='xlinkActuate' file='xlink' type='enum'/>
     <typedef name='xlinkHRef' file='xlink' type='xmlChar *'/>
@@ -10352,7 +10359,7 @@ Could we use @subtypes for this?'/>
       <info>Callback to copy data from a hash.</info>
       <return type='void *' info='a copy of the data or NULL in case of error.'/>
       <arg name='payload' type='void *' info='the data in the hash'/>
-      <arg name='name' type='xmlChar *' info='the name associated'/>
+      <arg name='name' type='const xmlChar *' info='the name associated'/>
     </functype>
     <function name='xmlHashCopy' file='hash' module='hash'>
       <info>Scan the hash @table and applied @f to each value.</info>
@@ -10375,8 +10382,14 @@ Could we use @subtypes for this?'/>
       <info>Callback to free data from a hash.</info>
       <return type='void'/>
       <arg name='payload' type='void *' info='the data in the hash'/>
-      <arg name='name' type='xmlChar *' info='the name associated'/>
+      <arg name='name' type='const xmlChar *' info='the name associated'/>
     </functype>
+    <function name='xmlHashDefaultDeallocator' file='hash' module='hash'>
+      <info>Free a hash table entry with xmlFree.</info>
+      <return type='void'/>
+      <arg name='entry' type='void *' info='the hash table entry'/>
+      <arg name='name' type='const xmlChar *' info='the entry&apos;s name'/>
+    </function>
     <function name='xmlHashFree' file='hash' module='hash'>
       <info>Free the hash @table and its contents. The userdata is deallocated with @f if provided.</info>
       <return type='void'/>
@@ -10494,7 +10507,7 @@ Could we use @subtypes for this?'/>
       <return type='void'/>
       <arg name='payload' type='void *' info='the data in the hash'/>
       <arg name='data' type='void *' info='extra scannner data'/>
-      <arg name='name' type='xmlChar *' info='the name associated'/>
+      <arg name='name' type='const xmlChar *' info='the name associated'/>
     </functype>
     <functype name='xmlHashScannerFull' file='hash' module='hash'>
       <info>Callback when scanning data in a hash with the full scanner.</info>
@@ -10903,7 +10916,7 @@ Could we use @subtypes for this?'/>
       <return type='void'/>
       <arg name='l' type='xmlListPtr' info='a list'/>
       <arg name='walker' type='xmlListWalker' info='a processing function'/>
-      <arg name='user' type='const void *' info='a user parameter passed to the walker function'/>
+      <arg name='user' type='void *' info='a user parameter passed to the walker function'/>
     </function>
     <function name='xmlListSearch' file='list' module='list'>
       <info>Search the list for an existing value of @data</info>
@@ -10926,13 +10939,13 @@ Could we use @subtypes for this?'/>
       <return type='void'/>
       <arg name='l' type='xmlListPtr' info='a list'/>
       <arg name='walker' type='xmlListWalker' info='a processing function'/>
-      <arg name='user' type='const void *' info='a user parameter passed to the walker function'/>
+      <arg name='user' type='void *' info='a user parameter passed to the walker function'/>
     </function>
     <functype name='xmlListWalker' file='list' module='list'>
       <info>Callback function used when walking a list with xmlListWalk().</info>
       <return type='int' info='0 to stop walking the list, 1 otherwise.'/>
       <arg name='data' type='const void *' info='the data found in the list'/>
-      <arg name='user' type='const void *' info='extra user provided data to the walker'/>
+      <arg name='user' type='void *' info='extra user provided data to the walker'/>
     </functype>
     <function name='xmlLoadACatalog' file='catalog' module='catalog'>
       <cond>defined(LIBXML_CATALOG_ENABLED)</cond>
@@ -17683,7 +17696,7 @@ Could we use @subtypes for this?'/>
     </function>
     <function name='xmlXPathInit' file='xpath' module='xpath'>
       <cond>defined(LIBXML_XPATH_ENABLED) || defined(LIBXML_SCHEMAS_ENABLED)</cond>
-      <info>Initialize the XPath environment</info>
+      <info>Initialize the XPath environment  Does nothing but must be kept as public function.</info>
       <return type='void'/>
     </function>
     <function name='xmlXPathIntersection' file='xpathInternals' module='xpath'>
@@ -17695,13 +17708,13 @@ Could we use @subtypes for this?'/>
     </function>
     <function name='xmlXPathIsInf' file='xpath' module='xpath'>
       <cond>defined(LIBXML_XPATH_ENABLED) || defined(LIBXML_SCHEMAS_ENABLED)</cond>
-      <info>Provides a portable isinf() function to detect whether a double is a +Infinite or -Infinite. Based on trio code http://sourceforge.net/projects/ctrio/</info>
-      <return type='int' info='1 vi the value is +Infinite, -1 if -Infinite, 0 otherwise'/>
+      <info></info>
+      <return type='int' info='1 if the value is +Infinite, -1 if -Infinite, 0 otherwise'/>
       <arg name='val' type='double' info='a double value'/>
     </function>
     <function name='xmlXPathIsNaN' file='xpath' module='xpath'>
       <cond>defined(LIBXML_XPATH_ENABLED) || defined(LIBXML_SCHEMAS_ENABLED)</cond>
-      <info>Provides a portable isnan() function to detect whether a double is a NotaNumber. Based on trio code http://sourceforge.net/projects/ctrio/</info>
+      <info></info>
       <return type='int' info='1 if the value is a NaN, 0 otherwise'/>
       <arg name='val' type='double' info='a double value'/>
     </function>

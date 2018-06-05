@@ -1,3 +1,4 @@
+fribidi_charset_to_unicode
 fribidi_debug_status
 fribidi_get_bidi_type
 fribidi_get_bidi_type_name
@@ -17,6 +18,7 @@ fribidi_join_arabic
 fribidi_log2vis
 fribidi_log2vis_get_embedding_levels
 fribidi_mirroring_status
+fribidi_parse_charset
 fribidi_remove_bidi_marks
 fribidi_reorder_line
 fribidi_reorder_nsm_status
@@ -26,5 +28,6 @@ fribidi_set_reorder_nsm
 fribidi_shape
 fribidi_shape_arabic
 fribidi_shape_mirroring
+fribidi_unicode_to_charset
 fribidi_unicode_version
 fribidi_version_info

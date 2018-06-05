@@ -29,6 +29,7 @@
 #include "libavutil/time.h"
 
 #include "avcodec.h"
+#include "decode.h"
 #include "dxva2_internal.h"
 
 /* define all the GUIDs used directly here,
@@ -43,6 +44,7 @@ DEFINE_GUID(ff_DXVA2_ModeVC1_D2010,      0x1b81beA4, 0xa0c7,0x11d3,0xb9,0x84,0x0
 DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main,  0x5b11d51b, 0x2f4c,0x4452,0xbc,0xc3,0x09,0xf2,0xa1,0x16,0x0c,0xc0);
 DEFINE_GUID(ff_DXVA2_ModeHEVC_VLD_Main10,0x107af0e0, 0xef1a,0x4d19,0xab,0xa8,0x67,0xa1,0x63,0x07,0x3d,0x13);
 DEFINE_GUID(ff_DXVA2_ModeVP9_VLD_Profile0,0x463707f8,0xa1d0,0x4585,0x87,0x6d,0x83,0xaa,0x6d,0x60,0xb8,0x9e);
+DEFINE_GUID(ff_DXVA2_ModeVP9_VLD_10bit_Profile2,0xa4c749ef,0x6ecf,0x48aa,0x84,0x48,0x50,0xa7,0xa1,0x16,0x5f,0xf7);
 DEFINE_GUID(ff_DXVA2_NoEncrypt,          0x1b81beD0, 0xa0c7,0x11d3,0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5);
 DEFINE_GUID(ff_GUID_NULL,                0x00000000, 0x0000,0x0000,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00);
 DEFINE_GUID(ff_IID_IDirectXVideoDecoderService, 0xfc51a551,0xd5e7,0x11d9,0xaf,0x55,0x00,0x05,0x4e,0x43,0xff,0x02);
@@ -65,6 +67,10 @@ static const int prof_h264_high[]    = {FF_PROFILE_H264_CONSTRAINED_BASELINE,
 static const int prof_hevc_main[]    = {FF_PROFILE_HEVC_MAIN,
                                         FF_PROFILE_UNKNOWN};
 static const int prof_hevc_main10[]  = {FF_PROFILE_HEVC_MAIN_10,
+                                        FF_PROFILE_UNKNOWN};
+static const int prof_vp9_profile0[] = {FF_PROFILE_VP9_0,
+                                        FF_PROFILE_UNKNOWN};
+static const int prof_vp9_profile2[] = {FF_PROFILE_VP9_2,
                                         FF_PROFILE_UNKNOWN};
 
 static const dxva_mode dxva_modes[] = {
@@ -89,7 +95,8 @@ static const dxva_mode dxva_modes[] = {
     { &ff_DXVA2_ModeHEVC_VLD_Main,   AV_CODEC_ID_HEVC, prof_hevc_main },
 
     /* VP8/9 */
-    { &ff_DXVA2_ModeVP9_VLD_Profile0,AV_CODEC_ID_VP9 },
+    { &ff_DXVA2_ModeVP9_VLD_Profile0,       AV_CODEC_ID_VP9, prof_vp9_profile0 },
+    { &ff_DXVA2_ModeVP9_VLD_10bit_Profile2, AV_CODEC_ID_VP9, prof_vp9_profile2 },
 
     { NULL,                          0 },
 };
@@ -576,14 +583,20 @@ static void ff_dxva2_unlock(AVCodecContext *avctx)
 #endif
 }
 
-// This must work before the decoder is created.
-// This somehow needs to be exported to the user.
-static void dxva_adjust_hwframes(AVCodecContext *avctx, AVHWFramesContext *frames_ctx)
+int ff_dxva2_common_frame_params(AVCodecContext *avctx,
+                                 AVBufferRef *hw_frames_ctx)
 {
-    FFDXVASharedContext *sctx = DXVA_SHARED_CONTEXT(avctx);
+    AVHWFramesContext *frames_ctx = (AVHWFramesContext *)hw_frames_ctx->data;
+    AVHWDeviceContext *device_ctx = frames_ctx->device_ctx;
     int surface_alignment, num_surfaces;
 
-    frames_ctx->format = sctx->pix_fmt;
+    if (device_ctx->type == AV_HWDEVICE_TYPE_DXVA2) {
+        frames_ctx->format = AV_PIX_FMT_DXVA2_VLD;
+    } else if (device_ctx->type == AV_HWDEVICE_TYPE_D3D11VA) {
+        frames_ctx->format = AV_PIX_FMT_D3D11;
+    } else {
+        return AVERROR(EINVAL);
+    }
 
     /* decoding MPEG-2 requires additional alignment on some Intel GPUs,
     but it causes issues for H.264 on certain AMD GPUs..... */
@@ -596,8 +609,8 @@ static void dxva_adjust_hwframes(AVCodecContext *avctx, AVHWFramesContext *frame
     else
         surface_alignment = 16;
 
-    /* 4 base work surfaces */
-    num_surfaces = 4;
+    /* 1 base work surface */
+    num_surfaces = 1;
 
     /* add surfaces based on number of possible refs */
     if (avctx->codec_id == AV_CODEC_ID_H264 || avctx->codec_id == AV_CODEC_ID_HEVC)
@@ -606,10 +619,6 @@ static void dxva_adjust_hwframes(AVCodecContext *avctx, AVHWFramesContext *frame
         num_surfaces += 8;
     else
         num_surfaces += 2;
-
-    /* add extra surfaces for frame threading */
-    if (avctx->active_thread_type & FF_THREAD_FRAME)
-        num_surfaces += avctx->thread_count;
 
     frames_ctx->sw_format = avctx->sw_pix_fmt == AV_PIX_FMT_YUV420P10 ?
                             AV_PIX_FMT_P010 : AV_PIX_FMT_NV12;
@@ -633,12 +642,16 @@ static void dxva_adjust_hwframes(AVCodecContext *avctx, AVHWFramesContext *frame
         frames_hwctx->BindFlags |= D3D11_BIND_DECODER;
     }
 #endif
+
+    return 0;
 }
 
 int ff_dxva2_decode_init(AVCodecContext *avctx)
 {
     FFDXVASharedContext *sctx = DXVA_SHARED_CONTEXT(avctx);
-    AVHWFramesContext *frames_ctx = NULL;
+    AVHWFramesContext *frames_ctx;
+    enum AVHWDeviceType dev_type = avctx->hwaccel->pix_fmt == AV_PIX_FMT_DXVA2_VLD
+                            ? AV_HWDEVICE_TYPE_DXVA2 : AV_HWDEVICE_TYPE_D3D11VA;
     int ret = 0;
 
     // Old API.
@@ -648,32 +661,14 @@ int ff_dxva2_decode_init(AVCodecContext *avctx)
     // (avctx->pix_fmt is not updated yet at this point)
     sctx->pix_fmt = avctx->hwaccel->pix_fmt;
 
-    if (!avctx->hw_frames_ctx && !avctx->hw_device_ctx) {
-        av_log(avctx, AV_LOG_ERROR, "Either a hw_frames_ctx or a hw_device_ctx needs to be set for hardware decoding.\n");
-        return AVERROR(EINVAL);
-    }
+    ret = ff_decode_get_hw_frames_ctx(avctx, dev_type);
+    if (ret < 0)
+        return ret;
 
-    if (avctx->hw_frames_ctx) {
-        frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
-    } else {
-        avctx->hw_frames_ctx = av_hwframe_ctx_alloc(avctx->hw_device_ctx);
-        if (!avctx->hw_frames_ctx)
-            return AVERROR(ENOMEM);
-
-        frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
-
-        dxva_adjust_hwframes(avctx, frames_ctx);
-
-        ret = av_hwframe_ctx_init(avctx->hw_frames_ctx);
-        if (ret < 0)
-            goto fail;
-    }
-
+    frames_ctx = (AVHWFramesContext*)avctx->hw_frames_ctx->data;
     sctx->device_ctx = frames_ctx->device_ctx;
 
-    if (frames_ctx->format != sctx->pix_fmt ||
-        !((sctx->pix_fmt == AV_PIX_FMT_D3D11 && CONFIG_D3D11VA) ||
-          (sctx->pix_fmt == AV_PIX_FMT_DXVA2_VLD && CONFIG_DXVA2))) {
+    if (frames_ctx->format != sctx->pix_fmt) {
         av_log(avctx, AV_LOG_ERROR, "Invalid pixfmt for hwaccel!\n");
         ret = AVERROR(EINVAL);
         goto fail;

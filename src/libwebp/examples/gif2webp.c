@@ -23,12 +23,20 @@
 
 #ifdef WEBP_HAVE_GIF
 
+#if defined(HAVE_UNISTD_H) && HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
 #include <gif_lib.h>
 #include "webp/encode.h"
 #include "webp/mux.h"
 #include "../examples/example_util.h"
 #include "../imageio/imageio_util.h"
 #include "./gifdec.h"
+
+#if !defined(STDIN_FILENO)
+#define STDIN_FILENO 0
+#endif
 
 //------------------------------------------------------------------------------
 
@@ -263,9 +271,11 @@ int main(int argc, const char *argv[]) {
 
   // Start the decoder object
 #if LOCAL_GIF_PREREQ(5,0)
-  gif = DGifOpenFileName(in_file, &gif_error);
+  gif = !strcmp(in_file, "-") ? DGifOpenFileHandle(STDIN_FILENO, &gif_error)
+                              : DGifOpenFileName(in_file, &gif_error);
 #else
-  gif = DGifOpenFileName(in_file);
+  gif = !strcmp(in_file, "-") ? DGifOpenFileHandle(STDIN_FILENO)
+                              : DGifOpenFileName(in_file);
 #endif
   if (gif == NULL) goto End;
 
@@ -350,6 +360,14 @@ int main(int argc, const char *argv[]) {
         // Update canvases.
         GIFDisposeFrame(orig_dispose, &gif_rect, &prev_canvas, &curr_canvas);
         GIFCopyPixels(&curr_canvas, &prev_canvas);
+
+        // Force frames with a small or no duration to 100ms to be consistent
+        // with web browsers and other transcoding tools. This also avoids
+        // incorrect durations between frames when padding frames are
+        // discarded.
+        if (frame_duration <= 10) {
+          frame_duration = 100;
+        }
 
         // Update timestamp (for next frame).
         frame_timestamp += frame_duration;
@@ -532,8 +550,13 @@ int main(int argc, const char *argv[]) {
       goto End;
     }
     if (!quiet) {
-      fprintf(stderr, "Saved output file (%d bytes): %s\n",
-              (int)webp_data.size, out_file);
+      if (!strcmp(out_file, "-")) {
+        fprintf(stderr, "Saved %d bytes to STDIO\n",
+                (int)webp_data.size);
+      } else {
+        fprintf(stderr, "Saved output file (%d bytes): %s\n",
+                (int)webp_data.size, out_file);
+      }
     }
   } else {
     if (!quiet) {

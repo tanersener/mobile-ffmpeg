@@ -1,13 +1,13 @@
 .\" WARNING! THIS FILE WAS GENERATED AUTOMATICALLY BY c2man!
 .\" DO NOT EDIT! CHANGES MADE TO THIS FILE WILL BE LOST!
-.TH "fribidi_shape_mirroring" 3 "3 February 2018" "c2man fribidi-mirroring.h" "Programmer's Manual"
+.TH "fribidi_shape_mirroring" 3 "19 February 2018" "c2man fribidi-mirroring.h" "Programmer's Manual"
 .SH "NAME"
 fribidi_shape_mirroring \- do mirroring shaping
 .SH "SYNOPSIS"
 .ft B
 #include <fribidi.h>
 .sp
-void fribidi_shape_mirroring
+extern void fribidi_shape_mirroring
 .br
 (
 .br
@@ -39,9 +39,6 @@ fribidi_get_mirror_char().
 This function implements rule L4 of the Unicode Bidirectional Algorithm
 available at http://www.unicode.org/reports/tr9/#L4.
 .SH "SEE ALSO"
-fribidi_charset_to_unicode(3),
-fribidi_unicode_to_charset(3),
-fribidi_parse_charset(3),
 fribidi_shape_arabic(3),
 fribidi_get_par_direction(3),
 fribidi_get_par_embedding_levels_ex(3),
@@ -51,6 +48,9 @@ fribidi_get_bidi_types(3),
 fribidi_get_bidi_type_name(3),
 fribidi_debug_status(3),
 fribidi_set_debug(3),
+fribidi_charset_to_unicode(3),
+fribidi_unicode_to_charset(3),
+fribidi_parse_charset(3),
 fribidi_mirroring_status(3),
 fribidi_set_mirroring(3),
 fribidi_reorder_nsm_status(3),

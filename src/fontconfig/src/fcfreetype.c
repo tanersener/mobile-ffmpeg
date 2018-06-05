@@ -2261,7 +2261,7 @@ static int
 FcFreeTypeSpacing (FT_Face face)
 {
     FT_Int	    load_flags = FT_LOAD_IGNORE_GLOBAL_ADVANCE_WIDTH | FT_LOAD_NO_SCALE | FT_LOAD_NO_HINTING;
-    FT_Pos	    advances[3] = {};
+    FT_Pos	    advances[3] = {0};
     unsigned int    num_advances = 0;
     int		    o;
 

@@ -1,3 +1,17 @@
+Overview of changes between 1.0.2 and 1.0.3
+=============================================
+
+* Minor compilation issues.
+
+Overview of changes between 1.0.1 and 1.0.2
+=============================================
+
+* Added meson build system.
+* glib dependency was completely removed even for tests.
+* Tests now run on Visual Studio (through meson).
+* Cleanup of obsolete options
+* Travis support.
+
 Overview of changes between 1.0 and 1.0.1
 =============================================
 

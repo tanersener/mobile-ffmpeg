@@ -30,6 +30,8 @@ static void Help(void) {
                                   "(default: 'dump_')\n");
   printf("  -tiff ............... save frames as TIFF\n");
   printf("  -pam ................ save frames as PAM\n");
+  printf("  -h .................. this help\n");
+  printf("  -version ............ print version number and exit\n");
 }
 
 int main(int argc, const char* argv[]) {
@@ -66,6 +68,18 @@ int main(int argc, const char* argv[]) {
     } else if (!strcmp(argv[c], "-pam")) {
       format = PAM;
       suffix = "pam";
+    } else if (!strcmp(argv[c], "-h") || !strcmp(argv[c], "-help")) {
+      Help();
+      return 0;
+    } else if (!strcmp(argv[c], "-version")) {
+      int dec_version, demux_version;
+      GetAnimatedImageVersions(&dec_version, &demux_version);
+      printf("WebP Decoder version: %d.%d.%d\nWebP Demux version: %d.%d.%d\n",
+             (dec_version >> 16) & 0xff, (dec_version >> 8) & 0xff,
+             (dec_version >> 0) & 0xff,
+             (demux_version >> 16) & 0xff, (demux_version >> 8) & 0xff,
+             (demux_version >> 0) & 0xff);
+      return 0;
     } else {
       uint32_t i;
       AnimatedImage image;

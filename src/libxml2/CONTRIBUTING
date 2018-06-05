@@ -1,0 +1,24 @@
+The current version of the code can be found in the GNOME Git Repository:
+
+    https://git.gnome.org/browse/libxml2/
+
+There's mirror on GitHub:
+
+    https://github.com/GNOME/libxml2
+
+Start discussions and send patches to the mailing list, or file a bug and
+add a patch as attachment.
+
+    https://mail.gnome.org/mailman/listinfo/xml
+    https://bugzilla.gnome.org/enter_bug.cgi?product=libxml2
+
+Format patches with git-format-patch and use plain text attachments
+if possible.
+
+All code must conform to C89 and pass the "make check" tests. Avoid
+compiler warnings and add regression tests if possible.
+
+The .travis.yml file can be used to thoroughly check the build with strict
+compiler flags, ASan and UBSan. Fork the libxml2 mirror on GitHub and set
+up Travis to test the commits you make on your fork.
+

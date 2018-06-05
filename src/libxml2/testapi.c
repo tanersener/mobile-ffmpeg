@@ -737,7 +737,8 @@ static void des_xmlSchemaValidCtxtPtr(int no ATTRIBUTE_UNUSED, xmlSchemaValidCtx
 
 #define gen_nb_xmlHashDeallocator 2
 static void
-test_xmlHashDeallocator(void *payload ATTRIBUTE_UNUSED, xmlChar *name ATTRIBUTE_UNUSED) {
+test_xmlHashDeallocator(void *payload ATTRIBUTE_UNUSED,
+                        const xmlChar *name ATTRIBUTE_UNUSED) {
 }
 
 static xmlHashDeallocator gen_xmlHashDeallocator(int no, int nr ATTRIBUTE_UNUSED) {
@@ -9988,6 +9989,43 @@ test_xmlHashCreateDict(void) {
 
 
 static int
+test_xmlHashDefaultDeallocator(void) {
+    int test_ret = 0;
+
+    int mem_base;
+    void * entry; /* the hash table entry */
+    int n_entry;
+    xmlChar * name; /* the entry's name */
+    int n_name;
+
+    for (n_entry = 0;n_entry < gen_nb_void_ptr;n_entry++) {
+    for (n_name = 0;n_name < gen_nb_const_xmlChar_ptr;n_name++) {
+        mem_base = xmlMemBlocks();
+        entry = gen_void_ptr(n_entry, 0);
+        name = gen_const_xmlChar_ptr(n_name, 1);
+
+        xmlHashDefaultDeallocator(entry, (const xmlChar *)name);
+        call_tests++;
+        des_void_ptr(n_entry, entry, 0);
+        des_const_xmlChar_ptr(n_name, (const xmlChar *)name, 1);
+        xmlResetLastError();
+        if (mem_base != xmlMemBlocks()) {
+            printf("Leak of %d blocks found in xmlHashDefaultDeallocator",
+	           xmlMemBlocks() - mem_base);
+	    test_ret++;
+            printf(" %d", n_entry);
+            printf(" %d", n_name);
+            printf("\n");
+        }
+    }
+    }
+    function_tests++;
+
+    return(test_ret);
+}
+
+
+static int
 test_xmlHashLookup(void) {
     int test_ret = 0;
 
@@ -10719,13 +10757,14 @@ static int
 test_hash(void) {
     int test_ret = 0;
 
-    if (quiet == 0) printf("Testing hash : 16 of 24 functions ...\n");
+    if (quiet == 0) printf("Testing hash : 17 of 25 functions ...\n");
     test_ret += test_xmlHashAddEntry();
     test_ret += test_xmlHashAddEntry2();
     test_ret += test_xmlHashAddEntry3();
     test_ret += test_xmlHashCopy();
     test_ret += test_xmlHashCreate();
     test_ret += test_xmlHashCreateDict();
+    test_ret += test_xmlHashDefaultDeallocator();
     test_ret += test_xmlHashLookup();
     test_ret += test_xmlHashLookup2();
     test_ret += test_xmlHashLookup3();

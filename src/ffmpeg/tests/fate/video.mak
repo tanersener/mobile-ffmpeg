@@ -69,6 +69,18 @@ fate-cavs: CMD = framecrc -i $(TARGET_SAMPLES)/cavs/cavs.mpg -an
 FATE_VIDEO-$(call DEMDEC, CDG, CDGRAPHICS) += fate-cdgraphics
 fate-cdgraphics: CMD = framecrc -i $(TARGET_SAMPLES)/cdgraphics/BrotherJohn.cdg -pix_fmt rgba -t 1
 
+FATE_CFHD-$(CONFIG_AVI_DEMUXER) += fate-cfhd-1
+fate-cfhd-1: CMD = framecrc -i $(TARGET_SAMPLES)/cfhd/cfhd_422.avi -pix_fmt yuv422p10le
+
+FATE_CFHD-$(CONFIG_AVI_DEMUXER) += fate-cfhd-2
+fate-cfhd-2: CMD = framecrc -i $(TARGET_SAMPLES)/cfhd/cfhd_444.avi -pix_fmt gbrp12le
+
+FATE_CFHD-$(CONFIG_MOV_DEMUXER) += fate-cfhd-3
+fate-cfhd-3: CMD = framecrc -i $(TARGET_SAMPLES)/cfhd/cfhd_odd.mov -pix_fmt yuv422p10le
+
+FATE_VIDEO-$(CONFIG_CFHD_DECODER) += $(FATE_CFHD-yes)
+fate-cfhd: $(FATE_CFHD-yes)
+
 FATE_VIDEO-$(call DEMDEC, AVI, CLJR) += fate-cljr
 fate-cljr: CMD = framecrc -i $(TARGET_SAMPLES)/cljr/testcljr-partial.avi
 
@@ -159,21 +171,6 @@ fate-id-cin-video: CMD = framecrc -i $(TARGET_SAMPLES)/idcin/idlog-2MB.cin -pix_
 FATE_VIDEO-$(call ENCDEC, ROQ PGMYUV, ROQ IMAGE2) += fate-idroq-video-encode
 fate-idroq-video-encode: CMD = md5 -f image2 -c:v pgmyuv -i $(TARGET_SAMPLES)/ffmpeg-synthetic/vsynth1/%02d.pgm -r 30 -sws_flags +bitexact -vf pad=512:512:80:112 -f roq -t 0.2
 
-FATE_HAP += fate-hap1
-fate-hap1: CMD = framecrc -i $(TARGET_SAMPLES)/hap/hap1.mov
-
-FATE_HAP += fate-hap5
-fate-hap5: CMD = framecrc -i $(TARGET_SAMPLES)/hap/hap5.mov
-
-FATE_HAP += fate-hapy
-fate-hapy: CMD = framecrc -i $(TARGET_SAMPLES)/hap/hapy.mov
-
-FATE_HAP += fate-hap-chunk
-fate-hap-chunk: CMD = framecrc -i $(TARGET_SAMPLES)/hap/hapy-12-chunks.mov
-
-FATE_VIDEO-$(call DEMDEC, MOV, HAP) += $(FATE_HAP)
-fate-hap: $(FATE_HAP)
-
 FATE_IFF-$(CONFIG_IFF_ILBM_DECODER) += fate-iff-byterun1
 fate-iff-byterun1: CMD = framecrc -i $(TARGET_SAMPLES)/iff/ASH.LBM -pix_fmt rgb24
 
@@ -244,6 +241,9 @@ fate-mpeg2-ticket186: CMD = framecrc -flags +bitexact -idct simple -i $(TARGET_S
 
 FATE_VIDEO-$(call DEMDEC, MPEGPS, MPEG2VIDEO) += fate-mpeg2-ticket6024
 fate-mpeg2-ticket6024: CMD = framecrc -flags +bitexact -idct simple -flags +truncated -i $(TARGET_SAMPLES)/mpeg2/matrixbench_mpeg2.lq1.mpg -an
+
+FATE_VIDEO-$(call DEMDEC, MPEGVIDEO, MPEG2VIDEO) += fate-mpeg2-ticket6677
+fate-mpeg2-ticket6677: CMD = framecrc -flags +bitexact -idct simple -vsync drop -i $(TARGET_SAMPLES)/mpeg2/sony-ct3.bs
 
 FATE_VIDEO-$(call DEMDEC, MV, MVC1) += fate-mv-mvc1
 fate-mv-mvc1: CMD = framecrc -i $(TARGET_SAMPLES)/mv/posture.mv -an -frames 25 -pix_fmt rgb555le

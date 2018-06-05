@@ -75,11 +75,11 @@
 #include "aac.h"
 #include "aactab.h"
 #include "aacdectab.h"
+#include "adts_header.h"
 #include "cbrt_data.h"
 #include "sbr.h"
 #include "aacsbr.h"
 #include "mpeg4audio.h"
-#include "aacadtsdec.h"
 #include "profiles.h"
 #include "libavutil/intfloat.h"
 
@@ -417,7 +417,7 @@ static void apply_independent_coupling_fixed(AACContext *ac,
     int i, c, shift, round, tmp;
     const int gain = cce->coup.gain[index][0];
     const int *src = cce->ch[0].ret;
-    int *dest = target->ret;
+    unsigned int *dest = target->ret;
     const int len = 1024 << (ac->oc[1].m4ac.sbr == 1);
 
     c = cce_scale_fixed[gain & 7];

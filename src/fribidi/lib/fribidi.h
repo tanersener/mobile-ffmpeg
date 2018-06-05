@@ -39,11 +39,7 @@
 #include "fribidi-brackets.h"
 #include "fribidi-arabic.h"
 #include "fribidi-shape.h"
-
-
-#if FRIBIDI_CHARSETS+0
-# include "fribidi-char-sets.h"
-#endif				/* FRIBIDI_CHARSETS */
+#include "fribidi-char-sets.h"
 
 
 #ifdef FRIBIDI_NO_DEPRECATED
@@ -56,9 +52,8 @@
 
 
 
-#define fribidi_version_info FRIBIDI_NAMESPACE(version_info)
 /* An string containing the version information of the library. */
-     extern const char *fribidi_version_info;
+FRIBIDI_ENTRY const char *fribidi_version_info;
 
 #include "fribidi-enddecls.h"
 

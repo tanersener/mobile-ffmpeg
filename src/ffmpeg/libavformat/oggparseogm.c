@@ -24,7 +24,6 @@
 
 #include <stdlib.h>
 
-#include "libavutil/avassert.h"
 #include "libavutil/intreadwrite.h"
 
 #include "libavcodec/bytestream.h"
@@ -106,10 +105,10 @@ ogm_header(AVFormatContext *s, int idx)
                 size -= 4;
             }
             if (size > 52) {
-                av_assert0(AV_INPUT_BUFFER_PADDING_SIZE <= 52);
                 size -= 52;
                 if (bytestream2_get_bytes_left(&p) < size)
                     return AVERROR_INVALIDDATA;
+                av_freep(&st->codecpar->extradata);
                 if (ff_alloc_extradata(st->codecpar, size) < 0)
                     return AVERROR(ENOMEM);
                 bytestream2_get_buffer(&p, st->codecpar->extradata, st->codecpar->extradata_size);
@@ -177,11 +176,14 @@ ogm_packet(AVFormatContext *s, int idx)
         os->pflags |= AV_PKT_FLAG_KEY;
 
     lb = ((*p & 2) << 1) | ((*p >> 6) & 3);
+    if (os->psize < lb + 1)
+        return AVERROR_INVALIDDATA;
+
     os->pstart += lb + 1;
     os->psize -= lb + 1;
 
     while (lb--)
-        os->pduration += p[lb+1] << (lb*8);
+        os->pduration += (uint64_t)p[lb+1] << (lb*8);
 
     return 0;
 }

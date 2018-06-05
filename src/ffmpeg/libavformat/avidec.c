@@ -401,10 +401,10 @@ static int avi_extract_stream_metadata(AVFormatContext *s, AVStream *st)
         // skip 4 byte padding
         bytestream2_skip(&gb, 4);
         offset = bytestream2_tell(&gb);
-        bytestream2_init(&gb, data + offset, data_size - offset);
 
         // decode EXIF tags from IFD, AVI is always little-endian
-        return avpriv_exif_decode_ifd(s, &gb, 1, 0, &st->metadata);
+        return avpriv_exif_decode_ifd(s, data + offset, data_size - offset,
+                                      1, 0, &st->metadata);
         break;
     case MKTAG('C', 'A', 'S', 'I'):
         avpriv_request_sample(s, "RIFF stream data tag type CASI (%u)", tag);
@@ -670,7 +670,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
             st->start_time = 0;
             avio_rl32(pb); /* buffer size */
             avio_rl32(pb); /* quality */
-            if (ast->cum_len*ast->scale/ast->rate > 3600) {
+            if (ast->cum_len > 3600LL * ast->rate / ast->scale) {
                 av_log(s, AV_LOG_ERROR, "crazy start time, iam scared, giving up\n");
                 ast->cum_len = 0;
             }

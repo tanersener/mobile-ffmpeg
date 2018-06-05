@@ -584,6 +584,12 @@ static char *sdp_write_media_attributes(char *buff, int size, AVStream *st, int 
                                          payload_type,
                                          p->sample_rate, p->channels);
             break;
+        case AV_CODEC_ID_PCM_S24BE:
+            if (payload_type >= RTP_PT_PRIVATE)
+                av_strlcatf(buff, size, "a=rtpmap:%d L24/%d/%d\r\n",
+                                         payload_type,
+                                         p->sample_rate, p->channels);
+            break;
         case AV_CODEC_ID_PCM_MULAW:
             if (payload_type >= RTP_PT_PRIVATE)
                 av_strlcatf(buff, size, "a=rtpmap:%d PCMU/%d/%d\r\n",
@@ -778,7 +784,7 @@ int av_sdp_create(AVFormatContext *ac[], int n_files, char *buf, int size)
     port = 0;
     ttl = 0;
     if (n_files == 1) {
-        port = sdp_get_address(dst, sizeof(dst), &ttl, ac[0]->filename);
+        port = sdp_get_address(dst, sizeof(dst), &ttl, ac[0]->url ? ac[0]->url : "");
         is_multicast = resolve_destination(dst, sizeof(dst), dst_type,
                                            sizeof(dst_type));
         if (!is_multicast)
@@ -798,7 +804,7 @@ int av_sdp_create(AVFormatContext *ac[], int n_files, char *buf, int size)
     dst[0] = 0;
     for (i = 0; i < n_files; i++) {
         if (n_files != 1) {
-            port = sdp_get_address(dst, sizeof(dst), &ttl, ac[i]->filename);
+            port = sdp_get_address(dst, sizeof(dst), &ttl, ac[i]->url ? ac[i]->url : "");
             is_multicast = resolve_destination(dst, sizeof(dst), dst_type,
                                                sizeof(dst_type));
             if (!is_multicast)

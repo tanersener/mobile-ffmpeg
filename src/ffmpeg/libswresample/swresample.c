@@ -240,7 +240,7 @@ av_cold int swr_init(struct SwrContext *s){
         &&s->int_sample_fmt != AV_SAMPLE_FMT_S64P
         &&s->int_sample_fmt != AV_SAMPLE_FMT_FLTP
         &&s->int_sample_fmt != AV_SAMPLE_FMT_DBLP){
-        av_log(s, AV_LOG_ERROR, "Requested sample format %s is not supported internally, S16/S32/S64/FLT/DBL is supported\n", av_get_sample_fmt_name(s->int_sample_fmt));
+        av_log(s, AV_LOG_ERROR, "Requested sample format %s is not supported internally, s16p/s32p/s64p/fltp/dblp are supported\n", av_get_sample_fmt_name(s->int_sample_fmt));
         return AVERROR(EINVAL);
     }
 
@@ -276,7 +276,7 @@ av_cold int swr_init(struct SwrContext *s){
         && s->int_sample_fmt != AV_SAMPLE_FMT_FLTP
         && s->int_sample_fmt != AV_SAMPLE_FMT_DBLP
         && s->resample){
-        av_log(s, AV_LOG_ERROR, "Resampling only supported with internal s16/s32/flt/dbl\n");
+        av_log(s, AV_LOG_ERROR, "Resampling only supported with internal s16p/s32p/fltp/dblp\n");
         ret = AVERROR(EINVAL);
         goto fail;
     }
@@ -678,7 +678,7 @@ static int swr_convert_internal(struct SwrContext *s, AudioData *out, int out_co
                             s->mix_2_1_simd(conv_src->ch[ch], preout->ch[ch], s->dither.noise.ch[ch] + s->dither.noise.bps * s->dither.noise_pos, s->native_simd_one, 0, 0, len1);
                     if(out_count != len1)
                         for(ch=0; ch<preout->ch_count; ch++)
-                            s->mix_2_1_f(conv_src->ch[ch] + off, preout->ch[ch] + off, s->dither.noise.ch[ch] + s->dither.noise.bps * s->dither.noise_pos + off + len1, s->native_one, 0, 0, out_count - len1);
+                            s->mix_2_1_f(conv_src->ch[ch] + off, preout->ch[ch] + off, s->dither.noise.ch[ch] + s->dither.noise.bps * s->dither.noise_pos + off, s->native_one, 0, 0, out_count - len1);
                 } else {
                     for(ch=0; ch<preout->ch_count; ch++)
                         s->mix_2_1_f(conv_src->ch[ch], preout->ch[ch], s->dither.noise.ch[ch] + s->dither.noise.bps * s->dither.noise_pos, s->native_one, 0, 0, out_count);

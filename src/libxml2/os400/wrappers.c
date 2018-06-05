@@ -110,7 +110,7 @@ _lx_dlerror(void)
 }
 
 
-#ifdef HAVE_ZLIB_H
+#ifdef LIBXML_ZLIB_ENABLED
 #include <zlib.h>
 
 gzFile

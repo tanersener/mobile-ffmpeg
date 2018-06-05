@@ -7,3 +7,5 @@
 /libavdevice.so.57
 /libavdevice.ver
 *.dylib
+/indev_list.c
+/outdev_list.c

@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: fontconfig 2.12.93\n"
+"Project-Id-Version: fontconfig 2.13.0\n"
 "Report-Msgid-Bugs-To: https://bugs.freedesktop.org/enter_bug.cgi?"
 "product=fontconfig\n"
-"POT-Creation-Date: 2018-02-15 21:57+0900\n"
+"POT-Creation-Date: 2018-03-06 12:50+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"

@@ -34,7 +34,7 @@ fi
 #       Copy some documentation files if needed.
 
 for TEXT in "${TOPDIR}/AUTHORS" "${TOPDIR}/ChangeLog"                   \
-    "${TOPDIR}/Copyright" "${TOPDIR}/HACKING" "${TOPDIR}/README"        \
+    "${TOPDIR}/Copyright" "${TOPDIR}/CONTRIBUTING" "${TOPDIR}/README"        \
     "${TOPDIR}/MAINTAINERS" "${TOPDIR}/NEWS" "${TOPDIR}/TODO"           \
     "${TOPDIR}/TODO_SCHEMAS" "${TOPDIR}/os400/README400"
 do      if [ -f "${TEXT}" ]

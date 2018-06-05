@@ -280,11 +280,9 @@ static int magy_decode_slice10(AVCodecContext *avctx, void *tdata,
         case GRADIENT:
             dst = (uint16_t *)p->data[i] + j * sheight * stride;
             s->llviddsp.add_left_pred_int16(dst, dst, max, width, 0);
-            left = lefttop = 0;
             dst += stride;
             if (interlaced) {
                 s->llviddsp.add_left_pred_int16(dst, dst, max, width, 0);
-                left = lefttop = 0;
                 dst += stride;
             }
             for (k = 1 + interlaced; k < height; k++) {
@@ -302,14 +300,13 @@ static int magy_decode_slice10(AVCodecContext *avctx, void *tdata,
             break;
         case MEDIAN:
             dst = (uint16_t *)p->data[i] + j * sheight * stride;
-            lefttop = left = dst[0];
             s->llviddsp.add_left_pred_int16(dst, dst, max, width, 0);
             dst += stride;
             if (interlaced) {
-                lefttop = left = dst[0];
                 s->llviddsp.add_left_pred_int16(dst, dst, max, width, 0);
                 dst += stride;
             }
+            lefttop = left = dst[0];
             for (k = 1 + interlaced; k < height; k++) {
                 magicyuv_median_pred16(dst, dst - fake_stride, dst, width, &left, &lefttop, max);
                 lefttop = left = dst[0];
@@ -348,7 +345,7 @@ static int magy_decode_slice(AVCodecContext *avctx, void *tdata,
     MagicYUVContext *s = avctx->priv_data;
     int interlaced = s->interlaced;
     AVFrame *p = s->p;
-    int i, k, x;
+    int i, k, x, min_width;
     GetBitContext gb;
     uint8_t *dst;
 
@@ -411,36 +408,36 @@ static int magy_decode_slice(AVCodecContext *avctx, void *tdata,
         case GRADIENT:
             dst = p->data[i] + j * sheight * stride;
             s->llviddsp.add_left_pred(dst, dst, width, 0);
-            left = lefttop = 0;
             dst += stride;
             if (interlaced) {
                 s->llviddsp.add_left_pred(dst, dst, width, 0);
-                left = lefttop = 0;
                 dst += stride;
             }
+            min_width = FFMIN(width, 32);
             for (k = 1 + interlaced; k < height; k++) {
                 top = dst[-fake_stride];
                 left = top + dst[0];
                 dst[0] = left;
-                for (x = 1; x < width; x++) {
+                for (x = 1; x < min_width; x++) { /* dsp need aligned 32 */
                     top = dst[x - fake_stride];
                     lefttop = dst[x - (fake_stride + 1)];
                     left += top - lefttop + dst[x];
                     dst[x] = left;
                 }
+                if (width > 32)
+                    s->llviddsp.add_gradient_pred(dst + 32, fake_stride, width - 32);
                 dst += stride;
             }
             break;
         case MEDIAN:
             dst = p->data[i] + j * sheight * stride;
-            lefttop = left = dst[0];
             s->llviddsp.add_left_pred(dst, dst, width, 0);
             dst += stride;
             if (interlaced) {
-                lefttop = left = dst[0];
                 s->llviddsp.add_left_pred(dst, dst, width, 0);
                 dst += stride;
             }
+            lefttop = left = dst[0];
             for (k = 1 + interlaced; k < height; k++) {
                 s->llviddsp.add_median_pred(dst, dst - fake_stride,
                                              dst, width, &left, &lefttop);

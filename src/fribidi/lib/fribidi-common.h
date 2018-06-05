@@ -40,14 +40,20 @@
 # include <fribidi-custom.h>
 #endif /* HAVE_FRIBIDI_CUSTOM_H */
 
-/* FRIBIDI_NAMESPACE is a macro used to name library symbols. */
-#ifndef FRIBIDI_NAMESPACE
-# define FRIBIDI_NAMESPACE(SYMBOL) fribidi##_##SYMBOL
-#endif /* !FRIBIDI_NAMESPACE */
 
 /* FRIBIDI_ENTRY is a macro used to declare library entry points. */
 #ifndef FRIBIDI_ENTRY
-#  define FRIBIDI_ENTRY		/* empty */
+# if (defined(_MSC_VER) || defined(FRIBIDI_BUILT_WITH_MSVC)) && !defined(FRIBIDI_STATIC)
+/* if we're building fribidi itself with MSVC, FRIBIDI_ENTRY will be defined,
+ * so if we're here then this is an external user including fribidi headers.
+ * The dllimport is needed here mostly for the fribidi_version_info variable,
+ * for functions it's not required. Probably needs more fine-tuning if
+ * someone starts building fribidi as static library with MSVC. We'll cross
+ * that brige when we get there. */
+#  define FRIBIDI_ENTRY __declspec(dllimport) extern
+# else
+#  define FRIBIDI_ENTRY extern
+# endif
 #endif /* !FRIBIDI_ENTRY */
 
 #ifdef __ICC
@@ -109,7 +115,6 @@
 
 
 
-#define fribidi_debug_status FRIBIDI_NAMESPACE(debug_status)
 /* fribidi_debug_status - get current debug state
  *
  */
@@ -117,7 +122,6 @@ FRIBIDI_ENTRY int fribidi_debug_status (
   void
 );
 
-#define fribidi_set_debug FRIBIDI_NAMESPACE(set_debug)
 /* fribidi_set_debug - set debug state
  *
  */

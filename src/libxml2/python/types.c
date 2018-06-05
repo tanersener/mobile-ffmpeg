@@ -31,8 +31,6 @@ libxml_PyFileGet(PyObject *f) {
     const char *mode;
 
     fd = PyObject_AsFileDescriptor(f);
-    if (!_PyVerify_fd(fd))
-        return(NULL);
     /*
      * Get the flags on the fd to understand how it was opened
      */

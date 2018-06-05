@@ -10,8 +10,6 @@ libwebpencode_la_SOURCES += backward_references_enc.h
 libwebpencode_la_SOURCES += config_enc.c
 libwebpencode_la_SOURCES += cost_enc.c
 libwebpencode_la_SOURCES += cost_enc.h
-libwebpencode_la_SOURCES += delta_palettization_enc.c
-libwebpencode_la_SOURCES += delta_palettization_enc.h
 libwebpencode_la_SOURCES += filter_enc.c
 libwebpencode_la_SOURCES += frame_enc.c
 libwebpencode_la_SOURCES += histogram_enc.c
@@ -40,5 +38,5 @@ noinst_HEADERS =
 noinst_HEADERS += ../webp/format_constants.h
 
 libwebpencode_la_LDFLAGS = -lm
-libwebpencode_la_CPPFLAGS = $(AM_CPPFLAGS) $(USE_EXPERIMENTAL_CODE)
+libwebpencode_la_CPPFLAGS = $(AM_CPPFLAGS)
 libwebpencodeincludedir = $(includedir)/webp

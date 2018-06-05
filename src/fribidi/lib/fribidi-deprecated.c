@@ -310,6 +310,9 @@ out:
   if (bidi_types)
     fribidi_free (bidi_types);
 
+  if (bracket_types)
+    fribidi_free (bracket_types);
+
   return status ? max_level + 1 : 0;
 }
 

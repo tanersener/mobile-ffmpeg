@@ -1,0 +1,4 @@
+option('deprecated', type : 'boolean', value : true,
+  description: 'Build deprecated functionality')
+option('docs', type : 'boolean', value : true,
+  description: 'Build documentation')

@@ -42,10 +42,20 @@ streams, 'V' only matches video streams which are not attached pictures, video
 thumbnails or cover arts.  If @var{stream_index} is given, then it matches
 stream number @var{stream_index} of this type. Otherwise, it matches all
 streams of this type.
-@item p:@var{program_id}[:@var{stream_index}]
-If @var{stream_index} is given, then it matches the stream with number @var{stream_index}
+@item p:@var{program_id}[:@var{stream_index}] or p:@var{program_id}[:@var{stream_type}[:@var{stream_index}]] or
+p:@var{program_id}:m:@var{key}[:@var{value}]
+In first version, if @var{stream_index} is given, then it matches the stream with number @var{stream_index}
 in the program with the id @var{program_id}. Otherwise, it matches all streams in the
-program.
+program. In the second version, @var{stream_type} is one of following: 'v' for video, 'a' for audio, 's'
+for subtitle, 'd' for data. If @var{stream_index} is also given, then it matches
+stream number @var{stream_index} of this type in the program with the id @var{program_id}.
+Otherwise, if only @var{stream_type} is given, it matches all
+streams of this type in the program with the id @var{program_id}.
+In the third version matches streams in the program with the id @var{program_id} with the metadata
+tag @var{key} having the specified value. If
+@var{value} is not given, matches streams that contain the given tag with any
+value.
+
 @item #@var{stream_id} or i:@var{stream_id}
 Match the stream by stream id (e.g. PID in MPEG-TS container).
 @item m:@var{key}[:@var{value}]
@@ -168,14 +178,24 @@ The returned list cannot be assumed to be always complete.
 ffmpeg -sinks pulse,server=192.168.0.4
 @end example
 
-@item -loglevel [repeat+]@var{loglevel} | -v [repeat+]@var{loglevel}
-Set the logging level used by the library.
-Adding "repeat+" indicates that repeated log output should not be compressed
-to the first line and the "Last message repeated n times" line will be
-omitted. "repeat" can also be used alone.
-If "repeat" is used alone, and with no prior loglevel set, the default
-loglevel will be used. If multiple loglevel parameters are given, using
-'repeat' will not change the loglevel.
+@item -loglevel [@var{flags}+]@var{loglevel} | -v [@var{flags}+]@var{loglevel}
+Set logging level and flags used by the library.
+
+The optional @var{flags} prefix can consist of the following values:
+@table @samp
+@item repeat
+Indicates that repeated log output should not be compressed to the first line
+and the "Last message repeated n times" line will be omitted.
+@item level
+Indicates that log output should add a @code{[level]} prefix to each message
+line. This can be used as an alternative to log coloring, e.g. when dumping the
+log to file.
+@end table
+Flags can also be used alone by adding a '+'/'-' prefix to set/reset a single
+flag without affecting other @var{flags} or changing @var{loglevel}. When
+setting both @var{flags} and @var{loglevel}, a '+' separator is expected
+between the last @var{flags} value and before @var{loglevel}.
+
 @var{loglevel} is a string or a number containing one of the following values:
 @table @samp
 @item quiet, -8
@@ -200,6 +220,17 @@ Same as @code{info}, except more verbose.
 Show everything, including debugging information.
 @item trace, 56
 @end table
+
+For example to enable repeated log output, add the @code{level} prefix, and set
+@var{loglevel} to @code{verbose}:
+@example
+ffmpeg -loglevel repeat+level+verbose -i input output
+@end example
+Another example that enables repeated log output without affecting current
+state of @code{level} prefix flag or @var{loglevel}:
+@example
+ffmpeg [...] -loglevel +repeat
+@end example
 
 By default the program logs to stderr. If coloring is supported by the
 terminal, colors are used to mark errors and warnings. Log coloring
@@ -315,51 +346,6 @@ Possible flags for this option are:
 @item k8
 @end table
 @end table
-
-@item -opencl_bench
-This option is used to benchmark all available OpenCL devices and print the
-results. This option is only available when FFmpeg has been compiled with
-@code{--enable-opencl}.
-
-When FFmpeg is configured with @code{--enable-opencl}, the options for the
-global OpenCL context are set via @option{-opencl_options}. See the
-"OpenCL Options" section in the ffmpeg-utils manual for the complete list of
-supported options. Amongst others, these options include the ability to select
-a specific platform and device to run the OpenCL code on. By default, FFmpeg
-will run on the first device of the first platform. While the options for the
-global OpenCL context provide flexibility to the user in selecting the OpenCL
-device of their choice, most users would probably want to select the fastest
-OpenCL device for their system.
-
-This option assists the selection of the most efficient configuration by
-identifying the appropriate device for the user's system. The built-in
-benchmark is run on all the OpenCL devices and the performance is measured for
-each device. The devices in the results list are sorted based on their
-performance with the fastest device listed first. The user can subsequently
-invoke @command{ffmpeg} using the device deemed most appropriate via
-@option{-opencl_options} to obtain the best performance for the OpenCL
-accelerated code.
-
-Typical usage to use the fastest OpenCL device involve the following steps.
-
-Run the command:
-@example
-ffmpeg -opencl_bench
-@end example
-Note down the platform ID (@var{pidx}) and device ID (@var{didx}) of the first
-i.e. fastest device in the list.
-Select the platform and device using the command:
-@example
-ffmpeg -opencl_options platform_idx=@var{pidx}:device_idx=@var{didx} ...
-@end example
-
-@item -opencl_options options (@emph{global})
-Set OpenCL environment options. This option is only available when
-FFmpeg has been compiled with @code{--enable-opencl}.
-
-@var{options} must be a list of @var{key}=@var{value} option pairs
-separated by ':'. See the ``OpenCL Options'' section in the
-ffmpeg-utils manual for the list of supported options.
 @end table
 
 @section AVOptions

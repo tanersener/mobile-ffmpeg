@@ -26,6 +26,7 @@
 #include <libxml/parserInternals.h>
 #include <libxml/tree.h>
 #include <libxml/uri.h>
+#include <libxml/encoding.h>
 
 #ifdef LIBXML_OUTPUT_ENABLED
 #ifdef LIBXML_READER_ENABLED
@@ -4412,6 +4413,9 @@ launchTests(testDescPtr tst) {
     char *result;
     char *error;
     int mem;
+    xmlCharEncodingHandlerPtr ebcdicHandler;
+
+    ebcdicHandler = xmlGetCharEncodingHandler(XML_CHAR_ENCODING_EBCDIC);
 
     if (tst == NULL) return(-1);
     if (tst->in != NULL) {
@@ -4422,6 +4426,9 @@ launchTests(testDescPtr tst) {
 	for (i = 0;i < globbuf.gl_pathc;i++) {
 	    if (!checkTestFile(globbuf.gl_pathv[i]))
 	        continue;
+            if ((ebcdicHandler == NULL) &&
+                (strstr(globbuf.gl_pathv[i], "ebcdic") != NULL))
+                continue;
 	    if (tst->suffix != NULL) {
 		result = resultFilename(globbuf.gl_pathv[i], tst->out,
 					tst->suffix);
@@ -4487,6 +4494,9 @@ launchTests(testDescPtr tst) {
 	    err++;
 	}
     }
+
+    xmlCharEncCloseFunc(ebcdicHandler);
+
     return(err);
 }
 

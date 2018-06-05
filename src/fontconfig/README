@@ -1,11 +1,19 @@
                               Fontconfig
              Font configuration and customization library
-                      Version 2.12.93 (2.13 RC3)
-                              2018-02-15
+                             Version 2.13
+                              2018-03-06
 
 
 Check INSTALL for compilation and installation instructions.
 Report bugs to https://bugs.freedesktop.org in the fontconfig module.
+
+2.13
+
+Akira TAGOH (4):
+      Add Simplified Chinese translations
+      Fix a build issue on MinGW with enabling nls
+      Initialize an array explicitly
+      Bump the libtool revision
 
 2.12.93 (2.13 RC3)
 

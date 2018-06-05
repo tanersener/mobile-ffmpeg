@@ -22,6 +22,7 @@ AUTOCONF = .\config.msvc
 XML_NAME = xml2
 XML_BASENAME = lib$(XML_NAME)
 XML_SO = $(XML_BASENAME).dll
+XML_RES = $(XML_BASENAME).res
 XML_IMP = $(XML_BASENAME).lib
 XML_DEF = $(XML_BASENAME).def
 XML_A = $(XML_BASENAME)_a.lib
@@ -55,12 +56,6 @@ CFLAGS = $(CFLAGS) /D "HAVE_WIN32_THREADS"
 !else if "$(WITH_THREADS)" == "posix"
 CFLAGS = $(CFLAGS) /D "HAVE_PTHREAD_H"
 !endif
-!if "$(WITH_ZLIB)" == "1"
-CFLAGS = $(CFLAGS) /D "HAVE_ZLIB_H"
-!endif
-!if "$(WITH_LZMA)" == "1"
-CFLAGS = $(CFLAGS) /D "HAVE_LZMA_H"
-!endif
 CFLAGS = $(CFLAGS) /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
 
 # The linker and its options.
@@ -75,7 +70,11 @@ LIBS = $(LIBS) wsock32.lib ws2_32.lib
 LIBS = $(LIBS) iconv.lib
 !endif 
 !if "$(WITH_ICU)" == "1"
-LIBS = $(LIBS) icu.lib
+!if "$(STATIC)" == "1"
+LIBS = $(LIBS) advapi32.lib sicuuc.lib sicuin.lib sicudt.lib
+!else
+LIBS = $(LIBS) icuuc.lib icuin.lib icudt.lib
+!endif
 !endif
 !if "$(WITH_ZLIB)" == "1"
 # could be named differently zdll or zlib
@@ -262,7 +261,10 @@ UTILS = $(BINDIR)\xmllint.exe\
 	$(BINDIR)\testXPath.exe\
 	$(BINDIR)\runtest.exe\
 	$(BINDIR)\runsuite.exe\
+	$(BINDIR)\runxmlconf.exe\
 	$(BINDIR)\testapi.exe\
+	$(BINDIR)\testchar.exe\
+	$(BINDIR)\testdict.exe\
 	$(BINDIR)\testlimits.exe\
 	$(BINDIR)\testrecurse.exe
 	
@@ -373,11 +375,13 @@ $(XML_OBJS_A_DLL) : $(XML_INTDIR_A_DLL)
 # Creates the export definition file (DEF) for libxml.
 $(XML_INTDIR)\$(XML_DEF) : $(XML_INTDIR) $(XML_DEF).src
 	$(CPP) $(CPPFLAGS) $(XML_DEF).src > $(XML_INTDIR)\$(XML_DEF)
+$(XML_INTDIR)\$(XML_RES) : $(XML_INTDIR) libxml2.rc
+	rc -Fo $(XML_INTDIR)\$(XML_RES) libxml2.rc
 
 # Creates the libxml shared object.
-$(BINDIR)\$(XML_SO) : $(BINDIR) $(XML_OBJS) $(XML_INTDIR)\$(XML_DEF)
+$(BINDIR)\$(XML_SO) : $(BINDIR) $(XML_OBJS) $(XML_INTDIR)\$(XML_DEF) $(XML_INTDIR)\$(XML_RES)
 	$(LD) $(LDFLAGS) /DLL \
-		/IMPLIB:$(BINDIR)\$(XML_IMP) /OUT:$(BINDIR)\$(XML_SO) $(XML_OBJS) $(LIBS)
+		/IMPLIB:$(BINDIR)\$(XML_IMP) /OUT:$(BINDIR)\$(XML_SO) $(XML_OBJS) $(XML_INTDIR)\$(XML_RES) $(LIBS)
 	@$(_VC_MANIFEST_EMBED_DLL)
 
 #$(BINDIR)\$(XML_SO) : $(BINDIR) $(XML_OBJS) $(XML_INTDIR)\$(XML_DEF)

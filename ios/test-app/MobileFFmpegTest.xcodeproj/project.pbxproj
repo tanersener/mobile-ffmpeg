@@ -7,22 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3479403220C5655D00A776FB /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402A20C5655100A776FB /* libavdevice.framework */; };
-		3479403320C5655D00A776FB /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402B20C5655300A776FB /* libavformat.framework */; };
-		3479403420C5655D00A776FB /* libavcodec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402C20C5655500A776FB /* libavcodec.framework */; };
-		3479403520C5655D00A776FB /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402D20C5655700A776FB /* libswscale.framework */; };
-		3479403620C5655D00A776FB /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402E20C5655800A776FB /* libavutil.framework */; };
-		3479403720C5655D00A776FB /* libavfilter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402F20C5655A00A776FB /* libavfilter.framework */; };
-		3479403820C5655D00A776FB /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3479403020C5655B00A776FB /* mobileffmpeg.framework */; };
-		3479403920C5655D00A776FB /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3479403120C5655D00A776FB /* libswresample.framework */; };
-		3479403A20C565A800A776FB /* libavcodec.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402C20C5655500A776FB /* libavcodec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3479403B20C565A800A776FB /* libavdevice.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402A20C5655100A776FB /* libavdevice.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3479403C20C565A800A776FB /* libavfilter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402F20C5655A00A776FB /* libavfilter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3479403D20C565A800A776FB /* libavformat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402B20C5655300A776FB /* libavformat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3479403E20C565A800A776FB /* libavutil.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402E20C5655800A776FB /* libavutil.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3479403F20C565A800A776FB /* libswresample.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3479403120C5655D00A776FB /* libswresample.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3479404020C565A800A776FB /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3479402D20C5655700A776FB /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		3479404120C565A800A776FB /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3479403020C5655B00A776FB /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3482BE6220C8106C00E9D4E2 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5A20C8106C00E9D4E2 /* libavutil.framework */; };
+		3482BE6320C8106C00E9D4E2 /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5B20C8106C00E9D4E2 /* libswscale.framework */; };
+		3482BE6420C8106C00E9D4E2 /* libavfilter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5C20C8106C00E9D4E2 /* libavfilter.framework */; };
+		3482BE6520C8106C00E9D4E2 /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5D20C8106C00E9D4E2 /* mobileffmpeg.framework */; };
+		3482BE6620C8106C00E9D4E2 /* libavcodec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5E20C8106C00E9D4E2 /* libavcodec.framework */; };
+		3482BE6720C8106C00E9D4E2 /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5F20C8106C00E9D4E2 /* libavdevice.framework */; };
+		3482BE6820C8106C00E9D4E2 /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE6020C8106C00E9D4E2 /* libavformat.framework */; };
+		3482BE6920C8106C00E9D4E2 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE6120C8106C00E9D4E2 /* libswresample.framework */; };
+		3482BE6A20C8107E00E9D4E2 /* libavcodec.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5E20C8106C00E9D4E2 /* libavcodec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3482BE6B20C8107E00E9D4E2 /* libavdevice.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5F20C8106C00E9D4E2 /* libavdevice.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3482BE6C20C8107E00E9D4E2 /* libavfilter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5C20C8106C00E9D4E2 /* libavfilter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3482BE6D20C8107E00E9D4E2 /* libavformat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE6020C8106C00E9D4E2 /* libavformat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3482BE6E20C8107E00E9D4E2 /* libavutil.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5A20C8106C00E9D4E2 /* libavutil.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3482BE6F20C8107E00E9D4E2 /* libswresample.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE6120C8106C00E9D4E2 /* libswresample.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3482BE7020C8107E00E9D4E2 /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5B20C8106C00E9D4E2 /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		3482BE7120C8107E00E9D4E2 /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 3482BE5D20C8106C00E9D4E2 /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		348439ED20B2EFAF001A3990 /* pyramid.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EA20B2EFAF001A3990 /* pyramid.jpg */; };
 		348439EE20B2EFAF001A3990 /* tajmahal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EB20B2EFAF001A3990 /* tajmahal.jpg */; };
 		348439EF20B2EFAF001A3990 /* colosseum.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EC20B2EFAF001A3990 /* colosseum.jpg */; };
@@ -42,14 +42,14 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				3479403A20C565A800A776FB /* libavcodec.framework in Embed Frameworks */,
-				3479403B20C565A800A776FB /* libavdevice.framework in Embed Frameworks */,
-				3479403C20C565A800A776FB /* libavfilter.framework in Embed Frameworks */,
-				3479403D20C565A800A776FB /* libavformat.framework in Embed Frameworks */,
-				3479403E20C565A800A776FB /* libavutil.framework in Embed Frameworks */,
-				3479403F20C565A800A776FB /* libswresample.framework in Embed Frameworks */,
-				3479404020C565A800A776FB /* libswscale.framework in Embed Frameworks */,
-				3479404120C565A800A776FB /* mobileffmpeg.framework in Embed Frameworks */,
+				3482BE6A20C8107E00E9D4E2 /* libavcodec.framework in Embed Frameworks */,
+				3482BE6B20C8107E00E9D4E2 /* libavdevice.framework in Embed Frameworks */,
+				3482BE6C20C8107E00E9D4E2 /* libavfilter.framework in Embed Frameworks */,
+				3482BE6D20C8107E00E9D4E2 /* libavformat.framework in Embed Frameworks */,
+				3482BE6E20C8107E00E9D4E2 /* libavutil.framework in Embed Frameworks */,
+				3482BE6F20C8107E00E9D4E2 /* libswresample.framework in Embed Frameworks */,
+				3482BE7020C8107E00E9D4E2 /* libswscale.framework in Embed Frameworks */,
+				3482BE7120C8107E00E9D4E2 /* mobileffmpeg.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -57,14 +57,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		3479402A20C5655100A776FB /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavdevice.framework; sourceTree = "<group>"; };
-		3479402B20C5655300A776FB /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavformat.framework; sourceTree = "<group>"; };
-		3479402C20C5655500A776FB /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavcodec.framework; sourceTree = "<group>"; };
-		3479402D20C5655700A776FB /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswscale.framework; sourceTree = "<group>"; };
-		3479402E20C5655800A776FB /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavutil.framework; sourceTree = "<group>"; };
-		3479402F20C5655A00A776FB /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavfilter.framework; sourceTree = "<group>"; };
-		3479403020C5655B00A776FB /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = mobileffmpeg.framework; sourceTree = "<group>"; };
-		3479403120C5655D00A776FB /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswresample.framework; sourceTree = "<group>"; };
+		3482BE5A20C8106C00E9D4E2 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavutil.framework; path = "../../prebuilt/ios-framework/libavutil.framework"; sourceTree = "<group>"; };
+		3482BE5B20C8106C00E9D4E2 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswscale.framework; path = "../../prebuilt/ios-framework/libswscale.framework"; sourceTree = "<group>"; };
+		3482BE5C20C8106C00E9D4E2 /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavfilter.framework; path = "../../prebuilt/ios-framework/libavfilter.framework"; sourceTree = "<group>"; };
+		3482BE5D20C8106C00E9D4E2 /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mobileffmpeg.framework; path = "../../prebuilt/ios-framework/mobileffmpeg.framework"; sourceTree = "<group>"; };
+		3482BE5E20C8106C00E9D4E2 /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavcodec.framework; path = "../../prebuilt/ios-framework/libavcodec.framework"; sourceTree = "<group>"; };
+		3482BE5F20C8106C00E9D4E2 /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavdevice.framework; path = "../../prebuilt/ios-framework/libavdevice.framework"; sourceTree = "<group>"; };
+		3482BE6020C8106C00E9D4E2 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavformat.framework; path = "../../prebuilt/ios-framework/libavformat.framework"; sourceTree = "<group>"; };
+		3482BE6120C8106C00E9D4E2 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswresample.framework; path = "../../prebuilt/ios-framework/libswresample.framework"; sourceTree = "<group>"; };
 		348439EA20B2EFAF001A3990 /* pyramid.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pyramid.jpg; sourceTree = "<group>"; };
 		348439EB20B2EFAF001A3990 /* tajmahal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tajmahal.jpg; sourceTree = "<group>"; };
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
@@ -87,14 +87,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3479403620C5655D00A776FB /* libavutil.framework in Frameworks */,
-				3479403820C5655D00A776FB /* mobileffmpeg.framework in Frameworks */,
-				3479403720C5655D00A776FB /* libavfilter.framework in Frameworks */,
-				3479403420C5655D00A776FB /* libavcodec.framework in Frameworks */,
-				3479403520C5655D00A776FB /* libswscale.framework in Frameworks */,
-				3479403920C5655D00A776FB /* libswresample.framework in Frameworks */,
-				3479403320C5655D00A776FB /* libavformat.framework in Frameworks */,
-				3479403220C5655D00A776FB /* libavdevice.framework in Frameworks */,
+				3482BE6220C8106C00E9D4E2 /* libavutil.framework in Frameworks */,
+				3482BE6720C8106C00E9D4E2 /* libavdevice.framework in Frameworks */,
+				3482BE6420C8106C00E9D4E2 /* libavfilter.framework in Frameworks */,
+				3482BE6320C8106C00E9D4E2 /* libswscale.framework in Frameworks */,
+				3482BE6620C8106C00E9D4E2 /* libavcodec.framework in Frameworks */,
+				3482BE6920C8106C00E9D4E2 /* libswresample.framework in Frameworks */,
+				3482BE6520C8106C00E9D4E2 /* mobileffmpeg.framework in Frameworks */,
+				3482BE6820C8106C00E9D4E2 /* libavformat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -114,14 +114,14 @@
 		3498DC65209F7F1C005F5883 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				3479402C20C5655500A776FB /* libavcodec.framework */,
-				3479402A20C5655100A776FB /* libavdevice.framework */,
-				3479402F20C5655A00A776FB /* libavfilter.framework */,
-				3479402B20C5655300A776FB /* libavformat.framework */,
-				3479402E20C5655800A776FB /* libavutil.framework */,
-				3479403120C5655D00A776FB /* libswresample.framework */,
-				3479402D20C5655700A776FB /* libswscale.framework */,
-				3479403020C5655B00A776FB /* mobileffmpeg.framework */,
+				3482BE5E20C8106C00E9D4E2 /* libavcodec.framework */,
+				3482BE5F20C8106C00E9D4E2 /* libavdevice.framework */,
+				3482BE5C20C8106C00E9D4E2 /* libavfilter.framework */,
+				3482BE6020C8106C00E9D4E2 /* libavformat.framework */,
+				3482BE5A20C8106C00E9D4E2 /* libavutil.framework */,
+				3482BE6120C8106C00E9D4E2 /* libswresample.framework */,
+				3482BE5B20C8106C00E9D4E2 /* libswscale.framework */,
+				3482BE5D20C8106C00E9D4E2 /* mobileffmpeg.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

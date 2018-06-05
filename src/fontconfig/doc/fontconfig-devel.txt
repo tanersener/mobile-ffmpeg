@@ -1,4 +1,4 @@
-Fontconfig Developers Reference, Version 2.12.93
+Fontconfig Developers Reference, Version 2.13.0
 
    Copyright © 2002 Keith Packard
 

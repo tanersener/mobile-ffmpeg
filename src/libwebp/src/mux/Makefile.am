@@ -13,8 +13,10 @@ libwebpmuxinclude_HEADERS =
 libwebpmuxinclude_HEADERS += ../webp/mux.h
 libwebpmuxinclude_HEADERS += ../webp/mux_types.h
 libwebpmuxinclude_HEADERS += ../webp/types.h
+noinst_HEADERS =
+noinst_HEADERS += ../webp/format_constants.h
 
 libwebpmux_la_LIBADD = ../libwebp.la
-libwebpmux_la_LDFLAGS = -no-undefined -version-info 3:1:0 -lm
+libwebpmux_la_LDFLAGS = -no-undefined -version-info 3:2:0 -lm
 libwebpmuxincludedir = $(includedir)/webp
 pkgconfig_DATA = libwebpmux.pc

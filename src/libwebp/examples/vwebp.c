@@ -205,6 +205,11 @@ static void decode_callback(int what) {
         }
       }
       duration = curr->duration;
+      // Behavior copied from Chrome, cf:
+      // https://cs.chromium.org/chromium/src/third_party/WebKit/Source/
+      // platform/graphics/DeferredImageDecoder.cpp?
+      // rcl=b4c33049f096cd283f32be9a58b9a9e768227c26&l=246
+      if (duration <= 10) duration = 100;
     }
     if (!Decode()) {
       kParams.decoding_error = 1;

@@ -24,6 +24,7 @@ HEADERS = adler32.h                                                     \
           dict.h                                                        \
           display.h                                                     \
           downmix_info.h                                                \
+          encryption_info.h                                             \
           error.h                                                       \
           eval.h                                                        \
           fifo.h                                                        \
@@ -37,6 +38,7 @@ HEADERS = adler32.h                                                     \
           hwcontext_drm.h                                               \
           hwcontext_dxva2.h                                             \
           hwcontext_qsv.h                                               \
+          hwcontext_mediacodec.h                                        \
           hwcontext_vaapi.h                                             \
           hwcontext_videotoolbox.h                                      \
           hwcontext_vdpau.h                                             \
@@ -79,8 +81,6 @@ HEADERS = adler32.h                                                     \
 
 HEADERS-$(CONFIG_LZO)                   += lzo.h
 
-HEADERS-$(CONFIG_OPENCL)                += opencl.h
-
 ARCH_HEADERS = bswap.h                                                  \
                intmath.h                                                \
                intreadwrite.h                                           \
@@ -108,6 +108,7 @@ OBJS = adler32.o                                                        \
        dict.o                                                           \
        display.o                                                        \
        downmix_info.o                                                   \
+       encryption_info.o                                                \
        error.o                                                          \
        eval.o                                                           \
        fifo.o                                                           \
@@ -156,18 +157,17 @@ OBJS = adler32.o                                                        \
        xtea.o                                                           \
        tea.o                                                            \
 
-OBJS-$(!HAVE_ATOMICS_NATIVE)            += atomic.o                     \
-
 OBJS-$(CONFIG_CUDA)                     += hwcontext_cuda.o
 OBJS-$(CONFIG_D3D11VA)                  += hwcontext_d3d11va.o
 OBJS-$(CONFIG_DXVA2)                    += hwcontext_dxva2.o
 OBJS-$(CONFIG_QSV)                   += hwcontext_qsv.o
 OBJS-$(CONFIG_LIBDRM)                   += hwcontext_drm.o
 OBJS-$(CONFIG_LZO)                      += lzo.o
-OBJS-$(CONFIG_OPENCL)                   += opencl.o opencl_internal.o
+OBJS-$(CONFIG_OPENCL)                   += hwcontext_opencl.o
 OBJS-$(CONFIG_VAAPI)                    += hwcontext_vaapi.o
 OBJS-$(CONFIG_VIDEOTOOLBOX)             += hwcontext_videotoolbox.o
 OBJS-$(CONFIG_VDPAU)                    += hwcontext_vdpau.o
+OBJS-$(CONFIG_MEDIACODEC)               += hwcontext_mediacodec.o
 
 OBJS += $(COMPAT_OBJS:%=../compat/%)
 
@@ -179,18 +179,14 @@ SKIPHEADERS-$(CONFIG_CUDA)             += hwcontext_cuda_internal.h
 SKIPHEADERS-$(CONFIG_D3D11VA)          += hwcontext_d3d11va.h
 SKIPHEADERS-$(CONFIG_DXVA2)            += hwcontext_dxva2.h
 SKIPHEADERS-$(CONFIG_QSV)           += hwcontext_qsv.h
+SKIPHEADERS-$(CONFIG_OPENCL)           += hwcontext_opencl.h
 SKIPHEADERS-$(CONFIG_VAAPI)            += hwcontext_vaapi.h
 SKIPHEADERS-$(CONFIG_VIDEOTOOLBOX)     += hwcontext_videotoolbox.h
 SKIPHEADERS-$(CONFIG_VDPAU)            += hwcontext_vdpau.h
-SKIPHEADERS-$(HAVE_ATOMICS_GCC)        += atomic_gcc.h
-SKIPHEADERS-$(HAVE_ATOMICS_SUNCC)      += atomic_suncc.h
-SKIPHEADERS-$(HAVE_ATOMICS_WIN32)      += atomic_win32.h
-SKIPHEADERS-$(CONFIG_OPENCL)           += opencl.h
 
 TESTPROGS = adler32                                                     \
             aes                                                         \
             aes_ctr                                                     \
-            atomic                                                      \
             audio_fifo                                                  \
             avstring                                                    \
             base64                                                      \
@@ -210,6 +206,7 @@ TESTPROGS = adler32                                                     \
             fifo                                                        \
             hash                                                        \
             hmac                                                        \
+            integer                                                     \
             imgutils                                                    \
             lfg                                                         \
             lls                                                         \

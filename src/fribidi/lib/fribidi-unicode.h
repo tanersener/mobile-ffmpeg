@@ -43,7 +43,6 @@
 # include "fribidi-unicode-version.h"
 #endif /* !DONT_HAVE_FRIBIDI_UNICODE_VERSION_H */
 
-#define fribidi_unicode_version FRIBIDI_NAMESPACE(unicode_version)
 /* An string containing the version the Unicode standard implemented,
  * in the form of "x.y.z", or "unknown". */
 extern const char *fribidi_unicode_version;

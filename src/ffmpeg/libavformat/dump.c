@@ -372,7 +372,9 @@ static void dump_spherical(void *ctx, AVCodecParameters *par, AVPacketSideData *
         size_t l, t, r, b;
         av_spherical_tile_bounds(spherical, par->width, par->height,
                                  &l, &t, &r, &b);
-        av_log(ctx, AV_LOG_INFO, "[%zu, %zu, %zu, %zu] ", l, t, r, b);
+        av_log(ctx, AV_LOG_INFO,
+               "[%"SIZE_SPECIFIER", %"SIZE_SPECIFIER", %"SIZE_SPECIFIER", %"SIZE_SPECIFIER"] ",
+               l, t, r, b);
     } else if (spherical->projection == AV_SPHERICAL_CUBEMAP) {
         av_log(ctx, AV_LOG_INFO, "[pad %"PRIu32"] ", spherical->padding);
     }
@@ -545,6 +547,10 @@ static void dump_stream_format(AVFormatContext *ic, int i,
         av_log(NULL, AV_LOG_INFO, " (visual impaired)");
     if (st->disposition & AV_DISPOSITION_CLEAN_EFFECTS)
         av_log(NULL, AV_LOG_INFO, " (clean effects)");
+    if (st->disposition & AV_DISPOSITION_DESCRIPTIONS)
+        av_log(NULL, AV_LOG_INFO, " (descriptions)");
+    if (st->disposition & AV_DISPOSITION_DEPENDENT)
+        av_log(NULL, AV_LOG_INFO, " (dependent)");
     av_log(NULL, AV_LOG_INFO, "\n");
 
     dump_metadata(NULL, st->metadata, "    ");

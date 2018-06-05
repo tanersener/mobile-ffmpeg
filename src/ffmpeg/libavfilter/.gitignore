@@ -7,3 +7,4 @@
 /libavfilter.so.6
 /libavfilter.ver
 *.dylib
+/filter_list.c

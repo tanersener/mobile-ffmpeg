@@ -1,9 +1,92 @@
+8d510751 webp-container-spec: correct frame duration=0 note
+e6b2164e vwebp: Copy Chrome's behavior w/frame duration == 0
+d20b7707 update ChangeLog (tag: v1.0.0-rc3)
+0d5fad46 add WEBP_DSP_INIT / WEBP_DSP_INIT_FUNC
+c1cb86af fix 16b overflow in SSE2
+e577feb7 makefile.unix: add DEBUG flag for compiling w/ debug-symbol
+99be34b3 cwebp,get_disto: fix bpp output
+f5565ca8 cmake: Make sure we use near-lossless by default.
+d898dc14 fix bug in WebPImport565: alpha value was not set
+882784b0 update ChangeLog (tag: v1.0.0-rc2)
+2f930e08 Revert "Use proper targets for CMake."
+8165e8fb Use proper targets for CMake.
+3f157dd5 Remove some very hard TODOs.
+cd758a17 {de,}mux/Makefile.am: add missing headers
+b892b8ba makefile.unix,dist: use ascii for text output
+64a57d05 add -version option to anim_dump,anim_diff and img2webp
+fc1b8e3a webp_js: fix webp_js demo html
+15aa48d9 update ChangeLog (tag: v1.0.0-rc1)
+e607dabc update AUTHORS
+38410c08 [CFI] Remove function pointer casts
+c57b2736 bump version to 1.0.0
+cba28853 update NEWS
+c909d531 Merge "remove some deprecation warning on MacOSX"
+217443c7 remove some deprecation warning on MacOSX
+b672bdfa configure: quiet glut deprecation warnings on OS X
+daa9fcaf configure: use sdl-config if available
+dd174cae Merge "imagedec: support metadata reading for WebP image decoding"
+641cedcc imagedec: support metadata reading for WebP image decoding
+065b2ce1 anim_diff: add a couple missing newlines in Help()
+c4cc1147 Merge "gif2webp: force low duration frames to 100ms"
+09333097 gif2webp: force low duration frames to 100ms
+e03f0ec3 sharp_yuv: use 14b fixed-point precision for gamma
+b2db361c image_enc,WebPWritePNG: move locals after setjmp
+74e82ec6 Merge "WebPPictureDistortion: fix big-endian results order"
+645d04ca Merge "cwebp,get_disto: report bpp"
+120f58c3 Merge "lossless*sse2: improve non-const 16-bit vector creation"
+a7fe9412 WebPPictureDistortion: fix big-endian results order
+e26fe066 cwebp,get_disto: report bpp
+9df64e28 Merge changes Id5b4a1a4,Ia20ce844
+8043504f lossless*sse2: improve non-const 16-bit vector creation
+1e3dfc48 Import: extract condition from loop
+3b07d327 Import,RGBA: fix for BigEndian import
+551948e4 Remove unused argument in VP8LBitsEntropy.
+3005237a ReadWebP: fix for big-endian
+499c395a Merge "anim_diff: expose the -max_diff option"
+f69dcd69 Merge "remove WEBP_EXPERIMENTAL_FEATURES"
+07d884d5 anim_diff: expose the -max_diff option
+f4dd9256 remove WEBP_EXPERIMENTAL_FEATURES
+94a8377b extract the command-line parsing helpers to example_util
+fc09e6e2 PNM decoder: prevent unsupported depth=2 PAM case.
+6de58603 MIPS64: Fix defined-but-not-used errors with WEBP_REDUCE_CSP
+cbde5728 gif2webp: add support for reading from stdin
+cf1c5054 Add an SSE4 version of some lossless color transforms.
+45a8b5eb Fix lint error with man page.
+cff38e8f Merge "PNG decoder: handle gAMA chunk"
+59cb1a48 Merge "enable dc error-diffusion always"
+78318b30 PNG decoder: handle gAMA chunk
+664c21dd Merge "remove some TODOs"
+815652de enable dc error-diffusion always
+aec45cec remove some TODOs
+5715dfce fix block-count[] increment in case of large image
+c2d04f3e enable DC error-diffusion always for multi-pass
+96bf07c5 use DC error diffusion for U/V at low-quality
+1c59020b fix missing sse41 targets in makefile.unix
+7a8e814b cosmetics: s/color_space/colorspace/
+05f6fe24 upsampling: rm asserts w/REDUCE_CSP+OMIT_C_CODE
+b4cf5597 Merge "Upsampling SSE2/SSE4 speedup."
+ccbeb32c Makefile.vc: add missing sse41 files
+55403a9a Upsampling SSE2/SSE4 speedup.
+807b53c4 Implement the upsampling/yuv functions in SSE41
+84101a81 Fix wasm WebP compilation
+8bebd2a3 fix warning on MSVC
+a7f93fe3 webpmux: allow reading argument from a file
+b69f18a7 gif2webp.1: fix -loop_compatibility layout
+72d530c0 Merge "fix lossless decoding w/WEBP_REDUCE_SIZE"
+296c7dc4 fix lossless decoding w/WEBP_REDUCE_SIZE
+0d5d029c Merge "ImgIoUtilReadFile: fix file leak upon error"
+ae568ce7 ImgIoUtilReadFile: fix file leak upon error
+796b5a8a Merge tag 'v0.6.1'
+6b7a95fd update ChangeLog (tag: v0.6.1)
 f66955de WEBP_REDUCE_CSP: restrict colorspace support
+1af0df76 Merge "WEBP_REDUCE_CSP: restrict colorspace support"
+6de20df0 WEBP_REDUCE_CSP: restrict colorspace support
 a289d8e7 update ChangeLog (tag: v0.6.1-rc2)
 c10a493c vwebp: disable double buffering on windows & mac
 0d4466c2 webp_to_sdl.c: fix file mode
 1b27bf8b WEBP_REDUCE_SIZE: disable all rescaler code
 126be109 webpinfo: add -version option
+0df22b9e WEBP_REDUCE_SIZE: disable all rescaler code
 9add62b5 bump version to 0.6.1
 d3e26144 update NEWS
 2edda639 README: add webpinfo section

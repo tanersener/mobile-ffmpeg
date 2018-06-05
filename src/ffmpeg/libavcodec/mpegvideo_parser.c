@@ -61,7 +61,7 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
             if (bytes_left >= 2) {
                 s->pict_type = (buf[1] >> 3) & 7;
                 if (bytes_left >= 4)
-                vbv_delay = ((buf[1] & 0x07) << 13) | (buf[2] << 5) | (buf[3]  >> 3);
+                    vbv_delay = ((buf[1] & 0x07) << 13) | (buf[2] << 5) | (buf[3] >> 3);
             }
             break;
         case SEQ_START_CODE:
@@ -131,7 +131,7 @@ static void mpegvideo_extract_headers(AVCodecParserContext *s,
                             }
                         }
 
-                        if (!pc->progressive_sequence) {
+                        if (!pc->progressive_sequence && !progressive_frame) {
                             if (top_field_first)
                                 s->field_order = AV_FIELD_TT;
                             else

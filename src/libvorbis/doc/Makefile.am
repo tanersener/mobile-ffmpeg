@@ -29,7 +29,6 @@ static_docs = \
 # bits needed by the spec
 SPEC_PNG = \
 	components.png \
-	fish_xiph_org.png \
 	floor1-1.png \
 	floor1-2.png \
 	floor1-3.png \
@@ -39,7 +38,22 @@ SPEC_PNG = \
 	residue-pack.png \
 	residue2.png \
 	window1.png \
-	window2.png
+	window2.png \
+	Vorbis_I_spec0x.png \
+	Vorbis_I_spec1x.png \
+	Vorbis_I_spec2x.png \
+	Vorbis_I_spec3x.png \
+	Vorbis_I_spec4x.png \
+	Vorbis_I_spec5x.png \
+	Vorbis_I_spec6x.png \
+	Vorbis_I_spec7x.png \
+	Vorbis_I_spec8x.png \
+	Vorbis_I_spec9x.png \
+	Vorbis_I_spec10x.png \
+	Vorbis_I_spec11x.png \
+	Vorbis_I_spec12x.png \
+	Vorbis_I_spec13x.png \
+	Vorbis_I_spec14x.png
 
 SPEC_TEX = \
 	Vorbis_I_spec.tex \
@@ -77,14 +91,13 @@ CLEANFILES = $(SPEC_TEX:%.tex=%.aux) \
 	     Vorbis_I_spec.lg  Vorbis_I_spec.log \
 	     Vorbis_I_spec.out Vorbis_I_spec.tmp \
 	     Vorbis_I_spec.toc Vorbis_I_spec.xref \
-	     Vorbis_I_spec*.png \
 	     zzVorbis_I_spec.ps
 DISTCLEANFILES = $(built_docs)
 
 
 # explicit rules for generating docs
 if BUILD_DOCS
-Vorbis_I_spec.html Vorbis_I_spec.css: $(SPEC_TEX) $(SPEC_PNG)
+Vorbis_I_spec.html Vorbis_I_spec.css: $(SPEC_TEX) $(SPEC_PNG) fish_xiph_org.png
 	htlatex $<
 
 Vorbis_I_spec.pdf: $(SPEC_TEX) $(SPEC_PNG)
@@ -107,7 +120,7 @@ doxygen-build.stamp: Doxyfile $(top_srcdir)/include/vorbis/*.h
 	touch doxygen-build.stamp
 else
 doxygen-build.stamp:
-	echo "*** Warning: Doxygen not found; documentation will not be built."
+	echo "*** Warning: Documentation build is disabled."
 	touch doxygen-build.stamp
 endif
 

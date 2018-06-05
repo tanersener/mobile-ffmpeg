@@ -27,7 +27,7 @@
 
 #include "common.h"
 
-#if HAVE_STDLIB_H+0
+#ifdef HAVE_STDLIB_H
 # include <stdlib.h>
 #endif
 

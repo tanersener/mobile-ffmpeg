@@ -12,7 +12,6 @@
 
  function: utility main for setting entropy encoding parameters
            for lattice codebooks
- last mod: $Id: latticetune.c 16037 2009-05-26 21:10:58Z xiphmont $
 
  ********************************************************************/
 
@@ -63,7 +62,7 @@ int main(int argc,char *argv[]){
 
     b=codebook_load(filename);
     c=(static_codebook *)(b->c);
-    
+
     ptr=strrchr(filename,'.');
     if(ptr){
       *ptr='\0';
@@ -94,11 +93,11 @@ int main(int argc,char *argv[]){
   if(!strrcmp_i(argv[0],"latticetune")){
     long lines=0;
     line=setup_line(in);
-    while(line){      
+    while(line){
       long code;
       lines++;
       if(!(lines&0xfff))spinnit("codewords so far...",lines);
-      
+
       if(sscanf(line,"%ld",&code)==1)
         hits[code]++;
 
@@ -119,7 +118,7 @@ int main(int argc,char *argv[]){
       char *pos=strchr(line,':');
       if(pos){
         long code=atol(line);
-        long val=atol(pos+1); 
+        long val=atol(pos+1);
         hits[code]+=val;
       }
 
@@ -133,19 +132,19 @@ int main(int argc,char *argv[]){
   build_tree_from_lengths0(entries,hits,lengths);
 
   c->lengthlist=lengths;
-  write_codebook(stdout,name,c); 
+  write_codebook(stdout,name,c);
 
   {
     long bins=_book_maptype1_quantvals(c);
     long i,k,base=c->lengthlist[0];
     for(i=0;i<entries;i++)
       if(c->lengthlist[i]>base)base=c->lengthlist[i];
-    
+
     for(j=0;j<entries;j++){
       if(c->lengthlist[j]){
         int indexdiv=1;
         fprintf(stderr,"%4ld: ",j);
-        for(k=0;k<c->dim;k++){      
+        for(k=0;k<c->dim;k++){
           int index= (j/indexdiv)%bins;
           fprintf(stderr,"%+3.1f,", c->quantlist[index]*_float32_unpack(c->q_delta)+
                  _float32_unpack(c->q_min));
@@ -157,7 +156,7 @@ int main(int argc,char *argv[]){
       }
     }
   }
-  
+
   fprintf(stderr,"\r                                                     "
           "\nDone.\n");
   exit(0);

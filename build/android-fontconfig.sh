@@ -58,6 +58,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_fontconfig_package_config "2.12.93"
+create_fontconfig_package_config "2.13.0"
 
 make install || exit 1

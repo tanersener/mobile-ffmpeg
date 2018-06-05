@@ -264,7 +264,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-ffmpeg \
     --disable-ffplay \
     --disable-ffprobe \
-    --disable-ffserver \
     --disable-videotoolbox \
     --disable-doc \
     --disable-htmlpages \
