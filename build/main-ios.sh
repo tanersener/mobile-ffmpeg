@@ -43,7 +43,7 @@ fi
 
 # BUILDING EXTERNAL LIBRARIES
 enabled_library_list=()
-for library in {1..25}
+for library in {1..26}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -117,6 +117,8 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
             echo -e "\nINFO: Building $library with the following environment variables\n" >> ${BASEDIR}/build.log
             echo -e "----------------------------------------------------------------" >> ${BASEDIR}/build.log
             env >> ${BASEDIR}/build.log
+            echo -e "----------------------------------------------------------------\n" >> ${BASEDIR}/build.log
+            uname -a >> ${BASEDIR}/build.log
             echo -e "----------------------------------------------------------------\n" >> ${BASEDIR}/build.log
 
             echo -n "${library}: "

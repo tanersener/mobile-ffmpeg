@@ -29,25 +29,26 @@ fi
 . ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="libvorbis"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-export CFLAGS=$(get_cflags "libvorbis")
-export CXXFLAGS=$(get_cxxflags "libvorbis")
-export LDFLAGS=$(get_ldflags "libvorbis")
+export CFLAGS=$(get_cflags ${LIB_NAME})
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-cd ${BASEDIR}/src/libvorbis || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 # RECONFIGURING IF REQUESTED
 if [[ ${RECONF_libvorbis} -eq 1 ]]; then
-    autoreconf --force --install
+    autoreconf_library ${LIB_NAME}
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvorbis \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --with-ogg-includes=${BASEDIR}/prebuilt/ios-$(get_target_host)/libogg/include \

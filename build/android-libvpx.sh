@@ -24,12 +24,13 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="libvpx"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-export CFLAGS="$(get_cflags "libvpx") -I${ANDROID_NDK_ROOT}/sources/android/cpufeatures"
-export CXXFLAGS=$(get_cxxflags "libvpx")
-export LDFLAGS="$(get_ldflags "libvpx") -L${ANDROID_NDK_ROOT}/sources/android/cpufeatures -lcpufeatures"
+export CFLAGS="$(get_cflags ${LIB_NAME}) -I${ANDROID_NDK_ROOT}/sources/android/cpufeatures"
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${ANDROID_NDK_ROOT}/sources/android/cpufeatures -lcpufeatures"
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
@@ -51,20 +52,15 @@ case ${ARCH} in
     ;;
 esac
 
-cd ${BASEDIR}/src/libvpx || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 # build cpu-features
 build_cpufeatures
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
-if [[ ${RECONF_libvpx} -eq 1 ]]; then
-    autoreconf --force --install
-fi
-
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libvpx \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
     --target="${TARGET_CPU}-android-gcc" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \

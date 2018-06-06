@@ -30,13 +30,14 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="ffmpeg"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-CFLAGS=$(get_cflags "ffmpeg")
-CXXFLAGS=$(get_cxxflags "ffmpeg")
-LDFLAGS=$(get_ldflags "ffmpeg")
+CFLAGS=$(get_cflags ${LIB_NAME})
+CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+LDFLAGS=$(get_ldflags ${LIB_NAME})
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
@@ -74,7 +75,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..27}
+for library in {1..28}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -176,6 +177,11 @@ do
                 LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static wavpack)"
                 CONFIGURE_POSTFIX+=" --enable-libwavpack"
             ;;
+            x264)
+                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags x264)"
+                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static x264)"
+                CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
+            ;;
             libogg)
                 CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags ogg)"
                 LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static ogg)"
@@ -183,10 +189,6 @@ do
             libpng)
                 CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libpng)"
                 LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libpng)"
-            ;;
-            libuuid)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags uuid)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static uuid)"
             ;;
             nettle)
                 CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags nettle)"
@@ -204,7 +206,7 @@ do
             ;;
         esac
     else
-        if [[ ${library} -eq 26 ]]; then
+        if [[ ${library} -eq 27 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
@@ -212,16 +214,16 @@ done
 
 LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
-cd ${BASEDIR}/src/ffmpeg || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-echo -n -e "\nffmpeg: "
+echo -n -e "\n${LIB_NAME}: "
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --cross-prefix="${TARGET_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
-    --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg" \
+    --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
@@ -241,11 +243,9 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
-    --disable-ffmpeg \
-    --disable-ffplay \
-    --disable-ffprobe \
-    --disable-ffserver \
+    --disable-programs \
     --disable-videotoolbox \
+    --disable-postproc \
     --disable-doc \
     --disable-htmlpages \
     --disable-manpages \
@@ -253,6 +253,8 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-txtpages \
     --disable-static \
     --disable-xlib \
+    --disable-jack \
+    --disable-sdl2 \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
 if [ $? -ne 0 ]; then

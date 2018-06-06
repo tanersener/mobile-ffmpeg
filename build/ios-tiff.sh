@@ -29,27 +29,28 @@ fi
 . ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="tiff"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-export CFLAGS=$(get_cflags "tiff")
-export CXXFLAGS=$(get_cxxflags "tiff")
-export LDFLAGS=$(get_ldflags "tiff")
+export CFLAGS=$(get_cflags ${LIB_NAME})
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 echo "LDFLAGS is $LDFLAGS"
 
-cd ${BASEDIR}/src/tiff || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 # RECONFIGURING IF REQUESTED
 if [[ ${RECONF_tiff} -eq 1 ]]; then
-    autoreconf --force --install
+    autoreconf_library ${LIB_NAME}
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/tiff \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --with-jpeg-include-dir=${BASEDIR}/prebuilt/ios-$(get_target_host)/jpeg/include \

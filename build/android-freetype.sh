@@ -24,26 +24,22 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="freetype"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-export CFLAGS=$(get_cflags "freetype")
-export CXXFLAGS=$(get_cxxflags "freetype")
-export LDFLAGS=$(get_ldflags "freetype")
+export CFLAGS=$(get_cflags ${LIB_NAME})
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS=$(get_ldflags ${LIB_NAME})
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
-cd ${BASEDIR}/src/freetype || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
-if [[ ${RECONF_freetype} -eq 1 ]]; then
-    autoreconf --force --install
-fi
-
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/freetype \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
     --with-pic \
     --with-zlib \
     --with-png \

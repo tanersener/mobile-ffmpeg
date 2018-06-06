@@ -24,26 +24,27 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="giflib"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-export CFLAGS=$(get_cflags "giflib")" -DS_IREAD=S_IRUSR -DS_IWRITE=S_IWUSR"
-export CXXFLAGS=$(get_cxxflags "giflib")
-export LDFLAGS=$(get_ldflags "giflib")
+export CFLAGS=$(get_cflags ${LIB_NAME})" -DS_IREAD=S_IRUSR -DS_IWRITE=S_IWUSR"
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS=$(get_ldflags ${LIB_NAME})
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
-cd ${BASEDIR}/src/giflib || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 # RECONFIGURING IF REQUESTED
 if [[ ${RECONF_giflib} -eq 1 ]]; then
-    autoreconf --force --install
+    autoreconf_library ${LIB_NAME}
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/giflib \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --enable-static \

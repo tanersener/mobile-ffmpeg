@@ -29,7 +29,8 @@ fi
 . ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="gmp"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 case ${ARCH} in
@@ -40,22 +41,22 @@ case ${ARCH} in
         TARGET_HOST=$(get_target_host)
     ;;
 esac
-export CFLAGS=$(get_cflags "gmp")
-export CXXFLAGS=$(get_cxxflags "gmp")
-export LDFLAGS=$(get_ldflags "gmp")
+export CFLAGS=$(get_cflags ${LIB_NAME})
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS=$(get_ldflags ${LIB_NAME})
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
-cd ${BASEDIR}/src/gmp || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 # RECONFIGURING IF REQUESTED
 if [[ ${RECONF_gmp} -eq 1 ]]; then
-    autoreconf --force --install
+    autoreconf_library ${LIB_NAME}
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \

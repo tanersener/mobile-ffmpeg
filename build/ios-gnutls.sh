@@ -29,13 +29,14 @@ fi
 . ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="gnutls"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-COMMON_CFLAGS=$(get_cflags "gnutls")
-COMMON_CXXFLAGS=$(get_cxxflags "gnutls")
-COMMON_LDFLAGS=$(get_ldflags "gnutls")
+COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
+COMMON_CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/include -I${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
@@ -57,17 +58,17 @@ case ${ARCH} in
     ;;
 esac
 
-cd ${BASEDIR}/src/gnutls || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 # RECONFIGURING IF REQUESTED
 if [[ ${RECONF_gnutls} -eq 1 ]]; then
-    autoreconf --force --install
+    autoreconf_library ${LIB_NAME}
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/gnutls \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --with-included-libtasn1 \

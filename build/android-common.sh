@@ -28,15 +28,16 @@ get_library_name() {
         15) echo "speex" ;;
         16) echo "wavpack" ;;
         17) echo "kvazaar" ;;
-        18) echo "giflib" ;;
-        19) echo "jpeg" ;;
-        20) echo "libogg" ;;
-        21) echo "libpng" ;;
-        22) echo "libuuid" ;;
-        23) echo "nettle" ;;
-        24) echo "tiff" ;;
-        25) echo "android-zlib" ;;
-        26) echo "android-media-codec" ;;
+        18) echo "x264" ;;
+        19) echo "giflib" ;;
+        20) echo "jpeg" ;;
+        21) echo "libogg" ;;
+        22) echo "libpng" ;;
+        23) echo "libuuid" ;;
+        24) echo "nettle" ;;
+        25) echo "tiff" ;;
+        26) echo "android-zlib" ;;
+        27) echo "android-media-codec" ;;
     esac
 }
 
@@ -214,11 +215,11 @@ get_app_specific_cflags() {
 }
 
 get_cflags() {
-    ARCH_FLAGS=$(get_arch_specific_cflags);
-    APP_FLAGS=$(get_app_specific_cflags $1);
-    COMMON_FLAGS=$(get_common_cflags);
-    OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1);
-    COMMON_INCLUDES=$(get_common_includes);
+    ARCH_FLAGS=$(get_arch_specific_cflags)
+    APP_FLAGS=$(get_app_specific_cflags $1)
+    COMMON_FLAGS=$(get_common_cflags)
+    OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+    COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_INCLUDES}"
 }
@@ -283,9 +284,9 @@ get_arch_specific_ldflags() {
 }
 
 get_ldflags() {
-    ARCH_FLAGS=$(get_arch_specific_ldflags);
-    OPTIMIZATION_FLAGS=$(get_size_optimization_ldflags);
-    COMMON_LINKED_LIBS=$(get_common_linked_libraries $1);
+    ARCH_FLAGS=$(get_arch_specific_ldflags)
+    OPTIMIZATION_FLAGS=$(get_size_optimization_ldflags)
+    COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
 
     echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS}"
 }
@@ -576,15 +577,132 @@ Cflags: -I\${includedir}
 EOF
 }
 
+#
+# download <url> <local file name> <on error action>
+#
+download() {
+    if [ ! -d "${MOBILE_FFMPEG_TMPDIR}" ]; then
+        mkdir -p "${MOBILE_FFMPEG_TMPDIR}"
+    fi
+
+    (curl --fail --location $1 -o ${MOBILE_FFMPEG_TMPDIR}/$2) 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+
+    local RC=$?
+
+    if [ ${RC} -eq 0 ]; then
+        echo -e "\nDownloaded $1 to ${MOBILE_FFMPEG_TMPDIR}/$2\n" >>${BASEDIR}/build.log
+    else
+        rm -f ${MOBILE_FFMPEG_TMPDIR}/$2 >>${BASEDIR}/build.log
+
+        echo -e -n "\nFailed to download $1 to ${MOBILE_FFMPEG_TMPDIR}/$2, rc=${RC}. " >>${BASEDIR}/build.log
+
+        if [ "$3" == "exit" ]; then
+            echo -e "Build will now exit.\n" >>${BASEDIR}/build.log
+            exit 1
+        else
+            echo -e "Build will continue.\n" >>${BASEDIR}/build.log
+        fi
+    fi
+
+    echo ${RC}
+}
+
+download_gpl_library_source() {
+    local GPL_LIB_URL=""
+    local GPL_LIB_FILE=""
+    local GPL_LIB_ORIG_DIR=""
+    local GPL_LIB_DEST_DIR=""
+
+    echo -e "\nDownloading GPL library source: $1\n" >>${BASEDIR}/build.log
+
+    case $1 in
+        x264)
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180606-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20180606-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20180606-2245-stable"
+            GPL_LIB_DEST_DIR="x264"
+        ;;
+    esac
+
+    local GPL_LIB_SOURCE_PATH="${BASEDIR}/src/${GPL_LIB_DEST_DIR}"
+
+    if [ -d "${GPL_LIB_SOURCE_PATH}" ]; then
+        echo -e "$1 already downloaded. Source folder found at ${GPL_LIB_SOURCE_PATH}\n" >>${BASEDIR}/build.log
+        echo 0
+        return
+    fi
+
+    local GPL_LIB_PACKAGE_PATH="${MOBILE_FFMPEG_TMPDIR}/${GPL_LIB_FILE}"
+
+    echo -e "$1 source not found. Checking if library package ${GPL_LIB_FILE} is downloaded at ${GPL_LIB_PACKAGE_PATH} \n" >>${BASEDIR}/build.log
+
+    if [ ! -f "${GPL_LIB_PACKAGE_PATH}" ]; then
+        echo -e "$1 library package not found. Downloading from ${GPL_LIB_URL}\n" >>${BASEDIR}/build.log
+
+        local DOWNLOAD_RC=$(download "${GPL_LIB_URL}" "${GPL_LIB_FILE}")
+
+        if [ ${DOWNLOAD_RC} -ne 0 ]; then
+            echo -e "Downloading GPL library $1 failed. Can not get library package from ${GPL_LIB_URL}\n" >>${BASEDIR}/build.log
+            echo ${DOWNLOAD_RC}
+            return
+        else
+            echo -e "$1 library package downloaded\n" >>${BASEDIR}/build.log
+        fi
+    else
+        echo -e "$1 library package already downloaded\n" >>${BASEDIR}/build.log
+    fi
+
+    local EXTRACT_COMMAND=""
+
+    if [[ "${GPL_LIB_FILE}" == "*bz2" ]]; then
+        EXTRACT_COMMAND="tar jxf ${GPL_LIB_PACKAGE_PATH} --directory ${MOBILE_FFMPEG_TMPDIR}"
+    else
+        EXTRACT_COMMAND="tar zxf ${GPL_LIB_PACKAGE_PATH} --directory ${MOBILE_FFMPEG_TMPDIR}"
+    fi
+
+    echo -e "Extracting library package ${GPL_LIB_FILE} inside ${MOBILE_FFMPEG_TMPDIR}\n" >>${BASEDIR}/build.log
+
+    ${EXTRACT_COMMAND}
+
+    local EXTRACT_RC=$?
+
+    if [ ${EXTRACT_RC} -ne 0 ]; then
+        echo -e "\nDownloading GPL library $1 failed. Extract for library package ${GPL_LIB_FILE} completed with rc=${EXTRACT_RC}. Deleting failed files.\n" >>${BASEDIR}/build.log
+        echo ${EXTRACT_RC}
+        rm -f ${GPL_LIB_PACKAGE_PATH} >>${BASEDIR}/build.log
+        rm -rf ${MOBILE_FFMPEG_TMPDIR}/${GPL_LIB_ORIG_DIR} >>${BASEDIR}/build.log
+        return
+    fi
+
+    echo -e "Extract completed. Copying library source to ${GPL_LIB_SOURCE_PATH}\n" >>${BASEDIR}/build.log
+
+    CP_RC=$(cp -r ${MOBILE_FFMPEG_TMPDIR}/${GPL_LIB_ORIG_DIR} ${GPL_LIB_SOURCE_PATH} >>${BASEDIR}/build.log)
+
+    if [[ ${CP_RC} -eq 0 ]]; then
+        echo -e "Downloading GPL library source $1 completed successfully\n" >>${BASEDIR}/build.log
+        echo ${CP_RC}
+    else
+        echo -e "Downloading GPL library $1 failed. Copying library source to ${GPL_LIB_SOURCE_PATH} completed with rc={CP_RC}\n" >>${BASEDIR}/build.log
+        rm -rf ${GPL_LIB_SOURCE_PATH} >>${BASEDIR}/build.log
+        echo ${CP_RC}
+    fi
+}
+
 set_toolchain_clang_paths() {
     export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin
 
     TARGET_HOST=$(get_target_host)
     
     export AR=${TARGET_HOST}-ar
-    export AS=${TARGET_HOST}-as
     export CC=${TARGET_HOST}-clang
     export CXX=${TARGET_HOST}-clang++
+
+    if [ "$1" == "x264" ]; then
+        export AS=${CC}
+    else
+        export AS=${TARGET_HOST}-as
+    fi
+
     export LD=${TARGET_HOST}-ld
     export RANLIB=${TARGET_HOST}-ranlib
     export STRIP=${TARGET_HOST}-strip
@@ -607,9 +725,15 @@ set_toolchain_gcc_paths() {
     TARGET_HOST=$(get_target_host)
 
     export AR=${TARGET_HOST}-ar
-    export AS=${TARGET_HOST}-as
     export CC=${TARGET_HOST}-gcc
     export CXX=${TARGET_HOST}-gcc++
+
+    if [ "$1" == "x264" ]; then
+        export AS=${CC}
+    else
+        export AS=${TARGET_HOST}-as
+    fi
+
     export LD=${TARGET_HOST}-ld
     export RANLIB=${TARGET_HOST}-ranlib
     export STRIP=${TARGET_HOST}-strip
@@ -647,4 +771,66 @@ build_cpufeatures() {
     ${TARGET_HOST}-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so
 
     create_cpufeatures_package_config
+}
+
+autoreconf_library() {
+    echo -e "\nRunning full autoreconf for $1\n" >> ${BASEDIR}/build.log
+
+    # TRY FULL RECONF
+    (autoreconf --force --install)
+
+    local EXTRACT_RC=$?
+    if [ ${EXTRACT_RC} -eq 0 ]; then
+        return
+    fi
+
+    echo -e "\nFull autoreconf failed. Running full autoreconf with include for $1\n" >> ${BASEDIR}/build.log
+
+    # TRY FULL RECONF WITH m4
+    (autoreconf --force --install -I m4)
+
+    EXTRACT_RC=$?
+    if [ ${EXTRACT_RC} -eq 0 ]; then
+        return
+    fi
+
+    echo -e "\nFull autoreconf with include failed. Running autoreconf without force for $1\n" >> ${BASEDIR}/build.log
+
+    # TRY RECONF WITHOUT FORCE
+    (autoreconf --install)
+
+    EXTRACT_RC=$?
+    if [ ${EXTRACT_RC} -eq 0 ]; then
+        return
+    fi
+
+    echo -e "\nAutoreconf without force failed. Running autoreconf without force with include for $1\n" >> ${BASEDIR}/build.log
+
+    # TRY RECONF WITHOUT FORCE WITH m4
+    (autoreconf --install -I m4)
+
+    EXTRACT_RC=$?
+    if [ ${EXTRACT_RC} -eq 0 ]; then
+        return
+    fi
+
+    echo -e "\nAutoreconf without force with include failed. Running default autoreconf for $1\n" >> ${BASEDIR}/build.log
+
+    # TRY DEFAULT RECONF
+    (autoreconf)
+
+    EXTRACT_RC=$?
+    if [ ${EXTRACT_RC} -eq 0 ]; then
+        return
+    fi
+
+    echo -e "\nDefault autoreconf failed. Running default autoreconf with include for $1\n" >> ${BASEDIR}/build.log
+
+    # TRY DEFAULT RECONF WITH m4
+    (autoreconf -I m4)
+
+    EXTRACT_RC=$?
+    if [ ${EXTRACT_RC} -eq 0 ]; then
+        return
+    fi
 }

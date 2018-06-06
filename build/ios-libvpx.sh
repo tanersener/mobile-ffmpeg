@@ -29,12 +29,13 @@ fi
 . ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="libvpx"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-export CFLAGS=$(get_cflags "libvpx")
-export CXXFLAGS=$(get_cxxflags "libvpx")
-export LDFLAGS=$(get_ldflags "libvpx")
+export CFLAGS=$(get_cflags ${LIB_NAME})
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS=$(get_ldflags ${LIB_NAME})
 export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET=""
@@ -58,17 +59,12 @@ case ${ARCH} in
     ;;
 esac
 
-cd ${BASEDIR}/src/libvpx || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
-if [[ ${RECONF_libvpx} -eq 1 ]]; then
-    autoreconf --force --install
-fi
-
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvpx \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --target="${TARGET}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \

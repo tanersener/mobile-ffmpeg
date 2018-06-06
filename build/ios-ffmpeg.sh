@@ -35,7 +35,8 @@ fi
 . ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="ffmpeg"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
@@ -76,7 +77,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..26}
+for library in {1..27}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -177,6 +178,11 @@ do
                 FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static wavpack)"
                 CONFIGURE_POSTFIX+=" --enable-libwavpack"
             ;;
+            x264)
+                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags x264)"
+                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static x264)"
+                CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
+            ;;
             libogg)
                 FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags ogg)"
                 FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static ogg)"
@@ -202,7 +208,7 @@ do
             ;;
         esac
     else
-        if [[ ${library} -eq 26 ]]; then
+        if [[ ${library} -eq 27 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
@@ -210,9 +216,9 @@ done
 
 # CFLAGS PARTS
 ARCH_CFLAGS=$(get_arch_specific_cflags);
-APP_CFLAGS=$(get_app_specific_cflags "ffmpeg");
+APP_CFLAGS=$(get_app_specific_cflags ${LIB_NAME});
 COMMON_CFLAGS=$(get_common_cflags);
-OPTIMIZATION_CFLAGS=$(get_size_optimization_cflags "ffmpeg");
+OPTIMIZATION_CFLAGS=$(get_size_optimization_cflags ${LIB_NAME});
 MIN_VERSION_CFLAGS=$(get_min_version_cflags);
 COMMON_INCLUDES=$(get_common_includes);
 
@@ -223,18 +229,18 @@ COMMON_LDFLAGS=$(get_common_ldflags);
 
 # REORDERED FLAGS
 CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS} ${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
-CXXFLAGS=$(get_cxxflags "ffmpeg")
+CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS="${ARCH_LDFLAGS} ${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS}"
 
-cd ${BASEDIR}/src/ffmpeg || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-echo -n -e "\nffmpeg: "
+echo -n -e "\n${LIB_NAME}: "
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --sysroot=${SDK_PATH} \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
@@ -261,11 +267,9 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
-    --disable-ffmpeg \
-    --disable-ffplay \
-    --disable-ffprobe \
-    --disable-ffserver \
+    --disable-programs \
     --disable-videotoolbox \
+    --disable-postproc \
     --disable-doc \
     --disable-htmlpages \
     --disable-manpages \
@@ -273,6 +277,8 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-txtpages \
     --disable-static \
     --disable-xlib \
+    --disable-jack \
+    --disable-sdl2 \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
 if [ $? -ne 0 ]; then

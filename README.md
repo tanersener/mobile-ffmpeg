@@ -150,5 +150,6 @@ This project is stable but far from complete. If you have any recommendations or
 
 ### 9. See Also
 
+- [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/3.4/index.html)
 - [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)
