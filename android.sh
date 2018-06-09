@@ -107,12 +107,16 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
     echo -e "  --enable-speex\t\tbuild with speex [no]"
-    echo -e "  --enable-wavpack\t\tbuild with wavpack [no]"
-    echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]\n"
+    echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
     echo -e "GPL libraries:"
 
     echo -e "  --enable-x264\t\t\tbuild with x264 [no]\n"
+
+    echo -e "Advanced options:"
+
+    echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
+    echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even it is detected as already built [no]\n"
 }
 
 display_version() {
@@ -132,6 +136,12 @@ reconf_library() {
     RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
 
     export ${RECONF_VARIABLE}=1
+}
+
+rebuild_library() {
+    REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
+
+    export ${REBUILD_VARIABLE}=1
 }
 
 enable_library() {
@@ -372,6 +382,11 @@ do
 
             reconf_library ${CONF_LIBRARY}
 	    ;;
+        --rebuild-*)
+            BUILD_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
+
+            rebuild_library ${BUILD_LIBRARY}
+	    ;;
 	    --full)
             for library in {0..27}
             do
@@ -406,7 +421,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
 fi
 
 echo -e "Building mobile-ffmpeg for Android\n"
-echo -e -n "Building mobile-ffmpeg for Android: " >>${BASEDIR}/build.log
+echo -e -n "INFO: Building mobile-ffmpeg for Android: " >>${BASEDIR}/build.log
 echo -e `date` >>${BASEDIR}/build.log
 
 if [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then

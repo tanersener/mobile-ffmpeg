@@ -54,9 +54,6 @@ esac
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-# build cpu-features
-build_cpufeatures
-
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
