@@ -1,22 +1,22 @@
 #!/bin/bash
 
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
+    echo -e "(*) ANDROID_NDK_ROOT not defined\n"
     exit 1
 fi
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${API} ]]; then
-    echo "API not defined"
+    echo -e "(*) API not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
@@ -57,6 +57,7 @@ fi
     --without-libidn2 \
     --without-p11-kit \
     --enable-openssl-compatibility \
+    --enable-hardware-acceleration \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

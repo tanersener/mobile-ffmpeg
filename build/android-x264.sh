@@ -1,27 +1,27 @@
 #!/bin/bash
 
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
+    echo -e "(*) ANDROID_NDK_ROOT not defined\n"
     exit 1
 fi
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${API} ]]; then
-    echo "API not defined"
+    echo -e "(*) API not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
 if ! [ -x "$(command -v tar)" ]; then
-    echo "tar command not found"
+    echo -e "(*) tar command not found\n"
     exit 1
 fi
 
@@ -44,11 +44,23 @@ make distclean 2>/dev/null 1>/dev/null
 
 ASM_FLAGS=""
 case ${ARCH} in
-    arm-v7a | arm-v7a-neon | arm64-v8a)
-        ASM_FLAGS=""
-    ;;
-    *)
+    x86)
+
+        # please note that asm is disabled
+        # because enabling asm for x86 causes text relocations in libavfilter.so
         ASM_FLAGS="--disable-asm"
+    ;;
+    x86-64)
+        if ! [ -x "$(command -v nasm)" ]; then
+            echo -e "(*) nasm command not found\n"
+            exit 1
+        fi
+
+        export AS="$(command -v nasm)"
+
+        # WORKAROUND APPLIED TO ENABLE X86 ASM
+        # https://github.com/android-ndk/ndk/issues/693
+        export CFLAGS="${CFLAGS} -mno-stackrealign"
     ;;
 esac
 

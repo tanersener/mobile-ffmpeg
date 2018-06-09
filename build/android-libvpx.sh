@@ -1,22 +1,22 @@
 #!/bin/bash
 
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
+    echo -e "(*) ANDROID_NDK_ROOT not defined\n"
     exit 1
 fi
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${API} ]]; then
-    echo "API not defined"
+    echo -e "(*) API not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
@@ -38,16 +38,21 @@ DISABLE_NEON_FLAG=""
 case ${ARCH} in
     arm-v7a)
         TARGET_CPU="armv7"
+
+        # NEON disabled explicitly because
+        # --enable-runtime-cpu-detect enables NEON for armv7 cpu
         DISABLE_NEON_FLAG="--disable-neon"
     ;;
     arm-v7a-neon)
-        TARGET_CPU="armv7"
         # NEON IS ENABLED BY --enable-runtime-cpu-detect
+        TARGET_CPU="armv7"
     ;;
     arm64-v8a)
+        # NEON IS ENABLED BY --enable-runtime-cpu-detect
         TARGET_CPU="arm64"
     ;;
     *)
+        # INTEL CPU EXTENSIONS ENABLED BY --enable-runtime-cpu-detect
         TARGET_CPU="$(get_target_build)"
     ;;
 esac
@@ -74,7 +79,6 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-vp9 \
     --enable-multithread \
     --enable-spatial-resampling \
-    --enable-runtime-cpu-detect \
     --enable-small \
     --enable-static \
     --disable-shared \

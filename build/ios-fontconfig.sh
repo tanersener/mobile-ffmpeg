@@ -1,27 +1,27 @@
 #!/bin/bash
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo "IOS_MIN_VERSION not defined"
+    echo -e "(*) IOS_MIN_VERSION not defined\n"
     exit 1
 fi
 
 if [[ -z ${TARGET_SDK} ]]; then
-    echo "TARGET_SDK not defined"
+    echo -e "(*) TARGET_SDK not defined\n"
     exit 1
 fi
 
 if [[ -z ${SDK_PATH} ]]; then
-    echo "SDK_PATH not defined"
+    echo -e "(*) SDK_PATH not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
