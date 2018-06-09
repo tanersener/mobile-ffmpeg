@@ -620,7 +620,7 @@ download_gpl_library_source() {
 
     local EXTRACT_COMMAND=""
 
-    if [[ "${GPL_LIB_FILE}" == "*bz2" ]]; then
+    if [[ ${GPL_LIB_FILE} == *bz2 ]]; then
         EXTRACT_COMMAND="tar jxf ${GPL_LIB_PACKAGE_PATH} --directory ${MOBILE_FFMPEG_TMPDIR}"
     else
         EXTRACT_COMMAND="tar zxf ${GPL_LIB_PACKAGE_PATH} --directory ${MOBILE_FFMPEG_TMPDIR}"

@@ -114,10 +114,11 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
         if [ $run -eq 1 ] && [[ -z ${!CONTROL} ]]; then
             ENABLED_LIBRARY_PATH="${INSTALL_BASE}/${library}"
 
-            echo -e "\nINFO: Building $library with the following environment variables\n" >> ${BASEDIR}/build.log
             echo -e "----------------------------------------------------------------" >> ${BASEDIR}/build.log
+            echo -e "\nINFO: Building $library with the following environment variables\n" >> ${BASEDIR}/build.log
             env >> ${BASEDIR}/build.log
             echo -e "----------------------------------------------------------------\n" >> ${BASEDIR}/build.log
+            echo -e "INFO: System information\n" >> ${BASEDIR}/build.log
             uname -a >> ${BASEDIR}/build.log
             echo -e "----------------------------------------------------------------\n" >> ${BASEDIR}/build.log
 
