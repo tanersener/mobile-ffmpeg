@@ -37,7 +37,7 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
-export PKG_CONFIG_PATH=${INSTALL_PKG_CONFIG_DIR}
+export PKG_CONFIG_LIBDIR=${INSTALL_PKG_CONFIG_DIR}
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -51,13 +51,14 @@ fi
 ./configure \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
-    --with-libiconv \
+    --with-libiconv-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv \
+    --with-expat=${BASEDIR}/prebuilt/ios-$(get_target_host)/expat \
+    --without-libintl-prefix \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
     --disable-rpath \
-    --enable-iconv \
-    --enable-libxml2 \
+    --disable-libxml2 \
     --disable-docs \
     --host=${TARGET_HOST} || exit 1
 

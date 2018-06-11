@@ -41,7 +41,6 @@ COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/include -I${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
 export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/lib -L${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/lib"
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 HARDWARE_ACCELERATION=""
 case ${ARCH} in

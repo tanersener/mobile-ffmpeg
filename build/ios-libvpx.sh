@@ -36,7 +36,6 @@ set_toolchain_clang_paths ${LIB_NAME}
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 # note that --disable-runtime-cpu-detect is used for arm
 # using --enable-runtime-cpu-detect cause the following error

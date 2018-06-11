@@ -1,0 +1,4 @@
+/.deps/
+*.o
+*.lo
+*.dirstamp

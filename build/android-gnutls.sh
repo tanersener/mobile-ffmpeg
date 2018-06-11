@@ -36,7 +36,6 @@ COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv/include -I${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
 export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv/lib -L${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/lib"
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 

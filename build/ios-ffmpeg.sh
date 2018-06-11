@@ -41,7 +41,7 @@ set_toolchain_clang_paths ${LIB_NAME}
 TARGET_HOST=$(get_target_host)
 FFMPEG_CFLAGS=""
 FFMPEG_LDFLAGS=""
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
 TARGET_ARCH=""
@@ -76,14 +76,14 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..30}
+for library in {1..35}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
 
         echo -e "INFO: Enabling library ${ENABLED_LIBRARY}" >> ${BASEDIR}/build.log
 
-        case $ENABLED_LIBRARY in
+        case ${ENABLED_LIBRARY} in
             fontconfig)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags fontconfig)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static fontconfig)"
@@ -129,6 +129,11 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libiconv)"
                 CONFIGURE_POSTFIX+=" --enable-iconv"
             ;;
+            libilbc)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags libilbc)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libilbc)"
+                CONFIGURE_POSTFIX+=" --enable-libilbc"
+            ;;
             libtheora)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags theora)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static theora)"
@@ -162,10 +167,20 @@ do
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
+            opus)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags opus)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opus)"
+                CONFIGURE_POSTFIX+=" --enable-libopus"
+            ;;
             shine)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags shine)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static shine)"
                 CONFIGURE_POSTFIX+=" --enable-libshine"
+            ;;
+            snappy)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags snappy)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static snappy)"
+                CONFIGURE_POSTFIX+=" --enable-libsnappy"
             ;;
             speex)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags speex)"
@@ -178,9 +193,18 @@ do
                 CONFIGURE_POSTFIX+=" --enable-libwavpack"
             ;;
             x264)
-                CFLAGS+=" $(pkg-config --cflags x264)"
-                LDFLAGS+=" $(pkg-config --libs --static x264)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags x264)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static x264)"
                 CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
+            ;;
+            xvidcore)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags xvidcore)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static xvidcore)"
+                CONFIGURE_POSTFIX+=" --enable-libxvid --enable-gpl"
+            ;;
+            expat)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags expat)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static expat)"
             ;;
             libogg)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags ogg)"
@@ -200,19 +224,27 @@ do
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags hogweed)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static hogweed)"
             ;;
-            ios-zlib)
+            ios-*)
+
+                # BUILT-IN LIBRARIES SHARE INCLUDE AND LIB DIRECTORIES
+                # INCLUDING ONLY ONE OF THEM IS ENOUGH
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags zlib)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static zlib)"
-                CONFIGURE_POSTFIX+=" --enable-zlib"
-            ;;
-            ios-audiotoolbox)
-                CONFIGURE_POSTFIX+=" --enable-audiotoolbox"
-            ;;
-            ios-coreimage)
-                CONFIGURE_POSTFIX+=" --enable-coreimage"
-            ;;
-            ios-bzlib)
-                CONFIGURE_POSTFIX+=" --enable-bzlib"
+
+                case ${ENABLED_LIBRARY} in
+                    ios-zlib)
+                        CONFIGURE_POSTFIX+=" --enable-zlib"
+                    ;;
+                    ios-audiotoolbox)
+                        CONFIGURE_POSTFIX+=" --enable-audiotoolbox"
+                    ;;
+                    ios-coreimage)
+                        CONFIGURE_POSTFIX+=" --enable-coreimage"
+                    ;;
+                    ios-bzip2)
+                        CONFIGURE_POSTFIX+=" --enable-bzlib"
+                    ;;
+                esac
             ;;
         esac
     else
@@ -220,13 +252,13 @@ do
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 8 ]]; then
             CONFIGURE_POSTFIX+=" --disable-iconv"
-        elif [[ ${library} -eq 27 ]]; then
+        elif [[ ${library} -eq 32 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
-        elif [[ ${library} -eq 28 ]]; then
+        elif [[ ${library} -eq 33 ]]; then
             CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
-        elif [[ ${library} -eq 29 ]]; then
+        elif [[ ${library} -eq 34 ]]; then
             CONFIGURE_POSTFIX+=" --disable-coreimage"
-        elif [[ ${library} -eq 30 ]]; then
+        elif [[ ${library} -eq 35 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
         fi
     fi
@@ -259,7 +291,6 @@ make distclean 2>/dev/null 1>/dev/null
 ./configure \
     --sysroot=${SDK_PATH} \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
-    --pkg-config="pkg-config" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --extra-ldflags="${LDFLAGS}" \
@@ -286,7 +317,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-debug \
     --disable-neon-clobber-test \
     --disable-programs \
-    --disable-videotoolbox \
     --disable-postproc \
     --disable-doc \
     --disable-htmlpages \
@@ -294,11 +324,28 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-podpages \
     --disable-txtpages \
     --disable-static \
-    --disable-xlib \
     --disable-jack \
-    --disable-sdl2 \
     --disable-sndio \
     --disable-schannel \
+    --disable-sdl2 \
+    --disable-securetransport \
+    --disable-xlib \
+    --disable-cuda \
+    --disable-cuvid \
+    --disable-nvenc \
+    --disable-vaapi \
+    --disable-vda \
+    --disable-vdpau \
+    --disable-videotoolbox \
+    --disable-appkit \
+    --disable-alsa \
+    --disable-cuda \
+    --disable-cuvid \
+    --disable-nvenc \
+    --disable-vaapi \
+    --disable-vda \
+    --disable-vdpau \
+    --disable-videotoolbox \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
 if [ $? -ne 0 ]; then

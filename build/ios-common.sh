@@ -29,17 +29,22 @@ get_library_name() {
         16) echo "wavpack" ;;
         17) echo "kvazaar" ;;
         18) echo "x264" ;;
-        19) echo "giflib" ;;
-        20) echo "jpeg" ;;
-        21) echo "libogg" ;;
-        22) echo "libpng" ;;
-        23) echo "libuuid" ;;
-        24) echo "nettle" ;;
-        25) echo "tiff" ;;
-        26) echo "ios-zlib" ;;
-        27) echo "ios-audiotoolbox" ;;
-        28) echo "ios-coreimage" ;;
-        29) echo "ios-bzlib" ;;
+        19) echo "xvidcore" ;;
+        20) echo "libilbc" ;;
+        21) echo "opus" ;;
+        22) echo "snappy" ;;
+        23) echo "giflib" ;;
+        24) echo "jpeg" ;;
+        25) echo "libogg" ;;
+        26) echo "libpng" ;;
+        27) echo "libuuid" ;;
+        28) echo "nettle" ;;
+        29) echo "tiff" ;;
+        30) echo "expat" ;;
+        31) echo "ios-zlib" ;;
+        32) echo "ios-audiotoolbox" ;;
+        33) echo "ios-coreimage" ;;
+        34) echo "ios-bzip2" ;;
     esac
 }
 
@@ -164,10 +169,10 @@ get_app_specific_cflags() {
 
     APP_FLAGS=""
     case $1 in
-        libwebp)
-            APP_FLAGS=""
+        libwebp | xvidcore | libaom)
+            APP_FLAGS="-fno-common -DPIC"
         ;;
-        ffmpeg | shine | x265)
+        ffmpeg | shine)
             APP_FLAGS="-Wno-unused-function"
         ;;
         kvazaar)
@@ -207,18 +212,23 @@ get_asmflags() {
 }
 
 get_cxxflags() {
+    local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags $1) $(get_min_version_cflags)"
+
     case $1 in
         gnutls)
-            echo "-std=c++11 -fno-rtti -fembed-bitcode"
+            echo "-std=c++11 -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
         ;;
         opencore-amr)
-            echo "-fno-rtti -fembed-bitcode"
+            echo "-fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
         ;;
-        x265)
-            echo "-std=c++11 -fno-exceptions -fembed-bitcode"
+        libwebp | xvidcore)
+            echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode -fno-common -DPIC ${COMMON_CFLAGS}"
+        ;;
+        libaom)
+            echo "-std=c++11 -fno-exceptions -fembed-bitcode -fno-common -DPIC ${COMMON_CFLAGS}"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode"
+            echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
         ;;
     esac
 }
@@ -276,7 +286,7 @@ cachedir=\${localstatedir}/cache/\${PACKAGE}
 Name: Fontconfig
 Description: Font configuration and customization library
 Version: ${FONTCONFIG_VERSION}
-Requires:  freetype2 >= 21.0.15, uuid, libxml-2.0 >= 2.6
+Requires:  freetype2 >= 21.0.15, uuid, expat >= 2.2.0, libiconv
 Requires.private:
 Libs: -L\${libdir} -lfontconfig
 Libs.private:
@@ -527,6 +537,44 @@ Libs: -L\${libdir} -luuid
 EOF
 }
 
+create_snappy_package_config() {
+    local SNAPPY_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/snappy.pc" << EOF
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/snappy
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: snappy
+Description: a fast compressor/decompressor
+Version: ${SNAPPY_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lz -lstdc++
+Cflags: -I\${includedir}
+EOF
+}
+
+create_xvidcore_package_config() {
+    local XVIDCORE_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/xvidcore.pc" << EOF
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/xvidcore
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: xvidcore
+Description: the main MPEG-4 de-/encoding library
+Version: ${XVIDCORE_VERSION}
+
+Requires:
+Libs: -L\${libdir}
+Cflags: -I\${includedir}
+EOF
+}
+
 create_zlib_package_config() {
     ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${SDK_PATH}/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
@@ -542,6 +590,25 @@ Version: ${ZLIB_VERSION}
 
 Requires:
 Libs: -L\${libdir} -lz
+Cflags: -I\${includedir}
+EOF
+}
+
+create_bzip2_package_config() {
+    BZIP2_VERSION=$(grep -Eo 'version.*of' ${SDK_PATH}/usr/include/bzlib.h | sed -e 's/of//;s/version//g;s/\ //g')
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/bzip2.pc" << EOF
+prefix=${SDK_PATH}/usr
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: bzip2
+Description: library for lossless, block-sorting data compression
+Version: ${BZIP2_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lbz2
 Cflags: -I\${includedir}
 EOF
 }
@@ -590,6 +657,12 @@ download_gpl_library_source() {
             GPL_LIB_FILE="x264-snapshot-20180606-2245-stable.tar.bz2"
             GPL_LIB_ORIG_DIR="x264-snapshot-20180606-2245-stable"
             GPL_LIB_DEST_DIR="x264"
+        ;;
+        xvidcore)
+            GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz"
+            GPL_LIB_FILE="xvidcore-1.3.5.tar.gz"
+            GPL_LIB_ORIG_DIR="xvidcore"
+            GPL_LIB_DEST_DIR="xvidcore"
         ;;
     esac
 
@@ -694,6 +767,7 @@ set_toolchain_clang_paths() {
 
     export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/ios-$(get_target_host)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
+    export BZIP2_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/bzip2.pc"
 
     if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
         mkdir -p ${INSTALL_PKG_CONFIG_DIR}
@@ -701,6 +775,10 @@ set_toolchain_clang_paths() {
 
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
         create_zlib_package_config
+    fi
+
+    if [ ! -f ${BZIP2_PACKAGE_CONFIG_PATH} ]; then
+        create_bzip2_package_config
     fi
 }
 

@@ -27,23 +27,28 @@ LIBRARY_SPEEX=15
 LIBRARY_WAVPACK=16
 LIBRARY_KVAZAAR=17
 LIBRARY_X264=18
-LIBRARY_GIFLIB=19
-LIBRARY_JPEG=20
-LIBRARY_LIBOGG=21
-LIBRARY_LIBPNG=22
-LIBRARY_LIBUUID=23
-LIBRARY_NETTLE=24
-LIBRARY_TIFF=25
-LIBRARY_ZLIB=26
-LIBRARY_AUDIOTOOLBOX=27
-LIBRARY_COREIMAGE=28
-LIBRARY_BZLIB=29
+LIBRARY_XVIDCORE=19
+LIBRARY_LIBILBC=20
+LIBRARY_OPUS=21
+LIBRARY_SNAPPY=22
+LIBRARY_GIFLIB=23
+LIBRARY_JPEG=24
+LIBRARY_LIBOGG=25
+LIBRARY_LIBPNG=26
+LIBRARY_LIBUUID=27
+LIBRARY_NETTLE=28
+LIBRARY_TIFF=29
+LIBRARY_EXPAT=30
+LIBRARY_ZLIB=31
+LIBRARY_AUDIOTOOLBOX=32
+LIBRARY_COREIMAGE=33
+LIBRARY_BZIP2=34
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -90,32 +95,36 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "Libraries:"
 
     echo -e "  --full\t\t\tenables all non-GPL external libraries"
-    echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib [no]"
     echo -e "  --enable-ios-audiotoolbox\tbuild with built-in Apple AudioToolbox [no]"
     echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage [no]"
-    echo -e "  --enable-ios-bzlib\t\tbuild with built-in bzlib [no]"
+    echo -e "  --enable-ios-bzip2\t\tbuild with built-in bzip2 [no]"
+    echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
     echo -e "  --enable-freetype\t\tbuild with freetype [no]"
     echo -e "  --enable-fribidi\t\tbuild with fribidi [no]"
-    echo -e "  --enable-gnutls\t\tbuild with gnutls [no]"
     echo -e "  --enable-gmp\t\t\tbuild with gmp [no]"
+    echo -e "  --enable-gnutls\t\tbuild with gnutls [no]"
     echo -e "  --enable-kvazaar\t\tbuild with kvazaar [no]"
     echo -e "  --enable-lame\t\t\tbuild with lame [no]"
     echo -e "  --enable-libass\t\tbuild with libass [no]"
     echo -e "  --enable-libiconv\t\tbuild with libiconv [no]"
+    echo -e "  --enable-libilbc\t\tbuild with libilbc [no]"
     echo -e "  --enable-libtheora\t\tbuild with libtheora [no]"
     echo -e "  --enable-libvorbis\t\tbuild with libvorbis [no]"
     echo -e "  --enable-libvpx\t\tbuild with libvpx [no]"
     echo -e "  --enable-libwebp\t\tbuild with libwebp [no]"
     echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
     echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
+    echo -e "  --enable-opus\t\t\tbuild with opus [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
+    echo -e "  --enable-snappy\t\tbuild with snappy [no]"
     echo -e "  --enable-speex\t\tbuild with speex [no]"
     echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
     echo -e "GPL libraries:"
 
-    echo -e "  --enable-x264\t\t\tbuild with x264 [no]\n"
+    echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
+    echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
 
     echo -e "Advanced options:"
 
@@ -163,13 +172,14 @@ set_library() {
         ios-coreimage)
             ENABLED_LIBRARIES[LIBRARY_COREIMAGE]=$2
         ;;
-        ios-bzlib)
-            ENABLED_LIBRARIES[LIBRARY_BZLIB]=$2
+        ios-bzip2)
+            ENABLED_LIBRARIES[LIBRARY_BZIP2]=$2
         ;;
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
-            set_library "libxml2" $2
+            ENABLED_LIBRARIES[LIBRARY_EXPAT]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
             set_library "freetype" $2
         ;;
         freetype)
@@ -199,15 +209,18 @@ set_library() {
         ;;
         libass)
             ENABLED_LIBRARIES[LIBRARY_LIBASS]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
+            ENABLED_LIBRARIES[LIBRARY_EXPAT]=$2
             set_library "freetype" $2
             set_library "fribidi" $2
             set_library "fontconfig" $2
             set_library "libiconv" $2
-            ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
-            set_library "libxml2" $2
         ;;
         libiconv)
             ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+        ;;
+        libilbc)
+            ENABLED_LIBRARIES[LIBRARY_LIBILBC]=$2
         ;;
         libpng)
             ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
@@ -239,8 +252,15 @@ set_library() {
         opencore-amr)
             ENABLED_LIBRARIES[LIBRARY_OPENCOREAMR]=$2
         ;;
+        opus)
+            ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
+        ;;
         shine)
             ENABLED_LIBRARIES[LIBRARY_SHINE]=$2
+        ;;
+        snappy)
+            ENABLED_LIBRARIES[LIBRARY_SNAPPY]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
         ;;
         speex)
             ENABLED_LIBRARIES[LIBRARY_SPEEX]=$2
@@ -251,7 +271,11 @@ set_library() {
         x264)
             ENABLED_LIBRARIES[LIBRARY_X264]=$2
         ;;
-        giflib | jpeg | libogg | libpng | libuuid | nettle | tiff)
+        xvidcore)
+            ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
+        ;;
+        giflib | jpeg | libogg | libpng | libuuid | nettle | tiff | expat)
+            # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         *)
             print_unknown_library $1
@@ -329,7 +353,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {26..29}
+    for library in {31..34}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -341,7 +365,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..18}
+    for library in {0..22}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -422,9 +446,9 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..26}
+            for library in {0..34}
             do
-                if [[ $library -ne 18 ]]; then
+                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]]; then
                     enable_library $(get_library_name $library)
                 fi
             done
@@ -456,23 +480,26 @@ echo -e `date` >>${BASEDIR}/build.log
 print_enabled_architectures
 print_enabled_libraries
 
-# CHECKING GPL FLAG
-if [[ ${ENABLED_LIBRARIES[LIBRARY_X264]} -eq 1 ]]; then
-    library_name=$(get_library_name ${LIBRARY_X264})
+# CHECKING GPL LIBRARIES
+for gpl_library in {18..19}
+do
+    if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
+        library_name=$(get_library_name ${gpl_library})
 
-    if  [ ${GPL_ENABLED} != "yes" ]; then
-        echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n"
-        echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" >> ${BASEDIR}/build.log
-        exit 1
-    else
-        DOWNLOAD_RESULT=$(download_gpl_library_source ${library_name})
-        if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
-            echo -e "\n(*) Failed to download GPL library ${library_name} source. Please check build.log file for details. If the problem persists refer to offline building instructions.\n"
-            echo -e "\n(*) Failed to download GPL library ${library_name} source.\n" >> ${BASEDIR}/build.log
+        if  [ ${GPL_ENABLED} != "yes" ]; then
+            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n"
+            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" >> ${BASEDIR}/build.log
             exit 1
+        else
+            DOWNLOAD_RESULT=$(download_gpl_library_source ${library_name})
+            if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+                echo -e "\n(*) Failed to download GPL library ${library_name} source. Please check build.log file for details. If the problem persists refer to offline building instructions.\n"
+                echo -e "\n(*) Failed to download GPL library ${library_name} source.\n" >> ${BASEDIR}/build.log
+                exit 1
+            fi
         fi
     fi
-fi
+done
 
 # CHECKING IF XCODE IS INSTALLED
 if ! [ -x "$(command -v xcrun)" ]; then
@@ -495,7 +522,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..30}
+        for library in {1..35}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

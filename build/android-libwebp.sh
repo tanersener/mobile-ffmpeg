@@ -32,7 +32,6 @@ TARGET_HOST=$(get_target_host)
 CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
-PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 

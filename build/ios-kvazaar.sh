@@ -44,7 +44,7 @@ esac
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 

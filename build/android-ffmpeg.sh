@@ -37,7 +37,7 @@ TARGET_HOST=$(get_target_host)
 CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
 TARGET_ARCH=""

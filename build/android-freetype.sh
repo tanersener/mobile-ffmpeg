@@ -32,7 +32,7 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -49,6 +49,7 @@ export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/libpng/lib
     --with-png \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --without-harfbuzz \
+    --without-bzip2 \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

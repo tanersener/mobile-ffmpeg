@@ -37,7 +37,7 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -54,6 +54,11 @@ export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/libpng/lib"
     --with-png \
     --with-sysroot=${SDK_PATH} \
     --without-harfbuzz \
+    --without-bzip2 \
+    --without-fsref \
+    --without-quickdraw-toolbox \
+    --without-quickdraw-carbon \
+    --without-ats \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

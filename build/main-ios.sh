@@ -41,7 +41,7 @@ fi
 # FILTERING WHICH EXTERNAL LIBRARIES WILL BE BUILT
 # NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..26}
+for library in {1..31}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -58,7 +58,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
         let run=0
         case $library in
             fontconfig)
-                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_libxml2 ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]]; then
+                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]]; then
                     run=1
                 fi
             ;;
@@ -78,7 +78,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 fi
             ;;
             libass)
-                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_libxml2 ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]]; then
+                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]]; then
                     run=1
                 fi
             ;;
