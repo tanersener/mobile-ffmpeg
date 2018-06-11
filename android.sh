@@ -88,7 +88,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "Libraries:"
 
     echo -e "  --full\t\t\tenables all external libraries"
-    echo -e "  --enable-android-media-codec\tbuild with built-in media codec [no]"
+    echo -e "  --enable-android-media-codec\tbuild with built-in Android MediaCodec [no]"
     echo -e "  --enable-android-zlib\t\tbuild with built-in zlib [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
     echo -e "  --enable-freetype\t\tbuild with freetype [no]"

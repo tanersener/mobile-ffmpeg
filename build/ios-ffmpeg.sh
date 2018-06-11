@@ -76,7 +76,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..27}
+for library in {1..30}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -205,10 +205,29 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static zlib)"
                 CONFIGURE_POSTFIX+=" --enable-zlib"
             ;;
+            ios-audiotoolbox)
+                CONFIGURE_POSTFIX+=" --enable-audiotoolbox"
+            ;;
+            ios-coreimage)
+                CONFIGURE_POSTFIX+=" --enable-coreimage"
+            ;;
+            ios-bzlib)
+                CONFIGURE_POSTFIX+=" --enable-bzlib"
+            ;;
         esac
     else
-        if [[ ${library} -eq 27 ]]; then
+
+        # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
+        if [[ ${library} -eq 8 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-iconv"
+        elif [[ ${library} -eq 27 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
+        elif [[ ${library} -eq 28 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
+        elif [[ ${library} -eq 29 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-coreimage"
+        elif [[ ${library} -eq 30 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-bzlib"
         fi
     fi
 done
@@ -278,6 +297,8 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-xlib \
     --disable-jack \
     --disable-sdl2 \
+    --disable-sndio \
+    --disable-schannel \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
 if [ $? -ne 0 ]; then

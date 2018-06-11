@@ -37,6 +37,9 @@ get_library_name() {
         24) echo "nettle" ;;
         25) echo "tiff" ;;
         26) echo "ios-zlib" ;;
+        27) echo "ios-audiotoolbox" ;;
+        28) echo "ios-coreimage" ;;
+        29) echo "ios-bzlib" ;;
     esac
 }
 

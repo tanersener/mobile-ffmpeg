@@ -35,12 +35,15 @@ LIBRARY_LIBUUID=23
 LIBRARY_NETTLE=24
 LIBRARY_TIFF=25
 LIBRARY_ZLIB=26
+LIBRARY_AUDIOTOOLBOX=27
+LIBRARY_COREIMAGE=28
+LIBRARY_BZLIB=29
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -88,6 +91,9 @@ When compilation ends a universal fat binary and an IOS framework is created wit
 
     echo -e "  --full\t\t\tenables all non-GPL external libraries"
     echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib [no]"
+    echo -e "  --enable-ios-audiotoolbox\tbuild with built-in Apple AudioToolbox [no]"
+    echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage [no]"
+    echo -e "  --enable-ios-bzlib\t\tbuild with built-in bzlib [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
     echo -e "  --enable-freetype\t\tbuild with freetype [no]"
     echo -e "  --enable-fribidi\t\tbuild with fribidi [no]"
@@ -150,6 +156,15 @@ set_library() {
     case $1 in
         ios-zlib)
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+        ;;
+        ios-audiotoolbox)
+            ENABLED_LIBRARIES[LIBRARY_AUDIOTOOLBOX]=$2
+        ;;
+        ios-coreimage)
+            ENABLED_LIBRARIES[LIBRARY_COREIMAGE]=$2
+        ;;
+        ios-bzlib)
+            ENABLED_LIBRARIES[LIBRARY_BZLIB]=$2
         ;;
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
@@ -314,13 +329,16 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    if [[ ${ENABLED_LIBRARIES[LIBRARY_ZLIB]} -eq 1 ]]; then
-        if [[ ${enabled} -ge 1 ]]; then
-            echo -n ", "
+    for library in {26..29}
+    do
+        if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+            if [[ ${enabled} -ge 1 ]]; then
+                echo -n ", "
+            fi
+            echo -n $(get_library_name $library)
+            enabled=$((${enabled} + 1));
         fi
-        echo -n $(get_library_name $library)
-        enabled=$((${enabled} + 1));
-    fi
+    done
 
     # THEN EXTERNAL LIBRARIES
     for library in {0..18}
@@ -477,7 +495,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..27}
+        for library in {1..30}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
