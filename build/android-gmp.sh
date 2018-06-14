@@ -50,6 +50,7 @@ fi
     --disable-shared \
     --disable-assembly \
     --disable-fast-install \
+    --disable-maintainer-mode \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1

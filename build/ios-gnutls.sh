@@ -38,9 +38,16 @@ COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
 COMMON_CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/include -I${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/include"
+export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
-export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/lib -L${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/lib"
+export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/lib"
+
+export NETTLE_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/nettle/include"
+export NETTLE_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/nettle/lib"
+export HOGWEED_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/nettle/include"
+export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/nettle/lib"
+export GMP_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/include"
+export GMP_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/lib"
 
 HARDWARE_ACCELERATION=""
 case ${ARCH} in

@@ -169,7 +169,7 @@ get_app_specific_cflags() {
 
     APP_FLAGS=""
     case $1 in
-        libwebp | xvidcore | libaom)
+        libwebp | xvidcore)
             APP_FLAGS="-fno-common -DPIC"
         ;;
         ffmpeg | shine)
@@ -223,9 +223,6 @@ get_cxxflags() {
         ;;
         libwebp | xvidcore)
             echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode -fno-common -DPIC ${COMMON_CFLAGS}"
-        ;;
-        libaom)
-            echo "-std=c++11 -fno-exceptions -fembed-bitcode -fno-common -DPIC ${COMMON_CFLAGS}"
         ;;
         *)
             echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"

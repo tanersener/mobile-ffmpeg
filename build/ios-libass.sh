@@ -52,6 +52,7 @@ fi
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
+    --disable-libtool-lock \
     --enable-static \
     --disable-shared \
     --disable-harfbuzz \

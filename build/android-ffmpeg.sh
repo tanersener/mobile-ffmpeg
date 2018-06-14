@@ -20,7 +20,8 @@ if [[ -z ${BASEDIR} ]]; then
     exit 1
 fi
 
-if ! [ -x "$(command -v pkg-config)" ]; then
+HOST_PKG_CONFIG_PATH=`command -v pkg-config`
+if [ -z ${HOST_PKG_CONFIG_PATH} ]; then
     echo -e "(*) pkg-config command not found\n"
     exit 1
 fi
@@ -74,7 +75,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..28}
+for library in {1..33}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -127,6 +128,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static libiconv)"
                 CONFIGURE_POSTFIX+=" --enable-iconv"
             ;;
+            libilbc)
+                CFLAGS+=" $(pkg-config --cflags libilbc)"
+                LDFLAGS+=" $(pkg-config --libs --static libilbc)"
+                CONFIGURE_POSTFIX+=" --enable-libilbc"
+            ;;
             libtheora)
                 CFLAGS+=" $(pkg-config --cflags theora)"
                 LDFLAGS+=" $(pkg-config --libs --static theora)"
@@ -161,10 +167,20 @@ do
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
+            opus)
+                CFLAGS+=" $(pkg-config --cflags opus)"
+                LDFLAGS+=" $(pkg-config --libs --static opus)"
+                CONFIGURE_POSTFIX+=" --enable-libopus"
+            ;;
             shine)
                 CFLAGS+=" $(pkg-config --cflags shine)"
                 LDFLAGS+=" $(pkg-config --libs --static shine)"
                 CONFIGURE_POSTFIX+=" --enable-libshine"
+            ;;
+            snappy)
+                CFLAGS+=" $(pkg-config --cflags snappy)"
+                LDFLAGS+=" $(pkg-config --libs --static snappy)"
+                CONFIGURE_POSTFIX+=" --enable-libsnappy"
             ;;
             speex)
                 CFLAGS+=" $(pkg-config --cflags speex)"
@@ -181,6 +197,15 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static x264)"
                 CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
             ;;
+            xvidcore)
+                CFLAGS+=" $(pkg-config --cflags xvidcore)"
+                LDFLAGS+=" $(pkg-config --libs --static xvidcore)"
+                CONFIGURE_POSTFIX+=" --enable-libxvid --enable-gpl"
+            ;;
+            expat)
+                CFLAGS+=" $(pkg-config --cflags expat)"
+                LDFLAGS+=" $(pkg-config --libs --static expat)"
+            ;;
             libogg)
                 CFLAGS+=" $(pkg-config --cflags ogg)"
                 LDFLAGS+=" $(pkg-config --libs --static ogg)"
@@ -188,6 +213,10 @@ do
             libpng)
                 CFLAGS+=" $(pkg-config --cflags libpng)"
                 LDFLAGS+=" $(pkg-config --libs --static libpng)"
+            ;;
+            libuuid)
+                CFLAGS+=" $(pkg-config --cflags uuid)"
+                LDFLAGS+=" $(pkg-config --libs --static uuid)"
             ;;
             nettle)
                 CFLAGS+=" $(pkg-config --cflags nettle)"
@@ -205,7 +234,9 @@ do
             ;;
         esac
     else
-        if [[ ${library} -eq 27 ]]; then
+
+        # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
+        if [[ ${library} -eq 32 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
@@ -223,7 +254,7 @@ make distclean 2>/dev/null 1>/dev/null
     --cross-prefix="${TARGET_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
     --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
-    --pkg-config="pkg-config" \
+    --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --extra-ldflags="${LDFLAGS}" \
@@ -243,7 +274,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-debug \
     --disable-neon-clobber-test \
     --disable-programs \
-    --disable-videotoolbox \
     --disable-postproc \
     --disable-doc \
     --disable-htmlpages \
@@ -251,9 +281,28 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-podpages \
     --disable-txtpages \
     --disable-static \
-    --disable-xlib \
     --disable-jack \
+    --disable-sndio \
+    --disable-schannel \
     --disable-sdl2 \
+    --disable-securetransport \
+    --disable-xlib \
+    --disable-cuda \
+    --disable-cuvid \
+    --disable-nvenc \
+    --disable-vaapi \
+    --disable-vda \
+    --disable-vdpau \
+    --disable-videotoolbox \
+    --disable-appkit \
+    --disable-alsa \
+    --disable-cuda \
+    --disable-cuvid \
+    --disable-nvenc \
+    --disable-vaapi \
+    --disable-vda \
+    --disable-vdpau \
+    --disable-videotoolbox \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
 if [ $? -ne 0 ]; then

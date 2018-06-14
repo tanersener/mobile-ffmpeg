@@ -62,6 +62,7 @@ cmake -Wno-dev \
     -DCMAKE_LINKER="$LD" \
     -DCMAKE_AR="$AR" \
     -DCMAKE_AS="$AS" \
+    -DSNAPPY_BUILD_TESTS=0 \
     -DHAVE_LIBLZO2=0 \
     -DHAVE_LIBZ=1 \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \

@@ -33,9 +33,16 @@ COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
 COMMON_CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv/include -I${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/include"
+export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
-export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv/lib -L${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/lib"
+export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv/lib"
+
+export NETTLE_CFLAGS="-I${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/include"
+export NETTLE_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/lib"
+export HOGWEED_CFLAGS="-I${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/include"
+export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/nettle/lib"
+export GMP_CFLAGS="-I${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/include"
+export GMP_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/gmp/lib"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 

@@ -32,6 +32,7 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -48,10 +49,10 @@ fi
     --enable-static \
     --disable-shared \
     --disable-fast-install \
-    --disable-spec \
     --disable-examples \
     --disable-telemetry \
-    --enable-valgrind-testing \
+    --disable-sdltest \
+    --disable-valgrind-testing \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1

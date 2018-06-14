@@ -57,3 +57,6 @@ make -j$(get_cpu_count) || exit 1
 create_xvidcore_package_config "1.3.5"
 
 make install || exit 1
+
+# REMOVE DYNAMIC LIBS
+rm -f ${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME}/lib/libxvidcore.dylib*

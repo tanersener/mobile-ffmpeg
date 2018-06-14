@@ -123,8 +123,8 @@ When compilation ends a universal fat binary and an IOS framework is created wit
 
     echo -e "GPL libraries:"
 
-    echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
     echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
+    echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
 
     echo -e "Advanced options:"
 

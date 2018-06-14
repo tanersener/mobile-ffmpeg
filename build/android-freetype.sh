@@ -50,6 +50,10 @@ export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/android-$(get_target_build)/libpng/lib
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --without-harfbuzz \
     --without-bzip2 \
+    --without-fsref \
+    --without-quickdraw-toolbox \
+    --without-quickdraw-carbon \
+    --without-ats \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

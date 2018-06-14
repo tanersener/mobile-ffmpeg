@@ -46,13 +46,14 @@ fi
 ./configure \
     --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
     --with-pic \
-    --with-libiconv \
+    --with-libiconv-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv \
+    --with-expat=${BASEDIR}/prebuilt/android-$(get_target_build)/expat \
+    --without-libintl-prefix \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
     --disable-rpath \
-    --enable-iconv \
-    --enable-libxml2 \
+    --disable-libxml2 \
     --disable-docs \
     --host=${TARGET_HOST} || exit 1
 
