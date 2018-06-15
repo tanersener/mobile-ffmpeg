@@ -48,7 +48,7 @@ fi
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --enable-static \
     --disable-shared \
-    --disable-assembly \
+    --enable-assembly \
     --disable-fast-install \
     --disable-maintainer-mode \
     --host=${TARGET_HOST} || exit 1

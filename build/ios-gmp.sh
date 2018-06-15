@@ -54,13 +54,23 @@ if [[ ${RECONF_gmp} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
+ASM_FLAGS=""
+case ${ARCH} in
+    armv7 | armv7s | arm64)
+        ASM_FLAGS="--disable-assembly"
+    ;;
+    i386 | x86-64)
+        ASM_FLAGS="--enable-assembly"
+    ;;
+esac
+
 ./configure \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \
     --disable-shared \
-    --disable-assembly \
+    ${ASM_FLAGS} \
     --disable-fast-install \
     --disable-maintainer-mode \
     --host=${TARGET_HOST} || exit 1
