@@ -559,7 +559,7 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
         exit 1
     fi
 
-    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-1.0.aar ${MOBILE_FFMPEG_AAR} || exit 1
+    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-1.1.aar ${MOBILE_FFMPEG_AAR} || exit 1
 
     echo -e "Created mobile-ffmpeg Android archive successfully.\n" >> ${BASEDIR}/build.log
 
