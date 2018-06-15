@@ -602,7 +602,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     if  [ ${GPL_ENABLED} == "yes" ]; then
 
         # GPLv3.0
-        cp ${BASEDIR}/src/ffmpeg/COPYING.GPLv3 ${FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
+        cp ${BASEDIR}/LICENSE.GPLv3 ${FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
     else
 
         # LGPLv3.0
@@ -637,7 +637,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         if  [ ${GPL_ENABLED} == "yes" ]; then
 
             # GPLv3.0
-            cp ${BASEDIR}/src/ffmpeg/COPYING.GPLv3 ${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
+            cp ${BASEDIR}/LICENSE.GPLv3 ${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
         else
 
             # LGPLv3.0
