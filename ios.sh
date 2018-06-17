@@ -606,7 +606,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     else
 
         # LGPLv3.0
-        cp ${BASEDIR}/LICENSE ${FRAMEWORK_PATH} >> ${BASEDIR}/build.log
+        cp ${BASEDIR}/LICENSE.LGPLv3 ${FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
     fi
 
     build_info_plist "${FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
@@ -641,7 +641,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         else
 
             # LGPLv3.0
-            cp ${BASEDIR}/LICENSE ${FFMPEG_LIB_FRAMEWORK_PATH} >> ${BASEDIR}/build.log
+            cp ${BASEDIR}/LICENSE.LGPLv3 ${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
         fi
 
         build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.mobileffmpeg.FFmpeg${FFMPEG_LIB}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"

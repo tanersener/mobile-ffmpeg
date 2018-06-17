@@ -1,5 +1,5 @@
 # MobileFFmpeg
-Source code and scripts to build FFmpeg for Android and IOS platform
+Source code and scripts to build FFmpeg for Android and IOS platform; prebuilt libraries for both platforms
 
 ### 1. Features
 - Builds both Android and IOS
@@ -52,6 +52,8 @@ Cross-compile instructions for all of them can be found under scripts inside `bu
 - snappy
 - speex
 - wavpack
+- x264
+- xvidcore
 
 External libraries and their dependencies are explained in the [External Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/External-Libraries) page.
 
