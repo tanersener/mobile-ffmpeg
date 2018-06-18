@@ -61,7 +61,8 @@ cmake -Wno-dev \
     -DWITH_DEV_TRACE=0 \
     -DWITH_LSR_BINDINGS=0 \
     -DWITH_OPENMP=0 \
-    -DCMAKE_SYSTEM_PROCESSOR=$(get_target_build) \
+    -DWITH_PFFFT=1 \
+    -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
 make -j$(get_cpu_count) || exit 1

@@ -92,6 +92,23 @@ get_toolchain() {
     esac
 }
 
+get_cmake_target_processor() {
+    case ${ARCH} in
+        arm-v7a | arm-v7a-neon)
+            echo "arm"
+        ;;
+        arm64-v8a)
+            echo "aarch64"
+        ;;
+        x86)
+            echo "x86"
+        ;;
+        x86-64)
+            echo "x86_64"
+        ;;
+    esac
+}
+
 get_target_build() {
     case ${ARCH} in
         arm-v7a)

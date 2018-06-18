@@ -60,7 +60,7 @@ cmake -Wno-dev \
     -DSNAPPY_BUILD_TESTS=0 \
     -DHAVE_LIBLZO2=0 \
     -DHAVE_LIBZ=1 \
-    -DCMAKE_SYSTEM_PROCESSOR=$(get_target_build) \
+    -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
 make -j$(get_cpu_count) || exit 1
