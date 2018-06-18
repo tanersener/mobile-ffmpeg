@@ -43,10 +43,8 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
-if [[ ${RECONF_libxml2} -eq 1 ]]; then
-    autoreconf_library ${LIB_NAME}
-fi
+# ALWAYS RECONFIGURED
+autoreconf_library ${LIB_NAME}
 
 ./configure \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
