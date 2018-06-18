@@ -31,22 +31,24 @@ LIBRARY_XVIDCORE=19
 LIBRARY_LIBILBC=20
 LIBRARY_OPUS=21
 LIBRARY_SNAPPY=22
-LIBRARY_GIFLIB=23
-LIBRARY_JPEG=24
-LIBRARY_LIBOGG=25
-LIBRARY_LIBPNG=26
-LIBRARY_LIBUUID=27
-LIBRARY_NETTLE=28
-LIBRARY_TIFF=29
-LIBRARY_EXPAT=30
-LIBRARY_ZLIB=31
-LIBRARY_MEDIA_CODEC=32
+LIBRARY_SOXR=23
+LIBRARY_LIBAOM=24
+LIBRARY_GIFLIB=25
+LIBRARY_JPEG=26
+LIBRARY_LIBOGG=27
+LIBRARY_LIBPNG=28
+LIBRARY_LIBUUID=29
+LIBRARY_NETTLE=30
+LIBRARY_TIFF=31
+LIBRARY_EXPAT=32
+LIBRARY_ZLIB=33
+LIBRARY_MEDIA_CODEC=34
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -102,6 +104,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  --enable-gnutls\t\tbuild with gnutls [no]"
     echo -e "  --enable-kvazaar\t\tbuild with kvazaar [no]"
     echo -e "  --enable-lame\t\t\tbuild with lame [no]"
+    echo -e "  --enable-libaom\t\tbuild with libaom [no]"
     echo -e "  --enable-libass\t\tbuild with libass [no]"
     echo -e "  --enable-libiconv\t\tbuild with libiconv [no]"
     echo -e "  --enable-libilbc\t\tbuild with libilbc [no]"
@@ -114,6 +117,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  --enable-opus\t\t\tbuild with opus [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
     echo -e "  --enable-snappy\t\tbuild with snappy [no]"
+    echo -e "  --enable-soxr\t\t\tbuild with soxr [no]"
     echo -e "  --enable-speex\t\tbuild with speex [no]"
     echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
@@ -197,6 +201,9 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_LAME]=$2
             set_library "libiconv" $2
         ;;
+        libaom)
+            ENABLED_LIBRARIES[LIBRARY_LIBAOM]=$2
+        ;;
         libass)
             ENABLED_LIBRARIES[LIBRARY_LIBASS]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
@@ -251,6 +258,9 @@ set_library() {
         snappy)
             ENABLED_LIBRARIES[LIBRARY_SNAPPY]=$2
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+        ;;
+        soxr)
+            ENABLED_LIBRARIES[LIBRARY_SOXR]=$2
         ;;
         speex)
             ENABLED_LIBRARIES[LIBRARY_SPEEX]=$2
@@ -343,7 +353,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {31..32}
+    for library in {33..34}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -355,7 +365,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..22}
+    for library in {0..24}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -497,7 +507,7 @@ do
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
         # CLEAR FLAGS
-        for library in {1..33}
+        for library in {1..35}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

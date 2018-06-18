@@ -33,18 +33,20 @@ get_library_name() {
         20) echo "libilbc" ;;
         21) echo "opus" ;;
         22) echo "snappy" ;;
-        23) echo "giflib" ;;
-        24) echo "jpeg" ;;
-        25) echo "libogg" ;;
-        26) echo "libpng" ;;
-        27) echo "libuuid" ;;
-        28) echo "nettle" ;;
-        29) echo "tiff" ;;
-        30) echo "expat" ;;
-        31) echo "ios-zlib" ;;
-        32) echo "ios-audiotoolbox" ;;
-        33) echo "ios-coreimage" ;;
-        34) echo "ios-bzip2" ;;
+        23) echo "soxr" ;;
+        24) echo "libaom" ;;
+        25) echo "giflib" ;;
+        26) echo "jpeg" ;;
+        27) echo "libogg" ;;
+        28) echo "libpng" ;;
+        29) echo "libuuid" ;;
+        30) echo "nettle" ;;
+        31) echo "tiff" ;;
+        32) echo "expat" ;;
+        33) echo "ios-zlib" ;;
+        34) echo "ios-audiotoolbox" ;;
+        35) echo "ios-coreimage" ;;
+        36) echo "ios-bzip2" ;;
     esac
 }
 
@@ -174,6 +176,9 @@ get_app_specific_cflags() {
         ;;
         ffmpeg | shine)
             APP_FLAGS="-Wno-unused-function"
+        ;;
+        soxr | snappy)
+            APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
         ;;
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"

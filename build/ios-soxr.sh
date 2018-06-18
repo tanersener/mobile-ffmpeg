@@ -56,7 +56,7 @@ cmake -Wno-dev \
     -DCMAKE_FIND_ROOT_PATH="${SDK_PATH}" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME}" \
-    -DCMAKE_SYSTEM_NAME=Generic \
+    -DCMAKE_SYSTEM_NAME=Darwin \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
     -DCMAKE_AR="$AR" \
