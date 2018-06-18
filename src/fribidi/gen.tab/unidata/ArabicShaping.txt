@@ -1,6 +1,6 @@
-# ArabicShaping-10.0.0.txt
-# Date: 2017-02-16, 00:00:00 GMT [RP, KW]
-# © 2017 Unicode®, Inc.
+# ArabicShaping-11.0.0.txt
+# Date: 2018-02-21, 14:50:00 GMT [KW, RP]
+# © 2018 Unicode®, Inc.
 # Unicode and the Unicode Logo are registered trademarks of Unicode, Inc. in the U.S. and other countries.
 # For terms of use, see http://www.unicode.org/terms_of_use.html
 #
@@ -8,22 +8,24 @@
 # Unicode Character Database.
 #
 # This file defines the Joining_Type and Joining_Group property
-# values for Arabic, Syriac, N'Ko, Mandaic, and Manichaean positional
+# values for Arabic, Syriac, N'Ko, Mandaic, Manichaean,
+# Hanifi Rohingya, and Sogdian positional
 # shaping, repeating in machine readable form the information
 # exemplified in Tables 9-3, 9-8, 9-9, 9-10, 9-14, 9-15, 9-16, 9-19,
-# 9-20, 10-4, 10-5, 10-6, 10-7, and 19-5 of The Unicode Standard core
+# 9-20, 10-4, 10-5, 10-6, 10-7, 14-10, 16-16, and 19-5 of The Unicode Standard core
 # specification. This file also defines Joining_Type values for
 # Mongolian, Phags-pa, Psalter Pahlavi, and Adlam positional shaping,
 # which are not listed in tables in the standard.
 #
-# See Sections 9.2, 9.3, 9.5, 10.5, 10.6, 13.4, 14.3, 19.4, and 19.9
+# See Sections 9.2, 9.3, 9.5, 10.5, 10.6, 13.4, 14.3, 14.10, 16.13, 19.4, and 19.9
 # of The Unicode Standard core specification for more information.
 #
 # Each line contains four fields, separated by a semicolon.
 #
 # Field 0: the code point, in 4-digit hexadecimal
 #   form, of an Arabic, Syriac, N'Ko, Mandaic, Mongolian,
-#   Phags-pa, Manichaean, Psalter Pahlavi, or other character.
+#   Phags-pa, Manichaean, Psalter Pahlavi, Hanifi Rohingya, Sogdian,
+#   or other character.
 #
 # Field 1: gives a short schematic name for that character.
 #   The schematic name is descriptive of the shape, based as
@@ -79,9 +81,13 @@
 # joining group values will be defined only if an explicit proposal
 # to define those values exactly has been approved by the UTC. This
 # is the convention exemplified by the N'Ko, Mandaic, Mongolian,
-# Phags-pa, and Psalter Pahlavi scripts. Only the Arabic,
-# Manichaean, and Syriac scripts currently have explicit joining
-# group values defined.
+# Phags-pa, Psalter Pahlavi, and Sogdian scripts.
+# Only the Arabic, Manichaean, and Syriac scripts currently have
+# explicit joining group values defined for all characters, including
+# those which have only a single character in a particular Joining_Group
+# class. Hanifi Rohingya has explicit Joining_Group values assigned only for
+# the few characters which share a particular Joining_Group class, but
+# assigns jg=No_Joining_Group to all the singletons.
 #
 # Note: Code points that are not explicitly listed in this file are
 # either of joining type T or U:
@@ -262,6 +268,7 @@
 
 # Syriac Characters
 
+070F; SYRIAC ABBREVIATION MARK; T; No_Joining_Group
 0710; ALAPH; R; ALAPH
 0712; BETH; D; BETH
 0713; GAMAL; D; GAMAL
@@ -554,6 +561,7 @@
 1875; MONGOLIAN MANCHU RA; D; No_Joining_Group
 1876; MONGOLIAN MANCHU FA; D; No_Joining_Group
 1877; MONGOLIAN MANCHU ZHA; D; No_Joining_Group
+1878; MONGOLIAN MANCHU CHA WITH 2 DOTS; D; No_Joining_Group
 1880; MONGOLIAN ALI GALI ANUSVARA ONE; U; No_Joining_Group
 1881; MONGOLIAN ALI GALI VISARGA ONE; U; No_Joining_Group
 1882; MONGOLIAN ALI GALI DAMARU; U; No_Joining_Group
@@ -734,6 +742,82 @@ A873; PHAGS-PA CANDRABINDU; U; No_Joining_Group
 10BAD; PSALTER PAHLAVI TEN; D; No_Joining_Group
 10BAE; PSALTER PAHLAVI TWENTY; D; No_Joining_Group
 10BAF; PSALTER PAHLAVI HUNDRED; U; No_Joining_Group
+
+# Hanifi Rohingya Characters
+
+10D00; HANIFI ROHINGYA A; L; No_Joining_Group
+10D01; HANIFI ROHINGYA BA; D; No_Joining_Group
+10D02; HANIFI ROHINGYA PA; D; HANIFI ROHINGYA PA
+10D03; HANIFI ROHINGYA TA; D; No_Joining_Group
+10D04; HANIFI ROHINGYA TTA; D; No_Joining_Group
+10D05; HANIFI ROHINGYA JA; D; No_Joining_Group
+10D06; HANIFI ROHINGYA CA; D; No_Joining_Group
+10D07; HANIFI ROHINGYA HA; D; No_Joining_Group
+10D08; HANIFI ROHINGYA KHA; D; No_Joining_Group
+10D09; HANIFI ROHINGYA PA WITH DOT ABOVE; D; HANIFI ROHINGYA PA
+10D0A; HANIFI ROHINGYA DA; D; No_Joining_Group
+10D0B; HANIFI ROHINGYA DDA; D; No_Joining_Group
+10D0C; HANIFI ROHINGYA RA; D; No_Joining_Group
+10D0D; HANIFI ROHINGYA RRA; D; No_Joining_Group
+10D0E; HANIFI ROHINGYA ZA; D; No_Joining_Group
+10D0F; HANIFI ROHINGYA SA; D; No_Joining_Group
+10D10; HANIFI ROHINGYA SHA; D; No_Joining_Group
+10D11; HANIFI ROHINGYA KA; D; No_Joining_Group
+10D12; HANIFI ROHINGYA GA; D; No_Joining_Group
+10D13; HANIFI ROHINGYA LA; D; No_Joining_Group
+10D14; HANIFI ROHINGYA MA; D; No_Joining_Group
+10D15; HANIFI ROHINGYA NA; D; No_Joining_Group
+10D16; HANIFI ROHINGYA WA; D; No_Joining_Group
+10D17; HANIFI ROHINGYA KINNA WA; D; No_Joining_Group
+10D18; HANIFI ROHINGYA YA; D; No_Joining_Group
+10D19; HANIFI ROHINGYA KINNA YA; D; HANIFI ROHINGYA KINNA YA
+10D1A; HANIFI ROHINGYA NGA; D; No_Joining_Group
+10D1B; HANIFI ROHINGYA NYA; D; No_Joining_Group
+10D1C; HANIFI ROHINGYA PA WITH 3 DOTS ABOVE; D; HANIFI ROHINGYA PA
+10D1D; HANIFI ROHINGYA VOWEL A; D; No_Joining_Group
+10D1E; HANIFI ROHINGYA DOTLESS KINNA YA WITH LEFT-FACING HOOK BELOW; D; HANIFI ROHINGYA KINNA YA
+10D1F; HANIFI ROHINGYA VOWEL U; D; No_Joining_Group
+10D20; HANIFI ROHINGYA DOTLESS KINNA YA WITH RIGHT-FACING HOOK BELOW; D; HANIFI ROHINGYA KINNA YA
+10D21; HANIFI ROHINGYA VOWEL O; D; No_Joining_Group
+10D22; HANIFI ROHINGYA SAKIN; R; No_Joining_Group
+10D23; HANIFI ROHINGYA DOTLESS KINNA YA WITH DOT ABOVE; D; HANIFI ROHINGYA KINNA YA
+
+# Sogdian Characters
+
+10F30; SOGDIAN ALEPH; D; No_Joining_Group
+10F31; SOGDIAN BETH; D; No_Joining_Group
+10F32; SOGDIAN GIMEL; D; No_Joining_Group
+10F33; SOGDIAN HE; R; No_Joining_Group
+10F34; SOGDIAN WAW; D; No_Joining_Group
+10F35; SOGDIAN ZAYIN; D; No_Joining_Group
+10F36; SOGDIAN HETH; D; No_Joining_Group
+10F37; SOGDIAN YODH; D; No_Joining_Group
+10F38; SOGDIAN KAPH; D; No_Joining_Group
+10F39; SOGDIAN LAMEDH; D; No_Joining_Group
+10F3A; SOGDIAN MEM; D; No_Joining_Group
+10F3B; SOGDIAN NUN; D; No_Joining_Group
+10F3C; SOGDIAN SAMEKH; D; No_Joining_Group
+10F3D; SOGDIAN AYIN; D; No_Joining_Group
+10F3E; SOGDIAN PE; D; No_Joining_Group
+10F3F; SOGDIAN SADHE; D; No_Joining_Group
+10F40; SOGDIAN RESH-AYIN; D; No_Joining_Group
+10F41; SOGDIAN SHIN; D; No_Joining_Group
+10F42; SOGDIAN TAW; D; No_Joining_Group
+10F43; SOGDIAN FETH; D; No_Joining_Group
+10F44; SOGDIAN LESH; D; No_Joining_Group
+10F45; SOGDIAN INDEPENDENT SHIN; U; No_Joining_Group
+10F51; SOGDIAN ONE; D; No_Joining_Group
+10F52; SOGDIAN TEN; D; No_Joining_Group
+10F53; SOGDIAN TWENTY; D; No_Joining_Group
+10F54; SOGDIAN ONE HUNDRED; R; No_Joining_Group
+
+# Kaithi Number Signs
+# These are prepended concatenation marks, comparable
+# to the number signs in the Arabic script.
+# Listed here for consistency in property values.
+
+110BD; KAITHI NUMBER SIGN; U; No_Joining_Group
+110CD; KAITHI NUMBER SIGN ABOVE; U; No_Joining_Group
 
 # Adlam Characters
 

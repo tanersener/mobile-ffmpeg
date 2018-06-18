@@ -1,0 +1,5 @@
+/.deps/
+/armopts.s
+*.o
+*.lo
+*.dirstamp

@@ -1,27 +1,27 @@
 #!/bin/bash
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo "IOS_MIN_VERSION not defined"
+    echo -e "(*) IOS_MIN_VERSION not defined\n"
     exit 1
 fi
 
 if [[ -z ${TARGET_SDK} ]]; then
-    echo "TARGET_SDK not defined"
+    echo -e "(*) TARGET_SDK not defined\n"
     exit 1
 fi
 
 if [[ -z ${SDK_PATH} ]]; then
-    echo "SDK_PATH not defined"
+    echo -e "(*) SDK_PATH not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
@@ -29,19 +29,19 @@ fi
 . ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="libwebp"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-CFLAGS=$(get_cflags "libwebp")
-CXXFLAGS=$(get_cxxflags "libwebp")
-LDFLAGS=$(get_ldflags "libwebp")
-PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+CFLAGS=$(get_cflags ${LIB_NAME})
+CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-cd ${BASEDIR}/src/libwebp || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 if [ -d "build" ]; then
-    rm -rf build;
+    rm -rf build
 fi
 
 mkdir build;
@@ -55,11 +55,12 @@ cmake -Wno-dev \
     -DCMAKE_SYSROOT="${SDK_PATH}" \
     -DCMAKE_FIND_ROOT_PATH="${SDK_PATH}" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_host)/libwebp" \
+    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME}" \
     -DCMAKE_SYSTEM_NAME=Generic \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
     -DCMAKE_AR="$AR" \
+    -DCMAKE_AS="$AS" \
     -DGIF_INCLUDE_DIR="${BASEDIR}/prebuilt/ios-$(get_target_host)/giflib/include" \
     -DGIF_LIBRARY="${BASEDIR}/prebuilt/ios-$(get_target_host)/giflib/lib" \
     -DJPEG_INCLUDE_DIR="${BASEDIR}/prebuilt/ios-$(get_target_host)/jpeg/include" \

@@ -46,6 +46,8 @@
 #define MB_TYPE_B_VLC_BITS 4
 #define STUDIO_INTRA_BITS 9
 
+static int decode_studio_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb);
+
 static VLC dc_lum, dc_chrom;
 static VLC sprite_trajectory;
 static VLC mb_type_b_vlc;
@@ -2049,6 +2051,23 @@ static int decode_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
     /* vol header */
     skip_bits(gb, 1);                   /* random access */
     s->vo_type = get_bits(gb, 8);
+
+    /* If we are in studio profile (per vo_type), check if its all consistent
+     * and if so continue pass control to decode_studio_vol_header().
+     * elIf something is inconsistent, error out
+     * else continue with (non studio) vol header decpoding.
+     */
+    if (s->vo_type == CORE_STUDIO_VO_TYPE ||
+        s->vo_type == SIMPLE_STUDIO_VO_TYPE) {
+        if (s->avctx->profile != FF_PROFILE_UNKNOWN && s->avctx->profile != FF_PROFILE_MPEG4_SIMPLE_STUDIO)
+            return AVERROR_INVALIDDATA;
+        s->studio_profile = 1;
+        s->avctx->profile = FF_PROFILE_MPEG4_SIMPLE_STUDIO;
+        return decode_studio_vol_header(ctx, gb);
+    } else if (s->studio_profile) {
+        return AVERROR_PATCHWELCOME;
+    }
+
     if (get_bits1(gb) != 0) {           /* is_ol_id */
         vo_ver_id = get_bits(gb, 4);    /* vo_ver_id */
         skip_bits(gb, 3);               /* vo_priority */
@@ -2931,9 +2950,6 @@ static int decode_studio_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
     if (get_bits_left(gb) <= 32)
         return 0;
 
-    if (get_bits_long(gb, 32) != VOP_STARTCODE)
-        return AVERROR_INVALIDDATA;
-
     s->decode_mb = mpeg4_decode_studio_mb;
 
     decode_smpte_tc(ctx, gb);
@@ -2982,26 +2998,30 @@ static int decode_studio_vop_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 
 static int decode_studiovisualobject(Mpeg4DecContext *ctx, GetBitContext *gb)
 {
-    uint32_t startcode;
     MpegEncContext *s = &ctx->m;
-    int visual_object_type, width, height;
+    int visual_object_type;
 
-    startcode = get_bits_long(gb, 32);
-
-    /* StudioVisualObject() */
-    if (startcode == VISUAL_OBJ_STARTCODE) {
         skip_bits(gb, 4); /* visual_object_verid */
         visual_object_type = get_bits(gb, 4);
+        if (visual_object_type != VOT_VIDEO_ID) {
+            avpriv_request_sample(s->avctx, "VO type %u", visual_object_type);
+            return AVERROR_PATCHWELCOME;
+        }
 
         next_start_code_studio(gb);
         extension_and_user_data(s, gb, 1);
 
-        if (visual_object_type == VOT_VIDEO_ID) {
-            /* StudioVideoObjectLayer */
-            skip_bits_long(gb, 32); /* video_object_start_code */
-            skip_bits_long(gb, 32); /* video_object_layer_start_code */
-            skip_bits1(gb); /* random_accessible_vol */
-            skip_bits(gb, 8); /* video_object_type_indication */
+    return 0;
+}
+
+static int decode_studio_vol_header(Mpeg4DecContext *ctx, GetBitContext *gb)
+{
+    MpegEncContext *s = &ctx->m;
+    int width, height;
+    int bits_per_raw_sample;
+
+            // random_accessible_vol and video_object_type_indication have already
+            // been read by the caller decode_vol_header()
             skip_bits(gb, 4); /* video_object_layer_verid */
             ctx->shape = get_bits(gb, 2); /* video_object_layer_shape */
             skip_bits(gb, 4); /* video_object_layer_shape_extension */
@@ -3014,8 +3034,8 @@ static int decode_studiovisualobject(Mpeg4DecContext *ctx, GetBitContext *gb)
                     return AVERROR_INVALIDDATA;
                 }
 
-                s->avctx->bits_per_raw_sample = get_bits(gb, 4); /* bit_depth */
-                if (s->avctx->bits_per_raw_sample == 10) {
+                bits_per_raw_sample = get_bits(gb, 4); /* bit_depth */
+                if (bits_per_raw_sample == 10) {
                     if (ctx->rgb) {
                         s->avctx->pix_fmt = AV_PIX_FMT_GBRP10;
                     }
@@ -3024,9 +3044,10 @@ static int decode_studiovisualobject(Mpeg4DecContext *ctx, GetBitContext *gb)
                     }
                 }
                 else {
-                    avpriv_request_sample(s->avctx, "MPEG-4 Studio profile bit-depth %u", s->avctx->bits_per_raw_sample);
+                    avpriv_request_sample(s->avctx, "MPEG-4 Studio profile bit-depth %u", bits_per_raw_sample);
                     return AVERROR_PATCHWELCOME;
                 }
+                s->avctx->bits_per_raw_sample = bits_per_raw_sample;
             }
             if (ctx->shape == RECT_SHAPE) {
                 check_marker(s->avctx, gb, "before video_object_layer_width");
@@ -3068,8 +3089,6 @@ static int decode_studiovisualobject(Mpeg4DecContext *ctx, GetBitContext *gb)
 
             next_start_code_studio(gb);
             extension_and_user_data(s, gb, 2);
-        }
-    }
 
     return 0;
 }
@@ -3089,6 +3108,12 @@ int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb)
 
     /* search next start code */
     align_get_bits(gb);
+
+    // If we have not switched to studio profile than we also did not switch bps
+    // that means something else (like a previous instance) outside set bps which
+    // would be inconsistant with the currect state, thus reset it
+    if (!s->studio_profile && s->avctx->bits_per_raw_sample != 8)
+        s->avctx->bits_per_raw_sample = 0;
 
     if (s->codec_tag == AV_RL32("WV1F") && show_bits(gb, 24) == 0x575630) {
         skip_bits(gb, 24);
@@ -3192,13 +3217,13 @@ int ff_mpeg4_decode_picture_header(Mpeg4DecContext *ctx, GetBitContext *gb)
                 s->studio_profile = 1;
                 next_start_code_studio(gb);
                 extension_and_user_data(s, gb, 0);
-
-                if ((ret = decode_studiovisualobject(ctx, gb)) < 0)
-                    return ret;
-                break;
             }
         } else if (startcode == VISUAL_OBJ_STARTCODE) {
-            mpeg4_decode_visual_object(s, gb);
+            if (s->studio_profile) {
+                if ((ret = decode_studiovisualobject(ctx, gb)) < 0)
+                    return ret;
+            } else
+                mpeg4_decode_visual_object(s, gb);
         } else if (startcode == VOP_STARTCODE) {
             break;
         }
@@ -3212,9 +3237,13 @@ end:
         s->low_delay = 1;
     s->avctx->has_b_frames = !s->low_delay;
 
-    if (s->studio_profile)
+    if (s->studio_profile) {
+        if (!s->avctx->bits_per_raw_sample) {
+            av_log(s->avctx, AV_LOG_ERROR, "Missing VOL header\n");
+            return AVERROR_INVALIDDATA;
+        }
         return decode_studio_vop_header(ctx, gb);
-    else
+    } else
         return decode_vop_header(ctx, gb);
 }
 

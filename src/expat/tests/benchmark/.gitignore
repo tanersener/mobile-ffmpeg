@@ -1,0 +1,5 @@
+/.deps/
+/.libs/
+*.o
+/Makefile
+/benchmark

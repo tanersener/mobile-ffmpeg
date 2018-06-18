@@ -1,0 +1,10 @@
+/.libs/
+/Makefile
+/config.h
+/config.status
+/libopus.la
+/libtool
+/opus-uninstalled.pc
+/opus.pc
+/stamp-h1
+/autom4te.cache/

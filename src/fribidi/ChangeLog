@@ -1,3 +1,52 @@
+commit fed6f9af1b8ffeef1538348f75aa06f8e1cb03ea
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Jun 6 12:46:30 2018 +0100
+
+    Bumped version to 1.0.4.
+
+ configure.ac | 2 +-
+ meson.build  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit d19206b72287c029a32f1c3ba0fbf29f3ccba718
+Merge: a465eef c8f3e3c
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Wed Jun 6 11:31:43 2018 +0300
+
+    Merge pull request #82 from khaledhosny/unicode-11
+
+    Update to Unicode 11
+
+commit a465eef7af30217e339eb50947d3256a95cef78e
+Author: Tim-Philipp Müller <tim@centricular.com>
+Date:   Sat Jun 2 11:00:57 2018 +0100
+
+    meson: docs: don't require c2man for tarball with pre-generated
+    man pages
+
+    Fixes #79
+
+ doc/meson.build | 51 ++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 30 insertions(+), 21 deletions(-)
+
+commit c8f3e3cac8b1f0f6af4eadf887ea1156adf9d80e
+Author: Khaled Hosny <khaledhosny@eglug.org>
+Date:   Wed Jun 6 03:44:22 2018 +0200
+
+    Update to Unicode 11
+
+    Fixes https://github.com/fribidi/fribidi/issues/81
+
+ gen.tab/unidata/ArabicShaping.txt              | 104 +++-
+ gen.tab/unidata/BidiBrackets.txt               |   6 +-
+ gen.tab/unidata/BidiMirroring.txt              | 141 +++--
+ gen.tab/unidata/ReadMe.txt                     |   9 +-
+ gen.tab/unidata/UnicodeData.txt                | 778
+ +++++++++++++++++++++++--
+ test/unicode-conformance/BidiCharacterTest.txt |   6 +-
+ test/unicode-conformance/BidiTest.txt          |  11 +-
+ 7 files changed, 917 insertions(+), 138 deletions(-)
+
 commit b254a4c06e449dcaf4e3356f7904f4e6cd19910c
 Author: Dov Grobgeld <dov.grobgeld@gmail.com>
 Date:   Wed May 16 20:46:45 2018 +0300

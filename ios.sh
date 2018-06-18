@@ -26,22 +26,33 @@ LIBRARY_SHINE=14
 LIBRARY_SPEEX=15
 LIBRARY_WAVPACK=16
 LIBRARY_KVAZAAR=17
-LIBRARY_GIFLIB=18
-LIBRARY_JPEG=19
-LIBRARY_LIBOGG=20
-LIBRARY_LIBPNG=21
-LIBRARY_LIBUUID=22
-LIBRARY_NETTLE=23
-LIBRARY_TIFF=24
-LIBRARY_ZLIB=25
+LIBRARY_X264=18
+LIBRARY_XVIDCORE=19
+LIBRARY_LIBILBC=20
+LIBRARY_OPUS=21
+LIBRARY_SNAPPY=22
+LIBRARY_GIFLIB=23
+LIBRARY_JPEG=24
+LIBRARY_LIBOGG=25
+LIBRARY_LIBPNG=26
+LIBRARY_LIBUUID=27
+LIBRARY_NETTLE=28
+LIBRARY_TIFF=29
+LIBRARY_EXPAT=30
+LIBRARY_ZLIB=31
+LIBRARY_AUDIOTOOLBOX=32
+LIBRARY_COREIMAGE=33
+LIBRARY_BZIP2=34
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
+
+export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 # MIN VERSION IOS7
 export IOS_MIN_VERSION=7.0
@@ -57,6 +68,7 @@ display_help() {
 
     echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built \
 without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. \
+Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
 When compilation ends a universal fat binary and an IOS framework is created with enabled architectures inside.\n"
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
@@ -68,37 +80,56 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
     echo -e "  -V, --version\t\t\tdisplay version information and exit\n"
 
+    echo -e "Licensing options:"
+
+    echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, resulting libs will be licensed under GPLv3.0 [no]\n"
+
     echo -e "Platforms:"
 
-    echo -e "  --disable-armv7\t\tdo not build armv7 platform"
-    echo -e "  --disable-armv7s\t\tdo not build armv7s platform"
-    echo -e "  --disable-arm64\t\tdo not build arm64 platform"
-    echo -e "  --disable-i386\t\tdo not build i386 platform"
-    echo -e "  --disable-x86-64\t\tdo not build x86-64 platform\n"
+    echo -e "  --disable-armv7\t\tdo not build armv7 platform [yes]"
+    echo -e "  --disable-armv7s\t\tdo not build armv7s platform [yes]"
+    echo -e "  --disable-arm64\t\tdo not build arm64 platform [yes]"
+    echo -e "  --disable-i386\t\tdo not build i386 platform [yes]"
+    echo -e "  --disable-x86-64\t\tdo not build x86-64 platform [yes]\n"
 
     echo -e "Libraries:"
 
-    echo -e "  --full\t\t\tenables all external libraries"
-    echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib"
-    echo -e "  --enable-fontconfig\t\tbuild with fontconfig"
-    echo -e "  --enable-freetype\t\tbuild with freetype"
-    echo -e "  --enable-fribidi\t\tbuild with fribidi"
-    echo -e "  --enable-gnutls\t\tbuild with gnutls"
-    echo -e "  --enable-gmp\t\t\tbuild with gmp"
-    echo -e "  --enable-kvazaar\t\tbuild with kvazaar"
-    echo -e "  --enable-lame\t\t\tbuild with lame"
-    echo -e "  --enable-libass\t\tbuild with libass"
-    echo -e "  --enable-libiconv\t\tbuild with libiconv"
-    echo -e "  --enable-libtheora\t\tbuild with libtheora"
-    echo -e "  --enable-libvorbis\t\tbuild with libvorbis"
-    echo -e "  --enable-libvpx\t\tbuild with libvpx"
-    echo -e "  --enable-libwebp\t\tbuild with libwebp"
-    echo -e "  --enable-libxml2\t\tbuild with libxml2"
-    echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr"
-    echo -e "  --enable-shine\t\tbuild with shine"
-    echo -e "  --enable-speex\t\tbuild with speex"
-    echo -e "  --enable-wavpack\t\tbuild with wavpack"
-    echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY\n"
+    echo -e "  --full\t\t\tenables all non-GPL external libraries"
+    echo -e "  --enable-ios-audiotoolbox\tbuild with built-in Apple AudioToolbox [no]"
+    echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage [no]"
+    echo -e "  --enable-ios-bzip2\t\tbuild with built-in bzip2 [no]"
+    echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib [no]"
+    echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
+    echo -e "  --enable-freetype\t\tbuild with freetype [no]"
+    echo -e "  --enable-fribidi\t\tbuild with fribidi [no]"
+    echo -e "  --enable-gmp\t\t\tbuild with gmp [no]"
+    echo -e "  --enable-gnutls\t\tbuild with gnutls [no]"
+    echo -e "  --enable-kvazaar\t\tbuild with kvazaar [no]"
+    echo -e "  --enable-lame\t\t\tbuild with lame [no]"
+    echo -e "  --enable-libass\t\tbuild with libass [no]"
+    echo -e "  --enable-libiconv\t\tbuild with libiconv [no]"
+    echo -e "  --enable-libilbc\t\tbuild with libilbc [no]"
+    echo -e "  --enable-libtheora\t\tbuild with libtheora [no]"
+    echo -e "  --enable-libvorbis\t\tbuild with libvorbis [no]"
+    echo -e "  --enable-libvpx\t\tbuild with libvpx [no]"
+    echo -e "  --enable-libwebp\t\tbuild with libwebp [no]"
+    echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
+    echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
+    echo -e "  --enable-opus\t\t\tbuild with opus [no]"
+    echo -e "  --enable-shine\t\tbuild with shine [no]"
+    echo -e "  --enable-snappy\t\tbuild with snappy [no]"
+    echo -e "  --enable-speex\t\tbuild with speex [no]"
+    echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
+
+    echo -e "GPL libraries:"
+
+    echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
+    echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
+
+    echo -e "Advanced options:"
+
+    echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
+    echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even it is detected as already built [no]\n"
 }
 
 display_version() {
@@ -120,6 +151,12 @@ reconf_library() {
     export ${RECONF_VARIABLE}=1
 }
 
+rebuild_library() {
+    REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
+
+    export ${REBUILD_VARIABLE}=1
+}
+
 enable_library() {
     set_library $1 1
 }
@@ -129,10 +166,20 @@ set_library() {
         ios-zlib)
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
         ;;
+        ios-audiotoolbox)
+            ENABLED_LIBRARIES[LIBRARY_AUDIOTOOLBOX]=$2
+        ;;
+        ios-coreimage)
+            ENABLED_LIBRARIES[LIBRARY_COREIMAGE]=$2
+        ;;
+        ios-bzip2)
+            ENABLED_LIBRARIES[LIBRARY_BZIP2]=$2
+        ;;
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
-            set_library "libxml2" $2
+            ENABLED_LIBRARIES[LIBRARY_EXPAT]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
             set_library "freetype" $2
         ;;
         freetype)
@@ -162,15 +209,18 @@ set_library() {
         ;;
         libass)
             ENABLED_LIBRARIES[LIBRARY_LIBASS]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
+            ENABLED_LIBRARIES[LIBRARY_EXPAT]=$2
             set_library "freetype" $2
             set_library "fribidi" $2
             set_library "fontconfig" $2
             set_library "libiconv" $2
-            ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
-            set_library "libxml2" $2
         ;;
         libiconv)
             ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+        ;;
+        libilbc)
+            ENABLED_LIBRARIES[LIBRARY_LIBILBC]=$2
         ;;
         libpng)
             ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
@@ -202,8 +252,15 @@ set_library() {
         opencore-amr)
             ENABLED_LIBRARIES[LIBRARY_OPENCOREAMR]=$2
         ;;
+        opus)
+            ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
+        ;;
         shine)
             ENABLED_LIBRARIES[LIBRARY_SHINE]=$2
+        ;;
+        snappy)
+            ENABLED_LIBRARIES[LIBRARY_SNAPPY]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
         ;;
         speex)
             ENABLED_LIBRARIES[LIBRARY_SPEEX]=$2
@@ -211,7 +268,14 @@ set_library() {
         wavpack)
             ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
         ;;
-        giflib | jpeg | libogg | libpng | libuuid | nettle | tiff)
+        x264)
+            ENABLED_LIBRARIES[LIBRARY_X264]=$2
+        ;;
+        xvidcore)
+            ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
+        ;;
+        giflib | jpeg | libogg | libpng | libuuid | nettle | tiff | expat)
+            # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         *)
             print_unknown_library $1
@@ -289,7 +353,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {25..26}
+    for library in {31..34}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -301,7 +365,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..17}
+    for library in {0..22}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -357,6 +421,8 @@ EOF
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/ios-common.sh
 
+GPL_ENABLED="no"
+
 while [ ! $# -eq 0 ]
 do
 
@@ -374,11 +440,21 @@ do
 
             reconf_library ${CONF_LIBRARY}
 	    ;;
+        --rebuild-*)
+            BUILD_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
+
+            rebuild_library ${BUILD_LIBRARY}
+	    ;;
 	    --full)
-            for library in {0..25}
+            for library in {0..34}
             do
-                enable_library $(get_library_name $library)
+                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]]; then
+                    enable_library $(get_library_name $library)
+                fi
             done
+	    ;;
+        --enable-gpl)
+            GPL_ENABLED="yes"
 	    ;;
         --enable-*)
             ENABLED_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
@@ -398,9 +474,38 @@ do
 done;
 
 echo -e "Building mobile-ffmpeg for IOS\n"
+echo -e -n "INFO: Building mobile-ffmpeg for IOS: " >>${BASEDIR}/build.log
+echo -e `date` >>${BASEDIR}/build.log
 
 print_enabled_architectures
 print_enabled_libraries
+
+# CHECKING GPL LIBRARIES
+for gpl_library in {18..19}
+do
+    if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
+        library_name=$(get_library_name ${gpl_library})
+
+        if  [ ${GPL_ENABLED} != "yes" ]; then
+            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n"
+            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" >> ${BASEDIR}/build.log
+            exit 1
+        else
+            DOWNLOAD_RESULT=$(download_gpl_library_source ${library_name})
+            if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+                echo -e "\n(*) Failed to download GPL library ${library_name} source. Please check build.log file for details. If the problem persists refer to offline building instructions.\n"
+                echo -e "\n(*) Failed to download GPL library ${library_name} source.\n" >> ${BASEDIR}/build.log
+                exit 1
+            fi
+        fi
+    fi
+done
+
+# CHECKING IF XCODE IS INSTALLED
+if ! [ -x "$(command -v xcrun)" ]; then
+    echo -e "\n(*) xcrun command not found. Please check your Xcode installation.\n"
+    exit 1
+fi
 
 TARGET_ARCH_LIST=()
 
@@ -417,7 +522,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..26}
+        for library in {1..35}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
@@ -492,7 +597,17 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     cp -r ${MOBILE_FFMPEG_UNIVERSAL}/include/* ${FRAMEWORK_PATH}/Headers
     cp ${FFMPEG_UNIVERSAL}/include/config.h ${FRAMEWORK_PATH}/Headers
     cp ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.dylib ${FRAMEWORK_PATH}/mobileffmpeg
-    cp ${BASEDIR}/LICENSE ${FRAMEWORK_PATH}
+
+    # COPYING THE LICENSE
+    if  [ ${GPL_ENABLED} == "yes" ]; then
+
+        # GPLv3.0
+        cp ${BASEDIR}/LICENSE.GPLv3 ${FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
+    else
+
+        # LGPLv3.0
+        cp ${BASEDIR}/LICENSE.LGPLv3 ${FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
+    fi
 
     build_info_plist "${FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
 
@@ -517,7 +632,17 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
         cp -r ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/* ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers
         cp ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.dylib ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}
-        cp ${BASEDIR}/LICENSE ${FFMPEG_LIB_FRAMEWORK_PATH}
+
+        # COPYING THE LICENSE
+        if  [ ${GPL_ENABLED} == "yes" ]; then
+
+            # GPLv3.0
+            cp ${BASEDIR}/LICENSE.GPLv3 ${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
+        else
+
+            # LGPLv3.0
+            cp ${BASEDIR}/LICENSE.LGPLv3 ${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
+        fi
 
         build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.mobileffmpeg.FFmpeg${FFMPEG_LIB}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
 

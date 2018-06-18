@@ -1,22 +1,22 @@
 #!/bin/bash
 
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
+    echo -e "(*) ANDROID_NDK_ROOT not defined\n"
     exit 1
 fi
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${API} ]]; then
-    echo "API not defined"
+    echo -e "(*) API not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
@@ -24,16 +24,17 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="libxml2"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-export CFLAGS=$(get_cflags "libxml2")
-export CXXFLAGS=$(get_cxxflags "libxml2")
-export LDFLAGS=$(get_ldflags "libxml2")
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+export CFLAGS=$(get_cflags ${LIB_NAME})
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS=$(get_ldflags ${LIB_NAME})
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
-cd ${BASEDIR}/src/libxml2 || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
@@ -43,15 +44,17 @@ make distclean 2>/dev/null 1>/dev/null
 # #error "LONG_BIT definition appears wrong for platform (bad gcc/glibc config?)."
 #
 
-# RECONFIGURE ALWAYS
-autoreconf --force --install || exit 1
+# RECONFIGURING IF REQUESTED
+if [[ ${RECONF_libxml2} -eq 1 ]]; then
+    autoreconf_library ${LIB_NAME}
+fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libxml2 \
+    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
     --with-zlib \
-    --with-iconv=${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv \
+    --with-iconv=${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv/lib \
     --with-sax1 \
     --without-python \
     --without-debug \
