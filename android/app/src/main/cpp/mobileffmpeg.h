@@ -28,7 +28,7 @@
 #include "log.h"
 
 /** Library version string */
-#define MOBILE_FFMPEG_VERSION "1.0"
+#define MOBILE_FFMPEG_VERSION "1.1"
 
 /*
  * Class:     com_arthenica_mobileffmpeg_FFmpeg

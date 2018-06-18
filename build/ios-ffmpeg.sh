@@ -1,33 +1,32 @@
 #!/bin/bash
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo "IOS_MIN_VERSION not defined"
+    echo -e "(*) IOS_MIN_VERSION not defined\n"
     exit 1
 fi
 
 if [[ -z ${TARGET_SDK} ]]; then
-    echo "TARGET_SDK not defined"
+    echo -e "(*) TARGET_SDK not defined\n"
     exit 1
 fi
 
 if [[ -z ${SDK_PATH} ]]; then
-    echo "SDK_PATH not defined"
+    echo -e "(*) SDK_PATH not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
-HOST_PKG_CONFIG_PATH=`type pkg-config 2>/dev/null | sed 's/.*is //g'`
-if [[ -z ${HOST_PKG_CONFIG_PATH} ]]; then
-    echo "pkg-config not found"
+if ! [ -x "$(command -v pkg-config)" ]; then
+    echo -e "(*) pkg-config command not found\n"
     exit 1
 fi
 
@@ -35,13 +34,14 @@ fi
 . ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="ffmpeg"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
 FFMPEG_CFLAGS=""
 FFMPEG_LDFLAGS=""
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
 TARGET_ARCH=""
@@ -76,143 +76,199 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..26}
+for library in {1..35}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
 
         echo -e "INFO: Enabling library ${ENABLED_LIBRARY}" >> ${BASEDIR}/build.log
 
-        case $ENABLED_LIBRARY in
+        case ${ENABLED_LIBRARY} in
             fontconfig)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags fontconfig)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static fontconfig)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags fontconfig)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static fontconfig)"
                 CONFIGURE_POSTFIX+=" --enable-libfontconfig"
             ;;
             freetype)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags freetype2)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static freetype2)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags freetype2)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static freetype2)"
                 CONFIGURE_POSTFIX+=" --enable-libfreetype"
             ;;
             fribidi)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags fribidi)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static fribidi)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags fribidi)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static fribidi)"
                 CONFIGURE_POSTFIX+=" --enable-libfribidi"
             ;;
             gmp)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags gmp)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static gmp)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags gmp)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static gmp)"
                 CONFIGURE_POSTFIX+=" --enable-gmp"
             ;;
             gnutls)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags gnutls)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static gnutls)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags gnutls)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static gnutls)"
                 CONFIGURE_POSTFIX+=" --enable-gnutls"
             ;;
             kvazaar)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags kvazaar)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static kvazaar)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags kvazaar)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static kvazaar)"
                 CONFIGURE_POSTFIX+=" --enable-libkvazaar"
             ;;
             lame)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libmp3lame)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libmp3lame)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags libmp3lame)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libmp3lame)"
                 CONFIGURE_POSTFIX+=" --enable-libmp3lame"
             ;;
             libass)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libass)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libass)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags libass)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libass)"
                 CONFIGURE_POSTFIX+=" --enable-libass"
             ;;
             libiconv)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libiconv)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libiconv)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags libiconv)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libiconv)"
                 CONFIGURE_POSTFIX+=" --enable-iconv"
             ;;
+            libilbc)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags libilbc)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libilbc)"
+                CONFIGURE_POSTFIX+=" --enable-libilbc"
+            ;;
             libtheora)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags theora)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static theora)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags theora)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static theora)"
                 CONFIGURE_POSTFIX+=" --enable-libtheora"
             ;;
             libvorbis)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags vorbis)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static vorbis)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags vorbis)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static vorbis)"
                 CONFIGURE_POSTFIX+=" --enable-libvorbis"
             ;;
             libvpx)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags vpx)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs vpx)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags vpx)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs vpx)"
                 CONFIGURE_POSTFIX+=" --enable-libvpx"
             ;;
             libwebp)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libwebp)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libwebp)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags libwebp)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libwebp)"
                 CONFIGURE_POSTFIX+=" --enable-libwebp"
             ;;
             libxml2)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libxml-2.0)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libxml-2.0)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags libxml-2.0)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libxml-2.0)"
                 CONFIGURE_POSTFIX+=" --enable-libxml2"
             ;;
             opencore-amr)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrnb)"
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrwb)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrnb)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrwb)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags opencore-amrnb)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags opencore-amrwb)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opencore-amrnb)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opencore-amrwb)"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
+            opus)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags opus)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opus)"
+                CONFIGURE_POSTFIX+=" --enable-libopus"
+            ;;
             shine)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags shine)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static shine)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags shine)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static shine)"
                 CONFIGURE_POSTFIX+=" --enable-libshine"
             ;;
+            snappy)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags snappy)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static snappy)"
+                CONFIGURE_POSTFIX+=" --enable-libsnappy"
+            ;;
             speex)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags speex)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static speex)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags speex)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static speex)"
                 CONFIGURE_POSTFIX+=" --enable-libspeex"
             ;;
             wavpack)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags wavpack)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static wavpack)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags wavpack)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static wavpack)"
                 CONFIGURE_POSTFIX+=" --enable-libwavpack"
             ;;
+            x264)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags x264)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static x264)"
+                CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
+            ;;
+            xvidcore)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags xvidcore)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static xvidcore)"
+                CONFIGURE_POSTFIX+=" --enable-libxvid --enable-gpl"
+            ;;
+            expat)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags expat)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static expat)"
+            ;;
             libogg)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags ogg)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static ogg)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags ogg)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static ogg)"
             ;;
             libpng)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libpng)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libpng)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags libpng)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libpng)"
             ;;
             libuuid)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags uuid)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static uuid)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags uuid)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static uuid)"
             ;;
             nettle)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags nettle)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static nettle)"
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags hogweed)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static hogweed)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags nettle)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static nettle)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags hogweed)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static hogweed)"
             ;;
-            ios-zlib)
-                FFMPEG_CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags zlib)"
-                FFMPEG_LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static zlib)"
-                CONFIGURE_POSTFIX+=" --enable-zlib"
+            ios-*)
+
+                # BUILT-IN LIBRARIES SHARE INCLUDE AND LIB DIRECTORIES
+                # INCLUDING ONLY ONE OF THEM IS ENOUGH
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags zlib)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static zlib)"
+
+                case ${ENABLED_LIBRARY} in
+                    ios-zlib)
+                        CONFIGURE_POSTFIX+=" --enable-zlib"
+                    ;;
+                    ios-audiotoolbox)
+                        CONFIGURE_POSTFIX+=" --enable-audiotoolbox"
+                    ;;
+                    ios-coreimage)
+                        CONFIGURE_POSTFIX+=" --enable-coreimage"
+                    ;;
+                    ios-bzip2)
+                        CONFIGURE_POSTFIX+=" --enable-bzlib"
+                    ;;
+                esac
             ;;
         esac
     else
-        if [[ ${library} -eq 26 ]]; then
+
+        # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
+        if [[ ${library} -eq 8 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-iconv"
+        elif [[ ${library} -eq 32 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
+        elif [[ ${library} -eq 33 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
+        elif [[ ${library} -eq 34 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-coreimage"
+        elif [[ ${library} -eq 35 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-bzlib"
         fi
     fi
 done
 
 # CFLAGS PARTS
 ARCH_CFLAGS=$(get_arch_specific_cflags);
-APP_CFLAGS=$(get_app_specific_cflags "ffmpeg");
+APP_CFLAGS=$(get_app_specific_cflags ${LIB_NAME});
 COMMON_CFLAGS=$(get_common_cflags);
-OPTIMIZATION_CFLAGS=$(get_size_optimization_cflags "ffmpeg");
+OPTIMIZATION_CFLAGS=$(get_size_optimization_cflags ${LIB_NAME});
 MIN_VERSION_CFLAGS=$(get_min_version_cflags);
 COMMON_INCLUDES=$(get_common_includes);
 
@@ -223,19 +279,18 @@ COMMON_LDFLAGS=$(get_common_ldflags);
 
 # REORDERED FLAGS
 CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS} ${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
-CXXFLAGS=$(get_cxxflags "ffmpeg")
+CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS="${ARCH_LDFLAGS} ${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS}"
 
-cd ${BASEDIR}/src/ffmpeg || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-echo -n -e "\nffmpeg: "
+echo -n -e "\n${LIB_NAME}: "
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --sysroot=${SDK_PATH} \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg \
-    --pkg-config="${HOST_PKG_CONFIG_PATH}" \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --extra-ldflags="${LDFLAGS}" \
@@ -261,18 +316,36 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
-    --disable-ffmpeg \
-    --disable-ffplay \
-    --disable-ffprobe \
-    --disable-ffserver \
-    --disable-videotoolbox \
+    --disable-programs \
+    --disable-postproc \
     --disable-doc \
     --disable-htmlpages \
     --disable-manpages \
     --disable-podpages \
     --disable-txtpages \
     --disable-static \
+    --disable-jack \
+    --disable-sndio \
+    --disable-schannel \
+    --disable-sdl2 \
+    --disable-securetransport \
     --disable-xlib \
+    --disable-cuda \
+    --disable-cuvid \
+    --disable-nvenc \
+    --disable-vaapi \
+    --disable-vda \
+    --disable-vdpau \
+    --disable-videotoolbox \
+    --disable-appkit \
+    --disable-alsa \
+    --disable-cuda \
+    --disable-cuvid \
+    --disable-nvenc \
+    --disable-vaapi \
+    --disable-vda \
+    --disable-vdpau \
+    --disable-videotoolbox \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
 if [ $? -ne 0 ]; then

@@ -1,22 +1,22 @@
 #!/bin/bash
 
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
+    echo -e "(*) ANDROID_NDK_ROOT not defined\n"
     exit 1
 fi
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${API} ]]; then
-    echo "API not defined"
+    echo -e "(*) API not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
@@ -27,18 +27,16 @@ echo -e "\nBuilding ${ARCH} platform on API level ${API}\n"
 echo -e "\nINFO: Starting new build for ${ARCH} on API level ${API} at "$(date)"\n">> ${BASEDIR}/build.log
 INSTALL_BASE="${BASEDIR}/prebuilt/android-$(get_target_build)"
 
-# CLEANING EXISTING PACKAGE CONFIG DIRECTORY
+# CREATING PACKAGE CONFIG DIRECTORY
 PKG_CONFIG_DIRECTORY="${INSTALL_BASE}/pkgconfig"
-if [ -d ${PKG_CONFIG_DIRECTORY} ]; then
-    cd ${PKG_CONFIG_DIRECTORY} || exit 1
-    rm -f *.pc || exit 1
-else
+if [ ! -d ${PKG_CONFIG_DIRECTORY} ]; then
     mkdir -p ${PKG_CONFIG_DIRECTORY} || exit 1
 fi
 
-# BUILDING EXTERNAL LIBRARIES
+# FILTERING WHICH EXTERNAL LIBRARIES WILL BE BUILT
+# NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..25}
+for library in {1..31}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -48,6 +46,9 @@ do
     fi
 done
 
+# BUILD CPU-FEATURES FIRST
+build_cpufeatures
+
 let completed=0
 while [ ${#enabled_library_list[@]} -gt $completed ]; do
     for library in "${enabled_library_list[@]}"
@@ -55,7 +56,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
         let run=0
         case $library in
             fontconfig)
-                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_libxml2 ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]]; then
+                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]]; then
                     run=1
                 fi
             ;;
@@ -75,7 +76,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 fi
             ;;
             libass)
-                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_libxml2 ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]]; then
+                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]]; then
                     run=1
                 fi
             ;;
@@ -104,39 +105,55 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
             ;;
         esac
 
-        CONTROL=$(echo "OK_${library}" | sed "s/\-/\_/g")
+        BUILD_COMPLETED_FLAG=$(echo "OK_${library}" | sed "s/\-/\_/g")
+        REBUILD_FLAG=$(echo "REBUILD_${library}" | sed "s/\-/\_/g")
 
-        if [ $run -eq 1 ] && [[ -z ${!CONTROL} ]]; then
+        if [ $run -eq 1 ] && [[ -z ${!BUILD_COMPLETED_FLAG} ]]; then
             ENABLED_LIBRARY_PATH="${INSTALL_BASE}/${library}"
 
-            echo -e "\nINFO: Building $library with the following environment variables\n" >> ${BASEDIR}/build.log
-            echo -e "----------------------------------------------------------------" >> ${BASEDIR}/build.log
-            env >> ${BASEDIR}/build.log
-            echo -e "----------------------------------------------------------------\n" >> ${BASEDIR}/build.log
+            LIBRARY_IS_INSTALLED=$(library_is_installed ${INSTALL_BASE} ${library})
 
-            echo -n "${library}: "
+            echo -e "INFO: Flags detected for ${library}: already installed=${LIBRARY_IS_INSTALLED}, rebuild=${!REBUILD_FLAG}\n" >> ${BASEDIR}/build.log
 
-            if [ -d ${ENABLED_LIBRARY_PATH} ]; then
-                rm -rf ${INSTALL_BASE}/${library} || exit 1
-            fi
+            # DECIDE TO BUILD OR NOT
+            if [[ ${LIBRARY_IS_INSTALLED} -ne 0 ]] || [[ ${!REBUILD_FLAG} -eq 1 ]]; then
 
-            SCRIPT_PATH="${BASEDIR}/build/android-${library}.sh"
+                echo -e "----------------------------------------------------------------" >> ${BASEDIR}/build.log
+                echo -e "\nINFO: Building $library with the following environment variables\n" >> ${BASEDIR}/build.log
+                env >> ${BASEDIR}/build.log
+                echo -e "----------------------------------------------------------------\n" >> ${BASEDIR}/build.log
+                echo -e "INFO: System information\n" >> ${BASEDIR}/build.log
+                uname -a >> ${BASEDIR}/build.log
+                echo -e "----------------------------------------------------------------\n" >> ${BASEDIR}/build.log
 
-            cd ${BASEDIR}
+                echo -n "${library}: "
 
-            # BUILD EACH LIBRARY ALONE FIRST
-            ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+                if [ -d ${ENABLED_LIBRARY_PATH} ]; then
+                    rm -rf ${INSTALL_BASE}/${library} || exit 1
+                fi
 
-            if [ $? -eq 0 ]; then
-                (( completed+=1 ))
-                declare "$CONTROL=1"
-                echo "ok"
+                SCRIPT_PATH="${BASEDIR}/build/android-${library}.sh"
+
+                cd ${BASEDIR}
+
+                # BUILD EACH LIBRARY ALONE FIRST
+                ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+
+                if [ $? -eq 0 ]; then
+                    (( completed+=1 ))
+                    declare "$BUILD_COMPLETED_FLAG=1"
+                    echo "ok"
+                else
+                    echo "failed"
+                    exit 1
+                fi
             else
-                echo "failed"
-                exit 1
+                (( completed+=1 ))
+                declare "$BUILD_COMPLETED_FLAG=1"
+                echo "${library}: already built"
             fi
         else
-            echo -e "\nINFO: Skipping $library, run=$run, completed=${!CONTROL}\n" >> ${BASEDIR}/build.log
+            echo -e "INFO: Skipping $library, run=$run, completed=${!BUILD_COMPLETED_FLAG}\n" >> ${BASEDIR}/build.log
         fi
     done
 done

@@ -26,23 +26,31 @@ LIBRARY_SHINE=14
 LIBRARY_SPEEX=15
 LIBRARY_WAVPACK=16
 LIBRARY_KVAZAAR=17
-LIBRARY_GIFLIB=18
-LIBRARY_JPEG=19
-LIBRARY_LIBOGG=20
-LIBRARY_LIBPNG=21
-LIBRARY_LIBUUID=22
-LIBRARY_NETTLE=23
-LIBRARY_TIFF=24
-LIBRARY_ZLIB=25
-LIBRARY_MEDIA_CODEC=26
+LIBRARY_X264=18
+LIBRARY_XVIDCORE=19
+LIBRARY_LIBILBC=20
+LIBRARY_OPUS=21
+LIBRARY_SNAPPY=22
+LIBRARY_GIFLIB=23
+LIBRARY_JPEG=24
+LIBRARY_LIBOGG=25
+LIBRARY_LIBPNG=26
+LIBRARY_LIBUUID=27
+LIBRARY_NETTLE=28
+LIBRARY_TIFF=29
+LIBRARY_EXPAT=30
+LIBRARY_ZLIB=31
+LIBRARY_MEDIA_CODEC=32
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
+
+export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 # USING API LEVEL 21 / Android 5.0 (LOLLIPOP)
 export API=21
@@ -58,6 +66,7 @@ display_help() {
 
     echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for Android platform. By default five Android ABIs (armeabi-v7a, armeabi-v7a-neon, arm64-v8a, x86 and x86_64) are built \
 without any external libraries enabled. Options can be used to disable ABIs and/or enable external libraries. \
+Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
 When compilation ends an Android Archive (AAR) file is created with enabled platforms inside.\n"
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"   
@@ -69,38 +78,54 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
     echo -e "  -V, --version\t\t\tdisplay version information and exit\n"
 
+    echo -e "Licensing options:"
+
+    echo -e "  --enable-gpl\t\t\tallow use of GPL libraries, resulting libs will be licensed under GPLv3.0 [no]\n"
+
     echo -e "Platforms:"
 
-    echo -e "  --disable-arm-v7a\t\tdo not build arm-v7a platform"
-    echo -e "  --disable-arm-v7a-neon\tdo not build arm-v7a-neon platform"
-    echo -e "  --disable-arm64-v8a\t\tdo not build arm64-v8a platform"
-    echo -e "  --disable-x86\t\t\tdo not build x86 platform"
-    echo -e "  --disable-x86-64\t\tdo not build x86-64 platform\n"
+    echo -e "  --disable-arm-v7a\t\tdo not build arm-v7a platform [yes]"
+    echo -e "  --disable-arm-v7a-neon\tdo not build arm-v7a-neon platform [yes]"
+    echo -e "  --disable-arm64-v8a\t\tdo not build arm64-v8a platform [yes]"
+    echo -e "  --disable-x86\t\t\tdo not build x86 platform [yes]"
+    echo -e "  --disable-x86-64\t\tdo not build x86-64 platform [yes]\n"
 
     echo -e "Libraries:"
 
     echo -e "  --full\t\t\tenables all external libraries"
-    echo -e "  --enable-android-media-codec\tbuild with built-in media codec"
-    echo -e "  --enable-android-zlib\t\tbuild with built-in zlib"
-    echo -e "  --enable-fontconfig\t\tbuild with fontconfig"
-    echo -e "  --enable-freetype\t\tbuild with freetype"
-    echo -e "  --enable-fribidi\t\tbuild with fribidi"
-    echo -e "  --enable-gnutls\t\tbuild with gnutls"
-    echo -e "  --enable-gmp\t\t\tbuild with gmp"
-    echo -e "  --enable-kvazaar\t\tbuild with kvazaar"
-    echo -e "  --enable-lame\t\t\tbuild with lame"
-    echo -e "  --enable-libass\t\tbuild with libass"
-    echo -e "  --enable-libiconv\t\tbuild with libiconv"
-    echo -e "  --enable-libtheora\t\tbuild with libtheora"
-    echo -e "  --enable-libvorbis\t\tbuild with libvorbis"
-    echo -e "  --enable-libvpx\t\tbuild with libvpx"
-    echo -e "  --enable-libwebp\t\tbuild with libwebp"
-    echo -e "  --enable-libxml2\t\tbuild with libxml2"
-    echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr"
-    echo -e "  --enable-shine\t\tbuild with shine"
-    echo -e "  --enable-speex\t\tbuild with speex"
-    echo -e "  --enable-wavpack\t\tbuild with wavpack"
-    echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY\n"
+    echo -e "  --enable-android-media-codec\tbuild with built-in Android MediaCodec [no]"
+    echo -e "  --enable-android-zlib\t\tbuild with built-in zlib [no]"
+    echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
+    echo -e "  --enable-freetype\t\tbuild with freetype [no]"
+    echo -e "  --enable-fribidi\t\tbuild with fribidi [no]"
+    echo -e "  --enable-gmp\t\t\tbuild with gmp [no]"
+    echo -e "  --enable-gnutls\t\tbuild with gnutls [no]"
+    echo -e "  --enable-kvazaar\t\tbuild with kvazaar [no]"
+    echo -e "  --enable-lame\t\t\tbuild with lame [no]"
+    echo -e "  --enable-libass\t\tbuild with libass [no]"
+    echo -e "  --enable-libiconv\t\tbuild with libiconv [no]"
+    echo -e "  --enable-libilbc\t\tbuild with libilbc [no]"
+    echo -e "  --enable-libtheora\t\tbuild with libtheora [no]"
+    echo -e "  --enable-libvorbis\t\tbuild with libvorbis [no]"
+    echo -e "  --enable-libvpx\t\tbuild with libvpx [no]"
+    echo -e "  --enable-libwebp\t\tbuild with libwebp [no]"
+    echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
+    echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
+    echo -e "  --enable-opus\t\t\tbuild with opus [no]"
+    echo -e "  --enable-shine\t\tbuild with shine [no]"
+    echo -e "  --enable-snappy\t\tbuild with snappy [no]"
+    echo -e "  --enable-speex\t\tbuild with speex [no]"
+    echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
+
+    echo -e "GPL libraries:"
+
+    echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
+    echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
+
+    echo -e "Advanced options:"
+
+    echo -e "  --reconf-LIBRARY\t\trun autoreconf before building LIBRARY [no]"
+    echo -e "  --rebuild-LIBRARY\t\tbuild LIBRARY even it is detected as already built [no]\n"
 }
 
 display_version() {
@@ -122,6 +147,12 @@ reconf_library() {
     export ${RECONF_VARIABLE}=1
 }
 
+rebuild_library() {
+    REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
+
+    export ${REBUILD_VARIABLE}=1
+}
+
 enable_library() {
     set_library $1 1
 }
@@ -137,12 +168,14 @@ set_library() {
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
-            set_library "libxml2" $2
+            ENABLED_LIBRARIES[LIBRARY_EXPAT]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
             set_library "freetype" $2
         ;;
         freetype)
             ENABLED_LIBRARIES[LIBRARY_FREETYPE]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+            set_library "libpng" $2
         ;;
         fribidi)
             ENABLED_LIBRARIES[LIBRARY_FRIBIDI]=$2
@@ -153,6 +186,7 @@ set_library() {
         gnutls)
             ENABLED_LIBRARIES[LIBRARY_GNUTLS]=$2
             ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
             set_library "gmp" $2
             set_library "libiconv" $2
         ;;
@@ -165,15 +199,22 @@ set_library() {
         ;;
         libass)
             ENABLED_LIBRARIES[LIBRARY_LIBASS]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
+            ENABLED_LIBRARIES[LIBRARY_EXPAT]=$2
             set_library "freetype" $2
             set_library "fribidi" $2
             set_library "fontconfig" $2
             set_library "libiconv" $2
-            ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
-            set_library "libxml2" $2
         ;;
         libiconv)
             ENABLED_LIBRARIES[LIBRARY_LIBICONV]=$2
+        ;;
+        libilbc)
+            ENABLED_LIBRARIES[LIBRARY_LIBILBC]=$2
+        ;;
+        libpng)
+            ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
         ;;
         libtheora)
             ENABLED_LIBRARIES[LIBRARY_LIBTHEORA]=$2
@@ -191,8 +232,8 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_LIBWEBP]=$2
             ENABLED_LIBRARIES[LIBRARY_GIFLIB]=$2
             ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
-            ENABLED_LIBRARIES[LIBRARY_LIBPNG]=$2
             ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+            set_library "libpng" $2
         ;;
         libxml2)
             ENABLED_LIBRARIES[LIBRARY_LIBXML2]=$2
@@ -201,8 +242,15 @@ set_library() {
         opencore-amr)
             ENABLED_LIBRARIES[LIBRARY_OPENCOREAMR]=$2
         ;;
+        opus)
+            ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
+        ;;
         shine)
             ENABLED_LIBRARIES[LIBRARY_SHINE]=$2
+        ;;
+        snappy)
+            ENABLED_LIBRARIES[LIBRARY_SNAPPY]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
         ;;
         speex)
             ENABLED_LIBRARIES[LIBRARY_SPEEX]=$2
@@ -210,7 +258,14 @@ set_library() {
         wavpack)
             ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
         ;;
-        giflib | jpeg | libogg | libpng | libuuid | nettle | tiff)
+        x264)
+            ENABLED_LIBRARIES[LIBRARY_X264]=$2
+        ;;
+        xvidcore)
+            ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
+        ;;
+        giflib | jpeg | libogg | libpng | libuuid | nettle | tiff | expat)
+            # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         *)
             print_unknown_library $1
@@ -288,7 +343,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {25..26}
+    for library in {31..32}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -300,7 +355,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..17}
+    for library in {0..22}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -338,6 +393,8 @@ EOF
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
+GPL_ENABLED="no"
+
 while [ ! $# -eq 0 ]
 do
 
@@ -355,11 +412,21 @@ do
 
             reconf_library ${CONF_LIBRARY}
 	    ;;
+        --rebuild-*)
+            BUILD_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
+
+            rebuild_library ${BUILD_LIBRARY}
+	    ;;
 	    --full)
-            for library in {0..26}
+            for library in {0..32}
             do
-                enable_library $(get_library_name $library)
+                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]]; then
+                    enable_library $(get_library_name $library)
+                fi
             done
+	    ;;
+        --enable-gpl)
+            GPL_ENABLED="yes"
 	    ;;
         --enable-*)
             ENABLED_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
@@ -384,6 +451,8 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
 fi
 
 echo -e "Building mobile-ffmpeg for Android\n"
+echo -e -n "INFO: Building mobile-ffmpeg for Android: " >>${BASEDIR}/build.log
+echo -e `date` >>${BASEDIR}/build.log
 
 if [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
     ENABLED_ARCHITECTURES[0]=1
@@ -394,6 +463,27 @@ fi
 
 print_enabled_architectures
 print_enabled_libraries
+
+# CHECKING GPL LIBRARIES
+for gpl_library in {18..19}
+do
+    if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
+        library_name=$(get_library_name ${gpl_library})
+
+        if  [ ${GPL_ENABLED} != "yes" ]; then
+            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n"
+            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" >> ${BASEDIR}/build.log
+            exit 1
+        else
+            DOWNLOAD_RESULT=$(download_gpl_library_source ${library_name})
+            if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+                echo -e "\n(*) Failed to download GPL library ${library_name} source. Please check build.log file for details. If the problem persists refer to offline building instructions.\n"
+                echo -e "\n(*) Failed to download GPL library ${library_name} source.\n" >> ${BASEDIR}/build.log
+                exit 1
+            fi
+        fi
+    fi
+done
 
 for run_arch in {0..4}
 do
@@ -407,7 +497,7 @@ do
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
         # CLEAR FLAGS
-        for library in {1..27}
+        for library in {1..33}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
@@ -469,7 +559,7 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
         exit 1
     fi
 
-    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-1.0.aar ${MOBILE_FFMPEG_AAR} || exit 1
+    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-1.1.aar ${MOBILE_FFMPEG_AAR} || exit 1
 
     echo -e "Created mobile-ffmpeg Android archive successfully.\n" >> ${BASEDIR}/build.log
 

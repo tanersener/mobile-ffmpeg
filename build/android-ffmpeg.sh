@@ -1,28 +1,28 @@
 #!/bin/bash
 
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
-    echo "ANDROID_NDK_ROOT not defined"
+    echo -e "(*) ANDROID_NDK_ROOT not defined\n"
     exit 1
 fi
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${API} ]]; then
-    echo "API not defined"
+    echo -e "(*) API not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
-HOST_PKG_CONFIG_PATH=`type pkg-config 2>/dev/null | sed 's/.*is //g'`
-if [[ -z ${HOST_PKG_CONFIG_PATH} ]]; then
-    echo "pkg-config not found"
+HOST_PKG_CONFIG_PATH=`command -v pkg-config`
+if [ -z ${HOST_PKG_CONFIG_PATH} ]; then
+    echo -e "(*) pkg-config command not found\n"
     exit 1
 fi
 
@@ -30,14 +30,15 @@ fi
 . ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="ffmpeg"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
-CFLAGS=$(get_cflags "ffmpeg")
-CXXFLAGS=$(get_cxxflags "ffmpeg")
-LDFLAGS=$(get_ldflags "ffmpeg")
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+CFLAGS=$(get_cflags ${LIB_NAME})
+CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+LDFLAGS=$(get_ldflags ${LIB_NAME})
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
 TARGET_ARCH=""
@@ -74,7 +75,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..27}
+for library in {1..33}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -83,120 +84,149 @@ do
 
         case $ENABLED_LIBRARY in
             fontconfig)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags fontconfig)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static fontconfig)"
+                CFLAGS+=" $(pkg-config --cflags fontconfig)"
+                LDFLAGS+=" $(pkg-config --libs --static fontconfig)"
                 CONFIGURE_POSTFIX+=" --enable-libfontconfig"
             ;;
             freetype)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags freetype2)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static freetype2)"
+                CFLAGS+=" $(pkg-config --cflags freetype2)"
+                LDFLAGS+=" $(pkg-config --libs --static freetype2)"
                 CONFIGURE_POSTFIX+=" --enable-libfreetype"
             ;;
             fribidi)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags fribidi)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static fribidi)"
+                CFLAGS+=" $(pkg-config --cflags fribidi)"
+                LDFLAGS+=" $(pkg-config --libs --static fribidi)"
                 CONFIGURE_POSTFIX+=" --enable-libfribidi"
             ;;
             gmp)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags gmp)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static gmp)"
+                CFLAGS+=" $(pkg-config --cflags gmp)"
+                LDFLAGS+=" $(pkg-config --libs --static gmp)"
                 CONFIGURE_POSTFIX+=" --enable-gmp"
             ;;
             gnutls)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags gnutls)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static gnutls)"
+                CFLAGS+=" $(pkg-config --cflags gnutls)"
+                LDFLAGS+=" $(pkg-config --libs --static gnutls)"
                 CONFIGURE_POSTFIX+=" --enable-gnutls"
             ;;
             kvazaar)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags kvazaar)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static kvazaar)"
+                CFLAGS+=" $(pkg-config --cflags kvazaar)"
+                LDFLAGS+=" $(pkg-config --libs --static kvazaar)"
                 CONFIGURE_POSTFIX+=" --enable-libkvazaar"
             ;;
             lame)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libmp3lame)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libmp3lame)"
+                CFLAGS+=" $(pkg-config --cflags libmp3lame)"
+                LDFLAGS+=" $(pkg-config --libs --static libmp3lame)"
                 CONFIGURE_POSTFIX+=" --enable-libmp3lame"
             ;;
             libass)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libass)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libass)"
+                CFLAGS+=" $(pkg-config --cflags libass)"
+                LDFLAGS+=" $(pkg-config --libs --static libass)"
                 CONFIGURE_POSTFIX+=" --enable-libass"
             ;;
             libiconv)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libiconv)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libiconv)"
+                CFLAGS+=" $(pkg-config --cflags libiconv)"
+                LDFLAGS+=" $(pkg-config --libs --static libiconv)"
                 CONFIGURE_POSTFIX+=" --enable-iconv"
             ;;
+            libilbc)
+                CFLAGS+=" $(pkg-config --cflags libilbc)"
+                LDFLAGS+=" $(pkg-config --libs --static libilbc)"
+                CONFIGURE_POSTFIX+=" --enable-libilbc"
+            ;;
             libtheora)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags theora)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static theora)"
+                CFLAGS+=" $(pkg-config --cflags theora)"
+                LDFLAGS+=" $(pkg-config --libs --static theora)"
                 CONFIGURE_POSTFIX+=" --enable-libtheora"
             ;;
             libvorbis)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags vorbis)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static vorbis)"
+                CFLAGS+=" $(pkg-config --cflags vorbis)"
+                LDFLAGS+=" $(pkg-config --libs --static vorbis)"
                 CONFIGURE_POSTFIX+=" --enable-libvorbis"
             ;;
             libvpx)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags vpx)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs vpx)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static cpufeatures)"
+                CFLAGS+=" $(pkg-config --cflags vpx)"
+                LDFLAGS+=" $(pkg-config --libs vpx)"
+                LDFLAGS+=" $(pkg-config --libs --static cpufeatures)"
                 CONFIGURE_POSTFIX+=" --enable-libvpx"
             ;;
             libwebp)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libwebp)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libwebp)"
+                CFLAGS+=" $(pkg-config --cflags libwebp)"
+                LDFLAGS+=" $(pkg-config --libs --static libwebp)"
                 CONFIGURE_POSTFIX+=" --enable-libwebp"
             ;;
             libxml2)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libxml-2.0)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libxml-2.0)"
+                CFLAGS+=" $(pkg-config --cflags libxml-2.0)"
+                LDFLAGS+=" $(pkg-config --libs --static libxml-2.0)"
                 CONFIGURE_POSTFIX+=" --enable-libxml2"
             ;;
             opencore-amr)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrnb)"
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags opencore-amrwb)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrnb)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static opencore-amrwb)"
+                CFLAGS+=" $(pkg-config --cflags opencore-amrnb)"
+                CFLAGS+=" $(pkg-config --cflags opencore-amrwb)"
+                LDFLAGS+=" $(pkg-config --libs --static opencore-amrnb)"
+                LDFLAGS+=" $(pkg-config --libs --static opencore-amrwb)"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
+            opus)
+                CFLAGS+=" $(pkg-config --cflags opus)"
+                LDFLAGS+=" $(pkg-config --libs --static opus)"
+                CONFIGURE_POSTFIX+=" --enable-libopus"
+            ;;
             shine)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags shine)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static shine)"
+                CFLAGS+=" $(pkg-config --cflags shine)"
+                LDFLAGS+=" $(pkg-config --libs --static shine)"
                 CONFIGURE_POSTFIX+=" --enable-libshine"
             ;;
+            snappy)
+                CFLAGS+=" $(pkg-config --cflags snappy)"
+                LDFLAGS+=" $(pkg-config --libs --static snappy)"
+                CONFIGURE_POSTFIX+=" --enable-libsnappy"
+            ;;
             speex)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags speex)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static speex)"
+                CFLAGS+=" $(pkg-config --cflags speex)"
+                LDFLAGS+=" $(pkg-config --libs --static speex)"
                 CONFIGURE_POSTFIX+=" --enable-libspeex"
             ;;
             wavpack)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags wavpack)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static wavpack)"
+                CFLAGS+=" $(pkg-config --cflags wavpack)"
+                LDFLAGS+=" $(pkg-config --libs --static wavpack)"
                 CONFIGURE_POSTFIX+=" --enable-libwavpack"
             ;;
+            x264)
+                CFLAGS+=" $(pkg-config --cflags x264)"
+                LDFLAGS+=" $(pkg-config --libs --static x264)"
+                CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
+            ;;
+            xvidcore)
+                CFLAGS+=" $(pkg-config --cflags xvidcore)"
+                LDFLAGS+=" $(pkg-config --libs --static xvidcore)"
+                CONFIGURE_POSTFIX+=" --enable-libxvid --enable-gpl"
+            ;;
+            expat)
+                CFLAGS+=" $(pkg-config --cflags expat)"
+                LDFLAGS+=" $(pkg-config --libs --static expat)"
+            ;;
             libogg)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags ogg)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static ogg)"
+                CFLAGS+=" $(pkg-config --cflags ogg)"
+                LDFLAGS+=" $(pkg-config --libs --static ogg)"
             ;;
             libpng)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags libpng)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static libpng)"
+                CFLAGS+=" $(pkg-config --cflags libpng)"
+                LDFLAGS+=" $(pkg-config --libs --static libpng)"
             ;;
             libuuid)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags uuid)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static uuid)"
+                CFLAGS+=" $(pkg-config --cflags uuid)"
+                LDFLAGS+=" $(pkg-config --libs --static uuid)"
             ;;
             nettle)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags nettle)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static nettle)"
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags hogweed)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static hogweed)"
+                CFLAGS+=" $(pkg-config --cflags nettle)"
+                LDFLAGS+=" $(pkg-config --libs --static nettle)"
+                CFLAGS+=" $(pkg-config --cflags hogweed)"
+                LDFLAGS+=" $(pkg-config --libs --static hogweed)"
             ;;
             android-zlib)
-                CFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --cflags zlib)"
-                LDFLAGS+=" $(${HOST_PKG_CONFIG_PATH} --libs --static zlib)"
+                CFLAGS+=" $(pkg-config --cflags zlib)"
+                LDFLAGS+=" $(pkg-config --libs --static zlib)"
                 CONFIGURE_POSTFIX+=" --enable-zlib"
             ;;
             android-media-codec)
@@ -204,7 +234,9 @@ do
             ;;
         esac
     else
-        if [[ ${library} -eq 26 ]]; then
+
+        # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
+        if [[ ${library} -eq 32 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
@@ -212,16 +244,16 @@ done
 
 LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
-cd ${BASEDIR}/src/ffmpeg || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-echo -n -e "\nffmpeg: "
+echo -n -e "\n${LIB_NAME}: "
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --cross-prefix="${TARGET_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
-    --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg" \
+    --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
@@ -241,18 +273,36 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
-    --disable-ffmpeg \
-    --disable-ffplay \
-    --disable-ffprobe \
-    --disable-ffserver \
-    --disable-videotoolbox \
+    --disable-programs \
+    --disable-postproc \
     --disable-doc \
     --disable-htmlpages \
     --disable-manpages \
     --disable-podpages \
     --disable-txtpages \
     --disable-static \
+    --disable-jack \
+    --disable-sndio \
+    --disable-schannel \
+    --disable-sdl2 \
+    --disable-securetransport \
     --disable-xlib \
+    --disable-cuda \
+    --disable-cuvid \
+    --disable-nvenc \
+    --disable-vaapi \
+    --disable-vda \
+    --disable-vdpau \
+    --disable-videotoolbox \
+    --disable-appkit \
+    --disable-alsa \
+    --disable-cuda \
+    --disable-cuvid \
+    --disable-nvenc \
+    --disable-vaapi \
+    --disable-vda \
+    --disable-vdpau \
+    --disable-videotoolbox \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
 
 if [ $? -ne 0 ]; then

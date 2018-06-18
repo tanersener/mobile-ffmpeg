@@ -1,27 +1,27 @@
 #!/bin/bash
 
 if [[ -z ${ARCH} ]]; then
-    echo "ARCH not defined"
+    echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
 if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo "IOS_MIN_VERSION not defined"
+    echo -e "(*) IOS_MIN_VERSION not defined\n"
     exit 1
 fi
 
 if [[ -z ${TARGET_SDK} ]]; then
-    echo "TARGET_SDK not defined"
+    echo -e "(*) TARGET_SDK not defined\n"
     exit 1
 fi
 
 if [[ -z ${SDK_PATH} ]]; then
-    echo "SDK_PATH not defined"
+    echo -e "(*) SDK_PATH not defined\n"
     exit 1
 fi
 
 if [[ -z ${BASEDIR} ]]; then
-    echo "BASEDIR not defined"
+    echo -e "(*) BASEDIR not defined\n"
     exit 1
 fi
 
@@ -29,46 +29,49 @@ fi
 . ${BASEDIR}/build/ios-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
-set_toolchain_clang_paths
+LIB_NAME="libvpx"
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
-export CFLAGS=$(get_cflags "libvpx")
-export CXXFLAGS=$(get_cxxflags "libvpx")
-export LDFLAGS=$(get_ldflags "libvpx")
-export PKG_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}"
+export CFLAGS=$(get_cflags ${LIB_NAME})
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS=$(get_ldflags ${LIB_NAME})
+
+# note that --disable-runtime-cpu-detect is used for arm
+# using --enable-runtime-cpu-detect cause the following error
+# vpx_ports/arm_cpudetect.c:151:2: error: "--enable-runtime-cpu-detect selected, but no CPU detection method " "available for your platform. Reconfigure with --disable-runtime-cpu-detect."
 
 TARGET=""
-NEON=""
+ASM_FLAGS=""
 case ${ARCH} in
     armv7 | armv7s)
-        NEON="--enable-neon --enable-neon-asm"
         TARGET="$(get_target_arch)-darwin-gcc"
+        ASM_FLAGS="--disable-runtime-cpu-detect --enable-neon --enable-neon-asm"
     ;;
     arm64)
-        NEON="--enable-neon"
         TARGET="arm64-darwin-gcc"
+
+        # --enable-neon-asm option not added because it causes the following error
+        # vpx_dsp/arm/intrapred_neon_asm.asm.S:653:26: error: vector register expected
+        #    vst1.64
+        ASM_FLAGS="--disable-runtime-cpu-detect --enable-neon"
     ;;
     i386)
-        NEON="--disable-neon --disable-neon-asm"
         TARGET="x86-iphonesimulator-gcc"
+        ASM_FLAGS="--enable-runtime-cpu-detect"
     ;;
     x86-64)
-        NEON="--disable-neon --disable-neon-asm"
         TARGET="x86_64-iphonesimulator-gcc"
+        ASM_FLAGS="--enable-runtime-cpu-detect"
     ;;
 esac
 
-cd ${BASEDIR}/src/libvpx || exit 1
+cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
-if [[ ${RECONF_libvpx} -eq 1 ]]; then
-    autoreconf --force --install
-fi
-
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvpx \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --target="${TARGET}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
@@ -79,8 +82,7 @@ fi
     --enable-pic \
     --enable-optimizations \
     --enable-better-hw-compatibility \
-    --disable-runtime-cpu-detect \
-    ${NEON} \
+    ${ASM_FLAGS} \
     --enable-vp8 \
     --enable-vp9 \
     --enable-multithread \

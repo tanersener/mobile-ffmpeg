@@ -1,12 +1,13 @@
 # MobileFFmpeg
-Source code and scripts to build FFmpeg for Android and IOS platform
+Source code and scripts to build FFmpeg for Android and IOS platform; prebuilt libraries for both platforms
 
 ### 1. Features
 - Builds both Android and IOS
-- Supports 18 external libraries and 10 architectures in total
+- Supports 21 external libraries, 2 GPL libraries and 10 architectures in total
 - Exposes FFmpeg capabilities both directly from FFmpeg libraries and through MobileFFmpeg wrapper library
 - Creates shared libraries (.so for Android, .dylib for IOS)
-- Licensed under LGPL 3.0
+- Includes cross-compile instructions for 32 open-source libraries including FFmpeg
+- Licensed under LGPL 3.0, can be customized to support GPL v3.0
 #### 1.1 Android
 - Creates Android archive with .aar extension
 #### 1.2 IOS
@@ -28,31 +29,37 @@ Source code and scripts to build FFmpeg for Android and IOS platform
 - x86_64
 
 ### 3. FFmpeg Support
-This repository branch contains FFmpeg version 3.4.2 with support for the following external libraries.
+This repository branch contains FFmpeg version 3.4.2 with support for the following external libraries. 
+Cross-compile instructions for all of them can be found under scripts inside `build` folder.
 - fontconfig
 - freetype
 - fribidi
 - gmp
 - gnutls
 - kvazaar
-- libiconv
 - lame
 - libass
+- libiconv
+- libilbc
 - libtheora
 - libvorbis
 - libvpx
 - libwebp
 - libxml2
 - opencore-amr
+- opus
 - shine
+- snappy
 - speex
 - wavpack
+- x264
+- xvidcore
 
 External libraries and their dependencies are explained in the [External Libraries](https://github.com/tanersener/mobile-ffmpeg/wiki/External-Libraries) page.
 
 ### 4. Using
 #### 4.1 Android
-Import `mobile-ffmpeg-1.0.aar` into your project and use the following source code.
+Import `mobile-ffmpeg-1.1.aar` into your project and use the following source code.
 ```
     import com.arthenica.mobileffmpeg.FFmpeg;
 
@@ -90,7 +97,7 @@ There is an Android test application under the `android/test-app` folder and an 
 #### 5.1 Prerequisites
 1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
 ```
-autoconf automake libtool pkg-config gcc cmake gperf yasm texinfo
+autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm
 ```
 Some of these packages are not mandatory for the default build.
 Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Prerequisites) and
@@ -105,7 +112,7 @@ Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg
 - **IOS SDK 7.0.x** or later
 - **Xcode 8.x** or later
 - **Command Line Tools**
-- **curl** and **lipo** utilities
+- **lipo** utility
 
 #### 5.2 Build Scripts
 Use `android.sh` and `ios.sh` to build MobileFFmpeg for each platform.
@@ -123,20 +130,18 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 ```
 ./ios.sh
 ```
+#### 5.3 GPL Support
+From `v1.1` onwards it is possible to enable to GPL libraries `x264` and `xvidcore` from top level build scripts.
+Their source code is not included in the repository and downloaded when enabled.
 
-### 6. API
+### 6. Documentation
 
-Below you can find documentation for all APIs exposed.
-
-[Android API](https://tanersener.github.io/mobile-ffmpeg/android/javadoc)
-
-[Android Native API](https://tanersener.github.io/mobile-ffmpeg/ios/html) 
-
-[IOS API](https://tanersener.github.io/mobile-ffmpeg/android/doc/html)
+A more detailed documentation is available at [Wiki](https://github.com/tanersener/mobile-ffmpeg/wiki).
 
 ### 7. License
 
-This project is licensed under the LGPL v3.0.
+This project is licensed under the LGPL v3.0. However, if source code is built using optional `--enable-gpl` flag or 
+prebuilt binaries with `-gpl` postfix are used then MobileFFmpeg is subject to the GPL v3.0 license.
 
 Source code of FFmpeg and external libraries is included in compliance with their individual licenses.
 
@@ -150,5 +155,6 @@ This project is stable but far from complete. If you have any recommendations or
 
 ### 9. See Also
 
+- [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/3.4/index.html)
 - [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)
