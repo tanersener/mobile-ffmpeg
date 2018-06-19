@@ -98,12 +98,18 @@ get_sdk_path() {
 }
 
 get_min_version_cflags() {
+    local min_version=${IOS_MIN_VERSION}
+
+    if [ "$1" == "gnutls" ]; then
+        min_version=${GNUTLS_IOS_MIN_VERSION}
+    fi
+
     case ${ARCH} in
         armv7 | armv7s | arm64)
-            echo "-miphoneos-version-min=${IOS_MIN_VERSION}"
+            echo "-miphoneos-version-min=${min_version}"
         ;;
         i386 | x86-64)
-            echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
+            echo "-mios-simulator-version-min=${min_version}"
         ;;
     esac
 }
@@ -132,7 +138,7 @@ get_arch_specific_cflags() {
             echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-arch arm64 -target $(get_target_host) -march=armv8a -mcpu=generic"
+            echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic"
         ;;
         i386)
             echo "-arch i386 -target $(get_target_host) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32"
@@ -199,7 +205,7 @@ get_cflags() {
     APP_FLAGS=$(get_app_specific_cflags $1)
     COMMON_FLAGS=$(get_common_cflags)
     OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
-    MIN_VERSION_FLAGS=$(get_min_version_cflags)
+    MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
     COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${MIN_VERSION_FLAGS} ${COMMON_INCLUDES}"
@@ -210,14 +216,14 @@ get_asmflags() {
     APP_FLAGS=$(get_app_specific_cflags $1)
     COMMON_FLAGS=$(get_common_cflags)
     OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
-    MIN_VERSION_FLAGS=$(get_min_version_cflags)
+    MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
     COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${MIN_VERSION_FLAGS} ${COMMON_INCLUDES}"
 }
 
 get_cxxflags() {
-    local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags $1) $(get_min_version_cflags)"
+    local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags $1) $(get_min_version_cflags $1)"
 
     case $1 in
         gnutls)
@@ -252,7 +258,7 @@ get_arch_specific_ldflags() {
             echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-arch arm64 -march=armv8a"
+            echo "-arch arm64 -march=armv8-a+crc+crypto"
         ;;
         i386)
             echo "-arch i386 -march=i386"
