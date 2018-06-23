@@ -1,5 +1,5 @@
 # MobileFFmpeg
-Source code and scripts to build FFmpeg for Android and IOS platforms
+Source code and scripts to build FFmpeg for Android and IOS platform; prebuilt libraries for both platforms
 
 ### 1. Features
 - Builds both Android and IOS
@@ -7,7 +7,7 @@ Source code and scripts to build FFmpeg for Android and IOS platforms
 - Exposes FFmpeg capabilities both directly from FFmpeg libraries and through MobileFFmpeg wrapper library
 - Different branches for FFmpeg v3.4.2 and FFmpeg v4.0.1
 - Creates shared libraries (.so for Android, .dylib for IOS)
-- Includes cross-compiling instructions for 32 open-source libraries
+- Includes cross-compile instructions for 32 open-source libraries including FFmpeg
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 #### 1.1 Android
 - Creates Android archive with .aar extension
@@ -32,7 +32,7 @@ Source code and scripts to build FFmpeg for Android and IOS platforms
 
 ### 3. FFmpeg Support
 This repository branch contains FFmpeg version 4.0.1 patched according to `http://ffmpeg.org/pipermail/ffmpeg-devel/2018-April/229129.html` with support for the following external libraries. 
-Cross-compiling instructions for all of them, including FFmpeg, can be found under the `build` folder.
+Cross-compile instructions for all of them can be found under the scripts inside `build` folder.
 - fontconfig
 - freetype
 - fribidi
