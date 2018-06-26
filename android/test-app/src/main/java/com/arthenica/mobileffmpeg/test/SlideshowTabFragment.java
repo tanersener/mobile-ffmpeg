@@ -36,7 +36,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -48,9 +50,12 @@ import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class SlideshowTabFragment extends Fragment {
 
+    public static final String DEFAULT_VIDEO_CODEC = "mpeg4";
+
     private Context context;
     private View playButton;
     private String asyncResult;
+    private EditText videoCodecText;
 
     public SlideshowTabFragment() {
     }
@@ -88,6 +93,10 @@ public class SlideshowTabFragment extends Fragment {
 
             final VideoView videoView = getView().findViewById(R.id.videoView);
             videoView.setBackgroundColor(Color.LTGRAY);
+
+            videoCodecText = getView().findViewById(R.id.videoCodecText);
+            videoCodecText.setText(DEFAULT_VIDEO_CODEC);
+            videoCodecText.setSelection(DEFAULT_VIDEO_CODEC.length());
 
             // PLAY BUTTON IS DISABLED AT STARTUP
             playButton = getView().findViewById(R.id.slideshowPlayButton);
@@ -130,6 +139,12 @@ public class SlideshowTabFragment extends Fragment {
         final ProgressDialog progressDialog = ProgressDialog.show(context, "", "Creating video slideshow");
 
         try {
+            String videoCodec = videoCodecText.getText().toString();
+            if (videoCodec.trim().length() == 0) {
+                videoCodec = DEFAULT_VIDEO_CODEC;
+            }
+            Log.i(TAG, String.format("Creating slideshow using video codec: %s", videoCodec));
+
             resourceToFile(R.drawable.colosseum, image1);
             resourceToFile(R.drawable.pyramid, image2);
             resourceToFile(R.drawable.tajmahal, image3);
@@ -164,7 +179,7 @@ public class SlideshowTabFragment extends Fragment {
             };
             handler.postDelayed(runnable, 1000);
 
-            String script = Slideshow.generateScript(context.getFilesDir(), image1, image2, image3, file.getName());
+            String script = Slideshow.generateScript(context.getFilesDir(), image1, image2, image3, file.getName(), videoCodec);
             MainActivity.executeAsync(new Function<Integer, Void>() {
 
                 @Override

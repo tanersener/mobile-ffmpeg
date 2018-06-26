@@ -24,10 +24,13 @@
 #import <AVKit/AVKit.h>
 #import <mobileffmpeg/mobileffmpeg.h>
 
+NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
+
 @interface SecondViewController ()
 
 @property (strong, nonatomic) IBOutlet UILabel *videoPlayerBox;
 @property (strong, nonatomic) IBOutlet UIButton *playButton;
+@property (strong, nonatomic) IBOutlet UITextField *videoCodecText;
 
 @end
 
@@ -39,6 +42,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    // SET DEFAULT TEXT
+    [[self videoCodecText] setText: DEFAULT_VIDEO_CODEC];
     
     // DISABLE PLAY BUTTON
     [[self playButton] setEnabled:FALSE];
@@ -73,8 +79,14 @@
     }
 
     [[NSFileManager defaultManager] removeItemAtPath:videoFile error:NULL];
+    NSString *videoCodec = [[self videoCodecText] text];
+    if (videoCodec == nil || [videoCodec length] == 0) {
+        videoCodec = DEFAULT_VIDEO_CODEC;
+    }
 
-    NSString* slideshowCommand = [self generateSlideshowScript:image1:image2:image3:videoFile];
+    NSLog(@"Creating slideshow using video codec: %@\n", videoCodec);
+
+    NSString* slideshowCommand = [self generateSlideshowScript:image1:image2:image3:videoFile:videoCodec];
 
     [self loadProgressDialog:@"Creating video slideshow\n\n"];
 
@@ -126,7 +138,7 @@
     [player play];
 }
 
-- (NSString *) generateSlideshowScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile {
+- (NSString *) generateSlideshowScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec {
     return [NSString stringWithFormat:
 @"-loop 1 -i %@ \
 -loop 1 -i %@ \
@@ -144,7 +156,7 @@
 [stream2starting][stream1ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream2blended];\
 [stream3starting][stream2ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream3blended];\
 [stream1overlaid][stream2blended][stream2overlaid][stream3blended][stream3overlaid]concat=n=5:v=1:a=0,format=yuv420p[video] \
--map [video] -vsync 2 -async 1 -c:v mpeg4 -r 30 %@", image1, image2, image3, videoFile];
+-map [video] -vsync 2 -async 1 -c:v %@ -r 30 %@", image1, image2, image3, videoCodec, videoFile];
 }
 
 - (void)loadProgressDialog:(NSString*) dialogMessage {

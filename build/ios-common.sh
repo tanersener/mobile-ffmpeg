@@ -241,13 +241,13 @@ get_common_ldflags() {
 get_arch_specific_ldflags() {
     case ${ARCH} in
         armv7)
-            echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp -fembed-bitcode"
         ;;
         armv7s)
-            echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -fembed-bitcode"
         ;;
         arm64)
-            echo "-arch arm64 -march=armv8a"
+            echo "-arch arm64 -march=armv8a -fembed-bitcode"
         ;;
         i386)
             echo "-arch i386 -march=i386"

@@ -7,4 +7,5 @@
     <string name="button_play_slideshow_text">Play</string>
     <string name="command_tab">Command</string>
     <string name="slideshow_tab">Slideshow</string>
+    <string name="video_text_hint">Enter video codec</string>
 </resources>

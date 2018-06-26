@@ -534,7 +534,6 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
     MOBILE_FFMPEG_AAR=${BASEDIR}/prebuilt/android-aar/mobile-ffmpeg
 
     # BUILDING ANDROID ARCHIVE LIBRARY
-    rm -rf ${BASEDIR}/prebuilt/android-aar
     rm -rf ${BASEDIR}/android/libs
 
     mkdir -p ${MOBILE_FFMPEG_AAR}
@@ -559,7 +558,7 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
         exit 1
     fi
 
-    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-1.1.aar ${MOBILE_FFMPEG_AAR} || exit 1
+    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-*.aar ${MOBILE_FFMPEG_AAR}/mobile-ffmpeg.aar || exit 1
 
     echo -e "Created mobile-ffmpeg Android archive successfully.\n" >> ${BASEDIR}/build.log
 
