@@ -610,16 +610,27 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     cp -r ${MOBILE_FFMPEG_UNIVERSAL}/include/* ${FRAMEWORK_PATH}/Headers
     cp ${FFMPEG_UNIVERSAL}/include/config.h ${FRAMEWORK_PATH}/Headers
     cp ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.dylib ${FRAMEWORK_PATH}/mobileffmpeg
+    cp ${BASEDIR}/tools/release/ios/strip-frameworks.sh ${FRAMEWORK_PATH}
 
     # COPYING THE LICENSE
     if  [ ${GPL_ENABLED} == "yes" ]; then
 
         # GPLv3.0
         cp ${BASEDIR}/LICENSE.GPLv3 ${FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
+
+        # COPYING LICENSE
+        cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE
+        cp ${BASEDIR}/LICENSE.GPLv3 ${FFMPEG_UNIVERSAL}/LICENSE
+
     else
 
         # LGPLv3.0
         cp ${BASEDIR}/LICENSE.LGPLv3 ${FRAMEWORK_PATH}/LICENSE >> ${BASEDIR}/build.log
+
+        # COPYING LICENSE
+        cp ${BASEDIR}/LICENSE.LGPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE
+        cp ${BASEDIR}/LICENSE.LGPLv3 ${FFMPEG_UNIVERSAL}/LICENSE
+
     fi
 
     build_info_plist "${FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
@@ -645,6 +656,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
         cp -r ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/* ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers
         cp ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.dylib ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB}
+        cp ${BASEDIR}/tools/release/ios/strip-frameworks.sh ${FFMPEG_LIB_FRAMEWORK_PATH}
 
         # COPYING THE LICENSE
         if  [ ${GPL_ENABLED} == "yes" ]; then

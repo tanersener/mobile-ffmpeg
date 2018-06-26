@@ -28,7 +28,7 @@ import java.io.File;
  */
 public class Slideshow {
 
-    public static String generateScript(final File fileDirectory, final String image1, final String image2, final String image3, final String videoFile) {
+    public static String generateScript(final File fileDirectory, final String image1, final String image2, final String image3, final String videoFile, final String videoCodec) {
         return
             "-loop 1 -i " + fileDirectory + "/" + image1 + " " +
             "-loop 1 -i " + fileDirectory + "/" + image2 + " " +
@@ -46,7 +46,7 @@ public class Slideshow {
             "[stream2starting][stream1ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream2blended];"+
             "[stream3starting][stream2ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream3blended];"+
             "[stream1overlaid][stream2blended][stream2overlaid][stream3blended][stream3overlaid]concat=n=5:v=1:a=0,format=yuv420p[video]"+
-            " -map [video] -vsync 2 -async 1 -c:v mpeg4 -r 30 " + fileDirectory + "/" + videoFile;
+            " -map [video] -vsync 2 -async 1 -c:v " + videoCodec.toLowerCase() + " -r 30 " + fileDirectory + "/" + videoFile;
     }
 
 }
