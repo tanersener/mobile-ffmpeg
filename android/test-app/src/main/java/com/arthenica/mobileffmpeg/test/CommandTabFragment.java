@@ -51,7 +51,9 @@ public class CommandTabFragment extends Fragment {
 
     public CommandTabFragment() {
         logQueue = new ConcurrentLinkedQueue<>();
+    }
 
+    public void enableLogRedirection() {
         Log.enableCallbackFunction(new Function<byte[], Void>() {
 
             @Override
@@ -60,6 +62,10 @@ public class CommandTabFragment extends Fragment {
                 return null;
             }
         });
+    }
+
+    public void disableLogRedirection() {
+        Log.enableCallbackFunction(null);
     }
 
     public static CommandTabFragment newInstance(final Context context) {
@@ -110,6 +116,7 @@ public class CommandTabFragment extends Fragment {
     }
 
     public void runFFmpeg() {
+        enableLogRedirection();
         String command = commandText.getText().toString();
         String[] split = command.split(" ");
 
@@ -121,9 +128,11 @@ public class CommandTabFragment extends Fragment {
         android.util.Log.i(MainActivity.TAG, String.format("Process exited with rc %d.", returnCode));
         Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
         logSync.countDown();
+        disableLogRedirection();
     }
 
     public void runFFmpegAsync() {
+        enableLogRedirection();
         String command = commandText.getText().toString();
         String[] arguments = command.split(" ");
 
@@ -137,6 +146,7 @@ public class CommandTabFragment extends Fragment {
             public Void apply(Integer returnCode) {
                 android.util.Log.i(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
                 logSync.countDown();
+                disableLogRedirection();
                 return null;
             }
         }, arguments);
