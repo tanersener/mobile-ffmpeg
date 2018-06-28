@@ -15,6 +15,7 @@
 #include "config/aom_config.h"
 
 #include "av1/common/onyxc_int.h"
+#include "av1/common/txb_common.h"
 #include "av1/encoder/block.h"
 #include "av1/encoder/tokenize.h"
 #ifdef __cplusplus
@@ -53,9 +54,8 @@ void av1_xform_quant(const AV1_COMMON *cm, MACROBLOCK *x, int plane, int block,
                      AV1_XFORM_QUANT xform_quant_idx);
 
 int av1_optimize_b(const struct AV1_COMP *cpi, MACROBLOCK *mb, int plane,
-                   int blk_row, int blk_col, int block, BLOCK_SIZE plane_bsize,
-                   TX_SIZE tx_size, const ENTROPY_CONTEXT *a,
-                   const ENTROPY_CONTEXT *l, int fast_mode, int *rate_cost);
+                   int block, TX_SIZE tx_size, TX_TYPE tx_type,
+                   const TXB_CTX *const txb_ctx, int fast_mode, int *rate_cost);
 
 void av1_subtract_txb(MACROBLOCK *x, int plane, BLOCK_SIZE plane_bsize,
                       int blk_col, int blk_row, TX_SIZE tx_size);

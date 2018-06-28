@@ -9,13 +9,12 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#include "config/aom_dsp_rtcd.h"
+#include "av1/common/common.h"
+#include "av1/common/enums.h"
 
-#include "av1/common/av1_txfm.h"
-#include "av1/common/x86/av1_txfm_sse4.h"
+#define DWT_MAX_LENGTH 64
 
-void av1_round_shift_array_sse4_1(int32_t *arr, int size, int bit) {
-  __m128i *const vec = (__m128i *)arr;
-  const int vec_size = size >> 2;
-  av1_round_shift_array_32_sse4_1(vec, vec, vec_size, bit);
-}
+void av1_fdwt8x8(tran_low_t *input, tran_low_t *output, int stride);
+void av1_fdwt8x8_uint8_input_c(uint8_t *input, tran_low_t *output, int stride,
+                               int hbd);
+int av1_haar_ac_sad_8x8_uint8_input(uint8_t *input, int stride, int hbd);

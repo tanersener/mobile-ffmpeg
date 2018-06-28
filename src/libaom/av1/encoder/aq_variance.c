@@ -19,6 +19,7 @@
 #include "av1/encoder/ratectrl.h"
 #include "av1/encoder/rd.h"
 #include "av1/encoder/segmentation.h"
+#include "av1/encoder/dwt.h"
 #include "aom_ports/system_state.h"
 
 #define ENERGY_MIN (-4)
@@ -192,6 +193,39 @@ int av1_block_energy(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bs) {
   energy_midpoint =
       (cpi->oxcf.pass == 2) ? cpi->twopass.mb_av_energy : DEFAULT_E_MIDPOINT;
   energy = av1_log_block_var(cpi, x, bs) - energy_midpoint;
+  return clamp((int)round(energy), ENERGY_MIN, ENERGY_MAX);
+}
+
+unsigned int haar_ac_energy(MACROBLOCK *x, BLOCK_SIZE bs) {
+  MACROBLOCKD *xd = &x->e_mbd;
+  int stride = x->plane[0].src.stride;
+  uint8_t *buf = x->plane[0].src.buf;
+  const int bw = MI_SIZE * mi_size_wide[bs];
+  const int bh = MI_SIZE * mi_size_high[bs];
+  int hbd = xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH;
+
+  int var = 0;
+  for (int r = 0; r < bh; r += 8)
+    for (int c = 0; c < bw; c += 8) {
+      var += av1_haar_ac_sad_8x8_uint8_input(buf + c + r * stride, stride, hbd);
+    }
+
+  return (unsigned int)((uint64_t)var * 256) >> num_pels_log2_lookup[bs];
+}
+
+double av1_log_block_wavelet_energy(MACROBLOCK *x, BLOCK_SIZE bs) {
+  unsigned int haar_sad = haar_ac_energy(x, bs);
+  aom_clear_system_state();
+  return log(haar_sad + 1.0);
+}
+
+int av1_block_wavelet_energy_level(const AV1_COMP *cpi, MACROBLOCK *x,
+                                   BLOCK_SIZE bs) {
+  double energy, energy_midpoint;
+  aom_clear_system_state();
+  energy_midpoint = (cpi->oxcf.pass == 2) ? cpi->twopass.frame_avg_haar_energy
+                                          : DEFAULT_E_MIDPOINT;
+  energy = av1_log_block_wavelet_energy(x, bs) - energy_midpoint;
   return clamp((int)round(energy), ENERGY_MIN, ENERGY_MAX);
 }
 

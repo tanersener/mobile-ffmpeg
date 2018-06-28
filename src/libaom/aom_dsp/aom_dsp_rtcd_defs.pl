@@ -294,16 +294,17 @@ specialize qw/aom_dc_predictor_64x16 sse2 avx2/;
 
   # TODO(yunqingwang): optimize rectangular DC_PRED to replace division
   # by multiply and shift.
-  specialize qw/aom_highbd_dc_predictor_4x4 sse2/;
+  specialize qw/aom_highbd_dc_predictor_4x4 sse2 neon/;
   specialize qw/aom_highbd_dc_predictor_4x8 sse2/;
   specialize qw/aom_highbd_dc_predictor_8x4 sse2/;;
-  specialize qw/aom_highbd_dc_predictor_8x8 sse2/;;
+  specialize qw/aom_highbd_dc_predictor_8x8 sse2 neon/;;
   specialize qw/aom_highbd_dc_predictor_8x16 sse2/;;
   specialize qw/aom_highbd_dc_predictor_16x8 sse2/;
-  specialize qw/aom_highbd_dc_predictor_16x16 sse2/;
+  specialize qw/aom_highbd_dc_predictor_16x16 sse2 neon/;
   specialize qw/aom_highbd_dc_predictor_16x32 sse2/;
   specialize qw/aom_highbd_dc_predictor_32x16 sse2/;
-  specialize qw/aom_highbd_dc_predictor_32x32 sse2/;
+  specialize qw/aom_highbd_dc_predictor_32x32 sse2 neon/;
+  specialize qw/aom_highbd_dc_predictor_64x64 neon/;
 
   specialize qw/aom_highbd_h_predictor_4x4 sse2/;
   specialize qw/aom_highbd_h_predictor_4x8 sse2/;
@@ -548,8 +549,8 @@ add_proto qw/void aom_blend_a64_mask/, "uint8_t *dst, uint32_t dst_stride, const
 add_proto qw/void aom_blend_a64_hmask/, "uint8_t *dst, uint32_t dst_stride, const uint8_t *src0, uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride, const uint8_t *mask, int w, int h";
 add_proto qw/void aom_blend_a64_vmask/, "uint8_t *dst, uint32_t dst_stride, const uint8_t *src0, uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride, const uint8_t *mask, int w, int h";
 specialize "aom_blend_a64_mask", qw/sse4_1/;
-specialize "aom_blend_a64_hmask", qw/sse4_1/;
-specialize "aom_blend_a64_vmask", qw/sse4_1/;
+specialize "aom_blend_a64_hmask", qw/sse4_1 neon/;
+specialize "aom_blend_a64_vmask", qw/sse4_1 neon/;
 
 add_proto qw/void aom_highbd_blend_a64_mask/, "uint8_t *dst, uint32_t dst_stride, const uint8_t *src0, uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride, const uint8_t *mask, uint32_t mask_stride, int w, int h, int subx, int suby, int bd";
 add_proto qw/void aom_highbd_blend_a64_hmask/, "uint8_t *dst, uint32_t dst_stride, const uint8_t *src0, uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride, const uint8_t *mask, int w, int h, int bd";

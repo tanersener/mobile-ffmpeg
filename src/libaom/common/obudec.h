@@ -17,17 +17,12 @@
 extern "C" {
 #endif
 
-// Assign this value to last_layer_id when the application wants full
-// temporal units regardless of the presence of enhancement layers.
-#define IGNORE_ENHANCEMENT_LAYERS 8
-
 struct ObuDecInputContext {
   struct AvxInputContext *avx_ctx;
   uint8_t *buffer;
   size_t buffer_capacity;
   size_t bytes_buffered;
   int is_annexb;
-  int last_layer_id;
 };
 
 // Returns 1 when file data starts (if Annex B stream, after reading the

@@ -75,6 +75,12 @@ struct aom_noise_tx_t *aom_noise_tx_malloc(int block_size) {
     aom_noise_tx_free(noise_tx);
     return NULL;
   }
+  // Clear the buffers up front. Some outputs of the forward transform are
+  // real only (the imaginary component will never be touched)
+  memset(noise_tx->tx_block, 0,
+         2 * sizeof(*noise_tx->tx_block) * block_size * block_size);
+  memset(noise_tx->temp, 0,
+         2 * sizeof(*noise_tx->temp) * block_size * block_size);
   return noise_tx;
 }
 

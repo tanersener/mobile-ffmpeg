@@ -46,8 +46,8 @@ class BlendA64Mask1DTest : public FunctionEquivalenceTest<F> {
   virtual void Execute(const T *p_src0, const T *p_src1) = 0;
 
   void Common() {
-    w_ = 1 << this->rng_(MAX_SB_SIZE_LOG2 + 1);
-    h_ = 1 << this->rng_(MAX_SB_SIZE_LOG2 + 1);
+    w_ = 2 << this->rng_(MAX_SB_SIZE_LOG2);
+    h_ = 2 << this->rng_(MAX_SB_SIZE_LOG2);
 
     dst_offset_ = this->rng_(33);
     dst_stride_ = this->rng_(kMaxWidth + 1 - w_) + w_;
@@ -206,6 +206,14 @@ INSTANTIATE_TEST_CASE_P(
         TestFuncs(blend_a64_hmask_ref, aom_blend_a64_hmask_sse4_1),
         TestFuncs(blend_a64_vmask_ref, aom_blend_a64_vmask_sse4_1)));
 #endif  // HAVE_SSE4_1
+
+#if HAVE_NEON
+INSTANTIATE_TEST_CASE_P(NEON, BlendA64Mask1DTest8B,
+                        ::testing::Values(TestFuncs(blend_a64_hmask_ref,
+                                                    aom_blend_a64_hmask_neon),
+                                          TestFuncs(blend_a64_vmask_ref,
+                                                    aom_blend_a64_vmask_neon)));
+#endif  // HAVE_NEON
 
 //////////////////////////////////////////////////////////////////////////////
 // High bit-depth version

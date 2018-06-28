@@ -391,8 +391,9 @@ void av1_warp_affine_sse4_1(const int32_t *mat, const uint8_t *ref, int width,
                              ref[iy * stride + (width - 1)] *
                                  (1 << (FILTER_BITS - reduce_bits_horiz)));
         }
-      } else if ((ix4 - 7) < 0) {
-        const int out_of_boundary = -(ix4 - 6);
+      } else if (((ix4 - 7) < 0) || ((ix4 + 9) > width)) {
+        const int out_of_boundary_left = -(ix4 - 6);
+        const int out_of_boundary_right = (ix4 + 8) - width;
         for (k = -7; k < AOMMIN(8, p_height - i); ++k) {
           int iy = iy4 + k;
           if (iy < 0)
@@ -402,33 +403,19 @@ void av1_warp_affine_sse4_1(const int32_t *mat, const uint8_t *ref, int width,
           int sx = sx4 + beta * (k + 4);
 
           // Load source pixels
-          const __m128i src =
+          __m128i src =
               _mm_loadu_si128((__m128i *)(ref + iy * stride + ix4 - 7));
-
-          const __m128i shuffle_reg =
-              _mm_loadu_si128((__m128i *)warp_pad_left[out_of_boundary]);
-          const __m128i src_padded = _mm_shuffle_epi8(src, shuffle_reg);
-          horizontal_filter(src_padded, tmp, sx, alpha, k, offset_bits_horiz,
-                            reduce_bits_horiz);
-        }
-      } else if ((ix4 + 9) > width) {
-        const int out_of_boundary = (ix4 + 8) - width;
-        for (k = -7; k < AOMMIN(8, p_height - i); ++k) {
-          int iy = iy4 + k;
-          if (iy < 0)
-            iy = 0;
-          else if (iy > height - 1)
-            iy = height - 1;
-          int sx = sx4 + beta * (k + 4);
-
-          // Load source pixels
-          const __m128i src =
-              _mm_loadu_si128((__m128i *)(ref + iy * stride + ix4 - 7));
-
-          const __m128i shuffle_reg =
-              _mm_loadu_si128((__m128i *)warp_pad_right[out_of_boundary]);
-          const __m128i src_padded = _mm_shuffle_epi8(src, shuffle_reg);
-          horizontal_filter(src_padded, tmp, sx, alpha, k, offset_bits_horiz,
+          if (out_of_boundary_left >= 0) {
+            const __m128i shuffle_reg_left =
+                _mm_loadu_si128((__m128i *)warp_pad_left[out_of_boundary_left]);
+            src = _mm_shuffle_epi8(src, shuffle_reg_left);
+          }
+          if (out_of_boundary_right >= 0) {
+            const __m128i shuffle_reg_right = _mm_loadu_si128(
+                (__m128i *)warp_pad_right[out_of_boundary_right]);
+            src = _mm_shuffle_epi8(src, shuffle_reg_right);
+          }
+          horizontal_filter(src, tmp, sx, alpha, k, offset_bits_horiz,
                             reduce_bits_horiz);
         }
       } else {

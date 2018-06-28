@@ -66,7 +66,8 @@ void av1_decode_palette_tokens(MACROBLOCKD *const xd, int plane,
                                aom_reader *r) {
   assert(plane == 0 || plane == 1);
   Av1ColorMapParam params;
-  params.color_map = xd->plane[plane].color_index_map;
+  params.color_map =
+      xd->plane[plane].color_index_map + xd->color_index_map_offset[plane];
   params.map_cdf = plane ? xd->tile_ctx->palette_uv_color_index_cdf
                          : xd->tile_ctx->palette_y_color_index_cdf;
   const MB_MODE_INFO *const mbmi = xd->mi[0];

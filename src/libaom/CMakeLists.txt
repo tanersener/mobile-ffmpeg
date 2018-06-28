@@ -19,13 +19,17 @@ if(NOT EMSCRIPTEN)
 endif()
 
 option(ENABLE_CCACHE "Enable ccache support." OFF)
+option(ENABLE_DECODE_PERF_TESTS "Enables decoder performance tests" OFF)
 option(ENABLE_DISTCC "Enable distcc support." OFF)
 option(ENABLE_DOCS "Enable documentation generation (doxygen required)." ON)
+option(ENABLE_ENCODE_PERF_TESTS "Enables encoder performance tests" OFF)
 option(ENABLE_EXAMPLES "Enables build of example code." ON)
 option(ENABLE_GOMA "Enable goma support." OFF)
 option(ENABLE_IDE_TEST_HOSTING
        "Enables running tests within IDEs like Visual Studio and Xcode." OFF)
 option(ENABLE_NASM "Use nasm instead of yasm for x86 assembly." OFF)
+option(ENABLE_TESTDATA "Enables unit test data download targets." ON)
+option(ENABLE_TESTS "Enables unit tests." ON)
 option(ENABLE_TOOLS "Enable applications in tools sub directory." ON)
 option(ENABLE_WERROR "Converts warnings to errors at compile time." OFF)
 
@@ -288,7 +292,7 @@ file(WRITE "${AOM_CONFIG_DIR}/usage_exit.cc"
 #
 # Application and application support targets.
 #
-if(CONFIG_UNIT_TESTS OR ENABLE_EXAMPLES OR ENABLE_TOOLS)
+if(ENABLE_EXAMPLES OR ENABLE_TESTS OR ENABLE_TOOLS)
   add_library(aom_common_app_util OBJECT ${AOM_COMMON_APP_UTIL_SOURCES})
   if(CONFIG_AV1_DECODER)
     add_library(aom_decoder_app_util OBJECT ${AOM_DECODER_APP_UTIL_SOURCES})
@@ -496,7 +500,7 @@ foreach(aom_app ${AOM_APP_TARGETS})
   target_link_libraries(${aom_app} ${AOM_LIB_LINK_TYPE} aom)
 endforeach()
 
-if(CONFIG_UNIT_TESTS OR ENABLE_EXAMPLES OR ENABLE_TOOLS)
+if(ENABLE_EXAMPLES OR ENABLE_TESTS OR ENABLE_TOOLS)
   if(CONFIG_LIBYUV)
     add_library(yuv OBJECT ${AOM_LIBYUV_SOURCES})
     if(NOT MSVC)
@@ -540,7 +544,7 @@ if(CONFIG_UNIT_TESTS OR ENABLE_EXAMPLES OR ENABLE_TOOLS)
   endif()
 endif()
 
-if(CONFIG_UNIT_TESTS)
+if(ENABLE_TESTS)
 
   # Create test_libaom target and the targets it depends on.
   setup_aom_test_targets()

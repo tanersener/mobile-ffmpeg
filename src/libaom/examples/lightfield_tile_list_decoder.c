@@ -16,12 +16,12 @@
 // contains the anchor frames that are references of the coded tiles, the camera
 // frame header, and tile list OBUs that include the tile information and the
 // compressed tile data. This input file is reconstructed from the encoded
-// lightfield ivf file, and is decodable by AV1 decoder. The lf_width and
-// lf_height arguments are the number of lightfield images in each dimension.
-// The lf_blocksize determines the number of reference images used.
+// lightfield ivf file, and is decodable by AV1 decoder. num_references is
+// the number of anchor frames coded at the beginning of the light field file.
+// num_tile_lists is the number of tile lists need to be decoded.
 // Run lightfield tile list decoder to decode an AV1 tile list file:
 // examples/lightfield_tile_list_decoder vase_tile_list.ivf vase_tile_list.yuv
-// 10 10 5 20
+// 4 2
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,8 +40,7 @@ static const char *exec_name;
 
 void usage_exit(void) {
   fprintf(stderr,
-          "Usage: %s <infile> <outfile> <lf_width> <lf_height> <lf_blocksize> "
-          "<num_tile_lists>\n",
+          "Usage: %s <infile> <outfile> <num_references> <num_tile_lists>\n",
           exec_name);
   exit(EXIT_FAILURE);
 }
@@ -52,12 +51,8 @@ int main(int argc, char **argv) {
   AvxVideoReader *reader = NULL;
   const AvxInterface *decoder = NULL;
   const AvxVideoInfo *info = NULL;
-  const char *lf_width_arg;
-  const char *lf_height_arg;
-  const char *lf_blocksize_arg;
   int width, height;
-  int lf_width, lf_height, lf_blocksize;
-  int u_blocks, v_blocks;
+  int num_references;
   int num_tile_lists;
   aom_image_t reference_images[MAX_EXTERNAL_REFERENCES];
   size_t frame_size = 0;
@@ -66,7 +61,7 @@ int main(int argc, char **argv) {
 
   exec_name = argv[0];
 
-  if (argc != 7) die("Invalid number of arguments.");
+  if (argc != 5) die("Invalid number of arguments.");
 
   reader = aom_video_reader_open(argv[1]);
   if (!reader) die("Failed to open %s for reading.", argv[1]);
@@ -74,13 +69,8 @@ int main(int argc, char **argv) {
   if (!(outfile = fopen(argv[2], "wb")))
     die("Failed to open %s for writing.", argv[2]);
 
-  lf_width_arg = argv[3];
-  lf_height_arg = argv[4];
-  lf_blocksize_arg = argv[5];
-  lf_width = (int)strtol(lf_width_arg, NULL, 0);
-  lf_height = (int)strtol(lf_height_arg, NULL, 0);
-  lf_blocksize = (int)strtol(lf_blocksize_arg, NULL, 0);
-  num_tile_lists = (int)strtol(argv[6], NULL, 0);
+  num_references = (int)strtol(argv[3], NULL, 0);
+  num_tile_lists = (int)strtol(argv[4], NULL, 0);
 
   info = aom_video_reader_get_info(reader);
   width = info->frame_width;
@@ -92,12 +82,6 @@ int main(int argc, char **argv) {
 
   if (aom_codec_dec_init(&codec, decoder->codec_interface(), NULL, 0))
     die_codec(&codec, "Failed to initialize decoder.");
-
-  // How many anchor frames we have.
-  u_blocks = (lf_width + lf_blocksize - 1) / lf_blocksize;
-  v_blocks = (lf_height + lf_blocksize - 1) / lf_blocksize;
-
-  int num_references = v_blocks * u_blocks;
 
   // Allocate memory to store decoded references.
   aom_img_fmt_t ref_fmt = AOM_IMG_FMT_I420;
@@ -156,12 +140,10 @@ int main(int argc, char **argv) {
 
     if (aom_codec_decode(&codec, frame, frame_size, NULL))
       die_codec(&codec, "Failed to decode the tile list.");
-
     aom_codec_iter_t iter = NULL;
     aom_image_t *img;
-    while ((img = aom_codec_get_frame(&codec, &iter))) {
-      aom_img_write(img, outfile);
-    }
+    while ((img = aom_codec_get_frame(&codec, &iter)))
+      fwrite(img->img_data, 1, img->sz, outfile);
   }
 
   for (i = 0; i < num_references; i++) aom_img_free(&reference_images[i]);

@@ -97,25 +97,23 @@ void av1_subtract_plane(MACROBLOCK *x, BLOCK_SIZE bsize, int plane) {
 }
 
 int av1_optimize_b(const struct AV1_COMP *cpi, MACROBLOCK *mb, int plane,
-                   int blk_row, int blk_col, int block, BLOCK_SIZE plane_bsize,
-                   TX_SIZE tx_size, const ENTROPY_CONTEXT *a,
-                   const ENTROPY_CONTEXT *l, int fast_mode, int *rate_cost) {
+                   int block, TX_SIZE tx_size, TX_TYPE tx_type,
+                   const TXB_CTX *const txb_ctx, int fast_mode,
+                   int *rate_cost) {
   MACROBLOCKD *const xd = &mb->e_mbd;
   struct macroblock_plane *const p = &mb->plane[plane];
   const int eob = p->eobs[block];
-  TXB_CTX txb_ctx;
-  get_txb_ctx(plane_bsize, tx_size, plane, a, l, &txb_ctx);
   const int segment_id = xd->mi[0]->segment_id;
 
   if (eob == 0 || !cpi->optimize_seg_arr[segment_id] ||
       xd->lossless[segment_id]) {
-    *rate_cost = av1_cost_skip_txb(mb, &txb_ctx, plane, tx_size);
+    *rate_cost = av1_cost_skip_txb(mb, txb_ctx, plane, tx_size);
     return eob;
   }
 
   (void)fast_mode;
-  return av1_optimize_txb_new(cpi, mb, plane, blk_row, blk_col, block, tx_size,
-                              &txb_ctx, rate_cost, cpi->oxcf.sharpness);
+  return av1_optimize_txb_new(cpi, mb, plane, block, tx_size, tx_type, txb_ctx,
+                              rate_cost, cpi->oxcf.sharpness);
 }
 
 typedef enum QUANT_FUNC {
@@ -234,8 +232,10 @@ static void encode_block(int plane, int block, int blk_row, int blk_col,
     if (args->enable_optimize_b) {
       av1_xform_quant(cm, x, plane, block, blk_row, blk_col, plane_bsize,
                       tx_size, tx_type, AV1_XFORM_QUANT_FP);
-      av1_optimize_b(args->cpi, x, plane, blk_row, blk_col, block, plane_bsize,
-                     tx_size, a, l, 1, &dummy_rate_cost);
+      TXB_CTX txb_ctx;
+      get_txb_ctx(plane_bsize, tx_size, plane, a, l, &txb_ctx);
+      av1_optimize_b(args->cpi, x, plane, block, tx_size, tx_type, &txb_ctx, 1,
+                     &dummy_rate_cost);
     } else {
       av1_xform_quant(
           cm, x, plane, block, blk_row, blk_col, plane_bsize, tx_size, tx_type,
@@ -526,8 +526,10 @@ void av1_encode_block_intra(int plane, int block, int blk_row, int blk_col,
     if (args->enable_optimize_b) {
       av1_xform_quant(cm, x, plane, block, blk_row, blk_col, plane_bsize,
                       tx_size, tx_type, AV1_XFORM_QUANT_FP);
-      av1_optimize_b(args->cpi, x, plane, blk_row, blk_col, block, plane_bsize,
-                     tx_size, a, l, 1, &dummy_rate_cost);
+      TXB_CTX txb_ctx;
+      get_txb_ctx(plane_bsize, tx_size, plane, a, l, &txb_ctx);
+      av1_optimize_b(args->cpi, x, plane, block, tx_size, tx_type, &txb_ctx, 1,
+                     &dummy_rate_cost);
     } else {
       av1_xform_quant(
           cm, x, plane, block, blk_row, blk_col, plane_bsize, tx_size, tx_type,

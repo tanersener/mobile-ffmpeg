@@ -167,41 +167,55 @@ void av1_build_nmv_cost_table(int *mvjoint, int *mvcost[2],
   build_nmv_component_cost_table(mvcost[1], &ctx->comps[1], precision);
 }
 
-int_mv av1_get_ref_mv(const MACROBLOCK *x, int ref_idx) {
-  const MACROBLOCKD *xd = &x->e_mbd;
-  const MB_MODE_INFO *mbmi = xd->mi[0];
-  int ref_mv_idx = mbmi->ref_mv_idx;
-  const MB_MODE_INFO_EXT *mbmi_ext = x->mbmi_ext;
-  const int8_t ref_frame_type = av1_ref_frame_type(mbmi->ref_frame);
+int_mv av1_get_ref_mv_from_stack(int ref_idx,
+                                 const MV_REFERENCE_FRAME *ref_frame,
+                                 int ref_mv_idx,
+                                 const MB_MODE_INFO_EXT *mbmi_ext) {
+  const int8_t ref_frame_type = av1_ref_frame_type(ref_frame);
   const CANDIDATE_MV *curr_ref_mv_stack =
       mbmi_ext->ref_mv_stack[ref_frame_type];
   int_mv ref_mv;
   ref_mv.as_int = INVALID_MV;
 
-  if (has_second_ref(mbmi)) {
-    // Special case: NEAR_NEWMV and NEW_NEARMV modes use 1 + mbmi->ref_mv_idx
-    // (like NEARMV) instead
-    if (mbmi->mode == NEAR_NEWMV || mbmi->mode == NEW_NEARMV) ref_mv_idx += 1;
-
+  if (ref_frame[1] > INTRA_FRAME) {
     if (ref_idx == 0) {
-      if (compound_ref0_mode(mbmi->mode) == NEWMV) {
-        ref_mv = curr_ref_mv_stack[ref_mv_idx].this_mv;
-      }
+      ref_mv = curr_ref_mv_stack[ref_mv_idx].this_mv;
     } else {
       assert(ref_idx == 1);
-      if (compound_ref1_mode(mbmi->mode) == NEWMV) {
-        ref_mv = curr_ref_mv_stack[ref_mv_idx].comp_mv;
-      }
+      ref_mv = curr_ref_mv_stack[ref_mv_idx].comp_mv;
     }
   } else {
     assert(ref_idx == 0);
-    if (mbmi->mode == NEWMV) {
-      if (ref_mv_idx < x->mbmi_ext->ref_mv_count[ref_frame_type]) {
-        ref_mv = curr_ref_mv_stack[ref_mv_idx].this_mv;
-      } else {
-        ref_mv = mbmi_ext->global_mvs[ref_frame_type];
-      }
+    if (ref_mv_idx < mbmi_ext->ref_mv_count[ref_frame_type]) {
+      ref_mv = curr_ref_mv_stack[ref_mv_idx].this_mv;
+    } else {
+      ref_mv = mbmi_ext->global_mvs[ref_frame_type];
     }
   }
   return ref_mv;
+}
+
+int_mv av1_get_ref_mv(const MACROBLOCK *x, int ref_idx) {
+  const MACROBLOCKD *xd = &x->e_mbd;
+  const MB_MODE_INFO *mbmi = xd->mi[0];
+  int ref_mv_idx = mbmi->ref_mv_idx;
+  if (mbmi->mode == NEAR_NEWMV || mbmi->mode == NEW_NEARMV) {
+    assert(has_second_ref(mbmi));
+    ref_mv_idx += 1;
+  }
+  return av1_get_ref_mv_from_stack(ref_idx, mbmi->ref_frame, ref_mv_idx,
+                                   x->mbmi_ext);
+}
+
+void av1_find_best_ref_mvs_from_stack(int allow_hp,
+                                      const MB_MODE_INFO_EXT *mbmi_ext,
+                                      MV_REFERENCE_FRAME ref_frame,
+                                      int_mv *nearest_mv, int_mv *near_mv,
+                                      int is_integer) {
+  const int ref_idx = 0;
+  MV_REFERENCE_FRAME ref_frames[2] = { ref_frame, NONE_FRAME };
+  *nearest_mv = av1_get_ref_mv_from_stack(ref_idx, ref_frames, 0, mbmi_ext);
+  lower_mv_precision(&nearest_mv->as_mv, allow_hp, is_integer);
+  *near_mv = av1_get_ref_mv_from_stack(ref_idx, ref_frames, 1, mbmi_ext);
+  lower_mv_precision(&near_mv->as_mv, allow_hp, is_integer);
 }

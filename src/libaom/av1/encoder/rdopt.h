@@ -68,8 +68,8 @@ int64_t av1_dist_8x8(const struct AV1_COMP *const cpi, const MACROBLOCK *x,
                      int bsh, int visible_w, int visible_h, int qindex);
 #endif
 
-static INLINE int av1_cost_skip_txb(MACROBLOCK *x, TXB_CTX *txb_ctx, int plane,
-                                    TX_SIZE tx_size) {
+static INLINE int av1_cost_skip_txb(MACROBLOCK *x, const TXB_CTX *const txb_ctx,
+                                    int plane, TX_SIZE tx_size) {
   const TX_SIZE txs_ctx = get_txsize_entropy_ctx(tx_size);
   const PLANE_TYPE plane_type = get_plane_type(plane);
   const LV_MAP_COEFF_COST *const coeff_costs =
@@ -78,16 +78,17 @@ static INLINE int av1_cost_skip_txb(MACROBLOCK *x, TXB_CTX *txb_ctx, int plane,
 }
 
 static INLINE int av1_cost_coeffs(const AV1_COMMON *const cm, MACROBLOCK *x,
-                                  int plane, int blk_row, int blk_col,
-                                  int block, TX_SIZE tx_size, TXB_CTX *txb_ctx,
+                                  int plane, int block, TX_SIZE tx_size,
+                                  const TX_TYPE tx_type,
+                                  const TXB_CTX *const txb_ctx,
                                   int use_fast_coef_costing) {
 #if TXCOEFF_COST_TIMER
   struct aom_usec_timer timer;
   aom_usec_timer_start(&timer);
 #endif
   (void)use_fast_coef_costing;
-  const int cost = av1_cost_coeffs_txb(cm, x, plane, blk_row, blk_col, block,
-                                       tx_size, txb_ctx);
+  const int cost =
+      av1_cost_coeffs_txb(cm, x, plane, block, tx_size, tx_type, txb_ctx);
 #if TXCOEFF_COST_TIMER
   AV1_COMMON *tmp_cm = (AV1_COMMON *)&cpi->common;
   aom_usec_timer_mark(&timer);

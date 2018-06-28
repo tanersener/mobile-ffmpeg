@@ -154,7 +154,7 @@ int aom_realloc_frame_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
                                        (uv_border_h * uv_stride) + uv_border_w,
                                    aom_byte_align);
 
-    ybf->use_external_refernce_buffers = 0;
+    ybf->use_external_reference_buffers = 0;
 
     if (use_highbitdepth) {
       if (ybf->y_buffer_8bit) aom_free(ybf->y_buffer_8bit);

@@ -261,9 +261,9 @@ static const uint8_t *get_wedge_mask_inplace(int wedge_index, int neg,
 
 const uint8_t *av1_get_compound_type_mask(
     const INTERINTER_COMPOUND_DATA *const comp_data, BLOCK_SIZE sb_type) {
-  assert(is_masked_compound_type(comp_data->interinter_compound_type));
+  assert(is_masked_compound_type(comp_data->type));
   (void)sb_type;
-  switch (comp_data->interinter_compound_type) {
+  switch (comp_data->type) {
     case COMPOUND_WEDGE:
       return av1_get_contiguous_soft_mask(comp_data->wedge_index,
                                           comp_data->wedge_sign, sb_type);
@@ -611,13 +611,11 @@ void av1_make_masked_inter_predictor(
     int h, ConvolveParams *conv_params, InterpFilters interp_filters, int plane,
     const WarpTypesAllowed *warp_types, int p_col, int p_row, int ref,
     MACROBLOCKD *xd, int can_use_previous) {
-  const MB_MODE_INFO *mi = xd->mi[0];
+  MB_MODE_INFO *mi = xd->mi[0];
   (void)dst;
   (void)dst_stride;
-
-  const INTERINTER_COMPOUND_DATA comp_data = { mi->wedge_index, mi->wedge_sign,
-                                               mi->mask_type, xd->seg_mask,
-                                               mi->interinter_compound_type };
+  mi->interinter_comp.seg_mask = xd->seg_mask;
+  const INTERINTER_COMPOUND_DATA *comp_data = &mi->interinter_comp;
 
 // We're going to call av1_make_inter_predictor to generate a prediction into
 // a temporary buffer, then will blend that temporary buffer with that from
@@ -647,13 +645,13 @@ void av1_make_masked_inter_predictor(
                            p_col, p_row, plane, ref, mi, 0, xd,
                            can_use_previous);
 
-  if (!plane && comp_data.interinter_compound_type == COMPOUND_DIFFWTD) {
+  if (!plane && comp_data->type == COMPOUND_DIFFWTD) {
     av1_build_compound_diffwtd_mask_d16(
-        comp_data.seg_mask, comp_data.mask_type, org_dst, org_dst_stride,
+        comp_data->seg_mask, comp_data->mask_type, org_dst, org_dst_stride,
         tmp_buf16, tmp_buf_stride, h, w, conv_params, xd->bd);
   }
   build_masked_compound_no_round(dst, dst_stride, org_dst, org_dst_stride,
-                                 tmp_buf16, tmp_buf_stride, &comp_data,
+                                 tmp_buf16, tmp_buf_stride, comp_data,
                                  mi->sb_type, h, w, conv_params, xd);
 }
 
@@ -909,7 +907,7 @@ static INLINE void build_inter_predictors(const AV1_COMMON *cm, MACROBLOCKD *xd,
 
         conv_params.ref = ref;
         conv_params.do_average = ref;
-        if (is_masked_compound_type(mi->interinter_compound_type)) {
+        if (is_masked_compound_type(mi->interinter_comp.type)) {
           // masked compound type has its own average mechanism
           conv_params.do_average = 0;
         }
@@ -955,7 +953,7 @@ static INLINE void build_inter_predictors(const AV1_COMMON *cm, MACROBLOCKD *xd,
       warp_types.local_warp_allowed = mi->motion_mode == WARPED_CAUSAL;
       conv_params.ref = ref;
 
-      if (ref && is_masked_compound_type(mi->interinter_compound_type)) {
+      if (ref && is_masked_compound_type(mi->interinter_comp.type)) {
         // masked compound type has its own average mechanism
         conv_params.do_average = 0;
         av1_make_masked_inter_predictor(
@@ -1158,7 +1156,7 @@ int av1_skip_u4x4_pred_in_obmc(BLOCK_SIZE bsize,
 
 void av1_modify_neighbor_predictor_for_obmc(MB_MODE_INFO *mbmi) {
   mbmi->ref_frame[1] = NONE_FRAME;
-  mbmi->interinter_compound_type = COMPOUND_AVERAGE;
+  mbmi->interinter_comp.type = COMPOUND_AVERAGE;
 
   return;
 }
@@ -1764,33 +1762,31 @@ static void build_wedge_inter_predictor_from_buf(
   MACROBLOCKD_PLANE *const pd = &xd->plane[plane];
   struct buf_2d *const dst_buf = &pd->dst;
   uint8_t *const dst = dst_buf->buf + dst_buf->stride * y + x;
-  const INTERINTER_COMPOUND_DATA comp_data = { mbmi->wedge_index,
-                                               mbmi->wedge_sign,
-                                               mbmi->mask_type, xd->seg_mask,
-                                               mbmi->interinter_compound_type };
+  mbmi->interinter_comp.seg_mask = xd->seg_mask;
+  const INTERINTER_COMPOUND_DATA *comp_data = &mbmi->interinter_comp;
 
-  if (is_compound && is_masked_compound_type(mbmi->interinter_compound_type)) {
-    if (!plane && comp_data.interinter_compound_type == COMPOUND_DIFFWTD) {
+  if (is_compound && is_masked_compound_type(comp_data->type)) {
+    if (!plane && comp_data->type == COMPOUND_DIFFWTD) {
       if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH)
         av1_build_compound_diffwtd_mask_highbd(
-            comp_data.seg_mask, comp_data.mask_type,
+            comp_data->seg_mask, comp_data->mask_type,
             CONVERT_TO_BYTEPTR(ext_dst0), ext_dst_stride0,
             CONVERT_TO_BYTEPTR(ext_dst1), ext_dst_stride1, h, w, xd->bd);
       else
-        av1_build_compound_diffwtd_mask(comp_data.seg_mask, comp_data.mask_type,
-                                        ext_dst0, ext_dst_stride0, ext_dst1,
-                                        ext_dst_stride1, h, w);
+        av1_build_compound_diffwtd_mask(
+            comp_data->seg_mask, comp_data->mask_type, ext_dst0,
+            ext_dst_stride0, ext_dst1, ext_dst_stride1, h, w);
     }
 
     if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH)
       build_masked_compound_highbd(
           dst, dst_buf->stride, CONVERT_TO_BYTEPTR(ext_dst0), ext_dst_stride0,
-          CONVERT_TO_BYTEPTR(ext_dst1), ext_dst_stride1, &comp_data,
+          CONVERT_TO_BYTEPTR(ext_dst1), ext_dst_stride1, comp_data,
           mbmi->sb_type, h, w, xd->bd);
     else
       build_masked_compound(dst, dst_buf->stride, ext_dst0, ext_dst_stride0,
-                            ext_dst1, ext_dst_stride1, &comp_data,
-                            mbmi->sb_type, h, w);
+                            ext_dst1, ext_dst_stride1, comp_data, mbmi->sb_type,
+                            h, w);
   } else {
     if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH)
       aom_highbd_convolve_copy(CONVERT_TO_BYTEPTR(ext_dst0), ext_dst_stride0,

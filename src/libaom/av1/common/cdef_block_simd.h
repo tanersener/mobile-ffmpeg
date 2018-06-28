@@ -168,39 +168,22 @@ int SIMD_FUNC(cdef_find_dir)(const uint16_t *img, int stride, int32_t *var,
         v128_sub_16(v128_shr_s16(lines[i], coeff_shift), v128_dup_16(128));
   }
 
-#if defined(__SSE4_1__)
   /* Compute "mostly vertical" directions. */
-  __m128i dir47 = compute_directions(lines, cost + 4);
+  v128 dir47 = compute_directions(lines, cost + 4);
 
   array_reverse_transpose_8x8(lines, lines);
 
   /* Compute "mostly horizontal" directions. */
-  __m128i dir03 = compute_directions(lines, cost);
+  v128 dir03 = compute_directions(lines, cost);
 
-  __m128i max = _mm_max_epi32(dir03, dir47);
-  max = _mm_max_epi32(max, _mm_shuffle_epi32(max, _MM_SHUFFLE(1, 0, 3, 2)));
-  max = _mm_max_epi32(max, _mm_shuffle_epi32(max, _MM_SHUFFLE(2, 3, 0, 1)));
-  best_cost = _mm_cvtsi128_si32(max);
-  __m128i t =
-      _mm_packs_epi32(_mm_cmpeq_epi32(max, dir03), _mm_cmpeq_epi32(max, dir47));
-  best_dir = _mm_movemask_epi8(_mm_packs_epi16(t, t));
+  v128 max = v128_max_s32(dir03, dir47);
+  max = v128_max_s32(max, v128_align(max, max, 8));
+  max = v128_max_s32(max, v128_align(max, max, 4));
+  best_cost = v128_low_u32(max);
+  v128 t =
+      v128_pack_s32_s16(v128_cmpeq_32(max, dir47), v128_cmpeq_32(max, dir03));
+  best_dir = v128_movemask_8(v128_pack_s16_s8(t, t));
   best_dir = get_msb(best_dir ^ (best_dir - 1));  // Count trailing zeros
-#else
-  /* Compute "mostly vertical" directions. */
-  compute_directions(lines, cost + 4);
-
-  array_reverse_transpose_8x8(lines, lines);
-
-  /* Compute "mostly horizontal" directions. */
-  compute_directions(lines, cost);
-
-  for (i = 0; i < 8; i++) {
-    if (cost[i] > best_cost) {
-      best_cost = cost[i];
-      best_dir = i;
-    }
-  }
-#endif
 
   /* Difference between the optimal variance and the variance along the
      orthogonal direction. Again, the sum(x^2) terms cancel out. */

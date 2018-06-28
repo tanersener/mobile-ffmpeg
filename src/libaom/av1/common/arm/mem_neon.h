@@ -323,6 +323,30 @@ static INLINE void load_unaligned_u8_4x4(const uint8_t *buf, int stride,
   *tu1 = vset_lane_u32(a, *tu1, 1);
 }
 
+static INLINE void load_unaligned_u8_4x2(const uint8_t *buf, int stride,
+                                         uint32x2_t *tu0) {
+  uint32_t a;
+
+  memcpy(&a, buf, 4);
+  buf += stride;
+  *tu0 = vset_lane_u32(a, *tu0, 0);
+  memcpy(&a, buf, 4);
+  buf += stride;
+  *tu0 = vset_lane_u32(a, *tu0, 1);
+}
+
+static INLINE void load_unaligned_u8_2x2(const uint8_t *buf, int stride,
+                                         uint16x4_t *tu0) {
+  uint16_t a;
+
+  memcpy(&a, buf, 2);
+  buf += stride;
+  *tu0 = vset_lane_u16(a, *tu0, 0);
+  memcpy(&a, buf, 2);
+  buf += stride;
+  *tu0 = vset_lane_u16(a, *tu0, 1);
+}
+
 static INLINE void load_u8_16x8(const uint8_t *s, ptrdiff_t p,
                                 uint8x16_t *const s0, uint8x16_t *const s1,
                                 uint8x16_t *const s2, uint8x16_t *const s3,

@@ -348,39 +348,6 @@ static void reset_tx_size(MACROBLOCK *x, MB_MODE_INFO *mbmi,
   x->skip = 0;
 }
 
-static void set_ref_and_pred_mvs(MACROBLOCK *const x, int8_t rf_type) {
-  MACROBLOCKD *const xd = &x->e_mbd;
-  MB_MODE_INFO *const mbmi = xd->mi[0];
-
-  int ref_mv_idx = mbmi->ref_mv_idx;
-  MB_MODE_INFO_EXT *const mbmi_ext = x->mbmi_ext;
-  CANDIDATE_MV *const curr_ref_mv_stack = mbmi_ext->ref_mv_stack[rf_type];
-
-  if (has_second_ref(mbmi)) {
-    // Special case: NEAR_NEWMV and NEW_NEARMV modes use 1 + mbmi->ref_mv_idx
-    // (like NEARMV) instead
-    if (mbmi->mode == NEAR_NEWMV || mbmi->mode == NEW_NEARMV) ref_mv_idx += 1;
-
-    if (compound_ref0_mode(mbmi->mode) == NEWMV) {
-      int_mv this_mv = curr_ref_mv_stack[ref_mv_idx].this_mv;
-      mbmi_ext->ref_mvs[mbmi->ref_frame[0]][0] = this_mv;
-    }
-    if (compound_ref1_mode(mbmi->mode) == NEWMV) {
-      int_mv this_mv = curr_ref_mv_stack[ref_mv_idx].comp_mv;
-      mbmi_ext->ref_mvs[mbmi->ref_frame[1]][0] = this_mv;
-    }
-  } else {
-    if (mbmi->mode == NEWMV) {
-      int i;
-      for (i = 0; i < 1 + has_second_ref(mbmi); ++i) {
-        int_mv this_mv = (i == 0) ? curr_ref_mv_stack[ref_mv_idx].this_mv
-                                  : curr_ref_mv_stack[ref_mv_idx].comp_mv;
-        mbmi_ext->ref_mvs[mbmi->ref_frame[i]][0] = this_mv;
-      }
-    }
-  }
-}
-
 static void update_state(const AV1_COMP *const cpi, TileDataEnc *tile_data,
                          ThreadData *td, PICK_MODE_CONTEXT *ctx, int mi_row,
                          int mi_col, BLOCK_SIZE bsize, RUN_TYPE dry_run) {
@@ -400,7 +367,6 @@ static void update_state(const AV1_COMP *const cpi, TileDataEnc *tile_data,
   const int mis = cm->mi_stride;
   const int mi_width = mi_size_wide[bsize];
   const int mi_height = mi_size_high[bsize];
-  int8_t rf_type;
 
   assert(mi->sb_type == bsize);
 
@@ -408,11 +374,6 @@ static void update_state(const AV1_COMP *const cpi, TileDataEnc *tile_data,
   *x->mbmi_ext = ctx->mbmi_ext;
 
   reset_intmv_filter_type(mi_addr);
-
-  rf_type = av1_ref_frame_type(mi_addr->ref_frame);
-  if (x->mbmi_ext->ref_mv_count[rf_type] > 1) {
-    set_ref_and_pred_mvs(x, rf_type);
-  }
 
   memcpy(x->blk_skip, ctx->blk_skip, sizeof(x->blk_skip[0]) * ctx->num_4x4_blk);
 
@@ -1279,24 +1240,23 @@ static void update_stats(const AV1_COMMON *const cm, TileDataEnc *tile_data,
             assert(masked_compound_used);
             if (is_interinter_compound_used(COMPOUND_WEDGE, bsize)) {
 #if CONFIG_ENTROPY_STATS
-              ++counts
-                    ->compound_type[bsize][mbmi->interinter_compound_type - 1];
+              ++counts->compound_type[bsize][mbmi->interinter_comp.type - 1];
 #endif
               if (allow_update_cdf) {
                 update_cdf(fc->compound_type_cdf[bsize],
-                           mbmi->interinter_compound_type - 1,
-                           COMPOUND_TYPES - 1);
+                           mbmi->interinter_comp.type - 1, COMPOUND_TYPES - 1);
               }
             }
           }
         }
-        if (mbmi->interinter_compound_type == COMPOUND_WEDGE) {
+        if (mbmi->interinter_comp.type == COMPOUND_WEDGE) {
           if (is_interinter_compound_used(COMPOUND_WEDGE, bsize)) {
 #if CONFIG_ENTROPY_STATS
-            counts->wedge_idx[bsize][mbmi->wedge_index]++;
+            counts->wedge_idx[bsize][mbmi->interinter_comp.wedge_index]++;
 #endif
             if (allow_update_cdf) {
-              update_cdf(fc->wedge_idx_cdf[bsize], mbmi->wedge_index, 16);
+              update_cdf(fc->wedge_idx_cdf[bsize],
+                         mbmi->interinter_comp.wedge_index, 16);
             }
           }
         }
@@ -1478,7 +1438,7 @@ static void encode_b(const AV1_COMP *const cpi, TileDataEnc *tile_data,
     }
     if (has_second_ref(mbmi)) {
       if (mbmi->compound_idx == 0 ||
-          mbmi->interinter_compound_type == COMPOUND_AVERAGE)
+          mbmi->interinter_comp.type == COMPOUND_AVERAGE)
         mbmi->comp_group_idx = 0;
       else
         mbmi->comp_group_idx = 1;
@@ -3900,9 +3860,19 @@ static void encode_rd_sb_row(AV1_COMP *cpi, ThreadData *td,
     if (cm->delta_q_present_flag) {
       // Delta-q modulation based on variance
       av1_setup_src_planes(x, cpi->source, mi_row, mi_col, num_planes);
-      int block_var_level = av1_block_energy(cpi, x, cm->seq_params.sb_size);
-      int offset_qindex =
-          av1_compute_deltaq_from_energy_level(cpi, block_var_level);
+
+      int offset_qindex;
+      if (DELTAQ_MODULATION == 1) {
+        const int block_wavelet_energy_level =
+            av1_block_wavelet_energy_level(cpi, x, cm->seq_params.sb_size);
+        offset_qindex = av1_compute_deltaq_from_energy_level(
+            cpi, block_wavelet_energy_level);
+      } else {
+        const int block_var_level =
+            av1_block_energy(cpi, x, cm->seq_params.sb_size);
+        offset_qindex =
+            av1_compute_deltaq_from_energy_level(cpi, block_var_level);
+      }
       int qmask = ~(cm->delta_q_res - 1);
       int current_qindex = clamp(cm->base_qindex + offset_qindex,
                                  cm->delta_q_res, 256 - cm->delta_q_res);
@@ -3973,6 +3943,7 @@ static void encode_rd_sb_row(AV1_COMP *cpi, ThreadData *td,
       x->use_cb_search_range = 0;
       init_first_partition_pass_stats_tables(x->first_partition_pass_stats);
       if (cpi->sf.two_pass_partition_search &&
+          !cpi->sf.use_square_partition_only &&
           mi_row + mi_size_high[cm->seq_params.sb_size] < cm->mi_rows &&
           mi_col + mi_size_wide[cm->seq_params.sb_size] < cm->mi_cols &&
           cm->frame_type != KEY_FRAME) {

@@ -72,11 +72,6 @@ set(CONFIG_BITSTREAM_DEBUG 0 CACHE NUMBER "Bitstream debugging flag.")
 set(CONFIG_DEBUG 0 CACHE NUMBER "Debug build flag.")
 set(CONFIG_MISMATCH_DEBUG 0 CACHE NUMBER "Mismatch debugging flag.")
 
-# Testing flags.
-set(CONFIG_DECODE_PERF_TESTS 0 CACHE NUMBER "Enables decoder performance test.")
-set(CONFIG_ENCODE_PERF_TESTS 0 CACHE NUMBER "Enables encoder performance test.")
-set(CONFIG_UNIT_TESTS 1 CACHE NUMBER "Enables unit tests.")
-
 # AV1 feature flags.
 set(CONFIG_ACCOUNTING 0 CACHE NUMBER "Enables bit accounting.")
 set(CONFIG_ANALYZER 0 CACHE NUMBER "Enables bit stream analyzer.")

@@ -235,6 +235,9 @@ get_cxxflags() {
         libwebp | xvidcore)
             echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode -fno-common -DPIC ${COMMON_CFLAGS}"
         ;;
+        libaom)
+            echo "-std=c++11 -fno-exceptions -fembed-bitcode ${COMMON_CFLAGS}"
+        ;;
         *)
             echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
         ;;

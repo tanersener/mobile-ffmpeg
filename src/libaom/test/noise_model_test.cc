@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2018, Alliance for Open Media. All rights reserved
+ *
+ * This source code is subject to the terms of the BSD 2 Clause License and
+ * the Alliance for Open Media Patent License 1.0. If the BSD 2 Clause License
+ * was not distributed with this source code in the LICENSE file, you can
+ * obtain it at www.aomedia.org/license/software. If the Alliance for Open
+ * Media Patent License 1.0 was not distributed with this source code in the
+ * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
+ */
+
 #include <math.h>
 #include <algorithm>
 #include <vector>
@@ -1296,8 +1307,9 @@ TYPED_TEST_P(WienerDenoiseTest, GradientTest) {
     std::vector<double> measured_noise(kWidth * kHeight);
 
     double var = 0;
-    for (int x = 0; x<kWidth>> (c > 0); ++x) {
-      for (int y = 0; y<kHeight>> (c > 0); ++y) {
+    const int shift = (c > 0);
+    for (int x = 0; x < (kWidth >> shift); ++x) {
+      for (int y = 0; y < (kHeight >> shift); ++y) {
         const double diff = this->denoised_[c][y * this->stride_[c] + x] -
                             x * this->kScaleNoise;
         var += diff * diff;
@@ -1316,9 +1328,10 @@ TYPED_TEST_P(WienerDenoiseTest, GradientTest) {
                 measured_psd_d.begin());
       std::copy(this->noise_psd_[0].begin(), this->noise_psd_[0].end(),
                 noise_psd_d.begin());
-      EXPECT_LT(aom_normalized_cross_correlation(
-                    &measured_psd_d[0], &noise_psd_d[0], noise_psd_d.size()),
-                0.35);
+      EXPECT_LT(
+          aom_normalized_cross_correlation(&measured_psd_d[0], &noise_psd_d[0],
+                                           (int)(noise_psd_d.size())),
+          0.35);
     }
   }
 }

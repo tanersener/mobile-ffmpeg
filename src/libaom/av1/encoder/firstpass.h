@@ -70,6 +70,7 @@ typedef struct {
   double frame;
   double weight;
   double intra_error;
+  double frame_avg_wavelet_energy;
   double coded_error;
   double sr_coded_error;
   double pcnt_inter;
@@ -143,6 +144,7 @@ typedef struct {
   double modified_error_max;
   double modified_error_left;
   double mb_av_energy;
+  double frame_avg_haar_energy;
 
 #if CONFIG_FP_MB_STATS
   uint8_t *frame_mb_stats_buf;

@@ -78,6 +78,7 @@ cmake -Wno-dev \
     -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
     ${ARCH_OPTIONS} \
+    -DENABLE_TESTS=0 \
     -DENABLE_EXAMPLES=0 \
     -DENABLE_TOOLS=0 \
     -DCONFIG_UNIT_TESTS=0 \

@@ -1350,7 +1350,7 @@ void av1_foreach_rest_unit_in_plane(const struct AV1Common *cm, int plane,
 int av1_loop_restoration_corners_in_sb(const struct AV1Common *cm, int plane,
                                        int mi_row, int mi_col, BLOCK_SIZE bsize,
                                        int *rcol0, int *rcol1, int *rrow0,
-                                       int *rrow1, int *tile_tl_idx) {
+                                       int *rrow1) {
   assert(rcol0 && rcol1 && rrow0 && rrow1);
 
   if (bsize != cm->seq_params.sb_size) return 0;
@@ -1418,9 +1418,6 @@ int av1_loop_restoration_corners_in_sb(const struct AV1Common *cm, int plane,
   // unit might not exist, in which case we'll clamp accordingly.
   *rcol1 = AOMMIN((mi_rel_col1 * mi_to_num_x + rnd_x) / denom_x, horz_units);
   *rrow1 = AOMMIN((mi_rel_row1 * mi_to_num_y + rnd_y) / denom_y, vert_units);
-
-  const int tile_idx = 0;
-  *tile_tl_idx = tile_idx * rsi->units_per_tile;
 
   return *rcol0 < *rcol1 && *rrow0 < *rrow1;
 }

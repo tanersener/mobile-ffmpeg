@@ -1184,14 +1184,7 @@ static void update_golden_frame_stats(AV1_COMP *cpi) {
     } else if (!rc->source_alt_ref_pending) {
       rc->source_alt_ref_active = 0;
     }
-
-    // Decrement count down till next gf
-    if (rc->frames_till_gf_update_due > 0) rc->frames_till_gf_update_due--;
-
   } else if (!cpi->refresh_alt_ref_frame && !cpi->refresh_alt2_ref_frame) {
-    // Decrement count down till next gf
-    if (rc->frames_till_gf_update_due > 0) rc->frames_till_gf_update_due--;
-
     rc->frames_since_golden++;
   }
 }

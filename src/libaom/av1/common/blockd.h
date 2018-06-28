@@ -210,7 +210,7 @@ typedef struct {
   int wedge_sign;
   DIFFWTD_MASK_TYPE mask_type;
   uint8_t *seg_mask;
-  COMPOUND_TYPE interinter_compound_type;
+  COMPOUND_TYPE type;
 } INTERINTER_COMPOUND_DATA;
 
 #define INTER_TX_SIZE_BUF_LEN 16
@@ -251,10 +251,7 @@ typedef struct MB_MODE_INFO {
   int interintra_wedge_index;
   int interintra_wedge_sign;
   // interinter members
-  COMPOUND_TYPE interinter_compound_type;
-  int wedge_index;
-  int wedge_sign;
-  DIFFWTD_MASK_TYPE mask_type;
+  INTERINTER_COMPOUND_DATA interinter_comp;
   MOTION_MODE motion_mode;
   int overlappable_neighbors[2];
   int_mv mv[2];
@@ -389,8 +386,22 @@ struct buf_2d {
   int stride;
 };
 
+typedef struct eob_info {
+  uint16_t eob;
+  uint16_t max_scan_line;
+} eob_info;
+
+typedef struct {
+  DECLARE_ALIGNED(32, tran_low_t, dqcoeff[MAX_MB_PLANE][MAX_SB_SQUARE]);
+  eob_info eob_data[MAX_MB_PLANE]
+                   [MAX_SB_SQUARE / (TX_SIZE_W_MIN * TX_SIZE_H_MIN)];
+  DECLARE_ALIGNED(16, uint8_t, color_index_map[2][MAX_SB_SQUARE]);
+} CB_BUFFER;
+
 typedef struct macroblockd_plane {
   tran_low_t *dqcoeff;
+  tran_low_t *dqcoeff_block;
+  eob_info *eob_data;
   PLANE_TYPE plane_type;
   int subsampling_x;
   int subsampling_y;
@@ -584,6 +595,10 @@ typedef struct macroblockd {
   CFL_CTX cfl;
 
   JNT_COMP_PARAMS jcp_param;
+
+  uint16_t cb_offset[MAX_MB_PLANE];
+  uint16_t txb_offset[MAX_MB_PLANE];
+  uint16_t color_index_map_offset[2];
 } MACROBLOCKD;
 
 static INLINE int get_bitdepth_data_path_index(const MACROBLOCKD *xd) {

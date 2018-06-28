@@ -204,8 +204,9 @@ void av1_highbd_warp_affine_sse4_1(const int32_t *mat, const uint16_t *ref,
                              ref[iy * stride + (width - 1)] *
                                  (1 << (FILTER_BITS - reduce_bits_horiz)));
         }
-      } else if ((ix4 - 7) < 0) {
-        const int out_of_boundary = -(ix4 - 6);
+      } else if (((ix4 - 7) < 0) || ((ix4 + 9) > width)) {
+        const int out_of_boundary_left = -(ix4 - 6);
+        const int out_of_boundary_right = (ix4 + 8) - width;
 
         for (k = -7; k < AOMMIN(8, p_height - i); ++k) {
           int iy = iy4 + k;
@@ -221,63 +222,30 @@ void av1_highbd_warp_affine_sse4_1(const int32_t *mat, const uint16_t *ref,
           const __m128i src2 =
               _mm_loadu_si128((__m128i *)(ref + iy * stride + ix4 + 1));
 
-          const __m128i shuffle_reg =
-              _mm_loadu_si128((__m128i *)warp_pad_left[out_of_boundary]);
-
           const __m128i src_01 = _mm_shuffle_epi8(
               src, _mm_loadu_si128((__m128i *)warp_highbd_arrange_bytes));
           const __m128i src2_01 = _mm_shuffle_epi8(
               src2, _mm_loadu_si128((__m128i *)warp_highbd_arrange_bytes));
 
-          const __m128i src_lo = _mm_unpacklo_epi64(src_01, src2_01);
-          const __m128i src_hi = _mm_unpackhi_epi64(src_01, src2_01);
+          __m128i src_lo = _mm_unpacklo_epi64(src_01, src2_01);
+          __m128i src_hi = _mm_unpackhi_epi64(src_01, src2_01);
 
-          const __m128i src_shuffle_lo = _mm_shuffle_epi8(src_lo, shuffle_reg);
-          const __m128i src_shuffle_hi = _mm_shuffle_epi8(src_hi, shuffle_reg);
+          if (out_of_boundary_left >= 0) {
+            const __m128i shuffle_reg_left =
+                _mm_loadu_si128((__m128i *)warp_pad_left[out_of_boundary_left]);
+            src_lo = _mm_shuffle_epi8(src_lo, shuffle_reg_left);
+            src_hi = _mm_shuffle_epi8(src_hi, shuffle_reg_left);
+          }
 
-          const __m128i src_padded =
-              _mm_unpacklo_epi8(src_shuffle_lo, src_shuffle_hi);
-          const __m128i src2_padded =
-              _mm_unpackhi_epi8(src_shuffle_lo, src_shuffle_hi);
+          if (out_of_boundary_right >= 0) {
+            const __m128i shuffle_reg_right = _mm_loadu_si128(
+                (__m128i *)warp_pad_right[out_of_boundary_right]);
+            src_lo = _mm_shuffle_epi8(src_lo, shuffle_reg_right);
+            src_hi = _mm_shuffle_epi8(src_hi, shuffle_reg_right);
+          }
 
-          horizontal_filter(src_padded, src2_padded, tmp, sx, alpha, k,
-                            offset_bits_horiz, reduce_bits_horiz);
-        }
-      } else if ((ix4 + 9) > width) {
-        const int out_of_boundary = (ix4 + 8) - width;
-
-        for (k = -7; k < AOMMIN(8, p_height - i); ++k) {
-          int iy = iy4 + k;
-          if (iy < 0)
-            iy = 0;
-          else if (iy > height - 1)
-            iy = height - 1;
-          int sx = sx4 + beta * (k + 4);
-
-          // Load source pixels
-          const __m128i src =
-              _mm_loadu_si128((__m128i *)(ref + iy * stride + ix4 - 7));
-          const __m128i src2 =
-              _mm_loadu_si128((__m128i *)(ref + iy * stride + ix4 + 1));
-
-          const __m128i shuffle_reg =
-              _mm_loadu_si128((__m128i *)warp_pad_right[out_of_boundary]);
-
-          const __m128i src_01 = _mm_shuffle_epi8(
-              src, _mm_loadu_si128((__m128i *)warp_highbd_arrange_bytes));
-          const __m128i src2_01 = _mm_shuffle_epi8(
-              src2, _mm_loadu_si128((__m128i *)warp_highbd_arrange_bytes));
-
-          const __m128i src_lo = _mm_unpacklo_epi64(src_01, src2_01);
-          const __m128i src_hi = _mm_unpackhi_epi64(src_01, src2_01);
-
-          const __m128i src_shuffle_lo = _mm_shuffle_epi8(src_lo, shuffle_reg);
-          const __m128i src_shuffle_hi = _mm_shuffle_epi8(src_hi, shuffle_reg);
-
-          const __m128i src_padded =
-              _mm_unpacklo_epi8(src_shuffle_lo, src_shuffle_hi);
-          const __m128i src2_padded =
-              _mm_unpackhi_epi8(src_shuffle_lo, src_shuffle_hi);
+          const __m128i src_padded = _mm_unpacklo_epi8(src_lo, src_hi);
+          const __m128i src2_padded = _mm_unpackhi_epi8(src_lo, src_hi);
 
           horizontal_filter(src_padded, src2_padded, tmp, sx, alpha, k,
                             offset_bits_horiz, reduce_bits_horiz);

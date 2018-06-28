@@ -676,7 +676,6 @@ void av1_mv_pred(const AV1_COMP *cpi, MACROBLOCK *x, uint8_t *ref_y_buffer,
                  int ref_y_stride, int ref_frame, BLOCK_SIZE block_size) {
   int i;
   int zero_seen = 0;
-  int best_index = 0;
   int best_sad = INT_MAX;
   int this_sad = INT_MAX;
   int max_mv = 0;
@@ -684,11 +683,15 @@ void av1_mv_pred(const AV1_COMP *cpi, MACROBLOCK *x, uint8_t *ref_y_buffer,
   uint8_t *ref_y_ptr;
   MV pred_mv[MAX_MV_REF_CANDIDATES + 1];
   int num_mv_refs = 0;
+  const MV_REFERENCE_FRAME ref_frames[2] = { ref_frame, NONE_FRAME };
+  const int_mv ref_mv =
+      av1_get_ref_mv_from_stack(0, ref_frames, 0, x->mbmi_ext);
+  const int_mv ref_mv1 =
+      av1_get_ref_mv_from_stack(0, ref_frames, 1, x->mbmi_ext);
 
-  pred_mv[num_mv_refs++] = x->mbmi_ext->ref_mvs[ref_frame][0].as_mv;
-  if (x->mbmi_ext->ref_mvs[ref_frame][0].as_int !=
-      x->mbmi_ext->ref_mvs[ref_frame][1].as_int) {
-    pred_mv[num_mv_refs++] = x->mbmi_ext->ref_mvs[ref_frame][1].as_mv;
+  pred_mv[num_mv_refs++] = ref_mv.as_mv;
+  if (ref_mv.as_int != ref_mv1.as_int) {
+    pred_mv[num_mv_refs++] = ref_mv1.as_mv;
   }
   if (cpi->sf.adaptive_motion_search && block_size < x->max_partition_size)
     pred_mv[num_mv_refs++] = x->pred_mv[ref_frame];
@@ -713,12 +716,10 @@ void av1_mv_pred(const AV1_COMP *cpi, MACROBLOCK *x, uint8_t *ref_y_buffer,
     // Note if it is the best so far.
     if (this_sad < best_sad) {
       best_sad = this_sad;
-      best_index = i;
     }
   }
 
   // Note the index of the mv that worked best in the reference list.
-  x->mv_best_ref_index[ref_frame] = best_index;
   x->max_mv_context[ref_frame] = max_mv;
   x->pred_mv_sad[ref_frame] = best_sad;
 }

@@ -276,6 +276,7 @@ typedef struct AV1EncoderConfig {
   int timing_info_present;
   aom_timing_info_t timing_info;
   int decoder_model_info_present_flag;
+  int display_model_info_present_flag;
   int buffer_removal_delay_present;
   aom_dec_model_info_t buffer_model;
   aom_dec_model_op_parameters_t op_params[MAX_NUM_OPERATING_POINTS + 1];
@@ -671,7 +672,6 @@ typedef struct AV1_COMP {
   int global_motion_search_done;
   tran_low_t *tcoeff_buf[MAX_MB_PLANE];
   int extra_arf_allowed;
-  int bwd_ref_allowed;
   // A flag to indicate if intrabc is ever used in current frame.
   int intrabc_used;
   int dv_cost[2][MV_VALS];

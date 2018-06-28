@@ -80,6 +80,7 @@ list(APPEND AOM_AV1_COMMON_SOURCES
             "${AOM_ROOT}/av1/common/tile_common.c"
             "${AOM_ROOT}/av1/common/tile_common.h"
             "${AOM_ROOT}/av1/common/timing.h"
+            "${AOM_ROOT}/av1/common/timing.c"
             "${AOM_ROOT}/av1/common/token_cdfs.h"
             "${AOM_ROOT}/av1/common/txb_common.c"
             "${AOM_ROOT}/av1/common/txb_common.h"
@@ -182,7 +183,6 @@ list(APPEND AOM_AV1_ENCODER_SOURCES
             "${AOM_ROOT}/av1/encoder/speed_features.h"
             "${AOM_ROOT}/av1/encoder/temporal_filter.c"
             "${AOM_ROOT}/av1/encoder/temporal_filter.h"
-            "${AOM_ROOT}/av1/encoder/timing.c"
             "${AOM_ROOT}/av1/encoder/tokenize.c"
             "${AOM_ROOT}/av1/encoder/tokenize.h"
             "${AOM_ROOT}/av1/encoder/wedge_utils.c"
@@ -191,7 +191,9 @@ list(APPEND AOM_AV1_ENCODER_SOURCES
             "${AOM_ROOT}/third_party/fastfeat/fast_9.c"
             "${AOM_ROOT}/third_party/fastfeat/nonmax.c"
             "${AOM_ROOT}/third_party/vector/vector.c"
-            "${AOM_ROOT}/third_party/vector/vector.h")
+            "${AOM_ROOT}/third_party/vector/vector.h"
+            "${AOM_ROOT}/av1/encoder/dwt.c"
+            "${AOM_ROOT}/av1/encoder/dwt.h")
 
 list(APPEND AOM_AV1_COMMON_INTRIN_SSE2
             "${AOM_ROOT}/av1/common/cdef_block_sse2.c"
@@ -290,7 +292,11 @@ list(APPEND AOM_AV1_COMMON_INTRIN_NEON
             "${AOM_ROOT}/av1/common/arm/jnt_convolve_neon.c"
             "${AOM_ROOT}/av1/common/arm/mem_neon.h"
             "${AOM_ROOT}/av1/common/arm/transpose_neon.h"
+            "${AOM_ROOT}/av1/common/arm/blend_a64_hmask_neon.c"
+            "${AOM_ROOT}/av1/common/arm/blend_a64_vmask_neon.c"
+            "${AOM_ROOT}/av1/common/arm/reconinter_neon.c"
             "${AOM_ROOT}/av1/common/arm/wiener_convolve_neon.c"
+            "${AOM_ROOT}/av1/common/arm/intrapred_neon.c"
             "${AOM_ROOT}/av1/common/cdef_block_neon.c")
 
 list(APPEND AOM_AV1_ENCODER_INTRIN_SSE4_2

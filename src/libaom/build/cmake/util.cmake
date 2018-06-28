@@ -36,8 +36,12 @@ endfunction()
 
 # Sets the value of the variable referenced by $feature to $value, and reports
 # the change to the user via call to message(WARNING ...). $cause is expected to
-# be a configuration variable that conflicts with $feature in some way.
+# be a configuration variable that conflicts with $feature in some way. This
+# function is a noop if $feature is already set to $value.
 function(change_config_and_warn feature value cause)
+  if(${feature} EQUAL ${value})
+    return()
+  endif()
   set(${feature} ${value} PARENT_SCOPE)
   if(${value} EQUAL 1)
     set(verb "Enabled")

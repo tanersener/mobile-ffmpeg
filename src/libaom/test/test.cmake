@@ -111,6 +111,7 @@ if(NOT BUILD_SHARED_LIBS)
                 "${AOM_ROOT}/test/coding_path_sync.cc"
                 "${AOM_ROOT}/test/decode_multithreaded_test.cc"
                 "${AOM_ROOT}/test/divu_small_test.cc"
+                "${AOM_ROOT}/test/dr_prediction_test.cc"
                 "${AOM_ROOT}/test/ec_test.cc"
                 "${AOM_ROOT}/test/ethread_test.cc"
                 "${AOM_ROOT}/test/film_grain_table_test.cc"
@@ -185,6 +186,7 @@ if(NOT BUILD_SHARED_LIBS)
               "${AOM_ROOT}/test/obmc_variance_test.cc"
               "${AOM_ROOT}/test/sad_test.cc"
               "${AOM_ROOT}/test/subtract_test.cc"
+              "${AOM_ROOT}/test/reconinter_test.cc"
               "${AOM_ROOT}/test/sum_squares_test.cc"
               "${AOM_ROOT}/test/variance_test.cc")
 
@@ -193,7 +195,6 @@ if(NOT BUILD_SHARED_LIBS)
               "${AOM_ROOT}/test/av1_quantize_test.cc"
               "${AOM_ROOT}/test/corner_match_test.cc"
               "${AOM_ROOT}/test/quantize_func_test.cc"
-              "${AOM_ROOT}/test/reconinter_test.cc"
               "${AOM_ROOT}/test/simd_cmp_sse4.cc")
 
   if(HAVE_SSE4_1)
@@ -212,14 +213,13 @@ if(NOT BUILD_SHARED_LIBS)
 
 endif()
 
-if(CONFIG_UNIT_TESTS)
+if(ENABLE_TESTS)
   find_package(PythonInterp)
   if(NOT PYTHONINTERP_FOUND)
-    message(
-      FATAL_ERROR
-        "--- Unit tests require Python, rerun cmake with "
-        "-DCONFIG_UNIT_TESTS=0 to avoid this error, or install Python and "
-        "make sure it's in your PATH.")
+    message(FATAL_ERROR
+              "--- Unit tests require Python, rerun cmake with "
+              "-DENABLE_TESTS=0 to avoid this error, or install Python and "
+              "make sure it's in your PATH.")
   endif()
 
   if(MSVC) # Force static run time to avoid collisions with googletest.
@@ -245,8 +245,8 @@ if(CONFIG_UNIT_TESTS)
   endif()
 endif()
 
-# Setup the targets for CONFIG_UNIT_TESTS. The libaom and app util targets must
-# exist before this function is called.
+# Setup testdata download targets, test build targets, and test run targets. The
+# libaom and app util targets must exist before this function is called.
 function(setup_aom_test_targets)
 
   # TODO(tomfinegan): Build speed optimization. $AOM_UNIT_TEST_COMMON_SOURCES
@@ -276,7 +276,7 @@ function(setup_aom_test_targets)
     target_sources(test_libaom PRIVATE $<TARGET_OBJECTS:aom_decoder_app_util>
                    $<TARGET_OBJECTS:test_aom_decoder>)
 
-    if(CONFIG_DECODE_PERF_TESTS AND CONFIG_WEBM_IO)
+    if(ENABLE_DECODE_PERF_TESTS AND CONFIG_WEBM_IO)
       target_sources(test_libaom PRIVATE ${AOM_DECODE_PERF_TEST_SOURCES})
     endif()
   endif()
@@ -285,7 +285,7 @@ function(setup_aom_test_targets)
     target_sources(test_libaom PRIVATE $<TARGET_OBJECTS:test_aom_encoder>
                    $<TARGET_OBJECTS:aom_encoder_app_util>)
 
-    if(CONFIG_ENCODE_PERF_TESTS)
+    if(ENABLE_ENCODE_PERF_TESTS)
       target_sources(test_libaom PRIVATE ${AOM_ENCODE_PERF_TEST_SOURCES})
     endif()
 
@@ -333,63 +333,60 @@ function(setup_aom_test_targets)
                                     "AOM_UNIT_TEST_COMMON_INTRIN_NEON")
   endif()
 
-  make_test_data_lists("${AOM_UNIT_TEST_DATA_LIST_FILE}" test_files
-                       test_file_checksums)
-  list(LENGTH test_files num_test_files)
-  list(LENGTH test_file_checksums num_test_file_checksums)
+  if(ENABLE_TESTDATA)
+    make_test_data_lists("${AOM_UNIT_TEST_DATA_LIST_FILE}" test_files
+                         test_file_checksums)
+    list(LENGTH test_files num_test_files)
+    list(LENGTH test_file_checksums num_test_file_checksums)
 
-  math(EXPR max_file_index "${num_test_files} - 1")
-  foreach(test_index RANGE ${max_file_index})
-    list(GET test_files ${test_index} test_file)
-    list(GET test_file_checksums ${test_index} test_file_checksum)
-    add_custom_target(testdata_${test_index}
-                      COMMAND
-                        ${CMAKE_COMMAND} -DAOM_CONFIG_DIR="${AOM_CONFIG_DIR}"
-                        -DAOM_ROOT="${AOM_ROOT}" -DAOM_TEST_FILE="${test_file}"
-                        -DAOM_TEST_CHECKSUM=${test_file_checksum} -P
-                        "${AOM_ROOT}/test/test_data_download_worker.cmake")
-    list(APPEND testdata_targets testdata_${test_index})
-  endforeach()
+    math(EXPR max_file_index "${num_test_files} - 1")
+    foreach(test_index RANGE ${max_file_index})
+      list(GET test_files ${test_index} test_file)
+      list(GET test_file_checksums ${test_index} test_file_checksum)
+      add_custom_target(testdata_${test_index}
+                        COMMAND
+                          ${CMAKE_COMMAND} -DAOM_CONFIG_DIR="${AOM_CONFIG_DIR}"
+                          -DAOM_ROOT="${AOM_ROOT}"
+                          -DAOM_TEST_FILE="${test_file}"
+                          -DAOM_TEST_CHECKSUM=${test_file_checksum} -P
+                          "${AOM_ROOT}/test/test_data_download_worker.cmake")
+      list(APPEND testdata_targets testdata_${test_index})
+    endforeach()
 
-  # Create a custom build target for running each test data download target.
-  add_custom_target(testdata)
-  add_dependencies(testdata ${testdata_targets})
+    # Create a custom build target for running each test data download target.
+    add_custom_target(testdata)
+    add_dependencies(testdata ${testdata_targets})
 
-  if(NOT ENABLE_IDE_TEST_HOSTING)
-    if(MSVC OR XCODE) # Skip creation of test run targets when generating for
-                      # Visual Studio and  Xcode unless the user explicitly
-                      # requests IDE test hosting. This is done  to make build
-                      # cycles in the IDE tolerable when the IDE command for
-                      # build  project is used to build AOM. Default behavior in
-                      # IDEs is to build all targets, and the test run takes
-                      # hours.
-      return()
+    # Skip creation of test run targets when generating for Visual Studio and
+    # Xcode unless the user explicitly requests IDE test hosting. This is done
+    # to make build cycles in the IDE tolerable when the IDE command for build
+    # project is used to build AOM. Default behavior in IDEs is to build all
+    # targets, and the test run takes hours.
+    if(((NOT MSVC) AND (NOT XCODE)) OR ENABLE_IDE_TEST_HOSTING)
+
+      # Pick a reasonable number of targets (this controls parallelization).
+      processorcount(num_test_targets)
+      if(num_test_targets EQUAL 0) # Just default to 10 targets when there's no
+                                   # processor count available.
+        set(num_test_targets 10)
+      endif()
+
+      math(EXPR max_shard_index "${num_test_targets} - 1")
+      foreach(shard_index RANGE ${max_shard_index})
+        set(test_name "test_${shard_index}")
+        add_custom_target(${test_name}
+                          COMMAND ${CMAKE_COMMAND}
+                                  -DGTEST_SHARD_INDEX=${shard_index}
+                                  -DGTEST_TOTAL_SHARDS=${num_test_targets}
+                                  -DTEST_LIBAOM=$<TARGET_FILE:test_libaom> -P
+                                  "${AOM_ROOT}/test/test_runner.cmake"
+                          DEPENDS testdata test_libaom)
+        list(APPEND test_targets ${test_name})
+      endforeach()
+      add_custom_target(runtests)
+      add_dependencies(runtests ${test_targets})
     endif()
   endif()
-
-  # Pick a reasonable number of targets (this controls parallelization).
-  processorcount(num_test_targets)
-  if(num_test_targets EQUAL 0) # Just default to 10 targets when there's no
-                               # processor count available.
-    set(num_test_targets 10)
-  endif()
-
-  math(EXPR max_shard_index "${num_test_targets} - 1")
-  foreach(shard_index RANGE ${max_shard_index})
-    set(test_name "test_${shard_index}")
-    add_custom_target(${test_name}
-                      COMMAND ${CMAKE_COMMAND}
-                              -DGTEST_SHARD_INDEX=${shard_index}
-                              -DGTEST_TOTAL_SHARDS=${num_test_targets}
-                              -DTEST_LIBAOM=$<TARGET_FILE:test_libaom> -P
-                              "${AOM_ROOT}/test/test_runner.cmake"
-                      DEPENDS testdata test_libaom)
-    list(APPEND test_targets ${test_name})
-  endforeach()
-  add_custom_target(runtests)
-  add_dependencies(runtests ${test_targets})
-
-  set(AOM_APP_TARGETS ${AOM_APP_TARGETS} PARENT_SCOPE)
 
   # Collect all variables containing libaom test source files.
   get_cmake_property(all_cmake_vars VARIABLES)
@@ -400,9 +397,9 @@ function(setup_aom_test_targets)
     if (("${var}" MATCHES "_TEST_" AND NOT
          "${var}" MATCHES
          "_DATA_\|_CMAKE_\|INTRA_PRED\|_COMPILED\|_HOSTING\|_PERF_\|CODER_")
-        OR (CONFIG_AV1_ENCODER AND CONFIG_ENCODE_PERF_TESTS AND
+        OR (CONFIG_AV1_ENCODER AND ENABLE_ENCODE_PERF_TESTS AND
             "${var}" MATCHES "_ENCODE_PERF_TEST_")
-        OR (CONFIG_AV1_DECODER AND CONFIG_DECODE_PERF_TESTS AND
+        OR (CONFIG_AV1_DECODER AND ENABLE_DECODE_PERF_TESTS AND
             "${var}" MATCHES "_DECODE_PERF_TEST_")
         OR (CONFIG_AV1_ENCODER AND "${var}" MATCHES "_TEST_ENCODER_")
         OR (CONFIG_AV1_DECODER AND  "${var}" MATCHES "_TEST_DECODER_"))
@@ -425,4 +422,6 @@ function(setup_aom_test_targets)
       endif()
     endforeach()
   endforeach()
+
+  set(AOM_APP_TARGETS ${AOM_APP_TARGETS} PARENT_SCOPE)
 endfunction()

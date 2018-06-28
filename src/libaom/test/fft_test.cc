@@ -1,3 +1,14 @@
+/*
+ * Copyright (c) 2018, Alliance for Open Media. All rights reserved
+ *
+ * This source code is subject to the terms of the BSD 2 Clause License and
+ * the Alliance for Open Media Patent License 1.0. If the BSD 2 Clause License
+ * was not distributed with this source code in the LICENSE file, you can
+ * obtain it at www.aomedia.org/license/software. If the Alliance for Open
+ * Media Patent License 1.0 was not distributed with this source code in the
+ * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
+ */
+
 #include <math.h>
 
 #include <algorithm>
@@ -73,6 +84,11 @@ struct FFTTestArg {
   FFTTestArg(int n_in, tform_fun_t fft_in, int flag_in)
       : n(n_in), fft(fft_in), flag(flag_in) {}
 };
+
+std::ostream &operator<<(std::ostream &os, const FFTTestArg &test_arg) {
+  return os << "fft_arg { n:" << test_arg.n << " fft:" << test_arg.fft
+            << " flag:" << test_arg.flag << "}";
+}
 
 class FFT2DTest : public ::testing::TestWithParam<FFTTestArg> {
  protected:
@@ -162,6 +178,11 @@ struct IFFTTestArg {
   IFFTTestArg(int n_in, tform_fun_t ifft_in, int flag_in)
       : n(n_in), ifft(ifft_in), flag(flag_in) {}
 };
+
+std::ostream &operator<<(std::ostream &os, const IFFTTestArg &test_arg) {
+  return os << "ifft_arg { n:" << test_arg.n << " fft:" << test_arg.ifft
+            << " flag:" << test_arg.flag << "}";
+}
 
 class IFFT2DTest : public ::testing::TestWithParam<IFFTTestArg> {
  protected:

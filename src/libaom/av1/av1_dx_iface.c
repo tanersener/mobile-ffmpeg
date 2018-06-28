@@ -50,6 +50,7 @@ struct aom_codec_alg_priv {
   int decode_tile_col;
   unsigned int tile_mode;
   unsigned int ext_tile_debug;
+  unsigned int row_mt;
   EXTERNAL_REFERENCES ext_refs;
   unsigned int is_annexb;
   int operating_point;
@@ -180,27 +181,20 @@ static aom_codec_err_t decoder_peek_si_internal(const uint8_t *data,
                                                 aom_codec_stream_info_t *si,
                                                 int *is_intra_only) {
   int intra_only_flag = 0;
+  int got_sequence_header = 0;
+  int found_keyframe = 0;
 
   if (data + data_sz <= data || data_sz < 1) return AOM_CODEC_INVALID_PARAM;
 
   si->w = 0;
   si->h = 0;
-  si->is_kf = 0;
-
-  // TODO(tomfinegan): This function needs Sequence and Frame Header OBUs to
-  // operate properly. At present it hard codes the values to 1 for the keyframe
-  // and intra only flags, and assumes the data being parsed is a Sequence
-  // Header OBU.
-  // NOTE(david.barker): In addition, this code currently requires the video
-  // stream to begin with an optional OBU_TEMPORAL_DELIMITER followed by an
-  // OBU_SEQUENCE_HEADER.
-  intra_only_flag = 1;
-  si->is_kf = 1;
+  si->is_kf = 0;  // is_kf indicates whether the current packet contains a RAP
 
   ObuHeader obu_header;
   memset(&obu_header, 0, sizeof(obu_header));
   size_t payload_size = 0;
   size_t bytes_read = 0;
+  int reduced_still_picture_hdr = 0;
   aom_codec_err_t status = aom_read_obu_header_and_size(
       data, data_sz, si->is_annexb, &obu_header, &payload_size, &bytes_read);
   if (status != AOM_CODEC_OK) return status;
@@ -217,35 +211,65 @@ static aom_codec_err_t decoder_peek_si_internal(const uint8_t *data,
         data, data_sz, si->is_annexb, &obu_header, &payload_size, &bytes_read);
     if (status != AOM_CODEC_OK) return status;
   }
+  while (1) {
+    data += bytes_read;
+    data_sz -= bytes_read;
+    const uint8_t *payload_start = data;
+    // Check that the selected OBU is a sequence header
+    if (obu_header.type == OBU_SEQUENCE_HEADER) {
+      // Sanity check on sequence header size
+      if (data_sz < 2) return AOM_CODEC_CORRUPT_FRAME;
+      // Read a few values from the sequence header payload
+      struct aom_read_bit_buffer rb = { data, data + data_sz, 0, NULL, NULL };
 
-  // Check that the selected OBU is a sequence header
-  if (obu_header.type != OBU_SEQUENCE_HEADER) return AOM_CODEC_UNSUP_BITSTREAM;
+      av1_read_profile(&rb);  // profile
+      const int still_picture = aom_rb_read_bit(&rb);
+      reduced_still_picture_hdr = aom_rb_read_bit(&rb);
 
-  // Read a few values from the sequence header payload
-  data += bytes_read;
-  data_sz -= bytes_read;
-  struct aom_read_bit_buffer rb = { data, data + data_sz, 0, NULL, NULL };
+      if (!still_picture && reduced_still_picture_hdr) {
+        return AOM_CODEC_UNSUP_BITSTREAM;
+      }
 
-  av1_read_profile(&rb);  // profile
-  const int still_picture = aom_rb_read_bit(&rb);
-  const int reduced_still_picture_hdr = aom_rb_read_bit(&rb);
+      if (parse_operating_points(&rb, reduced_still_picture_hdr, si) !=
+          AOM_CODEC_OK) {
+        return AOM_CODEC_ERROR;
+      }
 
-  if (!still_picture && reduced_still_picture_hdr) {
-    return AOM_CODEC_UNSUP_BITSTREAM;
+      int num_bits_width = aom_rb_read_literal(&rb, 4) + 1;
+      int num_bits_height = aom_rb_read_literal(&rb, 4) + 1;
+      int max_frame_width = aom_rb_read_literal(&rb, num_bits_width) + 1;
+      int max_frame_height = aom_rb_read_literal(&rb, num_bits_height) + 1;
+      si->w = max_frame_width;
+      si->h = max_frame_height;
+      got_sequence_header = 1;
+    } else if (obu_header.type == OBU_FRAME_HEADER ||
+               obu_header.type == OBU_FRAME) {
+      if (got_sequence_header && reduced_still_picture_hdr) {
+        found_keyframe = 1;
+        break;
+      } else {
+        // make sure we have enough bits to get the frame type out
+        if (data_sz < 1) return AOM_CODEC_CORRUPT_FRAME;
+        struct aom_read_bit_buffer rb = { data, data + data_sz, 0, NULL, NULL };
+        const int show_existing_frame = aom_rb_read_bit(&rb);
+        if (!show_existing_frame) {
+          const FRAME_TYPE frame_type = (FRAME_TYPE)aom_rb_read_literal(&rb, 2);
+          if (frame_type == KEY_FRAME) {
+            found_keyframe = 1;
+            break;  // Stop here as no further OBUs will change the outcome.
+          }
+        }
+      }
+    }
+    // skip past any unread OBU header data
+    data = payload_start + payload_size;
+    data_sz -= payload_size;
+    if (data_sz <= 0) break;  // exit if we're out of OBUs
+    status = aom_read_obu_header_and_size(
+        data, data_sz, si->is_annexb, &obu_header, &payload_size, &bytes_read);
+    if (status != AOM_CODEC_OK) return status;
   }
-
-  if (parse_operating_points(&rb, reduced_still_picture_hdr, si) !=
-      AOM_CODEC_OK) {
-    return AOM_CODEC_ERROR;
-  }
-
-  int num_bits_width = aom_rb_read_literal(&rb, 4) + 1;
-  int num_bits_height = aom_rb_read_literal(&rb, 4) + 1;
-  int max_frame_width = aom_rb_read_literal(&rb, num_bits_width) + 1;
-  int max_frame_height = aom_rb_read_literal(&rb, num_bits_height) + 1;
-  si->w = max_frame_width;
-  si->h = max_frame_height;
-
+  if (got_sequence_header && found_keyframe) si->is_kf = 1;
   if (is_intra_only != NULL) *is_intra_only = intra_only_flag;
   return AOM_CODEC_OK;
 }
@@ -406,6 +430,7 @@ static aom_codec_err_t init_decoder(aom_codec_alg_priv_t *ctx) {
     frame_worker_data->pbi->operating_point = ctx->operating_point;
     frame_worker_data->pbi->output_all_layers = ctx->output_all_layers;
     frame_worker_data->pbi->ext_tile_debug = ctx->ext_tile_debug;
+    frame_worker_data->pbi->row_mt = ctx->row_mt;
 
     worker->hook = (AVxWorkerHook)frame_worker_hook;
     if (!winterface->reset(worker)) {
@@ -466,6 +491,7 @@ static aom_codec_err_t decode_one(aom_codec_alg_priv_t *ctx,
   frame_worker_data->pbi->dec_tile_row = ctx->decode_tile_row;
   frame_worker_data->pbi->dec_tile_col = ctx->decode_tile_col;
   frame_worker_data->pbi->ext_tile_debug = ctx->ext_tile_debug;
+  frame_worker_data->pbi->row_mt = ctx->row_mt;
   frame_worker_data->pbi->ext_refs = ctx->ext_refs;
 
   frame_worker_data->pbi->common.is_annexb = ctx->is_annexb;
@@ -490,6 +516,25 @@ static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
   const uint8_t *data_start = data;
   const uint8_t *data_end = data + data_sz;
   aom_codec_err_t res = AOM_CODEC_OK;
+
+  // Release any pending output frames from the previous decoder call.
+  // We need to do this even if the decoder is being flushed
+  if (ctx->frame_workers) {
+    BufferPool *const pool = ctx->buffer_pool;
+    RefCntBuffer *const frame_bufs = pool->frame_bufs;
+    lock_buffer_pool(pool);
+    for (int i = 0; i < ctx->num_frame_workers; ++i) {
+      AVxWorker *const worker = &ctx->frame_workers[i];
+      FrameWorkerData *const frame_worker_data =
+          (FrameWorkerData *)worker->data1;
+      struct AV1Decoder *pbi = frame_worker_data->pbi;
+      for (size_t j = 0; j < pbi->num_output_frames; j++) {
+        decrease_ref_count((int)pbi->output_frame_index[j], frame_bufs, pool);
+      }
+      pbi->num_output_frames = 0;
+    }
+    unlock_buffer_pool(ctx->buffer_pool);
+  }
 
   if (data == NULL && data_sz == 0) {
     ctx->flushed = 1;
@@ -576,11 +621,20 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
                                       aom_codec_iter_t *iter) {
   aom_image_t *img = NULL;
 
-  // iter acts as a flip flop, so an image is only returned on the first
-  // call to get_frame.
-  if (*iter == NULL && ctx->frame_workers != NULL) {
+  if (!iter) {
+    return NULL;
+  }
+
+  // To avoid having to allocate any extra storage, treat 'iter' as
+  // simply a pointer to an integer index
+  uintptr_t *index = (uintptr_t *)iter;
+
+  if (ctx->frame_workers != NULL) {
     do {
-      YV12_BUFFER_CONFIG sd;
+      YV12_BUFFER_CONFIG *sd;
+      // NOTE(david.barker): This code does not support multiple worker threads
+      // yet. We should probably move the iteration over threads into *iter
+      // instead of using ctx->next_output_worker_id.
       const AVxWorkerInterface *const winterface = aom_get_worker_interface();
       AVxWorker *const worker = &ctx->frame_workers[ctx->next_output_worker_id];
       FrameWorkerData *const frame_worker_data =
@@ -595,18 +649,29 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
           frame_worker_data->received_frame = 0;
           check_resync(ctx, frame_worker_data->pbi);
         }
-        if (av1_get_raw_frame(frame_worker_data->pbi, &sd) == 0) {
-          AV1_COMMON *const cm = &frame_worker_data->pbi->common;
+        aom_film_grain_t *grain_params;
+        if (av1_get_raw_frame(frame_worker_data->pbi, *index, &sd,
+                              &grain_params) == 0) {
+          *index += 1;  // Advance the iterator to point to the next image
+
+          AV1Decoder *const pbi = frame_worker_data->pbi;
+          AV1_COMMON *const cm = &pbi->common;
           RefCntBuffer *const frame_bufs = cm->buffer_pool->frame_bufs;
-          ctx->last_show_frame = frame_worker_data->pbi->common.new_fb_idx;
+          ctx->last_show_frame = cm->new_fb_idx;
           if (ctx->need_resync) return NULL;
-          yuvconfig2image(&ctx->img, &sd, frame_worker_data->user_priv);
+          yuvconfig2image(&ctx->img, sd, frame_worker_data->user_priv);
+
+          if (!pbi->ext_tile_debug && cm->large_scale_tile) {
+            img = &ctx->img;
+            img->img_data = pbi->tile_list_output;
+            img->sz = pbi->tile_list_size;
+            return img;
+          }
 
           const int num_planes = av1_num_planes(cm);
-          if (cm->single_tile_decoding &&
-              frame_worker_data->pbi->dec_tile_row >= 0) {
-            const int tile_row =
-                AOMMIN(frame_worker_data->pbi->dec_tile_row, cm->tile_rows - 1);
+          if (pbi->ext_tile_debug && cm->single_tile_decoding &&
+              pbi->dec_tile_row >= 0) {
+            const int tile_row = AOMMIN(pbi->dec_tile_row, cm->tile_rows - 1);
             const int mi_row = tile_row * cm->tile_height;
             const int ssy = ctx->img.y_chroma_shift;
             int plane;
@@ -621,10 +686,9 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
                 AOMMIN(cm->tile_height, cm->mi_rows - mi_row) * MI_SIZE;
           }
 
-          if (cm->single_tile_decoding &&
-              frame_worker_data->pbi->dec_tile_col >= 0) {
-            const int tile_col =
-                AOMMIN(frame_worker_data->pbi->dec_tile_col, cm->tile_cols - 1);
+          if (pbi->ext_tile_debug && cm->single_tile_decoding &&
+              pbi->dec_tile_col >= 0) {
+            const int tile_col = AOMMIN(pbi->dec_tile_col, cm->tile_cols - 1);
             const int mi_col = tile_col * cm->tile_width;
             const int ssx = ctx->img.x_chroma_shift;
             int plane;
@@ -642,9 +706,7 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
           img = &ctx->img;
           img->temporal_id = cm->temporal_layer_id;
           img->spatial_id = cm->spatial_layer_id;
-          return add_grain_if_needed(
-              img, ctx->image_with_grain,
-              &frame_worker_data->pbi->common.film_grain_params);
+          return add_grain_if_needed(img, ctx->image_with_grain, grain_params);
         }
       } else {
         // Decoding failed. Release the worker thread.
@@ -815,7 +877,7 @@ static aom_codec_err_t ctrl_get_frame_corrupted(aom_codec_alg_priv_t *ctx,
           (FrameWorkerData *)worker->data1;
       AV1Decoder *const pbi = frame_worker_data->pbi;
       RefCntBuffer *const frame_bufs = pbi->common.buffer_pool->frame_bufs;
-      if (pbi->seen_frame_header && pbi->output_frame == NULL)
+      if (pbi->seen_frame_header && pbi->num_output_frames == 0)
         return AOM_CODEC_ERROR;
       if (ctx->last_show_frame >= 0)
         *corrupted = frame_bufs[ctx->last_show_frame].buf.corrupted;
@@ -841,6 +903,27 @@ static aom_codec_err_t ctrl_get_frame_size(aom_codec_alg_priv_t *ctx,
       frame_size[0] = cm->width;
       frame_size[1] = cm->height;
       return AOM_CODEC_OK;
+    } else {
+      return AOM_CODEC_ERROR;
+    }
+  }
+
+  return AOM_CODEC_INVALID_PARAM;
+}
+
+static aom_codec_err_t ctrl_get_frame_header_info(aom_codec_alg_priv_t *ctx,
+                                                  va_list args) {
+  aom_tile_data *const frame_header_info = va_arg(args, aom_tile_data *);
+
+  if (frame_header_info) {
+    if (ctx->frame_workers) {
+      AVxWorker *const worker = ctx->frame_workers;
+      FrameWorkerData *const frame_worker_data =
+          (FrameWorkerData *)worker->data1;
+      const AV1Decoder *pbi = frame_worker_data->pbi;
+      frame_header_info->coded_tile_data_size = pbi->obu_size_hdr.size;
+      frame_header_info->coded_tile_data = pbi->obu_size_hdr.data;
+      frame_header_info->extra_size = pbi->frame_header_size;
     } else {
       return AOM_CODEC_ERROR;
     }
@@ -1044,6 +1127,12 @@ static aom_codec_err_t ctrl_ext_tile_debug(aom_codec_alg_priv_t *ctx,
   return AOM_CODEC_OK;
 }
 
+static aom_codec_err_t ctrl_set_row_mt(aom_codec_alg_priv_t *ctx,
+                                       va_list args) {
+  ctx->row_mt = va_arg(args, unsigned int);
+  return AOM_CODEC_OK;
+}
+
 static aom_codec_ctrl_fn_map_t decoder_ctrl_maps[] = {
   { AV1_COPY_REFERENCE, ctrl_copy_reference },
 
@@ -1065,6 +1154,7 @@ static aom_codec_ctrl_fn_map_t decoder_ctrl_maps[] = {
   { AV1D_SET_OUTPUT_ALL_LAYERS, ctrl_set_output_all_layers },
   { AV1_SET_INSPECTION_CALLBACK, ctrl_set_inspection_callback },
   { AV1D_EXT_TILE_DEBUG, ctrl_ext_tile_debug },
+  { AV1D_SET_ROW_MT, ctrl_set_row_mt },
   { AV1D_SET_EXT_REF_PTR, ctrl_set_ext_ref_ptr },
 
   // Getters
@@ -1078,6 +1168,7 @@ static aom_codec_ctrl_fn_map_t decoder_ctrl_maps[] = {
   { AV1_GET_NEW_FRAME_IMAGE, ctrl_get_new_frame_image },
   { AV1_COPY_NEW_FRAME_IMAGE, ctrl_copy_new_frame_image },
   { AV1_GET_REFERENCE, ctrl_get_reference },
+  { AV1D_GET_FRAME_HEADER_INFO, ctrl_get_frame_header_info },
   { AV1D_GET_TILE_DATA, ctrl_get_tile_data },
 
   { -1, NULL },

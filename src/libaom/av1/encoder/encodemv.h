@@ -30,6 +30,16 @@ void av1_update_mv_count(ThreadData *td);
 void av1_encode_dv(aom_writer *w, const MV *mv, const MV *ref,
                    nmv_context *mvctx);
 int_mv av1_get_ref_mv(const MACROBLOCK *x, int ref_idx);
+int_mv av1_get_ref_mv_from_stack(int ref_idx,
+                                 const MV_REFERENCE_FRAME *ref_frame,
+                                 int ref_mv_idx,
+                                 const MB_MODE_INFO_EXT *mbmi_ext);
+void av1_find_best_ref_mvs_from_stack(int allow_hp,
+                                      const MB_MODE_INFO_EXT *mbmi_ext,
+                                      MV_REFERENCE_FRAME ref_frame,
+                                      int_mv *nearest_mv, int_mv *near_mv,
+                                      int is_integer);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

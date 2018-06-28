@@ -1411,7 +1411,7 @@ static void read_inter_block_mode_info(AV1Decoder *const pbi,
   // init
   mbmi->comp_group_idx = 0;
   mbmi->compound_idx = 1;
-  mbmi->interinter_compound_type = COMPOUND_AVERAGE;
+  mbmi->interinter_comp.type = COMPOUND_AVERAGE;
 
   if (has_second_ref(mbmi) && !mbmi->skip_mode) {
     // Read idx to indicate current compound inter prediction mode group
@@ -1441,20 +1441,21 @@ static void read_inter_block_mode_info(AV1Decoder *const pbi,
 
       // compound_diffwtd, wedge
       if (is_interinter_compound_used(COMPOUND_WEDGE, bsize))
-        mbmi->interinter_compound_type =
+        mbmi->interinter_comp.type =
             1 + aom_read_symbol(r, ec_ctx->compound_type_cdf[bsize],
                                 COMPOUND_TYPES - 1, ACCT_STR);
       else
-        mbmi->interinter_compound_type = COMPOUND_DIFFWTD;
+        mbmi->interinter_comp.type = COMPOUND_DIFFWTD;
 
-      if (mbmi->interinter_compound_type == COMPOUND_WEDGE) {
+      if (mbmi->interinter_comp.type == COMPOUND_WEDGE) {
         assert(is_interinter_compound_used(COMPOUND_WEDGE, bsize));
-        mbmi->wedge_index =
+        mbmi->interinter_comp.wedge_index =
             aom_read_symbol(r, ec_ctx->wedge_idx_cdf[bsize], 16, ACCT_STR);
-        mbmi->wedge_sign = aom_read_bit(r, ACCT_STR);
+        mbmi->interinter_comp.wedge_sign = aom_read_bit(r, ACCT_STR);
       } else {
-        assert(mbmi->interinter_compound_type == COMPOUND_DIFFWTD);
-        mbmi->mask_type = aom_read_literal(r, MAX_DIFFWTD_MASK_BITS, ACCT_STR);
+        assert(mbmi->interinter_comp.type == COMPOUND_DIFFWTD);
+        mbmi->interinter_comp.mask_type =
+            aom_read_literal(r, MAX_DIFFWTD_MASK_BITS, ACCT_STR);
       }
     }
   }

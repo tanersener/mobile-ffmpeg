@@ -1108,7 +1108,7 @@ static void pack_inter_mode_mvs(AV1_COMP *cpi, const int mi_row,
 
       if (mbmi->comp_group_idx == 0) {
         if (mbmi->compound_idx)
-          assert(mbmi->interinter_compound_type == COMPOUND_AVERAGE);
+          assert(mbmi->interinter_comp.type == COMPOUND_AVERAGE);
 
         if (cm->seq_params.enable_jnt_comp) {
           const int comp_index_ctx = get_comp_index_context(cm, xd);
@@ -1123,22 +1123,23 @@ static void pack_inter_mode_mvs(AV1_COMP *cpi, const int mi_row,
                mbmi->motion_mode == SIMPLE_TRANSLATION);
         assert(masked_compound_used);
         // compound_diffwtd, wedge
-        assert(mbmi->interinter_compound_type == COMPOUND_WEDGE ||
-               mbmi->interinter_compound_type == COMPOUND_DIFFWTD);
+        assert(mbmi->interinter_comp.type == COMPOUND_WEDGE ||
+               mbmi->interinter_comp.type == COMPOUND_DIFFWTD);
 
         if (is_interinter_compound_used(COMPOUND_WEDGE, bsize))
-          aom_write_symbol(w, mbmi->interinter_compound_type - 1,
+          aom_write_symbol(w, mbmi->interinter_comp.type - 1,
                            ec_ctx->compound_type_cdf[bsize],
                            COMPOUND_TYPES - 1);
 
-        if (mbmi->interinter_compound_type == COMPOUND_WEDGE) {
+        if (mbmi->interinter_comp.type == COMPOUND_WEDGE) {
           assert(is_interinter_compound_used(COMPOUND_WEDGE, bsize));
-          aom_write_symbol(w, mbmi->wedge_index, ec_ctx->wedge_idx_cdf[bsize],
-                           16);
-          aom_write_bit(w, mbmi->wedge_sign);
+          aom_write_symbol(w, mbmi->interinter_comp.wedge_index,
+                           ec_ctx->wedge_idx_cdf[bsize], 16);
+          aom_write_bit(w, mbmi->interinter_comp.wedge_sign);
         } else {
-          assert(mbmi->interinter_compound_type == COMPOUND_DIFFWTD);
-          aom_write_literal(w, mbmi->mask_type, MAX_DIFFWTD_MASK_BITS);
+          assert(mbmi->interinter_comp.type == COMPOUND_DIFFWTD);
+          aom_write_literal(w, mbmi->interinter_comp.mask_type,
+                            MAX_DIFFWTD_MASK_BITS);
         }
       }
     }
@@ -1158,7 +1159,7 @@ static void write_intrabc_info(MACROBLOCKD *xd,
     assert(mbmi->mode == DC_PRED);
     assert(mbmi->uv_mode == UV_DC_PRED);
     assert(mbmi->motion_mode == SIMPLE_TRANSLATION);
-    int_mv dv_ref = mbmi_ext->ref_mvs[INTRA_FRAME][0];
+    int_mv dv_ref = mbmi_ext->ref_mv_stack[INTRA_FRAME][0].this_mv;
     av1_encode_dv(w, &mbmi->mv[0].as_mv, &dv_ref.as_mv, &ec_ctx->ndvc);
   }
 }
@@ -1611,14 +1612,13 @@ static void write_modes_sb(AV1_COMP *const cpi, const TileInfo *const tile,
 
   const int num_planes = av1_num_planes(cm);
   for (int plane = 0; plane < num_planes; ++plane) {
-    int rcol0, rcol1, rrow0, rrow1, tile_tl_idx;
+    int rcol0, rcol1, rrow0, rrow1;
     if (av1_loop_restoration_corners_in_sb(cm, plane, mi_row, mi_col, bsize,
-                                           &rcol0, &rcol1, &rrow0, &rrow1,
-                                           &tile_tl_idx)) {
+                                           &rcol0, &rcol1, &rrow0, &rrow1)) {
       const int rstride = cm->rst_info[plane].horz_units_per_tile;
       for (int rrow = rrow0; rrow < rrow1; ++rrow) {
         for (int rcol = rcol0; rcol < rcol1; ++rcol) {
-          const int runit_idx = tile_tl_idx + rcol + rrow * rstride;
+          const int runit_idx = rcol + rrow * rstride;
           const RestorationUnitInfo *rui =
               &cm->rst_info[plane].unit_info[runit_idx];
           loop_restoration_write_sb_coeffs(cm, xd, rui, w, plane,
@@ -2204,6 +2204,11 @@ static void write_tile_info(const AV1_COMMON *const cm,
 static void write_ext_tile_info(const AV1_COMMON *const cm,
                                 struct aom_write_bit_buffer *saved_wb,
                                 struct aom_write_bit_buffer *wb) {
+  // This information is stored as a separate byte.
+  int mod = wb->bit_offset % CHAR_BIT;
+  if (mod > 0) aom_wb_write_literal(wb, 0, CHAR_BIT - mod);
+  assert(aom_wb_is_byte_aligned(wb));
+
   *saved_wb = *wb;
   if (cm->tile_rows * cm->tile_cols > 1) {
     // Note that the last item in the uncompressed header is the data
@@ -2507,8 +2512,6 @@ static void write_timing_info_header(AV1_COMMON *const cm,
 
 static void write_decoder_model_info(AV1_COMMON *const cm,
                                      struct aom_write_bit_buffer *wb) {
-  aom_wb_write_literal(wb, cm->buffer_model.bitrate_scale, 4);
-  aom_wb_write_literal(wb, cm->buffer_model.buffer_size_scale, 4);
   aom_wb_write_literal(
       wb, cm->buffer_model.encoder_decoder_buffer_delay_length - 1, 5);
   aom_wb_write_unsigned_literal(wb, cm->buffer_model.num_units_in_decoding_tick,
@@ -2528,12 +2531,6 @@ static void write_dec_model_op_parameters(AV1_COMMON *const cm,
 
   //  aom_wb_write_bit(wb, cm->op_params[op_num].has_parameters);
   //  if (!cm->op_params[op_num].has_parameters) return;
-
-  aom_wb_write_uvlc(wb, cm->op_params[op_num].bitrate - 1);
-
-  aom_wb_write_uvlc(wb, cm->op_params[op_num].buffer_size - 1);
-
-  aom_wb_write_bit(wb, cm->op_params[op_num].cbr_flag);
 
   aom_wb_write_literal(wb, cm->op_params[op_num].decoder_buffer_delay,
                        cm->buffer_model.encoder_decoder_buffer_delay_length);

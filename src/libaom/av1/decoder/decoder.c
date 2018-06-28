@@ -105,7 +105,7 @@ AV1Decoder *av1_decoder_create(BufferPool *const pool) {
   memset(&cm->next_ref_frame_map, -1, sizeof(cm->next_ref_frame_map));
 
   cm->current_video_frame = 0;
-  pbi->ready_for_new_data = 1;
+  pbi->decoding_first_frame = 1;
   pbi->common.buffer_pool = pool;
 
   cm->bit_depth = AOM_BITS_8;
@@ -131,10 +131,29 @@ AV1Decoder *av1_decoder_create(BufferPool *const pool) {
   return pbi;
 }
 
+void av1_dealloc_dec_jobs(struct AV1DecTileMTData *tile_mt_info) {
+  if (tile_mt_info != NULL) {
+#if CONFIG_MULTITHREAD
+    if (tile_mt_info->job_mutex != NULL) {
+      pthread_mutex_destroy(tile_mt_info->job_mutex);
+      aom_free(tile_mt_info->job_mutex);
+    }
+#endif
+    aom_free(tile_mt_info->job_queue);
+    // clear the structure as the source of this call may be a resize in which
+    // case this call will be followed by an _alloc() which may fail.
+    av1_zero(*tile_mt_info);
+  }
+}
+
 void av1_decoder_remove(AV1Decoder *pbi) {
   int i;
 
   if (!pbi) return;
+
+  // Free the tile list output buffer.
+  if (pbi->tile_list_output != NULL) aom_free(pbi->tile_list_output);
+  pbi->tile_list_output = NULL;
 
   aom_get_worker_interface()->end(&pbi->lf_worker);
   aom_free(pbi->lf_worker.data1);
@@ -159,6 +178,7 @@ void av1_decoder_remove(AV1Decoder *pbi) {
   if (pbi->num_workers > 0) {
     av1_loop_filter_dealloc(&pbi->lf_row_sync);
     av1_loop_restoration_dealloc(&pbi->lr_row_sync, pbi->num_workers);
+    av1_dealloc_dec_jobs(&pbi->tile_mt_info);
   }
 
 #if CONFIG_ACCOUNTING
@@ -168,6 +188,24 @@ void av1_decoder_remove(AV1Decoder *pbi) {
   av1_free_mc_tmp_buf(&pbi->td, use_highbd);
 
   aom_free(pbi);
+}
+
+void av1_visit_palette(AV1Decoder *const pbi, MACROBLOCKD *const xd, int mi_row,
+                       int mi_col, aom_reader *r, BLOCK_SIZE bsize,
+                       palette_visitor_fn_t visit) {
+  if (!is_inter_block(xd->mi[0])) {
+    for (int plane = 0; plane < AOMMIN(2, av1_num_planes(&pbi->common));
+         ++plane) {
+      const struct macroblockd_plane *const pd = &xd->plane[plane];
+      if (is_chroma_reference(mi_row, mi_col, bsize, pd->subsampling_x,
+                              pd->subsampling_y)) {
+        if (xd->mi[0]->palette_mode_info.palette_size[plane])
+          visit(xd, plane, r);
+      } else {
+        assert(xd->mi[0]->palette_mode_info.palette_size[plane] == 0);
+      }
+    }
+  }
 }
 
 static int equal_dimensions(const YV12_BUFFER_CONFIG *a,
@@ -241,7 +279,7 @@ aom_codec_err_t av1_set_reference_dec(AV1_COMMON *cm, int idx,
       ref_buf->y_buffer = sd->y_buffer;
       ref_buf->u_buffer = sd->u_buffer;
       ref_buf->v_buffer = sd->v_buffer;
-      ref_buf->use_external_refernce_buffers = 1;
+      ref_buf->use_external_reference_buffers = 1;
     }
   }
 
@@ -303,11 +341,28 @@ static void swap_frame_buffers(AV1Decoder *pbi, int frame_decoded) {
     YV12_BUFFER_CONFIG *cur_frame = get_frame_new_buffer(cm);
 
     if (cm->show_existing_frame || cm->show_frame) {
-      if (pbi->output_frame) {
-        decrease_ref_count(pbi->output_frame_index, frame_bufs, pool);
+      if (pbi->output_all_layers) {
+        // Append this frame to the output queue
+        if (pbi->num_output_frames >= MAX_NUM_SPATIAL_LAYERS) {
+          // We can't store the new frame anywhere, so drop it and return an
+          // error
+          decrease_ref_count(cm->new_fb_idx, frame_bufs, pool);
+          cm->error.error_code = AOM_CODEC_UNSUP_BITSTREAM;
+        } else {
+          pbi->output_frames[pbi->num_output_frames] = cur_frame;
+          pbi->output_frame_index[pbi->num_output_frames] = cm->new_fb_idx;
+          pbi->num_output_frames++;
+        }
+      } else {
+        // Replace any existing output frame
+        assert(pbi->num_output_frames == 0 || pbi->num_output_frames == 1);
+        if (pbi->num_output_frames > 0) {
+          decrease_ref_count((int)pbi->output_frame_index[0], frame_bufs, pool);
+        }
+        pbi->output_frames[0] = cur_frame;
+        pbi->output_frame_index[0] = cm->new_fb_idx;
+        pbi->num_output_frames = 1;
       }
-      pbi->output_frame = cur_frame;
-      pbi->output_frame_index = cm->new_fb_idx;
     } else {
       decrease_ref_count(cm->new_fb_idx, frame_bufs, pool);
     }
@@ -373,7 +428,6 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
     int i;
 
     cm->error.setjmp = 0;
-    pbi->ready_for_new_data = 1;
 
     // Synchronize all threads immediately as a subsequent decode call may
     // cause a resize invalidating some allocations.
@@ -435,6 +489,12 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
   // in the buffer pool. This reference is consumed by swap_frame_buffers().
   swap_frame_buffers(pbi, frame_decoded);
 
+  if (frame_decoded) {
+    pbi->decoding_first_frame = 0;
+  }
+
+  if (cm->error.error_code != AOM_CODEC_OK) return 1;
+
   aom_clear_system_state();
 
   if (!cm->show_existing_frame) {
@@ -457,29 +517,26 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
   cm->last_tile_rows = cm->tile_rows;
   cm->error.setjmp = 0;
 
-  if (frame_decoded) pbi->ready_for_new_data = 0;
   return 0;
 }
 
-int av1_get_raw_frame(AV1Decoder *pbi, YV12_BUFFER_CONFIG *sd) {
-  AV1_COMMON *const cm = &pbi->common;
-  if (pbi->ready_for_new_data == 1) return -1;
+// Get the frame at a particular index in the output queue
+int av1_get_raw_frame(AV1Decoder *pbi, size_t index, YV12_BUFFER_CONFIG **sd,
+                      aom_film_grain_t **grain_params) {
+  RefCntBuffer *const frame_bufs = pbi->common.buffer_pool->frame_bufs;
 
-  pbi->ready_for_new_data = 1;
-
-  /* no raw frame to show!!! */
-  if (!cm->show_frame) return -1;
-
-  *sd = *pbi->output_frame;
+  if (index >= pbi->num_output_frames) return -1;
+  *sd = pbi->output_frames[index];
+  *grain_params = &frame_bufs[pbi->output_frame_index[index]].film_grain_params;
   aom_clear_system_state();
   return 0;
 }
 
+// Get the highest-spatial-layer output
+// TODO(david.barker): What should this do?
 int av1_get_frame_to_show(AV1Decoder *pbi, YV12_BUFFER_CONFIG *frame) {
-  AV1_COMMON *const cm = &pbi->common;
+  if (pbi->num_output_frames == 0) return -1;
 
-  if (!cm->show_frame || !pbi->output_frame) return -1;
-
-  *frame = *pbi->output_frame;
+  *frame = *pbi->output_frames[pbi->num_output_frames - 1];
   return 0;
 }

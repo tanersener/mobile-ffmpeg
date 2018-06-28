@@ -248,11 +248,11 @@ appropriately using the emsdk\_env script.
         -DENABLE_CCACHE=1 \
         -DAOM_TARGET_CPU=generic \
         -DENABLE_DOCS=0 \
+        -DENABLE_TESTS=0 \
         -DCONFIG_ACCOUNTING=1 \
         -DCONFIG_INSPECTION=1 \
         -DCONFIG_MULTITHREAD=0 \
         -DCONFIG_RUNTIME_CPU_DETECT=0 \
-        -DCONFIG_UNIT_TESTS=0 \
         -DCONFIG_WEBM_IO=0 \
         -DCMAKE_TOOLCHAIN_FILE=path/to/emsdk-portable/.../Emscripten.cmake
 ~~~

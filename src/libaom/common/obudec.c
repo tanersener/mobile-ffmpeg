@@ -388,19 +388,7 @@ int obudec_read_temporal_unit(struct ObuDecInputContext *obu_ctx,
         return -1;
       }
 
-      if (obu_header.type == OBU_TEMPORAL_DELIMITER) {
-        // Reset last_layer_id at temporal delimiter
-        if (obu_ctx->last_layer_id != IGNORE_ENHANCEMENT_LAYERS)
-          obu_ctx->last_layer_id = 0;
-        tu_size = obu_ctx->bytes_buffered;
-        break;
-      } else if (obu_size == 0) {
-        tu_size = obu_ctx->bytes_buffered;
-        break;
-      } else if (obu_header.has_extension &&
-                 obu_header.spatial_layer_id > obu_ctx->last_layer_id) {
-        // Update last_layer_id to current spatial layer
-        obu_ctx->last_layer_id = obu_header.spatial_layer_id;
+      if (obu_header.type == OBU_TEMPORAL_DELIMITER || obu_size == 0) {
         tu_size = obu_ctx->bytes_buffered;
         break;
       } else {

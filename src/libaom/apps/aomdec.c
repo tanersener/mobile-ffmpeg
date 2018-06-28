@@ -83,6 +83,8 @@ static const arg_def_t outputfile =
     ARG_DEF("o", "output", 1, "Output file name pattern (see below)");
 static const arg_def_t threadsarg =
     ARG_DEF("t", "threads", 1, "Max threads to use");
+static const arg_def_t rowmtarg =
+    ARG_DEF(NULL, "row-mt", 1, "Enable row based multi-threading");
 static const arg_def_t verbosearg =
     ARG_DEF("v", "verbose", 0, "Show version string");
 static const arg_def_t scalearg =
@@ -114,12 +116,12 @@ static const arg_def_t outallarg = ARG_DEF(
     NULL, "all-layers", 0, "Output all decoded frames of a scalable bitstream");
 
 static const arg_def_t *all_args[] = {
-  &help,           &codecarg,   &use_yv12,    &use_i420,      &flipuvarg,
-  &rawvideo,       &noblitarg,  &progressarg, &limitarg,      &skiparg,
-  &postprocarg,    &summaryarg, &outputfile,  &threadsarg,    &verbosearg,
-  &scalearg,       &fb_arg,     &md5arg,      &framestatsarg, &continuearg,
-  &outbitdeptharg, &tilem,      &tiler,       &tilec,         &isannexb,
-  &oppointarg,     &outallarg,  NULL
+  &help,        &codecarg,       &use_yv12,    &use_i420,   &flipuvarg,
+  &rawvideo,    &noblitarg,      &progressarg, &limitarg,   &skiparg,
+  &postprocarg, &summaryarg,     &outputfile,  &threadsarg, &rowmtarg,
+  &verbosearg,  &scalearg,       &fb_arg,      &md5arg,     &framestatsarg,
+  &continuearg, &outbitdeptharg, &tilem,       &tiler,      &tilec,
+  &isannexb,    &oppointarg,     &outallarg,   NULL
 };
 
 #if CONFIG_LIBYUV
@@ -512,6 +514,7 @@ static int main_loop(int argc, const char **argv_) {
   int do_scale = 0;
   int operating_point = 0;
   int output_all_layers = 0;
+  unsigned int row_mt = 0;
   aom_image_t *scaled_img = NULL;
   aom_image_t *img_shifted = NULL;
   int frame_avail, got_data, flush_decoder = 0;
@@ -535,8 +538,7 @@ static int main_loop(int argc, const char **argv_) {
   memset(&webm_ctx, 0, sizeof(webm_ctx));
   input.webm_ctx = &webm_ctx;
 #endif
-  struct ObuDecInputContext obu_ctx = { NULL, NULL, 0,
-                                        0,    0,    IGNORE_ENHANCEMENT_LAYERS };
+  struct ObuDecInputContext obu_ctx = { NULL, NULL, 0, 0, 0 };
 
   obu_ctx.avx_ctx = &aom_input_ctx;
   input.obu_ctx = &obu_ctx;
@@ -602,6 +604,8 @@ static int main_loop(int argc, const char **argv_) {
       summary = 1;
     } else if (arg_match(&arg, &threadsarg, argi)) {
       cfg.threads = arg_parse_uint(&arg);
+    } else if (arg_match(&arg, &rowmtarg, argi)) {
+      row_mt = arg_parse_uint(&arg);
     } else if (arg_match(&arg, &verbosearg, argi)) {
       quiet = 0;
     } else if (arg_match(&arg, &scalearg, argi)) {
@@ -624,7 +628,6 @@ static int main_loop(int argc, const char **argv_) {
     } else if (arg_match(&arg, &oppointarg, argi)) {
       operating_point = arg_parse_int(&arg);
     } else if (arg_match(&arg, &outallarg, argi)) {
-      input.obu_ctx->last_layer_id = 0;
       output_all_layers = 1;
     } else {
       argj++;
@@ -763,6 +766,11 @@ static int main_loop(int argc, const char **argv_) {
                         output_all_layers)) {
     fprintf(stderr, "Failed to set output_all_layers: %s\n",
             aom_codec_error(&decoder));
+    goto fail;
+  }
+
+  if (aom_codec_control(&decoder, AV1D_SET_ROW_MT, row_mt)) {
+    fprintf(stderr, "Failed to set row_mt: %s\n", aom_codec_error(&decoder));
     goto fail;
   }
 #endif

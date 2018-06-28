@@ -449,6 +449,7 @@ static aom_codec_err_t set_encoder_config(
   if (extra_cfg->timing_info_type == AOM_TIMING_EQUAL) {
     oxcf->timing_info.equal_picture_interval = 1;
     oxcf->decoder_model_info_present_flag = 0;
+    oxcf->display_model_info_present_flag = 1;
   } else if (extra_cfg->timing_info_type == AOM_TIMING_DEC_MODEL) {
     //    if( extra_cfg->arnr_strength > 0 )
     //    {
@@ -464,6 +465,7 @@ static aom_codec_err_t set_encoder_config(
     oxcf->timing_info.equal_picture_interval = 0;
     oxcf->decoder_model_info_present_flag = 1;
     oxcf->buffer_removal_delay_present = 1;
+    oxcf->display_model_info_present_flag = 1;
   }
   if (oxcf->init_framerate > 180) {
     oxcf->init_framerate = 30;
@@ -663,6 +665,12 @@ static aom_codec_err_t set_encoder_config(
     oxcf->limit = n_packets - 1;
   } else {
     oxcf->limit = cfg->g_limit;
+  }
+
+  if (oxcf->limit == 1) {
+    // still picture mode, display model and timing is meaningless
+    oxcf->display_model_info_present_flag = 0;
+    oxcf->timing_info_present = 0;
   }
 
   oxcf->aq_mode = extra_cfg->aq_mode;

@@ -1341,7 +1341,7 @@ int aom_wiener_denoise_2d(const uint8_t *const data[3], uint8_t *denoised[3],
   int init_success = 1;
   aom_flat_block_finder_t block_finder_full;
   aom_flat_block_finder_t block_finder_chroma;
-  const float kBlockNormalization = (1 << bit_depth) - 1;
+  const float kBlockNormalization = (float)((1 << bit_depth) - 1);
   if (chroma_sub[0] != chroma_sub[1]) {
     fprintf(stderr,
             "aom_wiener_denoise_2d doesn't handle different chroma "

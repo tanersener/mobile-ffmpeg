@@ -12,15 +12,14 @@
 // Lightfield Bitstream Parsing
 // ============================
 //
-// This is an lightfield bitstream parsing example. It takes an input file
+// This is a lightfield bitstream parsing example. It takes an input file
 // containing the whole compressed lightfield bitstream(ivf file), and parses it
 // and constructs and outputs a new bitstream that can be decoded by an AV1
-// decoder. The output bitstream contains tile list OBUs. The lf_width and
-// lf_height arguments are the number of lightfield images in each dimension.
-// The lf_blocksize determines the number of reference images used.
+// decoder. The output bitstream contains reference frames(i.e. anchor frames),
+// camera frame header, and tile list OBUs. num_references is the number of
+// anchor frames coded at the beginning of the light field file.
 // After running the lightfield encoder, run lightfield bitstream parsing:
-// examples/lightfield_bitstream_parsing vase10x10.ivf vase_tile_list.ivf 10 10
-// 5
+// examples/lightfield_bitstream_parsing vase10x10.ivf vase_tile_list.ivf 4
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,10 +37,8 @@
 static const char *exec_name;
 
 void usage_exit(void) {
-  fprintf(
-      stderr,
-      "Usage: %s <infile> <outfile> <lf_width> <lf_height> <lf_blocksize> \n",
-      exec_name);
+  fprintf(stderr, "Usage: %s <infile> <outfile> <num_references> \n",
+          exec_name);
   exit(EXIT_FAILURE);
 }
 
@@ -51,7 +48,6 @@ void usage_exit(void) {
 // SB size: 64x64
 const uint8_t output_frame_width_in_tiles_minus_1 = 512 / 64 - 1;
 const uint8_t output_frame_height_in_tiles_minus_1 = 512 / 64 - 1;
-const uint16_t tile_count_minus_1 = 4 - 1;
 
 // Spec:
 // typedef struct {
@@ -74,9 +70,26 @@ typedef struct {
 // Note: order the image index incrementally, so that we only go through the
 // bitstream once to construct the tile list.
 const int num_tile_lists = 2;
-const TILE_LIST_INFO tile_list[2][4] = {
-  { { 0, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 }, { 0, 0, 1, 1 } },
-  { { 1, 0, 0, 0 }, { 1, 0, 1, 0 }, { 1, 0, 0, 1 }, { 1, 0, 1, 1 } },
+const uint16_t tile_count_minus_1 = 9 - 1;
+const TILE_LIST_INFO tile_list[2][9] = {
+  { { 16, 0, 4, 5 },
+    { 83, 3, 13, 2 },
+    { 57, 2, 2, 6 },
+    { 31, 1, 11, 5 },
+    { 2, 0, 7, 4 },
+    { 77, 3, 9, 9 },
+    { 49, 1, 0, 1 },
+    { 6, 0, 3, 10 },
+    { 63, 2, 5, 8 } },
+  { { 65, 2, 11, 1 },
+    { 42, 1, 3, 7 },
+    { 88, 3, 8, 4 },
+    { 76, 3, 1, 15 },
+    { 1, 0, 2, 2 },
+    { 19, 0, 5, 6 },
+    { 60, 2, 4, 0 },
+    { 25, 1, 11, 15 },
+    { 50, 2, 5, 4 } },
 };
 
 int main(int argc, char **argv) {
@@ -85,30 +98,18 @@ int main(int argc, char **argv) {
   AvxVideoWriter *writer = NULL;
   const AvxInterface *decoder = NULL;
   const AvxVideoInfo *info = NULL;
-  const char *lf_width_arg;
-  const char *lf_height_arg;
-  const char *lf_blocksize_arg;
   int width, height;
-  int lf_width, lf_height;
-  int lf_blocksize;
-  int u_blocks, v_blocks;
+  int num_references;
   int n, i;
   aom_codec_pts_t pts;
 
   exec_name = argv[0];
-  if (argc != 6) die("Invalid number of arguments.");
+  if (argc != 4) die("Invalid number of arguments.");
 
   reader = aom_video_reader_open(argv[1]);
   if (!reader) die("Failed to open %s for reading.", argv[1]);
 
-  lf_width_arg = argv[3];
-  lf_height_arg = argv[4];
-  lf_blocksize_arg = argv[5];
-
-  lf_width = (int)strtol(lf_width_arg, NULL, 0);
-  lf_height = (int)strtol(lf_height_arg, NULL, 0);
-  lf_blocksize = (int)strtol(lf_blocksize_arg, NULL, 0);
-
+  num_references = (int)strtol(argv[3], NULL, 0);
   info = aom_video_reader_get_info(reader);
   width = info->frame_width;
   height = info->frame_height;
@@ -128,11 +129,6 @@ int main(int argc, char **argv) {
   // Decode anchor frames.
   aom_codec_control_(&codec, AV1_SET_TILE_MODE, 0);
 
-  // How many anchor frames we have.
-  u_blocks = (lf_width + lf_blocksize - 1) / lf_blocksize;
-  v_blocks = (lf_height + lf_blocksize - 1) / lf_blocksize;
-
-  int num_references = v_blocks * u_blocks;
   for (i = 0; i < num_references; ++i) {
     aom_video_reader_read_frame(reader);
 
@@ -167,10 +163,44 @@ int main(int argc, char **argv) {
     const unsigned char *frame =
         aom_video_reader_get_frame(reader, &frame_size);
     pts = (aom_codec_pts_t)aom_video_reader_get_frame_pts(reader);
+    aom_tile_data frame_header_info = { 0, NULL, 0 };
 
-    // Copy camera frame bitstream directly to get the header.
-    if (!aom_video_writer_write_frame(writer, frame, frame_size, pts))
-      die_codec(&codec, "Failed to copy compressed camera frame.");
+    // Need to decode frame header to get camera frame header info. So, here
+    // decoding 1 tile is enough.
+    aom_codec_control_(&codec, AV1_SET_DECODE_TILE_ROW, 0);
+    aom_codec_control_(&codec, AV1_SET_DECODE_TILE_COL, 0);
+
+    aom_codec_err_t aom_status =
+        aom_codec_decode(&codec, frame, frame_size, NULL);
+    if (aom_status) die_codec(&codec, "Failed to decode tile.");
+
+    aom_codec_control_(&codec, AV1D_GET_FRAME_HEADER_INFO, &frame_header_info);
+
+    size_t obu_size_offset =
+        (uint8_t *)frame_header_info.coded_tile_data - frame;
+    size_t length_field_size = frame_header_info.coded_tile_data_size;
+    // Remove ext-tile tile info.
+    uint32_t frame_header_size = (uint32_t)frame_header_info.extra_size - 1;
+    size_t bytes_to_copy =
+        obu_size_offset + length_field_size + frame_header_size;
+
+    unsigned char *frame_hdr_buf = (unsigned char *)malloc(bytes_to_copy);
+    if (frame_hdr_buf == NULL)
+      die_codec(&codec, "Failed to allocate frame header buffer.");
+
+    memcpy(frame_hdr_buf, frame, bytes_to_copy);
+
+    // Update frame header OBU size.
+    size_t bytes_written = 0;
+    if (aom_uleb_encode_fixed_size(
+            frame_header_size, length_field_size, length_field_size,
+            frame_hdr_buf + obu_size_offset, &bytes_written))
+      die_codec(&codec, "Failed to encode the tile list obu size.");
+
+    // Copy camera frame header bitstream.
+    if (!aom_video_writer_write_frame(writer, frame_hdr_buf, bytes_to_copy,
+                                      pts))
+      die_codec(&codec, "Failed to copy compressed camera frame header.");
   }
 
   // Allocate a buffer to store tile list bitstream. Image format
@@ -214,7 +244,7 @@ int main(int argc, char **argv) {
 
     // Write each tile's data
     for (i = 0; i <= tile_count_minus_1; i++) {
-      aom_tile_data tile_data = { 0, NULL };
+      aom_tile_data tile_data = { 0, NULL, 0 };
 
       int image_idx = tile_list[n][i].image_idx;
       int ref_idx = tile_list[n][i].reference_idx;
@@ -275,7 +305,7 @@ int main(int argc, char **argv) {
                                    &bytes_written))
       die_codec(&codec, "Failed to encode the tile list obu size.");
 
-    // Copy camera frame bitstream directly to get the header.
+    // Copy the tile list.
     if (!aom_video_writer_write_frame(
             writer, tl_buf, tile_list_obu_header_size + tile_list_obu_size,
             tl_pts))

@@ -27,7 +27,6 @@ struct ThreadData;
 
 typedef struct DecWorkerData {
   struct ThreadData *td;
-  int tile_start, tile_end;  // pbi->tile_buffers to decode, inclusive
   const uint8_t *data_end;
   struct aom_internal_error_info error_info;
 } DecWorkerData;

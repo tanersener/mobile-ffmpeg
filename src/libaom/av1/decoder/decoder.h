@@ -38,7 +38,7 @@ typedef struct ThreadData {
   DECLARE_ALIGNED(32, MACROBLOCKD, xd);
   /* dqcoeff are shared by all the planes. So planes must be decoded serially */
   DECLARE_ALIGNED(32, tran_low_t, dqcoeff[MAX_TX_SQUARE]);
-  DECLARE_ALIGNED(16, uint8_t, color_index_map[2][MAX_PALETTE_SQUARE]);
+  CB_BUFFER cb_buffer_base;
   uint8_t *mc_buf[2];
   int32_t mc_buf_size;
 } ThreadData;
@@ -54,17 +54,36 @@ typedef struct TileBufferDec {
   size_t size;
 } TileBufferDec;
 
+typedef struct DataBuffer {
+  const uint8_t *data;
+  size_t size;
+} DataBuffer;
+
 typedef struct EXTERNAL_REFERENCES {
   YV12_BUFFER_CONFIG refs[MAX_EXTERNAL_REFERENCES];
   int num;
 } EXTERNAL_REFERENCES;
 
+typedef struct TileJobsDec {
+  TileBufferDec *tile_buffer;
+  TileDataDec *tile_data;
+} TileJobsDec;
+
+typedef struct AV1DecTileMTData {
+#if CONFIG_MULTITHREAD
+  pthread_mutex_t *job_mutex;
+#endif
+  TileJobsDec *job_queue;
+  int jobs_enqueued;
+  int jobs_dequeued;
+  int alloc_tile_rows;
+  int alloc_tile_cols;
+} AV1DecTileMT;
+
 typedef struct AV1Decoder {
   DECLARE_ALIGNED(32, MACROBLOCKD, mb);
 
   DECLARE_ALIGNED(32, AV1_COMMON, common);
-
-  int ready_for_new_data;
 
   int refresh_frame_flags;
 
@@ -85,10 +104,27 @@ typedef struct AV1Decoder {
   int allocated_tiles;
 
   TileBufferDec tile_buffers[MAX_TILE_ROWS][MAX_TILE_COLS];
+  AV1DecTileMT tile_mt_info;
 
+  // Each time the decoder is called, we expect to receive a full temporal unit.
+  // This can contain up to one shown frame per spatial layer in the current
+  // operating point (note that some layers may be entirely omitted).
+  // If the 'output_all_layers' option is true, we save all of these shown
+  // frames so that they can be returned to the application. If the
+  // 'output_all_layers' option is false, then we only output one image per
+  // temporal unit.
+  //
+  // Note: The saved buffers are released at the start of the next time the
+  // application calls aom_codec_decode().
   int output_all_layers;
-  YV12_BUFFER_CONFIG *output_frame;
-  int output_frame_index;  // Buffer pool index
+  YV12_BUFFER_CONFIG *output_frames[MAX_NUM_SPATIAL_LAYERS];
+  size_t output_frame_index[MAX_NUM_SPATIAL_LAYERS];  // Buffer pool indices
+  size_t num_output_frames;  // How many frames are queued up so far?
+
+  // In order to properly support random-access decoding, we need
+  // to behave slightly differently for the very first frame we decode.
+  // So we track whether this is the first frame or not.
+  int decoding_first_frame;
 
   int allow_lowbitdepth;
   int max_threads;
@@ -119,18 +155,26 @@ typedef struct AV1Decoder {
   // State if the camera frame header is already decoded while
   // large_scale_tile = 1.
   int camera_frame_header_ready;
+  size_t frame_header_size;
+  DataBuffer obu_size_hdr;
   int output_frame_width_in_tiles_minus_1;
   int output_frame_height_in_tiles_minus_1;
   int tile_count_minus_1;
   uint32_t coded_tile_data_size;
   unsigned int ext_tile_debug;  // for ext-tile software debug & testing
+  unsigned int row_mt;
   EXTERNAL_REFERENCES ext_refs;
+  size_t tile_list_size;
+  uint8_t *tile_list_output;
+  size_t buffer_sz;
 } AV1Decoder;
 
 int av1_receive_compressed_data(struct AV1Decoder *pbi, size_t size,
                                 const uint8_t **dest);
 
-int av1_get_raw_frame(struct AV1Decoder *pbi, YV12_BUFFER_CONFIG *sd);
+// Get the frame at a particular index in the output queue
+int av1_get_raw_frame(AV1Decoder *pbi, size_t index, YV12_BUFFER_CONFIG **sd,
+                      aom_film_grain_t **grain_params);
 
 int av1_get_frame_to_show(struct AV1Decoder *pbi, YV12_BUFFER_CONFIG *frame);
 
@@ -147,6 +191,7 @@ aom_codec_err_t av1_copy_new_frame_dec(AV1_COMMON *cm,
 struct AV1Decoder *av1_decoder_create(BufferPool *const pool);
 
 void av1_decoder_remove(struct AV1Decoder *pbi);
+void av1_dealloc_dec_jobs(struct AV1DecTileMTData *tile_jobs_sync);
 
 static INLINE void decrease_ref_count(int idx, RefCntBuffer *const frame_bufs,
                                       BufferPool *const pool) {
@@ -186,6 +231,13 @@ static INLINE int av1_read_uniform(aom_reader *r, int n) {
   else
     return (v << 1) - m + aom_read_literal(r, 1, ACCT_STR);
 }
+
+typedef void (*palette_visitor_fn_t)(MACROBLOCKD *const xd, int plane,
+                                     aom_reader *r);
+
+void av1_visit_palette(AV1Decoder *const pbi, MACROBLOCKD *const xd, int mi_row,
+                       int mi_col, aom_reader *r, BLOCK_SIZE bsize,
+                       palette_visitor_fn_t visit);
 
 #ifdef __cplusplus
 }  // extern "C"

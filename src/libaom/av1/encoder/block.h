@@ -74,7 +74,6 @@ typedef struct {
 } CB_COEFF_BUFFER;
 
 typedef struct {
-  int_mv ref_mvs[MODE_CTX_REF_FRAMES][MAX_MV_REF_CANDIDATES];
   int16_t mode_context[MODE_CTX_REF_FRAMES];
   // TODO(angiebird): Reduce the buffer size according to sb_type
   tran_low_t *tcoeff[MAX_MB_PLANE];
@@ -235,7 +234,6 @@ struct macroblock {
   BLOCK_SIZE min_partition_size;
   BLOCK_SIZE max_partition_size;
 
-  int mv_best_ref_index[REF_FRAMES];
   unsigned int max_mv_context[REF_FRAMES];
   unsigned int source_variance;
   unsigned int pred_sse[REF_FRAMES];

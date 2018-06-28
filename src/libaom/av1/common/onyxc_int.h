@@ -590,7 +590,7 @@ static INLINE int get_free_fb(AV1_COMMON *cm) {
     if (frame_bufs[i].ref_count == 0) break;
 
   if (i != FRAME_BUFFERS) {
-    if (frame_bufs[i].buf.use_external_refernce_buffers) {
+    if (frame_bufs[i].buf.use_external_reference_buffers) {
       // If this frame buffer's y_buffer, u_buffer, and v_buffer point to the
       // external reference buffers. Restore the buffer pointers to point to the
       // internally allocated memory.
@@ -598,7 +598,7 @@ static INLINE int get_free_fb(AV1_COMMON *cm) {
       ybf->y_buffer = ybf->store_buf_adr[0];
       ybf->u_buffer = ybf->store_buf_adr[1];
       ybf->v_buffer = ybf->store_buf_adr[2];
-      ybf->use_external_refernce_buffers = 0;
+      ybf->use_external_reference_buffers = 0;
     }
 
     frame_bufs[i].ref_count = 1;

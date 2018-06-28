@@ -69,6 +69,8 @@ typedef struct aom_tile_data {
   size_t coded_tile_data_size;
   /*! Tile's start address. */
   const void *coded_tile_data;
+  /*! Extra size information. */
+  size_t extra_size;
 } aom_tile_data;
 
 /*!\brief Structure to hold the external reference frame pointer.
@@ -167,6 +169,10 @@ enum aom_dec_control_id {
    *  1 indicates the tiles are coded in large-scale tile mode.
    */
   AV1_SET_TILE_MODE,
+  /** control function to get the frame header information of an encoded frame
+   * in the bitstream. This provides a way to access a frame's header data.
+   */
+  AV1D_GET_FRAME_HEADER_INFO,
   /** control function to get the start address and size of a tile in the coded
    * bitstream. This provides a way to access a specific tile's bitstream data.
    */
@@ -180,6 +186,12 @@ enum aom_dec_control_id {
    * the decoder.
    */
   AV1D_EXT_TILE_DEBUG,
+
+  /** control function to enable the row based multi-threading of decoding. A
+   * value that is equal to 1 indicates that row based multi-threading is
+   * enabled.
+   */
+  AV1D_SET_ROW_MT,
 
   /** control function to indicate whether bitstream is in Annex-B format. */
   AV1D_SET_IS_ANNEXB,
@@ -244,12 +256,16 @@ AOM_CTRL_USE_TYPE(AV1_SET_DECODE_TILE_COL, int)
 #define AOM_CTRL_AV1_SET_DECODE_TILE_COL
 AOM_CTRL_USE_TYPE(AV1_SET_TILE_MODE, unsigned int)
 #define AOM_CTRL_AV1_SET_TILE_MODE
+AOM_CTRL_USE_TYPE(AV1D_GET_FRAME_HEADER_INFO, aom_tile_data *)
+#define AOM_CTRL_AV1D_GET_FRAME_HEADER_INFO
 AOM_CTRL_USE_TYPE(AV1D_GET_TILE_DATA, aom_tile_data *)
 #define AOM_CTRL_AV1D_GET_TILE_DATA
 AOM_CTRL_USE_TYPE(AV1D_SET_EXT_REF_PTR, av1_ext_ref_frame_t *)
 #define AOM_CTRL_AV1D_SET_EXT_REF_PTR
 AOM_CTRL_USE_TYPE(AV1D_EXT_TILE_DEBUG, unsigned int)
 #define AOM_CTRL_AV1D_EXT_TILE_DEBUG
+AOM_CTRL_USE_TYPE(AV1D_SET_ROW_MT, unsigned int)
+#define AOM_CTRL_AV1D_SET_ROW_MT
 AOM_CTRL_USE_TYPE(AV1D_SET_IS_ANNEXB, unsigned int)
 #define AOM_CTRL_AV1D_SET_IS_ANNEXB
 AOM_CTRL_USE_TYPE(AV1D_SET_OPERATING_POINT, int)

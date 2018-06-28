@@ -280,7 +280,7 @@ static int get_coeff_cost(const tran_low_t qc, const int scan_idx,
                           const int is_eob, const TxbInfo *const txb_info,
                           const LV_MAP_COEFF_COST *const txb_costs,
                           const int coeff_ctx, const TX_CLASS tx_class) {
-  const TXB_CTX *txb_ctx = txb_info->txb_ctx;
+  const TXB_CTX *const txb_ctx = txb_info->txb_ctx;
   const int is_nz = (qc != 0);
   const tran_low_t abs_qc = abs(qc);
   int cost = 0;
@@ -792,9 +792,8 @@ static AOM_FORCE_INLINE int warehouse_efficients_txb(
 }
 
 int av1_cost_coeffs_txb(const AV1_COMMON *const cm, const MACROBLOCK *x,
-                        const int plane, const int blk_row, const int blk_col,
-                        const int block, const TX_SIZE tx_size,
-                        const TXB_CTX *const txb_ctx) {
+                        const int plane, const int block, const TX_SIZE tx_size,
+                        const TX_TYPE tx_type, const TXB_CTX *const txb_ctx) {
   const struct macroblock_plane *p = &x->plane[plane];
   const int eob = p->eobs[block];
   const TX_SIZE txs_ctx = get_txsize_entropy_ctx(tx_size);
@@ -806,8 +805,6 @@ int av1_cost_coeffs_txb(const AV1_COMMON *const cm, const MACROBLOCK *x,
   }
 
   const MACROBLOCKD *const xd = &x->e_mbd;
-  const TX_TYPE tx_type = av1_get_tx_type(plane_type, xd, blk_row, blk_col,
-                                          tx_size, cm->reduced_tx_set_used);
   const TX_CLASS tx_class = tx_type_to_class[tx_type];
 
 #define WAREHOUSE_EFFICIENTS_TXB_CASE(tx_class_literal)                        \
@@ -1552,14 +1549,13 @@ static INLINE void update_skip(int *accu_rate, int64_t accu_dist, int *eob,
 }
 
 int av1_optimize_txb_new(const struct AV1_COMP *cpi, MACROBLOCK *x, int plane,
-                         int blk_row, int blk_col, int block, TX_SIZE tx_size,
-                         TXB_CTX *txb_ctx, int *rate_cost, int sharpness) {
+                         int block, TX_SIZE tx_size, TX_TYPE tx_type,
+                         const TXB_CTX *const txb_ctx, int *rate_cost,
+                         int sharpness) {
   const AV1_COMMON *cm = &cpi->common;
   MACROBLOCKD *xd = &x->e_mbd;
   const PLANE_TYPE plane_type = get_plane_type(plane);
   const TX_SIZE txs_ctx = get_txsize_entropy_ctx(tx_size);
-  const TX_TYPE tx_type = av1_get_tx_type(plane_type, xd, blk_row, blk_col,
-                                          tx_size, cm->reduced_tx_set_used);
   const TX_CLASS tx_class = tx_type_to_class[tx_type];
   const MB_MODE_INFO *mbmi = xd->mi[0];
   const struct macroblock_plane *p = &x->plane[plane];

@@ -20,6 +20,8 @@
 extern "C" {
 #endif
 
+#include "aom/aom_integer.h"
+
 /*!\brief Current ABI version number
  *
  * \internal
@@ -170,6 +172,7 @@ typedef struct aom_image {
 #define AOM_PLANE_ALPHA 3   /**< A (Transparency) plane */
   unsigned char *planes[4]; /**< pointer to the top left pixel for each plane */
   int stride[4];            /**< stride between rows for each plane */
+  size_t sz;                /**< data size */
 
   int bps; /**< bits per sample (for packed formats) */
 
