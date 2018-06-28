@@ -1,16 +1,19 @@
 /*
  * jaricom.c
  *
- * Developed 1997-2011 by Guido Vollbeding.
- * This file is part of the Independent JPEG Group's software.
- * For conditions of distribution and use, see the accompanying README file.
+ * This file was part of the Independent JPEG Group's software:
+ * Developed 1997-2009 by Guido Vollbeding.
+ * libjpeg-turbo Modifications:
+ * Copyright (C) 2015, D. R. Commander.
+ * For conditions of distribution and use, see the accompanying README.ijg
+ * file.
  *
  * This file contains probability estimation tables for common use in
  * arithmetic entropy encoding and decoding routines.
  *
- * This data represents Table D.3 in the JPEG spec (D.2 in the draft),
- * ISO/IEC IS 10918-1 and CCITT Recommendation ITU-T T.81, and Table 24
- * in the JBIG spec, ISO/IEC IS 11544 and CCITT Recommendation ITU-T T.82.
+ * This data represents Table D.2 in the JPEG spec (ISO/IEC IS 10918-1
+ * and CCITT Recommendation ITU-T T.81) and Table 24 in the JBIG spec
+ * (ISO/IEC IS 11544 and CCITT Recommendation ITU-T T.82).
  */
 
 #define JPEG_INTERNALS
@@ -18,7 +21,7 @@
 #include "jpeglib.h"
 
 /* The following #define specifies the packing of the four components
- * into the compact INT32 representation.
+ * into the compact JLONG representation.
  * Note that this formula must match the actual arithmetic encoder
  * and decoder implementation.  The implementation has to be changed
  * if this formula is changed.
@@ -26,9 +29,9 @@
  * implementation (jbig_tab.c).
  */
 
-#define V(i,a,b,c,d) (((INT32)a << 16) | ((INT32)c << 8) | ((INT32)d << 7) | b)
+#define V(i,a,b,c,d) (((JLONG)a << 16) | ((JLONG)c << 8) | ((JLONG)d << 7) | b)
 
-const INT32 jpeg_aritab[113+1] = {
+const JLONG jpeg_aritab[113+1] = {
 /*
  * Index, Qe_Value, Next_Index_LPS, Next_Index_MPS, Switch_MPS
  */
@@ -147,7 +150,7 @@ const INT32 jpeg_aritab[113+1] = {
   V( 112, 0x59eb, 112, 111, 1 ),
 /*
  * This last entry is used for fixed probability estimate of 0.5
- * as suggested in Section 10.3 Table 5 of ITU-T Rec. T.851.
+ * as recommended in Section 10.3 Table 5 of ITU-T Rec. T.851.
  */
   V( 113, 0x5a1d, 113, 113, 0 )
 };

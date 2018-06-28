@@ -3,7 +3,8 @@
  *
  * Copyright (C) 1991-1997, Thomas G. Lane.
  * This file is part of the Independent JPEG Group's software.
- * For conditions of distribution and use, see the accompanying README file.
+ * For conditions of distribution and use, see the accompanying README.ijg
+ * file.
  *
  * This file contains routines to read input images in GIF format.
  *
@@ -19,7 +20,7 @@
  *    CompuServe Incorporated."
  */
 
-#include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
+#include "cdjpeg.h"             /* Common decls for cjpeg/djpeg applications */
 
 #ifdef GIF_SUPPORTED
 
@@ -32,7 +33,7 @@ jinit_read_gif (j_compress_ptr cinfo)
 {
   fprintf(stderr, "GIF input is unsupported for legal reasons.  Sorry.\n");
   exit(EXIT_FAILURE);
-  return NULL;			/* keep compiler happy */
+  return NULL;                  /* keep compiler happy */
 }
 
 #endif /* GIF_SUPPORTED */

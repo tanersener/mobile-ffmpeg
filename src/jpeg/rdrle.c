@@ -1,9 +1,12 @@
 /*
  * rdrle.c
  *
+ * This file was part of the Independent JPEG Group's software:
  * Copyright (C) 1991-1996, Thomas G. Lane.
- * This file is part of the Independent JPEG Group's software.
- * For conditions of distribution and use, see the accompanying README file.
+ * It was modified by The libjpeg-turbo Project to include only code and
+ * information relevant to libjpeg-turbo.
+ * For conditions of distribution and use, see the accompanying README.ijg
+ * file.
  *
  * This file contains routines to read input images in Utah RLE format.
  * The Utah Raster Toolkit library is required (version 3.1 or later).
@@ -19,7 +22,7 @@
  * with updates from Robert Hutchinson.
  */
 
-#include "cdjpeg.h"		/* Common decls for cjpeg/djpeg applications */
+#include "cdjpeg.h"             /* Common decls for cjpeg/djpeg applications */
 
 #ifdef RLE_SUPPORTED
 
@@ -38,7 +41,7 @@
 
 /*
  * We support the following types of RLE files:
- *   
+ *
  *   GRAYSCALE   - 8 bits, no colormap
  *   MAPPEDGRAY  - 8 bits, 1 channel colomap
  *   PSEUDOCOLOR - 8 bits, 3 channel colormap
@@ -59,16 +62,16 @@ typedef enum
  * then fetch the required row from the virtual array on subsequent calls.
  */
 
-typedef struct _rle_source_struct * rle_source_ptr;
+typedef struct _rle_source_struct *rle_source_ptr;
 
 typedef struct _rle_source_struct {
   struct cjpeg_source_struct pub; /* public fields */
 
   rle_kind visual;              /* actual type of input file */
   jvirt_sarray_ptr image;       /* virtual array to hold the image */
-  JDIMENSION row;		/* current row # in the virtual array */
+  JDIMENSION row;               /* current row # in the virtual array */
   rle_hdr header;               /* Input file information */
-  rle_pixel** rle_row;          /* holds a row returned by rle_getrow() */
+  rle_pixel **rle_row;          /* holds a row returned by rle_getrow() */
 
 } rle_source_struct;
 
@@ -111,10 +114,10 @@ start_input_rle (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
   }
 
   /* Figure out what we have, set private vars and return values accordingly */
-  
+
   width  = source->header.xmax - source->header.xmin + 1;
   height = source->header.ymax - source->header.ymin + 1;
-  source->header.xmin = 0;		/* realign horizontally */
+  source->header.xmin = 0;              /* realign horizontally */
   source->header.xmax = width-1;
 
   cinfo->image_width      = width;
@@ -131,17 +134,17 @@ start_input_rle (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
   } else if (source->header.ncolors == 1 && source->header.ncmap == 3) {
     source->visual     = PSEUDOCOLOR;
     TRACEMS3(cinfo, 1, JTRC_RLE_MAPPED, width, height,
-	     1 << source->header.cmaplen);
+             1 << source->header.cmaplen);
   } else if (source->header.ncolors == 3 && source->header.ncmap == 3) {
     source->visual     = TRUECOLOR;
     TRACEMS3(cinfo, 1, JTRC_RLE_FULLMAP, width, height,
-	     1 << source->header.cmaplen);
+             1 << source->header.cmaplen);
   } else if (source->header.ncolors == 3 && source->header.ncmap == 0) {
     source->visual     = DIRECTCOLOR;
     TRACEMS2(cinfo, 1, JTRC_RLE, width, height);
   } else
     ERREXIT(cinfo, JERR_RLE_UNSUPPORTED);
-  
+
   if (source->visual == GRAYSCALE || source->visual == MAPPEDGRAY) {
     cinfo->in_color_space   = JCS_GRAYSCALE;
     cinfo->input_components = 1;
@@ -213,7 +216,7 @@ get_pseudocolor_row (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
   colormap = source->header.cmap;
   dest_row = source->pub.buffer[0];
   source->row--;
-  src_row = * (*cinfo->mem->access_virt_sarray)
+  src_row = *(*cinfo->mem->access_virt_sarray)
     ((j_common_ptr) cinfo, source->image, source->row, (JDIMENSION) 1, FALSE);
 
   for (col = cinfo->image_width; col > 0; col--) {
@@ -254,8 +257,7 @@ load_image (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
   rle_row = source->rle_row;
 
   /* Read the RLE data into our virtual array.
-   * We assume here that (a) rle_pixel is represented the same as JSAMPLE,
-   * and (b) we are not on a machine where FAR pointers differ from regular.
+   * We assume here that rle_pixel is represented the same as JSAMPLE.
    */
   RLE_CLR_BIT(source->header, RLE_ALPHA); /* don't read the alpha channel */
 
@@ -287,7 +289,7 @@ load_image (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
   case MAPPEDGRAY:
   case TRUECOLOR:
     for (row = 0; row < cinfo->image_height; row++) {
-      scanline = * (*cinfo->mem->access_virt_sarray)
+      scanline = *(*cinfo->mem->access_virt_sarray)
         ((j_common_ptr) cinfo, source->image, row, (JDIMENSION) 1, TRUE);
       rle_row = source->rle_row;
       rle_getrow(&source->header, rle_row);
@@ -310,7 +312,7 @@ load_image (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
 
   case DIRECTCOLOR:
     for (row = 0; row < cinfo->image_height; row++) {
-      scanline = * (*cinfo->mem->access_virt_sarray)
+      scanline = *(*cinfo->mem->access_virt_sarray)
         ((j_common_ptr) cinfo, source->image, row, (JDIMENSION) 1, TRUE);
       rle_getrow(&source->header, rle_row);
 
@@ -348,7 +350,7 @@ load_image (j_compress_ptr cinfo, cjpeg_source_ptr sinfo)
   source->row = cinfo->image_height;
 
   /* And fetch the topmost (bottommost) row */
-  return (*source->pub.get_pixel_rows) (cinfo, sinfo);   
+  return (*source->pub.get_pixel_rows) (cinfo, sinfo);
 }
 
 
@@ -375,7 +377,7 @@ jinit_read_rle (j_compress_ptr cinfo)
   /* Create module interface object */
   source = (rle_source_ptr)
       (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_IMAGE,
-                                  SIZEOF(rle_source_struct));
+                                  sizeof(rle_source_struct));
   /* Fill in method ptrs */
   source->pub.start_input = start_input_rle;
   source->pub.finish_input = finish_input_rle;

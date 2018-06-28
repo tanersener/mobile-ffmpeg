@@ -1,4 +1,4 @@
-.TH DJPEG 1 "26 July 2015"
+.TH DJPEG 1 "13 November 2017"
 .SH NAME
 djpeg \- decompress a JPEG file to an image file
 .SH SYNOPSIS
@@ -55,23 +55,19 @@ default options are chosen for highest quality output.)  Currently, this is
 equivalent to \fB\-dct fast \-nosmooth \-onepass \-dither ordered\fR.
 .TP
 .B \-grayscale
-Force grayscale output even if JPEG file is color.
-Useful for viewing on monochrome displays; also,
+Force grayscale output even if JPEG file is color.  Useful for viewing on
+monochrome displays; also,
 .B djpeg
 runs noticeably faster in this mode.
 .TP
 .B \-rgb
 Force RGB output even if JPEG file is grayscale.
-This is provided to support applications that don't
-want to cope with grayscale as a separate case.
 .TP
 .BI \-scale " M/N"
-Scale the output image by a factor M/N.  Currently supported scale factors are
-M/N with all M from 1 to 16, where N is the source DCT size, which is 8 for
-baseline JPEG.  If the /N part is omitted, then M specifies the DCT scaled
-size to be applied on the given input.  For baseline JPEG this is equivalent
-to M/8 scaling, since the source DCT size for baseline JPEG is 8.
-Scaling is handy if the image is larger than your screen; also,
+Scale the output image by a factor M/N.  Currently the scale factor must be
+M/8, where M is an integer between 1 and 16 inclusive, or any reduced fraction
+thereof (such as 1/2, 3/4, etc.)  Scaling is handy if the image is larger than
+your screen; also,
 .B djpeg
 runs much faster when scaling down the output.
 .TP
@@ -122,14 +118,28 @@ Use integer DCT method (default).
 .TP
 .B \-dct fast
 Use fast integer DCT (less accurate).
+In libjpeg-turbo, the fast method is generally about 5-15% faster than the int
+method when using the x86/x86-64 SIMD extensions (results may vary with other
+SIMD implementations, or when using libjpeg-turbo without SIMD extensions.)  If
+the JPEG image was compressed using a quality level of 85 or below, then there
+should be little or no perceptible difference between the two algorithms.  When
+decompressing images that were compressed using quality levels above 85,
+however, the difference between the fast and int methods becomes more
+pronounced.  With images compressed using quality=97, for instance, the fast
+method incurs generally about a 4-6 dB loss (in PSNR) relative to the int
+method, but this can be larger for some images.  If you can avoid it, do not
+use the fast method when decompressing images that were compressed using
+quality levels above 97.  The algorithm often degenerates for such images and
+can actually produce a more lossy output image than if the JPEG image had been
+compressed using lower quality levels.
 .TP
 .B \-dct float
 Use floating-point DCT method.
-The float method is very slightly more accurate than the int method, but is
-much slower unless your machine has very fast floating-point hardware.  Also
-note that results of the floating-point method may vary slightly across
-machines, while the integer methods should give the same results everywhere.
-The fast integer method is much less accurate than the other two.
+The float method is mainly a legacy feature.  It does not produce significantly
+more accurate results than the int method, and it is much slower.  The float
+method may also give different results on different machines due to varying
+roundoff behavior, whereas the integer methods should give the same results on
+all machines.
 .TP
 .B \-dither fs
 Use Floyd-Steinberg dithering in color quantization.
@@ -158,7 +168,7 @@ and
 .BR \-onepass .
 .TP
 .B \-nosmooth
-Don't use high-quality upsampling.
+Use a faster, lower-quality upsampling routine.
 .TP
 .B \-onepass
 Use one-pass instead of two-pass color quantization.  The one-pass method is
@@ -175,10 +185,27 @@ Set limit for amount of memory to use in processing large images.  Value is
 in thousands of bytes, or millions of bytes if "M" is attached to the
 number.  For example,
 .B \-max 4m
-selects 4000000 bytes.  If more space is needed, temporary files will be used.
+selects 4000000 bytes.  If more space is needed, an error will occur.
 .TP
 .BI \-outfile " name"
 Send output image to the named file, not to standard output.
+.TP
+.BI \-memsrc
+Load input file into memory before decompressing.  This feature was implemented
+mainly as a way of testing the in-memory source manager (jpeg_mem_src().)
+.TP
+.BI \-skip " Y0,Y1"
+Decompress all rows of the JPEG image except those between Y0 and Y1
+(inclusive.)  Note that if decompression scaling is being used, then Y0 and Y1
+are relative to the scaled image dimensions.
+.TP
+.BI \-crop " WxH+X+Y"
+Decompress only a rectangular subregion of the image, starting at point X,Y
+with width W and height H.  If necessary, X will be shifted left to the nearest
+iMCU boundary, and the width will be increased accordingly.  Note that if
+decompression scaling is being used, then X, Y, W, and H are relative to the
+scaled image dimensions.  Currently this option only works with the
+PBMPLUS (PPM/PGM), GIF, and Targa output formats.
 .TP
 .B \-verbose
 Enable debug printout.  More
@@ -188,6 +215,9 @@ give more output.  Also, version information is printed at startup.
 .B \-debug
 Same as
 .BR \-verbose .
+.TP
+.B \-version
+Print version information and exit.
 .SH EXAMPLES
 .LP
 This example decompresses the JPEG file foo.jpg, quantizes it to
@@ -250,8 +280,14 @@ Wallace, Gregory K.  "The JPEG Still Picture Compression Standard",
 Communications of the ACM, April 1991 (vol. 34, no. 4), pp. 30-44.
 .SH AUTHOR
 Independent JPEG Group
-.SH BUGS
-To avoid the Unisys LZW patent (now expired),
-.B djpeg
-produces uncompressed GIF files.  These are larger than they should be, but
-are readable by standard GIF decoders.
+.PP
+This file was modified by The libjpeg-turbo Project to include only information
+relevant to libjpeg-turbo, to wordsmith certain sections, and to describe
+features not present in libjpeg.
+.SH ISSUES
+Support for compressed GIF output files was removed in djpeg v6b due to
+concerns over the Unisys LZW patent.  Although this patent expired in 2006,
+djpeg still lacks compressed GIF support, for these historical reasons.
+(Conversion of JPEG files to GIF is usually a bad idea anyway, since GIF is a
+256-color format.)  The uncompressed GIF files that djpeg generates are larger
+than they should be, but they are readable by standard GIF decoders.
