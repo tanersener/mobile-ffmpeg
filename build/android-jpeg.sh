@@ -26,7 +26,6 @@ fi
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="jpeg"
 set_toolchain_clang_paths ${LIB_NAME}
-export CCAS=${AS}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
@@ -51,8 +50,8 @@ fi
     --disable-shared \
     --disable-fast-install \
     --with-jpeg8 \
-    --with-gas-preprocessor \
     --with-simd \
+    --without-gas-preprocessor \
     --without-turbojpeg \
     --without-java \
     --host=${TARGET_HOST} || exit 1

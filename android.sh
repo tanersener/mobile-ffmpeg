@@ -511,6 +511,7 @@ do
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
+            unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")
         done
     fi
 done
