@@ -436,7 +436,7 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..32}
+            for library in {0..34}
             do
                 if [[ $library -ne 18 ]] && [[ $library -ne 19 ]]; then
                     enable_library $(get_library_name $library)
