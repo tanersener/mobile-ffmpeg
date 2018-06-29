@@ -280,6 +280,7 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-small  \
     --enable-swscale \
     --enable-shared \
+    --disable-openssl \
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
