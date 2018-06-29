@@ -46,8 +46,10 @@ check_if_dependency_rebuilt() {
         ;;
         gmp)
             set_dependency_rebuilt_flag "gnutls"
+            set_dependency_rebuilt_flag "nettle"
         ;;
         jpeg)
+            set_dependency_rebuilt_flag "tiff"
             set_dependency_rebuilt_flag "libwebp"
         ;;
         libiconv)
@@ -80,7 +82,6 @@ check_if_dependency_rebuilt() {
             set_dependency_rebuilt_flag "libwebp"
         ;;
     esac
-
 }
 
 set_dependency_rebuilt_flag() {
@@ -162,6 +163,16 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
             ;;
             libxml2)
                 if [[ ! -z $OK_libiconv ]]; then
+                    run=1
+                fi
+            ;;
+            nettle)
+                if [[ ! -z $OK_gmp ]]; then
+                    run=1
+                fi
+            ;;
+            tiff)
+                if [[ ! -z $OK_jpeg ]]; then
                     run=1
                 fi
             ;;

@@ -202,8 +202,8 @@ set_library() {
         ;;
         gnutls)
             ENABLED_LIBRARIES[LIBRARY_GNUTLS]=$2
-            ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+            set_library "nettle" $2
             set_library "gmp" $2
             set_library "libiconv" $2
         ;;
@@ -252,7 +252,7 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_LIBWEBP]=$2
             ENABLED_LIBRARIES[LIBRARY_GIFLIB]=$2
             ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
-            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+            set_library "tiff" $2
             set_library "libpng" $2
         ;;
         libxml2)
@@ -287,7 +287,15 @@ set_library() {
         xvidcore)
             ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
         ;;
-        giflib | jpeg | libogg | libpng | libuuid | nettle | tiff | expat)
+        tiff)
+            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+        ;;
+        nettle)
+            ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
+            set_library "gmp" $2
+        ;;
+        giflib | jpeg | libogg | libpng | libuuid | expat)
             # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         *)
