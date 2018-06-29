@@ -69,7 +69,7 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
     NSString *image1 = [resourceFolder stringByAppendingPathComponent: @"colosseum.jpg"];
     NSString *image2 = [resourceFolder stringByAppendingPathComponent: @"pyramid.jpg"];
     NSString *image3 = [resourceFolder stringByAppendingPathComponent: @"tajmahal.jpg"];
-    NSString *videoFile = [resourceFolder stringByAppendingPathComponent: @"slideshow.mp4"];
+    NSString *videoFile = [self getVideoPath];
 
     if (player != nil) {
         [player pause];
@@ -86,8 +86,9 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
 
     NSLog(@"Creating slideshow using video codec: %@\n", videoCodec);
 
-    NSString* slideshowCommand = [self generateSlideshowScript:image1:image2:image3:videoFile:videoCodec];
+    NSString* slideshowCommand = [self generateSlideshowScript:image1:image2:image3:videoFile:videoCodec:[self getCustomOptions]];
 
+    NSLog(@"Creating slideshow: %@\n", slideshowCommand);
     [self loadProgressDialog:@"Creating video slideshow\n\n"];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -120,8 +121,7 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
 }
 
 - (IBAction)playClicked:(id)sender {
-    NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
-    NSString *videoFile = [resourceFolder stringByAppendingPathComponent: @"slideshow.mp4"];
+    NSString *videoFile = [self getVideoPath];
     NSURL*videoURL=[NSURL fileURLWithPath:videoFile];
 
     player = [AVPlayer playerWithURL:videoURL];
@@ -138,7 +138,7 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
     [player play];
 }
 
-- (NSString *) generateSlideshowScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec {
+- (NSString *) generateSlideshowScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions {
     return [NSString stringWithFormat:
 @"-loop 1 -i %@ \
 -loop 1 -i %@ \
@@ -156,7 +156,7 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
 [stream2starting][stream1ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream2blended];\
 [stream3starting][stream2ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream3blended];\
 [stream1overlaid][stream2blended][stream2overlaid][stream3blended][stream3overlaid]concat=n=5:v=1:a=0,format=yuv420p[video] \
--map [video] -vsync 2 -async 1 -c:v %@ -r 30 %@", image1, image2, image3, videoCodec, videoFile];
+-map [video] -vsync 2 -async 1 %@-c:v %@ -r 30 %@", image1, image2, image3, customOptions, videoCodec, videoFile];
 }
 
 - (void)loadProgressDialog:(NSString*) dialogMessage {
@@ -175,6 +175,36 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
     [pending.view addConstraints:constraints];
     [indicator startAnimating];
     [self presentViewController:pending animated:YES completion:nil];
+}
+
+- (NSString *) getVideoPath {
+    NSString *videoCodec = [[self videoCodecText] text];
+    if (videoCodec == nil || [videoCodec length] == 0) {
+        videoCodec = DEFAULT_VIDEO_CODEC;
+    }
+    
+    NSString *extension;
+    if ([videoCodec isEqualToString:@"libaom-av1"]) {
+        extension = @"mkv";
+    } else {
+        extension = @"mp4";
+    }
+    
+    NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
+    return [[resourceFolder stringByAppendingPathComponent: @"slideshow."] stringByAppendingString: extension];
+}
+
+- (NSString *) getCustomOptions {
+    NSString *videoCodec = [[self videoCodecText] text];
+    if (videoCodec == nil || [videoCodec length] == 0) {
+        videoCodec = DEFAULT_VIDEO_CODEC;
+    }
+    
+    if ([videoCodec isEqualToString:@"libaom-av1"]) {
+        return @"-strict experimental ";
+    } else {
+        return @"";
+    }
 }
 
 - (void)dismissProgressDialog {

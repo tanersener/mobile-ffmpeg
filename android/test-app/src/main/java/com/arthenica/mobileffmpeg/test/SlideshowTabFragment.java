@@ -38,7 +38,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.MediaController;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -126,9 +125,35 @@ public class SlideshowTabFragment extends Fragment {
     }
 
     public String getVideoPath() {
-        final String video = "slideshow.mp4";
+        String videoCodec = videoCodecText.getText().toString();
+
+        final String extension;
+        switch (videoCodec) {
+            case "libaom-av1": {
+                extension = "mkv";
+            } break;
+            default: {
+                extension = "mp4";
+            }
+        }
+        final String video = "slideshow." + extension;
 
         return new File(context.getFilesDir(), video).getAbsolutePath();
+    }
+
+    public String getCustomOptions() {
+        String videoCodec = videoCodecText.getText().toString();
+
+        switch (videoCodec) {
+            case "libaom-av1": {
+
+                // libaom support is still experimental, requires this option
+                return "-strict experimental ";
+            }
+            default: {
+                return "";
+            }
+        }
     }
 
     public void createSlideshow() {
@@ -179,7 +204,8 @@ public class SlideshowTabFragment extends Fragment {
             };
             handler.postDelayed(runnable, 1000);
 
-            String script = Slideshow.generateScript(context.getFilesDir(), image1, image2, image3, file.getName(), videoCodec);
+            String script = Slideshow.generateScript(context.getFilesDir(), image1, image2, image3, file.getName(), videoCodec, getCustomOptions());
+            Log.d(TAG, "Creating slideshow: " + script);
             MainActivity.executeAsync(new Function<Integer, Void>() {
 
                 @Override
