@@ -16,10 +16,12 @@ create_package() {
     mkdir ${CURRENT_PACKAGE} || exit 1
 
     cp -r ${SOURCE_PACKAGE}/* ${CURRENT_PACKAGE} || exit 1
-    cp ${BASEDIR}/ios/${PACKAGE_NAME}.podspec ${CURRENT_PACKAGE} || exit 1
-    sed -i '' "s/VERSION/${PACKAGE_VERSION}/g" ${CURRENT_PACKAGE}/${PACKAGE_NAME}.podspec || exit 1
     cd ${CURRENT_PACKAGE} || exit 1
     zip -r "../mobile-ffmpeg-$1-$2-ios-framework.zip" * || exit 1
+
+    # COPY PODSPEC AS THE LAST ITEM
+    cp ${BASEDIR}/ios/${PACKAGE_NAME}.podspec ${CURRENT_PACKAGE} || exit 1
+    sed -i '' "s/VERSION/${PACKAGE_VERSION}/g" ${CURRENT_PACKAGE}/${PACKAGE_NAME}.podspec || exit 1
 }
 
 if [ $# -ne 1 ];
