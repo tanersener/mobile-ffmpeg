@@ -35,7 +35,8 @@ if [ "${MOBILE_FFMPEG_VERSION}" != "$1" ]; then
     echo "1. Update docs"
     echo "2. Update android/app/build.gradle file versions"
     echo "3. Update tools/release scripts' descriptions"
-    echo "4. Update mobileffmpeg.h versions for both android and ios"
+    echo "4. Update podspec links"
+    echo "5. Update mobileffmpeg.h versions for both android and ios"
     exit 1
 fi
 
