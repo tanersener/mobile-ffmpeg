@@ -1,4 +1,17 @@
-libvorbis 1.3.5 (unreleased) -- "Xiph.Org libVorbis I 20150105 (⛄⛄⛄⛄)"
+libvorbis 1.3.6 (2018-03-16) -- "Xiph.Org libVorbis I 20180316 (Now 100% fewer shells)"
+
+* Fix CVE-2018-5146 - out-of-bounds write on codebook decoding.
+* Fix CVE-2017-14632 - free() on unitialized data
+* Fix CVE-2017-14633 - out-of-bounds read
+* Fix bitrate metadata parsing.
+* Fix out-of-bounds read in codebook parsing.
+* Fix residue vector size in Vorbis I spec.
+* Appveyor support
+* Travis CI support
+* Add secondary CMake build system.
+* Build system fixes
+
+libvorbis 1.3.5 (2015-03-03) -- "Xiph.Org libVorbis I 20150105 (⛄⛄⛄⛄)"
 
 * Tolerate single-entry codebooks.
 * Fix decoder crash with invalid input.

@@ -92,7 +92,7 @@ fribidi_get_bidi_type_name (
     }
 }
 
-#if DEBUG+0
+#ifdef DEBUG
 
 char
 fribidi_char_from_bidi_type (

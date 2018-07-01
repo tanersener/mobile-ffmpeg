@@ -1,6 +1,5 @@
 % -*- mode: latex; TeX-master: "Vorbis_I_spec"; -*-
 %!TEX root = Vorbis_I_spec.tex
-% $Id$
 \section{Residue setup and decode} \label{vorbis:spec:residue}
 
 \subsection{Overview}
@@ -270,8 +269,8 @@ process.
   1) [actual\_size] = current blocksize/2;
   2) if residue encoding is format 2
        3) [actual\_size] = [actual\_size] * [ch];
-  4) [limit\_residue\_begin] = maximum of ([residue\_begin],[actual\_size]);
-  5) [limit\_residue\_end] = maximum of ([residue\_end],[actual\_size]);
+  4) [limit\_residue\_begin] = minimum of ([residue\_begin],[actual\_size]);
+  5) [limit\_residue\_end] = minimum of ([residue\_end],[actual\_size]);
 \end{programlisting}
 
 The following convenience values are conceptually useful to clarifying

@@ -25,6 +25,7 @@ ifeq ($(strip $(shell uname)), Darwin)
   # Failure observed with: gcc 4.2.1 and 4.0.1.
   EXTRA_FLAGS += -fno-common
   EXTRA_FLAGS += -DHAVE_GLUT_GLUT_H
+  EXTRA_FLAGS += -Wno-deprecated-declarations
   EXTRA_FLAGS += -I/opt/local/include
   EXTRA_LIBS  += -L/opt/local/lib
   GL_LIBS = -framework GLUT -framework OpenGL
@@ -62,9 +63,6 @@ endif
 # Alternatively, you can just use the command
 # 'make -f makefile.unix EXTRA_FLAGS=-m32' to that effect.
 # EXTRA_FLAGS += -m32
-
-# Extra flags to enable experimental features and code
-# EXTRA_FLAGS += -DWEBP_EXPERIMENTAL_FEATURES
 
 # Extra flags to enable byte swap for 16 bit colorspaces.
 # EXTRA_FLAGS += -DWEBP_SWAP_16BIT_CSP=1
@@ -114,7 +112,12 @@ endif
 AR = ar
 ARFLAGS = r
 CPPFLAGS = -I. -Isrc/ -Wall
-CFLAGS = -O3 -DNDEBUG $(EXTRA_FLAGS)
+ifeq ($(DEBUG), 1)
+  CFLAGS = -g
+else
+  CFLAGS = -O3 -DNDEBUG
+endif
+CFLAGS += $(EXTRA_FLAGS)
 CC = gcc
 INSTALL = install
 GROFF = /usr/bin/groff
@@ -176,11 +179,13 @@ DSP_DEC_OBJS = \
     src/dsp/upsampling_msa.o \
     src/dsp/upsampling_neon.o \
     src/dsp/upsampling_sse2.o \
+    src/dsp/upsampling_sse41.o \
     src/dsp/yuv.o \
     src/dsp/yuv_mips32.o \
     src/dsp/yuv_mips_dsp_r2.o \
     src/dsp/yuv_neon.o \
     src/dsp/yuv_sse2.o \
+    src/dsp/yuv_sse41.o \
 
 DSP_ENC_OBJS = \
     src/dsp/cost.o \
@@ -212,7 +217,6 @@ ENC_OBJS = \
     src/enc/backward_references_enc.o \
     src/enc/config_enc.o \
     src/enc/cost_enc.o \
-    src/enc/delta_palettization_enc.o \
     src/enc/filter_enc.o \
     src/enc/frame_enc.o \
     src/enc/histogram_enc.o \
@@ -310,7 +314,6 @@ HDRS = \
     src/dsp/yuv.h \
     src/enc/backward_references_enc.h \
     src/enc/cost_enc.h \
-    src/enc/delta_palettization_enc.h \
     src/enc/histogram_enc.h \
     src/enc/vp8i_enc.h \
     src/enc/vp8li_enc.h \
@@ -412,11 +415,13 @@ examples/anim_dump: src/libwebp.a
 examples/anim_dump: EXTRA_LIBS += $(GIF_LIBS) $(DWEBP_LIBS)
 examples/cwebp: examples/libexample_util.a
 examples/cwebp: imageio/libimagedec.a
+examples/cwebp: src/demux/libwebpdemux.a
 examples/cwebp: imageio/libimageio_util.a
 examples/cwebp: src/libwebp.a
 examples/cwebp: EXTRA_LIBS += $(CWEBP_LIBS)
 examples/dwebp: examples/libexample_util.a
 examples/dwebp: imageio/libimagedec.a
+examples/dwebp: src/demux/libwebpdemux.a
 examples/dwebp: imageio/libimageenc.a
 examples/dwebp: imageio/libimageio_util.a
 examples/dwebp: src/libwebp.a
@@ -433,13 +438,17 @@ examples/webpmux: examples/libexample_util.a imageio/libimageio_util.a
 examples/webpmux: src/mux/libwebpmux.a src/libwebpdecoder.a
 examples/img2webp: examples/libexample_util.a imageio/libimageio_util.a
 examples/img2webp: imageio/libimagedec.a
+examples/img2webp: src/demux/libwebpdemux.a
 examples/img2webp: src/mux/libwebpmux.a src/libwebp.a
 examples/img2webp: EXTRA_LIBS += $(CWEBP_LIBS)
 examples/webpinfo: examples/libexample_util.a imageio/libimageio_util.a
 examples/webpinfo: src/libwebpdecoder.a
 
 extras/get_disto: extras/get_disto.o
-extras/get_disto: imageio/libimagedec.a imageio/libimageio_util.a src/libwebp.a
+extras/get_disto: imageio/libimagedec.a
+extras/get_disto: src/demux/libwebpdemux.a
+extras/get_disto: imageio/libimageio_util.a
+extras/get_disto: src/libwebp.a
 extras/get_disto: EXTRA_LIBS += $(CWEBP_LIBS)
 
 extras/webp_quality: extras/webp_quality.o
@@ -470,7 +479,7 @@ dist: all
 	for m in man/[cdv]webp.1 man/gif2webp.1 man/webpmux.1 \
                  man/img2webp.1 man/webpinfo.1; do \
 	  basenam=$$(basename $$m .1); \
-	  $(GROFF) -t -e -man -T utf8 $$m \
+	  $(GROFF) -t -e -man -T ascii $$m \
 	    | $(COL) -bx >$(DESTDIR)/doc/$${basenam}.txt; \
 	  $(GROFF) -t -e -man -T html $$m \
 	    | $(COL) -bx >$(DESTDIR)/doc/$${basenam}.html; \

@@ -11,7 +11,6 @@
  ********************************************************************
 
  function: hufftree builder
- last mod: $Id: huffbuild.c 19057 2014-01-22 12:32:31Z xiphmont $
 
  ********************************************************************/
 
@@ -49,7 +48,7 @@ static int getval(FILE *in,int begin,int n,int group,int max){
 
 static void usage(){
   fprintf(stderr,
-          "usage:\n" 
+          "usage:\n"
           "huffbuild <input>.vqd <begin,n,group>|<lorange-hirange> [noguard]\n"
           "   where begin,n,group is first scalar, \n"
           "                          number of scalars of each in line,\n"
@@ -118,7 +117,7 @@ int main(int argc, char *argv[]){
       long v;
       if(get_next_ivalue(file,&v))break;
       if(v>maxval)maxval=v;
-      
+
       if(!(i++&0xff))spinnit("loading... ",i);
     }
     rewind(file);
@@ -129,9 +128,9 @@ int main(int argc, char *argv[]){
     long vals=pow(maxval,subn);
     long *hist=_ogg_calloc(vals,sizeof(long));
     long *lengths=_ogg_calloc(vals,sizeof(long));
-    
+
     for(j=loval;j<vals;j++)hist[j]=guard;
-    
+
     if(file){
       reset_next_value();
       i/=subn;
@@ -143,7 +142,7 @@ int main(int argc, char *argv[]){
       }
       fclose(file);
     }
- 
+
     /* we have the probabilities, build the tree */
     fprintf(stderr,"Building tree for %ld entries\n",vals);
     build_tree_from_lengths0(vals,hist,lengths);
@@ -159,7 +158,7 @@ int main(int argc, char *argv[]){
         exit(1);
       }
     }
-    
+
     /* first, the static vectors, then the book structure to tie it together. */
     /* lengthlist */
     fprintf(file,"static const char _huff_lengthlist_%s[] = {\n",base);
@@ -170,7 +169,7 @@ int main(int argc, char *argv[]){
       fprintf(file,"\n");
     }
     fprintf(file,"};\n\n");
-    
+
     /* the toplevel book */
     fprintf(file,"static const static_codebook _huff_book_%s = {\n",base);
     fprintf(file,"\t%d, %ld,\n",subn,vals);
@@ -179,7 +178,7 @@ int main(int argc, char *argv[]){
     fprintf(file,"\tNULL,\n");
 
     fprintf(file,"\t0\n};\n\n");
-    
+
     fclose(file);
     fprintf(stderr,"Done.                                \n\n");
   }

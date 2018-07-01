@@ -66,7 +66,7 @@ typedef struct SubStream {
     /// For each channel output by the matrix, the output channel to map it to
     uint8_t     ch_assign[MAX_CHANNELS];
     /// The channel layout for this substream
-    uint64_t    ch_layout;
+    uint64_t    mask;
     /// The matrix encoding mode for this substream
     enum AVMatrixEncoding matrix_encoding;
 
@@ -179,6 +179,11 @@ static const uint64_t thd_channel_order[] = {
     AV_CH_TOP_FRONT_CENTER,                                  // Cvh
     AV_CH_LOW_FREQUENCY_2,                                   // LFE2
 };
+
+static int mlp_channel_layout_subset(uint64_t channel_layout, uint64_t mask)
+{
+    return channel_layout && ((channel_layout & mask) == channel_layout);
+}
 
 static uint64_t thd_channel_layout_extract_channel(uint64_t channel_layout,
                                                    int index)
@@ -390,8 +395,8 @@ static int read_major_sync(MLPDecodeContext *m, GetBitContext *gb)
             return AVERROR_PATCHWELCOME;
         }
         if ((substr = (mh.num_substreams > 1)))
-            m->substream[0].ch_layout = AV_CH_LAYOUT_STEREO;
-        m->substream[substr].ch_layout = mh.channel_layout_mlp;
+            m->substream[0].mask = AV_CH_LAYOUT_STEREO;
+        m->substream[substr].mask = mh.channel_layout_mlp;
     } else {
         if (mh.stream_type != 0xba) {
             avpriv_request_sample(m->avctx,
@@ -400,15 +405,15 @@ static int read_major_sync(MLPDecodeContext *m, GetBitContext *gb)
             return AVERROR_PATCHWELCOME;
         }
         if ((substr = (mh.num_substreams > 1)))
-            m->substream[0].ch_layout = AV_CH_LAYOUT_STEREO;
+            m->substream[0].mask = AV_CH_LAYOUT_STEREO;
         if (mh.num_substreams > 2)
             if (mh.channel_layout_thd_stream2)
-                m->substream[2].ch_layout = mh.channel_layout_thd_stream2;
+                m->substream[2].mask = mh.channel_layout_thd_stream2;
             else
-                m->substream[2].ch_layout = mh.channel_layout_thd_stream1;
-        m->substream[substr].ch_layout = mh.channel_layout_thd_stream1;
+                m->substream[2].mask = mh.channel_layout_thd_stream1;
+        m->substream[substr].mask = mh.channel_layout_thd_stream1;
 
-        if (m->avctx->channels<=2 && m->substream[substr].ch_layout == AV_CH_LAYOUT_MONO && m->max_decoded_substream == 1) {
+        if (m->avctx->channels<=2 && m->substream[substr].mask == AV_CH_LAYOUT_MONO && m->max_decoded_substream == 1) {
             av_log(m->avctx, AV_LOG_DEBUG, "Mono stream with 2 substreams, ignoring 2nd\n");
             m->max_decoded_substream = 0;
             if (m->avctx->channels==2)
@@ -474,7 +479,7 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
     uint8_t checksum;
     uint8_t lossless_check;
     int start_count = get_bits_count(gbp);
-    int min_channel, max_channel, max_matrix_channel;
+    int min_channel, max_channel, max_matrix_channel, noise_type;
     const int std_max_matrix_channel = m->avctx->codec_id == AV_CODEC_ID_MLP
                                      ? MAX_MATRIX_CHANNEL_MLP
                                      : MAX_MATRIX_CHANNEL_TRUEHD;
@@ -487,9 +492,9 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
         return AVERROR_INVALIDDATA;
     }
 
-    s->noise_type = get_bits1(gbp);
+    noise_type = get_bits1(gbp);
 
-    if (m->avctx->codec_id == AV_CODEC_ID_MLP && s->noise_type) {
+    if (m->avctx->codec_id == AV_CODEC_ID_MLP && noise_type) {
         av_log(m->avctx, AV_LOG_ERROR, "MLP must have 0x31ea sync word.\n");
         return AVERROR_INVALIDDATA;
     }
@@ -515,7 +520,7 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
 
     /* This should happen for TrueHD streams with >6 channels and MLP's noise
      * type. It is not yet known if this is allowed. */
-    if (max_channel > MAX_MATRIX_CHANNEL_MLP && !s->noise_type) {
+    if (max_channel > MAX_MATRIX_CHANNEL_MLP && !noise_type) {
         avpriv_request_sample(m->avctx,
                               "%d channels (more than the "
                               "maximum supported by the decoder)",
@@ -532,13 +537,14 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
     s->min_channel        = min_channel;
     s->max_channel        = max_channel;
     s->max_matrix_channel = max_matrix_channel;
+    s->noise_type         = noise_type;
 
-    if (m->avctx->request_channel_layout && (s->ch_layout & m->avctx->request_channel_layout) ==
-        m->avctx->request_channel_layout && m->max_decoded_substream > substr) {
+    if (mlp_channel_layout_subset(m->avctx->request_channel_layout, s->mask) &&
+        m->max_decoded_substream > substr) {
         av_log(m->avctx, AV_LOG_DEBUG,
                "Extracting %d-channel downmix (0x%"PRIx64") from substream %d. "
                "Further substreams will be skipped.\n",
-               s->max_channel + 1, s->ch_layout, substr);
+               s->max_channel + 1, s->mask, substr);
         m->max_decoded_substream = substr;
     }
 
@@ -565,9 +571,9 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
     for (ch = 0; ch <= s->max_matrix_channel; ch++) {
         int ch_assign = get_bits(gbp, 6);
         if (m->avctx->codec_id == AV_CODEC_ID_TRUEHD) {
-            uint64_t channel = thd_channel_layout_extract_channel(s->ch_layout,
+            uint64_t channel = thd_channel_layout_extract_channel(s->mask,
                                                                   ch_assign);
-            ch_assign = av_get_channel_layout_channel_index(s->ch_layout,
+            ch_assign = av_get_channel_layout_channel_index(s->mask,
                                                             channel);
         }
         if (ch_assign < 0 || ch_assign > s->max_matrix_channel) {
@@ -609,7 +615,7 @@ static int read_restart_header(MLPDecodeContext *m, GetBitContext *gbp,
 
     if (substr == m->max_decoded_substream) {
         m->avctx->channels       = s->max_matrix_channel + 1;
-        m->avctx->channel_layout = s->ch_layout;
+        m->avctx->channel_layout = s->mask;
         m->dsp.mlp_pack_output = m->dsp.mlp_select_pack_output(s->ch_assign,
                                                                s->output_shift,
                                                                s->max_matrix_channel,

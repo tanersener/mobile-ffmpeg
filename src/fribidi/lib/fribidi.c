@@ -31,7 +31,7 @@
 
 #include <fribidi.h>
 
-#if DEBUG+0
+#ifdef DEBUG
 static int flag_debug = false;
 #endif
 
@@ -40,7 +40,7 @@ fribidi_debug_status (
   void
 )
 {
-#if DEBUG+0
+#ifdef DEBUG
   return flag_debug;
 #else
   return false;
@@ -53,7 +53,7 @@ fribidi_set_debug (
   fribidi_boolean state
 )
 {
-#if DEBUG+0
+#ifdef DEBUG
   return flag_debug = state;
 #else
   return false;
@@ -69,13 +69,9 @@ const char *fribidi_version_info =
   "interface version " FRIBIDI_INTERFACE_VERSION_STRING ",\n"
   "Unicode Character Database version " FRIBIDI_UNICODE_VERSION ",\n"
   "Configure options"
-#if DEBUG+0
+#ifdef DEBUG
   " --enable-debug"
 #endif /* DEBUG */
-#if FRIBIDI_CHARSETS+0
-#else
-  " --disable-charsets"
-#endif /* !FRIBIDI_CHARSETS */
   ".\n\n"
   "Copyright (C) 2004  Sharif FarsiWeb, Inc.\n"
   "Copyright (C) 2001, 2002, 2004, 2005  Behdad Esfahbod\n"

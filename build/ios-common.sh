@@ -33,18 +33,20 @@ get_library_name() {
         20) echo "libilbc" ;;
         21) echo "opus" ;;
         22) echo "snappy" ;;
-        23) echo "giflib" ;;
-        24) echo "jpeg" ;;
-        25) echo "libogg" ;;
-        26) echo "libpng" ;;
-        27) echo "libuuid" ;;
-        28) echo "nettle" ;;
-        29) echo "tiff" ;;
-        30) echo "expat" ;;
-        31) echo "ios-zlib" ;;
-        32) echo "ios-audiotoolbox" ;;
-        33) echo "ios-coreimage" ;;
-        34) echo "ios-bzip2" ;;
+        23) echo "soxr" ;;
+        24) echo "libaom" ;;
+        25) echo "giflib" ;;
+        26) echo "jpeg" ;;
+        27) echo "libogg" ;;
+        28) echo "libpng" ;;
+        29) echo "libuuid" ;;
+        30) echo "nettle" ;;
+        31) echo "tiff" ;;
+        32) echo "expat" ;;
+        33) echo "ios-zlib" ;;
+        34) echo "ios-audiotoolbox" ;;
+        35) echo "ios-coreimage" ;;
+        36) echo "ios-bzip2" ;;
     esac
 }
 
@@ -96,12 +98,18 @@ get_sdk_path() {
 }
 
 get_min_version_cflags() {
+    local min_version=${IOS_MIN_VERSION}
+
+    if [ "$1" == "gnutls" ]; then
+        min_version=${GNUTLS_IOS_MIN_VERSION}
+    fi
+
     case ${ARCH} in
         armv7 | armv7s | arm64)
-            echo "-miphoneos-version-min=${IOS_MIN_VERSION}"
+            echo "-miphoneos-version-min=${min_version}"
         ;;
         i386 | x86-64)
-            echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
+            echo "-mios-simulator-version-min=${min_version}"
         ;;
     esac
 }
@@ -130,7 +138,7 @@ get_arch_specific_cflags() {
             echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp"
         ;;
         arm64)
-            echo "-arch arm64 -target $(get_target_host) -march=armv8a -mcpu=generic"
+            echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic"
         ;;
         i386)
             echo "-arch i386 -target $(get_target_host) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32"
@@ -175,6 +183,9 @@ get_app_specific_cflags() {
         ffmpeg | shine)
             APP_FLAGS="-Wno-unused-function"
         ;;
+        soxr | snappy)
+            APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
+        ;;
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
@@ -194,7 +205,7 @@ get_cflags() {
     APP_FLAGS=$(get_app_specific_cflags $1)
     COMMON_FLAGS=$(get_common_cflags)
     OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
-    MIN_VERSION_FLAGS=$(get_min_version_cflags)
+    MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
     COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${MIN_VERSION_FLAGS} ${COMMON_INCLUDES}"
@@ -205,14 +216,14 @@ get_asmflags() {
     APP_FLAGS=$(get_app_specific_cflags $1)
     COMMON_FLAGS=$(get_common_cflags)
     OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
-    MIN_VERSION_FLAGS=$(get_min_version_cflags)
+    MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
     COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${MIN_VERSION_FLAGS} ${COMMON_INCLUDES}"
 }
 
 get_cxxflags() {
-    local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags $1) $(get_min_version_cflags)"
+    local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags $1) $(get_min_version_cflags $1)"
 
     case $1 in
         gnutls)
@@ -223,6 +234,9 @@ get_cxxflags() {
         ;;
         libwebp | xvidcore)
             echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode -fno-common -DPIC ${COMMON_CFLAGS}"
+        ;;
+        libaom)
+            echo "-std=c++11 -fno-exceptions -fembed-bitcode ${COMMON_CFLAGS}"
         ;;
         *)
             echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
@@ -247,7 +261,7 @@ get_arch_specific_ldflags() {
             echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -fembed-bitcode"
         ;;
         arm64)
-            echo "-arch arm64 -march=armv8a -fembed-bitcode"
+            echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode"
         ;;
         i386)
             echo "-arch i386 -march=i386"
@@ -516,24 +530,6 @@ Cflags: -I\${includedir} -I\${includedir}/libxml2
 EOF
 }
 
-create_uuid_package_config() {
-    local UUID_VERSION="$1"
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libuuid
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
-includedir=\${prefix}/include
-
-Name: uuid
-Description: Universally unique id library
-Version: ${UUID_VERSION}
-Requires:
-Cflags: -I\${includedir}
-Libs: -L\${libdir} -luuid
-EOF
-}
-
 create_snappy_package_config() {
     local SNAPPY_VERSION="$1"
 
@@ -550,6 +546,43 @@ Version: ${SNAPPY_VERSION}
 Requires:
 Libs: -L\${libdir} -lz -lstdc++
 Cflags: -I\${includedir}
+EOF
+}
+
+create_soxr_package_config() {
+    local SOXR_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/soxr.pc" << EOF
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/soxr
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: soxr
+Description: High quality, one-dimensional sample-rate conversion library
+Version: ${SOXR_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lsoxr
+Cflags: -I\${includedir}
+EOF
+}
+
+create_uuid_package_config() {
+    local UUID_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libuuid
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: uuid
+Description: Universally unique id library
+Version: ${UUID_VERSION}
+Requires:
+Cflags: -I\${includedir}
+Libs: -L\${libdir} -luuid
 EOF
 }
 
@@ -650,9 +683,9 @@ download_gpl_library_source() {
 
     case $1 in
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180606-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20180606-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20180606-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180627-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20180627-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20180627-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         xvidcore)

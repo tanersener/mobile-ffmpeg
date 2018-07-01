@@ -6,8 +6,8 @@
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0,4,0,1
- PRODUCTVERSION 0,4,0,1
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -24,12 +24,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Google, Inc."
             VALUE "FileDescription", "libwebpmux DLL"
-            VALUE "FileVersion", "0.4.1"
+            VALUE "FileVersion", "1.0.0"
             VALUE "InternalName", "libwebpmux.dll"
-            VALUE "LegalCopyright", "Copyright (C) 2017"
+            VALUE "LegalCopyright", "Copyright (C) 2018"
             VALUE "OriginalFilename", "libwebpmux.dll"
             VALUE "ProductName", "WebP Image Muxer"
-            VALUE "ProductVersion", "0.4.1"
+            VALUE "ProductVersion", "1.0.0"
         END
     END
     BLOCK "VarFileInfo"

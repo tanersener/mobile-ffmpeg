@@ -1,5 +1,5 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
-.TH GIF2WEBP 1 "September 20, 2017"
+.TH GIF2WEBP 1 "January 25, 2018"
 .SH NAME
 gif2webp \- Convert a GIF image to WebP
 .SH SYNOPSIS
@@ -19,6 +19,12 @@ The basic options are:
 Specify the name of the output WebP file. If omitted, \fBgif2webp\fP will
 perform conversion but only report statistics.
 Using "\-" as output name will direct output to 'stdout'.
+.TP
+.BI \-\- " string
+Explicitly specify the input file. This option is useful if the input
+file starts with an '\-' for instance. This option must appear \fBlast\fP.
+Any other options afterward will be ignored. If the input file is "\-",
+the data will be read from \fIstdin\fP instead of a file.
 .TP
 .B \-h, \-help
 Usage information.
@@ -109,6 +115,7 @@ the range of 20 to 50.
 .TP
 .B \-mt
 Use multi-threading for encoding, if possible.
+.TP
 .B \-loop_compatibility
 If enabled, handle the loop information in a compatible fashion for Chrome
 version prior to M62 (inclusive) and Firefox.
@@ -136,6 +143,8 @@ gif2webp \-lossy \-m 3 picture.gif \-o picture_lossy.webp
 gif2webp \-lossy \-f 50 picture.gif \-o picture.webp
 .br
 gif2webp \-q 70 \-o picture.webp \-\- \-\-\-picture.gif
+.br
+cat picture.gif | gif2webp \-o \- \-\- \- > output.webp
 
 .SH AUTHORS
 \fBgif2webp\fP is a part of libwebp and was written by the WebP team.

@@ -32,15 +32,6 @@ fi
 LIB_NAME="gmp"
 set_toolchain_clang_paths ${LIB_NAME}
 
-# PREPARING FLAGS
-case ${ARCH} in
-    i386)
-        TARGET_HOST="x86-apple-darwin"
-    ;;
-    *)
-        TARGET_HOST=$(get_target_host)
-    ;;
-esac
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
@@ -54,6 +45,7 @@ if [[ ${RECONF_gmp} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
+# PREPARING FLAGS
 ASM_FLAGS=""
 case ${ARCH} in
     armv7 | armv7s | arm64)
@@ -61,6 +53,14 @@ case ${ARCH} in
     ;;
     i386 | x86-64)
         ASM_FLAGS="--enable-assembly"
+    ;;
+esac
+case ${ARCH} in
+    i386)
+        TARGET_HOST="x86-apple-darwin"
+    ;;
+    *)
+        TARGET_HOST=$(get_target_host)
     ;;
 esac
 

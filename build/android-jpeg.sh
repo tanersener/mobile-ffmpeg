@@ -49,7 +49,11 @@ fi
     --enable-static \
     --disable-shared \
     --disable-fast-install \
-    --disable-maintainer-mode \
+    --with-jpeg8 \
+    --with-simd \
+    --without-gas-preprocessor \
+    --without-turbojpeg \
+    --without-java \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1

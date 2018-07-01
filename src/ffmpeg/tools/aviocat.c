@@ -42,7 +42,6 @@ int main(int argc, char **argv)
     AVDictionary *in_opts = NULL;
     AVDictionary *out_opts = NULL;
 
-    av_register_all();
     avformat_network_init();
 
     for (i = 1; i < argc; i++) {
@@ -107,6 +106,11 @@ int main(int argc, char **argv)
         if (n <= 0)
             break;
         avio_write(output, buf, n);
+        if (output->error) {
+            av_strerror(output->error, errbuf, sizeof(errbuf));
+            fprintf(stderr, "Unable to write %s: %s\n", output_url, errbuf);
+            break;
+        }
         stream_pos += n;
         if (bps) {
             avio_flush(output);

@@ -140,10 +140,11 @@ static void PrintByteCount(const int bytes[4], int total_size,
   fprintf(stderr, "| %7d  (%.1f%%)\n", total, 100.f * total / total_size);
 }
 
-static void PrintPercents(const int counts[4], int total) {
+static void PrintPercents(const int counts[4]) {
   int s;
+  const int total = counts[0] + counts[1] + counts[2] + counts[3];
   for (s = 0; s < 4; ++s) {
-    fprintf(stderr, "|      %2d%%", 100 * counts[s] / total);
+    fprintf(stderr, "|      %2d%%", (int)(100. * counts[s] / total + .5));
   }
   fprintf(stderr, "| %7d\n", total);
 }
@@ -186,7 +187,8 @@ static void PrintExtraInfoLossless(const WebPPicture* const pic,
   } else {
     fprintf(stderr, "File:      %s\n", file_name);
     fprintf(stderr, "Dimension: %d x %d\n", pic->width, pic->height);
-    fprintf(stderr, "Output:    %d bytes\n", stats->coded_size);
+    fprintf(stderr, "Output:    %d bytes (%.2f bpp)\n", stats->coded_size,
+            8.f * stats->coded_size / pic->width / pic->height);
     PrintFullLosslessInfo(stats, "ARGB");
   }
 }
@@ -207,15 +209,18 @@ static void PrintExtraInfoLossy(const WebPPicture* const pic, int short_output,
             pic->width, pic->height,
             stats->alpha_data_size ? " (with alpha)" : "");
     fprintf(stderr, "Output:    "
-            "%d bytes Y-U-V-All-PSNR %2.2f %2.2f %2.2f   %2.2f dB\n",
+            "%d bytes Y-U-V-All-PSNR %2.2f %2.2f %2.2f   %2.2f dB\n"
+            "           (%.2f bpp)\n",
             stats->coded_size,
-            stats->PSNR[0], stats->PSNR[1], stats->PSNR[2], stats->PSNR[3]);
+            stats->PSNR[0], stats->PSNR[1], stats->PSNR[2], stats->PSNR[3],
+            8.f * stats->coded_size / pic->width / pic->height);
     if (total > 0) {
       int totals[4] = { 0, 0, 0, 0 };
-      fprintf(stderr, "block count:  intra4: %d\n"
-                      "              intra16: %d  (-> %.2f%%)\n",
-              num_i4, num_i16, 100.f * num_i16 / total);
-      fprintf(stderr, "              skipped block: %d (%.2f%%)\n",
+      fprintf(stderr, "block count:  intra4:     %6d  (%.2f%%)\n"
+                      "              intra16:    %6d  (%.2f%%)\n"
+                      "              skipped:    %6d  (%.2f%%)\n",
+              num_i4, 100.f * num_i4 / total,
+              num_i16, 100.f * num_i16 / total,
               num_skip, 100.f * num_skip / total);
       fprintf(stderr, "bytes used:  header:         %6d  (%.1f%%)\n"
                       "             mode-partition: %6d  (%.1f%%)\n",
@@ -239,7 +244,7 @@ static void PrintExtraInfoLossy(const WebPPicture* const pic, int short_output,
         PrintByteCount(stats->residual_bytes[2], stats->coded_size, totals);
       }
       fprintf(stderr, "    macroblocks:  ");
-      PrintPercents(stats->segment_size, total);
+      PrintPercents(stats->segment_size);
       fprintf(stderr, "      quantizer:  ");
       PrintValues(stats->segment_quant);
       fprintf(stderr, "   filter level:  ");
@@ -580,9 +585,6 @@ static void HelpLong(void) {
   printf("  -near_lossless <int> ... use near-lossless image\n"
          "                           preprocessing (0..100=off), "
          "default=100\n");
-#ifdef WEBP_EXPERIMENTAL_FEATURES  /* not documented yet */
-  printf("  -delta_palette ......... use delta palettization\n");
-#endif  // WEBP_EXPERIMENTAL_FEATURES
   printf("  -hint <string> ......... specify image characteristics hint,\n");
   printf("                           one of: photo, picture or graph\n");
 
@@ -751,11 +753,6 @@ int main(int argc, const char *argv[]) {
     } else if (!strcmp(argv[c], "-near_lossless") && c < argc - 1) {
       config.near_lossless = ExUtilGetInt(argv[++c], 0, &parse_error);
       config.lossless = 1;  // use near-lossless only with lossless
-#ifdef WEBP_EXPERIMENTAL_FEATURES
-    } else if (!strcmp(argv[c], "-delta_palette")) {
-      config.use_delta_palette = 1;
-      config.lossless = 1;  // delta-palette is for lossless only
-#endif  // WEBP_EXPERIMENTAL_FEATURES
     } else if (!strcmp(argv[c], "-hint") && c < argc - 1) {
       ++c;
       if (!strcmp(argv[c], "photo")) {

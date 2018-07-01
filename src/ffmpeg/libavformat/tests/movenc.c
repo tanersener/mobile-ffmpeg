@@ -115,6 +115,7 @@ static int io_write_data_type(void *opaque, uint8_t *buf, int size,
     case AVIO_DATA_MARKER_BOUNDARY_POINT: str = "boundary"; break;
     case AVIO_DATA_MARKER_UNKNOWN:        str = "unknown";  break;
     case AVIO_DATA_MARKER_TRAILER:        str = "trailer";  break;
+    default:                              str = "unknown";  break;
     }
     if (time == AV_NOPTS_VALUE)
         snprintf(timebuf, sizeof(timebuf), "nopts");
@@ -377,8 +378,6 @@ int main(int argc, char **argv)
             return 0;
         }
     }
-
-    av_register_all();
 
     md5 = av_md5_alloc();
     if (!md5)

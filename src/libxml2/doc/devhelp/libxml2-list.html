@@ -55,14 +55,14 @@ void	<a href="#xmlListMerge">xmlListMerge</a>			(<a href="libxml2-list.html#xmlL
 <a href="libxml2-list.html#xmlListPtr">xmlListPtr</a>	<a href="#xmlListCreate">xmlListCreate</a>		(<a href="libxml2-list.html#xmlListDeallocator">xmlListDeallocator</a> deallocator, <br/>					 <a href="libxml2-list.html#xmlListDataCompare">xmlListDataCompare</a> compare);
 <a href="libxml2-list.html#xmlListPtr">xmlListPtr</a>	<a href="#xmlListDup">xmlListDup</a>		(const <a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> old);
 int	<a href="#xmlListRemoveLast">xmlListRemoveLast</a>		(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 void * data);
-void	<a href="#xmlListWalk">xmlListWalk</a>			(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 <a href="libxml2-list.html#xmlListWalker">xmlListWalker</a> walker, <br/>					 const void * user);
+void	<a href="#xmlListWalk">xmlListWalk</a>			(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 <a href="libxml2-list.html#xmlListWalker">xmlListWalker</a> walker, <br/>					 void * user);
 int	<a href="#xmlListRemoveAll">xmlListRemoveAll</a>		(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 void * data);
 int	<a href="#xmlListCopy">xmlListCopy</a>			(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> cur, <br/>					 const <a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> old);
 void	<a href="#xmlListPopFront">xmlListPopFront</a>			(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l);
 void *	<a href="#xmlListSearch">xmlListSearch</a>			(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 void * data);
-typedef int <a href="#xmlListWalker">xmlListWalker</a>			(const void * data, <br/>					 const void * user);
+typedef int <a href="#xmlListWalker">xmlListWalker</a>			(const void * data, <br/>					 void * user);
 int	<a href="#xmlListRemoveFirst">xmlListRemoveFirst</a>		(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 void * data);
-void	<a href="#xmlListReverseWalk">xmlListReverseWalk</a>		(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 <a href="libxml2-list.html#xmlListWalker">xmlListWalker</a> walker, <br/>					 const void * user);
+void	<a href="#xmlListReverseWalk">xmlListReverseWalk</a>		(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 <a href="libxml2-list.html#xmlListWalker">xmlListWalker</a> walker, <br/>					 void * user);
 void *	<a href="#xmlLinkGetData">xmlLinkGetData</a>			(<a href="libxml2-list.html#xmlLinkPtr">xmlLinkPtr</a> lk);
 void	<a href="#xmlListClear">xmlListClear</a>			(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l);
 int	<a href="#xmlListAppend">xmlListAppend</a>			(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 void * data);
@@ -112,7 +112,7 @@ The content of this structure is not made public by the API.
 </pre><p>Callback function used to free data from a list.</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>lk</tt></i>:</span></td><td>the data to deallocate</td></tr></tbody></table></div></div>
         <hr/>
-        <div class="refsect2" lang="en"><h3><a name="xmlListWalker"/>Function type xmlListWalker</h3><pre class="programlisting">int	xmlListWalker			(const void * data, <br/>					 const void * user)<br/>
+        <div class="refsect2" lang="en"><h3><a name="xmlListWalker"/>Function type xmlListWalker</h3><pre class="programlisting">int	xmlListWalker			(const void * data, <br/>					 void * user)<br/>
 </pre><p>Callback function used when walking a list with xmlListWalk().</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>data</tt></i>:</span></td><td>the data found in the list</td></tr><tr><td><span class="term"><i><tt>user</tt></i>:</span></td><td>extra user provided data to the walker</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>0 to stop walking the list, 1 otherwise.</td></tr></tbody></table></div></div>
         <hr/>
@@ -200,7 +200,7 @@ The content of this structure is not made public by the API.
 </pre><p>Search the list in reverse order for an existing value of @data</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>l</tt></i>:</span></td><td>a list</td></tr><tr><td><span class="term"><i><tt>data</tt></i>:</span></td><td>a search value</td></tr><tr><td><span class="term"><i><tt>Returns</tt></i>:</span></td><td>the value associated to @data or NULL in case of error</td></tr></tbody></table></div></div>
         <hr/>
-        <div class="refsect2" lang="en"><h3><a name="xmlListReverseWalk"/>xmlListReverseWalk ()</h3><pre class="programlisting">void	xmlListReverseWalk		(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 <a href="libxml2-list.html#xmlListWalker">xmlListWalker</a> walker, <br/>					 const void * user)<br/>
+        <div class="refsect2" lang="en"><h3><a name="xmlListReverseWalk"/>xmlListReverseWalk ()</h3><pre class="programlisting">void	xmlListReverseWalk		(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 <a href="libxml2-list.html#xmlListWalker">xmlListWalker</a> walker, <br/>					 void * user)<br/>
 </pre><p>Walk all the element of the list in reverse order and apply the walker function to it</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>l</tt></i>:</span></td><td>a list</td></tr><tr><td><span class="term"><i><tt>walker</tt></i>:</span></td><td>a processing function</td></tr><tr><td><span class="term"><i><tt>user</tt></i>:</span></td><td>a user parameter passed to the walker function</td></tr></tbody></table></div></div>
         <hr/>
@@ -216,7 +216,7 @@ The content of this structure is not made public by the API.
 </pre><p>Sort all the elements in the list</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>l</tt></i>:</span></td><td>a list</td></tr></tbody></table></div></div>
         <hr/>
-        <div class="refsect2" lang="en"><h3><a name="xmlListWalk"/>xmlListWalk ()</h3><pre class="programlisting">void	xmlListWalk			(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 <a href="libxml2-list.html#xmlListWalker">xmlListWalker</a> walker, <br/>					 const void * user)<br/>
+        <div class="refsect2" lang="en"><h3><a name="xmlListWalk"/>xmlListWalk ()</h3><pre class="programlisting">void	xmlListWalk			(<a href="libxml2-list.html#xmlListPtr">xmlListPtr</a> l, <br/>					 <a href="libxml2-list.html#xmlListWalker">xmlListWalker</a> walker, <br/>					 void * user)<br/>
 </pre><p>Walk all the element of the first from first to last and apply the walker function to it</p>
 <div class="variablelist"><table border="0"><col align="left"/><tbody><tr><td><span class="term"><i><tt>l</tt></i>:</span></td><td>a list</td></tr><tr><td><span class="term"><i><tt>walker</tt></i>:</span></td><td>a processing function</td></tr><tr><td><span class="term"><i><tt>user</tt></i>:</span></td><td>a user parameter passed to the walker function</td></tr></tbody></table></div></div>
         <hr/>

@@ -2,9 +2,10 @@
  * cderror.h
  *
  * Copyright (C) 1994-1997, Thomas G. Lane.
- * Modified 2009-2017 by Guido Vollbeding.
+ * Modified 2009 by Guido Vollbeding.
  * This file is part of the Independent JPEG Group's software.
- * For conditions of distribution and use, see the accompanying README file.
+ * For conditions of distribution and use, see the accompanying README.ijg
+ * file.
  *
  * This file defines the error and message codes for the cjpeg/djpeg
  * applications.  These strings are not needed as part of the JPEG library
@@ -33,7 +34,7 @@
 
 typedef enum {
 
-#define JMESSAGE(code,string)	code ,
+#define JMESSAGE(code,string)   code ,
 
 #endif /* JMAKE_ENUM_LIST */
 
@@ -41,16 +42,16 @@ JMESSAGE(JMSG_FIRSTADDONCODE=1000, NULL) /* Must be first entry! */
 
 #ifdef BMP_SUPPORTED
 JMESSAGE(JERR_BMP_BADCMAP, "Unsupported BMP colormap format")
-JMESSAGE(JERR_BMP_BADDEPTH, "Only 8-, 24-, and 32-bit BMP files are supported")
+JMESSAGE(JERR_BMP_BADDEPTH, "Only 8- and 24-bit BMP files are supported")
 JMESSAGE(JERR_BMP_BADHEADER, "Invalid BMP file: bad header length")
 JMESSAGE(JERR_BMP_BADPLANES, "Invalid BMP file: biPlanes not equal to 1")
 JMESSAGE(JERR_BMP_COLORSPACE, "BMP output must be grayscale or RGB")
 JMESSAGE(JERR_BMP_COMPRESSED, "Sorry, compressed BMPs not yet supported")
+JMESSAGE(JERR_BMP_EMPTY, "Empty BMP image")
 JMESSAGE(JERR_BMP_NOT, "Not a BMP file - does not start with BM")
-JMESSAGE(JERR_BMP_OUTOFRANGE, "Numeric value out of range in BMP file")
-JMESSAGE(JTRC_BMP, "%ux%u %d-bit BMP image")
+JMESSAGE(JTRC_BMP, "%ux%u 24-bit BMP image")
 JMESSAGE(JTRC_BMP_MAPPED, "%ux%u 8-bit colormapped BMP image")
-JMESSAGE(JTRC_BMP_OS2, "%ux%u %d-bit OS2 BMP image")
+JMESSAGE(JTRC_BMP_OS2, "%ux%u 24-bit OS2 BMP image")
 JMESSAGE(JTRC_BMP_OS2_MAPPED, "%ux%u 8-bit colormapped OS2 BMP image")
 #endif /* BMP_SUPPORTED */
 
@@ -62,7 +63,7 @@ JMESSAGE(JERR_GIF_IMAGENOTFOUND, "Too few images in GIF file")
 JMESSAGE(JERR_GIF_NOT, "Not a GIF file")
 JMESSAGE(JTRC_GIF, "%ux%ux%d GIF image")
 JMESSAGE(JTRC_GIF_BADVERSION,
-	 "Warning: unexpected GIF version number '%c%c%c'")
+         "Warning: unexpected GIF version number '%c%c%c'")
 JMESSAGE(JTRC_GIF_EXTENSION, "Ignoring GIF extension block of type 0x%02x")
 JMESSAGE(JTRC_GIF_NONSQUARE, "Caution: nonsquare pixels in input")
 JMESSAGE(JWRN_GIF_BADDATA, "Corrupt data in GIF file")
@@ -74,8 +75,8 @@ JMESSAGE(JWRN_GIF_NOMOREDATA, "Ran out of GIF bits")
 #ifdef PPM_SUPPORTED
 JMESSAGE(JERR_PPM_COLORSPACE, "PPM output must be grayscale or RGB")
 JMESSAGE(JERR_PPM_NONNUMERIC, "Nonnumeric data in PPM file")
+JMESSAGE(JERR_PPM_TOOLARGE, "Integer value too large in PPM file")
 JMESSAGE(JERR_PPM_NOT, "Not a PPM/PGM file")
-JMESSAGE(JERR_PPM_OUTOFRANGE, "Numeric value out of range in PPM file")
 JMESSAGE(JTRC_PGM, "%ux%u PGM image")
 JMESSAGE(JTRC_PGM_TEXT, "%ux%u text PGM image")
 JMESSAGE(JTRC_PPM, "%ux%u PPM image")
@@ -111,13 +112,13 @@ JMESSAGE(JERR_TGA_NOTCOMP, "Targa support was not compiled")
 #endif /* TARGA_SUPPORTED */
 
 JMESSAGE(JERR_BAD_CMAP_FILE,
-	 "Color map file is invalid or of unsupported format")
+         "Color map file is invalid or of unsupported format")
 JMESSAGE(JERR_TOO_MANY_COLORS,
-	 "Output file format cannot handle %d colormap entries")
+         "Output file format cannot handle %d colormap entries")
 JMESSAGE(JERR_UNGETC_FAILED, "ungetc failed")
 #ifdef TARGA_SUPPORTED
 JMESSAGE(JERR_UNKNOWN_FORMAT,
-	 "Unrecognized input file format --- perhaps you need -targa")
+         "Unrecognized input file format --- perhaps you need -targa")
 #else
 JMESSAGE(JERR_UNKNOWN_FORMAT, "Unrecognized input file format")
 #endif

@@ -9,7 +9,7 @@ AC_CANONICAL_HOST
 
 LIBXML_MAJOR_VERSION=2
 LIBXML_MINOR_VERSION=9
-LIBXML_MICRO_VERSION=7
+LIBXML_MICRO_VERSION=8
 LIBXML_MICRO_VERSION_SUFFIX=
 LIBXML_VERSION=$LIBXML_MAJOR_VERSION.$LIBXML_MINOR_VERSION.$LIBXML_MICRO_VERSION$LIBXML_MICRO_VERSION_SUFFIX
 LIBXML_VERSION_INFO=`expr $LIBXML_MAJOR_VERSION + $LIBXML_MINOR_VERSION`:$LIBXML_MICRO_VERSION:$LIBXML_MINOR_VERSION
@@ -389,18 +389,20 @@ dnl Checks for zlib library.
 
 WITH_ZLIB=0
 if test "$with_zlib" = "no"; then
-    echo "Disabling compression support"
+    echo "Disabling zlib compression support"
 else
-    # Try pkg-config first so that static linking works.
-    # If this succeeeds, we ignore the WITH_ZLIB directory.
-    PKG_CHECK_MODULES([Z],[zlib],
-        [have_libz=yes],
-        [have_libz=no])
+    # Don't run pkg-config if with_zlib contains a path.
+    if test "x$Z_DIR" = "x"; then
+        # Try pkg-config first so that static linking works.
+        PKG_CHECK_MODULES([Z],[zlib],
+            [WITH_ZLIB=1],
+            [ ])
+    fi
 
-     if test "x$have_libz" = "xno"; then
+    if test "$WITH_ZLIB" = "0"; then
         AC_CHECK_HEADERS(zlib.h,
             AC_CHECK_LIB(z, gzread,[
-                have_libz=yes
+                WITH_ZLIB=1
                 if test "x${Z_DIR}" != "x"; then
                     Z_CFLAGS="-I${Z_DIR}/include"
                     Z_LIBS="-L${Z_DIR}/lib -lz"
@@ -411,18 +413,8 @@ else
                     esac]
                 else
                     Z_LIBS="-lz"
-                fi],
-                [have_libz=no])
-             )
-    else
-	# we still need to check for zlib.h header
-	AC_CHECK_HEADERS([zlib.h])
-    fi
-
-    # Found the library via either method?
-    if test "x$have_libz" = "xyes"; then
-        AC_DEFINE([HAVE_LIBZ], [1], [Have compression library])
-        WITH_ZLIB=1
+                fi])
+            )
     fi
 fi
 
@@ -436,38 +428,30 @@ dnl Checks for lzma library.
 
 WITH_LZMA=0
 if test "$with_lzma" = "no"; then
-    echo "Disabling compression support"
+    echo "Disabling lzma compression support"
 else
-    # Try pkg-config first so that static linking works.
-    # If this succeeeds, we ignore the WITH_LZMA directory.
-    PKG_CHECK_MODULES([LZMA],[liblzma],
-        [have_liblzma=yes],
-        [have_liblzma=no])
+    # Don't run pkg-config if with_lzma contains a path.
+    if test "x$LZMA_DIR" = "x"; then
+        # Try pkg-config first so that static linking works.
+        PKG_CHECK_MODULES([LZMA],[liblzma],
+            [WITH_LZMA=1],
+            [ ])
+    fi
 
-     # If pkg-config failed, fall back to AC_CHECK_LIB. This
-     # will not pick up the necessary LIBS flags for liblzma's
-     # private dependencies, though, so static linking may fail.
-     if test "x$have_liblzma" = "xno"; then
-         AC_CHECK_HEADERS(lzma.h,
+    # If pkg-config failed, fall back to AC_CHECK_LIB. This
+    # will not pick up the necessary LIBS flags for liblzma's
+    # private dependencies, though, so static linking may fail.
+    if test "$WITH_LZMA" = "0"; then
+        AC_CHECK_HEADERS(lzma.h,
             AC_CHECK_LIB(lzma, lzma_code,[
-                have_liblzma=yes
+                WITH_LZMA=1
                 if test "x${LZMA_DIR}" != "x"; then
                     LZMA_CFLAGS="-I${LZMA_DIR}/include"
                     LZMA_LIBS="-L${LZMA_DIR}/lib -llzma"
                 else
                     LZMA_LIBS="-llzma"
-                fi],
-                [have_liblzma=no])
-	     )
-    else
-	# we still need to check for lzma,h header
-	AC_CHECK_HEADERS([lzma.h])
-    fi
-
-    # Found the library via either method?
-    if test "x$have_liblzma" = "xyes"; then
-        AC_DEFINE([HAVE_LIBLZMA], [1], [Have compression library])
-        WITH_LZMA=1
+                fi])
+            )
     fi
 fi
 
@@ -495,12 +479,8 @@ AC_CHECK_HEADERS([sys/types.h])
 AC_CHECK_HEADERS([stdint.h])
 AC_CHECK_HEADERS([inttypes.h])
 AC_CHECK_HEADERS([time.h])
-AC_CHECK_HEADERS([ansidecl.h])
-AC_CHECK_HEADERS([ieeefp.h])
-AC_CHECK_HEADERS([nan.h])
 AC_CHECK_HEADERS([math.h])
 AC_CHECK_HEADERS([limits.h])
-AC_CHECK_HEADERS([fp_class.h])
 AC_CHECK_HEADERS([float.h])
 AC_CHECK_HEADERS([stdlib.h])
 AC_CHECK_HEADERS([sys/socket.h], [], [],
@@ -557,10 +537,8 @@ echo Checking libraries
 
 dnl Checks for library functions.
 AC_FUNC_STRFTIME
-AC_CHECK_FUNCS(strdup strndup strerror)
-AC_CHECK_FUNCS(finite isnand fp_class class fpclass)
 AC_CHECK_FUNCS(strftime localtime gettimeofday ftime)
-AC_CHECK_FUNCS(stat _stat signal)
+AC_CHECK_FUNCS(stat signal)
 AC_CHECK_FUNCS(rand rand_r srand time)
 AC_CHECK_FUNCS(isascii mmap munmap putenv)
 
@@ -771,13 +749,13 @@ dnl
 if test "${GCC}" != "yes" ; then
     case "${host}" in
           hppa*-*-hpux* )
-	       CFLAGS="${CFLAGS} -Wp,-H30000"
+	       EXTRA_CFLAGS="${EXTRA_CFLAGS} -Wp,-H30000"
 	       ;;
           *-dec-osf* )
-               CFLAGS="${CFLAGS} -ieee"
+               EXTRA_CFLAGS="${EXTRA_CFLAGS} -ieee"
                ;;
 	  alpha*-*-linux* )
-	       CFLAGS="${CFLAGS} -ieee"
+	       EXTRA_CFLAGS="${EXTRA_CFLAGS} -ieee"
 	       ;;
     esac
 else
@@ -787,19 +765,19 @@ else
 	# Not activated by default because this inflates the code size
 	# Used to allow propagation of C++ exceptions through the library
 	#
-	CFLAGS="${CFLAGS} -fexceptions"
+	EXTRA_CFLAGS="${EXTRA_CFLAGS} -fexceptions"
     fi
 
     # warnings we'd like to see
-    CFLAGS="${CFLAGS} -pedantic -W -Wformat -Wno-format-extra-args -Wunused -Wimplicit -Wreturn-type -Wswitch -Wcomment -Wtrigraphs -Wchar-subscripts -Wuninitialized -Wparentheses -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -Wredundant-decls"
+    EXTRA_CFLAGS="${EXTRA_CFLAGS} -pedantic -Wall -Wextra -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -Wredundant-decls"
     # warnings we'd like to supress
-    CFLAGS="${CFLAGS} -Wno-long-long"
+    EXTRA_CFLAGS="${EXTRA_CFLAGS} -Wno-long-long -Wno-format-extra-args -Wno-array-bounds"
     case "${host}" in
           alpha*-*-linux* )
-	       CFLAGS="${CFLAGS} -mieee"
+	       EXTRA_CFLAGS="${EXTRA_CFLAGS} -mieee"
 	       ;;
 	  alpha*-*-osf* )
-	       CFLAGS="${CFLAGS} -mieee"
+	       EXTRA_CFLAGS="${EXTRA_CFLAGS} -mieee"
 	       ;;
     esac
 fi
@@ -812,13 +790,13 @@ case ${host} in
 	;;
     *-*-mingw* | *-*-cygwin* | *-*-msvc* )
         # If the host is Windows, and shared libraries are disabled, we
-        # need to add -DLIBXML_STATIC to CFLAGS in order for linking to
+        # need to add -DLIBXML_STATIC to EXTRA_CFLAGS in order for linking to
         # work properly (without it, xmlexports.h would force the use of
         # DLL imports, which obviously aren't present in a static
         # library).
         if test "x$enable_shared" = "xno"; then
             XML_CFLAGS="$XML_CFLAGS -DLIBXML_STATIC"
-            CFLAGS="$CFLAGS -DLIBXML_STATIC"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS -DLIBXML_STATIC"
         fi
         ;;
 esac
@@ -1010,7 +988,7 @@ if [[ "${LOGNAME}" = "veillard" -a "`pwd`" = "/u/veillard/XML" ]] || \
 	fi
     fi
     if test "${GCC}" = "yes" ; then
-    CFLAGS="-g -O -pedantic -W -Wformat -Wno-format-extra-args -Wunused -Wimplicit -Wreturn-type -Wswitch -Wcomment -Wtrigraphs -Wchar-subscripts -Wuninitialized -Wparentheses -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -Wredundant-decls -Wall"
+    EXTRA_CFLAGS="-g -O -pedantic -W -Wformat -Wno-format-extra-args -Wunused -Wimplicit -Wreturn-type -Wswitch -Wcomment -Wtrigraphs -Wchar-subscripts -Wuninitialized -Wparentheses -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wnested-externs -Winline -Wredundant-decls -Wall"
     fi
     STATIC_BINARIES="-static"
 dnl -Wcast-qual -ansi
@@ -1680,14 +1658,14 @@ AC_CHECK_FUNCS(printf sprintf fprintf snprintf vfprintf vsprintf vsnprintf sscan
 if test "$with_coverage" = "yes" -a "${GCC}" = "yes"
 then
     echo Enabling code coverage for GCC
-    CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
+    EXTRA_CFLAGS="$EXTRA_CFLAGS -fprofile-arcs -ftest-coverage"
     LDFLAGS="$LDFLAGS -fprofile-arcs -ftest-coverage"
 else
     echo Disabling code coverage for GCC
 fi
 
 AC_SUBST(CPPFLAGS)
-AC_SUBST(CFLAGS)
+AC_SUBST(EXTRA_CFLAGS)
 AC_SUBST(LDFLAGS)
 AC_SUBST(XML_CFLAGS)
 

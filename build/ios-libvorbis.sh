@@ -37,6 +37,7 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
+export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -51,8 +52,6 @@ fi
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
-    --with-ogg-includes=${BASEDIR}/prebuilt/ios-$(get_target_host)/libogg/include \
-    --with-ogg-libraries=${BASEDIR}/prebuilt/ios-$(get_target_host)/libogg/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
@@ -64,6 +63,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libvorbis_package_config "1.3.5"
+create_libvorbis_package_config "1.3.6"
 
 make install || exit 1

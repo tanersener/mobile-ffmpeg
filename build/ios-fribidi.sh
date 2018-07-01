@@ -52,7 +52,6 @@ fi
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
-    --without-glib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

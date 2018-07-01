@@ -423,13 +423,16 @@ static int filter_frame(AVFilterLink *inlink, AVFrame *in)
     if (av_frame_is_writable(in)) {
         out = in;
     } else {
-        out = ff_get_audio_buffer(inlink, in->nb_samples);
+        out = ff_get_audio_buffer(outlink, in->nb_samples);
         if (!out) {
             av_frame_free(&in);
             return AVERROR(ENOMEM);
         }
         av_frame_copy_props(out, in);
     }
+
+    if (s->pts == AV_NOPTS_VALUE)
+        s->pts = in->pts;
 
     out->pts = s->pts;
     src = (const double *)in->data[0];
@@ -763,7 +766,7 @@ static int config_input(AVFilterLink *inlink)
         inlink->partial_buf_size = frame_size(inlink->sample_rate, 3000);
     }
 
-    s->pts =
+    s->pts = AV_NOPTS_VALUE;
     s->buf_index =
     s->prev_buf_index =
     s->limiter_buf_index = 0;

@@ -1,0 +1,7 @@
+/.deps/
+/.libs/
+/Makefile
+/*.o
+/*.lo
+/*.la
+/jsimdcfg.inc

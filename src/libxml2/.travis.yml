@@ -1,0 +1,22 @@
+language: c
+sudo: false
+addons:
+  apt:
+    packages:
+      # Some tests require the DTDs.
+      w3c-sgml-lib
+matrix:
+  include:
+    # Try to emulate a C89 compiler on a POSIX system by disabling as many
+    # GNU extensions as possible.
+    - compiler: gcc
+      env: CFLAGS="-O2 -std=c89 -D_XOPEN_SOURCE=700 -Werror -Wno-error=unused-function"
+    # clang with AddressSanitizer and UndefinedBehaviorSanitizer.
+    - compiler: clang
+      dist: trusty
+      env: CONFIG="--without-python"
+           CFLAGS="-O2 -g -fno-omit-frame-pointer -fsanitize=address,undefined -fno-sanitize=float-divide-by-zero,pointer-overflow -fno-sanitize-recover=all -Werror -Wno-error=unused-function -Wno-error=cast-align"
+           UBSAN_OPTIONS=print_stacktrace=1
+script: sh autogen.sh $CONFIG && make -j2 V=1 && make check
+git:
+  depth: 10

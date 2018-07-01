@@ -834,4 +834,4 @@ See Also
 
 Version
 
-   Fontconfig version 2.12.93
+   Fontconfig version 2.13.0

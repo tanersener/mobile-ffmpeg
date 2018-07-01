@@ -257,17 +257,20 @@ static int decode_unregistered_user_data(H264SEIUnregistered *h, GetBitContext *
     if (e == 1 && build == 1 && !strncmp(user_data+16, "x264 - core 0000", 16))
         h->x264_build = 67;
 
-    if (strlen(user_data + 16) > 0)
-        av_log(logctx, AV_LOG_DEBUG, "user data:\"%s\"\n", user_data + 16);
-
     av_free(user_data);
     return 0;
 }
 
-static int decode_recovery_point(H264SEIRecoveryPoint *h, GetBitContext *gb)
+static int decode_recovery_point(H264SEIRecoveryPoint *h, GetBitContext *gb, void *logctx)
 {
-    h->recovery_frame_cnt = get_ue_golomb_long(gb);
+    unsigned recovery_frame_cnt = get_ue_golomb_long(gb);
 
+    if (recovery_frame_cnt >= (1<<MAX_LOG2_MAX_FRAME_NUM)) {
+        av_log(logctx, AV_LOG_ERROR, "recovery_frame_cnt %u is out of range\n", recovery_frame_cnt);
+        return AVERROR_INVALIDDATA;
+    }
+
+    h->recovery_frame_cnt = recovery_frame_cnt;
     /* 1b exact_match_flag,
      * 1b broken_link_flag,
      * 2b changing_slice_group_idc */
@@ -316,24 +319,25 @@ static int decode_buffering_period(H264SEIBufferingPeriod *h, GetBitContext *gb,
 static int decode_frame_packing_arrangement(H264SEIFramePacking *h,
                                             GetBitContext *gb)
 {
-    h->frame_packing_arrangement_id          = get_ue_golomb_long(gb);
-    h->frame_packing_arrangement_cancel_flag = get_bits1(gb);
-    h->present = !h->frame_packing_arrangement_cancel_flag;
+    h->arrangement_id          = get_ue_golomb_long(gb);
+    h->arrangement_cancel_flag = get_bits1(gb);
+    h->present = !h->arrangement_cancel_flag;
 
     if (h->present) {
-        h->frame_packing_arrangement_type = get_bits(gb, 7);
+        h->arrangement_type = get_bits(gb, 7);
         h->quincunx_sampling_flag         = get_bits1(gb);
         h->content_interpretation_type    = get_bits(gb, 6);
 
-        // the following skips: spatial_flipping_flag, frame0_flipped_flag,
-        // field_views_flag, current_frame_is_frame0_flag,
+        // spatial_flipping_flag, frame0_flipped_flag, field_views_flag
+        skip_bits(gb, 3);
+        h->current_frame_is_frame0_flag = get_bits1(gb);
         // frame0_self_contained_flag, frame1_self_contained_flag
-        skip_bits(gb, 6);
+        skip_bits(gb, 2);
 
-        if (!h->quincunx_sampling_flag && h->frame_packing_arrangement_type != 5)
+        if (!h->quincunx_sampling_flag && h->arrangement_type != 5)
             skip_bits(gb, 16);      // frame[01]_grid_position_[xy]
         skip_bits(gb, 8);           // frame_packing_arrangement_reserved_byte
-        h->frame_packing_arrangement_repetition_period = get_ue_golomb_long(gb);
+        h->arrangement_repetition_period = get_ue_golomb_long(gb);
     }
     skip_bits1(gb);                 // frame_packing_arrangement_extension_flag
 
@@ -431,7 +435,7 @@ int ff_h264_sei_decode(H264SEIContext *h, GetBitContext *gb,
             ret = decode_unregistered_user_data(&h->unregistered, gb, logctx, size);
             break;
         case H264_SEI_TYPE_RECOVERY_POINT:
-            ret = decode_recovery_point(&h->recovery_point, gb);
+            ret = decode_recovery_point(&h->recovery_point, gb, logctx);
             break;
         case H264_SEI_TYPE_BUFFERING_PERIOD:
             ret = decode_buffering_period(&h->buffering_period, gb, ps, logctx);
@@ -467,8 +471,8 @@ int ff_h264_sei_decode(H264SEIContext *h, GetBitContext *gb,
 
 const char *ff_h264_sei_stereo_mode(const H264SEIFramePacking *h)
 {
-    if (h->frame_packing_arrangement_cancel_flag == 0) {
-        switch (h->frame_packing_arrangement_type) {
+    if (h->arrangement_cancel_flag == 0) {
+        switch (h->arrangement_type) {
             case H264_SEI_FPA_TYPE_CHECKERBOARD:
                 if (h->content_interpretation_type == 2)
                     return "checkerboard_rl";
@@ -503,7 +507,7 @@ const char *ff_h264_sei_stereo_mode(const H264SEIFramePacking *h)
             default:
                 return "mono";
         }
-    } else if (h->frame_packing_arrangement_cancel_flag == 1) {
+    } else if (h->arrangement_cancel_flag == 1) {
         return "mono";
     } else {
         return NULL;

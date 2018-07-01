@@ -33,7 +33,7 @@
 
 #include <fribidi-begindecls.h>
 
-#if DEBUG+0
+#ifdef DEBUG
 
 /* These definitions should only be used in DEBUG mode: */
 #ifndef __LINE__

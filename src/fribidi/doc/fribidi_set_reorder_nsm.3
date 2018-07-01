@@ -1,13 +1,13 @@
 .\" WARNING! THIS FILE WAS GENERATED AUTOMATICALLY BY c2man!
 .\" DO NOT EDIT! CHANGES MADE TO THIS FILE WILL BE LOST!
-.TH "fribidi_set_reorder_nsm" 3 "4 February 2018" "c2man fribidi-deprecated.h" "Programmer's Manual"
+.TH "fribidi_set_reorder_nsm" 3 "19 February 2018" "c2man fribidi-deprecated.h" "Programmer's Manual"
 .SH "NAME"
 fribidi_set_reorder_nsm \- set marks reordering on or off
 .SH "SYNOPSIS"
 .ft B
 #include <fribidi.h>
 .sp
-fribidi_boolean fribidi_set_reorder_nsm(fribidi_boolean state);
+extern fribidi_boolean fribidi_set_reorder_nsm(fribidi_boolean state);
 .ft R
 .SH "PARAMETERS"
 .TP
@@ -28,9 +28,6 @@ This function is deprecated and only used with other deprecated functions.
 .SH "RETURNS"
 The new marks reordering status.
 .SH "SEE ALSO"
-fribidi_charset_to_unicode(3),
-fribidi_unicode_to_charset(3),
-fribidi_parse_charset(3),
 fribidi_shape_arabic(3),
 fribidi_get_par_direction(3),
 fribidi_get_par_embedding_levels_ex(3),
@@ -40,6 +37,9 @@ fribidi_get_bidi_types(3),
 fribidi_get_bidi_type_name(3),
 fribidi_debug_status(3),
 fribidi_set_debug(3),
+fribidi_charset_to_unicode(3),
+fribidi_unicode_to_charset(3),
+fribidi_parse_charset(3),
 fribidi_mirroring_status(3),
 fribidi_set_mirroring(3),
 fribidi_reorder_nsm_status(3),

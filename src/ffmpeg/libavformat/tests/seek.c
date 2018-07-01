@@ -67,8 +67,6 @@ int main(int argc, char **argv)
     int frame_count = 1;
     int duration = 4;
 
-    ic->flags |= AVFMT_FLAG_KEEP_SIDE_DATA;
-
     for(i=2; i<argc; i+=2){
         if       (!strcmp(argv[i], "-seekforw")){
             seekfirst = atoi(argv[i+1]);
@@ -92,9 +90,6 @@ int main(int argc, char **argv)
 
     av_dict_set(&format_opts, "channels", "1", 0);
     av_dict_set(&format_opts, "sample_rate", "22050", 0);
-
-    /* initialize libavcodec, and register all codecs and formats */
-    av_register_all();
 
     if (argc < 2) {
         printf("usage: %s input_file\n"

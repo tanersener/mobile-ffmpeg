@@ -37,7 +37,6 @@
 
 #include "fribidi-begindecls.h"
 
-#define fribidi_get_mirror_char FRIBIDI_NAMESPACE(get_mirror_char)
 /* fribidi_get_mirror_char - get mirrored character
  *
  * This function finds the mirrored equivalent of a character as defined in
@@ -56,7 +55,6 @@ FRIBIDI_ENTRY fribidi_boolean fribidi_get_mirror_char (
   FriBidiChar *mirrored_ch	/* output mirrored character */
 );
 
-#define fribidi_shape_mirroring FRIBIDI_NAMESPACE(shape_mirroring)
 /* fribidi_shape_mirroring - do mirroring shaping
  *
  * This functions replaces mirroring characters on right-to-left embeddings in

@@ -1,7 +1,7 @@
-*.pc
 /Makefile
 /config.h
-/config.log
 /config.status
+/fribidi.pc
 /libtool
 /stamp-h1
+/autom4te.cache/

@@ -14,10 +14,10 @@
 #define FRIBIDI_INTERFACE_VERSION @FRIBIDI_INTERFACE_VERSION@
 #define FRIBIDI_INTERFACE_VERSION_STRING "@FRIBIDI_INTERFACE_VERSION@"
 
-/* Define to 1 if you want charset conversion codes in the library */
-#define FRIBIDI_CHARSETS @FRIBIDI_CHARSETS@
-
 /* The size of a `int', as computed by sizeof. */
 #define FRIBIDI_SIZEOF_INT @SIZEOF_INT@
+
+/* Define if fribidi was built with MSVC */
+@FRIBIDI_MSVC_BUILD_PLACEHOLDER@
 
 #endif /* FRIBIDI_CONFIG_H */

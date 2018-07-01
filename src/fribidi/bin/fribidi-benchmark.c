@@ -33,7 +33,7 @@
 #include <fribidi-deprecated.h>
 
 #include <stdio.h>
-#if STDC_HEADERS+0
+#ifdef STDC_HEADERS
 # include <stdlib.h>
 # include <stddef.h>
 #else
@@ -41,16 +41,16 @@
 #  include <stdlib.h>
 # endif
 #endif
-#if HAVE_STRING_H+0
+#ifdef HAVE_STRING_H
 # if !STDC_HEADERS && HAVE_MEMORY_H
 #  include <memory.h>
 # endif
 # include <string.h>
 #endif
-#if HAVE_STRINGS_H+0
+#ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
-#if HAVE_SYS_TIMES_H+0
+#ifdef HAVE_SYS_TIMES_H
 # include <sys/times.h>
 #endif
 #ifdef _WIN32
@@ -133,7 +133,7 @@ utime (
   else
       return 0.0;
 #else /* !_WIN32 */
-#if HAVE_SYS_TIMES_H+0
+#ifdef HAVE_SYS_TIMES_H
   struct tms tb;
   times (&tb);
   return 0.01 * tb.tms_utime;

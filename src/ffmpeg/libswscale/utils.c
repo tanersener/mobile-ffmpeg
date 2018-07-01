@@ -27,7 +27,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
-#if HAVE_SYS_MMAN_H
+#if HAVE_MMAP
 #include <sys/mman.h>
 #if defined(MAP_ANON) && !defined(MAP_ANONYMOUS)
 #define MAP_ANONYMOUS MAP_ANON
@@ -254,8 +254,8 @@ static const FormatEntry format_entries[AV_PIX_FMT_NB] = {
     [AV_PIX_FMT_AYUV64LE]    = { 1, 1},
     [AV_PIX_FMT_P010LE]      = { 1, 1 },
     [AV_PIX_FMT_P010BE]      = { 1, 1 },
-    [AV_PIX_FMT_P016LE]      = { 1, 0 },
-    [AV_PIX_FMT_P016BE]      = { 1, 0 },
+    [AV_PIX_FMT_P016LE]      = { 1, 1 },
+    [AV_PIX_FMT_P016BE]      = { 1, 1 },
 };
 
 int sws_isSupportedInput(enum AVPixelFormat pix_fmt)

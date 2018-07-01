@@ -56,6 +56,10 @@ void GetDiffAndPSNR(const uint8_t rgba1[], const uint8_t rgba2[],
                     uint32_t width, uint32_t height, int premultiply,
                     int* const max_diff, double* const psnr);
 
+// Return library versions used by anim_util.
+void GetAnimatedImageVersions(int* const decoder_version,
+                              int* const demux_version);
+
 #ifdef __cplusplus
 }    // extern "C"
 #endif

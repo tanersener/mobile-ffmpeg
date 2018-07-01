@@ -1,10 +1,12 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
-.TH IMG2WEBP 1 "January 23, 2017"
+.TH IMG2WEBP 1 "April 3, 2018"
 .SH NAME
 img2webp \- create animated WebP file from a sequence of input images.
 .SH SYNOPSIS
 .B img2webp
 [file_level_options] [files] [per_frame_options...]
+.br
+.B img2webp argument_file_name
 .br
 .SH DESCRIPTION
 This manual page documents the
@@ -13,6 +15,9 @@ command.
 .PP
 \fBimg2webp\fP compresses a sequence of images using the animated WebP format.
 Input images can either be PNG, JPEG, TIFF or WebP.
+If a single file name (not starting with the character '\-') is supplied as
+the argument, the command line argument are actually tokenized from this file.
+This allows for easy scripting or using large number of arguments.
 .SH FILE-LEVEL OPTIONS
 The file-level options are applied at the beginning of the compression process,
 before the input frames are read.
@@ -40,14 +45,17 @@ lossy or lossless compression for each frame heuristically. This global
 option disables the local option \fB-lossy\fP and \fB-lossless\fP .
 .TP
 .BI \-loop " int
-Specifies the number of times the animation should loop. Using '0' means
-'loop indefinitely'.
+Specifies the number of times the animation should loop. Using '0'
+means 'loop indefinitely'.
 .TP
 .BI \-v
 Be more verbose.
 .TP
 .B \-h, \-help
 A short usage summary.
+.TP
+.B \-version
+Print the version numbers of the relevant libraries used.
 
 .SH PER-FRAME OPTIONS
 The per-frame options are applied for the images following as arguments in the

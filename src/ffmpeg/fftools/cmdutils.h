@@ -105,12 +105,6 @@ int opt_max_alloc(void *optctx, const char *opt, const char *arg);
 
 int opt_codec_debug(void *optctx, const char *opt, const char *arg);
 
-#if CONFIG_OPENCL
-int opt_opencl(void *optctx, const char *opt, const char *arg);
-
-int opt_opencl_bench(void *optctx, const char *opt, const char *arg);
-#endif
-
 /**
  * Limit the execution time.
  */
@@ -155,6 +149,7 @@ typedef struct SpecifierOpt {
         uint8_t *str;
         int        i;
         int64_t  i64;
+        uint64_t ui64;
         float      f;
         double   dbl;
     } u;
@@ -206,17 +201,6 @@ typedef struct OptionDef {
 void show_help_options(const OptionDef *options, const char *msg, int req_flags,
                        int rej_flags, int alt_flags);
 
-#if CONFIG_OPENCL
-#define CMDUTILS_COMMON_OPTIONS_OPENCL                                                                                  \
-    { "opencl_bench", OPT_EXIT, {.func_arg = opt_opencl_bench},                                                         \
-       "run benchmark on all OpenCL devices and show results" },                                                        \
-    { "opencl_options", HAS_ARG, {.func_arg = opt_opencl},                                                              \
-       "set OpenCL environment options" },                                                                              \
-
-#else
-#define CMDUTILS_COMMON_OPTIONS_OPENCL
-#endif
-
 #if CONFIG_AVDEVICE
 #define CMDUTILS_COMMON_OPTIONS_AVDEVICE                                                                                \
     { "sources"    , OPT_EXIT | HAS_ARG, { .func_arg = show_sources },                                                  \
@@ -256,7 +240,6 @@ void show_help_options(const OptionDef *options, const char *msg, int req_flags,
     { "max_alloc",   HAS_ARG,              { .func_arg = opt_max_alloc },    "set maximum size of a single allocated block", "bytes" }, \
     { "cpuflags",    HAS_ARG | OPT_EXPERT, { .func_arg = opt_cpuflags },     "force specific cpu flags", "flags" },     \
     { "hide_banner", OPT_BOOL | OPT_EXPERT, {&hide_banner},     "do not show program banner", "hide_banner" },          \
-    CMDUTILS_COMMON_OPTIONS_OPENCL                                                                                      \
     CMDUTILS_COMMON_OPTIONS_AVDEVICE                                                                                    \
 
 /**
@@ -641,6 +624,9 @@ void *grow_array(void *array, int elem_size, int *size, int new_size);
 
 #define GET_PIX_FMT_NAME(pix_fmt)\
     const char *name = av_get_pix_fmt_name(pix_fmt);
+
+#define GET_CODEC_NAME(id)\
+    const char *name = avcodec_descriptor_get(id)->name;
 
 #define GET_SAMPLE_FMT_NAME(sample_fmt)\
     const char *name = av_get_sample_fmt_name(sample_fmt)

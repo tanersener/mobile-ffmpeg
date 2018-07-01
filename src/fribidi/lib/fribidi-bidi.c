@@ -56,6 +56,15 @@
 #define RL_BRACKET_TYPE(list) ((list)->bracket_type)
 #define RL_ISOLATE_LEVEL(list) ((list)->isolate_level)
 
+/* Pairing nodes are used for holding a pair of open/close brackets as
+   described in BD16. */
+struct _FriBidiPairingNodeStruct {
+  FriBidiRun *open;
+  FriBidiRun *close;
+  struct _FriBidiPairingNodeStruct *next;
+};
+typedef struct _FriBidiPairingNodeStruct FriBidiPairingNode;
+
 static FriBidiRun *
 merge_with_prev (
   FriBidiRun *second
@@ -161,7 +170,7 @@ static FriBidiRun *get_adjacent_run(FriBidiRun *list, fribidi_boolean forward, f
   return ppp;
 }
 
-#if DEBUG+0
+#ifdef DEBUG
 /*======================================================================
  *  For debugging, define some functions for printing the types and the
  *  levels.
@@ -239,7 +248,7 @@ print_resolved_types (
   {
     FriBidiStrIndex i;
     for (i = RL_LEN (pp); i; i--)
-      MSG2 ("%c", fribidi_char_from_bidi_type (pp->type));
+      MSG2 ("%s ", fribidi_get_bidi_type_name (pp->type));
   }
   MSG ("\n");
 }
@@ -257,7 +266,7 @@ print_bidi_string (
 
   MSG ("  Org. types : ");
   for (i = 0; i < len; i++)
-    MSG2 ("%c", fribidi_char_from_bidi_type (bidi_types[i]));
+    MSG2 ("%s ", fribidi_get_bidi_type_name (bidi_types[i]));
   MSG ("\n");
 }
 
@@ -391,15 +400,6 @@ fribidi_get_par_direction (
 
   return FRIBIDI_PAR_ON;
 }
-
-/* Pairing nodes are used for holding a pair of open/close brackets as
-   described in BD16. */
-struct _FriBidiPairingNodeStruct {
-  FriBidiRun *open;
-  FriBidiRun *close;
-  struct _FriBidiPairingNodeStruct *next;
-};
-typedef struct _FriBidiPairingNodeStruct FriBidiPairingNode;
 
 /* Push a new entry to the pairing linked list */
 static FriBidiPairingNode * pairing_nodes_push(FriBidiPairingNode *nodes,
@@ -560,7 +560,7 @@ fribidi_get_par_embedding_levels_ex (
     }
   base_dir = FRIBIDI_LEVEL_TO_DIR (base_level);
   DBG2 ("  base level : %c", fribidi_char_from_level (base_level));
-  DBG2 ("  base dir   : %c", fribidi_char_from_bidi_type (base_dir));
+  DBG2 ("  base dir   : %s", fribidi_get_bidi_type_name (base_dir));
 
   base_level_per_iso_level = fribidi_malloc(sizeof(base_level_per_iso_level[0]) *
                                             FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL);

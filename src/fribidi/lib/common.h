@@ -26,18 +26,11 @@
 #ifndef _COMMON_H
 #define _COMMON_H
 
-#if HAVE_CONFIG_H+0
+#ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
 
 #include <fribidi-common.h>
-
-/* FRIBIDI_PRIVATESPACE is a macro used to name library internal symbols. */
-#ifndef FRIBIDI_PRIVATESPACE
-# define FRIBIDI_PRIVATESPACE1(A,B) A##B
-# define FRIBIDI_PRIVATESPACE0(A,B) FRIBIDI_PRIVATESPACE1(A,B)
-# define FRIBIDI_PRIVATESPACE(SYMBOL) FRIBIDI_PRIVATESPACE0(_,FRIBIDI_NAMESPACE(_##SYMBOL##__internal__))
-#endif /* !FRIBIDI_PRIVATESPACE */
 
 #ifndef false
 # define false (0)
@@ -72,13 +65,13 @@
 # endif	/* !fribidi_free */
 #endif /* fribidi_malloc */
 
-#if HAVE_STRING_H+0
+#ifdef HAVE_STRING_H
 # if !STDC_HEADERS && HAVE_MEMORY_H
 #  include <memory.h>
 # endif
 # include <string.h>
 #endif
-#if HAVE_STRINGS_H+0
+#ifdef HAVE_STRINGS_H
 # include <strings.h>
 #endif
 
@@ -115,7 +108,7 @@
 # define FRIBIDI_EMPTY_STMT FRIBIDI_BEGIN_STMT (void) 0; FRIBIDI_END_STMT
 #endif /* !FRIBIDI_EMPTY_STMT */
 
-#if HAVE_STRINGIZE+0
+#ifdef HAVE_STRINGIZE
 # define STRINGIZE(symbol) #symbol
 #else /* !HAVE_STRINGIZE */
 #  error "No stringize operator available?"
@@ -127,7 +120,9 @@
 #endif /* !_GNU_SOURCE */
 
 /* We respect our own rules. */
-#define FRIBIDI_NO_DEPRECATED
+#ifndef FRIBIDI_NO_DEPRECATED
+#  define FRIBIDI_NO_DEPRECATED
+#endif /* !FRIBIDI_NO_DEPRECATED */
 
 
 #include "debug.h"

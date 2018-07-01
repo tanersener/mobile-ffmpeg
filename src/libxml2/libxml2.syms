@@ -2279,3 +2279,10 @@ LIBXML2_2.9.1 {
   xmlXPathSetContextNode;
 } LIBXML2_2.9.0;
 
+LIBXML2_2.9.8 {
+    global:
+
+# hash
+  xmlHashDefaultDeallocator;
+} LIBXML2_2.9.1;
+

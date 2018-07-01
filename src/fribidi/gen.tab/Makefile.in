@@ -112,24 +112,29 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-am_gen_bidi_type_tab_OBJECTS = gen-bidi-type-tab.$(OBJEXT) \
-	packtab.$(OBJEXT)
+am_gen_bidi_type_tab_OBJECTS =  \
+	gen_bidi_type_tab-gen-bidi-type-tab.$(OBJEXT) \
+	gen_bidi_type_tab-packtab.$(OBJEXT)
 gen_bidi_type_tab_OBJECTS = $(am_gen_bidi_type_tab_OBJECTS)
 gen_bidi_type_tab_LDADD = $(LDADD)
-am_gen_brackets_tab_OBJECTS = gen-brackets-tab.$(OBJEXT) \
-	packtab.$(OBJEXT)
+am_gen_brackets_tab_OBJECTS =  \
+	gen_brackets_tab-gen-brackets-tab.$(OBJEXT) \
+	gen_brackets_tab-packtab.$(OBJEXT)
 gen_brackets_tab_OBJECTS = $(am_gen_brackets_tab_OBJECTS)
 gen_brackets_tab_LDADD = $(LDADD)
-am_gen_brackets_type_tab_OBJECTS = gen-brackets-type-tab.$(OBJEXT) \
-	packtab.$(OBJEXT)
+am_gen_brackets_type_tab_OBJECTS =  \
+	gen_brackets_type_tab-gen-brackets-type-tab.$(OBJEXT) \
+	gen_brackets_type_tab-packtab.$(OBJEXT)
 gen_brackets_type_tab_OBJECTS = $(am_gen_brackets_type_tab_OBJECTS)
 gen_brackets_type_tab_LDADD = $(LDADD)
-am_gen_joining_type_tab_OBJECTS = gen-joining-type-tab.$(OBJEXT) \
-	packtab.$(OBJEXT)
+am_gen_joining_type_tab_OBJECTS =  \
+	gen_joining_type_tab-gen-joining-type-tab.$(OBJEXT) \
+	gen_joining_type_tab-packtab.$(OBJEXT)
 gen_joining_type_tab_OBJECTS = $(am_gen_joining_type_tab_OBJECTS)
 gen_joining_type_tab_LDADD = $(LDADD)
-am_gen_mirroring_tab_OBJECTS = gen-mirroring-tab.$(OBJEXT) \
-	packtab.$(OBJEXT)
+am_gen_mirroring_tab_OBJECTS =  \
+	gen_mirroring_tab-gen-mirroring-tab.$(OBJEXT) \
+	gen_mirroring_tab-packtab.$(OBJEXT)
 gen_mirroring_tab_OBJECTS = $(am_gen_mirroring_tab_OBJECTS)
 gen_mirroring_tab_LDADD = $(LDADD)
 am_gen_unicode_version_OBJECTS = gen-unicode-version.$(OBJEXT)
@@ -238,16 +243,13 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 FRIBIDI_BINARY_AGE = @FRIBIDI_BINARY_AGE@
-FRIBIDI_CHARSETS = @FRIBIDI_CHARSETS@
 FRIBIDI_INTERFACE_AGE = @FRIBIDI_INTERFACE_AGE@
 FRIBIDI_INTERFACE_VERSION = @FRIBIDI_INTERFACE_VERSION@
 FRIBIDI_MAJOR_VERSION = @FRIBIDI_MAJOR_VERSION@
 FRIBIDI_MICRO_VERSION = @FRIBIDI_MICRO_VERSION@
 FRIBIDI_MINOR_VERSION = @FRIBIDI_MINOR_VERSION@
-FRIBIDI_NO_DEPRECATED = @FRIBIDI_NO_DEPRECATED@
+FRIBIDI_MSVC_BUILD_PLACEHOLDER = @FRIBIDI_MSVC_BUILD_PLACEHOLDER@
 FRIBIDI_VERSION = @FRIBIDI_VERSION@
-GLIB_CFLAGS = @GLIB_CFLAGS@
-GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -347,18 +349,25 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 gen_unicode_version_SOURCES = gen-unicode-version.c
+gen_arabic_shaping_tab_SOURCES = gen-arabic-shaping-tab.c
 gen_bidi_type_tab_SOURCES = gen-bidi-type-tab.c packtab.c packtab.h
 gen_joining_type_tab_SOURCES = gen-joining-type-tab.c packtab.c packtab.h
-gen_arabic_shaping_tab_SOURCES = gen-arabic-shaping-tab.c
 gen_mirroring_tab_SOURCES = gen-mirroring-tab.c packtab.c packtab.h
 gen_brackets_tab_SOURCES = gen-brackets-tab.c packtab.c packtab.h
 gen_brackets_type_tab_SOURCES = gen-brackets-type-tab.c packtab.c packtab.h
+# Set CPPFLAGS explicitly for these, such that they compile packtab.c to private
+# packtab.o so they don't race during parallel build from lib.
+# https://github.com/fribidi/fribidi/issues/52
+gen_bidi_type_tab_CPPFLAGS = $(AM_CPPFLAGS)
+gen_joining_type_tab_CPPFLAGS = $(AM_CPPFLAGS)
+gen_mirroring_tab_CPPFLAGS = $(AM_CPPFLAGS)
+gen_brackets_tab_CPPFLAGS = $(AM_CPPFLAGS)
+gen_brackets_type_tab_CPPFLAGS = $(AM_CPPFLAGS)
 CLEANFILES = $(EXTRA_PROGRAMS)
 DISTCLEANFILES = derived_bidi-type.tab.i
 AM_CPPFLAGS = \
 		-I$(top_builddir)/lib \
-		-I$(top_srcdir)/lib \
-		-I$(top_srcdir)/charset
+		-I$(top_srcdir)/lib
 
 UCD_FILES = \
 		unidata/ReadMe.txt \
@@ -459,13 +468,17 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-arabic-shaping-tab.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-bidi-type-tab.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-brackets-tab.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-brackets-type-tab.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-joining-type-tab.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-mirroring-tab.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen-unicode-version.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/packtab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_bidi_type_tab-gen-bidi-type-tab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_bidi_type_tab-packtab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_brackets_tab-gen-brackets-tab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_brackets_tab-packtab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_brackets_type_tab-gen-brackets-type-tab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_brackets_type_tab-packtab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_joining_type_tab-gen-joining-type-tab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_joining_type_tab-packtab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_mirroring_tab-gen-mirroring-tab.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_mirroring_tab-packtab.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -487,6 +500,146 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+gen_bidi_type_tab-gen-bidi-type-tab.o: gen-bidi-type-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_bidi_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_bidi_type_tab-gen-bidi-type-tab.o -MD -MP -MF $(DEPDIR)/gen_bidi_type_tab-gen-bidi-type-tab.Tpo -c -o gen_bidi_type_tab-gen-bidi-type-tab.o `test -f 'gen-bidi-type-tab.c' || echo '$(srcdir)/'`gen-bidi-type-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_bidi_type_tab-gen-bidi-type-tab.Tpo $(DEPDIR)/gen_bidi_type_tab-gen-bidi-type-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-bidi-type-tab.c' object='gen_bidi_type_tab-gen-bidi-type-tab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_bidi_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_bidi_type_tab-gen-bidi-type-tab.o `test -f 'gen-bidi-type-tab.c' || echo '$(srcdir)/'`gen-bidi-type-tab.c
+
+gen_bidi_type_tab-gen-bidi-type-tab.obj: gen-bidi-type-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_bidi_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_bidi_type_tab-gen-bidi-type-tab.obj -MD -MP -MF $(DEPDIR)/gen_bidi_type_tab-gen-bidi-type-tab.Tpo -c -o gen_bidi_type_tab-gen-bidi-type-tab.obj `if test -f 'gen-bidi-type-tab.c'; then $(CYGPATH_W) 'gen-bidi-type-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-bidi-type-tab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_bidi_type_tab-gen-bidi-type-tab.Tpo $(DEPDIR)/gen_bidi_type_tab-gen-bidi-type-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-bidi-type-tab.c' object='gen_bidi_type_tab-gen-bidi-type-tab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_bidi_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_bidi_type_tab-gen-bidi-type-tab.obj `if test -f 'gen-bidi-type-tab.c'; then $(CYGPATH_W) 'gen-bidi-type-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-bidi-type-tab.c'; fi`
+
+gen_bidi_type_tab-packtab.o: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_bidi_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_bidi_type_tab-packtab.o -MD -MP -MF $(DEPDIR)/gen_bidi_type_tab-packtab.Tpo -c -o gen_bidi_type_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_bidi_type_tab-packtab.Tpo $(DEPDIR)/gen_bidi_type_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_bidi_type_tab-packtab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_bidi_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_bidi_type_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+
+gen_bidi_type_tab-packtab.obj: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_bidi_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_bidi_type_tab-packtab.obj -MD -MP -MF $(DEPDIR)/gen_bidi_type_tab-packtab.Tpo -c -o gen_bidi_type_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_bidi_type_tab-packtab.Tpo $(DEPDIR)/gen_bidi_type_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_bidi_type_tab-packtab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_bidi_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_bidi_type_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
+
+gen_brackets_tab-gen-brackets-tab.o: gen-brackets-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_brackets_tab-gen-brackets-tab.o -MD -MP -MF $(DEPDIR)/gen_brackets_tab-gen-brackets-tab.Tpo -c -o gen_brackets_tab-gen-brackets-tab.o `test -f 'gen-brackets-tab.c' || echo '$(srcdir)/'`gen-brackets-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_brackets_tab-gen-brackets-tab.Tpo $(DEPDIR)/gen_brackets_tab-gen-brackets-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-brackets-tab.c' object='gen_brackets_tab-gen-brackets-tab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_brackets_tab-gen-brackets-tab.o `test -f 'gen-brackets-tab.c' || echo '$(srcdir)/'`gen-brackets-tab.c
+
+gen_brackets_tab-gen-brackets-tab.obj: gen-brackets-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_brackets_tab-gen-brackets-tab.obj -MD -MP -MF $(DEPDIR)/gen_brackets_tab-gen-brackets-tab.Tpo -c -o gen_brackets_tab-gen-brackets-tab.obj `if test -f 'gen-brackets-tab.c'; then $(CYGPATH_W) 'gen-brackets-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-brackets-tab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_brackets_tab-gen-brackets-tab.Tpo $(DEPDIR)/gen_brackets_tab-gen-brackets-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-brackets-tab.c' object='gen_brackets_tab-gen-brackets-tab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_brackets_tab-gen-brackets-tab.obj `if test -f 'gen-brackets-tab.c'; then $(CYGPATH_W) 'gen-brackets-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-brackets-tab.c'; fi`
+
+gen_brackets_tab-packtab.o: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_brackets_tab-packtab.o -MD -MP -MF $(DEPDIR)/gen_brackets_tab-packtab.Tpo -c -o gen_brackets_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_brackets_tab-packtab.Tpo $(DEPDIR)/gen_brackets_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_brackets_tab-packtab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_brackets_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+
+gen_brackets_tab-packtab.obj: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_brackets_tab-packtab.obj -MD -MP -MF $(DEPDIR)/gen_brackets_tab-packtab.Tpo -c -o gen_brackets_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_brackets_tab-packtab.Tpo $(DEPDIR)/gen_brackets_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_brackets_tab-packtab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_brackets_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
+
+gen_brackets_type_tab-gen-brackets-type-tab.o: gen-brackets-type-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_brackets_type_tab-gen-brackets-type-tab.o -MD -MP -MF $(DEPDIR)/gen_brackets_type_tab-gen-brackets-type-tab.Tpo -c -o gen_brackets_type_tab-gen-brackets-type-tab.o `test -f 'gen-brackets-type-tab.c' || echo '$(srcdir)/'`gen-brackets-type-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_brackets_type_tab-gen-brackets-type-tab.Tpo $(DEPDIR)/gen_brackets_type_tab-gen-brackets-type-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-brackets-type-tab.c' object='gen_brackets_type_tab-gen-brackets-type-tab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_brackets_type_tab-gen-brackets-type-tab.o `test -f 'gen-brackets-type-tab.c' || echo '$(srcdir)/'`gen-brackets-type-tab.c
+
+gen_brackets_type_tab-gen-brackets-type-tab.obj: gen-brackets-type-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_brackets_type_tab-gen-brackets-type-tab.obj -MD -MP -MF $(DEPDIR)/gen_brackets_type_tab-gen-brackets-type-tab.Tpo -c -o gen_brackets_type_tab-gen-brackets-type-tab.obj `if test -f 'gen-brackets-type-tab.c'; then $(CYGPATH_W) 'gen-brackets-type-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-brackets-type-tab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_brackets_type_tab-gen-brackets-type-tab.Tpo $(DEPDIR)/gen_brackets_type_tab-gen-brackets-type-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-brackets-type-tab.c' object='gen_brackets_type_tab-gen-brackets-type-tab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_brackets_type_tab-gen-brackets-type-tab.obj `if test -f 'gen-brackets-type-tab.c'; then $(CYGPATH_W) 'gen-brackets-type-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-brackets-type-tab.c'; fi`
+
+gen_brackets_type_tab-packtab.o: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_brackets_type_tab-packtab.o -MD -MP -MF $(DEPDIR)/gen_brackets_type_tab-packtab.Tpo -c -o gen_brackets_type_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_brackets_type_tab-packtab.Tpo $(DEPDIR)/gen_brackets_type_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_brackets_type_tab-packtab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_brackets_type_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+
+gen_brackets_type_tab-packtab.obj: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_brackets_type_tab-packtab.obj -MD -MP -MF $(DEPDIR)/gen_brackets_type_tab-packtab.Tpo -c -o gen_brackets_type_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_brackets_type_tab-packtab.Tpo $(DEPDIR)/gen_brackets_type_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_brackets_type_tab-packtab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_brackets_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_brackets_type_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
+
+gen_joining_type_tab-gen-joining-type-tab.o: gen-joining-type-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_joining_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_joining_type_tab-gen-joining-type-tab.o -MD -MP -MF $(DEPDIR)/gen_joining_type_tab-gen-joining-type-tab.Tpo -c -o gen_joining_type_tab-gen-joining-type-tab.o `test -f 'gen-joining-type-tab.c' || echo '$(srcdir)/'`gen-joining-type-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_joining_type_tab-gen-joining-type-tab.Tpo $(DEPDIR)/gen_joining_type_tab-gen-joining-type-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-joining-type-tab.c' object='gen_joining_type_tab-gen-joining-type-tab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_joining_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_joining_type_tab-gen-joining-type-tab.o `test -f 'gen-joining-type-tab.c' || echo '$(srcdir)/'`gen-joining-type-tab.c
+
+gen_joining_type_tab-gen-joining-type-tab.obj: gen-joining-type-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_joining_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_joining_type_tab-gen-joining-type-tab.obj -MD -MP -MF $(DEPDIR)/gen_joining_type_tab-gen-joining-type-tab.Tpo -c -o gen_joining_type_tab-gen-joining-type-tab.obj `if test -f 'gen-joining-type-tab.c'; then $(CYGPATH_W) 'gen-joining-type-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-joining-type-tab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_joining_type_tab-gen-joining-type-tab.Tpo $(DEPDIR)/gen_joining_type_tab-gen-joining-type-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-joining-type-tab.c' object='gen_joining_type_tab-gen-joining-type-tab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_joining_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_joining_type_tab-gen-joining-type-tab.obj `if test -f 'gen-joining-type-tab.c'; then $(CYGPATH_W) 'gen-joining-type-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-joining-type-tab.c'; fi`
+
+gen_joining_type_tab-packtab.o: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_joining_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_joining_type_tab-packtab.o -MD -MP -MF $(DEPDIR)/gen_joining_type_tab-packtab.Tpo -c -o gen_joining_type_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_joining_type_tab-packtab.Tpo $(DEPDIR)/gen_joining_type_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_joining_type_tab-packtab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_joining_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_joining_type_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+
+gen_joining_type_tab-packtab.obj: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_joining_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_joining_type_tab-packtab.obj -MD -MP -MF $(DEPDIR)/gen_joining_type_tab-packtab.Tpo -c -o gen_joining_type_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_joining_type_tab-packtab.Tpo $(DEPDIR)/gen_joining_type_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_joining_type_tab-packtab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_joining_type_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_joining_type_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
+
+gen_mirroring_tab-gen-mirroring-tab.o: gen-mirroring-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_mirroring_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_mirroring_tab-gen-mirroring-tab.o -MD -MP -MF $(DEPDIR)/gen_mirroring_tab-gen-mirroring-tab.Tpo -c -o gen_mirroring_tab-gen-mirroring-tab.o `test -f 'gen-mirroring-tab.c' || echo '$(srcdir)/'`gen-mirroring-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_mirroring_tab-gen-mirroring-tab.Tpo $(DEPDIR)/gen_mirroring_tab-gen-mirroring-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-mirroring-tab.c' object='gen_mirroring_tab-gen-mirroring-tab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_mirroring_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_mirroring_tab-gen-mirroring-tab.o `test -f 'gen-mirroring-tab.c' || echo '$(srcdir)/'`gen-mirroring-tab.c
+
+gen_mirroring_tab-gen-mirroring-tab.obj: gen-mirroring-tab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_mirroring_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_mirroring_tab-gen-mirroring-tab.obj -MD -MP -MF $(DEPDIR)/gen_mirroring_tab-gen-mirroring-tab.Tpo -c -o gen_mirroring_tab-gen-mirroring-tab.obj `if test -f 'gen-mirroring-tab.c'; then $(CYGPATH_W) 'gen-mirroring-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-mirroring-tab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_mirroring_tab-gen-mirroring-tab.Tpo $(DEPDIR)/gen_mirroring_tab-gen-mirroring-tab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='gen-mirroring-tab.c' object='gen_mirroring_tab-gen-mirroring-tab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_mirroring_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_mirroring_tab-gen-mirroring-tab.obj `if test -f 'gen-mirroring-tab.c'; then $(CYGPATH_W) 'gen-mirroring-tab.c'; else $(CYGPATH_W) '$(srcdir)/gen-mirroring-tab.c'; fi`
+
+gen_mirroring_tab-packtab.o: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_mirroring_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_mirroring_tab-packtab.o -MD -MP -MF $(DEPDIR)/gen_mirroring_tab-packtab.Tpo -c -o gen_mirroring_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_mirroring_tab-packtab.Tpo $(DEPDIR)/gen_mirroring_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_mirroring_tab-packtab.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_mirroring_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_mirroring_tab-packtab.o `test -f 'packtab.c' || echo '$(srcdir)/'`packtab.c
+
+gen_mirroring_tab-packtab.obj: packtab.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_mirroring_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT gen_mirroring_tab-packtab.obj -MD -MP -MF $(DEPDIR)/gen_mirroring_tab-packtab.Tpo -c -o gen_mirroring_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_mirroring_tab-packtab.Tpo $(DEPDIR)/gen_mirroring_tab-packtab.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='packtab.c' object='gen_mirroring_tab-packtab.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_mirroring_tab_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o gen_mirroring_tab-packtab.obj `if test -f 'packtab.c'; then $(CYGPATH_W) 'packtab.c'; else $(CYGPATH_W) '$(srcdir)/packtab.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -704,7 +857,7 @@ bidi-type.tab.i: \
 		unidata/UnicodeData.txt \
 		fribidi-unicode-version.h \
 		$(gen_bidi_type_tab)
-	./$(gen_bidi_type_tab) $(COMPRESSION) $^ > $@ \
+	$(AM_V_GEN) ./$(gen_bidi_type_tab) $(COMPRESSION) $^ > $@ \
 	|| ($(RM) $@ && false)
 
 joining-type.tab.i: \
@@ -712,21 +865,21 @@ joining-type.tab.i: \
 		unidata/ArabicShaping.txt \
 		fribidi-unicode-version.h \
 		$(gen_joining_type_tab)
-	./$(gen_joining_type_tab) $(COMPRESSION) $^ > $@ \
+	$(AM_V_GEN) ./$(gen_joining_type_tab) $(COMPRESSION) $^ > $@ \
 	|| ($(RM) $@ && false)
 
 arabic-shaping.tab.i: \
 		unidata/UnicodeData.txt \
 		fribidi-unicode-version.h \
 		$(gen_arabic_shaping_tab)
-	./$(gen_arabic_shaping_tab) $(COMPRESSION) $^ > $@ \
+	$(AM_V_GEN) ./$(gen_arabic_shaping_tab) $(COMPRESSION) $^ > $@ \
 	|| ($(RM) $@ && false)
 
 mirroring.tab.i: \
 		unidata/BidiMirroring.txt \
 		fribidi-unicode-version.h \
 		$(gen_mirroring_tab)
-	./$(gen_mirroring_tab) $(COMPRESSION) $^ > $@ \
+	$(AM_V_GEN) ./$(gen_mirroring_tab) $(COMPRESSION) $^ > $@ \
 	|| ($(RM) $@ && false)
 
 brackets.tab.i: \
@@ -734,21 +887,21 @@ brackets.tab.i: \
 		unidata/UnicodeData.txt \
 		fribidi-unicode-version.h \
 		$(gen_brackets_tab)
-	./$(gen_brackets_tab) $(COMPRESSION) $^ > $@ \
+	$(AM_V_GEN) ./$(gen_brackets_tab) $(COMPRESSION) $^ > $@ \
 	|| ($(RM) $@ && false)
 
 brackets-type.tab.i: \
 		unidata/BidiBrackets.txt \
 		fribidi-unicode-version.h \
 		$(gen_brackets_type_tab)
-	./$(gen_brackets_type_tab) $(COMPRESSION) $^ > $@ \
+	$(AM_V_GEN) ./$(gen_brackets_type_tab) $(COMPRESSION) $^ > $@ \
 	|| ($(RM) $@ && false)
 
 fribidi-unicode-version.h: \
 		unidata/ReadMe.txt \
 		unidata/BidiMirroring.txt \
 		$(gen_unicode_version)
-	./$(gen_unicode_version) $^ > $@ \
+	$(AM_V_GEN) ./$(gen_unicode_version) $^ > $@ \
 	|| ($(RM) $@ && false)
 
 # generate all generators:

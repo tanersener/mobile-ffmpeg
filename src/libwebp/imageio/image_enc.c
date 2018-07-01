@@ -158,14 +158,8 @@ static void PNGAPI PNGErrorFunction(png_structp png, png_const_charp dummy) {
 }
 
 int WebPWritePNG(FILE* out_file, const WebPDecBuffer* const buffer) {
-  const uint32_t width = buffer->width;
-  const uint32_t height = buffer->height;
-  png_bytep row = buffer->u.RGBA.rgba;
-  const int stride = buffer->u.RGBA.stride;
-  const int has_alpha = WebPIsAlphaMode(buffer->colorspace);
   volatile png_structp png;
   volatile png_infop info;
-  png_uint_32 y;
 
   if (out_file == NULL || buffer == NULL) return 0;
 
@@ -184,14 +178,23 @@ int WebPWritePNG(FILE* out_file, const WebPDecBuffer* const buffer) {
     return 0;
   }
   png_init_io(png, out_file);
-  png_set_IHDR(png, info, width, height, 8,
-               has_alpha ? PNG_COLOR_TYPE_RGBA : PNG_COLOR_TYPE_RGB,
-               PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
-               PNG_FILTER_TYPE_DEFAULT);
-  png_write_info(png, info);
-  for (y = 0; y < height; ++y) {
-    png_write_rows(png, &row, 1);
-    row += stride;
+  {
+    const uint32_t width = buffer->width;
+    const uint32_t height = buffer->height;
+    png_bytep row = buffer->u.RGBA.rgba;
+    const int stride = buffer->u.RGBA.stride;
+    const int has_alpha = WebPIsAlphaMode(buffer->colorspace);
+    uint32_t y;
+
+    png_set_IHDR(png, info, width, height, 8,
+                 has_alpha ? PNG_COLOR_TYPE_RGBA : PNG_COLOR_TYPE_RGB,
+                 PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+                 PNG_FILTER_TYPE_DEFAULT);
+    png_write_info(png, info);
+    for (y = 0; y < height; ++y) {
+      png_write_rows(png, &row, 1);
+      row += stride;
+    }
   }
   png_write_end(png, info);
   png_destroy_write_struct((png_structpp)&png, (png_infopp)&info);

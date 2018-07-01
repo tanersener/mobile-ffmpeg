@@ -340,7 +340,7 @@ static WebPInfoStatus ParseLossyHeader(const ChunkData* const chunk_data,
   WebPInfoStatus status = WEBP_INFO_OK;
   uint64_t bit_position = 0;
   uint64_t* const bit_pos = &bit_position;
-  int color_space, clamp_type;
+  int colorspace, clamp_type;
   printf("  Parsing lossy bitstream...\n");
   // Calling WebPGetFeatures() in ProcessImageChunk() should ensure this.
   assert(chunk_data->size_ >= CHUNK_HEADER_SIZE + 10);
@@ -381,9 +381,9 @@ static WebPInfoStatus ParseLossyHeader(const ChunkData* const chunk_data,
     LOG_ERROR("Bad partition length.");
     return WEBP_INFO_BITSTREAM_ERROR;
   }
-  GET_BITS(color_space, 1);
+  GET_BITS(colorspace, 1);
   GET_BITS(clamp_type, 1);
-  printf("  Color space:      %d\n", color_space);
+  printf("  Color space:      %d\n", colorspace);
   printf("  Clamp type:       %d\n", clamp_type);
   status = ParseLossySegmentHeader(webp_info, data, data_size, bit_pos);
   if (status != WEBP_INFO_OK) return status;

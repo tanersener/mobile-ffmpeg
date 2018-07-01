@@ -31,24 +31,26 @@ LIBRARY_XVIDCORE=19
 LIBRARY_LIBILBC=20
 LIBRARY_OPUS=21
 LIBRARY_SNAPPY=22
-LIBRARY_GIFLIB=23
-LIBRARY_JPEG=24
-LIBRARY_LIBOGG=25
-LIBRARY_LIBPNG=26
-LIBRARY_LIBUUID=27
-LIBRARY_NETTLE=28
-LIBRARY_TIFF=29
-LIBRARY_EXPAT=30
-LIBRARY_ZLIB=31
-LIBRARY_AUDIOTOOLBOX=32
-LIBRARY_COREIMAGE=33
-LIBRARY_BZIP2=34
+LIBRARY_SOXR=23
+LIBRARY_LIBAOM=24
+LIBRARY_GIFLIB=25
+LIBRARY_JPEG=26
+LIBRARY_LIBOGG=27
+LIBRARY_LIBPNG=28
+LIBRARY_LIBUUID=29
+LIBRARY_NETTLE=30
+LIBRARY_TIFF=31
+LIBRARY_EXPAT=32
+LIBRARY_ZLIB=33
+LIBRARY_AUDIOTOOLBOX=34
+LIBRARY_COREIMAGE=35
+LIBRARY_BZIP2=36
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -56,6 +58,9 @@ export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 # MIN VERSION IOS7
 export IOS_MIN_VERSION=7.0
+
+# UPDATE THIS TO 8.0 WHEN GNUTLS IS UPGRADED TO 3.6.x line
+export GNUTLS_IOS_MIN_VERSION=7.0
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
@@ -106,6 +111,7 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  --enable-gnutls\t\tbuild with gnutls [no]"
     echo -e "  --enable-kvazaar\t\tbuild with kvazaar [no]"
     echo -e "  --enable-lame\t\t\tbuild with lame [no]"
+    echo -e "  --enable-libaom\t\tbuild with libaom [no]"
     echo -e "  --enable-libass\t\tbuild with libass [no]"
     echo -e "  --enable-libiconv\t\tbuild with libiconv [no]"
     echo -e "  --enable-libilbc\t\tbuild with libilbc [no]"
@@ -118,6 +124,7 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  --enable-opus\t\t\tbuild with opus [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
     echo -e "  --enable-snappy\t\tbuild with snappy [no]"
+    echo -e "  --enable-soxr\t\t\tbuild with soxr [no]"
     echo -e "  --enable-speex\t\tbuild with speex [no]"
     echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
@@ -195,8 +202,8 @@ set_library() {
         ;;
         gnutls)
             ENABLED_LIBRARIES[LIBRARY_GNUTLS]=$2
-            ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+            set_library "nettle" $2
             set_library "gmp" $2
             set_library "libiconv" $2
         ;;
@@ -206,6 +213,9 @@ set_library() {
         lame)
             ENABLED_LIBRARIES[LIBRARY_LAME]=$2
             set_library "libiconv" $2
+        ;;
+        libaom)
+            ENABLED_LIBRARIES[LIBRARY_LIBAOM]=$2
         ;;
         libass)
             ENABLED_LIBRARIES[LIBRARY_LIBASS]=$2
@@ -242,7 +252,7 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_LIBWEBP]=$2
             ENABLED_LIBRARIES[LIBRARY_GIFLIB]=$2
             ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
-            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+            set_library "tiff" $2
             set_library "libpng" $2
         ;;
         libxml2)
@@ -262,6 +272,9 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_SNAPPY]=$2
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
         ;;
+        soxr)
+            ENABLED_LIBRARIES[LIBRARY_SOXR]=$2
+        ;;
         speex)
             ENABLED_LIBRARIES[LIBRARY_SPEEX]=$2
         ;;
@@ -274,7 +287,15 @@ set_library() {
         xvidcore)
             ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
         ;;
-        giflib | jpeg | libogg | libpng | libuuid | nettle | tiff | expat)
+        tiff)
+            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+        ;;
+        nettle)
+            ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
+            set_library "gmp" $2
+        ;;
+        giflib | jpeg | libogg | libpng | libuuid | expat)
             # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         *)
@@ -353,7 +374,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {31..34}
+    for library in {33..36}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -365,7 +386,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..22}
+    for library in {0..24}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -446,7 +467,7 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..34}
+            for library in {0..36}
             do
                 if [[ $library -ne 18 ]] && [[ $library -ne 19 ]]; then
                     enable_library $(get_library_name $library)
@@ -522,10 +543,11 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..35}
+        for library in {1..37}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
+            unset $(echo "DEPENDENCY_REBUILT_${library_name}" | sed "s/\-/\_/g")
         done
     fi
 done
@@ -669,15 +691,16 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     do
         for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
         do
+            ## TRY NOT TO USE HARDCODED VERSION NUMBERS
             install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.dylib @rpath/mobileffmpeg.framework/mobileffmpeg ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
 
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavcodec.57.dylib @rpath/libavcodec.framework/libavcodec ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavdevice.57.dylib @rpath/libavdevice.framework/libavdevice ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavfilter.6.dylib @rpath/libavfilter.framework/libavfilter ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavformat.57.dylib @rpath/libavformat.framework/libavformat ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswresample.2.dylib @rpath/libswresample.framework/libswresample ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswscale.4.dylib @rpath/libswscale.framework/libswscale ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavutil.55.dylib @rpath/libavutil.framework/libavutil ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavcodec.58.dylib @rpath/libavcodec.framework/libavcodec ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavdevice.58.dylib @rpath/libavdevice.framework/libavdevice ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavfilter.7.dylib @rpath/libavfilter.framework/libavfilter ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavformat.58.dylib @rpath/libavformat.framework/libavformat ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswresample.3.dylib @rpath/libswresample.framework/libswresample ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswscale.5.dylib @rpath/libswscale.framework/libswscale ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
+            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavutil.56.dylib @rpath/libavutil.framework/libavutil ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB}
         done
     done
 

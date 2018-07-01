@@ -170,8 +170,8 @@ static const AVOption options[] = {
      {.i64 = 1}, 0, 1, AV_OPT_FLAG_DECODING_PARAM },
     {"ts_packetsize", "output option carrying the raw packet size", offsetof(MpegTSContext, raw_packet_size), AV_OPT_TYPE_INT,
      {.i64 = 0}, 0, 0, AV_OPT_FLAG_DECODING_PARAM | AV_OPT_FLAG_EXPORT | AV_OPT_FLAG_READONLY },
-    {"scan_all_pmts",   "scan and combine all PMTs", offsetof(MpegTSContext, scan_all_pmts), AV_OPT_TYPE_BOOL,
-     { .i64 =  -1}, -1, 1,  AV_OPT_FLAG_DECODING_PARAM },
+    {"scan_all_pmts", "scan and combine all PMTs", offsetof(MpegTSContext, scan_all_pmts), AV_OPT_TYPE_BOOL,
+     {.i64 = -1}, -1, 1, AV_OPT_FLAG_DECODING_PARAM },
     {"skip_changes", "skip changing / adding streams / programs", offsetof(MpegTSContext, skip_changes), AV_OPT_TYPE_BOOL,
      {.i64 = 0}, 0, 1, 0 },
     {"skip_clear", "skip clearing programs", offsetof(MpegTSContext, skip_clear), AV_OPT_TYPE_BOOL,
@@ -391,7 +391,8 @@ static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
                                const uint8_t *buf, int buf_size, int is_start)
 {
     MpegTSSectionFilter *tss = &tss1->u.section_filter;
-    int len;
+    uint8_t *cur_section_buf = NULL;
+    int len, offset;
 
     if (is_start) {
         memcpy(tss->section_buf, buf, buf_size);
@@ -401,42 +402,53 @@ static void write_section_data(MpegTSContext *ts, MpegTSFilter *tss1,
     } else {
         if (tss->end_of_section_reached)
             return;
-        len = 4096 - tss->section_index;
+        len = MAX_SECTION_SIZE - tss->section_index;
         if (buf_size < len)
             len = buf_size;
         memcpy(tss->section_buf + tss->section_index, buf, len);
         tss->section_index += len;
     }
 
-    /* compute section length if possible */
-    if (tss->section_h_size == -1 && tss->section_index >= 3) {
-        len = (AV_RB16(tss->section_buf + 1) & 0xfff) + 3;
-        if (len > 4096)
-            return;
-        tss->section_h_size = len;
-    }
-
-    if (tss->section_h_size != -1 &&
-        tss->section_index >= tss->section_h_size) {
-        int crc_valid = 1;
-        tss->end_of_section_reached = 1;
-
-        if (tss->check_crc) {
-            crc_valid = !av_crc(av_crc_get_table(AV_CRC_32_IEEE), -1, tss->section_buf, tss->section_h_size);
-            if (tss->section_h_size >= 4)
-                tss->crc = AV_RB32(tss->section_buf + tss->section_h_size - 4);
-
-            if (crc_valid) {
-                ts->crc_validity[ tss1->pid ] = 100;
-            }else if (ts->crc_validity[ tss1->pid ] > -10) {
-                ts->crc_validity[ tss1->pid ]--;
-            }else
-                crc_valid = 2;
+    offset = 0;
+    cur_section_buf = tss->section_buf;
+    while (cur_section_buf - tss->section_buf < MAX_SECTION_SIZE && cur_section_buf[0] != 0xff) {
+        /* compute section length if possible */
+        if (tss->section_h_size == -1 && tss->section_index - offset >= 3) {
+            len = (AV_RB16(cur_section_buf + 1) & 0xfff) + 3;
+            if (len > MAX_SECTION_SIZE)
+                return;
+            tss->section_h_size = len;
         }
-        if (crc_valid) {
-            tss->section_cb(tss1, tss->section_buf, tss->section_h_size);
-            if (crc_valid != 1)
-                tss->last_ver = -1;
+
+        if (tss->section_h_size != -1 &&
+            tss->section_index >= offset + tss->section_h_size) {
+            int crc_valid = 1;
+            tss->end_of_section_reached = 1;
+
+            if (tss->check_crc) {
+                crc_valid = !av_crc(av_crc_get_table(AV_CRC_32_IEEE), -1, cur_section_buf, tss->section_h_size);
+                if (tss->section_h_size >= 4)
+                    tss->crc = AV_RB32(cur_section_buf + tss->section_h_size - 4);
+
+                if (crc_valid) {
+                    ts->crc_validity[ tss1->pid ] = 100;
+                }else if (ts->crc_validity[ tss1->pid ] > -10) {
+                    ts->crc_validity[ tss1->pid ]--;
+                }else
+                    crc_valid = 2;
+            }
+            if (crc_valid) {
+                tss->section_cb(tss1, cur_section_buf, tss->section_h_size);
+                if (crc_valid != 1)
+                    tss->last_ver = -1;
+            }
+
+            cur_section_buf += tss->section_h_size;
+            offset += tss->section_h_size;
+            tss->section_h_size = -1;
+        } else {
+            tss->end_of_section_reached = 0;
+            break;
         }
     }
 }
@@ -478,7 +490,7 @@ static MpegTSFilter *mpegts_open_section_filter(MpegTSContext *ts,
     sec = &filter->u.section_filter;
     sec->section_cb  = section_cb;
     sec->opaque      = opaque;
-    sec->section_buf = av_malloc(MAX_SECTION_SIZE);
+    sec->section_buf = av_mallocz(MAX_SECTION_SIZE);
     sec->check_crc   = check_crc;
     sec->last_ver    = -1;
 
@@ -1733,10 +1745,10 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type
                     }
                 }
 
-               if (st->codecpar->extradata_size < language_count * 2)
-                   return AVERROR_INVALIDDATA;
+                if (st->codecpar->extradata_size < language_count * 2)
+                    return AVERROR_INVALIDDATA;
 
-               extradata = st->codecpar->extradata;
+                extradata = st->codecpar->extradata;
 
                 for (i = 0; i < language_count; i++) {
                     language[i * 4 + 0] = get8(pp, desc_end);
@@ -1840,7 +1852,9 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type
         }
         if (i && language[0]) {
             language[i - 1] = 0;
-            av_dict_set(&st->metadata, "language", language, 0);
+            /* don't overwrite language, as it may already have been set by
+             * another, more specific descriptor (e.g. supplementary audio) */
+            av_dict_set(&st->metadata, "language", language, AV_DICT_DONT_OVERWRITE);
         }
         break;
     case 0x05: /* registration descriptor */
@@ -1895,6 +1909,42 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type
                 st->internal->need_context_update = 1;
             }
         }
+        if (ext_desc_tag == 0x06) { /* supplementary audio descriptor */
+            int flags;
+
+            if (desc_len < 1)
+                return AVERROR_INVALIDDATA;
+            flags = get8(pp, desc_end);
+
+            if ((flags & 0x80) == 0) /* mix_type */
+                st->disposition |= AV_DISPOSITION_DEPENDENT;
+
+            switch ((flags >> 2) & 0x1F) { /* editorial_classification */
+            case 0x01:
+                st->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED;
+                break;
+            case 0x02:
+                st->disposition |= AV_DISPOSITION_HEARING_IMPAIRED;
+                break;
+            case 0x03:
+                st->disposition |= AV_DISPOSITION_VISUAL_IMPAIRED;
+                break;
+            }
+
+            if (flags & 0x01) { /* language_code_present */
+                if (desc_len < 4)
+                    return AVERROR_INVALIDDATA;
+                language[0] = get8(pp, desc_end);
+                language[1] = get8(pp, desc_end);
+                language[2] = get8(pp, desc_end);
+                language[3] = 0;
+
+                /* This language always has to override a possible
+                 * ISO 639 language descriptor language */
+                if (language[0])
+                    av_dict_set(&st->metadata, "language", language, 0);
+            }
+        }
         break;
     default:
         break;
@@ -1932,14 +1982,14 @@ static void pmt_cb(MpegTSFilter *filter, const uint8_t *section, int section_len
     p = section;
     if (parse_section_header(h, &p, p_end) < 0)
         return;
+    if (h->tid != PMT_TID)
+        return;
     if (skip_identical(h, tssf))
         return;
 
     av_log(ts->stream, AV_LOG_TRACE, "sid=0x%x sec_num=%d/%d version=%d tid=%d\n",
             h->id, h->sec_num, h->last_sec_num, h->version, h->tid);
 
-    if (h->tid != PMT_TID)
-        return;
     if (!ts->scan_all_pmts && ts->skip_changes)
         return;
 
@@ -2290,6 +2340,14 @@ static int handle_packet(MpegTSContext *ts, const uint8_t *packet)
         av_log(ts->stream, AV_LOG_DEBUG,
                "Continuity check failed for pid %d expected %d got %d\n",
                pid, expected_cc, cc);
+        if (tss->type == MPEGTS_PES) {
+            PESContext *pc = tss->u.pes_filter.opaque;
+            pc->flags |= AV_PKT_FLAG_CORRUPT;
+        }
+    }
+
+    if (packet[1] & 0x80) {
+        av_log(ts->stream, AV_LOG_DEBUG, "Packet had TEI flag set; marking as corrupt\n");
         if (tss->type == MPEGTS_PES) {
             PESContext *pc = tss->u.pes_filter.opaque;
             pc->flags |= AV_PKT_FLAG_CORRUPT;

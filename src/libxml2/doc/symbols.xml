@@ -1765,4 +1765,7 @@
     <symbol file="xpath">xmlXPathNodeEval</symbol>
     <symbol file="xpath">xmlXPathSetContextNode</symbol>
   </release>
+  <release version="2.9.8">
+    <symbol file="hash">xmlHashDefaultDeallocator</symbol>
+  </release>
 </symbols>

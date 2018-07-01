@@ -90,9 +90,7 @@ build_triplet = @build@
 host_triplet = @host@
 bin_PROGRAMS = fribidi$(EXEEXT)
 noinst_PROGRAMS = fribidi-benchmark$(EXEEXT) \
-	fribidi-bidi-types$(EXEEXT) $(am__EXEEXT_1)
-@FRIBIDI_CHARSETS_TRUE@am__append_1 = fribidi-caprtl2utf8
-@FRIBIDI_CHARSETS_FALSE@am__append_2 = $(top_builddir)/charset/libfribidi-char-sets.la
+	fribidi-bidi-types$(EXEEXT) fribidi-caprtl2utf8$(EXEEXT)
 subdir = bin
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -108,14 +106,12 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
-@FRIBIDI_CHARSETS_TRUE@am__EXEEXT_1 = fribidi-caprtl2utf8$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am__objects_1 = getopt.$(OBJEXT) getopt1.$(OBJEXT)
 am_fribidi_OBJECTS = fribidi-main.$(OBJEXT) $(am__objects_1)
 fribidi_OBJECTS = $(am_fribidi_OBJECTS)
 fribidi_LDADD = $(LDADD)
-fribidi_DEPENDENCIES = $(top_builddir)/lib/libfribidi.la \
-	$(am__append_2)
+fribidi_DEPENDENCIES = $(top_builddir)/lib/libfribidi.la
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
@@ -124,18 +120,15 @@ am_fribidi_benchmark_OBJECTS = fribidi-benchmark.$(OBJEXT) \
 	$(am__objects_1)
 fribidi_benchmark_OBJECTS = $(am_fribidi_benchmark_OBJECTS)
 fribidi_benchmark_LDADD = $(LDADD)
-fribidi_benchmark_DEPENDENCIES = $(top_builddir)/lib/libfribidi.la \
-	$(am__append_2)
+fribidi_benchmark_DEPENDENCIES = $(top_builddir)/lib/libfribidi.la
 fribidi_bidi_types_SOURCES = fribidi-bidi-types.c
 fribidi_bidi_types_OBJECTS = fribidi-bidi-types.$(OBJEXT)
 fribidi_bidi_types_LDADD = $(LDADD)
-fribidi_bidi_types_DEPENDENCIES = $(top_builddir)/lib/libfribidi.la \
-	$(am__append_2)
+fribidi_bidi_types_DEPENDENCIES = $(top_builddir)/lib/libfribidi.la
 fribidi_caprtl2utf8_SOURCES = fribidi-caprtl2utf8.c
 fribidi_caprtl2utf8_OBJECTS = fribidi-caprtl2utf8.$(OBJEXT)
 fribidi_caprtl2utf8_LDADD = $(LDADD)
-fribidi_caprtl2utf8_DEPENDENCIES = $(top_builddir)/lib/libfribidi.la \
-	$(am__append_2)
+fribidi_caprtl2utf8_DEPENDENCIES = $(top_builddir)/lib/libfribidi.la
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -232,16 +225,13 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 FRIBIDI_BINARY_AGE = @FRIBIDI_BINARY_AGE@
-FRIBIDI_CHARSETS = @FRIBIDI_CHARSETS@
 FRIBIDI_INTERFACE_AGE = @FRIBIDI_INTERFACE_AGE@
 FRIBIDI_INTERFACE_VERSION = @FRIBIDI_INTERFACE_VERSION@
 FRIBIDI_MAJOR_VERSION = @FRIBIDI_MAJOR_VERSION@
 FRIBIDI_MICRO_VERSION = @FRIBIDI_MICRO_VERSION@
 FRIBIDI_MINOR_VERSION = @FRIBIDI_MINOR_VERSION@
-FRIBIDI_NO_DEPRECATED = @FRIBIDI_NO_DEPRECATED@
+FRIBIDI_MSVC_BUILD_PLACEHOLDER = @FRIBIDI_MSVC_BUILD_PLACEHOLDER@
 FRIBIDI_VERSION = @FRIBIDI_VERSION@
-GLIB_CFLAGS = @GLIB_CFLAGS@
-GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -345,10 +335,9 @@ fribidi_SOURCES = fribidi-main.c $(getopt_SOURCES)
 fribidi_benchmark_SOURCES = fribidi-benchmark.c $(getopt_SOURCES)
 AM_CPPFLAGS = \
 		-I$(top_builddir)/lib \
-		-I$(top_srcdir)/lib \
-		-I$(top_srcdir)/charset
+		-I$(top_srcdir)/lib
 
-LDADD = $(top_builddir)/lib/libfribidi.la $(am__append_2)
+LDADD = $(top_builddir)/lib/libfribidi.la
 all: all-am
 
 .SUFFIXES:

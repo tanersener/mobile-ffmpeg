@@ -406,7 +406,6 @@
 	
 	
 	<!-- some other conditional defines -->
-	<set var="ZLIB_DEF"><if cond="WITH_ZLIB=='1'">HAVE_ZLIB_H</if></set>
 	<set var="DEBUG_DEF"><if cond="BUILD=='debug'">_DEBUG</if></set>
 	<set var="DEBUG_DEF"><if cond="BUILD=='release'">NDEBUG</if></set>
 	

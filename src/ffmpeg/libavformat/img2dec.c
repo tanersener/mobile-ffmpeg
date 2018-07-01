@@ -198,7 +198,7 @@ int ff_img_read_header(AVFormatContext *s1)
         return AVERROR(EINVAL);
     }
 
-    av_strlcpy(s->path, s1->filename, sizeof(s->path));
+    av_strlcpy(s->path, s1->url, sizeof(s->path));
     s->img_number = 0;
     s->img_count  = 0;
 
@@ -323,7 +323,8 @@ int ff_img_read_header(AVFormatContext *s1)
         if (s1->pb) {
             int probe_buffer_size = 2048;
             uint8_t *probe_buffer = av_realloc(NULL, probe_buffer_size + AVPROBE_PADDING_SIZE);
-            AVInputFormat *fmt = NULL;
+            const AVInputFormat *fmt = NULL;
+            void *fmt_iter = NULL;
             AVProbeData pd = { 0 };
 
             if (!probe_buffer)
@@ -338,9 +339,9 @@ int ff_img_read_header(AVFormatContext *s1)
 
             pd.buf = probe_buffer;
             pd.buf_size = probe_buffer_size;
-            pd.filename = s1->filename;
+            pd.filename = s1->url;
 
-            while ((fmt = av_iformat_next(fmt))) {
+            while ((fmt = av_demuxer_iterate(&fmt_iter))) {
                 if (fmt->read_header != ff_img_read_header ||
                     !fmt->read_probe ||
                     (fmt->flags & AVFMT_NOFILE) ||
@@ -878,10 +879,14 @@ static int svg_probe(AVProbeData *p)
 {
     const uint8_t *b = p->buf;
     const uint8_t *end = p->buf + p->buf_size;
+
     if (memcmp(p->buf, "<?xml", 5))
         return 0;
     while (b < end) {
-        b += ff_subtitles_next_line(b);
+        int inc = ff_subtitles_next_line(b);
+        if (!inc)
+            break;
+        b += inc;
         if (b >= end - 4)
             return 0;
         if (!memcmp(b, "<svg", 4))

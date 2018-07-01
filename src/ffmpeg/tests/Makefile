@@ -1,5 +1,3 @@
-FFSERVER_REFFILE = $(SRC_PATH)/tests/ffserver.regression.ref
-
 THREADS = 1
 VREF = tests/vsynth1/00.pgm
 AREF = tests/data/asynth1.sw
@@ -10,14 +8,6 @@ FATEH = 34
 FFMPEG=ffmpeg$(PROGSSUF)$(EXESUF)
 
 $(AREF): CMP=
-
-ffservertest: export PROGSUF = $(PROGSSUF)
-ffservertest: ffserver$(PROGSSUF)$(EXESUF) ffmpeg$(PROGSSUF)$(EXESUF) tests/vsynth1/00.pgm tests/data/asynth1.sw
-	@echo
-	@echo "Unfortunately ffserver is broken and therefore its regression"
-	@echo "test fails randomly. Treat the results accordingly."
-	@echo
-	$(SRC_PATH)/tests/ffserver-regression.sh $(FFSERVER_REFFILE) $(SRC_PATH)/tests/ffserver.conf "$(TARGET_SAMPLES)" "$(TARGET_EXEC)" "$(TARGET_PATH)"
 
 APITESTSDIR := tests/api
 OBJDIRS += tests/data tests/vsynth1 tests/data/filtergraphs $(APITESTSDIR)/
@@ -113,7 +103,9 @@ include $(SRC_PATH)/tests/fate/apng.mak
 include $(SRC_PATH)/tests/fate/atrac.mak
 include $(SRC_PATH)/tests/fate/audio.mak
 include $(SRC_PATH)/tests/fate/bmp.mak
+include $(SRC_PATH)/tests/fate/build.mak
 include $(SRC_PATH)/tests/fate/canopus.mak
+include $(SRC_PATH)/tests/fate/cbs.mak
 include $(SRC_PATH)/tests/fate/cdxl.mak
 include $(SRC_PATH)/tests/fate/checkasm.mak
 include $(SRC_PATH)/tests/fate/concatdec.mak
@@ -137,7 +129,9 @@ include $(SRC_PATH)/tests/fate/flvenc.mak
 include $(SRC_PATH)/tests/fate/gapless.mak
 include $(SRC_PATH)/tests/fate/gif.mak
 include $(SRC_PATH)/tests/fate/h264.mak
+include $(SRC_PATH)/tests/fate/hap.mak
 include $(SRC_PATH)/tests/fate/hevc.mak
+include $(SRC_PATH)/tests/fate/id3v2.mak
 include $(SRC_PATH)/tests/fate/image.mak
 include $(SRC_PATH)/tests/fate/indeo.mak
 include $(SRC_PATH)/tests/fate/libavcodec.mak
@@ -156,6 +150,7 @@ include $(SRC_PATH)/tests/fate/mov.mak
 include $(SRC_PATH)/tests/fate/mp3.mak
 include $(SRC_PATH)/tests/fate/mpc.mak
 include $(SRC_PATH)/tests/fate/mpeg4.mak
+include $(SRC_PATH)/tests/fate/mpegps.mak
 include $(SRC_PATH)/tests/fate/mpegts.mak
 include $(SRC_PATH)/tests/fate/mxf.mak
 include $(SRC_PATH)/tests/fate/opus.mak

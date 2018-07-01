@@ -33,16 +33,18 @@ get_library_name() {
         20) echo "libilbc" ;;
         21) echo "opus" ;;
         22) echo "snappy" ;;
-        23) echo "giflib" ;;
-        24) echo "jpeg" ;;
-        25) echo "libogg" ;;
-        26) echo "libpng" ;;
-        27) echo "libuuid" ;;
-        28) echo "nettle" ;;
-        29) echo "tiff" ;;
-        30) echo "expat" ;;
-        31) echo "android-zlib" ;;
-        32) echo "android-media-codec" ;;
+        23) echo "soxr" ;;
+        24) echo "libaom" ;;
+        25) echo "giflib" ;;
+        26) echo "jpeg" ;;
+        27) echo "libogg" ;;
+        28) echo "libpng" ;;
+        29) echo "libuuid" ;;
+        30) echo "nettle" ;;
+        31) echo "tiff" ;;
+        32) echo "expat" ;;
+        33) echo "android-zlib" ;;
+        34) echo "android-media-codec" ;;
     esac
 }
 
@@ -83,6 +85,23 @@ get_toolchain() {
         ;;
         x86)
             echo "i686"
+        ;;
+        x86-64)
+            echo "x86_64"
+        ;;
+    esac
+}
+
+get_cmake_target_processor() {
+    case ${ARCH} in
+        arm-v7a | arm-v7a-neon)
+            echo "arm"
+        ;;
+        arm64-v8a)
+            echo "aarch64"
+        ;;
+        x86)
+            echo "x86"
         ;;
         x86-64)
             echo "x86_64"
@@ -202,11 +221,14 @@ get_app_specific_cflags() {
 
     APP_FLAGS=""
     case $1 in
-        libwebp | xvidcore)
+        xvidcore)
             APP_FLAGS=""
         ;;
         ffmpeg | shine)
             APP_FLAGS="-Wno-unused-function"
+        ;;
+        soxr | snappy | libwebp)
+            APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
         ;;
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
@@ -400,21 +422,21 @@ Libs.private: -lgmp
 EOF
 }
 
-create_libmp3lame_package_config() {
-    local LAME_VERSION="$1"
+create_libaom_package_config() {
+    local AOM_VERSION="$1"
 
-    cat > "${INSTALL_PKG_CONFIG_DIR}/libmp3lame.pc" << EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/lame
+    cat > "${INSTALL_PKG_CONFIG_DIR}/aom.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libaom
 exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
+libdir=\${prefix}/lib
 includedir=\${prefix}/include
 
-Name: libmp3lame
-Description: lame mp3 encoder library
-Version: ${LAME_VERSION}
+Name: aom
+Description: AV1 codec library v0.1.0.
+Version: ${AOM_VERSION}
 
 Requires:
-Libs: -L\${libdir} -lmp3lame
+Libs: -L\${libdir} -laom -lm
 Cflags: -I\${includedir}
 EOF
 }
@@ -434,6 +456,25 @@ Version: ${LIB_ICONV_VERSION}
 
 Requires:
 Libs: -L\${libdir} -liconv -lcharset
+Cflags: -I\${includedir}
+EOF
+}
+
+create_libmp3lame_package_config() {
+    local LAME_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/libmp3lame.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/lame
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: libmp3lame
+Description: lame mp3 encoder library
+Version: ${LAME_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lmp3lame
 Cflags: -I\${includedir}
 EOF
 }
@@ -528,24 +569,6 @@ Cflags: -I\${includedir} -I\${includedir}/libxml2
 EOF
 }
 
-create_uuid_package_config() {
-    local UUID_VERSION="$1"
-
-    cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
-prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libuuid
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
-includedir=\${prefix}/include
-
-Name: uuid
-Description: Universally unique id library
-Version: ${UUID_VERSION}
-Requires:
-Cflags: -I\${includedir}
-Libs: -L\${libdir} -luuid
-EOF
-}
-
 create_snappy_package_config() {
     local SNAPPY_VERSION="$1"
 
@@ -562,6 +585,43 @@ Version: ${SNAPPY_VERSION}
 Requires:
 Libs: -L\${libdir} -lz -lstdc++
 Cflags: -I\${includedir}
+EOF
+}
+
+create_soxr_package_config() {
+    local SOXR_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/soxr.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/soxr
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: soxr
+Description: High quality, one-dimensional sample-rate conversion library
+Version: ${SOXR_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lsoxr
+Cflags: -I\${includedir}
+EOF
+}
+
+create_uuid_package_config() {
+    local UUID_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/libuuid
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: uuid
+Description: Universally unique id library
+Version: ${UUID_VERSION}
+Requires:
+Cflags: -I\${includedir}
+Libs: -L\${libdir} -luuid
 EOF
 }
 
@@ -660,9 +720,9 @@ download_gpl_library_source() {
 
     case $1 in
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180606-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20180606-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20180606-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180627-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20180627-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20180627-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         xvidcore)

@@ -305,7 +305,7 @@ out:
   return status;
 }
 
-#if DEBUG+0
+#ifdef DEBUG
 
 void
 fribidi_validate_run_list (

@@ -22,6 +22,7 @@
 
 #include "libavutil/avassert.h"
 #include "libavutil/common.h"
+#include "libavutil/pixdesc.h"
 
 #include "avcodec.h"
 #include "motion_est.h"
@@ -58,11 +59,7 @@ int ff_mpeg_framesize_alloc(AVCodecContext *avctx, MotionEstContext *me,
 {
     int alloc_size = FFALIGN(FFABS(linesize) + 64, 32);
 
-    if (avctx->hwaccel
-#if FF_API_CAP_VDPAU
-        || avctx->codec->capabilities & AV_CODEC_CAP_HWACCEL_VDPAU
-#endif
-        )
+    if (avctx->hwaccel)
         return 0;
 
     if (linesize < 24) {
@@ -151,15 +148,18 @@ static int alloc_frame_buffer(AVCodecContext *avctx,  Picture *pic,
         }
     }
 
-    if (linesize && (linesize   != pic->f->linesize[0] ||
-                     uvlinesize != pic->f->linesize[1])) {
+    if ((linesize   &&   linesize != pic->f->linesize[0]) ||
+        (uvlinesize && uvlinesize != pic->f->linesize[1])) {
         av_log(avctx, AV_LOG_ERROR,
-               "get_buffer() failed (stride changed)\n");
+               "get_buffer() failed (stride changed: linesize=%d/%d uvlinesize=%d/%d)\n",
+               linesize,   pic->f->linesize[0],
+               uvlinesize, pic->f->linesize[1]);
         ff_mpeg_unref_picture(avctx, pic);
         return -1;
     }
 
-    if (pic->f->linesize[1] != pic->f->linesize[2]) {
+    if (av_pix_fmt_count_planes(pic->f->format) > 2 &&
+        pic->f->linesize[1] != pic->f->linesize[2]) {
         av_log(avctx, AV_LOG_ERROR,
                "get_buffer() failed (uv stride mismatch)\n");
         ff_mpeg_unref_picture(avctx, pic);
@@ -377,8 +377,10 @@ int ff_mpeg_ref_picture(AVCodecContext *avctx, Picture *dst, Picture *src)
 
     if (src->hwaccel_picture_private) {
         dst->hwaccel_priv_buf = av_buffer_ref(src->hwaccel_priv_buf);
-        if (!dst->hwaccel_priv_buf)
+        if (!dst->hwaccel_priv_buf) {
+            ret = AVERROR(ENOMEM);
             goto fail;
+        }
         dst->hwaccel_picture_private = dst->hwaccel_priv_buf->data;
     }
 

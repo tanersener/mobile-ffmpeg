@@ -36,16 +36,16 @@ export LDFLAGS=$(get_ldflags ${LIB_NAME})
 CPU_SPECIFIC_OPTIONS=""
 case ${ARCH} in
     x86 | x86-64)
-        CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations --enable-intel-sse"
+        CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations --enable-intel-sse=yes"
     ;;
     arm-v7a-neon | arm64-v8a)
-        CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations --enable-arm-neon"
+        CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations --enable-arm-neon=yes"
     ;;
     arm-v7a)
         # hardware-optimizations not enabled because
         # when --enable-hardware-optimizations is added
         # make tries to build arm-neon specific instructions, which breaks compilation
-        CPU_SPECIFIC_OPTIONS="--disable-arm-neon"
+        CPU_SPECIFIC_OPTIONS="--enable-arm-neon=no"
     ;;
 esac
 

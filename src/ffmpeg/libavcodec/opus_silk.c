@@ -185,8 +185,15 @@ static inline int silk_is_lpc_stable(const int16_t lpc[16], int order)
         row = lpc32[k & 1];
 
         for (j = 0; j < k; j++) {
-            int x = prevrow[j] - ROUND_MULL(prevrow[k - j - 1], rc, 31);
-            row[j] = ROUND_MULL(x, gain, fbits);
+            int x = av_sat_sub32(prevrow[j], ROUND_MULL(prevrow[k - j - 1], rc, 31));
+            int64_t tmp = ROUND_MULL(x, gain, fbits);
+
+            /* per RFC 8251 section 6, if this calculation overflows, the filter
+               is considered unstable. */
+            if (tmp < INT32_MIN || tmp > INT32_MAX)
+                return 0;
+
+            row[j] = (int32_t)tmp;
         }
     }
 }
@@ -232,8 +239,10 @@ static void silk_lsf2lpc(const int16_t nlsf[16], float lpcf[16], int order)
 
     /* reconstruct A(z) */
     for (k = 0; k < order>>1; k++) {
-        lpc32[k]         = -p[k + 1] - p[k] - q[k + 1] + q[k];
-        lpc32[order-k-1] = -p[k + 1] - p[k] + q[k + 1] - q[k];
+        int32_t p_tmp = p[k + 1] + p[k];
+        int32_t q_tmp = q[k + 1] - q[k];
+        lpc32[k]         = -q_tmp - p_tmp;
+        lpc32[order-k-1] =  q_tmp - p_tmp;
     }
 
     /* limit the range of the LPC coefficients to each fit within an int16_t */

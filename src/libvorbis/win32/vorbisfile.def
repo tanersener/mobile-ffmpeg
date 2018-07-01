@@ -1,7 +1,4 @@
-;
 ; vorbisfile.def
-;
-; last modified: $Id: vorbisfile.def 15566 2008-12-08 09:07:12Z conrad $
 ;
 LIBRARY
 EXPORTS

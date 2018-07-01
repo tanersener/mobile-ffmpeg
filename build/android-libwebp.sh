@@ -66,12 +66,12 @@ cmake -Wno-dev \
     -DTIFF_LIBRARY="${BASEDIR}/prebuilt/android-$(get_target_build)/tiff/lib" \
     -DZLIB_INCLUDE_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/include" \
     -DZLIB_LIBRARY="${ANDROID_NDK_ROOT}/platform/android-${API}/arch-$(get_target_build)/usr/lib" \
-    -DCMAKE_SYSTEM_PROCESSOR=$(get_target_build) \
+    -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libwebp_package_config "0.6.1"
+create_libwebp_package_config "1.0.0"
 
 make install || exit 1

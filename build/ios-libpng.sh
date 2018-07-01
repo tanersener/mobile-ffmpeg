@@ -38,13 +38,13 @@ export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations"
+CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations=yes"
 case ${ARCH} in
     x86 | x86-64)
-        CPU_SPECIFIC_OPTIONS+=" --enable-sse"
+        CPU_SPECIFIC_OPTIONS+=" --enable-sse=yes"
     ;;
     armv7 | armv7s | arm64)
-        CPU_SPECIFIC_OPTIONS+=" --enable-arm-neon"
+        CPU_SPECIFIC_OPTIONS+=" --enable-arm-neon=yes"
     ;;
 esac
 

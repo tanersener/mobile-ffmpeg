@@ -75,7 +75,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..33}
+for library in {1..35}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -117,6 +117,11 @@ do
                 CFLAGS+=" $(pkg-config --cflags libmp3lame)"
                 LDFLAGS+=" $(pkg-config --libs --static libmp3lame)"
                 CONFIGURE_POSTFIX+=" --enable-libmp3lame"
+            ;;
+            libaom)
+                CFLAGS+=" $(pkg-config --cflags aom)"
+                LDFLAGS+=" $(pkg-config --libs --static aom)"
+                CONFIGURE_POSTFIX+=" --enable-libaom"
             ;;
             libass)
                 CFLAGS+=" $(pkg-config --cflags libass)"
@@ -182,6 +187,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static snappy)"
                 CONFIGURE_POSTFIX+=" --enable-libsnappy"
             ;;
+            soxr)
+                CFLAGS+=" $(pkg-config --cflags soxr)"
+                LDFLAGS+=" $(pkg-config --libs --static soxr)"
+                CONFIGURE_POSTFIX+=" --enable-libsoxr"
+            ;;
             speex)
                 CFLAGS+=" $(pkg-config --cflags speex)"
                 LDFLAGS+=" $(pkg-config --libs --static speex)"
@@ -236,7 +246,7 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 32 ]]; then
+        if [[ ${library} -eq 34 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
@@ -270,6 +280,7 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-small  \
     --enable-swscale \
     --enable-shared \
+    --disable-openssl \
     --disable-xmm-clobber-test \
     --disable-debug \
     --disable-neon-clobber-test \
@@ -281,7 +292,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-podpages \
     --disable-txtpages \
     --disable-static \
-    --disable-jack \
     --disable-sndio \
     --disable-schannel \
     --disable-sdl2 \
@@ -291,7 +301,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-cuvid \
     --disable-nvenc \
     --disable-vaapi \
-    --disable-vda \
     --disable-vdpau \
     --disable-videotoolbox \
     --disable-appkit \
@@ -300,7 +309,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-cuvid \
     --disable-nvenc \
     --disable-vaapi \
-    --disable-vda \
     --disable-vdpau \
     --disable-videotoolbox \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log

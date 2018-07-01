@@ -21,15 +21,12 @@ dnl   FRIBIDI_BINARY_AGE = FRIBIDI_INTERFACE_AGE = 0;
 dnl
 m4_define(fribidi_major_version, 1)dnl
 m4_define(fribidi_minor_version, 0)dnl
-m4_define(fribidi_micro_version, 1)dnl
+m4_define(fribidi_micro_version, 4)dnl
 m4_define(fribidi_interface_version, 4)dnl
 m4_define(fribidi_interface_age, 0)dnl
 m4_define(fribidi_binary_age, 4)dnl
 dnl
-m4_define(fribidi_version,
-	  m4_if(m4_eval(fribidi_micro_version()),0,
-	    fribidi_major_version.fribidi_minor_version,
-	    fribidi_major_version.fribidi_minor_version.fribidi_micro_version))dnl
+m4_define(fribidi_version,fribidi_major_version.fribidi_minor_version.fribidi_micro_version)dnl
 
 AC_INIT([GNU FriBidi],
 	fribidi_version(),
@@ -65,6 +62,9 @@ AC_SUBST(FRIBIDI_VERSION)
 AC_SUBST(FRIBIDI_INTERFACE_VERSION)
 AC_SUBST(FRIBIDI_INTERFACE_AGE)
 AC_SUBST(FRIBIDI_BINARY_AGE)
+
+FRIBIDI_MSVC_BUILD_PLACEHOLDER="#undef FRIBIDI_BUILT_WITH_MSVC"
+AC_SUBST(FRIBIDI_MSVC_BUILD_PLACEHOLDER)
 
 dnl libtool versioning.
 m4_define(lt_current, fribidi_interface_version())dnl
@@ -143,53 +143,18 @@ AC_ARG_ENABLE(deprecated,
               AC_HELP_STRING([--disable-deprecated],
                              [do not build deprecated functionality]))
 if test x$enable_deprecated = xno; then
-	FRIBIDI_NO_DEPRECATED=1
-else
-	FRIBIDI_NO_DEPRECATED=0
+	AC_DEFINE(FRIBIDI_NO_DEPRECATED, 1,
+		  [Don not build deprecated functionality])
 fi
-AC_SUBST(FRIBIDI_NO_DEPRECATED)
-
-# --disable-charsets
-AC_ARG_ENABLE(charsets,
-              AC_HELP_STRING([--disable-charsets],
-                             [exclude charset conversion routines from library]))
-if test x$enable_charsets = xno; then
-	FRIBIDI_CHARSETS=0
-else
-	FRIBIDI_CHARSETS=1
-fi
-AC_SUBST(FRIBIDI_CHARSETS)
-AM_CONDITIONAL(FRIBIDI_CHARSETS, test x$FRIBIDI_CHARSETS = x1)
-
-# --with[out]-glib
-AC_ARG_WITH(glib,
-              AC_HELP_STRING([--with-glib=@<:@no/auto/yes@:>@],
-                             [use Glib @<:@default=auto@:>@]))
-GLIB_PACKAGE=glib-2.0
-GLIB_MINVERSION=2.4
-if test x$with_glib = xyes; then
-	PKG_CHECK_MODULES(GLIB,$GLIB_PACKAGE >= $GLIB_MINVERSION)
-	FRIBIDI_USE_GLIB=1
-else
-if test x$with_glib = xno; then
-	FRIBIDI_USE_GLIB=0
-else
-	PKG_CHECK_MODULES(GLIB,$GLIB_PACKAGE >= $GLIB_MINVERSION,
-		FRIBIDI_USE_GLIB=1,
-		FRIBIDI_USE_GLIB=0)
-fi
-fi
-AM_CONDITIONAL(FRIBIDI_USE_GLIB, test x$FRIBIDI_USE_GLIB = x1)
 
 # Generate output
 AC_CONFIG_FILES([fribidi.pc
 		 lib/fribidi-config.h
 		 Makefile
-		 charset/Makefile
 		 gen.tab/Makefile
 		 lib/Makefile
 		 bin/Makefile
 		 doc/Makefile
 		 test/Makefile
-		 fribidi-vs-unicode/Makefile])
+		 test/unicode-conformance/Makefile])
 AC_OUTPUT

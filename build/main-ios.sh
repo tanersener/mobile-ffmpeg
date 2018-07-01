@@ -25,6 +25,70 @@ if [[ -z ${BASEDIR} ]]; then
     exit 1
 fi
 
+check_if_dependency_rebuilt() {
+    case $1 in
+        expat)
+            set_dependency_rebuilt_flag "fontconfig"
+            set_dependency_rebuilt_flag "libass"
+        ;;
+        fontconfig)
+            set_dependency_rebuilt_flag "libass"
+        ;;
+        freetype)
+            set_dependency_rebuilt_flag "fontconfig"
+            set_dependency_rebuilt_flag "libass"
+        ;;
+        fribidi)
+            set_dependency_rebuilt_flag "libass"
+        ;;
+        giflib)
+            set_dependency_rebuilt_flag "libwebp"
+        ;;
+        gmp)
+            set_dependency_rebuilt_flag "gnutls"
+            set_dependency_rebuilt_flag "nettle"
+        ;;
+        jpeg)
+            set_dependency_rebuilt_flag "tiff"
+            set_dependency_rebuilt_flag "libwebp"
+        ;;
+        libiconv)
+            set_dependency_rebuilt_flag "fontconfig"
+            set_dependency_rebuilt_flag "gnutls"
+            set_dependency_rebuilt_flag "lame"
+            set_dependency_rebuilt_flag "libass"
+            set_dependency_rebuilt_flag "libxml2"
+        ;;
+        libogg)
+            set_dependency_rebuilt_flag "libvorbis"
+            set_dependency_rebuilt_flag "libtheora"
+        ;;
+        libpng)
+            set_dependency_rebuilt_flag "freetype"
+            set_dependency_rebuilt_flag "libwebp"
+            set_dependency_rebuilt_flag "libass"
+        ;;
+        libuuid)
+            set_dependency_rebuilt_flag "fontconfig"
+            set_dependency_rebuilt_flag "libass"
+        ;;
+        libvorbis)
+            set_dependency_rebuilt_flag "libtheora"
+        ;;
+        nettle)
+            set_dependency_rebuilt_flag "gnutls"
+        ;;
+        tiff)
+            set_dependency_rebuilt_flag "libwebp"
+        ;;
+    esac
+}
+
+set_dependency_rebuilt_flag() {
+    DEPENDENCY_REBUILT_VARIABLE=$(echo "DEPENDENCY_REBUILT_$1" | sed "s/\-/\_/g")
+    export ${DEPENDENCY_REBUILT_VARIABLE}=1
+}
+
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/ios-common.sh
 
@@ -41,7 +105,7 @@ fi
 # FILTERING WHICH EXTERNAL LIBRARIES WILL BE BUILT
 # NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..31}
+for library in {1..33}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -78,7 +142,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 fi
             ;;
             libass)
-                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]]; then
+                if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]] && [[ ! -z $OK_libpng ]]; then
                     run=1
                 fi
             ;;
@@ -102,6 +166,16 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                     run=1
                 fi
             ;;
+            nettle)
+                if [[ ! -z $OK_gmp ]]; then
+                    run=1
+                fi
+            ;;
+            tiff)
+                if [[ ! -z $OK_jpeg ]]; then
+                    run=1
+                fi
+            ;;
             *)
                 run=1
             ;;
@@ -109,16 +183,17 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 
         BUILD_COMPLETED_FLAG=$(echo "OK_${library}" | sed "s/\-/\_/g")
         REBUILD_FLAG=$(echo "REBUILD_${library}" | sed "s/\-/\_/g")
+        DEPENDENCY_REBUILT_FLAG=$(echo "DEPENDENCY_REBUILT_${library}" | sed "s/\-/\_/g")
 
         if [ $run -eq 1 ] && [[ -z ${!BUILD_COMPLETED_FLAG} ]]; then
             ENABLED_LIBRARY_PATH="${INSTALL_BASE}/${library}"
 
             LIBRARY_IS_INSTALLED=$(library_is_installed ${INSTALL_BASE} ${library})
 
-            echo -e "INFO: Flags detected for ${library}: already installed=${LIBRARY_IS_INSTALLED}, rebuild=${!REBUILD_FLAG}\n" >> ${BASEDIR}/build.log
+            echo -e "INFO: Flags detected for ${library}: already installed=${LIBRARY_IS_INSTALLED}, rebuild=${!REBUILD_FLAG}, dependency rebuilt=${!DEPENDENCY_REBUILT_FLAG}\n" >> ${BASEDIR}/build.log
 
             # DECIDE TO BUILD OR NOT
-            if [[ ${LIBRARY_IS_INSTALLED} -ne 0 ]] || [[ ${!REBUILD_FLAG} -eq 1 ]]; then
+            if [[ ${LIBRARY_IS_INSTALLED} -ne 0 ]] || [[ ${!REBUILD_FLAG} -eq 1 ]] || [[ ${!DEPENDENCY_REBUILT_FLAG} -eq 1 ]]; then
 
                 echo -e "----------------------------------------------------------------" >> ${BASEDIR}/build.log
                 echo -e "\nINFO: Building $library with the following environment variables\n" >> ${BASEDIR}/build.log
@@ -144,6 +219,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 if [ $? -eq 0 ]; then
                     (( completed+=1 ))
                     declare "$BUILD_COMPLETED_FLAG=1"
+                    check_if_dependency_rebuilt ${library}
                     echo "ok"
                 else
                     echo "failed"

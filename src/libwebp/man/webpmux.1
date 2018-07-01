@@ -1,5 +1,5 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
-.TH WEBPMUX 1 "November 10, 2016"
+.TH WEBPMUX 1 "December 1, 2017"
 .SH NAME
 webpmux \- create animated WebP files from non\-animated WebP images, extract
 frames from animated WebP images, and manage XMP/EXIF metadata and ICC profile.
@@ -48,6 +48,8 @@ frames from animated WebP images, and manage XMP/EXIF metadata and ICC profile.
 .B webpmux [\-h|\-help]
 .br
 .B webpmux \-version
+.br
+.B webpmux argument_file_name
 .SH DESCRIPTION
 This manual page documents the
 .B webpmux
@@ -55,6 +57,9 @@ command.
 .PP
 \fBwebpmux\fP can be used to create/extract from animated WebP files, as well as
 to add/extract/strip XMP/EXIF metadata and ICC profile.
+If a single file name (not starting with the character '\-') is supplied as
+the argument, the command line argument are actually tokenized from this file.
+This allows for easy scripting or using large number of arguments.
 .SH OPTIONS
 .SS GET_OPTIONS (\-get):
 .TP

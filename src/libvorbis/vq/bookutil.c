@@ -11,7 +11,6 @@
  ********************************************************************
 
  function: utility functions for loading .vqh and .vqd files
- last mod: $Id: bookutil.c 19057 2014-01-22 12:32:31Z xiphmont $
 
  ********************************************************************/
 
@@ -91,7 +90,7 @@ char *get_line(FILE *in){
 
     while(!gotline){
       if(sofar+1>=lbufsize){
-        if(!lbufsize){  
+        if(!lbufsize){
           lbufsize=1024;
           linebuffer=_ogg_malloc(lbufsize);
         }else{
@@ -116,7 +115,7 @@ char *get_line(FILE *in){
         }
       }
     }
-    
+
     if(linebuffer[0]=='#'){
       sofar=0;
     }else{
@@ -197,7 +196,7 @@ int get_vector(codebook *b,FILE *in,int start, int n,float *a){
     for(i=1;i<c->dim;i++)
       if(get_line_value(in,a+i))
         break;
-    
+
     if(i==c->dim){
       float temp=a[c->dim-1];
       for(i=0;i<c->dim;i++)a[i]-=sequence_base;
@@ -261,7 +260,7 @@ codebook *codebook_load(char *filename){
     fprintf(stderr,"1: syntax in %s in line:\t %s",filename,line);
     exit(1);
   }
-  
+
   switch(c->maptype){
   case 0:
     quant_to_read=0;
@@ -273,7 +272,7 @@ codebook *codebook_load(char *filename){
     quant_to_read=c->entries*c->dim;
     break;
   }
-    
+
   /* load the quantized entries */
   find_seek_to(in,"static const long _vq_quantlist_");
   reset_next_value();
@@ -283,7 +282,7 @@ codebook *codebook_load(char *filename){
       fprintf(stderr,"out of data while reading codebook %s\n",filename);
       exit(1);
     }
-  
+
   /* load the lengthlist */
   find_seek_to(in,"_lengthlist");
   reset_next_value();
@@ -296,7 +295,7 @@ codebook *codebook_load(char *filename){
 
   /* got it all */
   fclose(in);
-  
+
   vorbis_book_init_encode(b,c);
   b->valuelist=_book_unquantize(c,c->entries,NULL);
 
@@ -348,9 +347,9 @@ void build_tree_from_lengths(int vals, long *hist, long *lengths){
   for(i=vals;i>1;i--){
     int first=-1,second=-1;
     long least=-1;
-        
+
     spinnit("building... ",i);
-    
+
     /* find the two nodes to join */
     for(j=0;j<vals;j++)
       if(least==-1 || hist[j]<=least){
@@ -367,7 +366,7 @@ void build_tree_from_lengths(int vals, long *hist, long *lengths){
       fprintf(stderr,"huffman fault; no free branch\n");
       exit(1);
     }
-    
+
     /* join them */
     least=hist[first]+hist[second];
     for(j=0;j<vals;j++)
@@ -421,9 +420,9 @@ void build_tree_from_lengths0(int vals, long *hist, long *lengths){
     fprintf(stderr,"\rEliminating %d unused entries; %d entries remain\n",
             vals-upper,upper);
   }
-    
+
   build_tree_from_lengths(upper,newhist,lengthlist);
-      
+
   upper=0;
   for(i=0;i<vals;i++)
     if(hist[i]>0)
@@ -461,9 +460,9 @@ void write_codebook(FILE *out,char *name,const static_codebook *c){
   fprintf(out,"};\n\n");
 
   /* tie it all together */
-  
+
   fprintf(out,"static const static_codebook %s = {\n",name);
-  
+
   fprintf(out,"\t%ld, %ld,\n",c->dim,c->entries);
   fprintf(out,"\t(char *)_vq_lengthlist_%s,\n",name);
   fprintf(out,"\t%d, %ld, %ld, %d, %d,\n",

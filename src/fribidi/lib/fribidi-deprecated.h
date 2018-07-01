@@ -37,7 +37,6 @@
 
 
 
-#define fribidi_mirroring_status FRIBIDI_NAMESPACE(mirroring_status)
 /* fribidi_mirroring_status - get current mirroring status
  *
  * This function is deprecated and only used with other deprecated functions.
@@ -46,7 +45,6 @@
   void
 ) FRIBIDI_GNUC_DEPRECATED;
 
-#define fribidi_set_mirroring FRIBIDI_NAMESPACE(set_mirroring)
 /* fribidi_set_mirroring - set mirroring on or off
  *
  * This function is used to turn character mirroring on or off.
@@ -66,7 +64,6 @@
 ) FRIBIDI_GNUC_DEPRECATED;
 
 
-#define fribidi_reorder_nsm_status FRIBIDI_NAMESPACE(reorder_nsm_status)
 /* fribidi_reorder_nsm_status - get current marks reordering status
  *
  * This function is deprecated and only used with other deprecated functions.
@@ -75,7 +72,6 @@
   void
 ) FRIBIDI_GNUC_DEPRECATED;
 
-#define fribidi_set_reorder_nsm FRIBIDI_NAMESPACE(set_reorder_nsm)
 /* fribidi_set_reorder_nsm - set marks reordering on or off
  *
  * This function is used to turn non-spacing marks reordering on or
@@ -103,7 +99,6 @@
  *
  * Deprecated. Replaced by fribidi_get_par_embedding_levels_ex.
  */
-#define fribidi_log2vis_get_embedding_levels FRIBIDI_NAMESPACE(log2vis_get_embedding_levels)
 FRIBIDI_ENTRY FriBidiLevel
 fribidi_log2vis_get_embedding_levels (
   const FriBidiCharType *bidi_types,	/* input list of bidi types as returned by
@@ -118,7 +113,6 @@ fribidi_log2vis_get_embedding_levels (
  *
  * Deprecated. Replaced by fribidi_get_bidi_type.
  */
-#define fribidi_get_type FRIBIDI_NAMESPACE(get_type)
 FRIBIDI_ENTRY FriBidiCharType
 fribidi_get_type (
   FriBidiChar ch		/* input character */
@@ -128,13 +122,11 @@ fribidi_get_type (
  *
  * Deprecated. Replaced by fribidi_get_bidi_type.
  */
-#define fribidi_get_type_internal FRIBIDI_NAMESPACE(get_type_internal)
 FRIBIDI_ENTRY FriBidiCharType
 fribidi_get_type_internal (
   FriBidiChar ch		/* input character */
 ) FRIBIDI_GNUC_DEPRECATED;
 
-#define fribidi_remove_bidi_marks FRIBIDI_NAMESPACE(remove_bidi_marks)
 /* fribidi_remove_bidi_marks - remove bidi marks out of an string
  *
  * This function removes the bidi and boundary-neutral marks out of an string
@@ -172,7 +164,6 @@ fribidi_remove_bidi_marks (
      FRIBIDI_GNUC_WARN_UNUSED FRIBIDI_GNUC_DEPRECATED;
 
 
-#define fribidi_log2vis FRIBIDI_NAMESPACE(log2vis)
 /* fribidi_log2vis - get visual string
  *
  * This function converts the logical input string to the visual output
@@ -205,7 +196,6 @@ fribidi_remove_bidi_marks (
      FRIBIDI_GNUC_WARN_UNUSED FRIBIDI_GNUC_DEPRECATED;
 
 
-#define fribidi_get_par_embedding_levels FRIBIDI_NAMESPACE(get_par_embedding_levels)
 /* fribidi_get_par_embedding_levels - get bidi embedding levels of a paragraph
  *
  * Deprecated interface to fribidi_get_par_embedding_levels_ex(). Refer to

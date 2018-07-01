@@ -227,11 +227,13 @@ DSP_DEC_OBJS = \
     $(DIROBJ)\dsp\upsampling_msa.obj \
     $(DIROBJ)\dsp\upsampling_neon.obj \
     $(DIROBJ)\dsp\upsampling_sse2.obj \
+    $(DIROBJ)\dsp\upsampling_sse41.obj \
     $(DIROBJ)\dsp\yuv.obj \
     $(DIROBJ)\dsp\yuv_mips32.obj \
     $(DIROBJ)\dsp\yuv_mips_dsp_r2.obj \
     $(DIROBJ)\dsp\yuv_neon.obj \
     $(DIROBJ)\dsp\yuv_sse2.obj \
+    $(DIROBJ)\dsp\yuv_sse41.obj \
 
 DSP_ENC_OBJS = \
     $(DIROBJ)\dsp\cost.obj \
@@ -285,7 +287,6 @@ ENC_OBJS = \
     $(DIROBJ)\enc\backward_references_enc.obj \
     $(DIROBJ)\enc\config_enc.obj \
     $(DIROBJ)\enc\cost_enc.obj \
-    $(DIROBJ)\enc\delta_palettization_enc.obj \
     $(DIROBJ)\enc\filter_enc.obj \
     $(DIROBJ)\enc\frame_enc.obj \
     $(DIROBJ)\enc\histogram_enc.obj \
@@ -367,9 +368,11 @@ $(DIRBIN)\anim_dump.exe: $(EX_GIF_DEC_OBJS) $(LIBWEBPDEMUX) $(LIBWEBP)
 $(DIRBIN)\anim_dump.exe: $(IMAGEIO_ENC_OBJS)
 $(DIRBIN)\cwebp.exe: $(DIROBJ)\examples\cwebp.obj $(IMAGEIO_DEC_OBJS)
 $(DIRBIN)\cwebp.exe: $(IMAGEIO_UTIL_OBJS)
+$(DIRBIN)\cwebp.exe: $(LIBWEBPDEMUX)
 $(DIRBIN)\dwebp.exe: $(DIROBJ)\examples\dwebp.obj $(IMAGEIO_DEC_OBJS)
 $(DIRBIN)\dwebp.exe: $(IMAGEIO_ENC_OBJS)
 $(DIRBIN)\dwebp.exe: $(IMAGEIO_UTIL_OBJS)
+$(DIRBIN)\dwebp.exe: $(LIBWEBPDEMUX)
 $(DIRBIN)\gif2webp.exe: $(DIROBJ)\examples\gif2webp.obj $(EX_GIF_DEC_OBJS)
 $(DIRBIN)\gif2webp.exe: $(EX_UTIL_OBJS) $(IMAGEIO_UTIL_OBJS) $(LIBWEBPMUX)
 $(DIRBIN)\gif2webp.exe: $(LIBWEBP)
@@ -382,25 +385,23 @@ $(DIRBIN)\webpmux.exe: $(DIROBJ)\examples\webpmux.obj $(LIBWEBPMUX)
 $(DIRBIN)\webpmux.exe: $(EX_UTIL_OBJS) $(IMAGEIO_UTIL_OBJS) $(LIBWEBP)
 $(DIRBIN)\img2webp.exe: $(DIROBJ)\examples\img2webp.obj $(LIBWEBPMUX)
 $(DIRBIN)\img2webp.exe: $(IMAGEIO_DEC_OBJS)
-$(DIRBIN)\img2webp.exe: $(EX_UTIL_OBJS) $(IMAGEIO_UTIL_OBJS) $(LIBWEBP)
+$(DIRBIN)\img2webp.exe: $(EX_UTIL_OBJS) $(IMAGEIO_UTIL_OBJS)
+$(DIRBIN)\img2webp.exe: $(LIBWEBPDEMUX) $(LIBWEBP)
 $(DIRBIN)\get_disto.exe: $(DIROBJ)\extras\get_disto.obj
-$(DIRBIN)\get_disto.exe: $(IMAGEIO_DEC_OBJS) $(IMAGEIO_UTIL_OBJS) $(LIBWEBP)
+$(DIRBIN)\get_disto.exe: $(IMAGEIO_DEC_OBJS) $(IMAGEIO_UTIL_OBJS)
+$(DIRBIN)\get_disto.exe: $(LIBWEBPDEMUX) $(LIBWEBP)
 $(DIRBIN)\webp_quality.exe: $(DIROBJ)\extras\webp_quality.obj
 $(DIRBIN)\webp_quality.exe: $(IMAGEIO_UTIL_OBJS)
 $(DIRBIN)\webp_quality.exe: $(EXTRAS_OBJS) $(LIBWEBP)
 $(DIRBIN)\webpinfo.exe: $(DIROBJ)\examples\webpinfo.obj
 $(DIRBIN)\webpinfo.exe: $(IMAGEIO_DEC_OBJS)
-$(DIRBIN)\webpinfo.exe: $(EX_UTIL_OBJS) $(IMAGEIO_UTIL_OBJS) $(LIBWEBP)
+$(DIRBIN)\webpinfo.exe: $(EX_UTIL_OBJS) $(IMAGEIO_UTIL_OBJS)
+$(DIRBIN)\webpinfo.exe: $(LIBWEBPDEMUX) $(LIBWEBP)
 
 $(OUT_EXAMPLES): $(EX_UTIL_OBJS) $(LIBWEBP)
 $(EX_UTIL_OBJS) $(IMAGEIO_UTIL_OBJS): $(OUTPUT_DIRS)
 $(IMAGEIO_DEC_OBJS) $(IMAGEIO_ENC_OBJS) $(EXTRAS_OBJS): $(OUTPUT_DIRS)
 !ENDIF  # ARCH == ARM
-
-experimental:
-	$(MAKE) /f Makefile.vc \
-	    CFG=$(CFG) \
-	    CFLAGS="$(CFLAGS) /DWEBP_EXPERIMENTAL_FEATURES" /$(MAKEFLAGS)
 
 $(LIBWEBPDECODER): $(LIBWEBPDECODER_OBJS)
 $(LIBWEBP): $(LIBWEBP_OBJS)

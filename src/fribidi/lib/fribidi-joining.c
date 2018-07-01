@@ -32,7 +32,7 @@
 #include "bidi-types.h"
 #include "joining-types.h"
 
-#if DEBUG+0
+#ifdef DEBUG
 /*======================================================================
  *  For debugging, define some functions for printing joining types and
  *  properties.

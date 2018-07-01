@@ -32,7 +32,8 @@ using Emscripten and CMake.
    webp.js.mem files generated.
 
 The callable JavaScript function is WebPToSDL(), which decodes a raw WebP
-bitstream into a canvas. See webp_js/index.html for a simple usage sample.
+bitstream into a canvas. See webp_js/index.html for a simple usage sample
+(see below for instructions).
 
 Demo HTML page:
 ===============

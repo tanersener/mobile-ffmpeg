@@ -1,5 +1,0 @@
-*.d
-*.o
-*.a
-*.pc
-/libavresample.version

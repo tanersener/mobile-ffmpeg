@@ -354,7 +354,6 @@ typedef uint32_t FriBidiParType;
 /* Functions finally */
 
 
-#define fribidi_get_bidi_type FRIBIDI_NAMESPACE(get_bidi_type)
 /* fribidi_get_bidi_type - get character bidi type
  *
  * This function returns the bidi type of a character as defined in Table 3.7
@@ -372,7 +371,6 @@ fribidi_get_bidi_type (
   FriBidiChar ch		/* input character */
 ) FRIBIDI_GNUC_CONST;
 
-#define fribidi_get_bidi_types FRIBIDI_NAMESPACE(get_bidi_types)
 /* fribidi_get_bidi_types - get bidi types for an string of characters
  *
  * This function finds the bidi types of an string of characters.  See
@@ -385,7 +383,6 @@ fribidi_get_bidi_type (
   FriBidiCharType *btypes	/* output bidi types */
 );
 
-#define fribidi_get_bidi_type_name FRIBIDI_NAMESPACE(get_bidi_type_name)
 /* fribidi_get_bidi_type_name - get bidi type name
  *
  * This function returns the bidi type name of a character type.  The

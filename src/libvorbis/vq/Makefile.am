@@ -1,10 +1,9 @@
 ## Process this file with automake to produce Makefile.in
 
-INCLUDES = -I../lib -I$(top_srcdir)/include @OGG_CFLAGS@
-
 EXTRA_PROGRAMS = latticebuild latticetune huffbuild distribution
 CLEANFILES = $(EXTRA_PROGRAMS)
 
+AM_CPPFLAGS = -I../lib -I$(top_srcdir)/include @OGG_CFLAGS@
 AM_LDFLAGS = -static
 LDADD = ../lib/libvorbis.la
 

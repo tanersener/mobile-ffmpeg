@@ -8,3 +8,5 @@
 /libavcodec.so.57
 /libavcodec.ver
 *.dylib
+/codec_list.c
+/parser_list.c

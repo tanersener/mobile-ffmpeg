@@ -91,9 +91,6 @@ build_triplet = @build@
 host_triplet = @host@
 @OS_WIN32_TRUE@am__append_1 = -export-symbols $(srcdir)/fribidi.def
 @OS_WIN32_FALSE@am__append_2 = -export-symbols-regex "^fribidi_.*"
-@FRIBIDI_CHARSETS_TRUE@am__append_3 = -I$(top_srcdir)/charset
-@FRIBIDI_CHARSETS_TRUE@am__append_4 = $(top_builddir)/charset/libfribidi-char-sets.la
-@FRIBIDI_CHARSETS_TRUE@am__append_5 = $(top_builddir)/charset/libfribidi-char-sets.la
 subdir = lib
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -140,10 +137,13 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgincludedir)" \
 	"$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 am_libfribidi_la_OBJECTS = fribidi.lo fribidi-arabic.lo \
-	fribidi-bidi.lo fribidi-bidi-types.lo fribidi-deprecated.lo \
-	fribidi-joining.lo fribidi-joining-types.lo \
-	fribidi-mirroring.lo fribidi-brackets.lo fribidi-run.lo \
-	fribidi-shape.lo
+	fribidi-bidi.lo fribidi-bidi-types.lo fribidi-char-sets.lo \
+	fribidi-char-sets-cap-rtl.lo fribidi-char-sets-cp1255.lo \
+	fribidi-char-sets-cp1256.lo fribidi-char-sets-iso8859-6.lo \
+	fribidi-char-sets-iso8859-8.lo fribidi-char-sets-utf8.lo \
+	fribidi-deprecated.lo fribidi-joining.lo \
+	fribidi-joining-types.lo fribidi-mirroring.lo \
+	fribidi-brackets.lo fribidi-run.lo fribidi-shape.lo
 libfribidi_la_OBJECTS = $(am_libfribidi_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -248,16 +248,13 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 FRIBIDI_BINARY_AGE = @FRIBIDI_BINARY_AGE@
-FRIBIDI_CHARSETS = @FRIBIDI_CHARSETS@
 FRIBIDI_INTERFACE_AGE = @FRIBIDI_INTERFACE_AGE@
 FRIBIDI_INTERFACE_VERSION = @FRIBIDI_INTERFACE_VERSION@
 FRIBIDI_MAJOR_VERSION = @FRIBIDI_MAJOR_VERSION@
 FRIBIDI_MICRO_VERSION = @FRIBIDI_MICRO_VERSION@
 FRIBIDI_MINOR_VERSION = @FRIBIDI_MINOR_VERSION@
-FRIBIDI_NO_DEPRECATED = @FRIBIDI_NO_DEPRECATED@
+FRIBIDI_MSVC_BUILD_PLACEHOLDER = @FRIBIDI_MSVC_BUILD_PLACEHOLDER@
 FRIBIDI_VERSION = @FRIBIDI_VERSION@
-GLIB_CFLAGS = @GLIB_CFLAGS@
-GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -358,11 +355,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIST = fribidi.def
 lib_LTLIBRARIES = libfribidi.la
-AM_CPPFLAGS = $(am__append_3)
+AM_CPPFLAGS = 
 libfribidi_la_LDFLAGS = -no-undefined -version-info $(LT_VERSION_INFO) \
 	$(am__append_1) $(am__append_2)
-libfribidi_la_LIBADD = $(am__append_4)
-libfribidi_la_DEPENDENCIES = $(am__append_5)
+libfribidi_la_LIBADD = 
+libfribidi_la_DEPENDENCIES = 
 libfribidi_la_headers = \
 		fribidi-arabic.h \
 		fribidi-begindecls.h \
@@ -370,6 +367,8 @@ libfribidi_la_headers = \
 		fribidi-bidi-types.h \
 		fribidi-bidi-types-list.h \
 		fribidi-common.h \
+		fribidi-char-sets.h \
+		fribidi-char-sets-list.h \
 		fribidi-deprecated.h \
 		fribidi-enddecls.h \
 		fribidi-flags.h \
@@ -399,6 +398,19 @@ libfribidi_la_SOURCES = \
 		fribidi-arabic.c \
 		fribidi-bidi.c \
 		fribidi-bidi-types.c \
+		fribidi-char-sets.c \
+		fribidi-char-sets-cap-rtl.c \
+		fribidi-char-sets-cp1255.c \
+		fribidi-char-sets-cp1256.c \
+		fribidi-char-sets-iso8859-6.c \
+		fribidi-char-sets-iso8859-8.c \
+		fribidi-char-sets-utf8.c \
+		fribidi-char-sets-cap-rtl.h \
+		fribidi-char-sets-cp1255.h \
+		fribidi-char-sets-cp1256.h \
+		fribidi-char-sets-iso8859-6.h \
+		fribidi-char-sets-iso8859-8.h \
+		fribidi-char-sets-utf8.h \
 		fribidi-deprecated.c \
 		fribidi-joining.c \
 		fribidi-joining-types.c \
@@ -513,6 +525,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-bidi-types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-bidi.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-brackets.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-char-sets-cap-rtl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-char-sets-cp1255.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-char-sets-cp1256.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-char-sets-iso8859-6.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-char-sets-iso8859-8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-char-sets-utf8.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-char-sets.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-deprecated.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-joining-types.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fribidi-joining.Plo@am__quote@
@@ -807,9 +826,6 @@ uninstall-am: uninstall-libLTLIBRARIES \
 
 .PRECIOUS: Makefile
 
-
-@FRIBIDI_CHARSETS_TRUE@$(top_builddir)/charset/libfribidi-char-sets.la:
-@FRIBIDI_CHARSETS_TRUE@	cd $(top_builddir)/lib && $(MAKE) $(AM_MAKEFLAGS) libfribidi-char-sets.la
 
 $(GENERATEDSOURCES):
 	@(cd $(top_builddir)/gen.tab && \

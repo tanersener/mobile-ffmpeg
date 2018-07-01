@@ -446,8 +446,9 @@ Frame Height Minus One: 24 bits (_uint24_)
 Frame Duration: 24 bits (_uint24_)
 
 : The time to wait before displaying the next frame, in 1 millisecond units.
-  In particular, frame duration of 0 is useful when one wants to update
-  multiple areas of the canvas at once during the animation.
+  Note the interpretation of frame duration of 0 (and often <= 10) is
+  implementation defined. Many tools and browsers assign a minimum duration
+  similar to GIF.
 
 Reserved: 6 bits
 

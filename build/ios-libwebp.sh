@@ -56,7 +56,7 @@ cmake -Wno-dev \
     -DCMAKE_FIND_ROOT_PATH="${SDK_PATH}" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME}" \
-    -DCMAKE_SYSTEM_NAME=Generic \
+    -DCMAKE_SYSTEM_NAME=Darwin \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
     -DCMAKE_AR="$AR" \
@@ -77,6 +77,6 @@ cmake -Wno-dev \
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libwebp_package_config "0.6.1"
+create_libwebp_package_config "1.0.0"
 
 make install || exit 1

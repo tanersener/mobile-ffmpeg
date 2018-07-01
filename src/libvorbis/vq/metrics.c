@@ -11,7 +11,6 @@
  ********************************************************************
 
  function: function calls to collect codebook metrics
- last mod: $Id: metrics.c 16037 2009-05-26 21:10:58Z xiphmont $
 
  ********************************************************************/
 
@@ -24,7 +23,7 @@
 /* collect the following metrics:
 
    mean and mean squared amplitude
-   mean and mean squared error 
+   mean and mean squared error
    mean and mean squared error (per sample) by entry
    worst case fit by entry
    entry cell size
@@ -32,7 +31,7 @@
    total bits
    total samples
    (average bits per sample)*/
-   
+
 
 /* set up metrics */
 
@@ -58,7 +57,7 @@ int books=0;
 void process_preprocess(codebook **bs,char *basename){
   int i;
   while(bs[books])books++;
-  
+
   if(books){
     histogram=_ogg_calloc(books,sizeof(float *));
     histogram_error=_ogg_calloc(books,sizeof(float *));
@@ -107,7 +106,7 @@ void cell_spacing(codebook *c){
             localmin=this;
         }
       }
-      
+
       if(min==-1 || localmin<min)min=localmin;
       if(max==-1 || localmin>max)max=localmin;
       mean+=sqrt(localmin);
@@ -115,7 +114,7 @@ void cell_spacing(codebook *c){
       total++;
     }
   }
-  
+
   fprintf(stderr,"\tminimum cell spacing (closest side): %g\n",sqrt(min));
   fprintf(stderr,"\tmaximum cell spacing (closest side): %g\n",sqrt(max));
   fprintf(stderr,"\tmean closest side spacing: %g\n",mean/total);
@@ -161,7 +160,7 @@ void process_postprocess(codebook **bs,char *basename){
       fprintf(stderr,"Could not open file %s for writing\n",buffer);
       exit(1);
     }
-    
+
     for(i=0;i<n;i++){
       for(k=0;k<dim;k++){
         fprintf(out,"%d, %g, %g\n",
@@ -170,14 +169,14 @@ void process_postprocess(codebook **bs,char *basename){
       }
     }
     fclose(out);
-      
+
     sprintf(buffer,"%s-%d-me.m",basename,book);
     out=fopen(buffer,"w");
     if(!out){
       fprintf(stderr,"Could not open file %s for writing\n",buffer);
       exit(1);
     }
-    
+
     for(i=0;i<n;i++){
       for(k=0;k<dim;k++){
         fprintf(out,"%d, %g, %g\n",
@@ -193,7 +192,7 @@ void process_postprocess(codebook **bs,char *basename){
       fprintf(stderr,"Could not open file %s for writing\n",buffer);
       exit(1);
     }
-    
+
     for(i=0;i<n;i++){
       for(k=0;k<dim;k++){
         fprintf(out,"%d, %g, %g, %g\n",
@@ -237,10 +236,10 @@ float process_one(codebook *b,int book,float *a,int dim,int step,int addmul,
     fprintf(stderr,"Internal error: _best returned -1.\n");
     exit(1);
   }
-  
-  histogram[book][entry]++;  
+
+  histogram[book][entry]++;
   bits+=vorbis_book_codelen(b,entry);
-          
+
   for(j=0;j<dim;j++){
     float error=a[j*step];
 
@@ -276,7 +275,7 @@ void process_vector(codebook **bs,int *addmul,int inter,float *a,int n){
         base=process_one(b,bi,a+i,dim,1,addmul[bi],base);
     }
   }
-  
+
   if((long)(count)%100)spinnit("working.... samples: ",count);
 }
 
