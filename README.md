@@ -1,13 +1,16 @@
-# MobileFFmpeg
+# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Source code and scripts to build FFmpeg for Android and IOS platforms
 
 ### 1. Features
 - Builds both Android and IOS
 - Supports 
     - FFmpeg `v3.4.x` and `v4.0.x` releases
-    - 21 external libraries.
+    - 23 external libraries.
     
-        `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, `speex`, `wavpack`
+        `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, 
+        `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, 
+        `soxr`, `speex`, `wavpack`
     
     - 2 external libraries with GPL license
     
@@ -15,9 +18,12 @@ Source code and scripts to build FFmpeg for Android and IOS platforms
 
 - Exposes FFmpeg capabilities both directly from FFmpeg libraries and through MobileFFmpeg wrapper library
 - Creates shared libraries (.so for Android, .dylib for IOS)
-- Includes cross-compile instructions for 32 open-source libraries
+- Includes cross-compile instructions for 35 open-source libraries
     
-    `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libogg`, `libpng`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `shine`, `snappy`, `speex`, `tiff`, `wavpack`, `x264`, `xvidcore`
+    `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`,
+    `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libtheora`, `libuuid`, `libvorbis`, 
+    `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `tiff`, 
+    `wavpack`, `x264`, `xvidcore`
     
 - Prebuilt binaries under `JCenter` and `CocoaPods`
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
@@ -37,13 +43,17 @@ There are six different prebuilt packages. Below you can see which external libr
 
 |        | min | min-gpl | https | https-gpl | full | full-gpl |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| external <br/> libraries <br/> enabled |  -  |  x264 <br/> xvidcore  |  gnutls  |  gnutls <br/> x264 <br/> xvidcore  |  fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libass <br/> libiconv <br/> libilbc <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus <br/> shine <br/> snappy <br/> speex <br/> wavpack  | fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libass <br/> libiconv <br/> libilbc <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus <br/> shine <br/> snappy <br/> speex <br/> wavpack <br/> x264 <br/> xvidcore  |
+| external <br/> libraries <br/> enabled |  -  |  x264* <br/> xvidcore*  |  gnutls  |  gnutls <br/> x264* <br/> xvidcore*  |  fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack  | fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack <br/> x264* <br/> xvidcore*  |
+
+\* - Supported since `v1.1`
+
+\*\* - Supported since `v2.0`
 
 #### 2.1 Android
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {`
-        implementation 'com.arthenica:mobile-ffmpeg-full-gpl:1.1'
+        implementation 'com.arthenica:mobile-ffmpeg-full:1.1'
     }
     ```
 
@@ -57,7 +67,7 @@ There are six different prebuilt packages. Below you can see which external libr
 #### 2.2 IOS
 1. Add MobileFFmpeg pod to your `Podfile`
     ```
-    pod 'mobile-ffmpeg-full-gpl', '~> 1.1'
+    pod 'mobile-ffmpeg-full', '~> 1.1'
     ```
 
 2. Create and execute commands using the following `Objective-C` example.
