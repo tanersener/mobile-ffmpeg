@@ -491,6 +491,7 @@ do
         export ARCH=$(get_arch_name $run_arch)
         export TOOLCHAIN=$(get_toolchain)
         export TOOLCHAIN_ARCH=$(get_toolchain_arch)
+        export ANDROID_ARCH=$(get_android_arch $run_arch)
 
         create_toolchain || exit 1
 
