@@ -54,7 +54,7 @@ There are six different prebuilt packages. Below you can see which external libr
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {`
-        implementation 'com.arthenica:mobile-ffmpeg-full:2.0'
+        implementation 'com.arthenica:mobile-ffmpeg-full:1.1'
     }
     ```
 
@@ -68,7 +68,7 @@ There are six different prebuilt packages. Below you can see which external libr
 #### 2.2 IOS
 1. Add MobileFFmpeg pod to your `Podfile`
     ```
-    pod 'mobile-ffmpeg-full', '~> 2.0'
+    pod 'mobile-ffmpeg-full', '~> 1.1'
     ```
 
 2. Create and execute commands using the following `Objective-C` example.
