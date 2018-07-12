@@ -1,10 +1,11 @@
-# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/_latestVersion)
 
-Source code and scripts to build FFmpeg for Android and IOS platforms
+FFmpeg for Android and IOS
 
 ### 1. Features
-- Builds both Android and IOS
+- Use prebuilt binaries available under `JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports 
+    - Both Android and IOS
     - FFmpeg `v3.4.x` and `v4.0.x` releases
     - 23 external libraries.
     
@@ -23,16 +24,15 @@ Source code and scripts to build FFmpeg for Android and IOS platforms
     `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`,
     `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libtheora`, `libuuid`, `libvorbis`, 
     `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `tiff`, 
-    `wavpack`, `x264`, `xvidcore`
-    
-- Prebuilt binaries under `JCenter` and `CocoaPods`
+    `wavpack`, `x264`, `xvidcore`    
+
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 #### 1.1 Android
 - Supports `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` architectures
 - Creates Android archive with .aar extension
 #### 1.2 IOS
 - Supports `armv7`, `armv7s`, `arm64`, `i386` and `x86_64` architectures
-- Builds with `-fembed-bitcode` flag
+- Built with `-fembed-bitcode` flag
 - Creates IOS dynamic universal (fat) library
 - Creates IOS dynamic framework for IOS 8 or later
 
@@ -44,6 +44,7 @@ There are six different prebuilt packages. Below you can see which external libr
 |        | min | min-gpl | https | https-gpl | full | full-gpl |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
 | external <br/> libraries <br/> enabled |  -  |  x264* <br/> xvidcore*  |  gnutls  |  gnutls <br/> x264* <br/> xvidcore*  |  fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack  | fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack <br/> x264* <br/> xvidcore*  |
+|        | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full-gpl/_latestVersion) |
 
 \* - Supported since `v1.1`
 
