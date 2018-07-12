@@ -1,4 +1,5 @@
-# MobileFFmpeg
+# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Source code and scripts to build FFmpeg for Android and IOS platforms
 
 ### 1. Features
