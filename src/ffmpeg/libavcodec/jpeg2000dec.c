@@ -284,7 +284,7 @@ static int get_siz(Jpeg2000DecoderContext *s)
         avpriv_request_sample(s->avctx, "Support for image offsets");
         return AVERROR_PATCHWELCOME;
     }
-    if (av_image_check_size(s->width, s->height, 0, s->avctx)) {
+    if (av_image_check_size2(s->width, s->height, s->avctx->max_pixels, AV_PIX_FMT_NONE, 0, s->avctx)) {
         avpriv_request_sample(s->avctx, "Large Dimensions");
         return AVERROR_PATCHWELCOME;
     }
@@ -342,7 +342,10 @@ static int get_siz(Jpeg2000DecoderContext *s)
     s->numXtiles = ff_jpeg2000_ceildiv(s->width  - s->tile_offset_x, s->tile_width);
     s->numYtiles = ff_jpeg2000_ceildiv(s->height - s->tile_offset_y, s->tile_height);
 
-    if (s->numXtiles * (uint64_t)s->numYtiles > INT_MAX/sizeof(*s->tile)) {
+    // There must be at least a SOT and SOD per tile, their minimum size is 14
+    if (s->numXtiles * (uint64_t)s->numYtiles > INT_MAX/sizeof(*s->tile) ||
+        s->numXtiles * s->numYtiles * 14LL > bytestream2_size(&s->g)
+    ) {
         s->numXtiles = s->numYtiles = 0;
         return AVERROR(EINVAL);
     }
@@ -1127,6 +1130,9 @@ static int jpeg2000_decode_packets_po_iteration(Jpeg2000DecoderContext *s, Jpeg2
             step_x = 32;
             step_y = 32;
 
+            if (RSpoc > FFMIN(codsty->nreslevels, REpoc))
+                continue;
+
             for (reslevelno = RSpoc; reslevelno < FFMIN(codsty->nreslevels, REpoc); reslevelno++) {
                 uint8_t reducedresno = codsty->nreslevels - 1 -reslevelno; //  ==> N_L - r
                 Jpeg2000ResLevel *rlevel = comp->reslevel + reslevelno;
@@ -1146,10 +1152,10 @@ static int jpeg2000_decode_packets_po_iteration(Jpeg2000DecoderContext *s, Jpeg2
                         int xc = x / s->cdx[compno];
                         int yc = y / s->cdy[compno];
 
-                        if (yc % (1 << (rlevel->log2_prec_height + reducedresno)) && y != tile->coord[1][0]) //FIXME this is a subset of the check
+                        if (yc % (1LL << (rlevel->log2_prec_height + reducedresno)) && y != tile->coord[1][0]) //FIXME this is a subset of the check
                             continue;
 
-                        if (xc % (1 << (rlevel->log2_prec_width + reducedresno)) && x != tile->coord[0][0]) //FIXME this is a subset of the check
+                        if (xc % (1LL << (rlevel->log2_prec_width + reducedresno)) && x != tile->coord[0][0]) //FIXME this is a subset of the check
                             continue;
 
                         // check if a precinct exists
@@ -1216,10 +1222,10 @@ static int jpeg2000_decode_packets_po_iteration(Jpeg2000DecoderContext *s, Jpeg2
                         if (reslevelno >= codsty->nreslevels)
                             continue;
 
-                        if (yc % (1 << (rlevel->log2_prec_height + reducedresno)) && y != tile->coord[1][0]) //FIXME this is a subset of the check
+                        if (yc % (1LL << (rlevel->log2_prec_height + reducedresno)) && y != tile->coord[1][0]) //FIXME this is a subset of the check
                             continue;
 
-                        if (xc % (1 << (rlevel->log2_prec_width + reducedresno)) && x != tile->coord[0][0]) //FIXME this is a subset of the check
+                        if (xc % (1LL << (rlevel->log2_prec_width + reducedresno)) && x != tile->coord[0][0]) //FIXME this is a subset of the check
                             continue;
 
                         // check if a precinct exists
@@ -1287,10 +1293,10 @@ static int jpeg2000_decode_packets_po_iteration(Jpeg2000DecoderContext *s, Jpeg2
                         uint8_t reducedresno = codsty->nreslevels - 1 -reslevelno; //  ==> N_L - r
                         Jpeg2000ResLevel *rlevel = comp->reslevel + reslevelno;
 
-                        if (yc % (1 << (rlevel->log2_prec_height + reducedresno)) && y != tile->coord[1][0]) //FIXME this is a subset of the check
+                        if (yc % (1LL << (rlevel->log2_prec_height + reducedresno)) && y != tile->coord[1][0]) //FIXME this is a subset of the check
                             continue;
 
-                        if (xc % (1 << (rlevel->log2_prec_width + reducedresno)) && x != tile->coord[0][0]) //FIXME this is a subset of the check
+                        if (xc % (1LL << (rlevel->log2_prec_width + reducedresno)) && x != tile->coord[0][0]) //FIXME this is a subset of the check
                             continue;
 
                         // check if a precinct exists

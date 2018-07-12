@@ -1093,6 +1093,7 @@ static void update_initial_timestamps(AVFormatContext *s, int stream_index,
     if (st->first_dts != AV_NOPTS_VALUE ||
         dts           == AV_NOPTS_VALUE ||
         st->cur_dts   == AV_NOPTS_VALUE ||
+        st->cur_dts < INT_MIN + RELATIVE_TS_BASE ||
         is_relative(dts))
         return;
 
@@ -2611,7 +2612,7 @@ static void update_stream_timings(AVFormatContext *ic)
     else if (start_time > start_time_text)
         av_log(ic, AV_LOG_VERBOSE, "Ignoring outlier non primary stream starttime %f\n", start_time_text / (float)AV_TIME_BASE);
 
-    if (end_time == INT64_MIN || (end_time < end_time_text && end_time_text - end_time < AV_TIME_BASE)) {
+    if (end_time == INT64_MIN || (end_time < end_time_text && end_time_text - (uint64_t)end_time < AV_TIME_BASE)) {
         end_time = end_time_text;
     } else if (end_time < end_time_text) {
         av_log(ic, AV_LOG_VERBOSE, "Ignoring outlier non primary stream endtime %f\n", end_time_text / (float)AV_TIME_BASE);
@@ -3748,7 +3749,7 @@ FF_ENABLE_DEPRECATION_WARNINGS
             if (st->info->fps_last_dts != AV_NOPTS_VALUE &&
                 st->info->fps_last_dts_idx > st->info->fps_first_dts_idx &&
                 (pkt->dts - st->info->fps_last_dts) / 1000 >
-                (st->info->fps_last_dts     - st->info->fps_first_dts) /
+                (st->info->fps_last_dts     - (uint64_t)st->info->fps_first_dts) /
                 (st->info->fps_last_dts_idx - st->info->fps_first_dts_idx)) {
                 av_log(ic, AV_LOG_WARNING,
                        "DTS discontinuity in stream %d: packet %d with DTS "

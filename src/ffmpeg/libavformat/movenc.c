@@ -381,12 +381,17 @@ static int handle_eac3(MOVMuxContext *mov, AVPacket *pkt, MOVTrack *track)
 
             if (hdr->substreamid == info->num_ind_sub + 1) {
                 //info->num_ind_sub++;
-                avpriv_request_sample(track->par, "Multiple independent substreams");
+                avpriv_request_sample(mov->fc, "Multiple independent substreams");
                 return AVERROR_PATCHWELCOME;
             } else if (hdr->substreamid < info->num_ind_sub ||
                        hdr->substreamid == 0 && info->substream[0].bsid) {
                 info->ec3_done = 1;
                 goto concatenate;
+            }
+        } else {
+            if (hdr->substreamid != 0) {
+                avpriv_request_sample(mov->fc, "Multiple non EAC3 independent substreams");
+                return AVERROR_PATCHWELCOME;
             }
         }
 
@@ -5071,6 +5076,11 @@ int ff_mov_write_packet(AVFormatContext *s, AVPacket *pkt)
         samples_in_chunk = size / trk->sample_size;
     else
         samples_in_chunk = 1;
+
+    if (samples_in_chunk < 1) {
+        av_log(s, AV_LOG_ERROR, "fatal error, input packet contains no samples\n");
+        return AVERROR_PATCHWELCOME;
+    }
 
     /* copy extradata if it exists */
     if (trk->vos_len == 0 && par->extradata_size > 0 &&
