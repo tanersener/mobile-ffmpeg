@@ -59,7 +59,7 @@ This is a hint and typically the client should send a certificate that is signed
 by one of these CAs. These names, when available, are DER encoded. To get a more
 meaningful value use the function @code{gnutls_x509_rdn_get()} .
 
- @code{pk_algos} contains a list with server's acceptable signature algorithms.
+ @code{pk_algos} contains a list with server's acceptable public key algorithms.
 The certificate returned should support the server's given algorithms.
 
  @code{pcert} should contain a single certificate and public key or a list of them.
@@ -934,7 +934,16 @@ negative error value.
 @deftypefun {int} {gnutls_privkey_init} (gnutls_privkey_t * @var{key})
 @var{key}: A pointer to the type to be initialized
 
-This function will initialize a private key.
+This function will initialize a private key object. The object can
+be used to generate, import, and perform cryptographic operations
+on the associated private key.
+
+Note that when the underlying private key is a PKCS@code{11}  key (i.e.,
+when imported with a PKCS@code{11}  URI), the limitations of @code{gnutls_pkcs11_privkey_init()} 
+apply to this object as well. In versions of GnuTLS later than 3.5.11 the object
+is protected using locks and a single @code{gnutls_privkey_t}  can be re-used
+by many threads. However, for performance it is recommended to utilize
+one object per key per thread.
 
 @strong{Returns:} On success, @code{GNUTLS_E_SUCCESS}  (0) is returned, otherwise a
 negative error value.

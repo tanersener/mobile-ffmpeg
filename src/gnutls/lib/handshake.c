@@ -2875,6 +2875,8 @@ static int handshake_client(gnutls_session_t session)
 		STATE = STATE8;
 		if (ret < 0)
 			return gnutls_assert_val(ret);
+
+		FALLTHROUGH;
 	case STATE9:
 		/* receive the server key exchange */
 		if (session->internals.resumed == RESUME_FALSE)	/* if we are not resuming */

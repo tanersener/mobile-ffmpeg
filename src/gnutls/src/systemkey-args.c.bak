@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for systemkey-tool options
  */
 static char const systemkey_tool_opt_strs[1630] =
-/*     0 */ "systemkey-tool 3.5.18\n"
+/*     0 */ "systemkey-tool 3.5.19\n"
             "Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -114,7 +114,7 @@ static char const systemkey_tool_opt_strs[1630] =
 /*  1452 */ "\n\0"
 /*  1454 */ "Program that allows handling user keys as stored in the system in a uniform\n"
             "way.\n\0"
-/*  1536 */ "systemkey-tool 3.5.18\0"
+/*  1536 */ "systemkey-tool 3.5.19\0"
 /*  1558 */ "systemkey-tool [options]\n"
             "systemkey-tool --help for usage instructions.\n";
 
@@ -691,7 +691,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via systemkey_toolOptions.pzCopyright */
-  puts(_("systemkey-tool 3.5.18\n\
+  puts(_("systemkey-tool 3.5.19\n\
 Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -751,7 +751,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
 way.\n"));
 
   /* referenced via systemkey_toolOptions.pzFullVersion */
-  puts(_("systemkey-tool 3.5.18"));
+  puts(_("systemkey-tool 3.5.19"));
 
   /* referenced via systemkey_toolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

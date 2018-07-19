@@ -76,6 +76,13 @@ typedef int ssize_t;
 #define likely(x)      __builtin_expect((x), 1)
 #define unlikely(x)    __builtin_expect((x), 0)
 #endif
+#if _GNUTLS_GCC_VERSION >= 70100
+#define FALLTHROUGH      __attribute__ ((fallthrough))
+#endif
+#endif
+
+#ifndef FALLTHROUGH
+# define FALLTHROUGH
 #endif
 
 #ifndef likely

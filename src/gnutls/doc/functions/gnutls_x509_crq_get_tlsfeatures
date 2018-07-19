@@ -3,7 +3,7 @@
 
 
 @deftypefun {int} {gnutls_x509_crq_get_tlsfeatures} (gnutls_x509_crq_t @var{crq}, gnutls_x509_tlsfeatures_t @var{features}, unsigned int @var{flags}, unsigned int * @var{critical})
-@var{crq}: -- undescribed --
+@var{crq}: An X.509 certificate request
 
 @var{features}: If the function succeeds, the
 features will be stored in this variable.

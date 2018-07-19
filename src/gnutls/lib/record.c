@@ -1431,7 +1431,9 @@ check_session_status(gnutls_session_t session)
 			return gnutls_assert_val(ret);
 
 		session->internals.recv_state = RECV_STATE_0;
+
 		/* Fall through: */
+		FALLTHROUGH;
 	case RECV_STATE_0:
 
 		_dtls_async_timer_check(session);

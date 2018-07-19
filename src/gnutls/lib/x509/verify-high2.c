@@ -188,6 +188,10 @@ int add_trust_list_pkcs11_object_url(gnutls_x509_trust_list_t list, const char *
 	gnutls_pkcs11_obj_t *pcrt_list = NULL;
 	unsigned int pcrt_list_size = 0, i;
 	int ret;
+
+	/* here we don't use the flag GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE,
+	 * as we want to explicitly load from any module available in the system.
+	 */
 	ret =
 	    gnutls_pkcs11_obj_list_import_url2(&pcrt_list, &pcrt_list_size,
 					       url,
@@ -323,7 +327,7 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 			 */
 			if (is_pkcs11_url_object(ca_file) != 0) {
 				return add_trust_list_pkcs11_object_url(list, ca_file, tl_flags);
-			} else { /* token */
+			} else { /* trusted token */
 				if (list->pkcs11_token != NULL)
 					return gnutls_assert_val(GNUTLS_E_INVALID_REQUEST);
 				list->pkcs11_token = gnutls_strdup(ca_file);
@@ -331,7 +335,7 @@ gnutls_x509_trust_list_add_trust_file(gnutls_x509_trust_list_t list,
 				/* enumerate the certificates */
 				ret = gnutls_pkcs11_obj_list_import_url(NULL, &pcrt_list_size,
 					ca_file, 
-					(GNUTLS_PKCS11_OBJ_FLAG_CRT|GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED),
+					(GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|GNUTLS_PKCS11_OBJ_FLAG_CRT|GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED),
 					0);
 				if (ret < 0 && ret != GNUTLS_E_SHORT_MEMORY_BUFFER)
 					return gnutls_assert_val(ret);

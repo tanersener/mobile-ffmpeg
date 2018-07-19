@@ -1,6 +1,6 @@
-This is gnutls.info, produced by makeinfo version 6.3 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.5 from gnutls.texi.
 
-This manual is last updated 7 January 2018 for version 3.5.18 of GnuTLS.
+This manual is last updated 7 January 2018 for version 3.5.19 of GnuTLS.
 
 Copyright (C) 2001-2018 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2018 Nikos Mavrogiannopoulos
@@ -1321,7 +1321,7 @@ gnutls_ocsp_resp_verify
      VERIFY: output variable with verification status, an
      'gnutls_ocsp_verify_reason_t'
 
-     FLAGS: verification flags, 0 for now.
+     FLAGS: verification flags from 'gnutls_certificate_verify_flags'
 
      Verify signature of the Basic OCSP Response against the public key
      in the certificate of a trusted signer.  The 'trustlist' should be
@@ -1359,7 +1359,7 @@ gnutls_ocsp_resp_verify_direct
      VERIFY: output variable with verification status, an
      'gnutls_ocsp_verify_reason_t'
 
-     FLAGS: verification flags, 0 for now.
+     FLAGS: verification flags from 'gnutls_certificate_verify_flags'
 
      Verify signature of the Basic OCSP Response against the public key
      in the 'issuer' certificate.
@@ -3437,7 +3437,7 @@ gnutls_certificate_set_retrieve_function2
      encoded.  To get a more meaningful value use the function
      'gnutls_x509_rdn_get()' .
 
-     'pk_algos' contains a list with server's acceptable signature
+     'pk_algos' contains a list with server's acceptable public key
      algorithms.  The certificate returned should support the server's
      given algorithms.
 
@@ -4404,7 +4404,17 @@ gnutls_privkey_init
  -- Function: int gnutls_privkey_init (gnutls_privkey_t * KEY)
      KEY: A pointer to the type to be initialized
 
-     This function will initialize a private key.
+     This function will initialize a private key object.  The object can
+     be used to generate, import, and perform cryptographic operations
+     on the associated private key.
+
+     Note that when the underlying private key is a PKCS'11' key (i.e.,
+     when imported with a PKCS'11' URI), the limitations of
+     'gnutls_pkcs11_privkey_init()' apply to this object as well.  In
+     versions of GnuTLS later than 3.5.11 the object is protected using
+     locks and a single 'gnutls_privkey_t' can be re-used by many
+     threads.  However, for performance it is recommended to utilize one
+     object per key per thread.
 
      *Returns:* On success, 'GNUTLS_E_SUCCESS' (0) is returned,
      otherwise a negative error value.
@@ -5664,7 +5674,7 @@ dane_cert_usage_name
 
  -- Function: const char * dane_cert_usage_name (dane_cert_usage_t
           USAGE)
-     USAGE: - undescribed -
+     USAGE: is a DANE certificate usage
 
      Convert a 'dane_cert_usage_t' value to a string.
 
@@ -6798,7 +6808,9 @@ gnutls_rnd
      LEN: The requested size
 
      This function will generate random data and store it to output
-     buffer.
+     buffer.  The value of 'level' should be one of 'GNUTLS_RND_NONCE' ,
+     'GNUTLS_RND_RANDOM' and 'GNUTLS_RND_KEY' .  See the manual and
+     'gnutls_rnd_level_t' for detailed information.
 
      This function is thread-safe and also fork-safe.
 

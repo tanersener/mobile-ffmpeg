@@ -36,7 +36,7 @@
 /* In case of a fork, it will invalidate the open session
  * in the privkey and start another */
 #define PKCS11_CHECK_INIT_PRIVKEY(k) \
-	ret = _gnutls_pkcs11_check_init(PROV_INIT_MANUAL, k, reopen_privkey_session); \
+	ret = _gnutls_pkcs11_check_init(PROV_INIT_ALL, k, reopen_privkey_session); \
 	if (ret < 0) \
 		return gnutls_assert_val(ret)
 

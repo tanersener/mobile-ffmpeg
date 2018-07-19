@@ -120,6 +120,7 @@ TESTS_ENVIRONMENT = EXEEXT=$(EXEEXT) \
 	VALGRIND="$(VALGRIND)"			\
 	LIBTOOL="$(LIBTOOL)"			\
 	top_builddir="$(top_builddir)"		\
+	ac_cv_sizeof_unsigned_long_int="$(ac_cv_sizeof_unsigned_long_int)" \
 	ASAN_OPTIONS="detect_leaks=0:exitcode=6" \
 	srcdir="$(srcdir)"
 

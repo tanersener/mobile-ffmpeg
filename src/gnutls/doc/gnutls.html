@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is last updated 7 January 2018 for version
-3.5.18 of GnuTLS.
+3.5.19 of GnuTLS.
 
 Copyright (C) 2001-2018 Free Software Foundation, Inc.\\
 Copyright (C) 2001-2018 Nikos Mavrogiannopoulos
@@ -12,16 +12,16 @@ any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
 copy of the license is included in the section entitled "GNU Free
 Documentation License". -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.5, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>GnuTLS 3.5.18</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>GnuTLS 3.5.19</title>
 
-<meta name="description" content="GnuTLS 3.5.18">
-<meta name="keywords" content="GnuTLS 3.5.18">
+<meta name="description" content="GnuTLS 3.5.19">
+<meta name="keywords" content="GnuTLS 3.5.19">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="#Top" rel="start" title="Top">
 <link href="#Function-and-Data-Index" rel="index" title="Function and Data Index">
 <link href="#SEC_Contents" rel="contents" title="Table of Contents">
@@ -153,7 +153,7 @@ dl {
 </head>
 
 <body lang="en">
-<h1 class="settitle" align="center">GnuTLS 3.5.18</h1>
+<h1 class="settitle" align="center">GnuTLS 3.5.19</h1>
 
 
 
@@ -487,7 +487,7 @@ Next: <a href="#Preface" accesskey="n" rel="next">Preface</a>, Up: <a href="dir.
 <h1 class="top">GnuTLS</h1>
 
 <p>This manual is last updated 7 January 2018 for version
-3.5.18 of GnuTLS.
+3.5.19 of GnuTLS.
 </p>
 <p>Copyright &copy; 2001-2018 Free Software Foundation, Inc.\\
 Copyright &copy; 2001-2018 Nikos Mavrogiannopoulos
@@ -16255,7 +16255,9 @@ Fatal in session if broken.
 <p><var>len</var>: The requested size
 </p>
 <p>This function will generate random data and store it to output
-buffer.
+buffer. The value of  <code>level</code> should be one of <code>GNUTLS_RND_NONCE</code> ,
+<code>GNUTLS_RND_RANDOM</code>  and <code>GNUTLS_RND_KEY</code> . See the manual and
+<code>gnutls_rnd_level_t</code>  for detailed information.
 </p>
 <p>This function is thread-safe and also fork-safe.
 </p>
@@ -26131,6 +26133,8 @@ The other variables are only set on supported structures.
 <p><strong>Returns:</strong> <code>GNUTLS_E_INVALID_REQUEST</code>  if the provided structure isn&rsquo;t an encrypted key,
 <code>GNUTLS_E_UNKNOWN_CIPHER_TYPE</code>  if the structure&rsquo;s encryption isn&rsquo;t supported, or
 another negative error code in case of a failure. Zero on success.
+</p>
+<p><strong>Since:</strong> 3.4.0
 </p></dd></dl>
 
 <a name="gnutls_005fpkcs_005fschema_005fget_005fname-1"></a>
@@ -28080,7 +28084,7 @@ sequence number and with the otherName type then
 <h4 class="subheading">gnutls_x509_crq_get_tlsfeatures</h4>
 <a name="gnutls_005fx509_005fcrq_005fget_005ftlsfeatures"></a><dl>
 <dt><a name="index-gnutls_005fx509_005fcrq_005fget_005ftlsfeatures"></a>Function: <em>int</em> <strong>gnutls_x509_crq_get_tlsfeatures</strong> <em>(gnutls_x509_crq_t <var>crq</var>, gnutls_x509_tlsfeatures_t <var>features</var>, unsigned int <var>flags</var>, unsigned int * <var>critical</var>)</em></dt>
-<dd><p><var>crq</var>: &ndash; undescribed &ndash;
+<dd><p><var>crq</var>: An X.509 certificate request
 </p>
 <p><var>features</var>: If the function succeeds, the
 features will be stored in this variable.
@@ -28443,7 +28447,7 @@ negative error value.
 <h4 class="subheading">gnutls_x509_crq_set_tlsfeatures</h4>
 <a name="gnutls_005fx509_005fcrq_005fset_005ftlsfeatures"></a><dl>
 <dt><a name="index-gnutls_005fx509_005fcrq_005fset_005ftlsfeatures"></a>Function: <em>int</em> <strong>gnutls_x509_crq_set_tlsfeatures</strong> <em>(gnutls_x509_crq_t <var>crq</var>, gnutls_x509_tlsfeatures_t <var>features</var>)</em></dt>
-<dd><p><var>crq</var>: &ndash; undescribed &ndash;
+<dd><p><var>crq</var>: An X.509 certificate request
 </p>
 <p><var>features</var>: If the function succeeds, the
 features will be added to the certificate
@@ -28568,16 +28572,21 @@ and the DNSName/IPAddress subject alternative name PKIX extension.
 <p>IPv4 addresses are accepted by this function in the dotted-decimal
 format (e.g, ddd.ddd.ddd.ddd), and IPv6 addresses in the hexadecimal
 x:x:x:x:x:x:x:x format. For them the IPAddress subject alternative
-name extension is consulted, as well as the DNSNames in case of a non-match.
-The latter fallback exists due to misconfiguration of many servers
-which place an IPAddress inside the DNSName extension.
+name extension is consulted. Previous versions to 3.6.0 of GnuTLS
+in case of a non-match would consult (in a non-standard extension)
+the DNSname and CN fields. This is no longer the case.
 </p>
 <p>When the flag <code>GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS</code>  is specified no
 wildcards are considered. Otherwise they are only considered if the
 domain name consists of three components or more, and the wildcard
 starts at the leftmost position.
 </p>
+<p>The function <code>gnutls_x509_crt_check_ip()</code>  is available for matching
+IP addresses.
+</p>
 <p><strong>Returns:</strong> non-zero for a successful match, and zero on failure.
+</p>
+<p><strong>Since:</strong> 3.3.0
 </p></dd></dl>
 
 <a name="gnutls_005fx509_005fcrt_005fcheck_005fissuer-1"></a>
@@ -30548,7 +30557,7 @@ The input string should be plain ASCII or UTF-8 encoded. On
 DN parsing error <code>GNUTLS_E_PARSING_ERROR</code>  is returned.
 </p>
 <p>Note that DNs are not expected to hold DNS information, and thus
-no automatic IDNA convertions are attempted when using this function.
+no automatic IDNA conversions are attempted when using this function.
 If that is required (e.g., store a domain in CN), process the corresponding
 input with <code>gnutls_idna_map()</code> .
 </p>
@@ -32968,7 +32977,7 @@ the global function set using <code>gnutls_pkcs11_set_pin_function()</code> .
 <dt><a name="index-gnutls_005fx509_005fprivkey_005fsign_005fdata"></a>Function: <em>int</em> <strong>gnutls_x509_privkey_sign_data</strong> <em>(gnutls_x509_privkey_t <var>key</var>, gnutls_digest_algorithm_t <var>digest</var>, unsigned int <var>flags</var>, const gnutls_datum_t * <var>data</var>, void * <var>signature</var>, size_t * <var>signature_size</var>)</em></dt>
 <dd><p><var>key</var>: a key
 </p>
-<p><var>digest</var>: should be MD5 or SHA1
+<p><var>digest</var>: should be a digest algorithm
 </p>
 <p><var>flags</var>: should be 0 for now
 </p>
@@ -33058,9 +33067,9 @@ negative error value.
 <dt><a name="index-gnutls_005fx509_005frdn_005fget2"></a>Function: <em>int</em> <strong>gnutls_x509_rdn_get2</strong> <em>(const gnutls_datum_t * <var>idn</var>, gnutls_datum_t * <var>str</var>, unsigned <var>flags</var>)</em></dt>
 <dd><p><var>idn</var>: should contain a DER encoded RDN sequence
 </p>
-<p><var>str</var>: &ndash; undescribed &ndash;
+<p><var>str</var>: a datum that will hold the name
 </p>
-<p><var>flags</var>: &ndash; undescribed &ndash;
+<p><var>flags</var>: zero of <code>GNUTLS_X509_DN_FLAG_COMPAT</code> 
 </p>
 <p>This function will return the name of the given RDN sequence.  The
 name will be in the form &quot;C=xxxx,O=yyyy,CN=zzzz&quot; as described in
@@ -34979,7 +34988,7 @@ negative error value.
 </p>
 <p><var>verify</var>: output variable with verification status, an <code>gnutls_ocsp_verify_reason_t</code> 
 </p>
-<p><var>flags</var>: verification flags, 0 for now.
+<p><var>flags</var>: verification flags from <code>gnutls_certificate_verify_flags</code> 
 </p>
 <p>Verify signature of the Basic OCSP Response against the public key
 in the certificate of a trusted signer.  The  <code>trustlist</code> should be
@@ -35014,7 +35023,7 @@ negative error value.
 </p>
 <p><var>verify</var>: output variable with verification status, an <code>gnutls_ocsp_verify_reason_t</code> 
 </p>
-<p><var>flags</var>: verification flags, 0 for now.
+<p><var>flags</var>: verification flags from <code>gnutls_certificate_verify_flags</code> 
 </p>
 <p>Verify signature of the Basic OCSP Response against the public key
 in the  <code>issuer</code> certificate.
@@ -36995,7 +37004,7 @@ This is a hint and typically the client should send a certificate that is signed
 by one of these CAs. These names, when available, are DER encoded. To get a more
 meaningful value use the function <code>gnutls_x509_rdn_get()</code> .
 </p>
-<p><code>pk_algos</code> contains a list with server&rsquo;s acceptable signature algorithms.
+<p><code>pk_algos</code> contains a list with server&rsquo;s acceptable public key algorithms.
 The certificate returned should support the server&rsquo;s given algorithms.
 </p>
 <p><code>pcert</code> should contain a single certificate and public key or a list of them.
@@ -37908,7 +37917,16 @@ negative error value.
 <dt><a name="index-gnutls_005fprivkey_005finit"></a>Function: <em>int</em> <strong>gnutls_privkey_init</strong> <em>(gnutls_privkey_t * <var>key</var>)</em></dt>
 <dd><p><var>key</var>: A pointer to the type to be initialized
 </p>
-<p>This function will initialize a private key.
+<p>This function will initialize a private key object. The object can
+be used to generate, import, and perform cryptographic operations
+on the associated private key.
+</p>
+<p>Note that when the underlying private key is a PKCS<code>11</code>  key (i.e.,
+when imported with a PKCS<code>11</code>  URI), the limitations of <code>gnutls_pkcs11_privkey_init()</code> 
+apply to this object as well. In versions of GnuTLS later than 3.5.11 the object
+is protected using locks and a single <code>gnutls_privkey_t</code>  can be re-used
+by many threads. However, for performance it is recommended to utilize
+one object per key per thread.
 </p>
 <p><strong>Returns:</strong> On success, <code>GNUTLS_E_SUCCESS</code>  (0) is returned, otherwise a
 negative error value.
@@ -39126,7 +39144,7 @@ type, or <code>NULL</code> .
 <h4 class="subheading">dane_cert_usage_name</h4>
 <a name="dane_005fcert_005fusage_005fname"></a><dl>
 <dt><a name="index-dane_005fcert_005fusage_005fname"></a>Function: <em>const char *</em> <strong>dane_cert_usage_name</strong> <em>(dane_cert_usage_t <var>usage</var>)</em></dt>
-<dd><p><var>usage</var>: &ndash; undescribed &ndash;
+<dd><p><var>usage</var>: is a DANE certificate usage
 </p>
 <p>Convert a <code>dane_cert_usage_t</code>  value to a string.
 </p>
@@ -40218,7 +40236,9 @@ and reset the state of the MAC.
 <p><var>len</var>: The requested size
 </p>
 <p>This function will generate random data and store it to output
-buffer.
+buffer. The value of  <code>level</code> should be one of <code>GNUTLS_RND_NONCE</code> ,
+<code>GNUTLS_RND_RANDOM</code>  and <code>GNUTLS_RND_KEY</code> . See the manual and
+<code>gnutls_rnd_level_t</code>  for detailed information.
 </p>
 <p>This function is thread-safe and also fork-safe.
 </p>
@@ -40407,7 +40427,7 @@ Everyone is permitted to copy and distribute verbatim copies
 of this license document, but changing it is not allowed.
 </pre></div>
 
-<ol>
+<ol start="0">
 <li> PREAMBLE
 
 <p>The purpose of this License is to make a manual, textbook, or other
@@ -40583,7 +40603,7 @@ Version filling the role of the Document, thus licensing distribution
 and modification of the Modified Version to whoever possesses a copy
 of it.  In addition, you must do these things in the Modified Version:
 </p>
-<ol>
+<ol type="A" start="1">
 <li> Use in the Title Page (and on the covers, if any) a title distinct
 from that of the Document, and from those of previous versions
 (which should, if there were any, be listed in the History section
