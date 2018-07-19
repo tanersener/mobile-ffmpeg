@@ -720,9 +720,9 @@ download_gpl_library_source() {
 
     case $1 in
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180627-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20180627-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20180627-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180718-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20180718-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20180718-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         xvidcore)

@@ -10,3 +10,4 @@
 *.dylib
 /codec_list.c
 /parser_list.c
+/libavcodec.so.58

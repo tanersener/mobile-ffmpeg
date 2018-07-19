@@ -9,3 +9,4 @@
 /libavutil.so.55
 /libavutil.ver
 *.dylib
+/libavutil.so.56

@@ -8,3 +8,4 @@
 /libavfilter.ver
 *.dylib
 /filter_list.c
+/libavfilter.so.7

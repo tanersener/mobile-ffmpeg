@@ -10,3 +10,4 @@
 *.dylib
 /demuxer_list.c
 /muxer_list.c
+/libavformat.so.58

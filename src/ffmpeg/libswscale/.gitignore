@@ -7,3 +7,4 @@
 /libswscale.so.4
 /libswscale.ver
 *.dylib
+/libswscale.so.5
