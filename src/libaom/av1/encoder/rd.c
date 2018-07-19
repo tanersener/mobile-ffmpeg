@@ -44,9 +44,6 @@
 
 #define RD_THRESH_POW 1.25
 
-// Factor to weigh the rate for switchable interp filters.
-#define SWITCHABLE_INTERP_RATE_FACTOR 1
-
 // The baseline rd thresholds for breaking out of the rd loop for
 // certain modes are assumed to be based on 8x8 blocks.
 // This table is used to correct for block size.

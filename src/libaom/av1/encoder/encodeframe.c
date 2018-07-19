@@ -2099,7 +2099,7 @@ static void rd_auto_partition_range(AV1_COMP *cpi, const TileInfo *const tile,
   // When use_square_partition_only is true, make sure at least one square
   // partition is allowed by selecting the next smaller square size as
   // *min_block_size.
-  if (cpi->sf.use_square_partition_only) {
+  if (min_size >= cpi->sf.use_square_partition_only_threshold) {
     min_size = AOMMIN(min_size, next_square_size[max_size]);
   }
 
@@ -2363,6 +2363,7 @@ static int64_t dist_8x8_yuv(const AV1_COMP *const cpi, MACROBLOCK *const x,
 static void reset_partition(PC_TREE *pc_tree, BLOCK_SIZE bsize) {
   pc_tree->partitioning = PARTITION_NONE;
   pc_tree->cb_search_range = SEARCH_FULL_PLANE;
+  pc_tree->none.skip = 0;
 
   if (bsize >= BLOCK_8X8) {
     BLOCK_SIZE subsize = get_partition_subsize(bsize, PARTITION_SPLIT);
@@ -3003,7 +3004,8 @@ static void rd_pick_partition(const AV1_COMP *const cpi, ThreadData *td,
     partition_vert_allowed &= partition_allowed || !has_cols;
     do_square_split &= bsize > min_size;
   }
-  if (cpi->sf.use_square_partition_only) {
+
+  if (bsize > cpi->sf.use_square_partition_only_threshold) {
     partition_horz_allowed &= !has_rows;
     partition_vert_allowed &= !has_cols;
   }
@@ -3857,6 +3859,7 @@ static void encode_rd_sb_row(AV1_COMP *cpi, ThreadData *td,
     }
     xd->cur_frame_force_integer_mv = cm->cur_frame_force_integer_mv;
 
+    x->sb_energy_level = 0;
     if (cm->delta_q_present_flag) {
       // Delta-q modulation based on variance
       av1_setup_src_planes(x, cpi->source, mi_row, mi_col, num_planes);
@@ -3865,11 +3868,13 @@ static void encode_rd_sb_row(AV1_COMP *cpi, ThreadData *td,
       if (DELTAQ_MODULATION == 1) {
         const int block_wavelet_energy_level =
             av1_block_wavelet_energy_level(cpi, x, cm->seq_params.sb_size);
+        x->sb_energy_level = block_wavelet_energy_level;
         offset_qindex = av1_compute_deltaq_from_energy_level(
             cpi, block_wavelet_energy_level);
       } else {
         const int block_var_level =
             av1_block_energy(cpi, x, cm->seq_params.sb_size);
+        x->sb_energy_level = block_var_level;
         offset_qindex =
             av1_compute_deltaq_from_energy_level(cpi, block_var_level);
       }
@@ -3943,7 +3948,8 @@ static void encode_rd_sb_row(AV1_COMP *cpi, ThreadData *td,
       x->use_cb_search_range = 0;
       init_first_partition_pass_stats_tables(x->first_partition_pass_stats);
       if (cpi->sf.two_pass_partition_search &&
-          !cpi->sf.use_square_partition_only &&
+          cpi->sf.use_square_partition_only_threshold <
+              cm->seq_params.sb_size &&
           mi_row + mi_size_high[cm->seq_params.sb_size] < cm->mi_rows &&
           mi_col + mi_size_wide[cm->seq_params.sb_size] < cm->mi_cols &&
           cm->frame_type != KEY_FRAME) {
@@ -4117,8 +4123,8 @@ void av1_encode_tile(AV1_COMP *cpi, ThreadData *td, int tile_row,
   TOKENEXTRA *tok = cpi->tile_tok[tile_row][tile_col];
   int mi_row;
 
-  av1_zero_above_context(cm, tile_info->mi_col_start, tile_info->mi_col_end,
-                         tile_row);
+  av1_zero_above_context(cm, &td->mb.e_mbd, tile_info->mi_col_start,
+                         tile_info->mi_col_end, tile_row);
   av1_init_above_context(cm, &td->mb.e_mbd, tile_row);
 
   // Set up pointers to per thread motion search counters.
@@ -4264,25 +4270,24 @@ static int is_screen_content(const uint8_t *src, int use_hbd, int bd,
   return counts * blk_h * blk_w * 10 > width * height;
 }
 
+static const uint8_t ref_frame_flag_list[REF_FRAMES] = { 0,
+                                                         AOM_LAST_FLAG,
+                                                         AOM_LAST2_FLAG,
+                                                         AOM_LAST3_FLAG,
+                                                         AOM_GOLD_FLAG,
+                                                         AOM_BWD_FLAG,
+                                                         AOM_ALT2_FLAG,
+                                                         AOM_ALT_FLAG };
+
 // Enforce the number of references for each arbitrary frame limited to
 // (INTER_REFS_PER_FRAME - 1)
 static void enforce_max_ref_frames(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
-  static const int flag_list[REF_FRAMES] = { 0,
-                                             AOM_LAST_FLAG,
-                                             AOM_LAST2_FLAG,
-                                             AOM_LAST3_FLAG,
-                                             AOM_GOLD_FLAG,
-                                             AOM_BWD_FLAG,
-                                             AOM_ALT2_FLAG,
-                                             AOM_ALT_FLAG };
   MV_REFERENCE_FRAME ref_frame;
   int total_valid_refs = 0;
-
-  (void)flag_list;
-
   for (ref_frame = LAST_FRAME; ref_frame <= ALTREF_FRAME; ++ref_frame) {
-    if (cpi->ref_frame_flags & flag_list[ref_frame]) total_valid_refs++;
+    if (cpi->ref_frame_flags & ref_frame_flag_list[ref_frame])
+      total_valid_refs++;
   }
 
   // NOTE(zoeliu): When all the possible reference frames are availble, we
@@ -4618,7 +4623,6 @@ static void encode_frame_internal(AV1_COMP *cpi) {
   cm->prev_mi = cm->allow_ref_frame_mvs ? cm->prev_mip : NULL;
 
   x->txb_split_count = 0;
-  av1_zero(x->blk_skip_drl);
 
   av1_zero(rdc->global_motion_used);
   av1_zero(cpi->gmparams_cost);
@@ -4734,6 +4738,15 @@ static void encode_frame_internal(AV1_COMP *cpi) {
                              cm->allow_high_precision_mv) +
           cpi->gmtype_cost[cm->global_motion[frame].wmtype] -
           cpi->gmtype_cost[IDENTITY];
+    }
+    // clear disabled ref_frames
+    for (frame = LAST_FRAME; frame <= ALTREF_FRAME; ++frame) {
+      const int ref_disabled =
+          !(cpi->ref_frame_flags & ref_frame_flag_list[frame]);
+      if (ref_disabled && cpi->sf.recode_loop != DISALLOW_RECODE) {
+        cpi->gmparams_cost[frame] = 0;
+        cm->global_motion[frame] = default_warp_params;
+      }
     }
     cpi->global_motion_search_done = 1;
   }

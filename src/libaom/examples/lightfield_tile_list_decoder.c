@@ -51,13 +51,12 @@ int main(int argc, char **argv) {
   AvxVideoReader *reader = NULL;
   const AvxInterface *decoder = NULL;
   const AvxVideoInfo *info = NULL;
-  int width, height;
   int num_references;
   int num_tile_lists;
   aom_image_t reference_images[MAX_EXTERNAL_REFERENCES];
   size_t frame_size = 0;
   const unsigned char *frame = NULL;
-  int i, n;
+  int i, j, n;
 
   exec_name = argv[0];
 
@@ -73,8 +72,6 @@ int main(int argc, char **argv) {
   num_tile_lists = (int)strtol(argv[4], NULL, 0);
 
   info = aom_video_reader_get_info(reader);
-  width = info->frame_width;
-  height = info->frame_height;
 
   decoder = get_aom_decoder_by_fourcc(info->codec_fourcc);
   if (!decoder) die("Unknown input codec.");
@@ -83,26 +80,38 @@ int main(int argc, char **argv) {
   if (aom_codec_dec_init(&codec, decoder->codec_interface(), NULL, 0))
     die_codec(&codec, "Failed to initialize decoder.");
 
-  // Allocate memory to store decoded references.
-  aom_img_fmt_t ref_fmt = AOM_IMG_FMT_I420;
-  if (!CONFIG_LOWBITDEPTH) ref_fmt |= AOM_IMG_FMT_HIGHBITDEPTH;
-  // Allocate memory with the border so that it can be used as a reference.
-  for (i = 0; i < num_references; i++) {
-    unsigned int border = AOM_BORDER_IN_PIXELS;
-    if (!aom_img_alloc_with_border(&reference_images[i], ref_fmt, width, height,
-                                   32, 8, border)) {
-      die("Failed to allocate references.");
-    }
+  if (aom_codec_control(&codec, AV1D_SET_IS_ANNEXB, info->is_annexb)) {
+    die("Failed to set annex b status");
   }
 
   // Decode anchor frames.
   aom_codec_control_(&codec, AV1_SET_TILE_MODE, 0);
-
   for (i = 0; i < num_references; ++i) {
     aom_video_reader_read_frame(reader);
     frame = aom_video_reader_get_frame(reader, &frame_size);
     if (aom_codec_decode(&codec, frame, frame_size, NULL))
       die_codec(&codec, "Failed to decode frame.");
+
+    if (i == 0) {
+      aom_img_fmt_t ref_fmt = 0;
+      if (aom_codec_control(&codec, AV1D_GET_IMG_FORMAT, &ref_fmt))
+        die_codec(&codec, "Failed to get the image format");
+
+      int frame_res[2];
+      if (aom_codec_control(&codec, AV1D_GET_FRAME_SIZE, frame_res))
+        die_codec(&codec, "Failed to get the image frame size");
+
+      // Allocate memory to store decoded references. Allocate memory with the
+      // border so that it can be used as a reference.
+      for (j = 0; j < num_references; j++) {
+        unsigned int border = AOM_BORDER_IN_PIXELS;
+        if (!aom_img_alloc_with_border(&reference_images[j], ref_fmt,
+                                       frame_res[0], frame_res[1], 32, 8,
+                                       border)) {
+          die("Failed to allocate references.");
+        }
+      }
+    }
 
     if (aom_codec_control(&codec, AV1_COPY_NEW_FRAME_IMAGE,
                           &reference_images[i]))
@@ -126,13 +135,11 @@ int main(int argc, char **argv) {
   // Set external references.
   av1_ext_ref_frame_t set_ext_ref = { &reference_images[0], num_references };
   aom_codec_control_(&codec, AV1D_SET_EXT_REF_PTR, &set_ext_ref);
-
   // Must decode the camera frame header first.
   aom_video_reader_read_frame(reader);
   frame = aom_video_reader_get_frame(reader, &frame_size);
   if (aom_codec_decode(&codec, frame, frame_size, NULL))
     die_codec(&codec, "Failed to decode the frame.");
-
   // Decode tile lists one by one.
   for (n = 0; n < num_tile_lists; n++) {
     aom_video_reader_read_frame(reader);

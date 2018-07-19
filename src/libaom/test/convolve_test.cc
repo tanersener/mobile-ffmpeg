@@ -832,20 +832,30 @@ INSTANTIATE_TEST_CASE_P(SSSE3, ConvolveTest,
 #endif
 
 #if HAVE_AVX2
-const ConvolveFunctions convolve8_avx2(wrap_convolve_copy_avx2_8,
-                                       wrap_convolve8_horiz_avx2_8,
-                                       wrap_convolve8_vert_avx2_8, 8);
-const ConvolveFunctions convolve10_avx2(wrap_convolve_copy_avx2_10,
-                                        wrap_convolve8_horiz_avx2_10,
-                                        wrap_convolve8_vert_avx2_10, 10);
-const ConvolveFunctions convolve12_avx2(wrap_convolve_copy_avx2_12,
-                                        wrap_convolve8_horiz_avx2_12,
-                                        wrap_convolve8_vert_avx2_12, 12);
-const ConvolveParam kArrayConvolve8_avx2[] = { ALL_SIZES_64(convolve8_avx2),
-                                               ALL_SIZES_64(convolve10_avx2),
-                                               ALL_SIZES_64(convolve12_avx2) };
+const ConvolveFunctions convolve8_avx2(aom_convolve_copy_c,
+                                       aom_convolve8_horiz_avx2,
+                                       aom_convolve8_vert_avx2, 0);
+
+const ConvolveParam kArrayConvolve8_avx2[] = { ALL_SIZES(convolve8_avx2) };
 INSTANTIATE_TEST_CASE_P(AVX2, ConvolveTest,
                         ::testing::ValuesIn(kArrayConvolve8_avx2));
+#endif
+#if HAVE_AVX2
+const ConvolveFunctions wrap_convolve8_avx2(wrap_convolve_copy_avx2_8,
+                                            wrap_convolve8_horiz_avx2_8,
+                                            wrap_convolve8_vert_avx2_8, 8);
+const ConvolveFunctions wrap_convolve10_avx2(wrap_convolve_copy_avx2_10,
+                                             wrap_convolve8_horiz_avx2_10,
+                                             wrap_convolve8_vert_avx2_10, 10);
+const ConvolveFunctions wrap_convolve12_avx2(wrap_convolve_copy_avx2_12,
+                                             wrap_convolve8_horiz_avx2_12,
+                                             wrap_convolve8_vert_avx2_12, 12);
+const ConvolveParam kArray_wrap_Convolve8_avx2[] = {
+  ALL_SIZES_64(wrap_convolve8_avx2), ALL_SIZES_64(wrap_convolve10_avx2),
+  ALL_SIZES_64(wrap_convolve12_avx2)
+};
+INSTANTIATE_TEST_CASE_P(WRAP_AVX2, ConvolveTest,
+                        ::testing::ValuesIn(kArray_wrap_Convolve8_avx2));
 #endif  // HAVE_AVX2
 
 }  // namespace

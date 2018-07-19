@@ -604,6 +604,13 @@ static int main_loop(int argc, const char **argv_) {
       summary = 1;
     } else if (arg_match(&arg, &threadsarg, argi)) {
       cfg.threads = arg_parse_uint(&arg);
+#if !CONFIG_MULTITHREAD
+      if (cfg.threads > 1) {
+        die("Error: --threads=%d is not supported when CONFIG_MULTITHREAD = "
+            "0.\n",
+            cfg.threads);
+      }
+#endif
     } else if (arg_match(&arg, &rowmtarg, argi)) {
       row_mt = arg_parse_uint(&arg);
     } else if (arg_match(&arg, &verbosearg, argi)) {
@@ -920,9 +927,8 @@ static int main_loop(int argc, const char **argv_) {
         // Shift up or down if necessary
         if (output_bit_depth != 0) {
           const aom_img_fmt_t shifted_fmt =
-              output_bit_depth == 8
-                  ? img->fmt ^ (img->fmt & AOM_IMG_FMT_HIGHBITDEPTH)
-                  : img->fmt | AOM_IMG_FMT_HIGHBITDEPTH;
+              output_bit_depth == 8 ? img->fmt & ~AOM_IMG_FMT_HIGHBITDEPTH
+                                    : img->fmt | AOM_IMG_FMT_HIGHBITDEPTH;
 
           if (shifted_fmt != img->fmt || output_bit_depth != img->bit_depth) {
             if (img_shifted &&

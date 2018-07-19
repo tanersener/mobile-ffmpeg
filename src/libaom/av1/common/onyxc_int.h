@@ -253,12 +253,11 @@ typedef struct AV1Common {
   int last_height;
   int timing_info_present;
   aom_timing_info_t timing_info;
-  int buffer_removal_delay_present;
+  int buffer_removal_time_present;
   aom_dec_model_info_t buffer_model;
   aom_dec_model_op_parameters_t op_params[MAX_NUM_OPERATING_POINTS + 1];
   aom_op_timing_info_t op_frame_timing[MAX_NUM_OPERATING_POINTS + 1];
-  int tu_presentation_delay_flag;
-  int64_t tu_presentation_delay;
+  uint32_t frame_presentation_time;
 
   // TODO(jkoleszar): this implies chroma ss right now, but could vary per
   // plane. Revisit as part of the future change to YV12_BUFFER_CONFIG to
@@ -494,9 +493,9 @@ typedef struct AV1Common {
   ENTROPY_CONTEXT **above_context[MAX_MB_PLANE];
   TXFM_CONTEXT **above_txfm_context;
   WarpedMotionParams global_motion[REF_FRAMES];
-  aom_film_grain_table_t *film_grain_table;
   int film_grain_params_present;
   aom_film_grain_t film_grain_params;
+
   int cdef_pri_damping;
   int cdef_sec_damping;
   int nb_cdef_strengths;
@@ -1066,7 +1065,7 @@ static INLINE int max_intra_block_height(const MACROBLOCKD *xd,
   return ALIGN_POWER_OF_TWO(max_blocks_high, tx_size_high_log2[tx_size]);
 }
 
-static INLINE void av1_zero_above_context(AV1_COMMON *const cm,
+static INLINE void av1_zero_above_context(AV1_COMMON *const cm, const MACROBLOCKD *xd,
   int mi_col_start, int mi_col_end, const int tile_row) {
   const int num_planes = av1_num_planes(cm);
   const int width = mi_col_end - mi_col_start;
@@ -1084,7 +1083,7 @@ static INLINE void av1_zero_above_context(AV1_COMMON *const cm,
       av1_zero_array(cm->above_context[1][tile_row] + offset_uv, width_uv);
       av1_zero_array(cm->above_context[2][tile_row] + offset_uv, width_uv);
     } else {
-      aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
+      aom_internal_error(xd->error_info, AOM_CODEC_CORRUPT_FRAME,
                          "Invalid value of planes");
     }
   }

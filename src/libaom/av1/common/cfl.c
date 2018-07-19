@@ -18,14 +18,7 @@
 void cfl_init(CFL_CTX *cfl, AV1_COMMON *cm) {
   assert(block_size_wide[CFL_MAX_BLOCK_SIZE] == CFL_BUF_LINE);
   assert(block_size_high[CFL_MAX_BLOCK_SIZE] == CFL_BUF_LINE);
-  if (!(cm->subsampling_x == 0 && cm->subsampling_y == 0) &&
-      !(cm->subsampling_x == 1 && cm->subsampling_y == 1) &&
-      !(cm->subsampling_x == 1 && cm->subsampling_y == 0)) {
-    aom_internal_error(&cm->error, AOM_CODEC_UNSUP_BITSTREAM,
-                       "Only 4:4:4, 4:2:2 and 4:2:0 are currently supported by "
-                       "CfL, %d %d subsampling is not supported.\n",
-                       cm->subsampling_x, cm->subsampling_y);
-  }
+
   memset(&cfl->recon_buf_q3, 0, sizeof(cfl->recon_buf_q3));
   memset(&cfl->ac_buf_q3, 0, sizeof(cfl->ac_buf_q3));
   cfl->subsampling_x = cm->subsampling_x;

@@ -605,6 +605,12 @@ static INLINE int get_bitdepth_data_path_index(const MACROBLOCKD *xd) {
   return xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH ? 1 : 0;
 }
 
+static INLINE uint8_t *get_buf_by_bd(const MACROBLOCKD *xd, uint8_t *buf16) {
+  return (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH)
+             ? CONVERT_TO_BYTEPTR(buf16)
+             : buf16;
+}
+
 static INLINE int get_sqr_bsize_idx(BLOCK_SIZE bsize) {
   switch (bsize) {
     case BLOCK_4X4: return 0;
@@ -672,6 +678,15 @@ static const int av1_ext_tx_used[EXT_TX_SET_TYPES][TX_TYPES] = {
   { 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0 },
   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
   { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+};
+
+static const uint16_t av1_ext_tx_used_flag[EXT_TX_SET_TYPES] = {
+  0x0001,  // 0000 0000 0000 0001
+  0x0201,  // 0000 0010 0000 0001
+  0x020F,  // 0000 0010 0000 1111
+  0x0E0F,  // 0000 1110 0000 1111
+  0x0FFF,  // 0000 1111 1111 1111
+  0xFFFF,  // 1111 1111 1111 1111
 };
 
 static INLINE TxSetType av1_get_ext_tx_set_type(TX_SIZE tx_size, int is_inter,

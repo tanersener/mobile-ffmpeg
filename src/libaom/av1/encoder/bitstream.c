@@ -1704,7 +1704,7 @@ static void write_modes(AV1_COMP *const cpi, const TileInfo *const tile,
   const int mi_col_end = tile->mi_col_end;
   int mi_row, mi_col;
 
-  av1_zero_above_context(cm, mi_col_start, mi_col_end, tile->tile_row);
+  av1_zero_above_context(cm, xd, mi_col_start, mi_col_end, tile->tile_row);
   av1_init_above_context(cm, xd, tile->tile_row);
 
   if (cpi->common.delta_q_present_flag) {
@@ -2239,7 +2239,8 @@ static int get_refresh_mask_gf16(AV1_COMP *cpi) {
 #endif  // USE_GF16_MULTI_LAYER
 
 static int get_refresh_mask(AV1_COMP *cpi) {
-  if (cpi->common.frame_type == KEY_FRAME || frame_is_sframe(&cpi->common))
+  if ((cpi->common.frame_type == KEY_FRAME && cpi->common.show_frame) ||
+      frame_is_sframe(&cpi->common))
     return 0xFF;
 
   int refresh_mask = 0;
@@ -2257,9 +2258,15 @@ static int get_refresh_mask(AV1_COMP *cpi) {
   //     LAST3_FRAME.
   refresh_mask |=
       (cpi->refresh_last_frame << cpi->ref_fb_idx[LAST_REF_FRAMES - 1]);
-
+#if USE_SYMM_MULTI_LAYER
+  refresh_mask |=
+      (cpi->new_bwdref_update_rule == 1)
+          ? (cpi->refresh_bwd_ref_frame << cpi->ref_fb_idx[EXTREF_FRAME - 1])
+          : (cpi->refresh_bwd_ref_frame << cpi->ref_fb_idx[BWDREF_FRAME - 1]);
+#else
   refresh_mask |=
       (cpi->refresh_bwd_ref_frame << cpi->ref_fb_idx[BWDREF_FRAME - 1]);
+#endif
   refresh_mask |=
       (cpi->refresh_alt2_ref_frame << cpi->ref_fb_idx[ALTREF2_FRAME - 1]);
 
@@ -2516,8 +2523,8 @@ static void write_decoder_model_info(AV1_COMMON *const cm,
       wb, cm->buffer_model.encoder_decoder_buffer_delay_length - 1, 5);
   aom_wb_write_unsigned_literal(wb, cm->buffer_model.num_units_in_decoding_tick,
                                 32);  // Number of units in decoding tick
-  aom_wb_write_literal(wb, cm->buffer_model.buffer_removal_delay_length - 1, 5);
-  aom_wb_write_literal(wb, cm->buffer_model.frame_presentation_delay_length - 1,
+  aom_wb_write_literal(wb, cm->buffer_model.buffer_removal_time_length - 1, 5);
+  aom_wb_write_literal(wb, cm->buffer_model.frame_presentation_time_length - 1,
                        5);
 }
 
@@ -2532,23 +2539,25 @@ static void write_dec_model_op_parameters(AV1_COMMON *const cm,
   //  aom_wb_write_bit(wb, cm->op_params[op_num].has_parameters);
   //  if (!cm->op_params[op_num].has_parameters) return;
 
-  aom_wb_write_literal(wb, cm->op_params[op_num].decoder_buffer_delay,
-                       cm->buffer_model.encoder_decoder_buffer_delay_length);
+  aom_wb_write_unsigned_literal(
+      wb, cm->op_params[op_num].decoder_buffer_delay,
+      cm->buffer_model.encoder_decoder_buffer_delay_length);
 
-  aom_wb_write_literal(wb, cm->op_params[op_num].encoder_buffer_delay,
-                       cm->buffer_model.encoder_decoder_buffer_delay_length);
+  aom_wb_write_unsigned_literal(
+      wb, cm->op_params[op_num].encoder_buffer_delay,
+      cm->buffer_model.encoder_decoder_buffer_delay_length);
 
   aom_wb_write_bit(wb, cm->op_params[op_num].low_delay_mode_flag);
 
-  cm->op_frame_timing[op_num].buffer_removal_delay =
+  cm->op_frame_timing[op_num].buffer_removal_time =
       0;  // reset the decoded frame counter
 }
 
 static void write_tu_pts_info(AV1_COMMON *const cm,
                               struct aom_write_bit_buffer *wb) {
   aom_wb_write_unsigned_literal(
-      wb, (uint32_t)cm->tu_presentation_delay,
-      cm->buffer_model.frame_presentation_delay_length);
+      wb, cm->frame_presentation_time,
+      cm->buffer_model.frame_presentation_time_length);
 }
 
 static void write_film_grain_params(AV1_COMP *cpi,
@@ -3048,8 +3057,8 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
   }
 
   if (cm->seq_params.decoder_model_info_present_flag) {
-    aom_wb_write_bit(wb, cm->buffer_removal_delay_present);
-    if (cm->buffer_removal_delay_present) {
+    aom_wb_write_bit(wb, cm->buffer_removal_time_present);
+    if (cm->buffer_removal_time_present) {
       for (int op_num = 0;
            op_num < cm->seq_params.operating_points_cnt_minus_1 + 1; op_num++) {
         if (cm->op_params[op_num].decoder_model_param_present_flag) {
@@ -3060,10 +3069,14 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
                 (cm->spatial_layer_id + 8)) &
                    0x1) ||
               cm->seq_params.operating_point_idc[op_num] == 0) {
-            aom_wb_write_literal(
-                wb, (uint32_t)cm->op_frame_timing[op_num].buffer_removal_delay,
-                cm->buffer_model.buffer_removal_delay_length);
-            cm->op_frame_timing[op_num].buffer_removal_delay++;
+            aom_wb_write_unsigned_literal(
+                wb, cm->op_frame_timing[op_num].buffer_removal_time,
+                cm->buffer_model.buffer_removal_time_length);
+            cm->op_frame_timing[op_num].buffer_removal_time++;
+            if (cm->op_frame_timing[op_num].buffer_removal_time == 0) {
+              aom_internal_error(&cm->error, AOM_CODEC_UNSUP_BITSTREAM,
+                                 "buffer_removal_time overflowed");
+            }
           }
         }
       }
@@ -3959,7 +3972,7 @@ int av1_pack_bitstream(AV1_COMP *const cpi, uint8_t *dst, size_t *size) {
   // The TD is now written outside the frame encode loop
 
   // write sequence header obu if KEY_FRAME, preceded by 4-byte size
-  if (cm->frame_type == KEY_FRAME) {
+  if (cm->frame_type == KEY_FRAME && cm->show_frame) {
     obu_header_size = write_obu_header(OBU_SEQUENCE_HEADER, 0, data);
 
     obu_payload_size = write_sequence_header_obu(cpi, data + obu_header_size);

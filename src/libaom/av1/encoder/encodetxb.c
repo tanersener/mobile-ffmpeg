@@ -1580,9 +1580,14 @@ int av1_optimize_txb_new(const struct AV1_COMP *cpi, MACROBLOCK *x, int plane,
   const int64_t rdmult =
       ((x->rdmult * plane_rd_mult[is_inter][plane_type] << (2 * (xd->bd - 8))) +
        2) >>
-      (sharpness + (cpi->oxcf.aq_mode == VARIANCE_AQ && mbmi->segment_id < 4
-                        ? 7 - mbmi->segment_id
-                        : 2));
+      (sharpness +
+       (cpi->oxcf.aq_mode == VARIANCE_AQ && mbmi->segment_id < 4
+            ? 7 - mbmi->segment_id
+            : 2) +
+       (cpi->oxcf.aq_mode != VARIANCE_AQ &&
+                cpi->oxcf.deltaq_mode > NO_DELTA_Q && x->sb_energy_level < 0
+            ? (3 - x->sb_energy_level)
+            : 0));
 
   uint8_t levels_buf[TX_PAD_2D];
   uint8_t *const levels = set_levels(levels_buf, width);

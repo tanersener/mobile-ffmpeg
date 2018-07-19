@@ -1185,29 +1185,18 @@ void aom_highbd_comp_mask_pred_c(uint16_t *comp_pred, const uint8_t *pred8,
   }
 }
 
-void aom_highbd_comp_mask_upsampled_pred_c(
+void aom_highbd_comp_mask_upsampled_pred(
     MACROBLOCKD *xd, const struct AV1Common *const cm, int mi_row, int mi_col,
     const MV *const mv, uint16_t *comp_pred, const uint8_t *pred8, int width,
     int height, int subpel_x_q3, int subpel_y_q3, const uint8_t *ref8,
     int ref_stride, const uint8_t *mask, int mask_stride, int invert_mask,
     int bd) {
-  int i, j;
-
-  uint16_t *pred = CONVERT_TO_SHORTPTR(pred8);
   aom_highbd_upsampled_pred(xd, cm, mi_row, mi_col, mv, comp_pred, width,
                             height, subpel_x_q3, subpel_y_q3, ref8, ref_stride,
                             bd);
-  for (i = 0; i < height; ++i) {
-    for (j = 0; j < width; ++j) {
-      if (!invert_mask)
-        comp_pred[j] = AOM_BLEND_A64(mask[j], comp_pred[j], pred[j]);
-      else
-        comp_pred[j] = AOM_BLEND_A64(mask[j], pred[j], comp_pred[j]);
-    }
-    comp_pred += width;
-    pred += width;
-    mask += mask_stride;
-  }
+  aom_highbd_comp_mask_pred(comp_pred, pred8, width, height,
+                            CONVERT_TO_BYTEPTR(comp_pred), width, mask,
+                            mask_stride, invert_mask);
 }
 
 #define HIGHBD_MASK_SUBPIX_VAR(W, H)                                           \

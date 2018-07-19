@@ -69,7 +69,7 @@ class TestVectorTest : public ::libaom_test::DecoderTest,
     ::libaom_test::MD5 md5_res;
 #if !CONFIG_LOWBITDEPTH
     const aom_img_fmt_t shifted_fmt =
-        (aom_img_fmt)(img.fmt ^ (img.fmt & AOM_IMG_FMT_HIGHBITDEPTH));
+        (aom_img_fmt)(img.fmt & ~AOM_IMG_FMT_HIGHBITDEPTH);
     if (img.bit_depth == 8 && shifted_fmt != img.fmt) {
       aom_image_t *img_shifted =
           aom_img_alloc(NULL, shifted_fmt, img.d_w, img.d_h, 16);
@@ -144,9 +144,6 @@ TEST_P(TestVectorTest, MD5Match) {
   ASSERT_NO_FATAL_FAILURE(RunLoop(video.get(), cfg));
 }
 
-// TODO(yaowu): Current md5 check works only when CONFIG_LOWBITDEPTH is enabled,
-// remove CONFIG_LOWBITDEPTH when md5 check is reworked to be compatible with
-// CONFIG_LOWBITDEPTH = 0
 #if CONFIG_AV1_DECODER
 AV1_INSTANTIATE_TEST_CASE(
     TestVectorTest,

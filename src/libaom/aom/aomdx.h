@@ -119,6 +119,12 @@ enum aom_dec_control_id {
   /** control function to get the bit depth of the stream. */
   AV1D_GET_BIT_DEPTH,
 
+  /** control function to get the image format of the stream. */
+  AV1D_GET_IMG_FORMAT,
+
+  /** control function to get the size of the tile. */
+  AV1D_GET_TILE_SIZE,
+
   /** control function to set the byte alignment of the planes in the reference
    * buffers. Valid values are power of 2, from 32 to 1024. A value of 0 sets
    * legacy alignment. I.e. Y plane is aligned to 32 bytes, U plane directly
@@ -244,6 +250,10 @@ AOM_CTRL_USE_TYPE(AV1D_GET_DISPLAY_SIZE, int *)
 #define AOM_CTRL_AV1D_GET_DISPLAY_SIZE
 AOM_CTRL_USE_TYPE(AV1D_GET_BIT_DEPTH, unsigned int *)
 #define AOM_CTRL_AV1D_GET_BIT_DEPTH
+AOM_CTRL_USE_TYPE(AV1D_GET_IMG_FORMAT, aom_img_fmt_t *)
+#define AOM_CTRL_AV1D_GET_IMG_FORMAT
+AOM_CTRL_USE_TYPE(AV1D_GET_TILE_SIZE, unsigned int *)
+#define AOM_CTRL_AV1D_GET_TILE_SIZE
 AOM_CTRL_USE_TYPE(AV1D_GET_FRAME_SIZE, int *)
 #define AOM_CTRL_AV1D_GET_FRAME_SIZE
 AOM_CTRL_USE_TYPE(AV1_INVERT_TILE_DECODE_ORDER, int)

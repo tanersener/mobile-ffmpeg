@@ -290,7 +290,7 @@ static int read_segment_id(AV1_COMMON *const cm, const MACROBLOCKD *const xd,
       av1_neg_deinterleave(coded_id, pred, seg->last_active_segid + 1);
 
   if (segment_id < 0 || segment_id > seg->last_active_segid) {
-    aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
+    aom_internal_error(xd->error_info, AOM_CODEC_CORRUPT_FRAME,
                        "Corrupted segment_ids");
   }
   return segment_id;
@@ -1299,7 +1299,7 @@ static void read_inter_block_mode_info(AV1Decoder *const pbi,
   }
 
   if (is_compound != is_inter_compound_mode(mbmi->mode)) {
-    aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
+    aom_internal_error(xd->error_info, AOM_CODEC_CORRUPT_FRAME,
                        "Prediction mode %d invalid with ref frame %d %d",
                        mbmi->mode, mbmi->ref_frame[0], mbmi->ref_frame[1]);
   }

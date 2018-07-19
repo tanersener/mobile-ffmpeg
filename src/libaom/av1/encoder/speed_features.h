@@ -413,8 +413,8 @@ typedef struct SPEED_FEATURES {
   // rd than partition type split.
   int less_rectangular_check;
 
-  // Disable testing non square partitions. (eg 16x32)
-  int use_square_partition_only;
+  // Use square partition only beyond this block size.
+  BLOCK_SIZE use_square_partition_only_threshold;
 
   // Sets min and max partition sizes for this superblock based on the
   // same superblock in last encoded frame, and the left and above neighbor.
