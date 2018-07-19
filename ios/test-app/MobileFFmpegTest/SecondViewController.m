@@ -190,8 +190,8 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
         extension = @"mp4";
     }
     
-    NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
-    return [[resourceFolder stringByAppendingPathComponent: @"slideshow."] stringByAppendingString: extension];
+    NSString* docFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    return [[docFolder stringByAppendingPathComponent: @"slideshow."] stringByAppendingString: extension];
 }
 
 - (NSString *) getCustomOptions {
