@@ -8,7 +8,7 @@
 <link rel="up" href="intro.html" title="GnuTLS API Reference Manual">
 <link rel="prev" href="gnutls-abstract.html" title="abstract">
 <link rel="next" href="gnutls-openpgp.html" title="openpgp">
-<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.28 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -2078,8 +2078,6 @@
 </div>
 <div class="refsect1">
 <a name="gnutls-x509.description"></a><h2>Description</h2>
-<p>
-</p>
 </div>
 <div class="refsect1">
 <a name="gnutls-x509.functions_details"></a><h2>Functions</h2>
@@ -4221,6 +4219,16 @@ number on success.</p>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
+<td class="parameter_name"><p>trusted_cas</p></td>
+<td class="parameter_description"><p>is a certificate list that is considered to be trusted one</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>tcas_size</p></td>
+<td class="parameter_description"><p>holds the number of CA certificates in CA_list</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
 <td class="parameter_name"><p>flags</p></td>
 <td class="parameter_description"><p>Flags that may be used to change the verification algorithm. Use OR of the gnutls_certificate_verify_flags enumerations.</p></td>
 <td class="parameter_annotations"> </td>
@@ -4405,6 +4413,12 @@ specifies which to get, use (0) to get the first one</p></td>
 <tr>
 <td class="parameter_name"><p>buf</p></td>
 <td class="parameter_description"><p>a pointer to a structure to hold the attribute data (may be <code class="literal">NULL</code>)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>buf_size</p></td>
+<td class="parameter_description"><p>initially holds the size of <em class="parameter"><code>buf</code></em>
+</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -4619,6 +4633,12 @@ revocation of the certificate.</p>
 <td class="parameter_description"><p>will hold a (0)-terminated password string</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
+<tr>
+<td class="parameter_name"><p>pass_size</p></td>
+<td class="parameter_description"><p>Initially holds the size of <em class="parameter"><code>pass</code></em>
+.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
 </tbody>
 </table></div>
 </div>
@@ -4660,6 +4680,12 @@ that is required see <code class="function">gnutls_x509_crq_get_dn3()</code>.</p
 <tr>
 <td class="parameter_name"><p>buf</p></td>
 <td class="parameter_description"><p>a pointer to a structure to hold the name (may be <code class="literal">NULL</code>)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>buf_size</p></td>
+<td class="parameter_description"><p>initially holds the size of <em class="parameter"><code>buf</code></em>
+</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -4725,6 +4751,12 @@ which to get. Use (0) to get the first one.</p></td>
 <tr>
 <td class="parameter_name"><p>buf</p></td>
 <td class="parameter_description"><p>a pointer to a structure to hold the name (may be <code class="literal">NULL</code>)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>buf_size</p></td>
+<td class="parameter_description"><p>initially holds the size of <em class="parameter"><code>buf</code></em>
+</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -4830,6 +4862,12 @@ specifies which to get. Use (0) to get the first one.</p></td>
 <tr>
 <td class="parameter_name"><p>buf</p></td>
 <td class="parameter_description"><p>a pointer to a structure to hold the name (may be null)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>buf_size</p></td>
+<td class="parameter_description"><p>initially holds the size of <em class="parameter"><code>buf</code></em>
+</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -5242,6 +5280,11 @@ times of the private key of the certificate.</p>
 </colgroup>
 <tbody>
 <tr>
+<td class="parameter_name"><p>crq</p></td>
+<td class="parameter_description"><p>should contain a <a class="link" href="gnutls-gnutls.html#gnutls-x509-crq-t" title="gnutls_x509_crq_t"><span class="type">gnutls_x509_crq_t</span></a> type</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
 <td class="parameter_name"><p>activation</p></td>
 <td class="parameter_description"><p>The activation time</p></td>
 <td class="parameter_annotations"> </td>
@@ -5586,6 +5629,12 @@ appended to the request. Their interpretation depends on the CA policy.</p>
 <tr>
 <td class="parameter_name"><p>buf</p></td>
 <td class="parameter_description"><p>a pointer to a structure that holds the attribute data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>buf_size</p></td>
+<td class="parameter_description"><p>holds the size of <em class="parameter"><code>buf</code></em>
+</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -6816,6 +6865,16 @@ Extensions.</p>
 <tr>
 <td class="parameter_name"><p>seq</p></td>
 <td class="parameter_description"><p>specifies the sequence number of the distribution point (0 for the first one, 1 for the second etc.)</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>san</p></td>
+<td class="parameter_description"><p>is the place where the distribution point will be copied to</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>san_size</p></td>
+<td class="parameter_description"><p>holds the size of ret.</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -8336,11 +8395,18 @@ the length. This points to allocated data that must be free'd using <code class=
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
 <td class="parameter_name"><p>cert</p></td>
 <td class="parameter_description"><p>should contain a <a class="link" href="gnutls-gnutls.html#gnutls-x509-crt-t" title="gnutls_x509_crt_t"><span class="type">gnutls_x509_crt_t</span></a> type</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="parameter_name"><p>dn</p></td>
+<td class="parameter_description"><p>will hold the starting point of the DN</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -8365,11 +8431,18 @@ and the length. This points to allocated data that must be free'd using <code cl
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
 <td class="parameter_name"><p>cert</p></td>
 <td class="parameter_description"><p>should contain a <a class="link" href="gnutls-gnutls.html#gnutls-x509-crt-t" title="gnutls_x509_crt_t"><span class="type">gnutls_x509_crt_t</span></a> type</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="parameter_name"><p>dn</p></td>
+<td class="parameter_description"><p>will hold the starting point of the DN</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -8447,6 +8520,12 @@ gnutls_x509_crt_get_signature (<em class="parameter"><code><a class="link" href=
 <tr>
 <td class="parameter_name"><p>sig</p></td>
 <td class="parameter_description"><p>a pointer where the signature part will be copied (may be null).</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>sig_size</p></td>
+<td class="parameter_description"><p>initially holds the size of <em class="parameter"><code>sig</code></em>
+</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -12288,6 +12367,12 @@ that is required see <code class="function">gnutls_x509_rdn_get2()</code>.</p>
 <td class="parameter_description"><p>a pointer to a structure to hold the peer's name</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
+<tr>
+<td class="parameter_name"><p>buf_size</p></td>
+<td class="parameter_description"><p>holds the size of <em class="parameter"><code>buf</code></em>
+</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
 </tbody>
 </table></div>
 </div>
@@ -12348,6 +12433,12 @@ to send. Use 0 for the first one.</p></td>
 <td class="parameter_description"><p>a pointer to a structure to hold the peer's name</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
+<tr>
+<td class="parameter_name"><p>buf_size</p></td>
+<td class="parameter_description"><p>holds the size of <em class="parameter"><code>buf</code></em>
+</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
 </tbody>
 </table></div>
 </div>
@@ -12392,6 +12483,12 @@ RDN sequence.</p>
 <tr>
 <td class="parameter_name"><p>buf</p></td>
 <td class="parameter_description"><p>a pointer to a structure to hold the peer's name OID</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>buf_size</p></td>
+<td class="parameter_description"><p>holds the size of <em class="parameter"><code>buf</code></em>
+</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -12924,6 +13021,11 @@ its status. The <em class="parameter"><code>voutput</code></em>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
+<td class="parameter_name"><p>voutput</p></td>
+<td class="parameter_description"><p>will hold the certificate verification output.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
 <td class="parameter_name"><p>func</p></td>
 <td class="parameter_description"><p>If non-null will be called on each chain element verification with the output.</p></td>
 <td class="parameter_annotations"> </td>
@@ -12995,6 +13097,11 @@ flags.</p>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
+<td class="parameter_name"><p>voutput</p></td>
+<td class="parameter_description"><p>will hold the certificate verification output.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
 <td class="parameter_name"><p>func</p></td>
 <td class="parameter_description"><p>If non-null will be called on each chain element verification with the output.</p></td>
 <td class="parameter_annotations"> </td>
@@ -13016,352 +13123,264 @@ negative error value.</p>
 <a name="GNUTLS-CRL-REASON-SUPERSEEDED:CAPS"></a><h3>GNUTLS_CRL_REASON_SUPERSEEDED</h3>
 <pre class="programlisting">#define GNUTLS_CRL_REASON_SUPERSEEDED GNUTLS_CRL_REASON_SUPERSEDED,
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-FSAN-APPEND:CAPS"></a><h3>GNUTLS_FSAN_APPEND</h3>
 <pre class="programlisting">#define GNUTLS_FSAN_APPEND 1
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-FSAN-SET:CAPS"></a><h3>GNUTLS_FSAN_SET</h3>
 <pre class="programlisting">#define GNUTLS_FSAN_SET 0
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KP-ANY:CAPS"></a><h3>GNUTLS_KP_ANY</h3>
 <pre class="programlisting">#define GNUTLS_KP_ANY				"2.5.29.37.0"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KP-CODE-SIGNING:CAPS"></a><h3>GNUTLS_KP_CODE_SIGNING</h3>
 <pre class="programlisting">#define GNUTLS_KP_CODE_SIGNING			"1.3.6.1.5.5.7.3.3"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KP-EMAIL-PROTECTION:CAPS"></a><h3>GNUTLS_KP_EMAIL_PROTECTION</h3>
 <pre class="programlisting">#define GNUTLS_KP_EMAIL_PROTECTION		"1.3.6.1.5.5.7.3.4"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KP-IPSEC-IKE:CAPS"></a><h3>GNUTLS_KP_IPSEC_IKE</h3>
 <pre class="programlisting">#define GNUTLS_KP_IPSEC_IKE			"1.3.6.1.5.5.7.3.17"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KP-MS-SMART-CARD-LOGON:CAPS"></a><h3>GNUTLS_KP_MS_SMART_CARD_LOGON</h3>
 <pre class="programlisting">#define GNUTLS_KP_MS_SMART_CARD_LOGON		"1.3.6.1.4.1.311.20.2.2"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KP-OCSP-SIGNING:CAPS"></a><h3>GNUTLS_KP_OCSP_SIGNING</h3>
 <pre class="programlisting">#define GNUTLS_KP_OCSP_SIGNING			"1.3.6.1.5.5.7.3.9"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KP-TIME-STAMPING:CAPS"></a><h3>GNUTLS_KP_TIME_STAMPING</h3>
 <pre class="programlisting">#define GNUTLS_KP_TIME_STAMPING			"1.3.6.1.5.5.7.3.8"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KP-TLS-WWW-CLIENT:CAPS"></a><h3>GNUTLS_KP_TLS_WWW_CLIENT</h3>
 <pre class="programlisting">#define GNUTLS_KP_TLS_WWW_CLIENT                "1.3.6.1.5.5.7.3.2"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KP-TLS-WWW-SERVER:CAPS"></a><h3>GNUTLS_KP_TLS_WWW_SERVER</h3>
 <pre class="programlisting">#define GNUTLS_KP_TLS_WWW_SERVER		"1.3.6.1.5.5.7.3.1"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-MAX-QUALIFIERS:CAPS"></a><h3>GNUTLS_MAX_QUALIFIERS</h3>
 <pre class="programlisting">#define GNUTLS_MAX_QUALIFIERS 8
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-AD-CAISSUERS:CAPS"></a><h3>GNUTLS_OID_AD_CAISSUERS</h3>
 <pre class="programlisting">#define GNUTLS_OID_AD_CAISSUERS			"1.3.6.1.5.5.7.48.2"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-AD-OCSP:CAPS"></a><h3>GNUTLS_OID_AD_OCSP</h3>
 <pre class="programlisting">#define GNUTLS_OID_AD_OCSP			"1.3.6.1.5.5.7.48.1"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-AIA:CAPS"></a><h3>GNUTLS_OID_AIA</h3>
 <pre class="programlisting">#define GNUTLS_OID_AIA				"1.3.6.1.5.5.7.1.1"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-LDAP-DC:CAPS"></a><h3>GNUTLS_OID_LDAP_DC</h3>
 <pre class="programlisting">#define GNUTLS_OID_LDAP_DC			"0.9.2342.19200300.100.1.25"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-LDAP-UID:CAPS"></a><h3>GNUTLS_OID_LDAP_UID</h3>
 <pre class="programlisting">#define GNUTLS_OID_LDAP_UID			"0.9.2342.19200300.100.1.1"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-PKCS9-EMAIL:CAPS"></a><h3>GNUTLS_OID_PKCS9_EMAIL</h3>
 <pre class="programlisting">#define GNUTLS_OID_PKCS9_EMAIL			"1.2.840.113549.1.9.1"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-PKIX-COUNTRY-OF-CITIZENSHIP:CAPS"></a><h3>GNUTLS_OID_PKIX_COUNTRY_OF_CITIZENSHIP</h3>
 <pre class="programlisting">#define GNUTLS_OID_PKIX_COUNTRY_OF_CITIZENSHIP "1.3.6.1.5.5.7.9.4"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-PKIX-COUNTRY-OF-RESIDENCE:CAPS"></a><h3>GNUTLS_OID_PKIX_COUNTRY_OF_RESIDENCE</h3>
 <pre class="programlisting">#define GNUTLS_OID_PKIX_COUNTRY_OF_RESIDENCE "1.3.6.1.5.5.7.9.5"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-PKIX-DATE-OF-BIRTH:CAPS"></a><h3>GNUTLS_OID_PKIX_DATE_OF_BIRTH</h3>
 <pre class="programlisting">#define GNUTLS_OID_PKIX_DATE_OF_BIRTH		"1.3.6.1.5.5.7.9.1"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-PKIX-GENDER:CAPS"></a><h3>GNUTLS_OID_PKIX_GENDER</h3>
 <pre class="programlisting">#define GNUTLS_OID_PKIX_GENDER			"1.3.6.1.5.5.7.9.3"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-PKIX-PLACE-OF-BIRTH:CAPS"></a><h3>GNUTLS_OID_PKIX_PLACE_OF_BIRTH</h3>
 <pre class="programlisting">#define GNUTLS_OID_PKIX_PLACE_OF_BIRTH		"1.3.6.1.5.5.7.9.2"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-COMMON-NAME:CAPS"></a><h3>GNUTLS_OID_X520_COMMON_NAME</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_COMMON_NAME		"2.5.4.3"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-COUNTRY-NAME:CAPS"></a><h3>GNUTLS_OID_X520_COUNTRY_NAME</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_COUNTRY_NAME		"2.5.4.6"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-DN-QUALIFIER:CAPS"></a><h3>GNUTLS_OID_X520_DN_QUALIFIER</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_DN_QUALIFIER		"2.5.4.46"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-GENERATION-QUALIFIER:CAPS"></a><h3>GNUTLS_OID_X520_GENERATION_QUALIFIER</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_GENERATION_QUALIFIER "2.5.4.44"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-GIVEN-NAME:CAPS"></a><h3>GNUTLS_OID_X520_GIVEN_NAME</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_GIVEN_NAME		"2.5.4.42"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-INITIALS:CAPS"></a><h3>GNUTLS_OID_X520_INITIALS</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_INITIALS		"2.5.4.43"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-LOCALITY-NAME:CAPS"></a><h3>GNUTLS_OID_X520_LOCALITY_NAME</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_LOCALITY_NAME		"2.5.4.7"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-NAME:CAPS"></a><h3>GNUTLS_OID_X520_NAME</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_NAME                    "2.5.4.41"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-ORGANIZATIONAL-UNIT-NAME:CAPS"></a><h3>GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_ORGANIZATIONAL_UNIT_NAME "2.5.4.11"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-ORGANIZATION-NAME:CAPS"></a><h3>GNUTLS_OID_X520_ORGANIZATION_NAME</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_ORGANIZATION_NAME "2.5.4.10"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-POSTALCODE:CAPS"></a><h3>GNUTLS_OID_X520_POSTALCODE</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_POSTALCODE              "2.5.4.17"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-PSEUDONYM:CAPS"></a><h3>GNUTLS_OID_X520_PSEUDONYM</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_PSEUDONYM		"2.5.4.65"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-STATE-OR-PROVINCE-NAME:CAPS"></a><h3>GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_STATE_OR_PROVINCE_NAME "2.5.4.8"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-SURNAME:CAPS"></a><h3>GNUTLS_OID_X520_SURNAME</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_SURNAME			"2.5.4.4"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-OID-X520-TITLE:CAPS"></a><h3>GNUTLS_OID_X520_TITLE</h3>
 <pre class="programlisting">#define GNUTLS_OID_X520_TITLE			"2.5.4.12"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS8-PLAIN:CAPS"></a><h3>GNUTLS_PKCS8_PLAIN</h3>
 <pre class="programlisting">#define GNUTLS_PKCS8_PLAIN GNUTLS_PKCS_PLAIN
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS8-USE-PKCS12-3DES:CAPS"></a><h3>GNUTLS_PKCS8_USE_PKCS12_3DES</h3>
 <pre class="programlisting">#define GNUTLS_PKCS8_USE_PKCS12_3DES GNUTLS_PKCS_PKCS12_3DES
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS8-USE-PKCS12-ARCFOUR:CAPS"></a><h3>GNUTLS_PKCS8_USE_PKCS12_ARCFOUR</h3>
 <pre class="programlisting">#define GNUTLS_PKCS8_USE_PKCS12_ARCFOUR GNUTLS_PKCS_PKCS12_ARCFOUR
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS8-USE-PKCS12-RC2-40:CAPS"></a><h3>GNUTLS_PKCS8_USE_PKCS12_RC2_40</h3>
 <pre class="programlisting">#define GNUTLS_PKCS8_USE_PKCS12_RC2_40 GNUTLS_PKCS_PKCS12_RC2_40
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-X509-DN-OID-RETURN-OID:CAPS"></a><h3>GNUTLS_X509_DN_OID_RETURN_OID</h3>
 <pre class="programlisting">#define GNUTLS_X509_DN_OID_RETURN_OID 1
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -13573,8 +13592,8 @@ and <code class="literal">gnutls_certificate_verification_profiles_t</code>.</p>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-IA-UNKNOWN:CAPS"></a>GNUTLS_IA_UNKNOWN</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-IA-OCSP-URI:CAPS"></a>GNUTLS_IA_OCSP_URI</p></td>
@@ -13607,16 +13626,12 @@ and <code class="literal">gnutls_certificate_verification_profiles_t</code>.</p>
 	unsigned expanded;
 } gnutls_pkcs7_int;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-pkcs7-t"></a><h3>gnutls_pkcs7_t</h3>
 <pre class="programlisting">typedef struct gnutls_pkcs7_int *gnutls_pkcs7_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -13703,8 +13718,8 @@ and <code class="literal">gnutls_certificate_verification_profiles_t</code>.</p>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-PKCS-PBES1-DES-MD5:CAPS"></a>GNUTLS_PKCS_PBES1_DES_MD5</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 </tbody>
 </table></div>
@@ -13715,16 +13730,12 @@ and <code class="literal">gnutls_certificate_verification_profiles_t</code>.</p>
 <a name="gnutls-x509-crl-get-certificate"></a><h3>gnutls_x509_crl_get_certificate</h3>
 <pre class="programlisting">#define gnutls_x509_crl_get_certificate gnutls_x509_crl_get_crt_serial
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-x509-crl-get-certificate-count"></a><h3>gnutls_x509_crl_get_certificate_count</h3>
 <pre class="programlisting">#define gnutls_x509_crl_get_certificate_count gnutls_x509_crl_get_crt_count
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -13741,8 +13752,8 @@ and <code class="literal">gnutls_certificate_verification_profiles_t</code>.</p>
 <tbody>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-CRL-REASON-UNSPECIFIED:CAPS"></a>GNUTLS_CRL_REASON_UNSPECIFIED</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-CRL-REASON-PRIVILEGE-WITHDRAWN:CAPS"></a>GNUTLS_CRL_REASON_PRIVILEGE_WITHDRAWN</p></td>
@@ -13816,8 +13827,6 @@ and <code class="literal">gnutls_certificate_verification_profiles_t</code>.</p>
 <a name="gnutls-x509-dn-t"></a><h3>gnutls_x509_dn_t</h3>
 <pre class="programlisting">typedef struct gnutls_x509_dn_st *gnutls_x509_dn_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -13848,8 +13857,8 @@ and <code class="literal">gnutls_certificate_verification_profiles_t</code>.</p>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-X509-QUALIFIER-NOTICE:CAPS"></a>GNUTLS_X509_QUALIFIER_NOTICE</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 </tbody>
 </table></div>
@@ -13860,12 +13869,10 @@ and <code class="literal">gnutls_certificate_verification_profiles_t</code>.</p>
 <a name="gnutls-x509-trust-list-t"></a><h3>gnutls_x509_trust_list_t</h3>
 <pre class="programlisting">typedef struct gnutls_x509_trust_list_st *gnutls_x509_trust_list_t;
 </pre>
-<p>
-</p>
 </div>
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.25</div>
+<hr>Generated by GTK-Doc V1.28</div>
 </body>
 </html>

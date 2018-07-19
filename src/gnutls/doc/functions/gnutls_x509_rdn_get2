@@ -5,9 +5,9 @@
 @deftypefun {int} {gnutls_x509_rdn_get2} (const gnutls_datum_t * @var{idn}, gnutls_datum_t * @var{str}, unsigned @var{flags})
 @var{idn}: should contain a DER encoded RDN sequence
 
-@var{str}: -- undescribed --
+@var{str}: a datum that will hold the name
 
-@var{flags}: -- undescribed --
+@var{flags}: zero of @code{GNUTLS_X509_DN_FLAG_COMPAT} 
 
 This function will return the name of the given RDN sequence.  The
 name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in

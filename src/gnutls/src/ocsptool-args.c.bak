@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for ocsptool options
  */
 static char const ocsptool_opt_strs[2316] =
-/*     0 */ "ocsptool 3.5.18\n"
+/*     0 */ "ocsptool 3.5.19\n"
             "Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -147,7 +147,7 @@ static char const ocsptool_opt_strs[2316] =
 /*  2107 */ "\n\0"
 /*  2109 */ "Ocsptool is a program that can parse and print information about OCSP\n"
             "requests/responses, generate requests and verify responses.\n\0"
-/*  2240 */ "ocsptool 3.5.18\0"
+/*  2240 */ "ocsptool 3.5.19\0"
 /*  2256 */ "ocsptool [options]\n"
             "ocsptool --help for usage instructions.\n";
 
@@ -1153,7 +1153,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via ocsptoolOptions.pzCopyright */
-  puts(_("ocsptool 3.5.18\n\
+  puts(_("ocsptool 3.5.19\n\
 Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -1246,7 +1246,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
 requests/responses, generate requests and verify responses.\n"));
 
   /* referenced via ocsptoolOptions.pzFullVersion */
-  puts(_("ocsptool 3.5.18"));
+  puts(_("ocsptool 3.5.19"));
 
   /* referenced via ocsptoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

@@ -264,20 +264,20 @@ pkcs11_add_module(const char* name, struct ck_function_list *module, const char 
 */
 int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_function cb)
 {
-	int ret;
+	int ret, sret = 0;
 
 	ret = gnutls_mutex_lock(&_gnutls_pkcs11_mutex);
 	if (ret != 0)
 		return gnutls_assert_val(GNUTLS_E_LOCKING_ERROR);
 
-	if (providers_initialized >= req_level) {
+	if (providers_initialized > PROV_UNINITIALIZED) {
 		ret = 0;
 
 		if (_gnutls_detect_fork(pkcs11_forkid)) {
 			/* if we are initialized but a fork is detected */
 			ret = _gnutls_pkcs11_reinit();
 			if (ret == 0) {
-				ret = 1;
+				sret = 1;
 				if (cb) {
 					int ret2 = cb(priv);
 					if (ret2 < 0)
@@ -287,25 +287,60 @@ int _gnutls_pkcs11_check_init(init_level_t req_level, void *priv, pkcs11_reinit_
 			}
 		}
 
-		gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
-		return ret;
-	} else if (providers_initialized < req_level &&
-		   (req_level == PROV_INIT_TRUSTED)) {
-		_gnutls_debug_log("Initializing needed PKCS #11 modules\n");
-		ret = auto_load(1);
-
-		providers_initialized = PROV_INIT_TRUSTED;
-	} else {
-		_gnutls_debug_log("Initializing all PKCS #11 modules\n");
-		ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+		if (ret < 0) {
+			gnutls_assert();
+			goto cleanup;
+		}
 	}
 
+	/* Possible Transitions: PROV_UNINITIALIZED -> PROV_INIT_MANUAL -> PROV_INIT_MANUAL_TRUSTED
+	 * PROV_UNINITIALIZED -> PROV_INIT_TRUSTED -> PROV_INIT_ALL
+	 *
+	 * request for PROV_INIT_TRUSTED may result to PROV_INIT_MANUAL_TRUSTED
+	 * request for PROV_INIT_ALL may result to PROV_INIT_MANUAL or PROV_INIT_MANUAL_TRUSTED
+	 */
+	switch(req_level) {
+		case PROV_UNINITIALIZED:
+		case PROV_INIT_MANUAL:
+			break;
+		case PROV_INIT_TRUSTED:
+		case PROV_INIT_MANUAL_TRUSTED:
+			if (providers_initialized < PROV_INIT_MANUAL_TRUSTED) {
+				_gnutls_debug_log("Initializing needed PKCS #11 modules\n");
+				ret = auto_load(1);
+				if (ret < 0) {
+					gnutls_assert();
+				}
+
+				if (providers_initialized == PROV_INIT_MANUAL)
+					providers_initialized = PROV_INIT_MANUAL_TRUSTED;
+				else
+					providers_initialized = PROV_INIT_TRUSTED;
+
+				goto cleanup;
+			}
+			break;
+		case PROV_INIT_ALL:
+			if (providers_initialized == PROV_INIT_TRUSTED ||
+			    providers_initialized == PROV_UNINITIALIZED) {
+				_gnutls_debug_log("Initializing all PKCS #11 modules\n");
+				ret = gnutls_pkcs11_init(GNUTLS_PKCS11_FLAG_AUTO, NULL);
+				if (ret < 0) {
+					gnutls_assert();
+				}
+
+				providers_initialized = PROV_INIT_ALL;
+				goto cleanup;
+			}
+			break;
+	}
+
+	ret = sret;
+
+ cleanup:
 	gnutls_mutex_unlock(&_gnutls_pkcs11_mutex);
 
-	if (ret < 0)
-		return gnutls_assert_val(ret);
-
-	return 0;
+	return ret;
 }
 
 
@@ -2504,6 +2539,11 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 	/* First check for pin-value field */
 	pinfile = p11_kit_uri_get_pin_value(info);
 	if (pinfile != NULL) {
+		if (attempts > 0) {
+			_gnutls_debug_log("p11: refusing more than a single attempts with pin-value\n");
+			return gnutls_assert_val(GNUTLS_E_PKCS11_PIN_ERROR);
+		}
+
 		_gnutls_debug_log("p11: Using pin-value to retrieve PIN\n");
 		*pin = p11_kit_pin_new_for_string(pinfile);
 		if (*pin != NULL)
@@ -2512,6 +2552,11 @@ retrieve_pin(struct pin_info_st *pin_info, struct p11_kit_uri *info,
 		/* Check if a pinfile is specified, and use that if possible */
 		pinfile = p11_kit_uri_get_pin_source(info);
 		if (pinfile != NULL) {
+			if (attempts > 0) {
+				_gnutls_debug_log("p11: refusing more than a single attempts with pin-source\n");
+				return gnutls_assert_val(GNUTLS_E_PKCS11_PIN_ERROR);
+			}
+
 			_gnutls_debug_log("p11: Using pin-source to retrieve PIN\n");
 			ret =
 			    retrieve_pin_from_source(pinfile, token_info, attempts,
@@ -3149,11 +3194,7 @@ gnutls_pkcs11_obj_list_import_url4(gnutls_pkcs11_obj_t ** p_list,
 	int ret;
 	struct find_obj_data_st priv;
 
-	if (flags & GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED) {
-		PKCS11_CHECK_INIT_TRUSTED;
-	} else {
-		PKCS11_CHECK_INIT;
-	}
+	PKCS11_CHECK_INIT_FLAGS(flags);
 
 	memset(&priv, 0, sizeof(priv));
 
@@ -3790,7 +3831,7 @@ int gnutls_pkcs11_get_raw_issuer(const char *url, gnutls_x509_crt_t cert,
 	size_t id_size;
 	struct p11_kit_uri *info = NULL;
 
-	PKCS11_CHECK_INIT;
+	PKCS11_CHECK_INIT_FLAGS(flags);
 
 	memset(&priv, 0, sizeof(priv));
 
@@ -3882,7 +3923,7 @@ int gnutls_pkcs11_get_raw_issuer_by_dn (const char *url, const gnutls_datum_t *d
 	struct find_cert_st priv;
 	struct p11_kit_uri *info = NULL;
 
-	PKCS11_CHECK_INIT;
+	PKCS11_CHECK_INIT_FLAGS(flags);
 
 	memset(&priv, 0, sizeof(priv));
 
@@ -3969,7 +4010,7 @@ int gnutls_pkcs11_get_raw_issuer_by_subject_key_id (const char *url,
 	struct find_cert_st priv;
 	struct p11_kit_uri *info = NULL;
 
-	PKCS11_CHECK_INIT;
+	PKCS11_CHECK_INIT_FLAGS(flags);
 
 	memset(&priv, 0, sizeof(priv));
 
@@ -4063,7 +4104,7 @@ unsigned gnutls_pkcs11_crt_is_known(const char *url, gnutls_x509_crt_t cert,
 	size_t serial_size;
 	struct p11_kit_uri *info = NULL;
 
-	PKCS11_CHECK_INIT_RET(0);
+	PKCS11_CHECK_INIT_FLAGS_RET(flags, 0);
 
 	memset(&priv, 0, sizeof(priv));
 

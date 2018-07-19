@@ -63,6 +63,8 @@ The other variables are only set on supported structures.
 @strong{Returns:} @code{GNUTLS_E_INVALID_REQUEST}  if the provided structure isn't an encrypted key,
 @code{GNUTLS_E_UNKNOWN_CIPHER_TYPE}  if the structure's encryption isn't supported, or
 another negative error code in case of a failure. Zero on success.
+
+@strong{Since:} 3.4.0
 @end deftypefun
 
 @subheading gnutls_pkcs_schema_get_name
@@ -1920,7 +1922,7 @@ sequence number and with the otherName type then
 @subheading gnutls_x509_crq_get_tlsfeatures
 @anchor{gnutls_x509_crq_get_tlsfeatures}
 @deftypefun {int} {gnutls_x509_crq_get_tlsfeatures} (gnutls_x509_crq_t @var{crq}, gnutls_x509_tlsfeatures_t @var{features}, unsigned int @var{flags}, unsigned int * @var{critical})
-@var{crq}: -- undescribed --
+@var{crq}: An X.509 certificate request
 
 @var{features}: If the function succeeds, the
 features will be stored in this variable.
@@ -2265,7 +2267,7 @@ negative error value.
 @subheading gnutls_x509_crq_set_tlsfeatures
 @anchor{gnutls_x509_crq_set_tlsfeatures}
 @deftypefun {int} {gnutls_x509_crq_set_tlsfeatures} (gnutls_x509_crq_t @var{crq}, gnutls_x509_tlsfeatures_t @var{features})
-@var{crq}: -- undescribed --
+@var{crq}: An X.509 certificate request
 
 @var{features}: If the function succeeds, the
 features will be added to the certificate
@@ -2384,16 +2386,21 @@ and the DNSName/IPAddress subject alternative name PKIX extension.
 IPv4 addresses are accepted by this function in the dotted-decimal
 format (e.g, ddd.ddd.ddd.ddd), and IPv6 addresses in the hexadecimal
 x:x:x:x:x:x:x:x format. For them the IPAddress subject alternative
-name extension is consulted, as well as the DNSNames in case of a non-match.
-The latter fallback exists due to misconfiguration of many servers
-which place an IPAddress inside the DNSName extension.
+name extension is consulted. Previous versions to 3.6.0 of GnuTLS
+in case of a non-match would consult (in a non-standard extension)
+the DNSname and CN fields. This is no longer the case.
 
 When the flag @code{GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS}  is specified no
 wildcards are considered. Otherwise they are only considered if the
 domain name consists of three components or more, and the wildcard
 starts at the leftmost position.
 
+The function @code{gnutls_x509_crt_check_ip()}  is available for matching
+IP addresses.
+
 @strong{Returns:} non-zero for a successful match, and zero on failure.
+
+@strong{Since:} 3.3.0
 @end deftypefun
 
 @subheading gnutls_x509_crt_check_issuer
@@ -4281,7 +4288,7 @@ The input string should be plain ASCII or UTF-8 encoded. On
 DN parsing error @code{GNUTLS_E_PARSING_ERROR}  is returned.
 
 Note that DNs are not expected to hold DNS information, and thus
-no automatic IDNA convertions are attempted when using this function.
+no automatic IDNA conversions are attempted when using this function.
 If that is required (e.g., store a domain in CN), process the corresponding
 input with @code{gnutls_idna_map()} .
 
@@ -6585,7 +6592,7 @@ Note that this callback is used when decrypting a key.
 @deftypefun {int} {gnutls_x509_privkey_sign_data} (gnutls_x509_privkey_t @var{key}, gnutls_digest_algorithm_t @var{digest}, unsigned int @var{flags}, const gnutls_datum_t * @var{data}, void * @var{signature}, size_t * @var{signature_size})
 @var{key}: a key
 
-@var{digest}: should be MD5 or SHA1
+@var{digest}: should be a digest algorithm
 
 @var{flags}: should be 0 for now
 
@@ -6671,9 +6678,9 @@ negative error value.
 @deftypefun {int} {gnutls_x509_rdn_get2} (const gnutls_datum_t * @var{idn}, gnutls_datum_t * @var{str}, unsigned @var{flags})
 @var{idn}: should contain a DER encoded RDN sequence
 
-@var{str}: -- undescribed --
+@var{str}: a datum that will hold the name
 
-@var{flags}: -- undescribed --
+@var{flags}: zero of @code{GNUTLS_X509_DN_FLAG_COMPAT} 
 
 This function will return the name of the given RDN sequence.  The
 name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in

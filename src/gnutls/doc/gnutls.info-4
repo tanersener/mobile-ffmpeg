@@ -1,6 +1,6 @@
-This is gnutls.info, produced by makeinfo version 6.3 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.5 from gnutls.texi.
 
-This manual is last updated 7 January 2018 for version 3.5.18 of GnuTLS.
+This manual is last updated 7 January 2018 for version 3.5.19 of GnuTLS.
 
 Copyright (C) 2001-2018 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2018 Nikos Mavrogiannopoulos
@@ -333,6 +333,8 @@ gnutls_pkcs8_info
      isn't an encrypted key, 'GNUTLS_E_UNKNOWN_CIPHER_TYPE' if the
      structure's encryption isn't supported, or another negative error
      code in case of a failure.  Zero on success.
+
+     *Since:* 3.4.0
 
 gnutls_pkcs_schema_get_name
 ---------------------------
@@ -2390,7 +2392,7 @@ gnutls_x509_crq_get_tlsfeatures
  -- Function: int gnutls_x509_crq_get_tlsfeatures (gnutls_x509_crq_t
           CRQ, gnutls_x509_tlsfeatures_t FEATURES, unsigned int FLAGS,
           unsigned int * CRITICAL)
-     CRQ: - undescribed -
+     CRQ: An X.509 certificate request
 
      FEATURES: If the function succeeds, the features will be stored in
      this variable.
@@ -2763,7 +2765,7 @@ gnutls_x509_crq_set_tlsfeatures
 
  -- Function: int gnutls_x509_crq_set_tlsfeatures (gnutls_x509_crq_t
           CRQ, gnutls_x509_tlsfeatures_t FEATURES)
-     CRQ: - undescribed -
+     CRQ: An X.509 certificate request
 
      FEATURES: If the function succeeds, the features will be added to
      the certificate request.
@@ -2892,17 +2894,22 @@ gnutls_x509_crt_check_hostname2
      IPv4 addresses are accepted by this function in the dotted-decimal
      format (e.g, ddd.ddd.ddd.ddd), and IPv6 addresses in the
      hexadecimal x:x:x:x:x:x:x:x format.  For them the IPAddress subject
-     alternative name extension is consulted, as well as the DNSNames in
-     case of a non-match.  The latter fallback exists due to
-     misconfiguration of many servers which place an IPAddress inside
-     the DNSName extension.
+     alternative name extension is consulted.  Previous versions to
+     3.6.0 of GnuTLS in case of a non-match would consult (in a
+     non-standard extension) the DNSname and CN fields.  This is no
+     longer the case.
 
      When the flag 'GNUTLS_VERIFY_DO_NOT_ALLOW_WILDCARDS' is specified
      no wildcards are considered.  Otherwise they are only considered if
      the domain name consists of three components or more, and the
      wildcard starts at the leftmost position.
 
+     The function 'gnutls_x509_crt_check_ip()' is available for matching
+     IP addresses.
+
      *Returns:* non-zero for a successful match, and zero on failure.
+
+     *Since:* 3.3.0
 
 gnutls_x509_crt_check_issuer
 ----------------------------
@@ -4990,7 +4997,7 @@ gnutls_x509_crt_set_dn
      error 'GNUTLS_E_PARSING_ERROR' is returned.
 
      Note that DNs are not expected to hold DNS information, and thus no
-     automatic IDNA convertions are attempted when using this function.
+     automatic IDNA conversions are attempted when using this function.
      If that is required (e.g., store a domain in CN), process the
      corresponding input with 'gnutls_idna_map()' .
 
@@ -7565,7 +7572,7 @@ gnutls_x509_privkey_sign_data
           SIGNATURE_SIZE)
      KEY: a key
 
-     DIGEST: should be MD5 or SHA1
+     DIGEST: should be a digest algorithm
 
      FLAGS: should be 0 for now
 
@@ -7658,9 +7665,9 @@ gnutls_x509_rdn_get2
           gnutls_datum_t * STR, unsigned FLAGS)
      IDN: should contain a DER encoded RDN sequence
 
-     STR: - undescribed -
+     STR: a datum that will hold the name
 
-     FLAGS: - undescribed -
+     FLAGS: zero of 'GNUTLS_X509_DN_FLAG_COMPAT'
 
      This function will return the name of the given RDN sequence.  The
      name will be in the form "C=xxxx,O=yyyy,CN=zzzz" as described in

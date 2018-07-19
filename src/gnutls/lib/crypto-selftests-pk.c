@@ -701,7 +701,7 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 
 	switch (pk) {
 	case GNUTLS_PK_UNKNOWN:
-	
+		FALLTHROUGH;
 	case GNUTLS_PK_DH:
 #ifndef AVOID_INTERNALS
 		ret = test_dh();
@@ -713,15 +713,26 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
 			return 0;
 #endif
+		FALLTHROUGH;
 	case GNUTLS_PK_RSA:
 		PK_KNOWN_TEST(GNUTLS_PK_RSA, 1, 2048, GNUTLS_DIG_SHA256,
 			      rsa_key2048, rsa_sig);
 		PK_TEST(GNUTLS_PK_RSA, test_rsa_enc, 2048, 0);
 		PK_TEST(GNUTLS_PK_RSA, test_sig, 3072, GNUTLS_DIG_SHA256);
+
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
+
+		FALLTHROUGH;
 	case GNUTLS_PK_DSA:
 		PK_KNOWN_TEST(GNUTLS_PK_DSA, 0, 2048, GNUTLS_DIG_SHA256,
 			      dsa_privkey, dsa_sig);
 		PK_TEST(GNUTLS_PK_DSA, test_sig, 3072, GNUTLS_DIG_SHA256);
+
+		if (!(flags & GNUTLS_SELF_TEST_FLAG_ALL))
+			return 0;
+
+		FALLTHROUGH;
 	case GNUTLS_PK_EC:	/* Testing ECDSA */
 		/* Test ECDH */
 #ifndef AVOID_INTERNALS
@@ -783,7 +794,6 @@ int gnutls_pk_self_test(unsigned flags, gnutls_pk_algorithm_t pk)
 			GNUTLS_DIG_SHA512);
 
 		break;
-
 	default:
 		return gnutls_assert_val(GNUTLS_E_NO_SELF_TEST);
 	}

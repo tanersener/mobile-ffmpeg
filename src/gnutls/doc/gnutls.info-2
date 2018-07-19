@@ -1,6 +1,6 @@
-This is gnutls.info, produced by makeinfo version 6.3 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.5 from gnutls.texi.
 
-This manual is last updated 7 January 2018 for version 3.5.18 of GnuTLS.
+This manual is last updated 7 January 2018 for version 3.5.19 of GnuTLS.
 
 Copyright (C) 2001-2018 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2018 Nikos Mavrogiannopoulos
@@ -3495,12 +3495,12 @@ int main(void)
 
         /* If client holds a certificate it can be set using the following:
          *
-         gnutls_certificate_set_x509_key_file (xcred,
-         "cert.pem", "key.pem",
-         GNUTLS_X509_FMT_PEM);
+         gnutls_certificate_set_x509_key_file (xcred, 
+         "cert.pem", "key.pem", 
+         GNUTLS_X509_FMT_PEM); 
          */
 
-        /* Initialize TLS session
+        /* Initialize TLS session 
          */
         CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
@@ -3511,7 +3511,7 @@ int main(void)
         CHECK(gnutls_set_default_priority(session));
 #if 0
 	/* if more fine-graned control is required */
-        ret = gnutls_priority_set_direct(session,
+        ret = gnutls_priority_set_direct(session, 
                                          "NORMAL", &err);
         if (ret < 0) {
                 if (ret == GNUTLS_E_INVALID_REQUEST) {
@@ -3762,7 +3762,7 @@ int main(void)
 
         gnutls_anon_allocate_client_credentials(&anoncred);
 
-        /* Initialize TLS session
+        /* Initialize TLS session 
          */
         gnutls_init(&session, GNUTLS_CLIENT);
 
@@ -4091,7 +4091,7 @@ int print_info(gnutls_session_t session)
                 printf("- Ephemeral DH using prime of %d bits\n",
                        gnutls_dh_get_prime_bits(session));
 
-        /* print the protocol's name (ie TLS 1.0)
+        /* print the protocol's name (ie TLS 1.0) 
          */
         tmp =
             gnutls_protocol_get_name(gnutls_protocol_get_version(session));
@@ -4212,7 +4212,7 @@ int main(void)
         gnutls_session_t session;
         char buffer[MAX_BUF + 1];
         gnutls_certificate_credentials_t xcred;
-
+        
         if (gnutls_check_version("3.1.4") == NULL) {
                 fprintf(stderr, "GnuTLS 3.1.4 or later is required for this example\n");
                 exit(1);
@@ -4233,7 +4233,7 @@ int main(void)
 
         gnutls_certificate_set_retrieve_function2(xcred, cert_callback);
 
-        /* Initialize TLS session
+        /* Initialize TLS session 
          */
         CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
@@ -4435,7 +4435,7 @@ verify_certificate_chain(const char *hostname,
                                                 &output,
                                                 print_details_func));
 
-        /* if this certificate is not explicitly trusted verify against CAs
+        /* if this certificate is not explicitly trusted verify against CAs 
          */
         if (output != 0) {
                 CHECK(gnutls_x509_trust_list_verify_crt(tlist, cert,
@@ -4738,7 +4738,7 @@ int main(void)
         char buffer[MAX_BUF + 1];
         gnutls_certificate_credentials_t xcred;
 
-        /* variables used in session resuming
+        /* variables used in session resuming 
          */
         int t;
         char *session_data = NULL;
@@ -5022,7 +5022,7 @@ available in GnuTLS 3.1.4.
 #include "examples.h"
 
 /* A very basic TLS client, with X.509 authentication and server certificate
- * verification utilizing the GnuTLS 3.1.x API.
+ * verification utilizing the GnuTLS 3.1.x API. 
  * Note that error recovery is minimal for simplicity.
  */
 
@@ -5062,12 +5062,12 @@ int main(void)
 
         /* If client holds a certificate it can be set using the following:
          *
-         gnutls_certificate_set_x509_key_file (xcred,
-         "cert.pem", "key.pem",
-         GNUTLS_X509_FMT_PEM);
+         gnutls_certificate_set_x509_key_file (xcred, 
+         "cert.pem", "key.pem", 
+         GNUTLS_X509_FMT_PEM); 
          */
 
-        /* Initialize TLS session
+        /* Initialize TLS session 
          */
         CHECK(gnutls_init(&session, GNUTLS_CLIENT));
 
@@ -5080,7 +5080,7 @@ int main(void)
         CHECK(gnutls_set_default_priority(session));
 #if 0
 	/* if more fine-graned control is required */
-        ret = gnutls_priority_set_direct(session,
+        ret = gnutls_priority_set_direct(session, 
                                          "NORMAL", &err);
         if (ret < 0) {
                 if (ret == GNUTLS_E_INVALID_REQUEST) {
@@ -5526,7 +5526,7 @@ int main(void)
         CHECK(gnutls_certificate_set_x509_crl_file(x509_cred, CRLFILE,
                                                    GNUTLS_X509_FMT_PEM));
 
-        /* The following code sets the certificate key pair as well as,
+        /* The following code sets the certificate key pair as well as, 
          * an OCSP response which corresponds to it. It is possible
          * to set multiple key-pairs and multiple OCSP status responses
          * (the latter since 3.5.6). See the manual pages of the individual
@@ -5719,7 +5719,7 @@ int main(void)
         /* for backwards compatibility with gnutls < 3.3.0 */
         gnutls_global_init();
 
-        /* SRP_PASSWD a password file (created with the included srptool utility)
+        /* SRP_PASSWD a password file (created with the included srptool utility) 
          */
         gnutls_srp_allocate_server_credentials(&srp_cred);
         gnutls_srp_set_server_credentials_file(srp_cred, SRP_PASSWD,
@@ -6326,7 +6326,7 @@ static int pull_timeout_func(gnutls_transport_ptr_t ptr, unsigned int ms)
                 return ret;
 
         /* only report ok if the next message is from the peer we expect
-         * from
+         * from 
          */
         cli_addr_size = sizeof(cli_addr);
         ret =
@@ -6471,7 +6471,7 @@ _verify_response(gnutls_datum_t * data, gnutls_x509_crt_t cert,
    be checked, argv[2] holding the issuer for this certificate,
    and argv[3] holding a trusted certificate to verify OCSP's response.
    argv[4] is optional and should hold the server host name.
-
+   
    For simplicity the libcurl library is used.
  */
 
@@ -6803,7 +6803,7 @@ void check_alert(gnutls_session_t session, int ret)
             || ret == GNUTLS_E_FATAL_ALERT_RECEIVED) {
                 last_alert = gnutls_alert_get(session);
 
-                /* The check for renegotiation is only useful if we are
+                /* The check for renegotiation is only useful if we are 
                  * a server, and we had requested a rehandshake.
                  */
                 if (last_alert == GNUTLS_A_NO_RENEGOTIATION &&
@@ -7097,7 +7097,7 @@ write_pkcs12(const gnutls_datum_t * cert,
          */
         gnutls_pkcs12_bag_set_key_id(bag, bag_index, &key_id);
 
-        /* use weak encryption for the certificate.
+        /* use weak encryption for the certificate. 
          */
         gnutls_pkcs12_bag_encrypt(bag, password,
                                   GNUTLS_PKCS_USE_PKCS12_RC2_40);
@@ -7518,7 +7518,9 @@ Figure 8.5: The random number levels.
      LEN: The requested size
 
      This function will generate random data and store it to output
-     buffer.
+     buffer.  The value of 'level' should be one of 'GNUTLS_RND_NONCE' ,
+     'GNUTLS_RND_RANDOM' and 'GNUTLS_RND_KEY' .  See the manual and
+     'gnutls_rnd_level_t' for detailed information.
 
      This function is thread-safe and also fork-safe.
 

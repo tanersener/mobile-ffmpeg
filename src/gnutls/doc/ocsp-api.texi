@@ -630,7 +630,7 @@ negative error value.
 
 @var{verify}: output variable with verification status, an @code{gnutls_ocsp_verify_reason_t} 
 
-@var{flags}: verification flags, 0 for now.
+@var{flags}: verification flags from @code{gnutls_certificate_verify_flags} 
 
 Verify signature of the Basic OCSP Response against the public key
 in the certificate of a trusted signer.  The  @code{trustlist} should be
@@ -664,7 +664,7 @@ negative error value.
 
 @var{verify}: output variable with verification status, an @code{gnutls_ocsp_verify_reason_t} 
 
-@var{flags}: verification flags, 0 for now.
+@var{flags}: verification flags from @code{gnutls_certificate_verify_flags} 
 
 Verify signature of the Basic OCSP Response against the public key
 in the  @code{issuer} certificate.

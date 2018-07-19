@@ -90,9 +90,9 @@ typedef enum {
 /** count of all options for tpmtool */
 #define OPTION_CT    20
 /** tpmtool version */
-#define TPMTOOL_VERSION       "3.5.18"
+#define TPMTOOL_VERSION       "3.5.19"
 /** Full tpmtool version text */
-#define TPMTOOL_FULL_VERSION  "tpmtool 3.5.18"
+#define TPMTOOL_FULL_VERSION  "tpmtool 3.5.19"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED

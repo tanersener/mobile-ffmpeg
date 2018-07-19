@@ -5,6 +5,28 @@ Copyright (C) 2000-2016 Free Software Foundation, Inc.
 Copyright (C) 2013-2017 Nikos Mavrogiannopoulos
 See the end for copying conditions.
 
+* Version 3.5.19 (released 2018-07-16)
+
+** libgnutls: Backported PKCS#11 module improvements in initialization
+   from master branch.
+
+** libgnutls: Corrected infinite loop when an incorrect PIN was provided
+   via pin-value or pin-source.
+
+** Improved counter-measures for TLS CBC record padding. Kenny Paterson, Eyal Ronen
+   and Adi Shamir reported that the existing counter-measures had certain issues and
+   were insufficient when the attacker has additional access to the CPU cache and 
+   performs a chosen-plaintext attack. This affected the legacy CBC ciphersuites. [CVSS: medium]
+
+** The ciphers utilizing HMAC-SHA384 and SHA256 have been removed from the default
+   priority strings. They are not necessary for compatibility or other purpose and
+   provide no advantage over their SHA1 counter-parts, as they all depend on the legacy
+   TLS CBC block mode.
+
+** API and ABI modifications:
+No changes since last version.
+
+
 * Version 3.5.18 (released 2018-02-16)
 
 ** libgnutls: Addressed issue in the accelerated code which may affect interoperability

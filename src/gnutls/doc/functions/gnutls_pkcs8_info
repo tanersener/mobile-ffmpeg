@@ -29,4 +29,6 @@ The other variables are only set on supported structures.
 @strong{Returns:} @code{GNUTLS_E_INVALID_REQUEST}  if the provided structure isn't an encrypted key,
 @code{GNUTLS_E_UNKNOWN_CIPHER_TYPE}  if the structure's encryption isn't supported, or
 another negative error code in case of a failure. Zero on success.
+
+@strong{Since:} 3.4.0
 @end deftypefun

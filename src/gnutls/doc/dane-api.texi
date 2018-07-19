@@ -13,7 +13,7 @@ type, or @code{NULL} .
 @subheading dane_cert_usage_name
 @anchor{dane_cert_usage_name}
 @deftypefun {const char *} {dane_cert_usage_name} (dane_cert_usage_t @var{usage})
-@var{usage}: -- undescribed --
+@var{usage}: is a DANE certificate usage
 
 Convert a @code{dane_cert_usage_t}  value to a string.
 

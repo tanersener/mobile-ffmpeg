@@ -21,7 +21,7 @@ dnl Process this file with autoconf to produce a configure script.
 # USA
 
 AC_PREREQ(2.61)
-AC_INIT([GnuTLS], [3.5.18], [bugs@gnutls.org])
+AC_INIT([GnuTLS], [3.5.19], [bugs@gnutls.org])
 AC_CONFIG_AUX_DIR([build-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
@@ -127,6 +127,7 @@ case "$host" in
     have_macosx=yes
   ;;
   *solaris*)
+    have_elf=yes
     use_accel=no
     AC_MSG_WARN([[
 ***
@@ -418,6 +419,7 @@ if test "$gl_gcc_warnings" = yes; then
   done
   gl_WARN_ADD([-Wno-missing-field-initializers]) # We need this one
   gl_WARN_ADD([-Wno-unused-parameter]) # Too many warnings for now
+  gl_WARN_ADD([-Wno-format-truncation]) # Many warnings with no point
   gl_WARN_ADD([-fdiagnostics-show-option])
 fi
 
@@ -766,6 +768,10 @@ if test x$ac_zlib != xno; then
   fi
 fi
 AC_SUBST(LIBZ_PC)
+
+# export for use in scripts
+AC_SUBST(ac_cv_sizeof_unsigned_long_int)
+
 AC_SUBST(GNUTLS_REQUIRES_PRIVATE)
 
 

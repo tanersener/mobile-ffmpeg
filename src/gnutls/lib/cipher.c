@@ -455,37 +455,42 @@ compressed_to_ciphertext(gnutls_session_t session,
 	return length;
 }
 
-static void dummy_wait(record_parameters_st * params,
-		       gnutls_datum_t * plaintext, unsigned pad_failed,
-		       unsigned int pad, unsigned total)
+static void dummy_wait(record_parameters_st *params,
+		       gnutls_datum_t *plaintext,
+		       unsigned int mac_data, unsigned int max_mac_data)
 {
-	/* this hack is only needed on CBC ciphers */
+	/* this hack is only needed on CBC ciphers when Encrypt-then-MAC mode
+	 * is not supported by the peer. */
 	if (_gnutls_cipher_type(params->cipher) == CIPHER_BLOCK) {
-		unsigned len;
+		unsigned v;
+		unsigned int tag_size =
+		    _gnutls_auth_cipher_tag_len(&params->read.cipher_state);
+		unsigned hash_block = _gnutls_mac_block_size(params->mac);
 
-		/* force an additional hash compression function evaluation to prevent timing 
+		/* force additional hash compression function evaluations to prevent timing
 		 * attacks that distinguish between wrong-mac + correct pad, from wrong-mac + incorrect pad.
 		 */
-		if (pad_failed == 0 && pad > 0) {
-			len = _gnutls_mac_block_size(params->mac);
-			if (len > 0) {
-				/* This is really specific to the current hash functions.
-				 * It should be removed once a protocol fix is in place.
-				 */
-				if ((pad + total) % len > len - 9
-				    && total % len <= len - 9) {
-					if (len < plaintext->size)
-						_gnutls_auth_cipher_add_auth
-						    (&params->read.
-						     cipher_state,
-						     plaintext->data, len);
-					else
-						_gnutls_auth_cipher_add_auth
-						    (&params->read.
-						     cipher_state,
-						     plaintext->data,
-						     plaintext->size);
-				}
+		if (params->mac && params->mac->id == GNUTLS_MAC_SHA384)
+			/* v = 1 for the hash function padding + 16 for message length */
+			v = 17;
+		else /* v = 1 for the hash function padding + 8 for message length */
+			v = 9;
+
+		if (hash_block > 0) {
+			int max_blocks = (max_mac_data+v+hash_block-1)/hash_block;
+			int hashed_blocks = (mac_data+v+hash_block-1)/hash_block;
+			unsigned to_hash;
+
+			max_blocks -= hashed_blocks;
+			if (max_blocks < 1)
+				return;
+
+			to_hash = max_blocks * hash_block;
+			if ((unsigned)to_hash+1+tag_size < plaintext->size) {
+				_gnutls_auth_cipher_add_auth
+					    (&params->read.cipher_state,
+					     plaintext->data+plaintext->size-tag_size-to_hash-1,
+					     to_hash);
 			}
 		}
 	}
@@ -742,8 +747,12 @@ ciphertext_to_compressed(gnutls_session_t session,
 			 * because there is a timing channel in that memory access (in certain CPUs).
 			 */
 #ifdef ENABLE_SSL3
-			if (ver->id != GNUTLS_SSL3)
+			if (ver->id == GNUTLS_SSL3) {
+				if (pad >= blocksize)
+					pad_failed = 1;
+			} else
 #endif
+			{
 				for (i = 2; i <= MIN(256, ciphertext->size); i++) {
 					tmp_pad_failed |=
 					    (compressed->
@@ -751,6 +760,7 @@ ciphertext_to_compressed(gnutls_session_t session,
 					pad_failed |=
 					    ((i <= (1 + pad)) & (tmp_pad_failed));
 				}
+			}
 
 			if (unlikely
 			    (pad_failed != 0
@@ -814,17 +824,13 @@ ciphertext_to_compressed(gnutls_session_t session,
 		if (unlikely(ret < 0))
 			return gnutls_assert_val(ret);
 
-		/* Here there could be a timing leakage in CBC ciphersuites that
-		 * could be exploited if the cost of a successful memcmp is high. 
-		 * A constant time memcmp would help there, but it is not easy to maintain
-		 * against compiler optimizations. Currently we rely on the fact that
-		 * a memcmp comparison is negligible over the crypto operations.
-		 */
 		if (unlikely
 		    (gnutls_memcmp(tag, tag_ptr, tag_size) != 0 || pad_failed != 0)) {
 			/* HMAC was not the same. */
-			dummy_wait(params, compressed, pad_failed, pad,
-				   length + preamble_size);
+			gnutls_datum_t data = {compressed->data, ciphertext->size};
+
+			dummy_wait(params, &data, length + preamble_size,
+				   preamble_size + ciphertext->size - tag_size - 1);
 
 			return gnutls_assert_val(GNUTLS_E_DECRYPTION_FAILED);
 		}

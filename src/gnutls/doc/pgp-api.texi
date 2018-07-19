@@ -8,7 +8,7 @@
 
 @var{crt_list}: Where to store the certificate list.
 
-@var{crt_list_size}: -- undescribed --
+@var{crt_list_size}: Will hold the number of certificates.
 
 Obtains a X.509 certificate list that has been stored in  @code{res} with one of
 @code{gnutls_certificate_set_openpgp_key()} ,

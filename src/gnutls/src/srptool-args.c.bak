@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for srptool options
  */
 static char const srptool_opt_strs[2025] =
-/*     0 */ "srptool 3.5.18\n"
+/*     0 */ "srptool 3.5.19\n"
             "Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -120,7 +120,7 @@ static char const srptool_opt_strs[2025] =
             "In brief, to use SRP you need to create two files.  These are the password\n"
             "file that holds the users and the verifiers associated with them and the\n"
             "configuration file to hold the group parameters (called tpasswd.conf).\n\0"
-/*  1952 */ "srptool 3.5.18\0"
+/*  1952 */ "srptool 3.5.19\0"
 /*  1967 */ "srptool [options]\n"
             "srptool --help for usage instructions.\n";
 
@@ -693,7 +693,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via srptoolOptions.pzCopyright */
-  puts(_("srptool 3.5.18\n\
+  puts(_("srptool 3.5.19\n\
 Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -760,7 +760,7 @@ file that holds the users and the verifiers associated with them and the\n\
 configuration file to hold the group parameters (called tpasswd.conf).\n"));
 
   /* referenced via srptoolOptions.pzFullVersion */
-  puts(_("srptool 3.5.18"));
+  puts(_("srptool 3.5.19"));
 
   /* referenced via srptoolOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

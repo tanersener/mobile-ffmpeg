@@ -1,6 +1,6 @@
-This is gnutls.info, produced by makeinfo version 6.3 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.5 from gnutls.texi.
 
-This manual is last updated 7 January 2018 for version 3.5.18 of GnuTLS.
+This manual is last updated 7 January 2018 for version 3.5.19 of GnuTLS.
 
 Copyright (C) 2001-2018 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2018 Nikos Mavrogiannopoulos
@@ -32,7 +32,7 @@ File: gnutls.info,  Node: Top,  Next: Preface,  Up: (dir)
 GnuTLS
 ******
 
-This manual is last updated 7 January 2018 for version 3.5.18 of GnuTLS.
+This manual is last updated 7 January 2018 for version 3.5.19 of GnuTLS.
 
 Copyright (C) 2001-2018 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2018 Nikos Mavrogiannopoulos

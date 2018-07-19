@@ -1,6 +1,6 @@
-This is gnutls.info, produced by makeinfo version 6.3 from gnutls.texi.
+This is gnutls.info, produced by makeinfo version 6.5 from gnutls.texi.
 
-This manual is last updated 7 January 2018 for version 3.5.18 of GnuTLS.
+This manual is last updated 7 January 2018 for version 3.5.19 of GnuTLS.
 
 Copyright (C) 2001-2018 Free Software Foundation, Inc.\\ Copyright (C)
 2001-2018 Nikos Mavrogiannopoulos
@@ -549,7 +549,7 @@ the required changes to add a new authentication method affect only the
 handshake protocol, a simple interface is used.  An authentication
 method needs to implement the functions shown below.
 
-typedef struct
+typedef struct 
 {
   const char *name;
   int (*gnutls_generate_server_certificate) (gnutls_session_t, gnutls_buffer_st*);

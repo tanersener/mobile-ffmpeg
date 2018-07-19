@@ -93,23 +93,23 @@ try_prio(const char *prio, unsigned expected_cs, unsigned expected_ciphers, unsi
 
 void doit(void)
 {
-	const int normal = 57;
-	const int null = 5;
-	const int sec128 = 53;
+	const int normal = 41;
+	const int null = 4;
+	const int sec128 = 37;
 
 #ifdef ENABLE_FIPS140
 	exit(77);
 #endif
 
-	try_prio("PFS", 42, 12, __LINE__);
+	try_prio("PFS", 30, 12, __LINE__);
 	try_prio("NORMAL", normal, 12, __LINE__);
 	try_prio("NORMAL:-MAC-ALL:+MD5:+MAC-ALL", normal, 12, __LINE__);
 	try_prio("NORMAL:+CIPHER-ALL", normal, 12, __LINE__);	/* all (except null) */
 	try_prio("NORMAL:-CIPHER-ALL:+NULL", null, 1, __LINE__);	/* null */
 	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL", normal + null, 13, __LINE__);	/* should be null + all */
-	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 8, 1, __LINE__);	/* should be null + all */
+	try_prio("NORMAL:-CIPHER-ALL:+NULL:+CIPHER-ALL:-CIPHER-ALL:+AES-128-CBC", 4, 1, __LINE__);	/* should be null + all */
 	try_prio("PERFORMANCE", normal, 12, __LINE__);
-	try_prio("SECURE256", 22, 6, __LINE__);
+	try_prio("SECURE256", 14, 6, __LINE__);
 	try_prio("SECURE128", sec128, 11, __LINE__);
 	try_prio("SECURE128:+SECURE256", sec128, 11, __LINE__);	/* should be the same as SECURE128 */
 	try_prio("SECURE128:+SECURE256:+NORMAL", normal, 12, __LINE__);	/* should be the same as NORMAL */

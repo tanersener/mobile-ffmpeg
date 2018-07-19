@@ -8,7 +8,7 @@
 <link rel="up" href="intro.html" title="GnuTLS API Reference Manual">
 <link rel="prev" href="gnutls-gnutls.html" title="gnutls">
 <link rel="next" href="gnutls-x509.html" title="x509">
-<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.28 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -605,8 +605,6 @@
 </div>
 <div class="refsect1">
 <a name="gnutls-abstract.description"></a><h2>Description</h2>
-<p>
-</p>
 </div>
 <div class="refsect1">
 <a name="gnutls-abstract.functions_details"></a><h2>Functions</h2>
@@ -1082,8 +1080,6 @@ negative error value.</p>
                                 <em class="parameter"><code><span class="type">void</span> *userdata</code></em>,
                                 <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *ciphertext</code></em>,
                                 <em class="parameter"><code><span class="type">gnutls_datum_t</span> *plaintext</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -1114,8 +1110,6 @@ gnutls_privkey_deinit (<em class="parameter"><code><a class="link" href="gnutls-
 <pre class="programlisting"><span class="returnvalue">void</span>
 <span class="c_punctuation">(</span>*gnutls_privkey_deinit_func<span class="c_punctuation">)</span> (<em class="parameter"><code><a class="link" href="gnutls-abstract.html#gnutls-privkey-t" title="gnutls_privkey_t"><span class="type">gnutls_privkey_t</span></a> key</code></em>,
                                <em class="parameter"><code><span class="type">void</span> *userdata</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -1264,6 +1258,21 @@ will be provided, and the signing function is expected to do the PKCS #1
 <tr>
 <td class="parameter_name"><p>userdata</p></td>
 <td class="parameter_description"><p>private data to be provided to the callbacks</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>sign_fn</p></td>
+<td class="parameter_description"><p>callback for signature operations</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>decrypt_fn</p></td>
+<td class="parameter_description"><p>callback for decryption operations</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>deinit_fn</p></td>
+<td class="parameter_description"><p>a deinitialization function</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -1887,8 +1896,6 @@ negative error value.</p>
                              <em class="parameter"><code><span class="type">void</span> *userdata</code></em>,
                              <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *raw_data</code></em>,
                              <em class="parameter"><code><span class="type">gnutls_datum_t</span> *signature</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -3609,16 +3616,12 @@ negative error value.</p>
 <a name="GNUTLS-PCERT-NO-CERT:CAPS"></a><h3>GNUTLS_PCERT_NO_CERT</h3>
 <pre class="programlisting">#define GNUTLS_PCERT_NO_CERT 1
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PUBKEY-VERIFY-FLAG-TLS-RSA:CAPS"></a><h3>GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA</h3>
 <pre class="programlisting">#define GNUTLS_PUBKEY_VERIFY_FLAG_TLS_RSA GNUTLS_PUBKEY_VERIFY_FLAG_TLS1_RSA
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -3649,48 +3652,36 @@ negative error value.</p>
 	struct pin_info_st pin;
 };
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-privkey-t"></a><h3>gnutls_privkey_t</h3>
 <pre class="programlisting">typedef struct gnutls_privkey_st *gnutls_privkey_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-pubkey-get-pk-dsa-raw"></a><h3>gnutls_pubkey_get_pk_dsa_raw</h3>
 <pre class="programlisting">#define gnutls_pubkey_get_pk_dsa_raw gnutls_pubkey_export_dsa_raw
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-pubkey-get-pk-ecc-raw"></a><h3>gnutls_pubkey_get_pk_ecc_raw</h3>
 <pre class="programlisting">#define gnutls_pubkey_get_pk_ecc_raw gnutls_pubkey_export_ecc_raw
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-pubkey-get-pk-ecc-x962"></a><h3>gnutls_pubkey_get_pk_ecc_x962</h3>
 <pre class="programlisting">#define gnutls_pubkey_get_pk_ecc_x962 gnutls_pubkey_export_ecc_x962
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-pubkey-get-pk-rsa-raw"></a><h3>gnutls_pubkey_get_pk_rsa_raw</h3>
 <pre class="programlisting">#define gnutls_pubkey_get_pk_rsa_raw gnutls_pubkey_export_rsa_raw
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -3723,20 +3714,16 @@ negative error value.</p>
 	struct pin_info_st pin;
 };
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-pubkey-t"></a><h3>gnutls_pubkey_t</h3>
 <pre class="programlisting">typedef struct gnutls_pubkey_st *gnutls_pubkey_t;
 </pre>
-<p>
-</p>
 </div>
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.25</div>
+<hr>Generated by GTK-Doc V1.28</div>
 </body>
 </html>

@@ -368,7 +368,7 @@ advance_iter(gnutls_x509_trust_list_t list,
 	if (list->pkcs11_token != NULL) {
 		if (iter->pkcs11_list == NULL) {
 			ret = gnutls_pkcs11_obj_list_import_url2(&iter->pkcs11_list, &iter->pkcs11_size,
-			    list->pkcs11_token, (GNUTLS_PKCS11_OBJ_FLAG_CRT|GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED), 0);
+			    list->pkcs11_token, (GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE|GNUTLS_PKCS11_OBJ_FLAG_CRT|GNUTLS_PKCS11_OBJ_FLAG_MARK_CA|GNUTLS_PKCS11_OBJ_FLAG_MARK_TRUSTED), 0);
 			if (ret < 0)
 				return gnutls_assert_val(ret);
 
@@ -964,7 +964,7 @@ int gnutls_x509_trust_list_get_issuer(gnutls_x509_trust_list_t list,
 		gnutls_datum_t der = {NULL, 0};
 		/* use the token for verification */
 		ret = gnutls_pkcs11_get_raw_issuer(list->pkcs11_token, cert, &der,
-			GNUTLS_X509_FMT_DER, 0);
+			GNUTLS_X509_FMT_DER, GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -1036,7 +1036,7 @@ int gnutls_x509_trust_list_get_issuer_by_dn(gnutls_x509_trust_list_t list,
 		gnutls_datum_t der = {NULL, 0};
 		/* use the token for verification */
 		ret = gnutls_pkcs11_get_raw_issuer_by_dn(list->pkcs11_token, dn, &der,
-			GNUTLS_X509_FMT_DER, 0);
+			GNUTLS_X509_FMT_DER, GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
@@ -1097,7 +1097,7 @@ int gnutls_x509_trust_list_get_issuer_by_subject_key_id(gnutls_x509_trust_list_t
 		gnutls_datum_t der = {NULL, 0};
 		/* use the token for verification */
 		ret = gnutls_pkcs11_get_raw_issuer_by_subject_key_id(list->pkcs11_token, dn, spki, &der,
-			GNUTLS_X509_FMT_DER, 0);
+			GNUTLS_X509_FMT_DER, GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE);
 		if (ret < 0) {
 			gnutls_assert();
 			return ret;
