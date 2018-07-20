@@ -28,29 +28,33 @@ LIBRARY_WAVPACK=16
 LIBRARY_KVAZAAR=17
 LIBRARY_X264=18
 LIBRARY_XVIDCORE=19
-LIBRARY_LIBILBC=20
-LIBRARY_OPUS=21
-LIBRARY_SNAPPY=22
-LIBRARY_SOXR=23
-LIBRARY_LIBAOM=24
-LIBRARY_GIFLIB=25
-LIBRARY_JPEG=26
-LIBRARY_LIBOGG=27
-LIBRARY_LIBPNG=28
-LIBRARY_LIBUUID=29
-LIBRARY_NETTLE=30
-LIBRARY_TIFF=31
-LIBRARY_EXPAT=32
-LIBRARY_ZLIB=33
-LIBRARY_AUDIOTOOLBOX=34
-LIBRARY_COREIMAGE=35
-LIBRARY_BZIP2=36
+LIBRARY_X265=20
+LIBRARY_FREI0R=21
+LIBRARY_LIBVIDSTAB=22
+LIBRARY_LIBILBC=23
+LIBRARY_OPUS=24
+LIBRARY_SNAPPY=25
+LIBRARY_SOXR=26
+LIBRARY_LIBAOM=27
+LIBRARY_CHROMAPRINT=28
+LIBRARY_GIFLIB=29
+LIBRARY_JPEG=30
+LIBRARY_LIBOGG=31
+LIBRARY_LIBPNG=32
+LIBRARY_LIBUUID=33
+LIBRARY_NETTLE=34
+LIBRARY_TIFF=35
+LIBRARY_EXPAT=36
+LIBRARY_ZLIB=37
+LIBRARY_AUDIOTOOLBOX=38
+LIBRARY_COREIMAGE=39
+LIBRARY_BZIP2=40
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -104,6 +108,7 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage [no]"
     echo -e "  --enable-ios-bzip2\t\tbuild with built-in bzip2 [no]"
     echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib [no]"
+    echo -e "  --enable-chromaprint\t\tbuild with chromaprint [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
     echo -e "  --enable-freetype\t\tbuild with freetype [no]"
     echo -e "  --enable-fribidi\t\tbuild with fribidi [no]"
@@ -130,7 +135,10 @@ When compilation ends a universal fat binary and an IOS framework is created wit
 
     echo -e "GPL libraries:"
 
+    echo -e "  --enable-frei0r\t\tbuild with frei0r [no]"
+    echo -e "  --enable-libvidstab\t\tbuild with libvidstab [no]"
     echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
+    echo -e "  --enable-x265\t\t\tbuild with x265 [no]"
     echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
 
     echo -e "Advanced options:"
@@ -182,6 +190,9 @@ set_library() {
         ios-bzip2)
             ENABLED_LIBRARIES[LIBRARY_BZIP2]=$2
         ;;
+        chromaprint)
+            ENABLED_LIBRARIES[LIBRARY_CHROMAPRINT]=$2
+        ;;
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBUUID]=$2
@@ -193,6 +204,9 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_FREETYPE]=$2
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
             set_library "libpng" $2
+        ;;
+        frei0r)
+            ENABLED_LIBRARIES[LIBRARY_FREI0R]=$2
         ;;
         fribidi)
             ENABLED_LIBRARIES[LIBRARY_FRIBIDI]=$2
@@ -241,6 +255,9 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_LIBOGG]=$2
             set_library "libvorbis" $2
         ;;
+        libvidstab)
+            ENABLED_LIBRARIES[LIBRARY_LIBVIDSTAB]=$2
+        ;;
         libvorbis)
             ENABLED_LIBRARIES[LIBRARY_LIBVORBIS]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBOGG]=$2
@@ -283,6 +300,9 @@ set_library() {
         ;;
         x264)
             ENABLED_LIBRARIES[LIBRARY_X264]=$2
+        ;;
+        x265)
+            ENABLED_LIBRARIES[LIBRARY_X265]=$2
         ;;
         xvidcore)
             ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
@@ -374,7 +394,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {33..36}
+    for library in {37..40}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -386,7 +406,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..24}
+    for library in {0..28}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -467,9 +487,9 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..36}
+            for library in {0..40}
             do
-                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]]; then
+                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
                     enable_library $(get_library_name $library)
                 fi
             done
@@ -502,7 +522,7 @@ print_enabled_architectures
 print_enabled_libraries
 
 # CHECKING GPL LIBRARIES
-for gpl_library in {18..19}
+for gpl_library in {18..22}
 do
     if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
         library_name=$(get_library_name ${gpl_library})
@@ -543,7 +563,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..37}
+        for library in {1..41}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

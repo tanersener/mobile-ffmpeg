@@ -30,23 +30,27 @@ get_library_name() {
         17) echo "kvazaar" ;;
         18) echo "x264" ;;
         19) echo "xvidcore" ;;
-        20) echo "libilbc" ;;
-        21) echo "opus" ;;
-        22) echo "snappy" ;;
-        23) echo "soxr" ;;
-        24) echo "libaom" ;;
-        25) echo "giflib" ;;
-        26) echo "jpeg" ;;
-        27) echo "libogg" ;;
-        28) echo "libpng" ;;
-        29) echo "libuuid" ;;
-        30) echo "nettle" ;;
-        31) echo "tiff" ;;
-        32) echo "expat" ;;
-        33) echo "ios-zlib" ;;
-        34) echo "ios-audiotoolbox" ;;
-        35) echo "ios-coreimage" ;;
-        36) echo "ios-bzip2" ;;
+        20) echo "x265" ;;
+        21) echo "frei0r" ;;
+        22) echo "libvidstab" ;;
+        23) echo "libilbc" ;;
+        24) echo "opus" ;;
+        25) echo "snappy" ;;
+        26) echo "soxr" ;;
+        27) echo "libaom" ;;
+        28) echo "chromaprint" ;;
+        29) echo "giflib" ;;
+        30) echo "jpeg" ;;
+        31) echo "libogg" ;;
+        32) echo "libpng" ;;
+        33) echo "libuuid" ;;
+        34) echo "nettle" ;;
+        35) echo "tiff" ;;
+        36) echo "expat" ;;
+        37) echo "ios-zlib" ;;
+        38) echo "ios-audiotoolbox" ;;
+        39) echo "ios-coreimage" ;;
+        40) echo "ios-bzip2" ;;
     esac
 }
 
@@ -192,6 +196,9 @@ get_app_specific_cflags() {
         mobile-ffmpeg)
             APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable"
         ;;
+        x265)
+            APP_FLAGS="-Wno-unused-function"
+        ;;
         *)
             APP_FLAGS="-std=c99 -Wno-unused-function"
         ;;
@@ -226,6 +233,9 @@ get_cxxflags() {
     local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags $1) $(get_min_version_cflags $1)"
 
     case $1 in
+        x265)
+            echo "-std=c++11 -fno-exceptions -fembed-bitcode ${COMMON_CFLAGS}"
+        ;;
         gnutls)
             echo "-std=c++11 -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
         ;;
@@ -245,7 +255,7 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-    echo "-L${SDK_PATH}/usr/lib"
+    echo "-L${SDK_PATH}/usr/lib -lc++"
 }
 
 get_common_ldflags() {
@@ -682,11 +692,29 @@ download_gpl_library_source() {
     echo -e "\nDEBUG: Downloading GPL library source: $1\n" >>${BASEDIR}/build.log
 
     case $1 in
+        frei0r)
+            GPL_LIB_URL="https://files.dyne.org/frei0r/frei0r-plugins-1.6.1.tar.gz"
+            GPL_LIB_FILE="frei0r-plugins-1.6.1.tar.gz"
+            GPL_LIB_ORIG_DIR="frei0r-plugins-1.6.1"
+            GPL_LIB_DEST_DIR="frei0r"
+        ;;
+        libvidstab)
+            GPL_LIB_URL="https://github.com/georgmartius/vid.stab/archive/v1.1.0.tar.gz"
+            GPL_LIB_FILE="v1.1.0.tar.gz"
+            GPL_LIB_ORIG_DIR="vid.stab-1.1.0"
+            GPL_LIB_DEST_DIR="libvidstab"
+        ;;
         x264)
             GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180718-2245-stable.tar.bz2"
             GPL_LIB_FILE="x264-snapshot-20180718-2245-stable.tar.bz2"
             GPL_LIB_ORIG_DIR="x264-snapshot-20180718-2245-stable"
             GPL_LIB_DEST_DIR="x264"
+        ;;
+        x265)
+            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_2.8.tar.gz"
+            GPL_LIB_FILE="x265-2.8.tar.gz"
+            GPL_LIB_ORIG_DIR="x265-2.8"
+            GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
             GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz"
@@ -781,10 +809,22 @@ set_toolchain_clang_paths() {
     local ASMFLAGS="$(get_asmflags $1)"
     case ${ARCH} in
         armv7 | armv7s)
-            export AS="${GAS_PREPROCESSOR} -arch arm -- ${CC} ${ASMFLAGS}"
+            if [ "$1" == "x265" ]; then
+                export AS="${GAS_PREPROCESSOR}"
+                export AS_ARGUMENTS="-arch arm"
+                export ASM_FLAGS="${ASMFLAGS}"
+            else
+                export AS="${GAS_PREPROCESSOR} -arch arm -- ${CC} ${ASMFLAGS}"
+            fi
         ;;
         arm64)
-            export AS="${GAS_PREPROCESSOR} -arch aarch64 -- ${CC} ${ASMFLAGS}"
+            if [ "$1" == "x265" ]; then
+                export AS="${GAS_PREPROCESSOR}"
+                export AS_ARGUMENTS="-arch aarch64"
+                export ASM_FLAGS="${ASMFLAGS}"
+            else
+                export AS="${GAS_PREPROCESSOR} -arch aarch64 -- ${CC} ${ASMFLAGS}"
+            fi
         ;;
         *)
             export AS="${CC} ${ASMFLAGS}"

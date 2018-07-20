@@ -30,21 +30,25 @@ get_library_name() {
         17) echo "kvazaar" ;;
         18) echo "x264" ;;
         19) echo "xvidcore" ;;
-        20) echo "libilbc" ;;
-        21) echo "opus" ;;
-        22) echo "snappy" ;;
-        23) echo "soxr" ;;
-        24) echo "libaom" ;;
-        25) echo "giflib" ;;
-        26) echo "jpeg" ;;
-        27) echo "libogg" ;;
-        28) echo "libpng" ;;
-        29) echo "libuuid" ;;
-        30) echo "nettle" ;;
-        31) echo "tiff" ;;
-        32) echo "expat" ;;
-        33) echo "android-zlib" ;;
-        34) echo "android-media-codec" ;;
+        20) echo "x265" ;;
+        21) echo "frei0r" ;;
+        22) echo "libvidstab" ;;
+        23) echo "libilbc" ;;
+        24) echo "opus" ;;
+        25) echo "snappy" ;;
+        26) echo "soxr" ;;
+        27) echo "libaom" ;;
+        28) echo "chromaprint" ;;
+        29) echo "giflib" ;;
+        30) echo "jpeg" ;;
+        31) echo "libogg" ;;
+        32) echo "libpng" ;;
+        33) echo "libuuid" ;;
+        34) echo "nettle" ;;
+        35) echo "tiff" ;;
+        36) echo "expat" ;;
+        37) echo "android-zlib" ;;
+        38) echo "android-media-codec" ;;
     esac
 }
 
@@ -268,7 +272,7 @@ get_cxxflags() {
 get_common_linked_libraries() {
     case $1 in
         ffmpeg)
-            echo "-lc -lm -ldl -llog -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/libs/${ANDROID_ARCH}"
+            echo "-lc -lm -ldl -llog -lc++ -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/libs/${ANDROID_ARCH}"
         ;;
         libvpx)
             echo "-lc -lm -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib -L${ANDROID_NDK_ROOT}/sources/cxx-stl/llvm-libc++/libs/${ANDROID_ARCH}"
@@ -719,11 +723,29 @@ download_gpl_library_source() {
     echo -e "\nDEBUG: Downloading GPL library source: $1\n" >>${BASEDIR}/build.log
 
     case $1 in
+        frei0r)
+            GPL_LIB_URL="https://files.dyne.org/frei0r/frei0r-plugins-1.6.1.tar.gz"
+            GPL_LIB_FILE="frei0r-plugins-1.6.1.tar.gz"
+            GPL_LIB_ORIG_DIR="frei0r-plugins-1.6.1"
+            GPL_LIB_DEST_DIR="frei0r"
+        ;;
+        libvidstab)
+            GPL_LIB_URL="https://github.com/georgmartius/vid.stab/archive/v1.1.0.tar.gz"
+            GPL_LIB_FILE="v1.1.0.tar.gz"
+            GPL_LIB_ORIG_DIR="vid.stab-1.1.0"
+            GPL_LIB_DEST_DIR="libvidstab"
+        ;;
         x264)
             GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180718-2245-stable.tar.bz2"
             GPL_LIB_FILE="x264-snapshot-20180718-2245-stable.tar.bz2"
             GPL_LIB_ORIG_DIR="x264-snapshot-20180718-2245-stable"
             GPL_LIB_DEST_DIR="x264"
+        ;;
+        x265)
+            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_2.8.tar.gz"
+            GPL_LIB_FILE="x265-2.8.tar.gz"
+            GPL_LIB_ORIG_DIR="x265-2.8"
+            GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
             GPL_LIB_URL="https://downloads.xvid.com/downloads/xvidcore-1.3.5.tar.gz"

@@ -75,7 +75,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..35}
+for library in {1..39}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -83,6 +83,11 @@ do
         echo -e "INFO: Enabling library ${ENABLED_LIBRARY}" >> ${BASEDIR}/build.log
 
         case $ENABLED_LIBRARY in
+            chromaprint)
+                CFLAGS+=" $(pkg-config --cflags libchromaprint)"
+                LDFLAGS+=" $(pkg-config --libs --static libchromaprint)"
+                CONFIGURE_POSTFIX+=" --enable-chromaprint"
+            ;;
             fontconfig)
                 CFLAGS+=" $(pkg-config --cflags fontconfig)"
                 LDFLAGS+=" $(pkg-config --libs --static fontconfig)"
@@ -92,6 +97,11 @@ do
                 CFLAGS+=" $(pkg-config --cflags freetype2)"
                 LDFLAGS+=" $(pkg-config --libs --static freetype2)"
                 CONFIGURE_POSTFIX+=" --enable-libfreetype"
+            ;;
+            frei0r)
+                CFLAGS+=" $(pkg-config --cflags frei0r)"
+                LDFLAGS+=" $(pkg-config --libs --static frei0r)"
+                CONFIGURE_POSTFIX+=" --enable-frei0r --enable-gpl"
             ;;
             fribidi)
                 CFLAGS+=" $(pkg-config --cflags fribidi)"
@@ -142,6 +152,11 @@ do
                 CFLAGS+=" $(pkg-config --cflags theora)"
                 LDFLAGS+=" $(pkg-config --libs --static theora)"
                 CONFIGURE_POSTFIX+=" --enable-libtheora"
+            ;;
+            libvidstab)
+                CFLAGS+=" $(pkg-config --cflags vidstab)"
+                LDFLAGS+=" $(pkg-config --libs --static vidstab)"
+                CONFIGURE_POSTFIX+=" --enable-libvidstab --enable-gpl"
             ;;
             libvorbis)
                 CFLAGS+=" $(pkg-config --cflags vorbis)"
@@ -207,6 +222,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static x264)"
                 CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
             ;;
+            x265)
+                CFLAGS+=" $(pkg-config --cflags x265)"
+                LDFLAGS+=" $(pkg-config --libs --static x265)"
+                CONFIGURE_POSTFIX+=" --enable-x265 --enable-gpl"
+            ;;
             xvidcore)
                 CFLAGS+=" $(pkg-config --cflags xvidcore)"
                 LDFLAGS+=" $(pkg-config --libs --static xvidcore)"
@@ -246,7 +266,7 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 34 ]]; then
+        if [[ ${library} -eq 38 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi

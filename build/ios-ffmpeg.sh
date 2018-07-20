@@ -76,7 +76,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..37}
+for library in {1..41}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -84,6 +84,11 @@ do
         echo -e "INFO: Enabling library ${ENABLED_LIBRARY}" >> ${BASEDIR}/build.log
 
         case ${ENABLED_LIBRARY} in
+            chromaprint)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags libchromaprint)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libchromaprint)"
+                CONFIGURE_POSTFIX+=" --enable-chromaprint"
+            ;;
             fontconfig)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags fontconfig)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static fontconfig)"
@@ -93,6 +98,11 @@ do
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags freetype2)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static freetype2)"
                 CONFIGURE_POSTFIX+=" --enable-libfreetype"
+            ;;
+            frei0r)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags frei0r)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static frei0r)"
+                CONFIGURE_POSTFIX+=" --enable-frei0r --enable-gpl"
             ;;
             fribidi)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags fribidi)"
@@ -143,6 +153,11 @@ do
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags theora)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static theora)"
                 CONFIGURE_POSTFIX+=" --enable-libtheora"
+            ;;
+            libvidstab)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags vidstab)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static vidstab)"
+                CONFIGURE_POSTFIX+=" --enable-libvidstab --enable-gpl"
             ;;
             libvorbis)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags vorbis)"
@@ -207,6 +222,11 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static x264)"
                 CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
             ;;
+            x265)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags x265)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static x265)"
+                CONFIGURE_POSTFIX+=" --enable-libx265 --enable-gpl"
+            ;;
             xvidcore)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags xvidcore)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static xvidcore)"
@@ -262,13 +282,13 @@ do
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 8 ]]; then
             CONFIGURE_POSTFIX+=" --disable-iconv"
-        elif [[ ${library} -eq 34 ]]; then
+        elif [[ ${library} -eq 38 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
-        elif [[ ${library} -eq 35 ]]; then
+        elif [[ ${library} -eq 39 ]]; then
             CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
-        elif [[ ${library} -eq 36 ]]; then
+        elif [[ ${library} -eq 40 ]]; then
             CONFIGURE_POSTFIX+=" --disable-coreimage"
-        elif [[ ${library} -eq 37 ]]; then
+        elif [[ ${library} -eq 41 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
         fi
     fi
