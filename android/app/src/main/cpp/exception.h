@@ -17,8 +17,8 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOBILEFFMPEG_EXCEPTION_H
-#define MOBILEFFMPEG_EXCEPTION_H
+#ifndef MOBILE_FFMPEG_EXCEPTION_H
+#define MOBILE_FFMPEG_EXCEPTION_H
 
 #include <stdio.h>
 #include <setjmp.h>
@@ -26,4 +26,4 @@
 /** Holds information to implement exception handling. */
 jmp_buf ex_buf__;
 
-#endif // MOBILEFFMPEG_EXCEPTION_H
+#endif // MOBILE_FFMPEG_EXCEPTION_H

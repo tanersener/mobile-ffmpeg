@@ -22,7 +22,7 @@
 #import "SecondViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
-#import <mobileffmpeg/mobileffmpeg.h>
+#import <mobileffmpeg/MobileFFmpeg.h>
 
 NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
 
@@ -92,20 +92,9 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
     [self loadProgressDialog:@"Creating video slideshow\n\n"];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        
-        // SPLITTING COMMAND ARGUMENTS
-        NSArray* commandArray = [slideshowCommand componentsSeparatedByString:@" "];
-        char **arguments = (char **)malloc(sizeof(char*) * ([commandArray count]));
-        for (int i=0; i < [commandArray count]; i++) {
-            NSString *argument = [commandArray objectAtIndex:i];
-            arguments[i] = (char *) [argument UTF8String];
-        }
 
-        // EXECUTING
-        int result = mobileffmpeg_execute((int) [commandArray count], arguments);
-        
-        // CLEANING ARGUMENTS
-        free(arguments);
+        // EXECUTE
+        int result = [MobileFFmpeg execute: slideshowCommand];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self dismissProgressDialog];

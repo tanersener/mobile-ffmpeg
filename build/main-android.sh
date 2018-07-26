@@ -234,7 +234,13 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
     done
 done
 
-# BUILDING FFMPEG
-. ${BASEDIR}/build/android-ffmpeg.sh "$@"
+# SKIP TO SPEED UP BUILD
+if [[ ${SKIP_ffmpeg} -ne 1 ]]; then
+
+    # BUILDING FFMPEG
+    . ${BASEDIR}/build/android-ffmpeg.sh "$@"
+else
+    echo -e "\nffmpeg: skipped"
+fi
 
 echo -e "\nINFO: Completed build for ${ARCH} on API level ${API} at "$(date)"\n">> ${BASEDIR}/build.log

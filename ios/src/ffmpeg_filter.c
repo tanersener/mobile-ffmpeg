@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/* CHANGES 03.2018 Taner Sener
+/* CHANGES 07.2018 Taner Sener
  * --------------------------------------------------------
  * - Unused headers removed
  */
@@ -343,6 +343,7 @@ int init_complex_filtergraph(FilterGraph *fg)
     graph = avfilter_graph_alloc();
     if (!graph)
         return AVERROR(ENOMEM);
+    graph->nb_threads = 1;
 
     ret = avfilter_graph_parse2(graph, fg->graph_desc, &inputs, &outputs);
     if (ret < 0)

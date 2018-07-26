@@ -3,23 +3,24 @@ lib_LTLIBRARIES = libmobileffmpeg.la
 libmobileffmpeg_la_LIBADD = @FFMPEG_LIBS@
 
 libmobileffmpeg_la_SOURCES = \
-    archdetect.m \
+    ArchDetect.m \
     cmdutils.c \
-    exception.c \
+    exception.m \
     ffmpeg.c \
     ffmpeg_filter.c \
     ffmpeg_hw.c \
     ffmpeg_opt.c \
-    log.m \
-    mobileffmpeg.c
+    Log.m \
+    MobileFFmpeg.m
 
 include_HEADERS = \
-    archdetect.h \
+    ArchDetect.h \
     ffmpeg.h \
-    mobileffmpeg.h \
+    MobileFFmpeg.h \
 	cmdutils.h \
 	exception.h \
-	log.h
+	LogDelegate.h \
+	Log.h
 
 libmobileffmpeg_la_CFLAGS = $(CFLAGS)
 libmobileffmpeg_la_OBJCFLAGS = $(CFLAGS)

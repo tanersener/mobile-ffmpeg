@@ -50,7 +50,7 @@
     textView.layer.cornerRadius = 5.0f;
 }
 
-+(void) applyTooltipStyle: (RCEasyTipPreferences*)preferences {
++(void) applyTooltipStyle: (RCEasyTipPreferences*) preferences {
     preferences.drawing.backgroundColor = [UIColor colorWithDisplayP3Red:52.0/256 green:152.0/256 blue:219.0/256 alpha:1.0];
 }
 

@@ -17,49 +17,58 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOBILEFFMPEG_LOG_H
-#define MOBILEFFMPEG_LOG_H
-
 #include <stdio.h>
 #include <pthread.h>
 #include <unistd.h>
+#include <Foundation/Foundation.h>
+#include "LogDelegate.h"
+#include "libavutil/log.h"
 
 /** Identifier used for IOS logging. */
-#define LIB_NAME "mobile-ffmpeg"
+extern NSString *const LOG_LIB_NAME;
 
 /**
- * Verbose logging function.
- *
- * \param message log message
+ * This class is used to process FFmpeg logs.
  */
-void logv(const char *message, ...) __attribute__((format(printf, 1, 2)));
+@interface Log : NSObject
 
 /**
- * Debug logging function.
- *
- * \param message log message
+ * Enables log redirection.
  */
-void logd(const char *message, ...) __attribute__((format(printf, 1, 2)));
++ (void)enableRedirection;
 
 /**
- * Info logging function.
- *
- * \param message log message
+ * Disables log redirection.
  */
-void logi(const char *message, ...) __attribute__((format(printf, 1, 2)));
++ (void)disableRedirection;
 
 /**
- * Warn logging function.
+ * Returns log level.
  *
- * \param message log message
+ * \return log level
  */
-void logw(const char *message, ...) __attribute__((format(printf, 1, 2)));
++ (int)getLevel;
 
 /**
- * Error logging function.
+ * Sets log level.
  *
- * \param message log message
+ * \param log level
  */
-void loge(const char *message, ...) __attribute__((format(printf, 1, 2)));
++ (void)setLevel: (int)level;
 
-#endif /* MOBILEFFMPEG_LOG_H */
+/**
+ * Convert int log level to string.
+ *
+ * \param level value
+ * \return string value
+ */
++ (NSString*)levelToString: (int)level;
+
+/**
+ * Sets a LogDelegate. logCallback method inside LogDelegate is used to redirect logs.
+ *
+ * \param log delegate
+ */
++ (void)setLogDelegate: (id<LogDelegate>)newLogDelegate;
+
+@end

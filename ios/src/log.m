@@ -17,65 +17,117 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "log.h"
-#import <Foundation/Foundation.h>
+#include "Log.h"
+#include "ArchDetect.h"
+#include "MobileFFmpeg.h"
+
+/** Holds delegate defined to redirect logs */
+static id<LogDelegate> logDelegate = nil;
 
 /**
- * Verbose logging function.
+ * Callback function for ffmpeg logs.
  *
- * \param message log message
+ * \param pointer to AVClass struct
+ * \param level
+ * \param format
+ * \param arguments
  */
-void logv(const char *message,...) {
-    va_list args;
-    va_start(args, message);
-    NSLog(@"%@", [[NSString alloc] initWithFormat:[NSString stringWithUTF8String:message] arguments:args]);
-    va_end(args);
+void logCallbackFunction(void *ptr, int level, const char* format, va_list vargs) {
+    char line[1024];    // line size is defined as 1024 in libavutil/log.c
+
+    int activeLogLevel = [Log getLevel];
+
+    if (activeLogLevel == AV_LOG_QUIET || level > activeLogLevel) {
+        // LOG NEITHER PRINTED NOR FORWARDED
+        return;
+    }
+
+    vsnprintf(line, 1024, format, vargs);
+
+    NSString* logMessage = [NSString stringWithCString:line encoding:NSUTF8StringEncoding];
+
+    if (logDelegate != nil) {
+
+        // FORWARD LOG TO LOG DELEGATE
+        [logDelegate logCallback:level:logMessage];
+    } else {
+
+        // WRITE TO NSLOG
+        NSLog(@"%@: %@", [Log levelToString:level], logMessage);
+    }
+}
+
+@implementation Log
+
+NSString *const LOG_LIB_NAME = @"mobile-ffmpeg";
+
++ (void)initialize {
+    [ArchDetect class];
+    [MobileFFmpeg class];
+
+    [Log enableRedirection];
 }
 
 /**
- * Debug logging function.
- *
- * \param message log message
+ * Enables log redirection.
  */
-void logd(const char *message,...) {
-    va_list args;
-    va_start(args, message);
-    NSLog(@"%@", [[NSString alloc] initWithFormat:[NSString stringWithUTF8String:message] arguments:args]);
-    va_end(args);
++ (void)enableRedirection {
+    av_log_set_callback(logCallbackFunction);
 }
 
 /**
- * Info logging function.
- *
- * \param message log message
+ * Disables log redirection.
  */
-void logi(const char *message,...) {
-    va_list args;
-    va_start(args, message);
-    NSLog(@"%@", [[NSString alloc] initWithFormat:[NSString stringWithUTF8String:message] arguments:args]);
-    va_end(args);
++ (void)disableRedirection {
+    av_log_set_callback(av_log_default_callback);
 }
 
 /**
- * Warn logging function.
+ * Returns log level.
  *
- * \param message log message
+ * \return log level
  */
-void logw(const char *message,...) {
-    va_list args;
-    va_start(args, message);
-    NSLog(@"%@", [[NSString alloc] initWithFormat:[NSString stringWithUTF8String:message] arguments:args]);
-    va_end(args);
++ (int)getLevel {
+    return av_log_get_level();
 }
 
 /**
- * Error logging function.
+ * Sets log level.
  *
- * \param message log message
+ * \param log level
  */
-void loge(const char *message,...) {
-    va_list args;
-    va_start(args, message);
-    NSLog(@"%@", [[NSString alloc] initWithFormat:[NSString stringWithUTF8String:message] arguments:args]);
-    va_end(args);
++ (void)setLevel: (int)level {
+    av_log_set_level(level);
 }
+
+/**
+ * Convert int log level to string.
+ *
+ * \param level value
+ * \return string value
+ */
++ (NSString*)levelToString: (int)level {
+    switch (level) {
+        case AV_LOG_TRACE: return @"TRACE";
+        case AV_LOG_DEBUG: return @"DEBUG";
+        case AV_LOG_VERBOSE: return @"VERBOSE";
+        case AV_LOG_INFO: return @"INFO";
+        case AV_LOG_WARNING: return @"WARNING";
+        case AV_LOG_ERROR: return @"ERROR";
+        case AV_LOG_FATAL: return @"FATAL";
+        case AV_LOG_PANIC: return @"PANIC";
+        case AV_LOG_QUIET:
+        default: return @"";
+    }
+}
+
+/**
+ * Sets a LogDelegate. logCallback method inside LogDelegate is used to redirect logs.
+ *
+ * \param new log delegate
+ */
++ (void)setLogDelegate: (id<LogDelegate>)newLogDelegate {
+    logDelegate = newLogDelegate;
+}
+
+@end

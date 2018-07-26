@@ -265,7 +265,7 @@
                                     <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 </state>
                                 <connections>
-                                    <action selector="getInfoClicled:" destination="bz3-AU-N9p" eventType="touchUpInside" id="unY-po-q75"/>
+                                    <action selector="getInfoClicked:" destination="bz3-AU-N9p" eventType="touchUpInside" id="pEF-bx-hn7"/>
                                 </connections>
                             </button>
                         </subviews>

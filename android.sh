@@ -153,6 +153,12 @@ GNU Lesser General Public License as published by the Free Software Foundation, 
 either version 3 of the License, or (at your option) any later version."
 }
 
+skip_library() {
+    SKIP_VARIABLE=$(echo "SKIP_$1" | sed "s/\-/\_/g")
+
+    export ${SKIP_VARIABLE}=1
+}
+
 reconf_library() {
     RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
 
@@ -444,6 +450,11 @@ do
 	    -V | --version)
             display_version
             exit 0
+	    ;;
+        --skip-*)
+            SKIP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
+
+            skip_library ${SKIP_LIBRARY}
 	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`

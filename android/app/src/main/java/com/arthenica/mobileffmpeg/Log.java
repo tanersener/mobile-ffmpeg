@@ -22,14 +22,11 @@ package com.arthenica.mobileffmpeg;
 import android.arch.core.util.Function;
 
 /**
- * <p>This class is used to process stdout and stderr logs from native libraries.
+ * <p>This class is used to process FFmpeg logs.
  *
- * <p>By default stdout and stderr is redirected to <code>/dev/null</code> in Android. This class
- * redirects these streams to Logcat in order to view logs printed by FFmpeg native libraries.
- *
- * <p>Alternatively, it is possible not to print messages to Logcat and pass them to a callback
- * function. This function can decide whether to print these logs or ignore them according to its
- * own rules.
+ * <p>By default it redirects FFmpeg output to Logcat. Alternatively, it is possible not to print messages to Logcat
+ * and pass them to a callback function. This function can decide whether to print these logs, show them inside
+ * another container or ignore them.
  *
  * @author Taner Sener
  * @since v1.0
@@ -41,10 +38,37 @@ public class Log {
      */
     public static final String TAG = "mobile-ffmpeg";
 
-    private static Function<byte[], Void> callbackFunction;
+    public static final class Message {
+        private final Level level;
+        private final String text;
+
+        public Message(final Level level, final String text) {
+            this.level = level;
+            this.text = text;
+        }
+
+        public Level getLevel() {
+            return level;
+        }
+
+        public String getText() {
+            return text;
+        }
+    }
+
+    private static Function<Message, Void> callbackFunction;
+
+    private static Level activeLogLevel;
 
     static {
         System.loadLibrary("ffmpeglog");
+
+        /* ALL LIBRARIES LOADED AT STARTUP */
+        AbiDetect.class.getName();
+        FFmpeg.class.getName();
+
+        /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
+        activeLogLevel = Level.from(getNativeLevel());
     }
 
     /**
@@ -54,54 +78,118 @@ public class Log {
     }
 
     /**
-     * <p>Enables redirecting stdout and stderr.
+     * <p>Enables log redirection.
      */
-    public static void enableCollectingStdOutErr() {
-        startNativeCollector();
+    public static void enableRedirection() {
+        enableNativeRedirection();
     }
 
     /**
-     * <p>Disables redirecting stdout and stderr.
+     * <p>Disables log redirection.
      */
-    public static void disableCollectingStdOutErr() {
-        stopNativeCollector();
+    public static void disableRedirection() {
+        disableNativeRedirection();
     }
 
     /**
-     * <p>Sets a callback function to receive logs from FFmpeg native libraries.
+     * Returns log level.
      *
-     * @param newCallbackFunction callback to receive logs
+     * @return log level
      */
-    public static void enableCallbackFunction(final Function<byte[], Void> newCallbackFunction) {
-        callbackFunction = newCallbackFunction;
+    public static Level getLevel() {
+        return activeLogLevel;
     }
 
     /**
-     * <p>Main method called by JNI part to redirect log messages. It is not designed to be called
-     * manually by Java classes.
+     * Sets log level.
      *
-     * @param logMessage log message
+     * @param level log level
      */
-    public static void log(final byte[] logMessage) {
-        if (callbackFunction != null) {
-            callbackFunction.apply(logMessage);
-        } else {
-            android.util.Log.d(TAG, new String(logMessage));
+    public static void setLevel(final Level level) {
+        if (level != null) {
+            activeLogLevel = level;
+            setNativeLevel(level.getValue());
         }
     }
 
     /**
-     * <p>Starts native log collector.
+     * <p>Sets a callback function to receive FFmpeg logs.
      *
-     * @return zero on success, non-zero if an error occurs
+     * @param newCallbackFunction callback to receive logs
      */
-    public static native int startNativeCollector();
+    public static void enableCallbackFunction(final Function<Message, Void> newCallbackFunction) {
+        callbackFunction = newCallbackFunction;
+    }
 
     /**
-     * <p>Stops native log collector.
+     * <p>Log redirection method called by JNI/native part.
      *
-     * @return zero on success, non-zero if an error occurs
+     * @param levelValue log level as defined in {@link Level}
+     * @param logMessage redirected log message
      */
-    public static native int stopNativeCollector();
+    private static void log(final int levelValue, final byte[] logMessage) {
+        final Level level = Level.from(levelValue);
+        final String text = new String(logMessage);
+
+        if (activeLogLevel == Level.AV_LOG_QUIET || levelValue > activeLogLevel.getValue()) {
+            // LOG NEITHER PRINTED NOR FORWARDED
+            return;
+        }
+
+        if (callbackFunction != null) {
+            callbackFunction.apply(new Message(level, text));
+        } else {
+            switch (level) {
+                case AV_LOG_QUIET: {
+                    // PRINT NO OUTPUT
+                } break;
+                case AV_LOG_TRACE:
+                case AV_LOG_DEBUG: {
+                    android.util.Log.d(TAG, text);
+                } break;
+                case AV_LOG_VERBOSE: {
+                    android.util.Log.v(TAG, text);
+                } break;
+                case AV_LOG_INFO: {
+                    android.util.Log.i(TAG, text);
+                } break;
+                case AV_LOG_WARNING: {
+                    android.util.Log.w(TAG, text);
+                } break;
+                case AV_LOG_ERROR:
+                case AV_LOG_FATAL:
+                case AV_LOG_PANIC: {
+                    android.util.Log.e(TAG, text);
+                } break;
+                default: {
+                    android.util.Log.v(TAG, text);
+                } break;
+            }
+        }
+    }
+
+    /**
+     * <p>Enables native log redirection.
+     */
+    private static native void enableNativeRedirection();
+
+    /**
+     * <p>Disables native log redirection
+     */
+    private static native void disableNativeRedirection();
+
+    /**
+     * Sets native log level
+     *
+     * @param level log level
+     */
+    private static native void setNativeLevel(int level);
+
+    /**
+     * Returns native log level.
+     *
+     * @return log level
+     */
+    private static native int getNativeLevel();
 
 }

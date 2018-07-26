@@ -10,22 +10,6 @@
 		343E66B5210784BD00F95E5B /* HttpsViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E66B3210784BD00F95E5B /* HttpsViewController.h */; };
 		343E66B6210784BD00F95E5B /* HttpsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 343E66B4210784BD00F95E5B /* HttpsViewController.m */; };
 		343E66B9210789DE00F95E5B /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E66B7210789DE00F95E5B /* Constants.h */; };
-		343E66F321079D9F00F95E5B /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66EB21079D9F00F95E5B /* libavutil.framework */; };
-		343E66F421079D9F00F95E5B /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66EC21079D9F00F95E5B /* libswscale.framework */; };
-		343E66F521079D9F00F95E5B /* libavfilter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66ED21079D9F00F95E5B /* libavfilter.framework */; };
-		343E66F621079D9F00F95E5B /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66EE21079D9F00F95E5B /* mobileffmpeg.framework */; };
-		343E66F721079D9F00F95E5B /* libavcodec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66EF21079D9F00F95E5B /* libavcodec.framework */; };
-		343E66F821079D9F00F95E5B /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66F021079D9F00F95E5B /* libavdevice.framework */; };
-		343E66F921079D9F00F95E5B /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66F121079D9F00F95E5B /* libavformat.framework */; };
-		343E66FA21079D9F00F95E5B /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66F221079D9F00F95E5B /* libswresample.framework */; };
-		343E66FB21079DCC00F95E5B /* libavcodec.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66EF21079D9F00F95E5B /* libavcodec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		343E66FC21079DCC00F95E5B /* libavdevice.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66F021079D9F00F95E5B /* libavdevice.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		343E66FD21079DCC00F95E5B /* libavfilter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66ED21079D9F00F95E5B /* libavfilter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		343E66FE21079DCC00F95E5B /* libavformat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66F121079D9F00F95E5B /* libavformat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		343E66FF21079DCC00F95E5B /* libavutil.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66EB21079D9F00F95E5B /* libavutil.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		343E670021079DCC00F95E5B /* libswresample.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66F221079D9F00F95E5B /* libswresample.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		343E670121079DCC00F95E5B /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66EC21079D9F00F95E5B /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		343E670221079DCC00F95E5B /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 343E66EE21079D9F00F95E5B /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		343E67052107AD0100F95E5B /* Util.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E67032107AD0100F95E5B /* Util.h */; };
 		343E67062107AD0100F95E5B /* Util.m in Sources */ = {isa = PBXBuildFile; fileRef = 343E67042107AD0100F95E5B /* Util.m */; };
 		343E67092107C27600F95E5B /* TabBarController.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E67072107C27600F95E5B /* TabBarController.h */; };
@@ -42,6 +26,22 @@
 		34BB54792109BE5B00606B7C /* UIBarItem+RCBarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB54712109BE5B00606B7C /* UIBarItem+RCBarItem.m */; };
 		34BB547A2109BE5B00606B7C /* RCEasyTipViewIDGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB54722109BE5B00606B7C /* RCEasyTipViewIDGenerator.m */; };
 		34BB547C2109D44800606B7C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB547B2109D44800606B7C /* Constants.m */; };
+		34D26CE7210F5CA4005B3A32 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CDF210F5CA4005B3A32 /* libavutil.framework */; };
+		34D26CE8210F5CA4005B3A32 /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE0210F5CA4005B3A32 /* libswscale.framework */; };
+		34D26CE9210F5CA4005B3A32 /* libavfilter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE1210F5CA4005B3A32 /* libavfilter.framework */; };
+		34D26CEA210F5CA4005B3A32 /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */; };
+		34D26CEB210F5CA4005B3A32 /* libavcodec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE3210F5CA4005B3A32 /* libavcodec.framework */; };
+		34D26CEC210F5CA4005B3A32 /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE4210F5CA4005B3A32 /* libavdevice.framework */; };
+		34D26CED210F5CA4005B3A32 /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE5210F5CA4005B3A32 /* libavformat.framework */; };
+		34D26CEE210F5CA4005B3A32 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE6210F5CA4005B3A32 /* libswresample.framework */; };
+		34D26CEF210F5D2C005B3A32 /* libavcodec.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE3210F5CA4005B3A32 /* libavcodec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34D26CF0210F5D2C005B3A32 /* libavdevice.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE4210F5CA4005B3A32 /* libavdevice.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34D26CF1210F5D2C005B3A32 /* libavfilter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE1210F5CA4005B3A32 /* libavfilter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34D26CF2210F5D2C005B3A32 /* libavformat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE5210F5CA4005B3A32 /* libavformat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34D26CF3210F5D2C005B3A32 /* libavutil.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CDF210F5CA4005B3A32 /* libavutil.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34D26CF4210F5D2C005B3A32 /* libswresample.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE6210F5CA4005B3A32 /* libswresample.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34D26CF5210F5D2C005B3A32 /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE0210F5CA4005B3A32 /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34D26CF6210F5D2C005B3A32 /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE214209F7DDD005CE2AE /* AppDelegate.m */; };
 		34FAE218209F7DDD005CE2AE /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE217209F7DDD005CE2AE /* FirstViewController.m */; };
 		34FAE21B209F7DDD005CE2AE /* SecondViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE21A209F7DDD005CE2AE /* SecondViewController.m */; };
@@ -58,14 +58,14 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				343E66FB21079DCC00F95E5B /* libavcodec.framework in Embed Frameworks */,
-				343E66FC21079DCC00F95E5B /* libavdevice.framework in Embed Frameworks */,
-				343E66FD21079DCC00F95E5B /* libavfilter.framework in Embed Frameworks */,
-				343E66FE21079DCC00F95E5B /* libavformat.framework in Embed Frameworks */,
-				343E66FF21079DCC00F95E5B /* libavutil.framework in Embed Frameworks */,
-				343E670021079DCC00F95E5B /* libswresample.framework in Embed Frameworks */,
-				343E670121079DCC00F95E5B /* libswscale.framework in Embed Frameworks */,
-				343E670221079DCC00F95E5B /* mobileffmpeg.framework in Embed Frameworks */,
+				34D26CEF210F5D2C005B3A32 /* libavcodec.framework in Embed Frameworks */,
+				34D26CF0210F5D2C005B3A32 /* libavdevice.framework in Embed Frameworks */,
+				34D26CF1210F5D2C005B3A32 /* libavfilter.framework in Embed Frameworks */,
+				34D26CF2210F5D2C005B3A32 /* libavformat.framework in Embed Frameworks */,
+				34D26CF3210F5D2C005B3A32 /* libavutil.framework in Embed Frameworks */,
+				34D26CF4210F5D2C005B3A32 /* libswresample.framework in Embed Frameworks */,
+				34D26CF5210F5D2C005B3A32 /* libswscale.framework in Embed Frameworks */,
+				34D26CF6210F5D2C005B3A32 /* mobileffmpeg.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -76,14 +76,6 @@
 		343E66B3210784BD00F95E5B /* HttpsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpsViewController.h; sourceTree = "<group>"; };
 		343E66B4210784BD00F95E5B /* HttpsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpsViewController.m; sourceTree = "<group>"; };
 		343E66B7210789DE00F95E5B /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
-		343E66EB21079D9F00F95E5B /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavutil.framework; path = "../../prebuilt/ios-framework/libavutil.framework"; sourceTree = "<group>"; };
-		343E66EC21079D9F00F95E5B /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswscale.framework; path = "../../prebuilt/ios-framework/libswscale.framework"; sourceTree = "<group>"; };
-		343E66ED21079D9F00F95E5B /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavfilter.framework; path = "../../prebuilt/ios-framework/libavfilter.framework"; sourceTree = "<group>"; };
-		343E66EE21079D9F00F95E5B /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mobileffmpeg.framework; path = "../../prebuilt/ios-framework/mobileffmpeg.framework"; sourceTree = "<group>"; };
-		343E66EF21079D9F00F95E5B /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavcodec.framework; path = "../../prebuilt/ios-framework/libavcodec.framework"; sourceTree = "<group>"; };
-		343E66F021079D9F00F95E5B /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavdevice.framework; path = "../../prebuilt/ios-framework/libavdevice.framework"; sourceTree = "<group>"; };
-		343E66F121079D9F00F95E5B /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavformat.framework; path = "../../prebuilt/ios-framework/libavformat.framework"; sourceTree = "<group>"; };
-		343E66F221079D9F00F95E5B /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswresample.framework; path = "../../prebuilt/ios-framework/libswresample.framework"; sourceTree = "<group>"; };
 		343E67032107AD0100F95E5B /* Util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Util.h; sourceTree = "<group>"; };
 		343E67042107AD0100F95E5B /* Util.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Util.m; sourceTree = "<group>"; };
 		343E67072107C27600F95E5B /* TabBarController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TabBarController.h; sourceTree = "<group>"; };
@@ -100,6 +92,14 @@
 		34BB54712109BE5B00606B7C /* UIBarItem+RCBarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBarItem+RCBarItem.m"; sourceTree = "<group>"; };
 		34BB54722109BE5B00606B7C /* RCEasyTipViewIDGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCEasyTipViewIDGenerator.m; sourceTree = "<group>"; };
 		34BB547B2109D44800606B7C /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
+		34D26CDF210F5CA4005B3A32 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavutil.framework; path = "../../prebuilt/ios-framework/libavutil.framework"; sourceTree = "<group>"; };
+		34D26CE0210F5CA4005B3A32 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswscale.framework; path = "../../prebuilt/ios-framework/libswscale.framework"; sourceTree = "<group>"; };
+		34D26CE1210F5CA4005B3A32 /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavfilter.framework; path = "../../prebuilt/ios-framework/libavfilter.framework"; sourceTree = "<group>"; };
+		34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mobileffmpeg.framework; path = "../../prebuilt/ios-framework/mobileffmpeg.framework"; sourceTree = "<group>"; };
+		34D26CE3210F5CA4005B3A32 /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavcodec.framework; path = "../../prebuilt/ios-framework/libavcodec.framework"; sourceTree = "<group>"; };
+		34D26CE4210F5CA4005B3A32 /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavdevice.framework; path = "../../prebuilt/ios-framework/libavdevice.framework"; sourceTree = "<group>"; };
+		34D26CE5210F5CA4005B3A32 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavformat.framework; path = "../../prebuilt/ios-framework/libavformat.framework"; sourceTree = "<group>"; };
+		34D26CE6210F5CA4005B3A32 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswresample.framework; path = "../../prebuilt/ios-framework/libswresample.framework"; sourceTree = "<group>"; };
 		34FAE210209F7DDD005CE2AE /* MobileFFmpegTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileFFmpegTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		34FAE213209F7DDD005CE2AE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		34FAE214209F7DDD005CE2AE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -119,14 +119,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				343E66F321079D9F00F95E5B /* libavutil.framework in Frameworks */,
-				343E66F821079D9F00F95E5B /* libavdevice.framework in Frameworks */,
-				343E66F521079D9F00F95E5B /* libavfilter.framework in Frameworks */,
-				343E66F421079D9F00F95E5B /* libswscale.framework in Frameworks */,
-				343E66F721079D9F00F95E5B /* libavcodec.framework in Frameworks */,
-				343E66FA21079D9F00F95E5B /* libswresample.framework in Frameworks */,
-				343E66F621079D9F00F95E5B /* mobileffmpeg.framework in Frameworks */,
-				343E66F921079D9F00F95E5B /* libavformat.framework in Frameworks */,
+				34D26CE7210F5CA4005B3A32 /* libavutil.framework in Frameworks */,
+				34D26CEC210F5CA4005B3A32 /* libavdevice.framework in Frameworks */,
+				34D26CE9210F5CA4005B3A32 /* libavfilter.framework in Frameworks */,
+				34D26CE8210F5CA4005B3A32 /* libswscale.framework in Frameworks */,
+				34D26CEB210F5CA4005B3A32 /* libavcodec.framework in Frameworks */,
+				34D26CEE210F5CA4005B3A32 /* libswresample.framework in Frameworks */,
+				34D26CEA210F5CA4005B3A32 /* mobileffmpeg.framework in Frameworks */,
+				34D26CED210F5CA4005B3A32 /* libavformat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,14 +146,14 @@
 		3498DC65209F7F1C005F5883 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				343E66EF21079D9F00F95E5B /* libavcodec.framework */,
-				343E66F021079D9F00F95E5B /* libavdevice.framework */,
-				343E66ED21079D9F00F95E5B /* libavfilter.framework */,
-				343E66F121079D9F00F95E5B /* libavformat.framework */,
-				343E66EB21079D9F00F95E5B /* libavutil.framework */,
-				343E66F221079D9F00F95E5B /* libswresample.framework */,
-				343E66EC21079D9F00F95E5B /* libswscale.framework */,
-				343E66EE21079D9F00F95E5B /* mobileffmpeg.framework */,
+				34D26CE3210F5CA4005B3A32 /* libavcodec.framework */,
+				34D26CE4210F5CA4005B3A32 /* libavdevice.framework */,
+				34D26CE1210F5CA4005B3A32 /* libavfilter.framework */,
+				34D26CE5210F5CA4005B3A32 /* libavformat.framework */,
+				34D26CDF210F5CA4005B3A32 /* libavutil.framework */,
+				34D26CE6210F5CA4005B3A32 /* libswresample.framework */,
+				34D26CE0210F5CA4005B3A32 /* libswscale.framework */,
+				34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -200,8 +200,8 @@
 				34FAE214209F7DDD005CE2AE /* AppDelegate.m */,
 				34FAE216209F7DDD005CE2AE /* FirstViewController.h */,
 				34FAE217209F7DDD005CE2AE /* FirstViewController.m */,
-				34FAE21A209F7DDD005CE2AE /* SecondViewController.m */,
 				34FAE219209F7DDD005CE2AE /* SecondViewController.h */,
+				34FAE21A209F7DDD005CE2AE /* SecondViewController.m */,
 				34FAE21C209F7DDD005CE2AE /* Main.storyboard */,
 				34FAE21F209F7DDE005CE2AE /* Assets.xcassets */,
 				34FAE221209F7DDE005CE2AE /* LaunchScreen.storyboard */,

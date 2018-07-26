@@ -17,18 +17,30 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "mobileffmpeg.h"
+#include "MobileFFmpeg.h"
+#include "ArchDetect.h"
+#include "Log.h"
 
 /** Forward declaration for function defined in ffmpeg.c */
 int execute(int argc, char **argv);
+
+@implementation MobileFFmpeg
+
+/** Library version string */
+NSString *const MOBILE_FFMPEG_VERSION = @"2.1";
+
++ (void)initialize {
+    [Log class];
+    NSLog(@"Loaded mobile-ffmpeg-%@-%@\n", [ArchDetect getArch], [MobileFFmpeg getVersion]);
+}
 
 /**
  * Returns FFmpeg version bundled within the library.
  *
  * \return FFmpeg version string
  */
-const char *mobileffmpeg_get_ffmpeg_version(void) {
-    return FFMPEG_VERSION;
++ (NSString*)getFFmpegVersion {
+    return [NSString stringWithUTF8String:FFMPEG_VERSION];
 }
 
 /**
@@ -36,7 +48,7 @@ const char *mobileffmpeg_get_ffmpeg_version(void) {
  *
  * \return MobileFFmpeg version string
  */
-const char *mobileffmpeg_get_version(void) {
++ (NSString*)getVersion {
     return MOBILE_FFMPEG_VERSION;
 }
 
@@ -47,35 +59,32 @@ const char *mobileffmpeg_get_version(void) {
  * \param argv arguments pointer
  * \return zero on successful execution, non-zero on error
  */
-int mobileffmpeg_execute(int argc, char **argv) {
-    int argumentCount = 1;
-    char **newArgv = NULL;
++ (int)execute: (NSString*)arguments {
 
-    if (argv != NULL) {
-        argumentCount = argc + 1;
-    }
+    // SPLITTING ARGUMENTS
+    NSArray* commandArray = [arguments componentsSeparatedByString:@" "];
+    char **commandCharPArray = (char **)malloc(sizeof(char*) * ([commandArray count] + 1));
 
     /* PRESERVING USAGE FORMAT
      *
      * ffmpeg <arguments>
      */
-    newArgv = (char **)malloc(sizeof(char*) * (argumentCount));
-    newArgv[0] = (char *)malloc(sizeof(char) * (strlen(LIB_NAME) + 1));
-    strcpy(newArgv[0], LIB_NAME);
+    commandCharPArray[0] = (char *)malloc(sizeof(char) * ([LOG_LIB_NAME length] + 1));
+    strcpy(commandCharPArray[0], [LOG_LIB_NAME UTF8String]);
 
-    // PREPARE
-    if (argv != NULL) {
-        for (int i = 0; i < (argumentCount - 1); i++) {
-            newArgv[i + 1] = argv[i];
-        }
+    for (int i=0; i < [commandArray count]; i++) {
+        NSString *argument = [commandArray objectAtIndex:i];
+        commandCharPArray[i + 1] = (char *) [argument UTF8String];
     }
 
     // RUN
-    int retCode = execute(argumentCount, newArgv);
+    int retCode = execute(([commandArray count] + 1), commandCharPArray);
 
     // CLEANUP
-    free(newArgv[0]);
-    free(newArgv);
+    free(commandCharPArray[0]);
+    free(commandCharPArray);
 
     return retCode;
 }
+
+@end

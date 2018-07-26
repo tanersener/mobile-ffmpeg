@@ -40,7 +40,6 @@ import com.arthenica.mobileffmpeg.Log;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
 
 public class CommandTabFragment extends Fragment {
 
@@ -53,19 +52,27 @@ public class CommandTabFragment extends Fragment {
         logQueue = new ConcurrentLinkedQueue<>();
     }
 
-    public void enableLogRedirection() {
-        Log.enableCallbackFunction(new Function<byte[], Void>() {
+    public void enableCallbackFunction() {
+        Log.enableCallbackFunction(new Function<Log.Message, Void>() {
 
             @Override
-            public Void apply(byte[] logMessageBytes) {
-                logQueue.add(new String(logMessageBytes));
+            public Void apply(Log.Message message) {
+                logQueue.add(message.getText());
                 return null;
             }
         });
     }
 
-    public void disableLogRedirection() {
+    public void disableCallbackFunction() {
         Log.enableCallbackFunction(null);
+    }
+
+    public void enableLogRedirection() {
+        Log.enableRedirection();
+    }
+
+    public void disableLogRedirection() {
+        Log.disableRedirection();
     }
 
     public static CommandTabFragment newInstance(final Context context) {
@@ -112,41 +119,37 @@ public class CommandTabFragment extends Fragment {
                     runFFmpegAsync();
                 }
             });
+
+            waitForLogs();
         }
     }
 
     public void runFFmpeg() {
-        enableLogRedirection();
+        enableCallbackFunction();
+
         String command = commandText.getText().toString();
         String[] split = command.split(" ");
 
-        final CountDownLatch logSync = new CountDownLatch(1);
         clearLog();
-        waitForLogs(logSync);
 
         int returnCode = FFmpeg.execute(split);
         android.util.Log.i(MainActivity.TAG, String.format("Process exited with rc %d.", returnCode));
         Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
-        logSync.countDown();
-        disableLogRedirection();
     }
 
     public void runFFmpegAsync() {
-        enableLogRedirection();
+        disableCallbackFunction();
+
         String command = commandText.getText().toString();
         String[] arguments = command.split(" ");
 
-        final CountDownLatch logSync = new CountDownLatch(1);
         clearLog();
-        waitForLogs(logSync);
 
         MainActivity.executeAsync(new Function<Integer, Void>() {
 
             @Override
             public Void apply(Integer returnCode) {
                 android.util.Log.i(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
-                logSync.countDown();
-                disableLogRedirection();
                 return null;
             }
         }, arguments);
@@ -154,7 +157,6 @@ public class CommandTabFragment extends Fragment {
 
     public void appendLog(final String logMessage) {
         logText.append(logMessage);
-        logText.append("\n");
     }
 
     public void clearLog() {
@@ -162,7 +164,7 @@ public class CommandTabFragment extends Fragment {
         logText.setText("");
     }
 
-    public void waitForLogs(final CountDownLatch count) {
+    public void waitForLogs() {
         final Handler handler = new Handler();
         final Runnable runnable = new Runnable() {
 
@@ -177,16 +179,11 @@ public class CommandTabFragment extends Fragment {
                     }
                 } while (logMessage != null);
 
-                if (count.getCount() < 1) {
-                    Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
-                    handler.removeCallbacks(this);
-
-                } else {
-                    handler.postDelayed(this, 1000);
-                }
+                handler.postDelayed(this, 250);
             }
         };
-        handler.postDelayed(runnable, 1000);
+
+        handler.postDelayed(runnable, 250);
     }
 
 }

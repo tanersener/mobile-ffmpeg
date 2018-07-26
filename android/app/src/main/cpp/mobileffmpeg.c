@@ -42,18 +42,18 @@ JNINativeMethod ffmpegMethods[] = {
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     if ((*vm)->GetEnv(vm, (void**)(&env), JNI_VERSION_1_6) != JNI_OK) {
-        LOGE("OnLoad failed to GetEnv for class %s.", ffmpegClassName);
+        LOGE("OnLoad failed to GetEnv for class %s.\n", ffmpegClassName);
         return JNI_FALSE;
     }
 
     jclass ffmpegClass = (*env)->FindClass(env, ffmpegClassName);
     if (ffmpegClass == NULL) {
-        LOGE("OnLoad failed to FindClass %s.", ffmpegClassName);
+        LOGE("OnLoad failed to FindClass %s.\n", ffmpegClassName);
         return JNI_FALSE;
     }
 
     if ((*env)->RegisterNatives(env, ffmpegClass, ffmpegMethods, 3) < 0) {
-        LOGE("OnLoad failed to RegisterNatives for class %s.", ffmpegClassName);
+        LOGE("OnLoad failed to RegisterNatives for class %s.\n", ffmpegClassName);
         return JNI_FALSE;
     }
 
@@ -102,7 +102,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *en
         tempArray = (jstring *) malloc(sizeof(jstring) * programArgumentCount);
     }
 
-    /* PRESERVING USAGE FORMAT
+    /* PRESERVE USAGE FORMAT
      *
      * ffmpeg <arguments>
      */

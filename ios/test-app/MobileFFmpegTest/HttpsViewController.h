@@ -22,8 +22,9 @@
 #import <UIKit/UIKit.h>
 #import "Constants.h"
 #import "Util.h"
+#import <mobileffmpeg/Log.h>
 
-@interface HttpsViewController : UIViewController
+@interface HttpsViewController : UIViewController<LogDelegate>
 
 - (void)showTooltip;
 - (void)hideTooltip;

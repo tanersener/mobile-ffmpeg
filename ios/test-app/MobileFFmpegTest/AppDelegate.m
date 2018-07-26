@@ -20,9 +20,8 @@
 //
 
 #import "AppDelegate.h"
-
-#import <mobileffmpeg/archdetect.h>
-#import <mobileffmpeg/mobileffmpeg.h>
+#import <mobileffmpeg/ArchDetect.h>
+#import <mobileffmpeg/MobileFFmpeg.h>
 
 @interface AppDelegate ()
 
@@ -32,8 +31,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    
-    NSLog(@"Loaded mobile-ffmpeg-%s-%s\n", mobileffmpeg_get_arch(), mobileffmpeg_get_version());
 
     // UPDATE TAB BAR STYLE
     UITabBarController *tabBarController = (UITabBarController *)self.window.rootViewController;

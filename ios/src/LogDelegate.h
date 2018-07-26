@@ -17,36 +17,10 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string.h>
-#include <stdlib.h>
-#include <Foundation/Foundation.h>
-#include "libavutil/ffversion.h"
-
 /**
- * Main class for FFmpeg operations.
+ * Use this delegate to redirect FFmpeg logs.
  */
-@interface MobileFFmpeg : NSObject
-
-/**
- * Returns FFmpeg version bundled within the library.
- *
- * \return FFmpeg version
- */
-+ (NSString*)getFFmpegVersion;
-
-/**
- * Returns MobileFFmpeg library version.
- *
- * \return MobileFFmpeg version
- */
-+ (NSString*)getVersion;
-
-/**
- * Synchronously executes FFmpeg with arguments provided.
- *
- * \param FFmpeg command options/arguments
- * \return zero on successful execution, non-zero on error
- */
-+ (int)execute: (NSString*)arguments;
-
+@protocol LogDelegate<NSObject>
+@required
+- (void)logCallback: (int)level :(NSString*)message;
 @end

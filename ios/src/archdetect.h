@@ -17,32 +17,21 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOBILEFFMPEG_ARCHDETECT_H
-#define MOBILEFFMPEG_ARCHDETECT_H
-
-#include "log.h"
 #include <sys/types.h>
 #include <sys/sysctl.h>
 #include <mach/machine.h>
+#include <Foundation/Foundation.h>
 
-/** Represents armv7 architecture. */
-#define MF_ARCH_ARMV7 "armv7"
+/**
+ * This class is used to detect running architecture.
+ */
+@interface ArchDetect : NSObject
 
-/** Represents armv7s architecture. */
-#define MF_ARCH_ARMV7S "armv7s"
+/**
+ * Returns running architecture name.
+ *
+ * \return running architecture name as NSString
+ */
++ (NSString*)getArch;
 
-/** Represents arm64 architecture. */
-#define MF_ARCH_ARM64 "arm64"
-
-/** Represents i386 architecture. */
-#define MF_ARCH_I386 "i386"
-
-/** Represents x86_64 architecture. */
-#define MF_ARCH_X86_64 "x86_64"
-
-/** Represents not supported architectures. */
-#define MF_ABI_UNKNOWN "unknown"
-
-const char *mobileffmpeg_get_arch(void);
-
-#endif /* MOBILEFFMPEG_ARCHDETECT_H */
+@end

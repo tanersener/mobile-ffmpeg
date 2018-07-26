@@ -17,8 +17,8 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOBILEFFMPEG_ABIDETECT_H
-#define MOBILEFFMPEG_ABIDETECT_H
+#ifndef MOBILE_FFMPEG_ABIDETECT_H
+#define MOBILE_FFMPEG_ABIDETECT_H
 
 #include <jni.h>
 #include "log.h"
@@ -51,4 +51,4 @@
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEnv *, jclass);
 
-#endif /* MOBILEFFMPEG_ABIDETECT_H */
+#endif /* MOBILE_FFMPEG_ABIDETECT_H */

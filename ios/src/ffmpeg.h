@@ -16,29 +16,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/* CHANGES 03.2018 Taner Sener
+/* CHANGES 07.2018 Taner Sener
  * --------------------------------------------------------
  * - Include guards renamed
- * - log.h included
- * - mid_pred copied from libavcodec/mathops.h
- * - ff_dlog copied from libavutil/internal.h
- * - SWS_BILINEAR and SWS_BITEXACT definitions copied from libswscale/swscale.h
  */
 
-#ifndef MOBILEFFMPEG_FFMPEG_H
-#define MOBILEFFMPEG_FFMPEG_H
+#ifndef MOBILE_FFMPEG_FFMPEG_H
+#define MOBILE_FFMPEG_FFMPEG_H
 
 #include "config.h"
 
 #include <stdint.h>
 #include <stdio.h>
 #include <signal.h>
-
-#include "log.h"
-
-#if HAVE_PTHREADS
-#include <pthread.h>
-#endif
 
 #include "cmdutils.h"
 
@@ -56,38 +46,10 @@
 #include "libavutil/hwcontext.h"
 #include "libavutil/pixfmt.h"
 #include "libavutil/rational.h"
+#include "libavutil/thread.h"
 #include "libavutil/threadmessage.h"
 
 #include "libswresample/swresample.h"
-
-/* median of 3 */
-#ifndef mid_pred
-#define mid_pred mid_pred
-static inline av_const int mid_pred(int a, int b, int c)
-{
-    if(a>b){
-        if(c>b){
-            if(c>a) b=a;
-            else    b=c;
-        }
-    }else{
-        if(b>c){
-            if(c>a) b=c;
-            else    b=a;
-        }
-    }
-    return b;
-}
-#endif
-
-#define SWS_BILINEAR          2
-#define SWS_BITEXACT          0x80000
-
-#ifdef DEBUG
-#   define ff_dlog(ctx, ...) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__)
-#else
-#   define ff_dlog(ctx, ...) do { if (0) av_log(ctx, AV_LOG_DEBUG, __VA_ARGS__); } while (0)
-#endif
 
 #define VSYNC_AUTO       -1
 #define VSYNC_PASSTHROUGH 0
@@ -101,14 +63,10 @@ static inline av_const int mid_pred(int a, int b, int c)
 enum HWAccelID {
     HWACCEL_NONE = 0,
     HWACCEL_AUTO,
-    HWACCEL_VDPAU,
-    HWACCEL_DXVA2,
-    HWACCEL_VDA,
+    HWACCEL_GENERIC,
     HWACCEL_VIDEOTOOLBOX,
     HWACCEL_QSV,
-    HWACCEL_VAAPI,
     HWACCEL_CUVID,
-    HWACCEL_D3D11VA,
 };
 
 typedef struct HWAccel {
@@ -116,7 +74,6 @@ typedef struct HWAccel {
     int (*init)(AVCodecContext *s);
     enum HWAccelID id;
     enum AVPixelFormat pix_fmt;
-    enum AVHWDeviceType device_type;
 } HWAccel;
 
 typedef struct HWDevice {
@@ -201,6 +158,7 @@ typedef struct OptionsContext {
     float mux_preload;
     float mux_max_delay;
     int shortest;
+    int bitexact;
 
     int video_disable;
     int audio_disable;
@@ -409,11 +367,11 @@ typedef struct InputStream {
 
     /* hwaccel options */
     enum HWAccelID hwaccel_id;
+    enum AVHWDeviceType hwaccel_device_type;
     char  *hwaccel_device;
     enum AVPixelFormat hwaccel_output_format;
 
     /* hwaccel context */
-    enum HWAccelID active_hwaccel_id;
     void  *hwaccel_ctx;
     void (*hwaccel_uninit)(AVCodecContext *s);
     int  (*hwaccel_get_buffer)(AVCodecContext *s, AVFrame *frame, int flags);
@@ -459,7 +417,7 @@ typedef struct InputFile {
     int rate_emu;
     int accurate_seek;
 
-#if HAVE_PTHREADS
+#if HAVE_THREADS
     AVThreadMessageQueue *in_thread_queue;
     pthread_t thread;           /* thread reading from this file */
     int non_blocking;           /* reading packets from the thread should not block */
@@ -573,9 +531,6 @@ typedef struct OutputStream {
 
     int keep_pix_fmt;
 
-    AVCodecParserContext *parser;
-    AVCodecContext       *parser_avctx;
-
     /* stats */
     // combined size of all the packets written
     uint64_t data_size;
@@ -664,7 +619,6 @@ extern const AVIOInterruptCB int_cb;
 
 extern const OptionDef options[];
 extern const HWAccel hwaccels[];
-extern int hwaccel_lax_profile_check;
 extern AVBufferRef *hw_device_ctx;
 #if CONFIG_QSV
 extern char *qsv_device;
@@ -702,7 +656,6 @@ int ifilter_parameters_from_frame(InputFilter *ifilter, const AVFrame *frame);
 
 int ffmpeg_parse_options(int argc, char **argv);
 
-int vda_init(AVCodecContext *s);
 int videotoolbox_init(AVCodecContext *s);
 int qsv_init(AVCodecContext *s);
 int cuvid_init(AVCodecContext *s);
@@ -716,4 +669,4 @@ int hw_device_setup_for_encode(OutputStream *ost);
 
 int hwaccel_decode_init(AVCodecContext *avctx);
 
-#endif /* MOBILEFFMPEG_FFMPEG_H */
+#endif /* MOBILE_FFMPEG_FFMPEG_H */

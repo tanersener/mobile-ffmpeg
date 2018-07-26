@@ -236,10 +236,22 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
     done
 done
 
-# BUILDING FFMPEG
-. ${BASEDIR}/build/ios-ffmpeg.sh "$@" || exit 1
+# SKIP TO SPEED UP BUILD
+if [[ ${SKIP_ffmpeg} -ne 1 ]]; then
 
-# BUILDING MOBILE FFMPEG
-. ${BASEDIR}/build/ios-mobile-ffmpeg.sh || exit 1
+    # BUILDING FFMPEG
+    . ${BASEDIR}/build/ios-ffmpeg.sh "$@" || exit 1
+else
+    echo -e "\nffmpeg: skipped"
+fi
+
+# SKIP TO SPEED UP BUILD
+if [[ ${SKIP_mobile_ffmpeg} -ne 1 ]]; then
+
+    # BUILDING MOBILE FFMPEG
+    . ${BASEDIR}/build/ios-mobile-ffmpeg.sh || exit 1
+else
+    echo -e "\nmobile-ffmpeg: skipped"
+fi
 
 echo -e "\nINFO: Completed build for ${ARCH} at "$(date)"\n">> ${BASEDIR}/build.log

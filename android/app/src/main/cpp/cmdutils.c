@@ -19,12 +19,15 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/* CHANGES 03.2018 Taner Sener
+/* CHANGES 07.2018 Taner Sener
  * --------------------------------------------------------
  * - Unused headers removed
  * - Parentheses placed around assignments in condition to prevent -Wparentheses warning
  * - exit_program updated with longjmp, disabling exit
+ * - longjmp_value added to store exit code
  * - argc validation added for optional arguments inside split_commandline
+ * - all av_log_set_callback invocations updated to set logCallbackFunction from log.c. unused
+ * log_callback_help and log_callback_help methods removed.
  */
 
 #include <string.h>
@@ -43,14 +46,16 @@
 #include "libavformat/avformat.h"
 #include "libavfilter/avfilter.h"
 #include "libavdevice/avdevice.h"
-#include "libswresample/swresample.h"
 #include "libswscale/swscale.h"
+#include "libswresample/swresample.h"
+#include "libavutil/attributes.h"
 #include "libavutil/avassert.h"
 #include "libavutil/avstring.h"
 #include "libavutil/bprint.h"
 #include "libavutil/display.h"
 #include "libavutil/mathematics.h"
 #include "libavutil/imgutils.h"
+#include "libavutil/libm.h"
 #include "libavutil/parseutils.h"
 #include "libavutil/pixdesc.h"
 #include "libavutil/eval.h"
@@ -60,6 +65,9 @@
 #include "libavutil/ffversion.h"
 #include "libavutil/version.h"
 #include "cmdutils.h"
+#if CONFIG_NETWORK
+#include "libavformat/network.h"
+#endif
 #if HAVE_SYS_RESOURCE_H
 #include <sys/time.h>
 #include <sys/resource.h>
@@ -69,6 +77,7 @@
 #endif
 
 static int init_report(const char *env);
+extern void logCallbackFunction(void *ptr, int level, const char* format, va_list vargs);
 
 AVDictionary *sws_dict;
 AVDictionary *swr_opts;
@@ -77,6 +86,7 @@ AVDictionary *format_opts, *codec_opts, *resample_opts;
 static FILE *report_file;
 static int report_file_level = AV_LOG_DEBUG;
 int hide_banner = 0;
+int longjmp_value = 0;
 
 enum show_muxdemuxers {
     SHOW_DEFAULT,
@@ -96,27 +106,6 @@ void uninit_opts(void)
     av_dict_free(&format_opts);
     av_dict_free(&codec_opts);
     av_dict_free(&resample_opts);
-}
-
-void log_callback_help(void *ptr, int level, const char *fmt, va_list vl)
-{
-    vfprintf(stdout, fmt, vl);
-}
-
-static void log_callback_report(void *ptr, int level, const char *fmt, va_list vl)
-{
-    va_list vl2;
-    char line[1024];
-    static int print_prefix = 1;
-
-    va_copy(vl2, vl);
-    av_log_default_callback(ptr, level, fmt, vl);
-    av_log_format_line(ptr, level, fmt, vl2, line, sizeof(line), &print_prefix);
-    va_end(vl2);
-    if (report_file_level >= level) {
-        fputs(line, report_file);
-        fflush(report_file);
-    }
 }
 
 void init_dynload(void)
@@ -140,9 +129,10 @@ void exit_program(int ret)
     if (program_exit)
         program_exit(ret);
 
-    // exit disabled and replaced with longjmp
+    // exit disabled and replaced with longjmp, exit value stored in longjmp_value
     // exit(ret);
-    longjmp(ex_buf__, ret);;
+    longjmp_value = ret;
+    longjmp(ex_buf__, ret);
 }
 
 double parse_number_or_die(const char *context, const char *numstr, int type,
@@ -889,28 +879,54 @@ int opt_loglevel(void *optctx, const char *opt, const char *arg)
         { "debug"  , AV_LOG_DEBUG   },
         { "trace"  , AV_LOG_TRACE   },
     };
+    const char *token;
     char *tail;
-    int level;
-    int flags;
-    int i;
+    int flags = av_log_get_flags();
+    int level = av_log_get_level();
+    int cmd, i = 0;
 
-    flags = av_log_get_flags();
-    tail = strstr(arg, "repeat");
-    if (tail)
-        flags &= ~AV_LOG_SKIP_REPEATED;
-    else
-        flags |= AV_LOG_SKIP_REPEATED;
-
-    av_log_set_flags(flags);
-    if (tail == arg)
-        arg += 6 + (arg[6]=='+');
-    if(tail && !*arg)
-        return 0;
+    av_assert0(arg);
+    while (*arg) {
+        token = arg;
+        if (*token == '+' || *token == '-') {
+            cmd = *token++;
+        } else {
+            cmd = 0;
+        }
+        if (!i && !cmd) {
+            flags = 0;  /* missing relative prefix, build absolute value */
+        }
+        if (!strncmp(token, "repeat", 6)) {
+            if (cmd == '-') {
+                flags |= AV_LOG_SKIP_REPEATED;
+            } else {
+                flags &= ~AV_LOG_SKIP_REPEATED;
+            }
+            arg = token + 6;
+        } else if (!strncmp(token, "level", 5)) {
+            if (cmd == '-') {
+                flags &= ~AV_LOG_PRINT_LEVEL;
+            } else {
+                flags |= AV_LOG_PRINT_LEVEL;
+            }
+            arg = token + 5;
+        } else {
+            break;
+        }
+        i++;
+    }
+    if (!*arg) {
+        goto end;
+    } else if (*arg == '+') {
+        arg++;
+    } else if (!i) {
+        flags = av_log_get_flags();  /* level value without prefix, reset flags */
+    }
 
     for (i = 0; i < FF_ARRAY_ELEMS(log_levels); i++) {
         if (!strcmp(log_levels[i].name, arg)) {
-            av_log_set_level(log_levels[i].level);
-            return 0;
+            level = log_levels[i].level;
+            goto end;
         }
     }
 
@@ -922,6 +938,9 @@ int opt_loglevel(void *optctx, const char *opt, const char *arg)
             av_log(NULL, AV_LOG_FATAL, "\"%s\"\n", log_levels[i].name);
         exit_program(1);
     }
+
+end:
+    av_log_set_flags(flags);
     av_log_set_level(level);
     return 0;
 }
@@ -1013,7 +1032,7 @@ static int init_report(const char *env)
                filename.str, strerror(errno));
         return ret;
     }
-    av_log_set_callback(log_callback_report);
+    av_log_set_callback(logCallbackFunction);
     av_log(NULL, AV_LOG_INFO,
            "%s started on %04d-%02d-%02d at %02d:%02d:%02d\n"
            "Report written to \"%s\"\n",
@@ -1110,6 +1129,7 @@ static void print_all_libs_info(int flags, int level)
     PRINT_LIB_INFO(avformat,   AVFORMAT,   flags, level);
     PRINT_LIB_INFO(avdevice,   AVDEVICE,   flags, level);
     PRINT_LIB_INFO(avfilter,   AVFILTER,   flags, level);
+    PRINT_LIB_INFO(swscale,    SWSCALE,    flags, level);
     PRINT_LIB_INFO(swresample, SWRESAMPLE, flags, level);
 }
 
@@ -1166,7 +1186,7 @@ void show_banner(int argc, char **argv, const OptionDef *options)
 
 int show_version(void *optctx, const char *opt, const char *arg)
 {
-    av_log_set_callback(log_callback_help);
+    av_log_set_callback(logCallbackFunction);
     print_program_info (SHOW_COPYRIGHT, AV_LOG_INFO);
     print_all_libs_info(SHOW_VERSION, AV_LOG_INFO);
 
@@ -1175,7 +1195,7 @@ int show_version(void *optctx, const char *opt, const char *arg)
 
 int show_buildconf(void *optctx, const char *opt, const char *arg)
 {
-    av_log_set_callback(log_callback_help);
+    av_log_set_callback(logCallbackFunction);
     print_buildconf      (INDENT|0, AV_LOG_INFO);
 
     return 0;
@@ -1264,8 +1284,10 @@ static int is_device(const AVClass *avclass)
 
 static int show_formats_devices(void *optctx, const char *opt, const char *arg, int device_only, int muxdemuxers)
 {
-    AVInputFormat *ifmt  = NULL;
-    AVOutputFormat *ofmt = NULL;
+    void *ifmt_opaque = NULL;
+    const AVInputFormat *ifmt  = NULL;
+    void *ofmt_opaque = NULL;
+    const AVOutputFormat *ofmt = NULL;
     const char *last_name;
     int is_dev;
 
@@ -1281,7 +1303,8 @@ static int show_formats_devices(void *optctx, const char *opt, const char *arg, 
         const char *long_name = NULL;
 
         if (muxdemuxers !=SHOW_DEMUXERS) {
-            while ((ofmt = av_oformat_next(ofmt))) {
+            ofmt_opaque = NULL;
+            while ((ofmt = av_muxer_iterate(&ofmt_opaque))) {
                 is_dev = is_device(ofmt->priv_class);
                 if (!is_dev && device_only)
                     continue;
@@ -1294,7 +1317,8 @@ static int show_formats_devices(void *optctx, const char *opt, const char *arg, 
             }
         }
         if (muxdemuxers != SHOW_MUXERS) {
-            while ((ifmt = av_iformat_next(ifmt))) {
+            ifmt_opaque = NULL;
+            while ((ifmt = av_demuxer_iterate(&ifmt_opaque))) {
                 is_dev = is_device(ifmt->priv_class);
                 if (!is_dev && device_only)
                     continue;
@@ -1608,7 +1632,7 @@ int show_bsfs(void *optctx, const char *opt, const char *arg)
     void *opaque = NULL;
 
     printf("Bitstream filters:\n");
-    while ((bsf = av_bsf_next(&opaque)))
+    while ((bsf = av_bsf_iterate(&opaque)))
         printf("%s\n", bsf->name);
     printf("\n");
     return 0;
@@ -1634,6 +1658,7 @@ int show_filters(void *optctx, const char *opt, const char *arg)
 #if CONFIG_AVFILTER
     const AVFilter *filter = NULL;
     char descr[64], *descr_cur;
+    void *opaque = NULL;
     int i, j;
     const AVFilterPad *pad;
 
@@ -1645,7 +1670,7 @@ int show_filters(void *optctx, const char *opt, const char *arg)
            "  V = Video input/output\n"
            "  N = Dynamic number and/or type of input/output\n"
            "  | = Source or sink filter\n");
-    while ((filter = avfilter_next(filter))) {
+    while ((filter = av_filter_iterate(&opaque))) {
         descr_cur = descr;
         for (i = 0; i < 2; i++) {
             if (i) {
@@ -1708,7 +1733,7 @@ int show_pix_fmts(void *optctx, const char *opt, const char *arg)
 #endif
 
     while ((pix_desc = av_pix_fmt_desc_next(pix_desc))) {
-        enum AVPixelFormat pix_fmt = av_pix_fmt_desc_get_id(pix_desc);
+        enum AVPixelFormat av_unused pix_fmt = av_pix_fmt_desc_get_id(pix_desc);
         printf("%c%c%c%c%c %-16s       %d            %2d\n",
                sws_isSupportedInput (pix_fmt)              ? 'I' : '.',
                sws_isSupportedOutput(pix_fmt)              ? 'O' : '.',
@@ -1902,10 +1927,26 @@ static void show_help_filter(const char *name)
 }
 #endif
 
+static void show_help_bsf(const char *name)
+{
+    const AVBitStreamFilter *bsf = av_bsf_get_by_name(name);
+
+    if (!bsf) {
+        av_log(NULL, AV_LOG_ERROR, "Unknown bit stream filter '%s'.\n", name);
+        return;
+    }
+
+    printf("Bit stream filter %s\n", bsf->name);
+    PRINT_CODEC_SUPPORTED(bsf, codec_ids, enum AVCodecID, "codecs",
+                          AV_CODEC_ID_NONE, GET_CODEC_NAME);
+    if (bsf->priv_class)
+        show_help_children(bsf->priv_class, AV_OPT_FLAG_BSF_PARAM);
+}
+
 int show_help(void *optctx, const char *opt, const char *arg)
 {
     char *topic, *par;
-    av_log_set_callback(log_callback_help);
+    av_log_set_callback(logCallbackFunction);
 
     topic = av_strdup(arg ? arg : "");
     if (!topic)
@@ -1928,6 +1969,8 @@ int show_help(void *optctx, const char *opt, const char *arg)
     } else if (!strcmp(topic, "filter")) {
         show_help_filter(par);
 #endif
+    } else if (!strcmp(topic, "bsf")) {
+        show_help_bsf(par);
     } else {
         show_help_default(topic, par);
     }

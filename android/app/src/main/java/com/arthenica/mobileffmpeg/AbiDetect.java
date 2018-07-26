@@ -30,6 +30,10 @@ public class AbiDetect {
 
     static {
         System.loadLibrary("abidetect");
+
+        /* ALL LIBRARIES LOADED AT STARTUP */
+        AbiDetect.class.getName();
+        FFmpeg.class.getName();
     }
 
     /**

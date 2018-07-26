@@ -17,14 +17,12 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOBILEFFMPEG_LOG_H
-#define MOBILEFFMPEG_LOG_H
+#ifndef MOBILE_FFMPEG_LOG_H
+#define MOBILE_FFMPEG_LOG_H
 
-#include <stdio.h>
-#include <pthread.h>
-#include <unistd.h>
 #include <jni.h>
 #include <android/log.h>
+#include "libavutil/log.h"
 
 /** Defines tag used for Android logging. */
 #define LIB_NAME "mobile-ffmpeg"
@@ -46,16 +44,30 @@
 
 /*
  * Class:     com_arthenica_mobileffmpeg_Log
- * Method:    startNativeCollector
- * Signature: ()I
+ * Method:    enableNativeRedirection
+ * Signature: ()V
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_startNativeCollector(JNIEnv *, jobject);
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Log_enableNativeRedirection(JNIEnv *, jclass);
 
 /*
  * Class:     com_arthenica_mobileffmpeg_Log
- * Method:    stopNativeCollector
+ * Method:    disableNativeRedirection
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Log_disableNativeRedirection(JNIEnv *, jclass);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Log
+ * Method:    setNativeLevel
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Log_setNativeLevel(JNIEnv *, jclass, jint);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Log
+ * Method:    getNativeLevel
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_stopNativeCollector(JNIEnv *, jobject);
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_getNativeLevel(JNIEnv *, jclass);
 
-#endif /* MOBILEFFMPEG_LOG_H */
+#endif /* MOBILE_FFMPEG_LOG_H */

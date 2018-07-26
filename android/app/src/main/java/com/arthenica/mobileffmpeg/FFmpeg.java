@@ -26,8 +26,6 @@ package com.arthenica.mobileffmpeg;
  *      int rc = FFmpeg.execute("-i", "file1.mp4", "-c:v", "libxvid", "file1.avi");
  *      Log.i(Log.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
  * </pre>
- * <p>Note that it is recommended to call {@link #shutdown()} method before terminating your
- * Android app.
  *
  * @author Taner Sener
  * @since v1.0
@@ -35,12 +33,12 @@ package com.arthenica.mobileffmpeg;
 public class FFmpeg {
 
     static {
+        android.util.Log.i(Log.TAG, "Loading mobile-ffmpeg.");
+
         final Abi abi = Abi.from(AbiDetect.getAbi());
         String abiName = abi.getName();
 
-        Log.enableCollectingStdOutErr();
-
-        android.util.Log.i(Log.TAG, "Loading mobile-ffmpeg.");
+        Log.enableRedirection();
 
         /*
          * NEON supported arm-v7a library has a different name
@@ -91,20 +89,5 @@ public class FFmpeg {
      * @return zero on successful execution, non-zero on error
      */
     public native static int execute(final String ... arguments);
-
-    /**
-     * <p>Shuts down library capabilities.
-     */
-    public static void shutdown() {
-        Log.disableCollectingStdOutErr();
-    }
-
-    /**
-     * <p>Overrides default {@link Object#finalize()} method.
-     */
-    @Override
-    protected void finalize() {
-        shutdown();
-    }
 
 }

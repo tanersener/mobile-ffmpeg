@@ -21,7 +21,8 @@
 
 #import "HttpsViewController.h"
 #import "RCEasyTipView.h"
-#import <mobileffmpeg/mobileffmpeg.h>
+#import <mobileffmpeg/MobileFFmpeg.h>
+#import <mobileffmpeg/Log.h>
 
 @interface HttpsViewController ()
 
@@ -34,6 +35,7 @@
 
 @implementation HttpsViewController
 
+/** Tooltip view reference */
 RCEasyTipView *tooltip;
 
 - (void)viewDidLoad {
@@ -57,17 +59,27 @@ RCEasyTipView *tooltip;
     
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = HTTPS_TEST_TOOLTIP_TEXT;
+
+    [Log setLogDelegate:self];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
 
-- (IBAction)getInfoClicled:(id)sender {
+- (void)logCallback: (int)level :(NSString*)message {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self appendOutput: message];
+    });
+}
+
+- (IBAction)getInfoClicked:(id)sender {
+    [Log setLevel:AV_LOG_WARNING];
+
     [self hideTooltip];
     
     [self clearOutput];
-
+    
     NSString *testUrl = [self.urlText text];
     if ([testUrl length] > 0) {
         [self appendOutput:[NSString stringWithFormat:@"Testing HTTPS with url \'%@\'\n\n", testUrl]];
@@ -79,22 +91,13 @@ RCEasyTipView *tooltip;
     
     // SPLITTING COMMAND ARGUMENTS
     NSString* ffmpegCommand = [NSString stringWithFormat:@"-hide_banner -i %@", testUrl];
-    NSArray* commandArray = [ffmpegCommand componentsSeparatedByString:@" "];
-    char **arguments = (char **)malloc(sizeof(char*) * ([commandArray count]));
-    for (int i=0; i < [commandArray count]; i++) {
-        NSString *argument = [commandArray objectAtIndex:i];
-        arguments[i] = (char *) [argument UTF8String];
-    }
-    
+
     [self appendOutput:[NSString stringWithFormat:@"ffmpeg process started with arguments\n\'%@\'\n\n", ffmpegCommand]];
-    
-    // Executing
-    int result = mobileffmpeg_execute((int) [commandArray count], arguments);
-    
+
+    // Execute
+    int result = [MobileFFmpeg execute: ffmpegCommand];
+
     [self appendOutput:[NSString stringWithFormat:@"ffmpeg process exited with rc %d\n\n", result]];
-    
-    // CLEANING ARGUMENTS
-    free(arguments);
 }
 
 - (void)showTooltip {
@@ -104,7 +107,6 @@ RCEasyTipView *tooltip;
 - (void)hideTooltip {
     [tooltip dismissWithCompletion:nil];
 }
-
 
 - (void)clearOutput {
     [[self outputText] setText:@""];

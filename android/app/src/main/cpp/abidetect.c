@@ -38,18 +38,18 @@ JNINativeMethod abiDetectMethods[] = {
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     if ((*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_6) != JNI_OK) {
-        LOGE("OnLoad failed to GetEnv for class %s.", abiDetectClassName);
+        LOGE("OnLoad failed to GetEnv for class %s.\n", abiDetectClassName);
         return JNI_FALSE;
     }
 
     jclass abiDetectClass = (*env)->FindClass(env, abiDetectClassName);
     if (abiDetectClass == NULL) {
-        LOGE("OnLoad failed to FindClass %s.", abiDetectClassName);
+        LOGE("OnLoad failed to FindClass %s.\n", abiDetectClassName);
         return JNI_FALSE;
     }
 
     if ((*env)->RegisterNatives(env, abiDetectClass, abiDetectMethods, 1) < 0) {
-        LOGE("OnLoad failed to RegisterNatives for class %s.", abiDetectClassName);
+        LOGE("OnLoad failed to RegisterNatives for class %s.\n", abiDetectClassName);
         return JNI_FALSE;
     }
 

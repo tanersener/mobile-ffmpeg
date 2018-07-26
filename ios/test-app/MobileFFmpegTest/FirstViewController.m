@@ -20,9 +20,8 @@
 //
 
 #import "FirstViewController.h"
-
-#import <mobileffmpeg/log.h>
-#import <mobileffmpeg/mobileffmpeg.h>
+#import <mobileffmpeg/Log.h>
+#import <mobileffmpeg/MobileFFmpeg.h>
 
 @interface FirstViewController ()
 
@@ -42,51 +41,39 @@
 }
 
 - (IBAction)runAction:(id)sender {
+    [Log enableRedirection];
+
+    [Log setLevel:AV_LOG_WARNING];
     
-    // SPLITTING COMMAND ARGUMENTS
-    NSArray* commandArray = [[[self commandText] text] componentsSeparatedByString:@" "];
-    char **arguments = (char **)malloc(sizeof(char*) * ([commandArray count]));
-    for (int i=0; i < [commandArray count]; i++) {
-        NSString *argument = [commandArray objectAtIndex:i];
-        arguments[i] = (char *) [argument UTF8String];
-    }
+    NSString *command = [[self commandText] text];
 
     [self clearLog];
 
-    [self appendLog:[NSString stringWithFormat:@"Running synchronously with arguments '%s'\n", self.commandText.text.UTF8String]];
+    [self appendLog:[NSString stringWithFormat:@"Running synchronously with arguments '%@'\n", command]];
 
-    // Executing
-    int result = mobileffmpeg_execute((int) [commandArray count], arguments);
+    // Execute
+    int result = [MobileFFmpeg execute: command];
 
     [self appendLog:[NSString stringWithFormat:@"Process exited with rc %d\n", result]];
-
-    // CLEANING ARGUMENTS
-    free(arguments);
 }
 
 - (IBAction)runAsyncAction:(id)sender {
+    [Log disableRedirection];
+
+    [Log setLevel:AV_LOG_INFO];
+    
+    NSString *command = [[self commandText] text];
     
     dispatch_async(dispatch_get_main_queue(), ^{
 
-        // SPLITTING COMMAND ARGUMENTS
-        NSArray* commandArray = [[[self commandText] text] componentsSeparatedByString:@" "];
-        char **arguments = (char **)malloc(sizeof(char*) * ([commandArray count]));
-        for (int i=0; i < [commandArray count]; i++) {
-            NSString *argument = [commandArray objectAtIndex:i];
-            arguments[i] = (char *) [argument UTF8String];
-        }
-        
         [self clearLog];
         
-        [self appendLog:[NSString stringWithFormat:@"Running asynchronously with arguments '%s'\n", self.commandText.text.UTF8String]];
+        [self appendLog:[NSString stringWithFormat:@"Running asynchronously with arguments '%@'\n", command]];
         
-        // Executing
-        int result = mobileffmpeg_execute((int) [commandArray count], arguments);
+        // Execute
+        int result = [MobileFFmpeg execute: command];
         
         [self appendLog:[NSString stringWithFormat:@"Async process exited with rc %d\n", result]];
-        
-        // CLEANING ARGUMENTS
-        free(arguments);
     });
 }
 
