@@ -31,13 +31,34 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-     // Override point for customization after application launch.
-
+    // Override point for customization after application launch.
+    
     NSLog(@"Loaded mobile-ffmpeg-%s-%s\n", mobileffmpeg_get_arch(), mobileffmpeg_get_version());
 
+    // UPDATE TAB BAR STYLE
+    UITabBarController *tabBarController = (UITabBarController *)self.window.rootViewController;
+    UITabBar *tabBar = tabBarController.tabBar;
+    UITabBarItem *tabBarItem1 = [tabBar.items objectAtIndex:0];
+    UITabBarItem *tabBarItem2 = [tabBar.items objectAtIndex:1];
+    UITabBarItem *tabBarItem3 = [tabBar.items objectAtIndex:2];
+    tabBarItem1.title = @"COMMAND";
+    tabBarItem2.title = @"SLIDESHOW";
+    tabBarItem3.title = @"HTTPS";
+
+    // SELECTED BAR ITEM
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [UIColor colorWithRed:244.0/255.0 green:104.0/255.0 blue:66.0/255.0 alpha:1.0], NSForegroundColorAttributeName,
+                                                       [UIFont boldSystemFontOfSize:14], NSFontAttributeName,
+                                                       nil] forState:UIControlStateSelected];
+
+    // NOT SELECTED BAR ITEMS
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [UIColor colorWithRed:189.0/255.0 green:195.0/255.0 blue:199.0/255.0 alpha:1.0], NSForegroundColorAttributeName,
+                                                       [UIFont boldSystemFontOfSize:12], NSFontAttributeName,
+                                                       nil] forState:UIControlStateNormal];
+    
     return YES;
 }
-
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
