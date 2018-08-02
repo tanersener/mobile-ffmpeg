@@ -603,7 +603,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     # BUILDING FFMPEG FAT BINARY
     for FFMPEG_LIB in ${FFMPEG_LIBS}
     do
-        LIPO_COMMAND="lipo -create"
+        LIPO_COMMAND="${LIPO} -create"
 
         for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
         do
@@ -618,7 +618,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     done
 
     # BUILDING MOBILE FFMPEG FAT BINARY
-    LIPO_COMMAND="lipo -create"
+    LIPO_COMMAND="${LIPO} -create"
 
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
     do

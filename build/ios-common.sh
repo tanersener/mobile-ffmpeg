@@ -805,6 +805,7 @@ set_toolchain_clang_paths() {
     export CC="$(xcrun --sdk $(get_sdk_name) -f clang)"
     export OBJC="$(xcrun --sdk $(get_sdk_name) -f clang)"
     export CXX="$(xcrun --sdk $(get_sdk_name) -f clang++)"
+    export LIPO="$(xcrun --sdk $(get_sdk_name) -f lipo)"
 
     local ASMFLAGS="$(get_asmflags $1)"
     case ${ARCH} in
