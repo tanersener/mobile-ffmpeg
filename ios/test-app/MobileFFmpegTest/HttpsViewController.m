@@ -60,7 +60,9 @@
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = HTTPS_TEST_TOOLTIP_TEXT;
 
-    [Log setLogDelegate:self];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setActive];
+    });
 }
 
 - (void)didReceiveMemoryWarning {
@@ -98,12 +100,18 @@
     NSLog(@"FFmpeg process exited with rc %d\n", result);
 }
 
-- (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.getInfoButton withinSuperView:self.view];
+- (void)setActive {
+    [Log setLogDelegate:self];
+    [self hideTooltip];
+    [self showTooltip];
 }
 
 - (void)hideTooltip {
     [tooltip dismissWithCompletion:nil];
+}
+
+- (void)showTooltip {
+    [tooltip showAnimated:YES forView:self.getInfoButton withinSuperView:self.view];
 }
 
 - (void)clearOutput {
@@ -112,6 +120,11 @@
 
 - (void)appendOutput:(NSString*) message {
     self.outputText.text = [self.outputText.text stringByAppendingString:message];
+    
+    if (self.outputText.text.length > 0 ) {
+        NSRange bottom = NSMakeRange(self.outputText.text.length - 1, 1);
+        [self.outputText scrollRangeToVisible:bottom];
+    }
 }
 
 @end

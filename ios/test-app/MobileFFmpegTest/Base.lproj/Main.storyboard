@@ -13,7 +13,7 @@
         <!--Command-->
         <scene sceneID="hNz-n2-bh7">
             <objects>
-                <viewController title="Command" id="9pv-A4-QxB" customClass="FirstViewController" sceneMemberID="viewController">
+                <viewController title="Command" id="9pv-A4-QxB" customClass="CommandViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="tsR-hK-woN">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -25,8 +25,10 @@
                                     <constraint firstAttribute="height" constant="32" id="Vbs-En-ncY"/>
                                     <constraint firstAttribute="width" constant="80" id="YcO-s3-cGD"/>
                                 </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="RUN">
-                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="string" keyPath="layer.cornerRadius" value="5"/>
@@ -42,8 +44,10 @@
                                     <constraint firstAttribute="width" constant="130" id="85g-G9-Rc6"/>
                                     <constraint firstAttribute="height" constant="32" id="Qzz-p8-cYE"/>
                                 </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="RUN ASYNC">
-                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
@@ -106,17 +110,20 @@
                     </tabBarItem>
                     <connections>
                         <outlet property="commandText" destination="WEh-8G-EBV" id="czI-U3-1Jp"/>
-                        <outlet property="runOutput" destination="gqc-19-yb3" id="pim-bt-xjn"/>
+                        <outlet property="header" destination="4qP-Cg-LeP" id="d0K-uO-oPK"/>
+                        <outlet property="outputText" destination="gqc-19-yb3" id="gp8-7g-e3E"/>
+                        <outlet property="runAsyncButton" destination="0OP-Pr-kwN" id="ekS-So-1BZ"/>
+                        <outlet property="runButton" destination="3Wr-qB-Pyg" id="93m-Dh-Kc9"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="76" y="-310"/>
         </scene>
-        <!--Slideshow-->
+        <!--Video-->
         <scene sceneID="wg7-f3-ORb">
             <objects>
-                <viewController title="Slideshow" id="8rJ-Kc-sve" customClass="SecondViewController" sceneMemberID="viewController">
+                <viewController title="Video" id="8rJ-Kc-sve" customClass="VideoViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="QS5-Rx-YEW">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -205,7 +212,7 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="O1u-W8-tvY"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="SLIDESHOW" id="cPa-gy-q4n">
+                    <tabBarItem key="tabBarItem" title="VIDEO" id="cPa-gy-q4n">
                         <offsetWrapper key="titlePositionAdjustment" horizontal="0.0" vertical="-16"/>
                     </tabBarItem>
                     <connections>
@@ -262,7 +269,7 @@
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <state key="normal" title="GET INFO">
-                                    <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <connections>
                                     <action selector="getInfoClicked:" destination="bz3-AU-N9p" eventType="touchUpInside" id="pEF-bx-hn7"/>

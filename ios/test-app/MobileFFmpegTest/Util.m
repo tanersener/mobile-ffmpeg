@@ -25,6 +25,7 @@
 
 +(void) applyButtonStyle: (UIButton*) button {
     button.tintColor = [UIColor whiteColor];
+    [button setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     button.layer.backgroundColor = [UIColor colorWithDisplayP3Red:46.0/256 green:204.0/256 blue:113.0/256 alpha:1.0].CGColor;
     button.layer.borderWidth = 1.0f;
     button.layer.borderColor = [UIColor colorWithDisplayP3Red:39.0/256 green:174.0/256 blue:96.0/256 alpha:1.0].CGColor;

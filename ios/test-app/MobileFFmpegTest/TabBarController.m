@@ -20,8 +20,8 @@
 //
 
 #import "TabBarController.h"
-#import "FirstViewController.h"
-#import "SecondViewController.h"
+#import "CommandViewController.h"
+#import "VideoViewController.h"
 #import "HttpsViewController.h"
 
 @interface TabBarController () <UITabBarControllerDelegate>
@@ -42,12 +42,15 @@
 
 - (void)tabBarController: (UITabBarController *)tabBarController didSelectViewController: (UIViewController *)viewController {
     
-    if ([viewController isKindOfClass:[FirstViewController class]]) {
-    } else if ([viewController isKindOfClass:[SecondViewController class]]) {
+    if ([viewController isKindOfClass:[CommandViewController class]]) {
+        CommandViewController* commandView = (CommandViewController*)viewController;
+        [commandView setActive];
+    } else if ([viewController isKindOfClass:[VideoViewController class]]) {
+        VideoViewController* videoView = (VideoViewController*)viewController;
+        [videoView setActive];
     } else if ([viewController isKindOfClass:[HttpsViewController class]]) {
         HttpsViewController* httpsView = (HttpsViewController*)viewController;
-        [httpsView hideTooltip];
-        [httpsView showTooltip];
+        [httpsView setActive];
     }
 }
 

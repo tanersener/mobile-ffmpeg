@@ -39,7 +39,7 @@
     UITabBarItem *tabBarItem2 = [tabBar.items objectAtIndex:1];
     UITabBarItem *tabBarItem3 = [tabBar.items objectAtIndex:2];
     tabBarItem1.title = @"COMMAND";
-    tabBarItem2.title = @"SLIDESHOW";
+    tabBarItem2.title = @"VIDEO";
     tabBarItem3.title = @"HTTPS";
 
     // SELECTED BAR ITEM

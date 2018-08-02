@@ -1,5 +1,5 @@
 //
-// SecondViewController.m
+// VideoViewController.m
 //
 // Copyright (c) 2018 Taner Sener
 //
@@ -19,14 +19,16 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import "SecondViewController.h"
+#import "VideoViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
+#import "RCEasyTipView.h"
+#import <mobileffmpeg/Log.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
 
 NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
 
-@interface SecondViewController ()
+@interface VideoViewController ()
 
 @property (strong, nonatomic) IBOutlet UILabel *videoPlayerBox;
 @property (strong, nonatomic) IBOutlet UIButton *playButton;
@@ -34,10 +36,15 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
 
 @end
 
-@implementation SecondViewController {
+@implementation VideoViewController {
+
+    // Video player references
     AVPlayer *player;
     AVPlayerLayer *playerLayer;
     UIActivityIndicatorView* indicator;
+
+    // Tooltip view reference
+    RCEasyTipView *tooltip;
 }
 
 - (void)viewDidLoad {
@@ -58,10 +65,31 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
     innerFrame.origin.y = 290;
 
     self.videoPlayerBox.frame = innerFrame;
+    
+    RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
+    [Util applyTooltipStyle: preferences];
+    preferences.drawing.arrowPostion = Top;
+    preferences.animating.showDuration = 1.0;
+    preferences.animating.dismissDuration = HTTPS_TEST_TOOLTIP_DURATION;
+    preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
+    preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
+    
+    tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
+    tooltip.text = HTTPS_TEST_TOOLTIP_TEXT;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setActive];
+    });
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
+}
+
+- (void)logCallback: (int)level :(NSString*)message {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSLog(@"%@", message);
+    });
 }
 
 - (IBAction)createClicked:(id)sender {
@@ -199,6 +227,20 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
 - (void)dismissProgressDialog {
     [indicator stopAnimating];
     [self dismissViewControllerAnimated:TRUE completion:nil];
+}
+
+- (void)setActive {
+    [Log setLogDelegate:self];
+    [self hideTooltip];
+    [self showTooltip];
+}
+
+- (void)hideTooltip {
+    [tooltip dismissWithCompletion:nil];
+}
+
+- (void)showTooltip {
+    [tooltip showAnimated:YES forView:self.playButton withinSuperView:self.view];
 }
 
 @end

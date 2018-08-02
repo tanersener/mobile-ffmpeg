@@ -26,7 +26,6 @@
 
 @interface HttpsViewController : UIViewController<LogDelegate>
 
-- (void)showTooltip;
-- (void)hideTooltip;
+- (void)setActive;
 
 @end

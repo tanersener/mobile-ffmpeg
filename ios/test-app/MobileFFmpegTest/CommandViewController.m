@@ -57,14 +57,16 @@
     [Util applyTooltipStyle: preferences];
     preferences.drawing.arrowPostion = Top;
     preferences.animating.showDuration = 1.0;
-    preferences.animating.dismissDuration = HTTPS_TEST_TOOLTIP_DURATION;
+    preferences.animating.dismissDuration = COMMAND_TEST_TOOLTIP_DURATION;
     preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
     preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-    
+
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
-    tooltip.text = HTTPS_TEST_TOOLTIP_TEXT;
+    tooltip.text = COMMAND_TEST_TOOLTIP_TEXT;
     
-    [Log setLogDelegate:self];
+    dispatch_async(dispatch_get_main_queue(), ^{        
+        [self setActive];
+    });
 }
 
 - (void)didReceiveMemoryWarning {
@@ -114,12 +116,18 @@
     });
 }
 
-- (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.runButton withinSuperView:self.view];
+- (void)setActive {
+    [Log setLogDelegate:self];
+    [self hideTooltip];
+    [self showTooltip];
 }
 
 - (void)hideTooltip {
     [tooltip dismissWithCompletion:nil];
+}
+
+- (void)showTooltip {
+    [tooltip showAnimated:YES forView:self.commandText withinSuperView:self.view];
 }
 
 - (void)clearOutput {
@@ -128,6 +136,11 @@
 
 - (void)appendOutput:(NSString*) message {
     self.outputText.text = [self.outputText.text stringByAppendingString:message];
+    
+    if (self.outputText.text.length > 0 ) {
+        NSRange bottom = NSMakeRange(self.outputText.text.length - 1, 1);
+        [self.outputText scrollRangeToVisible:bottom];
+    }
 }
 
 @end

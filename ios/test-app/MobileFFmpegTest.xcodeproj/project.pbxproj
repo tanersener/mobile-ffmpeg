@@ -43,8 +43,8 @@
 		34D26CF5210F5D2C005B3A32 /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE0210F5CA4005B3A32 /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34D26CF6210F5D2C005B3A32 /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE214209F7DDD005CE2AE /* AppDelegate.m */; };
-		34FAE218209F7DDD005CE2AE /* FirstViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE217209F7DDD005CE2AE /* FirstViewController.m */; };
-		34FAE21B209F7DDD005CE2AE /* SecondViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE21A209F7DDD005CE2AE /* SecondViewController.m */; };
+		34FAE218209F7DDD005CE2AE /* CommandViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE217209F7DDD005CE2AE /* CommandViewController.m */; };
+		34FAE21B209F7DDD005CE2AE /* VideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE21A209F7DDD005CE2AE /* VideoViewController.m */; };
 		34FAE21E209F7DDD005CE2AE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 34FAE21C209F7DDD005CE2AE /* Main.storyboard */; };
 		34FAE220209F7DDE005CE2AE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34FAE21F209F7DDE005CE2AE /* Assets.xcassets */; };
 		34FAE223209F7DDE005CE2AE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 34FAE221209F7DDE005CE2AE /* LaunchScreen.storyboard */; };
@@ -103,10 +103,10 @@
 		34FAE210209F7DDD005CE2AE /* MobileFFmpegTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileFFmpegTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		34FAE213209F7DDD005CE2AE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		34FAE214209F7DDD005CE2AE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		34FAE216209F7DDD005CE2AE /* FirstViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FirstViewController.h; sourceTree = "<group>"; };
-		34FAE217209F7DDD005CE2AE /* FirstViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FirstViewController.m; sourceTree = "<group>"; };
-		34FAE219209F7DDD005CE2AE /* SecondViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SecondViewController.h; sourceTree = "<group>"; };
-		34FAE21A209F7DDD005CE2AE /* SecondViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SecondViewController.m; sourceTree = "<group>"; };
+		34FAE216209F7DDD005CE2AE /* CommandViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CommandViewController.h; sourceTree = "<group>"; };
+		34FAE217209F7DDD005CE2AE /* CommandViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CommandViewController.m; sourceTree = "<group>"; };
+		34FAE219209F7DDD005CE2AE /* VideoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VideoViewController.h; sourceTree = "<group>"; };
+		34FAE21A209F7DDD005CE2AE /* VideoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VideoViewController.m; sourceTree = "<group>"; };
 		34FAE21D209F7DDD005CE2AE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		34FAE21F209F7DDE005CE2AE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		34FAE222209F7DDE005CE2AE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -198,10 +198,10 @@
 			children = (
 				34FAE213209F7DDD005CE2AE /* AppDelegate.h */,
 				34FAE214209F7DDD005CE2AE /* AppDelegate.m */,
-				34FAE216209F7DDD005CE2AE /* FirstViewController.h */,
-				34FAE217209F7DDD005CE2AE /* FirstViewController.m */,
-				34FAE219209F7DDD005CE2AE /* SecondViewController.h */,
-				34FAE21A209F7DDD005CE2AE /* SecondViewController.m */,
+				34FAE216209F7DDD005CE2AE /* CommandViewController.h */,
+				34FAE217209F7DDD005CE2AE /* CommandViewController.m */,
+				34FAE219209F7DDD005CE2AE /* VideoViewController.h */,
+				34FAE21A209F7DDD005CE2AE /* VideoViewController.m */,
 				34FAE21C209F7DDD005CE2AE /* Main.storyboard */,
 				34FAE21F209F7DDE005CE2AE /* Assets.xcassets */,
 				34FAE221209F7DDE005CE2AE /* LaunchScreen.storyboard */,
@@ -320,13 +320,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34FAE21B209F7DDD005CE2AE /* SecondViewController.m in Sources */,
+				34FAE21B209F7DDD005CE2AE /* VideoViewController.m in Sources */,
 				34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */,
 				34FAE226209F7DDE005CE2AE /* main.m in Sources */,
 				34BB54792109BE5B00606B7C /* UIBarItem+RCBarItem.m in Sources */,
 				343E66B6210784BD00F95E5B /* HttpsViewController.m in Sources */,
 				34BB54782109BE5B00606B7C /* UIView+RCEssentials.m in Sources */,
-				34FAE218209F7DDD005CE2AE /* FirstViewController.m in Sources */,
+				34FAE218209F7DDD005CE2AE /* CommandViewController.m in Sources */,
 				343E670A2107C27600F95E5B /* TabBarController.m in Sources */,
 				34BB547A2109BE5B00606B7C /* RCEasyTipViewIDGenerator.m in Sources */,
 				343E67062107AD0100F95E5B /* Util.m in Sources */,

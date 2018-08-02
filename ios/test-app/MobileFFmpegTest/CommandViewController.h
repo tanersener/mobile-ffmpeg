@@ -26,8 +26,7 @@
 
 @interface CommandViewController : UIViewController<LogDelegate>
 
-- (void)showTooltip;
-- (void)hideTooltip;
+- (void)setActive;
 
 @end
 
