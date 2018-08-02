@@ -114,7 +114,9 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *en
     if (stringArray != NULL) {
         for (int i = 0; i < (argumentCount - 1); i++) {
             tempArray[i] = (jstring) (*env)->GetObjectArrayElement(env, stringArray, i);
-            argv[i + 1] = (char *) (*env)->GetStringUTFChars(env, tempArray[i], 0);
+            if (tempArray[i] != NULL) {
+                argv[i + 1] = (char *) (*env)->GetStringUTFChars(env, tempArray[i], 0);
+            }
         }
     }
 
