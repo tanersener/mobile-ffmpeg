@@ -24,7 +24,7 @@
 #import "Util.h"
 #import <mobileffmpeg/Log.h>
 
-@interface VideoViewController : UIViewController<LogDelegate>
+@interface VideoViewController : UIViewController<LogDelegate,UIPickerViewDataSource, UIPickerViewDelegate>
 
 - (void)setActive;
 

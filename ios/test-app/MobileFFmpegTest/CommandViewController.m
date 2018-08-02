@@ -49,10 +49,10 @@
     
     [Util applyButtonStyle: self.runAsyncButton];
     
-    [Util applyHeaderStyle: self.header];
-    
     [Util applyOutputTextStyle: self.outputText];
     
+    [Util applyHeaderStyle: self.header];
+
     RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
     [Util applyTooltipStyle: preferences];
     preferences.drawing.arrowPostion = Top;

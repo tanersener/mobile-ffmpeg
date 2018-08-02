@@ -21,12 +21,15 @@
 
 #import "Constants.h"
 
-// HTTPS TEST
-NSString *const HTTPS_TEST_DEFAULT_URL = @"https://download.blender.org/peach/trailer/trailer_400p.ogg";
-NSString *const HTTPS_TEST_TOOLTIP_TEXT = @"Enter the https url of a media file and click the button";
-NSTimeInterval const HTTPS_TEST_TOOLTIP_DURATION = 5.0;
-
 // COMMAND TEST
 NSString *const COMMAND_TEST_TOOLTIP_TEXT = @"Enter an FFmpeg command without 'ffmpeg' at the beginning and click one of the RUN buttons";
 NSTimeInterval const COMMAND_TEST_TOOLTIP_DURATION = 5.0;
 
+// VIDEO TEST
+NSString *const VIDEO_TEST_TOOLTIP_TEXT = @"Select a video codec and press ENCODE button";
+NSTimeInterval const VIDEO_TEST_TOOLTIP_DURATION = 5.0;
+
+// HTTPS TEST
+NSString *const HTTPS_TEST_DEFAULT_URL = @"https://download.blender.org/peach/trailer/trailer_400p.ogg";
+NSString *const HTTPS_TEST_TOOLTIP_TEXT = @"Enter the https url of a media file and click the button";
+NSTimeInterval const HTTPS_TEST_TOOLTIP_DURATION = 5.0;

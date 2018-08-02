@@ -138,41 +138,16 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="V9L-Av-PAz">
-                                <rect key="frame" x="152.5" y="162" width="70" height="32"/>
-                                <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="32" id="QWb-N2-T0Y"/>
-                                    <constraint firstAttribute="width" constant="70" id="b3j-fF-W6Z"/>
-                                </constraints>
-                                <state key="normal" title="PLAY">
-                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                </state>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                        <integer key="value" value="5"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                                <connections>
-                                    <action selector="playClicked:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="p3A-ql-6av"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="suo-Ve-dkM">
-                                <rect key="frame" x="20" y="284" width="335" height="304"/>
-                                <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.96078431372549022" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="z7Q-Af-rbI">
-                                <rect key="frame" x="147.5" y="100" width="80" height="32"/>
+                                <rect key="frame" x="147" y="250" width="80" height="32"/>
                                 <color key="backgroundColor" red="0.94117647058823528" green="0.94117647058823528" blue="0.96078431372549022" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="80" id="6F7-uT-WDk"/>
                                     <constraint firstAttribute="height" constant="32" id="NXC-JW-nHT"/>
                                 </constraints>
-                                <state key="normal" title="CREATE">
-                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="ENCODE">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
@@ -180,33 +155,36 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="createClicked:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="j6x-48-z6z"/>
+                                    <action selector="encodeClicked:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="Wkw-0h-9lc"/>
                                 </connections>
                             </button>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Enter video codec" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ddh-VM-R4H">
-                                <rect key="frame" x="107.5" y="224" width="160" height="30"/>
+                            <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5Kd-Bt-3GF">
+                                <rect key="frame" x="88" y="110" width="200" height="100"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="160" id="X9y-aG-itF"/>
-                                    <constraint firstAttribute="height" constant="30" id="ofm-IT-iAC"/>
+                                    <constraint firstAttribute="height" constant="100" id="30t-o7-8XA"/>
+                                    <constraint firstAttribute="width" constant="200" id="EmV-CK-eLe"/>
                                 </constraints>
+                            </pickerView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wZ4-t0-3Pz">
+                                <rect key="frame" x="20" y="312" width="335" height="286"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="z7Q-Af-rbI" firstAttribute="top" secondItem="qjq-ds-G4r" secondAttribute="bottom" constant="30" id="7T7-6j-sV2"/>
-                            <constraint firstItem="V9L-Av-PAz" firstAttribute="top" secondItem="z7Q-Af-rbI" secondAttribute="bottom" constant="30" id="AKe-ol-KwW"/>
-                            <constraint firstItem="O1u-W8-tvY" firstAttribute="bottom" secondItem="suo-Ve-dkM" secondAttribute="bottom" constant="30" id="BIg-Tm-yph"/>
-                            <constraint firstItem="ddh-VM-R4H" firstAttribute="top" secondItem="V9L-Av-PAz" secondAttribute="bottom" constant="30" id="EN5-Od-oG6"/>
+                            <constraint firstItem="5Kd-Bt-3GF" firstAttribute="centerX" secondItem="QS5-Rx-YEW" secondAttribute="centerX" id="CyR-64-dil"/>
+                            <constraint firstItem="z7Q-Af-rbI" firstAttribute="top" secondItem="5Kd-Bt-3GF" secondAttribute="bottom" constant="40" id="I0z-6a-I0z"/>
+                            <constraint firstItem="wZ4-t0-3Pz" firstAttribute="leading" secondItem="QS5-Rx-YEW" secondAttribute="leading" constant="20" id="IvM-cJ-a2r"/>
+                            <constraint firstItem="wZ4-t0-3Pz" firstAttribute="top" secondItem="z7Q-Af-rbI" secondAttribute="bottom" constant="30" id="Ojs-VU-OMG"/>
                             <constraint firstItem="qjq-ds-G4r" firstAttribute="leading" secondItem="O1u-W8-tvY" secondAttribute="leading" id="Sny-N7-eZP"/>
-                            <constraint firstItem="suo-Ve-dkM" firstAttribute="leading" secondItem="O1u-W8-tvY" secondAttribute="leading" constant="20" id="cng-gg-fht"/>
-                            <constraint firstItem="ddh-VM-R4H" firstAttribute="centerX" secondItem="QS5-Rx-YEW" secondAttribute="centerX" id="f5w-1J-1gC"/>
-                            <constraint firstItem="O1u-W8-tvY" firstAttribute="trailing" secondItem="suo-Ve-dkM" secondAttribute="trailing" constant="20" id="gXh-zm-iTa"/>
+                            <constraint firstItem="O1u-W8-tvY" firstAttribute="bottom" secondItem="wZ4-t0-3Pz" secondAttribute="bottom" constant="20" id="Tdc-fU-9yn"/>
+                            <constraint firstItem="5Kd-Bt-3GF" firstAttribute="top" secondItem="qjq-ds-G4r" secondAttribute="bottom" constant="40" id="VVX-2t-A6a"/>
+                            <constraint firstAttribute="trailing" secondItem="wZ4-t0-3Pz" secondAttribute="trailing" constant="20" id="YWq-NU-pSv"/>
                             <constraint firstItem="qjq-ds-G4r" firstAttribute="trailing" secondItem="O1u-W8-tvY" secondAttribute="trailing" id="lSL-yl-ipy"/>
-                            <constraint firstItem="V9L-Av-PAz" firstAttribute="centerX" secondItem="QS5-Rx-YEW" secondAttribute="centerX" id="mKc-7z-fCq"/>
-                            <constraint firstItem="suo-Ve-dkM" firstAttribute="top" secondItem="ddh-VM-R4H" secondAttribute="bottom" constant="30" id="mzH-9U-qVa"/>
+                            <constraint firstItem="wZ4-t0-3Pz" firstAttribute="centerX" secondItem="QS5-Rx-YEW" secondAttribute="centerX" id="pgQ-Ss-umX"/>
                             <constraint firstItem="z7Q-Af-rbI" firstAttribute="centerX" secondItem="QS5-Rx-YEW" secondAttribute="centerX" id="sTb-cb-Z80"/>
                             <constraint firstItem="qjq-ds-G4r" firstAttribute="top" secondItem="O1u-W8-tvY" secondAttribute="top" id="xBN-XP-eBu"/>
                         </constraints>
@@ -216,14 +194,15 @@
                         <offsetWrapper key="titlePositionAdjustment" horizontal="0.0" vertical="-16"/>
                     </tabBarItem>
                     <connections>
-                        <outlet property="playButton" destination="V9L-Av-PAz" id="1Yf-9P-e7v"/>
-                        <outlet property="videoCodecText" destination="ddh-VM-R4H" id="5MA-AT-gYX"/>
-                        <outlet property="videoPlayerBox" destination="suo-Ve-dkM" id="Cff-E9-QYS"/>
+                        <outlet property="encodeButton" destination="z7Q-Af-rbI" id="J4Z-d4-E2p"/>
+                        <outlet property="header" destination="qjq-ds-G4r" id="bZ0-4Q-YYn"/>
+                        <outlet property="videoCodecPicker" destination="5Kd-Bt-3GF" id="slO-8f-c0c"/>
+                        <outlet property="videoPlayerFrame" destination="wZ4-t0-3Pz" id="ep5-Xw-OCV"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="4Nw-L8-lE0" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-636" y="415"/>
+            <point key="canvasLocation" x="-636" y="414.24287856071965"/>
         </scene>
         <!--Https-->
         <scene sceneID="4wX-po-zkP">

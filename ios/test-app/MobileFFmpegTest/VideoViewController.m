@@ -26,21 +26,27 @@
 #import <mobileffmpeg/Log.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
 
-NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
-
 @interface VideoViewController ()
 
-@property (strong, nonatomic) IBOutlet UILabel *videoPlayerBox;
-@property (strong, nonatomic) IBOutlet UIButton *playButton;
-@property (strong, nonatomic) IBOutlet UITextField *videoCodecText;
+@property (strong, nonatomic) IBOutlet UILabel *header;
+@property (strong, nonatomic) IBOutlet UIPickerView *videoCodecPicker;
+@property (strong, nonatomic) IBOutlet UIButton *encodeButton;
+@property (strong, nonatomic) IBOutlet UILabel *videoPlayerFrame;
 
 @end
 
 @implementation VideoViewController {
 
+    // Video codec data
+    NSArray *codecData;
+    NSInteger selectedCodec;
+    
     // Video player references
-    AVPlayer *player;
+    AVQueuePlayer *player;
     AVPlayerLayer *playerLayer;
+    AVPlayerItem *activeItem;
+    
+    // Loading view
     UIActivityIndicatorView* indicator;
 
     // Tooltip view reference
@@ -50,33 +56,47 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // SET DEFAULT TEXT
-    [[self videoCodecText] setText: DEFAULT_VIDEO_CODEC];
+    // VIDEO CODE PICKER INIT
+    codecData = @[@"mpeg4", @"x264", @"x265", @"xvid", @"vp8", @"vp9", @"aom", @"kvazaar", @"theora", @"hap"];
+    selectedCodec = 0;
     
-    // DISABLE PLAY BUTTON
-    [[self playButton] setEnabled:FALSE];
-    [[self playButton] setUserInteractionEnabled:FALSE];
-    
-    // CREATING VIDEO PLAYER BOX
-    CGRect innerFrame = self.view.bounds;
-    innerFrame.size.width = self.view.bounds.size.width - 20;
-    innerFrame.size.height = innerFrame.size.width*2/3;
-    innerFrame.origin.x = 10;
-    innerFrame.origin.y = 290;
+    self.videoCodecPicker.dataSource = self;
+    self.videoCodecPicker.delegate = self;
 
-    self.videoPlayerBox.frame = innerFrame;
+    // STYLE UPDATE
+    [Util applyButtonStyle: self.encodeButton];
     
+    [Util applyPickerViewStyle: self.videoCodecPicker];
+    
+    [Util applyVideoPlayerFrameStyle: self.videoPlayerFrame];
+
+    [Util applyHeaderStyle: self.header];
+    
+    // TOOPTIP INIT
     RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
     [Util applyTooltipStyle: preferences];
     preferences.drawing.arrowPostion = Top;
     preferences.animating.showDuration = 1.0;
-    preferences.animating.dismissDuration = HTTPS_TEST_TOOLTIP_DURATION;
+    preferences.animating.dismissDuration = VIDEO_TEST_TOOLTIP_DURATION;
     preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
     preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
     
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
-    tooltip.text = HTTPS_TEST_TOOLTIP_TEXT;
+    tooltip.text = VIDEO_TEST_TOOLTIP_TEXT;
     
+    // VIDEO PLAYER INIT
+    player = [[AVQueuePlayer alloc] init];
+    playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
+    activeItem = nil;
+    
+    CGRect rectangularFrame = self.view.bounds;
+    rectangularFrame.size.width = self.view.bounds.size.width - 40;
+    rectangularFrame.origin.x = 20;
+    rectangularFrame.origin.y = 122;
+    
+    playerLayer.frame = rectangularFrame;
+    [self.view.layer addSublayer:playerLayer];
+
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setActive];
     });
@@ -86,13 +106,38 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
     [super didReceiveMemoryWarning];
 }
 
+/**
+ * The number of columns of data
+ */
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
+    return 1;
+}
+
+/**
+ * The number of rows of data
+ */
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
+    return codecData.count;
+}
+
+/**
+ * The data to return for the row and component (column) that's being passed in
+ */
+- (NSString*)pickerView:(UIPickerView *)pickerView titleForRow:(NSInteger)row forComponent:(NSInteger)component {
+    return codecData[row];
+}
+
+- (void)pickerView:(UIPickerView *)pickerView didSelectRow:(NSInteger)row inComponent:(NSInteger)component {
+    selectedCodec = row;
+}
+
 - (void)logCallback: (int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", message);
     });
 }
 
-- (IBAction)createClicked:(id)sender {
+- (IBAction)encodeClicked:(id)sender {
     NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
     NSString *image1 = [resourceFolder stringByAppendingPathComponent: @"colosseum.jpg"];
     NSString *image2 = [resourceFolder stringByAppendingPathComponent: @"pyramid.jpg"];
@@ -100,80 +145,129 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
     NSString *videoFile = [self getVideoPath];
 
     if (player != nil) {
-        [player pause];
-        [playerLayer removeFromSuperlayer];
-        player = nil;
-        playerLayer = nil;
+        [player removeAllItems];
+        activeItem = nil;
     }
 
     [[NSFileManager defaultManager] removeItemAtPath:videoFile error:NULL];
-    NSString *videoCodec = [[self videoCodecText] text];
-    if (videoCodec == nil || [videoCodec length] == 0) {
-        videoCodec = DEFAULT_VIDEO_CODEC;
-    }
+    NSString *videoCodec = codecData[selectedCodec];
 
-    NSLog(@"Creating slideshow using video codec: %@\n", videoCodec);
+    NSLog(@"Testing VIDEO encoding with \'%@\' codec\n", videoCodec);
 
-    NSString* slideshowCommand = [self generateSlideshowScript:image1:image2:image3:videoFile:videoCodec:[self getCustomOptions]];
+    NSString* ffmpegCommand = [VideoViewController generateVideoEncodeScript:image1:image2:image3:videoFile:[self getSelectedVideoCodec]:[self getCustomOptions]];
 
-    NSLog(@"Creating slideshow: %@\n", slideshowCommand);
-    [self loadProgressDialog:@"Creating video slideshow\n\n"];
+    [self loadProgressDialog:@"Encoding video\n\n"];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-
+        
+        NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
+        
         // EXECUTE
-        int result = [MobileFFmpeg execute: slideshowCommand];
+        int result = [MobileFFmpeg execute: ffmpegCommand];
+        
+        NSLog(@"FFmpeg process exited with rc %d\n", result);
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [self dismissProgressDialog];
-            
-            [[self playButton] setEnabled:TRUE];
-            [[self playButton] setUserInteractionEnabled:TRUE];
         });
         
-        if (result != 0) {
-            NSLog(@"Create failed with rc=%d\n", result);
+        if (result == 0) {
+            NSLog(@"Encode completed successfully; playing video.\n");
+            [self playVideo];
+        } else {
+            NSLog(@"Encode failed with rc=%d\n", result);
         }
     });
 }
 
-- (IBAction)playClicked:(id)sender {
+- (void)playVideo {
     NSString *videoFile = [self getVideoPath];
     NSURL*videoURL=[NSURL fileURLWithPath:videoFile];
 
-    player = [AVPlayer playerWithURL:videoURL];
-    playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
-    
-    CGRect innerFrame = self.view.bounds;
-    innerFrame.size.width = self.view.bounds.size.width - 20;
-    innerFrame.origin.x = 10;
-    innerFrame.origin.y = 100;
-    
-    playerLayer.frame = innerFrame;
+    AVAsset *asset = [AVAsset assetWithURL:videoURL];
+    NSArray *assetKeys = @[@"playable", @"hasProtectedContent"];
 
-    [self.view.layer addSublayer:playerLayer];
-    [player play];
+    AVPlayerItem *newVideo = [AVPlayerItem playerItemWithAsset:asset
+                                  automaticallyLoadedAssetKeys:assetKeys];
+
+    NSKeyValueObservingOptions options =
+    NSKeyValueObservingOptionOld | NSKeyValueObservingOptionNew;
+
+    activeItem = newVideo;
+    
+    [newVideo addObserver:self forKeyPath:@"status" options:options context:nil];
+
+    [player insertItem:newVideo afterItem:nil];
 }
 
-- (NSString *) generateSlideshowScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions {
-    return [NSString stringWithFormat:
-@"-loop 1 -i %@ \
--loop 1 -i %@ \
--loop 1 -i %@ \
--filter_complex \
-[0:v]setpts=PTS-STARTPTS,scale=w=\'if(gte(iw/ih,640/427),min(iw,640),-1)\':h=\'if(gte(iw/ih,640/427),-1,min(ih,427))\',scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=sar=1/1,split=2[stream1out1][stream1out2];\
-[1:v]setpts=PTS-STARTPTS,scale=w=\'if(gte(iw/ih,640/427),min(iw,640),-1)\':h=\'if(gte(iw/ih,640/427),-1,min(ih,427))\',scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=sar=1/1,split=2[stream2out1][stream2out2];\
-[2:v]setpts=PTS-STARTPTS,scale=w=\'if(gte(iw/ih,640/427),min(iw,640),-1)\':h=\'if(gte(iw/ih,640/427),-1,min(ih,427))\',scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=sar=1/1,split=2[stream3out1][stream3out2];\
-[stream1out1]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=3,select=lte(n\\,90)[stream1overlaid];\
-[stream1out2]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=1,select=lte(n\\,30)[stream1ending];\
-[stream2out1]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=2,select=lte(n\\,60)[stream2overlaid];\
-[stream2out2]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=1,select=lte(n\\,30),split=2[stream2starting][stream2ending];\
-[stream3out1]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=2,select=lte(n\\,60)[stream3overlaid];\
-[stream3out2]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=1,select=lte(n\\,30)[stream3starting];\
-[stream2starting][stream1ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream2blended];\
-[stream3starting][stream2ending]blend=all_expr=\'if(gte(X,(W/2)*T/1)*lte(X,W-(W/2)*T/1),B,A)\':shortest=1[stream3blended];\
-[stream1overlaid][stream2blended][stream2overlaid][stream3blended][stream3overlaid]concat=n=5:v=1:a=0,format=yuv420p[video] \
--map [video] -vsync 2 -async 1 %@-c:v %@ -r 30 %@", image1, image2, image3, customOptions, videoCodec, videoFile];
+- (NSString*)getSelectedVideoCodec {
+    NSString *videoCodec = codecData[selectedCodec];
+    
+    // VIDEO CODEC PICKER HAS BASIC NAMES, FFMPEG NEEDS LONGER AND EXACT CODEC NAMES.
+    // APPLYING NECESSARY TRANSFORMATION HERE
+    if ([videoCodec isEqualToString:@"x264"]) {
+        videoCodec = @"libx264";
+    } else if ([videoCodec isEqualToString:@"x265"]) {
+        videoCodec = @"libx265";
+    } else if ([videoCodec isEqualToString:@"xvid"]) {
+        videoCodec = @"libxvid";
+    } else if ([videoCodec isEqualToString:@"vp8"]) {
+        videoCodec = @"libvpx";
+    } else if ([videoCodec isEqualToString:@"vp9"]) {
+        videoCodec = @"libvpx-vp9";
+    } else if ([videoCodec isEqualToString:@"aom"]) {
+        videoCodec = @"libaom-av1";
+    } else if ([videoCodec isEqualToString:@"kvazaar"]) {
+        videoCodec = @"libkvazaar";
+    } else if ([videoCodec isEqualToString:@"theora"]) {
+        videoCodec = @"libtheora";
+    }
+    
+    return videoCodec;
+}
+
+- (NSString*)getVideoPath {
+    NSString *videoCodec = codecData[selectedCodec];
+    
+    NSString *extension;
+    if ([videoCodec isEqualToString:@"vp8"] || [videoCodec isEqualToString:@"vp9"]) {
+        extension = @"webm";
+    } else if ([videoCodec isEqualToString:@"aom"]) {
+        extension = @"mkv";
+    } else if ([videoCodec isEqualToString:@"theora"]) {
+        extension = @"ogv";
+    } else if ([videoCodec isEqualToString:@"hap"]) {
+        extension = @"mov";
+    } else {
+        
+        // mpeg4, x264, x265, xvid, kvazaar
+        extension = @"mp4";
+    }
+    
+    NSString* docFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    return [[docFolder stringByAppendingPathComponent: @"video."] stringByAppendingString: extension];
+}
+
+- (NSString*)getCustomOptions {
+    NSString *videoCodec = codecData[selectedCodec];
+
+    if ([videoCodec isEqualToString:@"x265"]) {
+        return @"-crf 28 -preset fast ";
+    } else if ([videoCodec isEqualToString:@"vp8"]) {
+        return @"-b:v 1M -crf 10 ";
+    } else if ([videoCodec isEqualToString:@"vp9"]) {
+        return @"-b:v 2M ";
+    } else if ([videoCodec isEqualToString:@"aom"]) {
+        return @"-crf 30 -strict experimental ";
+    } else if ([videoCodec isEqualToString:@"kvazaar"]) {
+        return @"-preset fast ";
+    } else if ([videoCodec isEqualToString:@"theora"]) {
+        return @"-qscale:v 7 ";
+    } else if ([videoCodec isEqualToString:@"hap"]) {
+        return @"-format hap_q ";
+    } else {
+        return @"";
+    }
 }
 
 - (void)loadProgressDialog:(NSString*) dialogMessage {
@@ -194,36 +288,6 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
     [self presentViewController:pending animated:YES completion:nil];
 }
 
-- (NSString *) getVideoPath {
-    NSString *videoCodec = [[self videoCodecText] text];
-    if (videoCodec == nil || [videoCodec length] == 0) {
-        videoCodec = DEFAULT_VIDEO_CODEC;
-    }
-    
-    NSString *extension;
-    if ([videoCodec isEqualToString:@"libaom-av1"]) {
-        extension = @"mkv";
-    } else {
-        extension = @"mp4";
-    }
-    
-    NSString* docFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
-    return [[docFolder stringByAppendingPathComponent: @"slideshow."] stringByAppendingString: extension];
-}
-
-- (NSString *) getCustomOptions {
-    NSString *videoCodec = [[self videoCodecText] text];
-    if (videoCodec == nil || [videoCodec length] == 0) {
-        videoCodec = DEFAULT_VIDEO_CODEC;
-    }
-    
-    if ([videoCodec isEqualToString:@"libaom-av1"]) {
-        return @"-strict experimental ";
-    } else {
-        return @"";
-    }
-}
-
 - (void)dismissProgressDialog {
     [indicator stopAnimating];
     [self dismissViewControllerAnimated:TRUE completion:nil];
@@ -240,7 +304,59 @@ NSString * const DEFAULT_VIDEO_CODEC = @"mpeg4";
 }
 
 - (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.playButton withinSuperView:self.view];
+    [tooltip showAnimated:YES forView:self.videoCodecPicker withinSuperView:self.view];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    
+    NSNumber *statusNumber = change[NSKeyValueChangeNewKey];
+    NSInteger status = -1;
+    if ([statusNumber isKindOfClass:[NSNumber class]]) {
+        status = statusNumber.integerValue;
+    }
+
+    switch (status) {
+        case AVPlayerItemStatusReadyToPlay: {
+            [player play];
+        } break;
+        case AVPlayerItemStatusFailed: {
+            if (activeItem != nil && activeItem.error != nil) {
+                
+                NSString *message = activeItem.error.localizedFailureReason;
+                if (message == nil) {
+                    message = activeItem.error.localizedDescription;
+                }
+                
+                [Util alert:self withTitle:@"Error" message:message andButtonText:@"OK"];
+            }
+        } break;
+        default: {
+            NSLog(@"Status %ld received from player.\n", status);
+        }
+    }
+}
+
++ (NSString*)generateVideoEncodeScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions {
+    return [NSString stringWithFormat:
+@"-y -loop 1 -i %@ \
+-loop 1 -i %@ \
+-loop 1 -i %@ \
+-filter_complex \
+[0:v]setpts=PTS-STARTPTS,scale=w=\'if(gte(iw/ih,640/427),min(iw,640),-1)\':h=\'if(gte(iw/ih,640/427),-1,min(ih,427))\',scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=sar=1/1,split=2[stream1out1][stream1out2];\
+[1:v]setpts=PTS-STARTPTS,scale=w=\'if(gte(iw/ih,640/427),min(iw,640),-1)\':h=\'if(gte(iw/ih,640/427),-1,min(ih,427))\',scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=sar=1/1,split=2[stream2out1][stream2out2];\
+[2:v]setpts=PTS-STARTPTS,scale=w=\'if(gte(iw/ih,640/427),min(iw,640),-1)\':h=\'if(gte(iw/ih,640/427),-1,min(ih,427))\',scale=trunc(iw/2)*2:trunc(ih/2)*2,setsar=sar=1/1,split=2[stream3out1][stream3out2];\
+[stream1out1]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=3,select=lte(n\\,90)[stream1overlaid];\
+[stream1out2]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=1,select=lte(n\\,30),fade=t=out:s=0:n=30[stream1fadeout];\
+[stream2out1]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=2,select=lte(n\\,60)[stream2overlaid];\
+[stream2out2]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=1,select=lte(n\\,30),split=2[stream2starting][stream2ending];\
+[stream3out1]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=2,select=lte(n\\,60)[stream3overlaid];\
+[stream3out2]pad=width=640:height=427:x=(640-iw)/2:y=(427-ih)/2:color=#00000000,trim=duration=1,select=lte(n\\,30),fade=t=in:s=0:n=30[stream3fadein];\
+[stream2starting]fade=t=in:s=0:n=30[stream2fadein];\
+[stream2ending]fade=t=out:s=0:n=30[stream2fadeout];\
+[stream2fadein][stream1fadeout]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2,trim=duration=1,select=lte(n\\,30)[stream2blended];\
+[stream3fadein][stream2fadeout]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2,trim=duration=1,select=lte(n\\,30)[stream3blended];\
+[stream1overlaid][stream2blended][stream2overlaid][stream3blended][stream3overlaid]concat=n=5:v=1:a=0,scale=w=640:h=424,format=yuv420p[video] \
+-map [video] -vsync 2 -async 1 %@-c:v %@ -r 30 %@", image1, image2, image3, customOptions, videoCodec, videoFile];
 }
 
 @end

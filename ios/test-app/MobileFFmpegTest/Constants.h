@@ -25,14 +25,17 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-// HTTPS TEST
-extern NSString *const HTTPS_TEST_DEFAULT_URL;
-extern NSString *const HTTPS_TEST_TOOLTIP_TEXT;
-extern NSTimeInterval const HTTPS_TEST_TOOLTIP_DURATION;
-
 // COMMAND TEST
 extern NSString *const COMMAND_TEST_TOOLTIP_TEXT;
 extern NSTimeInterval const COMMAND_TEST_TOOLTIP_DURATION;
 
+// VIDEO TEST
+extern NSString *const VIDEO_TEST_TOOLTIP_TEXT;
+extern NSTimeInterval const VIDEO_TEST_TOOLTIP_DURATION;
+
+// HTTPS TEST
+extern NSString *const HTTPS_TEST_DEFAULT_URL;
+extern NSString *const HTTPS_TEST_TOOLTIP_TEXT;
+extern NSTimeInterval const HTTPS_TEST_TOOLTIP_DURATION;
 
 #endif

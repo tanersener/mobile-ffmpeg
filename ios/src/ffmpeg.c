@@ -4794,7 +4794,10 @@ static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 }
 
 void cleanup() {
-    run_as_daemon  = 0;
+    main_return_code = 0;
+    longjmp_value = 0;
+
+    run_as_daemon = 0;
     nb_frames_dup = 0;
     dup_warning = 1000;
     nb_frames_drop = 0;

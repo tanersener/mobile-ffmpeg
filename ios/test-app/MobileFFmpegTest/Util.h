@@ -25,10 +25,13 @@
 
 @interface Util : NSObject
 
-+(void) applyButtonStyle: (UIButton*) button;
-+(void) applyEditTextStyle: (UITextField*) textField;
-+(void) applyHeaderStyle: (UILabel*) label;
-+(void) applyOutputTextStyle: (UITextView*) textView;
-+(void) applyTooltipStyle: (RCEasyTipPreferences*)preferences;
++ (void)applyButtonStyle: (UIButton*) button;
++ (void)applyEditTextStyle: (UITextField*) textField;
++ (void)applyHeaderStyle: (UILabel*) label;
++ (void)applyOutputTextStyle: (UITextView*) textView;
++ (void)applyPickerViewStyle: (UIPickerView*) pickerView;
++ (void)applyVideoPlayerFrameStyle: (UILabel*) playerFrame;
++ (void)applyTooltipStyle: (RCEasyTipPreferences*)preferences;
++ (void)alert: (UIViewController*)controller withTitle:(NSString*)title message:(NSString*)message andButtonText:(NSString*)buttonText;
 
 @end
