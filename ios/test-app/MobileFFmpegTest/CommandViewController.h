@@ -1,5 +1,5 @@
 //
-// FirstViewController.h
+// CommandViewController.h
 //
 // Copyright (c) 2018 Taner Sener
 //
@@ -20,8 +20,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Constants.h"
+#import "Util.h"
+#import <mobileffmpeg/Log.h>
 
-@interface FirstViewController : UIViewController
+@interface CommandViewController : UIViewController<LogDelegate>
+
+- (void)showTooltip;
+- (void)hideTooltip;
 
 @end
 

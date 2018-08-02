@@ -1,5 +1,5 @@
 //
-// HttpsViewController.m
+// CommandViewController.m
 //
 // Copyright (c) 2018 Taner Sener
 //
@@ -19,32 +19,36 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import "HttpsViewController.h"
+#import "CommandViewController.h"
 #import "RCEasyTipView.h"
 #import <mobileffmpeg/Log.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
 
-@interface HttpsViewController ()
+@interface CommandViewController ()
 
 @property (strong, nonatomic) IBOutlet UILabel *header;
-@property (strong, nonatomic) IBOutlet UITextField *urlText;
-@property (strong, nonatomic) IBOutlet UIButton *getInfoButton;
+@property (strong, nonatomic) IBOutlet UITextField *commandText;
+@property (strong, nonatomic) IBOutlet UIButton *runButton;
+@property (strong, nonatomic) IBOutlet UIButton *runAsyncButton;
 @property (strong, nonatomic) IBOutlet UITextView *outputText;
 
 @end
 
-@implementation HttpsViewController {
+@implementation CommandViewController {
 
     // Tooltip view reference
-    RCEasyTipView *tooltip;
+    RCEasyTipView *tooltip;    
 }
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [Util applyEditTextStyle: self.urlText];
+    [Util applyEditTextStyle: self.commandText];
     
-    [Util applyButtonStyle: self.getInfoButton];
-
+    [Util applyButtonStyle: self.runButton];
+    
+    [Util applyButtonStyle: self.runAsyncButton];
+    
     [Util applyHeaderStyle: self.header];
     
     [Util applyOutputTextStyle: self.outputText];
@@ -59,7 +63,7 @@
     
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = HTTPS_TEST_TOOLTIP_TEXT;
-
+    
     [Log setLogDelegate:self];
 }
 
@@ -73,33 +77,45 @@
     });
 }
 
-- (IBAction)getInfoClicked:(id)sender {
+- (IBAction)runAction:(id)sender {
     [self hideTooltip];
     
     [self clearOutput];
     
-    NSString *testUrl = [self.urlText text];
-    if ([testUrl length] > 0) {
-        NSLog(@"Testing HTTPS with url \'%@\'\n", testUrl);
-    } else {
-        testUrl = HTTPS_TEST_DEFAULT_URL;
-        [self.urlText setText:testUrl];
-        NSLog(@"Testing HTTPS with default url \'%@\'\n", testUrl);
-    }
+    NSString *ffmpegCommand = [[self commandText] text];
+
+    NSLog(@"Testing COMMAND synchronously.\n");
     
-    // HTTPS COMMAND ARGUMENTS
-    NSString* ffmpegCommand = [NSString stringWithFormat:@"-hide_banner -i %@", testUrl];
-
     NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
-
+    
     // EXECUTE
     int result = [MobileFFmpeg execute: ffmpegCommand];
-
+    
     NSLog(@"FFmpeg process exited with rc %d\n", result);
 }
 
+- (IBAction)runAsyncAction:(id)sender {
+    [self hideTooltip];
+    
+    [self clearOutput];
+
+    NSString *ffmpegCommand = [[self commandText] text];
+    
+    NSLog(@"Testing COMMAND asynchronously.\n");
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
+        
+        // EXECUTE
+        int result = [MobileFFmpeg execute: ffmpegCommand];
+        
+        NSLog(@"FFmpeg process exited with rc %d\n", result);
+    });
+}
+
 - (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.getInfoButton withinSuperView:self.view];
+    [tooltip showAnimated:YES forView:self.runButton withinSuperView:self.view];
 }
 
 - (void)hideTooltip {
