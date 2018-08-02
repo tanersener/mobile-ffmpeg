@@ -213,7 +213,7 @@ DSYMUTIL="dsymutil"
 NMEDIT="nmedit"
 
 # Tool to manipulate fat objects and archives on Mac OS X.
-LIPO="lipo"
+LIPO="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo"
 
 # ldd/readelf like tool for Mach-O binaries on Mac OS X.
 OTOOL="otool"

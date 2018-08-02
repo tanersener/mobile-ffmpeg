@@ -259,7 +259,7 @@ void *logThreadFunction() {
         }
     }
 
-    LOGI("Log redirect thread started.\n");
+    LOGD("Log redirect thread started.\n");
 
     while(logRedirectionEnabled) {
 
@@ -284,7 +284,7 @@ void *logThreadFunction() {
 
     (*globalVm)->DetachCurrentThread(globalVm);
 
-    LOGI("Log redirect thread stopped.\n");
+    LOGD("Log redirect thread stopped.\n");
 
     return NULL;
 }
@@ -320,8 +320,6 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Log_enableNativeRedirecti
     mutexLock();
 
     if (logRedirectionEnabled != 0) {
-        LOGE("Log redirection already enabled.\n");
-
         mutexUnlock();
         return;
     }
@@ -349,8 +347,6 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Log_disableNativeRedirect
     mutexLock();
 
     if (logRedirectionEnabled != 1) {
-        LOGE("Log redirection already disabled.\n");
-
         mutexUnlock();
         return;
     }
