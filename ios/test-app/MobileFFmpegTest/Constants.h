@@ -38,4 +38,16 @@ extern NSString *const HTTPS_TEST_DEFAULT_URL;
 extern NSString *const HTTPS_TEST_TOOLTIP_TEXT;
 extern NSTimeInterval const HTTPS_TEST_TOOLTIP_DURATION;
 
+// AUDIO TEST
+extern NSString *const AUDIO_TEST_TOOLTIP_TEXT;
+extern NSTimeInterval const AUDIO_TEST_TOOLTIP_DURATION;
+
+// SUBTITLE TEST
+extern NSString *const SUBTITLE_TEST_TOOLTIP_TEXT;
+extern NSTimeInterval const SUBTITLE_TEST_TOOLTIP_DURATION;
+
+// VID.STAB TEST
+extern NSString *const VIDSTAB_TEST_TOOLTIP_TEXT;
+extern NSTimeInterval const VIDSTAB_TEST_TOOLTIP_DURATION;
+
 #endif

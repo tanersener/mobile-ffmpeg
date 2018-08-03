@@ -1,5 +1,5 @@
 //
-// VideoViewController.h
+// SubtitleViewController.h
 //
 // Copyright (c) 2018 Taner Sener
 //
@@ -24,10 +24,8 @@
 #import "Util.h"
 #import <mobileffmpeg/Log.h>
 
-@interface VideoViewController : UIViewController<LogDelegate,UIPickerViewDataSource, UIPickerViewDelegate>
+@interface SubtitleViewController : UIViewController<LogDelegate>
 
 - (void)setActive;
-+ (NSString*)generateVideoEncodeScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions;
 
 @end
-

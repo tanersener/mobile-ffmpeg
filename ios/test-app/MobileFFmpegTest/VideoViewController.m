@@ -56,7 +56,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // VIDEO CODE PICKER INIT
+    // VIDEO CODEC PICKER INIT
     codecData = @[@"mpeg4", @"x264", @"x265", @"xvid", @"vp8", @"vp9", @"aom", @"kvazaar", @"theora", @"hap"];
     selectedCodec = 0;
     
@@ -65,14 +65,11 @@
 
     // STYLE UPDATE
     [Util applyButtonStyle: self.encodeButton];
-    
     [Util applyPickerViewStyle: self.videoCodecPicker];
-    
     [Util applyVideoPlayerFrameStyle: self.videoPlayerFrame];
-
     [Util applyHeaderStyle: self.header];
     
-    // TOOPTIP INIT
+    // TOOLTIP INIT
     RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
     [Util applyTooltipStyle: preferences];
     preferences.drawing.arrowPostion = Top;
@@ -168,15 +165,16 @@
         NSLog(@"FFmpeg process exited with rc %d\n", result);
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self dismissProgressDialog];
+            if (result == 0) {
+                [self dismissProgressDialog];
+                NSLog(@"Encode completed successfully; playing video.\n");
+                [self playVideo];
+            } else {
+                NSLog(@"Encode failed with rc=%d\n", result);
+                
+                [self dismissProgressDialogAndAlert:@"Encode failed. Please check log for the details."];
+            }
         });
-        
-        if (result == 0) {
-            NSLog(@"Encode completed successfully; playing video.\n");
-            [self playVideo];
-        } else {
-            NSLog(@"Encode failed with rc=%d\n", result);
-        }
     });
 }
 
@@ -293,6 +291,13 @@
     [self dismissViewControllerAnimated:TRUE completion:nil];
 }
 
+- (void)dismissProgressDialogAndAlert: (NSString*)message {
+    [indicator stopAnimating];
+    [self dismissViewControllerAnimated:TRUE completion:^{
+        [Util alert:self withTitle:@"Error" message:message andButtonText:@"OK"];
+    }];
+}
+
 - (void)setActive {
     [Log setLogDelegate:self];
     [self hideTooltip];
@@ -327,7 +332,7 @@
                     message = activeItem.error.localizedDescription;
                 }
                 
-                [Util alert:self withTitle:@"Error" message:message andButtonText:@"OK"];
+                [Util alert:self withTitle:@"Player Error" message:message andButtonText:@"OK"];
             }
         } break;
         default: {

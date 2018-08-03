@@ -41,14 +41,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    // STYLE UPDATE
     [Util applyEditTextStyle: self.urlText];
-    
     [Util applyButtonStyle: self.getInfoButton];
-
     [Util applyOutputTextStyle: self.outputText];
-
     [Util applyHeaderStyle: self.header];
 
+    // TOOLTIP INIT
     RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
     [Util applyTooltipStyle: preferences];
     preferences.drawing.arrowPostion = Top;

@@ -38,9 +38,15 @@
     UITabBarItem *tabBarItem1 = [tabBar.items objectAtIndex:0];
     UITabBarItem *tabBarItem2 = [tabBar.items objectAtIndex:1];
     UITabBarItem *tabBarItem3 = [tabBar.items objectAtIndex:2];
+    UITabBarItem *tabBarItem4 = [tabBar.items objectAtIndex:3];
+    UITabBarItem *tabBarItem5 = [tabBar.items objectAtIndex:4];
+    UITabBarItem *tabBarItem6 = [tabBar.items objectAtIndex:5];
     tabBarItem1.title = @"COMMAND";
     tabBarItem2.title = @"VIDEO";
     tabBarItem3.title = @"HTTPS";
+    tabBarItem4.title = @"AUDIO";
+    tabBarItem5.title = @"SUBTITLE";
+    tabBarItem6.title = @"VID.STAB";
 
     // SELECTED BAR ITEM
     [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:

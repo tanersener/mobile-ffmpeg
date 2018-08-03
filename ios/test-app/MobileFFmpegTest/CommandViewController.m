@@ -42,17 +42,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    // STYLE UPDATE
     [Util applyEditTextStyle: self.commandText];
-    
     [Util applyButtonStyle: self.runButton];
-    
     [Util applyButtonStyle: self.runAsyncButton];
-    
     [Util applyOutputTextStyle: self.outputText];
-    
     [Util applyHeaderStyle: self.header];
 
+    // TOOLTIP INIT
     RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
     [Util applyTooltipStyle: preferences];
     preferences.drawing.arrowPostion = Top;

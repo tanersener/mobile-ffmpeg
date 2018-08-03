@@ -23,6 +23,9 @@
 #import "CommandViewController.h"
 #import "VideoViewController.h"
 #import "HttpsViewController.h"
+#import "AudioViewController.h"
+#import "SubtitleViewController.h"
+#import "VidStabViewController.h"
 
 @interface TabBarController () <UITabBarControllerDelegate>
 
@@ -51,6 +54,15 @@
     } else if ([viewController isKindOfClass:[HttpsViewController class]]) {
         HttpsViewController* httpsView = (HttpsViewController*)viewController;
         [httpsView setActive];
+    } else if ([viewController isKindOfClass:[AudioViewController class]]) {
+        AudioViewController* audioView = (AudioViewController*)viewController;
+        [audioView setActive];
+    } else if ([viewController isKindOfClass:[SubtitleViewController class]]) {
+        SubtitleViewController* subtitleView = (SubtitleViewController*)viewController;
+        [subtitleView setActive];
+    } else if ([viewController isKindOfClass:[VidStabViewController class]]) {
+        VidStabViewController* vidStabView = (VidStabViewController*)viewController;
+        [vidStabView setActive];
     }
 }
 

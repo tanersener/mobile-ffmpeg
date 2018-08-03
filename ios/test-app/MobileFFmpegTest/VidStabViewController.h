@@ -1,5 +1,5 @@
 //
-// VideoViewController.h
+// VidStabViewController.h
 //
 // Copyright (c) 2018 Taner Sener
 //
@@ -18,16 +18,13 @@
 //  You should have received a copy of the GNU Lesser General Public License
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
-
 #import <UIKit/UIKit.h>
 #import "Constants.h"
 #import "Util.h"
 #import <mobileffmpeg/Log.h>
 
-@interface VideoViewController : UIViewController<LogDelegate,UIPickerViewDataSource, UIPickerViewDelegate>
+@interface VidStabViewController : UIViewController<LogDelegate>
 
 - (void)setActive;
-+ (NSString*)generateVideoEncodeScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions;
 
 @end
-

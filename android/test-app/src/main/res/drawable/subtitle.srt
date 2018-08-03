@@ -1,0 +1,11 @@
+1
+00:00:00,021 --> 00:00:04,000
+Colosseum or Coliseum is an oval amphitheatre in the centre of the city of Rome, Italy.
+
+2
+00:00:04,001 --> 00:00:06,927
+The Great Pyramid of Giza is the oldest and largest of the three pyramids in the Giza pyramid complex bordering what is now El Giza, Egypt.
+
+3
+00:00:06,928 --> 00:00:09,000
+The Taj Mahal is an ivory-white marble mausoleum on the south bank of the Yamuna river in the Indian city of Agra.
