@@ -29,32 +29,31 @@ LIBRARY_KVAZAAR=17
 LIBRARY_X264=18
 LIBRARY_XVIDCORE=19
 LIBRARY_X265=20
-LIBRARY_FREI0R=21
-LIBRARY_LIBVIDSTAB=22
-LIBRARY_LIBILBC=23
-LIBRARY_OPUS=24
-LIBRARY_SNAPPY=25
-LIBRARY_SOXR=26
-LIBRARY_LIBAOM=27
-LIBRARY_CHROMAPRINT=28
-LIBRARY_GIFLIB=29
-LIBRARY_JPEG=30
-LIBRARY_LIBOGG=31
-LIBRARY_LIBPNG=32
-LIBRARY_LIBUUID=33
-LIBRARY_NETTLE=34
-LIBRARY_TIFF=35
-LIBRARY_EXPAT=36
-LIBRARY_ZLIB=37
-LIBRARY_AUDIOTOOLBOX=38
-LIBRARY_COREIMAGE=39
-LIBRARY_BZIP2=40
+LIBRARY_LIBVIDSTAB=21
+LIBRARY_LIBILBC=22
+LIBRARY_OPUS=23
+LIBRARY_SNAPPY=24
+LIBRARY_SOXR=25
+LIBRARY_LIBAOM=26
+LIBRARY_CHROMAPRINT=27
+LIBRARY_GIFLIB=28
+LIBRARY_JPEG=29
+LIBRARY_LIBOGG=30
+LIBRARY_LIBPNG=31
+LIBRARY_LIBUUID=32
+LIBRARY_NETTLE=33
+LIBRARY_TIFF=34
+LIBRARY_EXPAT=35
+LIBRARY_ZLIB=36
+LIBRARY_AUDIOTOOLBOX=37
+LIBRARY_COREIMAGE=38
+LIBRARY_BZIP2=39
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -135,7 +134,6 @@ When compilation ends a universal fat binary and an IOS framework is created wit
 
     echo -e "GPL libraries:"
 
-    echo -e "  --enable-frei0r\t\tbuild with frei0r [no]"
     echo -e "  --enable-libvidstab\t\tbuild with libvidstab [no]"
     echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
     echo -e "  --enable-x265\t\t\tbuild with x265 [no]"
@@ -210,9 +208,6 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_FREETYPE]=$2
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
             set_library "libpng" $2
-        ;;
-        frei0r)
-            ENABLED_LIBRARIES[LIBRARY_FREI0R]=$2
         ;;
         fribidi)
             ENABLED_LIBRARIES[LIBRARY_FRIBIDI]=$2
@@ -400,7 +395,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {37..40}
+    for library in {36..39}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -412,7 +407,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..28}
+    for library in {0..27}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -498,9 +493,9 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..40}
+            for library in {0..39}
             do
-                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]] && [[ $library -ne 22 ]]; then
+                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
                 fi
             done
@@ -533,7 +528,7 @@ print_enabled_architectures
 print_enabled_libraries
 
 # CHECKING GPL LIBRARIES
-for gpl_library in {18..22}
+for gpl_library in {18..21}
 do
     if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
         library_name=$(get_library_name ${gpl_library})
@@ -574,7 +569,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..41}
+        for library in {1..40}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

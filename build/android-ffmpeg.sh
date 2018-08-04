@@ -75,7 +75,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..39}
+for library in {1..38}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -97,11 +97,6 @@ do
                 CFLAGS+=" $(pkg-config --cflags freetype2)"
                 LDFLAGS+=" $(pkg-config --libs --static freetype2)"
                 CONFIGURE_POSTFIX+=" --enable-libfreetype"
-            ;;
-            frei0r)
-                CFLAGS+=" $(pkg-config --cflags frei0r)"
-                LDFLAGS+=" $(pkg-config --libs --static frei0r)"
-                CONFIGURE_POSTFIX+=" --enable-frei0r --enable-gpl"
             ;;
             fribidi)
                 CFLAGS+=" $(pkg-config --cflags fribidi)"
@@ -266,7 +261,7 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 38 ]]; then
+        if [[ ${library} -eq 37 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi

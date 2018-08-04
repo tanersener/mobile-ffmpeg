@@ -76,7 +76,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..41}
+for library in {1..40}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -98,11 +98,6 @@ do
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags freetype2)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static freetype2)"
                 CONFIGURE_POSTFIX+=" --enable-libfreetype"
-            ;;
-            frei0r)
-                FFMPEG_CFLAGS+=" $(pkg-config --cflags frei0r)"
-                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static frei0r)"
-                CONFIGURE_POSTFIX+=" --enable-frei0r --enable-gpl"
             ;;
             fribidi)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags fribidi)"
@@ -282,13 +277,13 @@ do
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 8 ]]; then
             CONFIGURE_POSTFIX+=" --disable-iconv"
-        elif [[ ${library} -eq 38 ]]; then
+        elif [[ ${library} -eq 37 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
-        elif [[ ${library} -eq 39 ]]; then
+        elif [[ ${library} -eq 38 ]]; then
             CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
-        elif [[ ${library} -eq 40 ]]; then
+        elif [[ ${library} -eq 39 ]]; then
             CONFIGURE_POSTFIX+=" --disable-coreimage"
-        elif [[ ${library} -eq 41 ]]; then
+        elif [[ ${library} -eq 40 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
         fi
     fi

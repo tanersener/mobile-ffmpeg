@@ -31,24 +31,23 @@ get_library_name() {
         18) echo "x264" ;;
         19) echo "xvidcore" ;;
         20) echo "x265" ;;
-        21) echo "frei0r" ;;
-        22) echo "libvidstab" ;;
-        23) echo "libilbc" ;;
-        24) echo "opus" ;;
-        25) echo "snappy" ;;
-        26) echo "soxr" ;;
-        27) echo "libaom" ;;
-        28) echo "chromaprint" ;;
-        29) echo "giflib" ;;
-        30) echo "jpeg" ;;
-        31) echo "libogg" ;;
-        32) echo "libpng" ;;
-        33) echo "libuuid" ;;
-        34) echo "nettle" ;;
-        35) echo "tiff" ;;
-        36) echo "expat" ;;
-        37) echo "android-zlib" ;;
-        38) echo "android-media-codec" ;;
+        21) echo "libvidstab" ;;
+        22) echo "libilbc" ;;
+        23) echo "opus" ;;
+        24) echo "snappy" ;;
+        25) echo "soxr" ;;
+        26) echo "libaom" ;;
+        27) echo "chromaprint" ;;
+        28) echo "giflib" ;;
+        29) echo "jpeg" ;;
+        30) echo "libogg" ;;
+        31) echo "libpng" ;;
+        32) echo "libuuid" ;;
+        33) echo "nettle" ;;
+        34) echo "tiff" ;;
+        35) echo "expat" ;;
+        36) echo "android-zlib" ;;
+        37) echo "android-media-codec" ;;
     esac
 }
 
@@ -723,12 +722,6 @@ download_gpl_library_source() {
     echo -e "\nDEBUG: Downloading GPL library source: $1\n" >>${BASEDIR}/build.log
 
     case $1 in
-        frei0r)
-            GPL_LIB_URL="https://files.dyne.org/frei0r/frei0r-plugins-1.6.1.tar.gz"
-            GPL_LIB_FILE="frei0r-plugins-1.6.1.tar.gz"
-            GPL_LIB_ORIG_DIR="frei0r-plugins-1.6.1"
-            GPL_LIB_DEST_DIR="frei0r"
-        ;;
         libvidstab)
             GPL_LIB_URL="https://github.com/georgmartius/vid.stab/archive/v1.1.0.tar.gz"
             GPL_LIB_FILE="v1.1.0.tar.gz"
