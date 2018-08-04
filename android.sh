@@ -495,14 +495,14 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
 fi
 
 echo -e "Building mobile-ffmpeg for Android\n"
-echo -e -n "INFO: Building mobile-ffmpeg for Android: " >>${BASEDIR}/build.log
-echo -e `date` >>${BASEDIR}/build.log
+echo -e -n "INFO: Building mobile-ffmpeg for Android: " 1>>${BASEDIR}/build.log 2>&1
+echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 if [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
     ENABLED_ARCHITECTURES[0]=1
 
     echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n"
-    echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n" 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+    echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n" 1>>${BASEDIR}/build.log 2>&1
 fi
 
 print_enabled_architectures
@@ -516,13 +516,13 @@ do
 
         if  [ ${GPL_ENABLED} != "yes" ]; then
             echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n"
-            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" >> ${BASEDIR}/build.log
+            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" 1>>${BASEDIR}/build.log 2>&1
             exit 1
         else
             DOWNLOAD_RESULT=$(download_gpl_library_source ${library_name})
             if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
                 echo -e "\n(*) Failed to download GPL library ${library_name} source. Please check build.log file for details. If the problem persists refer to offline building instructions.\n"
-                echo -e "\n(*) Failed to download GPL library ${library_name} source.\n" >> ${BASEDIR}/build.log
+                echo -e "\n(*) Failed to download GPL library ${library_name} source.\n" 1>>${BASEDIR}/build.log 2>&1
                 exit 1
             fi
         fi
@@ -551,11 +551,11 @@ do
     fi
 done
 
-rm -f ${BASEDIR}/android/build/.neon
+rm -f ${BASEDIR}/android/build/.neon 1>>${BASEDIR}/build.log 2>&1
 ANDROID_ARCHITECTURES=""
 if [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
     ANDROID_ARCHITECTURES+="$(get_android_arch 0) "
-    mkdir -p ${BASEDIR}/android/build
+    mkdir -p ${BASEDIR}/android/build 1>>${BASEDIR}/build.log 2>&1
     cat > "${BASEDIR}/android/build/.neon" << EOF
 EOF
 elif [[ ${ENABLED_ARCHITECTURES[0]} -eq 1 ]]; then
@@ -580,13 +580,13 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
     MOBILE_FFMPEG_AAR=${BASEDIR}/prebuilt/android-aar/mobile-ffmpeg
 
     # BUILDING ANDROID ARCHIVE LIBRARY
-    rm -rf ${BASEDIR}/android/libs
+    rm -rf ${BASEDIR}/android/libs 1>>${BASEDIR}/build.log 2>&1
 
-    mkdir -p ${MOBILE_FFMPEG_AAR}
+    mkdir -p ${MOBILE_FFMPEG_AAR} 1>>${BASEDIR}/build.log 2>&1
 
-    cd ${BASEDIR}/android
+    cd ${BASEDIR}/android 1>>${BASEDIR}/build.log 2>&1
 
-    ${ANDROID_NDK_ROOT}/ndk-build -B 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+    ${ANDROID_NDK_ROOT}/ndk-build -B 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -eq 0 ]; then
         echo "ok"
@@ -597,16 +597,21 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
 
     echo -e -n "\n\nCreating Android archive under prebuilt/android-aar: "
 
-    gradle clean build 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+    gradle clean build 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -ne 0 ]; then
         echo -e "failed\n"
         exit 1
     fi
 
-    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-*.aar ${MOBILE_FFMPEG_AAR}/mobile-ffmpeg.aar || exit 1
+    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-*.aar ${MOBILE_FFMPEG_AAR}/mobile-ffmpeg.aar 1>>${BASEDIR}/build.log 2>&1
 
-    echo -e "Created mobile-ffmpeg Android archive successfully.\n" >> ${BASEDIR}/build.log
+    if [ $? -ne 0 ]; then
+        echo -e "failed\n"
+        exit 1
+    fi
+
+    echo -e "Created mobile-ffmpeg Android archive successfully.\n" 1>>${BASEDIR}/build.log 2>&1
 
     echo -e "ok\n"
 fi

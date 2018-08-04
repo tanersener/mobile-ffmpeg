@@ -78,20 +78,20 @@
     stabilizedVideoPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:stabilizedVideoPlayer];
 
     CGRect upperRectangularFrame = self.view.bounds;
-    upperRectangularFrame.size.width = self.view.bounds.size.width - 40;
-    upperRectangularFrame.origin.x = 20;
-    upperRectangularFrame.origin.y = 22;
+    upperRectangularFrame.size.width = self.view.bounds.size.width - 120;
+    upperRectangularFrame.origin.x = 40;
+    upperRectangularFrame.origin.y = -265;
     
     playerLayer.frame = upperRectangularFrame;
-    [self.view.layer addSublayer:playerLayer];
+    [self.videoPlayerFrame.layer addSublayer:playerLayer];
 
-    CGRect lowerRectangularFrame = upperRectangularFrame;
-    lowerRectangularFrame.size.width = self.view.bounds.size.width - 40;
-    lowerRectangularFrame.origin.x = 20;
-    lowerRectangularFrame.origin.y = 162;
+    CGRect lowerRectangularFrame = self.view.bounds;
+    lowerRectangularFrame.size.width = self.view.bounds.size.width - 120;
+    lowerRectangularFrame.origin.x = 40;
+    lowerRectangularFrame.origin.y = -255;
     
     stabilizedVideoPlayerLayer.frame = lowerRectangularFrame;
-    [self.view.layer addSublayer:stabilizedVideoPlayerLayer];
+    [self.stabilizedVideoPlayerFrame.layer addSublayer:stabilizedVideoPlayerLayer];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setActive];
@@ -149,7 +149,7 @@
                 
                 NSLog(@"Create completed successfully; stabilizing video.\n");
                 
-                NSString *analyzeVideoCommand = [NSString stringWithFormat:@"-y -i %@ -vf vidstabdetect=shakiness=10:accuracy=15:result=\"%@\" -f null -", videoFile, shakeResultsFile];
+                NSString *analyzeVideoCommand = [NSString stringWithFormat:@"-y -i %@ -vf vidstabdetect=shakiness=10:accuracy=15:result=%@ -f null -", videoFile, shakeResultsFile];
                 
                 [self loadProgressDialog:@"Stabilizing video\n\n"];
                 
@@ -167,7 +167,7 @@
 
                             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                                 
-                                NSString *stabilizeVideoCommand = [NSString stringWithFormat:@"-y -i %@ -vf vidstabtransform=smoothing=30:input=\"%@\" %@", videoFile, shakeResultsFile, stabilizedVideoFile];
+                                NSString *stabilizeVideoCommand = [NSString stringWithFormat:@"-y -i %@ -vf vidstabtransform=smoothing=30:input=%@ %@", videoFile, shakeResultsFile, stabilizedVideoFile];
                                 
                                 NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", stabilizeVideoCommand);
                                 

@@ -93,7 +93,7 @@ set_dependency_rebuilt_flag() {
 . ${BASEDIR}/build/ios-common.sh
 
 echo -e "\nBuilding ${ARCH} platform\n"
-echo -e "\nINFO: Starting new build for ${ARCH} at "$(date)"\n">> ${BASEDIR}/build.log
+echo -e "\nINFO: Starting new build for ${ARCH} at "$(date)"\n" 1>>${BASEDIR}/build.log 2>&1
 INSTALL_BASE="${BASEDIR}/prebuilt/ios-$(get_target_host)"
 
 # CREATING PACKAGE CONFIG DIRECTORY
@@ -111,7 +111,7 @@ do
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
         enabled_library_list+=(${ENABLED_LIBRARY})
 
-        echo -e "INFO: Enabled library ${ENABLED_LIBRARY}" >> ${BASEDIR}/build.log
+        echo -e "INFO: Enabled library ${ENABLED_LIBRARY}" 1>>${BASEDIR}/build.log 2>&1
     fi
 done
 
@@ -190,18 +190,18 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
 
             LIBRARY_IS_INSTALLED=$(library_is_installed ${INSTALL_BASE} ${library})
 
-            echo -e "INFO: Flags detected for ${library}: already installed=${LIBRARY_IS_INSTALLED}, rebuild=${!REBUILD_FLAG}, dependency rebuilt=${!DEPENDENCY_REBUILT_FLAG}\n" >> ${BASEDIR}/build.log
+            echo -e "INFO: Flags detected for ${library}: already installed=${LIBRARY_IS_INSTALLED}, rebuild=${!REBUILD_FLAG}, dependency rebuilt=${!DEPENDENCY_REBUILT_FLAG}\n" 1>>${BASEDIR}/build.log 2>&1
 
             # DECIDE TO BUILD OR NOT
             if [[ ${LIBRARY_IS_INSTALLED} -ne 0 ]] || [[ ${!REBUILD_FLAG} -eq 1 ]] || [[ ${!DEPENDENCY_REBUILT_FLAG} -eq 1 ]]; then
 
-                echo -e "----------------------------------------------------------------" >> ${BASEDIR}/build.log
-                echo -e "\nINFO: Building $library with the following environment variables\n" >> ${BASEDIR}/build.log
-                env >> ${BASEDIR}/build.log
-                echo -e "----------------------------------------------------------------\n" >> ${BASEDIR}/build.log
-                echo -e "INFO: System information\n" >> ${BASEDIR}/build.log
-                uname -a >> ${BASEDIR}/build.log
-                echo -e "----------------------------------------------------------------\n" >> ${BASEDIR}/build.log
+                echo -e "----------------------------------------------------------------" 1>>${BASEDIR}/build.log 2>&1
+                echo -e "\nINFO: Building $library with the following environment variables\n" 1>>${BASEDIR}/build.log 2>&1
+                env 1>>${BASEDIR}/build.log 2>&1
+                echo -e "----------------------------------------------------------------\n" 1>>${BASEDIR}/build.log 2>&1
+                echo -e "INFO: System information\n" 1>>${BASEDIR}/build.log 2>&1
+                uname -a 1>>${BASEDIR}/build.log 2>&1
+                echo -e "----------------------------------------------------------------\n" 1>>${BASEDIR}/build.log 2>&1
 
                 echo -n "${library}: "
 
@@ -214,7 +214,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 cd ${BASEDIR}
 
                 # BUILD EACH LIBRARY ALONE FIRST
-                ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+                ${SCRIPT_PATH} 1>>${BASEDIR}/build.log 2>&1
 
                 if [ $? -eq 0 ]; then
                     (( completed+=1 ))
@@ -231,7 +231,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 echo "${library}: already built"
             fi
         else
-            echo -e "INFO: Skipping $library, run=$run, completed=${!BUILD_COMPLETED_FLAG}\n" >> ${BASEDIR}/build.log
+            echo -e "INFO: Skipping $library, run=$run, completed=${!BUILD_COMPLETED_FLAG}\n" 1>>${BASEDIR}/build.log 2>&1
         fi
     done
 done
@@ -254,4 +254,4 @@ else
     echo -e "\nmobile-ffmpeg: skipped"
 fi
 
-echo -e "\nINFO: Completed build for ${ARCH} at "$(date)"\n">> ${BASEDIR}/build.log
+echo -e "\nINFO: Completed build for ${ARCH} at "$(date)"\n" 1>>${BASEDIR}/build.log 2>&1

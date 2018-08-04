@@ -229,7 +229,7 @@ get_asmflags() {
 }
 
 get_cxxflags() {
-    local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags $1) $(get_min_version_cflags $1)"
+    local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags) $(get_min_version_cflags $1)"
 
     case $1 in
         x265)
@@ -660,22 +660,22 @@ download() {
         mkdir -p "${MOBILE_FFMPEG_TMPDIR}"
     fi
 
-    (curl --fail --location $1 -o ${MOBILE_FFMPEG_TMPDIR}/$2) 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+    (curl --fail --location $1 -o ${MOBILE_FFMPEG_TMPDIR}/$2) 1>>${BASEDIR}/build.log 2>&1
 
     local RC=$?
 
     if [ ${RC} -eq 0 ]; then
-        echo -e "\nDEBUG: Downloaded $1 to ${MOBILE_FFMPEG_TMPDIR}/$2\n" >>${BASEDIR}/build.log
+        echo -e "\nDEBUG: Downloaded $1 to ${MOBILE_FFMPEG_TMPDIR}/$2\n" 1>>${BASEDIR}/build.log 2>&1
     else
-        rm -f ${MOBILE_FFMPEG_TMPDIR}/$2 >>${BASEDIR}/build.log
+        rm -f ${MOBILE_FFMPEG_TMPDIR}/$2 1>>${BASEDIR}/build.log 2>&1
 
-        echo -e -n "\nINFO: Failed to download $1 to ${MOBILE_FFMPEG_TMPDIR}/$2, rc=${RC}. " >>${BASEDIR}/build.log
+        echo -e -n "\nINFO: Failed to download $1 to ${MOBILE_FFMPEG_TMPDIR}/$2, rc=${RC}. " 1>>${BASEDIR}/build.log 2>&1
 
         if [ "$3" == "exit" ]; then
-            echo -e "DEBUG: Build will now exit.\n" >>${BASEDIR}/build.log
+            echo -e "DEBUG: Build will now exit.\n" 1>>${BASEDIR}/build.log 2>&1
             exit 1
         else
-            echo -e "DEBUG: Build will continue.\n" >>${BASEDIR}/build.log
+            echo -e "DEBUG: Build will continue.\n" 1>>${BASEDIR}/build.log 2>&1
         fi
     fi
 
@@ -688,7 +688,7 @@ download_gpl_library_source() {
     local GPL_LIB_ORIG_DIR=""
     local GPL_LIB_DEST_DIR=""
 
-    echo -e "\nDEBUG: Downloading GPL library source: $1\n" >>${BASEDIR}/build.log
+    echo -e "\nDEBUG: Downloading GPL library source: $1\n" 1>>${BASEDIR}/build.log 2>&1
 
     case $1 in
         libvidstab)
@@ -698,7 +698,7 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180803-2245.tar.bz2"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180803-2245-stable.tar.bz2"
             GPL_LIB_FILE="x264-snapshot-20180803-2245-stable.tar.bz2"
             GPL_LIB_ORIG_DIR="x264-snapshot-20180803-2245-stable"
             GPL_LIB_DEST_DIR="x264"
@@ -706,7 +706,7 @@ download_gpl_library_source() {
         x265)
             GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_2.8.tar.gz"
             GPL_LIB_FILE="x265-2.8.tar.gz"
-            GPL_LIB_ORIG_DIR="x265-2.8"
+            GPL_LIB_ORIG_DIR="x265_2.8"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
@@ -720,29 +720,29 @@ download_gpl_library_source() {
     local GPL_LIB_SOURCE_PATH="${BASEDIR}/src/${GPL_LIB_DEST_DIR}"
 
     if [ -d "${GPL_LIB_SOURCE_PATH}" ]; then
-        echo -e "INFO: $1 already downloaded. Source folder found at ${GPL_LIB_SOURCE_PATH}\n" >>${BASEDIR}/build.log
+        echo -e "INFO: $1 already downloaded. Source folder found at ${GPL_LIB_SOURCE_PATH}\n" 1>>${BASEDIR}/build.log 2>&1
         echo 0
         return
     fi
 
     local GPL_LIB_PACKAGE_PATH="${MOBILE_FFMPEG_TMPDIR}/${GPL_LIB_FILE}"
 
-    echo -e "DEBUG: $1 source not found. Checking if library package ${GPL_LIB_FILE} is downloaded at ${GPL_LIB_PACKAGE_PATH} \n" >>${BASEDIR}/build.log
+    echo -e "DEBUG: $1 source not found. Checking if library package ${GPL_LIB_FILE} is downloaded at ${GPL_LIB_PACKAGE_PATH} \n" 1>>${BASEDIR}/build.log 2>&1
 
     if [ ! -f "${GPL_LIB_PACKAGE_PATH}" ]; then
-        echo -e "DEBUG: $1 library package not found. Downloading from ${GPL_LIB_URL}\n" >>${BASEDIR}/build.log
+        echo -e "DEBUG: $1 library package not found. Downloading from ${GPL_LIB_URL}\n" 1>>${BASEDIR}/build.log 2>&1
 
         local DOWNLOAD_RC=$(download "${GPL_LIB_URL}" "${GPL_LIB_FILE}")
 
         if [ ${DOWNLOAD_RC} -ne 0 ]; then
-            echo -e "INFO: Downloading GPL library $1 failed. Can not get library package from ${GPL_LIB_URL}\n" >>${BASEDIR}/build.log
+            echo -e "INFO: Downloading GPL library $1 failed. Can not get library package from ${GPL_LIB_URL}\n" 1>>${BASEDIR}/build.log 2>&1
             echo ${DOWNLOAD_RC}
             return
         else
-            echo -e "DEBUG: $1 library package downloaded\n" >>${BASEDIR}/build.log
+            echo -e "DEBUG: $1 library package downloaded\n" 1>>${BASEDIR}/build.log 2>&1
         fi
     else
-        echo -e "DEBUG: $1 library package already downloaded\n" >>${BASEDIR}/build.log
+        echo -e "DEBUG: $1 library package already downloaded\n" 1>>${BASEDIR}/build.log 2>&1
     fi
 
     local EXTRACT_COMMAND=""
@@ -753,38 +753,42 @@ download_gpl_library_source() {
         EXTRACT_COMMAND="tar zxf ${GPL_LIB_PACKAGE_PATH} --directory ${MOBILE_FFMPEG_TMPDIR}"
     fi
 
-    echo -e "DEBUG: Extracting library package ${GPL_LIB_FILE} inside ${MOBILE_FFMPEG_TMPDIR}\n" >>${BASEDIR}/build.log
+    echo -e "DEBUG: Extracting library package ${GPL_LIB_FILE} inside ${MOBILE_FFMPEG_TMPDIR}\n" 1>>${BASEDIR}/build.log 2>&1
 
-    ${EXTRACT_COMMAND}
+    ${EXTRACT_COMMAND} 1>>${BASEDIR}/build.log 2>&1
 
     local EXTRACT_RC=$?
 
     if [ ${EXTRACT_RC} -ne 0 ]; then
-        echo -e "\nINFO: Downloading GPL library $1 failed. Extract for library package ${GPL_LIB_FILE} completed with rc=${EXTRACT_RC}. Deleting failed files.\n" >>${BASEDIR}/build.log
+        echo -e "\nINFO: Downloading GPL library $1 failed. Extract for library package ${GPL_LIB_FILE} completed with rc=${EXTRACT_RC}. Deleting failed files.\n" 1>>${BASEDIR}/build.log 2>&1
+        rm -f ${GPL_LIB_PACKAGE_PATH} 1>>${BASEDIR}/build.log 2>&1
+        rm -rf ${MOBILE_FFMPEG_TMPDIR}/${GPL_LIB_ORIG_DIR} 1>>${BASEDIR}/build.log 2>&1
         echo ${EXTRACT_RC}
-        rm -f ${GPL_LIB_PACKAGE_PATH} >>${BASEDIR}/build.log
-        rm -rf ${MOBILE_FFMPEG_TMPDIR}/${GPL_LIB_ORIG_DIR} >>${BASEDIR}/build.log
         return
     fi
 
-    echo -e "DEBUG: Extract completed. Copying library source to ${GPL_LIB_SOURCE_PATH}\n" >>${BASEDIR}/build.log
+    echo -e "DEBUG: Extract completed. Copying library source to ${GPL_LIB_SOURCE_PATH}\n" 1>>${BASEDIR}/build.log 2>&1
 
-    CP_RC=$(cp -r ${MOBILE_FFMPEG_TMPDIR}/${GPL_LIB_ORIG_DIR} ${GPL_LIB_SOURCE_PATH} >>${BASEDIR}/build.log)
+    COPY_COMMAND="cp -r ${MOBILE_FFMPEG_TMPDIR}/${GPL_LIB_ORIG_DIR} ${GPL_LIB_SOURCE_PATH}"
 
-    if [[ ${CP_RC} -eq 0 ]]; then
-        echo -e "DEBUG: Downloading GPL library source $1 completed successfully\n" >>${BASEDIR}/build.log
-        echo ${CP_RC}
+    ${COPY_COMMAND} 1>>${BASEDIR}/build.log 2>&1
+
+    local COPY_RC=$?
+
+    if [ ${COPY_RC} -eq 0 ]; then
+        echo -e "DEBUG: Downloading GPL library source $1 completed successfully\n" 1>>${BASEDIR}/build.log 2>&1
     else
-        echo -e "INFO: Downloading GPL library $1 failed. Copying library source to ${GPL_LIB_SOURCE_PATH} completed with rc={CP_RC}\n" >>${BASEDIR}/build.log
-        rm -rf ${GPL_LIB_SOURCE_PATH} >>${BASEDIR}/build.log
-        echo ${CP_RC}
+        echo -e "\nINFO: Downloading GPL library $1 failed. Copying library source to ${GPL_LIB_SOURCE_PATH} completed with rc=${COPY_RC}\n" 1>>${BASEDIR}/build.log 2>&1
+        rm -rf ${GPL_LIB_SOURCE_PATH} 1>>${BASEDIR}/build.log 2>&1
+        echo ${COPY_RC}
+        return
     fi
 }
 
 set_toolchain_clang_paths() {
     if [ ! -f "${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl" ]; then
         download "https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl" "gas-preprocessor.pl" "exit"
-        (chmod +x ${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl >>${BASEDIR}/build.log) || exit 1
+        (chmod +x ${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl 1>>${BASEDIR}/build.log 2>&1) || exit 1
     fi
 
     local GAS_PREPROCESSOR="${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl"
@@ -798,7 +802,6 @@ set_toolchain_clang_paths() {
     export CC="$(xcrun --sdk $(get_sdk_name) -f clang)"
     export OBJC="$(xcrun --sdk $(get_sdk_name) -f clang)"
     export CXX="$(xcrun --sdk $(get_sdk_name) -f clang++)"
-    export LIPO="$(xcrun --sdk $(get_sdk_name) -f lipo)"
 
     local ASMFLAGS="$(get_asmflags $1)"
     case ${ARCH} in
@@ -847,7 +850,7 @@ set_toolchain_clang_paths() {
 }
 
 autoreconf_library() {
-    echo -e "\nDEBUG: Running full autoreconf for $1\n" >> ${BASEDIR}/build.log
+    echo -e "\nDEBUG: Running full autoreconf for $1\n" 1>>${BASEDIR}/build.log 2>&1
 
     # TRY FULL RECONF
     (autoreconf --force --install)
@@ -857,7 +860,7 @@ autoreconf_library() {
         return
     fi
 
-    echo -e "\nDEBUG: Full autoreconf failed. Running full autoreconf with include for $1\n" >> ${BASEDIR}/build.log
+    echo -e "\nDEBUG: Full autoreconf failed. Running full autoreconf with include for $1\n" 1>>${BASEDIR}/build.log 2>&1
 
     # TRY FULL RECONF WITH m4
     (autoreconf --force --install -I m4)
@@ -867,7 +870,7 @@ autoreconf_library() {
         return
     fi
 
-    echo -e "\nDEBUG: Full autoreconf with include failed. Running autoreconf without force for $1\n" >> ${BASEDIR}/build.log
+    echo -e "\nDEBUG: Full autoreconf with include failed. Running autoreconf without force for $1\n" 1>>${BASEDIR}/build.log 2>&1
 
     # TRY RECONF WITHOUT FORCE
     (autoreconf --install)
@@ -877,7 +880,7 @@ autoreconf_library() {
         return
     fi
 
-    echo -e "\nDEBUG: Autoreconf without force failed. Running autoreconf without force with include for $1\n" >> ${BASEDIR}/build.log
+    echo -e "\nDEBUG: Autoreconf without force failed. Running autoreconf without force with include for $1\n" 1>>${BASEDIR}/build.log 2>&1
 
     # TRY RECONF WITHOUT FORCE WITH m4
     (autoreconf --install -I m4)
@@ -887,7 +890,7 @@ autoreconf_library() {
         return
     fi
 
-    echo -e "\nDEBUG: Autoreconf without force with include failed. Running default autoreconf for $1\n" >> ${BASEDIR}/build.log
+    echo -e "\nDEBUG: Autoreconf without force with include failed. Running default autoreconf for $1\n" 1>>${BASEDIR}/build.log 2>&1
 
     # TRY DEFAULT RECONF
     (autoreconf)
@@ -897,7 +900,7 @@ autoreconf_library() {
         return
     fi
 
-    echo -e "\nDEBUG: Default autoreconf failed. Running default autoreconf with include for $1\n" >> ${BASEDIR}/build.log
+    echo -e "\nDEBUG: Default autoreconf failed. Running default autoreconf with include for $1\n" 1>>${BASEDIR}/build.log 2>&1
 
     # TRY DEFAULT RECONF WITH m4
     (autoreconf -I m4)
@@ -912,22 +915,22 @@ library_is_installed() {
     local INSTALL_PATH=$1
     local LIB_NAME=$2
 
-    echo -e "DEBUG: Checking if ${LIB_NAME} is already built and installed at ${INSTALL_PATH}/${LIB_NAME}\n" >> ${BASEDIR}/build.log
+    echo -e "DEBUG: Checking if ${LIB_NAME} is already built and installed at ${INSTALL_PATH}/${LIB_NAME}\n" 1>>${BASEDIR}/build.log 2>&1
 
     if [ ! -d ${INSTALL_PATH}/${LIB_NAME} ]; then
-        echo -e "DEBUG: ${INSTALL_PATH}/${LIB_NAME} directory not found\n" >> ${BASEDIR}/build.log
+        echo -e "DEBUG: ${INSTALL_PATH}/${LIB_NAME} directory not found\n" 1>>${BASEDIR}/build.log 2>&1
         echo 1
         return
     fi
 
     if [ ! -d ${INSTALL_PATH}/${LIB_NAME}/lib ]; then
-        echo -e "DEBUG: ${INSTALL_PATH}/${LIB_NAME}/lib directory not found\n" >> ${BASEDIR}/build.log
+        echo -e "DEBUG: ${INSTALL_PATH}/${LIB_NAME}/lib directory not found\n" 1>>${BASEDIR}/build.log 2>&1
         echo 1
         return
     fi
 
     if [ ! -d ${INSTALL_PATH}/${LIB_NAME}/include ]; then
-        echo -e "DEBUG: ${INSTALL_PATH}/${LIB_NAME}/include directory not found\n" >> ${BASEDIR}/build.log
+        echo -e "DEBUG: ${INSTALL_PATH}/${LIB_NAME}/include directory not found\n" 1>>${BASEDIR}/build.log 2>&1
         echo 1
         return
     fi
@@ -936,18 +939,18 @@ library_is_installed() {
     local LIB_COUNT=$(ls -l ${INSTALL_PATH}/${LIB_NAME}/lib | wc -l)
 
     if [[ ${HEADER_COUNT} -eq 0 ]]; then
-        echo -e "DEBUG: No headers found under ${INSTALL_PATH}/${LIB_NAME}/include\n" >> ${BASEDIR}/build.log
+        echo -e "DEBUG: No headers found under ${INSTALL_PATH}/${LIB_NAME}/include\n" 1>>${BASEDIR}/build.log 2>&1
         echo 1
         return
     fi
 
     if [[ ${LIB_COUNT} -eq 0 ]]; then
-        echo -e "DEBUG: No libraries found under ${INSTALL_PATH}/${LIB_NAME}/lib\n" >> ${BASEDIR}/build.log
+        echo -e "DEBUG: No libraries found under ${INSTALL_PATH}/${LIB_NAME}/lib\n" 1>>${BASEDIR}/build.log 2>&1
         echo 1
         return
     fi
 
-    echo -e "INFO: ${LIB_NAME} library is already built and installed\n" >> ${BASEDIR}/build.log
+    echo -e "INFO: ${LIB_NAME} library is already built and installed\n" 1>>${BASEDIR}/build.log 2>&1
 
     echo 0
 }

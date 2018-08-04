@@ -1,22 +1,17 @@
 #!/bin/bash
 
+if [[ -z ${ANDROID_NDK_ROOT} ]]; then
+    echo -e "(*) ANDROID_NDK_ROOT not defined\n"
+    exit 1
+fi
+
 if [[ -z ${ARCH} ]]; then
     echo -e "(*) ARCH not defined\n"
     exit 1
 fi
 
-if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo -e "(*) IOS_MIN_VERSION not defined\n"
-    exit 1
-fi
-
-if [[ -z ${TARGET_SDK} ]]; then
-    echo -e "(*) TARGET_SDK not defined\n"
-    exit 1
-fi
-
-if [[ -z ${SDK_PATH} ]]; then
-    echo -e "(*) SDK_PATH not defined\n"
+if [[ -z ${API} ]]; then
+    echo -e "(*) API not defined\n"
     exit 1
 fi
 
@@ -26,7 +21,7 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/ios-common.sh
+. ${BASEDIR}/build/android-common.sh
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="x265"
@@ -55,8 +50,11 @@ case ${ARCH} in
     arm64)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
     ;;
-    *)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
+    i386)
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
+    ;;
+    x86-64)
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
     ;;
 esac
 
@@ -83,22 +81,6 @@ sed -i .tmp '/scale1D_128to64_neon/s/ p.scale/ *p.scale/g' ${BASEDIR}/src/x265/s
 # fixing constant shift
 sed -i .tmp 's/lsr 16/lsr #16/g' ${BASEDIR}/src/x265/source/common/arm/blockcopy8.S
 
-# fixing leading underscores
-sed -i .tmp 's/function x265_/function _x265_/g' ${BASEDIR}/src/x265/source/common/arm/*.S
-sed -i .tmp 's/ x265_/ _x265_/g' ${BASEDIR}/src/x265/source/common/arm/pixel-util.S
-
-# fixing relocation errors
-sed -i .tmp 's/sad12_mask:/sad12_mask_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/sad-a.S
-sed -i .tmp 's/g_lumaFilter:/g_lumaFilter_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
-sed -i .tmp 's/g_chromaFilter:/g_chromaFilter_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
-sed -i .tmp 's/\.text/.equ sad12_mask, .-sad12_mask_bytes\
-\
-.text/g' ${BASEDIR}/src/x265/source/common/arm/sad-a.S
-sed -i .tmp 's/\.text/.equ g_lumaFilter, .-g_lumaFilter_bytes\
-.equ g_chromaFilter, .-g_chromaFilter_bytes\
-\
-.text/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
-
 rm -f ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
 cp ${BASEDIR}/tools/cmake/CMakeLists.x265.ios.txt ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
 
@@ -107,21 +89,21 @@ cmake -Wno-dev \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
     -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \
-    -DCMAKE_SYSROOT="${SDK_PATH}" \
-    -DCMAKE_FIND_ROOT_PATH="${SDK_PATH}" \
+    -DCMAKE_SYSROOT="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
+    -DCMAKE_FIND_ROOT_PATH="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME}" \
+    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     -DCMAKE_SYSTEM_NAME=Generic \
-    -DCMAKE_C_COMPILER="$CC" \
-    -DCMAKE_CXX_COMPILER="$CXX" \
-    -DCMAKE_LINKER="$LD" \
-    -DCMAKE_AR="$AR" \
-    -DCMAKE_AS="$AS" \
+    -DCMAKE_C_COMPILER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$CC" \
+    -DCMAKE_CXX_COMPILER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$CXX" \
+    -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$LD" \
+    -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
+    -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
     -DSTATIC_LINK_CRT=1 \
     -DENABLE_PIC=1 \
     -DENABLE_CLI=0 \
     ${ASM_OPTIONS} \
-    -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \
+    -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
     -DENABLE_SHARED=0 ../source || exit 1
 
 make -j$(get_cpu_count) || exit 1

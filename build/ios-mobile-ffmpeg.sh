@@ -61,21 +61,21 @@ fi
     --disable-static \
     --disable-fast-install \
     --disable-maintainer-mode \
-    --host=${TARGET_HOST} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+    --host=${TARGET_HOST} 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"
     exit 1
 fi
 
-make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"
     exit 1
 fi
 
-make install 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+make install 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo "ok"
