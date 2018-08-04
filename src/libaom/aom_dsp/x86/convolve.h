@@ -17,7 +17,6 @@
 
 #include "aom/aom_integer.h"
 #include "aom_ports/mem.h"
-#include "aom_dsp/aom_convolve.h"
 
 typedef void filter8_1dfunction(const uint8_t *src_ptr, ptrdiff_t src_pitch,
                                 uint8_t *output_ptr, ptrdiff_t out_pitch,

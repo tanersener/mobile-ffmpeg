@@ -263,8 +263,9 @@ static INLINE void av1_collect_neighbors_ref_counts(MACROBLOCKD *const xd) {
   }
 }
 
-void av1_copy_frame_mvs(const AV1_COMMON *const cm, MB_MODE_INFO *mi,
-                        int mi_row, int mi_col, int x_mis, int y_mis);
+void av1_copy_frame_mvs(const AV1_COMMON *const cm,
+                        const MB_MODE_INFO *const mi, int mi_row, int mi_col,
+                        int x_mis, int y_mis);
 
 void av1_find_mv_refs(const AV1_COMMON *cm, const MACROBLOCKD *xd,
                       MB_MODE_INFO *mi, MV_REFERENCE_FRAME ref_frame,
@@ -286,7 +287,6 @@ int findSamples(const AV1_COMMON *cm, MACROBLOCKD *xd, int mi_row, int mi_col,
 
 #define INTRABC_DELAY_PIXELS 256  //  Delay of 256 pixels
 #define INTRABC_DELAY_SB64 (INTRABC_DELAY_PIXELS / 64)
-#define USE_WAVE_FRONT 1  // Use only top left area of frame for reference.
 
 static INLINE void av1_find_ref_dv(int_mv *ref_dv, const TileInfo *const tile,
                                    int mib_size, int mi_row, int mi_col) {
@@ -356,13 +356,12 @@ static INLINE int av1_is_dv_valid(const MV dv, const AV1_COMMON *cm,
   const int src_sb64 = src_sb_row * total_sb64_per_row + src_sb64_col;
   if (src_sb64 >= active_sb64 - INTRABC_DELAY_SB64) return 0;
 
-#if USE_WAVE_FRONT
+  // Wavefront constraint: use only top left area of frame for reference.
   const int gradient = 1 + INTRABC_DELAY_SB64 + (sb_size > 64);
   const int wf_offset = gradient * (active_sb_row - src_sb_row);
   if (src_sb_row > active_sb_row ||
       src_sb64_col >= active_sb64_col - INTRABC_DELAY_SB64 + wf_offset)
     return 0;
-#endif
 
   return 1;
 }

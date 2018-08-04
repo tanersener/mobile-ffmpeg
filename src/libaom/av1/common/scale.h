@@ -14,7 +14,6 @@
 
 #include "av1/common/convolve.h"
 #include "av1/common/mv.h"
-#include "aom_dsp/aom_convolve.h"
 
 #ifdef __cplusplus
 extern "C" {

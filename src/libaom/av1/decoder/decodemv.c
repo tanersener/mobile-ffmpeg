@@ -573,7 +573,7 @@ static void read_palette_mode_info(AV1_COMMON *const cm, MACROBLOCKD *const xd,
           aom_read_symbol(r, xd->tile_ctx->palette_y_size_cdf[bsize_ctx],
                           PALETTE_SIZES, ACCT_STR) +
           2;
-      read_palette_colors_y(xd, cm->bit_depth, pmi, r);
+      read_palette_colors_y(xd, cm->seq_params.bit_depth, pmi, r);
     }
   }
   if (num_planes > 1 && mbmi->uv_mode == UV_DC_PRED &&
@@ -587,7 +587,7 @@ static void read_palette_mode_info(AV1_COMMON *const cm, MACROBLOCKD *const xd,
           aom_read_symbol(r, xd->tile_ctx->palette_uv_size_cdf[bsize_ctx],
                           PALETTE_SIZES, ACCT_STR) +
           2;
-      read_palette_colors_uv(xd, cm->bit_depth, pmi, r);
+      read_palette_colors_uv(xd, cm->seq_params.bit_depth, pmi, r);
     }
   }
 }
@@ -618,19 +618,22 @@ static void read_filter_intra_mode_info(const AV1_COMMON *const cm,
 void av1_read_tx_type(const AV1_COMMON *const cm, MACROBLOCKD *xd, int blk_row,
                       int blk_col, TX_SIZE tx_size, aom_reader *r) {
   MB_MODE_INFO *mbmi = xd->mi[0];
-  const int inter_block = is_inter_block(mbmi);
-  FRAME_CONTEXT *ec_ctx = xd->tile_ctx;
-
   const int txk_type_idx =
       av1_get_txk_type_index(mbmi->sb_type, blk_row, blk_col);
   TX_TYPE *tx_type = &mbmi->txk_type[txk_type_idx];
+  *tx_type = DCT_DCT;
 
-  const TX_SIZE square_tx_size = txsize_sqr_map[tx_size];
-  if (get_ext_tx_types(tx_size, inter_block, cm->reduced_tx_set_used) > 1 &&
-      ((!cm->seg.enabled && cm->base_qindex > 0) ||
-       (cm->seg.enabled && xd->qindex[mbmi->segment_id] > 0)) &&
-      !mbmi->skip &&
-      !segfeature_active(&cm->seg, mbmi->segment_id, SEG_LVL_SKIP)) {
+  // No need to read transform type if block is skipped.
+  if (mbmi->skip || segfeature_active(&cm->seg, mbmi->segment_id, SEG_LVL_SKIP))
+    return;
+
+  // No need to read transform type for lossless mode(qindex==0).
+  const int qindex =
+      cm->seg.enabled ? xd->qindex[mbmi->segment_id] : cm->base_qindex;
+  if (qindex <= 0) return;
+
+  const int inter_block = is_inter_block(mbmi);
+  if (get_ext_tx_types(tx_size, inter_block, cm->reduced_tx_set_used) > 1) {
     const TxSetType tx_set_type =
         av1_get_ext_tx_set_type(tx_size, inter_block, cm->reduced_tx_set_used);
     const int eset =
@@ -639,23 +642,22 @@ void av1_read_tx_type(const AV1_COMMON *const cm, MACROBLOCKD *xd, int blk_row,
     // there is no need to read the tx_type
     assert(eset != 0);
 
+    const TX_SIZE square_tx_size = txsize_sqr_map[tx_size];
+    FRAME_CONTEXT *ec_ctx = xd->tile_ctx;
     if (inter_block) {
       *tx_type = av1_ext_tx_inv[tx_set_type][aom_read_symbol(
           r, ec_ctx->inter_ext_tx_cdf[eset][square_tx_size],
           av1_num_ext_tx_set[tx_set_type], ACCT_STR)];
     } else {
-      PREDICTION_MODE intra_dir;
-      if (mbmi->filter_intra_mode_info.use_filter_intra)
-        intra_dir =
-            fimode_to_intradir[mbmi->filter_intra_mode_info.filter_intra_mode];
-      else
-        intra_dir = mbmi->mode;
+      const PREDICTION_MODE intra_mode =
+          mbmi->filter_intra_mode_info.use_filter_intra
+              ? fimode_to_intradir[mbmi->filter_intra_mode_info
+                                       .filter_intra_mode]
+              : mbmi->mode;
       *tx_type = av1_ext_tx_inv[tx_set_type][aom_read_symbol(
-          r, ec_ctx->intra_ext_tx_cdf[eset][square_tx_size][intra_dir],
+          r, ec_ctx->intra_ext_tx_cdf[eset][square_tx_size][intra_mode],
           av1_num_ext_tx_set[tx_set_type], ACCT_STR)];
     }
-  } else {
-    *tx_type = DCT_DCT;
   }
 }
 
@@ -1402,7 +1404,7 @@ static void read_inter_block_mode_info(AV1Decoder *const pbi,
   mbmi->motion_mode = SIMPLE_TRANSLATION;
   if (is_motion_variation_allowed_bsize(mbmi->sb_type) && !mbmi->skip_mode &&
       !has_second_ref(mbmi))
-    mbmi->num_proj_ref[0] = findSamples(cm, xd, mi_row, mi_col, pts, pts_inref);
+    mbmi->num_proj_ref = findSamples(cm, xd, mi_row, mi_col, pts, pts_inref);
   av1_count_overlappable_neighbors(cm, xd, mi_row, mi_col);
 
   if (mbmi->ref_frame[1] != INTRA_FRAME)
@@ -1463,25 +1465,26 @@ static void read_inter_block_mode_info(AV1Decoder *const pbi,
   read_mb_interp_filter(cm, xd, mbmi, r);
 
   if (mbmi->motion_mode == WARPED_CAUSAL) {
-    mbmi->wm_params[0].wmtype = DEFAULT_WMTYPE;
-    mbmi->wm_params[0].invalid = 0;
+    mbmi->wm_params.wmtype = DEFAULT_WMTYPE;
+    mbmi->wm_params.invalid = 0;
 
-    if (mbmi->num_proj_ref[0] > 1)
-      mbmi->num_proj_ref[0] = selectSamples(&mbmi->mv[0].as_mv, pts, pts_inref,
-                                            mbmi->num_proj_ref[0], bsize);
+    if (mbmi->num_proj_ref > 1)
+      mbmi->num_proj_ref = selectSamples(&mbmi->mv[0].as_mv, pts, pts_inref,
+                                         mbmi->num_proj_ref, bsize);
 
-    if (find_projection(mbmi->num_proj_ref[0], pts, pts_inref, bsize,
+    if (find_projection(mbmi->num_proj_ref, pts, pts_inref, bsize,
                         mbmi->mv[0].as_mv.row, mbmi->mv[0].as_mv.col,
-                        &mbmi->wm_params[0], mi_row, mi_col)) {
+                        &mbmi->wm_params, mi_row, mi_col)) {
 #if WARPED_MOTION_DEBUG
       printf("Warning: unexpected warped model from aomenc\n");
 #endif
-      mbmi->wm_params[0].invalid = 1;
+      mbmi->wm_params.invalid = 1;
     }
   }
 
-  xd->cfl.is_chroma_reference = is_chroma_reference(
-      mi_row, mi_col, bsize, cm->subsampling_x, cm->subsampling_y);
+  xd->cfl.is_chroma_reference =
+      is_chroma_reference(mi_row, mi_col, bsize, cm->seq_params.subsampling_x,
+                          cm->seq_params.subsampling_y);
   xd->cfl.store_y = store_cfl_required(cm, xd);
 
 #if DEC_MISMATCH_DEBUG

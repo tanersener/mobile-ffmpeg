@@ -50,8 +50,9 @@ static int enc_worker_hook(EncWorkerData *const thread_data, void *unused) {
 void av1_encode_tiles_mt(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
   const int tile_cols = cm->tile_cols;
+  const int tile_rows = cm->tile_rows;
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
-  int num_workers = AOMMIN(cpi->oxcf.max_threads, tile_cols);
+  int num_workers = AOMMIN(cpi->oxcf.max_threads, tile_cols * tile_rows);
   int i;
 
   av1_init_tile_data(cpi);

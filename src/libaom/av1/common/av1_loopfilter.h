@@ -68,43 +68,6 @@ typedef struct {
   uint8_t lfl_v_hor[MI_SIZE_64X64][MI_SIZE_64X64];
   uint8_t lfl_v_ver[MI_SIZE_64X64][MI_SIZE_64X64];
 } LoopFilterMask;
-
-// To determine whether to apply loop filtering at one transform block edge,
-// we need information of the neighboring transform block. Specifically,
-// in determining a vertical edge, we need the information of the tx block
-// to its left. For a horizontal edge, we need info of the tx block above it.
-// Thus, we need to record info of right column and bottom row of tx blocks.
-// We record the information of the neighboring superblock, when bitmask
-// building for a superblock is finished. And it will be used for next
-// superblock bitmask building.
-// Information includes:
-// ------------------------------------------------------------
-//                    MI_SIZE_64X64
-// Y  tx_size above |--------------|
-// Y  tx_size left  |--------------|
-// UV tx_size above |--------------|
-// UV tx_size left  |--------------|
-// Y level above    |--------------|
-// Y level left     |--------------|
-// U level above    |--------------|
-// U level left     |--------------|
-// V level above    |--------------|
-// V level left     |--------------|
-// skip             |--------------|
-// ------------------------------------------------------------
-typedef struct {
-  TX_SIZE tx_size_y_above[MI_SIZE_64X64];
-  TX_SIZE tx_size_y_left[MI_SIZE_64X64];
-  TX_SIZE tx_size_uv_above[MI_SIZE_64X64];
-  TX_SIZE tx_size_uv_left[MI_SIZE_64X64];
-  uint8_t y_level_above[MI_SIZE_64X64];
-  uint8_t y_level_left[MI_SIZE_64X64];
-  uint8_t u_level_above[MI_SIZE_64X64];
-  uint8_t u_level_left[MI_SIZE_64X64];
-  uint8_t v_level_above[MI_SIZE_64X64];
-  uint8_t v_level_left[MI_SIZE_64X64];
-  uint8_t skip[MI_SIZE_64X64];
-} LpfSuperblockInfo;
 #endif  // LOOP_FILTER_BITMASK
 
 struct loopfilter {
@@ -130,7 +93,6 @@ struct loopfilter {
   LoopFilterMask *lfm;
   size_t lfm_num;
   int lfm_stride;
-  LpfSuperblockInfo neighbor_sb_lpf_info;
 #endif  // LOOP_FILTER_BITMASK
 };
 

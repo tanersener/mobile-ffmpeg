@@ -40,6 +40,14 @@ void av1_find_best_ref_mvs_from_stack(int allow_hp,
                                       int_mv *nearest_mv, int_mv *near_mv,
                                       int is_integer);
 
+static INLINE MV_JOINT_TYPE av1_get_mv_joint(const MV *mv) {
+  if (mv->row == 0) {
+    return mv->col == 0 ? MV_JOINT_ZERO : MV_JOINT_HNZVZ;
+  } else {
+    return mv->col == 0 ? MV_JOINT_HZVNZ : MV_JOINT_HNZVNZ;
+  }
+}
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -14,7 +14,7 @@ use warnings;
 use 5.010;
 use Getopt::Long;
 
-my $git_desc;
+my $git_desc = '';
 my $version_data;
 my $version_filename;
 GetOptions('version_data=s' => \$version_data,

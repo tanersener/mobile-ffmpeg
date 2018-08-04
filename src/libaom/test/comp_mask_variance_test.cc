@@ -428,6 +428,14 @@ INSTANTIATE_TEST_CASE_P(
                        ::testing::Range(8, 13, 2)));
 #endif
 
+#if HAVE_SSE2
+INSTANTIATE_TEST_CASE_P(
+    SSE2, AV1HighbdCompMaskVarianceTest,
+    ::testing::Combine(::testing::Values(&aom_highbd_comp_mask_pred_sse2),
+                       ::testing::ValuesIn(kValidBlockSize),
+                       ::testing::Range(8, 13, 2)));
+#endif
+
 #ifndef aom_highbd_comp_mask_pred
 // can't run this test if aom_highbd_comp_mask_pred is defined to
 // aom_highbd_comp_mask_pred_c
@@ -536,6 +544,14 @@ TEST_P(AV1HighbdCompMaskUpVarianceTest, DISABLED_Speed) {
 INSTANTIATE_TEST_CASE_P(
     AVX2, AV1HighbdCompMaskUpVarianceTest,
     ::testing::Combine(::testing::Values(&aom_highbd_comp_mask_pred_avx2),
+                       ::testing::ValuesIn(kValidBlockSize),
+                       ::testing::Range(8, 13, 2)));
+#endif
+
+#if HAVE_SSE2
+INSTANTIATE_TEST_CASE_P(
+    SSE2, AV1HighbdCompMaskUpVarianceTest,
+    ::testing::Combine(::testing::Values(&aom_highbd_comp_mask_pred_sse2),
                        ::testing::ValuesIn(kValidBlockSize),
                        ::testing::Range(8, 13, 2)));
 #endif

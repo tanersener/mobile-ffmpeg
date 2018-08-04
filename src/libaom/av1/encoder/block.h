@@ -170,6 +170,7 @@ typedef struct {
   InterpFilters filters;
   int_mv mv[2];
   int8_t ref_frames[2];
+  COMPOUND_TYPE comp_type;
 } INTERPOLATION_FILTER_STATS;
 
 typedef struct macroblock MACROBLOCK;
@@ -352,6 +353,8 @@ struct macroblock {
   int tx_search_prune[EXT_TX_SET_TYPES];
   int must_find_valid_partition;
   int tx_split_prune_flag;  // Flag to skip tx split RD search.
+  int recalc_luma_mc_data;  // Flag to indicate recalculation of MC data during
+                            // interpolation filter search
 };
 
 static INLINE int is_rect_tx_allowed_bsize(BLOCK_SIZE bsize) {

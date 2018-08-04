@@ -25,13 +25,16 @@ extern "C" {
 #define BPER_MB_NORMBITS 9
 
 #define CUSTOMIZED_GF 1
-#define FIX_GF_INTERVAL_LENGTH 0
 
-#if FIX_GF_INTERVAL_LENGTH
+#if CONFIG_FIX_GF_LENGTH
 #define FIXED_GF_LENGTH 16
 #define USE_SYMM_MULTI_LAYER 1
+#define REDUCE_LAST_ALT_BOOST 0
+#define REDUCE_LAST_GF_LENGTH 1
 #else
 #define USE_SYMM_MULTI_LAYER 0
+#define REDUCE_LAST_ALT_BOOST 0
+#define REDUCE_LAST_GF_LENGTH 0
 #endif
 
 #if USE_SYMM_MULTI_LAYER
@@ -159,6 +162,9 @@ typedef struct {
 
   // Auto frame-scaling variables.
   int rf_level_maxq[RATE_FACTOR_LEVELS];
+  float_t arf_boost_factor;
+  // Q index used for ALT frame
+  int arf_q;
 } RATE_CONTROL;
 
 struct AV1_COMP;
@@ -228,7 +234,7 @@ void av1_rc_compute_frame_size_bounds(const struct AV1_COMP *cpi,
                                       int *frame_over_shoot_limit);
 
 // Picks q and q bounds given the target for bits
-int av1_rc_pick_q_and_bounds(const struct AV1_COMP *cpi, int width, int height,
+int av1_rc_pick_q_and_bounds(struct AV1_COMP *cpi, int width, int height,
                              int *bottom_index, int *top_index);
 
 // Estimates q to achieve a target bits per frame

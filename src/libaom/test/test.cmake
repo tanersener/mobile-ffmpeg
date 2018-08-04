@@ -20,7 +20,7 @@ include("${AOM_ROOT}/test/test_data_util.cmake")
 
 set(AOM_UNIT_TEST_DATA_LIST_FILE "${AOM_ROOT}/test/test-data.sha1")
 
-list(APPEND AOM_UNIT_TEST_WRAPPER_SOURCES "${AOM_CONFIG_DIR}/usage_exit.c"
+list(APPEND AOM_UNIT_TEST_WRAPPER_SOURCES "${AOM_GEN_SRC_DIR}/usage_exit.c"
             "${AOM_ROOT}/test/test_libaom.cc")
 
 list(APPEND AOM_UNIT_TEST_COMMON_SOURCES
@@ -31,6 +31,7 @@ list(APPEND AOM_UNIT_TEST_COMMON_SOURCES
             "${AOM_ROOT}/test/decode_test_driver.cc"
             "${AOM_ROOT}/test/decode_test_driver.h"
             "${AOM_ROOT}/test/function_equivalence_test.h"
+            "${AOM_ROOT}/test/log2_test.cc"
             "${AOM_ROOT}/test/md5_helper.h"
             "${AOM_ROOT}/test/register_state_check.h"
             "${AOM_ROOT}/test/test_vectors.cc"
@@ -78,7 +79,7 @@ list(APPEND AOM_UNIT_TEST_ENCODER_SOURCES
 list(APPEND AOM_DECODE_PERF_TEST_SOURCES "${AOM_ROOT}/test/decode_perf_test.cc")
 list(APPEND AOM_ENCODE_PERF_TEST_SOURCES "${AOM_ROOT}/test/encode_perf_test.cc")
 list(APPEND AOM_UNIT_TEST_WEBM_SOURCES "${AOM_ROOT}/test/webm_video_source.h")
-list(APPEND AOM_TEST_INTRA_PRED_SPEED_SOURCES "${AOM_CONFIG_DIR}/usage_exit.c"
+list(APPEND AOM_TEST_INTRA_PRED_SPEED_SOURCES "${AOM_GEN_SRC_DIR}/usage_exit.c"
             "${AOM_ROOT}/test/test_intra_pred_speed.cc")
 
 if(NOT BUILD_SHARED_LIBS)
@@ -184,11 +185,13 @@ if(NOT BUILD_SHARED_LIBS)
               "${AOM_ROOT}/test/noise_model_test.cc"
               "${AOM_ROOT}/test/obmc_sad_test.cc"
               "${AOM_ROOT}/test/obmc_variance_test.cc"
+              "${AOM_ROOT}/test/pickrst_test.cc"
               "${AOM_ROOT}/test/sad_test.cc"
               "${AOM_ROOT}/test/subtract_test.cc"
               "${AOM_ROOT}/test/reconinter_test.cc"
               "${AOM_ROOT}/test/sum_squares_test.cc"
-              "${AOM_ROOT}/test/variance_test.cc")
+              "${AOM_ROOT}/test/variance_test.cc"
+              "${AOM_ROOT}/test/wiener_test.cc")
 
   list(APPEND AOM_UNIT_TEST_ENCODER_INTRIN_SSE4_1
               "${AOM_ROOT}/test/av1_highbd_iht_test.cc"
@@ -224,6 +227,9 @@ if(ENABLE_TESTS)
 
   if(MSVC) # Force static run time to avoid collisions with googletest.
     include("${AOM_ROOT}/build/cmake/msvc_runtime.cmake")
+    if(BUILD_SHARED_LIBS)
+      set(AOM_DISABLE_GTEST_CMAKE 1)
+    endif()
   endif()
 
   if(BUILD_SHARED_LIBS AND APPLE) # Silence an RPATH warning.

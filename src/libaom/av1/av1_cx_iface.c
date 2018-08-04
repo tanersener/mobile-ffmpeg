@@ -14,23 +14,23 @@
 #include "config/aom_config.h"
 #include "config/aom_version.h"
 
-#include "aom/aom_encoder.h"
 #include "aom_ports/aom_once.h"
+#include "aom_ports/mem_ops.h"
 #include "aom_ports/system_state.h"
+
+#include "aom/aom_encoder.h"
 #include "aom/internal/aom_codec_internal.h"
-#include "av1/encoder/encoder.h"
-#include "aom/aomcx.h"
-#include "av1/encoder/firstpass.h"
+
 #include "av1/av1_iface_common.h"
 #include "av1/encoder/bitstream.h"
-#include "aom_ports/mem_ops.h"
+#include "av1/encoder/encoder.h"
+#include "av1/encoder/firstpass.h"
 
 #define MAG_SIZE (4)
 #define MAX_NUM_ENHANCEMENT_LAYERS 3
 
 struct av1_extracfg {
   int cpu_used;  // available cpu percentage in 1/16
-  int dev_sf;
   unsigned int enable_auto_alt_ref;
   unsigned int enable_auto_bwd_ref;
   unsigned int noise_sensitivity;
@@ -102,7 +102,6 @@ struct av1_extracfg {
 
 static struct av1_extracfg default_extra_cfg = {
   0,                 // cpu_used
-  0,                 // dev_sf
   1,                 // enable_auto_alt_ref
   0,                 // enable_auto_bwd_ref
   0,                 // noise_sensitivity
@@ -251,10 +250,7 @@ static aom_codec_err_t validate_config(aom_codec_alg_priv_t *ctx,
   RANGE_CHECK_HI(extra_cfg, min_gf_interval, MAX_LAG_BUFFERS - 1);
   RANGE_CHECK_HI(extra_cfg, max_gf_interval, MAX_LAG_BUFFERS - 1);
   if (extra_cfg->max_gf_interval > 0) {
-    RANGE_CHECK(extra_cfg, max_gf_interval, 2, (MAX_LAG_BUFFERS - 1));
-  }
-  if (extra_cfg->min_gf_interval > 0 && extra_cfg->max_gf_interval > 0) {
-    RANGE_CHECK(extra_cfg, max_gf_interval, extra_cfg->min_gf_interval,
+    RANGE_CHECK(extra_cfg, max_gf_interval, MAX(2, extra_cfg->min_gf_interval),
                 (MAX_LAG_BUFFERS - 1));
   }
 
@@ -284,7 +280,6 @@ static aom_codec_err_t validate_config(aom_codec_alg_priv_t *ctx,
   RANGE_CHECK_HI(extra_cfg, enable_auto_alt_ref, 2);
   RANGE_CHECK_HI(extra_cfg, enable_auto_bwd_ref, 2);
   RANGE_CHECK(extra_cfg, cpu_used, 0, 8);
-  RANGE_CHECK(extra_cfg, dev_sf, 0, UINT8_MAX);
   RANGE_CHECK_HI(extra_cfg, noise_sensitivity, 6);
   RANGE_CHECK(extra_cfg, superblock_size, AOM_SUPERBLOCK_SIZE_64X64,
               AOM_SUPERBLOCK_SIZE_DYNAMIC);
@@ -581,7 +576,6 @@ static aom_codec_err_t set_encoder_config(
   oxcf->sframe_mode = cfg->sframe_mode;
   oxcf->sframe_enabled = cfg->sframe_dist != 0;
   oxcf->speed = extra_cfg->cpu_used;
-  oxcf->dev_sf = extra_cfg->dev_sf;
   oxcf->enable_auto_arf = extra_cfg->enable_auto_alt_ref;
   oxcf->enable_auto_brf = extra_cfg->enable_auto_bwd_ref;
   oxcf->noise_sensitivity = extra_cfg->noise_sensitivity;
@@ -722,7 +716,7 @@ static aom_codec_err_t encoder_set_config(aom_codec_alg_priv_t *ctx,
     ctx->cfg = *cfg;
     set_encoder_config(&ctx->oxcf, &ctx->cfg, &ctx->extra_cfg);
     // On profile change, request a key frame
-    force_key |= ctx->cpi->common.profile != ctx->oxcf.profile;
+    force_key |= ctx->cpi->common.seq_params.profile != ctx->oxcf.profile;
     av1_change_config(ctx->cpi, &ctx->oxcf);
   }
 
@@ -762,12 +756,6 @@ static aom_codec_err_t ctrl_set_cpuused(aom_codec_alg_priv_t *ctx,
                                         va_list args) {
   struct av1_extracfg extra_cfg = ctx->extra_cfg;
   extra_cfg.cpu_used = CAST(AOME_SET_CPUUSED, args);
-  return update_extra_cfg(ctx, &extra_cfg);
-}
-
-static aom_codec_err_t ctrl_set_devsf(aom_codec_alg_priv_t *ctx, va_list args) {
-  struct av1_extracfg extra_cfg = ctx->extra_cfg;
-  extra_cfg.dev_sf = CAST(AOME_SET_DEVSF, args);
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
@@ -1229,6 +1217,9 @@ static aom_codec_err_t encoder_encode(aom_codec_alg_priv_t *ctx,
 
   volatile aom_enc_frame_flags_t flags = enc_flags;
 
+  // The jmp_buf is valid only for the duration of the function that calls
+  // setjmp(). Therefore, this function must reset the 'setjmp' field to 0
+  // before it returns.
   if (setjmp(cpi->common.error.jmp)) {
     cpi->common.error.setjmp = 0;
     res = update_error_state(ctx, &cpi->common.error);
@@ -1678,7 +1669,6 @@ static aom_codec_ctrl_fn_map_t encoder_ctrl_maps[] = {
   { AOME_SET_SCALEMODE, ctrl_set_scale_mode },
   { AOME_SET_SPATIAL_LAYER_ID, ctrl_set_spatial_layer_id },
   { AOME_SET_CPUUSED, ctrl_set_cpuused },
-  { AOME_SET_DEVSF, ctrl_set_devsf },
   { AOME_SET_ENABLEAUTOALTREF, ctrl_set_enable_auto_alt_ref },
   { AOME_SET_ENABLEAUTOBWDREF, ctrl_set_enable_auto_bwd_ref },
   { AOME_SET_SHARPNESS, ctrl_set_sharpness },

@@ -392,6 +392,10 @@ void av1_initialize_me_consts(const struct AV1_COMP *cpi, MACROBLOCK *x,
 void av1_model_rd_from_var_lapndz(int64_t var, unsigned int n,
                                   unsigned int qstep, int *rate, int64_t *dist);
 
+void av1_model_rd_curvfit(double xqr, double *rate_f, double *distbysse_f);
+void av1_model_rd_surffit(double xm, double yl, double *rate_f,
+                          double *distbysse_f);
+
 int av1_get_switchable_rate(const AV1_COMMON *const cm, MACROBLOCK *x,
                             const MACROBLOCKD *xd);
 

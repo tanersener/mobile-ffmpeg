@@ -200,13 +200,13 @@ static void addsub_shift_avx2(const __m256i in0, const __m256i in1,
   __m256i a0 = _mm256_add_epi32(in0_w_offset, in1);
   __m256i a1 = _mm256_sub_epi32(in0_w_offset, in1);
 
+  a0 = _mm256_sra_epi32(a0, _mm_cvtsi32_si128(shift));
+  a1 = _mm256_sra_epi32(a1, _mm_cvtsi32_si128(shift));
+
   a0 = _mm256_max_epi32(a0, *clamp_lo);
   a0 = _mm256_min_epi32(a0, *clamp_hi);
   a1 = _mm256_max_epi32(a1, *clamp_lo);
   a1 = _mm256_min_epi32(a1, *clamp_hi);
-
-  a0 = _mm256_sra_epi32(a0, _mm_cvtsi32_si128(shift));
-  a1 = _mm256_sra_epi32(a1, _mm_cvtsi32_si128(shift));
 
   *out0 = a0;
   *out1 = a1;
@@ -601,38 +601,50 @@ static void idct32_avx2(__m256i *in, __m256i *out, int bit, int do_cols, int bd,
       addsub_no_clamp_avx2(bf0[15], bf0[16], out + 15 * 4 + col,
                            out + 16 * 4 + col);
     } else {
+      const int log_range_out = AOMMAX(16, bd + 6);
+      const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
+          -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
+      const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
+          (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
+
       addsub_shift_avx2(bf0[0], bf0[31], out + 0 * 4 + col, out + 31 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[1], bf0[30], out + 1 * 4 + col, out + 30 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[2], bf0[29], out + 2 * 4 + col, out + 29 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[3], bf0[28], out + 3 * 4 + col, out + 28 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[4], bf0[27], out + 4 * 4 + col, out + 27 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[5], bf0[26], out + 5 * 4 + col, out + 26 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[6], bf0[25], out + 6 * 4 + col, out + 25 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[7], bf0[24], out + 7 * 4 + col, out + 24 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[8], bf0[23], out + 8 * 4 + col, out + 23 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[9], bf0[22], out + 9 * 4 + col, out + 22 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[10], bf0[21], out + 10 * 4 + col,
-                        out + 21 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 21 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[11], bf0[20], out + 11 * 4 + col,
-                        out + 20 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 20 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[12], bf0[19], out + 12 * 4 + col,
-                        out + 19 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 19 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[13], bf0[18], out + 13 * 4 + col,
-                        out + 18 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 18 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[14], bf0[17], out + 14 * 4 + col,
-                        out + 17 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 17 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[15], bf0[16], out + 15 * 4 + col,
-                        out + 16 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 16 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
     }
   }
 }

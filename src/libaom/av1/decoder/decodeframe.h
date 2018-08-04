@@ -51,8 +51,9 @@ void av1_decode_tg_tiles_and_wrapup(struct AV1Decoder *pbi, const uint8_t *data,
 
 // Implements the color_config() function in the spec. Reports errors by
 // calling rb->error_handler() or aom_internal_error().
-void av1_read_color_config(AV1_COMMON *cm, struct aom_read_bit_buffer *rb,
-                           int allow_lowbitdepth, SequenceHeader *seq_params);
+void av1_read_color_config(struct aom_read_bit_buffer *rb,
+                           int allow_lowbitdepth, SequenceHeader *seq_params,
+                           struct aom_internal_error_info *error_info);
 
 // Implements the timing_info() function in the spec. Reports errors by calling
 // rb->error_handler().

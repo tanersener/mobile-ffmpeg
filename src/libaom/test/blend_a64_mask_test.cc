@@ -270,6 +270,13 @@ INSTANTIATE_TEST_CASE_P(
                                     aom_lowbd_blend_a64_d16_mask_sse4_1)));
 #endif  // HAVE_SSE4_1
 
+#if HAVE_AVX2
+INSTANTIATE_TEST_CASE_P(
+    AVX2, BlendA64MaskTest8B_d16,
+    ::testing::Values(TestFuncs_d16(aom_lowbd_blend_a64_d16_mask_c,
+                                    aom_lowbd_blend_a64_d16_mask_avx2)));
+#endif  // HAVE_AVX2
+
 #if HAVE_NEON
 INSTANTIATE_TEST_CASE_P(
     NEON, BlendA64MaskTest8B_d16,

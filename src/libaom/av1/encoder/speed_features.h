@@ -400,6 +400,9 @@ typedef struct SPEED_FEATURES {
   // Use a ML model to prune horz_a, horz_b, vert_a and vert_b partitions.
   int ml_prune_ab_partition;
 
+  // Use a ML model to prune horz4 and vert4 partitions.
+  int ml_prune_4_partition;
+
   int fast_cdef_search;
 
   // 2-pass coding block partition search
@@ -415,6 +418,9 @@ typedef struct SPEED_FEATURES {
 
   // Use square partition only beyond this block size.
   BLOCK_SIZE use_square_partition_only_threshold;
+
+  // Prune reference frames for rectangular partitions.
+  int prune_ref_frame_for_rect_partitions;
 
   // Sets min and max partition sizes for this superblock based on the
   // same superblock in last encoded frame, and the left and above neighbor.

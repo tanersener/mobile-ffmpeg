@@ -414,6 +414,14 @@ First, add the new test data file to the `aom-test-data` bucket of the
 `aomedia-testing` project on Google Cloud Platform. You may need to ask someone
 with the necessary access permissions to do this for you.
 
+NOTE: When a new test data file is added to the `aom-test-data` bucket, its
+"Public access" is initially "Not public". We need to change its
+"Public access" to "Public" by doing the following:
+ * Invoke the "Edit permissions" dialog for the file.
+ * Click the "+ Add item" button in the dialog.
+ * Set "ENTITY" to "User", set "NAME" to "allUsers", and set "ACCESS" to
+   "Reader". Then click the "SAVE" button.
+
 Once the new test data file has been added to `aom-test-data`, create a CL to
 add the name of the new test data file to `test/test_data_util.cmake` and add
 the SHA1 checksum of the new test data file to `test/test-data.sha1`. (The SHA1

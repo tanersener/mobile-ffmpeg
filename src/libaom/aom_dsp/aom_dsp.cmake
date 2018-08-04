@@ -15,7 +15,6 @@ set(AOM_AOM_DSP_AOM_DSP_CMAKE_ 1)
 
 list(APPEND AOM_DSP_COMMON_SOURCES
             "${AOM_ROOT}/aom_dsp/aom_convolve.c"
-            "${AOM_ROOT}/aom_dsp/aom_convolve.h"
             "${AOM_ROOT}/aom_dsp/aom_dsp_common.h"
             "${AOM_ROOT}/aom_dsp/aom_filter.h"
             "${AOM_ROOT}/aom_dsp/aom_simd.h"
@@ -76,6 +75,7 @@ list(APPEND AOM_DSP_COMMON_INTRIN_SSSE3
             "${AOM_ROOT}/aom_dsp/x86/intrapred_ssse3.c")
 
 list(APPEND AOM_DSP_COMMON_INTRIN_SSE4_1
+            "${AOM_ROOT}/aom_dsp/x86/blend_mask_sse4.h"
             "${AOM_ROOT}/aom_dsp/x86/blend_a64_hmask_sse4.c"
             "${AOM_ROOT}/aom_dsp/x86/blend_a64_mask_sse4.c"
             "${AOM_ROOT}/aom_dsp/x86/blend_a64_vmask_sse4.c")
@@ -88,7 +88,8 @@ list(APPEND AOM_DSP_COMMON_INTRIN_AVX2
             "${AOM_ROOT}/aom_dsp/x86/fft_avx2.c"
             "${AOM_ROOT}/aom_dsp/x86/highbd_convolve_avx2.c"
             "${AOM_ROOT}/aom_dsp/x86/highbd_loopfilter_avx2.c"
-            "${AOM_ROOT}/aom_dsp/x86/intrapred_avx2.c")
+            "${AOM_ROOT}/aom_dsp/x86/intrapred_avx2.c"
+            "${AOM_ROOT}/aom_dsp/x86/blend_a64_mask_avx2.c")
 
 list(APPEND AOM_DSP_COMMON_INTRIN_NEON
             "${AOM_ROOT}/aom_dsp/arm/fwd_txfm_neon.c"
@@ -200,7 +201,8 @@ if(CONFIG_AV1_ENCODER)
               "${AOM_ROOT}/aom_dsp/x86/sad_impl_avx2.c"
               "${AOM_ROOT}/aom_dsp/x86/variance_avx2.c"
               "${AOM_ROOT}/aom_dsp/x86/variance_impl_avx2.c"
-              "${AOM_ROOT}/aom_dsp/x86/obmc_sad_avx2.c")
+              "${AOM_ROOT}/aom_dsp/x86/obmc_sad_avx2.c"
+              "${AOM_ROOT}/aom_dsp/x86/obmc_variance_avx2.c")
 
   list(APPEND AOM_DSP_ENCODER_ASM_SSSE3_X86_64
               "${AOM_ROOT}/aom_dsp/x86/quantize_ssse3_x86_64.asm")

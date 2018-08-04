@@ -31,6 +31,7 @@
 #include "av1/encoder/aq_variance.h"
 #include "av1/encoder/av1_quantize.h"
 #include "av1/encoder/block.h"
+#include "av1/encoder/dwt.h"
 #include "av1/encoder/encodeframe.h"
 #include "av1/encoder/encodemb.h"
 #include "av1/encoder/encodemv.h"
@@ -39,7 +40,7 @@
 #include "av1/encoder/firstpass.h"
 #include "av1/encoder/mcomp.h"
 #include "av1/encoder/rd.h"
-#include "av1/encoder/dwt.h"
+#include "av1/encoder/reconinter_enc.h"
 
 #define OUTPUT_FPF 0
 #define ARF_STATS_OUTPUT 0
@@ -486,6 +487,7 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
   int mb_row, mb_col;
   MACROBLOCK *const x = &cpi->td.mb;
   AV1_COMMON *const cm = &cpi->common;
+  const SequenceHeader *const seq_params = &cm->seq_params;
   const int num_planes = av1_num_planes(cm);
   MACROBLOCKD *const xd = &x->e_mbd;
   TileInfo tile;
@@ -524,7 +526,7 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
   double intra_factor;
   double brightness_factor;
   BufferPool *const pool = cm->buffer_pool;
-  const int qindex = find_fp_qindex(cm->bit_depth);
+  const int qindex = find_fp_qindex(seq_params->bit_depth);
   const int mb_scale = mi_size_wide[BLOCK_16X16];
 
   int *raw_motion_err_list;
@@ -555,11 +557,11 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
   set_first_pass_params(cpi);
   av1_set_quantizer(cm, qindex);
 
-  av1_setup_block_planes(&x->e_mbd, cm->subsampling_x, cm->subsampling_y,
-                         num_planes);
+  av1_setup_block_planes(&x->e_mbd, seq_params->subsampling_x,
+                         seq_params->subsampling_y, num_planes);
 
   av1_setup_src_planes(x, cpi->source, 0, 0, num_planes);
-  av1_setup_dst_planes(xd->plane, cm->seq_params.sb_size, new_yv12, 0, 0, 0,
+  av1_setup_dst_planes(xd->plane, seq_params->sb_size, new_yv12, 0, 0, 0,
                        num_planes);
 
   if (!frame_is_intra_only(cm)) {
@@ -654,14 +656,14 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
         image_data_start_row = mb_row;
       }
 
-      if (cm->use_highbitdepth) {
-        switch (cm->bit_depth) {
+      if (seq_params->use_highbitdepth) {
+        switch (seq_params->bit_depth) {
           case AOM_BITS_8: break;
           case AOM_BITS_10: this_error >>= 4; break;
           case AOM_BITS_12: this_error >>= 8; break;
           default:
             assert(0 &&
-                   "cm->bit_depth should be AOM_BITS_8, "
+                   "seq_params->bit_depth should be AOM_BITS_8, "
                    "AOM_BITS_10 or AOM_BITS_12");
             return;
         }
@@ -674,7 +676,7 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
       else
         intra_factor += 1.0;
 
-      if (cm->use_highbitdepth)
+      if (seq_params->use_highbitdepth)
         level_sample = CONVERT_TO_SHORTPTR(x->plane[0].src.buf)[0];
       else
         level_sample = x->plane[0].src.buf[0];
@@ -1156,10 +1158,10 @@ static int get_twopass_worst_quality(const AV1_COMP *cpi,
     for (q = rc->best_quality; q < rc->worst_quality; ++q) {
       const double factor = calc_correction_factor(
           av_err_per_mb, ERR_DIVISOR - ediv_size_correction, FACTOR_PT_LOW,
-          FACTOR_PT_HIGH, q, cpi->common.bit_depth);
+          FACTOR_PT_HIGH, q, cpi->common.seq_params.bit_depth);
       const int bits_per_mb = av1_rc_bits_per_mb(
           INTER_FRAME, q, factor * speed_term * group_weight_factor,
-          cpi->common.bit_depth);
+          cpi->common.seq_params.bit_depth);
       if (bits_per_mb <= target_norm_bits_per_mb) break;
     }
 
@@ -1377,7 +1379,7 @@ static double calc_frame_boost(AV1_COMP *cpi, const FIRSTPASS_STATS *this_frame,
                                double this_frame_mv_in_out, double max_boost) {
   double frame_boost;
   const double lq = av1_convert_qindex_to_q(
-      cpi->rc.avg_frame_qindex[INTER_FRAME], cpi->common.bit_depth);
+      cpi->rc.avg_frame_qindex[INTER_FRAME], cpi->common.seq_params.bit_depth);
   const double boost_q_correction = AOMMIN((0.5 + (lq * 0.015)), 1.5);
   int num_mbs = (cpi->oxcf.resize_mode != RESIZE_NONE) ? cpi->initial_mbs
                                                        : cpi->common.MBs;
@@ -1561,576 +1563,9 @@ static int calculate_boost_bits(int frame_count, int boost,
                 0);
 }
 
-#if USE_GF16_MULTI_LAYER
-// === GF Group of 16 ===
-#define GF_INTERVAL_16 16
-#define GF_FRAME_PARAMS (REF_FRAMES + 5)
-
-// GF Group of 16: multi-layer hierarchical coding structure
-//   1st Layer: Frame 0 and Frame 16 (ALTREF)
-//   2nd Layer: Frame 8 (ALTREF2)
-//   3rd Layer: Frame 4 and 12 (ALTREF2)
-//   4th Layer: Frame 2, 6, 10, and 14 (BWDREF)
-//   5th Layer: Frame 1, 3, 5, 7, 9, 11, 13, and 15
-static const unsigned char gf16_multi_layer_params[][GF_FRAME_PARAMS] = {
-  // gf_group->index: coding order
-  // (Frame #)      : display order
-  {
-      // gf_group->index == 0 (Frame 0)
-      OVERLAY_UPDATE,  // update_type
-      0,               // arf_src_offset
-      0,               // brf_src_offset
-      // References (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      ALTREF_FRAME,  // Index (current) of reference to get updated
-      GOLDEN_FRAME   // cpi->refresh_golden_frame = 1
-  },
-  {
-      // gf_group->index == 1 (Frame 16)
-      ARF_UPDATE,          // update_type
-      GF_INTERVAL_16 - 1,  // arf_src_offset
-      0,                   // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      ALTREF_FRAME,   // cpi->alt_fb_idx ===> cpi->gld_fb_idx (GOLDEN_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      GOLDEN_FRAME,   // cpi->gld_fb_idx ===> cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      ALTREF_FRAME,  // Index (current) of reference to get updated
-      ALTREF_FRAME   // cpi->refresh_alt_ref_frame = 1
-  },
-  {
-      // gf_group->index == 2 (Frame 8)
-      INTNL_ARF_UPDATE,           // update_type
-      (GF_INTERVAL_16 >> 1) - 1,  // arf_src_offset
-      0,                          // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      ALTREF2_FRAME,  // Index (current) of reference to get updated
-      ALTREF2_FRAME   // cpi->refresh_alt2_ref_frame = 1
-  },
-  {
-      // gf_group->index == 3 (Frame 4)
-      INTNL_ARF_UPDATE,           // update_type
-      (GF_INTERVAL_16 >> 2) - 1,  // arf_src_offset
-      0,                          // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx ===> cpi->bwd_fb_idx
-                      // (BWDREF_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->alt2_fb_idx
-                      // (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      ALTREF2_FRAME,  // Index (current) of reference to get updated
-      ALTREF2_FRAME   // cpi->refresh_alt2_ref_frame = 1
-  },
-  {
-      // gf_group->index == 4 (Frame 2)
-      BRF_UPDATE,  // update_type
-      0,           // arf_src_offset
-      1,           // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx ===> cpi->bwd_fb_idx
-                      // (BWDREF_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->alt2_fb_idx
-                      // (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      REF_FRAMES,   // Index (current) of reference to get updated
-      BWDREF_FRAME  // cpi->refresh_bwd_ref_frame = 1
-  },
-  {
-      // gf_group->index == 5 (Frame 1)
-      LAST_BIPRED_UPDATE,  // update_type
-      0,                   // arf_src_offset
-      0,                   // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx ===> cpi->bwd_fb_idx (BWDREF_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx ===> cpi->alt_fb_idx (ALTREF_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx ===> cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      LAST3_FRAME,  // Index (current) of reference to get updated
-      LAST_FRAME    // cpi->refresh_last_frame = 1
-  },
-  {
-      // gf_group->index == 6 (Frame 3)
-      LF_UPDATE,  // update_type
-      0,          // arf_src_offset
-      0,          // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->lst_fb_idxes[LAST_FRAME -
-                      // LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx ===> cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx ===> cpi->alt2_fb_idx (ALTREF2_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx ===> cpi->alt_fb_idx (ALTREF_FRAME)
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      LAST3_FRAME,  // Index (current) of reference to get updated
-      LAST_FRAME    // cpi->refresh_last_frame = 1
-  },
-  {
-      // gf_group->index == 7 (Frame 4 - OVERLAY)
-      INTNL_OVERLAY_UPDATE,  // update_type
-      0,                     // arf_src_offset
-      0,                     // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      BWDREF_FRAME,  // Index (current) of reference to get updated
-      ALTREF2_FRAME  // cpi->refresh_alt2_ref_frame = 1
-  },
-  {
-      // gf_group->index == 8 (Frame 6)
-      BRF_UPDATE,  // update_type
-      0,           // arf_src_offset
-      1,           // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->lst_fb_idxes[LAST_FRAME -
-                      // LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx -> cpi->bwd_fb_idx (BWDREF_FRAME)
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      ALTREF2_FRAME,  // Index (current) of reference to get updated
-      BWDREF_FRAME    // cpi->refresh_bwd_frame = 1
-  },
-  {
-      // gf_group->index == 9 (Frame 5)
-      LAST_BIPRED_UPDATE,  // update_type
-      0,                   // arf_src_offset
-      0,                   // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx ===> cpi->bwd_fb_idx (BWDREF_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      LAST3_FRAME,  // Index (current) of reference to get updated
-      LAST_FRAME    // cpi->refresh_last_frame = 1
-  },
-  {
-      // gf_group->index == 10 (Frame 7)
-      LF_UPDATE,  // update_type
-      0,          // arf_src_offset
-      0,          // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->lst_fb_idxes[LAST_FRAME -
-                      // LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx ===> cpi->bwd_fb_idx (BWDREF_FRAME)
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      LAST3_FRAME,  // Index (current) of reference to get updated
-      LAST_FRAME    // cpi->refresh_last_frame = 1
-  },
-  {
-      // gf_group->index == 11 (Frame 8 - OVERLAY)
-      INTNL_OVERLAY_UPDATE,  // update_type
-      0,                     // arf_src_offset
-      0,                     // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      BWDREF_FRAME,  // Index (current) of reference to get updated
-      ALTREF2_FRAME  // cpi->refresh_alt2_ref_frame = 1
-  },
-  {
-      // gf_group->index == 12 (Frame 12)
-      INTNL_ARF_UPDATE,           // update_type
-      (GF_INTERVAL_16 >> 2) - 1,  // arf_src_offset
-      0,                          // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->lst_fb_idxes[LAST_FRAME -
-                      // LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST2_FRAME,    //  cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      //  cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      ALTREF2_FRAME,  // Index (current) of reference to get updated
-      ALTREF2_FRAME   // cpi->refresh_alt2_ref_frame = 1
-  },
-  {
-      // gf_group->index == 13 (Frame 10)
-      BRF_UPDATE,  // update_type
-      0,           // arf_src_offset
-      1,           // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx ===> cpi->bwd_fb_idx (BWDREF_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      ALTREF2_FRAME,  // Index (current) of reference to get updated
-      BWDREF_FRAME    // cpi->refresh_bwd_frame = 1
-  },
-  {
-      // gf_group->index == 14 (Frame 9)
-      LAST_BIPRED_UPDATE,  // update_type
-      0,                   // arf_src_offset
-      0,                   // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx ===> cpi->bwd_fb_idx (BWDREF_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      LAST3_FRAME,  // Index (current) of reference to get updated
-      LAST_FRAME    // cpi->refresh_last_frame = 1
-  },
-  {
-      // gf_group->index == 15 (Frame 11)
-      LF_UPDATE,  // update_type
-      0,          // arf_src_offset
-      0,          // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->lst_fb_idxes[LAST_FRAME -
-                      // LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx ===> cpi->bwd_fb_idx (BWDREF_FRAME)
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      LAST3_FRAME,  // Index (current) of reference to get updated
-      LAST_FRAME    // cpi->refresh_last_frame = 1
-  },
-  {
-      // gf_group->index == 16 (Frame 12 - OVERLAY)
-      INTNL_OVERLAY_UPDATE,  // update_type
-      0,                     // arf_src_offset
-      0,                     // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      BWDREF_FRAME,  // Index (current) of reference to get updated
-      ALTREF2_FRAME  // cpi->refresh_alt2_ref_frame = 1
-  },
-  {
-      // gf_group->index == 17 (Frame 14)
-      BRF_UPDATE,  // update_type
-      0,           // arf_src_offset
-      1,           // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->lst_fb_idxes[LAST_FRAME -
-                      // LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      BWDREF_FRAME,  // Index (current) of reference to get updated
-      BWDREF_FRAME   // cpi->refresh_bwd_frame = 1
-  },
-  {
-      // gf_group->index == 18 (Frame 13)
-      LAST_BIPRED_UPDATE,  // update_type
-      0,                   // arf_src_offset
-      0,                   // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      LAST3_FRAME,  // Index (current) of reference to get updated
-      LAST_FRAME    // cpi->refresh_last_frame = 1
-  },
-  {
-      // gf_group->index == 19 (Frame 15)
-      LF_UPDATE,  // update_type
-      0,          // arf_src_offset
-      0,          // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx ===> cpi->lst_fb_idxes[LAST_FRAME -
-                      // LAST_FRAME]
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      LAST3_FRAME,  // Index (current) of reference to get updated
-      LAST_FRAME    // cpi->refresh_last_frame = 1
-  },
-  {
-      // gf_group->index == 20 (Frame 16 - OVERLAY: Belonging to the next GF
-      // group)
-      OVERLAY_UPDATE,  // update_type
-      0,               // arf_src_offset
-      0,               // brf_src_offset
-      // Reference frame indexes (previous ===> current)
-      LAST3_FRAME,    // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME]
-      LAST_FRAME,     // cpi->lst_fb_idxes[LAST_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME]
-      LAST2_FRAME,    // cpi->lst_fb_idxes[LAST2_FRAME - LAST_FRAME] ===>
-                      // cpi->lst_fb_idxes[LAST3_FRAME - LAST_FRAME]
-      GOLDEN_FRAME,   // cpi->gld_fb_idx (GOLDEN_FRAME)
-      BWDREF_FRAME,   // cpi->bwd_fb_idx (BWDREF_FRAME)
-      ALTREF2_FRAME,  // cpi->alt2_fb_idx (ALTREF2_FRAME)
-      ALTREF_FRAME,   // cpi->alt_fb_idx (ALTREF_FRAME)
-      REF_FRAMES,     // cpi->ext_fb_idx (extra ref frame)
-      // Refreshment (index, flag)
-      ALTREF_FRAME,  // Index (current) of reference to get updated
-      GOLDEN_FRAME   // cpi->refresh_golden_frame = 1
-  }
-};
-
-// === GF Group of 16 ===
-static void define_gf_group_structure_16(AV1_COMP *cpi) {
-  RATE_CONTROL *const rc = &cpi->rc;
-  TWO_PASS *const twopass = &cpi->twopass;
-  GF_GROUP *const gf_group = &twopass->gf_group;
-  const int key_frame = cpi->common.frame_type == KEY_FRAME;
-
-  assert(rc->baseline_gf_interval == GF_INTERVAL_16);
-
-  // Total number of frames to consider for GF group of 16:
-  //   = GF group interval + number of OVERLAY's
-  //   = rc->baseline_gf_interval + MAX_EXT_ARFS + 1 + 1
-  // NOTE: The OVERLAY frame for the next GF group also needs to consider to
-  //       prepare for the reference frame index mapping.
-
-  const int gf_update_frames = rc->baseline_gf_interval + MAX_EXT_ARFS + 2;
-
-  for (int frame_index = 0; frame_index < gf_update_frames; ++frame_index) {
-    int param_idx = 0;
-
-    // Treat KEY_FRAME differently
-    if (frame_index == 0 && key_frame) {
-      gf_group->update_type[frame_index] = KF_UPDATE;
-
-      gf_group->rf_level[frame_index] = KF_STD;
-      gf_group->arf_src_offset[frame_index] = 0;
-      gf_group->brf_src_offset[frame_index] = 0;
-      gf_group->bidir_pred_enabled[frame_index] = 0;
-      for (int ref_idx = 0; ref_idx < REF_FRAMES; ++ref_idx)
-        gf_group->ref_fb_idx_map[frame_index][ref_idx] = ref_idx;
-      gf_group->refresh_idx[frame_index] = cpi->ref_fb_idx[LAST_FRAME - 1];
-      gf_group->refresh_flag[frame_index] = cpi->ref_fb_idx[LAST_FRAME - 1];
-
-      continue;
-    }
-
-    // == update_type ==
-    gf_group->update_type[frame_index] =
-        gf16_multi_layer_params[frame_index][param_idx++];
-
-    // == rf_level ==
-    // Derive rf_level from update_type
-    switch (gf_group->update_type[frame_index]) {
-      case LF_UPDATE: gf_group->rf_level[frame_index] = INTER_NORMAL; break;
-      case ARF_UPDATE: gf_group->rf_level[frame_index] = GF_ARF_LOW; break;
-      case OVERLAY_UPDATE:
-        gf_group->rf_level[frame_index] = INTER_NORMAL;
-        break;
-      case BRF_UPDATE: gf_group->rf_level[frame_index] = GF_ARF_LOW; break;
-      case LAST_BIPRED_UPDATE:
-        gf_group->rf_level[frame_index] = INTER_NORMAL;
-        break;
-      case BIPRED_UPDATE: gf_group->rf_level[frame_index] = INTER_NORMAL; break;
-      case INTNL_ARF_UPDATE:
-        gf_group->rf_level[frame_index] = GF_ARF_LOW;
-        break;
-      case INTNL_OVERLAY_UPDATE:
-        gf_group->rf_level[frame_index] = INTER_NORMAL;
-        break;
-      default: gf_group->rf_level[frame_index] = INTER_NORMAL; break;
-    }
-
-    // == arf_src_offset ==
-    gf_group->arf_src_offset[frame_index] =
-        gf16_multi_layer_params[frame_index][param_idx++];
-
-    // == brf_src_offset ==
-    gf_group->brf_src_offset[frame_index] =
-        gf16_multi_layer_params[frame_index][param_idx++];
-
-    // == bidir_pred_enabled ==
-    // Derive bidir_pred_enabled from bidir_src_offset
-    gf_group->bidir_pred_enabled[frame_index] =
-        gf_group->brf_src_offset[frame_index] ? 1 : 0;
-
-    // == ref_fb_idx_map ==
-    for (int ref_idx = 0; ref_idx < REF_FRAMES; ++ref_idx)
-      gf_group->ref_fb_idx_map[frame_index][ref_idx] =
-          gf16_multi_layer_params[frame_index][param_idx++];
-
-    // == refresh_idx ==
-    gf_group->refresh_idx[frame_index] =
-        gf16_multi_layer_params[frame_index][param_idx++];
-
-    // == refresh_flag ==
-    gf_group->refresh_flag[frame_index] =
-        gf16_multi_layer_params[frame_index][param_idx];
-  }
-
-  // Mark the ARF_UPDATE / INTNL_ARF_UPDATE and OVERLAY_UPDATE /
-  // INTNL_OVERLAY_UPDATE for rate allocation
-  // NOTE: Indexes are designed in the display order backward:
-  //       ALT[3] .. ALT[2] .. ALT[1] .. ALT[0],
-  //       but their coding order is as follows:
-  // ALT0-ALT2-ALT3 .. OVERLAY3 .. OVERLAY2-ALT1 .. OVERLAY1 .. OVERLAY0
-
-  const int num_arfs_in_gf = cpi->num_extra_arfs + 1;
-  const int sub_arf_interval = rc->baseline_gf_interval / num_arfs_in_gf;
-
-  // == arf_pos_for_ovrly ==: Position for OVERLAY
-  for (int arf_idx = 0; arf_idx < num_arfs_in_gf; arf_idx++) {
-    const int prior_num_arfs =
-        (arf_idx <= 1) ? num_arfs_in_gf : (num_arfs_in_gf - 1);
-    cpi->arf_pos_for_ovrly[arf_idx] =
-        sub_arf_interval * (num_arfs_in_gf - arf_idx) + prior_num_arfs;
-  }
-
-  // == arf_pos_in_gf ==: Position for ALTREF
-  cpi->arf_pos_in_gf[0] = 1;
-  cpi->arf_pos_in_gf[1] = cpi->arf_pos_for_ovrly[2] + 1;
-  cpi->arf_pos_in_gf[2] = 2;
-  cpi->arf_pos_in_gf[3] = 3;
-
-  // == arf_update_idx ==
-  // == arf_ref_idx ==
-  // NOTE: Due to the hierarchical nature of GF16, these two parameters only
-  //       relect the index to the nearest future overlay.
-  int start_frame_index = 0;
-  for (int arf_idx = (num_arfs_in_gf - 1); arf_idx >= 0; --arf_idx) {
-    const int end_frame_index = cpi->arf_pos_for_ovrly[arf_idx];
-    for (int frame_index = start_frame_index; frame_index <= end_frame_index;
-         ++frame_index) {
-      gf_group->arf_update_idx[frame_index] = arf_idx;
-      gf_group->arf_ref_idx[frame_index] = arf_idx;
-    }
-    start_frame_index = end_frame_index + 1;
-  }
-}
-#endif  // USE_GF16_MULTI_LAYER
-
 #if USE_SYMM_MULTI_LAYER
+// #define CHCEK_GF_PARAMETER
+#ifdef CHCEK_GF_PARAMETER
 void check_frame_params(GF_GROUP *const gf_group, int gf_interval,
                         int frame_nums) {
   static const char *update_type_strings[] = {
@@ -2150,7 +1585,7 @@ void check_frame_params(GF_GROUP *const gf_group, int gf_interval,
   }
   fclose(fid);
 }
-
+#endif  // CHCEK_GF_PARAMETER
 static int update_type_2_rf_level(FRAME_UPDATE_TYPE update_type) {
   // Derive rf_level from update_type
   switch (update_type) {
@@ -2168,14 +1603,16 @@ static int update_type_2_rf_level(FRAME_UPDATE_TYPE update_type) {
 
 static void set_multi_layer_params(GF_GROUP *const gf_group, int l, int r,
                                    int *frame_ind, int arf_ind, int level) {
-  if (r - l == 2) {
-    // leaf node, not a look-ahead frame
-    gf_group->update_type[*frame_ind] = LF_UPDATE;
-    gf_group->arf_src_offset[*frame_ind] = 0;
-    gf_group->arf_pos_in_gf[*frame_ind] = 0;
-    gf_group->arf_update_idx[*frame_ind] = arf_ind;
-    gf_group->pyramid_level[*frame_ind] = level;
-    ++(*frame_ind);
+  if (r - l < 4) {
+    while (++l < r) {
+      // leaf nodes, not a look-ahead frame
+      gf_group->update_type[*frame_ind] = LF_UPDATE;
+      gf_group->arf_src_offset[*frame_ind] = 0;
+      gf_group->arf_pos_in_gf[*frame_ind] = 0;
+      gf_group->arf_update_idx[*frame_ind] = arf_ind;
+      gf_group->pyramid_level[*frame_ind] = level;
+      ++(*frame_ind);
+    }
   } else {
     int m = (l + r) / 2;
     int arf_pos_in_gf = *frame_ind;
@@ -2208,7 +1645,7 @@ static INLINE unsigned char get_pyramid_height(int pyramid_width) {
   assert(pyramid_width <= 16 && pyramid_width >= 4 &&
          "invalid gf interval for pyramid structure");
 
-  return pyramid_width == 16 ? 4 : (pyramid_width >= 8 ? 3 : 2);
+  return pyramid_width > 12 ? 4 : (pyramid_width > 6 ? 3 : 2);
 }
 
 static int construct_multi_layer_gf_structure(GF_GROUP *const gf_group,
@@ -2235,9 +1672,6 @@ static int construct_multi_layer_gf_structure(GF_GROUP *const gf_group,
   // set parameters for the rest of the frames
   set_multi_layer_params(gf_group, 0, gf_interval, &frame_index, 0,
                          gf_group->pyramid_height - 1);
-
-  // check_frame_params(gf_group, gf_interval, frame_index);
-
   return frame_index;
 }
 
@@ -2247,8 +1681,7 @@ void define_customized_gf_group_structure(AV1_COMP *cpi) {
   GF_GROUP *const gf_group = &twopass->gf_group;
   const int key_frame = cpi->common.frame_type == KEY_FRAME;
 
-  assert(rc->baseline_gf_interval == 4 || rc->baseline_gf_interval == 8 ||
-         rc->baseline_gf_interval == 16);
+  assert(rc->baseline_gf_interval >= 4 && rc->baseline_gf_interval <= 16);
 
   const int gf_update_frames =
       construct_multi_layer_gf_structure(gf_group, rc->baseline_gf_interval);
@@ -2304,8 +1737,9 @@ void define_customized_gf_group_structure(AV1_COMP *cpi) {
 
   // This parameter is useless?
   gf_group->arf_ref_idx[frame_index] = 0;
-
+#ifdef CHCEK_GF_PARAMETER
   check_frame_params(gf_group, rc->baseline_gf_interval, gf_update_frames);
+#endif
 }
 
 // It is an example of how to define a GF stucture manually. The function will
@@ -2446,16 +1880,9 @@ static int define_gf_group_structure_4(AV1_COMP *cpi) {
 static void define_gf_group_structure(AV1_COMP *cpi) {
   RATE_CONTROL *const rc = &cpi->rc;
 
-#if USE_GF16_MULTI_LAYER
-  if (rc->baseline_gf_interval == 16) {
-    define_gf_group_structure_16(cpi);
-    return;
-  }
-#endif  // USE_GF16_MULTI_LAYER
 #if USE_SYMM_MULTI_LAYER
-  const int valid_customized_gf_length = rc->baseline_gf_interval == 4 ||
-                                         rc->baseline_gf_interval == 8 ||
-                                         rc->baseline_gf_interval == 16;
+  const int valid_customized_gf_length =
+      rc->baseline_gf_interval >= 4 && rc->baseline_gf_interval <= 16;
   // used the new structure only if extra_arf is allowed
   if (valid_customized_gf_length && rc->source_alt_ref_pending &&
       cpi->extra_arf_allowed > 0) {
@@ -2832,9 +2259,11 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   int i;
 
   double boost_score = 0.0;
-#if !FIX_GF_INTERVAL_LENGTH
+#if !CONFIG_FIX_GF_LENGTH
   double old_boost_score = 0.0;
   double mv_ratio_accumulator_thresh;
+  int active_max_gf_interval;
+  int active_min_gf_interval;
 #endif
   double gf_group_err = 0.0;
 #if GROUP_ADAPTIVE_MAXQ
@@ -2861,8 +2290,6 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   int f_boost = 0;
   int b_boost = 0;
   int flash_detected;
-  int active_max_gf_interval;
-  int active_min_gf_interval;
   int64_t gf_group_bits;
   double gf_group_error_left;
   int gf_arf_bits;
@@ -2897,23 +2324,21 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
     gf_group_skip_pct -= this_frame->intra_skip_pct;
     gf_group_inactive_zone_rows -= this_frame->inactive_zone_rows;
   }
-#if !FIX_GF_INTERVAL_LENGTH
+#if !CONFIG_FIX_GF_LENGTH
   // Motion breakout threshold for loop below depends on image size.
   mv_ratio_accumulator_thresh =
       (cpi->initial_height + cpi->initial_width) / 4.0;
-#endif
   // Set a maximum and minimum interval for the GF group.
   // If the image appears almost completely static we can extend beyond this.
   {
-    int int_max_q = (int)(av1_convert_qindex_to_q(twopass->active_worst_quality,
-                                                  cpi->common.bit_depth));
-    int int_lbq = (int)(av1_convert_qindex_to_q(rc->last_boosted_qindex,
-                                                cpi->common.bit_depth));
+    int int_max_q = (int)(av1_convert_qindex_to_q(
+        twopass->active_worst_quality, cpi->common.seq_params.bit_depth));
+    int int_lbq = (int)(av1_convert_qindex_to_q(
+        rc->last_boosted_qindex, cpi->common.seq_params.bit_depth));
 
     active_min_gf_interval = rc->min_gf_interval + AOMMIN(2, int_max_q / 200);
     if (active_min_gf_interval > rc->max_gf_interval)
       active_min_gf_interval = rc->max_gf_interval;
-
     if (cpi->multi_arf_allowed) {
       active_max_gf_interval = rc->max_gf_interval;
     } else {
@@ -2930,7 +2355,7 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
         active_max_gf_interval = rc->max_gf_interval;
     }
   }
-
+#endif  // !CONFIG_FIX_GF_LENGTH
   double avg_sr_coded_error = 0;
   double avg_raw_err_stdev = 0;
   int non_zero_stdev_count = 0;
@@ -2989,10 +2414,10 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
     boost_score +=
         decay_accumulator *
         calc_frame_boost(cpi, &next_frame, this_frame_mv_in_out, GF_MAX_BOOST);
-#if FIX_GF_INTERVAL_LENGTH
+#if CONFIG_FIX_GF_LENGTH
     if (i == (FIXED_GF_LENGTH + 1)) break;
 #else
-    // Skip breaking condition for FIX_GF_INTERVAL_LENGTH
+    // Skip breaking condition for CONFIG_FIX_GF_LENGTH
     // Break out conditions.
     if (
         // Break at active_max_gf_interval unless almost totally static.
@@ -3016,7 +2441,7 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
       }
     }
     old_boost_score = boost_score;
-#endif  // FIX_GF_INTERVAL_LENGTH
+#endif  // CONFIG_FIX_GF_LENGTH
     *this_frame = next_frame;
   }
   twopass->gf_zeromotion_pct = (int)(zero_motion_accumulator * 1000.0);
@@ -3029,12 +2454,31 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   assert(num_mbs > 0);
   if (i) avg_sr_coded_error /= i;
 
+#if REDUCE_LAST_GF_LENGTH
+  int alt_offset = 0;
+  // We are going to have an alt ref.
+  if (allow_alt_ref && (i < cpi->oxcf.lag_in_frames) &&
+      (i >= rc->min_gf_interval)) {
+    // If the last gf is too long, then we have to reduce
+    // the current gf length
+    if (rc->frames_to_key - i < 9 && i > 10) {
+      // too long, reduce the length by one
+      alt_offset = -1;
+      i -= 1;
+    }
+  }
+#endif
+
   // Should we use the alternate reference frame.
   if (allow_alt_ref && (i < cpi->oxcf.lag_in_frames) &&
       (i >= rc->min_gf_interval)) {
     // Calculate the boost for alt ref.
     rc->gfu_boost =
+#if REDUCE_LAST_GF_LENGTH
+        calc_arf_boost(cpi, alt_offset, (i - 1), (i - 1), &f_boost, &b_boost);
+#else
         calc_arf_boost(cpi, 0, (i - 1), (i - 1), &f_boost, &b_boost);
+#endif
     rc->source_alt_ref_pending = 1;
   } else {
     rc->gfu_boost = AOMMAX((int)boost_score, MIN_ARF_GF_BOOST);
@@ -3054,6 +2498,18 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   } else {
     rc->baseline_gf_interval = i - (is_key_frame || rc->source_alt_ref_pending);
   }
+
+#if REDUCE_LAST_ALT_BOOST
+  rc->arf_boost_factor = 1.0;
+  if (rc->source_alt_ref_pending) {
+    // If the last gf is too long, then we have to reduce
+    // the boost factor on current alt ref
+    if (rc->frames_to_key - i == 0 && i > 10) {
+      rc->arf_boost_factor = 0;
+    }
+  }
+#endif
+
   if (non_zero_stdev_count) avg_raw_err_stdev /= non_zero_stdev_count;
 
   // Disable extra altrefs and backward refs for "still" gf group:
@@ -3512,147 +2968,6 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   twopass->modified_error_left -= kf_group_err;
 }
 
-#if USE_GF16_MULTI_LAYER
-// === GF Group of 16 ===
-void av1_ref_frame_map_idx_updates(AV1_COMP *cpi, int gf_frame_index) {
-  TWO_PASS *const twopass = &cpi->twopass;
-  GF_GROUP *const gf_group = &twopass->gf_group;
-
-  int ref_fb_idx_prev[REF_FRAMES];
-  int ref_fb_idx_curr[REF_FRAMES];
-
-  for (int ref_frame = 0; ref_frame < REF_FRAMES; ++ref_frame) {
-    ref_fb_idx_prev[ref_frame] = cpi->ref_fb_idx[ref_frame];
-  }
-
-  // Update map index for each reference frame
-  for (int ref_idx = 0; ref_idx < REF_FRAMES; ++ref_idx) {
-    int ref_frame = gf_group->ref_fb_idx_map[gf_frame_index][ref_idx];
-    ref_fb_idx_curr[ref_idx] = ref_fb_idx_prev[ref_frame - LAST_FRAME];
-  }
-
-  for (int ref_frame = 0; ref_frame < REF_FRAMES; ++ref_frame) {
-    cpi->ref_fb_idx[ref_frame] = ref_fb_idx_curr[ref_frame];
-  }
-}
-
-// Define the reference buffers that will be updated post encode.
-static void configure_buffer_updates_16(AV1_COMP *cpi) {
-  TWO_PASS *const twopass = &cpi->twopass;
-  GF_GROUP *const gf_group = &twopass->gf_group;
-
-  if (gf_group->update_type[gf_group->index] == KF_UPDATE) {
-    cpi->refresh_fb_idx = 0;
-
-    cpi->refresh_last_frame = 1;
-    cpi->refresh_golden_frame = 1;
-    cpi->refresh_bwd_ref_frame = 1;
-    cpi->refresh_alt2_ref_frame = 1;
-    cpi->refresh_alt_ref_frame = 1;
-
-    return;
-  }
-
-  // Update reference frame map indexes
-  av1_ref_frame_map_idx_updates(cpi, gf_group->index);
-
-  // Update refresh index
-  switch (gf_group->refresh_idx[gf_group->index]) {
-    case LAST_FRAME:
-      cpi->refresh_fb_idx = cpi->ref_fb_idx[LAST_FRAME - LAST_FRAME];
-      break;
-
-    case LAST2_FRAME:
-      cpi->refresh_fb_idx = cpi->ref_fb_idx[LAST2_FRAME - LAST_FRAME];
-      break;
-
-    case LAST3_FRAME:
-      cpi->refresh_fb_idx = cpi->ref_fb_idx[LAST3_FRAME - LAST_FRAME];
-      break;
-
-    case GOLDEN_FRAME:
-      cpi->refresh_fb_idx = cpi->ref_fb_idx[GOLDEN_FRAME - 1];
-      break;
-
-    case BWDREF_FRAME:
-      cpi->refresh_fb_idx = cpi->ref_fb_idx[BWDREF_FRAME - 1];
-      break;
-
-    case ALTREF2_FRAME:
-      cpi->refresh_fb_idx = cpi->ref_fb_idx[ALTREF2_FRAME - 1];
-      break;
-
-    case ALTREF_FRAME:
-      cpi->refresh_fb_idx = cpi->ref_fb_idx[ALTREF_FRAME - 1];
-      break;
-
-    case REF_FRAMES:
-      cpi->refresh_fb_idx = cpi->ref_fb_idx[REF_FRAMES - 1];
-      break;
-
-    default: assert(0); break;
-  }
-
-  // Update refresh flags
-  switch (gf_group->refresh_flag[gf_group->index]) {
-    case LAST_FRAME:
-      cpi->refresh_last_frame = 1;
-      cpi->refresh_golden_frame = 0;
-      cpi->refresh_bwd_ref_frame = 0;
-      cpi->refresh_alt2_ref_frame = 0;
-      cpi->refresh_alt_ref_frame = 0;
-      break;
-
-    case GOLDEN_FRAME:
-      cpi->refresh_last_frame = 0;
-      cpi->refresh_golden_frame = 1;
-      cpi->refresh_bwd_ref_frame = 0;
-      cpi->refresh_alt2_ref_frame = 0;
-      cpi->refresh_alt_ref_frame = 0;
-      break;
-
-    case BWDREF_FRAME:
-      cpi->refresh_last_frame = 0;
-      cpi->refresh_golden_frame = 0;
-      cpi->refresh_bwd_ref_frame = 1;
-      cpi->refresh_alt2_ref_frame = 0;
-      cpi->refresh_alt_ref_frame = 0;
-      break;
-
-    case ALTREF2_FRAME:
-      cpi->refresh_last_frame = 0;
-      cpi->refresh_golden_frame = 0;
-      cpi->refresh_bwd_ref_frame = 0;
-      cpi->refresh_alt2_ref_frame = 1;
-      cpi->refresh_alt_ref_frame = 0;
-      break;
-
-    case ALTREF_FRAME:
-      cpi->refresh_last_frame = 0;
-      cpi->refresh_golden_frame = 0;
-      cpi->refresh_bwd_ref_frame = 0;
-      cpi->refresh_alt2_ref_frame = 0;
-      cpi->refresh_alt_ref_frame = 1;
-      break;
-
-    default: assert(0); break;
-  }
-
-  switch (gf_group->update_type[gf_group->index]) {
-    case BRF_UPDATE: cpi->rc.is_bwd_ref_frame = 1; break;
-
-    case LAST_BIPRED_UPDATE: cpi->rc.is_last_bipred_frame = 1; break;
-
-    case BIPRED_UPDATE: cpi->rc.is_bipred_frame = 1; break;
-
-    case INTNL_OVERLAY_UPDATE: cpi->rc.is_src_frame_ext_arf = 1;
-    case OVERLAY_UPDATE: cpi->rc.is_src_frame_alt_ref = 1; break;
-
-    default: break;
-  }
-}
-#endif  // USE_GF16_MULTI_LAYER
-
 // Define the reference buffers that will be updated post encode.
 static void configure_buffer_updates(AV1_COMP *cpi) {
   TWO_PASS *const twopass = &cpi->twopass;
@@ -3665,14 +2980,6 @@ static void configure_buffer_updates(AV1_COMP *cpi) {
   cpi->rc.is_last_bipred_frame = 0;
   cpi->rc.is_bipred_frame = 0;
   cpi->rc.is_src_frame_ext_arf = 0;
-
-#if USE_GF16_MULTI_LAYER
-  RATE_CONTROL *const rc = &cpi->rc;
-  if (rc->baseline_gf_interval == 16) {
-    configure_buffer_updates_16(cpi);
-    return;
-  }
-#endif  // USE_GF16_MULTI_LAYER
 
   switch (twopass->gf_group.update_type[twopass->gf_group.index]) {
     case KF_UPDATE:
@@ -3909,7 +3216,7 @@ void av1_rc_get_second_pass_params(AV1_COMP *cpi) {
     twopass->baseline_active_worst_quality = tmp_q;
     rc->ni_av_qi = tmp_q;
     rc->last_q[INTER_FRAME] = tmp_q;
-    rc->avg_q = av1_convert_qindex_to_q(tmp_q, cm->bit_depth);
+    rc->avg_q = av1_convert_qindex_to_q(tmp_q, cm->seq_params.bit_depth);
     rc->avg_frame_qindex[INTER_FRAME] = tmp_q;
     rc->last_q[KEY_FRAME] = (tmp_q + cpi->oxcf.best_allowed_q) / 2;
     rc->avg_frame_qindex[KEY_FRAME] = rc->last_q[KEY_FRAME];
@@ -3978,8 +3285,7 @@ void av1_rc_get_second_pass_params(AV1_COMP *cpi) {
                             : cpi->common.MBs;
     // The multiplication by 256 reverses a scaling factor of (>> 8)
     // applied when combining MB error values for the frame.
-    twopass->mb_av_energy =
-        log(((this_frame.intra_error * 256.0) / num_mbs) + 1.0);
+    twopass->mb_av_energy = log((this_frame.intra_error / num_mbs) + 1.0);
     twopass->frame_avg_haar_energy =
         log((this_frame.frame_avg_wavelet_energy / num_mbs) + 1.0);
   }
@@ -3995,6 +3301,9 @@ void av1_twopass_postencode_update(AV1_COMP *cpi) {
   TWO_PASS *const twopass = &cpi->twopass;
   RATE_CONTROL *const rc = &cpi->rc;
   const int bits_used = rc->base_frame_target;
+
+  assert(IMPLIES(cpi->common.show_existing_frame && !rc->is_src_frame_alt_ref,
+                 cpi->common.error_resilient_mode));
 
   // VBR correction is done through rc->vbr_bits_off_target. Based on the
   // sign of this value, a limited % adjustment is made to the target rate
@@ -4019,8 +3328,12 @@ void av1_twopass_postencode_update(AV1_COMP *cpi) {
   }
   twopass->kf_group_bits = AOMMAX(twopass->kf_group_bits, 0);
 
-  // Increment the gf group index ready for the next frame.
-  ++twopass->gf_group.index;
+  // Increment the gf group index ready for the next frame. If this is
+  // a show_existing_frame with a source other than altref, the index
+  // was incremented when it was originally encoded.
+  if (!cpi->common.show_existing_frame || rc->is_src_frame_alt_ref) {
+    ++twopass->gf_group.index;
+  }
 
   // If the rate control is drifting consider adjustment to min or maxq.
   if ((cpi->oxcf.rc_mode != AOM_Q) &&

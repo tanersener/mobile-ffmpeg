@@ -29,6 +29,7 @@
 #include "av1/encoder/encodemv.h"
 #include "av1/encoder/mcomp.h"
 #include "av1/encoder/rdopt.h"
+#include "av1/encoder/reconinter_enc.h"
 
 // #define NEW_DIAMOND_SEARCH
 
@@ -929,8 +930,8 @@ unsigned int av1_refine_warped_mv(const AV1_COMP *cpi, MACROBLOCK *const x,
   int16_t bc = mbmi->mv[0].as_mv.col;
   int16_t *tr = &mbmi->mv[0].as_mv.row;
   int16_t *tc = &mbmi->mv[0].as_mv.col;
-  WarpedMotionParams best_wm_params = mbmi->wm_params[0];
-  int best_num_proj_ref = mbmi->num_proj_ref[0];
+  WarpedMotionParams best_wm_params = mbmi->wm_params;
+  int best_num_proj_ref = mbmi->num_proj_ref;
   unsigned int bestmse;
   int minc, maxc, minr, maxr;
   const int start = cm->allow_high_precision_mv ? 0 : 4;
@@ -962,18 +963,18 @@ unsigned int av1_refine_warped_mv(const AV1_COMP *cpi, MACROBLOCK *const x,
         memcpy(pts, pts0, total_samples * 2 * sizeof(*pts0));
         memcpy(pts_inref, pts_inref0, total_samples * 2 * sizeof(*pts_inref0));
         if (total_samples > 1)
-          mbmi->num_proj_ref[0] =
+          mbmi->num_proj_ref =
               selectSamples(&this_mv, pts, pts_inref, total_samples, bsize);
 
-        if (!find_projection(mbmi->num_proj_ref[0], pts, pts_inref, bsize, *tr,
-                             *tc, &mbmi->wm_params[0], mi_row, mi_col)) {
+        if (!find_projection(mbmi->num_proj_ref, pts, pts_inref, bsize, *tr,
+                             *tc, &mbmi->wm_params, mi_row, mi_col)) {
           thismse =
               av1_compute_motion_cost(cpi, x, bsize, mi_row, mi_col, &this_mv);
 
           if (thismse < bestmse) {
             best_idx = idx;
-            best_wm_params = mbmi->wm_params[0];
-            best_num_proj_ref = mbmi->num_proj_ref[0];
+            best_wm_params = mbmi->wm_params;
+            best_num_proj_ref = mbmi->num_proj_ref;
             bestmse = thismse;
           }
         }
@@ -990,8 +991,8 @@ unsigned int av1_refine_warped_mv(const AV1_COMP *cpi, MACROBLOCK *const x,
 
   *tr = br;
   *tc = bc;
-  mbmi->wm_params[0] = best_wm_params;
-  mbmi->num_proj_ref[0] = best_num_proj_ref;
+  mbmi->wm_params = best_wm_params;
+  mbmi->num_proj_ref = best_num_proj_ref;
   return bestmse;
 }
 

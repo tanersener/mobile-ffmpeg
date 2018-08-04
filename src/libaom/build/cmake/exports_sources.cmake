@@ -24,3 +24,8 @@ if(CONFIG_AV1_ENCODER)
   set(AOM_EXPORTS_SOURCES ${AOM_EXPORTS_SOURCES} "${AOM_ROOT}/aom/exports_enc"
       "${AOM_ROOT}/av1/exports_enc")
 endif()
+
+if(ENABLE_TESTS)
+  set(AOM_EXPORTS_SOURCES ${AOM_EXPORTS_SOURCES} "${AOM_ROOT}/aom/exports_test"
+      "${AOM_ROOT}/av1/exports_test")
+endif()

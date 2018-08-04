@@ -281,18 +281,6 @@ static INLINE void decrease_ref_count(int idx, RefCntBuffer *const frame_bufs,
   }
 }
 
-static INLINE int dec_is_ref_frame_buf(AV1Decoder *const pbi,
-                                       RefCntBuffer *frame_buf) {
-  AV1_COMMON *const cm = &pbi->common;
-  int i;
-  for (i = 0; i < INTER_REFS_PER_FRAME; ++i) {
-    RefBuffer *const ref_frame = &cm->frame_refs[i];
-    if (ref_frame->idx == INVALID_IDX) continue;
-    if (frame_buf == &cm->buffer_pool->frame_bufs[ref_frame->idx]) break;
-  }
-  return (i < INTER_REFS_PER_FRAME);
-}
-
 #define ACCT_STR __func__
 static INLINE int av1_read_uniform(aom_reader *r, int n) {
   const int l = get_unsigned_bits(n);

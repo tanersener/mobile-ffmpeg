@@ -38,13 +38,13 @@ extern "C" {
 #define MAX_DIFFWTD_MASK_BITS 1
 
 // DIFFWTD_MASK_TYPES should not surpass 1 << MAX_DIFFWTD_MASK_BITS
-typedef enum {
+typedef enum ATTRIBUTE_PACKED {
   DIFFWTD_38 = 0,
   DIFFWTD_38_INV,
   DIFFWTD_MASK_TYPES,
 } DIFFWTD_MASK_TYPE;
 
-typedef enum {
+typedef enum ATTRIBUTE_PACKED {
   KEY_FRAME = 0,
   INTER_FRAME = 1,
   INTRA_ONLY_FRAME = 2,  // replaces intra-only
@@ -57,7 +57,7 @@ static INLINE int is_comp_ref_allowed(BLOCK_SIZE bsize) {
 }
 
 static INLINE int is_inter_mode(PREDICTION_MODE mode) {
-  return mode >= NEARESTMV && mode <= NEW_NEWMV;
+  return mode >= INTER_MODE_START && mode < INTER_MODE_END;
 }
 
 typedef struct {
@@ -66,10 +66,10 @@ typedef struct {
 } BUFFER_SET;
 
 static INLINE int is_inter_singleref_mode(PREDICTION_MODE mode) {
-  return mode >= NEARESTMV && mode <= NEWMV;
+  return mode >= SINGLE_INTER_MODE_START && mode < SINGLE_INTER_MODE_END;
 }
 static INLINE int is_inter_compound_mode(PREDICTION_MODE mode) {
-  return mode >= NEAREST_NEARESTMV && mode <= NEW_NEWMV;
+  return mode >= COMP_INTER_MODE_START && mode < COMP_INTER_MODE_END;
 }
 
 static INLINE PREDICTION_MODE compound_ref0_mode(PREDICTION_MODE mode) {
@@ -146,10 +146,6 @@ static INLINE int have_nearmv_in_inter_mode(PREDICTION_MODE mode) {
 static INLINE int have_newmv_in_inter_mode(PREDICTION_MODE mode) {
   return (mode == NEWMV || mode == NEW_NEWMV || mode == NEAREST_NEWMV ||
           mode == NEW_NEARESTMV || mode == NEAR_NEWMV || mode == NEW_NEARMV);
-}
-
-static INLINE int use_masked_motion_search(COMPOUND_TYPE type) {
-  return (type == COMPOUND_WEDGE);
 }
 
 static INLINE int is_masked_compound_type(COMPOUND_TYPE type) {
@@ -267,8 +263,8 @@ typedef struct MB_MODE_INFO {
   int mi_row;
   int mi_col;
 #endif
-  int num_proj_ref[2];
-  WarpedMotionParams wm_params[2];
+  int num_proj_ref;
+  WarpedMotionParams wm_params;
 
   // Index of the alpha Cb and alpha Cr combination
   int cfl_alpha_idx;
@@ -376,7 +372,7 @@ static INLINE void mi_to_pixel_loc(int *pixel_c, int *pixel_r, int mi_col,
 }
 #endif
 
-enum mv_precision { MV_PRECISION_Q3, MV_PRECISION_Q4 };
+enum ATTRIBUTE_PACKED mv_precision { MV_PRECISION_Q3, MV_PRECISION_Q4 };
 
 struct buf_2d {
   uint8_t *buf;
@@ -952,15 +948,6 @@ typedef void (*foreach_transformed_block_visitor)(int plane, int block,
                                                   BLOCK_SIZE plane_bsize,
                                                   TX_SIZE tx_size, void *arg);
 
-void av1_foreach_transformed_block_in_plane(
-    const MACROBLOCKD *const xd, BLOCK_SIZE bsize, int plane,
-    foreach_transformed_block_visitor visit, void *arg);
-
-void av1_foreach_transformed_block(const MACROBLOCKD *const xd,
-                                   BLOCK_SIZE bsize, int mi_row, int mi_col,
-                                   foreach_transformed_block_visitor visit,
-                                   void *arg, const int num_planes);
-
 void av1_set_contexts(const MACROBLOCKD *xd, struct macroblockd_plane *pd,
                       int plane, BLOCK_SIZE plane_bsize, TX_SIZE tx_size,
                       int has_eob, int aoff, int loff);
@@ -976,7 +963,7 @@ static INLINE int is_interintra_allowed_bsize(const BLOCK_SIZE bsize) {
 }
 
 static INLINE int is_interintra_allowed_mode(const PREDICTION_MODE mode) {
-  return (mode >= NEARESTMV) && (mode <= NEWMV);
+  return (mode >= SINGLE_INTER_MODE_START) && (mode < SINGLE_INTER_MODE_END);
 }
 
 static INLINE int is_interintra_allowed_ref(const MV_REFERENCE_FRAME rf[2]) {
@@ -1045,7 +1032,7 @@ motion_mode_allowed(const WarpedMotionParams *gm_params, const MACROBLOCKD *xd,
       is_motion_variation_allowed_compound(mbmi)) {
     if (!check_num_overlappable_neighbors(mbmi)) return SIMPLE_TRANSLATION;
     assert(!has_second_ref(mbmi));
-    if (mbmi->num_proj_ref[0] >= 1 &&
+    if (mbmi->num_proj_ref >= 1 &&
         (allow_warped_motion && !av1_is_scaled(&(xd->block_refs[0]->sf)))) {
       if (xd->cur_frame_force_integer_mv) {
         return OBMC_CAUSAL;
@@ -1158,38 +1145,6 @@ static INLINE int is_nontrans_global_motion(const MACROBLOCKD *xd,
 
 static INLINE PLANE_TYPE get_plane_type(int plane) {
   return (plane == 0) ? PLANE_TYPE_Y : PLANE_TYPE_UV;
-}
-
-static INLINE void transpose_uint8(uint8_t *dst, int dst_stride,
-                                   const uint8_t *src, int src_stride, int w,
-                                   int h) {
-  int r, c;
-  for (r = 0; r < h; ++r)
-    for (c = 0; c < w; ++c) dst[c * dst_stride + r] = src[r * src_stride + c];
-}
-
-static INLINE void transpose_uint16(uint16_t *dst, int dst_stride,
-                                    const uint16_t *src, int src_stride, int w,
-                                    int h) {
-  int r, c;
-  for (r = 0; r < h; ++r)
-    for (c = 0; c < w; ++c) dst[c * dst_stride + r] = src[r * src_stride + c];
-}
-
-static INLINE void transpose_int16(int16_t *dst, int dst_stride,
-                                   const int16_t *src, int src_stride, int w,
-                                   int h) {
-  int r, c;
-  for (r = 0; r < h; ++r)
-    for (c = 0; c < w; ++c) dst[c * dst_stride + r] = src[r * src_stride + c];
-}
-
-static INLINE void transpose_int32(int32_t *dst, int dst_stride,
-                                   const int32_t *src, int src_stride, int w,
-                                   int h) {
-  int r, c;
-  for (r = 0; r < h; ++r)
-    for (c = 0; c < w; ++c) dst[c * dst_stride + r] = src[r * src_stride + c];
 }
 
 static INLINE int av1_get_max_eob(TX_SIZE tx_size) {

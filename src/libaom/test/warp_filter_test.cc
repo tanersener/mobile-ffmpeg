@@ -18,15 +18,23 @@ using libaom_test::AV1WarpFilter::AV1WarpFilterTest;
 
 namespace {
 #if HAVE_SSE4_1
-TEST_P(AV1WarpFilterTest, CheckOutput) { RunCheckOutput(GET_PARAM(3)); }
-TEST_P(AV1WarpFilterTest, DISABLED_Speed) { RunSpeedTest(GET_PARAM(3)); }
+TEST_P(AV1WarpFilterTest, CheckOutput) {
+  RunCheckOutput(::testing::get<3>(GET_PARAM(0)));
+}
+TEST_P(AV1WarpFilterTest, DISABLED_Speed) {
+  RunSpeedTest(::testing::get<3>(GET_PARAM(0)));
+}
 
 INSTANTIATE_TEST_CASE_P(
     SSE4_1, AV1WarpFilterTest,
     libaom_test::AV1WarpFilter::BuildParams(av1_warp_affine_sse4_1));
 
-TEST_P(AV1HighbdWarpFilterTest, CheckOutput) { RunCheckOutput(GET_PARAM(4)); }
-TEST_P(AV1HighbdWarpFilterTest, DISABLED_Speed) { RunSpeedTest(GET_PARAM(4)); }
+TEST_P(AV1HighbdWarpFilterTest, CheckOutput) {
+  RunCheckOutput(::testing::get<4>(GET_PARAM(0)));
+}
+TEST_P(AV1HighbdWarpFilterTest, DISABLED_Speed) {
+  RunSpeedTest(::testing::get<4>(GET_PARAM(0)));
+}
 
 INSTANTIATE_TEST_CASE_P(SSE4_1, AV1HighbdWarpFilterTest,
                         libaom_test::AV1HighbdWarpFilter::BuildParams(

@@ -133,6 +133,38 @@ static INLINE int64_t get_coeff_dist(tran_low_t tcoeff, tran_low_t dqcoeff,
   return error;
 }
 
+static const int8_t eob_to_pos_small[33] = {
+  0, 1, 2,                                        // 0-2
+  3, 3,                                           // 3-4
+  4, 4, 4, 4,                                     // 5-8
+  5, 5, 5, 5, 5, 5, 5, 5,                         // 9-16
+  6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6  // 17-32
+};
+
+static const int8_t eob_to_pos_large[17] = {
+  6,                               // place holder
+  7,                               // 33-64
+  8,  8,                           // 65-128
+  9,  9,  9,  9,                   // 129-256
+  10, 10, 10, 10, 10, 10, 10, 10,  // 257-512
+  11                               // 513-
+};
+
+static INLINE int get_eob_pos_token(const int eob, int *const extra) {
+  int t;
+
+  if (eob < 33) {
+    t = eob_to_pos_small[eob];
+  } else {
+    const int e = AOMMIN((eob - 1) >> 5, 16);
+    t = eob_to_pos_large[e];
+  }
+
+  *extra = eob - k_eob_group_start[t];
+
+  return t;
+}
+
 #if CONFIG_ENTROPY_STATS
 void av1_update_eob_context(int cdf_idx, int eob, TX_SIZE tx_size,
                             TX_CLASS tx_class, PLANE_TYPE plane,

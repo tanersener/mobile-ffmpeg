@@ -25,6 +25,7 @@
 #include "av1/encoder/mcomp.h"
 #include "av1/encoder/encoder.h"
 #include "av1/encoder/ratectrl.h"
+#include "av1/encoder/reconinter_enc.h"
 #include "av1/encoder/segmentation.h"
 #include "av1/encoder/temporal_filter.h"
 #include "aom_dsp/aom_dsp_common.h"
@@ -535,10 +536,10 @@ static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
   // Adjust the strength based on active max q.
   if (cpi->common.current_video_frame > 1)
     q = ((int)av1_convert_qindex_to_q(cpi->rc.avg_frame_qindex[INTER_FRAME],
-                                      cpi->common.bit_depth));
+                                      cpi->common.seq_params.bit_depth));
   else
     q = ((int)av1_convert_qindex_to_q(cpi->rc.avg_frame_qindex[KEY_FRAME],
-                                      cpi->common.bit_depth));
+                                      cpi->common.seq_params.bit_depth));
   if (q > 16) {
     strength = oxcf->arnr_strength;
   } else {
@@ -592,21 +593,6 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
   }
 
   int which_arf = gf_group->arf_update_idx[gf_group->index];
-
-#if USE_GF16_MULTI_LAYER
-  if (cpi->rc.baseline_gf_interval == 16) {
-    // Identify the index to the current ARF.
-    const int num_arfs_in_gf = cpi->num_extra_arfs + 1;
-    int arf_idx;
-    for (arf_idx = 0; arf_idx < num_arfs_in_gf; arf_idx++) {
-      if (gf_group->index == cpi->arf_pos_in_gf[arf_idx]) {
-        which_arf = arf_idx;
-        break;
-      }
-    }
-    assert(arf_idx < num_arfs_in_gf);
-  }
-#endif  // USE_GF16_MULTI_LAYER
 
   // Set the temporal filtering status for the corresponding OVERLAY frame
   if (strength == 0 && frames_to_blur == 1)

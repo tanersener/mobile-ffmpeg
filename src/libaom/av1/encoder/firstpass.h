@@ -47,15 +47,7 @@ typedef struct {
 //       number of bi-predictive frames.
 #define BFG_INTERVAL 2
 // The maximum number of extra ALTREF's except ALTREF_FRAME
-// NOTE: REF_FRAMES indicates the maximum number of frames that may be buffered
-//       to serve as references. Currently REF_FRAMES == 8.
-#define USE_GF16_MULTI_LAYER 0
-
-#if USE_GF16_MULTI_LAYER
-#define MAX_EXT_ARFS (REF_FRAMES - BWDREF_FRAME)
-#else  // !USE_GF16_MULTI_LAYER
 #define MAX_EXT_ARFS (REF_FRAMES - BWDREF_FRAME - 1)
-#endif  // USE_GF16_MULTI_LAYER
 
 #define MIN_EXT_ARF_INTERVAL 4
 
@@ -196,10 +188,6 @@ void av1_configure_buffer_updates_firstpass(struct AV1_COMP *cpi,
 
 // Post encode update of the rate control parameters for 2-pass
 void av1_twopass_postencode_update(struct AV1_COMP *cpi);
-
-#if USE_GF16_MULTI_LAYER
-void av1_ref_frame_map_idx_updates(struct AV1_COMP *cpi, int gf_frame_index);
-#endif  // USE_GF16_MULTI_LAYER
 
 static INLINE int get_number_of_extra_arfs(int interval, int arf_pending) {
   if (arf_pending && MAX_EXT_ARFS > 0)

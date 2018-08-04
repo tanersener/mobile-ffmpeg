@@ -99,14 +99,15 @@ static const arg_def_t framestatsarg =
     ARG_DEF(NULL, "framestats", 1, "Output per-frame stats (.csv format)");
 static const arg_def_t outbitdeptharg =
     ARG_DEF(NULL, "output-bit-depth", 1, "Output bit-depth for decoded frames");
-static const arg_def_t tilem = ARG_DEF(NULL, "tile-mode", 1,
-                                       "Tile coding mode "
-                                       "(0 for normal tile coding mode)");
+static const arg_def_t tilem =
+    ARG_DEF(NULL, "tile-mode", 1,
+            "Tile coding mode "
+            "(1 for large scale tile mode, refer to lightfield example)");
 static const arg_def_t tiler = ARG_DEF(NULL, "tile-row", 1,
-                                       "Row index of tile to decode "
+                                       "(debug) Row index of tile to decode "
                                        "(-1 for all rows)");
 static const arg_def_t tilec = ARG_DEF(NULL, "tile-column", 1,
-                                       "Column index of tile to decode "
+                                       "(debug) Column index of tile to decode "
                                        "(-1 for all columns)");
 static const arg_def_t isannexb =
     ARG_DEF(NULL, "annexb", 0, "Bitstream is in Annex-B format");

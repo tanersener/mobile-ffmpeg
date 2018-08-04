@@ -42,8 +42,8 @@ const sgr_params_type sgr_params[SGRPROJ_PARAMS] = {
 AV1PixelRect av1_whole_frame_rect(const AV1_COMMON *cm, int is_uv) {
   AV1PixelRect rect;
 
-  int ss_x = is_uv && cm->subsampling_x;
-  int ss_y = is_uv && cm->subsampling_y;
+  int ss_x = is_uv && cm->seq_params.subsampling_x;
+  int ss_y = is_uv && cm->seq_params.subsampling_y;
 
   rect.top = 0;
   rect.bottom = ROUND_POWER_OF_TWO(cm->height, ss_y);
@@ -661,9 +661,10 @@ const int32_t one_by_x[MAX_NELEM] = {
   293,  273,  256,  241,  228, 216, 205, 195, 186, 178, 171, 164,
 };
 
-static void selfguided_restoration_fast_internal(
-    int32_t *dgd, int width, int height, int dgd_stride, int32_t *dst,
-    int dst_stride, int bit_depth, int sgr_params_idx, int radius_idx) {
+static void calculate_intermediate_result(int32_t *dgd, int width, int height,
+                                          int dgd_stride, int bit_depth,
+                                          int sgr_params_idx, int radius_idx,
+                                          int pass, int32_t *A, int32_t *B) {
   const sgr_params_type *const params = &sgr_params[sgr_params_idx];
   const int r = params->r[radius_idx];
   const int width_ext = width + 2 * SGRPROJ_BORDER_HORZ;
@@ -673,10 +674,7 @@ static void selfguided_restoration_fast_internal(
   // We also align the stride to a multiple of 16 bytes, for consistency
   // with the SIMD version of this function.
   int buf_stride = ((width_ext + 3) & ~3) + 16;
-  int32_t A_[RESTORATION_PROC_UNIT_PELS];
-  int32_t B_[RESTORATION_PROC_UNIT_PELS];
-  int32_t *A = A_;
-  int32_t *B = B_;
+  const int step = pass == 0 ? 1 : 2;
   int i, j;
 
   assert(r <= MAX_RADIUS && "Need MAX_RADIUS >= r");
@@ -691,7 +689,7 @@ static void selfguided_restoration_fast_internal(
   B += SGRPROJ_BORDER_VERT * buf_stride + SGRPROJ_BORDER_HORZ;
   // Calculate the eventual A[] and B[] arrays. Include a 1-pixel border - ie,
   // for a 64x64 processing unit, we calculate 66x66 pixels of A[] and B[].
-  for (i = -1; i < height + 1; i += 2) {
+  for (i = -1; i < height + 1; i += step) {
     for (j = -1; j < width + 1; ++j) {
       const int k = i * buf_stride + j;
       const int n = (2 * r + 1) * (2 * r + 1);
@@ -754,7 +752,31 @@ static void selfguided_restoration_fast_internal(
                                          SGRPROJ_RECIP_BITS);
     }
   }
+}
+
+static void selfguided_restoration_fast_internal(
+    int32_t *dgd, int width, int height, int dgd_stride, int32_t *dst,
+    int dst_stride, int bit_depth, int sgr_params_idx, int radius_idx) {
+  const sgr_params_type *const params = &sgr_params[sgr_params_idx];
+  const int r = params->r[radius_idx];
+  const int width_ext = width + 2 * SGRPROJ_BORDER_HORZ;
+  // Adjusting the stride of A and B here appears to avoid bad cache effects,
+  // leading to a significant speed improvement.
+  // We also align the stride to a multiple of 16 bytes, for consistency
+  // with the SIMD version of this function.
+  int buf_stride = ((width_ext + 3) & ~3) + 16;
+  int32_t A_[RESTORATION_PROC_UNIT_PELS];
+  int32_t B_[RESTORATION_PROC_UNIT_PELS];
+  int32_t *A = A_;
+  int32_t *B = B_;
+  int i, j;
+  calculate_intermediate_result(dgd, width, height, dgd_stride, bit_depth,
+                                sgr_params_idx, radius_idx, 1, A, B);
+  A += SGRPROJ_BORDER_VERT * buf_stride + SGRPROJ_BORDER_HORZ;
+  B += SGRPROJ_BORDER_VERT * buf_stride + SGRPROJ_BORDER_HORZ;
+
   // Use the A[] and B[] arrays to calculate the filtered image
+  (void)r;
   assert(r == 2);
   for (i = 0; i < height; ++i) {
     if (!(i & 1)) {  // even row
@@ -796,10 +818,7 @@ static void selfguided_restoration_internal(int32_t *dgd, int width, int height,
                                             int dst_stride, int bit_depth,
                                             int sgr_params_idx,
                                             int radius_idx) {
-  const sgr_params_type *const params = &sgr_params[sgr_params_idx];
-  const int r = params->r[radius_idx];
   const int width_ext = width + 2 * SGRPROJ_BORDER_HORZ;
-  const int height_ext = height + 2 * SGRPROJ_BORDER_VERT;
   // Adjusting the stride of A and B here appears to avoid bad cache effects,
   // leading to a significant speed improvement.
   // We also align the stride to a multiple of 16 bytes, for consistency
@@ -810,82 +829,11 @@ static void selfguided_restoration_internal(int32_t *dgd, int width, int height,
   int32_t *A = A_;
   int32_t *B = B_;
   int i, j;
-
-  assert(r <= MAX_RADIUS && "Need MAX_RADIUS >= r");
-  assert(r <= SGRPROJ_BORDER_VERT - 1 && r <= SGRPROJ_BORDER_HORZ - 1 &&
-         "Need SGRPROJ_BORDER_* >= r+1");
-
-  boxsum(dgd - dgd_stride * SGRPROJ_BORDER_VERT - SGRPROJ_BORDER_HORZ,
-         width_ext, height_ext, dgd_stride, r, 0, B, buf_stride);
-  boxsum(dgd - dgd_stride * SGRPROJ_BORDER_VERT - SGRPROJ_BORDER_HORZ,
-         width_ext, height_ext, dgd_stride, r, 1, A, buf_stride);
+  calculate_intermediate_result(dgd, width, height, dgd_stride, bit_depth,
+                                sgr_params_idx, radius_idx, 0, A, B);
   A += SGRPROJ_BORDER_VERT * buf_stride + SGRPROJ_BORDER_HORZ;
   B += SGRPROJ_BORDER_VERT * buf_stride + SGRPROJ_BORDER_HORZ;
-  // Calculate the eventual A[] and B[] arrays. Include a 1-pixel border - ie,
-  // for a 64x64 processing unit, we calculate 66x66 pixels of A[] and B[].
-  for (i = -1; i < height + 1; ++i) {
-    for (j = -1; j < width + 1; ++j) {
-      const int k = i * buf_stride + j;
-      const int n = (2 * r + 1) * (2 * r + 1);
 
-      // a < 2^16 * n < 2^22 regardless of bit depth
-      uint32_t a = ROUND_POWER_OF_TWO(A[k], 2 * (bit_depth - 8));
-      // b < 2^8 * n < 2^14 regardless of bit depth
-      uint32_t b = ROUND_POWER_OF_TWO(B[k], bit_depth - 8);
-
-      // Each term in calculating p = a * n - b * b is < 2^16 * n^2 < 2^28,
-      // and p itself satisfies p < 2^14 * n^2 < 2^26.
-      // This bound on p is due to:
-      // https://en.wikipedia.org/wiki/Popoviciu's_inequality_on_variances
-      //
-      // Note: Sometimes, in high bit depth, we can end up with a*n < b*b.
-      // This is an artefact of rounding, and can only happen if all pixels
-      // are (almost) identical, so in this case we saturate to p=0.
-      uint32_t p = (a * n < b * b) ? 0 : a * n - b * b;
-
-      const uint32_t s = params->s[radius_idx];
-
-      // p * s < (2^14 * n^2) * round(2^20 / n^2 eps) < 2^34 / eps < 2^32
-      // as long as eps >= 4. So p * s fits into a uint32_t, and z < 2^12
-      // (this holds even after accounting for the rounding in s)
-      const uint32_t z = ROUND_POWER_OF_TWO(p * s, SGRPROJ_MTABLE_BITS);
-
-      // Note: We have to be quite careful about the value of A[k].
-      // This is used as a blend factor between individual pixel values and the
-      // local mean. So it logically has a range of [0, 256], including both
-      // endpoints.
-      //
-      // This is a pain for hardware, as we'd like something which can be stored
-      // in exactly 8 bits.
-      // Further, in the calculation of B[k] below, if z == 0 and r == 2,
-      // then A[k] "should be" 0. But then we can end up setting B[k] to a value
-      // slightly above 2^(8 + bit depth), due to rounding in the value of
-      // one_by_x[25-1].
-      //
-      // Thus we saturate so that, when z == 0, A[k] is set to 1 instead of 0.
-      // This fixes the above issues (256 - A[k] fits in a uint8, and we can't
-      // overflow), without significantly affecting the final result: z == 0
-      // implies that the image is essentially "flat", so the local mean and
-      // individual pixel values are very similar.
-      //
-      // Note that saturating on the other side, ie. requring A[k] <= 255,
-      // would be a bad idea, as that corresponds to the case where the image
-      // is very variable, when we want to preserve the local pixel value as
-      // much as possible.
-      A[k] = x_by_xplus1[AOMMIN(z, 255)];  // in range [1, 256]
-
-      // SGRPROJ_SGR - A[k] < 2^8 (from above), B[k] < 2^(bit_depth) * n,
-      // one_by_x[n - 1] = round(2^12 / n)
-      // => the product here is < 2^(20 + bit_depth) <= 2^32,
-      // and B[k] is set to a value < 2^(8 + bit depth)
-      // This holds even with the rounding in one_by_x and in the overall
-      // result, as long as SGRPROJ_SGR - A[k] is strictly less than 2^8.
-      B[k] = (int32_t)ROUND_POWER_OF_TWO((uint32_t)(SGRPROJ_SGR - A[k]) *
-                                             (uint32_t)B[k] *
-                                             (uint32_t)one_by_x[n - 1],
-                                         SGRPROJ_RECIP_BITS);
-    }
-  }
   // Use the A[] and B[] arrays to calculate the filtered image
   for (i = 0; i < height; ++i) {
     for (j = 0; j < width; ++j) {
@@ -1146,16 +1094,17 @@ void av1_loop_restoration_filter_frame_init(AV1LrStruct *lr_ctxt,
                                             YV12_BUFFER_CONFIG *frame,
                                             AV1_COMMON *cm, int optimized_lr,
                                             int num_planes) {
-  const int bit_depth = cm->bit_depth;
-  const int highbd = cm->use_highbitdepth;
+  const SequenceHeader *const seq_params = &cm->seq_params;
+  const int bit_depth = seq_params->bit_depth;
+  const int highbd = seq_params->use_highbitdepth;
   lr_ctxt->dst = &cm->rst_frame;
 
   const int frame_width = frame->crop_widths[0];
   const int frame_height = frame->crop_heights[0];
-  if (aom_realloc_frame_buffer(lr_ctxt->dst, frame_width, frame_height,
-                               cm->subsampling_x, cm->subsampling_y,
-                               cm->use_highbitdepth, AOM_BORDER_IN_PIXELS,
-                               cm->byte_alignment, NULL, NULL, NULL) < 0)
+  if (aom_realloc_frame_buffer(
+          lr_ctxt->dst, frame_width, frame_height, seq_params->subsampling_x,
+          seq_params->subsampling_y, highbd, AOM_BORDER_IN_PIXELS,
+          cm->byte_alignment, NULL, NULL, NULL) < 0)
     aom_internal_error(&cm->error, AOM_CODEC_MEM_ERROR,
                        "Failed to allocate restoration dst buffer");
 
@@ -1180,8 +1129,8 @@ void av1_loop_restoration_filter_frame_init(AV1LrStruct *lr_ctxt,
                  highbd);
 
     lr_plane_ctxt->rsi = rsi;
-    lr_plane_ctxt->ss_x = is_uv && cm->subsampling_x;
-    lr_plane_ctxt->ss_y = is_uv && cm->subsampling_y;
+    lr_plane_ctxt->ss_x = is_uv && seq_params->subsampling_x;
+    lr_plane_ctxt->ss_y = is_uv && seq_params->subsampling_y;
     lr_plane_ctxt->highbd = highbd;
     lr_plane_ctxt->bit_depth = bit_depth;
     lr_plane_ctxt->data8 = frame->buffers[plane];
@@ -1337,7 +1286,7 @@ void av1_foreach_rest_unit_in_plane(const struct AV1Common *cm, int plane,
                                     int32_t *tmpbuf,
                                     RestorationLineBuffers *rlbs) {
   const int is_uv = plane > 0;
-  const int ss_y = is_uv && cm->subsampling_y;
+  const int ss_y = is_uv && cm->seq_params.subsampling_y;
 
   const RestorationInfo *rsi = &cm->rst_info[plane];
 
@@ -1383,8 +1332,8 @@ int av1_loop_restoration_corners_in_sb(const struct AV1Common *cm, int plane,
   const int vert_units = av1_lr_count_units_in_tile(size, tile_h);
 
   // The size of an MI-unit on this plane of the image
-  const int ss_x = is_uv && cm->subsampling_x;
-  const int ss_y = is_uv && cm->subsampling_y;
+  const int ss_x = is_uv && cm->seq_params.subsampling_x;
+  const int ss_y = is_uv && cm->seq_params.subsampling_y;
   const int mi_size_x = MI_SIZE >> ss_x;
   const int mi_size_y = MI_SIZE >> ss_y;
 
@@ -1465,7 +1414,7 @@ static void save_deblock_boundary_lines(
   int upscaled_width;
   int line_bytes;
   if (av1_superres_scaled(cm)) {
-    const int ss_x = is_uv && cm->subsampling_x;
+    const int ss_x = is_uv && cm->seq_params.subsampling_x;
     upscaled_width = (cm->superres_upscaled_width + ss_x) >> ss_x;
     line_bytes = upscaled_width << use_highbd;
     if (use_highbd)
@@ -1512,7 +1461,7 @@ static void save_cdef_boundary_lines(const YV12_BUFFER_CONFIG *frame,
   // At the point where this function is called, we've already applied
   // superres. So we don't need to extend the lines here, we can just
   // pull directly from the topmost row of the upscaled frame.
-  const int ss_x = is_uv && cm->subsampling_x;
+  const int ss_x = is_uv && cm->seq_params.subsampling_x;
   const int upscaled_width = av1_superres_scaled(cm)
                                  ? (cm->superres_upscaled_width + ss_x) >> ss_x
                                  : src_width;
@@ -1532,7 +1481,7 @@ static void save_tile_row_boundary_lines(const YV12_BUFFER_CONFIG *frame,
                                          int use_highbd, int plane,
                                          AV1_COMMON *cm, int after_cdef) {
   const int is_uv = plane > 0;
-  const int ss_y = is_uv && cm->subsampling_y;
+  const int ss_y = is_uv && cm->seq_params.subsampling_y;
   const int stripe_height = RESTORATION_PROC_UNIT_SIZE >> ss_y;
   const int stripe_off = RESTORATION_UNIT_OFFSET >> ss_y;
 
@@ -1597,7 +1546,7 @@ static void save_tile_row_boundary_lines(const YV12_BUFFER_CONFIG *frame,
 void av1_loop_restoration_save_boundary_lines(const YV12_BUFFER_CONFIG *frame,
                                               AV1_COMMON *cm, int after_cdef) {
   const int num_planes = av1_num_planes(cm);
-  const int use_highbd = cm->use_highbitdepth;
+  const int use_highbd = cm->seq_params.use_highbitdepth;
   for (int p = 0; p < num_planes; ++p) {
     save_tile_row_boundary_lines(frame, use_highbd, p, cm, after_cdef);
   }

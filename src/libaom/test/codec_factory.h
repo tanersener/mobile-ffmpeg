@@ -89,7 +89,7 @@ class AV1Decoder : public Decoder {
  protected:
   virtual aom_codec_iface_t *CodecInterface() const {
 #if CONFIG_AV1_DECODER
-    return &aom_codec_av1_dx_algo;
+    return aom_codec_av1_dx();
 #else
     return NULL;
 #endif
@@ -105,7 +105,7 @@ class AV1Encoder : public Encoder {
  protected:
   virtual aom_codec_iface_t *CodecInterface() const {
 #if CONFIG_AV1_ENCODER
-    return &aom_codec_av1_cx_algo;
+    return aom_codec_av1_cx();
 #else
     return NULL;
 #endif
@@ -147,7 +147,7 @@ class AV1CodecFactory : public CodecFactory {
   virtual aom_codec_err_t DefaultEncoderConfig(aom_codec_enc_cfg_t *cfg,
                                                int usage) const {
 #if CONFIG_AV1_ENCODER
-    return aom_codec_enc_config_default(&aom_codec_av1_cx_algo, cfg, usage);
+    return aom_codec_enc_config_default(aom_codec_av1_cx(), cfg, usage);
 #else
     (void)cfg;
     (void)usage;

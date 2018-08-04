@@ -186,6 +186,8 @@ void av1_set_default_mode_deltas(int8_t *mode_deltas);
 void av1_setup_frame_contexts(struct AV1Common *cm);
 void av1_setup_past_independence(struct AV1Common *cm);
 
+// Returns (int)ceil(log2(n)).
+// NOTE: This implementation only works for n <= 2^30.
 static INLINE int av1_ceil_log2(int n) {
   if (n < 2) return 0;
   int i = 1, p = 2;
