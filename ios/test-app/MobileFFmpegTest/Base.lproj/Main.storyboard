@@ -130,7 +130,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4h8-5u-nyc">
-                                <rect key="frame" x="80" y="275.5" width="160" height="32"/>
+                                <rect key="frame" x="80" y="293.5" width="160" height="32"/>
                                 <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.96078431369999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="160" id="LS3-oh-jPR"/>
@@ -151,7 +151,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="s4J-D4-REU">
-                                <rect key="frame" x="20" y="327" width="280" height="171.5"/>
+                                <rect key="frame" x="20" y="345" width="280" height="153.5"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -168,7 +168,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NbH-jU-Bnw">
-                                <rect key="frame" x="20" y="90" width="280" height="166"/>
+                                <rect key="frame" x="20" y="90" width="280" height="184"/>
                                 <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -183,7 +183,7 @@
                             <constraint firstItem="QbR-eE-pgH" firstAttribute="trailing" secondItem="0TE-EO-U6Y" secondAttribute="trailing" id="b2t-sh-0UC"/>
                             <constraint firstItem="0TE-EO-U6Y" firstAttribute="trailing" secondItem="s4J-D4-REU" secondAttribute="trailing" constant="20" id="bGQ-sm-fE1"/>
                             <constraint firstItem="NbH-jU-Bnw" firstAttribute="top" secondItem="QbR-eE-pgH" secondAttribute="bottom" constant="20" id="hCL-7m-plX"/>
-                            <constraint firstItem="4h8-5u-nyc" firstAttribute="centerY" secondItem="kvJ-t3-ZkO" secondAttribute="centerY" constant="32" id="iTm-m5-OPM"/>
+                            <constraint firstItem="4h8-5u-nyc" firstAttribute="centerY" secondItem="kvJ-t3-ZkO" secondAttribute="centerY" constant="50" id="iTm-m5-OPM"/>
                             <constraint firstItem="0TE-EO-U6Y" firstAttribute="bottom" secondItem="s4J-D4-REU" secondAttribute="bottom" constant="20" id="kcH-8V-JdO"/>
                             <constraint firstItem="NbH-jU-Bnw" firstAttribute="leading" secondItem="0TE-EO-U6Y" secondAttribute="leading" constant="20" id="mv6-f5-GBI"/>
                             <constraint firstItem="4h8-5u-nyc" firstAttribute="top" secondItem="NbH-jU-Bnw" secondAttribute="bottom" constant="20" id="nfL-M2-8qq"/>

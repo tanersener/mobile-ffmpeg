@@ -252,7 +252,7 @@
 }
 
 - (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.audioCodecPicker withinSuperView:self.view];
+    [tooltip showAnimated:YES forView:self.encodeButton withinSuperView:self.view];
 }
 
 - (void)clearOutput {

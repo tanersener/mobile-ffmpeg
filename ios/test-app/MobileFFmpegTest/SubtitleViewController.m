@@ -72,10 +72,10 @@
     player = [[AVQueuePlayer alloc] init];
     playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
     
-    CGRect rectangularFrame = self.view.bounds;
-    rectangularFrame.size.width = self.view.bounds.size.width - 40;
+    CGRect rectangularFrame = self.view.layer.bounds;
+    rectangularFrame.size.width = self.view.layer.bounds.size.width - 40;
     rectangularFrame.origin.x = 20;
-    rectangularFrame.origin.y = 76;
+    rectangularFrame.origin.y = self.burnSubtitlesButton.layer.bounds.origin.y + 80;
     
     playerLayer.frame = rectangularFrame;
     [self.view.layer addSublayer:playerLayer];
@@ -153,8 +153,11 @@
                             [self playVideo];
                         } else {
                             NSLog(@"Burn subtitles failed with rc=%d\n", result);
-                            
-                            [self dismissProgressDialogAndAlert:@"Burn subtitles failed. Please check log for the details."];
+
+                            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 1.3 * NSEC_PER_SEC);
+                            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                                [self dismissProgressDialogAndAlert:@"Burn subtitles failed. Please check log for the details."];
+                            });
                         }
                     });
                 });

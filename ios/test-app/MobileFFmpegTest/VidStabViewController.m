@@ -70,27 +70,34 @@
     
     tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
     tooltip.text = VIDSTAB_TEST_TOOLTIP_TEXT;
-    
+
     // VIDEO PLAYER INIT
     player = [[AVQueuePlayer alloc] init];
     playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
     stabilizedVideoPlayer = [[AVQueuePlayer alloc] init];
     stabilizedVideoPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:stabilizedVideoPlayer];
 
+    // SETTING VIDEO FRAME POSITIONS, RANDOMLY (?)
+    [self.stabilizedVideoPlayerFrame setFrame:CGRectMake(20, 20, self.view.bounds.size.width - 40, self.view.bounds.size.height/4)];
+    
     CGRect upperRectangularFrame = self.view.bounds;
-    upperRectangularFrame.size.width = self.view.bounds.size.width - 120;
-    upperRectangularFrame.origin.x = 40;
-    upperRectangularFrame.origin.y = -265;
+    upperRectangularFrame.size.width = self.stabilizedVideoPlayerFrame.bounds.size.width;
+    upperRectangularFrame.size.height = self.stabilizedVideoPlayerFrame.bounds.size.height - 4;
+    upperRectangularFrame.origin.x = 0;
+    upperRectangularFrame.origin.y = self.view.bounds.size.height/100 - 4;
     
     playerLayer.frame = upperRectangularFrame;
+    playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     [self.videoPlayerFrame.layer addSublayer:playerLayer];
 
     CGRect lowerRectangularFrame = self.view.bounds;
-    lowerRectangularFrame.size.width = self.view.bounds.size.width - 120;
-    lowerRectangularFrame.origin.x = 40;
-    lowerRectangularFrame.origin.y = -255;
+    lowerRectangularFrame.size.width = self.stabilizedVideoPlayerFrame.bounds.size.width;
+    lowerRectangularFrame.size.height = self.stabilizedVideoPlayerFrame.bounds.size.height + 4;
+    lowerRectangularFrame.origin.x = 0;
+    lowerRectangularFrame.origin.y = self.view.bounds.size.height/50 - 4;
     
     stabilizedVideoPlayerLayer.frame = lowerRectangularFrame;
+    stabilizedVideoPlayerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
     [self.stabilizedVideoPlayerFrame.layer addSublayer:stabilizedVideoPlayerLayer];
     
     dispatch_async(dispatch_get_main_queue(), ^{

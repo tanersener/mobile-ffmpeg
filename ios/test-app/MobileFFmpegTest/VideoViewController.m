@@ -86,10 +86,10 @@
     playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
     activeItem = nil;
     
-    CGRect rectangularFrame = self.view.bounds;
-    rectangularFrame.size.width = self.view.bounds.size.width - 40;
+    CGRect rectangularFrame = self.view.layer.bounds;
+    rectangularFrame.size.width = self.view.layer.bounds.size.width - 40;
     rectangularFrame.origin.x = 20;
-    rectangularFrame.origin.y = 122;
+    rectangularFrame.origin.y = self.encodeButton.layer.bounds.origin.y + 120;
     
     playerLayer.frame = rectangularFrame;
     [self.view.layer addSublayer:playerLayer];
@@ -309,7 +309,7 @@
 }
 
 - (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.videoCodecPicker withinSuperView:self.view];
+    [tooltip showAnimated:YES forView:self.encodeButton withinSuperView:self.view];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
