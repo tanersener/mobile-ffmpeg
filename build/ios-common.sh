@@ -10,9 +10,9 @@ get_cpu_count() {
 
 prepare_inline_sed() {
     if [ "$(uname)" == "Darwin" ]; then
-        export SED="sed -i .tmp"
+        export SED_INLINE="sed -i .tmp"
     else
-        export SED="sed -i"
+        export SED_INLINE="sed -i"
     fi
 }
 

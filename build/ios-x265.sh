@@ -68,33 +68,33 @@ mkdir cmake-build || exit 1
 cd cmake-build || exit 1
 
 # fix pointer array assignments
-${SED} 's/parseCpuName(value, bError)/parseCpuName(value, bError, 0)/g' ${BASEDIR}/src/x265/source/common/param.cpp
-${SED} '/addAvg/s/ p.pu/ *p.pu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED} '/convert_p2s/s/ p.pu/ *p.pu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED} '/pixelavg_pp/s/ p.pu/ *p.pu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED} '/addAvg/s/ p.chroma/ *p.chroma/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED} '/add_ps/s/ p.chroma/ *p.chroma/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED} '/add_ps/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED} '/blockfill_s/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED} '/ssd_s/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED} '/calcresidual/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED} '/scale1D_128to64_neon/s/ p.scale/ *p.scale/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} 's/parseCpuName(value, bError)/parseCpuName(value, bError, 0)/g' ${BASEDIR}/src/x265/source/common/param.cpp
+${SED_INLINE} '/addAvg/s/ p.pu/ *p.pu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} '/convert_p2s/s/ p.pu/ *p.pu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} '/pixelavg_pp/s/ p.pu/ *p.pu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} '/addAvg/s/ p.chroma/ *p.chroma/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} '/add_ps/s/ p.chroma/ *p.chroma/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} '/add_ps/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} '/blockfill_s/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} '/ssd_s/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} '/calcresidual/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
+${SED_INLINE} '/scale1D_128to64_neon/s/ p.scale/ *p.scale/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
 
 # fixing constant shift
-${SED} 's/lsr 16/lsr #16/g' ${BASEDIR}/src/x265/source/common/arm/blockcopy8.S
+${SED_INLINE} 's/lsr 16/lsr #16/g' ${BASEDIR}/src/x265/source/common/arm/blockcopy8.S
 
 # fixing leading underscores
-${SED} 's/function x265_/function _x265_/g' ${BASEDIR}/src/x265/source/common/arm/*.S
-${SED} 's/ x265_/ _x265_/g' ${BASEDIR}/src/x265/source/common/arm/pixel-util.S
+${SED_INLINE} 's/function x265_/function _x265_/g' ${BASEDIR}/src/x265/source/common/arm/*.S
+${SED_INLINE} 's/ x265_/ _x265_/g' ${BASEDIR}/src/x265/source/common/arm/pixel-util.S
 
 # fixing relocation errors
-${SED} 's/sad12_mask:/sad12_mask_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/sad-a.S
-${SED} 's/g_lumaFilter:/g_lumaFilter_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
-${SED} 's/g_chromaFilter:/g_chromaFilter_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
-${SED} 's/\.text/.equ sad12_mask, .-sad12_mask_bytes\
+${SED_INLINE} 's/sad12_mask:/sad12_mask_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/sad-a.S
+${SED_INLINE} 's/g_lumaFilter:/g_lumaFilter_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
+${SED_INLINE} 's/g_chromaFilter:/g_chromaFilter_bytes:/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
+${SED_INLINE} 's/\.text/.equ sad12_mask, .-sad12_mask_bytes\
 \
 .text/g' ${BASEDIR}/src/x265/source/common/arm/sad-a.S
-${SED} 's/\.text/.equ g_lumaFilter, .-g_lumaFilter_bytes\
+${SED_INLINE} 's/\.text/.equ g_lumaFilter, .-g_lumaFilter_bytes\
 .equ g_chromaFilter, .-g_chromaFilter_bytes\
 \
 .text/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
