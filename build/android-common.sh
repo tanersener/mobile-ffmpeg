@@ -321,6 +321,24 @@ get_ldflags() {
     echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS}"
 }
 
+create_chromaprint_package_config() {
+    local CHROMAPRINT_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/libchromaprint.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/chromaprint
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: chromaprint
+Description: Audio fingerprint library
+URL: http://acoustid.org/chromaprint
+Version: ${CHROMAPRINT_VERSION}
+Libs: -L\${libdir} -lchromaprint -lc++
+Cflags: -I\${includedir}
+EOF
+}
+
 create_fontconfig_package_config() {
     local FONTCONFIG_VERSION="$1"
 
