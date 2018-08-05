@@ -950,7 +950,7 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
             int passes = 1;
 #        endif /* !WRITE_INTERLACING */
          int pass;
-         png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+         size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
          row = malloc(rowbytes);
 
@@ -1094,7 +1094,7 @@ load_file(png_const_charp name, png_bytepp result)
    return 0;
 }
 
-static png_size_t
+static size_t
 load_fake(png_charp param, png_bytepp profile)
 {
    char *endptr = NULL;
@@ -1164,7 +1164,7 @@ insert_iCCP(png_structp png_ptr, png_infop info_ptr, int nparams,
    {
       case '<':
          {
-            png_size_t filelen = load_file(params[1]+1, &profile);
+            size_t filelen = load_file(params[1]+1, &profile);
             if (filelen > 0xfffffffc) /* Maximum profile length */
             {
                fprintf(stderr, "%s: file too long (%lu) for an ICC profile\n",
@@ -1179,7 +1179,7 @@ insert_iCCP(png_structp png_ptr, png_infop info_ptr, int nparams,
       case '0': case '1': case '2': case '3': case '4':
       case '5': case '6': case '7': case '8': case '9':
          {
-            png_size_t fake_len = load_fake(params[1], &profile);
+            size_t fake_len = load_fake(params[1], &profile);
 
             if (fake_len > 0) /* else a simple parameter */
             {
@@ -1274,7 +1274,7 @@ set_text(png_structp png_ptr, png_infop info_ptr, png_textp text,
       case '5': case '6': case '7': case '8': case '9':
          {
             png_bytep data = NULL;
-            png_size_t fake_len = load_fake(param, &data);
+            size_t fake_len = load_fake(param, &data);
 
             if (fake_len > 0) /* else a simple parameter */
             {

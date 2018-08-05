@@ -578,11 +578,11 @@ typedef struct
    int         stride_extra;
    FILE       *input_file;
    png_voidp   input_memory;
-   png_size_t  input_memory_size;
+   size_t      input_memory_size;
    png_bytep   buffer;
    ptrdiff_t   stride;
-   png_size_t  bufsize;
-   png_size_t  allocsize;
+   size_t      bufsize;
+   size_t      allocsize;
    char        tmpfile_name[32];
    png_uint_16 colormap[256*4];
 }
@@ -665,7 +665,7 @@ static void initimage(Image *image, png_uint_32 opts, const char *file_name,
 static void
 allocbuffer(Image *image)
 {
-   png_size_t size = PNG_IMAGE_BUFFER_SIZE(image->image, image->stride);
+   size_t size = PNG_IMAGE_BUFFER_SIZE(image->image, image->stride);
 
    if (size+32 > image->bufsize)
    {
@@ -1142,7 +1142,7 @@ get_pixel(png_uint_32 format))(Pixel *p, png_const_voidp pb)
    }
 }
 
-/* Convertion between pixel formats.  The code above effectively eliminates the
+/* Conversion between pixel formats.  The code above effectively eliminates the
  * component ordering changes leaving three basic changes:
  *
  * 1) Remove an alpha channel by pre-multiplication or compositing on a
@@ -2036,7 +2036,7 @@ typedef struct
    /* Precalculated values: */
    int          in_opaque;   /* Value of input alpha that is opaque */
    int          is_palette;  /* Sample values come from the palette */
-   int          accumulate;  /* Accumlate component errors (don't log) */
+   int          accumulate;  /* Accumulate component errors (don't log) */
    int          output_8bit; /* Output is 8-bit (else 16-bit) */
 
    void (*in_gp)(Pixel*, png_const_voidp);
