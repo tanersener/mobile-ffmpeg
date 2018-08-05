@@ -31,6 +31,11 @@
 #include "jversion.h"           /* for version message */
 #include "jconfigint.h"
 
+#ifndef HAVE_STDLIB_H           /* <stdlib.h> should declare malloc(),free() */
+extern void *malloc(size_t size);
+extern void free(void *ptr);
+#endif
+
 #ifdef USE_CCOMMAND             /* command-line reader for Macintosh */
 #ifdef __MWERKS__
 #include <SIOUX.h>              /* Metrowerks needs this */
@@ -44,7 +49,7 @@
 
 /* Create the add-on message string table. */
 
-#define JMESSAGE(code,string)   string ,
+#define JMESSAGE(code, string)  string,
 
 static const char * const cdjpeg_message_table[] = {
 #include "cderror.h"
@@ -82,7 +87,7 @@ static boolean is_targa;        /* records user -targa switch */
 
 
 LOCAL(cjpeg_source_ptr)
-select_file_type (j_compress_ptr cinfo, FILE *infile)
+select_file_type(j_compress_ptr cinfo, FILE *infile)
 {
   int c;
 
@@ -102,7 +107,7 @@ select_file_type (j_compress_ptr cinfo, FILE *infile)
   switch (c) {
 #ifdef BMP_SUPPORTED
   case 'B':
-    return jinit_read_bmp(cinfo);
+    return jinit_read_bmp(cinfo, TRUE);
 #endif
 #ifdef GIF_SUPPORTED
   case 'G':
@@ -139,12 +144,13 @@ select_file_type (j_compress_ptr cinfo, FILE *infile)
 
 
 static const char *progname;    /* program name for error messages */
+static char *icc_filename;      /* for -icc switch */
 static char *outfilename;       /* for -outfile switch */
 boolean memdst;                 /* for -memdst switch */
 
 
 LOCAL(void)
-usage (void)
+usage(void)
 /* complain about bad command line */
 {
   fprintf(stderr, "usage: %s [switches] ", progname);
@@ -184,6 +190,7 @@ usage (void)
   fprintf(stderr, "  -dct float     Use floating-point DCT method%s\n",
           (JDCT_DEFAULT == JDCT_FLOAT ? " (default)" : ""));
 #endif
+  fprintf(stderr, "  -icc FILE      Embed ICC profile contained in FILE\n");
   fprintf(stderr, "  -restart N     Set restart interval in rows, or in blocks with B\n");
 #ifdef INPUT_SMOOTHING_SUPPORTED
   fprintf(stderr, "  -smooth N      Smooth dithered input (N=1..100 is strength)\n");
@@ -208,8 +215,8 @@ usage (void)
 
 
 LOCAL(int)
-parse_switches (j_compress_ptr cinfo, int argc, char **argv,
-                int last_file_arg_seen, boolean for_real)
+parse_switches(j_compress_ptr cinfo, int argc, char **argv,
+               int last_file_arg_seen, boolean for_real)
 /* Parse optional switches.
  * Returns argv[] index of first file-name argument (== argc if none).
  * Any file names with indexes <= last_file_arg_seen are ignored;
@@ -234,6 +241,7 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
   force_baseline = FALSE;       /* by default, allow 16-bit quantizers */
   simple_progressive = FALSE;
   is_targa = FALSE;
+  icc_filename = NULL;
   outfilename = NULL;
   memdst = FALSE;
   cinfo->err->trace_level = 0;
@@ -284,7 +292,7 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
       /* On first -d, print version identification */
       static boolean printed_version = FALSE;
 
-      if (! printed_version) {
+      if (!printed_version) {
         fprintf(stderr, "%s version %s (build %s)\n",
                 PACKAGE_NAME, VERSION, BUILD);
         fprintf(stderr, "%s\n\n", JCOPYRIGHT);
@@ -299,13 +307,20 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
               PACKAGE_NAME, VERSION, BUILD);
       exit(EXIT_SUCCESS);
 
-    } else if (keymatch(arg, "grayscale", 2) || keymatch(arg, "greyscale",2)) {
+    } else if (keymatch(arg, "grayscale", 2) ||
+               keymatch(arg, "greyscale", 2)) {
       /* Force a monochrome JPEG file to be generated. */
       jpeg_set_colorspace(cinfo, JCS_GRAYSCALE);
 
     } else if (keymatch(arg, "rgb", 3)) {
       /* Force an RGB JPEG file to be generated. */
       jpeg_set_colorspace(cinfo, JCS_RGB);
+
+    } else if (keymatch(arg, "icc", 1)) {
+      /* Set ICC filename. */
+      if (++argn >= argc)       /* advance to next argument */
+        usage();
+      icc_filename = argv[argn];
 
     } else if (keymatch(arg, "maxmemory", 3)) {
       /* Maximum memory in Kb (or Mb with 'm'). */
@@ -392,10 +407,10 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
       if (lval < 0 || lval > 65535L)
         usage();
       if (ch == 'b' || ch == 'B') {
-        cinfo->restart_interval = (unsigned int) lval;
+        cinfo->restart_interval = (unsigned int)lval;
         cinfo->restart_in_rows = 0; /* else prior '-restart n' overrides me */
       } else {
-        cinfo->restart_in_rows = (int) lval;
+        cinfo->restart_in_rows = (int)lval;
         /* restart_interval will be computed during startup */
       }
 
@@ -450,19 +465,19 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
     /* Set quantization tables for selected quality. */
     /* Some or all may be overridden if -qtables is present. */
     if (qualityarg != NULL)     /* process -quality if it was present */
-      if (! set_quality_ratings(cinfo, qualityarg, force_baseline))
+      if (!set_quality_ratings(cinfo, qualityarg, force_baseline))
         usage();
 
     if (qtablefile != NULL)     /* process -qtables if it was present */
-      if (! read_quant_tables(cinfo, qtablefile, force_baseline))
+      if (!read_quant_tables(cinfo, qtablefile, force_baseline))
         usage();
 
     if (qslotsarg != NULL)      /* process -qslots if it was present */
-      if (! set_quant_slots(cinfo, qslotsarg))
+      if (!set_quant_slots(cinfo, qslotsarg))
         usage();
 
     if (samplearg != NULL)      /* process -sample if it was present */
-      if (! set_sample_factors(cinfo, samplearg))
+      if (!set_sample_factors(cinfo, samplearg))
         usage();
 
 #ifdef C_PROGRESSIVE_SUPPORTED
@@ -472,7 +487,7 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
 
 #ifdef C_MULTISCAN_FILES_SUPPORTED
     if (scansarg != NULL)       /* process -scans if it was present */
-      if (! read_scan_script(cinfo, scansarg))
+      if (!read_scan_script(cinfo, scansarg))
         usage();
 #endif
   }
@@ -486,7 +501,7 @@ parse_switches (j_compress_ptr cinfo, int argc, char **argv,
  */
 
 int
-main (int argc, char **argv)
+main(int argc, char **argv)
 {
   struct jpeg_compress_struct cinfo;
   struct jpeg_error_mgr jerr;
@@ -496,6 +511,9 @@ main (int argc, char **argv)
   int file_index;
   cjpeg_source_ptr src_mgr;
   FILE *input_file;
+  FILE *icc_file;
+  JOCTET *icc_profile = NULL;
+  long icc_len = 0;
   FILE *output_file = NULL;
   unsigned char *outbuffer = NULL;
   unsigned long outsize = 0;
@@ -539,14 +557,14 @@ main (int argc, char **argv)
   if (!memdst) {
     /* Must have either -outfile switch or explicit output file name */
     if (outfilename == NULL) {
-      if (file_index != argc-2) {
+      if (file_index != argc - 2) {
         fprintf(stderr, "%s: must name one input and one output file\n",
                 progname);
         usage();
       }
-      outfilename = argv[file_index+1];
+      outfilename = argv[file_index + 1];
     } else {
-      if (file_index != argc-1) {
+      if (file_index != argc - 1) {
         fprintf(stderr, "%s: must name one input and one output file\n",
                 progname);
         usage();
@@ -555,7 +573,7 @@ main (int argc, char **argv)
   }
 #else
   /* Unix style: expect zero or one file name */
-  if (file_index < argc-1) {
+  if (file_index < argc - 1) {
     fprintf(stderr, "%s: only one input file\n", progname);
     usage();
   }
@@ -583,8 +601,35 @@ main (int argc, char **argv)
     output_file = write_stdout();
   }
 
+  if (icc_filename != NULL) {
+    if ((icc_file = fopen(icc_filename, READ_BINARY)) == NULL) {
+      fprintf(stderr, "%s: can't open %s\n", progname, icc_filename);
+      exit(EXIT_FAILURE);
+    }
+    if (fseek(icc_file, 0, SEEK_END) < 0 ||
+        (icc_len = ftell(icc_file)) < 1 ||
+        fseek(icc_file, 0, SEEK_SET) < 0) {
+      fprintf(stderr, "%s: can't determine size of %s\n", progname,
+              icc_filename);
+      exit(EXIT_FAILURE);
+    }
+    if ((icc_profile = (JOCTET *)malloc(icc_len)) == NULL) {
+      fprintf(stderr, "%s: can't allocate memory for ICC profile\n", progname);
+      fclose(icc_file);
+      exit(EXIT_FAILURE);
+    }
+    if (fread(icc_profile, icc_len, 1, icc_file) < 1) {
+      fprintf(stderr, "%s: can't read ICC profile from %s\n", progname,
+              icc_filename);
+      free(icc_profile);
+      fclose(icc_file);
+      exit(EXIT_FAILURE);
+    }
+    fclose(icc_file);
+  }
+
 #ifdef PROGRESS_REPORT
-  start_progress_monitor((j_common_ptr) &cinfo, &progress);
+  start_progress_monitor((j_common_ptr)&cinfo, &progress);
 #endif
 
   /* Figure out the input file format, and set up to read it. */
@@ -611,10 +656,13 @@ main (int argc, char **argv)
   /* Start compressor */
   jpeg_start_compress(&cinfo, TRUE);
 
+  if (icc_profile != NULL)
+    jpeg_write_icc_profile(&cinfo, icc_profile, (unsigned int)icc_len);
+
   /* Process data */
   while (cinfo.next_scanline < cinfo.image_height) {
     num_scanlines = (*src_mgr->get_pixel_rows) (&cinfo, src_mgr);
-    (void) jpeg_write_scanlines(&cinfo, src_mgr->buffer, num_scanlines);
+    (void)jpeg_write_scanlines(&cinfo, src_mgr->buffer, num_scanlines);
   }
 
   /* Finish compression and release memory */
@@ -629,7 +677,7 @@ main (int argc, char **argv)
     fclose(output_file);
 
 #ifdef PROGRESS_REPORT
-  end_progress_monitor((j_common_ptr) &cinfo);
+  end_progress_monitor((j_common_ptr)&cinfo);
 #endif
 
   if (memdst) {
@@ -637,6 +685,9 @@ main (int argc, char **argv)
     if (outbuffer != NULL)
       free(outbuffer);
   }
+
+  if (icc_profile != NULL)
+    free(icc_profile);
 
   /* All done. */
   exit(jerr.num_warnings ? EXIT_WARNING : EXIT_SUCCESS);
