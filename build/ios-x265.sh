@@ -56,7 +56,7 @@ case ${ARCH} in
         ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
     ;;
     *)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
     ;;
 esac
 
@@ -66,6 +66,10 @@ fi
 
 mkdir cmake-build || exit 1
 cd cmake-build || exit 1
+
+# fix x86 and x86_64 assembly
+${SED_INLINE} 's/win64/macho64 -DPREFIX/g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInformation.cmake
+${SED_INLINE} 's/win/macho/g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInformation.cmake
 
 # fix pointer array assignments
 ${SED_INLINE} 's/parseCpuName(value, bError)/parseCpuName(value, bError, 0)/g' ${BASEDIR}/src/x265/source/common/param.cpp
