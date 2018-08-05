@@ -253,7 +253,7 @@ main (int argc, char **argv)
   FriBidiChar *code_points = NULL;
   int code_points_len = 0;
   int expected_ltor_len = 0;
-  int base_dir_mode = 0, paragraph_dir;
+  int paragraph_dir = 0;
   FriBidiLevel *expected_levels = NULL;
   int *expected_ltor = NULL;
   int resolved_paragraph_embedding_level;
@@ -345,9 +345,6 @@ main (int argc, char **argv)
                 bracket_types[i] = NoBracket;
           }
 
-        if ((paragraph_dir & (1<<base_dir_mode)) == 0)
-          continue;
-
         switch (paragraph_dir)
           {
           case 0: base_dir = FRIBIDI_PAR_LTR; break;
@@ -430,16 +427,7 @@ main (int argc, char **argv)
 
             if (debug)
               {
-                FriBidiParType base_dir;
-
                 fribidi_set_debug (1);
-
-                switch (base_dir_mode)
-                  {
-                  case 0: base_dir = FRIBIDI_PAR_ON;  break;
-                  case 1: base_dir = FRIBIDI_PAR_LTR; break;
-                  case 2: base_dir = FRIBIDI_PAR_RTL; break;
-                  }
 
                 if (fribidi_get_par_embedding_levels_ex (types,
                                                          bracket_types,

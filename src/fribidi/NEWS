@@ -1,3 +1,12 @@
+Overview of changes between 1.0.4 and 1.0.5
+=============================================
+
+* This is a bugfix release that fixed a bug BidiCharacterTest.c due to which a large number of character tests were not run. Once run, it uncovered 18 test failures. These have all been fixed in this release.
+
+* The release also includes a small speedup due to small arrays being allocated on the stack instead of in dynamic memory.
+
+* Updated Unicode tables to version 11.
+
 Overview of changes between 1.0.3 and 1.0.4
 =============================================
 

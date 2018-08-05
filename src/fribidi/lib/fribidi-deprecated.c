@@ -177,7 +177,8 @@ out:
   return status ? j : -1;
 }
 
-
+/* Local array size, used for stack-based local arrays */
+#define LOCAL_LIST_SIZE 128
 
 FRIBIDI_ENTRY FriBidiLevel
 fribidi_log2vis (
@@ -198,9 +199,14 @@ fribidi_log2vis (
   fribidi_boolean private_V_to_L = false;
   fribidi_boolean private_embedding_levels = false;
   fribidi_boolean status = false;
+  FriBidiArabicProp local_ar_props[LOCAL_LIST_SIZE];
   FriBidiArabicProp *ar_props = NULL;
+  FriBidiLevel local_embedding_levels[LOCAL_LIST_SIZE];
+  FriBidiCharType local_bidi_types[LOCAL_LIST_SIZE];
   FriBidiCharType *bidi_types = NULL;
+  FriBidiBracketType local_bracket_types[LOCAL_LIST_SIZE];
   FriBidiBracketType *bracket_types = NULL;
+  FriBidiStrIndex local_positions_V_to_L[LOCAL_LIST_SIZE];
 
   if UNLIKELY
     (len == 0)
@@ -214,13 +220,20 @@ fribidi_log2vis (
   fribidi_assert (str);
   fribidi_assert (pbase_dir);
 
-  bidi_types = fribidi_malloc (len * sizeof bidi_types[0]);
+  if (len < LOCAL_LIST_SIZE)
+    bidi_types = local_bidi_types;
+  else
+    bidi_types = fribidi_malloc (len * sizeof bidi_types[0]);
   if (!bidi_types)
     goto out;
 
   fribidi_get_bidi_types (str, len, bidi_types);
 
-  bracket_types = fribidi_malloc (len * sizeof bracket_types[0]);
+  if (len < LOCAL_LIST_SIZE)
+    bracket_types = local_bracket_types;
+  else
+    bracket_types = fribidi_malloc (len * sizeof bracket_types[0]);
+    
   if (!bracket_types)
     goto out;
 
@@ -229,7 +242,10 @@ fribidi_log2vis (
                              bracket_types);
   if (!embedding_levels)
     {
-      embedding_levels = fribidi_malloc (len * sizeof embedding_levels[0]);
+      if (len < LOCAL_LIST_SIZE)
+        embedding_levels = local_embedding_levels;
+      else
+        embedding_levels = fribidi_malloc (len * sizeof embedding_levels[0]);
       if (!embedding_levels)
 	goto out;
       private_embedding_levels = true;
@@ -247,7 +263,10 @@ fribidi_log2vis (
      given by the caller, we have to make a private instance of it. */
   if (positions_L_to_V && !positions_V_to_L)
     {
-      positions_V_to_L =
+      if (len < LOCAL_LIST_SIZE)
+        positions_V_to_L = local_positions_V_to_L;
+      else
+        positions_V_to_L =
 	(FriBidiStrIndex *) fribidi_malloc (sizeof (FriBidiStrIndex) * len);
       if (!positions_V_to_L)
 	goto out;
@@ -271,7 +290,10 @@ fribidi_log2vis (
       memcpy (visual_str, str, len * sizeof (*visual_str));
 
       /* Arabic joining */
-      ar_props = fribidi_malloc (len * sizeof ar_props[0]);
+      if (len < LOCAL_LIST_SIZE)
+        ar_props = local_ar_props;
+      else
+        ar_props = fribidi_malloc (len * sizeof ar_props[0]);
       fribidi_get_joining_types (str, len, ar_props);
       fribidi_join_arabic (bidi_types, len, embedding_levels, ar_props);
 
@@ -298,19 +320,19 @@ fribidi_log2vis (
 
 out:
 
-  if (private_V_to_L)
+  if (private_V_to_L && positions_V_to_L != local_positions_V_to_L)
     fribidi_free (positions_V_to_L);
 
-  if (private_embedding_levels)
+  if (private_embedding_levels && embedding_levels != local_embedding_levels)
     fribidi_free (embedding_levels);
 
-  if (ar_props)
+  if (ar_props && ar_props != local_ar_props)
     fribidi_free (ar_props);
 
-  if (bidi_types)
+  if (bidi_types && bidi_types != local_bidi_types)
     fribidi_free (bidi_types);
 
-  if (bracket_types)
+  if (bracket_types && bracket_types != local_bracket_types)
     fribidi_free (bracket_types);
 
   return status ? max_level + 1 : 0;
