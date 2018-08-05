@@ -44,13 +44,10 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 ASM_OPTIONS=""
 case ${ARCH} in
-    armv7 | armv7s)
+    arm-v7a | arm-v7a-neon | arm64-v8a)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
     ;;
-    arm64)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
-    ;;
-    i386)
+    x86)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
     ;;
     x86-64)
@@ -79,10 +76,7 @@ ${SED} '/calcresidual/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/as
 ${SED} '/scale1D_128to64_neon/s/ p.scale/ *p.scale/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
 
 # fixing constant shift
-sed -i .tmp 's/lsr 16/lsr #16/g' ${BASEDIR}/src/x265/source/common/arm/blockcopy8.S
-
-rm -f ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
-cp ${BASEDIR}/tools/cmake/CMakeLists.x265.ios.txt ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
+${SED} 's/lsr 16/lsr #16/g' ${BASEDIR}/src/x265/source/common/arm/blockcopy8.S
 
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
@@ -108,7 +102,7 @@ cmake -Wno-dev \
 
 make -j$(get_cpu_count) || exit 1
 
-# MANUALLY COPY PKG-CONFIG FILES
-cp x265.pc ${INSTALL_PKG_CONFIG_DIR}
+# CREATE PACKAGE CONFIG MANUALLY
+create_x265_package_config "2.8"
 
 make install || exit 1

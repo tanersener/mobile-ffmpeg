@@ -220,7 +220,7 @@ do
             x265)
                 CFLAGS+=" $(pkg-config --cflags x265)"
                 LDFLAGS+=" $(pkg-config --libs --static x265)"
-                CONFIGURE_POSTFIX+=" --enable-x265 --enable-gpl"
+                CONFIGURE_POSTFIX+=" --enable-libx265 --enable-gpl"
             ;;
             xvidcore)
                 CFLAGS+=" $(pkg-config --cflags xvidcore)"
