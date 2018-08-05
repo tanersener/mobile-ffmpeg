@@ -43,15 +43,20 @@ fi
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 ASM_OPTIONS=""
+X265_SYSTEM_PROCESSOR="${ARCH}"
 case ${ARCH} in
-    arm-v7a | arm-v7a-neon | arm64-v8a)
+    arm-v7a | arm-v7a-neon)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
+    ;;
+    arm64-v8a)
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
     ;;
     x86)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
     ;;
     x86-64)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
+        X265_SYSTEM_PROCESSOR="x86_64"
     ;;
 esac
 
@@ -61,6 +66,10 @@ fi
 
 mkdir cmake-build || exit 1
 cd cmake-build || exit 1
+
+# fix x86 and x86_64 assembly
+${SED_INLINE} 's/\-DPREFIX//g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInformation.cmake
+${SED_INLINE} 's/win/elf/g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInformation.cmake
 
 # fix pointer array assignments
 ${SED_INLINE} 's/parseCpuName(value, bError)/parseCpuName(value, bError, 0)/g' ${BASEDIR}/src/x265/source/common/param.cpp
@@ -77,6 +86,10 @@ ${SED_INLINE} '/scale1D_128to64_neon/s/ p.scale/ *p.scale/g' ${BASEDIR}/src/x265
 
 # fixing constant shift
 ${SED_INLINE} 's/lsr 16/lsr #16/g' ${BASEDIR}/src/x265/source/common/arm/blockcopy8.S
+
+# using customized build file
+rm -f ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
+cp ${BASEDIR}/tools/cmake/CMakeLists.x265.android.txt ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
 
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
@@ -97,7 +110,7 @@ cmake -Wno-dev \
     -DENABLE_PIC=1 \
     -DENABLE_CLI=0 \
     ${ASM_OPTIONS} \
-    -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
+    -DCMAKE_SYSTEM_PROCESSOR="${X265_SYSTEM_PROCESSOR}" \
     -DENABLE_SHARED=0 ../source || exit 1
 
 make -j$(get_cpu_count) || exit 1

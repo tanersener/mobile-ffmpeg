@@ -103,6 +103,7 @@ ${SED_INLINE} 's/\.text/.equ g_lumaFilter, .-g_lumaFilter_bytes\
 \
 .text/g' ${BASEDIR}/src/x265/source/common/arm/ipfilter8.S
 
+# using customized build file
 rm -f ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
 cp ${BASEDIR}/tools/cmake/CMakeLists.x265.ios.txt ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
 
