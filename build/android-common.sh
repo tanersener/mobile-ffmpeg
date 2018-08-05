@@ -8,6 +8,14 @@ get_cpu_count() {
     fi
 }
 
+prepare_inline_sed() {
+    if [ "$(uname)" == "Darwin" ]; then
+        export SED="sed -i .tmp"
+    else
+        export SED="sed -i"
+    fi
+}
+
 get_library_name() {
     case $1 in
         0) echo "fontconfig" ;;
@@ -261,6 +269,9 @@ get_cxxflags() {
         ;;
         opencore-amr)
             echo ""
+        ;;
+        x265)
+            echo "-std=c++11 -fno-exceptions"
         ;;
         *)
             echo "-std=c++11 -fno-exceptions -fno-rtti"
@@ -646,6 +657,26 @@ Libs: -L\${libdir} -luuid
 EOF
 }
 
+create_x265_package_config() {
+    local X265_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/x265.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/x265
+exec_prefix=\${prefix}
+libdir=\${prefix}/lib
+includedir=\${prefix}/include
+
+Name: x265
+Description: H.265/HEVC video encoder
+Version: ${X265_VERSION}
+
+Requires:
+Libs: -L\${libdir} -lx265 -lstdc++ -lc++
+Libs.private: -lstdc++ -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl
+Cflags: -I\${includedir}
+EOF
+}
+
 create_xvidcore_package_config() {
     local XVIDCORE_VERSION="$1"
 
@@ -863,6 +894,8 @@ set_toolchain_clang_paths() {
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
         create_zlib_package_config
     fi
+
+    prepare_inline_sed
 }
 
 set_toolchain_gcc_paths() {
@@ -872,7 +905,7 @@ set_toolchain_gcc_paths() {
 
     export AR=${TARGET_HOST}-ar
     export CC=${TARGET_HOST}-gcc
-    export CXX=${TARGET_HOST}-gcc++
+    export CXX=${TARGET_HOST}-g++
 
     if [ "$1" == "x264" ]; then
         export AS=${CC}
@@ -894,6 +927,8 @@ set_toolchain_gcc_paths() {
     if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
         create_zlib_package_config
     fi
+
+    prepare_inline_sed
 }
 
 create_toolchain() {

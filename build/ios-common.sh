@@ -8,6 +8,14 @@ get_cpu_count() {
     fi
 }
 
+prepare_inline_sed() {
+    if [ "$(uname)" == "Darwin" ]; then
+        export SED="sed -i .tmp"
+    else
+        export SED="sed -i"
+    fi
+}
+
 get_library_name() {
     case $1 in
         0) echo "fontconfig" ;;
@@ -791,9 +799,9 @@ set_toolchain_clang_paths() {
         (chmod +x ${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl 1>>${BASEDIR}/build.log 2>&1) || exit 1
     fi
 
-    local GAS_PREPROCESSOR="${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl"
+    LOCAL_GAS_PREPROCESSOR="${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl"
     if [ "$1" == "x264" ]; then
-        GAS_PREPROCESSOR="${BASEDIR}/src/x264/tools/gas-preprocessor.pl"
+        LOCAL_GAS_PREPROCESSOR="${BASEDIR}/src/x264/tools/gas-preprocessor.pl"
     fi
 
     TARGET_HOST=$(get_target_host)
@@ -803,28 +811,28 @@ set_toolchain_clang_paths() {
     export OBJC="$(xcrun --sdk $(get_sdk_name) -f clang)"
     export CXX="$(xcrun --sdk $(get_sdk_name) -f clang++)"
 
-    local ASMFLAGS="$(get_asmflags $1)"
+    LOCAL_ASMFLAGS="$(get_asmflags $1)"
     case ${ARCH} in
         armv7 | armv7s)
             if [ "$1" == "x265" ]; then
-                export AS="${GAS_PREPROCESSOR}"
+                export AS="${LOCAL_GAS_PREPROCESSOR}"
                 export AS_ARGUMENTS="-arch arm"
-                export ASM_FLAGS="${ASMFLAGS}"
+                export ASM_FLAGS="${LOCAL_ASMFLAGS}"
             else
-                export AS="${GAS_PREPROCESSOR} -arch arm -- ${CC} ${ASMFLAGS}"
+                export AS="${LOCAL_GAS_PREPROCESSOR} -arch arm -- ${CC} ${LOCAL_ASMFLAGS}"
             fi
         ;;
         arm64)
             if [ "$1" == "x265" ]; then
-                export AS="${GAS_PREPROCESSOR}"
+                export AS="${LOCAL_GAS_PREPROCESSOR}"
                 export AS_ARGUMENTS="-arch aarch64"
-                export ASM_FLAGS="${ASMFLAGS}"
+                export ASM_FLAGS="${LOCAL_ASMFLAGS}"
             else
-                export AS="${GAS_PREPROCESSOR} -arch aarch64 -- ${CC} ${ASMFLAGS}"
+                export AS="${LOCAL_GAS_PREPROCESSOR} -arch aarch64 -- ${CC} ${LOCAL_ASMFLAGS}"
             fi
         ;;
         *)
-            export AS="${CC} ${ASMFLAGS}"
+            export AS="${CC} ${LOCAL_ASMFLAGS}"
         ;;
     esac
 
@@ -847,6 +855,8 @@ set_toolchain_clang_paths() {
     if [ ! -f ${BZIP2_PACKAGE_CONFIG_PATH} ]; then
         create_bzip2_package_config
     fi
+
+    prepare_inline_sed
 }
 
 autoreconf_library() {

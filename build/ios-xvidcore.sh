@@ -54,11 +54,11 @@ case ${ARCH} in
 
         # REMOVING -flat_namespace OPTION FROM CONFIGURE TO FIX THE FOLLOWING ERROR
         # ld: -flat_namespace and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
-        sed -i .tmp 's/ -flat_namespace//g' configure
+        ${SED} 's/ -flat_namespace//g' configure
 
         # REMOVING -Wl,-read_only_relocs,suppress OPTION FROM CONFIGURE TO FIX THE FOLLOWING ERROR
         # ld: -read_only_relocs and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
-        sed -i .tmp 's/-Wl,-read_only_relocs,suppress//g' configure
+        ${SED} 's/-Wl,-read_only_relocs,suppress//g' configure
 
     ;;
     i386)
