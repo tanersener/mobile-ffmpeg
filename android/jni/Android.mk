@@ -28,7 +28,7 @@ LOCAL_MODULE := ffmpeglog
 LOCAL_SRC_FILES := $(MY_PATH)/log.c
 LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
 LOCAL_LDLIBS := -llog -lz -landroid
-LOCAL_SHARED_LIBRARIES := libavutil
+LOCAL_SHARED_LIBRARIES := libavutil libcpp_shared
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
@@ -58,4 +58,5 @@ ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
     endif
 endif
 
+$(call import-module, cpp)
 $(call import-module, ffmpeg)

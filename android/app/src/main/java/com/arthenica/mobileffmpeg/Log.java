@@ -19,14 +19,12 @@
 
 package com.arthenica.mobileffmpeg;
 
-import android.arch.core.util.Function;
-
 /**
  * <p>This class is used to process FFmpeg logs.
  *
- * <p>By default it redirects FFmpeg output to Logcat. Alternatively, it is possible not to print messages to Logcat
- * and pass them to a callback function. This function can decide whether to print these logs, show them inside
- * another container or ignore them.
+ * <p>By default it redirects FFmpeg output to Logcat. Alternatively, it is possible not to print
+ * messages to Logcat and pass them to a {@link LogCallback} function. This function can decide
+ * whether to print these logs, show them inside another container or ignore them.
  *
  * @author Taner Sener
  * @since v1.0
@@ -56,7 +54,7 @@ public class Log {
         }
     }
 
-    private static Function<Message, Void> callbackFunction;
+    private static LogCallback callbackFunction;
 
     private static Level activeLogLevel;
 
@@ -113,12 +111,12 @@ public class Log {
     }
 
     /**
-     * <p>Sets a callback function to receive FFmpeg logs.
+     * <p>Sets a callback function to redirect FFmpeg logs.
      *
-     * @param newCallbackFunction callback to receive logs
+     * @param newLogCallback new log callback function
      */
-    public static void enableCallbackFunction(final Function<Message, Void> newCallbackFunction) {
-        callbackFunction = newCallbackFunction;
+    public static void enableLogCallback(final LogCallback newLogCallback) {
+        callbackFunction = newLogCallback;
     }
 
     /**
@@ -142,28 +140,35 @@ public class Log {
             switch (level) {
                 case AV_LOG_QUIET: {
                     // PRINT NO OUTPUT
-                } break;
+                }
+                break;
                 case AV_LOG_TRACE:
                 case AV_LOG_DEBUG: {
                     android.util.Log.d(TAG, text);
-                } break;
+                }
+                break;
                 case AV_LOG_VERBOSE: {
                     android.util.Log.v(TAG, text);
-                } break;
+                }
+                break;
                 case AV_LOG_INFO: {
                     android.util.Log.i(TAG, text);
-                } break;
+                }
+                break;
                 case AV_LOG_WARNING: {
                     android.util.Log.w(TAG, text);
-                } break;
+                }
+                break;
                 case AV_LOG_ERROR:
                 case AV_LOG_FATAL:
                 case AV_LOG_PANIC: {
                     android.util.Log.e(TAG, text);
-                } break;
+                }
+                break;
                 default: {
                     android.util.Log.v(TAG, text);
-                } break;
+                }
+                break;
             }
         }
     }

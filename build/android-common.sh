@@ -280,15 +280,17 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
+    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib"
+
     case $1 in
         ffmpeg)
-            echo "-lc -lm -ldl -llog -lc++_shared -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib"
+            echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
         ;;
         libvpx)
-            echo "-lc -lm -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib"
+            echo "-lc -lm ${COMMON_LIBRARY_PATHS}"
         ;;
         *)
-            echo "-lc -lm -ldl -llog -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib"
+            echo "-lc -lm -ldl -llog ${COMMON_LIBRARY_PATHS}"
         ;;
     esac
 }
@@ -345,7 +347,7 @@ Name: chromaprint
 Description: Audio fingerprint library
 URL: http://acoustid.org/chromaprint
 Version: ${CHROMAPRINT_VERSION}
-Libs: -L\${libdir} -lchromaprint -lc++_shared
+Libs: -L\${libdir} -lchromaprint
 Cflags: -I\${includedir}
 EOF
 }
@@ -615,7 +617,7 @@ Description: a fast compressor/decompressor
 Version: ${SNAPPY_VERSION}
 
 Requires:
-Libs: -L\${libdir} -lz -lstdc++
+Libs: -L\${libdir} -lz
 Cflags: -I\${includedir}
 EOF
 }
@@ -671,8 +673,8 @@ Description: H.265/HEVC video encoder
 Version: ${X265_VERSION}
 
 Requires:
-Libs: -L\${libdir} -lx265 -lstdc++ -lc++_shared
-Libs.private: -lstdc++ -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl
+Libs: -L\${libdir} -lx265
+Libs.private: -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl
 Cflags: -I\${includedir}
 EOF
 }

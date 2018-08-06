@@ -22,7 +22,7 @@ package com.arthenica.mobileffmpeg.test;
 import java.io.File;
 
 /**
- * <p>Generates FFmpeg command arguments to create a 640x427 video from provided images
+ * <p>Generates FFmpeg command arguments to create a 640x427 video from provided images.
  *
  * @author Taner Sener
  */

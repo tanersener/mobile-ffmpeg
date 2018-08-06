@@ -29,7 +29,8 @@ struct LogData {
 
 /** Log redirection variables */
 pthread_mutex_t lockMutex;
-pthread_cond_t lockCondition;
+pthread_mutex_t monitorMutex;
+pthread_cond_t monitorCondition;
 
 pthread_t logThread;
 int logRedirectionEnabled;
@@ -62,20 +63,33 @@ void mutexInit() {
     pthread_mutexattr_init(&attributes);
     pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE_NP);
 
+    pthread_mutex_init(&lockMutex, &attributes);
+    pthread_mutexattr_destroy(&attributes);
+}
+
+void monitorInit() {
+    pthread_mutexattr_t attributes;
+    pthread_mutexattr_init(&attributes);
+    pthread_mutexattr_settype(&attributes, PTHREAD_MUTEX_RECURSIVE_NP);
+
     pthread_condattr_t cattributes;
     pthread_condattr_init(&cattributes);
     pthread_condattr_setpshared(&cattributes, PTHREAD_PROCESS_PRIVATE);
 
-    pthread_mutex_init(&lockMutex, &attributes);
+    pthread_mutex_init(&monitorMutex, &attributes);
     pthread_mutexattr_destroy(&attributes);
 
-    pthread_cond_init(&lockCondition, &cattributes);
+    pthread_cond_init(&monitorCondition, &cattributes);
     pthread_condattr_destroy(&cattributes);
 }
 
 void mutexUnInit() {
     pthread_mutex_destroy(&lockMutex);
-    pthread_cond_destroy(&lockCondition);
+}
+
+void monitorUnInit() {
+    pthread_mutex_destroy(&monitorMutex);
+    pthread_cond_destroy(&monitorCondition);
 }
 
 void mutexLock() {
@@ -86,7 +100,7 @@ void mutexUnlock() {
     pthread_mutex_unlock(&lockMutex);
 }
 
-void mutexLockWait(int milliSeconds) {
+void monitorWait(int milliSeconds) {
     struct timeval tp;
     struct timespec ts;
     int rc;
@@ -101,15 +115,15 @@ void mutexLockWait(int milliSeconds) {
     ts.tv_sec += milliSeconds / 1000;
     ts.tv_nsec += (milliSeconds % 1000)*1000000;
 
-    pthread_mutex_lock(&lockMutex);
-    pthread_cond_timedwait(&lockCondition, &lockMutex, &ts);
-    pthread_mutex_unlock(&lockMutex);
+    pthread_mutex_lock(&monitorMutex);
+    pthread_cond_timedwait(&monitorCondition, &monitorMutex, &ts);
+    pthread_mutex_unlock(&monitorMutex);
 }
 
-void mutexLockNotify() {
-    pthread_mutex_lock(&lockMutex);
-    pthread_cond_signal(&lockCondition);
-    pthread_mutex_unlock(&lockMutex);
+void monitorNotify() {
+    pthread_mutex_lock(&monitorMutex);
+    pthread_cond_signal(&monitorCondition);
+    pthread_mutex_unlock(&monitorMutex);
 }
 
 /**
@@ -120,8 +134,9 @@ void logDataAdd(const int level, const char *data) {
     // CREATE DATA STRUCT FIRST
     struct LogData *newData = (struct LogData*)malloc(sizeof(struct LogData));
     newData->level = level;
-    newData->data = (char*)malloc(strlen(data));
-    strcpy(newData->data, data);
+    size_t dataSize = strlen(data) + 1;
+    newData->data = (char*)malloc(dataSize);
+    memcpy(newData->data, data, dataSize);
     newData->next = NULL;
 
     mutexLock();
@@ -144,7 +159,7 @@ void logDataAdd(const int level, const char *data) {
 
     mutexUnlock();
 
-    mutexLockNotify();
+    monitorNotify();
 }
 
 /**
@@ -221,6 +236,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     logDataTail = NULL;
 
     mutexInit();
+    monitorInit();
 
     return JNI_VERSION_1_6;
 }
@@ -278,7 +294,7 @@ void *logThreadFunction() {
             free(logData->data);
             free(logData);
         } else {
-            mutexLockWait(100);
+            monitorWait(100);
         }
     }
 
@@ -356,5 +372,5 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Log_disableNativeRedirect
 
     av_log_set_callback(av_log_default_callback);
 
-    mutexLockNotify();
+    monitorNotify();
 }

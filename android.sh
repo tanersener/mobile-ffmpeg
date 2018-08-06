@@ -529,15 +529,28 @@ do
     fi
 done
 
+# CLEANING PREVIOUSLY COPIED c++_shared.so FILES
+rm -rf ${BASEDIR}/prebuilt/android-cpp-shared 1>>${BASEDIR}/build.log 2>&1
+
 for run_arch in {0..4}
 do
     if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
         export ARCH=$(get_arch_name $run_arch)
         export TOOLCHAIN=$(get_toolchain)
         export TOOLCHAIN_ARCH=$(get_toolchain_arch)
-        export ANDROID_ARCH=$(get_android_arch $run_arch)
 
         create_toolchain || exit 1
+
+        # COPY libc++_shared.so FROM EACH TOOLCHAIN
+        mkdir -p ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH}
+
+        if [[ $run_arch -eq 0 ]] || [[ $run_arch -eq 1 ]]; then
+            cp ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/$(get_target_host)/lib/armv7-a/libc++_shared.so ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH} 1>>${BASEDIR}/build.log 2>&1
+        elif [[ $run_arch -eq 4 ]]; then
+            cp ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/$(get_target_host)/lib64/libc++_shared.so ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH} 1>>${BASEDIR}/build.log 2>&1
+        else
+            cp ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/$(get_target_host)/lib/libc++_shared.so ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH} 1>>${BASEDIR}/build.log 2>&1
+        fi
 
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 

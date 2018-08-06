@@ -82,9 +82,9 @@ fi
     --without-idn \
     --without-libidn2 \
     --without-p11-kit \
-    --enable-openssl-compatibility \
     ${HARDWARE_ACCELERATION} \
     --enable-static \
+    --disable-openssl-compatibility \
     --disable-shared \
     --disable-fast-install \
     --disable-code-coverage \

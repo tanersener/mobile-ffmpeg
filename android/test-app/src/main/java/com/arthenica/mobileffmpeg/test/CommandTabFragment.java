@@ -19,7 +19,6 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.arch.core.util.Function;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -37,6 +36,8 @@ import android.widget.Toast;
 
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.Log;
+import com.arthenica.mobileffmpeg.LogCallback;
+import com.arthenica.mobileffmpeg.RunCallback;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -52,27 +53,24 @@ public class CommandTabFragment extends Fragment {
         logQueue = new ConcurrentLinkedQueue<>();
     }
 
-    public void enableCallbackFunction() {
-        Log.enableCallbackFunction(new Function<Log.Message, Void>() {
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            android.util.Log.i(MainActivity.TAG, "COMMAND TAB VIEWED");
+        }
+    }
+
+    public void enableLogCallback() {
+        Log.enableLogCallback(new LogCallback() {
 
             @Override
-            public Void apply(Log.Message message) {
+            public void apply(Log.Message message) {
                 logQueue.add(message.getText());
-                return null;
             }
         });
-    }
-
-    public void disableCallbackFunction() {
-        Log.enableCallbackFunction(null);
-    }
-
-    public void enableLogRedirection() {
-        Log.enableRedirection();
-    }
-
-    public void disableLogRedirection() {
-        Log.disableRedirection();
     }
 
     public static CommandTabFragment newInstance(final Context context) {
@@ -125,7 +123,7 @@ public class CommandTabFragment extends Fragment {
     }
 
     public void runFFmpeg() {
-        enableCallbackFunction();
+        enableLogCallback();
 
         String command = commandText.getText().toString();
         String[] split = command.split(" ");
@@ -138,19 +136,16 @@ public class CommandTabFragment extends Fragment {
     }
 
     public void runFFmpegAsync() {
-        disableCallbackFunction();
-
         String command = commandText.getText().toString();
         String[] arguments = command.split(" ");
 
         clearLog();
 
-        MainActivity.executeAsync(new Function<Integer, Void>() {
+        MainActivity.executeAsync(new RunCallback() {
 
             @Override
-            public Void apply(Integer returnCode) {
+            public void apply(int returnCode) {
                 android.util.Log.i(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
-                return null;
             }
         }, arguments);
     }

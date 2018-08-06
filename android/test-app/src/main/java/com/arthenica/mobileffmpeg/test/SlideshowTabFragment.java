@@ -19,8 +19,6 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.app.ProgressDialog;
-import android.arch.core.util.Function;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,7 +26,6 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -40,6 +37,9 @@ import android.widget.EditText;
 import android.widget.MediaController;
 import android.widget.Toast;
 import android.widget.VideoView;
+
+import com.arthenica.mobileffmpeg.LogCallback;
+import com.arthenica.mobileffmpeg.RunCallback;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,16 +53,34 @@ public class SlideshowTabFragment extends Fragment {
 
     private Context context;
     private View playButton;
-    private String asyncResult;
     private EditText videoCodecText;
 
     public SlideshowTabFragment() {
+    }
+
+    public void enableLogCallback() {
+        com.arthenica.mobileffmpeg.Log.enableLogCallback(new LogCallback() {
+            @Override
+            public void apply(com.arthenica.mobileffmpeg.Log.Message message) {
+                android.util.Log.i(MainActivity.TAG, message.getText());
+            }
+        });
     }
 
     public static SlideshowTabFragment newInstance(final Context context) {
         final SlideshowTabFragment fragment = new SlideshowTabFragment();
         fragment.setContext(context);
         return fragment;
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            android.util.Log.i(MainActivity.TAG, "VIDEO TAB VIEWED");
+        }
     }
 
     public void setContext(Context context) {
@@ -157,11 +175,11 @@ public class SlideshowTabFragment extends Fragment {
     }
 
     public void createSlideshow() {
+        enableLogCallback();
+
         final String image1 = "colosseum.jpg";
         final String image2 = "pyramid.jpg";
         final String image3 = "tajmahal.jpg";
-
-        final ProgressDialog progressDialog = ProgressDialog.show(context, "", "Creating video slideshow");
 
         try {
             String videoCodec = videoCodecText.getText().toString();
@@ -179,44 +197,18 @@ public class SlideshowTabFragment extends Fragment {
                 file.delete();
             }
 
-            asyncResult = null;
-
-            final Handler handler = new Handler();
-            final Runnable runnable = new Runnable() {
-
-                @Override
-                public void run() {
-                    if (asyncResult != null) {
-                        String message = (asyncResult.equals("0")) ? "Slideshow created" : "Create failed with rc=" + asyncResult;
-
-                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
-
-                        handler.removeCallbacks(this);
-
-                        if (asyncResult.equals("0")) {
-                            playButton.setEnabled(true);
-                        }
-
-                    } else {
-                        handler.postDelayed(this, 1000);
-                    }
-                }
-            };
-            handler.postDelayed(runnable, 1000);
-
             String script = Slideshow.generateScript(context.getFilesDir(), image1, image2, image3, file.getName(), videoCodec, getCustomOptions());
             Log.d(TAG, "Creating slideshow: " + script);
-            MainActivity.executeAsync(new Function<Integer, Void>() {
-
+            MainActivity.executeAsync(new RunCallback() {
                 @Override
-                public Void apply(Integer returnCode) {
-                    progressDialog.cancel();
-                    Log.i(TAG, "Create completed");
-                    asyncResult = String.valueOf(returnCode);
-                    return null;
+                public void apply(int returnCode) {
+                    Log.d(TAG, "Create slideshow operation completed with: " + returnCode);
+                    if (returnCode == 0) {
+                        playButton.setEnabled(true);
+                    }
+
                 }
             }, script.split(" "));
-
 
         } catch (IOException e) {
             Log.e(TAG, "Creating slideshow failed", e);

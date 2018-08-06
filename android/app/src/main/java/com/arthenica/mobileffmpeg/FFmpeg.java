@@ -88,6 +88,6 @@ public class FFmpeg {
      * @param arguments FFmpeg command options/arguments
      * @return zero on successful execution, non-zero on error
      */
-    public native static int execute(final String ... arguments);
+    public native static int execute(final String... arguments);
 
 }
