@@ -22,13 +22,13 @@ package com.arthenica.mobileffmpeg.test;
 import java.io.File;
 
 /**
- * <p>Generates FFmpeg command arguments to create a 640x427 video from provided images.
+ * <p>Generates an FFmpeg command to create a 640x427 video from provided images.
  *
  * @author Taner Sener
  */
-public class Slideshow {
+public class Video {
 
-    public static String generateScript(final File fileDirectory, final String image1, final String image2, final String image3, final String videoFile, final String videoCodec, final String customOptions) {
+    public static String generateCreateScript(final File fileDirectory, final String image1, final String image2, final String image3, final String videoFile, final String videoCodec, final String customOptions) {
         return
             "-loop 1 -i " + fileDirectory + "/" + image1 + " " +
             "-loop 1 -i " + fileDirectory + "/" + image2 + " " +

@@ -13,7 +13,8 @@
         android:supportsRtl="true"
         android:largeHeap="true"
         android:theme="@style/AppTheme">
-        <activity android:name="com.arthenica.mobileffmpeg.test.MainActivity">
+        <activity android:name="com.arthenica.mobileffmpeg.test.MainActivity"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -4,45 +4,65 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     tools:context=".CommandTabFragment">
 
     <EditText
         android:id="@+id/commandText"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="30dp"
-        android:hint="@string/command_text_hint"
-        android:inputType="text" />
+        android:layout_marginTop="20dp"
+        android:hint="@string/command_text_input_placeholder"
+        android:inputType="text"
+        android:singleLine="true" />
 
     <Button
         android:id="@+id/runButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
-        android:layout_marginEnd="130dp"
-        android:layout_marginStart="130dp"
-        android:text="@string/run_button_text" />
+        android:layout_width="80dp"
+        android:layout_height="36dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/rounded_button"
+        android:fontFamily="sans-serif"
+        android:gravity="center"
+        android:text="@string/command_run_button_text"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <Button
         android:id="@+id/runAsyncButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="100dp"
-        android:layout_marginStart="100dp"
-        android:text="@string/run_async_button_text" />
+        android:layout_width="140dp"
+        android:layout_height="36dp"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/rounded_button"
+        android:fontFamily="sans-serif"
+        android:text="@string/command_run_async_button_text"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/logText"
+        android:id="@+id/outputText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="30dp"
+        android:padding="6dp"
+        android:layout_marginBottom="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/rounded_output_area"
+        android:fontFamily="sans-serif"
+        android:gravity="bottom"
         android:overScrollMode="ifContentScrolls"
         android:scrollbars="vertical"
-        android:gravity="bottom"/>
+        android:textColor="@android:color/black"
+        android:textSize="14sp"
+        android:typeface="sans" />
 </LinearLayout>

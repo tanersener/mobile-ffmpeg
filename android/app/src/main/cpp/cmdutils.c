@@ -25,9 +25,11 @@
  * - Parentheses placed around assignments in condition to prevent -Wparentheses warning
  * - exit_program updated with longjmp, disabling exit
  * - longjmp_value added to store exit code
- * - argc validation added for optional arguments inside split_commandline
+ * - (optindex < argc) validation added before accessing argv[optindex] inside split_commandline()
+ * and parse_options()
  * - all av_log_set_callback invocations updated to set logCallbackFunction from log.c. unused
  * log_callback_help and log_callback_help methods removed.
+ * - (idx + 1 < argc) expression added in parse_loglevel().
  */
 
 #include <string.h>
@@ -395,9 +397,11 @@ void parse_options(void *optctx, int argc, char **argv, const OptionDef *options
             }
             opt++;
 
-            if ((ret = parse_option(optctx, opt, argv[optindex], options)) < 0)
-                exit_program(1);
-            optindex += ret;
+            if (optindex < argc) {
+                if ((ret = parse_option(optctx, opt, argv[optindex], options)) < 0)
+                    exit_program(1);
+                optindex += ret;
+            }
         } else {
             if (parse_arg_function)
                 parse_arg_function(optctx, opt);
@@ -506,7 +510,7 @@ void parse_loglevel(int argc, char **argv, const OptionDef *options)
 
     if (!idx)
         idx = locate_option(argc, argv, options, "v");
-    if (idx && argv[idx + 1])
+    if (idx && (idx + 1 < argc) && argv[idx + 1])
         opt_loglevel(NULL, "loglevel", argv[idx + 1]);
     idx = locate_option(argc, argv, options, "report");
     if ((env = getenv("FFREPORT")) || idx) {
@@ -778,8 +782,9 @@ int split_commandline(OptionParseContext *octx, int argc, char *argv[],
 
 #define GET_ARG(arg)                                                           \
 do {                                                                           \
-    arg = argv[optindex++];                                                    \
-    if (!arg) {                                                                \
+    if (optindex < argc) {                                                     \
+        arg = argv[optindex++];                                                \
+    } else {                                                                   \
         av_log(NULL, AV_LOG_ERROR, "Missing argument for option '%s'.\n", opt);\
         return AVERROR(EINVAL);                                                \
     }                                                                          \
@@ -817,7 +822,7 @@ do {                                                                           \
         }
 
         /* AVOptions */
-        if (argv[optindex]) {
+        if ((optindex < argc) && argv[optindex]) {
             ret = opt_default(NULL, opt, argv[optindex]);
             if (ret >= 0) {
                 av_log(NULL, AV_LOG_DEBUG, " matched as AVOption '%s' with "

@@ -21,32 +21,39 @@ package com.arthenica.mobileffmpeg.test;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.Log;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.RunCallback;
 
-import java.util.concurrent.Callable;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class CommandTabFragment extends Fragment {
+public class SubtitleTabFragment extends Fragment {
 
     private Context context;
     private EditText commandText;
-    private TextView outputText;
+    private TextView logText;
+    private final Queue<String> logQueue;
+
+    public SubtitleTabFragment() {
+        logQueue = new ConcurrentLinkedQueue<>();
+    }
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_command_tab, container, false);
+        return inflater.inflate(R.layout.fragment_subtitle_tab, container, false);
     }
 
     @Override
@@ -54,12 +61,12 @@ public class CommandTabFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getView() != null) {
-            commandText = getView().findViewById(R.id.commandText);
-            MainActivity.registerTooltipOnTouch(context, commandText, Tooltip.COMMAND_TEST_TOOLTIP_TEXT);
+            /* commandText = getView().findViewById(R.id.commandText);
 
-            // SET OUTPUT TEXT COLOR
-            outputText = getView().findViewById(R.id.outputText);
-            outputText.setMovementMethod(new ScrollingMovementMethod());
+            // CHANGE LOG TEXT COLOR
+            logText = getView().findViewById(R.id.logText);
+            logText.setBackgroundColor(Color.LTGRAY);
+            logText.setMovementMethod(new ScrollingMovementMethod());
 
             View runButton = getView().findViewById(R.id.runButton);
             runButton.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +84,9 @@ public class CommandTabFragment extends Fragment {
                 public void onClick(View v) {
                     runFFmpegAsync();
                 }
-            });
+            });*/
+
+            waitForLogs();
         }
     }
 
@@ -85,7 +94,7 @@ public class CommandTabFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            setActive();
+            android.util.Log.i(MainActivity.TAG, "COMMAND TAB VIEWED");
         }
     }
 
@@ -93,8 +102,8 @@ public class CommandTabFragment extends Fragment {
         this.context = context;
     }
 
-    public static CommandTabFragment newInstance(final Context context) {
-        final CommandTabFragment fragment = new CommandTabFragment();
+    public static SubtitleTabFragment newInstance(final Context context) {
+        final SubtitleTabFragment fragment = new SubtitleTabFragment();
         fragment.setContext(context);
         return fragment;
     }
@@ -103,36 +112,24 @@ public class CommandTabFragment extends Fragment {
         Log.enableLogCallback(new LogCallback() {
 
             @Override
-            public void apply(final Log.Message message) {
-                MainActivity.addUIAction(new Callable() {
-
-                    @Override
-                    public Object call() {
-                        appendLog(message.getText());
-                        return null;
-                    }
-                });
+            public void apply(Log.Message message) {
+                logQueue.add(message.getText());
             }
         });
     }
 
+
     public void runFFmpeg() {
+        enableLogCallback();
+
         String command = commandText.getText().toString();
-        String[] ffmpegCommand = command.split(" ");
+        String[] split = command.split(" ");
 
         clearLog();
 
-        android.util.Log.d(MainActivity.TAG, "Testing COMMAND synchronously.");
-
-        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments \'%s\'", command));
-
-        int result = FFmpeg.execute(ffmpegCommand);
-
-        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
-
-        if (result != 0) {
-            Popup.show(context, "Command failed. Please check output for the details.");
-        }
+        int returnCode = FFmpeg.execute(split);
+        android.util.Log.i(MainActivity.TAG, String.format("Process exited with rc %d.", returnCode));
+        Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
     }
 
     public void runFFmpegAsync() {
@@ -141,42 +138,44 @@ public class CommandTabFragment extends Fragment {
 
         clearLog();
 
-        android.util.Log.d(MainActivity.TAG, "Testing COMMAND asynchronously.");
-
-        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments \'%s\'", command));
-
         MainActivity.executeAsync(new RunCallback() {
 
             @Override
-            public void apply(int result) {
-
-                android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
-
-                if (result != 0) {
-                    MainActivity.addUIAction(new Callable() {
-                        @Override
-                        public Object call() {
-                            Popup.show(context, "Command failed. Please check output for the details.");
-                            return null;
-                        }
-                    });
-                }
-
+            public void apply(int returnCode) {
+                android.util.Log.i(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
             }
         }, arguments);
     }
 
-    public void setActive() {
-        android.util.Log.i(MainActivity.TAG, "Command Tab Activated");
-        enableLogCallback();
-    }
-
     public void appendLog(final String logMessage) {
-        outputText.append(logMessage);
+        logText.append(logMessage);
     }
 
     public void clearLog() {
-        outputText.setText("");
+        logQueue.clear();
+        logText.setText("");
+    }
+
+    public void waitForLogs() {
+        final Handler handler = new Handler();
+        final Runnable runnable = new Runnable() {
+
+            @Override
+            public void run() {
+                String logMessage;
+
+                do {
+                    logMessage = logQueue.poll();
+                    if (logMessage != null) {
+                        appendLog(logMessage);
+                    }
+                } while (logMessage != null);
+
+                handler.postDelayed(this, 250);
+            }
+        };
+
+        handler.postDelayed(runnable, 250);
     }
 
 }

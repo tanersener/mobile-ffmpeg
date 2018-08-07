@@ -86,7 +86,7 @@
 
     NSLog(@"Testing COMMAND synchronously.\n");
     
-    NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
+    NSLog(@"FFmpeg process started with arguments \'%@\'\n", ffmpegCommand);
     
     // EXECUTE
     int result = [MobileFFmpeg execute: ffmpegCommand];
@@ -109,7 +109,7 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         
-        NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
+        NSLog(@"FFmpeg process started with arguments \'%@\'\n", ffmpegCommand);
         
         // EXECUTE
         int result = [MobileFFmpeg execute: ffmpegCommand];

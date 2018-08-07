@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">MobileFFmpegTest</string>
-    <string name="command_text_hint">Enter command</string>
-    <string name="run_button_text">Run</string>
-    <string name="run_async_button_text">Run Async</string>
-    <string name="button_create_slideshow_text">Create</string>
-    <string name="button_play_slideshow_text">Play</string>
-    <string name="command_tab">Command</string>
-    <string name="slideshow_tab">Slideshow</string>
-    <string name="video_text_hint">Enter video codec</string>
+    <string name="command_tab">COMMAND</string>
+    <string name="video_tab">VIDEO</string>
+    <string name="https_tab">HTTPS</string>
+    <string name="audio_tab">AUDIO</string>
+    <string name="subtitle_tab">SUBTITLE</string>
+    <string name="vidstab_tab">VID.STAB</string>
+    <string name="command_text_input_placeholder">Enter command</string>
+    <string name="command_run_async_button_text">RUN ASYNC</string>
+    <string name="command_run_button_text">RUN</string>
+    <string name="video_encode_button_text">ENCODE</string>
 </resources>

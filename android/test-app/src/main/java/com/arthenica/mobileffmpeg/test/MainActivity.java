@@ -19,33 +19,89 @@
 
 package com.arthenica.mobileffmpeg.test;
 
+import android.app.ActionBar;
+import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.MotionEvent;
+import android.view.View;
 
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.RunCallback;
 import com.arthenica.mobileffmpeg.util.AsynchronousTaskService;
 
+import java.util.Queue;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "mobile-ffmpeg-test";
 
-    protected static AsynchronousTaskService asynchronousTaskService = new AsynchronousTaskService();
+    protected static final AsynchronousTaskService asynchronousTaskService = new AsynchronousTaskService();
+
+    protected static final Queue<Callable> actionQueue = new ConcurrentLinkedQueue<>();
+
+    protected static final Handler handler = new Handler();
+
+    protected static final Runnable runnable = new Runnable() {
+
+        @Override
+        public void run() {
+            Callable callable;
+
+            do {
+                callable = actionQueue.poll();
+                if (callable != null) {
+                    try {
+                        callable.call();
+                    } catch (final Exception e) {
+                        android.util.Log.e(MainActivity.TAG, "Running UI action received error.", e);
+                    }
+                }
+            } while (callable != null);
+
+            handler.postDelayed(this, 250);
+        }
+    };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
+        android.support.v7.app.ActionBar supportActionBar = getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            supportActionBar.setCustomView(R.layout.support_action_bar);
+        }
+
+        PagerTabStrip pagerTabStrip = findViewById(R.id.pagerTabStrip);
+        if (pagerTabStrip != null) {
+            pagerTabStrip.setDrawFullUnderline(false);
+            pagerTabStrip.setTabIndicatorColorResource(R.color.navigationColor);
+            pagerTabStrip.setTextColor(Color.parseColor("#f39c12"));
+        }
+
         final ViewPager viewPager = findViewById(R.id.pager);
 
-        final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), this, 2);
+        final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), this, 6);
         viewPager.setAdapter(adapter);
+
+        waitForUIAction();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        handler.removeCallbacks(runnable);
     }
 
     /**
@@ -68,6 +124,25 @@ public class MainActivity extends AppCompatActivity {
                 return returnCode;
             }
         });
+    }
+
+    public static void registerTooltipOnTouch(final Context context, final View view, final String tooltip) {
+        view.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                Popup.show(context, tooltip);
+                return true;
+            }
+        });
+    }
+
+    public static void waitForUIAction() {
+        handler.postDelayed(runnable, 250);
+    }
+
+    public static void addUIAction(final Callable callable) {
+        actionQueue.add(callable);
     }
 
 }

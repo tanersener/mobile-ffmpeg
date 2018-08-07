@@ -28,7 +28,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
     private Context context;
     private int numberOfTabs;
 
-    PagerAdapter(FragmentManager fragmentManager, Context context, int numberOfTabs) {
+    PagerAdapter(final FragmentManager fragmentManager, final Context context, final int numberOfTabs) {
         super(fragmentManager);
 
         this.context = context;
@@ -36,13 +36,25 @@ public class PagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public Fragment getItem(int position) {
+    public Fragment getItem(final int position) {
         switch (position) {
             case 0: {
                 return CommandTabFragment.newInstance(context);
             }
             case 1: {
-                return SlideshowTabFragment.newInstance(context);
+                return VideoTabFragment.newInstance(context);
+            }
+            case 2: {
+                return HttpsTabFragment.newInstance(context);
+            }
+            case 3: {
+                return AudioTabFragment.newInstance(context);
+            }
+            case 4: {
+                return SubtitleTabFragment.newInstance(context);
+            }
+            case 5: {
+                return VidStabTabFragment.newInstance(context);
             }
             default: {
                 return null;
@@ -56,13 +68,25 @@ public class PagerAdapter extends FragmentPagerAdapter {
     }
 
     @Override
-    public CharSequence getPageTitle(int position) {
+    public CharSequence getPageTitle(final int position) {
         switch (position) {
             case 0: {
                 return context.getString(R.string.command_tab);
             }
             case 1: {
-                return context.getString(R.string.slideshow_tab);
+                return context.getString(R.string.video_tab);
+            }
+            case 2: {
+                return context.getString(R.string.https_tab);
+            }
+            case 3: {
+                return context.getString(R.string.audio_tab);
+            }
+            case 4: {
+                return context.getString(R.string.subtitle_tab);
+            }
+            case 5: {
+                return context.getString(R.string.vidstab_tab);
             }
             default: {
                 return null;

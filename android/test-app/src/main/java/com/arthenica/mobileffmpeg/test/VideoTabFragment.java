@@ -22,7 +22,6 @@ package com.arthenica.mobileffmpeg.test;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,8 +32,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.MediaController;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -47,15 +46,59 @@ import java.io.IOException;
 
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
-public class SlideshowTabFragment extends Fragment {
-
-    public static final String DEFAULT_VIDEO_CODEC = "mpeg4";
+public class VideoTabFragment extends Fragment {
 
     private Context context;
-    private View playButton;
-    private EditText videoCodecText;
+    private View encodeButton;
+    private Spinner videoCodecSpinner;
 
-    public SlideshowTabFragment() {
+    public VideoTabFragment() {
+    }
+
+    @Override
+    public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_video_tab, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if (getView() != null) {
+            View encodeButton = getView().findViewById(R.id.encodeButton);
+            if (encodeButton != null) {
+                encodeButton.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        createVideo();
+                    }
+                });
+            }
+
+            final VideoView videoView = getView().findViewById(R.id.videoPlayerFrame);
+            videoView.setBackgroundResource(R.color.playerColor);
+
+            getView().findViewById(R.id.videoCodecSpinner);
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            android.util.Log.i(MainActivity.TAG, "VIDEO TAB VIEWED");
+        }
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+    public static VideoTabFragment newInstance(final Context context) {
+        final VideoTabFragment fragment = new VideoTabFragment();
+        fragment.setContext(context);
+        return fragment;
     }
 
     public void enableLogCallback() {
@@ -67,81 +110,7 @@ public class SlideshowTabFragment extends Fragment {
         });
     }
 
-    public static SlideshowTabFragment newInstance(final Context context) {
-        final SlideshowTabFragment fragment = new SlideshowTabFragment();
-        fragment.setContext(context);
-        return fragment;
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-            android.util.Log.i(MainActivity.TAG, "VIDEO TAB VIEWED");
-        }
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
-    @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_slideshow_tab, container, false);
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if (getView() != null) {
-            View createButton = getView().findViewById(R.id.slideshowCreateButton);
-            if (createButton != null) {
-                createButton.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        createSlideshow();
-                    }
-                });
-            }
-
-            final VideoView videoView = getView().findViewById(R.id.videoView);
-            videoView.setBackgroundColor(Color.LTGRAY);
-
-            videoCodecText = getView().findViewById(R.id.videoCodecText);
-            videoCodecText.setText(DEFAULT_VIDEO_CODEC);
-            videoCodecText.setSelection(DEFAULT_VIDEO_CODEC.length());
-
-            // PLAY BUTTON IS DISABLED AT STARTUP
-            playButton = getView().findViewById(R.id.slideshowPlayButton);
-            if (playButton != null) {
-                playButton.setEnabled(false);
-                playButton.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-                        MediaController mediaController = new MediaController(context);
-                        mediaController.setAnchorView(videoView);
-                        videoView.setVideoURI(Uri.parse("file://" + getVideoPath()));
-                        videoView.setMediaController(mediaController);
-                        videoView.requestFocus();
-                        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-                            @Override
-                            public void onPrepared(MediaPlayer mp) {
-                                videoView.setBackgroundColor(0x00000000);
-                            }
-                        });
-                        videoView.start();
-                    }
-                });
-            }
-        }
-    }
-
+/*
     public String getVideoPath() {
         String videoCodec = videoCodecText.getText().toString();
 
@@ -173,14 +142,14 @@ public class SlideshowTabFragment extends Fragment {
             }
         }
     }
-
-    public void createSlideshow() {
+*/
+    public void createVideo() {
         enableLogCallback();
 
         final String image1 = "colosseum.jpg";
         final String image2 = "pyramid.jpg";
         final String image3 = "tajmahal.jpg";
-
+/*
         try {
             String videoCodec = videoCodecText.getText().toString();
             if (videoCodec.trim().length() == 0) {
@@ -197,14 +166,14 @@ public class SlideshowTabFragment extends Fragment {
                 file.delete();
             }
 
-            String script = Slideshow.generateScript(context.getFilesDir(), image1, image2, image3, file.getName(), videoCodec, getCustomOptions());
+            String script = Video.generateCreateScript(context.getFilesDir(), image1, image2, image3, file.getName(), videoCodec, getCustomOptions());
             Log.d(TAG, "Creating slideshow: " + script);
             MainActivity.executeAsync(new RunCallback() {
                 @Override
                 public void apply(int returnCode) {
                     Log.d(TAG, "Create slideshow operation completed with: " + returnCode);
                     if (returnCode == 0) {
-                        playButton.setEnabled(true);
+                        encodeButton.setEnabled(true);
                     }
 
                 }
@@ -213,7 +182,25 @@ public class SlideshowTabFragment extends Fragment {
         } catch (IOException e) {
             Log.e(TAG, "Creating slideshow failed", e);
             Toast.makeText(context, "Creating slideshow failed", Toast.LENGTH_SHORT).show();
-        }
+        }*/
+    }
+
+    protected void playVideo() {
+        final VideoView videoView = getView().findViewById(R.id.videoPlayerFrame);
+
+        MediaController mediaController = new MediaController(context);
+        mediaController.setAnchorView(videoView);
+        // videoView.setVideoURI(Uri.parse("file://" + getVideoPath()));
+        videoView.setMediaController(mediaController);
+        videoView.requestFocus();
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                videoView.setBackgroundColor(0x00000000);
+            }
+        });
+        videoView.start();
     }
 
     protected void resourceToFile(final int resourceId, final String fileName) throws IOException {
