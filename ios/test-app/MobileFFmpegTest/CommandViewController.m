@@ -92,6 +92,10 @@
     int result = [MobileFFmpeg execute: ffmpegCommand];
     
     NSLog(@"FFmpeg process exited with rc %d\n", result);
+
+    if (result != 0) {
+        [Util alert:self withTitle:@"Error" message:@"Command failed. Please check log for the details." andButtonText:@"OK"];
+    }
 }
 
 - (IBAction)runAsyncAction:(id)sender {
@@ -111,6 +115,10 @@
         int result = [MobileFFmpeg execute: ffmpegCommand];
         
         NSLog(@"FFmpeg process exited with rc %d\n", result);
+
+        if (result != 0) {
+            [Util alert:self withTitle:@"Error" message:@"Command failed. Please check log for the details." andButtonText:@"OK"];
+        }
     });
 }
 

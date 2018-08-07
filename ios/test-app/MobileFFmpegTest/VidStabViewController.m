@@ -199,8 +199,11 @@
 
                         } else {
                             NSLog(@"Stabilize video failed with rc=%d\n", result);
-                            
-                            [self dismissProgressDialogAndAlert:@"Stabilize video failed. Please check log for the details."];
+
+                            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 1.3 * NSEC_PER_SEC);
+                            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                                [self dismissProgressDialogAndAlert:@"Stabilize video failed. Please check log for the details."];
+                            });
                         }
                     });
                 });
