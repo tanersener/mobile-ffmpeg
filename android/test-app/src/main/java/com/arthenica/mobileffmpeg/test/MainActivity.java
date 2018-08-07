@@ -22,6 +22,7 @@ package com.arthenica.mobileffmpeg.test;
 import android.app.ActionBar;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.PagerTabStrip;
@@ -127,14 +128,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void registerTooltipOnTouch(final Context context, final View view, final String tooltip) {
-        view.setOnTouchListener(new View.OnTouchListener() {
+        if (Build.VERSION.SDK_INT >= 26) {
+            view.setTooltipText(tooltip);
+        } else {
 
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                Popup.show(context, tooltip);
-                return true;
-            }
-        });
+            view.setOnTouchListener(new View.OnTouchListener() {
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    Popup.show(context, tooltip);
+                    return true;
+                }
+            });
+        }
     }
 
     public static void waitForUIAction() {
