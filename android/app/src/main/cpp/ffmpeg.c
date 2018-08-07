@@ -4824,7 +4824,7 @@ int execute(int argc, char **argv) {
     int i, ret;
     int64_t ti;
 
-        int savedCode = setjmp(ex_buf__);
+    int savedCode = setjmp(ex_buf__);
     if (savedCode == 0) {
 
         cleanup();

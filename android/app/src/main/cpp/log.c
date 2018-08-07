@@ -250,11 +250,19 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
  * \param arguments
  */
 void logCallbackFunction(void *ptr, int level, const char* format, va_list vargs) {
-    char line[1024];    // line size is defined as 1024 in libavutil/log.c
+    char line[2];
 
-    vsnprintf(line, 1024, format, vargs);
+    int logSize = vsnprintf(line, 1, format, vargs);
 
-    logDataAdd(level, line);
+    if (logSize > 0) {
+        int bufferSize = logSize + 1;
+        char* buffer = (char*)malloc(bufferSize);
+
+        vsnprintf(buffer, bufferSize, format, vargs);
+        logDataAdd(level, buffer);
+
+        free(buffer);
+    }
 }
 
 /**
