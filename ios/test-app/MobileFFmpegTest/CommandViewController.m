@@ -86,7 +86,7 @@
 
     NSLog(@"Testing COMMAND synchronously.\n");
     
-    NSLog(@"FFmpeg process started with arguments \'%@\'\n", ffmpegCommand);
+    NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
     
     // EXECUTE
     int result = [MobileFFmpeg execute: ffmpegCommand];
@@ -94,7 +94,7 @@
     NSLog(@"FFmpeg process exited with rc %d\n", result);
 
     if (result != 0) {
-        [Util alert:self withTitle:@"Error" message:@"Command failed. Please check log for the details." andButtonText:@"OK"];
+        [Util alert:self withTitle:@"Error" message:@"Command failed. Please check output for the details." andButtonText:@"OK"];
     }
 }
 
@@ -109,7 +109,7 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
         
-        NSLog(@"FFmpeg process started with arguments \'%@\'\n", ffmpegCommand);
+        NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
         
         // EXECUTE
         int result = [MobileFFmpeg execute: ffmpegCommand];
@@ -117,7 +117,7 @@
         NSLog(@"FFmpeg process exited with rc %d\n", result);
 
         if (result != 0) {
-            [Util alert:self withTitle:@"Error" message:@"Command failed. Please check log for the details." andButtonText:@"OK"];
+            [Util alert:self withTitle:@"Error" message:@"Command failed. Please check output for the details." andButtonText:@"OK"];
         }
     });
 }

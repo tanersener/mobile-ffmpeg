@@ -19,7 +19,6 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -40,7 +39,7 @@ import java.util.concurrent.Callable;
 
 public class CommandTabFragment extends Fragment {
 
-    private Context context;
+    private MainActivity mainActivity;
     private EditText commandText;
     private TextView outputText;
 
@@ -55,11 +54,6 @@ public class CommandTabFragment extends Fragment {
 
         if (getView() != null) {
             commandText = getView().findViewById(R.id.commandText);
-            MainActivity.registerTooltipOnTouch(context, commandText, Tooltip.COMMAND_TEST_TOOLTIP_TEXT);
-
-            // SET OUTPUT TEXT COLOR
-            outputText = getView().findViewById(R.id.outputText);
-            outputText.setMovementMethod(new ScrollingMovementMethod());
 
             View runButton = getView().findViewById(R.id.runButton);
             runButton.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +72,9 @@ public class CommandTabFragment extends Fragment {
                     runFFmpegAsync();
                 }
             });
+
+            outputText = getView().findViewById(R.id.outputText);
+            outputText.setMovementMethod(new ScrollingMovementMethod());
         }
     }
 
@@ -89,13 +86,13 @@ public class CommandTabFragment extends Fragment {
         }
     }
 
-    public void setContext(Context context) {
-        this.context = context;
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 
-    public static CommandTabFragment newInstance(final Context context) {
+    public static CommandTabFragment newInstance(final MainActivity mainActivity) {
         final CommandTabFragment fragment = new CommandTabFragment();
-        fragment.setContext(context);
+        fragment.setMainActivity(mainActivity);
         return fragment;
     }
 
@@ -117,33 +114,31 @@ public class CommandTabFragment extends Fragment {
     }
 
     public void runFFmpeg() {
-        String command = commandText.getText().toString();
-        String[] ffmpegCommand = command.split(" ");
-
         clearLog();
+
+        final String ffmpegCommand = commandText.getText().toString();
 
         android.util.Log.d(MainActivity.TAG, "Testing COMMAND synchronously.");
 
-        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments \'%s\'", command));
+        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
 
         int result = FFmpeg.execute(ffmpegCommand);
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
 
         if (result != 0) {
-            Popup.show(context, "Command failed. Please check output for the details.");
+            Popup.show(mainActivity, "Command failed. Please check output for the details.");
         }
     }
 
     public void runFFmpegAsync() {
-        String command = commandText.getText().toString();
-        String[] arguments = command.split(" ");
-
         clearLog();
+
+        final String ffmpegCommand = commandText.getText().toString();
 
         android.util.Log.d(MainActivity.TAG, "Testing COMMAND asynchronously.");
 
-        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments \'%s\'", command));
+        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
 
         MainActivity.executeAsync(new RunCallback() {
 
@@ -156,19 +151,20 @@ public class CommandTabFragment extends Fragment {
                     MainActivity.addUIAction(new Callable() {
                         @Override
                         public Object call() {
-                            Popup.show(context, "Command failed. Please check output for the details.");
+                            Popup.show(mainActivity, "Command failed. Please check output for the details.");
                             return null;
                         }
                     });
                 }
 
             }
-        }, arguments);
+        }, ffmpegCommand);
     }
 
     public void setActive() {
         android.util.Log.i(MainActivity.TAG, "Command Tab Activated");
         enableLogCallback();
+        Popup.show(mainActivity, Tooltip.COMMAND_TEST_TOOLTIP_TEXT);
     }
 
     public void appendLog(final String logMessage) {

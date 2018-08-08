@@ -19,19 +19,18 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 public class PagerAdapter extends FragmentPagerAdapter {
-    private Context context;
+    private final MainActivity mainActivity;
     private int numberOfTabs;
 
-    PagerAdapter(final FragmentManager fragmentManager, final Context context, final int numberOfTabs) {
+    PagerAdapter(final FragmentManager fragmentManager, final MainActivity mainActivity, final int numberOfTabs) {
         super(fragmentManager);
 
-        this.context = context;
+        this.mainActivity = mainActivity;
         this.numberOfTabs = numberOfTabs;
     }
 
@@ -39,22 +38,22 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public Fragment getItem(final int position) {
         switch (position) {
             case 0: {
-                return CommandTabFragment.newInstance(context);
+                return CommandTabFragment.newInstance(mainActivity);
             }
             case 1: {
-                return VideoTabFragment.newInstance(context);
+                return VideoTabFragment.newInstance(mainActivity);
             }
             case 2: {
-                return HttpsTabFragment.newInstance(context);
+                return HttpsTabFragment.newInstance(mainActivity);
             }
             case 3: {
-                return AudioTabFragment.newInstance(context);
+                return AudioTabFragment.newInstance(mainActivity);
             }
             case 4: {
-                return SubtitleTabFragment.newInstance(context);
+                return SubtitleTabFragment.newInstance(mainActivity);
             }
             case 5: {
-                return VidStabTabFragment.newInstance(context);
+                return VidStabTabFragment.newInstance(mainActivity);
             }
             default: {
                 return null;
@@ -71,22 +70,22 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public CharSequence getPageTitle(final int position) {
         switch (position) {
             case 0: {
-                return context.getString(R.string.command_tab);
+                return mainActivity.getString(R.string.command_tab);
             }
             case 1: {
-                return context.getString(R.string.video_tab);
+                return mainActivity.getString(R.string.video_tab);
             }
             case 2: {
-                return context.getString(R.string.https_tab);
+                return mainActivity.getString(R.string.https_tab);
             }
             case 3: {
-                return context.getString(R.string.audio_tab);
+                return mainActivity.getString(R.string.audio_tab);
             }
             case 4: {
-                return context.getString(R.string.subtitle_tab);
+                return mainActivity.getString(R.string.subtitle_tab);
             }
             case 5: {
-                return context.getString(R.string.vidstab_tab);
+                return mainActivity.getString(R.string.vidstab_tab);
             }
             default: {
                 return null;

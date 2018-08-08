@@ -161,7 +161,7 @@
     
     NSString *ffmpegCommand = [NSString stringWithFormat:@"-y -f lavfi -i sine=frequency=1000:duration=5 -c:a pcm_s16le %@", audioSampleFile];
     
-    NSLog(@"Sample file is %@\n", ffmpegCommand);
+    NSLog(@"Sample file is created with \'%@\'\n", ffmpegCommand);
     
     int result = [MobileFFmpeg execute: ffmpegCommand];
     if (result == 0) {

@@ -1,0 +1,11 @@
+<CheckedTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/text1"
+    android:layout_width="168dp"
+    android:layout_height="40dp"
+    android:gravity="center"
+    android:ellipsize="marquee"
+    android:singleLine="true"
+    android:textAlignment="center"
+    android:textColor="@android:color/black"
+    android:textSize="16sp" />

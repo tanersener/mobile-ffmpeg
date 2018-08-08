@@ -19,22 +19,35 @@
 
 package com.arthenica.mobileffmpeg.test;
 
+import android.Manifest;
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
+import android.system.ErrnoException;
+import android.system.Os;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.RunCallback;
 import com.arthenica.mobileffmpeg.util.AsynchronousTaskService;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -43,6 +56,12 @@ import java.util.concurrent.Future;
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "mobile-ffmpeg-test";
+
+    public static final int REQUEST_EXTERNAL_STORAGE = 1;
+    public static String[] PERMISSIONS_STORAGE = {
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     protected static final AsynchronousTaskService asynchronousTaskService = new AsynchronousTaskService();
 
@@ -80,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         android.support.v7.app.ActionBar supportActionBar = getSupportActionBar();
         if (supportActionBar != null) {
             supportActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-            supportActionBar.setCustomView(R.layout.support_action_bar);
+            supportActionBar.setCustomView(R.layout.action_bar);
         }
 
         PagerTabStrip pagerTabStrip = findViewById(R.id.pagerTabStrip);
@@ -91,11 +110,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final ViewPager viewPager = findViewById(R.id.pager);
-
-        final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), this, 6);
-        viewPager.setAdapter(adapter);
+        viewPager.setAdapter(new PagerAdapter(getSupportFragmentManager(), this, 6));
 
         waitForUIAction();
+
+        // VERIFY PERMISSIONS
+        int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_EXTERNAL_STORAGE);
+        }
+
+        try {
+            createFontConfig();
+            Log.d(TAG, "Font config created.");
+        } catch (final IOException e) {
+            Log.e(TAG, "Creating font config failed.", e);
+        }
     }
 
     @Override
@@ -112,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
      * @param arguments   FFmpeg command options/arguments
      * @return <code>Future</code> instance of asynchronous operation started
      */
-    public static Future executeAsync(final RunCallback runCallback, final String... arguments) {
+    public static Future executeAsync(final RunCallback runCallback, final String arguments) {
         return asynchronousTaskService.runAsynchronously(new Callable<Integer>() {
 
             @Override
@@ -127,28 +159,112 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public static void registerTooltipOnTouch(final Context context, final View view, final String tooltip) {
-        if (Build.VERSION.SDK_INT >= 26) {
-            view.setTooltipText(tooltip);
-        } else {
-
-            view.setOnTouchListener(new View.OnTouchListener() {
-
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    Popup.show(context, tooltip);
-                    return true;
-                }
-            });
-        }
-    }
-
     public static void waitForUIAction() {
         handler.postDelayed(runnable, 250);
     }
 
     public static void addUIAction(final Callable callable) {
         actionQueue.add(callable);
+    }
+
+    public AlertDialog createProgressDialog(final String text) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (inflater != null) {
+            View dialogView = inflater.inflate(R.layout.progress_dialog_layout, null);
+            builder.setView(dialogView);
+
+            TextView textView = dialogView.findViewById(R.id.progressDialogText);
+            if (textView != null) {
+                textView.setText(text);
+            }
+        }
+        builder.setCancelable(false);
+        return builder.create();
+    }
+
+    protected void resourceToFile(final int resourceId, final File file) throws IOException {
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resourceId);
+
+        if (file.exists()) {
+            file.delete();
+        }
+
+        FileOutputStream outputStream = new FileOutputStream(file);
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+        outputStream.flush();
+        outputStream.close();
+    }
+
+    protected void rawResourceToFile(final int resourceId, final File file) throws IOException {
+        final InputStream inputStream = getResources().openRawResource(resourceId);
+        if (file.exists()) {
+            file.delete();
+        }
+        final FileOutputStream outputStream = new FileOutputStream(file);
+
+        try {
+            final byte[] buffer = new byte[1024];
+            int readSize;
+
+            while ((readSize = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, readSize);
+            }
+        } catch (final IOException e) {
+            Log.e(TAG, "Saving raw resource failed.", e);
+        } finally {
+            inputStream.close();
+            outputStream.flush();
+            outputStream.close();
+        }
+    }
+
+    protected void createFontConfig() throws IOException {
+        File parentDirectory = getCacheDir();
+
+        final File fontDirectory = new File(parentDirectory, "fonts");
+        if (!fontDirectory.exists()) {
+            fontDirectory.mkdirs();
+        }
+
+        // SAVE FONTS
+        rawResourceToFile(R.raw.doppioone_regular, new File(fontDirectory, "doppioone_regular.ttf"));
+        rawResourceToFile(R.raw.truenorg, new File(fontDirectory, "truenorg.otf"));
+
+        try {
+            Os.setenv("FONTCONFIG_PATH", parentDirectory.getAbsolutePath(), true);
+            android.util.Log.e(TAG, "Fontconfig env variable set");
+        } catch (ErrnoException e) {
+            android.util.Log.e(TAG, "Setting env variable failed", e);
+        }
+
+        final File configFile = new File(parentDirectory.getAbsolutePath(), "fonts.conf");
+        if (configFile.exists()) {
+            configFile.delete();
+        }
+
+        final String fontConfig = "<?xml version=\"1.0\"?>\n" +
+                "<!DOCTYPE fontconfig SYSTEM \"fonts.dtd\">\n" +
+                "<fontconfig>\n" +
+                "\n" +
+                "<dir>.</dir>\n" +
+                "<dir>" + fontDirectory.getAbsolutePath() + "</dir>\n" +
+                "  <!-- settings go here -->\n" +
+                "        <match target=\"pattern\">\n" +
+                "                <test qual=\"any\" name=\"family\">\n" +
+                "                        <string>Doppio</string>\n" +
+                "                </test>\n" +
+                "                <edit name=\"family\" mode=\"assign\" binding=\"same\">\n" +
+                "                        <string>Doppio One</string>\n" +
+                "                </edit>\n" +
+                "        </match>\n" +
+                "\n" +
+                "</fontconfig>";
+
+        final FileOutputStream outputStream = new FileOutputStream(configFile);
+        outputStream.write(fontConfig.getBytes());
+        outputStream.flush();
+        outputStream.close();
     }
 
 }

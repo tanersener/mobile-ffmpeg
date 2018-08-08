@@ -19,9 +19,7 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.app.AlertDialog;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,28 +30,27 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.MediaController;
 import android.widget.Spinner;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.RunCallback;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.concurrent.Callable;
 
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
-public class VideoTabFragment extends Fragment {
+public class VideoTabFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    private Context context;
-    private View encodeButton;
-    private Spinner videoCodecSpinner;
-
-    public VideoTabFragment() {
-    }
+    private MainActivity mainActivity;
+    private VideoView videoView;
+    private AlertDialog progressDialog;
+    private String selectedCodec;
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -65,39 +62,47 @@ public class VideoTabFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getView() != null) {
+            Spinner videoCodecSpinner = getView().findViewById(R.id.videoCodecSpinner);
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mainActivity,
+                    R.array.video_codec, R.layout.spinner_item);
+            adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+            videoCodecSpinner.setAdapter(adapter);
+            videoCodecSpinner.setOnItemSelectedListener(this);
+
             View encodeButton = getView().findViewById(R.id.encodeButton);
             if (encodeButton != null) {
                 encodeButton.setOnClickListener(new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
-                        createVideo();
+                        encodeVideo();
                     }
                 });
             }
 
-            final VideoView videoView = getView().findViewById(R.id.videoPlayerFrame);
-            videoView.setBackgroundResource(R.color.playerColor);
-
-            getView().findViewById(R.id.videoCodecSpinner);
+            videoView = getView().findViewById(R.id.videoPlayerFrame);
         }
+
+        progressDialog = mainActivity.createProgressDialog("Encoding video");
+
+        selectedCodec = getResources().getStringArray(R.array.video_codec)[0];
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            android.util.Log.i(MainActivity.TAG, "VIDEO TAB VIEWED");
+            setActive();
         }
     }
 
-    public void setContext(Context context) {
-        this.context = context;
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 
-    public static VideoTabFragment newInstance(final Context context) {
+    public static VideoTabFragment newInstance(final MainActivity mainActivity) {
         final VideoTabFragment fragment = new VideoTabFragment();
-        fragment.setContext(context);
+        fragment.setMainActivity(mainActivity);
         return fragment;
     }
 
@@ -105,92 +110,86 @@ public class VideoTabFragment extends Fragment {
         com.arthenica.mobileffmpeg.Log.enableLogCallback(new LogCallback() {
             @Override
             public void apply(com.arthenica.mobileffmpeg.Log.Message message) {
-                android.util.Log.i(MainActivity.TAG, message.getText());
+                android.util.Log.d(MainActivity.TAG, message.getText());
             }
         });
     }
 
-/*
-    public String getVideoPath() {
-        String videoCodec = videoCodecText.getText().toString();
-
-        final String extension;
-        switch (videoCodec) {
-            case "libaom-av1": {
-                extension = "mkv";
-            } break;
-            default: {
-                extension = "mp4";
-            }
-        }
-        final String video = "slideshow." + extension;
-
-        return new File(context.getFilesDir(), video).getAbsolutePath();
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        selectedCodec = parent.getItemAtPosition(position).toString();
     }
 
-    public String getCustomOptions() {
-        String videoCodec = videoCodecText.getText().toString();
-
-        switch (videoCodec) {
-            case "libaom-av1": {
-
-                // libaom support is still experimental, requires this option
-                return "-strict experimental ";
-            }
-            default: {
-                return "";
-            }
-        }
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // DO NOTHING
     }
-*/
-    public void createVideo() {
-        enableLogCallback();
 
-        final String image1 = "colosseum.jpg";
-        final String image2 = "pyramid.jpg";
-        final String image3 = "tajmahal.jpg";
-/*
+    public void encodeVideo() {
+        final File image1File = new File(mainActivity.getCacheDir(), "colosseum.jpg");
+        final File image2File = new File(mainActivity.getCacheDir(), "pyramid.jpg");
+        final File image3File = new File(mainActivity.getCacheDir(), "tajmahal.jpg");
+        final File videoFile = getVideoFile();
+
         try {
-            String videoCodec = videoCodecText.getText().toString();
-            if (videoCodec.trim().length() == 0) {
-                videoCodec = DEFAULT_VIDEO_CODEC;
-            }
-            Log.i(TAG, String.format("Creating slideshow using video codec: %s", videoCodec));
 
-            resourceToFile(R.drawable.colosseum, image1);
-            resourceToFile(R.drawable.pyramid, image2);
-            resourceToFile(R.drawable.tajmahal, image3);
+            // IF VIDEO IS PLAYING STOP PLAYBACK
+            videoView.stopPlayback();
 
-            File file = new File(getVideoPath());
-            if (file.exists()) {
-                file.delete();
+            if (videoFile.exists()) {
+                videoFile.delete();
             }
 
-            String script = Video.generateCreateScript(context.getFilesDir(), image1, image2, image3, file.getName(), videoCodec, getCustomOptions());
-            Log.d(TAG, "Creating slideshow: " + script);
+            final String videoCodec = selectedCodec;
+
+            Log.d(TAG, String.format("Testing VIDEO encoding with '%s' codec", videoCodec));
+
+            showProgressDialog();
+
+            mainActivity.resourceToFile(R.drawable.colosseum, image1File);
+            mainActivity.resourceToFile(R.drawable.pyramid, image2File);
+            mainActivity.resourceToFile(R.drawable.tajmahal, image3File);
+
+            final String ffmpegCommand = Video.generateEncodeVideoScript(image1File.getAbsolutePath(), image2File.getAbsolutePath(), image3File.getAbsolutePath(), videoFile.getAbsolutePath(), getSelectedVideoCodec(), getCustomOptions());
+
+            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+
             MainActivity.executeAsync(new RunCallback() {
-                @Override
-                public void apply(int returnCode) {
-                    Log.d(TAG, "Create slideshow operation completed with: " + returnCode);
-                    if (returnCode == 0) {
-                        encodeButton.setEnabled(true);
-                    }
 
+                @Override
+                public void apply(final int returnCode) {
+                    Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+
+                    hideProgressDialog();
+
+                    MainActivity.addUIAction(new Callable() {
+
+                        @Override
+                        public Object call() {
+                            if (returnCode == 0) {
+                                Log.d(TAG, "Encode completed successfully; playing video.");
+                                playVideo();
+                            } else {
+                                Popup.show(mainActivity, "Encode failed. Please check log for the details.");
+                                Log.d(TAG, String.format("Encode failed with rc=%d", returnCode));
+                            }
+
+                            return null;
+                        }
+                    });
                 }
-            }, script.split(" "));
+            }, ffmpegCommand);
 
         } catch (IOException e) {
-            Log.e(TAG, "Creating slideshow failed", e);
-            Toast.makeText(context, "Creating slideshow failed", Toast.LENGTH_SHORT).show();
-        }*/
+            Log.e(TAG, "Encode video failed", e);
+            Popup.show(mainActivity, "Encode video failed");
+        }
     }
 
     protected void playVideo() {
-        final VideoView videoView = getView().findViewById(R.id.videoPlayerFrame);
-
-        MediaController mediaController = new MediaController(context);
+        MediaController mediaController = new MediaController(mainActivity);
         mediaController.setAnchorView(videoView);
-        // videoView.setVideoURI(Uri.parse("file://" + getVideoPath()));
+        videoView.setVideoURI(Uri.parse("file://" + getVideoFile().getAbsolutePath()));
         videoView.setMediaController(mediaController);
         videoView.requestFocus();
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -200,22 +199,120 @@ public class VideoTabFragment extends Fragment {
                 videoView.setBackgroundColor(0x00000000);
             }
         });
+        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                videoView.stopPlayback();
+                return false;
+            }
+        });
         videoView.start();
     }
 
-    protected void resourceToFile(final int resourceId, final String fileName) throws IOException {
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resourceId);
+    public String getSelectedVideoCodec() {
+        String videoCodec = selectedCodec;
 
-        File file = new File(context.getFilesDir(), fileName);
-        if (file.exists()) {
-            file.delete();
+        // VIDEO CODEC SPINNER HAS BASIC NAMES, FFMPEG NEEDS LONGER AND EXACT CODEC NAMES.
+        // APPLYING NECESSARY TRANSFORMATION HERE
+        switch (videoCodec) {
+            case "x264":
+                videoCodec = "libx264";
+                break;
+            case "x265":
+                videoCodec = "libx265";
+                break;
+            case "xvid":
+                videoCodec = "libxvid";
+                break;
+            case "vp8":
+                videoCodec = "libvpx";
+                break;
+            case "vp9":
+                videoCodec = "libvpx-vp9";
+                break;
+            case "aom":
+                videoCodec = "libaom-av1";
+                break;
+            case "kvazaar":
+                videoCodec = "libkvazaar";
+                break;
+            case "theora":
+                videoCodec = "libtheora";
+                break;
         }
 
-        FileOutputStream outputStream = new FileOutputStream(file);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-        outputStream.flush();
-        outputStream.close();
-        Log.d(TAG, String.format("Saved resource %d to file %s.", resourceId, fileName));
+        return videoCodec;
+    }
+
+    public File getVideoFile() {
+        String videoCodec = selectedCodec;
+
+        final String extension;
+        switch (videoCodec) {
+            case "vp8":
+            case "vp9":
+                extension = "webm";
+                break;
+            case "aom":
+                extension = "mkv";
+                break;
+            case "theora":
+                extension = "ogv";
+                break;
+            case "hap":
+                extension = "mov";
+                break;
+            default:
+
+                // mpeg4, x264, x265, xvid, kvazaar
+                extension = "mp4";
+                break;
+        }
+
+        final String video = "video." + extension;
+        return new File(mainActivity.getFilesDir(), video);
+    }
+
+    public String getCustomOptions() {
+        String videoCodec = selectedCodec;
+
+        switch (videoCodec) {
+            case "x265":
+                return "-crf 28 -preset fast ";
+            case "vp8":
+                return "-b:v 1M -crf 10 ";
+            case "vp9":
+                return "-b:v 2M ";
+            case "aom":
+                return "-crf 30 -strict experimental ";
+            case "kvazaar":
+                return "-preset fast ";
+            case "theora":
+                return "-qscale:v 7 ";
+            case "hap":
+                return "-format hap_q ";
+            default:
+                return "";
+        }
+    }
+
+    public void setActive() {
+        android.util.Log.i(MainActivity.TAG, "Video Tab Activated");
+        enableLogCallback();
+        Popup.show(mainActivity, Tooltip.VIDEO_TEST_TOOLTIP_TEXT);
+    }
+
+    protected void showProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.show();
+        }
+    }
+
+    protected void hideProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
     }
 
 }

@@ -19,37 +19,36 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.content.Context;
+import android.app.AlertDialog;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.MediaController;
+import android.widget.VideoView;
 
-import com.arthenica.mobileffmpeg.FFmpeg;
-import com.arthenica.mobileffmpeg.Log;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.RunCallback;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.Callable;
+
+import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class SubtitleTabFragment extends Fragment {
 
-    private Context context;
-    private EditText commandText;
-    private TextView logText;
-    private final Queue<String> logQueue;
-
-    public SubtitleTabFragment() {
-        logQueue = new ConcurrentLinkedQueue<>();
-    }
+    private MainActivity mainActivity;
+    private VideoView videoView;
+    private AlertDialog createProgressDialog;
+    private AlertDialog burnProgressDialog;
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -61,121 +60,203 @@ public class SubtitleTabFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getView() != null) {
-            /* commandText = getView().findViewById(R.id.commandText);
-
-            // CHANGE LOG TEXT COLOR
-            logText = getView().findViewById(R.id.logText);
-            logText.setBackgroundColor(Color.LTGRAY);
-            logText.setMovementMethod(new ScrollingMovementMethod());
-
-            View runButton = getView().findViewById(R.id.runButton);
-            runButton.setOnClickListener(new View.OnClickListener() {
+            View burnSubtitlesButton = getView().findViewById(R.id.burnSubtitlesButton);
+            burnSubtitlesButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-                    runFFmpeg();
+                    burnSubtitles();
                 }
             });
 
-            View runAsyncButton = getView().findViewById(R.id.runAsyncButton);
-            runAsyncButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    runFFmpegAsync();
-                }
-            });*/
-
-            waitForLogs();
+            videoView = getView().findViewById(R.id.videoPlayerFrame);
         }
+
+        createProgressDialog = mainActivity.createProgressDialog("Creating video");
+        burnProgressDialog = mainActivity.createProgressDialog("Burning subtitles");
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            android.util.Log.i(MainActivity.TAG, "COMMAND TAB VIEWED");
+            setActive();
         }
     }
 
-    public void setContext(Context context) {
-        this.context = context;
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 
-    public static SubtitleTabFragment newInstance(final Context context) {
+    public static SubtitleTabFragment newInstance(final MainActivity mainActivity) {
         final SubtitleTabFragment fragment = new SubtitleTabFragment();
-        fragment.setContext(context);
+        fragment.setMainActivity(mainActivity);
         return fragment;
     }
 
     public void enableLogCallback() {
-        Log.enableLogCallback(new LogCallback() {
-
+        com.arthenica.mobileffmpeg.Log.enableLogCallback(new LogCallback() {
             @Override
-            public void apply(Log.Message message) {
-                logQueue.add(message.getText());
+            public void apply(com.arthenica.mobileffmpeg.Log.Message message) {
+                android.util.Log.d(MainActivity.TAG, message.getText());
             }
         });
     }
 
+    public void burnSubtitles() {
+        final File image1File = new File(mainActivity.getCacheDir(), "colosseum.jpg");
+        final File image2File = new File(mainActivity.getCacheDir(), "pyramid.jpg");
+        final File image3File = new File(mainActivity.getCacheDir(), "tajmahal.jpg");
+        final File videoFile = getVideoFile();
+        final File videoWithSubtitlesFile = getVideoWithSubtitlesFile();
 
-    public void runFFmpeg() {
+        try {
+
+            // IF VIDEO IS PLAYING STOP PLAYBACK
+            videoView.stopPlayback();
+
+            if (videoFile.exists()) {
+                videoFile.delete();
+            }
+
+            if (videoWithSubtitlesFile.exists()) {
+                videoWithSubtitlesFile.delete();
+            }
+
+            Log.d(TAG, "Testing SUBTITLE burning");
+
+            showCreateProgressDialog();
+
+            mainActivity.resourceToFile(R.drawable.colosseum, image1File);
+            mainActivity.resourceToFile(R.drawable.pyramid, image2File);
+            mainActivity.resourceToFile(R.drawable.tajmahal, image3File);
+            mainActivity.rawResourceToFile(R.raw.subtitle, getSubtitleFile());
+
+            final String ffmpegCommand = Video.generateEncodeVideoScript(image1File.getAbsolutePath(), image2File.getAbsolutePath(), image3File.getAbsolutePath(), videoFile.getAbsolutePath(), "mpeg4", "");
+
+            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+
+            MainActivity.executeAsync(new RunCallback() {
+
+                @Override
+                public void apply(final int returnCode) {
+                    Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+
+                    hideCreateProgressDialog();
+
+                    MainActivity.addUIAction(new Callable() {
+
+                        @Override
+                        public Object call() {
+                            if (returnCode == 0) {
+
+                                Log.d(TAG, "Create completed successfully; burning subtitles.");
+
+                                String burnSubtitlesCommand = String.format("-y -i %s -vf subtitles=%s:force_style='FontName=Trueno' %s", videoFile.getAbsolutePath(), getSubtitleFile().getAbsolutePath(), videoWithSubtitlesFile.getAbsolutePath());
+
+                                showBurnProgressDialog();
+
+                                Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", burnSubtitlesCommand));
+
+                                MainActivity.executeAsync(new RunCallback() {
+
+                                    @Override
+                                    public void apply(final int returnCode) {
+                                        Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+
+                                        hideBurnProgressDialog();
+
+                                        MainActivity.addUIAction(new Callable() {
+
+                                            @Override
+                                            public Object call() {
+                                                if (returnCode == 0) {
+                                                    Log.d(TAG, "Burn subtitles completed successfully; playing video.");
+                                                    playVideo();
+                                                } else {
+                                                    Popup.show(mainActivity, "Burn subtitles failed. Please check log for the details.");
+                                                    Log.d(TAG, String.format("Burn subtitles failed with rc=%d", returnCode));
+                                                }
+
+                                                return null;
+                                            }
+                                        });
+                                    }
+                                }, burnSubtitlesCommand);
+
+                            } else {
+                                Popup.show(mainActivity, "Create video failed. Please check log for the details.");
+                                Log.d(TAG, String.format("Create failed with rc=%d", returnCode));
+                            }
+
+                            return null;
+                        }
+                    });
+                }
+            }, ffmpegCommand);
+
+        } catch (IOException e) {
+            Log.e(TAG, "Burn subtitles failed", e);
+            Popup.show(mainActivity, "Burn subtitles failed");
+        }
+    }
+
+    protected void playVideo() {
+        MediaController mediaController = new MediaController(mainActivity);
+        mediaController.setAnchorView(videoView);
+        videoView.setVideoURI(Uri.parse("file://" + getVideoWithSubtitlesFile().getAbsolutePath()));
+        videoView.setMediaController(mediaController);
+        videoView.requestFocus();
+        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                videoView.setBackgroundColor(0x00000000);
+            }
+        });
+        videoView.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+
+            @Override
+            public boolean onError(MediaPlayer mp, int what, int extra) {
+                videoView.stopPlayback();
+                return false;
+            }
+        });
+        videoView.start();
+    }
+
+    public File getSubtitleFile() {
+        return new File(mainActivity.getCacheDir(), "subtitle.srt");
+    }
+
+    public File getVideoFile() {
+        return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "video.mp4");
+    }
+
+    public File getVideoWithSubtitlesFile() {
+        return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "video-with-subtitles.mp4");
+    }
+
+    public void setActive() {
+        android.util.Log.i(MainActivity.TAG, "Subtitle Tab Activated");
         enableLogCallback();
-
-        String command = commandText.getText().toString();
-        String[] split = command.split(" ");
-
-        clearLog();
-
-        int returnCode = FFmpeg.execute(split);
-        android.util.Log.i(MainActivity.TAG, String.format("Process exited with rc %d.", returnCode));
-        Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
+        Popup.show(mainActivity, Tooltip.SUBTITLE_TEST_TOOLTIP_TEXT);
     }
 
-    public void runFFmpegAsync() {
-        String command = commandText.getText().toString();
-        String[] arguments = command.split(" ");
-
-        clearLog();
-
-        MainActivity.executeAsync(new RunCallback() {
-
-            @Override
-            public void apply(int returnCode) {
-                android.util.Log.i(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
-            }
-        }, arguments);
+    protected void showCreateProgressDialog() {
+        createProgressDialog.show();
     }
 
-    public void appendLog(final String logMessage) {
-        logText.append(logMessage);
+    protected void hideCreateProgressDialog() {
+        createProgressDialog.dismiss();
     }
 
-    public void clearLog() {
-        logQueue.clear();
-        logText.setText("");
+    protected void showBurnProgressDialog() {
+        burnProgressDialog.show();
     }
 
-    public void waitForLogs() {
-        final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
-
-            @Override
-            public void run() {
-                String logMessage;
-
-                do {
-                    logMessage = logQueue.poll();
-                    if (logMessage != null) {
-                        appendLog(logMessage);
-                    }
-                } while (logMessage != null);
-
-                handler.postDelayed(this, 250);
-            }
-        };
-
-        handler.postDelayed(runnable, 250);
+    protected void hideBurnProgressDialog() {
+        burnProgressDialog.dismiss();
     }
 
 }

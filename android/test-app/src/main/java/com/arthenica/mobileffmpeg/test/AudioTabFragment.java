@@ -19,37 +19,38 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.content.Context;
+import android.app.AlertDialog;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.Log;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.RunCallback;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.io.File;
+import java.util.concurrent.Callable;
 
-public class AudioTabFragment extends Fragment {
+import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
-    private Context context;
-    private EditText commandText;
-    private TextView logText;
-    private final Queue<String> logQueue;
+public class AudioTabFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
-    public AudioTabFragment() {
-        logQueue = new ConcurrentLinkedQueue<>();
-    }
+    private MainActivity mainActivity;
+    private AlertDialog progressDialog;
+    private Button encodeButton;
+    private TextView outputText;
+    private String selectedCodec;
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -61,50 +62,47 @@ public class AudioTabFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getView() != null) {
-        /*    commandText = getView().findViewById(R.id.commandText);
+            Spinner audioCodecSpinner = getView().findViewById(R.id.audioCodecSpinner);
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(mainActivity,
+                    R.array.audio_codec, R.layout.spinner_item);
+            adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
+            audioCodecSpinner.setAdapter(adapter);
+            audioCodecSpinner.setOnItemSelectedListener(this);
 
-            // CHANGE LOG TEXT COLOR
-            logText = getView().findViewById(R.id.logText);
-            logText.setBackgroundColor(Color.LTGRAY);
-            logText.setMovementMethod(new ScrollingMovementMethod());
-
-            View runButton = getView().findViewById(R.id.runButton);
-            runButton.setOnClickListener(new View.OnClickListener() {
+            encodeButton = getView().findViewById(R.id.encodeButton);
+            encodeButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-                    runFFmpeg();
+                    encodeAudio();
                 }
             });
+            encodeButton.setEnabled(false);
 
-            View runAsyncButton = getView().findViewById(R.id.runAsyncButton);
-            runAsyncButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    runFFmpegAsync();
-                }
-            });*/
-
-            waitForLogs();
+            outputText = getView().findViewById(R.id.outputText);
+            outputText.setMovementMethod(new ScrollingMovementMethod());
         }
+
+        progressDialog = mainActivity.createProgressDialog("Encoding audio");
+
+        selectedCodec = getResources().getStringArray(R.array.audio_codec)[0];
     }
 
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            android.util.Log.i(MainActivity.TAG, "COMMAND TAB VIEWED");
+            setActive();
         }
     }
 
-    public void setContext(Context context) {
-        this.context = context;
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 
-    public static AudioTabFragment newInstance(final Context context) {
+    public static AudioTabFragment newInstance(final MainActivity mainActivity) {
         final AudioTabFragment fragment = new AudioTabFragment();
-        fragment.setContext(context);
+        fragment.setMainActivity(mainActivity);
         return fragment;
     }
 
@@ -112,70 +110,197 @@ public class AudioTabFragment extends Fragment {
         Log.enableLogCallback(new LogCallback() {
 
             @Override
-            public void apply(Log.Message message) {
-                logQueue.add(message.getText());
+            public void apply(final Log.Message message) {
+                MainActivity.addUIAction(new Callable() {
+
+                    @Override
+                    public Object call() {
+                        appendLog(message.getText());
+                        return null;
+                    }
+                });
             }
         });
     }
 
-
-    public void runFFmpeg() {
-        enableLogCallback();
-
-        String command = commandText.getText().toString();
-        String[] split = command.split(" ");
-
-        clearLog();
-
-        int returnCode = FFmpeg.execute(split);
-        android.util.Log.i(MainActivity.TAG, String.format("Process exited with rc %d.", returnCode));
-        Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
+    public void disableLogCallback() {
+        Log.enableLogCallback(null);
     }
 
-    public void runFFmpegAsync() {
-        String command = commandText.getText().toString();
-        String[] arguments = command.split(" ");
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        selectedCodec = parent.getItemAtPosition(position).toString();
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // DO NOTHING
+    }
+
+    public void encodeAudio() {
+        File audioOutputFile = getAudioOutputFile();
+        if (audioOutputFile.exists()) {
+            audioOutputFile.delete();
+        }
+
+        final String audioCodec = selectedCodec;
+
+        android.util.Log.d(TAG, String.format("Testing AUDIO encoding with '%s' codec", audioCodec));
+
+        final String ffmpegCommand = generateAudioEncodeScript();
+
+        showProgressDialog();
 
         clearLog();
+
+        android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
 
         MainActivity.executeAsync(new RunCallback() {
 
             @Override
-            public void apply(int returnCode) {
-                android.util.Log.i(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
+            public void apply(final int returnCode) {
+                android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+
+                hideProgressDialog();
+
+                MainActivity.addUIAction(new Callable() {
+
+                    @Override
+                    public Object call() {
+                        if (returnCode == 0) {
+                            Popup.show(mainActivity, "Encode completed successfully.");
+                            android.util.Log.d(TAG, "Encode completed successfully.");
+                        } else {
+                            Popup.show(mainActivity, "Encode failed. Please check log for the details.");
+                            android.util.Log.d(TAG, String.format("Encode failed with rc=%d", returnCode));
+                        }
+
+                        return null;
+                    }
+                });
             }
-        }, arguments);
+        }, ffmpegCommand);
+    }
+
+    public void createAudioSample() {
+        android.util.Log.d(TAG, "Creating AUDIO sample before the test.");
+
+        File audioSampleFile = getAudioSampleFile();
+        if (audioSampleFile.exists()) {
+            audioSampleFile.delete();
+        }
+
+        String ffmpegCommand = String.format("-y -f lavfi -i sine=frequency=1000:duration=5 -c:a pcm_s16le %s", audioSampleFile.getAbsolutePath());
+
+        android.util.Log.d(TAG, String.format("Sample file is created with '%s'", ffmpegCommand));
+
+        int result = FFmpeg.execute(ffmpegCommand);
+        if (result == 0) {
+            encodeButton.setEnabled(true);
+            android.util.Log.d(TAG, "AUDIO sample created");
+        } else {
+            android.util.Log.d(TAG, String.format("Creating AUDIO sample failed with rc=%d", result));
+            Popup.show(mainActivity, "Creating AUDIO sample failed. Please check log for the details.");
+        }
+    }
+
+    public File getAudioOutputFile() {
+        String audioCodec = selectedCodec;
+
+        String extension;
+        switch (audioCodec) {
+            case "mp3 (liblame)":
+            case "mp3 (libshine)":
+                extension = "mp3";
+                break;
+            case "vorbis":
+                extension = "ogg";
+                break;
+            case "opus":
+                extension = "opus";
+                break;
+            case "amr":
+                extension = "amr";
+                break;
+            case "ilbc":
+                extension = "lbc";
+                break;
+            case "speex":
+                extension = "spx";
+                break;
+            case "wavpack":
+                extension = "wv";
+                break;
+            default:
+
+                // soxr
+                extension = "wav";
+                break;
+        }
+
+        final String audio = "audio." + extension;
+        return new File(mainActivity.getFilesDir(), audio);
+    }
+
+    public File getAudioSampleFile() {
+        return new File(mainActivity.getFilesDir(), "audio-sample.wav");
+    }
+
+    public void setActive() {
+        android.util.Log.i(MainActivity.TAG, "Audio Tab Activated");
+        disableLogCallback();
+        createAudioSample();
+        enableLogCallback();
+        Popup.show(mainActivity, Tooltip.AUDIO_TEST_TOOLTIP_TEXT);
     }
 
     public void appendLog(final String logMessage) {
-        logText.append(logMessage);
+        outputText.append(logMessage);
     }
 
     public void clearLog() {
-        logQueue.clear();
-        logText.setText("");
+        outputText.setText("");
     }
 
-    public void waitForLogs() {
-        final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
+    protected void showProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.show();
+        }
+    }
 
-            @Override
-            public void run() {
-                String logMessage;
+    protected void hideProgressDialog() {
+        if (progressDialog != null) {
+            progressDialog.dismiss();
+        }
+    }
 
-                do {
-                    logMessage = logQueue.poll();
-                    if (logMessage != null) {
-                        appendLog(logMessage);
-                    }
-                } while (logMessage != null);
+    public String generateAudioEncodeScript() {
+        String audioCodec = selectedCodec;
+        String audioSampleFile = getAudioSampleFile().getAbsolutePath();
+        String audioOutputFile = getAudioOutputFile().getAbsolutePath();
 
-                handler.postDelayed(this, 250);
-            }
-        };
+        switch (audioCodec) {
+            case "mp3 (liblame)":
+                return String.format("-y -i %s -c:a libmp3lame -qscale:a 2 %s", audioSampleFile, audioOutputFile);
+            case "mp3 (libshine)":
+                return String.format("-y -i %s -c:a libshine -qscale:a 2 %s", audioSampleFile, audioOutputFile);
+            case "vorbis":
+                return String.format("-y -i %s -c:a libvorbis -b:a 64k %s", audioSampleFile, audioOutputFile);
+            case "opus":
+                return String.format("-y -i %s -c:a libopus -b:a 64k -vbr on -compression_level 10 %s", audioSampleFile, audioOutputFile);
+            case "amr":
+                return String.format("-y -i %s -ar 8000 -ab 12.2k %s", audioSampleFile, audioOutputFile);
+            case "ilbc":
+                return String.format("-y -i %s -c:a ilbc -ar 8000 -b:a 15200 %s", audioSampleFile, audioOutputFile);
+            case "speex":
+                return String.format("-y -i %s -c:a libspeex -ar 16000 %s", audioSampleFile, audioOutputFile);
+            case "wavpack":
+                return String.format("-y -i %s -c:a wavpack -b:a 64k %s", audioSampleFile, audioOutputFile);
+            default:
 
-        handler.postDelayed(runnable, 250);
+                // soxr
+                return String.format("-y -i %s -af aresample=resampler=soxr -ar 44100 %s", audioSampleFile, audioOutputFile);
+        }
     }
 
 }

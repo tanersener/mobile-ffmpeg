@@ -3,34 +3,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context=".VideoTabFragment">
 
     <LinearLayout
+        android:id="@+id/videoCodecSpinnerLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="40dp"
+        android:gravity="center"
         android:orientation="horizontal">
 
         <Spinner
             android:id="@+id/videoCodecSpinner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:background="@drawable/rounded_spinner"
+            android:layout_width="180dp"
+            android:layout_height="54dp"
+            android:layout_marginBottom="0dp"
+            android:layout_marginTop="0dp"
+            android:padding="6dp"
+            android:textAlignment="center"
+            android:gravity="center"/>
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/encodeButtonLayout"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
 
         <Button
             android:id="@+id/encodeButton"
-            android:layout_width="140dp"
+            android:layout_width="90dp"
             android:layout_height="36dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/rounded_button"
             android:fontFamily="sans-serif"
             android:gravity="center"
@@ -43,8 +54,10 @@
 
     <VideoView
         android:id="@+id/videoPlayerFrame"
-        android:layout_width="match_parent"
-        android:layout_height="262dp"
-        android:layout_margin="30dp"
+        android:layout_width="wrap_content"
+        android:background="@drawable/rounded_video_frame"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="20dp"
         android:layout_weight="1" />
 </LinearLayout>

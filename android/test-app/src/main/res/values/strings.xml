@@ -10,4 +10,9 @@
     <string name="command_run_async_button_text">RUN ASYNC</string>
     <string name="command_run_button_text">RUN</string>
     <string name="video_encode_button_text">ENCODE</string>
+    <string name="https_get_info_button_text">GET INFO</string>
+    <string name="https_text_input_placeholder">Enter https url</string>
+    <string name="audio_encode_button_text">ENCODE</string>
+    <string name="subtitle_burn_subtitles_button_text">BURN SUBTITLES</string>
+    <string name="vidstab_stabilize_video_button_text">STABILIZE VIDEO</string>
 </resources>

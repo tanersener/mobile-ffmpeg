@@ -38,6 +38,7 @@
     // Tooltip view reference
     RCEasyTipView *tooltip;
 }
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     

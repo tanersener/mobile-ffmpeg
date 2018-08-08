@@ -19,40 +19,30 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.Log;
 import com.arthenica.mobileffmpeg.LogCallback;
-import com.arthenica.mobileffmpeg.RunCallback;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Callable;
 
 public class HttpsTabFragment extends Fragment {
 
-    // NSString *const HTTPS_TEST_DEFAULT_URL = @"https://download.blender.org/peach/trailer/trailer_400p.ogg";
+    public static final String HTTPS_TEST_DEFAULT_URL = "https://download.blender.org/peach/trailer/trailer_400p.ogg";
 
-
-    private Context context;
-    private EditText commandText;
-    private TextView logText;
-    private final Queue<String> logQueue;
-
-    public HttpsTabFragment() {
-        logQueue = new ConcurrentLinkedQueue<>();
-    }
+    private MainActivity mainActivity;
+    private EditText urlText;
+    private TextView outputText;
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -64,32 +54,19 @@ public class HttpsTabFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if (getView() != null) {
-            /* commandText = getView().findViewById(R.id.commandText);
+            urlText = getView().findViewById(R.id.urlText);
 
-            // CHANGE LOG TEXT COLOR
-            logText = getView().findViewById(R.id.logText);
-            logText.setBackgroundColor(Color.LTGRAY);
-            logText.setMovementMethod(new ScrollingMovementMethod());
-
-            View runButton = getView().findViewById(R.id.runButton);
-            runButton.setOnClickListener(new View.OnClickListener() {
+            View getInfoButton = getView().findViewById(R.id.getInfoButton);
+            getInfoButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View v) {
-                    runFFmpeg();
+                    getInfo();
                 }
             });
 
-            View runAsyncButton = getView().findViewById(R.id.runAsyncButton);
-            runAsyncButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    runFFmpegAsync();
-                }
-            });*/
-
-            waitForLogs();
+            outputText = getView().findViewById(R.id.outputText);
+            outputText.setMovementMethod(new ScrollingMovementMethod());
         }
     }
 
@@ -97,17 +74,17 @@ public class HttpsTabFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            android.util.Log.i(MainActivity.TAG, "COMMAND TAB VIEWED");
+            setActive();
         }
     }
 
-    public void setContext(Context context) {
-        this.context = context;
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 
-    public static HttpsTabFragment newInstance(final Context context) {
+    public static HttpsTabFragment newInstance(final MainActivity mainActivity) {
         final HttpsTabFragment fragment = new HttpsTabFragment();
-        fragment.setContext(context);
+        fragment.setMainActivity(mainActivity);
         return fragment;
     }
 
@@ -115,70 +92,54 @@ public class HttpsTabFragment extends Fragment {
         Log.enableLogCallback(new LogCallback() {
 
             @Override
-            public void apply(Log.Message message) {
-                logQueue.add(message.getText());
+            public void apply(final Log.Message message) {
+                MainActivity.addUIAction(new Callable() {
+
+                    @Override
+                    public Object call() {
+                        appendLog(message.getText());
+                        return null;
+                    }
+                });
             }
         });
     }
 
-
-    public void runFFmpeg() {
-        enableLogCallback();
-
-        String command = commandText.getText().toString();
-        String[] split = command.split(" ");
-
+    public void getInfo() {
         clearLog();
 
-        int returnCode = FFmpeg.execute(split);
-        android.util.Log.i(MainActivity.TAG, String.format("Process exited with rc %d.", returnCode));
-        Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
+        String testUrl = urlText.getText().toString();
+        if (testUrl.isEmpty()) {
+            testUrl = HTTPS_TEST_DEFAULT_URL;
+            urlText.setText(testUrl);
+            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with default url '%s'", testUrl));
+        } else {
+            android.util.Log.d(MainActivity.TAG, String.format("Testing HTTPS with url '%s'", testUrl));
+        }
+
+        // HTTPS COMMAND ARGUMENTS
+        final String ffmpegCommand = String.format("-hide_banner -i %s", testUrl);
+
+        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+
+        // EXECUTE
+        int result = FFmpeg.execute(ffmpegCommand);
+
+        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
     }
 
-    public void runFFmpegAsync() {
-        String command = commandText.getText().toString();
-        String[] arguments = command.split(" ");
-
-        clearLog();
-
-        MainActivity.executeAsync(new RunCallback() {
-
-            @Override
-            public void apply(int returnCode) {
-                android.util.Log.i(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
-            }
-        }, arguments);
+    public void setActive() {
+        android.util.Log.i(MainActivity.TAG, "Https Tab Activated");
+        enableLogCallback();
+        Popup.show(mainActivity, Tooltip.HTTPS_TEST_TOOLTIP_TEXT);
     }
 
     public void appendLog(final String logMessage) {
-        logText.append(logMessage);
+        outputText.append(logMessage);
     }
 
     public void clearLog() {
-        logQueue.clear();
-        logText.setText("");
-    }
-
-    public void waitForLogs() {
-        final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
-
-            @Override
-            public void run() {
-                String logMessage;
-
-                do {
-                    logMessage = logQueue.poll();
-                    if (logMessage != null) {
-                        appendLog(logMessage);
-                    }
-                } while (logMessage != null);
-
-                handler.postDelayed(this, 250);
-            }
-        };
-
-        handler.postDelayed(runnable, 250);
+        outputText.setText("");
     }
 
 }

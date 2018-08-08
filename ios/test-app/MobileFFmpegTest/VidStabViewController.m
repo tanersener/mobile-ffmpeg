@@ -187,8 +187,9 @@
                                     if (result == 0) {
                                         [self dismissProgressDialog];
                                         
-                                        NSLog(@"Stabilize video completed successfully; playing video.\n");
+                                        NSLog(@"Stabilize video completed successfully; playing videos.\n");
                                         [self playVideo];
+                                        [self playStabilizedVideo];
                                     } else {
                                         NSLog(@"Stabilize video failed with rc=%d\n", result);
                                         
@@ -224,16 +225,23 @@
     NSArray *assetKeys = @[@"playable", @"hasProtectedContent"];
     AVPlayerItem *video = [AVPlayerItem playerItemWithAsset:asset
                                          automaticallyLoadedAssetKeys:assetKeys];
+   
     [player insertItem:video afterItem:nil];
+    [player play];
+}
+
+- (void)playStabilizedVideo {
+    AVAsset *asset = [AVAsset assetWithURL:videoURL];
+    NSArray *assetKeys = @[@"playable", @"hasProtectedContent"];
 
     NSString *stabilizedVideoFile = [self getStabilizedVideoPath];
     NSURL*stabilizedVideoURL=[NSURL fileURLWithPath:stabilizedVideoFile];
-    AVAsset *stabilizedAsset = [AVAsset assetWithURL:stabilizedVideoURL];
-    AVPlayerItem *stabilizedVideo = [AVPlayerItem playerItemWithAsset:stabilizedAsset
+    AVAsset *asset = [AVAsset assetWithURL:stabilizedVideoURL];
+    NSArray *assetKeys = @[@"playable", @"hasProtectedContent"];
+    AVPlayerItem *stabilizedVideo = [AVPlayerItem playerItemWithAsset:asset
                                   automaticallyLoadedAssetKeys:assetKeys];
-    [stabilizedVideoPlayer insertItem:stabilizedVideo afterItem:nil];
     
-    [player play];
+    [stabilizedVideoPlayer insertItem:stabilizedVideo afterItem:nil];
     [stabilizedVideoPlayer play];
 }
 

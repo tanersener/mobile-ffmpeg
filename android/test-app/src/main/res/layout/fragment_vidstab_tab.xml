@@ -4,6 +4,48 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     tools:context=".VidStabTabFragment">
+
+    <VideoView
+        android:id="@+id/videoPlayerFrame"
+        android:layout_width="wrap_content"
+        android:background="@drawable/rounded_video_frame"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="10dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/stabilizeVideoButtonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/stabilizeVideoButton"
+            android:layout_width="160dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rounded_button"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:text="@string/vidstab_stabilize_video_button_text"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <VideoView
+        android:id="@+id/stabilizedVideoPlayerFrame"
+        android:layout_width="wrap_content"
+        android:background="@drawable/rounded_video_frame"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="10dp"
+        android:layout_weight="1" />
 
 </LinearLayout>
