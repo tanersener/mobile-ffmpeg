@@ -231,9 +231,6 @@
 }
 
 - (void)playStabilizedVideo {
-    AVAsset *asset = [AVAsset assetWithURL:videoURL];
-    NSArray *assetKeys = @[@"playable", @"hasProtectedContent"];
-
     NSString *stabilizedVideoFile = [self getStabilizedVideoPath];
     NSURL*stabilizedVideoURL=[NSURL fileURLWithPath:stabilizedVideoFile];
     AVAsset *asset = [AVAsset assetWithURL:stabilizedVideoURL];
