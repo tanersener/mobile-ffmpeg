@@ -398,7 +398,7 @@ void av1_build_prediction_by_above_preds(const AV1_COMMON *cm, MACROBLOCKD *xd,
   // Adjust mb_to_bottom_edge to have the correct value for the OBMC
   // prediction block. This is half the height of the original block,
   // except for 128-wide blocks, where we only use a height of 32.
-  int this_height = xd->n8_h * MI_SIZE;
+  int this_height = xd->n4_h * MI_SIZE;
   int pred_height = AOMMIN(this_height / 2, 32);
   xd->mb_to_bottom_edge += (this_height - pred_height) * 8;
 
@@ -453,7 +453,7 @@ void av1_build_prediction_by_left_preds(const AV1_COMMON *cm, MACROBLOCKD *xd,
   // Adjust mb_to_right_edge to have the correct value for the OBMC
   // prediction block. This is half the width of the original block,
   // except for 128-wide blocks, where we only use a width of 32.
-  int this_width = xd->n8_w * MI_SIZE;
+  int this_width = xd->n4_w * MI_SIZE;
   int pred_width = AOMMIN(this_width / 2, 32);
   xd->mb_to_right_edge += (this_width - pred_width) * 8;
 

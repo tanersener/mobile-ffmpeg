@@ -937,6 +937,9 @@ static int main_loop(int argc, const char **argv_) {
               aom_img_free(img_shifted);
               img_shifted = NULL;
             }
+            if (img_shifted) {
+              img_shifted->monochrome = img->monochrome;
+            }
             if (!img_shifted) {
               img_shifted =
                   aom_img_alloc(NULL, shifted_fmt, img->d_w, img->d_h, 16);

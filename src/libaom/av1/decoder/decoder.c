@@ -37,16 +37,11 @@
 #include "av1/decoder/obu.h"
 
 static void initialize_dec(void) {
-  static volatile int init_done = 0;
-
-  if (!init_done) {
-    av1_rtcd();
-    aom_dsp_rtcd();
-    aom_scale_rtcd();
-    av1_init_intra_predictors();
-    av1_init_wedge_masks();
-    init_done = 1;
-  }
+  av1_rtcd();
+  aom_dsp_rtcd();
+  aom_scale_rtcd();
+  av1_init_intra_predictors();
+  av1_init_wedge_masks();
 }
 
 static void dec_setup_mi(AV1_COMMON *cm) {

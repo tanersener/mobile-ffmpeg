@@ -119,7 +119,7 @@ set_aom_config_var(DECODE_WIDTH_LIMIT 0 NUMBER "Set limit for decode width.")
 set_aom_config_var(CONFIG_COLLECT_INTER_MODE_RD_STATS 1 NUMBER
                    "AV1 experiment flag.")
 set_aom_config_var(CONFIG_COLLECT_RD_STATS 0 NUMBER "AV1 experiment flag.")
-set_aom_config_var(CONFIG_DIST_8X8 1 NUMBER "AV1 experiment flag.")
+set_aom_config_var(CONFIG_DIST_8X8 0 NUMBER "AV1 experiment flag.")
 set_aom_config_var(CONFIG_ENTROPY_STATS 0 NUMBER "AV1 experiment flag.")
 set_aom_config_var(CONFIG_FP_MB_STATS 0 NUMBER "AV1 experiment flag.")
 set_aom_config_var(CONFIG_INTER_STATS_ONLY 0 NUMBER "AV1 experiment flag.")

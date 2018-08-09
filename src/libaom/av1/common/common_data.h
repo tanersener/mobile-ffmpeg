@@ -65,6 +65,8 @@ static const uint8_t num_pels_log2_lookup[BLOCK_SIZES_ALL] = {
   4, 5, 5, 6, 7, 7, 8, 9, 9, 10, 11, 11, 12, 13, 13, 14, 6, 6, 8, 8, 10, 10
 };
 
+// A compressed version of the Partition_Subsize table in the spec (9.3.
+// Conversion tables), for square block sizes only.
 /* clang-format off */
 static const BLOCK_SIZE subsize_lookup[EXT_PARTITION_TYPES][SQR_BLOCK_SIZES] = {
   {     // PARTITION_NONE
@@ -360,6 +362,8 @@ static const TX_SIZE tx_mode_to_biggest_tx_size[TX_MODES] = {
   TX_64X64,  // TX_MODE_SELECT
 };
 
+// The Subsampled_Size table in the spec (Section 5.11.38. Get plane residual
+// size function).
 static const BLOCK_SIZE ss_size_lookup[BLOCK_SIZES_ALL][2][2] = {
   //  ss_x == 0      ss_x == 0          ss_x == 1      ss_x == 1
   //  ss_y == 0      ss_y == 1          ss_y == 0      ss_y == 1

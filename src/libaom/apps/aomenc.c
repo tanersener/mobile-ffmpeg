@@ -1605,14 +1605,14 @@ static void encode_frame(struct stream_state *stream,
             aom_img_alloc(NULL, AOM_IMG_FMT_I42016, cfg->g_w, cfg->g_h, 16);
       }
       I420Scale_16(
-          (uint16 *)img->planes[AOM_PLANE_Y], img->stride[AOM_PLANE_Y] / 2,
-          (uint16 *)img->planes[AOM_PLANE_U], img->stride[AOM_PLANE_U] / 2,
-          (uint16 *)img->planes[AOM_PLANE_V], img->stride[AOM_PLANE_V] / 2,
-          img->d_w, img->d_h, (uint16 *)stream->img->planes[AOM_PLANE_Y],
+          (uint16_t *)img->planes[AOM_PLANE_Y], img->stride[AOM_PLANE_Y] / 2,
+          (uint16_t *)img->planes[AOM_PLANE_U], img->stride[AOM_PLANE_U] / 2,
+          (uint16_t *)img->planes[AOM_PLANE_V], img->stride[AOM_PLANE_V] / 2,
+          img->d_w, img->d_h, (uint16_t *)stream->img->planes[AOM_PLANE_Y],
           stream->img->stride[AOM_PLANE_Y] / 2,
-          (uint16 *)stream->img->planes[AOM_PLANE_U],
+          (uint16_t *)stream->img->planes[AOM_PLANE_U],
           stream->img->stride[AOM_PLANE_U] / 2,
-          (uint16 *)stream->img->planes[AOM_PLANE_V],
+          (uint16_t *)stream->img->planes[AOM_PLANE_V],
           stream->img->stride[AOM_PLANE_V] / 2, stream->img->d_w,
           stream->img->d_h, kFilterBox);
       img = stream->img;

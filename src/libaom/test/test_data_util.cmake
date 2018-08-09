@@ -18,6 +18,8 @@ list(APPEND AOM_TEST_DATA_FILE_NAMES
             "invalid-oss-fuzz-9463.ivf.res"
             "invalid-oss-fuzz-9482.ivf"
             "invalid-oss-fuzz-9482.ivf.res"
+            "invalid-oss-fuzz-9720.ivf"
+            "invalid-oss-fuzz-9720.ivf.res"
             "park_joy_90p_10_420.y4m"
             "park_joy_90p_10_422.y4m"
             "park_joy_90p_10_444.y4m"

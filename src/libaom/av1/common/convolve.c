@@ -520,12 +520,22 @@ void av1_convolve_2d_facade(const uint8_t *src, int src_stride, uint8_t *dst,
   (void)y_step_q4;
   (void)dst;
   (void)dst_stride;
-  InterpFilter filter_x = av1_extract_interp_filter(interp_filters, 1);
-  InterpFilter filter_y = av1_extract_interp_filter(interp_filters, 0);
+  InterpFilter filter_x;
+  InterpFilter filter_y;
+  const int need_filter_params_x = (subpel_x_q4 != 0) | scaled;
+  const int need_filter_params_y = (subpel_y_q4 != 0) | scaled;
+  if (need_filter_params_x)
+    filter_x = av1_extract_interp_filter(interp_filters, 1);
+  if (need_filter_params_y)
+    filter_y = av1_extract_interp_filter(interp_filters, 0);
   const InterpFilterParams *filter_params_x =
-      av1_get_interp_filter_params_with_block_size(filter_x, w);
+      need_filter_params_x
+          ? av1_get_interp_filter_params_with_block_size(filter_x, w)
+          : NULL;
   const InterpFilterParams *filter_params_y =
-      av1_get_interp_filter_params_with_block_size(filter_y, h);
+      need_filter_params_y
+          ? av1_get_interp_filter_params_with_block_size(filter_y, h)
+          : NULL;
 
   if (scaled)
     convolve_2d_scale_wrapper(src, src_stride, dst, dst_stride, w, h,
@@ -976,12 +986,22 @@ void av1_highbd_convolve_2d_facade(const uint8_t *src8, int src_stride,
   (void)dst_stride;
 
   const uint16_t *src = CONVERT_TO_SHORTPTR(src8);
-  InterpFilter filter_x = av1_extract_interp_filter(interp_filters, 1);
-  InterpFilter filter_y = av1_extract_interp_filter(interp_filters, 0);
+  InterpFilter filter_x;
+  InterpFilter filter_y;
+  const int need_filter_params_x = (subpel_x_q4 != 0) | scaled;
+  const int need_filter_params_y = (subpel_y_q4 != 0) | scaled;
+  if (need_filter_params_x)
+    filter_x = av1_extract_interp_filter(interp_filters, 1);
+  if (need_filter_params_y)
+    filter_y = av1_extract_interp_filter(interp_filters, 0);
   const InterpFilterParams *filter_params_x =
-      av1_get_interp_filter_params_with_block_size(filter_x, w);
+      need_filter_params_x
+          ? av1_get_interp_filter_params_with_block_size(filter_x, w)
+          : NULL;
   const InterpFilterParams *filter_params_y =
-      av1_get_interp_filter_params_with_block_size(filter_y, h);
+      need_filter_params_y
+          ? av1_get_interp_filter_params_with_block_size(filter_y, h)
+          : NULL;
 
   if (scaled) {
     uint16_t *dst = CONVERT_TO_SHORTPTR(dst8);

@@ -215,6 +215,16 @@ static const uint8_t shuffle_alpha0_mask45[16] = { 4, 5, 4, 5, 4, 5, 4, 5,
 static const uint8_t shuffle_alpha0_mask67[16] = { 6, 7, 6, 7, 6, 7, 6, 7,
                                                    6, 7, 6, 7, 6, 7, 6, 7 };
 
+static const uint8_t shuffle_gamma0_mask0[16] = { 0, 1, 2, 3, 0, 1, 2, 3,
+                                                  0, 1, 2, 3, 0, 1, 2, 3 };
+static const uint8_t shuffle_gamma0_mask1[16] = { 4, 5, 6, 7, 4, 5, 6, 7,
+                                                  4, 5, 6, 7, 4, 5, 6, 7 };
+static const uint8_t shuffle_gamma0_mask2[16] = { 8, 9, 10, 11, 8, 9, 10, 11,
+                                                  8, 9, 10, 11, 8, 9, 10, 11 };
+static const uint8_t shuffle_gamma0_mask3[16] = {
+  12, 13, 14, 15, 12, 13, 14, 15, 12, 13, 14, 15, 12, 13, 14, 15
+};
+
 static INLINE void filter_src_pixels(__m128i src, __m128i *tmp, __m128i *coeff,
                                      const int offset_bits_horiz,
                                      const int reduce_bits_horiz, int k) {
@@ -429,17 +439,372 @@ static INLINE void warp_horizontal_filter_alpha0_beta0(
   }
 }
 
-typedef void (*warp_horizontal_filter_fn_t)(const uint8_t *ref, __m128i *tmp,
-                                            int stride, int32_t ix4,
-                                            int32_t iy4, int32_t sx4, int alpha,
-                                            int beta, int p_height, int height,
-                                            int i, const int offset_bits_horiz,
-                                            const int reduce_bits_horiz);
+static INLINE void unpack_weights_and_set_round_const(
+    ConvolveParams *conv_params, const int round_bits, const int offset_bits,
+    __m128i *res_sub_const, __m128i *round_bits_const, __m128i *wt) {
+  *res_sub_const =
+      _mm_set1_epi16(-(1 << (offset_bits - conv_params->round_1)) -
+                     (1 << (offset_bits - conv_params->round_1 - 1)));
+  *round_bits_const = _mm_set1_epi16(((1 << round_bits) >> 1));
 
-warp_horizontal_filter_fn_t warp_horizontal_filter_fn_t_array[2][2] = {
-  { warp_horizontal_filter, warp_horizontal_filter_beta0 },
-  { warp_horizontal_filter_alpha0, warp_horizontal_filter_alpha0_beta0 }
-};
+  const int w0 = conv_params->fwd_offset;
+  const int w1 = conv_params->bck_offset;
+  const __m128i wt0 = _mm_set1_epi16(w0);
+  const __m128i wt1 = _mm_set1_epi16(w1);
+  *wt = _mm_unpacklo_epi16(wt0, wt1);
+}
+
+static INLINE void prepare_vertical_filter_coeffs(int gamma, int sy,
+                                                  __m128i *coeffs) {
+  const __m128i tmp_0 = _mm_loadu_si128(
+      (__m128i *)(warped_filter + ((sy + 0 * gamma) >> WARPEDDIFF_PREC_BITS)));
+  const __m128i tmp_2 = _mm_loadu_si128(
+      (__m128i *)(warped_filter + ((sy + 2 * gamma) >> WARPEDDIFF_PREC_BITS)));
+  const __m128i tmp_4 = _mm_loadu_si128(
+      (__m128i *)(warped_filter + ((sy + 4 * gamma) >> WARPEDDIFF_PREC_BITS)));
+  const __m128i tmp_6 = _mm_loadu_si128(
+      (__m128i *)(warped_filter + ((sy + 6 * gamma) >> WARPEDDIFF_PREC_BITS)));
+
+  const __m128i tmp_8 = _mm_unpacklo_epi32(tmp_0, tmp_2);
+  const __m128i tmp_10 = _mm_unpacklo_epi32(tmp_4, tmp_6);
+  const __m128i tmp_12 = _mm_unpackhi_epi32(tmp_0, tmp_2);
+  const __m128i tmp_14 = _mm_unpackhi_epi32(tmp_4, tmp_6);
+
+  // even coeffs
+  coeffs[0] = _mm_unpacklo_epi64(tmp_8, tmp_10);
+  coeffs[1] = _mm_unpackhi_epi64(tmp_8, tmp_10);
+  coeffs[2] = _mm_unpacklo_epi64(tmp_12, tmp_14);
+  coeffs[3] = _mm_unpackhi_epi64(tmp_12, tmp_14);
+
+  const __m128i tmp_1 = _mm_loadu_si128(
+      (__m128i *)(warped_filter + ((sy + 1 * gamma) >> WARPEDDIFF_PREC_BITS)));
+  const __m128i tmp_3 = _mm_loadu_si128(
+      (__m128i *)(warped_filter + ((sy + 3 * gamma) >> WARPEDDIFF_PREC_BITS)));
+  const __m128i tmp_5 = _mm_loadu_si128(
+      (__m128i *)(warped_filter + ((sy + 5 * gamma) >> WARPEDDIFF_PREC_BITS)));
+  const __m128i tmp_7 = _mm_loadu_si128(
+      (__m128i *)(warped_filter + ((sy + 7 * gamma) >> WARPEDDIFF_PREC_BITS)));
+
+  const __m128i tmp_9 = _mm_unpacklo_epi32(tmp_1, tmp_3);
+  const __m128i tmp_11 = _mm_unpacklo_epi32(tmp_5, tmp_7);
+  const __m128i tmp_13 = _mm_unpackhi_epi32(tmp_1, tmp_3);
+  const __m128i tmp_15 = _mm_unpackhi_epi32(tmp_5, tmp_7);
+
+  // odd coeffs
+  coeffs[4] = _mm_unpacklo_epi64(tmp_9, tmp_11);
+  coeffs[5] = _mm_unpackhi_epi64(tmp_9, tmp_11);
+  coeffs[6] = _mm_unpacklo_epi64(tmp_13, tmp_15);
+  coeffs[7] = _mm_unpackhi_epi64(tmp_13, tmp_15);
+}
+
+static INLINE void prepare_vertical_filter_coeffs_gamma0(int sy,
+                                                         __m128i *coeffs) {
+  const __m128i tmp_0 = _mm_loadu_si128(
+      (__m128i *)(warped_filter + (sy >> WARPEDDIFF_PREC_BITS)));
+
+  // even coeffs
+  coeffs[0] =
+      _mm_shuffle_epi8(tmp_0, _mm_loadu_si128((__m128i *)shuffle_gamma0_mask0));
+  coeffs[1] =
+      _mm_shuffle_epi8(tmp_0, _mm_loadu_si128((__m128i *)shuffle_gamma0_mask1));
+  coeffs[2] =
+      _mm_shuffle_epi8(tmp_0, _mm_loadu_si128((__m128i *)shuffle_gamma0_mask2));
+  coeffs[3] =
+      _mm_shuffle_epi8(tmp_0, _mm_loadu_si128((__m128i *)shuffle_gamma0_mask3));
+
+  // odd coeffs
+  coeffs[4] = coeffs[0];
+  coeffs[5] = coeffs[1];
+  coeffs[6] = coeffs[2];
+  coeffs[7] = coeffs[3];
+}
+
+static INLINE void filter_src_pixels_vertical(__m128i *tmp, __m128i *coeffs,
+                                              __m128i *res_lo, __m128i *res_hi,
+                                              int k) {
+  // Load from tmp and rearrange pairs of consecutive rows into the
+  // column order 0 0 2 2 4 4 6 6; 1 1 3 3 5 5 7 7
+  const __m128i *src = tmp + (k + 4);
+  const __m128i src_0 = _mm_unpacklo_epi16(src[0], src[1]);
+  const __m128i src_2 = _mm_unpacklo_epi16(src[2], src[3]);
+  const __m128i src_4 = _mm_unpacklo_epi16(src[4], src[5]);
+  const __m128i src_6 = _mm_unpacklo_epi16(src[6], src[7]);
+
+  const __m128i res_0 = _mm_madd_epi16(src_0, coeffs[0]);
+  const __m128i res_2 = _mm_madd_epi16(src_2, coeffs[1]);
+  const __m128i res_4 = _mm_madd_epi16(src_4, coeffs[2]);
+  const __m128i res_6 = _mm_madd_epi16(src_6, coeffs[3]);
+
+  const __m128i res_even =
+      _mm_add_epi32(_mm_add_epi32(res_0, res_2), _mm_add_epi32(res_4, res_6));
+
+  // Filter odd-index pixels
+  const __m128i src_1 = _mm_unpackhi_epi16(src[0], src[1]);
+  const __m128i src_3 = _mm_unpackhi_epi16(src[2], src[3]);
+  const __m128i src_5 = _mm_unpackhi_epi16(src[4], src[5]);
+  const __m128i src_7 = _mm_unpackhi_epi16(src[6], src[7]);
+
+  const __m128i res_1 = _mm_madd_epi16(src_1, coeffs[4]);
+  const __m128i res_3 = _mm_madd_epi16(src_3, coeffs[5]);
+  const __m128i res_5 = _mm_madd_epi16(src_5, coeffs[6]);
+  const __m128i res_7 = _mm_madd_epi16(src_7, coeffs[7]);
+
+  const __m128i res_odd =
+      _mm_add_epi32(_mm_add_epi32(res_1, res_3), _mm_add_epi32(res_5, res_7));
+
+  // Rearrange pixels back into the order 0 ... 7
+  *res_lo = _mm_unpacklo_epi32(res_even, res_odd);
+  *res_hi = _mm_unpackhi_epi32(res_even, res_odd);
+}
+
+static INLINE void store_vertical_filter_output(
+    __m128i *res_lo, __m128i *res_hi, const __m128i *res_add_const,
+    const __m128i *wt, const __m128i *res_sub_const, __m128i *round_bits_const,
+    uint8_t *pred, ConvolveParams *conv_params, int i, int j, int k,
+    const int reduce_bits_vert, int p_stride, int p_width,
+    const int round_bits) {
+  __m128i res_lo_1 = *res_lo;
+  __m128i res_hi_1 = *res_hi;
+
+  if (conv_params->is_compound) {
+    __m128i *const p =
+        (__m128i *)&conv_params->dst[(i + k + 4) * conv_params->dst_stride + j];
+    res_lo_1 = _mm_srai_epi32(_mm_add_epi32(res_lo_1, *res_add_const),
+                              reduce_bits_vert);
+    const __m128i temp_lo_16 = _mm_packus_epi32(res_lo_1, res_lo_1);
+    __m128i res_lo_16;
+    if (conv_params->do_average) {
+      __m128i *const dst8 = (__m128i *)&pred[(i + k + 4) * p_stride + j];
+      const __m128i p_16 = _mm_loadl_epi64(p);
+
+      if (conv_params->use_jnt_comp_avg) {
+        const __m128i p_16_lo = _mm_unpacklo_epi16(p_16, temp_lo_16);
+        const __m128i wt_res_lo = _mm_madd_epi16(p_16_lo, *wt);
+        const __m128i shifted_32 =
+            _mm_srai_epi32(wt_res_lo, DIST_PRECISION_BITS);
+        res_lo_16 = _mm_packus_epi32(shifted_32, shifted_32);
+      } else {
+        res_lo_16 = _mm_srai_epi16(_mm_add_epi16(p_16, temp_lo_16), 1);
+      }
+
+      res_lo_16 = _mm_add_epi16(res_lo_16, *res_sub_const);
+
+      res_lo_16 = _mm_srai_epi16(_mm_add_epi16(res_lo_16, *round_bits_const),
+                                 round_bits);
+      __m128i res_8_lo = _mm_packus_epi16(res_lo_16, res_lo_16);
+      *(uint32_t *)dst8 = _mm_cvtsi128_si32(res_8_lo);
+    } else {
+      _mm_storel_epi64(p, temp_lo_16);
+    }
+    if (p_width > 4) {
+      __m128i *const p4 =
+          (__m128i *)&conv_params
+              ->dst[(i + k + 4) * conv_params->dst_stride + j + 4];
+      res_hi_1 = _mm_srai_epi32(_mm_add_epi32(res_hi_1, *res_add_const),
+                                reduce_bits_vert);
+      const __m128i temp_hi_16 = _mm_packus_epi32(res_hi_1, res_hi_1);
+      __m128i res_hi_16;
+
+      if (conv_params->do_average) {
+        __m128i *const dst8_4 =
+            (__m128i *)&pred[(i + k + 4) * p_stride + j + 4];
+        const __m128i p4_16 = _mm_loadl_epi64(p4);
+
+        if (conv_params->use_jnt_comp_avg) {
+          const __m128i p_16_hi = _mm_unpacklo_epi16(p4_16, temp_hi_16);
+          const __m128i wt_res_hi = _mm_madd_epi16(p_16_hi, *wt);
+          const __m128i shifted_32 =
+              _mm_srai_epi32(wt_res_hi, DIST_PRECISION_BITS);
+          res_hi_16 = _mm_packus_epi32(shifted_32, shifted_32);
+        } else {
+          res_hi_16 = _mm_srai_epi16(_mm_add_epi16(p4_16, temp_hi_16), 1);
+        }
+        res_hi_16 = _mm_add_epi16(res_hi_16, *res_sub_const);
+
+        res_hi_16 = _mm_srai_epi16(_mm_add_epi16(res_hi_16, *round_bits_const),
+                                   round_bits);
+        __m128i res_8_hi = _mm_packus_epi16(res_hi_16, res_hi_16);
+        *(uint32_t *)dst8_4 = _mm_cvtsi128_si32(res_8_hi);
+
+      } else {
+        _mm_storel_epi64(p4, temp_hi_16);
+      }
+    }
+  } else {
+    const __m128i res_lo_round = _mm_srai_epi32(
+        _mm_add_epi32(res_lo_1, *res_add_const), reduce_bits_vert);
+    const __m128i res_hi_round = _mm_srai_epi32(
+        _mm_add_epi32(res_hi_1, *res_add_const), reduce_bits_vert);
+
+    const __m128i res_16bit = _mm_packs_epi32(res_lo_round, res_hi_round);
+    __m128i res_8bit = _mm_packus_epi16(res_16bit, res_16bit);
+
+    // Store, blending with 'pred' if needed
+    __m128i *const p = (__m128i *)&pred[(i + k + 4) * p_stride + j];
+
+    // Note: If we're outputting a 4x4 block, we need to be very careful
+    // to only output 4 pixels at this point, to avoid encode/decode
+    // mismatches when encoding with multiple threads.
+    if (p_width == 4) {
+      *(uint32_t *)p = _mm_cvtsi128_si32(res_8bit);
+    } else {
+      _mm_storel_epi64(p, res_8bit);
+    }
+  }
+}
+
+static INLINE void warp_vertical_filter(
+    uint8_t *pred, __m128i *tmp, ConvolveParams *conv_params, int16_t gamma,
+    int16_t delta, int p_height, int p_stride, int p_width, int i, int j,
+    int sy4, const int reduce_bits_vert, const __m128i *res_add_const,
+    const int round_bits, const int offset_bits) {
+  int k;
+  __m128i res_sub_const, round_bits_const, wt;
+  unpack_weights_and_set_round_const(conv_params, round_bits, offset_bits,
+                                     &res_sub_const, &round_bits_const, &wt);
+  // Vertical filter
+  for (k = -4; k < AOMMIN(4, p_height - i - 4); ++k) {
+    int sy = sy4 + delta * (k + 4);
+
+    __m128i coeffs[8];
+    prepare_vertical_filter_coeffs(gamma, sy, coeffs);
+
+    __m128i res_lo;
+    __m128i res_hi;
+    filter_src_pixels_vertical(tmp, coeffs, &res_lo, &res_hi, k);
+
+    store_vertical_filter_output(&res_lo, &res_hi, res_add_const, &wt,
+                                 &res_sub_const, &round_bits_const, pred,
+                                 conv_params, i, j, k, reduce_bits_vert,
+                                 p_stride, p_width, round_bits);
+  }
+}
+
+static INLINE void warp_vertical_filter_gamma0(
+    uint8_t *pred, __m128i *tmp, ConvolveParams *conv_params, int16_t gamma,
+    int16_t delta, int p_height, int p_stride, int p_width, int i, int j,
+    int sy4, const int reduce_bits_vert, const __m128i *res_add_const,
+    const int round_bits, const int offset_bits) {
+  int k;
+  (void)gamma;
+  __m128i res_sub_const, round_bits_const, wt;
+  unpack_weights_and_set_round_const(conv_params, round_bits, offset_bits,
+                                     &res_sub_const, &round_bits_const, &wt);
+  // Vertical filter
+  for (k = -4; k < AOMMIN(4, p_height - i - 4); ++k) {
+    int sy = sy4 + delta * (k + 4);
+
+    __m128i coeffs[8];
+    prepare_vertical_filter_coeffs_gamma0(sy, coeffs);
+
+    __m128i res_lo;
+    __m128i res_hi;
+    filter_src_pixels_vertical(tmp, coeffs, &res_lo, &res_hi, k);
+
+    store_vertical_filter_output(&res_lo, &res_hi, res_add_const, &wt,
+                                 &res_sub_const, &round_bits_const, pred,
+                                 conv_params, i, j, k, reduce_bits_vert,
+                                 p_stride, p_width, round_bits);
+  }
+}
+
+static INLINE void warp_vertical_filter_delta0(
+    uint8_t *pred, __m128i *tmp, ConvolveParams *conv_params, int16_t gamma,
+    int16_t delta, int p_height, int p_stride, int p_width, int i, int j,
+    int sy4, const int reduce_bits_vert, const __m128i *res_add_const,
+    const int round_bits, const int offset_bits) {
+  (void)delta;
+  int k;
+  __m128i res_sub_const, round_bits_const, wt;
+  unpack_weights_and_set_round_const(conv_params, round_bits, offset_bits,
+                                     &res_sub_const, &round_bits_const, &wt);
+
+  __m128i coeffs[8];
+  prepare_vertical_filter_coeffs(gamma, sy4, coeffs);
+  // Vertical filter
+  for (k = -4; k < AOMMIN(4, p_height - i - 4); ++k) {
+    __m128i res_lo;
+    __m128i res_hi;
+    filter_src_pixels_vertical(tmp, coeffs, &res_lo, &res_hi, k);
+
+    store_vertical_filter_output(&res_lo, &res_hi, res_add_const, &wt,
+                                 &res_sub_const, &round_bits_const, pred,
+                                 conv_params, i, j, k, reduce_bits_vert,
+                                 p_stride, p_width, round_bits);
+  }
+}
+
+static INLINE void warp_vertical_filter_gamma0_delta0(
+    uint8_t *pred, __m128i *tmp, ConvolveParams *conv_params, int16_t gamma,
+    int16_t delta, int p_height, int p_stride, int p_width, int i, int j,
+    int sy4, const int reduce_bits_vert, const __m128i *res_add_const,
+    const int round_bits, const int offset_bits) {
+  (void)delta;
+  (void)gamma;
+  int k;
+  __m128i res_sub_const, round_bits_const, wt;
+  unpack_weights_and_set_round_const(conv_params, round_bits, offset_bits,
+                                     &res_sub_const, &round_bits_const, &wt);
+
+  __m128i coeffs[8];
+  prepare_vertical_filter_coeffs_gamma0(sy4, coeffs);
+  // Vertical filter
+  for (k = -4; k < AOMMIN(4, p_height - i - 4); ++k) {
+    __m128i res_lo;
+    __m128i res_hi;
+    filter_src_pixels_vertical(tmp, coeffs, &res_lo, &res_hi, k);
+
+    store_vertical_filter_output(&res_lo, &res_hi, res_add_const, &wt,
+                                 &res_sub_const, &round_bits_const, pred,
+                                 conv_params, i, j, k, reduce_bits_vert,
+                                 p_stride, p_width, round_bits);
+  }
+}
+
+static INLINE void prepare_warp_vertical_filter(
+    uint8_t *pred, __m128i *tmp, ConvolveParams *conv_params, int16_t gamma,
+    int16_t delta, int p_height, int p_stride, int p_width, int i, int j,
+    int sy4, const int reduce_bits_vert, const __m128i *res_add_const,
+    const int round_bits, const int offset_bits) {
+  if (gamma == 0 && delta == 0)
+    warp_vertical_filter_gamma0_delta0(
+        pred, tmp, conv_params, gamma, delta, p_height, p_stride, p_width, i, j,
+        sy4, reduce_bits_vert, res_add_const, round_bits, offset_bits);
+  else if (gamma == 0 && delta != 0)
+    warp_vertical_filter_gamma0(pred, tmp, conv_params, gamma, delta, p_height,
+                                p_stride, p_width, i, j, sy4, reduce_bits_vert,
+                                res_add_const, round_bits, offset_bits);
+  else if (gamma != 0 && delta == 0)
+    warp_vertical_filter_delta0(pred, tmp, conv_params, gamma, delta, p_height,
+                                p_stride, p_width, i, j, sy4, reduce_bits_vert,
+                                res_add_const, round_bits, offset_bits);
+  else
+    warp_vertical_filter(pred, tmp, conv_params, gamma, delta, p_height,
+                         p_stride, p_width, i, j, sy4, reduce_bits_vert,
+                         res_add_const, round_bits, offset_bits);
+}
+
+static INLINE void prepare_warp_horizontal_filter(
+    const uint8_t *ref, __m128i *tmp, int stride, int32_t ix4, int32_t iy4,
+    int32_t sx4, int alpha, int beta, int p_height, int height, int i,
+    const int offset_bits_horiz, const int reduce_bits_horiz) {
+  if (alpha == 0 && beta == 0)
+    warp_horizontal_filter_alpha0_beta0(ref, tmp, stride, ix4, iy4, sx4, alpha,
+                                        beta, p_height, height, i,
+                                        offset_bits_horiz, reduce_bits_horiz);
+  else if (alpha == 0 && beta != 0)
+    warp_horizontal_filter_alpha0(ref, tmp, stride, ix4, iy4, sx4, alpha, beta,
+                                  p_height, height, i, offset_bits_horiz,
+                                  reduce_bits_horiz);
+  else if (alpha != 0 && beta == 0)
+    warp_horizontal_filter_beta0(ref, tmp, stride, ix4, iy4, sx4, alpha, beta,
+                                 p_height, height, i, offset_bits_horiz,
+                                 reduce_bits_horiz);
+  else
+    warp_horizontal_filter(ref, tmp, stride, ix4, iy4, sx4, alpha, beta,
+                           p_height, height, i, offset_bits_horiz,
+                           reduce_bits_horiz);
+}
 
 void av1_warp_affine_sse4_1(const int32_t *mat, const uint8_t *ref, int width,
                             int height, int stride, uint8_t *pred, int p_col,
@@ -458,24 +823,12 @@ void av1_warp_affine_sse4_1(const int32_t *mat, const uint8_t *ref, int width,
   assert(IMPLIES(conv_params->is_compound, conv_params->dst != NULL));
 
   const int offset_bits_vert = bd + 2 * FILTER_BITS - reduce_bits_horiz;
-  const __m128i reduce_bits_vert_shift = _mm_cvtsi32_si128(reduce_bits_vert);
   const __m128i reduce_bits_vert_const =
       _mm_set1_epi32(((1 << reduce_bits_vert) >> 1));
   const __m128i res_add_const = _mm_set1_epi32(1 << offset_bits_vert);
   const int round_bits =
       2 * FILTER_BITS - conv_params->round_0 - conv_params->round_1;
   const int offset_bits = bd + 2 * FILTER_BITS - conv_params->round_0;
-  const __m128i res_sub_const =
-      _mm_set1_epi16(-(1 << (offset_bits - conv_params->round_1)) -
-                     (1 << (offset_bits - conv_params->round_1 - 1)));
-  __m128i round_bits_shift = _mm_cvtsi32_si128(round_bits);
-  __m128i round_bits_const = _mm_set1_epi16(((1 << round_bits) >> 1));
-
-  const int w0 = conv_params->fwd_offset;
-  const int w1 = conv_params->bck_offset;
-  const __m128i wt0 = _mm_set1_epi16(w0);
-  const __m128i wt1 = _mm_set1_epi16(w1);
-  const __m128i wt = _mm_unpacklo_epi16(wt0, wt1);
   assert(IMPLIES(conv_params->do_average, conv_params->is_compound));
 
   /* Note: For this code to work, the left/right frame borders need to be
@@ -489,9 +842,13 @@ void av1_warp_affine_sse4_1(const int32_t *mat, const uint8_t *ref, int width,
   assert(ref[i * stride + width + j] == ref[i * stride + (width - 1)]);
   }
   }*/
-
-  warp_horizontal_filter_fn_t warp_horizontal_filter_fn =
-      warp_horizontal_filter_fn_t_array[alpha == 0][beta == 0];
+  __m128i res_add_const_1;
+  if (conv_params->is_compound == 1) {
+    res_add_const_1 = _mm_add_epi32(reduce_bits_vert_const, res_add_const);
+  } else {
+    res_add_const_1 = _mm_set1_epi32(-(1 << (bd + reduce_bits_vert - 1)) +
+                                     ((1 << reduce_bits_vert) >> 1));
+  }
 
   for (i = 0; i < p_height; i += 8) {
     for (j = 0; j < p_width; j += 8) {
@@ -571,192 +928,15 @@ void av1_warp_affine_sse4_1(const int32_t *mat, const uint8_t *ref, int width,
                             reduce_bits_horiz);
         }
       } else {
-        warp_horizontal_filter_fn(ref, tmp, stride, ix4, iy4, sx4, alpha, beta,
-                                  p_height, height, i, offset_bits_horiz,
-                                  reduce_bits_horiz);
+        prepare_warp_horizontal_filter(ref, tmp, stride, ix4, iy4, sx4, alpha,
+                                       beta, p_height, height, i,
+                                       offset_bits_horiz, reduce_bits_horiz);
       }
 
       // Vertical filter
-      for (k = -4; k < AOMMIN(4, p_height - i - 4); ++k) {
-        int sy = sy4 + delta * (k + 4);
-
-        // Load from tmp and rearrange pairs of consecutive rows into the
-        // column order 0 0 2 2 4 4 6 6; 1 1 3 3 5 5 7 7
-        const __m128i *src = tmp + (k + 4);
-        const __m128i src_0 = _mm_unpacklo_epi16(src[0], src[1]);
-        const __m128i src_2 = _mm_unpacklo_epi16(src[2], src[3]);
-        const __m128i src_4 = _mm_unpacklo_epi16(src[4], src[5]);
-        const __m128i src_6 = _mm_unpacklo_epi16(src[6], src[7]);
-
-        // Filter even-index pixels
-        const __m128i tmp_0 = _mm_loadu_si128(
-            (__m128i *)(warped_filter +
-                        ((sy + 0 * gamma) >> WARPEDDIFF_PREC_BITS)));
-        const __m128i tmp_2 = _mm_loadu_si128(
-            (__m128i *)(warped_filter +
-                        ((sy + 2 * gamma) >> WARPEDDIFF_PREC_BITS)));
-        const __m128i tmp_4 = _mm_loadu_si128(
-            (__m128i *)(warped_filter +
-                        ((sy + 4 * gamma) >> WARPEDDIFF_PREC_BITS)));
-        const __m128i tmp_6 = _mm_loadu_si128(
-            (__m128i *)(warped_filter +
-                        ((sy + 6 * gamma) >> WARPEDDIFF_PREC_BITS)));
-
-        const __m128i tmp_8 = _mm_unpacklo_epi32(tmp_0, tmp_2);
-        const __m128i tmp_10 = _mm_unpacklo_epi32(tmp_4, tmp_6);
-        const __m128i tmp_12 = _mm_unpackhi_epi32(tmp_0, tmp_2);
-        const __m128i tmp_14 = _mm_unpackhi_epi32(tmp_4, tmp_6);
-
-        const __m128i coeff_0 = _mm_unpacklo_epi64(tmp_8, tmp_10);
-        const __m128i coeff_2 = _mm_unpackhi_epi64(tmp_8, tmp_10);
-        const __m128i coeff_4 = _mm_unpacklo_epi64(tmp_12, tmp_14);
-        const __m128i coeff_6 = _mm_unpackhi_epi64(tmp_12, tmp_14);
-
-        const __m128i res_0 = _mm_madd_epi16(src_0, coeff_0);
-        const __m128i res_2 = _mm_madd_epi16(src_2, coeff_2);
-        const __m128i res_4 = _mm_madd_epi16(src_4, coeff_4);
-        const __m128i res_6 = _mm_madd_epi16(src_6, coeff_6);
-
-        const __m128i res_even = _mm_add_epi32(_mm_add_epi32(res_0, res_2),
-                                               _mm_add_epi32(res_4, res_6));
-
-        // Filter odd-index pixels
-        const __m128i src_1 = _mm_unpackhi_epi16(src[0], src[1]);
-        const __m128i src_3 = _mm_unpackhi_epi16(src[2], src[3]);
-        const __m128i src_5 = _mm_unpackhi_epi16(src[4], src[5]);
-        const __m128i src_7 = _mm_unpackhi_epi16(src[6], src[7]);
-
-        const __m128i tmp_1 = _mm_loadu_si128(
-            (__m128i *)(warped_filter +
-                        ((sy + 1 * gamma) >> WARPEDDIFF_PREC_BITS)));
-        const __m128i tmp_3 = _mm_loadu_si128(
-            (__m128i *)(warped_filter +
-                        ((sy + 3 * gamma) >> WARPEDDIFF_PREC_BITS)));
-        const __m128i tmp_5 = _mm_loadu_si128(
-            (__m128i *)(warped_filter +
-                        ((sy + 5 * gamma) >> WARPEDDIFF_PREC_BITS)));
-        const __m128i tmp_7 = _mm_loadu_si128(
-            (__m128i *)(warped_filter +
-                        ((sy + 7 * gamma) >> WARPEDDIFF_PREC_BITS)));
-
-        const __m128i tmp_9 = _mm_unpacklo_epi32(tmp_1, tmp_3);
-        const __m128i tmp_11 = _mm_unpacklo_epi32(tmp_5, tmp_7);
-        const __m128i tmp_13 = _mm_unpackhi_epi32(tmp_1, tmp_3);
-        const __m128i tmp_15 = _mm_unpackhi_epi32(tmp_5, tmp_7);
-
-        const __m128i coeff_1 = _mm_unpacklo_epi64(tmp_9, tmp_11);
-        const __m128i coeff_3 = _mm_unpackhi_epi64(tmp_9, tmp_11);
-        const __m128i coeff_5 = _mm_unpacklo_epi64(tmp_13, tmp_15);
-        const __m128i coeff_7 = _mm_unpackhi_epi64(tmp_13, tmp_15);
-
-        const __m128i res_1 = _mm_madd_epi16(src_1, coeff_1);
-        const __m128i res_3 = _mm_madd_epi16(src_3, coeff_3);
-        const __m128i res_5 = _mm_madd_epi16(src_5, coeff_5);
-        const __m128i res_7 = _mm_madd_epi16(src_7, coeff_7);
-
-        const __m128i res_odd = _mm_add_epi32(_mm_add_epi32(res_1, res_3),
-                                              _mm_add_epi32(res_5, res_7));
-
-        // Rearrange pixels back into the order 0 ... 7
-        __m128i res_lo = _mm_unpacklo_epi32(res_even, res_odd);
-        __m128i res_hi = _mm_unpackhi_epi32(res_even, res_odd);
-
-        if (conv_params->is_compound) {
-          __m128i *const p =
-              (__m128i *)&conv_params
-                  ->dst[(i + k + 4) * conv_params->dst_stride + j];
-          res_lo = _mm_add_epi32(res_lo, res_add_const);
-          res_lo = _mm_sra_epi32(_mm_add_epi32(res_lo, reduce_bits_vert_const),
-                                 reduce_bits_vert_shift);
-          const __m128i temp_lo_16 = _mm_packus_epi32(res_lo, res_lo);
-          __m128i res_lo_16;
-          if (conv_params->do_average) {
-            __m128i *const dst8 = (__m128i *)&pred[(i + k + 4) * p_stride + j];
-            const __m128i p_16 = _mm_loadl_epi64(p);
-
-            if (conv_params->use_jnt_comp_avg) {
-              const __m128i p_16_lo = _mm_unpacklo_epi16(p_16, temp_lo_16);
-              const __m128i wt_res_lo = _mm_madd_epi16(p_16_lo, wt);
-              const __m128i shifted_32 =
-                  _mm_srai_epi32(wt_res_lo, DIST_PRECISION_BITS);
-              res_lo_16 = _mm_packus_epi32(shifted_32, shifted_32);
-            } else {
-              res_lo_16 = _mm_srai_epi16(_mm_add_epi16(p_16, temp_lo_16), 1);
-            }
-
-            res_lo_16 = _mm_add_epi16(res_lo_16, res_sub_const);
-
-            res_lo_16 = _mm_sra_epi16(
-                _mm_add_epi16(res_lo_16, round_bits_const), round_bits_shift);
-            __m128i res_8_lo = _mm_packus_epi16(res_lo_16, res_lo_16);
-            *(uint32_t *)dst8 = _mm_cvtsi128_si32(res_8_lo);
-          } else {
-            _mm_storel_epi64(p, temp_lo_16);
-          }
-          if (p_width > 4) {
-            __m128i *const p4 =
-                (__m128i *)&conv_params
-                    ->dst[(i + k + 4) * conv_params->dst_stride + j + 4];
-
-            res_hi = _mm_add_epi32(res_hi, res_add_const);
-            res_hi =
-                _mm_sra_epi32(_mm_add_epi32(res_hi, reduce_bits_vert_const),
-                              reduce_bits_vert_shift);
-            const __m128i temp_hi_16 = _mm_packus_epi32(res_hi, res_hi);
-            __m128i res_hi_16;
-
-            if (conv_params->do_average) {
-              __m128i *const dst8_4 =
-                  (__m128i *)&pred[(i + k + 4) * p_stride + j + 4];
-              const __m128i p4_16 = _mm_loadl_epi64(p4);
-
-              if (conv_params->use_jnt_comp_avg) {
-                const __m128i p_16_hi = _mm_unpacklo_epi16(p4_16, temp_hi_16);
-                const __m128i wt_res_hi = _mm_madd_epi16(p_16_hi, wt);
-                const __m128i shifted_32 =
-                    _mm_srai_epi32(wt_res_hi, DIST_PRECISION_BITS);
-                res_hi_16 = _mm_packus_epi32(shifted_32, shifted_32);
-              } else {
-                res_hi_16 = _mm_srai_epi16(_mm_add_epi16(p4_16, temp_hi_16), 1);
-              }
-              res_hi_16 = _mm_add_epi16(res_hi_16, res_sub_const);
-
-              res_hi_16 = _mm_sra_epi16(
-                  _mm_add_epi16(res_hi_16, round_bits_const), round_bits_shift);
-              __m128i res_8_hi = _mm_packus_epi16(res_hi_16, res_hi_16);
-              *(uint32_t *)dst8_4 = _mm_cvtsi128_si32(res_8_hi);
-
-            } else {
-              _mm_storel_epi64(p4, temp_hi_16);
-            }
-          }
-        } else {
-          // Round and pack into 8 bits
-          const __m128i round_const =
-              _mm_set1_epi32(-(1 << (bd + reduce_bits_vert - 1)) +
-                             ((1 << reduce_bits_vert) >> 1));
-
-          const __m128i res_lo_round = _mm_srai_epi32(
-              _mm_add_epi32(res_lo, round_const), reduce_bits_vert);
-          const __m128i res_hi_round = _mm_srai_epi32(
-              _mm_add_epi32(res_hi, round_const), reduce_bits_vert);
-
-          const __m128i res_16bit = _mm_packs_epi32(res_lo_round, res_hi_round);
-          __m128i res_8bit = _mm_packus_epi16(res_16bit, res_16bit);
-
-          // Store, blending with 'pred' if needed
-          __m128i *const p = (__m128i *)&pred[(i + k + 4) * p_stride + j];
-
-          // Note: If we're outputting a 4x4 block, we need to be very careful
-          // to only output 4 pixels at this point, to avoid encode/decode
-          // mismatches when encoding with multiple threads.
-          if (p_width == 4) {
-            *(uint32_t *)p = _mm_cvtsi128_si32(res_8bit);
-          } else {
-            _mm_storel_epi64(p, res_8bit);
-          }
-        }
-      }
+      prepare_warp_vertical_filter(
+          pred, tmp, conv_params, gamma, delta, p_height, p_stride, p_width, i,
+          j, sy4, reduce_bits_vert, &res_add_const_1, round_bits, offset_bits);
     }
   }
 }

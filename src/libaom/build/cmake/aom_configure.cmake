@@ -70,7 +70,9 @@ if(NOT AOM_TARGET_CPU)
 endif()
 
 if(CMAKE_TOOLCHAIN_FILE) # Add toolchain file to config string.
-  set(toolchain_string "-DCMAKE_TOOLCHAIN_FILE=\\\"${CMAKE_TOOLCHAIN_FILE}\\\"")
+  file(RELATIVE_PATH toolchain_path "${AOM_CONFIG_DIR}"
+                     "${CMAKE_TOOLCHAIN_FILE}")
+  set(toolchain_string "-DCMAKE_TOOLCHAIN_FILE=\\\"${toolchain_path}\\\"")
   set(AOM_CMAKE_CONFIG "${toolchain_string} ${AOM_CMAKE_CONFIG}")
 else()
 
@@ -78,6 +80,8 @@ else()
   set(AOM_CMAKE_CONFIG "-DAOM_TARGET_CPU=${AOM_TARGET_CPU} ${AOM_CMAKE_CONFIG}")
 endif()
 set(AOM_CMAKE_CONFIG "-G \\\"${CMAKE_GENERATOR}\\\" ${AOM_CMAKE_CONFIG}")
+file(RELATIVE_PATH source_path "${AOM_CONFIG_DIR}" "${AOM_ROOT}")
+set(AOM_CMAKE_CONFIG "cmake ${source_path} ${AOM_CMAKE_CONFIG}")
 string(STRIP "${AOM_CMAKE_CONFIG}" AOM_CMAKE_CONFIG)
 
 message("--- aom_configure: Detected CPU: ${AOM_TARGET_CPU}")

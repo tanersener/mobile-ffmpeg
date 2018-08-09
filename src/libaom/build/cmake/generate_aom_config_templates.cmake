@@ -79,6 +79,7 @@ endif()
 
 include("${AOM_ROOT}/build/cmake/aom_config_defaults.cmake")
 list(APPEND aom_build_vars ${AOM_DETECT_VARS} ${AOM_CONFIG_VARS})
+list(SORT aom_build_vars)
 
 set(aom_config_h_template "${AOM_CONFIG_DIR}/config/aom_config.h.cmake")
 file(WRITE "${aom_config_h_template}" ${h_file_header_block})

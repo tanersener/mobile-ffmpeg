@@ -413,18 +413,13 @@ static void swap_mi_and_prev_mi(AV1_COMMON *cm) {
 }
 
 void av1_initialize_enc(void) {
-  static volatile int init_done = 0;
-
-  if (!init_done) {
-    av1_rtcd();
-    aom_dsp_rtcd();
-    aom_scale_rtcd();
-    av1_init_intra_predictors();
-    av1_init_me_luts();
-    av1_rc_init_minq_luts();
-    av1_init_wedge_masks();
-    init_done = 1;
-  }
+  av1_rtcd();
+  aom_dsp_rtcd();
+  aom_scale_rtcd();
+  av1_init_intra_predictors();
+  av1_init_me_luts();
+  av1_rc_init_minq_luts();
+  av1_init_wedge_masks();
 }
 
 static void dealloc_context_buffers_ext(AV1_COMP *cpi) {

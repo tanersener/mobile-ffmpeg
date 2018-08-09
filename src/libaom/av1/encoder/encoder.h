@@ -707,6 +707,7 @@ typedef struct AV1_COMP {
   int default_interp_skip_flags;
 } AV1_COMP;
 
+// Must not be called more than once.
 void av1_initialize_enc(void);
 
 struct AV1_COMP *av1_create_compressor(AV1EncoderConfig *oxcf,

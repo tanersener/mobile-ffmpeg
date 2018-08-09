@@ -1839,7 +1839,8 @@ static void rd_use_partition(AV1_COMP *cpi, ThreadData *td,
     case PARTITION_HORZ_A:
     case PARTITION_HORZ_B:
     case PARTITION_HORZ_4:
-    case PARTITION_VERT_4: assert(0 && "Cannot handle extended partiton types");
+    case PARTITION_VERT_4:
+      assert(0 && "Cannot handle extended partition types");
     default: assert(0); break;
   }
 
@@ -4239,6 +4240,7 @@ static void encode_rd_sb_row(AV1_COMP *cpi, ThreadData *td,
       reset_partition(pc_root, cm->seq_params.sb_size);
       x->use_cb_search_range = 0;
       init_first_partition_pass_stats_tables(x->first_partition_pass_stats);
+      // Do the first pass if we need two pass partition search
       if (cpi->sf.two_pass_partition_search &&
           cpi->sf.use_square_partition_only_threshold > BLOCK_4X4 &&
           mi_row + mi_size_high[cm->seq_params.sb_size] < cm->mi_rows &&
@@ -4299,15 +4301,11 @@ static void encode_rd_sb_row(AV1_COMP *cpi, ThreadData *td,
             }
           }
         }
-
-        rd_pick_partition(cpi, td, tile_data, tp, mi_row, mi_col,
-                          cm->seq_params.sb_size, &dummy_rdc, INT64_MAX,
-                          pc_root, NULL);
-      } else {
-        rd_pick_partition(cpi, td, tile_data, tp, mi_row, mi_col,
-                          cm->seq_params.sb_size, &dummy_rdc, INT64_MAX,
-                          pc_root, NULL);
       }
+
+      rd_pick_partition(cpi, td, tile_data, tp, mi_row, mi_col,
+                        cm->seq_params.sb_size, &dummy_rdc, INT64_MAX, pc_root,
+                        NULL);
     }
 #if CONFIG_COLLECT_INTER_MODE_RD_STATS
     // TODO(angiebird): Let inter_mode_rd_model_estimation support multi-tile.
@@ -5527,7 +5525,7 @@ static void encode_superblock(const AV1_COMP *const cpi, TileDataEnc *tile_data,
       tx_size = (bsize > BLOCK_4X4) ? tx_size : TX_4X4;
     }
     mbmi->tx_size = tx_size;
-    set_txfm_ctxs(tx_size, xd->n8_w, xd->n8_h,
+    set_txfm_ctxs(tx_size, xd->n4_w, xd->n4_h,
                   (mbmi->skip || seg_skip) && is_inter_block(mbmi), xd);
   }
   CFL_CTX *const cfl = &xd->cfl;
