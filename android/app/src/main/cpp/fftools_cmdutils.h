@@ -19,14 +19,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/* CHANGES 07.2018 Taner Sener
+/*
+ * CHANGES 08.2018
+ * --------------------------------------------------------
+ * - fftools_ prefix added to file name and include guards
+ *
+ * CHANGES 07.2018
  * --------------------------------------------------------
  * - Include guards renamed
  * - Unused headers removed
  */
 
-#ifndef MOBILE_FFMPEG_CMDUTILS_H
-#define MOBILE_FFMPEG_CMDUTILS_H
+#ifndef FFTOOLS_CMDUTILS_H
+#define FFTOOLS_CMDUTILS_H
 
 #include <stdint.h>
 
@@ -651,4 +656,4 @@ void *grow_array(void *array, int elem_size, int *size, int new_size);
 
 double get_rotation(AVStream *st);
 
-#endif /* MOBILE_FFMPEG_CMDUTILS_H */
+#endif /* FFTOOLS_CMDUTILS_H */

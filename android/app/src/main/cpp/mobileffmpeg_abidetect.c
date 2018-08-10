@@ -18,7 +18,7 @@
  */
 
 #include "cpu-features.h"
-#include "abidetect.h"
+#include "mobileffmpeg_abidetect.h"
 
 /** Full name of the Java class that owns native functions in this file. */
 const char *abiDetectClassName = "com/arthenica/mobileffmpeg/AbiDetect";

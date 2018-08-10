@@ -32,13 +32,16 @@ import android.view.ViewGroup;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
+import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.LogCallback;
+import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.RunCallback;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
+import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_SUCCESS;
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class VidStabTabFragment extends Fragment {
@@ -95,9 +98,10 @@ public class VidStabTabFragment extends Fragment {
     }
 
     public void enableLogCallback() {
-        com.arthenica.mobileffmpeg.Log.enableLogCallback(new LogCallback() {
+        Config.enableLogCallback(new LogCallback() {
+
             @Override
-            public void apply(com.arthenica.mobileffmpeg.Log.Message message) {
+            public void apply(LogMessage message) {
                 android.util.Log.d(MainActivity.TAG, message.getText());
             }
         });
@@ -151,7 +155,7 @@ public class VidStabTabFragment extends Fragment {
 
                         @Override
                         public Object call() {
-                            if (returnCode == 0) {
+                            if (returnCode == RETURN_CODE_SUCCESS) {
 
                                 android.util.Log.d(TAG, "Create completed successfully; stabilizing video.");
 
@@ -167,7 +171,7 @@ public class VidStabTabFragment extends Fragment {
                                     public void apply(final int returnCode) {
                                         android.util.Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
-                                        if (returnCode == 0) {
+                                        if (returnCode == RETURN_CODE_SUCCESS) {
                                             final String stabilizeVideoCommand = String.format("-y -i %s -vf vidstabtransform=smoothing=30:input=%s %s", videoFile.getAbsolutePath(), shakeResultsFile.getAbsolutePath(), stabilizedVideoFile.getAbsolutePath());
 
                                             android.util.Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", stabilizeVideoCommand));
@@ -184,7 +188,7 @@ public class VidStabTabFragment extends Fragment {
 
                                                         @Override
                                                         public Object call() {
-                                                            if (returnCode == 0) {
+                                                            if (returnCode == RETURN_CODE_SUCCESS) {
                                                                 android.util.Log.d(TAG, "Stabilize video completed successfully; playing videos.");
                                                                 playVideo();
                                                                 playStabilizedVideo();

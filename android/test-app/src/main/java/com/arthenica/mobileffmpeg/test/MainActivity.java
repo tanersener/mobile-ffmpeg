@@ -33,13 +33,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.system.ErrnoException;
-import android.system.Os;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.RunCallback;
 import com.arthenica.mobileffmpeg.util.AsynchronousTaskService;
@@ -48,6 +48,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -123,10 +124,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            createFontConfig();
-            Log.d(TAG, "Font config created.");
+            registerAppFont();
+            Log.d(TAG, "Application fonts registered.");
         } catch (final IOException e) {
-            Log.e(TAG, "Creating font config failed.", e);
+            Log.e(TAG, "Font registration failed.", e);
         }
     }
 
@@ -183,6 +184,26 @@ public class MainActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    public AlertDialog createCancellableProgressDialog(final String text, final View.OnClickListener onClickListener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (inflater != null) {
+            View dialogView = inflater.inflate(R.layout.cancellable_progress_dialog_layout, null);
+            builder.setView(dialogView);
+
+            TextView textView = dialogView.findViewById(R.id.progressDialogText);
+            if (textView != null) {
+                textView.setText(text);
+            }
+            Button cancelButton = dialogView.findViewById(R.id.cancelButton);
+            if (cancelButton != null) {
+                cancelButton.setOnClickListener(onClickListener);
+            }
+        }
+        builder.setCancelable(false);
+        return builder.create();
+    }
+
     protected void resourceToFile(final int resourceId, final File file) throws IOException {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), resourceId);
 
@@ -219,52 +240,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    protected void createFontConfig() throws IOException {
-        File parentDirectory = getCacheDir();
-
-        final File fontDirectory = new File(parentDirectory, "fonts");
-        if (!fontDirectory.exists()) {
-            fontDirectory.mkdirs();
-        }
+    protected void registerAppFont() throws IOException {
+        final File cacheDirectory = getCacheDir();
 
         // SAVE FONTS
-        rawResourceToFile(R.raw.doppioone_regular, new File(fontDirectory, "doppioone_regular.ttf"));
-        rawResourceToFile(R.raw.truenorg, new File(fontDirectory, "truenorg.otf"));
+        rawResourceToFile(R.raw.doppioone_regular, new File(cacheDirectory, "doppioone_regular.ttf"));
+        rawResourceToFile(R.raw.truenorg, new File(cacheDirectory, "truenorg.otf"));
 
-        try {
-            Os.setenv("FONTCONFIG_PATH", parentDirectory.getAbsolutePath(), true);
-            android.util.Log.e(TAG, "Fontconfig env variable set");
-        } catch (ErrnoException e) {
-            android.util.Log.e(TAG, "Setting env variable failed", e);
-        }
-
-        final File configFile = new File(parentDirectory.getAbsolutePath(), "fonts.conf");
-        if (configFile.exists()) {
-            configFile.delete();
-        }
-
-        final String fontConfig = "<?xml version=\"1.0\"?>\n" +
-                "<!DOCTYPE fontconfig SYSTEM \"fonts.dtd\">\n" +
-                "<fontconfig>\n" +
-                "\n" +
-                "<dir>.</dir>\n" +
-                "<dir>" + fontDirectory.getAbsolutePath() + "</dir>\n" +
-                "  <!-- settings go here -->\n" +
-                "        <match target=\"pattern\">\n" +
-                "                <test qual=\"any\" name=\"family\">\n" +
-                "                        <string>Doppio</string>\n" +
-                "                </test>\n" +
-                "                <edit name=\"family\" mode=\"assign\" binding=\"same\">\n" +
-                "                        <string>Doppio One</string>\n" +
-                "                </edit>\n" +
-                "        </match>\n" +
-                "\n" +
-                "</fontconfig>";
-
-        final FileOutputStream outputStream = new FileOutputStream(configFile);
-        outputStream.write(fontConfig.getBytes());
-        outputStream.flush();
-        outputStream.close();
+        final HashMap<String, String> fontNameMapping = new HashMap<>();
+        fontNameMapping.put("Doppio", "Doppio One");
+        Config.setFontDirectory(this, cacheDirectory.getAbsolutePath(), fontNameMapping);
     }
 
 }

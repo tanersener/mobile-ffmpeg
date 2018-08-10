@@ -17,15 +17,19 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pthread.h>
+
+#include "fftools_ffmpeg.h"
+
 #include "mobileffmpeg.h"
 
-/** Forward declaration for function defined in ffmpeg.c */
+/** Forward declaration for function defined in fftools_ffmpeg.c */
 int execute(int argc, char **argv);
 
-/** Full name of the Java class that owns native functions in this file. */
+/** Full name of the FFmpeg class */
 const char *ffmpegClassName = "com/arthenica/mobileffmpeg/FFmpeg";
 
-/** Prototypes of native functions defined by this file. */
+/** Prototypes of native functions defined by FFmpeg class. */
 JNINativeMethod ffmpegMethods[] = {
   {"getFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion},
   {"getVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion},
@@ -135,4 +139,14 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *en
     free(argv);
 
     return retCode;
+}
+
+/**
+ * Cancels an ongoing operation.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_cancel(JNIEnv *env, jclass object) {
+    cancel_operation();
 }

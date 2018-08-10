@@ -18,15 +18,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/* CHANGES 07.2018 Taner Sener
+/*
+ * CHANGES 08.2018
+ * --------------------------------------------------------
+ * - fftools_ prefix added to file name and parent headers
+ *
+ * CHANGES 07.2018
  * --------------------------------------------------------
  * - Parentheses placed around assignments in condition to prevent -Wparentheses warning
  */
 
 #include <stdint.h>
 
-#include "ffmpeg.h"
-#include "cmdutils.h"
+#include "fftools_ffmpeg.h"
+#include "fftools_cmdutils.h"
 
 #include "libavformat/avformat.h"
 

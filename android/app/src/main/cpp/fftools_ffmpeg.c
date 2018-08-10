@@ -23,11 +23,20 @@
  * multimedia converter based on the FFmpeg libraries
  */
 
-/* CHANGES 07.2018 Taner Sener
+/*
+ * CHANGES 08.2018
+ * --------------------------------------------------------
+ * - fftools_ prefix added to file name and parent headers
+ * - forward_report() method, report_callback function pointer and set_report_callback() setter
+ * method added to forward stats.
+ * - forward_report() call added from print_report()
+ * - cancel_operation() method added to trigger sigterm_handler
+ *
+ * CHANGES 07.2018
  * --------------------------------------------------------
  * - main() function renamed as execute()
- * - exit_program implemented with setjmp
- * - extern longjmp_value added to access exit code stored in exit_program
+ * - exit_program() implemented with setjmp
+ * - extern longjmp_value added to access exit code stored in exit_program()
  * - cleanup() method added
  */
 
@@ -41,7 +50,7 @@
 #include <stdatomic.h>
 #include <stdint.h>
 
-#include "exception.h"
+#include "mobileffmpeg_exception.h"
 
 #if HAVE_IO_H
 #include <io.h>
@@ -111,8 +120,8 @@
 
 #include <time.h>
 
-#include "ffmpeg.h"
-#include "cmdutils.h"
+#include "fftools_ffmpeg.h"
+#include "fftools_cmdutils.h"
 
 #include "libavutil/avassert.h"
 
@@ -160,6 +169,8 @@ int         nb_output_files   = 0;
 
 FilterGraph **filtergraphs;
 int        nb_filtergraphs;
+
+static void (*report_callback)(int, float, float, int64_t, int, double, double) = NULL;
 
 #if HAVE_TERMIOS_H
 
@@ -1644,6 +1655,93 @@ static void print_final_stats(int64_t total_size)
     }
 }
 
+
+static void forward_report(int is_last_report, int64_t timer_start, int64_t cur_time)
+{
+    AVFormatContext *oc = NULL;
+    AVCodecContext *enc = NULL;
+    OutputStream *ost = NULL;
+    static int64_t last_time = -1;
+    int64_t pts = INT64_MIN + 1;
+    int vid, i;
+
+    int frame_number = 0;
+    float fps = 0;
+    float quality = 0;
+    int64_t total_size = 0;
+    int seconds = 0;
+    double bitrate = 0.0;
+    double speed = 0.0;
+
+    // 1. calculate operation duration
+    if (!is_last_report) {
+        if (last_time == -1) {
+            last_time = cur_time;
+            return;
+        }
+        if ((cur_time - last_time) < 500000) {
+            return;
+        }
+        last_time = cur_time;
+    }
+    float t = (cur_time-timer_start) / 1000000.0;
+
+    oc = output_files[0]->ctx;
+
+    // 2. calculate size
+    total_size = avio_size(oc->pb);
+    if (total_size <= 0) {
+        total_size = avio_tell(oc->pb);
+    }
+
+    vid = 0;
+    for (i = 0; i < nb_output_streams; i++) {
+        ost = output_streams[i];
+        enc = ost->enc_ctx;
+
+        if (!ost->stream_copy) {
+
+            // 3. extract quality
+            quality = ost->quality / (float) FF_QP2LAMBDA;
+        }
+
+        if (!vid && enc->codec_type == AVMEDIA_TYPE_VIDEO) {
+
+            // 4. extract frame number
+            frame_number = ost->frame_number;
+
+            // 5. calculate fps
+            fps = t > 1 ? frame_number / t : 0;
+        }
+
+        // 6. calculate time
+        if (av_stream_get_end_pts(ost->st) != AV_NOPTS_VALUE)
+            pts = FFMAX(pts, av_rescale_q(av_stream_get_end_pts(ost->st),
+                                          ost->st->time_base, AV_TIME_BASE_Q));
+
+        vid = 1;
+
+        // FORWARD DATA
+        if (report_callback != NULL) {
+            report_callback(frame_number, fps, quality, total_size, seconds, bitrate, speed);
+        }
+    }
+
+    // 7. calculate time, with microseconds to milliseconds conversion
+    seconds = FFABS(pts) / 1000;
+
+    // 8. calculating kbit/s value
+    bitrate = pts && total_size >= 0 ? total_size * 8 / (pts / 1000.0) : -1;
+
+    // 9. calculate processing speed = processed stream duration/operation duration
+    speed = t != 0.0 ? (double)pts / AV_TIME_BASE / t : -1;
+
+    // FORWARD DATA
+    if (report_callback != NULL) {
+        report_callback(frame_number, fps, quality, total_size, seconds, bitrate, speed);
+    }
+}
+
 static void print_report(int is_last_report, int64_t timer_start, int64_t cur_time)
 {
     AVBPrint buf, buf_script;
@@ -1661,6 +1759,9 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
     const char *hours_sign;
     int ret;
     float t;
+
+    // FORWARD IT BEFORE PROCESSING
+    forward_report(is_last_report, timer_start, cur_time);
 
     if (!print_stats && !is_last_report && !progress_avio)
         return;
@@ -4796,6 +4897,9 @@ static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 void cleanup() {
     main_return_code = 0;
     longjmp_value = 0;
+    received_sigterm = 0;
+    received_nb_signals = 0;
+    ffmpeg_exited = 0;
 
     run_as_daemon = 0;
     nb_frames_dup = 0;
@@ -4820,7 +4924,18 @@ void cleanup() {
     nb_filtergraphs = 0;
 }
 
-int execute(int argc, char **argv) {
+void set_report_callback(void (*callback)(int, float, float, int64_t, int, double, double))
+{
+    report_callback = callback;
+}
+
+void cancel_operation()
+{
+    sigterm_handler(SIGINT);
+}
+
+int execute(int argc, char **argv)
+{
     int i, ret;
     int64_t ti;
 

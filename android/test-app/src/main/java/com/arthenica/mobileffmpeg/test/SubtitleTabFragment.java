@@ -32,23 +32,40 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.arthenica.mobileffmpeg.Config;
+import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
+import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.RunCallback;
+import com.arthenica.mobileffmpeg.Statistics;
+import com.arthenica.mobileffmpeg.StatsCallback;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.concurrent.Callable;
 
+import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_CANCEL;
+import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_SUCCESS;
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class SubtitleTabFragment extends Fragment {
+
+    private enum State {
+        IDLE,
+        CREATING,
+        BURNING
+    }
 
     private MainActivity mainActivity;
     private VideoView videoView;
     private AlertDialog createProgressDialog;
     private AlertDialog burnProgressDialog;
+    private Statistics statistics;
+    private State state;
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -72,8 +89,21 @@ public class SubtitleTabFragment extends Fragment {
             videoView = getView().findViewById(R.id.videoPlayerFrame);
         }
 
-        createProgressDialog = mainActivity.createProgressDialog("Creating video");
-        burnProgressDialog = mainActivity.createProgressDialog("Burning subtitles");
+        createProgressDialog = mainActivity.createCancellableProgressDialog("Creating video", new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                FFmpeg.cancel();
+            }
+        });
+        burnProgressDialog = mainActivity.createCancellableProgressDialog("Burning subtitles", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FFmpeg.cancel();
+            }
+        });
+
+        state = State.IDLE;
     }
 
     @Override
@@ -95,10 +125,29 @@ public class SubtitleTabFragment extends Fragment {
     }
 
     public void enableLogCallback() {
-        com.arthenica.mobileffmpeg.Log.enableLogCallback(new LogCallback() {
+        Config.enableLogCallback(new LogCallback() {
+
             @Override
-            public void apply(com.arthenica.mobileffmpeg.Log.Message message) {
+            public void apply(LogMessage message) {
                 android.util.Log.d(MainActivity.TAG, message.getText());
+            }
+        });
+    }
+
+    public void enableStatsCallback() {
+        Config.enableStatsCallback(new StatsCallback() {
+
+            @Override
+            public void apply(final Statistics newStatistics) {
+                MainActivity.addUIAction(new Callable() {
+
+                    @Override
+                    public Object call() {
+                        SubtitleTabFragment.this.statistics = newStatistics;
+                        updateProgressDialog();
+                        return null;
+                    }
+                });
             }
         });
     }
@@ -136,11 +185,15 @@ public class SubtitleTabFragment extends Fragment {
 
             Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
 
+            state = State.CREATING;
+
             MainActivity.executeAsync(new RunCallback() {
 
                 @Override
                 public void apply(final int returnCode) {
                     Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+
+                    state = State.IDLE;
 
                     hideCreateProgressDialog();
 
@@ -148,15 +201,17 @@ public class SubtitleTabFragment extends Fragment {
 
                         @Override
                         public Object call() {
-                            if (returnCode == 0) {
+                            if (returnCode == RETURN_CODE_SUCCESS) {
 
                                 Log.d(TAG, "Create completed successfully; burning subtitles.");
 
-                                String burnSubtitlesCommand = String.format("-y -i %s -vf subtitles=%s:force_style='FontName=Trueno' %s", videoFile.getAbsolutePath(), getSubtitleFile().getAbsolutePath(), videoWithSubtitlesFile.getAbsolutePath());
+                                String burnSubtitlesCommand = String.format("-y -i %s -vf subtitles=%s:force_style='FontName=Doppio' %s", videoFile.getAbsolutePath(), getSubtitleFile().getAbsolutePath(), videoWithSubtitlesFile.getAbsolutePath());
 
                                 showBurnProgressDialog();
 
                                 Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", burnSubtitlesCommand));
+
+                                state = State.BURNING;
 
                                 MainActivity.executeAsync(new RunCallback() {
 
@@ -164,15 +219,20 @@ public class SubtitleTabFragment extends Fragment {
                                     public void apply(final int returnCode) {
                                         Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
+                                        state = State.IDLE;
+
                                         hideBurnProgressDialog();
 
                                         MainActivity.addUIAction(new Callable() {
 
                                             @Override
                                             public Object call() {
-                                                if (returnCode == 0) {
+                                                if (returnCode == RETURN_CODE_SUCCESS) {
                                                     Log.d(TAG, "Burn subtitles completed successfully; playing video.");
                                                     playVideo();
+                                                } else if (returnCode == RETURN_CODE_CANCEL) {
+                                                    Popup.show(mainActivity, "Burn subtitles operation cancelled.");
+                                                    Log.d(TAG, "Burn subtitles operation cancelled");
                                                 } else {
                                                     Popup.show(mainActivity, "Burn subtitles failed. Please check log for the details.");
                                                     Log.d(TAG, String.format("Burn subtitles failed with rc=%d", returnCode));
@@ -184,6 +244,9 @@ public class SubtitleTabFragment extends Fragment {
                                     }
                                 }, burnSubtitlesCommand);
 
+                            } else if (returnCode == RETURN_CODE_CANCEL) {
+                                Popup.show(mainActivity, "Create operation cancelled.");
+                                Log.d(TAG, "Create operation cancelled");
                             } else {
                                 Popup.show(mainActivity, "Create video failed. Please check log for the details.");
                                 Log.d(TAG, String.format("Create failed with rc=%d", returnCode));
@@ -240,11 +303,41 @@ public class SubtitleTabFragment extends Fragment {
     public void setActive() {
         android.util.Log.i(MainActivity.TAG, "Subtitle Tab Activated");
         enableLogCallback();
+        enableStatsCallback();
         Popup.show(mainActivity, Tooltip.SUBTITLE_TEST_TOOLTIP_TEXT);
     }
 
     protected void showCreateProgressDialog() {
+
+        // CLEAN STATISTICS
+        statistics = null;
+        Config.resetStatistics();
+
         createProgressDialog.show();
+    }
+
+    protected void updateProgressDialog() {
+        if (statistics == null) {
+            return;
+        }
+
+        int timeInMilliseconds = this.statistics.getTime();
+        int totalVideoDuration = 9000;
+
+        String completePercentage = new BigDecimal(timeInMilliseconds).multiply(new BigDecimal(100)).divide(new BigDecimal(totalVideoDuration), 0, BigDecimal.ROUND_HALF_UP).toString();
+
+        if (state == State.CREATING) {
+            TextView textView = createProgressDialog.findViewById(R.id.progressDialogText);
+            if (textView != null) {
+                textView.setText(String.format("Creating video: %% %s", completePercentage));
+            }
+        } else if (state == State.BURNING) {
+            TextView textView = burnProgressDialog.findViewById(R.id.progressDialogText);
+            if (textView != null) {
+                textView.setText(String.format("Burning subtitles: %% %s", completePercentage));
+            }
+        }
+
     }
 
     protected void hideCreateProgressDialog() {
@@ -252,6 +345,11 @@ public class SubtitleTabFragment extends Fragment {
     }
 
     protected void showBurnProgressDialog() {
+
+        // CLEAN STATISTICS
+        statistics = null;
+        Config.resetStatistics();
+
         burnProgressDialog.show();
     }
 

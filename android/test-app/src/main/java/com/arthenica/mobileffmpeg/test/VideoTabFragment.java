@@ -34,15 +34,22 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.MediaController;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.LogCallback;
+import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.RunCallback;
+import com.arthenica.mobileffmpeg.Statistics;
+import com.arthenica.mobileffmpeg.StatsCallback;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.concurrent.Callable;
 
+import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_SUCCESS;
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class VideoTabFragment extends Fragment implements AdapterView.OnItemSelectedListener {
@@ -51,6 +58,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
     private VideoView videoView;
     private AlertDialog progressDialog;
     private String selectedCodec;
+    private Statistics statistics;
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -107,10 +115,29 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     public void enableLogCallback() {
-        com.arthenica.mobileffmpeg.Log.enableLogCallback(new LogCallback() {
+        Config.enableLogCallback(new LogCallback() {
+
             @Override
-            public void apply(com.arthenica.mobileffmpeg.Log.Message message) {
+            public void apply(LogMessage message) {
                 android.util.Log.d(MainActivity.TAG, message.getText());
+            }
+        });
+    }
+
+    public void enableStatsCallback() {
+        Config.enableStatsCallback(new StatsCallback() {
+
+            @Override
+            public void apply(final Statistics newStatistics) {
+                MainActivity.addUIAction(new Callable() {
+
+                    @Override
+                    public Object call() {
+                        VideoTabFragment.this.statistics = newStatistics;
+                        updateProgressDialog();
+                        return null;
+                    }
+                });
             }
         });
     }
@@ -166,7 +193,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
                         @Override
                         public Object call() {
-                            if (returnCode == 0) {
+                            if (returnCode == RETURN_CODE_SUCCESS) {
                                 Log.d(TAG, "Encode completed successfully; playing video.");
                                 playVideo();
                             } else {
@@ -300,19 +327,46 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
     public void setActive() {
         android.util.Log.i(MainActivity.TAG, "Video Tab Activated");
         enableLogCallback();
+        enableStatsCallback();
         Popup.show(mainActivity, Tooltip.VIDEO_TEST_TOOLTIP_TEXT);
     }
 
     protected void showProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.show();
+
+        // CLEAN STATISTICS
+        statistics = null;
+        Config.resetStatistics();
+
+        progressDialog.show();
+    }
+
+    protected void updateProgressDialog() {
+        if (statistics == null) {
+            return;
+        }
+
+        int timeInMilliseconds = this.statistics.getTime();
+        int totalVideoDuration = 9000;
+
+        String completePercentage = new BigDecimal(timeInMilliseconds).multiply(new BigDecimal(100)).divide(new BigDecimal(totalVideoDuration), 0, BigDecimal.ROUND_HALF_UP).toString();
+
+        TextView textView = progressDialog.findViewById(R.id.progressDialogText);
+        if (textView != null) {
+            textView.setText(String.format("Encoding video: %% %s", completePercentage));
         }
     }
 
     protected void hideProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
+        progressDialog.dismiss();
+
+        MainActivity.addUIAction(new Callable() {
+
+            @Override
+            public Object call() {
+                VideoTabFragment.this.progressDialog = mainActivity.createProgressDialog("Encoding video");
+                return null;
+            }
+        });
     }
 
 }

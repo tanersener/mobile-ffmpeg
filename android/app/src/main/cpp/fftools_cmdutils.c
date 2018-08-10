@@ -19,7 +19,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/* CHANGES 07.2018 Taner Sener
+/*
+ * CHANGES 08.2018
+ * --------------------------------------------------------
+ * - fftools_ prefix added to file name and parent header
+ *
+ * CHANGES 07.2018
  * --------------------------------------------------------
  * - Unused headers removed
  * - Parentheses placed around assignments in condition to prevent -Wparentheses warning
@@ -27,9 +32,9 @@
  * - longjmp_value added to store exit code
  * - (optindex < argc) validation added before accessing argv[optindex] inside split_commandline()
  * and parse_options()
- * - all av_log_set_callback invocations updated to set logCallbackFunction from log.c. unused
+ * - all av_log_set_callback invocations updated to set mobileffmpeg_log_callback_function from mobileffmpeg.c. unused
  * log_callback_help and log_callback_help methods removed.
- * - (idx + 1 < argc) expression added in parse_loglevel().
+ * - (idx + 1 < argc) validation added in parse_loglevel().ig
  */
 
 #include <string.h>
@@ -38,7 +43,7 @@
 #include <errno.h>
 #include <math.h>
 
-#include "exception.h"
+#include "mobileffmpeg_exception.h"
 
 /* Include only the enabled headers since some compilers (namely, Sun
    Studio) will not omit unused inline functions and create undefined
@@ -66,7 +71,7 @@
 #include "libavutil/cpu.h"
 #include "libavutil/ffversion.h"
 #include "libavutil/version.h"
-#include "cmdutils.h"
+#include "fftools_cmdutils.h"
 #if CONFIG_NETWORK
 #include "libavformat/network.h"
 #endif
@@ -79,7 +84,7 @@
 #endif
 
 static int init_report(const char *env);
-extern void logCallbackFunction(void *ptr, int level, const char* format, va_list vargs);
+extern void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs);
 
 AVDictionary *sws_dict;
 AVDictionary *swr_opts;
@@ -1037,7 +1042,7 @@ static int init_report(const char *env)
                filename.str, strerror(errno));
         return ret;
     }
-    av_log_set_callback(logCallbackFunction);
+    av_log_set_callback(mobileffmpeg_log_callback_function);
     av_log(NULL, AV_LOG_INFO,
            "%s started on %04d-%02d-%02d at %02d:%02d:%02d\n"
            "Report written to \"%s\"\n",
@@ -1191,7 +1196,7 @@ void show_banner(int argc, char **argv, const OptionDef *options)
 
 int show_version(void *optctx, const char *opt, const char *arg)
 {
-    av_log_set_callback(logCallbackFunction);
+    av_log_set_callback(mobileffmpeg_log_callback_function);
     print_program_info (SHOW_COPYRIGHT, AV_LOG_INFO);
     print_all_libs_info(SHOW_VERSION, AV_LOG_INFO);
 
@@ -1200,7 +1205,7 @@ int show_version(void *optctx, const char *opt, const char *arg)
 
 int show_buildconf(void *optctx, const char *opt, const char *arg)
 {
-    av_log_set_callback(logCallbackFunction);
+    av_log_set_callback(mobileffmpeg_log_callback_function);
     print_buildconf      (INDENT|0, AV_LOG_INFO);
 
     return 0;
@@ -1951,7 +1956,7 @@ static void show_help_bsf(const char *name)
 int show_help(void *optctx, const char *opt, const char *arg)
 {
     char *topic, *par;
-    av_log_set_callback(logCallbackFunction);
+    av_log_set_callback(mobileffmpeg_log_callback_function);
 
     topic = av_strdup(arg ? arg : "");
     if (!topic)

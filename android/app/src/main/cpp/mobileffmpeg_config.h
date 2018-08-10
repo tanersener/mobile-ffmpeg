@@ -17,12 +17,17 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOBILE_FFMPEG_LOG_H
-#define MOBILE_FFMPEG_LOG_H
+#ifndef MOBILE_FFMPEG_CONFIG_H
+#define MOBILE_FFMPEG_CONFIG_H
 
 #include <jni.h>
 #include <android/log.h>
+
 #include "libavutil/log.h"
+#include "libavutil/ffversion.h"
+
+/** Library version string */
+#define MOBILE_FFMPEG_VERSION "2.1"
 
 /** Defines tag used for Android logging. */
 #define LIB_NAME "mobile-ffmpeg"
@@ -43,31 +48,31 @@
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LIB_NAME, __VA_ARGS__)
 
 /*
- * Class:     com_arthenica_mobileffmpeg_Log
+ * Class:     com_arthenica_mobileffmpeg_Config
  * Method:    enableNativeRedirection
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Log_enableNativeRedirection(JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_enableNativeRedirection(JNIEnv *, jclass);
 
 /*
- * Class:     com_arthenica_mobileffmpeg_Log
+ * Class:     com_arthenica_mobileffmpeg_Config
  * Method:    disableNativeRedirection
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Log_disableNativeRedirection(JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_disableNativeRedirection(JNIEnv *, jclass);
 
 /*
- * Class:     com_arthenica_mobileffmpeg_Log
- * Method:    setNativeLevel
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    setNativeLogLevel
  * Signature: (I)V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Log_setNativeLevel(JNIEnv *, jclass, jint);
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel(JNIEnv *, jclass, jint);
 
 /*
- * Class:     com_arthenica_mobileffmpeg_Log
- * Method:    getNativeLevel
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    getNativeLogLevel
  * Signature: ()I
  */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Log_getNativeLevel(JNIEnv *, jclass);
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel(JNIEnv *, jclass);
 
-#endif /* MOBILE_FFMPEG_LOG_H */
+#endif /* MOBILE_FFMPEG_CONFIG_H */

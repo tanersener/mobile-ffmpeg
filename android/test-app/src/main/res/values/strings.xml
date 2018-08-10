@@ -15,4 +15,5 @@
     <string name="audio_encode_button_text">ENCODE</string>
     <string name="subtitle_burn_subtitles_button_text">BURN SUBTITLES</string>
     <string name="vidstab_stabilize_video_button_text">STABILIZE VIDEO</string>
+    <string name="dialog_cancel_button_text">CANCEL</string>
 </resources>

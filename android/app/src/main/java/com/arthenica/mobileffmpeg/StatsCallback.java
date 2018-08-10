@@ -20,33 +20,14 @@
 package com.arthenica.mobileffmpeg;
 
 /**
- * <p>This class is used to detect running ABI name using Android's <code>cpufeatures</code>
- * library.
+ * <p>Represents a callback function to receive statistics of running operation.
  *
  * @author Taner Sener
- * @since v1.0
+ * @since v2.1
  */
-public class AbiDetect {
+@FunctionalInterface
+public interface StatsCallback {
 
-    static {
-        System.loadLibrary("mobileffmpeg-abidetect");
-
-        /* ALL LIBRARIES LOADED AT STARTUP */
-        Config.class.getName();
-        FFmpeg.class.getName();
-    }
-
-    /**
-     * Default constructor hidden.
-     */
-    private AbiDetect() {
-    }
-
-    /**
-     * <p>Returns running ABI name.
-     *
-     * @return running ABI name
-     */
-    public native static String getAbi();
+    void apply(final Statistics statistics);
 
 }

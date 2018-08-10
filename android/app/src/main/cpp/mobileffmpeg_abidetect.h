@@ -21,7 +21,7 @@
 #define MOBILE_FFMPEG_ABIDETECT_H
 
 #include <jni.h>
-#include "log.h"
+#include "mobileffmpeg.h"
 
 /** Represents armeabi-v7a ABI with NEON support. */
 #define ABI_ARMV7A_NEON "armeabi-v7a-neon"

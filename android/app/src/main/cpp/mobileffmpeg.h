@@ -20,15 +20,10 @@
 #ifndef MOBILE_FFMPEG_H
 #define MOBILE_FFMPEG_H
 
-#include <string.h>
-#include <stdlib.h>
 #include <jni.h>
 
 #include "libavutil/ffversion.h"
-#include "log.h"
-
-/** Library version string */
-#define MOBILE_FFMPEG_VERSION "2.1"
+#include "mobileffmpeg_config.h"
 
 /*
  * Class:     com_arthenica_mobileffmpeg_FFmpeg
@@ -50,5 +45,12 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIE
  * Signature: ([Ljava/lang/String;)I
  */
 JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *, jclass, jobjectArray);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_FFmpeg
+ * Method:    cancel
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_cancel(JNIEnv *, jclass);
 
 #endif /* MOBILE_FFMPEG_H */

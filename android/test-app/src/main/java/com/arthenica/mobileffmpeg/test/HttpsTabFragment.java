@@ -30,9 +30,10 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
-import com.arthenica.mobileffmpeg.Log;
 import com.arthenica.mobileffmpeg.LogCallback;
+import com.arthenica.mobileffmpeg.LogMessage;
 
 import java.util.concurrent.Callable;
 
@@ -89,10 +90,10 @@ public class HttpsTabFragment extends Fragment {
     }
 
     public void enableLogCallback() {
-        Log.enableLogCallback(new LogCallback() {
+        Config.enableLogCallback(new LogCallback() {
 
             @Override
-            public void apply(final Log.Message message) {
+            public void apply(final LogMessage message) {
                 MainActivity.addUIAction(new Callable() {
 
                     @Override

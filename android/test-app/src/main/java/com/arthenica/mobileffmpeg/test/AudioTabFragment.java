@@ -34,14 +34,16 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
-import com.arthenica.mobileffmpeg.Log;
 import com.arthenica.mobileffmpeg.LogCallback;
+import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.RunCallback;
 
 import java.io.File;
 import java.util.concurrent.Callable;
 
+import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_SUCCESS;
 import static com.arthenica.mobileffmpeg.test.MainActivity.TAG;
 
 public class AudioTabFragment extends Fragment implements AdapterView.OnItemSelectedListener {
@@ -107,10 +109,10 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     public void enableLogCallback() {
-        Log.enableLogCallback(new LogCallback() {
+        Config.enableLogCallback(new LogCallback() {
 
             @Override
-            public void apply(final Log.Message message) {
+            public void apply(final LogMessage message) {
                 MainActivity.addUIAction(new Callable() {
 
                     @Override
@@ -124,7 +126,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     public void disableLogCallback() {
-        Log.enableLogCallback(null);
+        Config.enableLogCallback(null);
     }
 
     @Override
@@ -167,7 +169,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
 
                     @Override
                     public Object call() {
-                        if (returnCode == 0) {
+                        if (returnCode == RETURN_CODE_SUCCESS) {
                             Popup.show(mainActivity, "Encode completed successfully.");
                             android.util.Log.d(TAG, "Encode completed successfully.");
                         } else {
@@ -263,15 +265,11 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     protected void showProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.show();
-        }
+        progressDialog.show();
     }
 
     protected void hideProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
+        progressDialog.dismiss();
     }
 
     public String generateAudioEncodeScript() {

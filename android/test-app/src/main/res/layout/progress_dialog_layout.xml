@@ -19,7 +19,7 @@
 
         <TextView
             android:id="@+id/progressDialogText"
-            android:layout_width="158dp"
+            android:layout_width="200dp"
             android:layout_height="match_parent"
             android:gravity="center|start"
             android:textColor="@android:color/black"

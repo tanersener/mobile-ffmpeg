@@ -28,6 +28,6 @@ package com.arthenica.mobileffmpeg;
 @FunctionalInterface
 public interface LogCallback {
 
-    void apply(final Log.Message message);
+    void apply(final LogMessage message);
 
 }
