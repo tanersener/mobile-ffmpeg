@@ -17,7 +17,7 @@
  *  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.arthenica.mobileffmpeg;
+package com.arthenica.mobileffmpeg.util;
 
 /**
  * <p>Represents a callback function to receive run result.

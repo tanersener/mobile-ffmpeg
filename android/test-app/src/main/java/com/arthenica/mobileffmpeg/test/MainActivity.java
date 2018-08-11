@@ -41,7 +41,7 @@ import android.widget.TextView;
 
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
-import com.arthenica.mobileffmpeg.RunCallback;
+import com.arthenica.mobileffmpeg.util.RunCallback;
 import com.arthenica.mobileffmpeg.util.AsynchronousTaskService;
 
 import java.io.File;

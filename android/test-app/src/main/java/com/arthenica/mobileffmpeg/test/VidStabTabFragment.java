@@ -35,7 +35,7 @@ import android.widget.VideoView;
 import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
-import com.arthenica.mobileffmpeg.RunCallback;
+import com.arthenica.mobileffmpeg.util.RunCallback;
 
 import java.io.File;
 import java.io.IOException;

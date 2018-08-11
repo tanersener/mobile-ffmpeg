@@ -34,7 +34,7 @@ import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
-import com.arthenica.mobileffmpeg.RunCallback;
+import com.arthenica.mobileffmpeg.util.RunCallback;
 
 import java.util.concurrent.Callable;
 
