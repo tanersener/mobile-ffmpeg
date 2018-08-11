@@ -21,7 +21,7 @@
 
 #import "AudioViewController.h"
 #import "RCEasyTipView.h"
-#import <mobileffmpeg/Log.h>
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
 
 @interface AudioViewController ()
@@ -152,7 +152,7 @@
 }
 
 - (void)createAudioSample {
-    [Log setLogDelegate:nil];
+    [MobileFFmpegConfig setLogDelegate:nil];
     
     NSLog(@"Creating AUDIO sample before the test.\n");
     
@@ -242,7 +242,7 @@
 }
 
 - (void)setActive {
-    [Log setLogDelegate:self];
+    [MobileFFmpegConfig setLogDelegate:self];
     [self hideTooltip];
     [self showTooltip];
 }

@@ -41,8 +41,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * <p>2. {@link #setLogLevel(Level)}/{@link #getLogLevel()}: Use this methods to see/control FFmpeg
  * log severity.
  *
- * <p>3. {@link StatsCallback}: It is possible to receive statistics about ongoing operation by
- * defining a {@link StatsCallback} function or calling {@link #getLastReceivedStatistics()}
+ * <p>3. {@link StatisticsCallback}: It is possible to receive statistics about ongoing operation by
+ * defining a {@link StatisticsCallback} function or by calling {@link #getLastReceivedStatistics()}
  * method.
  *
  * <p>4. Font configuration: It is possible to register custom fonts with
@@ -65,7 +65,7 @@ public class Config {
 
     private static Level activeLogLevel;
 
-    private static StatsCallback statsCallbackFunction;
+    private static StatisticsCallback statisticsCallbackFunction;
 
     private static Statistics lastReceivedStatistics;
 
@@ -93,12 +93,12 @@ public class Config {
             System.loadLibrary("mobileffmpeg-config");
         }
 
-        Config.enableRedirection();
-
         /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
         activeLogLevel = Level.from(getNativeLogLevel());
 
         lastReceivedStatistics = new Statistics();
+
+        Config.enableRedirection();
     }
 
     /**
@@ -108,14 +108,14 @@ public class Config {
     }
 
     /**
-     * <p>Enables log and stats redirection.
+     * <p>Enables log and statistics redirection.
      */
     public static void enableRedirection() {
         enableNativeRedirection();
     }
 
     /**
-     * <p>Disables log and stats redirection.
+     * <p>Disables log and statistics redirection.
      */
     public static void disableRedirection() {
         disableNativeRedirection();
@@ -152,12 +152,12 @@ public class Config {
     }
 
     /**
-     * <p>Sets a callback function to redirect FFmpeg stats.
+     * <p>Sets a callback function to redirect FFmpeg statistics.
      *
-     * @param statsCallback new stats callback function
+     * @param statisticsCallback new statistics callback function
      */
-    public static void enableStatsCallback(final StatsCallback statsCallback) {
-        statsCallbackFunction = statsCallback;
+    public static void enableStatisticsCallback(final StatisticsCallback statisticsCallback) {
+        statisticsCallbackFunction = statisticsCallback;
     }
 
     /**
@@ -215,7 +215,7 @@ public class Config {
     }
 
     /**
-     * <p>Stats redirection method called by JNI/native part.
+     * <p>Statistics redirection method called by JNI/native part.
      *
      * @param videoFrameNumber last processed frame number for videos
      * @param videoFps frames processed per second for videos
@@ -225,14 +225,14 @@ public class Config {
      * @param bitrate output bit rate in kbits/s
      * @param speed processing speed = processed duration / operation duration
      */
-    private static void stats(final int videoFrameNumber, final float videoFps,
+    private static void statistics(final int videoFrameNumber, final float videoFps,
                               final float videoQuality, final long size, final int time,
                               final double bitrate, final double speed) {
         final Statistics newStatistics = new Statistics(videoFrameNumber, videoFps, videoQuality, size, time, bitrate, speed);
         lastReceivedStatistics.update(newStatistics);
 
-        if (statsCallbackFunction != null) {
-            statsCallbackFunction.apply(lastReceivedStatistics);
+        if (statisticsCallbackFunction != null) {
+            statisticsCallbackFunction.apply(lastReceivedStatistics);
         }
     }
 
@@ -264,26 +264,25 @@ public class Config {
 
     /**
      * <p>Registers fonts inside the given path, so they are available in FFmpeg filters.
-     * <p>
+     *
      * <p>Note that you need to build <code>MobileFFmpeg</code> with <code>fontconfig</code>
      * enabled or use a prebuilt package with <code>fontconfig</code> inside to use this feature.
      *
      * @param context           application context to access application data
      * @param fontDirectoryPath directory which contains fonts (.ttf and .otf files)
-     * @param fontNameMapping   custom font name mappings, useful to give your fonts more friendly
-     *                          names
+     * @param fontNameMapping   custom font name mappings, useful to access your fonts with more friendly names
      */
     public static void setFontDirectory(final Context context, final String fontDirectoryPath, final Map<String, String> fontNameMapping) {
         final File cacheDir = context.getCacheDir();
         int validFontNameMappingCount = 0;
 
-        final File fontDirectory = new File(cacheDir, ".mobileffmpeg");
-        if (!fontDirectory.exists()) {
-            boolean tempFontConfDirectoryCreated = fontDirectory.mkdirs();
+        final File tempConfigurationDirectory = new File(cacheDir, ".mobileffmpeg");
+        if (!tempConfigurationDirectory.exists()) {
+            boolean tempFontConfDirectoryCreated = tempConfigurationDirectory.mkdirs();
             Log.d(TAG, String.format("Created temporary font conf directory: %s.", tempFontConfDirectoryCreated));
         }
 
-        final File fontConfiguration = new File(fontDirectory, "fonts.conf");
+        final File fontConfiguration = new File(tempConfigurationDirectory, "fonts.conf");
         if (fontConfiguration.exists()) {
             boolean fontConfigurationDeleted = fontConfiguration.delete();
             Log.d(TAG, String.format("Deleted old temporary font configuration: %s.", fontConfigurationDeleted));
@@ -330,7 +329,7 @@ public class Config {
 
             Log.d(TAG, String.format("Saved new temporary font configuration with %d font name mappings.", validFontNameMappingCount));
 
-            setFontconfigConfigurationPath(fontDirectory.getAbsolutePath());
+            setFontconfigConfigurationPath(tempConfigurationDirectory.getAbsolutePath());
 
             Log.d(TAG, String.format("Font directory %s registered successfully.", fontDirectoryPath));
 
@@ -348,7 +347,7 @@ public class Config {
     }
 
     /**
-     * <p>Enables native redirection. Necessary for log and stats callback functions.
+     * <p>Enables native redirection. Necessary for log and statistics callback functions.
      */
     private static native void enableNativeRedirection();
 

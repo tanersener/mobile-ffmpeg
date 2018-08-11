@@ -1,0 +1,502 @@
+/*
+ * Copyright (c) 2018 Taner Sener
+ *
+ * This file is part of MobileFFmpeg.
+ *
+ * MobileFFmpeg is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * MobileFFmpeg is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "fftools_ffmpeg.h"
+
+#include "MobileFFmpegConfig.h"
+#include "ArchDetect.h"
+#include "MobileFFmpeg.h"
+
+typedef enum {
+    LogType = 1,
+    StatisticsType = 2
+} CallbackType;
+
+/**
+ * Callback data class.
+ */
+@interface CallbackData : NSObject
+
+@end
+
+@implementation CallbackData {
+
+    CallbackType type;
+
+    int logLevel;                       // log level
+    NSString *logData;                  // log data
+
+    int statisticsFrameNumber;          // statistics frame number
+    float statisticsFps;                // statistics fps
+    float statisticsQuality;            // statistics quality
+    int64_t statisticsSize;             // statistics size
+    int statisticsTime;                 // statistics time
+    double statisticsBitrate;           // statistics bitrate
+    double statisticsSpeed;             // statistics speed
+}
+
+ - (instancetype)initWithLogLevel:(int)newLogLevel data:(NSString*)newData {
+    self = [super init];
+    if (self) {
+        type = LogType;
+
+        logLevel = newLogLevel;
+        logData = newData;
+    }
+
+    return self;
+}
+
+ - (instancetype)initWithVideoFrameNumber: (int)videoFrameNumber
+                            fps:(float)videoFps
+                            quality:(float)videoQuality
+                            size:(int64_t)size
+                            time:(int)time
+                            bitrate:(double)bitrate
+                            speed:(double)speed {
+    self = [super init];
+    if (self) {
+        type = StatisticsType;
+
+        statisticsFrameNumber = videoFrameNumber;
+        statisticsFps = videoFps;
+        statisticsQuality = videoQuality;
+        statisticsSize = size;
+        statisticsTime = time;
+        statisticsBitrate = bitrate;
+        statisticsSpeed = speed;
+    }
+
+    return self;
+}
+
+- (CallbackType)getType {
+    return type;
+}
+
+- (int)getLogLevel {
+    return logLevel;
+}
+
+- (NSString*)getLogData {
+    return logData;
+}
+
+- (int)getStatisticsFrameNumber {
+    return statisticsFrameNumber;
+}
+
+- (float)getStatisticsFps {
+    return statisticsFps;
+}
+
+- (float)getStatisticsQuality {
+    return statisticsQuality;
+}
+
+- (int64_t)getStatisticsSize {
+    return statisticsSize;
+}
+
+- (int)getStatisticsTime {
+    return statisticsTime;
+}
+
+- (double)getStatisticsBitrate {
+    return statisticsBitrate;
+}
+
+- (double)getStatisticsSpeed {
+    return statisticsSpeed;
+}
+
+@end
+
+/** Redirection control variables */
+static int redirectionEnabled;
+static NSRecursiveLock *lock;
+static dispatch_semaphore_t semaphore;
+static NSMutableArray *callbackDataArray;
+
+/** Holds delegate defined to redirect logs */
+static id<LogDelegate> logDelegate = nil;
+
+/** Holds delegate defined to redirect statistics */
+static id<StatisticsDelegate> statisticsDelegate = nil;
+
+NSString *const LIB_NAME = @"mobile-ffmpeg";
+
+static Statistics *lastReceivedStatistics = nil;
+
+void callbackWait(int milliSeconds) {
+    dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(milliSeconds * NSEC_PER_MSEC)));
+}
+
+void callbackNotify() {
+    dispatch_semaphore_signal(semaphore);
+}
+
+/**
+ * Adds log data to the end of callback data list.
+ */
+void logCallbackDataAdd(int level, NSString*logData) {
+    CallbackData *callbackData = [[CallbackData alloc] initWithLogLevel:level data:logData];
+
+    [lock lock];
+    [callbackDataArray addObject:callbackData];
+    [lock unlock];
+
+    callbackNotify();
+}
+
+/**
+ * Adds statistics data to the end of callback data list.
+ */
+void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+    CallbackData *callbackData = [[CallbackData alloc] initWithVideoFrameNumber:frameNumber fps:fps quality:quality size:size time:time bitrate:bitrate speed:speed];
+
+    [lock lock];
+    [callbackDataArray addObject:callbackData];
+    [lock unlock];
+
+    callbackNotify();
+}
+
+/**
+ * Removes head of callback data list.
+ */
+CallbackData *callbackDataRemove() {
+    CallbackData *newData = nil;
+
+    [lock lock];
+
+    @try {
+        newData = [callbackDataArray objectAtIndex:0];
+        [callbackDataArray removeObjectAtIndex:0];
+    } @catch(NSException *exception) {
+        // DO NOTHING
+    } @finally {
+        [lock unlock];
+    }
+
+    return newData;
+}
+
+/**
+ * Callback function for FFmpeg logs.
+ *
+ * \param pointer to AVClass struct
+ * \param level
+ * \param format
+ * \param arguments
+ */
+void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs) {
+    NSString *logData = [[[NSString alloc] initWithFormat:[NSString stringWithCString:format encoding:NSUTF8StringEncoding] arguments:vargs] autorelease];
+    logCallbackDataAdd(level, logData);
+}
+
+/**
+ * Callback function for FFmpeg statistics.
+ *
+ * \param frameNumber last processed frame number
+ * \param fps frames processed per second
+ * \param quality quality of the output stream (video only)
+ * \param size size in bytes
+ * \param time processed output duration
+ * \param bitrate output bit rate in kbits/s
+ * \param speed processing speed = processed duration / operation duration
+ */
+void mobileffmpeg_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+    statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
+}
+
+/**
+ * Forwards callback messages to Delegates.
+ */
+void callbackBlockFunction() {
+    NSLog(@"Async callback block started.\n");
+
+    while(redirectionEnabled) {
+
+        CallbackData *callbackData = callbackDataRemove();
+        if (callbackData != nil) {
+
+            if ([callbackData getType] == LogType) {
+
+                // LOG CALLBACK
+                int activeLogLevel = [MobileFFmpegConfig getLogLevel];
+
+                if (activeLogLevel == AV_LOG_QUIET || [callbackData getLogLevel] > activeLogLevel) {
+
+                    // LOG NEITHER PRINTED NOR FORWARDED
+                    return;
+                }
+
+                if (logDelegate != nil) {
+
+                    // FORWARD LOG TO DELEGATE
+                    [logDelegate logCallback:[callbackData getLogLevel]:[callbackData getLogData]];
+                } else {
+
+                    // WRITE TO NSLOG
+                    NSLog(@"%@: %@", [MobileFFmpegConfig logLevelToString:[callbackData getLogLevel]], [callbackData getLogData]);
+                }
+
+            } else {
+
+                // STATISTICS CALLBACK
+                Statistics *newStatistics = [[Statistics alloc] initWithVideoFrameNumber:[callbackData getStatisticsFrameNumber] fps:[callbackData getStatisticsFps] quality:[callbackData getStatisticsQuality] size:[callbackData getStatisticsSize] time:[callbackData getStatisticsTime] bitrate:[callbackData getStatisticsBitrate] speed:[callbackData getStatisticsSpeed]];
+                [lastReceivedStatistics update:newStatistics];
+
+                if (logDelegate != nil) {
+
+                    // FORWARD STATISTICS TO DELEGATE
+                    [statisticsDelegate statisticsCallback:newStatistics];
+                }
+            }
+
+        } else {
+            callbackWait(100);
+        }
+    }
+
+    NSLog(@"Async callback block stopped.\n");
+}
+
+@implementation MobileFFmpegConfig
+
++ (void)initialize {
+    [ArchDetect class];
+    [MobileFFmpeg class];
+
+    redirectionEnabled = 0;
+    lock = [[NSRecursiveLock alloc] init];
+    semaphore = dispatch_semaphore_create(0);
+    lastReceivedStatistics = [[Statistics alloc] init];
+    callbackDataArray = [[NSMutableArray alloc] init];
+
+    [MobileFFmpegConfig enableRedirection];
+}
+
+- (void)dealloc {
+    [super dealloc];
+
+    dispatch_release(semaphore);
+}
+
+/**
+ * Enables log and statistics redirection.
+ */
++ (void)enableRedirection {
+    [lock lock];
+
+    if (redirectionEnabled != 0) {
+        [lock unlock];
+        return;
+    }
+    redirectionEnabled = 1;
+
+    [lock unlock];
+
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        callbackBlockFunction();
+    });
+
+    av_log_set_callback(mobileffmpeg_log_callback_function);
+    set_report_callback(mobileffmpeg_statistics_callback_function);
+}
+
+/**
+ * Disables log and statistics redirection.
+ */
++ (void)disableRedirection {
+    [lock lock];
+
+    if (redirectionEnabled != 1) {
+        [lock unlock];
+        return;
+    }
+    redirectionEnabled = 0;
+
+    [lock unlock];
+
+    av_log_set_callback(av_log_default_callback);
+    set_report_callback(nil);
+
+    callbackNotify();
+}
+
+/**
+ * Returns log level.
+ *
+ * \return log level
+ */
++ (int)getLogLevel {
+    return av_log_get_level();
+}
+
+/**
+ * Sets log level.
+ *
+ * \param log level
+ */
++ (void)setLogLevel: (int)level {
+    av_log_set_level(level);
+}
+
+/**
+ * Converts int log level to string.
+ *
+ * \param level value
+ * \return string value
+ */
++ (NSString*)logLevelToString: (int)level {
+    switch (level) {
+        case AV_LOG_TRACE: return @"TRACE";
+        case AV_LOG_DEBUG: return @"DEBUG";
+        case AV_LOG_VERBOSE: return @"VERBOSE";
+        case AV_LOG_INFO: return @"INFO";
+        case AV_LOG_WARNING: return @"WARNING";
+        case AV_LOG_ERROR: return @"ERROR";
+        case AV_LOG_FATAL: return @"FATAL";
+        case AV_LOG_PANIC: return @"PANIC";
+        case AV_LOG_QUIET:
+        default: return @"";
+    }
+}
+
+/**
+ * Sets a LogDelegate. logCallback method inside LogDelegate is used to redirect logs.
+ *
+ * \param new log delegate
+ */
++ (void)setLogDelegate: (id<LogDelegate>)newLogDelegate {
+    logDelegate = newLogDelegate;
+}
+
+/**
+ * Sets a StatisticsDelegate.
+ *
+ * \param statistics delegate
+ */
++ (void)setStatisticsDelegate: (id<StatisticsDelegate>)newStatisticsDelegate {
+    statisticsDelegate = newStatisticsDelegate;
+}
+
+/**
+ * Returns the last received statistics data.
+ *
+ * \return last received statistics data
+ */
++ (Statistics*)getLastReceivedStatistics {
+    return lastReceivedStatistics;
+}
+
+/**
+ * Resets last received statistics.
+ */
++ (void)resetStatistics {
+    lastReceivedStatistics = [[Statistics alloc] init];
+}
+
+/**
+ * Sets and overrides fontconfig configuration directory.
+ *
+ * \param directory which contains fontconfig configuration (fonts.conf)
+ */
++ (void)setFontconfigConfigurationPath: (NSString*)path {
+    if (path != nil) {
+        setenv("FONTCONFIG_PATH", [path UTF8String], true);
+    }
+}
+
+/**
+ * Registers fonts inside the given path, so they are available in FFmpeg filters.
+ *
+ * Note that you need to build MobileFFmpeg with fontconfig
+ * enabled or use a prebuilt package with fontconfig inside to use this feature.
+ *
+ * \param directory which contains fonts (.ttf and .otf files)
+ * \param custom font name mappings, useful to access your fonts with more friendly names
+ */
++ (void)setFontDirectory: (NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping {
+    NSError *error = nil;
+    BOOL isDirectory = YES;
+    BOOL isFile = NO;
+    int validFontNameMappingCount = 0;
+    NSString *tempConfigurationDirectory = [NSTemporaryDirectory() stringByAppendingPathComponent:@".mobileffmpeg"];
+    NSString *fontConfigurationFile = [tempConfigurationDirectory stringByAppendingPathComponent:@"fonts.conf"];
+
+    if (![[NSFileManager defaultManager] fileExistsAtPath:tempConfigurationDirectory isDirectory:&isDirectory]) {
+
+        if (![[NSFileManager defaultManager] createDirectoryAtPath:tempConfigurationDirectory withIntermediateDirectories:YES attributes:nil error:&error]) {
+            NSLog(@"Failed to set font directory. Error received while creating temp conf directory: %@.", error);
+            return;
+        }
+
+        NSLog(@"Created temporary font conf directory: TRUE.");
+    }
+
+    if ([[NSFileManager defaultManager] fileExistsAtPath:fontConfigurationFile isDirectory:&isFile]) {
+        BOOL fontConfigurationDeleted = [[NSFileManager defaultManager] removeItemAtPath:fontConfigurationFile error:NULL];
+        NSLog(@"Deleted old temporary font configuration: %s.", fontConfigurationDeleted?"TRUE":"FALSE");
+    }
+
+    /* PROCESS MAPPINGS FIRST */
+    NSString *fontNameMappingBlock = @"";
+    for (NSString *fontName in [fontNameMapping allKeys]) {
+        NSString *mappedFontName = [fontNameMapping objectForKey:fontName];
+
+        if ((fontName != nil) && (mappedFontName != nil) && ([fontName length] > 0) && ([mappedFontName length] > 0)) {
+
+            fontNameMappingBlock = [NSString stringWithFormat:@"%@\n%@\n%@%@%@\n%@\n%@\n%@%@%@\n%@\n%@\n",
+                @"        <match target=\"pattern\">",
+                @"                <test qual=\"any\" name=\"family\">",
+                @"                        <string>", fontName, @"</string>",
+                @"                </test>",
+                @"                <edit name=\"family\" mode=\"assign\" binding=\"same\">",
+                @"                        <string>", mappedFontName, @"</string>",
+                @"                </edit>",
+                @"        </match>"];
+
+            validFontNameMappingCount++;
+        }
+    }
+
+    NSString *fontConfiguration = [NSString stringWithFormat:@"%@\n%@\n%@\n%@\n%@%@%@\n%@\n%@\n",
+                            @"<?xml version=\"1.0\"?>",
+                            @"<!DOCTYPE fontconfig SYSTEM \"fonts.dtd\">",
+                            @"<fontconfig>",
+                            @"    <dir>.</dir>",
+                            @"    <dir>", fontDirectoryPath, @"</dir>",
+                            fontNameMappingBlock,
+                            @"</fontconfig>"];
+
+    if (![fontConfiguration writeToFile:fontConfigurationFile atomically:YES encoding:NSUTF8StringEncoding error:&error]) {
+        NSLog(@"Failed to set font directory. Error received while saving font configuration: %@.", error);
+        return;
+    }
+    NSLog(@"Saved new temporary font configuration with %d font name mappings.", validFontNameMappingCount);
+
+    [MobileFFmpegConfig setFontconfigConfigurationPath:tempConfigurationDirectory];
+
+    NSLog(@"Font directory %@ registered successfully.", fontDirectoryPath);
+}
+
+@end

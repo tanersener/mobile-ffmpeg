@@ -32,9 +32,9 @@
  * - longjmp_value added to store exit code
  * - (optindex < argc) validation added before accessing argv[optindex] inside split_commandline()
  * and parse_options()
- * - all av_log_set_callback invocations updated to set mobileffmpeg_log_callback_function from mobileffmpeg.c. unused
- * log_callback_help and log_callback_help methods removed.
- * - (idx + 1 < argc) validation added in parse_loglevel().ig
+ * - All av_log_set_callback invocations updated to set mobileffmpeg_log_callback_function from mobileffmpeg.c. Unused
+ * log_callback_help and log_callback_help methods removed
+ * - (idx + 1 < argc) validation added in parse_loglevel()
  */
 
 #include <string.h>

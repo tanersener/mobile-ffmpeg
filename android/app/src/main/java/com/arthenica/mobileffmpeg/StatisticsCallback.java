@@ -13,16 +13,21 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MOBILE_FFMPEG_EXCEPTION_H
-#define MOBILE_FFMPEG_EXCEPTION_H
+package com.arthenica.mobileffmpeg;
 
-#include <stdio.h>
-#include <setjmp.h>
+/**
+ * <p>Represents a callback function to receive statistics of running operation.
+ *
+ * @author Taner Sener
+ * @since v2.1
+ */
+@FunctionalInterface
+public interface StatisticsCallback {
 
-extern jmp_buf ex_buf__;
+    void apply(final Statistics statistics);
 
-#endif // MOBILE_FFMPEG_EXCEPTION_H
+}

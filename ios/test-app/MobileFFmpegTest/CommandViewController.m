@@ -21,7 +21,7 @@
 
 #import "CommandViewController.h"
 #import "RCEasyTipView.h"
-#import <mobileffmpeg/Log.h>
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
 
 @interface CommandViewController ()
@@ -123,7 +123,7 @@
 }
 
 - (void)setActive {
-    [Log setLogDelegate:self];
+    [MobileFFmpegConfig setLogDelegate:self];
     [self hideTooltip];
     [self showTooltip];
 }

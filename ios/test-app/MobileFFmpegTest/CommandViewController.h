@@ -22,7 +22,7 @@
 #import <UIKit/UIKit.h>
 #import "Constants.h"
 #import "Util.h"
-#import <mobileffmpeg/Log.h>
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 
 @interface CommandViewController : UIViewController<LogDelegate>
 

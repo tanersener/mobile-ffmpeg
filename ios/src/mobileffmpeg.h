@@ -44,9 +44,24 @@
 /**
  * Synchronously executes FFmpeg with arguments provided.
  *
- * \param FFmpeg command options/arguments
- * \return zero on successful execution, non-zero on error
+ * \param FFmpeg command options/arguments in one string
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)execute: (NSString*)arguments;
+
+/**
+ * Synchronously executes FFmpeg with arguments provided.
+ *
+ * \param FFmpeg command options/arguments as string array
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
+ */
++ (int)executeWithArray: (NSArray*)arguments;
+
+/**
+ * Cancels an ongoing operation.
+ *
+ * This function does not wait for termination to complete and returns immediately.
+ */
++ (void)cancel;
 
 @end

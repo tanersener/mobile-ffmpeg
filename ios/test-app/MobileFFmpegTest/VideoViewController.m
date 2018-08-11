@@ -23,7 +23,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 #import "RCEasyTipView.h"
-#import <mobileffmpeg/Log.h>
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
 
 @interface VideoViewController ()
@@ -299,7 +299,7 @@
 }
 
 - (void)setActive {
-    [Log setLogDelegate:self];
+    [MobileFFmpegConfig setLogDelegate:self];
     [self hideTooltip];
     [self showTooltip];
 }

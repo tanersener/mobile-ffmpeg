@@ -41,7 +41,7 @@ import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.util.RunCallback;
 import com.arthenica.mobileffmpeg.Statistics;
-import com.arthenica.mobileffmpeg.StatsCallback;
+import com.arthenica.mobileffmpeg.StatisticsCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -134,8 +134,8 @@ public class SubtitleTabFragment extends Fragment {
         });
     }
 
-    public void enableStatsCallback() {
-        Config.enableStatsCallback(new StatsCallback() {
+    public void enableStatisticsCallback() {
+        Config.enableStatisticsCallback(new StatisticsCallback() {
 
             @Override
             public void apply(final Statistics newStatistics) {
@@ -303,7 +303,7 @@ public class SubtitleTabFragment extends Fragment {
     public void setActive() {
         android.util.Log.i(MainActivity.TAG, "Subtitle Tab Activated");
         enableLogCallback();
-        enableStatsCallback();
+        enableStatisticsCallback();
         Popup.show(mainActivity, Tooltip.SUBTITLE_TEST_TOOLTIP_TEXT);
     }
 

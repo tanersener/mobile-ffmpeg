@@ -16,13 +16,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/* CHANGES 07.2018 Taner Sener
+/*
+ * CHANGES 08.2018
+ * --------------------------------------------------------
+ * - fftools_ prefix added to file name and include guards
+ * - set_report_callback() method declared
+ * - cancel_operation() method declared
+ *
+ * CHANGES 07.2018
  * --------------------------------------------------------
  * - Include guards renamed
  */
 
-#ifndef MOBILE_FFMPEG_FFMPEG_H
-#define MOBILE_FFMPEG_FFMPEG_H
+#ifndef FFTOOLS_FFMPEG_H
+#define FFTOOLS_FFMPEG_H
 
 #include "config.h"
 
@@ -30,7 +37,7 @@
 #include <stdio.h>
 #include <signal.h>
 
-#include "cmdutils.h"
+#include "fftools_cmdutils.h"
 
 #include "libavformat/avformat.h"
 #include "libavformat/avio.h"
@@ -669,4 +676,8 @@ int hw_device_setup_for_encode(OutputStream *ost);
 
 int hwaccel_decode_init(AVCodecContext *avctx);
 
-#endif /* MOBILE_FFMPEG_FFMPEG_H */
+void set_report_callback(void (*callback)(int, float, float, int64_t, int, double, double));
+
+void cancel_operation();
+
+#endif /* FFTOOLS_FFMPEG_H */

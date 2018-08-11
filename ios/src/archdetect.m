@@ -18,13 +18,13 @@
  */
 
 #include "ArchDetect.h"
-#include "Log.h"
+#include "MobileFFmpegConfig.h"
 #include "MobileFFmpeg.h"
 
 @implementation ArchDetect
 
 + (void)initialize {
-    [Log class];
+    [MobileFFmpegConfig class];
     [MobileFFmpeg class];
 }
 

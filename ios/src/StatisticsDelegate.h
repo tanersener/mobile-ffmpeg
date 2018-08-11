@@ -13,21 +13,16 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.arthenica.mobileffmpeg;
+#include "Statistics.h"
 
 /**
- * <p>Represents a callback function to receive statistics of running operation.
- *
- * @author Taner Sener
- * @since v2.1
+ * Use this delegate to redirect FFmpeg statistics.
  */
-@FunctionalInterface
-public interface StatsCallback {
-
-    void apply(final Statistics statistics);
-
-}
+@protocol StatisticsDelegate<NSObject>
+@required
+- (void)statisticsCallback: (Statistics*)statistics;
+@end

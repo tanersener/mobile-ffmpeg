@@ -73,9 +73,19 @@ public class FFmpeg {
      * <p>Synchronously executes FFmpeg with arguments provided.
      *
      * @param arguments FFmpeg command options/arguments as string array
-     * @return zero on successful execution, non-zero on error
+     * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     public native static int execute(final String[] arguments);
+
+    /**
+     * <p>Synchronously executes FFmpeg with arguments provided.
+     *
+     * @param arguments FFmpeg command options/arguments in one string
+     * @return zero on successful execution, 255 on user cancel and non-zero on error
+     */
+    public static int execute(final String arguments) {
+        return execute((arguments == null) ? new String[]{""} : arguments.split(" "));
+    }
 
     /**
      * <p>Cancels an ongoing operation.
@@ -83,15 +93,5 @@ public class FFmpeg {
      * <p>This function does not wait for termination to complete and returns immediately.
      */
     public native static void cancel();
-
-    /**
-     * <p>Synchronously executes FFmpeg with arguments provided.
-     *
-     * @param arguments FFmpeg command options/arguments in one string
-     * @return zero on successful execution, non-zero on error
-     */
-    public static int execute(final String arguments) {
-        return execute((arguments == null) ? new String[]{""} : arguments.split(" "));
-    }
 
 }

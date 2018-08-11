@@ -18,14 +18,19 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-/* CHANGES 07.2018 Taner Sener
+/*
+ * CHANGES 08.2018
+ * --------------------------------------------------------
+ * - fftools_ prefix added to file name and parent header
+ *
+ * CHANGES 07.2018
  * --------------------------------------------------------
  * - Unused headers removed
  */
 
 #include <stdint.h>
 
-#include "ffmpeg.h"
+#include "fftools_ffmpeg.h"
 
 #include "libavfilter/avfilter.h"
 #include "libavfilter/buffersink.h"

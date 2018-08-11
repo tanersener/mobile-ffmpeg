@@ -17,11 +17,13 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "fftools_ffmpeg.h"
+
 #include "MobileFFmpeg.h"
 #include "ArchDetect.h"
-#include "Log.h"
+#include "MobileFFmpegConfig.h"
 
-/** Forward declaration for function defined in ffmpeg.c */
+/** Forward declaration for function defined in fftools_ffmpeg.c */
 int execute(int argc, char **argv);
 
 @implementation MobileFFmpeg
@@ -30,7 +32,7 @@ int execute(int argc, char **argv);
 NSString *const MOBILE_FFMPEG_VERSION = @"2.1";
 
 + (void)initialize {
-    [Log class];
+    [MobileFFmpegConfig class];
     NSLog(@"Loaded mobile-ffmpeg-%@-%@\n", [ArchDetect getArch], [MobileFFmpeg getVersion]);
 }
 
@@ -55,36 +57,54 @@ NSString *const MOBILE_FFMPEG_VERSION = @"2.1";
 /**
  * Synchronously executes FFmpeg command with arguments provided.
  *
- * \param argc argument count
- * \param argv arguments pointer
- * \return zero on successful execution, non-zero on error
+ * \param FFmpeg command options/arguments in one string
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)execute: (NSString*)arguments {
 
     // SPLITTING ARGUMENTS
-    NSArray* commandArray = [arguments componentsSeparatedByString:@" "];
-    char **commandCharPArray = (char **)malloc(sizeof(char*) * ([commandArray count] + 1));
+    NSArray* argumentArray = [arguments componentsSeparatedByString:@" "];
+    return [self executeWithArray:argumentArray];
+}
 
-    /* PRESERVING USAGE FORMAT
+/**
+ * Synchronously executes FFmpeg with arguments provided.
+ *
+ * \param FFmpeg command options/arguments as string array
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
+ */
++ (int)executeWithArray: (NSArray*)arguments {
+    char **commandCharPArray = (char **)malloc(sizeof(char*) * ([arguments count] + 1));
+
+    /* PRESERVING CALLING FORMAT
      *
      * ffmpeg <arguments>
      */
-    commandCharPArray[0] = (char *)malloc(sizeof(char) * ([LOG_LIB_NAME length] + 1));
-    strcpy(commandCharPArray[0], [LOG_LIB_NAME UTF8String]);
+    commandCharPArray[0] = (char *)malloc(sizeof(char) * ([LIB_NAME length] + 1));
+    strcpy(commandCharPArray[0], [LIB_NAME UTF8String]);
 
-    for (int i=0; i < [commandArray count]; i++) {
-        NSString *argument = [commandArray objectAtIndex:i];
+    for (int i=0; i < [arguments count]; i++) {
+        NSString *argument = [arguments objectAtIndex:i];
         commandCharPArray[i + 1] = (char *) [argument UTF8String];
     }
 
     // RUN
-    int retCode = execute(([commandArray count] + 1), commandCharPArray);
+    int retCode = execute(([arguments count] + 1), commandCharPArray);
 
     // CLEANUP
     free(commandCharPArray[0]);
     free(commandCharPArray);
 
     return retCode;
+}
+
+/**
+ * Cancels an ongoing operation.
+ *
+ * This function does not wait for termination to complete and returns immediately.
+ */
++ (void)cancel {
+    cancel_operation();
 }
 
 @end

@@ -20,8 +20,6 @@
 //
 
 #import "AppDelegate.h"
-#import <mobileffmpeg/ArchDetect.h>
-#import <mobileffmpeg/MobileFFmpeg.h>
 
 @interface AppDelegate ()
 

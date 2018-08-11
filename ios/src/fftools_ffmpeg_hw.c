@@ -16,11 +16,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+/*
+ * CHANGES 08.2018
+ * --------------------------------------------------------
+ * - fftools_ prefix added to file name and parent header
+ */
+
 #include <string.h>
 
 #include "libavutil/avstring.h"
 
-#include "ffmpeg.h"
+#include "fftools_ffmpeg.h"
 
 static int nb_hw_devices;
 static HWDevice **hw_devices;

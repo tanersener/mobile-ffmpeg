@@ -14250,7 +14250,7 @@ _ACEOF
 
 
 # Checks for library functions.
-for ac_func in dup2 floor memmove memset select strchr strcspn strerror strrchr strstr strtol malloc
+for ac_func in dup2 floor memmove memset select strchr strcspn strerror strrchr strstr strtol malloc strcpy strlen vsnprintf
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"

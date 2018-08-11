@@ -22,25 +22,25 @@
 #include "fftools_ffmpeg.h"
 #include "mobileffmpeg.h"
 
-/** Log data structure */
+/** Callback data structure */
 struct CallbackData {
-  int type;                 // 1 (log callback) or 2 (stats callback)
+  int type;                 // 1 (log callback) or 2 (statistics callback)
 
   int logLevel;             // log level
   char *logData;            // log data
 
-  int statsFrameNumber;     // stats frame number
-  float statsFps;           // stats fps
-  float statsQuality;       // stats quality
-  int64_t statsSize;        // stats size
-  int statsTime;            // stats time
-  double statsBitrate;      // stats bitrate
-  double statsSpeed;        // stats speed
+  int statisticsFrameNumber;        // statistics frame number
+  float statisticsFps;              // statistics fps
+  float statisticsQuality;          // statistics quality
+  int64_t statisticsSize;           // statistics size
+  int statisticsTime;               // statistics time
+  double statisticsBitrate;         // statistics bitrate
+  double statisticsSpeed;           // statistics speed
 
   struct CallbackData *next;
 };
 
-/** Log redirection variables */
+/** Redirection control variables */
 pthread_mutex_t lockMutex;
 pthread_mutex_t monitorMutex;
 pthread_cond_t monitorCondition;
@@ -60,8 +60,8 @@ static jclass configClass;
 /** Global reference of log redirection method in Java */
 static jmethodID logMethod;
 
-/** Global reference of stats redirection method in Java */
-static jmethodID statsMethod;
+/** Global reference of statistics redirection method in Java */
+static jmethodID statisticsMethod;
 
 /** Full name of the Config class */
 const char *configClassName = "com/arthenica/mobileffmpeg/Config";
@@ -145,7 +145,7 @@ void monitorNotify() {
 /**
  * Adds log data to the end of callback data list.
  */
-void logCallbackDataAdd(const int level, const char *data) {
+void logCallbackDataAdd(int level, const char *data) {
 
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)malloc(sizeof(struct CallbackData));
@@ -180,20 +180,20 @@ void logCallbackDataAdd(const int level, const char *data) {
 }
 
 /**
- * Adds stats data to the end of callback data list.
+ * Adds statistics data to the end of callback data list.
  */
-void statsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+void statisticsCallbackDataAdd(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
 
     // CREATE DATA STRUCT FIRST
     struct CallbackData *newData = (struct CallbackData*)malloc(sizeof(struct CallbackData));
     newData->type = 2;
-    newData->statsFrameNumber = frameNumber;
-    newData->statsFps = fps;
-    newData->statsQuality = quality;
-    newData->statsSize = size;
-    newData->statsTime = time;
-    newData->statsBitrate = bitrate;
-    newData->statsSpeed = speed;
+    newData->statisticsFrameNumber = frameNumber;
+    newData->statisticsFps = fps;
+    newData->statisticsQuality = quality;
+    newData->statisticsSize = size;
+    newData->statisticsTime = time;
+    newData->statisticsBitrate = bitrate;
+    newData->statisticsSpeed = speed;
 
     newData->next = NULL;
 
@@ -253,7 +253,7 @@ struct CallbackData *callbackDataRemove() {
 }
 
 /**
- * Callback function for ffmpeg logs.
+ * Callback function for FFmpeg logs.
  *
  * \param pointer to AVClass struct
  * \param level
@@ -277,7 +277,7 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
 }
 
 /**
- * Callback function for ffmpeg stats.
+ * Callback function for FFmpeg statistics.
  *
  * \param frameNumber last processed frame number
  * \param fps frames processed per second
@@ -287,8 +287,8 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
  * \param bitrate output bit rate in kbits/s
  * \param speed processing speed = processed duration / operation duration
  */
-void mobileffmpeg_stats_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
-    statsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
+void mobileffmpeg_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
+    statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
 }
 
 /**
@@ -331,13 +331,13 @@ void *callbackThreadFunction() {
 
             } else {
 
-                // STATS CALLBACK
+                // STATISTICS CALLBACK
 
-                (*env)->CallStaticVoidMethod(env, configClass, statsMethod,
-                    callbackData->statsFrameNumber, callbackData->statsFps,
-                    callbackData->statsQuality, callbackData->statsSize,
-                    callbackData->statsTime, callbackData->statsBitrate,
-                    callbackData->statsSpeed);
+                (*env)->CallStaticVoidMethod(env, configClass, statisticsMethod,
+                    callbackData->statisticsFrameNumber, callbackData->statisticsFps,
+                    callbackData->statisticsQuality, callbackData->statisticsSize,
+                    callbackData->statisticsTime, callbackData->statisticsBitrate,
+                    callbackData->statisticsSpeed);
 
             }
 
@@ -391,9 +391,9 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    statsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "stats", "(IFFJIDD)V");
+    statisticsMethod = (*env)->GetStaticMethodID(env, localConfigClass, "statistics", "(IFFJIDD)V");
     if (logMethod == NULL) {
-        LOGE("OnLoad thread failed to GetMethodID for %s.\n", "stats");
+        LOGE("OnLoad thread failed to GetMethodID for %s.\n", "statistics");
         (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
@@ -433,7 +433,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel(
 }
 
 /**
- * Enables log and stats redirection.
+ * Enables log and statistics redirection.
  *
  * \param env pointer to native method interface
  * \param reference to the class on which this method is invoked
@@ -456,11 +456,11 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_enableNativeRedire
     }
 
     av_log_set_callback(mobileffmpeg_log_callback_function);
-    set_report_callback(mobileffmpeg_stats_callback_function);
+    set_report_callback(mobileffmpeg_statistics_callback_function);
 }
 
 /**
- * Disables log and stats redirection.
+ * Disables log and statistics redirection.
  *
  * \param env pointer to native method interface
  * \param reference to the class on which this method is invoked
