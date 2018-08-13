@@ -21,6 +21,11 @@
 
 #import "AppDelegate.h"
 
+void uncaughtExceptionHandler(NSException *exception) {
+    NSLog(@"Uncaught exception detected: %@.", exception);
+    NSLog(@"%@", [exception callStackSymbols]);
+}
+
 @interface AppDelegate ()
 
 @end
@@ -29,6 +34,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
 
     // UPDATE TAB BAR STYLE
     UITabBarController *tabBarController = (UITabBarController *)self.window.rootViewController;
