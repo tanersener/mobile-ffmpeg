@@ -346,13 +346,15 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
         }
 
         int timeInMilliseconds = this.statistics.getTime();
-        int totalVideoDuration = 9000;
+        if (timeInMilliseconds > 0) {
+            int totalVideoDuration = 9000;
 
-        String completePercentage = new BigDecimal(timeInMilliseconds).multiply(new BigDecimal(100)).divide(new BigDecimal(totalVideoDuration), 0, BigDecimal.ROUND_HALF_UP).toString();
+            String completePercentage = new BigDecimal(timeInMilliseconds).multiply(new BigDecimal(100)).divide(new BigDecimal(totalVideoDuration), 0, BigDecimal.ROUND_HALF_UP).toString();
 
-        TextView textView = progressDialog.findViewById(R.id.progressDialogText);
-        if (textView != null) {
-            textView.setText(String.format("Encoding video: %% %s", completePercentage));
+            TextView textView = progressDialog.findViewById(R.id.progressDialogText);
+            if (textView != null) {
+                textView.setText(String.format("Encoding video: %% %s", completePercentage));
+            }
         }
     }
 

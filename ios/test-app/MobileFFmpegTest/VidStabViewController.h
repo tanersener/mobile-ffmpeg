@@ -19,9 +19,9 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 #import <UIKit/UIKit.h>
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 #import "Constants.h"
 #import "Util.h"
-#import <mobileffmpeg/MobileFFmpegConfig.h>
 
 @interface VidStabViewController : UIViewController<LogDelegate>
 

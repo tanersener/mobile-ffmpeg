@@ -19,13 +19,19 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import "SubtitleViewController.h"
-#import "VideoViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
-#import "RCEasyTipView.h"
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
+#import "RCEasyTipView.h"
+#import "SubtitleViewController.h"
+#import "VideoViewController.h"
+
+typedef enum {
+    IdleState = 1,
+    CreatingState = 2,
+    BurningState = 3
+} UITestState;
 
 @interface SubtitleViewController ()
 
@@ -42,10 +48,15 @@
     AVPlayerLayer *playerLayer;
     
     // Loading view
+    UIAlertController *alertController;
     UIActivityIndicatorView* indicator;
     
     // Tooltip view reference
     RCEasyTipView *tooltip;
+    
+    Statistics *statistics;
+    
+    UITestState state;
 }
 
 - (void)viewDidLoad {
@@ -80,6 +91,11 @@
     playerLayer.frame = rectangularFrame;
     [self.view.layer addSublayer:playerLayer];
     
+    alertController = nil;
+    statistics = nil;
+
+    state = IdleState;
+
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setActive];
     });
@@ -92,6 +108,13 @@
 - (void)logCallback: (int)level :(NSString*)message {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSLog(@"%@", message);
+    });
+}
+
+- (void)statisticsCallback:(Statistics *)newStatistics {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self->statistics = newStatistics;
+        [self updateProgressDialog];
     });
 }
 
@@ -121,18 +144,22 @@
         
         NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
         
+        self->state = CreatingState;
+        
         // EXECUTE
         int result = [MobileFFmpeg execute: ffmpegCommand];
         
         NSLog(@"FFmpeg process exited with rc %d\n", result);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (result == 0) {
-                [self dismissProgressDialog];
+            self->state = IdleState;
 
+            if (result == RETURN_CODE_SUCCESS) {
+                [self dismissProgressDialog];
+                
                 NSLog(@"Create completed successfully; burning subtitles.\n");
 
-                NSString *burnSubtitlesCommand = [NSString stringWithFormat:@"-y -i %@ -vf subtitles=%@ %@", videoFile, subtitle, videoWithSubtitlesFile];
+                NSString *burnSubtitlesCommand = [NSString stringWithFormat:@"-y -i %@ -vf subtitles=%@:force_style='FontName=MyFontName' %@", videoFile, subtitle, videoWithSubtitlesFile];
                 
                 [self loadProgressDialog:@"Burning subtitles\n\n"];
                 
@@ -140,17 +167,25 @@
                     
                     NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", burnSubtitlesCommand);
                     
+                    self->state = BurningState;
+                    
                     // EXECUTE
                     int result = [MobileFFmpeg execute: burnSubtitlesCommand];
                     
                     NSLog(@"FFmpeg process exited with rc %d\n", result);
                     
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        if (result == 0) {
+                        self->state = IdleState;
+
+                        if (result == RETURN_CODE_SUCCESS) {
                             [self dismissProgressDialog];
                             
                             NSLog(@"Burn subtitles completed successfully; playing video.\n");
                             [self playVideo];
+                        } else if (result == RETURN_CODE_CANCEL) {
+                            NSLog(@"Burn subtitles operation cancelled\n");
+                            
+                            [self dismissProgressDialogAndAlert:@"Burn subtitles operation cancelled."];
                         } else {
                             NSLog(@"Burn subtitles failed with rc=%d\n", result);
 
@@ -161,7 +196,10 @@
                         }
                     });
                 });
-                
+            } else if (result == RETURN_CODE_CANCEL) {
+                NSLog(@"Create operation cancelled\n");
+
+                [self dismissProgressDialogAndAlert:@"Create operation cancelled."];
             } else {
                 NSLog(@"Create failed with rc=%d\n", result);
                 
@@ -196,21 +234,53 @@
 }
 
 - (void)loadProgressDialog:(NSString*) dialogMessage {
-    UIAlertController *pending = [UIAlertController alertControllerWithTitle:nil
+
+    // CLEAN STATISTICS
+    statistics = nil;
+    [MobileFFmpegConfig resetStatistics];
+
+    alertController = [UIAlertController alertControllerWithTitle:nil
                                                                      message:dialogMessage
                                                               preferredStyle:UIAlertControllerStyleAlert];
     indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     indicator.color = [UIColor blackColor];
     indicator.translatesAutoresizingMaskIntoConstraints=NO;
-    [pending.view addSubview:indicator];
-    NSDictionary * views = @{@"pending" : pending.view, @"indicator" : indicator};
+    [alertController.view addSubview:indicator];
+    NSDictionary * views = @{@"pending" : alertController.view, @"indicator" : indicator};
     
-    NSArray * constraintsVertical = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[indicator]-(20)-|" options:0 metrics:nil views:views];
+    UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction * action) {
+                                                              [MobileFFmpeg cancel];
+                                                          }];
+    [alertController addAction:cancelAction];
+
+    NSArray * constraintsVertical = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[indicator]-(56)-|" options:0 metrics:nil views:views];
     NSArray * constraintsHorizontal = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[indicator]|" options:0 metrics:nil views:views];
     NSArray * constraints = [constraintsVertical arrayByAddingObjectsFromArray:constraintsHorizontal];
-    [pending.view addConstraints:constraints];
+    [alertController.view addConstraints:constraints];
     [indicator startAnimating];
-    [self presentViewController:pending animated:YES completion:nil];
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)updateProgressDialog {
+    if (statistics == nil) {
+        return;
+    }
+    
+    if (alertController != nil) {
+        int timeInMilliseconds = [statistics getTime];
+        if (timeInMilliseconds > 0) {
+            int totalVideoDuration = 9000;
+            
+            float percentage = (float)timeInMilliseconds*100/totalVideoDuration;
+            
+            if (state == CreatingState) {
+                [alertController setMessage:[NSString stringWithFormat:@"Creating video  %% %0.2f \n\n", percentage]];
+            } else if (state == BurningState) {
+                [alertController setMessage:[NSString stringWithFormat:@"Burning subtitles  %% %0.2f \n\n", percentage]];
+            }            
+        }
+    }
 }
 
 - (void)dismissProgressDialog {
@@ -227,6 +297,7 @@
 
 - (void)setActive {
     [MobileFFmpegConfig setLogDelegate:self];
+    [MobileFFmpegConfig setStatisticsDelegate:self];
     [self hideTooltip];
     [self showTooltip];
 }

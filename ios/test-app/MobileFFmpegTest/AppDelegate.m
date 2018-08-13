@@ -19,6 +19,7 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 #import "AppDelegate.h"
 
 void uncaughtExceptionHandler(NSException *exception) {
@@ -64,6 +65,12 @@ void uncaughtExceptionHandler(NSException *exception) {
                                                        [UIColor colorWithRed:189.0/255.0 green:195.0/255.0 blue:199.0/255.0 alpha:1.0], NSForegroundColorAttributeName,
                                                        [UIFont boldSystemFontOfSize:12], NSFontAttributeName,
                                                        nil] forState:UIControlStateNormal];
+    
+    NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
+    NSDictionary *fontNameMapping = @{@"MyFontName" : @"Doppio One"};
+
+    [MobileFFmpegConfig setFontDirectory:resourceFolder with:fontNameMapping];
+    // [MobileFFmpegConfig setFontDirectory:resourceFolder with:nil];
     
     return YES;
 }

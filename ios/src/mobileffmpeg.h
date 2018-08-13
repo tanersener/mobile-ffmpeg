@@ -22,6 +22,13 @@
 #include <Foundation/Foundation.h>
 #include "libavutil/ffversion.h"
 
+/** Global library version */
+extern NSString *const MOBILE_FFMPEG_VERSION;
+
+/** Common return code values */
+extern int const RETURN_CODE_SUCCESS;
+extern int const RETURN_CODE_CANCEL;
+
 /**
  * Main class for FFmpeg operations.
  */

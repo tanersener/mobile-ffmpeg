@@ -19,12 +19,12 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import "VidStabViewController.h"
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
-#import "RCEasyTipView.h"
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
+#import "RCEasyTipView.h"
+#import "VidStabViewController.h"
 
 @interface VidStabViewController ()
 
@@ -151,7 +151,7 @@
         NSLog(@"FFmpeg process exited with rc %d\n", result);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (result == 0) {
+            if (result == RETURN_CODE_SUCCESS) {
                 [self dismissProgressDialog];
                 
                 NSLog(@"Create completed successfully; stabilizing video.\n");
@@ -170,7 +170,7 @@
                     NSLog(@"FFmpeg process exited with rc %d\n", result);
                     
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        if (result == 0) {
+                        if (result == RETURN_CODE_SUCCESS) {
 
                             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                                 
@@ -184,7 +184,7 @@
                                 NSLog(@"FFmpeg process exited with rc %d\n", result);
                                 
                                 dispatch_async(dispatch_get_main_queue(), ^{
-                                    if (result == 0) {
+                                    if (result == RETURN_CODE_SUCCESS) {
                                         [self dismissProgressDialog];
                                         
                                         NSLog(@"Stabilize video completed successfully; playing videos.\n");

@@ -19,10 +19,10 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import "AudioViewController.h"
-#import "RCEasyTipView.h"
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
+#import "AudioViewController.h"
+#import "RCEasyTipView.h"
 
 @interface AudioViewController ()
 
@@ -139,7 +139,7 @@
         NSLog(@"FFmpeg process exited with rc %d\n", result);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if (result == 0) {
+            if (result == RETURN_CODE_SUCCESS) {
                 NSLog(@"Encode completed successfully.\n");
                 [self dismissProgressDialogAndAlert:@"Success" and:@"Encode completed successfully."];
             } else {
@@ -164,7 +164,7 @@
     NSLog(@"Sample file is created with \'%@\'\n", ffmpegCommand);
     
     int result = [MobileFFmpeg execute: ffmpegCommand];
-    if (result == 0) {
+    if (result == RETURN_CODE_SUCCESS) {
         [self.encodeButton setEnabled:true];
 
         dispatch_async(dispatch_get_main_queue(), ^{

@@ -248,8 +248,9 @@ public class MainActivity extends AppCompatActivity {
         rawResourceToFile(R.raw.truenorg, new File(cacheDirectory, "truenorg.otf"));
 
         final HashMap<String, String> fontNameMapping = new HashMap<>();
-        fontNameMapping.put("Doppio", "Doppio One");
+        fontNameMapping.put("MyFontName", "Doppio One");
         Config.setFontDirectory(this, cacheDirectory.getAbsolutePath(), fontNameMapping);
+        // Config.setFontDirectory(this, cacheDirectory.getAbsolutePath(), null);
     }
 
 }

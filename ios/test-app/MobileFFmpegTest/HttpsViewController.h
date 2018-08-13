@@ -20,9 +20,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 #import "Constants.h"
 #import "Util.h"
-#import <mobileffmpeg/MobileFFmpegConfig.h>
 
 @interface HttpsViewController : UIViewController<LogDelegate>
 

@@ -19,10 +19,10 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import "CommandViewController.h"
-#import "RCEasyTipView.h"
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
+#import "CommandViewController.h"
+#import "RCEasyTipView.h"
 
 @interface CommandViewController ()
 
@@ -93,7 +93,7 @@
     
     NSLog(@"FFmpeg process exited with rc %d\n", result);
 
-    if (result != 0) {
+    if (result != RETURN_CODE_SUCCESS) {
         [Util alert:self withTitle:@"Error" message:@"Command failed. Please check output for the details." andButtonText:@"OK"];
     }
 }
@@ -116,7 +116,7 @@
         
         NSLog(@"FFmpeg process exited with rc %d\n", result);
 
-        if (result != 0) {
+        if (result != RETURN_CODE_SUCCESS) {
             [Util alert:self withTitle:@"Error" message:@"Command failed. Please check output for the details." andButtonText:@"OK"];
         }
     });

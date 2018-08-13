@@ -20,7 +20,6 @@
 		3457454C2113B8AD00059043 /* AudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3457454A2113B8AD00059043 /* AudioViewController.m */; };
 		3457454F2113B8D300059043 /* SubtitleViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3457454D2113B8D300059043 /* SubtitleViewController.h */; };
 		345745502113B8D300059043 /* SubtitleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3457454E2113B8D300059043 /* SubtitleViewController.m */; };
-		346E74FA2117029D00FF0D33 /* subtitle.srt in Resources */ = {isa = PBXBuildFile; fileRef = 346E74F92117029D00FF0D33 /* subtitle.srt */; };
 		348439ED20B2EFAF001A3990 /* pyramid.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EA20B2EFAF001A3990 /* pyramid.jpg */; };
 		348439EE20B2EFAF001A3990 /* tajmahal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EB20B2EFAF001A3990 /* tajmahal.jpg */; };
 		348439EF20B2EFAF001A3990 /* colosseum.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EC20B2EFAF001A3990 /* colosseum.jpg */; };
@@ -49,6 +48,10 @@
 		34D26CF4210F5D2C005B3A32 /* libswresample.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE6210F5CA4005B3A32 /* libswresample.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34D26CF5210F5D2C005B3A32 /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE0210F5CA4005B3A32 /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34D26CF6210F5D2C005B3A32 /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		34DC789B21215B5800C3486C /* truenorg.otf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789721215B5800C3486C /* truenorg.otf */; };
+		34DC789C21215B5800C3486C /* subtitle.srt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789821215B5800C3486C /* subtitle.srt */; };
+		34DC789D21215B5800C3486C /* doppioone_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789921215B5800C3486C /* doppioone_regular.ttf */; };
+		34DC789E21215B5800C3486C /* sil_open_font_license.txt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789A21215B5800C3486C /* sil_open_font_license.txt */; };
 		34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE214209F7DDD005CE2AE /* AppDelegate.m */; };
 		34FAE218209F7DDD005CE2AE /* CommandViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE217209F7DDD005CE2AE /* CommandViewController.m */; };
 		34FAE21B209F7DDD005CE2AE /* VideoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE21A209F7DDD005CE2AE /* VideoViewController.m */; };
@@ -93,7 +96,6 @@
 		3457454A2113B8AD00059043 /* AudioViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioViewController.m; sourceTree = "<group>"; };
 		3457454D2113B8D300059043 /* SubtitleViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubtitleViewController.h; sourceTree = "<group>"; };
 		3457454E2113B8D300059043 /* SubtitleViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubtitleViewController.m; sourceTree = "<group>"; };
-		346E74F92117029D00FF0D33 /* subtitle.srt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = subtitle.srt; path = "../../../android/test-app/src/main/res/raw/subtitle.srt"; sourceTree = "<group>"; };
 		348439EA20B2EFAF001A3990 /* pyramid.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pyramid.jpg; sourceTree = "<group>"; };
 		348439EB20B2EFAF001A3990 /* tajmahal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tajmahal.jpg; sourceTree = "<group>"; };
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
@@ -114,6 +116,10 @@
 		34D26CE4210F5CA4005B3A32 /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavdevice.framework; path = "../../prebuilt/ios-framework/libavdevice.framework"; sourceTree = "<group>"; };
 		34D26CE5210F5CA4005B3A32 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavformat.framework; path = "../../prebuilt/ios-framework/libavformat.framework"; sourceTree = "<group>"; };
 		34D26CE6210F5CA4005B3A32 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswresample.framework; path = "../../prebuilt/ios-framework/libswresample.framework"; sourceTree = "<group>"; };
+		34DC789721215B5800C3486C /* truenorg.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = truenorg.otf; sourceTree = "<group>"; };
+		34DC789821215B5800C3486C /* subtitle.srt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = subtitle.srt; sourceTree = "<group>"; };
+		34DC789921215B5800C3486C /* doppioone_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = doppioone_regular.ttf; sourceTree = "<group>"; };
+		34DC789A21215B5800C3486C /* sil_open_font_license.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sil_open_font_license.txt; sourceTree = "<group>"; };
 		34FAE210209F7DDD005CE2AE /* MobileFFmpegTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MobileFFmpegTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		34FAE213209F7DDD005CE2AE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		34FAE214209F7DDD005CE2AE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -151,9 +157,12 @@
 			isa = PBXGroup;
 			children = (
 				348439EC20B2EFAF001A3990 /* colosseum.jpg */,
+				34DC789921215B5800C3486C /* doppioone_regular.ttf */,
 				348439EA20B2EFAF001A3990 /* pyramid.jpg */,
+				34DC789A21215B5800C3486C /* sil_open_font_license.txt */,
+				34DC789821215B5800C3486C /* subtitle.srt */,
 				348439EB20B2EFAF001A3990 /* tajmahal.jpg */,
-				346E74F92117029D00FF0D33 /* subtitle.srt */,
+				34DC789721215B5800C3486C /* truenorg.otf */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -329,12 +338,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				348439ED20B2EFAF001A3990 /* pyramid.jpg in Resources */,
-				346E74FA2117029D00FF0D33 /* subtitle.srt in Resources */,
+				34DC789D21215B5800C3486C /* doppioone_regular.ttf in Resources */,
+				34DC789E21215B5800C3486C /* sil_open_font_license.txt in Resources */,
 				34FAE223209F7DDE005CE2AE /* LaunchScreen.storyboard in Resources */,
 				348439EF20B2EFAF001A3990 /* colosseum.jpg in Resources */,
 				34FAE220209F7DDE005CE2AE /* Assets.xcassets in Resources */,
+				34DC789B21215B5800C3486C /* truenorg.otf in Resources */,
 				34FAE21E209F7DDD005CE2AE /* Main.storyboard in Resources */,
 				348439EE20B2EFAF001A3990 /* tajmahal.jpg in Resources */,
+				34DC789C21215B5800C3486C /* subtitle.srt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

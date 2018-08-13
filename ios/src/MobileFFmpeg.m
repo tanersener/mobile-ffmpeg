@@ -28,8 +28,12 @@ int execute(int argc, char **argv);
 
 @implementation MobileFFmpeg
 
-/** Library version string */
+/** Global library version */
 NSString *const MOBILE_FFMPEG_VERSION = @"2.1";
+
+/** Common return code values */
+int const RETURN_CODE_SUCCESS = 0;
+int const RETURN_CODE_CANCEL = 255;
 
 + (void)initialize {
     [MobileFFmpegConfig class];

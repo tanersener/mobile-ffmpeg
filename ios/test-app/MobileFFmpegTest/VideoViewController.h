@@ -20,11 +20,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 #import "Constants.h"
 #import "Util.h"
-#import <mobileffmpeg/MobileFFmpegConfig.h>
 
-@interface VideoViewController : UIViewController<LogDelegate,UIPickerViewDataSource, UIPickerViewDelegate>
+@interface VideoViewController : UIViewController<LogDelegate,StatisticsDelegate,UIPickerViewDataSource, UIPickerViewDelegate>
 
 - (void)setActive;
 + (NSString*)generateVideoEncodeScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions;
