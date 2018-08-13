@@ -295,15 +295,8 @@
     indicator.translatesAutoresizingMaskIntoConstraints=NO;
     [alertController.view addSubview:indicator];
     NSDictionary * views = @{@"pending" : alertController.view, @"indicator" : indicator};
-    
-    UIAlertAction* cancelAction = [UIAlertAction actionWithTitle:@"CANCEL" style:UIAlertActionStyleDefault
-                                                         handler:^(UIAlertAction * action) {
-                                                             [MobileFFmpeg cancel];
-                                                         }];
 
-    [alertController addAction:cancelAction];
-    
-    NSArray * constraintsVertical = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[indicator]-(56)-|" options:0 metrics:nil views:views];
+    NSArray * constraintsVertical = [NSLayoutConstraint constraintsWithVisualFormat:@"V:[indicator]-(20)-|" options:0 metrics:nil views:views];
     NSArray * constraintsHorizontal = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[indicator]|" options:0 metrics:nil views:views];
     NSArray * constraints = [constraintsVertical arrayByAddingObjectsFromArray:constraintsHorizontal];
     [alertController.view addConstraints:constraints];

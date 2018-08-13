@@ -130,14 +130,14 @@ typedef enum {
     if (player != nil) {
         [player removeAllItems];
     }
-    
+
     [[NSFileManager defaultManager] removeItemAtPath:videoFile error:NULL];
     [[NSFileManager defaultManager] removeItemAtPath:videoWithSubtitlesFile error:NULL];
 
     NSLog(@"Testing SUBTITLE burning\n");
-    
+
     [self loadProgressDialog:@"Creating video\n\n"];
-    
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     
         NSString* ffmpegCommand = [VideoViewController generateVideoEncodeScript:image1:image2:image3:videoFile:@"mpeg4":@""];
@@ -185,7 +185,8 @@ typedef enum {
                         } else if (result == RETURN_CODE_CANCEL) {
                             NSLog(@"Burn subtitles operation cancelled\n");
                             
-                            [self dismissProgressDialogAndAlert:@"Burn subtitles operation cancelled."];
+                            [self->indicator stopAnimating];
+                            [Util alert:self withTitle:@"Error" message:@"Burn subtitles operation cancelled." andButtonText:@"OK"];
                         } else {
                             NSLog(@"Burn subtitles failed with rc=%d\n", result);
 
@@ -199,7 +200,8 @@ typedef enum {
             } else if (result == RETURN_CODE_CANCEL) {
                 NSLog(@"Create operation cancelled\n");
 
-                [self dismissProgressDialogAndAlert:@"Create operation cancelled."];
+                [self->indicator stopAnimating];
+                [Util alert:self withTitle:@"Error" message:@"Create operation cancelled." andButtonText:@"OK"];
             } else {
                 NSLog(@"Create failed with rc=%d\n", result);
                 

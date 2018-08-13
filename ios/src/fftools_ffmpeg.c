@@ -31,6 +31,7 @@
  * method added to forward stats.
  * - forward_report() call added from print_report()
  * - cancel_operation() method added to trigger sigterm_handler
+ * - (!received_sigterm) validation added inside ifilter_send_eof() to complete cancellation
  *
  * CHANGES 07.2018
  * --------------------------------------------------------
@@ -2301,7 +2302,11 @@ static int ifilter_send_eof(InputFilter *ifilter, int64_t pts)
     ifilter->eof = 1;
 
     if (ifilter->filter) {
-        ret = av_buffersrc_close(ifilter->filter, pts, AV_BUFFERSRC_FLAG_PUSH);
+
+        /* THIS VALIDATION IS REQUIRED TO COMPLETE CANCELLATION */
+        if (!received_sigterm) {
+            ret = av_buffersrc_close(ifilter->filter, pts, AV_BUFFERSRC_FLAG_PUSH);
+        }
         if (ret < 0)
             return ret;
     } else {
