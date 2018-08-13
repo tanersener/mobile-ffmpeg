@@ -1720,11 +1720,6 @@ static void forward_report(int is_last_report, int64_t timer_start, int64_t cur_
                                           ost->st->time_base, AV_TIME_BASE_Q));
 
         vid = 1;
-
-        // FORWARD DATA
-        if (report_callback != NULL) {
-            report_callback(frame_number, fps, quality, total_size, seconds, bitrate, speed);
-        }
     }
 
     // 7. calculate time, with microseconds to milliseconds conversion
