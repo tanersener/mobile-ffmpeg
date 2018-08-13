@@ -274,12 +274,12 @@ typedef enum {
         if (timeInMilliseconds > 0) {
             int totalVideoDuration = 9000;
             
-            float percentage = (float)timeInMilliseconds*100/totalVideoDuration;
+            int percentage = timeInMilliseconds*100/totalVideoDuration;
             
             if (state == CreatingState) {
-                [alertController setMessage:[NSString stringWithFormat:@"Creating video  %% %0.2f \n\n", percentage]];
+                [alertController setMessage:[NSString stringWithFormat:@"Creating video  %% %d \n\n", percentage]];
             } else if (state == BurningState) {
-                [alertController setMessage:[NSString stringWithFormat:@"Burning subtitles  %% %0.2f \n\n", percentage]];
+                [alertController setMessage:[NSString stringWithFormat:@"Burning subtitles  %% %d \n\n", percentage]];
             }            
         }
     }

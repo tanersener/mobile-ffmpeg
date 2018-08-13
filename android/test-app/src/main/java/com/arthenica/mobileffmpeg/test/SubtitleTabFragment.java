@@ -89,20 +89,6 @@ public class SubtitleTabFragment extends Fragment {
             videoView = getView().findViewById(R.id.videoPlayerFrame);
         }
 
-        createProgressDialog = mainActivity.createCancellableProgressDialog("Creating video", new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                FFmpeg.cancel();
-            }
-        });
-        burnProgressDialog = mainActivity.createCancellableProgressDialog("Burning subtitles", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FFmpeg.cancel();
-            }
-        });
-
         state = State.IDLE;
     }
 
@@ -313,6 +299,13 @@ public class SubtitleTabFragment extends Fragment {
         statistics = null;
         Config.resetStatistics();
 
+        createProgressDialog = mainActivity.createCancellableProgressDialog("Creating video", new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                FFmpeg.cancel();
+            }
+        });
         createProgressDialog.show();
     }
 
@@ -350,6 +343,12 @@ public class SubtitleTabFragment extends Fragment {
         statistics = null;
         Config.resetStatistics();
 
+        burnProgressDialog = mainActivity.createCancellableProgressDialog("Burning subtitles", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FFmpeg.cancel();
+            }
+        });
         burnProgressDialog.show();
     }
 

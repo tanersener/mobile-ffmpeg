@@ -314,9 +314,9 @@
         if (timeInMilliseconds > 0) {
             int totalVideoDuration = 9000;
 
-            float percentage = (float)timeInMilliseconds*100/totalVideoDuration;
+            int percentage = timeInMilliseconds*100/totalVideoDuration;
             
-            [alertController setMessage:[NSString stringWithFormat:@"Encoding video  %% %0.2f \n\n", percentage]];
+            [alertController setMessage:[NSString stringWithFormat:@"Encoding video  %% %d \n\n", percentage]];
         }
     }
 }

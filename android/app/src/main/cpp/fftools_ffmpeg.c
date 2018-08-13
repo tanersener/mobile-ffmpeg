@@ -2297,7 +2297,7 @@ static int ifilter_send_frame(InputFilter *ifilter, AVFrame *frame)
 
 static int ifilter_send_eof(InputFilter *ifilter, int64_t pts)
 {
-    int ret;
+    int ret = 0;
 
     ifilter->eof = 1;
 
