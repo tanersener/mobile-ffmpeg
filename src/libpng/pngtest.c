@@ -1,8 +1,8 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.32 [August 24, 2017]
- * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.35 [July 15, 2018]
+ * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -345,10 +345,10 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 
 #ifdef PNG_IO_STATE_SUPPORTED
 void
-pngtest_check_io_state(png_structp png_ptr, png_size_t data_length,
+pngtest_check_io_state(png_structp png_ptr, size_t data_length,
     png_uint_32 io_op);
 void
-pngtest_check_io_state(png_structp png_ptr, png_size_t data_length,
+pngtest_check_io_state(png_structp png_ptr, size_t data_length,
     png_uint_32 io_op)
 {
    png_uint_32 io_state = png_get_io_state(png_ptr);
@@ -386,12 +386,12 @@ pngtest_check_io_state(png_structp png_ptr, png_size_t data_length,
 #endif
 
 static void PNGCBAPI
-pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+pngtest_read_data(png_structp png_ptr, png_bytep data, size_t length)
 {
-   png_size_t check = 0;
+   size_t check = 0;
    png_voidp io_ptr;
 
-   /* fread() returns 0 on error, so it is OK to store this in a png_size_t
+   /* fread() returns 0 on error, so it is OK to store this in a size_t
     * instead of an int, which is what fread() actually returns.
     */
    io_ptr = png_get_io_ptr(png_ptr);
@@ -425,9 +425,9 @@ pngtest_flush(png_structp png_ptr)
  * than changing the library.
  */
 static void PNGCBAPI
-pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
+pngtest_write_data(png_structp png_ptr, png_bytep data, size_t length)
 {
-   png_size_t check;
+   size_t check;
 
    check = fwrite(data, 1, length, (png_FILE_p)png_get_io_ptr(png_ptr));
 
@@ -705,7 +705,7 @@ read_user_chunk_callback(png_struct *png_ptr, png_unknown_chunkp chunk)
     * The unknown chunk structure contains the chunk data:
     * png_byte name[5];
     * png_byte *data;
-    * png_size_t size;
+    * size_t size;
     *
     * Note that libpng has already taken care of the CRC handling.
     */
@@ -1726,7 +1726,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       for (;;)
       {
          static int wrote_question = 0;
-         png_size_t num_in, num_out;
+         size_t num_in, num_out;
          char inbuf[256], outbuf[256];
 
          num_in = fread(inbuf, 1, sizeof inbuf, fpin);
@@ -2153,4 +2153,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_34 Your_png_h_is_not_version_1_6_34;
+typedef png_libpng_version_1_6_35 Your_png_h_is_not_version_1_6_35;

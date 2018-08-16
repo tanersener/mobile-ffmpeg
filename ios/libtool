@@ -72,8 +72,8 @@ host_os=darwin
 
 # The build system.
 build_alias=
-build=x86_64-apple-darwin17.6.0
-build_os=darwin17.6.0
+build=x86_64-apple-darwin17.7.0
+build_os=darwin17.7.0
 
 # A sed program that does not truncate output.
 SED="/usr/bin/sed"
