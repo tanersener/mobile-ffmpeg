@@ -560,8 +560,9 @@ uninstall-man: uninstall-man1
 
 
 xmlwf.1: xmlwf.xml
+@WITH_DOCBOOK_TRUE@	-rm -f $@
 @WITH_DOCBOOK_TRUE@	$(DOCBOOK_TO_MAN) $<
-@WITH_DOCBOOK_TRUE@	mv XMLWF.1 $@
+@WITH_DOCBOOK_TRUE@	test -f $@ || mv XMLWF.1 $@
 @WITH_DOCBOOK_FALSE@	@echo 'ERROR: Configure with --with-docbook for "make dist".' 1>&2
 @WITH_DOCBOOK_FALSE@	@false
 

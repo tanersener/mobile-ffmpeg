@@ -1,11 +1,11 @@
 dnl @synopsis AC_C_BIGENDIAN_CROSS
 dnl
-dnl Check endianess even when crosscompiling
+dnl Check endianness even when crosscompiling
 dnl (partially based on the original AC_C_BIGENDIAN).
 dnl
 dnl The implementation will create a binary, and instead of running
 dnl the binary it will be grep'ed for some symbols that will look
-dnl different for different endianess of the binary.
+dnl different for different endianness of the binary.
 dnl
 dnl @version $Id: ac_c_bigendian_cross.m4,v 1.1 2001/07/24 19:51:35 fdrake Exp $
 dnl @author Guido Draheim <guidod@gmx.de>
@@ -76,6 +76,6 @@ else
 fi
 AC_DEFINE_UNQUOTED(BYTEORDER, $BYTEORDER, [1234 = LIL_ENDIAN, 4321 = BIGENDIAN])
 if test $ac_cv_c_bigendian = unknown; then
-  AC_MSG_ERROR(unknown endianess - sorry, please pre-set ac_cv_c_bigendian)
+  AC_MSG_ERROR(unknown endianness - sorry, please pre-set ac_cv_c_bigendian)
 fi
 ])
