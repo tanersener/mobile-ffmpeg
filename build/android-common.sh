@@ -560,7 +560,7 @@ Description: a fast compressor/decompressor
 Version: ${SNAPPY_VERSION}
 
 Requires:
-Libs: -L\${libdir} -lz -lstdc++
+Libs: -L\${libdir} -lz
 Cflags: -I\${includedir}
 EOF
 }
