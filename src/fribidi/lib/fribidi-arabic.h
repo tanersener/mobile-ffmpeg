@@ -37,7 +37,6 @@
 #include "fribidi-begindecls.h"
 
 
-#define fribidi_shape_arabic FRIBIDI_NAMESPACE(shape_arabic)
 /* fribidi_shape_arabic - do Arabic shaping
  *
  * The actual shaping that is done depends on the flags set.  Only flags

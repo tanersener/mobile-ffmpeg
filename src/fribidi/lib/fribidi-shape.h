@@ -35,7 +35,6 @@
 #include "fribidi-begindecls.h"
 
 
-#define fribidi_shape FRIBIDI_NAMESPACE(shape)
 /* fribidi_shape - do bidi-aware shaping
  *
  * This function does all shaping work that depends on the resolved embedding

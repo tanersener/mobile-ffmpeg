@@ -198,7 +198,6 @@ typedef uint8_t FriBidiArabicProp;
 /* Functions finally */
 
 
-#define fribidi_get_joining_type FRIBIDI_NAMESPACE(get_joining_type)
 /* fribidi_get_joining_type - get character joining type
  *
  * This function returns the joining type of a character as defined in Table
@@ -217,7 +216,6 @@ fribidi_get_joining_type (
   FriBidiChar ch		/* input character */
 ) FRIBIDI_GNUC_CONST;
 
-#define fribidi_get_joining_types FRIBIDI_NAMESPACE(get_joining_types)
 /* fribidi_get_joining_types - get joining types for an string of characters
  *
  * This function finds the joining types of an string of characters.  See
@@ -230,7 +228,6 @@ fribidi_get_joining_type (
   FriBidiJoiningType *jtypes	/* output joining types */
 );
 
-#define fribidi_get_joining_type_name FRIBIDI_NAMESPACE(get_joining_type_name)
 /* fribidi_get_joining_type_name - get joining type name
  *
  * This function returns the joining type name of a joining type.  The

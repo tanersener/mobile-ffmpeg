@@ -56,6 +56,17 @@
 #define RL_BRACKET_TYPE(list) ((list)->bracket_type)
 #define RL_ISOLATE_LEVEL(list) ((list)->isolate_level)
 
+#define LOCAL_BRACKET_SIZE 16
+
+/* Pairing nodes are used for holding a pair of open/close brackets as
+   described in BD16. */
+struct _FriBidiPairingNodeStruct {
+  FriBidiRun *open;
+  FriBidiRun *close;
+  struct _FriBidiPairingNodeStruct *next;
+};
+typedef struct _FriBidiPairingNodeStruct FriBidiPairingNode;
+
 static FriBidiRun *
 merge_with_prev (
   FriBidiRun *second
@@ -161,7 +172,7 @@ static FriBidiRun *get_adjacent_run(FriBidiRun *list, fribidi_boolean forward, f
   return ppp;
 }
 
-#if DEBUG+0
+#ifdef DEBUG
 /*======================================================================
  *  For debugging, define some functions for printing the types and the
  *  levels.
@@ -239,7 +250,7 @@ print_resolved_types (
   {
     FriBidiStrIndex i;
     for (i = RL_LEN (pp); i; i--)
-      MSG2 ("%c", fribidi_char_from_bidi_type (pp->type));
+      MSG2 ("%s ", fribidi_get_bidi_type_name (pp->type));
   }
   MSG ("\n");
 }
@@ -257,7 +268,7 @@ print_bidi_string (
 
   MSG ("  Org. types : ");
   for (i = 0; i < len; i++)
-    MSG2 ("%c", fribidi_char_from_bidi_type (bidi_types[i]));
+    MSG2 ("%s ", fribidi_get_bidi_type_name (bidi_types[i]));
   MSG ("\n");
 }
 
@@ -392,15 +403,6 @@ fribidi_get_par_direction (
   return FRIBIDI_PAR_ON;
 }
 
-/* Pairing nodes are used for holding a pair of open/close brackets as
-   described in BD16. */
-struct _FriBidiPairingNodeStruct {
-  FriBidiRun *open;
-  FriBidiRun *close;
-  struct _FriBidiPairingNodeStruct *next;
-};
-typedef struct _FriBidiPairingNodeStruct FriBidiPairingNode;
-
 /* Push a new entry to the pairing linked list */
 static FriBidiPairingNode * pairing_nodes_push(FriBidiPairingNode *nodes,
                                                FriBidiRun *open,
@@ -504,7 +506,8 @@ fribidi_get_par_embedding_levels_ex (
   FriBidiLevel *embedding_levels
 )
 {
-  FriBidiLevel base_level, *base_level_per_iso_level = NULL, max_level = 0;
+  FriBidiLevel base_level_per_iso_level[FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL];
+  FriBidiLevel base_level, max_level = 0;
   FriBidiParType base_dir;
   FriBidiRun *main_run_list = NULL, *explicits_list = NULL, *pp;
   fribidi_boolean status = false;
@@ -560,10 +563,8 @@ fribidi_get_par_embedding_levels_ex (
     }
   base_dir = FRIBIDI_LEVEL_TO_DIR (base_level);
   DBG2 ("  base level : %c", fribidi_char_from_level (base_level));
-  DBG2 ("  base dir   : %c", fribidi_char_from_bidi_type (base_dir));
+  DBG2 ("  base dir   : %s", fribidi_get_bidi_type_name (base_dir));
 
-  base_level_per_iso_level = fribidi_malloc(sizeof(base_level_per_iso_level[0]) *
-                                            FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL);
   base_level_per_iso_level[0] = base_level;
 
 # if DEBUG
@@ -591,12 +592,10 @@ fribidi_get_par_embedding_levels_ex (
       FriBidiLevel level;
       int isolate;
       int isolate_level;
-    } *status_stack;
+    } status_stack[FRIBIDI_BIDI_MAX_RESOLVED_LEVELS];
     FriBidiRun temp_link;
-    FriBidiRun **run_per_isolate_level; /* Connect the isolate levels */
+    FriBidiRun *run_per_isolate_level[FRIBIDI_BIDI_MAX_RESOLVED_LEVELS];
 
-    run_per_isolate_level = fribidi_malloc(sizeof(run_per_isolate_level[0])
-                                           * FRIBIDI_BIDI_MAX_RESOLVED_LEVELS);
     memset(run_per_isolate_level, 0, sizeof(run_per_isolate_level[0])
            * FRIBIDI_BIDI_MAX_RESOLVED_LEVELS);
 
@@ -623,8 +622,6 @@ fribidi_get_par_embedding_levels_ex (
     first_interval = 0;
     valid_isolate_count = 0;
     isolate_overflow = 0;
-    status_stack = fribidi_malloc (sizeof (status_stack[0]) *
-				   FRIBIDI_BIDI_MAX_RESOLVED_LEVELS);
 
     for_run_list (pp, main_run_list)
     {
@@ -803,9 +800,6 @@ fribidi_get_par_embedding_levels_ex (
     override = FRIBIDI_TYPE_ON;
     stack_size = 0;
     over_pushed = 0;
-
-    fribidi_free (status_stack);
-    fribidi_free (run_per_isolate_level);
   }
   /* X10. The remaining rules are applied to each run of characters at the
      same level. For each run, determine the start-of-level-run (sor) and
@@ -834,12 +828,10 @@ fribidi_get_par_embedding_levels_ex (
   max_iso_level = 0;
   DBG ("resolving weak types");
   {
-    int *last_strong_stack;
+    int last_strong_stack[FRIBIDI_BIDI_MAX_RESOLVED_LEVELS];
     FriBidiCharType prev_type_orig;
     fribidi_boolean w4;
 
-    last_strong_stack = fribidi_malloc (sizeof (int)
-                                        * FRIBIDI_BIDI_MAX_RESOLVED_LEVELS);
     last_strong_stack[0] = base_dir;
 
     for_run_list (pp, main_run_list)
@@ -1001,8 +993,6 @@ fribidi_get_par_embedding_levels_ex (
       else
 	prev_type_orig = PREV_TYPE_OR_SOR (pp->next);
     }
-
-    fribidi_free (last_strong_stack);
   }
 
   compact_neutrals (main_run_list);
@@ -1023,15 +1013,27 @@ fribidi_get_par_embedding_levels_ex (
     /*  BD16 - Build list of all pairs*/
     int num_iso_levels = max_iso_level + 1;
     FriBidiPairingNode *pairing_nodes = NULL;
-    FriBidiRun ***bracket_stack = fribidi_malloc(sizeof(bracket_stack[0])
-                                                 * num_iso_levels);
-    int *bracket_stack_size = fribidi_malloc(sizeof(bracket_stack_size[0])
-                                             * num_iso_levels);
+    FriBidiRun *local_bracket_stack[FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL][LOCAL_BRACKET_SIZE];
+    FriBidiRun **bracket_stack[FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL];
+    int bracket_stack_size[FRIBIDI_BIDI_MAX_EXPLICIT_LEVEL];
     int last_level = RL_LEVEL(main_run_list);
     int last_iso_level = 0;
 
     memset(bracket_stack, 0, sizeof(bracket_stack[0])*num_iso_levels);
     memset(bracket_stack_size, 0, sizeof(bracket_stack_size[0])*num_iso_levels);
+
+    /* populate the bracket_size. The first LOCAL_BRACKET_SIZE entries
+       of the stack are one the stack. Allocate the rest of the entries.
+     */
+    {
+      int iso_level;
+      for (iso_level=0; iso_level < LOCAL_BRACKET_SIZE; iso_level++)
+        bracket_stack[iso_level] = local_bracket_stack[iso_level];
+
+      for (iso_level=LOCAL_BRACKET_SIZE; iso_level < num_iso_levels; iso_level++)
+        bracket_stack[iso_level] = fribidi_malloc (sizeof (bracket_stack[0])
+                                                       * FRIBIDI_BIDI_MAX_NESTED_BRACKET_PAIRS);
+    }
 
     /* Build the bd16 pair stack. */
     for_run_list (pp, main_run_list)
@@ -1046,10 +1048,8 @@ fribidi_get_par_embedding_levels_ex (
         if (level != last_level && last_iso_level == iso_level)
           bracket_stack_size[last_iso_level] = 0;
 
-        if (!bracket_stack[iso_level])
-          bracket_stack[iso_level] = fribidi_malloc (sizeof (bracket_stack[0])
-                                                     * FRIBIDI_BIDI_MAX_NESTED_BRACKET_PAIRS);
-        if (brack_prop!= FRIBIDI_NO_BRACKET)
+        if (brack_prop!= FRIBIDI_NO_BRACKET
+            && RL_TYPE(pp)==FRIBIDI_TYPE_ON)
           {
             if (FRIBIDI_IS_BRACKET_OPEN(brack_prop))
               {
@@ -1162,20 +1162,21 @@ fribidi_get_par_embedding_levels_ex (
         }
 
       free_pairing_nodes(pairing_nodes);
-      {
-        int i;
-        for (i=0; i<num_iso_levels; i++)
-          fribidi_free(bracket_stack[i]);
-      }
-      fribidi_free(bracket_stack);
-      fribidi_free(bracket_stack_size);
+
+      if (num_iso_levels >= LOCAL_BRACKET_SIZE)
+        {
+          int i;
+          /* Only need to free the non static members */
+          for (i=LOCAL_BRACKET_SIZE; i<num_iso_levels; i++)
+            fribidi_free(bracket_stack[i]);
+        }
 
       /* Remove the bracket property and re-compact */
       {
         const FriBidiBracketType NoBracket = FRIBIDI_NO_BRACKET;
         for_run_list (pp, main_run_list)
           pp->bracket_type = NoBracket;
-        compact_list (main_run_list);
+        compact_neutrals (main_run_list);
       }
     }
 
@@ -1388,8 +1389,6 @@ out:
     free_run_list (main_run_list);
   if UNLIKELY
     (explicits_list) free_run_list (explicits_list);
-  if (base_level_per_iso_level)
-    fribidi_free (base_level_per_iso_level);
 
   return status ? max_level + 1 : 0;
 }

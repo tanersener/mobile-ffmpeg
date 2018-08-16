@@ -1,13 +1,13 @@
 .\" WARNING! THIS FILE WAS GENERATED AUTOMATICALLY BY c2man!
 .\" DO NOT EDIT! CHANGES MADE TO THIS FILE WILL BE LOST!
-.TH "fribidi_join_arabic" 3 "4 February 2018" "c2man fribidi-joining.h" "Programmer's Manual"
+.TH "fribidi_join_arabic" 3 "19 February 2018" "c2man fribidi-joining.h" "Programmer's Manual"
 .SH "NAME"
 fribidi_join_arabic \- do Arabic joining
 .SH "SYNOPSIS"
 .ft B
 #include <fribidi.h>
 .sp
-void fribidi_join_arabic
+extern void fribidi_join_arabic
 .br
 (
 .br
@@ -60,9 +60,6 @@ http://www.unicode.org/reports/tr9/#Shaping.
 There are a few macros defined in fribidi-joining-types.h for querying the
 Arabic properties computed by this function.
 .SH "SEE ALSO"
-fribidi_charset_to_unicode(3),
-fribidi_unicode_to_charset(3),
-fribidi_parse_charset(3),
 fribidi_shape_arabic(3),
 fribidi_get_par_direction(3),
 fribidi_get_par_embedding_levels_ex(3),
@@ -72,6 +69,9 @@ fribidi_get_bidi_types(3),
 fribidi_get_bidi_type_name(3),
 fribidi_debug_status(3),
 fribidi_set_debug(3),
+fribidi_charset_to_unicode(3),
+fribidi_unicode_to_charset(3),
+fribidi_parse_charset(3),
 fribidi_mirroring_status(3),
 fribidi_set_mirroring(3),
 fribidi_reorder_nsm_status(3),

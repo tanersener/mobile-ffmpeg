@@ -35,7 +35,6 @@
 
 #include "fribidi-begindecls.h"
 
-#define fribidi_join_arabic FRIBIDI_NAMESPACE(join_arabic)
 /* fribidi_join_arabic - do Arabic joining
  *
  * This function does the Arabic joining algorithm.  Means, given Arabic

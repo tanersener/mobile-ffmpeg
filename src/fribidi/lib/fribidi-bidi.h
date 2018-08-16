@@ -37,7 +37,6 @@
 
 #include "fribidi-begindecls.h"
 
-#define fribidi_get_par_direction FRIBIDI_NAMESPACE(get_par_direction)
 /* fribidi_get_par_direction - get base paragraph direction
  *
  * This function finds the base direction of a single paragraph,
@@ -62,7 +61,6 @@ FRIBIDI_ENTRY FriBidiParType fribidi_get_par_direction (
   const FriBidiStrIndex len	/* input string length */
 );
 
-#define fribidi_get_par_embedding_levels_ex FRIBIDI_NAMESPACE(get_par_embedding_levels_ex)
 /* fribidi_get_par_embedding_levels_ex - get bidi embedding levels of a paragraph
  *
  * This function finds the bidi embedding levels of a single paragraph,
@@ -90,7 +88,6 @@ fribidi_get_par_embedding_levels_ex (
   FriBidiLevel *embedding_levels	/* output list of embedding levels */
 ) FRIBIDI_GNUC_WARN_UNUSED;
 
-#define fribidi_reorder_line FRIBIDI_NAMESPACE(reorder_line)
 /* fribidi_reorder_line - reorder a line of logical string to visual
  *
  * This function reorders the characters in a line of text from logical to

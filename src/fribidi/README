@@ -2,14 +2,11 @@
 
 The Free Implementation of the [Unicode Bidirectional Algorithm].
 
-
 ## Background
 
 One of the missing links stopping the penetration of free software in Middle
 East is the lack of support for the Arabic and Hebrew alphabets. In order to
-have proper Arabic and Hebrew support, the bidi algorithm needs to be implemented. It is
-our hope that this library will stimulate more free software in the Middle
-Eastern countries.
+have proper Arabic and Hebrew support, the bidi algorithm needs to be implemented. It is our hope that this library will stimulate more free software in the Middle Eastern countries.
 
 See [`HISTORY`](./HISTORY) on how the project started and evolved.
 
@@ -17,20 +14,16 @@ See [`HISTORY`](./HISTORY) on how the project started and evolved.
 ## Audience
 
 It is our hope that this library will stimulate the implementation of Hebrew and
-Arabic support in lots of Free Software. Here is a small list of projects that
-would benefit from the use of the GNU FriBidi library, but of course there are
-many more: Wine, Mozilla, Qt, KDE, lynx, OpenOffice.
+Arabic support in lots of Free Software. 
 
-GNU FriBidi is already being used in projects like Pango (resulting in [GTK+] and
-[GNOME] using GNU FriBidi), AbiWord, MLTerm, MPlayer, and BiCon.
+GNU FriBidi is already being used in projects like Pango (resulting in [GTK+] and [GNOME] using GNU FriBidi), AbiWord, MLTerm, MPlayer, BiCon, and vlc.
 
 See [`USERS`](./USERS) for a list of projects using GNU FriBidi.
 
 
 ## Dependencies
 
-Currently GNU FriBidi does not depend on any other library, but uses Glib if
-available. It uses GNU Build System for build and installation on POSIX systems.
+GNU FriBidi does not depend on any other library. It uses either the GNU Build System or meson for build and installation.
 
 
 ## Downloading
@@ -41,14 +34,15 @@ The latest version of GNU FriBidi may be found at:
 
 ## Building
 
-Start with running the [`bootstrap`](./bootstrap) script and follow the
-instructions.
+Start with running the [`autogen.sh`](./autogen.sh) script and follow the
+instructions. Alternatively use `meson`.
 
 
 ## License
 
 GNU FriBidi is Free Software; you can redistribute it and/or modify it under the
 terms of the [GNU Lesser General Public License] as published by the Free Software
+
 Foundation; either version 2.1 of the License, or (at your option) any later
 version.
 
@@ -60,8 +54,9 @@ You should have received a copy of the GNU Lesser General Public License along
 with GNU FriBidi, in a file named COPYING; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
-For licensing issues, contact <fribidi.license@gmail.com>.
+### Commercial licensing
 
+For commercial licensing options, contact <fribidi.license@gmail.com>.
 
 ## Implementation
 
@@ -83,7 +78,7 @@ machines.
 
 ### Conformance Status
 
-GNU Fribidi has been tested exhaustively against the [Unicode Reference Code],
+GNU FriBidi has been tested exhaustively against the [Unicode Reference Code],
 and to the best of our knowledge, it completely conforms to the specification,
 always producing the same result as the Reference Code.
 

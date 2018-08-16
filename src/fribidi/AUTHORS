@@ -1,21 +1,19 @@
-behdad: Behdad Esfahbod <behdad@gnu.org>
+Behdad Esfahbod <behdad@gnu.org>
 #
-# Behdad Esfahbod is the only author that actually codes these days.  He
-# maintains the package too.  He has revised all of the code written by
-# others, and has written much of the code himself.  He's listed (or should
-# be listed) on every file in the package as one of the authors.  Behdad
-# designs, implements, documents, maintains, ...
+# Behdad Esfahbod maintained the entire 0.19 series. He designed, and
+# implemented most of what is in FriBidi today.
 #
 
-dov-g: Dov Grobgeld <dov.grobgeld@gmail.com>
+Dov Grobgeld <dov.grobgeld@gmail.com>
 #
 # Dov Grobgeld originally wrote FriBidi.  The 0.1.* releases were all done
-# by him.  After that, Dov rarely touched the code, but contributed ideas. 
-# All files that he has originally authored have him listed as an author in
-# the header of the file.
+# by him.  After the a long time of not being involved, Dov received
+# back the maintenance of the package in time for the 1.0 release.
+# He did the entire algorithmic work to support the changes made
+# to the Unicode algorithm in the Unicode 6.3 standard.
 #
 
-roozbeh: Roozbeh Pournader <roozbeh@gnu.org>
+Roozbeh Pournader <roozbeh@gnu.org>
 #
 # Roozbeh Pournader hasn't contributed much code to FriBidi personally; but
 # has maintained, promoted, and supported the project for a while.  He has
@@ -24,8 +22,10 @@ roozbeh: Roozbeh Pournader <roozbeh@gnu.org>
 # be a co-maintainer of GNU FriBidi, but he's not doing that yet.
 #
 
-
+Khaled Hosny <khaledhosny@eglug.org>
 #
+# Khaled Hosny has done lots of cleanup and autoconfig work.
+
 # Note: Other people have contributed significant amounts of code, but
 # usually the code has faded out because of restructuring and redesigning
 # things around GNU FriBidi.  As an example, the FriBidiEnv patch by Omer

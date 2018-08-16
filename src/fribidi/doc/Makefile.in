@@ -86,8 +86,6 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@FRIBIDI_CHARSETS_TRUE@am__append_1 = $(libfribidi_char_sets_la_symbols)
-@FRIBIDI_CHARSETS_FALSE@am__append_2 = $(libfribidi_char_sets_la_symbols)
 subdir = doc
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -154,7 +152,7 @@ NROFF = nroff
 MANS = $(dist_man_MANS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 am__DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.in \
-	$(top_srcdir)/charset/Headers.mk $(top_srcdir)/lib/Headers.mk
+	$(top_srcdir)/lib/Headers.mk
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 VPATH = @srcdir@ $(includevpath)
 ACLOCAL = @ACLOCAL@
@@ -189,16 +187,13 @@ EGREP = @EGREP@
 EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 FRIBIDI_BINARY_AGE = @FRIBIDI_BINARY_AGE@
-FRIBIDI_CHARSETS = @FRIBIDI_CHARSETS@
 FRIBIDI_INTERFACE_AGE = @FRIBIDI_INTERFACE_AGE@
 FRIBIDI_INTERFACE_VERSION = @FRIBIDI_INTERFACE_VERSION@
 FRIBIDI_MAJOR_VERSION = @FRIBIDI_MAJOR_VERSION@
 FRIBIDI_MICRO_VERSION = @FRIBIDI_MICRO_VERSION@
 FRIBIDI_MINOR_VERSION = @FRIBIDI_MINOR_VERSION@
-FRIBIDI_NO_DEPRECATED = @FRIBIDI_NO_DEPRECATED@
+FRIBIDI_MSVC_BUILD_PLACEHOLDER = @FRIBIDI_MSVC_BUILD_PLACEHOLDER@
 FRIBIDI_VERSION = @FRIBIDI_VERSION@
-GLIB_CFLAGS = @GLIB_CFLAGS@
-GLIB_LIBS = @GLIB_LIBS@
 GREP = @GREP@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -304,26 +299,15 @@ MOSTLYCLEANFILES = c2man.stamp.tmp
 MAINTAINERCLEANFILES = $(man3) c2man.stamp
 
 # man3
-includepath = -I$(top_srcdir)/charset -I$(top_builddir)/lib \
-	-I$(top_srcdir)/lib
-includevpath = :$(top_srcdir)/charset \
-	:$(top_builddir)/lib:$(top_srcdir)/lib
+includepath = -I$(top_builddir)/lib -I$(top_srcdir)/lib
+includevpath = :$(top_builddir)/lib:$(top_srcdir)/lib
 
 # The lib/Headers.mk stuff should come after all optional stuff.
-headers = $(libfribidi_char_sets_la_headers) $(libfribidi_la_headers)
+headers = $(libfribidi_la_headers)
 # The las two lines are not functions, we don't want them here.
-inst_symbols = $(am__append_1) $(shell head -n -2 \
-	$(top_srcdir)/lib/fribidi.def)
-noinst_symbols = $(am__append_2)
-libfribidi_char_sets_la_headers = \
-		fribidi-char-sets.h \
-		fribidi-char-sets-list.h
-
-libfribidi_char_sets_la_symbols = \
-		fribidi_charset_to_unicode \
-		fribidi_unicode_to_charset \
-		fribidi_parse_charset
-
+inst_symbols = $(shell sed '$$d' $(top_srcdir)/lib/fribidi.def | sed \
+	'$$d')
+noinst_symbols = 
 libfribidi_la_headers = \
 		fribidi-arabic.h \
 		fribidi-begindecls.h \
@@ -331,6 +315,8 @@ libfribidi_la_headers = \
 		fribidi-bidi-types.h \
 		fribidi-bidi-types-list.h \
 		fribidi-common.h \
+		fribidi-char-sets.h \
+		fribidi-char-sets-list.h \
 		fribidi-deprecated.h \
 		fribidi-enddecls.h \
 		fribidi-flags.h \
@@ -356,7 +342,7 @@ C2MANFLAGS = $(includepath) \
 all: all-am
 
 .SUFFIXES:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/charset/Headers.mk $(top_srcdir)/lib/Headers.mk $(am__configure_deps)
+$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am $(top_srcdir)/lib/Headers.mk $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
@@ -376,7 +362,7 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
 	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(top_srcdir)/charset/Headers.mk $(top_srcdir)/lib/Headers.mk $(am__empty):
+$(top_srcdir)/lib/Headers.mk $(am__empty):
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh

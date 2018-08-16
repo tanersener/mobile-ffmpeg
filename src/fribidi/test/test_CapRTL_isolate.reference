@@ -1,0 +1,8 @@
+_yBEAR_I:how is LION?               => RAEB:how is NOIL?
+_ibear_I:how is LION?               => bear:how is NOIL?
+_fBEAR_I:how is LION?               => RAEB:how is NOIL?
+_fbear_I:how is LION?               => bear:how is NOIL?
+_yBEAR_I:HOW IS lion?               =>                   ?lion SI WOH:RAEB
+_ibear_I:HOW IS lion?               =>                   ?lion SI WOH:bear
+_fBEAR_I:HOW IS lion?               =>                   ?lion SI WOH:RAEB
+_fbear_I:HOW IS lion?               =>                   ?lion SI WOH:bear

@@ -83,7 +83,7 @@ fribidi_get_joining_type_name (
     }
 }
 
-#if DEBUG+0
+#ifdef DEBUG
 
 char
 fribidi_char_from_joining_type (

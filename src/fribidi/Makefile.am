@@ -4,9 +4,12 @@
 ACLOCAL_AMFLAGS = -I m4
 
 ## The order of subdirs is important, don't change without a reason.
-SUBDIRS = gen.tab charset lib bin doc test fribidi-vs-unicode
+SUBDIRS = gen.tab lib bin doc test
 
-EXTRA_DIST = bootstrap ChangeLog.old
+EXTRA_DIST = autogen.sh ChangeLog.old \
+	meson.build meson_options.txt bin/meson.build doc/meson.build \
+	gen.tab/meson.build lib/meson.build test/meson.build \
+	test/test-runner.py test/unicode-conformance/meson.build
 
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = @PACKAGE@.pc
