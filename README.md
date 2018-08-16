@@ -1,4 +1,4 @@
-# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg?version=1.1) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/1.1/link)
+# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg?version=1.2) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/1.2/link)
 
 FFmpeg for Android and IOS
 
@@ -9,9 +9,7 @@ FFmpeg for Android and IOS
     - FFmpeg `v3.4.x` and `v4.0.x` releases
     - 23 external libraries.
     
-        `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, 
-        `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, 
-        `soxr`, `speex`, `wavpack`
+        `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `wavpack`
     
     - 2 external libraries with GPL license
     
@@ -21,10 +19,7 @@ FFmpeg for Android and IOS
 - Creates shared libraries (.so for Android, .dylib for IOS)
 - Includes cross-compile instructions for 35 open-source libraries
     
-    `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`,
-    `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libtheora`, `libuuid`, `libvorbis`, 
-    `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `tiff`, 
-    `wavpack`, `x264`, `xvidcore`    
+    `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `tiff`, `wavpack`, `x264`, `xvidcore`    
 
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 #### 1.1 Android
@@ -44,7 +39,7 @@ There are six different prebuilt packages. Below you can see which external libr
 |        | min | min-gpl | https | https-gpl | full | full-gpl |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
 | external <br/> libraries <br/> enabled |  -  |  x264* <br/> xvidcore*  |  gnutls  |  gnutls <br/> x264* <br/> xvidcore*  |  fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack  | fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack <br/> x264* <br/> xvidcore*  |
-|        | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min/images/download.svg?version=1.1) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min/1.1/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min-gpl/images/download.svg?version=1.1) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min-gpl/1.1/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https/images/download.svg?version=1.1) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https/1.1/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https-gpl/images/download.svg?version=1.1) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https-gpl/1.1/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg?version=1.1) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/1.1/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full-gpl/images/download.svg?version=1.1) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full-gpl/1.1/link) |
+|        | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min/images/download.svg?version=1.2) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min/1.2/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min-gpl/images/download.svg?version=1.2) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min-gpl/1.2/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https/images/download.svg?version=1.2) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https/1.2/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https-gpl/images/download.svg?version=1.2) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https-gpl/1.2/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg?version=1.2) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/1.2/link) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full-gpl/images/download.svg?version=1.2) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full-gpl/1.2/link) |
 
 \* - Supported since `v1.1`
 
@@ -54,7 +49,7 @@ There are six different prebuilt packages. Below you can see which external libr
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {`
-        implementation 'com.arthenica:mobile-ffmpeg-full:1.1'
+        implementation 'com.arthenica:mobile-ffmpeg-full:1.2'
     }
     ```
 
@@ -68,7 +63,7 @@ There are six different prebuilt packages. Below you can see which external libr
 #### 2.2 IOS
 1. Add MobileFFmpeg pod to your `Podfile`
     ```
-    pod 'mobile-ffmpeg-full', '~> 1.1'
+    pod 'mobile-ffmpeg-full', '~> 1.2'
     ```
 
 2. Create and execute commands using the following `Objective-C` example.
@@ -96,9 +91,9 @@ There is an Android test application under the `android/test-app` folder and an 
 
 ### 3. Versions
 
-- `MobileFFmpeg v1.x` is the current stable, includes `FFmpeg v3.4.3`
+- `MobileFFmpeg v1.x` is the current stable, includes `FFmpeg v3.4.4`
 
-- `MobileFFmpeg v2.x` is the next stable, includes `FFmpeg v4.0.1`
+- `MobileFFmpeg v2.x` is the next stable, includes `FFmpeg v4.0.2`
 
 ### 4. Building
 #### 4.1 Prerequisites
@@ -144,9 +139,7 @@ Since`v1.1`, it is possible to enable to GPL licensed libraries `x264` and `xvid
 Their source code is not included in the repository and downloaded when enabled.
 
 #### 4.4 External Libraries
-`build` directory includes build scripts for external libraries. There are two scripts for each library, one for Android
-and one for IOS. They include all options/flags used to cross-compile the libraries. `ASM` is enabled by most of them, 
-exceptions are listed under the [ASM Support](https://github.com/tanersener/mobile-ffmpeg/wiki/ASM-Support) page.
+`build` directory includes build scripts for external libraries. There are two scripts for each library, one for Android and one for IOS. They include all options/flags used to cross-compile the libraries. `ASM` is enabled by most of them, exceptions are listed under the [ASM Support](https://github.com/tanersener/mobile-ffmpeg/wiki/ASM-Support) page.
 
 ### 5. Documentation
 

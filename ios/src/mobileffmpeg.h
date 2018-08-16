@@ -27,7 +27,7 @@
 #include "log.h"
 
 /** Library version string */
-#define MOBILE_FFMPEG_VERSION "1.1"
+#define MOBILE_FFMPEG_VERSION "1.2"
 
 const char *mobileffmpeg_get_ffmpeg_version(void);
 
