@@ -46,15 +46,6 @@ if [[ ${RECONF_gmp} -eq 1 ]]; then
 fi
 
 # PREPARING FLAGS
-ASM_FLAGS=""
-case ${ARCH} in
-    armv7 | armv7s | arm64)
-        ASM_FLAGS="--disable-assembly"
-    ;;
-    i386 | x86-64)
-        ASM_FLAGS="--enable-assembly"
-    ;;
-esac
 case ${ARCH} in
     i386)
         TARGET_HOST="x86-apple-darwin"
@@ -70,7 +61,7 @@ esac
     --with-sysroot=${SDK_PATH} \
     --enable-static \
     --disable-shared \
-    ${ASM_FLAGS} \
+    --disable-assembly \
     --disable-fast-install \
     --disable-maintainer-mode \
     --host=${TARGET_HOST} || exit 1
