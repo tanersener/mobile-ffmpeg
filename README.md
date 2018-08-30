@@ -91,9 +91,9 @@ There is an Android test application under the `android/test-app` folder and an 
 
 ### 3. Versions
 
-- `MobileFFmpeg v1.x` is the current stable, includes `FFmpeg v3.4.4`
+- `MobileFFmpeg v1.x` is the previous stable, includes `FFmpeg v3.4.4`
 
-- `MobileFFmpeg v2.x` is the next stable, includes `FFmpeg v4.0.2`
+- `MobileFFmpeg v2.x` is the current stable, includes `FFmpeg v4.0.2`
 
 ### 4. Building
 #### 4.1 Prerequisites

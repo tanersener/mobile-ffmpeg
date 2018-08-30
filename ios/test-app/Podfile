@@ -3,5 +3,5 @@ platform :ios, '8.0'
 use_frameworks!
 
 target "MobileFFmpegTest" do
-    pod 'mobile-ffmpeg-full-gpl', '~> 1.1'
+    pod 'mobile-ffmpeg-full', '~> 1.2'
 end

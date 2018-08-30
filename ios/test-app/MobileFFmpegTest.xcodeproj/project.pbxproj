@@ -238,15 +238,15 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-frameworks.sh",
-				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/mobileffmpeg.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavcodec.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavdevice.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavfilter.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavformat.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libavutil.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libswresample.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full-gpl/libswscale.framework",
+				"${PODS_ROOT}/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-frameworks.sh",
+				"${PODS_ROOT}/mobile-ffmpeg-full/mobileffmpeg.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavcodec.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavdevice.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavfilter.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavformat.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavutil.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libswresample.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libswscale.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -261,7 +261,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
