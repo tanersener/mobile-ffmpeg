@@ -62,7 +62,7 @@ There are six different prebuilt packages. Below you can see which external libr
     ```
     import com.arthenica.mobileffmpeg.FFmpeg;
 
-    int rc = FFmpeg.execute("-i", "file1.mp4", "-c:v", "libxvid", "file1.avi");
+    int rc = FFmpeg.execute("-i", "file1.mp4", "-c:v", "mpeg4", "file1.avi");
     Log.i(Log.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
     ```
 #### 2.2 IOS
@@ -75,7 +75,7 @@ There are six different prebuilt packages. Below you can see which external libr
     ```
     #import <mobileffmpeg/mobileffmpeg.h>
 
-    NSString* command = @"-i file1.mp4 -c:v libxvid file1.avi";
+    NSString* command = @"-i file1.mp4 -c:v mpeg4 file1.avi";
     NSArray* commandArray = [command componentsSeparatedByString:@" "];
     char **arguments = (char **)malloc(sizeof(char*) * ([commandArray count]));
     for (int i=0; i < [commandArray count]; i++) {
