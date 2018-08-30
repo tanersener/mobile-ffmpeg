@@ -2,29 +2,26 @@
 
 FFmpeg for Android and IOS
 
+<img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/mobile-ffmpeg-logo-v4.png" width="240">
+
 ### 1. Features
-- Use prebuilt binaries available under `JCenter`/`CocoaPods` or build your own version with external libraries you need
-- Supports 
+- Use prebuilt binaries available under `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
+- Supports
     - Both Android and IOS
     - FFmpeg `v3.4.x` and `v4.0.x` releases
-    - 23 external libraries.
+    - 24 external libraries
     
-        `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, 
-        `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, 
-        `soxr`, `speex`, `wavpack`
+        `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `wavpack`
     
-    - 2 external libraries with GPL license
+    - 4 external libraries with GPL license
     
-        `x264`, `xvidcore`
+        `vid.stab`, `x264`, `x265`, `xvidcore`
 
 - Exposes FFmpeg capabilities both directly from FFmpeg libraries and through MobileFFmpeg wrapper library
 - Creates shared libraries (.so for Android, .dylib for IOS)
-- Includes cross-compile instructions for 35 open-source libraries
+- Includes cross-compile instructions for 38 open-source libraries
     
-    `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`,
-    `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libtheora`, `libuuid`, `libvorbis`, 
-    `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `tiff`, 
-    `wavpack`, `x264`, `xvidcore`    
+    `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `tiff`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
 
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 #### 1.1 Android
@@ -43,18 +40,20 @@ There are six different prebuilt packages. Below you can see which external libr
 
 |        | min | min-gpl | https | https-gpl | full | full-gpl |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| external <br/> libraries <br/> enabled |  -  |  x264* <br/> xvidcore*  |  gnutls  |  gnutls <br/> x264* <br/> xvidcore*  |  fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack  | fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack <br/> x264* <br/> xvidcore*  |
+| external <br/> libraries <br/> enabled |  -  |  vid.stab*** <br/> x264* <br/> x265*** <br/> xvidcore*  |  gnutls  |  gnutls <br/> vid.stab*** <br/> x264* <br/> x265*** <br/> xvidcore*  |  chromaprint*** <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack  |  chromaprint*** <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> vid.stab*** <br/> wavpack <br/> x264* <br/> x265*** <br/> xvidcore*  |
 |        | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full-gpl/_latestVersion) |
 
 \* - Supported since `v1.1`
 
 \*\* - Supported since `v2.0`
 
+\*\*\* - Supported since `v2.1`
+
 #### 2.1 Android
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {`
-        implementation 'com.arthenica:mobile-ffmpeg-full:2.0'
+        implementation 'com.arthenica:mobile-ffmpeg-full:2.1'
     }
     ```
 
@@ -62,43 +61,35 @@ There are six different prebuilt packages. Below you can see which external libr
     ```
     import com.arthenica.mobileffmpeg.FFmpeg;
 
-    int rc = FFmpeg.execute("-i", "file1.mp4", "-c:v", "mpeg4", "file1.avi");
+    int rc = FFmpeg.execute("-i file1.mp4 -c:v mpeg4 file1.mp4");
     Log.i(Log.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
     ```
 #### 2.2 IOS
 1. Add MobileFFmpeg pod to your `Podfile`
     ```
-    pod 'mobile-ffmpeg-full', '~> 2.0'
+    pod 'mobile-ffmpeg-full', '~> 2.1'
     ```
 
 2. Create and execute commands using the following `Objective-C` example.
     ```
-    #import <mobileffmpeg/mobileffmpeg.h>
+    #import <mobileffmpeg/MobileFFmpeg.h>
 
-    NSString* command = @"-i file1.mp4 -c:v mpeg4 file1.avi";
-    NSArray* commandArray = [command componentsSeparatedByString:@" "];
-    char **arguments = (char **)malloc(sizeof(char*) * ([commandArray count]));
-    for (int i=0; i < [commandArray count]; i++) {
-        NSString *argument = [commandArray objectAtIndex:i];
-        arguments[i] = (char *) [argument UTF8String];
-    }
-
-    int result = mobileffmpeg_execute((int) [commandArray count], arguments);
+    NSString* ffmpegCommand = @"-i file1.mp4 -c:v mpeg4 file1.mp4";
+    int result = [MobileFFmpeg execute: ffmpegCommand];
 
     NSLog(@"Process exited with rc %d\n", result);
-    
-    free(arguments);
     ```
 #### 2.3 Test Application
 You can see how MobileFFmpeg is used inside an application by running test applications provided.
 There is an Android test application under the `android/test-app` folder and an IOS test application under the 
-`ios/test-app` folder. Both applications are identical and supports command execution and video encoding.
+`ios/test-app` folder. Both applications are identical and supports command execution, video encoding, accessing https,
+encoding audio, burning subtitles and video stabilization.
 
 ### 3. Versions
 
-- `MobileFFmpeg v1.x` is the current stable, includes `FFmpeg v3.4.2`
+- `MobileFFmpeg v1.x` is the previous stable, includes `FFmpeg v3.4.4`
 
-- `MobileFFmpeg v2.x` is the next stable, includes `FFmpeg v4.0.1`
+- `MobileFFmpeg v2.x` is the current stable, includes `FFmpeg v4.0.2`
 
 ### 4. Building
 #### 4.1 Prerequisites
@@ -140,7 +131,8 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 ```
 
 #### 4.3 GPL Support
-Since`v1.1`, it is possible to enable to GPL licensed libraries `x264` and `xvidcore` from the top level build scripts.
+It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1` 
+from the top level build scripts.
 Their source code is not included in the repository and downloaded when enabled.
 
 #### 4.4 External Libraries
