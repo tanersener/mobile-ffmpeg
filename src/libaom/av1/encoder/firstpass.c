@@ -52,9 +52,10 @@
 #define FACTOR_PT_LOW 0.70
 #define FACTOR_PT_HIGH 0.90
 #define FIRST_PASS_Q 10.0
-#define GF_MAX_BOOST 96.0
+#define GF_MAX_BOOST 90.0
 #define INTRA_MODE_PENALTY 1024
-#define KF_MAX_BOOST 128.0
+#define KF_MIN_FRAME_BOOST 80.0
+#define KF_MAX_FRAME_BOOST 128.0
 #define MIN_ARF_GF_BOOST 240
 #define MIN_DECAY_FACTOR 0.01
 #define MIN_KF_BOOST 300
@@ -2339,21 +2340,18 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
     active_min_gf_interval = rc->min_gf_interval + AOMMIN(2, int_max_q / 200);
     if (active_min_gf_interval > rc->max_gf_interval)
       active_min_gf_interval = rc->max_gf_interval;
-    if (cpi->multi_arf_allowed) {
-      active_max_gf_interval = rc->max_gf_interval;
-    } else {
-      // The value chosen depends on the active Q range. At low Q we have
-      // bits to spare and are better with a smaller interval and smaller boost.
-      // At high Q when there are few bits to spare we are better with a longer
-      // interval to spread the cost of the GF.
-      active_max_gf_interval = 12 + AOMMIN(4, (int_lbq / 6));
 
-      // We have: active_min_gf_interval <= rc->max_gf_interval
-      if (active_max_gf_interval < active_min_gf_interval)
-        active_max_gf_interval = active_min_gf_interval;
-      else if (active_max_gf_interval > rc->max_gf_interval)
-        active_max_gf_interval = rc->max_gf_interval;
-    }
+    // The value chosen depends on the active Q range. At low Q we have
+    // bits to spare and are better with a smaller interval and smaller boost.
+    // At high Q when there are few bits to spare we are better with a longer
+    // interval to spread the cost of the GF.
+    active_max_gf_interval = 12 + AOMMIN(4, (int_lbq / 6));
+
+    // We have: active_min_gf_interval <= rc->max_gf_interval
+    if (active_max_gf_interval < active_min_gf_interval)
+      active_max_gf_interval = active_min_gf_interval;
+    else if (active_max_gf_interval > rc->max_gf_interval)
+      active_max_gf_interval = rc->max_gf_interval;
   }
 #endif  // !CONFIG_FIX_GF_LENGTH
   double avg_sr_coded_error = 0;
@@ -2454,17 +2452,36 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   assert(num_mbs > 0);
   if (i) avg_sr_coded_error /= i;
 
-#if REDUCE_LAST_GF_LENGTH
+#define REDUCE_GF_LENGTH_THRESH 4
+#define REDUCE_GF_LENGTH_TO_KEY_THRESH 9
+#define REDUCE_GF_LENGTH_BY 1
   int alt_offset = 0;
-  // We are going to have an alt ref.
+#if REDUCE_LAST_GF_LENGTH
+  // We are going to have an alt ref, but we don't have do adjustment for
+  // lossless mode
   if (allow_alt_ref && (i < cpi->oxcf.lag_in_frames) &&
-      (i >= rc->min_gf_interval)) {
-    // If the last gf is too long, then we have to reduce
-    // the current gf length
-    if (rc->frames_to_key - i < 9 && i > 10) {
-      // too long, reduce the length by one
-      alt_offset = -1;
-      i -= 1;
+      (i >= rc->min_gf_interval) && !is_lossless_requested(&cpi->oxcf)) {
+    // adjust length of this gf group if one of the following condition met
+    // 1: only one overlay frame left and this gf is too long
+    // 2: next gf group is too short to have arf compared to the current gf
+
+    // maximum length of next gf group
+    const int next_gf_len = rc->frames_to_key - i;
+    const int single_overlay_left =
+        next_gf_len == 0 && i > REDUCE_GF_LENGTH_THRESH;
+    // the next gf is probably going to have a ARF but it will be shorter than
+    // this gf
+    const int unbalanced_gf =
+        i > REDUCE_GF_LENGTH_TO_KEY_THRESH &&
+        next_gf_len + 1 < REDUCE_GF_LENGTH_TO_KEY_THRESH &&
+        next_gf_len + 1 >= rc->min_gf_interval;
+
+    if (single_overlay_left || unbalanced_gf) {
+      // Note: Tried roll_back = DIVIDE_AND_ROUND(i, 8), but is does not work
+      // better in the current setting
+      const int roll_back = REDUCE_GF_LENGTH_BY;
+      alt_offset = -roll_back;
+      i -= roll_back;
     }
   }
 #endif
@@ -2474,15 +2491,15 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
       (i >= rc->min_gf_interval)) {
     // Calculate the boost for alt ref.
     rc->gfu_boost =
-#if REDUCE_LAST_GF_LENGTH
         calc_arf_boost(cpi, alt_offset, (i - 1), (i - 1), &f_boost, &b_boost);
-#else
-        calc_arf_boost(cpi, 0, (i - 1), (i - 1), &f_boost, &b_boost);
-#endif
     rc->source_alt_ref_pending = 1;
+
+    // do not replace ARFs with overlay frames, and keep it as GOLDEN_REF
+    cpi->preserve_arf_as_gld = 1;
   } else {
     rc->gfu_boost = AOMMAX((int)boost_score, MIN_ARF_GF_BOOST);
     rc->source_alt_ref_pending = 0;
+    cpi->preserve_arf_as_gld = 0;
   }
 
   // Set the interval until the next gf.
@@ -2500,12 +2517,13 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   }
 
 #if REDUCE_LAST_ALT_BOOST
+#define LAST_ALR_BOOST_FACTOR 0.2f
   rc->arf_boost_factor = 1.0;
-  if (rc->source_alt_ref_pending) {
-    // If the last gf is too long, then we have to reduce
-    // the boost factor on current alt ref
-    if (rc->frames_to_key - i == 0 && i > 10) {
-      rc->arf_boost_factor = 0;
+  if (rc->source_alt_ref_pending && !is_lossless_requested(&cpi->oxcf)) {
+    // Reduce the boost of altref in the last gf group
+    if (rc->frames_to_key - i == REDUCE_GF_LENGTH_BY ||
+        rc->frames_to_key - i == 0) {
+      rc->arf_boost_factor = LAST_ALR_BOOST_FACTOR;
     }
   }
 #endif
@@ -2894,6 +2912,8 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   // how many bits to spend on it.
   decay_accumulator = 1.0;
   boost_score = 0.0;
+  const double kf_max_boost = AOMMIN(
+      AOMMAX(rc->frames_to_key * 2.0, KF_MIN_FRAME_BOOST), KF_MAX_FRAME_BOOST);
   for (i = 0; i < (rc->frames_to_key - 1); ++i) {
     if (EOF == input_stats(twopass, &next_frame)) break;
 
@@ -2905,7 +2925,7 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
     if ((i <= rc->max_gf_interval) ||
         ((i <= (rc->max_gf_interval * 4)) && (decay_accumulator > 0.5))) {
       const double frame_boost =
-          calc_frame_boost(cpi, this_frame, 0, KF_MAX_BOOST);
+          calc_frame_boost(cpi, this_frame, 0, kf_max_boost);
 
       // How fast is prediction quality decaying.
       if (!detect_flash(twopass, 0)) {
@@ -3302,9 +3322,6 @@ void av1_twopass_postencode_update(AV1_COMP *cpi) {
   RATE_CONTROL *const rc = &cpi->rc;
   const int bits_used = rc->base_frame_target;
 
-  assert(IMPLIES(cpi->common.show_existing_frame && !rc->is_src_frame_alt_ref,
-                 cpi->common.error_resilient_mode));
-
   // VBR correction is done through rc->vbr_bits_off_target. Based on the
   // sign of this value, a limited % adjustment is made to the target rate
   // of subsequent frames, to try and push it back towards 0. This method
@@ -3327,13 +3344,6 @@ void av1_twopass_postencode_update(AV1_COMP *cpi) {
     twopass->last_kfgroup_zeromotion_pct = twopass->kf_zeromotion_pct;
   }
   twopass->kf_group_bits = AOMMAX(twopass->kf_group_bits, 0);
-
-  // Increment the gf group index ready for the next frame. If this is
-  // a show_existing_frame with a source other than altref, the index
-  // was incremented when it was originally encoded.
-  if (!cpi->common.show_existing_frame || rc->is_src_frame_alt_ref) {
-    ++twopass->gf_group.index;
-  }
 
   // If the rate control is drifting consider adjustment to min or maxq.
   if ((cpi->oxcf.rc_mode != AOM_Q) &&

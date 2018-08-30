@@ -117,7 +117,7 @@ static void init_minq_luts(int *kf_low_m, int *kf_high_m, int *arfgf_low,
   for (i = 0; i < QINDEX_RANGE; i++) {
     const double maxq = av1_convert_qindex_to_q(i, bit_depth);
     kf_low_m[i] = get_minq_index(maxq, 0.000001, -0.0004, 0.150, bit_depth);
-    kf_high_m[i] = get_minq_index(maxq, 0.0000021, -0.00125, 0.55, bit_depth);
+    kf_high_m[i] = get_minq_index(maxq, 0.0000021, -0.00125, 0.45, bit_depth);
     arfgf_low[i] = get_minq_index(maxq, 0.0000015, -0.0009, 0.30, bit_depth);
     arfgf_high[i] = get_minq_index(maxq, 0.0000021, -0.00125, 0.55, bit_depth);
     inter[i] = get_minq_index(maxq, 0.00000271, -0.00113, 0.90, bit_depth);
@@ -302,9 +302,9 @@ void av1_rc_init(const AV1EncoderConfig *oxcf, int pass, RATE_CONTROL *rc) {
   rc->avg_q = av1_convert_qindex_to_q(oxcf->worst_allowed_q, oxcf->bit_depth);
 
   for (i = 0; i < RATE_FACTOR_LEVELS; ++i) {
-    rc->rate_correction_factors[i] = 1.0;
+    rc->rate_correction_factors[i] = 0.7;
   }
-
+  rc->rate_correction_factors[KF_STD] = 1.0;
   rc->min_gf_interval = oxcf->min_gf_interval;
   rc->max_gf_interval = oxcf->max_gf_interval;
   if (rc->min_gf_interval == 0)
@@ -1025,10 +1025,8 @@ static int rc_pick_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
           active_best_quality = get_gf_active_quality(rc, q, bit_depth);
           *arf_q = active_best_quality;
 #if REDUCE_LAST_ALT_BOOST
-          int min_boost =
-              (get_gf_high_motion_quality(q, bit_depth) + active_best_quality) /
-              2;
-          int boost = min_boost - active_best_quality;
+          const int min_boost = get_gf_high_motion_quality(q, bit_depth);
+          const int boost = min_boost - active_best_quality;
 
           active_best_quality = min_boost - (int)(boost * rc->arf_boost_factor);
 #endif
@@ -1360,13 +1358,6 @@ void av1_rc_postencode_update(AV1_COMP *cpi, uint64_t bytes_used) {
     update_golden_frame_stats(cpi);
 
   if (cm->frame_type == KEY_FRAME) rc->frames_since_key = 0;
-
-  // TODO(zoeliu): To investigate whether we should treat BWDREF_FRAME
-  //               differently here for rc->avg_frame_bandwidth.
-  if (cm->show_frame || rc->is_bwd_ref_frame) {
-    rc->frames_since_key++;
-    rc->frames_to_key--;
-  }
   // if (cm->current_video_frame == 1 && cm->show_frame)
   /*
   rc->this_frame_target =

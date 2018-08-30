@@ -36,6 +36,7 @@ struct av1_extracfg {
   unsigned int noise_sensitivity;
   unsigned int sharpness;
   unsigned int static_thresh;
+  unsigned int row_mt;
   unsigned int tile_columns;  // log2 number of tile columns
   unsigned int tile_rows;     // log2 number of tile rows
   unsigned int arnr_max_frames;
@@ -98,6 +99,9 @@ struct av1_extracfg {
   float noise_level;
   int noise_block_size;
 #endif
+
+  unsigned int chroma_subsampling_x;
+  unsigned int chroma_subsampling_y;
 };
 
 static struct av1_extracfg default_extra_cfg = {
@@ -107,6 +111,7 @@ static struct av1_extracfg default_extra_cfg = {
   0,                 // noise_sensitivity
   0,                 // sharpness
   0,                 // static_thresh
+  0,                 // row_mt
   0,                 // tile_columns
   0,                 // tile_rows
   7,                 // arnr_max_frames
@@ -167,6 +172,8 @@ static struct av1_extracfg default_extra_cfg = {
   0,   // noise_level
   32,  // noise_block_size
 #endif
+  0,  // chroma_subsampling_x
+  0,  // chroma_subsampling_y
 };
 
 struct aom_codec_alg_priv {
@@ -286,6 +293,8 @@ static aom_codec_err_t validate_config(aom_codec_alg_priv_t *ctx,
   RANGE_CHECK_HI(cfg, large_scale_tile, 1);
   RANGE_CHECK_HI(extra_cfg, single_tile_decoding, 1);
 
+  RANGE_CHECK_HI(extra_cfg, row_mt, 1);
+
   RANGE_CHECK_HI(extra_cfg, tile_columns, 6);
   RANGE_CHECK_HI(extra_cfg, tile_rows, 6);
 
@@ -366,6 +375,9 @@ static aom_codec_err_t validate_config(aom_codec_alg_priv_t *ctx,
       ERROR("dist-8x8 cannot be used with lossless compression.");
 #endif
   }
+
+  RANGE_CHECK_HI(extra_cfg, chroma_subsampling_x, 1);
+  RANGE_CHECK_HI(extra_cfg, chroma_subsampling_y, 1);
 
   return AOM_CODEC_OK;
 }
@@ -631,6 +643,8 @@ static aom_codec_err_t set_encoder_config(
       oxcf->superblock_size = AOM_SUPERBLOCK_SIZE_64X64;
   }
 
+  oxcf->row_mt = extra_cfg->row_mt;
+
   oxcf->tile_columns = extra_cfg->tile_columns;
   oxcf->tile_rows = extra_cfg->tile_rows;
 
@@ -686,6 +700,24 @@ static aom_codec_err_t set_encoder_config(
 
   oxcf->frame_periodic_boost = extra_cfg->frame_periodic_boost;
   oxcf->motion_vector_unit_test = extra_cfg->motion_vector_unit_test;
+
+#if CONFIG_REDUCED_ENCODER_BORDER
+  if (oxcf->superres_mode != SUPERRES_NONE ||
+      oxcf->resize_mode != RESIZE_NONE) {
+    warn(
+        "Superres / resize cannot be used with CONFIG_REDUCED_ENCODER_BORDER. "
+        "Disabling superres/resize.\n");
+    // return AOM_CODEC_INVALID_PARAM;
+    disable_superres(oxcf);
+    oxcf->resize_mode = RESIZE_NONE;
+    oxcf->resize_scale_denominator = SCALE_NUMERATOR;
+    oxcf->resize_kf_scale_denominator = SCALE_NUMERATOR;
+  }
+#endif  // CONFIG_REDUCED_ENCODER_BORDER
+
+  oxcf->chroma_subsampling_x = extra_cfg->chroma_subsampling_x;
+  oxcf->chroma_subsampling_y = extra_cfg->chroma_subsampling_y;
+
   return AOM_CODEC_OK;
 }
 
@@ -723,6 +755,10 @@ static aom_codec_err_t encoder_set_config(aom_codec_alg_priv_t *ctx,
   if (force_key) ctx->next_frame_flags |= AOM_EFLAG_FORCE_KF;
 
   return res;
+}
+
+static aom_fixed_buf_t *encoder_get_global_headers(aom_codec_alg_priv_t *ctx) {
+  return av1_get_global_headers(ctx->cpi);
 }
 
 static aom_codec_err_t ctrl_get_quantizer(aom_codec_alg_priv_t *ctx,
@@ -791,6 +827,13 @@ static aom_codec_err_t ctrl_set_static_thresh(aom_codec_alg_priv_t *ctx,
                                               va_list args) {
   struct av1_extracfg extra_cfg = ctx->extra_cfg;
   extra_cfg.static_thresh = CAST(AOME_SET_STATIC_THRESHOLD, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_row_mt(aom_codec_alg_priv_t *ctx,
+                                       va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.row_mt = CAST(AV1E_SET_ROW_MT, args);
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
@@ -1657,6 +1700,20 @@ static aom_codec_err_t ctrl_set_superblock_size(aom_codec_alg_priv_t *ctx,
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
+static aom_codec_err_t ctrl_set_chroma_subsampling_x(aom_codec_alg_priv_t *ctx,
+                                                     va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.chroma_subsampling_x = CAST(AV1E_SET_CHROMA_SUBSAMPLING_X, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_chroma_subsampling_y(aom_codec_alg_priv_t *ctx,
+                                                     va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.chroma_subsampling_y = CAST(AV1E_SET_CHROMA_SUBSAMPLING_Y, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
 static aom_codec_ctrl_fn_map_t encoder_ctrl_maps[] = {
   { AV1_COPY_REFERENCE, ctrl_copy_reference },
   { AOME_USE_REFERENCE, ctrl_use_reference },
@@ -1673,6 +1730,7 @@ static aom_codec_ctrl_fn_map_t encoder_ctrl_maps[] = {
   { AOME_SET_ENABLEAUTOBWDREF, ctrl_set_enable_auto_bwd_ref },
   { AOME_SET_SHARPNESS, ctrl_set_sharpness },
   { AOME_SET_STATIC_THRESHOLD, ctrl_set_static_thresh },
+  { AV1E_SET_ROW_MT, ctrl_set_row_mt },
   { AV1E_SET_TILE_COLUMNS, ctrl_set_tile_columns },
   { AV1E_SET_TILE_ROWS, ctrl_set_tile_rows },
   { AOME_SET_ARNR_MAXFRAMES, ctrl_set_arnr_max_frames },
@@ -1741,7 +1799,8 @@ static aom_codec_ctrl_fn_map_t encoder_ctrl_maps[] = {
   { AV1E_GET_ACTIVEMAP, ctrl_get_active_map },
   { AV1_GET_NEW_FRAME_IMAGE, ctrl_get_new_frame_image },
   { AV1_COPY_NEW_FRAME_IMAGE, ctrl_copy_new_frame_image },
-
+  { AV1E_SET_CHROMA_SUBSAMPLING_X, ctrl_set_chroma_subsampling_x },
+  { AV1E_SET_CHROMA_SUBSAMPLING_Y, ctrl_set_chroma_subsampling_y },
   { -1, NULL },
 };
 
@@ -1837,13 +1896,13 @@ CODEC_INTERFACE(aom_codec_av1_cx) = {
   },
   {
       // NOLINT
-      1,                      // 1 cfg map
-      encoder_usage_cfg_map,  // aom_codec_enc_cfg_map_t
-      encoder_encode,         // aom_codec_encode_fn_t
-      encoder_get_cxdata,     // aom_codec_get_cx_data_fn_t
-      encoder_set_config,     // aom_codec_enc_config_set_fn_t
-      NULL,                   // aom_codec_get_global_headers_fn_t
-      encoder_get_preview,    // aom_codec_get_preview_frame_fn_t
-      NULL                    // aom_codec_enc_mr_get_mem_loc_fn_t
+      1,                           // 1 cfg map
+      encoder_usage_cfg_map,       // aom_codec_enc_cfg_map_t
+      encoder_encode,              // aom_codec_encode_fn_t
+      encoder_get_cxdata,          // aom_codec_get_cx_data_fn_t
+      encoder_set_config,          // aom_codec_enc_config_set_fn_t
+      encoder_get_global_headers,  // aom_codec_get_global_headers_fn_t
+      encoder_get_preview,         // aom_codec_get_preview_frame_fn_t
+      NULL                         // aom_codec_enc_mr_get_mem_loc_fn_t
   }
 };

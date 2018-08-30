@@ -255,6 +255,16 @@ struct macroblock {
 
   PALETTE_BUFFER *palette_buffer;
 
+  // buffer for hash value calculation of a block
+  // used only in av1_get_block_hash_value()
+  // [first hash/second hash]
+  // [two buffers used ping-pong]
+  uint32_t *hash_value_buffer[2][2];
+
+  CRC_CALCULATOR crc_calculator1;
+  CRC_CALCULATOR crc_calculator2;
+  int g_crc_initialized;
+
   // These define limits to motion vector components to prevent them
   // from extending outside the UMV borders
   MvLimits mv_limits;
@@ -345,7 +355,6 @@ struct macroblock {
 #if CONFIG_DIST_8X8
   int using_dist_8x8;
   aom_tune_metric tune_metric;
-  DECLARE_ALIGNED(16, int16_t, pred_luma[MAX_SB_SQUARE]);
 #endif  // CONFIG_DIST_8X8
   int comp_idx_cost[COMP_INDEX_CONTEXTS][2];
   int comp_group_idx_cost[COMP_GROUP_IDX_CONTEXTS][2];

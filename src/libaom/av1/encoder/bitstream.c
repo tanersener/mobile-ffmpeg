@@ -18,6 +18,7 @@
 #include "aom_dsp/binary_codes_writer.h"
 #include "aom_dsp/bitwriter_buffer.h"
 #include "aom_mem/aom_mem.h"
+#include "aom_ports/bitops.h"
 #include "aom_ports/mem_ops.h"
 #include "aom_ports/system_state.h"
 #if CONFIG_BITSTREAM_DEBUG
@@ -30,7 +31,6 @@
 #include "av1/common/entropymode.h"
 #include "av1/common/entropymv.h"
 #include "av1/common/mvref_common.h"
-#include "av1/common/odintrin.h"
 #include "av1/common/pred_common.h"
 #include "av1/common/reconinter.h"
 #include "av1/common/reconintra.h"
@@ -297,7 +297,7 @@ static void write_delta_qindex(const MACROBLOCKD *xd, int delta_qindex,
                    DELTA_Q_PROBS + 1);
 
   if (!smallval) {
-    rem_bits = OD_ILOG_NZ(abs - 1) - 1;
+    rem_bits = get_msb(abs - 1);
     thr = (1 << rem_bits) + 1;
     aom_write_literal(w, rem_bits - 1, 3);
     aom_write_literal(w, abs - thr, rem_bits);
@@ -326,7 +326,7 @@ static void write_delta_lflevel(const AV1_COMMON *cm, const MACROBLOCKD *xd,
   }
 
   if (!smallval) {
-    rem_bits = OD_ILOG_NZ(abs - 1) - 1;
+    rem_bits = get_msb(abs - 1);
     thr = (1 << rem_bits) + 1;
     aom_write_literal(w, rem_bits - 1, 3);
     aom_write_literal(w, abs - thr, rem_bits);
@@ -2239,8 +2239,13 @@ static int get_refresh_mask(AV1_COMP *cpi) {
     // Note: This is highly specific to the use of ARF as a forward reference,
     // and this needs to be generalized as other uses are implemented
     // (like RTC/temporal scalability).
-    return refresh_mask |
-           (cpi->refresh_golden_frame << cpi->ref_fb_idx[ALTREF_FRAME - 1]);
+
+    if (cpi->preserve_arf_as_gld) {
+      return refresh_mask;
+    } else {
+      return refresh_mask |
+             (cpi->refresh_golden_frame << cpi->ref_fb_idx[ALTREF_FRAME - 1]);
+    }
   } else {
     const int arf_idx = cpi->ref_fb_idx[ALTREF_FRAME - 1];
     return refresh_mask |
@@ -2643,7 +2648,8 @@ static void write_sb_size(SequenceHeader *seq_params,
   aom_wb_write_bit(wb, seq_params->sb_size == BLOCK_128X128 ? 1 : 0);
 }
 
-void write_sequence_header(AV1_COMP *cpi, struct aom_write_bit_buffer *wb) {
+static void write_sequence_header(AV1_COMP *cpi,
+                                  struct aom_write_bit_buffer *wb) {
   AV1_COMMON *const cm = &cpi->common;
   SequenceHeader *seq_params = &cm->seq_params;
 
@@ -2653,8 +2659,10 @@ void write_sequence_header(AV1_COMP *cpi, struct aom_write_bit_buffer *wb) {
   int max_frame_height = cpi->oxcf.forced_max_frame_height
                              ? cpi->oxcf.forced_max_frame_height
                              : cpi->oxcf.height;
+  // max((int)ceil(log2(max_frame_width)), 1)
   const int num_bits_width =
       (max_frame_width > 1) ? get_msb(max_frame_width - 1) + 1 : 1;
+  // max((int)ceil(log2(max_frame_height)), 1)
   const int num_bits_height =
       (max_frame_height > 1) ? get_msb(max_frame_height - 1) + 1 : 1;
   assert(num_bits_width <= 16);
@@ -3212,14 +3220,14 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
   if (cm->base_qindex > 0) {
     aom_wb_write_bit(wb, cm->delta_q_present_flag);
     if (cm->delta_q_present_flag) {
-      aom_wb_write_literal(wb, OD_ILOG_NZ(cm->delta_q_res) - 1, 2);
+      aom_wb_write_literal(wb, get_msb(cm->delta_q_res), 2);
       xd->current_qindex = cm->base_qindex;
       if (cm->allow_intrabc)
         assert(cm->delta_lf_present_flag == 0);
       else
         aom_wb_write_bit(wb, cm->delta_lf_present_flag);
       if (cm->delta_lf_present_flag) {
-        aom_wb_write_literal(wb, OD_ILOG_NZ(cm->delta_lf_res) - 1, 2);
+        aom_wb_write_literal(wb, get_msb(cm->delta_lf_res), 2);
         aom_wb_write_bit(wb, cm->delta_lf_multi);
         av1_reset_loop_filter_delta(xd, av1_num_planes(cm));
       }
@@ -3466,7 +3474,7 @@ static void write_bitstream_level(BitstreamLevel bl,
   aom_wb_write_literal(wb, seq_level_idx, LEVEL_BITS);
 }
 
-static uint32_t write_sequence_header_obu(AV1_COMP *cpi, uint8_t *const dst) {
+uint32_t write_sequence_header_obu(AV1_COMP *cpi, uint8_t *const dst) {
   AV1_COMMON *const cm = &cpi->common;
   struct aom_write_bit_buffer wb = { dst, 0 };
   uint32_t size = 0;

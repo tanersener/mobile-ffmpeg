@@ -1131,7 +1131,7 @@ void av1_wiener_convolve_add_src_c(const uint8_t *src, ptrdiff_t src_stride,
 
   uint16_t temp[WIENER_MAX_EXT_SIZE * MAX_SB_SIZE];
   const int intermediate_height =
-      (((h - 1) * y_step_q4 + y0_q4) >> SUBPEL_BITS) + SUBPEL_TAPS;
+      (((h - 1) * y_step_q4 + y0_q4) >> SUBPEL_BITS) + SUBPEL_TAPS - 1;
 
   assert(w <= MAX_SB_SIZE);
   assert(h <= MAX_SB_SIZE);

@@ -15,29 +15,6 @@
 #include "aom/aom_codec.h"
 #include "av1/decoder/decoder.h"
 
-typedef struct {
-  size_t size;  // Size (1 or 2 bytes) of the OBU header (including the
-                // optional OBU extension header) in the bitstream.
-  OBU_TYPE type;
-  int has_size_field;
-  int has_extension;
-  // The following fields come from the OBU extension header and therefore are
-  // only used if has_extension is true.
-  int temporal_layer_id;
-  int spatial_layer_id;
-} ObuHeader;
-
-aom_codec_err_t aom_read_obu_header(uint8_t *buffer, size_t buffer_length,
-                                    size_t *consumed, ObuHeader *header,
-                                    int is_annexb);
-
-aom_codec_err_t aom_read_obu_header_and_size(const uint8_t *data,
-                                             size_t bytes_available,
-                                             int is_annexb,
-                                             ObuHeader *obu_header,
-                                             size_t *const payload_size,
-                                             size_t *const bytes_read);
-
 // Try to decode one frame from a buffer.
 // Returns 1 if we decoded a frame,
 //         0 if we didn't decode a frame but that's okay

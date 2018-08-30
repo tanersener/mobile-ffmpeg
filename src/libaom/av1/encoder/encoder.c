@@ -501,6 +501,11 @@ static void dealloc_compressor_data(AV1_COMP *cpi) {
   aom_free(cpi->td.mb.wsrc_buf);
   cpi->td.mb.wsrc_buf = NULL;
 
+  for (int i = 0; i < 2; i++)
+    for (int j = 0; j < 2; j++) {
+      aom_free(cpi->td.mb.hash_value_buffer[i][j]);
+      cpi->td.mb.hash_value_buffer[i][j] = NULL;
+    }
   aom_free(cpi->td.mb.mask_buf);
   cpi->td.mb.mask_buf = NULL;
 
@@ -1060,6 +1065,32 @@ static void init_config(struct AV1_COMP *cpi, AV1EncoderConfig *oxcf) {
   } else {
     cm->op_params[0].initial_display_delay =
         10;  // Default value (not signaled)
+  }
+
+  if (cm->seq_params.monochrome) {
+    cm->seq_params.subsampling_x = 1;
+    cm->seq_params.subsampling_y = 1;
+  } else if (cm->seq_params.color_primaries == AOM_CICP_CP_BT_709 &&
+             cm->seq_params.transfer_characteristics == AOM_CICP_TC_SRGB &&
+             cm->seq_params.matrix_coefficients == AOM_CICP_MC_IDENTITY) {
+    cm->seq_params.subsampling_x = 0;
+    cm->seq_params.subsampling_y = 0;
+  } else {
+    if (cm->seq_params.profile == 0) {
+      cm->seq_params.subsampling_x = 1;
+      cm->seq_params.subsampling_y = 1;
+    } else if (cm->seq_params.profile == 1) {
+      cm->seq_params.subsampling_x = 0;
+      cm->seq_params.subsampling_y = 0;
+    } else {
+      if (cm->seq_params.bit_depth == AOM_BITS_12) {
+        cm->seq_params.subsampling_x = oxcf->chroma_subsampling_x;
+        cm->seq_params.subsampling_y = oxcf->chroma_subsampling_y;
+      } else {
+        cm->seq_params.subsampling_x = 1;
+        cm->seq_params.subsampling_y = 0;
+      }
+    }
   }
 
   cm->width = oxcf->width;
@@ -2321,6 +2352,7 @@ void av1_change_config(struct AV1_COMP *cpi, const AV1EncoderConfig *oxcf) {
 
   cpi->oxcf = *oxcf;
   cpi->common.options = oxcf->cfg;
+  cpi->row_mt = oxcf->row_mt;
   x->e_mbd.bd = (int)seq_params->bit_depth;
   x->e_mbd.global_motion = cm->global_motion;
 
@@ -2582,6 +2614,15 @@ AV1_COMP *av1_create_compressor(AV1EncoderConfig *oxcf,
   CHECK_MEM_ERROR(cm, cpi->td.mb.wsrc_buf,
                   (int32_t *)aom_memalign(
                       16, MAX_SB_SQUARE * sizeof(*cpi->td.mb.wsrc_buf)));
+
+  for (int x = 0; x < 2; x++)
+    for (int y = 0; y < 2; y++)
+      CHECK_MEM_ERROR(
+          cm, cpi->td.mb.hash_value_buffer[x][y],
+          (uint32_t *)aom_malloc(AOM_BUFFER_SIZE_FOR_BLOCK_HASH *
+                                 sizeof(*cpi->td.mb.hash_value_buffer[0][0])));
+
+  cpi->td.mb.g_crc_initialized = 0;
 
   CHECK_MEM_ERROR(cm, cpi->td.mb.mask_buf,
                   (int32_t *)aom_memalign(
@@ -2911,6 +2952,11 @@ void av1_remove_compressor(AV1_COMP *cpi) {
       aom_free(thread_data->td->above_pred_buf);
       aom_free(thread_data->td->left_pred_buf);
       aom_free(thread_data->td->wsrc_buf);
+      for (int x = 0; x < 2; x++)
+        for (int y = 0; y < 2; y++) {
+          aom_free(thread_data->td->hash_value_buffer[x][y]);
+          thread_data->td->hash_value_buffer[x][y] = NULL;
+        }
       aom_free(thread_data->td->mask_buf);
       aom_free(thread_data->td->counts);
       av1_free_pc_tree(thread_data->td, num_planes);
@@ -3379,9 +3425,15 @@ static void update_reference_frames(AV1_COMP *cpi) {
     // slot and, if we're updating the GF, the current frame becomes the new GF.
     int tmp;
 
-    ref_cnt_fb(pool->frame_bufs,
-               &cm->ref_frame_map[cpi->ref_fb_idx[ALTREF_FRAME - 1]],
-               cm->new_fb_idx);
+    // ARF in general is a better reference than overlay. We shouldkeep ARF as
+    // reference instead of replacing it with overlay.
+
+    if (!cpi->preserve_arf_as_gld) {
+      ref_cnt_fb(pool->frame_bufs,
+                 &cm->ref_frame_map[cpi->ref_fb_idx[ALTREF_FRAME - 1]],
+                 cm->new_fb_idx);
+    }
+
     tmp = cpi->ref_fb_idx[ALTREF_FRAME - 1];
     cpi->ref_fb_idx[ALTREF_FRAME - 1] = cpi->ref_fb_idx[GOLDEN_FRAME - 1];
     cpi->ref_fb_idx[GOLDEN_FRAME - 1] = tmp;
@@ -3739,7 +3791,8 @@ static void set_restoration_unit_size(int width, int height, int sx, int sy,
   rst[2].restoration_unit_size = rst[1].restoration_unit_size;
 }
 
-static void init_ref_frame_bufs(AV1_COMMON *cm) {
+static void init_ref_frame_bufs(AV1_COMP *cpi) {
+  AV1_COMMON *const cm = &cpi->common;
   int i;
   BufferPool *const pool = cm->buffer_pool;
   cm->new_fb_idx = INVALID_IDX;
@@ -3749,7 +3802,7 @@ static void init_ref_frame_bufs(AV1_COMMON *cm) {
   }
   if (cm->seq_params.force_screen_content_tools) {
     for (i = 0; i < FRAME_BUFFERS; ++i) {
-      av1_hash_table_init(&pool->frame_bufs[i].hash_table);
+      av1_hash_table_init(&pool->frame_bufs[i].hash_table, &cpi->td.mb);
     }
   }
 }
@@ -3767,7 +3820,7 @@ static void check_initial_width(AV1_COMP *cpi, int use_highbitdepth,
     seq_params->use_highbitdepth = use_highbitdepth;
 
     alloc_raw_frame_buffers(cpi);
-    init_ref_frame_bufs(cm);
+    init_ref_frame_bufs(cpi);
     alloc_util_frame_buffers(cpi);
 
     init_motion_estimation(cpi);  // TODO(agrange) This can be removed.
@@ -4897,10 +4950,6 @@ static int encode_frame_to_data_rate(AV1_COMP *cpi, size_t *size, uint8_t *dest,
       av1_rc_postencode_update(cpi, *size);
     }
 
-    // Decrement count down till next gf
-    if (cpi->rc.frames_till_gf_update_due > 0)
-      cpi->rc.frames_till_gf_update_due--;
-
     ++cm->current_video_frame;
 
     return AOM_CODEC_OK;
@@ -5153,15 +5202,6 @@ static int encode_frame_to_data_rate(AV1_COMP *cpi, size_t *size, uint8_t *dest,
   // takes a space in the gf group. Therefore, even when
   // it is not shown, we still need update the count down.
 
-  // TODO(weitinglin): This is a work-around to handle the condition
-  // when a frame is drop. We should fix the cm->show_frame flag
-  // instead of checking the other condition to update the counter properly.
-  if (cm->show_frame || is_frame_droppable(cpi)) {
-    // Decrement count down till next gf
-    if (cpi->rc.frames_till_gf_update_due > 0)
-      cpi->rc.frames_till_gf_update_due--;
-  }
-
   if (cm->show_frame) {
     // TODO(zoeliu): We may only swamp mi and prev_mi for those frames that
     // are
@@ -5186,6 +5226,50 @@ static int encode_frame_to_data_rate(AV1_COMP *cpi, size_t *size, uint8_t *dest,
   return AOM_CODEC_OK;
 }
 
+static INLINE void update_keyframe_counters(AV1_COMP *cpi) {
+  // TODO(zoeliu): To investigate whether we should treat BWDREF_FRAME
+  //               differently here for rc->avg_frame_bandwidth.
+  if (cpi->common.show_frame || cpi->rc.is_bwd_ref_frame) {
+    if (!cpi->common.show_existing_frame || cpi->rc.is_src_frame_alt_ref ||
+        cpi->common.frame_type == KEY_FRAME) {
+      // If this is a show_existing_frame with a source other than altref,
+      // or if it is not a displayed forward keyframe, the keyframe update
+      // counters were incremented when it was originally encoded.
+      cpi->rc.frames_since_key++;
+      cpi->rc.frames_to_key--;
+    }
+  }
+}
+
+static INLINE void update_frames_till_gf_update(AV1_COMP *cpi) {
+  // TODO(weitinglin): Updating this counter for is_frame_droppable
+  // is a work-around to handle the condition when a frame is drop.
+  // We should fix the cpi->common.show_frame flag
+  // instead of checking the other condition to update the counter properly.
+  if (cpi->common.show_frame || is_frame_droppable(cpi)) {
+    // Decrement count down till next gf
+    if (cpi->rc.frames_till_gf_update_due > 0)
+      cpi->rc.frames_till_gf_update_due--;
+  }
+}
+
+static INLINE void update_twopass_gf_group_index(AV1_COMP *cpi) {
+  // Increment the gf group index ready for the next frame. If this is
+  // a show_existing_frame with a source other than altref, or if it is not
+  // a displayed forward keyframe, the index was incremented when it was
+  // originally encoded.
+  if (!cpi->common.show_existing_frame || cpi->rc.is_src_frame_alt_ref ||
+      cpi->common.frame_type == KEY_FRAME) {
+    ++cpi->twopass.gf_group.index;
+  }
+}
+
+static void update_rc_counts(AV1_COMP *cpi) {
+  update_keyframe_counters(cpi);
+  update_frames_till_gf_update(cpi);
+  if (cpi->oxcf.pass == 2) update_twopass_gf_group_index(cpi);
+}
+
 static int Pass0Encode(AV1_COMP *cpi, size_t *size, uint8_t *dest,
                        int skip_adapt, unsigned int *frame_flags) {
   if (cpi->oxcf.rc_mode == AOM_CBR) {
@@ -5197,6 +5281,7 @@ static int Pass0Encode(AV1_COMP *cpi, size_t *size, uint8_t *dest,
       AOM_CODEC_OK) {
     return AOM_CODEC_ERROR;
   }
+  update_rc_counts(cpi);
   check_show_existing_frame(cpi);
   return AOM_CODEC_OK;
 }
@@ -5226,20 +5311,8 @@ static int Pass2Encode(AV1_COMP *cpi, size_t *size, uint8_t *dest,
           cm->cum_txcoeff_cost_timer);
 #endif
 
-  // Do not do post-encoding update for those frames that do not have a spot
-  // in a gf group, but note that an OVERLAY frame always has a spot in a gf
-  // group, even when show_existing_frame is used.
-  // Error resilient frames cannot be true show_existing_frames, as this
-  // would require displaying a frame that was encoded in the past.
-  // In this case, any frame that would traditionally be a
-  // show_existing_frame will need to be re-encoded at display time,
-  // making it necessary to do this postencode_update. If error resilient mode
-  // is disabled, a show_existing_frame should never enter this function unless
-  // it was the source of an altref.
-  if (cpi->common.error_resilient_mode || !cpi->common.show_existing_frame ||
-      cpi->rc.is_src_frame_alt_ref) {
-    av1_twopass_postencode_update(cpi);
-  }
+  av1_twopass_postencode_update(cpi);
+  update_rc_counts(cpi);
   check_show_existing_frame(cpi);
   return AOM_CODEC_OK;
 }
@@ -5647,7 +5720,7 @@ static int is_integer_mv(AV1_COMP *cpi, const YV12_BUFFER_CONFIG *cur_picture,
       av1_get_block_hash_value(
           cur_picture->y_buffer + y_pos * stride_cur + x_pos, stride_cur,
           block_size, &hash_value_1, &hash_value_2,
-          (cur_picture->flags & YV12_FLAG_HIGHBITDEPTH));
+          (cur_picture->flags & YV12_FLAG_HIGHBITDEPTH), &cpi->td.mb);
       // Hashing does not work for highbitdepth currently.
       // TODO(Roger): Make it work for highbitdepth.
       if (av1_use_hash_me(&cpi->common)) {
@@ -5734,13 +5807,6 @@ int av1_get_compressed_data(AV1_COMP *cpi, unsigned int *frame_flags,
   aom_usec_timer_start(&cmptimer);
 
   set_high_precision_mv(cpi, ALTREF_HIGH_PRECISION_MV, 0);
-
-  // Is multi-arf enabled.
-  // Note that at the moment multi_arf is only configured for 2 pass VBR
-  if ((oxcf->pass == 2) && (cpi->oxcf.enable_auto_arf > 1))
-    cpi->multi_arf_allowed = 1;
-  else
-    cpi->multi_arf_allowed = 0;
 
   // Normal defaults
   cm->refresh_frame_context = oxcf->frame_parallel_decoding_mode
@@ -6331,4 +6397,51 @@ int64_t timebase_units_to_ticks(const aom_rational_t *timebase, int64_t n) {
 int64_t ticks_to_timebase_units(const aom_rational_t *timebase, int64_t n) {
   const int64_t round = TICKS_PER_SEC * timebase->num / 2 - 1;
   return (n * timebase->den + round) / timebase->num / TICKS_PER_SEC;
+}
+
+aom_fixed_buf_t *av1_get_global_headers(AV1_COMP *cpi) {
+  if (!cpi) return NULL;
+
+  uint8_t header_buf[512] = { 0 };
+  const uint32_t sequence_header_size =
+      write_sequence_header_obu(cpi, &header_buf[0]);
+  assert(sequence_header_size <= sizeof(header_buf));
+  if (sequence_header_size == 0) return NULL;
+
+  const size_t obu_header_size = 1;
+  const size_t size_field_size = aom_uleb_size_in_bytes(sequence_header_size);
+  const size_t payload_offset = obu_header_size + size_field_size;
+
+  if (payload_offset + sequence_header_size > sizeof(header_buf)) return NULL;
+  memmove(&header_buf[payload_offset], &header_buf[0], sequence_header_size);
+
+  if (write_obu_header(OBU_SEQUENCE_HEADER, 0, &header_buf[0]) !=
+      obu_header_size) {
+    return NULL;
+  }
+
+  size_t coded_size_field_size = 0;
+  if (aom_uleb_encode(sequence_header_size, size_field_size,
+                      &header_buf[obu_header_size],
+                      &coded_size_field_size) != 0) {
+    return NULL;
+  }
+  assert(coded_size_field_size == size_field_size);
+
+  aom_fixed_buf_t *global_headers =
+      (aom_fixed_buf_t *)malloc(sizeof(*global_headers));
+  if (!global_headers) return NULL;
+
+  const size_t global_header_buf_size =
+      obu_header_size + size_field_size + sequence_header_size;
+
+  global_headers->buf = malloc(global_header_buf_size);
+  if (!global_headers->buf) {
+    free(global_headers);
+    return NULL;
+  }
+
+  memcpy(global_headers->buf, &header_buf[0], global_header_buf_size);
+  global_headers->sz = global_header_buf_size;
+  return global_headers;
 }

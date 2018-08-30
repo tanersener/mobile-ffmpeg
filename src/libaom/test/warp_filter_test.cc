@@ -17,7 +17,7 @@ using libaom_test::AV1HighbdWarpFilter::AV1HighbdWarpFilterTest;
 using libaom_test::AV1WarpFilter::AV1WarpFilterTest;
 
 namespace {
-#if HAVE_SSE4_1
+
 TEST_P(AV1WarpFilterTest, CheckOutput) {
   RunCheckOutput(::testing::get<3>(GET_PARAM(0)));
 }
@@ -25,6 +25,11 @@ TEST_P(AV1WarpFilterTest, DISABLED_Speed) {
   RunSpeedTest(::testing::get<3>(GET_PARAM(0)));
 }
 
+INSTANTIATE_TEST_CASE_P(
+    C, AV1WarpFilterTest,
+    libaom_test::AV1WarpFilter::BuildParams(av1_warp_affine_c));
+
+#if HAVE_SSE4_1
 INSTANTIATE_TEST_CASE_P(
     SSE4_1, AV1WarpFilterTest,
     libaom_test::AV1WarpFilter::BuildParams(av1_warp_affine_sse4_1));
@@ -41,4 +46,11 @@ INSTANTIATE_TEST_CASE_P(SSE4_1, AV1HighbdWarpFilterTest,
                             av1_highbd_warp_affine_sse4_1));
 
 #endif  // HAVE_SSE4_1
+
+#if HAVE_NEON
+INSTANTIATE_TEST_CASE_P(
+    NEON, AV1WarpFilterTest,
+    libaom_test::AV1WarpFilter::BuildParams(av1_warp_affine_neon));
+#endif  // HAVE_NEON
+
 }  // namespace

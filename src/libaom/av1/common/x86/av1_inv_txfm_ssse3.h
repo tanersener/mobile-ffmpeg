@@ -94,10 +94,6 @@ static const ITX_TYPE_1D hitx_1d_tab[TX_TYPES] = {
   IIDENTITY_1D, IADST_1D,     IIDENTITY_1D, IFLIPADST_1D,
 };
 
-// Sqrt2, Sqrt2^2, Sqrt2^3, Sqrt2^4, Sqrt2^5
-static int32_t NewSqrt2list[TX_SIZES] = { 5793, 2 * 4096, 2 * 5793, 4 * 4096,
-                                          4 * 5793 };
-
 DECLARE_ALIGNED(16, static const int16_t, av1_eob_to_eobxy_8x8_default[8]) = {
   0x0707, 0x0707, 0x0707, 0x0707, 0x0707, 0x0707, 0x0707, 0x0707,
 };

@@ -108,6 +108,18 @@ specialize qw/av1_highbd_convolve8_vert/, "$sse2_x86_64";
 add_proto qw/void av1_inv_txfm_add/, "const tran_low_t *dqcoeff, uint8_t *dst, int stride, const TxfmParam *txfm_param";
 specialize qw/av1_inv_txfm_add ssse3 avx2 neon/;
 
+add_proto qw/void av1_highbd_inv_txfm_add/, "const tran_low_t *dqcoeff, uint8_t *dst, int stride, const TxfmParam *txfm_param";
+specialize qw/av1_highbd_inv_txfm_add sse4_1 avx2/;
+
+add_proto qw/void av1_highbd_inv_txfm_add_4x4/,  "const tran_low_t *dqcoeff, uint8_t *dst, int stride, const TxfmParam *txfm_param";
+specialize qw/av1_highbd_inv_txfm_add_4x4 sse4_1/;
+add_proto qw/void av1_highbd_inv_txfm_add_8x8/,  "const tran_low_t *dqcoeff, uint8_t *dst, int stride, const TxfmParam *txfm_param";
+specialize qw/av1_highbd_inv_txfm_add_8x8 sse4_1/;
+add_proto qw/void av1_highbd_inv_txfm_add_16x16/,  "const tran_low_t *dqcoeff, uint8_t *dst, int stride, const TxfmParam *txfm_param";
+specialize qw/av1_highbd_inv_txfm_add_16x16 sse4_1/;
+add_proto qw/void av1_highbd_inv_txfm_add_32x32/,  "const tran_low_t *dqcoeff, uint8_t *dst, int stride, const TxfmParam *txfm_param";
+specialize qw/av1_highbd_inv_txfm_add_32x32 avx2/;
+
 add_proto qw/void av1_highbd_iwht4x4_1_add/, "const tran_low_t *input, uint8_t *dest, int dest_stride, int bd";
 add_proto qw/void av1_highbd_iwht4x4_16_add/, "const tran_low_t *input, uint8_t *dest, int dest_stride, int bd";
 
@@ -122,7 +134,6 @@ specialize qw/av1_inv_txfm2d_add_4x4 sse4_1/;
 add_proto qw/void av1_inv_txfm2d_add_8x8/, "const int32_t *input, uint16_t *output, int stride, TX_TYPE tx_type, int bd";
 specialize qw/av1_inv_txfm2d_add_8x8 sse4_1/;
 add_proto qw/void av1_inv_txfm2d_add_16x16/, "const int32_t *input, uint16_t *output, int stride, TX_TYPE tx_type, int bd";
-specialize qw/av1_inv_txfm2d_add_16x16 sse4_1/;
 add_proto qw/void av1_inv_txfm2d_add_32x32/, "const int32_t *input, uint16_t *output, int stride, TX_TYPE tx_type, int bd";
 specialize qw/av1_inv_txfm2d_add_32x32 avx2/;
 
@@ -131,8 +142,6 @@ add_proto qw/void av1_inv_txfm2d_add_32x64/, "const int32_t *input, uint16_t *ou
 add_proto qw/void av1_inv_txfm2d_add_64x32/, "const int32_t *input, uint16_t *output, int stride, TX_TYPE tx_type, int bd";
 add_proto qw/void av1_inv_txfm2d_add_16x64/, "const int32_t *input, uint16_t *output, int stride, TX_TYPE tx_type, int bd";
 add_proto qw/void av1_inv_txfm2d_add_64x16/, "const int32_t *input, uint16_t *output, int stride, TX_TYPE tx_type, int bd";
-
-specialize qw/av1_inv_txfm2d_add_64x64 sse4_1/;
 
 add_proto qw/void av1_inv_txfm2d_add_4x16/, "const int32_t *input, uint16_t *output, int stride, TX_TYPE tx_type, int bd";
 add_proto qw/void av1_inv_txfm2d_add_16x4/, "const int32_t *input, uint16_t *output, int stride, TX_TYPE tx_type, int bd";
@@ -146,13 +155,13 @@ add_proto qw/void av1_highbd_dr_prediction_z3/, "uint16_t *dst, ptrdiff_t stride
 
 # build compound seg mask functions
 add_proto qw/void av1_build_compound_diffwtd_mask/, "uint8_t *mask, DIFFWTD_MASK_TYPE mask_type, const uint8_t *src0, int src0_stride, const uint8_t *src1, int src1_stride, int h, int w";
-specialize qw/av1_build_compound_diffwtd_mask sse4_1/;
+specialize qw/av1_build_compound_diffwtd_mask sse4_1 avx2/;
 
 add_proto qw/void av1_build_compound_diffwtd_mask_highbd/, "uint8_t *mask, DIFFWTD_MASK_TYPE mask_type, const uint8_t *src0, int src0_stride, const uint8_t *src1, int src1_stride, int h, int w, int bd";
 specialize qw/av1_build_compound_diffwtd_mask_highbd ssse3 avx2/;
 
 add_proto qw/void av1_build_compound_diffwtd_mask_d16/, "uint8_t *mask, DIFFWTD_MASK_TYPE mask_type, const CONV_BUF_TYPE *src0, int src0_stride, const CONV_BUF_TYPE *src1, int src1_stride, int h, int w, ConvolveParams *conv_params, int bd";
-specialize qw/av1_build_compound_diffwtd_mask_d16 sse4_1 neon/;
+specialize qw/av1_build_compound_diffwtd_mask_d16 sse4_1 avx2 neon/;
 
 #
 # Encoder functions below this point.
@@ -238,7 +247,7 @@ if (aom_config("CONFIG_AV1_ENCODER") eq "yes") {
   add_proto qw/void av1_get_nz_map_contexts/, "const uint8_t *const levels, const int16_t *const scan, const uint16_t eob, const TX_SIZE tx_size, const TX_CLASS tx_class, int8_t *const coeff_contexts";
   specialize qw/av1_get_nz_map_contexts sse2/;
   add_proto qw/void av1_txb_init_levels/, "const tran_low_t *const coeff, const int width, const int height, uint8_t *const levels";
-  specialize qw/av1_txb_init_levels sse4_1/;
+  specialize qw/av1_txb_init_levels sse4_1 avx2/;
 
   add_proto qw/uint64_t av1_wedge_sse_from_residuals/, "const int16_t *r1, const int16_t *d, const uint8_t *m, int N";
   specialize qw/av1_wedge_sse_from_residuals sse2 avx2/;
@@ -280,7 +289,7 @@ if ($opts{config} !~ /libs-x86-win32-vs.*/) {
 # WARPED_MOTION / GLOBAL_MOTION functions
 
 add_proto qw/void av1_warp_affine/, "const int32_t *mat, const uint8_t *ref, int width, int height, int stride, uint8_t *pred, int p_col, int p_row, int p_width, int p_height, int p_stride, int subsampling_x, int subsampling_y, ConvolveParams *conv_params, int16_t alpha, int16_t beta, int16_t gamma, int16_t delta";
-specialize qw/av1_warp_affine sse4_1/;
+specialize qw/av1_warp_affine sse4_1 neon/;
 
 add_proto qw/void av1_highbd_warp_affine/, "const int32_t *mat, const uint16_t *ref, int width, int height, int stride, uint16_t *pred, int p_col, int p_row, int p_width, int p_height, int p_stride, int subsampling_x, int subsampling_y, int bd, ConvolveParams *conv_params, int16_t alpha, int16_t beta, int16_t gamma, int16_t delta";
 specialize qw/av1_highbd_warp_affine sse4_1/;

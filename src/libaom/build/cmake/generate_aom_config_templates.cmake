@@ -86,7 +86,7 @@ file(WRITE "${aom_config_h_template}" ${h_file_header_block})
 foreach(aom_var ${aom_build_vars})
   file(APPEND "${aom_config_h_template}" "\#define ${aom_var} \${${aom_var}}\n")
 endforeach()
-file(APPEND "${aom_config_h_template}" "\#endif  /* AOM_CONFIG_H_ */")
+file(APPEND "${aom_config_h_template}" "\#endif  // AOM_CONFIG_H_")
 
 set(aom_asm_config_template "${AOM_CONFIG_DIR}/config/aom_config.asm.cmake")
 file(WRITE "${aom_asm_config_template}" ${asm_file_header_block})

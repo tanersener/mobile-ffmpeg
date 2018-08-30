@@ -54,6 +54,16 @@ TEST(EncodeAPI, InvalidParams) {
 
     EXPECT_EQ(AOM_CODEC_OK, aom_codec_enc_config_default(kCodecs[i], &cfg, 0));
     EXPECT_EQ(AOM_CODEC_OK, aom_codec_enc_init(&enc, kCodecs[i], &cfg, 0));
+
+    EXPECT_EQ(NULL, aom_codec_get_global_headers(NULL));
+
+    aom_fixed_buf_t *glob_headers = aom_codec_get_global_headers(&enc);
+    EXPECT_TRUE(glob_headers->buf != NULL);
+    if (glob_headers) {
+      free(glob_headers->buf);
+      free(glob_headers);
+    }
+
     EXPECT_EQ(AOM_CODEC_OK, aom_codec_encode(&enc, NULL, 0, 0, 0));
 
     EXPECT_EQ(AOM_CODEC_OK, aom_codec_destroy(&enc));

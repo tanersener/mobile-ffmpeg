@@ -548,7 +548,7 @@ add_proto qw/void aom_highbd_blend_a64_d16_mask/, "uint8_t *dst, uint32_t dst_st
 add_proto qw/void aom_blend_a64_mask/, "uint8_t *dst, uint32_t dst_stride, const uint8_t *src0, uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride, const uint8_t *mask, uint32_t mask_stride, int w, int h, int subx, int suby";
 add_proto qw/void aom_blend_a64_hmask/, "uint8_t *dst, uint32_t dst_stride, const uint8_t *src0, uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride, const uint8_t *mask, int w, int h";
 add_proto qw/void aom_blend_a64_vmask/, "uint8_t *dst, uint32_t dst_stride, const uint8_t *src0, uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride, const uint8_t *mask, int w, int h";
-specialize "aom_blend_a64_mask", qw/sse4_1/;
+specialize "aom_blend_a64_mask", qw/sse4_1 avx2/;
 specialize "aom_blend_a64_hmask", qw/sse4_1 neon/;
 specialize "aom_blend_a64_vmask", qw/sse4_1 neon/;
 
@@ -888,36 +888,36 @@ if (aom_config("CONFIG_AV1_ENCODER") eq "yes") {
   #
   add_proto qw/void aom_upsampled_pred/, "MACROBLOCKD *xd, const struct AV1Common *const cm, int mi_row, int mi_col,
                                           const MV *const mv, uint8_t *comp_pred, int width, int height, int subpel_x_q3,
-                                          int subpel_y_q3, const uint8_t *ref, int ref_stride";
+                                          int subpel_y_q3, const uint8_t *ref, int ref_stride, int subpel_search";
   specialize qw/aom_upsampled_pred sse2/;
 
   add_proto qw/void aom_comp_avg_upsampled_pred/, "MACROBLOCKD *xd, const struct AV1Common *const cm, int mi_row, int mi_col,
                                                    const MV *const mv, uint8_t *comp_pred, const uint8_t *pred, int width,
                                                    int height, int subpel_x_q3, int subpel_y_q3, const uint8_t *ref,
-                                                   int ref_stride";
+                                                   int ref_stride, int subpel_search";
   specialize qw/aom_comp_avg_upsampled_pred sse2/;
 
   add_proto qw/void aom_jnt_comp_avg_upsampled_pred/, "MACROBLOCKD *xd, const struct AV1Common *const cm, int mi_row, int mi_col,
                                                        const MV *const mv, uint8_t *comp_pred, const uint8_t *pred, int width,
                                                        int height, int subpel_x_q3, int subpel_y_q3, const uint8_t *ref,
-                                                       int ref_stride, const JNT_COMP_PARAMS *jcp_param";
+                                                       int ref_stride, const JNT_COMP_PARAMS *jcp_param, int subpel_search";
   specialize qw/aom_jnt_comp_avg_upsampled_pred ssse3/;
 
 
   add_proto qw/void aom_highbd_upsampled_pred/, "MACROBLOCKD *xd, const struct AV1Common *const cm, int mi_row, int mi_col,
-                                                 const MV *const mv, uint16_t *comp_pred, int width, int height, int subpel_x_q3,
-                                                 int subpel_y_q3, const uint8_t *ref8, int ref_stride, int bd";
+                                                 const MV *const mv, uint8_t *comp_pred8, int width, int height, int subpel_x_q3,
+                                                 int subpel_y_q3, const uint8_t *ref8, int ref_stride, int bd, int subpel_search";
   specialize qw/aom_highbd_upsampled_pred sse2/;
 
   add_proto qw/void aom_highbd_comp_avg_upsampled_pred/, "MACROBLOCKD *xd, const struct AV1Common *const cm, int mi_row, int mi_col,
-                                                          const MV *const mv, uint16_t *comp_pred, const uint8_t *pred8, int width,
-                                                          int height, int subpel_x_q3, int subpel_y_q3, const uint8_t *ref8, int ref_stride, int bd";
+                                                          const MV *const mv, uint8_t *comp_pred8, const uint8_t *pred8, int width,
+                                                          int height, int subpel_x_q3, int subpel_y_q3, const uint8_t *ref8, int ref_stride, int bd, int subpel_search";
   specialize qw/aom_highbd_comp_avg_upsampled_pred sse2/;
 
   add_proto qw/void aom_highbd_jnt_comp_avg_upsampled_pred/, "MACROBLOCKD *xd, const struct AV1Common *const cm, int mi_row, int mi_col,
-                                                              const MV *const mv, uint16_t *comp_pred, const uint8_t *pred8, int width,
+                                                              const MV *const mv, uint8_t *comp_pred8, const uint8_t *pred8, int width,
                                                               int height, int subpel_x_q3, int subpel_y_q3, const uint8_t *ref8,
-                                                              int ref_stride, int bd, const JNT_COMP_PARAMS *jcp_param";
+                                                              int ref_stride, int bd, const JNT_COMP_PARAMS *jcp_param, int subpel_search";
   specialize qw/aom_highbd_jnt_comp_avg_upsampled_pred sse2/;
 
 
@@ -1154,17 +1154,6 @@ if (aom_config("CONFIG_AV1_ENCODER") eq "yes") {
 
   add_proto qw/uint32_t aom_sub_pixel_avg_variance4x4/, "const uint8_t *src_ptr, int source_stride, int xoffset, int  yoffset, const uint8_t *ref_ptr, int ref_stride, uint32_t *sse, const uint8_t *second_pred";
   specialize qw/aom_sub_pixel_avg_variance4x4 msa sse2 ssse3/;
-  #
-  # Specialty Subpixel
-  #
-  add_proto qw/uint32_t aom_variance_halfpixvar16x16_h/, "const unsigned char *src_ptr, int source_stride, const unsigned char *ref_ptr, int  ref_stride, uint32_t *sse";
-  specialize qw/aom_variance_halfpixvar16x16_h sse2/;
-
-  add_proto qw/uint32_t aom_variance_halfpixvar16x16_v/, "const unsigned char *src_ptr, int source_stride, const unsigned char *ref_ptr, int  ref_stride, uint32_t *sse";
-  specialize qw/aom_variance_halfpixvar16x16_v sse2/;
-
-  add_proto qw/uint32_t aom_variance_halfpixvar16x16_hv/, "const unsigned char *src_ptr, int source_stride, const unsigned char *ref_ptr, int  ref_stride, uint32_t *sse";
-  specialize qw/aom_variance_halfpixvar16x16_hv sse2/;
 
   #
   # Comp Avg
@@ -1336,9 +1325,9 @@ if (aom_config("CONFIG_AV1_ENCODER") eq "yes") {
     add_proto qw/unsigned int aom_highbd_12_mse8x8/, "const uint8_t *src_ptr, int  source_stride, const uint8_t *ref_ptr, int  recon_stride, unsigned int *sse";
     specialize qw/aom_highbd_12_mse8x8 sse2/;
 
-    add_proto qw/void aom_highbd_comp_avg_pred/, "uint16_t *comp_pred, const uint8_t *pred8, int width, int height, const uint8_t *ref8, int ref_stride";
+    add_proto qw/void aom_highbd_comp_avg_pred/, "uint8_t *comp_pred8, const uint8_t *pred8, int width, int height, const uint8_t *ref8, int ref_stride";
 
-    add_proto qw/void aom_highbd_jnt_comp_avg_pred/, "uint16_t *comp_pred, const uint8_t *pred8, int width, int height, const uint8_t *ref8, int ref_stride, const JNT_COMP_PARAMS *jcp_param";
+    add_proto qw/void aom_highbd_jnt_comp_avg_pred/, "uint8_t *comp_pred8, const uint8_t *pred8, int width, int height, const uint8_t *ref8, int ref_stride, const JNT_COMP_PARAMS *jcp_param";
     specialize qw/aom_highbd_jnt_comp_avg_pred sse2/;
 
     #
@@ -1565,7 +1554,7 @@ if (aom_config("CONFIG_AV1_ENCODER") eq "yes") {
   add_proto qw/void aom_comp_mask_pred/, "uint8_t *comp_pred, const uint8_t *pred, int width, int height, const uint8_t *ref, int ref_stride, const uint8_t *mask, int mask_stride, int invert_mask";
   specialize qw/aom_comp_mask_pred ssse3 avx2/;
 
-  add_proto qw/void aom_highbd_comp_mask_pred/, "uint16_t *comp_pred, const uint8_t *pred8, int width, int height, const uint8_t *ref8, int ref_stride, const uint8_t *mask, int mask_stride, int invert_mask";
+  add_proto qw/void aom_highbd_comp_mask_pred/, "uint8_t *comp_pred, const uint8_t *pred8, int width, int height, const uint8_t *ref8, int ref_stride, const uint8_t *mask, int mask_stride, int invert_mask";
   specialize qw/aom_highbd_comp_mask_pred sse2 avx2/;
 
 }  # CONFIG_AV1_ENCODER

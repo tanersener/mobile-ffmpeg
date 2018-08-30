@@ -181,6 +181,11 @@ av1_get_interp_filter_params_with_block_size(const InterpFilter interp_filter,
   return &av1_interp_filter_params_list[interp_filter];
 }
 
+static INLINE const InterpFilterParams *av1_get_4tap_interp_filter_params(
+    const InterpFilter interp_filter) {
+  return &av1_interp_4tap[interp_filter];
+}
+
 static INLINE const int16_t *av1_get_interp_filter_kernel(
     const InterpFilter interp_filter) {
   return av1_interp_filter_params_list[interp_filter].filter_ptr;

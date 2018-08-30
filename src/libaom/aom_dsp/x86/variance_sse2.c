@@ -486,7 +486,8 @@ void aom_upsampled_pred_sse2(MACROBLOCKD *xd, const struct AV1Common *const cm,
                              int mi_row, int mi_col, const MV *const mv,
                              uint8_t *comp_pred, int width, int height,
                              int subpel_x_q3, int subpel_y_q3,
-                             const uint8_t *ref, int ref_stride) {
+                             const uint8_t *ref, int ref_stride,
+                             int subpel_search) {
   // expect xd == NULL only in tests
   if (xd != NULL) {
     const MB_MODE_INFO *mi = xd->mi[0];
@@ -554,7 +555,7 @@ void aom_upsampled_pred_sse2(MACROBLOCKD *xd, const struct AV1Common *const cm,
       warp_types.local_warp_allowed = mi->motion_mode == WARPED_CAUSAL;
 
       // Get convolve parameters.
-      ConvolveParams conv_params = get_conv_params(ref_num, 0, plane, xd->bd);
+      ConvolveParams conv_params = get_conv_params(0, plane, xd->bd);
       const InterpFilters filters =
           av1_broadcast_interp_filter(EIGHTTAP_REGULAR);
 
@@ -571,7 +572,9 @@ void aom_upsampled_pred_sse2(MACROBLOCKD *xd, const struct AV1Common *const cm,
   }
 
   const InterpFilterParams *filter =
-      av1_get_interp_filter_params_with_block_size(EIGHTTAP_REGULAR, 8);
+      (subpel_search == 1)
+          ? av1_get_4tap_interp_filter_params(EIGHTTAP_REGULAR)
+          : av1_get_interp_filter_params_with_block_size(EIGHTTAP_REGULAR, 8);
 
   if (!subpel_x_q3 && !subpel_y_q3) {
     if (width >= 16) {
@@ -649,11 +652,11 @@ void aom_comp_avg_upsampled_pred_sse2(
     MACROBLOCKD *xd, const struct AV1Common *const cm, int mi_row, int mi_col,
     const MV *const mv, uint8_t *comp_pred, const uint8_t *pred, int width,
     int height, int subpel_x_q3, int subpel_y_q3, const uint8_t *ref,
-    int ref_stride) {
+    int ref_stride, int subpel_search) {
   int n;
   int i;
   aom_upsampled_pred(xd, cm, mi_row, mi_col, mv, comp_pred, width, height,
-                     subpel_x_q3, subpel_y_q3, ref, ref_stride);
+                     subpel_x_q3, subpel_y_q3, ref, ref_stride, subpel_search);
   /*The total number of pixels must be a multiple of 16 (e.g., 4x4).*/
   assert(!(width * height & 15));
   n = width * height >> 4;
@@ -691,11 +694,12 @@ static INLINE __m128i highbd_comp_mask_pred_line_sse2(const __m128i s0,
   return comp;
 }
 
-void aom_highbd_comp_mask_pred_sse2(uint16_t *comp_pred, const uint8_t *pred8,
+void aom_highbd_comp_mask_pred_sse2(uint8_t *comp_pred8, const uint8_t *pred8,
                                     int width, int height, const uint8_t *ref8,
                                     int ref_stride, const uint8_t *mask,
                                     int mask_stride, int invert_mask) {
   int i = 0;
+  uint16_t *comp_pred = CONVERT_TO_SHORTPTR(comp_pred8);
   uint16_t *pred = CONVERT_TO_SHORTPTR(pred8);
   uint16_t *ref = CONVERT_TO_SHORTPTR(ref8);
   const uint16_t *src0 = invert_mask ? pred : ref;

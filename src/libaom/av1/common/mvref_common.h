@@ -85,29 +85,17 @@ static INLINE int_mv scale_mv(const MB_MODE_INFO *mbmi, int ref,
 // Checks that the given mi_row, mi_col and search point
 // are inside the borders of the tile.
 static INLINE int is_inside(const TileInfo *const tile, int mi_col, int mi_row,
-                            int mi_rows, const POSITION *mi_pos) {
-  const int dependent_horz_tile_flag = 0;
-  if (dependent_horz_tile_flag && !tile->tg_horz_boundary) {
-    return !(mi_row + mi_pos->row < 0 ||
-             mi_col + mi_pos->col < tile->mi_col_start ||
-             mi_row + mi_pos->row >= mi_rows ||
-             mi_col + mi_pos->col >= tile->mi_col_end);
-  } else {
-    return !(mi_row + mi_pos->row < tile->mi_row_start ||
-             mi_col + mi_pos->col < tile->mi_col_start ||
-             mi_row + mi_pos->row >= tile->mi_row_end ||
-             mi_col + mi_pos->col >= tile->mi_col_end);
-  }
+                            const POSITION *mi_pos) {
+  return !(mi_row + mi_pos->row < tile->mi_row_start ||
+           mi_col + mi_pos->col < tile->mi_col_start ||
+           mi_row + mi_pos->row >= tile->mi_row_end ||
+           mi_col + mi_pos->col >= tile->mi_col_end);
 }
 
 static INLINE int find_valid_row_offset(const TileInfo *const tile, int mi_row,
-                                        int mi_rows, int row_offset) {
-  const int dependent_horz_tile_flag = 0;
-  if (dependent_horz_tile_flag && !tile->tg_horz_boundary)
-    return clamp(row_offset, -mi_row, mi_rows - mi_row - 1);
-  else
-    return clamp(row_offset, tile->mi_row_start - mi_row,
-                 tile->mi_row_end - mi_row - 1);
+                                        int row_offset) {
+  return clamp(row_offset, tile->mi_row_start - mi_row,
+               tile->mi_row_end - mi_row - 1);
 }
 
 static INLINE int find_valid_col_offset(const TileInfo *const tile, int mi_col,

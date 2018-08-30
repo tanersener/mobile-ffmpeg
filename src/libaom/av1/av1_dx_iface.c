@@ -26,6 +26,7 @@
 #include "av1/common/alloccommon.h"
 #include "av1/common/frame_buffers.h"
 #include "av1/common/enums.h"
+#include "av1/common/obu_util.h"
 
 #include "av1/decoder/decoder.h"
 #include "av1/decoder/decodeframe.h"
@@ -617,6 +618,7 @@ static aom_image_t *add_grain_if_needed(aom_image_t *img,
         img->fmt != grain_img_buf->fmt) {
       aom_img_free(grain_img_buf);
       grain_img_buf = NULL;
+      *grain_img_ptr = NULL;
     }
   }
   if (!grain_img_buf) {
@@ -624,7 +626,13 @@ static aom_image_t *add_grain_if_needed(aom_image_t *img,
     *grain_img_ptr = grain_img_buf;
   }
 
-  av1_add_film_grain(grain_params, img, grain_img_buf);
+  if (grain_img_buf) {
+    if (av1_add_film_grain(grain_params, img, grain_img_buf)) {
+      aom_img_free(grain_img_buf);
+      grain_img_buf = NULL;
+      *grain_img_ptr = NULL;
+    }
+  }
 
   return grain_img_buf;
 }
@@ -722,6 +730,10 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
           img->spatial_id = cm->spatial_layer_id;
           aom_image_t *res = add_grain_if_needed(
               img, &ctx->image_with_grain[*index], grain_params);
+          if (!res) {
+            aom_internal_error(&pbi->common.error, AOM_CODEC_CORRUPT_FRAME,
+                               "Grain systhesis failed\n");
+          }
           *index += 1;  // Advance the iterator to point to the next image
           return res;
         }

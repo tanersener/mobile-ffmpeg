@@ -206,6 +206,9 @@ static INLINE int get_txw_idx(TX_SIZE tx_size) {
 static INLINE int get_txh_idx(TX_SIZE tx_size) {
   return tx_size_high_log2[tx_size] - tx_size_high_log2[0];
 }
+
+void av1_range_check_buf(int32_t stage, const int32_t *input,
+                         const int32_t *buf, int32_t size, int8_t bit);
 #define MAX_TXWH_IDX 5
 #ifdef __cplusplus
 }

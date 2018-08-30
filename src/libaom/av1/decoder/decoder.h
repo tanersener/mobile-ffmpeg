@@ -199,6 +199,7 @@ typedef struct AV1Decoder {
   int tg_start;  // First tile in the current tilegroup
   int tg_size_bit_offset;
   int sequence_header_ready;
+  int sequence_header_changed;
 #if CONFIG_INSPECTION
   aom_inspect_cb inspect_cb;
   void *inspect_ctx;

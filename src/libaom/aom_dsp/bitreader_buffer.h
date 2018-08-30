@@ -41,6 +41,8 @@ uint32_t aom_rb_read_unsigned_literal(struct aom_read_bit_buffer *rb, int bits);
 
 int aom_rb_read_inv_signed_literal(struct aom_read_bit_buffer *rb, int bits);
 
+uint32_t aom_rb_read_uvlc(struct aom_read_bit_buffer *rb);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

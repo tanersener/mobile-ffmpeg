@@ -97,6 +97,15 @@ void av1_encode_tiles_mt(AV1_COMP *cpi) {
             cm, thread_data->td->wsrc_buf,
             (int32_t *)aom_memalign(
                 16, MAX_SB_SQUARE * sizeof(*thread_data->td->wsrc_buf)));
+
+        for (int x = 0; x < 2; x++)
+          for (int y = 0; y < 2; y++)
+            CHECK_MEM_ERROR(
+                cm, thread_data->td->hash_value_buffer[x][y],
+                (uint32_t *)aom_malloc(
+                    AOM_BUFFER_SIZE_FOR_BLOCK_HASH *
+                    sizeof(*thread_data->td->hash_value_buffer[0][0])));
+
         CHECK_MEM_ERROR(
             cm, thread_data->td->mask_buf,
             (int32_t *)aom_memalign(
@@ -140,6 +149,15 @@ void av1_encode_tiles_mt(AV1_COMP *cpi) {
       thread_data->td->mb.above_pred_buf = thread_data->td->above_pred_buf;
       thread_data->td->mb.left_pred_buf = thread_data->td->left_pred_buf;
       thread_data->td->mb.wsrc_buf = thread_data->td->wsrc_buf;
+      for (int x = 0; x < 2; x++)
+        for (int y = 0; y < 2; y++) {
+          memcpy(thread_data->td->hash_value_buffer[x][y],
+                 cpi->td.mb.hash_value_buffer[x][y],
+                 AOM_BUFFER_SIZE_FOR_BLOCK_HASH *
+                     sizeof(*thread_data->td->hash_value_buffer[0][0]));
+          thread_data->td->mb.hash_value_buffer[x][y] =
+              thread_data->td->hash_value_buffer[x][y];
+        }
       thread_data->td->mb.mask_buf = thread_data->td->mask_buf;
     }
     if (thread_data->td->counts != &cpi->counts) {

@@ -42,6 +42,8 @@ void aom_wb_overwrite_literal(struct aom_write_bit_buffer *wb, int data,
 void aom_wb_write_inv_signed_literal(struct aom_write_bit_buffer *wb, int data,
                                      int bits);
 
+void aom_wb_write_uvlc(struct aom_write_bit_buffer *wb, uint32_t v);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

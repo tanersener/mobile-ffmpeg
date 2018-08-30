@@ -56,7 +56,8 @@ void av1_copy_frame_mvs(const AV1_COMMON *const cm,
       for (int idx = 0; idx < 2; ++idx) {
         MV_REFERENCE_FRAME ref_frame = mi->ref_frame[idx];
         if (ref_frame > INTRA_FRAME) {
-          if (cm->ref_frame_sign_bias[ref_frame] == 1) continue;
+          int8_t ref_idx = cm->ref_frame_side[ref_frame];
+          if (ref_idx) continue;
           if ((abs(mi->mv[idx].as_mv.row) > REFMVS_LIMIT) ||
               (abs(mi->mv[idx].as_mv.col) > REFMVS_LIMIT))
             continue;
@@ -149,7 +150,6 @@ static void scan_row_mbmi(const AV1_COMMON *cm, const MACROBLOCKD *xd,
   const int n8_w_16 = mi_size_wide[BLOCK_16X16];
   int i;
   int col_offset = 0;
-  const int shift = 0;
   // TODO(jingning): Revisit this part after cb4x4 is stable.
   if (abs(row_offset) > 1) {
     col_offset = 1;
@@ -174,7 +174,7 @@ static void scan_row_mbmi(const AV1_COMMON *cm, const MACROBLOCKD *xd,
       int inc = AOMMIN(-max_row_offset + row_offset + 1,
                        mi_size_high[candidate_bsize]);
       // Obtain range used in weight calculation.
-      weight = AOMMAX(weight, (inc << shift));
+      weight = AOMMAX(weight, inc);
       // Update processed rows.
       *processed_rows = inc - row_offset - 1;
     }
@@ -200,7 +200,6 @@ static void scan_col_mbmi(const AV1_COMMON *cm, const MACROBLOCKD *xd,
   const int n8_h_16 = mi_size_high[BLOCK_16X16];
   int i;
   int row_offset = 0;
-  const int shift = 0;
   if (abs(col_offset) > 1) {
     row_offset = 1;
     if ((mi_row & 0x01) && xd->n4_h < n8_h_8) --row_offset;
@@ -224,7 +223,7 @@ static void scan_col_mbmi(const AV1_COMMON *cm, const MACROBLOCKD *xd,
       int inc = AOMMIN(-max_col_offset + col_offset + 1,
                        mi_size_wide[candidate_bsize]);
       // Obtain range used in weight calculation.
-      weight = AOMMAX(weight, (inc << shift));
+      weight = AOMMAX(weight, inc);
       // Update processed cols.
       *processed_cols = inc - col_offset - 1;
     }
@@ -250,7 +249,7 @@ static void scan_blk_mbmi(const AV1_COMMON *cm, const MACROBLOCKD *xd,
   mi_pos.row = row_offset;
   mi_pos.col = col_offset;
 
-  if (is_inside(tile, mi_col, mi_row, cm->mi_rows, &mi_pos)) {
+  if (is_inside(tile, mi_col, mi_row, &mi_pos)) {
     const MB_MODE_INFO *const candidate =
         xd->mi[mi_pos.row * xd->mi_stride + mi_pos.col];
     const int len = mi_size_wide[BLOCK_8X8];
@@ -337,7 +336,7 @@ static int add_tpl_ref_mv(const AV1_COMMON *cm, const MACROBLOCKD *xd,
   mi_pos.row = (mi_row & 0x01) ? blk_row : blk_row + 1;
   mi_pos.col = (mi_col & 0x01) ? blk_col : blk_col + 1;
 
-  if (!is_inside(&xd->tile, mi_col, mi_row, cm->mi_rows, &mi_pos)) return 0;
+  if (!is_inside(&xd->tile, mi_col, mi_row, &mi_pos)) return 0;
 
   const TPL_MV_REF *prev_frame_mvs =
       cm->tpl_mvs + ((mi_row + mi_pos.row) >> 1) * (cm->mi_stride >> 1) +
@@ -515,8 +514,7 @@ static void setup_ref_mv_list(
     if (xd->n4_h < mi_size_high[BLOCK_8X8])
       max_row_offset = -(2 << 1) + row_adj;
 
-    max_row_offset =
-        find_valid_row_offset(tile, mi_row, cm->mi_rows, max_row_offset);
+    max_row_offset = find_valid_row_offset(tile, mi_row, max_row_offset);
   }
 
   if (xd->left_available) {
@@ -548,8 +546,8 @@ static void setup_ref_mv_list(
                   ref_mv_stack[ref_frame], &row_match_count, &newmv_count,
                   gm_mv_candidates, &refmv_count[ref_frame]);
 
-  uint8_t nearest_match = (row_match_count > 0) + (col_match_count > 0);
-  uint8_t nearest_refmv_count = refmv_count[ref_frame];
+  const uint8_t nearest_match = (row_match_count > 0) + (col_match_count > 0);
+  const uint8_t nearest_refmv_count = refmv_count[ref_frame];
 
   // TODO(yunqing): for comp_search, do it for all 3 cases.
   for (int idx = 0; idx < nearest_refmv_count; ++idx)
@@ -572,12 +570,12 @@ static void setup_ref_mv_list(
                                 (xd->n4_w >= mi_size_wide[BLOCK_8X8]) &&
                                 (xd->n4_w < mi_size_wide[BLOCK_64X64]);
 
-    int step_h = (xd->n4_h >= mi_size_high[BLOCK_64X64])
-                     ? mi_size_high[BLOCK_16X16]
-                     : mi_size_high[BLOCK_8X8];
-    int step_w = (xd->n4_w >= mi_size_wide[BLOCK_64X64])
-                     ? mi_size_wide[BLOCK_16X16]
-                     : mi_size_wide[BLOCK_8X8];
+    const int step_h = (xd->n4_h >= mi_size_high[BLOCK_64X64])
+                           ? mi_size_high[BLOCK_16X16]
+                           : mi_size_high[BLOCK_8X8];
+    const int step_w = (xd->n4_w >= mi_size_wide[BLOCK_64X64])
+                           ? mi_size_wide[BLOCK_16X16]
+                           : mi_size_wide[BLOCK_8X8];
 
     for (int blk_row = 0; blk_row < blk_row_end; blk_row += step_h) {
       for (int blk_col = 0; blk_col < blk_col_end; blk_col += step_w) {
@@ -626,7 +624,7 @@ static void setup_ref_mv_list(
                     max_col_offset, &processed_cols);
   }
 
-  uint8_t ref_match_count = (row_match_count > 0) + (col_match_count > 0);
+  const uint8_t ref_match_count = (row_match_count > 0) + (col_match_count > 0);
 
   switch (nearest_match) {
     case 0:
@@ -1004,6 +1002,7 @@ static int motion_field_projection(AV1_COMMON *cm,
 }
 
 void av1_setup_motion_field(AV1_COMMON *cm) {
+  memset(cm->ref_frame_side, 0, sizeof(cm->ref_frame_side));
   if (!cm->seq_params.enable_order_hint) return;
 
   TPL_MV_REF *tpl_mvs_base = cm->tpl_mvs;
@@ -1028,6 +1027,11 @@ void av1_setup_motion_field(AV1_COMMON *cm) {
 
     ref_buf_idx[ref_idx] = buf_idx;
     ref_order_hint[ref_idx] = order_hint;
+
+    if (get_relative_dist(cm, order_hint, cur_order_hint) > 0)
+      cm->ref_frame_side[ref_frame] = 1;
+    else if (order_hint == cur_order_hint)
+      cm->ref_frame_side[ref_frame] = -1;
   }
 
   int ref_stamp = MFMV_STACK_SIZE - 1;
@@ -1240,7 +1244,7 @@ int findSamples(const AV1_COMMON *cm, MACROBLOCKD *xd, int mi_row, int mi_col,
       has_top_right(cm, xd, mi_row, mi_col, AOMMAX(xd->n4_w, xd->n4_h))) {
     POSITION trb_pos = { -1, xd->n4_w };
 
-    if (is_inside(tile, mi_col, mi_row, cm->mi_rows, &trb_pos)) {
+    if (is_inside(tile, mi_col, mi_row, &trb_pos)) {
       int mi_row_offset = -1;
       int mi_col_offset = xd->n4_w;
 
@@ -1345,7 +1349,7 @@ static int compare_ref_frame_info(const void *arg_a, const void *arg_b) {
 
 static void set_ref_frame_info(AV1_COMMON *const cm, int frame_idx,
                                REF_FRAME_INFO *ref_info) {
-  assert(frame_idx >= 0 && frame_idx <= INTER_REFS_PER_FRAME);
+  assert(frame_idx >= 0 && frame_idx < INTER_REFS_PER_FRAME);
 
   const int buf_idx = ref_info->buf_idx;
 

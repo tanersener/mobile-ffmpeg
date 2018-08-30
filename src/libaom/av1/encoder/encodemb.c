@@ -442,7 +442,7 @@ static void encode_block_pass1(int plane, int block, int blk_row, int blk_col,
     txfm_param.tx_set_type = av1_get_ext_tx_set_type(
         txfm_param.tx_size, is_inter_block(xd->mi[0]), cm->reduced_tx_set_used);
     if (txfm_param.is_hbd) {
-      av1_highbd_inv_txfm_add_4x4(dqcoeff, dst, pd->dst.stride, &txfm_param);
+      av1_highbd_inv_txfm_add(dqcoeff, dst, pd->dst.stride, &txfm_param);
       return;
     }
     av1_inv_txfm_add(dqcoeff, dst, pd->dst.stride, &txfm_param);

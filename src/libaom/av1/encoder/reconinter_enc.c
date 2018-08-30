@@ -138,7 +138,7 @@ static INLINE void build_inter_predictors(const AV1_COMMON *cm, MACROBLOCKD *xd,
         int tmp_dst_stride = 8;
         assert(bw < 8 || bh < 8);
         ConvolveParams conv_params = get_conv_params_no_round(
-            0, 0, plane, tmp_dst, tmp_dst_stride, is_compound, xd->bd);
+            0, plane, tmp_dst, tmp_dst_stride, is_compound, xd->bd);
         conv_params.use_jnt_comp_avg = 0;
         struct buf_2d *const dst_buf = &pd->dst;
         uint8_t *dst = dst_buf->buf + dst_buf->stride * y + x;
@@ -171,8 +171,6 @@ static INLINE void build_inter_predictors(const AV1_COMMON *cm, MACROBLOCKD *xd,
 
         calc_subpel_params(xd, sf, mv, plane, pre_x, pre_y, x, y, pre_buf, &pre,
                            &subpel_params, bw, bh);
-
-        conv_params.ref = ref;
         conv_params.do_average = ref;
         if (is_masked_compound_type(mi->interinter_comp.type)) {
           // masked compound type has its own average mechanism
@@ -197,7 +195,7 @@ static INLINE void build_inter_predictors(const AV1_COMMON *cm, MACROBLOCKD *xd,
   {
     DECLARE_ALIGNED(32, uint16_t, tmp_dst[MAX_SB_SIZE * MAX_SB_SIZE]);
     ConvolveParams conv_params = get_conv_params_no_round(
-        0, 0, plane, tmp_dst, MAX_SB_SIZE, is_compound, xd->bd);
+        0, plane, tmp_dst, MAX_SB_SIZE, is_compound, xd->bd);
     av1_jnt_comp_weight_assign(cm, mi, 0, &conv_params.fwd_offset,
                                &conv_params.bck_offset,
                                &conv_params.use_jnt_comp_avg, is_compound);
@@ -218,7 +216,6 @@ static INLINE void build_inter_predictors(const AV1_COMMON *cm, MACROBLOCKD *xd,
       WarpTypesAllowed warp_types;
       warp_types.global_warp_allowed = is_global[ref];
       warp_types.local_warp_allowed = mi->motion_mode == WARPED_CAUSAL;
-      conv_params.ref = ref;
 
       if (ref && is_masked_compound_type(mi->interinter_comp.type)) {
         // masked compound type has its own average mechanism
@@ -303,35 +300,9 @@ void av1_build_inter_predictors_sb(const AV1_COMMON *cm, MACROBLOCKD *xd,
     av1_build_inter_predictors_sbuv(cm, xd, mi_row, mi_col, ctx, bsize);
 }
 
-// TODO(sarahparker) av1_highbd_build_inter_predictor and
+// TODO(sarahparker):
 // av1_build_inter_predictor should be combined with
 // av1_make_inter_predictor
-void av1_highbd_build_inter_predictor(
-    const uint8_t *src, int src_stride, uint8_t *dst, int dst_stride,
-    const MV *src_mv, const struct scale_factors *sf, int w, int h, int ref,
-    InterpFilters interp_filters, const WarpTypesAllowed *warp_types, int p_col,
-    int p_row, int plane, enum mv_precision precision, int x, int y,
-    const MACROBLOCKD *xd, int can_use_previous) {
-  const int is_q4 = precision == MV_PRECISION_Q4;
-  const MV mv_q4 = { is_q4 ? src_mv->row : src_mv->row * 2,
-                     is_q4 ? src_mv->col : src_mv->col * 2 };
-  MV32 mv = av1_scale_mv(&mv_q4, x, y, sf);
-  mv.col += SCALE_EXTRA_OFF;
-  mv.row += SCALE_EXTRA_OFF;
-  const SubpelParams subpel_params = { sf->x_step_q4, sf->y_step_q4,
-                                       mv.col & SCALE_SUBPEL_MASK,
-                                       mv.row & SCALE_SUBPEL_MASK };
-  ConvolveParams conv_params = get_conv_params(ref, 0, plane, xd->bd);
-
-  src += (mv.row >> SCALE_SUBPEL_BITS) * src_stride +
-         (mv.col >> SCALE_SUBPEL_BITS);
-
-  av1_make_inter_predictor(src, src_stride, dst, dst_stride, &subpel_params, sf,
-                           w, h, &conv_params, interp_filters, warp_types,
-                           p_col, p_row, plane, ref, xd->mi[0], 0, xd,
-                           can_use_previous);
-}
-
 void av1_build_inter_predictor(const uint8_t *src, int src_stride, uint8_t *dst,
                                int dst_stride, const MV *src_mv,
                                const struct scale_factors *sf, int w, int h,
@@ -526,7 +497,7 @@ static void build_inter_predictors_single_buf(MACROBLOCKD *xd, int plane,
   uint8_t *const dst = get_buf_by_bd(xd, ext_dst) + ext_dst_stride * y + x;
   const MV mv = mi->mv[ref].as_mv;
 
-  ConvolveParams conv_params = get_conv_params(ref, 0, plane, xd->bd);
+  ConvolveParams conv_params = get_conv_params(0, plane, xd->bd);
   WarpTypesAllowed warp_types;
   const WarpedMotionParams *const wm = &xd->global_motion[mi->ref_frame[ref]];
   warp_types.global_warp_allowed = is_global_mv_block(mi, wm->wmtype);

@@ -524,6 +524,8 @@ typedef struct AV1Common {
   LV_MAP_CTX_TABLE coeff_ctx_table;
   TPL_MV_REF *tpl_mvs;
   int tpl_mvs_mem_size;
+  // TODO(jingning): This can be combined with sign_bias later.
+  int8_t ref_frame_side[REF_FRAMES];
 
   int is_annexb;
 

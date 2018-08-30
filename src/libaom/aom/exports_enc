@@ -16,5 +16,3 @@ text aom_noise_model_init
 text aom_noise_model_get_grain_parameters
 text aom_noise_model_save_latest
 text aom_noise_model_update
-text aom_wb_write_literal
-text aom_wb_write_unsigned_literal

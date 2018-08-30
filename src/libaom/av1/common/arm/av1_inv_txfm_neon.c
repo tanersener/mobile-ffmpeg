@@ -23,19 +23,6 @@
 #include "av1/common/arm/av1_inv_txfm_neon.h"
 #include "av1/common/arm/transpose_neon.h"
 
-static INLINE TxSetType find_TxSetType(TX_SIZE tx_size) {
-  const TX_SIZE tx_size_sqr_up = txsize_sqr_up_map[tx_size];
-  TxSetType tx_set_type;
-  if (tx_size_sqr_up > TX_32X32) {
-    tx_set_type = EXT_TX_SET_DCTONLY;
-  } else if (tx_size_sqr_up == TX_32X32) {
-    tx_set_type = EXT_TX_SET_DCT_IDTX;
-  } else {
-    tx_set_type = EXT_TX_SET_ALL16;
-  }
-  return tx_set_type;
-}
-
 // 1D itx types
 typedef enum ATTRIBUTE_PACKED {
   IDCT_1D,
@@ -116,14 +103,6 @@ static INLINE void lowbd_inv_txfm2d_memset_neon(int16x8_t *a, int size,
   for (int i = 0; i < size; i++) {
     a[i] = vdupq_n_s16((int16_t)value);
   }
-}
-static INLINE void dct_const_round_shift_low_8_dual(const int32x4_t *t32,
-                                                    int16x8_t *d0,
-                                                    int16x8_t *d1) {
-  *d0 = vcombine_s16(vrshrn_n_s32(t32[0], INV_COS_BIT),
-                     vrshrn_n_s32(t32[1], INV_COS_BIT));
-  *d1 = vcombine_s16(vrshrn_n_s32(t32[2], INV_COS_BIT),
-                     vrshrn_n_s32(t32[3], INV_COS_BIT));
 }
 
 static INLINE void btf_16_lane_0_1_neon(const int16x8_t in0,
