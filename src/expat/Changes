@@ -2,6 +2,53 @@ NOTE: We are looking for help with a few things:
       https://github.com/libexpat/libexpat/labels/help%20wanted
       If you can help, please get in touch.  Thanks!
 
+Release 2.2.6 Sun August 12 2018
+        Bug fixes:
+       #170 #206  Avoid doing arithmetic with NULL pointers in XML_GetBuffer
+       #204 #205  Fix 2.2.5 regression with suspend-resume while parsing
+                    a document like '<root/>'
+
+        Other changes:
+       #165 #168  Autotools: Fix docbook-related configure syntax error
+            #166  Autotools: Avoid grep option `-q` for Solaris
+            #167  Autotools: Support
+                    ./configure DOCBOOK_TO_MAN="xmlto man --skip-validation"
+       #159 #167  Autotools: Support DOCBOOK_TO_MAN command which produces
+                    xmlwf.1 rather than XMLWF.1; also covers case insensitive
+                    file systems
+            #181  Autotools: Drop -rpath option passed to libtool
+            #188  Autotools: Detect and deny SGML docbook2man as ours is XML
+            #188  Autotools/CMake: Support command db2x_docbook2man as well
+            #174  CMake: Introduce option WARNINGS_AS_ERRORS, defaults to OFF
+       #184 #185  CMake: Introduce option MSVC_USE_STATIC_CRT, defaults to OFF
+       #207 #208  CMake: Introduce option XML_UNICODE and XML_UNICODE_WCHAR_T,
+                    both defaulting to OFF
+            #175  CMake: Prefer check_symbol_exists over check_function_exists
+            #176  CMake: Create the same pkg-config file as with GNU Autotools
+       #178 #179  CMake: Use GNUInstallDirs module to set proper defaults for
+                    install directories
+            #208  CMake: Utilize expat_config.h.cmake for XML_DEV_URANDOM
+            #180  Windows: Fix compilation of test suite for Visual Studio 2008
+  #131 #173 #202  Address compiler warnings
+  #187 #190 #200  Fix miscellaneous typos
+                  Version info bumped from 7:7:6 to 7:8:6
+
+        Special thanks to:
+            Anton Maklakov
+            Benjamin Peterson
+            Brad King
+            Franek Korta
+            Frank Rast
+            Joe Orton
+            luzpaz
+            Pedro Vicente
+            Rainer Jung
+            Rhodri James
+            Rolf Ade
+            Rolf Eike Beer
+            Thomas Beutlich
+            Tomasz Kłoczko
+
 Release 2.2.5 Tue October 31 2017
         Bug fixes:
               #8  If the parser runs out of memory, make sure its internal
@@ -22,6 +69,7 @@ Release 2.2.5 Tue October 31 2017
                     output was incomplete
             #127  Windows: Fix test suite compilation
        #126 #127  Windows: Fix compilation for Visual Studio 2012
+                  Windows: Upgrade shipped project files to Visual Studio 2017
         #33 #132  tests: Mass-fix compilation for XML_UNICODE_WCHAR_T
             #129  examples: Fix compilation for XML_UNICODE_WCHAR_T
             #130  benchmark: Fix compilation for XML_UNICODE_WCHAR_T

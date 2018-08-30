@@ -60,7 +60,7 @@
 static XML_Char *
 xmlstrdup(const XML_Char *s)
 {
-    int byte_count = (xcstrlen(s) + 1) * sizeof(XML_Char);
+    size_t byte_count = (xcstrlen(s) + 1) * sizeof(XML_Char);
     XML_Char *dup = malloc(byte_count);
 
     assert(dup != NULL);

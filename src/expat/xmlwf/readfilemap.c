@@ -43,13 +43,16 @@
 
 /* Function "read": */
 #if defined(_MSC_VER)
+# include <io.h>
   /* https://msdn.microsoft.com/en-us/library/wyssk1bs(v=vs.100).aspx */
 # define _EXPAT_read          _read
 # define _EXPAT_read_count_t  int
+# define _EXPAT_read_req_t    unsigned int
 #else  /* POSIX */
   /* http://pubs.opengroup.org/onlinepubs/009695399/functions/read.html */
 # define _EXPAT_read          read
 # define _EXPAT_read_count_t  ssize_t
+# define _EXPAT_read_req_t    size_t
 #endif
 
 #ifndef S_ISREG
@@ -118,7 +121,7 @@ filemap(const tchar *name,
     close(fd);
     return 0;
   }
-  n = _EXPAT_read(fd, p, nbytes);
+  n = _EXPAT_read(fd, p, (_EXPAT_read_req_t)nbytes);
   if (n < 0) {
     tperror(name);
     free(p);

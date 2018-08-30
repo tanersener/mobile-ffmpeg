@@ -47,7 +47,7 @@ dnl If the API changes incompatibly set LIBAGE back to 0
 dnl
 
 LIBCURRENT=7   # sync
-LIBREVISION=7  # with
+LIBREVISION=8  # with
 LIBAGE=6       # CMakeLists.txt!
 
 CPPFLAGS="${CPPFLAGS} -DHAVE_EXPAT_CONFIG_H"
@@ -106,8 +106,8 @@ AC_ARG_WITH([xmlwf], [
 AS_HELP_STRING([--without-xmlwf], [do not build xmlwf])], [], [with_xmlwf=yes])
 AM_CONDITIONAL([WITH_XMLWF], [test x${with_xmlwf} = xyes])
 
-AM_CONDITIONAL([MINGW], [echo -- "${host}" | fgrep -q mingw])
-AM_CONDITIONAL([UNICODE], [echo -- "${CPPFLAGS}${CFLAGS}" | fgrep -q XML_UNICODE])
+AM_CONDITIONAL([MINGW], [echo -- "${host}" | ${FGREP} mingw >/dev/null])
+AM_CONDITIONAL([UNICODE], [echo -- "${CPPFLAGS}${CFLAGS}" | ${FGREP} XML_UNICODE >/dev/null])
 
 
 AC_ARG_WITH([libbsd], [
@@ -237,11 +237,19 @@ AS_HELP_STRING([--without-docbook],
 
 AC_ARG_VAR([DOCBOOK_TO_MAN], [docbook2x-man command])
 AS_IF([test "x$with_docbook" != xno],
-  [AC_CHECK_PROGS([DOCBOOK_TO_MAN], [docbook2x-man docbook2man docbook-to-man],
-  [if test "x$with_docbook" != xcheck; then 
-    AC_MSG_ERROR([Required program 'docbook2x-man' not found.])])])
+  [AC_CHECK_PROGS([DOCBOOK_TO_MAN], [docbook2x-man db2x_docbook2man docbook2man docbook-to-man])])
+AS_IF([test "x${DOCBOOK_TO_MAN}" = x -a "x$with_docbook" = xyes],
+  [AC_MSG_ERROR([Required program 'docbook2x-man' not found.])])
+AS_IF([test "x${DOCBOOK_TO_MAN}" != x -a "x$with_docbook" != xno],
+  [AS_IF([${DOCBOOK_TO_MAN} --help | grep -i -q -F sgmlbase],
+    [AC_MSG_ERROR([Your local ${DOCBOOK_TO_MAN} was found to work with SGML rather
+  than XML. Please install docbook2X and use variable DOCBOOK_TO_MAN to point
+  configure to command docbook2x-man of docbook2X.
+  Or use DOCBOOK_TO_MAN="xmlto man --skip-validation" if you have xmlto around.
+  You can also configure using --without-docbook if you can do without a man
+  page for xmlwf.])])])
 
-AM_CONDITIONAL(WITH_DOCBOOK, [test x${DOCBOOK_TO_MAN} != x])
+AM_CONDITIONAL(WITH_DOCBOOK, [test "x${DOCBOOK_TO_MAN}" != x])
 
 AC_CONFIG_FILES([Makefile expat.pc])
 AC_CONFIG_FILES([
