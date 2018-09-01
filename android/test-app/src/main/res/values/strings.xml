@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MobileFFmpegTest</string>
+    <string name="app_name">MobileFFmpeg Test</string>
     <string name="command_tab">COMMAND</string>
     <string name="video_tab">VIDEO</string>
     <string name="https_tab">HTTPS</string>
