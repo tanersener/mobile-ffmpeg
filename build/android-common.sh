@@ -742,7 +742,7 @@ download() {
         mkdir -p "${MOBILE_FFMPEG_TMPDIR}"
     fi
 
-    (curl --fail --location $1 -o ${MOBILE_FFMPEG_TMPDIR}/$2) 1>>${BASEDIR}/build.log 2>&1
+    (curl --fail --location $1 -o ${MOBILE_FFMPEG_TMPDIR}/$2 1>>${BASEDIR}/build.log 2>&1)
 
     local RC=$?
 

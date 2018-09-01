@@ -155,7 +155,7 @@ void callbackNotify() {
 /**
  * Adds log data to the end of callback data list.
  */
-void logCallbackDataAdd(int level, NSString*logData) {
+void logCallbackDataAdd(int level, NSString *logData) {
     CallbackData *callbackData = [[CallbackData alloc] initWithLogLevel:level data:logData];
 
     [lock lock];

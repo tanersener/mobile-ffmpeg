@@ -668,7 +668,7 @@ download() {
         mkdir -p "${MOBILE_FFMPEG_TMPDIR}"
     fi
 
-    (curl --fail --location $1 -o ${MOBILE_FFMPEG_TMPDIR}/$2) 1>>${BASEDIR}/build.log 2>&1
+    (curl --fail --location $1 -o ${MOBILE_FFMPEG_TMPDIR}/$2 1>>${BASEDIR}/build.log 2>&1)
 
     local RC=$?
 
@@ -795,7 +795,10 @@ download_gpl_library_source() {
 
 set_toolchain_clang_paths() {
     if [ ! -f "${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl" ]; then
-        download "https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl" "gas-preprocessor.pl" "exit"
+        DOWNLOAD_RESULT=$(download "https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl" "gas-preprocessor.pl" "exit")
+        if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
+            exit 1
+        fi
         (chmod +x ${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl 1>>${BASEDIR}/build.log 2>&1) || exit 1
     fi
 
