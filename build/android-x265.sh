@@ -46,13 +46,13 @@ ASM_OPTIONS=""
 X265_SYSTEM_PROCESSOR="${ARCH}"
 case ${ARCH} in
     arm-v7a | arm-v7a-neon)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
     ;;
     arm64-v8a)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
     ;;
     x86)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
     ;;
     x86-64)
         ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
@@ -73,23 +73,6 @@ ${SED_INLINE} 's/win/elf/g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInform
 
 # fix pointer array assignments
 ${SED_INLINE} 's/parseCpuName(value, bError)/parseCpuName(value, bError, 0)/g' ${BASEDIR}/src/x265/source/common/param.cpp
-${SED_INLINE} '/addAvg/s/ p.pu/ *p.pu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED_INLINE} '/convert_p2s/s/ p.pu/ *p.pu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED_INLINE} '/pixelavg_pp/s/ p.pu/ *p.pu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED_INLINE} '/addAvg/s/ p.chroma/ *p.chroma/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED_INLINE} '/add_ps/s/ p.chroma/ *p.chroma/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED_INLINE} '/add_ps/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED_INLINE} '/blockfill_s/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED_INLINE} '/ssd_s/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED_INLINE} '/calcresidual/s/ p.cu/ *p.cu/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-${SED_INLINE} '/scale1D_128to64_neon/s/ p.scale/ *p.scale/g' ${BASEDIR}/src/x265/source/common/arm/asm-primitives.cpp
-
-# fixing constant shift
-${SED_INLINE} 's/lsr 16/lsr #16/g' ${BASEDIR}/src/x265/source/common/arm/blockcopy8.S
-
-# using customized build file
-rm -f ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
-cp ${BASEDIR}/tools/cmake/CMakeLists.x265.android.txt ${BASEDIR}/src/${LIB_NAME}/source/CMakeLists.txt || exit 1
 
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
