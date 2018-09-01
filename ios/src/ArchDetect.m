@@ -50,6 +50,9 @@
     } else if (type == CPU_TYPE_X86) {
         [cpu appendString:@"x86"];
 
+    } else if (type == CPU_TYPE_ARM64) {
+        [cpu appendString:@"ARM64"];
+
     } else if (type == CPU_TYPE_ARM) {
         [cpu appendString:@"ARM"];
 
@@ -59,14 +62,25 @@
             break;
             case CPU_SUBTYPE_ARM_V7:
                 [cpu appendString:@"V7"];
-                break;
+            break;
+            case CPU_SUBTYPE_ARM_V7F:
+                [cpu appendString:@"V7F"];
+            break;
+            case CPU_SUBTYPE_ARM_V7K:
+                [cpu appendString:@"V7K"];
+            break;
+            case CPU_SUBTYPE_ARM_V7S:
+                [cpu appendString:@"V7S"];
+            break;
             case CPU_SUBTYPE_ARM_V8:
                 [cpu appendString:@"V8"];
-                break;
+            break;
             default:
-                [cpu appendString:@"unknown"];
-                break;
+                [cpu appendString:@"ALL"];
+            break;
         }
+    } else {
+        [cpu appendString:[NSString stringWithFormat:@"%d", type]];
     }
 
     return cpu;
