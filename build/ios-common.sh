@@ -204,7 +204,7 @@ get_app_specific_cflags() {
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
         mobile-ffmpeg)
-            APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC"
+            APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc"
         ;;
         x265)
             APP_FLAGS="-Wno-unused-function"
@@ -299,7 +299,14 @@ get_ldflags() {
 
     case $1 in
         mobile-ffmpeg)
-            echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode"
+            case ${ARCH} in
+                armv7 | armv7s | arm64)
+                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode"
+                ;;
+                *)
+                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS}"
+                ;;
+            esac
         ;;
         *)
             echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS}"

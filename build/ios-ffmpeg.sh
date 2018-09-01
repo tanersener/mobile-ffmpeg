@@ -45,32 +45,38 @@ export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 TARGET_CPU=""
 TARGET_ARCH=""
+BITCODE_FLAGS=""
 NEON_FLAG=""
 case ${ARCH} in
     armv7)
         TARGET_CPU="armv7"
         TARGET_ARCH="armv7"
         NEON_FLAG="	--enable-neon"
+        BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
     ;;
     armv7s)
         TARGET_CPU="armv7s"
         TARGET_ARCH="armv7s"
         NEON_FLAG="	--enable-neon"
+        BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
     ;;
     arm64)
         TARGET_CPU="armv8"
         TARGET_ARCH="aarch64"
         NEON_FLAG="	--enable-neon"
+        BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
     ;;
     i386)
         TARGET_CPU="i386"
         TARGET_ARCH="i386"
         NEON_FLAG="	--disable-neon"
+        BITCODE_FLAGS=""
     ;;
     x86-64)
         TARGET_CPU="x86_64"
         TARGET_ARCH="x86_64"
         NEON_FLAG="	--disable-neon"
+        BITCODE_FLAGS=""
     ;;
 esac
 
@@ -305,7 +311,7 @@ COMMON_LDFLAGS=$(get_common_ldflags);
 # REORDERED FLAGS
 CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS} ${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-LDFLAGS="${ARCH_LDFLAGS} ${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} -fembed-bitcode -Wc,-fembed-bitcode"
+LDFLAGS="${ARCH_LDFLAGS} ${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 

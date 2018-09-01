@@ -303,12 +303,6 @@ void callbackBlockFunction() {
     [MobileFFmpegConfig enableRedirection];
 }
 
-- (void)dealloc {
-    [super dealloc];
-
-    dispatch_release(semaphore);
-}
-
 /**
  * Enables log and statistics redirection.
  */
