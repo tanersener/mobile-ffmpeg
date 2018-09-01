@@ -82,6 +82,8 @@
     
     [self clearOutput];
     
+    [[self commandText] endEditing:TRUE];
+    
     NSString *ffmpegCommand = [[self commandText] text];
 
     NSLog(@"Testing COMMAND synchronously.\n");
@@ -102,6 +104,8 @@
     [self hideTooltip];
     
     [self clearOutput];
+    
+    [[self commandText] endEditing:TRUE];
 
     NSString *ffmpegCommand = [[self commandText] text];
     
