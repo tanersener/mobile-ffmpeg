@@ -69,7 +69,6 @@
         }
     }
 
-    [cpu autorelease];
     return cpu;
 }
 

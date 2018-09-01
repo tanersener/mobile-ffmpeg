@@ -191,8 +191,11 @@ get_app_specific_cflags() {
         libwebp | xvidcore)
             APP_FLAGS="-fno-common -DPIC"
         ;;
-        ffmpeg | shine)
+        shine)
             APP_FLAGS="-Wno-unused-function"
+        ;;
+        ffmpeg)
+            APP_FLAGS="-Wno-unused-function -DPIC"
         ;;
         soxr | snappy)
             APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
@@ -201,7 +204,7 @@ get_app_specific_cflags() {
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
         mobile-ffmpeg)
-            APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable"
+            APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC"
         ;;
         x265)
             APP_FLAGS="-Wno-unused-function"
@@ -294,7 +297,14 @@ get_ldflags() {
     LINKED_LIBRARIES=$(get_common_linked_libraries)
     COMMON_FLAGS=$(get_common_ldflags)
 
-    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS}"
+    case $1 in
+        mobile-ffmpeg)
+            echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode"
+        ;;
+        *)
+            echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS}"
+        ;;
+    esac
 }
 
 create_fontconfig_package_config() {
