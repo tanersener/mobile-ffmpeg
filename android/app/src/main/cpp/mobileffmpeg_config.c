@@ -17,10 +17,17 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+ * CHANGES 08.2018
+ * --------------------------------------------------------
+ * - Copied methods with avutil_log_ prefix from libavutil/log.c
+ */
+
 #include <pthread.h>
 
 #include "fftools_ffmpeg.h"
 #include "mobileffmpeg.h"
+#include "libavutil/bprint.h"
 
 /** Callback data structure */
 struct CallbackData {
@@ -73,6 +80,72 @@ JNINativeMethod configMethods[] = {
     {"setNativeLogLevel", "(I)V", (void*) Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel},
     {"getNativeLogLevel", "()I", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel}
 };
+
+/** DEFINES LINE SIZE USED FOR LOGGING */
+#define LOG_LINE_SIZE 1024
+
+static const char *avutil_log_get_level_str(int level) {
+    switch (level) {
+    case AV_LOG_QUIET:
+        return "quiet";
+    case AV_LOG_DEBUG:
+        return "debug";
+    case AV_LOG_VERBOSE:
+        return "verbose";
+    case AV_LOG_INFO:
+        return "info";
+    case AV_LOG_WARNING:
+        return "warning";
+    case AV_LOG_ERROR:
+        return "error";
+    case AV_LOG_FATAL:
+        return "fatal";
+    case AV_LOG_PANIC:
+        return "panic";
+    default:
+        return "";
+    }
+}
+
+static void avutil_log_format_line(void *avcl, int level, const char *fmt, va_list vl, AVBPrint part[4], int *print_prefix) {
+    int flags = av_log_get_flags();
+    AVClass* avc = avcl ? *(AVClass **) avcl : NULL;
+    av_bprint_init(part+0, 0, 1);
+    av_bprint_init(part+1, 0, 1);
+    av_bprint_init(part+2, 0, 1);
+    av_bprint_init(part+3, 0, 65536);
+
+    if (*print_prefix && avc) {
+        if (avc->parent_log_context_offset) {
+            AVClass** parent = *(AVClass ***) (((uint8_t *) avcl) +
+                                   avc->parent_log_context_offset);
+            if (parent && *parent) {
+                av_bprintf(part+0, "[%s @ %p] ",
+                         (*parent)->item_name(parent), parent);
+            }
+        }
+        av_bprintf(part+1, "[%s @ %p] ",
+                 avc->item_name(avcl), avcl);
+    }
+
+    if (*print_prefix && (level > AV_LOG_QUIET) && (flags & AV_LOG_PRINT_LEVEL))
+        av_bprintf(part+2, "[%s] ", avutil_log_get_level_str(level));
+
+    av_vbprintf(part+3, fmt, vl);
+
+    if(*part[0].str || *part[1].str || *part[2].str || *part[3].str) {
+        char lastc = part[3].len && part[3].len <= part[3].size ? part[3].str[part[3].len - 1] : 0;
+        *print_prefix = lastc == '\n' || lastc == '\r';
+    }
+}
+
+static void avutil_log_sanitize(uint8_t *line) {
+    while(*line){
+        if(*line < 0x08 || (*line > 0x0D && *line < 0x20))
+            *line='?';
+        line++;
+    }
+}
 
 void mutexInit() {
     pthread_mutexattr_t attributes;
@@ -261,19 +334,27 @@ struct CallbackData *callbackDataRemove() {
  * \param arguments
  */
 void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs) {
-    char line[2];
+    char line[LOG_LINE_SIZE];
+    AVBPrint part[4];
+    int print_prefix = 1;
 
-    int logSize = vsnprintf(line, 1, format, vargs);
-
-    if (logSize > 0) {
-        int bufferSize = logSize + 1;
-        char* buffer = (char*)malloc(bufferSize);
-
-        vsnprintf(buffer, bufferSize, format, vargs);
-        logCallbackDataAdd(level, buffer);
-
-        free(buffer);
+    if (level >= 0) {
+        level &= 0xff;
     }
+
+    avutil_log_format_line(ptr, level, format, vargs, part, &print_prefix);
+    snprintf(line, sizeof(line), "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);
+
+    avutil_log_sanitize(part[0].str);
+    logCallbackDataAdd(level, part[0].str);
+    avutil_log_sanitize(part[1].str);
+    logCallbackDataAdd(level, part[1].str);
+    avutil_log_sanitize(part[2].str);
+    logCallbackDataAdd(level, part[2].str);
+    avutil_log_sanitize(part[3].str);
+    logCallbackDataAdd(level, part[3].str);
+
+    av_bprint_finalize(part+3, NULL);
 }
 
 /**
