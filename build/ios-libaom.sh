@@ -95,7 +95,7 @@ cmake -Wno-dev \
     -DCONFIG_UNIT_TESTS=0 \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
-make -j$(get_cpu_count) || exit 1
+make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
 cp ${BASEDIR}/src/${LIB_NAME}/cmake-build/aom.pc ${INSTALL_PKG_CONFIG_DIR}

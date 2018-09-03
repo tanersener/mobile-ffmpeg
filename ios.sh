@@ -86,7 +86,8 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "Options:"
 
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
-    echo -e "  -V, --version\t\t\tdisplay version information and exit\n"
+    echo -e "  -V, --version\t\t\tdisplay version information and exit"
+    echo -e "  -d, --debug\t\t\tbuild with debug information\n"
 
     echo -e "Licensing options:"
 
@@ -162,6 +163,10 @@ skip_library() {
     SKIP_VARIABLE=$(echo "SKIP_$1" | sed "s/\-/\_/g")
 
     export ${SKIP_VARIABLE}=1
+}
+
+enable_debug() {
+    export MOBILE_FFMPEG_DEBUG="-d"
 }
 
 reconf_library() {
@@ -481,6 +486,9 @@ do
             SKIP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
             skip_library ${SKIP_LIBRARY}
+	    ;;
+        -d | --debug)
+            enable_debug
 	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`

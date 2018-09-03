@@ -129,7 +129,7 @@ cmake -Wno-dev \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \
     -DENABLE_SHARED=0 ../source || exit 1
 
-make -j$(get_cpu_count) || exit 1
+make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
 cp x265.pc ${INSTALL_PKG_CONFIG_DIR}
