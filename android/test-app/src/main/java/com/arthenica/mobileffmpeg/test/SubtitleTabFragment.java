@@ -23,7 +23,6 @@ import android.app.AlertDialog;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -39,9 +38,9 @@ import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
-import com.arthenica.mobileffmpeg.util.RunCallback;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
+import com.arthenica.mobileffmpeg.util.RunCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -279,11 +278,11 @@ public class SubtitleTabFragment extends Fragment {
     }
 
     public File getVideoFile() {
-        return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "video.mp4");
+        return new File(mainActivity.getFilesDir(), "video.mp4");
     }
 
     public File getVideoWithSubtitlesFile() {
-        return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "video-with-subtitles.mp4");
+        return new File(mainActivity.getFilesDir(), "video-with-subtitles.mp4");
     }
 
     public void setActive() {
