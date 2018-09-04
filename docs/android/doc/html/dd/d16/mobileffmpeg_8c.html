@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MobileFFmpeg Android API
-   &#160;<span id="projectnumber">2.0</span>
+   &#160;<span id="projectnumber">2.1</span>
    </div>
   </td>
  </tr>
@@ -74,7 +74,7 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ad3c24cf0f7dc765ac3df0655170b3b63"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d16/mobileffmpeg_8c.html#ad3c24cf0f7dc765ac3df0655170b3b63">execute</a> (int argc, char **argv)</td></tr>
+<tr class="memitem:ad3c24cf0f7dc765ac3df0655170b3b63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d16/mobileffmpeg_8c.html#ad3c24cf0f7dc765ac3df0655170b3b63">execute</a> (<a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> argc, char **argv)</td></tr>
 <tr class="separator:ad3c24cf0f7dc765ac3df0655170b3b63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2f07df887428c1c8e78f3c485e9c71c"><td class="memItemLeft" align="right" valign="top">jint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d16/mobileffmpeg_8c.html#ad2f07df887428c1c8e78f3c485e9c71c">JNI_OnLoad</a> (JavaVM *vm, void *reserved)</td></tr>
 <tr class="separator:ad2f07df887428c1c8e78f3c485e9c71c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -84,6 +84,8 @@ Functions</h2></td></tr>
 <tr class="separator:a7798cb6b074521ea5db9f1542c404b3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ad36f342bbd80253d8f1e4662496dde"><td class="memItemLeft" align="right" valign="top">JNIEXPORT jint JNICALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d16/mobileffmpeg_8c.html#a5ad36f342bbd80253d8f1e4662496dde">Java_com_arthenica_mobileffmpeg_FFmpeg_execute</a> (JNIEnv *env, jclass object, jobjectArray stringArray)</td></tr>
 <tr class="separator:a5ad36f342bbd80253d8f1e4662496dde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67c768e85034e55ba7e2da1b2f928213"><td class="memItemLeft" align="right" valign="top">JNIEXPORT void JNICALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../dd/d16/mobileffmpeg_8c.html#a67c768e85034e55ba7e2da1b2f928213">Java_com_arthenica_mobileffmpeg_FFmpeg_cancel</a> (JNIEnv *env, jclass object)</td></tr>
+<tr class="separator:a67c768e85034e55ba7e2da1b2f928213"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -100,9 +102,9 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int execute </td>
+          <td class="memname"><a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> execute </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype"><a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td>
           <td class="paramname"><em>argc</em>, </td>
         </tr>
         <tr>
@@ -118,7 +120,47 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Forward declaration for function defined in ffmpeg.c </p>
+<p>Forward declaration for function defined in <a class="el" href="../../d7/d48/fftools__ffmpeg_8c.html">fftools_ffmpeg.c</a> </p>
+
+<p class="definition">Definition at line <a class="el" href="../../d7/d48/fftools__ffmpeg_8c_source.html#l04937">4937</a> of file <a class="el" href="../../d7/d48/fftools__ffmpeg_8c_source.html">fftools_ffmpeg.c</a>.</p>
+
+</div>
+</div>
+<a id="a67c768e85034e55ba7e2da1b2f928213"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67c768e85034e55ba7e2da1b2f928213">&#9670;&nbsp;</a></span>Java_com_arthenica_mobileffmpeg_FFmpeg_cancel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_cancel </td>
+          <td>(</td>
+          <td class="paramtype">JNIEnv *&#160;</td>
+          <td class="paramname"><em>env</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">jclass&#160;</td>
+          <td class="paramname"><em>object</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Cancels an ongoing operation.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">env</td><td>pointer to native method interface </td></tr>
+    <tr><td class="paramname">object</td><td>reference to the class on which this method is invoked </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00150">150</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -164,7 +206,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>zero on successful execution, non-zero on error </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00093">93</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00097">97</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -203,7 +245,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>FFmpeg version string </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00070">70</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00074">74</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -242,7 +284,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>MobileFFmpeg version string </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00081">81</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00085">85</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -281,7 +323,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>JNI version needed by 'mobileffmpeg' library </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00042">42</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00046">46</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -297,9 +339,9 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Full name of the Java class that owns native functions in this file. </p>
+<p>Full name of the FFmpeg class </p>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00026">26</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00030">30</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -314,19 +356,19 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">= {</div><div class="line">  {<span class="stringliteral">&quot;getFFmpegVersion&quot;</span>, <span class="stringliteral">&quot;()Ljava/lang/String;&quot;</span>, (<span class="keywordtype">void</span>*) <a class="code" href="../../dd/d16/mobileffmpeg_8c.html#ad579b6d5dd7c250f3c2d8612de713299">Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion</a>},</div><div class="line">  {<span class="stringliteral">&quot;getVersion&quot;</span>, <span class="stringliteral">&quot;()Ljava/lang/String;&quot;</span>, (<span class="keywordtype">void</span>*) <a class="code" href="../../dd/d16/mobileffmpeg_8c.html#a7798cb6b074521ea5db9f1542c404b3f">Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion</a>},</div><div class="line">  {<span class="stringliteral">&quot;execute&quot;</span>, <span class="stringliteral">&quot;([Ljava/lang/String;)I&quot;</span>, (<span class="keywordtype">void</span>*) <a class="code" href="../../dd/d16/mobileffmpeg_8c.html#a5ad36f342bbd80253d8f1e4662496dde">Java_com_arthenica_mobileffmpeg_FFmpeg_execute</a>}</div><div class="line">}</div><div class="ttc" id="mobileffmpeg_8c_html_ad579b6d5dd7c250f3c2d8612de713299"><div class="ttname"><a href="../../dd/d16/mobileffmpeg_8c.html#ad579b6d5dd7c250f3c2d8612de713299">Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion</a></div><div class="ttdeci">JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion(JNIEnv *env, jclass object)</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d16/mobileffmpeg_8c_source.html#l00070">mobileffmpeg.c:70</a></div></div>
-<div class="ttc" id="mobileffmpeg_8c_html_a5ad36f342bbd80253d8f1e4662496dde"><div class="ttname"><a href="../../dd/d16/mobileffmpeg_8c.html#a5ad36f342bbd80253d8f1e4662496dde">Java_com_arthenica_mobileffmpeg_FFmpeg_execute</a></div><div class="ttdeci">JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *env, jclass object, jobjectArray stringArray)</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d16/mobileffmpeg_8c_source.html#l00093">mobileffmpeg.c:93</a></div></div>
-<div class="ttc" id="mobileffmpeg_8c_html_a7798cb6b074521ea5db9f1542c404b3f"><div class="ttname"><a href="../../dd/d16/mobileffmpeg_8c.html#a7798cb6b074521ea5db9f1542c404b3f">Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion</a></div><div class="ttdeci">JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIEnv *env, jclass object)</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d16/mobileffmpeg_8c_source.html#l00081">mobileffmpeg.c:81</a></div></div>
-</div><!-- fragment --><p>Prototypes of native functions defined by this file. </p>
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div><div class="line">  {<span class="stringliteral">&quot;getFFmpegVersion&quot;</span>, <span class="stringliteral">&quot;()Ljava/lang/String;&quot;</span>, (<span class="keywordtype">void</span>*) <a class="code" href="../../dd/d16/mobileffmpeg_8c.html#ad579b6d5dd7c250f3c2d8612de713299">Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion</a>},</div><div class="line">  {<span class="stringliteral">&quot;getVersion&quot;</span>, <span class="stringliteral">&quot;()Ljava/lang/String;&quot;</span>, (<span class="keywordtype">void</span>*) <a class="code" href="../../dd/d16/mobileffmpeg_8c.html#a7798cb6b074521ea5db9f1542c404b3f">Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion</a>},</div><div class="line">  {<span class="stringliteral">&quot;execute&quot;</span>, <span class="stringliteral">&quot;([Ljava/lang/String;)I&quot;</span>, (<span class="keywordtype">void</span>*) <a class="code" href="../../dd/d16/mobileffmpeg_8c.html#a5ad36f342bbd80253d8f1e4662496dde">Java_com_arthenica_mobileffmpeg_FFmpeg_execute</a>}</div><div class="line">}</div><div class="ttc" id="mobileffmpeg_8c_html_ad579b6d5dd7c250f3c2d8612de713299"><div class="ttname"><a href="../../dd/d16/mobileffmpeg_8c.html#ad579b6d5dd7c250f3c2d8612de713299">Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion</a></div><div class="ttdeci">JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion(JNIEnv *env, jclass object)</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d16/mobileffmpeg_8c_source.html#l00074">mobileffmpeg.c:74</a></div></div>
+<div class="ttc" id="mobileffmpeg_8c_html_a5ad36f342bbd80253d8f1e4662496dde"><div class="ttname"><a href="../../dd/d16/mobileffmpeg_8c.html#a5ad36f342bbd80253d8f1e4662496dde">Java_com_arthenica_mobileffmpeg_FFmpeg_execute</a></div><div class="ttdeci">JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *env, jclass object, jobjectArray stringArray)</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d16/mobileffmpeg_8c_source.html#l00097">mobileffmpeg.c:97</a></div></div>
+<div class="ttc" id="mobileffmpeg_8c_html_a7798cb6b074521ea5db9f1542c404b3f"><div class="ttname"><a href="../../dd/d16/mobileffmpeg_8c.html#a7798cb6b074521ea5db9f1542c404b3f">Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion</a></div><div class="ttdeci">JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIEnv *env, jclass object)</div><div class="ttdef"><b>Definition:</b> <a href="../../dd/d16/mobileffmpeg_8c_source.html#l00085">mobileffmpeg.c:85</a></div></div>
+</div><!-- fragment --><p>Prototypes of native functions defined by FFmpeg class. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00029">29</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00033">33</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 29 2018 21:32:21 for MobileFFmpeg Android API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Sep 5 2018 00:38:07 for MobileFFmpeg Android API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

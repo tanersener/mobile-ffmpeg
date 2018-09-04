@@ -1,9 +1,5 @@
 var searchData=
 [
-  ['lib_5fname',['LIB_NAME',['../d7/d7f/log_8h.html#a6e43beaa714b1bf01ce2271440786e38',1,'log.h']]],
-  ['logd',['LOGD',['../d7/d7f/log_8h.html#aa839997a58e14061861cd634fdb7664d',1,'log.h']]],
-  ['loge',['LOGE',['../d7/d7f/log_8h.html#ae02538a80ad5fc009caec73487d11a8d',1,'log.h']]],
-  ['logi',['LOGI',['../d7/d7f/log_8h.html#a5512e59d578a380a441a70256af997d0',1,'log.h']]],
-  ['logv',['LOGV',['../d7/d7f/log_8h.html#ab78bd305488c62caf8515ee765b1ed49',1,'log.h']]],
-  ['logw',['LOGW',['../d7/d7f/log_8h.html#a07f1b0d507acedeb7550353eba4f6e66',1,'log.h']]]
+  ['cmdutils_5fcommon_5foptions',['CMDUTILS_COMMON_OPTIONS',['../d8/d4e/fftools__cmdutils_8h.html#af65f53949c69b7d2ce7d64b82f71e0b6',1,'fftools_cmdutils.h']]],
+  ['cmdutils_5fcommon_5foptions_5favdevice',['CMDUTILS_COMMON_OPTIONS_AVDEVICE',['../d8/d4e/fftools__cmdutils_8h.html#a51a3d8e6860d954cc6fbefdca1fc267d',1,'fftools_cmdutils.h']]]
 ];
