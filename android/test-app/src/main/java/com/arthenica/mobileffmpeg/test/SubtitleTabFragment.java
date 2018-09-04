@@ -190,7 +190,7 @@ public class SubtitleTabFragment extends Fragment {
 
                                 Log.d(TAG, "Create completed successfully; burning subtitles.");
 
-                                String burnSubtitlesCommand = String.format("-y -i %s -vf subtitles=%s:force_style='FontName=MyFontName' %s", videoFile.getAbsolutePath(), getSubtitleFile().getAbsolutePath(), videoWithSubtitlesFile.getAbsolutePath());
+                                String burnSubtitlesCommand = String.format("-y -i %s -vf subtitles=%s:force_style='FontName=MyFontName' -c:v mpeg4 %s", videoFile.getAbsolutePath(), getSubtitleFile().getAbsolutePath(), videoWithSubtitlesFile.getAbsolutePath());
 
                                 showBurnProgressDialog();
 
