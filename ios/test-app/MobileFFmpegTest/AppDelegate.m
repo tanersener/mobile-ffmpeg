@@ -69,7 +69,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
     NSDictionary *fontNameMapping = @{@"MyFontName" : @"Doppio One"};
 
-    [MobileFFmpegConfig setFontDirectory:resourceFolder with:fontNameMapping];
+    // [MobileFFmpegConfig setFontDirectory:resourceFolder with:fontNameMapping];
     // [MobileFFmpegConfig setFontDirectory:resourceFolder with:nil];
     
     return YES;
