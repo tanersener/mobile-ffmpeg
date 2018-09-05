@@ -166,9 +166,7 @@ There are eight different prebuilt packages. Below you can see which external li
     
 #### 2.3 Test Application
 You can see how MobileFFmpeg is used inside an application by running test applications provided.
-There is an Android test application under the `android/test-app` folder and an IOS test application under the 
-`ios/test-app` folder. Both applications are identical and supports command execution, video encoding, accessing https,
-encoding audio, burning subtitles and video stabilization.
+There is an Android test application under the `android/test-app` folder and an IOS test application under the `ios/test-app` folder. Both applications are identical and supports command execution, video encoding, accessing https, encoding audio, burning subtitles and video stabilization.
 
 ### 3. Versions
 
