@@ -26,7 +26,7 @@
 #include <pthread.h>
 
 #include "fftools_ffmpeg.h"
-#include "mobileffmpeg.h"
+#include "mobileffmpeg_config.h"
 #include "libavutil/bprint.h"
 
 /** Callback data structure */

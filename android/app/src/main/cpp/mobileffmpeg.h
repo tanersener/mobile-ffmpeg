@@ -25,6 +25,9 @@
 #include "libavutil/ffversion.h"
 #include "mobileffmpeg_config.h"
 
+/** Library version string */
+#define MOBILE_FFMPEG_VERSION "2.1"
+
 /*
  * Class:     com_arthenica_mobileffmpeg_FFmpeg
  * Method:    getFFmpegVersion
