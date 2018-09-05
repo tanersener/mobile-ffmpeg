@@ -23,14 +23,6 @@
 		348439ED20B2EFAF001A3990 /* pyramid.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EA20B2EFAF001A3990 /* pyramid.jpg */; };
 		348439EE20B2EFAF001A3990 /* tajmahal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EB20B2EFAF001A3990 /* tajmahal.jpg */; };
 		348439EF20B2EFAF001A3990 /* colosseum.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EC20B2EFAF001A3990 /* colosseum.jpg */; };
-		34BB54732109BE5B00606B7C /* RCEasyTipView.h in Headers */ = {isa = PBXBuildFile; fileRef = 34BB546B2109BE5B00606B7C /* RCEasyTipView.h */; };
-		34BB54742109BE5B00606B7C /* RCEasyTipViewIDGenerator.h in Headers */ = {isa = PBXBuildFile; fileRef = 34BB546C2109BE5B00606B7C /* RCEasyTipViewIDGenerator.h */; };
-		34BB54752109BE5B00606B7C /* UIBarItem+RCBarItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 34BB546D2109BE5B00606B7C /* UIBarItem+RCBarItem.h */; };
-		34BB54762109BE5B00606B7C /* UIView+RCEssentials.h in Headers */ = {isa = PBXBuildFile; fileRef = 34BB546E2109BE5B00606B7C /* UIView+RCEssentials.h */; };
-		34BB54772109BE5B00606B7C /* RCEasyTipView.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB546F2109BE5B00606B7C /* RCEasyTipView.m */; };
-		34BB54782109BE5B00606B7C /* UIView+RCEssentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB54702109BE5B00606B7C /* UIView+RCEssentials.m */; };
-		34BB54792109BE5B00606B7C /* UIBarItem+RCBarItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB54712109BE5B00606B7C /* UIBarItem+RCBarItem.m */; };
-		34BB547A2109BE5B00606B7C /* RCEasyTipViewIDGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB54722109BE5B00606B7C /* RCEasyTipViewIDGenerator.m */; };
 		34BB547C2109D44800606B7C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB547B2109D44800606B7C /* Constants.m */; };
 		34D26CE7210F5CA4005B3A32 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CDF210F5CA4005B3A32 /* libavutil.framework */; };
 		34D26CE8210F5CA4005B3A32 /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE0210F5CA4005B3A32 /* libswscale.framework */; };
@@ -101,14 +93,6 @@
 		348439EA20B2EFAF001A3990 /* pyramid.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pyramid.jpg; sourceTree = "<group>"; };
 		348439EB20B2EFAF001A3990 /* tajmahal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tajmahal.jpg; sourceTree = "<group>"; };
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
-		34BB546B2109BE5B00606B7C /* RCEasyTipView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCEasyTipView.h; sourceTree = "<group>"; };
-		34BB546C2109BE5B00606B7C /* RCEasyTipViewIDGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCEasyTipViewIDGenerator.h; sourceTree = "<group>"; };
-		34BB546D2109BE5B00606B7C /* UIBarItem+RCBarItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIBarItem+RCBarItem.h"; sourceTree = "<group>"; };
-		34BB546E2109BE5B00606B7C /* UIView+RCEssentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+RCEssentials.h"; sourceTree = "<group>"; };
-		34BB546F2109BE5B00606B7C /* RCEasyTipView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCEasyTipView.m; sourceTree = "<group>"; };
-		34BB54702109BE5B00606B7C /* UIView+RCEssentials.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+RCEssentials.m"; sourceTree = "<group>"; };
-		34BB54712109BE5B00606B7C /* UIBarItem+RCBarItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBarItem+RCBarItem.m"; sourceTree = "<group>"; };
-		34BB54722109BE5B00606B7C /* RCEasyTipViewIDGenerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCEasyTipViewIDGenerator.m; sourceTree = "<group>"; };
 		34BB547B2109D44800606B7C /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		34D26CDF210F5CA4005B3A32 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavutil.framework; path = "../../prebuilt/ios-framework/libavutil.framework"; sourceTree = "<group>"; };
 		34D26CE0210F5CA4005B3A32 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswscale.framework; path = "../../prebuilt/ios-framework/libswscale.framework"; sourceTree = "<group>"; };
@@ -188,25 +172,9 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		34BB546A2109BE5B00606B7C /* EasyTipView */ = {
-			isa = PBXGroup;
-			children = (
-				34BB546B2109BE5B00606B7C /* RCEasyTipView.h */,
-				34BB546C2109BE5B00606B7C /* RCEasyTipViewIDGenerator.h */,
-				34BB546D2109BE5B00606B7C /* UIBarItem+RCBarItem.h */,
-				34BB546E2109BE5B00606B7C /* UIView+RCEssentials.h */,
-				34BB546F2109BE5B00606B7C /* RCEasyTipView.m */,
-				34BB54702109BE5B00606B7C /* UIView+RCEssentials.m */,
-				34BB54712109BE5B00606B7C /* UIBarItem+RCBarItem.m */,
-				34BB54722109BE5B00606B7C /* RCEasyTipViewIDGenerator.m */,
-			);
-			path = EasyTipView;
-			sourceTree = "<group>";
-		};
 		34FAE207209F7DDD005CE2AE = {
 			isa = PBXGroup;
 			children = (
-				34BB546A2109BE5B00606B7C /* EasyTipView */,
 				346AA95920B2ED94000623FE /* Resources */,
 				34FAE212209F7DDD005CE2AE /* MobileFFmpegTest */,
 				34FAE211209F7DDD005CE2AE /* Products */,
@@ -272,16 +240,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				343E67092107C27600F95E5B /* TabBarController.h in Headers */,
-				34BB54742109BE5B00606B7C /* RCEasyTipViewIDGenerator.h in Headers */,
 				3457454B2113B8AD00059043 /* AudioViewController.h in Headers */,
-				34BB54732109BE5B00606B7C /* RCEasyTipView.h in Headers */,
-				34BB54752109BE5B00606B7C /* UIBarItem+RCBarItem.h in Headers */,
 				3457454F2113B8D300059043 /* SubtitleViewController.h in Headers */,
 				343E66B9210789DE00F95E5B /* Constants.h in Headers */,
 				343E67052107AD0100F95E5B /* Util.h in Headers */,
 				343E66B5210784BD00F95E5B /* HttpsViewController.h in Headers */,
 				340FABBE2115A17600B33CE7 /* VidStabViewController.h in Headers */,
-				34BB54762109BE5B00606B7C /* UIView+RCEssentials.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,15 +332,11 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
 				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
 				"${PODS_ROOT}/Manifest.lock",
 			);
 			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-MobileFFmpegTest-checkManifestLockResult.txt",
 			);
@@ -389,8 +349,6 @@
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			inputFileListPaths = (
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-frameworks.sh",
@@ -405,8 +363,6 @@
 				"${PODS_ROOT}/mobile-ffmpeg-full/libswscale.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NMEasyTipView.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/mobileffmpeg.framework",
@@ -433,17 +389,13 @@
 				34FAE21B209F7DDD005CE2AE /* VideoViewController.m in Sources */,
 				34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */,
 				34FAE226209F7DDE005CE2AE /* main.m in Sources */,
-				34BB54792109BE5B00606B7C /* UIBarItem+RCBarItem.m in Sources */,
 				343E66B6210784BD00F95E5B /* HttpsViewController.m in Sources */,
-				34BB54782109BE5B00606B7C /* UIView+RCEssentials.m in Sources */,
 				340FABBF2115A17600B33CE7 /* VidStabViewController.m in Sources */,
 				34FAE218209F7DDD005CE2AE /* CommandViewController.m in Sources */,
 				343E670A2107C27600F95E5B /* TabBarController.m in Sources */,
 				345745502113B8D300059043 /* SubtitleViewController.m in Sources */,
-				34BB547A2109BE5B00606B7C /* RCEasyTipViewIDGenerator.m in Sources */,
 				343E67062107AD0100F95E5B /* Util.m in Sources */,
 				3457454C2113B8AD00059043 /* AudioViewController.m in Sources */,
-				34BB54772109BE5B00606B7C /* RCEasyTipView.m in Sources */,
 				34BB547C2109D44800606B7C /* Constants.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

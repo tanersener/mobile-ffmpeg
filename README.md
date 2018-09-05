@@ -254,6 +254,7 @@ If you have any recommendations or ideas to improve it, please feel free to subm
 
 - [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
+- [FFmpeg Wiki](https://trac.ffmpeg.org/wiki/WikiStart)
 - [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)
 - [FFmpeg External Library Licenses](https://www.ffmpeg.org/doxygen/4.0/md_LICENSE.html)
 
