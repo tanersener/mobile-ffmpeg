@@ -76,11 +76,6 @@ cd ${BASEDIR}/../.. || exit 1
 ./ios.sh --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx --enable-snappy || exit 1
 create_package "video" "$1" || exit 1
 
-# VIDEO-GPL RELEASE
-cd ${BASEDIR}/../.. || exit 1
-./ios.sh --enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore || exit 1
-create_package "video-gpl" "$1" || exit 1
-
 # FULL RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh --full || exit 1

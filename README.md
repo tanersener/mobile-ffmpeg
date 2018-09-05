@@ -29,6 +29,7 @@ FFmpeg for Android and IOS
 - Creates Android archive with .aar extension
 #### 1.2 IOS
 - Supports `armv7`, `armv7s`, `arm64`, `i386` and `x86_64` architectures
+- `ARC` enabled library
 - Built with `-fembed-bitcode` flag
 - Creates IOS dynamic universal (fat) library
 - Creates IOS dynamic framework for IOS 8 or later
@@ -36,12 +37,12 @@ FFmpeg for Android and IOS
 ### 2. Using
 Prebuilt libraries are available under [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org)
 
-There are six different prebuilt packages. Below you can see which external libraries are enabled in each of them.
+There are eight different prebuilt packages. Below you can see which external libraries are enabled in each of them.
 
-|        | min | min-gpl | https | https-gpl | full | full-gpl |
-| :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| external <br/> libraries <br/> enabled |  -  |  vid.stab*** <br/> x264* <br/> x265*** <br/> xvidcore*  |  gnutls  |  gnutls <br/> vid.stab*** <br/> x264* <br/> x265*** <br/> xvidcore*  |  chromaprint*** <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack  |  chromaprint*** <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> vid.stab*** <br/> wavpack <br/> x264* <br/> x265*** <br/> xvidcore*  |
-|        | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full-gpl/_latestVersion) |
+|        | min | min-gpl* | https* | https-gpl* | audio*** | video*** | full | full-gpl* |
+| :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| external <br/> libraries <br/> enabled |  -  |  vid.stab*** <br/> x264* <br/> x265*** <br/> xvidcore*  |  gnutls  |  gnutls <br/> vid.stab*** <br/> x264* <br/> x265*** <br/> xvidcore*  |  chromaprint*** <br/> lame <br/> libilbc* <br/> libvorbis <br/> opencore-amr <br/> opus* <br/> shine <br/> soxr** <br/> speex <br/> wavpack  |  fontconfig <br/> freetype <br/> fribidi <br/> kvazaar <br/> libaom** <br/> libass <br/> libiconv <br/> libtheora <br/> libvpx <br/> snappy*  |  chromaprint*** <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> wavpack  |  chromaprint*** <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom** <br/> libass <br/> libiconv <br/> libilbc* <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus* <br/> shine <br/> snappy* <br/> soxr** <br/> speex <br/> vid.stab*** <br/> wavpack <br/> x264* <br/> x265*** <br/> xvidcore*  |
+|        | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-audio/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-audio/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-video/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-video/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full-gpl/_latestVersion) |
 
 \* - Supported since `v1.1`
 
@@ -61,7 +62,7 @@ There are six different prebuilt packages. Below you can see which external libr
     ```
     import com.arthenica.mobileffmpeg.FFmpeg;
 
-    int rc = FFmpeg.execute("-i file1.mp4 -c:v mpeg4 file1.mp4");
+    int rc = FFmpeg.execute("-i file1.mp4 -c:v mpeg4 file2.mp4");
     Log.i(Log.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
     ```
 #### 2.2 IOS
@@ -74,7 +75,7 @@ There are six different prebuilt packages. Below you can see which external libr
     ```
     #import <mobileffmpeg/MobileFFmpeg.h>
 
-    NSString* ffmpegCommand = @"-i file1.mp4 -c:v mpeg4 file1.mp4";
+    NSString* ffmpegCommand = @"-i file1.mp4 -c:v mpeg4 file2.mp4";
     int result = [MobileFFmpeg execute: ffmpegCommand];
 
     NSLog(@"Process exited with rc %d\n", result);
