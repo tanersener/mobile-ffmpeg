@@ -66,7 +66,7 @@ export IOS_MIN_VERSION=7.0
 export GNUTLS_IOS_MIN_VERSION=7.0
 
 get_mobile_ffmpeg_version() {
-    local MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+    local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
     echo ${MOBILE_FFMPEG_VERSION}
 }
@@ -430,6 +430,9 @@ print_enabled_libraries() {
     fi
 }
 
+#
+# Note that MinimumOSVersion is set to 8.0, because dynamic frameworks are supported by IOS 8 and later.
+#
 build_info_plist() {
     local FILE_PATH="$1"
     local FRAMEWORK_NAME="$2"
@@ -458,6 +461,8 @@ build_info_plist() {
 	<string>${FRAMEWORK_SHORT_VERSION}</string>
 	<key>CFBundleVersion</key>
 	<string>${FRAMEWORK_VERSION}</string>
+	<key>MinimumOSVersion</key>
+	<string>8.0</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>
@@ -654,7 +659,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     # BUILDING MOBILE FFMPEG FRAMEWORK
     echo -e -n "\nCreating mobileffmpeg.framework under prebuilt/ios-framework: "
 
-    MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${MOBILE_FFMPEG_UNIVERSAL}/include/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+    MOBILE_FFMPEG_VERSION=$(get_mobile_ffmpeg_version)
 
     FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-framework/mobileffmpeg.framework
 
