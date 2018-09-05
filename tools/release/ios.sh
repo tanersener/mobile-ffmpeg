@@ -31,7 +31,7 @@ then
 fi
 
 # VALIDATE VERSIONS
-MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${BASEDIR}/../../ios/src/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/../../ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
 if [ "${MOBILE_FFMPEG_VERSION}" != "$1" ]; then
     echo "Error: version mismatch. v$1 requested but v${MOBILE_FFMPEG_VERSION} found. Please perform the following updates and try again."
     echo "1. Update docs"
