@@ -19,11 +19,7 @@
 
 package com.arthenica.mobileffmpeg.test;
 
-import android.arch.core.util.Function;
-import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -33,50 +29,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
-import com.arthenica.mobileffmpeg.Log;
+import com.arthenica.mobileffmpeg.LogCallback;
+import com.arthenica.mobileffmpeg.LogMessage;
+import com.arthenica.mobileffmpeg.util.RunCallback;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Callable;
 
 public class CommandTabFragment extends Fragment {
 
-    private Context context;
+    private MainActivity mainActivity;
     private EditText commandText;
-    private TextView logText;
-    private final Queue<String> logQueue;
-
-    public CommandTabFragment() {
-        logQueue = new ConcurrentLinkedQueue<>();
-    }
-
-    public void enableLogRedirection() {
-        Log.enableCallbackFunction(new Function<byte[], Void>() {
-
-            @Override
-            public Void apply(byte[] logMessageBytes) {
-                logQueue.add(new String(logMessageBytes));
-                return null;
-            }
-        });
-    }
-
-    public void disableLogRedirection() {
-        Log.enableCallbackFunction(null);
-    }
-
-    public static CommandTabFragment newInstance(final Context context) {
-        CommandTabFragment fragment = new CommandTabFragment();
-        fragment.setContext(context);
-        return fragment;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
+    private TextView outputText;
 
     @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -89,11 +55,6 @@ public class CommandTabFragment extends Fragment {
 
         if (getView() != null) {
             commandText = getView().findViewById(R.id.commandText);
-
-            // CHANGE LOG TEXT COLOR
-            logText = getView().findViewById(R.id.logText);
-            logText.setBackgroundColor(Color.LTGRAY);
-            logText.setMovementMethod(new ScrollingMovementMethod());
 
             View runButton = getView().findViewById(R.id.runButton);
             runButton.setOnClickListener(new View.OnClickListener() {
@@ -112,81 +73,107 @@ public class CommandTabFragment extends Fragment {
                     runFFmpegAsync();
                 }
             });
+
+            outputText = getView().findViewById(R.id.outputText);
+            outputText.setMovementMethod(new ScrollingMovementMethod());
         }
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            setActive();
+        }
+    }
+
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
+
+    public static CommandTabFragment newInstance(final MainActivity mainActivity) {
+        final CommandTabFragment fragment = new CommandTabFragment();
+        fragment.setMainActivity(mainActivity);
+        return fragment;
+    }
+
+    public void enableLogCallback() {
+        Config.enableLogCallback(new LogCallback() {
+
+            @Override
+            public void apply(final LogMessage message) {
+                MainActivity.addUIAction(new Callable() {
+
+                    @Override
+                    public Object call() {
+                        appendLog(message.getText());
+                        return null;
+                    }
+                });
+            }
+        });
+    }
+
     public void runFFmpeg() {
-        enableLogRedirection();
-        String command = commandText.getText().toString();
-        String[] split = command.split(" ");
-
-        final CountDownLatch logSync = new CountDownLatch(1);
         clearLog();
-        waitForLogs(logSync);
 
-        int returnCode = FFmpeg.execute(split);
-        android.util.Log.i(MainActivity.TAG, String.format("Process exited with rc %d.", returnCode));
-        Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
-        logSync.countDown();
-        disableLogRedirection();
+        final String ffmpegCommand = commandText.getText().toString();
+
+        android.util.Log.d(MainActivity.TAG, "Testing COMMAND synchronously.");
+
+        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
+
+        int result = FFmpeg.execute(ffmpegCommand);
+
+        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
+
+        if (result != 0) {
+            Popup.show(mainActivity, "Command failed. Please check output for the details.");
+        }
     }
 
     public void runFFmpegAsync() {
-        enableLogRedirection();
-        String command = commandText.getText().toString();
-        String[] arguments = command.split(" ");
-
-        final CountDownLatch logSync = new CountDownLatch(1);
         clearLog();
-        waitForLogs(logSync);
 
-        MainActivity.executeAsync(new Function<Integer, Void>() {
+        final String ffmpegCommand = commandText.getText().toString();
+
+        android.util.Log.d(MainActivity.TAG, "Testing COMMAND asynchronously.");
+
+        android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
+
+        MainActivity.executeAsync(new RunCallback() {
 
             @Override
-            public Void apply(Integer returnCode) {
-                android.util.Log.i(MainActivity.TAG, String.format("Async process exited with rc %d.", returnCode));
-                logSync.countDown();
-                disableLogRedirection();
-                return null;
+            public void apply(int result) {
+
+                android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
+
+                if (result != 0) {
+                    MainActivity.addUIAction(new Callable() {
+                        @Override
+                        public Object call() {
+                            Popup.show(mainActivity, "Command failed. Please check output for the details.");
+                            return null;
+                        }
+                    });
+                }
+
             }
-        }, arguments);
+        }, ffmpegCommand);
+    }
+
+    public void setActive() {
+        android.util.Log.i(MainActivity.TAG, "Command Tab Activated");
+        enableLogCallback();
+        Popup.show(mainActivity, Tooltip.COMMAND_TEST_TOOLTIP_TEXT);
     }
 
     public void appendLog(final String logMessage) {
-        logText.append(logMessage);
-        logText.append("\n");
+        outputText.append(logMessage);
     }
 
     public void clearLog() {
-        logQueue.clear();
-        logText.setText("");
-    }
-
-    public void waitForLogs(final CountDownLatch count) {
-        final Handler handler = new Handler();
-        final Runnable runnable = new Runnable() {
-
-            @Override
-            public void run() {
-                String logMessage;
-
-                do {
-                    logMessage = logQueue.poll();
-                    if (logMessage != null) {
-                        appendLog(logMessage);
-                    }
-                } while (logMessage != null);
-
-                if (count.getCount() < 1) {
-                    Toast.makeText(context, "Run completed", Toast.LENGTH_SHORT).show();
-                    handler.removeCallbacks(this);
-
-                } else {
-                    handler.postDelayed(this, 1000);
-                }
-            }
-        };
-        handler.postDelayed(runnable, 1000);
+        outputText.setText("");
     }
 
 }

@@ -37,16 +37,11 @@
 #include "av1/decoder/obu.h"
 
 static void initialize_dec(void) {
-  static volatile int init_done = 0;
-
-  if (!init_done) {
-    av1_rtcd();
-    aom_dsp_rtcd();
-    aom_scale_rtcd();
-    av1_init_intra_predictors();
-    av1_init_wedge_masks();
-    init_done = 1;
-  }
+  av1_rtcd();
+  aom_dsp_rtcd();
+  aom_scale_rtcd();
+  av1_init_intra_predictors();
+  av1_init_wedge_masks();
 }
 
 static void dec_setup_mi(AV1_COMMON *cm) {
@@ -71,6 +66,7 @@ static void dec_free_mi(AV1_COMMON *cm) {
   cm->mip = NULL;
   aom_free(cm->mi_grid_base);
   cm->mi_grid_base = NULL;
+  cm->mi_alloc_size = 0;
 }
 
 AV1Decoder *av1_decoder_create(BufferPool *const pool) {
@@ -81,6 +77,9 @@ AV1Decoder *av1_decoder_create(BufferPool *const pool) {
 
   av1_zero(*pbi);
 
+  // The jmp_buf is valid only for the duration of the function that calls
+  // setjmp(). Therefore, this function must reset the 'setjmp' field to 0
+  // before it returns.
   if (setjmp(cm->error.jmp)) {
     cm->error.setjmp = 0;
     av1_decoder_remove(pbi);
@@ -98,7 +97,7 @@ AV1Decoder *av1_decoder_create(BufferPool *const pool) {
   memset(cm->frame_contexts, 0, FRAME_CONTEXTS * sizeof(*cm->frame_contexts));
 
   pbi->need_resync = 1;
-  once(initialize_dec);
+  aom_once(initialize_dec);
 
   // Initialize the references to not point to any frame buffers.
   memset(&cm->ref_frame_map, -1, sizeof(cm->ref_frame_map));
@@ -108,7 +107,7 @@ AV1Decoder *av1_decoder_create(BufferPool *const pool) {
   pbi->decoding_first_frame = 1;
   pbi->common.buffer_pool = pool;
 
-  cm->bit_depth = AOM_BITS_8;
+  cm->seq_params.bit_depth = AOM_BITS_8;
   cm->dequant_bit_depth = AOM_BITS_8;
 
   cm->alloc_mi = av1_dec_alloc_mi;
@@ -146,6 +145,12 @@ void av1_dealloc_dec_jobs(struct AV1DecTileMTData *tile_mt_info) {
   }
 }
 
+void av1_dec_free_cb_buf(AV1Decoder *pbi) {
+  aom_free(pbi->cb_buffer_base);
+  pbi->cb_buffer_base = NULL;
+  pbi->cb_buffer_alloc_size = 0;
+}
+
 void av1_decoder_remove(AV1Decoder *pbi) {
   int i;
 
@@ -161,7 +166,7 @@ void av1_decoder_remove(AV1Decoder *pbi) {
   if (pbi->thread_data) {
     for (int worker_idx = 0; worker_idx < pbi->max_threads - 1; worker_idx++) {
       DecWorkerData *const thread_data = pbi->thread_data + worker_idx;
-      const int use_highbd = pbi->common.use_highbitdepth ? 1 : 0;
+      const int use_highbd = pbi->common.seq_params.use_highbitdepth ? 1 : 0;
       av1_free_mc_tmp_buf(thread_data->td, use_highbd);
       aom_free(thread_data->td);
     }
@@ -172,6 +177,20 @@ void av1_decoder_remove(AV1Decoder *pbi) {
     AVxWorker *const worker = &pbi->tile_workers[i];
     aom_get_worker_interface()->end(worker);
   }
+#if CONFIG_MULTITHREAD
+  if (pbi->row_mt_mutex_ != NULL) {
+    pthread_mutex_destroy(pbi->row_mt_mutex_);
+    aom_free(pbi->row_mt_mutex_);
+  }
+  if (pbi->row_mt_cond_ != NULL) {
+    pthread_cond_destroy(pbi->row_mt_cond_);
+    aom_free(pbi->row_mt_cond_);
+  }
+#endif
+  for (i = 0; i < pbi->allocated_tiles; i++) {
+    TileDataDec *const tile_data = pbi->tile_data + i;
+    av1_dec_row_mt_dealloc(&tile_data->dec_row_mt_sync);
+  }
   aom_free(pbi->tile_data);
   aom_free(pbi->tile_workers);
 
@@ -181,10 +200,11 @@ void av1_decoder_remove(AV1Decoder *pbi) {
     av1_dealloc_dec_jobs(&pbi->tile_mt_info);
   }
 
+  av1_dec_free_cb_buf(pbi);
 #if CONFIG_ACCOUNTING
   aom_accounting_clear(&pbi->accounting);
 #endif
-  const int use_highbd = pbi->common.use_highbitdepth ? 1 : 0;
+  const int use_highbd = pbi->common.seq_params.use_highbitdepth ? 1 : 0;
   av1_free_mc_tmp_buf(&pbi->td, use_highbd);
 
   aom_free(pbi);
@@ -414,7 +434,10 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
 
   // Find a free frame buffer. Return error if can not find any.
   cm->new_fb_idx = get_free_fb(cm);
-  if (cm->new_fb_idx == INVALID_IDX) return AOM_CODEC_MEM_ERROR;
+  if (cm->new_fb_idx == INVALID_IDX) {
+    cm->error.error_code = AOM_CODEC_MEM_ERROR;
+    return 1;
+  }
 
   // Assign a MV array to the frame buffer.
   cm->cur_frame = &pool->frame_bufs[cm->new_fb_idx];
@@ -423,6 +446,9 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
 
   pbi->cur_buf = &frame_bufs[cm->new_fb_idx];
 
+  // The jmp_buf is valid only for the duration of the function that calls
+  // setjmp(). Therefore, this function must reset the 'setjmp' field to 0
+  // before it returns.
   if (setjmp(cm->error.jmp)) {
     const AVxWorkerInterface *const winterface = aom_get_worker_interface();
     int i;
@@ -474,7 +500,13 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
   int frame_decoded =
       aom_decode_frame_from_obus(pbi, source, source + size, psource);
 
-  if (cm->error.error_code != AOM_CODEC_OK) return 1;
+  if (cm->error.error_code != AOM_CODEC_OK) {
+    lock_buffer_pool(pool);
+    decrease_ref_count(cm->new_fb_idx, frame_bufs, pool);
+    unlock_buffer_pool(pool);
+    cm->error.setjmp = 0;
+    return 1;
+  }
 
 #if TXCOEFF_TIMER
   cm->cum_txcoeff_timer += cm->txcoeff_timer;
@@ -493,7 +525,10 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
     pbi->decoding_first_frame = 0;
   }
 
-  if (cm->error.error_code != AOM_CODEC_OK) return 1;
+  if (cm->error.error_code != AOM_CODEC_OK) {
+    cm->error.setjmp = 0;
+    return 1;
+  }
 
   aom_clear_system_state();
 

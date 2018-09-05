@@ -18,11 +18,9 @@
 extern "C" {
 #endif
 
-unsigned int av1_vaq_segment_id(int energy);
 void av1_vaq_frame_setup(AV1_COMP *cpi);
 
-int av1_block_energy(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bs);
-double av1_log_block_var(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bs);
+int av1_log_block_var(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bs);
 int av1_compute_deltaq_from_energy_level(const AV1_COMP *const cpi,
                                          int block_var_level);
 int av1_block_wavelet_energy_level(const AV1_COMP *cpi, MACROBLOCK *x,

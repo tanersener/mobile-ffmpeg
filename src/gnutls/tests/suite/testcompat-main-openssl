@@ -114,17 +114,17 @@ run_client_suite() {
 
 		# Test SSL 3.0 with RSA ciphersuite
 		echo "${PREFIX}Checking SSL 3.0 with RSA..."
-		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
+		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+3DES-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
 		# Test SSL 3.0 with DHE-RSA ciphersuite
 		echo "${PREFIX}Checking SSL 3.0 with DHE-RSA..."
-		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
+		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+3DES-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
 		# Test SSL 3.0 with DHE-DSS ciphersuite
 		echo "${PREFIX}Checking SSL 3.0 with DHE-DSS..."
-		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
+		${VALGRIND} "${CLI}" ${DEBUG} -p "${PORT}" 127.0.0.1 --priority "NONE:+CIPHER-ALL:+3DES-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --insecure --x509certfile "${CLI_CERT}" --x509keyfile "${CLI_KEY}" </dev/null >/dev/null || \
 			fail ${PID} "Failed"
 
 		kill ${PID}
@@ -457,7 +457,7 @@ run_server_suite() {
 
 		echo "${PREFIX}Check SSL 3.0 with RSA ciphersuite"
 		eval "${GETPORT}"
-		launch_server $$ --priority "NONE:+MD5:+ARCFOUR-128:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+		launch_server $$ --priority "NONE:+MD5:+ARCFOUR-128:+3DES-CBC:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 		PID=$!
 		wait_server ${PID}
 
@@ -473,7 +473,7 @@ run_server_suite() {
 
 		echo "${PREFIX}Check SSL 3.0 with DHE-RSA ciphersuite"
 		eval "${GETPORT}"
-		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
+		launch_server $$ --priority "NONE:+CIPHER-ALL:+3DES-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-RSA${ADD}" --x509certfile "${SERV_CERT}" --x509keyfile "${SERV_KEY}" --x509cafile "${CA_CERT}" --dhparams "${DH_PARAMS}"
 		PID=$!
 		wait_server ${PID}
 
@@ -485,7 +485,7 @@ run_server_suite() {
 
 		echo "${PREFIX}Check SSL 3.0 with DHE-DSS ciphersuite"
 		eval "${GETPORT}"
-		launch_server $$ --priority "NONE:+CIPHER-ALL:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${DH_PARAMS}"
+		launch_server $$ --priority "NONE:+CIPHER-ALL:+3DES-CBC:+SIGN-ALL:+COMP-NULL:+MAC-ALL:+VERS-SSL3.0:+DHE-DSS:+SIGN-DSA-SHA1:+SIGN-DSA-SHA256${ADD}" --x509certfile "${SERV_DSA_CERT}" --x509keyfile "${SERV_DSA_KEY}" --dhparams "${DH_PARAMS}"
 		PID=$!
 		wait_server ${PID}
 

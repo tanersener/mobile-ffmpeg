@@ -15,6 +15,8 @@
 #include "config/av1_rtcd.h"
 
 #include "av1/common/av1_inv_txfm1d_cfg.h"
+#include "av1/common/idct.h"
+#include "av1/common/x86/highbd_txfm_utility_sse4.h"
 
 // Note:
 //  Total 32x4 registers to represent 32x32 block coefficients.
@@ -200,13 +202,13 @@ static void addsub_shift_avx2(const __m256i in0, const __m256i in1,
   __m256i a0 = _mm256_add_epi32(in0_w_offset, in1);
   __m256i a1 = _mm256_sub_epi32(in0_w_offset, in1);
 
+  a0 = _mm256_sra_epi32(a0, _mm_cvtsi32_si128(shift));
+  a1 = _mm256_sra_epi32(a1, _mm_cvtsi32_si128(shift));
+
   a0 = _mm256_max_epi32(a0, *clamp_lo);
   a0 = _mm256_min_epi32(a0, *clamp_hi);
   a1 = _mm256_max_epi32(a1, *clamp_lo);
   a1 = _mm256_min_epi32(a1, *clamp_hi);
-
-  a0 = _mm256_sra_epi32(a0, _mm_cvtsi32_si128(shift));
-  a1 = _mm256_sra_epi32(a1, _mm_cvtsi32_si128(shift));
 
   *out0 = a0;
   *out1 = a1;
@@ -601,38 +603,50 @@ static void idct32_avx2(__m256i *in, __m256i *out, int bit, int do_cols, int bd,
       addsub_no_clamp_avx2(bf0[15], bf0[16], out + 15 * 4 + col,
                            out + 16 * 4 + col);
     } else {
+      const int log_range_out = AOMMAX(16, bd + 6);
+      const __m256i clamp_lo_out = _mm256_set1_epi32(AOMMAX(
+          -(1 << (log_range_out - 1)), -(1 << (log_range - 1 - out_shift))));
+      const __m256i clamp_hi_out = _mm256_set1_epi32(AOMMIN(
+          (1 << (log_range_out - 1)) - 1, (1 << (log_range - 1 - out_shift))));
+
       addsub_shift_avx2(bf0[0], bf0[31], out + 0 * 4 + col, out + 31 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[1], bf0[30], out + 1 * 4 + col, out + 30 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[2], bf0[29], out + 2 * 4 + col, out + 29 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[3], bf0[28], out + 3 * 4 + col, out + 28 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[4], bf0[27], out + 4 * 4 + col, out + 27 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[5], bf0[26], out + 5 * 4 + col, out + 26 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[6], bf0[25], out + 6 * 4 + col, out + 25 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[7], bf0[24], out + 7 * 4 + col, out + 24 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[8], bf0[23], out + 8 * 4 + col, out + 23 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[9], bf0[22], out + 9 * 4 + col, out + 22 * 4 + col,
-                        &clamp_lo, &clamp_hi, out_shift);
+                        &clamp_lo_out, &clamp_hi_out, out_shift);
       addsub_shift_avx2(bf0[10], bf0[21], out + 10 * 4 + col,
-                        out + 21 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 21 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[11], bf0[20], out + 11 * 4 + col,
-                        out + 20 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 20 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[12], bf0[19], out + 12 * 4 + col,
-                        out + 19 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 19 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[13], bf0[18], out + 13 * 4 + col,
-                        out + 18 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 18 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[14], bf0[17], out + 14 * 4 + col,
-                        out + 17 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 17 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
       addsub_shift_avx2(bf0[15], bf0[16], out + 15 * 4 + col,
-                        out + 16 * 4 + col, &clamp_lo, &clamp_hi, out_shift);
+                        out + 16 * 4 + col, &clamp_lo_out, &clamp_hi_out,
+                        out_shift);
     }
   }
 }
@@ -654,5 +668,90 @@ void av1_inv_txfm2d_add_32x32_avx2(const int32_t *coeff, uint16_t *output,
       write_buffer_32x32(in, output, stride, 0, 0, -shift[1], bd);
       break;
     default: assert(0);
+  }
+}
+
+void av1_highbd_inv_txfm_add_32x32_avx2(const tran_low_t *input, uint8_t *dest,
+                                        int stride,
+                                        const TxfmParam *txfm_param) {
+  const int bd = txfm_param->bd;
+  const TX_TYPE tx_type = txfm_param->tx_type;
+  const int32_t *src = cast_to_int32(input);
+  switch (tx_type) {
+    case DCT_DCT:
+      av1_inv_txfm2d_add_32x32_avx2(src, CONVERT_TO_SHORTPTR(dest), stride,
+                                    tx_type, bd);
+      break;
+      // Assembly version doesn't support IDTX, so use C version for it.
+    case IDTX:
+      av1_inv_txfm2d_add_32x32_c(src, CONVERT_TO_SHORTPTR(dest), stride,
+                                 tx_type, bd);
+      break;
+
+    default: assert(0);
+  }
+}
+
+void av1_highbd_inv_txfm_add_avx2(const tran_low_t *input, uint8_t *dest,
+                                  int stride, const TxfmParam *txfm_param) {
+  assert(av1_ext_tx_used[txfm_param->tx_set_type][txfm_param->tx_type]);
+  const TX_SIZE tx_size = txfm_param->tx_size;
+  switch (tx_size) {
+    case TX_32X32:
+      av1_highbd_inv_txfm_add_32x32_avx2(input, dest, stride, txfm_param);
+      break;
+    case TX_16X16:
+      av1_highbd_inv_txfm_add_16x16_sse4_1(input, dest, stride, txfm_param);
+      break;
+    case TX_8X8:
+      av1_highbd_inv_txfm_add_8x8_sse4_1(input, dest, stride, txfm_param);
+      break;
+    case TX_4X8:
+      av1_highbd_inv_txfm_add_4x8(input, dest, stride, txfm_param);
+      break;
+    case TX_8X4:
+      av1_highbd_inv_txfm_add_8x4(input, dest, stride, txfm_param);
+      break;
+    case TX_8X16:
+      av1_highbd_inv_txfm_add_8x16(input, dest, stride, txfm_param);
+      break;
+    case TX_16X8:
+      av1_highbd_inv_txfm_add_16x8(input, dest, stride, txfm_param);
+      break;
+    case TX_16X32:
+      av1_highbd_inv_txfm_add_16x32(input, dest, stride, txfm_param);
+      break;
+    case TX_32X16:
+      av1_highbd_inv_txfm_add_32x16(input, dest, stride, txfm_param);
+      break;
+    case TX_32X64:
+      av1_highbd_inv_txfm_add_32x64(input, dest, stride, txfm_param);
+      break;
+    case TX_64X32:
+      av1_highbd_inv_txfm_add_64x32(input, dest, stride, txfm_param);
+      break;
+    case TX_4X4:
+      av1_highbd_inv_txfm_add_4x4_sse4_1(input, dest, stride, txfm_param);
+      break;
+    case TX_16X4:
+      av1_highbd_inv_txfm_add_16x4(input, dest, stride, txfm_param);
+      break;
+    case TX_4X16:
+      av1_highbd_inv_txfm_add_4x16(input, dest, stride, txfm_param);
+      break;
+    case TX_8X32:
+      av1_highbd_inv_txfm_add_8x32(input, dest, stride, txfm_param);
+      break;
+    case TX_32X8:
+      av1_highbd_inv_txfm_add_32x8(input, dest, stride, txfm_param);
+      break;
+    case TX_64X64:
+    case TX_16X64:
+    case TX_64X16:
+      av1_highbd_inv_txfm2d_add_universe_sse4_1(
+          input, dest, stride, txfm_param->tx_type, txfm_param->tx_size,
+          txfm_param->eob, txfm_param->bd);
+      break;
+    default: assert(0 && "Invalid transform size"); break;
   }
 }

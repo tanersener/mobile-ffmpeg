@@ -30,10 +30,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnutls 3.5.18\n"
+"Project-Id-Version: gnutls 3.5.19\n"
 "Report-Msgid-Bugs-To: bug-gnutls@gnu.org\n"
-"POT-Creation-Date: 2018-02-16 08:24+0100\n"
-"PO-Revision-Date: 2018-02-16 08:24+0100\n"
+"POT-Creation-Date: 2018-07-16 08:05+0200\n"
+"PO-Revision-Date: 2018-07-16 08:05+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@boldquot\n"

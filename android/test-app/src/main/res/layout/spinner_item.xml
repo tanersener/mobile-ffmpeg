@@ -1,0 +1,13 @@
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/text1"
+    android:layout_width="180dp"
+    android:layout_height="50dp"
+    android:gravity="center"
+    android:background="@drawable/rounded_spinner"
+    android:ellipsize="marquee"
+    android:singleLine="true"
+    android:fontFamily="sans-serif"
+    android:textColor="@android:color/black"
+    android:textAlignment="center"
+    android:textSize="20sp"/>

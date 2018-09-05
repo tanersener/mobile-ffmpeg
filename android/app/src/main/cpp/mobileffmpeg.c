@@ -17,15 +17,19 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <pthread.h>
+
+#include "fftools_ffmpeg.h"
+
 #include "mobileffmpeg.h"
 
-/** Forward declaration for function defined in ffmpeg.c */
+/** Forward declaration for function defined in fftools_ffmpeg.c */
 int execute(int argc, char **argv);
 
-/** Full name of the Java class that owns native functions in this file. */
+/** Full name of the FFmpeg class */
 const char *ffmpegClassName = "com/arthenica/mobileffmpeg/FFmpeg";
 
-/** Prototypes of native functions defined by this file. */
+/** Prototypes of native functions defined by FFmpeg class. */
 JNINativeMethod ffmpegMethods[] = {
   {"getFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion},
   {"getVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion},
@@ -42,18 +46,18 @@ JNINativeMethod ffmpegMethods[] = {
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     if ((*vm)->GetEnv(vm, (void**)(&env), JNI_VERSION_1_6) != JNI_OK) {
-        LOGE("OnLoad failed to GetEnv for class %s.", ffmpegClassName);
+        LOGE("OnLoad failed to GetEnv for class %s.\n", ffmpegClassName);
         return JNI_FALSE;
     }
 
     jclass ffmpegClass = (*env)->FindClass(env, ffmpegClassName);
     if (ffmpegClass == NULL) {
-        LOGE("OnLoad failed to FindClass %s.", ffmpegClassName);
+        LOGE("OnLoad failed to FindClass %s.\n", ffmpegClassName);
         return JNI_FALSE;
     }
 
     if ((*env)->RegisterNatives(env, ffmpegClass, ffmpegMethods, 3) < 0) {
-        LOGE("OnLoad failed to RegisterNatives for class %s.", ffmpegClassName);
+        LOGE("OnLoad failed to RegisterNatives for class %s.\n", ffmpegClassName);
         return JNI_FALSE;
     }
 
@@ -102,7 +106,7 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *en
         tempArray = (jstring *) malloc(sizeof(jstring) * programArgumentCount);
     }
 
-    /* PRESERVING USAGE FORMAT
+    /* PRESERVE USAGE FORMAT
      *
      * ffmpeg <arguments>
      */
@@ -114,7 +118,9 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *en
     if (stringArray != NULL) {
         for (int i = 0; i < (argumentCount - 1); i++) {
             tempArray[i] = (jstring) (*env)->GetObjectArrayElement(env, stringArray, i);
-            argv[i + 1] = (char *) (*env)->GetStringUTFChars(env, tempArray[i], 0);
+            if (tempArray[i] != NULL) {
+                argv[i + 1] = (char *) (*env)->GetStringUTFChars(env, tempArray[i], 0);
+            }
         }
     }
 
@@ -133,4 +139,14 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *en
     free(argv);
 
     return retCode;
+}
+
+/**
+ * Cancels an ongoing operation.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_cancel(JNIEnv *env, jclass object) {
+    cancel_operation();
 }

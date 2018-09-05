@@ -82,9 +82,9 @@ fi
     --without-idn \
     --without-libidn2 \
     --without-p11-kit \
-    --enable-openssl-compatibility \
     ${HARDWARE_ACCELERATION} \
     --enable-static \
+    --disable-openssl-compatibility \
     --disable-shared \
     --disable-fast-install \
     --disable-code-coverage \
@@ -95,9 +95,9 @@ fi
     --disable-maintainer-mode \
     --host=${TARGET_HOST} || exit 1
 
-make -j$(get_cpu_count) || exit 1
+make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_gnutls_package_config "3.5.18"
+create_gnutls_package_config "3.5.19"
 
 make install || exit 1

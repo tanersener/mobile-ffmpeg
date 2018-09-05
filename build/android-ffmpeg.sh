@@ -75,14 +75,19 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..35}
+for library in {1..38}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
 
-        echo -e "INFO: Enabling library ${ENABLED_LIBRARY}" >> ${BASEDIR}/build.log
+        echo -e "INFO: Enabling library ${ENABLED_LIBRARY}" 1>>${BASEDIR}/build.log 2>&1
 
         case $ENABLED_LIBRARY in
+            chromaprint)
+                CFLAGS+=" $(pkg-config --cflags libchromaprint)"
+                LDFLAGS+=" $(pkg-config --libs --static libchromaprint)"
+                CONFIGURE_POSTFIX+=" --enable-chromaprint"
+            ;;
             fontconfig)
                 CFLAGS+=" $(pkg-config --cflags fontconfig)"
                 LDFLAGS+=" $(pkg-config --libs --static fontconfig)"
@@ -142,6 +147,11 @@ do
                 CFLAGS+=" $(pkg-config --cflags theora)"
                 LDFLAGS+=" $(pkg-config --libs --static theora)"
                 CONFIGURE_POSTFIX+=" --enable-libtheora"
+            ;;
+            libvidstab)
+                CFLAGS+=" $(pkg-config --cflags vidstab)"
+                LDFLAGS+=" $(pkg-config --libs --static vidstab)"
+                CONFIGURE_POSTFIX+=" --enable-libvidstab --enable-gpl"
             ;;
             libvorbis)
                 CFLAGS+=" $(pkg-config --cflags vorbis)"
@@ -207,6 +217,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static x264)"
                 CONFIGURE_POSTFIX+=" --enable-libx264 --enable-gpl"
             ;;
+            x265)
+                CFLAGS+=" $(pkg-config --cflags x265)"
+                LDFLAGS+=" $(pkg-config --libs --static x265)"
+                CONFIGURE_POSTFIX+=" --enable-libx265 --enable-gpl"
+            ;;
             xvidcore)
                 CFLAGS+=" $(pkg-config --cflags xvidcore)"
                 LDFLAGS+=" $(pkg-config --libs --static xvidcore)"
@@ -246,7 +261,7 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 34 ]]; then
+        if [[ ${library} -eq 37 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
@@ -311,29 +326,50 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-vaapi \
     --disable-vdpau \
     --disable-videotoolbox \
-    ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+    ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"
     exit 1
 fi
 
-make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"
     exit 1
 fi
 
-make install 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+make install 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"
     exit 1
 fi
 
-# MANUALLY ADD CONFIG HEADER
+# MANUALLY ADD REQUIRED HEADERS
+mkdir -p ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil/x86
+mkdir -p ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil/arm
+mkdir -p ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil/aarch64
+mkdir -p ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavcodec/x86
+mkdir -p ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavcodec/arm
 cp -f ${BASEDIR}/src/ffmpeg/config.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include
+cp -f ${BASEDIR}/src/ffmpeg/libavcodec/mathops.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavcodec
+cp -f ${BASEDIR}/src/ffmpeg/libavcodec/x86/mathops.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavcodec/x86
+cp -f ${BASEDIR}/src/ffmpeg/libavcodec/arm/mathops.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavcodec/arm
+cp -f ${BASEDIR}/src/ffmpeg/libavformat/network.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavformat
+cp -f ${BASEDIR}/src/ffmpeg/libavformat/os_support.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavformat
+cp -f ${BASEDIR}/src/ffmpeg/libavformat/url.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavformat
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/internal.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/libm.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/reverse.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/thread.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/timer.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/asm.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil/x86
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/timer.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil/x86
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/arm/timer.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil/arm
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/aarch64/timer.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil/aarch64
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/emms.h ${BASEDIR}/prebuilt/android-$(get_target_build)/ffmpeg/include/libavutil/x86
 
 if [ $? -eq 0 ]; then
     echo "ok"

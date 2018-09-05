@@ -61,7 +61,6 @@ int aom_count_primitive_refsubexpfin(uint16_t n, uint16_t k, uint16_t ref,
                                      uint16_t v);
 int aom_count_signed_primitive_refsubexpfin(uint16_t n, uint16_t k, int16_t ref,
                                             int16_t v);
-void aom_wb_write_uvlc(struct aom_write_bit_buffer *wb, uint32_t v);
 #ifdef __cplusplus
 }  // extern "C"
 #endif

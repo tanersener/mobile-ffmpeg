@@ -8,7 +8,7 @@
 /* #undef HAVE_ARC4RANDOM */
 
 /* Define to 1 if you have the `arc4random_buf' function. */
-#define HAVE_ARC4RANDOM_BUF 1
+/* #undef HAVE_ARC4RANDOM_BUF */
 
 /* Define to 1 if you have the `bcopy' function. */
 #define HAVE_BCOPY 1
@@ -23,7 +23,7 @@
 #define HAVE_GETPAGESIZE 1
 
 /* Define to 1 if you have the `getrandom' function. */
-/* #undef HAVE_GETRANDOM */
+#define HAVE_GETRANDOM 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
@@ -38,7 +38,7 @@
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have a working `mmap' system call. */
-/* #undef HAVE_MMAP */
+#define HAVE_MMAP 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #define HAVE_STDINT_H 1
@@ -80,7 +80,7 @@
 #define PACKAGE_NAME "expat"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "expat 2.2.5"
+#define PACKAGE_STRING "expat 2.2.6"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "expat"
@@ -89,13 +89,13 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.2.5"
+#define PACKAGE_VERSION "2.2.6"
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
 /* Version number of package */
-#define VERSION "2.2.5"
+#define VERSION "2.2.6"
 
 /* whether byteorder is bigendian */
 /* #undef WORDS_BIGENDIAN */

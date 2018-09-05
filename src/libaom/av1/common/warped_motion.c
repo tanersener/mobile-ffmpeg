@@ -92,33 +92,6 @@ static const int error_measure_lut[512] = {
 };
 /* clang-format on */
 
-void project_points_affine(const int32_t *mat, int *points, int *proj,
-                           const int n, const int stride_points,
-                           const int stride_proj, const int subsampling_x,
-                           const int subsampling_y) {
-  for (int i = 0; i < n; ++i) {
-    const int x = *(points++), y = *(points++);
-    if (subsampling_x)
-      *(proj++) = ROUND_POWER_OF_TWO_SIGNED(
-          mat[2] * 2 * x + mat[3] * 2 * y + mat[0] +
-              (mat[2] + mat[3] - (1 << WARPEDMODEL_PREC_BITS)) / 2,
-          WARPEDDIFF_PREC_BITS + 1);
-    else
-      *(proj++) = ROUND_POWER_OF_TWO_SIGNED(mat[2] * x + mat[3] * y + mat[0],
-                                            WARPEDDIFF_PREC_BITS);
-    if (subsampling_y)
-      *(proj++) = ROUND_POWER_OF_TWO_SIGNED(
-          mat[4] * 2 * x + mat[5] * 2 * y + mat[1] +
-              (mat[4] + mat[5] - (1 << WARPEDMODEL_PREC_BITS)) / 2,
-          WARPEDDIFF_PREC_BITS + 1);
-    else
-      *(proj++) = ROUND_POWER_OF_TWO_SIGNED(mat[4] * x + mat[5] * y + mat[1],
-                                            WARPEDDIFF_PREC_BITS);
-    points += stride_points - 2;
-    proj += stride_proj - 2;
-  }
-}
-
 // For warping, we really use a 6-tap filter, but we do blocks of 8 pixels
 // at a time. The zoom/rotation/shear in the model are applied to the
 // "fractional" position of each pixel, which therefore varies within
@@ -589,7 +562,7 @@ static int64_t highbd_warp_error(
   const int error_bsize_h = AOMMIN(p_height, WARP_ERROR_BLOCK);
   uint16_t tmp[WARP_ERROR_BLOCK * WARP_ERROR_BLOCK];
 
-  ConvolveParams conv_params = get_conv_params(0, 0, 0, bd);
+  ConvolveParams conv_params = get_conv_params(0, 0, bd);
   conv_params.use_jnt_comp_avg = 0;
   for (int i = p_row; i < p_row + p_height; i += WARP_ERROR_BLOCK) {
     for (int j = p_col; j < p_col + p_width; j += WARP_ERROR_BLOCK) {
@@ -872,7 +845,7 @@ static int64_t warp_error(WarpedMotionParams *wm, const uint8_t *const ref,
   int error_bsize_w = AOMMIN(p_width, WARP_ERROR_BLOCK);
   int error_bsize_h = AOMMIN(p_height, WARP_ERROR_BLOCK);
   uint8_t tmp[WARP_ERROR_BLOCK * WARP_ERROR_BLOCK];
-  ConvolveParams conv_params = get_conv_params(0, 0, 0, 8);
+  ConvolveParams conv_params = get_conv_params(0, 0, 8);
   conv_params.use_jnt_comp_avg = 0;
 
   for (int i = p_row; i < p_row + p_height; i += WARP_ERROR_BLOCK) {

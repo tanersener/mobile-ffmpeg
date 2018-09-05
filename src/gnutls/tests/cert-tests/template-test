@@ -21,6 +21,7 @@
 #set -e
 
 srcdir="${srcdir:-.}"
+ac_cv_sizeof_unsigned_long_int="${ac_cv_sizeof_unsigned_long_int:-8}"
 CERTTOOL="${CERTTOOL:-../../src/certtool${EXEEXT}}"
 DIFF="${DIFF:-diff}"
 
@@ -121,7 +122,7 @@ fi
 rm -f tmp-tt.pem
 
 # The following test works in 64-bit systems
-if test "$(getconf LONG_BIT)" = "64"; then
+if test "${ac_cv_sizeof_unsigned_long_int}" = 8;then
 
 datefudge -s "2007-04-22" \
 	"${CERTTOOL}" --generate-self-signed \
@@ -179,7 +180,7 @@ rm -f tmp-tt.pem
 
 
 # Test the GeneralizedTime support
-if test "$(getconf LONG_BIT)" = "64"; then
+if test "${ac_cv_sizeof_unsigned_long_int}" = 8;then
 	# we should test that on systems which have 64-bit time_t.
 	datefudge -s "2051-04-22" \
 			"${CERTTOOL}" --generate-self-signed \

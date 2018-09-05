@@ -16,7 +16,9 @@
 #include "config/aom_config.h"
 
 #if HAVE_FEXCEPT
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <fenv.h>
 #endif
 

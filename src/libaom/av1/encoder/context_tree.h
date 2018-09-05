@@ -56,6 +56,8 @@ typedef struct {
   int hybrid_pred_diff;
   int comp_pred_diff;
   int single_pred_diff;
+  // Skip certain ref frames during RD search of rectangular partitions.
+  int skip_ref_frame_mask;
 
   // TODO(jingning) Use RD_COST struct here instead. This involves a boarder
   // scope of refactoring.

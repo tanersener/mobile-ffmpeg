@@ -1,7 +1,7 @@
-# mobile-ffmpeg 1.0 configure.ac
+# mobile-ffmpeg 2.1 configure.ac
 
-AC_INIT([mobile-ffmpeg], [1.0], [https://github.com/tanersener/mobile-ffmpeg/issues/new])
-AC_CONFIG_SRCDIR([src/mobileffmpeg.c])
+AC_INIT([mobile-ffmpeg], [2.1], [https://github.com/tanersener/mobile-ffmpeg/issues/new])
+AC_CONFIG_SRCDIR([src/MobileFFmpeg.m])
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign subdir-objects])
@@ -67,7 +67,7 @@ AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 
 # Checks for library functions.
-AC_CHECK_FUNCS([dup2 floor memmove memset select strchr strcspn strerror strrchr strstr strtol malloc])
+AC_CHECK_FUNCS([dup2 floor memmove memset select strchr strcspn strerror strrchr strstr strtol malloc strcpy strlen vsnprintf])
 
 AC_CONFIG_FILES([Makefile
                  src/Makefile])

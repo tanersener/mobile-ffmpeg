@@ -44,14 +44,15 @@ static int enc_worker_hook(EncWorkerData *const thread_data, void *unused) {
     av1_encode_tile(cpi, thread_data->td, tile_row, tile_col);
   }
 
-  return 0;
+  return 1;
 }
 
 void av1_encode_tiles_mt(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
   const int tile_cols = cm->tile_cols;
+  const int tile_rows = cm->tile_rows;
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
-  int num_workers = AOMMIN(cpi->oxcf.max_threads, tile_cols);
+  int num_workers = AOMMIN(cpi->oxcf.max_threads, tile_cols * tile_rows);
   int i;
 
   av1_init_tile_data(cpi);
@@ -96,6 +97,15 @@ void av1_encode_tiles_mt(AV1_COMP *cpi) {
             cm, thread_data->td->wsrc_buf,
             (int32_t *)aom_memalign(
                 16, MAX_SB_SQUARE * sizeof(*thread_data->td->wsrc_buf)));
+
+        for (int x = 0; x < 2; x++)
+          for (int y = 0; y < 2; y++)
+            CHECK_MEM_ERROR(
+                cm, thread_data->td->hash_value_buffer[x][y],
+                (uint32_t *)aom_malloc(
+                    AOM_BUFFER_SIZE_FOR_BLOCK_HASH *
+                    sizeof(*thread_data->td->hash_value_buffer[0][0])));
+
         CHECK_MEM_ERROR(
             cm, thread_data->td->mask_buf,
             (int32_t *)aom_memalign(
@@ -126,12 +136,11 @@ void av1_encode_tiles_mt(AV1_COMP *cpi) {
 
   for (i = 0; i < num_workers; i++) {
     AVxWorker *const worker = &cpi->workers[i];
-    EncWorkerData *thread_data;
+    EncWorkerData *const thread_data = &cpi->tile_thr_data[i];
 
     worker->hook = (AVxWorkerHook)enc_worker_hook;
-    worker->data1 = &cpi->tile_thr_data[i];
+    worker->data1 = thread_data;
     worker->data2 = NULL;
-    thread_data = (EncWorkerData *)worker->data1;
 
     // Before encoding a frame, copy the thread data from cpi.
     if (thread_data->td != &cpi->td) {
@@ -140,6 +149,15 @@ void av1_encode_tiles_mt(AV1_COMP *cpi) {
       thread_data->td->mb.above_pred_buf = thread_data->td->above_pred_buf;
       thread_data->td->mb.left_pred_buf = thread_data->td->left_pred_buf;
       thread_data->td->mb.wsrc_buf = thread_data->td->wsrc_buf;
+      for (int x = 0; x < 2; x++)
+        for (int y = 0; y < 2; y++) {
+          memcpy(thread_data->td->hash_value_buffer[x][y],
+                 cpi->td.mb.hash_value_buffer[x][y],
+                 AOM_BUFFER_SIZE_FOR_BLOCK_HASH *
+                     sizeof(*thread_data->td->hash_value_buffer[0][0]));
+          thread_data->td->mb.hash_value_buffer[x][y] =
+              thread_data->td->hash_value_buffer[x][y];
+        }
       thread_data->td->mb.mask_buf = thread_data->td->mask_buf;
     }
     if (thread_data->td->counts != &cpi->counts) {

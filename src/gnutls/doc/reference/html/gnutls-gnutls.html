@@ -8,7 +8,7 @@
 <link rel="up" href="intro.html" title="GnuTLS API Reference Manual">
 <link rel="prev" href="intro.html" title="GnuTLS API Reference Manual">
 <link rel="next" href="gnutls-abstract.html" title="abstract">
-<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.28 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -3051,8 +3051,6 @@
 </div>
 <div class="refsect1">
 <a name="gnutls-gnutls.description"></a><h2>Description</h2>
-<p>
-</p>
 </div>
 <div class="refsect1">
 <a name="gnutls-gnutls.functions_details"></a><h2>Functions</h2>
@@ -3233,8 +3231,6 @@ an error code is returned.</p>
 <a name="gnutls-alloc-function"></a><h3>gnutls_alloc_function ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span> *
 <span class="c_punctuation">(</span>*gnutls_alloc_function<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">size_t</span> Param1</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -3437,8 +3433,6 @@ callback should return <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS
 <pre class="programlisting"><span class="returnvalue">void</span>
 <span class="c_punctuation">(</span>*gnutls_audit_log_func<span class="c_punctuation">)</span> (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-session-t" title="gnutls_session_t"><span class="type">gnutls_session_t</span></a> Param1</code></em>,
                           <em class="parameter"><code>const <span class="type">char</span> *Param2</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -3500,8 +3494,6 @@ function documentation for entire semantics.</p>
 <pre class="programlisting"><span class="returnvalue">void</span> *
 <span class="c_punctuation">(</span>*gnutls_calloc_function<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">size_t</span> Param1</code></em>,
                            <em class="parameter"><code><span class="type">size_t</span> Param2</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -4055,6 +4047,11 @@ functions return an index usable by this function.</p>
 </colgroup>
 <tbody>
 <tr>
+<td class="parameter_name"><p>sc</p></td>
+<td class="parameter_description"><p>is a credentials structure.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
 <td class="parameter_name"><p>response_file</p></td>
 <td class="parameter_description"><p>a filename of the OCSP response</p></td>
 <td class="parameter_annotations"> </td>
@@ -4106,6 +4103,11 @@ using <code class="function">gnutls_certificate_set_ocsp_status_request_function
 <col width="200px" class="parameters_annotations">
 </colgroup>
 <tbody>
+<tr>
+<td class="parameter_name"><p>sc</p></td>
+<td class="parameter_description"><p>is a <span class="type">gnutls_certificate_credentials_t</span> type.</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
 <tr>
 <td class="parameter_name"><p>ocsp_func</p></td>
 <td class="parameter_description"><p>function pointer to OCSP status request callback.</p></td>
@@ -4161,8 +4163,6 @@ authentication.  The callback should return <a class="link" href="gnutls-gnutls.
 gnutls_certificate_set_pin_function (<em class="parameter"><code><span class="type">gnutls_certificate_credentials_t</span> Param1</code></em>,
                                      <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-pin-callback-t" title="gnutls_pin_callback_t ()"><span class="type">gnutls_pin_callback_t</span></a> fn</code></em>,
                                      <em class="parameter"><code><span class="type">void</span> *userdata</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -5183,6 +5183,21 @@ See <a class="link" href="gnutls-gnutls.html#GNUTLS-VERSION:CAPS" title="GNUTLS_
 <p>See also <code class="function">gnutls_check_version_numeric()</code>, which provides this
 functionality as a macro.</p>
 <div class="refsect3">
+<a name="gnutls-check-version.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>req_version</p></td>
+<td class="parameter_description"><p>version string to compare with, or <code class="literal">NULL</code>.</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
 <a name="gnutls-check-version.returns"></a><h4>Returns</h4>
 <p> Check that the version of the library is at
 minimum the one given as a string in <em class="parameter"><code>req_version</code></em>
@@ -5226,6 +5241,21 @@ type.</p>
 gnutls_cipher_get_name ();</pre>
 <p>Convert a <a class="link" href="gnutls-gnutls.html#gnutls-cipher-algorithm-t" title="enum gnutls_cipher_algorithm_t"><span class="type">gnutls_cipher_algorithm_t</span></a> type to a string.</p>
 <div class="refsect3">
+<a name="gnutls-cipher-get-name.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>algorithm</p></td>
+<td class="parameter_description"><p>is an encryption algorithm</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
 <a name="gnutls-cipher-get-name.returns"></a><h4>Returns</h4>
 <p> a pointer to a string that contains the name of the
 specified cipher, or <code class="literal">NULL</code>.</p>
@@ -5256,6 +5286,11 @@ SSL depending of the protocol in use.</p>
 <tr>
 <td class="parameter_name"><p>cipher_algorithm</p></td>
 <td class="parameter_description"><p>is a cipher algorithm</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>mac_algorithm</p></td>
+<td class="parameter_description"><p>is a MAC algorithm</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -5422,8 +5457,6 @@ delete functions, as the first argument.</p>
 <pre class="programlisting"><span class="returnvalue">int</span>
 <span class="c_punctuation">(</span>*gnutls_db_remove_func<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">void</span> *Param1</code></em>,
                           <em class="parameter"><code><span class="type">gnutls_datum_t</span> key</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -5458,8 +5491,6 @@ sessions.</p>
 <pre class="programlisting"><span class="returnvalue">gnutls_datum_t</span>
 <span class="c_punctuation">(</span>*gnutls_db_retr_func<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">void</span> *Param1</code></em>,
                         <em class="parameter"><code><span class="type">gnutls_datum_t</span> key</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -5636,8 +5667,6 @@ sessions database. This function must return 0 on success.</p>
 <span class="c_punctuation">(</span>*gnutls_db_store_func<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">void</span> *Param1</code></em>,
                          <em class="parameter"><code><span class="type">gnutls_datum_t</span> key</code></em>,
                          <em class="parameter"><code><span class="type">gnutls_datum_t</span> data</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -6075,11 +6104,18 @@ See the "Parameter generation" section in the manual.</p>
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
+<td class="parameter_name"><p>dparams</p></td>
+<td class="parameter_description"><p>The parameters</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
 <td class="parameter_name"><p>bits</p></td>
 <td class="parameter_description"><p>is the prime's number of bits</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -6250,8 +6286,6 @@ or the set value may be overridden by the selected priority options.</p>
 <a name="gnutls-errno-func"></a><h3>gnutls_errno_func ()</h3>
 <pre class="programlisting"><span class="returnvalue">int</span>
 <span class="c_punctuation">(</span>*gnutls_errno_func<span class="c_punctuation">)</span> (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-transport-ptr-t" title="gnutls_transport_ptr_t"><span class="type">gnutls_transport_ptr_t</span></a> Param1</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -6267,6 +6301,21 @@ a rehandshake request) may be fatal for your program.</p>
 <p>This function is only useful if you are dealing with errors from
 functions that relate to a TLS session (e.g., record layer or handshake 
 layer handling functions).</p>
+<div class="refsect3">
+<a name="gnutls-error-is-fatal.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>is a GnuTLS error code, a negative error code</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
 <div class="refsect3">
 <a name="gnutls-error-is-fatal.returns"></a><h4>Returns</h4>
 <p> Non-zero value on fatal errors or zero on non-fatal.</p>
@@ -6331,8 +6380,6 @@ an error code is returned.</p>
 <a name="gnutls-free-function"></a><h3>gnutls_free_function ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 <span class="c_punctuation">(</span>*gnutls_free_function<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">void</span> *Param1</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -7253,8 +7300,6 @@ flag.</p>
 <a name="gnutls-is-secure-function"></a><h3>gnutls_is_secure_function ()</h3>
 <pre class="programlisting"><span class="returnvalue">int</span>
 <span class="c_punctuation">(</span>*gnutls_is_secure_function<span class="c_punctuation">)</span> (<em class="parameter"><code>const <span class="type">void</span> *Param1</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -7365,8 +7410,6 @@ an error code is returned.</p>
 <pre class="programlisting"><span class="returnvalue">void</span>
 <span class="c_punctuation">(</span>*gnutls_log_func<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">int</span> Param1</code></em>,
                     <em class="parameter"><code>const <span class="type">char</span> *Param2</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -7440,6 +7483,11 @@ parameters set to <code class="literal">NULL</code>.</p>
 <td class="parameter_name"><p>responder_id_size</p></td>
 <td class="parameter_description"><p>number of members in <em class="parameter"><code>responder_id</code></em>
 array</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>extensions</p></td>
+<td class="parameter_description"><p>a <span class="type">gnutls_datum_t</span> with DER encoded OCSP extensions</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -8158,8 +8206,6 @@ gnutls_priority_get_cipher_suite_index
                                (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-priority-t" title="gnutls_priority_t"><span class="type">gnutls_priority_t</span></a> pcache</code></em>,
                                 <em class="parameter"><code>unsigned <span class="type">int</span> idx</code></em>,
                                 <em class="parameter"><code>unsigned <span class="type">int</span> *sidx</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -8426,6 +8472,21 @@ structure.</p>
 <pre class="programlisting">const <span class="returnvalue">char</span> *
 gnutls_protocol_get_name ();</pre>
 <p>Convert a <a class="link" href="gnutls-gnutls.html#gnutls-protocol-t" title="enum gnutls_protocol_t"><span class="type">gnutls_protocol_t</span></a> value to a string.</p>
+<div class="refsect3">
+<a name="gnutls-protocol-get-name.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>version</p></td>
+<td class="parameter_description"><p>is a (gnutls) version number</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
 <div class="refsect3">
 <a name="gnutls-protocol-get-name.returns"></a><h4>Returns</h4>
 <p> a string that contains the name of the specified TLS
@@ -8910,8 +8971,6 @@ should return <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" ti
 <span class="c_punctuation">(</span>*gnutls_pull_func<span class="c_punctuation">)</span> (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-transport-ptr-t" title="gnutls_transport_ptr_t"><span class="type">gnutls_transport_ptr_t</span></a> Param1</code></em>,
                      <em class="parameter"><code><span class="type">void</span> *Param2</code></em>,
                      <em class="parameter"><code><span class="type">size_t</span> Param3</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -8919,8 +8978,6 @@ should return <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" ti
 <pre class="programlisting"><span class="returnvalue">int</span>
 <span class="c_punctuation">(</span>*gnutls_pull_timeout_func<span class="c_punctuation">)</span> (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-transport-ptr-t" title="gnutls_transport_ptr_t"><span class="type">gnutls_transport_ptr_t</span></a> Param1</code></em>,
                              <em class="parameter"><code>unsigned <span class="type">int</span> ms</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -8929,8 +8986,6 @@ should return <a class="link" href="gnutls-gnutls.html#GNUTLS-E-SUCCESS:CAPS" ti
 <span class="c_punctuation">(</span>*gnutls_push_func<span class="c_punctuation">)</span> (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-transport-ptr-t" title="gnutls_transport_ptr_t"><span class="type">gnutls_transport_ptr_t</span></a> Param1</code></em>,
                      <em class="parameter"><code>const <span class="type">void</span> *Param2</code></em>,
                      <em class="parameter"><code><span class="type">size_t</span> Param3</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -8999,8 +9054,6 @@ an error code is returned.</p>
 <pre class="programlisting"><span class="returnvalue">void</span> *
 <span class="c_punctuation">(</span>*gnutls_realloc_function<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">void</span> *Param1</code></em>,
                             <em class="parameter"><code><span class="type">size_t</span> Param2</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -9446,6 +9499,28 @@ is which size of "bits" the modulus will be in RSA and the group size
 in DSA. The easy answer is 1024, which is also wrong. This function
 will convert a human understandable security parameter to an
 appropriate size for the specific algorithm.</p>
+<div class="refsect3">
+<a name="gnutls-sec-param-to-pk-bits.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>algo</p></td>
+<td class="parameter_description"><p>is a public key algorithm</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>param</p></td>
+<td class="parameter_description"><p>is a security parameter</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
 <div class="refsect3">
 <a name="gnutls-sec-param-to-pk-bits.returns"></a><h4>Returns</h4>
 <p> The number of bits, or (0).</p>
@@ -10816,13 +10891,13 @@ be <code class="literal">NULL</code>.</p>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
-<td class="parameter_name"><p>client_salt</p></td>
-<td class="parameter_description"><p>The master client write salt, pointing inside the key material</p></td>
+<td class="parameter_name"><p>server_key</p></td>
+<td class="parameter_description"><p>The master server write key, pointing inside the key material</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
-<td class="parameter_name"><p>server_key</p></td>
-<td class="parameter_description"><p>The master server write key, pointing inside the key material</p></td>
+<td class="parameter_name"><p>client_salt</p></td>
+<td class="parameter_description"><p>The master client write salt, pointing inside the key material</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -11273,6 +11348,21 @@ accepts an error number returned by a gnutls function; In case of
 an unknown error a descriptive string is sent instead of <code class="literal">NULL</code>.</p>
 <p>Error codes are always a negative error code.</p>
 <div class="refsect3">
+<a name="gnutls-strerror.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>error</p></td>
+<td class="parameter_description"><p>is a GnuTLS error code, a negative error code</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
 <a name="gnutls-strerror.returns"></a><h4>Returns</h4>
 <p> A string explaining the GnuTLS error message.</p>
 </div>
@@ -11332,8 +11422,6 @@ negative error value.</p>
 <pre class="programlisting"><span class="returnvalue">void</span>
 gnutls_tdb_set_store_commitment_func (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-tdb-t" title="gnutls_tdb_t"><span class="type">gnutls_tdb_t</span></a> tdb</code></em>,
                                       <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-tdb-store-commitment-func" title="gnutls_tdb_store_commitment_func ()"><span class="type">gnutls_tdb_store_commitment_func</span></a> cstore</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -11341,8 +11429,6 @@ gnutls_tdb_set_store_commitment_func (<em class="parameter"><code><a class="link
 <pre class="programlisting"><span class="returnvalue">void</span>
 gnutls_tdb_set_store_func (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-tdb-t" title="gnutls_tdb_t"><span class="type">gnutls_tdb_t</span></a> tdb</code></em>,
                            <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-tdb-store-func" title="gnutls_tdb_store_func ()"><span class="type">gnutls_tdb_store_func</span></a> store</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -11350,8 +11436,6 @@ gnutls_tdb_set_store_func (<em class="parameter"><code><a class="link" href="gnu
 <pre class="programlisting"><span class="returnvalue">void</span>
 gnutls_tdb_set_verify_func (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-tdb-t" title="gnutls_tdb_t"><span class="type">gnutls_tdb_t</span></a> tdb</code></em>,
                             <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-tdb-verify-func" title="gnutls_tdb_verify_func ()"><span class="type">gnutls_tdb_verify_func</span></a> verify</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -11363,8 +11447,6 @@ gnutls_tdb_set_verify_func (<em class="parameter"><code><a class="link" href="gn
                                      <em class="parameter"><code><span class="type">time_t</span> expiration</code></em>,
                                      <em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-digest-algorithm-t" title="enum gnutls_digest_algorithm_t"><span class="type">gnutls_digest_algorithm_t</span></a> hash_algo</code></em>,
                                      <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *hash</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -11375,8 +11457,6 @@ gnutls_tdb_set_verify_func (<em class="parameter"><code><a class="link" href="gn
                           <em class="parameter"><code>const <span class="type">char</span> *service</code></em>,
                           <em class="parameter"><code><span class="type">time_t</span> expiration</code></em>,
                           <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *pubkey</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -11386,8 +11466,6 @@ gnutls_tdb_set_verify_func (<em class="parameter"><code><a class="link" href="gn
                            <em class="parameter"><code>const <span class="type">char</span> *host</code></em>,
                            <em class="parameter"><code>const <span class="type">char</span> *service</code></em>,
                            <em class="parameter"><code>const <span class="type">gnutls_datum_t</span> *pubkey</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -11836,8 +11914,6 @@ it is not known.</p>
 <span class="c_punctuation">(</span>*gnutls_vec_push_func<span class="c_punctuation">)</span> (<em class="parameter"><code><a class="link" href="gnutls-gnutls.html#gnutls-transport-ptr-t" title="gnutls_transport_ptr_t"><span class="type">gnutls_transport_ptr_t</span></a> Param1</code></em>,
                          <em class="parameter"><code>const <span class="type">giovec_t</span> *iov</code></em>,
                          <em class="parameter"><code><span class="type">int</span> iovcnt</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -11927,32 +12003,24 @@ or a negative error value on other errors.</p>
 <a name="mutex-deinit-func"></a><h3>mutex_deinit_func ()</h3>
 <pre class="programlisting"><span class="returnvalue">int</span>
 <span class="c_punctuation">(</span>*mutex_deinit_func<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">void</span> **mutex</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="mutex-init-func"></a><h3>mutex_init_func ()</h3>
 <pre class="programlisting"><span class="returnvalue">int</span>
 <span class="c_punctuation">(</span>*mutex_init_func<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">void</span> **mutex</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="mutex-lock-func"></a><h3>mutex_lock_func ()</h3>
 <pre class="programlisting"><span class="returnvalue">int</span>
 <span class="c_punctuation">(</span>*mutex_lock_func<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">void</span> **mutex</code></em>);</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="mutex-unlock-func"></a><h3>mutex_unlock_func ()</h3>
 <pre class="programlisting"><span class="returnvalue">int</span>
 <span class="c_punctuation">(</span>*mutex_unlock_func<span class="c_punctuation">)</span> (<em class="parameter"><code><span class="type">void</span> **mutex</code></em>);</pre>
-<p>
-</p>
 </div>
 </div>
 <div class="refsect1">
@@ -11961,1559 +12029,1169 @@ or a negative error value on other errors.</p>
 <a name="GNUTLS-CIPHER-ARCFOUR:CAPS"></a><h3>GNUTLS_CIPHER_ARCFOUR</h3>
 <pre class="programlisting">#define GNUTLS_CIPHER_ARCFOUR GNUTLS_CIPHER_ARCFOUR_128
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-CIPHER-RIJNDAEL-128-CBC:CAPS"></a><h3>GNUTLS_CIPHER_RIJNDAEL_128_CBC</h3>
 <pre class="programlisting">#define GNUTLS_CIPHER_RIJNDAEL_128_CBC GNUTLS_CIPHER_AES_128_CBC
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-CIPHER-RIJNDAEL-256-CBC:CAPS"></a><h3>GNUTLS_CIPHER_RIJNDAEL_256_CBC</h3>
 <pre class="programlisting">#define GNUTLS_CIPHER_RIJNDAEL_256_CBC GNUTLS_CIPHER_AES_256_CBC
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-CIPHER-RIJNDAEL-CBC:CAPS"></a><h3>GNUTLS_CIPHER_RIJNDAEL_CBC</h3>
 <pre class="programlisting">#define GNUTLS_CIPHER_RIJNDAEL_CBC GNUTLS_CIPHER_AES_128_CBC
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-CLIENT:CAPS"></a><h3>GNUTLS_CLIENT</h3>
 <pre class="programlisting">#define GNUTLS_CLIENT (1&lt;&lt;1)
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-DATAGRAM:CAPS"></a><h3>GNUTLS_DATAGRAM</h3>
 <pre class="programlisting">#define GNUTLS_DATAGRAM (1&lt;&lt;2)
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-DEFAULT-HANDSHAKE-TIMEOUT:CAPS"></a><h3>GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT</h3>
 <pre class="programlisting">#define GNUTLS_DEFAULT_HANDSHAKE_TIMEOUT ((unsigned int)-1)
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-DIG-SHA:CAPS"></a><h3>GNUTLS_DIG_SHA</h3>
 <pre class="programlisting">#define GNUTLS_DIG_SHA GNUTLS_DIG_SHA1
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-AGAIN:CAPS"></a><h3>GNUTLS_E_AGAIN</h3>
 <pre class="programlisting">#define GNUTLS_E_AGAIN -28
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-APPLICATION-ERROR-MAX:CAPS"></a><h3>GNUTLS_E_APPLICATION_ERROR_MAX</h3>
 <pre class="programlisting">#define GNUTLS_E_APPLICATION_ERROR_MAX -65000
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-APPLICATION-ERROR-MIN:CAPS"></a><h3>GNUTLS_E_APPLICATION_ERROR_MIN</h3>
 <pre class="programlisting">#define GNUTLS_E_APPLICATION_ERROR_MIN -65500
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-DER-ERROR:CAPS"></a><h3>GNUTLS_E_ASN1_DER_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_DER_ERROR -69
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-DER-OVERFLOW:CAPS"></a><h3>GNUTLS_E_ASN1_DER_OVERFLOW</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_DER_OVERFLOW -77
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-ELEMENT-NOT-FOUND:CAPS"></a><h3>GNUTLS_E_ASN1_ELEMENT_NOT_FOUND</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_ELEMENT_NOT_FOUND -67
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-GENERIC-ERROR:CAPS"></a><h3>GNUTLS_E_ASN1_GENERIC_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_GENERIC_ERROR -71
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-IDENTIFIER-NOT-FOUND:CAPS"></a><h3>GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_IDENTIFIER_NOT_FOUND -68
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-SYNTAX-ERROR:CAPS"></a><h3>GNUTLS_E_ASN1_SYNTAX_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_SYNTAX_ERROR -76
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-TAG-ERROR:CAPS"></a><h3>GNUTLS_E_ASN1_TAG_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_TAG_ERROR -73
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-TAG-IMPLICIT:CAPS"></a><h3>GNUTLS_E_ASN1_TAG_IMPLICIT</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_TAG_IMPLICIT -74
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-TYPE-ANY-ERROR:CAPS"></a><h3>GNUTLS_E_ASN1_TYPE_ANY_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_TYPE_ANY_ERROR -75
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-VALUE-NOT-FOUND:CAPS"></a><h3>GNUTLS_E_ASN1_VALUE_NOT_FOUND</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_VALUE_NOT_FOUND -70
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ASN1-VALUE-NOT-VALID:CAPS"></a><h3>GNUTLS_E_ASN1_VALUE_NOT_VALID</h3>
 <pre class="programlisting">#define GNUTLS_E_ASN1_VALUE_NOT_VALID -72
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-BAD-COOKIE:CAPS"></a><h3>GNUTLS_E_BAD_COOKIE</h3>
 <pre class="programlisting">#define GNUTLS_E_BAD_COOKIE -214
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-BASE64-DECODING-ERROR:CAPS"></a><h3>GNUTLS_E_BASE64_DECODING_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_BASE64_DECODING_ERROR -34
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-BASE64-ENCODING-ERROR:CAPS"></a><h3>GNUTLS_E_BASE64_ENCODING_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_BASE64_ENCODING_ERROR -201
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-BASE64-UNEXPECTED-HEADER-ERROR:CAPS"></a><h3>GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_BASE64_UNEXPECTED_HEADER_ERROR -207
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-CERTIFICATE-ERROR:CAPS"></a><h3>GNUTLS_E_CERTIFICATE_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_CERTIFICATE_ERROR -43
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-CERTIFICATE-KEY-MISMATCH:CAPS"></a><h3>GNUTLS_E_CERTIFICATE_KEY_MISMATCH</h3>
 <pre class="programlisting">#define GNUTLS_E_CERTIFICATE_KEY_MISMATCH -60
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-CERTIFICATE-LIST-UNSORTED:CAPS"></a><h3>GNUTLS_E_CERTIFICATE_LIST_UNSORTED</h3>
 <pre class="programlisting">#define GNUTLS_E_CERTIFICATE_LIST_UNSORTED -324
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-CHANNEL-BINDING-NOT-AVAILABLE:CAPS"></a><h3>GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE</h3>
 <pre class="programlisting">#define GNUTLS_E_CHANNEL_BINDING_NOT_AVAILABLE -213
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-COMPRESSION-FAILED:CAPS"></a><h3>GNUTLS_E_COMPRESSION_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_COMPRESSION_FAILED -27
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-CONSTRAINT-ERROR:CAPS"></a><h3>GNUTLS_E_CONSTRAINT_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_CONSTRAINT_ERROR -101
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-CRYPTODEV-DEVICE-ERROR:CAPS"></a><h3>GNUTLS_E_CRYPTODEV_DEVICE_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_CRYPTODEV_DEVICE_ERROR -212
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-CRYPTODEV-IOCTL-ERROR:CAPS"></a><h3>GNUTLS_E_CRYPTODEV_IOCTL_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_CRYPTODEV_IOCTL_ERROR -211
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-CRYPTO-ALREADY-REGISTERED:CAPS"></a><h3>GNUTLS_E_CRYPTO_ALREADY_REGISTERED</h3>
 <pre class="programlisting">#define GNUTLS_E_CRYPTO_ALREADY_REGISTERED GNUTLS_E_ALREADY_REGISTERED
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-CRYPTO-INIT-FAILED:CAPS"></a><h3>GNUTLS_E_CRYPTO_INIT_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_CRYPTO_INIT_FAILED -318
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-DB-ERROR:CAPS"></a><h3>GNUTLS_E_DB_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_DB_ERROR -30
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-DECOMPRESSION-FAILED:CAPS"></a><h3>GNUTLS_E_DECOMPRESSION_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_DECOMPRESSION_FAILED -26 /* GNUTLS_A_DECOMPRESSION_FAILURE */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-DECRYPTION-FAILED:CAPS"></a><h3>GNUTLS_E_DECRYPTION_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_DECRYPTION_FAILED -24 /* GNUTLS_A_DECRYPTION_FAILED, GNUTLS_A_BAD_RECORD_MAC */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-DH-PRIME-UNACCEPTABLE:CAPS"></a><h3>GNUTLS_E_DH_PRIME_UNACCEPTABLE</h3>
 <pre class="programlisting">#define GNUTLS_E_DH_PRIME_UNACCEPTABLE -63
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ECC-NO-SUPPORTED-CURVES:CAPS"></a><h3>GNUTLS_E_ECC_NO_SUPPORTED_CURVES</h3>
 <pre class="programlisting">#define GNUTLS_E_ECC_NO_SUPPORTED_CURVES -321
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ECC-UNSUPPORTED-CURVE:CAPS"></a><h3>GNUTLS_E_ECC_UNSUPPORTED_CURVE</h3>
 <pre class="programlisting">#define GNUTLS_E_ECC_UNSUPPORTED_CURVE -322
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ENCRYPTION-FAILED:CAPS"></a><h3>GNUTLS_E_ENCRYPTION_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_ENCRYPTION_FAILED -40
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ERROR-IN-FINISHED-PACKET:CAPS"></a><h3>GNUTLS_E_ERROR_IN_FINISHED_PACKET</h3>
 <pre class="programlisting">#define GNUTLS_E_ERROR_IN_FINISHED_PACKET -18
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-EXPIRED:CAPS"></a><h3>GNUTLS_E_EXPIRED</h3>
 <pre class="programlisting">#define GNUTLS_E_EXPIRED -29
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-FATAL-ALERT-RECEIVED:CAPS"></a><h3>GNUTLS_E_FATAL_ALERT_RECEIVED</h3>
 <pre class="programlisting">#define GNUTLS_E_FATAL_ALERT_RECEIVED -12
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-FILE-ERROR:CAPS"></a><h3>GNUTLS_E_FILE_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_FILE_ERROR -64
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-GOT-APPLICATION-DATA:CAPS"></a><h3>GNUTLS_E_GOT_APPLICATION_DATA</h3>
 <pre class="programlisting">#define GNUTLS_E_GOT_APPLICATION_DATA -38
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-HANDSHAKE-TOO-LARGE:CAPS"></a><h3>GNUTLS_E_HANDSHAKE_TOO_LARGE</h3>
 <pre class="programlisting">#define GNUTLS_E_HANDSHAKE_TOO_LARGE -210
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-HASH-FAILED:CAPS"></a><h3>GNUTLS_E_HASH_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_HASH_FAILED -33
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-HEARTBEAT-PING-RECEIVED:CAPS"></a><h3>GNUTLS_E_HEARTBEAT_PING_RECEIVED</h3>
 <pre class="programlisting">#define GNUTLS_E_HEARTBEAT_PING_RECEIVED -293
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-HEARTBEAT-PONG-RECEIVED:CAPS"></a><h3>GNUTLS_E_HEARTBEAT_PONG_RECEIVED</h3>
 <pre class="programlisting">#define GNUTLS_E_HEARTBEAT_PONG_RECEIVED -292
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-IA-VERIFY-FAILED:CAPS"></a><h3>GNUTLS_E_IA_VERIFY_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_IA_VERIFY_FAILED -104
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ILLEGAL-PARAMETER:CAPS"></a><h3>GNUTLS_E_ILLEGAL_PARAMETER</h3>
 <pre class="programlisting">#define GNUTLS_E_ILLEGAL_PARAMETER -325
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-ILLEGAL-SRP-USERNAME:CAPS"></a><h3>GNUTLS_E_ILLEGAL_SRP_USERNAME</h3>
 <pre class="programlisting">#define GNUTLS_E_ILLEGAL_SRP_USERNAME -90
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INCOMPATIBLE-CRYPTO-LIBRARY:CAPS"></a><h3>GNUTLS_E_INCOMPATIBLE_CRYPTO_LIBRARY</h3>
 <pre class="programlisting">#define GNUTLS_E_INCOMPATIBLE_CRYPTO_LIBRARY -202
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INCOMPATIBLE-GCRYPT-LIBRARY:CAPS"></a><h3>GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY</h3>
 <pre class="programlisting">#define GNUTLS_E_INCOMPATIBLE_GCRYPT_LIBRARY -202 /* obsolete */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INCOMPATIBLE-LIBTASN1-LIBRARY:CAPS"></a><h3>GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY</h3>
 <pre class="programlisting">#define GNUTLS_E_INCOMPATIBLE_LIBTASN1_LIBRARY -203
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INCOMPAT-DSA-KEY-WITH-TLS-PROTOCOL:CAPS"></a><h3>GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL</h3>
 <pre class="programlisting">#define GNUTLS_E_INCOMPAT_DSA_KEY_WITH_TLS_PROTOCOL -216
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INSUFFICIENT-CRED:CAPS"></a><h3>GNUTLS_E_INSUFFICIENT_CRED</h3>
 <pre class="programlisting">#define GNUTLS_E_INSUFFICIENT_CRED GNUTLS_E_INSUFFICIENT_CREDENTIALS
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INSUFFICIENT-CREDENTIALS:CAPS"></a><h3>GNUTLS_E_INSUFFICIENT_CREDENTIALS</h3>
 <pre class="programlisting">#define GNUTLS_E_INSUFFICIENT_CREDENTIALS -32
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INSUFICIENT-CRED:CAPS"></a><h3>GNUTLS_E_INSUFICIENT_CRED</h3>
 <pre class="programlisting">#define GNUTLS_E_INSUFICIENT_CRED GNUTLS_E_INSUFFICIENT_CREDENTIALS /* for backwards compatibility only */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INSUFICIENT-CREDENTIALS:CAPS"></a><h3>GNUTLS_E_INSUFICIENT_CREDENTIALS</h3>
 <pre class="programlisting">#define GNUTLS_E_INSUFICIENT_CREDENTIALS GNUTLS_E_INSUFFICIENT_CREDENTIALS /* for backwards compatibility only */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INTERNAL-ERROR:CAPS"></a><h3>GNUTLS_E_INTERNAL_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_INTERNAL_ERROR -59
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INTERRUPTED:CAPS"></a><h3>GNUTLS_E_INTERRUPTED</h3>
 <pre class="programlisting">#define GNUTLS_E_INTERRUPTED -52
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INVALID-PASSWORD:CAPS"></a><h3>GNUTLS_E_INVALID_PASSWORD</h3>
 <pre class="programlisting">#define GNUTLS_E_INVALID_PASSWORD -99
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INVALID-REQUEST:CAPS"></a><h3>GNUTLS_E_INVALID_REQUEST</h3>
 <pre class="programlisting">#define GNUTLS_E_INVALID_REQUEST -50
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-INVALID-SESSION:CAPS"></a><h3>GNUTLS_E_INVALID_SESSION</h3>
 <pre class="programlisting">#define GNUTLS_E_INVALID_SESSION -10
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-KEY-USAGE-VIOLATION:CAPS"></a><h3>GNUTLS_E_KEY_USAGE_VIOLATION</h3>
 <pre class="programlisting">#define GNUTLS_E_KEY_USAGE_VIOLATION -48
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-LARGE-PACKET:CAPS"></a><h3>GNUTLS_E_LARGE_PACKET</h3>
 <pre class="programlisting">#define GNUTLS_E_LARGE_PACKET -7
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-LOCKING-ERROR:CAPS"></a><h3>GNUTLS_E_LOCKING_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_LOCKING_ERROR -306
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-MAC-VERIFY-FAILED:CAPS"></a><h3>GNUTLS_E_MAC_VERIFY_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_MAC_VERIFY_FAILED -100 /* for PKCS #12 MAC */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-MEMORY-ERROR:CAPS"></a><h3>GNUTLS_E_MEMORY_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_MEMORY_ERROR -25
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-MPI-PRINT-FAILED:CAPS"></a><h3>GNUTLS_E_MPI_PRINT_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_MPI_PRINT_FAILED -35
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-MPI-SCAN-FAILED:CAPS"></a><h3>GNUTLS_E_MPI_SCAN_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_MPI_SCAN_FAILED -23
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-NO-CERTIFICATE-FOUND:CAPS"></a><h3>GNUTLS_E_NO_CERTIFICATE_FOUND</h3>
 <pre class="programlisting">#define GNUTLS_E_NO_CERTIFICATE_FOUND -49 /* GNUTLS_A_BAD_CERTIFICATE */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-NO-CERTIFICATE-STATUS:CAPS"></a><h3>GNUTLS_E_NO_CERTIFICATE_STATUS</h3>
 <pre class="programlisting">#define GNUTLS_E_NO_CERTIFICATE_STATUS -340
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-NO-CIPHER-SUITES:CAPS"></a><h3>GNUTLS_E_NO_CIPHER_SUITES</h3>
 <pre class="programlisting">#define GNUTLS_E_NO_CIPHER_SUITES -87
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-NO-COMPRESSION-ALGORITHMS:CAPS"></a><h3>GNUTLS_E_NO_COMPRESSION_ALGORITHMS</h3>
 <pre class="programlisting">#define GNUTLS_E_NO_COMPRESSION_ALGORITHMS -86
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-NO-PRIORITIES-WERE-SET:CAPS"></a><h3>GNUTLS_E_NO_PRIORITIES_WERE_SET</h3>
 <pre class="programlisting">#define GNUTLS_E_NO_PRIORITIES_WERE_SET -326
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-NO-TEMPORARY-DH-PARAMS:CAPS"></a><h3>GNUTLS_E_NO_TEMPORARY_DH_PARAMS</h3>
 <pre class="programlisting">#define GNUTLS_E_NO_TEMPORARY_DH_PARAMS -93
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-NO-TEMPORARY-RSA-PARAMS:CAPS"></a><h3>GNUTLS_E_NO_TEMPORARY_RSA_PARAMS</h3>
 <pre class="programlisting">#define GNUTLS_E_NO_TEMPORARY_RSA_PARAMS -84
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-OCSP-RESPONSE-ERROR:CAPS"></a><h3>GNUTLS_E_OCSP_RESPONSE_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_OCSP_RESPONSE_ERROR -341
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-OPENPGP-FINGERPRINT-UNSUPPORTED:CAPS"></a><h3>GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED</h3>
 <pre class="programlisting">#define GNUTLS_E_OPENPGP_FINGERPRINT_UNSUPPORTED -94
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-OPENPGP-GETKEY-FAILED:CAPS"></a><h3>GNUTLS_E_OPENPGP_GETKEY_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_OPENPGP_GETKEY_FAILED -88
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-OPENPGP-KEYRING-ERROR:CAPS"></a><h3>GNUTLS_E_OPENPGP_KEYRING_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_OPENPGP_KEYRING_ERROR -204
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-OPENPGP-PREFERRED-KEY-ERROR:CAPS"></a><h3>GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_OPENPGP_PREFERRED_KEY_ERROR -215
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-OPENPGP-SUBKEY-ERROR:CAPS"></a><h3>GNUTLS_E_OPENPGP_SUBKEY_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_OPENPGP_SUBKEY_ERROR -208
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-OPENPGP-UID-REVOKED:CAPS"></a><h3>GNUTLS_E_OPENPGP_UID_REVOKED</h3>
 <pre class="programlisting">#define GNUTLS_E_OPENPGP_UID_REVOKED -79
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PARSING-ERROR:CAPS"></a><h3>GNUTLS_E_PARSING_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PARSING_ERROR -302
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-ATTRIBUTE-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_ATTRIBUTE_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_ATTRIBUTE_ERROR -307
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-DATA-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_DATA_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_DATA_ERROR -309
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-DEVICE-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_DEVICE_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_DEVICE_ERROR -308
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_ERROR -300
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-KEY-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_KEY_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_KEY_ERROR -311
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-LOAD-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_LOAD_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_LOAD_ERROR -301
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-PIN-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_PIN_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_PIN_ERROR -303
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-PIN-EXPIRED:CAPS"></a><h3>GNUTLS_E_PKCS11_PIN_EXPIRED</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_PIN_EXPIRED -312
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-PIN-LOCKED:CAPS"></a><h3>GNUTLS_E_PKCS11_PIN_LOCKED</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_PIN_LOCKED -313
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-REQUESTED-OBJECT-NOT-AVAILBLE:CAPS"></a><h3>GNUTLS_E_PKCS11_REQUESTED_OBJECT_NOT_AVAILBLE</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_REQUESTED_OBJECT_NOT_AVAILBLE -323
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-SESSION-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_SESSION_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_SESSION_ERROR -314
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-SIGNATURE-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_SIGNATURE_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_SIGNATURE_ERROR -315
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-SLOT-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_SLOT_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_SLOT_ERROR -305
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-TOKEN-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_TOKEN_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_TOKEN_ERROR -316
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-UNSUPPORTED-FEATURE-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_UNSUPPORTED_FEATURE_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_UNSUPPORTED_FEATURE_ERROR -310
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS11-USER-ERROR:CAPS"></a><h3>GNUTLS_E_PKCS11_USER_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS11_USER_ERROR -317
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PKCS1-WRONG-PAD:CAPS"></a><h3>GNUTLS_E_PKCS1_WRONG_PAD</h3>
 <pre class="programlisting">#define GNUTLS_E_PKCS1_WRONG_PAD -57
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PK-DECRYPTION-FAILED:CAPS"></a><h3>GNUTLS_E_PK_DECRYPTION_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_PK_DECRYPTION_FAILED -45
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PK-ENCRYPTION-FAILED:CAPS"></a><h3>GNUTLS_E_PK_ENCRYPTION_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_PK_ENCRYPTION_FAILED -44
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PK-SIGN-FAILED:CAPS"></a><h3>GNUTLS_E_PK_SIGN_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_PK_SIGN_FAILED -46
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PK-SIG-VERIFY-FAILED:CAPS"></a><h3>GNUTLS_E_PK_SIG_VERIFY_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_PK_SIG_VERIFY_FAILED -89
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PREMATURE-TERMINATION:CAPS"></a><h3>GNUTLS_E_PREMATURE_TERMINATION</h3>
 <pre class="programlisting">#define GNUTLS_E_PREMATURE_TERMINATION -110
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PULL-ERROR:CAPS"></a><h3>GNUTLS_E_PULL_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PULL_ERROR -54
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-PUSH-ERROR:CAPS"></a><h3>GNUTLS_E_PUSH_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_PUSH_ERROR -53
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-RANDOM-FAILED:CAPS"></a><h3>GNUTLS_E_RANDOM_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_RANDOM_FAILED -206
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-RECEIVED-ILLEGAL-EXTENSION:CAPS"></a><h3>GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION</h3>
 <pre class="programlisting">#define GNUTLS_E_RECEIVED_ILLEGAL_EXTENSION -58
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-RECEIVED-ILLEGAL-PARAMETER:CAPS"></a><h3>GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER</h3>
 <pre class="programlisting">#define GNUTLS_E_RECEIVED_ILLEGAL_PARAMETER -55 /* GNUTLS_A_ILLEGAL_PARAMETER */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-RECORD-LIMIT-REACHED:CAPS"></a><h3>GNUTLS_E_RECORD_LIMIT_REACHED</h3>
 <pre class="programlisting">#define GNUTLS_E_RECORD_LIMIT_REACHED -39
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-REHANDSHAKE:CAPS"></a><h3>GNUTLS_E_REHANDSHAKE</h3>
 <pre class="programlisting">#define GNUTLS_E_REHANDSHAKE -37 /* GNUTLS_A_NO_RENEGOTIATION */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-REQUESTED-DATA-NOT-AVAILABLE:CAPS"></a><h3>GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE</h3>
 <pre class="programlisting">#define GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE -56
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-SAFE-RENEGOTIATION-FAILED:CAPS"></a><h3>GNUTLS_E_SAFE_RENEGOTIATION_FAILED</h3>
 <pre class="programlisting">#define GNUTLS_E_SAFE_RENEGOTIATION_FAILED -107
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-SESSION-EOF:CAPS"></a><h3>GNUTLS_E_SESSION_EOF</h3>
 <pre class="programlisting">#define GNUTLS_E_SESSION_EOF -328
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-SHORT-MEMORY-BUFFER:CAPS"></a><h3>GNUTLS_E_SHORT_MEMORY_BUFFER</h3>
 <pre class="programlisting">#define GNUTLS_E_SHORT_MEMORY_BUFFER -51
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-SRP-PWD-ERROR:CAPS"></a><h3>GNUTLS_E_SRP_PWD_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_SRP_PWD_ERROR -31
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-SRP-PWD-PARSING-ERROR:CAPS"></a><h3>GNUTLS_E_SRP_PWD_PARSING_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_SRP_PWD_PARSING_ERROR -91
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-SUCCESS:CAPS"></a><h3>GNUTLS_E_SUCCESS</h3>
 <pre class="programlisting">#define GNUTLS_E_SUCCESS 0
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-TIMEDOUT:CAPS"></a><h3>GNUTLS_E_TIMEDOUT</h3>
 <pre class="programlisting">#define GNUTLS_E_TIMEDOUT -319
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-TOO-MANY-EMPTY-PACKETS:CAPS"></a><h3>GNUTLS_E_TOO_MANY_EMPTY_PACKETS</h3>
 <pre class="programlisting">#define GNUTLS_E_TOO_MANY_EMPTY_PACKETS -78
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-TOO-MANY-HANDSHAKE-PACKETS:CAPS"></a><h3>GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS</h3>
 <pre class="programlisting">#define GNUTLS_E_TOO_MANY_HANDSHAKE_PACKETS -81
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-TPM-ERROR:CAPS"></a><h3>GNUTLS_E_TPM_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_TPM_ERROR -329
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-TPM-KEY-NOT-FOUND:CAPS"></a><h3>GNUTLS_E_TPM_KEY_NOT_FOUND</h3>
 <pre class="programlisting">#define GNUTLS_E_TPM_KEY_NOT_FOUND -333
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-TPM-KEY-PASSWORD-ERROR:CAPS"></a><h3>GNUTLS_E_TPM_KEY_PASSWORD_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_TPM_KEY_PASSWORD_ERROR -330
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-TPM-SESSION-ERROR:CAPS"></a><h3>GNUTLS_E_TPM_SESSION_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_TPM_SESSION_ERROR -332
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-TPM-SRK-PASSWORD-ERROR:CAPS"></a><h3>GNUTLS_E_TPM_SRK_PASSWORD_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_TPM_SRK_PASSWORD_ERROR -331
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-TPM-UNINITIALIZED:CAPS"></a><h3>GNUTLS_E_TPM_UNINITIALIZED</h3>
 <pre class="programlisting">#define GNUTLS_E_TPM_UNINITIALIZED -334
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNEXPECTED-HANDSHAKE-PACKET:CAPS"></a><h3>GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET</h3>
 <pre class="programlisting">#define GNUTLS_E_UNEXPECTED_HANDSHAKE_PACKET -19
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNEXPECTED-PACKET:CAPS"></a><h3>GNUTLS_E_UNEXPECTED_PACKET</h3>
 <pre class="programlisting">#define GNUTLS_E_UNEXPECTED_PACKET -15 /* GNUTLS_A_UNEXPECTED_MESSAGE */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNEXPECTED-PACKET-LENGTH:CAPS"></a><h3>GNUTLS_E_UNEXPECTED_PACKET_LENGTH</h3>
 <pre class="programlisting">#define GNUTLS_E_UNEXPECTED_PACKET_LENGTH -9 /* GNUTLS_A_RECORD_OVERFLOW */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNIMPLEMENTED-FEATURE:CAPS"></a><h3>GNUTLS_E_UNIMPLEMENTED_FEATURE</h3>
 <pre class="programlisting">#define GNUTLS_E_UNIMPLEMENTED_FEATURE -1250
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNKNOWN-ALGORITHM:CAPS"></a><h3>GNUTLS_E_UNKNOWN_ALGORITHM</h3>
 <pre class="programlisting">#define GNUTLS_E_UNKNOWN_ALGORITHM -105
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNKNOWN-CIPHER-SUITE:CAPS"></a><h3>GNUTLS_E_UNKNOWN_CIPHER_SUITE</h3>
 <pre class="programlisting">#define GNUTLS_E_UNKNOWN_CIPHER_SUITE -21 /* GNUTLS_A_HANDSHAKE_FAILURE */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNKNOWN-CIPHER-TYPE:CAPS"></a><h3>GNUTLS_E_UNKNOWN_CIPHER_TYPE</h3>
 <pre class="programlisting">#define GNUTLS_E_UNKNOWN_CIPHER_TYPE -6
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNKNOWN-COMPRESSION-ALGORITHM:CAPS"></a><h3>GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM</h3>
 <pre class="programlisting">#define GNUTLS_E_UNKNOWN_COMPRESSION_ALGORITHM -3
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNKNOWN-HASH-ALGORITHM:CAPS"></a><h3>GNUTLS_E_UNKNOWN_HASH_ALGORITHM</h3>
 <pre class="programlisting">#define GNUTLS_E_UNKNOWN_HASH_ALGORITHM -96
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNKNOWN-PKCS-BAG-TYPE:CAPS"></a><h3>GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE</h3>
 <pre class="programlisting">#define GNUTLS_E_UNKNOWN_PKCS_BAG_TYPE -98
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNKNOWN-PKCS-CONTENT-TYPE:CAPS"></a><h3>GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE</h3>
 <pre class="programlisting">#define GNUTLS_E_UNKNOWN_PKCS_CONTENT_TYPE -97
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNKNOWN-PK-ALGORITHM:CAPS"></a><h3>GNUTLS_E_UNKNOWN_PK_ALGORITHM</h3>
 <pre class="programlisting">#define GNUTLS_E_UNKNOWN_PK_ALGORITHM -80
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNKNOWN-SRP-USERNAME:CAPS"></a><h3>GNUTLS_E_UNKNOWN_SRP_USERNAME</h3>
 <pre class="programlisting">#define GNUTLS_E_UNKNOWN_SRP_USERNAME -109
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNSAFE-RENEGOTIATION-DENIED:CAPS"></a><h3>GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED</h3>
 <pre class="programlisting">#define GNUTLS_E_UNSAFE_RENEGOTIATION_DENIED -108
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNSUPPORTED-CERTIFICATE-TYPE:CAPS"></a><h3>GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE</h3>
 <pre class="programlisting">#define GNUTLS_E_UNSUPPORTED_CERTIFICATE_TYPE -61 /* GNUTLS_A_UNSUPPORTED_CERTIFICATE */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNSUPPORTED-SIGNATURE-ALGORITHM:CAPS"></a><h3>GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM</h3>
 <pre class="programlisting">#define GNUTLS_E_UNSUPPORTED_SIGNATURE_ALGORITHM -106
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNSUPPORTED-VERSION-PACKET:CAPS"></a><h3>GNUTLS_E_UNSUPPORTED_VERSION_PACKET</h3>
 <pre class="programlisting">#define GNUTLS_E_UNSUPPORTED_VERSION_PACKET -8 /* GNUTLS_A_PROTOCOL_VERSION */
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-UNWANTED-ALGORITHM:CAPS"></a><h3>GNUTLS_E_UNWANTED_ALGORITHM</h3>
 <pre class="programlisting">#define GNUTLS_E_UNWANTED_ALGORITHM -22
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-USER-ERROR:CAPS"></a><h3>GNUTLS_E_USER_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_USER_ERROR -320
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-WARNING-ALERT-RECEIVED:CAPS"></a><h3>GNUTLS_E_WARNING_ALERT_RECEIVED</h3>
 <pre class="programlisting">#define GNUTLS_E_WARNING_ALERT_RECEIVED -16
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-WARNING-IA-FPHF-RECEIVED:CAPS"></a><h3>GNUTLS_E_WARNING_IA_FPHF_RECEIVED</h3>
 <pre class="programlisting">#define GNUTLS_E_WARNING_IA_FPHF_RECEIVED -103
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-WARNING-IA-IPHF-RECEIVED:CAPS"></a><h3>GNUTLS_E_WARNING_IA_IPHF_RECEIVED</h3>
 <pre class="programlisting">#define GNUTLS_E_WARNING_IA_IPHF_RECEIVED -102
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-X509-CERTIFICATE-ERROR:CAPS"></a><h3>GNUTLS_E_X509_CERTIFICATE_ERROR</h3>
 <pre class="programlisting">#define GNUTLS_E_X509_CERTIFICATE_ERROR GNUTLS_E_CERTIFICATE_ERROR
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-X509-UNKNOWN-SAN:CAPS"></a><h3>GNUTLS_E_X509_UNKNOWN_SAN</h3>
 <pre class="programlisting">#define GNUTLS_E_X509_UNKNOWN_SAN -62
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-X509-UNSUPPORTED-ATTRIBUTE:CAPS"></a><h3>GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE</h3>
 <pre class="programlisting">#define GNUTLS_E_X509_UNSUPPORTED_ATTRIBUTE -95
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-X509-UNSUPPORTED-CRITICAL-EXTENSION:CAPS"></a><h3>GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION</h3>
 <pre class="programlisting">#define GNUTLS_E_X509_UNSUPPORTED_CRITICAL_EXTENSION -47
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-X509-UNSUPPORTED-EXTENSION:CAPS"></a><h3>GNUTLS_E_X509_UNSUPPORTED_EXTENSION</h3>
 <pre class="programlisting">#define GNUTLS_E_X509_UNSUPPORTED_EXTENSION -327
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-E-X509-UNSUPPORTED-OID:CAPS"></a><h3>GNUTLS_E_X509_UNSUPPORTED_OID</h3>
 <pre class="programlisting">#define GNUTLS_E_X509_UNSUPPORTED_OID -205
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-HB-LOCAL-ALLOWED-TO-SEND:CAPS"></a><h3>GNUTLS_HB_LOCAL_ALLOWED_TO_SEND</h3>
 <pre class="programlisting">#define GNUTLS_HB_LOCAL_ALLOWED_TO_SEND (1&lt;&lt;2)
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-HB-PEER-ALLOWED-TO-SEND:CAPS"></a><h3>GNUTLS_HB_PEER_ALLOWED_TO_SEND</h3>
 <pre class="programlisting">#define GNUTLS_HB_PEER_ALLOWED_TO_SEND (1)
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-HB-PEER-NOT-ALLOWED-TO-SEND:CAPS"></a><h3>GNUTLS_HB_PEER_NOT_ALLOWED_TO_SEND</h3>
 <pre class="programlisting">#define GNUTLS_HB_PEER_NOT_ALLOWED_TO_SEND (1&lt;&lt;1)
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-HEARTBEAT-WAIT:CAPS"></a><h3>GNUTLS_HEARTBEAT_WAIT</h3>
 <pre class="programlisting">#define GNUTLS_HEARTBEAT_WAIT 1
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KEY-CRL-SIGN:CAPS"></a><h3>GNUTLS_KEY_CRL_SIGN</h3>
 <pre class="programlisting">#define GNUTLS_KEY_CRL_SIGN		2
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KEY-DATA-ENCIPHERMENT:CAPS"></a><h3>GNUTLS_KEY_DATA_ENCIPHERMENT</h3>
 <pre class="programlisting">#define GNUTLS_KEY_DATA_ENCIPHERMENT 16
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KEY-DECIPHER-ONLY:CAPS"></a><h3>GNUTLS_KEY_DECIPHER_ONLY</h3>
 <pre class="programlisting">#define GNUTLS_KEY_DECIPHER_ONLY 32768
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KEY-DIGITAL-SIGNATURE:CAPS"></a><h3>GNUTLS_KEY_DIGITAL_SIGNATURE</h3>
 <pre class="programlisting">#define GNUTLS_KEY_DIGITAL_SIGNATURE 128
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KEY-ENCIPHER-ONLY:CAPS"></a><h3>GNUTLS_KEY_ENCIPHER_ONLY</h3>
 <pre class="programlisting">#define GNUTLS_KEY_ENCIPHER_ONLY 1
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KEY-KEY-AGREEMENT:CAPS"></a><h3>GNUTLS_KEY_KEY_AGREEMENT</h3>
 <pre class="programlisting">#define GNUTLS_KEY_KEY_AGREEMENT 8
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KEY-KEY-CERT-SIGN:CAPS"></a><h3>GNUTLS_KEY_KEY_CERT_SIGN</h3>
 <pre class="programlisting">#define GNUTLS_KEY_KEY_CERT_SIGN 4
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KEY-KEY-ENCIPHERMENT:CAPS"></a><h3>GNUTLS_KEY_KEY_ENCIPHERMENT</h3>
 <pre class="programlisting">#define GNUTLS_KEY_KEY_ENCIPHERMENT 32
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-KEY-NON-REPUDIATION:CAPS"></a><h3>GNUTLS_KEY_NON_REPUDIATION</h3>
 <pre class="programlisting">#define GNUTLS_KEY_NON_REPUDIATION 64
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-MAC-SHA:CAPS"></a><h3>GNUTLS_MAC_SHA</h3>
 <pre class="programlisting">#define GNUTLS_MAC_SHA GNUTLS_MAC_SHA1
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-MAX-ALGORITHM-NUM:CAPS"></a><h3>GNUTLS_MAX_ALGORITHM_NUM</h3>
 <pre class="programlisting">#define GNUTLS_MAX_ALGORITHM_NUM 64
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-MAX-SESSION-ID:CAPS"></a><h3>GNUTLS_MAX_SESSION_ID</h3>
 <pre class="programlisting">#define GNUTLS_MAX_SESSION_ID 32
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-NONBLOCK:CAPS"></a><h3>GNUTLS_NONBLOCK</h3>
 <pre class="programlisting">#define GNUTLS_NONBLOCK (1&lt;&lt;3)
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-NO-EXTENSIONS:CAPS"></a><h3>GNUTLS_NO_EXTENSIONS</h3>
 <pre class="programlisting">#define GNUTLS_NO_EXTENSIONS (1&lt;&lt;4)
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS11-PIN-CONTEXT-SPECIFIC:CAPS"></a><h3>GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC</h3>
 <pre class="programlisting">#define GNUTLS_PKCS11_PIN_CONTEXT_SPECIFIC GNUTLS_PIN_CONTEXT_SPECIFIC
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS11-PIN-COUNT-LOW:CAPS"></a><h3>GNUTLS_PKCS11_PIN_COUNT_LOW</h3>
 <pre class="programlisting">#define GNUTLS_PKCS11_PIN_COUNT_LOW  GNUTLS_PIN_COUNT_LOW
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS11-PIN-FINAL-TRY:CAPS"></a><h3>GNUTLS_PKCS11_PIN_FINAL_TRY</h3>
 <pre class="programlisting">#define GNUTLS_PKCS11_PIN_FINAL_TRY GNUTLS_PIN_FINAL_TRY
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS11-PIN-SO:CAPS"></a><h3>GNUTLS_PKCS11_PIN_SO</h3>
 <pre class="programlisting">#define GNUTLS_PKCS11_PIN_SO GNUTLS_PIN_SO
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS11-PIN-USER:CAPS"></a><h3>GNUTLS_PKCS11_PIN_USER</h3>
 <pre class="programlisting">#define GNUTLS_PKCS11_PIN_USER GNUTLS_PIN_USER
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PKCS11-PIN-WRONG:CAPS"></a><h3>GNUTLS_PKCS11_PIN_WRONG</h3>
 <pre class="programlisting">#define GNUTLS_PKCS11_PIN_WRONG GNUTLS_PIN_WRONG
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-PK-ECC:CAPS"></a><h3>GNUTLS_PK_ECC</h3>
 <pre class="programlisting">#define GNUTLS_PK_ECC GNUTLS_PK_ECDSA
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-SERVER:CAPS"></a><h3>GNUTLS_SERVER</h3>
 <pre class="programlisting">#define GNUTLS_SERVER (1)
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-VERSION:CAPS"></a><h3>GNUTLS_VERSION</h3>
-<pre class="programlisting">#define GNUTLS_VERSION "3.5.18"
+<pre class="programlisting">#define GNUTLS_VERSION "3.5.19"
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-VERSION-MAJOR:CAPS"></a><h3>GNUTLS_VERSION_MAJOR</h3>
 <pre class="programlisting">#define GNUTLS_VERSION_MAJOR 3
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-VERSION-MINOR:CAPS"></a><h3>GNUTLS_VERSION_MINOR</h3>
 <pre class="programlisting">#define GNUTLS_VERSION_MINOR 5
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-VERSION-NUMBER:CAPS"></a><h3>GNUTLS_VERSION_NUMBER</h3>
-<pre class="programlisting">#define GNUTLS_VERSION_NUMBER 0x030512
+<pre class="programlisting">#define GNUTLS_VERSION_NUMBER 0x030513
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="GNUTLS-VERSION-PATCH:CAPS"></a><h3>GNUTLS_VERSION_PATCH</h3>
-<pre class="programlisting">#define GNUTLS_VERSION_PATCH 18
+<pre class="programlisting">#define GNUTLS_VERSION_PATCH 19
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="HAVE-SSIZE-T:CAPS"></a><h3>HAVE_SSIZE_T</h3>
 <pre class="programlisting">#define             HAVE_SSIZE_T</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -13782,8 +13460,6 @@ or a negative error value on other errors.</p>
 <div class="refsect2">
 <a name="gnutls-certificate-credentials-st"></a><h3>struct gnutls_certificate_credentials_st</h3>
 <pre class="programlisting">struct gnutls_certificate_credentials_st;</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -14411,8 +14087,6 @@ certificate verification.</p>
 <a name="gnutls-cred-set"></a><h3>gnutls_cred_set</h3>
 <pre class="programlisting">#define gnutls_cred_set gnutls_credentials_set
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -14470,16 +14144,12 @@ certificate verification.</p>
 <div class="refsect2">
 <a name="gnutls-dh-params-int"></a><h3>struct gnutls_dh_params_int</h3>
 <pre class="programlisting">struct gnutls_dh_params_int;</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-dh-params-t"></a><h3>gnutls_dh_params_t</h3>
 <pre class="programlisting">typedef struct gnutls_dh_params_int *gnutls_dh_params_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -14796,8 +14466,6 @@ certificate verification.</p>
 <a name="gnutls-handshake-post-client-hello-func"></a><h3>gnutls_handshake_post_client_hello_func</h3>
 <pre class="programlisting">#define gnutls_handshake_post_client_hello_func gnutls_handshake_simple_hook_func
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15014,23 +14682,23 @@ algorithms.</p>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-MAC-SHA3-224:CAPS"></a>GNUTLS_MAC_SHA3_224</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-MAC-SHA3-256:CAPS"></a>GNUTLS_MAC_SHA3_256</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-MAC-SHA3-384:CAPS"></a>GNUTLS_MAC_SHA3_384</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-MAC-SHA3-512:CAPS"></a>GNUTLS_MAC_SHA3_512</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-MAC-AEAD:CAPS"></a>GNUTLS_MAC_AEAD</p></td>
@@ -15066,8 +14734,6 @@ algorithms.</p>
 	int preferred_set;
 } gnutls_openpgp_crt_int;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15105,8 +14771,6 @@ algorithms.</p>
 <a name="gnutls-openpgp-crt-t"></a><h3>gnutls_openpgp_crt_t</h3>
 <pre class="programlisting">typedef struct gnutls_openpgp_crt_int *gnutls_openpgp_crt_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15115,16 +14779,12 @@ algorithms.</p>
 	cdk_keydb_hd_t db;
 } gnutls_openpgp_keyring_int;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-openpgp-keyring-t"></a><h3>gnutls_openpgp_keyring_t</h3>
 <pre class="programlisting">typedef struct gnutls_openpgp_keyring_int *gnutls_openpgp_keyring_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15135,16 +14795,12 @@ algorithms.</p>
 	int preferred_set;
 } gnutls_openpgp_privkey_int;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-openpgp-privkey-t"></a><h3>gnutls_openpgp_privkey_t</h3>
 <pre class="programlisting">typedef struct gnutls_openpgp_privkey_int *gnutls_openpgp_privkey_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15189,16 +14845,12 @@ algorithms.</p>
 <a name="gnutls-pem-base64-decode-alloc"></a><h3>gnutls_pem_base64_decode_alloc</h3>
 <pre class="programlisting">#define gnutls_pem_base64_decode_alloc gnutls_pem_base64_decode2
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-pem-base64-encode-alloc"></a><h3>gnutls_pem_base64_encode_alloc</h3>
 <pre class="programlisting">#define gnutls_pem_base64_encode_alloc gnutls_pem_base64_encode2
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15322,16 +14974,12 @@ algorithms.</p>
 <div class="refsect2">
 <a name="gnutls-pkcs11-privkey-st"></a><h3>struct gnutls_pkcs11_privkey_st</h3>
 <pre class="programlisting">struct gnutls_pkcs11_privkey_st;</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-pkcs11-privkey-t"></a><h3>gnutls_pkcs11_privkey_t</h3>
 <pre class="programlisting">typedef struct gnutls_pkcs11_privkey_st *gnutls_pkcs11_privkey_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15375,16 +15023,12 @@ algorithms.</p>
 	bool fallback;
 };
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-priority-t"></a><h3>gnutls_priority_t</h3>
 <pre class="programlisting">typedef struct gnutls_priority_st *gnutls_priority_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15502,18 +15146,18 @@ algorithms.</p>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-DTLS-VERSION-MIN:CAPS"></a>GNUTLS_DTLS_VERSION_MIN</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-DTLS-VERSION-MAX:CAPS"></a>GNUTLS_DTLS_VERSION_MAX</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-TLS-VERSION-MAX:CAPS"></a>GNUTLS_TLS_VERSION_MAX</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-VERSION-UNKNOWN:CAPS"></a>GNUTLS_VERSION_UNKNOWN</p></td>
@@ -15584,16 +15228,12 @@ algorithms.</p>
 <a name="gnutls-read"></a><h3>gnutls_read</h3>
 <pre class="programlisting">#define gnutls_read gnutls_record_recv
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-rsa-params-t"></a><h3>gnutls_rsa_params_t</h3>
 <pre class="programlisting">typedef struct gnutls_x509_privkey_int *gnutls_rsa_params_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15721,16 +15361,12 @@ algorithms.</p>
 	gnutls_key_st key;
 };
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-session-t"></a><h3>gnutls_session_t</h3>
 <pre class="programlisting">typedef struct gnutls_session_int *gnutls_session_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -15985,16 +15621,12 @@ algorithms.</p>
 <a name="gnutls-srp-base64-decode-alloc"></a><h3>gnutls_srp_base64_decode_alloc</h3>
 <pre class="programlisting">#define gnutls_srp_base64_decode_alloc gnutls_srp_base64_decode2
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-srp-base64-encode-alloc"></a><h3>gnutls_srp_base64_encode_alloc</h3>
 <pre class="programlisting">#define gnutls_srp_base64_encode_alloc gnutls_srp_base64_encode2
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -16067,32 +15699,24 @@ algorithms.</p>
 <div class="refsect2">
 <a name="gnutls-tdb-int"></a><h3>struct gnutls_tdb_int</h3>
 <pre class="programlisting">struct gnutls_tdb_int;</pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-tdb-t"></a><h3>gnutls_tdb_t</h3>
 <pre class="programlisting">typedef struct gnutls_tdb_int *gnutls_tdb_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-transport-ptr-t"></a><h3>gnutls_transport_ptr_t</h3>
 <pre class="programlisting">typedef void *gnutls_transport_ptr_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-write"></a><h3>gnutls_write</h3>
 <pre class="programlisting">#define gnutls_write gnutls_record_send
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -16110,16 +15734,12 @@ algorithms.</p>
 	gnutls_datum_t raw_issuer_dn;
 } gnutls_x509_crl_int;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-x509-crl-t"></a><h3>gnutls_x509_crl_t</h3>
 <pre class="programlisting">typedef struct gnutls_x509_crl_int *gnutls_x509_crl_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -16128,16 +15748,12 @@ algorithms.</p>
 	ASN1_TYPE crq;
 } gnutls_x509_crq_int;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-x509-crq-t"></a><h3>gnutls_x509_crq_t</h3>
 <pre class="programlisting">typedef struct gnutls_x509_crq_int *gnutls_x509_crq_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -16199,16 +15815,12 @@ algorithms.</p>
 	gnutls_x509_dn_st idn;
 } gnutls_x509_crt_int;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-x509-crt-t"></a><h3>gnutls_x509_crt_t</h3>
 <pre class="programlisting">typedef struct gnutls_x509_crt_int *gnutls_x509_crt_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -16227,16 +15839,12 @@ algorithms.</p>
 	struct pin_info_st pin;
 } gnutls_x509_privkey_int;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-x509-privkey-t"></a><h3>gnutls_x509_privkey_t</h3>
 <pre class="programlisting">typedef struct gnutls_x509_privkey_int *gnutls_x509_privkey_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -16295,8 +15903,8 @@ algorithms.</p>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-SAN-MAX:CAPS"></a>GNUTLS_SAN_MAX</p></td>
-<td class="enum_member_description"> </td>
-<td class="enum_member_annotations"> </td>
+<td> </td>
+<td> </td>
 </tr>
 <tr>
 <td class="enum_member_name"><p><a name="GNUTLS-SAN-OTHERNAME-XMPP:CAPS"></a>GNUTLS_SAN_OTHERNAME_XMPP</p></td>
@@ -16319,6 +15927,6 @@ algorithms.</p>
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.25</div>
+<hr>Generated by GTK-Doc V1.28</div>
 </body>
 </html>

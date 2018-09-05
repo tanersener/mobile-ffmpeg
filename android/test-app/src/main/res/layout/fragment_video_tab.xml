@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".VideoTabFragment">
+
+    <LinearLayout
+        android:id="@+id/videoCodecSpinnerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="40dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/videoCodecSpinner"
+            android:background="@drawable/rounded_spinner"
+            android:layout_width="180dp"
+            android:layout_height="54dp"
+            android:layout_marginBottom="0dp"
+            android:layout_marginTop="0dp"
+            android:padding="6dp"
+            android:textAlignment="center"
+            android:gravity="center"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/encodeButtonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/encodeButton"
+            android:layout_width="90dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/rounded_button"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:text="@string/video_encode_button_text"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <VideoView
+        android:id="@+id/videoPlayerFrame"
+        android:layout_width="wrap_content"
+        android:background="@drawable/rounded_video_frame"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="20dp"
+        android:layout_weight="1" />
+</LinearLayout>

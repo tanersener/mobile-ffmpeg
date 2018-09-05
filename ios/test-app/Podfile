@@ -3,5 +3,6 @@ platform :ios, '8.0'
 use_frameworks!
 
 target "MobileFFmpegTest" do
-    pod 'mobile-ffmpeg-full', '~> 2.0'
+    pod 'mobile-ffmpeg-full', '~> 2.1'
+    pod 'NMEasyTipView', '~> 1.1'
 end

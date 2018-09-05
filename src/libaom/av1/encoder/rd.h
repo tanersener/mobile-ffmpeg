@@ -43,6 +43,9 @@ extern "C" {
 #define RD_THRESH_MAX_FACT 64
 #define RD_THRESH_INC 1
 
+// Factor to weigh the rate for switchable interp filters.
+#define SWITCHABLE_INTERP_RATE_FACTOR 1
+
 // This enumerator type needs to be kept aligned with the mode order in
 // const MODE_DEFINITION av1_mode_order[MAX_MODES] used in the rd code.
 typedef enum {
@@ -388,6 +391,10 @@ void av1_initialize_me_consts(const struct AV1_COMP *cpi, MACROBLOCK *x,
 
 void av1_model_rd_from_var_lapndz(int64_t var, unsigned int n,
                                   unsigned int qstep, int *rate, int64_t *dist);
+
+void av1_model_rd_curvfit(double xqr, double *rate_f, double *distbysse_f);
+void av1_model_rd_surffit(double xm, double yl, double *rate_f,
+                          double *distbysse_f);
 
 int av1_get_switchable_rate(const AV1_COMMON *const cm, MACROBLOCK *x,
                             const MACROBLOCKD *xd);

@@ -1,0 +1,138 @@
+Version 1.4.3 -- January 21, 2017
+==================================
+
+ - Allow one packet to have decoding error
+ - Print output even if there is a decoding error, exit with error code 3 instead of 2 in such case
+ - Add new option -ignore-errors to change the error code 3 to 0
+ - Add new option -algorithm NUM
+ - Periotically flush output when working on a stream
+
+Version 1.4.2 -- December 28, 2016
+==================================
+
+ - Fixed invalid memory access when decoding base64-encoded fingerprints.
+ - Removed unnecessary library dependencies libchromaprint to avoid circular dependency problems with FFmpeg.
+
+Version 1.4.1 -- December 12, 2016
+==================================
+
+ - Restored the -v/-version parameter for fpcalc that got accidentally removed in 1.4.
+ - Fixed processing of some short audio files. They were ignored in 1.4.
+ - The DURATION field in the default output of fpcalc is now printed as an integer again.
+ - Added missing version number to libchromaprint.pc.
+ - Mac OS X fpcalc builds are done with clang/libc++ and should work on 10.7+.
+ - Linux fpcalc builds are now fully static.
+
+Version 1.4 -- December 3, 2016
+===============================
+
+ - Fully streaming audio processing without any post-processing step for the fingerprint generation.
+ - Many performance optimizations. Especially when processing long streams, operations should be faster and use less memory.
+ - C++11 compiler is now required for building the library.
+ - The public C API now uses standard fixed-size int types from stdint.h (breaks backwards compatibility).
+ - All code written for the library is now distributed under the MIT license.
+ - Kiss FFT is now included with the library and automatically used if no other FFT library is found.
+ - Added support for using the FFTW3F version of FFTW3.
+ - Boost is no longer used.
+
+Version 1.3.2 -- July 9, 2016
+=============================
+
+ - Fixed crash on an invalid audio file that FFmpeg could not decode.
+ - Fixed build on Ubuntu 14.04 with libav.
+
+Version 1.3.1 -- February 10, 2016
+==================================
+
+ - Fixed `fpcalc -length` to actually restrict fingerprints the requested length.
+ - Fixed SONAME version for the shared library.
+
+Version 1.3 -- February 2, 2016
+===============================
+
+ - You can use use "-length 0" in fpcalc to get the full fingerprint
+ - New function chromaprint_get_fingerprint_hash for calculating
+   SimHash from the fingerprint data
+ - Added info section to the fpcalc executable on Mac OS X
+ - Generate .pc (pkg-config) file on Mac OS X when not building a framework
+ - Removed use of some long deprecated FFmpeg APIs
+ - Some smaller bug fixes
+
+Version 1.2 -- August 26, 2014
+==============================
+
+ - Fixed compilation with neither libswresample nor libavresample (#11)
+ - Fixed compilation with static libav (#10)
+ - Functions chromaprint_encode_fingerprint and chromaprint_decode_fingerprint
+   are changed to accept const pointer as input
+ - Added support for using the Kiss FFT library (should make Android port easier)
+ - Removed obsolete dev tools from the package
+ - More compatible DEBUG() macro
+
+Version 1.1 -- November 23, 2013
+================================
+
+ - Fixed potential DoS attack in fingerprint decompression code. (#6)
+ - Fixed invalid memory read with some fingerprinter configurations. (#5)
+ - Fixed compilation with clang on OS X 10.9 (#7, #9)
+ - Added support for audio format conversion with libav. (#2, Gordon Pettey)
+
+Version 1.0 -- September 7, 2013
+================================
+
+ - Support for the latest FFmpeg API.
+ - Support for reading audio from stdin in fpcalc.
+ - Changed fpcalc to return non-zero status on failure.
+
+Version 0.7 -- September 5, 2012
+================================
+
+ - Support for the latest FFmpeg API.
+ - New (non-default) fingerprint algorithm that removes leading silence.
+ - API to configure fingerprint algorithms, currently only used by
+   CHROMAPRINT_ALGORITHM_TEST4.
+
+Version 0.6 -- December 22, 2011
+================================
+
+ - Support for 24-bit file formats in fpcalc.
+ - The fpcalc utility now uses 120 seconds of audio data by default.
+ - Python bindings moved to a separate project (pyacoustid).
+
+Version 0.5 -- October 6, 2011
+==============================
+
+ - Unicode command line handling in fpcalc.
+ - Fixed a crash in fpcalc when FFmpeg was not able to identify the codec.
+ - Added encode_fingerprint to the Python bindings.
+
+Version 0.4 -- May 14, 2011
+===========================
+
+ - Support for building a Mac OS X framework.
+ - Support for building a static library.
+ - Simple C example (fpcalc) that can be used from external applications for
+   fingerprint calculations.
+
+Version 0.3 -- April 26, 2011
+=============================
+
+ - Fixed compilation with MSVC 2010.
+ - Added support for calculating FFT using the Accelerate framework on
+   Mac OS X and iOS.
+ - Added Python bindings.
+
+Version 0.2 -- January 26, 2011
+===============================
+
+ - New public functions chromaprint_{encode,decode}_fingerprint to
+   encoding/decoding raw fingerprints.
+ - New public function chromaprint_dealloc that should be used for
+   releasing all memory allocated in Chromaprint functions.
+ - Extended fpcollect to allow processing files with MBIDs.
+
+Version 0.1 -- October 30, 2010
+===============================
+
+ - Initial release
+

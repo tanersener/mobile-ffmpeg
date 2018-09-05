@@ -29,7 +29,11 @@ package com.arthenica.mobileffmpeg;
 public class AbiDetect {
 
     static {
-        System.loadLibrary("abidetect");
+        System.loadLibrary("mobileffmpeg-abidetect");
+
+        /* ALL LIBRARIES LOADED AT STARTUP */
+        Config.class.getName();
+        FFmpeg.class.getName();
     }
 
     /**

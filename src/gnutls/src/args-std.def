@@ -5,7 +5,7 @@ gnu-usage;
 disable-save;
 long-opts;
 no-xlate        = opt;
-version         = "3.5.18";
+version         = "3.5.19";
 no-misuse-usage;
 export          = '#include <gettext.h>';
 

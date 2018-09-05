@@ -35,30 +35,40 @@ export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
-make distclean 2>/dev/null 1>/dev/null
-
-# RECONFIGURING IF REQUESTED
-if [[ ${RECONF_jpeg} -eq 1 ]]; then
-    autoreconf_library ${LIB_NAME}
+if [ -d "build" ]; then
+    rm -rf build
 fi
 
-./configure \
-    --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
-    --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \
-    --enable-static \
-    --disable-shared \
-    --disable-fast-install \
-    --with-jpeg8 \
-    --with-simd \
-    --without-gas-preprocessor \
-    --without-turbojpeg \
-    --without-java \
-    --host=${TARGET_HOST} || exit 1
+mkdir build || exit 1
+cd build || exit 1
 
-make -j$(get_cpu_count) || exit 1
+cmake -Wno-dev \
+    -DCMAKE_VERBOSE_MAKEFILE=0 \
+    -DCMAKE_C_FLAGS="${CFLAGS}" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
+    -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \
+    -DCMAKE_SYSROOT="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
+    -DCMAKE_FIND_ROOT_PATH="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
+    -DCMAKE_SYSTEM_NAME=Generic \
+    -DCMAKE_C_COMPILER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$CC" \
+    -DCMAKE_CXX_COMPILER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$CXX" \
+    -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$LD" \
+    -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
+    -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
+    -DENABLE_PIC=1 \
+    -DENABLE_STATIC=1 \
+    -DWITH_JPEG8=1 \
+    -DWITH_SIMD=1 \
+    -DWITH_TURBOJPEG=0 \
+    -DWITH_JAVA=0 \
+    -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
+    -DENABLE_SHARED=0 .. || exit 1
+
+make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp ./*.pc ${INSTALL_PKG_CONFIG_DIR}
+cp ${BASEDIR}/src/${LIB_NAME}/build/pkgscripts/libjpeg.pc ${INSTALL_PKG_CONFIG_DIR}
 
 make install || exit 1

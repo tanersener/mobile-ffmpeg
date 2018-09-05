@@ -1,7 +1,7 @@
-This is gnutls-guile.info, produced by makeinfo version 6.3 from
+This is gnutls-guile.info, produced by makeinfo version 6.5 from
 gnutls-guile.texi.
 
-This manual is last updated 28 March 2017 for version 3.5.18 of GnuTLS.
+This manual is last updated 28 March 2017 for version 3.5.19 of GnuTLS.
 
 Copyright (C) 2001-2012, 2014, 2016 Free Software Foundation, Inc.
 
@@ -22,7 +22,7 @@ File: gnutls-guile.info,  Node: Top,  Next: Preface,  Up: (dir)
 GnuTLS-Guile
 ************
 
-This manual is last updated 28 March 2017 for version 3.5.18 of GnuTLS.
+This manual is last updated 28 March 2017 for version 3.5.19 of GnuTLS.
 
 Copyright (C) 2001-2012, 2014, 2016 Free Software Foundation, Inc.
 
@@ -130,7 +130,7 @@ the version number of the loaded library as follows:
      $ guile
      scheme@(guile-user)> (use-modules (gnutls))
      scheme@(guile-user)> (gnutls-version)
-     "3.5.18"
+     "3.5.19"
      scheme@(guile-user)>
 
 

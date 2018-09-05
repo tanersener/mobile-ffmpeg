@@ -41,6 +41,9 @@
 #include "aom_dsp/ssim.h"
 #endif
 #include "aom_dsp/variance.h"
+#if CONFIG_DENOISE
+#include "aom_dsp/noise_model.h"
+#endif
 #include "aom/internal/aom_codec_internal.h"
 #include "aom_util/aom_thread.h"
 
@@ -139,7 +142,6 @@ typedef struct AV1EncoderConfig {
   int noise_sensitivity;  // pre processing blur: recommendation 0
   int sharpness;          // sharpening output: recommendation 0:
   int speed;
-  int dev_sf;
   // maximum allowed bitrate for any intra frame in % of bitrate target.
   unsigned int rc_max_intra_bitrate_pct;
   // maximum allowed bitrate for any inter frame in % of bitrate target.
@@ -246,6 +248,7 @@ typedef struct AV1EncoderConfig {
   int min_gf_interval;
   int max_gf_interval;
 
+  int row_mt;
   int tile_columns;
   int tile_rows;
   int tile_width_count;
@@ -277,7 +280,7 @@ typedef struct AV1EncoderConfig {
   aom_timing_info_t timing_info;
   int decoder_model_info_present_flag;
   int display_model_info_present_flag;
-  int buffer_removal_delay_present;
+  int buffer_removal_time_present;
   aom_dec_model_info_t buffer_model;
   aom_dec_model_op_parameters_t op_params[MAX_NUM_OPERATING_POINTS + 1];
   aom_op_timing_info_t op_frame_timing[MAX_NUM_OPERATING_POINTS + 1];
@@ -301,6 +304,14 @@ typedef struct AV1EncoderConfig {
   int allow_warped_motion;
   int enable_superres;
   unsigned int save_as_annexb;
+
+#if CONFIG_DENOISE
+  float noise_level;
+  int noise_block_size;
+#endif
+
+  unsigned int chroma_subsampling_x;
+  unsigned int chroma_subsampling_y;
 } AV1EncoderConfig;
 
 static INLINE int is_lossless_requested(const AV1EncoderConfig *cfg) {
@@ -393,6 +404,43 @@ typedef struct FRAME_COUNTS {
                                 [SWITCHABLE_FILTERS];
 } FRAME_COUNTS;
 
+#if CONFIG_COLLECT_INTER_MODE_RD_STATS
+#define INTER_MODE_RD_DATA_OVERALL_SIZE 6400
+
+typedef struct {
+  int ready;
+  double a;
+  double b;
+  double dist_mean;
+  double ld_mean;
+  double sse_mean;
+  double sse_sse_mean;
+  double sse_ld_mean;
+  int num;
+  double dist_sum;
+  double ld_sum;
+  double sse_sum;
+  double sse_sse_sum;
+  double sse_ld_sum;
+} InterModeRdModel;
+
+typedef struct {
+  int idx;
+  int64_t rd;
+} RdIdxPair;
+// TODO(angiebird): This is an estimated size. We still need to figure what is
+// the maximum number of modes.
+#define MAX_INTER_MODES 1024
+typedef struct inter_modes_info {
+  int num;
+  MB_MODE_INFO mbmi_arr[MAX_INTER_MODES];
+  int mode_rate_arr[MAX_INTER_MODES];
+  int64_t sse_arr[MAX_INTER_MODES];
+  int64_t est_rd_arr[MAX_INTER_MODES];
+  RdIdxPair rd_idx_pair_arr[MAX_INTER_MODES];
+} InterModesInfo;
+#endif
+
 // TODO(jingning) All spatially adaptive variables should go to TileDataEnc.
 typedef struct TileDataEnc {
   TileInfo tile_info;
@@ -403,6 +451,10 @@ typedef struct TileDataEnc {
   CFL_CTX cfl;
   DECLARE_ALIGNED(16, FRAME_CONTEXT, tctx);
   uint8_t allow_update_cdf;
+#if CONFIG_COLLECT_INTER_MODE_RD_STATS
+  InterModeRdModel inter_mode_rd_models[BLOCK_SIZES_ALL];
+  InterModesInfo inter_modes_info;
+#endif
 } TileDataEnc;
 
 typedef struct RD_COUNTS {
@@ -419,6 +471,7 @@ typedef struct ThreadData {
   FRAME_COUNTS *counts;
   PC_TREE *pc_tree;
   PC_TREE *pc_root[MAX_MIB_SIZE_LOG2 - MIN_MIB_SIZE_LOG2 + 1];
+  uint32_t *hash_value_buffer[2][2];
   int32_t *wsrc_buf;
   int32_t *mask_buf;
   uint8_t *above_pred_buf;
@@ -472,6 +525,7 @@ typedef struct AV1_COMP {
   AV1EncoderConfig oxcf;
   struct lookahead_ctx *lookahead;
   struct lookahead_entry *alt_ref_source;
+  int no_show_kf;
 
   int optimize_speed_feature;
   int optimize_seg_arr[MAX_SEGMENTS];
@@ -493,6 +547,7 @@ typedef struct AV1_COMP {
   int previous_index;
   int cur_poc;  // DebugInfo
 
+  unsigned int row_mt;
   int scaled_ref_idx[REF_FRAMES];
   int ref_fb_idx[REF_FRAMES];
   int refresh_fb_idx;  // ref frame buffer index to refresh
@@ -504,6 +559,9 @@ typedef struct AV1_COMP {
   int refresh_bwd_ref_frame;
   int refresh_alt2_ref_frame;
   int refresh_alt_ref_frame;
+#if USE_SYMM_MULTI_LAYER
+  int new_bwdref_update_rule;
+#endif
 
   int ext_refresh_frame_flags_pending;
   int ext_refresh_last_frame;
@@ -635,8 +693,6 @@ typedef struct AV1_COMP {
 
   search_site_config ss_cfg;
 
-  int multi_arf_allowed;
-
   TileDataEnc *tile_data;
   int allocated_tiles;  // Keep track of memory allocated for tiles.
 
@@ -666,7 +722,6 @@ typedef struct AV1_COMP {
   int existing_fb_idx_to_show;
   int is_arf_filter_off[MAX_EXT_ARFS + 1];
   int num_extra_arfs;
-  int arf_map[MAX_EXT_ARFS + 1];
   int arf_pos_in_gf[MAX_EXT_ARFS + 1];
   int arf_pos_for_ovrly[MAX_EXT_ARFS + 1];
   int global_motion_search_done;
@@ -687,8 +742,18 @@ typedef struct AV1_COMP {
   AV1LfSync lf_row_sync;
   AV1LrSync lr_row_sync;
   AV1LrStruct lr_ctxt;
+
+  aom_film_grain_table_t *film_grain_table;
+#if CONFIG_DENOISE
+  struct aom_denoise_and_model_t *denoise_and_model;
+#endif
+  // Stores the default value of skip flag depending on chroma format
+  // Set as 1 for monochrome and 3 for other color formats
+  int default_interp_skip_flags;
+  int preserve_arf_as_gld;
 } AV1_COMP;
 
+// Must not be called more than once.
 void av1_initialize_enc(void);
 
 struct AV1_COMP *av1_create_compressor(AV1EncoderConfig *oxcf,
@@ -868,6 +933,25 @@ static INLINE int av1_resize_scaled(const AV1_COMMON *cm) {
 static INLINE int av1_frame_scaled(const AV1_COMMON *cm) {
   return !av1_superres_scaled(cm) && av1_resize_scaled(cm);
 }
+
+// Don't allow a show_existing_frame to coincide with an error resilient
+// frame. An exception can be made for a forward keyframe since it has no
+// previous dependencies.
+static INLINE int encode_show_existing_frame(const AV1_COMMON *cm) {
+  return cm->show_existing_frame &&
+         (!cm->error_resilient_mode || cm->frame_type == KEY_FRAME);
+}
+
+// Returns a Sequence Header OBU stored in an aom_fixed_buf_t, or NULL upon
+// failure. When a non-NULL aom_fixed_buf_t pointer is returned by this
+// function, the memory must be freed by the caller. Both the buf member of the
+// aom_fixed_buf_t, and the aom_fixed_buf_t pointer itself must be freed. Memory
+// returned must be freed via call to free().
+//
+// Note: The OBU returned is in Low Overhead Bitstream Format. Specifically,
+// the obu_has_size_field bit is set, and the buffer contains the obu_size
+// field.
+aom_fixed_buf_t *av1_get_global_headers(AV1_COMP *cpi);
 
 #ifdef __cplusplus
 }  // extern "C"

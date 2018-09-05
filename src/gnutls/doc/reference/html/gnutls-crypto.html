@@ -8,7 +8,7 @@
 <link rel="up" href="intro.html" title="GnuTLS API Reference Manual">
 <link rel="prev" href="gnutls-openpgp.html" title="openpgp">
 <link rel="next" href="gnutls-pkcs11.html" title="pkcs11">
-<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.28 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -231,8 +231,6 @@
 </div>
 <div class="refsect1">
 <a name="gnutls-crypto.description"></a><h2>Description</h2>
-<p>
-</p>
 </div>
 <div class="refsect1">
 <a name="gnutls-crypto.functions_details"></a><h2>Functions</h2>
@@ -254,11 +252,23 @@ and before any encryption operations.</p>
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
 <td class="parameter_name"><p>handle</p></td>
 <td class="parameter_description"><p>is a <a class="link" href="gnutls-crypto.html#gnutls-cipher-hd-t" title="gnutls_cipher_hd_t"><span class="type">gnutls_cipher_hd_t</span></a> type</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext</p></td>
+<td class="parameter_description"><p>the data to be authenticated</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext_size</p></td>
+<td class="parameter_description"><p>the length of the data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -286,11 +296,23 @@ need to compare the tag sent with the value returned from <a class="link" href="
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
 <td class="parameter_name"><p>handle</p></td>
 <td class="parameter_description"><p>is a <a class="link" href="gnutls-crypto.html#gnutls-cipher-hd-t" title="gnutls_cipher_hd_t"><span class="type">gnutls_cipher_hd_t</span></a> type</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="parameter_name"><p>ctext</p></td>
+<td class="parameter_description"><p>the data to decrypt</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ctext_len</p></td>
+<td class="parameter_description"><p>the length of data to decrypt</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -323,11 +345,33 @@ need to compare the tag sent with the value returned from <a class="link" href="
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
 <td class="parameter_name"><p>handle</p></td>
 <td class="parameter_description"><p>is a <a class="link" href="gnutls-crypto.html#gnutls-cipher-hd-t" title="gnutls_cipher_hd_t"><span class="type">gnutls_cipher_hd_t</span></a> type</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="parameter_name"><p>ctext</p></td>
+<td class="parameter_description"><p>the data to decrypt</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ctext_len</p></td>
+<td class="parameter_description"><p>the length of data to decrypt</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext</p></td>
+<td class="parameter_description"><p>the decrypted data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext_len</p></td>
+<td class="parameter_description"><p>the available length for decrypted data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -377,11 +421,23 @@ specified by the context.</p>
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
 <td class="parameter_name"><p>handle</p></td>
 <td class="parameter_description"><p>is a <a class="link" href="gnutls-crypto.html#gnutls-cipher-hd-t" title="gnutls_cipher_hd_t"><span class="type">gnutls_cipher_hd_t</span></a> type</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext</p></td>
+<td class="parameter_description"><p>the data to encrypt</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext_len</p></td>
+<td class="parameter_description"><p>the length of data to encrypt</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -412,11 +468,33 @@ data length will equal the plaintext size.</p>
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
 <td class="parameter_name"><p>handle</p></td>
 <td class="parameter_description"><p>is a <a class="link" href="gnutls-crypto.html#gnutls-cipher-hd-t" title="gnutls_cipher_hd_t"><span class="type">gnutls_cipher_hd_t</span></a> type</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext</p></td>
+<td class="parameter_description"><p>the data to encrypt</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext_len</p></td>
+<td class="parameter_description"><p>the length of data to encrypt</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ctext</p></td>
+<td class="parameter_description"><p>the encrypted data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ctext_len</p></td>
+<td class="parameter_description"><p>the available length for encrypted data</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -430,6 +508,21 @@ data length will equal the plaintext size.</p>
 <a name="gnutls-cipher-get-block-size"></a><h3>gnutls_cipher_get_block_size ()</h3>
 <pre class="programlisting"><span class="returnvalue">unsigned</span>
 gnutls_cipher_get_block_size ();</pre>
+<div class="refsect3">
+<a name="gnutls-cipher-get-block-size.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>algorithm</p></td>
+<td class="parameter_description"><p>is an encryption algorithm</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
 <div class="refsect3">
 <a name="gnutls-cipher-get-block-size.returns"></a><h4>Returns</h4>
 <p> the block size of the encryption algorithm.</p>
@@ -585,11 +678,23 @@ specified by the context.</p>
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
 <td class="parameter_name"><p>handle</p></td>
 <td class="parameter_description"><p>is a <a class="link" href="gnutls-crypto.html#gnutls-hash-hd-t" title="gnutls_hash_hd_t"><span class="type">gnutls_hash_hd_t</span></a> type</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext</p></td>
+<td class="parameter_description"><p>the data to hash</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext_len</p></td>
+<td class="parameter_description"><p>the length of data to hash</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -637,6 +742,21 @@ the given hash context.</p>
 gnutls_hash_get_len ();</pre>
 <p>This function will return the length of the output data
 of the given hash algorithm.</p>
+<div class="refsect3">
+<a name="gnutls-hash-get-len.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>algorithm</p></td>
+<td class="parameter_description"><p>the hash algorithm to use</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
 <div class="refsect3">
 <a name="gnutls-hash-get-len.returns"></a><h4>Returns</h4>
 <p> The length or zero on error.</p>
@@ -730,11 +850,23 @@ specified by the context.</p>
 <col class="parameters_description">
 <col width="200px" class="parameters_annotations">
 </colgroup>
-<tbody><tr>
+<tbody>
+<tr>
 <td class="parameter_name"><p>handle</p></td>
 <td class="parameter_description"><p>is a <a class="link" href="gnutls-crypto.html#gnutls-hmac-hd-t" title="gnutls_hmac_hd_t"><span class="type">gnutls_hmac_hd_t</span></a> type</p></td>
 <td class="parameter_annotations"> </td>
-</tr></tbody>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext</p></td>
+<td class="parameter_description"><p>the data to hash</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>ptext_len</p></td>
+<td class="parameter_description"><p>the length of data to hash</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
 </table></div>
 </div>
 <div class="refsect3">
@@ -782,6 +914,21 @@ the given hmac context.</p>
 gnutls_hmac_get_len ();</pre>
 <p>This function will return the length of the output data
 of the given hmac algorithm.</p>
+<div class="refsect3">
+<a name="gnutls-hmac-get-len.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>algorithm</p></td>
+<td class="parameter_description"><p>the hmac algorithm to use</p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
 <div class="refsect3">
 <a name="gnutls-hmac-get-len.returns"></a><h4>Returns</h4>
 <p> The length or zero on error.</p>
@@ -873,24 +1020,18 @@ buffer. The value of <em class="parameter"><code>level</code></em>
 <a name="gnutls-cipher-hd-t"></a><h3>gnutls_cipher_hd_t</h3>
 <pre class="programlisting">typedef struct api_cipher_hd_st *gnutls_cipher_hd_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-hash-hd-t"></a><h3>gnutls_hash_hd_t</h3>
 <pre class="programlisting">typedef struct hash_hd_st *gnutls_hash_hd_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="gnutls-hmac-hd-t"></a><h3>gnutls_hmac_hd_t</h3>
 <pre class="programlisting">typedef struct hmac_hd_st *gnutls_hmac_hd_t;
 </pre>
-<p>
-</p>
 </div>
 <hr>
 <div class="refsect2">
@@ -935,6 +1076,6 @@ buffer. The value of <em class="parameter"><code>level</code></em>
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.25</div>
+<hr>Generated by GTK-Doc V1.28</div>
 </body>
 </html>

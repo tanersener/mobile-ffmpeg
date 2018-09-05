@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="audio_codec">
+        <item>mp3 (liblame)</item>
+        <item>mp3 (libshine)</item>
+        <item>vorbis</item>
+        <item>opus</item>
+        <item>amr</item>
+        <item>ilbc</item>
+        <item>soxr</item>
+        <item>speex</item>
+        <item>wavpack</item>
+    </string-array>
+</resources>

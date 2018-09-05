@@ -56,7 +56,7 @@ typedef struct mv32 {
 #define WARPEDDIFF_PREC_BITS (WARPEDMODEL_PREC_BITS - WARPEDPIXEL_PREC_BITS)
 
 /* clang-format off */
-typedef enum {
+typedef enum ATTRIBUTE_PACKED {
   IDENTITY = 0,      // identity transformation, 0-parameter
   TRANSLATION = 1,   // translational motion 2-parameter
   ROTZOOM = 2,       // simplified affine with rotation + zoom only, 4-parameter
@@ -294,9 +294,6 @@ static INLINE void clamp_mv(MV *mv, int min_col, int max_col, int min_row,
   mv->row = clamp(mv->row, min_row, max_row);
 }
 
-static INLINE int mv_has_subpel(const MV *mv) {
-  return (mv->row & SUBPEL_MASK) || (mv->col & SUBPEL_MASK);
-}
 #ifdef __cplusplus
 }  // extern "C"
 #endif

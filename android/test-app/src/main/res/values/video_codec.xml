@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="video_codec">
+        <item>mpeg4</item>
+        <item>x264</item>
+        <item>x265</item>
+        <item>xvid</item>
+        <item>vp8</item>
+        <item>vp9</item>
+        <item>aom</item>
+        <item>kvazaar</item>
+        <item>theora</item>
+        <item>hap</item>
+    </string-array>
+</resources>

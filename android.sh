@@ -28,27 +28,30 @@ LIBRARY_WAVPACK=16
 LIBRARY_KVAZAAR=17
 LIBRARY_X264=18
 LIBRARY_XVIDCORE=19
-LIBRARY_LIBILBC=20
-LIBRARY_OPUS=21
-LIBRARY_SNAPPY=22
-LIBRARY_SOXR=23
-LIBRARY_LIBAOM=24
-LIBRARY_GIFLIB=25
-LIBRARY_JPEG=26
-LIBRARY_LIBOGG=27
-LIBRARY_LIBPNG=28
-LIBRARY_LIBUUID=29
-LIBRARY_NETTLE=30
-LIBRARY_TIFF=31
-LIBRARY_EXPAT=32
-LIBRARY_ZLIB=33
-LIBRARY_MEDIA_CODEC=34
+LIBRARY_X265=20
+LIBRARY_LIBVIDSTAB=21
+LIBRARY_LIBILBC=22
+LIBRARY_OPUS=23
+LIBRARY_SNAPPY=24
+LIBRARY_SOXR=25
+LIBRARY_LIBAOM=26
+LIBRARY_CHROMAPRINT=27
+LIBRARY_GIFLIB=28
+LIBRARY_JPEG=29
+LIBRARY_LIBOGG=30
+LIBRARY_LIBPNG=31
+LIBRARY_LIBUUID=32
+LIBRARY_NETTLE=33
+LIBRARY_TIFF=34
+LIBRARY_EXPAT=35
+LIBRARY_ZLIB=36
+LIBRARY_MEDIA_CODEC=37
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -78,7 +81,8 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "Options:"
 
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
-    echo -e "  -V, --version\t\t\tdisplay version information and exit\n"
+    echo -e "  -V, --version\t\t\tdisplay version information and exit"
+    echo -e "  -d, --debug\t\t\tbuild with debug information\n"
 
     echo -e "Licensing options:"
 
@@ -97,6 +101,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  --full\t\t\tenables all external libraries"
     echo -e "  --enable-android-media-codec\tbuild with built-in Android MediaCodec [no]"
     echo -e "  --enable-android-zlib\t\tbuild with built-in zlib [no]"
+    echo -e "  --enable-chromaprint\t\tbuild with chromaprint [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
     echo -e "  --enable-freetype\t\tbuild with freetype [no]"
     echo -e "  --enable-fribidi\t\tbuild with fribidi [no]"
@@ -123,7 +128,9 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
 
     echo -e "GPL libraries:"
 
+    echo -e "  --enable-libvidstab\t\tbuild with libvidstab [no]"
     echo -e "  --enable-x264\t\t\tbuild with x264 [no]"
+    echo -e "  --enable-x265\t\t\tbuild with x265 [no]"
     echo -e "  --enable-xvidcore\t\tbuild with xvidcore [no]\n"
 
     echo -e "Advanced options:"
@@ -143,6 +150,16 @@ License LGPLv3.0: GNU LGPL version 3 or later\n\
 This is free software: you can redistribute it and/or modify it under the terms of the \
 GNU Lesser General Public License as published by the Free Software Foundation, \
 either version 3 of the License, or (at your option) any later version."
+}
+
+skip_library() {
+    SKIP_VARIABLE=$(echo "SKIP_$1" | sed "s/\-/\_/g")
+
+    export ${SKIP_VARIABLE}=1
+}
+
+enable_debug() {
+    export MOBILE_FFMPEG_DEBUG="-d"
 }
 
 reconf_library() {
@@ -168,6 +185,9 @@ set_library() {
         ;;
         android-zlib)
             ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+        ;;
+        chromaprint)
+            ENABLED_LIBRARIES[LIBRARY_CHROMAPRINT]=$2
         ;;
         fontconfig)
             ENABLED_LIBRARIES[LIBRARY_FONTCONFIG]=$2
@@ -228,6 +248,9 @@ set_library() {
             ENABLED_LIBRARIES[LIBRARY_LIBOGG]=$2
             set_library "libvorbis" $2
         ;;
+        libvidstab)
+            ENABLED_LIBRARIES[LIBRARY_LIBVIDSTAB]=$2
+        ;;
         libvorbis)
             ENABLED_LIBRARIES[LIBRARY_LIBVORBIS]=$2
             ENABLED_LIBRARIES[LIBRARY_LIBOGG]=$2
@@ -270,6 +293,9 @@ set_library() {
         ;;
         x264)
             ENABLED_LIBRARIES[LIBRARY_X264]=$2
+        ;;
+        x265)
+            ENABLED_LIBRARIES[LIBRARY_X265]=$2
         ;;
         xvidcore)
             ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
@@ -361,7 +387,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {33..34}
+    for library in {36..37}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -373,7 +399,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..24}
+    for library in {0..27}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -425,6 +451,14 @@ do
             display_version
             exit 0
 	    ;;
+        --skip-*)
+            SKIP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
+
+            skip_library ${SKIP_LIBRARY}
+	    ;;
+        -d | --debug)
+            enable_debug
+	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
@@ -436,9 +470,9 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..34}
+            for library in {0..37}
             do
-                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]]; then
+                if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
                 fi
             done
@@ -469,39 +503,42 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
 fi
 
 echo -e "Building mobile-ffmpeg for Android\n"
-echo -e -n "INFO: Building mobile-ffmpeg for Android: " >>${BASEDIR}/build.log
-echo -e `date` >>${BASEDIR}/build.log
+echo -e -n "INFO: Building mobile-ffmpeg for Android: " 1>>${BASEDIR}/build.log 2>&1
+echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 if [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
     ENABLED_ARCHITECTURES[0]=1
 
     echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n"
-    echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n" 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+    echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n" 1>>${BASEDIR}/build.log 2>&1
 fi
 
 print_enabled_architectures
 print_enabled_libraries
 
 # CHECKING GPL LIBRARIES
-for gpl_library in {18..19}
+for gpl_library in {18..21}
 do
     if [[ ${ENABLED_LIBRARIES[$gpl_library]} -eq 1 ]]; then
         library_name=$(get_library_name ${gpl_library})
 
         if  [ ${GPL_ENABLED} != "yes" ]; then
             echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n"
-            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" >> ${BASEDIR}/build.log
+            echo -e "\n(*) Invalid configuration detected. GPL library ${library_name} enabled without --enable-gpl flag.\n" 1>>${BASEDIR}/build.log 2>&1
             exit 1
         else
             DOWNLOAD_RESULT=$(download_gpl_library_source ${library_name})
             if [[ ${DOWNLOAD_RESULT} -ne 0 ]]; then
                 echo -e "\n(*) Failed to download GPL library ${library_name} source. Please check build.log file for details. If the problem persists refer to offline building instructions.\n"
-                echo -e "\n(*) Failed to download GPL library ${library_name} source.\n" >> ${BASEDIR}/build.log
+                echo -e "\n(*) Failed to download GPL library ${library_name} source.\n" 1>>${BASEDIR}/build.log 2>&1
                 exit 1
             fi
         fi
     fi
 done
+
+# CLEANING PREVIOUSLY COPIED c++_shared.so FILES
+rm -rf ${BASEDIR}/prebuilt/android-cpp-shared 1>>${BASEDIR}/build.log 2>&1
 
 for run_arch in {0..4}
 do
@@ -512,10 +549,21 @@ do
 
         create_toolchain || exit 1
 
+        # COPY libc++_shared.so FROM EACH TOOLCHAIN
+        mkdir -p ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH}
+
+        if [[ $run_arch -eq 0 ]] || [[ $run_arch -eq 1 ]]; then
+            cp ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/$(get_target_host)/lib/armv7-a/libc++_shared.so ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH} 1>>${BASEDIR}/build.log 2>&1
+        elif [[ $run_arch -eq 4 ]]; then
+            cp ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/$(get_target_host)/lib64/libc++_shared.so ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH} 1>>${BASEDIR}/build.log 2>&1
+        else
+            cp ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/$(get_target_host)/lib/libc++_shared.so ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH} 1>>${BASEDIR}/build.log 2>&1
+        fi
+
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
         # CLEAR FLAGS
-        for library in {1..35}
+        for library in {1..38}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
@@ -524,11 +572,11 @@ do
     fi
 done
 
-rm -f ${BASEDIR}/android/build/.neon
+rm -f ${BASEDIR}/android/build/.neon 1>>${BASEDIR}/build.log 2>&1
 ANDROID_ARCHITECTURES=""
 if [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
     ANDROID_ARCHITECTURES+="$(get_android_arch 0) "
-    mkdir -p ${BASEDIR}/android/build
+    mkdir -p ${BASEDIR}/android/build 1>>${BASEDIR}/build.log 2>&1
     cat > "${BASEDIR}/android/build/.neon" << EOF
 EOF
 elif [[ ${ENABLED_ARCHITECTURES[0]} -eq 1 ]]; then
@@ -553,13 +601,13 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
     MOBILE_FFMPEG_AAR=${BASEDIR}/prebuilt/android-aar/mobile-ffmpeg
 
     # BUILDING ANDROID ARCHIVE LIBRARY
-    rm -rf ${BASEDIR}/android/libs
+    rm -rf ${BASEDIR}/android/libs 1>>${BASEDIR}/build.log 2>&1
 
-    mkdir -p ${MOBILE_FFMPEG_AAR}
+    mkdir -p ${MOBILE_FFMPEG_AAR} 1>>${BASEDIR}/build.log 2>&1
 
-    cd ${BASEDIR}/android
+    cd ${BASEDIR}/android 1>>${BASEDIR}/build.log 2>&1
 
-    ${ANDROID_NDK_ROOT}/ndk-build -B 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+    ${ANDROID_NDK_ROOT}/ndk-build -B 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -eq 0 ]; then
         echo "ok"
@@ -570,16 +618,21 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
 
     echo -e -n "\n\nCreating Android archive under prebuilt/android-aar: "
 
-    gradle clean build 2>>${BASEDIR}/build.log 1>>${BASEDIR}/build.log
+    gradle clean build 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -ne 0 ]; then
         echo -e "failed\n"
         exit 1
     fi
 
-    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-*.aar ${MOBILE_FFMPEG_AAR}/mobile-ffmpeg.aar || exit 1
+    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-*.aar ${MOBILE_FFMPEG_AAR}/mobile-ffmpeg.aar 1>>${BASEDIR}/build.log 2>&1
 
-    echo -e "Created mobile-ffmpeg Android archive successfully.\n" >> ${BASEDIR}/build.log
+    if [ $? -ne 0 ]; then
+        echo -e "failed\n"
+        exit 1
+    fi
+
+    echo -e "Created mobile-ffmpeg Android archive successfully.\n" 1>>${BASEDIR}/build.log 2>&1
 
     echo -e "ok\n"
 fi

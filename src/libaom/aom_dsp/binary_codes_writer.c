@@ -208,15 +208,3 @@ int aom_count_signed_primitive_refsubexpfin(uint16_t n, uint16_t k, int16_t ref,
   const uint16_t scaled_n = (n << 1) - 1;
   return aom_count_primitive_refsubexpfin(scaled_n, k, ref, v);
 }
-
-void aom_wb_write_uvlc(struct aom_write_bit_buffer *wb, uint32_t v) {
-  int64_t shift_val = ++v;
-  int leading_zeroes = 1;
-
-  assert(shift_val > 0);
-
-  while (shift_val >>= 1) leading_zeroes += 2;
-
-  aom_wb_write_literal(wb, 0, leading_zeroes >> 1);
-  aom_wb_write_unsigned_literal(wb, v, (leading_zeroes + 1) >> 1);
-}

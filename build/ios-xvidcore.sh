@@ -54,11 +54,11 @@ case ${ARCH} in
 
         # REMOVING -flat_namespace OPTION FROM CONFIGURE TO FIX THE FOLLOWING ERROR
         # ld: -flat_namespace and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
-        sed -i .tmp 's/ -flat_namespace//g' configure
+        ${SED_INLINE} 's/ -flat_namespace//g' configure
 
         # REMOVING -Wl,-read_only_relocs,suppress OPTION FROM CONFIGURE TO FIX THE FOLLOWING ERROR
         # ld: -read_only_relocs and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
-        sed -i .tmp 's/-Wl,-read_only_relocs,suppress//g' configure
+        ${SED_INLINE} 's/-Wl,-read_only_relocs,suppress//g' configure
 
     ;;
     i386)
@@ -74,7 +74,7 @@ esac
     ${ASM_FLAGS} \
     --host=${TARGET_HOST} || exit 1
 
-make -j$(get_cpu_count) || exit 1
+make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_xvidcore_package_config "1.3.5"

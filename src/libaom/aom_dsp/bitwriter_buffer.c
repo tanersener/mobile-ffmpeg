@@ -9,6 +9,7 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
+#include <assert.h>
 #include <limits.h>
 #include <stdlib.h>
 
@@ -49,12 +50,14 @@ void aom_wb_overwrite_bit(struct aom_write_bit_buffer *wb, int bit) {
 }
 
 void aom_wb_write_literal(struct aom_write_bit_buffer *wb, int data, int bits) {
+  assert(bits <= 31);
   int bit;
   for (bit = bits - 1; bit >= 0; bit--) aom_wb_write_bit(wb, (data >> bit) & 1);
 }
 
 void aom_wb_write_unsigned_literal(struct aom_write_bit_buffer *wb,
                                    uint32_t data, int bits) {
+  assert(bits <= 32);
   int bit;
   for (bit = bits - 1; bit >= 0; bit--) aom_wb_write_bit(wb, (data >> bit) & 1);
 }
@@ -69,4 +72,16 @@ void aom_wb_overwrite_literal(struct aom_write_bit_buffer *wb, int data,
 void aom_wb_write_inv_signed_literal(struct aom_write_bit_buffer *wb, int data,
                                      int bits) {
   aom_wb_write_literal(wb, data, bits + 1);
+}
+
+void aom_wb_write_uvlc(struct aom_write_bit_buffer *wb, uint32_t v) {
+  int64_t shift_val = ++v;
+  int leading_zeroes = 1;
+
+  assert(shift_val > 0);
+
+  while (shift_val >>= 1) leading_zeroes += 2;
+
+  aom_wb_write_literal(wb, 0, leading_zeroes >> 1);
+  aom_wb_write_unsigned_literal(wb, v, (leading_zeroes + 1) >> 1);
 }

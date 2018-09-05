@@ -14,19 +14,16 @@
 
 #include "config/aom_dsp_rtcd.h"
 
-#include "aom_dsp/aom_convolve.h"
 #include "aom_dsp/aom_dsp_common.h"
 #include "aom_dsp/aom_filter.h"
 #include "aom_dsp/x86/convolve_sse2.h"
 #include "av1/common/convolve.h"
 
-void av1_highbd_convolve_2d_sr_ssse3(const uint16_t *src, int src_stride,
-                                     uint16_t *dst, int dst_stride, int w,
-                                     int h, InterpFilterParams *filter_params_x,
-                                     InterpFilterParams *filter_params_y,
-                                     const int subpel_x_q4,
-                                     const int subpel_y_q4,
-                                     ConvolveParams *conv_params, int bd) {
+void av1_highbd_convolve_2d_sr_ssse3(
+    const uint16_t *src, int src_stride, uint16_t *dst, int dst_stride, int w,
+    int h, const InterpFilterParams *filter_params_x,
+    const InterpFilterParams *filter_params_y, const int subpel_x_q4,
+    const int subpel_y_q4, ConvolveParams *conv_params, int bd) {
   DECLARE_ALIGNED(32, int16_t, im_block[(MAX_SB_SIZE + MAX_FILTER_TAP) * 8]);
   int im_h = h + filter_params_y->taps - 1;
   int im_stride = 8;

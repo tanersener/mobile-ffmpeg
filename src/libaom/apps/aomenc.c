@@ -203,6 +203,12 @@ static const arg_def_t bitdeptharg = ARG_DEF_ENUM(
     bitdepth_enum);
 static const arg_def_t inbitdeptharg =
     ARG_DEF(NULL, "input-bit-depth", 1, "Bit depth of input");
+
+static const arg_def_t input_chroma_subsampling_x = ARG_DEF(
+    NULL, "input-chroma-subsampling-x", 1, "chroma subsampling x value.");
+static const arg_def_t input_chroma_subsampling_y = ARG_DEF(
+    NULL, "input-chroma-subsampling-y", 1, "chroma subsampling y value.");
+
 static const arg_def_t *main_args[] = { &help,
 #if CONFIG_FILEOPTIONS
                                         &use_cfg,
@@ -411,11 +417,12 @@ static const arg_def_t max_intra_rate_pct =
 #if CONFIG_AV1_ENCODER
 static const arg_def_t cpu_used_av1 =
     ARG_DEF(NULL, "cpu-used", 1, "CPU Used (0..8)");
-static const arg_def_t dev_sf_av1 =
-    ARG_DEF(NULL, "dev-sf", 1, "Dev Speed (0..255)");
 static const arg_def_t single_tile_decoding =
     ARG_DEF(NULL, "single-tile-decoding", 1,
             "Single tile decoding (0: off (default), 1: on)");
+static const arg_def_t rowmtarg =
+    ARG_DEF(NULL, "row-mt", 1,
+            "Enable row based multi-threading (0: off (default), 1: on)");
 static const arg_def_t tile_cols =
     ARG_DEF(NULL, "tile-columns", 1, "Number of tile columns to use, log2");
 static const arg_def_t tile_rows =
@@ -475,6 +482,13 @@ static const arg_def_t film_grain_test =
 static const arg_def_t film_grain_table =
     ARG_DEF(NULL, "film-grain-table", 1,
             "Path to file containing film grain parameters");
+#if CONFIG_DENOISE
+static const arg_def_t denoise_noise_level =
+    ARG_DEF(NULL, "denoise-noise-level", 1,
+            "Amount of noise (from 0 = don't denoise, to 50)");
+static const arg_def_t denoise_block_size =
+    ARG_DEF(NULL, "denoise-block-size", 1, "Denoise block size (default = 32)");
+#endif
 static const arg_def_t enable_ref_frame_mvs =
     ARG_DEF(NULL, "enable-ref-frame-mvs", 1,
             "Enable temporal mv prediction (default is 1)");
@@ -612,11 +626,11 @@ static const arg_def_t superblock_size = ARG_DEF_ENUM(
     NULL, "sb-size", 1, "Superblock size to use", superblock_size_enum);
 
 static const arg_def_t *av1_args[] = { &cpu_used_av1,
-                                       &dev_sf_av1,
                                        &auto_altref,
                                        &sharpness,
                                        &static_thresh,
                                        &single_tile_decoding,
+                                       &rowmtarg,
                                        &tile_cols,
                                        &tile_rows,
                                        &arnr_maxframes,
@@ -656,19 +670,25 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &timing_info,
                                        &film_grain_test,
                                        &film_grain_table,
+#if CONFIG_DENOISE
+                                       &denoise_noise_level,
+                                       &denoise_block_size,
+#endif
                                        &enable_ref_frame_mvs,
                                        &bitdeptharg,
                                        &inbitdeptharg,
+                                       &input_chroma_subsampling_x,
+                                       &input_chroma_subsampling_y,
                                        &sframe_dist,
                                        &sframe_mode,
                                        &save_as_annexb,
                                        NULL };
 static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
-                                        AOME_SET_DEVSF,
                                         AOME_SET_ENABLEAUTOALTREF,
                                         AOME_SET_SHARPNESS,
                                         AOME_SET_STATIC_THRESHOLD,
                                         AV1E_SET_SINGLE_TILE_DECODING,
+                                        AV1E_SET_ROW_MT,
                                         AV1E_SET_TILE_COLUMNS,
                                         AV1E_SET_TILE_ROWS,
                                         AOME_SET_ARNR_MAXFRAMES,
@@ -708,6 +728,10 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_TIMING_INFO_TYPE,
                                         AV1E_SET_FILM_GRAIN_TEST_VECTOR,
                                         AV1E_SET_FILM_GRAIN_TABLE,
+#if CONFIG_DENOISE
+                                        AV1E_SET_DENOISE_NOISE_LEVEL,
+                                        AV1E_SET_DENOISE_BLOCK_SIZE,
+#endif
                                         AV1E_SET_ENABLE_REF_FRAME_MVS,
                                         AV1E_SET_ENABLE_DF,
                                         AV1E_SET_ENABLE_ORDER_HINT,
@@ -815,6 +839,8 @@ struct stream_state {
   struct aom_image *img;
   aom_codec_ctx_t decoder;
   int mismatch_seen;
+  unsigned int chroma_subsampling_x;
+  unsigned int chroma_subsampling_y;
 };
 
 static void validate_positive_rational(const char *msg,
@@ -1072,6 +1098,11 @@ static void set_config_arg_ctrls(struct stream_config *config, int key,
   assert(j < (int)ARG_CTRL_CNT_MAX);
   config->arg_ctrls[j][0] = key;
   config->arg_ctrls[j][1] = arg_parse_enum_or_int(arg);
+
+  if (key == AOME_SET_ENABLEAUTOALTREF && config->arg_ctrls[j][1] > 1) {
+    warn("auto-alt-ref > 1 is deprecated... setting auto-alt-ref=1\n");
+    config->arg_ctrls[j][1] = 1;
+  }
   if (j == config->arg_ctrl_cnt) config->arg_ctrl_cnt++;
 }
 
@@ -1159,6 +1190,10 @@ static int parse_stream_params(struct AvxEncoderConfig *global,
       config->cfg.g_bit_depth = arg_parse_enum_or_int(&arg);
     } else if (arg_match(&arg, &inbitdeptharg, argi)) {
       config->cfg.g_input_bit_depth = arg_parse_uint(&arg);
+    } else if (arg_match(&arg, &input_chroma_subsampling_x, argi)) {
+      stream->chroma_subsampling_x = arg_parse_uint(&arg);
+    } else if (arg_match(&arg, &input_chroma_subsampling_y, argi)) {
+      stream->chroma_subsampling_y = arg_parse_uint(&arg);
 #if CONFIG_WEBM_IO
     } else if (arg_match(&arg, &stereo_mode, argi)) {
       config->stereo_fmt = arg_parse_enum_or_int(&arg);
@@ -1594,14 +1629,14 @@ static void encode_frame(struct stream_state *stream,
             aom_img_alloc(NULL, AOM_IMG_FMT_I42016, cfg->g_w, cfg->g_h, 16);
       }
       I420Scale_16(
-          (uint16 *)img->planes[AOM_PLANE_Y], img->stride[AOM_PLANE_Y] / 2,
-          (uint16 *)img->planes[AOM_PLANE_U], img->stride[AOM_PLANE_U] / 2,
-          (uint16 *)img->planes[AOM_PLANE_V], img->stride[AOM_PLANE_V] / 2,
-          img->d_w, img->d_h, (uint16 *)stream->img->planes[AOM_PLANE_Y],
+          (uint16_t *)img->planes[AOM_PLANE_Y], img->stride[AOM_PLANE_Y] / 2,
+          (uint16_t *)img->planes[AOM_PLANE_U], img->stride[AOM_PLANE_U] / 2,
+          (uint16_t *)img->planes[AOM_PLANE_V], img->stride[AOM_PLANE_V] / 2,
+          img->d_w, img->d_h, (uint16_t *)stream->img->planes[AOM_PLANE_Y],
           stream->img->stride[AOM_PLANE_Y] / 2,
-          (uint16 *)stream->img->planes[AOM_PLANE_U],
+          (uint16_t *)stream->img->planes[AOM_PLANE_U],
           stream->img->stride[AOM_PLANE_U] / 2,
-          (uint16 *)stream->img->planes[AOM_PLANE_V],
+          (uint16_t *)stream->img->planes[AOM_PLANE_V],
           stream->img->stride[AOM_PLANE_V] / 2, stream->img->d_w,
           stream->img->d_h, kFilterBox);
       img = stream->img;
@@ -2028,6 +2063,20 @@ int main(int argc, const char **argv_) {
                         input.fmt == AOM_IMG_FMT_I42016)) {
               stream->config.cfg.g_profile = 0;
               profile_updated = 1;
+            } else if (input.bit_depth == 12 &&
+                       input.file_type == FILE_TYPE_Y4M) {
+              // Note that here the input file values for chroma subsampling
+              // are used instead of those from the command line.
+              aom_codec_control(&stream->encoder, AV1E_SET_CHROMA_SUBSAMPLING_X,
+                                input.y4m.dst_c_dec_h >> 1);
+              aom_codec_control(&stream->encoder, AV1E_SET_CHROMA_SUBSAMPLING_Y,
+                                input.y4m.dst_c_dec_v >> 1);
+            } else if (input.bit_depth == 12 &&
+                       input.file_type == FILE_TYPE_RAW) {
+              aom_codec_control(&stream->encoder, AV1E_SET_CHROMA_SUBSAMPLING_X,
+                                stream->chroma_subsampling_x);
+              aom_codec_control(&stream->encoder, AV1E_SET_CHROMA_SUBSAMPLING_Y,
+                                stream->chroma_subsampling_y);
             }
             break;
           default: break;

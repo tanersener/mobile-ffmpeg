@@ -19,10 +19,13 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 #import "AppDelegate.h"
 
-#import <mobileffmpeg/archdetect.h>
-#import <mobileffmpeg/mobileffmpeg.h>
+void uncaughtExceptionHandler(NSException *exception) {
+    NSLog(@"Uncaught exception detected: %@.", exception);
+    NSLog(@"%@", [exception callStackSymbols]);
+}
 
 @interface AppDelegate ()
 
@@ -31,13 +34,46 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-     // Override point for customization after application launch.
+    // Override point for customization after application launch.
 
-    NSLog(@"Loaded mobile-ffmpeg-%s-%s\n", mobileffmpeg_get_arch(), mobileffmpeg_get_version());
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
 
+    // UPDATE TAB BAR STYLE
+    UITabBarController *tabBarController = (UITabBarController *)self.window.rootViewController;
+    UITabBar *tabBar = tabBarController.tabBar;
+    UITabBarItem *tabBarItem1 = [tabBar.items objectAtIndex:0];
+    UITabBarItem *tabBarItem2 = [tabBar.items objectAtIndex:1];
+    UITabBarItem *tabBarItem3 = [tabBar.items objectAtIndex:2];
+    UITabBarItem *tabBarItem4 = [tabBar.items objectAtIndex:3];
+    UITabBarItem *tabBarItem5 = [tabBar.items objectAtIndex:4];
+    UITabBarItem *tabBarItem6 = [tabBar.items objectAtIndex:5];
+    tabBarItem1.title = @"COMMAND";
+    tabBarItem2.title = @"VIDEO";
+    tabBarItem3.title = @"HTTPS";
+    tabBarItem4.title = @"AUDIO";
+    tabBarItem5.title = @"SUBTITLE";
+    tabBarItem6.title = @"VID.STAB";
+
+    // SELECTED BAR ITEM
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [UIColor colorWithRed:244.0/255.0 green:104.0/255.0 blue:66.0/255.0 alpha:1.0], NSForegroundColorAttributeName,
+                                                       [UIFont boldSystemFontOfSize:14], NSFontAttributeName,
+                                                       nil] forState:UIControlStateSelected];
+
+    // NOT SELECTED BAR ITEMS
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [UIColor colorWithRed:189.0/255.0 green:195.0/255.0 blue:199.0/255.0 alpha:1.0], NSForegroundColorAttributeName,
+                                                       [UIFont boldSystemFontOfSize:12], NSFontAttributeName,
+                                                       nil] forState:UIControlStateNormal];
+    
+    NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
+    NSDictionary *fontNameMapping = @{@"MyFontName" : @"Doppio One"};
+
+    [MobileFFmpegConfig setFontDirectory:resourceFolder with:fontNameMapping];
+    [MobileFFmpegConfig setFontDirectory:resourceFolder with:nil];
+    
     return YES;
 }
-
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.

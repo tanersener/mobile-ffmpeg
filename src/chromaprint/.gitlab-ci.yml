@@ -1,0 +1,83 @@
+image: docker.oxygene.sk/acoustid/chromaprint-build
+
+stages:
+  - test
+  - package
+
+.test: &test
+  stage: test
+  script:
+    - JOB_NAME=($CI_BUILD_NAME)
+    - mkdir build.test.${JOB_NAME[1]}
+    - cd build.test.${JOB_NAME[1]}
+    - cmake -DCMAKE_BUILD_TYPE=Release -DFFT_LIB=${JOB_NAME[1]} -DBUILD_TESTS=ON $EXTRA_CMAKE_ARGS ..
+    - make VERBOSE=1
+    - make check VERBOSE=1
+
+test avfft:
+  <<: *test
+  variables:
+    EXTRA_CMAKE_ARGS: -DBUILD_TOOLS=ON
+
+test fftw3:
+  <<: *test
+  variables:
+    EXTRA_CMAKE_ARGS: -DBUILD_TOOLS=ON
+
+test fftw3f:
+  <<: *test
+  variables:
+    EXTRA_CMAKE_ARGS: -DBUILD_TOOLS=ON
+
+test kissfft:
+  <<: *test
+  variables:
+    EXTRA_CMAKE_ARGS: -DBUILD_TOOLS=ON
+
+test vdsp:
+  <<: *test
+  variables:
+    EXTRA_CMAKE_ARGS: -DCMAKE_CXX_FLAGS='-stdlib=libc++' -DGTEST_ROOT=/usr/local/src/googletest/googletest/
+  tags:
+    - osx
+
+.package: &package
+  stage: package
+  script:
+    - JOB_NAME=($CI_BUILD_NAME)
+    - export OS=${JOB_NAME[1]}
+    - export ARCH=${JOB_NAME[2]}
+    - export TAG=$CI_BUILD_TAG
+    - export BRANCH=$CI_BUILD_REF_NAME
+    - ./package/build.sh
+  artifacts:
+    paths:
+      - chromaprint-*.zip
+      - chromaprint-*.tar.gz
+    expire_in: 7d
+
+.package-macos: &package-macos
+  <<: *package
+  tags:
+    - osx
+
+.package-linux-armhf: &package-linux-armhf
+  <<: *package
+  tags:
+    - linux
+    - armhf
+
+package linux i686: *package
+package linux x86_64: *package
+package linux armhf: *package-linux-armhf
+package windows i686: *package
+package windows x86_64: *package
+package macos x86_64: *package-macos
+
+package src:
+  <<: *package
+  script:
+    - VERSION=$(echo $CI_BUILD_TAG | sed 's/^v//')
+    - git archive --format=tar.gz --prefix=chromaprint-$CI_BUILD_TAG/ $CI_BUILD_TAG >chromaprint-$VERSION.tar.gz
+  only:
+    - tags

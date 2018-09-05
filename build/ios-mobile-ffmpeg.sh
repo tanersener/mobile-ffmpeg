@@ -39,7 +39,7 @@ COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include"
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/lib"
+export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/lib -framework Foundation -lavdevice"
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 cd ${BASEDIR}/ios || exit 1
@@ -53,6 +53,12 @@ if [[ ${RECONF_mobile_ffmpeg} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
+# REMOVING OPTIONS FROM CONFIGURE TO FIX THE FOLLOWING ERROR
+# ld: -flat_namespace and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
+${SED_INLINE} 's/$wl-flat_namespace //g' configure
+${SED_INLINE} 's/$wl-undefined //g' configure
+${SED_INLINE} 's/${wl}suppress//g' configure
+
 ./configure \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
@@ -61,21 +67,21 @@ fi
     --disable-static \
     --disable-fast-install \
     --disable-maintainer-mode \
-    --host=${TARGET_HOST} 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+    --host=${TARGET_HOST} 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"
     exit 1
 fi
 
-make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"
     exit 1
 fi
 
-make install 1>>${BASEDIR}/build.log 2>>${BASEDIR}/build.log
+make install 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo "ok"

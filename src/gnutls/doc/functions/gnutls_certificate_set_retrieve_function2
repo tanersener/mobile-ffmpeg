@@ -22,7 +22,7 @@ This is a hint and typically the client should send a certificate that is signed
 by one of these CAs. These names, when available, are DER encoded. To get a more
 meaningful value use the function @code{gnutls_x509_rdn_get()} .
 
- @code{pk_algos} contains a list with server's acceptable signature algorithms.
+ @code{pk_algos} contains a list with server's acceptable public key algorithms.
 The certificate returned should support the server's given algorithms.
 
  @code{pcert} should contain a single certificate and public key or a list of them.

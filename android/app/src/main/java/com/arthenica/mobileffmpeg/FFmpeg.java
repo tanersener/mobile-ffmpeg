@@ -19,49 +19,34 @@
 
 package com.arthenica.mobileffmpeg;
 
+import android.util.Log;
+
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
  * FFmpeg commands.
  * <pre>
  *      int rc = FFmpeg.execute("-i", "file1.mp4", "-c:v", "libxvid", "file1.avi");
- *      Log.i(Log.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
+ *      Log.i(Config.TAG, String.format("Command execution %s.", (rc == 0?"completed successfully":"failed with rc=" + rc));
  * </pre>
- * <p>Note that it is recommended to call {@link #shutdown()} method before terminating your
- * Android app.
  *
  * @author Taner Sener
  * @since v1.0
  */
 public class FFmpeg {
 
+    public static final int RETURN_CODE_SUCCESS = 0;
+
+    public static final int RETURN_CODE_CANCEL = 255;
+
     static {
-        final Abi abi = Abi.from(AbiDetect.getAbi());
-        String abiName = abi.getName();
+        Log.i(Config.TAG, "Loading mobile-ffmpeg.");
 
-        Log.enableCollectingStdOutErr();
+        System.loadLibrary("mobileffmpeg");
 
-        android.util.Log.i(Log.TAG, "Loading mobile-ffmpeg.");
+        AbiDetect.class.getName();
+        Config.class.getName();
 
-        /*
-         * NEON supported arm-v7a library has a different name
-         */
-        boolean nativeLibraryLoaded = false;
-        if (abi == Abi.ABI_ARMV7A_NEON) {
-            try {
-                System.loadLibrary("mobileffmpeg-armv7a-neon");
-                android.util.Log.i(Log.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", abiName, getVersion()));
-                nativeLibraryLoaded = true;
-            } catch (UnsatisfiedLinkError e) {
-                android.util.Log.i(Log.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
-                abiName = Abi.ABI_ARMV7A.getName();
-            }
-        }
-
-        if (!nativeLibraryLoaded) {
-            System.loadLibrary("mobileffmpeg");
-
-            android.util.Log.i(Log.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", abiName, getVersion()));
-        }
+        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", AbiDetect.getAbi(), getVersion()));
     }
 
     /**
@@ -87,24 +72,26 @@ public class FFmpeg {
     /**
      * <p>Synchronously executes FFmpeg with arguments provided.
      *
-     * @param arguments FFmpeg command options/arguments
-     * @return zero on successful execution, non-zero on error
+     * @param arguments FFmpeg command options/arguments as string array
+     * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
-    public native static int execute(final String ... arguments);
+    public native static int execute(final String[] arguments);
 
     /**
-     * <p>Shuts down library capabilities.
+     * <p>Synchronously executes FFmpeg with arguments provided.
+     *
+     * @param arguments FFmpeg command options/arguments in one string
+     * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
-    public static void shutdown() {
-        Log.disableCollectingStdOutErr();
+    public static int execute(final String arguments) {
+        return execute((arguments == null) ? new String[]{""} : arguments.split(" "));
     }
 
     /**
-     * <p>Overrides default {@link Object#finalize()} method.
+     * <p>Cancels an ongoing operation.
+     *
+     * <p>This function does not wait for termination to complete and returns immediately.
      */
-    @Override
-    protected void finalize() {
-        shutdown();
-    }
+    public native static void cancel();
 
 }

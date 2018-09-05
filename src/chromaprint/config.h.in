@@ -1,0 +1,16 @@
+#cmakedefine HAVE_ROUND 1
+#cmakedefine HAVE_LRINTF 1
+#cmakedefine HAVE_AV_PACKET_UNREF 1
+#cmakedefine HAVE_AV_FRAME_ALLOC 1
+#cmakedefine HAVE_AV_FRAME_FREE 1
+
+#cmakedefine TESTS_DIR "@TESTS_DIR@"
+
+#cmakedefine USE_SWRESAMPLE 1
+#cmakedefine USE_AVRESAMPLE 1
+
+#cmakedefine USE_AVFFT 1
+#cmakedefine USE_FFTW3 1
+#cmakedefine USE_FFTW3F 1
+#cmakedefine USE_VDSP 1
+#cmakedefine USE_KISSFFT 1

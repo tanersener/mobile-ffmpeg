@@ -220,18 +220,6 @@ void doit(void)
 		exit(1);
 	}
 
-	ret = gnutls_pkcs12_generate_mac2(pkcs12, GNUTLS_MAC_SHA512, "passwd1");
-	if (ret < 0) {
-		fprintf(stderr, "generate_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
-		exit(1);
-	}
-
-	ret = gnutls_pkcs12_verify_mac(pkcs12, "passwd1");
-	if (ret < 0) {
-		fprintf(stderr, "verify_mac2: %s (%d)\n", gnutls_strerror(ret), ret);
-		exit(1);
-	}
-
 	size = sizeof(outbuf);
 	ret =
 	    gnutls_pkcs12_export(pkcs12, GNUTLS_X509_FMT_PEM, outbuf,

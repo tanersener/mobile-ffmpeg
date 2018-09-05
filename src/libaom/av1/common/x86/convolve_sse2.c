@@ -13,7 +13,6 @@
 
 #include "config/aom_dsp_rtcd.h"
 
-#include "aom_dsp/aom_convolve.h"
 #include "aom_dsp/aom_dsp_common.h"
 #include "aom_dsp/aom_filter.h"
 #include "aom_dsp/x86/convolve_common_intrin.h"
@@ -23,7 +22,7 @@ static INLINE void prepare_coeffs(const InterpFilterParams *const filter_params,
                                   const int subpel_q4,
                                   __m128i *const coeffs /* [4] */) {
   const int16_t *const y_filter = av1_get_interp_filter_subpel_kernel(
-      *filter_params, subpel_q4 & SUBPEL_MASK);
+      filter_params, subpel_q4 & SUBPEL_MASK);
   const __m128i coeffs_y = _mm_loadu_si128((__m128i *)y_filter);
   // coeffs 0 1 0 1 2 3 2 3
   const __m128i tmp_0 = _mm_unpacklo_epi32(coeffs_y, coeffs_y);
@@ -78,8 +77,8 @@ static INLINE __m128i convolve_hi_y(const __m128i *const s,
 
 void av1_convolve_y_sr_sse2(const uint8_t *src, int src_stride,
                             const uint8_t *dst, int dst_stride, int w, int h,
-                            InterpFilterParams *filter_params_x,
-                            InterpFilterParams *filter_params_y,
+                            const InterpFilterParams *filter_params_x,
+                            const InterpFilterParams *filter_params_y,
                             const int subpel_x_q4, const int subpel_y_q4,
                             ConvolveParams *conv_params) {
   const int fo_vert = filter_params_y->taps / 2 - 1;
@@ -239,8 +238,8 @@ void av1_convolve_y_sr_sse2(const uint8_t *src, int src_stride,
 
 void av1_convolve_x_sr_sse2(const uint8_t *src, int src_stride,
                             const uint8_t *dst, int dst_stride, int w, int h,
-                            InterpFilterParams *filter_params_x,
-                            InterpFilterParams *filter_params_y,
+                            const InterpFilterParams *filter_params_x,
+                            const InterpFilterParams *filter_params_y,
                             const int subpel_x_q4, const int subpel_y_q4,
                             ConvolveParams *conv_params) {
   const int fo_horiz = filter_params_x->taps / 2 - 1;

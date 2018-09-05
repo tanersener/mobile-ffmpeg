@@ -20,19 +20,6 @@ include(FindThreads)
 set(AOM_SUPPORTED_CPU_TARGETS
     "arm64 armv7 armv7s generic mips32 mips64 ppc x86 x86_64")
 
-# Generate the user config settings. This must occur before include of
-# aom_config_defaults.cmake (because it turns every config variable into a cache
-# variable with its own help string).
-get_cmake_property(cmake_cache_vars CACHE_VARIABLES)
-foreach(cache_var ${cmake_cache_vars})
-  get_property(cache_var_helpstring CACHE ${cache_var} PROPERTY HELPSTRING)
-  set(cmdline_helpstring "No help, variable specified on the command line.")
-  if("${cache_var_helpstring}" STREQUAL "${cmdline_helpstring}")
-    set(AOM_CMAKE_CONFIG "${AOM_CMAKE_CONFIG} -D${cache_var}=${${cache_var}}")
-  endif()
-endforeach()
-string(STRIP "${AOM_CMAKE_CONFIG}" AOM_CMAKE_CONFIG)
-
 include("${AOM_ROOT}/build/cmake/aom_config_defaults.cmake")
 include("${AOM_ROOT}/build/cmake/aom_experiment_deps.cmake")
 include("${AOM_ROOT}/build/cmake/aom_optimization.cmake")
@@ -40,13 +27,15 @@ include("${AOM_ROOT}/build/cmake/compiler_flags.cmake")
 include("${AOM_ROOT}/build/cmake/compiler_tests.cmake")
 include("${AOM_ROOT}/build/cmake/util.cmake")
 
-# Build a list of all configurable variables.
-get_cmake_property(cmake_cache_vars CACHE_VARIABLES)
-foreach(var ${cmake_cache_vars})
-  if("${var}" MATCHES "^CONFIG_")
-    list(APPEND AOM_CONFIG_VARS ${var})
+# Generate the user config settings.
+list(APPEND aom_build_vars ${AOM_CONFIG_VARS} ${AOM_OPTION_VARS})
+foreach(cache_var ${aom_build_vars})
+  get_property(cache_var_helpstring CACHE ${cache_var} PROPERTY HELPSTRING)
+  if("${cache_var_helpstring}" STREQUAL "${cmake_cmdline_helpstring}")
+    set(AOM_CMAKE_CONFIG "${AOM_CMAKE_CONFIG} -D${cache_var}=${${cache_var}}")
   endif()
 endforeach()
+string(STRIP "${AOM_CMAKE_CONFIG}" AOM_CMAKE_CONFIG)
 
 # Detect target CPU.
 if(NOT AOM_TARGET_CPU)
@@ -81,7 +70,9 @@ if(NOT AOM_TARGET_CPU)
 endif()
 
 if(CMAKE_TOOLCHAIN_FILE) # Add toolchain file to config string.
-  set(toolchain_string "-DCMAKE_TOOLCHAIN_FILE=\\\"${CMAKE_TOOLCHAIN_FILE}\\\"")
+  file(RELATIVE_PATH toolchain_path "${AOM_CONFIG_DIR}"
+                     "${CMAKE_TOOLCHAIN_FILE}")
+  set(toolchain_string "-DCMAKE_TOOLCHAIN_FILE=\\\"${toolchain_path}\\\"")
   set(AOM_CMAKE_CONFIG "${toolchain_string} ${AOM_CMAKE_CONFIG}")
 else()
 
@@ -89,6 +80,8 @@ else()
   set(AOM_CMAKE_CONFIG "-DAOM_TARGET_CPU=${AOM_TARGET_CPU} ${AOM_CMAKE_CONFIG}")
 endif()
 set(AOM_CMAKE_CONFIG "-G \\\"${CMAKE_GENERATOR}\\\" ${AOM_CMAKE_CONFIG}")
+file(RELATIVE_PATH source_path "${AOM_CONFIG_DIR}" "${AOM_ROOT}")
+set(AOM_CMAKE_CONFIG "cmake ${source_path} ${AOM_CMAKE_CONFIG}")
 string(STRIP "${AOM_CMAKE_CONFIG}" AOM_CMAKE_CONFIG)
 
 message("--- aom_configure: Detected CPU: ${AOM_TARGET_CPU}")
@@ -98,13 +91,13 @@ if("${CMAKE_BUILD_TYPE}" MATCHES "Deb")
   set(CONFIG_DEBUG 1)
 endif()
 
-if(NOT MSVC)
-  if(BUILD_SHARED_LIBS)
-    set(CONFIG_PIC 1)
-    set(CONFIG_SHARED 1)
-    set(CONFIG_STATIC 0)
-  endif()
+if(BUILD_SHARED_LIBS)
+  set(CONFIG_PIC 1)
+  set(CONFIG_SHARED 1)
+  set(CONFIG_STATIC 0)
+endif()
 
+if(NOT MSVC)
   if(CONFIG_PIC)
 
     # TODO(tomfinegan): clang needs -pie in CMAKE_EXE_LINKER_FLAGS for this to
@@ -117,8 +110,6 @@ if(NOT MSVC)
       set(AOM_AS_FLAGS ${AOM_AS_FLAGS} -DPIC)
     endif()
   endif()
-else()
-  set(CONFIG_MSVS 1)
 endif()
 
 if(NOT "${AOM_SUPPORTED_CPU_TARGETS}" MATCHES "${AOM_TARGET_CPU}")
@@ -269,7 +260,7 @@ else()
   add_compiler_flag_if_supported("-Wlogical-op")
   add_compiler_flag_if_supported("-Wpointer-arith")
   add_compiler_flag_if_supported("-Wsign-compare")
-  add_compiler_flag_if_supported("-Wstack-usage=320000")
+  add_compiler_flag_if_supported("-Wstack-usage=360000")
   add_compiler_flag_if_supported("-Wstring-conversion")
   add_compiler_flag_if_supported("-Wtype-limits")
   add_compiler_flag_if_supported("-Wuninitialized")
@@ -334,9 +325,6 @@ if(NOT PERL_FOUND)
   message(FATAL_ERROR "Perl is required to build libaom.")
 endif()
 
-configure_file("${AOM_CONFIG_DIR}/rtcd_config.cmake"
-               "${AOM_CONFIG_DIR}/${AOM_TARGET_CPU}_rtcd_config.rtcd")
-
 set(AOM_RTCD_CONFIG_FILE_LIST "${AOM_ROOT}/aom_dsp/aom_dsp_rtcd_defs.pl"
     "${AOM_ROOT}/aom_scale/aom_scale_rtcd.pl"
     "${AOM_ROOT}/av1/common/av1_rtcd_defs.pl")
@@ -355,13 +343,12 @@ foreach(NUM RANGE ${AOM_RTCD_CUSTOM_COMMAND_COUNT})
   list(GET AOM_RTCD_HEADER_FILE_LIST ${NUM} AOM_RTCD_HEADER_FILE)
   list(GET AOM_RTCD_SOURCE_FILE_LIST ${NUM} AOM_RTCD_SOURCE_FILE)
   list(GET AOM_RTCD_SYMBOL_LIST ${NUM} AOM_RTCD_SYMBOL)
-  execute_process(
-    COMMAND ${PERL_EXECUTABLE} "${AOM_ROOT}/build/make/rtcd.pl"
-            --arch=${AOM_TARGET_CPU}
-            --sym=${AOM_RTCD_SYMBOL} ${AOM_RTCD_FLAGS}
-            --config=${AOM_CONFIG_DIR}/${AOM_TARGET_CPU}_rtcd_config.rtcd
-            ${AOM_RTCD_CONFIG_FILE}
-    OUTPUT_FILE ${AOM_RTCD_HEADER_FILE})
+  execute_process(COMMAND ${PERL_EXECUTABLE} "${AOM_ROOT}/build/cmake/rtcd.pl"
+                          --arch=${AOM_TARGET_CPU}
+                          --sym=${AOM_RTCD_SYMBOL} ${AOM_RTCD_FLAGS}
+                          --config=${AOM_CONFIG_DIR}/config/aom_config.h
+                          ${AOM_RTCD_CONFIG_FILE}
+                  OUTPUT_FILE ${AOM_RTCD_HEADER_FILE})
 endforeach()
 
 # Generate aom_version.h.

@@ -191,7 +191,7 @@ vl_strategy[] =
    /* This controls the order of search. */
    { "huffman", Z_HUFFMAN_ONLY },
    { "RLE", Z_RLE },
-   { "fixed", Z_FIXED }, /* the remainder do window searchs */
+   { "fixed", Z_FIXED }, /* the remainder do window searches */
    { "filtered", Z_FILTERED },
    { "default", Z_DEFAULT_STRATEGY },
    { all, 0 }
@@ -336,7 +336,7 @@ static const option options[] =
 #  define VLC(name) VLCIDAT(name) VLCiCCP(name) VLCzTXt(name)
 
 #  ifdef PNG_SW_COMPRESS_png_level
-      /* The libpng compression level isn't searched beause it justs sets the
+      /* The libpng compression level isn't searched because it justs sets the
        * other things that are searched!
        */
       VLO("compression", compression, 0)
@@ -1725,7 +1725,7 @@ display_start_read(struct display *dp, const char *filename)
 }
 
 static void PNGCBAPI
-read_function(png_structp pp, png_bytep data, png_size_t size)
+read_function(png_structp pp, png_bytep data, size_t size)
 {
    struct display *dp = get_dp(pp);
 
@@ -1881,7 +1881,7 @@ display_start_write(struct display *dp, const char *filename)
 }
 
 static void PNGCBAPI
-write_function(png_structp pp, png_bytep data, png_size_t size)
+write_function(png_structp pp, png_bytep data, size_t size)
 {
    struct display *dp = get_dp(pp);
 
@@ -2117,7 +2117,7 @@ better_options(const struct display *dp)
     *
     * This function looks through the stack from the bottom up looking for an
     * option that does not match the current best value.  When it finds one it
-    * checks to see if it is more or less desireable and returns true or false
+    * checks to see if it is more or less desirable and returns true or false
     * as appropriate.
     *
     * Notice that this means that the order options are pushed onto the stack

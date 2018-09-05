@@ -15,8 +15,8 @@ include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := abidetect
-LOCAL_SRC_FILES := $(MY_PATH)/abidetect.c
+LOCAL_MODULE := mobileffmpeg-abidetect
+LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg_abidetect.c
 LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include -I$(NDK_ROOT)/sources/android/cpufeatures
 LOCAL_LDLIBS := -llog -lz -landroid
 LOCAL_SHARED_LIBRARIES := cpufeatures
@@ -24,17 +24,18 @@ include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := ffmpeglog
-LOCAL_SRC_FILES := $(MY_PATH)/log.c
-LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter
+LOCAL_MODULE := mobileffmpeg
+LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg.c
+LOCAL_CFLAGS := -Wall -Werror -Wno-unused-parameter -Wno-switch -Wno-sign-compare -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
 LOCAL_LDLIBS := -llog -lz -landroid
+LOCAL_SHARED_LIBRARIES := c++_shared mobileffmpeg-config
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
-LOCAL_MODULE := mobileffmpeg
-LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg.c $(MY_PATH)/cmdutils.c $(MY_PATH)/ffmpeg.c $(MY_PATH)/ffmpeg_opt.c $(MY_PATH)/ffmpeg_hw.c $(MY_PATH)/ffmpeg_filter.c
-LOCAL_CFLAGS := -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
+LOCAL_MODULE := mobileffmpeg-config
+LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg_config.c $(MY_PATH)/fftools_cmdutils.c $(MY_PATH)/fftools_ffmpeg.c $(MY_PATH)/fftools_ffmpeg_opt.c $(MY_PATH)/fftools_ffmpeg_hw.c $(MY_PATH)/fftools_ffmpeg_filter.c
+LOCAL_CFLAGS := -Wall -Werror -Wno-unused-parameter -Wno-switch -Wno-sign-compare -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
 LOCAL_LDLIBS := -llog -lz -landroid
 LOCAL_SHARED_LIBRARIES := libavfilter libavformat libavcodec libavutil libswresample libavdevice libswscale
 include $(BUILD_SHARED_LIBRARY)
@@ -44,9 +45,9 @@ ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 
         include $(CLEAR_VARS)
         LOCAL_ARM_MODE := $(MY_ARM_MODE)
-        LOCAL_MODULE := mobileffmpeg-armv7a-neon
-        LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg.c $(MY_PATH)/cmdutils.c $(MY_PATH)/ffmpeg.c $(MY_PATH)/ffmpeg_opt.c $(MY_PATH)/ffmpeg_hw.c $(MY_PATH)/ffmpeg_filter.c
-        LOCAL_CFLAGS := -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
+        LOCAL_MODULE := mobileffmpeg-config-armv7a-neon
+        LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg_config.c $(MY_PATH)/fftools_cmdutils.c $(MY_PATH)/fftools_ffmpeg.c $(MY_PATH)/fftools_ffmpeg_opt.c $(MY_PATH)/fftools_ffmpeg_hw.c $(MY_PATH)/fftools_ffmpeg_filter.c
+        LOCAL_CFLAGS := -Wall -Werror -Wno-unused-parameter -Wno-switch -Wno-sign-compare -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include
         LOCAL_LDLIBS := -llog -lz -landroid
         LOCAL_SHARED_LIBRARIES := libavcodec-neon libavfilter-neon libswscale-neon libavformat libavutil libswresample libavdevice
         LOCAL_ARM_NEON := true

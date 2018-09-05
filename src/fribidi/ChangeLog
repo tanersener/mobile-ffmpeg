@@ -1,12 +1,60 @@
-commit fed6f9af1b8ffeef1538348f75aa06f8e1cb03ea
+commit f245343730303bf7edd2af751d739f977466bf41
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Mon Jul 23 00:04:19 2018 +0300
+
+    Bumped version to 1.0.5
+
+ configure.ac | 2 +-
+ meson.build  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+commit beaa8a69771693178f38c76d98cd25a84020db8c
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sun Jul 22 23:49:10 2018 +0300
+
+    Fixed remaining 16 char tests errors.
+
+    - A matching parenthesis must be ON.
+
+ lib/fribidi-bidi.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+commit 0932559b116ec3aa15a483c32845b439535b1fb7
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sun Jul 22 21:55:19 2018 +0300
+
+    Remove skipping tests and fixed two test errors.
+
+    - BidiCharTest was erroneously skipping RTL tests. This has been
+      fixed.
+    - This exposed 18 errors. Two have been fixed in this commit, but
+      16 remains.
+
+ lib/fribidi-bidi.c                           |  2 +-
+ test/unicode-conformance/BidiCharacterTest.c | 14 +-------------
+ 2 files changed, 2 insertions(+), 14 deletions(-)
+
+commit d989590e124ad995de3598800c8835d819fadf80
+Author: Dov Grobgeld <dov.grobgeld@gmail.com>
+Date:   Sat Jun 30 23:15:21 2018 +0300
+
+    Reduce dynamic allocations by using arrays for all small arrays.
+
+ lib/fribidi-bidi.c       | 64
+ +++++++++++++++++++++++-------------------------
+ lib/fribidi-deprecated.c | 44 ++++++++++++++++++++++++---------
+ 2 files changed, 64 insertions(+), 44 deletions(-)
+
+commit 902618192f1cdb4430e4f2dfc032d9fb36fccc5b
 Author: Dov Grobgeld <dov.grobgeld@gmail.com>
 Date:   Wed Jun 6 12:46:30 2018 +0100
 
     Bumped version to 1.0.4.
 
+ NEWS         | 5 +++++
  configure.ac | 2 +-
  meson.build  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 3 files changed, 7 insertions(+), 2 deletions(-)
 
 commit d19206b72287c029a32f1c3ba0fbf29f3ccba718
 Merge: a465eef c8f3e3c

@@ -31,7 +31,7 @@ then
 fi
 
 # VALIDATE VERSIONS
-MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${BASEDIR}/../../ios/src/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/../../ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
 if [ "${MOBILE_FFMPEG_VERSION}" != "$1" ]; then
     echo "Error: version mismatch. v$1 requested but v${MOBILE_FFMPEG_VERSION} found. Please perform the following updates and try again."
     echo "1. Update docs"
@@ -53,7 +53,7 @@ create_package "min" "$1" || exit 1
 
 # MIN-GPL RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh --enable-gpl --enable-x264 --enable-xvidcore || exit 1
+./ios.sh --enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore || exit 1
 create_package "min-gpl" "$1" || exit 1
 
 # HTTPS RELEASE
@@ -63,8 +63,18 @@ create_package "https" "$1" || exit 1
 
 # HTTPS-GPL RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh --enable-gnutls --enable-gpl --enable-x264 --enable-xvidcore || exit 1
+./ios.sh --enable-gnutls --enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore || exit 1
 create_package "https-gpl" "$1" || exit 1
+
+# AUDIO RELEASE
+cd ${BASEDIR}/../.. || exit 1
+./ios.sh --enable-chromaprint --enable-lame --enable-libilbc --enable-libvorbis --enable-opencore-amr --enable-opus --enable-shine --enable-soxr --enable-speex --enable-wavpack || exit 1
+create_package "audio" "$1" || exit 1
+
+# VIDEO RELEASE
+cd ${BASEDIR}/../.. || exit 1
+./ios.sh --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx --enable-snappy || exit 1
+create_package "video" "$1" || exit 1
 
 # FULL RELEASE
 cd ${BASEDIR}/../.. || exit 1
@@ -73,5 +83,5 @@ create_package "full" "$1" || exit 1
 
 # FULL-GPL RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh --full --enable-gpl --enable-x264 --enable-xvidcore || exit 1
+./ios.sh --full --enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore || exit 1
 create_package "full-gpl" "$1" || exit 1

@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for gnutls-serv options
  */
 static char const gnutls_serv_opt_strs[3362] =
-/*     0 */ "gnutls-serv 3.5.18\n"
+/*     0 */ "gnutls-serv 3.5.19\n"
             "Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -206,7 +206,7 @@ static char const gnutls_serv_opt_strs[3362] =
 /*  3194 */ "bugs@gnutls.org\0"
 /*  3210 */ "\n\0"
 /*  3212 */ "Server program that listens to incoming TLS connections.\n\0"
-/*  3270 */ "gnutls-serv 3.5.18\0"
+/*  3270 */ "gnutls-serv 3.5.19\0"
 /*  3289 */ "Usage: gnutls-serv [options]\n"
             "gnutls-serv --help for usage instructions.\n";
 
@@ -1818,7 +1818,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via gnutls_servOptions.pzCopyright */
-  puts(_("gnutls-serv 3.5.18\n\
+  puts(_("gnutls-serv 3.5.19\n\
 Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -1973,7 +1973,7 @@ Usage:  %s [ -<flag> [<val>] | --<name>[{=| }<val>] ]...\n"));
   puts(_("Server program that listens to incoming TLS connections.\n"));
 
   /* referenced via gnutls_servOptions.pzFullVersion */
-  puts(_("gnutls-serv 3.5.18"));
+  puts(_("gnutls-serv 3.5.19"));
 
   /* referenced via gnutls_servOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

@@ -80,9 +80,9 @@ typedef enum {
 /** count of all options for systemkey-tool */
 #define OPTION_CT    10
 /** systemkey-tool version */
-#define SYSTEMKEY_TOOL_VERSION       "3.5.18"
+#define SYSTEMKEY_TOOL_VERSION       "3.5.19"
 /** Full systemkey-tool version text */
-#define SYSTEMKEY_TOOL_FULL_VERSION  "systemkey-tool 3.5.18"
+#define SYSTEMKEY_TOOL_FULL_VERSION  "systemkey-tool 3.5.19"
 
 /**
  *  Interface defines for all options.  Replace "n" with the UPPER_CASED

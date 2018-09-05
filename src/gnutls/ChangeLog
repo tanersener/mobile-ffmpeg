@@ -1,3 +1,195 @@
+2018-07-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* Makefile.am: Makefile.am: backported abi-check from master branch This avoids any incompatibilities between abi-compliance-checker and
+	abi-dumper.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2017-09-27  Andreas Metzler <ametzler@bebt.de>
+
+	* doc/reference/Makefile.am, gtk-doc.make, m4/gtk-doc.m4: Modernize
+	gtk-doc support Update gtk-doc.make, m4/gtk-doc.m4 and doc/reference/Makefile.am
+	from gtk-doc git head (that is 1.26 +
+	c08cc78562c59082fc83b55b58747177510b7a70).  Disable gtkdoc-check.  Signed-off-by: Andreas Metzler <ametzler@bebt.de>
+
+2018-07-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: doc update Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2018-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitlab-ci.yml: .gitlab-ci.yml: use the new CI testing image of
+	debian Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2018-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac, m4/hooks.m4: bumped version Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2018-07-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: doc update [ci skip] Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2018-07-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* NEWS: doc update [ci skip] Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2018-06-21  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* NEWS: doc update [ci skip] Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2018-06-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* : commit 9fdd24d53c84cc68dac1be28f8b1436e424ce1f1 Author: Nikos
+	Mavrogiannopoulos <nmav@redhat.com> Date:   Wed Jun 13 12:55:02 2018
+	+0200
+
+2018-06-12  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/priority.c, tests/dtls1-2-mtu-check.c, tests/priorities.c: 
+	hmac-sha384 and sha256 ciphersuites were removed from defaults These ciphersuites are deprecated since the introduction of AEAD
+	ciphersuites, and are only necessary for compatibility with older
+	servers. Since older servers already support hmac-sha1 there is no
+	reason to keep these ciphersuites enabled by default, as they
+	increase our attack surface.  Relates #456 Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2018-06-12  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/cipher.c: cbc_mac_verify: require minimum padding under SSL3.0 Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2018-06-12  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/cipher.c: dummy_wait: always hash the same amount of blocks
+	that would have been on minimum pad This improves protection against lucky13-type of attacks when
+	encrypt-then-mac is not in use.  Resolves #456 Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2018-06-12  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/algorithms/mac.c, lib/cipher.c: dummy_wait: correctly account
+	the length field in SHA384 HMAC The existing lucky13 attack count-measures did not work correctly
+	for SHA384 HMAC.  The overall impact of that should not be significant as SHA384 is
+	prioritized lower than SHA256 or SHA1 and thus it is not typically
+	negotiated, unless a client prioritizes a SHA384 MAC, or a server
+	only supports SHA384, and in both cases the vulnerability is only
+	present if Encrypt-then-MAC (RFC7366) is unsupported by the peer.  Relates #455 Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2017-08-11  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* configure.ac, tests/cert-tests/Makefile.am,
+	tests/cert-tests/template-test: tests: improved detection of 64-bit
+	systems We now use the ${ac_cv_sizeof_unsigned_long_int} variable which
+	gives the numbers used in the host system, not the build one.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2017-07-17  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* tests/suite/testcompat-main-openssl: tests: testcompat-openssl:
+	3DES is explicitly enabled for SSL 3.0 Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2017-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/crypto-selftests-pk.c, lib/crypto-selftests.c,
+	lib/gnutls_int.h, lib/handshake.c, lib/record.c: Use gcc's attribute
+	to mark fallthrough statements gcc7 is more verbose on fallthrough warnings, and this patch set
+	cleans up the current state by making use of the attribute when
+	necessary.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2017-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* configure.ac: configure: do not utilize the -Wno-format-truncation
+	gcc warning The warnings it produces have little value in our use of string
+	functions.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2017-09-07  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* .gitlab-ci.yml: .gitlab-ci.yml: removed initialization step That is, combine syntax-check with the static analyzers run. That
+	provides more parallelism per build and reduces the overall time
+	spent on a successful run.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2017-08-29  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitlab-ci.yml: .gitlab-ci.yml: give more specific name to windows
+	job artifacts [ci skip] This allows a more descriptive name to any downloaded artifacts.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2017-08-21  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitlab-ci.yml: .gitlab-ci.yml: use the same flags in the tags and
+	non-tags windows builds Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2017-08-10  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* .gitlab-ci.yml: .gitlab-ci.yml: replaced the f23 x86 build with a
+	f26 x86 build Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2017-07-17  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* .gitlab-ci.yml: .gitlab-ci.yml: document that the x86 build is our
+	openssl 1.0.x compat testing as well Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2017-07-15  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* .gitlab-ci.yml: .gitlab-ci.yml: switched to fedora 26 for CI
+	builds Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2018-04-25  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* NEWS: doc update Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2018-04-24  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/pkcs11.c, tests/pkcs11/pkcs11-import-with-pin.c: retrieve_pin:
+	refuse to retrieve PIN from URI more than one time That is, prevent re-using a static PIN if it has already been known
+	to be wrong. Introduced tests of that behavior.  Resolves #425 Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2018-03-25  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/nettle/pk.c: nettle: corrected typo in version check for
+	compatibility mode with 3.3 Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2018-03-20  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/nettle/pk.c: nettle/pk: include nettle/version.h That enables the nettle version macros to operate.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+2018-03-08  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/accelerated/cryptodev.c: cryptodev: fix prototype of
+	cryptodev_mac_fast [ci skip] Resolves #406 Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2018-03-07  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/accelerated/cryptodev.h: cryptodev: added missing macro [ci
+	skip] Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2018-02-06  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* configure.ac: configure: treat solaris as ELF system Resolves #376 Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2018-02-16  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* NEWS: doc update Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2017-11-30  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/x509/verify-high.c, lib/x509/verify-high2.c: pkcs11
+	verification: always use the
+	GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE That is, make sure that all our calls to PKCS#11 subsystem for
+	verification will only trigger the trust module initialization, and
+	not the generic PKCS#11 initialization.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2017-11-30  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/pkcs11.c, lib/pkcs11_int.h: pkcs11: simplify trusted module
+	loading state That is always utilize the same flags
+	(GNUTLS_PKCS11_OBJ_FLAG_PRESENT_IN_TRUSTED_MODULE) to determine
+	whether to initialize trusted modules only or proceed with general
+	initialization.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+2017-11-30  Nikos Mavrogiannopoulos <nmav@redhat.com>
+
+	* lib/pkcs11.c, lib/pkcs11_int.h, lib/pkcs11_privkey.c: 
+	_gnutls_pkcs11_check_init: improved transition between states The init_level_t for PKCS#11 modules, was incorrectly handled as a
+	linear state transition, causing few cases in the transition to be
+	incorrectly handled. Define precisely the state transitions and
+	enforce them in _gnutls_pkcs11_check_init.  That addresses a regression introduced by the previous state
+	handling addition, which made impossible to switch from the trusted
+	state to the all modules.  Signed-off-by: Nikos Mavrogiannopoulos <nmav@redhat.com>
+
 2018-02-16  Nikos Mavrogiannopoulos <nmav@gnutls.org>
 
 	* NEWS, configure.ac, m4/hooks.m4: bumped version Signed-off-by: Nikos Mavrogiannopoulos <nmav@gnutls.org>
@@ -18164,7 +18356,17 @@
 
 2014-11-07  Nikos Mavrogiannopoulos <nmav@redhat.com>
 
-	* pkcs11: added the flag GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH
+	* lib/includes/gnutls/pkcs11.h, lib/pkcs11.c, lib/pkcs11_write.c: 
+	pkcs11: added the flag GNUTLS_PKCS11_OBJ_FLAG_MARK_ALWAYS_AUTH
+
+2014-11-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* lib/pkcs11_privkey.c: pkcs11: perform reauth at the appropriate
+	state
+
+2014-11-07  Nikos Mavrogiannopoulos <nmav@gnutls.org>
+
+	* pkcs11_login: set the correct user type on reauthentication
 
 	-----
 

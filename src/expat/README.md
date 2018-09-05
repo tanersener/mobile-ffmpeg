@@ -2,7 +2,7 @@
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/libexpat/libexpat?svg=true)](https://ci.appveyor.com/project/libexpat/libexpat)
 
 
-# Expat, Release 2.2.5
+# Expat, Release 2.2.6
 
 This is Expat, a C library for parsing XML, started by
 [James Clark](https://en.wikipedia.org/wiki/James_Clark_(programmer)) in 1997.

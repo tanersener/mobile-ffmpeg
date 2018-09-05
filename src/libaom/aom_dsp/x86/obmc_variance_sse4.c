@@ -19,51 +19,22 @@
 
 #include "aom_dsp/aom_dsp_common.h"
 #include "aom_dsp/aom_filter.h"
-#include "aom_dsp/x86/obmc_intrinsic_ssse3.h"
+#include "aom_dsp/x86/obmc_intrinsic_sse4.h"
 #include "aom_dsp/x86/synonyms.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 // 8 bit
 ////////////////////////////////////////////////////////////////////////////////
 
-static INLINE void obmc_variance_w4(const uint8_t *pre, const int pre_stride,
-                                    const int32_t *wsrc, const int32_t *mask,
-                                    unsigned int *const sse, int *const sum,
-                                    const int h) {
-  const int pre_step = pre_stride - 4;
-  int n = 0;
-  __m128i v_sum_d = _mm_setzero_si128();
-  __m128i v_sse_d = _mm_setzero_si128();
+void aom_var_filter_block2d_bil_first_pass_ssse3(
+    const uint8_t *a, uint16_t *b, unsigned int src_pixels_per_line,
+    unsigned int pixel_step, unsigned int output_height,
+    unsigned int output_width, const uint8_t *filter);
 
-  assert(IS_POWER_OF_TWO(h));
-
-  do {
-    const __m128i v_p_b = xx_loadl_32(pre + n);
-    const __m128i v_m_d = xx_load_128(mask + n);
-    const __m128i v_w_d = xx_load_128(wsrc + n);
-
-    const __m128i v_p_d = _mm_cvtepu8_epi32(v_p_b);
-
-    // Values in both pre and mask fit in 15 bits, and are packed at 32 bit
-    // boundaries. We use pmaddwd, as it has lower latency on Haswell
-    // than pmulld but produces the same result with these inputs.
-    const __m128i v_pm_d = _mm_madd_epi16(v_p_d, v_m_d);
-
-    const __m128i v_diff_d = _mm_sub_epi32(v_w_d, v_pm_d);
-    const __m128i v_rdiff_d = xx_roundn_epi32(v_diff_d, 12);
-    const __m128i v_sqrdiff_d = _mm_mullo_epi32(v_rdiff_d, v_rdiff_d);
-
-    v_sum_d = _mm_add_epi32(v_sum_d, v_rdiff_d);
-    v_sse_d = _mm_add_epi32(v_sse_d, v_sqrdiff_d);
-
-    n += 4;
-
-    if (n % 4 == 0) pre += pre_step;
-  } while (n < 4 * h);
-
-  *sum = xx_hsum_epi32_si32(v_sum_d);
-  *sse = xx_hsum_epi32_si32(v_sse_d);
-}
+void aom_var_filter_block2d_bil_second_pass_ssse3(
+    const uint16_t *a, uint8_t *b, unsigned int src_pixels_per_line,
+    unsigned int pixel_step, unsigned int output_height,
+    unsigned int output_width, const uint8_t *filter);
 
 static INLINE void obmc_variance_w8n(const uint8_t *pre, const int pre_stride,
                                      const int32_t *wsrc, const int32_t *mask,
@@ -151,6 +122,46 @@ OBMCVARWXH(8, 32)
 OBMCVARWXH(32, 8)
 OBMCVARWXH(16, 64)
 OBMCVARWXH(64, 16)
+
+#include "config/aom_dsp_rtcd.h"
+
+#define OBMC_SUBPIX_VAR(W, H)                                                \
+  uint32_t aom_obmc_sub_pixel_variance##W##x##H##_sse4_1(                    \
+      const uint8_t *pre, int pre_stride, int xoffset, int yoffset,          \
+      const int32_t *wsrc, const int32_t *mask, unsigned int *sse) {         \
+    uint16_t fdata3[(H + 1) * W];                                            \
+    uint8_t temp2[H * W];                                                    \
+                                                                             \
+    aom_var_filter_block2d_bil_first_pass_ssse3(                             \
+        pre, fdata3, pre_stride, 1, H + 1, W, bilinear_filters_2t[xoffset]); \
+    aom_var_filter_block2d_bil_second_pass_ssse3(                            \
+        fdata3, temp2, W, W, H, W, bilinear_filters_2t[yoffset]);            \
+                                                                             \
+    return aom_obmc_variance##W##x##H##_sse4_1(temp2, W, wsrc, mask, sse);   \
+  }
+
+OBMC_SUBPIX_VAR(128, 128)
+OBMC_SUBPIX_VAR(128, 64)
+OBMC_SUBPIX_VAR(64, 128)
+OBMC_SUBPIX_VAR(64, 64)
+OBMC_SUBPIX_VAR(64, 32)
+OBMC_SUBPIX_VAR(32, 64)
+OBMC_SUBPIX_VAR(32, 32)
+OBMC_SUBPIX_VAR(32, 16)
+OBMC_SUBPIX_VAR(16, 32)
+OBMC_SUBPIX_VAR(16, 16)
+OBMC_SUBPIX_VAR(16, 8)
+OBMC_SUBPIX_VAR(8, 16)
+OBMC_SUBPIX_VAR(8, 8)
+OBMC_SUBPIX_VAR(8, 4)
+OBMC_SUBPIX_VAR(4, 8)
+OBMC_SUBPIX_VAR(4, 4)
+OBMC_SUBPIX_VAR(4, 16)
+OBMC_SUBPIX_VAR(16, 4)
+OBMC_SUBPIX_VAR(8, 32)
+OBMC_SUBPIX_VAR(32, 8)
+OBMC_SUBPIX_VAR(16, 64)
+OBMC_SUBPIX_VAR(64, 16)
 
 ////////////////////////////////////////////////////////////////////////////////
 // High bit-depth

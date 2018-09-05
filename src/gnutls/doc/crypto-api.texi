@@ -698,7 +698,9 @@ Returns the size of the nonce used by the MAC in TLS.
 @var{len}: The requested size
 
 This function will generate random data and store it to output
-buffer.
+buffer. The value of  @code{level} should be one of @code{GNUTLS_RND_NONCE} ,
+@code{GNUTLS_RND_RANDOM}  and @code{GNUTLS_RND_KEY} . See the manual and
+@code{gnutls_rnd_level_t}  for detailed information.
 
 This function is thread-safe and also fork-safe.
 

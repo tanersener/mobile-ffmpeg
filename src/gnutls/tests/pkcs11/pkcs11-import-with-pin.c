@@ -153,6 +153,16 @@ void doit(void)
 	assert(gnutls_privkey_init(&pkey) == 0);
 
 	/* Test 1
+	 * Try importing with wrong pin-value */
+	ret = gnutls_privkey_import_pkcs11_url(pkey, SOFTHSM_URL";object=cert;object-type=private;pin-value=XXXX");
+	if (ret != GNUTLS_E_PKCS11_PIN_ERROR) {
+		fprintf(stderr, "unexpected error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+	gnutls_privkey_deinit(pkey);
+	assert(gnutls_privkey_init(&pkey) == 0);
+
+	/* Test 2
 	 * Try importing with pin-value */
 	ret = gnutls_privkey_import_pkcs11_url(pkey, SOFTHSM_URL";object=cert;object-type=private;pin-value="PIN);
 	if (ret < 0) {
@@ -165,13 +175,26 @@ void doit(void)
 	gnutls_free(sig.data);
 	gnutls_privkey_deinit(pkey);
 
-	/* Test 2
-	 * Try importing with pin-source */
+	/* Test 3
+	 * Try importing with wrong pin-source */
 	track_temp_files();
 	get_tmpname(file);
 
-	write_pin(file, PIN);
+	write_pin(file, "XXXX");
 
+	assert(gnutls_privkey_init(&pkey) == 0);
+	snprintf(buf, sizeof(buf), "%s;object=cert;object-type=private;pin-source=%s", SOFTHSM_URL, file);
+	ret = gnutls_privkey_import_pkcs11_url(pkey, buf);
+	if (ret != GNUTLS_E_PKCS11_PIN_ERROR) {
+		fprintf(stderr, "error in %d: %s\n", __LINE__, gnutls_strerror(ret));
+		exit(1);
+	}
+
+	gnutls_privkey_deinit(pkey);
+
+	/* Test 4
+	 * Try importing with pin-source */
+	write_pin(file, PIN);
 
 	assert(gnutls_privkey_init(&pkey) == 0);
 	snprintf(buf, sizeof(buf), "%s;object=cert;object-type=private;pin-source=%s", SOFTHSM_URL, file);

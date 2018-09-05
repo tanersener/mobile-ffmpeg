@@ -64,7 +64,7 @@ extern FILE * option_usage_fp;
  *  static const strings for gnutls-cli-debug options
  */
 static char const gnutls_cli_debug_opt_strs[2044] =
-/*     0 */ "gnutls-cli-debug 3.5.18\n"
+/*     0 */ "gnutls-cli-debug 3.5.19\n"
             "Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n"
             "This is free software. It is licensed for use, modification and\n"
             "redistribution under the terms of the GNU General Public License,\n"
@@ -111,7 +111,7 @@ static char const gnutls_cli_debug_opt_strs[2044] =
             "to a TLS server, performs tests and print the server's capabilities.  If\n"
             "called with the `-V' parameter more checks will be performed.  Can be used\n"
             "to check for servers with special needs or bugs.\n\0"
-/*  1934 */ "gnutls-cli-debug 3.5.18\0"
+/*  1934 */ "gnutls-cli-debug 3.5.19\0"
 /*  1958 */ "Usage: gnutls-cli-debug [options] hostname\n"
             "gnutls-cli --help for usage instructions.\n";
 
@@ -657,7 +657,7 @@ static void bogus_function(void) {
      translate option names.
    */
   /* referenced via gnutls_cli_debugOptions.pzCopyright */
-  puts(_("gnutls-cli-debug 3.5.18\n\
+  puts(_("gnutls-cli-debug 3.5.19\n\
 Copyright (C) 2000-2018 Free Software Foundation, and others, all rights reserved.\n\
 This is free software. It is licensed for use, modification and\n\
 redistribution under the terms of the GNU General Public License,\n\
@@ -716,7 +716,7 @@ called with the `-V' parameter more checks will be performed.  Can be used\n\
 to check for servers with special needs or bugs.\n"));
 
   /* referenced via gnutls_cli_debugOptions.pzFullVersion */
-  puts(_("gnutls-cli-debug 3.5.18"));
+  puts(_("gnutls-cli-debug 3.5.19"));
 
   /* referenced via gnutls_cli_debugOptions.pzFullUsage */
   puts(_("<<<NOT-FOUND>>>"));

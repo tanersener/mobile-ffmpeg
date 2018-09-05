@@ -181,10 +181,6 @@ enum aome_enc_control_id {
    */
   AOME_SET_CPUUSED = 13,
 
-  /*!\brief Speed features for codec development
-   */
-  AOME_SET_DEVSF,
-
   /*!\brief Codec control function to enable automatic set and use alf frames.
    */
   AOME_SET_ENABLEAUTOALTREF,
@@ -285,6 +281,12 @@ enum aome_enc_control_id {
    *  By default, encoder operates in normal coding mode (maybe lossy).
    */
   AV1E_SET_LOSSLESS = AV1E_SET_GF_CBR_BOOST_PCT + 2,
+
+  /** control function to enable the row based multi-threading of encoder. A
+   * value that is equal to 1 indicates that row based multi-threading is
+   * enabled.
+   */
+  AV1E_SET_ROW_MT,
 
   /*!\brief Codec control function to set number of tile columns.
    *
@@ -854,6 +856,18 @@ enum aome_enc_control_id {
   /*!\brief Codec control function to set the path to the film grain parameters
    */
   AV1E_SET_FILM_GRAIN_TABLE,
+
+  /*!\brief Sets the noise level */
+  AV1E_SET_DENOISE_NOISE_LEVEL,
+
+  /*!\brief Sets the denoisers block size */
+  AV1E_SET_DENOISE_BLOCK_SIZE,
+
+  /*!\brief Sets the chroma subsampling x value */
+  AV1E_SET_CHROMA_SUBSAMPLING_X,
+
+  /*!\brief Sets the chroma subsampling y value */
+  AV1E_SET_CHROMA_SUBSAMPLING_Y,
 };
 
 /*!\brief aom 1-D scaling mode
@@ -986,6 +1000,9 @@ AOM_CTRL_USE_TYPE(AOME_SET_TUNING, int) /* aom_tune_metric */
 #define AOM_CTRL_AOME_SET_TUNING
 AOM_CTRL_USE_TYPE(AOME_SET_CQ_LEVEL, unsigned int)
 #define AOM_CTRL_AOME_SET_CQ_LEVEL
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ROW_MT, int)
+#define AOM_CTRL_AV1E_SET_ROW_MT
 
 AOM_CTRL_USE_TYPE(AV1E_SET_TILE_COLUMNS, int)
 #define AOM_CTRL_AV1E_SET_TILE_COLUMNS
@@ -1131,10 +1148,6 @@ AOM_CTRL_USE_TYPE(AV1E_GET_ACTIVEMAP, aom_active_map_t *)
 AOM_CTRL_USE_TYPE(AV1E_SET_COLOR_RANGE, int)
 #define AOM_CTRL_AV1E_SET_COLOR_RANGE
 
-/*!\brief
- *
- * TODO(rbultje) : add support of the control in ffmpeg
- */
 #define AOM_CTRL_AV1E_SET_RENDER_SIZE
 AOM_CTRL_USE_TYPE(AV1E_SET_RENDER_SIZE, int *)
 
@@ -1164,6 +1177,20 @@ AOM_CTRL_USE_TYPE(AV1E_SET_FILM_GRAIN_TABLE, const char *)
 
 AOM_CTRL_USE_TYPE(AV1E_SET_CDF_UPDATE_MODE, int)
 #define AOM_CTRL_AV1E_SET_CDF_UPDATE_MODE
+
+#ifdef CONFIG_DENOISE
+AOM_CTRL_USE_TYPE(AV1E_SET_DENOISE_NOISE_LEVEL, int);
+#define AOM_CTRL_AV1E_SET_DENOISE_NOISE_LEVEL
+
+AOM_CTRL_USE_TYPE(AV1E_SET_DENOISE_BLOCK_SIZE, unsigned int);
+#define AOM_CTRL_AV1E_SET_DENOISE_BLOCK_SIZE
+#endif
+
+AOM_CTRL_USE_TYPE(AV1E_SET_CHROMA_SUBSAMPLING_X, unsigned int)
+#define AOM_CTRL_AV1E_SET_CHROMA_SUBSAMPLING_X
+
+AOM_CTRL_USE_TYPE(AV1E_SET_CHROMA_SUBSAMPLING_Y, unsigned int)
+#define AOM_CTRL_AV1E_SET_CHROMA_SUBSAMPLING_Y
 
 /*!\endcond */
 /*! @} - end defgroup aom_encoder */

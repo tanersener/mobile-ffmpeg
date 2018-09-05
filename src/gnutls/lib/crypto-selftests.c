@@ -1130,22 +1130,31 @@ int gnutls_cipher_self_test(unsigned flags, gnutls_cipher_algorithm_t cipher)
 	case GNUTLS_CIPHER_UNKNOWN:
 		CASE(GNUTLS_CIPHER_AES_128_CCM, test_cipher_aead,
 		     aes128_ccm_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_256_CCM, test_cipher_aead,
 		     aes256_ccm_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_128_CBC, test_cipher,
 		     aes128_cbc_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_192_CBC, test_cipher,
 		     aes192_cbc_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_256_CBC, test_cipher,
 		     aes256_cbc_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_3DES_CBC, test_cipher,
 		     tdes_cbc_vectors);
+		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_CIPHER_ARCFOUR_128, test_cipher,
 		     arcfour_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_128_GCM, test_cipher_aead,
 		     aes128_gcm_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_CIPHER_AES_256_GCM, test_cipher_aead,
 		     aes256_gcm_vectors);
+		FALLTHROUGH;
 		NON_FIPS_CASE(GNUTLS_CIPHER_CHACHA20_POLY1305, test_cipher_aead,
 		     chacha_poly1305_vectors);
 		break;
@@ -1177,10 +1186,15 @@ int gnutls_mac_self_test(unsigned flags, gnutls_mac_algorithm_t mac)
 	switch (mac) {
 	case GNUTLS_MAC_UNKNOWN:
 		FIPS_STARTUP_ONLY_TEST_CASE(GNUTLS_MAC_MD5, test_mac, hmac_md5_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_MAC_SHA1, test_mac, hmac_sha1_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_MAC_SHA224, test_mac, hmac_sha224_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_MAC_SHA256, test_mac, hmac_sha256_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_MAC_SHA384, test_mac, hmac_sha384_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_MAC_SHA512, test_mac, hmac_sha512_vectors);
 
 		break;
@@ -1212,15 +1226,24 @@ int gnutls_digest_self_test(unsigned flags, gnutls_digest_algorithm_t digest)
 	switch (digest) {
 	case GNUTLS_DIG_UNKNOWN:
 		FIPS_STARTUP_ONLY_TEST_CASE(GNUTLS_DIG_MD5, test_digest, md5_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA1, test_digest, sha1_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA224, test_digest, sha224_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA256, test_digest, sha256_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA384, test_digest, sha384_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA512, test_digest, sha512_vectors);
 #ifdef NETTLE_SHA3_FIPS202
+		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA3_224, test_digest, sha3_224_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA3_256, test_digest, sha3_256_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA3_384, test_digest, sha3_384_vectors);
+		FALLTHROUGH;
 		CASE(GNUTLS_DIG_SHA3_512, test_digest, sha3_512_vectors);
 #endif
 		break;
