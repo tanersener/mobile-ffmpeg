@@ -3,7 +3,7 @@ layout: default
 ---
 FFmpeg for Android and IOS
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/dev-v2.x/docs/mobile-ffmpeg-logo-v4.png" width="120">
+<img src="https://github.com/tanersener/mobile-ffmpeg/raw/dev-v2.x/docs/assets/mobile-ffmpeg-logo-v4.png" width="120">
 
 ### 1. Features
 - Supports FFmpeg `v3.4.x` and `v4.0.x` releases
@@ -188,14 +188,14 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 ./android.sh
 ```
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/android_custom.gif" width="600">
+<img src="https://github.com/tanersener/mobile-ffmpeg/raw/master/docs/assets/android_custom.gif" width="600">
 
 ##### 4.2.2 IOS
 ```
 ./ios.sh
 ```
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/ios_custom.gif" width="600">
+<img src="https://github.com/tanersener/mobile-ffmpeg/raw/master/docs/assets/ios_custom.gif" width="600">
 
 #### 4.3 GPL Support
 It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1` 
@@ -226,5 +226,7 @@ Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License)
 ### 7. See Also
 
 - [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
-- [FFmpeg API Documentation](https://ffmpeg.org/doxygen/3.4/index.html)
+- [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
+- [FFmpeg Wiki](https://trac.ffmpeg.org/wiki/WikiStart)
 - [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)
+- [FFmpeg External Library Licenses](https://www.ffmpeg.org/doxygen/4.0/md_LICENSE.html)
