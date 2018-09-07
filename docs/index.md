@@ -123,24 +123,26 @@ There are eight different prebuilt packages. Below you can see which external li
     ```
 
 4. Enable log callback.
+
     ```
     - (void)logCallback: (int)level :(NSString*)message {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"%@", message);
         });
     }
-
+    ...
     [MobileFFmpegConfig setLogDelegate:self];
     ```
 
 5. Enable statistics callback.
+
     ```
     - (void)statisticsCallback:(Statistics *)newStatistics {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"frame: %d, time: %d\n", newStatistics.getVideoFrameNumber, newStatistics.getTime);
         });
     }
-
+    ...
     [MobileFFmpegConfig setStatisticsDelegate:self];
     ```
 
