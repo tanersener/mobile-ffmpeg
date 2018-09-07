@@ -769,13 +769,13 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
             ## TRY NOT TO USE HARDCODED VERSION NUMBERS
             install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.dylib @rpath/mobileffmpeg.framework/mobileffmpeg ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
 
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavcodec.58.dylib @rpath/libavcodec.framework/libavcodec ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavdevice.58.dylib @rpath/libavdevice.framework/libavdevice ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavfilter.7.dylib @rpath/libavfilter.framework/libavfilter ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavformat.58.dylib @rpath/libavformat.framework/libavformat ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswresample.3.dylib @rpath/libswresample.framework/libswresample ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswscale.5.dylib @rpath/libswscale.framework/libswscale ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-            install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavutil.56.dylib @rpath/libavutil.framework/libavutil ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+            install_name_tool -change @rpath/libavutil.dylib @rpath/libavcodec.framework/libavcodec ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+            install_name_tool -change @rpath/libavdevice.dylib @rpath/libavdevice.framework/libavdevice ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+            install_name_tool -change @rpath/libavfilter.dylib @rpath/libavfilter.framework/libavfilter ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+            install_name_tool -change @rpath/libavformat.dylib @rpath/libavformat.framework/libavformat ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+            install_name_tool -change @rpath/libswresample.dylib @rpath/libswresample.framework/libswresample ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+            install_name_tool -change @rpath/libswscale.dylib @rpath/libswscale.framework/libswscale ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+            install_name_tool -change @rpath/libavutil.dylib @rpath/libavutil.framework/libavutil ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
         done
     done
 
