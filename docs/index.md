@@ -3,7 +3,7 @@ layout: default
 ---
 FFmpeg for Android and IOS
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/dev-v2.x/docs/mobile-ffmpeg-logo-v4.png" width="120">
+<img src="https://github.com/tanersener/mobile-ffmpeg/raw/dev-v2.x/docs/assets/mobile-ffmpeg-logo-v4.png" width="120">
 
 ### 1. Features
 - Supports FFmpeg `v3.4.x` and `v4.0.x` releases
@@ -33,7 +33,6 @@ There are eight different prebuilt packages. Below you can see which external li
 | min | min-gpl | https | https-gpl | audio | video | full | full-gpl |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
 |  -  |  vid.stab<sup>3</sup> <br/> x264<sup>1</sup> <br/> x265<sup>3</sup> <br/> xvidcore<sup>1</sup>  |  gnutls  |  gnutls <br/> vid.stab<sup>3</sup> <br/> x264<sup>1</sup> <br/> x265<sup>3</sup> <br/> xvidcore<sup>1</sup>  |  chromaprint<sup>3</sup> <br/> lame <br/> libilbc<sup>1</sup> <br/> libvorbis <br/> opencore-amr <br/> opus<sup>1</sup> <br/> shine <br/> soxr<sup>2</sup> <br/> speex <br/> wavpack  |  fontconfig <br/> freetype <br/> fribidi <br/> kvazaar <br/> libaom<sup>2</sup> <br/> libass <br/> libiconv <br/> libtheora <br/> libvpx <br/> snappy<sup>1</sup>  |  chromaprint<sup>3</sup> <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom<sup>2</sup> <br/> libass <br/> libiconv <br/> libilbc<sup>1</sup> <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus<sup>1</sup> <br/> shine <br/> snappy<sup>1</sup> <br/> soxr<sup>2</sup> <br/> speex <br/> wavpack  |  chromaprint<sup>3</sup> <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom<sup>2</sup> <br/> libass <br/> libiconv <br/> libilbc<sup>1</sup> <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus<sup>1</sup> <br/> shine <br/> snappy<sup>1</sup> <br/> soxr<sup>2</sup> <br/> speex <br/> vid.stab<sup>3</sup> <br/> wavpack <br/> x264<sup>1</sup> <br/> x265<sup>3</sup> <br/> xvidcore<sup>1</sup>  |
-| [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-min-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-min-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-https-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-https-gpl/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-audio/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-audio/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-video/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-video/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full/_latestVersion) | [ ![Download](https://api.bintray.com/packages/tanersener/maven/mobile-ffmpeg-full-gpl/images/download.svg) ](https://bintray.com/tanersener/maven/mobile-ffmpeg-full-gpl/_latestVersion) |
 
 <sup>1</sup> - Supported since `v1.1`
 
@@ -188,14 +187,14 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 ./android.sh
 ```
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/android_custom.gif" width="600">
+<img src="https://github.com/tanersener/mobile-ffmpeg/raw/master/docs/assets/android_custom.gif" width="600">
 
 ##### 4.2.2 IOS
 ```
 ./ios.sh
 ```
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/ios_custom.gif" width="600">
+<img src="https://github.com/tanersener/mobile-ffmpeg/raw/master/docs/assets/ios_custom.gif" width="600">
 
 #### 4.3 GPL Support
 It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1` 
@@ -226,5 +225,7 @@ Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License)
 ### 7. See Also
 
 - [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
-- [FFmpeg API Documentation](https://ffmpeg.org/doxygen/3.4/index.html)
+- [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)
+- [FFmpeg Wiki](https://trac.ffmpeg.org/wiki/WikiStart)
 - [FFmpeg License and Legal Considerations](https://ffmpeg.org/legal.html)
+- [FFmpeg External Library Licenses](https://www.ffmpeg.org/doxygen/4.0/md_LICENSE.html)

@@ -188,23 +188,33 @@ get_app_specific_cflags() {
 
     APP_FLAGS=""
     case $1 in
-        libwebp | xvidcore)
-            APP_FLAGS="-fno-common -DPIC"
-        ;;
-        shine)
-            APP_FLAGS="-Wno-unused-function"
+        fontconfig)
+            case ${ARCH} in
+                armv7 | armv7s | arm64)
+                    APP_FLAGS="-std=c99 -Wno-unused-function -D__IPHONE_OS_MIN_REQUIRED -D__IPHONE_VERSION_MIN_REQUIRED=30000"
+                ;;
+                *)
+                    APP_FLAGS="-std=c99 -Wno-unused-function"
+                ;;
+            esac
         ;;
         ffmpeg)
             APP_FLAGS="-Wno-unused-function -DPIC"
         ;;
-        soxr | snappy)
-            APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
-        ;;
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
+        libwebp | xvidcore)
+            APP_FLAGS="-fno-common -DPIC"
+        ;;
         mobile-ffmpeg)
             APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc"
+        ;;
+        shine)
+            APP_FLAGS="-Wno-unused-function"
+        ;;
+        soxr | snappy)
+            APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
         ;;
         x265)
             APP_FLAGS="-Wno-unused-function"
