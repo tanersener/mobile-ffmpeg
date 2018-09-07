@@ -129,7 +129,7 @@ There are eight different prebuilt packages. Below you can see which external li
             NSLog(@"%@", message);
         });
     }
-    ...
+
     [MobileFFmpegConfig setLogDelegate:self];
     ```
 
@@ -140,7 +140,7 @@ There are eight different prebuilt packages. Below you can see which external li
             NSLog(@"frame: %d, time: %d\n", newStatistics.getVideoFrameNumber, newStatistics.getTime);
         });
     }
-    ...
+
     [MobileFFmpegConfig setStatisticsDelegate:self];
     ```
 
