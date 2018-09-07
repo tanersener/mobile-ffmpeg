@@ -26,7 +26,7 @@
 #include "mobileffmpeg_config.h"
 
 /** Library version string */
-#define MOBILE_FFMPEG_VERSION "2.1"
+#define MOBILE_FFMPEG_VERSION "2.2"
 
 /*
  * Class:     com_arthenica_mobileffmpeg_FFmpeg
