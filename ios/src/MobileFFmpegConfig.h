@@ -53,6 +53,13 @@ extern NSString *const LIB_NAME;
 
 /**
  * Enables log and statistics redirection.
+ * When redirection is not enabled FFmpeg logs are printed to stderr. By enabling redirection, they are routed to
+ * NSLog and can be routed further to a log delegate.
+ * Statistics redirection behaviour is similar. Statistics are not printed at all if redirection is not enabled.
+ * If it is enabled then it is possible to define a statistics delegate but if you don't, they are not printed
+ * anywhere and only saved as 'lastReceivedStatistics' data which can be polled with 'getLastReceivedStatistics()'.
+ * Note that redirection is enabled by default. If you do not want to use its functionality please use
+ * 'disableRedirection()' to disable it.
  */
 + (void)enableRedirection;
 
@@ -86,19 +93,19 @@ extern NSString *const LIB_NAME;
 /**
  * Sets a LogDelegate. logCallback method inside LogDelegate is used to redirect logs.
  *
- * \param log delegate
+ * \param log delegate or nil to disable a previously defined delegate
  */
 + (void)setLogDelegate: (id<LogDelegate>)newLogDelegate;
 
 /**
  * Sets a StatisticsDelegate. statisticsCallback method inside StatisticsDelegate is used to redirect statistics.
  *
- * \param statistics delegate
+ * \param statistics delegate or nil to disable a previously defined delegate
  */
 + (void)setStatisticsDelegate: (id<StatisticsDelegate>)newStatisticsDelegate;
 
 /**
- * Returns the last received statistics data.
+ * Returns the last received statistics data. It is recommended to call it before starting a new execution.
  *
  * \return last received statistics data
  */

@@ -142,6 +142,7 @@ Class Methods</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Enables log and statistics redirection. When redirection is not enabled FFmpeg logs are printed to stderr. By enabling redirection, they are routed to NSLog and can be routed further to a log delegate. <a class="el" href="../../d9/dcc/interface_statistics.html">Statistics</a> redirection behaviour is similar. <a class="el" href="../../d9/dcc/interface_statistics.html">Statistics</a> are not printed at all if redirection is not enabled. If it is enabled then it is possible to define a statistics delegate but if you don't, they are not printed anywhere and only saved as 'lastReceivedStatistics' data which can be polled with '<a class="el" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ac8e48eda99c41aeab3e73c67425487fc">getLastReceivedStatistics</a>'. Note that redirection is enabled by default. If you do not want to use its functionality please use '<a class="el" href="../../df/d45/interface_mobile_f_fmpeg_config.html#ae7d648c9c855966b59c6f8d7bfada703">disableRedirection</a>' to disable it.</p>
 <p>Enables log and statistics redirection. </p>
 
 <p class="definition">Definition at line <a class="el" href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00309">309</a> of file <a class="el" href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html">MobileFFmpegConfig.m</a>.</p>
@@ -162,6 +163,8 @@ Class Methods</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Returns the last received statistics data. It is recommended to call it before starting a new execution.</p>
+<dl class="section return"><dt>Returns</dt><dd>last received statistics data</dd></dl>
 <p>Returns the last received statistics data.</p>
 <dl class="section return"><dt>Returns</dt><dd>last received statistics data </dd></dl>
 
@@ -349,7 +352,7 @@ Class Methods</h2></td></tr>
 <p>Sets a <a class="el" href="../../d1/dd3/protocol_log_delegate-p.html">LogDelegate</a>. logCallback method inside <a class="el" href="../../d1/dd3/protocol_log_delegate-p.html">LogDelegate</a> is used to redirect logs.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">log</td><td>delegate</td></tr>
+    <tr><td class="paramname">log</td><td>delegate or nil to disable a previously defined delegate</td></tr>
   </table>
   </dd>
 </dl>
@@ -410,7 +413,7 @@ Class Methods</h2></td></tr>
 <p>Sets a <a class="el" href="../../d5/d74/protocol_statistics_delegate-p.html">StatisticsDelegate</a>. statisticsCallback method inside <a class="el" href="../../d5/d74/protocol_statistics_delegate-p.html">StatisticsDelegate</a> is used to redirect statistics.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">statistics</td><td>delegate</td></tr>
+    <tr><td class="paramname">statistics</td><td>delegate or nil to disable a previously defined delegate</td></tr>
   </table>
   </dd>
 </dl>
@@ -433,7 +436,7 @@ Class Methods</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Sep 7 2018 16:04:23 for MobileFFmpeg IOS API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Sep 11 2018 12:10:33 for MobileFFmpeg IOS API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

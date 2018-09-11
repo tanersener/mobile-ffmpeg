@@ -109,6 +109,14 @@ public class Config {
 
     /**
      * <p>Enables log and statistics redirection.
+     * <p>When redirection is not enabled FFmpeg logs are printed to stderr. By enabling redirection, they are routed
+     * to Logcat and can be routed further to a callback function.
+     * <p>Statistics redirection behaviour is similar. Statistics are not printed at all if redirection is not enabled.
+     * If it is enabled then it is possible to define a statistics callback function but if you don't, they are not
+     * printed anywhere and only saved as <code>lastReceivedStatistics</code> data which can be polled with
+     * {@link #getLastReceivedStatistics()}.
+     * <p>Note that redirection is enabled by default. If you do not want to use its functionality please use
+     * {@link #disableRedirection()} to disable it.
      */
     public static void enableRedirection() {
         enableNativeRedirection();
@@ -145,7 +153,7 @@ public class Config {
     /**
      * <p>Sets a callback function to redirect FFmpeg logs.
      *
-     * @param newLogCallback new log callback function
+     * @param newLogCallback new log callback function or NULL to disable a previously defined callback
      */
     public static void enableLogCallback(final LogCallback newLogCallback) {
         logCallbackFunction = newLogCallback;
@@ -154,7 +162,7 @@ public class Config {
     /**
      * <p>Sets a callback function to redirect FFmpeg statistics.
      *
-     * @param statisticsCallback new statistics callback function
+     * @param statisticsCallback new statistics callback function or NULL to disable a previously defined callback
      */
     public static void enableStatisticsCallback(final StatisticsCallback statisticsCallback) {
         statisticsCallbackFunction = statisticsCallback;
@@ -246,7 +254,7 @@ public class Config {
     }
 
     /**
-     * <p>Resets last received statistics.
+     * <p>Resets last received statistics. It is recommended to call it before starting a new execution.
      */
     public static void resetStatistics() {
         lastReceivedStatistics = new Statistics();
