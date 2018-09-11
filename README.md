@@ -102,7 +102,7 @@ There are eight different prebuilt packages. Below you can see which external li
 
 7. Register custom fonts directory.
     ```
-    Config.setFontDirectory(this, "fonts", Collections.EMPTY_MAP);
+    Config.setFontDirectory(this, "<folder with fonts>", Collections.EMPTY_MAP);
     ```
 
 #### 2.2 IOS
@@ -160,7 +160,7 @@ There are eight different prebuilt packages. Below you can see which external li
 
 7. Register custom fonts directory.
     ```
-    [MobileFFmpegConfig setFontDirectory:@"fonts" with:nil];
+    [MobileFFmpegConfig setFontDirectory:@"<folder with fonts>" with:nil];
     ```
     
 #### 2.3 Test Application
