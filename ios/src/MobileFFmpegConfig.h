@@ -124,7 +124,7 @@ extern NSString *const LIB_NAME;
 + (void)setFontconfigConfigurationPath: (NSString*)path;
 
 /**
- * Registers fonts inside the given path, so they are available in FFmpeg filters.
+ * Registers fonts inside the given path, so they are available to use in FFmpeg filters.
  *
  * Note that you need to build MobileFFmpeg with fontconfig
  * enabled or use a prebuilt package with fontconfig inside to use this feature.
