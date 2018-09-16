@@ -86,7 +86,7 @@ public class Config {
         boolean nativeLibraryLoaded = false;
         if (abi == Abi.ABI_ARMV7A_NEON) {
             try {
-                System.loadLibrary("mobileffmpeg-config-armv7a-neon");
+                System.loadLibrary("mobileffmpeg-armv7a-neon");
                 nativeLibraryLoaded = true;
             } catch (final UnsatisfiedLinkError e) {
                 Log.i(Config.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
@@ -95,7 +95,7 @@ public class Config {
         }
 
         if (!nativeLibraryLoaded) {
-            System.loadLibrary("mobileffmpeg-config");
+            System.loadLibrary("mobileffmpeg");
         }
 
         Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", abi.getName(), getVersion()));
@@ -384,5 +384,34 @@ public class Config {
      * @return log level
      */
     private static native int getNativeLogLevel();
+
+    /**
+     * <p>Returns FFmpeg version bundled within the library natively.
+     *
+     * @return FFmpeg version
+     */
+    native static String getNativeFFmpegVersion();
+
+    /**
+     * <p>Returns MobileFFmpeg library version natively.
+     *
+     * @return MobileFFmpeg version
+     */
+    native static String getNativeVersion();
+
+    /**
+     * <p>Synchronously executes FFmpeg natively with arguments provided.
+     *
+     * @param arguments FFmpeg command options/arguments as string array
+     * @return zero on successful execution, 255 on user cancel and non-zero on error
+     */
+    native static int nativeExecute(final String[] arguments);
+
+    /**
+     * <p>Cancels an ongoing operation natively.
+     *
+     * <p>This function does not wait for termination to complete and returns immediately.
+     */
+    native static void nativeCancel();
 
 }

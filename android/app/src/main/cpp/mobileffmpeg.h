@@ -21,39 +21,86 @@
 #define MOBILE_FFMPEG_H
 
 #include <jni.h>
+#include <android/log.h>
 
+#include "libavutil/log.h"
 #include "libavutil/ffversion.h"
-#include "mobileffmpeg_config.h"
 
 /** Library version string */
 #define MOBILE_FFMPEG_VERSION "2.2"
 
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    getFFmpegVersion
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getFFmpegVersion(JNIEnv *, jclass);
+/** Defines tag used for Android logging. */
+#define LIB_NAME "mobile-ffmpeg"
+
+/** Verbose Android logging macro. */
+#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, LIB_NAME, __VA_ARGS__)
+
+/** Debug Android logging macro. */
+#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LIB_NAME, __VA_ARGS__)
+
+/** Info Android logging macro. */
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO, LIB_NAME, __VA_ARGS__)
+
+/** Warn Android logging macro. */
+#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, LIB_NAME, __VA_ARGS__)
+
+/** Error Android logging macro. */
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LIB_NAME, __VA_ARGS__)
 
 /*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    getVersion
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_getVersion(JNIEnv *, jclass);
-
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    execute
- * Signature: ([Ljava/lang/String;)I
- */
-JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_execute(JNIEnv *, jclass, jobjectArray);
-
-/*
- * Class:     com_arthenica_mobileffmpeg_FFmpeg
- * Method:    cancel
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    enableNativeRedirection
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_FFmpeg_cancel(JNIEnv *, jclass);
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_enableNativeRedirection(JNIEnv *, jclass);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    disableNativeRedirection
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_disableNativeRedirection(JNIEnv *, jclass);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    setNativeLogLevel
+ * Signature: (I)V
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel(JNIEnv *, jclass, jint);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    getNativeLogLevel
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel(JNIEnv *, jclass);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    getNativeFFmpegVersion
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeFFmpegVersion(JNIEnv *, jclass);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    getNativeVersion
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeVersion(JNIEnv *, jclass);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    nativeExecute
+ * Signature: ([Ljava/lang/String;)I
+ */
+JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIEnv *, jclass, jobjectArray);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    nativeCancel
+ * Signature: ()V
+ */
+JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEnv *, jclass);
 
 #endif /* MOBILE_FFMPEG_H */
