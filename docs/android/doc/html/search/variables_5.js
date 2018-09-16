@@ -2,7 +2,6 @@ var searchData=
 [
   ['f',['f',['../dd/da5/struct_specifier_opt.html#a09d09953c0263bc3992d7b8f4c1fcfc7',1,'SpecifierOpt']]],
   ['ffmpeg_5fexited',['ffmpeg_exited',['../d7/d48/fftools__ffmpeg_8c.html#a7e7ee2a0542150203a78fc135a15674b',1,'fftools_ffmpeg.c']]],
-  ['ffmpegclassname',['ffmpegClassName',['../dd/d16/mobileffmpeg_8c.html#a560aa66a72c21df871b7665d982df59e',1,'mobileffmpeg.c']]],
   ['ffmpegmethods',['ffmpegMethods',['../dd/d16/mobileffmpeg_8c.html#a52aadca549819e998bb89a9f9553da81',1,'mobileffmpeg.c']]],
   ['file_5fidx',['file_idx',['../d6/d2c/struct_audio_channel_map.html#a81b4cfad9b7f201c8a0be6a030688839',1,'AudioChannelMap']]],
   ['file_5findex',['file_index',['../db/d60/struct_stream_map.html#af8b5bac41a8831242ead1441bdca6783',1,'StreamMap::file_index()'],['../d3/d6e/struct_input_stream.html#ad47d834630eee2dca258aa449fb1df47',1,'InputStream::file_index()'],['../db/dde/struct_output_stream.html#af608105788daa4300771669d992ef890',1,'OutputStream::file_index()']]],

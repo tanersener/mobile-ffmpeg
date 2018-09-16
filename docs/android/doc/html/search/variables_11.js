@@ -21,7 +21,7 @@ var searchData=
   ['statisticsbitrate',['statisticsBitrate',['../d2/dc3/struct_callback_data.html#a0e02eb985ed5c68bdf82a3445c0b4514',1,'CallbackData']]],
   ['statisticsfps',['statisticsFps',['../d2/dc3/struct_callback_data.html#ad4ef14e9625fe915267d644480e9410f',1,'CallbackData']]],
   ['statisticsframenumber',['statisticsFrameNumber',['../d2/dc3/struct_callback_data.html#a6ea1c5fbcf7ad64a04687d738a9c6559',1,'CallbackData']]],
-  ['statisticsmethod',['statisticsMethod',['../d9/dae/mobileffmpeg__config_8c.html#afb701a25861b4bc7d008764199e39b39',1,'mobileffmpeg_config.c']]],
+  ['statisticsmethod',['statisticsMethod',['../dd/d16/mobileffmpeg_8c.html#afb701a25861b4bc7d008764199e39b39',1,'mobileffmpeg.c']]],
   ['statisticsquality',['statisticsQuality',['../d2/dc3/struct_callback_data.html#a0eba672f8309ce08c41eeb63c48091af',1,'CallbackData']]],
   ['statisticssize',['statisticsSize',['../d2/dc3/struct_callback_data.html#aee6855bc657b56db6c8a32656b3018c4',1,'CallbackData']]],
   ['statisticsspeed',['statisticsSpeed',['../d2/dc3/struct_callback_data.html#a577a99dc4c2767d1946ac174f7a0c69e',1,'CallbackData']]],

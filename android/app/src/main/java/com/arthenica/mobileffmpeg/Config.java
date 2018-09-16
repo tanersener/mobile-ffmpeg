@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.arthenica.mobileffmpeg.FFmpeg.getVersion;
+
 /**
  * <p>This class is used to configure MobileFFmpeg library utilities/tools.
  *
@@ -71,6 +73,8 @@ public class Config {
 
     static {
 
+        Log.i(Config.TAG, "Loading mobile-ffmpeg.");
+
         /* ALL LIBRARIES LOADED AT STARTUP */
         String abiName = AbiDetect.getAbi();
         Abi abi = Abi.from(abiName);
@@ -82,16 +86,19 @@ public class Config {
         boolean nativeLibraryLoaded = false;
         if (abi == Abi.ABI_ARMV7A_NEON) {
             try {
-                System.loadLibrary("mobileffmpeg-config-armv7a-neon");
+                System.loadLibrary("mobileffmpeg-armv7a-neon");
                 nativeLibraryLoaded = true;
-            } catch (UnsatisfiedLinkError e) {
+            } catch (final UnsatisfiedLinkError e) {
                 Log.i(Config.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
+                abi = Abi.ABI_ARMV7A;
             }
         }
 
         if (!nativeLibraryLoaded) {
-            System.loadLibrary("mobileffmpeg-config");
+            System.loadLibrary("mobileffmpeg");
         }
+
+        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", abi.getName(), getVersion()));
 
         /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
         activeLogLevel = Level.from(getNativeLogLevel());
@@ -109,6 +116,14 @@ public class Config {
 
     /**
      * <p>Enables log and statistics redirection.
+     * <p>When redirection is not enabled FFmpeg logs are printed to stderr. By enabling redirection, they are routed
+     * to Logcat and can be routed further to a callback function.
+     * <p>Statistics redirection behaviour is similar. Statistics are not printed at all if redirection is not enabled.
+     * If it is enabled then it is possible to define a statistics callback function but if you don't, they are not
+     * printed anywhere and only saved as <code>lastReceivedStatistics</code> data which can be polled with
+     * {@link #getLastReceivedStatistics()}.
+     * <p>Note that redirection is enabled by default. If you do not want to use its functionality please use
+     * {@link #disableRedirection()} to disable it.
      */
     public static void enableRedirection() {
         enableNativeRedirection();
@@ -145,7 +160,7 @@ public class Config {
     /**
      * <p>Sets a callback function to redirect FFmpeg logs.
      *
-     * @param newLogCallback new log callback function
+     * @param newLogCallback new log callback function or NULL to disable a previously defined callback
      */
     public static void enableLogCallback(final LogCallback newLogCallback) {
         logCallbackFunction = newLogCallback;
@@ -154,7 +169,7 @@ public class Config {
     /**
      * <p>Sets a callback function to redirect FFmpeg statistics.
      *
-     * @param statisticsCallback new statistics callback function
+     * @param statisticsCallback new statistics callback function or NULL to disable a previously defined callback
      */
     public static void enableStatisticsCallback(final StatisticsCallback statisticsCallback) {
         statisticsCallbackFunction = statisticsCallback;
@@ -246,7 +261,7 @@ public class Config {
     }
 
     /**
-     * <p>Resets last received statistics.
+     * <p>Resets last received statistics. It is recommended to call it before starting a new execution.
      */
     public static void resetStatistics() {
         lastReceivedStatistics = new Statistics();
@@ -369,5 +384,34 @@ public class Config {
      * @return log level
      */
     private static native int getNativeLogLevel();
+
+    /**
+     * <p>Returns FFmpeg version bundled within the library natively.
+     *
+     * @return FFmpeg version
+     */
+    native static String getNativeFFmpegVersion();
+
+    /**
+     * <p>Returns MobileFFmpeg library version natively.
+     *
+     * @return MobileFFmpeg version
+     */
+    native static String getNativeVersion();
+
+    /**
+     * <p>Synchronously executes FFmpeg natively with arguments provided.
+     *
+     * @param arguments FFmpeg command options/arguments as string array
+     * @return zero on successful execution, 255 on user cancel and non-zero on error
+     */
+    native static int nativeExecute(final String[] arguments);
+
+    /**
+     * <p>Cancels an ongoing operation natively.
+     *
+     * <p>This function does not wait for termination to complete and returns immediately.
+     */
+    native static void nativeCancel();
 
 }

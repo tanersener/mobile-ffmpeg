@@ -39,14 +39,8 @@ public class FFmpeg {
     public static final int RETURN_CODE_CANCEL = 255;
 
     static {
-        Log.i(Config.TAG, "Loading mobile-ffmpeg.");
-
-        System.loadLibrary("mobileffmpeg");
-
         AbiDetect.class.getName();
         Config.class.getName();
-
-        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", AbiDetect.getAbi(), getVersion()));
     }
 
     /**
@@ -60,14 +54,18 @@ public class FFmpeg {
      *
      * @return FFmpeg version
      */
-    public native static String getFFmpegVersion();
+    public static String getFFmpegVersion() {
+        return Config.getNativeFFmpegVersion();
+    }
 
     /**
      * <p>Returns MobileFFmpeg library version.
      *
      * @return MobileFFmpeg version
      */
-    public native static String getVersion();
+    public static String getVersion() {
+        return Config.getNativeVersion();
+    }
 
     /**
      * <p>Synchronously executes FFmpeg with arguments provided.
@@ -75,7 +73,9 @@ public class FFmpeg {
      * @param arguments FFmpeg command options/arguments as string array
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
-    public native static int execute(final String[] arguments);
+    public static int execute(final String[] arguments) {
+        return Config.nativeExecute(arguments);
+    }
 
     /**
      * <p>Synchronously executes FFmpeg with arguments provided.
@@ -92,6 +92,8 @@ public class FFmpeg {
      *
      * <p>This function does not wait for termination to complete and returns immediately.
      */
-    public native static void cancel();
+    public static void cancel() {
+        Config.nativeCancel();
+    }
 
 }

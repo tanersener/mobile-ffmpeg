@@ -1,4 +1,4 @@
-# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![GitHub release](https://img.shields.io/badge/release-v2.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v2.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v2.1.1-blue.svg)
+# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![GitHub release](https://img.shields.io/badge/release-v2.1.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v2.1.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v2.1.1-blue.svg)
 
 FFmpeg for Android and IOS
 
@@ -53,7 +53,7 @@ There are eight different prebuilt packages. Below you can see which external li
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {`
-        implementation 'com.arthenica:mobile-ffmpeg-full:2.1'
+        implementation 'com.arthenica:mobile-ffmpeg-full:2.1.1'
     }
     ```
 
@@ -102,7 +102,7 @@ There are eight different prebuilt packages. Below you can see which external li
 
 7. Register custom fonts directory.
     ```
-    Config.setFontDirectory(this, "fonts", Collections.EMPTY_MAP);
+    Config.setFontDirectory(this, "<folder with fonts>", Collections.EMPTY_MAP);
     ```
 
 #### 2.2 IOS
@@ -160,7 +160,7 @@ There are eight different prebuilt packages. Below you can see which external li
 
 7. Register custom fonts directory.
     ```
-    [MobileFFmpegConfig setFontDirectory:@"fonts" with:nil];
+    [MobileFFmpegConfig setFontDirectory:@"<folder with fonts>" with:nil];
     ```
     
 #### 2.3 Test Application
