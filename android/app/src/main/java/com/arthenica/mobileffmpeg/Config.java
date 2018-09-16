@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.arthenica.mobileffmpeg.FFmpeg.getVersion;
+
 /**
  * <p>This class is used to configure MobileFFmpeg library utilities/tools.
  *
@@ -71,6 +73,8 @@ public class Config {
 
     static {
 
+        Log.i(Config.TAG, "Loading mobile-ffmpeg.");
+
         /* ALL LIBRARIES LOADED AT STARTUP */
         String abiName = AbiDetect.getAbi();
         Abi abi = Abi.from(abiName);
@@ -84,14 +88,17 @@ public class Config {
             try {
                 System.loadLibrary("mobileffmpeg-config-armv7a-neon");
                 nativeLibraryLoaded = true;
-            } catch (UnsatisfiedLinkError e) {
+            } catch (final UnsatisfiedLinkError e) {
                 Log.i(Config.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
+                abi = Abi.ABI_ARMV7A;
             }
         }
 
         if (!nativeLibraryLoaded) {
             System.loadLibrary("mobileffmpeg-config");
         }
+
+        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", abi.getName(), getVersion()));
 
         /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
         activeLogLevel = Level.from(getNativeLogLevel());

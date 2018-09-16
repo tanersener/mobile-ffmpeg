@@ -19,8 +19,6 @@
 
 package com.arthenica.mobileffmpeg;
 
-import android.util.Log;
-
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
  * FFmpeg commands.
@@ -39,14 +37,10 @@ public class FFmpeg {
     public static final int RETURN_CODE_CANCEL = 255;
 
     static {
-        Log.i(Config.TAG, "Loading mobile-ffmpeg.");
-
         System.loadLibrary("mobileffmpeg");
 
         AbiDetect.class.getName();
         Config.class.getName();
-
-        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", AbiDetect.getAbi(), getVersion()));
     }
 
     /**
