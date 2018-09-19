@@ -29,26 +29,6 @@ AC_SUBST(FFMPEG_LIBS)
 
 LT_INIT
 
-# Checks for libraries.
-AC_SEARCH_LIBS([dlopen], [dl], [], [
-  AC_MSG_ERROR([unable to find dlopen()])
-])
-AC_SEARCH_LIBS([avcodec_is_open], [avcodec], [], [
-  AC_MSG_ERROR([unable to find libavcodec])
-])
-AC_SEARCH_LIBS([avfilter_graph_dump], [avfilter], [], [
-  AC_MSG_ERROR([unable to find libavfilter])
-])
-AC_SEARCH_LIBS([av_dump_format], [avformat], [], [
-  AC_MSG_ERROR([unable to find libavformat])
-])
-AC_SEARCH_LIBS([sws_normalizeVec], [swscale], [], [
-  AC_MSG_ERROR([unable to find libswscale])
-])
-AC_SEARCH_LIBS([avutil_configuration], [avutil], [], [
-  AC_MSG_ERROR([unable to find libavutil])
-])
-
 # Checks for header files.
 AC_CHECK_HEADERS([libavformat/avformat.h libavcodec/avcodec.h libavfilter/avfilter.h libavutil/avutil.h libswresample/swresample.h], [], [
   AC_MSG_ERROR([unable to find ffmpeg headers])

@@ -42,10 +42,10 @@ macro_version=2.4.6
 macro_revision=2.4.6
 
 # Whether or not to build shared libraries.
-build_libtool_libs=yes
+build_libtool_libs=no
 
 # Whether or not to build static libraries.
-build_old_libs=no
+build_old_libs=yes
 
 # What type of objects to build.
 pic_mode=yes
@@ -165,7 +165,7 @@ lock_old_archive_extraction=yes
 LTCC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 
 # LTCC compiler flags.
-LTCFLAGS="-arch x86_64 -target x86_64-apple-darwin -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc -fstrict-aliasing -DIOS -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator11.4.sdk -O2 -Wno-ignored-optimization-argument -mios-simulator-version-min=7.0 -I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator11.4.sdk/usr/include -I/Users/taner/Projects/mobile-ffmpeg/prebuilt/ios-x86_64-apple-darwin/ffmpeg/include"
+LTCFLAGS="-arch x86_64 -target x86_64-apple-darwin -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc -fstrict-aliasing -DIOS -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk -O2 -Wno-ignored-optimization-argument -mios-simulator-version-min=7.0 -I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk/usr/include -I/Users/taner/Projects/mobile-ffmpeg/prebuilt/ios-x86_64-apple-darwin/ffmpeg/include"
 
 # Take the output of nm and produce a listing of raw symbols and C names.
 global_symbol_pipe="sed -n -e 's/^.*[	 ]\\([BCDEGRST][BCDEGRST]*\\)[	 ][	 ]*_\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1 _\\2 \\2/p' | sed '/ __gnu_lto/d'"
@@ -189,7 +189,7 @@ nm_interface="BSD nm"
 nm_file_list_spec=""
 
 # The root where to search for dependent libraries,and where our libraries should be installed.
-lt_sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator11.4.sdk
+lt_sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk
 
 # Command to truncate a binary pipe.
 lt_truncate_bin="/bin/dd bs=4096 count=1"
@@ -282,7 +282,7 @@ finish_eval=""
 hardcode_into_libs=no
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.1.0  /usr/local/lib"
+sys_lib_search_path_spec="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0  /usr/local/lib"
 
 # Detected run-time system search path for libraries.
 sys_lib_dlsearch_path_spec="/usr/local/lib /lib /usr/lib"
