@@ -435,9 +435,6 @@ print_enabled_libraries() {
     fi
 }
 
-#
-# Note that MinimumOSVersion is set to 8.0, because dynamic frameworks are supported by IOS 8 and later.
-#
 build_info_plist() {
     local FILE_PATH="$1"
     local FRAMEWORK_NAME="$2"
@@ -466,8 +463,6 @@ build_info_plist() {
 	<string>${FRAMEWORK_SHORT_VERSION}</string>
 	<key>CFBundleVersion</key>
 	<string>${FRAMEWORK_VERSION}</string>
-	<key>MinimumOSVersion</key>
-	<string>8.0</string>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>
