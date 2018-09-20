@@ -32,6 +32,7 @@ FFmpeg for Android and IOS
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
 - Creates IOS dynamic universal (fat) library
+- Creates IOS static universal (fat) library
 - Creates IOS dynamic framework for IOS 8 or later
 
 ### 2. Using
