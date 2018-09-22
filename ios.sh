@@ -470,6 +470,21 @@ build_info_plist() {
 EOF
 }
 
+create_static_fat_library() {
+    LIPO_COMMAND="${LIPO} -create"
+
+    for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
+    do
+        LIPO_COMMAND+=" $(find ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin -name $1)"
+    done
+
+    LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/$1"
+
+    RC=$(${LIPO_COMMAND} 1>>${BASEDIR}/build.log 2>&1)
+
+    echo ${RC}
+}
+
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/ios-common.sh
 
@@ -690,6 +705,130 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
                 install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavutil.56.${BUILD_LIBRARY_EXTENSION} @rpath/libavutil.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
             done
         done
+    else
+
+        for library in {0..35}
+        do
+            if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
+
+                library_name=$(get_library_name $((library)))
+
+                echo -e "Creating fat library for ${library_name}\n" 1>>${BASEDIR}/build.log 2>&1
+
+                if [[ ${LIBRARY_LIBICONV} == $library ]]; then
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libiconv.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libcharset.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                elif [[ ${LIBRARY_LIBTHEORA} == $library ]]; then
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libtheora.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libtheoraenc.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libtheoradec.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                elif [[ ${LIBRARY_LIBVORBIS} == $library ]]; then
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libvorbisfile.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libvorbisenc.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libvorbis.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                elif [[ ${LIBRARY_LIBWEBP} == $library ]]; then
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libwebpdecoder.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libwebpdemux.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libwebp.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                elif [[ ${LIBRARY_OPENCOREAMR} == $library ]]; then
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libopencore-amrwb.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libopencore-amrnb.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                elif [[ ${LIBRARY_NETTLE} == $library ]]; then
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libnettle.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                    LIBRARY_CREATED=$(create_static_fat_library "libhogweed.a")
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+
+                else
+                    static_archive_name=$(get_static_archive_name $((library)))
+                    LIBRARY_CREATED=$(create_static_fat_library $static_archive_name)
+                    if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                        echo -e "failed\n"
+                        exit 1
+                    fi
+                fi
+
+            fi
+        done
+
     fi
 
     # COPYING HEADERS
