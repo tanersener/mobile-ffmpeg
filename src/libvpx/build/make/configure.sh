@@ -825,7 +825,7 @@ process_common_toolchain() {
     IOS_VERSION_MIN="8.0"
   else
     IOS_VERSION_OPTIONS=""
-    IOS_VERSION_MIN="6.0"
+    IOS_VERSION_MIN="7.0"
   fi
 
   # Handle darwin variants. Newer SDKs allow targeting older

@@ -278,7 +278,7 @@ public class Config {
     }
 
     /**
-     * <p>Registers fonts inside the given path, so they are available in FFmpeg filters.
+     * <p>Registers fonts inside the given path, so they are available to use in FFmpeg filters.
      *
      * <p>Note that you need to build <code>MobileFFmpeg</code> with <code>fontconfig</code>
      * enabled or use a prebuilt package with <code>fontconfig</code> inside to use this feature.

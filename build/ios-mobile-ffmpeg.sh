@@ -42,6 +42,13 @@ export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/lib -framework Foundation -lavdevice"
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
+# BUILD SHARED (DEFAULT) OR STATIC LIBRARIES
+if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
+    BUILD_LIBRARY_OPTIONS="--enable-shared --disable-static";
+else
+    BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
+fi
+
 cd ${BASEDIR}/ios || exit 1
 
 echo -n -e "\n${LIB_NAME}: "
@@ -63,8 +70,7 @@ ${SED_INLINE} 's/${wl}suppress//g' configure
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
-    --enable-shared \
-    --disable-static \
+    ${BUILD_LIBRARY_OPTIONS} \
     --disable-fast-install \
     --disable-maintainer-mode \
     --host=${TARGET_HOST} 1>>${BASEDIR}/build.log 2>&1

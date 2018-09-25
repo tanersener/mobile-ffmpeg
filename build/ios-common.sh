@@ -61,6 +61,23 @@ get_library_name() {
     esac
 }
 
+get_static_archive_name() {
+    case $1 in
+        5) echo "libmp3lame.a" ;;
+        6) echo "libass.a" ;;
+        10) echo "libvpx.a" ;;
+        12) echo "libxml2.a" ;;
+        21) echo "libvidstab.a" ;;
+        22) echo "libilbc.a" ;;
+        26) echo "libaom.a" ;;
+        28) echo "libgif.a" ;;
+        30) echo "libogg.a" ;;
+        31) echo "libpng.a" ;;
+        32) echo "libuuid.a" ;;
+        *) echo lib$(get_library_name $1).a
+    esac
+}
+
 get_arch_name() {
     case $1 in
         0) echo "armv7" ;;

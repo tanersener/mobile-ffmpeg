@@ -5,7 +5,7 @@ FFmpeg for Android and IOS
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/dev-v2.x/docs/assets/mobile-ffmpeg-logo-v4.png" width="240">
 
 ### 1. Features
-- Use prebuilt binaries available under `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
+- Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports
     - Both Android and IOS
     - FFmpeg `v3.4.x` and `v4.0.x` releases
@@ -17,7 +17,7 @@ FFmpeg for Android and IOS
     
         `vid.stab`, `x264`, `x265`, `xvidcore`
 
-- Exposes FFmpeg capabilities both directly from FFmpeg libraries and through MobileFFmpeg wrapper library
+- Exposes FFmpeg capabilities both from FFmpeg libraries and through MobileFFmpeg wrapper library
 - Creates shared libraries (.so for Android, .dylib for IOS)
 - Includes cross-compile instructions for 38 open-source libraries
     
@@ -31,11 +31,12 @@ FFmpeg for Android and IOS
 - Supports `armv7`, `armv7s`, `arm64`, `i386` and `x86_64` architectures
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
-- Creates IOS dynamic universal (fat) library
+- Creates IOS shared/dynamic universal (fat) library
+- Creates IOS static universal (fat) library
 - Creates IOS dynamic framework for IOS 8 or later
 
 ### 2. Using
-Prebuilt libraries are available under [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org)
+Prebuilt libraries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org). Refer to [Using IOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-IOS-Universal-Binaries) guide to import IOS universal binaries released at [Github](https://github.com/tanersener/mobile-ffmpeg/releases).
 
 There are eight different prebuilt packages. Below you can see which external libraries are enabled in each of them.
 

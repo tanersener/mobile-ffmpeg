@@ -295,6 +295,13 @@ do
     fi
 done
 
+# BUILD SHARED (DEFAULT) OR STATIC LIBRARIES
+if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
+    BUILD_LIBRARY_OPTIONS="--enable-shared --disable-static";
+else
+    BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
+fi
+
 # CFLAGS PARTS
 ARCH_CFLAGS=$(get_arch_specific_cflags);
 APP_CFLAGS=$(get_app_specific_cflags ${LIB_NAME});
@@ -343,7 +350,7 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-optimizations \
     --enable-small  \
     --enable-swscale \
-    --enable-shared \
+    ${BUILD_LIBRARY_OPTIONS} \
     --disable-openssl \
     --disable-xmm-clobber-test \
     --disable-debug \
@@ -355,7 +362,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-manpages \
     --disable-podpages \
     --disable-txtpages \
-    --disable-static \
     --disable-sndio \
     --disable-schannel \
     --disable-sdl2 \
@@ -419,7 +425,6 @@ cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/timer.h ${BASEDIR}/prebuilt/ios-$(get_
 cp -f ${BASEDIR}/src/ffmpeg/libavutil/arm/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/arm
 cp -f ${BASEDIR}/src/ffmpeg/libavutil/aarch64/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/aarch64
 cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/emms.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/x86
-
 
 if [ $? -eq 0 ]; then
     echo "ok"
