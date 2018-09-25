@@ -678,14 +678,14 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
     if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
 
-        # FIXING IDs FOR SHARED LIBRARIES
-        install_name_tool -id @rpath/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
+        # FIXING IDs OF SHARED UNIVERSAL LIBRARIES
+        install_name_tool -id @rpath/libmobileffmpeg.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.dylib 1>>${BASEDIR}/build.log 2>&1
         for FFMPEG_LIB in ${FFMPEG_LIBS}
         do
-            install_name_tool -id @rpath/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
+            install_name_tool -id @rpath/${FFMPEG_LIB}.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
         done
 
-        # FIXING IDs PATHS FOR SHARED LIBRARIES
+        # FIXING PATHS FOR UNIVERSAL SHARED LIBRARIES
         ALL_LIBS=("${FFMPEG_LIBS[@]}")
         ALL_LIBS+=" libmobileffmpeg"
 
@@ -694,15 +694,15 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
             for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
             do
                 ## TRY NOT TO USE HARDCODED VERSION NUMBERS
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.${BUILD_LIBRARY_EXTENSION} @rpath/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.dylib @rpath/libmobileffmpeg.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
 
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavcodec.58.${BUILD_LIBRARY_EXTENSION} @rpath/libavcodec.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavdevice.58.${BUILD_LIBRARY_EXTENSION} @rpath/libavdevice.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavfilter.7.${BUILD_LIBRARY_EXTENSION} @rpath/libavfilter.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavformat.58.${BUILD_LIBRARY_EXTENSION} @rpath/libavformat.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswresample.3.${BUILD_LIBRARY_EXTENSION} @rpath/libswresample.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswscale.5.${BUILD_LIBRARY_EXTENSION} @rpath/libswscale.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavutil.56.${BUILD_LIBRARY_EXTENSION} @rpath/libavutil.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.${BUILD_LIBRARY_EXTENSION} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavcodec.58.dylib @rpath/libavcodec.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavdevice.58.dylib @rpath/libavdevice.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavfilter.7.dylib @rpath/libavfilter.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavformat.58.dylib @rpath/libavformat.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswresample.3.dylib @rpath/libswresample.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswscale.5.dylib @rpath/libswscale.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavutil.56.dylib @rpath/libavutil.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
             done
         done
     else
@@ -835,10 +835,20 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
     cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
 
+    # COPYING THE LICENSE
+    if  [ ${GPL_ENABLED} == "yes" ]; then
+        cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
+    else
+        cp ${BASEDIR}/LICENSE.LGPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
+    fi
+
     echo -e "Created fat-binary mobileffmpeg successfully.\n" 1>>${BASEDIR}/build.log 2>&1
 
     echo -e "ok\n"
 
+    if [[ ! -z ${MOBILE_FFMPEG_STATIC} ]]; then
+        exit 0
+    fi
 
     # BUILDING MOBILE FFMPEG FRAMEWORK
     echo -e -n "\nCreating mobileffmpeg.framework under prebuilt/ios-framework: "
@@ -860,23 +870,17 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
         # GPLv3.0
         cp ${BASEDIR}/LICENSE.GPLv3 ${FRAMEWORK_PATH}/LICENSE 1>>${BASEDIR}/build.log 2>&1
-
-        # COPYING LICENSE
-        cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
-
     else
 
         # LGPLv3.0
         cp ${BASEDIR}/LICENSE.LGPLv3 ${FRAMEWORK_PATH}/LICENSE 1>>${BASEDIR}/build.log 2>&1
-
-        # COPYING LICENSE
-        cp ${BASEDIR}/LICENSE.LGPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
-
     fi
 
     build_info_plist "${FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
 
     if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
+
+        # FIXING ID OF SHARED FRAMEWORK
         install_name_tool -id @rpath/mobileffmpeg.framework/mobileffmpeg ${FRAMEWORK_PATH}/mobileffmpeg 1>>${BASEDIR}/build.log 2>&1
     fi
 
@@ -915,6 +919,8 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.mobileffmpeg.FFmpeg${FFMPEG_LIB}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
 
         if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
+
+            # FIXING IDs OF SHARED FRAMEWORKs
             install_name_tool -id @rpath/${FFMPEG_LIB}.framework/${FFMPEG_LIB} ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB} 1>>${BASEDIR}/build.log 2>&1
         fi
     done
@@ -930,15 +936,15 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
             for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
             do
                 ## TRY NOT TO USE HARDCODED VERSION NUMBERS
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.${BUILD_LIBRARY_EXTENSION} @rpath/mobileffmpeg.framework/mobileffmpeg ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.dylib @rpath/mobileffmpeg.framework/mobileffmpeg ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
 
-                install_name_tool -change @rpath/libavutil.${BUILD_LIBRARY_EXTENSION} @rpath/libavcodec.framework/libavcodec ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change @rpath/libavdevice.${BUILD_LIBRARY_EXTENSION} @rpath/libavdevice.framework/libavdevice ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change @rpath/libavfilter.${BUILD_LIBRARY_EXTENSION} @rpath/libavfilter.framework/libavfilter ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change @rpath/libavformat.${BUILD_LIBRARY_EXTENSION} @rpath/libavformat.framework/libavformat ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change @rpath/libswresample.${BUILD_LIBRARY_EXTENSION} @rpath/libswresample.framework/libswresample ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change @rpath/libswscale.${BUILD_LIBRARY_EXTENSION} @rpath/libswscale.framework/libswscale ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change @rpath/libavutil.${BUILD_LIBRARY_EXTENSION} @rpath/libavutil.framework/libavutil ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change @rpath/libavcodec.dylib @rpath/libavcodec.framework/libavcodec ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change @rpath/libavdevice.dylib @rpath/libavdevice.framework/libavdevice ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change @rpath/libavfilter.dylib @rpath/libavfilter.framework/libavfilter ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change @rpath/libavformat.dylib @rpath/libavformat.framework/libavformat ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change @rpath/libswresample.dylib @rpath/libswresample.framework/libswresample ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change @rpath/libswscale.dylib @rpath/libswscale.framework/libswscale ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change @rpath/libavutil.dylib @rpath/libavutil.framework/libavutil ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
             done
         done
     fi
