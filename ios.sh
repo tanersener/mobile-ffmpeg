@@ -463,6 +463,14 @@ build_info_plist() {
 	<string>${FRAMEWORK_SHORT_VERSION}</string>
 	<key>CFBundleVersion</key>
 	<string>${FRAMEWORK_VERSION}</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
+	<key>MinimumOSVersion</key>
+	<string>8.0</string>
+    <key>CFBundleSupportedPlatforms</key>
+	<array>
+        <string>iPhoneOS</string>
+	</array>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>
