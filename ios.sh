@@ -498,6 +498,14 @@ create_static_fat_library() {
 
 GPL_ENABLED="no"
 
+# SELECT XCODE VERSION USED FOR BUILDING
+XCODE_FOR_MOBILE_FFMPEG=~/.xcode.for.mobile.ffmpeg.sh
+if [[ -f ${XCODE_FOR_MOBILE_FFMPEG} ]]; then
+    source ${XCODE_FOR_MOBILE_FFMPEG} 1>>${BASEDIR}/build.log 2>&1
+fi
+
+echo -e "Using Xcode provided at $(xcode-select -p)\n" 1>>${BASEDIR}/build.log 2>&1
+
 while [ ! $# -eq 0 ]
 do
 
