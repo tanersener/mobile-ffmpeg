@@ -58,11 +58,11 @@ case ${ARCH} in
     ;;
     i386)
         TARGET="x86-iphonesimulator-gcc"
-        ASM_FLAGS="--enable-runtime-cpu-detect"
+        ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512"
     ;;
     x86-64)
         TARGET="x86_64-iphonesimulator-gcc"
-        ASM_FLAGS="--enable-runtime-cpu-detect"
+        ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512"
     ;;
 esac
 
