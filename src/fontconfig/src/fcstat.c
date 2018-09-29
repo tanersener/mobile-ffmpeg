@@ -218,6 +218,14 @@ FcScandir (const char		*dirp,
 	    size_t dentlen = FcPtrToOffset (dent, dent->d_name) + strlen (dent->d_name) + 1;
 	    dentlen = ((dentlen + ALIGNOF_VOID_P - 1) & ~(ALIGNOF_VOID_P - 1));
 	    p = (struct dirent *) malloc (dentlen);
+	    if (!p)
+	    {
+		free_dirent (dlist);
+		closedir (d);
+		errno = ENOMEM;
+
+		return -1;
+	    }
 	    memcpy (p, dent, dentlen);
 	    if ((n + 1) >= lsize)
 	    {
@@ -225,6 +233,7 @@ FcScandir (const char		*dirp,
 		dlp = (struct dirent **) realloc (dlist, sizeof (struct dirent *) * lsize);
 		if (!dlp)
 		{
+		    free (p);
 		    free_dirent (dlist);
 		    closedir (d);
 		    errno = ENOMEM;

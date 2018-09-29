@@ -544,7 +544,7 @@ interpret_count (FcFormatContext *c,
 		 FcStrBuf        *buf)
 {
     int count;
-    FcPatternElt *e;
+    FcPatternIter iter;
     FcChar8 buf_static[64];
 
     if (!expect_char (c, '#'))
@@ -554,16 +554,9 @@ interpret_count (FcFormatContext *c,
 	return FcFalse;
 
     count = 0;
-    e = FcPatternObjectFindElt (pat,
-				FcObjectFromName ((const char *) c->word));
-    if (e)
+    if (FcPatternFindIter (pat, &iter, (const char *) c->word))
     {
-	FcValueListPtr l;
-	count++;
-	for (l = FcPatternEltValues(e);
-	     l->next;
-	     l = l->next)
-	    count++;
+	count = FcPatternIterValueCount (pat, &iter);
     }
 
     snprintf ((char *) buf_static, sizeof (buf_static), "%d", count);
@@ -695,7 +688,7 @@ interpret_simple (FcFormatContext *c,
 		  FcPattern       *pat,
 		  FcStrBuf        *buf)
 {
-    FcPatternElt *e;
+    FcPatternIter iter;
     FcBool        add_colon = FcFalse;
     FcBool        add_elt_name = FcFalse;
     int           idx;
@@ -743,9 +736,7 @@ interpret_simple (FcFormatContext *c,
 	c->word = orig;
     }
 
-    e = FcPatternObjectFindElt (pat,
-				FcObjectFromName ((const char *) c->word));
-    if (e || else_string)
+    if (FcPatternFindIter (pat, &iter, (const char *) c->word) || else_string)
     {
 	FcValueListPtr l = NULL;
 
@@ -757,8 +748,7 @@ interpret_simple (FcFormatContext *c,
 	    FcStrBufChar (buf, '=');
 	}
 
-	if (e)
-	    l = FcPatternEltValues(e);
+	l = FcPatternIterGetValues (pat, &iter);
 
 	if (idx != -1)
 	{

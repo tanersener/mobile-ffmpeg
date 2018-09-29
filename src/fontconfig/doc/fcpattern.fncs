@@ -57,6 +57,15 @@ Decrement the pattern reference count. If all references are gone, destroys
 the pattern, in the process destroying all related values.
 @@
 
+@RET@		int
+@FUNC@		FcPatternObjectCount
+@TYPE1@		const FcPattern *		@ARG1@		p
+@PURPOSE@	Returns the number of the object
+@DESC@
+Returns the number of the object <parameter>p</parameter> has.
+@SINCE@		2.13.1
+@@
+
 @RET@		FcBool
 @FUNC@		FcPatternEqual
 @TYPE1@ 	const FcPattern *		@ARG1@ 		pa
@@ -383,7 +392,107 @@ whether the property existed or not.
 Removes the value associated with the property `object' at position `id', returning 
 whether the property existed and had a value at that position or not.
 @@
-		
+
+@RET@		void
+@FUNC@		FcPatternIterStart
+@TYPE1@		const FcPattern *		@ARG1@		p
+@TYPE2@		FcPatternIter *			@ARG2@		iter
+@PURPOSE@	Initialize the iterator with the first iterator in the pattern
+@DESC@
+Initialize <parameter>iter</parameter> with the first iterator in <parameter>p</parameter>.
+If there are no objects in <parameter>p</parameter>, <parameter>iter</parameter>
+will not have any valid data.
+@SINCE@		2.13.1
+@@
+
+@RET@		FcBool
+@FUNC@		FcPatternIterNext
+@TYPE1@		const FcPattern *		@ARG1@		p
+@TYPE2@		FcPatternIter *			@ARG2@		iter
+@PURPUSE@	Set the iterator to point to the next object in the pattern
+@DESC@
+Set <parameter>iter</parameter> to point to the next object in <parameter>p</parameter>
+and returns FcTrue if <parameter>iter</parameter> has been changed to the next object.
+returns FcFalse otherwise.
+@SINCE@		2.13.1
+@@
+
+@RET@		FcBool
+@FUNC@		FcPatternIterEqual
+@TYPE1@		const FcPattern *		@ARG1@		p1
+@TYPE2@		FcPatternIter *			@ARG2@		i1
+@TYPE3@		const FcPattern *		@ARG3@		p2
+@TYPE4@		FcPatternIter *			@ARG4@		i2
+@PURPOSE@	Compare iterators
+@DESC@
+Return FcTrue if both <parameter>i1</parameter> and <parameter>i2</parameter>
+point to same object and contains same values. return FcFalse otherwise.
+@SINCE@		2.13.1
+@@
+
+@RET@		FcBool
+@FUNC@		FcPatternFindIter
+@TYPE1@		const FcPattern *		@ARG1@		p
+@TYPE2@		FcPatternIter *			@ARG2@		iter
+@TYPE3@		const char *  			@ARG3@		object
+@PURPOSE@	Set the iterator to point to the object in the pattern
+@DESC@
+Set <parameter>iter</parameter> to point to <parameter>object</parameter> in
+<parameter>p</parameter> if any and returns FcTrue. returns FcFalse otherwise.
+@SINCE@		2.13.1
+@@
+
+@RET@		FcBool
+@FUNC@		FcPatternIterIsValid
+@TYPE1@		const FcPattern *		@ARG1@		p
+@TYPE2@		FcPatternIter :			@ARG2@		iter
+@PURPOSE@	Check whether the iterator is valid or not
+@DESC@
+Returns FcTrue if <parameter>iter</parameter> point to the valid entry
+in <parameter>p</parameter>. returns FcFalse otherwise.
+@SINCE@		2.13.1
+@@
+
+@RET@		const char *
+@FUNC@		FcPatternIterGetObject
+@TYPE1@		const FcPattern *		@ARG1@		p
+@TYPE2@		FcPatternIter *			@ARG2@		iter
+@PURPOSE@	Returns an object name which the iterator point to
+@DESC@
+Returns an object name in <parameter>p</parameter> which
+<parameter>iter</parameter> point to. returns NULL if
+<parameter>iter</parameter> isn't valid.
+@SINCE@		2.13.1
+@@
+
+@RET@		int
+@FUNC@		FcPatternIterValueCount
+@TYPE1@		const FcPattern *		@ARG1@		p
+@TYPE2@		FcPatternIter *			@ARG2@		iter
+@PURPOSE@	Returns the number of the values which the iterator point to
+@DESC@
+Returns the number of the values in the object which <parameter>iter</parameter>
+point to. if <parameter>iter</parameter> isn't valid, returns 0.
+@SINCE@		2.13.1
+@@
+
+@RET@		FcResult
+@FUNC@		FcPatternIterGetValue
+@TYPE1@		const FcPattern *		@ARG1@		p
+@TYPE2@		FcPatternIter *			@ARG2@		iter
+@TYPE3@		int	      			@ARG3@		id
+@TYPE4@		FcValue *			@ARG4@		v
+@TYPE5@		FcValueBinding *		@ARG5@		b
+@PURPOSE@	Returns a value which the iterator point to
+@DESC@
+Returns in <parameter>v</parameter> the <parameter>id</parameter>'th value
+which <parameter>iter</parameter> point to. also binding to <parameter>b</parameter>
+if given.
+The value returned is not a copy, but rather refers to the data stored
+within the pattern directly.  Applications must not free this value.
+@SINCE@		2.13.1
+@@
+
 @RET@		void
 @FUNC@		FcPatternPrint
 @TYPE1@		const FcPattern *		@ARG1@		p 

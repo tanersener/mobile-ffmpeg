@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #else
@@ -117,6 +118,7 @@ main (int argc, char **argv)
 #if HAVE_GETOPT_LONG || HAVE_GETOPT
     int			c;
 
+    setlocale (LC_ALL, "");
 #if HAVE_GETOPT_LONG
     while ((c = getopt_long (argc, argv, "vbf:qVh", longopts, NULL)) != -1)
 #else

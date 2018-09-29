@@ -26,7 +26,6 @@
 
 #include "fcint.h"
 #include <dirent.h>
-#include <locale.h>
 #include <sys/types.h>
 
 #if defined (_WIN32) && !defined (R_OK)
@@ -39,19 +38,7 @@ static FcConfig *
 FcConfigEnsure (void)
 {
     FcConfig	*config;
-    FcBool	is_locale_initialized;
-    static void *static_is_locale_initialized;
-retry_locale:
-    is_locale_initialized = (intptr_t) fc_atomic_ptr_get (&static_is_locale_initialized);
-    if (!is_locale_initialized)
-    {
-	is_locale_initialized = FcTrue;
-	if (!fc_atomic_ptr_cmpexch (&static_is_locale_initialized, NULL,
-				    (void *)(intptr_t) is_locale_initialized))
-	    goto retry_locale;
-	setlocale (LC_ALL, "");
-    }
-retry_config:
+retry:
     config = fc_atomic_ptr_get (&_fcConfig);
     if (!config)
     {
@@ -59,10 +46,40 @@ retry_config:
 
 	if (!fc_atomic_ptr_cmpexch (&_fcConfig, NULL, config)) {
 	    FcConfigDestroy (config);
-	    goto retry_config;
+	    goto retry;
 	}
     }
     return config;
+}
+
+static FcChar32
+FcHashAsStrIgnoreCase (const void *data)
+{
+    return FcStrHashIgnoreCase (data);
+}
+
+static int
+FcCompareAsStr (const void *v1, const void *v2)
+{
+    return FcStrCmp (v1, v2);
+}
+
+static void
+FcDestroyAsRule (void *data)
+{
+    FcRuleDestroy (data);
+}
+
+static void
+FcDestroyAsRuleSet (void *data)
+{
+    FcRuleSetDestroy (data);
+}
+
+static void
+FcDestroyAsStr (void *data)
+{
+    FcStrFree (data);
 }
 
 FcBool
@@ -126,7 +143,7 @@ FcConfigCreate (void)
 
     for (k = FcMatchKindBegin; k < FcMatchKindEnd; k++)
     {
-	config->subst[k] = FcPtrListCreate ((FcDestroyFunc) FcRuleSetDestroy);
+	config->subst[k] = FcPtrListCreate (FcDestroyAsRuleSet);
 	if (!config->subst[k])
 	    err = FcTrue;
     }
@@ -144,25 +161,19 @@ FcConfigCreate (void)
 
     config->sysRoot = NULL;
 
-    config->rulesetList = FcPtrListCreate ((FcDestroyFunc) FcRuleSetDestroy);
+    config->rulesetList = FcPtrListCreate (FcDestroyAsRuleSet);
     if (!config->rulesetList)
 	goto bail9;
     config->availConfigFiles = FcStrSetCreate ();
     if (!config->availConfigFiles)
 	goto bail10;
 
-    config->uuid_table = FcHashTableCreate ((FcHashFunc) FcStrHashIgnoreCase,
-					    (FcCompareFunc) FcStrCmp,
+    config->uuid_table = FcHashTableCreate (FcHashAsStrIgnoreCase,
+					    FcCompareAsStr,
 					    FcHashStrCopy,
 					    FcHashUuidCopy,
-					    (FcDestroyFunc) FcStrFree,
+					    FcDestroyAsStr,
 					    FcHashUuidFree);
-    config->alias_table = FcHashTableCreate ((FcHashFunc) FcStrHashIgnoreCase,
-					     (FcCompareFunc) FcStrCmp,
-					     FcHashStrCopy,
-					     FcHashStrCopy,
-					     (FcDestroyFunc) FcStrFree,
-					     (FcDestroyFunc) FcStrFree);
 
     FcRefInit (&config->ref, 1);
 
@@ -326,7 +337,6 @@ FcConfigDestroy (FcConfig *config)
 	FcStrFree (config->sysRoot);
 
     FcHashTableDestroy (config->uuid_table);
-    FcHashTableDestroy (config->alias_table);
 
     free (config);
 }
@@ -337,11 +347,15 @@ FcConfigDestroy (FcConfig *config)
 
 FcBool
 FcConfigAddCache (FcConfig *config, FcCache *cache,
-		  FcSetName set, FcStrSet *dirSet)
+		  FcSetName set, FcStrSet *dirSet, FcChar8 *forDir)
 {
     FcFontSet	*fs;
     intptr_t	*dirs;
     int		i;
+    FcBool      relocated = FcFalse;
+
+    if (strcmp ((char *)FcCacheDir(cache), (char *)forDir) != 0)
+      relocated = FcTrue;
 
     /*
      * Add fonts
@@ -355,23 +369,43 @@ FcConfigAddCache (FcConfig *config, FcCache *cache,
 	{
 	    FcPattern	*font = FcFontSetFont (fs, i);
 	    FcChar8	*font_file;
+	    FcChar8	*relocated_font_file = NULL;
 
-	    /*
-	     * Check to see if font is banned by filename
-	     */
 	    if (FcPatternObjectGetString (font, FC_FILE_OBJECT,
-					  0, &font_file) == FcResultMatch &&
-		!FcConfigAcceptFilename (config, font_file))
+					  0, &font_file) == FcResultMatch)
 	    {
-		continue;
+		if (relocated)
+		  {
+		    FcChar8 *slash = FcStrLastSlash (font_file);
+		    relocated_font_file = FcStrBuildFilename (forDir, slash + 1, NULL);
+		    font_file = relocated_font_file;
+		  }
+
+		/*
+		 * Check to see if font is banned by filename
+		 */
+		if (!FcConfigAcceptFilename (config, font_file))
+		{
+		    free (relocated_font_file);
+		    continue;
+		}
 	    }
-		
+
 	    /*
 	     * Check to see if font is banned by pattern
 	     */
 	    if (!FcConfigAcceptFont (config, font))
+	    {
+		free (relocated_font_file);
 		continue;
-		
+	    }
+
+	    if (relocated_font_file)
+	    {
+	      font = FcPatternCacheRewriteFile (font, cache, relocated_font_file);
+	      free (relocated_font_file);
+	    }
+
 	    if (FcFontSetAdd (config->fonts[set], font))
 		nref++;
 	}
@@ -387,18 +421,14 @@ FcConfigAddCache (FcConfig *config, FcCache *cache,
 	for (i = 0; i < cache->dirs_count; i++)
 	{
 	    const FcChar8 *dir = FcCacheSubdir (cache, i);
-	    FcChar8 *alias;
-	    FcChar8 *d = FcStrDirname (dir);
 	    FcChar8 *s = NULL;
 
-	    if (FcHashTableFind (config->alias_table, d, (void **)&alias))
+	    if (relocated)
 	    {
 		FcChar8 *base = FcStrBasename (dir);
-		dir = s = FcStrBuildFilename (alias, base, NULL);
-		FcStrFree (alias);
+		dir = s = FcStrBuildFilename (forDir, base, NULL);
 		FcStrFree (base);
 	    }
-	    FcStrFree (d);
 	    if (FcConfigAcceptFilename (config, dir))
 		FcStrSetAddFilename (dirSet, dir);
 	    if (s)
@@ -426,7 +456,7 @@ FcConfigAddDirList (FcConfig *config, FcSetName set, FcStrSet *dirSet)
 	cache = FcDirCacheRead (dir, FcFalse, config);
 	if (!cache)
 	    continue;
-	FcConfigAddCache (config, cache, set, dirSet);
+	FcConfigAddCache (config, cache, set, dirSet, dir);
 	FcDirCacheUnload (cache);
     }
     FcStrListDone (dirlist);
@@ -718,12 +748,12 @@ FcConfigPromote (FcValue v, FcValue u, FcValuePromotionBuffer *buf)
 	v.u.l = FcLangSetPromote (v.u.s, buf);
 	v.type = FcTypeLangSet;
     }
-    else if (v.type == FcTypeVoid && u.type == FcTypeLangSet)
+    else if (buf && v.type == FcTypeVoid && u.type == FcTypeLangSet)
     {
 	v.u.l = FcLangSetPromote (NULL, buf);
 	v.type = FcTypeLangSet;
     }
-    else if (v.type == FcTypeVoid && u.type == FcTypeCharSet)
+    else if (buf && v.type == FcTypeVoid && u.type == FcTypeCharSet)
     {
 	v.u.c = FcCharSetPromote (buf);
 	v.type = FcTypeCharSet;
@@ -1802,11 +1832,13 @@ FcConfigSubstituteWithPat (FcConfig    *config,
 			if (value[object])
 			{
 			    FcConfigDel (&elt[object]->values, value[object]);
+			    FcValueListDestroy (l);
 			    break;
 			}
 			/* fall through ... */
 		    case FcOpDeleteAll:
 			FcConfigPatternDel (p, r->u.edit->object);
+			FcValueListDestroy (l);
 			break;
 		    default:
 			FcValueListDestroy (l);
@@ -2077,7 +2109,8 @@ FcConfigXdgCacheHome (void)
 	ret = malloc (len + 7 + 1);
 	if (ret)
 	{
-	    memcpy (ret, home, len);
+	    if (home)
+		memcpy (ret, home, len);
 	    memcpy (&ret[len], FC_DIR_SEPARATOR_S ".cache", 7);
 	    ret[len + 7] = 0;
 	}
@@ -2104,7 +2137,8 @@ FcConfigXdgConfigHome (void)
 	ret = malloc (len + 8 + 1);
 	if (ret)
 	{
-	    memcpy (ret, home, len);
+	    if (home)
+		memcpy (ret, home, len);
 	    memcpy (&ret[len], FC_DIR_SEPARATOR_S ".config", 8);
 	    ret[len + 8] = 0;
 	}
@@ -2131,7 +2165,8 @@ FcConfigXdgDataHome (void)
 	ret = malloc (len + 13 + 1);
 	if (ret)
 	{
-	    memcpy (ret, home, len);
+	    if (home)
+		memcpy (ret, home, len);
 	    memcpy (&ret[len], FC_DIR_SEPARATOR_S ".local" FC_DIR_SEPARATOR_S "share", 13);
 	    ret[len + 13] = 0;
 	}
@@ -2161,42 +2196,28 @@ FcConfigFilename (const FcChar8 *url)
     }
     file = 0;
 
-#ifdef _WIN32
-    if (isalpha (*url) &&
-	url[1] == ':' &&
-	(url[2] == '/' || url[2] == '\\'))
-	goto absolute_path;
-#endif
+    if (FcStrIsAbsoluteFilename(url))
+	return FcConfigFileExists (0, url);
 
-    switch (*url) {
-    case '~':
+    if (*url == '~')
+    {
 	dir = FcConfigHome ();
 	if (dir)
 	    file = FcConfigFileExists (dir, url + 1);
 	else
 	    file = 0;
-	break;
-#ifdef _WIN32
-    case '\\':
-    absolute_path:
-#endif
-    case '/':
-	file = FcConfigFileExists (0, url);
-	break;
-    default:
-	path = FcConfigGetPath ();
-	if (!path)
-	    return NULL;
-	for (p = path; *p; p++)
-	{
-	    file = FcConfigFileExists (*p, url);
-	    if (file)
-		break;
-	}
-	FcConfigFreePath (path);
-	break;
     }
 
+    path = FcConfigGetPath ();
+    if (!path)
+	return NULL;
+    for (p = path; *p; p++)
+    {
+	file = FcConfigFileExists (*p, url);
+	if (file)
+	    break;
+    }
+    FcConfigFreePath (path);
     return file;
 }
 
@@ -2222,8 +2243,27 @@ FcConfigRealFilename (FcConfig		*config,
 	if ((len = FcReadLink (nn, buf, sizeof (buf) - 1)) != -1)
 	{
 	    buf[len] = 0;
-	    FcStrFree (nn);
-	    nn = FcStrdup (buf);
+
+	    if (!FcStrIsAbsoluteFilename (buf))
+	    {
+		FcChar8 *dirname = FcStrDirname (nn);
+		FcStrFree (nn);
+		if (!dirname)
+		    return NULL;
+
+		FcChar8 *path = FcStrBuildFilename (dirname, buf, NULL);
+		FcStrFree (dirname);
+		if (!path)
+		    return NULL;
+
+		nn = FcStrCanonFilename (path);
+		FcStrFree (path);
+	    }
+	    else
+	    {
+		FcStrFree (nn);
+		nn = FcStrdup (buf);
+	    }
 	}
     }
 
@@ -2421,7 +2461,10 @@ FcConfigGetSysRoot (const FcConfig *config)
 	    return NULL;
     }
 
-    return config->sysRoot;
+    if (config->sysRoot)
+        return config->sysRoot;
+
+    return (FcChar8 *) getenv ("FONTCONFIG_SYSROOT");
 }
 
 void
@@ -2488,7 +2531,7 @@ FcRuleSetCreate (const FcChar8 *name)
 	ret->description = NULL;
 	ret->domain = NULL;
 	for (k = FcMatchKindBegin; k < FcMatchKindEnd; k++)
-	    ret->subst[k] = FcPtrListCreate ((FcDestroyFunc) FcRuleDestroy);
+	    ret->subst[k] = FcPtrListCreate (FcDestroyAsRule);
 	FcRefInit (&ret->ref, 1);
     }
 
@@ -2573,12 +2616,13 @@ FcRuleSetAdd (FcRuleSet		*rs,
 	switch (r->type)
 	{
 	case FcRuleTest:
-	    if (r->u.test &&
-		r->u.test->kind == FcMatchDefault)
-		r->u.test->kind = kind;
-
-	    if (n < r->u.test->object)
-		n = r->u.test->object;
+	    if (r->u.test)
+	    {
+		if (r->u.test->kind == FcMatchDefault)
+		    r->u.test->kind = kind;
+		if (n < r->u.test->object)
+		    n = r->u.test->object;
+	    }
 	    break;
 	case FcRuleEdit:
 	    if (n < r->u.edit->object)

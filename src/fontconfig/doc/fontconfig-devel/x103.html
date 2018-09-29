@@ -162,6 +162,11 @@ HREF="fcpatterndestroy.html"
 >&nbsp;--&nbsp;Destroy a pattern</DT
 ><DT
 ><A
+HREF="fcpatternobjectcount.html"
+>FcPatternObjectCount</A
+>&nbsp;--&nbsp;Returns the number of the object</DT
+><DT
+><A
 HREF="fcpatternequal.html"
 >FcPatternEqual</A
 >&nbsp;--&nbsp;Compare patterns</DT
@@ -227,6 +232,46 @@ HREF="fcpatternremove.html"
 >&nbsp;--&nbsp;Remove one object of the specified type from the pattern</DT
 ><DT
 ><A
+HREF="fcpatterniterstart.html"
+>FcPatternIterStart</A
+>&nbsp;--&nbsp;Initialize the iterator with the first iterator in the pattern</DT
+><DT
+><A
+HREF="fcpatterniternext.html"
+>FcPatternIterNext</A
+>&nbsp;--&nbsp;</DT
+><DT
+><A
+HREF="fcpatterniterequal.html"
+>FcPatternIterEqual</A
+>&nbsp;--&nbsp;Compare iterators</DT
+><DT
+><A
+HREF="fcpatternfinditer.html"
+>FcPatternFindIter</A
+>&nbsp;--&nbsp;Set the iterator to point to the object in the pattern</DT
+><DT
+><A
+HREF="fcpatterniterisvalid.html"
+>FcPatternIterIsValid</A
+>&nbsp;--&nbsp;Check whether the iterator is valid or not</DT
+><DT
+><A
+HREF="fcpatternitergetobject.html"
+>FcPatternIterGetObject</A
+>&nbsp;--&nbsp;Returns an object name which the iterator point to</DT
+><DT
+><A
+HREF="fcpatternitervaluecount.html"
+>FcPatternIterValueCount</A
+>&nbsp;--&nbsp;Returns the number of the values which the iterator point to</DT
+><DT
+><A
+HREF="fcpatternitergetvalue.html"
+>FcPatternIterGetValue</A
+>&nbsp;--&nbsp;Returns a value which the iterator point to</DT
+><DT
+><A
 HREF="fcpatternprint.html"
 >FcPatternPrint</A
 >&nbsp;--&nbsp;Print a pattern for debugging</DT
@@ -262,7 +307,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN1066"
+NAME="AEN1316"
 >FcFontSet</A
 ></H2
 ><DIV
@@ -324,7 +369,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN1277"
+NAME="AEN1527"
 >FcObjectSet</A
 ></H2
 ><DIV
@@ -367,7 +412,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN1379"
+NAME="AEN1629"
 >FreeType specific functions</A
 ></H2
 ><DIV
@@ -420,7 +465,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN1533"
+NAME="AEN1783"
 >FcValue</A
 ></H2
 ><DIV
@@ -468,7 +513,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN1619"
+NAME="AEN1869"
 >FcCharSet</A
 ></H2
 ><DIV
@@ -588,7 +633,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN2086"
+NAME="AEN2336"
 >FcLangSet</A
 ></H2
 ><DIV
@@ -698,7 +743,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN2480"
+NAME="AEN2730"
 >FcMatrix</A
 ></H2
 ><DIV
@@ -754,7 +799,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN2660"
+NAME="AEN2910"
 >FcRange</A
 ></H2
 ><DIV
@@ -800,7 +845,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN2788"
+NAME="AEN3038"
 >FcConfig</A
 ></H2
 ><DIV
@@ -998,7 +1043,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN3593"
+NAME="AEN3843"
 >FcObjectType</A
 ></H2
 ><DIV
@@ -1035,7 +1080,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN3658"
+NAME="AEN3908"
 >FcConstant</A
 ></H2
 ><DIV
@@ -1076,7 +1121,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN3746"
+NAME="AEN3996"
 >FcWeight</A
 ></H2
 ><DIV
@@ -1117,7 +1162,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN3844"
+NAME="AEN4094"
 >FcBlanks</A
 ></H2
 ><DIV
@@ -1167,7 +1212,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN3928"
+NAME="AEN4178"
 >FcAtomic</A
 ></H2
 ><DIV
@@ -1230,7 +1275,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN4089"
+NAME="AEN4339"
 >File and Directory routines</A
 ></H2
 ><DIV
@@ -1312,7 +1357,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN4367"
+NAME="AEN4617"
 >FcCache routines</A
 ></H2
 ><DIV
@@ -1387,6 +1432,11 @@ HREF="fccachecreatetagfile.html"
 HREF="fcdircachecreateuuid.html"
 >FcDirCacheCreateUUID</A
 >&nbsp;--&nbsp;Create .uuid file at a directory</DT
+><DT
+><A
+HREF="fcdircachedeleteuuid.html"
+>FcDirCacheDeleteUUID</A
+>&nbsp;--&nbsp;Delete .uuid file</DT
 ></DL
 ></DIV
 ><P
@@ -1400,7 +1450,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN4551"
+NAME="AEN4826"
 >FcStrSet and FcStrList</A
 ></H2
 ><DIV
@@ -1477,7 +1527,7 @@ CLASS="SECT2"
 ><H2
 CLASS="SECT2"
 ><A
-NAME="AEN4792"
+NAME="AEN5067"
 >String utilities</A
 ></H2
 ><DIV

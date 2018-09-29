@@ -254,7 +254,7 @@ static int compare (const void *a, const void *b)
 #define MAX_LANG	    1024
 #define MAX_LANG_SET_MAP    ((MAX_LANG + 31) / 32)
 
-#define BitSet(map, i)   ((map)[(entries[i].id)>>5] |= ((FcChar32) 1 << ((entries[i].id) & 0x1f)))
+#define BitSet(map, i)   ((map)[(entries[i].id)>>5] |= ((FcChar32) 1U << ((entries[i].id) & 0x1f)))
 
 int
 main (int argc FC_UNUSED, char **argv)

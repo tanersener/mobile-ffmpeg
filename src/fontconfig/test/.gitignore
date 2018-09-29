@@ -1,9 +1,0 @@
-/.deps/
-/Makefile
-/.libs/
-*.o
-/test-bz131804
-/test-bz89617
-/test-bz96676
-/test-migration
-/test-pthread
