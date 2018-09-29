@@ -34,6 +34,7 @@ FFmpeg for Android and IOS
 - Creates IOS shared/dynamic universal (fat) library
 - Creates IOS static universal (fat) library
 - Creates IOS dynamic framework for IOS 8 or later
+- Supports Xcode 7.3.1 or later
 
 ### 2. Using
 Prebuilt libraries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org). Refer to [Using IOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-IOS-Universal-Binaries) guide to import IOS universal binaries released at [Github](https://github.com/tanersener/mobile-ffmpeg/releases).
@@ -166,7 +167,9 @@ There are eight different prebuilt packages. Below you can see which external li
     
 #### 2.3 Test Application
 You can see how MobileFFmpeg is used inside an application by running test applications provided.
-There is an Android test application under the `android/test-app` folder and an IOS test application under the `ios/test-app` folder. Both applications are identical and supports command execution, video encoding, accessing https, encoding audio, burning subtitles and video stabilization.
+There is an Android test application under the `android/test-app` folder and an IOS test application, which requires 
+`Xcode 9.x` or later, under the `ios/test-app` folder. Both applications are identical and supports command 
+execution, video encoding, accessing https, encoding audio, burning subtitles and video stabilization.
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/ios_test_app.gif" width="240">
 
@@ -194,7 +197,7 @@ Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg
 
 3. IOS builds need these extra packages and tools.
     - **IOS SDK 7.0.x** or later
-    - **Xcode 8.x** or later
+    - **Xcode 7.3.1** or later
     - **Command Line Tools**
 
 #### 4.2 Build Scripts
