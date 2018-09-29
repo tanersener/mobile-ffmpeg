@@ -1077,6 +1077,10 @@ FcUtf16Len (const FcChar8   *string,
 	    int		    *wchar);
 
 FcPublic FcChar8 *
+FcStrBuildFilename (const FcChar8 *path,
+		    ...);
+
+FcPublic FcChar8 *
 FcStrDirname (const FcChar8 *file);
 
 FcPublic FcChar8 *

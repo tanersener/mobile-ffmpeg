@@ -224,6 +224,18 @@ strings within the fontconfig library.
 @@
 
 @RET@		FcChar8 *
+@FUNC@		FcStrBuildFilename
+@TYPE1@		const FcChar8 *			@ARG1@		path
+@TYPE2@		...
+@PURPOSE@	Concatenate strings as a file path
+@DESC@
+Creates a filename from the given elements of strings as file paths
+and concatenate them with the appropriate file separator.
+Arguments must be null-terminated.
+This returns a newly-allocated memory which should be freed when no longer needed.
+@@
+
+@RET@		FcChar8 *
 @FUNC@		FcStrDirname
 @TYPE1@		const FcChar8 *			@ARG1@		file
 @PURPOSE@	directory part of filename

@@ -25,24 +25,25 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <dirent.h>
+#include <unistd.h>
+#include <errno.h>
 #ifndef HAVE_STRUCT_DIRENT_D_TYPE
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 #endif
-#include "fcstr.c"
-#undef FcConfigBuildFonts
-#undef FcConfigCreate
-#undef FcConfigGetCurrent
-#undef FcConfigParseAndLoadFromMemory
-#undef FcConfigUptoDate
-#undef FcFontList
-#undef FcInitReinitialize
-#undef FcPatternCreate
-#undef FcPatternDestroy
 #include <fontconfig/fontconfig.h>
+
+#ifdef _WIN32
+#  define FC_DIR_SEPARATOR         '\\'
+#  define FC_DIR_SEPARATOR_S       "\\"
+#else
+#  define FC_DIR_SEPARATOR         '/'
+#  define FC_DIR_SEPARATOR_S       "/"
+#endif
 
 #ifdef HAVE_MKDTEMP
 #define fc_mkdtemp	mkdtemp
@@ -152,18 +153,6 @@ unlink_dirs (const char *dir)
     }
 
     return ret;
-}
-
-FcChar8 *
-FcLangNormalize (const FcChar8 *lang)
-{
-    return NULL;
-}
-
-FcChar8 *
-FcConfigHome (void)
-{
-    return NULL;
 }
 
 int

@@ -1283,10 +1283,6 @@ FcPrivate FcBool
 FcStrIsAbsoluteFilename (const FcChar8 *s);
 
 FcPrivate FcChar8 *
-FcStrBuildFilename (const FcChar8 *path,
-		    ...);
-
-FcPrivate FcChar8 *
 FcStrLastSlash (const FcChar8  *path);
 
 FcPrivate FcChar32
