@@ -152,6 +152,8 @@ typedef struct NvencContext
     int64_t initial_pts[2];
     int first_packet_output;
 
+    int support_dyn_bitrate;
+
     void *nvencoder;
 
     int preset;
@@ -184,6 +186,7 @@ typedef struct NvencContext
     int weighted_pred;
     int coder;
     int b_ref_mode;
+    int a53_cc;
 } NvencContext;
 
 int ff_nvenc_encode_init(AVCodecContext *avctx);

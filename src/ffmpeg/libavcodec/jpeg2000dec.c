@@ -82,7 +82,7 @@ typedef struct Jpeg2000Tile {
     Jpeg2000CodingStyle codsty[4];
     Jpeg2000QuantStyle  qntsty[4];
     Jpeg2000POC         poc;
-    Jpeg2000TilePart    tile_part[256];
+    Jpeg2000TilePart    tile_part[32];
     uint16_t tp_idx;                    // Tile-part index
     int coord[2][2];                    // border coordinates {{x0, x1}, {y0, y1}}
 } Jpeg2000Tile;
@@ -764,7 +764,10 @@ static int get_sot(Jpeg2000DecoderContext *s, int n)
         return AVERROR_INVALIDDATA;
     }
 
-    av_assert0(TPsot < FF_ARRAY_ELEMS(s->tile[Isot].tile_part));
+    if (TPsot >= FF_ARRAY_ELEMS(s->tile[Isot].tile_part)) {
+        avpriv_request_sample(s->avctx, "Too many tile parts");
+        return AVERROR_PATCHWELCOME;
+    }
 
     s->tile[Isot].tp_idx = TPsot;
     tp             = s->tile[Isot].tile_part + TPsot;
@@ -2053,7 +2056,6 @@ static int jp2_find_codestream(Jpeg2000DecoderContext *s)
                     }
                 } else if (atom2 == MKBETAG('p','c','l','r') && atom2_size >= 6) {
                     int i, size, colour_count, colour_channels, colour_depth[3];
-                    uint32_t r, g, b;
                     colour_count = bytestream2_get_be16u(&s->g);
                     colour_channels = bytestream2_get_byteu(&s->g);
                     // FIXME: Do not ignore channel_sign
@@ -2063,7 +2065,7 @@ static int jp2_find_codestream(Jpeg2000DecoderContext *s)
                     size = (colour_depth[0] + 7 >> 3) * colour_count +
                            (colour_depth[1] + 7 >> 3) * colour_count +
                            (colour_depth[2] + 7 >> 3) * colour_count;
-                    if (colour_count > 256   ||
+                    if (colour_count > AVPALETTE_COUNT ||
                         colour_channels != 3 ||
                         colour_depth[0] > 16 ||
                         colour_depth[1] > 16 ||
@@ -2075,6 +2077,7 @@ static int jp2_find_codestream(Jpeg2000DecoderContext *s)
                     }
                     s->pal8 = 1;
                     for (i = 0; i < colour_count; i++) {
+                        uint32_t r, g, b;
                         if (colour_depth[0] <= 8) {
                             r = bytestream2_get_byteu(&s->g) << 8 - colour_depth[0];
                             r |= r >> colour_depth[0];

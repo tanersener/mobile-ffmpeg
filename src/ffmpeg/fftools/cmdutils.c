@@ -1018,7 +1018,7 @@ static int init_report(const char *env)
         av_free(key);
     }
 
-    av_bprint_init(&filename, 0, 1);
+    av_bprint_init(&filename, 0, AV_BPRINT_SIZE_AUTOMATIC);
     expand_filename_template(&filename,
                              av_x_if_null(filename_template, "%p-%t.log"), tm);
     av_free(filename_template);
@@ -1414,6 +1414,16 @@ static void print_codec(const AVCodec *c)
                            AV_CODEC_CAP_SLICE_THREADS |
                            AV_CODEC_CAP_AUTO_THREADS))
         printf("threads ");
+    if (c->capabilities & AV_CODEC_CAP_AVOID_PROBING)
+        printf("avoidprobe ");
+    if (c->capabilities & AV_CODEC_CAP_INTRA_ONLY)
+        printf("intraonly ");
+    if (c->capabilities & AV_CODEC_CAP_LOSSLESS)
+        printf("lossless ");
+    if (c->capabilities & AV_CODEC_CAP_HARDWARE)
+        printf("hardware ");
+    if (c->capabilities & AV_CODEC_CAP_HYBRID)
+        printf("hybrid ");
     if (!c->capabilities)
         printf("none");
     printf("\n");
@@ -1430,6 +1440,17 @@ static void print_codec(const AVCodec *c)
         case AV_CODEC_CAP_SLICE_THREADS: printf("slice");           break;
         case AV_CODEC_CAP_AUTO_THREADS : printf("auto");            break;
         default:                         printf("none");            break;
+        }
+        printf("\n");
+    }
+
+    if (avcodec_get_hw_config(c, 0)) {
+        printf("    Supported hardware devices: ");
+        for (int i = 0;; i++) {
+            const AVCodecHWConfig *config = avcodec_get_hw_config(c, i);
+            if (!config)
+                break;
+            printf("%s ", av_hwdevice_get_type_name(config->device_type));
         }
         printf("\n");
     }
@@ -1935,7 +1956,10 @@ static void show_help_bsf(const char *name)
 {
     const AVBitStreamFilter *bsf = av_bsf_get_by_name(name);
 
-    if (!bsf) {
+    if (!name) {
+        av_log(NULL, AV_LOG_ERROR, "No bitstream filter name specified.\n");
+        return;
+    } else if (!bsf) {
         av_log(NULL, AV_LOG_ERROR, "Unknown bit stream filter '%s'.\n", name);
         return;
     }

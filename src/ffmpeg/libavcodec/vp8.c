@@ -492,9 +492,11 @@ static void fade(uint8_t *dst, ptrdiff_t dst_linesize,
 {
     int i, j;
     for (j = 0; j < height; j++) {
+        const uint8_t *src2 = src + j * src_linesize;
+        uint8_t *dst2 = dst + j * dst_linesize;
         for (i = 0; i < width; i++) {
-            uint8_t y = src[j * src_linesize + i];
-            dst[j * dst_linesize + i] = av_clip_uint8(y + ((y * beta) >> 8) + alpha);
+            uint8_t y = src2[i];
+            dst2[i] = av_clip_uint8(y + ((y * beta) >> 8) + alpha);
         }
     }
 }
@@ -504,6 +506,9 @@ static int vp7_fade_frame(VP8Context *s, VP56RangeCoder *c)
     int alpha = (int8_t) vp8_rac_get_uint(c, 8);
     int beta  = (int8_t) vp8_rac_get_uint(c, 8);
     int ret;
+
+    if (c->end <= c->buffer && c->bits >= 0)
+        return AVERROR_INVALIDDATA;
 
     if (!s->keyframe && (alpha || beta)) {
         int width  = s->mb_width * 16;
