@@ -1,0 +1,14 @@
+/.deps/
+/.libs/
+*.o
+/Makefile
+/out.expected
+/test-bz106618
+/test-bz106632
+/test-bz131804
+/test-bz89617
+/test-bz96676
+/test-hash
+/test-migration
+/test-name-parse
+/test-pthread

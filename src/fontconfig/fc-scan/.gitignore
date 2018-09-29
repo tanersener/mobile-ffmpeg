@@ -1,0 +1,5 @@
+/.deps/
+/.libs/
+/Makefile
+/fc-scan
+/fc-scan.o

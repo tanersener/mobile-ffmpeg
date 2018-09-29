@@ -1,0 +1,15 @@
+/.deps/
+/.libs/
+*.lo
+*.la
+*.o
+/stamp-fcobjshash.gperf
+/stamp-fcstdint
+/Makefile
+/fcalias.h
+/fcaliastail.h
+/fcarch
+/fcftalias.h
+/fcftaliastail.h
+/fcobjshash.gperf
+/fcobjshash.h

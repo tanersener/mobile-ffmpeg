@@ -1,0 +1,5 @@
+/.deps/
+/.libs/
+/Makefile
+/fc-pattern
+/fc-pattern.o
