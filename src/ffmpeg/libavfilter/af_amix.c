@@ -425,8 +425,6 @@ static int activate(AVFilterContext *ctx)
     AVFrame *buf = NULL;
     int i, ret;
 
-    FF_FILTER_FORWARD_STATUS_BACK_ALL(outlink, ctx);
-
     for (i = 0; i < s->nb_inputs; i++) {
         AVFilterLink *inlink = ctx->inputs[i];
 

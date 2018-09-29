@@ -38,29 +38,24 @@
 #define FUNC_MPEG2(rw, name) FUNC_NAME(rw, mpeg2, name)
 #define FUNC(name) FUNC_MPEG2(READWRITE, name)
 
-#define SUBSCRIPTS(subs, ...) (subs > 0 ? ((int[subs + 1]){ subs, __VA_ARGS__ }) : NULL)
-
-#define ui(width, name) \
-        xui(width, name, current->name, 0)
-#define uis(width, name, subs, ...) \
-        xui(width, name, current->name, subs, __VA_ARGS__)
-
 
 #define READ
 #define READWRITE read
 #define RWContext GetBitContext
 
-#define xui(width, name, var, subs, ...) do { \
+#define xui(width, name, var) do { \
         uint32_t value = 0; \
         CHECK(ff_cbs_read_unsigned(ctx, rw, width, #name, \
-                                   SUBSCRIPTS(subs, __VA_ARGS__), \
                                    &value, 0, (1 << width) - 1)); \
         var = value; \
     } while (0)
 
+#define ui(width, name) \
+        xui(width, name, current->name)
+
 #define marker_bit() do { \
         av_unused uint32_t one; \
-        CHECK(ff_cbs_read_unsigned(ctx, rw, 1, "marker_bit", NULL, &one, 1, 1)); \
+        CHECK(ff_cbs_read_unsigned(ctx, rw, 1, "marker_bit", &one, 1, 1)); \
     } while (0)
 
 #define nextbits(width, compare, var) \
@@ -73,6 +68,7 @@
 #undef READWRITE
 #undef RWContext
 #undef xui
+#undef ui
 #undef marker_bit
 #undef nextbits
 
@@ -81,14 +77,16 @@
 #define READWRITE write
 #define RWContext PutBitContext
 
-#define xui(width, name, var, subs, ...) do { \
+#define xui(width, name, var) do { \
         CHECK(ff_cbs_write_unsigned(ctx, rw, width, #name, \
-                                    SUBSCRIPTS(subs, __VA_ARGS__), \
                                     var, 0, (1 << width) - 1)); \
     } while (0)
 
+#define ui(width, name) \
+        xui(width, name, current->name)
+
 #define marker_bit() do { \
-        CHECK(ff_cbs_write_unsigned(ctx, rw, 1, "marker_bit", NULL, 1, 1, 1)); \
+        CHECK(ff_cbs_write_unsigned(ctx, rw, 1, "marker_bit", 1, 1, 1)); \
     } while (0)
 
 #define nextbits(width, compare, var) (var)
@@ -99,6 +97,7 @@
 #undef READWRITE
 #undef RWContext
 #undef xui
+#undef ui
 #undef marker_bit
 #undef nextbits
 
@@ -147,12 +146,18 @@ static int cbs_mpeg2_split_fragment(CodedBitstreamContext *ctx,
             unit_size = (end - 4) - (start - 1);
         }
 
-        unit_data = (uint8_t *)start - 1;
+        unit_data = av_malloc(unit_size + AV_INPUT_BUFFER_PADDING_SIZE);
+        if (!unit_data)
+            return AVERROR(ENOMEM);
+        memcpy(unit_data, start - 1, unit_size);
+        memset(unit_data + unit_size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
         err = ff_cbs_insert_unit_data(ctx, frag, i, unit_type,
-                                      unit_data, unit_size, frag->data_ref);
-        if (err < 0)
+                                      unit_data, unit_size, NULL);
+        if (err < 0) {
+            av_freep(&unit_data);
             return err;
+        }
 
         if (end == frag->data + frag->data_size)
             break;
@@ -192,11 +197,16 @@ static int cbs_mpeg2_read_unit(CodedBitstreamContext *ctx,
         len = unit->data_size;
 
         slice->data_size = len - pos / 8;
-        slice->data_ref  = av_buffer_ref(unit->data_ref);
+        slice->data_ref  = av_buffer_alloc(slice->data_size +
+                                           AV_INPUT_BUFFER_PADDING_SIZE);
         if (!slice->data_ref)
             return AVERROR(ENOMEM);
-        slice->data = unit->data + pos / 8;
+        slice->data = slice->data_ref->data;
 
+        memcpy(slice->data,
+               unit->data + pos / 8, slice->data_size);
+        memset(slice->data + slice->data_size, 0,
+               AV_INPUT_BUFFER_PADDING_SIZE);
         slice->data_bit_start = pos % 8;
 
     } else {
@@ -352,7 +362,7 @@ static int cbs_mpeg2_assemble_fragment(CodedBitstreamContext *ctx,
                                        CodedBitstreamFragment *frag)
 {
     uint8_t *data;
-    size_t size, dp;
+    size_t size, dp, sp;
     int i;
 
     size = 0;
@@ -372,8 +382,8 @@ static int cbs_mpeg2_assemble_fragment(CodedBitstreamContext *ctx,
         data[dp++] = 0;
         data[dp++] = 1;
 
-        memcpy(data + dp, unit->data, unit->data_size);
-        dp += unit->data_size;
+        for (sp = 0; sp < unit->data_size; sp++)
+            data[dp++] = unit->data[sp];
     }
 
     av_assert0(dp == size);

@@ -25,7 +25,6 @@ cmp_unit=${15:-2}
 gen=${16:-no}
 hwaccel=${17:-none}
 report_type=${18:-standard}
-keep=${19:-0}
 
 outdir="tests/data/fate"
 outfile="${outdir}/${test}"
@@ -429,9 +428,7 @@ if test $err != 0 && test $gen != "no" ; then
 fi
 
 if test $err = 0; then
-    if test $keep = 0; then
-        rm -f $outfile $errfile $cmpfile $cleanfiles
-    fi
+    rm -f $outfile $errfile $cmpfile $cleanfiles
 elif test $gen = "no"; then
     echo "Test $test failed. Look at $errfile for details."
     test "${V:-0}" -gt 0 && cat $errfile

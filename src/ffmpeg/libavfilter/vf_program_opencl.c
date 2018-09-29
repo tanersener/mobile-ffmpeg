@@ -148,11 +148,21 @@ static int program_opencl_run(AVFilterContext *avctx)
 
         cle = clEnqueueNDRangeKernel(ctx->command_queue, ctx->kernel, 2, NULL,
                                      global_work, NULL, 0, NULL, NULL);
-        CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to enqueue kernel: %d.\n", cle);
+        if (cle != CL_SUCCESS) {
+            av_log(avctx, AV_LOG_ERROR, "Failed to enqueue kernel: %d.\n",
+                   cle);
+            err = AVERROR(EIO);
+            goto fail;
+        }
     }
 
     cle = clFinish(ctx->command_queue);
-    CL_FAIL_ON_ERROR(AVERROR(EIO), "Failed to finish command queue: %d.\n", cle);
+    if (cle != CL_SUCCESS) {
+        av_log(avctx, AV_LOG_ERROR, "Failed to finish command queue: %d.\n",
+               cle);
+        err = AVERROR(EIO);
+        goto fail;
+    }
 
     if (ctx->nb_inputs > 0) {
         err = av_frame_copy_props(output, ctx->frames[0]);

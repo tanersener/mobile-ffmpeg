@@ -106,7 +106,7 @@ typedef struct AVBufferSrcParameters {
     AVBufferRef *hw_frames_ctx;
 
     /**
-     * Audio only, the audio sampling rate in samples per second.
+     * Audio only, the audio sampling rate in samples per secon.
      */
     int sample_rate;
 

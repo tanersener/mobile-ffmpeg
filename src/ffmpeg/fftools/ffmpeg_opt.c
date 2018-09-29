@@ -900,14 +900,13 @@ static void add_input_streams(OptionsContext *o, AVFormatContext *ic)
 
 static void assert_file_overwrite(const char *filename)
 {
-    const char *proto_name = avio_find_protocol_name(filename);
-
     if (file_overwrite && no_file_overwrite) {
         fprintf(stderr, "Error, both -y and -n supplied. Exiting.\n");
         exit_program(1);
     }
 
     if (!file_overwrite) {
+        const char *proto_name = avio_find_protocol_name(filename);
         if (proto_name && !strcmp(proto_name, "file") && avio_check(filename, 0) == 0) {
             if (stdin_interaction && !no_file_overwrite) {
                 fprintf(stderr,"File '%s' already exists. Overwrite ? [y/N] ", filename);
@@ -924,19 +923,6 @@ static void assert_file_overwrite(const char *filename)
                 av_log(NULL, AV_LOG_FATAL, "File '%s' already exists. Exiting.\n", filename);
                 exit_program(1);
             }
-        }
-    }
-
-    if (proto_name && !strcmp(proto_name, "file")) {
-        for (int i = 0; i < nb_input_files; i++) {
-             InputFile *file = input_files[i];
-             if (file->ctx->iformat->flags & AVFMT_NOFILE)
-                 continue;
-             if (!strcmp(filename, file->ctx->url)) {
-                 av_log(NULL, AV_LOG_FATAL, "Output %s same as Input #%d - exiting\n", filename, i);
-                 av_log(NULL, AV_LOG_WARNING, "FFmpeg cannot edit existing files in-place.\n");
-                 exit_program(1);
-             }
         }
     }
 }
@@ -1117,22 +1103,9 @@ static int open_input_file(OptionsContext *o, const char *filename)
         }
     }
 
-    if (o->start_time != AV_NOPTS_VALUE && o->start_time_eof != AV_NOPTS_VALUE) {
-        av_log(NULL, AV_LOG_WARNING, "Cannot use -ss and -sseof both, using -ss for %s\n", filename);
-        o->start_time_eof = AV_NOPTS_VALUE;
-    }
-
     if (o->start_time_eof != AV_NOPTS_VALUE) {
-        if (o->start_time_eof >= 0) {
-            av_log(NULL, AV_LOG_ERROR, "-sseof value must be negative; aborting\n");
-            exit_program(1);
-        }
-        if (ic->duration > 0) {
+        if (ic->duration>0) {
             o->start_time = o->start_time_eof + ic->duration;
-            if (o->start_time < 0) {
-                av_log(NULL, AV_LOG_WARNING, "-sseof value seeks to before start of file %s; ignored\n", filename);
-                o->start_time = AV_NOPTS_VALUE;
-            }
         } else
             av_log(NULL, AV_LOG_WARNING, "Cannot use -sseof, duration of %s not known\n", filename);
     }
@@ -1351,7 +1324,6 @@ static OutputStream *new_output_stream(OptionsContext *o, AVFormatContext *oc, e
     ost->file_index = nb_output_files - 1;
     ost->index      = idx;
     ost->st         = st;
-    ost->forced_kf_ref_pts = AV_NOPTS_VALUE;
     st->codecpar->codec_type = type;
 
     ret = choose_encoder(o, oc, ost);
@@ -3185,9 +3157,7 @@ void show_help_default(const char *opt, const char *arg)
 #if CONFIG_SWSCALE
         show_help_children(sws_get_class(), flags);
 #endif
-#if CONFIG_SWRESAMPLE
         show_help_children(swr_get_class(), AV_OPT_FLAG_AUDIO_PARAM);
-#endif
         show_help_children(avfilter_get_class(), AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_FILTERING_PARAM);
         show_help_children(av_bsf_get_class(), AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_BSF_PARAM);
     }
@@ -3367,7 +3337,7 @@ const OptionDef options[] = {
                         OPT_INPUT | OPT_OUTPUT,                      { .off = OFFSET(start_time) },
         "set the start time offset", "time_off" },
     { "sseof",          HAS_ARG | OPT_TIME | OPT_OFFSET |
-                        OPT_INPUT,                                   { .off = OFFSET(start_time_eof) },
+                        OPT_INPUT | OPT_OUTPUT,                      { .off = OFFSET(start_time_eof) },
         "set the start time offset relative to EOF", "time_off" },
     { "seek_timestamp", HAS_ARG | OPT_INT | OPT_OFFSET |
                         OPT_INPUT,                                   { .off = OFFSET(seek_timestamp) },

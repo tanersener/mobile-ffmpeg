@@ -663,7 +663,8 @@ int ffurl_shutdown(URLContext *h, int flags)
 
 int ff_check_interrupt(AVIOInterruptCB *cb)
 {
-    if (cb && cb->callback)
-        return cb->callback(cb->opaque);
+    int ret;
+    if (cb && cb->callback && (ret = cb->callback(cb->opaque)))
+        return ret;
     return 0;
 }

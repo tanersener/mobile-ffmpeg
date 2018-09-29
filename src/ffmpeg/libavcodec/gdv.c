@@ -80,49 +80,47 @@ static void rescale(GDVContext *gdv, uint8_t *dst, int w, int h, int scale_v, in
         return;
     }
 
-    if (gdv->scale_v) {
+    if (gdv->scale_h && gdv->scale_v) {
         for (j = 0; j < h; j++) {
             int y = h - j - 1;
-            uint8_t *dst1 = dst + PREAMBLE_SIZE + y * w;
-            uint8_t *src1 = dst + PREAMBLE_SIZE + (y>>!!gdv->scale_h) * (w>>1);
-
-            for (x = w - 1; x >= 0 && !(x&1); x--) {
-                dst1[x] = src1[(x>>1)];
-            }
-
-            for (x--; x >= 0; x-=2) {
-                dst1[x  ] =
-                dst1[x+1] = src1[(x>>1)];
+            for (i = 0; i < w; i++) {
+                int x = w - i - 1;
+                dst[PREAMBLE_SIZE + x + y * w] = dst[PREAMBLE_SIZE + x/2 + (y/2) * (w/2)];
             }
         }
     } else if (gdv->scale_h) {
         for (j = 0; j < h; j++) {
             int y = h - j - 1;
-            uint8_t *dst1 = dst + PREAMBLE_SIZE + y * w;
-            uint8_t *src1 = dst + PREAMBLE_SIZE + (y>>1) * w;
-            memcpy(dst1, src1, w);
+            for (x = 0; x < w; x++) {
+                dst[PREAMBLE_SIZE + x + y * w] = dst[PREAMBLE_SIZE + x + (y/2) * w];
+            }
+        }
+    } else if (gdv->scale_v) {
+        for (j = 0; j < h; j++) {
+            int y = h - j - 1;
+            for (i = 0; i < w; i++) {
+                int x = w - i - 1;
+                dst[PREAMBLE_SIZE + x + y * w] = dst[PREAMBLE_SIZE + x/2 + y * (w/2)];
+            }
         }
     }
 
     if (scale_h && scale_v) {
-        for (y = 0; y < (h>>1); y++) {
-            uint8_t *dst1 = dst + PREAMBLE_SIZE + y * (w>>1);
-            uint8_t *src1 = dst + PREAMBLE_SIZE + y*2 * w;
-            for (x = 0; x < (w>>1); x++) {
-                dst1[x] = src1[x*2];
+        for (y = 0; y < h/2; y++) {
+            for (x = 0; x < w/2; x++) {
+                dst[PREAMBLE_SIZE + x + y * (w/2)] = dst[PREAMBLE_SIZE + x*2 + y*2 * w];
             }
         }
     } else if (scale_h) {
-        for (y = 0; y < (h>>1); y++) {
-            uint8_t *dst1 = dst + PREAMBLE_SIZE + y * w;
-            uint8_t *src1 = dst + PREAMBLE_SIZE + y*2 * w;
-            memcpy(dst1, src1, w);
+        for (y = 0; y < h/2; y++) {
+            for (x = 0; x < w; x++) {
+                dst[PREAMBLE_SIZE + x + y * w] = dst[PREAMBLE_SIZE + x + y*2 * w];
+            }
         }
     } else if (scale_v) {
         for (y = 0; y < h; y++) {
-            uint8_t *dst1 = dst + PREAMBLE_SIZE + y * w;
-            for (x = 0; x < (w>>1); x++) {
-                dst1[x] = dst1[x*2];
+            for (x = 0; x < w/2; x++) {
+                dst[PREAMBLE_SIZE + x + y * w] = dst[PREAMBLE_SIZE + x*2 + y * w];
             }
         }
     }
@@ -230,10 +228,6 @@ static int decompress_2(AVCodecContext *avctx)
             break;
         }
     }
-
-    if (bytestream2_get_bytes_left_p(pb) > 0)
-        return AVERROR_INVALIDDATA;
-
     return 0;
 }
 
@@ -462,8 +456,6 @@ static int gdv_decode_frame(AVCodecContext *avctx, void *data,
     default:
         av_assert0(0);
     }
-    if (ret < 0)
-        return ret;
 
     memcpy(frame->data[1], gdv->pal, AVPALETTE_SIZE);
     dst = frame->data[0];
@@ -485,14 +477,12 @@ static int gdv_decode_frame(AVCodecContext *avctx, void *data,
 
         for (y = 0; y < avctx->height; y++) {
             if (!gdv->scale_v) {
-                memcpy(dst + didx, gdv->frame + sidx, avctx->width);
-            } else {
-                for (x = 0; x < avctx->width - 1; x+=2) {
-                    dst[didx + x    ] =
-                    dst[didx + x + 1] = gdv->frame[sidx + (x>>1)];
+                for (x = 0; x < avctx->width; x++) {
+                    dst[didx + x] = gdv->frame[sidx + x];
                 }
-                for (; x < avctx->width; x++) {
-                    dst[didx + x] = gdv->frame[sidx + (x>>1)];
+            } else {
+                for (x = 0; x < avctx->width; x++) {
+                    dst[didx + x] = gdv->frame[sidx + x/2];
                 }
             }
             if (!gdv->scale_h || ((y & 1) == 1)) {

@@ -50,7 +50,6 @@ struct decklink_cctx {
     DecklinkPtsSource video_pts_source;
     int audio_input;
     int video_input;
-    int tc_format;
     int draw_bars;
     char *format_code;
     int raw_format;

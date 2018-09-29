@@ -120,14 +120,8 @@ const char *const forced_keyframes_const_names[] = {
     NULL
 };
 
-typedef struct BenchmarkTimeStamps {
-    int64_t real_usec;
-    int64_t user_usec;
-    int64_t sys_usec;
-} BenchmarkTimeStamps;
-
 static void do_video_stats(OutputStream *ost, int frame_size);
-static BenchmarkTimeStamps get_benchmark_time_stamps(void);
+static int64_t getutime(void);
 static int64_t getmaxrss(void);
 static int ifilter_has_all_input_formats(FilterGraph *fg);
 
@@ -139,7 +133,7 @@ static int64_t decode_error_stat[2];
 
 static int want_sdp = 1;
 
-static BenchmarkTimeStamps current_time;
+static int current_time;
 AVIOContext *progress_avio = NULL;
 
 static uint8_t *subtitle_out;
@@ -659,7 +653,7 @@ static void abort_codec_experimental(AVCodec *c, int encoder)
 static void update_benchmark(const char *fmt, ...)
 {
     if (do_benchmark_all) {
-        BenchmarkTimeStamps t = get_benchmark_time_stamps();
+        int64_t t = getutime();
         va_list va;
         char buf[1024];
 
@@ -667,11 +661,7 @@ static void update_benchmark(const char *fmt, ...)
             va_start(va, fmt);
             vsnprintf(buf, sizeof(buf), fmt, va);
             va_end(va);
-            av_log(NULL, AV_LOG_INFO,
-                   "bench: %8" PRIu64 " user %8" PRIu64 " sys %8" PRIu64 " real %s \n",
-                   t.user_usec - current_time.user_usec,
-                   t.sys_usec - current_time.sys_usec,
-                   t.real_usec - current_time.real_usec, buf);
+            av_log(NULL, AV_LOG_INFO, "bench: %8"PRIu64" %s \n", t - current_time, buf);
         }
         current_time = t;
     }
@@ -724,11 +714,11 @@ static void write_packet(OutputFile *of, AVPacket *pkt, OutputStream *ost, int u
             if (ret < 0)
                 exit_program(1);
         }
-        ret = av_packet_make_refcounted(pkt);
+        ret = av_packet_ref(&tmp_pkt, pkt);
         if (ret < 0)
             exit_program(1);
-        av_packet_move_ref(&tmp_pkt, pkt);
         av_fifo_generic_write(ost->muxing_queue, &tmp_pkt, sizeof(tmp_pkt), NULL);
+        av_packet_unref(pkt);
         return;
     }
 
@@ -772,7 +762,7 @@ static void write_packet(OutputFile *of, AVPacket *pkt, OutputStream *ost, int u
                      - FFMIN3(pkt->pts, pkt->dts, ost->last_mux_dts + 1)
                      - FFMAX3(pkt->pts, pkt->dts, ost->last_mux_dts + 1);
         }
-        if ((st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO || st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO || st->codecpar->codec_type == AVMEDIA_TYPE_SUBTITLE) &&
+        if ((st->codecpar->codec_type == AVMEDIA_TYPE_AUDIO || st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) &&
             pkt->dts != AV_NOPTS_VALUE &&
             !(st->codecpar->codec_id == AV_CODEC_ID_VP9 && ost->stream_copy) &&
             ost->last_mux_dts != AV_NOPTS_VALUE) {
@@ -1121,7 +1111,7 @@ static void do_video_out(OutputFile *of,
             format_video_sync != VSYNC_PASSTHROUGH &&
             format_video_sync != VSYNC_DROP) {
             if (delta0 < -0.6) {
-                av_log(NULL, AV_LOG_VERBOSE, "Past duration %f too large\n", -delta0);
+                av_log(NULL, AV_LOG_WARNING, "Past duration %f too large\n", -delta0);
             } else
                 av_log(NULL, AV_LOG_DEBUG, "Clipping frame in rate conversion by %f\n", -delta0);
             sync_ipts = ost->sync_opts;
@@ -1236,12 +1226,8 @@ static void do_video_out(OutputFile *of,
         in_picture->quality = enc->global_quality;
         in_picture->pict_type = 0;
 
-        if (ost->forced_kf_ref_pts == AV_NOPTS_VALUE &&
-            in_picture->pts != AV_NOPTS_VALUE)
-            ost->forced_kf_ref_pts = in_picture->pts;
-
         pts_time = in_picture->pts != AV_NOPTS_VALUE ?
-            (in_picture->pts - ost->forced_kf_ref_pts) * av_q2d(enc->time_base) : NAN;
+            in_picture->pts * av_q2d(enc->time_base) : NAN;
         if (ost->forced_kf_index < ost->forced_kf_count &&
             in_picture->pts >= ost->forced_kf_pts[ost->forced_kf_index]) {
             ost->forced_kf_index++;
@@ -1689,7 +1675,7 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
 
     vid = 0;
     av_bprint_init(&buf, 0, AV_BPRINT_SIZE_AUTOMATIC);
-    av_bprint_init(&buf_script, 0, AV_BPRINT_SIZE_AUTOMATIC);
+    av_bprint_init(&buf_script, 0, 1);
     for (i = 0; i < nb_output_streams; i++) {
         float q = -1;
         ost = output_streams[i];
@@ -1710,7 +1696,7 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
             av_bprintf(&buf, "frame=%5d fps=%3.*f q=%3.1f ",
                      frame_number, fps < 9.95, fps, q);
             av_bprintf(&buf_script, "frame=%d\n", frame_number);
-            av_bprintf(&buf_script, "fps=%.2f\n", fps);
+            av_bprintf(&buf_script, "fps=%.1f\n", fps);
             av_bprintf(&buf_script, "stream_%d_%d_q=%.1f\n",
                        ost->file_index, ost->index, q);
             if (is_last_report)
@@ -1794,11 +1780,9 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
     if (total_size < 0) av_bprintf(&buf_script, "total_size=N/A\n");
     else                av_bprintf(&buf_script, "total_size=%"PRId64"\n", total_size);
     if (pts == AV_NOPTS_VALUE) {
-        av_bprintf(&buf_script, "out_time_us=N/A\n");
         av_bprintf(&buf_script, "out_time_ms=N/A\n");
         av_bprintf(&buf_script, "out_time=N/A\n");
     } else {
-        av_bprintf(&buf_script, "out_time_us=%"PRId64"\n", pts);
         av_bprintf(&buf_script, "out_time_ms=%"PRId64"\n", pts);
         av_bprintf(&buf_script, "out_time=%s%02d:%02d:%02d.%06d\n",
                    hours_sign, hours, mins, secs, us);
@@ -2712,7 +2696,6 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eo
         ist->dts = ist->next_dts;
         switch (ist->dec_ctx->codec_type) {
         case AVMEDIA_TYPE_AUDIO:
-            av_assert1(pkt->duration >= 0);
             if (ist->dec_ctx->sample_rate) {
                 ist->next_dts += ((int64_t)AV_TIME_BASE * ist->dec_ctx->frame_size) /
                                   ist->dec_ctx->sample_rate;
@@ -3400,12 +3383,6 @@ static int init_output_stream_encode(OutputStream *ost)
             enc_ctx->bits_per_raw_sample = frame_bits_per_raw_sample;
         }
 
-        if (ost->top_field_first == 0) {
-            enc_ctx->field_order = AV_FIELD_BB;
-        } else if (ost->top_field_first == 1) {
-            enc_ctx->field_order = AV_FIELD_TT;
-        }
-
         if (ost->forced_keyframes) {
             if (!strncmp(ost->forced_keyframes, "expr:", 5)) {
                 ret = av_expr_parse(&ost->forced_keyframes_pexpr, ost->forced_keyframes+5,
@@ -3490,23 +3467,6 @@ static int init_output_stream(OutputStream *ost, char *error, int error_len)
                          "encoder on output stream #%d:%d : %s",
                      ost->file_index, ost->index, av_err2str(ret));
                 return ret;
-            }
-        }
-        if (ist && ist->dec->type == AVMEDIA_TYPE_SUBTITLE && ost->enc->type == AVMEDIA_TYPE_SUBTITLE) {
-            int input_props = 0, output_props = 0;
-            AVCodecDescriptor const *input_descriptor =
-                avcodec_descriptor_get(dec->codec_id);
-            AVCodecDescriptor const *output_descriptor =
-                avcodec_descriptor_get(ost->enc_ctx->codec_id);
-            if (input_descriptor)
-                input_props = input_descriptor->props & (AV_CODEC_PROP_TEXT_SUB | AV_CODEC_PROP_BITMAP_SUB);
-            if (output_descriptor)
-                output_props = output_descriptor->props & (AV_CODEC_PROP_TEXT_SUB | AV_CODEC_PROP_BITMAP_SUB);
-            if (input_props && output_props && input_props != output_props) {
-                snprintf(error, error_len,
-                         "Subtitle encoding currently only possible from text to text "
-                         "or bitmap to bitmap");
-                return AVERROR_INVALIDDATA;
             }
         }
 
@@ -4781,30 +4741,23 @@ static int transcode(void)
     return ret;
 }
 
-static BenchmarkTimeStamps get_benchmark_time_stamps(void)
+
+static int64_t getutime(void)
 {
-    BenchmarkTimeStamps time_stamps = { av_gettime_relative() };
 #if HAVE_GETRUSAGE
     struct rusage rusage;
 
     getrusage(RUSAGE_SELF, &rusage);
-    time_stamps.user_usec =
-        (rusage.ru_utime.tv_sec * 1000000LL) + rusage.ru_utime.tv_usec;
-    time_stamps.sys_usec =
-        (rusage.ru_stime.tv_sec * 1000000LL) + rusage.ru_stime.tv_usec;
+    return (rusage.ru_utime.tv_sec * 1000000LL) + rusage.ru_utime.tv_usec;
 #elif HAVE_GETPROCESSTIMES
     HANDLE proc;
     FILETIME c, e, k, u;
     proc = GetCurrentProcess();
     GetProcessTimes(proc, &c, &e, &k, &u);
-    time_stamps.user_usec =
-        ((int64_t)u.dwHighDateTime << 32 | u.dwLowDateTime) / 10;
-    time_stamps.sys_usec =
-        ((int64_t)k.dwHighDateTime << 32 | k.dwLowDateTime) / 10;
+    return ((int64_t) u.dwHighDateTime << 32 | u.dwLowDateTime) / 10;
 #else
-    time_stamps.user_usec = time_stamps.sys_usec = 0;
+    return av_gettime_relative();
 #endif
-    return time_stamps;
 }
 
 static int64_t getmaxrss(void)
@@ -4832,7 +4785,7 @@ static void log_callback_null(void *ptr, int level, const char *fmt, va_list vl)
 int main(int argc, char **argv)
 {
     int i, ret;
-    BenchmarkTimeStamps ti;
+    int64_t ti;
 
     init_dynload();
 
@@ -4884,18 +4837,12 @@ int main(int argc, char **argv)
             want_sdp = 0;
     }
 
-    current_time = ti = get_benchmark_time_stamps();
+    current_time = ti = getutime();
     if (transcode() < 0)
         exit_program(1);
+    ti = getutime() - ti;
     if (do_benchmark) {
-        int64_t utime, stime, rtime;
-        current_time = get_benchmark_time_stamps();
-        utime = current_time.user_usec - ti.user_usec;
-        stime = current_time.sys_usec  - ti.sys_usec;
-        rtime = current_time.real_usec - ti.real_usec;
-        av_log(NULL, AV_LOG_INFO,
-               "bench: utime=%0.3fs stime=%0.3fs rtime=%0.3fs\n",
-               utime / 1000000.0, stime / 1000000.0, rtime / 1000000.0);
+        av_log(NULL, AV_LOG_INFO, "bench: utime=%0.3fs\n", ti / 1000000.0);
     }
     av_log(NULL, AV_LOG_DEBUG, "%"PRIu64" frames successfully decoded, %"PRIu64" decoding errors\n",
            decode_error_stat[0], decode_error_stat[1]);

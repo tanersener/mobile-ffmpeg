@@ -161,8 +161,6 @@ static int avfmt2_num_planes(int avfmt)
     case AV_PIX_FMT_BGR0:
     case AV_PIX_FMT_BGR24:
     case AV_PIX_FMT_RGB24:
-    case AV_PIX_FMT_GRAY8:
-    case AV_PIX_FMT_GRAY10:
         return 1;
 
     default:
@@ -444,10 +442,6 @@ static int convert_pix_fmt(enum AVPixelFormat pix_fmt)
     case AV_PIX_FMT_NV20:      return X264_CSP_NV16;
 #ifdef X264_CSP_NV21
     case AV_PIX_FMT_NV21:      return X264_CSP_NV21;
-#endif
-#ifdef X264_CSP_I400
-    case AV_PIX_FMT_GRAY8:
-    case AV_PIX_FMT_GRAY10:    return X264_CSP_I400;
 #endif
     };
     return 0;
@@ -891,10 +885,6 @@ static const enum AVPixelFormat pix_fmts_all[] = {
     AV_PIX_FMT_YUV422P10,
     AV_PIX_FMT_YUV444P10,
     AV_PIX_FMT_NV20,
-#ifdef X264_CSP_I400
-    AV_PIX_FMT_GRAY8,
-    AV_PIX_FMT_GRAY10,
-#endif
     AV_PIX_FMT_NONE
 };
 #if CONFIG_LIBX264RGB_ENCODER

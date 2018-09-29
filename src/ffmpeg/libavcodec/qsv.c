@@ -31,7 +31,6 @@
 #include "libavutil/hwcontext.h"
 #include "libavutil/hwcontext_qsv.h"
 #include "libavutil/imgutils.h"
-#include "libavutil/avassert.h"
 
 #include "avcodec.h"
 #include "qsv_internal.h"
@@ -215,11 +214,6 @@ enum AVPictureType ff_qsv_map_pictype(int mfx_pic_type)
         else
             type = AV_PICTURE_TYPE_P;
         break;
-    case MFX_FRAMETYPE_UNKNOWN:
-        type = AV_PICTURE_TYPE_NONE;
-        break;
-    default:
-        av_assert0(0);
     }
 
     return type;

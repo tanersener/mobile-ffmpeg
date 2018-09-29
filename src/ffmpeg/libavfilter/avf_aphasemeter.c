@@ -233,7 +233,6 @@ static av_cold int init(AVFilterContext *ctx)
 {
     AudioPhaseMeterContext *s = ctx->priv;
     AVFilterPad pad;
-    int ret;
 
     pad = (AVFilterPad){
         .name         = av_strdup("out0"),
@@ -241,11 +240,7 @@ static av_cold int init(AVFilterContext *ctx)
     };
     if (!pad.name)
         return AVERROR(ENOMEM);
-    ret = ff_insert_outpad(ctx, 0, &pad);
-    if (ret < 0) {
-        av_freep(&pad.name);
-        return ret;
-    }
+    ff_insert_outpad(ctx, 0, &pad);
 
     if (s->do_video) {
         pad = (AVFilterPad){
@@ -255,11 +250,7 @@ static av_cold int init(AVFilterContext *ctx)
         };
         if (!pad.name)
             return AVERROR(ENOMEM);
-        ret = ff_insert_outpad(ctx, 1, &pad);
-        if (ret < 0) {
-            av_freep(&pad.name);
-            return ret;
-        }
+        ff_insert_outpad(ctx, 1, &pad);
     }
 
     return 0;

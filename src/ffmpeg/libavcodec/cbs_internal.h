@@ -63,8 +63,8 @@ typedef struct CodedBitstreamType {
 void ff_cbs_trace_header(CodedBitstreamContext *ctx,
                          const char *name);
 
-void ff_cbs_trace_syntax_element(CodedBitstreamContext *ctx, int position,
-                                 const char *name, const int *subscripts,
+void ff_cbs_trace_syntax_element(CodedBitstreamContext *ctx,
+                                 int position, const char *name,
                                  const char *bitstring, int64_t value);
 
 
@@ -72,13 +72,11 @@ void ff_cbs_trace_syntax_element(CodedBitstreamContext *ctx, int position,
 // generation of trace output.
 
 int ff_cbs_read_unsigned(CodedBitstreamContext *ctx, GetBitContext *gbc,
-                         int width, const char *name,
-                         const int *subscripts, uint32_t *write_to,
+                         int width, const char *name, uint32_t *write_to,
                          uint32_t range_min, uint32_t range_max);
 
 int ff_cbs_write_unsigned(CodedBitstreamContext *ctx, PutBitContext *pbc,
-                          int width, const char *name,
-                          const int *subscripts, uint32_t value,
+                          int width, const char *name, uint32_t value,
                           uint32_t range_min, uint32_t range_max);
 
 // The largest value representable in N bits, suitable for use as
@@ -86,12 +84,9 @@ int ff_cbs_write_unsigned(CodedBitstreamContext *ctx, PutBitContext *pbc,
 #define MAX_UINT_BITS(length) ((UINT64_C(1) << (length)) - 1)
 
 
-extern const CodedBitstreamType ff_cbs_type_av1;
 extern const CodedBitstreamType ff_cbs_type_h264;
 extern const CodedBitstreamType ff_cbs_type_h265;
-extern const CodedBitstreamType ff_cbs_type_jpeg;
 extern const CodedBitstreamType ff_cbs_type_mpeg2;
-extern const CodedBitstreamType ff_cbs_type_vp9;
 
 
 #endif /* AVCODEC_CBS_INTERNAL_H */

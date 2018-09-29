@@ -51,7 +51,7 @@ static unsigned int read32(const uint8_t **ptr, int is_big)
 }
 
 static uint16_t read10in32(const uint8_t **ptr, uint32_t * lbuf,
-                                  int * n_datum, int is_big, int shift)
+                                  int * n_datum, int is_big)
 {
     if (*n_datum)
         (*n_datum)--;
@@ -60,7 +60,7 @@ static uint16_t read10in32(const uint8_t **ptr, uint32_t * lbuf,
         *n_datum = 2;
     }
 
-    *lbuf = *lbuf << 10 | *lbuf >> shift & 0x3FFFFF;
+    *lbuf = (*lbuf << 10) | (*lbuf >> 22);
 
     return *lbuf & 0x3FF;
 }
@@ -170,6 +170,10 @@ static int decode_frame(AVCodecContext *avctx,
     packing = read16(&buf, endian);
     encoding = read16(&buf, endian);
 
+    if (packing > 1) {
+        avpriv_report_missing_feature(avctx, "Packing %d", packing);
+        return AVERROR_PATCHWELCOME;
+    }
     if (encoding) {
         avpriv_report_missing_feature(avctx, "Encoding %d", encoding);
         return AVERROR_PATCHWELCOME;
@@ -228,6 +232,16 @@ static int decode_frame(AVCodecContext *avctx,
         stride = (avctx->width * elements + 2) / 3 * 4;
         break;
     case 12:
+        if (!packing) {
+            int tested = 0;
+            if (descriptor == 50 && endian && (avctx->width%8) == 0) { // Little endian and widths not a multiple of 8 need tests
+                tested = 1;
+            }
+            if (!tested) {
+                av_log(avctx, AV_LOG_ERROR, "Packing to 16bit required\n");
+                return -1;
+            }
+        }
         stride = avctx->width * elements;
         if (packing) {
             stride *= 2;
@@ -360,18 +374,17 @@ static int decode_frame(AVCodecContext *avctx,
                                 (uint16_t*)ptr[1],
                                 (uint16_t*)ptr[2],
                                 (uint16_t*)ptr[3]};
-            int shift = packing == 1 ? 22 : 20;
             for (y = 0; y < avctx->width; y++) {
                 *dst[2]++ = read10in32(&buf, &rgbBuffer,
-                                       &n_datum, endian, shift);
+                                       &n_datum, endian);
                 *dst[0]++ = read10in32(&buf, &rgbBuffer,
-                                       &n_datum, endian, shift);
+                                       &n_datum, endian);
                 *dst[1]++ = read10in32(&buf, &rgbBuffer,
-                                       &n_datum, endian, shift);
+                                       &n_datum, endian);
                 if (elements == 4)
                     *dst[3]++ =
                     read10in32(&buf, &rgbBuffer,
-                               &n_datum, endian, shift);
+                               &n_datum, endian);
             }
             n_datum = 0;
             for (i = 0; i < elements; i++)
@@ -384,16 +397,16 @@ static int decode_frame(AVCodecContext *avctx,
                                 (uint16_t*)ptr[1],
                                 (uint16_t*)ptr[2],
                                 (uint16_t*)ptr[3]};
-            int shift = packing == 1 ? 4 : 0;
             for (y = 0; y < avctx->width; y++) {
                 if (packing) {
-                    if (elements >= 3)
-                        *dst[2]++ = read16(&buf, endian) >> shift & 0xFFF;
-                    *dst[0]++ = read16(&buf, endian) >> shift & 0xFFF;
-                    if (elements >= 2)
-                        *dst[1]++ = read16(&buf, endian) >> shift & 0xFFF;
-                    if (elements == 4)
-                        *dst[3]++ = read16(&buf, endian) >> shift & 0xFFF;
+                if (elements >= 3)
+                    *dst[2]++ = read16(&buf, endian) >> 4;
+                *dst[0] = read16(&buf, endian) >> 4;
+                dst[0]++;
+                if (elements >= 2)
+                    *dst[1]++ = read16(&buf, endian) >> 4;
+                if (elements == 4)
+                    *dst[3]++ = read16(&buf, endian) >> 4;
                 } else {
                     if (elements >= 3)
                         *dst[2]++ = read12in32(&buf, &rgbBuffer,
@@ -408,7 +421,6 @@ static int decode_frame(AVCodecContext *avctx,
                                                &n_datum, endian);
                 }
             }
-            n_datum = 0;
             for (i = 0; i < elements; i++)
                 ptr[i] += p->linesize[i];
             // Jump to next aligned position

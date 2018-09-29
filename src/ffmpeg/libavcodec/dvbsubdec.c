@@ -127,7 +127,6 @@ typedef struct DVBSubContext {
     int compute_edt; /**< if 1 end display time calculated using pts
                           if 0 (Default) calculated using time out */
     int compute_clut;
-    int clut_count2[257][256];
     int substream;
     int64_t prev_start;
     DVBSubRegion *region_list;
@@ -651,17 +650,13 @@ static int dvbsub_read_8bit_string(AVCodecContext *avctx,
     return pixels_read;
 }
 
-static void compute_default_clut(DVBSubContext *ctx, uint8_t *clut, AVSubtitleRect *rect, int w, int h)
+static void compute_default_clut(uint8_t *clut, AVSubtitleRect *rect, int w, int h)
 {
     uint8_t list[256] = {0};
     uint8_t list_inv[256];
     int counttab[256] = {0};
-    int (*counttab2)[256] = ctx->clut_count2;
     int count, i, x, y;
     ptrdiff_t stride = rect->linesize[0];
-
-    memset(ctx->clut_count2, 0 , sizeof(ctx->clut_count2));
-
 #define V(x,y) rect->data[0][(x) + (y)*stride]
     for (y = 0; y<h; y++) {
         for (x = 0; x<w; x++) {
@@ -671,32 +666,31 @@ static void compute_default_clut(DVBSubContext *ctx, uint8_t *clut, AVSubtitleRe
             int vt = y     ? V(x,y-1) + 1 : 0;
             int vb = y+1<h ? V(x,y+1) + 1 : 0;
             counttab[v-1] += !!((v!=vl) + (v!=vr) + (v!=vt) + (v!=vb));
-            counttab2[vl][v-1] ++;
-            counttab2[vr][v-1] ++;
-            counttab2[vt][v-1] ++;
-            counttab2[vb][v-1] ++;
         }
     }
 #define L(x,y) list[d[(x) + (y)*stride]]
 
     for (i = 0; i<256; i++) {
-        counttab2[i+1][i] = 0;
-    }
-    for (i = 0; i<256; i++) {
+        int scoretab[256] = {0};
         int bestscore = 0;
         int bestv = 0;
-
-        for (x = 0; x < 256; x++) {
-            int scorev = 0;
-            if (list[x])
-                continue;
-            scorev += counttab2[0][x];
-            for (y = 0; y < 256; y++) {
-                scorev += list[y] * counttab2[y+1][x];
+        for (y = 0; y<h; y++) {
+            for (x = 0; x<w; x++) {
+                uint8_t *d = &rect->data[0][x + y*stride];
+                int v = *d;
+                int l_m = list[v];
+                int l_l = x     ? L(-1, 0) : 1;
+                int l_r = x+1<w ? L( 1, 0) : 1;
+                int l_t = y     ? L( 0,-1) : 1;
+                int l_b = y+1<h ? L( 0, 1) : 1;
+                if (l_m)
+                    continue;
+                scoretab[v] += l_l + l_r + l_t + l_b;
             }
-
-            if (scorev) {
-                int score = 1024LL*scorev / counttab[x];
+        }
+        for (x = 0; x < 256; x++) {
+            if (scoretab[x]) {
+                int score = 1024LL*scoretab[x] / counttab[x];
                 if (score > bestscore) {
                     bestscore = score;
                     bestv = x;
@@ -825,7 +819,7 @@ static int save_subtitle_set(AVCodecContext *avctx, AVSubtitle *sub, int *got_ou
 
             if ((clut == &default_clut && ctx->compute_clut == -1) || ctx->compute_clut == 1) {
                 if (!region->has_computed_clut) {
-                    compute_default_clut(ctx, region->computed_clut, rect, rect->w, rect->h);
+                    compute_default_clut(region->computed_clut, rect, rect->w, rect->h);
                     region->has_computed_clut = 1;
                 }
 

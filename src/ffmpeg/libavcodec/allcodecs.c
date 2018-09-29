@@ -58,7 +58,6 @@ extern AVCodec ff_ayuv_decoder;
 extern AVCodec ff_bethsoftvid_decoder;
 extern AVCodec ff_bfi_decoder;
 extern AVCodec ff_bink_decoder;
-extern AVCodec ff_bitpacked_decoder;
 extern AVCodec ff_bmp_encoder;
 extern AVCodec ff_bmp_decoder;
 extern AVCodec ff_bmv_video_decoder;
@@ -154,7 +153,6 @@ extern AVCodec ff_huffyuv_encoder;
 extern AVCodec ff_huffyuv_decoder;
 extern AVCodec ff_idcin_decoder;
 extern AVCodec ff_iff_ilbm_decoder;
-extern AVCodec ff_imm4_decoder;
 extern AVCodec ff_indeo2_decoder;
 extern AVCodec ff_indeo3_decoder;
 extern AVCodec ff_indeo4_decoder;
@@ -213,7 +211,6 @@ extern AVCodec ff_mszh_decoder;
 extern AVCodec ff_mts2_decoder;
 extern AVCodec ff_mvc1_decoder;
 extern AVCodec ff_mvc2_decoder;
-extern AVCodec ff_mwsc_decoder;
 extern AVCodec ff_mxpeg_decoder;
 extern AVCodec ff_nuv_decoder;
 extern AVCodec ff_paf_video_decoder;
@@ -237,7 +234,7 @@ extern AVCodec ff_prores_encoder;
 extern AVCodec ff_prores_decoder;
 extern AVCodec ff_prores_aw_encoder;
 extern AVCodec ff_prores_ks_encoder;
-extern AVCodec ff_prosumer_decoder;
+extern AVCodec ff_prores_lgpl_decoder;
 extern AVCodec ff_psd_decoder;
 extern AVCodec ff_ptx_decoder;
 extern AVCodec ff_qdraw_decoder;
@@ -248,7 +245,6 @@ extern AVCodec ff_r10k_encoder;
 extern AVCodec ff_r10k_decoder;
 extern AVCodec ff_r210_encoder;
 extern AVCodec ff_r210_decoder;
-extern AVCodec ff_rasc_decoder;
 extern AVCodec ff_rawvideo_encoder;
 extern AVCodec ff_rawvideo_decoder;
 extern AVCodec ff_rl2_decoder;
@@ -338,8 +334,8 @@ extern AVCodec ff_vp9_decoder;
 extern AVCodec ff_vp9_rkmpp_decoder;
 extern AVCodec ff_vp9_v4l2m2m_decoder;
 extern AVCodec ff_vqa_decoder;
+extern AVCodec ff_bitpacked_decoder;
 extern AVCodec ff_webp_decoder;
-extern AVCodec ff_wcmv_decoder;
 extern AVCodec ff_wrapped_avframe_encoder;
 extern AVCodec ff_wrapped_avframe_decoder;
 extern AVCodec ff_wmv1_encoder;
@@ -397,7 +393,6 @@ extern AVCodec ff_atrac3_decoder;
 extern AVCodec ff_atrac3al_decoder;
 extern AVCodec ff_atrac3p_decoder;
 extern AVCodec ff_atrac3pal_decoder;
-extern AVCodec ff_atrac9_decoder;
 extern AVCodec ff_binkaudio_dct_decoder;
 extern AVCodec ff_binkaudio_rdft_decoder;
 extern AVCodec ff_bmv_audio_decoder;
@@ -424,7 +419,6 @@ extern AVCodec ff_g729_decoder;
 extern AVCodec ff_gsm_decoder;
 extern AVCodec ff_gsm_ms_decoder;
 extern AVCodec ff_iac_decoder;
-extern AVCodec ff_ilbc_decoder;
 extern AVCodec ff_imc_decoder;
 extern AVCodec ff_interplay_acm_decoder;
 extern AVCodec ff_mace3_decoder;
@@ -674,7 +668,6 @@ extern AVCodec ff_libaom_av1_encoder;
 extern AVCodec ff_libcelt_decoder;
 extern AVCodec ff_libcodec2_encoder;
 extern AVCodec ff_libcodec2_decoder;
-extern AVCodec ff_libdavs2_decoder;
 extern AVCodec ff_libfdk_aac_encoder;
 extern AVCodec ff_libfdk_aac_decoder;
 extern AVCodec ff_libgsm_encoder;
@@ -713,7 +706,6 @@ extern AVCodec ff_libx264_encoder;
 extern AVCodec ff_libx264rgb_encoder;
 extern AVCodec ff_libx265_encoder;
 extern AVCodec ff_libxavs_encoder;
-extern AVCodec ff_libxavs2_encoder;
 extern AVCodec ff_libxvid_encoder;
 extern AVCodec ff_libzvbi_teletext_decoder;
 
@@ -769,15 +761,7 @@ extern AVCodec ff_vp9_cuvid_decoder;
 extern AVCodec ff_vp9_mediacodec_decoder;
 extern AVCodec ff_vp9_vaapi_encoder;
 
-// The iterate API is not usable with ossfuzz due to the excessive size of binaries created
-#if CONFIG_OSSFUZZ
-AVCodec * codec_list[] = {
-    NULL,
-    NULL
-};
-#else
 #include "libavcodec/codec_list.c"
-#endif
 
 static AVOnce av_codec_static_init = AV_ONCE_INIT;
 static void av_codec_init_static(void)

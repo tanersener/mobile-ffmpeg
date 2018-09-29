@@ -57,7 +57,6 @@ static int dvbsub_parse(AVCodecParserContext *s,
     DVBSubParseContext *pc = s->priv_data;
     uint8_t *p, *p_end;
     int i, len, buf_pos = 0;
-    int out_size = 0;
 
     ff_dlog(avctx, "DVB parse packet pts=%"PRIx64", lpts=%"PRIx64", cpts=%"PRIx64":\n",
             s->pts, s->last_pts, s->cur_frame_pts[s->cur_frame_start_index]);
@@ -72,8 +71,8 @@ static int dvbsub_parse(AVCodecParserContext *s,
     if (i % 16 != 0)
         ff_dlog(avctx, "\n");
 
-    *poutbuf      = buf;
-    *poutbuf_size = buf_size;
+    *poutbuf = NULL;
+    *poutbuf_size = 0;
 
     s->fetch_timestamp = 1;
 
@@ -90,7 +89,7 @@ static int dvbsub_parse(AVCodecParserContext *s,
 
         if (buf_size < 2 || buf[0] != 0x20 || buf[1] != 0x00) {
             ff_dlog(avctx, "Bad packet header\n");
-            return buf_size;
+            return -1;
         }
 
         buf_pos = 2;
@@ -114,9 +113,9 @@ static int dvbsub_parse(AVCodecParserContext *s,
     }
 
     if (buf_size - buf_pos + pc->packet_index > PARSE_BUF_SIZE)
-        return buf_size;
+        return -1;
 
-/* if not currently in a packet, pass data */
+/* if not currently in a packet, discard data */
     if (pc->in_packet == 0)
         return buf_size;
 
@@ -136,7 +135,7 @@ static int dvbsub_parse(AVCodecParserContext *s,
 
                 if (len + 6 <= p_end - p)
                 {
-                    out_size += len + 6;
+                    *poutbuf_size += len + 6;
 
                     p += len + 6;
                 } else
@@ -160,10 +159,9 @@ static int dvbsub_parse(AVCodecParserContext *s,
         }
     }
 
-    if (out_size > 0)
+    if (*poutbuf_size > 0)
     {
         *poutbuf = pc->packet_buf;
-        *poutbuf_size = out_size;
         pc->packet_start = *poutbuf_size;
     }
 

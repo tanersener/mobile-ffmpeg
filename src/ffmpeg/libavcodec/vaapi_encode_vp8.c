@@ -32,16 +32,14 @@
 
 
 typedef struct VAAPIEncodeVP8Context {
-    VAAPIEncodeContext common;
-
-    // User options.
-    int loop_filter_level;
-    int loop_filter_sharpness;
-
-    // Derived settings.
     int q_index_i;
     int q_index_p;
 } VAAPIEncodeVP8Context;
+
+typedef struct VAAPIEncodeVP8Options {
+    int loop_filter_level;
+    int loop_filter_sharpness;
+} VAAPIEncodeVP8Options;
 
 
 #define vseq_var(name)     vseq->name, name
@@ -65,8 +63,8 @@ static int vaapi_encode_vp8_init_sequence_params(AVCodecContext *avctx)
     vseq->kf_auto = 0;
 
     if (!(ctx->va_rc_mode & VA_RC_CQP)) {
-        vseq->bits_per_second = ctx->va_bit_rate;
-        vseq->intra_period    = ctx->gop_size;
+        vseq->bits_per_second = avctx->bit_rate;
+        vseq->intra_period    = avctx->gop_size;
     }
 
     return 0;
@@ -75,8 +73,9 @@ static int vaapi_encode_vp8_init_sequence_params(AVCodecContext *avctx)
 static int vaapi_encode_vp8_init_picture_params(AVCodecContext *avctx,
                                                 VAAPIEncodePicture *pic)
 {
-    VAAPIEncodeVP8Context          *priv = avctx->priv_data;
+    VAAPIEncodeContext              *ctx = avctx->priv_data;
     VAEncPictureParameterBufferVP8 *vpic = pic->codec_picture_params;
+    VAAPIEncodeVP8Options           *opt = ctx->codec_options;
     int i;
 
     vpic->reconstructed_frame = pic->recon_surface;
@@ -117,8 +116,8 @@ static int vaapi_encode_vp8_init_picture_params(AVCodecContext *avctx,
     vpic->pic_flags.bits.version = 0;
     vpic->pic_flags.bits.loop_filter_type = 0;
     for (i = 0; i < 4; i++)
-        vpic->loop_filter_level[i] = priv->loop_filter_level;
-    vpic->sharpness_level = priv->loop_filter_sharpness;
+        vpic->loop_filter_level[i] = opt->loop_filter_level;
+    vpic->sharpness_level = opt->loop_filter_sharpness;
 
     vpic->clamp_qindex_low  = 0;
     vpic->clamp_qindex_high = 127;
@@ -131,7 +130,8 @@ static int vaapi_encode_vp8_write_quant_table(AVCodecContext *avctx,
                                               int index, int *type,
                                               char *data, size_t *data_len)
 {
-    VAAPIEncodeVP8Context *priv = avctx->priv_data;
+    VAAPIEncodeContext     *ctx = avctx->priv_data;
+    VAAPIEncodeVP8Context *priv = ctx->priv_data;
     VAQMatrixBufferVP8 quant;
     int i, q;
 
@@ -142,8 +142,6 @@ static int vaapi_encode_vp8_write_quant_table(AVCodecContext *avctx,
         return AVERROR(EINVAL);
     *type     = VAQMatrixBufferType;
     *data_len = sizeof(quant);
-
-    memset(&quant, 0, sizeof(quant));
 
     if (pic->type == PICTURE_TYPE_P)
         q = priv->q_index_p;
@@ -161,7 +159,8 @@ static int vaapi_encode_vp8_write_quant_table(AVCodecContext *avctx,
 
 static av_cold int vaapi_encode_vp8_configure(AVCodecContext *avctx)
 {
-    VAAPIEncodeVP8Context *priv = avctx->priv_data;
+    VAAPIEncodeContext     *ctx = avctx->priv_data;
+    VAAPIEncodeVP8Context *priv = ctx->priv_data;
 
     priv->q_index_p = av_clip(avctx->global_quality, 0, VP8_MAX_QUANT);
     if (avctx->i_quant_factor > 0.0)
@@ -175,15 +174,10 @@ static av_cold int vaapi_encode_vp8_configure(AVCodecContext *avctx)
     return 0;
 }
 
-static const VAAPIEncodeProfile vaapi_encode_vp8_profiles[] = {
-    { 0 /* VP8 has no profiles */, 8, 3, 1, 1, VAProfileVP8Version0_3 },
-    { FF_PROFILE_UNKNOWN }
-};
-
 static const VAAPIEncodeType vaapi_encode_type_vp8 = {
-    .profiles              = vaapi_encode_vp8_profiles,
-
     .configure             = &vaapi_encode_vp8_configure,
+
+    .priv_data_size        = sizeof(VAAPIEncodeVP8Context),
 
     .sequence_params_size  = sizeof(VAEncSequenceParameterBufferVP8),
     .init_sequence_params  = &vaapi_encode_vp8_init_sequence_params,
@@ -198,12 +192,30 @@ static av_cold int vaapi_encode_vp8_init(AVCodecContext *avctx)
 {
     VAAPIEncodeContext *ctx = avctx->priv_data;
 
+    if (avctx->max_b_frames > 0) {
+        av_log(avctx, AV_LOG_ERROR, "B-frames are not supported.\n");
+        return AVERROR_PATCHWELCOME;
+    }
+
     ctx->codec = &vaapi_encode_type_vp8;
 
-    // No packed headers are currently desired.  VP8 has no metadata
-    // which would be useful to write, and no existing driver supports
-    // adding them anyway.
-    ctx->desired_packed_headers = 0;
+    ctx->va_profile    = VAProfileVP8Version0_3;
+    ctx->va_entrypoint = VAEntrypointEncSlice;
+    ctx->va_rt_format  = VA_RT_FORMAT_YUV420;
+
+    if (avctx->flags & AV_CODEC_FLAG_QSCALE) {
+        ctx->va_rc_mode = VA_RC_CQP;
+    } else if (avctx->bit_rate > 0) {
+        if (avctx->rc_max_rate == avctx->bit_rate)
+            ctx->va_rc_mode = VA_RC_CBR;
+        else
+            ctx->va_rc_mode = VA_RC_VBR;
+    } else {
+        ctx->va_rc_mode = VA_RC_CQP;
+    }
+
+    // Packed headers are not currently supported.
+    ctx->va_packed_headers = 0;
 
     ctx->surface_width  = FFALIGN(avctx->width,  16);
     ctx->surface_height = FFALIGN(avctx->height, 16);
@@ -211,10 +223,10 @@ static av_cold int vaapi_encode_vp8_init(AVCodecContext *avctx)
     return ff_vaapi_encode_init(avctx);
 }
 
-#define OFFSET(x) offsetof(VAAPIEncodeVP8Context, x)
+#define OFFSET(x) (offsetof(VAAPIEncodeContext, codec_options_data) + \
+                   offsetof(VAAPIEncodeVP8Options, x))
 #define FLAGS (AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM)
 static const AVOption vaapi_encode_vp8_options[] = {
-    VAAPI_ENCODE_COMMON_OPTIONS,
     { "loop_filter_level", "Loop filter level",
       OFFSET(loop_filter_level), AV_OPT_TYPE_INT, { .i64 = 16 }, 0, 63, FLAGS },
     { "loop_filter_sharpness", "Loop filter sharpness",
@@ -227,8 +239,6 @@ static const AVCodecDefault vaapi_encode_vp8_defaults[] = {
     { "bf",             "0"   },
     { "g",              "120" },
     { "global_quality", "40"  },
-    { "qmin",           "-1"  },
-    { "qmax",           "-1"  },
     { NULL },
 };
 
@@ -244,7 +254,8 @@ AVCodec ff_vp8_vaapi_encoder = {
     .long_name      = NULL_IF_CONFIG_SMALL("VP8 (VAAPI)"),
     .type           = AVMEDIA_TYPE_VIDEO,
     .id             = AV_CODEC_ID_VP8,
-    .priv_data_size = sizeof(VAAPIEncodeVP8Context),
+    .priv_data_size = (sizeof(VAAPIEncodeContext) +
+                       sizeof(VAAPIEncodeVP8Options)),
     .init           = &vaapi_encode_vp8_init,
     .encode2        = &ff_vaapi_encode2,
     .close          = &ff_vaapi_encode_close,

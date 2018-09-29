@@ -44,7 +44,7 @@
 enum DisplayMode  { COMBINED, SEPARATE, NB_MODES };
 enum DataMode     { D_MAGNITUDE, D_PHASE, NB_DMODES };
 enum DisplayScale { LINEAR, SQRT, CBRT, LOG, FOURTHRT, FIFTHRT, NB_SCALES };
-enum ColorMode    { CHANNEL, INTENSITY, RAINBOW, MORELAND, NEBULAE, FIRE, FIERY, FRUIT, COOL, MAGMA, NB_CLMODES };
+enum ColorMode    { CHANNEL, INTENSITY, RAINBOW, MORELAND, NEBULAE, FIRE, FIERY, FRUIT, COOL, NB_CLMODES };
 enum SlideMode    { REPLACE, SCROLL, FULLFRAME, RSCROLL, NB_SLIDES };
 enum Orientation  { VERTICAL, HORIZONTAL, NB_ORIENTATIONS };
 
@@ -109,7 +109,6 @@ static const AVOption showspectrum_options[] = {
         { "fiery",     "fiery based coloring",            0, AV_OPT_TYPE_CONST, {.i64=FIERY},     0, 0, FLAGS, "color" },
         { "fruit",     "fruit based coloring",            0, AV_OPT_TYPE_CONST, {.i64=FRUIT},     0, 0, FLAGS, "color" },
         { "cool",      "cool based coloring",             0, AV_OPT_TYPE_CONST, {.i64=COOL},      0, 0, FLAGS, "color" },
-        { "magma",     "magma based coloring",            0, AV_OPT_TYPE_CONST, {.i64=MAGMA},     0, 0, FLAGS, "color" },
     { "scale", "set display scale", OFFSET(scale), AV_OPT_TYPE_INT, {.i64=SQRT}, LINEAR, NB_SCALES-1, FLAGS, "scale" },
         { "lin",  "linear",      0, AV_OPT_TYPE_CONST, {.i64=LINEAR}, 0, 0, FLAGS, "scale" },
         { "sqrt", "square root", 0, AV_OPT_TYPE_CONST, {.i64=SQRT},   0, 0, FLAGS, "scale" },
@@ -223,15 +222,6 @@ static const struct ColorTable {
     {    0,                  0,                  0,                   0 },
     {  .15,                  0,                 .5,                 -.5 },
     {    1,                  1,                -.5,                  .5 }},
-    [MAGMA] = {
-    {    0,                  0,                  0,                   0 },
-    { 0.10,            23/256.,     (175-128)/256.,      (120-128)/256. },
-    { 0.23,            43/256.,     (158-128)/256.,      (144-128)/256. },
-    { 0.35,            85/256.,     (138-128)/256.,      (179-128)/256. },
-    { 0.48,            96/256.,     (128-128)/256.,      (189-128)/256. },
-    { 0.64,           128/256.,     (103-128)/256.,      (214-128)/256. },
-    { 0.78,           167/256.,      (85-128)/256.,      (174-128)/256. },
-    {    1,           205/256.,      (80-128)/256.,      (152-128)/256. }},
 };
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -570,7 +560,6 @@ static void color_range(ShowSpectrumContext *s, int ch,
         case FIERY:
         case FRUIT:
         case COOL:
-        case MAGMA:
         case INTENSITY:
             *uf = *yf;
             *vf = *yf;
@@ -957,7 +946,6 @@ static const AVOption showspectrumpic_options[] = {
         { "fiery",     "fiery based coloring",            0, AV_OPT_TYPE_CONST, {.i64=FIERY},     0, 0, FLAGS, "color" },
         { "fruit",     "fruit based coloring",            0, AV_OPT_TYPE_CONST, {.i64=FRUIT},     0, 0, FLAGS, "color" },
         { "cool",      "cool based coloring",             0, AV_OPT_TYPE_CONST, {.i64=COOL},      0, 0, FLAGS, "color" },
-        { "magma",     "magma based coloring",            0, AV_OPT_TYPE_CONST, {.i64=MAGMA},     0, 0, FLAGS, "color" },
     { "scale", "set display scale", OFFSET(scale), AV_OPT_TYPE_INT, {.i64=LOG}, 0, NB_SCALES-1, FLAGS, "scale" },
         { "lin",  "linear",      0, AV_OPT_TYPE_CONST, {.i64=LINEAR}, 0, 0, FLAGS, "scale" },
         { "sqrt", "square root", 0, AV_OPT_TYPE_CONST, {.i64=SQRT},   0, 0, FLAGS, "scale" },
@@ -1094,19 +1082,9 @@ static int showspectrumpic_request_frame(AVFilterLink *outlink)
         if (s->legend) {
             int multi = (s->mode == SEPARATE && s->color_mode == CHANNEL);
             float spp = samples / (float)sz;
-            char *text;
             uint8_t *dst;
-            char chlayout_str[128];
-
-            av_get_channel_layout_string(chlayout_str, sizeof(chlayout_str), inlink->channels,
-                                         inlink->channel_layout);
-
-            text = av_asprintf("%d Hz | %s", inlink->sample_rate, chlayout_str);
 
             drawtext(s->outpicref, 2, outlink->h - 10, "CREATED BY LIBAVFILTER", 0);
-            drawtext(s->outpicref, outlink->w - 2 - strlen(text) * 10, outlink->h - 10, text, 0);
-
-            av_freep(&text);
 
             dst = s->outpicref->data[0] + (s->start_y - 1) * s->outpicref->linesize[0] + s->start_x - 1;
             for (x = 0; x < s->w + 1; x++)
@@ -1121,15 +1099,14 @@ static int showspectrumpic_request_frame(AVFilterLink *outlink)
             }
             if (s->orientation == VERTICAL) {
                 int h = s->mode == SEPARATE ? s->h / s->nb_display_channels : s->h;
-                int hh = s->mode == SEPARATE ? -(s->h % s->nb_display_channels) + 1 : 1;
                 for (ch = 0; ch < (s->mode == SEPARATE ? s->nb_display_channels : 1); ch++) {
                     for (y = 0; y < h; y += 20) {
-                        dst = s->outpicref->data[0] + (s->start_y + h * (ch + 1) - y - hh) * s->outpicref->linesize[0];
+                        dst = s->outpicref->data[0] + (s->start_y + h * (ch + 1) - y - 1) * s->outpicref->linesize[0];
                         dst[s->start_x - 2] = 200;
                         dst[s->start_x + s->w + 1] = 200;
                     }
                     for (y = 0; y < h; y += 40) {
-                        dst = s->outpicref->data[0] + (s->start_y + h * (ch + 1) - y - hh) * s->outpicref->linesize[0];
+                        dst = s->outpicref->data[0] + (s->start_y + h * (ch + 1) - y - 1) * s->outpicref->linesize[0];
                         dst[s->start_x - 3] = 200;
                         dst[s->start_x + s->w + 2] = 200;
                     }
@@ -1158,7 +1135,7 @@ static int showspectrumpic_request_frame(AVFilterLink *outlink)
                         if (!units)
                             return AVERROR(ENOMEM);
 
-                        drawtext(s->outpicref, s->start_x - 8 * strlen(units) - 4, h * (ch + 1) + s->start_y - y - 4 - hh, units, 0);
+                        drawtext(s->outpicref, s->start_x - 8 * strlen(units) - 4, h * (ch + 1) + s->start_y - y - 4, units, 0);
                         av_free(units);
                     }
                 }
@@ -1212,7 +1189,7 @@ static int showspectrumpic_request_frame(AVFilterLink *outlink)
                     for (x = 0; x < w; x+=80) {
                         dst[x] = 200;
                     }
-                    for (x = 0; x < w - 79; x += 80) {
+                    for (x = 0; x < w; x += 80) {
                         float hertz = x * (inlink->sample_rate / 2) / (float)(1 << (int)ceil(log2(w)));
                         char *units;
 

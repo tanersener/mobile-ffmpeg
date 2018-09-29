@@ -36,7 +36,6 @@
 #include "libavutil/imgutils.h"
 #include "libavutil/internal.h"
 #include "libavutil/intmath.h"
-#include "libavutil/opt.h"
 
 #include "avcodec.h"
 #include "bytestream.h"
@@ -182,7 +181,7 @@ static int unrefcount_frame(AVCodecInternal *avci, AVFrame *frame)
     return 0;
 }
 
-int ff_decode_bsfs_init(AVCodecContext *avctx)
+static int bsfs_init(AVCodecContext *avctx)
 {
     AVCodecInternal *avci = avctx->internal;
     DecodeFilterContext *s = &avci->filter;
@@ -196,33 +195,27 @@ int ff_decode_bsfs_init(AVCodecContext *avctx)
     while (bsfs_str && *bsfs_str) {
         AVBSFContext **tmp;
         const AVBitStreamFilter *filter;
-        char *bsf, *bsf_options_str, *bsf_name;
+        char *bsf;
 
         bsf = av_get_token(&bsfs_str, ",");
         if (!bsf) {
             ret = AVERROR(ENOMEM);
             goto fail;
         }
-        bsf_name = av_strtok(bsf, "=", &bsf_options_str);
-        if (!bsf_name) {
-            av_freep(&bsf);
-            ret = AVERROR(ENOMEM);
-            goto fail;
-        }
 
-        filter = av_bsf_get_by_name(bsf_name);
+        filter = av_bsf_get_by_name(bsf);
         if (!filter) {
             av_log(avctx, AV_LOG_ERROR, "A non-existing bitstream filter %s "
                    "requested by a decoder. This is a bug, please report it.\n",
-                   bsf_name);
-            av_freep(&bsf);
+                   bsf);
             ret = AVERROR_BUG;
+            av_freep(&bsf);
             goto fail;
         }
+        av_freep(&bsf);
 
         tmp = av_realloc_array(s->bsfs, s->nb_bsfs + 1, sizeof(*s->bsfs));
         if (!tmp) {
-            av_freep(&bsf);
             ret = AVERROR(ENOMEM);
             goto fail;
         }
@@ -230,10 +223,8 @@ int ff_decode_bsfs_init(AVCodecContext *avctx)
         s->nb_bsfs++;
 
         ret = av_bsf_alloc(filter, &s->bsfs[s->nb_bsfs - 1]);
-        if (ret < 0) {
-            av_freep(&bsf);
+        if (ret < 0)
             goto fail;
-        }
 
         if (s->nb_bsfs == 1) {
             /* We do not currently have an API for passing the input timebase into decoders,
@@ -247,43 +238,13 @@ int ff_decode_bsfs_init(AVCodecContext *avctx)
             ret = avcodec_parameters_copy(s->bsfs[s->nb_bsfs - 1]->par_in,
                                           s->bsfs[s->nb_bsfs - 2]->par_out);
         }
-        if (ret < 0) {
-            av_freep(&bsf);
+        if (ret < 0)
             goto fail;
-        }
-
-        if (bsf_options_str && filter->priv_class) {
-            const AVOption *opt = av_opt_next(s->bsfs[s->nb_bsfs - 1]->priv_data, NULL);
-            const char * shorthand[2] = {NULL};
-
-            if (opt)
-                shorthand[0] = opt->name;
-
-            ret = av_opt_set_from_string(s->bsfs[s->nb_bsfs - 1]->priv_data, bsf_options_str, shorthand, "=", ":");
-            if (ret < 0) {
-                if (ret != AVERROR(ENOMEM)) {
-                    av_log(avctx, AV_LOG_ERROR, "Invalid options for bitstream filter %s "
-                           "requested by the decoder. This is a bug, please report it.\n",
-                           bsf_name);
-                    ret = AVERROR_BUG;
-                }
-                av_freep(&bsf);
-                goto fail;
-            }
-        }
-        av_freep(&bsf);
 
         ret = av_bsf_init(s->bsfs[s->nb_bsfs - 1]);
         if (ret < 0)
             goto fail;
-
-        if (*bsfs_str)
-            bsfs_str++;
     }
-
-    ret = avcodec_parameters_to_context(avctx, s->bsfs[s->nb_bsfs - 1]->par_out);
-    if (ret < 0)
-        return ret;
 
     return 0;
 fail:
@@ -692,6 +653,10 @@ int attribute_align_arg avcodec_send_packet(AVCodecContext *avctx, const AVPacke
     if (avpkt && !avpkt->size && avpkt->data)
         return AVERROR(EINVAL);
 
+    ret = bsfs_init(avctx);
+    if (ret < 0)
+        return ret;
+
     av_packet_unref(avci->buffer_pkt);
     if (avpkt && (avpkt->data || avpkt->side_data_elems)) {
         ret = av_packet_ref(avci->buffer_pkt, avpkt);
@@ -750,6 +715,10 @@ int attribute_align_arg avcodec_receive_frame(AVCodecContext *avctx, AVFrame *fr
 
     if (!avcodec_is_open(avctx) || !av_codec_is_decoder(avctx->codec))
         return AVERROR(EINVAL);
+
+    ret = bsfs_init(avctx);
+    if (ret < 0)
+        return ret;
 
     if (avci->buffer_frame->buf[0]) {
         av_frame_move_ref(frame, avci->buffer_frame);
@@ -1868,7 +1837,7 @@ static int get_buffer_internal(AVCodecContext *avctx, AVFrame *frame, int flags)
     int ret;
 
     if (avctx->codec_type == AVMEDIA_TYPE_VIDEO) {
-        if ((ret = av_image_check_size2(FFALIGN(avctx->width, STRIDE_ALIGN), avctx->height, avctx->max_pixels, AV_PIX_FMT_NONE, 0, avctx)) < 0 || avctx->pix_fmt<0) {
+        if ((ret = av_image_check_size2(avctx->width, avctx->height, avctx->max_pixels, AV_PIX_FMT_NONE, 0, avctx)) < 0 || avctx->pix_fmt<0) {
             av_log(avctx, AV_LOG_ERROR, "video_get_buffer: image parameters invalid\n");
             return AVERROR(EINVAL);
         }
@@ -1974,14 +1943,6 @@ int ff_reget_buffer(AVCodecContext *avctx, AVFrame *frame)
     return ret;
 }
 
-static void bsfs_flush(AVCodecContext *avctx)
-{
-    DecodeFilterContext *s = &avctx->internal->filter;
-
-    for (int i = 0; i < s->nb_bsfs; i++)
-        av_bsf_flush(s->bsfs[i]);
-}
-
 void avcodec_flush_buffers(AVCodecContext *avctx)
 {
     avctx->internal->draining      = 0;
@@ -2002,7 +1963,7 @@ void avcodec_flush_buffers(AVCodecContext *avctx)
     avctx->pts_correction_last_pts =
     avctx->pts_correction_last_dts = INT64_MIN;
 
-    bsfs_flush(avctx);
+    ff_decode_bsfs_uninit(avctx);
 
     if (!avctx->refcounted_frames)
         av_frame_unref(avctx->internal->to_free);

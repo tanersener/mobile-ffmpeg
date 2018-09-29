@@ -17,34 +17,6 @@ for more formats. None of them are used by default, their use has to be
 explicitly requested by passing the appropriate flags to
 @command{./configure}.
 
-@section libxavs2
-
-FFmpeg can make use of the xavs2 library for AVS2-P2/IEEE1857.4 video encoding.
-
-Go to @url{https://github.com/pkuvcl/xavs2} and follow the instructions for
-installing the library. Then pass @code{--enable-libxavs2} to configure to
-enable it.
-
-@float NOTE
-libxavs2 is under the GNU Public License Version 2 or later
-(see @url{http://www.gnu.org/licenses/old-licenses/gpl-2.0.html} for
-details), you must upgrade FFmpeg's license to GPL in order to use it.
-@end float
-
-@section libdavs2
-
-FFmpeg can make use of the davs2 library for AVS2-P2/IEEE1857.4 video decoding.
-
-Go to @url{https://github.com/pkuvcl/davs2} and follow the instructions for
-installing the library. Then pass @code{--enable-libdavs2} to configure to
-enable it.
-
-@float NOTE
-libdavs2 is under the GNU Public License Version 2 or later
-(see @url{http://www.gnu.org/licenses/old-licenses/gpl-2.0.html} for
-details), you must upgrade FFmpeg's license to GPL in order to use it.
-@end float
-
 @section Alliance for Open Media libaom
 
 FFmpeg can make use of the libaom library for AV1 decoding.
@@ -74,10 +46,9 @@ upgrade FFmpeg's license to LGPL version 3 (or if you have enabled
 GPL components, GPL version 3) by passing @code{--enable-version3} to configure in
 order to use it.
 
-The license of the Fraunhofer AAC library is incompatible with the GPL.
-Therefore, for GPL builds, you have to pass @code{--enable-nonfree} to
-configure in order to use it. To the best of our knowledge, it is
-compatible with the LGPL.
+The Fraunhofer AAC library is licensed under a license incompatible to the GPL
+and is not known to be compatible to the LGPL. Therefore, you have to pass
+@code{--enable-nonfree} to configure to use it.
 @end float
 
 @subsection OpenCORE AMR
@@ -100,7 +71,7 @@ Then pass @code{--enable-libvo-amrwbenc} to configure to enable it.
 
 @subsection Fraunhofer AAC library
 
-FFmpeg can make use of the Fraunhofer AAC library for AAC decoding & encoding.
+FFmpeg can make use of the Fraunhofer AAC library for AAC encoding.
 
 Go to @url{http://sourceforge.net/projects/opencore-amr/} and follow the
 instructions for installing the library.
@@ -831,7 +802,6 @@ following image formats are supported:
     @tab fourcc: G2M2, G2M3
 @item Go2Webinar             @tab     @tab  X
     @tab fourcc: G2M4
-@item Gremlin Digital Video  @tab     @tab  X
 @item H.261                  @tab  X  @tab  X
 @item H.263 / H.263-1996     @tab  X  @tab  X
 @item H.263+ / H.263-1998 / H.263 version 2  @tab  X  @tab  X
@@ -852,7 +822,6 @@ following image formats are supported:
     @tab IFF interleaved bitmap
 @item IFF ByteRun1           @tab     @tab  X
     @tab IFF run length encoded bitmap
-@item Infinity IMM4          @tab     @tab  X
 @item Intel H.263            @tab     @tab  X
 @item Intel Indeo 2          @tab     @tab  X
 @item Intel Indeo 3          @tab     @tab  X
@@ -1079,7 +1048,6 @@ following image formats are supported:
 @item ATRAC1                 @tab     @tab  X
 @item ATRAC3                 @tab     @tab  X
 @item ATRAC3+                @tab     @tab  X
-@item ATRAC9                 @tab     @tab  X
 @item Bink Audio             @tab     @tab  X
     @tab Used in Bink and Smacker files in many games.
 @item CELT                   @tab     @tab  E

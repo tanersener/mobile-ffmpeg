@@ -55,7 +55,6 @@ typedef struct FFDrawContext {
     uint8_t vsub[MAX_PLANES];  /*< vertical subsampling */
     uint8_t hsub_max;
     uint8_t vsub_max;
-    int full_range;
     unsigned flags;
 } FFDrawContext;
 

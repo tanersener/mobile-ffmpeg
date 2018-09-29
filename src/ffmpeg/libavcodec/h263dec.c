@@ -47,9 +47,10 @@
 
 static enum AVPixelFormat h263_get_format(AVCodecContext *avctx)
 {
+    MpegEncContext *s = avctx->priv_data;
     /* MPEG-4 Studio Profile only, not supported by hardware */
     if (avctx->bits_per_raw_sample > 8) {
-        av_assert1(((MpegEncContext *)avctx->priv_data)->studio_profile);
+        av_assert1(s->studio_profile);
         return avctx->pix_fmt;
     }
 
@@ -318,7 +319,6 @@ static int decode_slice(MpegEncContext *s)
 
     av_assert1(s->mb_x == 0 && s->mb_y == s->mb_height);
 
-    // Detect incorrect padding with wrong stuffing codes used by NEC N-02B
     if (s->codec_id == AV_CODEC_ID_MPEG4         &&
         (s->workaround_bugs & FF_BUG_AUTODETECT) &&
         get_bits_left(&s->gb) >= 48              &&

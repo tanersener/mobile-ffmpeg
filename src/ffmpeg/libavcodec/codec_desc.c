@@ -1395,13 +1395,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .props     = AV_CODEC_PROP_LOSSLESS,
     },
     {
-        .id        = AV_CODEC_ID_AVS2,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "avs2",
-        .long_name = NULL_IF_CONFIG_SMALL("AVS2-P2/IEEE1857.4"),
-        .props     = AV_CODEC_PROP_LOSSY,
-    },
-    {
         .id        = AV_CODEC_ID_Y41P,
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "y41p",
@@ -1523,7 +1516,7 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_VIDEO,
         .name      = "truemotion2rt",
         .long_name = NULL_IF_CONFIG_SMALL("Duck TrueMotion 2.0 Real Time"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
+        .props     = AV_CODEC_PROP_LOSSY,
     },
     {
         .id        = AV_CODEC_ID_M101,
@@ -1653,41 +1646,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .name      = "fits",
         .long_name = NULL_IF_CONFIG_SMALL("FITS (Flexible Image Transport System)"),
         .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
-    },
-    {
-        .id        = AV_CODEC_ID_IMM4,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "imm4",
-        .long_name = NULL_IF_CONFIG_SMALL("Infinity IMM4"),
-        .props     = AV_CODEC_PROP_LOSSY,
-    },
-    {
-        .id        = AV_CODEC_ID_PROSUMER,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "prosumer",
-        .long_name = NULL_IF_CONFIG_SMALL("Brooktree ProSumer Video"),
-        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSY,
-    },
-    {
-        .id        = AV_CODEC_ID_MWSC,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "mwsc",
-        .long_name = NULL_IF_CONFIG_SMALL("MatchWare Screen Capture Codec"),
-        .props     = AV_CODEC_PROP_LOSSLESS,
-    },
-    {
-        .id        = AV_CODEC_ID_WCMV,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "wcmv",
-        .long_name = NULL_IF_CONFIG_SMALL("WinCAM Motion Video"),
-        .props     = AV_CODEC_PROP_LOSSLESS,
-    },
-    {
-        .id        = AV_CODEC_ID_RASC,
-        .type      = AVMEDIA_TYPE_VIDEO,
-        .name      = "rasc",
-        .long_name = NULL_IF_CONFIG_SMALL("RemotelyAnywhere Screen Capture"),
-        .props     = AV_CODEC_PROP_LOSSY,
     },
 
     /* various PCM "codecs" */
@@ -2920,13 +2878,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("SBC (low-complexity subband codec)"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
-    {
-        .id        = AV_CODEC_ID_ATRAC9,
-        .type      = AVMEDIA_TYPE_AUDIO,
-        .name      = "atrac9",
-        .long_name = NULL_IF_CONFIG_SMALL("ATRAC9 (Adaptive TRansform Acoustic Coding 9)"),
-        .props     = AV_CODEC_PROP_LOSSY,
-    },
 
     /* subtitle codecs */
     {
@@ -3096,14 +3047,6 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("HDMV Text subtitle"),
         .props     = AV_CODEC_PROP_TEXT_SUB,
     },
-    {
-        .id        = AV_CODEC_ID_TTML,
-        .type      = AVMEDIA_TYPE_SUBTITLE,
-        .name      = "ttml",
-        .long_name = NULL_IF_CONFIG_SMALL("Timed Text Markup Language"),
-        .props     = AV_CODEC_PROP_TEXT_SUB,
-    },
-
 
     /* other kind of codecs and pseudo-codecs */
     {

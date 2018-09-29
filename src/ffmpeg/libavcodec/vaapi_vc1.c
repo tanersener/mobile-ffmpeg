@@ -138,9 +138,8 @@ static int vc1_get_FPTYPE(const VC1Context *v)
 /** Reconstruct bitstream MVMODE (7.1.1.32) */
 static inline VAMvModeVC1 vc1_get_MVMODE(const VC1Context *v)
 {
-    if ((v->fcm == PROGRESSIVE || v->fcm == ILACE_FIELD) &&
-        ((v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) ||
-         (v->s.pict_type == AV_PICTURE_TYPE_B && !v->bi_type)))
+    if ((v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) ||
+        (v->s.pict_type == AV_PICTURE_TYPE_B && !v->bi_type))
         return get_VAMvModeVC1(v->mv_mode);
     return 0;
 }
@@ -148,8 +147,7 @@ static inline VAMvModeVC1 vc1_get_MVMODE(const VC1Context *v)
 /** Reconstruct bitstream MVMODE2 (7.1.1.33) */
 static inline VAMvModeVC1 vc1_get_MVMODE2(const VC1Context *v)
 {
-    if ((v->fcm == PROGRESSIVE || v->fcm == ILACE_FIELD) &&
-        (v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) &&
+    if ((v->s.pict_type == AV_PICTURE_TYPE_P && !v->p_frame_skipped) &&
         v->mv_mode == MV_PMODE_INTENSITY_COMP)
         return get_VAMvModeVC1(v->mv_mode2);
     return 0;
@@ -467,7 +465,6 @@ static int vaapi_vc1_decode_slice(AVCodecContext *avctx, const uint8_t *buffer, 
     const MpegEncContext *s = &v->s;
     VAAPIDecodePicture *pic = s->current_picture_ptr->hwaccel_picture_private;
     VASliceParameterBufferVC1 slice_param;
-    int mb_height;
     int err;
 
     /* Current bit buffer is beyond any marker for VC-1, so skip it */
@@ -476,17 +473,12 @@ static int vaapi_vc1_decode_slice(AVCodecContext *avctx, const uint8_t *buffer, 
         size -= 4;
     }
 
-    if (v->fcm == ILACE_FIELD)
-        mb_height = avctx->coded_height + 31 >> 5;
-    else
-        mb_height = avctx->coded_height + 15 >> 4;
-
     slice_param = (VASliceParameterBufferVC1) {
         .slice_data_size         = size,
         .slice_data_offset       = 0,
         .slice_data_flag         = VA_SLICE_DATA_FLAG_ALL,
         .macroblock_offset       = get_bits_count(&s->gb),
-        .slice_vertical_position = s->mb_y % mb_height,
+        .slice_vertical_position = s->mb_y,
     };
 
     err = ff_vaapi_decode_make_slice_buffer(avctx, pic,

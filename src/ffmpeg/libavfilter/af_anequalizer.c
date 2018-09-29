@@ -189,7 +189,6 @@ static av_cold int init(AVFilterContext *ctx)
 {
     AudioNEqualizerContext *s = ctx->priv;
     AVFilterPad pad, vpad;
-    int ret;
 
     pad = (AVFilterPad){
         .name         = av_strdup("out0"),
@@ -209,19 +208,10 @@ static av_cold int init(AVFilterContext *ctx)
             return AVERROR(ENOMEM);
     }
 
-    ret = ff_insert_outpad(ctx, 0, &pad);
-    if (ret < 0) {
-        av_freep(&pad.name);
-        return ret;
-    }
+    ff_insert_outpad(ctx, 0, &pad);
 
-    if (s->draw_curves) {
-        ret = ff_insert_outpad(ctx, 1, &vpad);
-        if (ret < 0) {
-            av_freep(&vpad.name);
-            return ret;
-        }
-    }
+    if (s->draw_curves)
+        ff_insert_outpad(ctx, 1, &vpad);
 
     return 0;
 }
@@ -269,8 +259,9 @@ static av_cold void uninit(AVFilterContext *ctx)
 {
     AudioNEqualizerContext *s = ctx->priv;
 
-    for (int i = 0; i < ctx->nb_outputs; i++)
-        av_freep(&ctx->output_pads[i].name);
+    av_freep(&ctx->output_pads[0].name);
+    if (s->draw_curves)
+        av_freep(&ctx->output_pads[1].name);
     av_frame_free(&s->video);
     av_freep(&s->filters);
     s->nb_filters = 0;

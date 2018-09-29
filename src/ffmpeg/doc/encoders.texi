@@ -2565,9 +2565,6 @@ The following standard libavcodec options are used:
 @option{bf} / @option{max_b_frames}
 @item
 @option{profile}
-
-If not set, this will be determined automatically from the format of the input
-frames and the profiles supported by the driver.
 @item
 @option{level}
 @item
@@ -2588,8 +2585,7 @@ Speed / quality tradeoff: higher values are faster / worse quality.
 Size / quality tradeoff: higher values are smaller / worse quality.
 @item
 @option{qmin}
-@item
-@option{qmax}
+(only: @option{qmax} is not supported)
 @item
 @option{i_qfactor} / @option{i_quant_factor}
 @item
@@ -2600,18 +2596,6 @@ Size / quality tradeoff: higher values are smaller / worse quality.
 @option{b_qoffset} / @option{b_quant_offset}
 @end itemize
 
-All encoders support the following options:
-@itemize
-@item
-@option{low_power}
-
-Some drivers/platforms offer a second encoder for some codecs intended to use
-less power than the default encoder; setting this option will attempt to use
-that encoder.  Note that it may support a reduced feature set, so some other
-options may not be available in this mode.
-@end itemize
-
-Each encoder also has its own specific options:
 @table @option
 
 @item h264_vaapi
@@ -2619,6 +2603,8 @@ Each encoder also has its own specific options:
 @option{level} sets the value of @emph{level_idc}.
 
 @table @option
+@item low_power
+Use low-power encoding mode.
 @item coder
 Set entropy encoder (default is @emph{cabac}).  Possible values:
 
@@ -2631,69 +2617,20 @@ Use CABAC.
 @item cavlc
 Use CAVLC.
 @end table
-
-@item aud
-Include access unit delimiters in the stream (not included by default).
-
-@item sei
-Set SEI message types to include.
-Some combination of the following values:
-@table @samp
-@item identifier
-Include a @emph{user_data_unregistered} message containing information about
-the encoder.
-@item timing
-Include picture timing parameters (@emph{buffering_period} and
-@emph{pic_timing} messages).
-@item recovery_point
-Include recovery points where appropriate (@emph{recovery_point} messages).
-@end table
-
 @end table
 
 @item hevc_vaapi
 @option{profile} and @option{level} set the values of
 @emph{general_profile_idc} and @emph{general_level_idc} respectively.
 
-@table @option
-@item aud
-Include access unit delimiters in the stream (not included by default).
-
-@item tier
-Set @emph{general_tier_flag}.  This may affect the level chosen for the stream
-if it is not explicitly specified.
-
-@item sei
-Set SEI message types to include.
-Some combination of the following values:
-@table @samp
-@item hdr
-Include HDR metadata if the input frames have it
-(@emph{mastering_display_colour_volume} and @emph{content_light_level}
-messages).
-@end table
-
-@end table
-
 @item mjpeg_vaapi
-Only baseline DCT encoding is supported.  The encoder always uses the standard
-quantisation and huffman tables - @option{global_quality} scales the standard
-quantisation table (range 1-100).
-
-For YUV, 4:2:0, 4:2:2 and 4:4:4 subsampling modes are supported.  RGB is also
-supported, and will create an RGB JPEG.
-
-@table @option
-@item jfif
-Include JFIF header in each frame (not included by default).
-@item huffman
-Include standard huffman tables (on by default).  Turning this off will save
-a few hundred bytes in each output frame, but may lose compatibility with some
-JPEG decoders which don't fully handle MJPEG.
-@end table
+Always encodes using the standard quantisation and huffman tables -
+@option{global_quality} scales the standard quantisation table (range 1-100).
 
 @item mpeg2_vaapi
 @option{profile} and @option{level} set the value of @emph{profile_and_level_indication}.
+
+No rate control is supported.
 
 @item vp8_vaapi
 B-frames are not supported.
@@ -2787,52 +2724,6 @@ reduce perception. Use in bogus benchmarks.
 Reduces detail but attempts to preserve color at extremely low bitrates.
 @end itemize
 
-@end table
-
-@section libxavs2
-
-xavs2 AVS2-P2/IEEE1857.4 encoder wrapper.
-
-This encoder requires the presence of the libxavs2 headers and library
-during configuration. You need to explicitly configure the build with
-@option{--enable-libxavs2}.
-
-@subsection Options
-
-@table @option
-@item lcu_row_threads
-Set the number of parallel threads for rows from 1 to 8 (default 5).
-
-@item initial_qp
-Set the xavs2 quantization parameter from 1 to 63 (default 34). This is
-used to set the initial qp for the first frame.
-
-@item qp
-Set the xavs2 quantization parameter from 1 to 63 (default 34). This is
-used to set the qp value under constant-QP mode.
-
-@item max_qp
-Set the max qp for rate control from 1 to 63 (default 55).
-
-@item min_qp
-Set the min qp for rate control from 1 to 63 (default 20).
-
-@item speed_level
-Set the Speed level from 0 to 9 (default 0). Higher is better but slower.
-
-@item log_level
-Set the log level from -1 to 3 (default 0). -1: none, 0: error,
-1: warning, 2: info, 3: debug.
-
-@item xavs2-params
-Set xavs2 options using a list of @var{key}=@var{value} couples separated
-by ":".
-
-For example to specify libxavs2 encoding options with @option{-xavs2-params}:
-
-@example
-ffmpeg -i input -c:v libxavs2 -xavs2-params preset_level=5 output.avs2
-@end example
 @end table
 
 @c man end VIDEO ENCODERS

@@ -27,7 +27,6 @@
 #include <inttypes.h>
 #include <stdlib.h>
 
-#define CACHED_BITSTREAM_READER !ARCH_X86_32
 #define UNCHECKED_BITSTREAM_READER 1
 
 #include "libavutil/intreadwrite.h"

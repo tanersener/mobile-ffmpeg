@@ -29,44 +29,26 @@
 
 
 static const CodedBitstreamType *cbs_type_table[] = {
-#if CONFIG_CBS_AV1
-    &ff_cbs_type_av1,
-#endif
 #if CONFIG_CBS_H264
     &ff_cbs_type_h264,
 #endif
 #if CONFIG_CBS_H265
     &ff_cbs_type_h265,
 #endif
-#if CONFIG_CBS_JPEG
-    &ff_cbs_type_jpeg,
-#endif
 #if CONFIG_CBS_MPEG2
     &ff_cbs_type_mpeg2,
-#endif
-#if CONFIG_CBS_VP9
-    &ff_cbs_type_vp9,
 #endif
 };
 
 const enum AVCodecID ff_cbs_all_codec_ids[] = {
-#if CONFIG_CBS_AV1
-    AV_CODEC_ID_AV1,
-#endif
 #if CONFIG_CBS_H264
     AV_CODEC_ID_H264,
 #endif
 #if CONFIG_CBS_H265
     AV_CODEC_ID_H265,
 #endif
-#if CONFIG_CBS_JPEG
-    AV_CODEC_ID_MJPEG,
-#endif
 #if CONFIG_CBS_MPEG2
     AV_CODEC_ID_MPEG2VIDEO,
-#endif
-#if CONFIG_CBS_VP9
-    AV_CODEC_ID_VP9,
 #endif
     AV_CODEC_ID_NONE
 };
@@ -158,35 +140,52 @@ static int cbs_read_fragment_content(CodedBitstreamContext *ctx,
     int err, i, j;
 
     for (i = 0; i < frag->nb_units; i++) {
-        CodedBitstreamUnit *unit = &frag->units[i];
-
         if (ctx->decompose_unit_types) {
             for (j = 0; j < ctx->nb_decompose_unit_types; j++) {
-                if (ctx->decompose_unit_types[j] == unit->type)
+                if (ctx->decompose_unit_types[j] == frag->units[i].type)
                     break;
             }
             if (j >= ctx->nb_decompose_unit_types)
                 continue;
         }
 
-        av_buffer_unref(&unit->content_ref);
-        unit->content = NULL;
+        av_buffer_unref(&frag->units[i].content_ref);
+        frag->units[i].content = NULL;
 
-        av_assert0(unit->data && unit->data_ref);
-
-        err = ctx->codec->read_unit(ctx, unit);
+        err = ctx->codec->read_unit(ctx, &frag->units[i]);
         if (err == AVERROR(ENOSYS)) {
             av_log(ctx->log_ctx, AV_LOG_VERBOSE,
                    "Decomposition unimplemented for unit %d "
-                   "(type %"PRIu32").\n", i, unit->type);
+                   "(type %"PRIu32").\n", i, frag->units[i].type);
         } else if (err < 0) {
             av_log(ctx->log_ctx, AV_LOG_ERROR, "Failed to read unit %d "
-                   "(type %"PRIu32").\n", i, unit->type);
+                   "(type %"PRIu32").\n", i, frag->units[i].type);
             return err;
         }
     }
 
     return 0;
+}
+
+int ff_cbs_read_extradata(CodedBitstreamContext *ctx,
+                          CodedBitstreamFragment *frag,
+                          const AVCodecParameters *par)
+{
+    int err;
+
+    memset(frag, 0, sizeof(*frag));
+
+    frag->data      = par->extradata;
+    frag->data_size = par->extradata_size;
+
+    err = ctx->codec->split_fragment(ctx, frag, 1);
+    if (err < 0)
+        return err;
+
+    frag->data      = NULL;
+    frag->data_size = 0;
+
+    return cbs_read_fragment_content(ctx, frag);
 }
 
 static int cbs_fill_fragment_data(CodedBitstreamContext *ctx,
@@ -208,26 +207,6 @@ static int cbs_fill_fragment_data(CodedBitstreamContext *ctx,
            AV_INPUT_BUFFER_PADDING_SIZE);
 
     return 0;
-}
-
-int ff_cbs_read_extradata(CodedBitstreamContext *ctx,
-                          CodedBitstreamFragment *frag,
-                          const AVCodecParameters *par)
-{
-    int err;
-
-    memset(frag, 0, sizeof(*frag));
-
-    err = cbs_fill_fragment_data(ctx, frag, par->extradata,
-                                 par->extradata_size);
-    if (err < 0)
-        return err;
-
-    err = ctx->codec->split_fragment(ctx, frag, 1);
-    if (err < 0)
-        return err;
-
-    return cbs_read_fragment_content(ctx, frag);
 }
 
 int ff_cbs_read_packet(CodedBitstreamContext *ctx,
@@ -299,7 +278,6 @@ int ff_cbs_write_fragment_data(CodedBitstreamContext *ctx,
                    "(type %"PRIu32").\n", i, unit->type);
             return err;
         }
-        av_assert0(unit->data && unit->data_ref);
     }
 
     av_buffer_unref(&frag->data_ref);
@@ -310,7 +288,6 @@ int ff_cbs_write_fragment_data(CodedBitstreamContext *ctx,
         av_log(ctx->log_ctx, AV_LOG_ERROR, "Failed to assemble fragment.\n");
         return err;
     }
-    av_assert0(frag->data && frag->data_ref);
 
     return 0;
 }
@@ -351,6 +328,7 @@ int ff_cbs_write_packet(CodedBitstreamContext *ctx,
     if (err < 0)
         return err;
 
+    av_assert0(frag->data_ref);
     buf = av_buffer_ref(frag->data_ref);
     if (!buf)
         return AVERROR(ENOMEM);
@@ -374,42 +352,16 @@ void ff_cbs_trace_header(CodedBitstreamContext *ctx,
 }
 
 void ff_cbs_trace_syntax_element(CodedBitstreamContext *ctx, int position,
-                                 const char *str, const int *subscripts,
-                                 const char *bits, int64_t value)
+                                 const char *name, const char *bits,
+                                 int64_t value)
 {
-    char name[256];
     size_t name_len, bits_len;
-    int pad, subs, i, j, k, n;
+    int pad;
 
     if (!ctx->trace_enable)
         return;
 
     av_assert0(value >= INT_MIN && value <= UINT32_MAX);
-
-    subs = subscripts ? subscripts[0] : 0;
-    n = 0;
-    for (i = j = 0; str[i];) {
-        if (str[i] == '[') {
-            if (n < subs) {
-                ++n;
-                k = snprintf(name + j, sizeof(name) - j, "[%d", subscripts[n]);
-                av_assert0(k > 0 && j + k < sizeof(name));
-                j += k;
-                for (++i; str[i] && str[i] != ']'; i++);
-                av_assert0(str[i] == ']');
-            } else {
-                while (str[i] && str[i] != ']')
-                    name[j++] = str[i++];
-                av_assert0(str[i] == ']');
-            }
-        } else {
-            av_assert0(j + 1 < sizeof(name));
-            name[j++] = str[i++];
-        }
-    }
-    av_assert0(j + 1 < sizeof(name));
-    name[j] = 0;
-    av_assert0(n == subs);
 
     name_len = strlen(name);
     bits_len = strlen(bits);
@@ -424,8 +376,7 @@ void ff_cbs_trace_syntax_element(CodedBitstreamContext *ctx, int position,
 }
 
 int ff_cbs_read_unsigned(CodedBitstreamContext *ctx, GetBitContext *gbc,
-                         int width, const char *name,
-                         const int *subscripts, uint32_t *write_to,
+                         int width, const char *name, uint32_t *write_to,
                          uint32_t range_min, uint32_t range_max)
 {
     uint32_t value;
@@ -451,8 +402,7 @@ int ff_cbs_read_unsigned(CodedBitstreamContext *ctx, GetBitContext *gbc,
             bits[i] = value >> (width - i - 1) & 1 ? '1' : '0';
         bits[i] = 0;
 
-        ff_cbs_trace_syntax_element(ctx, position, name, subscripts,
-                                    bits, value);
+        ff_cbs_trace_syntax_element(ctx, position, name, bits, value);
     }
 
     if (value < range_min || value > range_max) {
@@ -467,8 +417,7 @@ int ff_cbs_read_unsigned(CodedBitstreamContext *ctx, GetBitContext *gbc,
 }
 
 int ff_cbs_write_unsigned(CodedBitstreamContext *ctx, PutBitContext *pbc,
-                          int width, const char *name,
-                          const int *subscripts, uint32_t value,
+                          int width, const char *name, uint32_t value,
                           uint32_t range_min, uint32_t range_max)
 {
     av_assert0(width > 0 && width <= 32);
@@ -490,8 +439,7 @@ int ff_cbs_write_unsigned(CodedBitstreamContext *ctx, PutBitContext *pbc,
             bits[i] = value >> (width - i - 1) & 1 ? '1' : '0';
         bits[i] = 0;
 
-        ff_cbs_trace_syntax_element(ctx, put_bits_count(pbc),
-                                    name, subscripts, bits, value);
+        ff_cbs_trace_syntax_element(ctx, put_bits_count(pbc), name, bits, value);
     }
 
     if (width < 32)

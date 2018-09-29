@@ -1,3 +1,13 @@
 /protocol_list.c
-/muxer_list.c
+*.d
+*.o
+*.a
+*.pc
+/libavformat.version
+/libavformat.so
+/libavformat.so.57
+/libavformat.ver
+*.dylib
 /demuxer_list.c
+/muxer_list.c
+/libavformat.so.58
