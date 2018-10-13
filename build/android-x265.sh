@@ -72,7 +72,7 @@ ${SED_INLINE} 's/\-DPREFIX//g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInf
 ${SED_INLINE} 's/win/elf/g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInformation.cmake
 
 # fix pointer array assignments
-${SED_INLINE} 's/parseCpuName(value, bError)/parseCpuName(value, bError, 0)/g' ${BASEDIR}/src/x265/source/common/param.cpp
+# ${SED_INLINE} 's/parseCpuName(value, bError)/parseCpuName(value, bError, 0)/g' ${BASEDIR}/src/x265/source/common/param.cpp
 
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
@@ -99,6 +99,6 @@ cmake -Wno-dev \
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_x265_package_config "2.8"
+create_x265_package_config "2.9"
 
 make install || exit 1
