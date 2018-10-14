@@ -1,0 +1,8 @@
+/build/
+/Makefile
+/Makefile.rules
+/config.status
+/libtool
+/sdl2-config
+/sdl2-config.cmake
+/sdl2.pc
