@@ -674,7 +674,7 @@ Version: ${X265_VERSION}
 
 Requires:
 Libs: -L\${libdir} -lx265
-Libs.private: -lc++_shared -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl
+Libs.private: -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl
 Cflags: -I\${includedir}
 EOF
 }
