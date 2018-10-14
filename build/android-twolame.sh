@@ -26,7 +26,6 @@ fi
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="twolame"
 set_toolchain_clang_paths ${LIB_NAME}
-export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)

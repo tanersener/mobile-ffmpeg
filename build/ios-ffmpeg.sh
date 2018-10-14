@@ -82,7 +82,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..40}
+for library in {1..45}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -193,6 +193,11 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opus)"
                 CONFIGURE_POSTFIX+=" --enable-libopus"
             ;;
+            sdl)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags sdl2)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static sdl2)"
+                CONFIGURE_POSTFIX+=" --enable-sdl2"
+            ;;
             shine)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags shine)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static shine)"
@@ -212,6 +217,18 @@ do
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags speex)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static speex)"
                 CONFIGURE_POSTFIX+=" --enable-libspeex"
+            ;;
+            tesseract)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags tesseract)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static tesseract)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags giflib)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static giflib)"
+                CONFIGURE_POSTFIX+=" --enable-libtesseract"
+            ;;
+            twolame)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags twolame)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static twolame)"
+                CONFIGURE_POSTFIX+=" --enable-libtwolame"
             ;;
             wavpack)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags wavpack)"
@@ -283,13 +300,13 @@ do
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 8 ]]; then
             CONFIGURE_POSTFIX+=" --disable-iconv"
-        elif [[ ${library} -eq 37 ]]; then
+        elif [[ ${library} -eq 42 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
-        elif [[ ${library} -eq 38 ]]; then
+        elif [[ ${library} -eq 43 ]]; then
             CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
-        elif [[ ${library} -eq 39 ]]; then
+        elif [[ ${library} -eq 44 ]]; then
             CONFIGURE_POSTFIX+=" --disable-coreimage"
-        elif [[ ${library} -eq 40 ]]; then
+        elif [[ ${library} -eq 45 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
         fi
     fi
@@ -364,7 +381,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-txtpages \
     --disable-sndio \
     --disable-schannel \
-    --disable-sdl2 \
     --disable-securetransport \
     --disable-xlib \
     --disable-cuda \

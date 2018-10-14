@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@/leptonica
+
+Name: leptonica
+Description: An open source C library for efficient image processing and image analysis operations
+Version: @VERSION@
+Libs: -L${libdir} -llept
+Libs.private: @ZLIB_LIBS@ @LIBPNG_LIBS@ @JPEG_LIBS@ @GIFLIB_LIBS@ @LIBTIFF_LIBS@ @LIBWEBP_LIBS@
+Cflags: -I${includedir}
+

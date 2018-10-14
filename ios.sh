@@ -36,24 +36,29 @@ LIBRARY_SNAPPY=24
 LIBRARY_SOXR=25
 LIBRARY_LIBAOM=26
 LIBRARY_CHROMAPRINT=27
-LIBRARY_GIFLIB=28
-LIBRARY_JPEG=29
-LIBRARY_LIBOGG=30
-LIBRARY_LIBPNG=31
-LIBRARY_LIBUUID=32
-LIBRARY_NETTLE=33
-LIBRARY_TIFF=34
-LIBRARY_EXPAT=35
-LIBRARY_ZLIB=36
-LIBRARY_AUDIOTOOLBOX=37
-LIBRARY_COREIMAGE=38
-LIBRARY_BZIP2=39
+LIBRARY_TWOLAME=28
+LIBRARY_SDL=29
+LIBRARY_TESSERACT=30
+LIBRARY_GIFLIB=31
+LIBRARY_JPEG=32
+LIBRARY_LIBOGG=33
+LIBRARY_LIBPNG=34
+LIBRARY_LIBUUID=35
+LIBRARY_NETTLE=36
+LIBRARY_TIFF=37
+LIBRARY_EXPAT=38
+LIBRARY_SNDFILE=39
+LIBRARY_LEPTONICA=40
+LIBRARY_ZLIB=41
+LIBRARY_AUDIOTOOLBOX=42
+LIBRARY_COREIMAGE=43
+LIBRARY_BZIP2=44
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -128,10 +133,13 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
     echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
     echo -e "  --enable-opus\t\t\tbuild with opus [no]"
+    echo -e "  --enable-sdl\t\t\tbuild with sdl [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
     echo -e "  --enable-snappy\t\tbuild with snappy [no]"
     echo -e "  --enable-soxr\t\t\tbuild with soxr [no]"
     echo -e "  --enable-speex\t\tbuild with speex [no]"
+    echo -e "  --enable-tesseract\t\tbuild with tesseract [no]"
+    echo -e "  --enable-twolame\t\tbuild with twolame [no]"
     echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
     echo -e "GPL libraries:"
@@ -293,6 +301,9 @@ set_library() {
         opus)
             ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
         ;;
+        sdl)
+            ENABLED_LIBRARIES[LIBRARY_SDL]=$2
+        ;;
         shine)
             ENABLED_LIBRARIES[LIBRARY_SHINE]=$2
         ;;
@@ -306,6 +317,20 @@ set_library() {
         speex)
             ENABLED_LIBRARIES[LIBRARY_SPEEX]=$2
         ;;
+        tesseract)
+            ENABLED_LIBRARIES[LIBRARY_TESSERACT]=$2
+            ENABLED_LIBRARIES[LIBRARY_LEPTONICA]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBWEBP]=$2
+            ENABLED_LIBRARIES[LIBRARY_GIFLIB]=$2
+            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+            set_library "tiff" $2
+            set_library "libpng" $2
+        ;;
+        twolame)
+            ENABLED_LIBRARIES[LIBRARY_TWOLAME]=$2
+            ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
+        ;;
         wavpack)
             ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
         ;;
@@ -318,16 +343,16 @@ set_library() {
         xvidcore)
             ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
         ;;
-        tiff)
-            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
-            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+        expat | giflib | jpeg | leptonica | libogg | libpng | libsndfile | libuuid)
+            # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         nettle)
             ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
             set_library "gmp" $2
         ;;
-        giflib | jpeg | libogg | libpng | libuuid | expat)
-            # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
+        tiff)
+            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
         ;;
         *)
             print_unknown_library $1
@@ -405,7 +430,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {36..39}
+    for library in {41..44}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -417,7 +442,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..27}
+    for library in {0..30}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -540,7 +565,7 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..39}
+            for library in {0..44}
             do
                 if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
@@ -623,7 +648,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..40}
+        for library in {1..45}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
@@ -723,7 +748,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         done
     else
 
-        for library in {0..35}
+        for library in {0..40}
         do
             if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 

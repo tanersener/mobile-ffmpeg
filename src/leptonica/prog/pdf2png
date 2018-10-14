@@ -1,0 +1,40 @@
+#!/bin/bash
+#   pdf2png
+#
+#     Rasterizes a PDF file, saving as a set of binary png images
+#
+#     input:  PDF
+#             root name of output files
+#     output: png binary files for each page
+#
+
+
+scriptname=${0##*/}
+
+if test $# != 2
+then
+  echo "usage: " $scriptname " inpdffile outpngroot"
+  exit -1
+fi
+
+inpdffile=$1
+outpngroot=$2
+
+# strip off directory and suffix parts of $1 to use in other names
+basename=${1##*/}
+baseroot=${basename%.*}
+
+# make names for temporary files
+tmppdffile=${baseroot}.$$_.pdf
+tmppdfroot=${tmppdffile%.*}
+
+# have the temporary files deleted on exit, interrupt, etc:
+trap "/bin/rm -f ${tmppdfroot}*" EXIT SIGHUP SIGINT SIGTERM
+
+cp $inpdffile $tmppdffile
+
+# need mysterious "primer"
+#echo "0 neg 0 neg" translate | gs -sDEVICE=pngmono -sOutputFile=${outpngroot}%03d.png -r300x300 -q - ${tmppdffile}
+echo "0 neg 0 neg" translate | gs -sDEVICE=pngmono -sOutputFile=${outpngroot}%03d.png -g2550x3300 -r300x300 -q - ${tmppdffile}
+
+

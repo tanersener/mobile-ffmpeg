@@ -75,7 +75,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..38}
+for library in {1..43}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -192,6 +192,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static shine)"
                 CONFIGURE_POSTFIX+=" --enable-libshine"
             ;;
+            sdl)
+                CFLAGS+=" $(pkg-config --cflags sdl2)"
+                LDFLAGS+=" $(pkg-config --libs --static sdl2)"
+                CONFIGURE_POSTFIX+=" --enable-sdl2"
+            ;;
             snappy)
                 CFLAGS+=" $(pkg-config --cflags snappy)"
                 LDFLAGS+=" $(pkg-config --libs --static snappy)"
@@ -206,6 +211,18 @@ do
                 CFLAGS+=" $(pkg-config --cflags speex)"
                 LDFLAGS+=" $(pkg-config --libs --static speex)"
                 CONFIGURE_POSTFIX+=" --enable-libspeex"
+            ;;
+            tesseract)
+                CFLAGS+=" $(pkg-config --cflags tesseract)"
+                LDFLAGS+=" $(pkg-config --libs --static tesseract)"
+                CFLAGS+=" $(pkg-config --cflags giflib)"
+                LDFLAGS+=" $(pkg-config --libs --static giflib)"
+                CONFIGURE_POSTFIX+=" --enable-libtesseract"
+            ;;
+            twolame)
+                CFLAGS+=" $(pkg-config --cflags twolame)"
+                LDFLAGS+=" $(pkg-config --libs --static twolame)"
+                CONFIGURE_POSTFIX+=" --enable-libtwolame"
             ;;
             wavpack)
                 CFLAGS+=" $(pkg-config --cflags wavpack)"
@@ -261,7 +278,7 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 37 ]]; then
+        if [[ ${library} -eq 42 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
@@ -309,7 +326,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-static \
     --disable-sndio \
     --disable-schannel \
-    --disable-sdl2 \
     --disable-securetransport \
     --disable-xlib \
     --disable-cuda \

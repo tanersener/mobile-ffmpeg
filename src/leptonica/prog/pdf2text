@@ -1,0 +1,49 @@
+#!/bin/bash
+#   pdf2text
+#
+#     Rasterizes a PDF file, saving as a single multipage g4 compressed
+#     tiff file.  Then runs tesseract on that file, producing the output
+#     text file.
+#
+#     input:  PDF file
+#             multipage tiff filename
+#             text filename (without any extension; this adds '.txt')
+#
+#   N.B. Requires ghostscript
+
+scriptname=${0##*/}
+
+if test $# != 3
+then
+  echo "usage: " $scriptname " pdfin tiffout textout"
+  exit -1
+fi
+
+pdfin=$1
+tiffout=$2
+textout=$3
+
+# assert (input pdf filename ends in .pdf)
+if test ${pdfin##*.} != pdf
+then
+  echo $scriptname ": " $pdfin "does not end in .pdf"
+  exit -1
+fi
+
+# 'echo "0 neg 0 neg" translate' is the mysterious "primer"
+# choose one of the two options below
+
+# output image size at 300 ppi
+rm /tmp/junkpdf*
+echo "0 neg 0 neg" translate | /usr/bin/gs -sDEVICE=tiffg4 -sOutputFile=/tmp/junkpdf%03d.tif -r300x300 -q - ${pdfin}
+writemtiff /tmp junkpdf ${tiffout}
+
+# output image size at 600 ppi
+rm /tmp/junkpdf*
+echo "0 neg 0 neg" translate | /usr/bin/gs -sDEVICE=tiffg4 -sOutputFile=/tmp/junkpdf%03d.tif -r600x600 -q - ${pdfin}
+writemtiff /tmp junkpdf ${tiffout}
+
+# now run tesseract
+cd /home/dbloomberg/src5/google3
+./tesseract ${tiffout} ${textout}
+

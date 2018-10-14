@@ -46,18 +46,23 @@ get_library_name() {
         25) echo "soxr" ;;
         26) echo "libaom" ;;
         27) echo "chromaprint" ;;
-        28) echo "giflib" ;;
-        29) echo "jpeg" ;;
-        30) echo "libogg" ;;
-        31) echo "libpng" ;;
-        32) echo "libuuid" ;;
-        33) echo "nettle" ;;
-        34) echo "tiff" ;;
-        35) echo "expat" ;;
-        36) echo "ios-zlib" ;;
-        37) echo "ios-audiotoolbox" ;;
-        38) echo "ios-coreimage" ;;
-        39) echo "ios-bzip2" ;;
+        28) echo "twolame" ;;
+        29) echo "sdl" ;;
+        30) echo "tesseract" ;;
+        31) echo "giflib" ;;
+        32) echo "jpeg" ;;
+        33) echo "libogg" ;;
+        34) echo "libpng" ;;
+        35) echo "libuuid" ;;
+        36) echo "nettle" ;;
+        37) echo "tiff" ;;
+        38) echo "expat" ;;
+        39) echo "libsndfile" ;;
+        40) echo "leptonica" ;;
+        41) echo "ios-zlib" ;;
+        42) echo "ios-audiotoolbox" ;;
+        43) echo "ios-coreimage" ;;
+        44) echo "ios-bzip2" ;;
     esac
 }
 
@@ -220,6 +225,9 @@ get_app_specific_cflags() {
         ;;
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
+        ;;
+        leptonica)
+            APP_FLAGS="-std=c99 -Wno-unused-function -DOS_IOS"
         ;;
         libwebp | xvidcore)
             APP_FLAGS="-fno-common -DPIC"
@@ -625,6 +633,29 @@ Version: ${SOXR_VERSION}
 
 Requires:
 Libs: -L\${libdir} -lsoxr
+Cflags: -I\${includedir}
+EOF
+}
+
+create_tesseract_package_config() {
+    local TESSERACT_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/tesseract.pc" << EOF
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/tesseract
+exec_prefix=\${prefix}
+bindir=\${exec_prefix}/bin
+datarootdir=\${prefix}/share
+datadir=\${datarootdir}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: tesseract
+Description: An OCR Engine that was developed at HP Labs between 1985 and 1995... and now at Google.
+URL: https://github.com/tesseract-ocr/tesseract
+Version: ${TESSERACT_VERSION}
+
+Requires: lept
+Libs: -L\${libdir} -ltesseract
 Cflags: -I\${includedir}
 EOF
 }

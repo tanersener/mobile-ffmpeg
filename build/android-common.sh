@@ -46,16 +46,21 @@ get_library_name() {
         25) echo "soxr" ;;
         26) echo "libaom" ;;
         27) echo "chromaprint" ;;
-        28) echo "giflib" ;;
-        29) echo "jpeg" ;;
-        30) echo "libogg" ;;
-        31) echo "libpng" ;;
-        32) echo "libuuid" ;;
-        33) echo "nettle" ;;
-        34) echo "tiff" ;;
-        35) echo "expat" ;;
-        36) echo "android-zlib" ;;
-        37) echo "android-media-codec" ;;
+        28) echo "twolame" ;;
+        29) echo "sdl" ;;
+        30) echo "tesseract" ;;
+        31) echo "giflib" ;;
+        32) echo "jpeg" ;;
+        33) echo "libogg" ;;
+        34) echo "libpng" ;;
+        35) echo "libuuid" ;;
+        36) echo "nettle" ;;
+        37) echo "tiff" ;;
+        38) echo "expat" ;;
+        39) echo "libsndfile" ;;
+        40) echo "leptonica" ;;
+        41) echo "android-zlib" ;;
+        42) echo "android-media-codec" ;;
     esac
 }
 
@@ -283,7 +288,7 @@ get_common_linked_libraries() {
     local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib"
 
     case $1 in
-        ffmpeg)
+        ffmpeg | tesseract)
             echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
         ;;
         libvpx)
@@ -637,6 +642,29 @@ Version: ${SOXR_VERSION}
 
 Requires:
 Libs: -L\${libdir} -lsoxr
+Cflags: -I\${includedir}
+EOF
+}
+
+create_tesseract_package_config() {
+    local TESSERACT_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/tesseract.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/tesseract
+exec_prefix=\${prefix}
+bindir=\${exec_prefix}/bin
+datarootdir=\${prefix}/share
+datadir=\${datarootdir}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: tesseract
+Description: An OCR Engine that was developed at HP Labs between 1985 and 1995... and now at Google.
+URL: https://github.com/tesseract-ocr/tesseract
+Version: ${TESSERACT_VERSION}
+
+Requires: lept, libjpeg, libpng, giflib, zlib, libwebp, libtiff-4
+Libs: -L\${libdir} -ltesseract
 Cflags: -I\${includedir}
 EOF
 }

@@ -3,7 +3,7 @@ layout: default
 ---
 FFmpeg for Android and IOS
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/raw/dev-v2.x/docs/assets/mobile-ffmpeg-logo-v4.png" width="120">
+<img src="https://github.com/tanersener/mobile-ffmpeg/raw/dev-v3.x/docs/assets/mobile-ffmpeg-logo-v6.jpeg" width="120">
 
 ### 1. Features
 - Supports FFmpeg `v3.4.x` and `v4.0.x` releases
