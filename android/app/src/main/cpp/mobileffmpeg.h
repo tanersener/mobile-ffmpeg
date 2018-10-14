@@ -27,7 +27,7 @@
 #include "libavutil/ffversion.h"
 
 /** Library version string */
-#define MOBILE_FFMPEG_VERSION "2.2"
+#define MOBILE_FFMPEG_VERSION "3.0"
 
 /** Defines tag used for Android logging. */
 #define LIB_NAME "mobile-ffmpeg"
