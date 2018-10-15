@@ -75,12 +75,12 @@ create_package "https-gpl" "$1" || exit 1
 
 # AUDIO RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} --enable-chromaprint --enable-lame --enable-libilbc --enable-libvorbis --enable-opencore-amr --enable-opus --enable-shine --enable-soxr --enable-speex --enable-wavpack || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-chromaprint --enable-lame --enable-libilbc --enable-libvorbis --enable-opencore-amr --enable-opus --enable-shine --enable-soxr --enable-speex --enable-twolame --enable-wavpack || exit 1
 create_package "audio" "$1" || exit 1
 
 # VIDEO RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx --enable-snappy || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx --enable-snappy --enable-tesseract || exit 1
 create_package "video" "$1" || exit 1
 
 # FULL RELEASE
