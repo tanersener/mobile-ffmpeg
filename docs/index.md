@@ -6,13 +6,13 @@ FFmpeg for Android and IOS
 <img src="https://github.com/tanersener/mobile-ffmpeg/raw/dev-v3.x/docs/assets/mobile-ffmpeg-logo-v6.jpeg" width="120">
 
 ### 1. Features
-- Supports FFmpeg `v3.4.x` and `v4.0.x` releases
+- Supports FFmpeg `v3.4.x`, `v4.0.x` and `v4.1-dev` releases
 - Use prebuilt binaries available under `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
-- Includes 24 external libraries, 4 GPL libraries and 10 architectures in total
+- Includes 27 external libraries, 4 GPL libraries and 10 architectures in total
 - Exposes FFmpeg capabilities both directly from FFmpeg libraries and through MobileFFmpeg wrapper library
-- Includes cross-compile instructions for 38 open-source libraries
+- Includes cross-compile instructions for 43 open-source libraries
 
-   `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `shine`, `snappy`, `soxr`, `speex`, `tiff`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
+   `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `sdl2`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
 
 - Prebuilt binaries under `Github`, `JCenter` and `CocoaPods`
 - Supports `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` Android architectures
@@ -32,7 +32,7 @@ There are eight different prebuilt packages. Below you can see which external li
 
 | min | min-gpl | https | https-gpl | audio | video | full | full-gpl |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-|  -  |  vid.stab<sup>3</sup> <br/> x264<sup>1</sup> <br/> x265<sup>3</sup> <br/> xvidcore<sup>1</sup>  |  gnutls  |  gnutls <br/> vid.stab<sup>3</sup> <br/> x264<sup>1</sup> <br/> x265<sup>3</sup> <br/> xvidcore<sup>1</sup>  |  chromaprint<sup>3</sup> <br/> lame <br/> libilbc<sup>1</sup> <br/> libvorbis <br/> opencore-amr <br/> opus<sup>1</sup> <br/> shine <br/> soxr<sup>2</sup> <br/> speex <br/> wavpack  |  fontconfig <br/> freetype <br/> fribidi <br/> kvazaar <br/> libaom<sup>2</sup> <br/> libass <br/> libiconv <br/> libtheora <br/> libvpx <br/> snappy<sup>1</sup>  |  chromaprint<sup>3</sup> <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom<sup>2</sup> <br/> libass <br/> libiconv <br/> libilbc<sup>1</sup> <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus<sup>1</sup> <br/> shine <br/> snappy<sup>1</sup> <br/> soxr<sup>2</sup> <br/> speex <br/> wavpack  |  chromaprint<sup>3</sup> <br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom<sup>2</sup> <br/> libass <br/> libiconv <br/> libilbc<sup>1</sup> <br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus<sup>1</sup> <br/> shine <br/> snappy<sup>1</sup> <br/> soxr<sup>2</sup> <br/> speex <br/> vid.stab<sup>3</sup> <br/> wavpack <br/> x264<sup>1</sup> <br/> x265<sup>3</sup> <br/> xvidcore<sup>1</sup>  |
+|  -  |  vid.stab<sup>3</sup><br/> x264<sup>1</sup><br/> x265<sup>3</sup><br/> xvidcore<sup>1</sup>  |  gnutls  |  gnutls <br/> vid.stab<sup>3</sup><br/> x264<sup>1</sup><br/> x265<sup>3</sup><br/> xvidcore<sup>1</sup>  |  chromaprint<sup>3</sup><br/> lame <br/> libilbc<sup>1</sup><br/> libvorbis <br/> opencore-amr <br/> opus<sup>1</sup><br/> shine <br/> soxr<sup>2</sup><br/> speex <br/> twolame<sup>4</sup><br/> wavpack  |  fontconfig <br/> freetype <br/> fribidi <br/> kvazaar <br/> libaom<sup>2</sup><br/> libass <br/> libiconv <br/> libtheora <br/> libvpx <br/> libwebp <br/> sdl2<sup>4</sup><br/> snappy<sup>1</sup><br/> tesseract<sup>4</sup> |  chromaprint<sup>3</sup><br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom<sup>2</sup><br/> libass <br/> libiconv <br/> libilbc<sup>1</sup><br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus<sup>1</sup><br/> sdl2<sup>4</sup><br/> shine <br/> snappy<sup>1</sup><br/> soxr<sup>2</sup><br/> speex <br/> tesseract<sup>4</sup><br/>twolame<sup>4</sup><br/>wavpack  |  chromaprint<sup>3</sup><br/> fontconfig <br/> freetype <br/> fribidi <br/> gmp <br/> gnutls <br/> kvazaar <br/> lame <br/> libaom<sup>2</sup><br/> libass <br/> libiconv <br/> libilbc<sup>1</sup><br/> libtheora <br/> libvorbis <br/> libvpx <br/> libwebp <br/> libxml2 <br/> opencore-amr <br/> opus<sup>1</sup><br/> sdl2<sup>4</sup><br/> shine<br/> snappy<sup>1</sup><br/> soxr<sup>2</sup><br/> speex <br/> tesseract<sup>4</sup><br/> twolame<sup>4</sup><br/>vid.stab<sup>3</sup><br/> wavpack <br/> x264<sup>1</sup><br/> x265<sup>3</sup><br/> xvidcore<sup>1</sup>  |
 
 <sup>1</sup> - Supported since `v1.1`
 
@@ -40,11 +40,13 @@ There are eight different prebuilt packages. Below you can see which external li
 
 <sup>3</sup> - Supported since `v2.1`
 
+<sup>4</sup> - Supported since `v3.0`
+
 #### 2.1 Android
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {`
-        implementation 'com.arthenica:mobile-ffmpeg-full:2.1'
+        implementation 'com.arthenica:mobile-ffmpeg-full:3.0'
     }
     ```
 
@@ -99,7 +101,7 @@ There are eight different prebuilt packages. Below you can see which external li
 #### 2.2 IOS
 1. Add MobileFFmpeg pod to your `Podfile`
     ```
-    pod 'mobile-ffmpeg-full', '~> 2.1'
+    pod 'mobile-ffmpeg-full', '~> 3.0'
     ```
 
 2. Create and execute commands.
@@ -175,8 +177,8 @@ There are eight different prebuilt packages. Below you can see which external li
     - **gradle 4.4** or later
 
 3. IOS builds need these extra packages and tools.
-    - **IOS SDK 7.0.x** or later
-    - **Xcode 8.x** or later
+    - **IOS SDK 8.0.x** or later
+    - **Xcode 7.3.1** or later
     - **Command Line Tools**
 
 #### 4.2 Build Scripts
