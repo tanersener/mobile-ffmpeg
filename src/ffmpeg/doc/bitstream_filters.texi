@@ -215,6 +215,15 @@ insert the string ``hello'' associated with the given UUID.
 @item delete_filler
 Deletes both filler NAL units and filler SEI messages.
 
+@item level
+Set the level in the SPS.  Refer to H.264 section A.3 and tables A-1
+to A-5.
+
+The argument must be the name of a level (for example, @samp{4.2}), a
+level_idc value (for example, @samp{42}), or the special name @samp{auto}
+indicating that the filter should attempt to guess the level from the
+input stream properties.
+
 @end table
 
 @section h264_mp4toannexb
@@ -505,7 +514,33 @@ Log trace output containing all syntax elements in the coded stream
 headers (everything above the level of individual coded blocks).
 This can be useful for debugging low-level stream issues.
 
-Supports H.264, H.265 and MPEG-2.
+Supports H.264, H.265, MPEG-2 and VP9.
+
+@section vp9_metadata
+
+Modify metadata embedded in a VP9 stream.
+
+@table @option
+@item color_space
+Set the color space value in the frame header.
+@table @samp
+@item unknown
+@item bt601
+@item bt709
+@item smpte170
+@item smpte240
+@item bt2020
+@item rgb
+@end table
+
+@item color_range
+Set the color range value in the frame header.  Note that this cannot
+be set in RGB streams.
+@table @samp
+@item tv
+@item pc
+@end table
+@end table
 
 @section vp9_superframe
 

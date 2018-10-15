@@ -1,12 +1,2 @@
 /avconfig.h
-*.o
-*.d
-*.a
-*.pc
 /ffversion.h
-/libavutil.version
-/libavutil.so
-/libavutil.so.55
-/libavutil.ver
-*.dylib
-/libavutil.so.56

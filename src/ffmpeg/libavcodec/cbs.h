@@ -48,6 +48,7 @@ struct CodedBitstreamType;
  * H.264 / AVC: nal_unit_type
  * H.265 / HEVC: nal_unit_type
  * MPEG-2: start code value (without prefix)
+ * VP9: unused, set to zero (every unit is a frame)
  */
 typedef uint32_t CodedBitstreamUnitType;
 
@@ -84,8 +85,9 @@ typedef struct CodedBitstreamUnit {
      */
     size_t   data_bit_padding;
     /**
-     * If data is reference counted, a reference to the buffer containing
-     * data.  Null if data is not reference counted.
+     * A reference to the buffer containing data.
+     *
+     * Must be set if data is not NULL.
      */
     AVBufferRef *data_ref;
 
@@ -130,8 +132,9 @@ typedef struct CodedBitstreamFragment {
      */
     size_t data_bit_padding;
     /**
-     * If data is reference counted, a reference to the buffer containing
-     * data.  Null if data is not reference counted.
+     * A reference to the buffer containing data.
+     *
+     * Must be set if data is not NULL.
      */
     AVBufferRef *data_ref;
 

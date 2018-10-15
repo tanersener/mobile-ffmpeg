@@ -59,6 +59,7 @@ cmake -Wno-dev \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
     -DENABLE_PIC=1 \
     -DENABLE_STATIC=1 \
+    -DENABLE_SHARED=0 \
     -DWITH_JPEG8=1 \
     -DWITH_SIMD=1 \
     -DWITH_TURBOJPEG=0 \

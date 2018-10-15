@@ -375,6 +375,9 @@ const char *av_packet_side_data_name(enum AVPacketSideDataType type)
     case AV_PKT_DATA_DISPLAYMATRIX:              return "Display Matrix";
     case AV_PKT_DATA_STEREO3D:                   return "Stereo 3D";
     case AV_PKT_DATA_AUDIO_SERVICE_TYPE:         return "Audio Service Type";
+    case AV_PKT_DATA_QUALITY_STATS:              return "Quality stats";
+    case AV_PKT_DATA_FALLBACK_TRACK:             return "Fallback track";
+    case AV_PKT_DATA_CPB_PROPERTIES:             return "CPB properties";
     case AV_PKT_DATA_SKIP_SAMPLES:               return "Skip Samples";
     case AV_PKT_DATA_JP_DUALMONO:                return "JP Dual Mono";
     case AV_PKT_DATA_STRINGS_METADATA:           return "Strings Metadata";
@@ -388,6 +391,9 @@ const char *av_packet_side_data_name(enum AVPacketSideDataType type)
     case AV_PKT_DATA_CONTENT_LIGHT_LEVEL:        return "Content light level metadata";
     case AV_PKT_DATA_SPHERICAL:                  return "Spherical Mapping";
     case AV_PKT_DATA_A53_CC:                     return "A53 Closed Captions";
+    case AV_PKT_DATA_ENCRYPTION_INIT_INFO:       return "Encryption initialization data";
+    case AV_PKT_DATA_ENCRYPTION_INFO:            return "Encryption info";
+    case AV_PKT_DATA_AFD:                        return "Active Format Description data";
     }
     return NULL;
 }
@@ -574,10 +580,10 @@ FF_ENABLE_DEPRECATION_WARNINGS
     dst->side_data            = NULL;
     dst->side_data_elems      = 0;
     for (i = 0; i < src->side_data_elems; i++) {
-         enum AVPacketSideDataType type = src->side_data[i].type;
-         int size          = src->side_data[i].size;
-         uint8_t *src_data = src->side_data[i].data;
-         uint8_t *dst_data = av_packet_new_side_data(dst, type, size);
+        enum AVPacketSideDataType type = src->side_data[i].type;
+        int size          = src->side_data[i].size;
+        uint8_t *src_data = src->side_data[i].data;
+        uint8_t *dst_data = av_packet_new_side_data(dst, type, size);
 
         if (!dst_data) {
             av_packet_free_side_data(dst);

@@ -358,6 +358,7 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
         h->mb_num    = h1->mb_num;
         h->mb_stride = h1->mb_stride;
         h->b_stride  = h1->b_stride;
+        h->x264_build = h1->x264_build;
 
         if (h->context_initialized || h1->context_initialized) {
             if ((err = h264_slice_header_init(h)) < 0) {
@@ -399,7 +400,6 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
 
     h->enable_er       = h1->enable_er;
     h->workaround_bugs = h1->workaround_bugs;
-    h->x264_build      = h1->x264_build;
     h->droppable       = h1->droppable;
 
     // extradata/NAL handling
@@ -429,6 +429,13 @@ int ff_h264_update_thread_context(AVCodecContext *dst,
                        MAX_DELAYED_PIC_COUNT + 2, h, h1);
 
     h->frame_recovered       = h1->frame_recovered;
+
+    av_buffer_unref(&h->sei.a53_caption.buf_ref);
+    if (h1->sei.a53_caption.buf_ref) {
+        h->sei.a53_caption.buf_ref = av_buffer_ref(h1->sei.a53_caption.buf_ref);
+        if (!h->sei.a53_caption.buf_ref)
+            return AVERROR(ENOMEM);
+    }
 
     if (!h->cur_pic_ptr)
         return 0;
@@ -1269,15 +1276,14 @@ static int h264_export_frame_props(H264Context *h)
         }
     }
 
-    if (h->sei.a53_caption.a53_caption) {
+    if (h->sei.a53_caption.buf_ref) {
         H264SEIA53Caption *a53 = &h->sei.a53_caption;
-        AVFrameSideData *sd = av_frame_new_side_data(cur->f,
-                                                     AV_FRAME_DATA_A53_CC,
-                                                     a53->a53_caption_size);
-        if (sd)
-            memcpy(sd->data, a53->a53_caption, a53->a53_caption_size);
-        av_freep(&a53->a53_caption);
-        a53->a53_caption_size = 0;
+
+        AVFrameSideData *sd = av_frame_new_side_data_from_buf(cur->f, AV_FRAME_DATA_A53_CC, a53->buf_ref);
+        if (!sd)
+            av_buffer_unref(&a53->buf_ref);
+        a53->buf_ref = NULL;
+
         h->avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
     }
 
@@ -1406,6 +1412,11 @@ static int h264_field_start(H264Context *h, const H264SliceContext *sl,
         return ret;
 
     sps = h->ps.sps;
+
+    if (sps && sps->bitstream_restriction_flag &&
+        h->avctx->has_b_frames < sps->num_reorder_frames) {
+        h->avctx->has_b_frames = sps->num_reorder_frames;
+    }
 
     last_pic_droppable   = h->droppable;
     last_pic_structure   = h->picture_structure;
