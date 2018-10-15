@@ -312,6 +312,7 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-small  \
     --enable-swscale \
     --enable-shared \
+    --enable-v4l2-m2m \
     --disable-openssl \
     --disable-xmm-clobber-test \
     --disable-debug \
@@ -341,7 +342,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-nvenc \
     --disable-vaapi \
     --disable-vdpau \
-    --disable-videotoolbox \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then

@@ -388,7 +388,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-nvenc \
     --disable-vaapi \
     --disable-vdpau \
-    --disable-videotoolbox \
     --disable-appkit \
     --disable-alsa \
     --disable-cuda \

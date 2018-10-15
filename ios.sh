@@ -65,10 +65,10 @@ export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 # MIN VERSION IOS7
-export IOS_MIN_VERSION=7.0
+export IOS_MIN_VERSION=8.0
 
 # UPDATE THIS TO 8.0 WHEN GNUTLS IS UPGRADED TO 3.6.x line
-export GNUTLS_IOS_MIN_VERSION=7.0
+export GNUTLS_IOS_MIN_VERSION=8.0
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
