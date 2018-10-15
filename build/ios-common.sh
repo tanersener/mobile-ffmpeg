@@ -94,7 +94,7 @@ get_arch_name() {
 }
 
 get_target_host() {
-    echo "$(get_target_arch)-apple-darwin"
+    echo "$(get_target_arch)-ios-darwin"
 }
 
 get_target_arch() {
