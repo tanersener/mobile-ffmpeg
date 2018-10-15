@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_ENUMS_H_
-#define AV1_COMMON_ENUMS_H_
+#ifndef AOM_AV1_COMMON_ENUMS_H_
+#define AOM_AV1_COMMON_ENUMS_H_
 
 #include "config/aom_config.h"
 
@@ -66,13 +66,10 @@ extern "C" {
 #define REF_FRAMES_LOG2 3
 #define REF_FRAMES (1 << REF_FRAMES_LOG2)
 
-// 4 scratch frames for the new frames to support a maximum of 4 cores decoding
-// in parallel, 3 for scaled references on the encoder.
-// TODO(hkuang): Add ondemand frame buffers instead of hardcoding the number
-// of framebuffers.
-// TODO(jkoleszar): These 3 extra references could probably come from the
-// normal reference pool.
-#define FRAME_BUFFERS (REF_FRAMES + 7)
+// REF_FRAMES for the cm->ref_frame_map array, 1 scratch frame for the new
+// frame in cm->new_fb_idx, INTER_REFS_PER_FRAME for scaled references on the
+// encoder in the cpi->scaled_ref_idx array.
+#define FRAME_BUFFERS (REF_FRAMES + 1 + INTER_REFS_PER_FRAME)
 
 // 4 frame filter levels: y plane vertical, y plane horizontal,
 // u plane, and v plane
@@ -616,4 +613,4 @@ typedef enum ATTRIBUTE_PACKED {
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_ENUMS_H_
+#endif  // AOM_AV1_COMMON_ENUMS_H_

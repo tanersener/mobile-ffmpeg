@@ -13,12 +13,12 @@
 #include "test/av1_txfm_test.h"
 
 using libaom_test::ACMRandom;
+using libaom_test::input_base;
+using libaom_test::reference_hybrid_1d;
 using libaom_test::TYPE_ADST;
 using libaom_test::TYPE_DCT;
 using libaom_test::TYPE_IDTX;
 using libaom_test::TYPE_TXFM;
-using libaom_test::input_base;
-using libaom_test::reference_hybrid_1d;
 
 namespace {
 const int txfm_type_num = 3;

@@ -134,11 +134,10 @@ static INLINE void build_inter_predictors(const AV1_COMMON *cm, MACROBLOCKD *xd,
       for (int x = 0; x < b8_w; x += b4_w) {
         MB_MODE_INFO *this_mbmi = xd->mi[row * xd->mi_stride + col];
         is_compound = has_second_ref(this_mbmi);
-        DECLARE_ALIGNED(32, CONV_BUF_TYPE, tmp_dst[8 * 8]);
         int tmp_dst_stride = 8;
         assert(bw < 8 || bh < 8);
         ConvolveParams conv_params = get_conv_params_no_round(
-            0, plane, tmp_dst, tmp_dst_stride, is_compound, xd->bd);
+            0, plane, xd->tmp_conv_dst, tmp_dst_stride, is_compound, xd->bd);
         conv_params.use_jnt_comp_avg = 0;
         struct buf_2d *const dst_buf = &pd->dst;
         uint8_t *dst = dst_buf->buf + dst_buf->stride * y + x;
@@ -193,9 +192,8 @@ static INLINE void build_inter_predictors(const AV1_COMMON *cm, MACROBLOCKD *xd,
   }
 
   {
-    DECLARE_ALIGNED(32, uint16_t, tmp_dst[MAX_SB_SIZE * MAX_SB_SIZE]);
     ConvolveParams conv_params = get_conv_params_no_round(
-        0, plane, tmp_dst, MAX_SB_SIZE, is_compound, xd->bd);
+        0, plane, xd->tmp_conv_dst, MAX_SB_SIZE, is_compound, xd->bd);
     av1_jnt_comp_weight_assign(cm, mi, 0, &conv_params.fwd_offset,
                                &conv_params.bck_offset,
                                &conv_params.use_jnt_comp_avg, is_compound);
@@ -340,7 +338,7 @@ static INLINE void build_prediction_by_above_pred(
   MB_MODE_INFO backup_mbmi = *above_mbmi;
 
   av1_setup_build_prediction_by_above_pred(xd, rel_mi_col, above_mi_width,
-                                           above_mbmi, ctxt, num_planes);
+                                           &backup_mbmi, ctxt, num_planes);
   mi_x = above_mi_col << MI_SIZE_LOG2;
   mi_y = ctxt->mi_row << MI_SIZE_LOG2;
 
@@ -353,9 +351,9 @@ static INLINE void build_prediction_by_above_pred(
                    block_size_high[BLOCK_64X64] >> (pd->subsampling_y + 1));
 
     if (av1_skip_u4x4_pred_in_obmc(bsize, pd, 0)) continue;
-    build_inter_predictors(ctxt->cm, xd, j, above_mbmi, 1, bw, bh, mi_x, mi_y);
+    build_inter_predictors(ctxt->cm, xd, j, &backup_mbmi, 1, bw, bh, mi_x,
+                           mi_y);
   }
-  *above_mbmi = backup_mbmi;
 }
 
 void av1_build_prediction_by_above_preds(const AV1_COMMON *cm, MACROBLOCKD *xd,
@@ -396,7 +394,7 @@ static INLINE void build_prediction_by_left_pred(
   MB_MODE_INFO backup_mbmi = *left_mbmi;
 
   av1_setup_build_prediction_by_left_pred(xd, rel_mi_row, left_mi_height,
-                                          left_mbmi, ctxt, num_planes);
+                                          &backup_mbmi, ctxt, num_planes);
   mi_x = ctxt->mi_col << MI_SIZE_LOG2;
   mi_y = left_mi_row << MI_SIZE_LOG2;
   const BLOCK_SIZE bsize = xd->mi[0]->sb_type;
@@ -408,9 +406,9 @@ static INLINE void build_prediction_by_left_pred(
     int bh = (left_mi_height << MI_SIZE_LOG2) >> pd->subsampling_y;
 
     if (av1_skip_u4x4_pred_in_obmc(bsize, pd, 1)) continue;
-    build_inter_predictors(ctxt->cm, xd, j, left_mbmi, 1, bw, bh, mi_x, mi_y);
+    build_inter_predictors(ctxt->cm, xd, j, &backup_mbmi, 1, bw, bh, mi_x,
+                           mi_y);
   }
-  *left_mbmi = backup_mbmi;
 }
 
 void av1_build_prediction_by_left_preds(const AV1_COMMON *cm, MACROBLOCKD *xd,
@@ -445,8 +443,6 @@ void av1_build_prediction_by_left_preds(const AV1_COMMON *cm, MACROBLOCKD *xd,
 void av1_build_obmc_inter_predictors_sb(const AV1_COMMON *cm, MACROBLOCKD *xd,
                                         int mi_row, int mi_col) {
   const int num_planes = av1_num_planes(cm);
-  DECLARE_ALIGNED(16, uint8_t, tmp_buf1[2 * MAX_MB_PLANE * MAX_SB_SQUARE]);
-  DECLARE_ALIGNED(16, uint8_t, tmp_buf2[2 * MAX_MB_PLANE * MAX_SB_SQUARE]);
   uint8_t *dst_buf1[MAX_MB_PLANE], *dst_buf2[MAX_MB_PLANE];
   int dst_stride1[MAX_MB_PLANE] = { MAX_SB_SIZE, MAX_SB_SIZE, MAX_SB_SIZE };
   int dst_stride2[MAX_MB_PLANE] = { MAX_SB_SIZE, MAX_SB_SIZE, MAX_SB_SIZE };
@@ -457,19 +453,23 @@ void av1_build_obmc_inter_predictors_sb(const AV1_COMMON *cm, MACROBLOCKD *xd,
 
   if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) {
     int len = sizeof(uint16_t);
-    dst_buf1[0] = CONVERT_TO_BYTEPTR(tmp_buf1);
-    dst_buf1[1] = CONVERT_TO_BYTEPTR(tmp_buf1 + MAX_SB_SQUARE * len);
-    dst_buf1[2] = CONVERT_TO_BYTEPTR(tmp_buf1 + MAX_SB_SQUARE * 2 * len);
-    dst_buf2[0] = CONVERT_TO_BYTEPTR(tmp_buf2);
-    dst_buf2[1] = CONVERT_TO_BYTEPTR(tmp_buf2 + MAX_SB_SQUARE * len);
-    dst_buf2[2] = CONVERT_TO_BYTEPTR(tmp_buf2 + MAX_SB_SQUARE * 2 * len);
+    dst_buf1[0] = CONVERT_TO_BYTEPTR(xd->tmp_obmc_bufs[0]);
+    dst_buf1[1] =
+        CONVERT_TO_BYTEPTR(xd->tmp_obmc_bufs[0] + MAX_SB_SQUARE * len);
+    dst_buf1[2] =
+        CONVERT_TO_BYTEPTR(xd->tmp_obmc_bufs[0] + MAX_SB_SQUARE * 2 * len);
+    dst_buf2[0] = CONVERT_TO_BYTEPTR(xd->tmp_obmc_bufs[1]);
+    dst_buf2[1] =
+        CONVERT_TO_BYTEPTR(xd->tmp_obmc_bufs[1] + MAX_SB_SQUARE * len);
+    dst_buf2[2] =
+        CONVERT_TO_BYTEPTR(xd->tmp_obmc_bufs[1] + MAX_SB_SQUARE * 2 * len);
   } else {
-    dst_buf1[0] = tmp_buf1;
-    dst_buf1[1] = tmp_buf1 + MAX_SB_SQUARE;
-    dst_buf1[2] = tmp_buf1 + MAX_SB_SQUARE * 2;
-    dst_buf2[0] = tmp_buf2;
-    dst_buf2[1] = tmp_buf2 + MAX_SB_SQUARE;
-    dst_buf2[2] = tmp_buf2 + MAX_SB_SQUARE * 2;
+    dst_buf1[0] = xd->tmp_obmc_bufs[0];
+    dst_buf1[1] = xd->tmp_obmc_bufs[0] + MAX_SB_SQUARE;
+    dst_buf1[2] = xd->tmp_obmc_bufs[0] + MAX_SB_SQUARE * 2;
+    dst_buf2[0] = xd->tmp_obmc_bufs[1];
+    dst_buf2[1] = xd->tmp_obmc_bufs[1] + MAX_SB_SQUARE;
+    dst_buf2[2] = xd->tmp_obmc_bufs[1] + MAX_SB_SQUARE * 2;
   }
   av1_build_prediction_by_above_preds(cm, xd, mi_row, mi_col, dst_buf1,
                                       dst_width1, dst_height1, dst_stride1);

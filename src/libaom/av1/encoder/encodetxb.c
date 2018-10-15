@@ -496,8 +496,12 @@ void av1_write_coeffs_txb(const AV1_COMMON *const cm, MACROBLOCKD *xd,
                           aom_writer *w, int blk_row, int blk_col, int plane,
                           TX_SIZE tx_size, const tran_low_t *tcoeff,
                           uint16_t eob, TXB_CTX *txb_ctx) {
-  const PLANE_TYPE plane_type = get_plane_type(plane);
   const TX_SIZE txs_ctx = get_txsize_entropy_ctx(tx_size);
+  FRAME_CONTEXT *ec_ctx = xd->tile_ctx;
+  aom_write_symbol(w, eob == 0,
+                   ec_ctx->txb_skip_cdf[txs_ctx][txb_ctx->txb_skip_ctx], 2);
+  if (eob == 0) return;
+  const PLANE_TYPE plane_type = get_plane_type(plane);
   const TX_TYPE tx_type = av1_get_tx_type(plane_type, xd, blk_row, blk_col,
                                           tx_size, cm->reduced_tx_set_used);
   const TX_CLASS tx_class = tx_type_to_class[tx_type];
@@ -507,18 +511,10 @@ void av1_write_coeffs_txb(const AV1_COMMON *const cm, MACROBLOCKD *xd,
   const int bwl = get_txb_bwl(tx_size);
   const int width = get_txb_wide(tx_size);
   const int height = get_txb_high(tx_size);
-  FRAME_CONTEXT *ec_ctx = xd->tile_ctx;
+
   uint8_t levels_buf[TX_PAD_2D];
   uint8_t *const levels = set_levels(levels_buf, width);
   DECLARE_ALIGNED(16, int8_t, coeff_contexts[MAX_TX_SQUARE]);
-
-  aom_write_symbol(w, eob == 0,
-                   ec_ctx->txb_skip_cdf[txs_ctx][txb_ctx->txb_skip_ctx], 2);
-  if (plane == 0 && eob == 0) {
-    assert(tx_type == DCT_DCT);
-  }
-  if (eob == 0) return;
-
   av1_txb_init_levels(tcoeff, width, height, levels);
 
   av1_write_tx_type(cm, xd, blk_row, blk_col, plane, tx_size, w);
@@ -1018,13 +1014,7 @@ static int optimize_txb(TxbInfo *txb_info, const LV_MAP_COEFF_COST *txb_costs,
   return update;
 }
 
-// These numbers are empirically obtained.
-static const int plane_rd_mult[REF_TYPES][PLANE_TYPES] = {
-  { 17, 13 },
-  { 16, 10 },
-};
-
-void hbt_init() {
+static void hbt_init() {
   hbt_hash_table =
       aom_malloc(sizeof(OptTxbQcoeff) * HBT_TABLE_SIZE * HBT_ARRAY_LENGTH);
   memset(hbt_hash_table, 0,
@@ -1036,11 +1026,11 @@ void hbt_init() {
 
 void hbt_destroy() { aom_free(hbt_hash_table); }
 
-int hbt_hash_miss(uint32_t hbt_ctx_hash, uint32_t hbt_qc_hash,
-                  TxbInfo *txb_info, const LV_MAP_COEFF_COST *txb_costs,
-                  const LV_MAP_EOB_COST *txb_eob_costs,
-                  const struct macroblock_plane *p, int block, int fast_mode,
-                  int *rate_cost) {
+static int hbt_hash_miss(uint32_t hbt_ctx_hash, uint32_t hbt_qc_hash,
+                         TxbInfo *txb_info, const LV_MAP_COEFF_COST *txb_costs,
+                         const LV_MAP_EOB_COST *txb_eob_costs,
+                         const struct macroblock_plane *p, int block,
+                         int fast_mode, int *rate_cost) {
   (void)fast_mode;
   const int16_t *scan = txb_info->scan_order->scan;
   int prev_eob = txb_info->eob;
@@ -1102,9 +1092,9 @@ int hbt_hash_miss(uint32_t hbt_ctx_hash, uint32_t hbt_qc_hash,
   return txb_info->eob;
 }
 
-int hbt_hash_hit(uint32_t hbt_table_index, int hbt_array_index,
-                 TxbInfo *txb_info, const struct macroblock_plane *p, int block,
-                 int *rate_cost) {
+static int hbt_hash_hit(uint32_t hbt_table_index, int hbt_array_index,
+                        TxbInfo *txb_info, const struct macroblock_plane *p,
+                        int block, int *rate_cost) {
   const int16_t *scan = txb_info->scan_order->scan;
   int new_eob = 0;
   int update = 0;
@@ -1144,11 +1134,12 @@ int hbt_hash_hit(uint32_t hbt_table_index, int hbt_array_index,
   return txb_info->eob;
 }
 
-int hbt_search_match(uint32_t hbt_ctx_hash, uint32_t hbt_qc_hash,
-                     TxbInfo *txb_info, const LV_MAP_COEFF_COST *txb_costs,
-                     const LV_MAP_EOB_COST *txb_eob_costs,
-                     const struct macroblock_plane *p, int block, int fast_mode,
-                     int *rate_cost) {
+static int hbt_search_match(uint32_t hbt_ctx_hash, uint32_t hbt_qc_hash,
+                            TxbInfo *txb_info,
+                            const LV_MAP_COEFF_COST *txb_costs,
+                            const LV_MAP_EOB_COST *txb_eob_costs,
+                            const struct macroblock_plane *p, int block,
+                            int fast_mode, int *rate_cost) {
   // Check for qcoeff match
   int hbt_array_index = hbt_qc_hash % HBT_ARRAY_LENGTH;
   int hbt_table_index = hbt_ctx_hash % HBT_TABLE_SIZE;
@@ -1167,10 +1158,11 @@ int hbt_search_match(uint32_t hbt_ctx_hash, uint32_t hbt_qc_hash,
   }
 }
 
-int hbt_create_hashes(TxbInfo *txb_info, const LV_MAP_COEFF_COST *txb_costs,
-                      const LV_MAP_EOB_COST *txb_eob_costs,
-                      const struct macroblock_plane *p, int block,
-                      int fast_mode, int *rate_cost) {
+static int hbt_create_hashes(TxbInfo *txb_info,
+                             const LV_MAP_COEFF_COST *txb_costs,
+                             const LV_MAP_EOB_COST *txb_eob_costs,
+                             const struct macroblock_plane *p, int block,
+                             int fast_mode, int *rate_cost) {
   // Initialize hash table if needed.
   if (hbt_needs_init) {
     hbt_init();

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_SCALE_H_
-#define AV1_COMMON_SCALE_H_
+#ifndef AOM_AV1_COMMON_SCALE_H_
+#define AOM_AV1_COMMON_SCALE_H_
 
 #include "av1/common/convolve.h"
 #include "av1/common/mv.h"
@@ -64,4 +64,4 @@ static INLINE int valid_ref_frame_size(int ref_width, int ref_height,
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_SCALE_H_
+#endif  // AOM_AV1_COMMON_SCALE_H_

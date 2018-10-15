@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_DSP_X86_BLEND_MASK_SSE4_H_
-#define AOM_DSP_X86_BLEND_MASK_SSE4_H_
+#ifndef AOM_AOM_DSP_X86_BLEND_MASK_SSE4_H_
+#define AOM_AOM_DSP_X86_BLEND_MASK_SSE4_H_
 #include <smmintrin.h>  // SSE4.1
 
 #include <assert.h>
@@ -234,4 +234,4 @@ static INLINE void aom_lowbd_blend_a64_d16_mask_subw0_subh1_w8_sse4_1(
     src1 += src1_stride;
   }
 }
-#endif  // AOM_DSP_X86_BLEND_MASK_SSE4_H_
+#endif  // AOM_AOM_DSP_X86_BLEND_MASK_SSE4_H_

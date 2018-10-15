@@ -17,6 +17,7 @@
 #include "config/aom_dsp_rtcd.h"
 #include "config/aom_scale_rtcd.h"
 
+#include "aom_dsp/aom_dsp_common.h"
 #include "aom_mem/aom_mem.h"
 #include "aom_ports/system_state.h"
 #include "aom_ports/aom_once.h"
@@ -71,11 +72,10 @@ static void dec_free_mi(AV1_COMMON *cm) {
 
 AV1Decoder *av1_decoder_create(BufferPool *const pool) {
   AV1Decoder *volatile const pbi = aom_memalign(32, sizeof(*pbi));
-  AV1_COMMON *volatile const cm = pbi ? &pbi->common : NULL;
-
-  if (!cm) return NULL;
-
+  if (!pbi) return NULL;
   av1_zero(*pbi);
+
+  AV1_COMMON *volatile const cm = &pbi->common;
 
   // The jmp_buf is valid only for the duration of the function that calls
   // setjmp(). Therefore, this function must reset the 'setjmp' field to 0
@@ -126,6 +126,7 @@ AV1Decoder *av1_decoder_create(BufferPool *const pool) {
   cm->error.setjmp = 0;
 
   aom_get_worker_interface()->init(&pbi->lf_worker);
+  pbi->lf_worker.thread_name = "aom lf worker";
 
   return pbi;
 }
@@ -166,8 +167,7 @@ void av1_decoder_remove(AV1Decoder *pbi) {
   if (pbi->thread_data) {
     for (int worker_idx = 0; worker_idx < pbi->max_threads - 1; worker_idx++) {
       DecWorkerData *const thread_data = pbi->thread_data + worker_idx;
-      const int use_highbd = pbi->common.seq_params.use_highbitdepth ? 1 : 0;
-      av1_free_mc_tmp_buf(thread_data->td, use_highbd);
+      av1_free_mc_tmp_buf(thread_data->td);
       aom_free(thread_data->td);
     }
     aom_free(pbi->thread_data);
@@ -204,8 +204,7 @@ void av1_decoder_remove(AV1Decoder *pbi) {
 #if CONFIG_ACCOUNTING
   aom_accounting_clear(&pbi->accounting);
 #endif
-  const int use_highbd = pbi->common.seq_params.use_highbitdepth ? 1 : 0;
-  av1_free_mc_tmp_buf(&pbi->td, use_highbd);
+  av1_free_mc_tmp_buf(&pbi->td);
 
   aom_free(pbi);
 }
@@ -320,9 +319,48 @@ aom_codec_err_t av1_copy_new_frame_dec(AV1_COMMON *cm,
   return cm->error.error_code;
 }
 
-/* If any buffer updating is signaled it should be done here.
-   Consumes a reference to cm->new_fb_idx.
-*/
+static void release_frame_buffers(AV1Decoder *pbi) {
+  AV1_COMMON *const cm = &pbi->common;
+  BufferPool *const pool = cm->buffer_pool;
+  RefCntBuffer *const frame_bufs = cm->buffer_pool->frame_bufs;
+
+  lock_buffer_pool(pool);
+  // Release all the reference buffers if worker thread is holding them.
+  if (pbi->hold_ref_buf) {
+    int ref_index = 0, mask;
+    for (mask = pbi->refresh_frame_flags; mask; mask >>= 1) {
+      const int old_idx = cm->ref_frame_map[ref_index];
+      // Current thread releases the holding of reference frame.
+      decrease_ref_count(old_idx, frame_bufs, pool);
+
+      // Release the reference frame holding in the reference map for the
+      // decoding of the next frame.
+      if (mask & 1) {
+        const int new_idx = cm->next_ref_frame_map[ref_index];
+        decrease_ref_count(new_idx, frame_bufs, pool);
+      }
+      ++ref_index;
+    }
+
+    // Current thread releases the holding of reference frame.
+    // TODO(wtc): Remove this assertion after 2018-10-31.
+    assert(!cm->show_existing_frame || cm->reset_decoder_state);
+    for (; ref_index < REF_FRAMES; ++ref_index) {
+      const int old_idx = cm->ref_frame_map[ref_index];
+      decrease_ref_count(old_idx, frame_bufs, pool);
+    }
+    pbi->hold_ref_buf = 0;
+  }
+  // Release current frame.
+  decrease_ref_count(cm->new_fb_idx, frame_bufs, pool);
+  unlock_buffer_pool(pool);
+}
+
+// If any buffer updating is signaled it should be done here.
+// Consumes a reference to cm->new_fb_idx.
+//
+// This functions returns void. It reports failure by setting
+// cm->error.error_code.
 static void swap_frame_buffers(AV1Decoder *pbi, int frame_decoded) {
   int ref_index = 0, mask;
   AV1_COMMON *const cm = &pbi->common;
@@ -335,6 +373,12 @@ static void swap_frame_buffers(AV1Decoder *pbi, int frame_decoded) {
     // In ext-tile decoding, the camera frame header is only decoded once. So,
     // we don't release the references here.
     if (!pbi->camera_frame_header_ready) {
+      // If we are not holding reference buffers in cm->next_ref_frame_map,
+      // assert that the following two for loops are no-ops.
+      assert(IMPLIES(!pbi->hold_ref_buf, pbi->refresh_frame_flags == 0));
+      assert(IMPLIES(!pbi->hold_ref_buf,
+                     cm->show_existing_frame && !cm->reset_decoder_state));
+
       for (mask = pbi->refresh_frame_flags; mask; mask >>= 1) {
         const int old_idx = cm->ref_frame_map[ref_index];
         // Current thread releases the holding of reference frame.
@@ -358,9 +402,8 @@ static void swap_frame_buffers(AV1Decoder *pbi, int frame_decoded) {
       }
     }
 
-    YV12_BUFFER_CONFIG *cur_frame = get_frame_new_buffer(cm);
-
     if (cm->show_existing_frame || cm->show_frame) {
+      YV12_BUFFER_CONFIG *cur_frame = get_frame_new_buffer(cm);
       if (pbi->output_all_layers) {
         // Append this frame to the output queue
         if (pbi->num_output_frames >= MAX_NUM_SPATIAL_LAYERS) {
@@ -389,6 +432,10 @@ static void swap_frame_buffers(AV1Decoder *pbi, int frame_decoded) {
 
     unlock_buffer_pool(pool);
   } else {
+    // The code here assumes we are not holding reference buffers in
+    // cm->next_ref_frame_map. If this assertion fails, we are leaking the
+    // frame buffer references in cm->next_ref_frame_map.
+    assert(IMPLIES(!pbi->camera_frame_header_ready, !pbi->hold_ref_buf));
     // Nothing was decoded, so just drop this frame buffer
     lock_buffer_pool(pool);
     decrease_ref_count(cm->new_fb_idx, frame_bufs, pool);
@@ -413,6 +460,7 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
   RefCntBuffer *volatile const frame_bufs = cm->buffer_pool->frame_bufs;
   const uint8_t *source = *psource;
   cm->error.error_code = AOM_CODEC_OK;
+  cm->error.has_detail = 0;
 
   if (size == 0) {
     // This is used to signal that we are missing frames.
@@ -435,6 +483,7 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
   // Find a free frame buffer. Return error if can not find any.
   cm->new_fb_idx = get_free_fb(cm);
   if (cm->new_fb_idx == INVALID_IDX) {
+    assert(0 && "Ran out of free frame buffers. Likely a reference leak.");
     cm->error.error_code = AOM_CODEC_MEM_ERROR;
     return 1;
   }
@@ -462,35 +511,7 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
       winterface->sync(&pbi->tile_workers[i]);
     }
 
-    lock_buffer_pool(pool);
-    // Release all the reference buffers if worker thread is holding them.
-    if (pbi->hold_ref_buf == 1) {
-      int ref_index = 0, mask;
-      for (mask = pbi->refresh_frame_flags; mask; mask >>= 1) {
-        const int old_idx = cm->ref_frame_map[ref_index];
-        // Current thread releases the holding of reference frame.
-        decrease_ref_count(old_idx, frame_bufs, pool);
-
-        // Release the reference frame holding in the reference map for the
-        // decoding of the next frame.
-        if (mask & 1) decrease_ref_count(old_idx, frame_bufs, pool);
-        ++ref_index;
-      }
-
-      // Current thread releases the holding of reference frame.
-      const int check_on_show_existing_frame =
-          !cm->show_existing_frame || cm->reset_decoder_state;
-      for (; ref_index < REF_FRAMES && check_on_show_existing_frame;
-           ++ref_index) {
-        const int old_idx = cm->ref_frame_map[ref_index];
-        decrease_ref_count(old_idx, frame_bufs, pool);
-      }
-      pbi->hold_ref_buf = 0;
-    }
-    // Release current frame.
-    decrease_ref_count(cm->new_fb_idx, frame_bufs, pool);
-    unlock_buffer_pool(pool);
-
+    release_frame_buffers(pbi);
     aom_clear_system_state();
     return -1;
   }
@@ -500,10 +521,9 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
   int frame_decoded =
       aom_decode_frame_from_obus(pbi, source, source + size, psource);
 
-  if (cm->error.error_code != AOM_CODEC_OK) {
-    lock_buffer_pool(pool);
-    decrease_ref_count(cm->new_fb_idx, frame_bufs, pool);
-    unlock_buffer_pool(pool);
+  if (frame_decoded < 0) {
+    assert(cm->error.error_code != AOM_CODEC_OK);
+    release_frame_buffers(pbi);
     cm->error.setjmp = 0;
     return 1;
   }

@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef AV1_COMMON_ARM_MEM_NEON_H_
-#define AV1_COMMON_ARM_MEM_NEON_H_
+#ifndef AOM_AV1_COMMON_ARM_MEM_NEON_H_
+#define AOM_AV1_COMMON_ARM_MEM_NEON_H_
 
 #include <arm_neon.h>
 #include <string.h>
@@ -491,4 +491,4 @@ static INLINE void store_u32_4x4(uint32_t *s, int32_t p, uint32x4_t s1,
   vst1q_u32(s, s4);
 }
 
-#endif  // AV1_COMMON_ARM_MEM_NEON_H_
+#endif  // AOM_AV1_COMMON_ARM_MEM_NEON_H_

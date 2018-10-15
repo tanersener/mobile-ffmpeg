@@ -43,6 +43,9 @@ static const RestorationType force_restore_type = RESTORE_TYPES;
 // Penalty factor for use of dual sgr
 #define DUAL_SGR_PENALTY_MULT 0.01
 
+// Working precision for Wiener filter coefficients
+#define WIENER_TAP_SCALE_FACTOR ((int64_t)1 << 16)
+
 const int frame_level_restore_bits[RESTORE_TYPES] = { 2, 2, 2, 2 };
 
 typedef int64_t (*sse_extractor_type)(const YV12_BUFFER_CONFIG *a,
@@ -252,88 +255,97 @@ int64_t av1_lowbd_pixel_proj_error_c(const uint8_t *src8, int width, int height,
   return err;
 }
 
+int64_t av1_highbd_pixel_proj_error_c(const uint8_t *src8, int width,
+                                      int height, int src_stride,
+                                      const uint8_t *dat8, int dat_stride,
+                                      int32_t *flt0, int flt0_stride,
+                                      int32_t *flt1, int flt1_stride, int xq[2],
+                                      const sgr_params_type *params) {
+  const uint16_t *src = CONVERT_TO_SHORTPTR(src8);
+  const uint16_t *dat = CONVERT_TO_SHORTPTR(dat8);
+  int i, j;
+  int64_t err = 0;
+  const int32_t half = 1 << (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS - 1);
+  if (params->r[0] > 0 && params->r[1] > 0) {
+    int xq0 = xq[0];
+    int xq1 = xq[1];
+    for (i = 0; i < height; ++i) {
+      for (j = 0; j < width; ++j) {
+        const int32_t d = dat[j];
+        const int32_t s = src[j];
+        const int32_t u = (int32_t)(d << SGRPROJ_RST_BITS);
+        int32_t v0 = flt0[j] - u;
+        int32_t v1 = flt1[j] - u;
+        int32_t v = half;
+        v += xq0 * v0;
+        v += xq1 * v1;
+        const int32_t e = (v >> (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS)) + d - s;
+        err += e * e;
+      }
+      dat += dat_stride;
+      flt0 += flt0_stride;
+      flt1 += flt1_stride;
+      src += src_stride;
+    }
+  } else if (params->r[0] > 0 || params->r[1] > 0) {
+    int exq;
+    int32_t *flt;
+    int flt_stride;
+    if (params->r[0] > 0) {
+      exq = xq[0];
+      flt = flt0;
+      flt_stride = flt0_stride;
+    } else {
+      exq = xq[1];
+      flt = flt1;
+      flt_stride = flt1_stride;
+    }
+    for (i = 0; i < height; ++i) {
+      for (j = 0; j < width; ++j) {
+        const int32_t d = dat[j];
+        const int32_t s = src[j];
+        const int32_t u = (int32_t)(d << SGRPROJ_RST_BITS);
+        int32_t v = half;
+        v += exq * (flt[j] - u);
+        const int32_t e = (v >> (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS)) + d - s;
+        err += e * e;
+      }
+      dat += dat_stride;
+      flt += flt_stride;
+      src += src_stride;
+    }
+  } else {
+    for (i = 0; i < height; ++i) {
+      for (j = 0; j < width; ++j) {
+        const int32_t d = dat[j];
+        const int32_t s = src[j];
+        const int32_t e = d - s;
+        err += e * e;
+      }
+      dat += dat_stride;
+      src += src_stride;
+    }
+  }
+  return err;
+}
+
 static int64_t get_pixel_proj_error(const uint8_t *src8, int width, int height,
                                     int src_stride, const uint8_t *dat8,
                                     int dat_stride, int use_highbitdepth,
                                     int32_t *flt0, int flt0_stride,
                                     int32_t *flt1, int flt1_stride, int *xqd,
                                     const sgr_params_type *params) {
-  int i, j;
-  int64_t err = 0;
   int xq[2];
   decode_xq(xqd, xq, params);
   if (!use_highbitdepth) {
-    err = av1_lowbd_pixel_proj_error(src8, width, height, src_stride, dat8,
-                                     dat_stride, flt0, flt0_stride, flt1,
-                                     flt1_stride, xq, params);
+    return av1_lowbd_pixel_proj_error(src8, width, height, src_stride, dat8,
+                                      dat_stride, flt0, flt0_stride, flt1,
+                                      flt1_stride, xq, params);
   } else {
-    const uint16_t *src = CONVERT_TO_SHORTPTR(src8);
-    const uint16_t *dat = CONVERT_TO_SHORTPTR(dat8);
-    const int32_t half = 1 << (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS - 1);
-    if (params->r[0] > 0 && params->r[1] > 0) {
-      int xq0 = xq[0];
-      int xq1 = xq[1];
-      for (i = 0; i < height; ++i) {
-        for (j = 0; j < width; ++j) {
-          const int32_t d = dat[j];
-          const int32_t s = src[j];
-          const int32_t u = (int32_t)(d << SGRPROJ_RST_BITS);
-          int32_t v0 = flt0[j] - u;
-          int32_t v1 = flt1[j] - u;
-          int32_t v = half;
-          v += xq0 * v0;
-          v += xq1 * v1;
-          const int32_t e =
-              (v >> (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS)) + d - s;
-          err += e * e;
-        }
-        dat += dat_stride;
-        flt0 += flt0_stride;
-        flt1 += flt1_stride;
-        src += src_stride;
-      }
-    } else if (params->r[0] > 0 || params->r[1] > 0) {
-      int exq;
-      int32_t *flt;
-      int flt_stride;
-      if (params->r[0] > 0) {
-        exq = xq[0];
-        flt = flt0;
-        flt_stride = flt0_stride;
-      } else {
-        exq = xq[1];
-        flt = flt1;
-        flt_stride = flt1_stride;
-      }
-      for (i = 0; i < height; ++i) {
-        for (j = 0; j < width; ++j) {
-          const int32_t d = dat[j];
-          const int32_t s = src[j];
-          const int32_t u = (int32_t)(d << SGRPROJ_RST_BITS);
-          int32_t v = half;
-          v += exq * (flt[j] - u);
-          const int32_t e =
-              (v >> (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS)) + d - s;
-          err += e * e;
-        }
-        dat += dat_stride;
-        flt += flt_stride;
-        src += src_stride;
-      }
-    } else {
-      for (i = 0; i < height; ++i) {
-        for (j = 0; j < width; ++j) {
-          const int32_t d = dat[j];
-          const int32_t s = src[j];
-          const int32_t e = d - s;
-          err += e * e;
-        }
-        dat += dat_stride;
-        src += src_stride;
-      }
-    }
+    return av1_highbd_pixel_proj_error(src8, width, height, src_stride, dat8,
+                                       dat_stride, flt0, flt0_stride, flt1,
+                                       flt1_stride, xq, params);
   }
-  return err;
 }
 
 #define USE_SGRPROJ_REFINEMENT_SEARCH 1
@@ -398,12 +410,112 @@ static int64_t finer_search_pixel_proj_error(
   return err;
 }
 
+#if CONFIG_INTEGERIZE_SGR
+static int64_t signed_rounded_divide(int64_t dividend, int64_t divisor) {
+  if (dividend < 0)
+    return (dividend - divisor / 2) / divisor;
+  else
+    return (dividend + divisor / 2) / divisor;
+}
+#endif  // CONFIG_INTEGERIZE_SGR
+
 static void get_proj_subspace(const uint8_t *src8, int width, int height,
                               int src_stride, const uint8_t *dat8,
                               int dat_stride, int use_highbitdepth,
                               int32_t *flt0, int flt0_stride, int32_t *flt1,
                               int flt1_stride, int *xq,
                               const sgr_params_type *params) {
+#if CONFIG_INTEGERIZE_SGR
+  int i, j;
+  int64_t H[2][2] = { { 0, 0 }, { 0, 0 } };
+  int64_t C[2] = { 0, 0 };
+  const int size = width * height;
+
+  // Default values to be returned if the problem becomes ill-posed
+  xq[0] = 0;
+  xq[1] = 0;
+
+  if (!use_highbitdepth) {
+    const uint8_t *src = src8;
+    const uint8_t *dat = dat8;
+    for (i = 0; i < height; ++i) {
+      for (j = 0; j < width; ++j) {
+        const int32_t u =
+            (int32_t)(dat[i * dat_stride + j] << SGRPROJ_RST_BITS);
+        const int32_t s =
+            (int32_t)(src[i * src_stride + j] << SGRPROJ_RST_BITS) - u;
+        const int32_t f1 =
+            (params->r[0] > 0) ? (int32_t)flt0[i * flt0_stride + j] - u : 0;
+        const int32_t f2 =
+            (params->r[1] > 0) ? (int32_t)flt1[i * flt1_stride + j] - u : 0;
+        H[0][0] += (int64_t)f1 * f1;
+        H[1][1] += (int64_t)f2 * f2;
+        H[0][1] += (int64_t)f1 * f2;
+        C[0] += (int64_t)f1 * s;
+        C[1] += (int64_t)f2 * s;
+      }
+    }
+  } else {
+    const uint16_t *src = CONVERT_TO_SHORTPTR(src8);
+    const uint16_t *dat = CONVERT_TO_SHORTPTR(dat8);
+    for (i = 0; i < height; ++i) {
+      for (j = 0; j < width; ++j) {
+        const int32_t u =
+            (int32_t)(dat[i * dat_stride + j] << SGRPROJ_RST_BITS);
+        const int32_t s =
+            (int32_t)(src[i * src_stride + j] << SGRPROJ_RST_BITS) - u;
+        const int32_t f1 =
+            (params->r[0] > 0) ? (int32_t)flt0[i * flt0_stride + j] - u : 0;
+        const int32_t f2 =
+            (params->r[1] > 0) ? (int32_t)flt1[i * flt1_stride + j] - u : 0;
+        H[0][0] += (int64_t)f1 * f1;
+        H[1][1] += (int64_t)f2 * f2;
+        H[0][1] += (int64_t)f1 * f2;
+        C[0] += (int64_t)f1 * s;
+        C[1] += (int64_t)f2 * s;
+      }
+    }
+  }
+  H[0][0] /= size;
+  H[0][1] /= size;
+  H[1][1] /= size;
+  H[1][0] = H[0][1];
+  C[0] /= size;
+  C[1] /= size;
+  if (params->r[0] == 0) {
+    // H matrix is now only the scalar H[1][1]
+    // C vector is now only the scalar C[1]
+    const int64_t Det = H[1][1];
+    if (Det == 0) return;  // ill-posed, return default values
+    xq[0] = 0;
+    xq[1] = (int)signed_rounded_divide(C[1] * (1 << SGRPROJ_PRJ_BITS), Det);
+  } else if (params->r[1] == 0) {
+    // H matrix is now only the scalar H[0][0]
+    // C vector is now only the scalar C[0]
+    const int64_t Det = H[0][0];
+    if (Det == 0) return;  // ill-posed, return default values
+    xq[0] = (int)signed_rounded_divide(C[0] * (1 << SGRPROJ_PRJ_BITS), Det);
+    xq[1] = 0;
+  } else {
+    const int64_t Det = H[0][0] * H[1][1] - H[0][1] * H[1][0];
+    if (Det == 0) return;  // ill-posed, return default values
+
+    // If scaling up dividend would overflow, instead scale down the divisor
+    const int64_t div1 = H[1][1] * C[0] - H[0][1] * C[1];
+    if ((div1 > 0 && INT64_MAX / (1 << SGRPROJ_PRJ_BITS) < div1) ||
+        (div1 < 0 && INT64_MIN / (1 << SGRPROJ_PRJ_BITS) > div1))
+      xq[0] = (int)signed_rounded_divide(div1, Det / (1 << SGRPROJ_PRJ_BITS));
+    else
+      xq[0] = (int)signed_rounded_divide(div1 * (1 << SGRPROJ_PRJ_BITS), Det);
+
+    const int64_t div2 = H[0][0] * C[1] - H[1][0] * C[0];
+    if ((div2 > 0 && INT64_MAX / (1 << SGRPROJ_PRJ_BITS) < div2) ||
+        (div2 < 0 && INT64_MIN / (1 << SGRPROJ_PRJ_BITS) > div2))
+      xq[1] = (int)signed_rounded_divide(div2, Det / (1 << SGRPROJ_PRJ_BITS));
+    else
+      xq[1] = (int)signed_rounded_divide(div2 * (1 << SGRPROJ_PRJ_BITS), Det);
+  }
+#else   // CONFIG_INTEGERIZE_SGR
   int i, j;
   double H[2][2] = { { 0, 0 }, { 0, 0 } };
   double C[2] = { 0, 0 };
@@ -490,9 +602,10 @@ static void get_proj_subspace(const uint8_t *src8, int width, int height,
     xq[0] = (int)rint(x[0] * (1 << SGRPROJ_PRJ_BITS));
     xq[1] = (int)rint(x[1] * (1 << SGRPROJ_PRJ_BITS));
   }
+#endif  // CONFIG_INTEGERIZE_SGR
 }
 
-void encode_xq(int *xq, int *xqd, const sgr_params_type *params) {
+static void encode_xq(int *xq, int *xqd, const sgr_params_type *params) {
   if (params->r[0] == 0) {
     xqd[0] = 0;
     xqd[1] = clamp((1 << SGRPROJ_PRJ_BITS) - xq[1], SGRPROJ_PRJ_MIN1,
@@ -522,9 +635,11 @@ static void apply_sgr(int sgr_params_idx, const uint8_t *dat8, int width,
     // Iterate over the stripe in blocks of width pu_width
     for (int j = 0; j < width; j += pu_width) {
       const int w = AOMMIN(pu_width, width - j);
-      av1_selfguided_restoration(dat8_row + j, w, h, dat_stride, flt0_row + j,
-                                 flt1_row + j, flt_stride, sgr_params_idx,
-                                 bit_depth, use_highbd);
+      const int ret = av1_selfguided_restoration(
+          dat8_row + j, w, h, dat_stride, flt0_row + j, flt1_row + j,
+          flt_stride, sgr_params_idx, bit_depth, use_highbd);
+      (void)ret;
+      assert(!ret);
     }
   }
 }
@@ -649,34 +764,34 @@ static void search_sgrproj(const RestorationTileLimits *limits,
 
 void av1_compute_stats_c(int wiener_win, const uint8_t *dgd, const uint8_t *src,
                          int h_start, int h_end, int v_start, int v_end,
-                         int dgd_stride, int src_stride, double *M, double *H) {
+                         int dgd_stride, int src_stride, int64_t *M,
+                         int64_t *H) {
   int i, j, k, l;
-  double Y[WIENER_WIN2];
+  int16_t Y[WIENER_WIN2];
   const int wiener_win2 = wiener_win * wiener_win;
   const int wiener_halfwin = (wiener_win >> 1);
-  const double avg =
-      find_average(dgd, h_start, h_end, v_start, v_end, dgd_stride);
+  uint8_t avg = find_average(dgd, h_start, h_end, v_start, v_end, dgd_stride);
 
   memset(M, 0, sizeof(*M) * wiener_win2);
   memset(H, 0, sizeof(*H) * wiener_win2 * wiener_win2);
   for (i = v_start; i < v_end; i++) {
     for (j = h_start; j < h_end; j++) {
-      const double X = (double)src[i * src_stride + j] - avg;
+      const int16_t X = (int16_t)src[i * src_stride + j] - (int16_t)avg;
       int idx = 0;
       for (k = -wiener_halfwin; k <= wiener_halfwin; k++) {
         for (l = -wiener_halfwin; l <= wiener_halfwin; l++) {
-          Y[idx] = (double)dgd[(i + l) * dgd_stride + (j + k)] - avg;
+          Y[idx] = (int16_t)dgd[(i + l) * dgd_stride + (j + k)] - (int16_t)avg;
           idx++;
         }
       }
       assert(idx == wiener_win2);
       for (k = 0; k < wiener_win2; ++k) {
-        M[k] += Y[k] * X;
+        M[k] += (int32_t)Y[k] * X;
         for (l = k; l < wiener_win2; ++l) {
           // H is a symmetric matrix, so we only need to fill out the upper
           // triangle here. We can copy it down to the lower triangle outside
           // the (i, j) loops.
-          H[k * wiener_win2 + l] += Y[k] * Y[l];
+          H[k * wiener_win2 + l] += (int32_t)Y[k] * Y[l];
         }
       }
     }
@@ -688,60 +803,55 @@ void av1_compute_stats_c(int wiener_win, const uint8_t *dgd, const uint8_t *src,
   }
 }
 
-static double find_average_highbd(const uint16_t *src, int h_start, int h_end,
-                                  int v_start, int v_end, int stride) {
-  uint64_t sum = 0;
-  double avg = 0;
-  int i, j;
-  aom_clear_system_state();
-  for (i = v_start; i < v_end; i++)
-    for (j = h_start; j < h_end; j++) sum += src[i * stride + j];
-  avg = (double)sum / ((v_end - v_start) * (h_end - h_start));
-  return avg;
-}
-
-static AOM_FORCE_INLINE void compute_stats_highbd(
-    int wiener_win, const uint8_t *dgd8, const uint8_t *src8, int h_start,
-    int h_end, int v_start, int v_end, int dgd_stride, int src_stride,
-    double *M, double *H) {
+void av1_compute_stats_highbd_c(int wiener_win, const uint8_t *dgd8,
+                                const uint8_t *src8, int h_start, int h_end,
+                                int v_start, int v_end, int dgd_stride,
+                                int src_stride, int64_t *M, int64_t *H,
+                                aom_bit_depth_t bit_depth) {
   int i, j, k, l;
-  double Y[WIENER_WIN2];
+  int32_t Y[WIENER_WIN2];
   const int wiener_win2 = wiener_win * wiener_win;
   const int wiener_halfwin = (wiener_win >> 1);
   const uint16_t *src = CONVERT_TO_SHORTPTR(src8);
   const uint16_t *dgd = CONVERT_TO_SHORTPTR(dgd8);
-  const double avg =
+  uint16_t avg =
       find_average_highbd(dgd, h_start, h_end, v_start, v_end, dgd_stride);
+
+  uint8_t bit_depth_divider = 1;
+  if (bit_depth == AOM_BITS_12)
+    bit_depth_divider = 16;
+  else if (bit_depth == AOM_BITS_10)
+    bit_depth_divider = 4;
 
   memset(M, 0, sizeof(*M) * wiener_win2);
   memset(H, 0, sizeof(*H) * wiener_win2 * wiener_win2);
   for (i = v_start; i < v_end; i++) {
     for (j = h_start; j < h_end; j++) {
-      const double X = (double)src[i * src_stride + j] - avg;
+      const int32_t X = (int32_t)src[i * src_stride + j] - (int32_t)avg;
       int idx = 0;
       for (k = -wiener_halfwin; k <= wiener_halfwin; k++) {
         for (l = -wiener_halfwin; l <= wiener_halfwin; l++) {
-          Y[idx] = (double)dgd[(i + l) * dgd_stride + (j + k)] - avg;
+          Y[idx] = (int32_t)dgd[(i + l) * dgd_stride + (j + k)] - (int32_t)avg;
           idx++;
         }
       }
       assert(idx == wiener_win2);
       for (k = 0; k < wiener_win2; ++k) {
-        double Yk = Y[k];
-        M[k] += Yk * X;
-        double *H2 = &H[k * wiener_win2];
-        H2[k] += Yk * Yk;
-        for (l = k + 1; l < wiener_win2; ++l) {
+        M[k] += (int64_t)Y[k] * X;
+        for (l = k; l < wiener_win2; ++l) {
           // H is a symmetric matrix, so we only need to fill out the upper
           // triangle here. We can copy it down to the lower triangle outside
           // the (i, j) loops.
-          H2[l] += Yk * Y[l];
+          H[k * wiener_win2 + l] += (int64_t)Y[k] * Y[l];
         }
       }
     }
   }
   for (k = 0; k < wiener_win2; ++k) {
+    M[k] /= bit_depth_divider;
+    H[k * wiener_win2 + k] /= bit_depth_divider;
     for (l = k + 1; l < wiener_win2; ++l) {
+      H[k * wiener_win2 + l] /= bit_depth_divider;
       H[l * wiener_win2 + k] = H[k * wiener_win2 + l];
     }
   }
@@ -752,12 +862,56 @@ static INLINE int wrap_index(int i, int wiener_win) {
   return (i >= wiener_halfwin1 ? wiener_win - 1 - i : i);
 }
 
+// Solve linear equations to find Wiener filter tap values
+// Taps are output scaled by WIENER_FILT_STEP
+static int linsolve_wiener(int n, int64_t *A, int stride, int64_t *b,
+                           int32_t *x) {
+  for (int k = 0; k < n - 1; k++) {
+    // Partial pivoting: bring the row with the largest pivot to the top
+    for (int i = n - 1; i > k; i--) {
+      // If row i has a better (bigger) pivot than row (i-1), swap them
+      if (llabs(A[(i - 1) * stride + k]) < llabs(A[i * stride + k])) {
+        for (int j = 0; j < n; j++) {
+          const int64_t c = A[i * stride + j];
+          A[i * stride + j] = A[(i - 1) * stride + j];
+          A[(i - 1) * stride + j] = c;
+        }
+        const int64_t c = b[i];
+        b[i] = b[i - 1];
+        b[i - 1] = c;
+      }
+    }
+    // Forward elimination (convert A to row-echelon form)
+    for (int i = k; i < n - 1; i++) {
+      if (A[k * stride + k] == 0) return 0;
+      const int64_t c = A[(i + 1) * stride + k];
+      const int64_t cd = A[k * stride + k];
+      for (int j = 0; j < n; j++) {
+        A[(i + 1) * stride + j] -= c / 256 * A[k * stride + j] / cd * 256;
+      }
+      b[i + 1] -= c * b[k] / cd;
+    }
+  }
+  // Back-substitution
+  for (int i = n - 1; i >= 0; i--) {
+    if (A[i * stride + i] == 0) return 0;
+    int64_t c = 0;
+    for (int j = i + 1; j <= n - 1; j++) {
+      c += A[i * stride + j] * x[j] / WIENER_TAP_SCALE_FACTOR;
+    }
+    // Store filter taps x in scaled form.
+    x[i] = (int32_t)(WIENER_TAP_SCALE_FACTOR * (b[i] - c) / A[i * stride + i]);
+  }
+
+  return 1;
+}
+
 // Fix vector b, update vector a
-static void update_a_sep_sym(int wiener_win, double **Mc, double **Hc,
-                             double *a, double *b) {
+static void update_a_sep_sym(int wiener_win, int64_t **Mc, int64_t **Hc,
+                             int32_t *a, int32_t *b) {
   int i, j;
-  double S[WIENER_WIN];
-  double A[WIENER_HALFWIN1], B[WIENER_HALFWIN1 * WIENER_HALFWIN1];
+  int32_t S[WIENER_WIN];
+  int64_t A[WIENER_HALFWIN1], B[WIENER_HALFWIN1 * WIENER_HALFWIN1];
   const int wiener_win2 = wiener_win * wiener_win;
   const int wiener_halfwin1 = (wiener_win >> 1) + 1;
   memset(A, 0, sizeof(A));
@@ -765,36 +919,41 @@ static void update_a_sep_sym(int wiener_win, double **Mc, double **Hc,
   for (i = 0; i < wiener_win; i++) {
     for (j = 0; j < wiener_win; ++j) {
       const int jj = wrap_index(j, wiener_win);
-      A[jj] += Mc[i][j] * b[i];
+      A[jj] += Mc[i][j] * b[i] / WIENER_TAP_SCALE_FACTOR;
     }
   }
   for (i = 0; i < wiener_win; i++) {
     for (j = 0; j < wiener_win; j++) {
       int k, l;
-      for (k = 0; k < wiener_win; ++k)
+      for (k = 0; k < wiener_win; ++k) {
         for (l = 0; l < wiener_win; ++l) {
           const int kk = wrap_index(k, wiener_win);
           const int ll = wrap_index(l, wiener_win);
           B[ll * wiener_halfwin1 + kk] +=
-              Hc[j * wiener_win + i][k * wiener_win2 + l] * b[i] * b[j];
+              Hc[j * wiener_win + i][k * wiener_win2 + l] * b[i] /
+              WIENER_TAP_SCALE_FACTOR * b[j] / WIENER_TAP_SCALE_FACTOR;
         }
+      }
     }
   }
   // Normalization enforcement in the system of equations itself
-  for (i = 0; i < wiener_halfwin1 - 1; ++i)
+  for (i = 0; i < wiener_halfwin1 - 1; ++i) {
     A[i] -=
         A[wiener_halfwin1 - 1] * 2 +
         B[i * wiener_halfwin1 + wiener_halfwin1 - 1] -
         2 * B[(wiener_halfwin1 - 1) * wiener_halfwin1 + (wiener_halfwin1 - 1)];
-  for (i = 0; i < wiener_halfwin1 - 1; ++i)
-    for (j = 0; j < wiener_halfwin1 - 1; ++j)
+  }
+  for (i = 0; i < wiener_halfwin1 - 1; ++i) {
+    for (j = 0; j < wiener_halfwin1 - 1; ++j) {
       B[i * wiener_halfwin1 + j] -=
           2 * (B[i * wiener_halfwin1 + (wiener_halfwin1 - 1)] +
                B[(wiener_halfwin1 - 1) * wiener_halfwin1 + j] -
                2 * B[(wiener_halfwin1 - 1) * wiener_halfwin1 +
                      (wiener_halfwin1 - 1)]);
-  if (linsolve(wiener_halfwin1 - 1, B, wiener_halfwin1, A, S)) {
-    S[wiener_halfwin1 - 1] = 1.0;
+    }
+  }
+  if (linsolve_wiener(wiener_halfwin1 - 1, B, wiener_halfwin1, A, S)) {
+    S[wiener_halfwin1 - 1] = WIENER_TAP_SCALE_FACTOR;
     for (i = wiener_halfwin1; i < wiener_win; ++i) {
       S[i] = S[wiener_win - 1 - i];
       S[wiener_halfwin1 - 1] -= 2 * S[i];
@@ -804,18 +963,20 @@ static void update_a_sep_sym(int wiener_win, double **Mc, double **Hc,
 }
 
 // Fix vector a, update vector b
-static void update_b_sep_sym(int wiener_win, double **Mc, double **Hc,
-                             double *a, double *b) {
+static void update_b_sep_sym(int wiener_win, int64_t **Mc, int64_t **Hc,
+                             int32_t *a, int32_t *b) {
   int i, j;
-  double S[WIENER_WIN];
-  double A[WIENER_HALFWIN1], B[WIENER_HALFWIN1 * WIENER_HALFWIN1];
+  int32_t S[WIENER_WIN];
+  int64_t A[WIENER_HALFWIN1], B[WIENER_HALFWIN1 * WIENER_HALFWIN1];
   const int wiener_win2 = wiener_win * wiener_win;
   const int wiener_halfwin1 = (wiener_win >> 1) + 1;
   memset(A, 0, sizeof(A));
   memset(B, 0, sizeof(B));
   for (i = 0; i < wiener_win; i++) {
     const int ii = wrap_index(i, wiener_win);
-    for (j = 0; j < wiener_win; j++) A[ii] += Mc[i][j] * a[j];
+    for (j = 0; j < wiener_win; j++) {
+      A[ii] += Mc[i][j] * a[j] / WIENER_TAP_SCALE_FACTOR;
+    }
   }
 
   for (i = 0; i < wiener_win; i++) {
@@ -823,27 +984,33 @@ static void update_b_sep_sym(int wiener_win, double **Mc, double **Hc,
       const int ii = wrap_index(i, wiener_win);
       const int jj = wrap_index(j, wiener_win);
       int k, l;
-      for (k = 0; k < wiener_win; ++k)
-        for (l = 0; l < wiener_win; ++l)
+      for (k = 0; k < wiener_win; ++k) {
+        for (l = 0; l < wiener_win; ++l) {
           B[jj * wiener_halfwin1 + ii] +=
-              Hc[i * wiener_win + j][k * wiener_win2 + l] * a[k] * a[l];
+              Hc[i * wiener_win + j][k * wiener_win2 + l] * a[k] /
+              WIENER_TAP_SCALE_FACTOR * a[l] / WIENER_TAP_SCALE_FACTOR;
+        }
+      }
     }
   }
   // Normalization enforcement in the system of equations itself
-  for (i = 0; i < wiener_halfwin1 - 1; ++i)
+  for (i = 0; i < wiener_halfwin1 - 1; ++i) {
     A[i] -=
         A[wiener_halfwin1 - 1] * 2 +
         B[i * wiener_halfwin1 + wiener_halfwin1 - 1] -
         2 * B[(wiener_halfwin1 - 1) * wiener_halfwin1 + (wiener_halfwin1 - 1)];
-  for (i = 0; i < wiener_halfwin1 - 1; ++i)
-    for (j = 0; j < wiener_halfwin1 - 1; ++j)
+  }
+  for (i = 0; i < wiener_halfwin1 - 1; ++i) {
+    for (j = 0; j < wiener_halfwin1 - 1; ++j) {
       B[i * wiener_halfwin1 + j] -=
           2 * (B[i * wiener_halfwin1 + (wiener_halfwin1 - 1)] +
                B[(wiener_halfwin1 - 1) * wiener_halfwin1 + j] -
                2 * B[(wiener_halfwin1 - 1) * wiener_halfwin1 +
                      (wiener_halfwin1 - 1)]);
-  if (linsolve(wiener_halfwin1 - 1, B, wiener_halfwin1, A, S)) {
-    S[wiener_halfwin1 - 1] = 1.0;
+    }
+  }
+  if (linsolve_wiener(wiener_halfwin1 - 1, B, wiener_halfwin1, A, S)) {
+    S[wiener_halfwin1 - 1] = WIENER_TAP_SCALE_FACTOR;
     for (i = wiener_halfwin1; i < wiener_win; ++i) {
       S[i] = S[wiener_win - 1 - i];
       S[wiener_halfwin1 - 1] -= 2 * S[i];
@@ -852,20 +1019,21 @@ static void update_b_sep_sym(int wiener_win, double **Mc, double **Hc,
   }
 }
 
-static int wiener_decompose_sep_sym(int wiener_win, double *M, double *H,
-                                    double *a, double *b) {
-  static const int init_filt[WIENER_WIN] = {
+static int wiener_decompose_sep_sym(int wiener_win, int64_t *M, int64_t *H,
+                                    int32_t *a, int32_t *b) {
+  static const int32_t init_filt[WIENER_WIN] = {
     WIENER_FILT_TAP0_MIDV, WIENER_FILT_TAP1_MIDV, WIENER_FILT_TAP2_MIDV,
     WIENER_FILT_TAP3_MIDV, WIENER_FILT_TAP2_MIDV, WIENER_FILT_TAP1_MIDV,
     WIENER_FILT_TAP0_MIDV,
   };
-  double *Hc[WIENER_WIN2];
-  double *Mc[WIENER_WIN];
+  int64_t *Hc[WIENER_WIN2];
+  int64_t *Mc[WIENER_WIN];
   int i, j, iter;
   const int plane_off = (WIENER_WIN - wiener_win) >> 1;
   const int wiener_win2 = wiener_win * wiener_win;
   for (i = 0; i < wiener_win; i++) {
-    a[i] = b[i] = (double)init_filt[i + plane_off] / WIENER_FILT_STEP;
+    a[i] = b[i] =
+        WIENER_TAP_SCALE_FACTOR / WIENER_FILT_STEP * init_filt[i + plane_off];
   }
   for (i = 0; i < wiener_win; i++) {
     Mc[i] = M + i * wiener_win;
@@ -887,23 +1055,23 @@ static int wiener_decompose_sep_sym(int wiener_win, double *M, double *H,
 // Computes the function x'*H*x - x'*M for the learned 2D filter x, and compares
 // against identity filters; Final score is defined as the difference between
 // the function values
-static double compute_score(int wiener_win, double *M, double *H,
-                            InterpKernel vfilt, InterpKernel hfilt) {
-  double ab[WIENER_WIN * WIENER_WIN];
+static int64_t compute_score(int wiener_win, int64_t *M, int64_t *H,
+                             InterpKernel vfilt, InterpKernel hfilt) {
+  int32_t ab[WIENER_WIN * WIENER_WIN];
+  int16_t a[WIENER_WIN], b[WIENER_WIN];
+  int64_t P = 0, Q = 0;
+  int64_t iP = 0, iQ = 0;
+  int64_t Score, iScore;
   int i, k, l;
-  double P = 0, Q = 0;
-  double iP = 0, iQ = 0;
-  double Score, iScore;
-  double a[WIENER_WIN], b[WIENER_WIN];
   const int plane_off = (WIENER_WIN - wiener_win) >> 1;
   const int wiener_win2 = wiener_win * wiener_win;
 
   aom_clear_system_state();
 
-  a[WIENER_HALFWIN] = b[WIENER_HALFWIN] = 1.0;
+  a[WIENER_HALFWIN] = b[WIENER_HALFWIN] = WIENER_FILT_STEP;
   for (i = 0; i < WIENER_HALFWIN; ++i) {
-    a[i] = a[WIENER_WIN - i - 1] = (double)vfilt[i] / WIENER_FILT_STEP;
-    b[i] = b[WIENER_WIN - i - 1] = (double)hfilt[i] / WIENER_FILT_STEP;
+    a[i] = a[WIENER_WIN - i - 1] = vfilt[i];
+    b[i] = b[WIENER_WIN - i - 1] = hfilt[i];
     a[WIENER_HALFWIN] -= 2 * a[i];
     b[WIENER_HALFWIN] -= 2 * b[i];
   }
@@ -913,9 +1081,11 @@ static double compute_score(int wiener_win, double *M, double *H,
       ab[k * wiener_win + l] = a[l + plane_off] * b[k + plane_off];
   }
   for (k = 0; k < wiener_win2; ++k) {
-    P += ab[k] * M[k];
-    for (l = 0; l < wiener_win2; ++l)
-      Q += ab[k] * H[k * wiener_win2 + l] * ab[l];
+    P += ab[k] * M[k] / WIENER_FILT_STEP / WIENER_FILT_STEP;
+    for (l = 0; l < wiener_win2; ++l) {
+      Q += ab[k] * H[k * wiener_win2 + l] * ab[l] / WIENER_FILT_STEP /
+           WIENER_FILT_STEP / WIENER_FILT_STEP / WIENER_FILT_STEP;
+    }
   }
   Score = Q - 2 * P;
 
@@ -926,11 +1096,19 @@ static double compute_score(int wiener_win, double *M, double *H,
   return Score - iScore;
 }
 
-static void quantize_sym_filter(int wiener_win, double *f, InterpKernel fi) {
+static void finalize_sym_filter(int wiener_win, int32_t *f, InterpKernel fi) {
   int i;
   const int wiener_halfwin = (wiener_win >> 1);
+
   for (i = 0; i < wiener_halfwin; ++i) {
-    fi[i] = RINT(f[i] * WIENER_FILT_STEP);
+    const int64_t dividend = f[i] * WIENER_FILT_STEP;
+    const int64_t divisor = WIENER_TAP_SCALE_FACTOR;
+    // Perform this division with proper rounding rather than truncation
+    if (dividend < 0) {
+      fi[i] = (int16_t)((dividend - (divisor / 2)) / divisor);
+    } else {
+      fi[i] = (int16_t)((dividend + (divisor / 2)) / divisor);
+    }
   }
   // Specialize for 7-tap filter
   if (wiener_win == WIENER_WIN) {
@@ -1108,15 +1286,16 @@ static void search_wiener(const RestorationTileLimits *limits,
   const int wiener_win =
       (rsc->plane == AOM_PLANE_Y) ? WIENER_WIN : WIENER_WIN_CHROMA;
 
-  double M[WIENER_WIN2];
-  double H[WIENER_WIN2 * WIENER_WIN2];
-  double vfilterd[WIENER_WIN], hfilterd[WIENER_WIN];
+  int64_t M[WIENER_WIN2];
+  int64_t H[WIENER_WIN2 * WIENER_WIN2];
+  int32_t vfilter[WIENER_WIN], hfilter[WIENER_WIN];
 
   const AV1_COMMON *const cm = rsc->cm;
   if (cm->seq_params.use_highbitdepth) {
-    compute_stats_highbd(wiener_win, rsc->dgd_buffer, rsc->src_buffer,
-                         limits->h_start, limits->h_end, limits->v_start,
-                         limits->v_end, rsc->dgd_stride, rsc->src_stride, M, H);
+    av1_compute_stats_highbd(wiener_win, rsc->dgd_buffer, rsc->src_buffer,
+                             limits->h_start, limits->h_end, limits->v_start,
+                             limits->v_end, rsc->dgd_stride, rsc->src_stride, M,
+                             H, cm->seq_params.bit_depth);
   } else {
     av1_compute_stats(wiener_win, rsc->dgd_buffer, rsc->src_buffer,
                       limits->h_start, limits->h_end, limits->v_start,
@@ -1126,7 +1305,7 @@ static void search_wiener(const RestorationTileLimits *limits,
   const MACROBLOCK *const x = rsc->x;
   const int64_t bits_none = x->wiener_restore_cost[0];
 
-  if (!wiener_decompose_sep_sym(wiener_win, M, H, vfilterd, hfilterd)) {
+  if (!wiener_decompose_sep_sym(wiener_win, M, H, vfilter, hfilter)) {
     rsc->bits += bits_none;
     rsc->sse += rusi->sse[RESTORE_NONE];
     rusi->best_rtype[RESTORE_WIENER - 1] = RESTORE_NONE;
@@ -1137,8 +1316,8 @@ static void search_wiener(const RestorationTileLimits *limits,
   RestorationUnitInfo rui;
   memset(&rui, 0, sizeof(rui));
   rui.restoration_type = RESTORE_WIENER;
-  quantize_sym_filter(wiener_win, vfilterd, rui.wiener_info.vfilter);
-  quantize_sym_filter(wiener_win, hfilterd, rui.wiener_info.hfilter);
+  finalize_sym_filter(wiener_win, vfilter, rui.wiener_info.vfilter);
+  finalize_sym_filter(wiener_win, hfilter, rui.wiener_info.hfilter);
 
   // Filter score computes the value of the function x'*A*x - x'*b for the
   // learned filter and compares it against identity filer. If there is no

@@ -8,8 +8,8 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef AOM_AOMCX_H_
-#define AOM_AOMCX_H_
+#ifndef AOM_AOM_AOMCX_H_
+#define AOM_AOM_AOMCX_H_
 
 /*!\defgroup aom_encoder AOMedia AOM/AV1 Encoder
  * \ingroup aom
@@ -291,11 +291,10 @@ enum aome_enc_control_id {
   /*!\brief Codec control function to set number of tile columns.
    *
    * In encoding and decoding, AV1 allows an input image frame be partitioned
-   * into separated vertical tile columns, which can be encoded or decoded
+   * into separate vertical tile columns, which can be encoded or decoded
    * independently. This enables easy implementation of parallel encoding and
-   * decoding. This control requests the encoder to use column tiles in
-   * encoding an input frame, with number of tile columns (in Log2 unit) as
-   * the parameter:
+   * decoding. The parameter for this control describes the number of tile
+   * columns (in log2 units), which has a valid range of [0, 6]:
    *             0 = 1 tile column
    *             1 = 2 tile columns
    *             2 = 4 tile columns
@@ -312,20 +311,25 @@ enum aome_enc_control_id {
   /*!\brief Codec control function to set number of tile rows.
    *
    * In encoding and decoding, AV1 allows an input image frame be partitioned
-   * into separated horizontal tile rows. Tile rows are encoded or decoded
-   * sequentially. Even though encoding/decoding of later tile rows depends on
-   * earlier ones, this allows the encoder to output data packets for tile rows
-   * prior to completely processing all tile rows in a frame, thereby reducing
-   * the latency in processing between input and output. The parameter
-   * for this control describes the number of tile rows, which has a valid
-   * range [0, 2]:
+   * into separate horizontal tile rows, which can be encoded or decoded
+   * independently. The parameter for this control describes the number of tile
+   * rows (in log2 units), which has a valid range of [0, 6]:
    *            0 = 1 tile row
    *            1 = 2 tile rows
    *            2 = 4 tile rows
+   *            .....
+   *            n = 2**n tile rows
    *
    * By default, the value is 0, i.e. one single row tile for entire image.
    */
   AV1E_SET_TILE_ROWS,
+
+  /*!\brief Codec control function to enable RDO modulated by frame temporal
+   * dependency.
+   *
+   * By default, this feature is off.
+   */
+  AV1E_SET_ENABLE_TPL_MODEL,
 
   /*!\brief Codec control function to enable frame parallel decoding feature.
    *
@@ -1009,6 +1013,9 @@ AOM_CTRL_USE_TYPE(AV1E_SET_TILE_COLUMNS, int)
 AOM_CTRL_USE_TYPE(AV1E_SET_TILE_ROWS, int)
 #define AOM_CTRL_AV1E_SET_TILE_ROWS
 
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_TPL_MODEL, unsigned int)
+#define AOM_CTRL_AV1E_SET_ENABLE_TPL_MODEL
+
 AOM_CTRL_USE_TYPE(AV1E_SET_TILE_DEPENDENT_ROWS, int)
 #define AOM_CTRL_AV1E_SET_TILE_DEPENDENT_ROWS
 
@@ -1198,4 +1205,4 @@ AOM_CTRL_USE_TYPE(AV1E_SET_CHROMA_SUBSAMPLING_Y, unsigned int)
 }  // extern "C"
 #endif
 
-#endif  // AOM_AOMCX_H_
+#endif  // AOM_AOM_AOMCX_H_

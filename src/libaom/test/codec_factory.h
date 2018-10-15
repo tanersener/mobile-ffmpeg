@@ -8,8 +8,8 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef TEST_CODEC_FACTORY_H_
-#define TEST_CODEC_FACTORY_H_
+#ifndef AOM_TEST_CODEC_FACTORY_H_
+#define AOM_TEST_CODEC_FACTORY_H_
 
 #include "config/aom_config.h"
 
@@ -167,4 +167,4 @@ const libaom_test::AV1CodecFactory kAV1;
           __VA_ARGS__))
 
 }  // namespace libaom_test
-#endif  // TEST_CODEC_FACTORY_H_
+#endif  // AOM_TEST_CODEC_FACTORY_H_

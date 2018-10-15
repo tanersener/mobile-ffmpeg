@@ -12,13 +12,13 @@
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 #include "test/av1_convolve_2d_test_util.h"
 
-using ::testing::make_tuple;
-using ::testing::tuple;
 using libaom_test::ACMRandom;
 using libaom_test::AV1Convolve2D::AV1Convolve2DSrTest;
 using libaom_test::AV1Convolve2D::AV1JntConvolve2DTest;
 using libaom_test::AV1HighbdConvolve2D::AV1HighbdConvolve2DSrTest;
 using libaom_test::AV1HighbdConvolve2D::AV1HighbdJntConvolve2DTest;
+using ::testing::make_tuple;
+using ::testing::tuple;
 namespace {
 
 TEST_P(AV1Convolve2DSrTest, DISABLED_Speed) { RunSpeedTest(GET_PARAM(0)); }

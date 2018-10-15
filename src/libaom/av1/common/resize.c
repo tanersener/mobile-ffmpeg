@@ -1155,10 +1155,19 @@ YV12_BUFFER_CONFIG *av1_scale_if_required(AV1_COMMON *cm,
 // denominator.
 static void calculate_scaled_size_helper(int *dim, int denom) {
   if (denom != SCALE_NUMERATOR) {
+    // We need to ensure the constraint in "Appendix A" of the spec:
+    // * FrameWidth is greater than or equal to 16
+    // * FrameHeight is greater than or equal to 16
+    // For this, we clamp the downscaled dimension to at least 16. One
+    // exception: if original dimension itself was < 16, then we keep the
+    // downscaled dimension to be same as the original, to ensure that resizing
+    // is valid.
+    const int min_dim = AOMMIN(16, *dim);
     // Use this version if we need *dim to be even
     // *width = (*width * SCALE_NUMERATOR + denom) / (2 * denom);
     // *width <<= 1;
     *dim = (*dim * SCALE_NUMERATOR + denom / 2) / (denom);
+    *dim = AOMMAX(*dim, min_dim);
   }
 }
 

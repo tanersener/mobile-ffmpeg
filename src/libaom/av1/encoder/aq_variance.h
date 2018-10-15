@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_AQ_VARIANCE_H_
-#define AV1_ENCODER_AQ_VARIANCE_H_
+#ifndef AOM_AV1_ENCODER_AQ_VARIANCE_H_
+#define AOM_AV1_ENCODER_AQ_VARIANCE_H_
 
 #include "av1/encoder/encoder.h"
 
@@ -30,4 +30,4 @@ int av1_block_wavelet_energy_level(const AV1_COMP *cpi, MACROBLOCK *x,
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_AQ_VARIANCE_H_
+#endif  // AOM_AV1_ENCODER_AQ_VARIANCE_H_

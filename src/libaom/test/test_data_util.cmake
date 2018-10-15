@@ -12,14 +12,6 @@
 list(APPEND AOM_TEST_DATA_FILE_NAMES
             "hantro_collage_w352h288.yuv"
             "hantro_odd.yuv"
-            "invalid-bug-1814.ivf"
-            "invalid-bug-1814.ivf.res"
-            "invalid-oss-fuzz-9463.ivf"
-            "invalid-oss-fuzz-9463.ivf.res"
-            "invalid-oss-fuzz-9482.ivf"
-            "invalid-oss-fuzz-9482.ivf.res"
-            "invalid-oss-fuzz-9720.ivf"
-            "invalid-oss-fuzz-9720.ivf.res"
             "park_joy_90p_10_420.y4m"
             "park_joy_90p_10_422.y4m"
             "park_joy_90p_10_444.y4m"
@@ -28,6 +20,8 @@ list(APPEND AOM_TEST_DATA_FILE_NAMES
             "park_joy_90p_12_444.y4m"
             "park_joy_90p_8_420_a10-1.y4m"
             "park_joy_90p_8_420.y4m"
+            "park_joy_90p_8_420_monochrome.y4m"
+            "park_joy_90p_8_420_vertical_csp.y4m"
             "park_joy_90p_8_422.y4m"
             "park_joy_90p_8_444.y4m"
             "desktop_credits.y4m"
@@ -35,7 +29,8 @@ list(APPEND AOM_TEST_DATA_FILE_NAMES
             "rush_hour_444.y4m"
             "screendata.y4m"
             "niklas_640_480_30.yuv"
-            "vase10x10.yuv")
+            "vase10x10.yuv"
+            "vase10x10_tiles.txt")
 
 if(ENABLE_DECODE_PERF_TESTS AND CONFIG_AV1_ENCODER)
   list(APPEND AOM_TEST_DATA_FILE_NAMES "niklas_1280_720_30.yuv")
@@ -504,7 +499,33 @@ if(CONFIG_AV1_DECODER)
               "av1-1-b8-03-sizeup.mkv"
               "av1-1-b8-03-sizeup.mkv.md5"
               "av1-1-b8-03-sizedown.mkv"
-              "av1-1-b8-03-sizedown.mkv.md5")
+              "av1-1-b8-03-sizedown.mkv.md5"
+              "invalid-bug-1814.ivf"
+              "invalid-bug-1814.ivf.res"
+              "invalid-oss-fuzz-10061.ivf"
+              "invalid-oss-fuzz-10061.ivf.res"
+              "invalid-oss-fuzz-10117-mc-buf-use-highbd.ivf"
+              "invalid-oss-fuzz-10117-mc-buf-use-highbd.ivf.res"
+              "invalid-oss-fuzz-10227.ivf"
+              "invalid-oss-fuzz-10227.ivf.res"
+              "invalid-oss-fuzz-10389.ivf"
+              "invalid-oss-fuzz-10389.ivf.res"
+              "invalid-oss-fuzz-10555.ivf"
+              "invalid-oss-fuzz-10555.ivf.res"
+              "invalid-oss-fuzz-10705.ivf"
+              "invalid-oss-fuzz-10705.ivf.res"
+              "invalid-oss-fuzz-10723.ivf"
+              "invalid-oss-fuzz-10723.ivf.res"
+              "invalid-oss-fuzz-10779.ivf"
+              "invalid-oss-fuzz-10779.ivf.res"
+              "invalid-oss-fuzz-9288.ivf"
+              "invalid-oss-fuzz-9288.ivf.res"
+              "invalid-oss-fuzz-9463.ivf"
+              "invalid-oss-fuzz-9463.ivf.res"
+              "invalid-oss-fuzz-9482.ivf"
+              "invalid-oss-fuzz-9482.ivf.res"
+              "invalid-oss-fuzz-9720.ivf"
+              "invalid-oss-fuzz-9720.ivf.res")
 endif()
 
 if(ENABLE_ENCODE_PERF_TESTS AND CONFIG_AV1_ENCODER)

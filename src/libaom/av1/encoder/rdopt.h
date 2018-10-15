@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_RDOPT_H_
-#define AV1_ENCODER_RDOPT_H_
+#ifndef AOM_AV1_ENCODER_RDOPT_H_
+#define AOM_AV1_ENCODER_RDOPT_H_
 
 #include "av1/common/blockd.h"
 #include "av1/common/txb_common.h"
@@ -115,7 +115,7 @@ unsigned int av1_high_get_sby_perpixel_variance(const struct AV1_COMP *cpi,
                                                 const struct buf_2d *ref,
                                                 BLOCK_SIZE bs, int bd);
 
-void av1_rd_pick_inter_mode_sb(const struct AV1_COMP *cpi,
+void av1_rd_pick_inter_mode_sb(struct AV1_COMP *cpi,
                                struct TileDataEnc *tile_data,
                                struct macroblock *x, int mi_row, int mi_col,
                                struct RD_STATS *rd_cost, BLOCK_SIZE bsize,
@@ -135,4 +135,4 @@ void av1_inter_mode_data_fit(TileDataEnc *tile_data, int rdmult);
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_RDOPT_H_
+#endif  // AOM_AV1_ENCODER_RDOPT_H_

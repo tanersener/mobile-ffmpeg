@@ -616,10 +616,10 @@ void aom_lpf_horizontal_4_sse2(uint8_t *s, int p /* pitch */,
   __m128i qs1qs0, ps1ps0;
   __m128i p1, p0, q0, q1;
 
-  p1 = _mm_cvtsi32_si128(*(int *)(s - 2 * p));
-  p0 = _mm_cvtsi32_si128(*(int *)(s - 1 * p));
-  q0 = _mm_cvtsi32_si128(*(int *)(s + 0 * p));
-  q1 = _mm_cvtsi32_si128(*(int *)(s + 1 * p));
+  p1 = xx_loadl_32(s - 2 * p);
+  p0 = xx_loadl_32(s - 1 * p);
+  q0 = xx_loadl_32(s - 0 * p);
+  q1 = xx_loadl_32(s + 1 * p);
 
   lpf_internal_4_sse2(&p1, &p0, &q0, &q1, &limit, &thresh, &qs1qs0, &ps1ps0);
 
@@ -1241,23 +1241,16 @@ void aom_lpf_horizontal_14_sse2(unsigned char *s, int p,
   __m128i limit = _mm_load_si128((const __m128i *)_limit);
   __m128i thresh = _mm_load_si128((const __m128i *)_thresh);
 
-  q4p4 = _mm_unpacklo_epi32(_mm_cvtsi32_si128(*(int *)(s - 5 * p)),
-                            _mm_cvtsi32_si128(*(int *)(s + 4 * p)));
-  q3p3 = _mm_unpacklo_epi32(_mm_cvtsi32_si128(*(int *)(s - 4 * p)),
-                            _mm_cvtsi32_si128(*(int *)(s + 3 * p)));
-  q2p2 = _mm_unpacklo_epi32(_mm_cvtsi32_si128(*(int *)(s - 3 * p)),
-                            _mm_cvtsi32_si128(*(int *)(s + 2 * p)));
-  q1p1 = _mm_unpacklo_epi32(_mm_cvtsi32_si128(*(int *)(s - 2 * p)),
-                            _mm_cvtsi32_si128(*(int *)(s + 1 * p)));
+  q4p4 = _mm_unpacklo_epi32(xx_loadl_32(s - 5 * p), xx_loadl_32(s + 4 * p));
+  q3p3 = _mm_unpacklo_epi32(xx_loadl_32(s - 4 * p), xx_loadl_32(s + 3 * p));
+  q2p2 = _mm_unpacklo_epi32(xx_loadl_32(s - 3 * p), xx_loadl_32(s + 2 * p));
+  q1p1 = _mm_unpacklo_epi32(xx_loadl_32(s - 2 * p), xx_loadl_32(s + 1 * p));
 
-  q0p0 = _mm_unpacklo_epi32(_mm_cvtsi32_si128(*(int *)(s - 1 * p)),
-                            _mm_cvtsi32_si128(*(int *)(s - 0 * p)));
+  q0p0 = _mm_unpacklo_epi32(xx_loadl_32(s - 1 * p), xx_loadl_32(s - 0 * p));
 
-  q5p5 = _mm_unpacklo_epi32(_mm_cvtsi32_si128(*(int *)(s - 6 * p)),
-                            _mm_cvtsi32_si128(*(int *)(s + 5 * p)));
+  q5p5 = _mm_unpacklo_epi32(xx_loadl_32(s - 6 * p), xx_loadl_32(s + 5 * p));
 
-  q6p6 = _mm_unpacklo_epi32(_mm_cvtsi32_si128(*(int *)(s - 7 * p)),
-                            _mm_cvtsi32_si128(*(int *)(s + 6 * p)));
+  q6p6 = _mm_unpacklo_epi32(xx_loadl_32(s - 7 * p), xx_loadl_32(s + 6 * p));
 
   lpf_internal_14_sse2(&q6p6, &q5p5, &q4p4, &q3p3, &q2p2, &q1p1, &q0p0, &blimit,
                        &limit, &thresh);
@@ -1543,12 +1536,12 @@ void aom_lpf_horizontal_6_sse2(unsigned char *s, int p,
   __m128i limit = _mm_load_si128((__m128i *)_limit);
   __m128i thresh = _mm_load_si128((__m128i *)_thresh);
 
-  p2 = _mm_cvtsi32_si128(*(int *)(s - 3 * p));
-  p1 = _mm_cvtsi32_si128(*(int *)(s - 2 * p));
-  p0 = _mm_cvtsi32_si128(*(int *)(s - 1 * p));
-  q0 = _mm_cvtsi32_si128(*(int *)(s - 0 * p));
-  q1 = _mm_cvtsi32_si128(*(int *)(s + 1 * p));
-  q2 = _mm_cvtsi32_si128(*(int *)(s + 2 * p));
+  p2 = xx_loadl_32(s - 3 * p);
+  p1 = xx_loadl_32(s - 2 * p);
+  p0 = xx_loadl_32(s - 1 * p);
+  q0 = xx_loadl_32(s - 0 * p);
+  q1 = xx_loadl_32(s + 1 * p);
+  q2 = xx_loadl_32(s + 2 * p);
 
   lpf_internal_6_sse2(&p2, &q2, &p1, &q1, &p0, &q0, &q1q0, &p1p0, &blimit,
                       &limit, &thresh);
@@ -1895,20 +1888,20 @@ void aom_lpf_horizontal_8_sse2(unsigned char *s, int p,
                                const unsigned char *_blimit,
                                const unsigned char *_limit,
                                const unsigned char *_thresh) {
-  __m128i p2, p1, p0, q0, q1, q2, p3, q3;
+  __m128i p3, p2, p1, p0, q0, q1, q2, q3;
   __m128i q1q0, p1p0;
   __m128i blimit = _mm_load_si128((const __m128i *)_blimit);
   __m128i limit = _mm_load_si128((const __m128i *)_limit);
   __m128i thresh = _mm_load_si128((const __m128i *)_thresh);
 
-  p3 = _mm_cvtsi32_si128(*(int *)(s - 4 * p));
-  p2 = _mm_cvtsi32_si128(*(int *)(s - 3 * p));
-  p1 = _mm_cvtsi32_si128(*(int *)(s - 2 * p));
-  p0 = _mm_cvtsi32_si128(*(int *)(s - 1 * p));
-  q0 = _mm_cvtsi32_si128(*(int *)(s - 0 * p));
-  q1 = _mm_cvtsi32_si128(*(int *)(s + 1 * p));
-  q2 = _mm_cvtsi32_si128(*(int *)(s + 2 * p));
-  q3 = _mm_cvtsi32_si128(*(int *)(s + 3 * p));
+  p3 = xx_loadl_32(s - 4 * p);
+  p2 = xx_loadl_32(s - 3 * p);
+  p1 = xx_loadl_32(s - 2 * p);
+  p0 = xx_loadl_32(s - 1 * p);
+  q0 = xx_loadl_32(s - 0 * p);
+  q1 = xx_loadl_32(s + 1 * p);
+  q2 = xx_loadl_32(s + 2 * p);
+  q3 = xx_loadl_32(s + 3 * p);
 
   lpf_internal_8_sse2(&p3, &q3, &p2, &q2, &p1, &q1, &p0, &q0, &q1q0, &p1p0,
                       &blimit, &limit, &thresh);

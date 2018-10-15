@@ -10,11 +10,11 @@
  */
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 #include "test/warp_filter_test_util.h"
-using ::testing::make_tuple;
-using ::testing::tuple;
 using libaom_test::ACMRandom;
 using libaom_test::AV1HighbdWarpFilter::AV1HighbdWarpFilterTest;
 using libaom_test::AV1WarpFilter::AV1WarpFilterTest;
+using ::testing::make_tuple;
+using ::testing::tuple;
 
 namespace {
 

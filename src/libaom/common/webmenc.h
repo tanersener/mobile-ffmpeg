@@ -8,8 +8,8 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef WEBMENC_H_
-#define WEBMENC_H_
+#ifndef AOM_COMMON_WEBMENC_H_
+#define AOM_COMMON_WEBMENC_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,19 +38,23 @@ typedef enum stereo_format {
   STEREO_FORMAT_RIGHT_LEFT = 11
 } stereo_format_t;
 
-void write_webm_file_header(struct WebmOutputContext *webm_ctx,
-                            const aom_codec_enc_cfg_t *cfg,
-                            stereo_format_t stereo_fmt, unsigned int fourcc,
-                            const struct AvxRational *par);
+// The following functions wrap libwebm's mkvmuxer. All functions return 0 upon
+// success, or -1 upon failure.
 
-void write_webm_block(struct WebmOutputContext *webm_ctx,
-                      const aom_codec_enc_cfg_t *cfg,
-                      const aom_codec_cx_pkt_t *pkt);
+int write_webm_file_header(struct WebmOutputContext *webm_ctx,
+                           aom_codec_ctx_t *encoder_ctx,
+                           const aom_codec_enc_cfg_t *cfg,
+                           stereo_format_t stereo_fmt, unsigned int fourcc,
+                           const struct AvxRational *par);
 
-void write_webm_file_footer(struct WebmOutputContext *webm_ctx);
+int write_webm_block(struct WebmOutputContext *webm_ctx,
+                     const aom_codec_enc_cfg_t *cfg,
+                     const aom_codec_cx_pkt_t *pkt);
+
+int write_webm_file_footer(struct WebmOutputContext *webm_ctx);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // WEBMENC_H_
+#endif  // AOM_COMMON_WEBMENC_H_

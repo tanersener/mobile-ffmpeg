@@ -992,6 +992,13 @@ void aom_highbd_filter_block1d4_v2_sse2(const uint16_t *, ptrdiff_t, uint16_t *,
 #define aom_highbd_filter_block1d4_v8_avx2 aom_highbd_filter_block1d4_v8_sse2
 #define aom_highbd_filter_block1d4_v2_avx2 aom_highbd_filter_block1d4_v2_sse2
 
+#define aom_highbd_filter_block1d16_h4_avx2 aom_highbd_filter_block1d16_h8_avx2
+#define aom_highbd_filter_block1d8_h4_avx2 aom_highbd_filter_block1d8_h8_avx2
+#define aom_highbd_filter_block1d4_h4_avx2 aom_highbd_filter_block1d4_h8_avx2
+#define aom_highbd_filter_block1d16_v4_avx2 aom_highbd_filter_block1d16_v8_avx2
+#define aom_highbd_filter_block1d8_v4_avx2 aom_highbd_filter_block1d8_v8_avx2
+#define aom_highbd_filter_block1d4_v4_avx2 aom_highbd_filter_block1d4_v8_avx2
+
 HIGH_FUN_CONV_1D(horiz, x_step_q4, filter_x, h, src, , avx2);
 HIGH_FUN_CONV_1D(vert, y_step_q4, filter_y, v, src - src_stride * 3, , avx2);
 

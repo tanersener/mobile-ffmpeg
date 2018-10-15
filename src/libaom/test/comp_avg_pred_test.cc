@@ -11,13 +11,13 @@
 
 #include "test/comp_avg_pred_test.h"
 
-using ::testing::make_tuple;
-using ::testing::tuple;
 using libaom_test::ACMRandom;
 using libaom_test::AV1JNTCOMPAVG::AV1HighBDJNTCOMPAVGTest;
 using libaom_test::AV1JNTCOMPAVG::AV1HighBDJNTCOMPAVGUPSAMPLEDTest;
 using libaom_test::AV1JNTCOMPAVG::AV1JNTCOMPAVGTest;
 using libaom_test::AV1JNTCOMPAVG::AV1JNTCOMPAVGUPSAMPLEDTest;
+using ::testing::make_tuple;
+using ::testing::tuple;
 
 namespace {
 

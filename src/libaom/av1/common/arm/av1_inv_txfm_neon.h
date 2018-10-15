@@ -8,8 +8,8 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef AV1_COMMON_ARM_AV1_INV_TXFM_NEON_H_
-#define AV1_COMMON_ARM_AV1_INV_TXFM_NEON_H_
+#ifndef AOM_AV1_COMMON_ARM_AV1_INV_TXFM_NEON_H_
+#define AOM_AV1_COMMON_ARM_AV1_INV_TXFM_NEON_H_
 
 #include "config/aom_config.h"
 #include "config/av1_rtcd.h"
@@ -151,4 +151,4 @@ static INLINE void get_eobx_eoby_scan_h_identity(int *eobx, int *eoby,
   *eoby = eob_fill[temp_eoby];
 }
 
-#endif  // AV1_COMMON_ARM_AV1_INV_TXFM_NEON_H_
+#endif  // AOM_AV1_COMMON_ARM_AV1_INV_TXFM_NEON_H_

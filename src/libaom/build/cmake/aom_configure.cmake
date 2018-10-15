@@ -70,8 +70,12 @@ if(NOT AOM_TARGET_CPU)
 endif()
 
 if(CMAKE_TOOLCHAIN_FILE) # Add toolchain file to config string.
-  file(RELATIVE_PATH toolchain_path "${AOM_CONFIG_DIR}"
-                     "${CMAKE_TOOLCHAIN_FILE}")
+  if(IS_ABSOLUTE "${CMAKE_TOOLCHAIN_FILE}")
+    file(RELATIVE_PATH toolchain_path "${AOM_CONFIG_DIR}"
+                       "${CMAKE_TOOLCHAIN_FILE}")
+  else()
+    set(toolchain_path "${CMAKE_TOOLCHAIN_FILE}")
+  endif()
   set(toolchain_string "-DCMAKE_TOOLCHAIN_FILE=\\\"${toolchain_path}\\\"")
   set(AOM_CMAKE_CONFIG "${toolchain_string} ${AOM_CMAKE_CONFIG}")
 else()
@@ -260,12 +264,14 @@ else()
   add_compiler_flag_if_supported("-Wlogical-op")
   add_compiler_flag_if_supported("-Wpointer-arith")
   add_compiler_flag_if_supported("-Wsign-compare")
-  add_compiler_flag_if_supported("-Wstack-usage=360000")
   add_compiler_flag_if_supported("-Wstring-conversion")
   add_compiler_flag_if_supported("-Wtype-limits")
   add_compiler_flag_if_supported("-Wuninitialized")
   add_compiler_flag_if_supported("-Wunused")
   add_compiler_flag_if_supported("-Wvla")
+
+  add_c_flag_if_supported("-Wstack-usage=100000")
+  add_cxx_flag_if_supported("-Wstack-usage=240000")
 
   # TODO(jzern): this could be added as a cxx flags for test/*.cc only, avoiding
   # third_party.
@@ -276,6 +282,12 @@ else()
 
   # Add -Wundef only for C files to avoid massive gtest warning spam.
   add_c_flag_if_supported("-Wundef")
+
+  # Quiet gcc 6 vs 7 abi warnings:
+  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=77728
+  if("${AOM_TARGET_CPU}" MATCHES "arm")
+    add_cxx_flag_if_supported("-Wno-psabi")
+  endif()
 
   if(ENABLE_WERROR)
     add_compiler_flag_if_supported("-Werror")

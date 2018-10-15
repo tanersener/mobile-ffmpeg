@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_BLOCKD_H_
-#define AV1_COMMON_BLOCKD_H_
+#ifndef AOM_AV1_COMMON_BLOCKD_H_
+#define AOM_AV1_COMMON_BLOCKD_H_
 
 #include "config/aom_config.h"
 
@@ -406,7 +406,7 @@ typedef struct macroblockd_plane {
   ENTROPY_CONTEXT *above_context;
   ENTROPY_CONTEXT *left_context;
 
-  // The dequantizers below are true dequntizers used only in the
+  // The dequantizers below are true dequantizers used only in the
   // dequantization process.  They have the same coefficient
   // shift/scale as TX.
   int16_t seg_dequant_QTX[MAX_SEGMENTS][2];
@@ -496,6 +496,8 @@ typedef struct jnt_comp_params {
   int bck_offset;
 } JNT_COMP_PARAMS;
 
+// Most/all of the pointers are mere pointers to actual arrays are allocated
+// elsewhere. This is mostly for coding convenience.
 typedef struct macroblockd {
   struct macroblockd_plane plane[MAX_MB_PLANE];
 
@@ -595,6 +597,9 @@ typedef struct macroblockd {
   uint16_t cb_offset[MAX_MB_PLANE];
   uint16_t txb_offset[MAX_MB_PLANE];
   uint16_t color_index_map_offset[2];
+
+  CONV_BUF_TYPE *tmp_conv_dst;
+  uint8_t *tmp_obmc_bufs[2];
 } MACROBLOCKD;
 
 static INLINE int get_bitdepth_data_path_index(const MACROBLOCKD *xd) {
@@ -1168,4 +1173,4 @@ static INLINE int av1_get_max_eob(TX_SIZE tx_size) {
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_BLOCKD_H_
+#endif  // AOM_AV1_COMMON_BLOCKD_H_

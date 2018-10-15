@@ -47,6 +47,7 @@ struct aom_codec_alg_priv {
   int last_show_frame;  // Index of last output frame.
   int byte_alignment;
   int skip_loop_filter;
+  int skip_film_grain;
   int decode_tile_row;
   int decode_tile_col;
   unsigned int tile_mode;
@@ -57,12 +58,13 @@ struct aom_codec_alg_priv {
   int operating_point;
   int output_all_layers;
 
+  // TODO(wtc): This can be simplified. num_frame_workers is always 1, and
+  // next_output_worker_id is always 0. The frame_workers array of size 1 can
+  // be replaced by a single AVxWorker.
   AVxWorker *frame_workers;
   int num_frame_workers;
-  int next_submit_worker_id;
-  int last_submit_worker_id;
   int next_output_worker_id;
-  int available_threads;
+
   aom_image_t *image_with_grain[MAX_NUM_SPATIAL_LAYERS];
   int need_resync;  // wait for key/intra-only frame
   // BufferPool that holds all reference frames. Shared by all the FrameWorkers.
@@ -104,6 +106,15 @@ static aom_codec_err_t decoder_init(aom_codec_ctx_t *ctx,
       priv->cfg.cfg.ext_partition = 1;
     }
     av1_zero(priv->image_with_grain);
+    // Turn row_mt on by default.
+    priv->row_mt = 1;
+
+    // Turn on normal tile coding mode by default.
+    // 0 is for normal tile coding mode, and 1 is for large scale tile coding
+    // mode(refer to lightfield example).
+    priv->tile_mode = 0;
+    priv->decode_tile_row = -1;
+    priv->decode_tile_col = -1;
   }
 
   return AOM_CODEC_OK;
@@ -122,11 +133,6 @@ static aom_codec_err_t decoder_destroy(aom_codec_alg_priv_t *ctx) {
       av1_remove_common(&frame_worker_data->pbi->common);
       av1_free_restoration_buffers(&frame_worker_data->pbi->common);
       av1_decoder_remove(frame_worker_data->pbi);
-      aom_free(frame_worker_data->scratch_buffer);
-#if CONFIG_MULTITHREAD
-      pthread_mutex_destroy(&frame_worker_data->stats_mutex);
-      pthread_cond_destroy(&frame_worker_data->stats_cond);
-#endif
       aom_free(frame_worker_data);
     }
 #if CONFIG_MULTITHREAD
@@ -314,6 +320,7 @@ static void init_buffer_callbacks(aom_codec_alg_priv_t *ctx) {
     cm->new_fb_idx = INVALID_IDX;
     cm->byte_alignment = ctx->byte_alignment;
     cm->skip_loop_filter = ctx->skip_loop_filter;
+    cm->skip_film_grain = ctx->skip_film_grain;
 
     if (ctx->get_ext_fb_cb != NULL && ctx->release_ext_fb_cb != NULL) {
       pool->get_fb_cb = ctx->get_ext_fb_cb;
@@ -360,14 +367,11 @@ static aom_codec_err_t init_decoder(aom_codec_alg_priv_t *ctx) {
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
 
   ctx->last_show_frame = -1;
-  ctx->next_submit_worker_id = 0;
-  ctx->last_submit_worker_id = 0;
   ctx->next_output_worker_id = 0;
   ctx->need_resync = 1;
   ctx->num_frame_workers = 1;
   if (ctx->num_frame_workers > MAX_DECODE_THREADS)
     ctx->num_frame_workers = MAX_DECODE_THREADS;
-  ctx->available_threads = ctx->num_frame_workers;
   ctx->flushed = 0;
 
   ctx->buffer_pool = (BufferPool *)aom_calloc(1, sizeof(BufferPool));
@@ -391,6 +395,7 @@ static aom_codec_err_t init_decoder(aom_codec_alg_priv_t *ctx) {
     AVxWorker *const worker = &ctx->frame_workers[i];
     FrameWorkerData *frame_worker_data = NULL;
     winterface->init(worker);
+    worker->thread_name = "aom frameworker";
     worker->data1 = aom_memalign(32, sizeof(FrameWorkerData));
     if (worker->data1 == NULL) {
       set_error_detail(ctx, "Failed to allocate frame_worker_data");
@@ -403,23 +408,9 @@ static aom_codec_err_t init_decoder(aom_codec_alg_priv_t *ctx) {
       return AOM_CODEC_MEM_ERROR;
     }
     frame_worker_data->pbi->common.options = &ctx->cfg.cfg;
-    frame_worker_data->pbi->frame_worker_owner = worker;
     frame_worker_data->worker_id = i;
-    frame_worker_data->scratch_buffer = NULL;
-    frame_worker_data->scratch_buffer_size = 0;
     frame_worker_data->frame_context_ready = 0;
     frame_worker_data->received_frame = 0;
-#if CONFIG_MULTITHREAD
-    if (pthread_mutex_init(&frame_worker_data->stats_mutex, NULL)) {
-      set_error_detail(ctx, "Failed to allocate frame_worker_data mutex");
-      return AOM_CODEC_MEM_ERROR;
-    }
-
-    if (pthread_cond_init(&frame_worker_data->stats_cond, NULL)) {
-      set_error_detail(ctx, "Failed to allocate frame_worker_data cond");
-      return AOM_CODEC_MEM_ERROR;
-    }
-#endif
     frame_worker_data->pbi->allow_lowbitdepth = ctx->cfg.allow_lowbitdepth;
 
     // If decoding in serial mode, FrameWorker thread could create tile worker
@@ -435,8 +426,9 @@ static aom_codec_err_t init_decoder(aom_codec_alg_priv_t *ctx) {
     frame_worker_data->pbi->ext_tile_debug = ctx->ext_tile_debug;
     frame_worker_data->pbi->row_mt = ctx->row_mt;
 
-    worker->hook = (AVxWorkerHook)frame_worker_hook;
-    if (!winterface->reset(worker)) {
+    worker->hook = frame_worker_hook;
+    // The main thread acts as Frame Worker 0.
+    if (i != 0 && !winterface->reset(worker)) {
       set_error_detail(ctx, "Frame Worker thread creation failed");
       return AOM_CODEC_MEM_ERROR;
     }
@@ -516,12 +508,11 @@ static aom_codec_err_t decode_one(aom_codec_alg_priv_t *ctx,
 static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
                                       const uint8_t *data, size_t data_sz,
                                       void *user_priv) {
-  const uint8_t *data_start = data;
-  const uint8_t *data_end = data + data_sz;
   aom_codec_err_t res = AOM_CODEC_OK;
 
-  // Release any pending output frames from the previous decoder call.
-  // We need to do this even if the decoder is being flushed
+  // Release any pending output frames from the previous decoder_decode call.
+  // We need to do this even if the decoder is being flushed or the input
+  // arguments are invalid.
   if (ctx->frame_workers) {
     BufferPool *const pool = ctx->buffer_pool;
     RefCntBuffer *const frame_bufs = pool->frame_bufs;
@@ -539,10 +530,13 @@ static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
     unlock_buffer_pool(ctx->buffer_pool);
   }
 
+  /* Sanity checks */
+  /* NULL data ptr allowed if data_sz is 0 too */
   if (data == NULL && data_sz == 0) {
     ctx->flushed = 1;
     return AOM_CODEC_OK;
   }
+  if (data == NULL || data_sz == 0) return AOM_CODEC_INVALID_PARAM;
 
   // Reset flushed when receiving a valid frame.
   ctx->flushed = 0;
@@ -552,6 +546,9 @@ static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
     res = init_decoder(ctx);
     if (res != AOM_CODEC_OK) return res;
   }
+
+  const uint8_t *data_start = data;
+  const uint8_t *data_end = data + data_sz;
 
   if (ctx->is_annexb) {
     // read the size of this temporal unit
@@ -627,6 +624,7 @@ static aom_image_t *add_grain_if_needed(aom_image_t *img,
   }
 
   if (grain_img_buf) {
+    grain_img_buf->user_priv = img->user_priv;
     if (av1_add_film_grain(grain_params, img, grain_img_buf)) {
       aom_img_free(grain_img_buf);
       grain_img_buf = NULL;
@@ -665,7 +663,6 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
       if (winterface->sync(worker)) {
         // Check if worker has received any frames.
         if (frame_worker_data->received_frame == 1) {
-          ++ctx->available_threads;
           frame_worker_data->received_frame = 0;
           check_resync(ctx, frame_worker_data->pbi);
         }
@@ -728,6 +725,7 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
           img = &ctx->img;
           img->temporal_id = cm->temporal_layer_id;
           img->spatial_id = cm->spatial_layer_id;
+          if (cm->skip_film_grain) grain_params->apply_grain = 0;
           aom_image_t *res = add_grain_if_needed(
               img, &ctx->image_with_grain[*index], grain_params);
           if (!res) {
@@ -740,11 +738,10 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
       } else {
         // Decoding failed. Release the worker thread.
         frame_worker_data->received_frame = 0;
-        ++ctx->available_threads;
         ctx->need_resync = 1;
         if (ctx->flushed != 1) return NULL;
       }
-    } while (ctx->next_output_worker_id != ctx->next_submit_worker_id);
+    } while (ctx->next_output_worker_id != 0);
   }
   return NULL;
 }
@@ -1140,6 +1137,19 @@ static aom_codec_err_t ctrl_set_skip_loop_filter(aom_codec_alg_priv_t *ctx,
   return AOM_CODEC_OK;
 }
 
+static aom_codec_err_t ctrl_set_skip_film_grain(aom_codec_alg_priv_t *ctx,
+                                                va_list args) {
+  ctx->skip_film_grain = va_arg(args, int);
+
+  if (ctx->frame_workers) {
+    AVxWorker *const worker = ctx->frame_workers;
+    FrameWorkerData *const frame_worker_data = (FrameWorkerData *)worker->data1;
+    frame_worker_data->pbi->common.skip_film_grain = ctx->skip_film_grain;
+  }
+
+  return AOM_CODEC_OK;
+}
+
 static aom_codec_err_t ctrl_get_accounting(aom_codec_alg_priv_t *ctx,
                                            va_list args) {
 #if !CONFIG_ACCOUNTING
@@ -1243,6 +1253,7 @@ static aom_codec_ctrl_fn_map_t decoder_ctrl_maps[] = {
   { AV1D_EXT_TILE_DEBUG, ctrl_ext_tile_debug },
   { AV1D_SET_ROW_MT, ctrl_set_row_mt },
   { AV1D_SET_EXT_REF_PTR, ctrl_set_ext_ref_ptr },
+  { AV1D_SET_SKIP_FILM_GRAIN, ctrl_set_skip_film_grain },
 
   // Getters
   { AOMD_GET_FRAME_CORRUPTED, ctrl_get_frame_corrupted },

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_ENTROPYMODE_H_
-#define AV1_COMMON_ENTROPYMODE_H_
+#ifndef AOM_AV1_COMMON_ENTROPYMODE_H_
+#define AOM_AV1_COMMON_ENTROPYMODE_H_
 
 #include "av1/common/entropy.h"
 #include "av1/common/entropymv.h"
@@ -209,4 +209,4 @@ int av1_get_palette_color_index_context(const uint8_t *color_map, int stride,
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_ENTROPYMODE_H_
+#endif  // AOM_AV1_COMMON_ENTROPYMODE_H_

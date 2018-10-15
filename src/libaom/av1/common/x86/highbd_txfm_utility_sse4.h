@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef _HIGHBD_TXFM_UTILITY_SSE4_H
-#define _HIGHBD_TXFM_UTILITY_SSE4_H
+#ifndef AOM_AV1_COMMON_X86_HIGHBD_TXFM_UTILITY_SSE4_H_
+#define AOM_AV1_COMMON_X86_HIGHBD_TXFM_UTILITY_SSE4_H_
 
 #include <smmintrin.h> /* SSE4.1 */
 
@@ -75,6 +75,24 @@ static INLINE void transpose_16x16(const __m128i *in, __m128i *out) {
                 out[63]);
 }
 
+static INLINE void transpose_8nx8n(const __m128i *input, __m128i *output,
+                                   const int width, const int height) {
+  const int numcol = height >> 2;
+  const int numrow = width >> 2;
+  for (int j = 0; j < numrow; j++) {
+    for (int i = 0; i < numcol; i++) {
+      TRANSPOSE_4X4(input[i * width + j + (numrow * 0)],
+                    input[i * width + j + (numrow * 1)],
+                    input[i * width + j + (numrow * 2)],
+                    input[i * width + j + (numrow * 3)],
+                    output[j * height + i + (numcol * 0)],
+                    output[j * height + i + (numcol * 1)],
+                    output[j * height + i + (numcol * 2)],
+                    output[j * height + i + (numcol * 3)]);
+    }
+  }
+}
+
 // Note:
 //  rounding = 1 << (bit - 1)
 static INLINE __m128i half_btf_sse4_1(const __m128i *w0, const __m128i *n0,
@@ -103,9 +121,12 @@ static INLINE __m128i half_btf_0_sse4_1(const __m128i *w0, const __m128i *n0,
 typedef void (*transform_1d_sse4_1)(__m128i *in, __m128i *out, int bit,
                                     int do_cols, int bd, int out_shift);
 
+typedef void (*fwd_transform_1d_sse4_1)(__m128i *in, __m128i *out, int bit,
+                                        const int num_cols);
+
 void av1_highbd_inv_txfm2d_add_universe_sse4_1(const int32_t *input,
                                                uint8_t *output, int stride,
                                                TX_TYPE tx_type, TX_SIZE tx_size,
                                                int eob, const int bd);
 
-#endif  // _HIGHBD_TXFM_UTILITY_SSE4_H
+#endif  // AOM_AV1_COMMON_X86_HIGHBD_TXFM_UTILITY_SSE4_H_

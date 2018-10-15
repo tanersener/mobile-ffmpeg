@@ -35,7 +35,7 @@ class AqSegmentTest
 
   virtual void PreEncodeFrameHook(::libaom_test::VideoSource *video,
                                   ::libaom_test::Encoder *encoder) {
-    if (video->frame() == 1) {
+    if (video->frame() == 0) {
       encoder->Control(AOME_SET_CPUUSED, set_cpu_used_);
       encoder->Control(AV1E_SET_AQ_MODE, aq_mode_);
       encoder->Control(AV1E_SET_DELTAQ_MODE, deltaq_mode_);

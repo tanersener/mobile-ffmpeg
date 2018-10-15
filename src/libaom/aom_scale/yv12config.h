@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_SCALE_YV12CONFIG_H_
-#define AOM_SCALE_YV12CONFIG_H_
+#ifndef AOM_AOM_SCALE_YV12CONFIG_H_
+#define AOM_AOM_SCALE_YV12CONFIG_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -140,4 +140,4 @@ int aom_free_frame_buffer(YV12_BUFFER_CONFIG *ybf);
 }
 #endif
 
-#endif  // AOM_SCALE_YV12CONFIG_H_
+#endif  // AOM_AOM_SCALE_YV12CONFIG_H_

@@ -25,8 +25,8 @@
 
 namespace {
 
-using ::testing::tuple;
 using libaom_test::ACMRandom;
+using ::testing::tuple;
 
 typedef void (*HbdHtFunc)(const int16_t *input, int32_t *output, int stride,
                           TX_TYPE tx_type, int bd);
@@ -144,30 +144,8 @@ using ::testing::make_tuple;
 #define PARAM_LIST_4X4                                   \
   &av1_fwd_txfm2d_4x4_c, &av1_inv_txfm2d_add_4x4_sse4_1, \
       &av1_inv_txfm2d_add_4x4_c, 16
-#define PARAM_LIST_8X8                                   \
-  &av1_fwd_txfm2d_8x8_c, &av1_inv_txfm2d_add_8x8_sse4_1, \
-      &av1_inv_txfm2d_add_8x8_c, 64
 
 const IHbdHtParam kArrayIhtParam[] = {
-  // 8x8
-  make_tuple(PARAM_LIST_8X8, DCT_DCT, 10),
-  make_tuple(PARAM_LIST_8X8, DCT_DCT, 12),
-  make_tuple(PARAM_LIST_8X8, ADST_DCT, 10),
-  make_tuple(PARAM_LIST_8X8, ADST_DCT, 12),
-  make_tuple(PARAM_LIST_8X8, DCT_ADST, 10),
-  make_tuple(PARAM_LIST_8X8, DCT_ADST, 12),
-  make_tuple(PARAM_LIST_8X8, ADST_ADST, 10),
-  make_tuple(PARAM_LIST_8X8, ADST_ADST, 12),
-  make_tuple(PARAM_LIST_8X8, FLIPADST_DCT, 10),
-  make_tuple(PARAM_LIST_8X8, FLIPADST_DCT, 12),
-  make_tuple(PARAM_LIST_8X8, DCT_FLIPADST, 10),
-  make_tuple(PARAM_LIST_8X8, DCT_FLIPADST, 12),
-  make_tuple(PARAM_LIST_8X8, FLIPADST_FLIPADST, 10),
-  make_tuple(PARAM_LIST_8X8, FLIPADST_FLIPADST, 12),
-  make_tuple(PARAM_LIST_8X8, ADST_FLIPADST, 10),
-  make_tuple(PARAM_LIST_8X8, ADST_FLIPADST, 12),
-  make_tuple(PARAM_LIST_8X8, FLIPADST_ADST, 10),
-  make_tuple(PARAM_LIST_8X8, FLIPADST_ADST, 12),
   // 4x4
   make_tuple(PARAM_LIST_4X4, DCT_DCT, 10),
   make_tuple(PARAM_LIST_4X4, DCT_DCT, 12),
@@ -192,22 +170,6 @@ const IHbdHtParam kArrayIhtParam[] = {
 INSTANTIATE_TEST_CASE_P(SSE4_1, AV1HighbdInvHTNxN,
                         ::testing::ValuesIn(kArrayIhtParam));
 #endif  // HAVE_SSE4_1
-
-#if HAVE_AVX2
-#define PARAM_LIST_32X32                                   \
-  &av1_fwd_txfm2d_32x32_c, &av1_inv_txfm2d_add_32x32_avx2, \
-      &av1_inv_txfm2d_add_32x32_c, 1024
-
-const IHbdHtParam kArrayIhtParam32x32[] = {
-  // 32x32
-  make_tuple(PARAM_LIST_32X32, DCT_DCT, 10),
-  make_tuple(PARAM_LIST_32X32, DCT_DCT, 12),
-};
-
-INSTANTIATE_TEST_CASE_P(AVX2, AV1HighbdInvHTNxN,
-                        ::testing::ValuesIn(kArrayIhtParam32x32));
-
-#endif  // HAVE_AVX2
 
 typedef void (*HighbdInvTxfm2dFunc)(const int32_t *input, uint8_t *output,
                                     int stride, const TxfmParam *txfm_param);

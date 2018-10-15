@@ -27,6 +27,10 @@
 
 using libaom_test::ACMRandom;
 using libaom_test::FunctionEquivalenceTest;
+using ::testing::Combine;
+using ::testing::Range;
+using ::testing::Values;
+using ::testing::ValuesIn;
 
 namespace {
 const int kNumIterations = 10000;
@@ -52,6 +56,7 @@ class SumSquaresTest : public ::testing::TestWithParam<TestFuncs> {
     aom_free(src_);
   }
   void RunTest(int isRandom);
+  void RunSpeedTest();
 
   void GenRandomData(int width, int height, int stride) {
     const int msb = 11;  // Up to 12 bit input
@@ -108,6 +113,38 @@ void SumSquaresTest::RunTest(int isRandom) {
   }
 }
 
+void SumSquaresTest::RunSpeedTest() {
+  for (int block = BLOCK_4X4; block < BLOCK_SIZES_ALL; block++) {
+    const int width = block_size_wide[block];   // Up to 128x128
+    const int height = block_size_high[block];  // Up to 128x128
+    int stride = 4 << rnd_(7);                  // Up to 256 stride
+    while (stride < width) {                    // Make sure it's valid
+      stride = 4 << rnd_(7);
+    }
+    GenExtremeData(width, height, stride);
+    const int num_loops = 1000000000 / (width + height);
+    aom_usec_timer timer;
+    aom_usec_timer_start(&timer);
+
+    for (int i = 0; i < num_loops; ++i)
+      params_.ref_func(src_, stride, width, height);
+
+    aom_usec_timer_mark(&timer);
+    const int elapsed_time = static_cast<int>(aom_usec_timer_elapsed(&timer));
+    printf("SumSquaresTest C %3dx%-3d: %7.2f ns\n", width, height,
+           1000.0 * elapsed_time / num_loops);
+
+    aom_usec_timer timer1;
+    aom_usec_timer_start(&timer1);
+    for (int i = 0; i < num_loops; ++i)
+      params_.tst_func(src_, stride, width, height);
+    aom_usec_timer_mark(&timer1);
+    const int elapsed_time1 = static_cast<int>(aom_usec_timer_elapsed(&timer1));
+    printf("SumSquaresTest Test %3dx%-3d: %7.2f ns\n", width, height,
+           1000.0 * elapsed_time1 / num_loops);
+  }
+}
+
 TEST_P(SumSquaresTest, OperationCheck) {
   RunTest(1);  // GenRandomData
 }
@@ -115,6 +152,8 @@ TEST_P(SumSquaresTest, OperationCheck) {
 TEST_P(SumSquaresTest, ExtremeValues) {
   RunTest(0);  // GenExtremeData
 }
+
+TEST_P(SumSquaresTest, DISABLED_Speed) { RunSpeedTest(); }
 
 #if HAVE_SSE2
 
@@ -124,6 +163,13 @@ INSTANTIATE_TEST_CASE_P(
                                 &aom_sum_squares_2d_i16_sse2)));
 
 #endif  // HAVE_SSE2
+
+#if HAVE_AVX2
+INSTANTIATE_TEST_CASE_P(
+    AVX2, SumSquaresTest,
+    ::testing::Values(TestFuncs(&aom_sum_squares_2d_i16_c,
+                                &aom_sum_squares_2d_i16_avx2)));
+#endif  // HAVE_AVX2
 
 //////////////////////////////////////////////////////////////////////////////
 // 1D version
@@ -183,4 +229,142 @@ INSTANTIATE_TEST_CASE_P(SSE2, SumSquares1DTest,
                             aom_sum_squares_i16_c, aom_sum_squares_i16_sse2)));
 
 #endif  // HAVE_SSE2
+
+typedef int64_t (*sse_func)(const uint8_t *a, int a_stride, const uint8_t *b,
+                            int b_stride, int width, int height);
+typedef libaom_test::FuncParam<sse_func> TestSSEFuncs;
+
+typedef ::testing::tuple<TestSSEFuncs, int> SSETestParam;
+
+class SSETest : public ::testing::TestWithParam<SSETestParam> {
+ public:
+  virtual ~SSETest() {}
+  virtual void SetUp() {
+    params_ = GET_PARAM(0);
+    width_ = GET_PARAM(1);
+    isHbd_ = params_.ref_func == aom_highbd_sse_c;
+    rnd_.Reset(ACMRandom::DeterministicSeed());
+    src_ = reinterpret_cast<uint8_t *>(aom_memalign(32, 256 * 256 * 2));
+    ref_ = reinterpret_cast<uint8_t *>(aom_memalign(32, 256 * 256 * 2));
+    ASSERT_TRUE(src_ != NULL);
+    ASSERT_TRUE(ref_ != NULL);
+  }
+
+  virtual void TearDown() {
+    libaom_test::ClearSystemState();
+    aom_free(src_);
+    aom_free(ref_);
+  }
+  void RunTest(int isRandom, int width, int height);
+
+  void GenRandomData(int width, int height, int stride) {
+    uint16_t *pSrc = (uint16_t *)src_;
+    uint16_t *pRef = (uint16_t *)ref_;
+    const int msb = 11;  // Up to 12 bit input
+    const int limit = 1 << (msb + 1);
+    for (int ii = 0; ii < height; ii++) {
+      for (int jj = 0; jj < width; jj++) {
+        if (!isHbd_) {
+          src_[ii * stride + jj] = rnd_.Rand8();
+          ref_[ii * stride + jj] = rnd_.Rand8();
+        } else {
+          pSrc[ii * stride + jj] = rnd_(limit);
+          pRef[ii * stride + jj] = rnd_(limit);
+        }
+      }
+    }
+  }
+
+  void GenExtremeData(int width, int height, int stride, uint8_t *data,
+                      int16_t val) {
+    uint16_t *pData = (uint16_t *)data;
+    for (int ii = 0; ii < height; ii++) {
+      for (int jj = 0; jj < width; jj++) {
+        if (!isHbd_) {
+          data[ii * stride + jj] = (uint8_t)val;
+        } else {
+          pData[ii * stride + jj] = val;
+        }
+      }
+    }
+  }
+
+ protected:
+  int isHbd_;
+  int width_;
+  TestSSEFuncs params_;
+  uint8_t *src_;
+  uint8_t *ref_;
+  ACMRandom rnd_;
+};
+
+void SSETest::RunTest(int isRandom, int width, int height) {
+  int failed = 0;
+  for (int k = 0; k < 3; k++) {
+    int stride = 4 << rnd_(7);  // Up to 256 stride
+    while (stride < width) {    // Make sure it's valid
+      stride = 4 << rnd_(7);
+    }
+    if (isRandom) {
+      GenRandomData(width, height, stride);
+    } else {
+      const int msb = isHbd_ ? 12 : 8;  // Up to 12 bit input
+      const int limit = (1 << msb) - 1;
+      if (k == 0) {
+        GenExtremeData(width, height, stride, src_, 0);
+        GenExtremeData(width, height, stride, ref_, limit);
+      } else {
+        GenExtremeData(width, height, stride, src_, limit);
+        GenExtremeData(width, height, stride, ref_, 0);
+      }
+    }
+    int64_t res_ref, res_tst;
+    uint8_t *pSrc = src_;
+    uint8_t *pRef = ref_;
+    if (isHbd_) {
+      pSrc = CONVERT_TO_BYTEPTR(src_);
+      pRef = CONVERT_TO_BYTEPTR(ref_);
+    }
+    res_ref = params_.ref_func(pSrc, stride, pRef, stride, width, height);
+
+    ASM_REGISTER_STATE_CHECK(
+        res_tst = params_.tst_func(pSrc, stride, pRef, stride, width, height));
+
+    if (!failed) {
+      failed = res_ref != res_tst;
+      EXPECT_EQ(res_ref, res_tst)
+          << "Error:" << (isHbd_ ? "hbd " : " ") << k << " SSE Test [" << width
+          << "x" << height << "] C output does not match optimized output.";
+    }
+  }
+}
+
+TEST_P(SSETest, OperationCheck) {
+  for (int height = 4; height <= 128; height += 4) {
+    RunTest(1, width_, height);  // GenRandomData
+  }
+}
+
+TEST_P(SSETest, ExtremeValues) {
+  for (int height = 4; height <= 128; height += 4) {
+    RunTest(0, width_, height);
+  }
+}
+
+#if HAVE_SSE4_1
+TestSSEFuncs sse_sse4[] = { TestSSEFuncs(&aom_sse_c, &aom_sse_sse4_1),
+                            TestSSEFuncs(&aom_highbd_sse_c,
+                                         &aom_highbd_sse_sse4_1) };
+INSTANTIATE_TEST_CASE_P(SSE4_1, SSETest,
+                        Combine(ValuesIn(sse_sse4), Range(4, 129, 4)));
+#endif  // HAVE_SSE4_1
+
+#if HAVE_AVX2
+
+TestSSEFuncs sse_avx2[] = { TestSSEFuncs(&aom_sse_c, &aom_sse_avx2),
+                            TestSSEFuncs(&aom_highbd_sse_c,
+                                         &aom_highbd_sse_avx2) };
+INSTANTIATE_TEST_CASE_P(AVX2, SSETest,
+                        Combine(ValuesIn(sse_avx2), Range(4, 129, 4)));
+#endif  // HAVE_AVX2
 }  // namespace

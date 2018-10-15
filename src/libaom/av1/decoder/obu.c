@@ -292,6 +292,8 @@ static uint32_t read_frame_header_obu(AV1Decoder *pbi,
                                             trailing_bits_present);
 }
 
+// On success, returns the tile group header size. On failure, calls
+// aom_internal_error() and returns -1.
 static int32_t read_tile_group_header(AV1Decoder *pbi,
                                       struct aom_read_bit_buffer *rb,
                                       int *start_tile, int *end_tile,
@@ -303,26 +305,33 @@ static int32_t read_tile_group_header(AV1Decoder *pbi,
 
   if (!pbi->common.large_scale_tile && num_tiles > 1) {
     tile_start_and_end_present_flag = aom_rb_read_bit(rb);
+    if (tile_start_implicit && tile_start_and_end_present_flag) {
+      aom_internal_error(
+          &cm->error, AOM_CODEC_UNSUP_BITSTREAM,
+          "For OBU_FRAME type obu tile_start_and_end_present_flag must be 0");
+      return -1;
+    }
   }
   if (pbi->common.large_scale_tile || num_tiles == 1 ||
       !tile_start_and_end_present_flag) {
     *start_tile = 0;
     *end_tile = num_tiles - 1;
-    return ((rb->bit_offset - saved_bit_offset + 7) >> 3);
+  } else {
+    int tile_bits = cm->log2_tile_rows + cm->log2_tile_cols;
+    *start_tile = aom_rb_read_literal(rb, tile_bits);
+    *end_tile = aom_rb_read_literal(rb, tile_bits);
   }
-  if (tile_start_implicit && tile_start_and_end_present_flag) {
-    aom_internal_error(
-        &cm->error, AOM_CODEC_UNSUP_BITSTREAM,
-        "For OBU_FRAME type obu tile_start_and_end_present_flag must be 0");
+  if (*start_tile > *end_tile) {
+    aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
+                       "tg_end must be greater than or equal to tg_start");
     return -1;
   }
-  *start_tile =
-      aom_rb_read_literal(rb, cm->log2_tile_rows + cm->log2_tile_cols);
-  *end_tile = aom_rb_read_literal(rb, cm->log2_tile_rows + cm->log2_tile_cols);
 
   return ((rb->bit_offset - saved_bit_offset + 7) >> 3);
 }
 
+// On success, returns the tile group OBU size. On failure, sets
+// pbi->common.error.error_code and returns 0.
 static uint32_t read_one_tile_group_obu(
     AV1Decoder *pbi, struct aom_read_bit_buffer *rb, int is_first_tg,
     const uint8_t *data, const uint8_t *data_end, const uint8_t **p_data_end,
@@ -337,7 +346,6 @@ static uint32_t read_one_tile_group_obu(
   header_size = read_tile_group_header(pbi, rb, &start_tile, &end_tile,
                                        tile_start_implicit);
   if (header_size == -1 || byte_alignment(cm, rb)) return 0;
-  if (start_tile > end_tile) return header_size;
   data += header_size;
   av1_decode_tg_tiles_and_wrapup(pbi, data, data_end, p_data_end, start_tile,
                                  end_tile, is_first_tg);
@@ -431,6 +439,9 @@ static void copy_decoded_tile_to_tile_list_buffer(AV1Decoder *pbi,
 }
 
 // Only called while large_scale_tile = 1.
+//
+// On success, returns the tile list OBU size. On failure, sets
+// pbi->common.error.error_code and returns 0.
 static uint32_t read_and_decode_one_tile_list(AV1Decoder *pbi,
                                               struct aom_read_bit_buffer *rb,
                                               const uint8_t *data,
@@ -613,6 +624,7 @@ static void read_metadata_timecode(const uint8_t *data, size_t sz) {
   }
 }
 
+// Not fully implemented. Always succeeds and returns sz.
 static size_t read_metadata(const uint8_t *data, size_t sz) {
   size_t type_length;
   uint64_t type_value;
@@ -659,7 +671,7 @@ int aom_decode_frame_from_obus(struct AV1Decoder *pbi, const uint8_t *data,
   if (!cm->large_scale_tile) pbi->camera_frame_header_ready = 0;
 
   // decode frame as a series of OBUs
-  while (!frame_decoding_finished && !cm->error.error_code) {
+  while (!frame_decoding_finished && cm->error.error_code == AOM_CODEC_OK) {
     struct aom_read_bit_buffer rb;
     size_t payload_size = 0;
     size_t decoded_payload_size = 0;
@@ -769,6 +781,7 @@ int aom_decode_frame_from_obus(struct AV1Decoder *pbi, const uint8_t *data,
         if (obu_header.type != OBU_FRAME) break;
         obu_payload_offset = frame_header_size;
         // Byte align the reader before reading the tile group.
+        // byte_alignment() has set cm->error.error_code if it returns -1.
         if (byte_alignment(cm, &rb)) return -1;
         AOM_FALLTHROUGH_INTENDED;  // fall through to read tile group.
       case OBU_TILE_GROUP:
@@ -784,6 +797,7 @@ int aom_decode_frame_from_obus(struct AV1Decoder *pbi, const uint8_t *data,
             pbi, &rb, is_first_tg_obu_received, data + obu_payload_offset,
             data + payload_size, p_data_end, &frame_decoding_finished,
             obu_header.type == OBU_FRAME);
+        if (cm->error.error_code != AOM_CODEC_OK) return -1;
         is_first_tg_obu_received = 0;
         if (frame_decoding_finished) pbi->seen_frame_header = 0;
         break;
@@ -835,5 +849,6 @@ int aom_decode_frame_from_obus(struct AV1Decoder *pbi, const uint8_t *data,
     data += payload_size;
   }
 
+  if (cm->error.error_code != AOM_CODEC_OK) return -1;
   return frame_decoding_finished;
 }

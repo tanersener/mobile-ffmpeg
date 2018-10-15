@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef TEST_WARP_FILTER_TEST_UTIL_H_
-#define TEST_WARP_FILTER_TEST_UTIL_H_
+#ifndef AOM_TEST_WARP_FILTER_TEST_UTIL_H_
+#define AOM_TEST_WARP_FILTER_TEST_UTIL_H_
 
 #include "config/av1_rtcd.h"
 #include "config/aom_dsp_rtcd.h"
@@ -100,4 +100,4 @@ class AV1HighbdWarpFilterTest
 
 }  // namespace libaom_test
 
-#endif  // TEST_WARP_FILTER_TEST_UTIL_H_
+#endif  // AOM_TEST_WARP_FILTER_TEST_UTIL_H_

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_ONYXC_INT_H_
-#define AV1_COMMON_ONYXC_INT_H_
+#ifndef AOM_AV1_COMMON_ONYXC_INT_H_
+#define AOM_AV1_COMMON_ONYXC_INT_H_
 
 #include "config/aom_config.h"
 #include "config/av1_rtcd.h"
@@ -133,17 +133,6 @@ typedef struct {
   hash_table hash_table;
   uint8_t intra_only;
   FRAME_TYPE frame_type;
-  // The Following variables will only be used in frame parallel decode.
-
-  // frame_worker_owner indicates which FrameWorker owns this buffer. NULL means
-  // that no FrameWorker owns, or is decoding, this buffer.
-  AVxWorker *frame_worker_owner;
-
-  // row and col indicate which position frame has been decoded to in real
-  // pixel unit. They are reset to -1 when decoding begins and set to INT_MAX
-  // when the frame is fully decoded.
-  int row;
-  int col;
 
   // Inter frame reference frame delta for loop filter
   int8_t ref_deltas[REF_FRAMES];
@@ -156,6 +145,8 @@ typedef struct BufferPool {
 // Protect BufferPool from being accessed by several FrameWorkers at
 // the same time during frame parallel decode.
 // TODO(hkuang): Try to use atomic variable instead of locking the whole pool.
+// TODO(wtc): Remove this. See
+// https://chromium-review.googlesource.com/c/webm/libvpx/+/560630.
 #if CONFIG_MULTITHREAD
   pthread_mutex_t pool_mutex;
 #endif
@@ -349,7 +340,7 @@ typedef struct AV1Common {
   int u_ac_delta_q;
   int v_ac_delta_q;
 
-  // The dequantizers below are true dequntizers used only in the
+  // The dequantizers below are true dequantizers used only in the
   // dequantization process.  They have the same coefficient
   // shift/scale as TX.
   int16_t y_dequant_QTX[MAX_SEGMENTS][2];
@@ -480,6 +471,7 @@ typedef struct AV1Common {
 
   int byte_alignment;
   int skip_loop_filter;
+  int skip_film_grain;
 
   // Private data associated with the frame buffer callbacks.
   void *cb_priv;
@@ -550,6 +542,7 @@ typedef struct AV1Common {
   int64_t txcoeff_cost_count;
 #endif
   const cfg_options_t *options;
+  int is_decoding;
 } AV1_COMMON;
 
 // TODO(hkuang): Don't need to lock the whole pool after implementing atomic
@@ -1338,4 +1331,4 @@ static INLINE uint8_t major_minor_to_seq_level_idx(BitstreamLevel bl) {
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_ONYXC_INT_H_
+#endif  // AOM_AV1_COMMON_ONYXC_INT_H_
