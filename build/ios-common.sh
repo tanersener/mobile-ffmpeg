@@ -277,24 +277,31 @@ get_asmflags() {
 get_cxxflags() {
     local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags) $(get_min_version_cflags $1)"
 
+    local BITCODE_FLAGS=""
+    case ${ARCH} in
+        armv7 | armv7s | arm64)
+            BITCODE_FLAGS="-fembed-bitcode"
+        ;;
+    esac
+
     case $1 in
         x265)
-            echo "-std=c++11 -fno-exceptions -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         gnutls)
-            echo "-std=c++11 -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         opencore-amr)
-            echo "-fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         libwebp | xvidcore)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode -fno-common -DPIC ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS}"
         ;;
         libaom)
-            echo "-std=c++11 -fno-exceptions -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
     esac
 }

@@ -53,17 +53,9 @@ export ac_cv_header_libunwind_h=no
 ./configure \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
-    --without-x \
     --with-sysroot=${SDK_PATH} \
     --enable-static \
-    --enable-video \
-    --enable-render \
-    --disable-joystick \
-    --disable-power \
-    --disable-haptic \
     --disable-shared \
-    --disable-fast-install \
-    --disable-video-opengl \
     --host=${TARGET_HOST} || exit 1
 
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
