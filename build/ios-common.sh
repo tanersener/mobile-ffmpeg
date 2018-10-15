@@ -788,9 +788,9 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180829-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20180829-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20180829-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20181015-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20181015-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20181015-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
