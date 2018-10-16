@@ -138,6 +138,7 @@ am_libmobileffmpeg_la_OBJECTS = libmobileffmpeg_la-ArchDetect.lo \
 	libmobileffmpeg_la-fftools_ffmpeg_filter.lo \
 	libmobileffmpeg_la-fftools_ffmpeg_hw.lo \
 	libmobileffmpeg_la-fftools_ffmpeg_opt.lo \
+	libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.lo \
 	libmobileffmpeg_la-MobileFFmpeg.lo \
 	libmobileffmpeg_la-MobileFFmpegConfig.lo \
 	libmobileffmpeg_la-mobileffmpeg_exception.lo \
@@ -175,6 +176,7 @@ am__depfiles_remade = ./$(DEPDIR)/libmobileffmpeg_la-ArchDetect.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_filter.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_hw.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_opt.Plo \
+	./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-mobileffmpeg_exception.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
@@ -372,6 +374,7 @@ libmobileffmpeg_la_SOURCES = \
     fftools_ffmpeg_filter.c \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_opt.c \
+    fftools_ffmpeg_videotoolbox.c \
     MobileFFmpeg.m \
     MobileFFmpegConfig.m \
     mobileffmpeg_exception.m \
@@ -479,6 +482,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_filter.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_hw.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_opt.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-mobileffmpeg_exception.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -545,6 +549,13 @@ libmobileffmpeg_la-fftools_ffmpeg_opt.lo: fftools_ffmpeg_opt.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fftools_ffmpeg_opt.c' object='libmobileffmpeg_la-fftools_ffmpeg_opt.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_CFLAGS) $(CFLAGS) -c -o libmobileffmpeg_la-fftools_ffmpeg_opt.lo `test -f 'fftools_ffmpeg_opt.c' || echo '$(srcdir)/'`fftools_ffmpeg_opt.c
+
+libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.lo: fftools_ffmpeg_videotoolbox.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_CFLAGS) $(CFLAGS) -MT libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.Tpo -c -o libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.lo `test -f 'fftools_ffmpeg_videotoolbox.c' || echo '$(srcdir)/'`fftools_ffmpeg_videotoolbox.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.Tpo $(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.Plo
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='fftools_ffmpeg_videotoolbox.c' object='libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_CFLAGS) $(CFLAGS) -c -o libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.lo `test -f 'fftools_ffmpeg_videotoolbox.c' || echo '$(srcdir)/'`fftools_ffmpeg_videotoolbox.c
 
 .m.o:
 @am__fastdepOBJC_TRUE@	$(AM_V_OBJC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -769,6 +780,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_filter.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_hw.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_opt.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-mobileffmpeg_exception.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -824,6 +836,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_filter.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_hw.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_opt.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-mobileffmpeg_exception.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic

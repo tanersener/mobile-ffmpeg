@@ -39,7 +39,7 @@ COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include"
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/lib -framework Foundation -lavdevice"
+export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/lib -framework Foundation -framework CoreVideo -lavdevice"
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 # BUILD SHARED (DEFAULT) OR STATIC LIBRARIES

@@ -9,6 +9,7 @@ libmobileffmpeg_la_SOURCES = \
     fftools_ffmpeg_filter.c \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_opt.c \
+    fftools_ffmpeg_videotoolbox.c \
     MobileFFmpeg.m \
     MobileFFmpegConfig.m \
     mobileffmpeg_exception.m \

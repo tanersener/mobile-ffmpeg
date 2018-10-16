@@ -367,6 +367,7 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-optimizations \
     --enable-small  \
     --enable-swscale \
+    --enable-videotoolbox \
     ${BUILD_LIBRARY_OPTIONS} \
     --disable-openssl \
     --disable-xmm-clobber-test \
@@ -395,7 +396,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-nvenc \
     --disable-vaapi \
     --disable-vdpau \
-    --disable-videotoolbox \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
