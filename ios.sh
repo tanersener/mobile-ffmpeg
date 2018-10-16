@@ -53,12 +53,14 @@ LIBRARY_ZLIB=41
 LIBRARY_AUDIOTOOLBOX=42
 LIBRARY_COREIMAGE=43
 LIBRARY_BZIP2=44
+LIBRARY_VIDEOTOOLBOX=45
+LIBRARY_AVFOUNDATION=46
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -111,9 +113,11 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "Libraries:"
 
     echo -e "  --full\t\t\tenables all non-GPL external libraries"
-    echo -e "  --enable-ios-audiotoolbox\tbuild with built-in Apple AudioToolbox [no]"
-    echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage [no]"
-    echo -e "  --enable-ios-bzip2\t\tbuild with built-in bzip2 [no]"
+    echo -e "  --enable-ios-audiotoolbox\tbuild with built-in Apple AudioToolbox support[no]"
+    echo -e "  --enable-ios-avfoundation\tbuild with built-in Apple AVFoundation support[no]"
+    echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage support[no]"
+    echo -e "  --enable-ios-bzip2\t\tbuild with built-in bzip2 support[no]"
+    echo -e "  --enable-ios-videotoolbox\tbuild with built-in Apple VideoToolbox support[no]"
     echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib [no]"
     echo -e "  --enable-chromaprint\t\tbuild with chromaprint [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
@@ -211,11 +215,17 @@ set_library() {
         ios-audiotoolbox)
             ENABLED_LIBRARIES[LIBRARY_AUDIOTOOLBOX]=$2
         ;;
+        ios-avfoundation)
+            ENABLED_LIBRARIES[LIBRARY_AVFOUNDATION]=$2
+        ;;
         ios-coreimage)
             ENABLED_LIBRARIES[LIBRARY_COREIMAGE]=$2
         ;;
         ios-bzip2)
             ENABLED_LIBRARIES[LIBRARY_BZIP2]=$2
+        ;;
+        ios-videotoolbox)
+            ENABLED_LIBRARIES[LIBRARY_VIDEOTOOLBOX]=$2
         ;;
         chromaprint)
             ENABLED_LIBRARIES[LIBRARY_CHROMAPRINT]=$2
@@ -435,7 +445,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {41..44}
+    for library in {41..46}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -573,7 +583,7 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..44}
+            for library in {0..46}
             do
                 if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
@@ -656,7 +666,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..45}
+        for library in {1..47}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

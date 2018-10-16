@@ -342,6 +342,7 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-vaapi \
     --disable-vdpau \
     --disable-videotoolbox \
+    --disable-audiotoolbox \
     --disable-appkit \
     --disable-alsa \
     --disable-cuda \

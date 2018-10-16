@@ -63,6 +63,8 @@ get_library_name() {
         42) echo "ios-audiotoolbox" ;;
         43) echo "ios-coreimage" ;;
         44) echo "ios-bzip2" ;;
+        45) echo "ios-videotoolbox" ;;
+        46) echo "ios-avfoundation" ;;
     esac
 }
 

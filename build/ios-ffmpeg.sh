@@ -82,7 +82,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..45}
+for library in {1..47}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -280,17 +280,23 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static zlib)"
 
                 case ${ENABLED_LIBRARY} in
-                    ios-zlib)
-                        CONFIGURE_POSTFIX+=" --enable-zlib"
-                    ;;
                     ios-audiotoolbox)
                         CONFIGURE_POSTFIX+=" --enable-audiotoolbox"
+                    ;;
+                    ios-avfoundation)
+                        CONFIGURE_POSTFIX+=" --enable-avfoundation"
+                    ;;
+                    ios-bzip2)
+                        CONFIGURE_POSTFIX+=" --enable-bzlib"
                     ;;
                     ios-coreimage)
                         CONFIGURE_POSTFIX+=" --enable-coreimage"
                     ;;
-                    ios-bzip2)
-                        CONFIGURE_POSTFIX+=" --enable-bzlib"
+                    ios-videotoolbox)
+                        CONFIGURE_POSTFIX+=" --enable-videotoolbox"
+                    ;;
+                    ios-zlib)
+                        CONFIGURE_POSTFIX+=" --enable-zlib"
                     ;;
                 esac
             ;;
@@ -308,6 +314,10 @@ do
             CONFIGURE_POSTFIX+=" --disable-coreimage"
         elif [[ ${library} -eq 45 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
+        elif [[ ${library} -eq 46 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-videotoolbox"
+        elif [[ ${library} -eq 47 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-avfoundation"
         fi
     fi
 done
@@ -373,7 +383,6 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-inline-asm \
     --enable-optimizations \
     --enable-swscale \
-    --enable-videotoolbox \
     ${BUILD_LIBRARY_OPTIONS} \
     ${SIZE_OPTIONS}  \
     --disable-openssl \
