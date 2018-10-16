@@ -319,6 +319,13 @@ else
     BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
 fi
 
+# OPTIMIZE FOR SPEED INSTEAD OF SIZE
+if [[ -z ${MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED} ]]; then
+    SIZE_OPTIONS="--enable-small";
+else
+    SIZE_OPTIONS="";
+fi
+
 # CFLAGS PARTS
 ARCH_CFLAGS=$(get_arch_specific_cflags);
 APP_CFLAGS=$(get_app_specific_cflags ${LIB_NAME});
@@ -365,10 +372,10 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-asm \
     --enable-inline-asm \
     --enable-optimizations \
-    --enable-small  \
     --enable-swscale \
     --enable-videotoolbox \
     ${BUILD_LIBRARY_OPTIONS} \
+    ${SIZE_OPTIONS}  \
     --disable-openssl \
     --disable-xmm-clobber-test \
     --disable-debug \

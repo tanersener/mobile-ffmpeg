@@ -286,6 +286,13 @@ done
 
 LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
+# OPTIMIZE FOR SPEED INSTEAD OF SIZE
+if [[ -z ${MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED} ]]; then
+    SIZE_OPTIONS="--enable-small";
+else
+    SIZE_OPTIONS="";
+fi
+
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 echo -n -e "\n${LIB_NAME}: "
@@ -309,10 +316,10 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-pic \
     --enable-jni \
     --enable-optimizations \
-    --enable-small  \
     --enable-swscale \
     --enable-shared \
     --enable-v4l2-m2m \
+    ${SIZE_OPTIONS} \
     --disable-openssl \
     --disable-xmm-clobber-test \
     --disable-debug \

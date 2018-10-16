@@ -87,7 +87,8 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
 
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
     echo -e "  -V, --version\t\t\tdisplay version information and exit"
-    echo -e "  -d, --debug\t\t\tbuild with debug information\n"
+    echo -e "  -d, --debug\t\t\tbuild with debug information"
+    echo -e "  -S, --speed\t\t\toptimize for speed instead of size\n"
 
     echo -e "Licensing options:"
 
@@ -168,6 +169,10 @@ skip_library() {
 
 enable_debug() {
     export MOBILE_FFMPEG_DEBUG="-d"
+}
+
+optimize_for_speed() {
+    export MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED="1"
 }
 
 reconf_library() {
@@ -483,6 +488,9 @@ do
 	    ;;
         -d | --debug)
             enable_debug
+	    ;;
+        -S | --speed)
+	        optimize_for_speed
 	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`

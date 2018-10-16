@@ -93,7 +93,8 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
     echo -e "  -V, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
-    echo -e "  -s, --static\t\t\tbuild static mobile-ffmpeg libraries (by default shared libraries are built)\n"
+    echo -e "  -s, --static\t\t\tbuild static mobile-ffmpeg libraries (by default shared libraries are built)"
+    echo -e "  -S, --speed\t\t\toptimize for speed instead of size\n"
 
     echo -e "Licensing options:"
 
@@ -180,6 +181,10 @@ enable_debug() {
 
 enable_static() {
     export MOBILE_FFMPEG_STATIC="1"
+}
+
+optimize_for_speed() {
+    export MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED="1"
 }
 
 reconf_library() {
@@ -553,6 +558,9 @@ do
 	    ;;
         -s | --static)
             enable_static
+	    ;;
+	    -S | --speed)
+	        optimize_for_speed
 	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
