@@ -471,7 +471,7 @@ libdir=\${prefix}/lib
 includedir=\${prefix}/include
 
 Name: aom
-Description: AV1 codec library v0.1.0.
+Description: AV1 codec library v${AOM_VERSION}.
 Version: ${AOM_VERSION}
 
 Requires:

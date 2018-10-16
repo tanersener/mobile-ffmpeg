@@ -88,6 +88,6 @@ cmake -Wno-dev \
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libaom_package_config "0.1.0"
+create_libaom_package_config "1.0.0"
 
 make install || exit 1
