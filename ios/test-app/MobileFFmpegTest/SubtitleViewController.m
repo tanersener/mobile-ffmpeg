@@ -159,7 +159,7 @@ typedef enum {
                 
                 NSLog(@"Create completed successfully; burning subtitles.\n");
 
-                NSString *burnSubtitlesCommand = [NSString stringWithFormat:@"-y -i %@ -vf subtitles=%@:force_style='FontName=MyFontName' %@", videoFile, subtitle, videoWithSubtitlesFile];
+                NSString *burnSubtitlesCommand = [NSString stringWithFormat:@"-hide_banner -y -i %@ -vf subtitles=%@:force_style='FontName=MyFontName' %@", videoFile, subtitle, videoWithSubtitlesFile];
                 
                 [self loadProgressDialog:@"Burning subtitles\n\n"];
                 

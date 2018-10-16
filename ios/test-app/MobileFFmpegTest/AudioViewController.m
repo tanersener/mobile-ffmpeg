@@ -50,7 +50,7 @@
     [super viewDidLoad];
     
     // AUDIO CODEC PICKER INIT
-    codecData = @[@"mp3 (liblame)", @"mp3 (libshine)", @"vorbis", @"opus", @"amr", @"ilbc", @"soxr", @"speex", @"wavpack"];
+    codecData = @[@"aac (audiotoolbox)", @"mp2 (twolame)", @"mp3 (liblame)", @"mp3 (libshine)", @"vorbis", @"opus", @"amr", @"ilbc", @"soxr", @"speex", @"wavpack"];
     selectedCodec = 0;
     
     self.audioCodecPicker.dataSource = self;
@@ -182,7 +182,11 @@
     NSString *audioCodec = codecData[selectedCodec];
     
     NSString *extension;
-    if ([audioCodec isEqualToString:@"mp3 (liblame)"] || [audioCodec isEqualToString:@"mp3 (libshine)"]) {
+    if ([audioCodec isEqualToString:@"aac (audiotoolbox)"]) {
+        extension = @"m4a";
+    } else if ([audioCodec isEqualToString:@"mp2 (twolame)"]) {
+        extension = @"mpg";
+    } else if ([audioCodec isEqualToString:@"mp3 (liblame)"] || [audioCodec isEqualToString:@"mp3 (libshine)"]) {
         extension = @"mp3";
     } else if ([audioCodec isEqualToString:@"vorbis"]) {
         extension = @"ogg";
@@ -273,26 +277,30 @@
     NSString *audioSampleFile = [self getAudioSamplePath];
     NSString *audioOutputFile = [self getAudioOutputFilePath];
 
-    if ([audioCodec isEqualToString:@"mp3 (liblame)"]) {
-        return [NSString stringWithFormat:@"-y -i %@ -c:a libmp3lame -qscale:a 2 %@", audioSampleFile, audioOutputFile];
+    if ([audioCodec isEqualToString:@"aac (audiotoolbox)"]) {
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a aac_at -b:a 192k %@", audioSampleFile, audioOutputFile];
+    } else if ([audioCodec isEqualToString:@"mp2 (twolame)"]) {
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a mp2 -b:a 192k %@", audioSampleFile, audioOutputFile];
+    } else if ([audioCodec isEqualToString:@"mp3 (liblame)"]) {
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libmp3lame -qscale:a 2 %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"mp3 (libshine)"]) {
-        return [NSString stringWithFormat:@"-y -i %@ -c:a libshine -qscale:a 2 %@", audioSampleFile, audioOutputFile];
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libshine -qscale:a 2 %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"vorbis"]) {
-        return [NSString stringWithFormat:@"-y -i %@ -c:a libvorbis -b:a 64k %@", audioSampleFile, audioOutputFile];
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libvorbis -b:a 64k %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"opus"]) {
-        return [NSString stringWithFormat:@"-y -i %@ -c:a libopus -b:a 64k -vbr on -compression_level 10 %@", audioSampleFile, audioOutputFile];
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libopus -b:a 64k -vbr on -compression_level 10 %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"amr"]) {
-        return [NSString stringWithFormat:@"-y -i %@ -ar 8000 -ab 12.2k %@", audioSampleFile, audioOutputFile];
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -ar 8000 -ab 12.2k %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"ilbc"]) {
-        return [NSString stringWithFormat:@"-y -i %@ -c:a ilbc -ar 8000 -b:a 15200 %@", audioSampleFile, audioOutputFile];
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a ilbc -ar 8000 -b:a 15200 %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"speex"]) {
-        return [NSString stringWithFormat:@"-y -i %@ -c:a libspeex -ar 16000 %@", audioSampleFile, audioOutputFile];
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libspeex -ar 16000 %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"wavpack"]) {
-        return [NSString stringWithFormat:@"-y -i %@ -c:a wavpack -b:a 64k %@", audioSampleFile, audioOutputFile];
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a wavpack -b:a 64k %@", audioSampleFile, audioOutputFile];
     } else {
         
         // soxr
-        return [NSString stringWithFormat:@"-y -i %@ -af aresample=resampler=soxr -ar 44100 %@", audioSampleFile, audioOutputFile];
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -af aresample=resampler=soxr -ar 44100 %@", audioSampleFile, audioOutputFile];
     }
 }
 

@@ -60,7 +60,7 @@
     [super viewDidLoad];
 
     // VIDEO CODEC PICKER INIT
-    codecData = @[@"mpeg4", @"x264", @"x265", @"xvid", @"vp8", @"vp9", @"aom", @"kvazaar", @"theora", @"hap"];
+    codecData = @[@"mpeg4", @"h264 (x264)", @"h264 (videotoolbox)", @"x265", @"xvid", @"vp8", @"vp9", @"aom", @"kvazaar", @"theora", @"hap"];
     selectedCodec = 0;
     
     self.videoCodecPicker.dataSource = self;
@@ -216,8 +216,10 @@
     
     // VIDEO CODEC PICKER HAS BASIC NAMES, FFMPEG NEEDS LONGER AND EXACT CODEC NAMES.
     // APPLYING NECESSARY TRANSFORMATION HERE
-    if ([videoCodec isEqualToString:@"x264"]) {
+    if ([videoCodec isEqualToString:@"h264 (x264)"]) {
         videoCodec = @"libx264";
+    } else if ([videoCodec isEqualToString:@"h264 (videotoolbox)"]) {
+        videoCodec = @"h264_videotoolbox";
     } else if ([videoCodec isEqualToString:@"x265"]) {
         videoCodec = @"libx265";
     } else if ([videoCodec isEqualToString:@"xvid"]) {
@@ -379,7 +381,7 @@
 
 + (NSString*)generateVideoEncodeScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions {
     return [NSString stringWithFormat:
-@"-y -loop 1 -i %@ \
+@"-hide_banner -y -loop 1 -i %@ \
 -loop 1 -i %@ \
 -loop 1 -i %@ \
 -filter_complex \
