@@ -2110,12 +2110,10 @@ static void check_decode_result(InputStream *ist, int *got_output, int ret)
     if (ret < 0 && exit_on_error)
         exit_program(1);
 
-    if (*got_output && ist) {
+    if (exit_on_error && *got_output && ist) {
         if (ist->decoded_frame->decode_error_flags || (ist->decoded_frame->flags & AV_FRAME_FLAG_CORRUPT)) {
-            av_log(NULL, exit_on_error ? AV_LOG_FATAL : AV_LOG_WARNING,
-                   "%s: corrupt decoded frame in stream %d\n", input_files[ist->file_index]->ctx->url, ist->st->index);
-            if (exit_on_error)
-                exit_program(1);
+            av_log(NULL, AV_LOG_FATAL, "%s: corrupt decoded frame in stream %d\n", input_files[ist->file_index]->ctx->url, ist->st->index);
+            exit_program(1);
         }
     }
 }
@@ -3074,13 +3072,7 @@ static int init_output_stream_streamcopy(OutputStream *ost)
                "Error setting up codec context options.\n");
         return ret;
     }
-
-    ret = avcodec_parameters_from_context(par_src, ost->enc_ctx);
-    if (ret < 0) {
-        av_log(NULL, AV_LOG_FATAL,
-               "Error getting reference codec parameters.\n");
-        return ret;
-    }
+    avcodec_parameters_from_context(par_src, ost->enc_ctx);
 
     if (!codec_tag) {
         unsigned int codec_tag_tmp;
@@ -4352,11 +4344,9 @@ static int process_input(int file_index)
     if (ist->discard)
         goto discard_packet;
 
-    if (pkt.flags & AV_PKT_FLAG_CORRUPT) {
-        av_log(NULL, exit_on_error ? AV_LOG_FATAL : AV_LOG_WARNING,
-               "%s: corrupt input packet in stream %d\n", is->url, pkt.stream_index);
-        if (exit_on_error)
-            exit_program(1);
+    if (exit_on_error && (pkt.flags & AV_PKT_FLAG_CORRUPT)) {
+        av_log(NULL, AV_LOG_FATAL, "%s: corrupt input packet in stream %d\n", is->url, pkt.stream_index);
+        exit_program(1);
     }
 
     if (debug_ts) {

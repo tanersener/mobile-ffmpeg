@@ -149,16 +149,11 @@ typedef struct ATempoContext {
     uint64_t nsamples_out;
 } ATempoContext;
 
-#define YAE_ATEMPO_MIN 0.5
-#define YAE_ATEMPO_MAX 100.0
-
 #define OFFSET(x) offsetof(ATempoContext, x)
 
 static const AVOption atempo_options[] = {
     { "tempo", "set tempo scale factor",
-      OFFSET(tempo), AV_OPT_TYPE_DOUBLE, { .dbl = 1.0 },
-      YAE_ATEMPO_MIN,
-      YAE_ATEMPO_MAX,
+      OFFSET(tempo), AV_OPT_TYPE_DOUBLE, { .dbl = 1.0 }, 0.5, 100.0,
       AV_OPT_FLAG_AUDIO_PARAM | AV_OPT_FLAG_FILTERING_PARAM },
     { NULL }
 };
@@ -336,9 +331,9 @@ static int yae_set_tempo(AVFilterContext *ctx, const char *arg_tempo)
         return AVERROR(EINVAL);
     }
 
-    if (tempo < YAE_ATEMPO_MIN || tempo > YAE_ATEMPO_MAX) {
-        av_log(ctx, AV_LOG_ERROR, "Tempo value %f exceeds [%f, %f] range\n",
-               tempo, YAE_ATEMPO_MIN, YAE_ATEMPO_MAX);
+    if (tempo < 0.5 || tempo > 2.0) {
+        av_log(ctx, AV_LOG_ERROR, "Tempo value %f exceeds [0.5, 2.0] range\n",
+               tempo);
         return AVERROR(EINVAL);
     }
 

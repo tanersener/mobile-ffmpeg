@@ -32,8 +32,6 @@ version <next>:
 - acrossover filter
 - ilbc decoder
 - audio denoiser as afftdn filter
-- AV1 parser
-- SER demuxer
 
 
 version 4.0:

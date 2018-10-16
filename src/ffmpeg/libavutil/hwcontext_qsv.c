@@ -100,7 +100,6 @@ static const struct {
     uint32_t           fourcc;
 } supported_pixel_formats[] = {
     { AV_PIX_FMT_NV12, MFX_FOURCC_NV12 },
-    { AV_PIX_FMT_BGRA, MFX_FOURCC_RGB4 },
     { AV_PIX_FMT_P010, MFX_FOURCC_P010 },
     { AV_PIX_FMT_PAL8, MFX_FOURCC_P8   },
 };
@@ -752,37 +751,6 @@ static int qsv_transfer_data_child(AVHWFramesContext *ctx, AVFrame *dst,
     return ret;
 }
 
-static int map_frame_to_surface(const AVFrame *frame, mfxFrameSurface1 *surface)
-{
-    switch (frame->format) {
-    case AV_PIX_FMT_NV12:
-    case AV_PIX_FMT_P010:
-        surface->Data.Y  = frame->data[0];
-        surface->Data.UV = frame->data[1];
-        break;
-
-    case AV_PIX_FMT_YUV420P:
-        surface->Data.Y = frame->data[0];
-        surface->Data.U = frame->data[1];
-        surface->Data.V = frame->data[2];
-        break;
-
-    case AV_PIX_FMT_BGRA:
-        surface->Data.B = frame->data[0];
-        surface->Data.G = frame->data[0] + 1;
-        surface->Data.R = frame->data[0] + 2;
-        surface->Data.A = frame->data[0] + 3;
-        break;
-
-    default:
-        return MFX_ERR_UNSUPPORTED;
-    }
-    surface->Data.Pitch     = frame->linesize[0];
-    surface->Data.TimeStamp = frame->pts;
-
-    return 0;
-}
-
 static int qsv_transfer_data_from(AVHWFramesContext *ctx, AVFrame *dst,
                                   const AVFrame *src)
 {
@@ -828,7 +796,11 @@ static int qsv_transfer_data_from(AVHWFramesContext *ctx, AVFrame *dst,
     }
 
     out.Info = in->Info;
-    map_frame_to_surface(dst, &out);
+    out.Data.PitchLow = dst->linesize[0];
+    out.Data.Y        = dst->data[0];
+    out.Data.U        = dst->data[1];
+    out.Data.V        = dst->data[2];
+    out.Data.A        = dst->data[3];
 
     do {
         err = MFXVideoVPP_RunFrameVPPAsync(s->session_download, in, &out, NULL, &sync);
@@ -861,11 +833,7 @@ static int qsv_transfer_data_to(AVHWFramesContext *ctx, AVFrame *dst,
 
     mfxSyncPoint sync = NULL;
     mfxStatus err;
-    int ret = 0;
-    /* make a copy if the input is not padded as libmfx requires */
-    AVFrame tmp_frame, *src_frame;
-    int realigned = 0;
-
+    int ret;
 
     while (!s->session_upload_init && !s->session_upload && !ret) {
 #if HAVE_PTHREADS
@@ -891,36 +859,20 @@ static int qsv_transfer_data_to(AVHWFramesContext *ctx, AVFrame *dst,
     if (ret < 0)
         return ret;
 
-
-    if (src->height & 16 || src->linesize[0] & 16) {
-        realigned = 1;
-        memset(&tmp_frame, 0, sizeof(tmp_frame));
-        tmp_frame.format         = src->format;
-        tmp_frame.width          = FFALIGN(src->width, 16);
-        tmp_frame.height         = FFALIGN(src->height, 16);
-        ret = av_frame_get_buffer(&tmp_frame, 32);
-        if (ret < 0)
-            return ret;
-
-        ret = av_frame_copy(&tmp_frame, src);
-        if (ret < 0) {
-            av_frame_unref(&tmp_frame);
-            return ret;
-        }
-    }
-
-    src_frame = realigned ? &tmp_frame : src;
-
     if (!s->session_upload) {
         if (s->child_frames_ref)
-            return qsv_transfer_data_child(ctx, dst, src_frame);
+            return qsv_transfer_data_child(ctx, dst, src);
 
         av_log(ctx, AV_LOG_ERROR, "Surface upload not possible\n");
         return AVERROR(ENOSYS);
     }
 
     in.Info = out->Info;
-    map_frame_to_surface(src_frame, &in);
+    in.Data.PitchLow = src->linesize[0];
+    in.Data.Y        = src->data[0];
+    in.Data.U        = src->data[1];
+    in.Data.V        = src->data[2];
+    in.Data.A        = src->data[3];
 
     do {
         err = MFXVideoVPP_RunFrameVPPAsync(s->session_upload, &in, out, NULL, &sync);
@@ -940,9 +892,6 @@ static int qsv_transfer_data_to(AVHWFramesContext *ctx, AVFrame *dst,
         av_log(ctx, AV_LOG_ERROR, "Error synchronizing the operation\n");
         return AVERROR_UNKNOWN;
     }
-
-    if (realigned)
-        av_frame_unref(&tmp_frame);
 
     return 0;
 }

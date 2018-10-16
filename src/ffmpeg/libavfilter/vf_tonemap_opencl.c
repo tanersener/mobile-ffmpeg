@@ -33,7 +33,7 @@
 #include "colorspace.h"
 
 // TODO:
-// - separate peak-detection from tone-mapping kernel to solve
+// - seperate peak-detection from tone-mapping kernel to solve
 //    one-frame-delay issue.
 // - import colorspace matrix generation from vf_colorspace.c
 // - more format support

@@ -1448,19 +1448,9 @@ int ff_inlink_acknowledge_status(AVFilterLink *link, int *rstatus, int64_t *rpts
     return 1;
 }
 
-size_t ff_inlink_queued_frames(AVFilterLink *link)
-{
-    return ff_framequeue_queued_frames(&link->fifo);
-}
-
 int ff_inlink_check_available_frame(AVFilterLink *link)
 {
     return ff_framequeue_queued_frames(&link->fifo) > 0;
-}
-
-int ff_inlink_queued_samples(AVFilterLink *link)
-{
-    return ff_framequeue_queued_samples(&link->fifo);
 }
 
 int ff_inlink_check_available_samples(AVFilterLink *link, unsigned min)
@@ -1515,11 +1505,6 @@ int ff_inlink_consume_samples(AVFilterLink *link, unsigned min, unsigned max,
     consume_update(link, frame);
     *rframe = frame;
     return 1;
-}
-
-AVFrame *ff_inlink_peek_frame(AVFilterLink *link, size_t idx)
-{
-    return ff_framequeue_peek(&link->fifo, idx);
 }
 
 int ff_inlink_make_frame_writable(AVFilterLink *link, AVFrame **rframe)
