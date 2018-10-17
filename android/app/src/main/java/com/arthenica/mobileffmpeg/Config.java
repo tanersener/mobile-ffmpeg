@@ -234,7 +234,9 @@ public class Config {
         final String text = new String(logMessage);
 
         if (runningSystemCommand) {
-            systemCommandOutputReference.get().append(text);
+            if (activeLogLevel != Level.AV_LOG_QUIET && levelValue <= activeLogLevel.getValue()) {
+                systemCommandOutputReference.get().append(text);
+            }
             return;
         }
 
