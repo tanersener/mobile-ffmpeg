@@ -56,8 +56,9 @@ cmake -Wno-dev \
     -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$LD" \
     -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
-    -DFFT_LIB=kissfft \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
+    -DFFT_LIB=kissfft \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1

@@ -66,6 +66,7 @@ cmake -Wno-dev \
     -DTIFF_LIBRARY="${BASEDIR}/prebuilt/android-$(get_target_build)/tiff/lib" \
     -DZLIB_INCLUDE_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/include" \
     -DZLIB_LIBRARY="${ANDROID_NDK_ROOT}/platform/android-${API}/arch-$(get_target_build)/usr/lib" \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
