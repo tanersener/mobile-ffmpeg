@@ -74,9 +74,9 @@ public class Config {
 
     private static Statistics lastReceivedStatistics;
 
-    private static StringBuffer systemCommandOutput = new StringBuffer();
+    private static final AtomicReference<StringBuffer> systemCommandOutputReference;
 
-    private static boolean runningSystemCommand = false;
+    private static boolean runningSystemCommand;
 
     private static final List<String> supportedExternalLibraries;
 
@@ -149,6 +149,11 @@ public class Config {
         lastReceivedStatistics = new Statistics();
 
         Config.enableRedirection();
+
+        systemCommandOutputReference = new AtomicReference<>();
+        systemCommandOutputReference.set(new StringBuffer());
+
+        runningSystemCommand = false;
     }
 
     /**
@@ -229,7 +234,7 @@ public class Config {
         final String text = new String(logMessage);
 
         if (runningSystemCommand) {
-            systemCommandOutput.append(text);
+            systemCommandOutputReference.get().append(text);
             return;
         }
 
@@ -473,14 +478,44 @@ public class Config {
         return enabledLibraryList;
     }
 
-    static int systemExecute(final String[] arguments) {
+    /**
+     * Executes system command. System command is not logged to output.
+     *
+     * @param arguments               command arguments
+     * @param commandOutputEndPattern pattern which will indicate that operation has ended
+     * @param timeout                 execution timeout
+     * @return return code
+     */
+    static int systemExecute(final String[] arguments, final String commandOutputEndPattern, final long timeout) {
         runningSystemCommand = true;
 
         int rc = Config.nativeExecute(arguments);
 
+        long totalWaitTime = 0;
+
+        try {
+            while (!systemCommandOutputReference.get().toString().contains(commandOutputEndPattern) && (totalWaitTime < timeout)) {
+                synchronized (systemCommandOutputReference) {
+                    systemCommandOutputReference.wait(20);
+                }
+                totalWaitTime += 20;
+            }
+        } catch (final InterruptedException e) {
+            Log.w(TAG, "systemExecute operation interrupted.", e);
+        }
+
         runningSystemCommand = false;
 
         return rc;
+    }
+
+    /**
+     * Returns output of last executed system command.
+     *
+     * @return output of last executed system command
+     */
+    static String getSystemCommandOutput() {
+        return systemCommandOutputReference.get().toString();
     }
 
     /**

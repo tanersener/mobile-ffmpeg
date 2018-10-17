@@ -47,6 +47,7 @@ import com.arthenica.mobileffmpeg.StatisticsCallback;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.concurrent.Callable;
 
 import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_SUCCESS;
@@ -83,7 +84,10 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
 
                     @Override
                     public void onClick(View v) {
-                        encodeVideo();
+                        // encodeVideo();
+                        List<String> externalLibraries = Config.getExternalLibraries();
+                        System.out.println("externalLibraries = " + externalLibraries);
+                        System.out.println("Config.getPackageName() = " + Config.getPackageName());
                     }
                 });
             }

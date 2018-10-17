@@ -145,4 +145,15 @@ public class FFmpeg {
         return lastCommandOutput.toString();
     }
 
+    /**
+     * <p>Returns media information for given file.
+     *
+     * @return media information
+     * @since 3.0
+     */
+    public static String getMediaInformation(final String filePath) {
+        int i = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", filePath, "-f", "null", "-"}, "Press [q] to stop, [?] for help", 1000);
+        return Config.getSystemCommandOutput();
+    }
+
 }
