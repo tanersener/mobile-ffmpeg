@@ -78,43 +78,7 @@ public class Config {
 
     private static boolean runningSystemCommand;
 
-    private static final List<String> supportedExternalLibraries;
-
     static {
-        supportedExternalLibraries = new ArrayList<>();
-        supportedExternalLibraries.add("chromaprint");
-        supportedExternalLibraries.add("fontconfig");
-        supportedExternalLibraries.add("freetype");
-        supportedExternalLibraries.add("fribidi");
-        supportedExternalLibraries.add("gmp");
-        supportedExternalLibraries.add("gnutls");
-        supportedExternalLibraries.add("kvazaar");
-        supportedExternalLibraries.add("lame");
-        supportedExternalLibraries.add("libaom");
-        supportedExternalLibraries.add("libass");
-        supportedExternalLibraries.add("libiconv");
-        supportedExternalLibraries.add("libilbc");
-        supportedExternalLibraries.add("libtheora");
-        supportedExternalLibraries.add("libvidstab");
-        supportedExternalLibraries.add("libvorbis");
-        supportedExternalLibraries.add("libvpx");
-        supportedExternalLibraries.add("libwebp");
-        supportedExternalLibraries.add("libxml2");
-        supportedExternalLibraries.add("opencore-amr");
-        supportedExternalLibraries.add("opus");
-        supportedExternalLibraries.add("shine");
-        supportedExternalLibraries.add("sdl");
-        supportedExternalLibraries.add("snappy");
-        supportedExternalLibraries.add("soxr");
-        supportedExternalLibraries.add("speex");
-        supportedExternalLibraries.add("tesseract");
-        supportedExternalLibraries.add("twolame");
-        supportedExternalLibraries.add("wavpack");
-        supportedExternalLibraries.add("x264");
-        supportedExternalLibraries.add("x265");
-        supportedExternalLibraries.add("xvidcore");
-        supportedExternalLibraries.add("android-zlib");
-        supportedExternalLibraries.add("android-media-codec");
 
         Log.i(Config.TAG, "Loading mobile-ffmpeg.");
 
@@ -426,36 +390,7 @@ public class Config {
      * @since 3.0
      */
     public static String getPackageName() {
-        final List<String> externalLibraryList = getExternalLibraries();
-        final boolean speex = externalLibraryList.contains("speex");
-        final boolean fribidi = externalLibraryList.contains("fribidi");
-        final boolean gnutls = externalLibraryList.contains("gnutls");
-        final boolean xvidcore = externalLibraryList.contains("xvidcore");
-
-        if (speex && fribidi) {
-            if (xvidcore) {
-                return "full-gpl";
-            } else {
-                return "full";
-            }
-        } else if (speex) {
-            return "audio";
-        } else if (fribidi) {
-            return "video";
-        } else if (xvidcore) {
-            if (gnutls) {
-                return "https-gpl";
-            } else {
-                return "min-gpl";
-            }
-        } else {
-            if (gnutls) {
-                return "https";
-            } else {
-                return "min";
-            }
-        }
-
+        return Packages.getPackageName();
     }
 
     /**
@@ -465,19 +400,7 @@ public class Config {
      * @since 3.0
      */
     public static List<String> getExternalLibraries() {
-        final String buildConfiguration = getNativeBuildConf();
-
-        final List<String> enabledLibraryList = new ArrayList<>();
-        for (String supportedExternalLibrary : supportedExternalLibraries) {
-            if (buildConfiguration.contains("enable-" + supportedExternalLibrary) ||
-                    buildConfiguration.contains("enable-lib" + supportedExternalLibrary)) {
-                enabledLibraryList.add(supportedExternalLibrary);
-            }
-        }
-
-        Collections.sort(enabledLibraryList);
-
-        return enabledLibraryList;
+        return Packages.getExternalLibraries();
     }
 
     /**
