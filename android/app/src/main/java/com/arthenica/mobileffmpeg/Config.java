@@ -71,6 +71,10 @@ public class Config {
 
     private static Statistics lastReceivedStatistics;
 
+    private static StringBuffer systemCommandOutput = new StringBuffer();
+
+    private static boolean runningSystemCommand = false;
+
     static {
 
         Log.i(Config.TAG, "Loading mobile-ffmpeg.");
@@ -184,6 +188,11 @@ public class Config {
     private static void log(final int levelValue, final byte[] logMessage) {
         final Level level = Level.from(levelValue);
         final String text = new String(logMessage);
+
+        if (runningSystemCommand) {
+            systemCommandOutput.append(text);
+            return;
+        }
 
         // ALWAYS REDIRECT COMMAND OUTPUT
         FFmpeg.appendCommandOutput(text);
@@ -362,6 +371,43 @@ public class Config {
                 }
             }
         }
+    }
+
+    /**
+     * <p>Returns package name.
+     *
+     * @return guessed package name according to supported external libraries
+     * @since 3.0
+     */
+    public String getPackageName() {
+        String externalLibraries = getExternalLibraries();
+
+        return "min";
+    }
+
+    /**
+     * <p>Returns supported external libraries.
+     *
+     * @return list of supported external libraries separated with space
+     * @since 3.0
+     */
+    public String getExternalLibraries() {
+        int rc = systemExecute(new String[]{"-hide_banner", "-buildconf"});
+        if (rc == 0) {
+            return "";
+        } else {
+            return systemCommandOutput.toString();
+        }
+    }
+
+    int systemExecute(final String[] arguments) {
+        runningSystemCommand = true;
+
+        int rc = Config.nativeExecute(arguments);
+
+        runningSystemCommand = false;
+
+        return rc;
     }
 
     /**
