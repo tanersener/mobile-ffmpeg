@@ -103,4 +103,11 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIE
  */
 JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEnv *, jclass);
 
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    getNativeBuildConf
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf(JNIEnv *, jclass);
+
 #endif /* MOBILE_FFMPEG_H */
