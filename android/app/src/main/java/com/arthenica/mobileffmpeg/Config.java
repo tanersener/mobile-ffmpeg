@@ -185,6 +185,9 @@ public class Config {
         final Level level = Level.from(levelValue);
         final String text = new String(logMessage);
 
+        // ALWAYS REDIRECT COMMAND OUTPUT
+        FFmpeg.appendCommandOutput(text);
+
         if (activeLogLevel == Level.AV_LOG_QUIET || levelValue > activeLogLevel.getValue()) {
             // LOG NEITHER PRINTED NOR FORWARDED
             return;
@@ -233,16 +236,16 @@ public class Config {
      * <p>Statistics redirection method called by JNI/native part.
      *
      * @param videoFrameNumber last processed frame number for videos
-     * @param videoFps frames processed per second for videos
-     * @param videoQuality quality of the video stream
-     * @param size size in bytes
-     * @param time processed duration in milliseconds
-     * @param bitrate output bit rate in kbits/s
-     * @param speed processing speed = processed duration / operation duration
+     * @param videoFps         frames processed per second for videos
+     * @param videoQuality     quality of the video stream
+     * @param size             size in bytes
+     * @param time             processed duration in milliseconds
+     * @param bitrate          output bit rate in kbits/s
+     * @param speed            processing speed = processed duration / operation duration
      */
     private static void statistics(final int videoFrameNumber, final float videoFps,
-                              final float videoQuality, final long size, final int time,
-                              final double bitrate, final double speed) {
+                                   final float videoQuality, final long size, final int time,
+                                   final double bitrate, final double speed) {
         final Statistics newStatistics = new Statistics(videoFrameNumber, videoFps, videoQuality, size, time, bitrate, speed);
         lastReceivedStatistics.update(newStatistics);
 
@@ -279,7 +282,7 @@ public class Config {
 
     /**
      * <p>Registers fonts inside the given path, so they are available to use in FFmpeg filters.
-     *
+     * <p>
      * <p>Note that you need to build <code>MobileFFmpeg</code> with <code>fontconfig</code>
      * enabled or use a prebuilt package with <code>fontconfig</code> inside to use this feature.
      *
@@ -408,9 +411,8 @@ public class Config {
     native static int nativeExecute(final String[] arguments);
 
     /**
-     * <p>Cancels an ongoing operation natively.
-     *
-     * <p>This function does not wait for termination to complete and returns immediately.
+     * <p>Cancels an ongoing operation natively. This function does not wait for termination to
+     * complete and returns immediately.
      */
     native static void nativeCancel();
 
