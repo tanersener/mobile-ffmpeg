@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="audio_codec">
+        <item>mp2 (twolame)</item>
         <item>mp3 (liblame)</item>
         <item>mp3 (libshine)</item>
         <item>vorbis</item>
