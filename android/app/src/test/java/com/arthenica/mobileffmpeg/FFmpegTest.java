@@ -19,6 +19,7 @@
 
 package com.arthenica.mobileffmpeg;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -298,11 +299,10 @@ public class FFmpegTest {
                     "video:426kB audio:6190kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown";
 
     @Test
-    public void mediaInformationParse() {
-        final int endIndex = MEDIA_INFORMATION_JPG.indexOf("Press [q] to stop, [?] for help");
+    public void mediaInformationMp3() {
+        MediaInformation mediaInformation = MediaInformation.from(MEDIA_INFORMATION_MP3);
 
-        final String output = MEDIA_INFORMATION_JPG.substring(0, endIndex);
-        System.out.println("output = " + output);
+        Assert.assertNotNull(mediaInformation);
     }
 
 }
