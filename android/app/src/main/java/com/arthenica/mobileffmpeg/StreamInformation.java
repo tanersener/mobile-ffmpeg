@@ -28,24 +28,31 @@ public class StreamInformation {
     /**
      * Stream index
      */
-    private Integer index;
+    private Long index;
 
     private String type;
     private String codec;
+    private String fullCodec;
     private String format;
+    private String fullFormat;
 
-    private String width;
-    private String height;
+    private Long width;
+    private Long height;
+
+    private Long bitrate;
+    private Long sampleRate;
+    private String sampleFormat;
+    private String channelLayout;
 
     /**
-     * Sample Aspect Ratio
+     * SAR
      */
-    private String sar;
+    private String sampleAspectRatio;
 
     /**
-     * Display Aspect Ratio
+     * DAR
      */
-    private String dar;
+    private String displayAspectRatio;
 
     /**
      * fps
@@ -76,11 +83,11 @@ public class StreamInformation {
         this.metadata = new HashMap<>();
     }
 
-    public Integer getIndex() {
+    public Long getIndex() {
         return index;
     }
 
-    public void setIndex(Integer index) {
+    public void setIndex(Long index) {
         this.index = index;
     }
 
@@ -100,6 +107,14 @@ public class StreamInformation {
         this.codec = codec;
     }
 
+    public String getFullCodec() {
+        return fullCodec;
+    }
+
+    public void setFullCodec(String fullCodec) {
+        this.fullCodec = fullCodec;
+    }
+
     public String getFormat() {
         return format;
     }
@@ -108,36 +123,76 @@ public class StreamInformation {
         this.format = format;
     }
 
-    public String getWidth() {
+    public String getFullFormat() {
+        return fullFormat;
+    }
+
+    public void setFullFormat(String fullFormat) {
+        this.fullFormat = fullFormat;
+    }
+
+    public Long getWidth() {
         return width;
     }
 
-    public void setWidth(String width) {
+    public void setWidth(Long width) {
         this.width = width;
     }
 
-    public String getHeight() {
+    public Long getHeight() {
         return height;
     }
 
-    public void setHeight(String height) {
+    public void setHeight(Long height) {
         this.height = height;
     }
 
-    public String getSar() {
-        return sar;
+    public Long getBitrate() {
+        return bitrate;
     }
 
-    public void setSar(String sar) {
-        this.sar = sar;
+    public void setBitrate(Long bitrate) {
+        this.bitrate = bitrate;
     }
 
-    public String getDar() {
-        return dar;
+    public Long getSampleRate() {
+        return sampleRate;
     }
 
-    public void setDar(String dar) {
-        this.dar = dar;
+    public void setSampleRate(Long sampleRate) {
+        this.sampleRate = sampleRate;
+    }
+
+    public String getSampleFormat() {
+        return sampleFormat;
+    }
+
+    public void setSampleFormat(String sampleFormat) {
+        this.sampleFormat = sampleFormat;
+    }
+
+    public String getChannelLayout() {
+        return channelLayout;
+    }
+
+    public void setChannelLayout(String channelLayout) {
+        this.channelLayout = channelLayout;
+    }
+
+    public String getSampleAspectRatio() {
+        return sampleAspectRatio;
+    }
+
+    public void setSampleAspectRatio(String sampleAspectRatio) {
+        this.sampleAspectRatio = sampleAspectRatio;
+    }
+
+    public String getDisplayAspectRatio() {
+        return displayAspectRatio;
+    }
+
+    public void setDisplayAspectRatio(String displayAspectRatio) {
+        this.displayAspectRatio = displayAspectRatio;
     }
 
     public String getAverageFrameRate() {

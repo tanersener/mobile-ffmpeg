@@ -148,11 +148,24 @@ public class FFmpeg {
     /**
      * <p>Returns media information for given file.
      *
+     * @param path path or uri of media file
      * @return media information
      * @since 3.0
      */
-    public static String getMediaInformation(final String filePath) {
-        int i = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", filePath, "-f", "null", "-"}, "Press [q] to stop, [?] for help", 1000);
+    public static String getMediaInformation(final String path) {
+        return getMediaInformation(path, 10000L);
+    }
+
+    /**
+     * <p>Returns media information for given file.
+     *
+     * @param path    path or uri of media file
+     * @param timeout complete timeout
+     * @return media information
+     * @since 3.0
+     */
+    public static String getMediaInformation(final String path, final Long timeout) {
+        Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path, "-f", "null", "-"}, "Press [q] to stop, [?] for help", timeout);
         return Config.getSystemCommandOutput();
     }
 

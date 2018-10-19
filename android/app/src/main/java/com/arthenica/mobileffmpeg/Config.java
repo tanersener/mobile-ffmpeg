@@ -415,6 +415,9 @@ public class Config {
         runningSystemCommand = true;
 
         int rc = Config.nativeExecute(arguments);
+        if (rc != 0) {
+            return rc;
+        }
 
         long totalWaitTime = 0;
 
@@ -430,6 +433,8 @@ public class Config {
         }
 
         runningSystemCommand = false;
+
+        nativeCancel();
 
         return rc;
     }
