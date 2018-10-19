@@ -204,13 +204,13 @@ public class Config {
             return;
         }
 
-        // ALWAYS REDIRECT COMMAND OUTPUT
-        FFmpeg.appendCommandOutput(text);
-
         if (activeLogLevel == Level.AV_LOG_QUIET || levelValue > activeLogLevel.getValue()) {
             // LOG NEITHER PRINTED NOR FORWARDED
             return;
         }
+
+        // ALWAYS REDIRECT COMMAND OUTPUT
+        FFmpeg.appendCommandOutput(text);
 
         if (logCallbackFunction != null) {
             logCallbackFunction.apply(new LogMessage(level, text));
