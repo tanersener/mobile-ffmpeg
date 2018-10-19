@@ -27,8 +27,6 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -406,23 +404,21 @@ public class Config {
     /**
      * Executes system command. System command is not logged to output.
      *
-     * @param arguments               command arguments
-     * @param commandOutputEndPattern pattern which will indicate that operation has ended
-     * @param timeout                 execution timeout
+     * @param arguments                   command arguments
+     * @param commandOutputEndPatternList list of patterns which will indicate that operation has ended
+     * @param timeout                     execution timeout
      * @return return code
      */
-    static int systemExecute(final String[] arguments, final String commandOutputEndPattern, final long timeout) {
+    static int systemExecute(final String[] arguments, final List<String> commandOutputEndPatternList, final long timeout) {
+        systemCommandOutputReference.set(new StringBuffer());
         runningSystemCommand = true;
 
         int rc = Config.nativeExecute(arguments);
-        if (rc != 0) {
-            return rc;
-        }
 
         long totalWaitTime = 0;
 
         try {
-            while (!systemCommandOutputReference.get().toString().contains(commandOutputEndPattern) && (totalWaitTime < timeout)) {
+            while (!systemCommandOutputContainsPattern(commandOutputEndPatternList) && (totalWaitTime < timeout)) {
                 synchronized (systemCommandOutputReference) {
                     systemCommandOutputReference.wait(20);
                 }
@@ -437,6 +433,17 @@ public class Config {
         nativeCancel();
 
         return rc;
+    }
+
+    private static boolean systemCommandOutputContainsPattern(final List<String> patternList) {
+        String string = systemCommandOutputReference.get().toString();
+        for (String pattern : patternList) {
+            if (string.contains(pattern)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

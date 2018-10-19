@@ -19,6 +19,10 @@
 
 package com.arthenica.mobileffmpeg;
 
+import android.util.Log;
+
+import java.util.Arrays;
+
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
  * FFmpeg commands.
@@ -152,7 +156,7 @@ public class FFmpeg {
      * @return media information
      * @since 3.0
      */
-    public static String getMediaInformation(final String path) {
+    public static MediaInformation getMediaInformation(final String path) {
         return getMediaInformation(path, 10000L);
     }
 
@@ -164,9 +168,15 @@ public class FFmpeg {
      * @return media information
      * @since 3.0
      */
-    public static String getMediaInformation(final String path, final Long timeout) {
-        Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path, "-f", "null", "-"}, "Press [q] to stop, [?] for help", timeout);
-        return Config.getSystemCommandOutput();
+    public static MediaInformation getMediaInformation(final String path, final Long timeout) {
+        int rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path, "-f", "null", "-"}, Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed"), timeout);
+
+        if (rc == 0) {
+            return MediaInformationParser.from(Config.getSystemCommandOutput());
+        } else {
+            Log.i(Config.TAG, Config.getSystemCommandOutput());
+            return null;
+        }
     }
 
 }
