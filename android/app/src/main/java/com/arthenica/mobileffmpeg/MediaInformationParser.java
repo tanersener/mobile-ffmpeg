@@ -432,7 +432,7 @@ public class MediaInformationParser {
         int count = 1;
 
         while (count <= n) {
-            startIndex = string.indexOf(substring, startIndex + 1);
+            startIndex = string.indexOf(substring, startIndex + substring.length());
             count++;
         }
 

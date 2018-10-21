@@ -59,6 +59,7 @@ public class MediaInformationTest {
     public void index() {
         Assert.assertEquals(7, MediaInformationParser.index("one:two:three:", ":", 0, 2));
         Assert.assertEquals(13, MediaInformationParser.index("one:two:three:", ":", 0, 3));
+        Assert.assertEquals(8, MediaInformationParser.index("one::two::three::", "::", 0, 2));
     }
 
     @Test
