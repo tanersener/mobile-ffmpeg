@@ -172,7 +172,7 @@ public class MediaInformationTest {
         parseStartTime("10.003000", 10003L);
         parseStartTime("324.000000", 324000L);
         parseStartTime("-4.000000", -4000L);
-        parseStartTime("14.00030", 14000L);
+        parseStartTime("14.00030", 14001L);
         parseStartTime("14.00080", 14001L);
     }
 

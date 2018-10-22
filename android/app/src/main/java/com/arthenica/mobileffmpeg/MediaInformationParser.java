@@ -378,7 +378,7 @@ public class MediaInformationParser {
 
         try {
             BigDecimal bigDecimal = new BigDecimal(startTime);
-            bigDecimal = bigDecimal.setScale(3, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(1000));
+            bigDecimal = bigDecimal.setScale(3, BigDecimal.ROUND_CEILING).multiply(new BigDecimal(1000));
             return bigDecimal.longValue();
         } catch (NumberFormatException e) {
             Log.d(Config.TAG, String.format("Parsing startTime: %s failed.", startTime), e);
