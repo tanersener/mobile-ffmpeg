@@ -168,6 +168,7 @@ public class MediaInformationTest {
     public void parseStartTime() {
         parseStartTime(null, null);
         parseStartTime("", null);
+        parseStartTime("N/A", null);
         parseStartTime("0.000000", 0L);
         parseStartTime("10.003000", 10003L);
         parseStartTime("324.000000", 324000L);
@@ -189,7 +190,7 @@ public class MediaInformationTest {
     public void parseInputBlock() {
         parseInputBlock("Input #0,", null, null);
         parseInputBlock("Input #0, ogg, from 'trailer_400p.ogg':", "ogg", "trailer_400p.ogg");
-        parseInputBlock("Input #0, mp3, from 'cold_stone_-_planet_x.mp3':", "mp3", "cold_stone_-_planet_x.mp3");
+        parseInputBlock("Input #0, mp3, from 'beethoven_-_symphony_no_9.mp3':", "mp3", "beethoven_-_symphony_no_9.mp3");
         parseInputBlock("Input #0, image2, from '/data/user/0/com.arthenica.mobileffmpeg.test/cache/colosseum.jpg':", "image2", "/data/user/0/com.arthenica.mobileffmpeg.test/cache/colosseum.jpg");
         parseInputBlock("Input #0, gif, from 'advanced_zoom_in_and_pan_with_fade_in_out.gif':", "gif", "advanced_zoom_in_and_pan_with_fade_in_out.gif");
         parseInputBlock("Input #0, mov,mp4,m4a,3gp,3g2,mj2, from 'transition_rotate.mp4':", "mov,mp4,m4a,3gp,3g2,mj2", "transition_rotate.mp4");
