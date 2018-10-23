@@ -22,6 +22,8 @@
 #include <Foundation/Foundation.h>
 #include "libavutil/ffversion.h"
 
+#include "MediaInformationParser.h"
+
 /** Global library version */
 extern NSString *const MOBILE_FFMPEG_VERSION;
 
@@ -33,13 +35,6 @@ extern int const RETURN_CODE_CANCEL;
  * Main class for FFmpeg operations.
  */
 @interface MobileFFmpeg : NSObject
-
-/**
- * Appends given log output to the last command output.
- *
- * \param output log output
- */
-+ (void)appendCommandOutput: (NSString*)output;
 
 /**
  * Returns FFmpeg version bundled within the library.
@@ -80,7 +75,7 @@ extern int const RETURN_CODE_CANCEL;
  * \param arguments delimiter
  * \return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)executeWithDelimiter: (NSString*)command delimiter:(NSString*)delimiter;
++ (int)execute: (NSString*)command delimiter:(NSString*)delimiter;
 
 /**
  * Cancels an ongoing operation.
@@ -103,5 +98,22 @@ extern int const RETURN_CODE_CANCEL;
  * \return output of last executed command
  */
 + (NSString*)getLastCommandOutput;
+
+/**
+ * Returns media information for given file.
+ *
+ * \param path or uri of media file
+ * \return media information
+ */
++ (MediaInformation*)getMediaInformation: (NSString*)path;
+
+/**
+ * Returns media information for given file.
+ *
+ * \param path    path or uri of media file
+ * \param timeout complete timeout
+ * \return media information
+ */
+ + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout;
 
 @end

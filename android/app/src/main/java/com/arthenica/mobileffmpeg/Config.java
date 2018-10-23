@@ -196,6 +196,8 @@ public class Config {
         final String text = new String(logMessage);
 
         if (runningSystemCommand) {
+
+            // REDIRECT SYSTEM OUTPUT
             if (activeLogLevel != Level.AV_LOG_QUIET && levelValue <= activeLogLevel.getValue()) {
                 systemCommandOutputReference.get().append(text);
             }

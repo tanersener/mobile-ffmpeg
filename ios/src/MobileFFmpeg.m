@@ -35,8 +35,11 @@ NSString *const MOBILE_FFMPEG_VERSION = @"3.0";
 int const RETURN_CODE_SUCCESS = 0;
 int const RETURN_CODE_CANCEL = 255;
 
-static int lastReturnCode;
-static NSMutableString *lastCommandOutput;
+int lastReturnCode;
+NSMutableString *lastCommandOutput;
+
+extern NSMutableString *systemCommandOutput;
+extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPatternList, long timeout);
 
 + (void)initialize {
     [MobileFFmpegConfig class];
@@ -44,16 +47,7 @@ static NSMutableString *lastCommandOutput;
     lastReturnCode = 0;
     lastCommandOutput = [[NSMutableString alloc] init];
 
-    NSLog(@"Loaded mobile-ffmpeg-%@-%@\n", [ArchDetect getArch], [MobileFFmpeg getVersion]);
-}
-
-/**
- * Appends given log output to the last command output.
- *
- * \param output log output
- */
-+ (void)appendCommandOutput: (NSString*)output {
-    [lastCommandOutput appendString:output];
+    NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpeg getVersion]);
 }
 
 /**
@@ -115,7 +109,7 @@ static NSMutableString *lastCommandOutput;
  * \return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)execute: (NSString*)command {
-    return [self execute:argumentArray delimiter:@" "];
+    return [self execute:command delimiter:@" "];
 }
 
 /**
@@ -126,11 +120,11 @@ static NSMutableString *lastCommandOutput;
  * \param arguments delimiter
  * \return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)executeWithDelimiter: (NSString*)command delimiter:(NSString*)delimiter {
++ (int)execute: (NSString*)command delimiter:(NSString*)delimiter {
 
     // SPLITTING ARGUMENTS
     NSArray* argumentArray = [command componentsSeparatedByString:delimiter];
-    return [self executeWithArray:argumentArray];
+    return [self executeWithArguments:argumentArray];
 }
 
 /**
@@ -159,6 +153,34 @@ static NSMutableString *lastCommandOutput;
  */
 + (NSString*)getLastCommandOutput {
     return lastCommandOutput;
+}
+
+/**
+ * Returns media information for given file.
+ *
+ * \param path or uri of media file
+ * \return media information
+ */
++ (MediaInformation*)getMediaInformation: (NSString*)path {
+    return [MobileFFmpeg getMediaInformation:path timeout:10000];
+}
+
+/**
+ * Returns media information for given file.
+ *
+ * \param path    path or uri of media file
+ * \param timeout complete timeout
+ * \return media information
+ */
+ + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
+    int rc = mobileffmpeg_system_execute([[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, @"-f", @"null", @"-", nil], [[NSArray alloc] initWithObjects:@"Press [q] to stop, [?] for help", @"No such file or directory", @"Input/output error", @"Conversion failed", nil], timeout);
+
+    if (rc == 0) {
+        return [MediaInformationParser from:systemCommandOutput];
+    } else {
+        NSLog(@"%@", systemCommandOutput);
+        return nil;
+    }
 }
 
 @end

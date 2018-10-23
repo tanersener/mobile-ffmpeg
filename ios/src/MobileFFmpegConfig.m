@@ -18,7 +18,6 @@
  */
 
 #include "fftools_ffmpeg.h"
-
 #include "MobileFFmpegConfig.h"
 #include "ArchDetect.h"
 #include "MobileFFmpeg.h"
@@ -144,6 +143,13 @@ NSString *const LIB_NAME = @"mobile-ffmpeg";
 
 static Statistics *lastReceivedStatistics = nil;
 
+static NSMutableArray *supportedExternalLibraries;
+
+extern NSMutableString *lastCommandOutput;
+
+NSMutableString *systemCommandOutput;
+static int runningSystemCommand;
+
 void callbackWait(int milliSeconds) {
     dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(milliSeconds * NSEC_PER_MSEC)));
 }
@@ -244,10 +250,19 @@ void callbackBlockFunction() {
                     // LOG CALLBACK
                     int activeLogLevel = [MobileFFmpegConfig getLogLevel];
 
-                    if (activeLogLevel == AV_LOG_QUIET || [callbackData getLogLevel] > activeLogLevel) {
+                    if (runningSystemCommand == 1) {
+
+                        // REDIRECT SYSTEM OUTPUT
+                        if ((activeLogLevel != AV_LOG_QUIET) && ([callbackData getLogLevel] <= activeLogLevel)) {
+                            [systemCommandOutput appendString:[callbackData getLogData]];
+                        }
+                    } else if ((activeLogLevel == AV_LOG_QUIET) || ([callbackData getLogLevel] > activeLogLevel)) {
 
                         // LOG NEITHER PRINTED NOR FORWARDED
                     } else {
+
+                        // ALWAYS REDIRECT COMMAND OUTPUT
+                        [lastCommandOutput appendString:[callbackData getLogData]];
 
                         if (logDelegate != nil) {
 
@@ -288,9 +303,92 @@ void callbackBlockFunction() {
     NSLog(@"Async callback block stopped.\n");
 }
 
+static int systemCommandOutputContainsPattern(NSArray *patternList) {
+    for (int i=0; i < [patternList count]; i++) {
+        NSString *pattern = [patternList objectAtIndex:i];
+        if ([systemCommandOutput rangeOfString:pattern].location != NSNotFound) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+/**
+ * Executes system command. System command is not logged to output.
+ *
+ * \param arguments command arguments
+ * \param commandOutputEndPatternList list of patterns which will indicate that operation has ended
+ * \param timeout execution timeout
+ * \return return code
+ */
+int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPatternList, long timeout) {
+    systemCommandOutput = [[NSMutableString alloc] init];
+    runningSystemCommand = 1;
+
+    int rc = [MobileFFmpeg executeWithArguments:arguments];
+
+    long totalWaitTime = 0;
+
+    while ((systemCommandOutputContainsPattern(commandOutputEndPatternList) == 0) && (totalWaitTime < timeout)) {
+        [NSThread sleepForTimeInterval:.02];
+        totalWaitTime += 20;
+    }
+
+    runningSystemCommand = 0;
+
+    [MobileFFmpeg cancel];
+
+    return rc;
+}
+
+@interface MobileFFmpegConfig()
+
+/**
+ * Returns build configuration for FFmpeg.
+ *
+ * \return build configuration string
+ */
++ (NSString*)getBuildConf;
+
+@end
+
 @implementation MobileFFmpegConfig
 
 + (void)initialize {
+    supportedExternalLibraries = [[NSMutableArray alloc] init];
+    [supportedExternalLibraries addObject:@"chromaprint"];
+    [supportedExternalLibraries addObject:@"fontconfig"];
+    [supportedExternalLibraries addObject:@"freetype"];
+    [supportedExternalLibraries addObject:@"fribidi"];
+    [supportedExternalLibraries addObject:@"gmp"];
+    [supportedExternalLibraries addObject:@"gnutls"];
+    [supportedExternalLibraries addObject:@"kvazaar"];
+    [supportedExternalLibraries addObject:@"mp3lame"];
+    [supportedExternalLibraries addObject:@"libaom"];
+    [supportedExternalLibraries addObject:@"libass"];
+    [supportedExternalLibraries addObject:@"iconv"];
+    [supportedExternalLibraries addObject:@"libilbc"];
+    [supportedExternalLibraries addObject:@"libtheora"];
+    [supportedExternalLibraries addObject:@"libvidstab"];
+    [supportedExternalLibraries addObject:@"libvorbis"];
+    [supportedExternalLibraries addObject:@"libvpx"];
+    [supportedExternalLibraries addObject:@"libwebp"];
+    [supportedExternalLibraries addObject:@"libxml2"];
+    [supportedExternalLibraries addObject:@"opencore-amr"];
+    [supportedExternalLibraries addObject:@"opus"];
+    [supportedExternalLibraries addObject:@"shine"];
+    [supportedExternalLibraries addObject:@"sdl"];
+    [supportedExternalLibraries addObject:@"snappy"];
+    [supportedExternalLibraries addObject:@"soxr"];
+    [supportedExternalLibraries addObject:@"speex"];
+    [supportedExternalLibraries addObject:@"tesseract"];
+    [supportedExternalLibraries addObject:@"twolame"];
+    [supportedExternalLibraries addObject:@"wavpack"];
+    [supportedExternalLibraries addObject:@"x264"];
+    [supportedExternalLibraries addObject:@"x265"];
+    [supportedExternalLibraries addObject:@"xvidcore"];
+
     [ArchDetect class];
     [MobileFFmpeg class];
 
@@ -299,6 +397,9 @@ void callbackBlockFunction() {
     semaphore = dispatch_semaphore_create(0);
     lastReceivedStatistics = [[Statistics alloc] init];
     callbackDataArray = [[NSMutableArray alloc] init];
+
+    runningSystemCommand = 0;
+    systemCommandOutput = [[NSMutableString alloc] init];
 
     [MobileFFmpegConfig enableRedirection];
 }
@@ -500,6 +601,228 @@ void callbackBlockFunction() {
     [MobileFFmpegConfig setFontconfigConfigurationPath:tempConfigurationDirectory];
 
     NSLog(@"Font directory %@ registered successfully.", fontDirectoryPath);
+}
+
+/**
+ * Returns build configuration for FFmpeg.
+ *
+ * \return build configuration string
+ */
++ (NSString*)getBuildConf {
+    return [NSString stringWithUTF8String:FFMPEG_CONFIGURATION];
+}
+
+/**
+ * Returns package name.
+ *
+ * \return guessed package name according to supported external libraries
+ */
++ (NSString*)getPackageName {
+    NSArray *enabledLibraryArray = [MobileFFmpegConfig getExternalLibraries];
+    Boolean speex = [enabledLibraryArray containsObject:@"speex"];
+    Boolean fribidi = [enabledLibraryArray containsObject:@"fribidi"];
+    Boolean gnutls = [enabledLibraryArray containsObject:@"gnutls"];
+    Boolean xvidcore = [enabledLibraryArray containsObject:@"xvidcore"];
+
+    Boolean min = false;
+    Boolean minGpl = false;
+    Boolean https = false;
+    Boolean httpsGpl = false;
+    Boolean audio = false;
+    Boolean video = false;
+    Boolean full = false;
+    Boolean fullGpl = false;
+
+    if (speex && fribidi) {
+        if (xvidcore) {
+            fullGpl = true;
+        } else {
+            full = true;
+        }
+    } else if (speex) {
+        audio = true;
+    } else if (fribidi) {
+        video = true;
+    } else if (xvidcore) {
+        if (gnutls) {
+            httpsGpl = true;
+        } else {
+            minGpl = true;
+        }
+    } else {
+        if (gnutls) {
+            https = true;
+        } else {
+            min = true;
+        }
+    }
+
+    if (fullGpl) {
+        if ([enabledLibraryArray containsObject:@"chromaprint"] &&
+            [enabledLibraryArray containsObject:@"fontconfig"] &&
+            [enabledLibraryArray containsObject:@"freetype"] &&
+            [enabledLibraryArray containsObject:@"fribidi"] &&
+            [enabledLibraryArray containsObject:@"gmp"] &&
+            [enabledLibraryArray containsObject:@"gnutls"] &&
+            [enabledLibraryArray containsObject:@"kvazaar"] &&
+            [enabledLibraryArray containsObject:@"mp3lame"] &&
+            [enabledLibraryArray containsObject:@"libaom"] &&
+            [enabledLibraryArray containsObject:@"libass"] &&
+            [enabledLibraryArray containsObject:@"iconv"] &&
+            [enabledLibraryArray containsObject:@"libilbc"] &&
+            [enabledLibraryArray containsObject:@"libtheora"] &&
+            [enabledLibraryArray containsObject:@"libvidstab"] &&
+            [enabledLibraryArray containsObject:@"libvorbis"] &&
+            [enabledLibraryArray containsObject:@"libvpx"] &&
+            [enabledLibraryArray containsObject:@"libwebp"] &&
+            [enabledLibraryArray containsObject:@"libxml2"] &&
+            [enabledLibraryArray containsObject:@"opencore-amr"] &&
+            [enabledLibraryArray containsObject:@"opus"] &&
+            [enabledLibraryArray containsObject:@"shine"] &&
+            [enabledLibraryArray containsObject:@"sdl"] &&
+            [enabledLibraryArray containsObject:@"snappy"] &&
+            [enabledLibraryArray containsObject:@"soxr"] &&
+            [enabledLibraryArray containsObject:@"speex"] &&
+            [enabledLibraryArray containsObject:@"tesseract"] &&
+            [enabledLibraryArray containsObject:@"twolame"] &&
+            [enabledLibraryArray containsObject:@"wavpack"] &&
+            [enabledLibraryArray containsObject:@"x264"] &&
+            [enabledLibraryArray containsObject:@"x265"] &&
+            [enabledLibraryArray containsObject:@"xvidcore"]) {
+            return @"full-gpl";
+        } else {
+            return @"custom";
+        }
+    }
+
+    if (full) {
+        if ([enabledLibraryArray containsObject:@"chromaprint"] &&
+            [enabledLibraryArray containsObject:@"fontconfig"] &&
+            [enabledLibraryArray containsObject:@"freetype"] &&
+            [enabledLibraryArray containsObject:@"fribidi"] &&
+            [enabledLibraryArray containsObject:@"gmp"] &&
+            [enabledLibraryArray containsObject:@"gnutls"] &&
+            [enabledLibraryArray containsObject:@"kvazaar"] &&
+            [enabledLibraryArray containsObject:@"mp3lame"] &&
+            [enabledLibraryArray containsObject:@"libaom"] &&
+            [enabledLibraryArray containsObject:@"libass"] &&
+            [enabledLibraryArray containsObject:@"iconv"] &&
+            [enabledLibraryArray containsObject:@"libilbc"] &&
+            [enabledLibraryArray containsObject:@"libtheora"] &&
+            [enabledLibraryArray containsObject:@"libvorbis"] &&
+            [enabledLibraryArray containsObject:@"libvpx"] &&
+            [enabledLibraryArray containsObject:@"libwebp"] &&
+            [enabledLibraryArray containsObject:@"libxml2"] &&
+            [enabledLibraryArray containsObject:@"opencore-amr"] &&
+            [enabledLibraryArray containsObject:@"opus"] &&
+            [enabledLibraryArray containsObject:@"shine"] &&
+            [enabledLibraryArray containsObject:@"sdl"] &&
+            [enabledLibraryArray containsObject:@"snappy"] &&
+            [enabledLibraryArray containsObject:@"soxr"] &&
+            [enabledLibraryArray containsObject:@"speex"] &&
+            [enabledLibraryArray containsObject:@"tesseract"] &&
+            [enabledLibraryArray containsObject:@"twolame"] &&
+            [enabledLibraryArray containsObject:@"wavpack"]) {
+            return @"full";
+        } else {
+            return @"custom";
+        }
+    }
+
+    if (video) {
+        if ([enabledLibraryArray containsObject:@"fontconfig"] &&
+            [enabledLibraryArray containsObject:@"freetype"] &&
+            [enabledLibraryArray containsObject:@"fribidi"] &&
+            [enabledLibraryArray containsObject:@"kvazaar"] &&
+            [enabledLibraryArray containsObject:@"libaom"] &&
+            [enabledLibraryArray containsObject:@"libass"] &&
+            [enabledLibraryArray containsObject:@"iconv"] &&
+            [enabledLibraryArray containsObject:@"libtheora"] &&
+            [enabledLibraryArray containsObject:@"libvpx"] &&
+            [enabledLibraryArray containsObject:@"libwebp"] &&
+            [enabledLibraryArray containsObject:@"snappy"]) {
+            return @"video";
+        } else {
+            return @"custom";
+        }
+    }
+
+    if (audio) {
+        if ([enabledLibraryArray containsObject:@"mp3lame"] &&
+            [enabledLibraryArray containsObject:@"libilbc"] &&
+            [enabledLibraryArray containsObject:@"libvorbis"] &&
+            [enabledLibraryArray containsObject:@"opencore-amr"] &&
+            [enabledLibraryArray containsObject:@"opus"] &&
+            [enabledLibraryArray containsObject:@"shine"] &&
+            [enabledLibraryArray containsObject:@"soxr"] &&
+            [enabledLibraryArray containsObject:@"speex"] &&
+            [enabledLibraryArray containsObject:@"twolame"] &&
+            [enabledLibraryArray containsObject:@"wavpack"]) {
+            return @"audio";
+        } else {
+            return @"custom";
+        }
+    }
+
+    if (httpsGpl) {
+        if ([enabledLibraryArray containsObject:@"gmp"] &&
+            [enabledLibraryArray containsObject:@"gnutls"] &&
+            [enabledLibraryArray containsObject:@"libvidstab"] &&
+            [enabledLibraryArray containsObject:@"x264"] &&
+            [enabledLibraryArray containsObject:@"x265"] &&
+            [enabledLibraryArray containsObject:@"xvidcore"]) {
+            return @"https-gpl";
+        } else {
+            return @"custom";
+        }
+    }
+
+    if (https) {
+        if ([enabledLibraryArray containsObject:@"gmp"] &&
+            [enabledLibraryArray containsObject:@"gnutls"]) {
+            return @"https";
+        } else {
+            return @"custom";
+        }
+    }
+
+    if (minGpl) {
+        if ([enabledLibraryArray containsObject:@"libvidstab"] &&
+            [enabledLibraryArray containsObject:@"x264"] &&
+            [enabledLibraryArray containsObject:@"x265"] &&
+            [enabledLibraryArray containsObject:@"xvidcore"]) {
+            return @"min-gpl";
+        } else {
+            return @"custom";
+        }
+    }
+
+    return @"min";
+}
+
+/**
+ * Returns supported external libraries.
+ *
+ * \return array of supported external libraries
+ */
++ (NSArray*)getExternalLibraries {
+    NSString *buildConfiguration = [MobileFFmpegConfig getBuildConf];
+    NSMutableArray *enabledLibraryArray = [[NSMutableArray alloc] init];
+
+    for (int i=0; i < [supportedExternalLibraries count]; i++) {
+        NSString *supportedExternalLibrary = [supportedExternalLibraries objectAtIndex:i];
+
+        NSString *libraryName1 = [NSString stringWithFormat:@"enable-%@", supportedExternalLibrary];
+        NSString *libraryName2 = [NSString stringWithFormat:@"enable-lib%@", supportedExternalLibrary];
+
+        if ([buildConfiguration rangeOfString:libraryName1].location != NSNotFound || [buildConfiguration rangeOfString:libraryName2].location != NSNotFound) {
+            [enabledLibraryArray addObject:supportedExternalLibrary];
+        }
+    }
+
+    [enabledLibraryArray sortUsingSelector:@selector(compare:)];
+
+    return enabledLibraryArray;
 }
 
 @end

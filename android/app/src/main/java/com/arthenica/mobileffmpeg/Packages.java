@@ -41,10 +41,10 @@ class Packages {
         supportedExternalLibraries.add("gmp");
         supportedExternalLibraries.add("gnutls");
         supportedExternalLibraries.add("kvazaar");
-        supportedExternalLibraries.add("lame");
+        supportedExternalLibraries.add("mp3lame");
         supportedExternalLibraries.add("libaom");
         supportedExternalLibraries.add("libass");
-        supportedExternalLibraries.add("libiconv");
+        supportedExternalLibraries.add("iconv");
         supportedExternalLibraries.add("libilbc");
         supportedExternalLibraries.add("libtheora");
         supportedExternalLibraries.add("libvidstab");
@@ -67,6 +67,11 @@ class Packages {
         supportedExternalLibraries.add("xvidcore");
     }
 
+    /**
+     * Returns enabled external libraries by FFmpeg.
+     *
+     * @return enabled external libraries
+     */
     static List<String> getExternalLibraries() {
         final String buildConfiguration = Config.getNativeBuildConf();
 
@@ -83,6 +88,11 @@ class Packages {
         return enabledLibraryList;
     }
 
+    /**
+     * Returns MobileFFmpeg binary package name.
+     *
+     * @return guessed MobileFFmpeg binary package name
+     */
     static String getPackageName() {
         final List<String> externalLibraryList = getExternalLibraries();
         final boolean speex = externalLibraryList.contains("speex");
@@ -131,10 +141,10 @@ class Packages {
                     externalLibraryList.contains("gmp") &&
                     externalLibraryList.contains("gnutls") &&
                     externalLibraryList.contains("kvazaar") &&
-                    externalLibraryList.contains("lame") &&
+                    externalLibraryList.contains("mp3lame") &&
                     externalLibraryList.contains("libaom") &&
                     externalLibraryList.contains("libass") &&
-                    externalLibraryList.contains("libiconv") &&
+                    externalLibraryList.contains("iconv") &&
                     externalLibraryList.contains("libilbc") &&
                     externalLibraryList.contains("libtheora") &&
                     externalLibraryList.contains("libvidstab") &&
@@ -169,10 +179,10 @@ class Packages {
                     externalLibraryList.contains("gmp") &&
                     externalLibraryList.contains("gnutls") &&
                     externalLibraryList.contains("kvazaar") &&
-                    externalLibraryList.contains("lame") &&
+                    externalLibraryList.contains("mp3lame") &&
                     externalLibraryList.contains("libaom") &&
                     externalLibraryList.contains("libass") &&
-                    externalLibraryList.contains("libiconv") &&
+                    externalLibraryList.contains("iconv") &&
                     externalLibraryList.contains("libilbc") &&
                     externalLibraryList.contains("libtheora") &&
                     externalLibraryList.contains("libvorbis") &&
@@ -202,7 +212,7 @@ class Packages {
                     externalLibraryList.contains("kvazaar") &&
                     externalLibraryList.contains("libaom") &&
                     externalLibraryList.contains("libass") &&
-                    externalLibraryList.contains("libiconv") &&
+                    externalLibraryList.contains("iconv") &&
                     externalLibraryList.contains("libtheora") &&
                     externalLibraryList.contains("libvpx") &&
                     externalLibraryList.contains("libwebp") &&
@@ -214,7 +224,7 @@ class Packages {
         }
 
         if (audio) {
-            if (externalLibraryList.contains("lame") &&
+            if (externalLibraryList.contains("mp3lame") &&
                     externalLibraryList.contains("libilbc") &&
                     externalLibraryList.contains("libvorbis") &&
                     externalLibraryList.contains("opencore-amr") &&
