@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public Integer call() {
-                int returnCode = FFmpeg.execute(arguments);
+                int returnCode = FFmpeg.execute(arguments, " ");
                 if (runCallback != null) {
                     runCallback.apply(returnCode);
                 }
