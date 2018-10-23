@@ -2250,14 +2250,15 @@ static void setup_quantization(AV1_COMMON *const cm,
 }
 
 // Build y/uv dequant values based on segmentation.
-static void setup_segmentation_dequant(AV1_COMMON *const cm) {
+static void setup_segmentation_dequant(AV1_COMMON *const cm,
+                                       MACROBLOCKD *const xd) {
   const int bit_depth = cm->seq_params.bit_depth;
   const int using_qm = cm->using_qmatrix;
   // When segmentation is disabled, only the first value is used.  The
   // remaining are don't cares.
   const int max_segments = cm->seg.enabled ? MAX_SEGMENTS : 1;
   for (int i = 0; i < max_segments; ++i) {
-    const int qindex = av1_get_qindex(&cm->seg, i, cm->base_qindex);
+    const int qindex = xd->qindex[i];
     cm->y_dequant_QTX[i][0] =
         av1_dc_quant_QTX(qindex, cm->y_dc_delta_q, bit_depth);
     cm->y_dequant_QTX[i][1] = av1_ac_quant_QTX(qindex, 0, bit_depth);
@@ -2269,9 +2270,7 @@ static void setup_segmentation_dequant(AV1_COMMON *const cm) {
         av1_dc_quant_QTX(qindex, cm->v_dc_delta_q, bit_depth);
     cm->v_dequant_QTX[i][1] =
         av1_ac_quant_QTX(qindex, cm->v_ac_delta_q, bit_depth);
-    const int lossless = qindex == 0 && cm->y_dc_delta_q == 0 &&
-                         cm->u_dc_delta_q == 0 && cm->u_ac_delta_q == 0 &&
-                         cm->v_dc_delta_q == 0 && cm->v_ac_delta_q == 0;
+    const int lossless = xd->lossless[i];
     // NB: depends on base index so there is only 1 set per frame
     // No quant weighting when lossless or signalled not using QM
     int qmlevel = (lossless || using_qm == 0) ? NUM_QM_LEVELS - 1 : cm->qm_y;
@@ -5062,8 +5061,6 @@ static int read_uncompressed_header(AV1Decoder *pbi,
           // pixels set to neutral grey.
           buf_idx = get_free_fb(cm);
           if (buf_idx == INVALID_IDX) {
-            assert(0 &&
-                   "Ran out of free frame buffers. Likely a reference leak.");
             aom_internal_error(&cm->error, AOM_CODEC_MEM_ERROR,
                                "Unable to find free frame buffer");
           }
@@ -5324,9 +5321,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
   xd->cur_frame_force_integer_mv = cm->cur_frame_force_integer_mv;
 
   for (int i = 0; i < MAX_SEGMENTS; ++i) {
-    const int qindex = cm->seg.enabled
-                           ? av1_get_qindex(&cm->seg, i, cm->base_qindex)
-                           : cm->base_qindex;
+    const int qindex = av1_get_qindex(&cm->seg, i, cm->base_qindex);
     xd->lossless[i] = qindex == 0 && cm->y_dc_delta_q == 0 &&
                       cm->u_dc_delta_q == 0 && cm->u_ac_delta_q == 0 &&
                       cm->v_dc_delta_q == 0 && cm->v_ac_delta_q == 0;
@@ -5334,7 +5329,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
   }
   cm->coded_lossless = is_coded_lossless(cm, xd);
   cm->all_lossless = cm->coded_lossless && !av1_superres_scaled(cm);
-  setup_segmentation_dequant(cm);
+  setup_segmentation_dequant(cm, xd);
   if (cm->coded_lossless) {
     cm->lf.filter_level[0] = 0;
     cm->lf.filter_level[1] = 0;

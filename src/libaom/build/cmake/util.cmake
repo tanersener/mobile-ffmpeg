@@ -16,10 +16,10 @@ set(AOM_BUILD_CMAKE_UTIL_CMAKE_ 1)
 # Directory where generated sources will be written.
 set(AOM_GEN_SRC_DIR "${AOM_CONFIG_DIR}/gen_src")
 
-# Creates dummy source file in $AOM_CONFIG_DIR named $basename.$extension and
-# returns the full path to the dummy source file via the $out_file_path
-# parameter.
-macro(create_dummy_source_file basename extension out_file_path)
+# Creates dummy source file in $AOM_GEN_SRC_DIR named $basename.$extension and
+# returns the full path to the dummy source file via appending it to the list
+# variable referred to by $out_file_list_var parameter.
+macro(create_dummy_source_file basename extension out_file_list_var)
   set(dummy_source_file "${AOM_GEN_SRC_DIR}/${basename}_dummy.${extension}")
   file(
     WRITE
@@ -27,13 +27,15 @@ macro(create_dummy_source_file basename extension out_file_path)
       "// ${target_name} needs a ${extension} file to force link language, \n"
       "// or to silence a harmless CMake warning: Ignore me.\n"
       "void ${target_name}_dummy_function(void) {}\n")
+  list(APPEND "${out_file_list_var}" "${dummy_source_file}")
 endmacro()
 
 # Convenience function for adding a dummy source file to $target_name using
 # $extension as the file extension. Wraps create_dummy_source_file().
 function(add_dummy_source_file_to_target target_name extension)
-  create_dummy_source_file("${target_name}" "${extension}" "dummy_source_file")
-  target_sources(${target_name} PRIVATE ${dummy_source_file})
+  create_dummy_source_file("${target_name}" "${extension}"
+                           "dummy_source_file_list")
+  target_sources(${target_name} PRIVATE ${dummy_source_file_list})
 endfunction()
 
 # Sets the value of the variable referenced by $feature to $value, and reports

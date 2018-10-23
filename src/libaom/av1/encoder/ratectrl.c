@@ -973,10 +973,13 @@ static int rc_pick_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
         active_worst_quality =
             AOMMIN(qindex + delta_qindex, active_worst_quality);
       } else {
+        // Increase the boost if the forced keyframe is a forward reference.
+        // These numbers were derived empirically.
+        const double boost_factor = cpi->oxcf.fwd_kf_enabled ? 0.25 : 0.50;
         qindex = rc->last_boosted_qindex;
         last_boosted_q = av1_convert_qindex_to_q(qindex, bit_depth);
-        delta_qindex = av1_compute_qdelta(rc, last_boosted_q,
-                                          last_boosted_q * 0.5, bit_depth);
+        delta_qindex = av1_compute_qdelta(
+            rc, last_boosted_q, last_boosted_q * boost_factor, bit_depth);
         active_best_quality = AOMMAX(qindex + delta_qindex, rc->best_quality);
       }
     } else {

@@ -270,8 +270,17 @@ else()
   add_compiler_flag_if_supported("-Wunused")
   add_compiler_flag_if_supported("-Wvla")
 
-  add_c_flag_if_supported("-Wstack-usage=100000")
-  add_cxx_flag_if_supported("-Wstack-usage=240000")
+  if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND "${SANITIZE}" MATCHES
+     "address|undefined")
+
+    # This combination has more stack overhead, so we account for it by
+    # providing higher stack limit than usual.
+    add_c_flag_if_supported("-Wstack-usage=170000")
+    add_cxx_flag_if_supported("-Wstack-usage=270000")
+  else()
+    add_c_flag_if_supported("-Wstack-usage=100000")
+    add_cxx_flag_if_supported("-Wstack-usage=240000")
+  endif()
 
   # TODO(jzern): this could be added as a cxx flags for test/*.cc only, avoiding
   # third_party.
@@ -369,13 +378,3 @@ execute_process(COMMAND ${CMAKE_COMMAND} -DAOM_CONFIG_DIR=${AOM_CONFIG_DIR}
                         -DGIT_EXECUTABLE=${GIT_EXECUTABLE}
                         -DPERL_EXECUTABLE=${PERL_EXECUTABLE} -P
                         "${AOM_ROOT}/build/cmake/version.cmake")
-
-if(NOT MSVC) # Generate aom.pc (pkg-config file).
-  execute_process(COMMAND ${CMAKE_COMMAND} -DAOM_CONFIG_DIR=${AOM_CONFIG_DIR}
-                          -DAOM_ROOT=${AOM_ROOT}
-                          -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                          -DCMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
-                          -DCONFIG_MULTITHREAD=${CONFIG_MULTITHREAD}
-                          -DHAVE_PTHREAD_H=${HAVE_PTHREAD_H} -P
-                          "${AOM_ROOT}/build/cmake/pkg_config.cmake")
-endif()

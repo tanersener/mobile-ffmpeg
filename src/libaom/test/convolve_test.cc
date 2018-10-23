@@ -273,6 +273,8 @@ class ConvolveTest : public ::testing::TestWithParam<ConvolveParam> {
     input_ = reinterpret_cast<uint8_t *>(
                  aom_memalign(kDataAlignment, kInputBufferSize + 1)) +
              1;
+    ref8_ = reinterpret_cast<uint8_t *>(
+        aom_memalign(kDataAlignment, kOutputStride * kMaxDimension));
     output_ = reinterpret_cast<uint8_t *>(
         aom_memalign(kDataAlignment, kOutputBufferSize));
     output_ref_ = reinterpret_cast<uint8_t *>(
@@ -280,6 +282,8 @@ class ConvolveTest : public ::testing::TestWithParam<ConvolveParam> {
     input16_ = reinterpret_cast<uint16_t *>(aom_memalign(
                    kDataAlignment, (kInputBufferSize + 1) * sizeof(uint16_t))) +
                1;
+    ref16_ = reinterpret_cast<uint16_t *>(aom_memalign(
+        kDataAlignment, kOutputStride * kMaxDimension * sizeof(uint16_t)));
     output16_ = reinterpret_cast<uint16_t *>(
         aom_memalign(kDataAlignment, (kOutputBufferSize) * sizeof(uint16_t)));
     output16_ref_ = reinterpret_cast<uint16_t *>(
@@ -291,12 +295,16 @@ class ConvolveTest : public ::testing::TestWithParam<ConvolveParam> {
   static void TearDownTestCase() {
     aom_free(input_ - 1);
     input_ = NULL;
+    aom_free(ref8_);
+    ref8_ = NULL;
     aom_free(output_);
     output_ = NULL;
     aom_free(output_ref_);
     output_ref_ = NULL;
     aom_free(input16_ - 1);
     input16_ = NULL;
+    aom_free(ref16_);
+    ref16_ = NULL;
     aom_free(output16_);
     output16_ = NULL;
     aom_free(output16_ref_);
@@ -449,18 +457,22 @@ class ConvolveTest : public ::testing::TestWithParam<ConvolveParam> {
 
   const ConvolveFunctions *UUT_;
   static uint8_t *input_;
+  static uint8_t *ref8_;
   static uint8_t *output_;
   static uint8_t *output_ref_;
   static uint16_t *input16_;
+  static uint16_t *ref16_;
   static uint16_t *output16_;
   static uint16_t *output16_ref_;
   int mask_;
 };
 
 uint8_t *ConvolveTest::input_ = NULL;
+uint8_t *ConvolveTest::ref8_ = NULL;
 uint8_t *ConvolveTest::output_ = NULL;
 uint8_t *ConvolveTest::output_ref_ = NULL;
 uint16_t *ConvolveTest::input16_ = NULL;
+uint16_t *ConvolveTest::ref16_ = NULL;
 uint16_t *ConvolveTest::output16_ = NULL;
 uint16_t *ConvolveTest::output16_ref_ = NULL;
 
@@ -517,13 +529,11 @@ const int16_t kInvalidFilter[8] = { 0 };
 TEST_P(ConvolveTest, MatchesReferenceSubpixelFilter) {
   uint8_t *const in = input();
   uint8_t *const out = output();
-  uint8_t ref8[kOutputStride * kMaxDimension];
-  uint16_t ref16[kOutputStride * kMaxDimension];
   uint8_t *ref;
   if (UUT_->use_highbd_ == 0) {
-    ref = ref8;
+    ref = ref8_;
   } else {
-    ref = CONVERT_TO_BYTEPTR(ref16);
+    ref = CONVERT_TO_BYTEPTR(ref16_);
   }
   int subpel_search;
   for (subpel_search = USE_4_TAPS; subpel_search <= USE_8_TAPS;
@@ -572,13 +582,11 @@ TEST_P(ConvolveTest, MatchesReferenceSubpixelFilter) {
 TEST_P(ConvolveTest, FilterExtremes) {
   uint8_t *const in = input();
   uint8_t *const out = output();
-  uint8_t ref8[kOutputStride * kMaxDimension];
-  uint16_t ref16[kOutputStride * kMaxDimension];
   uint8_t *ref;
   if (UUT_->use_highbd_ == 0) {
-    ref = ref8;
+    ref = ref8_;
   } else {
-    ref = CONVERT_TO_BYTEPTR(ref16);
+    ref = CONVERT_TO_BYTEPTR(ref16_);
   }
 
   // Populate ref and out with some random data
@@ -678,13 +686,11 @@ TEST_P(ConvolveTest, DISABLED_Copy_Speed) {
 TEST_P(ConvolveTest, DISABLED_Speed) {
   uint8_t *const in = input();
   uint8_t *const out = output();
-  uint8_t ref8[kOutputStride * kMaxDimension];
-  uint16_t ref16[kOutputStride * kMaxDimension];
   uint8_t *ref;
   if (UUT_->use_highbd_ == 0) {
-    ref = ref8;
+    ref = ref8_;
   } else {
-    ref = CONVERT_TO_BYTEPTR(ref16);
+    ref = CONVERT_TO_BYTEPTR(ref16_);
   }
 
   // Populate ref and out with some random data

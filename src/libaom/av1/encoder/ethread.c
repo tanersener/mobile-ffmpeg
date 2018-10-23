@@ -416,7 +416,7 @@ static void create_enc_workers(AV1_COMP *cpi, int num_workers) {
       for (int j = 0; j < 2; ++j) {
         CHECK_MEM_ERROR(
             cm, thread_data->td->tmp_obmc_bufs[j],
-            aom_memalign(16, 2 * MAX_MB_PLANE * MAX_SB_SQUARE *
+            aom_memalign(32, 2 * MAX_MB_PLANE * MAX_SB_SQUARE *
                                  sizeof(*thread_data->td->tmp_obmc_bufs[j])));
       }
 
@@ -455,12 +455,17 @@ static void launch_enc_workers(AV1_COMP *cpi, int num_workers) {
 
 static void sync_enc_workers(AV1_COMP *cpi, int num_workers) {
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
+  int had_error = 0;
 
   // Encoding ends.
   for (int i = 0; i < num_workers; i++) {
     AVxWorker *const worker = &cpi->workers[i];
-    winterface->sync(worker);
+    had_error |= !winterface->sync(worker);
   }
+
+  if (had_error)
+    aom_internal_error(&cpi->common.error, AOM_CODEC_ERROR,
+                       "Failed to encode tile data");
 }
 
 static void accumulate_counters_enc_workers(AV1_COMP *cpi, int num_workers) {
@@ -494,6 +499,7 @@ static void prepare_enc_workers(AV1_COMP *cpi, AVxWorkerHook hook,
       thread_data->td->mb.above_pred_buf = thread_data->td->above_pred_buf;
       thread_data->td->mb.left_pred_buf = thread_data->td->left_pred_buf;
       thread_data->td->mb.wsrc_buf = thread_data->td->wsrc_buf;
+
 #if CONFIG_COLLECT_INTER_MODE_RD_STATS
       thread_data->td->mb.inter_modes_info = thread_data->td->inter_modes_info;
 #endif

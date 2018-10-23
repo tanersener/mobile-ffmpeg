@@ -2225,7 +2225,6 @@ static void allocate_gf_group_bits(AV1_COMP *cpi, int64_t gf_group_bits,
     } else if (cpi->new_bwdref_update_rule &&
                gf_group->update_type[frame_index] == INTNL_OVERLAY_UPDATE) {
       assert(gf_group->pyramid_height <= MAX_PYRAMID_LVL &&
-             gf_group->pyramid_height >= 0 &&
              "non-valid height for a pyramid structure");
 
       const int arf_pos = gf_group->arf_pos_in_gf[frame_index];
@@ -2273,7 +2272,6 @@ static void allocate_gf_group_bits(AV1_COMP *cpi, int64_t gf_group_bits,
       if (cpi->new_bwdref_update_rule &&
           gf_group->update_type[frame_index] == INTNL_OVERLAY_UPDATE) {
         assert(gf_group->pyramid_height <= MAX_PYRAMID_LVL &&
-               gf_group->pyramid_height >= 0 &&
                "non-valid height for a pyramid structure");
         const int arf_pos = gf_group->arf_pos_in_gf[frame_index];
         const int this_lvl = gf_group->pyramid_level[arf_pos];

@@ -197,6 +197,7 @@ static void set_good_speed_features_framesize_independent(AV1_COMP *cpi,
   sf->gm_disable_recode = 1;
   sf->use_fast_interpolation_filter_search = 1;
   sf->intra_tx_size_search_init_depth_sqr = 1;
+  sf->intra_angle_estimation = 1;
 
   if (speed >= 1) {
     sf->gm_erroradv_type = GM_ERRORADV_TR_1;
@@ -453,6 +454,7 @@ void av1_set_speed_features_framesize_independent(AV1_COMP *cpi) {
   sf->jnt_comp_fast_tx_search = 0;
   sf->use_jnt_comp_flag = JNT_COMP_ENABLED;
   sf->reuse_inter_intra_mode = 0;
+  sf->intra_angle_estimation = 0;
 
   for (i = 0; i < TX_SIZES; i++) {
     sf->intra_y_mode_mask[i] = INTRA_ALL;

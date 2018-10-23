@@ -570,6 +570,9 @@ typedef struct SPEED_FEATURES {
 
   // flag to skip NEWMV mode in drl if the motion search result is the same
   int skip_repeated_newmv;
+
+  // Prune intra mode candidates based on source block gradient stats.
+  int intra_angle_estimation;
 } SPEED_FEATURES;
 
 struct AV1_COMP;

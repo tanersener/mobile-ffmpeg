@@ -33,11 +33,11 @@ enum lf_path {
   LF_PATH_SLOW,
 };
 
-#if LOOP_FILTER_BITMASK
 typedef struct {
   uint64_t bits[4];
 } FilterMask;
 
+#if LOOP_FILTER_BITMASK
 // This structure holds bit masks for all 4x4 blocks in a 64x64 region.
 // Each 1 bit represents a position in which we want to apply the loop filter.
 // For Y plane, 4x4 in 64x64 requires 16x16 = 256 bit, therefore we use 4
@@ -191,6 +191,8 @@ void av1_filter_block_plane_bitmask_horz(
     struct AV1Common *const cm, struct macroblockd_plane *const plane_ptr,
     int pl, int mi_row, int mi_col);
 
+#endif  // LOOP_FILTER_BITMASK
+
 extern const int mask_id_table_tx_4x4[BLOCK_SIZES_ALL];
 
 extern const int mask_id_table_tx_8x8[BLOCK_SIZES_ALL];
@@ -206,8 +208,6 @@ extern const int mask_id_table_vert_border[BLOCK_SIZES_ALL];
 extern const FilterMask left_mask_univariant_reordered[67];
 
 extern const FilterMask above_mask_univariant_reordered[67];
-
-#endif
 
 #ifdef __cplusplus
 }  // extern "C"

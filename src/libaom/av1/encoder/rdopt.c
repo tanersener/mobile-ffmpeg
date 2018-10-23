@@ -30,6 +30,7 @@
 #include "av1/common/idct.h"
 #include "av1/common/mvref_common.h"
 #include "av1/common/obmc.h"
+#include "av1/common/onyxc_int.h"
 #include "av1/common/pred_common.h"
 #include "av1/common/quant_common.h"
 #include "av1/common/reconinter.h"
@@ -165,19 +166,12 @@ static const InterpFilters filter_sets[DUAL_FILTER_SET_SIZE] = {
   ((1 << ALTREF_FRAME) | (1 << ALTREF2_FRAME) | (1 << BWDREF_FRAME) | \
    (1 << GOLDEN_FRAME) | (1 << LAST2_FRAME) | 0x01)
 
-#define ANGLE_SKIP_THRESH 10
-
 static const double ADST_FLIP_SVM[8] = {
   /* vertical */
   -6.6623, -2.8062, -3.2531, 3.1671,
   /* horizontal */
   -7.7051, -3.2234, -3.6193, 3.4533
 };
-
-typedef struct {
-  int16_t x;
-  int16_t y;
-} sobel_xy;
 
 typedef struct {
   PREDICTION_MODE mode;
@@ -3203,41 +3197,37 @@ static int64_t search_txk_type(const AV1_COMP *cpi, MACROBLOCK *x, int plane,
 #endif  // CONFIG_COLLECT_RD_STATS == 1
 
 #if COLLECT_TX_SIZE_DATA
-    const int mi_row = -xd->mb_to_top_edge >> (3 + MI_SIZE_LOG2);
-    const int mi_col = -xd->mb_to_left_edge >> (3 + MI_SIZE_LOG2);
-    const int within_border =
-        mi_row >= xd->tile.mi_row_start &&
-        (mi_row + mi_size_high[plane_bsize] < xd->tile.mi_row_end) &&
-        mi_col >= xd->tile.mi_col_start &&
-        (mi_col + mi_size_wide[plane_bsize] < xd->tile.mi_col_end);
+    // Generate small sample to restrict output size.
+    static unsigned int seed = 21743;
+    if (lcg_rand16(&seed) % 200 == 0) {
+      FILE *fp = NULL;
 
-    FILE *fp = NULL;
-
-    if (within_border) {
-      fp = fopen(av1_tx_size_data_output_file, "a");
-    }
-
-    if (fp) {
-      // Transform info and RD
-      const int txb_w = tx_size_wide[tx_size];
-      const int txb_h = tx_size_high[tx_size];
-
-      // Residue signal.
-      const int diff_stride = block_size_wide[plane_bsize];
-      struct macroblock_plane *const p = &x->plane[plane];
-      const int16_t *src_diff =
-          &p->src_diff[(blk_row * diff_stride + blk_col) * 4];
-
-      for (int r = 0; r < txb_h; ++r) {
-        for (int c = 0; c < txb_w; ++c) {
-          fprintf(fp, "%d,", src_diff[c]);
-        }
-        src_diff += diff_stride;
+      if (within_border) {
+        fp = fopen(av1_tx_size_data_output_file, "a");
       }
 
-      fprintf(fp, "%d,%d,%d,%" PRId64, txb_w, txb_h, tx_type, rd);
-      fprintf(fp, "\n");
-      fclose(fp);
+      if (fp) {
+        // Transform info and RD
+        const int txb_w = tx_size_wide[tx_size];
+        const int txb_h = tx_size_high[tx_size];
+
+        // Residue signal.
+        const int diff_stride = block_size_wide[plane_bsize];
+        struct macroblock_plane *const p = &x->plane[plane];
+        const int16_t *src_diff =
+            &p->src_diff[(blk_row * diff_stride + blk_col) * 4];
+
+        for (int r = 0; r < txb_h; ++r) {
+          for (int c = 0; c < txb_w; ++c) {
+            fprintf(fp, "%d,", src_diff[c]);
+          }
+          src_diff += diff_stride;
+        }
+
+        fprintf(fp, "%d,%d,%d,%" PRId64, txb_w, txb_h, tx_type, rd);
+        fprintf(fp, "\n");
+        fclose(fp);
+      }
     }
 #endif  // COLLECT_TX_SIZE_DATA
 
@@ -4240,21 +4230,13 @@ static const uint8_t mode_to_angle_bin[INTRA_MODES] = {
 };
 /* clang-format on */
 
-static void angle_estimation(const uint8_t *src, int src_stride, int rows,
-                             int cols, BLOCK_SIZE bsize,
-                             uint8_t *directional_mode_skip_mask) {
-  memset(directional_mode_skip_mask, 0,
-         INTRA_MODES * sizeof(*directional_mode_skip_mask));
-  // Check if angle_delta is used
-  if (!av1_use_angle_delta(bsize)) return;
-  uint64_t hist[DIRECTIONAL_MODES];
-  memset(hist, 0, DIRECTIONAL_MODES * sizeof(hist[0]));
+static void get_gradient_hist(const uint8_t *src, int src_stride, int rows,
+                              int cols, uint64_t *hist) {
   src += src_stride;
-  int r, c, dx, dy;
-  for (r = 1; r < rows; ++r) {
-    for (c = 1; c < cols; ++c) {
-      dx = src[c] - src[c - 1];
-      dy = src[c] - src[c - src_stride];
+  for (int r = 1; r < rows; ++r) {
+    for (int c = 1; c < cols; ++c) {
+      int dx = src[c] - src[c - 1];
+      int dy = src[c] - src[c - src_stride];
       int index;
       const int temp = dx * dx + dy * dy;
       if (dy == 0) {
@@ -4270,46 +4252,17 @@ static void angle_estimation(const uint8_t *src, int src_stride, int rows,
       hist[index] += temp;
     }
     src += src_stride;
-  }
-
-  int i;
-  uint64_t hist_sum = 0;
-  for (i = 0; i < DIRECTIONAL_MODES; ++i) hist_sum += hist[i];
-  for (i = 0; i < INTRA_MODES; ++i) {
-    if (av1_is_directional_mode(i)) {
-      const uint8_t angle_bin = mode_to_angle_bin[i];
-      uint64_t score = 2 * hist[angle_bin];
-      int weight = 2;
-      if (angle_bin > 0) {
-        score += hist[angle_bin - 1];
-        ++weight;
-      }
-      if (angle_bin < DIRECTIONAL_MODES - 1) {
-        score += hist[angle_bin + 1];
-        ++weight;
-      }
-      if (score * ANGLE_SKIP_THRESH < hist_sum * weight)
-        directional_mode_skip_mask[i] = 1;
-    }
   }
 }
 
-static void highbd_angle_estimation(const uint8_t *src8, int src_stride,
-                                    int rows, int cols, BLOCK_SIZE bsize,
-                                    uint8_t *directional_mode_skip_mask) {
-  memset(directional_mode_skip_mask, 0,
-         INTRA_MODES * sizeof(*directional_mode_skip_mask));
-  // Check if angle_delta is used
-  if (!av1_use_angle_delta(bsize)) return;
+static void get_highbd_gradient_hist(const uint8_t *src8, int src_stride,
+                                     int rows, int cols, uint64_t *hist) {
   uint16_t *src = CONVERT_TO_SHORTPTR(src8);
-  uint64_t hist[DIRECTIONAL_MODES];
-  memset(hist, 0, DIRECTIONAL_MODES * sizeof(hist[0]));
   src += src_stride;
-  int r, c, dx, dy;
-  for (r = 1; r < rows; ++r) {
-    for (c = 1; c < cols; ++c) {
-      dx = src[c] - src[c - 1];
-      dy = src[c] - src[c - src_stride];
+  for (int r = 1; r < rows; ++r) {
+    for (int c = 1; c < cols; ++c) {
+      int dx = src[c] - src[c - 1];
+      int dy = src[c] - src[c - src_stride];
       int index;
       const int temp = dx * dx + dy * dy;
       if (dy == 0) {
@@ -4326,6 +4279,19 @@ static void highbd_angle_estimation(const uint8_t *src8, int src_stride,
     }
     src += src_stride;
   }
+}
+
+static void angle_estimation(const uint8_t *src, int src_stride, int rows,
+                             int cols, BLOCK_SIZE bsize, int is_hbd,
+                             uint8_t *directional_mode_skip_mask) {
+  // Check if angle_delta is used
+  if (!av1_use_angle_delta(bsize)) return;
+
+  uint64_t hist[DIRECTIONAL_MODES] = { 0 };
+  if (is_hbd)
+    get_highbd_gradient_hist(src, src_stride, rows, cols, hist);
+  else
+    get_gradient_hist(src, src_stride, rows, cols, hist);
 
   int i;
   uint64_t hist_sum = 0;
@@ -4343,8 +4309,8 @@ static void highbd_angle_estimation(const uint8_t *src8, int src_stride,
         score += hist[angle_bin + 1];
         ++weight;
       }
-      if (score * ANGLE_SKIP_THRESH < hist_sum * weight)
-        directional_mode_skip_mask[i] = 1;
+      const int thresh = 10;
+      if (score * thresh < hist_sum * weight) directional_mode_skip_mask[i] = 1;
     }
   }
 }
@@ -4397,9 +4363,7 @@ static int64_t rd_pick_intra_sby_mode(const AV1_COMP *const cpi, MACROBLOCK *x,
   const int rows = block_size_high[bsize];
   const int cols = block_size_wide[bsize];
   int is_directional_mode;
-  uint8_t directional_mode_skip_mask[INTRA_MODES];
-  const int src_stride = x->plane[0].src.stride;
-  const uint8_t *src = x->plane[0].src.buf;
+  uint8_t directional_mode_skip_mask[INTRA_MODES] = { 0 };
   int beat_best_rd = 0;
   const int *bmode_costs;
   PALETTE_MODE_INFO *const pmi = &mbmi->palette_mode_info;
@@ -4416,12 +4380,13 @@ static int64_t rd_pick_intra_sby_mode(const AV1_COMP *const cpi, MACROBLOCK *x,
   bmode_costs = x->y_mode_costs[above_ctx][left_ctx];
 
   mbmi->angle_delta[PLANE_TYPE_Y] = 0;
-  if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH)
-    highbd_angle_estimation(src, src_stride, rows, cols, bsize,
-                            directional_mode_skip_mask);
-  else
+  if (cpi->sf.intra_angle_estimation) {
+    const int src_stride = x->plane[0].src.stride;
+    const uint8_t *src = x->plane[0].src.buf;
     angle_estimation(src, src_stride, rows, cols, bsize,
+                     xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH,
                      directional_mode_skip_mask);
+  }
   mbmi->filter_intra_mode_info.use_filter_intra = 0;
   pmi->palette_size[0] = 0;
 
@@ -10699,6 +10664,7 @@ static void init_inter_mode_search_state(InterModeSearchState *search_state,
   search_state->best_intra_rd = INT64_MAX;
 
   search_state->angle_stats_ready = 0;
+  av1_zero(search_state->directional_mode_skip_mask);
 
   search_state->best_pred_sse = UINT_MAX;
 
@@ -10968,15 +10934,12 @@ static int64_t handle_intra_mode(InterModeSearchState *search_state,
   if (is_directional_mode && av1_use_angle_delta(bsize)) {
     int rate_dummy;
     int64_t model_rd = INT64_MAX;
-    if (!search_state->angle_stats_ready) {
+    if (sf->intra_angle_estimation && !search_state->angle_stats_ready) {
       const int src_stride = x->plane[0].src.stride;
       const uint8_t *src = x->plane[0].src.buf;
-      if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH)
-        highbd_angle_estimation(src, src_stride, rows, cols, bsize,
-                                search_state->directional_mode_skip_mask);
-      else
-        angle_estimation(src, src_stride, rows, cols, bsize,
-                         search_state->directional_mode_skip_mask);
+      angle_estimation(src, src_stride, rows, cols, bsize,
+                       xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH,
+                       search_state->directional_mode_skip_mask);
       search_state->angle_stats_ready = 1;
     }
     if (search_state->directional_mode_skip_mask[mbmi->mode]) return INT64_MAX;
@@ -11577,13 +11540,7 @@ void av1_rd_pick_inter_mode_sb(AV1_COMP *cpi, TileDataEnc *tile_data,
   int reach_first_comp_mode = 0;
 
   // Temporary buffers used by handle_inter_mode().
-  // We allocate them once and reuse it in every call to that function.
-  // Note: Must be allocated on the heap due to large size of the arrays.
-  uint8_t *tmp_buf_orig;
-  CHECK_MEM_ERROR(
-      cm, tmp_buf_orig,
-      (uint8_t *)aom_memalign(32, 2 * MAX_MB_PLANE * MAX_SB_SQUARE));
-  uint8_t *const tmp_buf = get_buf_by_bd(xd, tmp_buf_orig);
+  uint8_t *const tmp_buf = get_buf_by_bd(xd, x->tmp_obmc_bufs[0]);
 
   CompoundTypeRdBuffers rd_buffers;
   alloc_compound_type_rd_buffers(cm, &rd_buffers);
@@ -11840,8 +11797,6 @@ void av1_rd_pick_inter_mode_sb(AV1_COMP *cpi, TileDataEnc *tile_data,
     if (x->skip && !comp_pred) break;
   }
 
-  aom_free(tmp_buf_orig);
-  tmp_buf_orig = NULL;
   release_compound_type_rd_buffers(&rd_buffers);
 
 #if CONFIG_COLLECT_INTER_MODE_RD_STATS
@@ -12370,4 +12325,82 @@ static void calc_target_weighted_pred(const AV1_COMMON *cm, const MACROBLOCK *x,
       src += x->plane[0].src.stride;
     }
   }
+}
+
+static INLINE uint8_t get_pix(const uint8_t *src, int stride, int i, int j) {
+  return src[i + stride * j];
+}
+
+// 8-tap Gaussian convolution filter with sigma = 1.3, sums to 128,
+// all co-efficients must be even.
+DECLARE_ALIGNED(16, static const int16_t, gauss_filter[8]) = { 2,  12, 30, 40,
+                                                               30, 12, 2,  0 };
+
+void gaussian_blur(const uint8_t *src, int src_stride, int w, int h,
+                   uint8_t *dst) {
+  ConvolveParams conv_params = get_conv_params(0, 0, 0);
+  InterpFilterParams filter = { .filter_ptr = gauss_filter,
+                                .taps = 8,
+                                .subpel_shifts = 0,
+                                .interp_filter = EIGHTTAP_REGULAR };
+  // Requirements from the vector-optimized implementations.
+  assert(h % 4 == 0);
+  assert(w % 8 == 0);
+  // Because we use an eight tap filter, the stride should be at least 7 + w.
+  assert(src_stride >= w + 7);
+  av1_convolve_2d_sr(src, src_stride, dst, w, w, h, &filter, &filter, 0, 0,
+                     &conv_params);
+}
+
+/* Use standard 3x3 Sobel matrix. */
+sobel_xy sobel(const uint8_t *input, int stride, int i, int j) {
+  const int16_t s_x = get_pix(input, stride, i - 1, j - 1) -
+                      get_pix(input, stride, i + 1, j - 1) +
+                      2 * get_pix(input, stride, i - 1, j) -
+                      2 * get_pix(input, stride, i + 1, j) +
+                      get_pix(input, stride, i - 1, j + 1) -
+                      get_pix(input, stride, i + 1, j + 1);
+  const int16_t s_y = get_pix(input, stride, i - 1, j - 1) +
+                      2 * get_pix(input, stride, i, j - 1) +
+                      get_pix(input, stride, i + 1, j - 1) -
+                      get_pix(input, stride, i - 1, j + 1) -
+                      2 * get_pix(input, stride, i, j + 1) -
+                      get_pix(input, stride, i + 1, j + 1);
+  sobel_xy r = { .x = s_x, .y = s_y };
+  return r;
+}
+
+static uint16_t edge_probability(const uint8_t *input, int w, int h) {
+  // The probability of an edge in the whole image is the same as the highest
+  // probability of an edge for any individual pixel. Use Sobel as the metric
+  // for finding an edge.
+  uint16_t highest = 0;
+  // Ignore the 1 pixel border around the image for the computation.
+  for (int j = 1; j < h - 1; ++j) {
+    for (int i = 1; i < w - 1; ++i) {
+      sobel_xy g = sobel(input, w, i, j);
+      uint16_t magnitude = (uint16_t)sqrt(g.x * g.x + g.y * g.y);
+      highest = AOMMAX(highest, magnitude);
+    }
+  }
+  return highest;
+}
+
+/* Uses most of the Canny edge detection algorithm to find if there are any
+ * edges in the image.
+ */
+uint16_t av1_edge_exists(const uint8_t *src, int src_stride, int w, int h) {
+  if (w < 3 || h < 3) {
+    return 0;
+  }
+  uint8_t *blurred = NULL;
+  blurred = (uint8_t *)aom_memalign(32, sizeof(*blurred) * w * h);
+  gaussian_blur(src, src_stride, w, h, blurred);
+  // Skip the non-maximum suppression step in Canny edge detection. We just
+  // want a probability of an edge existing in the buffer, which is determined
+  // by the strongest edge in it -- we don't need to eliminate the weaker
+  // edges. Use Sobel for the edge detection.
+  uint16_t prob = edge_probability(blurred, w, h);
+  aom_free(blurred);
+  return prob;
 }

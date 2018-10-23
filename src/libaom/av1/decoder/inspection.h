@@ -20,7 +20,7 @@ extern "C" {
 #include "av1/decoder/accounting.h"
 #endif
 
-#ifndef AOM_AOMDX_H_
+#ifndef AOM_AOM_AOMDX_H_
 typedef void (*aom_inspect_cb)(void *decoder, void *data);
 #endif
 
@@ -50,6 +50,8 @@ struct insp_mi_data {
   int16_t cfl_alpha_idx;
   int16_t cfl_alpha_sign;
   int16_t current_qindex;
+  int16_t compound_type;
+  int16_t motion_mode;
 };
 
 typedef struct insp_frame_data insp_frame_data;
@@ -59,6 +61,7 @@ struct insp_frame_data {
   Accounting *accounting;
 #endif
   insp_mi_data *mi_grid;
+  int16_t frame_number;
   int show_frame;
   int frame_type;
   int base_qindex;

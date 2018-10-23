@@ -283,6 +283,7 @@ static void lowbd_img_upshift(aom_image_t *dst, const aom_image_t *src,
     fatal("Unsupported image conversion");
   }
   switch (src->fmt) {
+    case AOM_IMG_FMT_YV12:
     case AOM_IMG_FMT_I420:
     case AOM_IMG_FMT_I422:
     case AOM_IMG_FMT_I444: break;

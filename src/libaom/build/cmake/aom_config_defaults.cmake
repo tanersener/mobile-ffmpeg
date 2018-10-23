@@ -106,7 +106,7 @@ set_aom_config_var(CONFIG_FIX_GF_LENGTH 1 NUMBER
 set_aom_config_var(CONFIG_INSPECTION 0 NUMBER "Enables bitstream inspection.")
 set_aom_config_var(CONFIG_INTERNAL_STATS 0 NUMBER
                    "Enables internal encoder stats.")
-set_aom_config_var(CONFIG_LOWBITDEPTH 0 NUMBER
+set_aom_config_var(CONFIG_LOWBITDEPTH 1 NUMBER
                    "Enables 8-bit optimized pipeline.")
 set_aom_config_var(CONFIG_MAX_DECODE_PROFILE 2 NUMBER
                    "Max profile to support decoding.")

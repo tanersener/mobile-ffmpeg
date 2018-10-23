@@ -597,6 +597,9 @@ static INLINE int get_free_fb(AV1_COMMON *cm) {
 
     frame_bufs[i].ref_count = 1;
   } else {
+    // We should never run out of free buffers. If this assertion fails, there
+    // is a reference leak.
+    assert(0 && "Ran out of free frame buffers. Likely a reference leak.");
     // Reset i to be INVALID_IDX to indicate no free buffer found.
     i = INVALID_IDX;
   }

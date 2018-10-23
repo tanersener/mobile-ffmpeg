@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "common/obudec.h"
 
@@ -27,10 +28,10 @@
 #define OBU_MAX_LENGTH_FIELD_SIZE 8
 
 #define OBU_MAX_HEADER_SIZE \
-  (OBU_HEADER_SIZE + OBU_EXTENSION_SIZE + OBU_MAX_LENGTH_FIELD_SIZE)
+  (OBU_HEADER_SIZE + OBU_EXTENSION_SIZE + 2 * OBU_MAX_LENGTH_FIELD_SIZE)
 
 #define OBU_DETECTION_SIZE \
-  (OBU_HEADER_SIZE + OBU_EXTENSION_SIZE + 3 * OBU_MAX_LENGTH_FIELD_SIZE)
+  (OBU_HEADER_SIZE + OBU_EXTENSION_SIZE + 4 * OBU_MAX_LENGTH_FIELD_SIZE)
 
 // Reads unsigned LEB128 integer and returns 0 upon successful read and decode.
 // Stores raw bytes in 'value_buffer', length of the number in 'value_length',
@@ -128,13 +129,14 @@ static int obudec_read_obu_header_and_size(FILE *f, size_t buffer_capacity,
     return -1;
   }
 
-  size_t leb128_length = 0;
+  size_t leb128_length_obu = 0;
+  size_t leb128_length_payload = 0;
   uint64_t obu_size = 0;
   if (is_annexb) {
-    if (obudec_read_leb128(f, &buffer[0], &leb128_length, &obu_size) != 0) {
+    if (obudec_read_leb128(f, &buffer[0], &leb128_length_obu, &obu_size) != 0) {
       fprintf(stderr, "obudec: Failure reading OBU size length.\n");
       return -1;
-    } else if (leb128_length == 0) {
+    } else if (leb128_length_obu == 0) {
       *payload_length = 0;
       return 0;
     }
@@ -145,8 +147,8 @@ static int obudec_read_obu_header_and_size(FILE *f, size_t buffer_capacity,
   }
 
   size_t header_size = 0;
-  if (obudec_read_obu_header(f, buffer_capacity - leb128_length, is_annexb,
-                             buffer + leb128_length, obu_header,
+  if (obudec_read_obu_header(f, buffer_capacity - leb128_length_obu, is_annexb,
+                             buffer + leb128_length_obu, obu_header,
                              &header_size) != 0) {
     return -1;
   } else if (header_size == 0) {
@@ -154,7 +156,8 @@ static int obudec_read_obu_header_and_size(FILE *f, size_t buffer_capacity,
     return 0;
   }
 
-  if (is_annexb) {
+  if (!obu_header->has_size_field) {
+    assert(is_annexb);
     if (obu_size < header_size) {
       fprintf(stderr, "obudec: OBU size is too small.\n");
       return -1;
@@ -162,8 +165,8 @@ static int obudec_read_obu_header_and_size(FILE *f, size_t buffer_capacity,
     *payload_length = (size_t)obu_size - header_size;
   } else {
     uint64_t u64_payload_length = 0;
-    if (obudec_read_leb128(f, &buffer[header_size], &leb128_length,
-                           &u64_payload_length) != 0) {
+    if (obudec_read_leb128(f, &buffer[leb128_length_obu + header_size],
+                           &leb128_length_payload, &u64_payload_length) != 0) {
       fprintf(stderr, "obudec: Failure reading OBU payload length.\n");
       return -1;
     }
@@ -175,7 +178,7 @@ static int obudec_read_obu_header_and_size(FILE *f, size_t buffer_capacity,
     *payload_length = (size_t)u64_payload_length;
   }
 
-  *bytes_read = leb128_length + header_size;
+  *bytes_read = leb128_length_obu + header_size + leb128_length_payload;
   return 0;
 }
 

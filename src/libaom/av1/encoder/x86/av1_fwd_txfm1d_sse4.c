@@ -1407,3 +1407,11 @@ void av1_fdct64_new_sse4_1(__m128i *input, __m128i *output, int8_t cos_bit,
   output[startidx] = x10[62];
   output[endidx] = x10[1];
 }
+
+void av1_idtx32_new_sse4_1(__m128i *input, __m128i *output, int cos_bit,
+                           const int col_num) {
+  (void)cos_bit;
+  for (int i = 0; i < 32; i++) {
+    output[i * col_num] = _mm_slli_epi32(input[i * col_num], 2);
+  }
+}

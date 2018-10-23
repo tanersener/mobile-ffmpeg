@@ -477,11 +477,6 @@ static aom_codec_err_t decode_one(aom_codec_alg_priv_t *ctx,
   frame_worker_data->user_priv = user_priv;
   frame_worker_data->received_frame = 1;
 
-#if CONFIG_INSPECTION
-  frame_worker_data->pbi->inspect_cb = ctx->inspect_cb;
-  frame_worker_data->pbi->inspect_ctx = ctx->inspect_ctx;
-#endif
-
   frame_worker_data->pbi->common.large_scale_tile = ctx->tile_mode;
   frame_worker_data->pbi->dec_tile_row = ctx->decode_tile_row;
   frame_worker_data->pbi->dec_tile_col = ctx->decode_tile_col;
@@ -505,11 +500,46 @@ static aom_codec_err_t decode_one(aom_codec_alg_priv_t *ctx,
   return AOM_CODEC_OK;
 }
 
+#if CONFIG_INSPECTION
+// This function enables the inspector to inspect non visible frames.
+static aom_codec_err_t decoder_inspect(aom_codec_alg_priv_t *ctx,
+                                       const uint8_t *data, size_t data_sz,
+                                       void *user_priv) {
+  aom_codec_err_t res = AOM_CODEC_OK;
+
+  Av1DecodeReturn *data2 = (Av1DecodeReturn *)user_priv;
+
+  if (ctx->frame_workers == NULL) {
+    res = init_decoder(ctx);
+    if (res != AOM_CODEC_OK) return res;
+  }
+  FrameWorkerData *const frame_worker_data =
+      (FrameWorkerData *)ctx->frame_workers[0].data1;
+  AV1Decoder *const pbi = frame_worker_data->pbi;
+  AV1_COMMON *const cm = &pbi->common;
+  frame_worker_data->pbi->inspect_cb = ctx->inspect_cb;
+  frame_worker_data->pbi->inspect_ctx = ctx->inspect_ctx;
+  res = av1_receive_compressed_data(frame_worker_data->pbi, data_sz, &data);
+  if (ctx->frame_workers->had_error)
+    return update_error_state(ctx, &frame_worker_data->pbi->common.error);
+
+  for (int i = 0; i < REF_FRAMES; ++i)
+    if (cm->ref_frame_map[i] == cm->new_fb_idx) data2->idx = i;
+  data2->buf = data;
+  return res;
+}
+#endif
+
 static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
                                       const uint8_t *data, size_t data_sz,
                                       void *user_priv) {
   aom_codec_err_t res = AOM_CODEC_OK;
 
+#if CONFIG_INSPECTION
+  if (user_priv != 0) {
+    return decoder_inspect(ctx, data, data_sz, user_priv);
+  }
+#endif
   // Release any pending output frames from the previous decoder_decode call.
   // We need to do this even if the decoder is being flushed or the input
   // arguments are invalid.

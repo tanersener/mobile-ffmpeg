@@ -1390,6 +1390,7 @@ static const char *image_format_to_string(aom_img_fmt_t f) {
     case AOM_IMG_FMT_I422: return "I422";
     case AOM_IMG_FMT_I444: return "I444";
     case AOM_IMG_FMT_YV12: return "YV12";
+    case AOM_IMG_FMT_YV1216: return "YV1216";
     case AOM_IMG_FMT_I42016: return "I42016";
     case AOM_IMG_FMT_I42216: return "I42216";
     case AOM_IMG_FMT_I44416: return "I44416";

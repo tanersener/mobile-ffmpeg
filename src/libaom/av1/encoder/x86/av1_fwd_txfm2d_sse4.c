@@ -55,11 +55,20 @@ static void fdct64_new_sse4_1(__m128i *input, __m128i *output,
                           col_num);
   }
 }
+static void idtx32x32_sse4_1(__m128i *input, __m128i *output,
+                             const int8_t cos_bit, const int8_t *stage_range) {
+  (void)stage_range;
+
+  for (int i = 0; i < 8; i++) {
+    av1_idtx32_new_sse4_1(&input[i * 32], &output[i * 32], cos_bit, 1);
+  }
+}
 
 static INLINE TxfmFuncSSE2 fwd_txfm_type_to_func(TXFM_TYPE txfm_type) {
   switch (txfm_type) {
     case TXFM_TYPE_DCT32: return fdct32_new_sse4_1; break;
     case TXFM_TYPE_DCT64: return fdct64_new_sse4_1; break;
+    case TXFM_TYPE_IDENTITY32: return idtx32x32_sse4_1; break;
     default: assert(0);
   }
   return NULL;

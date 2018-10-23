@@ -179,6 +179,7 @@ if(NOT BUILD_SHARED_LIBS)
               "${AOM_ROOT}/test/comp_avg_pred_test.cc"
               "${AOM_ROOT}/test/comp_avg_pred_test.h"
               "${AOM_ROOT}/test/comp_mask_variance_test.cc"
+              "${AOM_ROOT}/test/edge_detect_test.cc"
               "${AOM_ROOT}/test/encodetxb_test.cc"
               "${AOM_ROOT}/test/error_block_test.cc"
               "${AOM_ROOT}/test/fft_test.cc"

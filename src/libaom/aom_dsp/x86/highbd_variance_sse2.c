@@ -734,16 +734,6 @@ void aom_highbd_upsampled_pred_sse2(MACROBLOCKD *xd,
     const int intermediate_height =
         (((height - 1) * 8 + subpel_y_q3) >> 3) + filter_taps;
     assert(intermediate_height <= (MAX_SB_SIZE * 2 + 16) + 16);
-    // TODO(Sachin): Remove the memset below when we have
-    // 4 tap simd for avx2.
-    if (subpel_search <= USE_4_TAPS) {
-      memset(temp_start_vert - 3 * MAX_SB_SIZE, 0, width * sizeof(uint16_t));
-      memset(temp_start_vert - 2 * MAX_SB_SIZE, 0, width * sizeof(uint16_t));
-      memset(temp_start_vert + (height + 2) * MAX_SB_SIZE, 0,
-             width * sizeof(uint16_t));
-      memset(temp_start_vert + (height + 3) * MAX_SB_SIZE, 0,
-             width * sizeof(uint16_t));
-    }
     aom_highbd_convolve8_horiz(
         ref_start, ref_stride, CONVERT_TO_BYTEPTR(temp_start_horiz),
         MAX_SB_SIZE, kernel_x, 16, NULL, -1, width, intermediate_height, bd);

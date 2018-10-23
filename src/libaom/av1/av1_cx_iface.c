@@ -389,6 +389,7 @@ static aom_codec_err_t validate_img(aom_codec_alg_priv_t *ctx,
   switch (img->fmt) {
     case AOM_IMG_FMT_YV12:
     case AOM_IMG_FMT_I420:
+    case AOM_IMG_FMT_YV1216:
     case AOM_IMG_FMT_I42016: break;
     case AOM_IMG_FMT_I444:
     case AOM_IMG_FMT_I44416:
@@ -422,6 +423,7 @@ static int get_image_bps(const aom_image_t *img) {
     case AOM_IMG_FMT_I420: return 12;
     case AOM_IMG_FMT_I422: return 16;
     case AOM_IMG_FMT_I444: return 24;
+    case AOM_IMG_FMT_YV1216:
     case AOM_IMG_FMT_I42016: return 24;
     case AOM_IMG_FMT_I42216: return 32;
     case AOM_IMG_FMT_I44416: return 48;

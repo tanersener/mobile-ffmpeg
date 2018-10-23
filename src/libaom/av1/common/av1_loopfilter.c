@@ -40,7 +40,6 @@ static const int mode_lf_lut[] = {
   1, 1, 1, 1, 1, 1, 0, 1  // INTER_COMPOUND_MODES (GLOBAL_GLOBALMV == 0)
 };
 
-#if LOOP_FILTER_BITMASK
 // 256 bit masks (64x64 / 4x4) for left transform size for Y plane.
 // We use 4 uint64_t to represent the 256 bit.
 // Each 1 represents a position where we should apply a loop filter
@@ -406,6 +405,7 @@ const FilterMask above_mask_univariant_reordered[67] = {
       0x0000000000000000ULL } },  // block size 64X16, TX_64X16
 };
 
+#if LOOP_FILTER_BITMASK
 LoopFilterMask *get_loop_filter_mask(const AV1_COMMON *const cm, int mi_row,
                                      int mi_col) {
   assert(cm->lf.lfm != NULL);

@@ -42,22 +42,21 @@ set(pkgconfig_file "${AOM_CONFIG_DIR}/aom.pc")
 string(TOLOWER ${CMAKE_PROJECT_NAME} pkg_name)
 file(WRITE "${pkgconfig_file}" "# libaom pkg-config.\n")
 file(APPEND "${pkgconfig_file}" "prefix=${prefix}\n")
-file(APPEND "${pkgconfig_file}" "exec_prefix=\${prefix}/${bindir}\n")
-file(APPEND "${pkgconfig_file}" "libdir=\${prefix}/${libdir}\n")
-file(APPEND "${pkgconfig_file}" "includedir=\${prefix}/${includedir}\n\n")
+file(APPEND "${pkgconfig_file}" "exec_prefix=\${prefix}\n")
+file(APPEND "${pkgconfig_file}" "includedir=\${prefix}/${includedir}\n")
+file(APPEND "${pkgconfig_file}" "libdir=\${exec_prefix}/${libdir}\n\n")
 file(APPEND "${pkgconfig_file}" "Name: ${pkg_name}\n")
-file(APPEND "${pkgconfig_file}"
-            "Description: AV1 codec library v${aom_version}.\n")
+file(
+  APPEND
+    "${pkgconfig_file}"
+    "Description: Alliance for Open Media AV1 codec library v${aom_version}.\n")
 file(APPEND "${pkgconfig_file}" "Version: ${package_version}\n")
 file(APPEND "${pkgconfig_file}" "Requires:\n")
 file(APPEND "${pkgconfig_file}" "Conflicts:\n")
+file(APPEND "${pkgconfig_file}" "Libs: -L\${libdir} -l${pkg_name}\n")
 if(CONFIG_MULTITHREAD AND HAVE_PTHREAD_H)
-  file(APPEND "${pkgconfig_file}"
-              "Libs: -L\${prefix}/${libdir} -l${pkg_name} -lm -lpthread\n")
   file(APPEND "${pkgconfig_file}" "Libs.private: -lm -lpthread\n")
 else()
-  file(APPEND "${pkgconfig_file}"
-              "Libs: -L\${prefix}/${libdir} -l${pkg_name} -lm\n")
   file(APPEND "${pkgconfig_file}" "Libs.private: -lm\n")
 endif()
-file(APPEND "${pkgconfig_file}" "Cflags: -I\${prefix}/${includedir}\n")
+file(APPEND "${pkgconfig_file}" "Cflags: -I\${includedir}\n")

@@ -483,7 +483,6 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
   // Find a free frame buffer. Return error if can not find any.
   cm->new_fb_idx = get_free_fb(cm);
   if (cm->new_fb_idx == INVALID_IDX) {
-    assert(0 && "Ran out of free frame buffers. Likely a reference leak.");
     cm->error.error_code = AOM_CODEC_MEM_ERROR;
     return 1;
   }

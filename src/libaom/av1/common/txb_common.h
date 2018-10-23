@@ -12,6 +12,8 @@
 #ifndef AOM_AV1_COMMON_TXB_COMMON_H_
 #define AOM_AV1_COMMON_TXB_COMMON_H_
 
+#include "av1/common/onyxc_int.h"
+
 extern const int16_t k_eob_group_start[12];
 extern const int16_t k_eob_offset_bits[12];
 

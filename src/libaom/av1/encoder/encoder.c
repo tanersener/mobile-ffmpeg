@@ -2435,7 +2435,7 @@ void av1_change_config(struct AV1_COMP *cpi, const AV1EncoderConfig *oxcf) {
   for (int i = 0; i < 2; ++i) {
     if (x->tmp_obmc_bufs[i] == NULL) {
       CHECK_MEM_ERROR(cm, x->tmp_obmc_bufs[i],
-                      aom_memalign(16, 2 * MAX_MB_PLANE * MAX_SB_SQUARE *
+                      aom_memalign(32, 2 * MAX_MB_PLANE * MAX_SB_SQUARE *
                                            sizeof(*x->tmp_obmc_bufs[i])));
       x->e_mbd.tmp_obmc_bufs[i] = x->tmp_obmc_bufs[i];
     }
@@ -3043,6 +3043,7 @@ void av1_remove_compressor(AV1_COMP *cpi) {
       aom_free(thread_data->td->above_pred_buf);
       aom_free(thread_data->td->left_pred_buf);
       aom_free(thread_data->td->wsrc_buf);
+
 #if CONFIG_COLLECT_INTER_MODE_RD_STATS
       aom_free(thread_data->td->inter_modes_info);
 #endif
@@ -3491,7 +3492,12 @@ static void update_reference_frames(AV1_COMP *cpi) {
   // to decoder. Any change in the reference frame buffer can be done by
   // switching the virtual indices.
   if (cm->show_existing_frame) {
-    cpi->refresh_last_frame = 0;
+    // If we are not indicating to the decoder that this frame is
+    // a show_existing_frame, which occurs in error_resilient mode,
+    // we still want to refresh the LAST_FRAME when the current frame
+    // was the source of an ext_arf.
+    cpi->refresh_last_frame =
+        !encode_show_existing_frame(cm) && cpi->rc.is_src_frame_ext_arf;
     cpi->refresh_golden_frame = 0;
     cpi->refresh_bwd_ref_frame = 0;
     cpi->refresh_alt2_ref_frame = 0;
@@ -3680,7 +3686,7 @@ static void update_reference_frames(AV1_COMP *cpi) {
     shift_last_ref_frames(cpi);
     cpi->ref_fb_idx[0] = tmp;
 
-    assert(cm->show_existing_frame == 0);
+    assert(!encode_show_existing_frame(cm));
     memcpy(cpi->interp_filter_selected[LAST_FRAME],
            cpi->interp_filter_selected[0],
            sizeof(cpi->interp_filter_selected[0]));
@@ -3754,10 +3760,11 @@ static void scale_references(AV1_COMP *cpi) {
         int new_fb = cpi->scaled_ref_idx[ref_frame - 1];
         if (new_fb == INVALID_IDX) {
           new_fb = get_free_fb(cm);
+          if (new_fb == INVALID_IDX)
+            aom_internal_error(&cm->error, AOM_CODEC_MEM_ERROR,
+                               "Unable to find free frame buffer");
           force_scaling = 1;
         }
-        // TODO(wtc): Is it OK to ignore the get_free_fb() failure?
-        if (new_fb == INVALID_IDX) return;
         new_fb_ptr = &pool->frame_bufs[new_fb];
         if (force_scaling || new_fb_ptr->buf.y_crop_width != cm->width ||
             new_fb_ptr->buf.y_crop_height != cm->height) {
@@ -6523,10 +6530,7 @@ int av1_get_compressed_data(AV1_COMP *cpi, unsigned int *frame_flags,
     }
     cm->new_fb_idx = get_free_fb(cm);
 
-    if (cm->new_fb_idx == INVALID_IDX) {
-      assert(0 && "Ran out of free frame buffers. Likely a reference leak.");
-      return -1;
-    }
+    if (cm->new_fb_idx == INVALID_IDX) return -1;
 
     // Clear down mmx registers
     aom_clear_system_state();
@@ -6716,10 +6720,7 @@ int av1_get_compressed_data(AV1_COMP *cpi, unsigned int *frame_flags,
   }
   cm->new_fb_idx = get_free_fb(cm);
 
-  if (cm->new_fb_idx == INVALID_IDX) {
-    assert(0 && "Ran out of free frame buffers. Likely a reference leak.");
-    return -1;
-  }
+  if (cm->new_fb_idx == INVALID_IDX) return -1;
 
   // Retain the RF_LEVEL for the current newly coded frame.
   cpi->frame_rf_level[cm->new_fb_idx] =
