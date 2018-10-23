@@ -139,10 +139,13 @@ am_libmobileffmpeg_la_OBJECTS = libmobileffmpeg_la-ArchDetect.lo \
 	libmobileffmpeg_la-fftools_ffmpeg_hw.lo \
 	libmobileffmpeg_la-fftools_ffmpeg_opt.lo \
 	libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.lo \
+	libmobileffmpeg_la-MediaInformation.lo \
+	libmobileffmpeg_la-MediaInformationParser.lo \
 	libmobileffmpeg_la-MobileFFmpeg.lo \
 	libmobileffmpeg_la-MobileFFmpegConfig.lo \
 	libmobileffmpeg_la-mobileffmpeg_exception.lo \
-	libmobileffmpeg_la-Statistics.lo
+	libmobileffmpeg_la-Statistics.lo \
+	libmobileffmpeg_la-StreamInformation.lo
 libmobileffmpeg_la_OBJECTS = $(am_libmobileffmpeg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -168,9 +171,12 @@ DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/libmobileffmpeg_la-ArchDetect.Plo \
+	./$(DEPDIR)/libmobileffmpeg_la-MediaInformation.Plo \
+	./$(DEPDIR)/libmobileffmpeg_la-MediaInformationParser.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-MobileFFmpeg.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-MobileFFmpegConfig.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-Statistics.Plo \
+	./$(DEPDIR)/libmobileffmpeg_la-StreamInformation.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-fftools_cmdutils.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg.Plo \
 	./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_filter.Plo \
@@ -375,21 +381,27 @@ libmobileffmpeg_la_SOURCES = \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_opt.c \
     fftools_ffmpeg_videotoolbox.c \
+    MediaInformation.m \
+    MediaInformationParser.m \
     MobileFFmpeg.m \
     MobileFFmpegConfig.m \
     mobileffmpeg_exception.m \
-    Statistics.m
+    Statistics.m \
+    StreamInformation.m
 
 include_HEADERS = \
     ArchDetect.h \
 	fftools_cmdutils.h \
     fftools_ffmpeg.h \
 	LogDelegate.h \
+	MediaInformation.h \
+	MediaInformationParser.h \
     MobileFFmpeg.h \
     MobileFFmpegConfig.h \
 	mobileffmpeg_exception.h \
 	Statistics.h \
-	StatisticsDelegate.h
+	StatisticsDelegate.h \
+	StreamInformation.h
 
 libmobileffmpeg_la_CFLAGS = $(CFLAGS)
 libmobileffmpeg_la_OBJCFLAGS = $(CFLAGS)
@@ -474,9 +486,12 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-ArchDetect.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-MediaInformation.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-MediaInformationParser.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-MobileFFmpeg.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-MobileFFmpegConfig.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-Statistics.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-StreamInformation.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-fftools_cmdutils.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_filter.Plo@am__quote@ # am--include-marker
@@ -588,6 +603,20 @@ libmobileffmpeg_la-ArchDetect.lo: ArchDetect.m
 @AMDEP_TRUE@@am__fastdepOBJC_FALSE@	DEPDIR=$(DEPDIR) $(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepOBJC_FALSE@	$(AM_V_OBJC@am__nodep@)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -c -o libmobileffmpeg_la-ArchDetect.lo `test -f 'ArchDetect.m' || echo '$(srcdir)/'`ArchDetect.m
 
+libmobileffmpeg_la-MediaInformation.lo: MediaInformation.m
+@am__fastdepOBJC_TRUE@	$(AM_V_OBJC)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -MT libmobileffmpeg_la-MediaInformation.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-MediaInformation.Tpo -c -o libmobileffmpeg_la-MediaInformation.lo `test -f 'MediaInformation.m' || echo '$(srcdir)/'`MediaInformation.m
+@am__fastdepOBJC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmobileffmpeg_la-MediaInformation.Tpo $(DEPDIR)/libmobileffmpeg_la-MediaInformation.Plo
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(AM_V_OBJC)source='MediaInformation.m' object='libmobileffmpeg_la-MediaInformation.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	DEPDIR=$(DEPDIR) $(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepOBJC_FALSE@	$(AM_V_OBJC@am__nodep@)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -c -o libmobileffmpeg_la-MediaInformation.lo `test -f 'MediaInformation.m' || echo '$(srcdir)/'`MediaInformation.m
+
+libmobileffmpeg_la-MediaInformationParser.lo: MediaInformationParser.m
+@am__fastdepOBJC_TRUE@	$(AM_V_OBJC)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -MT libmobileffmpeg_la-MediaInformationParser.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-MediaInformationParser.Tpo -c -o libmobileffmpeg_la-MediaInformationParser.lo `test -f 'MediaInformationParser.m' || echo '$(srcdir)/'`MediaInformationParser.m
+@am__fastdepOBJC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmobileffmpeg_la-MediaInformationParser.Tpo $(DEPDIR)/libmobileffmpeg_la-MediaInformationParser.Plo
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(AM_V_OBJC)source='MediaInformationParser.m' object='libmobileffmpeg_la-MediaInformationParser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	DEPDIR=$(DEPDIR) $(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepOBJC_FALSE@	$(AM_V_OBJC@am__nodep@)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -c -o libmobileffmpeg_la-MediaInformationParser.lo `test -f 'MediaInformationParser.m' || echo '$(srcdir)/'`MediaInformationParser.m
+
 libmobileffmpeg_la-MobileFFmpeg.lo: MobileFFmpeg.m
 @am__fastdepOBJC_TRUE@	$(AM_V_OBJC)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -MT libmobileffmpeg_la-MobileFFmpeg.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-MobileFFmpeg.Tpo -c -o libmobileffmpeg_la-MobileFFmpeg.lo `test -f 'MobileFFmpeg.m' || echo '$(srcdir)/'`MobileFFmpeg.m
 @am__fastdepOBJC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmobileffmpeg_la-MobileFFmpeg.Tpo $(DEPDIR)/libmobileffmpeg_la-MobileFFmpeg.Plo
@@ -615,6 +644,13 @@ libmobileffmpeg_la-Statistics.lo: Statistics.m
 @AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(AM_V_OBJC)source='Statistics.m' object='libmobileffmpeg_la-Statistics.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepOBJC_FALSE@	DEPDIR=$(DEPDIR) $(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepOBJC_FALSE@	$(AM_V_OBJC@am__nodep@)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -c -o libmobileffmpeg_la-Statistics.lo `test -f 'Statistics.m' || echo '$(srcdir)/'`Statistics.m
+
+libmobileffmpeg_la-StreamInformation.lo: StreamInformation.m
+@am__fastdepOBJC_TRUE@	$(AM_V_OBJC)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -MT libmobileffmpeg_la-StreamInformation.lo -MD -MP -MF $(DEPDIR)/libmobileffmpeg_la-StreamInformation.Tpo -c -o libmobileffmpeg_la-StreamInformation.lo `test -f 'StreamInformation.m' || echo '$(srcdir)/'`StreamInformation.m
+@am__fastdepOBJC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libmobileffmpeg_la-StreamInformation.Tpo $(DEPDIR)/libmobileffmpeg_la-StreamInformation.Plo
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	$(AM_V_OBJC)source='StreamInformation.m' object='libmobileffmpeg_la-StreamInformation.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepOBJC_FALSE@	DEPDIR=$(DEPDIR) $(OBJCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepOBJC_FALSE@	$(AM_V_OBJC@am__nodep@)$(LIBTOOL) $(AM_V_lt) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(OBJC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libmobileffmpeg_la_OBJCFLAGS) $(OBJCFLAGS) -c -o libmobileffmpeg_la-StreamInformation.lo `test -f 'StreamInformation.m' || echo '$(srcdir)/'`StreamInformation.m
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -772,9 +808,12 @@ clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ArchDetect.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-MediaInformation.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-MediaInformationParser.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-MobileFFmpeg.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-MobileFFmpegConfig.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-Statistics.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-StreamInformation.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_cmdutils.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_filter.Plo
@@ -828,9 +867,12 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/libmobileffmpeg_la-ArchDetect.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-MediaInformation.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-MediaInformationParser.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-MobileFFmpeg.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-MobileFFmpegConfig.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-Statistics.Plo
+	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-StreamInformation.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_cmdutils.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg.Plo
 	-rm -f ./$(DEPDIR)/libmobileffmpeg_la-fftools_ffmpeg_filter.Plo

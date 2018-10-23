@@ -1,5 +1,5 @@
 //
-// main.m
+// MediaInformationParserTests.h
 //
 // Copyright (c) 2018 Taner Sener
 //
@@ -19,17 +19,7 @@
 //  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
-#import <UIKit/UIKit.h>
-
-#import "AppDelegate.h"
-#import "MediaInformationParserTests.h"
-
-int main(int argc, char * argv[]) {
-    @autoreleasepool {
-        
-        // RUN UNIT TESTS BEFORE STARTING THE APPLICATION
-        runMediaInformationParserTests();
-
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
-    }
-}
+/**
+ * All parsing tests are initiated from this method
+ */
+void runMediaInformationParserTests();
