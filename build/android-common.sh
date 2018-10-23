@@ -261,7 +261,11 @@ get_cflags() {
     ARCH_FLAGS=$(get_arch_specific_cflags)
     APP_FLAGS=$(get_app_specific_cflags $1)
     COMMON_FLAGS=$(get_common_cflags)
-    OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+    if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+        OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+    else
+        OPTIMIZATION_FLAGS=""
+    fi
     COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_INCLUDES}"
