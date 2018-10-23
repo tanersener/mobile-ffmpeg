@@ -35,6 +35,13 @@ extern int const RETURN_CODE_CANCEL;
 @interface MobileFFmpeg : NSObject
 
 /**
+ * Appends given log output to the last command output.
+ *
+ * \param output log output
+ */
++ (void)appendCommandOutput: (NSString*)output;
+
+/**
  * Returns FFmpeg version bundled within the library.
  *
  * \return FFmpeg version
@@ -81,5 +88,20 @@ extern int const RETURN_CODE_CANCEL;
  * This function does not wait for termination to complete and returns immediately.
  */
 + (void)cancel;
+
+/**
+ * Returns return code of last executed command.
+ *
+ * \return return code of last executed command
+ */
++ (int)getLastReturnCode;
+
+/**
+ * Returns log output of last executed command. Please note that disabling redirection using
+ * MobileFFmpegConfig.disableRedirection() method also disables this functionality.
+ *
+ * \return output of last executed command
+ */
++ (NSString*)getLastCommandOutput;
 
 @end

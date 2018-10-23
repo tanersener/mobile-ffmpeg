@@ -35,9 +35,25 @@ NSString *const MOBILE_FFMPEG_VERSION = @"3.0";
 int const RETURN_CODE_SUCCESS = 0;
 int const RETURN_CODE_CANCEL = 255;
 
+static int lastReturnCode;
+static NSMutableString *lastCommandOutput;
+
 + (void)initialize {
     [MobileFFmpegConfig class];
+
+    lastReturnCode = 0;
+    lastCommandOutput = [[NSMutableString alloc] init];
+
     NSLog(@"Loaded mobile-ffmpeg-%@-%@\n", [ArchDetect getArch], [MobileFFmpeg getVersion]);
+}
+
+/**
+ * Appends given log output to the last command output.
+ *
+ * \param output log output
+ */
++ (void)appendCommandOutput: (NSString*)output {
+    [lastCommandOutput appendString:output];
 }
 
 /**
@@ -65,6 +81,8 @@ int const RETURN_CODE_CANCEL = 255;
  * \return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)executeWithArguments: (NSArray*)arguments {
+    lastCommandOutput = [[NSMutableString alloc] init];
+
     char **commandCharPArray = (char **)malloc(sizeof(char*) * ([arguments count] + 1));
 
     /* PRESERVING CALLING FORMAT
@@ -80,13 +98,13 @@ int const RETURN_CODE_CANCEL = 255;
     }
 
     // RUN
-    int retCode = execute(([arguments count] + 1), commandCharPArray);
+    lastReturnCode = execute(([arguments count] + 1), commandCharPArray);
 
     // CLEANUP
     free(commandCharPArray[0]);
     free(commandCharPArray);
 
-    return retCode;
+    return lastReturnCode;
 }
 
 /**
@@ -122,6 +140,25 @@ int const RETURN_CODE_CANCEL = 255;
  */
 + (void)cancel {
     cancel_operation();
+}
+
+/**
+ * Returns return code of last executed command.
+ *
+ * \return return code of last executed command
+ */
++ (int)getLastReturnCode {
+    return lastReturnCode;
+}
+
+/**
+ * Returns log output of last executed command. Please note that disabling redirection using
+ * MobileFFmpegConfig.disableRedirection() method also disables this functionality.
+ *
+ * \return output of last executed command
+ */
++ (NSString*)getLastCommandOutput {
+    return lastCommandOutput;
 }
 
 @end
