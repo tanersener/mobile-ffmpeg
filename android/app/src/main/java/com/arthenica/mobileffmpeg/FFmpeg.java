@@ -142,7 +142,7 @@ public class FFmpeg {
      * <p>Returns log output of last executed command. Please note that disabling redirection using
      * {@link Config#disableRedirection()} method also disables this functionality.
      *
-     * @return output of last executed command.
+     * @return output of last executed command
      * @since 3.0
      */
     public static String getLastCommandOutput() {

@@ -51,18 +51,29 @@ extern int const RETURN_CODE_CANCEL;
 /**
  * Synchronously executes FFmpeg with arguments provided.
  *
- * \param FFmpeg command options/arguments in one string
- * \return zero on successful execution, 255 on user cancel and non-zero on error
- */
-+ (int)execute: (NSString*)arguments;
-
-/**
- * Synchronously executes FFmpeg with arguments provided.
- *
  * \param FFmpeg command options/arguments as string array
  * \return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)executeWithArray: (NSArray*)arguments;
++ (int)executeWithArguments: (NSArray*)arguments;
+
+/**
+ * Synchronously executes FFmpeg command provided. Space character is used to split command
+ * into arguments.
+ *
+ * \param FFmpeg command
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
+ */
++ (int)execute: (NSString*)command;
+
+/**
+ * Synchronously executes FFmpeg command provided. Delimiter parameter is used to split
+ * command into arguments.
+ *
+ * \param FFmpeg command
+ * \param arguments delimiter
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
+ */
++ (int)executeWithDelimiter: (NSString*)command delimiter:(NSString*)delimiter;
 
 /**
  * Cancels an ongoing operation.
