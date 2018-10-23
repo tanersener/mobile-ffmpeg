@@ -39,7 +39,7 @@ import java.util.concurrent.Callable;
 
 public class HttpsTabFragment extends Fragment {
 
-    public static final String HTTPS_TEST_DEFAULT_URL = "https://download.blender.org/peach/trailer/trailer_400p.ogg";
+    public static final String HTTPS_TEST_DEFAULT_URL = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/FFmpeg-Logo.svg/568px-FFmpeg-Logo.svg.png";
 
     private MainActivity mainActivity;
     private EditText urlText;
@@ -119,7 +119,7 @@ public class HttpsTabFragment extends Fragment {
         }
 
         // HTTPS COMMAND ARGUMENTS
-        final String ffmpegCommand = String.format("-hide_banner -i %s", testUrl);
+        final String ffmpegCommand = String.format("-hide_banner -i %s -f null -", testUrl);
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
 
