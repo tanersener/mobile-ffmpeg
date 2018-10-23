@@ -77,11 +77,11 @@ silk/stereo_find_predictor.c \
 silk/stereo_quant_pred.c \
 silk/LPC_fit.c
 
-SILK_SOURCES_SSE4_1 = silk/x86/NSQ_sse.c \
-silk/x86/NSQ_del_dec_sse.c \
+SILK_SOURCES_SSE4_1 = silk/x86/NSQ_sse4_1.c \
+silk/x86/NSQ_del_dec_sse4_1.c \
 silk/x86/x86_silk_map.c \
-silk/x86/VAD_sse.c \
-silk/x86/VQ_WMat_EC_sse.c
+silk/x86/VAD_sse4_1.c \
+silk/x86/VQ_WMat_EC_sse4_1.c
 
 SILK_SOURCES_ARM_NEON_INTR = \
 silk/arm/arm_silk_map.c \
@@ -115,8 +115,8 @@ silk/fixed/vector_ops_FIX.c \
 silk/fixed/schur64_FIX.c \
 silk/fixed/schur_FIX.c
 
-SILK_SOURCES_FIXED_SSE4_1 = silk/fixed/x86/vector_ops_FIX_sse.c \
-silk/fixed/x86/burg_modified_FIX_sse.c
+SILK_SOURCES_FIXED_SSE4_1 = silk/fixed/x86/vector_ops_FIX_sse4_1.c \
+silk/fixed/x86/burg_modified_FIX_sse4_1.c
 
 SILK_SOURCES_FIXED_ARM_NEON_INTR = \
 silk/fixed/arm/warped_autocorrelation_FIX_neon_intr.c
