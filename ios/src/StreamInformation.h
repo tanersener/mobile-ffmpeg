@@ -19,6 +19,9 @@
 
 #include <Foundation/Foundation.h>
 
+/**
+ * Stream information class.
+ */
 @interface StreamInformation : NSObject
 
 - (instancetype)init;

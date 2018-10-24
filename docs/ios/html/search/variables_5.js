@@ -30,7 +30,8 @@ var searchData=
   ['forced_5fkf_5fcount',['forced_kf_count',['../db/dde/struct_output_stream.html#ad637657f407c25840b6d1ed803b026e3',1,'OutputStream']]],
   ['forced_5fkf_5findex',['forced_kf_index',['../db/dde/struct_output_stream.html#a7286a2f0c752dbd752ac4192f5c3bca8',1,'OutputStream']]],
   ['forced_5fkf_5fpts',['forced_kf_pts',['../db/dde/struct_output_stream.html#a53f8e114ef0ef477d3d4409568a68ff6',1,'OutputStream']]],
-  ['format',['format',['../df/d77/struct_options_context.html#a295fefa29d7132a93db9110dce6eeab9',1,'OptionsContext::format()'],['../d7/d0c/struct_input_filter.html#ae704ff879704d2ab90dad159526785e2',1,'InputFilter::format()'],['../d0/d0f/struct_output_filter.html#aeba350050d2035d755254154e6551c49',1,'OutputFilter::format()']]],
+  ['forced_5fkf_5fref_5fpts',['forced_kf_ref_pts',['../db/dde/struct_output_stream.html#ac99140cc5be4b4ed439d5e4c854189fa',1,'OutputStream']]],
+  ['format',['format',['../df/d77/struct_options_context.html#a295fefa29d7132a93db9110dce6eeab9',1,'OptionsContext::format()'],['../d7/d0c/struct_input_filter.html#ae704ff879704d2ab90dad159526785e2',1,'InputFilter::format()'],['../d0/d0f/struct_output_filter.html#aeba350050d2035d755254154e6551c49',1,'OutputFilter::format()'],['../d7/da5/_stream_information_8m.html#a93680d6497794a5fe65d556ebefe05f1',1,'format():&#160;StreamInformation.m']]],
   ['format_5fopts',['format_opts',['../d6/d69/struct_option_group.html#aeac5e8e830df2e99aadfe65a471ce8fb',1,'OptionGroup::format_opts()'],['../d7/dcc/fftools__cmdutils_8c.html#a943d0199a3f44df589324a8fe9365c48',1,'format_opts():&#160;fftools_cmdutils.c'],['../d8/d4e/fftools__cmdutils_8h.html#a943d0199a3f44df589324a8fe9365c48',1,'format_opts():&#160;fftools_cmdutils.c']]],
   ['formats',['formats',['../d0/d0f/struct_output_filter.html#acd4f04cfb3db05beef2507e397aef9aa',1,'OutputFilter']]],
   ['frame',['frame',['../d4/dfd/struct_input_stream_1_1sub2video.html#a0e7ca3e0eebc5db360ae15f2dac3d622',1,'InputStream::sub2video']]],
@@ -47,5 +48,7 @@ var searchData=
   ['framerate',['framerate',['../d3/d6e/struct_input_stream.html#afbaeaac6e0b1fc3095bb90f17d58621d',1,'InputStream']]],
   ['frames_5fdecoded',['frames_decoded',['../d3/d6e/struct_input_stream.html#ac61e0f854402b58a64e676bdcfa75dfd',1,'InputStream']]],
   ['frames_5fencoded',['frames_encoded',['../db/dde/struct_output_stream.html#a669f4ed12e518b1179b038eb0c045a78',1,'OutputStream']]],
+  ['fullcodec',['fullCodec',['../d7/da5/_stream_information_8m.html#a2af9e88e693eb88bf98a17d3ca439bd5',1,'StreamInformation.m']]],
+  ['fullformat',['fullFormat',['../d7/da5/_stream_information_8m.html#a1b24391c80805e9b4e90b671019bdf20',1,'StreamInformation.m']]],
   ['func_5farg',['func_arg',['../dc/d1e/struct_option_def.html#af4ef79476a47881699b234288bb79841',1,'OptionDef']]]
 ];

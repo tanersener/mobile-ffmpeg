@@ -20,6 +20,9 @@
 #include <Foundation/Foundation.h>
 #include "StreamInformation.h"
 
+/**
+ * Media information class.
+ */
 @interface MediaInformation : NSObject
 
 - (instancetype)init;
@@ -130,7 +133,7 @@
 - (void)addStream:(StreamInformation*) stream;
 
 /**
- * Returns all streams
+ * Returns all streams.
  *
  * \return streams array
  */

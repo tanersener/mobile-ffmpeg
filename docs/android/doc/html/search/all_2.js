@@ -60,6 +60,6 @@ var searchData=
   ['copy_5funknown_5fstreams',['copy_unknown_streams',['../da/d66/fftools__ffmpeg__opt_8c.html#a5aa06b6f3cf96243bf03bcbcb7b2ae43',1,'fftools_ffmpeg_opt.c']]],
   ['ctx',['ctx',['../d8/d99/struct_input_file.html#a4062ac530db413964aa76090995b85cd',1,'InputFile::ctx()'],['../de/df2/struct_output_file.html#a6bfbcb8e4d6564ae0c488d58c0fb0d5f',1,'OutputFile::ctx()']]],
   ['cur_5fgroup',['cur_group',['../db/db5/struct_option_parse_context.html#aeee35d464ee609c78c9363cd54b7db13',1,'OptionParseContext']]],
-  ['current_5ftime',['current_time',['../d7/d48/fftools__ffmpeg_8c.html#a8915224642e155ba06d1682e27c56c41',1,'fftools_ffmpeg.c']]],
+  ['current_5ftime',['current_time',['../d7/d48/fftools__ffmpeg_8c.html#ab5bf959273aea0345c7589f15d913331',1,'fftools_ffmpeg.c']]],
   ['cuvid_5finit',['cuvid_init',['../d7/db3/fftools__ffmpeg_8h.html#ab32fb6d7c6b1506ecfc72d4de48c4be6',1,'fftools_ffmpeg.h']]]
 ];

@@ -2,6 +2,7 @@ var searchData=
 [
   ['g',['g',['../df/d77/struct_options_context.html#affab676ea6f867fa622a0a642d8dacf8',1,'OptionsContext']]],
   ['get_5farg',['GET_ARG',['../d7/dcc/fftools__cmdutils_8c.html#a77359635accb87859b14d66b53002138',1,'fftools_cmdutils.c']]],
+  ['get_5fbenchmark_5ftime_5fstamps',['get_benchmark_time_stamps',['../d7/d48/fftools__ffmpeg_8c.html#a18d3980caddd835d0192f7ff2ed1b9b2',1,'fftools_ffmpeg.c']]],
   ['get_5fbuffer',['get_buffer',['../d7/d48/fftools__ffmpeg_8c.html#a8aac50e0d8fe8a1bb2d79b56b9e57b0a',1,'fftools_ffmpeg.c']]],
   ['get_5fch_5flayout_5fdesc',['GET_CH_LAYOUT_DESC',['../d8/d4e/fftools__cmdutils_8h.html#a950a3e73a77345e482e796c305ef25e4',1,'fftools_cmdutils.h']]],
   ['get_5fch_5flayout_5fname',['GET_CH_LAYOUT_NAME',['../d8/d4e/fftools__cmdutils_8h.html#a7b25c6a8e4f3e33fa53837200cbee607',1,'fftools_cmdutils.h']]],
@@ -21,7 +22,6 @@ var searchData=
   ['get_5fsample_5ffmt_5fname',['GET_SAMPLE_FMT_NAME',['../d8/d4e/fftools__cmdutils_8h.html#ab04427a6bc0201f8f4a95db84104c8ad',1,'fftools_cmdutils.h']]],
   ['get_5fsample_5frate_5fname',['GET_SAMPLE_RATE_NAME',['../d8/d4e/fftools__cmdutils_8h.html#a0745a3311be303dc4d6d9da67756e1e9',1,'fftools_cmdutils.h']]],
   ['getmaxrss',['getmaxrss',['../d7/d48/fftools__ffmpeg_8c.html#a5be8624c1f375fb6ad9bd97bcc05f898',1,'fftools_ffmpeg.c']]],
-  ['getutime',['getutime',['../d7/d48/fftools__ffmpeg_8c.html#a7e7fb7d9afa5132c36352b1e12b6d0f8',1,'fftools_ffmpeg.c']]],
   ['global_5fopts',['global_opts',['../db/db5/struct_option_parse_context.html#a1aea6da0c95924fa2d68bae2a404bd32',1,'OptionParseContext']]],
   ['globalvm',['globalVm',['../dd/d16/mobileffmpeg_8c.html#a836d04ac8f7f51d0e6181c641eed7441',1,'mobileffmpeg.c']]],
   ['got_5feagain',['got_eagain',['../d7/d48/fftools__ffmpeg_8c.html#a94a52b0309bc05208e547d00c4ad3cba',1,'fftools_ffmpeg.c']]],

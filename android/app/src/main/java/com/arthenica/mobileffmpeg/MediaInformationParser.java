@@ -33,6 +33,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Helper class for {@link MediaInformation}.
+ *
+ * @since 3.0
+ */
 public class MediaInformationParser {
 
     public static SimpleDateFormat DURATION_FORMAT;
@@ -50,6 +55,12 @@ public class MediaInformationParser {
         }
     }
 
+    /**
+     * Parses media information command output and builds a {@link MediaInformation} instance.
+     *
+     * @param rawCommandOutput media information command output
+     * @return parsed instance of null if a parsing error occurs
+     */
     public static MediaInformation from(final String rawCommandOutput) {
         final MediaInformation mediaInformation = new MediaInformation();
 
@@ -110,14 +121,14 @@ public class MediaInformationParser {
         return mediaInformation;
     }
 
-    public static Pair<String, String> parseInputBlock(final String input) {
+    static Pair<String, String> parseInputBlock(final String input) {
         String format = substring(input, ",", ", from", Collections.<String>emptyList());
         String path = substring(input, "\'", "\'", Collections.<String>emptyList());
 
         return new Pair<>(format, path);
     }
 
-    public static Trio<Long, Long, Long> parseDurationBlock(final String line) {
+    static Trio<Long, Long, Long> parseDurationBlock(final String line) {
         Long duration = parseDuration(substring(line, "Duration:", ",", Collections.singletonList("uration:")));
         Long start = parseStartTime(substring(line, "start:", ",", Collections.singletonList("tart:")));
         Long bitrate = toLongObject(substring(line, "bitrate:", Arrays.asList("itrate:", "kb/s")));
@@ -125,7 +136,7 @@ public class MediaInformationParser {
         return new Trio<>(duration, start, bitrate);
     }
 
-    public static Pair<String, String> parseMetadataBlock(final String metadata) {
+    static Pair<String, String> parseMetadataBlock(final String metadata) {
         String key = null;
         String value = null;
 
@@ -140,7 +151,7 @@ public class MediaInformationParser {
         return new Pair<>(key, value);
     }
 
-    public static StreamInformation parseStreamBlock(final String input) {
+    static StreamInformation parseStreamBlock(final String input) {
         final StreamInformation streamInformation = new StreamInformation();
 
         if (input != null) {
@@ -229,7 +240,7 @@ public class MediaInformationParser {
         return streamInformation;
     }
 
-    public static Pair<Long, Long> parseVideoDimensions(final String input) {
+    static Pair<Long, Long> parseVideoDimensions(final String input) {
         Long width = null;
         Long height = null;
 
@@ -242,7 +253,7 @@ public class MediaInformationParser {
         return new Pair<>(width, height);
     }
 
-    public static String parseVideoStreamSampleAspectRatio(final String input) {
+    static String parseVideoStreamSampleAspectRatio(final String input) {
         if (input != null) {
             String[] parts = input.replaceAll("\\[", "").replaceAll("\\]", "").split(" ");
             for (int i = 0; i < parts.length; i++) {
@@ -255,7 +266,7 @@ public class MediaInformationParser {
         return null;
     }
 
-    public static String parseVideoStreamDisplayAspectRatio(final String input) {
+    static String parseVideoStreamDisplayAspectRatio(final String input) {
         if (input != null) {
             String[] parts = input.replaceAll("\\[", "").replaceAll("\\]", "").split(" ");
             for (int i = 0; i < parts.length; i++) {
@@ -268,7 +279,7 @@ public class MediaInformationParser {
         return null;
     }
 
-    public static Long parseAudioStreamSampleRate(final String input) {
+    static Long parseAudioStreamSampleRate(final String input) {
         if (input != null) {
             boolean khz = false;
             boolean mhz = false;
@@ -299,7 +310,7 @@ public class MediaInformationParser {
         return null;
     }
 
-    public static String parseStreamType(final String input) {
+    static String parseStreamType(final String input) {
         if (input != null) {
             if (input.toLowerCase().contains("audio:")) {
                 return "audio";
@@ -311,7 +322,7 @@ public class MediaInformationParser {
         return null;
     }
 
-    public static String parseStreamCodec(final String input) {
+    static String parseStreamCodec(final String input) {
         if (input != null) {
             return input.toLowerCase()
                     .replaceAll("\\(.*\\)", "")
@@ -323,7 +334,7 @@ public class MediaInformationParser {
         return null;
     }
 
-    public static String parseStreamFullCodec(final String input) {
+    static String parseStreamFullCodec(final String input) {
         if (input != null) {
             return input.toLowerCase()
                     .replaceAll("video:", "")
@@ -334,7 +345,7 @@ public class MediaInformationParser {
         return null;
     }
 
-    public static Long parseStreamIndex(final String input) {
+    static Long parseStreamIndex(final String input) {
         String substring = substring(input, "Stream #0:", ":", Collections.singletonList("tream #0"));
         if (substring != null) {
 
@@ -347,7 +358,7 @@ public class MediaInformationParser {
         return null;
     }
 
-    public static Long parseDuration(final String duration) {
+    static Long parseDuration(final String duration) {
         if (duration == null || duration.equals("N/A")) {
             return null;
         }
@@ -371,7 +382,7 @@ public class MediaInformationParser {
         }
     }
 
-    public static Long parseStartTime(final String startTime) {
+    static Long parseStartTime(final String startTime) {
         if (startTime == null || startTime.equals("N/A")) {
             return null;
         }
@@ -454,7 +465,7 @@ public class MediaInformationParser {
         return count;
     }
 
-    public static <K> K safeGet(final K[] array, final int index) {
+    private static <K> K safeGet(final K[] array, final int index) {
         if (array == null) {
             return null;
         }
@@ -471,7 +482,7 @@ public class MediaInformationParser {
         }
     }
 
-    public static long toLong(final String value) {
+    private static long toLong(final String value) {
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {
@@ -479,7 +490,7 @@ public class MediaInformationParser {
         }
     }
 
-    public static Long toLongObject(final String value) {
+    static Long toLongObject(final String value) {
         try {
             return Long.parseLong(value);
         } catch (NumberFormatException e) {

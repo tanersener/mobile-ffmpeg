@@ -44,5 +44,6 @@ var searchData=
   ['sync_5ffile_5findex',['sync_file_index',['../db/d60/struct_stream_map.html#aebf79dd4732117dab9f6b88ffe0d6fb0',1,'StreamMap']]],
   ['sync_5fist',['sync_ist',['../db/dde/struct_output_stream.html#abc0329cada4c47662e2777d392a38efb',1,'OutputStream']]],
   ['sync_5fopts',['sync_opts',['../db/dde/struct_output_stream.html#a50f00c2ce0091c940779ac59227ad934',1,'OutputStream']]],
-  ['sync_5fstream_5findex',['sync_stream_index',['../db/d60/struct_stream_map.html#a8839b093e6e8ae59892cfe68d9dc99c6',1,'StreamMap']]]
+  ['sync_5fstream_5findex',['sync_stream_index',['../db/d60/struct_stream_map.html#a8839b093e6e8ae59892cfe68d9dc99c6',1,'StreamMap']]],
+  ['sys_5fusec',['sys_usec',['../d5/d8e/struct_benchmark_time_stamps.html#a06a44cae9b837e8481ba86a648cbcc95',1,'BenchmarkTimeStamps']]]
 ];

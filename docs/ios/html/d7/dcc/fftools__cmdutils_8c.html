@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MobileFFmpeg IOS API
-   &#160;<span id="projectnumber">2.2</span>
+   &#160;<span id="projectnumber">3.0</span>
    </div>
   </td>
  </tr>
@@ -76,7 +76,7 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a6ccad09b4a2a06ae178418fdccf5940d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a6ccad09b4a2a06ae178418fdccf5940d">FLAGS</a>&#160;&#160;&#160;(o-&gt;type == AV_OPT_TYPE_FLAGS &amp;&amp; (arg[0]=='-' || arg[0]=='+')) ? AV_DICT_APPEND : 0</td></tr>
+<tr class="memitem:a6ccad09b4a2a06ae178418fdccf5940d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a6ccad09b4a2a06ae178418fdccf5940d">FLAGS</a>&#160;&#160;&#160;(o-&gt;<a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a> == AV_OPT_TYPE_FLAGS &amp;&amp; (arg[0]=='-' || arg[0]=='+')) ? AV_DICT_APPEND : 0</td></tr>
 <tr class="separator:a6ccad09b4a2a06ae178418fdccf5940d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77359635accb87859b14d66b53002138"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a77359635accb87859b14d66b53002138">GET_ARG</a>(arg)</td></tr>
 <tr class="separator:a77359635accb87859b14d66b53002138"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -90,7 +90,7 @@ Macros</h2></td></tr>
 <tr class="separator:abd0ec713b97008fc3cf59d1e62f8d414"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6dbb327ec24eebea72ba8769c68024b3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a6dbb327ec24eebea72ba8769c68024b3">PRINT_LIB_INFO</a>(libname,  LIBNAME,  flags,  level)</td></tr>
 <tr class="separator:a6dbb327ec24eebea72ba8769c68024b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0ae219da0c0d02b180f9badbb6edb38"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#af0ae219da0c0d02b180f9badbb6edb38">PRINT_CODEC_SUPPORTED</a>(codec,  field,  type,  list_name,  term,  get_name)</td></tr>
+<tr class="memitem:af0ae219da0c0d02b180f9badbb6edb38"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#af0ae219da0c0d02b180f9badbb6edb38">PRINT_CODEC_SUPPORTED</a>(<a class="el" href="../../d7/da5/_stream_information_8m.html#afc795c423a27dc464531c514244cef50">codec</a>,  field,  <a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>,  list_name,  term,  get_name)</td></tr>
 <tr class="separator:af0ae219da0c0d02b180f9badbb6edb38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9e1a5468e1c3cc5eaf3d3a7ce599455"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#af9e1a5468e1c3cc5eaf3d3a7ce599455">sws_isSupportedInput</a>(x)&#160;&#160;&#160;0</td></tr>
 <tr class="separator:af9e1a5468e1c3cc5eaf3d3a7ce599455"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,7 +109,7 @@ Enumerations</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:af0097496b83f2029f059d317c97392f3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#af0097496b83f2029f059d317c97392f3">init_report</a> (const char *env)</td></tr>
 <tr class="separator:af0097496b83f2029f059d317c97392f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a0b0c8c4f0496cd0ed87e183a0a493d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a2a0b0c8c4f0496cd0ed87e183a0a493d">mobileffmpeg_log_callback_function</a> (void *ptr, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> level, const char *format, va_list vargs)</td></tr>
+<tr class="memitem:a2a0b0c8c4f0496cd0ed87e183a0a493d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a2a0b0c8c4f0496cd0ed87e183a0a493d">mobileffmpeg_log_callback_function</a> (void *ptr, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> level, const char *<a class="el" href="../../d7/da5/_stream_information_8m.html#a93680d6497794a5fe65d556ebefe05f1">format</a>, va_list vargs)</td></tr>
 <tr class="separator:a2a0b0c8c4f0496cd0ed87e183a0a493d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb11173c4516257ff8fa004ad388e41a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#aeb11173c4516257ff8fa004ad388e41a">init_opts</a> (void)</td></tr>
 <tr class="separator:aeb11173c4516257ff8fa004ad388e41a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -121,7 +121,7 @@ Functions</h2></td></tr>
 <tr class="separator:aa64dcad44f54da335b337154d9e9950f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00fcf983c7dd20dd65568b3ebc20ed44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a00fcf983c7dd20dd65568b3ebc20ed44">exit_program</a> (<a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> ret)</td></tr>
 <tr class="separator:a00fcf983c7dd20dd65568b3ebc20ed44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aee611299e84dab23d614366f993e96ae"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#aee611299e84dab23d614366f993e96ae">parse_number_or_die</a> (const char *context, const char *numstr, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> type, double min, double max)</td></tr>
+<tr class="memitem:aee611299e84dab23d614366f993e96ae"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#aee611299e84dab23d614366f993e96ae">parse_number_or_die</a> (const char *context, const char *numstr, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> <a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>, double min, double max)</td></tr>
 <tr class="separator:aee611299e84dab23d614366f993e96ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa60d6deab0047c29fc1f6602f812774f"><td class="memItemLeft" align="right" valign="top">int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#aa60d6deab0047c29fc1f6602f812774f">parse_time_or_die</a> (const char *context, const char *timestr, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> is_duration)</td></tr>
 <tr class="separator:aa60d6deab0047c29fc1f6602f812774f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -207,7 +207,7 @@ Functions</h2></td></tr>
 <tr class="separator:aaf26a4937c16d8b7cb22a6542ebb46a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac5cf0f0047f2fbb773b73e95919d4821"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#ac5cf0f0047f2fbb773b73e95919d4821">print_codec</a> (const AVCodec *c)</td></tr>
 <tr class="separator:ac5cf0f0047f2fbb773b73e95919d4821"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a10d00329fa22b369c9b36167947c02"><td class="memItemLeft" align="right" valign="top">static char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a8a10d00329fa22b369c9b36167947c02">get_media_type_char</a> (enum AVMediaType type)</td></tr>
+<tr class="memitem:a8a10d00329fa22b369c9b36167947c02"><td class="memItemLeft" align="right" valign="top">static char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a8a10d00329fa22b369c9b36167947c02">get_media_type_char</a> (enum AVMediaType <a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>)</td></tr>
 <tr class="separator:a8a10d00329fa22b369c9b36167947c02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a32ce6570506a3665692064967411b000"><td class="memItemLeft" align="right" valign="top">static const AVCodec *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a32ce6570506a3665692064967411b000">next_codec_for_id</a> (enum AVCodecID id, const AVCodec *prev, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> encoder)</td></tr>
 <tr class="separator:a32ce6570506a3665692064967411b000"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -255,7 +255,7 @@ Functions</h2></td></tr>
 <tr class="separator:a4ba31d95fc6fc14e603fa86e7a007409"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a632b71e4b56c5ee8556a407bbecbcef8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a632b71e4b56c5ee8556a407bbecbcef8">check_stream_specifier</a> (AVFormatContext *s, AVStream *st, const char *spec)</td></tr>
 <tr class="separator:a632b71e4b56c5ee8556a407bbecbcef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a98c102ceb9bca5531e6d43f951e9afed"><td class="memItemLeft" align="right" valign="top">AVDictionary *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a98c102ceb9bca5531e6d43f951e9afed">filter_codec_opts</a> (AVDictionary *opts, enum AVCodecID codec_id, AVFormatContext *s, AVStream *st, AVCodec *codec)</td></tr>
+<tr class="memitem:a98c102ceb9bca5531e6d43f951e9afed"><td class="memItemLeft" align="right" valign="top">AVDictionary *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a98c102ceb9bca5531e6d43f951e9afed">filter_codec_opts</a> (AVDictionary *opts, enum AVCodecID codec_id, AVFormatContext *s, AVStream *st, AVCodec *<a class="el" href="../../d7/da5/_stream_information_8m.html#afc795c423a27dc464531c514244cef50">codec</a>)</td></tr>
 <tr class="separator:a98c102ceb9bca5531e6d43f951e9afed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6246f47f8e3ef9a3e99e5d1457c7d197"><td class="memItemLeft" align="right" valign="top">AVDictionary **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d7/dcc/fftools__cmdutils_8c.html#a6246f47f8e3ef9a3e99e5d1457c7d197">setup_find_stream_info_opts</a> (AVFormatContext *s, AVDictionary *<a class="el" href="../../d8/d4e/fftools__cmdutils_8h.html#aade971c14ebd8eacf328845208aad523">codec_opts</a>)</td></tr>
 <tr class="separator:a6246f47f8e3ef9a3e99e5d1457c7d197"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -297,7 +297,7 @@ Variables</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define FLAGS&#160;&#160;&#160;(o-&gt;type == AV_OPT_TYPE_FLAGS &amp;&amp; (arg[0]=='-' || arg[0]=='+')) ? AV_DICT_APPEND : 0</td>
+          <td class="memname">#define FLAGS&#160;&#160;&#160;(o-&gt;<a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a> == AV_OPT_TYPE_FLAGS &amp;&amp; (arg[0]=='-' || arg[0]=='+')) ? AV_DICT_APPEND : 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -350,7 +350,7 @@ Variables</h2></td></tr>
           <td class="memname">#define PRINT_CODEC_SUPPORTED</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">codec, </td>
+          <td class="paramname"><a class="el" href="../../d7/da5/_stream_information_8m.html#afc795c423a27dc464531c514244cef50">codec</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -362,7 +362,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
+          <td class="paramname"><a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -389,7 +389,9 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span> (codec-&gt;field) {                                                      \</div><div class="line">        const type *p = codec-&gt;field;                                        \</div><div class="line">                                                                             \</div><div class="line">        printf(<span class="stringliteral">&quot;    Supported &quot;</span> list_name <span class="stringliteral">&quot;:&quot;</span>);                              \</div><div class="line">        while (*p != term) {                                                 \</div><div class="line">            get_name(*p);                                                    \</div><div class="line">            printf(<span class="stringliteral">&quot; %s&quot;</span>, name);                                             \</div><div class="line">            p++;                                                             \</div><div class="line">        }                                                                    \</div><div class="line">        printf(<span class="stringliteral">&quot;\n&quot;</span>);                                                        \</div><div class="line">    }                                                                        \</div></div><!-- fragment -->
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span> (<a class="code" href="../../d7/da5/_stream_information_8m.html#afc795c423a27dc464531c514244cef50">codec</a>-&gt;field) {                                                      \</div><div class="line">        const <a class="code" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a> *p = <a class="code" href="../../d7/da5/_stream_information_8m.html#afc795c423a27dc464531c514244cef50">codec</a>-&gt;field;                                        \</div><div class="line">                                                                             \</div><div class="line">        printf(<span class="stringliteral">&quot;    Supported &quot;</span> list_name <span class="stringliteral">&quot;:&quot;</span>);                              \</div><div class="line">        while (*p != term) {                                                 \</div><div class="line">            get_name(*p);                                                    \</div><div class="line">            printf(<span class="stringliteral">&quot; %s&quot;</span>, name);                                             \</div><div class="line">            p++;                                                             \</div><div class="line">        }                                                                    \</div><div class="line">        printf(<span class="stringliteral">&quot;\n&quot;</span>);                                                        \</div><div class="line">    }                                                                        \</div><div class="ttc" id="_stream_information_8m_html_abff6a04d71c2bba87e646615388a1f5c"><div class="ttname"><a href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a></div><div class="ttdeci">NSString * type</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/da5/_stream_information_8m_source.html#l00022">StreamInformation.m:22</a></div></div>
+<div class="ttc" id="_stream_information_8m_html_afc795c423a27dc464531c514244cef50"><div class="ttname"><a href="../../d7/da5/_stream_information_8m.html#afc795c423a27dc464531c514244cef50">codec</a></div><div class="ttdeci">NSString * codec</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/da5/_stream_information_8m_source.html#l00030">StreamInformation.m:30</a></div></div>
+</div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01378">1378</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
@@ -667,7 +669,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>1 if the stream matches, 0 if it doesn't, &lt;0 on error </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02053">2053</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02077">2077</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -705,7 +707,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01492">1492</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01513">1513</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -859,7 +861,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a pointer to the created dictionary </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02061">2061</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02085">2085</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -969,7 +971,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01501">1501</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01522">1522</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -997,7 +999,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01469">1469</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01490">1490</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -1057,7 +1059,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02003">2003</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02027">2027</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -1077,7 +1079,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02157">2157</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02181">2181</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -1130,7 +1132,7 @@ Variables</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>reallocated array </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02138">2138</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02162">2162</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -1411,7 +1413,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00209">209</a> of file <a class="el" href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html">MobileFFmpegConfig.m</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html#l00215">215</a> of file <a class="el" href="../../d2/d82/_mobile_f_fmpeg_config_8m_source.html">MobileFFmpegConfig.m</a>.</p>
 
 </div>
 </div>
@@ -1455,7 +1457,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01481">1481</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01502">1502</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2156,7 +2158,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01589">1589</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01610">1610</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2194,7 +2196,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01522">1522</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01543">1543</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2286,7 +2288,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Return a positive value if a line read from standard input starts with [yY], otherwise return 0. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01992">1992</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02016">2016</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2340,7 +2342,7 @@ Variables</h2></td></tr>
 <p>Create an array of dictionaries, one dictionary for each stream contained in s. Each dictionary will contain the options from codec_opts which can be applied to the corresponding stream codec context.</p>
 <dl class="section return"><dt>Returns</dt><dd>pointer to the created array of dictionaries, NULL if it cannot be created </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02118">2118</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02142">2142</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2414,7 +2416,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the bit stream filters supported by the program. This option processing function does not utilize the arguments. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01639">1639</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01660">1660</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2488,7 +2490,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the codecs supported by the program. This option processing function does not utilize the arguments. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01534">1534</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01555">1555</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2525,7 +2527,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the color names and values recognized by the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01713">1713</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01734">1734</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2562,7 +2564,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the decoders supported by the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01627">1627</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01648">1648</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2673,7 +2675,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the encoders supported by the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01633">1633</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01654">1654</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2710,7 +2712,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the filters supported by the program. This option processing function does not utilize the arguments. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01666">1666</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01687">1687</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2840,7 +2842,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Generic -h handler common to all fftools. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01956">1956</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01980">1980</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2868,7 +2870,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01940">1940</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01961">1961</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2937,7 +2939,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01798">1798</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01819">1819</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2965,7 +2967,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01833">1833</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01854">1854</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -2993,7 +2995,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01851">1851</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01872">1872</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -3089,7 +3091,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the standard channel layouts supported by the program. This option processing function does not utilize the arguments. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01760">1760</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01781">1781</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -3200,7 +3202,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the pixel formats supported by the program. This option processing function does not utilize the arguments. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01727">1727</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01748">1748</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -3237,7 +3239,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the protocols supported by the program. This option processing function does not utilize the arguments. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01651">1651</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01672">1672</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -3274,7 +3276,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Print a listing containing all the sample formats supported by the program. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01789">1789</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html#l01810">1810</a> of file <a class="el" href="../../d7/dcc/fftools__cmdutils_8c_source.html">fftools_cmdutils.c</a>.</p>
 
 </div>
 </div>
@@ -3677,7 +3679,7 @@ Variables</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Sep 29 2018 11:25:34 for MobileFFmpeg IOS API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 24 2018 21:43:23 for MobileFFmpeg IOS API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>

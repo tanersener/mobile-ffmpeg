@@ -5,6 +5,7 @@ var searchData=
   ['read_5ffile',['read_file',['../da/d66/fftools__ffmpeg__opt_8c.html#a5e2e3bad3070597d6c24777682c6209d',1,'fftools_ffmpeg_opt.c']]],
   ['read_5fkey',['read_key',['../d7/d48/fftools__ffmpeg_8c.html#a888998656da528d50f125b39dcd1067a',1,'fftools_ffmpeg.c']]],
   ['read_5fyesno',['read_yesno',['../d7/dcc/fftools__cmdutils_8c.html#a40394fd5966088e759ce995186773700',1,'read_yesno(void):&#160;fftools_cmdutils.c'],['../d8/d4e/fftools__cmdutils_8h.html#a40394fd5966088e759ce995186773700',1,'read_yesno(void):&#160;fftools_cmdutils.c']]],
+  ['real_5fusec',['real_usec',['../d5/d8e/struct_benchmark_time_stamps.html#a8639f0bbe9044fc765f4ec5b3968a488',1,'BenchmarkTimeStamps']]],
   ['reap_5ffilters',['reap_filters',['../d7/d48/fftools__ffmpeg_8c.html#a2fb313e7b4b1ef89bd7e8fff6f85d71e',1,'fftools_ffmpeg.c']]],
   ['received_5fnb_5fsignals',['received_nb_signals',['../d7/d48/fftools__ffmpeg_8c.html#aa67220b3d47d990ba75e7099f11cfa68',1,'fftools_ffmpeg.c']]],
   ['received_5fsigterm',['received_sigterm',['../d7/d48/fftools__ffmpeg_8c.html#a1a9c2c01a83c8bbcd4eb7a8af9a0b160',1,'fftools_ffmpeg.c']]],

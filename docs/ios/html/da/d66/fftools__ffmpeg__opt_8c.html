@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MobileFFmpeg IOS API
-   &#160;<span id="projectnumber">2.2</span>
+   &#160;<span id="projectnumber">3.0</span>
    </div>
   </td>
  </tr>
@@ -77,13 +77,13 @@ $(function() {
 Macros</h2></td></tr>
 <tr class="memitem:a4dd32a1942a804edb22f2e016406db41"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a4dd32a1942a804edb22f2e016406db41">DEFAULT_PASS_LOGFILENAME_PREFIX</a>&#160;&#160;&#160;&quot;ffmpeg2pass&quot;</td></tr>
 <tr class="separator:a4dd32a1942a804edb22f2e016406db41"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acb83c221072b82ac43e6ebe61787072c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#acb83c221072b82ac43e6ebe61787072c">MATCH_PER_STREAM_OPT</a>(name,  type,  outvar,  fmtctx,  st)</td></tr>
+<tr class="memitem:acb83c221072b82ac43e6ebe61787072c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#acb83c221072b82ac43e6ebe61787072c">MATCH_PER_STREAM_OPT</a>(name,  <a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>,  outvar,  fmtctx,  st)</td></tr>
 <tr class="separator:acb83c221072b82ac43e6ebe61787072c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4cc472c69041f4fae418334430ccb829"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a4cc472c69041f4fae418334430ccb829">MATCH_PER_TYPE_OPT</a>(name,  type,  outvar,  fmtctx,  mediatype)</td></tr>
+<tr class="memitem:a4cc472c69041f4fae418334430ccb829"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a4cc472c69041f4fae418334430ccb829">MATCH_PER_TYPE_OPT</a>(name,  <a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>,  outvar,  fmtctx,  mediatype)</td></tr>
 <tr class="separator:a4cc472c69041f4fae418334430ccb829"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b9568a0878b1ab0c5892ecd144030d2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a2b9568a0878b1ab0c5892ecd144030d2">METADATA_CHECK_INDEX</a>(index,  nb_elems,  desc)</td></tr>
 <tr class="separator:a2b9568a0878b1ab0c5892ecd144030d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0116f637ab1a81dd3079aaba28d280eb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a0116f637ab1a81dd3079aaba28d280eb">SET_DICT</a>(type,  meta,  context,  index)</td></tr>
+<tr class="memitem:a0116f637ab1a81dd3079aaba28d280eb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a0116f637ab1a81dd3079aaba28d280eb">SET_DICT</a>(<a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>,  meta,  context,  index)</td></tr>
 <tr class="separator:a0116f637ab1a81dd3079aaba28d280eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad12dce0a7bf9d908b172a28155b3d261"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#ad12dce0a7bf9d908b172a28155b3d261">OFFSET</a>(x)&#160;&#160;&#160;offsetof(<a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a>, x)</td></tr>
 <tr class="separator:ad12dce0a7bf9d908b172a28155b3d261"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -126,13 +126,13 @@ Functions</h2></td></tr>
 <tr class="separator:a0562365f1430adb96c3caf7f118570fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25e1d401275866fab2fc27a538ee5dcb"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a25e1d401275866fab2fc27a538ee5dcb">opt_filter_hw_device</a> (void *optctx, const char *opt, const char *arg)</td></tr>
 <tr class="separator:a25e1d401275866fab2fc27a538ee5dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:addce5fd9be8bdf3164ee4530de9d1a9b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#addce5fd9be8bdf3164ee4530de9d1a9b">parse_meta_type</a> (char *arg, char *type, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> *index, const char **stream_spec)</td></tr>
+<tr class="memitem:addce5fd9be8bdf3164ee4530de9d1a9b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#addce5fd9be8bdf3164ee4530de9d1a9b">parse_meta_type</a> (char *arg, char *<a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> *index, const char **stream_spec)</td></tr>
 <tr class="separator:addce5fd9be8bdf3164ee4530de9d1a9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6a67eca26b4c6486f913ffd45212699"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#af6a67eca26b4c6486f913ffd45212699">copy_metadata</a> (char *outspec, char *inspec, AVFormatContext *oc, AVFormatContext *ic, <a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a> *o)</td></tr>
 <tr class="separator:af6a67eca26b4c6486f913ffd45212699"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a051be8a087f27ad07591f6518c9d2901"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a051be8a087f27ad07591f6518c9d2901">opt_recording_timestamp</a> (void *optctx, const char *opt, const char *arg)</td></tr>
 <tr class="separator:a051be8a087f27ad07591f6518c9d2901"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6160b8451e297139e259026418310fc4"><td class="memItemLeft" align="right" valign="top">static AVCodec *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a6160b8451e297139e259026418310fc4">find_codec_or_die</a> (const char *name, enum AVMediaType type, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> encoder)</td></tr>
+<tr class="memitem:a6160b8451e297139e259026418310fc4"><td class="memItemLeft" align="right" valign="top">static AVCodec *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a6160b8451e297139e259026418310fc4">find_codec_or_die</a> (const char *name, enum AVMediaType <a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> encoder)</td></tr>
 <tr class="separator:a6160b8451e297139e259026418310fc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac744988f863cb2c27fce2a3c14e42c2c"><td class="memItemLeft" align="right" valign="top">static AVCodec *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#ac744988f863cb2c27fce2a3c14e42c2c">choose_decoder</a> (<a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a> *o, AVFormatContext *s, AVStream *st)</td></tr>
 <tr class="separator:ac744988f863cb2c27fce2a3c14e42c2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,7 +150,7 @@ Functions</h2></td></tr>
 <tr class="separator:a0052cf48462a3b3af1ba77fc84a3bb45"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a798202f0a6093603784e25782938fcd9"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a798202f0a6093603784e25782938fcd9">choose_encoder</a> (<a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a> *o, AVFormatContext *s, <a class="el" href="../../db/dde/struct_output_stream.html">OutputStream</a> *ost)</td></tr>
 <tr class="separator:a798202f0a6093603784e25782938fcd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a597d7c0a57e3c8b18fe58797b4f61309"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="../../db/dde/struct_output_stream.html">OutputStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a597d7c0a57e3c8b18fe58797b4f61309">new_output_stream</a> (<a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a> *o, AVFormatContext *oc, enum AVMediaType type, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> source_index)</td></tr>
+<tr class="memitem:a597d7c0a57e3c8b18fe58797b4f61309"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="../../db/dde/struct_output_stream.html">OutputStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a597d7c0a57e3c8b18fe58797b4f61309">new_output_stream</a> (<a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a> *o, AVFormatContext *oc, enum AVMediaType <a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> source_index)</td></tr>
 <tr class="separator:a597d7c0a57e3c8b18fe58797b4f61309"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a397cc104dc1f9c0ce9c8e2759226a15b"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a397cc104dc1f9c0ce9c8e2759226a15b">parse_matrix_coeffs</a> (uint16_t *dest, const char *str)</td></tr>
 <tr class="separator:a397cc104dc1f9c0ce9c8e2759226a15b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,7 +158,7 @@ Functions</h2></td></tr>
 <tr class="separator:a5e2e3bad3070597d6c24777682c6209d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2821dea1d310ba95f5f355d54d08269f"><td class="memItemLeft" align="right" valign="top">static char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a2821dea1d310ba95f5f355d54d08269f">get_ost_filters</a> (<a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a> *o, AVFormatContext *oc, <a class="el" href="../../db/dde/struct_output_stream.html">OutputStream</a> *ost)</td></tr>
 <tr class="separator:a2821dea1d310ba95f5f355d54d08269f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aad4dfdb9acf11da1cc83b034efcb1994"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#aad4dfdb9acf11da1cc83b034efcb1994">check_streamcopy_filters</a> (<a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a> *o, AVFormatContext *oc, const <a class="el" href="../../db/dde/struct_output_stream.html">OutputStream</a> *ost, enum AVMediaType type)</td></tr>
+<tr class="memitem:aad4dfdb9acf11da1cc83b034efcb1994"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#aad4dfdb9acf11da1cc83b034efcb1994">check_streamcopy_filters</a> (<a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a> *o, AVFormatContext *oc, const <a class="el" href="../../db/dde/struct_output_stream.html">OutputStream</a> *ost, enum AVMediaType <a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>)</td></tr>
 <tr class="separator:aad4dfdb9acf11da1cc83b034efcb1994"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67f363878eab56b6d0800e45a3bfffde"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="../../db/dde/struct_output_stream.html">OutputStream</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c.html#a67f363878eab56b6d0800e45a3bfffde">new_video_stream</a> (<a class="el" href="../../df/d77/struct_options_context.html">OptionsContext</a> *o, AVFormatContext *oc, <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c.html#a61569f2965b7a369eb10b6d75d410d11">int</a> source_index)</td></tr>
 <tr class="separator:a67f363878eab56b6d0800e45a3bfffde"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -343,7 +343,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
+          <td class="paramname"><a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -370,7 +370,7 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">{\</div><div class="line">    int i, ret;\</div><div class="line">    for (i = 0; i &lt; o-&gt;nb_ ## name; i++) {\</div><div class="line">        char *spec = o-&gt;name[i].specifier;\</div><div class="line">        if ((ret = <a class="code" href="../../d7/dcc/fftools__cmdutils_8c.html#a632b71e4b56c5ee8556a407bbecbcef8">check_stream_specifier</a>(fmtctx, st, spec)) &gt; 0)\</div><div class="line">            outvar = o-&gt;name[i].u.type;\</div><div class="line">        else <span class="keywordflow">if</span> (ret &lt; 0)\</div><div class="line">            exit_program(1);\</div><div class="line">    }\</div><div class="line">}</div><div class="ttc" id="fftools__cmdutils_8c_html_a632b71e4b56c5ee8556a407bbecbcef8"><div class="ttname"><a href="../../d7/dcc/fftools__cmdutils_8c.html#a632b71e4b56c5ee8556a407bbecbcef8">check_stream_specifier</a></div><div class="ttdeci">int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02053">fftools_cmdutils.c:2053</a></div></div>
+<b>Value:</b><div class="fragment"><div class="line">{\</div><div class="line">    int i, ret;\</div><div class="line">    for (i = 0; i &lt; o-&gt;nb_ ## name; i++) {\</div><div class="line">        char *spec = o-&gt;name[i].specifier;\</div><div class="line">        if ((ret = <a class="code" href="../../d7/dcc/fftools__cmdutils_8c.html#a632b71e4b56c5ee8556a407bbecbcef8">check_stream_specifier</a>(fmtctx, st, spec)) &gt; 0)\</div><div class="line">            outvar = o-&gt;name[i].u.type;\</div><div class="line">        else <span class="keywordflow">if</span> (ret &lt; 0)\</div><div class="line">            exit_program(1);\</div><div class="line">    }\</div><div class="line">}</div><div class="ttc" id="fftools__cmdutils_8c_html_a632b71e4b56c5ee8556a407bbecbcef8"><div class="ttname"><a href="../../d7/dcc/fftools__cmdutils_8c.html#a632b71e4b56c5ee8556a407bbecbcef8">check_stream_specifier</a></div><div class="ttdeci">int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/dcc/fftools__cmdutils_8c_source.html#l02077">fftools_cmdutils.c:2077</a></div></div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l00056">56</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
@@ -392,7 +392,7 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
+          <td class="paramname"><a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -486,7 +486,7 @@ Variables</h2></td></tr>
           <td class="memname">#define SET_DICT</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">type, </td>
+          <td class="paramname"><a class="el" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -513,7 +513,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">switch</span> (type) {\</div><div class="line">        case <span class="charliteral">&#39;g&#39;</span>:\</div><div class="line">            meta = &amp;context-&gt;metadata;\</div><div class="line">            break;\</div><div class="line">        case <span class="charliteral">&#39;c&#39;</span>:\</div><div class="line">            METADATA_CHECK_INDEX(index, context-&gt;nb_chapters, <span class="stringliteral">&quot;chapter&quot;</span>)\</div><div class="line">            meta = &amp;context-&gt;chapters[index]-&gt;metadata;\</div><div class="line">            break;\</div><div class="line">        case <span class="charliteral">&#39;p&#39;</span>:\</div><div class="line">            METADATA_CHECK_INDEX(index, context-&gt;nb_programs, <span class="stringliteral">&quot;program&quot;</span>)\</div><div class="line">            meta = &amp;context-&gt;programs[index]-&gt;metadata;\</div><div class="line">            break;\</div><div class="line">        case <span class="charliteral">&#39;s&#39;</span>:\</div><div class="line">            break; <span class="comment">/* handled separately below */</span> \</div><div class="line">        default: av_assert0(0);\</div><div class="line">        }\</div></div><!-- fragment -->
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">switch</span> (<a class="code" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a>) {\</div><div class="line">        case <span class="charliteral">&#39;g&#39;</span>:\</div><div class="line">            meta = &amp;context-&gt;metadata;\</div><div class="line">            break;\</div><div class="line">        case <span class="charliteral">&#39;c&#39;</span>:\</div><div class="line">            METADATA_CHECK_INDEX(index, context-&gt;nb_chapters, <span class="stringliteral">&quot;chapter&quot;</span>)\</div><div class="line">            meta = &amp;context-&gt;chapters[index]-&gt;metadata;\</div><div class="line">            break;\</div><div class="line">        case <span class="charliteral">&#39;p&#39;</span>:\</div><div class="line">            METADATA_CHECK_INDEX(index, context-&gt;nb_programs, <span class="stringliteral">&quot;program&quot;</span>)\</div><div class="line">            meta = &amp;context-&gt;programs[index]-&gt;metadata;\</div><div class="line">            break;\</div><div class="line">        case <span class="charliteral">&#39;s&#39;</span>:\</div><div class="line">            break; <span class="comment">/* handled separately below */</span> \</div><div class="line">        default: av_assert0(0);\</div><div class="line">        }\</div><div class="ttc" id="_stream_information_8m_html_abff6a04d71c2bba87e646615388a1f5c"><div class="ttname"><a href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a></div><div class="ttdeci">NSString * type</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/da5/_stream_information_8m_source.html#l00022">StreamInformation.m:22</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
@@ -629,7 +630,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01597">1597</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01627">1627</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -717,7 +718,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01276">1276</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01305">1305</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -761,7 +762,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01966">1966</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01996">1996</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -855,7 +856,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l00940">940</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l00954">954</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -927,7 +928,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01231">1231</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01260">1260</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -971,7 +972,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01577">1577</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01607">1607</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1015,7 +1016,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01250">1250</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01279">1279</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1043,7 +1044,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02051">2051</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02081">2081</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1115,7 +1116,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02009">2009</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02039">2039</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1159,7 +1160,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01908">1908</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01938">1938</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1203,7 +1204,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01809">1809</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01839">1839</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1247,7 +1248,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01882">1882</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01912">1912</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1297,7 +1298,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01311">1311</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01340">1340</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1341,7 +1342,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01916">1916</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01946">1946</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1385,7 +1386,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01895">1895</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01925">1925</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1429,7 +1430,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01611">1611</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01641">1641</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1467,7 +1468,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l00972">972</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l00986">986</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1505,7 +1506,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02063">2063</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02093">2093</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1681,7 +1682,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03003">3003</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03033">3033</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1725,7 +1726,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02865">2865</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02895">2895</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1769,7 +1770,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03068">3068</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03098">3098</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1813,7 +1814,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02954">2954</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02984">2984</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1857,7 +1858,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03032">3032</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03062">3062</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1945,7 +1946,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02871">2871</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02901">2901</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -1989,7 +1990,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02877">2877</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02907">2907</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2033,7 +2034,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03074">3074</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03104">3104</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2077,7 +2078,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03089">3089</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03119">3119</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2297,7 +2298,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02945">2945</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02975">2975</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2341,7 +2342,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02897">2897</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02927">2927</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2385,7 +2386,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02985">2985</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03015">3015</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2429,7 +2430,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02970">2970</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03000">3000</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2605,7 +2606,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01944">1944</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01974">1974</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2693,7 +2694,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02694">2694</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02724">2724</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2737,7 +2738,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03021">3021</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03051">3051</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2869,7 +2870,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02997">2997</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03027">3027</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -2913,7 +2914,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02859">2859</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02889">2889</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -3001,7 +3002,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02843">2843</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02873">2873</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -3045,7 +3046,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02836">2836</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l02866">2866</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -3089,7 +3090,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03009">3009</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03039">3039</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -3127,7 +3128,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01531">1531</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01561">1561</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -3214,7 +3215,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01549">1549</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l01579">1579</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -3245,7 +3246,7 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 <p>Per-fftool specific help handler. Implemented in each fftool, called by <a class="el" href="../../d8/d4e/fftools__cmdutils_8h.html#a0ff9db0d178a0397441c0269cea9e48a">show_help()</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03106">3106</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03136">3136</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -3309,7 +3310,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03176">3176</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html#l03208">3208</a> of file <a class="el" href="../../da/d66/fftools__ffmpeg__opt_8c_source.html">fftools_ffmpeg_opt.c</a>.</p>
 
 </div>
 </div>
@@ -4085,7 +4086,7 @@ Variables</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sat Sep 29 2018 11:25:34 for MobileFFmpeg IOS API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 24 2018 21:43:23 for MobileFFmpeg IOS API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>
