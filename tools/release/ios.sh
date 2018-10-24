@@ -55,32 +55,32 @@ mkdir ${COCOA_PACKAGE} || exit 1
 
 # MIN RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox || exit 1
 create_package "min" "$1" || exit 1
 
 # MIN-GPL RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} --enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox --enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore || exit 1
 create_package "min-gpl" "$1" || exit 1
 
 # HTTPS RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} --enable-gnutls || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox --enable-gnutls || exit 1
 create_package "https" "$1" || exit 1
 
 # HTTPS-GPL RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} --enable-gnutls --enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox --enable-gnutls --enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore || exit 1
 create_package "https-gpl" "$1" || exit 1
 
 # AUDIO RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} --enable-chromaprint --enable-lame --enable-libilbc --enable-libvorbis --enable-opencore-amr --enable-opus --enable-shine --enable-soxr --enable-speex --enable-twolame --enable-wavpack || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox --enable-chromaprint --enable-lame --enable-libilbc --enable-libvorbis --enable-opencore-amr --enable-opus --enable-shine --enable-soxr --enable-speex --enable-twolame --enable-wavpack || exit 1
 create_package "audio" "$1" || exit 1
 
 # VIDEO RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx --enable-snappy --enable-tesseract || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx --enable-snappy --enable-libwebp || exit 1
 create_package "video" "$1" || exit 1
 
 # FULL RELEASE
