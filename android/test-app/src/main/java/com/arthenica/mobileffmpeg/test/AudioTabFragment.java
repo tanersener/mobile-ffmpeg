@@ -25,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +78,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
                 @Override
                 public void onClick(View v) {
                     encodeAudio();
+                    // encodeChromaprint();
                 }
             });
             encodeButton.setEnabled(false);
@@ -182,6 +184,20 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
                 });
             }
         }, ffmpegCommand);
+    }
+
+    protected void encodeChromaprint() {
+        File audioSampleFile = getAudioSampleFile();
+
+        Log.d(TAG, "Testing AUDIO encoding with 'chromaprint' muxer");
+
+        final String ffmpegCommand = String.format("-v quiet -i %s -f chromaprint -fp_format 2 -", audioSampleFile.getAbsolutePath());
+
+        Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+
+        int returnCode = FFmpeg.execute(ffmpegCommand);
+
+        Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
     }
 
     public void createAudioSample() {

@@ -77,10 +77,15 @@ get_static_archive_name() {
         21) echo "libvidstab.a" ;;
         22) echo "libilbc.a" ;;
         26) echo "libaom.a" ;;
-        28) echo "libgif.a" ;;
-        30) echo "libogg.a" ;;
-        31) echo "libpng.a" ;;
-        32) echo "libuuid.a" ;;
+        28) echo "libtwolame.a" ;;
+        29) echo "libSDL2.a" ;;
+        30) echo "libtesseract.a" ;;
+        31) echo "libgif.a" ;;
+        33) echo "libogg.a" ;;
+        34) echo "libpng.a" ;;
+        35) echo "libuuid.a" ;;
+        39) echo "libsndfile.a" ;;
+        40) echo "liblept.a" ;;
         *) echo lib$(get_library_name $1).a
     esac
 }

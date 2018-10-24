@@ -31,6 +31,8 @@
 @property (strong, nonatomic) IBOutlet UIButton *encodeButton;
 @property (strong, nonatomic) IBOutlet UITextView *outputText;
 
+- (void)encodeChromaprint;
+
 @end
 
 @implementation AudioViewController {
@@ -116,6 +118,11 @@
 }
 
 - (IBAction)encodeClicked:(id)sender {
+    // [MobileFFmpegConfig setLogDelegate:nil];
+    // [self encodeChromaprint];
+    // return;
+    
+    [MobileFFmpegConfig setLogDelegate:self];
     NSString *audioOutputFile = [self getAudioOutputFilePath];
    
     [[NSFileManager defaultManager] removeItemAtPath:audioOutputFile error:NULL];
@@ -148,7 +155,21 @@
             }
         });
     });
+}
 
+- (void)encodeChromaprint {
+    NSString *audioSampleFile = [self getAudioSamplePath];
+    
+    NSLog(@"Testing AUDIO encoding with 'chromaprint' muxer\n");
+    
+    NSString* ffmpegCommand = [[NSString alloc] initWithFormat:@"-v quiet -i %@ -f chromaprint -fp_format 2 -", audioSampleFile];
+    
+    NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
+    
+    // EXECUTE
+    int result = [MobileFFmpeg execute: ffmpegCommand];
+    
+    NSLog(@"FFmpeg process exited with rc %d\n", result);
 }
 
 - (void)createAudioSample {

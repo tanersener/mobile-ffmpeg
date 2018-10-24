@@ -33,6 +33,8 @@
 @property (strong, nonatomic) IBOutlet UIButton *encodeButton;
 @property (strong, nonatomic) IBOutlet UILabel *videoPlayerFrame;
 
+- (void)encodeWebp;
+
 @end
 
 @implementation VideoViewController {
@@ -148,6 +150,11 @@
 }
 
 - (IBAction)encodeClicked:(id)sender {
+    // [MobileFFmpegConfig setLogDelegate:nil];
+    // [self encodeWebp];
+    // return;
+
+    [MobileFFmpegConfig setLogDelegate:self];
     NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
     NSString *image1 = [resourceFolder stringByAppendingPathComponent: @"colosseum.jpg"];
     NSString *image2 = [resourceFolder stringByAppendingPathComponent: @"pyramid.jpg"];
@@ -189,6 +196,25 @@
             }
         });
     });
+}
+
+- (void)encodeWebp {
+    NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
+    NSString *image = [resourceFolder stringByAppendingPathComponent: @"colosseum.jpg"];
+    
+    NSString *docFolder = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+    NSString *output = [[docFolder stringByAppendingPathComponent: @"video."] stringByAppendingString: @"webp"];
+
+    NSLog(@"Testing VIDEO encoding with \'webp\' codec\n");
+    
+    NSString* ffmpegCommand = [[NSString alloc] initWithFormat:@"-hide_banner -i %@ %@", image, output];
+
+    NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
+    
+    // EXECUTE
+    int result = [MobileFFmpeg execute: ffmpegCommand];
+    
+    NSLog(@"FFmpeg process exited with rc %d\n", result);
 }
 
 - (void)playVideo {
