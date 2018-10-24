@@ -282,7 +282,7 @@ fi
 if [[ ${SKIP_mobile_ffmpeg} -ne 1 ]]; then
 
     # BUILDING MOBILE FFMPEG
-    . ${BASEDIR}/build/ios-mobile-ffmpeg.sh || exit 1
+    . ${BASEDIR}/build/ios-mobile-ffmpeg.sh "$@" || exit 1
 else
     echo -e "\nmobile-ffmpeg: skipped"
 fi

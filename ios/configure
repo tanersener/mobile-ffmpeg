@@ -637,6 +637,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+MOBILEFFMPEG_VIDEOTOOLBOX_FALSE
+MOBILEFFMPEG_VIDEOTOOLBOX_TRUE
 LT_SYS_LIBRARY_PATH
 OTOOL64
 OTOOL
@@ -774,6 +776,7 @@ with_aix_soname
 with_gnu_ld
 with_sysroot
 enable_libtool_lock
+enable_videotoolbox
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1419,6 +1422,7 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-videotoolbox   enable videotoolbox support
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -13745,6 +13749,26 @@ fi
 done
 
 
+# Check whether --enable-videotoolbox was given.
+if test "${enable_videotoolbox+set}" = set; then :
+  enableval=$enable_videotoolbox; case "${enableval}" in
+  yes) videotoolbox=true ;;
+  no)  videotoolbox=false ;;
+  *) as_fn_error $? "bad value ${enableval} for --enable-videotoolbox" "$LINENO" 5 ;;
+esac
+else
+  videotoolbox=false
+fi
+
+ if test x$videotoolbox = xtrue; then
+  MOBILEFFMPEG_VIDEOTOOLBOX_TRUE=
+  MOBILEFFMPEG_VIDEOTOOLBOX_FALSE='#'
+else
+  MOBILEFFMPEG_VIDEOTOOLBOX_TRUE='#'
+  MOBILEFFMPEG_VIDEOTOOLBOX_FALSE=
+fi
+
+
 # Checks for typedefs, structures, and compiler characteristics.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for inline" >&5
 $as_echo_n "checking for inline... " >&6; }
@@ -14084,6 +14108,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepOBJC_TRUE}" && test -z "${am__fastdepOBJC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepOBJC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${MOBILEFFMPEG_VIDEOTOOLBOX_TRUE}" && test -z "${MOBILEFFMPEG_VIDEOTOOLBOX_FALSE}"; then
+  as_fn_error $? "conditional \"MOBILEFFMPEG_VIDEOTOOLBOX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

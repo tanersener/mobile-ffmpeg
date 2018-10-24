@@ -9,7 +9,6 @@ libmobileffmpeg_la_SOURCES = \
     fftools_ffmpeg_filter.c \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_opt.c \
-    fftools_ffmpeg_videotoolbox.c \
     MediaInformation.m \
     MediaInformationParser.m \
     MobileFFmpeg.m \
@@ -17,6 +16,10 @@ libmobileffmpeg_la_SOURCES = \
     mobileffmpeg_exception.m \
     Statistics.m \
     StreamInformation.m
+
+if MOBILEFFMPEG_VIDEOTOOLBOX
+    libmobileffmpeg_la_SOURCES += fftools_ffmpeg_videotoolbox.c
+endif
 
 include_HEADERS = \
     ArchDetect.h \

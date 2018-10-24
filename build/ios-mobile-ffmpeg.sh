@@ -60,6 +60,11 @@ if [[ ${RECONF_mobile_ffmpeg} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
+VIDEOTOOLBOX_SUPPORT_FLAG=""
+if [[ ${46} -eq 1 ]]; then
+    VIDEOTOOLBOX_SUPPORT_FLAG="--enable-videotoolbox"
+fi
+
 # REMOVING OPTIONS FROM CONFIGURE TO FIX THE FOLLOWING ERROR
 # ld: -flat_namespace and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
 ${SED_INLINE} 's/$wl-flat_namespace //g' configure
@@ -71,6 +76,7 @@ ${SED_INLINE} 's/${wl}suppress//g' configure
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     ${BUILD_LIBRARY_OPTIONS} \
+    ${VIDEOTOOLBOX_SUPPORT_FLAG} \
     --disable-fast-install \
     --disable-maintainer-mode \
     --host=${TARGET_HOST} 1>>${BASEDIR}/build.log 2>&1

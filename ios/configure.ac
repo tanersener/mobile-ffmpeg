@@ -35,6 +35,15 @@ AC_CHECK_HEADERS([libavformat/avformat.h libavcodec/avcodec.h libavfilter/avfilt
 ])
 AC_CHECK_HEADERS([fcntl.h limits.h stdint.h stdlib.h string.h sys/ioctl.h sys/time.h termios.h unistd.h])
 
+AC_ARG_ENABLE([videotoolbox],
+[  --enable-videotoolbox   enable videotoolbox support],
+[case "${enableval}" in
+  yes) videotoolbox=true ;;
+  no)  videotoolbox=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-videotoolbox]) ;;
+esac],[videotoolbox=false])
+AM_CONDITIONAL([MOBILEFFMPEG_VIDEOTOOLBOX], [test x$videotoolbox = xtrue])
+
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
 AC_TYPE_INT32_T

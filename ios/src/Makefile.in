@@ -89,6 +89,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@MOBILEFFMPEG_VIDEOTOOLBOX_TRUE@am__append_1 = fftools_ffmpeg_videotoolbox.c
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -132,20 +133,26 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libmobileffmpeg_la_DEPENDENCIES =
+am__libmobileffmpeg_la_SOURCES_DIST = ArchDetect.m fftools_cmdutils.c \
+	fftools_ffmpeg.c fftools_ffmpeg_filter.c fftools_ffmpeg_hw.c \
+	fftools_ffmpeg_opt.c MediaInformation.m \
+	MediaInformationParser.m MobileFFmpeg.m MobileFFmpegConfig.m \
+	mobileffmpeg_exception.m Statistics.m StreamInformation.m \
+	fftools_ffmpeg_videotoolbox.c
+@MOBILEFFMPEG_VIDEOTOOLBOX_TRUE@am__objects_1 = libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.lo
 am_libmobileffmpeg_la_OBJECTS = libmobileffmpeg_la-ArchDetect.lo \
 	libmobileffmpeg_la-fftools_cmdutils.lo \
 	libmobileffmpeg_la-fftools_ffmpeg.lo \
 	libmobileffmpeg_la-fftools_ffmpeg_filter.lo \
 	libmobileffmpeg_la-fftools_ffmpeg_hw.lo \
 	libmobileffmpeg_la-fftools_ffmpeg_opt.lo \
-	libmobileffmpeg_la-fftools_ffmpeg_videotoolbox.lo \
 	libmobileffmpeg_la-MediaInformation.lo \
 	libmobileffmpeg_la-MediaInformationParser.lo \
 	libmobileffmpeg_la-MobileFFmpeg.lo \
 	libmobileffmpeg_la-MobileFFmpegConfig.lo \
 	libmobileffmpeg_la-mobileffmpeg_exception.lo \
 	libmobileffmpeg_la-Statistics.lo \
-	libmobileffmpeg_la-StreamInformation.lo
+	libmobileffmpeg_la-StreamInformation.lo $(am__objects_1)
 libmobileffmpeg_la_OBJECTS = $(am_libmobileffmpeg_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -222,7 +229,7 @@ am__v_OBJCLD_ = $(am__v_OBJCLD_@AM_DEFAULT_V@)
 am__v_OBJCLD_0 = @echo "  OBJCLD  " $@;
 am__v_OBJCLD_1 = 
 SOURCES = $(libmobileffmpeg_la_SOURCES)
-DIST_SOURCES = $(libmobileffmpeg_la_SOURCES)
+DIST_SOURCES = $(am__libmobileffmpeg_la_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -373,22 +380,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libmobileffmpeg.la
 libmobileffmpeg_la_LIBADD = @FFMPEG_LIBS@
-libmobileffmpeg_la_SOURCES = \
-    ArchDetect.m \
-    fftools_cmdutils.c \
-    fftools_ffmpeg.c \
-    fftools_ffmpeg_filter.c \
-    fftools_ffmpeg_hw.c \
-    fftools_ffmpeg_opt.c \
-    fftools_ffmpeg_videotoolbox.c \
-    MediaInformation.m \
-    MediaInformationParser.m \
-    MobileFFmpeg.m \
-    MobileFFmpegConfig.m \
-    mobileffmpeg_exception.m \
-    Statistics.m \
-    StreamInformation.m
-
+libmobileffmpeg_la_SOURCES = ArchDetect.m fftools_cmdutils.c \
+	fftools_ffmpeg.c fftools_ffmpeg_filter.c fftools_ffmpeg_hw.c \
+	fftools_ffmpeg_opt.c MediaInformation.m \
+	MediaInformationParser.m MobileFFmpeg.m MobileFFmpegConfig.m \
+	mobileffmpeg_exception.m Statistics.m StreamInformation.m \
+	$(am__append_1)
 include_HEADERS = \
     ArchDetect.h \
 	fftools_cmdutils.h \
