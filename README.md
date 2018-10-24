@@ -44,12 +44,42 @@ Binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/r
 
 There are eight different binary packages. Below you can see which system libraries and external libraries are enabled in each of them.
 
-|  | min | min-gpl | https | https-gpl | audio | video | full | full-gpl |
-| :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| <sup>android system libraries</sup> | <sup>zlib</sup><br/><sup>MediaCodec</sup> | <sup>zlib</sup><br/><sup>MediaCodec</sup> | <sup>zlib</sup><br/><sup>MediaCodec</sup> | <sup>zlib</sup><br/><sup>MediaCodec</sup> | <sup>zlib</sup><br/><sup>MediaCodec</sup> | <sup>zlib</sup><br/><sup>MediaCodec</sup> | <sup>zlib</sup><br/><sup>MediaCodec</sup> | <sup>zlib</sup><br/><sup>MediaCodec</sup>|
-| <sup>ios system libraries</sup> | <sup>zlib</sup><br/><sup>AudioToolbox</sup><br/><sup>AVFoundation</sup><br/><sup>CoreImage</sup><br/><sup>VideoToolbox</sup><br/><sup>bzip2</sup> | <sup>zlib</sup><br/><sup>AudioToolbox</sup><br/><sup>AVFoundation</sup><br/><sup>CoreImage</sup><br/><sup>VideoToolbox</sup><br/><sup>bzip2</sup> | <sup>zlib</sup><br/><sup>AudioToolbox</sup><br/><sup>AVFoundation</sup><br/><sup>CoreImage</sup><br/><sup>VideoToolbox</sup><br/><sup>bzip2</sup> | <sup>zlib</sup><br/><sup>AudioToolbox</sup><br/><sup>AVFoundation</sup><br/><sup>CoreImage</sup><br/><sup>VideoToolbox</sup><br/><sup>bzip2</sup> | <sup>zlib</sup><br/><sup>AudioToolbox</sup><br/><sup>AVFoundation</sup><br/><sup>CoreImage</sup><br/><sup>VideoToolbox</sup><br/><sup>bzip2</sup> | <sup>zlib</sup><br/><sup>AudioToolbox</sup><br/><sup>AVFoundation</sup><br/><sup>CoreImage</sup><br/><sup>VideoToolbox</sup><br/><sup>bzip2</sup> | <sup>zlib</sup><br/><sup>AudioToolbox</sup><br/><sup>AVFoundation</sup><br/><sup>CoreImage</sup><br/><sup>VideoToolbox</sup><br/><sup>bzip2</sup> | <sup>zlib</sup><br/><sup>AudioToolbox</sup><br/><sup>AVFoundation</sup><br/><sup>CoreImage</sup><br/><sup>VideoToolbox</sup><br/><sup>bzip2</sup> |
-| <sup>external libraries</sup> |  -  | <sup>vid.stab</sup><br/><sup>x264</sup><br/><sup>x265</sup><br/><sup>xvidcore</sup> | <sup>gmp</sup><br/><sup>gnutls</sup> | <sup>gmp</sup><br/><sup>gnutls</sup><br/><sup>vid.stab</sup><br/><sup>x264</sup><br/><sup>x265</sup><br/><sup>xvidcore</sup> | <sup>chromaprint</sup><br/><sup>lame</sup><br/><sup>libilbc</sup><br/><sup>libvorbis</sup><br/><sup>opencore-amr</sup><br/><sup>opus</sup><br/><sup>shine</sup><br/><sup>soxr</sup><br/><sup>speex</sup><br/><sup>twolame</sup><br/><sup>wavpack</sup> | <sup>fontconfig</sup><br/><sup>freetype</sup><br/><sup>fribidi</sup><br/><sup>kvazaar</sup><br/><sup>libaom</sup><br/><sup>libass</sup><br/><sup>libiconv</sup><br/><sup>libtheora</sup><br/><sup>libvpx</sup><br/><sup>snappy</sup><br/><sup>libwebp</sup> | <sup>chromaprint</sup><br/><sup>fontconfig</sup><br/><sup>freetype</sup><br/><sup>fribidi</sup><br/><sup>gmp</sup><br/><sup>gnutls</sup><br/><sup>kvazaar</sup><br/><sup>lame</sup><br/><sup>libaom</sup><br/><sup>libass</sup><br/><sup>libiconv</sup><br/><sup>libilbc</sup><br/><sup>libtheora</sup><br/><sup>libvorbis</sup><br/><sup>libvpx</sup><br/><sup>libwebp</sup><br/><sup>libxml2</sup><br/><sup>opencore-amr</sup><br/><sup>opus</sup><br/><sup>sdl</sup><br/><sup>shine</sup><br/><sup>snappy</sup><br/><sup>soxr</sup><br/><sup>speex</sup><br/><sup>tesseract</sup><br/><sup>twolame</sup><br/><sup>wavpack</sup> | <sup>chromaprint</sup><br/><sup>fontconfig</sup><br/><sup>freetype</sup><br/><sup>fribidi</sup><br/><sup>gmp</sup><br/><sup>gnutls</sup><br/><sup>kvazaar</sup><br/><sup>lame</sup><br/><sup>libaom</sup><br/><sup>libass</sup><br/><sup>libiconv</sup><br/><sup>libilbc</sup><br/><sup>libtheora</sup><br/><sup>libvorbis</sup><br/><sup>libvpx</sup><br/><sup>libwebp</sup><br/><sup>libxml2</sup><br/><sup>opencore-amr</sup><br/><sup>opus</sup><br/><sup>sdl</sup><br/><sup>shine</sup><br/><sup>snappy</sup><br/><sup>soxr</sup><br/><sup>speex</sup><br/><sup>tesseract</sup><br/><sup>twolame</sup><br/><sup>vid.stab</sup><br/><sup>wavpack</sup><br/><sup>x264</sup><br/><sup>x265</sup><br/><sup>xvidcore</sup> |
-
+<table>
+<thead>
+<tr>
+<th align="center"></th>
+<th align="center">min</th>
+<th align="center">min-gpl</th>
+<th align="center">https</th>
+<th align="center">https-gpl</th>
+<th align="center">audio</th>
+<th align="center">video</th>
+<th align="center">full</th>
+<th align="center">full-gpl</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center"><sup>android system libraries</sup></td>
+<td align="center" colspan=8><sup>zlib</sup><br><sup>MediaCodec</sup></td>
+</tr>
+<tr>
+<td align="center"><sup>ios system libraries</sup></td>
+<td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>CoreImage</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
+</tr>
+<tr>
+<td align="center"><sup>external libraries</sup></td>
+<td align="center">-</td>
+<td align="center"><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
+<td align="center"><sup>gmp</sup><br><sup>gnutls</sup></td>
+<td align="center"><sup>gmp</sup><br><sup>gnutls</sup><br><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
+<td align="center"><sup>chromaprint</sup><br><sup>lame</sup><br><sup>libilbc</sup><br><sup>libvorbis</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
+<td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>kvazaar</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libtheora</sup><br><sup>libvpx</sup><br><sup>snappy</sup><br><sup>libwebp</sup></td>
+<td align="center"><sup>chromaprint</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>sdl</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>tesseract</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
+<td align="center"><sup>chromaprint</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>sdl</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>tesseract</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>wavpack</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
+</tr>
+</tbody>
+</table>
  - `v1.1` adds support for `libilbc`, `opus`, `snappy`, `x264` and `xvidcore`
 
  - `v2.0` adds support for `libaom` and `soxr`
