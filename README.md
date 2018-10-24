@@ -8,7 +8,7 @@ FFmpeg for Android and IOS
 - Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports
     - Both Android and IOS
-    - FFmpeg `v3.4.x`, `v4.0.x` and `v4.1-dev` (current master) releases
+    - FFmpeg `v3.4.x`, `v4.0.x` and `v4.1-dev` (master) releases
     - 27 external libraries
     
         `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
@@ -24,6 +24,7 @@ FFmpeg for Android and IOS
     `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
 
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
+
 #### 1.1 Android
 - Builds `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` architectures
 - Supports `zlib` and `MediaCodec` system libraries
@@ -60,14 +61,6 @@ There are eight different binary packages. Below you can see which system librar
 </thead>
 <tbody>
 <tr>
-<td align="center"><sup>android system libraries</sup></td>
-<td align="center" colspan=8><sup>zlib</sup><br><sup>MediaCodec</sup></td>
-</tr>
-<tr>
-<td align="center"><sup>ios system libraries</sup></td>
-<td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>CoreImage</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
-</tr>
-<tr>
 <td align="center"><sup>external libraries</sup></td>
 <td align="center">-</td>
 <td align="center"><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
@@ -78,17 +71,24 @@ There are eight different binary packages. Below you can see which system librar
 <td align="center"><sup>chromaprint</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>sdl</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>tesseract</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
 <td align="center"><sup>chromaprint</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>sdl</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>tesseract</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>wavpack</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
 </tr>
+<tr>
+<td align="center"><sup>android system libraries</sup></td>
+<td align="center" colspan=8><sup>zlib</sup><br><sup>MediaCodec</sup></td>
+</tr>
+<tr>
+<td align="center"><sup>ios system libraries</sup></td>
+<td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>CoreImage</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
+</tr>
 </tbody>
 </table>
- - `v1.1` adds support for `libilbc`, `opus`, `snappy`, `x264` and `xvidcore`
 
- - `v2.0` adds support for `libaom` and `soxr`
+ - `libilbc`, `opus`, `snappy`, `x264` and `xvidcore` are supported since `v1.1`
 
- - `v2.1` adds support for `chromaprint`, `vid.stab` and `x265`
+ - `libaom` and `soxr` are supported since `v2.0`
 
- - `v3.0` adds support for `sdl`, `tesseract` and `twolame` external libraries, `zlib` and `MediaCodec` Android 
- system libraries, `bzip2`, `zlib` IOS system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation`
-  IOS system frameworks
+ - `chromaprint`, `vid.stab` and `x265` are supported since `v2.1`
+
+ - `sdl`, `tesseract`, `twolame` external libraries; `zlib`, `MediaCodec` Android system libraries; `bzip2`, `zlib` IOS system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` IOS system frameworks are supported since `v3.0`
 
 #### 2.1 Android
 1. Add MobileFFmpeg dependency from `jcenter()`
