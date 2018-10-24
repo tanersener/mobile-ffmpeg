@@ -551,10 +551,9 @@ static int FUNC(sei_buffering_period)(CodedBitstreamContext *ctx, RWContext *rw,
 }
 
 static int FUNC(sei_pic_timestamp)(CodedBitstreamContext *ctx, RWContext *rw,
-                                   H264RawSEIPicTimestamp *current)
+                                   H264RawSEIPicTimestamp *current,
+                                   const H264RawSPS *sps)
 {
-    CodedBitstreamH264Context *h264 = ctx->priv_data;
-    const H264RawSPS *sps;
     uint8_t time_offset_length;
     int err;
 
@@ -583,7 +582,6 @@ static int FUNC(sei_pic_timestamp)(CodedBitstreamContext *ctx, RWContext *rw,
         }
     }
 
-    sps = h264->active_sps;
     if (sps->vui.nal_hrd_parameters_present_flag)
         time_offset_length = sps->vui.nal_hrd_parameters.time_offset_length;
     else if (sps->vui.vcl_hrd_parameters_present_flag)
@@ -663,7 +661,8 @@ static int FUNC(sei_pic_timing)(CodedBitstreamContext *ctx, RWContext *rw,
         for (i = 0; i < num_clock_ts[current->pic_struct]; i++) {
             flags(clock_timestamp_flag[i], 1, i);
             if (current->clock_timestamp_flag[i])
-                CHECK(FUNC(sei_pic_timestamp)(ctx, rw, &current->timestamp[i]));
+                CHECK(FUNC(sei_pic_timestamp)(ctx, rw,
+                                              &current->timestamp[i], sps));
         }
     }
 
@@ -1368,4 +1367,22 @@ static int FUNC(filler)(CodedBitstreamContext *ctx, RWContext *rw,
     CHECK(FUNC(rbsp_trailing_bits)(ctx, rw));
 
     return 0;
+}
+
+static int FUNC(end_of_sequence)(CodedBitstreamContext *ctx, RWContext *rw,
+                                 H264RawNALUnitHeader *current)
+{
+    HEADER("End of Sequence");
+
+    return FUNC(nal_unit_header)(ctx, rw, current,
+                                 1 << H264_NAL_END_SEQUENCE);
+}
+
+static int FUNC(end_of_stream)(CodedBitstreamContext *ctx, RWContext *rw,
+                               H264RawNALUnitHeader *current)
+{
+    HEADER("End of Stream");
+
+    return FUNC(nal_unit_header)(ctx, rw, current,
+                                 1 << H264_NAL_END_STREAM);
 }

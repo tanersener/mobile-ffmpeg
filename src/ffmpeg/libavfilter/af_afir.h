@@ -38,9 +38,9 @@ typedef struct AudioFIRContext {
     float wet_gain;
     float dry_gain;
     float length;
-    int again;
     int gtype;
     float ir_gain;
+    int ir_format;
     float max_ir_len;
     int response;
     int w, h;

@@ -247,7 +247,9 @@ static void set_codec_str(AVFormatContext *s, AVCodecParameters *par,
     else
         return;
 
-    tag = av_codec_get_tag(tags, par->codec_id);
+    tag = par->codec_tag;
+    if (!tag)
+        tag = av_codec_get_tag(tags, par->codec_id);
     if (!tag)
         return;
     if (size < 5)
@@ -876,14 +878,14 @@ static int write_manifest(AVFormatContext *s, int final)
         snprintf(temp_filename, sizeof(temp_filename), use_rename ? "%s.tmp" : "%s", filename_hls);
 
         set_http_options(&opts, c);
-        ret = avio_open2(&out, temp_filename, AVIO_FLAG_WRITE, NULL, &opts);
+        ret = dashenc_io_open(s, &c->m3u8_out, temp_filename, &opts);
         if (ret < 0) {
             av_log(s, AV_LOG_ERROR, "Unable to open %s for writing\n", temp_filename);
             return ret;
         }
         av_dict_free(&opts);
 
-        ff_hls_write_playlist_version(out, 7);
+        ff_hls_write_playlist_version(c->m3u8_out, 7);
 
         for (i = 0; i < s->nb_streams; i++) {
             char playlist_file[64];
@@ -892,7 +894,7 @@ static int write_manifest(AVFormatContext *s, int final)
             if (st->codecpar->codec_type != AVMEDIA_TYPE_AUDIO)
                 continue;
             get_hls_playlist_name(playlist_file, sizeof(playlist_file), NULL, i);
-            ff_hls_write_audio_rendition(out, (char *)audio_group,
+            ff_hls_write_audio_rendition(c->m3u8_out, (char *)audio_group,
                                          playlist_file, i, is_default);
             max_audio_bitrate = FFMAX(st->codecpar->bit_rate +
                                       os->muxer_overhead, max_audio_bitrate);
@@ -911,18 +913,21 @@ static int write_manifest(AVFormatContext *s, int final)
             OutputStream *os = &c->streams[i];
             char *agroup = NULL;
             int stream_bitrate = st->codecpar->bit_rate + os->muxer_overhead;
+            if (st->codecpar->codec_type != AVMEDIA_TYPE_VIDEO)
+                continue;
             av_strlcpy(codec_str, os->codec_str, sizeof(codec_str));
-            if ((st->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) && max_audio_bitrate) {
+            if (max_audio_bitrate) {
                 agroup = (char *)audio_group;
                 stream_bitrate += max_audio_bitrate;
                 av_strlcat(codec_str, ",", sizeof(codec_str));
                 av_strlcat(codec_str, audio_codec_str, sizeof(codec_str));
             }
             get_hls_playlist_name(playlist_file, sizeof(playlist_file), NULL, i);
-            ff_hls_write_stream_info(st, out, stream_bitrate, playlist_file, agroup,
+            ff_hls_write_stream_info(st, c->m3u8_out, stream_bitrate,
+                                     playlist_file, agroup,
                                      codec_str, NULL);
         }
-        avio_close(out);
+        dashenc_io_close(s, &c->m3u8_out, temp_filename);
         if (use_rename)
             if ((ret = avpriv_io_move(temp_filename, filename_hls)) < 0)
                 return ret;
@@ -1248,7 +1253,7 @@ static void dashenc_delete_file(AVFormatContext *s, char *filename) {
         }
 
         av_dict_free(&http_opts);
-        dashenc_io_close(s, &out, filename);
+        ff_format_io_close(s, &out);
     } else if (unlink(filename) < 0) {
         av_log(s, AV_LOG_ERROR, "failed to delete %s: %s\n", filename, strerror(errno));
     }

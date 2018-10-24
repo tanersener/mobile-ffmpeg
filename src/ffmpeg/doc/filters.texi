@@ -955,6 +955,8 @@ select inverted half of sine wave
 select double-exponential seat
 @item desi
 select double-exponential sigmoid
+@item losi
+select logistic sigmoid
 @end table
 @end table
 
@@ -1171,14 +1173,15 @@ Set wet gain. This sets final output gain.
 @item length
 Set Impulse Response filter length. Default is 1, which means whole IR is processed.
 
-@item again
-Enable applying gain measured from power of IR. For approach to use for measuring power
-of IR see next option.
-
 @item gtype
+Enable applying gain measured from power of IR.
+
 Set which approach to use for auto gain measurement.
 
 @table @option
+@item none
+Do not apply any gain.
+
 @item peak
 select peak gain, very conservative approach. This is default value.
 
@@ -1191,14 +1194,18 @@ select gain to noise approach, this is most popular one.
 
 @item irgain
 Set gain to be applied to IR coefficients before filtering.
-Allowed range is 0 to 1. This can be set even with @var{again} used.
+Allowed range is 0 to 1. This gain is applied after any gain applied with @var{gtype} option.
+
+@item irfmt
+Set format of IR stream. Can be @code{mono} or @code{input}.
+Default is @code{input}.
 
 @item maxir
 Set max allowed Impulse Response filter duration in seconds. Default is 30 seconds.
 Allowed range is 0.1 to 60 seconds.
 
 @item response
-Show IR frequency reponse, magnitude and phase in additional video stream.
+Show IR frequency reponse, magnitude(magenta) and phase(green) and group delay(yellow) in additional video stream.
 By default it is disabled.
 
 @item channel
@@ -4336,6 +4343,19 @@ you may wish to increase the value to account for background noise.
 Can be specified in dB (in case "dB" is appended to the specified value)
 or amplitude ratio. Default value is @code{0}.
 
+@item start_silence
+Specify max duration of silence at beginning that will be kept after
+trimming. Default is 0, which is equal to trimming all samples detected
+as silence.
+
+@item start_mode
+Specify mode of detection of silence end in start of multi-channel audio.
+Can be @var{any} or @var{all}. Default is @var{any}.
+With @var{any}, any sample that is detected as non-silence will cause
+stopped trimming of silence.
+With @var{all}, only if all channels are detected as non-silence will cause
+stopped trimming of silence.
+
 @item stop_periods
 Set the count for trimming silence from the end of audio.
 To remove silence from the middle of a file, specify a @var{stop_periods}
@@ -4357,11 +4377,18 @@ the end of audio.
 Can be specified in dB (in case "dB" is appended to the specified value)
 or amplitude ratio. Default value is @code{0}.
 
-@item leave_silence
-This indicates that @var{stop_duration} length of audio should be left intact
-at the beginning of each period of silence.
-For example, if you want to remove long pauses between words but do not want
-to remove the pauses completely. Default value is @code{0}.
+@item stop_silence
+Specify max duration of silence at end that will be kept after
+trimming. Default is 0, which is equal to trimming all samples detected
+as silence.
+
+@item stop_mode
+Specify mode of detection of silence start in end of multi-channel audio.
+Can be @var{any} or @var{all}. Default is @var{any}.
+With @var{any}, any sample that is detected as non-silence will cause
+stopped trimming of silence.
+With @var{all}, only if all channels are detected as non-silence will cause
+stopped trimming of silence.
 
 @item detection
 Set how is silence detected. Can be @code{rms} or @code{peak}. Second is faster
@@ -4369,7 +4396,8 @@ and works better with digital silence which is exactly 0.
 Default value is @code{rms}.
 
 @item window
-Set ratio used to calculate size of window for detecting silence.
+Set duration in number of seconds used to calculate size of window in number
+of samples for detecting silence.
 Default value is @code{0.02}. Allowed range is from @code{0} to @code{10}.
 @end table
 
@@ -4381,14 +4409,14 @@ The following example shows how this filter can be used to start a recording
 that does not contain the delay at the start which usually occurs between
 pressing the record button and the start of the performance:
 @example
-silenceremove=1:5:0.02
+silenceremove=start_periods=1:start_duration=5:start_threshold=0.02
 @end example
 
 @item
 Trim all silence encountered from beginning to end where there is more than 1
 second of silence in audio:
 @example
-silenceremove=0:0:0:-1:1:-90dB
+silenceremove=stop_periods=-1:stop_duration=1:stop_threshold=-90dB
 @end example
 @end itemize
 
@@ -5342,6 +5370,49 @@ Set number of samples per each frame.
 Set window function to be used when generating FIR coefficients.
 @end table
 
+@section sinc
+
+Generate a sinc kaiser-windowed low-pass, high-pass, band-pass, or band-reject FIR coefficients.
+
+The resulting stream can be used with @ref{afir} filter for filtering the audio signal.
+
+The filter accepts the following options:
+
+@table @option
+@item sample_rate, r
+Set sample rate, default is 44100.
+
+@item nb_samples, n
+Set number of samples per each frame. Default is 1024.
+
+@item hp
+Set high-pass frequency. Default is 0.
+
+@item lp
+Set low-pass frequency. Default is 0.
+If high-pass frequency is lower than low-pass frequency and low-pass frequency
+is higher than 0 then filter will create band-pass filter coefficients,
+otherwise band-reject filter coefficients.
+
+@item phase
+Set filter phase response. Default is 50. Allowed range is from 0 to 100.
+
+@item beta
+Set Kaiser window beta.
+
+@item att
+Set stop-band attenuation. Default is 120dB, allowed range is from 40 to 180 dB.
+
+@item round
+Enable rounding, by default is disabled.
+
+@item hptaps
+Set number of taps for high-pass filter.
+
+@item lptaps
+Set number of taps for low-pass filter.
+@end table
+
 @section sine
 
 Generate an audio signal made of a sine wave with amplitude 1/8.
@@ -6090,6 +6161,26 @@ Only deinterlace frames marked as interlaced.
 @end table
 
 The default value is @code{all}.
+@end table
+
+@section chromahold
+Remove all color information for all colors except for certain one.
+
+The filter accepts the following options:
+
+@table @option
+@item color
+The color which will not be replaced with neutral chroma.
+
+@item similarity
+Similarity percentage with the above color.
+0.01 matches only the exact key color, while 1.0 matches everything.
+
+@item yuv
+Signals that the color passed is already in YUV instead of RGB.
+
+Literal colors like "green" or "red" don't make sense with this enabled anymore.
+This can be used to pass exact YUV values as hexadecimal numbers.
 @end table
 
 @section chromakey
@@ -14876,6 +14967,125 @@ Mark the frame as progressive.
 @end table
 @end table
 
+@anchor{setparams}
+@section setparams
+
+Force frame parameter for the output video frame.
+
+The @code{setparams} filter marks interlace and color range for the
+output frames. It does not change the input frame, but only sets the
+corresponding property, which affects how the frame is treated by
+filters/encoders.
+
+@table @option
+@item field_mode
+Available values are:
+
+@table @samp
+@item auto
+Keep the same field property (default).
+
+@item bff
+Mark the frame as bottom-field-first.
+
+@item tff
+Mark the frame as top-field-first.
+
+@item prog
+Mark the frame as progressive.
+@end table
+
+@item range
+Available values are:
+
+@table @samp
+@item auto
+Keep the same color range property (default).
+
+@item unspecified, unknown
+Mark the frame as unspecified color range.
+
+@item limited, tv, mpeg
+Mark the frame as limited range.
+
+@item full, pc, jpeg
+Mark the frame as full range.
+@end table
+
+@item color_primaries
+Set the color primaries.
+Available values are:
+
+@table @samp
+@item auto
+Keep the same color primaries property (default).
+
+@item bt709
+@item unknown
+@item bt470m
+@item bt470bg
+@item smpte170m
+@item smpte240m
+@item film
+@item bt2020
+@item smpte428
+@item smpte431
+@item smpte432
+@item jedec-p22
+@end table
+
+@item color_trc
+Set the color transfert.
+Available values are:
+
+@table @samp
+@item auto
+Keep the same color trc property (default).
+
+@item bt709
+@item unknown
+@item bt470m
+@item bt470bg
+@item smpte170m
+@item smpte240m
+@item linear
+@item log100
+@item log316
+@item iec61966-2-4
+@item bt1361e
+@item iec61966-2-1
+@item bt2020-10
+@item bt2020-12
+@item smpte2084
+@item smpte428
+@item arib-std-b67
+@end table
+
+@item colorspace
+Set the colorspace.
+Available values are:
+
+@table @samp
+@item auto
+Keep the same colorspace property (default).
+
+@item gbr
+@item bt709
+@item unknown
+@item fcc
+@item bt470bg
+@item smpte170m
+@item smpte240m
+@item ycgco
+@item bt2020nc
+@item bt2020c
+@item smpte2085
+@item chroma-derived-nc
+@item chroma-derived-c
+@item ictcp
+@end table
+@end table
+
 @section showinfo
 
 Show a line containing various information for each input video frame.
@@ -17183,6 +17393,35 @@ and ones with constant delta pts.
 If there was frames with variable delta, than it will also show min and max delta
 encountered.
 
+@section vibrance
+
+Boost or alter saturation.
+
+The filter accepts the following options:
+@table @option
+@item intensity
+Set strength of boost if positive value or strength of alter if negative value.
+Default is 0. Allowed range is from -2 to 2.
+
+@item rbal
+Set the red balance. Default is 1. Allowed range is from -10 to 10.
+
+@item gbal
+Set the green balance. Default is 1. Allowed range is from -10 to 10.
+
+@item bbal
+Set the blue balance. Default is 1. Allowed range is from -10 to 10.
+
+@item rlum
+Set the red luma coefficient.
+
+@item glum
+Set the green luma coefficient.
+
+@item blum
+Set the blue luma coefficient.
+@end table
+
 @anchor{vignette}
 @section vignette
 
@@ -19275,7 +19514,11 @@ time graph to observe the loudness evolution. The graphic contains the logged
 message mentioned above, so it is not printed anymore when this option is set,
 unless the verbose logging is set. The main graphing area contains the
 short-term loudness (3 seconds of analysis), and the gauge on the right is for
-the momentary loudness (400 milliseconds).
+the momentary loudness (400 milliseconds), but can optionally be configured
+to instead display short-term loudness (see @var{gauge}).
+
+The green area marks a  +/- 1LU target range around the target loudness
+(-23LUFS by default, unless modified through @var{target}).
 
 More information about the Loudness Recommendation EBU R128 on
 @url{http://tech.ebu.ch/loudness}.
@@ -19352,6 +19595,23 @@ Multi-channel input files are not affected by this option.
 @item panlaw
 Set a specific pan law to be used for the measurement of dual mono files.
 This parameter is optional, and has a default value of -3.01dB.
+
+@item target
+Set a specific target level (in LUFS) used as relative zero in the visualization.
+This parameter is optional and has a default value of -23LUFS as specified
+by EBU R128. However, material published online may prefer a level of -16LUFS
+(e.g. for use with podcasts or video platforms).
+
+@item gauge
+Set the value displayed by the gauge. Valid values are @code{momentary} and s
+@code{shortterm}. By default the momentary value will be used, but in certain
+scenarios it may be more useful to observe the short term value instead (e.g.
+live mixing).
+
+@item scale
+Sets the display scale for the loudness. Valid parameters are @code{absolute}
+(in LUFS) or @code{relative} (LU) relative to the target. This only affects the
+video output, not the summary or continuous log output.
 @end table
 
 @subsection Examples
@@ -20636,6 +20896,8 @@ each channel is displayed using the fruit color scheme
 each channel is displayed using the cool color scheme
 @item magma
 each channel is displayed using the magma color scheme
+@item green
+each channel is displayed using the green color scheme
 @end table
 
 Default value is @samp{channel}.
@@ -20715,6 +20977,18 @@ Set which data to display. Can be @code{magnitude}, default or @code{phase}.
 @item rotation
 Set color rotation, must be in [-1.0, 1.0] range.
 Default value is @code{0}.
+
+@item start
+Set start frequency from which to display spectrogram. Default is @code{0}.
+
+@item stop
+Set stop frequency to which to display spectrogram. Default is @code{0}.
+
+@item fps
+Set upper frame rate limit. Default is @code{auto}, unlimited.
+
+@item legend
+Draw time and frequency axes and legends. Default is disabled.
 @end table
 
 The usage is very similar to the showwaves filter; see the examples in that
@@ -20787,6 +21061,8 @@ each channel is displayed using the fruit color scheme
 each channel is displayed using the cool color scheme
 @item magma
 each channel is displayed using the magma color scheme
+@item green
+each channel is displayed using the green color scheme
 @end table
 Default value is @samp{intensity}.
 
@@ -20858,6 +21134,12 @@ Draw time and frequency axes and legends. Default is enabled.
 @item rotation
 Set color rotation, must be in [-1.0, 1.0] range.
 Default value is @code{0}.
+
+@item start
+Set start frequency from which to display spectrogram. Default is @code{0}.
+
+@item stop
+Set stop frequency to which to display spectrogram. Default is @code{0}.
 @end table
 
 @subsection Examples

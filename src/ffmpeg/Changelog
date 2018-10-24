@@ -32,6 +32,12 @@ version <next>:
 - acrossover filter
 - ilbc decoder
 - audio denoiser as afftdn filter
+- AV1 parser
+- SER demuxer
+- sinc audio filter source
+- chromahold filter
+- setparams filter
+- vibrance filter
 
 
 version 4.0:

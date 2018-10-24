@@ -376,15 +376,15 @@ static void get_lsp_poly(int16_t *lsp, int32_t *f)
 
         for (j = i; j > 1; j--, l--) {
             high = f[l - 1] >> 16;
-            low = (f[l - 1] - (high << 16)) >> 1;
+            low = (f[l - 1] - (high * (1 << 16))) >> 1;
 
-            tmp = ((high * lsp[k]) << 2) + (((low * lsp[k]) >> 15) << 2);
+            tmp = ((high * lsp[k]) * 4) + (((low * lsp[k]) >> 15) * 4);
 
             f[l] += f[l - 2];
-            f[l] -= tmp;
+            f[l] -= (unsigned)tmp;
         }
 
-        f[l] -= lsp[k] << 10;
+        f[l] -= lsp[k] * (1 << 10);
         l += i;
     }
 }
@@ -402,16 +402,16 @@ static void lsf2poly(int16_t *a, int16_t *lsf)
     get_lsp_poly(&lsp[1], f[1]);
 
     for (i = 5; i > 0; i--) {
-        f[0][i] += f[0][i - 1];
-        f[1][i] -= f[1][i - 1];
+        f[0][i] += (unsigned)f[0][i - 1];
+        f[1][i] -= (unsigned)f[1][i - 1];
     }
 
     a[0] = 4096;
     for (i = 5; i > 0; i--) {
-        tmp = f[0][6 - i] + f[1][6 - i];
+        tmp = f[0][6 - i] + (unsigned)f[1][6 - i];
         a[6 - i] = (tmp + 4096) >> 13;
 
-        tmp = f[0][6 - i] - f[1][6 - i];
+        tmp = f[0][6 - i] - (unsigned)f[1][6 - i];
         a[5 + i] = (tmp + 4096) >> 13;
     }
 }
@@ -508,10 +508,10 @@ static void filter_arfq12(const int16_t *data_in,
         int output = 0, sum = 0;
 
         for (j = coefficients_length - 1; j > 0; j--) {
-            sum += coefficients[j] * data_out[i - j];
+            sum += (unsigned)(coefficients[j] * data_out[i - j]);
         }
 
-        output = coefficients[0] * data_in[i] - sum;
+        output = coefficients[0] * data_in[i] - (unsigned)sum;
         output = av_clip(output, -134217728, 134215679);
 
         data_out[i] = (output + 2048) >> 12;
@@ -631,15 +631,16 @@ static void add_vector_and_shift(int16_t *out, const int16_t *in1,
 static void create_augmented_vector(int index, int16_t *buffer, int16_t *cbVec)
 {
     int16_t cbVecTmp[4];
-    int16_t ilow = index - 4;
+    int interpolation_length = FFMIN(4, index);
+    int16_t ilow = index - interpolation_length;
 
     memcpy(cbVec, buffer - index, index * 2);
 
-    vector_multiplication(&cbVec[ilow], buffer - index - 4, alpha, 4, 15);
-    vector_rmultiplication(cbVecTmp, buffer - 4, &alpha[3], 4, 15);
-    add_vector_and_shift(&cbVec[ilow], &cbVec[ilow], cbVecTmp, 4, 0);
+    vector_multiplication(&cbVec[ilow], buffer - index - interpolation_length, alpha, interpolation_length, 15);
+    vector_rmultiplication(cbVecTmp, buffer - interpolation_length, &alpha[interpolation_length - 1], interpolation_length, 15);
+    add_vector_and_shift(&cbVec[ilow], &cbVec[ilow], cbVecTmp, interpolation_length, 0);
 
-    memcpy(cbVec + index, buffer - index, (SUBL - index) * sizeof(*cbVec));
+    memcpy(cbVec + index, buffer - index, FFMIN(SUBL - index, index) * sizeof(*cbVec));
 }
 
 static void get_codebook(int16_t * cbvec,   /* (o) Constructed codebook vector */
@@ -900,12 +901,12 @@ static int16_t get_size_in_bits(uint32_t n)
 
 static int32_t scale_dot_product(const int16_t *v1, const int16_t *v2, int length, int scaling)
 {
-    int32_t sum = 0;
+    int64_t sum = 0;
 
     for (int i = 0; i < length; i++)
         sum += (v1[i] * v2[i]) >> scaling;
 
-    return sum;
+    return av_clipl_int32(sum);
 }
 
 static void correlation(int32_t *corr, int32_t *ener, int16_t *buffer,
@@ -1268,7 +1269,7 @@ static int xcorr_coeff(int16_t *target, int16_t *regressor,
             /* Calculate the total number of (dynamic) right shifts that have
                been performed on (cross_corr*cross_corr)/energy
              */
-            totscale = energy_scale - (cross_corr_scale << 1);
+            totscale = energy_scale - (cross_corr_scale * 2);
 
             /* Calculate the shift difference in order to be able to compare the two
                (cross_corr*cross_corr)/energy in the same domain
@@ -1321,7 +1322,7 @@ static void hp_output(int16_t *signal, const int16_t *ba, int16_t *y,
         tmp = (tmp >> 15);
         tmp += SPL_MUL_16_16(y[0], ba[3]);    /* (-a[1])*y[i-1] (high part) */
         tmp += SPL_MUL_16_16(y[2], ba[4]);    /* (-a[2])*y[i-2] (high part) */
-        tmp = (tmp << 1);
+        tmp = (tmp * 2);
 
         tmp += SPL_MUL_16_16(signal[i], ba[0]);       /* b[0]*x[0] */
         tmp += SPL_MUL_16_16(x[0], ba[1]);    /* b[1]*x[i-1] */
@@ -1344,11 +1345,11 @@ static void hp_output(int16_t *signal, const int16_t *ba, int16_t *y,
         } else if (tmp < -268435456) {
             tmp = INT32_MIN;
         } else {
-            tmp = tmp << 3;
+            tmp = tmp * 8;
         }
 
         y[0] = tmp >> 16;
-        y[1] = (tmp - (y[0] << 16)) >> 1;
+        y[1] = (tmp - (y[0] * (1 << 16))) >> 1;
     }
 }
 
@@ -1371,7 +1372,7 @@ static int ilbc_decode_frame(AVCodecContext *avctx, void *data,
 
     if (unpack_frame(s))
         mode = 0;
-    if (s->frame.start < 1)
+    if (s->frame.start < 1 || s->frame.start > 5)
         mode = 0;
 
     if (mode) {
