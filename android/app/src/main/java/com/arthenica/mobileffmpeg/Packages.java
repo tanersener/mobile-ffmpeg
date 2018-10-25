@@ -64,7 +64,7 @@ class Packages {
         supportedExternalLibraries.add("wavpack");
         supportedExternalLibraries.add("x264");
         supportedExternalLibraries.add("x265");
-        supportedExternalLibraries.add("xvidcore");
+        supportedExternalLibraries.add("xvid");
     }
 
     /**
@@ -98,7 +98,7 @@ class Packages {
         final boolean speex = externalLibraryList.contains("speex");
         final boolean fribidi = externalLibraryList.contains("fribidi");
         final boolean gnutls = externalLibraryList.contains("gnutls");
-        final boolean xvidcore = externalLibraryList.contains("xvidcore");
+        final boolean xvid = externalLibraryList.contains("xvid");
 
         boolean min = false;
         boolean minGpl = false;
@@ -110,7 +110,7 @@ class Packages {
         boolean fullGpl = false;
 
         if (speex && fribidi) {
-            if (xvidcore) {
+            if (xvid) {
                 fullGpl = true;
             } else {
                 full = true;
@@ -119,7 +119,7 @@ class Packages {
             audio = true;
         } else if (fribidi) {
             video = true;
-        } else if (xvidcore) {
+        } else if (xvid) {
             if (gnutls) {
                 httpsGpl = true;
             } else {
@@ -164,7 +164,7 @@ class Packages {
                     externalLibraryList.contains("wavpack") &&
                     externalLibraryList.contains("x264") &&
                     externalLibraryList.contains("x265") &&
-                    externalLibraryList.contains("xvidcore")) {
+                    externalLibraryList.contains("xvid")) {
                 return "full-gpl";
             } else {
                 return "custom";
@@ -246,7 +246,7 @@ class Packages {
                     externalLibraryList.contains("libvidstab") &&
                     externalLibraryList.contains("x264") &&
                     externalLibraryList.contains("x265") &&
-                    externalLibraryList.contains("xvidcore")) {
+                    externalLibraryList.contains("xvid")) {
                 return "https-gpl";
             } else {
                 return "custom";
@@ -266,7 +266,7 @@ class Packages {
             if (externalLibraryList.contains("libvidstab") &&
                     externalLibraryList.contains("x264") &&
                     externalLibraryList.contains("x265") &&
-                    externalLibraryList.contains("xvidcore")) {
+                    externalLibraryList.contains("xvid")) {
                 return "min-gpl";
             } else {
                 return "custom";

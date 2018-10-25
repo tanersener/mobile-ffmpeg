@@ -387,7 +387,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     [supportedExternalLibraries addObject:@"wavpack"];
     [supportedExternalLibraries addObject:@"x264"];
     [supportedExternalLibraries addObject:@"x265"];
-    [supportedExternalLibraries addObject:@"xvidcore"];
+    [supportedExternalLibraries addObject:@"xvid"];
 
     [ArchDetect class];
     [MobileFFmpeg class];
@@ -622,7 +622,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     Boolean speex = [enabledLibraryArray containsObject:@"speex"];
     Boolean fribidi = [enabledLibraryArray containsObject:@"fribidi"];
     Boolean gnutls = [enabledLibraryArray containsObject:@"gnutls"];
-    Boolean xvidcore = [enabledLibraryArray containsObject:@"xvidcore"];
+    Boolean xvid = [enabledLibraryArray containsObject:@"xvid"];
 
     Boolean min = false;
     Boolean minGpl = false;
@@ -634,7 +634,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     Boolean fullGpl = false;
 
     if (speex && fribidi) {
-        if (xvidcore) {
+        if (xvid) {
             fullGpl = true;
         } else {
             full = true;
@@ -643,7 +643,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
         audio = true;
     } else if (fribidi) {
         video = true;
-    } else if (xvidcore) {
+    } else if (xvid) {
         if (gnutls) {
             httpsGpl = true;
         } else {
@@ -688,7 +688,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
             [enabledLibraryArray containsObject:@"wavpack"] &&
             [enabledLibraryArray containsObject:@"x264"] &&
             [enabledLibraryArray containsObject:@"x265"] &&
-            [enabledLibraryArray containsObject:@"xvidcore"]) {
+            [enabledLibraryArray containsObject:@"xvid"]) {
             return @"full-gpl";
         } else {
             return @"custom";
@@ -770,7 +770,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
             [enabledLibraryArray containsObject:@"libvidstab"] &&
             [enabledLibraryArray containsObject:@"x264"] &&
             [enabledLibraryArray containsObject:@"x265"] &&
-            [enabledLibraryArray containsObject:@"xvidcore"]) {
+            [enabledLibraryArray containsObject:@"xvid"]) {
             return @"https-gpl";
         } else {
             return @"custom";
@@ -790,7 +790,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
         if ([enabledLibraryArray containsObject:@"libvidstab"] &&
             [enabledLibraryArray containsObject:@"x264"] &&
             [enabledLibraryArray containsObject:@"x265"] &&
-            [enabledLibraryArray containsObject:@"xvidcore"]) {
+            [enabledLibraryArray containsObject:@"xvid"]) {
             return @"min-gpl";
         } else {
             return @"custom";
