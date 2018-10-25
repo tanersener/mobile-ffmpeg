@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_PORTS_BITOPS_H_
-#define AOM_PORTS_BITOPS_H_
+#ifndef AOM_AOM_PORTS_BITOPS_H_
+#define AOM_AOM_PORTS_BITOPS_H_
 
 #include <assert.h>
 
@@ -75,4 +75,4 @@ static INLINE int get_msb(unsigned int n) {
 }  // extern "C"
 #endif
 
-#endif  // AOM_PORTS_BITOPS_H_
+#endif  // AOM_AOM_PORTS_BITOPS_H_

@@ -22,7 +22,7 @@
 // as described for AOM_BLEND_A64 in aom_dsp/blend.h. src0 or src1 can
 // be the same as dst, or dst can be different from both sources.
 
-// NOTE(david.barker): The input and output of aom_blend_a64_d32_mask_c() are
+// NOTE(david.barker): The input and output of aom_blend_a64_d16_mask_c() are
 // in a higher intermediate precision, and will later be rounded down to pixel
 // precision.
 // Thus, in order to avoid double-rounding, we want to use normal right shifts
@@ -30,7 +30,7 @@
 // This works because of the identity:
 // ROUND_POWER_OF_TWO(x >> y, z) == ROUND_POWER_OF_TWO(x, y+z)
 //
-// In contrast, the output of the non-d32 functions will not be further rounded,
+// In contrast, the output of the non-d16 functions will not be further rounded,
 // so we *should* use ROUND_POWER_OF_TWO there.
 
 void aom_lowbd_blend_a64_d16_mask_c(

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_RECONINTER_H_
-#define AV1_COMMON_RECONINTER_H_
+#ifndef AOM_AV1_COMMON_RECONINTER_H_
+#define AOM_AV1_COMMON_RECONINTER_H_
 
 #include "av1/common/filter.h"
 #include "av1/common/onyxc_int.h"
@@ -113,40 +113,48 @@ static INLINE void inter_predictor(const uint8_t *src, int src_stride,
                                    const SubpelParams *subpel_params,
                                    const struct scale_factors *sf, int w, int h,
                                    ConvolveParams *conv_params,
-                                   InterpFilters interp_filters) {
+                                   InterpFilters interp_filters,
+                                   int is_intrabc) {
   assert(conv_params->do_average == 0 || conv_params->do_average == 1);
   assert(sf);
-  if (has_scale(subpel_params->xs, subpel_params->ys)) {
+  const int is_scaled = has_scale(subpel_params->xs, subpel_params->ys);
+  assert(IMPLIES(is_intrabc, !is_scaled));
+  if (is_scaled) {
     av1_convolve_2d_facade(src, src_stride, dst, dst_stride, w, h,
                            interp_filters, subpel_params->subpel_x,
                            subpel_params->xs, subpel_params->subpel_y,
-                           subpel_params->ys, 1, conv_params, sf);
+                           subpel_params->ys, 1, conv_params, sf, is_intrabc);
   } else {
     SubpelParams sp = *subpel_params;
     revert_scale_extra_bits(&sp);
     av1_convolve_2d_facade(src, src_stride, dst, dst_stride, w, h,
                            interp_filters, sp.subpel_x, sp.xs, sp.subpel_y,
-                           sp.ys, 0, conv_params, sf);
+                           sp.ys, 0, conv_params, sf, is_intrabc);
   }
 }
 
-static INLINE void highbd_inter_predictor(
-    const uint8_t *src, int src_stride, uint8_t *dst, int dst_stride,
-    const SubpelParams *subpel_params, const struct scale_factors *sf, int w,
-    int h, ConvolveParams *conv_params, InterpFilters interp_filters, int bd) {
+static INLINE void highbd_inter_predictor(const uint8_t *src, int src_stride,
+                                          uint8_t *dst, int dst_stride,
+                                          const SubpelParams *subpel_params,
+                                          const struct scale_factors *sf, int w,
+                                          int h, ConvolveParams *conv_params,
+                                          InterpFilters interp_filters,
+                                          int is_intrabc, int bd) {
   assert(conv_params->do_average == 0 || conv_params->do_average == 1);
   assert(sf);
-  if (has_scale(subpel_params->xs, subpel_params->ys)) {
-    av1_highbd_convolve_2d_facade(src, src_stride, dst, dst_stride, w, h,
-                                  interp_filters, subpel_params->subpel_x,
-                                  subpel_params->xs, subpel_params->subpel_y,
-                                  subpel_params->ys, 1, conv_params, sf, bd);
+  const int is_scaled = has_scale(subpel_params->xs, subpel_params->ys);
+  assert(IMPLIES(is_intrabc, !is_scaled));
+  if (is_scaled) {
+    av1_highbd_convolve_2d_facade(
+        src, src_stride, dst, dst_stride, w, h, interp_filters,
+        subpel_params->subpel_x, subpel_params->xs, subpel_params->subpel_y,
+        subpel_params->ys, 1, conv_params, sf, is_intrabc, bd);
   } else {
     SubpelParams sp = *subpel_params;
     revert_scale_extra_bits(&sp);
-    av1_highbd_convolve_2d_facade(src, src_stride, dst, dst_stride, w, h,
-                                  interp_filters, sp.subpel_x, sp.xs,
-                                  sp.subpel_y, sp.ys, 0, conv_params, sf, bd);
+    av1_highbd_convolve_2d_facade(
+        src, src_stride, dst, dst_stride, w, h, interp_filters, sp.subpel_x,
+        sp.xs, sp.subpel_y, sp.ys, 0, conv_params, sf, is_intrabc, bd);
   }
 }
 
@@ -347,11 +355,11 @@ void av1_jnt_comp_weight_assign(const AV1_COMMON *cm, const MB_MODE_INFO *mbmi,
 int av1_allow_warp(const MB_MODE_INFO *const mbmi,
                    const WarpTypesAllowed *const warp_types,
                    const WarpedMotionParams *const gm_params,
-                   int build_for_obmc, int x_scale, int y_scale,
+                   int build_for_obmc, const struct scale_factors *const sf,
                    WarpedMotionParams *final_warp_params);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_RECONINTER_H_
+#endif  // AOM_AV1_COMMON_RECONINTER_H_

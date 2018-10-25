@@ -84,7 +84,7 @@ class CFLTest {
     tx_size = tx;
     width = tx_size_wide[tx_size];
     height = tx_size_high[tx_size];
-    rnd(ACMRandom::DeterministicSeed());
+    rnd.Reset(ACMRandom::DeterministicSeed());
   }
 
  protected:

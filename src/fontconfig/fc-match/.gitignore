@@ -1,5 +1,5 @@
 /.deps/
-/Makefile
-*.o
-/fc-match
 /.libs/
+/Makefile
+/fc-match
+/fc-match.o

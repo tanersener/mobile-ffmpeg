@@ -18,6 +18,10 @@
  */
 
 /*
+ * CHANGES 10.2018
+ * --------------------------------------------------------
+ * - getBuildConf method added
+ *
  * CHANGES 09.2018
  * --------------------------------------------------------
  * - Merged with mobileffmpeg_config
@@ -29,6 +33,7 @@
 
 #include <pthread.h>
 
+#include "config.h"
 #include "libavutil/bprint.h"
 #include "mobileffmpeg.h"
 #include "fftools_ffmpeg.h"
@@ -82,15 +87,12 @@ JNINativeMethod configMethods[] = {
     {"enableNativeRedirection", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_enableNativeRedirection},
     {"disableNativeRedirection", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_disableNativeRedirection},
     {"setNativeLogLevel", "(I)V", (void*) Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel},
-    {"getNativeLogLevel", "()I", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel}
-};
-
-/** Prototypes of native functions defined by FFmpeg class. */
-JNINativeMethod ffmpegMethods[] = {
-  {"getNativeFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeFFmpegVersion},
-  {"getNativeVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeVersion},
-  {"nativeExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeExecute},
-  {"nativeCancel", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeCancel}
+    {"getNativeLogLevel", "()I", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel},
+    {"getNativeFFmpegVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeFFmpegVersion},
+    {"getNativeVersion", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeVersion},
+    {"nativeExecute", "([Ljava/lang/String;)I", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeExecute},
+    {"nativeCancel", "()V", (void*) Java_com_arthenica_mobileffmpeg_Config_nativeCancel},
+    {"getNativeBuildConf", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf}
 };
 
 /** Forward declaration for function defined in fftools_ffmpeg.c */
@@ -473,12 +475,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    if ((*env)->RegisterNatives(env, localConfigClass, ffmpegMethods, 4) < 0) {
-        LOGE("OnLoad failed to RegisterNatives for class %s.\n", configClassName);
-        return JNI_FALSE;
-    }
-
-    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 4) < 0) {
+    if ((*env)->RegisterNatives(env, localConfigClass, configMethods, 9) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.\n", configClassName);
         return JNI_FALSE;
     }
@@ -669,4 +666,15 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIE
  */
 JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEnv *env, jclass object) {
     cancel_operation();
+}
+
+/**
+ * Returns build configuration for FFmpeg.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ * \return build configuration string
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf(JNIEnv *env, jclass object) {
+    return (*env)->NewStringUTF(env, FFMPEG_CONFIGURATION);
 }

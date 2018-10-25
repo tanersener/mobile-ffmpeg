@@ -22,6 +22,8 @@
 #include <Foundation/Foundation.h>
 #include "libavutil/ffversion.h"
 
+#include "MediaInformationParser.h"
+
 /** Global library version */
 extern NSString *const MOBILE_FFMPEG_VERSION;
 
@@ -51,18 +53,29 @@ extern int const RETURN_CODE_CANCEL;
 /**
  * Synchronously executes FFmpeg with arguments provided.
  *
- * \param FFmpeg command options/arguments in one string
- * \return zero on successful execution, 255 on user cancel and non-zero on error
- */
-+ (int)execute: (NSString*)arguments;
-
-/**
- * Synchronously executes FFmpeg with arguments provided.
- *
  * \param FFmpeg command options/arguments as string array
  * \return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)executeWithArray: (NSArray*)arguments;
++ (int)executeWithArguments: (NSArray*)arguments;
+
+/**
+ * Synchronously executes FFmpeg command provided. Space character is used to split command
+ * into arguments.
+ *
+ * \param FFmpeg command
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
+ */
++ (int)execute: (NSString*)command;
+
+/**
+ * Synchronously executes FFmpeg command provided. Delimiter parameter is used to split
+ * command into arguments.
+ *
+ * \param FFmpeg command
+ * \param arguments delimiter
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
+ */
++ (int)execute: (NSString*)command delimiter:(NSString*)delimiter;
 
 /**
  * Cancels an ongoing operation.
@@ -70,5 +83,37 @@ extern int const RETURN_CODE_CANCEL;
  * This function does not wait for termination to complete and returns immediately.
  */
 + (void)cancel;
+
+/**
+ * Returns return code of last executed command.
+ *
+ * \return return code of last executed command
+ */
++ (int)getLastReturnCode;
+
+/**
+ * Returns log output of last executed command. Please note that disabling redirection using
+ * MobileFFmpegConfig.disableRedirection() method also disables this functionality.
+ *
+ * \return output of last executed command
+ */
++ (NSString*)getLastCommandOutput;
+
+/**
+ * Returns media information for given file.
+ *
+ * \param path or uri of media file
+ * \return media information
+ */
++ (MediaInformation*)getMediaInformation: (NSString*)path;
+
+/**
+ * Returns media information for given file.
+ *
+ * \param path    path or uri of media file
+ * \param timeout complete timeout
+ * \return media information
+ */
+ + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout;
 
 @end

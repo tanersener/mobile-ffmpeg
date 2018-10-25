@@ -1,5 +1,5 @@
 /.deps/
-/Makefile
-*.o
-/fc-query
 /.libs/
+/Makefile
+/fc-query
+/fc-query.o

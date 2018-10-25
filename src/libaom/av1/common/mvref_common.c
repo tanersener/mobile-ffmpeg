@@ -1383,7 +1383,8 @@ void av1_set_frame_refs(AV1_COMMON *const cm, int lst_map_idx,
     const int buf_idx = cm->ref_frame_map[map_idx];
     ref_frame_info[i].buf_idx = buf_idx;
 
-    if (buf_idx < 0 || buf_idx >= FRAME_BUFFERS) continue;
+    assert(buf_idx < FRAME_BUFFERS);
+    if (buf_idx < 0) continue;
     // TODO(zoeliu@google.com): To verify the checking on ref_count.
     if (frame_bufs[buf_idx].ref_count <= 0) continue;
 

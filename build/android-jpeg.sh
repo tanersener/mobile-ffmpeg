@@ -57,14 +57,14 @@ cmake -Wno-dev \
     -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$LD" \
     -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
-    -DENABLE_PIC=1 \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
     -DENABLE_STATIC=1 \
+    -DENABLE_SHARED=0 \
     -DWITH_JPEG8=1 \
     -DWITH_SIMD=1 \
     -DWITH_TURBOJPEG=0 \
     -DWITH_JAVA=0 \
-    -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
-    -DENABLE_SHARED=0 .. || exit 1
+    -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) .. || exit 1
 
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 

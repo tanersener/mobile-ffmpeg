@@ -406,7 +406,7 @@ to <parameter>config</parameter>.
 	    <funcdef>FcBool <function>FcDirCacheCreateUUID</function></funcdef>
 		<paramdef>FcChar8 *<parameter>dir</parameter></paramdef>
 		<paramdef>FcBool<parameter>force</parameter></paramdef>
-		<paramdef>FcConfig<parameter>config</parameter></paramdef>
+		<paramdef>FcConfig *<parameter>config</parameter></paramdef>
 	</funcprototype>
 	</funcsynopsis>
 	</refsynopsisdiv>
@@ -420,5 +420,60 @@ the cache filename if available.
 	</refsect1>
 	<refsect1><title>Since</title>
 	    <para>version 2.12.92</para>
+	</refsect1>
+    </refentry>
+<!--
+   fontconfig/doc/func.sgml
+  
+   Copyright © 2003 Keith Packard
+  
+   Permission to use, copy, modify, distribute, and sell this software and its
+   documentation for any purpose is hereby granted without fee, provided that
+   the above copyright notice appear in all copies and that both that
+   copyright notice and this permission notice appear in supporting
+   documentation, and that the name of the author(s) not be used in
+   advertising or publicity pertaining to distribution of the software without
+   specific, written prior permission.  The authors make no
+   representations about the suitability of this software for any purpose.  It
+   is provided "as is" without express or implied warranty.
+  
+   THE AUTHOR(S) DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+   INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO
+   EVENT SHALL THE AUTHOR(S) BE LIABLE FOR ANY SPECIAL, INDIRECT OR
+   CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
+   DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+   TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+   PERFORMANCE OF THIS SOFTWARE.
+ -->
+    <refentry id="FcDirCacheDeleteUUID">
+	<refmeta>
+	    <refentrytitle>FcDirCacheDeleteUUID</refentrytitle>
+	    <manvolnum>3</manvolnum>
+	    <refmiscinfo class="software">Fontconfig &version;</refmiscinfo>
+	</refmeta>
+	<refnamediv>
+	    <refname>FcDirCacheDeleteUUID</refname>
+	    <refpurpose>Delete .uuid file</refpurpose>
+	</refnamediv>
+	<refsynopsisdiv>
+	<funcsynopsis>
+	<funcsynopsisinfo>
+#include &lt;fontconfig/fontconfig.h&gt;
+	</funcsynopsisinfo>
+	<funcprototype>
+	    <funcdef>FcBool <function>FcDirCacheDeleteUUID</function></funcdef>
+		<paramdef>const FcChar8 *<parameter>dir</parameter></paramdef>
+		<paramdef>FcConfig *<parameter>config</parameter></paramdef>
+	</funcprototype>
+	</funcsynopsis>
+	</refsynopsisdiv>
+	<refsect1><title>Description</title>
+	    <para>
+This is to delete .uuid file containing an UUID at a font directory of
+<parameter>dir</parameter>.
+	    </para>
+	</refsect1>
+	<refsect1><title>Since</title>
+	    <para>version 2.13.1</para>
 	</refsect1>
     </refentry>

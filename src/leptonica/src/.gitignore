@@ -1,0 +1,7 @@
+/.deps/
+/.libs/
+*.lo
+*.o
+/Makefile
+/endianness.h
+/liblept.la

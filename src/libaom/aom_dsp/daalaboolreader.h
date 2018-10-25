@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_DSP_DAALABOOLREADER_H_
-#define AOM_DSP_DAALABOOLREADER_H_
+#ifndef AOM_AOM_DSP_DAALABOOLREADER_H_
+#define AOM_AOM_DSP_DAALABOOLREADER_H_
 
 #include "aom/aom_integer.h"
 #include "aom_dsp/entdec.h"
@@ -101,10 +101,6 @@ static INLINE int aom_daala_read(daala_reader *r, int prob) {
   return bit;
 }
 
-static INLINE int aom_daala_reader_has_error(daala_reader *r) {
-  return r->ec.error;
-}
-
 static INLINE int daala_read_symbol(daala_reader *r, const aom_cdf_prob *cdf,
                                     int nsymbs) {
   int symb;
@@ -157,4 +153,4 @@ static INLINE int daala_read_symbol(daala_reader *r, const aom_cdf_prob *cdf,
 }  // extern "C"
 #endif
 
-#endif
+#endif  // AOM_AOM_DSP_DAALABOOLREADER_H_

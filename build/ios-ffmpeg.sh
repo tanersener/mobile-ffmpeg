@@ -82,7 +82,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..40}
+for library in {1..47}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -193,6 +193,11 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opus)"
                 CONFIGURE_POSTFIX+=" --enable-libopus"
             ;;
+            sdl)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags sdl2)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static sdl2)"
+                CONFIGURE_POSTFIX+=" --enable-sdl2"
+            ;;
             shine)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags shine)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static shine)"
@@ -212,6 +217,18 @@ do
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags speex)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static speex)"
                 CONFIGURE_POSTFIX+=" --enable-libspeex"
+            ;;
+            tesseract)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags tesseract)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static tesseract)"
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags giflib)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static giflib)"
+                CONFIGURE_POSTFIX+=" --enable-libtesseract"
+            ;;
+            twolame)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags twolame)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static twolame)"
+                CONFIGURE_POSTFIX+=" --enable-libtwolame"
             ;;
             wavpack)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags wavpack)"
@@ -263,17 +280,23 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static zlib)"
 
                 case ${ENABLED_LIBRARY} in
-                    ios-zlib)
-                        CONFIGURE_POSTFIX+=" --enable-zlib"
-                    ;;
                     ios-audiotoolbox)
                         CONFIGURE_POSTFIX+=" --enable-audiotoolbox"
+                    ;;
+                    ios-avfoundation)
+                        CONFIGURE_POSTFIX+=" --enable-avfoundation"
+                    ;;
+                    ios-bzip2)
+                        CONFIGURE_POSTFIX+=" --enable-bzlib"
                     ;;
                     ios-coreimage)
                         CONFIGURE_POSTFIX+=" --enable-coreimage"
                     ;;
-                    ios-bzip2)
-                        CONFIGURE_POSTFIX+=" --enable-bzlib"
+                    ios-videotoolbox)
+                        CONFIGURE_POSTFIX+=" --enable-videotoolbox"
+                    ;;
+                    ios-zlib)
+                        CONFIGURE_POSTFIX+=" --enable-zlib"
                     ;;
                 esac
             ;;
@@ -283,14 +306,18 @@ do
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 8 ]]; then
             CONFIGURE_POSTFIX+=" --disable-iconv"
-        elif [[ ${library} -eq 37 ]]; then
+        elif [[ ${library} -eq 42 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
-        elif [[ ${library} -eq 38 ]]; then
+        elif [[ ${library} -eq 43 ]]; then
             CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
-        elif [[ ${library} -eq 39 ]]; then
+        elif [[ ${library} -eq 44 ]]; then
             CONFIGURE_POSTFIX+=" --disable-coreimage"
-        elif [[ ${library} -eq 40 ]]; then
+        elif [[ ${library} -eq 45 ]]; then
             CONFIGURE_POSTFIX+=" --disable-bzlib"
+        elif [[ ${library} -eq 46 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-videotoolbox"
+        elif [[ ${library} -eq 47 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-avfoundation"
         fi
     fi
 done
@@ -300,6 +327,13 @@ if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
     BUILD_LIBRARY_OPTIONS="--enable-shared --disable-static";
 else
     BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
+fi
+
+# OPTIMIZE FOR SPEED INSTEAD OF SIZE
+if [[ -z ${MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED} ]]; then
+    SIZE_OPTIONS="--enable-small";
+else
+    SIZE_OPTIONS="";
 fi
 
 # CFLAGS PARTS
@@ -348,9 +382,9 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-asm \
     --enable-inline-asm \
     --enable-optimizations \
-    --enable-small  \
     --enable-swscale \
     ${BUILD_LIBRARY_OPTIONS} \
+    ${SIZE_OPTIONS}  \
     --disable-openssl \
     --disable-xmm-clobber-test \
     --disable-debug \
@@ -364,7 +398,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-txtpages \
     --disable-sndio \
     --disable-schannel \
-    --disable-sdl2 \
     --disable-securetransport \
     --disable-xlib \
     --disable-cuda \
@@ -372,7 +405,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-nvenc \
     --disable-vaapi \
     --disable-vdpau \
-    --disable-videotoolbox \
     --disable-appkit \
     --disable-alsa \
     --disable-cuda \
@@ -380,7 +412,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-nvenc \
     --disable-vaapi \
     --disable-vdpau \
-    --disable-videotoolbox \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then

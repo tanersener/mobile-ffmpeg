@@ -10,11 +10,11 @@
  */
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 #include "test/warp_filter_test_util.h"
-using ::testing::make_tuple;
-using ::testing::tuple;
 using libaom_test::ACMRandom;
 using libaom_test::AV1HighbdWarpFilter::AV1HighbdWarpFilterTest;
 using libaom_test::AV1WarpFilter::AV1WarpFilterTest;
+using ::testing::make_tuple;
+using ::testing::tuple;
 
 namespace {
 
@@ -25,6 +25,18 @@ TEST_P(AV1WarpFilterTest, DISABLED_Speed) {
   RunSpeedTest(::testing::get<3>(GET_PARAM(0)));
 }
 
+TEST_P(AV1WarpFilterTest, CheckOutput) {
+  RunCheckOutput(::testing::get<3>(GET_PARAM(0)));
+}
+TEST_P(AV1WarpFilterTest, DISABLED_Speed) {
+  RunSpeedTest(::testing::get<3>(GET_PARAM(0)));
+}
+
+INSTANTIATE_TEST_CASE_P(
+    C, AV1WarpFilterTest,
+    libaom_test::AV1WarpFilter::BuildParams(av1_warp_affine_c));
+
+#if HAVE_SSE4_1
 INSTANTIATE_TEST_CASE_P(
     C, AV1WarpFilterTest,
     libaom_test::AV1WarpFilter::BuildParams(av1_warp_affine_c));

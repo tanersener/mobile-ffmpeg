@@ -2437,9 +2437,10 @@ static INLINE void lowbd_inv_txfm2d_add_idtx_ssse3(const int32_t *input,
   }
 }
 
-void lowbd_inv_txfm2d_add_4x4_ssse3(const int32_t *input, uint8_t *output,
-                                    int stride, TX_TYPE tx_type,
-                                    TX_SIZE tx_size_, int eob) {
+static void lowbd_inv_txfm2d_add_4x4_ssse3(const int32_t *input,
+                                           uint8_t *output, int stride,
+                                           TX_TYPE tx_type, TX_SIZE tx_size_,
+                                           int eob) {
   (void)tx_size_;
   (void)eob;
   __m128i buf[4];
@@ -2708,9 +2709,10 @@ static INLINE void lowbd_inv_txfm2d_add_universe_ssse3(
   }
 }
 
-void lowbd_inv_txfm2d_add_4x8_ssse3(const int32_t *input, uint8_t *output,
-                                    int stride, TX_TYPE tx_type,
-                                    TX_SIZE tx_size_, int eob) {
+static void lowbd_inv_txfm2d_add_4x8_ssse3(const int32_t *input,
+                                           uint8_t *output, int stride,
+                                           TX_TYPE tx_type, TX_SIZE tx_size_,
+                                           int eob) {
   (void)tx_size_;
   (void)eob;
   __m128i buf[8];
@@ -2747,9 +2749,10 @@ void lowbd_inv_txfm2d_add_4x8_ssse3(const int32_t *input, uint8_t *output,
   lowbd_write_buffer_4xn_sse2(buf, output, stride, ud_flip, txfm_size_row);
 }
 
-void lowbd_inv_txfm2d_add_8x4_ssse3(const int32_t *input, uint8_t *output,
-                                    int stride, TX_TYPE tx_type,
-                                    TX_SIZE tx_size_, int eob) {
+static void lowbd_inv_txfm2d_add_8x4_ssse3(const int32_t *input,
+                                           uint8_t *output, int stride,
+                                           TX_TYPE tx_type, TX_SIZE tx_size_,
+                                           int eob) {
   (void)tx_size_;
   (void)eob;
   __m128i buf[8];
@@ -2786,9 +2789,10 @@ void lowbd_inv_txfm2d_add_8x4_ssse3(const int32_t *input, uint8_t *output,
   lowbd_write_buffer_8xn_sse2(buf, output, stride, ud_flip, txfm_size_row);
 }
 
-void lowbd_inv_txfm2d_add_4x16_ssse3(const int32_t *input, uint8_t *output,
-                                     int stride, TX_TYPE tx_type,
-                                     TX_SIZE tx_size_, int eob) {
+static void lowbd_inv_txfm2d_add_4x16_ssse3(const int32_t *input,
+                                            uint8_t *output, int stride,
+                                            TX_TYPE tx_type, TX_SIZE tx_size_,
+                                            int eob) {
   (void)tx_size_;
   (void)eob;
   __m128i buf[16];
@@ -2831,9 +2835,10 @@ void lowbd_inv_txfm2d_add_4x16_ssse3(const int32_t *input, uint8_t *output,
   lowbd_write_buffer_4xn_sse2(buf, output, stride, ud_flip, txfm_size_row);
 }
 
-void lowbd_inv_txfm2d_add_16x4_ssse3(const int32_t *input, uint8_t *output,
-                                     int stride, TX_TYPE tx_type,
-                                     TX_SIZE tx_size_, int eob) {
+static void lowbd_inv_txfm2d_add_16x4_ssse3(const int32_t *input,
+                                            uint8_t *output, int stride,
+                                            TX_TYPE tx_type, TX_SIZE tx_size_,
+                                            int eob) {
   (void)tx_size_;
   (void)eob;
   __m128i buf[16];

@@ -242,7 +242,7 @@ typedef enum _FcOp {
 } FcOp;
 
 typedef enum _FcOpFlags {
-	FcOpFlagIgnoreBlanks = 1 << 0
+	FcOpFlagIgnoreBlanks = 1U << 0
 } FcOpFlags;
 
 #define FC_OP_GET_OP(_x_)	((_x_) & 0xffff)
@@ -566,7 +566,6 @@ struct _FcConfig {
     FcStrSet	*availConfigFiles;  /* config files available */
     FcPtrList	*rulesetList;	    /* List of rulesets being installed */
     FcHashTable *uuid_table;	    /* UUID table for cachedirs */
-    FcHashTable *alias_table;	    /* alias table for cachedirs */
 };
 
 typedef struct _FcFileTime {
@@ -617,8 +616,12 @@ FcCacheObjectReference (void *object);
 FcPrivate void
 FcCacheObjectDereference (void *object);
 
+FcPrivate void *
+FcCacheAllocate (FcCache *cache, size_t len);
+
 FcPrivate void
 FcCacheFini (void);
+
 
 FcPrivate void
 FcDirCacheReference (FcCache *cache, int nref);
@@ -708,7 +711,7 @@ FcConfigModifiedTime (FcConfig *config);
 
 FcPrivate FcBool
 FcConfigAddCache (FcConfig *config, FcCache *cache,
-		  FcSetName set, FcStrSet *dirSet);
+		  FcSetName set, FcStrSet *dirSet, FcChar8 *forDir);
 
 FcPrivate FcRuleSet *
 FcRuleSetCreate (const FcChar8 *name);
@@ -1150,6 +1153,18 @@ FcPatternAppend (FcPattern *p, FcPattern *s);
 FcPrivate int
 FcPatternPosition (const FcPattern *p, const char *object);
 
+FcPrivate FcBool
+FcPatternFindObjectIter (const FcPattern *pat, FcPatternIter *iter, FcObject object);
+
+FcPrivate FcObject
+FcPatternIterGetObjectId (const FcPattern *pat, FcPatternIter *iter);
+
+FcPrivate FcValueListPtr
+FcPatternIterGetValues (const FcPattern *pat, FcPatternIter *iter);
+
+FcPrivate FcPattern *
+FcPatternCacheRewriteFile (const FcPattern *pat, FcCache *cache, const FcChar8 *relocated_font_file);
+
 FcPrivate FcChar32
 FcStringHash (const FcChar8 *s);
 
@@ -1264,9 +1279,8 @@ FcStrGlobMatch (const FcChar8 *glob,
 FcPrivate FcBool
 FcStrUsesHome (const FcChar8 *s);
 
-FcPrivate FcChar8 *
-FcStrBuildFilename (const FcChar8 *path,
-		    ...);
+FcPrivate FcBool
+FcStrIsAbsoluteFilename (const FcChar8 *s);
 
 FcPrivate FcChar8 *
 FcStrLastSlash (const FcChar8  *path);
@@ -1340,5 +1354,9 @@ FcPrivate FcBool
 FcHashTableReplace (FcHashTable *table,
 		    void        *key,
 		    void        *value);
+
+FcPrivate FcBool
+FcHashTableRemove (FcHashTable *table,
+		   void        *key);
 
 #endif /* _FC_INT_H_ */

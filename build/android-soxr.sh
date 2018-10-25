@@ -57,6 +57,7 @@ cmake -Wno-dev \
     -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$LD" \
     -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
     -DBUILD_TESTS=0 \
     -DWITH_DEV_TRACE=0 \
     -DWITH_LSR_BINDINGS=0 \

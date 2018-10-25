@@ -2,3 +2,8 @@
 /Makefile
 /config.status
 /configure.tmp
+/.deps/
+/.libs/
+*.trs
+/unittests
+/test-driver

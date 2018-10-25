@@ -143,6 +143,8 @@ FcPtrListIterAdd (FcPtrList	*list,
 	return FcFalse;
 
     e = (FcPtrListEntry *) malloc (sizeof (FcPtrListEntry));
+    if (!e)
+	return FcFalse;
     e->data = data;
 
     if (priv->entry)

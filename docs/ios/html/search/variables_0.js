@@ -18,6 +18,7 @@ var searchData=
   ['audio_5fvolume',['audio_volume',['../d7/db3/fftools__ffmpeg_8h.html#a13213d6339827ff18b6af3f0ec13db5e',1,'audio_volume():&#160;fftools_ffmpeg_opt.c'],['../da/d66/fftools__ffmpeg__opt_8c.html#a13213d6339827ff18b6af3f0ec13db5e',1,'audio_volume():&#160;fftools_ffmpeg_opt.c']]],
   ['autorotate',['autorotate',['../df/d77/struct_options_context.html#a69b72bacd7b4ac7c63d9799cd6b8cc7f',1,'OptionsContext::autorotate()'],['../d3/d6e/struct_input_stream.html#abcb8222561f1ee84a2f7a2157bed356c',1,'InputStream::autorotate()']]],
   ['avcodec_5fopts',['avcodec_opts',['../d8/d4e/fftools__cmdutils_8h.html#a8280138e6b57909763e4a7a78b663a03',1,'fftools_cmdutils.h']]],
+  ['averageframerate',['averageFrameRate',['../d7/da5/_stream_information_8m.html#a784da57b84e3e9bf518cee2b3a8e2383',1,'StreamInformation.m']]],
   ['avfilter',['avfilter',['../db/dde/struct_output_stream.html#ac35ecb04b8b6ca22d10180918de95be4',1,'OutputStream']]],
   ['avformat_5fopts',['avformat_opts',['../d8/d4e/fftools__cmdutils_8h.html#a38b8dd64a9ea09a7dd31a6b18e98ac6c',1,'fftools_cmdutils.h']]]
 ];

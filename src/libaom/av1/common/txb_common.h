@@ -9,8 +9,10 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_TXB_COMMON_H_
-#define AV1_COMMON_TXB_COMMON_H_
+#ifndef AOM_AV1_COMMON_TXB_COMMON_H_
+#define AOM_AV1_COMMON_TXB_COMMON_H_
+
+#include "av1/common/onyxc_int.h"
 
 extern const int16_t k_eob_group_start[12];
 extern const int16_t k_eob_offset_bits[12];
@@ -421,4 +423,4 @@ static INLINE void get_txb_ctx(const BLOCK_SIZE plane_bsize,
 
 void av1_init_lv_map(AV1_COMMON *cm);
 
-#endif  // AV1_COMMON_TXB_COMMON_H_
+#endif  // AOM_AV1_COMMON_TXB_COMMON_H_

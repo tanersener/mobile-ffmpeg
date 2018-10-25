@@ -67,6 +67,8 @@ set_aom_detect_var(HAVE_WXWIDGETS 0 NUMBER "WxWidgets present.")
 #
 
 # Build configuration flags.
+set_aom_config_var(AOM_RTCD_FLAGS "" STRING
+                   "Arguments to pass to rtcd.pl. Separate with ';'")
 set_aom_config_var(CONFIG_AV1_DECODER 1 NUMBER "Enable AV1 decoder.")
 set_aom_config_var(CONFIG_AV1_ENCODER 1 NUMBER "Enable AV1 encoder.")
 set_aom_config_var(CONFIG_BIG_ENDIAN 0 NUMBER "Internal flag.")
@@ -95,7 +97,7 @@ set_aom_config_var(CONFIG_ACCOUNTING 0 NUMBER "Enables bit accounting.")
 set_aom_config_var(CONFIG_ANALYZER 0 NUMBER "Enables bit stream analyzer.")
 set_aom_config_var(CONFIG_COEFFICIENT_RANGE_CHECKING 0 NUMBER
                    "Coefficient range check.")
-set_aom_config_var(CONFIG_DENOISE 0 NUMBER
+set_aom_config_var(CONFIG_DENOISE 1 NUMBER
                    "Denoise/noise modeling support in encoder.")
 set_aom_config_var(CONFIG_FILEOPTIONS 1 NUMBER
                    "Enables encoder config file support.")
@@ -104,7 +106,7 @@ set_aom_config_var(CONFIG_FIX_GF_LENGTH 1 NUMBER
 set_aom_config_var(CONFIG_INSPECTION 0 NUMBER "Enables bitstream inspection.")
 set_aom_config_var(CONFIG_INTERNAL_STATS 0 NUMBER
                    "Enables internal encoder stats.")
-set_aom_config_var(CONFIG_LOWBITDEPTH 0 NUMBER
+set_aom_config_var(CONFIG_LOWBITDEPTH 1 NUMBER
                    "Enables 8-bit optimized pipeline.")
 set_aom_config_var(CONFIG_MAX_DECODE_PROFILE 2 NUMBER
                    "Max profile to support decoding.")
@@ -133,6 +135,9 @@ set_aom_config_var(CONFIG_INTER_STATS_ONLY 0 NUMBER "AV1 experiment flag.")
 set_aom_config_var(CONFIG_RD_DEBUG 0 NUMBER "AV1 experiment flag.")
 set_aom_config_var(CONFIG_2PASS_PARTITION_SEARCH_LVL 1 NUMBER
                    "AV1 experiment flag.")
+set_aom_config_var(CONFIG_SHARP_SETTINGS 0 NUMBER
+                   "Use sharper encoding settings")
+set_aom_config_var(CONFIG_INTEGERIZE_SGR 1 NUMBER "AV1 experiment flag.")
 
 #
 # Variables in this section control optional features of the build system.

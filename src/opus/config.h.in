@@ -12,14 +12,14 @@
 /* Do not build the float API */
 #undef DISABLE_FLOAT_API
 
+/* Disable bitstream fixes from RFC 8251 */
+#undef DISABLE_UPDATE_DRAFT
+
 /* Assertions */
 #undef ENABLE_ASSERTIONS
 
-/* Ambisonics Support */
-#undef ENABLE_EXPERIMENTAL_AMBISONICS
-
-/* Enable bitstream changes from draft-ietf-codec-opus-update */
-#undef ENABLE_UPDATE_DRAFT
+/* Hardening */
+#undef ENABLE_HARDENING
 
 /* Debug fixed-point implementation */
 #undef FIXED_DEBUG

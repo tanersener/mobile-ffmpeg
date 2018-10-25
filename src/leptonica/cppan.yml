@@ -1,0 +1,74 @@
+files:
+    - src/.*\.h
+    - src/.*\.c
+    - src/endianness.h.in
+
+include_directories:
+    public: src
+
+check_function_exists:
+  - fmemopen
+  - fstatat
+
+check_include_exists:
+  - dlfcn.h
+  - inttypes.h
+  - memory.h
+  - stdint.h
+  - stdlib.h
+  - strings.h
+  - string.h
+  - sys/stat.h
+  - sys/types.h
+  - unistd.h
+
+pre_sources: |
+    if(WORDS_BIGENDIAN)
+      set(ENDIANNESS L_BIG_ENDIAN)
+    else()
+      set(ENDIANNESS L_LITTLE_ENDIAN)
+    endif()
+
+    set(APPLE_UNIVERSAL_BUILD "defined (__APPLE_CC__)")
+    configure_file(
+        ${SDIR}/src/endianness.h.in
+        ${BDIR}/endianness.h
+        @ONLY)
+
+    # dummy config file
+    if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/config_auto.h)
+        file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/config_auto.h)
+    endif()
+
+post_sources: |
+    if (MSVC)
+        file(GLOB_RECURSE csrc "${SDIR}/*.c")
+        set_source_files_properties(${csrc} PROPERTIES LANGUAGE CXX)
+    endif()
+
+options:
+    any:
+        definitions:
+            public:
+              - HAVE_CONFIG_H
+            private:
+              - HAVE_LIBGIF
+              - HAVE_LIBJPEG
+              - HAVE_LIBPNG
+              - HAVE_LIBTIFF
+              - HAVE_LIBWEBP
+              - HAVE_LIBZ
+              - HAVE_LIBJP2K
+              - LIBJP2K_HEADER="openjpeg.h"
+    shared:
+        definitions:
+            private: LIBLEPT_EXPORTS
+
+dependencies:
+    private:
+        pvt.cppan.demo.gif: 5
+        pvt.cppan.demo.jpeg: 9
+        pvt.cppan.demo.png: 1
+        pvt.cppan.demo.tiff: 4
+        pvt.cppan.demo.webmproject.webp: 1
+        pvt.cppan.demo.openjpeg.openjp2: 2

@@ -147,7 +147,7 @@ int av1_log_block_var(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bs) {
 
 #define DEFAULT_E_MIDPOINT 10.0
 
-unsigned int haar_ac_energy(MACROBLOCK *x, BLOCK_SIZE bs) {
+static unsigned int haar_ac_energy(MACROBLOCK *x, BLOCK_SIZE bs) {
   MACROBLOCKD *xd = &x->e_mbd;
   int stride = x->plane[0].src.stride;
   uint8_t *buf = x->plane[0].src.buf;

@@ -8,8 +8,8 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef AV1_COMMON_X86_AV1_INV_TXFM_SSSE3_H_
-#define AV1_COMMON_X86_AV1_INV_TXFM_SSSE3_H_
+#ifndef AOM_AV1_COMMON_X86_AV1_INV_TXFM_SSSE3_H_
+#define AOM_AV1_COMMON_X86_AV1_INV_TXFM_SSSE3_H_
 
 #include <emmintrin.h>  // SSE2
 #include <tmmintrin.h>  // SSSE3
@@ -229,4 +229,4 @@ void av1_lowbd_inv_txfm2d_add_ssse3(const int32_t *input, uint8_t *output,
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_X86_AV1_INV_TXFM_SSSE3_H_
+#endif  // AOM_AV1_COMMON_X86_AV1_INV_TXFM_SSSE3_H_

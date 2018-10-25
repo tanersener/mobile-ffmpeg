@@ -1,5 +1,5 @@
 /.deps/
-/Makefile
-*.o
-/fc-cache
 /.libs/
+/Makefile
+/fc-cache.o
+/fc-cache

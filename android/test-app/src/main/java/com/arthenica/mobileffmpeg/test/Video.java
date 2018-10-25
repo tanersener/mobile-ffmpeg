@@ -28,7 +28,7 @@ public class Video {
 
     public static String generateEncodeVideoScript(final String image1Path, final String image2Path, final String image3Path, final String videoFilePath, final String videoCodec, final String customOptions) {
         return
-                "-y -loop 1 -i " + image1Path + " " +
+                "-hide_banner -y -loop 1 -i " + image1Path + " " +
                         "-loop 1 -i " + image2Path + " " +
                         "-loop 1 -i " + image3Path + " " +
                         "-filter_complex " +
@@ -49,7 +49,7 @@ public class Video {
 
     public static String generateShakingVideoScript(final String image1Path, final String image2Path, final String image3Path, final String videoFilePath) {
         return
-                "-y -loop 1 -i " + image1Path + " " +
+                "-hide_banner -y -loop 1 -i " + image1Path + " " +
                         "-loop 1 -i " + image2Path + " " +
                         "-loop 1 -i " + image3Path + " " +
                         "-f lavfi -i color=black:s=640x427 " +

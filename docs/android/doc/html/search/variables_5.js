@@ -2,7 +2,6 @@ var searchData=
 [
   ['f',['f',['../dd/da5/struct_specifier_opt.html#a09d09953c0263bc3992d7b8f4c1fcfc7',1,'SpecifierOpt']]],
   ['ffmpeg_5fexited',['ffmpeg_exited',['../d7/d48/fftools__ffmpeg_8c.html#a7e7ee2a0542150203a78fc135a15674b',1,'fftools_ffmpeg.c']]],
-  ['ffmpegmethods',['ffmpegMethods',['../dd/d16/mobileffmpeg_8c.html#a52aadca549819e998bb89a9f9553da81',1,'mobileffmpeg.c']]],
   ['file_5fidx',['file_idx',['../d6/d2c/struct_audio_channel_map.html#a81b4cfad9b7f201c8a0be6a030688839',1,'AudioChannelMap']]],
   ['file_5findex',['file_index',['../db/d60/struct_stream_map.html#af8b5bac41a8831242ead1441bdca6783',1,'StreamMap::file_index()'],['../d3/d6e/struct_input_stream.html#ad47d834630eee2dca258aa449fb1df47',1,'InputStream::file_index()'],['../db/dde/struct_output_stream.html#af608105788daa4300771669d992ef890',1,'OutputStream::file_index()']]],
   ['file_5foverwrite',['file_overwrite',['../da/d66/fftools__ffmpeg__opt_8c.html#ae5fd4094dfc055c612cd8f7193d29e0a',1,'fftools_ffmpeg_opt.c']]],
@@ -31,6 +30,7 @@ var searchData=
   ['forced_5fkf_5fcount',['forced_kf_count',['../db/dde/struct_output_stream.html#ad637657f407c25840b6d1ed803b026e3',1,'OutputStream']]],
   ['forced_5fkf_5findex',['forced_kf_index',['../db/dde/struct_output_stream.html#a7286a2f0c752dbd752ac4192f5c3bca8',1,'OutputStream']]],
   ['forced_5fkf_5fpts',['forced_kf_pts',['../db/dde/struct_output_stream.html#a53f8e114ef0ef477d3d4409568a68ff6',1,'OutputStream']]],
+  ['forced_5fkf_5fref_5fpts',['forced_kf_ref_pts',['../db/dde/struct_output_stream.html#ac99140cc5be4b4ed439d5e4c854189fa',1,'OutputStream']]],
   ['format',['format',['../df/d77/struct_options_context.html#a295fefa29d7132a93db9110dce6eeab9',1,'OptionsContext::format()'],['../d7/d0c/struct_input_filter.html#ae704ff879704d2ab90dad159526785e2',1,'InputFilter::format()'],['../d0/d0f/struct_output_filter.html#aeba350050d2035d755254154e6551c49',1,'OutputFilter::format()']]],
   ['format_5fopts',['format_opts',['../d6/d69/struct_option_group.html#aeac5e8e830df2e99aadfe65a471ce8fb',1,'OptionGroup::format_opts()'],['../d7/dcc/fftools__cmdutils_8c.html#a943d0199a3f44df589324a8fe9365c48',1,'format_opts():&#160;fftools_cmdutils.c'],['../d8/d4e/fftools__cmdutils_8h.html#a943d0199a3f44df589324a8fe9365c48',1,'format_opts():&#160;fftools_cmdutils.c']]],
   ['formats',['formats',['../d0/d0f/struct_output_filter.html#acd4f04cfb3db05beef2507e397aef9aa',1,'OutputFilter']]],

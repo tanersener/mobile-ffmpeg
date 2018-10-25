@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_FILTER_H_
-#define AV1_COMMON_FILTER_H_
+#ifndef AOM_AV1_COMMON_FILTER_H_
+#define AOM_AV1_COMMON_FILTER_H_
 
 #include <assert.h>
 
@@ -36,6 +36,13 @@ typedef enum ATTRIBUTE_PACKED {
   SWITCHABLE = SWITCHABLE_FILTERS + 1, /* the last switchable one */
   EXTRA_FILTERS = INTERP_FILTERS_ALL - SWITCHABLE_FILTERS,
 } InterpFilter;
+
+typedef enum {
+  USE_2_TAPS_ORIG = 0,  // This is used in temporal filtering.
+  USE_2_TAPS,
+  USE_4_TAPS,
+  USE_8_TAPS,
+} SUBPEL_SEARCH_TYPE;
 
 // With CONFIG_DUAL_FILTER, pack two InterpFilter's into a uint32_t: since
 // there are at most 10 filters, we can use 16 bits for each and have more than
@@ -139,6 +146,17 @@ static const InterpFilterParams
         BILINEAR }
     };
 
+// A special 2-tap bilinear filter for IntraBC chroma. IntraBC uses full pixel
+// MV for luma. If sub-sampling exists, chroma may possibly use half-pel MV.
+DECLARE_ALIGNED(256, static const int16_t, av1_intrabc_bilinear_filter[2]) = {
+  64,
+  64,
+};
+
+static const InterpFilterParams av1_intrabc_filter_params = {
+  av1_intrabc_bilinear_filter, 2, 0, BILINEAR
+};
+
 DECLARE_ALIGNED(256, static const InterpKernel,
                 av1_sub_pel_filters_4[SUBPEL_SHIFTS]) = {
   { 0, 0, 0, 128, 0, 0, 0, 0 },     { 0, 0, -4, 126, 8, -2, 0, 0 },
@@ -181,14 +199,19 @@ av1_get_interp_filter_params_with_block_size(const InterpFilter interp_filter,
   return &av1_interp_filter_params_list[interp_filter];
 }
 
-static INLINE const InterpFilterParams *av1_get_4tap_interp_filter_params(
+static INLINE const InterpFilterParams *get_4tap_interp_filter_params(
     const InterpFilter interp_filter) {
   return &av1_interp_4tap[interp_filter];
 }
 
 static INLINE const int16_t *av1_get_interp_filter_kernel(
-    const InterpFilter interp_filter) {
-  return av1_interp_filter_params_list[interp_filter].filter_ptr;
+    const InterpFilter interp_filter, int subpel_search) {
+  assert(subpel_search >= USE_2_TAPS);
+  return (subpel_search == USE_2_TAPS)
+             ? av1_interp_4tap[BILINEAR].filter_ptr
+             : ((subpel_search == USE_4_TAPS)
+                    ? av1_interp_4tap[interp_filter].filter_ptr
+                    : av1_interp_filter_params_list[interp_filter].filter_ptr);
 }
 
 static INLINE const int16_t *av1_get_interp_filter_subpel_kernel(
@@ -196,8 +219,18 @@ static INLINE const int16_t *av1_get_interp_filter_subpel_kernel(
   return filter_params->filter_ptr + filter_params->taps * subpel;
 }
 
+static INLINE const InterpFilterParams *av1_get_filter(int subpel_search) {
+  assert(subpel_search >= USE_2_TAPS);
+  return (subpel_search == USE_2_TAPS)
+             ? get_4tap_interp_filter_params(BILINEAR)
+             : ((subpel_search == USE_4_TAPS)
+                    ? get_4tap_interp_filter_params(EIGHTTAP_REGULAR)
+                    : av1_get_interp_filter_params_with_block_size(
+                          EIGHTTAP_REGULAR, 8));
+}
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_FILTER_H_
+#endif  // AOM_AV1_COMMON_FILTER_H_

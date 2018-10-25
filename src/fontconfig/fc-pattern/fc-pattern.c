@@ -36,6 +36,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #ifdef ENABLE_NLS
 #include <libintl.h>
@@ -111,6 +112,7 @@ main (int argc, char **argv)
 #if HAVE_GETOPT_LONG || HAVE_GETOPT
     int		c;
 
+    setlocale (LC_ALL, "");
 #if HAVE_GETOPT_LONG
     while ((c = getopt_long (argc, argv, "cdf:Vh", longopts, NULL)) != -1)
 #else

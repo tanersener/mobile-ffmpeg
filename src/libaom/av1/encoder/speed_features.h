@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_SPEED_FEATURES_H_
-#define AV1_ENCODER_SPEED_FEATURES_H_
+#ifndef AOM_AV1_ENCODER_SPEED_FEATURES_H_
+#define AOM_AV1_ENCODER_SPEED_FEATURES_H_
 
 #include "av1/common/enums.h"
 
@@ -54,25 +54,6 @@ enum {
               (1 << NEWMV) | (1 << NEAREST_NEARESTMV) | (1 << NEAR_NEARMV) |
               (1 << NEW_NEWMV) | (1 << NEAREST_NEWMV) | (1 << NEAR_NEWMV) |
               (1 << NEW_NEARMV) | (1 << NEW_NEARESTMV) | (1 << GLOBAL_GLOBALMV),
-  INTER_NEAREST = (1 << NEARESTMV) | (1 << NEAREST_NEARESTMV) |
-                  (1 << NEW_NEARESTMV) | (1 << NEAREST_NEWMV),
-  INTER_NEAREST_NEW = (1 << NEARESTMV) | (1 << NEWMV) |
-                      (1 << NEAREST_NEARESTMV) | (1 << NEW_NEWMV) |
-                      (1 << NEW_NEARESTMV) | (1 << NEAREST_NEWMV) |
-                      (1 << NEW_NEARMV) | (1 << NEAR_NEWMV),
-  INTER_NEAREST_ZERO = (1 << NEARESTMV) | (1 << GLOBALMV) |
-                       (1 << NEAREST_NEARESTMV) | (1 << GLOBAL_GLOBALMV) |
-                       (1 << NEAREST_NEWMV) | (1 << NEW_NEARESTMV),
-  INTER_NEAREST_NEW_ZERO = (1 << NEARESTMV) | (1 << GLOBALMV) | (1 << NEWMV) |
-                           (1 << NEAREST_NEARESTMV) | (1 << GLOBAL_GLOBALMV) |
-                           (1 << NEW_NEWMV) | (1 << NEW_NEARESTMV) |
-                           (1 << NEAREST_NEWMV) | (1 << NEW_NEARMV) |
-                           (1 << NEAR_NEWMV),
-  INTER_NEAREST_NEAR_NEW = (1 << NEARESTMV) | (1 << NEARMV) | (1 << NEWMV) |
-                           (1 << NEAREST_NEARESTMV) | (1 << NEW_NEWMV) |
-                           (1 << NEW_NEARESTMV) | (1 << NEAREST_NEWMV) |
-                           (1 << NEW_NEARMV) | (1 << NEAR_NEWMV) |
-                           (1 << NEAR_NEARMV),
   INTER_NEAREST_NEAR_ZERO = (1 << NEARESTMV) | (1 << NEARMV) | (1 << GLOBALMV) |
                             (1 << NEAREST_NEARESTMV) | (1 << GLOBAL_GLOBALMV) |
                             (1 << NEAREST_NEWMV) | (1 << NEW_NEARESTMV) |
@@ -133,11 +114,6 @@ typedef enum {
 } SUBPEL_SEARCH_METHODS;
 
 typedef enum {
-  NO_MOTION_THRESHOLD = 0,
-  LOW_MOTION_THRESHOLD = 7
-} MOTION_THRESHOLD;
-
-typedef enum {
   USE_FULL_RD = 0,
   USE_FAST_RD,
   USE_LARGESTALL,
@@ -179,12 +155,6 @@ typedef enum {
 } MODE_SEARCH_SKIP_LOGIC;
 
 typedef enum {
-  FLAG_SKIP_EIGHTTAP_REGULAR = 1 << EIGHTTAP_REGULAR,
-  FLAG_SKIP_EIGHTTAP_SMOOTH = 1 << EIGHTTAP_SMOOTH,
-  FLAG_SKIP_MULTITAP_SHARP = 1 << MULTITAP_SHARP,
-} INTERP_FILTER_MASK;
-
-typedef enum {
   NO_PRUNE = 0,
   // eliminates one tx type in vertical and horizontal direction
   PRUNE_ONE = 1,
@@ -224,16 +194,6 @@ typedef enum {
   REFERENCE_PARTITION
 } PARTITION_SEARCH_TYPE;
 
-typedef enum {
-  // Does a dry run to see if any of the contexts need to be updated or not,
-  // before the final run.
-  TWO_LOOP = 0,
-
-  // No dry run, also only half the coef contexts and bands are updated.
-  // The rest are not updated at all.
-  ONE_LOOP_REDUCED = 1
-} FAST_COEFF_UPDATE;
-
 typedef struct MV_SPEED_FEATURES {
   // Motion search method (Diamond, NSTEP, Hex, Big Diamond, Square, etc).
   SEARCH_METHODS search_method;
@@ -257,9 +217,6 @@ typedef struct MV_SPEED_FEATURES {
 
   // Control when to stop subpel search
   int subpel_force_stop;
-
-  // This variable sets the step_param used in full pel motion search.
-  int fullpel_search_step_param;
 } MV_SPEED_FEATURES;
 
 #define MAX_MESH_STEP 4
@@ -292,6 +249,12 @@ typedef enum {
   FULL_TXFM_RD,
   LOW_TXFM_RD,
 } TXFM_RD_MODEL;
+
+typedef enum {
+  JNT_COMP_ENABLED,
+  JNT_COMP_SKIP_MV_SEARCH,
+  JNT_COMP_DISABLED,
+} JNT_COMP_FLAG;
 
 typedef struct SPEED_FEATURES {
   MV_SPEED_FEATURES mv;
@@ -332,13 +295,6 @@ typedef struct SPEED_FEATURES {
   // mode to be evaluated. A high value means we will be faster.
   int adaptive_rd_thresh;
 
-  // Coefficient probability model approximation step size
-  int coeff_prob_appx_step;
-
-  // The threshold is to determine how slow the motino is, it is used when
-  // use_lastframe_partitioning is set to LAST_FRAME_PARTITION_LOW_MOTION
-  MOTION_THRESHOLD lf_motion_threshold;
-
   // Determine which method we use to determine transform size. We can choose
   // between options like full rd, largest for prediction size, largest
   // for intra and model coefs for the rest.
@@ -354,11 +310,6 @@ typedef struct SPEED_FEATURES {
   // If any dimension of a coding block size above 64, always search the
   // largest transform only, since the largest transform block size is 64x64.
   int tx_size_search_lgr_block;
-
-  // After looking at the first set of modes (set by index here), skip
-  // checking modes for reference frames that don't match the reference frame
-  // of the best so far.
-  int mode_skip_start;
 
   PARTITION_SEARCH_TYPE partition_search_type;
 
@@ -397,6 +348,9 @@ typedef struct SPEED_FEATURES {
   // aggressiveness of pruning in order.
   int prune_ext_partition_types_search_level;
 
+  // Use a ML model to prune horz and vert partitions
+  int ml_prune_rect_partition;
+
   // Use a ML model to prune horz_a, horz_b, vert_a and vert_b partitions.
   int ml_prune_ab_partition;
 
@@ -423,6 +377,9 @@ typedef struct SPEED_FEATURES {
   // Prune reference frames for rectangular partitions.
   int prune_ref_frame_for_rect_partitions;
 
+  // Prune ref/mode choices for partitions.
+  int prune_ref_mode_for_partitions;
+
   // Sets min and max partition sizes for this superblock based on the
   // same superblock in last encoded frame, and the left and above neighbor.
   AUTO_MIN_MAX_MODE auto_min_max_partition_size;
@@ -438,10 +395,6 @@ typedef struct SPEED_FEATURES {
   // Whether or not we allow partitions one smaller or one greater than the last
   // frame's partitioning. Only used if use_lastframe_partitioning is set.
   int adjust_partitioning_from_last_frame;
-
-  // How frequently we re do the partitioning from scratch. Only used if
-  // use_lastframe_partitioning is set.
-  int last_partitioning_redo_frequency;
 
   // Disables sub 8x8 blocksizes in different scenarios: Choices are to disable
   // it always, to allow it for only Last frame and Intra, disable it for all
@@ -465,8 +418,6 @@ typedef struct SPEED_FEATURES {
   // Pattern to be used for any exhaustive mesh searches.
   MESH_PATTERN mesh_patterns[MAX_MESH_STEP];
 
-  int schedule_mode_search;
-
   // Allows sub 8x8 modes to use the prediction filter that was determined
   // best for 8x8 mode. If set to 0 we always re check all the filters for
   // sizes less than 8x8, 1 means we check all filter modes if no 8x8 filter
@@ -476,19 +427,9 @@ typedef struct SPEED_FEATURES {
   // Adaptive prediction mode search
   int adaptive_mode_search;
 
-  // Chessboard pattern prediction filter type search
-  int cb_pred_filter_search;
-
   int cb_partition_search;
 
   int alt_ref_search_fp;
-
-  // Use finer quantizer in every other few frames that run variable block
-  // partition type search.
-  int force_frame_boost;
-
-  // Maximally allowed base quantization index fluctuation.
-  int max_delta_qindex;
 
   // Implements various heuristics to skip searching modes
   // The heuristics selected are based on  flags
@@ -510,21 +451,8 @@ typedef struct SPEED_FEATURES {
   int intra_y_mode_mask[TX_SIZES];
   int intra_uv_mode_mask[TX_SIZES];
 
-  // This variable enables an early break out of mode testing if the model for
-  // rd built from the prediction signal indicates a value that's much
-  // higher than the best rd we've seen so far.
-  int use_rd_breakout;
-
   // This feature controls how the loop filter level is determined.
   LPF_PICK_METHOD lpf_pick;
-
-  // This feature limits the number of coefficients updates we actually do
-  // by only looking at counts from 1/2 the bands.
-  FAST_COEFF_UPDATE use_fast_coef_updates;
-
-  // A binary mask indicating if NEARESTMV, NEARMV, GLOBALMV, NEWMV
-  // modes are used in order from LSB to MSB for each BLOCK_SIZE.
-  int inter_mode_mask[BLOCK_SIZES_ALL];
 
   // This feature controls whether we do the expensive context update and
   // calculation in the rd coefficient costing loop.
@@ -538,24 +466,6 @@ typedef struct SPEED_FEATURES {
   // used in inter frames.
   // TODO(aconverse): Fold this into one of the other many mode skips
   BLOCK_SIZE max_intra_bsize;
-
-  // The frequency that we check if
-  // FIXED_PARTITION search type should be used.
-  int search_type_check_frequency;
-
-  // When partition is pre-set, the inter prediction result from pick_inter_mode
-  // can be reused in final block encoding process. It is enabled only for real-
-  // time mode speed 6.
-  int reuse_inter_pred_sby;
-
-  // default interp filter choice
-  InterpFilter default_interp_filter;
-
-  // adaptive interp_filter search to allow skip of certain filter types.
-  int adaptive_interp_filter_search;
-
-  // mask for skip evaluation of certain interp_filter type.
-  INTERP_FILTER_MASK interp_filter_search_mask;
 
   // Partition search early breakout thresholds.
   int64_t partition_search_breakout_dist_thr;
@@ -572,7 +482,7 @@ typedef struct SPEED_FEATURES {
 
   // If true, sub-pixel search uses the exact convolve function used for final
   // encoding and decoding; otherwise, it uses bilinear interpolation.
-  int use_accurate_subpel_search;
+  SUBPEL_SEARCH_TYPE use_accurate_subpel_search;
 
   // Whether to compute distortion in the image domain (slower but
   // more accurate), or in the transform domain (faster but less acurate).
@@ -584,9 +494,15 @@ typedef struct SPEED_FEATURES {
 
   GM_SEARCH_TYPE gm_search_type;
 
+  // whether to disable the global motion recode loop
+  int gm_disable_recode;
+
   // Do limited interpolation filter search for dual filters, since best choice
   // usually includes EIGHTTAP_REGULAR.
   int use_fast_interpolation_filter_search;
+
+  // Disable dual filter
+  int disable_dual_filter;
 
   // Save results of interpolation_filter_search for a block
   // Check mv and ref_frames before search, if they are same with previous
@@ -621,8 +537,8 @@ typedef struct SPEED_FEATURES {
   // Use model rd instead of transform search in jnt_comp
   int jnt_comp_fast_tx_search;
 
-  // Skip mv search in jnt_comp
-  int jnt_comp_skip_mv_search;
+  // Decide when and how to use joint_comp.
+  JNT_COMP_FLAG use_jnt_comp_flag;
 
   // Decoder side speed feature to add penalty for use of dual-sgr filters.
   // Takes values 0 - 10, 0 indicating no penalty and each additional level
@@ -638,6 +554,25 @@ typedef struct SPEED_FEATURES {
   // Note: The search order might affect the result. It is better to search same
   // single inter mode as a group.
   int prune_comp_search_by_single_result;
+
+  // Skip certain motion modes (OBMC, warped, interintra) for single reference
+  // motion search, using the results of single ref SIMPLE_TRANSLATION
+  int prune_single_motion_modes_by_simple_trans;
+
+  // Reuse the inter_intra_mode search result from NEARESTMV mode to other
+  // single ref modes
+  int reuse_inter_intra_mode;
+
+  // Set the full pixel search level of obmc
+  // 0: obmc_full_pixel_diamond
+  // 1: obmc_refining_search_sad (faster)
+  int obmc_full_pixel_search_level;
+
+  // flag to skip NEWMV mode in drl if the motion search result is the same
+  int skip_repeated_newmv;
+
+  // Prune intra mode candidates based on source block gradient stats.
+  int intra_angle_estimation;
 } SPEED_FEATURES;
 
 struct AV1_COMP;
@@ -649,4 +584,4 @@ void av1_set_speed_features_framesize_dependent(struct AV1_COMP *cpi);
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_SPEED_FEATURES_H_
+#endif  // AOM_AV1_ENCODER_SPEED_FEATURES_H_

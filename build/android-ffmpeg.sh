@@ -75,7 +75,7 @@ esac
 
 CONFIGURE_POSTFIX=""
 
-for library in {1..38}
+for library in {1..43}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -192,6 +192,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static shine)"
                 CONFIGURE_POSTFIX+=" --enable-libshine"
             ;;
+            sdl)
+                CFLAGS+=" $(pkg-config --cflags sdl2)"
+                LDFLAGS+=" $(pkg-config --libs --static sdl2)"
+                CONFIGURE_POSTFIX+=" --enable-sdl2"
+            ;;
             snappy)
                 CFLAGS+=" $(pkg-config --cflags snappy)"
                 LDFLAGS+=" $(pkg-config --libs --static snappy)"
@@ -206,6 +211,18 @@ do
                 CFLAGS+=" $(pkg-config --cflags speex)"
                 LDFLAGS+=" $(pkg-config --libs --static speex)"
                 CONFIGURE_POSTFIX+=" --enable-libspeex"
+            ;;
+            tesseract)
+                CFLAGS+=" $(pkg-config --cflags tesseract)"
+                LDFLAGS+=" $(pkg-config --libs --static tesseract)"
+                CFLAGS+=" $(pkg-config --cflags giflib)"
+                LDFLAGS+=" $(pkg-config --libs --static giflib)"
+                CONFIGURE_POSTFIX+=" --enable-libtesseract"
+            ;;
+            twolame)
+                CFLAGS+=" $(pkg-config --cflags twolame)"
+                LDFLAGS+=" $(pkg-config --libs --static twolame)"
+                CONFIGURE_POSTFIX+=" --enable-libtwolame"
             ;;
             wavpack)
                 CFLAGS+=" $(pkg-config --cflags wavpack)"
@@ -261,13 +278,20 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 37 ]]; then
+        if [[ ${library} -eq 42 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
 done
 
 LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
+
+# OPTIMIZE FOR SPEED INSTEAD OF SIZE
+if [[ -z ${MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED} ]]; then
+    SIZE_OPTIONS="--enable-small";
+else
+    SIZE_OPTIONS="";
+fi
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -292,9 +316,10 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-pic \
     --enable-jni \
     --enable-optimizations \
-    --enable-small  \
     --enable-swscale \
     --enable-shared \
+    --enable-v4l2-m2m \
+    ${SIZE_OPTIONS} \
     --disable-openssl \
     --disable-xmm-clobber-test \
     --disable-debug \
@@ -309,7 +334,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-static \
     --disable-sndio \
     --disable-schannel \
-    --disable-sdl2 \
     --disable-securetransport \
     --disable-xlib \
     --disable-cuda \
@@ -318,6 +342,7 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-vaapi \
     --disable-vdpau \
     --disable-videotoolbox \
+    --disable-audiotoolbox \
     --disable-appkit \
     --disable-alsa \
     --disable-cuda \
@@ -325,7 +350,6 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-nvenc \
     --disable-vaapi \
     --disable-vdpau \
-    --disable-videotoolbox \
     ${CONFIGURE_POSTFIX} 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then

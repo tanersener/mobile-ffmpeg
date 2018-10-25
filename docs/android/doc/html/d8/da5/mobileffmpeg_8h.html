@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MobileFFmpeg Android API
-   &#160;<span id="projectnumber">2.1.1</span>
+   &#160;<span id="projectnumber">3.0</span>
    </div>
   </td>
  </tr>
@@ -70,7 +70,7 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ab40bb25ef4ec0f35c70e84dbad36cfc2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/da5/mobileffmpeg_8h.html#ab40bb25ef4ec0f35c70e84dbad36cfc2">MOBILE_FFMPEG_VERSION</a>&#160;&#160;&#160;&quot;2.1.1&quot;</td></tr>
+<tr class="memitem:ab40bb25ef4ec0f35c70e84dbad36cfc2"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/da5/mobileffmpeg_8h.html#ab40bb25ef4ec0f35c70e84dbad36cfc2">MOBILE_FFMPEG_VERSION</a>&#160;&#160;&#160;&quot;3.0&quot;</td></tr>
 <tr class="separator:ab40bb25ef4ec0f35c70e84dbad36cfc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e43beaa714b1bf01ce2271440786e38"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/da5/mobileffmpeg_8h.html#a6e43beaa714b1bf01ce2271440786e38">LIB_NAME</a>&#160;&#160;&#160;&quot;mobile-ffmpeg&quot;</td></tr>
 <tr class="separator:a6e43beaa714b1bf01ce2271440786e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -103,6 +103,8 @@ Functions</h2></td></tr>
 <tr class="separator:a44b5cc5aca302ad683b6a88974157d1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9be298ab41d2b4192bd2caee9e5c7b4f"><td class="memItemLeft" align="right" valign="top">JNIEXPORT void JNICALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/da5/mobileffmpeg_8h.html#a9be298ab41d2b4192bd2caee9e5c7b4f">Java_com_arthenica_mobileffmpeg_Config_nativeCancel</a> (JNIEnv *, jclass)</td></tr>
 <tr class="separator:a9be298ab41d2b4192bd2caee9e5c7b4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41cf49b53f4763a2bb095a725e3364d0"><td class="memItemLeft" align="right" valign="top">JNIEXPORT jstring JNICALL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="../../d8/da5/mobileffmpeg_8h.html#a41cf49b53f4763a2bb095a725e3364d0">Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf</a> (JNIEnv *, jclass)</td></tr>
+<tr class="separator:a41cf49b53f4763a2bb095a725e3364d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="a6e43beaa714b1bf01ce2271440786e38"></a>
@@ -234,7 +236,7 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define MOBILE_FFMPEG_VERSION&#160;&#160;&#160;&quot;2.1.1&quot;</td>
+          <td class="memname">#define MOBILE_FFMPEG_VERSION&#160;&#160;&#160;&quot;3.0&quot;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -286,7 +288,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00569">569</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00566">566</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -324,7 +326,46 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00542">542</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00539">539</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+
+</div>
+</div>
+<a id="a41cf49b53f4763a2bb095a725e3364d0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a41cf49b53f4763a2bb095a725e3364d0">&#9670;&nbsp;</a></span>Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf </td>
+          <td>(</td>
+          <td class="paramtype">JNIEnv *&#160;</td>
+          <td class="paramname"><em>env</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">jclass&#160;</td>
+          <td class="paramname"><em>object</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Returns build configuration for FFmpeg.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">env</td><td>pointer to native method interface </td></tr>
+    <tr><td class="paramname">object</td><td>reference to the class on which this method is invoked </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>build configuration string </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00678">678</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -363,7 +404,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>FFmpeg version string </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00594">594</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00591">591</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -401,7 +442,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00532">532</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00529">529</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -440,7 +481,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>MobileFFmpeg version string </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00605">605</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00602">602</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -478,7 +519,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00670">670</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00667">667</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -524,7 +565,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>zero on successful execution, non-zero on error </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00617">617</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00614">614</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
@@ -569,14 +610,14 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00522">522</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html#l00519">519</a> of file <a class="el" href="../../dd/d16/mobileffmpeg_8c_source.html">mobileffmpeg.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Sep 16 2018 17:21:12 for MobileFFmpeg Android API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Oct 24 2018 21:43:20 for MobileFFmpeg Android API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>

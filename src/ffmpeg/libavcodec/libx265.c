@@ -114,6 +114,7 @@ static av_cold int libx265_encode_init(AVCodecContext *avctx)
     ctx->params->sourceWidth     = avctx->width;
     ctx->params->sourceHeight    = avctx->height;
     ctx->params->bEnablePsnr     = !!(avctx->flags & AV_CODEC_FLAG_PSNR);
+    ctx->params->bOpenGOP        = !(avctx->flags & AV_CODEC_FLAG_CLOSED_GOP);
 
     /* Tune the CTU size based on input resolution. */
     if (ctx->params->sourceWidth < 64 || ctx->params->sourceHeight < 64)
@@ -204,6 +205,9 @@ static av_cold int libx265_encode_init(AVCodecContext *avctx)
         ctx->params->rc.rateControlMode = X265_RC_ABR;
     }
 
+    ctx->params->rc.vbvBufferSize = avctx->rc_buffer_size / 1000;
+    ctx->params->rc.vbvMaxBitrate = avctx->rc_max_rate    / 1000;
+
     if (!(avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER))
         ctx->params->bRepeatHeaders = 1;
 
@@ -230,6 +234,11 @@ static av_cold int libx265_encode_init(AVCodecContext *avctx)
             }
             av_dict_free(&dict);
         }
+    }
+
+    if (ctx->params->rc.vbvBufferSize && avctx->rc_initial_buffer_occupancy > 1000 &&
+        ctx->params->rc.vbvBufferInit == 0.9) {
+        ctx->params->rc.vbvBufferInit = (float)avctx->rc_initial_buffer_occupancy / 1000;
     }
 
     if (ctx->profile) {

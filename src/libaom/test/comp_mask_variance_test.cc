@@ -34,7 +34,7 @@ typedef void (*comp_mask_pred_func)(uint8_t *comp_pred, const uint8_t *pred,
                                     int ref_stride, const uint8_t *mask,
                                     int mask_stride, int invert_mask);
 
-#if HAVE_SSSE3 || HAVE_AV2
+#if HAVE_SSSE3 || HAVE_SSE2 || HAVE_AV2
 const BLOCK_SIZE kValidBlockSize[] = {
   BLOCK_8X8,   BLOCK_8X16, BLOCK_8X32,  BLOCK_16X8,  BLOCK_16X16,
   BLOCK_16X32, BLOCK_32X8, BLOCK_32X16, BLOCK_32X32,
@@ -191,7 +191,8 @@ void AV1CompMaskUpVarianceTest::RunCheckOutput(comp_mask_pred_func test_impl,
   const int h = block_size_high[bsize];
   int wedge_types = (1 << get_wedge_bits_lookup(bsize));
   int subpel_search;
-  for (subpel_search = 1; subpel_search <= 2; ++subpel_search) {
+  for (subpel_search = USE_4_TAPS; subpel_search <= USE_8_TAPS;
+       ++subpel_search) {
     // loop through subx and suby
     for (int sub = 0; sub < 8 * 8; ++sub) {
       int subx = sub & 0x7;
@@ -200,10 +201,10 @@ void AV1CompMaskUpVarianceTest::RunCheckOutput(comp_mask_pred_func test_impl,
         const uint8_t *mask =
             av1_get_contiguous_soft_mask(wedge_index, 1, bsize);
 
-        aom_comp_mask_pred = aom_comp_mask_pred_c;  // ref
-        aom_comp_mask_upsampled_pred(NULL, NULL, 0, 0, NULL, comp_pred1_, pred_,
-                                     w, h, subx, suby, ref_, MAX_SB_SIZE, mask,
-                                     w, inv, subpel_search);
+        // ref
+        aom_comp_mask_upsampled_pred_c(
+            NULL, NULL, 0, 0, NULL, comp_pred1_, pred_, w, h, subx, suby, ref_,
+            MAX_SB_SIZE, mask, w, inv, subpel_search);
 
         aom_comp_mask_pred = test_impl;  // test
         aom_comp_mask_upsampled_pred(NULL, NULL, 0, 0, NULL, comp_pred2_, pred_,
@@ -231,7 +232,7 @@ void AV1CompMaskUpVarianceTest::RunSpeedTest(comp_mask_pred_func test_impl,
   const int num_loops = 1000000000 / (w + h);
   comp_mask_pred_func funcs[2] = { &aom_comp_mask_pred_c, test_impl };
   double elapsed_time[2] = { 0 };
-  int subpel_search = 2;  // set to 1 to test 4-tap filter.
+  int subpel_search = USE_8_TAPS;  // set to USE_4_TAPS to test 4-tap filter.
   for (int i = 0; i < 2; ++i) {
     aom_usec_timer timer;
     aom_usec_timer_start(&timer);
@@ -458,6 +459,7 @@ AV1HighbdCompMaskUpVarianceTest::~AV1HighbdCompMaskUpVarianceTest() { ; }
 
 void AV1HighbdCompMaskUpVarianceTest::RunCheckOutput(
     highbd_comp_mask_pred_func test_impl, BLOCK_SIZE bsize, int inv) {
+  (void)test_impl;
   int bd_ = GET_PARAM(2);
   const int w = block_size_wide[bsize];
   const int h = block_size_high[bsize];
@@ -480,19 +482,24 @@ void AV1HighbdCompMaskUpVarianceTest::RunCheckOutput(
         const uint8_t *mask =
             av1_get_contiguous_soft_mask(wedge_index, 1, bsize);
 
-        aom_highbd_comp_mask_pred = aom_highbd_comp_mask_pred_c;  // ref
-        aom_highbd_comp_mask_upsampled_pred(
-            NULL, NULL, 0, 0, NULL, CONVERT_TO_BYTEPTR(comp_pred1_),
-            CONVERT_TO_BYTEPTR(pred_), w, h, subx, suby,
-            CONVERT_TO_BYTEPTR(ref_), MAX_SB_SIZE, mask, w, inv, bd_,
-            subpel_search);
+        // ref
+        aom_highbd_upsampled_pred_c(
+            NULL, NULL, 0, 0, NULL, CONVERT_TO_BYTEPTR(comp_pred1_), w, h, subx,
+            suby, CONVERT_TO_BYTEPTR(ref_), MAX_SB_SIZE, bd_, subpel_search);
 
-        aom_highbd_comp_mask_pred = test_impl;  // test
-        aom_highbd_comp_mask_upsampled_pred(
-            NULL, NULL, 0, 0, NULL, CONVERT_TO_BYTEPTR(comp_pred2_),
-            CONVERT_TO_BYTEPTR(pred_), w, h, subx, suby,
-            CONVERT_TO_BYTEPTR(ref_), MAX_SB_SIZE, mask, w, inv, bd_,
-            subpel_search);
+        aom_highbd_comp_mask_pred_c(
+            CONVERT_TO_BYTEPTR(comp_pred1_), CONVERT_TO_BYTEPTR(pred_), w, h,
+            CONVERT_TO_BYTEPTR(comp_pred1_), w, mask, w, inv);
+
+        // test
+        aom_highbd_upsampled_pred(
+            NULL, NULL, 0, 0, NULL, CONVERT_TO_BYTEPTR(comp_pred2_), w, h, subx,
+            suby, CONVERT_TO_BYTEPTR(ref_), MAX_SB_SIZE, bd_, subpel_search);
+
+        aom_highbd_comp_mask_pred(
+            CONVERT_TO_BYTEPTR(comp_pred2_), CONVERT_TO_BYTEPTR(pred_), w, h,
+            CONVERT_TO_BYTEPTR(comp_pred2_), w, mask, w, inv);
+
         ASSERT_EQ(CheckResult(w, h), true)
             << " wedge " << wedge_index << " inv " << inv << "sub (" << subx
             << "," << suby << ")";

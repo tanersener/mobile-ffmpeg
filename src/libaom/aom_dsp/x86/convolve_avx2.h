@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_DSP_X86_CONVOLVE_AVX2_H_
-#define AOM_DSP_X86_CONVOLVE_AVX2_H_
+#ifndef AOM_AOM_DSP_X86_CONVOLVE_AVX2_H_
+#define AOM_AOM_DSP_X86_CONVOLVE_AVX2_H_
 
 // filters for 16
 DECLARE_ALIGNED(32, static const uint8_t, filt_global_avx2[]) = {
@@ -21,6 +21,27 @@ DECLARE_ALIGNED(32, static const uint8_t, filt_global_avx2[]) = {
   10, 11, 11, 12, 4, 5,  5,  6,  6,  7,  7,  8,  8,  9,  9,  10, 10, 11, 11,
   12, 6,  7,  7,  8, 8,  9,  9,  10, 10, 11, 11, 12, 12, 13, 13, 14, 6,  7,
   7,  8,  8,  9,  9, 10, 10, 11, 11, 12, 12, 13, 13, 14
+};
+
+DECLARE_ALIGNED(32, static const uint8_t, filt_d4_global_avx2[]) = {
+  0, 1, 2, 3,  1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6, 0, 1, 2, 3,  1, 2,
+  3, 4, 2, 3,  4, 5, 3, 4, 5, 6, 4, 5, 6, 7, 5, 6, 7, 8, 6, 7,  8, 9,
+  7, 8, 9, 10, 4, 5, 6, 7, 5, 6, 7, 8, 6, 7, 8, 9, 7, 8, 9, 10,
+};
+
+DECLARE_ALIGNED(32, static const uint8_t, filt4_d4_global_avx2[]) = {
+  2, 3, 4, 5, 3, 4, 5, 6, 4, 5, 6, 7, 5, 6, 7, 8,
+  2, 3, 4, 5, 3, 4, 5, 6, 4, 5, 6, 7, 5, 6, 7, 8,
+};
+
+DECLARE_ALIGNED(32, static const uint8_t, filt_center_global_avx2[32]) = {
+  3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 8, 255, 9, 255, 10, 255,
+  3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 8, 255, 9, 255, 10, 255
+};
+
+DECLARE_ALIGNED(32, static const uint8_t, filt1_global_avx2[32]) = {
+  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8,
+  0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8
 };
 
 DECLARE_ALIGNED(32, static const uint8_t, filt_d4_global_avx2[]) = {
@@ -100,6 +121,15 @@ static INLINE __m256i convolve(const __m256i *const s,
   const __m256i res = _mm256_add_epi32(_mm256_add_epi32(res_0, res_1),
                                        _mm256_add_epi32(res_2, res_3));
 
+  return res;
+}
+
+static INLINE __m256i convolve_4tap(const __m256i *const s,
+                                    const __m256i *const coeffs) {
+  const __m256i res_1 = _mm256_madd_epi16(s[0], coeffs[0]);
+  const __m256i res_2 = _mm256_madd_epi16(s[1], coeffs[1]);
+
+  const __m256i res = _mm256_add_epi32(res_1, res_2);
   return res;
 }
 
@@ -191,4 +221,4 @@ static INLINE __m256i highbd_convolve_rounding(
   return res_round;
 }
 
-#endif
+#endif  // AOM_AOM_DSP_X86_CONVOLVE_AVX2_H_

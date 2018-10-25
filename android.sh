@@ -36,22 +36,27 @@ LIBRARY_SNAPPY=24
 LIBRARY_SOXR=25
 LIBRARY_LIBAOM=26
 LIBRARY_CHROMAPRINT=27
-LIBRARY_GIFLIB=28
-LIBRARY_JPEG=29
-LIBRARY_LIBOGG=30
-LIBRARY_LIBPNG=31
-LIBRARY_LIBUUID=32
-LIBRARY_NETTLE=33
-LIBRARY_TIFF=34
-LIBRARY_EXPAT=35
-LIBRARY_ZLIB=36
-LIBRARY_MEDIA_CODEC=37
+LIBRARY_TWOLAME=28
+LIBRARY_SDL=29
+LIBRARY_TESSERACT=30
+LIBRARY_GIFLIB=31
+LIBRARY_JPEG=32
+LIBRARY_LIBOGG=33
+LIBRARY_LIBPNG=34
+LIBRARY_LIBUUID=35
+LIBRARY_NETTLE=36
+LIBRARY_TIFF=37
+LIBRARY_EXPAT=38
+LIBRARY_SNDFILE=39
+LIBRARY_LEPTONICA=40
+LIBRARY_ZLIB=41
+LIBRARY_MEDIA_CODEC=42
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -82,7 +87,8 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
 
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
     echo -e "  -V, --version\t\t\tdisplay version information and exit"
-    echo -e "  -d, --debug\t\t\tbuild with debug information\n"
+    echo -e "  -d, --debug\t\t\tbuild with debug information"
+    echo -e "  -S, --speed\t\t\toptimize for speed instead of size\n"
 
     echo -e "Licensing options:"
 
@@ -99,8 +105,8 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "Libraries:"
 
     echo -e "  --full\t\t\tenables all external libraries"
-    echo -e "  --enable-android-media-codec\tbuild with built-in Android MediaCodec [no]"
-    echo -e "  --enable-android-zlib\t\tbuild with built-in zlib [no]"
+    echo -e "  --enable-android-media-codec\tbuild with built-in Android MediaCodec support[no]"
+    echo -e "  --enable-android-zlib\t\tbuild with built-in zlib support[no]"
     echo -e "  --enable-chromaprint\t\tbuild with chromaprint [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
     echo -e "  --enable-freetype\t\tbuild with freetype [no]"
@@ -120,10 +126,13 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
     echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
     echo -e "  --enable-opus\t\t\tbuild with opus [no]"
+    echo -e "  --enable-sdl\t\t\tbuild with sdl [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
     echo -e "  --enable-snappy\t\tbuild with snappy [no]"
     echo -e "  --enable-soxr\t\t\tbuild with soxr [no]"
     echo -e "  --enable-speex\t\tbuild with speex [no]"
+    echo -e "  --enable-tesseract\t\tbuild with tesseract [no]"
+    echo -e "  --enable-twolame\t\tbuild with twolame [no]"
     echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
     echo -e "GPL libraries:"
@@ -160,6 +169,10 @@ skip_library() {
 
 enable_debug() {
     export MOBILE_FFMPEG_DEBUG="-d"
+}
+
+optimize_for_speed() {
+    export MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED="1"
 }
 
 reconf_library() {
@@ -275,6 +288,9 @@ set_library() {
         opus)
             ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
         ;;
+        sdl)
+            ENABLED_LIBRARIES[LIBRARY_SDL]=$2
+        ;;
         shine)
             ENABLED_LIBRARIES[LIBRARY_SHINE]=$2
         ;;
@@ -288,6 +304,20 @@ set_library() {
         speex)
             ENABLED_LIBRARIES[LIBRARY_SPEEX]=$2
         ;;
+        tesseract)
+            ENABLED_LIBRARIES[LIBRARY_TESSERACT]=$2
+            ENABLED_LIBRARIES[LIBRARY_LEPTONICA]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBWEBP]=$2
+            ENABLED_LIBRARIES[LIBRARY_GIFLIB]=$2
+            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+            set_library "tiff" $2
+            set_library "libpng" $2
+        ;;
+        twolame)
+            ENABLED_LIBRARIES[LIBRARY_TWOLAME]=$2
+            ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
+        ;;
         wavpack)
             ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
         ;;
@@ -300,16 +330,16 @@ set_library() {
         xvidcore)
             ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
         ;;
-        tiff)
-            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
-            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+        expat | giflib | jpeg | leptonica | libogg | libpng | libsndfile | libuuid)
+            # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         nettle)
             ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
             set_library "gmp" $2
         ;;
-        giflib | jpeg | libogg | libpng | libuuid | expat)
-            # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
+        tiff)
+            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
         ;;
         *)
             print_unknown_library $1
@@ -387,7 +417,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {36..37}
+    for library in {41..42}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -399,7 +429,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..27}
+    for library in {0..30}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -459,6 +489,9 @@ do
         -d | --debug)
             enable_debug
 	    ;;
+        -S | --speed)
+	        optimize_for_speed
+	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
@@ -470,7 +503,7 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..37}
+            for library in {0..42}
             do
                 if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
@@ -563,7 +596,7 @@ do
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
         # CLEAR FLAGS
-        for library in {1..38}
+        for library in {1..43}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

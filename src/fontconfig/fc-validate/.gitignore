@@ -1,5 +1,5 @@
 /.deps/
-/Makefile
-*.o
-/fc-validate
 /.libs/
+/Makefile
+/fc-validate
+/fc-validate.o

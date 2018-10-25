@@ -36,34 +36,41 @@ LIBRARY_SNAPPY=24
 LIBRARY_SOXR=25
 LIBRARY_LIBAOM=26
 LIBRARY_CHROMAPRINT=27
-LIBRARY_GIFLIB=28
-LIBRARY_JPEG=29
-LIBRARY_LIBOGG=30
-LIBRARY_LIBPNG=31
-LIBRARY_LIBUUID=32
-LIBRARY_NETTLE=33
-LIBRARY_TIFF=34
-LIBRARY_EXPAT=35
-LIBRARY_ZLIB=36
-LIBRARY_AUDIOTOOLBOX=37
-LIBRARY_COREIMAGE=38
-LIBRARY_BZIP2=39
+LIBRARY_TWOLAME=28
+LIBRARY_SDL=29
+LIBRARY_TESSERACT=30
+LIBRARY_GIFLIB=31
+LIBRARY_JPEG=32
+LIBRARY_LIBOGG=33
+LIBRARY_LIBPNG=34
+LIBRARY_LIBUUID=35
+LIBRARY_NETTLE=36
+LIBRARY_TIFF=37
+LIBRARY_EXPAT=38
+LIBRARY_SNDFILE=39
+LIBRARY_LEPTONICA=40
+LIBRARY_ZLIB=41
+LIBRARY_AUDIOTOOLBOX=42
+LIBRARY_COREIMAGE=43
+LIBRARY_BZIP2=44
+LIBRARY_VIDEOTOOLBOX=45
+LIBRARY_AVFOUNDATION=46
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 # MIN VERSION IOS7
-export IOS_MIN_VERSION=7.0
+export IOS_MIN_VERSION=8.0
 
 # UPDATE THIS TO 8.0 WHEN GNUTLS IS UPGRADED TO 3.6.x line
-export GNUTLS_IOS_MIN_VERSION=7.0
+export GNUTLS_IOS_MIN_VERSION=8.0
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
@@ -88,7 +95,8 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
     echo -e "  -V, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
-    echo -e "  -s, --static\t\t\tbuild static mobile-ffmpeg libraries (by default shared libraries are built)\n"
+    echo -e "  -s, --static\t\t\tbuild static mobile-ffmpeg libraries (by default shared libraries are built)"
+    echo -e "  -S, --speed\t\t\toptimize for speed instead of size\n"
 
     echo -e "Licensing options:"
 
@@ -105,9 +113,11 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "Libraries:"
 
     echo -e "  --full\t\t\tenables all non-GPL external libraries"
-    echo -e "  --enable-ios-audiotoolbox\tbuild with built-in Apple AudioToolbox [no]"
-    echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage [no]"
-    echo -e "  --enable-ios-bzip2\t\tbuild with built-in bzip2 [no]"
+    echo -e "  --enable-ios-audiotoolbox\tbuild with built-in Apple AudioToolbox support[no]"
+    echo -e "  --enable-ios-avfoundation\tbuild with built-in Apple AVFoundation support[no]"
+    echo -e "  --enable-ios-coreimage\tbuild with built-in Apple CoreImage support[no]"
+    echo -e "  --enable-ios-bzip2\t\tbuild with built-in bzip2 support[no]"
+    echo -e "  --enable-ios-videotoolbox\tbuild with built-in Apple VideoToolbox support[no]"
     echo -e "  --enable-ios-zlib\t\tbuild with built-in zlib [no]"
     echo -e "  --enable-chromaprint\t\tbuild with chromaprint [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
@@ -128,10 +138,13 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
     echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
     echo -e "  --enable-opus\t\t\tbuild with opus [no]"
+    echo -e "  --enable-sdl\t\t\tbuild with sdl [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
     echo -e "  --enable-snappy\t\tbuild with snappy [no]"
     echo -e "  --enable-soxr\t\t\tbuild with soxr [no]"
     echo -e "  --enable-speex\t\tbuild with speex [no]"
+    echo -e "  --enable-tesseract\t\tbuild with tesseract [no]"
+    echo -e "  --enable-twolame\t\tbuild with twolame [no]"
     echo -e "  --enable-wavpack\t\tbuild with wavpack [no]\n"
 
     echo -e "GPL libraries:"
@@ -174,6 +187,10 @@ enable_static() {
     export MOBILE_FFMPEG_STATIC="1"
 }
 
+optimize_for_speed() {
+    export MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED="1"
+}
+
 reconf_library() {
     RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
 
@@ -198,11 +215,17 @@ set_library() {
         ios-audiotoolbox)
             ENABLED_LIBRARIES[LIBRARY_AUDIOTOOLBOX]=$2
         ;;
+        ios-avfoundation)
+            ENABLED_LIBRARIES[LIBRARY_AVFOUNDATION]=$2
+        ;;
         ios-coreimage)
             ENABLED_LIBRARIES[LIBRARY_COREIMAGE]=$2
         ;;
         ios-bzip2)
             ENABLED_LIBRARIES[LIBRARY_BZIP2]=$2
+        ;;
+        ios-videotoolbox)
+            ENABLED_LIBRARIES[LIBRARY_VIDEOTOOLBOX]=$2
         ;;
         chromaprint)
             ENABLED_LIBRARIES[LIBRARY_CHROMAPRINT]=$2
@@ -293,6 +316,9 @@ set_library() {
         opus)
             ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
         ;;
+        sdl)
+            ENABLED_LIBRARIES[LIBRARY_SDL]=$2
+        ;;
         shine)
             ENABLED_LIBRARIES[LIBRARY_SHINE]=$2
         ;;
@@ -306,6 +332,20 @@ set_library() {
         speex)
             ENABLED_LIBRARIES[LIBRARY_SPEEX]=$2
         ;;
+        tesseract)
+            ENABLED_LIBRARIES[LIBRARY_TESSERACT]=$2
+            ENABLED_LIBRARIES[LIBRARY_LEPTONICA]=$2
+            ENABLED_LIBRARIES[LIBRARY_LIBWEBP]=$2
+            ENABLED_LIBRARIES[LIBRARY_GIFLIB]=$2
+            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+            ENABLED_LIBRARIES[LIBRARY_ZLIB]=$2
+            set_library "tiff" $2
+            set_library "libpng" $2
+        ;;
+        twolame)
+            ENABLED_LIBRARIES[LIBRARY_TWOLAME]=$2
+            ENABLED_LIBRARIES[LIBRARY_SNDFILE]=$2
+        ;;
         wavpack)
             ENABLED_LIBRARIES[LIBRARY_WAVPACK]=$2
         ;;
@@ -318,16 +358,16 @@ set_library() {
         xvidcore)
             ENABLED_LIBRARIES[LIBRARY_XVIDCORE]=$2
         ;;
-        tiff)
-            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
-            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
+        expat | giflib | jpeg | leptonica | libogg | libpng | libsndfile | libuuid)
+            # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
         ;;
         nettle)
             ENABLED_LIBRARIES[LIBRARY_NETTLE]=$2
             set_library "gmp" $2
         ;;
-        giflib | jpeg | libogg | libpng | libuuid | expat)
-            # THESE LIBRARIES ARE NOT ENABLED DIRECTLY
+        tiff)
+            ENABLED_LIBRARIES[LIBRARY_TIFF]=$2
+            ENABLED_LIBRARIES[LIBRARY_JPEG]=$2
         ;;
         *)
             print_unknown_library $1
@@ -405,7 +445,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {36..39}
+    for library in {41..46}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -417,7 +457,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..27}
+    for library in {0..30}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -466,8 +506,14 @@ build_info_plist() {
 	<string>${FRAMEWORK_SHORT_VERSION}</string>
 	<key>CFBundleVersion</key>
 	<string>${FRAMEWORK_VERSION}</string>
+    <key>CFBundleSignature</key>
+    <string>????</string>
 	<key>MinimumOSVersion</key>
 	<string>8.0</string>
+    <key>CFBundleSupportedPlatforms</key>
+	<array>
+        <string>iPhoneOS</string>
+	</array>
 	<key>NSPrincipalClass</key>
 	<string></string>
 </dict>
@@ -480,7 +526,7 @@ create_static_fat_library() {
 
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
     do
-        LIPO_COMMAND+=" $(find ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin -name $1)"
+        LIPO_COMMAND+=" $(find ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin -name $1)"
     done
 
     LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/$1"
@@ -494,6 +540,14 @@ create_static_fat_library() {
 . ${BASEDIR}/build/ios-common.sh
 
 GPL_ENABLED="no"
+
+# SELECT XCODE VERSION USED FOR BUILDING
+XCODE_FOR_MOBILE_FFMPEG=~/.xcode.for.mobile.ffmpeg.sh
+if [[ -f ${XCODE_FOR_MOBILE_FFMPEG} ]]; then
+    source ${XCODE_FOR_MOBILE_FFMPEG} 1>>${BASEDIR}/build.log 2>&1
+fi
+
+echo -e "Using Xcode provided at $(xcode-select -p)\n" 1>>${BASEDIR}/build.log 2>&1
 
 while [ ! $# -eq 0 ]
 do
@@ -518,6 +572,9 @@ do
         -s | --static)
             enable_static
 	    ;;
+	    -S | --speed)
+	        optimize_for_speed
+	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
@@ -529,7 +586,7 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..39}
+            for library in {0..46}
             do
                 if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
@@ -612,7 +669,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..40}
+        for library in {1..47}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
@@ -649,7 +706,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
         for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
         do
-            LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
+            LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
         done
 
         LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
@@ -669,7 +726,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
     do
-        LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
+        LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
     done
 
     LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
@@ -699,20 +756,20 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
             for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
             do
                 ## TRY NOT TO USE HARDCODED VERSION NUMBERS
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.dylib @rpath/libmobileffmpeg.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.dylib @rpath/libmobileffmpeg.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
 
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavcodec.58.dylib @rpath/libavcodec.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavdevice.58.dylib @rpath/libavdevice.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavfilter.7.dylib @rpath/libavfilter.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavformat.58.dylib @rpath/libavformat.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswresample.3.dylib @rpath/libswresample.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libswscale.5.dylib @rpath/libswscale.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/ffmpeg/lib/libavutil.56.dylib @rpath/libavutil.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/libavcodec.58.dylib @rpath/libavcodec.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/libavdevice.58.dylib @rpath/libavdevice.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/libavfilter.7.dylib @rpath/libavfilter.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/libavformat.58.dylib @rpath/libavformat.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/libswresample.3.dylib @rpath/libswresample.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/libswscale.5.dylib @rpath/libswscale.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/libavutil.56.dylib @rpath/libavutil.dylib ${MOBILE_FFMPEG_UNIVERSAL}/lib/${ONE_LIB}.dylib 1>>${BASEDIR}/build.log 2>&1
             done
         done
     else
 
-        for library in {0..35}
+        for library in {0..40}
         do
             if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 
@@ -837,8 +894,8 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     fi
 
     # COPYING HEADERS
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-apple-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
 
     # COPYING THE LICENSE
     if  [ ${GPL_ENABLED} == "yes" ]; then
@@ -941,7 +998,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
             for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
             do
                 ## TRY NOT TO USE HARDCODED VERSION NUMBERS
-                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-apple-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.dylib @rpath/mobileffmpeg.framework/mobileffmpeg ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
+                install_name_tool -change ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/mobile-ffmpeg/lib/libmobileffmpeg.0.dylib @rpath/mobileffmpeg.framework/mobileffmpeg ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
 
                 install_name_tool -change @rpath/libavcodec.dylib @rpath/libavcodec.framework/libavcodec ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1
                 install_name_tool -change @rpath/libavdevice.dylib @rpath/libavdevice.framework/libavdevice ${BASEDIR}/prebuilt/ios-framework/${ONE_LIB}.framework/${ONE_LIB} 1>>${BASEDIR}/build.log 2>&1

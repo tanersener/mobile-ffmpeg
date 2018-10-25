@@ -22,6 +22,7 @@
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <string.h>
 #include "fcint.h"
 #include <fcntl.h>
 #include <stdarg.h>
@@ -645,7 +646,6 @@ FcTypecheckValue (FcConfigParse *parse, FcType value, FcType type)
     {
 	if ((value == FcTypeLangSet && type == FcTypeString) ||
 	    (value == FcTypeString && type == FcTypeLangSet) ||
-	    (value == FcTypeInteger && type == FcTypeRange) ||
 	    (value == FcTypeDouble && type == FcTypeRange))
 	    return;
 	if (type ==  FcTypeUnknown)
@@ -1834,6 +1834,8 @@ FcParseAlias (FcConfigParse *parse)
 	!def)
     {
 	FcExprDestroy (family);
+	if (rule)
+	    FcRuleDestroy (rule);
 	return;
     }
     else
@@ -2186,6 +2188,7 @@ FcParseCacheDir (FcConfigParse *parse)
     if (!data)
     {
 	FcConfigMessage (parse, FcSevereError, "out of memory");
+	data = prefix;
 	goto bail;
     }
     if (prefix)
@@ -2197,7 +2200,7 @@ FcParseCacheDir (FcConfigParse *parse)
 	if (!p)
 	{
 	    FcConfigMessage (parse, FcSevereError, "out of memory");
-	    data = prefix;
+	    FcStrFree (prefix);
 	    goto bail;
 	}
 	prefix = p;
@@ -2229,6 +2232,7 @@ FcParseCacheDir (FcConfigParse *parse)
     else if (strcmp ((const char *) data, "WINDOWSTEMPDIR_FONTCONFIG_CACHE") == 0)
     {
 	int rc;
+
 	FcStrFree (data);
 	data = malloc (1000);
 	if (!data)
@@ -2773,6 +2777,14 @@ FcParseAcceptRejectFont (FcConfigParse *parse, FcElement element)
 	    {
 		FcConfigMessage (parse, FcSevereError, "out of memory");
 	    }
+	    else
+	    {
+		if (parse->scanOnly && vstack->u.string)
+		{
+		    FcStrFree (vstack->u.string);
+		    vstack->tag = FcVStackNone;
+		}
+	    }
 	    break;
 	case FcVStackPattern:
 	    if (!parse->scanOnly && !FcConfigPatternsAdd (parse->config,
@@ -2782,7 +2794,11 @@ FcParseAcceptRejectFont (FcConfigParse *parse, FcElement element)
 		FcConfigMessage (parse, FcSevereError, "out of memory");
 	    }
 	    else
+	    {
+		if (parse->scanOnly && vstack->u.pattern)
+		    FcPatternDestroy (vstack->u.pattern);
 		vstack->tag = FcVStackNone;
+	    }
 	    break;
 	default:
 	    FcConfigMessage (parse, FcSevereWarning, "bad font selector");
@@ -3443,7 +3459,7 @@ _FcConfigParse (FcConfig	*config,
 
     FcStrBufInit (&sbuf, NULL, 0);
 
-    fd = FcOpen ((char *) filename, O_RDONLY);
+    fd = FcOpen ((char *) realfilename, O_RDONLY);
     if (fd == -1)
 	goto bail1;
 
@@ -3451,7 +3467,20 @@ _FcConfigParse (FcConfig	*config,
 	len = read (fd, buf, BUFSIZ);
 	if (len < 0)
 	{
-	    FcConfigMessage (0, FcSevereError, "failed reading config file");
+	    int errno_ = errno;
+	    char ebuf[BUFSIZ+1];
+
+#if HAVE_STRERROR_R
+	    strerror_r (errno_, ebuf, BUFSIZ);
+#elif HAVE_STRERROR
+	    char *tmp = strerror (errno_);
+	    size_t len = strlen (tmp);
+	    strncpy (ebuf, tmp, FC_MIN (BUFSIZ, len));
+	    ebuf[FC_MIN (BUFSIZ, len)] = 0;
+#else
+	    ebuf[0] = 0;
+#endif
+	    FcConfigMessage (0, FcSevereError, "failed reading config file: %s: %s (errno %d)", realfilename, ebuf, errno_);
 	    close (fd);
 	    goto bail1;
 	}

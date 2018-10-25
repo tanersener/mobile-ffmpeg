@@ -20,10 +20,16 @@
 //
 
 #import <UIKit/UIKit.h>
+
 #import "AppDelegate.h"
+#import "MediaInformationParserTests.h"
 
 int main(int argc, char * argv[]) {
     @autoreleasepool {
+        
+        // RUN UNIT TESTS BEFORE STARTING THE APPLICATION
+        runMediaInformationParserTests();
+
         return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
     }
 }

@@ -8,8 +8,8 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef AV1_AV1_IFACE_COMMON_H_
-#define AV1_AV1_IFACE_COMMON_H_
+#ifndef AOM_AV1_AV1_IFACE_COMMON_H_
+#define AOM_AV1_AV1_IFACE_COMMON_H_
 
 #include "aom_ports/mem.h"
 #include "aom_scale/yv12config.h"
@@ -133,4 +133,4 @@ static aom_codec_err_t image2yuvconfig(const aom_image_t *img,
   return AOM_CODEC_OK;
 }
 
-#endif  // AV1_AV1_IFACE_COMMON_H_
+#endif  // AOM_AV1_AV1_IFACE_COMMON_H_

@@ -156,7 +156,7 @@
                 
                 NSLog(@"Create completed successfully; stabilizing video.\n");
                 
-                NSString *analyzeVideoCommand = [NSString stringWithFormat:@"-y -i %@ -vf vidstabdetect=shakiness=10:accuracy=15:result=%@ -f null -", videoFile, shakeResultsFile];
+                NSString *analyzeVideoCommand = [NSString stringWithFormat:@"-hide_banner -y -i %@ -vf vidstabdetect=shakiness=10:accuracy=15:result=%@ -f null -", videoFile, shakeResultsFile];
                 
                 [self loadProgressDialog:@"Stabilizing video\n\n"];
                 
@@ -174,7 +174,7 @@
 
                             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                                 
-                                NSString *stabilizeVideoCommand = [NSString stringWithFormat:@"-y -i %@ -vf vidstabtransform=smoothing=30:input=%@ %@", videoFile, shakeResultsFile, stabilizedVideoFile];
+                                NSString *stabilizeVideoCommand = [NSString stringWithFormat:@"-hide_banner -y -i %@ -vf vidstabtransform=smoothing=30:input=%@ %@", videoFile, shakeResultsFile, stabilizedVideoFile];
                                 
                                 NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", stabilizeVideoCommand);
                                 
@@ -303,7 +303,7 @@
 
 + (NSString*)generateVideoCreateScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile {
     return [NSString stringWithFormat:
-@"-y -loop 1 -i %@ \
+@"-hide_banner -y -loop 1 -i %@ \
 -loop 1 -i %@ \
 -loop 1 -i %@ \
 -f lavfi -i color=black:s=640x427 \

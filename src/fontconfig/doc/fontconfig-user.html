@@ -1245,9 +1245,9 @@ CLASS="PROGRAMLISTING"
 	Names not including any well known alias are given 'sans-serif'
 --&#62;
 &#60;match target="pattern"&#62;
-	&#60;test qual="all" name="family" mode="not_eq"&#62;&#60;string&#62;sans-serif&#60;/string&#62;&#60;/test&#62;
-	&#60;test qual="all" name="family" mode="not_eq"&#62;&#60;string&#62;serif&#60;/string&#62;&#60;/test&#62;
-	&#60;test qual="all" name="family" mode="not_eq"&#62;&#60;string&#62;monospace&#60;/string&#62;&#60;/test&#62;
+	&#60;test qual="all" name="family" compare="not_eq"&#62;&#60;string&#62;sans-serif&#60;/string&#62;&#60;/test&#62;
+	&#60;test qual="all" name="family" compare="not_eq"&#62;&#60;string&#62;serif&#60;/string&#62;&#60;/test&#62;
+	&#60;test qual="all" name="family" compare="not_eq"&#62;&#60;string&#62;monospace&#60;/string&#62;&#60;/test&#62;
 	&#60;edit name="family" mode="append_last"&#62;&#60;string&#62;sans-serif&#60;/string&#62;&#60;/edit&#62;
 &#60;/match&#62;
 
@@ -1309,7 +1309,7 @@ CLASS="PROGRAMLISTING"
 	add 'monospace' as the alternative
 --&#62;
 &#60;match target="pattern"&#62;
-	&#60;test name="family" mode="eq"&#62;
+	&#60;test name="family" compare="eq"&#62;
 		&#60;string&#62;Courier New&#60;/string&#62;
 	&#60;/test&#62;
 	&#60;edit name="family" mode="prepend"&#62;
@@ -1317,7 +1317,7 @@ CLASS="PROGRAMLISTING"
 	&#60;/edit&#62;
 &#60;/match&#62;
 &#60;match target="pattern"&#62;
-	&#60;test name="family" mode="eq"&#62;
+	&#60;test name="family" compare="eq"&#62;
 		&#60;string&#62;Courier&#60;/string&#62;
 	&#60;/test&#62;
 	&#60;edit name="family" mode="prepend"&#62;
@@ -1505,6 +1505,13 @@ is used to override the default configuration directory.
 ><P
 ><I
 CLASS="EMPHASIS"
+>FONTCONFIG_SYSROOT</I
+>
+is used to set a default sysroot directory.
+  </P
+><P
+><I
+CLASS="EMPHASIS"
 >FC_DEBUG</I
 >
 is used to output the detailed debugging messages. see <A
@@ -1536,27 +1543,44 @@ CLASS="EMPHASIS"
 >
 is used to control the use of mmap(2) for the cache files if available. this take a boolean value. fontconfig will checks if the cache files are stored on the filesystem that is safe to use mmap(2). explicitly setting this environment variable will causes skipping this check and enforce to use or not use mmap(2) anyway.
   </P
-></DIV
-><DIV
-CLASS="REFSECT1"
-><A
-NAME="AEN278"
-></A
-><H2
->See Also</H2
 ><P
->fc-cat(1), fc-cache(1), fc-list(1), fc-match(1), fc-query(1)
+><I
+CLASS="EMPHASIS"
+>SOURCE_DATE_EPOCH</I
+>
+is used to ensure <TT
+CLASS="LITERAL"
+>fc-cache(1)</TT
+> generates files in a deterministic manner in order to support reproducible builds. When set to a numeric representation of UNIX timestamp, fontconfig will prefer this value over using the modification timestamps of the input files in order to identify which cache files require regeneration. If <TT
+CLASS="LITERAL"
+>SOURCE_DATE_EPOCH</TT
+> is not set (or is newer than the mtime of the directory), the existing behaviour is unchanged.
   </P
 ></DIV
 ><DIV
 CLASS="REFSECT1"
 ><A
-NAME="AEN281"
+NAME="AEN284"
+></A
+><H2
+>See Also</H2
+><P
+>fc-cat(1), fc-cache(1), fc-list(1), fc-match(1), fc-query(1), <A
+HREF="https://reproducible-builds.org/specs/source-date-epoch/"
+TARGET="_top"
+>SOURCE_DATE_EPOCH</A
+>.
+  </P
+></DIV
+><DIV
+CLASS="REFSECT1"
+><A
+NAME="AEN288"
 ></A
 ><H2
 >Version</H2
 ><P
->Fontconfig version 2.13.0
+>Fontconfig version 2.13.1
 
 	    </P
 ></DIV

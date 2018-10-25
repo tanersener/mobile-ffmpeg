@@ -27,6 +27,7 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -71,6 +72,10 @@ public class Config {
 
     private static Statistics lastReceivedStatistics;
 
+    private static final AtomicReference<StringBuffer> systemCommandOutputReference;
+
+    private static boolean runningSystemCommand;
+
     static {
 
         Log.i(Config.TAG, "Loading mobile-ffmpeg.");
@@ -98,7 +103,7 @@ public class Config {
             System.loadLibrary("mobileffmpeg");
         }
 
-        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s.", abi.getName(), getVersion()));
+        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s-%s.", getPackageName(), abi.getName(), getVersion()));
 
         /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
         activeLogLevel = Level.from(getNativeLogLevel());
@@ -106,6 +111,11 @@ public class Config {
         lastReceivedStatistics = new Statistics();
 
         Config.enableRedirection();
+
+        systemCommandOutputReference = new AtomicReference<>();
+        systemCommandOutputReference.set(new StringBuffer());
+
+        runningSystemCommand = false;
     }
 
     /**
@@ -185,10 +195,22 @@ public class Config {
         final Level level = Level.from(levelValue);
         final String text = new String(logMessage);
 
+        if (runningSystemCommand) {
+
+            // REDIRECT SYSTEM OUTPUT
+            if (activeLogLevel != Level.AV_LOG_QUIET && levelValue <= activeLogLevel.getValue()) {
+                systemCommandOutputReference.get().append(text);
+            }
+            return;
+        }
+
         if (activeLogLevel == Level.AV_LOG_QUIET || levelValue > activeLogLevel.getValue()) {
             // LOG NEITHER PRINTED NOR FORWARDED
             return;
         }
+
+        // ALWAYS REDIRECT COMMAND OUTPUT
+        FFmpeg.appendCommandOutput(text);
 
         if (logCallbackFunction != null) {
             logCallbackFunction.apply(new LogMessage(level, text));
@@ -233,16 +255,16 @@ public class Config {
      * <p>Statistics redirection method called by JNI/native part.
      *
      * @param videoFrameNumber last processed frame number for videos
-     * @param videoFps frames processed per second for videos
-     * @param videoQuality quality of the video stream
-     * @param size size in bytes
-     * @param time processed duration in milliseconds
-     * @param bitrate output bit rate in kbits/s
-     * @param speed processing speed = processed duration / operation duration
+     * @param videoFps         frames processed per second for videos
+     * @param videoQuality     quality of the video stream
+     * @param size             size in bytes
+     * @param time             processed duration in milliseconds
+     * @param bitrate          output bit rate in kbits/s
+     * @param speed            processing speed = processed duration / operation duration
      */
     private static void statistics(final int videoFrameNumber, final float videoFps,
-                              final float videoQuality, final long size, final int time,
-                              final double bitrate, final double speed) {
+                                   final float videoQuality, final long size, final int time,
+                                   final double bitrate, final double speed) {
         final Statistics newStatistics = new Statistics(videoFrameNumber, videoFps, videoQuality, size, time, bitrate, speed);
         lastReceivedStatistics.update(newStatistics);
 
@@ -362,6 +384,80 @@ public class Config {
     }
 
     /**
+     * <p>Returns package name.
+     *
+     * @return guessed package name according to supported external libraries
+     * @since 3.0
+     */
+    public static String getPackageName() {
+        return Packages.getPackageName();
+    }
+
+    /**
+     * <p>Returns supported external libraries.
+     *
+     * @return list of supported external libraries
+     * @since 3.0
+     */
+    public static List<String> getExternalLibraries() {
+        return Packages.getExternalLibraries();
+    }
+
+    /**
+     * Executes system command. System command is not logged to output.
+     *
+     * @param arguments                   command arguments
+     * @param commandOutputEndPatternList list of patterns which will indicate that operation has ended
+     * @param timeout                     execution timeout
+     * @return return code
+     */
+    static int systemExecute(final String[] arguments, final List<String> commandOutputEndPatternList, final long timeout) {
+        systemCommandOutputReference.set(new StringBuffer());
+        runningSystemCommand = true;
+
+        int rc = Config.nativeExecute(arguments);
+
+        long totalWaitTime = 0;
+
+        try {
+            while (!systemCommandOutputContainsPattern(commandOutputEndPatternList) && (totalWaitTime < timeout)) {
+                synchronized (systemCommandOutputReference) {
+                    systemCommandOutputReference.wait(20);
+                }
+                totalWaitTime += 20;
+            }
+        } catch (final InterruptedException e) {
+            Log.w(TAG, "systemExecute operation interrupted.", e);
+        }
+
+        runningSystemCommand = false;
+
+        nativeCancel();
+
+        return rc;
+    }
+
+    private static boolean systemCommandOutputContainsPattern(final List<String> patternList) {
+        String string = systemCommandOutputReference.get().toString();
+        for (String pattern : patternList) {
+            if (string.contains(pattern)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns output of last executed system command.
+     *
+     * @return output of last executed system command
+     */
+    static String getSystemCommandOutput() {
+        return systemCommandOutputReference.get().toString();
+    }
+
+    /**
      * <p>Enables native redirection. Necessary for log and statistics callback functions.
      */
     private static native void enableNativeRedirection();
@@ -408,10 +504,16 @@ public class Config {
     native static int nativeExecute(final String[] arguments);
 
     /**
-     * <p>Cancels an ongoing operation natively.
-     *
-     * <p>This function does not wait for termination to complete and returns immediately.
+     * <p>Cancels an ongoing operation natively. This function does not wait for termination to
+     * complete and returns immediately.
      */
     native static void nativeCancel();
+
+    /**
+     * <p>Returns build configuration for <code>FFmpeg</code>.
+     *
+     * @return build configuration string
+     */
+    native static String getNativeBuildConf();
 
 }

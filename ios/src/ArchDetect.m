@@ -50,33 +50,66 @@
     } else if (type == CPU_TYPE_X86) {
         [cpu appendString:@"x86"];
 
-    } else if (type == CPU_TYPE_ARM64) {
-        [cpu appendString:@"ARM64"];
+        switch(subtype) {
+            case CPU_SUBTYPE_X86_64_H:
+                [cpu appendString:@"_64h"];
+            break;
+            case CPU_SUBTYPE_X86_64_ALL:
+                [cpu appendString:@"_64all"];
+            break;
+            case CPU_SUBTYPE_X86_ARCH1:
+                [cpu appendString:@"_arch1"];
+            break;
+        }
 
-    } else if (type == CPU_TYPE_ARM) {
-        [cpu appendString:@"ARM"];
+    } else if (type == CPU_TYPE_ARM64) {
+        [cpu appendString:@"arm64"];
 
         switch(subtype) {
+            case CPU_SUBTYPE_ARM64_V8:
+                [cpu appendString:@"v8"];
+            break;
+        }
+
+    } else if (type == CPU_TYPE_ARM) {
+        [cpu appendString:@"arm"];
+
+        switch(subtype) {
+            case CPU_SUBTYPE_ARM_XSCALE:
+                [cpu appendString:@"xscale"];
+            break;
+            case CPU_SUBTYPE_ARM_V4T:
+                [cpu appendString:@"v4t"];
+            break;
+            case CPU_SUBTYPE_ARM_V5TEJ:
+                [cpu appendString:@"v5tej"];
+            break;
             case CPU_SUBTYPE_ARM_V6:
-                [cpu appendString:@"V6"];
+                [cpu appendString:@"v6"];
+            break;
+            case CPU_SUBTYPE_ARM_V6M:
+                [cpu appendString:@"v6m"];
             break;
             case CPU_SUBTYPE_ARM_V7:
-                [cpu appendString:@"V7"];
+                [cpu appendString:@"v7"];
+            break;
+            case CPU_SUBTYPE_ARM_V7EM:
+                [cpu appendString:@"v7em"];
             break;
             case CPU_SUBTYPE_ARM_V7F:
-                [cpu appendString:@"V7F"];
+                [cpu appendString:@"v7f"];
             break;
             case CPU_SUBTYPE_ARM_V7K:
-                [cpu appendString:@"V7K"];
+                [cpu appendString:@"v7k"];
+            break;
+            case CPU_SUBTYPE_ARM_V7M:
+                [cpu appendString:@"v7m"];
             break;
             case CPU_SUBTYPE_ARM_V7S:
-                [cpu appendString:@"V7S"];
+                [cpu appendString:@"v7s"];
             break;
             case CPU_SUBTYPE_ARM_V8:
-                [cpu appendString:@"V8"];
-            break;
-            default:
-                [cpu appendString:@"ALL"];
+                [cpu appendString:@"v8"];
             break;
         }
     } else {

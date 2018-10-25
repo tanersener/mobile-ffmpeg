@@ -92,7 +92,7 @@ to <parameter>config</parameter>.
 @FUNC@		FcDirCacheCreateUUID
 @TYPE1@		FcChar8 *			@ARG1@		dir
 @TYPE2@		FcBool				@ARG2@		force
-@TYPE3@		FcConfig			@ARG3@		config
+@TYPE3@		FcConfig *			@ARG3@		config
 @PURPOSE@	Create .uuid file at a directory
 @DESC@
 This is to create .uuid file containing an UUID at a font directory of
@@ -102,3 +102,13 @@ the cache filename if available.
 @SINCE@		2.12.92
 @@
 
+@RET@		FcBool
+@FUNC@		FcDirCacheDeleteUUID
+@TYPE1@		const FcChar8 *			@ARG1@		dir
+@TYPE2@		FcConfig *			@ARG2@		config
+@PURPOSE@	Delete .uuid file
+@DESC@
+This is to delete .uuid file containing an UUID at a font directory of
+<parameter>dir</parameter>.
+@SINCE@		2.13.1
+@@

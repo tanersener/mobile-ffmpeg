@@ -38,6 +38,8 @@ check_if_dependency_rebuilt() {
         ;;
         giflib)
             set_dependency_rebuilt_flag "libwebp"
+            set_dependency_rebuilt_flag "leptonica"
+            set_dependency_rebuilt_flag "tesseract"
         ;;
         gmp)
             set_dependency_rebuilt_flag "gnutls"
@@ -46,6 +48,11 @@ check_if_dependency_rebuilt() {
         jpeg)
             set_dependency_rebuilt_flag "tiff"
             set_dependency_rebuilt_flag "libwebp"
+            set_dependency_rebuilt_flag "leptonica"
+            set_dependency_rebuilt_flag "tesseract"
+        ;;
+        leptonica)
+            set_dependency_rebuilt_flag "tesseract"
         ;;
         libiconv)
             set_dependency_rebuilt_flag "fontconfig"
@@ -62,6 +69,11 @@ check_if_dependency_rebuilt() {
             set_dependency_rebuilt_flag "freetype"
             set_dependency_rebuilt_flag "libwebp"
             set_dependency_rebuilt_flag "libass"
+            set_dependency_rebuilt_flag "leptonica"
+            set_dependency_rebuilt_flag "tesseract"
+        ;;
+        libsndfile)
+            set_dependency_rebuilt_flag "twolame"
         ;;
         libuuid)
             set_dependency_rebuilt_flag "fontconfig"
@@ -70,11 +82,17 @@ check_if_dependency_rebuilt() {
         libvorbis)
             set_dependency_rebuilt_flag "libtheora"
         ;;
+        libwebp)
+            set_dependency_rebuilt_flag "leptonica"
+            set_dependency_rebuilt_flag "tesseract"
+        ;;
         nettle)
             set_dependency_rebuilt_flag "gnutls"
         ;;
         tiff)
             set_dependency_rebuilt_flag "libwebp"
+            set_dependency_rebuilt_flag "leptonica"
+            set_dependency_rebuilt_flag "tesseract"
         ;;
     esac
 }
@@ -100,7 +118,7 @@ fi
 # FILTERING WHICH EXTERNAL LIBRARIES WILL BE BUILT
 # NOTE THAT BUILT-IN LIBRARIES ARE FORWARDED TO FFMPEG SCRIPT WITHOUT ANY PROCESSING
 enabled_library_list=()
-for library in {1..36}
+for library in {1..41}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -139,6 +157,11 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                     run=1
                 fi
             ;;
+            leptonica)
+                if [[ ! -z $OK_giflib ]] && [[ ! -z $OK_jpeg ]] && [[ ! -z $OK_libpng ]] && [[ ! -z $OK_tiff ]] && [[ ! -z $OK_libwebp ]]; then
+                    run=1
+                fi
+            ;;
             libass)
                 if [[ ! -z $OK_libuuid ]] && [[ ! -z $OK_expat ]] && [[ ! -z $OK_libiconv ]] && [[ ! -z $OK_freetype ]] && [[ ! -z $OK_fribidi ]] && [[ ! -z $OK_fontconfig ]] && [[ ! -z $OK_libpng ]]; then
                     run=1
@@ -169,8 +192,18 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                     run=1
                 fi
             ;;
+            tesseract)
+                if [[ ! -z $OK_leptonica ]]; then
+                    run=1
+                fi
+            ;;
             tiff)
                 if [[ ! -z $OK_jpeg ]]; then
+                    run=1
+                fi
+            ;;
+            twolame)
+                if [[ ! -z $OK_libsndfile ]]; then
                     run=1
                 fi
             ;;

@@ -43,20 +43,18 @@ fi
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 ASM_OPTIONS=""
-X265_SYSTEM_PROCESSOR="${ARCH}"
 case ${ARCH} in
     arm-v7a | arm-v7a-neon)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
     ;;
     arm64-v8a)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1 -DSSE2_FOUND=0 -DSSE3_FOUND=0"
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=1"
     ;;
     x86)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0"
     ;;
     x86-64)
-        ASM_OPTIONS="-DENABLE_ASSEMBLY=1 -DCROSS_COMPILE_ARM=0 -DSSE2_FOUND=1 -DSSE3_FOUND=1"
-        X265_SYSTEM_PROCESSOR="x86_64"
+        ASM_OPTIONS="-DENABLE_ASSEMBLY=0 -DCROSS_COMPILE_ARM=0"
     ;;
 esac
 
@@ -67,12 +65,11 @@ fi
 mkdir cmake-build || exit 1
 cd cmake-build || exit 1
 
-# fix x86 and x86_64 assembly
-${SED_INLINE} 's/\-DPREFIX//g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInformation.cmake
-${SED_INLINE} 's/win/elf/g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInformation.cmake
-
-# fix pointer array assignments
-${SED_INLINE} 's/parseCpuName(value, bError)/parseCpuName(value, bError, 0)/g' ${BASEDIR}/src/x265/source/common/param.cpp
+# apply detect512 patch
+rc=$(download "https://bitbucket.org/multicoreware/x265/issues/attachments/442/multicoreware/x265/1539002893.24/442/enable512.diff" "enable512.diff")
+cd ${BASEDIR}/src/${LIB_NAME}/source/common
+patch -p3 < ${MOBILE_FFMPEG_TMPDIR}/enable512.diff
+cd ${BASEDIR}/src/${LIB_NAME}/cmake-build
 
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
@@ -89,16 +86,17 @@ cmake -Wno-dev \
     -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$LD" \
     -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
     -DSTATIC_LINK_CRT=1 \
     -DENABLE_PIC=1 \
     -DENABLE_CLI=0 \
     ${ASM_OPTIONS} \
-    -DCMAKE_SYSTEM_PROCESSOR="${X265_SYSTEM_PROCESSOR}" \
+    -DCMAKE_SYSTEM_PROCESSOR="${ARCH}" \
     -DENABLE_SHARED=0 ../source || exit 1
 
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_x265_package_config "2.8"
+create_x265_package_config "2.9"
 
 make install || exit 1

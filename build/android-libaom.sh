@@ -77,6 +77,7 @@ cmake -Wno-dev \
     -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$LD" \
     -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
     ${ARCH_OPTIONS} \
     -DENABLE_TESTS=0 \
     -DENABLE_EXAMPLES=0 \
@@ -88,6 +89,6 @@ cmake -Wno-dev \
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libaom_package_config "0.1.0"
+create_libaom_package_config "1.0.0"
 
 make install || exit 1

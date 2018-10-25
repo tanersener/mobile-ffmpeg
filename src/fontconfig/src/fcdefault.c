@@ -238,21 +238,22 @@ FcDefaultFini (void)
 void
 FcDefaultSubstitute (FcPattern *pattern)
 {
+    FcPatternIter iter;
     FcValue v, namelang, v2;
     int	    i;
     double	dpi, size, scale, pixelsize;
 
-    if (FcPatternObjectGet (pattern, FC_WEIGHT_OBJECT, 0, &v) == FcResultNoMatch )
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_WEIGHT_OBJECT))
 	FcPatternObjectAddInteger (pattern, FC_WEIGHT_OBJECT, FC_WEIGHT_NORMAL);
 
-    if (FcPatternObjectGet (pattern, FC_SLANT_OBJECT, 0, &v) == FcResultNoMatch)
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_SLANT_OBJECT))
 	FcPatternObjectAddInteger (pattern, FC_SLANT_OBJECT, FC_SLANT_ROMAN);
 
-    if (FcPatternObjectGet (pattern, FC_WIDTH_OBJECT, 0, &v) == FcResultNoMatch)
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_WIDTH_OBJECT))
 	FcPatternObjectAddInteger (pattern, FC_WIDTH_OBJECT, FC_WIDTH_NORMAL);
 
     for (i = 0; i < NUM_FC_BOOL_DEFAULTS; i++)
-	if (FcPatternObjectGet (pattern, FcBoolDefaults[i].field, 0, &v) == FcResultNoMatch)
+	if (!FcPatternFindObjectIter (pattern, &iter, FcBoolDefaults[i].field))
 	    FcPatternObjectAddBool (pattern, FcBoolDefaults[i].field, FcBoolDefaults[i].value);
 
     if (FcPatternObjectGetDouble (pattern, FC_SIZE_OBJECT, 0, &size) != FcResultMatch)
@@ -269,7 +270,7 @@ FcDefaultSubstitute (FcPattern *pattern)
     if (FcPatternObjectGetDouble (pattern, FC_DPI_OBJECT, 0, &dpi) != FcResultMatch)
 	dpi = 75.0;
 
-    if (FcPatternObjectGet (pattern, FC_PIXEL_SIZE_OBJECT, 0, &v) != FcResultMatch)
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_PIXEL_SIZE_OBJECT))
     {
 	(void) FcPatternObjectDel (pattern, FC_SCALE_OBJECT);
 	FcPatternObjectAddDouble (pattern, FC_SCALE_OBJECT, scale);
@@ -281,25 +282,22 @@ FcDefaultSubstitute (FcPattern *pattern)
     }
     else
     {
+	FcPatternIterGetValue(pattern, &iter, 0, &v, NULL);
 	size = v.u.d;
 	size = size / dpi * 72.0 / scale;
     }
     (void) FcPatternObjectDel (pattern, FC_SIZE_OBJECT);
     FcPatternObjectAddDouble (pattern, FC_SIZE_OBJECT, size);
 
-    if (FcPatternObjectGet (pattern, FC_FONTVERSION_OBJECT, 0, &v) == FcResultNoMatch)
-    {
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_FONTVERSION_OBJECT))
 	FcPatternObjectAddInteger (pattern, FC_FONTVERSION_OBJECT, 0x7fffffff);
-    }
 
-    if (FcPatternObjectGet (pattern, FC_HINT_STYLE_OBJECT, 0, &v) == FcResultNoMatch)
-    {
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_HINT_STYLE_OBJECT))
 	FcPatternObjectAddInteger (pattern, FC_HINT_STYLE_OBJECT, FC_HINT_FULL);
-    }
-    if (FcPatternObjectGet (pattern, FC_NAMELANG_OBJECT, 0, &v) == FcResultNoMatch)
-    {
+
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_NAMELANG_OBJECT))
 	FcPatternObjectAddString (pattern, FC_NAMELANG_OBJECT, FcGetDefaultLang ());
-    }
+
     /* shouldn't be failed. */
     FcPatternObjectGet (pattern, FC_NAMELANG_OBJECT, 0, &namelang);
     /* Add a fallback to ensure the english name when the requested language
@@ -315,17 +313,17 @@ FcDefaultSubstitute (FcPattern *pattern)
      */
     v2.type = FcTypeString;
     v2.u.s = (FcChar8 *) "en-us";
-    if (FcPatternObjectGet (pattern, FC_FAMILYLANG_OBJECT, 0, &v) == FcResultNoMatch)
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_FAMILYLANG_OBJECT))
     {
 	FcPatternObjectAdd (pattern, FC_FAMILYLANG_OBJECT, namelang, FcTrue);
 	FcPatternObjectAddWithBinding (pattern, FC_FAMILYLANG_OBJECT, v2, FcValueBindingWeak, FcTrue);
     }
-    if (FcPatternObjectGet (pattern, FC_STYLELANG_OBJECT, 0, &v) == FcResultNoMatch)
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_STYLELANG_OBJECT))
     {
 	FcPatternObjectAdd (pattern, FC_STYLELANG_OBJECT, namelang, FcTrue);
 	FcPatternObjectAddWithBinding (pattern, FC_STYLELANG_OBJECT, v2, FcValueBindingWeak, FcTrue);
     }
-    if (FcPatternObjectGet (pattern, FC_FULLNAMELANG_OBJECT, 0, &v) == FcResultNoMatch)
+    if (!FcPatternFindObjectIter (pattern, &iter, FC_FULLNAMELANG_OBJECT))
     {
 	FcPatternObjectAdd (pattern, FC_FULLNAMELANG_OBJECT, namelang, FcTrue);
 	FcPatternObjectAddWithBinding (pattern, FC_FULLNAMELANG_OBJECT, v2, FcValueBindingWeak, FcTrue);

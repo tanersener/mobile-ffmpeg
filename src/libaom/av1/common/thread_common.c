@@ -205,7 +205,11 @@ static INLINE void sync_write(AV1LfSync *const lf_sync, int r, int c,
 }
 
 static void enqueue_lf_jobs(AV1LfSync *lf_sync, AV1_COMMON *cm, int start,
-                            int stop, int plane_start, int plane_end) {
+                            int stop,
+#if LOOP_FILTER_BITMASK
+                            int is_decoding,
+#endif
+                            int plane_start, int plane_end) {
   int mi_row, plane, dir;
   AV1LfMTInfo *lf_job_queue = lf_sync->job_queue;
   lf_sync->jobs_enqueued = 0;
@@ -219,7 +223,16 @@ static void enqueue_lf_jobs(AV1LfSync *lf_sync, AV1_COMMON *cm, int start,
         continue;
       else if (plane == 2 && !(cm->lf.filter_level_v))
         continue;
-      for (mi_row = start; mi_row < stop; mi_row += MAX_MIB_SIZE) {
+#if LOOP_FILTER_BITMASK
+      int step = MAX_MIB_SIZE;
+      if (is_decoding) {
+        step = MI_SIZE_64X64;
+      }
+      for (mi_row = start; mi_row < stop; mi_row += step)
+#else
+      for (mi_row = start; mi_row < stop; mi_row += MAX_MIB_SIZE)
+#endif
+      {
         lf_job_queue->mi_row = mi_row;
         lf_job_queue->plane = plane;
         lf_job_queue->dir = dir;
@@ -230,7 +243,7 @@ static void enqueue_lf_jobs(AV1LfSync *lf_sync, AV1_COMMON *cm, int start,
   }
 }
 
-AV1LfMTInfo *get_lf_job_info(AV1LfSync *lf_sync) {
+static AV1LfMTInfo *get_lf_job_info(AV1LfSync *lf_sync) {
   AV1LfMTInfo *cur_job_info = NULL;
 
 #if CONFIG_MULTITHREAD
@@ -304,22 +317,102 @@ static INLINE void thread_loop_filter_rows(
 }
 
 // Row-based multi-threaded loopfilter hook
-static int loop_filter_row_worker(AV1LfSync *const lf_sync,
-                                  LFWorkerData *const lf_data) {
+static int loop_filter_row_worker(void *arg1, void *arg2) {
+  AV1LfSync *const lf_sync = (AV1LfSync *)arg1;
+  LFWorkerData *const lf_data = (LFWorkerData *)arg2;
   thread_loop_filter_rows(lf_data->frame_buffer, lf_data->cm, lf_data->planes,
                           lf_data->xd, lf_sync);
   return 1;
 }
 
+#if LOOP_FILTER_BITMASK
+static INLINE void thread_loop_filter_bitmask_rows(
+    const YV12_BUFFER_CONFIG *const frame_buffer, AV1_COMMON *const cm,
+    struct macroblockd_plane *planes, MACROBLOCKD *xd,
+    AV1LfSync *const lf_sync) {
+  const int sb_cols =
+      ALIGN_POWER_OF_TWO(cm->mi_cols, MIN_MIB_SIZE_LOG2) >> MIN_MIB_SIZE_LOG2;
+  int mi_row, mi_col, plane, dir;
+  int r, c;
+  (void)xd;
+
+  while (1) {
+    AV1LfMTInfo *cur_job_info = get_lf_job_info(lf_sync);
+
+    if (cur_job_info != NULL) {
+      mi_row = cur_job_info->mi_row;
+      plane = cur_job_info->plane;
+      dir = cur_job_info->dir;
+      r = mi_row >> MIN_MIB_SIZE_LOG2;
+
+      if (dir == 0) {
+        for (mi_col = 0; mi_col < cm->mi_cols; mi_col += MI_SIZE_64X64) {
+          c = mi_col >> MIN_MIB_SIZE_LOG2;
+
+          av1_setup_dst_planes(planes, BLOCK_64X64, frame_buffer, mi_row,
+                               mi_col, plane, plane + 1);
+
+          av1_filter_block_plane_bitmask_vert(cm, &planes[plane], plane, mi_row,
+                                              mi_col);
+          sync_write(lf_sync, r, c, sb_cols, plane);
+        }
+      } else if (dir == 1) {
+        for (mi_col = 0; mi_col < cm->mi_cols; mi_col += MI_SIZE_64X64) {
+          c = mi_col >> MIN_MIB_SIZE_LOG2;
+
+          // Wait for vertical edge filtering of the top-right block to be
+          // completed
+          sync_read(lf_sync, r, c, plane);
+
+          // Wait for vertical edge filtering of the right block to be
+          // completed
+          sync_read(lf_sync, r + 1, c, plane);
+
+          av1_setup_dst_planes(planes, BLOCK_64X64, frame_buffer, mi_row,
+                               mi_col, plane, plane + 1);
+          av1_filter_block_plane_bitmask_horz(cm, &planes[plane], plane, mi_row,
+                                              mi_col);
+        }
+      }
+    } else {
+      break;
+    }
+  }
+}
+
+// Row-based multi-threaded loopfilter hook
+static int loop_filter_bitmask_row_worker(void *arg1, void *arg2) {
+  AV1LfSync *const lf_sync = (AV1LfSync *)arg1;
+  LFWorkerData *const lf_data = (LFWorkerData *)arg2;
+  thread_loop_filter_bitmask_rows(lf_data->frame_buffer, lf_data->cm,
+                                  lf_data->planes, lf_data->xd, lf_sync);
+  return 1;
+}
+#endif  // LOOP_FILTER_BITMASK
+
 static void loop_filter_rows_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
                                 MACROBLOCKD *xd, int start, int stop,
                                 int plane_start, int plane_end,
+#if LOOP_FILTER_BITMASK
+                                int is_decoding,
+#endif
                                 AVxWorker *workers, int nworkers,
                                 AV1LfSync *lf_sync) {
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
+#if LOOP_FILTER_BITMASK
+  int sb_rows;
+  if (is_decoding) {
+    sb_rows =
+        ALIGN_POWER_OF_TWO(cm->mi_rows, MIN_MIB_SIZE_LOG2) >> MIN_MIB_SIZE_LOG2;
+  } else {
+    sb_rows =
+        ALIGN_POWER_OF_TWO(cm->mi_rows, MAX_MIB_SIZE_LOG2) >> MAX_MIB_SIZE_LOG2;
+  }
+#else
   // Number of superblock rows and cols
   const int sb_rows =
       ALIGN_POWER_OF_TWO(cm->mi_rows, MAX_MIB_SIZE_LOG2) >> MAX_MIB_SIZE_LOG2;
+#endif
   const int num_workers = nworkers;
   int i;
 
@@ -335,14 +428,26 @@ static void loop_filter_rows_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
            sizeof(*(lf_sync->cur_sb_col[i])) * sb_rows);
   }
 
-  enqueue_lf_jobs(lf_sync, cm, start, stop, plane_start, plane_end);
+  enqueue_lf_jobs(lf_sync, cm, start, stop,
+#if LOOP_FILTER_BITMASK
+                  is_decoding,
+#endif
+                  plane_start, plane_end);
 
   // Set up loopfilter thread data.
   for (i = 0; i < num_workers; ++i) {
     AVxWorker *const worker = &workers[i];
     LFWorkerData *const lf_data = &lf_sync->lfdata[i];
 
-    worker->hook = (AVxWorkerHook)loop_filter_row_worker;
+#if LOOP_FILTER_BITMASK
+    if (is_decoding) {
+      worker->hook = loop_filter_bitmask_row_worker;
+    } else {
+      worker->hook = loop_filter_row_worker;
+    }
+#else
+    worker->hook = loop_filter_row_worker;
+#endif
     worker->data1 = lf_sync;
     worker->data2 = lf_data;
 
@@ -365,8 +470,12 @@ static void loop_filter_rows_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
 
 void av1_loop_filter_frame_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
                               MACROBLOCKD *xd, int plane_start, int plane_end,
-                              int partial_frame, AVxWorker *workers,
-                              int num_workers, AV1LfSync *lf_sync) {
+                              int partial_frame,
+#if LOOP_FILTER_BITMASK
+                              int is_decoding,
+#endif
+                              AVxWorker *workers, int num_workers,
+                              AV1LfSync *lf_sync) {
   int start_mi_row, end_mi_row, mi_rows_to_filter;
 
   start_mi_row = 0;
@@ -379,8 +488,37 @@ void av1_loop_filter_frame_mt(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
   end_mi_row = start_mi_row + mi_rows_to_filter;
   av1_loop_filter_frame_init(cm, plane_start, plane_end);
 
+#if LOOP_FILTER_BITMASK
+  if (is_decoding) {
+    cm->is_decoding = is_decoding;
+    // TODO(chengchen): currently use one thread to build bitmasks for the
+    // frame. Make it support multi-thread later.
+    for (int plane = plane_start; plane < plane_end; plane++) {
+      if (plane == 0 && !(cm->lf.filter_level[0]) && !(cm->lf.filter_level[1]))
+        break;
+      else if (plane == 1 && !(cm->lf.filter_level_u))
+        continue;
+      else if (plane == 2 && !(cm->lf.filter_level_v))
+        continue;
+
+      // TODO(chengchen): can we remove this?
+      struct macroblockd_plane *pd = xd->plane;
+      av1_setup_dst_planes(pd, cm->seq_params.sb_size, frame, 0, 0, plane,
+                           plane + 1);
+
+      av1_build_bitmask_vert_info(cm, &pd[plane], plane);
+      av1_build_bitmask_horz_info(cm, &pd[plane], plane);
+    }
+    loop_filter_rows_mt(frame, cm, xd, start_mi_row, end_mi_row, plane_start,
+                        plane_end, 1, workers, num_workers, lf_sync);
+  } else {
+    loop_filter_rows_mt(frame, cm, xd, start_mi_row, end_mi_row, plane_start,
+                        plane_end, 0, workers, num_workers, lf_sync);
+  }
+#else
   loop_filter_rows_mt(frame, cm, xd, start_mi_row, end_mi_row, plane_start,
                       plane_end, workers, num_workers, lf_sync);
+#endif
 }
 
 static INLINE void lr_sync_read(void *const lr_sync, int r, int c, int plane) {
@@ -629,7 +767,7 @@ static void enqueue_lr_jobs(AV1LrSync *lr_sync, AV1LrStruct *lr_ctxt,
   }
 }
 
-AV1LrMTInfo *get_lr_job_info(AV1LrSync *lr_sync) {
+static AV1LrMTInfo *get_lr_job_info(AV1LrSync *lr_sync) {
   AV1LrMTInfo *cur_job_info = NULL;
 
 #if CONFIG_MULTITHREAD
@@ -649,8 +787,9 @@ AV1LrMTInfo *get_lr_job_info(AV1LrSync *lr_sync) {
 }
 
 // Implement row loop restoration for each thread.
-static int loop_restoration_row_worker(AV1LrSync *const lr_sync,
-                                       LRWorkerData *lrworkerdata) {
+static int loop_restoration_row_worker(void *arg1, void *arg2) {
+  AV1LrSync *const lr_sync = (AV1LrSync *)arg1;
+  LRWorkerData *lrworkerdata = (LRWorkerData *)arg2;
   AV1LrStruct *lr_ctxt = (AV1LrStruct *)lrworkerdata->lr_ctxt;
   FilterFrameCtxt *ctxt = lr_ctxt->ctxt;
   int lr_unit_row;
@@ -714,10 +853,12 @@ static void foreach_rest_unit_in_planes_mt(AV1LrStruct *lr_ctxt,
   int num_rows_lr = 0;
 
   for (int plane = 0; plane < num_planes; plane++) {
+    if (cm->rst_info[plane].frame_restoration_type == RESTORE_NONE) continue;
+
     const AV1PixelRect tile_rect = ctxt[plane].tile_rect;
     const int max_tile_h = tile_rect.bottom - tile_rect.top;
 
-    const int unit_size = cm->seq_params.sb_size == BLOCK_128X128 ? 128 : 64;
+    const int unit_size = cm->rst_info[plane].restoration_unit_size;
 
     num_rows_lr =
         AOMMAX(num_rows_lr, av1_lr_count_units_in_tile(unit_size, max_tile_h));
@@ -746,7 +887,7 @@ static void foreach_rest_unit_in_planes_mt(AV1LrStruct *lr_ctxt,
   for (i = 0; i < num_workers; ++i) {
     AVxWorker *const worker = &workers[i];
     lr_sync->lrworkerdata[i].lr_ctxt = (void *)lr_ctxt;
-    worker->hook = (AVxWorkerHook)loop_restoration_row_worker;
+    worker->hook = loop_restoration_row_worker;
     worker->data1 = lr_sync;
     worker->data2 = &lr_sync->lrworkerdata[i];
 

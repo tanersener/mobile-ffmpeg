@@ -66,6 +66,7 @@ cmake -Wno-dev \
     -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$LD" \
     -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
+    -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
     -DUSE_OMP=0 \
     ${ASM_FLAGS} \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \

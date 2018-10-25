@@ -2,6 +2,7 @@ var searchData=
 [
   ['rate_5femu',['rate_emu',['../df/d77/struct_options_context.html#a3132753aec8bcb63437da6a28c8104e2',1,'OptionsContext::rate_emu()'],['../d8/d99/struct_input_file.html#a44943da9b6e2a44ba3951a6203b1acc4',1,'InputFile::rate_emu()']]],
   ['rc_5foverrides',['rc_overrides',['../df/d77/struct_options_context.html#acab9897a7ab3fdfb2109e1cc7ed10678',1,'OptionsContext']]],
+  ['real_5fusec',['real_usec',['../d5/d8e/struct_benchmark_time_stamps.html#a8639f0bbe9044fc765f4ec5b3968a488',1,'BenchmarkTimeStamps']]],
   ['received_5fnb_5fsignals',['received_nb_signals',['../d7/d48/fftools__ffmpeg_8c.html#aa67220b3d47d990ba75e7099f11cfa68',1,'fftools_ffmpeg.c']]],
   ['received_5fsigterm',['received_sigterm',['../d7/d48/fftools__ffmpeg_8c.html#a1a9c2c01a83c8bbcd4eb7a8af9a0b160',1,'fftools_ffmpeg.c']]],
   ['reconfiguration',['reconfiguration',['../d9/de7/struct_filter_graph.html#a7bc2aac4115ac1a2fc951e5d0a403824',1,'FilterGraph']]],

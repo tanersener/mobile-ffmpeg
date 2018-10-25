@@ -1,11 +1,89 @@
                               Fontconfig
              Font configuration and customization library
-                             Version 2.13
-                              2018-03-06
+                            Version 2.13.1
+                              2018-08-30
 
 
 Check INSTALL for compilation and installation instructions.
-Report bugs to https://bugs.freedesktop.org in the fontconfig module.
+Report bugs to https://gitlab.freedesktop.org/fontconfig/fontconfig/issues/new.
+
+2.13.1
+
+Akira TAGOH (48):
+      Use the builtin uuid for OSX
+      Fix the build issue again on MinGW with enabling nls
+      Add uuid to Requires.private in .pc only when pkgconfig macro found it
+      Allow the constant names in the range
+      Do not override locale if already set by app
+      Add the value of the constant name to the implicit object in the pattern
+      Add a testcase for FcNameParse
+      Leave the locale setting to applications
+      call setlocale
+      Fix make check fail when srcdir != builddir.
+      Do not ship fcobjshash.h
+      Fix typo in doc
+      Change the emboldening logic again
+      Bug 43367 - RFE: iterator to peek objects in FcPattern
+      Add a testrunner for conf
+      Add a test case for 90-synthetic.conf
+      Bug 106497 - better error description when problem reading font configuration
+      Bug 106459 - fc-cache doesn't use -y option for .uuid files
+      Fix leaks
+      Fix -Wstringop-truncation warning
+      Fix double-free
+      Add a test case for bz#106618
+      Update CaseFolding.txt to Unicode 11
+      Remove .uuid when no font files exists on a directory
+      Fix the leak of file handle
+      Fix memory leak
+      Fix memory leaks
+      Fix memory leak
+      Fix memory leak
+      Fix memory leak
+      Fix unterminated string issue
+      Fix array access in a null pointer dereference
+      Fix access in a null pointer dereference
+      do not pass null pointer to memcpy
+      Fix dereferencing null pointer
+      Fix a typo
+      Fix possibly dereferencing a null pointer
+      Fix allocating insufficient memory for terminating null of the string
+      Make a call fail on ENOMEM
+      Allocate sufficient memory to terminate with null
+      Drop the redundant code
+      Fix memory leak
+      Fix the build issue with gperf
+      Fix missing closing bracket in FcStrIsAbsoluteFilename()
+      Update the issue tracker URL
+      Fix distcheck fail
+      Add .gitlab-ci.yml
+      Bump the libtool revision
+
+Alexander Larsson (3):
+      Add FcCacheAllocate() helper
+      Cache: Rewrite relocated paths in earlier
+      Cache: Remove alias_table
+
+Behdad Esfahbod (4):
+      Minor: fix warnings
+      Fix name scanning
+      Share name-mapping across instances
+      Use FT_HAS_COLOR
+
+Chris Lamb (1):
+      Ensure cache checksums are deterministic
+
+Matthieu Herrb (1):
+      FcCacheFindByStat(): fix checking of nanoseconds field.
+
+Tom Anderson (7):
+      Fix undefined-shift UBSAN errors
+      Use realfilename for FcOpen in _FcConfigParse
+      Add FONTCONFIG_SYSROOT environment variable
+      Fix CFI builds
+      Fix heap use-after-free
+      Return canonicalized paths from FcConfigRealFilename
+      Fix build with CFLAGS="-std=c11 -D_GNU_SOURCE"
 
 2.13
 

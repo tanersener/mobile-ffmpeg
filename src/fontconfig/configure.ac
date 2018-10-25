@@ -33,7 +33,7 @@ dnl This is the package version number, not the shared library
 dnl version.  This same version number must appear in fontconfig/fontconfig.h
 dnl Yes, it is a pain to synchronize version numbers.  Unfortunately, it's
 dnl not possible to extract the version number here from fontconfig.h
-AC_INIT([fontconfig], [2.13.0], [https://bugs.freedesktop.org/enter_bug.cgi?product=fontconfig])
+AC_INIT([fontconfig], [2.13.1], [https://gitlab.freedesktop.org/fontconfig/fontconfig/issues/new])
 AM_INIT_AUTOMAKE([1.11 parallel-tests dist-bzip2])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
@@ -72,11 +72,11 @@ dnl libtool versioning
 dnl bump revision when fixing bugs
 dnl bump current and age, reset revision to zero when adding APIs
 dnl bump current, leave age, reset revision to zero when changing/removing APIS
-LIBT_CURRENT=12
-LIBT_REVISION=1
+LIBT_CURRENT=13
+LIBT_REVISION=0
 AC_SUBST(LIBT_CURRENT)
 AC_SUBST(LIBT_REVISION)
-LIBT_AGE=11
+LIBT_AGE=12
 
 LIBT_VERSION_INFO="$LIBT_CURRENT:$LIBT_REVISION:$LIBT_AGE"
 AC_SUBST(LIBT_VERSION_INFO)
@@ -169,7 +169,7 @@ AC_TYPE_PID_T
 # Checks for library functions.
 AC_FUNC_VPRINTF
 AC_FUNC_MMAP
-AC_CHECK_FUNCS([link mkstemp mkostemp _mktemp_s mkdtemp getopt getopt_long getprogname getexecname rand random lrand48 random_r rand_r readlink fstatvfs fstatfs lstat])
+AC_CHECK_FUNCS([link mkstemp mkostemp _mktemp_s mkdtemp getopt getopt_long getprogname getexecname rand random lrand48 random_r rand_r readlink fstatvfs fstatfs lstat strerror strerror_r])
 
 dnl AC_CHECK_FUNCS doesn't check for header files.
 dnl posix_fadvise() may be not available in older libc.
@@ -336,8 +336,28 @@ CFLAGS="$fontconfig_save_cflags"
 # Check for uuid
 #
 if test "$os_win32" != "yes"; then
-	PKG_CHECK_MODULES([UUID], [uuid])
-	PKGCONFIG_REQUIRES_PRIVATELY="$PKGCONFIG_REQUIRES_PRIVATELY uuid"
+	use_pkgconfig_for_uuid=yes
+	if test -n "${UUID_LIBS}"; then
+		save_UUID_LIBS=$UUID_LIBS
+	fi
+	PKG_CHECK_MODULES([UUID], [uuid],
+			  [use_pkgconfig_for_uuid=yes],
+			  [use_pkgconfig_for_uuid=no])
+	if test "x$use_pkgconfig_for_uuid" = "xno"; then
+		AC_MSG_CHECKING([where uuid functions comes from])
+		AC_TRY_LINK([#include <uuid/uuid.h>],
+			[uuid_t a; uuid_generate(a);],
+			[AC_MSG_RESULT([builtin])
+			 UUID_CFLAGS=""
+			 UUID_LIBS=""
+			],[AC_MSG_ERROR([
+*** uuid is required. install util-linux.
+			])])
+	else
+		if test -z "${save_UUID_LIBS+x}" && test "x${UUID_LIBS}" != "x"; then
+			PKGCONFIG_REQUIRES_PRIVATELY="$PKGCONFIG_REQUIRES_PRIVATELY uuid"
+		fi
+	fi
 else
 	UUID_CFLAGS=""
 	UUID_LIBS=""
@@ -452,6 +472,15 @@ if test "$enable_libxml2" = "yes"; then
 *** SAX1 support in libxml2 is required. enable it or use expat instead.])])
     CFLAGS="$fc_saved_CFLAGS"
 fi
+
+#
+# Check json-c
+#
+PKG_CHECK_MODULES([JSONC], [json-c], [use_jsonc=yes], [use_jsonc=no])
+
+AM_CONDITIONAL(ENABLE_JSONC, test "x$use_jsonc" = "xyes")
+AC_SUBST(JSONC_CFLAGS)
+AC_SUBST(JSONC_LIBS)
 
 #
 # Set default hinting

@@ -125,9 +125,9 @@ void av1_tokenize_color_map(const MACROBLOCK *const x, int plane,
                         counts);
 }
 
-void tokenize_vartx(ThreadData *td, TOKENEXTRA **t, RUN_TYPE dry_run,
-                    TX_SIZE tx_size, BLOCK_SIZE plane_bsize, int blk_row,
-                    int blk_col, int block, int plane, void *arg) {
+static void tokenize_vartx(ThreadData *td, TOKENEXTRA **t, RUN_TYPE dry_run,
+                           TX_SIZE tx_size, BLOCK_SIZE plane_bsize, int blk_row,
+                           int blk_col, int block, int plane, void *arg) {
   MACROBLOCK *const x = &td->mb;
   MACROBLOCKD *const xd = &x->e_mbd;
   MB_MODE_INFO *const mbmi = xd->mi[0];

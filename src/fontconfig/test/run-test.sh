@@ -26,6 +26,7 @@ case "$OSTYPE" in
 esac
 
 TESTDIR=${srcdir-"$MyPWD"}
+BUILDTESTDIR=${builddir-"$MyPWD"}
 
 FONTDIR="$MyPWD"/fonts
 CACHEDIR="$MyPWD"/cache.dir
@@ -51,12 +52,12 @@ check () {
   echo "=" >> out
   $FCLIST - family pixelsize | sort >> out
   tr -d '\015' <out >out.tmp; mv out.tmp out
-  if cmp out $TESTDIR/$EXPECTED > /dev/null ; then : ; else
+  if cmp out $BUILDTESTDIR/$EXPECTED > /dev/null ; then : ; else
     echo "*** Test failed: $TEST"
     echo "*** output is in 'out', expected output in '$EXPECTED'"
     exit 1
   fi
-  rm out
+  rm -f out
 }
 
 prep() {
@@ -140,7 +141,7 @@ if cmp out1 out2 > /dev/null ; then
   echo "*** .uuid wasn't modified"
   exit 1
 fi
-rm out1 out2
+rm -f out1 out2
 
 dotest "Consistency between .uuid and cache name"
 prep
@@ -188,6 +189,8 @@ TESTTMPDIR=`mktemp -d /tmp/fontconfig.XXXXXXXX`
 sed "s!@FONTDIR@!$TESTTMPDIR/fonts!
 s!@CACHEDIR@!$TESTTMPDIR/cache.dir!" < $TESTDIR/fonts.conf.in > bind-fonts.conf
 $BWRAP --bind / / --bind $CACHEDIR $TESTTMPDIR/cache.dir --bind $FONTDIR $TESTTMPDIR/fonts --bind .. $TESTTMPDIR/build --dev-bind /dev /dev --setenv FONTCONFIG_FILE $TESTTMPDIR/build/test/bind-fonts.conf $TESTTMPDIR/build/fc-match/fc-match$EXEEXT -f "%{file}\n" ":foundry=Misc" > xxx
+$BWRAP --bind / / --bind $CACHEDIR $TESTTMPDIR/cache.dir --bind $FONTDIR $TESTTMPDIR/fonts --bind .. $TESTTMPDIR/build --dev-bind /dev /dev --setenv FONTCONFIG_FILE $TESTTMPDIR/build/test/bind-fonts.conf $TESTTMPDIR/build/test/test-bz106618$EXEEXT | sort > flist1
+$BWRAP --bind / / --bind $CACHEDIR $TESTTMPDIR/cache.dir --bind $FONTDIR $TESTTMPDIR/fonts --bind .. $TESTTMPDIR/build --dev-bind /dev /dev find $TESTTMPDIR/fonts/ -type f -name '*.pcf' | sort > flist2
 ls -l $CACHEDIR > out2
 if cmp out1 out2 > /dev/null ; then : ; else
   echo "*** Test failed: $TEST"
@@ -196,10 +199,59 @@ if cmp out1 out2 > /dev/null ; then : ; else
 fi
 if [ x`cat xxx` != "x$TESTTMPDIR/fonts/4x6.pcf" ]; then
   echo "*** Test failed: $TEST"
-  echo "file property doesn't points to the new place: $TESTTMPDIR/fonts/4x6.pcf"
+  echo "file property doesn't point to the new place: $TESTTMPDIR/fonts/4x6.pcf"
   exit 1
 fi
-rm -rf $TESTTMPDIR out1 out2 xxx bind-fonts.conf
+if cmp flist1 flist2 > /dev/null ; then : ; else
+  echo "*** Test failed: $TEST"
+  echo "file properties doesn't point to the new places"
+  echo "Expected result:"
+  cat flist2
+  echo "Actual result:"
+  cat flist1
+  exit 1
+fi
+rm -rf $TESTTMPDIR out1 out2 xxx flist1 flist2 bind-fonts.conf
+fi
+
+dotest "sysroot option"
+prep
+mkdir -p $MyPWD/sysroot/$FONTDIR
+mkdir -p $MyPWD/sysroot/$CACHEDIR
+cp $FONT1 $MyPWD/sysroot/$FONTDIR
+cp $MyPWD/fonts.conf $MyPWD/sysroot/$MyPWD/fonts.conf
+$FCCACHE -y $MyPWD/sysroot
+stat $MyPWD/sysroot/$FONTDIR/.uuid
+if test $? != 0; then
+  echo "*** Test failed: $TEST"
+  exit 1
+fi
+
+dotest "creating uuid-based cache file on sysroot"
+uuid=`cat $MyPWD/sysroot/$FONTDIR/.uuid`
+ls $MyPWD/sysroot/$CACHEDIR/$uuid*
+if [ $? != 0 ]; then
+  echo "*** Test failed: $TEST"
+  echo "No cache for $uuid"
+  ls $MyPWD/sysroot/$CACHEDIR
+  exit 1
+fi
+
+rm -rf $MyPWD/sysroot
+
+dotest "deleting .uuid file on empty dir"
+prep
+cp $FONT1 $FONT2 $FONTDIR
+$FCCACHE $FONTDIR
+sleep 1
+rm -f $FONTDIR/*pcf
+$FCCACHE $FONTDIR
+rmdir $FONTDIR > /dev/null 2>&1
+if [ $? != 0 ]; then
+  echo "*** Test failed: $TEST"
+  echo "$FONTDIR isn't empty"
+  ls -al $FONTDIR
+  exit 1
 fi
 
 rm -rf $FONTDIR $CACHEFILE $CACHEDIR $FONTCONFIG_FILE out

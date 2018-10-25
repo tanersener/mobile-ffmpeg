@@ -29,15 +29,25 @@ int execute(int argc, char **argv);
 @implementation MobileFFmpeg
 
 /** Global library version */
-NSString *const MOBILE_FFMPEG_VERSION = @"2.1.1";
+NSString *const MOBILE_FFMPEG_VERSION = @"3.0";
 
 /** Common return code values */
 int const RETURN_CODE_SUCCESS = 0;
 int const RETURN_CODE_CANCEL = 255;
 
+int lastReturnCode;
+NSMutableString *lastCommandOutput;
+
+extern NSMutableString *systemCommandOutput;
+extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPatternList, long timeout);
+
 + (void)initialize {
     [MobileFFmpegConfig class];
-    NSLog(@"Loaded mobile-ffmpeg-%@-%@\n", [ArchDetect getArch], [MobileFFmpeg getVersion]);
+
+    lastReturnCode = 0;
+    lastCommandOutput = [[NSMutableString alloc] init];
+
+    NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpeg getVersion]);
 }
 
 /**
@@ -59,25 +69,14 @@ int const RETURN_CODE_CANCEL = 255;
 }
 
 /**
- * Synchronously executes FFmpeg command with arguments provided.
- *
- * \param FFmpeg command options/arguments in one string
- * \return zero on successful execution, 255 on user cancel and non-zero on error
- */
-+ (int)execute: (NSString*)arguments {
-
-    // SPLITTING ARGUMENTS
-    NSArray* argumentArray = [arguments componentsSeparatedByString:@" "];
-    return [self executeWithArray:argumentArray];
-}
-
-/**
  * Synchronously executes FFmpeg with arguments provided.
  *
  * \param FFmpeg command options/arguments as string array
  * \return zero on successful execution, 255 on user cancel and non-zero on error
  */
-+ (int)executeWithArray: (NSArray*)arguments {
++ (int)executeWithArguments: (NSArray*)arguments {
+    lastCommandOutput = [[NSMutableString alloc] init];
+
     char **commandCharPArray = (char **)malloc(sizeof(char*) * ([arguments count] + 1));
 
     /* PRESERVING CALLING FORMAT
@@ -93,13 +92,39 @@ int const RETURN_CODE_CANCEL = 255;
     }
 
     // RUN
-    int retCode = execute(([arguments count] + 1), commandCharPArray);
+    lastReturnCode = execute(([arguments count] + 1), commandCharPArray);
 
     // CLEANUP
     free(commandCharPArray[0]);
     free(commandCharPArray);
 
-    return retCode;
+    return lastReturnCode;
+}
+
+/**
+ * Synchronously executes FFmpeg command provided. Space character is used to split command
+ * into arguments.
+ *
+ * \param FFmpeg command
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
+ */
++ (int)execute: (NSString*)command {
+    return [self execute:command delimiter:@" "];
+}
+
+/**
+ * Synchronously executes FFmpeg command provided. Delimiter parameter is used to split
+ * command into arguments.
+ *
+ * \param FFmpeg command
+ * \param arguments delimiter
+ * \return zero on successful execution, 255 on user cancel and non-zero on error
+ */
++ (int)execute: (NSString*)command delimiter:(NSString*)delimiter {
+
+    // SPLITTING ARGUMENTS
+    NSArray* argumentArray = [command componentsSeparatedByString:delimiter];
+    return [self executeWithArguments:argumentArray];
 }
 
 /**
@@ -109,6 +134,53 @@ int const RETURN_CODE_CANCEL = 255;
  */
 + (void)cancel {
     cancel_operation();
+}
+
+/**
+ * Returns return code of last executed command.
+ *
+ * \return return code of last executed command
+ */
++ (int)getLastReturnCode {
+    return lastReturnCode;
+}
+
+/**
+ * Returns log output of last executed command. Please note that disabling redirection using
+ * MobileFFmpegConfig.disableRedirection() method also disables this functionality.
+ *
+ * \return output of last executed command
+ */
++ (NSString*)getLastCommandOutput {
+    return lastCommandOutput;
+}
+
+/**
+ * Returns media information for given file.
+ *
+ * \param path or uri of media file
+ * \return media information
+ */
++ (MediaInformation*)getMediaInformation: (NSString*)path {
+    return [MobileFFmpeg getMediaInformation:path timeout:10000];
+}
+
+/**
+ * Returns media information for given file.
+ *
+ * \param path    path or uri of media file
+ * \param timeout complete timeout
+ * \return media information
+ */
+ + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout {
+    int rc = mobileffmpeg_system_execute([[NSArray alloc] initWithObjects:@"-v", @"info", @"-hide_banner", @"-i", path, @"-f", @"null", @"-", nil], [[NSArray alloc] initWithObjects:@"Press [q] to stop, [?] for help", @"No such file or directory", @"Input/output error", @"Conversion failed", nil], timeout);
+
+    if (rc == 0) {
+        return [MediaInformationParser from:systemCommandOutput];
+    } else {
+        NSLog(@"%@", systemCommandOutput);
+        return nil;
+    }
 }
 
 @end

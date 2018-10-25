@@ -46,18 +46,25 @@ get_library_name() {
         25) echo "soxr" ;;
         26) echo "libaom" ;;
         27) echo "chromaprint" ;;
-        28) echo "giflib" ;;
-        29) echo "jpeg" ;;
-        30) echo "libogg" ;;
-        31) echo "libpng" ;;
-        32) echo "libuuid" ;;
-        33) echo "nettle" ;;
-        34) echo "tiff" ;;
-        35) echo "expat" ;;
-        36) echo "ios-zlib" ;;
-        37) echo "ios-audiotoolbox" ;;
-        38) echo "ios-coreimage" ;;
-        39) echo "ios-bzip2" ;;
+        28) echo "twolame" ;;
+        29) echo "sdl" ;;
+        30) echo "tesseract" ;;
+        31) echo "giflib" ;;
+        32) echo "jpeg" ;;
+        33) echo "libogg" ;;
+        34) echo "libpng" ;;
+        35) echo "libuuid" ;;
+        36) echo "nettle" ;;
+        37) echo "tiff" ;;
+        38) echo "expat" ;;
+        39) echo "libsndfile" ;;
+        40) echo "leptonica" ;;
+        41) echo "ios-zlib" ;;
+        42) echo "ios-audiotoolbox" ;;
+        43) echo "ios-coreimage" ;;
+        44) echo "ios-bzip2" ;;
+        45) echo "ios-videotoolbox" ;;
+        46) echo "ios-avfoundation" ;;
     esac
 }
 
@@ -70,10 +77,15 @@ get_static_archive_name() {
         21) echo "libvidstab.a" ;;
         22) echo "libilbc.a" ;;
         26) echo "libaom.a" ;;
-        28) echo "libgif.a" ;;
-        30) echo "libogg.a" ;;
-        31) echo "libpng.a" ;;
-        32) echo "libuuid.a" ;;
+        28) echo "libtwolame.a" ;;
+        29) echo "libSDL2.a" ;;
+        30) echo "libtesseract.a" ;;
+        31) echo "libgif.a" ;;
+        33) echo "libogg.a" ;;
+        34) echo "libpng.a" ;;
+        35) echo "libuuid.a" ;;
+        39) echo "libsndfile.a" ;;
+        40) echo "liblept.a" ;;
         *) echo lib$(get_library_name $1).a
     esac
 }
@@ -89,7 +101,7 @@ get_arch_name() {
 }
 
 get_target_host() {
-    echo "$(get_target_arch)-apple-darwin"
+    echo "$(get_target_arch)-ios-darwin"
 }
 
 get_target_arch() {
@@ -221,6 +233,9 @@ get_app_specific_cflags() {
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
+        leptonica)
+            APP_FLAGS="-std=c99 -Wno-unused-function -DOS_IOS"
+        ;;
         libwebp | xvidcore)
             APP_FLAGS="-fno-common -DPIC"
         ;;
@@ -248,7 +263,11 @@ get_cflags() {
     ARCH_FLAGS=$(get_arch_specific_cflags)
     APP_FLAGS=$(get_app_specific_cflags $1)
     COMMON_FLAGS=$(get_common_cflags)
-    OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+    if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+        OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+    else
+        OPTIMIZATION_FLAGS=""
+    fi
     MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
     COMMON_INCLUDES=$(get_common_includes)
 
@@ -259,7 +278,11 @@ get_asmflags() {
     ARCH_FLAGS=$(get_arch_specific_cflags)
     APP_FLAGS=$(get_app_specific_cflags $1)
     COMMON_FLAGS=$(get_common_cflags)
-    OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+    if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+        OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+    else
+        OPTIMIZATION_FLAGS=""
+    fi
     MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
     COMMON_INCLUDES=$(get_common_includes)
 
@@ -269,24 +292,31 @@ get_asmflags() {
 get_cxxflags() {
     local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags) $(get_min_version_cflags $1)"
 
+    local BITCODE_FLAGS=""
+    case ${ARCH} in
+        armv7 | armv7s | arm64)
+            BITCODE_FLAGS="-fembed-bitcode"
+        ;;
+    esac
+
     case $1 in
         x265)
-            echo "-std=c++11 -fno-exceptions -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         gnutls)
-            echo "-std=c++11 -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         opencore-amr)
-            echo "-fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         libwebp | xvidcore)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode -fno-common -DPIC ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS}"
         ;;
         libaom)
-            echo "-std=c++11 -fno-exceptions -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -fembed-bitcode ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
     esac
 }
@@ -629,6 +659,29 @@ Cflags: -I\${includedir}
 EOF
 }
 
+create_tesseract_package_config() {
+    local TESSERACT_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/tesseract.pc" << EOF
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/tesseract
+exec_prefix=\${prefix}
+bindir=\${exec_prefix}/bin
+datarootdir=\${prefix}/share
+datadir=\${datarootdir}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: tesseract
+Description: An OCR Engine that was developed at HP Labs between 1985 and 1995... and now at Google.
+URL: https://github.com/tesseract-ocr/tesseract
+Version: ${TESSERACT_VERSION}
+
+Requires: lept
+Libs: -L\${libdir} -ltesseract
+Cflags: -I\${includedir}
+EOF
+}
+
 create_uuid_package_config() {
     local UUID_VERSION="$1"
 
@@ -750,15 +803,15 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20180829-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20180829-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20180829-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20181015-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20181015-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20181015-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
-            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_2.8.tar.gz"
-            GPL_LIB_FILE="x265-2.8.tar.gz"
-            GPL_LIB_ORIG_DIR="x265_2.8"
+            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_2.9.tar.gz"
+            GPL_LIB_FILE="x265-2.9.tar.gz"
+            GPL_LIB_ORIG_DIR="x265_2.9"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)

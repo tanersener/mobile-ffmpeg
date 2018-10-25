@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_RESTORATION_H_
-#define AV1_COMMON_RESTORATION_H_
+#ifndef AOM_AV1_COMMON_RESTORATION_H_
+#define AOM_AV1_COMMON_RESTORATION_H_
 
 #include "aom_ports/mem.h"
 #include "config/aom_config.h"
@@ -374,4 +374,4 @@ void av1_lr_sync_write_dummy(void *const lr_sync, int r, int c,
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_RESTORATION_H_
+#endif  // AOM_AV1_COMMON_RESTORATION_H_

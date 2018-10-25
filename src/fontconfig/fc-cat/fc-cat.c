@@ -40,6 +40,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <locale.h>
 
 #ifdef ENABLE_NLS
 #include <libintl.h>
@@ -271,6 +272,7 @@ main (int argc, char **argv)
 #if HAVE_GETOPT_LONG || HAVE_GETOPT
     int		c;
 
+    setlocale (LC_ALL, "");
 #if HAVE_GETOPT_LONG
     while ((c = getopt_long (argc, argv, "Vvrh", longopts, NULL)) != -1)
 #else

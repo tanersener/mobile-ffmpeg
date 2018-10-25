@@ -3,7 +3,7 @@ var searchData=
   ['off',['off',['../dc/d1e/struct_option_def.html#a1c25e8faf0036e9b0292fa0db6682d6c',1,'OptionDef']]],
   ['ofile_5fidx',['ofile_idx',['../d6/d2c/struct_audio_channel_map.html#a8174d989c9c3c6bacd2ff229900e3edf',1,'AudioChannelMap']]],
   ['opt',['opt',['../d3/d1d/struct_option.html#a3b25df629d81a005daeb930f12560edc',1,'Option']]],
-  ['options',['options',['../d7/db3/fftools__ffmpeg_8h.html#affee77914991e4f6048c708556a7edbe',1,'options():&#160;fftools_ffmpeg_opt.c'],['../da/d66/fftools__ffmpeg__opt_8c.html#affee77914991e4f6048c708556a7edbe',1,'options():&#160;fftools_ffmpeg_opt.c']]],
+  ['options',['options',['../d7/db3/fftools__ffmpeg_8h.html#affee77914991e4f6048c708556a7edbe',1,'fftools_ffmpeg.h']]],
   ['opts',['opts',['../d6/d69/struct_option_group.html#ab9bf148a556ccce86462e948dd1dc856',1,'OptionGroup::opts()'],['../de/df2/struct_output_file.html#aac74ddf07f90ad30cd5ddf80583468ec',1,'OutputFile::opts()']]],
   ['ost',['ost',['../d0/d0f/struct_output_filter.html#a2d283eee3e140f822b5eb381890ba035',1,'OutputFilter']]],
   ['ost_5findex',['ost_index',['../de/df2/struct_output_file.html#ac09855bfd066c44eb761f84e28f00dce',1,'OutputFile']]],

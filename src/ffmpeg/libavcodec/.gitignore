@@ -1,13 +1,7 @@
+/*_tablegen
+/*_tables.c
+/*_tables.h
 /bsf_list.c
-*.o
-*.d
-*.a
-*.pc
-/libavcodec.version
-/libavcodec.so
-/libavcodec.so.57
-/libavcodec.ver
-*.dylib
 /codec_list.c
 /parser_list.c
 /libavcodec.so.58

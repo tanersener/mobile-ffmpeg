@@ -23,6 +23,7 @@ var searchData=
   ['disabled',['disabled',['../db/d60/struct_stream_map.html#a4b146ee6da0df9d55d435d9153636504',1,'StreamMap']]],
   ['disableredirection',['disableRedirection',['../df/d45/interface_mobile_f_fmpeg_config.html#ae7d648c9c855966b59c6f8d7bfada703',1,'MobileFFmpegConfig']]],
   ['discard',['discard',['../df/d77/struct_options_context.html#a529c61a5ef7c199d9d118c18abb88e86',1,'OptionsContext::discard()'],['../d3/d6e/struct_input_stream.html#ac39249a26eeec2ed084fcc433ec9825e',1,'InputStream::discard()']]],
+  ['displayaspectratio',['displayAspectRatio',['../d7/da5/_stream_information_8m.html#a6a5ad793ef8c6b069c91f194563953b2',1,'StreamInformation.m']]],
   ['disposition',['disposition',['../df/d77/struct_options_context.html#a6ef7bc766a94c671d3e9ffbe3ddaa744',1,'OptionsContext::disposition()'],['../db/dde/struct_output_stream.html#add36114220f77c320ff544748163a15d',1,'OutputStream::disposition()']]],
   ['do_5faudio_5fout',['do_audio_out',['../d7/d48/fftools__ffmpeg_8c.html#a18033581df001bc68ef11676eb7040bd',1,'fftools_ffmpeg.c']]],
   ['do_5fbenchmark',['do_benchmark',['../d7/db3/fftools__ffmpeg_8h.html#a2b9cc93533df33a5f103f70a005cafd1',1,'do_benchmark():&#160;fftools_ffmpeg_opt.c'],['../da/d66/fftools__ffmpeg__opt_8c.html#a2b9cc93533df33a5f103f70a005cafd1',1,'do_benchmark():&#160;fftools_ffmpeg_opt.c']]],
@@ -44,6 +45,7 @@ var searchData=
   ['dump_5fargument',['dump_argument',['../d7/dcc/fftools__cmdutils_8c.html#a71385b26c42379eabd572d72994c1a9a',1,'fftools_cmdutils.c']]],
   ['dump_5fattachment',['dump_attachment',['../df/d77/struct_options_context.html#a0cb98e36b0f4ceaa7700573f3f99a820',1,'OptionsContext::dump_attachment()'],['../da/d66/fftools__ffmpeg__opt_8c.html#a9d1c0c7f8c8652f8d8ef87cb078b72c4',1,'dump_attachment():&#160;fftools_ffmpeg_opt.c']]],
   ['dup_5fwarning',['dup_warning',['../d7/d48/fftools__ffmpeg_8c.html#a6e50fb6ee72b2eb86923d914ce0d5394',1,'fftools_ffmpeg.c']]],
-  ['duration',['duration',['../d8/d99/struct_input_file.html#a0d245cef00bdb0fa9a365ab8480ade2f',1,'InputFile']]],
-  ['duration_5fmax',['duration_max',['../d7/d48/fftools__ffmpeg_8c.html#ab98f0ee465a0b23b09ba22ac22f359b7',1,'fftools_ffmpeg.c']]]
+  ['duration',['duration',['../d8/d99/struct_input_file.html#a0d245cef00bdb0fa9a365ab8480ade2f',1,'InputFile::duration()'],['../d5/d1a/_media_information_8m.html#a749e359df4bb43501987a5298cc3fe5d',1,'duration():&#160;MediaInformation.m']]],
+  ['duration_5fmax',['duration_max',['../d7/d48/fftools__ffmpeg_8c.html#ab98f0ee465a0b23b09ba22ac22f359b7',1,'fftools_ffmpeg.c']]],
+  ['durationformat',['durationFormat',['../d6/d21/_media_information_parser_8m.html#a040e2ffd9f25759de2cbcababf17a269',1,'MediaInformationParser.m']]]
 ];

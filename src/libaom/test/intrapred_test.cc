@@ -197,8 +197,8 @@ TEST_P(LowbdIntraPredTest, Bitexact) {
       highbd_entry(type, 32, 16, opt, bd), highbd_entry(type, 32, 32, opt, bd)
 #endif
 
-  // ---------------------------------------------------------------------------
-  // Low Bit Depth Tests
+// ---------------------------------------------------------------------------
+// Low Bit Depth Tests
 
 #define lowbd_entry(type, width, height, opt)                                  \
   IntraPredFunc<IntraPred>(&aom_##type##_predictor_##width##x##height##_##opt, \

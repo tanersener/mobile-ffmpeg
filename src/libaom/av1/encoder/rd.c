@@ -377,6 +377,35 @@ int av1_compute_rd_mult(const AV1_COMP *cpi, int qindex) {
   return (int)rdmult;
 }
 
+int av1_get_adaptive_rdmult(const AV1_COMP *cpi, double beta) {
+  const AV1_COMMON *cm = &cpi->common;
+  int64_t q =
+      av1_dc_quant_Q3(cm->base_qindex, 0, cpi->common.seq_params.bit_depth);
+  int64_t rdmult = 0;
+
+  switch (cpi->common.seq_params.bit_depth) {
+    case AOM_BITS_8: rdmult = (int)((88 * q * q / beta) / 24); break;
+    case AOM_BITS_10:
+      rdmult = ROUND_POWER_OF_TWO((int)((88 * q * q / beta) / 24), 4);
+      break;
+    default:
+      assert(cpi->common.seq_params.bit_depth == AOM_BITS_12);
+      rdmult = ROUND_POWER_OF_TWO((int)((88 * q * q / beta) / 24), 8);
+      break;
+  }
+
+  if (cpi->oxcf.pass == 2 && (cpi->common.frame_type != KEY_FRAME)) {
+    const GF_GROUP *const gf_group = &cpi->twopass.gf_group;
+    const FRAME_UPDATE_TYPE frame_type = gf_group->update_type[gf_group->index];
+    const int boost_index = AOMMIN(15, (cpi->rc.gfu_boost / 100));
+
+    rdmult = (rdmult * rd_frame_type_factor[frame_type]) >> 7;
+    rdmult += ((rdmult * rd_boost_factor[boost_index]) >> 7);
+  }
+  if (rdmult < 1) rdmult = 1;
+  return (int)rdmult;
+}
+
 static int compute_rd_thresh_factor(int qindex, aom_bit_depth_t bit_depth) {
   double q;
   switch (bit_depth) {
@@ -1229,6 +1258,7 @@ int16_t *av1_raster_block_offset_int16(BLOCK_SIZE plane_bsize, int raster_block,
 YV12_BUFFER_CONFIG *av1_get_scaled_ref_frame(const AV1_COMP *cpi,
                                              int ref_frame) {
   const AV1_COMMON *const cm = &cpi->common;
+  assert(ref_frame >= LAST_FRAME && ref_frame <= ALTREF_FRAME);
   const int scaled_idx = cpi->scaled_ref_idx[ref_frame - 1];
   const int ref_idx = get_ref_frame_buf_idx(cpi, ref_frame);
   return (scaled_idx != ref_idx && scaled_idx != INVALID_IDX)
@@ -1281,8 +1311,6 @@ void av1_set_rd_speed_thresholds(AV1_COMP *cpi) {
     rd->thresh_mult[THR_NEARESTG] = 0;
   }
 
-  rd->thresh_mult[THR_DC] += 1000;
-
   rd->thresh_mult[THR_NEWMV] += 1000;
   rd->thresh_mult[THR_NEWL2] += 1000;
   rd->thresh_mult[THR_NEWL3] += 1000;
@@ -1306,8 +1334,6 @@ void av1_set_rd_speed_thresholds(AV1_COMP *cpi) {
   rd->thresh_mult[THR_GLOBALA2] = 2000;
   rd->thresh_mult[THR_GLOBALG] += 2000;
   rd->thresh_mult[THR_GLOBALA] += 2000;
-
-  rd->thresh_mult[THR_PAETH] += 1000;
 
   rd->thresh_mult[THR_COMP_NEAREST_NEARESTLA] += 1000;
   rd->thresh_mult[THR_COMP_NEAREST_NEARESTL2A] += 1000;
@@ -1423,15 +1449,6 @@ void av1_set_rd_speed_thresholds(AV1_COMP *cpi) {
   rd->thresh_mult[THR_COMP_NEW_NEWGA2] += 2000;
   rd->thresh_mult[THR_COMP_GLOBAL_GLOBALGA2] += 2500;
 
-  rd->thresh_mult[THR_H_PRED] += 2000;
-  rd->thresh_mult[THR_V_PRED] += 2000;
-  rd->thresh_mult[THR_D135_PRED] += 2500;
-  rd->thresh_mult[THR_D203_PRED] += 2500;
-  rd->thresh_mult[THR_D157_PRED] += 2500;
-  rd->thresh_mult[THR_D67_PRED] += 2500;
-  rd->thresh_mult[THR_D113_PRED] += 2500;
-  rd->thresh_mult[THR_D45_PRED] += 2500;
-
   rd->thresh_mult[THR_COMP_NEAR_NEARLL2] += 1600;
   rd->thresh_mult[THR_COMP_NEAREST_NEWLL2] += 2000;
   rd->thresh_mult[THR_COMP_NEW_NEARESTLL2] += 2000;
@@ -1463,6 +1480,20 @@ void av1_set_rd_speed_thresholds(AV1_COMP *cpi) {
   rd->thresh_mult[THR_COMP_NEW_NEARBA] += 2200;
   rd->thresh_mult[THR_COMP_NEW_NEWBA] += 2400;
   rd->thresh_mult[THR_COMP_GLOBAL_GLOBALBA] += 3200;
+
+  rd->thresh_mult[THR_DC] += 1000;
+  rd->thresh_mult[THR_PAETH] += 1000;
+  rd->thresh_mult[THR_SMOOTH] += 2000;
+  rd->thresh_mult[THR_SMOOTH_V] += 2000;
+  rd->thresh_mult[THR_SMOOTH_H] += 2000;
+  rd->thresh_mult[THR_H_PRED] += 2000;
+  rd->thresh_mult[THR_V_PRED] += 2000;
+  rd->thresh_mult[THR_D135_PRED] += 2500;
+  rd->thresh_mult[THR_D203_PRED] += 2500;
+  rd->thresh_mult[THR_D157_PRED] += 2500;
+  rd->thresh_mult[THR_D67_PRED] += 2500;
+  rd->thresh_mult[THR_D113_PRED] += 2500;
+  rd->thresh_mult[THR_D45_PRED] += 2500;
 }
 
 void av1_set_rd_speed_thresholds_sub8x8(AV1_COMP *cpi) {

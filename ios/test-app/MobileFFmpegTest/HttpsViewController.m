@@ -90,7 +90,7 @@
     }
     
     // HTTPS COMMAND ARGUMENTS
-    NSString* ffmpegCommand = [NSString stringWithFormat:@"-hide_banner -i %@", testUrl];
+    NSString* ffmpegCommand = [NSString stringWithFormat:@"-hide_banner -i %@ -f null -", testUrl];
 
     NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
 

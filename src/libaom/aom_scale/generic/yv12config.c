@@ -106,7 +106,7 @@ int aom_realloc_frame_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
       // This memset is needed for fixing the issue of using uninitialized
       // value in msan test. It will cause a perf loss, so only do this for
       // msan test.
-      memset(ybf->buffer_alloc, 0, (int)frame_size);
+      memset(ybf->buffer_alloc, 0, (size_t)frame_size);
 #endif
 #endif
     } else if (frame_size > (size_t)ybf->buffer_alloc_sz) {

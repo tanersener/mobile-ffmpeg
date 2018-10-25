@@ -471,7 +471,7 @@ typedef struct {
 
 #define MAP(name)                                \
   {                                              \
-    #name, reinterpret_cast < fptr > (c_##name), \
+#name, reinterpret_cast < fptr > (c_##name), \
         reinterpret_cast < fptr > (name)         \
   }
 

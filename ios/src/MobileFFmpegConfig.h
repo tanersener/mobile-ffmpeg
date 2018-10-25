@@ -134,4 +134,18 @@ extern NSString *const LIB_NAME;
  */
 + (void)setFontDirectory: (NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping;
 
+/**
+ * Returns package name.
+ *
+ * \return guessed package name according to supported external libraries
+ */
++ (NSString*)getPackageName;
+
+/**
+ * Returns supported external libraries.
+ *
+ * \return array of supported external libraries
+ */
++ (NSArray*)getExternalLibraries;
+
 @end

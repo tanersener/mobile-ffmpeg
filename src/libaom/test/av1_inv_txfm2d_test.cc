@@ -24,11 +24,11 @@
 #include "test/util.h"
 
 using libaom_test::ACMRandom;
-using libaom_test::InvTxfm2dFunc;
-using libaom_test::LbdInvTxfm2dFunc;
 using libaom_test::bd;
 using libaom_test::compute_avg_abs_error;
 using libaom_test::input_base;
+using libaom_test::InvTxfm2dFunc;
+using libaom_test::LbdInvTxfm2dFunc;
 
 using ::testing::Combine;
 using ::testing::Range;

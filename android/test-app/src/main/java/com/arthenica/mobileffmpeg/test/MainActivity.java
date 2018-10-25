@@ -43,6 +43,7 @@ import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.util.RunCallback;
 import com.arthenica.mobileffmpeg.util.AsynchronousTaskService;
+import com.arthenica.mobileffmpeg.util.RunCallback;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -59,9 +60,10 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "mobile-ffmpeg-test";
 
     public static final int REQUEST_EXTERNAL_STORAGE = 1;
-    public static String[] PERMISSIONS_STORAGE = {
+    public static String[] PERMISSIONS_ALL = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA
     };
 
     protected static final AsynchronousTaskService asynchronousTaskService = new AsynchronousTaskService();
@@ -119,7 +121,19 @@ public class MainActivity extends AppCompatActivity {
         int permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permission != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
-                    PERMISSIONS_STORAGE,
+                    PERMISSIONS_ALL,
+                    REQUEST_EXTERNAL_STORAGE);
+        }
+        permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    PERMISSIONS_ALL,
+                    REQUEST_EXTERNAL_STORAGE);
+        }
+        permission = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    PERMISSIONS_ALL,
                     REQUEST_EXTERNAL_STORAGE);
         }
 
@@ -150,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public Integer call() {
-                int returnCode = FFmpeg.execute(arguments);
+                int returnCode = FFmpeg.execute(arguments, " ");
                 if (runCallback != null) {
                     runCallback.apply(returnCode);
                 }

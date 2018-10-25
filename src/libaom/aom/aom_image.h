@@ -13,8 +13,8 @@
  * \brief Describes the aom image descriptor and associated operations
  *
  */
-#ifndef AOM_AOM_IMAGE_H_
-#define AOM_AOM_IMAGE_H_
+#ifndef AOM_AOM_AOM_IMAGE_H_
+#define AOM_AOM_AOM_IMAGE_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,6 +50,7 @@ typedef enum aom_img_fmt {
   AOM_IMG_FMT_I444 = AOM_IMG_FMT_PLANAR | 6,
   AOM_IMG_FMT_444A = AOM_IMG_FMT_PLANAR | AOM_IMG_FMT_HAS_ALPHA | 6,
   AOM_IMG_FMT_I42016 = AOM_IMG_FMT_I420 | AOM_IMG_FMT_HIGHBITDEPTH,
+  AOM_IMG_FMT_YV1216 = AOM_IMG_FMT_YV12 | AOM_IMG_FMT_HIGHBITDEPTH,
   AOM_IMG_FMT_I42216 = AOM_IMG_FMT_I422 | AOM_IMG_FMT_HIGHBITDEPTH,
   AOM_IMG_FMT_I44416 = AOM_IMG_FMT_I444 | AOM_IMG_FMT_HIGHBITDEPTH,
 } aom_img_fmt_t; /**< alias for enum aom_img_fmt */
@@ -328,4 +329,4 @@ int aom_img_plane_height(const aom_image_t *img, int plane);
 }  // extern "C"
 #endif
 
-#endif  // AOM_AOM_IMAGE_H_
+#endif  // AOM_AOM_AOM_IMAGE_H_

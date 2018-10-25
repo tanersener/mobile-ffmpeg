@@ -35,6 +35,7 @@ function(setup_exports_target)
                             -DAOM_XCODE=${XCODE} -DCONFIG_NAME=$<CONFIG>
                             -DCONFIG_AV1_DECODER=${CONFIG_AV1_DECODER}
                             -DCONFIG_AV1_ENCODER=${CONFIG_AV1_ENCODER}
+                            -DCONFIG_INSPECTION=${CONFIG_INSPECTION}
                             -DENABLE_TESTS=${ENABLE_TESTS} -P
                             "${AOM_ROOT}/build/cmake/generate_exports.cmake"
                     SOURCES ${AOM_EXPORTS_SOURCES}

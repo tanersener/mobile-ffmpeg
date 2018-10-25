@@ -1,0 +1,32 @@
+#!/bin/bash
+#   pdf2png-binary
+#
+#     Rasterizes a PDF file, saving as a set of binary png images
+#
+#     input:  PDF
+#             root name of output files
+#     output: 1 bpp png files for each page
+#
+#   N.B. Requires ghostscript
+
+scriptname=${0##*/}
+
+if test $# != 2
+then
+  echo "usage: " $scriptname " inpdffile outpngroot"
+  exit -1
+fi
+
+inpdffile=$1
+outpngroot=$2
+
+# need mysterious "primer"
+# choose one of the two options below
+
+# output image size depending on resolution
+echo "0 neg 0 neg" translate | gs -sDEVICE=pngmono -sOutputFile=${outpngroot}%03d.png -r300x300 -q - ${inpdffile}
+
+# output fixed image size
+#echo "0 neg 0 neg" translate | gs -sDEVICE=pngmono -sOutputFile=${outpngroot}%03d.png -g2550x3300 -r300x300 -q - ${inpdffile}
+
+

@@ -571,10 +571,10 @@ void aom_upsampled_pred_sse2(MACROBLOCKD *xd, const struct AV1Common *const cm,
     }
   }
 
-  const InterpFilterParams *filter =
-      (subpel_search == 1)
-          ? av1_get_4tap_interp_filter_params(EIGHTTAP_REGULAR)
-          : av1_get_interp_filter_params_with_block_size(EIGHTTAP_REGULAR, 8);
+  const InterpFilterParams *filter = av1_get_filter(subpel_search);
+  // (TODO:yunqing) 2-tap case uses 4-tap functions since there is no SIMD for
+  // 2-tap yet.
+  int filter_taps = (subpel_search <= USE_4_TAPS) ? 4 : SUBPEL_TAPS;
 
   if (!subpel_x_q3 && !subpel_y_q3) {
     if (width >= 16) {
@@ -636,15 +636,18 @@ void aom_upsampled_pred_sse2(MACROBLOCKD *xd, const struct AV1Common *const cm,
         av1_get_interp_filter_subpel_kernel(filter, subpel_x_q3 << 1);
     const int16_t *const kernel_y =
         av1_get_interp_filter_subpel_kernel(filter, subpel_y_q3 << 1);
-    const int intermediate_height =
-        (((height - 1) * 8 + subpel_y_q3) >> 3) + filter->taps;
+    const uint8_t *ref_start = ref - ref_stride * ((filter_taps >> 1) - 1);
+    uint8_t *temp_start_horiz = (subpel_search <= USE_4_TAPS)
+                                    ? temp + (filter_taps >> 1) * MAX_SB_SIZE
+                                    : temp;
+    uint8_t *temp_start_vert = temp + MAX_SB_SIZE * ((filter->taps >> 1) - 1);
+    int intermediate_height =
+        (((height - 1) * 8 + subpel_y_q3) >> 3) + filter_taps;
     assert(intermediate_height <= (MAX_SB_SIZE * 2 + 16) + 16);
-    aom_convolve8_horiz(ref - ref_stride * ((filter->taps >> 1) - 1),
-                        ref_stride, temp, MAX_SB_SIZE, kernel_x, 16, NULL, -1,
-                        width, intermediate_height);
-    aom_convolve8_vert(temp + MAX_SB_SIZE * ((filter->taps >> 1) - 1),
-                       MAX_SB_SIZE, comp_pred, width, NULL, -1, kernel_y, 16,
-                       width, height);
+    aom_convolve8_horiz(ref_start, ref_stride, temp_start_horiz, MAX_SB_SIZE,
+                        kernel_x, 16, NULL, -1, width, intermediate_height);
+    aom_convolve8_vert(temp_start_vert, MAX_SB_SIZE, comp_pred, width, NULL, -1,
+                       kernel_y, 16, width, height);
   }
 }
 
@@ -667,6 +670,23 @@ void aom_comp_avg_upsampled_pred_sse2(
     comp_pred += 16;
     pred += 16;
   }
+}
+
+void aom_comp_mask_upsampled_pred_sse2(
+    MACROBLOCKD *xd, const AV1_COMMON *const cm, int mi_row, int mi_col,
+    const MV *const mv, uint8_t *comp_pred, const uint8_t *pred, int width,
+    int height, int subpel_x_q3, int subpel_y_q3, const uint8_t *ref,
+    int ref_stride, const uint8_t *mask, int mask_stride, int invert_mask,
+    int subpel_search) {
+  if (subpel_x_q3 | subpel_y_q3) {
+    aom_upsampled_pred(xd, cm, mi_row, mi_col, mv, comp_pred, width, height,
+                       subpel_x_q3, subpel_y_q3, ref, ref_stride,
+                       subpel_search);
+    ref = comp_pred;
+    ref_stride = width;
+  }
+  aom_comp_mask_pred(comp_pred, pred, width, height, ref, ref_stride, mask,
+                     mask_stride, invert_mask);
 }
 
 static INLINE __m128i highbd_comp_mask_pred_line_sse2(const __m128i s0,

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_AV1_CONVOLVE_H_
-#define AV1_COMMON_AV1_CONVOLVE_H_
+#ifndef AOM_AV1_COMMON_CONVOLVE_H_
+#define AOM_AV1_COMMON_CONVOLVE_H_
 #include "av1/common/filter.h"
 
 #ifdef __cplusplus
@@ -58,7 +58,7 @@ void av1_convolve_2d_facade(const uint8_t *src, int src_stride, uint8_t *dst,
                             InterpFilters interp_filters, const int subpel_x_q4,
                             int x_step_q4, const int subpel_y_q4, int y_step_q4,
                             int scaled, ConvolveParams *conv_params,
-                            const struct scale_factors *sf);
+                            const struct scale_factors *sf, int is_intrabc);
 
 static INLINE ConvolveParams get_conv_params_no_round(int do_average, int plane,
                                                       CONV_BUF_TYPE *dst,
@@ -115,10 +115,11 @@ void av1_highbd_convolve_2d_facade(const uint8_t *src8, int src_stride,
                                    const int subpel_x_q4, int x_step_q4,
                                    const int subpel_y_q4, int y_step_q4,
                                    int scaled, ConvolveParams *conv_params,
-                                   const struct scale_factors *sf, int bd);
+                                   const struct scale_factors *sf,
+                                   int is_intrabc, int bd);
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_AV1_CONVOLVE_H_
+#endif  // AOM_AV1_COMMON_CONVOLVE_H_

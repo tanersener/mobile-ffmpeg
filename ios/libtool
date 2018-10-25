@@ -142,7 +142,7 @@ DLLTOOL="false"
 sharedlib_from_linklib_cmd="printf %s\\n"
 
 # The archiver.
-AR="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar"
+AR="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar"
 
 # Flags to create an archive.
 AR_FLAGS="cru"
@@ -151,10 +151,10 @@ AR_FLAGS="cru"
 archiver_list_spec=""
 
 # A symbol stripping program.
-STRIP="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip"
+STRIP="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip"
 
 # Commands used to install an old-style archive.
-RANLIB="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib"
+RANLIB="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib"
 old_postinstall_cmds="chmod 644 \$oldlib~\$RANLIB \$tool_oldlib"
 old_postuninstall_cmds=""
 
@@ -162,10 +162,10 @@ old_postuninstall_cmds=""
 lock_old_archive_extraction=yes
 
 # A C compiler.
-LTCC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+LTCC="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 
 # LTCC compiler flags.
-LTCFLAGS="-arch x86_64 -target x86_64-apple-darwin -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc -fstrict-aliasing -DIOS -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk -O2 -Wno-ignored-optimization-argument -mios-simulator-version-min=7.0 -I/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk/usr/include -I/Users/taner/Projects/mobile-ffmpeg/prebuilt/ios-x86_64-apple-darwin/ffmpeg/include"
+LTCFLAGS="-arch x86_64 -target x86_64-apple-darwin -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc -fstrict-aliasing -DIOS -isysroot /Applications/Xcode-v7.3.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator9.3.sdk -O2 -Wno-ignored-optimization-argument -mios-simulator-version-min=7.0 -I/Applications/Xcode-v7.3.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator9.3.sdk/usr/include -I/Users/taner/Projects/mobile-ffmpeg/prebuilt/ios-x86_64-apple-darwin/ffmpeg/include"
 
 # Take the output of nm and produce a listing of raw symbols and C names.
 global_symbol_pipe="sed -n -e 's/^.*[	 ]\\([BCDEGRST][BCDEGRST]*\\)[	 ][	 ]*_\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1 _\\2 \\2/p' | sed '/ __gnu_lto/d'"
@@ -189,7 +189,7 @@ nm_interface="BSD nm"
 nm_file_list_spec=""
 
 # The root where to search for dependent libraries,and where our libraries should be installed.
-lt_sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator12.0.sdk
+lt_sysroot=/Applications/Xcode-v7.3.1.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator9.3.sdk
 
 # Command to truncate a binary pipe.
 lt_truncate_bin="/bin/dd bs=4096 count=1"
@@ -213,7 +213,7 @@ DSYMUTIL="dsymutil"
 NMEDIT="nmedit"
 
 # Tool to manipulate fat objects and archives on Mac OS X.
-LIPO="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo"
+LIPO="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/lipo"
 
 # ldd/readelf like tool for Mach-O binaries on Mac OS X.
 OTOOL="otool"
@@ -282,7 +282,7 @@ finish_eval=""
 hardcode_into_libs=no
 
 # Compile-time system search path for libraries.
-sys_lib_search_path_spec="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0  /usr/local/lib"
+sys_lib_search_path_spec="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/7.3.0  /usr/local/lib"
 
 # Detected run-time system search path for libraries.
 sys_lib_dlsearch_path_spec="/usr/local/lib /lib /usr/lib"
@@ -300,12 +300,12 @@ dlopen_self=unknown
 dlopen_self_static=unknown
 
 # Commands to strip libraries.
-old_striplib="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S"
-striplib="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -x"
+old_striplib="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -S"
+striplib="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -x"
 
 
 # The linker used to build libraries.
-LD="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld"
+LD="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld"
 
 # How to create reloadable object files.
 reload_flag=" -r"
@@ -315,7 +315,7 @@ reload_cmds="\$LTCC \$LTCFLAGS -nostdlib \$wl-r -o \$output\$reload_objs"
 old_archive_cmds="\$AR \$AR_FLAGS \$oldlib\$oldobjs~\$RANLIB \$tool_oldlib"
 
 # A language specific compiler.
-CC="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+CC="/Applications/Xcode-v7.3.1.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 
 # Is the compiler the GNU compiler?
 with_gcc=yes

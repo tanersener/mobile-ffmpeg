@@ -214,3 +214,32 @@ FcHashTableReplace (FcHashTable *table,
 {
     return FcHashTableAddInternal (table, key, value, FcTrue);
 }
+
+FcBool
+FcHashTableRemove (FcHashTable *table,
+		   void        *key)
+{
+    FcHashBucket **prev, *bucket;
+    FcChar32 hash = table->hash_func (key);
+    FcBool ret = FcFalse;
+
+retry:
+    for (prev = &table->buckets[hash % FC_HASH_SIZE];
+	 (bucket = fc_atomic_ptr_get (prev)); prev = &(bucket->next))
+    {
+	if (!table->compare_func (bucket->key, key))
+	{
+	    if (!fc_atomic_ptr_cmpexch (prev, bucket, bucket->next))
+		goto retry;
+	    if (table->key_destroy_func)
+		table->key_destroy_func (bucket->key);
+	    if (table->value_destroy_func)
+		table->value_destroy_func (bucket->value);
+	    free (bucket);
+	    ret = FcTrue;
+	    break;
+	}
+    }
+
+    return ret;
+}

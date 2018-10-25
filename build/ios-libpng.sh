@@ -35,6 +35,7 @@ set_toolchain_clang_paths ${LIB_NAME}
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
+export CPPFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 

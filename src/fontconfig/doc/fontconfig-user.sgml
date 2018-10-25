@@ -589,9 +589,9 @@ This is an example of a system-wide configuration file
 	Names not including any well known alias are given 'sans-serif'
 --&gt;
 &lt;match target="pattern"&gt;
-	&lt;test qual="all" name="family" mode="not_eq"&gt;&lt;string&gt;sans-serif&lt;/string&gt;&lt;/test&gt;
-	&lt;test qual="all" name="family" mode="not_eq"&gt;&lt;string&gt;serif&lt;/string&gt;&lt;/test&gt;
-	&lt;test qual="all" name="family" mode="not_eq"&gt;&lt;string&gt;monospace&lt;/string&gt;&lt;/test&gt;
+	&lt;test qual="all" name="family" compare="not_eq"&gt;&lt;string&gt;sans-serif&lt;/string&gt;&lt;/test&gt;
+	&lt;test qual="all" name="family" compare="not_eq"&gt;&lt;string&gt;serif&lt;/string&gt;&lt;/test&gt;
+	&lt;test qual="all" name="family" compare="not_eq"&gt;&lt;string&gt;monospace&lt;/string&gt;&lt;/test&gt;
 	&lt;edit name="family" mode="append_last"&gt;&lt;string&gt;sans-serif&lt;/string&gt;&lt;/edit&gt;
 &lt;/match&gt;
 
@@ -653,7 +653,7 @@ This is an example of a system-wide configuration file
 	add 'monospace' as the alternative
 --&gt;
 &lt;match target="pattern"&gt;
-	&lt;test name="family" mode="eq"&gt;
+	&lt;test name="family" compare="eq"&gt;
 		&lt;string&gt;Courier New&lt;/string&gt;
 	&lt;/test&gt;
 	&lt;edit name="family" mode="prepend"&gt;
@@ -661,7 +661,7 @@ This is an example of a system-wide configuration file
 	&lt;/edit&gt;
 &lt;/match&gt;
 &lt;match target="pattern"&gt;
-	&lt;test name="family" mode="eq"&gt;
+	&lt;test name="family" compare="eq"&gt;
 		&lt;string&gt;Courier&lt;/string&gt;
 	&lt;/test&gt;
 	&lt;edit name="family" mode="prepend"&gt;
@@ -783,6 +783,10 @@ is used to override the default configuration file.
 is used to override the default configuration directory.
   </para>
   <para>
+<emphasis>FONTCONFIG_SYSROOT</emphasis>
+is used to set a default sysroot directory.
+  </para>
+  <para>
 <emphasis>FC_DEBUG</emphasis>
 is used to output the detailed debugging messages. see <link linkend="debug">Debugging Applications</link> section for more details.
   </para>
@@ -798,10 +802,14 @@ is used to specify the default language as the weak binding in the query. if thi
 <emphasis>FONTCONFIG_USE_MMAP</emphasis>
 is used to control the use of mmap(2) for the cache files if available. this take a boolean value. fontconfig will checks if the cache files are stored on the filesystem that is safe to use mmap(2). explicitly setting this environment variable will causes skipping this check and enforce to use or not use mmap(2) anyway.
   </para>
+  <para>
+<emphasis>SOURCE_DATE_EPOCH</emphasis>
+is used to ensure <literal>fc-cache(1)</literal> generates files in a deterministic manner in order to support reproducible builds. When set to a numeric representation of UNIX timestamp, fontconfig will prefer this value over using the modification timestamps of the input files in order to identify which cache files require regeneration. If <literal>SOURCE_DATE_EPOCH</literal> is not set (or is newer than the mtime of the directory), the existing behaviour is unchanged.
+  </para>
 </refsect1>
 <refsect1><title>See Also</title>
   <para>
-fc-cat(1), fc-cache(1), fc-list(1), fc-match(1), fc-query(1)
+fc-cat(1), fc-cache(1), fc-list(1), fc-match(1), fc-query(1), <ulink url="https://reproducible-builds.org/specs/source-date-epoch/">SOURCE_DATE_EPOCH</ulink>.
   </para>
 </refsect1>
 <refsect1><title>Version</title>

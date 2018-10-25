@@ -41,6 +41,7 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <string.h>
+#include <locale.h>
 
 #if defined (_WIN32)
 #define STRICT
@@ -302,6 +303,7 @@ main (int argc, char **argv)
 #if HAVE_GETOPT_LONG || HAVE_GETOPT
     int		c;
 
+    setlocale (LC_ALL, "");
 #if HAVE_GETOPT_LONG
     while ((c = getopt_long (argc, argv, "Efrsy:Vvh", longopts, NULL)) != -1)
 #else

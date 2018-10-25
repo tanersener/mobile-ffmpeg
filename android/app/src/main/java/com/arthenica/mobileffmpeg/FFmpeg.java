@@ -21,6 +21,8 @@ package com.arthenica.mobileffmpeg;
 
 import android.util.Log;
 
+import java.util.Arrays;
+
 /**
  * <p>Main class for FFmpeg operations. Provides {@link #execute(String...)} method to execute
  * FFmpeg commands.
@@ -38,6 +40,10 @@ public class FFmpeg {
 
     public static final int RETURN_CODE_CANCEL = 255;
 
+    private static int lastReturnCode = 0;
+
+    private static StringBuffer lastCommandOutput = new StringBuffer();
+
     static {
         AbiDetect.class.getName();
         Config.class.getName();
@@ -47,6 +53,15 @@ public class FFmpeg {
      * Default constructor hidden.
      */
     private FFmpeg() {
+    }
+
+    /**
+     * <p>Appends given log output to the last command output.
+     *
+     * @param output log output
+     */
+    static void appendCommandOutput(final String output) {
+        lastCommandOutput.append(output);
     }
 
     /**
@@ -74,26 +89,94 @@ public class FFmpeg {
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
     public static int execute(final String[] arguments) {
-        return Config.nativeExecute(arguments);
+        lastCommandOutput = new StringBuffer();
+
+        lastReturnCode = Config.nativeExecute(arguments);
+
+        return lastReturnCode;
     }
 
     /**
-     * <p>Synchronously executes FFmpeg with arguments provided.
+     * <p>Synchronously executes FFmpeg command provided. Command is split into arguments using
+     * provided delimiter.
      *
-     * @param arguments FFmpeg command options/arguments in one string
+     * @param command   FFmpeg command
+     * @param delimiter delimiter used between arguments
+     * @return zero on successful execution, 255 on user cancel and non-zero on error
+     * @since 3.0
+     */
+    public static int execute(final String command, final String delimiter) {
+        return execute((command == null) ? new String[]{""} : command.split(delimiter));
+    }
+
+    /**
+     * <p>Synchronously executes FFmpeg command provided. Space character is used to split command
+     * into arguments.
+     *
+     * @param command FFmpeg command
      * @return zero on successful execution, 255 on user cancel and non-zero on error
      */
-    public static int execute(final String arguments) {
-        return execute((arguments == null) ? new String[]{""} : arguments.split(" "));
+    public static int execute(final String command) {
+        return execute(command, " ");
     }
 
     /**
-     * <p>Cancels an ongoing operation.
-     *
-     * <p>This function does not wait for termination to complete and returns immediately.
+     * <p>Cancels an ongoing operation. This function does not wait for termination to complete and
+     * returns immediately.
      */
     public static void cancel() {
         Config.nativeCancel();
+    }
+
+    /**
+     * <p>Returns return code of last executed command.
+     *
+     * @return return code of last executed command
+     * @since 3.0
+     */
+    public static int getLastReturnCode() {
+        return lastReturnCode;
+    }
+
+    /**
+     * <p>Returns log output of last executed command. Please note that disabling redirection using
+     * {@link Config#disableRedirection()} method also disables this functionality.
+     *
+     * @return output of last executed command
+     * @since 3.0
+     */
+    public static String getLastCommandOutput() {
+        return lastCommandOutput.toString();
+    }
+
+    /**
+     * <p>Returns media information for given file.
+     *
+     * @param path path or uri of media file
+     * @return media information
+     * @since 3.0
+     */
+    public static MediaInformation getMediaInformation(final String path) {
+        return getMediaInformation(path, 10000L);
+    }
+
+    /**
+     * <p>Returns media information for given file.
+     *
+     * @param path    path or uri of media file
+     * @param timeout complete timeout
+     * @return media information
+     * @since 3.0
+     */
+    public static MediaInformation getMediaInformation(final String path, final Long timeout) {
+        int rc = Config.systemExecute(new String[]{"-v", "info", "-hide_banner", "-i", path, "-f", "null", "-"}, Arrays.asList("Press [q] to stop, [?] for help", "No such file or directory", "Input/output error", "Conversion failed"), timeout);
+
+        if (rc == 0) {
+            return MediaInformationParser.from(Config.getSystemCommandOutput());
+        } else {
+            Log.i(Config.TAG, Config.getSystemCommandOutput());
+            return null;
+        }
     }
 
 }

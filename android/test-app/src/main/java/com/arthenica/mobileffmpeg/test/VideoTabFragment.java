@@ -38,11 +38,12 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.arthenica.mobileffmpeg.Config;
+import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
-import com.arthenica.mobileffmpeg.util.RunCallback;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
+import com.arthenica.mobileffmpeg.util.RunCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,6 +85,7 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
                     @Override
                     public void onClick(View v) {
                         encodeVideo();
+                        // encodeWebp();
                     }
                 });
             }
@@ -213,6 +215,28 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
         }
     }
 
+    protected void encodeWebp() {
+        final File imageFile = new File(mainActivity.getCacheDir(), "colosseum.jpg");
+        final File outputFile = new File(mainActivity.getFilesDir(), "video.webp");
+
+        try {
+            mainActivity.resourceToFile(R.drawable.colosseum, imageFile);
+
+            Log.d(TAG, "Testing VIDEO encoding with 'webp' codec");
+
+            final String ffmpegCommand = String.format("-hide_banner -i %s %s", imageFile.getAbsolutePath(), outputFile.getAbsolutePath());
+
+            Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+
+            int returnCode = FFmpeg.execute(ffmpegCommand);
+
+            Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+        } catch (IOException e) {
+            Log.e(TAG, "Encode webp failed", e);
+            Popup.show(mainActivity, "Encode webp failed");
+        }
+    }
+
     protected void playVideo() {
         MediaController mediaController = new MediaController(mainActivity);
         mediaController.setAnchorView(videoView);
@@ -238,6 +262,8 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
     }
 
     public String getSelectedVideoCodec() {
+
+        // NOTE THAT MPEG4 CODEC IS ASSIGNED HERE
         String videoCodec = selectedCodec;
 
         // VIDEO CODEC SPINNER HAS BASIC NAMES, FFMPEG NEEDS LONGER AND EXACT CODEC NAMES.
@@ -320,6 +346,8 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
             case "hap":
                 return "-format hap_q ";
             default:
+
+                // mpeg4, x264, xvid
                 return "";
         }
     }

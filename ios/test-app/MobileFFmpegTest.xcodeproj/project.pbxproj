@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		340FABBE2115A17600B33CE7 /* VidStabViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 340FABBC2115A17600B33CE7 /* VidStabViewController.h */; };
 		340FABBF2115A17600B33CE7 /* VidStabViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 340FABBD2115A17600B33CE7 /* VidStabViewController.m */; };
+		3423D267217F7CC100C3C7ED /* MediaInformationParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3423D266217F7CC100C3C7ED /* MediaInformationParserTests.m */; };
+		3423D269217F7D4E00C3C7ED /* MediaInformationParserTests.h in Headers */ = {isa = PBXBuildFile; fileRef = 3423D268217F7D4E00C3C7ED /* MediaInformationParserTests.h */; };
 		343E66B5210784BD00F95E5B /* HttpsViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E66B3210784BD00F95E5B /* HttpsViewController.h */; };
 		343E66B6210784BD00F95E5B /* HttpsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 343E66B4210784BD00F95E5B /* HttpsViewController.m */; };
 		343E66B9210789DE00F95E5B /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E66B7210789DE00F95E5B /* Constants.h */; };
@@ -24,22 +26,6 @@
 		348439EE20B2EFAF001A3990 /* tajmahal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EB20B2EFAF001A3990 /* tajmahal.jpg */; };
 		348439EF20B2EFAF001A3990 /* colosseum.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EC20B2EFAF001A3990 /* colosseum.jpg */; };
 		34BB547C2109D44800606B7C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB547B2109D44800606B7C /* Constants.m */; };
-		34D26CE7210F5CA4005B3A32 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CDF210F5CA4005B3A32 /* libavutil.framework */; };
-		34D26CE8210F5CA4005B3A32 /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE0210F5CA4005B3A32 /* libswscale.framework */; };
-		34D26CE9210F5CA4005B3A32 /* libavfilter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE1210F5CA4005B3A32 /* libavfilter.framework */; };
-		34D26CEA210F5CA4005B3A32 /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */; };
-		34D26CEB210F5CA4005B3A32 /* libavcodec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE3210F5CA4005B3A32 /* libavcodec.framework */; };
-		34D26CEC210F5CA4005B3A32 /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE4210F5CA4005B3A32 /* libavdevice.framework */; };
-		34D26CED210F5CA4005B3A32 /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE5210F5CA4005B3A32 /* libavformat.framework */; };
-		34D26CEE210F5CA4005B3A32 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE6210F5CA4005B3A32 /* libswresample.framework */; };
-		34D26CEF210F5D2C005B3A32 /* libavcodec.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE3210F5CA4005B3A32 /* libavcodec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34D26CF0210F5D2C005B3A32 /* libavdevice.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE4210F5CA4005B3A32 /* libavdevice.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34D26CF1210F5D2C005B3A32 /* libavfilter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE1210F5CA4005B3A32 /* libavfilter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34D26CF2210F5D2C005B3A32 /* libavformat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE5210F5CA4005B3A32 /* libavformat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34D26CF3210F5D2C005B3A32 /* libavutil.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CDF210F5CA4005B3A32 /* libavutil.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34D26CF4210F5D2C005B3A32 /* libswresample.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE6210F5CA4005B3A32 /* libswresample.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34D26CF5210F5D2C005B3A32 /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE0210F5CA4005B3A32 /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34D26CF6210F5D2C005B3A32 /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34DC789B21215B5800C3486C /* truenorg.otf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789721215B5800C3486C /* truenorg.otf */; };
 		34DC789C21215B5800C3486C /* subtitle.srt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789821215B5800C3486C /* subtitle.srt */; };
 		34DC789D21215B5800C3486C /* doppioone_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789921215B5800C3486C /* doppioone_regular.ttf */; };
@@ -79,6 +65,8 @@
 		09762EB4030C758C5727BD68 /* Pods-MobileFFmpegTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobileFFmpegTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest.debug.xcconfig"; sourceTree = "<group>"; };
 		340FABBC2115A17600B33CE7 /* VidStabViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VidStabViewController.h; sourceTree = "<group>"; };
 		340FABBD2115A17600B33CE7 /* VidStabViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VidStabViewController.m; sourceTree = "<group>"; };
+		3423D266217F7CC100C3C7ED /* MediaInformationParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaInformationParserTests.m; sourceTree = "<group>"; };
+		3423D268217F7D4E00C3C7ED /* MediaInformationParserTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaInformationParserTests.h; sourceTree = "<group>"; };
 		343E66B3210784BD00F95E5B /* HttpsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpsViewController.h; sourceTree = "<group>"; };
 		343E66B4210784BD00F95E5B /* HttpsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpsViewController.m; sourceTree = "<group>"; };
 		343E66B7210789DE00F95E5B /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
@@ -94,14 +82,6 @@
 		348439EB20B2EFAF001A3990 /* tajmahal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tajmahal.jpg; sourceTree = "<group>"; };
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
 		34BB547B2109D44800606B7C /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
-		34D26CDF210F5CA4005B3A32 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavutil.framework; path = "../../prebuilt/ios-framework/libavutil.framework"; sourceTree = "<group>"; };
-		34D26CE0210F5CA4005B3A32 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswscale.framework; path = "../../prebuilt/ios-framework/libswscale.framework"; sourceTree = "<group>"; };
-		34D26CE1210F5CA4005B3A32 /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavfilter.framework; path = "../../prebuilt/ios-framework/libavfilter.framework"; sourceTree = "<group>"; };
-		34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = mobileffmpeg.framework; path = "../../prebuilt/ios-framework/mobileffmpeg.framework"; sourceTree = "<group>"; };
-		34D26CE3210F5CA4005B3A32 /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavcodec.framework; path = "../../prebuilt/ios-framework/libavcodec.framework"; sourceTree = "<group>"; };
-		34D26CE4210F5CA4005B3A32 /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavdevice.framework; path = "../../prebuilt/ios-framework/libavdevice.framework"; sourceTree = "<group>"; };
-		34D26CE5210F5CA4005B3A32 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libavformat.framework; path = "../../prebuilt/ios-framework/libavformat.framework"; sourceTree = "<group>"; };
-		34D26CE6210F5CA4005B3A32 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libswresample.framework; path = "../../prebuilt/ios-framework/libswresample.framework"; sourceTree = "<group>"; };
 		34DC789721215B5800C3486C /* truenorg.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = truenorg.otf; sourceTree = "<group>"; };
 		34DC789821215B5800C3486C /* subtitle.srt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = subtitle.srt; sourceTree = "<group>"; };
 		34DC789921215B5800C3486C /* doppioone_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = doppioone_regular.ttf; sourceTree = "<group>"; };
@@ -127,14 +107,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34D26CE7210F5CA4005B3A32 /* libavutil.framework in Frameworks */,
-				34D26CEC210F5CA4005B3A32 /* libavdevice.framework in Frameworks */,
-				34D26CE9210F5CA4005B3A32 /* libavfilter.framework in Frameworks */,
-				34D26CE8210F5CA4005B3A32 /* libswscale.framework in Frameworks */,
-				34D26CEB210F5CA4005B3A32 /* libavcodec.framework in Frameworks */,
-				34D26CEE210F5CA4005B3A32 /* libswresample.framework in Frameworks */,
-				34D26CEA210F5CA4005B3A32 /* mobileffmpeg.framework in Frameworks */,
-				34D26CED210F5CA4005B3A32 /* libavformat.framework in Frameworks */,
 				8A776E4D8F4EB85888ADFB99 /* Pods_MobileFFmpegTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -159,14 +131,6 @@
 		3498DC65209F7F1C005F5883 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				34D26CE3210F5CA4005B3A32 /* libavcodec.framework */,
-				34D26CE4210F5CA4005B3A32 /* libavdevice.framework */,
-				34D26CE1210F5CA4005B3A32 /* libavfilter.framework */,
-				34D26CE5210F5CA4005B3A32 /* libavformat.framework */,
-				34D26CDF210F5CA4005B3A32 /* libavutil.framework */,
-				34D26CE6210F5CA4005B3A32 /* libswresample.framework */,
-				34D26CE0210F5CA4005B3A32 /* libswscale.framework */,
-				34D26CE2210F5CA4005B3A32 /* mobileffmpeg.framework */,
 				F4B824D376F9CD476C761D40 /* Pods_MobileFFmpegTest.framework */,
 			);
 			name = Frameworks;
@@ -205,20 +169,31 @@
 				34FAE219209F7DDD005CE2AE /* VideoViewController.h */,
 				340FABBC2115A17600B33CE7 /* VidStabViewController.h */,
 				34FAE214209F7DDD005CE2AE /* AppDelegate.m */,
-				3457454A2113B8AD00059043 /* AudioViewController.m */,
-				34FAE217209F7DDD005CE2AE /* CommandViewController.m */,
-				34BB547B2109D44800606B7C /* Constants.m */,
-				343E66B4210784BD00F95E5B /* HttpsViewController.m */,
-				34FAE225209F7DDE005CE2AE /* main.m */,
-				3457454E2113B8D300059043 /* SubtitleViewController.m */,
-				343E67082107C27600F95E5B /* TabBarController.m */,
-				343E67042107AD0100F95E5B /* Util.m */,
-				34FAE21A209F7DDD005CE2AE /* VideoViewController.m */,
-				340FABBD2115A17600B33CE7 /* VidStabViewController.m */,
-				34FAE224209F7DDE005CE2AE /* Info.plist */,
 				34FAE21F209F7DDE005CE2AE /* Assets.xcassets */,
+				345745492113B8AD00059043 /* AudioViewController.h */,
+				3457454A2113B8AD00059043 /* AudioViewController.m */,
+				34FAE216209F7DDD005CE2AE /* CommandViewController.h */,
+				34FAE217209F7DDD005CE2AE /* CommandViewController.m */,
+				343E66B7210789DE00F95E5B /* Constants.h */,
+				34BB547B2109D44800606B7C /* Constants.m */,
+				343E66B3210784BD00F95E5B /* HttpsViewController.h */,
+				343E66B4210784BD00F95E5B /* HttpsViewController.m */,
+				34FAE224209F7DDE005CE2AE /* Info.plist */,
 				34FAE221209F7DDE005CE2AE /* LaunchScreen.storyboard */,
+				34FAE225209F7DDE005CE2AE /* main.m */,
 				34FAE21C209F7DDD005CE2AE /* Main.storyboard */,
+				3423D268217F7D4E00C3C7ED /* MediaInformationParserTests.h */,
+				3423D266217F7CC100C3C7ED /* MediaInformationParserTests.m */,
+				3457454D2113B8D300059043 /* SubtitleViewController.h */,
+				3457454E2113B8D300059043 /* SubtitleViewController.m */,
+				343E67072107C27600F95E5B /* TabBarController.h */,
+				343E67082107C27600F95E5B /* TabBarController.m */,
+				343E67032107AD0100F95E5B /* Util.h */,
+				343E67042107AD0100F95E5B /* Util.m */,
+				34FAE219209F7DDD005CE2AE /* VideoViewController.h */,
+				34FAE21A209F7DDD005CE2AE /* VideoViewController.m */,
+				340FABBC2115A17600B33CE7 /* VidStabViewController.h */,
+				340FABBD2115A17600B33CE7 /* VidStabViewController.m */,
 			);
 			path = MobileFFmpegTest;
 			sourceTree = "<group>";
@@ -240,6 +215,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				343E67092107C27600F95E5B /* TabBarController.h in Headers */,
+				3423D269217F7D4E00C3C7ED /* MediaInformationParserTests.h in Headers */,
 				3457454B2113B8AD00059043 /* AudioViewController.h in Headers */,
 				3457454F2113B8D300059043 /* SubtitleViewController.h in Headers */,
 				343E66B9210789DE00F95E5B /* Constants.h in Headers */,
@@ -284,6 +260,7 @@
 				TargetAttributes = {
 					34FAE20F209F7DDD005CE2AE = {
 						CreatedOnToolsVersion = 9.3;
+						DevelopmentTeam = 98GD5J4999;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -392,6 +369,7 @@
 				343E66B6210784BD00F95E5B /* HttpsViewController.m in Sources */,
 				340FABBF2115A17600B33CE7 /* VidStabViewController.m in Sources */,
 				34FAE218209F7DDD005CE2AE /* CommandViewController.m in Sources */,
+				3423D267217F7CC100C3C7ED /* MediaInformationParserTests.m in Sources */,
 				343E670A2107C27600F95E5B /* TabBarController.m in Sources */,
 				345745502113B8D300059043 /* SubtitleViewController.m in Sources */,
 				343E67062107AD0100F95E5B /* Util.m in Sources */,
@@ -553,6 +531,7 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobileFFmpegTest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
@@ -579,6 +558,7 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobileFFmpegTest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";

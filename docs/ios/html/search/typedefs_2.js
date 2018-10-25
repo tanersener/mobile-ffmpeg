@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['inputfile',['InputFile',['../d7/db3/fftools__ffmpeg_8h.html#a15608b42bebfa7f2ff3c2b1bb954ef9e',1,'fftools_ffmpeg.h']]],
-  ['inputfilter',['InputFilter',['../d7/db3/fftools__ffmpeg_8h.html#a7f15ab2494a1f5b90462272363f1442d',1,'fftools_ffmpeg.h']]],
-  ['inputstream',['InputStream',['../d7/db3/fftools__ffmpeg_8h.html#a2b82ad544823d6f3a67af9a15ff39d1a',1,'fftools_ffmpeg.h']]]
+  ['hwaccel',['HWAccel',['../d7/db3/fftools__ffmpeg_8h.html#a96720136f649fc28df776bb2d92498cb',1,'fftools_ffmpeg.h']]],
+  ['hwdevice',['HWDevice',['../d7/db3/fftools__ffmpeg_8h.html#ae0c9e39ef069133b116f0ce01796f4fa',1,'fftools_ffmpeg.h']]]
 ];

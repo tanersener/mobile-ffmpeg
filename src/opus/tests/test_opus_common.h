@@ -64,6 +64,8 @@ static opus_uint32 iseed;
 
 #ifdef __GNUC__
 __attribute__((noreturn))
+#elif defined(_MSC_VER)
+__declspec(noreturn)
 #endif
 static OPUS_INLINE void _test_failed(const char *file, int line)
 {

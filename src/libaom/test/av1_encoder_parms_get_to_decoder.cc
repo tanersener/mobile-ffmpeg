@@ -95,7 +95,7 @@ class AVxEncoderParmsGetToDecoder
 
   virtual void PreEncodeFrameHook(::libaom_test::VideoSource *video,
                                   ::libaom_test::Encoder *encoder) {
-    if (video->frame() == 1) {
+    if (video->frame() == 0) {
       encoder->Control(AV1E_SET_COLOR_PRIMARIES, encode_parms.color_primaries);
       encoder->Control(AV1E_SET_TRANSFER_CHARACTERISTICS,
                        encode_parms.transfer_characteristics);

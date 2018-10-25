@@ -9,21 +9,31 @@ libmobileffmpeg_la_SOURCES = \
     fftools_ffmpeg_filter.c \
     fftools_ffmpeg_hw.c \
     fftools_ffmpeg_opt.c \
+    MediaInformation.m \
+    MediaInformationParser.m \
     MobileFFmpeg.m \
     MobileFFmpegConfig.m \
     mobileffmpeg_exception.m \
-    Statistics.m
+    Statistics.m \
+    StreamInformation.m
+
+if MOBILEFFMPEG_VIDEOTOOLBOX
+    libmobileffmpeg_la_SOURCES += fftools_ffmpeg_videotoolbox.c
+endif
 
 include_HEADERS = \
     ArchDetect.h \
 	fftools_cmdutils.h \
     fftools_ffmpeg.h \
 	LogDelegate.h \
+	MediaInformation.h \
+	MediaInformationParser.h \
     MobileFFmpeg.h \
     MobileFFmpegConfig.h \
 	mobileffmpeg_exception.h \
 	Statistics.h \
-	StatisticsDelegate.h
+	StatisticsDelegate.h \
+	StreamInformation.h
 
 libmobileffmpeg_la_CFLAGS = $(CFLAGS)
 libmobileffmpeg_la_OBJCFLAGS = $(CFLAGS)

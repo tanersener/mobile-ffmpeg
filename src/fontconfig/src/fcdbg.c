@@ -187,22 +187,21 @@ FcCharSetPrint (const FcCharSet *c)
 void
 FcPatternPrint (const FcPattern *p)
 {
-    int		    i;
-    FcPatternElt   *e;
+    FcPatternIter iter;
 
     if (!p)
     {
 	printf ("Null pattern\n");
 	return;
     }
-    printf ("Pattern has %d elts (size %d)\n", p->num, p->size);
-    for (i = 0; i < p->num; i++)
+    printf ("Pattern has %d elts (size %d)\n", FcPatternObjectCount (p), p->size);
+    FcPatternIterStart (p, &iter);
+    do
     {
-	e = &FcPatternElts(p)[i];
-	printf ("\t%s:", FcObjectName(e->object));
-	FcValueListPrint (FcPatternEltValues(e));
+	printf ("\t%s:", FcPatternIterGetObject (p, &iter));
+	FcValueListPrint (FcPatternIterGetValues (p, &iter));
 	printf ("\n");
-    }
+    } while (FcPatternIterNext (p, &iter));
     printf ("\n");
 }
 

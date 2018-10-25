@@ -378,7 +378,11 @@ static int cuvid_is_buffer_full(AVCodecContext *avctx)
 {
     CuvidContext *ctx = avctx->priv_data;
 
-    return (av_fifo_size(ctx->frame_queue) / sizeof(CuvidParsedFrame)) + 2 > ctx->nb_surfaces;
+    int delay = ctx->cuparseinfo.ulMaxDisplayDelay;
+    if (ctx->deint_mode != cudaVideoDeinterlaceMode_Weave && !ctx->drop_second_field)
+        delay *= 2;
+
+    return (av_fifo_size(ctx->frame_queue) / sizeof(CuvidParsedFrame)) + delay >= ctx->nb_surfaces;
 }
 
 static int cuvid_decode_packet(AVCodecContext *avctx, const AVPacket *avpkt)
@@ -550,12 +554,16 @@ static int cuvid_output_frame(AVCodecContext *avctx, AVFrame *frame)
                     .Height        = avctx->height >> (i ? 1 : 0),
                 };
 
-                ret = CHECK_CU(ctx->cudl->cuMemcpy2D(&cpy));
+                ret = CHECK_CU(ctx->cudl->cuMemcpy2DAsync(&cpy, device_hwctx->stream));
                 if (ret < 0)
                     goto error;
 
                 offset += avctx->height;
             }
+
+            ret = CHECK_CU(ctx->cudl->cuStreamSynchronize(device_hwctx->stream));
+            if (ret < 0)
+                goto error;
         } else if (avctx->pix_fmt == AV_PIX_FMT_NV12 ||
                    avctx->pix_fmt == AV_PIX_FMT_P010 ||
                    avctx->pix_fmt == AV_PIX_FMT_P016) {

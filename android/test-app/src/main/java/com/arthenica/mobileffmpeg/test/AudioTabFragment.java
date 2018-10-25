@@ -25,6 +25,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +78,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
                 @Override
                 public void onClick(View v) {
                     encodeAudio();
+                    // encodeChromaprint();
                 }
             });
             encodeButton.setEnabled(false);
@@ -184,6 +186,20 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
         }, ffmpegCommand);
     }
 
+    protected void encodeChromaprint() {
+        File audioSampleFile = getAudioSampleFile();
+
+        Log.d(TAG, "Testing AUDIO encoding with 'chromaprint' muxer");
+
+        final String ffmpegCommand = String.format("-v quiet -i %s -f chromaprint -fp_format 2 -", audioSampleFile.getAbsolutePath());
+
+        Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
+
+        int returnCode = FFmpeg.execute(ffmpegCommand);
+
+        Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
+    }
+
     public void createAudioSample() {
         android.util.Log.d(TAG, "Creating AUDIO sample before the test.");
 
@@ -192,7 +208,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
             audioSampleFile.delete();
         }
 
-        String ffmpegCommand = String.format("-y -f lavfi -i sine=frequency=1000:duration=5 -c:a pcm_s16le %s", audioSampleFile.getAbsolutePath());
+        String ffmpegCommand = String.format("-hide_banner -y -f lavfi -i sine=frequency=1000:duration=5 -c:a pcm_s16le %s", audioSampleFile.getAbsolutePath());
 
         android.util.Log.d(TAG, String.format("Sample file is created with '%s'", ffmpegCommand));
 
@@ -211,6 +227,9 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
 
         String extension;
         switch (audioCodec) {
+            case "mp2 (twolame)":
+                extension = "mpg";
+                break;
             case "mp3 (liblame)":
             case "mp3 (libshine)":
                 extension = "mp3";
@@ -278,26 +297,28 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
         String audioOutputFile = getAudioOutputFile().getAbsolutePath();
 
         switch (audioCodec) {
+            case "mp2 (twolame)":
+                return String.format("-hide_banner -y -i %s -c:a mp2 -b:a 192k %s", audioSampleFile, audioOutputFile);
             case "mp3 (liblame)":
-                return String.format("-y -i %s -c:a libmp3lame -qscale:a 2 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libmp3lame -qscale:a 2 %s", audioSampleFile, audioOutputFile);
             case "mp3 (libshine)":
-                return String.format("-y -i %s -c:a libshine -qscale:a 2 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libshine -qscale:a 2 %s", audioSampleFile, audioOutputFile);
             case "vorbis":
-                return String.format("-y -i %s -c:a libvorbis -b:a 64k %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libvorbis -b:a 64k %s", audioSampleFile, audioOutputFile);
             case "opus":
-                return String.format("-y -i %s -c:a libopus -b:a 64k -vbr on -compression_level 10 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libopus -b:a 64k -vbr on -compression_level 10 %s", audioSampleFile, audioOutputFile);
             case "amr":
-                return String.format("-y -i %s -ar 8000 -ab 12.2k %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -ar 8000 -ab 12.2k %s", audioSampleFile, audioOutputFile);
             case "ilbc":
-                return String.format("-y -i %s -c:a ilbc -ar 8000 -b:a 15200 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a ilbc -ar 8000 -b:a 15200 %s", audioSampleFile, audioOutputFile);
             case "speex":
-                return String.format("-y -i %s -c:a libspeex -ar 16000 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a libspeex -ar 16000 %s", audioSampleFile, audioOutputFile);
             case "wavpack":
-                return String.format("-y -i %s -c:a wavpack -b:a 64k %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -c:a wavpack -b:a 64k %s", audioSampleFile, audioOutputFile);
             default:
 
                 // soxr
-                return String.format("-y -i %s -af aresample=resampler=soxr -ar 44100 %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -af aresample=resampler=soxr -ar 44100 %s", audioSampleFile, audioOutputFile);
         }
     }
 
