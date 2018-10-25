@@ -26,22 +26,6 @@
 		348439EE20B2EFAF001A3990 /* tajmahal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EB20B2EFAF001A3990 /* tajmahal.jpg */; };
 		348439EF20B2EFAF001A3990 /* colosseum.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EC20B2EFAF001A3990 /* colosseum.jpg */; };
 		34BB547C2109D44800606B7C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB547B2109D44800606B7C /* Constants.m */; };
-		34C5E89E217F7F86001DCD99 /* libavfilter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E896217F7F86001DCD99 /* libavfilter.framework */; };
-		34C5E89F217F7F86001DCD99 /* libavcodec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E897217F7F86001DCD99 /* libavcodec.framework */; };
-		34C5E8A0217F7F86001DCD99 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E898217F7F86001DCD99 /* libswresample.framework */; };
-		34C5E8A1217F7F86001DCD99 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E899217F7F86001DCD99 /* libavutil.framework */; };
-		34C5E8A2217F7F86001DCD99 /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E89A217F7F86001DCD99 /* libswscale.framework */; };
-		34C5E8A3217F7F86001DCD99 /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E89B217F7F86001DCD99 /* libavformat.framework */; };
-		34C5E8A4217F7F86001DCD99 /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E89C217F7F86001DCD99 /* mobileffmpeg.framework */; };
-		34C5E8A5217F7F86001DCD99 /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E89D217F7F86001DCD99 /* libavdevice.framework */; };
-		34C5E8A6217F7F92001DCD99 /* libavcodec.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E897217F7F86001DCD99 /* libavcodec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34C5E8A7217F7F92001DCD99 /* libavdevice.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E89D217F7F86001DCD99 /* libavdevice.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34C5E8A8217F7F92001DCD99 /* libavfilter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E896217F7F86001DCD99 /* libavfilter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34C5E8A9217F7F92001DCD99 /* libavformat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E89B217F7F86001DCD99 /* libavformat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34C5E8AA217F7F92001DCD99 /* libavutil.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E899217F7F86001DCD99 /* libavutil.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34C5E8AB217F7F92001DCD99 /* libswresample.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E898217F7F86001DCD99 /* libswresample.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34C5E8AC217F7F92001DCD99 /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E89A217F7F86001DCD99 /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34C5E8AD217F7F92001DCD99 /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34C5E89C217F7F86001DCD99 /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34DC789B21215B5800C3486C /* truenorg.otf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789721215B5800C3486C /* truenorg.otf */; };
 		34DC789C21215B5800C3486C /* subtitle.srt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789821215B5800C3486C /* subtitle.srt */; };
 		34DC789D21215B5800C3486C /* doppioone_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789921215B5800C3486C /* doppioone_regular.ttf */; };
@@ -63,14 +47,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				34C5E8A6217F7F92001DCD99 /* libavcodec.framework in Embed Frameworks */,
-				34C5E8A7217F7F92001DCD99 /* libavdevice.framework in Embed Frameworks */,
-				34C5E8A8217F7F92001DCD99 /* libavfilter.framework in Embed Frameworks */,
-				34C5E8A9217F7F92001DCD99 /* libavformat.framework in Embed Frameworks */,
-				34C5E8AA217F7F92001DCD99 /* libavutil.framework in Embed Frameworks */,
-				34C5E8AB217F7F92001DCD99 /* libswresample.framework in Embed Frameworks */,
-				34C5E8AC217F7F92001DCD99 /* libswscale.framework in Embed Frameworks */,
-				34C5E8AD217F7F92001DCD99 /* mobileffmpeg.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -98,14 +74,6 @@
 		348439EB20B2EFAF001A3990 /* tajmahal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tajmahal.jpg; sourceTree = "<group>"; };
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
 		34BB547B2109D44800606B7C /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
-		34C5E896217F7F86001DCD99 /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavfilter.framework; sourceTree = "<group>"; };
-		34C5E897217F7F86001DCD99 /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavcodec.framework; sourceTree = "<group>"; };
-		34C5E898217F7F86001DCD99 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswresample.framework; sourceTree = "<group>"; };
-		34C5E899217F7F86001DCD99 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavutil.framework; sourceTree = "<group>"; };
-		34C5E89A217F7F86001DCD99 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswscale.framework; sourceTree = "<group>"; };
-		34C5E89B217F7F86001DCD99 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavformat.framework; sourceTree = "<group>"; };
-		34C5E89C217F7F86001DCD99 /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = mobileffmpeg.framework; sourceTree = "<group>"; };
-		34C5E89D217F7F86001DCD99 /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavdevice.framework; sourceTree = "<group>"; };
 		34DC789721215B5800C3486C /* truenorg.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = truenorg.otf; sourceTree = "<group>"; };
 		34DC789821215B5800C3486C /* subtitle.srt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = subtitle.srt; sourceTree = "<group>"; };
 		34DC789921215B5800C3486C /* doppioone_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = doppioone_regular.ttf; sourceTree = "<group>"; };
@@ -131,15 +99,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34C5E8A1217F7F86001DCD99 /* libavutil.framework in Frameworks */,
-				34C5E89F217F7F86001DCD99 /* libavcodec.framework in Frameworks */,
-				34C5E8A0217F7F86001DCD99 /* libswresample.framework in Frameworks */,
-				34C5E8A2217F7F86001DCD99 /* libswscale.framework in Frameworks */,
-				34C5E8A5217F7F86001DCD99 /* libavdevice.framework in Frameworks */,
 				8A776E4D8F4EB85888ADFB99 /* Pods_MobileFFmpegTest.framework in Frameworks */,
-				34C5E89E217F7F86001DCD99 /* libavfilter.framework in Frameworks */,
-				34C5E8A3217F7F86001DCD99 /* libavformat.framework in Frameworks */,
-				34C5E8A4217F7F86001DCD99 /* mobileffmpeg.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -163,14 +123,6 @@
 		3498DC65209F7F1C005F5883 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				34C5E897217F7F86001DCD99 /* libavcodec.framework */,
-				34C5E89D217F7F86001DCD99 /* libavdevice.framework */,
-				34C5E896217F7F86001DCD99 /* libavfilter.framework */,
-				34C5E89B217F7F86001DCD99 /* libavformat.framework */,
-				34C5E899217F7F86001DCD99 /* libavutil.framework */,
-				34C5E898217F7F86001DCD99 /* libswresample.framework */,
-				34C5E89A217F7F86001DCD99 /* libswscale.framework */,
-				34C5E89C217F7F86001DCD99 /* mobileffmpeg.framework */,
 				F4B824D376F9CD476C761D40 /* Pods_MobileFFmpegTest.framework */,
 			);
 			name = Frameworks;
