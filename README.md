@@ -8,7 +8,7 @@ FFmpeg for Android and IOS
 - Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports
     - Both Android and IOS
-    - FFmpeg `v3.4.x`, `v4.0.x` and `v4.1-dev` (master) releases
+    - FFmpeg `v3.4.x`, `v4.0.x` and `v4.1-dev-x` (master) releases
     - 27 external libraries
     
         `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`

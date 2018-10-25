@@ -6,7 +6,7 @@ FFmpeg for Android and IOS
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/dev-v3.x/docs/assets/mobile-ffmpeg-logo-v7.png" width="240">
 
 ### 1. Features
-- Supports FFmpeg `v3.4.x`, `v4.0.x` and `v4.1-dev` (master) releases
+- Supports FFmpeg `v3.4.x`, `v4.0.x` and `v4.1-dev-x` (master) releases
 - Use prebuilt binaries available under `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Includes 27 external libraries, 4 GPL libraries and 10 architectures in total
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
