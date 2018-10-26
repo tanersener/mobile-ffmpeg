@@ -259,7 +259,7 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
 
     ```
-    autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison
+    autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen patch
     ```
 Some of these packages are not mandatory for the default build.
 Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Prerequisites) and
