@@ -234,7 +234,7 @@
  *
  * \param average frame rate in fps
  */
-- (void)setAverageFrameRate:(NSString*) averageFrameRatehn;
+- (void)setAverageFrameRate:(NSString*) averageFrameRate;
 
 /**
  * Returns real frame rate.
