@@ -123,7 +123,7 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutpu
 + (int)execute: (NSString*)command delimiter:(NSString*)delimiter {
 
     // SPLITTING ARGUMENTS
-    NSArray* argumentArray = [command componentsSeparatedByString:delimiter];
+    NSArray* argumentArray = [command componentsSeparatedByString:(delimiter == nil ? @" ": delimiter)];
     return [self executeWithArguments:argumentArray];
 }
 

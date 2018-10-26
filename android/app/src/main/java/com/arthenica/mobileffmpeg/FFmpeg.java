@@ -106,7 +106,7 @@ public class FFmpeg {
      * @since 3.0
      */
     public static int execute(final String command, final String delimiter) {
-        return execute((command == null) ? new String[]{""} : command.split(delimiter));
+        return execute((command == null) ? new String[]{""} : command.split((delimiter == null) ? " " : delimiter));
     }
 
     /**
