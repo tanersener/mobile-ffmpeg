@@ -311,7 +311,7 @@
     } else if ([audioCodec isEqualToString:@"opus"]) {
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a libopus -b:a 64k -vbr on -compression_level 10 %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"amr"]) {
-        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -ar 8000 -ab 12.2k %@", audioSampleFile, audioOutputFile];
+        return [NSString stringWithFormat:@"-hide_banner -y -i %@ -ar 8000 -ab 12.2k -c:a libopencore_amrnb %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"ilbc"]) {
         return [NSString stringWithFormat:@"-hide_banner -y -i %@ -c:a ilbc -ar 8000 -b:a 15200 %@", audioSampleFile, audioOutputFile];
     } else if ([audioCodec isEqualToString:@"speex"]) {
