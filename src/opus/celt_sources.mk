@@ -27,7 +27,7 @@ celt/x86/pitch_sse2.c \
 celt/x86/vq_sse2.c
 
 CELT_SOURCES_SSE4_1 = \
-celt/x86/celt_lpc_sse.c \
+celt/x86/celt_lpc_sse4_1.c \
 celt/x86/pitch_sse4_1.c
 
 CELT_SOURCES_ARM = \
@@ -45,5 +45,5 @@ celt/arm/celt_neon_intr.c \
 celt/arm/pitch_neon_intr.c
 
 CELT_SOURCES_ARM_NE10 = \
-celt/arm/celt_ne10_fft.c \
-celt/arm/celt_ne10_mdct.c
+celt/arm/celt_fft_ne10.c \
+celt/arm/celt_mdct_ne10.c
