@@ -47,11 +47,11 @@ if [[ ! -f ${BASEDIR}/src/${LIB_NAME}/configure ]] || [[ ${RECONF_tesseract} -eq
     autoreconf_library ${LIB_NAME}
 fi
 
-export LEPTONICA_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/leptonica/include/leptonica"
-export LEPTONICA_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/leptonica/lib -llept"
+export LEPTONICA_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/leptonica/include/leptonica"
+export LEPTONICA_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/leptonica/lib -llept"
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \

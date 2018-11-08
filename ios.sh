@@ -4,8 +4,9 @@
 ARCH_ARMV7=0
 ARCH_ARMV7S=1
 ARCH_ARM64=2
-ARCH_I386=3
-ARCH_X86_64=4
+ARCH_ARM64E=3
+ARCH_I386=4
+ARCH_X86_64=5
 
 # LIBRARY INDEXES
 LIBRARY_FONTCONFIG=0
@@ -57,7 +58,7 @@ LIBRARY_VIDEOTOOLBOX=45
 LIBRARY_AVFOUNDATION=46
 
 # ENABLE ARCH
-ENABLED_ARCHITECTURES=(1 1 1 1 1)
+ENABLED_ARCHITECTURES=(1 1 1 1 1 1)
 
 # ENABLE LIBRARIES
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -67,10 +68,10 @@ export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 # MIN VERSION IOS7
-export IOS_MIN_VERSION=8.0
+export IOS_MIN_VERSION=9.0
 
 # UPDATE THIS TO 8.0 WHEN GNUTLS IS UPGRADED TO 3.6.x line
-export GNUTLS_IOS_MIN_VERSION=8.0
+export GNUTLS_IOS_MIN_VERSION=9.0
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
@@ -81,10 +82,7 @@ get_mobile_ffmpeg_version() {
 display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
-    echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built \
-without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. \
-Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
-When compilation ends a universal fat binary and an IOS framework is created with enabled architectures inside.\n"
+    echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default six architectures (armv7, armv7s, arm64, arm64e, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends a universal fat binary and an IOS framework is created with enabled architectures inside.\n"
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
@@ -107,6 +105,7 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  --disable-armv7\t\tdo not build armv7 platform [yes]"
     echo -e "  --disable-armv7s\t\tdo not build armv7s platform [yes]"
     echo -e "  --disable-arm64\t\tdo not build arm64 platform [yes]"
+    echo -e "  --disable-arm64e\t\tdo not build arm64e platform [yes]"
     echo -e "  --disable-i386\t\tdo not build i386 platform [yes]"
     echo -e "  --disable-x86-64\t\tdo not build x86-64 platform [yes]\n"
 
@@ -390,6 +389,9 @@ set_arch() {
         arm64)
             ENABLED_ARCHITECTURES[ARCH_ARM64]=$2
         ;;
+        arm64e)
+            ENABLED_ARCHITECTURES[ARCH_ARM64E]=$2
+        ;;
         i386)
             ENABLED_ARCHITECTURES[ARCH_I386]=$2
         ;;
@@ -421,7 +423,7 @@ print_enabled_architectures() {
     echo -n "Architectures: "
 
     let enabled=0;
-    for print_arch in {0..4}
+    for print_arch in {0..5}
     do
         if [[ ${ENABLED_ARCHITECTURES[$print_arch]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -652,7 +654,7 @@ fi
 
 TARGET_ARCH_LIST=()
 
-for run_arch in {0..4}
+for run_arch in {0..5}
 do
     if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
         export ARCH=$(get_arch_name $run_arch)
@@ -661,8 +663,14 @@ do
         export LIPO="$(xcrun --sdk $(get_sdk_name) -f lipo)"
 
         . ${BASEDIR}/build/main-ios.sh "${ENABLED_LIBRARIES[@]}"
-
-        TARGET_ARCH=$(get_target_arch)
+        case ${ARCH} in
+            x86-64)
+                TARGET_ARCH="x86_64"
+            ;;
+            *)
+                TARGET_ARCH="${ARCH}"
+            ;;
+        esac
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS

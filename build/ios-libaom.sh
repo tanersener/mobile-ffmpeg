@@ -49,7 +49,7 @@ case ${ARCH} in
         TOOLCHAIN_FILE="${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/armv7s-ios.cmake"
         ARCH_OPTIONS="-DARCH_ARM=1 -DENABLE_NEON=1 -DHAVE_NEON=1"
     ;;
-    arm64)
+    arm64 | arm64e)
         TOOLCHAIN_FILE="${BASEDIR}/src/${LIB_NAME}/build/cmake/toolchains/arm64-ios.cmake"
         ARCH_OPTIONS="-DARCH_ARM=1 -DENABLE_NEON=1 -DHAVE_NEON=1"
     ;;
@@ -81,7 +81,7 @@ cmake -Wno-dev \
     -DCMAKE_SYSROOT="${SDK_PATH}" \
     -DCMAKE_FIND_ROOT_PATH="${SDK_PATH}" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME}" \
+    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME}" \
     -DCMAKE_CXX_COMPILER="$CXX" \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \

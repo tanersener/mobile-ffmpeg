@@ -112,7 +112,7 @@ set_dependency_rebuilt_flag() {
 
 echo -e "\nBuilding ${ARCH} platform\n"
 echo -e "\nINFO: Starting new build for ${ARCH} at "$(date)"\n" 1>>${BASEDIR}/build.log 2>&1
-INSTALL_BASE="${BASEDIR}/prebuilt/ios-$(get_target_host)"
+INSTALL_BASE="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)"
 
 # CREATING PACKAGE CONFIG DIRECTORY
 PKG_CONFIG_DIRECTORY="${INSTALL_BASE}/pkgconfig"

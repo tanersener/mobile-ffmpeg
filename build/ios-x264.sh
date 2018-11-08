@@ -60,7 +60,7 @@ case ${ARCH} in
 esac
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --enable-pic \
     --sysroot=${SDK_PATH} \
     --enable-static \

@@ -73,7 +73,7 @@ case ${ARCH} in
     ;;
 esac
 
-CONFIGURE_POSTFIX=""
+CONFIGURE_POSTFIX="--disable-autodetect"
 
 for library in {1..43}
 do

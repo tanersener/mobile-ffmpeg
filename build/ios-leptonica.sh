@@ -36,8 +36,8 @@ set_toolchain_clang_paths ${LIB_NAME}
 TARGET_HOST=$(get_target_host)
 export CFLAGS="$(get_cflags ${LIB_NAME})"
 export CXXFLAGS="$(get_cxxflags ${LIB_NAME})"
-export CPPFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/giflib/include"
-export LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${BASEDIR}/prebuilt/ios-$(get_target_host)/giflib/lib -lgif"
+export CPPFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/giflib/include"
+export LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/giflib/lib -lgif"
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
 export LIBPNG_CFLAGS="$(pkg-config --cflags libpng)"
@@ -65,7 +65,7 @@ if [[ ${RECONF_leptonica} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-zlib \
     --with-libpng \
