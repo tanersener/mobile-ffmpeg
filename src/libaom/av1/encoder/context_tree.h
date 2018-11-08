@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_CONTEXT_TREE_H_
-#define AV1_ENCODER_CONTEXT_TREE_H_
+#ifndef AOM_AV1_ENCODER_CONTEXT_TREE_H_
+#define AOM_AV1_ENCODER_CONTEXT_TREE_H_
 
 #include "av1/common/blockd.h"
 #include "av1/encoder/block.h"
@@ -67,11 +67,26 @@ typedef struct {
   int rd_mode_is_ready;  // Flag to indicate whether rd pick mode decision has
                          // been made.
 
+#if CONFIG_ONE_PASS_SVM
+  // Features for one pass svm early term
+  int seg_feat;
+#endif
+
   // motion vector cache for adaptive motion search control in partition
   // search loop
   MV pred_mv[REF_FRAMES];
   InterpFilter pred_interp_filter;
   PARTITION_TYPE partition;
+
+  // Reference and prediction mode cache for ref/mode speedup
+  // TODO(zoeliu@gmail.com): The values of ref_selected and mode_selected will
+  // be explored for further encoder speedup, to differentiate this approach for
+  // setting skip_ref_frame_mask from others. For instance, it is possible that
+  // the underlying square block(s) share the same SIMPLE_TRANSLATION motion
+  // mode as well as the mode of GLOBALMV, more ref/mode combos could be
+  // skipped.
+  MV_REFERENCE_FRAME ref_selected[2];
+  int mode_selected;
 } PICK_MODE_CONTEXT;
 
 typedef struct {
@@ -111,4 +126,4 @@ void av1_copy_tree_context(PICK_MODE_CONTEXT *dst_ctx,
 }  // extern "C"
 #endif
 
-#endif /* AV1_ENCODER_CONTEXT_TREE_H_ */
+#endif  // AOM_AV1_ENCODER_CONTEXT_TREE_H_

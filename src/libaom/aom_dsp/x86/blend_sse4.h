@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_DSP_X86_BLEND_SSE4_H_
-#define AOM_DSP_X86_BLEND_SSE4_H_
+#ifndef AOM_AOM_DSP_X86_BLEND_SSE4_H_
+#define AOM_AOM_DSP_X86_BLEND_SSE4_H_
 
 #include "aom_dsp/blend.h"
 #include "aom_dsp/x86/synonyms.h"
@@ -188,4 +188,4 @@ static INLINE __m128i blend_8_b12(const uint16_t *src0, const uint16_t *src1,
   return v_res_w;
 }
 
-#endif  // AOM_DSP_X86_BLEND_SSE4_H_
+#endif  // AOM_AOM_DSP_X86_BLEND_SSE4_H_

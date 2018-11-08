@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_MCOMP_H_
-#define AV1_ENCODER_MCOMP_H_
+#ifndef AOM_AV1_ENCODER_MCOMP_H_
+#define AOM_AV1_ENCODER_MCOMP_H_
 
 #include "av1/encoder/block.h"
 #include "aom_dsp/variance.h"
@@ -103,7 +103,7 @@ typedef int(fractional_mv_step_fp)(
     int iters_per_step, int *cost_list, int *mvjcost, int *mvcost[2],
     int *distortion, unsigned int *sse1, const uint8_t *second_pred,
     const uint8_t *mask, int mask_stride, int invert_mask, int w, int h,
-    int use_accurate_subpel_search);
+    int use_accurate_subpel_search, const int do_reset_fractional_mv);
 
 extern fractional_mv_step_fp av1_find_best_sub_pixel_tree;
 extern fractional_mv_step_fp av1_find_best_sub_pixel_tree_pruned;
@@ -134,11 +134,11 @@ int av1_full_pixel_search(const struct AV1_COMP *cpi, MACROBLOCK *x,
                           int *cost_list, const MV *ref_mv, int var_max, int rd,
                           int x_pos, int y_pos, int intra);
 
-int av1_obmc_full_pixel_diamond(const struct AV1_COMP *cpi, MACROBLOCK *x,
-                                MV *mvp_full, int step_param, int sadpb,
-                                int further_steps, int do_refine,
-                                const aom_variance_fn_ptr_t *fn_ptr,
-                                const MV *ref_mv, MV *dst_mv, int is_second);
+int av1_obmc_full_pixel_search(const struct AV1_COMP *cpi, MACROBLOCK *x,
+                               MV *mvp_full, int step_param, int sadpb,
+                               int further_steps, int do_refine,
+                               const aom_variance_fn_ptr_t *fn_ptr,
+                               const MV *ref_mv, MV *dst_mv, int is_second);
 int av1_find_best_obmc_sub_pixel_tree_up(
     MACROBLOCK *x, const AV1_COMMON *const cm, int mi_row, int mi_col,
     MV *bestmv, const MV *ref_mv, int allow_hp, int error_per_bit,
@@ -154,8 +154,14 @@ unsigned int av1_refine_warped_mv(const struct AV1_COMP *cpi,
                                   int mi_row, int mi_col, int *pts0,
                                   int *pts_inref0, int total_samples);
 
+static INLINE void av1_set_fractional_mv(int_mv *fractional_best_mv) {
+  for (int z = 0; z < 3; z++) {
+    fractional_best_mv[z].as_int = INVALID_MV;
+  }
+}
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_MCOMP_H_
+#endif  // AOM_AV1_ENCODER_MCOMP_H_

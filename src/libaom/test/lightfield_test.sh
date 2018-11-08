@@ -50,13 +50,14 @@ lightfield_test() {
   # be decoded by an AV1 decoder.
   local bs_decoder="${LIBAOM_BIN_PATH}/lightfield_bitstream_parsing${AOM_TEST_EXE_SUFFIX}"
   local tl_file="${AOM_TEST_OUTPUT_DIR}/vase_tile_list.ivf"
+  local tl_text_file="${LIBAOM_TEST_DATA_PATH}/vase10x10_tiles.txt"
   if [ ! -x "${bs_decoder}" ]; then
     elog "${bs_decoder} does not exist or is not executable."
     return 1
   fi
 
   eval "${AOM_TEST_PREFIX}" "${bs_decoder}" "${lf_file}" "${tl_file}" \
-      "${num_references}" ${devnull}
+      "${num_references}" "${tl_text_file}" ${devnull}
 
   [ -e "${tl_file}" ] || return 1
 
@@ -82,7 +83,7 @@ lightfield_test() {
   fi
 
   eval "${AOM_TEST_PREFIX}" "${ref_decoder}" "${lf_file}" "${tl_reffile}" \
-      "${num_references}" ${devnull}
+      "${num_references}" "${tl_text_file}" ${devnull}
 
   [ -e "${tl_reffile}" ] || return 1
 

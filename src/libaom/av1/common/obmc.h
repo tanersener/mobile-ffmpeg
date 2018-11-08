@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_OBMC_H_
-#define AV1_COMMON_OBMC_H_
+#ifndef AOM_AV1_COMMON_OBMC_H_
+#define AOM_AV1_COMMON_OBMC_H_
 
 typedef void (*overlappable_nb_visitor_t)(MACROBLOCKD *xd, int rel_mi_pos,
                                           uint8_t nb_mi_size,
@@ -88,4 +88,4 @@ static INLINE void foreach_overlappable_nb_left(const AV1_COMMON *cm,
   }
 }
 
-#endif  // AV1_COMMON_OBMC_H_
+#endif  // AOM_AV1_COMMON_OBMC_H_

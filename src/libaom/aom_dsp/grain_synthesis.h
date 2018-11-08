@@ -13,8 +13,8 @@
  * \brief Describes film grain parameters and film grain synthesis
  *
  */
-#ifndef AOM_AOM_GRAIN_SYNTHESIS_H_
-#define AOM_AOM_GRAIN_SYNTHESIS_H_
+#ifndef AOM_AOM_DSP_GRAIN_SYNTHESIS_H_
+#define AOM_AOM_DSP_GRAIN_SYNTHESIS_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -119,4 +119,4 @@ int av1_add_film_grain(const aom_film_grain_t *grain_params,
 }  // extern "C"
 #endif
 
-#endif  // AOM_AOM_GRAIN_SYNTHESIS_H_
+#endif  // AOM_AOM_DSP_GRAIN_SYNTHESIS_H_

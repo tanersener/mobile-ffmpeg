@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_DSP_X86_OBMC_INTRINSIC_SSSE3_H_
-#define AOM_DSP_X86_OBMC_INTRINSIC_SSSE3_H_
+#ifndef AOM_AOM_DSP_X86_OBMC_INTRINSIC_SSSE3_H_
+#define AOM_AOM_DSP_X86_OBMC_INTRINSIC_SSSE3_H_
 
 #include <immintrin.h>
 
@@ -51,4 +51,4 @@ static INLINE __m128i xx_roundn_epi32(__m128i v_val_d, int bits) {
   return _mm_srai_epi32(v_tmp_d, bits);
 }
 
-#endif  // AOM_DSP_X86_OBMC_INTRINSIC_SSSE3_H_
+#endif  // AOM_AOM_DSP_X86_OBMC_INTRINSIC_SSSE3_H_

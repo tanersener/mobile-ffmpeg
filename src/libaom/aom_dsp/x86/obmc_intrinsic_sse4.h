@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_DSP_X86_OBMC_INTRINSIC_SSE4_1_H_
-#define AOM_DSP_X86_OBMC_INTRINSIC_SSE4_1_H_
+#ifndef AOM_AOM_DSP_X86_OBMC_INTRINSIC_SSE4_H_
+#define AOM_AOM_DSP_X86_OBMC_INTRINSIC_SSE4_H_
 
 #include <smmintrin.h>
 
@@ -55,4 +55,4 @@ static INLINE void obmc_variance_w4(const uint8_t *pre, const int pre_stride,
   *sse = xx_hsum_epi32_si32(v_sse_d);
 }
 
-#endif  // AOM_DSP_X86_OBMC_INTRINSIC_SSE4_1_H_
+#endif  // AOM_AOM_DSP_X86_OBMC_INTRINSIC_SSE4_H_

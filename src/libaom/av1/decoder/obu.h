@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_DECODER_OBU_H
-#define AV1_DECODER_OBU_H
+#ifndef AOM_AV1_DECODER_OBU_H_
+#define AOM_AV1_DECODER_OBU_H_
 
 #include "aom/aom_codec.h"
 #include "av1/decoder/decoder.h"
@@ -28,4 +28,4 @@ aom_codec_err_t aom_get_num_layers_from_operating_point_idc(
     int operating_point_idc, unsigned int *num_spatial_layers,
     unsigned int *num_temporal_layers);
 
-#endif
+#endif  // AOM_AV1_DECODER_OBU_H_

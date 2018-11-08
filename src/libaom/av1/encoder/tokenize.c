@@ -32,6 +32,7 @@ static int cost_and_tokenize_map(Av1ColorMapParam *param, TOKENEXTRA **t,
                                  FRAME_COUNTS *counts) {
   const uint8_t *const color_map = param->color_map;
   MapCdf map_cdf = param->map_cdf;
+  MapCdf map_pb_cdf = param->map_pb_cdf;
   ColorCost color_cost = param->color_cost;
   const int plane_block_width = param->plane_width;
   const int rows = param->rows;
@@ -55,7 +56,7 @@ static int cost_and_tokenize_map(Av1ColorMapParam *param, TOKENEXTRA **t,
         this_rate += (*color_cost)[palette_size_idx][color_ctx][color_new_idx];
       } else {
         (*t)->token = color_new_idx;
-        (*t)->color_map_cdf = map_cdf[palette_size_idx][color_ctx];
+        (*t)->color_map_cdf = map_pb_cdf[palette_size_idx][color_ctx];
         ++(*t);
         if (allow_update_cdf)
           update_cdf(map_cdf[palette_size_idx][color_ctx], color_new_idx, n);
@@ -83,6 +84,8 @@ static void get_palette_params(const MACROBLOCK *const x, int plane,
   params->color_map = xd->plane[plane].color_index_map;
   params->map_cdf = plane ? xd->tile_ctx->palette_uv_color_index_cdf
                           : xd->tile_ctx->palette_y_color_index_cdf;
+  params->map_pb_cdf = plane ? x->tile_pb_ctx->palette_uv_color_index_cdf
+                             : x->tile_pb_ctx->palette_y_color_index_cdf;
   params->color_cost =
       plane ? &x->palette_uv_color_cost : &x->palette_y_color_cost;
   params->n_colors = pmi->palette_size[plane];
@@ -125,9 +128,9 @@ void av1_tokenize_color_map(const MACROBLOCK *const x, int plane,
                         counts);
 }
 
-void tokenize_vartx(ThreadData *td, TOKENEXTRA **t, RUN_TYPE dry_run,
-                    TX_SIZE tx_size, BLOCK_SIZE plane_bsize, int blk_row,
-                    int blk_col, int block, int plane, void *arg) {
+static void tokenize_vartx(ThreadData *td, TOKENEXTRA **t, RUN_TYPE dry_run,
+                           TX_SIZE tx_size, BLOCK_SIZE plane_bsize, int blk_row,
+                           int blk_col, int block, int plane, void *arg) {
   MACROBLOCK *const x = &td->mb;
   MACROBLOCKD *const xd = &x->e_mbd;
   MB_MODE_INFO *const mbmi = xd->mi[0];

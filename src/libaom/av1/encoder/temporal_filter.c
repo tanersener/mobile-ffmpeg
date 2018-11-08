@@ -34,6 +34,9 @@
 #include "aom_ports/aom_timer.h"
 #include "aom_scale/aom_scale.h"
 
+#define EDGE_THRESHOLD 50
+#define SQRT_PI_BY_2 1.25331413732
+
 static void temporal_filter_predictors_mb_c(
     MACROBLOCKD *xd, uint8_t *y_mb_ptr, uint8_t *u_mb_ptr, uint8_t *v_mb_ptr,
     int stride, int uv_block_width, int uv_block_height, int mv_row, int mv_col,
@@ -44,7 +47,8 @@ static void temporal_filter_predictors_mb_c(
   int uv_stride;
   // TODO(angiebird): change plane setting accordingly
   ConvolveParams conv_params = get_conv_params(0, 0, xd->bd);
-  const InterpFilters interp_filters = xd->mi[0]->interp_filters;
+  const InterpFilters interp_filters =
+      av1_make_interp_filters(MULTITAP_SHARP, MULTITAP_SHARP);
   WarpTypesAllowed warp_types;
   memset(&warp_types, 0, sizeof(WarpTypesAllowed));
 
@@ -232,9 +236,6 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
 
   av1_set_mv_search_range(&x->mv_limits, &best_ref_mv1);
 
-  x->mvcost = x->mv_cost_stack;
-  x->nmvjointcost = x->nmv_vec_cost;
-
   av1_full_pixel_search(cpi, x, BLOCK_16X16, &best_ref_mv1_full, step_param,
                         NSTEP, 1, sadpb, cond_cost_list(cpi, cost_list),
                         &best_ref_mv1, 0, 0, x_pos, y_pos, 0);
@@ -259,7 +260,7 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
         cpi->common.allow_high_precision_mv, x->errorperbit,
         &cpi->fn_ptr[BLOCK_16X16], 0, mv_sf->subpel_iters_per_step,
         cond_cost_list(cpi, cost_list), NULL, NULL, &distortion, &sse, NULL,
-        NULL, 0, 0, 0, 0, 0);
+        NULL, 0, 0, 16, 16, USE_8_TAPS, 1);
   }
 
   x->e_mbd.mi[0]->mv[0] = x->best_mv;
@@ -274,8 +275,7 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
 static void temporal_filter_iterate_c(AV1_COMP *cpi,
                                       YV12_BUFFER_CONFIG **frames,
                                       int frame_count, int alt_ref_index,
-                                      int strength,
-                                      struct scale_factors *scale) {
+                                      int strength, RefBuffer *ref_buf) {
   const AV1_COMMON *cm = &cpi->common;
   const int num_planes = av1_num_planes(cm);
   int byte;
@@ -305,6 +305,9 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
   } else {
     predictor = predictor8;
   }
+
+  mbd->block_refs[0] = ref_buf;
+  mbd->block_refs[1] = ref_buf;
 
   for (i = 0; i < num_planes; i++) input_buffer[i] = mbd->plane[i].pre[0].buf;
 
@@ -369,7 +372,7 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
               frames[frame]->u_buffer + mb_uv_offset,
               frames[frame]->v_buffer + mb_uv_offset, frames[frame]->y_stride,
               mb_uv_width, mb_uv_height, mbd->mi[0]->mv[0].as_mv.row,
-              mbd->mi[0]->mv[0].as_mv.col, predictor, scale, mb_col * 16,
+              mbd->mi[0]->mv[0].as_mv.col, predictor, &ref_buf->sf, mb_col * 16,
               mb_row * 16, cm->allow_warped_motion, num_planes);
 
           // Apply the filter (YUV)
@@ -493,6 +496,83 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
   for (i = 0; i < num_planes; i++) mbd->plane[i].pre[0].buf = input_buffer[i];
 }
 
+// This is an adaptation of the mehtod in the following paper:
+// Shen-Chuan Tai, Shih-Ming Yang, "A fast method for image noise
+// estimation using Laplacian operator and adaptive edge detection,"
+// Proc. 3rd International Symposium on Communications, Control and
+// Signal Processing, 2008, St Julians, Malta.
+//
+// Return noise estimate, or -1.0 if there was a failure
+static double estimate_noise(const uint8_t *src, int width, int height,
+                             int stride, int edge_thresh) {
+  int64_t sum = 0;
+  int64_t num = 0;
+  for (int i = 1; i < height - 1; ++i) {
+    for (int j = 1; j < width - 1; ++j) {
+      const int k = i * stride + j;
+      // Sobel gradients
+      const int Gx = (src[k - stride - 1] - src[k - stride + 1]) +
+                     (src[k + stride - 1] - src[k + stride + 1]) +
+                     2 * (src[k - 1] - src[k + 1]);
+      const int Gy = (src[k - stride - 1] - src[k + stride - 1]) +
+                     (src[k - stride + 1] - src[k + stride + 1]) +
+                     2 * (src[k - stride] - src[k + stride]);
+      const int Ga = abs(Gx) + abs(Gy);
+      if (Ga < edge_thresh) {  // Smooth pixels
+        // Find Laplacian
+        const int v =
+            4 * src[k] -
+            2 * (src[k - 1] + src[k + 1] + src[k - stride] + src[k + stride]) +
+            (src[k - stride - 1] + src[k - stride + 1] + src[k + stride - 1] +
+             src[k + stride + 1]);
+        sum += abs(v);
+        ++num;
+      }
+    }
+  }
+  // If very few smooth pels, return -1 since the estimate is unreliable
+  if (num < 16) return -1.0;
+
+  const double sigma = (double)sum / (6 * num) * SQRT_PI_BY_2;
+  return sigma;
+}
+
+// Return noise estimate, or -1.0 if there was a failure
+static double highbd_estimate_noise(const uint8_t *src8, int width, int height,
+                                    int stride, int bd, int edge_thresh) {
+  uint16_t *src = CONVERT_TO_SHORTPTR(src8);
+  int64_t sum = 0;
+  int64_t num = 0;
+  for (int i = 1; i < height - 1; ++i) {
+    for (int j = 1; j < width - 1; ++j) {
+      const int k = i * stride + j;
+      // Sobel gradients
+      const int Gx = (src[k - stride - 1] - src[k - stride + 1]) +
+                     (src[k + stride - 1] - src[k + stride + 1]) +
+                     2 * (src[k - 1] - src[k + 1]);
+      const int Gy = (src[k - stride - 1] - src[k + stride - 1]) +
+                     (src[k - stride + 1] - src[k + stride + 1]) +
+                     2 * (src[k - stride] - src[k + stride]);
+      const int Ga = ROUND_POWER_OF_TWO(abs(Gx) + abs(Gy), bd - 8);
+      if (Ga < edge_thresh) {  // Smooth pixels
+        // Find Laplacian
+        const int v =
+            4 * src[k] -
+            2 * (src[k - 1] + src[k + 1] + src[k - stride] + src[k + stride]) +
+            (src[k - stride - 1] + src[k - stride + 1] + src[k + stride - 1] +
+             src[k + stride + 1]);
+        sum += ROUND_POWER_OF_TWO(abs(v), bd - 8);
+        ++num;
+      }
+    }
+  }
+  // If very few smooth pels, return -1 since the estimate is unreliable
+  if (num < 16) return -1.0;
+
+  const double sigma = (double)sum / (6 * num) * SQRT_PI_BY_2;
+  return sigma;
+}
+
 // Apply buffer limits and context specific adjustments to arnr filter.
 static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
                                int *arnr_frames, int *arnr_strength) {
@@ -523,10 +603,38 @@ static void adjust_arnr_filter(AV1_COMP *cpi, int distance, int group_boost,
   else
     q = ((int)av1_convert_qindex_to_q(cpi->rc.avg_frame_qindex[KEY_FRAME],
                                       cpi->common.seq_params.bit_depth));
-  if (q > 16) {
-    strength = oxcf->arnr_strength;
+  MACROBLOCKD *mbd = &cpi->td.mb.e_mbd;
+  struct lookahead_entry *buf = av1_lookahead_peek(cpi->lookahead, distance);
+  double noiselevel;
+  if (mbd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) {
+    noiselevel = highbd_estimate_noise(
+        buf->img.y_buffer, buf->img.y_crop_width, buf->img.y_crop_height,
+        buf->img.y_stride, mbd->bd, EDGE_THRESHOLD);
   } else {
-    strength = oxcf->arnr_strength - ((16 - q) / 2);
+    noiselevel = estimate_noise(buf->img.y_buffer, buf->img.y_crop_width,
+                                buf->img.y_crop_height, buf->img.y_stride,
+                                EDGE_THRESHOLD);
+  }
+  int adj_strength = oxcf->arnr_strength;
+  if (noiselevel > 0) {
+    // Get 4 integer adjustment levels in [-2, 1]
+    int noiselevel_adj;
+    if (noiselevel < 0.75)
+      noiselevel_adj = -2;
+    else if (noiselevel < 1.75)
+      noiselevel_adj = -1;
+    else if (noiselevel < 4.0)
+      noiselevel_adj = 0;
+    else
+      noiselevel_adj = 1;
+    adj_strength += noiselevel_adj;
+  }
+  // printf("[noise level: %g, strength = %d]\n", noiselevel, adj_strength);
+
+  if (q > 16) {
+    strength = adj_strength;
+  } else {
+    strength = adj_strength - ((16 - q) / 2);
     if (strength < 0) strength = 0;
   }
 
@@ -552,19 +660,26 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
   int strength;
   int frames_to_blur_backward;
   int frames_to_blur_forward;
-  struct scale_factors sf;
+  RefBuffer ref_buf;
+  ref_buf.idx = INVALID_IDX;
+  ref_buf.idx = INVALID_IDX;
+  ref_buf.buf = NULL;
+
   YV12_BUFFER_CONFIG *frames[MAX_LAG_BUFFERS] = { NULL };
   const GF_GROUP *const gf_group = &cpi->twopass.gf_group;
+  int rdmult = 0;
 
   // Apply context specific adjustments to the arnr filter parameters.
-  adjust_arnr_filter(cpi, distance, rc->gfu_boost, &frames_to_blur, &strength);
-  // TODO(weitinglin): Currently, we enforce the filtering strength on
-  //                   extra ARFs' to be zeros. We should investigate in which
-  //                   case it is more beneficial to use non-zero strength
-  //                   filtering.
   if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE) {
+    // TODO(weitinglin): Currently, we enforce the filtering strength on
+    //                   extra ARFs' to be zeros. We should investigate in which
+    //                   case it is more beneficial to use non-zero strength
+    //                   filtering.
     strength = 0;
     frames_to_blur = 1;
+  } else {
+    adjust_arnr_filter(cpi, distance, rc->gfu_boost, &frames_to_blur,
+                       &strength);
   }
 
   int which_arf = gf_group->arf_update_idx[gf_group->index];
@@ -593,10 +708,16 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
     // supported.
     // ARF is produced at the native frame size and resized when coded.
     av1_setup_scale_factors_for_frame(
-        &sf, frames[0]->y_crop_width, frames[0]->y_crop_height,
+        &ref_buf.sf, frames[0]->y_crop_width, frames[0]->y_crop_height,
         frames[0]->y_crop_width, frames[0]->y_crop_height);
   }
 
+  // Initialize errorperbit, sadperbit16 and sadperbit4.
+  rdmult = av1_compute_rd_mult_based_on_qindex(cpi, ARNR_FILT_QINDEX);
+  set_error_per_bit(&cpi->td.mb, rdmult);
+  av1_initialize_me_consts(cpi, &cpi->td.mb, ARNR_FILT_QINDEX);
+  av1_initialize_cost_tables(&cpi->common, &cpi->td.mb);
+
   temporal_filter_iterate_c(cpi, frames, frames_to_blur,
-                            frames_to_blur_backward, strength, &sf);
+                            frames_to_blur_backward, strength, &ref_buf);
 }

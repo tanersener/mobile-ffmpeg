@@ -23,7 +23,7 @@
 #define MAX_DEGENERATE_ITER 10
 #define MINPTS_MULTIPLIER 5
 
-#define INLIER_THRESHOLD 1.0
+#define INLIER_THRESHOLD 1.25
 #define MIN_TRIALS 20
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -376,10 +376,7 @@ static int ransac(const int *matched_points, int npoints,
                   IsDegenerateFunc is_degenerate,
                   FindTransformationFunc find_transformation,
                   ProjectPointsDoubleFunc projectpoints) {
-  static const double PROBABILITY_REQUIRED = 0.9;
-  static const double EPS = 1e-12;
-
-  int N = 10000, trial_count = 0;
+  int trial_count = 0;
   int i = 0;
   int ret_val = 0;
 
@@ -444,7 +441,7 @@ static int ransac(const int *matched_points, int npoints,
     *(cnp2++) = *(matched_points++);
   }
 
-  while (N > trial_count) {
+  while (MIN_TRIALS > trial_count) {
     double sum_distance = 0.0;
     double sum_distance_squared = 0.0;
 
@@ -491,8 +488,7 @@ static int ransac(const int *matched_points, int npoints,
 
     if (current_motion.num_inliers >= worst_kept_motion->num_inliers &&
         current_motion.num_inliers > 1) {
-      int temp;
-      double fracinliers, pNoOutliers, mean_distance, dtemp;
+      double mean_distance;
       mean_distance = sum_distance / ((double)current_motion.num_inliers);
       current_motion.variance =
           sum_distance_squared / ((double)current_motion.num_inliers - 1.0) -
@@ -506,21 +502,7 @@ static int ransac(const int *matched_points, int npoints,
         worst_kept_motion->variance = current_motion.variance;
         memcpy(worst_kept_motion->inlier_indices, current_motion.inlier_indices,
                sizeof(*current_motion.inlier_indices) * npoints);
-
         assert(npoints > 0);
-        fracinliers = (double)current_motion.num_inliers / (double)npoints;
-        pNoOutliers = 1 - pow(fracinliers, minpts);
-        pNoOutliers = fmax(EPS, pNoOutliers);
-        pNoOutliers = fmin(1 - EPS, pNoOutliers);
-        dtemp = log(1.0 - PROBABILITY_REQUIRED) / log(pNoOutliers);
-        temp = (dtemp > (double)INT32_MAX)
-                   ? INT32_MAX
-                   : dtemp < (double)INT32_MIN ? INT32_MIN : (int)dtemp;
-
-        if (temp > 0 && temp < N) {
-          N = AOMMAX(temp, MIN_TRIALS);
-        }
-
         // Determine the new worst kept motion and its num_inliers and variance.
         for (i = 0; i < num_desired_motions; ++i) {
           if (is_better_motion(worst_kept_motion, &motions[i])) {

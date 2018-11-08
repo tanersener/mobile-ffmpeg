@@ -70,8 +70,12 @@ if(NOT AOM_TARGET_CPU)
 endif()
 
 if(CMAKE_TOOLCHAIN_FILE) # Add toolchain file to config string.
-  file(RELATIVE_PATH toolchain_path "${AOM_CONFIG_DIR}"
-                     "${CMAKE_TOOLCHAIN_FILE}")
+  if(IS_ABSOLUTE "${CMAKE_TOOLCHAIN_FILE}")
+    file(RELATIVE_PATH toolchain_path "${AOM_CONFIG_DIR}"
+                       "${CMAKE_TOOLCHAIN_FILE}")
+  else()
+    set(toolchain_path "${CMAKE_TOOLCHAIN_FILE}")
+  endif()
   set(toolchain_string "-DCMAKE_TOOLCHAIN_FILE=\\\"${toolchain_path}\\\"")
   set(AOM_CMAKE_CONFIG "${toolchain_string} ${AOM_CMAKE_CONFIG}")
 else()
@@ -252,6 +256,7 @@ if(MSVC)
   endif()
 else()
   require_c_flag("-std=c99" YES)
+  require_cxx_flag_nomsvc("-std=c++11" YES)
   add_compiler_flag_if_supported("-Wall")
   add_compiler_flag_if_supported("-Wdisabled-optimization")
   add_compiler_flag_if_supported("-Wextra")
@@ -260,12 +265,23 @@ else()
   add_compiler_flag_if_supported("-Wlogical-op")
   add_compiler_flag_if_supported("-Wpointer-arith")
   add_compiler_flag_if_supported("-Wsign-compare")
-  add_compiler_flag_if_supported("-Wstack-usage=360000")
   add_compiler_flag_if_supported("-Wstring-conversion")
   add_compiler_flag_if_supported("-Wtype-limits")
   add_compiler_flag_if_supported("-Wuninitialized")
   add_compiler_flag_if_supported("-Wunused")
   add_compiler_flag_if_supported("-Wvla")
+
+  if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND "${SANITIZE}" MATCHES
+     "address|undefined")
+
+    # This combination has more stack overhead, so we account for it by
+    # providing higher stack limit than usual.
+    add_c_flag_if_supported("-Wstack-usage=170000")
+    add_cxx_flag_if_supported("-Wstack-usage=270000")
+  else()
+    add_c_flag_if_supported("-Wstack-usage=100000")
+    add_cxx_flag_if_supported("-Wstack-usage=240000")
+  endif()
 
   # TODO(jzern): this could be added as a cxx flags for test/*.cc only, avoiding
   # third_party.
@@ -276,6 +292,12 @@ else()
 
   # Add -Wundef only for C files to avoid massive gtest warning spam.
   add_c_flag_if_supported("-Wundef")
+
+  # Quiet gcc 6 vs 7 abi warnings:
+  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=77728
+  if("${AOM_TARGET_CPU}" MATCHES "arm")
+    add_cxx_flag_if_supported("-Wno-psabi")
+  endif()
 
   if(ENABLE_WERROR)
     add_compiler_flag_if_supported("-Werror")
@@ -357,13 +379,3 @@ execute_process(COMMAND ${CMAKE_COMMAND} -DAOM_CONFIG_DIR=${AOM_CONFIG_DIR}
                         -DGIT_EXECUTABLE=${GIT_EXECUTABLE}
                         -DPERL_EXECUTABLE=${PERL_EXECUTABLE} -P
                         "${AOM_ROOT}/build/cmake/version.cmake")
-
-if(NOT MSVC) # Generate aom.pc (pkg-config file).
-  execute_process(COMMAND ${CMAKE_COMMAND} -DAOM_CONFIG_DIR=${AOM_CONFIG_DIR}
-                          -DAOM_ROOT=${AOM_ROOT}
-                          -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                          -DCMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
-                          -DCONFIG_MULTITHREAD=${CONFIG_MULTITHREAD}
-                          -DHAVE_PTHREAD_H=${HAVE_PTHREAD_H} -P
-                          "${AOM_ROOT}/build/cmake/pkg_config.cmake")
-endif()

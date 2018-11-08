@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_DECODER_DECODER_H_
-#define AV1_DECODER_DECODER_H_
+#ifndef AOM_AV1_DECODER_DECODER_H_
+#define AOM_AV1_DECODER_DECODER_H_
 
 #include "config/aom_config.h"
 
@@ -55,6 +55,11 @@ typedef struct ThreadData {
   CB_BUFFER cb_buffer_base;
   uint8_t *mc_buf[2];
   int32_t mc_buf_size;
+  int mc_buf_use_highbd;  // Boolean: whether the byte pointers stored in
+                          // mc_buf were converted from highbd pointers.
+
+  CONV_BUF_TYPE *tmp_conv_dst;
+  uint8_t *tmp_obmc_bufs[2];
 
   decode_block_visitor_fn_t read_coeffs_tx_intra_block_visit;
   decode_block_visitor_fn_t predict_and_recon_intra_block_visit;
@@ -92,9 +97,26 @@ typedef struct AV1DecRowMTInfo {
   int tile_cols_end;
   int start_tile;
   int end_tile;
-  int mi_rows_parse_done;
-  int mi_rows_decode_started;
   int mi_rows_to_decode;
+
+  // Invariant:
+  //   mi_rows_parse_done >= mi_rows_decode_started.
+  // mi_rows_parse_done and mi_rows_decode_started are both initialized to 0.
+  // mi_rows_parse_done is incremented freely. mi_rows_decode_started may only
+  // be incremented to catch up with mi_rows_parse_done but is not allowed to
+  // surpass mi_rows_parse_done.
+  //
+  // When mi_rows_decode_started reaches mi_rows_to_decode, there are no more
+  // decode jobs.
+
+  // Indicates the progress of the bit-stream parsing of superblocks.
+  // Initialized to 0. Incremented by sb_mi_size when parse sb row is done.
+  int mi_rows_parse_done;
+  // Indicates the progress of the decoding of superblocks.
+  // Initialized to 0. Incremented by sb_mi_size when decode sb row is started.
+  int mi_rows_decode_started;
+  // Boolean: Initialized to 0 (false). Set to 1 (true) on error to abort
+  // decoding.
   int row_mt_exit;
 } AV1DecRowMTInfo;
 
@@ -147,7 +169,6 @@ typedef struct AV1Decoder {
   // the same.
   RefCntBuffer *cur_buf;  //  Current decoding frame buffer.
 
-  AVxWorker *frame_worker_owner;  // frame_worker that owns this pbi.
   AVxWorker lf_worker;
   AV1LfSync lf_row_sync;
   AV1LrSync lr_row_sync;
@@ -186,7 +207,8 @@ typedef struct AV1Decoder {
   int max_threads;
   int inv_tile_order;
   int need_resync;   // wait for key/intra-only frame.
-  int hold_ref_buf;  // hold the reference buffer.
+  int hold_ref_buf;  // Boolean: whether we are holding reference buffers in
+                     // common.next_ref_frame_map.
 
   int tile_size_bytes;
   int tile_col_size_bytes;
@@ -271,13 +293,19 @@ static INLINE void decrease_ref_count(int idx, RefCntBuffer *const frame_bufs,
                                       BufferPool *const pool) {
   if (idx >= 0) {
     --frame_bufs[idx].ref_count;
+    // Reference counts should never become negative. If this assertion fails,
+    // there is a bug in our reference count management.
+    assert(frame_bufs[idx].ref_count >= 0);
     // A worker may only get a free framebuffer index when calling get_free_fb.
-    // But the private buffer is not set up until finish decoding header.
-    // So any error happens during decoding header, the frame_bufs will not
-    // have valid priv buffer.
+    // But the raw frame buffer is not set up until we finish decoding header.
+    // So if any error happens during decoding header, frame_bufs[idx] will not
+    // have a valid raw frame buffer.
     if (frame_bufs[idx].ref_count == 0 &&
-        frame_bufs[idx].raw_frame_buffer.priv) {
+        frame_bufs[idx].raw_frame_buffer.data) {
       pool->release_fb_cb(pool->cb_priv, &frame_bufs[idx].raw_frame_buffer);
+      frame_bufs[idx].raw_frame_buffer.data = NULL;
+      frame_bufs[idx].raw_frame_buffer.size = 0;
+      frame_bufs[idx].raw_frame_buffer.priv = NULL;
     }
   }
 }
@@ -309,4 +337,4 @@ typedef void (*block_visitor_fn_t)(AV1Decoder *const pbi, ThreadData *const td,
 }  // extern "C"
 #endif
 
-#endif  // AV1_DECODER_DECODER_H_
+#endif  // AOM_AV1_DECODER_DECODER_H_

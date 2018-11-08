@@ -8,9 +8,10 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef TEST_Y4M_VIDEO_SOURCE_H_
-#define TEST_Y4M_VIDEO_SOURCE_H_
+#ifndef AOM_TEST_Y4M_VIDEO_SOURCE_H_
+#define AOM_TEST_Y4M_VIDEO_SOURCE_H_
 #include <algorithm>
+#include <memory>
 #include <string>
 
 #include "common/y4minput.h"
@@ -41,7 +42,8 @@ class Y4mVideoSource : public VideoSource {
 
   virtual void ReadSourceToStart() {
     ASSERT_TRUE(input_file_ != NULL);
-    ASSERT_FALSE(y4m_input_open(&y4m_, input_file_, NULL, 0, 0));
+    ASSERT_FALSE(
+        y4m_input_open(&y4m_, input_file_, NULL, 0, AOM_CSP_UNKNOWN, 0));
     framerate_numerator_ = y4m_.fps_n;
     framerate_denominator_ = y4m_.fps_d;
     frame_ = 0;
@@ -109,7 +111,7 @@ class Y4mVideoSource : public VideoSource {
 
   std::string file_name_;
   FILE *input_file_;
-  testing::internal::scoped_ptr<aom_image_t> img_;
+  std::unique_ptr<aom_image_t> img_;
   unsigned int start_;
   unsigned int limit_;
   unsigned int frame_;
@@ -120,4 +122,4 @@ class Y4mVideoSource : public VideoSource {
 
 }  // namespace libaom_test
 
-#endif  // TEST_Y4M_VIDEO_SOURCE_H_
+#endif  // AOM_TEST_Y4M_VIDEO_SOURCE_H_

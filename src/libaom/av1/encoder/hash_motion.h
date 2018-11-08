@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_HASH_MOTION_H_
-#define AV1_ENCODER_HASH_MOTION_H_
+#ifndef AOM_AV1_ENCODER_HASH_MOTION_H_
+#define AOM_AV1_ENCODER_HASH_MOTION_H_
 
 #include "config/aom_config.h"
 
@@ -75,4 +75,4 @@ void av1_get_block_hash_value(uint8_t *y_src, int stride, int block_size,
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_HASH_MOTION_H_
+#endif  // AOM_AV1_ENCODER_HASH_MOTION_H_

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_RATECTRL_H_
-#define AV1_ENCODER_RATECTRL_H_
+#ifndef AOM_AV1_ENCODER_RATECTRL_H_
+#define AOM_AV1_ENCODER_RATECTRL_H_
 
 #include "aom/aom_codec.h"
 #include "aom/aom_integer.h"
@@ -28,13 +28,25 @@ extern "C" {
 
 #if CONFIG_FIX_GF_LENGTH
 #define FIXED_GF_LENGTH 16
+#define MAX_PYRAMID_LVL 4
+// We allow a frame to have at most two left/right descendants before changing
+// them into to a subtree, i.e., we allow the following structure:
+/*                    OUT_OF_ORDER_FRAME
+                     / /              \ \
+(two left children) F F                F F (two right children) */
+// Therefore the max gf size supported by 4 layer structure is
+// 1 (KEY/OVERLAY) + 1 + 2 + 4 + 16 (two children on both side of their parent)
+#define MAX_PYRAMID_SIZE 24
 #define USE_SYMM_MULTI_LAYER 1
 #define REDUCE_LAST_ALT_BOOST 1
 #define REDUCE_LAST_GF_LENGTH 1
+#define MULTI_LVL_BOOST_VBR_CQ 1
 #else
+#define MAX_PYRAMID_SIZE 16
 #define USE_SYMM_MULTI_LAYER 0
 #define REDUCE_LAST_ALT_BOOST 0
 #define REDUCE_LAST_GF_LENGTH 0
+#define MULTI_LVL_BOOST_VBR_CQ 0
 #endif
 
 #if USE_SYMM_MULTI_LAYER
@@ -251,9 +263,6 @@ int av1_rc_clamp_iframe_target_size(const struct AV1_COMP *const cpi,
                                     int target);
 int av1_rc_clamp_pframe_target_size(const struct AV1_COMP *const cpi,
                                     int target);
-// Utility to set frame_target into the RATE_CONTROL structure
-// This function is called only from the av1_rc_get_..._params() functions.
-void av1_rc_set_frame_target(struct AV1_COMP *cpi, int target);
 
 // Computes a q delta (in "q index" terms) to get from a starting q value
 // to a target q value
@@ -277,8 +286,12 @@ void av1_set_target_rate(struct AV1_COMP *cpi, int width, int height);
 
 int av1_resize_one_pass_cbr(struct AV1_COMP *cpi);
 
+void av1_configure_buffer_updates(struct AV1_COMP *cpi);
+
+void av1_estimate_qp_gop(struct AV1_COMP *cpi);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_RATECTRL_H_
+#endif  // AOM_AV1_ENCODER_RATECTRL_H_

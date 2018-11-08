@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_RDOPT_H_
-#define AV1_ENCODER_RDOPT_H_
+#ifndef AOM_AV1_ENCODER_RDOPT_H_
+#define AOM_AV1_ENCODER_RDOPT_H_
 
 #include "av1/common/blockd.h"
 #include "av1/common/txb_common.h"
@@ -115,7 +115,7 @@ unsigned int av1_high_get_sby_perpixel_variance(const struct AV1_COMP *cpi,
                                                 const struct buf_2d *ref,
                                                 BLOCK_SIZE bs, int bd);
 
-void av1_rd_pick_inter_mode_sb(const struct AV1_COMP *cpi,
+void av1_rd_pick_inter_mode_sb(struct AV1_COMP *cpi,
                                struct TileDataEnc *tile_data,
                                struct macroblock *x, int mi_row, int mi_col,
                                struct RD_STATS *rd_cost, BLOCK_SIZE bsize,
@@ -126,6 +126,28 @@ void av1_rd_pick_inter_mode_sb_seg_skip(
     struct macroblock *x, int mi_row, int mi_col, struct RD_STATS *rd_cost,
     BLOCK_SIZE bsize, PICK_MODE_CONTEXT *ctx, int64_t best_rd_so_far);
 
+/** Returns an integer indicating the strength of the edge.
+ * 0 means no edge found, 556 is the strength of a solid black/white edge,
+ * and the number may range higher if the signal is even stronger (e.g., on a
+ * corner). bd is the bit depth.
+ */
+uint16_t av1_edge_exists(const uint8_t *src, int src_stride, int w, int h,
+                         int bd);
+
+/** Applies a Gaussian blur with sigma = 1.3. Used by av1_edge_exists and
+ * tests.
+ */
+void gaussian_blur(const uint8_t *src, int src_stride, int w, int h,
+                   uint8_t *dst, int bd);
+
+/* Applies standard 3x3 Sobel matrix. */
+typedef struct {
+  int16_t x;
+  int16_t y;
+} sobel_xy;
+
+sobel_xy sobel(const uint8_t *input, int stride, int i, int j, int bd);
+
 #if CONFIG_COLLECT_INTER_MODE_RD_STATS
 void av1_inter_mode_data_init(struct TileDataEnc *tile_data);
 void av1_inter_mode_data_fit(TileDataEnc *tile_data, int rdmult);
@@ -135,4 +157,4 @@ void av1_inter_mode_data_fit(TileDataEnc *tile_data, int rdmult);
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_RDOPT_H_
+#endif  // AOM_AV1_ENCODER_RDOPT_H_

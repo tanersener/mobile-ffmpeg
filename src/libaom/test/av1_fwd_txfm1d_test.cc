@@ -13,12 +13,12 @@
 #include "test/av1_txfm_test.h"
 
 using libaom_test::ACMRandom;
+using libaom_test::input_base;
+using libaom_test::reference_hybrid_1d;
 using libaom_test::TYPE_ADST;
 using libaom_test::TYPE_DCT;
 using libaom_test::TYPE_IDTX;
 using libaom_test::TYPE_TXFM;
-using libaom_test::input_base;
-using libaom_test::reference_hybrid_1d;
 
 namespace {
 const int txfm_type_num = 3;
@@ -56,7 +56,7 @@ TEST(av1_fwd_txfm1d, av1_cospi_arr_data) {
   for (int i = 0; i < 7; i++) {
     for (int j = 0; j < 64; j++) {
       EXPECT_EQ(av1_cospi_arr_data[i][j],
-                (int32_t)round(cos(M_PI * j / 128) * (1 << (cos_bit_min + i))));
+                (int32_t)round(cos(PI * j / 128) * (1 << (cos_bit_min + i))));
     }
   }
 }

@@ -9,6 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
+#include <memory>
+
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 
 #include "av1/encoder/encoder.h"
@@ -125,7 +127,7 @@ class HorzSuperresEndToEndTest
 
   virtual void PreEncodeFrameHook(::libaom_test::VideoSource *video,
                                   ::libaom_test::Encoder *encoder) {
-    if (video->frame() == 1) {
+    if (video->frame() == 0) {
       encoder->Control(AV1E_SET_FRAME_PARALLEL_DECODING, 1);
       encoder->Control(AV1E_SET_TILE_COLUMNS, 4);
 
@@ -152,7 +154,7 @@ class HorzSuperresEndToEndTest
   double GetPsnrThreshold() { return kPSNRThresholds[test_video_idx_]; }
 
   void DoTest() {
-    testing::internal::scoped_ptr<libaom_test::VideoSource> video;
+    std::unique_ptr<libaom_test::VideoSource> video;
     video.reset(new libaom_test::Y4mVideoSource(test_video_param_.filename, 0,
                                                 test_video_param_.limit));
     ASSERT_TRUE(video.get() != NULL);
@@ -248,7 +250,7 @@ class HorzSuperresQThreshEndToEndTest
 
   virtual void PreEncodeFrameHook(::libaom_test::VideoSource *video,
                                   ::libaom_test::Encoder *encoder) {
-    if (video->frame() == 1) {
+    if (video->frame() == 0) {
       encoder->Control(AV1E_SET_FRAME_PARALLEL_DECODING, 1);
       encoder->Control(AV1E_SET_TILE_COLUMNS, 0);
 
@@ -275,7 +277,7 @@ class HorzSuperresQThreshEndToEndTest
   double GetPsnrThreshold() { return kPSNRThresholds[test_video_idx_]; }
 
   void DoTest() {
-    testing::internal::scoped_ptr<libaom_test::VideoSource> video;
+    std::unique_ptr<libaom_test::VideoSource> video;
     video.reset(new libaom_test::Y4mVideoSource(test_video_param_.filename, 0,
                                                 test_video_param_.limit));
     ASSERT_TRUE(video.get() != NULL);

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_ENCODEMB_H_
-#define AV1_ENCODER_ENCODEMB_H_
+#ifndef AOM_AV1_ENCODER_ENCODEMB_H_
+#define AOM_AV1_ENCODER_ENCODEMB_H_
 
 #include "config/aom_config.h"
 
@@ -93,4 +93,4 @@ void av1_encode_intra_block_plane(const struct AV1_COMP *cpi, MACROBLOCK *x,
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_ENCODEMB_H_
+#endif  // AOM_AV1_ENCODER_ENCODEMB_H_

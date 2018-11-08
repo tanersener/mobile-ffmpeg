@@ -944,7 +944,7 @@ void av1_jnt_convolve_x_neon(const uint8_t *src, int src_stride, uint8_t *dst8,
     int16x4_t s8, s9, s10, d1, d2, d3;
     int16x8_t tt1, tt2, tt3;
     uint16x4_t res5, res6, res7;
-    uint32x2_t tu0, tu1;
+    uint32x2_t tu0 = vdup_n_u32(0), tu1 = vdup_n_u32(0);
     int16x8_t u0, u1;
 #else
     int16x4_t temp_0;
@@ -1402,7 +1402,8 @@ void av1_jnt_convolve_y_neon(const uint8_t *src, int src_stride, uint8_t *dst8,
   if ((w == 4) || (h == 4)) {
     int16x4_t s0, s1, s2, s3, s4, s5, s6, s7, d0;
     uint16x4_t res4;
-    uint32x2_t tu0, tu1, tu2, tu3;
+    uint32x2_t tu0 = vdup_n_u32(0), tu1 = vdup_n_u32(0), tu2 = vdup_n_u32(0),
+               tu3 = vdup_n_u32(0);
     int16x8_t u0, u1, u2, u3;
     uint8x8_t t0;
 

@@ -48,9 +48,6 @@ aom_codec_err_t aom_codec_enc_init_ver(aom_codec_ctx_t *ctx,
     res = AOM_CODEC_INCAPABLE;
   else if ((flags & AOM_CODEC_USE_PSNR) && !(iface->caps & AOM_CODEC_CAP_PSNR))
     res = AOM_CODEC_INCAPABLE;
-  else if ((flags & AOM_CODEC_USE_OUTPUT_PARTITION) &&
-           !(iface->caps & AOM_CODEC_CAP_OUTPUT_PARTITION))
-    res = AOM_CODEC_INCAPABLE;
   else {
     ctx->iface = iface;
     ctx->name = iface->name;
@@ -82,9 +79,6 @@ aom_codec_err_t aom_codec_enc_init_multi_ver(
   else if (!(iface->caps & AOM_CODEC_CAP_ENCODER))
     res = AOM_CODEC_INCAPABLE;
   else if ((flags & AOM_CODEC_USE_PSNR) && !(iface->caps & AOM_CODEC_CAP_PSNR))
-    res = AOM_CODEC_INCAPABLE;
-  else if ((flags & AOM_CODEC_USE_OUTPUT_PARTITION) &&
-           !(iface->caps & AOM_CODEC_CAP_OUTPUT_PARTITION))
     res = AOM_CODEC_INCAPABLE;
   else {
     int i;

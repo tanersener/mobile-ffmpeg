@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_QUANTIZE_H_
-#define AV1_ENCODER_QUANTIZE_H_
+#ifndef AOM_AV1_ENCODER_AV1_QUANTIZE_H_
+#define AOM_AV1_ENCODER_AV1_QUANTIZE_H_
 
 #include "config/aom_config.h"
 
@@ -67,7 +67,7 @@ typedef struct {
 
 // The Dequants structure is used only for internal quantizer setup in
 // av1_quantize.c.
-// Fields are sufffixed according to whether or not they're expressed in
+// Fields are suffixed according to whether or not they're expressed in
 // the same coefficient shift/precision as TX or a fixed Q3 format.
 typedef struct {
   DECLARE_ALIGNED(16, int16_t,
@@ -145,4 +145,4 @@ void av1_highbd_quantize_dc_facade(const tran_low_t *coeff_ptr,
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_QUANTIZE_H_
+#endif  // AOM_AV1_ENCODER_AV1_QUANTIZE_H_

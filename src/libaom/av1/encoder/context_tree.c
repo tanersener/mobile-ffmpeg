@@ -16,8 +16,15 @@ static const BLOCK_SIZE square[MAX_SB_SIZE_LOG2 - 1] = {
   BLOCK_4X4, BLOCK_8X8, BLOCK_16X16, BLOCK_32X32, BLOCK_64X64, BLOCK_128X128,
 };
 
+typedef struct {
+  tran_low_t *coeff_buf[MAX_MB_PLANE];
+  tran_low_t *qcoeff_buf[MAX_MB_PLANE];
+  tran_low_t *dqcoeff_buf[MAX_MB_PLANE];
+} PC_TREE_SHARED_BUFFERS;
+
 static void alloc_mode_context(AV1_COMMON *cm, int num_pix,
-                               PICK_MODE_CONTEXT *ctx) {
+                               PICK_MODE_CONTEXT *ctx,
+                               PC_TREE_SHARED_BUFFERS *shared_bufs) {
   const int num_planes = av1_num_planes(cm);
   int i;
   const int num_blk = num_pix / 16;
@@ -25,12 +32,9 @@ static void alloc_mode_context(AV1_COMMON *cm, int num_pix,
 
   CHECK_MEM_ERROR(cm, ctx->blk_skip, aom_calloc(num_blk, sizeof(uint8_t)));
   for (i = 0; i < num_planes; ++i) {
-    CHECK_MEM_ERROR(cm, ctx->coeff[i],
-                    aom_memalign(32, num_pix * sizeof(*ctx->coeff[i])));
-    CHECK_MEM_ERROR(cm, ctx->qcoeff[i],
-                    aom_memalign(32, num_pix * sizeof(*ctx->qcoeff[i])));
-    CHECK_MEM_ERROR(cm, ctx->dqcoeff[i],
-                    aom_memalign(32, num_pix * sizeof(*ctx->dqcoeff[i])));
+    ctx->coeff[i] = shared_bufs->coeff_buf[i];
+    ctx->qcoeff[i] = shared_bufs->qcoeff_buf[i];
+    ctx->dqcoeff[i] = shared_bufs->dqcoeff_buf[i];
     CHECK_MEM_ERROR(cm, ctx->eobs[i],
                     aom_memalign(32, num_blk * sizeof(*ctx->eobs[i])));
     CHECK_MEM_ERROR(
@@ -52,11 +56,8 @@ static void free_mode_context(PICK_MODE_CONTEXT *ctx, const int num_planes) {
   aom_free(ctx->blk_skip);
   ctx->blk_skip = 0;
   for (i = 0; i < num_planes; ++i) {
-    aom_free(ctx->coeff[i]);
     ctx->coeff[i] = 0;
-    aom_free(ctx->qcoeff[i]);
     ctx->qcoeff[i] = 0;
-    aom_free(ctx->dqcoeff[i]);
     ctx->dqcoeff[i] = 0;
     aom_free(ctx->eobs[i]);
     ctx->eobs[i] = 0;
@@ -71,36 +72,37 @@ static void free_mode_context(PICK_MODE_CONTEXT *ctx, const int num_planes) {
 }
 
 static void alloc_tree_contexts(AV1_COMMON *cm, PC_TREE *tree, int num_pix,
-                                int is_leaf) {
-  alloc_mode_context(cm, num_pix, &tree->none);
+                                int is_leaf,
+                                PC_TREE_SHARED_BUFFERS *shared_bufs) {
+  alloc_mode_context(cm, num_pix, &tree->none, shared_bufs);
 
   if (is_leaf) return;
 
-  alloc_mode_context(cm, num_pix / 2, &tree->horizontal[0]);
-  alloc_mode_context(cm, num_pix / 2, &tree->vertical[0]);
+  alloc_mode_context(cm, num_pix / 2, &tree->horizontal[0], shared_bufs);
+  alloc_mode_context(cm, num_pix / 2, &tree->vertical[0], shared_bufs);
 
-  alloc_mode_context(cm, num_pix / 2, &tree->horizontal[1]);
-  alloc_mode_context(cm, num_pix / 2, &tree->vertical[1]);
+  alloc_mode_context(cm, num_pix / 2, &tree->horizontal[1], shared_bufs);
+  alloc_mode_context(cm, num_pix / 2, &tree->vertical[1], shared_bufs);
 
-  alloc_mode_context(cm, num_pix / 4, &tree->horizontala[0]);
-  alloc_mode_context(cm, num_pix / 4, &tree->horizontala[1]);
-  alloc_mode_context(cm, num_pix / 2, &tree->horizontala[2]);
+  alloc_mode_context(cm, num_pix / 4, &tree->horizontala[0], shared_bufs);
+  alloc_mode_context(cm, num_pix / 4, &tree->horizontala[1], shared_bufs);
+  alloc_mode_context(cm, num_pix / 2, &tree->horizontala[2], shared_bufs);
 
-  alloc_mode_context(cm, num_pix / 2, &tree->horizontalb[0]);
-  alloc_mode_context(cm, num_pix / 4, &tree->horizontalb[1]);
-  alloc_mode_context(cm, num_pix / 4, &tree->horizontalb[2]);
+  alloc_mode_context(cm, num_pix / 2, &tree->horizontalb[0], shared_bufs);
+  alloc_mode_context(cm, num_pix / 4, &tree->horizontalb[1], shared_bufs);
+  alloc_mode_context(cm, num_pix / 4, &tree->horizontalb[2], shared_bufs);
 
-  alloc_mode_context(cm, num_pix / 4, &tree->verticala[0]);
-  alloc_mode_context(cm, num_pix / 4, &tree->verticala[1]);
-  alloc_mode_context(cm, num_pix / 2, &tree->verticala[2]);
+  alloc_mode_context(cm, num_pix / 4, &tree->verticala[0], shared_bufs);
+  alloc_mode_context(cm, num_pix / 4, &tree->verticala[1], shared_bufs);
+  alloc_mode_context(cm, num_pix / 2, &tree->verticala[2], shared_bufs);
 
-  alloc_mode_context(cm, num_pix / 2, &tree->verticalb[0]);
-  alloc_mode_context(cm, num_pix / 4, &tree->verticalb[1]);
-  alloc_mode_context(cm, num_pix / 4, &tree->verticalb[2]);
+  alloc_mode_context(cm, num_pix / 2, &tree->verticalb[0], shared_bufs);
+  alloc_mode_context(cm, num_pix / 4, &tree->verticalb[1], shared_bufs);
+  alloc_mode_context(cm, num_pix / 4, &tree->verticalb[2], shared_bufs);
 
   for (int i = 0; i < 4; ++i) {
-    alloc_mode_context(cm, num_pix / 4, &tree->horizontal4[i]);
-    alloc_mode_context(cm, num_pix / 4, &tree->vertical4[i]);
+    alloc_mode_context(cm, num_pix / 4, &tree->horizontal4[i], shared_bufs);
+    alloc_mode_context(cm, num_pix / 4, &tree->vertical4[i], shared_bufs);
   }
 }
 
@@ -135,6 +137,7 @@ void av1_setup_pc_tree(AV1_COMMON *cm, ThreadData *td) {
   const int tree_nodes = tree_nodes_inc + 256 + 64 + 16 + 4 + 1;
   int pc_tree_index = 0;
   PC_TREE *this_pc;
+  PC_TREE_SHARED_BUFFERS shared_bufs;
   int square_index = 1;
   int nodes;
 
@@ -143,11 +146,24 @@ void av1_setup_pc_tree(AV1_COMMON *cm, ThreadData *td) {
                   aom_calloc(tree_nodes, sizeof(*td->pc_tree)));
   this_pc = &td->pc_tree[0];
 
+  for (i = 0; i < 3; i++) {
+    const int max_num_pix = MAX_SB_SIZE * MAX_SB_SIZE;
+    CHECK_MEM_ERROR(cm, td->tree_coeff_buf[i],
+                    aom_memalign(32, max_num_pix * sizeof(tran_low_t)));
+    CHECK_MEM_ERROR(cm, td->tree_qcoeff_buf[i],
+                    aom_memalign(32, max_num_pix * sizeof(tran_low_t)));
+    CHECK_MEM_ERROR(cm, td->tree_dqcoeff_buf[i],
+                    aom_memalign(32, max_num_pix * sizeof(tran_low_t)));
+    shared_bufs.coeff_buf[i] = td->tree_coeff_buf[i];
+    shared_bufs.qcoeff_buf[i] = td->tree_qcoeff_buf[i];
+    shared_bufs.dqcoeff_buf[i] = td->tree_dqcoeff_buf[i];
+  }
+
   // Sets up all the leaf nodes in the tree.
   for (pc_tree_index = 0; pc_tree_index < leaf_nodes; ++pc_tree_index) {
     PC_TREE *const tree = &td->pc_tree[pc_tree_index];
     tree->block_size = square[0];
-    alloc_tree_contexts(cm, tree, 16, 1);
+    alloc_tree_contexts(cm, tree, 16, 1, &shared_bufs);
   }
 
   // Each node has 4 leaf nodes, fill each block_size level of the tree
@@ -155,7 +171,7 @@ void av1_setup_pc_tree(AV1_COMMON *cm, ThreadData *td) {
   for (nodes = leaf_nodes >> 2; nodes > 0; nodes >>= 2) {
     for (i = 0; i < nodes; ++i) {
       PC_TREE *const tree = &td->pc_tree[pc_tree_index];
-      alloc_tree_contexts(cm, tree, 16 << (2 * square_index), 0);
+      alloc_tree_contexts(cm, tree, 16 << (2 * square_index), 0, &shared_bufs);
       tree->block_size = square[square_index];
       for (j = 0; j < 4; j++) tree->split[j] = this_pc++;
       ++pc_tree_index;
@@ -175,14 +191,23 @@ void av1_setup_pc_tree(AV1_COMMON *cm, ThreadData *td) {
 }
 
 void av1_free_pc_tree(ThreadData *td, const int num_planes) {
-  const int tree_nodes_inc = 1024;
-
-  const int tree_nodes = tree_nodes_inc + 256 + 64 + 16 + 4 + 1;
-  int i;
-  for (i = 0; i < tree_nodes; ++i)
-    free_tree_contexts(&td->pc_tree[i], num_planes);
-  aom_free(td->pc_tree);
-  td->pc_tree = NULL;
+  if (td->pc_tree != NULL) {
+    const int tree_nodes_inc = 1024;
+    const int tree_nodes = tree_nodes_inc + 256 + 64 + 16 + 4 + 1;
+    for (int i = 0; i < tree_nodes; ++i) {
+      free_tree_contexts(&td->pc_tree[i], num_planes);
+    }
+    for (int i = 0; i < 3; ++i) {
+      aom_free(td->tree_coeff_buf[i]);
+      aom_free(td->tree_qcoeff_buf[i]);
+      aom_free(td->tree_dqcoeff_buf[i]);
+      td->tree_coeff_buf[i] = NULL;
+      td->tree_qcoeff_buf[i] = NULL;
+      td->tree_dqcoeff_buf[i] = NULL;
+    }
+    aom_free(td->pc_tree);
+    td->pc_tree = NULL;
+  }
 }
 
 void av1_copy_tree_context(PICK_MODE_CONTEXT *dst_ctx,

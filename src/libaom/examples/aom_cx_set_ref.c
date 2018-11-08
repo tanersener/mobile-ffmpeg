@@ -141,9 +141,7 @@ static int encode_frame(aom_codec_ctx_t *ecodec, aom_image_t *img,
     if (pkt->kind == AOM_CODEC_CX_FRAME_PKT) {
       const int keyframe = (pkt->data.frame.flags & AOM_FRAME_IS_KEY) != 0;
 
-      if (!(pkt->data.frame.flags & AOM_FRAME_IS_FRAGMENT)) {
-        *frame_out += 1;
-      }
+      ++*frame_out;
 
       if (!aom_video_writer_write_frame(writer, pkt->data.frame.buf,
                                         pkt->data.frame.sz,

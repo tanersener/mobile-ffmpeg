@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_ONYXC_INT_H_
-#define AV1_COMMON_ONYXC_INT_H_
+#ifndef AOM_AV1_COMMON_ONYXC_INT_H_
+#define AOM_AV1_COMMON_ONYXC_INT_H_
 
 #include "config/aom_config.h"
 #include "config/av1_rtcd.h"
@@ -110,6 +110,19 @@ typedef struct {
 } MV_REF;
 
 typedef struct {
+  // For a RefCntBuffer, the following are reference-holding variables:
+  // - cm->ref_frame_map[]
+  // - cm->new_fb_idx
+  // - cm->scaled_ref_idx[] (encoder only)
+  // - cm->next_ref_frame_map[] (decoder only)
+  // - pbi->output_frame_index[] (decoder only)
+  // With that definition, 'ref_count' is the number of reference-holding
+  // variables that are currently referencing this buffer.
+  // For example:
+  // - suppose this buffer is at index 'k' in the buffer pool, and
+  // - Total 'n' of the variables / array elements above have value 'k' (that
+  // is, they are pointing to buffer at index 'k').
+  // Then, pool->frame_bufs[k].ref_count = n.
   int ref_count;
 
   unsigned int cur_frame_offset;
@@ -133,17 +146,6 @@ typedef struct {
   hash_table hash_table;
   uint8_t intra_only;
   FRAME_TYPE frame_type;
-  // The Following variables will only be used in frame parallel decode.
-
-  // frame_worker_owner indicates which FrameWorker owns this buffer. NULL means
-  // that no FrameWorker owns, or is decoding, this buffer.
-  AVxWorker *frame_worker_owner;
-
-  // row and col indicate which position frame has been decoded to in real
-  // pixel unit. They are reset to -1 when decoding begins and set to INT_MAX
-  // when the frame is fully decoded.
-  int row;
-  int col;
 
   // Inter frame reference frame delta for loop filter
   int8_t ref_deltas[REF_FRAMES];
@@ -156,6 +158,8 @@ typedef struct BufferPool {
 // Protect BufferPool from being accessed by several FrameWorkers at
 // the same time during frame parallel decode.
 // TODO(hkuang): Try to use atomic variable instead of locking the whole pool.
+// TODO(wtc): Remove this. See
+// https://chromium-review.googlesource.com/c/webm/libvpx/+/560630.
 #if CONFIG_MULTITHREAD
   pthread_mutex_t pool_mutex;
 #endif
@@ -288,22 +292,28 @@ typedef struct AV1Common {
   // TODO(hkuang): Combine this with cur_buf in macroblockd.
   RefCntBuffer *cur_frame;
 
-  int ref_frame_map[REF_FRAMES]; /* maps fb_idx to reference slot */
+  // For decoder, ref_frame_map[i] maps reference type 'i' to actual index of
+  // the buffer in the buffer pool ‘cm->buffer_pool.frame_bufs’.
+  // For encoder, ref_frame_map[j] (where j = remapped_ref_idx[i]) maps
+  // remapped reference index 'j' (that is, original reference type 'i') to
+  // actual index of the buffer in the buffer pool ‘cm->buffer_pool.frame_bufs’.
+  int ref_frame_map[REF_FRAMES];
 
   // Prepare ref_frame_map for the next frame.
   // Only used in frame parallel decode.
   int next_ref_frame_map[REF_FRAMES];
 
-  // TODO(jkoleszar): could expand active_ref_idx to 4, with 0 as intra, and
-  // roll new_fb_idx into it.
-
-  // Each Inter frame can reference INTER_REFS_PER_FRAME buffers
+  // Each Inter frame can reference INTER_REFS_PER_FRAME buffers. This maps each
+  // (inter) reference frame type to the corresponding reference buffer.
   RefBuffer frame_refs[INTER_REFS_PER_FRAME];
+
   int is_skip_mode_allowed;
   int skip_mode_flag;
   int ref_frame_idx_0;
   int ref_frame_idx_1;
 
+  // Index to the 'new' frame (i.e. the frame currently being encoded or
+  // decoded) in the buffer pool 'cm->buffer_pool'.
   int new_fb_idx;
 
   FRAME_TYPE last_frame_type; /* last frame's frame type for motion search.*/
@@ -349,7 +359,7 @@ typedef struct AV1Common {
   int u_ac_delta_q;
   int v_ac_delta_q;
 
-  // The dequantizers below are true dequntizers used only in the
+  // The dequantizers below are true dequantizers used only in the
   // dequantization process.  They have the same coefficient
   // shift/scale as TX.
   int16_t y_dequant_QTX[MAX_SEGMENTS][2];
@@ -414,10 +424,6 @@ typedef struct AV1Common {
   int superres_upscaled_height;
   RestorationInfo rst_info[MAX_MB_PLANE];
 
-  // rst_end_stripe[i] is one more than the index of the bottom stripe
-  // for tile row i.
-  int rst_end_stripe[MAX_TILE_ROWS];
-
   // Pointer to a scratch buffer used by self-guided restoration
   int32_t *rst_tmpbuf;
   RestorationLineBuffers *rlbs;
@@ -480,14 +486,7 @@ typedef struct AV1Common {
 
   int byte_alignment;
   int skip_loop_filter;
-
-  // Private data associated with the frame buffer callbacks.
-  void *cb_priv;
-  aom_get_frame_buffer_cb_fn_t get_fb_cb;
-  aom_release_frame_buffer_cb_fn_t release_fb_cb;
-
-  // Handles memory for the codec.
-  InternalFrameBufferList int_frame_buffers;
+  int skip_film_grain;
 
   // External BufferPool passed from outside.
   BufferPool *buffer_pool;
@@ -550,6 +549,7 @@ typedef struct AV1Common {
   int64_t txcoeff_cost_count;
 #endif
   const cfg_options_t *options;
+  int is_decoding;
 } AV1_COMMON;
 
 // TODO(hkuang): Don't need to lock the whole pool after implementing atomic
@@ -604,6 +604,9 @@ static INLINE int get_free_fb(AV1_COMMON *cm) {
 
     frame_bufs[i].ref_count = 1;
   } else {
+    // We should never run out of free buffers. If this assertion fails, there
+    // is a reference leak.
+    assert(0 && "Ran out of free frame buffers. Likely a reference leak.");
     // Reset i to be INVALID_IDX to indicate no free buffer found.
     i = INVALID_IDX;
   }
@@ -612,15 +615,20 @@ static INLINE int get_free_fb(AV1_COMMON *cm) {
   return i;
 }
 
-static INLINE void ref_cnt_fb(RefCntBuffer *bufs, int *idx, int new_idx) {
-  const int ref_index = *idx;
+// Modify 'idx_ptr' to reference the buffer at 'new_idx', and update the ref
+// counts accordingly.
+static INLINE void assign_frame_buffer(RefCntBuffer *bufs, int *idx_ptr,
+                                       int new_idx) {
+  const int old_idx = *idx_ptr;
+  if (old_idx >= 0) {
+    assert(bufs[old_idx].ref_count > 0);
+    // One less reference to the buffer at 'old_idx', so decrease ref count.
+    --bufs[old_idx].ref_count;
+  }
 
-  if (ref_index >= 0 && bufs[ref_index].ref_count > 0)
-    bufs[ref_index].ref_count--;
-
-  *idx = new_idx;
-
-  bufs[new_idx].ref_count++;
+  *idx_ptr = new_idx;
+  // One more reference to the buffer at 'new_idx', so increase ref count.
+  ++bufs[new_idx].ref_count;
 }
 
 static INLINE int frame_is_intra_only(const AV1_COMMON *const cm) {
@@ -1338,4 +1346,4 @@ static INLINE uint8_t major_minor_to_seq_level_idx(BitstreamLevel bl) {
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_ONYXC_INT_H_
+#endif  // AOM_AV1_COMMON_ONYXC_INT_H_

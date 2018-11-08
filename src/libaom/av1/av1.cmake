@@ -100,7 +100,6 @@ list(APPEND AOM_AV1_DECODER_SOURCES
             "${AOM_ROOT}/av1/decoder/decodetxb.h"
             "${AOM_ROOT}/av1/decoder/detokenize.c"
             "${AOM_ROOT}/av1/decoder/detokenize.h"
-            "${AOM_ROOT}/av1/decoder/dthread.c"
             "${AOM_ROOT}/av1/decoder/dthread.h"
             "${AOM_ROOT}/av1/decoder/obu.h"
             "${AOM_ROOT}/av1/decoder/obu.c")
@@ -117,6 +116,8 @@ list(APPEND AOM_AV1_ENCODER_SOURCES
             "${AOM_ROOT}/av1/encoder/av1_fwd_txfm1d.h"
             "${AOM_ROOT}/av1/encoder/av1_fwd_txfm1d_cfg.h"
             "${AOM_ROOT}/av1/encoder/av1_fwd_txfm2d.c"
+            "${AOM_ROOT}/av1/encoder/av1_multi_thread.c"
+            "${AOM_ROOT}/av1/encoder/av1_multi_thread.h"
             "${AOM_ROOT}/av1/encoder/av1_quantize.c"
             "${AOM_ROOT}/av1/encoder/av1_quantize.h"
             "${AOM_ROOT}/av1/encoder/bitstream.c"
@@ -273,6 +274,7 @@ list(APPEND AOM_AV1_ENCODER_INTRIN_SSE4_1
             "${AOM_ROOT}/av1/encoder/x86/corner_match_sse4.c"
             "${AOM_ROOT}/av1/encoder/x86/encodetxb_sse4.c"
             "${AOM_ROOT}/av1/encoder/x86/highbd_fwd_txfm_sse4.c"
+            "${AOM_ROOT}/av1/encoder/x86/rdopt_sse4.c"
             "${AOM_ROOT}/av1/encoder/x86/pickrst_sse4.c")
 
 list(APPEND AOM_AV1_ENCODER_INTRIN_AVX2
@@ -283,6 +285,7 @@ list(APPEND AOM_AV1_ENCODER_INTRIN_AVX2
             "${AOM_ROOT}/av1/encoder/x86/av1_fwd_txfm2d_avx2.c"
             "${AOM_ROOT}/av1/encoder/x86/wedge_utils_avx2.c"
             "${AOM_ROOT}/av1/encoder/x86/encodetxb_avx2.c"
+            "${AOM_ROOT}/av1/encoder/x86/rdopt_avx2.c"
             "${AOM_ROOT}/av1/encoder/x86/pickrst_avx2.c")
 
 list(APPEND AOM_AV1_ENCODER_INTRIN_NEON

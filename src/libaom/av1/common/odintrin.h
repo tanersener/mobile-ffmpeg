@@ -11,8 +11,8 @@
 
 /* clang-format off */
 
-#ifndef AV1_COMMON_ODINTRIN_H_
-#define AV1_COMMON_ODINTRIN_H_
+#ifndef AOM_AV1_COMMON_ODINTRIN_H_
+#define AOM_AV1_COMMON_ODINTRIN_H_
 
 #include <stdlib.h>
 #include <string.h>
@@ -93,4 +93,4 @@ extern uint32_t OD_DIVU_SMALL_CONSTS[OD_DIVU_DMAX][2];
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_ODINTRIN_H_
+#endif  // AOM_AV1_COMMON_ODINTRIN_H_

@@ -30,9 +30,9 @@ const int kPerfIters = 1000;
 const int kVPad = 32;
 const int kHPad = 32;
 
+using libaom_test::ACMRandom;
 using ::testing::make_tuple;
 using ::testing::tuple;
-using libaom_test::ACMRandom;
 
 template <typename Pixel>
 class TestImage {

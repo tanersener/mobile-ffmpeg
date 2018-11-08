@@ -8,8 +8,8 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef AV1_COMMON_OBU_UTIL_H
-#define AV1_COMMON_OBU_UTIL_H
+#ifndef AOM_AV1_COMMON_OBU_UTIL_H_
+#define AOM_AV1_COMMON_OBU_UTIL_H_
 
 #include "aom/aom_codec.h"
 
@@ -44,4 +44,4 @@ aom_codec_err_t aom_read_obu_header_and_size(const uint8_t *data,
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_OBU_UTIL_H
+#endif  // AOM_AV1_COMMON_OBU_UTIL_H_

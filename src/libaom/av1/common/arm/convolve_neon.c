@@ -13,6 +13,8 @@
 #include <assert.h>
 #include <arm_neon.h>
 
+#include "config/av1_rtcd.h"
+
 #include "aom_dsp/aom_dsp_common.h"
 #include "aom_ports/mem.h"
 #include "av1/common/convolve.h"

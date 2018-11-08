@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_ENCODER_H_
-#define AV1_ENCODER_ENCODER_H_
+#ifndef AOM_AV1_ENCODER_ENCODER_H_
+#define AOM_AV1_ENCODER_ENCODER_H_
 
 #include <stdio.h>
 
@@ -94,6 +94,9 @@ typedef enum {
   FRAMEFLAGS_BWDREF = 1 << 2,
   // TODO(zoeliu): To determine whether a frame flag is needed for ALTREF2_FRAME
   FRAMEFLAGS_ALTREF = 1 << 3,
+  FRAMEFLAGS_INTRAONLY = 1 << 4,
+  FRAMEFLAGS_SWITCH = 1 << 5,
+  FRAMEFLAGS_ERROR_RESILIENT = 1 << 6,
 } FRAMETYPE_FLAGS;
 
 typedef enum {
@@ -127,6 +130,30 @@ typedef enum {
                          // q_index
   SUPERRES_MODES
 } SUPERRES_MODE;
+
+typedef struct TplDepStats {
+  int64_t intra_cost;
+  int64_t inter_cost;
+  int64_t mc_flow;
+  int64_t mc_dep_cost;
+  int64_t mc_ref_cost;
+
+  int ref_frame_index;
+  int_mv mv;
+} TplDepStats;
+
+typedef struct TplDepFrame {
+  uint8_t is_valid;
+  TplDepStats *tpl_stats_ptr;
+  int stride;
+  int width;
+  int height;
+  int mi_rows;
+  int mi_cols;
+  int base_qindex;
+} TplDepFrame;
+
+#define TPL_DEP_COST_SCALE_LOG2 4
 
 typedef struct AV1EncoderConfig {
   BITSTREAM_PROFILE profile;
@@ -255,6 +282,8 @@ typedef struct AV1EncoderConfig {
   int tile_height_count;
   int tile_widths[MAX_TILE_COLS];
   int tile_heights[MAX_TILE_ROWS];
+
+  int enable_tpl_model;
 
   int max_threads;
 
@@ -441,6 +470,23 @@ typedef struct inter_modes_info {
 } InterModesInfo;
 #endif
 
+// Encoder row synchronization
+typedef struct AV1RowMTSyncData {
+#if CONFIG_MULTITHREAD
+  pthread_mutex_t *mutex_;
+  pthread_cond_t *cond_;
+#endif
+  // Allocate memory to store the sb/mb block index in each row.
+  int *cur_col;
+  int sync_range;
+  int rows;
+} AV1RowMTSync;
+
+typedef struct AV1RowMTInfo {
+  int current_mi_row;
+  int num_threads_working;
+} AV1RowMTInfo;
+
 // TODO(jingning) All spatially adaptive variables should go to TileDataEnc.
 typedef struct TileDataEnc {
   TileInfo tile_info;
@@ -450,12 +496,27 @@ typedef struct TileDataEnc {
   int ex_search_count;
   CFL_CTX cfl;
   DECLARE_ALIGNED(16, FRAME_CONTEXT, tctx);
+  DECLARE_ALIGNED(16, FRAME_CONTEXT, backup_tctx);
   uint8_t allow_update_cdf;
 #if CONFIG_COLLECT_INTER_MODE_RD_STATS
   InterModeRdModel inter_mode_rd_models[BLOCK_SIZES_ALL];
-  InterModesInfo inter_modes_info;
 #endif
+  AV1RowMTSync row_mt_sync;
+  AV1RowMTInfo row_mt_info;
 } TileDataEnc;
+
+typedef struct {
+  TOKENEXTRA *start;
+  TOKENEXTRA *stop;
+  unsigned int count;
+} TOKENLIST;
+
+typedef struct MultiThreadHandle {
+  int allocated_tile_rows;
+  int allocated_tile_cols;
+  int allocated_sb_rows;
+  int thread_id_to_tile_id[MAX_NUM_THREADS];  // Mapping of threads to tiles
+} MultiThreadHandle;
 
 typedef struct RD_COUNTS {
   int64_t comp_pred_diff[REFERENCE_MODES];
@@ -471,13 +532,22 @@ typedef struct ThreadData {
   FRAME_COUNTS *counts;
   PC_TREE *pc_tree;
   PC_TREE *pc_root[MAX_MIB_SIZE_LOG2 - MIN_MIB_SIZE_LOG2 + 1];
+  tran_low_t *tree_coeff_buf[MAX_MB_PLANE];
+  tran_low_t *tree_qcoeff_buf[MAX_MB_PLANE];
+  tran_low_t *tree_dqcoeff_buf[MAX_MB_PLANE];
+#if CONFIG_COLLECT_INTER_MODE_RD_STATS
+  InterModesInfo *inter_modes_info;
+#endif
   uint32_t *hash_value_buffer[2][2];
   int32_t *wsrc_buf;
   int32_t *mask_buf;
   uint8_t *above_pred_buf;
   uint8_t *left_pred_buf;
   PALETTE_BUFFER *palette_buffer;
-  int intrabc_used_this_tile;
+  CONV_BUF_TYPE *tmp_conv_dst;
+  uint8_t *tmp_obmc_bufs[2];
+  int intrabc_used;
+  FRAME_CONTEXT *tctx;
 } ThreadData;
 
 struct EncWorkerData;
@@ -537,6 +607,9 @@ typedef struct AV1_COMP {
   YV12_BUFFER_CONFIG *unscaled_last_source;
   YV12_BUFFER_CONFIG scaled_last_source;
 
+  TplDepFrame tpl_stats[MAX_LAG_BUFFERS];
+  YV12_BUFFER_CONFIG *tpl_recon_frames[INTER_REFS_PER_FRAME + 1];
+
   // For a still frame, this flag is set to 1 to skip partition search.
   int partition_search_skippable_frame;
   double csm_rate_array[32];
@@ -548,18 +621,52 @@ typedef struct AV1_COMP {
   int cur_poc;  // DebugInfo
 
   unsigned int row_mt;
-  int scaled_ref_idx[REF_FRAMES];
-  int ref_fb_idx[REF_FRAMES];
-  int refresh_fb_idx;  // ref frame buffer index to refresh
+  int scaled_ref_idx[INTER_REFS_PER_FRAME];
+
+  // For encoder, we have a two-level mapping from reference frame type to the
+  // corresponding buffer in the buffer pool:
+  // * 'remapped_ref_idx[i - 1]' maps reference type ‘i’ (range: LAST_FRAME ...
+  // EXTREF_FRAME) to a remapped index ‘j’ (in range: 0 ... REF_FRAMES - 1)
+  // * Later, 'cm->ref_frame_map[j]' maps the remapped index ‘j’ to actual index
+  //   of the buffer in the buffer pool ‘cm->buffer_pool.frame_bufs’.
+  //
+  // LAST_FRAME,                        ...,      EXTREF_FRAME
+  //      |                                           |
+  //      v                                           v
+  // remapped_ref_idx[LAST_FRAME - 1],  ...,  remapped_ref_idx[EXTREF_FRAME - 1]
+  //      |                                           |
+  //      v                                           v
+  // ref_frame_map[],                   ...,     ref_frame_map[]
+  //
+  // Note: INTRA_FRAME always refers to the current frame, so there's no need to
+  // have a remapped index for the same.
+  int remapped_ref_idx[REF_FRAMES];
 
   int last_show_frame_buf_idx;  // last show frame buffer index
 
+  // refresh_*_frame are boolean flags. If 'refresh_xyz_frame' is true, then
+  // after the current frame is encoded, the XYZ reference frame gets refreshed
+  // (updated) to be the current frame.
+  //
+  // Special case: 'refresh_last_frame' specifies that:
+  // - LAST_FRAME reference should be updated to be the current frame (as usual)
+  // - Also, LAST2_FRAME and LAST3_FRAME references are implicitly updated to be
+  // the two past reference frames just before LAST_FRAME that are available.
+  //
+  // Note: Usually at most one of these refresh flags is true at a time.
+  // But a key-frame is special, for which all the flags are true at once.
   int refresh_last_frame;
   int refresh_golden_frame;
   int refresh_bwd_ref_frame;
   int refresh_alt2_ref_frame;
   int refresh_alt_ref_frame;
+
 #if USE_SYMM_MULTI_LAYER
+  // When true, a new rule for backward (future) reference frames is in effect:
+  // - BWDREF_FRAME is always the closest future frame available
+  // - ALTREF2_FRAME is always the 2nd closest future frame available
+  // - 'refresh_bwd_ref_frame' flag is used for updating both the BWDREF_FRAME
+  // and ALTREF2_FRAME. ('refresh_alt2_ref_frame' flag is irrelevant).
   int new_bwdref_update_rule;
 #endif
 
@@ -600,9 +707,10 @@ typedef struct AV1_COMP {
   RATE_CONTROL rc;
   double framerate;
 
-  // NOTE(zoeliu): Any inter frame allows maximum of REF_FRAMES inter
-  // references; Plus the currently coded frame itself, it is needed to allocate
-  // sufficient space to the size of the maximum possible number of frames.
+  // Relevant for an inter frame.
+  // - Index '0' corresponds to the values for the currently coded frame.
+  // - Indices 1 ... REF_FRAMES are used to store values for all the possible
+  // reference frames.
   int interp_filter_selected[REF_FRAMES + 1][SWITCHABLE];
 
   struct aom_codec_pkt_list *output_pkt_list;
@@ -698,6 +806,7 @@ typedef struct AV1_COMP {
 
   TOKENEXTRA *tile_tok[MAX_TILE_ROWS][MAX_TILE_COLS];
   unsigned int tok_count[MAX_TILE_ROWS][MAX_TILE_COLS];
+  TOKENLIST *tplist[MAX_TILE_ROWS][MAX_TILE_COLS];
 
   TileBufferEnc tile_buffers[MAX_TILE_ROWS][MAX_TILE_COLS];
 
@@ -751,6 +860,12 @@ typedef struct AV1_COMP {
   // Set as 1 for monochrome and 3 for other color formats
   int default_interp_skip_flags;
   int preserve_arf_as_gld;
+  MultiThreadHandle multi_thread_ctxt;
+  void (*row_mt_sync_read_ptr)(AV1RowMTSync *const, int, int);
+  void (*row_mt_sync_write_ptr)(AV1RowMTSync *const, int, int, const int);
+#if CONFIG_MULTITHREAD
+  pthread_mutex_t *row_mt_mutex_;
+#endif
 } AV1_COMP;
 
 // Must not be called more than once.
@@ -812,7 +927,7 @@ static INLINE int frame_is_kf_gf_arf(const AV1_COMP *cpi) {
 
 static INLINE int get_ref_frame_map_idx(const AV1_COMP *cpi,
                                         MV_REFERENCE_FRAME ref_frame) {
-  return (ref_frame >= 1) ? cpi->ref_fb_idx[ref_frame - 1] : INVALID_IDX;
+  return (ref_frame >= 1) ? cpi->remapped_ref_idx[ref_frame - 1] : INVALID_IDX;
 }
 
 static INLINE int get_ref_frame_buf_idx(const AV1_COMP *cpi,
@@ -845,8 +960,8 @@ static INLINE YV12_BUFFER_CONFIG *get_ref_frame_buffer(
 }
 
 static INLINE int enc_is_ref_frame_buf(AV1_COMP *cpi, RefCntBuffer *frame_buf) {
-  MV_REFERENCE_FRAME ref_frame;
   AV1_COMMON *const cm = &cpi->common;
+  MV_REFERENCE_FRAME ref_frame;
   for (ref_frame = LAST_FRAME; ref_frame <= ALTREF_FRAME; ++ref_frame) {
     const int buf_idx = get_ref_frame_buf_idx(cpi, ref_frame);
     if (buf_idx == INVALID_IDX) continue;
@@ -882,6 +997,22 @@ static INLINE unsigned int allocated_tokens(TileInfo tile, int sb_size_log2,
   return get_token_alloc(tile_mb_rows, tile_mb_cols, sb_size_log2, num_planes);
 }
 
+static INLINE void get_start_tok(AV1_COMP *cpi, int tile_row, int tile_col,
+                                 int mi_row, TOKENEXTRA **tok, int sb_size_log2,
+                                 int num_planes) {
+  AV1_COMMON *const cm = &cpi->common;
+  const int tile_cols = cm->tile_cols;
+  TileDataEnc *this_tile = &cpi->tile_data[tile_row * tile_cols + tile_col];
+  const TileInfo *const tile_info = &this_tile->tile_info;
+
+  const int tile_mb_cols =
+      (tile_info->mi_col_end - tile_info->mi_col_start + 2) >> 2;
+  const int tile_mb_row = (mi_row - tile_info->mi_row_start + 2) >> 2;
+
+  *tok = cpi->tile_tok[tile_row][tile_col] +
+         get_token_alloc(tile_mb_row, tile_mb_cols, sb_size_log2, num_planes);
+}
+
 void av1_apply_encoding_flags(AV1_COMP *cpi, aom_enc_frame_flags_t flags);
 
 #define ALT_MIN_LAG 3
@@ -911,18 +1042,6 @@ static INLINE int *cond_cost_list(const struct AV1_COMP *cpi, int *cost_list) {
 void av1_new_framerate(AV1_COMP *cpi, double framerate);
 
 #define LAYER_IDS_TO_IDX(sl, tl, num_tl) ((sl) * (num_tl) + (tl))
-
-// Update up-sampled reference frame index.
-static INLINE void uref_cnt_fb(EncRefCntBuffer *ubufs, int *uidx,
-                               int new_uidx) {
-  const int ref_index = *uidx;
-
-  if (ref_index >= 0 && ubufs[ref_index].ref_count > 0)
-    ubufs[ref_index].ref_count--;
-
-  *uidx = new_uidx;
-  ubufs[new_uidx].ref_count++;
-}
 
 // Returns 1 if a frame is scaled and 0 otherwise.
 static INLINE int av1_resize_scaled(const AV1_COMMON *cm) {
@@ -957,4 +1076,4 @@ aom_fixed_buf_t *av1_get_global_headers(AV1_COMP *cpi);
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_ENCODER_H_
+#endif  // AOM_AV1_ENCODER_ENCODER_H_

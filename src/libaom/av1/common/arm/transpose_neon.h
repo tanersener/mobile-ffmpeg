@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef AV1_COMMON_ARM_TRANSPOSE_NEON_H_
-#define AV1_COMMON_ARM_TRANSPOSE_NEON_H_
+#ifndef AOM_AV1_COMMON_ARM_TRANSPOSE_NEON_H_
+#define AOM_AV1_COMMON_ARM_TRANSPOSE_NEON_H_
 
 #include <arm_neon.h>
 
@@ -534,4 +534,4 @@ static INLINE void transpose_s32_4x4(int32x4_t *a0, int32x4_t *a1,
   *a3 = c1.val[1];
 }
 
-#endif  // AV1_COMMON_ARM_TRANSPOSE_NEON_H_
+#endif  // AOM_AV1_COMMON_ARM_TRANSPOSE_NEON_H_

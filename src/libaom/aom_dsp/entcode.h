@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_DSP_ENTCODE_H_
-#define AOM_DSP_ENTCODE_H_
+#ifndef AOM_AOM_DSP_ENTCODE_H_
+#define AOM_AOM_DSP_ENTCODE_H_
 
 #include <limits.h>
 #include <stddef.h>
@@ -24,6 +24,7 @@
    on a larger type, you can speed up the decoder by using it here.*/
 typedef uint32_t od_ec_window;
 
+/*The size in bits of od_ec_window.*/
 #define OD_EC_WINDOW_SIZE ((int)sizeof(od_ec_window) * CHAR_BIT)
 
 /*The resolution of fractional-precision bit usage measurements, i.e.,
@@ -37,4 +38,4 @@ typedef uint32_t od_ec_window;
 OD_WARN_UNUSED_RESULT uint32_t od_ec_tell_frac(uint32_t nbits_total,
                                                uint32_t rng);
 
-#endif  // AOM_DSP_ENTCODE_H_
+#endif  // AOM_AOM_DSP_ENTCODE_H_

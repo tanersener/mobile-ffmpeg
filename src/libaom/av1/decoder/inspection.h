@@ -8,8 +8,8 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef AOM_INSPECTION_H_
-#define AOM_INSPECTION_H_
+#ifndef AOM_AV1_DECODER_INSPECTION_H_
+#define AOM_AV1_DECODER_INSPECTION_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,7 +20,7 @@ extern "C" {
 #include "av1/decoder/accounting.h"
 #endif
 
-#ifndef AOM_AOMDX_H_
+#ifndef AOM_AOM_AOMDX_H_
 typedef void (*aom_inspect_cb)(void *decoder, void *data);
 #endif
 
@@ -50,6 +50,8 @@ struct insp_mi_data {
   int16_t cfl_alpha_idx;
   int16_t cfl_alpha_sign;
   int16_t current_qindex;
+  int16_t compound_type;
+  int16_t motion_mode;
 };
 
 typedef struct insp_frame_data insp_frame_data;
@@ -59,6 +61,7 @@ struct insp_frame_data {
   Accounting *accounting;
 #endif
   insp_mi_data *mi_grid;
+  int16_t frame_number;
   int show_frame;
   int frame_type;
   int base_qindex;
@@ -72,6 +75,7 @@ struct insp_frame_data {
   // TODO(negge): add per frame CDEF data
   int delta_q_present_flag;
   int delta_q_res;
+  int show_existing_frame;
 };
 
 void ifd_init(insp_frame_data *fd, int frame_width, int frame_height);
@@ -81,4 +85,4 @@ int ifd_inspect(insp_frame_data *fd, void *decoder);
 #ifdef __cplusplus
 }  // extern "C"
 #endif  // __cplusplus
-#endif  // AOM_INSPECTION_H_
+#endif  // AOM_AV1_DECODER_INSPECTION_H_

@@ -54,7 +54,7 @@ static int fixed_point_scale_to_coarse_point_scale(int scale_fp) {
 }
 
 // Note: x and y are integer precision, mvq4 is q4 precision.
-MV32 av1_scale_mv(const MV *mvq4, int x, int y,
+MV32 av1_scale_mv(const MV32 *mvq4, int x, int y,
                   const struct scale_factors *sf) {
   const int x_off_q4 = scaled_x(x << SUBPEL_BITS, sf);
   const int y_off_q4 = scaled_y(y << SUBPEL_BITS, sf);

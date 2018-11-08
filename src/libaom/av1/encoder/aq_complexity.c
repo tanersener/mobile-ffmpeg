@@ -148,7 +148,7 @@ void av1_caq_select_segment(const AV1_COMP *cpi, MACROBLOCK *mb, BLOCK_SIZE bs,
             ? AOMMAX(exp(cpi->twopass.mb_av_energy), MIN_DEFAULT_LV_THRESH)
             : DEFAULT_LV_THRESH;
 
-    av1_setup_src_planes(mb, cpi->source, mi_row, mi_col, num_planes);
+    av1_setup_src_planes(mb, cpi->source, mi_row, mi_col, num_planes, bs);
     logvar = av1_log_block_var(cpi, mb, bs);
 
     segment = AQ_C_SEGMENTS - 1;  // Just in case no break out below.

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_MV_H_
-#define AV1_COMMON_MV_H_
+#ifndef AOM_AV1_COMMON_MV_H_
+#define AOM_AV1_COMMON_MV_H_
 
 #include "av1/common/common.h"
 #include "av1/common/common_data.h"
@@ -298,4 +298,4 @@ static INLINE void clamp_mv(MV *mv, int min_col, int max_col, int min_row,
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_MV_H_
+#endif  // AOM_AV1_COMMON_MV_H_

@@ -1673,15 +1673,14 @@ static void write_modes_sb(AV1_COMP *const cpi, const TileInfo *const tile,
 }
 
 static void write_modes(AV1_COMP *const cpi, const TileInfo *const tile,
-                        aom_writer *const w, const TOKENEXTRA **tok,
-                        const TOKENEXTRA *const tok_end) {
+                        aom_writer *const w, int tile_row, int tile_col) {
   AV1_COMMON *const cm = &cpi->common;
   MACROBLOCKD *const xd = &cpi->td.mb.e_mbd;
   const int mi_row_start = tile->mi_row_start;
   const int mi_row_end = tile->mi_row_end;
   const int mi_col_start = tile->mi_col_start;
   const int mi_col_end = tile->mi_col_end;
-  int mi_row, mi_col;
+  int mi_row, mi_col, sb_row_in_tile;
 
   av1_zero_above_context(cm, xd, mi_col_start, mi_col_end, tile->tile_row);
   av1_init_above_context(cm, xd, tile->tile_row);
@@ -1695,13 +1694,21 @@ static void write_modes(AV1_COMP *const cpi, const TileInfo *const tile,
 
   for (mi_row = mi_row_start; mi_row < mi_row_end;
        mi_row += cm->seq_params.mib_size) {
+    sb_row_in_tile =
+        (mi_row - tile->mi_row_start) >> cm->seq_params.mib_size_log2;
+    const TOKENEXTRA *tok =
+        cpi->tplist[tile_row][tile_col][sb_row_in_tile].start;
+    const TOKENEXTRA *tok_end =
+        tok + cpi->tplist[tile_row][tile_col][sb_row_in_tile].count;
+
     av1_zero_left_context(xd);
 
     for (mi_col = mi_col_start; mi_col < mi_col_end;
          mi_col += cm->seq_params.mib_size) {
-      write_modes_sb(cpi, tile, w, tok, tok_end, mi_row, mi_col,
+      write_modes_sb(cpi, tile, w, &tok, tok_end, mi_row, mi_col,
                      cm->seq_params.sb_size);
     }
+    assert(tok == cpi->tplist[tile_row][tile_col][sb_row_in_tile].stop);
   }
 }
 
@@ -2215,18 +2222,19 @@ static int get_refresh_mask(AV1_COMP *cpi) {
   //     shifted and become the new virtual indexes for LAST2_FRAME and
   //     LAST3_FRAME.
   refresh_mask |=
-      (cpi->refresh_last_frame << cpi->ref_fb_idx[LAST_REF_FRAMES - 1]);
+      (cpi->refresh_last_frame << cpi->remapped_ref_idx[LAST3_FRAME - 1]);
 #if USE_SYMM_MULTI_LAYER
-  refresh_mask |=
-      (cpi->new_bwdref_update_rule == 1)
-          ? (cpi->refresh_bwd_ref_frame << cpi->ref_fb_idx[EXTREF_FRAME - 1])
-          : (cpi->refresh_bwd_ref_frame << cpi->ref_fb_idx[BWDREF_FRAME - 1]);
+  refresh_mask |= (cpi->new_bwdref_update_rule == 1)
+                      ? (cpi->refresh_bwd_ref_frame
+                         << cpi->remapped_ref_idx[EXTREF_FRAME - 1])
+                      : (cpi->refresh_bwd_ref_frame
+                         << cpi->remapped_ref_idx[BWDREF_FRAME - 1]);
 #else
   refresh_mask |=
-      (cpi->refresh_bwd_ref_frame << cpi->ref_fb_idx[BWDREF_FRAME - 1]);
+      (cpi->refresh_bwd_ref_frame << cpi->remapped_ref_idx[BWDREF_FRAME - 1]);
 #endif
   refresh_mask |=
-      (cpi->refresh_alt2_ref_frame << cpi->ref_fb_idx[ALTREF2_FRAME - 1]);
+      (cpi->refresh_alt2_ref_frame << cpi->remapped_ref_idx[ALTREF2_FRAME - 1]);
 
   if (av1_preserve_existing_gf(cpi)) {
     // We have decided to preserve the previously existing golden frame as our
@@ -2243,13 +2251,14 @@ static int get_refresh_mask(AV1_COMP *cpi) {
     if (cpi->preserve_arf_as_gld) {
       return refresh_mask;
     } else {
-      return refresh_mask |
-             (cpi->refresh_golden_frame << cpi->ref_fb_idx[ALTREF_FRAME - 1]);
+      return refresh_mask | (cpi->refresh_golden_frame
+                             << cpi->remapped_ref_idx[ALTREF_FRAME - 1]);
     }
   } else {
-    const int arf_idx = cpi->ref_fb_idx[ALTREF_FRAME - 1];
+    const int arf_idx = cpi->remapped_ref_idx[ALTREF_FRAME - 1];
     return refresh_mask |
-           (cpi->refresh_golden_frame << cpi->ref_fb_idx[GOLDEN_FRAME - 1]) |
+           (cpi->refresh_golden_frame
+            << cpi->remapped_ref_idx[GOLDEN_FRAME - 1]) |
            (cpi->refresh_alt_ref_frame << arf_idx);
   }
 }
@@ -2424,9 +2433,7 @@ static void write_color_config(const SequenceHeader *const seq_params,
   }
   if (seq_params->color_primaries == AOM_CICP_CP_BT_709 &&
       seq_params->transfer_characteristics == AOM_CICP_TC_SRGB &&
-      seq_params->matrix_coefficients ==
-          AOM_CICP_MC_IDENTITY) {  // it would be better to remove this
-                                   // dependency too
+      seq_params->matrix_coefficients == AOM_CICP_MC_IDENTITY) {
     assert(seq_params->subsampling_x == 0 && seq_params->subsampling_y == 0);
     assert(seq_params->profile == PROFILE_1 ||
            (seq_params->profile == PROFILE_2 &&
@@ -2537,9 +2544,9 @@ static void write_film_grain_params(AV1_COMP *cpi,
 
   aom_wb_write_literal(wb, pars->random_seed, 16);
 
-  pars->random_seed += 3245;  // For film grain test vectors purposes
+  pars->random_seed += 3381;  // Changing random seed for film grain
   if (!pars->random_seed)     // Random seed should not be zero
-    pars->random_seed += 1735;
+    pars->random_seed += 7391;
   if (cm->frame_type == INTER_FRAME)
     aom_wb_write_bit(wb, pars->update_parameters);
   else
@@ -2929,7 +2936,7 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
                            "Buffer %d does not contain a reconstructed frame",
                            frame_to_show);
       }
-      ref_cnt_fb(frame_bufs, &cm->new_fb_idx, frame_to_show);
+      assign_frame_buffer(frame_bufs, &cm->new_fb_idx, frame_to_show);
 
       aom_wb_write_bit(wb, 1);  // show_existing_frame
       aom_wb_write_literal(wb, cpi->existing_fb_idx_to_show, 3);
@@ -3585,7 +3592,6 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
   AV1_COMMON *const cm = &cpi->common;
   aom_writer mode_bc;
   int tile_row, tile_col;
-  TOKENEXTRA *(*const tok_buffers)[MAX_TILE_COLS] = cpi->tile_tok;
   TileBufferEnc(*const tile_buffers)[MAX_TILE_COLS] = cpi->tile_buffers;
   uint32_t total_size = 0;
   const int tile_cols = cm->tile_cols;
@@ -3650,8 +3656,6 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
 
       for (tile_row = 0; tile_row < tile_rows; tile_row++) {
         TileBufferEnc *const buf = &tile_buffers[tile_row][tile_col];
-        const TOKENEXTRA *tok = tok_buffers[tile_row][tile_col];
-        const TOKENEXTRA *tok_end = tok + cpi->tok_count[tile_row][tile_col];
         const int data_offset = have_tiles ? 4 : 0;
         const int tile_idx = tile_row * tile_cols + tile_col;
         TileDataEnc *this_tile = &cpi->tile_data[tile_idx];
@@ -3669,8 +3673,7 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
         mode_bc.allow_update_cdf =
             mode_bc.allow_update_cdf && !cm->disable_cdf_update;
         aom_start_encode(&mode_bc, buf->data + data_offset);
-        write_modes(cpi, &tile_info, &mode_bc, &tok, tok_end);
-        assert(tok == tok_end);
+        write_modes(cpi, &tile_info, &mode_bc, tile_row, tile_col);
         aom_stop_encode(&mode_bc);
         tile_size = mode_bc.pos;
         buf->size = tile_size;
@@ -3760,8 +3763,6 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
       const int tile_idx = tile_row * tile_cols + tile_col;
       TileBufferEnc *const buf = &tile_buffers[tile_row][tile_col];
       TileDataEnc *this_tile = &cpi->tile_data[tile_idx];
-      const TOKENEXTRA *tok = tok_buffers[tile_row][tile_col];
-      const TOKENEXTRA *tok_end = tok + cpi->tok_count[tile_row][tile_col];
       int is_last_tile_in_tg = 0;
 
       if (new_tg) {
@@ -3813,7 +3814,7 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
       av1_reset_loop_restoration(&cpi->td.mb.e_mbd, num_planes);
 
       aom_start_encode(&mode_bc, dst + total_size);
-      write_modes(cpi, &tile_info, &mode_bc, &tok, tok_end);
+      write_modes(cpi, &tile_info, &mode_bc, tile_row, tile_col);
       aom_stop_encode(&mode_bc);
       tile_size = mode_bc.pos;
       assert(tile_size >= AV1_MIN_TILE_SIZE_BYTES);

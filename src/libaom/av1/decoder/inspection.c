@@ -36,10 +36,13 @@ void ifd_clear(insp_frame_data *fd) {
 int ifd_inspect(insp_frame_data *fd, void *decoder) {
   struct AV1Decoder *pbi = (struct AV1Decoder *)decoder;
   AV1_COMMON *const cm = &pbi->common;
+
   if (fd->mi_rows != cm->mi_rows || fd->mi_cols != cm->mi_cols) {
     ifd_clear(fd);
     ifd_init_mi_rc(fd, cm->mi_rows, cm->mi_cols);
   }
+  fd->show_existing_frame = cm->show_existing_frame;
+  fd->frame_number = cm->current_video_frame;
   fd->show_frame = cm->show_frame;
   fd->frame_type = cm->frame_type;
   fd->base_qindex = cm->base_qindex;
@@ -85,6 +88,10 @@ int ifd_inspect(insp_frame_data *fd, void *decoder) {
       } else {
         mi->uv_mode = UV_MODE_INVALID;
       }
+
+      mi->motion_mode = mbmi->motion_mode;
+      mi->compound_type = mbmi->interinter_comp.type;
+
       // Block Size
       mi->sb_type = mbmi->sb_type;
       // Skip Flag
@@ -92,10 +99,20 @@ int ifd_inspect(insp_frame_data *fd, void *decoder) {
       mi->filter[0] = av1_extract_interp_filter(mbmi->interp_filters, 0);
       mi->filter[1] = av1_extract_interp_filter(mbmi->interp_filters, 1);
       mi->dual_filter_type = mi->filter[0] * 3 + mi->filter[1];
+
       // Transform
       // TODO(anyone): extract tx type info from mbmi->txk_type[].
-      mi->tx_type = DCT_DCT;
-      mi->tx_size = mbmi->tx_size;
+
+      const BLOCK_SIZE bsize = mbmi->sb_type;
+      const int c = i % mi_size_wide[bsize];
+      const int r = j % mi_size_high[bsize];
+      if (is_inter_block(mbmi) || is_intrabc_block(mbmi))
+        mi->tx_size = mbmi->inter_tx_size[av1_get_txb_size_index(bsize, r, c)];
+      else
+        mi->tx_size = mbmi->tx_size;
+
+      mi->tx_type =
+          (mi->skip ? 0 : mbmi->txk_type[av1_get_txk_type_index(bsize, r, c)]);
 
       mi->cdef_level =
           cm->cdef_strengths[mbmi->cdef_strength] / CDEF_SEC_STRENGTHS;

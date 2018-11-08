@@ -12,8 +12,8 @@
  * Copyright (C) 2002-2010 The Xiph.Org Foundation and contributors.
  */
 
-#ifndef Y4MINPUT_H_
-#define Y4MINPUT_H_
+#ifndef AOM_COMMON_Y4MINPUT_H_
+#define AOM_COMMON_Y4MINPUT_H_
 
 #include <stdio.h>
 #include "aom/aom_image.h"
@@ -57,8 +57,14 @@ struct y4m_input {
   unsigned int bit_depth;
 };
 
+/**
+ * Open the input file, treating it as Y4M. y4m_input is filled in after
+ * reading it. Note that chroma-sample-position should only be set for 420
+ * input, and the input chroma is shifted if necessary. The code does not
+ * support the conversion from co-located to vertical.
+ */
 int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
-                   int only_420);
+                   aom_chroma_sample_position_t csp, int only_420);
 void y4m_input_close(y4m_input *_y4m);
 int y4m_input_fetch_frame(y4m_input *_y4m, FILE *_fin, aom_image_t *img);
 
@@ -66,4 +72,4 @@ int y4m_input_fetch_frame(y4m_input *_y4m, FILE *_fin, aom_image_t *img);
 }  // extern "C"
 #endif
 
-#endif  // Y4MINPUT_H_
+#endif  // AOM_COMMON_Y4MINPUT_H_

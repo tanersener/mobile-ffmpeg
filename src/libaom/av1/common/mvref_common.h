@@ -8,8 +8,8 @@
  * Media Patent License 1.0 was not distributed with this source code in the
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
-#ifndef AV1_COMMON_MVREF_COMMON_H_
-#define AV1_COMMON_MVREF_COMMON_H_
+#ifndef AOM_AV1_COMMON_MVREF_COMMON_H_
+#define AOM_AV1_COMMON_MVREF_COMMON_H_
 
 #include "av1/common/onyxc_int.h"
 #include "av1/common/blockd.h"
@@ -169,14 +169,14 @@ static MV_REFERENCE_FRAME ref_frame_map[TOTAL_COMP_REFS][2] = {
 // clang-format on
 
 static INLINE void av1_set_ref_frame(MV_REFERENCE_FRAME *rf,
-                                     int8_t ref_frame_type) {
+                                     MV_REFERENCE_FRAME ref_frame_type) {
   if (ref_frame_type >= REF_FRAMES) {
     rf[0] = ref_frame_map[ref_frame_type - REF_FRAMES][0];
     rf[1] = ref_frame_map[ref_frame_type - REF_FRAMES][1];
   } else {
+    assert(ref_frame_type > NONE_FRAME);
     rf[0] = ref_frame_type;
     rf[1] = NONE_FRAME;
-    assert(ref_frame_type > NONE_FRAME);
   }
 }
 
@@ -358,4 +358,4 @@ static INLINE int av1_is_dv_valid(const MV dv, const AV1_COMMON *cm,
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_MVREF_COMMON_H_
+#endif  // AOM_AV1_COMMON_MVREF_COMMON_H_

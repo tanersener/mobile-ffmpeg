@@ -859,10 +859,10 @@ static void selfguided_restoration_internal(int32_t *dgd, int width, int height,
   }
 }
 
-void av1_selfguided_restoration_c(const uint8_t *dgd8, int width, int height,
-                                  int dgd_stride, int32_t *flt0, int32_t *flt1,
-                                  int flt_stride, int sgr_params_idx,
-                                  int bit_depth, int highbd) {
+int av1_selfguided_restoration_c(const uint8_t *dgd8, int width, int height,
+                                 int dgd_stride, int32_t *flt0, int32_t *flt1,
+                                 int flt_stride, int sgr_params_idx,
+                                 int bit_depth, int highbd) {
   int32_t dgd32_[RESTORATION_PROC_UNIT_PELS];
   const int dgd32_stride = width + 2 * SGRPROJ_BORDER_HORZ;
   int32_t *dgd32 =
@@ -896,6 +896,7 @@ void av1_selfguided_restoration_c(const uint8_t *dgd8, int width, int height,
   if (params->r[1] > 0)
     selfguided_restoration_internal(dgd32, width, height, dgd32_stride, flt1,
                                     flt_stride, bit_depth, sgr_params_idx, 1);
+  return 0;
 }
 
 void apply_selfguided_restoration_c(const uint8_t *dat8, int width, int height,
@@ -907,8 +908,10 @@ void apply_selfguided_restoration_c(const uint8_t *dat8, int width, int height,
   int32_t *flt1 = flt0 + RESTORATION_UNITPELS_MAX;
   assert(width * height <= RESTORATION_UNITPELS_MAX);
 
-  av1_selfguided_restoration_c(dat8, width, height, stride, flt0, flt1, width,
-                               eps, bit_depth, highbd);
+  const int ret = av1_selfguided_restoration_c(
+      dat8, width, height, stride, flt0, flt1, width, eps, bit_depth, highbd);
+  (void)ret;
+  assert(!ret);
   const sgr_params_type *const params = &sgr_params[eps];
   int xq[2];
   decode_xq(xqd, xq, params);
@@ -1069,13 +1072,6 @@ void av1_loop_restoration_filter_unit(
   }
 }
 
-static void filter_frame_on_tile(int tile_row, int tile_col, void *priv,
-                                 AV1_COMMON *cm) {
-  (void)tile_col;
-  FilterFrameCtxt *ctxt = (FilterFrameCtxt *)priv;
-  ctxt->tile_stripe0 = (tile_row == 0) ? 0 : cm->rst_end_stripe[tile_row - 1];
-}
-
 static void filter_frame_on_unit(const RestorationTileLimits *limits,
                                  const AV1PixelRect *tile_rect,
                                  int rest_unit_idx, void *priv, int32_t *tmpbuf,
@@ -1138,7 +1134,7 @@ void av1_loop_restoration_filter_frame_init(AV1LrStruct *lr_ctxt,
     lr_plane_ctxt->data_stride = frame->strides[is_uv];
     lr_plane_ctxt->dst_stride = lr_ctxt->dst->strides[is_uv];
     lr_plane_ctxt->tile_rect = av1_whole_frame_rect(cm, is_uv);
-    filter_frame_on_tile(LR_TILE_ROW, LR_TILE_COL, lr_plane_ctxt, cm);
+    lr_plane_ctxt->tile_stripe0 = 0;
   }
 }
 

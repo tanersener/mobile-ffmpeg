@@ -183,7 +183,6 @@ void av1_get_inv_txfm_cfg(TX_TYPE tx_type, TX_SIZE tx_size,
                           TXFM_2D_FLIP_CFG *cfg) {
   assert(cfg != NULL);
   cfg->tx_size = tx_size;
-  set_flip_cfg(tx_type, cfg);
   av1_zero(cfg->stage_range_col);
   av1_zero(cfg->stage_range_row);
   set_flip_cfg(tx_type, cfg);

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AOM_SCALE_YV12CONFIG_H_
-#define AOM_SCALE_YV12CONFIG_H_
+#ifndef AOM_AOM_SCALE_YV12CONFIG_H_
+#define AOM_AOM_SCALE_YV12CONFIG_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,17 +39,15 @@ typedef struct yv12_buffer_config {
     struct {
       int y_width;
       int uv_width;
-      int alpha_width;
     };
-    int widths[3];
+    int widths[2];
   };
   union {
     struct {
       int y_height;
       int uv_height;
-      int alpha_height;
     };
-    int heights[3];
+    int heights[2];
   };
   union {
     struct {
@@ -69,18 +67,16 @@ typedef struct yv12_buffer_config {
     struct {
       int y_stride;
       int uv_stride;
-      int alpha_stride;
     };
-    int strides[3];
+    int strides[2];
   };
   union {
     struct {
       uint8_t *y_buffer;
       uint8_t *u_buffer;
       uint8_t *v_buffer;
-      uint8_t *alpha_buffer;
     };
-    uint8_t *buffers[4];
+    uint8_t *buffers[3];
   };
 
   // Indicate whether y_buffer, u_buffer, and v_buffer points to the internally
@@ -140,4 +136,4 @@ int aom_free_frame_buffer(YV12_BUFFER_CONFIG *ybf);
 }
 #endif
 
-#endif  // AOM_SCALE_YV12CONFIG_H_
+#endif  // AOM_AOM_SCALE_YV12CONFIG_H_

@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_ENCODER_ENCODEMV_H_
-#define AV1_ENCODER_ENCODEMV_H_
+#ifndef AOM_AV1_ENCODER_ENCODEMV_H_
+#define AOM_AV1_ENCODER_ENCODEMV_H_
 
 #include "av1/encoder/encoder.h"
 
@@ -52,4 +52,4 @@ static INLINE MV_JOINT_TYPE av1_get_mv_joint(const MV *mv) {
 }  // extern "C"
 #endif
 
-#endif  // AV1_ENCODER_ENCODEMV_H_
+#endif  // AOM_AV1_ENCODER_ENCODEMV_H_

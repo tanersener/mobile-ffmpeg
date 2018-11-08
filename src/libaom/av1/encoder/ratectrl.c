@@ -950,10 +950,16 @@ static int rc_pick_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
 #endif  // CUSTOMIZED_GF
 
   if (frame_is_intra_only(cm)) {
-    // Handle the special case for key frames forced when we have reached
-    // the maximum key frame interval. Here force the Q to a range
-    // based on the ambient Q to reduce the risk of popping.
-    if (rc->this_key_frame_forced) {
+    if (rc->frames_to_key == 1 && oxcf->rc_mode == AOM_Q) {
+      // If the next frame is also a key frame or the current frame is the
+      // only frame in the sequence in AOM_Q mode, just use the cq_level
+      // as q.
+      active_best_quality = cq_level;
+      active_worst_quality = cq_level;
+    } else if (rc->this_key_frame_forced) {
+      // Handle the special case for key frames forced when we have reached
+      // the maximum key frame interval. Here force the Q to a range
+      // based on the ambient Q to reduce the risk of popping.
       double last_boosted_q;
       int delta_qindex;
       int qindex;
@@ -967,10 +973,13 @@ static int rc_pick_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
         active_worst_quality =
             AOMMIN(qindex + delta_qindex, active_worst_quality);
       } else {
+        // Increase the boost if the forced keyframe is a forward reference.
+        // These numbers were derived empirically.
+        const double boost_factor = cpi->oxcf.fwd_kf_enabled ? 0.25 : 0.50;
         qindex = rc->last_boosted_qindex;
         last_boosted_q = av1_convert_qindex_to_q(qindex, bit_depth);
-        delta_qindex = av1_compute_qdelta(rc, last_boosted_q,
-                                          last_boosted_q * 0.75, bit_depth);
+        delta_qindex = av1_compute_qdelta(
+            rc, last_boosted_q, last_boosted_q * boost_factor, bit_depth);
         active_best_quality = AOMMAX(qindex + delta_qindex, rc->best_quality);
       }
     } else {
@@ -1011,12 +1020,33 @@ static int rc_pick_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
     // For constrained quality dont allow Q less than the cq level
     if (oxcf->rc_mode == AOM_CQ) {
       if (q < cq_level) q = cq_level;
+#if USE_SYMM_MULTI_LAYER && MULTI_LVL_BOOST_VBR_CQ
+      if (gf_group->update_type[gf_group->index] == ARF_UPDATE ||
+          (is_intrl_arf_boost && !cpi->new_bwdref_update_rule)) {
+#endif  // USE_SYMM_MULTI_LAYER && MULTI_LVL_BOOST_VBR_CQ
+        active_best_quality = get_gf_active_quality(rc, q, bit_depth);
 
-      active_best_quality = get_gf_active_quality(rc, q, bit_depth);
+        // Constrained quality use slightly lower active best.
+        active_best_quality = active_best_quality * 15 / 16;
+#if REDUCE_LAST_ALT_BOOST
+        if (gf_group->update_type[gf_group->index] == ARF_UPDATE) {
+          const int min_boost = get_gf_high_motion_quality(q, bit_depth);
+          const int boost = min_boost - active_best_quality;
 
-      // Constrained quality use slightly lower active best.
-      active_best_quality = active_best_quality * 15 / 16;
-
+          active_best_quality = min_boost - (int)(boost * rc->arf_boost_factor);
+        }
+#endif
+        *arf_q = active_best_quality;
+#if USE_SYMM_MULTI_LAYER && MULTI_LVL_BOOST_VBR_CQ
+      } else {
+        active_best_quality = rc->arf_q;
+        int this_height = gf_group->pyramid_level[gf_group->index];
+        while (this_height < gf_group->pyramid_height) {
+          active_best_quality = (active_best_quality + cq_level + 1) / 2;
+          ++this_height;
+        }
+      }
+#endif  // USE_SYMM_MULTI_LAYER && MULTI_LVL_BOOST_VBR_CQ
     } else if (oxcf->rc_mode == AOM_Q) {
       if (!cpi->refresh_alt_ref_frame && !is_intrl_arf_boost) {
         active_best_quality = cq_level;
@@ -1052,6 +1082,12 @@ static int rc_pick_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
       }
     } else {
       active_best_quality = get_gf_active_quality(rc, q, bit_depth);
+#if REDUCE_LAST_ALT_BOOST
+      const int min_boost = get_gf_high_motion_quality(q, bit_depth);
+      const int boost = min_boost - active_best_quality;
+
+      active_best_quality = min_boost - (int)(boost * rc->arf_boost_factor);
+#endif
 #if USE_SYMM_MULTI_LAYER
       if (cpi->new_bwdref_update_rule && is_intrl_arf_boost) {
         int this_height = gf_group->pyramid_level[gf_group->index];
@@ -1126,7 +1162,8 @@ static int rc_pick_q_and_bounds_two_pass(const AV1_COMP *cpi, int width,
     if (cpi->twopass.last_kfgroup_zeromotion_pct >= STATIC_MOTION_THRESH) {
       q = AOMMIN(rc->last_kf_qindex, rc->last_boosted_qindex);
     } else {
-      q = rc->last_boosted_qindex;
+      q = AOMMIN(rc->last_boosted_qindex,
+                 (active_best_quality + active_worst_quality) / 2);
     }
   } else {
     q = av1_rc_regulate_q(cpi, rc->this_frame_target, active_best_quality,
@@ -1258,6 +1295,151 @@ static void update_golden_frame_stats(AV1_COMP *cpi) {
   } else if (!cpi->refresh_alt_ref_frame && !is_intrnl_arf) {
     rc->frames_since_golden++;
   }
+}
+
+// Define the reference buffers that will be updated post encode.
+void av1_configure_buffer_updates(AV1_COMP *cpi) {
+  TWO_PASS *const twopass = &cpi->twopass;
+
+  // NOTE(weitinglin): Should we define another function to take care of
+  // cpi->rc.is_$Source_Type to make this function as it is in the comment?
+
+  cpi->rc.is_src_frame_alt_ref = 0;
+  cpi->rc.is_bwd_ref_frame = 0;
+  cpi->rc.is_last_bipred_frame = 0;
+  cpi->rc.is_bipred_frame = 0;
+  cpi->rc.is_src_frame_ext_arf = 0;
+
+  switch (twopass->gf_group.update_type[twopass->gf_group.index]) {
+    case KF_UPDATE:
+      cpi->refresh_last_frame = 1;
+      cpi->refresh_golden_frame = 1;
+      cpi->refresh_bwd_ref_frame = 1;
+      cpi->refresh_alt2_ref_frame = 1;
+      cpi->refresh_alt_ref_frame = 1;
+      break;
+
+    case LF_UPDATE:
+      cpi->refresh_last_frame = 1;
+      cpi->refresh_golden_frame = 0;
+      cpi->refresh_bwd_ref_frame = 0;
+      cpi->refresh_alt2_ref_frame = 0;
+      cpi->refresh_alt_ref_frame = 0;
+      break;
+
+    case GF_UPDATE:
+      // TODO(zoeliu): To further investigate whether 'refresh_last_frame' is
+      //               needed.
+      cpi->refresh_last_frame = 1;
+      cpi->refresh_golden_frame = 1;
+      cpi->refresh_bwd_ref_frame = 0;
+      cpi->refresh_alt2_ref_frame = 0;
+      cpi->refresh_alt_ref_frame = 0;
+      break;
+
+    case OVERLAY_UPDATE:
+      cpi->refresh_last_frame = 0;
+      cpi->refresh_golden_frame = 1;
+      cpi->refresh_bwd_ref_frame = 0;
+      cpi->refresh_alt2_ref_frame = 0;
+      cpi->refresh_alt_ref_frame = 0;
+
+      cpi->rc.is_src_frame_alt_ref = 1;
+      break;
+
+    case ARF_UPDATE:
+      cpi->refresh_last_frame = 0;
+      cpi->refresh_golden_frame = 0;
+      // NOTE: BWDREF does not get updated along with ALTREF_FRAME.
+      cpi->refresh_bwd_ref_frame = 0;
+      cpi->refresh_alt2_ref_frame = 0;
+      cpi->refresh_alt_ref_frame = 1;
+      break;
+
+    case BRF_UPDATE:
+      cpi->refresh_last_frame = 0;
+      cpi->refresh_golden_frame = 0;
+      cpi->refresh_bwd_ref_frame = 1;
+      cpi->refresh_alt2_ref_frame = 0;
+      cpi->refresh_alt_ref_frame = 0;
+
+      cpi->rc.is_bwd_ref_frame = 1;
+      break;
+
+    case LAST_BIPRED_UPDATE:
+      cpi->refresh_last_frame = 1;
+      cpi->refresh_golden_frame = 0;
+      cpi->refresh_bwd_ref_frame = 0;
+      cpi->refresh_alt2_ref_frame = 0;
+      cpi->refresh_alt_ref_frame = 0;
+
+      cpi->rc.is_last_bipred_frame = 1;
+      break;
+
+    case BIPRED_UPDATE:
+      cpi->refresh_last_frame = 1;
+      cpi->refresh_golden_frame = 0;
+      cpi->refresh_bwd_ref_frame = 0;
+      cpi->refresh_alt2_ref_frame = 0;
+      cpi->refresh_alt_ref_frame = 0;
+
+      cpi->rc.is_bipred_frame = 1;
+      break;
+
+    case INTNL_OVERLAY_UPDATE:
+      cpi->refresh_last_frame = 1;
+      cpi->refresh_golden_frame = 0;
+      cpi->refresh_bwd_ref_frame = 0;
+      cpi->refresh_alt2_ref_frame = 0;
+      cpi->refresh_alt_ref_frame = 0;
+
+      cpi->rc.is_src_frame_alt_ref = 1;
+      cpi->rc.is_src_frame_ext_arf = 1;
+      break;
+
+    case INTNL_ARF_UPDATE:
+      cpi->refresh_last_frame = 0;
+      cpi->refresh_golden_frame = 0;
+#if USE_SYMM_MULTI_LAYER
+      if (cpi->new_bwdref_update_rule == 1) {
+        cpi->refresh_bwd_ref_frame = 1;
+        cpi->refresh_alt2_ref_frame = 0;
+      } else {
+#endif
+        cpi->refresh_bwd_ref_frame = 0;
+        cpi->refresh_alt2_ref_frame = 1;
+#if USE_SYMM_MULTI_LAYER
+      }
+#endif
+      cpi->refresh_alt_ref_frame = 0;
+      break;
+
+    default: assert(0); break;
+  }
+}
+
+void av1_estimate_qp_gop(AV1_COMP *cpi) {
+  AV1_COMMON *const cm = &cpi->common;
+  int gop_length = cpi->rc.baseline_gf_interval;
+  int bottom_index, top_index;
+  int idx;
+  const int gf_index = cpi->twopass.gf_group.index;
+
+  for (idx = 1; idx <= gop_length + 1 && idx < MAX_LAG_BUFFERS; ++idx) {
+    TplDepFrame *tpl_frame = &cpi->tpl_stats[idx];
+    int target_rate = cpi->twopass.gf_group.bit_allocation[idx];
+    int arf_q = 0;
+
+    cpi->twopass.gf_group.index = idx;
+    rc_set_frame_target(cpi, target_rate, cm->width, cm->height);
+    av1_configure_buffer_updates(cpi);
+    tpl_frame->base_qindex = rc_pick_q_and_bounds_two_pass(
+        cpi, cm->width, cm->height, &bottom_index, &top_index, &arf_q);
+    tpl_frame->base_qindex = AOMMAX(tpl_frame->base_qindex, 1);
+  }
+  // Reset the actual index and frame update
+  cpi->twopass.gf_group.index = gf_index;
+  av1_configure_buffer_updates(cpi);
 }
 
 void av1_rc_postencode_update(AV1_COMP *cpi, uint64_t bytes_used) {

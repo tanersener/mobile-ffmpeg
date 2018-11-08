@@ -2086,33 +2086,1570 @@ static INLINE void idct32_low16_new_neon(int16x8_t *in, int16x8_t *out,
   out[30] = vqsubq_s16(step2[1], step2[30]);
   out[31] = vqsubq_s16(step2[0], step2[31]);
 }
+static INLINE void idct64_stage9_neon(int16x8_t *step2, int16x8_t *step1,
+                                      int8_t cos_bit) {
+  const int32_t *cospi = cospi_arr(cos_bit);
+  const int16x4_t c3 =
+      create_s16x4_neon((int16_t *)(cospi + 32), (int16_t *)(cospi + 32),
+                        (int16_t *)(cospi + 16), (int16_t *)(cospi + 48));
+
+  btf_16_lane_0_1_neon(step2[27], step2[20], c3, &step1[27], &step1[20]);
+  btf_16_lane_0_1_neon(step2[26], step2[21], c3, &step1[26], &step1[21]);
+  btf_16_lane_0_1_neon(step2[25], step2[22], c3, &step1[25], &step1[22]);
+  btf_16_lane_0_1_neon(step2[24], step2[23], c3, &step1[24], &step1[23]);
+
+  step1[0] = vqaddq_s16(step2[0], step2[15]);
+  step1[1] = vqaddq_s16(step2[1], step2[14]);
+  step1[2] = vqaddq_s16(step2[2], step2[13]);
+  step1[3] = vqaddq_s16(step2[3], step2[12]);
+  step1[4] = vqaddq_s16(step2[4], step2[11]);
+  step1[5] = vqaddq_s16(step2[5], step2[10]);
+  step1[6] = vqaddq_s16(step2[6], step2[9]);
+  step1[7] = vqaddq_s16(step2[7], step2[8]);
+  step1[8] = vqsubq_s16(step2[7], step2[8]);
+  step1[9] = vqsubq_s16(step2[6], step2[9]);
+  step1[10] = vqsubq_s16(step2[5], step2[10]);
+  step1[11] = vqsubq_s16(step2[4], step2[11]);
+  step1[12] = vqsubq_s16(step2[3], step2[12]);
+  step1[13] = vqsubq_s16(step2[2], step2[13]);
+  step1[14] = vqsubq_s16(step2[1], step2[14]);
+  step1[15] = vqsubq_s16(step2[0], step2[15]);
+  step1[16] = step2[16];
+  step1[17] = step2[17];
+  step1[18] = step2[18];
+  step1[19] = step2[19];
+  step1[28] = step2[28];
+  step1[29] = step2[29];
+  step1[30] = step2[30];
+  step1[31] = step2[31];
+  step1[32] = vqaddq_s16(step2[32], step2[47]);
+  step1[33] = vqaddq_s16(step2[33], step2[46]);
+  step1[34] = vqaddq_s16(step2[34], step2[45]);
+  step1[35] = vqaddq_s16(step2[35], step2[44]);
+  step1[36] = vqaddq_s16(step2[36], step2[43]);
+  step1[37] = vqaddq_s16(step2[37], step2[42]);
+  step1[38] = vqaddq_s16(step2[38], step2[41]);
+  step1[39] = vqaddq_s16(step2[39], step2[40]);
+  step1[40] = vqsubq_s16(step2[39], step2[40]);
+  step1[41] = vqsubq_s16(step2[38], step2[41]);
+  step1[42] = vqsubq_s16(step2[37], step2[42]);
+  step1[43] = vqsubq_s16(step2[36], step2[43]);
+  step1[44] = vqsubq_s16(step2[35], step2[44]);
+  step1[45] = vqsubq_s16(step2[34], step2[45]);
+  step1[46] = vqsubq_s16(step2[33], step2[46]);
+  step1[47] = vqsubq_s16(step2[32], step2[47]);
+  step1[48] = vqsubq_s16(step2[63], step2[48]);
+  step1[49] = vqsubq_s16(step2[62], step2[49]);
+  step1[50] = vqsubq_s16(step2[61], step2[50]);
+  step1[51] = vqsubq_s16(step2[60], step2[51]);
+  step1[52] = vqsubq_s16(step2[59], step2[52]);
+  step1[53] = vqsubq_s16(step2[58], step2[53]);
+  step1[54] = vqsubq_s16(step2[57], step2[54]);
+  step1[55] = vqsubq_s16(step2[56], step2[55]);
+  step1[56] = vqaddq_s16(step2[56], step2[55]);
+  step1[57] = vqaddq_s16(step2[57], step2[54]);
+  step1[58] = vqaddq_s16(step2[58], step2[53]);
+  step1[59] = vqaddq_s16(step2[59], step2[52]);
+  step1[60] = vqaddq_s16(step2[60], step2[51]);
+  step1[61] = vqaddq_s16(step2[61], step2[50]);
+  step1[62] = vqaddq_s16(step2[62], step2[49]);
+  step1[63] = vqaddq_s16(step2[63], step2[48]);
+}
+
+static INLINE void idct64_stage10_neon(int16x8_t *step1, int16x8_t *step2,
+                                       int8_t cos_bit) {
+  const int32_t *cospi = cospi_arr(cos_bit);
+  const int16x4_t c3 =
+      create_s16x4_neon((int16_t *)(cospi + 32), (int16_t *)(cospi + 32),
+                        (int16_t *)(cospi + 16), (int16_t *)(cospi + 48));
+
+  btf_16_lane_0_1_neon(step1[55], step1[40], c3, &step2[55], &step2[40]);
+  btf_16_lane_0_1_neon(step1[54], step1[41], c3, &step2[54], &step2[41]);
+  btf_16_lane_0_1_neon(step1[53], step1[42], c3, &step2[53], &step2[42]);
+  btf_16_lane_0_1_neon(step1[52], step1[43], c3, &step2[52], &step2[43]);
+  btf_16_lane_0_1_neon(step1[51], step1[44], c3, &step2[51], &step2[44]);
+  btf_16_lane_0_1_neon(step1[50], step1[45], c3, &step2[50], &step2[45]);
+  btf_16_lane_0_1_neon(step1[49], step1[46], c3, &step2[49], &step2[46]);
+  btf_16_lane_0_1_neon(step1[48], step1[47], c3, &step2[48], &step2[47]);
+
+  step2[0] = vqaddq_s16(step1[0], step1[31]);
+  step2[1] = vqaddq_s16(step1[1], step1[30]);
+  step2[2] = vqaddq_s16(step1[2], step1[29]);
+  step2[3] = vqaddq_s16(step1[3], step1[28]);
+  step2[4] = vqaddq_s16(step1[4], step1[27]);
+  step2[5] = vqaddq_s16(step1[5], step1[26]);
+  step2[6] = vqaddq_s16(step1[6], step1[25]);
+  step2[7] = vqaddq_s16(step1[7], step1[24]);
+  step2[8] = vqaddq_s16(step1[8], step1[23]);
+  step2[9] = vqaddq_s16(step1[9], step1[22]);
+  step2[10] = vqaddq_s16(step1[10], step1[21]);
+  step2[11] = vqaddq_s16(step1[11], step1[20]);
+  step2[12] = vqaddq_s16(step1[12], step1[19]);
+  step2[13] = vqaddq_s16(step1[13], step1[18]);
+  step2[14] = vqaddq_s16(step1[14], step1[17]);
+  step2[15] = vqaddq_s16(step1[15], step1[16]);
+  step2[16] = vqsubq_s16(step1[15], step1[16]);
+  step2[17] = vqsubq_s16(step1[14], step1[17]);
+  step2[18] = vqsubq_s16(step1[13], step1[18]);
+  step2[19] = vqsubq_s16(step1[12], step1[19]);
+  step2[20] = vqsubq_s16(step1[11], step1[20]);
+  step2[21] = vqsubq_s16(step1[10], step1[21]);
+  step2[22] = vqsubq_s16(step1[9], step1[22]);
+  step2[23] = vqsubq_s16(step1[8], step1[23]);
+  step2[24] = vqsubq_s16(step1[7], step1[24]);
+  step2[25] = vqsubq_s16(step1[6], step1[25]);
+  step2[26] = vqsubq_s16(step1[5], step1[26]);
+  step2[27] = vqsubq_s16(step1[4], step1[27]);
+  step2[28] = vqsubq_s16(step1[3], step1[28]);
+  step2[29] = vqsubq_s16(step1[2], step1[29]);
+  step2[30] = vqsubq_s16(step1[1], step1[30]);
+  step2[31] = vqsubq_s16(step1[0], step1[31]);
+  step2[32] = step1[32];
+  step2[33] = step1[33];
+  step2[34] = step1[34];
+  step2[35] = step1[35];
+  step2[36] = step1[36];
+  step2[37] = step1[37];
+  step2[38] = step1[38];
+  step2[39] = step1[39];
+  step2[56] = step1[56];
+  step2[57] = step1[57];
+  step2[58] = step1[58];
+  step2[59] = step1[59];
+  step2[60] = step1[60];
+  step2[61] = step1[61];
+  step2[62] = step1[62];
+  step2[63] = step1[63];
+}
+
+static INLINE void idct64_low32_new_neon(int16x8_t *in, int16x8_t *out,
+                                         int8_t cos_bit, int bit) {
+  (void)bit;
+  const int32_t *cospi = cospi_arr(cos_bit);
+  int16x8_t step2[64], step1[64];
+  const int16x4_t c0 =
+      create_s16x4_neon((int16_t *)(cospi + 4), (int16_t *)(cospi + 60),
+                        (int16_t *)(cospi + 36), (int16_t *)(cospi + 28));
+  const int16x4_t c1 =
+      create_s16x4_neon((int16_t *)(cospi + 20), (int16_t *)(cospi + 44),
+                        (int16_t *)(cospi + 52), (int16_t *)(cospi + 12));
+  const int16x4_t c2 =
+      create_s16x4_neon((int16_t *)(cospi + 8), (int16_t *)(cospi + 56),
+                        (int16_t *)(cospi + 40), (int16_t *)(cospi + 24));
+  const int16x4_t c3 =
+      create_s16x4_neon((int16_t *)(cospi + 32), (int16_t *)(cospi + 32),
+                        (int16_t *)(cospi + 16), (int16_t *)(cospi + 48));
+
+  // stage 1
+  // stage 2
+
+  step2[0] = in[0];
+  step2[2] = in[16];
+  step2[4] = in[8];
+  step2[6] = in[24];
+  step2[8] = in[4];
+  step2[10] = in[20];
+  step2[12] = in[12];
+  step2[14] = in[28];
+  step2[16] = in[2];
+  step2[18] = in[18];
+  step2[20] = in[10];
+  step2[22] = in[26];
+  step2[24] = in[6];
+  step2[26] = in[22];
+  step2[28] = in[14];
+  step2[30] = in[30];
+
+  btf_16_neon(in[1], cospi[63], cospi[1], &step2[32], &step2[63]);
+  btf_16_neon(in[31], -cospi[33], cospi[31], &step2[33], &step2[62]);
+  btf_16_neon(in[17], cospi[47], cospi[17], &step2[34], &step2[61]);
+  btf_16_neon(in[15], -cospi[49], cospi[15], &step2[35], &step2[60]);
+  btf_16_neon(in[9], cospi[55], cospi[9], &step2[36], &step2[59]);
+  btf_16_neon(in[23], -cospi[41], cospi[23], &step2[37], &step2[58]);
+  btf_16_neon(in[25], cospi[39], cospi[25], &step2[38], &step2[57]);
+  btf_16_neon(in[7], -cospi[57], cospi[7], &step2[39], &step2[56]);
+  btf_16_neon(in[5], cospi[59], cospi[5], &step2[40], &step2[55]);
+  btf_16_neon(in[27], -cospi[37], cospi[27], &step2[41], &step2[54]);
+  btf_16_neon(in[21], cospi[43], cospi[21], &step2[42], &step2[53]);
+  btf_16_neon(in[11], -cospi[53], cospi[11], &step2[43], &step2[52]);
+  btf_16_neon(in[13], cospi[51], cospi[13], &step2[44], &step2[51]);
+  btf_16_neon(in[19], -cospi[45], cospi[19], &step2[45], &step2[50]);
+  btf_16_neon(in[29], cospi[35], cospi[29], &step2[46], &step2[49]);
+  btf_16_neon(in[3], -cospi[61], cospi[3], &step2[47], &step2[48]);
+
+  // stage 3
+
+  step1[0] = step2[0];
+  step1[2] = step2[2];
+  step1[4] = step2[4];
+  step1[6] = step2[6];
+  step1[8] = step2[8];
+  step1[10] = step2[10];
+  step1[12] = step2[12];
+  step1[14] = step2[14];
+
+  btf_16_neon(step2[16], cospi[62], cospi[2], &step1[16], &step1[31]);
+  btf_16_neon(step2[30], -cospi[34], cospi[30], &step1[17], &step1[30]);
+  btf_16_neon(step2[18], cospi[46], cospi[18], &step1[18], &step1[29]);
+  btf_16_neon(step2[28], -cospi[50], cospi[14], &step1[19], &step1[28]);
+  btf_16_neon(step2[20], cospi[54], cospi[10], &step1[20], &step1[27]);
+  btf_16_neon(step2[26], -cospi[42], cospi[22], &step1[21], &step1[26]);
+  btf_16_neon(step2[22], cospi[38], cospi[26], &step1[22], &step1[25]);
+  btf_16_neon(step2[24], -cospi[58], cospi[6], &step1[23], &step1[24]);
+
+  step1[32] = vqaddq_s16(step2[32], step2[33]);
+  step1[33] = vqsubq_s16(step2[32], step2[33]);
+  step1[34] = vqsubq_s16(step2[35], step2[34]);
+  step1[35] = vqaddq_s16(step2[35], step2[34]);
+  step1[36] = vqaddq_s16(step2[36], step2[37]);
+  step1[37] = vqsubq_s16(step2[36], step2[37]);
+  step1[38] = vqsubq_s16(step2[39], step2[38]);
+  step1[39] = vqaddq_s16(step2[39], step2[38]);
+  step1[40] = vqaddq_s16(step2[40], step2[41]);
+  step1[41] = vqsubq_s16(step2[40], step2[41]);
+  step1[42] = vqsubq_s16(step2[43], step2[42]);
+  step1[43] = vqaddq_s16(step2[43], step2[42]);
+  step1[44] = vqaddq_s16(step2[44], step2[45]);
+  step1[45] = vqsubq_s16(step2[44], step2[45]);
+  step1[46] = vqsubq_s16(step2[47], step2[46]);
+  step1[47] = vqaddq_s16(step2[47], step2[46]);
+  step1[48] = vqaddq_s16(step2[48], step2[49]);
+  step1[49] = vqsubq_s16(step2[48], step2[49]);
+  step1[50] = vqsubq_s16(step2[51], step2[50]);
+  step1[51] = vqaddq_s16(step2[51], step2[50]);
+  step1[52] = vqaddq_s16(step2[52], step2[53]);
+  step1[53] = vqsubq_s16(step2[52], step2[53]);
+  step1[54] = vqsubq_s16(step2[55], step2[54]);
+  step1[55] = vqaddq_s16(step2[55], step2[54]);
+  step1[56] = vqaddq_s16(step2[56], step2[57]);
+  step1[57] = vqsubq_s16(step2[56], step2[57]);
+  step1[58] = vqsubq_s16(step2[59], step2[58]);
+  step1[59] = vqaddq_s16(step2[59], step2[58]);
+  step1[60] = vqaddq_s16(step2[60], step2[61]);
+  step1[61] = vqsubq_s16(step2[60], step2[61]);
+  step1[62] = vqsubq_s16(step2[63], step2[62]);
+  step1[63] = vqaddq_s16(step2[63], step2[62]);
+
+  // stage 4
+
+  step2[0] = step1[0];
+  step2[2] = step1[2];
+  step2[4] = step1[4];
+  step2[6] = step1[6];
+
+  btf_16_neon(step1[8], cospi[60], cospi[4], &step2[8], &step2[15]);
+  btf_16_neon(step1[14], -cospi[36], cospi[28], &step2[9], &step2[14]);
+  btf_16_neon(step1[10], cospi[44], cospi[20], &step2[10], &step2[13]);
+  btf_16_neon(step1[12], -cospi[52], cospi[12], &step2[11], &step2[12]);
+  btf_16_lane_0_1_neon(step1[62], step1[33], c0, &step2[62], &step2[33]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[34]), vnegq_s16(step1[61]), c0,
+                       &step2[34], &step2[61]);
+  btf_16_lane_2_3_neon(step1[58], step1[37], c0, &step2[58], &step2[37]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[38]), vnegq_s16(step1[57]), c0,
+                       &step2[38], &step2[57]);
+  btf_16_lane_0_1_neon(step1[54], step1[41], c1, &step2[54], &step2[41]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[42]), vnegq_s16(step1[53]), c1,
+                       &step2[42], &step2[53]);
+  btf_16_lane_2_3_neon(step1[50], step1[45], c1, &step2[50], &step2[45]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[46]), vnegq_s16(step1[49]), c1,
+                       &step2[46], &step2[49]);
+
+  step2[16] = vqaddq_s16(step1[16], step1[17]);
+  step2[17] = vqsubq_s16(step1[16], step1[17]);
+  step2[18] = vqsubq_s16(step1[19], step1[18]);
+  step2[19] = vqaddq_s16(step1[19], step1[18]);
+  step2[20] = vqaddq_s16(step1[20], step1[21]);
+  step2[21] = vqsubq_s16(step1[20], step1[21]);
+  step2[22] = vqsubq_s16(step1[23], step1[22]);
+  step2[23] = vqaddq_s16(step1[23], step1[22]);
+  step2[24] = vqaddq_s16(step1[24], step1[25]);
+  step2[25] = vqsubq_s16(step1[24], step1[25]);
+  step2[26] = vqsubq_s16(step1[27], step1[26]);
+  step2[27] = vqaddq_s16(step1[27], step1[26]);
+  step2[28] = vqaddq_s16(step1[28], step1[29]);
+  step2[29] = vqsubq_s16(step1[28], step1[29]);
+  step2[30] = vqsubq_s16(step1[31], step1[30]);
+  step2[31] = vqaddq_s16(step1[31], step1[30]);
+  step2[32] = step1[32];
+  step2[35] = step1[35];
+  step2[36] = step1[36];
+  step2[39] = step1[39];
+  step2[40] = step1[40];
+  step2[43] = step1[43];
+  step2[44] = step1[44];
+  step2[47] = step1[47];
+  step2[48] = step1[48];
+  step2[51] = step1[51];
+  step2[52] = step1[52];
+  step2[55] = step1[55];
+  step2[56] = step1[56];
+  step2[59] = step1[59];
+  step2[60] = step1[60];
+  step2[63] = step1[63];
+
+  // stage 5
+
+  step1[0] = step2[0];
+  step1[2] = step2[2];
+
+  btf_16_neon(step2[4], cospi[56], cospi[8], &step1[4], &step1[7]);
+  btf_16_neon(step2[6], -cospi[40], cospi[24], &step1[5], &step1[6]);
+  btf_16_lane_0_1_neon(step2[30], step2[17], c2, &step1[30], &step1[17]);
+  btf_16_lane_1_0_neon(vnegq_s16(step2[18]), vnegq_s16(step2[29]), c2,
+                       &step1[18], &step1[29]);
+  btf_16_lane_2_3_neon(step2[26], step2[21], c2, &step1[26], &step1[21]);
+  btf_16_lane_3_2_neon(vnegq_s16(step2[22]), vnegq_s16(step2[25]), c2,
+                       &step1[22], &step1[25]);
+
+  step1[8] = vqaddq_s16(step2[8], step2[9]);
+  step1[9] = vqsubq_s16(step2[8], step2[9]);
+  step1[10] = vqsubq_s16(step2[11], step2[10]);
+  step1[11] = vqaddq_s16(step2[11], step2[10]);
+  step1[12] = vqaddq_s16(step2[12], step2[13]);
+  step1[13] = vqsubq_s16(step2[12], step2[13]);
+  step1[14] = vqsubq_s16(step2[15], step2[14]);
+  step1[15] = vqaddq_s16(step2[15], step2[14]);
+  step1[16] = step2[16];
+  step1[19] = step2[19];
+  step1[20] = step2[20];
+  step1[23] = step2[23];
+  step1[24] = step2[24];
+  step1[27] = step2[27];
+  step1[28] = step2[28];
+  step1[31] = step2[31];
+  step1[32] = vqaddq_s16(step2[32], step2[35]);
+  step1[33] = vqaddq_s16(step2[33], step2[34]);
+  step1[34] = vqsubq_s16(step2[33], step2[34]);
+  step1[35] = vqsubq_s16(step2[32], step2[35]);
+  step1[36] = vqsubq_s16(step2[39], step2[36]);
+  step1[37] = vqsubq_s16(step2[38], step2[37]);
+  step1[38] = vqaddq_s16(step2[38], step2[37]);
+  step1[39] = vqaddq_s16(step2[39], step2[36]);
+  step1[40] = vqaddq_s16(step2[40], step2[43]);
+  step1[41] = vqaddq_s16(step2[41], step2[42]);
+  step1[42] = vqsubq_s16(step2[41], step2[42]);
+  step1[43] = vqsubq_s16(step2[40], step2[43]);
+  step1[44] = vqsubq_s16(step2[47], step2[44]);
+  step1[45] = vqsubq_s16(step2[46], step2[45]);
+  step1[46] = vqaddq_s16(step2[46], step2[45]);
+  step1[47] = vqaddq_s16(step2[47], step2[44]);
+  step1[48] = vqaddq_s16(step2[48], step2[51]);
+  step1[49] = vqaddq_s16(step2[49], step2[50]);
+  step1[50] = vqsubq_s16(step2[49], step2[50]);
+  step1[51] = vqsubq_s16(step2[48], step2[51]);
+  step1[52] = vqsubq_s16(step2[55], step2[52]);
+  step1[53] = vqsubq_s16(step2[54], step2[53]);
+  step1[54] = vqaddq_s16(step2[54], step2[53]);
+  step1[55] = vqaddq_s16(step2[55], step2[52]);
+  step1[56] = vqaddq_s16(step2[56], step2[59]);
+  step1[57] = vqaddq_s16(step2[57], step2[58]);
+  step1[58] = vqsubq_s16(step2[57], step2[58]);
+  step1[59] = vqsubq_s16(step2[56], step2[59]);
+  step1[60] = vqsubq_s16(step2[63], step2[60]);
+  step1[61] = vqsubq_s16(step2[62], step2[61]);
+  step1[62] = vqaddq_s16(step2[62], step2[61]);
+  step1[63] = vqaddq_s16(step2[63], step2[60]);
+
+  // stage 6
+
+  btf_16_neon(step1[0], cospi[32], cospi[32], &step2[0], &step2[1]);
+  btf_16_neon(step1[2], cospi[48], cospi[16], &step2[2], &step2[3]);
+  btf_16_lane_2_3_neon(step1[14], step1[9], c3, &step2[14], &step2[9]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[10]), vnegq_s16(step1[13]), c3,
+                       &step2[10], &step2[13]);
+  btf_16_lane_0_1_neon(step1[61], step1[34], c2, &step2[61], &step2[34]);
+  btf_16_lane_0_1_neon(step1[60], step1[35], c2, &step2[60], &step2[35]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[36]), vnegq_s16(step1[59]), c2,
+                       &step2[36], &step2[59]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[37]), vnegq_s16(step1[58]), c2,
+                       &step2[37], &step2[58]);
+  btf_16_lane_2_3_neon(step1[53], step1[42], c2, &step2[53], &step2[42]);
+  btf_16_lane_2_3_neon(step1[52], step1[43], c2, &step2[52], &step2[43]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[44]), vnegq_s16(step1[51]), c2,
+                       &step2[44], &step2[51]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[45]), vnegq_s16(step1[50]), c2,
+                       &step2[45], &step2[50]);
+
+  step2[4] = vqaddq_s16(step1[4], step1[5]);
+  step2[5] = vqsubq_s16(step1[4], step1[5]);
+  step2[6] = vqsubq_s16(step1[7], step1[6]);
+  step2[7] = vqaddq_s16(step1[7], step1[6]);
+  step2[8] = step1[8];
+  step2[11] = step1[11];
+  step2[12] = step1[12];
+  step2[15] = step1[15];
+  step2[16] = vqaddq_s16(step1[16], step1[19]);
+  step2[17] = vqaddq_s16(step1[17], step1[18]);
+  step2[18] = vqsubq_s16(step1[17], step1[18]);
+  step2[19] = vqsubq_s16(step1[16], step1[19]);
+  step2[20] = vqsubq_s16(step1[23], step1[20]);
+  step2[21] = vqsubq_s16(step1[22], step1[21]);
+  step2[22] = vqaddq_s16(step1[22], step1[21]);
+  step2[23] = vqaddq_s16(step1[23], step1[20]);
+  step2[24] = vqaddq_s16(step1[24], step1[27]);
+  step2[25] = vqaddq_s16(step1[25], step1[26]);
+  step2[26] = vqsubq_s16(step1[25], step1[26]);
+  step2[27] = vqsubq_s16(step1[24], step1[27]);
+  step2[28] = vqsubq_s16(step1[31], step1[28]);
+  step2[29] = vqsubq_s16(step1[30], step1[29]);
+  step2[30] = vqaddq_s16(step1[30], step1[29]);
+  step2[31] = vqaddq_s16(step1[31], step1[28]);
+  step2[32] = step1[32];
+  step2[33] = step1[33];
+  step2[38] = step1[38];
+  step2[39] = step1[39];
+  step2[40] = step1[40];
+  step2[41] = step1[41];
+  step2[46] = step1[46];
+  step2[47] = step1[47];
+  step2[48] = step1[48];
+  step2[49] = step1[49];
+  step2[54] = step1[54];
+  step2[55] = step1[55];
+  step2[56] = step1[56];
+  step2[57] = step1[57];
+  step2[62] = step1[62];
+  step2[63] = step1[63];
+
+  // stage 7
+
+  btf_16_lane_0_1_neon(step2[6], step2[5], c3, &step1[6], &step1[5]);
+  btf_16_lane_2_3_neon(step2[29], step2[18], c3, &step1[29], &step1[18]);
+  btf_16_lane_2_3_neon(step2[28], step2[19], c3, &step1[28], &step1[19]);
+  btf_16_lane_3_2_neon(vnegq_s16(step2[20]), vnegq_s16(step2[27]), c3,
+                       &step1[20], &step1[27]);
+  btf_16_lane_3_2_neon(vnegq_s16(step2[21]), vnegq_s16(step2[26]), c3,
+                       &step1[21], &step1[26]);
+
+  step1[0] = vqaddq_s16(step2[0], step2[3]);
+  step1[1] = vqaddq_s16(step2[1], step2[2]);
+  step1[2] = vqsubq_s16(step2[1], step2[2]);
+  step1[3] = vqsubq_s16(step2[0], step2[3]);
+  step1[4] = step2[4];
+  step1[7] = step2[7];
+  step1[8] = vqaddq_s16(step2[8], step2[11]);
+  step1[9] = vqaddq_s16(step2[9], step2[10]);
+  step1[10] = vqsubq_s16(step2[9], step2[10]);
+  step1[11] = vqsubq_s16(step2[8], step2[11]);
+  step1[12] = vqsubq_s16(step2[15], step2[12]);
+  step1[13] = vqsubq_s16(step2[14], step2[13]);
+  step1[14] = vqaddq_s16(step2[14], step2[13]);
+  step1[15] = vqaddq_s16(step2[15], step2[12]);
+  step1[16] = step2[16];
+  step1[17] = step2[17];
+  step1[22] = step2[22];
+  step1[23] = step2[23];
+  step1[24] = step2[24];
+  step1[25] = step2[25];
+  step1[30] = step2[30];
+  step1[31] = step2[31];
+  step1[32] = vqaddq_s16(step2[32], step2[39]);
+  step1[33] = vqaddq_s16(step2[33], step2[38]);
+  step1[34] = vqaddq_s16(step2[34], step2[37]);
+  step1[35] = vqaddq_s16(step2[35], step2[36]);
+  step1[36] = vqsubq_s16(step2[35], step2[36]);
+  step1[37] = vqsubq_s16(step2[34], step2[37]);
+  step1[38] = vqsubq_s16(step2[33], step2[38]);
+  step1[39] = vqsubq_s16(step2[32], step2[39]);
+  step1[40] = vqsubq_s16(step2[47], step2[40]);
+  step1[41] = vqsubq_s16(step2[46], step2[41]);
+  step1[42] = vqsubq_s16(step2[45], step2[42]);
+  step1[43] = vqsubq_s16(step2[44], step2[43]);
+  step1[44] = vqaddq_s16(step2[43], step2[44]);
+  step1[45] = vqaddq_s16(step2[42], step2[45]);
+  step1[46] = vqaddq_s16(step2[41], step2[46]);
+  step1[47] = vqaddq_s16(step2[40], step2[47]);
+  step1[48] = vqaddq_s16(step2[48], step2[55]);
+  step1[49] = vqaddq_s16(step2[49], step2[54]);
+  step1[50] = vqaddq_s16(step2[50], step2[53]);
+  step1[51] = vqaddq_s16(step2[51], step2[52]);
+  step1[52] = vqsubq_s16(step2[51], step2[52]);
+  step1[53] = vqsubq_s16(step2[50], step2[53]);
+  step1[54] = vqsubq_s16(step2[49], step2[54]);
+  step1[55] = vqsubq_s16(step2[48], step2[55]);
+  step1[56] = vqsubq_s16(step2[63], step2[56]);
+  step1[57] = vqsubq_s16(step2[62], step2[57]);
+  step1[58] = vqsubq_s16(step2[61], step2[58]);
+  step1[59] = vqsubq_s16(step2[60], step2[59]);
+  step1[60] = vqaddq_s16(step2[59], step2[60]);
+  step1[61] = vqaddq_s16(step2[58], step2[61]);
+  step1[62] = vqaddq_s16(step2[57], step2[62]);
+  step1[63] = vqaddq_s16(step2[56], step2[63]);
+
+  // stage 8
+
+  btf_16_lane_0_1_neon(step1[13], step1[10], c3, &step2[13], &step2[10]);
+  btf_16_lane_0_1_neon(step1[12], step1[11], c3, &step2[12], &step2[11]);
+  btf_16_lane_2_3_neon(step1[59], step1[36], c3, &step2[59], &step2[36]);
+  btf_16_lane_2_3_neon(step1[58], step1[37], c3, &step2[58], &step2[37]);
+  btf_16_lane_2_3_neon(step1[57], step1[38], c3, &step2[57], &step2[38]);
+  btf_16_lane_2_3_neon(step1[56], step1[39], c3, &step2[56], &step2[39]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[40]), vnegq_s16(step1[55]), c3,
+                       &step2[40], &step2[55]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[41]), vnegq_s16(step1[54]), c3,
+                       &step2[41], &step2[54]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[42]), vnegq_s16(step1[53]), c3,
+                       &step2[42], &step2[53]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[43]), vnegq_s16(step1[52]), c3,
+                       &step2[43], &step2[52]);
+
+  step2[0] = vqaddq_s16(step1[0], step1[7]);
+  step2[1] = vqaddq_s16(step1[1], step1[6]);
+  step2[2] = vqaddq_s16(step1[2], step1[5]);
+  step2[3] = vqaddq_s16(step1[3], step1[4]);
+  step2[4] = vqsubq_s16(step1[3], step1[4]);
+  step2[5] = vqsubq_s16(step1[2], step1[5]);
+  step2[6] = vqsubq_s16(step1[1], step1[6]);
+  step2[7] = vqsubq_s16(step1[0], step1[7]);
+  step2[8] = step1[8];
+  step2[9] = step1[9];
+  step2[14] = step1[14];
+  step2[15] = step1[15];
+  step2[16] = vqaddq_s16(step1[16], step1[23]);
+  step2[17] = vqaddq_s16(step1[17], step1[22]);
+  step2[18] = vqaddq_s16(step1[18], step1[21]);
+  step2[19] = vqaddq_s16(step1[19], step1[20]);
+  step2[20] = vqsubq_s16(step1[19], step1[20]);
+  step2[21] = vqsubq_s16(step1[18], step1[21]);
+  step2[22] = vqsubq_s16(step1[17], step1[22]);
+  step2[23] = vqsubq_s16(step1[16], step1[23]);
+  step2[24] = vqsubq_s16(step1[31], step1[24]);
+  step2[25] = vqsubq_s16(step1[30], step1[25]);
+  step2[26] = vqsubq_s16(step1[29], step1[26]);
+  step2[27] = vqsubq_s16(step1[28], step1[27]);
+  step2[28] = vqaddq_s16(step1[28], step1[27]);
+  step2[29] = vqaddq_s16(step1[29], step1[26]);
+  step2[30] = vqaddq_s16(step1[30], step1[25]);
+  step2[31] = vqaddq_s16(step1[31], step1[24]);
+  step2[32] = step1[32];
+  step2[33] = step1[33];
+  step2[34] = step1[34];
+  step2[35] = step1[35];
+  step2[44] = step1[44];
+  step2[45] = step1[45];
+  step2[46] = step1[46];
+  step2[47] = step1[47];
+  step2[48] = step1[48];
+  step2[49] = step1[49];
+  step2[50] = step1[50];
+  step2[51] = step1[51];
+  step2[60] = step1[60];
+  step2[61] = step1[61];
+  step2[62] = step1[62];
+  step2[63] = step1[63];
+
+  // stage 9
+  idct64_stage9_neon(step2, step1, cos_bit);
+
+  // stage 10
+  idct64_stage10_neon(step1, step2, cos_bit);
+
+  // stage 11
+
+  out[0] = vqaddq_s16(step2[0], step2[63]);
+  out[1] = vqaddq_s16(step2[1], step2[62]);
+  out[2] = vqaddq_s16(step2[2], step2[61]);
+  out[3] = vqaddq_s16(step2[3], step2[60]);
+  out[4] = vqaddq_s16(step2[4], step2[59]);
+  out[5] = vqaddq_s16(step2[5], step2[58]);
+  out[6] = vqaddq_s16(step2[6], step2[57]);
+  out[7] = vqaddq_s16(step2[7], step2[56]);
+  out[8] = vqaddq_s16(step2[8], step2[55]);
+  out[9] = vqaddq_s16(step2[9], step2[54]);
+  out[10] = vqaddq_s16(step2[10], step2[53]);
+  out[11] = vqaddq_s16(step2[11], step2[52]);
+  out[12] = vqaddq_s16(step2[12], step2[51]);
+  out[13] = vqaddq_s16(step2[13], step2[50]);
+  out[14] = vqaddq_s16(step2[14], step2[49]);
+  out[15] = vqaddq_s16(step2[15], step2[48]);
+  out[16] = vqaddq_s16(step2[16], step2[47]);
+  out[17] = vqaddq_s16(step2[17], step2[46]);
+  out[18] = vqaddq_s16(step2[18], step2[45]);
+  out[19] = vqaddq_s16(step2[19], step2[44]);
+  out[20] = vqaddq_s16(step2[20], step2[43]);
+  out[21] = vqaddq_s16(step2[21], step2[42]);
+  out[22] = vqaddq_s16(step2[22], step2[41]);
+  out[23] = vqaddq_s16(step2[23], step2[40]);
+  out[24] = vqaddq_s16(step2[24], step2[39]);
+  out[25] = vqaddq_s16(step2[25], step2[38]);
+  out[26] = vqaddq_s16(step2[26], step2[37]);
+  out[27] = vqaddq_s16(step2[27], step2[36]);
+  out[28] = vqaddq_s16(step2[28], step2[35]);
+  out[29] = vqaddq_s16(step2[29], step2[34]);
+  out[30] = vqaddq_s16(step2[30], step2[33]);
+  out[31] = vqaddq_s16(step2[31], step2[32]);
+  out[32] = vqsubq_s16(step2[31], step2[32]);
+  out[33] = vqsubq_s16(step2[30], step2[33]);
+  out[34] = vqsubq_s16(step2[29], step2[34]);
+  out[35] = vqsubq_s16(step2[28], step2[35]);
+  out[36] = vqsubq_s16(step2[27], step2[36]);
+  out[37] = vqsubq_s16(step2[26], step2[37]);
+  out[38] = vqsubq_s16(step2[25], step2[38]);
+  out[39] = vqsubq_s16(step2[24], step2[39]);
+  out[40] = vqsubq_s16(step2[23], step2[40]);
+  out[41] = vqsubq_s16(step2[22], step2[41]);
+  out[42] = vqsubq_s16(step2[21], step2[42]);
+  out[43] = vqsubq_s16(step2[20], step2[43]);
+  out[44] = vqsubq_s16(step2[19], step2[44]);
+  out[45] = vqsubq_s16(step2[18], step2[45]);
+  out[46] = vqsubq_s16(step2[17], step2[46]);
+  out[47] = vqsubq_s16(step2[16], step2[47]);
+  out[48] = vqsubq_s16(step2[15], step2[48]);
+  out[49] = vqsubq_s16(step2[14], step2[49]);
+  out[50] = vqsubq_s16(step2[13], step2[50]);
+  out[51] = vqsubq_s16(step2[12], step2[51]);
+  out[52] = vqsubq_s16(step2[11], step2[52]);
+  out[53] = vqsubq_s16(step2[10], step2[53]);
+  out[54] = vqsubq_s16(step2[9], step2[54]);
+  out[55] = vqsubq_s16(step2[8], step2[55]);
+  out[56] = vqsubq_s16(step2[7], step2[56]);
+  out[57] = vqsubq_s16(step2[6], step2[57]);
+  out[58] = vqsubq_s16(step2[5], step2[58]);
+  out[59] = vqsubq_s16(step2[4], step2[59]);
+  out[60] = vqsubq_s16(step2[3], step2[60]);
+  out[61] = vqsubq_s16(step2[2], step2[61]);
+  out[62] = vqsubq_s16(step2[1], step2[62]);
+  out[63] = vqsubq_s16(step2[0], step2[63]);
+}
+
+static INLINE void idct64_low1_new_neon(int16x8_t *input, int16x8_t *out,
+                                        int8_t cos_bit, int bit) {
+  (void)bit;
+  const int32_t *cospi = cospi_arr(cos_bit);
+  int16x8_t step1;
+  int32x4_t t32[2];
+
+  // stage 1
+  // stage 2
+  // stage 3
+  // stage 4
+  // stage 5
+  // stage 6
+
+  t32[0] = vmull_n_s16(vget_low_s16(input[0]), cospi[32]);
+  t32[1] = vmull_n_s16(vget_high_s16(input[0]), cospi[32]);
+
+  step1 = vcombine_s16(vrshrn_n_s32(t32[0], INV_COS_BIT),
+                       vrshrn_n_s32(t32[1], INV_COS_BIT));
+  // stage 7
+  // stage 8
+  // stage 9
+  // stage 10
+  // stage 11
+  out[0] = step1;
+  out[1] = step1;
+  out[2] = step1;
+  out[3] = step1;
+  out[4] = step1;
+  out[5] = step1;
+  out[6] = step1;
+  out[7] = step1;
+  out[8] = step1;
+  out[9] = step1;
+  out[10] = step1;
+  out[11] = step1;
+  out[12] = step1;
+  out[13] = step1;
+  out[14] = step1;
+  out[15] = step1;
+  out[16] = step1;
+  out[17] = step1;
+  out[18] = step1;
+  out[19] = step1;
+  out[20] = step1;
+  out[21] = step1;
+  out[22] = step1;
+  out[23] = step1;
+  out[24] = step1;
+  out[25] = step1;
+  out[26] = step1;
+  out[27] = step1;
+  out[28] = step1;
+  out[29] = step1;
+  out[30] = step1;
+  out[31] = step1;
+  out[32] = step1;
+  out[33] = step1;
+  out[34] = step1;
+  out[35] = step1;
+  out[36] = step1;
+  out[37] = step1;
+  out[38] = step1;
+  out[39] = step1;
+  out[40] = step1;
+  out[41] = step1;
+  out[42] = step1;
+  out[43] = step1;
+  out[44] = step1;
+  out[45] = step1;
+  out[46] = step1;
+  out[47] = step1;
+  out[48] = step1;
+  out[49] = step1;
+  out[50] = step1;
+  out[51] = step1;
+  out[52] = step1;
+  out[53] = step1;
+  out[54] = step1;
+  out[55] = step1;
+  out[56] = step1;
+  out[57] = step1;
+  out[58] = step1;
+  out[59] = step1;
+  out[60] = step1;
+  out[61] = step1;
+  out[62] = step1;
+  out[63] = step1;
+}
+
+static INLINE void idct64_low8_new_neon(int16x8_t *in, int16x8_t *out,
+                                        int8_t cos_bit, int bit) {
+  (void)bit;
+  const int32_t *cospi = cospi_arr(cos_bit);
+  int16x8_t step2[64], step1[64];
+
+  const int16x4_t c0 =
+      create_s16x4_neon((int16_t *)(cospi + 4), (int16_t *)(cospi + 60),
+                        (int16_t *)(cospi + 36), (int16_t *)(cospi + 28));
+  const int16x4_t c1 =
+      create_s16x4_neon((int16_t *)(cospi + 20), (int16_t *)(cospi + 44),
+                        (int16_t *)(cospi + 52), (int16_t *)(cospi + 12));
+  const int16x4_t c2 =
+      create_s16x4_neon((int16_t *)(cospi + 8), (int16_t *)(cospi + 56),
+                        (int16_t *)(cospi + 40), (int16_t *)(cospi + 24));
+  const int16x4_t c3 =
+      create_s16x4_neon((int16_t *)(cospi + 32), (int16_t *)(cospi + 32),
+                        (int16_t *)(cospi + 16), (int16_t *)(cospi + 48));
+
+  // stage 1
+  // stage 2
+
+  step2[0] = in[0];
+  step2[8] = in[4];
+  step2[16] = in[2];
+  step2[24] = in[6];
+
+  btf_16_neon(in[1], cospi[63], cospi[1], &step2[32], &step2[63]);
+  btf_16_neon(in[7], -cospi[57], cospi[7], &step2[39], &step2[56]);
+  btf_16_neon(in[5], cospi[59], cospi[5], &step2[40], &step2[55]);
+  btf_16_neon(in[3], -cospi[61], cospi[3], &step2[47], &step2[48]);
+
+  // stage 3
+
+  step1[0] = step2[0];
+  step1[8] = step2[8];
+
+  btf_16_neon(step2[16], cospi[62], cospi[2], &step1[16], &step1[31]);
+  btf_16_neon(step2[24], -cospi[58], cospi[6], &step1[23], &step1[24]);
+
+  step1[32] = step2[32];
+  step1[33] = step2[32];
+  step1[38] = step2[39];
+  step1[39] = step2[39];
+  step1[40] = step2[40];
+  step1[41] = step2[40];
+  step1[46] = step2[47];
+  step1[47] = step2[47];
+  step1[48] = step2[48];
+  step1[49] = step2[48];
+  step1[54] = step2[55];
+  step1[55] = step2[55];
+  step1[56] = step2[56];
+  step1[57] = step2[56];
+  step1[62] = step2[63];
+  step1[63] = step2[63];
+
+  // stage 4
+
+  step2[0] = step1[0];
+
+  btf_16_neon(step1[8], cospi[60], cospi[4], &step2[8], &step2[15]);
+  btf_16_lane_0_1_neon(step1[62], step1[33], c0, &step2[62], &step2[33]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[38]), vnegq_s16(step1[57]), c0,
+                       &step2[38], &step2[57]);
+  btf_16_lane_0_1_neon(step1[54], step1[41], c1, &step2[54], &step2[41]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[46]), vnegq_s16(step1[49]), c1,
+                       &step2[46], &step2[49]);
+
+  step2[16] = step1[16];
+  step2[17] = step1[16];
+  step2[22] = step1[23];
+  step2[23] = step1[23];
+  step2[24] = step1[24];
+  step2[25] = step1[24];
+  step2[30] = step1[31];
+  step2[31] = step1[31];
+  step2[32] = step1[32];
+  step2[39] = step1[39];
+  step2[40] = step1[40];
+  step2[47] = step1[47];
+  step2[48] = step1[48];
+  step2[55] = step1[55];
+  step2[56] = step1[56];
+  step2[63] = step1[63];
+
+  // stage 5
+
+  step1[0] = step2[0];
+
+  btf_16_lane_0_1_neon(step2[30], step2[17], c2, &step1[30], &step1[17]);
+  btf_16_lane_3_2_neon(vnegq_s16(step2[22]), vnegq_s16(step2[25]), c2,
+                       &step1[22], &step1[25]);
+
+  step1[8] = step2[8];
+  step1[9] = step2[8];
+  step1[14] = step2[15];
+  step1[15] = step2[15];
+
+  step1[16] = step2[16];
+  step1[23] = step2[23];
+  step1[24] = step2[24];
+  step1[31] = step2[31];
+  step1[32] = step2[32];
+  step1[33] = step2[33];
+  step1[34] = step2[33];
+  step1[35] = step2[32];
+  step1[36] = step2[39];
+  step1[37] = step2[38];
+  step1[38] = step2[38];
+  step1[39] = step2[39];
+  step1[40] = step2[40];
+  step1[41] = step2[41];
+  step1[42] = step2[41];
+  step1[43] = step2[40];
+  step1[44] = step2[47];
+  step1[45] = step2[46];
+  step1[46] = step2[46];
+  step1[47] = step2[47];
+  step1[48] = step2[48];
+  step1[49] = step2[49];
+  step1[50] = step2[49];
+  step1[51] = step2[48];
+  step1[52] = step2[55];
+  step1[53] = step2[54];
+  step1[54] = step2[54];
+  step1[55] = step2[55];
+  step1[56] = step2[56];
+  step1[57] = step2[57];
+  step1[58] = step2[57];
+  step1[59] = step2[56];
+  step1[60] = step2[63];
+  step1[61] = step2[62];
+  step1[62] = step2[62];
+  step1[63] = step2[63];
+
+  // stage 6
+
+  btf_16_neon(step1[0], cospi[32], cospi[32], &step2[0], &step2[1]);
+  btf_16_lane_2_3_neon(step1[14], step1[9], c3, &step2[14], &step2[9]);
+  btf_16_lane_0_1_neon(step1[61], step1[34], c2, &step2[61], &step2[34]);
+  btf_16_lane_0_1_neon(step1[60], step1[35], c2, &step2[60], &step2[35]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[36]), vnegq_s16(step1[59]), c2,
+                       &step2[36], &step2[59]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[37]), vnegq_s16(step1[58]), c2,
+                       &step2[37], &step2[58]);
+  btf_16_lane_2_3_neon(step1[53], step1[42], c2, &step2[53], &step2[42]);
+  btf_16_lane_2_3_neon(step1[52], step1[43], c2, &step2[52], &step2[43]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[44]), vnegq_s16(step1[51]), c2,
+                       &step2[44], &step2[51]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[45]), vnegq_s16(step1[50]), c2,
+                       &step2[45], &step2[50]);
+
+  step2[8] = step1[8];
+  step2[15] = step1[15];
+  step2[16] = step1[16];
+  step2[17] = step1[17];
+  step2[18] = step1[17];
+  step2[19] = step1[16];
+  step2[20] = step1[23];
+  step2[21] = step1[22];
+  step2[22] = step1[22];
+  step2[23] = step1[23];
+  step2[24] = step1[24];
+  step2[25] = step1[25];
+  step2[26] = step1[25];
+  step2[27] = step1[24];
+  step2[28] = step1[31];
+  step2[29] = step1[30];
+  step2[30] = step1[30];
+  step2[31] = step1[31];
+  step2[32] = step1[32];
+  step2[33] = step1[33];
+  step2[38] = step1[38];
+  step2[39] = step1[39];
+  step2[40] = step1[40];
+  step2[41] = step1[41];
+  step2[46] = step1[46];
+  step2[47] = step1[47];
+  step2[48] = step1[48];
+  step2[49] = step1[49];
+  step2[54] = step1[54];
+  step2[55] = step1[55];
+  step2[56] = step1[56];
+  step2[57] = step1[57];
+  step2[62] = step1[62];
+  step2[63] = step1[63];
+
+  // stage 7
+
+  btf_16_lane_2_3_neon(step2[29], step2[18], c3, &step1[29], &step1[18]);
+  btf_16_lane_2_3_neon(step2[28], step2[19], c3, &step1[28], &step1[19]);
+  btf_16_lane_3_2_neon(vnegq_s16(step2[20]), vnegq_s16(step2[27]), c3,
+                       &step1[20], &step1[27]);
+  btf_16_lane_3_2_neon(vnegq_s16(step2[21]), vnegq_s16(step2[26]), c3,
+                       &step1[21], &step1[26]);
+
+  step1[0] = step2[0];
+  step1[1] = step2[1];
+  step1[2] = step2[1];
+  step1[3] = step2[0];
+  step1[8] = step2[8];
+  step1[9] = step2[9];
+  step1[10] = step2[9];
+  step1[11] = step2[8];
+  step1[12] = step2[15];
+  step1[13] = step2[14];
+  step1[14] = step2[14];
+  step1[15] = step2[15];
+  step1[16] = step2[16];
+  step1[17] = step2[17];
+  step1[22] = step2[22];
+  step1[23] = step2[23];
+  step1[24] = step2[24];
+  step1[25] = step2[25];
+  step1[30] = step2[30];
+  step1[31] = step2[31];
+  step1[32] = vqaddq_s16(step2[32], step2[39]);
+  step1[33] = vqaddq_s16(step2[33], step2[38]);
+  step1[34] = vqaddq_s16(step2[34], step2[37]);
+  step1[35] = vqaddq_s16(step2[35], step2[36]);
+  step1[36] = vqsubq_s16(step2[35], step2[36]);
+  step1[37] = vqsubq_s16(step2[34], step2[37]);
+  step1[38] = vqsubq_s16(step2[33], step2[38]);
+  step1[39] = vqsubq_s16(step2[32], step2[39]);
+  step1[40] = vqsubq_s16(step2[47], step2[40]);
+  step1[41] = vqsubq_s16(step2[46], step2[41]);
+  step1[42] = vqsubq_s16(step2[45], step2[42]);
+  step1[43] = vqsubq_s16(step2[44], step2[43]);
+  step1[44] = vqaddq_s16(step2[43], step2[44]);
+  step1[45] = vqaddq_s16(step2[42], step2[45]);
+  step1[46] = vqaddq_s16(step2[41], step2[46]);
+  step1[47] = vqaddq_s16(step2[40], step2[47]);
+  step1[48] = vqaddq_s16(step2[48], step2[55]);
+  step1[49] = vqaddq_s16(step2[49], step2[54]);
+  step1[50] = vqaddq_s16(step2[50], step2[53]);
+  step1[51] = vqaddq_s16(step2[51], step2[52]);
+  step1[52] = vqsubq_s16(step2[51], step2[52]);
+  step1[53] = vqsubq_s16(step2[50], step2[53]);
+  step1[54] = vqsubq_s16(step2[49], step2[54]);
+  step1[55] = vqsubq_s16(step2[48], step2[55]);
+  step1[56] = vqsubq_s16(step2[63], step2[56]);
+  step1[57] = vqsubq_s16(step2[62], step2[57]);
+  step1[58] = vqsubq_s16(step2[61], step2[58]);
+  step1[59] = vqsubq_s16(step2[60], step2[59]);
+  step1[60] = vqaddq_s16(step2[59], step2[60]);
+  step1[61] = vqaddq_s16(step2[58], step2[61]);
+  step1[62] = vqaddq_s16(step2[57], step2[62]);
+  step1[63] = vqaddq_s16(step2[56], step2[63]);
+
+  // stage 8
+
+  btf_16_lane_0_1_neon(step1[13], step1[10], c3, &step2[13], &step2[10]);
+  btf_16_lane_0_1_neon(step1[12], step1[11], c3, &step2[12], &step2[11]);
+  btf_16_lane_2_3_neon(step1[59], step1[36], c3, &step2[59], &step2[36]);
+  btf_16_lane_2_3_neon(step1[58], step1[37], c3, &step2[58], &step2[37]);
+  btf_16_lane_2_3_neon(step1[57], step1[38], c3, &step2[57], &step2[38]);
+  btf_16_lane_2_3_neon(step1[56], step1[39], c3, &step2[56], &step2[39]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[40]), vnegq_s16(step1[55]), c3,
+                       &step2[40], &step2[55]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[41]), vnegq_s16(step1[54]), c3,
+                       &step2[41], &step2[54]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[42]), vnegq_s16(step1[53]), c3,
+                       &step2[42], &step2[53]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[43]), vnegq_s16(step1[52]), c3,
+                       &step2[43], &step2[52]);
+
+  step2[0] = step1[0];
+  step2[1] = step1[1];
+  step2[2] = step1[2];
+  step2[3] = step1[3];
+  step2[4] = step1[3];
+  step2[5] = step1[2];
+  step2[6] = step1[1];
+  step2[7] = step1[0];
+  step2[8] = step1[8];
+  step2[9] = step1[9];
+  step2[14] = step1[14];
+  step2[15] = step1[15];
+  step2[16] = vqaddq_s16(step1[16], step1[23]);
+  step2[17] = vqaddq_s16(step1[17], step1[22]);
+  step2[18] = vqaddq_s16(step1[18], step1[21]);
+  step2[19] = vqaddq_s16(step1[19], step1[20]);
+  step2[20] = vqsubq_s16(step1[19], step1[20]);
+  step2[21] = vqsubq_s16(step1[18], step1[21]);
+  step2[22] = vqsubq_s16(step1[17], step1[22]);
+  step2[23] = vqsubq_s16(step1[16], step1[23]);
+  step2[24] = vqsubq_s16(step1[31], step1[24]);
+  step2[25] = vqsubq_s16(step1[30], step1[25]);
+  step2[26] = vqsubq_s16(step1[29], step1[26]);
+  step2[27] = vqsubq_s16(step1[28], step1[27]);
+  step2[28] = vqaddq_s16(step1[28], step1[27]);
+  step2[29] = vqaddq_s16(step1[29], step1[26]);
+  step2[30] = vqaddq_s16(step1[30], step1[25]);
+  step2[31] = vqaddq_s16(step1[31], step1[24]);
+  step2[32] = step1[32];
+  step2[33] = step1[33];
+  step2[34] = step1[34];
+  step2[35] = step1[35];
+  step2[44] = step1[44];
+  step2[45] = step1[45];
+  step2[46] = step1[46];
+  step2[47] = step1[47];
+  step2[48] = step1[48];
+  step2[49] = step1[49];
+  step2[50] = step1[50];
+  step2[51] = step1[51];
+  step2[60] = step1[60];
+  step2[61] = step1[61];
+  step2[62] = step1[62];
+  step2[63] = step1[63];
+
+  // stage 9
+  idct64_stage9_neon(step2, step1, cos_bit);
+
+  // stage 10
+  idct64_stage10_neon(step1, step2, cos_bit);
+
+  // stage 11
+
+  out[0] = vqaddq_s16(step2[0], step2[63]);
+  out[1] = vqaddq_s16(step2[1], step2[62]);
+  out[2] = vqaddq_s16(step2[2], step2[61]);
+  out[3] = vqaddq_s16(step2[3], step2[60]);
+  out[4] = vqaddq_s16(step2[4], step2[59]);
+  out[5] = vqaddq_s16(step2[5], step2[58]);
+  out[6] = vqaddq_s16(step2[6], step2[57]);
+  out[7] = vqaddq_s16(step2[7], step2[56]);
+  out[8] = vqaddq_s16(step2[8], step2[55]);
+  out[9] = vqaddq_s16(step2[9], step2[54]);
+  out[10] = vqaddq_s16(step2[10], step2[53]);
+  out[11] = vqaddq_s16(step2[11], step2[52]);
+  out[12] = vqaddq_s16(step2[12], step2[51]);
+  out[13] = vqaddq_s16(step2[13], step2[50]);
+  out[14] = vqaddq_s16(step2[14], step2[49]);
+  out[15] = vqaddq_s16(step2[15], step2[48]);
+  out[16] = vqaddq_s16(step2[16], step2[47]);
+  out[17] = vqaddq_s16(step2[17], step2[46]);
+  out[18] = vqaddq_s16(step2[18], step2[45]);
+  out[19] = vqaddq_s16(step2[19], step2[44]);
+  out[20] = vqaddq_s16(step2[20], step2[43]);
+  out[21] = vqaddq_s16(step2[21], step2[42]);
+  out[22] = vqaddq_s16(step2[22], step2[41]);
+  out[23] = vqaddq_s16(step2[23], step2[40]);
+  out[24] = vqaddq_s16(step2[24], step2[39]);
+  out[25] = vqaddq_s16(step2[25], step2[38]);
+  out[26] = vqaddq_s16(step2[26], step2[37]);
+  out[27] = vqaddq_s16(step2[27], step2[36]);
+  out[28] = vqaddq_s16(step2[28], step2[35]);
+  out[29] = vqaddq_s16(step2[29], step2[34]);
+  out[30] = vqaddq_s16(step2[30], step2[33]);
+  out[31] = vqaddq_s16(step2[31], step2[32]);
+  out[32] = vqsubq_s16(step2[31], step2[32]);
+  out[33] = vqsubq_s16(step2[30], step2[33]);
+  out[34] = vqsubq_s16(step2[29], step2[34]);
+  out[35] = vqsubq_s16(step2[28], step2[35]);
+  out[36] = vqsubq_s16(step2[27], step2[36]);
+  out[37] = vqsubq_s16(step2[26], step2[37]);
+  out[38] = vqsubq_s16(step2[25], step2[38]);
+  out[39] = vqsubq_s16(step2[24], step2[39]);
+  out[40] = vqsubq_s16(step2[23], step2[40]);
+  out[41] = vqsubq_s16(step2[22], step2[41]);
+  out[42] = vqsubq_s16(step2[21], step2[42]);
+  out[43] = vqsubq_s16(step2[20], step2[43]);
+  out[44] = vqsubq_s16(step2[19], step2[44]);
+  out[45] = vqsubq_s16(step2[18], step2[45]);
+  out[46] = vqsubq_s16(step2[17], step2[46]);
+  out[47] = vqsubq_s16(step2[16], step2[47]);
+  out[48] = vqsubq_s16(step2[15], step2[48]);
+  out[49] = vqsubq_s16(step2[14], step2[49]);
+  out[50] = vqsubq_s16(step2[13], step2[50]);
+  out[51] = vqsubq_s16(step2[12], step2[51]);
+  out[52] = vqsubq_s16(step2[11], step2[52]);
+  out[53] = vqsubq_s16(step2[10], step2[53]);
+  out[54] = vqsubq_s16(step2[9], step2[54]);
+  out[55] = vqsubq_s16(step2[8], step2[55]);
+  out[56] = vqsubq_s16(step2[7], step2[56]);
+  out[57] = vqsubq_s16(step2[6], step2[57]);
+  out[58] = vqsubq_s16(step2[5], step2[58]);
+  out[59] = vqsubq_s16(step2[4], step2[59]);
+  out[60] = vqsubq_s16(step2[3], step2[60]);
+  out[61] = vqsubq_s16(step2[2], step2[61]);
+  out[62] = vqsubq_s16(step2[1], step2[62]);
+  out[63] = vqsubq_s16(step2[0], step2[63]);
+}
+
+static INLINE void idct64_low16_new_neon(int16x8_t *in, int16x8_t *out,
+                                         int8_t cos_bit, int bit) {
+  (void)bit;
+  const int32_t *cospi = cospi_arr(cos_bit);
+  int16x8_t step2[64], step1[64];
+
+  const int16x4_t c0 =
+      create_s16x4_neon((int16_t *)(cospi + 4), (int16_t *)(cospi + 60),
+                        (int16_t *)(cospi + 36), (int16_t *)(cospi + 28));
+  const int16x4_t c1 =
+      create_s16x4_neon((int16_t *)(cospi + 20), (int16_t *)(cospi + 44),
+                        (int16_t *)(cospi + 52), (int16_t *)(cospi + 12));
+  const int16x4_t c2 =
+      create_s16x4_neon((int16_t *)(cospi + 8), (int16_t *)(cospi + 56),
+                        (int16_t *)(cospi + 40), (int16_t *)(cospi + 24));
+  const int16x4_t c3 =
+      create_s16x4_neon((int16_t *)(cospi + 32), (int16_t *)(cospi + 32),
+                        (int16_t *)(cospi + 16), (int16_t *)(cospi + 48));
+
+  // stage 1
+  // stage 2
+
+  step2[0] = in[0];
+  step2[4] = in[8];
+  step2[8] = in[4];
+  step2[12] = in[12];
+  step2[16] = in[2];
+  step2[20] = in[10];
+  step2[24] = in[6];
+  step2[28] = in[14];
+
+  btf_16_neon(in[1], cospi[63], cospi[1], &step2[32], &step2[63]);
+  btf_16_neon(in[15], -cospi[49], cospi[15], &step2[35], &step2[60]);
+  btf_16_neon(in[9], cospi[55], cospi[9], &step2[36], &step2[59]);
+  btf_16_neon(in[7], -cospi[57], cospi[7], &step2[39], &step2[56]);
+  btf_16_neon(in[5], cospi[59], cospi[5], &step2[40], &step2[55]);
+  btf_16_neon(in[11], -cospi[53], cospi[11], &step2[43], &step2[52]);
+  btf_16_neon(in[13], cospi[51], cospi[13], &step2[44], &step2[51]);
+  btf_16_neon(in[3], -cospi[61], cospi[3], &step2[47], &step2[48]);
+
+  // stage 3
+
+  step1[0] = step2[0];
+  step1[4] = step2[4];
+  step1[8] = step2[8];
+  step1[12] = step2[12];
+
+  btf_16_neon(step2[16], cospi[62], cospi[2], &step1[16], &step1[31]);
+  btf_16_neon(step2[20], cospi[54], cospi[10], &step1[20], &step1[27]);
+  btf_16_neon(step2[24], -cospi[58], cospi[6], &step1[23], &step1[24]);
+  btf_16_neon(step2[28], -cospi[50], cospi[14], &step1[19], &step1[28]);
+
+  step1[32] = step2[32];
+  step1[33] = step2[32];
+  step1[34] = step2[35];
+  step1[35] = step2[35];
+  step1[36] = step2[36];
+  step1[37] = step2[36];
+  step1[38] = step2[39];
+  step1[39] = step2[39];
+  step1[40] = step2[40];
+  step1[41] = step2[40];
+  step1[42] = step2[43];
+  step1[43] = step2[43];
+  step1[44] = step2[44];
+  step1[45] = step2[44];
+  step1[46] = step2[47];
+  step1[47] = step2[47];
+  step1[48] = step2[48];
+  step1[49] = step2[48];
+  step1[50] = step2[51];
+  step1[51] = step2[51];
+  step1[52] = step2[52];
+  step1[53] = step2[52];
+  step1[54] = step2[55];
+  step1[55] = step2[55];
+  step1[56] = step2[56];
+  step1[57] = step2[56];
+  step1[58] = step2[59];
+  step1[59] = step2[59];
+  step1[60] = step2[60];
+  step1[61] = step2[60];
+  step1[62] = step2[63];
+  step1[63] = step2[63];
+
+  // stage 4
+
+  step2[0] = step1[0];
+  step2[4] = step1[4];
+
+  btf_16_neon(step1[8], cospi[60], cospi[4], &step2[8], &step2[15]);
+  btf_16_neon(step1[12], -cospi[52], cospi[12], &step2[11], &step2[12]);
+  btf_16_lane_0_1_neon(step1[62], step1[33], c0, &step2[62], &step2[33]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[34]), vnegq_s16(step1[61]), c0,
+                       &step2[34], &step2[61]);
+  btf_16_lane_2_3_neon(step1[58], step1[37], c0, &step2[58], &step2[37]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[38]), vnegq_s16(step1[57]), c0,
+                       &step2[38], &step2[57]);
+  btf_16_lane_0_1_neon(step1[54], step1[41], c1, &step2[54], &step2[41]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[42]), vnegq_s16(step1[53]), c1,
+                       &step2[42], &step2[53]);
+  btf_16_lane_2_3_neon(step1[50], step1[45], c1, &step2[50], &step2[45]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[46]), vnegq_s16(step1[49]), c1,
+                       &step2[46], &step2[49]);
+
+  step2[16] = step1[16];
+  step2[17] = step1[16];
+  step2[18] = step1[19];
+  step2[19] = step1[19];
+  step2[20] = step1[20];
+  step2[21] = step1[20];
+  step2[22] = step1[23];
+  step2[23] = step1[23];
+  step2[24] = step1[24];
+  step2[25] = step1[24];
+  step2[26] = step1[27];
+  step2[27] = step1[27];
+  step2[28] = step1[28];
+  step2[29] = step1[28];
+  step2[30] = step1[31];
+  step2[31] = step1[31];
+  step2[32] = step1[32];
+  step2[35] = step1[35];
+  step2[36] = step1[36];
+  step2[39] = step1[39];
+  step2[40] = step1[40];
+  step2[43] = step1[43];
+  step2[44] = step1[44];
+  step2[47] = step1[47];
+  step2[48] = step1[48];
+  step2[51] = step1[51];
+  step2[52] = step1[52];
+  step2[55] = step1[55];
+  step2[56] = step1[56];
+  step2[59] = step1[59];
+  step2[60] = step1[60];
+  step2[63] = step1[63];
+
+  // stage 5
+
+  step1[0] = step2[0];
+
+  btf_16_neon(step2[4], cospi[56], cospi[8], &step1[4], &step1[7]);
+  btf_16_lane_0_1_neon(step2[30], step2[17], c2, &step1[30], &step1[17]);
+  btf_16_lane_1_0_neon(vnegq_s16(step2[18]), vnegq_s16(step2[29]), c2,
+                       &step1[18], &step1[29]);
+  btf_16_lane_2_3_neon(step2[26], step2[21], c2, &step1[26], &step1[21]);
+  btf_16_lane_3_2_neon(vnegq_s16(step2[22]), vnegq_s16(step2[25]), c2,
+                       &step1[22], &step1[25]);
+
+  step1[8] = step2[8];
+  step1[9] = step2[8];
+  step1[10] = step2[11];
+  step1[11] = step2[11];
+  step1[12] = step2[12];
+  step1[13] = step2[12];
+  step1[14] = step2[15];
+  step1[15] = step2[15];
+  step1[16] = step2[16];
+  step1[19] = step2[19];
+  step1[20] = step2[20];
+  step1[23] = step2[23];
+  step1[24] = step2[24];
+  step1[27] = step2[27];
+  step1[28] = step2[28];
+  step1[31] = step2[31];
+  step1[32] = vqaddq_s16(step2[32], step2[35]);
+  step1[33] = vqaddq_s16(step2[33], step2[34]);
+  step1[34] = vqsubq_s16(step2[33], step2[34]);
+  step1[35] = vqsubq_s16(step2[32], step2[35]);
+  step1[36] = vqsubq_s16(step2[39], step2[36]);
+  step1[37] = vqsubq_s16(step2[38], step2[37]);
+  step1[38] = vqaddq_s16(step2[38], step2[37]);
+  step1[39] = vqaddq_s16(step2[39], step2[36]);
+  step1[40] = vqaddq_s16(step2[40], step2[43]);
+  step1[41] = vqaddq_s16(step2[41], step2[42]);
+  step1[42] = vqsubq_s16(step2[41], step2[42]);
+  step1[43] = vqsubq_s16(step2[40], step2[43]);
+  step1[44] = vqsubq_s16(step2[47], step2[44]);
+  step1[45] = vqsubq_s16(step2[46], step2[45]);
+  step1[46] = vqaddq_s16(step2[46], step2[45]);
+  step1[47] = vqaddq_s16(step2[47], step2[44]);
+  step1[48] = vqaddq_s16(step2[48], step2[51]);
+  step1[49] = vqaddq_s16(step2[49], step2[50]);
+  step1[50] = vqsubq_s16(step2[49], step2[50]);
+  step1[51] = vqsubq_s16(step2[48], step2[51]);
+  step1[52] = vqsubq_s16(step2[55], step2[52]);
+  step1[53] = vqsubq_s16(step2[54], step2[53]);
+  step1[54] = vqaddq_s16(step2[54], step2[53]);
+  step1[55] = vqaddq_s16(step2[55], step2[52]);
+  step1[56] = vqaddq_s16(step2[56], step2[59]);
+  step1[57] = vqaddq_s16(step2[57], step2[58]);
+  step1[58] = vqsubq_s16(step2[57], step2[58]);
+  step1[59] = vqsubq_s16(step2[56], step2[59]);
+  step1[60] = vqsubq_s16(step2[63], step2[60]);
+  step1[61] = vqsubq_s16(step2[62], step2[61]);
+  step1[62] = vqaddq_s16(step2[62], step2[61]);
+  step1[63] = vqaddq_s16(step2[63], step2[60]);
+
+  // stage 6
+
+  btf_16_neon(step1[0], cospi[32], cospi[32], &step2[0], &step2[1]);
+  btf_16_lane_2_3_neon(step1[14], step1[9], c3, &step2[14], &step2[9]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[10]), vnegq_s16(step1[13]), c3,
+                       &step2[10], &step2[13]);
+  btf_16_lane_0_1_neon(step1[61], step1[34], c2, &step2[61], &step2[34]);
+  btf_16_lane_0_1_neon(step1[60], step1[35], c2, &step2[60], &step2[35]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[36]), vnegq_s16(step1[59]), c2,
+                       &step2[36], &step2[59]);
+  btf_16_lane_1_0_neon(vnegq_s16(step1[37]), vnegq_s16(step1[58]), c2,
+                       &step2[37], &step2[58]);
+  btf_16_lane_2_3_neon(step1[53], step1[42], c2, &step2[53], &step2[42]);
+  btf_16_lane_2_3_neon(step1[52], step1[43], c2, &step2[52], &step2[43]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[44]), vnegq_s16(step1[51]), c2,
+                       &step2[44], &step2[51]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[45]), vnegq_s16(step1[50]), c2,
+                       &step2[45], &step2[50]);
+
+  step2[4] = step1[4];
+  step2[5] = step1[4];
+  step2[6] = step1[7];
+  step2[7] = step1[7];
+  step2[8] = step1[8];
+  step2[11] = step1[11];
+  step2[12] = step1[12];
+  step2[15] = step1[15];
+  step2[16] = vqaddq_s16(step1[16], step1[19]);
+  step2[17] = vqaddq_s16(step1[17], step1[18]);
+  step2[18] = vqsubq_s16(step1[17], step1[18]);
+  step2[19] = vqsubq_s16(step1[16], step1[19]);
+  step2[20] = vqsubq_s16(step1[23], step1[20]);
+  step2[21] = vqsubq_s16(step1[22], step1[21]);
+  step2[22] = vqaddq_s16(step1[22], step1[21]);
+  step2[23] = vqaddq_s16(step1[23], step1[20]);
+  step2[24] = vqaddq_s16(step1[24], step1[27]);
+  step2[25] = vqaddq_s16(step1[25], step1[26]);
+  step2[26] = vqsubq_s16(step1[25], step1[26]);
+  step2[27] = vqsubq_s16(step1[24], step1[27]);
+  step2[28] = vqsubq_s16(step1[31], step1[28]);
+  step2[29] = vqsubq_s16(step1[30], step1[29]);
+  step2[30] = vqaddq_s16(step1[30], step1[29]);
+  step2[31] = vqaddq_s16(step1[31], step1[28]);
+  step2[32] = step1[32];
+  step2[33] = step1[33];
+  step2[38] = step1[38];
+  step2[39] = step1[39];
+  step2[40] = step1[40];
+  step2[41] = step1[41];
+  step2[46] = step1[46];
+  step2[47] = step1[47];
+  step2[48] = step1[48];
+  step2[49] = step1[49];
+  step2[54] = step1[54];
+  step2[55] = step1[55];
+  step2[56] = step1[56];
+  step2[57] = step1[57];
+  step2[62] = step1[62];
+  step2[63] = step1[63];
+
+  // stage 7
+
+  btf_16_lane_0_1_neon(step2[6], step2[5], c3, &step1[6], &step1[5]);
+  btf_16_lane_2_3_neon(step2[29], step2[18], c3, &step1[29], &step1[18]);
+  btf_16_lane_2_3_neon(step2[28], step2[19], c3, &step1[28], &step1[19]);
+  btf_16_lane_3_2_neon(vnegq_s16(step2[20]), vnegq_s16(step2[27]), c3,
+                       &step1[20], &step1[27]);
+  btf_16_lane_3_2_neon(vnegq_s16(step2[21]), vnegq_s16(step2[26]), c3,
+                       &step1[21], &step1[26]);
+
+  step1[0] = step2[0];
+  step1[1] = step2[1];
+  step1[2] = step2[1];
+  step1[3] = step2[0];
+  step1[4] = step2[4];
+  step1[7] = step2[7];
+  step1[8] = vqaddq_s16(step2[8], step2[11]);
+  step1[9] = vqaddq_s16(step2[9], step2[10]);
+  step1[10] = vqsubq_s16(step2[9], step2[10]);
+  step1[11] = vqsubq_s16(step2[8], step2[11]);
+  step1[12] = vqsubq_s16(step2[15], step2[12]);
+  step1[13] = vqsubq_s16(step2[14], step2[13]);
+  step1[14] = vqaddq_s16(step2[14], step2[13]);
+  step1[15] = vqaddq_s16(step2[15], step2[12]);
+  step1[16] = step2[16];
+  step1[17] = step2[17];
+  step1[22] = step2[22];
+  step1[23] = step2[23];
+  step1[24] = step2[24];
+  step1[25] = step2[25];
+  step1[30] = step2[30];
+  step1[31] = step2[31];
+  step1[32] = vqaddq_s16(step2[32], step2[39]);
+  step1[33] = vqaddq_s16(step2[33], step2[38]);
+  step1[34] = vqaddq_s16(step2[34], step2[37]);
+  step1[35] = vqaddq_s16(step2[35], step2[36]);
+  step1[36] = vqsubq_s16(step2[35], step2[36]);
+  step1[37] = vqsubq_s16(step2[34], step2[37]);
+  step1[38] = vqsubq_s16(step2[33], step2[38]);
+  step1[39] = vqsubq_s16(step2[32], step2[39]);
+  step1[40] = vqsubq_s16(step2[47], step2[40]);
+  step1[41] = vqsubq_s16(step2[46], step2[41]);
+  step1[42] = vqsubq_s16(step2[45], step2[42]);
+  step1[43] = vqsubq_s16(step2[44], step2[43]);
+  step1[44] = vqaddq_s16(step2[43], step2[44]);
+  step1[45] = vqaddq_s16(step2[42], step2[45]);
+  step1[46] = vqaddq_s16(step2[41], step2[46]);
+  step1[47] = vqaddq_s16(step2[40], step2[47]);
+  step1[48] = vqaddq_s16(step2[48], step2[55]);
+  step1[49] = vqaddq_s16(step2[49], step2[54]);
+  step1[50] = vqaddq_s16(step2[50], step2[53]);
+  step1[51] = vqaddq_s16(step2[51], step2[52]);
+  step1[52] = vqsubq_s16(step2[51], step2[52]);
+  step1[53] = vqsubq_s16(step2[50], step2[53]);
+  step1[54] = vqsubq_s16(step2[49], step2[54]);
+  step1[55] = vqsubq_s16(step2[48], step2[55]);
+  step1[56] = vqsubq_s16(step2[63], step2[56]);
+  step1[57] = vqsubq_s16(step2[62], step2[57]);
+  step1[58] = vqsubq_s16(step2[61], step2[58]);
+  step1[59] = vqsubq_s16(step2[60], step2[59]);
+  step1[60] = vqaddq_s16(step2[59], step2[60]);
+  step1[61] = vqaddq_s16(step2[58], step2[61]);
+  step1[62] = vqaddq_s16(step2[57], step2[62]);
+  step1[63] = vqaddq_s16(step2[56], step2[63]);
+
+  // stage 8
+
+  btf_16_lane_0_1_neon(step1[13], step1[10], c3, &step2[13], &step2[10]);
+  btf_16_lane_0_1_neon(step1[12], step1[11], c3, &step2[12], &step2[11]);
+  btf_16_lane_2_3_neon(step1[59], step1[36], c3, &step2[59], &step2[36]);
+  btf_16_lane_2_3_neon(step1[58], step1[37], c3, &step2[58], &step2[37]);
+  btf_16_lane_2_3_neon(step1[57], step1[38], c3, &step2[57], &step2[38]);
+  btf_16_lane_2_3_neon(step1[56], step1[39], c3, &step2[56], &step2[39]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[40]), vnegq_s16(step1[55]), c3,
+                       &step2[40], &step2[55]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[41]), vnegq_s16(step1[54]), c3,
+                       &step2[41], &step2[54]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[42]), vnegq_s16(step1[53]), c3,
+                       &step2[42], &step2[53]);
+  btf_16_lane_3_2_neon(vnegq_s16(step1[43]), vnegq_s16(step1[52]), c3,
+                       &step2[43], &step2[52]);
+
+  step2[0] = vqaddq_s16(step1[0], step1[7]);
+  step2[1] = vqaddq_s16(step1[1], step1[6]);
+  step2[2] = vqaddq_s16(step1[2], step1[5]);
+  step2[3] = vqaddq_s16(step1[3], step1[4]);
+  step2[4] = vqsubq_s16(step1[3], step1[4]);
+  step2[5] = vqsubq_s16(step1[2], step1[5]);
+  step2[6] = vqsubq_s16(step1[1], step1[6]);
+  step2[7] = vqsubq_s16(step1[0], step1[7]);
+  step2[8] = step1[8];
+  step2[9] = step1[9];
+  step2[14] = step1[14];
+  step2[15] = step1[15];
+  step2[16] = vqaddq_s16(step1[16], step1[23]);
+  step2[17] = vqaddq_s16(step1[17], step1[22]);
+  step2[18] = vqaddq_s16(step1[18], step1[21]);
+  step2[19] = vqaddq_s16(step1[19], step1[20]);
+  step2[20] = vqsubq_s16(step1[19], step1[20]);
+  step2[21] = vqsubq_s16(step1[18], step1[21]);
+  step2[22] = vqsubq_s16(step1[17], step1[22]);
+  step2[23] = vqsubq_s16(step1[16], step1[23]);
+  step2[24] = vqsubq_s16(step1[31], step1[24]);
+  step2[25] = vqsubq_s16(step1[30], step1[25]);
+  step2[26] = vqsubq_s16(step1[29], step1[26]);
+  step2[27] = vqsubq_s16(step1[28], step1[27]);
+  step2[28] = vqaddq_s16(step1[28], step1[27]);
+  step2[29] = vqaddq_s16(step1[29], step1[26]);
+  step2[30] = vqaddq_s16(step1[30], step1[25]);
+  step2[31] = vqaddq_s16(step1[31], step1[24]);
+  step2[32] = step1[32];
+  step2[33] = step1[33];
+  step2[34] = step1[34];
+  step2[35] = step1[35];
+  step2[44] = step1[44];
+  step2[45] = step1[45];
+  step2[46] = step1[46];
+  step2[47] = step1[47];
+  step2[48] = step1[48];
+  step2[49] = step1[49];
+  step2[50] = step1[50];
+  step2[51] = step1[51];
+  step2[60] = step1[60];
+  step2[61] = step1[61];
+  step2[62] = step1[62];
+  step2[63] = step1[63];
+
+  // stage 9
+  idct64_stage9_neon(step2, step1, cos_bit);
+
+  // stage 10
+  idct64_stage10_neon(step1, step2, cos_bit);
+
+  // stage 11
+
+  out[0] = vqaddq_s16(step2[0], step2[63]);
+  out[1] = vqaddq_s16(step2[1], step2[62]);
+  out[2] = vqaddq_s16(step2[2], step2[61]);
+  out[3] = vqaddq_s16(step2[3], step2[60]);
+  out[4] = vqaddq_s16(step2[4], step2[59]);
+  out[5] = vqaddq_s16(step2[5], step2[58]);
+  out[6] = vqaddq_s16(step2[6], step2[57]);
+  out[7] = vqaddq_s16(step2[7], step2[56]);
+  out[8] = vqaddq_s16(step2[8], step2[55]);
+  out[9] = vqaddq_s16(step2[9], step2[54]);
+  out[10] = vqaddq_s16(step2[10], step2[53]);
+  out[11] = vqaddq_s16(step2[11], step2[52]);
+  out[12] = vqaddq_s16(step2[12], step2[51]);
+  out[13] = vqaddq_s16(step2[13], step2[50]);
+  out[14] = vqaddq_s16(step2[14], step2[49]);
+  out[15] = vqaddq_s16(step2[15], step2[48]);
+  out[16] = vqaddq_s16(step2[16], step2[47]);
+  out[17] = vqaddq_s16(step2[17], step2[46]);
+  out[18] = vqaddq_s16(step2[18], step2[45]);
+  out[19] = vqaddq_s16(step2[19], step2[44]);
+  out[20] = vqaddq_s16(step2[20], step2[43]);
+  out[21] = vqaddq_s16(step2[21], step2[42]);
+  out[22] = vqaddq_s16(step2[22], step2[41]);
+  out[23] = vqaddq_s16(step2[23], step2[40]);
+  out[24] = vqaddq_s16(step2[24], step2[39]);
+  out[25] = vqaddq_s16(step2[25], step2[38]);
+  out[26] = vqaddq_s16(step2[26], step2[37]);
+  out[27] = vqaddq_s16(step2[27], step2[36]);
+  out[28] = vqaddq_s16(step2[28], step2[35]);
+  out[29] = vqaddq_s16(step2[29], step2[34]);
+  out[30] = vqaddq_s16(step2[30], step2[33]);
+  out[31] = vqaddq_s16(step2[31], step2[32]);
+  out[32] = vqsubq_s16(step2[31], step2[32]);
+  out[33] = vqsubq_s16(step2[30], step2[33]);
+  out[34] = vqsubq_s16(step2[29], step2[34]);
+  out[35] = vqsubq_s16(step2[28], step2[35]);
+  out[36] = vqsubq_s16(step2[27], step2[36]);
+  out[37] = vqsubq_s16(step2[26], step2[37]);
+  out[38] = vqsubq_s16(step2[25], step2[38]);
+  out[39] = vqsubq_s16(step2[24], step2[39]);
+  out[40] = vqsubq_s16(step2[23], step2[40]);
+  out[41] = vqsubq_s16(step2[22], step2[41]);
+  out[42] = vqsubq_s16(step2[21], step2[42]);
+  out[43] = vqsubq_s16(step2[20], step2[43]);
+  out[44] = vqsubq_s16(step2[19], step2[44]);
+  out[45] = vqsubq_s16(step2[18], step2[45]);
+  out[46] = vqsubq_s16(step2[17], step2[46]);
+  out[47] = vqsubq_s16(step2[16], step2[47]);
+  out[48] = vqsubq_s16(step2[15], step2[48]);
+  out[49] = vqsubq_s16(step2[14], step2[49]);
+  out[50] = vqsubq_s16(step2[13], step2[50]);
+  out[51] = vqsubq_s16(step2[12], step2[51]);
+  out[52] = vqsubq_s16(step2[11], step2[52]);
+  out[53] = vqsubq_s16(step2[10], step2[53]);
+  out[54] = vqsubq_s16(step2[9], step2[54]);
+  out[55] = vqsubq_s16(step2[8], step2[55]);
+  out[56] = vqsubq_s16(step2[7], step2[56]);
+  out[57] = vqsubq_s16(step2[6], step2[57]);
+  out[58] = vqsubq_s16(step2[5], step2[58]);
+  out[59] = vqsubq_s16(step2[4], step2[59]);
+  out[60] = vqsubq_s16(step2[3], step2[60]);
+  out[61] = vqsubq_s16(step2[2], step2[61]);
+  out[62] = vqsubq_s16(step2[1], step2[62]);
+  out[63] = vqsubq_s16(step2[0], step2[63]);
+}
 
 // Functions for blocks with eob at DC and within
 // topleft 8x8, 16x16, 32x32 corner
-static const transform_1d_neon
-    lowbd_txfm_all_1d_zeros_w8_arr[TX_SIZES][ITX_TYPES_1D][4] = {
-      {
-          { av1_idct4_new, av1_idct4_new, NULL, NULL },
-          { av1_iadst4_new, av1_iadst4_new, NULL, NULL },
-          { av1_iidentity4_c, av1_iidentity4_c, NULL, NULL },
-      },
-      { { av1_idct8_new, av1_idct8_new, NULL, NULL },
-        { av1_iadst8_new, av1_iadst8_new, NULL, NULL },
-        { av1_iidentity8_c, av1_iidentity8_c, NULL, NULL } },
-      {
-          { av1_idct16_new, av1_idct16_new, av1_idct16_new, NULL },
-          { av1_iadst16_new, av1_iadst16_new, av1_iadst16_new, NULL },
-          { av1_iidentity16_c, av1_iidentity16_c, av1_iidentity16_c, NULL },
-      },
-      { { av1_idct32_new, av1_idct32_new, av1_idct32_new, av1_idct32_new },
-        { NULL, NULL, NULL, NULL },
-        { av1_iidentity32_c, av1_iidentity32_c, av1_iidentity32_c,
-          av1_iidentity32_c } },
-      { { av1_idct64_new, av1_idct64_new, av1_idct64_new, av1_idct64_new },
-        { NULL, NULL, NULL, NULL },
-        { NULL, NULL, NULL, NULL } }
-    };
-
 static const transform_neon
     lowbd_txfm_all_1d_zeros_w_arr[TX_SIZES][ITX_TYPES_1D][4] = {
       {
@@ -2135,79 +3672,11 @@ static const transform_neon
         { NULL, NULL, NULL, NULL },
         { identity32_new_neon, identity32_new_neon, identity32_new_neon,
           identity32_new_neon } },
-      { { NULL, NULL, NULL, NULL },
+      { { idct64_low1_new_neon, idct64_low8_new_neon, idct64_low16_new_neon,
+          idct64_low32_new_neon },
         { NULL, NULL, NULL, NULL },
         { NULL, NULL, NULL, NULL } }
     };
-
-static INLINE void lowbd_inv_txfm2d_add_wxh_idtx_neon(
-    const int32_t *input, uint8_t *output, int stride, TX_TYPE tx_type,
-    TX_SIZE tx_size, int eob) {
-  DECLARE_ALIGNED(32, int, txfm_buf[32 * 32 + 32 + 32]);
-  int32_t *temp_in = txfm_buf;
-
-  int eobx, eoby;
-  get_eobx_eoby_scan_default(&eobx, &eoby, tx_size, eob);
-  const int8_t *shift = inv_txfm_shift_ls[tx_size];
-  const int txw_idx = get_txw_idx(tx_size);
-  const int txh_idx = get_txh_idx(tx_size);
-  const int cos_bit_col = inv_cos_bit_col[txw_idx][txh_idx];
-  const int cos_bit_row = inv_cos_bit_row[txw_idx][txh_idx];
-  const int txfm_size_col = tx_size_wide[tx_size];
-  const int txfm_size_row = tx_size_high[tx_size];
-  const int buf_size_nonzero_h_div8 = (eoby + 8) >> 3;
-
-  const int rect_type = get_rect_tx_log_ratio(txfm_size_col, txfm_size_row);
-  const int buf_offset = AOMMAX(txfm_size_row, txfm_size_col);
-
-  int32_t *temp_out = temp_in + buf_offset;
-  int32_t *buf = temp_out + buf_offset;
-  int32_t *buf_ptr = buf;
-  const int8_t stage_range[MAX_TXFM_STAGE_NUM] = { 16 };
-  int r, bd = 8;
-
-  const int fun_idx_x = lowbd_txfm_all_1d_zeros_idx[eobx];
-  const int fun_idx_y = lowbd_txfm_all_1d_zeros_idx[eoby];
-  const transform_1d_neon row_txfm =
-      lowbd_txfm_all_1d_zeros_w8_arr[txw_idx][hitx_1d_tab[tx_type]][fun_idx_x];
-  const transform_1d_neon col_txfm =
-      lowbd_txfm_all_1d_zeros_w8_arr[txh_idx][vitx_1d_tab[tx_type]][fun_idx_y];
-
-  assert(col_txfm != NULL);
-  assert(row_txfm != NULL);
-
-  // row tx
-  int row_start = (buf_size_nonzero_h_div8 * 8);
-  for (int i = 0; i < row_start; i++) {
-    if (abs(rect_type) == 1) {
-      for (int j = 0; j < txfm_size_col; j++)
-        temp_in[j] = round_shift((int64_t)input[j] * NewInvSqrt2, NewSqrt2Bits);
-      row_txfm(temp_in, buf_ptr, cos_bit_row, stage_range);
-    } else {
-      row_txfm(input, buf_ptr, cos_bit_row, stage_range);
-    }
-    av1_round_shift_array(buf_ptr, txfm_size_col, -shift[0]);
-    input += txfm_size_col;
-    buf_ptr += txfm_size_col;
-  }
-
-  // Doing memset for the rows which are not processed in row transform.
-  memset(buf_ptr, 0,
-         sizeof(int32_t) * txfm_size_col * (txfm_size_row - row_start));
-
-  // col tx
-  for (int c = 0; c < txfm_size_col; c++) {
-    for (r = 0; r < txfm_size_row; ++r) temp_in[r] = buf[r * txfm_size_col + c];
-
-    col_txfm(temp_in, temp_out, cos_bit_col, stage_range);
-    av1_round_shift_array(temp_out, txfm_size_row, -shift[1]);
-
-    for (r = 0; r < txfm_size_row; ++r) {
-      output[r * stride + c] =
-          highbd_clip_pixel_add(output[r * stride + c], temp_out[r], bd);
-    }
-  }
-}
 
 static INLINE void lowbd_inv_txfm2d_add_idtx_neon(const int32_t *input,
                                                   uint8_t *output, int stride,
@@ -2278,90 +3747,6 @@ static INLINE void lowbd_inv_txfm2d_add_idtx_neon(const int32_t *input,
     }
   } else if (txfm_size_col == 8) {
     lowbd_add_flip_buffer_8xn_neon(b, output, stride, 0, txfm_size_row);
-  }
-}
-
-static INLINE void lowbd_inv_txfm2d_add_v_wxh_identity_neon(
-    const int32_t *input, uint8_t *output, int stride, TX_TYPE tx_type,
-    TX_SIZE tx_size, int eob) {
-  DECLARE_ALIGNED(32, int, txfm_buf[32 * 32 + 32 + 32]);
-  int32_t *temp_in = txfm_buf;
-
-  int eobx, eoby;
-  get_eobx_eoby_scan_v_identity(&eobx, &eoby, tx_size, eob);
-  const int8_t *shift = inv_txfm_shift_ls[tx_size];
-  const int txw_idx = get_txw_idx(tx_size);
-  const int txh_idx = get_txh_idx(tx_size);
-  const int cos_bit_col = inv_cos_bit_col[txw_idx][txh_idx];
-  const int cos_bit_row = inv_cos_bit_row[txw_idx][txh_idx];
-  const int txfm_size_col = tx_size_wide[tx_size];
-  const int txfm_size_row = tx_size_high[tx_size];
-  const int buf_size_nonzero_h_div8 = (eoby + 8) >> 3;
-
-  const int rect_type = get_rect_tx_log_ratio(txfm_size_col, txfm_size_row);
-  const int buf_offset = AOMMAX(txfm_size_row, txfm_size_col);
-
-  int32_t *temp_out = temp_in + buf_offset;
-  int32_t *buf = temp_out + buf_offset;
-  int32_t *buf_ptr = buf;
-  const int8_t stage_range[MAX_TXFM_STAGE_NUM] = { 16 };
-  int r, bd = 8;
-
-  const int fun_idx_x = lowbd_txfm_all_1d_zeros_idx[eobx];
-  const int fun_idx_y = lowbd_txfm_all_1d_zeros_idx[eoby];
-  const transform_1d_neon row_txfm =
-      lowbd_txfm_all_1d_zeros_w8_arr[txw_idx][hitx_1d_tab[tx_type]][fun_idx_x];
-  const transform_1d_neon col_txfm =
-      lowbd_txfm_all_1d_zeros_w8_arr[txh_idx][vitx_1d_tab[tx_type]][fun_idx_y];
-
-  assert(col_txfm != NULL);
-  assert(row_txfm != NULL);
-  int ud_flip, lr_flip;
-  get_flip_cfg(tx_type, &ud_flip, &lr_flip);
-
-  // row tx
-  int row_start = (buf_size_nonzero_h_div8 * 8);
-  for (int i = 0; i < row_start; i++) {
-    if (abs(rect_type) == 1) {
-      for (int j = 0; j < txfm_size_col; j++)
-        temp_in[j] = round_shift((int64_t)input[j] * NewInvSqrt2, NewSqrt2Bits);
-      row_txfm(temp_in, buf_ptr, cos_bit_row, stage_range);
-    } else {
-      row_txfm(input, buf_ptr, cos_bit_row, stage_range);
-    }
-    av1_round_shift_array(buf_ptr, txfm_size_col, -shift[0]);
-    input += txfm_size_col;
-    buf_ptr += txfm_size_col;
-  }
-  // Doing memset for the rows which are not processed in row transform.
-  memset(buf_ptr, 0,
-         sizeof(int32_t) * txfm_size_col * (txfm_size_row - row_start));
-
-  // col tx
-  for (int c = 0; c < txfm_size_col; c++) {
-    if (lr_flip == 0) {
-      for (r = 0; r < txfm_size_row; ++r)
-        temp_in[r] = buf[r * txfm_size_col + c];
-    } else {
-      // flip left right
-      for (r = 0; r < txfm_size_row; ++r)
-        temp_in[r] = buf[r * txfm_size_col + (txfm_size_col - c - 1)];
-    }
-    col_txfm(temp_in, temp_out, cos_bit_col, stage_range);
-    av1_round_shift_array(temp_out, txfm_size_row, -shift[1]);
-
-    if (ud_flip == 0) {
-      for (r = 0; r < txfm_size_row; ++r) {
-        output[r * stride + c] =
-            highbd_clip_pixel_add(output[r * stride + c], temp_out[r], bd);
-      }
-    } else {
-      // flip upside down
-      for (r = 0; r < txfm_size_row; ++r) {
-        output[r * stride + c] = highbd_clip_pixel_add(
-            output[r * stride + c], temp_out[txfm_size_row - r - 1], bd);
-      }
-    }
   }
 }
 
@@ -2446,90 +3831,6 @@ static INLINE void lowbd_inv_txfm2d_add_v_identity_neon(
   }
 }
 
-static INLINE void lowbd_inv_txfm2d_add_h_wxh_identity_neon(
-    const int32_t *input, uint8_t *output, int stride, TX_TYPE tx_type,
-    TX_SIZE tx_size, int eob) {
-  DECLARE_ALIGNED(32, int, txfm_buf[32 * 32 + 32 + 32]);
-  int32_t *temp_in = txfm_buf;
-
-  int eobx, eoby;
-  get_eobx_eoby_scan_h_identity(&eobx, &eoby, tx_size, eob);
-  const int8_t *shift = inv_txfm_shift_ls[tx_size];
-  const int txw_idx = get_txw_idx(tx_size);
-  const int txh_idx = get_txh_idx(tx_size);
-  const int cos_bit_col = inv_cos_bit_col[txw_idx][txh_idx];
-  const int cos_bit_row = inv_cos_bit_row[txw_idx][txh_idx];
-  const int txfm_size_col = tx_size_wide[tx_size];
-  const int txfm_size_row = tx_size_high[tx_size];
-  const int buf_size_nonzero_h_div8 = (eoby + 8) >> 3;
-
-  const int rect_type = get_rect_tx_log_ratio(txfm_size_col, txfm_size_row);
-  const int buf_offset = AOMMAX(txfm_size_row, txfm_size_col);
-
-  int32_t *temp_out = temp_in + buf_offset;
-  int32_t *buf = temp_out + buf_offset;
-  int32_t *buf_ptr = buf;
-  const int8_t stage_range[MAX_TXFM_STAGE_NUM] = { 16 };
-  int r, bd = 8;
-
-  const int fun_idx_x = lowbd_txfm_all_1d_zeros_idx[eobx];
-  const int fun_idx_y = lowbd_txfm_all_1d_zeros_idx[eoby];
-  const transform_1d_neon row_txfm =
-      lowbd_txfm_all_1d_zeros_w8_arr[txw_idx][hitx_1d_tab[tx_type]][fun_idx_x];
-  const transform_1d_neon col_txfm =
-      lowbd_txfm_all_1d_zeros_w8_arr[txh_idx][vitx_1d_tab[tx_type]][fun_idx_y];
-
-  assert(col_txfm != NULL);
-  assert(row_txfm != NULL);
-  int ud_flip, lr_flip;
-  get_flip_cfg(tx_type, &ud_flip, &lr_flip);
-
-  // row tx
-  int row_start = (buf_size_nonzero_h_div8 * 8);
-  for (int i = 0; i < row_start; i++) {
-    if (abs(rect_type) == 1) {
-      for (int j = 0; j < txfm_size_col; j++)
-        temp_in[j] = round_shift((int64_t)input[j] * NewInvSqrt2, NewSqrt2Bits);
-      row_txfm(temp_in, buf_ptr, cos_bit_row, stage_range);
-    } else {
-      row_txfm(input, buf_ptr, cos_bit_row, stage_range);
-    }
-    av1_round_shift_array(buf_ptr, txfm_size_col, -shift[0]);
-    input += txfm_size_col;
-    buf_ptr += txfm_size_col;
-  }
-  // Doing memset for the rows which are not processed in row transform.
-  memset(buf_ptr, 0,
-         sizeof(int32_t) * txfm_size_col * (txfm_size_row - row_start));
-
-  // col tx
-  for (int c = 0; c < txfm_size_col; c++) {
-    if (lr_flip == 0) {
-      for (r = 0; r < txfm_size_row; ++r)
-        temp_in[r] = buf[r * txfm_size_col + c];
-    } else {
-      // flip left right
-      for (r = 0; r < txfm_size_row; ++r)
-        temp_in[r] = buf[r * txfm_size_col + (txfm_size_col - c - 1)];
-    }
-    col_txfm(temp_in, temp_out, cos_bit_col, stage_range);
-    av1_round_shift_array(temp_out, txfm_size_row, -shift[1]);
-
-    if (ud_flip == 0) {
-      for (r = 0; r < txfm_size_row; ++r) {
-        output[r * stride + c] =
-            highbd_clip_pixel_add(output[r * stride + c], temp_out[r], bd);
-      }
-    } else {
-      // flip upside down
-      for (r = 0; r < txfm_size_row; ++r) {
-        output[r * stride + c] = highbd_clip_pixel_add(
-            output[r * stride + c], temp_out[txfm_size_row - r - 1], bd);
-      }
-    }
-  }
-}
-
 static INLINE void lowbd_inv_txfm2d_add_h_identity_neon(
     const int32_t *input, uint8_t *output, int stride, TX_TYPE tx_type,
     TX_SIZE tx_size, int eob) {
@@ -2604,9 +3905,9 @@ static INLINE void lowbd_inv_txfm2d_add_h_identity_neon(
 
 static INLINE void lowbd_inv_txfm2d_add_4x4_neon(const int32_t *input,
                                                  uint8_t *output, int stride,
-                                                 TX_TYPE tx_type,
-                                                 TX_SIZE tx_size, int eob) {
+                                                 TX_TYPE tx_type, int eob) {
   (void)eob;
+  TX_SIZE tx_size = TX_4X4;
   DECLARE_ALIGNED(32, int, txfm_buf[4 * 4 + 8 + 8]);
   int32_t *temp_in = txfm_buf;
 
@@ -2666,9 +3967,9 @@ static INLINE void lowbd_inv_txfm2d_add_4x4_neon(const int32_t *input,
 }
 
 void lowbd_inv_txfm2d_add_4x8_neon(const int32_t *input, uint8_t *output,
-                                   int stride, TX_TYPE tx_type, TX_SIZE tx_size,
-                                   int eob) {
+                                   int stride, TX_TYPE tx_type, int eob) {
   (void)eob;
+  TX_SIZE tx_size = TX_4X8;
   DECLARE_ALIGNED(32, int, txfm_buf[4 * 8 + 8 + 8]);
   int32_t *temp_in = txfm_buf;
 
@@ -2730,9 +4031,9 @@ void lowbd_inv_txfm2d_add_4x8_neon(const int32_t *input, uint8_t *output,
 }
 
 void lowbd_inv_txfm2d_add_8x4_neon(const int32_t *input, uint8_t *output,
-                                   int stride, TX_TYPE tx_type, TX_SIZE tx_size,
-                                   int eob) {
+                                   int stride, TX_TYPE tx_type, int eob) {
   (void)eob;
+  TX_SIZE tx_size = TX_8X4;
   DECLARE_ALIGNED(32, int, txfm_buf[8 * 4 + 8 + 8]);
   int32_t *temp_in = txfm_buf;
 
@@ -2794,9 +4095,9 @@ void lowbd_inv_txfm2d_add_8x4_neon(const int32_t *input, uint8_t *output,
 }
 
 void lowbd_inv_txfm2d_add_4x16_neon(const int32_t *input, uint8_t *output,
-                                    int stride, TX_TYPE tx_type,
-                                    TX_SIZE tx_size, int eob) {
+                                    int stride, TX_TYPE tx_type, int eob) {
   (void)eob;
+  TX_SIZE tx_size = TX_4X16;
   DECLARE_ALIGNED(32, int, txfm_buf[4 * 16 + 16 + 16]);
   int32_t *temp_in = txfm_buf;
 
@@ -2856,10 +4157,9 @@ void lowbd_inv_txfm2d_add_4x16_neon(const int32_t *input, uint8_t *output,
 }
 
 void lowbd_inv_txfm2d_add_16x4_neon(const int32_t *input, uint8_t *output,
-                                    int stride, TX_TYPE tx_type,
-                                    TX_SIZE tx_size, int eob) {
+                                    int stride, TX_TYPE tx_type, int eob) {
   (void)eob;
-
+  TX_SIZE tx_size = TX_16X4;
   DECLARE_ALIGNED(32, int, txfm_buf[16 * 4 + 16 + 16]);
   int32_t *temp_in = txfm_buf;
 
@@ -2918,89 +4218,6 @@ void lowbd_inv_txfm2d_add_16x4_neon(const int32_t *input, uint8_t *output,
   }
 }
 
-static INLINE void lowbd_inv_txfm2d_add_wxh_no_identity_neon(
-    const int32_t *input, uint8_t *output, int stride, TX_TYPE tx_type,
-    TX_SIZE tx_size, int eob) {
-  DECLARE_ALIGNED(32, int, txfm_buf[64 * 64 + 64 + 64]);
-  int32_t *temp_in = txfm_buf;
-
-  int eobx, eoby, ud_flip, lr_flip, row_start;
-  get_eobx_eoby_scan_default(&eobx, &eoby, tx_size, eob);
-  const int8_t *shift = inv_txfm_shift_ls[tx_size];
-  const int txw_idx = get_txw_idx(tx_size);
-  const int txh_idx = get_txh_idx(tx_size);
-  const int cos_bit_col = inv_cos_bit_col[txw_idx][txh_idx];
-  const int cos_bit_row = inv_cos_bit_row[txw_idx][txh_idx];
-  const int txfm_size_col = tx_size_wide[tx_size];
-  const int txfm_size_row = tx_size_high[tx_size];
-  const int buf_size_nonzero_h_div8 = (eoby + 8) >> 3;
-  const int rect_type = get_rect_tx_log_ratio(txfm_size_col, txfm_size_row);
-  const int buf_offset = AOMMAX(txfm_size_row, txfm_size_col);
-
-  int32_t *temp_out = temp_in + buf_offset;
-  int32_t *buf = temp_out + buf_offset;
-  int32_t *buf_ptr = buf;
-  const int8_t stage_range[MAX_TXFM_STAGE_NUM] = { 16 };
-  const int bd = 8;
-  int r;
-
-  const int fun_idx_x = lowbd_txfm_all_1d_zeros_idx[eobx];
-  const int fun_idx_y = lowbd_txfm_all_1d_zeros_idx[eoby];
-  const transform_1d_neon row_txfm =
-      lowbd_txfm_all_1d_zeros_w8_arr[txw_idx][hitx_1d_tab[tx_type]][fun_idx_x];
-  const transform_1d_neon col_txfm =
-      lowbd_txfm_all_1d_zeros_w8_arr[txh_idx][vitx_1d_tab[tx_type]][fun_idx_y];
-
-  assert(col_txfm != NULL);
-  assert(row_txfm != NULL);
-
-  get_flip_cfg(tx_type, &ud_flip, &lr_flip);
-  row_start = (buf_size_nonzero_h_div8 << 3);
-
-  for (int i = 0; i < row_start; i++) {
-    if (abs(rect_type) == 1) {
-      for (int j = 0; j < txfm_size_col; j++)
-        temp_in[j] = round_shift((int64_t)input[j] * NewInvSqrt2, NewSqrt2Bits);
-      row_txfm(temp_in, buf_ptr, cos_bit_row, stage_range);
-    } else {
-      row_txfm(input, buf_ptr, cos_bit_row, stage_range);
-    }
-    av1_round_shift_array(buf_ptr, txfm_size_col, -shift[0]);
-    input += txfm_size_col;
-    buf_ptr += txfm_size_col;
-  }
-
-  // Doing memset for the rows which are not processed in row transform.
-  memset(buf_ptr, 0,
-         sizeof(int32_t) * txfm_size_col * (txfm_size_row - row_start));
-
-  for (int c = 0; c < txfm_size_col; c++) {
-    if (lr_flip == 0) {
-      for (r = 0; r < txfm_size_row; ++r)
-        temp_in[r] = buf[r * txfm_size_col + c];
-    } else {
-      // flip left right
-      for (r = 0; r < txfm_size_row; ++r)
-        temp_in[r] = buf[r * txfm_size_col + (txfm_size_col - c - 1)];
-    }
-    col_txfm(temp_in, temp_out, cos_bit_col, stage_range);
-    av1_round_shift_array(temp_out, txfm_size_row, -shift[1]);
-
-    if (ud_flip == 0) {
-      for (r = 0; r < txfm_size_row; ++r) {
-        output[r * stride + c] =
-            highbd_clip_pixel_add(output[r * stride + c], temp_out[r], bd);
-      }
-    } else {
-      // flip upside down
-      for (r = 0; r < txfm_size_row; ++r) {
-        output[r * stride + c] = highbd_clip_pixel_add(
-            output[r * stride + c], temp_out[txfm_size_row - r - 1], bd);
-      }
-    }
-  }
-}
-
 static INLINE void lowbd_inv_txfm2d_add_no_identity_neon(
     const int32_t *input, uint8_t *output, int stride, TX_TYPE tx_type,
     TX_SIZE tx_size, int eob) {
@@ -3019,6 +4236,7 @@ static INLINE void lowbd_inv_txfm2d_add_no_identity_neon(
   const int buf_size_w_div8 = txfm_size_col >> 3;
   const int buf_size_nonzero_h_div8 = (eoby + 8) >> 3;
   const int buf_size_nonzero_w_div8 = (eobx + 8) >> 3;
+  const int input_stride = AOMMIN(32, txfm_size_col);
   const int fun_idx_x = lowbd_txfm_all_1d_zeros_idx[eobx];
   const int fun_idx_y = lowbd_txfm_all_1d_zeros_idx[eoby];
   const int32_t *input_1;
@@ -3038,14 +4256,14 @@ static INLINE void lowbd_inv_txfm2d_add_no_identity_neon(
     input_1 = input;
     for (int j = 0; j < buf_size_nonzero_w_div8; ++j) {
       int k = j * 8 + i * txfm_size_col;
-      load_buffer_32bit_to_16bit_neon(input_1, &a[k], txfm_size_col);
+      load_buffer_32bit_to_16bit_neon(input_1, &a[k], input_stride);
       transpose_s16_8x8q(&a[k], &a[k]);
       input_1 += 8;
     }
-    input += (txfm_size_col * 8);
+    input += (input_stride * 8);
     if (abs(rect_type) == 1) {
       int y = i * txfm_size_col;
-      round_shift_for_rect(&a[y], &a[y], txfm_size_col);
+      round_shift_for_rect(&a[y], &a[y], input_stride);
     }
     row_txfm(&a[i * txfm_size_col], &a[i * txfm_size_col], cos_bit_row, 0);
     av1_round_shift_array_16_neon(&a[i * txfm_size_col], txfm_size_col,
@@ -3083,36 +4301,6 @@ static INLINE void lowbd_inv_txfm2d_add_no_identity_neon(
   }
 }
 
-static INLINE void lowbd_inv_txfm2d_add_wxh_universe_neon(
-    const int32_t *input, uint8_t *output, int stride, TX_TYPE tx_type,
-    TX_SIZE tx_size, int eob) {
-  switch (tx_type) {
-    case IDTX:
-      lowbd_inv_txfm2d_add_wxh_idtx_neon(input, output, stride, tx_type,
-                                         tx_size, eob);
-      break;
-
-    case H_DCT:
-    case H_ADST:
-    case H_FLIPADST:
-      lowbd_inv_txfm2d_add_v_wxh_identity_neon(input, output, stride, tx_type,
-                                               tx_size, eob);
-      break;
-
-    case V_DCT:
-    case V_ADST:
-    case V_FLIPADST:
-      lowbd_inv_txfm2d_add_h_wxh_identity_neon(input, output, stride, tx_type,
-                                               tx_size, eob);
-      break;
-
-    default:
-      lowbd_inv_txfm2d_add_wxh_no_identity_neon(input, output, stride, tx_type,
-                                                tx_size, eob);
-      break;
-  }
-}
-
 static INLINE void lowbd_inv_txfm2d_add_universe_neon(
     const int32_t *input, uint8_t *output, int stride, TX_TYPE tx_type,
     TX_SIZE tx_size, int eob) {
@@ -3146,72 +4334,26 @@ static INLINE void lowbd_inv_txfm2d_add_universe_neon(
 void av1_lowbd_inv_txfm2d_add_neon(const int32_t *input, uint8_t *output,
                                    int stride, TX_TYPE tx_type, TX_SIZE tx_size,
                                    int eob) {
-  int row;
   switch (tx_size) {
     case TX_4X4:
-      lowbd_inv_txfm2d_add_4x4_neon(input, output, stride, tx_type, tx_size,
-                                    eob);
+      lowbd_inv_txfm2d_add_4x4_neon(input, output, stride, tx_type, eob);
       break;
 
     case TX_4X8:
-      lowbd_inv_txfm2d_add_4x8_neon(input, output, stride, tx_type, tx_size,
-                                    eob);
+      lowbd_inv_txfm2d_add_4x8_neon(input, output, stride, tx_type, eob);
       break;
 
     case TX_8X4:
-      lowbd_inv_txfm2d_add_8x4_neon(input, output, stride, tx_type, tx_size,
-                                    eob);
+      lowbd_inv_txfm2d_add_8x4_neon(input, output, stride, tx_type, eob);
       break;
 
     case TX_4X16:
-      lowbd_inv_txfm2d_add_4x16_neon(input, output, stride, tx_type, tx_size,
-                                     eob);
+      lowbd_inv_txfm2d_add_4x16_neon(input, output, stride, tx_type, eob);
       break;
 
     case TX_16X4:
-      lowbd_inv_txfm2d_add_16x4_neon(input, output, stride, tx_type, tx_size,
-                                     eob);
+      lowbd_inv_txfm2d_add_16x4_neon(input, output, stride, tx_type, eob);
       break;
-
-    case TX_16X64: {
-      lowbd_inv_txfm2d_add_wxh_universe_neon(input, output, stride, tx_type,
-                                             tx_size, eob);
-    } break;
-
-    case TX_64X16: {
-      int32_t mod_input[64 * 16];
-      for (row = 0; row < 16; ++row) {
-        memcpy(mod_input + row * 64, input + row * 32, 32 * sizeof(*mod_input));
-        memset(mod_input + row * 64 + 32, 0, 32 * sizeof(*mod_input));
-      }
-      lowbd_inv_txfm2d_add_wxh_universe_neon(mod_input, output, stride, tx_type,
-                                             tx_size, eob);
-    } break;
-
-    case TX_32X64: {
-      lowbd_inv_txfm2d_add_wxh_universe_neon(input, output, stride, tx_type,
-                                             tx_size, eob);
-    } break;
-
-    case TX_64X32: {
-      int32_t mod_input[64 * 32];
-      for (row = 0; row < 32; ++row) {
-        memcpy(mod_input + row * 64, input + row * 32, 32 * sizeof(*mod_input));
-        memset(mod_input + row * 64 + 32, 0, 32 * sizeof(*mod_input));
-      }
-      lowbd_inv_txfm2d_add_wxh_universe_neon(mod_input, output, stride, tx_type,
-                                             tx_size, eob);
-    } break;
-
-    case TX_64X64: {
-      int32_t mod_input[64 * 64];
-      for (row = 0; row < 32; ++row) {
-        memcpy(mod_input + row * 64, input + row * 32, 32 * sizeof(*mod_input));
-        memset(mod_input + row * 64 + 32, 0, 32 * sizeof(*mod_input));
-      }
-      lowbd_inv_txfm2d_add_wxh_universe_neon(mod_input, output, stride, tx_type,
-                                             tx_size, eob);
-    } break;
 
     default:
       lowbd_inv_txfm2d_add_universe_neon(input, output, stride, tx_type,

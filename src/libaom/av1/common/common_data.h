@@ -9,8 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
-#ifndef AV1_COMMON_COMMON_DATA_H_
-#define AV1_COMMON_COMMON_DATA_H_
+#ifndef AOM_AV1_COMMON_COMMON_DATA_H_
+#define AOM_AV1_COMMON_COMMON_DATA_H_
 
 #include "av1/common/enums.h"
 #include "aom/aom_integer.h"
@@ -443,4 +443,4 @@ static const int quant_dist_lookup_table[2][4][2] = {
 }  // extern "C"
 #endif
 
-#endif  // AV1_COMMON_COMMON_DATA_H_
+#endif  // AOM_AV1_COMMON_COMMON_DATA_H_

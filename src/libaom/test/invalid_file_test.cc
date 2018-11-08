@@ -108,9 +108,18 @@ TEST_P(InvalidFileTest, ReturnCode) { RunTest(); }
 
 const DecodeParam kAV1InvalidFileTests[] = {
   { 1, "invalid-bug-1814.ivf" },
+  { 1, "invalid-oss-fuzz-9288.ivf" },
   { 4, "invalid-oss-fuzz-9463.ivf" },
   { 1, "invalid-oss-fuzz-9482.ivf" },
   { 1, "invalid-oss-fuzz-9720.ivf" },
+  { 1, "invalid-oss-fuzz-10061.ivf" },
+  { 1, "invalid-oss-fuzz-10117-mc-buf-use-highbd.ivf" },
+  { 1, "invalid-oss-fuzz-10227.ivf" },
+  { 1, "invalid-oss-fuzz-10389.ivf" },
+  { 4, "invalid-oss-fuzz-10555.ivf" },
+  { 1, "invalid-oss-fuzz-10705.ivf" },
+  { 1, "invalid-oss-fuzz-10723.ivf" },
+  { 1, "invalid-oss-fuzz-10779.ivf" },
 };
 
 AV1_INSTANTIATE_TEST_CASE(InvalidFileTest,
