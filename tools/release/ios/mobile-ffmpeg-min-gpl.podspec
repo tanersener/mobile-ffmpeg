@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
     s.name              = 'mobile-ffmpeg-min-gpl'
     s.version           = 'VERSION'
     s.summary           = 'Mobile FFmpeg Min GPL Dynamic Framework'
-    s.description       = 'Includes FFmpeg v4.0.2 with libvid.stab v1.1.0, x264 20180829-2245-stable, x265 v2.9 and xvidcore v1.3.5 libraries enabled.'
+    s.description       = 'Includes FFmpeg v4.0.3 with libvid.stab v1.1.0, x264 20181107-2245-stable, x265 v2.9 and xvidcore v1.3.5 libraries enabled.'
     s.homepage          = 'https://github.com/tanersener/mobile-ffmpeg'
 
     s.author            = { 'Taner Sener' => 'tanersener@gmail.com' }
