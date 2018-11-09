@@ -64,6 +64,22 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
  * \return running ABI name as UTF string
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEnv *env, jclass object) {
+
+#ifdef MOBILE_FFMPEG_ARM_V7A
+    return (*env)->NewStringUTF(env, "arm-v7a");
+#elif MOBILE_FFMPEG_ARM_V7A_NEON
+    return (*env)->NewStringUTF(env, "arm-v7a-neon");
+#elif MOBILE_FFMPEG_ARM64_V8A
+    return (*env)->NewStringUTF(env, "arm64-v8a");
+#elif MOBILE_FFMPEG_X86
+    return (*env)->NewStringUTF(env, "x86");
+#elif MOBILE_FFMPEG_X86_64
+    return (*env)->NewStringUTF(env, "x86_64");
+#else
+    return (*env)->NewStringUTF(env, "unknown");
+#endif
+
+/* OLD IMPLEMENTATION
     AndroidCpuFamily family = android_getCpuFamily();
 
     if (family == ANDROID_CPU_FAMILY_ARM) {
@@ -88,4 +104,5 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEn
     } else {
         return (*env)->NewStringUTF(env, ABI_UNKNOWN);
     }
+*/
 }
