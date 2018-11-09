@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
     s.ios.frameworks    = 'Foundation', 'AudioToolbox', 'CoreImage'
     s.ios.library       = 'z', 'bz2'
       
-    s.source            = { :http => 'https://github.com/tanersener/mobile-ffmpeg/releases/download/v2.1.1/mobile-ffmpeg-full-2.1.1-ios-framework.zip' }
+    s.source            = { :http => 'https://github.com/tanersener/mobile-ffmpeg/releases/download/v2.2/mobile-ffmpeg-full-2.2-ios-framework.zip' }
     s.ios.vendored_frameworks = 'mobileffmpeg.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  

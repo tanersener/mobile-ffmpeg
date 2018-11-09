@@ -48,7 +48,7 @@ if [[ ${RECONF_libvorbis} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
-./configure \
+PKG_CONFIG= ./configure \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \

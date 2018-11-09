@@ -42,7 +42,7 @@ if [[ ${RECONF_libvorbis} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
-./configure \
+PKG_CONFIG= ./configure \
     --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot \

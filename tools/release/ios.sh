@@ -80,8 +80,7 @@ create_package "audio" "$1" || exit 1
 
 # VIDEO RELEASE
 cd ${BASEDIR}/../.. || exit 1
-./ios.sh ${CUSTOM_OPTIONS} --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx
- --enable-snappy --enable-libwebp || exit 1
+./ios.sh ${CUSTOM_OPTIONS} --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx --enable-snappy --enable-libwebp || exit 1
 create_package "video" "$1" || exit 1
 
 # FULL RELEASE
