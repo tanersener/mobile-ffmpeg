@@ -1,4 +1,4 @@
-# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![GitHub release](https://img.shields.io/badge/release-v2.1.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v2.1.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v2.1.1-blue.svg)
+# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![GitHub release](https://img.shields.io/badge/release-v2.2-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v2.2-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v2.2-blue.svg)
 
 FFmpeg for Android and IOS
 
@@ -177,7 +177,7 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 
 - `MobileFFmpeg v1.x` is the previous stable, includes `FFmpeg v3.4.4`
 
-- `MobileFFmpeg v2.x` is the current stable, includes `FFmpeg v4.0.2`
+- `MobileFFmpeg v2.x` is the current stable, includes `FFmpeg v4.0.3`
 
 ### 4. Building
 #### 4.1 Prerequisites
