@@ -25,7 +25,8 @@ const char *abiDetectClassName = "com/arthenica/mobileffmpeg/AbiDetect";
 
 /** Prototypes of native functions defined by this file. */
 JNINativeMethod abiDetectMethods[] = {
-  {"getAbi", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi}
+  {"getNativeAbi", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeAbi},
+  {"getCpuAbi", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getCpuAbi}
 };
 
 /**
@@ -48,7 +49,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    if ((*env)->RegisterNatives(env, abiDetectClass, abiDetectMethods, 1) < 0) {
+    if ((*env)->RegisterNatives(env, abiDetectClass, abiDetectMethods, 2) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.\n", abiDetectClassName);
         return JNI_FALSE;
     }
@@ -57,18 +58,16 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 }
 
 /**
- * Returns running ABI name.
+ * Returns loaded ABI name.
  *
  * \param env pointer to native method interface
  * \param object reference to the class on which this method is invoked
- * \return running ABI name as UTF string
+ * \return loaded ABI name as UTF string
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEnv *env, jclass object) {
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeAbi(JNIEnv *env, jclass object) {
 
 #ifdef MOBILE_FFMPEG_ARM_V7A
     return (*env)->NewStringUTF(env, "arm-v7a");
-#elif MOBILE_FFMPEG_ARM_V7A_NEON
-    return (*env)->NewStringUTF(env, "arm-v7a-neon");
 #elif MOBILE_FFMPEG_ARM64_V8A
     return (*env)->NewStringUTF(env, "arm64-v8a");
 #elif MOBILE_FFMPEG_X86
@@ -79,7 +78,16 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEn
     return (*env)->NewStringUTF(env, "unknown");
 #endif
 
-/* OLD IMPLEMENTATION
+}
+
+/**
+ * Returns ABI name of the running cpu.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ * \return ABI name of the running cpu as UTF string
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getCpuAbi(JNIEnv *env, jclass object) {
     AndroidCpuFamily family = android_getCpuFamily();
 
     if (family == ANDROID_CPU_FAMILY_ARM) {
@@ -104,5 +112,4 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEn
     } else {
         return (*env)->NewStringUTF(env, ABI_UNKNOWN);
     }
-*/
 }

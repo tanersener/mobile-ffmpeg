@@ -29,6 +29,7 @@ package com.arthenica.mobileffmpeg;
 public class AbiDetect {
 
     static {
+        armV7aNeonLoaded = false;
         System.loadLibrary("mobileffmpeg-abidetect");
 
         /* ALL LIBRARIES LOADED AT STARTUP */
@@ -36,17 +37,43 @@ public class AbiDetect {
         FFmpeg.class.getName();
     }
 
+    private static boolean armV7aNeonLoaded;
+
     /**
      * Default constructor hidden.
      */
     private AbiDetect() {
     }
 
+    static void setArmV7aNeonLoaded(final boolean armV7aNeonLoaded) {
+        AbiDetect.armV7aNeonLoaded = armV7aNeonLoaded;
+    }
+
     /**
-     * <p>Returns running ABI name.
+     * <p>Returns loaded ABI name.
      *
-     * @return running ABI name
+     * @return loaded ABI name
      */
-    public native static String getAbi();
+    public static String getAbi() {
+        if (armV7aNeonLoaded) {
+            return "arm-v7a-neon";
+        } else {
+            return getNativeAbi();
+        }
+    }
+
+    /**
+     * <p>Returns native loaded ABI name.
+     *
+     * @return native loaded ABI name
+     */
+    private native static String getNativeAbi();
+
+    /**
+     * <p>Returns ABI name of the running cpu.
+     *
+     * @return ABI name of the running cpu
+     */
+    public native static String getCpuAbi();
 
 }

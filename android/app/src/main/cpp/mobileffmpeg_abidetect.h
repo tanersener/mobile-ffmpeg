@@ -46,9 +46,17 @@
 
 /*
  * Class:     com_arthenica_mobileffmpeg_AbiDetect
- * Method:    getAbi
+ * Method:    getNativeAbi
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getAbi(JNIEnv *, jclass);
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeAbi(JNIEnv *, jclass);
+
+/*
+ * Class:     com_arthenica_mobileffmpeg_AbiDetect
+ * Method:    getCpuAbi
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getCpuAbi(JNIEnv *, jclass);
+
 
 #endif /* MOBILE_FFMPEG_ABIDETECT_H */
