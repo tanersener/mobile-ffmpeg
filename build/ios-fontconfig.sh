@@ -62,6 +62,11 @@ fi
     --disable-docs \
     --host=${TARGET_HOST} || exit 1
 
+# DISABLE IOS TESTS with system() calls - system() is deprecated for IOS
+# 1. test-bz106632.c
+rm -f ${BASEDIR}/src/${LIB_NAME}/test/test-bz106632.c
+cp ${BASEDIR}/src/${LIB_NAME}/test/test-bz106618.c ${BASEDIR}/src/${LIB_NAME}/test/test-bz106632.c
+
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
