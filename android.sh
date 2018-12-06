@@ -469,6 +469,10 @@ EOF
 
 GPL_ENABLED="no"
 
+DETECTED_NDK_VERSION=$(grep -Eo Revision.* ${ANDROID_NDK_ROOT}/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
+
+echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>${BASEDIR}/build.log 2>&1
+
 while [ ! $# -eq 0 ]
 do
 
