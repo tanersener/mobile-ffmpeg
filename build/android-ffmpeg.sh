@@ -318,8 +318,9 @@ make distclean 2>/dev/null 1>/dev/null
     --enable-optimizations \
     --enable-swscale \
     --enable-shared \
-    --enable-v4l2-m2m \
     ${SIZE_OPTIONS} \
+    --disable-v4l2-m2m \
+    --disable-indev=v4l2 \
     --disable-openssl \
     --disable-xmm-clobber-test \
     --disable-debug \
