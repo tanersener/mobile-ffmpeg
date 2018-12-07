@@ -240,7 +240,10 @@ get_app_specific_cflags() {
         xvidcore)
             APP_FLAGS=""
         ;;
-        ffmpeg | shine)
+        ffmpeg)
+            APP_FLAGS="-Wno-unused-function -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
+        ;;
+        shine)
             APP_FLAGS="-Wno-unused-function"
         ;;
         soxr | snappy | libwebp)
