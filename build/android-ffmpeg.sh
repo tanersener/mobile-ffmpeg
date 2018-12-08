@@ -278,7 +278,9 @@ do
     else
 
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
-        if [[ ${library} -eq 42 ]]; then
+        if [[ ${library} -eq 30 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-sdl2"
+        elif [[ ${library} -eq 42 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi
