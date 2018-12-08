@@ -655,7 +655,7 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
 
     echo -e -n "\n\nCreating Android archive under prebuilt/android-aar: "
 
-    gradle clean build 1>>${BASEDIR}/build.log 2>&1
+    ./gradlew clean build 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -ne 0 ]; then
         echo -e "failed\n"
