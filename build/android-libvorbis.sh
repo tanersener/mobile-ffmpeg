@@ -25,7 +25,7 @@ fi
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="libvorbis"
-set_toolchain_gcc_paths ${LIB_NAME}
+set_toolchain_clang_paths ${LIB_NAME}
 
 # PREPARING FLAGS
 TARGET_HOST=$(get_target_host)
@@ -37,10 +37,11 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-# RECONFIGURING IF REQUESTED
-if [[ ${RECONF_libvorbis} -eq 1 ]]; then
-    autoreconf_library ${LIB_NAME}
-fi
+# -mno-ieee-fp option is not compatible with clang. removing it
+${SED_INLINE} 's/\-mno-ieee-fp//g' ${BASEDIR}/src/${LIB_NAME}/configure.ac
+
+# ALWAYS RECONFIGURE
+autoreconf_library ${LIB_NAME}
 
 ./configure \
     --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \

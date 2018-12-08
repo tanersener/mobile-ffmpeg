@@ -74,6 +74,7 @@ case ${ARCH} in
 esac
 
 CONFIGURE_POSTFIX=""
+HIGH_PRIORITY_INCLUDES=""
 
 for library in {1..43}
 do
@@ -137,6 +138,7 @@ do
                 CFLAGS+=" $(pkg-config --cflags libiconv)"
                 LDFLAGS+=" $(pkg-config --libs --static libiconv)"
                 CONFIGURE_POSTFIX+=" --enable-iconv"
+                HIGH_PRIORITY_INCLUDES+=" $(pkg-config --cflags libiconv)"
             ;;
             libilbc)
                 CFLAGS+=" $(pkg-config --cflags libilbc)"
@@ -306,7 +308,7 @@ make distclean 2>/dev/null 1>/dev/null
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
     --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
-    --extra-cflags="${CFLAGS}" \
+    --extra-cflags="${HIGH_PRIORITY_INCLUDES} ${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \
     --extra-ldflags="${LDFLAGS}" \
     --enable-version3 \
