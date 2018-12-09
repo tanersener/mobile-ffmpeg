@@ -1,23 +1,116 @@
+fa8210e4 Fix pair update in stochastic entropy merging.
+825389ac README.mux: add a reference to the AnimDecoder API
+3be698c3 CMake: fix webp_js compilation
+4cbb4caf update NEWS
+f5a5918d bump version to 1.0.1
+d61385db Speed-up: Make sure we only initialize histograms when needed.
+0c570316 update AUTHORS
+301a2dda img2webp: add help note about arguments from a file
+f0abab92 Speedups for empty histograms.
+f2dfd925 Split HistogramAdd to only have the high level logic in C.
+06b7bc7d Fix compilation on windows and clang-cl+ninja.
+98179495 remove some minor TODOs
+cbf82cc0 Remove AVX2 files.
+5030e902 Merge "TIFF decoder: remove unused KINV definition"
+ac543311 Remove a few more useless #defines
+123d3306 TIFF decoder: remove unused KINV definition
+ef1094b0 Merge "- install pkg-config files during the CMake build"
+b911fbc9 libwebp: Remove duplicate GIFDisplayError in anim_util
+eee00b66 - install pkg-config files during the CMake build
+ac3ec8c9 Merge "Clean-up the common sources in dsp."
+3e13da7b Clean-up the common sources in dsp.
+5c395f1d libwebp: cmake-format all
+e7a69729 libwebp: Add extras targets in CMakeLists.txt
+e52485d6 libwebp: Rename macros in webpmux.c
+92dc0f09 clean-up MakeInputImageCopy()
+39952de2 VP8IteratorImport: add missing 'const'
+382af7a2 clean-up WebPBlendAlpha
+14d020f6 libwebp: Use ExUtilGet*() in anim_diff
+0d92ff25 libwebp: remove useless variable in gif2webp
+556cb1b4 Merge "CMake: Set WEBP_BUILD_GIF2WEBP to off"
+da26ee49 CMake: Set WEBP_BUILD_GIF2WEBP to off
+b2a867c0 cwebp: Don't premultiply during -resize if -exact
+637141bc pngdec: fix build w/libpng < 1.4.x
+bc5092b1 pngdec: set memory functions
+50d8345a Fix CMake math library.
+6aa3e8aa Fix math library on Visual Studio.
+d71df4e2 Fix math library finding in CMake.
+de08d727 cosmetics: normalize include guard comment
+009562b4 vwebp: Fix bug when Dispose then NoBlend frames
+423f2579 Fix up CMake to create targets.
+907208f9 Wait for all threads to be done in DecodeRemaining.
+4649b3c4 vwebp: Add background color display option
+78ad57a3 Fix bad glClearColor parameters
+da96d8d9 Allow for a non-initialized alpha decompressor in DoRemap.
+2563db47 fix rescaling rounding inaccuracy
+211f37ee fix endian problems in pattern copy
+5f0f5c07 Make sure partition #0 is read before VP8 data in IDecode.
+de98732b fix GetColorf() bug
+4338cd36 misc fixes in libwebpmux
+e00af13e fix signatures after a9ceda7ff1
+a9ceda7f Speed-up chunk list operations.
+2281bbf6 Merge "Better handling of bogus Huffman codes."
+39cb9aad Better handling of bogus Huffman codes.
+89cc9d37 Merge "fix read-overflow while parsing VP8X chunk"
+95fd6507 fix read-overflow while parsing VP8X chunk
+9e729fe1 Fix VP8IoTeardownHook being called twice on worker sync failure
+29fb8562 Merge "muxread,anmf: fail on multiple image chunks"
+eb82ce76 muxread,anmf: fail on multiple image chunks
+1344a2e9 fix alpha-filtering crash when image width is larger than radius
+be738c6d muxread,ChunkVerifyAndAssign: validate chunk_size
+2c70ad76 muxread,CreateInternal: fix riff size checks
+569001f1 Fix for thread race heap-use-after-free
+c56a02d9 Android.mk: use LOCAL_EXPORT_C_INCLUDES w/public libs
+15795596 CMakeLists.txt,cosmetics: normalize if() formatting
+1a44c233 Merge "cmake: add support for webpmux"
+e9569ad7 Merge "configure,*am,cosmetics: s/WANT_/BUILD_/"
+35c7de6f cmake: add support for webpmux
+0f25e61c WebpToSDL(): fix the return value in case of error
+5d8985de configure,*am,cosmetics: s/WANT_/BUILD_/
+895fd28f Merge "man/Makefile.am: add img2webp.1"
+5cf3e2af man/Makefile.am: add img2webp.1
+2a9de5b9 Add build rules for anim_diff & anim_dump utils.
+71ed73cf fix invalid check for buffer size
+af0e4fbb gif2webp: fix transcode of loop count=65535
+dce5d764 Limit memory allocation when reading invalid Huffman codes.
+f9df0081 Merge "cmake: quiet glut deprecation warnings on OS X"
+dc39b16f webpmux.1: correct grammar
+c7aa1264 cwebp.c: fix a missing \n
+53aa51e9 Merge tag 'v1.0.0'
+698b8844 update ChangeLog (tag: v1.0.0)
 8d510751 webp-container-spec: correct frame duration=0 note
 e6b2164e vwebp: Copy Chrome's behavior w/frame duration == 0
+094b3b28 cmake: quiet glut deprecation warnings on OS X
+71c39a06 webp-container-spec: correct frame duration=0 note
+fd3d5756 vwebp: Copy Chrome's behavior w/frame duration == 0
+b0c966fb Build vwebp from CMake.
 d20b7707 update ChangeLog (tag: v1.0.0-rc3)
 0d5fad46 add WEBP_DSP_INIT / WEBP_DSP_INIT_FUNC
+d77bf512 add WEBP_DSP_INIT / WEBP_DSP_INIT_FUNC
 c1cb86af fix 16b overflow in SSE2
 e577feb7 makefile.unix: add DEBUG flag for compiling w/ debug-symbol
 99be34b3 cwebp,get_disto: fix bpp output
+e122e511 cwebp,get_disto: fix bpp output
 f5565ca8 cmake: Make sure we use near-lossless by default.
 d898dc14 fix bug in WebPImport565: alpha value was not set
+1c8f358d Fix CMake with WASM.
+a0215fb7 webp_js: fix webp_js demo html
 882784b0 update ChangeLog (tag: v1.0.0-rc2)
 2f930e08 Revert "Use proper targets for CMake."
 8165e8fb Use proper targets for CMake.
 3f157dd5 Remove some very hard TODOs.
+abb47760 Merge "Use proper targets for CMake."
 cd758a17 {de,}mux/Makefile.am: add missing headers
+e155dda0 Use proper targets for CMake.
 b892b8ba makefile.unix,dist: use ascii for text output
 64a57d05 add -version option to anim_dump,anim_diff and img2webp
+994be82d Merge "Remove some very hard TODOs."
+4033e1d7 Remove some very hard TODOs.
 fc1b8e3a webp_js: fix webp_js demo html
 15aa48d9 update ChangeLog (tag: v1.0.0-rc1)
 e607dabc update AUTHORS
 38410c08 [CFI] Remove function pointer casts
+978eec25 [CFI] Remove function pointer casts
 c57b2736 bump version to 1.0.0
 cba28853 update NEWS
 c909d531 Merge "remove some deprecation warning on MacOSX"

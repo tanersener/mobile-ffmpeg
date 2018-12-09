@@ -103,9 +103,6 @@
 /* Version number of package */
 #cmakedefine VERSION "@VERSION@"
 
-/* Set to 1 if AVX2 is supported */
-#cmakedefine WEBP_HAVE_AVX2 1
-
 /* Set to 1 if GIF library is installed */
 #cmakedefine WEBP_HAVE_GIF 1
 

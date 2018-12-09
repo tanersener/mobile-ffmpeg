@@ -1,7 +1,6 @@
 AM_CPPFLAGS += -I$(top_builddir) -I$(top_srcdir)
 noinst_LTLIBRARIES =
 noinst_LTLIBRARIES += libwebpdsp.la
-noinst_LTLIBRARIES += libwebpdsp_avx2.la
 noinst_LTLIBRARIES += libwebpdsp_sse2.la
 noinst_LTLIBRARIES += libwebpdspdecode_sse2.la
 noinst_LTLIBRARIES += libwebpdsp_sse41.la
@@ -10,6 +9,10 @@ noinst_LTLIBRARIES += libwebpdsp_neon.la
 noinst_LTLIBRARIES += libwebpdspdecode_neon.la
 noinst_LTLIBRARIES += libwebpdsp_msa.la
 noinst_LTLIBRARIES += libwebpdspdecode_msa.la
+noinst_LTLIBRARIES += libwebpdsp_mips32.la
+noinst_LTLIBRARIES += libwebpdspdecode_mips32.la
+noinst_LTLIBRARIES += libwebpdsp_mips_dsp_r2.la
+noinst_LTLIBRARIES += libwebpdspdecode_mips_dsp_r2.la
 
 if BUILD_LIBWEBPDECODER
   noinst_LTLIBRARIES += libwebpdspdecode.la
@@ -20,47 +23,24 @@ commondir = $(includedir)/webp
 
 COMMON_SOURCES =
 COMMON_SOURCES += alpha_processing.c
-COMMON_SOURCES += alpha_processing_mips_dsp_r2.c
-COMMON_SOURCES += common_sse2.h
 COMMON_SOURCES += cpu.c
 COMMON_SOURCES += dec.c
 COMMON_SOURCES += dec_clip_tables.c
-COMMON_SOURCES += dec_mips32.c
-COMMON_SOURCES += dec_mips_dsp_r2.c
 COMMON_SOURCES += dsp.h
 COMMON_SOURCES += filters.c
-COMMON_SOURCES += filters_mips_dsp_r2.c
 COMMON_SOURCES += lossless.c
 COMMON_SOURCES += lossless.h
 COMMON_SOURCES += lossless_common.h
-COMMON_SOURCES += lossless_mips_dsp_r2.c
-COMMON_SOURCES += mips_macro.h
 COMMON_SOURCES += rescaler.c
-COMMON_SOURCES += rescaler_mips32.c
-COMMON_SOURCES += rescaler_mips_dsp_r2.c
 COMMON_SOURCES += upsampling.c
-COMMON_SOURCES += upsampling_mips_dsp_r2.c
 COMMON_SOURCES += yuv.c
 COMMON_SOURCES += yuv.h
-COMMON_SOURCES += yuv_mips32.c
-COMMON_SOURCES += yuv_mips_dsp_r2.c
 
 ENC_SOURCES =
 ENC_SOURCES += cost.c
-ENC_SOURCES += cost_mips32.c
-ENC_SOURCES += cost_mips_dsp_r2.c
 ENC_SOURCES += enc.c
-ENC_SOURCES += enc_mips32.c
-ENC_SOURCES += enc_mips_dsp_r2.c
 ENC_SOURCES += lossless_enc.c
-ENC_SOURCES += lossless_enc_mips32.c
-ENC_SOURCES += lossless_enc_mips_dsp_r2.c
 ENC_SOURCES += ssim.c
-
-libwebpdsp_avx2_la_SOURCES =
-libwebpdsp_avx2_la_SOURCES += enc_avx2.c
-libwebpdsp_avx2_la_CPPFLAGS = $(libwebpdsp_la_CPPFLAGS)
-libwebpdsp_avx2_la_CFLAGS = $(AM_CFLAGS) $(AVX2_FLAGS)
 
 libwebpdspdecode_sse41_la_SOURCES =
 libwebpdspdecode_sse41_la_SOURCES += alpha_processing_sse41.c
@@ -72,6 +52,7 @@ libwebpdspdecode_sse41_la_CFLAGS = $(AM_CFLAGS) $(SSE41_FLAGS)
 
 libwebpdspdecode_sse2_la_SOURCES =
 libwebpdspdecode_sse2_la_SOURCES += alpha_processing_sse2.c
+libwebpdspdecode_sse2_la_SOURCES += common_sse2.h
 libwebpdspdecode_sse2_la_SOURCES += dec_sse2.c
 libwebpdspdecode_sse2_la_SOURCES += filters_sse2.c
 libwebpdspdecode_sse2_la_SOURCES += lossless_sse2.c
@@ -103,6 +84,26 @@ libwebpdspdecode_msa_la_SOURCES += upsampling_msa.c
 libwebpdspdecode_msa_la_CPPFLAGS = $(libwebpdsp_msa_la_CPPFLAGS)
 libwebpdspdecode_msa_la_CFLAGS = $(libwebpdsp_msa_la_CFLAGS)
 
+libwebpdspdecode_mips32_la_SOURCES =
+libwebpdspdecode_mips32_la_SOURCES += dec_mips32.c
+libwebpdspdecode_mips32_la_SOURCES += mips_macro.h
+libwebpdspdecode_mips32_la_SOURCES += rescaler_mips32.c
+libwebpdspdecode_mips32_la_SOURCES += yuv_mips32.c
+libwebpdspdecode_mips32_la_CPPFLAGS = $(libwebpdsp_mips32_la_CPPFLAGS)
+libwebpdspdecode_mips32_la_CFLAGS = $(libwebpdsp_mips32_la_CFLAGS)
+
+libwebpdspdecode_mips_dsp_r2_la_SOURCES =
+libwebpdspdecode_mips_dsp_r2_la_SOURCES += alpha_processing_mips_dsp_r2.c
+libwebpdspdecode_mips_dsp_r2_la_SOURCES += dec_mips_dsp_r2.c
+libwebpdspdecode_mips_dsp_r2_la_SOURCES += filters_mips_dsp_r2.c
+libwebpdspdecode_mips_dsp_r2_la_SOURCES += lossless_mips_dsp_r2.c
+libwebpdspdecode_mips_dsp_r2_la_SOURCES += mips_macro.h
+libwebpdspdecode_mips_dsp_r2_la_SOURCES += rescaler_mips_dsp_r2.c
+libwebpdspdecode_mips_dsp_r2_la_SOURCES += upsampling_mips_dsp_r2.c
+libwebpdspdecode_mips_dsp_r2_la_SOURCES += yuv_mips_dsp_r2.c
+libwebpdspdecode_mips_dsp_r2_la_CPPFLAGS = $(libwebpdsp_mips_dsp_r2_la_CPPFLAGS)
+libwebpdspdecode_mips_dsp_r2_la_CFLAGS = $(libwebpdsp_mips_dsp_r2_la_CFLAGS)
+
 libwebpdsp_sse2_la_SOURCES =
 libwebpdsp_sse2_la_SOURCES += cost_sse2.c
 libwebpdsp_sse2_la_SOURCES += enc_sse2.c
@@ -133,6 +134,22 @@ libwebpdsp_msa_la_CPPFLAGS = $(libwebpdsp_la_CPPFLAGS)
 libwebpdsp_msa_la_CFLAGS = $(AM_CFLAGS)
 libwebpdsp_msa_la_LIBADD = libwebpdspdecode_msa.la
 
+libwebpdsp_mips32_la_SOURCES =
+libwebpdsp_mips32_la_SOURCES += cost_mips32.c
+libwebpdsp_mips32_la_SOURCES += enc_mips32.c
+libwebpdsp_mips32_la_SOURCES += lossless_enc_mips32.c
+libwebpdsp_mips32_la_CPPFLAGS = $(libwebpdsp_la_CPPFLAGS)
+libwebpdsp_mips32_la_CFLAGS = $(AM_CFLAGS)
+libwebpdsp_mips32_la_LIBADD = libwebpdspdecode_mips32.la
+
+libwebpdsp_mips_dsp_r2_la_SOURCES =
+libwebpdsp_mips_dsp_r2_la_SOURCES += cost_mips_dsp_r2.c
+libwebpdsp_mips_dsp_r2_la_SOURCES += enc_mips_dsp_r2.c
+libwebpdsp_mips_dsp_r2_la_SOURCES += lossless_enc_mips_dsp_r2.c
+libwebpdsp_mips_dsp_r2_la_CPPFLAGS = $(libwebpdsp_la_CPPFLAGS)
+libwebpdsp_mips_dsp_r2_la_CFLAGS = $(AM_CFLAGS)
+libwebpdsp_mips_dsp_r2_la_LIBADD = libwebpdspdecode_mips_dsp_r2.la
+
 libwebpdsp_la_SOURCES = $(COMMON_SOURCES) $(ENC_SOURCES)
 
 noinst_HEADERS =
@@ -144,11 +161,12 @@ libwebpdsp_la_CPPFLAGS += $(AM_CPPFLAGS)
 libwebpdsp_la_CPPFLAGS += $(USE_SWAP_16BIT_CSP)
 libwebpdsp_la_LDFLAGS = -lm
 libwebpdsp_la_LIBADD =
-libwebpdsp_la_LIBADD += libwebpdsp_avx2.la
 libwebpdsp_la_LIBADD += libwebpdsp_sse2.la
 libwebpdsp_la_LIBADD += libwebpdsp_sse41.la
 libwebpdsp_la_LIBADD += libwebpdsp_neon.la
 libwebpdsp_la_LIBADD += libwebpdsp_msa.la
+libwebpdsp_la_LIBADD += libwebpdsp_mips32.la
+libwebpdsp_la_LIBADD += libwebpdsp_mips_dsp_r2.la
 
 if BUILD_LIBWEBPDECODER
   libwebpdspdecode_la_SOURCES = $(COMMON_SOURCES)
@@ -160,4 +178,6 @@ if BUILD_LIBWEBPDECODER
   libwebpdspdecode_la_LIBADD += libwebpdspdecode_sse41.la
   libwebpdspdecode_la_LIBADD += libwebpdspdecode_neon.la
   libwebpdspdecode_la_LIBADD += libwebpdspdecode_msa.la
+  libwebpdspdecode_la_LIBADD += libwebpdspdecode_mips32.la
+  libwebpdspdecode_la_LIBADD += libwebpdspdecode_mips_dsp_r2.la
 endif

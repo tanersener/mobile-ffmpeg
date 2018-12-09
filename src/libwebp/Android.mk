@@ -99,7 +99,6 @@ dsp_enc_srcs := \
     src/dsp/cost_mips_dsp_r2.c \
     src/dsp/cost_sse2.c \
     src/dsp/enc.c \
-    src/dsp/enc_avx2.c \
     src/dsp/enc_mips32.c \
     src/dsp/enc_mips_dsp_r2.c \
     src/dsp/enc_msa.c \
@@ -174,7 +173,7 @@ LOCAL_SRC_FILES := \
     $(utils_dec_srcs) \
 
 LOCAL_CFLAGS := $(WEBP_CFLAGS)
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/src
+LOCAL_EXPORT_C_INCLUDES += $(LOCAL_PATH)/src
 
 # prefer arm over thumb mode for performance gains
 LOCAL_ARM_MODE := arm
@@ -208,7 +207,7 @@ LOCAL_SRC_FILES := \
     $(utils_enc_srcs) \
 
 LOCAL_CFLAGS := $(WEBP_CFLAGS)
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/src
+LOCAL_EXPORT_C_INCLUDES += $(LOCAL_PATH)/src
 
 # prefer arm over thumb mode for performance gains
 LOCAL_ARM_MODE := arm
@@ -231,7 +230,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(demux_srcs)
 
 LOCAL_CFLAGS := $(WEBP_CFLAGS)
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/src
+LOCAL_EXPORT_C_INCLUDES += $(LOCAL_PATH)/src
 
 # prefer arm over thumb mode for performance gains
 LOCAL_ARM_MODE := arm
@@ -254,7 +253,7 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := $(mux_srcs)
 
 LOCAL_CFLAGS := $(WEBP_CFLAGS)
-LOCAL_C_INCLUDES += $(LOCAL_PATH)/src
+LOCAL_EXPORT_C_INCLUDES += $(LOCAL_PATH)/src
 
 # prefer arm over thumb mode for performance gains
 LOCAL_ARM_MODE := arm

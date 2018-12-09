@@ -42,6 +42,12 @@ fi
 mkdir build;
 cd build
 
+# OVERRIDING INCLUDE PATH ORDER
+CFLAGS="-I${BASEDIR}/prebuilt/android-$(get_target_build)/giflib/include \
+-I${BASEDIR}/prebuilt/android-$(get_target_build)/jpeg/include \
+-I${BASEDIR}/prebuilt/android-$(get_target_build)/libpng/include \
+-I${BASEDIR}/prebuilt/android-$(get_target_build)/tiff/include $CFLAGS"
+
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
@@ -57,7 +63,6 @@ cmake -Wno-dev \
     -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AR" \
     -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin/$AS" \
     -DGIF_INCLUDE_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/giflib/include" \
-    -DGIF_LIBRARY="${BASEDIR}/prebuilt/android-$(get_target_build)/giflib/lib" \
     -DJPEG_INCLUDE_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/jpeg/include" \
     -DJPEG_LIBRARY="${BASEDIR}/prebuilt/android-$(get_target_build)/jpeg/lib" \
     -DPNG_PNG_INCLUDE_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/libpng/include" \
@@ -67,12 +72,25 @@ cmake -Wno-dev \
     -DZLIB_INCLUDE_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/include" \
     -DZLIB_LIBRARY="${ANDROID_NDK_ROOT}/platform/android-${API}/arch-$(get_target_build)/usr/lib" \
     -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
+    -DGLUT_INCLUDE_DIR= \
+    -DGLUT_cocoa_LIBRARY= \
+    -DGLUT_glut_LIBRARY= \
+    -DOPENGL_INCLUDE_DIR= \
+    -DSDLMAIN_LIBRARY= \
+    -DSDL_INCLUDE_DIR= \
+    -DWEBP_BUILD_CWEBP=0 \
+    -DWEBP_BUILD_DWEBP=0 \
+    -DWEBP_BUILD_EXTRAS=0 \
+    -DWEBP_BUILD_GIF2WEBP=0 \
+    -DWEBP_BUILD_IMG2WEBP=0 \
+    -DWEBP_BUILD_WEBPMUX=0 \
+    -DWEBP_BUILD_WEBPINFO=0 \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libwebp_package_config "1.0.0"
+create_libwebp_package_config "1.0.1"
 
 make install || exit 1

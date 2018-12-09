@@ -175,7 +175,6 @@ model {
             include "cost_mips_dsp_r2.c"
             include "cost_sse2.c"
             include "enc.c"
-            include "enc_avx2.c"
             include "enc_mips32.c"
             include "enc_mips_dsp_r2.c"
             include "enc_msa.c"

@@ -100,9 +100,6 @@
 /* Version number of package */
 #undef VERSION
 
-/* Set to 1 if AVX2 is supported */
-#undef WEBP_HAVE_AVX2
-
 /* Set to 1 if GIF library is installed */
 #undef WEBP_HAVE_GIF
 

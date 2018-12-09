@@ -67,4 +67,4 @@ WEBP_EXTERN int VP8EstimateQuality(const uint8_t* const data, size_t size);
 }    // extern "C"
 #endif
 
-#endif  /* WEBP_EXTRAS_EXTRAS_H_ */
+#endif  // WEBP_EXTRAS_EXTRAS_H_

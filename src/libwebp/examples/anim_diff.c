@@ -20,6 +20,7 @@
 #include <string.h>  // for 'strcmp'.
 
 #include "./anim_util.h"
+#include "./example_util.h"
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -143,8 +144,18 @@ static int CompareAnimatedImagePair(const AnimatedImage* const img1,
   if (!ok) return 0;  // These are fatal failures, can't proceed.
 
   if (is_multi_frame_image) {  // Checks relevant for multi-frame images only.
-    ok = CompareValues(img1->loop_count, img2->loop_count,
-                       "Loop count mismatch") && ok;
+    int max_loop_count_workaround = 0;
+    // Transcodes to webp increase the gif loop count by 1 for compatibility.
+    // When the gif has the maximum value the webp value will be off by one.
+    if ((img1->format == ANIM_GIF && img1->loop_count == 65536 &&
+         img2->format == ANIM_WEBP && img2->loop_count == 65535) ||
+        (img1->format == ANIM_WEBP && img1->loop_count == 65535 &&
+         img2->format == ANIM_GIF && img2->loop_count == 65536)) {
+      max_loop_count_workaround = 1;
+    }
+    ok = (max_loop_count_workaround ||
+          CompareValues(img1->loop_count, img2->loop_count,
+                        "Loop count mismatch")) && ok;
     ok = CompareBackgroundColor(img1->bgcolor, img2->bgcolor,
                                 premultiply) && ok;
   }
@@ -218,14 +229,7 @@ int main(int argc, const char* argv[]) {
       }
     } else if (!strcmp(argv[c], "-min_psnr")) {
       if (c < argc - 1) {
-        const char* const v = argv[++c];
-        char* end = NULL;
-        const double d = strtod(v, &end);
-        if (end == v) {
-          parse_error = 1;
-          fprintf(stderr, "Error! '%s' is not a floating point number.\n", v);
-        }
-        min_psnr = d;
+        min_psnr = ExUtilGetFloat(argv[++c], &parse_error);
       } else {
         parse_error = 1;
       }
@@ -233,14 +237,7 @@ int main(int argc, const char* argv[]) {
       premultiply = 0;
     } else if (!strcmp(argv[c], "-max_diff")) {
       if (c < argc - 1) {
-        const char* const v = argv[++c];
-        char* end = NULL;
-        const int n = (int)strtol(v, &end, 10);
-        if (end == v) {
-          parse_error = 1;
-          fprintf(stderr, "Error! '%s' is not an integer.\n", v);
-        }
-        max_diff = n;
+        max_diff = ExUtilGetInt(argv[++c], 0, &parse_error);
       } else {
         parse_error = 1;
       }

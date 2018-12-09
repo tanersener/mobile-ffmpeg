@@ -53,11 +53,6 @@ OUTDIR = ..\obj\
 OUTDIR = $(OBJDIR)
 !ENDIF
 
-!IF "$(HAVE_AVX2)" == "1"
-CFLAGS = $(CFLAGS) /DWEBP_HAVE_AVX2
-AVX2_FLAGS = /arch:AVX2
-!ENDIF
-
 ##############################################################
 # Runtime library configuration
 !IF "$(RTLIBCFG)" == "static"
@@ -241,7 +236,6 @@ DSP_ENC_OBJS = \
     $(DIROBJ)\dsp\cost_mips_dsp_r2.obj \
     $(DIROBJ)\dsp\cost_sse2.obj \
     $(DIROBJ)\dsp\enc.obj \
-    $(DIROBJ)\dsp\enc_avx2.obj \
     $(DIROBJ)\dsp\enc_mips32.obj \
     $(DIROBJ)\dsp\enc_mips_dsp_r2.obj \
     $(DIROBJ)\dsp\enc_msa.obj \
@@ -454,9 +448,6 @@ $(DIROBJ)\$(DLLINC):
 .SUFFIXES: .c .obj .res .exe
 # File-specific flag builds. Note batch rules take precedence over wildcards,
 # so for now name each file individually.
-$(DIROBJ)\dsp\enc_avx2.obj: src\dsp\enc_avx2.c
-	$(CC) $(CFLAGS) $(AVX2_FLAGS) /Fd$(LIBWEBP_PDBNAME) /Fo$(DIROBJ)\dsp\ \
-	  src\dsp\$(@B).c
 $(DIROBJ)\examples\anim_diff.obj: examples\anim_diff.c
 	$(CC) $(CFLAGS) /DWEBP_HAVE_GIF /Fd$(LIBWEBP_PDBNAME) \
 	  /Fo$(DIROBJ)\examples\ examples\$(@B).c

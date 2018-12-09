@@ -1,7 +1,7 @@
 AM_CPPFLAGS += -I$(top_builddir)/src -I$(top_srcdir)/src
 noinst_LTLIBRARIES =
 noinst_LTLIBRARIES += libimageio_util.la
-if WANT_DEMUX
+if BUILD_DEMUX
   noinst_LTLIBRARIES += libimagedec.la
 endif
 noinst_LTLIBRARIES += libimageenc.la
