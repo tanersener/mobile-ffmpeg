@@ -305,7 +305,7 @@ make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --cross-prefix="${TARGET_HOST}-" \
-    --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot" \
+    --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot" \
     --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --extra-cflags="${HIGH_PRIORITY_INCLUDES} ${CFLAGS}" \
