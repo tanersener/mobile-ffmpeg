@@ -92,6 +92,7 @@ nettle_SOURCES = aes-decrypt-internal.c aes-decrypt.c \
 		 camellia256-meta.c \
 		 cast128.c cast128-meta.c cbc.c \
 		 ccm.c ccm-aes128.c ccm-aes192.c ccm-aes256.c cfb.c \
+		 cnd-memcpy.c \
 		 chacha-crypt.c chacha-core-internal.c \
 		 chacha-poly1305.c chacha-poly1305-meta.c \
 		 chacha-set-key.c chacha-set-nonce.c \
@@ -143,10 +144,12 @@ hogweed_SOURCES = sexp.c sexp-format.c \
 		  bignum.c bignum-random.c bignum-random-prime.c \
 		  sexp2bignum.c \
 		  pkcs1.c pkcs1-encrypt.c pkcs1-decrypt.c \
+		  pkcs1-sec-decrypt.c \
 		  pkcs1-rsa-digest.c pkcs1-rsa-md5.c pkcs1-rsa-sha1.c \
 		  pkcs1-rsa-sha256.c pkcs1-rsa-sha512.c \
 		  pss.c pss-mgf1.c \
 		  rsa.c rsa-sign.c rsa-sign-tr.c rsa-verify.c \
+		  rsa-sec-compute-root.c \
 		  rsa-pkcs1-sign.c rsa-pkcs1-sign-tr.c rsa-pkcs1-verify.c \
 		  rsa-md5-sign.c rsa-md5-sign-tr.c rsa-md5-verify.c \
 		  rsa-sha1-sign.c rsa-sha1-sign-tr.c rsa-sha1-verify.c \
@@ -154,7 +157,8 @@ hogweed_SOURCES = sexp.c sexp-format.c \
 		  rsa-sha512-sign.c rsa-sha512-sign-tr.c rsa-sha512-verify.c \
 		  rsa-pss-sha256-sign-tr.c rsa-pss-sha256-verify.c \
 		  rsa-pss-sha512-sign-tr.c rsa-pss-sha512-verify.c \
-		  rsa-encrypt.c rsa-decrypt.c rsa-decrypt-tr.c \
+		  rsa-encrypt.c rsa-decrypt.c \
+		  rsa-sec-decrypt.c rsa-decrypt-tr.c \
 		  rsa-keygen.c rsa-blind.c \
 		  rsa2sexp.c sexp2rsa.c \
 		  dsa.c dsa-compat.c dsa-compat-keygen.c dsa-gen-params.c \
@@ -228,6 +232,7 @@ DISTFILES = $(SOURCES) $(HEADERS) getopt.h getopt_int.h \
 	aes-internal.h camellia-internal.h serpent-internal.h \
 	cast128_sboxes.h desinfo.h desCode.h \
 	memxor-internal.h nettle-internal.h nettle-write.h \
+	rsa-internal.h \
 	gmp-glue.h ecc-internal.h fat-setup.h \
 	mini-gmp.h asm.m4 \
 	nettle.texinfo nettle.info nettle.html nettle.pdf sha-example.c

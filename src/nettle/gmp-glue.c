@@ -247,6 +247,37 @@ mpn_set_base256_le (mp_limb_t *rp, mp_size_t rn,
 }
 
 void
+mpn_get_base256 (uint8_t *rp, size_t rn,
+		 const mp_limb_t *xp, mp_size_t xn)
+{
+  unsigned bits;
+  mp_limb_t in;
+  for (bits = in = 0; xn > 0 && rn > 0; )
+    {
+      if (bits >= 8)
+	{
+	  rp[--rn] = in;
+	  in >>= 8;
+	  bits -= 8;
+	}
+      else
+	{
+	  uint8_t old = in;
+	  in = *xp++;
+	  xn--;
+	  rp[--rn] = old | (in << bits);
+	  in >>= (8 - bits);
+	  bits += GMP_NUMB_BITS - 8;
+	}
+    }
+  while (rn > 0)
+    {
+      rp[--rn] = in;
+      in >>= 8;
+    }
+}
+
+void
 mpn_get_base256_le (uint8_t *rp, size_t rn,
 		    const mp_limb_t *xp, mp_size_t xn)
 {

@@ -2,7 +2,7 @@ dnl -*- mode: shell-script; sh-indentation: 2; -*-
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([nettle], [3.4], [nettle-bugs@lists.lysator.liu.se])
+AC_INIT([nettle], [3.4.1], [nettle-bugs@lists.lysator.liu.se])
 AC_PREREQ(2.61)
 AC_CONFIG_SRCDIR([arcfour.c])
 # Needed to stop autoconf from looking for files in parent directories.
@@ -11,10 +11,10 @@ AC_CONFIG_AUX_DIR([.])
 AC_CONFIG_HEADER([config.h])
 
 LIBNETTLE_MAJOR=6
-LIBNETTLE_MINOR=4
+LIBNETTLE_MINOR=5
 
 LIBHOGWEED_MAJOR=4
-LIBHOGWEED_MINOR=4
+LIBHOGWEED_MINOR=5
 
 dnl Note double square brackets, for extra m4 quoting.
 MAJOR_VERSION=`echo $PACKAGE_VERSION | sed 's/^\([[^.]]*\)\..*/\1/'`
@@ -236,9 +236,9 @@ fi
 # Checks for libraries
 if test "x$enable_public_key" = "xyes" ; then
   if test "x$enable_mini_gmp" = "xno" ; then
-    AC_CHECK_LIB(gmp, __gmpz_powm_sec,,
+    AC_CHECK_LIB(gmp, __gmpn_sec_div_r,,
         [AC_MSG_WARN(
-    [GNU MP not found, or too old. GMP-5.0 or later is needed, see http://gmplib.org/.
+    [GNU MP not found, or too old. GMP-6.0 or later is needed, see https://gmplib.org/.
     Support for public key algorithms will be unavailable.])]
         enable_public_key=no)
 

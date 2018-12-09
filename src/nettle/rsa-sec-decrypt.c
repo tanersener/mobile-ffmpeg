@@ -1,8 +1,11 @@
-/* pkcs1-decrypt.c
+/* rsa-sec-decrypt.c
 
-   The RSA publickey algorithm. PKCS#1 decryption.
+   RSA decryption, using randomized RSA blinding to be more resistant
+   to side-channel attacks like timing attacks or cache based memory
+   access measurements.
 
-   Copyright (C) 2001, 2012 Niels Möller
+   Copyright (C) 2001, 2012 Niels Möller, Nikos Mavrogiannopoulos
+   Copyright (C) 2018 Red Hat, Inc.
 
    This file is part of GNU Nettle.
 
@@ -35,28 +38,35 @@
 # include "config.h"
 #endif
 
-#include <string.h>
-
-#include "pkcs1.h"
-
-#include "bignum.h"
-#include "gmp-glue.h"
+#include "rsa.h"
 #include "rsa-internal.h"
 
+#include "gmp-glue.h"
+
 int
-pkcs1_decrypt (size_t key_size,
-	       const mpz_t m,
-	       size_t *length, uint8_t *message)
+rsa_sec_decrypt(const struct rsa_public_key *pub,
+	        const struct rsa_private_key *key,
+	        void *random_ctx, nettle_random_func *random,
+	        size_t length, uint8_t *message,
+	        const mpz_t gibberish)
 {
-  TMP_GMP_DECL(em, uint8_t);
-  int ret;
+  TMP_GMP_DECL (m, mp_limb_t);
+  TMP_GMP_DECL (em, uint8_t);
+  int res;
 
-  TMP_GMP_ALLOC(em, key_size);
-  nettle_mpz_get_str_256(key_size, em, m);
+  TMP_GMP_ALLOC (m, mpz_size(pub->n));
+  TMP_GMP_ALLOC (em, key->size);
 
-  ret = _pkcs1_sec_decrypt_variable (length, message, key_size, em);
+  res = _rsa_sec_compute_root_tr (pub, key, random_ctx, random, m,
+				  mpz_limbs_read(gibberish),
+				  mpz_size(gibberish));
 
-  TMP_GMP_FREE(em);
-  return ret;
+  mpn_get_base256 (em, key->size, m, mpz_size(pub->n));
+
+  res &= _pkcs1_sec_decrypt (length, message, key->size, em);
+
+  TMP_GMP_FREE (em);
+  TMP_GMP_FREE (m);
+  return res;
 }
-	       
+

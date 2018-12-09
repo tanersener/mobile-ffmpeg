@@ -14,6 +14,7 @@ TS_NETTLE_SOURCES = aes-test.c arcfour-test.c arctwo-test.c \
 		    blowfish-test.c cast128-test.c \
 	            base16-test.c base64-test.c \
 		    camellia-test.c chacha-test.c \
+		    cnd-memcpy-test.c \
 		    des-test.c des3-test.c des-compat-test.c \
 		    md2-test.c md4-test.c md5-test.c md5-compat-test.c \
 		    memeql-test.c memxor-test.c gosthash94-test.c \
@@ -30,14 +31,17 @@ TS_NETTLE_SOURCES = aes-test.c arcfour-test.c arctwo-test.c \
 		    hmac-test.c umac-test.c \
 		    meta-hash-test.c meta-cipher-test.c\
 		    meta-aead-test.c meta-armor-test.c \
-		    buffer-test.c yarrow-test.c pbkdf2-test.c pss-mgf1-test.c
+		    buffer-test.c yarrow-test.c pbkdf2-test.c
 
 TS_HOGWEED_SOURCES = sexp-test.c sexp-format-test.c \
 		     rsa2sexp-test.c sexp2rsa-test.c \
 		     bignum-test.c random-prime-test.c \
-		     pkcs1-test.c pss-test.c rsa-sign-tr-test.c \
-		     rsa-pss-sign-tr-test.c \
+		     pkcs1-test.c pkcs1-sec-decrypt-test.c \
+		     pss-test.c rsa-sign-tr-test.c \
+		     pss-mgf1-test.c rsa-pss-sign-tr-test.c \
 		     rsa-test.c rsa-encrypt-test.c rsa-keygen-test.c \
+		     rsa-sec-decrypt-test.c \
+		     rsa-compute-root-test.c \
 		     dsa-test.c dsa-keygen-test.c \
 		     curve25519-dh-test.c \
 		     ecc-mod-test.c ecc-modinv-test.c ecc-redc-test.c \

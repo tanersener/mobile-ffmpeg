@@ -1,8 +1,6 @@
-/* pkcs1-decrypt.c
+/* cnd-memcpy.c
 
-   The RSA publickey algorithm. PKCS#1 decryption.
-
-   Copyright (C) 2001, 2012 Niels Möller
+   Copyright (C) 2018 Niels Möller
 
    This file is part of GNU Nettle.
 
@@ -35,28 +33,23 @@
 # include "config.h"
 #endif
 
-#include <string.h>
+#include "memops.h"
 
-#include "pkcs1.h"
-
-#include "bignum.h"
-#include "gmp-glue.h"
-#include "rsa-internal.h"
-
-int
-pkcs1_decrypt (size_t key_size,
-	       const mpz_t m,
-	       size_t *length, uint8_t *message)
+void
+cnd_memcpy(int cnd, volatile void *dst, const volatile void *src, size_t n)
 {
-  TMP_GMP_DECL(em, uint8_t);
-  int ret;
+  const volatile unsigned char *sp = src;
+  volatile unsigned char *dp = dst;
+  volatile unsigned char c;
+  volatile unsigned char m;
+  size_t i;
 
-  TMP_GMP_ALLOC(em, key_size);
-  nettle_mpz_get_str_256(key_size, em, m);
+  m = -(unsigned char) cnd;
 
-  ret = _pkcs1_sec_decrypt_variable (length, message, key_size, em);
-
-  TMP_GMP_FREE(em);
-  return ret;
+  for (i = 0; i < n; i++)
+    {
+      c = (sp[i] & m);
+      c |= (dp[i] & ~m);
+      dp[i] = c;
+    }
 }
-	       

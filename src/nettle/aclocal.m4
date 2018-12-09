@@ -650,7 +650,7 @@ AC_DEFUN([NETTLE_CHECK_IFUNC],
 [AC_REQUIRE([AC_PROG_CC])
 AC_CACHE_CHECK([for ifunc support],
   nettle_cv_link_ifunc,
-  AC_LINK_IFELSE([AC_LANG_PROGRAM([
+  [AC_LINK_IFELSE([AC_LANG_PROGRAM([
 static int
 foo_imp(int x)
 {
@@ -671,7 +671,7 @@ int foo (int x) __attribute__ ((ifunc("foo_resolv")));
 
 ])],
 [nettle_cv_link_ifunc=yes],
-[nettle_cv_link_ifunc=no]))
+[nettle_cv_link_ifunc=no])])
 AH_TEMPLATE([HAVE_LINK_IFUNC], [Define if compiler and linker supports __attribute__ ifunc])
 if test "x$nettle_cv_link_ifunc" = xyes ; then
   AC_DEFINE(HAVE_LINK_IFUNC)

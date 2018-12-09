@@ -1,8 +1,7 @@
-/* pkcs1-decrypt.c
+C x86_64/sha1-compress.asm
 
-   The RSA publickey algorithm. PKCS#1 decryption.
-
-   Copyright (C) 2001, 2012 Niels Möller
+ifelse(<
+   Copyright (C) 2004, 2008, 2013, 2018 Niels Möller
 
    This file is part of GNU Nettle.
 
@@ -29,34 +28,33 @@
    You should have received copies of the GNU General Public License and
    the GNU Lesser General Public License along with this program.  If
    not, see http://www.gnu.org/licenses/.
-*/
+>)
 
-#if HAVE_CONFIG_H
-# include "config.h"
-#endif
+C Register usage.
 
-#include <string.h>
+C Arguments
+define(<STATE>,<%rdi>)dnl
+define(<INPUT>,<%rsi>)dnl
 
-#include "pkcs1.h"
+C Constants
+define(<K1VALUE>, <0x5A827999>)dnl		C  Rounds  0-19
+define(<K2VALUE>, <0x6ED9EBA1>)dnl		C  Rounds 20-39
+define(<K3VALUE>, <0x8F1BBCDC>)dnl		C  Rounds 40-59
+define(<K4VALUE>, <0xCA62C1D6>)dnl		C  Rounds 60-79
 
-#include "bignum.h"
-#include "gmp-glue.h"
-#include "rsa-internal.h"
+	.file "sha1-compress.asm"
 
-int
-pkcs1_decrypt (size_t key_size,
-	       const mpz_t m,
-	       size_t *length, uint8_t *message)
-{
-  TMP_GMP_DECL(em, uint8_t);
-  int ret;
+	C _nettle_sha1_compress(uint32_t *state, uint8_t *input)
+	
+	.text
+	ALIGN(16)
+PROLOGUE(_nettle_sha1_compress)
+	C save all registers that need to be saved XXX
+	movups (INPUT), W0
+	movups 16(INPUT), W1
+	movups 32(INPUT), W2
+	movups 48(INPUT), W3
 
-  TMP_GMP_ALLOC(em, key_size);
-  nettle_mpz_get_str_256(key_size, em, m);
+	ret
+EPILOGUE(_nettle_sha1_compress)
 
-  ret = _pkcs1_sec_decrypt_variable (length, message, key_size, em);
-
-  TMP_GMP_FREE(em);
-  return ret;
-}
-	       
