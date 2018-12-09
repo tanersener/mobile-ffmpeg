@@ -935,39 +935,6 @@ set_toolchain_clang_paths() {
     prepare_inline_sed
 }
 
-set_toolchain_gcc_paths() {
-    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin
-
-    TARGET_HOST=$(get_target_host)
-
-    export AR=${TARGET_HOST}-ar
-    export CC=${TARGET_HOST}-gcc
-    export CXX=${TARGET_HOST}-g++
-
-    if [ "$1" == "x264" ]; then
-        export AS=${CC}
-    else
-        export AS=${TARGET_HOST}-as
-    fi
-
-    export LD=${TARGET_HOST}-ld
-    export RANLIB=${TARGET_HOST}-ranlib
-    export STRIP=${TARGET_HOST}-strip
-
-    export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/pkgconfig"
-    export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
-
-    if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
-        mkdir -p ${INSTALL_PKG_CONFIG_DIR}
-    fi
-
-    if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
-        create_zlib_package_config
-    fi
-
-    prepare_inline_sed
-}
-
 create_toolchain() {
     local TOOLCHAIN_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-"${TOOLCHAIN}
 
