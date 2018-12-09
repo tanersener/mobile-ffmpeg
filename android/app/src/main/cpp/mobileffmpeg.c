@@ -358,6 +358,10 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
     if (level >= 0) {
         level &= 0xff;
     }
+    int activeLogLevel = av_log_get_level();
+    if ((activeLogLevel == AV_LOG_QUIET) || (level > activeLogLevel)) {
+        return;
+    }
 
     avutil_log_format_line(ptr, level, format, vargs, part, &print_prefix);
     snprintf(line, sizeof(line), "%s%s%s%s", part[0].str, part[1].str, part[2].str, part[3].str);

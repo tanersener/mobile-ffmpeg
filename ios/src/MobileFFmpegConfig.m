@@ -213,6 +213,16 @@ CallbackData *callbackDataRemove() {
  * \param arguments
  */
 void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs) {
+
+    // DO NOT PROCESS UNWANTED LOGS
+    if (level >= 0) {
+        level &= 0xff;
+    }
+    int activeLogLevel = [MobileFFmpegConfig getLogLevel];
+    if ((activeLogLevel == AV_LOG_QUIET) || (level > activeLogLevel)) {
+        return;
+    }
+
     NSString *logData = [[NSString alloc] initWithFormat:[NSString stringWithCString:format encoding:NSUTF8StringEncoding] arguments:vargs];
 
     logCallbackDataAdd(level, logData);
