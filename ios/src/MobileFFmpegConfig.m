@@ -250,63 +250,65 @@ void callbackBlockFunction() {
     NSLog(@"Async callback block started.\n");
 
     while(redirectionEnabled) {
-        @try {
+        @autoreleasepool {
+            @try {
 
-            CallbackData *callbackData = callbackDataRemove();
-            if (callbackData != nil) {
+                CallbackData *callbackData = callbackDataRemove();
+                if (callbackData != nil) {
 
-                if ([callbackData getType] == LogType) {
+                    if ([callbackData getType] == LogType) {
 
-                    // LOG CALLBACK
-                    int activeLogLevel = [MobileFFmpegConfig getLogLevel];
+                        // LOG CALLBACK
+                        int activeLogLevel = [MobileFFmpegConfig getLogLevel];
 
-                    if (runningSystemCommand == 1) {
+                        if (runningSystemCommand == 1) {
 
-                        // REDIRECT SYSTEM OUTPUT
-                        if ((activeLogLevel != AV_LOG_QUIET) && ([callbackData getLogLevel] <= activeLogLevel)) {
-                            [systemCommandOutput appendString:[callbackData getLogData]];
+                            // REDIRECT SYSTEM OUTPUT
+                            if ((activeLogLevel != AV_LOG_QUIET) && ([callbackData getLogLevel] <= activeLogLevel)) {
+                                [systemCommandOutput appendString:[callbackData getLogData]];
+                            }
+                        } else if ((activeLogLevel == AV_LOG_QUIET) || ([callbackData getLogLevel] > activeLogLevel)) {
+
+                            // LOG NEITHER PRINTED NOR FORWARDED
+                        } else {
+
+                            // ALWAYS REDIRECT COMMAND OUTPUT
+                            [lastCommandOutput appendString:[callbackData getLogData]];
+
+                            if (logDelegate != nil) {
+
+                                // FORWARD LOG TO DELEGATE
+                                [logDelegate logCallback:[callbackData getLogLevel]:[callbackData getLogData]];
+
+                            } else {
+
+                                // WRITE TO NSLOG
+                                NSLog(@"%@: %@", [MobileFFmpegConfig logLevelToString:[callbackData getLogLevel]], [callbackData getLogData]);
+                            }
+
                         }
-                    } else if ((activeLogLevel == AV_LOG_QUIET) || ([callbackData getLogLevel] > activeLogLevel)) {
 
-                        // LOG NEITHER PRINTED NOR FORWARDED
                     } else {
 
-                        // ALWAYS REDIRECT COMMAND OUTPUT
-                        [lastCommandOutput appendString:[callbackData getLogData]];
+                        // STATISTICS CALLBACK
+                        Statistics *newStatistics = [[Statistics alloc] initWithVideoFrameNumber:[callbackData getStatisticsFrameNumber] fps:[callbackData getStatisticsFps] quality:[callbackData getStatisticsQuality] size:[callbackData getStatisticsSize] time:[callbackData getStatisticsTime] bitrate:[callbackData getStatisticsBitrate] speed:[callbackData getStatisticsSpeed]];
+                        [lastReceivedStatistics update:newStatistics];
 
                         if (logDelegate != nil) {
 
-                            // FORWARD LOG TO DELEGATE
-                            [logDelegate logCallback:[callbackData getLogLevel]:[callbackData getLogData]];
-
-                        } else {
-
-                            // WRITE TO NSLOG
-                            NSLog(@"%@: %@", [MobileFFmpegConfig logLevelToString:[callbackData getLogLevel]], [callbackData getLogData]);
+                            // FORWARD STATISTICS TO DELEGATE
+                            [statisticsDelegate statisticsCallback:lastReceivedStatistics];
                         }
-                        
                     }
 
                 } else {
-
-                    // STATISTICS CALLBACK
-                    Statistics *newStatistics = [[Statistics alloc] initWithVideoFrameNumber:[callbackData getStatisticsFrameNumber] fps:[callbackData getStatisticsFps] quality:[callbackData getStatisticsQuality] size:[callbackData getStatisticsSize] time:[callbackData getStatisticsTime] bitrate:[callbackData getStatisticsBitrate] speed:[callbackData getStatisticsSpeed]];
-                    [lastReceivedStatistics update:newStatistics];
-
-                    if (logDelegate != nil) {
-
-                        // FORWARD STATISTICS TO DELEGATE
-                        [statisticsDelegate statisticsCallback:lastReceivedStatistics];
-                    }
+                    callbackWait(100);
                 }
 
-            } else {
-                callbackWait(100);
+            } @catch(NSException *exception) {
+                NSLog(@"Async callback block received error: %@n\n", exception);
+                NSLog(@"%@", [exception callStackSymbols]);
             }
-
-        } @catch(NSException *exception) {
-            NSLog(@"Async callback block received error: %@n\n", exception);
-            NSLog(@"%@", [exception callStackSymbols]);
         }
     }
 
