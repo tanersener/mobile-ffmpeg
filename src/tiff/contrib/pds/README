@@ -30,7 +30,7 @@ Your ReadRGBA() routine works well for reading many different formats
 (TILED, STIP, compressed or not, etc.) of the most basic types of data
 (RGB, 8-bit greyscale, 8-bit colormapped) into an SGI-style data array,
 and serves as a good template for users with other needs. I used it as
-an exmaple of how to make an iterator which, rather than fill a data
+an example of how to make an iterator which, rather than fill a data
 array, calls an arbitrary user-supplied callback function for each
 "chunk" of data - that "chunk" might be a strip or a tile, and might
 have one sample-per-pixel or two, and might be 8-bit data or 16-bit or

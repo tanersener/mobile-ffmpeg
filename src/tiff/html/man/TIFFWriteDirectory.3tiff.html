@@ -69,7 +69,7 @@ have an established location in the file. It will rewrite
 the directory, but instead of place it at it&rsquo;s old
 location (as <i>TIFFWriteDirectory</i> would) it will place
 them at the end of the file, correcting the pointer from the
-preceeding directory or file header to point to it&rsquo;s
+preceding directory or file header to point to it&rsquo;s
 new location. This is particularly important in cases where
 the size of the directory and pointed to data has grown, so
 it won&rsquo;t fit in the space available at the old

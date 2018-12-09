@@ -24,7 +24,7 @@ Notes on releasing.
 
 1. Commit any unsaved changes. 
 
-2. Create html/vX.X.html and add it to cvs with 'cvs add html/vX.X.html'.
+2. Create html/vX.X.html and add it to git with 'git add html/vX.X.html'.
    Take ChangeLog entries and html-ify in there. 
    Easist thing to do is take html/vX.(X-1).html and use it as a template.
 
@@ -101,19 +101,23 @@ Notes on releasing.
 
 13. In the source tree do
 
-      'cvs commit'.
+      'git commit' and 'git push'
 
-14. In the source tree do
+14. In the source tree, create a signed tag
 
-      cvs tag Release-v4-0-0
+      git tag -s v4.0.0 -m "Create tag for v4.0.0"
 
     (or the appropriate name for the release)
+
+    and push it to "origin" (if "origin" points to the official repository)
+
+      git push origin v4.0.0
 
 15. Copy release packages from the build tree to the
     ftp.remotesensing.org ftp site.
 
       scp tiff-*.tar.gz tiff-*.zip \
-    	 warmerdam@upload.osgeo.org:/osgeo/download/libtiff
+    	 bfriesen@upload.osgeo.org:/osgeo/download/libtiff
 
 16. Announce to list, tiff@lists.maptools.org
 

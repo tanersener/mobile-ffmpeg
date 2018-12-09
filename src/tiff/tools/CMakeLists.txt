@@ -118,7 +118,7 @@ if(HAVE_OPENGL)
   endif()
 
   add_executable(tiffgt tiffgt.c)
-  target_link_libraries(tiffgt tiff ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
+  target_link_libraries(tiffgt tiff port ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
 
   install(TARGETS tiffgt
           RUNTIME DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}")

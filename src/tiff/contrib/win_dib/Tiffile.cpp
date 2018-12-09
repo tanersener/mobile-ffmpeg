@@ -360,7 +360,7 @@ setorientation(TIFFRGBAImage* img, uint32 h)
     case ORIENTATION_LEFTBOT:   /* XXX */
     TIFFWarning(TIFFFileName(tif), "using bottom-left orientation");
     img->orientation = ORIENTATION_BOTLEFT;
-    /* fall thru... */
+    /* fall through... */
     case ORIENTATION_BOTLEFT:
     y = 0;
     break;
@@ -370,7 +370,7 @@ setorientation(TIFFRGBAImage* img, uint32 h)
     default:
     TIFFWarning(TIFFFileName(tif), "using top-left orientation");
     img->orientation = ORIENTATION_TOPLEFT;
-    /* fall thru... */
+    /* fall through... */
     case ORIENTATION_TOPLEFT:
     y = h-1;
     break;

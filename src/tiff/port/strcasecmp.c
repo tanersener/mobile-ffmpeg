@@ -1,5 +1,3 @@
-/* $Id: strcasecmp.c,v 1.4 2015-06-21 01:09:09 bfriesen Exp $ */
-
 /*
  * Copyright (c) 1987, 1993
  *	The Regents of the University of California.  All rights reserved.

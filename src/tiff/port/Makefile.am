@@ -27,7 +27,9 @@ EXTRA_DIST = \
 	CMakeLists.txt \
 	Makefile.vc \
 	libport.h \
-	snprintf.c
+	snprintf.c \
+	_strtol.h \
+	_strtoul.h
 
 noinst_LTLIBRARIES	= libport.la
 libport_la_SOURCES	= dummy.c libport.h

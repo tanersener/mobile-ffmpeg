@@ -1,5 +1,3 @@
-/* $Id: rgb2ycbcr.c,v 1.17 2016-08-15 21:26:56 erouault Exp $ */
-
 /*
  * Copyright (c) 1991-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.

@@ -1,5 +1,3 @@
-/* $Id: getopt.c,v 1.3 2009-01-22 20:53:07 fwarmerdam Exp $ */
-
 /*
  * Copyright (c) 1987, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.

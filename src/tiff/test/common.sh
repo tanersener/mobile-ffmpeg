@@ -41,6 +41,7 @@ IMG_RGB_3C_16B=${IMAGES}/rgb-3c-16b.tiff
 IMG_RGB_3C_8B=${IMAGES}/rgb-3c-8b.tiff
 IMG_MINISBLACK_2C_8B_ALPHA=${IMAGES}/minisblack-2c-8b-alpha.tiff
 IMG_QUAD_LZW_COMPAT=${IMAGES}/quad-lzw-compat.tiff
+IMG_LZW_SINGLE_STROP=${IMAGES}/lzw-single-strip.tiff
 
 IMG_MINISWHITE_1C_1B_PBM=${IMAGES}/miniswhite-1c-1b.pbm
 IMG_MINISBLACK_1C_8B_PGM=${IMAGES}/minisblack-1c-8b.pgm

@@ -1,5 +1,3 @@
-/* $Header: /cvs/maptools/cvsroot/libtiff/contrib/pds/tif_pdsdirread.c,v 1.4 2010-06-08 18:55:15 bfriesen Exp $ */
-
 /*
  * Copyright (c) 1988-1996 Sam Leffler
  * Copyright (c) 1991-1996 Silicon Graphics, Inc.
@@ -194,7 +192,7 @@ TIFFReadPrivateDataSubDirectory(TIFF* tif, toff_t pdir_offset,
 	 * the fields to check type and tag information,
 	 * and to extract info required to size data
 	 * structures.  A second pass is made afterwards
-	 * to read in everthing not taken in the first pass.
+	 * to read in everything not taken in the first pass.
 	 */
 	td = &tif->tif_dir;
 	
@@ -827,7 +825,7 @@ TIFFFetchNormalSubTag(TIFF* tif, TIFFDirEntry* dp, const TIFFFieldInfo* fip,
 				break;
 			  }
 			}
-			/* fall thru... */
+			/* fall through... */
 		case TIFF_LONG:
 		case TIFF_SLONG:
 			{ uint32 v32 =

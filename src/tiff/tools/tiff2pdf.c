@@ -1,4 +1,4 @@
-/* $Id: tiff2pdf.c,v 1.103 2017-10-29 18:50:41 bfriesen Exp $
+/*
  *
  * tiff2pdf - converts a TIFF image to a PDF document
  *
@@ -67,6 +67,8 @@ extern int getopt(int, char**, char*);
 #define TIFF2PDF_MODULE "tiff2pdf"
 
 #define PS_UNIT_SIZE	72.0F
+
+#define TIFF_DIR_MAX    65534
 
 /* This type is of PDF color spaces. */
 typedef enum {
@@ -237,7 +239,7 @@ typedef struct {
 	float tiff_whitechromaticities[2];
 	float tiff_primarychromaticities[6];
 	float tiff_referenceblackwhite[2];
-	float* tiff_transferfunction[3];
+	uint16* tiff_transferfunction[3];
 	int pdf_image_interpolate;	/* 0 (default) : do not interpolate,
 					   1 : interpolate */
 	uint16 tiff_transferfunctioncount;
@@ -1047,8 +1049,18 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
 	uint16 pagen=0;
 	uint16 paged=0;
 	uint16 xuint16=0;
+	uint16 tiff_transferfunctioncount=0;
+	uint16* tiff_transferfunction[3];
 
 	directorycount=TIFFNumberOfDirectories(input);
+	if(directorycount > TIFF_DIR_MAX) {
+		TIFFError(
+			TIFF2PDF_MODULE,
+			"TIFF contains too many directories, %s",
+			TIFFFileName(input));
+		t2p->t2p_error = T2P_ERR_ERROR;
+		return;
+	}
 	t2p->tiff_pages = (T2P_PAGE*) _TIFFmalloc(TIFFSafeMultiply(tmsize_t,directorycount,sizeof(T2P_PAGE)));
 	if(t2p->tiff_pages==NULL){
 		TIFFError(
@@ -1147,26 +1159,48 @@ void t2p_read_tiff_init(T2P* t2p, TIFF* input){
                 }
 #endif
 		if (TIFFGetField(input, TIFFTAG_TRANSFERFUNCTION,
-                                 &(t2p->tiff_transferfunction[0]),
-                                 &(t2p->tiff_transferfunction[1]),
-                                 &(t2p->tiff_transferfunction[2]))) {
-			if((t2p->tiff_transferfunction[1] != (float*) NULL) &&
-                           (t2p->tiff_transferfunction[2] != (float*) NULL) &&
-                           (t2p->tiff_transferfunction[1] !=
-                            t2p->tiff_transferfunction[0])) {
-				t2p->tiff_transferfunctioncount = 3;
-				t2p->tiff_pages[i].page_extra += 4;
-				t2p->pdf_xrefcount += 4;
-			} else {
-				t2p->tiff_transferfunctioncount = 1;
-				t2p->tiff_pages[i].page_extra += 2;
-				t2p->pdf_xrefcount += 2;
-			}
-			if(t2p->pdf_minorversion < 2)
-				t2p->pdf_minorversion = 2;
+                                 &(tiff_transferfunction[0]),
+                                 &(tiff_transferfunction[1]),
+                                 &(tiff_transferfunction[2]))) {
+
+                        if((tiff_transferfunction[1] != (uint16*) NULL) &&
+                           (tiff_transferfunction[2] != (uint16*) NULL)
+                          ) {
+                            tiff_transferfunctioncount=3;
+                        } else {
+                            tiff_transferfunctioncount=1;
+                        }
                 } else {
-			t2p->tiff_transferfunctioncount=0;
+			tiff_transferfunctioncount=0;
 		}
+
+                if (i > 0){
+                    if (tiff_transferfunctioncount != t2p->tiff_transferfunctioncount){
+                        TIFFError(
+                            TIFF2PDF_MODULE,
+                            "Different transfer function on page %d",
+                            i);
+                        t2p->t2p_error = T2P_ERR_ERROR;
+                        return;
+                    }
+                }
+
+                t2p->tiff_transferfunctioncount = tiff_transferfunctioncount;
+                t2p->tiff_transferfunction[0] = tiff_transferfunction[0];
+                t2p->tiff_transferfunction[1] = tiff_transferfunction[1];
+                t2p->tiff_transferfunction[2] = tiff_transferfunction[2];
+                if(tiff_transferfunctioncount == 3){
+                        t2p->tiff_pages[i].page_extra += 4;
+                        t2p->pdf_xrefcount += 4;
+                        if(t2p->pdf_minorversion < 2)
+                                t2p->pdf_minorversion = 2;
+                } else if (tiff_transferfunctioncount == 1){
+                        t2p->tiff_pages[i].page_extra += 2;
+                        t2p->pdf_xrefcount += 2;
+                        if(t2p->pdf_minorversion < 2)
+                                t2p->pdf_minorversion = 2;
+                }
+
 		if( TIFFGetField(
 			input, 
 			TIFFTAG_ICCPROFILE, 
@@ -1827,10 +1861,9 @@ void t2p_read_tiff_data(T2P* t2p, TIFF* input){
 			 &(t2p->tiff_transferfunction[0]),
 			 &(t2p->tiff_transferfunction[1]),
 			 &(t2p->tiff_transferfunction[2]))) {
-		if((t2p->tiff_transferfunction[1] != (float*) NULL) &&
-                   (t2p->tiff_transferfunction[2] != (float*) NULL) &&
-                   (t2p->tiff_transferfunction[1] !=
-                    t2p->tiff_transferfunction[0])) {
+		if((t2p->tiff_transferfunction[1] != (uint16*) NULL) &&
+                   (t2p->tiff_transferfunction[2] != (uint16*) NULL)
+                  ) {
 			t2p->tiff_transferfunctioncount=3;
 		} else {
 			t2p->tiff_transferfunctioncount=1;
@@ -3713,12 +3746,13 @@ tsize_t
 t2p_sample_rgbaa_to_rgb(tdata_t data, uint32 samplecount)
 {
 	uint32 i;
-	
-    /* For the 3 first samples, there is overlapping between souce and
-       destination, so use memmove().
-       See http://bugzilla.maptools.org/show_bug.cgi?id=2577 */
-    for(i = 0; i < 3 && i < samplecount; i++)
-        memmove((uint8*)data + i * 3, (uint8*)data + i * 4, 3);
+
+	/* For the 3 first samples, there is overlap between source and
+	 * destination, so use memmove().
+	 * See http://bugzilla.maptools.org/show_bug.cgi?id=2577
+	 */
+	for(i = 0; i < 3 && i < samplecount; i++)
+		memmove((uint8*)data + i * 3, (uint8*)data + i * 4, 3);
 	for(; i < samplecount; i++)
 		memcpy((uint8*)data + i * 3, (uint8*)data + i * 4, 3);
 
@@ -4217,13 +4251,13 @@ void t2p_pdf_currenttime(T2P* t2p)
 
 	currenttime = localtime(&timenow);
 	snprintf(t2p->pdf_datetime, sizeof(t2p->pdf_datetime),
-		 "D:%.4d%.2d%.2d%.2d%.2d%.2d",
-		 (currenttime->tm_year + 1900) % 65536,
-		 (currenttime->tm_mon + 1) % 256,
-		 (currenttime->tm_mday) % 256,
-		 (currenttime->tm_hour) % 256,
-		 (currenttime->tm_min) % 256,
-		 (currenttime->tm_sec) % 256);
+		 "D:%.4u%.2u%.2u%.2u%.2u%.2u",
+		 TIFFmin((unsigned) currenttime->tm_year + 1900U,9999U),
+		 TIFFmin((unsigned) currenttime->tm_mon + 1U,12U),   /* 0-11 + 1 */
+		 TIFFmin((unsigned) currenttime->tm_mday,31U),       /* 1-31 */
+		 TIFFmin((unsigned) currenttime->tm_hour,23U),       /* 0-23 */
+		 TIFFmin((unsigned) currenttime->tm_min,59U),        /* 0-59 */
+		 TIFFmin((unsigned) (currenttime->tm_sec),60U));     /* 0-60 */
 
 	return;
 }

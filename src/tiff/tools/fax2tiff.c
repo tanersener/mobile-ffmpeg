@@ -1,5 +1,3 @@
-/* $Id: fax2tiff.c,v 1.28 2017-10-29 18:28:45 bfriesen Exp $ */
-
 /*
  * Copyright (c) 1990-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.

@@ -1,4 +1,3 @@
-.\" $Id: TIFFquery.3tiff,v 1.1 2004-11-11 14:39:16 dron Exp $
 .\"
 .\" Copyright (c) 1988-1997 Sam Leffler
 .\" Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -114,7 +113,7 @@ returned if the image data is organized in strips.
 .IR TIFFIsByteSwapped
 returns a non-zero value if the image data was in a different byte-order than
 the host machine. Zero is returned if the TIFF file and local host byte-orders
-are the same.  Note that TIFFReadTile(), TIFFReadStrip() and
+are the same.  Note that TIFFReadTile(), TIFFReadEncodedStrip() and
 TIFFReadScanline() functions already normally perform byte swapping to local
 host order if needed.
 .PP

@@ -1,5 +1,3 @@
-/* $Id: ascii_tag.c,v 1.8 2013-12-17 14:41:57 bfriesen Exp $ */
-
 /*
  * Copyright (c) 2004, Andrey Kiselev  <dron@ak4719.spb.edu>
  *

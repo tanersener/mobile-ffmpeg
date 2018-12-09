@@ -1,5 +1,3 @@
-/* $Id: iptcutil.c,v 1.11 2015-06-21 01:09:09 bfriesen Exp $ */
-
 #include "tif_config.h"
 
 #include <stdio.h>
@@ -784,7 +782,7 @@ int sindex(char ch,char *string)
   char *cp;
   for(cp=string;*cp;++cp)
     if(ch==*cp)
-      return (int)(cp-string);	/* return postion of character */
+      return (int)(cp-string);	/* return position of character */
   return -1;			/* eol ... no match found */
 }
 
@@ -928,6 +926,7 @@ int tokenizer(unsigned inflag,char *token,int tokmax,char *line,
             {
 	    case IN_WHITE:
 	      _p_state=IN_TOKEN; /* switch states */
+          /* Fall through */
 
 	    case IN_TOKEN:		 /* these 2 are     */
 	    case IN_QUOTE:		 /*  identical here */

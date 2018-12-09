@@ -1,5 +1,3 @@
-/* $Id: rewrite_tag.c,v 1.9 2015-08-23 14:23:00 bfriesen Exp $ */
-
 /*
  * Copyright (c) 2007, Frank Warmerdam <warmerdam@pobox.com>
  *

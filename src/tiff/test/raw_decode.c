@@ -1,5 +1,3 @@
-/* $Id: raw_decode.c,v 1.7 2015-08-16 20:08:21 bfriesen Exp $ */
-
 /*
  * Copyright (c) 2012, Frank Warmerdam <warmerdam@pobox.com>
  *

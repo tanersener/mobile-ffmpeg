@@ -65,6 +65,8 @@
 #  define MAX(a,b)      ((a>b) ? a : b)
 #endif
 
+#define TIFF_DIR_MAX  65534
+
 void TIFFBuildOverviews( TIFF *, int, int *, int, const char *,
                          int (*)(double,void*), void * );
 
@@ -91,6 +93,7 @@ uint32 TIFF_WriteOverview( TIFF *hTIFF, uint32 nXSize, uint32 nYSize,
 {
     toff_t	nBaseDirOffset;
     toff_t	nOffset;
+    tdir_t	iNumDir;
 
     (void) bUseSubIFDs;
 
@@ -147,7 +150,16 @@ uint32 TIFF_WriteOverview( TIFF *hTIFF, uint32 nXSize, uint32 nYSize,
         return 0;
 
     TIFFWriteDirectory( hTIFF );
-    TIFFSetDirectory( hTIFF, (tdir_t) (TIFFNumberOfDirectories(hTIFF)-1) );
+    iNumDir = TIFFNumberOfDirectories(hTIFF);
+    if( iNumDir > TIFF_DIR_MAX )
+    {
+        TIFFErrorExt( TIFFClientdata(hTIFF),
+                      "TIFF_WriteOverview",
+                      "File `%s' has too many directories.\n",
+                      TIFFFileName(hTIFF) );
+        exit(-1);
+    }
+    TIFFSetDirectory( hTIFF, (tdir_t) (iNumDir - 1) );
 
     nOffset = TIFFCurrentDirOffset( hTIFF );
 

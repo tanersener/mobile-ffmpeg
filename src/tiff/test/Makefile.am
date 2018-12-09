@@ -79,6 +79,7 @@ TESTSCRIPTS = \
 	tiffcp-logluv.sh \
 	tiffcp-thumbnail.sh \
 	tiffcp-lzw-compat.sh \
+	tiffcp-lzw-scanline-decode.sh \
 	tiffdump.sh \
 	tiffinfo.sh \
 	tiffcp-split.sh \
@@ -158,7 +159,8 @@ TIFFIMAGES = \
 	images/rgb-3c-16b.tiff \
 	images/rgb-3c-8b.tiff \
 	images/quad-tile.jpg.tiff \
-	images/quad-lzw-compat.tiff
+	images/quad-lzw-compat.tiff \
+	images/lzw-single-strip.tiff
 
 PNMIMAGES = \
 	images/minisblack-1c-8b.pgm \

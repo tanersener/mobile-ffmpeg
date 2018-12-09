@@ -1,6 +1,3 @@
-$Header: /cvs/maptools/cvsroot/libtiff/README,v 1.7 2012-02-18 21:53:27 bfriesen Exp $
-
-
 TIFF Software Distribution
 --------------------------
 This file is just a placeholder; all the documentation is now in
@@ -14,7 +11,7 @@ e.g.
 If you don't have an HTML viewer then you can read the HTML source
 or fetch a PostScript version of this documentation from the directory
 
-    ftp://ftp.remotesensing.org/pub/libtiff/
+    http://download.osgeo.org/libtiff/
 
 If you can't hack either of these options then basically what you
 want to do is:
@@ -25,7 +22,17 @@ want to do is:
     # make install
 
 More information, email contacts, and mailing list information can be 
-found online at http://www.remotesensing.org/libtiff/.
+found online at http://www.simplesystems.org/libtiff/
+
+Source code repository
+----------------------
+
+[GitLab](https://gitlab.com/libtiff/libtiff)
+
+Bug database
+------------
+
+[Bugzilla](http://bugzilla.maptools.org/buglist.cgi?product=libtiff)
 
 
 Use and Copyright
