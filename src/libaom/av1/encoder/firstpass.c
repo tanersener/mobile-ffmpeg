@@ -58,7 +58,8 @@
 #define KF_MAX_FRAME_BOOST 128.0
 #define MIN_ARF_GF_BOOST 240
 #define MIN_DECAY_FACTOR 0.01
-#define MIN_KF_BOOST 300
+#define MIN_KF_BOOST 300          // Minimum boost for non-static KF interval
+#define MIN_STATIC_KF_BOOST 5400  // Minimum boost for static KF interval
 #define NEW_MV_MODE_PENALTY 32
 #define DARK_THRESH 64
 #define DEFAULT_GRP_WEIGHT 1.0
@@ -450,11 +451,11 @@ static int find_fp_qindex(aom_bit_depth_t bit_depth) {
 
 static void set_first_pass_params(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
-  if (!cpi->refresh_alt_ref_frame &&
-      (cm->current_video_frame == 0 || (cpi->frame_flags & FRAMEFLAGS_KEY))) {
-    cm->frame_type = KEY_FRAME;
+  if (!cpi->refresh_alt_ref_frame && (cm->current_frame.frame_number == 0 ||
+                                      (cpi->frame_flags & FRAMEFLAGS_KEY))) {
+    cm->current_frame.frame_type = KEY_FRAME;
   } else {
-    cm->frame_type = INTER_FRAME;
+    cm->current_frame.frame_type = INTER_FRAME;
   }
   // Do not use periodic key frames.
   cpi->rc.frames_to_key = INT_MAX;
@@ -489,6 +490,7 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
   int mb_row, mb_col;
   MACROBLOCK *const x = &cpi->td.mb;
   AV1_COMMON *const cm = &cpi->common;
+  CurrentFrame *const current_frame = &cm->current_frame;
   const SequenceHeader *const seq_params = &cm->seq_params;
   const int num_planes = av1_num_planes(cm);
   MACROBLOCKD *const xd = &x->e_mbd;
@@ -521,13 +523,13 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
   TWO_PASS *twopass = &cpi->twopass;
   int recon_y_stride, recon_uv_stride, uv_mb_height;
 
-  YV12_BUFFER_CONFIG *const lst_yv12 = get_ref_frame_buffer(cpi, LAST_FRAME);
-  YV12_BUFFER_CONFIG *gld_yv12 = get_ref_frame_buffer(cpi, GOLDEN_FRAME);
-  YV12_BUFFER_CONFIG *const new_yv12 = get_frame_new_buffer(cm);
+  const YV12_BUFFER_CONFIG *const lst_yv12 =
+      get_ref_frame_yv12_buf(cm, LAST_FRAME);
+  const YV12_BUFFER_CONFIG *gld_yv12 = get_ref_frame_yv12_buf(cm, GOLDEN_FRAME);
+  YV12_BUFFER_CONFIG *const new_yv12 = &cm->cur_frame->buf;
   const YV12_BUFFER_CONFIG *first_ref_buf = lst_yv12;
   double intra_factor;
   double brightness_factor;
-  BufferPool *const pool = cm->buffer_pool;
   const int qindex = find_fp_qindex(seq_params->bit_depth);
   const int mb_scale = mi_size_wide[BLOCK_16X16];
 
@@ -562,7 +564,8 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
   av1_setup_block_planes(&x->e_mbd, seq_params->subsampling_x,
                          seq_params->subsampling_y, num_planes);
 
-  av1_setup_src_planes(x, cpi->source, 0, 0, num_planes);
+  av1_setup_src_planes(x, cpi->source, 0, 0, num_planes,
+                       x->e_mbd.mi[0]->sb_type);
   av1_setup_dst_planes(xd->plane, seq_params->sb_size, new_yv12, 0, 0, 0,
                        num_planes);
 
@@ -586,7 +589,6 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
   }
 
   av1_init_mv_probs(cm);
-  av1_init_lv_map(cm);
   av1_initialize_rd_consts(cpi);
 
   // Tiling is ignored in the first pass.
@@ -770,7 +772,7 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
           }
 
           // Search in an older reference frame.
-          if ((cm->current_video_frame > 1) && gld_yv12 != NULL) {
+          if ((current_frame->frame_number > 1) && gld_yv12 != NULL) {
             // Assume 0,0 motion with no mv overhead.
             int gf_motion_error;
 
@@ -995,7 +997,7 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
     brightness_factor = brightness_factor / (double)num_mbs;
     fps.weight = intra_factor * brightness_factor;
 
-    fps.frame = cm->current_video_frame;
+    fps.frame = current_frame->frame_number;
     fps.coded_error = (double)(coded_error >> 8) + min_err;
     fps.sr_coded_error = (double)(sr_coded_error >> 8) + min_err;
     fps.intra_error = (double)(intra_error >> 8) + min_err;
@@ -1054,14 +1056,14 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
   // Copy the previous Last Frame back into gf and and arf buffers if
   // the prediction is good enough... but also don't allow it to lag too far.
   if ((twopass->sr_update_lag > 3) ||
-      ((cm->current_video_frame > 0) &&
+      ((current_frame->frame_number > 0) &&
        (twopass->this_frame_stats.pcnt_inter > 0.20) &&
        ((twopass->this_frame_stats.intra_error /
          DOUBLE_DIVIDE_CHECK(twopass->this_frame_stats.coded_error)) > 2.0))) {
     if (gld_yv12 != NULL) {
-      ref_cnt_fb(pool->frame_bufs,
-                 &cm->ref_frame_map[cpi->ref_fb_idx[GOLDEN_FRAME - 1]],
-                 cm->ref_frame_map[cpi->ref_fb_idx[LAST_FRAME - 1]]);
+      assign_frame_buffer_p(
+          &cm->ref_frame_map[get_ref_frame_map_idx(cm, GOLDEN_FRAME)],
+          cm->ref_frame_map[get_ref_frame_map_idx(cm, LAST_FRAME)]);
     }
     twopass->sr_update_lag = 1;
   } else {
@@ -1071,17 +1073,16 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
   aom_extend_frame_borders(new_yv12, num_planes);
 
   // The frame we just compressed now becomes the last frame.
-  ref_cnt_fb(pool->frame_bufs,
-             &cm->ref_frame_map[cpi->ref_fb_idx[LAST_FRAME - 1]],
-             cm->new_fb_idx);
+  assign_frame_buffer_p(
+      &cm->ref_frame_map[get_ref_frame_map_idx(cm, LAST_FRAME)], cm->cur_frame);
 
   // Special case for the first frame. Copy into the GF buffer as a second
   // reference.
-  if (cm->current_video_frame == 0 &&
-      cpi->ref_fb_idx[GOLDEN_FRAME - 1] != INVALID_IDX) {
-    ref_cnt_fb(pool->frame_bufs,
-               &cm->ref_frame_map[cpi->ref_fb_idx[GOLDEN_FRAME - 1]],
-               cm->ref_frame_map[cpi->ref_fb_idx[LAST_FRAME - 1]]);
+  if (current_frame->frame_number == 0 &&
+      get_ref_frame_map_idx(cm, GOLDEN_FRAME) != INVALID_IDX) {
+    assign_frame_buffer_p(
+        &cm->ref_frame_map[get_ref_frame_map_idx(cm, GOLDEN_FRAME)],
+        cm->ref_frame_map[get_ref_frame_map_idx(cm, LAST_FRAME)]);
   }
 
   // Use this to see what the first pass reconstruction looks like.
@@ -1089,9 +1090,9 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
     char filename[512];
     FILE *recon_file;
     snprintf(filename, sizeof(filename), "enc%04d.yuv",
-             (int)cm->current_video_frame);
+             (int)current_frame->frame_number);
 
-    if (cm->current_video_frame == 0)
+    if (current_frame->frame_number == 0)
       recon_file = fopen(filename, "wb");
     else
       recon_file = fopen(filename, "ab");
@@ -1100,7 +1101,7 @@ void av1_first_pass(AV1_COMP *cpi, const struct lookahead_entry *source) {
     fclose(recon_file);
   }
 
-  ++cm->current_video_frame;
+  ++current_frame->frame_number;
 }
 
 static double calc_correction_factor(double err_per_mb, double err_divisor,
@@ -1693,7 +1694,7 @@ static void define_customized_gf_group_structure(AV1_COMP *cpi) {
   RATE_CONTROL *const rc = &cpi->rc;
   TWO_PASS *const twopass = &cpi->twopass;
   GF_GROUP *const gf_group = &twopass->gf_group;
-  const int key_frame = cpi->common.frame_type == KEY_FRAME;
+  const int key_frame = cpi->common.current_frame.frame_type == KEY_FRAME;
 
   assert(rc->baseline_gf_interval >= 4 &&
          rc->baseline_gf_interval <= MAX_PYRAMID_SIZE);
@@ -1814,7 +1815,7 @@ static int define_gf_group_structure_4(AV1_COMP *cpi) {
   RATE_CONTROL *const rc = &cpi->rc;
   TWO_PASS *const twopass = &cpi->twopass;
   GF_GROUP *const gf_group = &twopass->gf_group;
-  const int key_frame = cpi->common.frame_type == KEY_FRAME;
+  const int key_frame = cpi->common.current_frame.frame_type == KEY_FRAME;
 
   assert(rc->baseline_gf_interval == GF_INTERVAL_4);
 
@@ -1919,7 +1920,7 @@ static void define_gf_group_structure(AV1_COMP *cpi) {
   GF_GROUP *const gf_group = &twopass->gf_group;
   int i;
   int frame_index = 0;
-  const int key_frame = cpi->common.frame_type == KEY_FRAME;
+  const int key_frame = cpi->common.current_frame.frame_type == KEY_FRAME;
 
   // The use of bi-predictive frames are only enabled when following 3
   // conditions are met:
@@ -2015,7 +2016,10 @@ static void define_gf_group_structure(AV1_COMP *cpi) {
     accumulative_subgroup_interval += subgroup_interval[cpi->num_extra_arfs];
   }
 
-  for (i = 0; i < rc->baseline_gf_interval - rc->source_alt_ref_pending; ++i) {
+  const int normal_frames =
+      rc->baseline_gf_interval - (key_frame || rc->source_alt_ref_pending);
+
+  for (i = 0; i < normal_frames; ++i) {
     gf_group->arf_update_idx[frame_index] = which_arf;
     gf_group->arf_ref_idx[frame_index] = which_arf;
 
@@ -2154,7 +2158,7 @@ static void allocate_gf_group_bits(AV1_COMP *cpi, int64_t gf_group_bits,
 
   av1_zero_array(ext_arf_boost, MAX_EXT_ARFS);
 
-  key_frame = cpi->common.frame_type == KEY_FRAME;
+  key_frame = cpi->common.current_frame.frame_type == KEY_FRAME;
 
   // For key frames the frame target rate is already set and it
   // is also the golden frame.
@@ -2191,12 +2195,19 @@ static void allocate_gf_group_bits(AV1_COMP *cpi, int64_t gf_group_bits,
     }
   }
 
+#if USE_SYMM_MULTI_LAYER
+#if NEW_MULTI_LVL_BOOST_VBR_ALLOC
   // Save.
   const int tmp_frame_index = frame_index;
   int budget_reduced_from_leaf_level = 0;
+#endif  // NEW_MULTI_LVL_BOOST_VBR_ALLOC
+#endif  // USE_SYMM_MULTI_LAYER
 
   // Allocate bits to the other frames in the group.
-  for (i = 0; i < rc->baseline_gf_interval - rc->source_alt_ref_pending; ++i) {
+  const int normal_frames =
+      rc->baseline_gf_interval - (key_frame || rc->source_alt_ref_pending);
+
+  for (i = 0; i < normal_frames; ++i) {
     FIRSTPASS_STATS frame_stats;
     if (EOF == input_stats(twopass, &frame_stats)) break;
 
@@ -2267,8 +2278,7 @@ static void allocate_gf_group_bits(AV1_COMP *cpi, int64_t gf_group_bits,
     frame_index = tmp_frame_index;
 
     // Re-distribute this extra budget to overlay frames in the group.
-    for (i = 0; i < rc->baseline_gf_interval - rc->source_alt_ref_pending;
-         ++i) {
+    for (i = 0; i < normal_frames; ++i) {
       if (cpi->new_bwdref_update_rule &&
           gf_group->update_type[frame_index] == INTNL_OVERLAY_UPDATE) {
         assert(gf_group->pyramid_height <= MAX_PYRAMID_LVL &&
@@ -2324,6 +2334,12 @@ static void allocate_gf_group_bits(AV1_COMP *cpi, int64_t gf_group_bits,
       }
     }
   }
+}
+
+// Returns true if KF group and GF group both are almost completely static.
+static INLINE int is_almost_static(double gf_zero_motion, int kf_zero_motion) {
+  return (gf_zero_motion >= 0.995) &&
+         (kf_zero_motion >= STATIC_KF_GROUP_THRESH);
 }
 
 // Analyse and define a gf/arf group.
@@ -2473,8 +2489,10 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
       decay_accumulator = decay_accumulator * loop_decay_rate;
 
       // Monitor for static sections.
-      zero_motion_accumulator = AOMMIN(
-          zero_motion_accumulator, get_zero_motion_factor(cpi, &next_frame));
+      if ((rc->frames_since_key + i - 1) > 1) {
+        zero_motion_accumulator = AOMMIN(
+            zero_motion_accumulator, get_zero_motion_factor(cpi, &next_frame));
+      }
 
       // Break clause to detect very still sections after motion. For example,
       // a static image after a fade or other transition.
@@ -2490,14 +2508,27 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
         decay_accumulator *
         calc_frame_boost(cpi, &next_frame, this_frame_mv_in_out, GF_MAX_BOOST);
 #if CONFIG_FIX_GF_LENGTH
-    if (i == (FIXED_GF_LENGTH + 1)) break;
+    // If almost totally static, we will not use the FIXED_GF_LENGTH later, so
+    // we can continue for more frames.
+    if (i >= (FIXED_GF_LENGTH + 1) &&
+        !is_almost_static(zero_motion_accumulator,
+                          twopass->kf_zeromotion_pct)) {
+      break;
+    }
 #else
-    // Skip breaking condition for CONFIG_FIX_GF_LENGTH
     // Break out conditions.
-    if (
-        // Break at active_max_gf_interval unless almost totally static.
-        (i >= (active_max_gf_interval + arf_active_or_kf) &&
-         zero_motion_accumulator < 0.995) ||
+    // Break at maximum of active_max_gf_interval unless almost totally static.
+    //
+    // Note that the addition of a test of rc->source_alt_ref_active is
+    // deliberate. The effect of this is that after a normal altref group even
+    // if the material is static there will be one normal length GF group
+    // before allowing longer GF groups. The reason for this is that in cases
+    // such as slide shows where slides are separated by a complex transition
+    // such as a fade, the arf group spanning the transition may not be coded
+    // at a very high quality and hence this frame (with its overlay) is a
+    // poor golden frame to use for an extended group.
+    if ((i >= (active_max_gf_interval + arf_active_or_kf) &&
+         ((zero_motion_accumulator < 0.995) || (rc->source_alt_ref_active))) ||
         (
             // Don't break out with a very short interval.
             (i >= active_min_gf_interval + arf_active_or_kf) &&
@@ -2543,23 +2574,24 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
 
   if (disable_bwd_extarf) cpi->extra_arf_allowed = 0;
 
+  const int use_alt_ref =
+      !is_almost_static(zero_motion_accumulator, twopass->kf_zeromotion_pct) &&
+      allow_alt_ref && (i < cpi->oxcf.lag_in_frames) &&
+      (i >= rc->min_gf_interval);
+
 #define REDUCE_GF_LENGTH_THRESH 4
 #define REDUCE_GF_LENGTH_TO_KEY_THRESH 9
 #define REDUCE_GF_LENGTH_BY 1
   int alt_offset = 0;
 #if REDUCE_LAST_GF_LENGTH
-  // TODO(weitinglin): The length reduction stretagy is tweaking using AOM_Q
-  // mode, and hurting the performance of VBR mode. We need to investigate how
-  // to adjust GF length for other modes.
+  // The length reduction strategy is tweaked using AOM_Q mode, and doesn't work
+  // for VBR mode.
+  // Also, we don't have do adjustment for lossless mode.
+  const int allow_gf_length_reduction =
+      (cpi->oxcf.rc_mode == AOM_Q || cpi->extra_arf_allowed == 0) &&
+      !is_lossless_requested(&cpi->oxcf);
 
-  int allow_gf_length_reduction =
-      cpi->oxcf.rc_mode == AOM_Q || cpi->extra_arf_allowed == 0;
-
-  // We are going to have an alt ref, but we don't have do adjustment for
-  // lossless mode
-  if (allow_alt_ref && allow_gf_length_reduction &&
-      (i < cpi->oxcf.lag_in_frames) && (i >= rc->min_gf_interval) &&
-      !is_lossless_requested(&cpi->oxcf)) {
+  if (allow_gf_length_reduction && use_alt_ref) {
     // adjust length of this gf group if one of the following condition met
     // 1: only one overlay frame left and this gf is too long
     // 2: next gf group is too short to have arf compared to the current gf
@@ -2583,11 +2615,10 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
       i -= roll_back;
     }
   }
-#endif
+#endif  // REDUCE_LAST_GF_LENGTH
 
   // Should we use the alternate reference frame.
-  if (allow_alt_ref && (i < cpi->oxcf.lag_in_frames) &&
-      (i >= rc->min_gf_interval)) {
+  if (use_alt_ref) {
     // Calculate the boost for alt ref.
     rc->gfu_boost =
         calc_arf_boost(cpi, alt_offset, (i - 1), (i - 1), &f_boost, &b_boost);
@@ -2621,11 +2652,10 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
         rc->baseline_gf_interval = rc->frames_to_key - MIN_FWD_KF_INTERVAL;
       }
     } else {
-      rc->baseline_gf_interval =
-          i - (is_key_frame || rc->source_alt_ref_pending);
+      rc->baseline_gf_interval = i - rc->source_alt_ref_pending;
     }
   } else {
-    rc->baseline_gf_interval = i - (is_key_frame || rc->source_alt_ref_pending);
+    rc->baseline_gf_interval = i - rc->source_alt_ref_pending;
   }
 
 #if REDUCE_LAST_ALT_BOOST
@@ -2735,7 +2765,7 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   reset_fpf_position(twopass, start_pos);
 
   // Calculate a section intra ratio used in setting max loop filter.
-  if (cpi->common.frame_type != KEY_FRAME) {
+  if (cpi->common.current_frame.frame_type != KEY_FRAME) {
     twopass->section_intra_rating = calculate_section_intra_ratio(
         start_pos, twopass->stats_in_end, rc->baseline_gf_interval);
   }
@@ -2874,7 +2904,8 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
 
   av1_zero(next_frame);
 
-  cpi->common.frame_type = KEY_FRAME;
+  cpi->common.current_frame.frame_type = KEY_FRAME;
+  rc->frames_since_key = 0;
 
   // Reset the GF group data structures.
   av1_zero(*gf_group);
@@ -3019,8 +3050,13 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
     if (EOF == input_stats(twopass, &next_frame)) break;
 
     // Monitor for static sections.
-    zero_motion_accumulator = AOMMIN(zero_motion_accumulator,
-                                     get_zero_motion_factor(cpi, &next_frame));
+    // For the first frame in kf group, the second ref indicator is invalid.
+    if (i > 0) {
+      zero_motion_accumulator = AOMMIN(
+          zero_motion_accumulator, get_zero_motion_factor(cpi, &next_frame));
+    } else {
+      zero_motion_accumulator = next_frame.pcnt_inter - next_frame.pcnt_motion;
+    }
 
     // Not all frames in the group are necessarily used in calculating boost.
     if ((i <= rc->max_gf_interval) ||
@@ -3052,10 +3088,18 @@ static void find_next_key_frame(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   twopass->section_intra_rating = calculate_section_intra_ratio(
       start_position, twopass->stats_in_end, rc->frames_to_key);
 
-  // Apply various clamps for min and max boost
   rc->kf_boost = (int)(av_decay_accumulator * boost_score);
-  rc->kf_boost = AOMMAX(rc->kf_boost, (rc->frames_to_key * 3));
-  rc->kf_boost = AOMMAX(rc->kf_boost, MIN_KF_BOOST);
+
+  // Special case for static / slide show content but don't apply
+  // if the kf group is very short.
+  if ((zero_motion_accumulator > STATIC_KF_GROUP_FLOAT_THRESH) &&
+      (rc->frames_to_key > 8)) {
+    rc->kf_boost = AOMMAX(rc->kf_boost, MIN_STATIC_KF_BOOST);
+  } else {
+    // Apply various clamps for min and max boost
+    rc->kf_boost = AOMMAX(rc->kf_boost, (rc->frames_to_key * 3));
+    rc->kf_boost = AOMMAX(rc->kf_boost, MIN_KF_BOOST);
+  }
 
   // Work out how many bits to allocate for the key frame itself.
   kf_bits = calculate_boost_bits((rc->frames_to_key - 1), rc->kf_boost,
@@ -3155,6 +3199,7 @@ static int is_skippable_frame(const AV1_COMP *cpi) {
 
 void av1_rc_get_second_pass_params(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
+  CurrentFrame *const current_frame = &cm->current_frame;
   RATE_CONTROL *const rc = &cpi->rc;
   TWO_PASS *const twopass = &cpi->twopass;
   GF_GROUP *const gf_group = &twopass->gf_group;
@@ -3163,7 +3208,7 @@ void av1_rc_get_second_pass_params(AV1_COMP *cpi) {
 
   int target_rate;
 
-  frames_left = (int)(twopass->total_stats.count - cm->current_video_frame);
+  frames_left = (int)(twopass->total_stats.count - current_frame->frame_number);
 
   if (!twopass->stats_in) return;
 
@@ -3178,9 +3223,9 @@ void av1_rc_get_second_pass_params(AV1_COMP *cpi) {
 
     if (cpi->no_show_kf) {
       assert(gf_group->update_type[gf_group->index] == ARF_UPDATE);
-      cm->frame_type = KEY_FRAME;
+      current_frame->frame_type = KEY_FRAME;
     } else {
-      cm->frame_type = INTER_FRAME;
+      current_frame->frame_type = INTER_FRAME;
     }
 
     // Do the firstpass stats indicate that this frame is skippable for the
@@ -3196,7 +3241,7 @@ void av1_rc_get_second_pass_params(AV1_COMP *cpi) {
 
   if (cpi->oxcf.rc_mode == AOM_Q) {
     twopass->active_worst_quality = cpi->oxcf.cq_level;
-  } else if (cm->current_video_frame == 0) {
+  } else if (current_frame->frame_number == 0) {
     // Special case code for first frame.
     const int section_target_bandwidth =
         (int)(twopass->bits_left / frames_left);
@@ -3239,7 +3284,7 @@ void av1_rc_get_second_pass_params(AV1_COMP *cpi) {
     find_next_key_frame(cpi, &this_frame);
     this_frame = this_frame_copy;
   } else {
-    cm->frame_type = INTER_FRAME;
+    current_frame->frame_type = INTER_FRAME;
   }
 
   // Define a new GF/ARF group. (Should always enter here for key frames).
@@ -3253,7 +3298,7 @@ void av1_rc_get_second_pass_params(AV1_COMP *cpi) {
       FILE *fpfile;
       fpfile = fopen("arf.stt", "a");
       ++arf_count;
-      fprintf(fpfile, "%10d %10d %10d %10d %10d\n", cm->current_video_frame,
+      fprintf(fpfile, "%10d %10d %10d %10d %10d\n", current_frame->frame_number,
               rc->frames_till_gf_update_due, rc->kf_boost, arf_count,
               rc->gfu_boost);
 
@@ -3272,7 +3317,7 @@ void av1_rc_get_second_pass_params(AV1_COMP *cpi) {
 
   target_rate = gf_group->bit_allocation[gf_group->index];
 
-  if (cpi->common.frame_type == KEY_FRAME)
+  if (cpi->common.current_frame.frame_type == KEY_FRAME)
     target_rate = av1_rc_clamp_iframe_target_size(cpi, target_rate);
   else
     target_rate = av1_rc_clamp_pframe_target_size(cpi, target_rate);
@@ -3319,7 +3364,7 @@ void av1_twopass_postencode_update(AV1_COMP *cpi) {
     rc->rate_error_estimate = 0;
   }
 
-  if (cpi->common.frame_type != KEY_FRAME) {
+  if (cpi->common.current_frame.frame_type != KEY_FRAME) {
     twopass->kf_group_bits -= bits_used;
     twopass->last_kfgroup_zeromotion_pct = twopass->kf_zeromotion_pct;
   }

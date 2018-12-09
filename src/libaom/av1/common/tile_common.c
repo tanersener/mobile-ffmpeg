@@ -143,30 +143,6 @@ int av1_get_sb_cols_in_tile(AV1_COMMON *cm, TileInfo tile) {
   return sb_cols;
 }
 
-int get_tile_size(int mi_frame_size, int log2_tile_num, int *ntiles) {
-  // Round the frame up to a whole number of max superblocks
-  mi_frame_size = ALIGN_POWER_OF_TWO(mi_frame_size, MAX_MIB_SIZE_LOG2);
-
-  // Divide by the signalled number of tiles, rounding up to the multiple of
-  // the max superblock size. To do this, shift right (and round up) to get the
-  // tile size in max super-blocks and then shift left again to convert it to
-  // mi units.
-  const int shift = log2_tile_num + MAX_MIB_SIZE_LOG2;
-  const int max_sb_tile_size =
-      ALIGN_POWER_OF_TWO(mi_frame_size, shift) >> shift;
-  const int mi_tile_size = max_sb_tile_size << MAX_MIB_SIZE_LOG2;
-
-  // The actual number of tiles is the ceiling of the frame size in mi units
-  // divided by mi_size. This is at most 1 << log2_tile_num but might be
-  // strictly less if max_sb_tile_size got rounded up significantly.
-  if (ntiles) {
-    *ntiles = (mi_frame_size + mi_tile_size - 1) / mi_tile_size;
-    assert(*ntiles <= (1 << log2_tile_num));
-  }
-
-  return mi_tile_size;
-}
-
 AV1PixelRect av1_get_tile_rect(const TileInfo *tile_info, const AV1_COMMON *cm,
                                int is_uv) {
   AV1PixelRect r;
@@ -204,4 +180,27 @@ AV1PixelRect av1_get_tile_rect(const TileInfo *tile_info, const AV1_COMMON *cm,
   r.bottom = ROUND_POWER_OF_TWO(r.bottom, ss_y);
 
   return r;
+}
+
+void av1_get_uniform_tile_size(const AV1_COMMON *cm, int *w, int *h) {
+  if (cm->uniform_tile_spacing_flag) {
+    *w = cm->tile_width;
+    *h = cm->tile_height;
+  } else {
+    for (int i = 0; i < cm->tile_cols; ++i) {
+      const int tile_width_sb =
+          cm->tile_col_start_sb[i + 1] - cm->tile_col_start_sb[i];
+      const int tile_w = tile_width_sb * cm->seq_params.mib_size;
+      assert(i == 0 || tile_w == *w);  // ensure all tiles have same dimension
+      *w = tile_w;
+    }
+
+    for (int i = 0; i < cm->tile_rows; ++i) {
+      const int tile_height_sb =
+          cm->tile_row_start_sb[i + 1] - cm->tile_row_start_sb[i];
+      const int tile_h = tile_height_sb * cm->seq_params.mib_size;
+      assert(i == 0 || tile_h == *h);  // ensure all tiles have same dimension
+      *h = tile_h;
+    }
+  }
 }

@@ -29,7 +29,7 @@
 
 static int cost_and_tokenize_map(Av1ColorMapParam *param, TOKENEXTRA **t,
                                  int plane, int calc_rate, int allow_update_cdf,
-                                 FRAME_COUNTS *counts) {
+                                 FRAME_COUNTS *counts, MapCdf map_pb_cdf) {
   const uint8_t *const color_map = param->color_map;
   MapCdf map_cdf = param->map_cdf;
   ColorCost color_cost = param->color_cost;
@@ -55,7 +55,7 @@ static int cost_and_tokenize_map(Av1ColorMapParam *param, TOKENEXTRA **t,
         this_rate += (*color_cost)[palette_size_idx][color_ctx][color_new_idx];
       } else {
         (*t)->token = color_new_idx;
-        (*t)->color_map_cdf = map_cdf[palette_size_idx][color_ctx];
+        (*t)->color_map_cdf = map_pb_cdf[palette_size_idx][color_ctx];
         ++(*t);
         if (allow_update_cdf)
           update_cdf(map_cdf[palette_size_idx][color_ctx], color_new_idx, n);
@@ -107,7 +107,10 @@ int av1_cost_color_map(const MACROBLOCK *const x, int plane, BLOCK_SIZE bsize,
   assert(plane == 0 || plane == 1);
   Av1ColorMapParam color_map_params;
   get_color_map_params(x, plane, bsize, tx_size, type, &color_map_params);
-  return cost_and_tokenize_map(&color_map_params, NULL, plane, 1, 0, NULL);
+  MapCdf map_pb_cdf = plane ? x->tile_pb_ctx->palette_uv_color_index_cdf
+                            : x->tile_pb_ctx->palette_y_color_index_cdf;
+  return cost_and_tokenize_map(&color_map_params, NULL, plane, 1, 0, NULL,
+                               map_pb_cdf);
 }
 
 void av1_tokenize_color_map(const MACROBLOCK *const x, int plane,
@@ -121,8 +124,10 @@ void av1_tokenize_color_map(const MACROBLOCK *const x, int plane,
   (*t)->token = color_map_params.color_map[0];
   (*t)->color_map_cdf = NULL;
   ++(*t);
+  MapCdf map_pb_cdf = plane ? x->tile_pb_ctx->palette_uv_color_index_cdf
+                            : x->tile_pb_ctx->palette_y_color_index_cdf;
   cost_and_tokenize_map(&color_map_params, t, plane, 0, allow_update_cdf,
-                        counts);
+                        counts, map_pb_cdf);
 }
 
 static void tokenize_vartx(ThreadData *td, TOKENEXTRA **t, RUN_TYPE dry_run,

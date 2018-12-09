@@ -116,7 +116,7 @@ void test_cdef(int bsize, int iterations, cdef_filter_block_func cdef,
                   ref_cdef(depth == 8 ? (uint8_t *)ref_d : 0, ref_d, size,
                            s + CDEF_HBORDER + CDEF_VBORDER * CDEF_BSTRIDE,
                            pristrength, secstrength, dir, pridamping,
-                           secdamping, bsize, (1 << depth) - 1, depth - 8);
+                           secdamping, bsize, depth - 8);
                   // If cdef and ref_cdef are the same, we're just testing
                   // speed
                   if (cdef != ref_cdef)
@@ -124,7 +124,7 @@ void test_cdef(int bsize, int iterations, cdef_filter_block_func cdef,
                         cdef(depth == 8 ? (uint8_t *)d : 0, d, size,
                              s + CDEF_HBORDER + CDEF_VBORDER * CDEF_BSTRIDE,
                              pristrength, secstrength, dir, pridamping,
-                             secdamping, bsize, (1 << depth) - 1, depth - 8));
+                             secdamping, bsize, depth - 8));
                   if (ref_cdef != cdef) {
                     for (pos = 0; pos < max_pos && !error; pos++) {
                       error = ref_d[pos] != d[pos];

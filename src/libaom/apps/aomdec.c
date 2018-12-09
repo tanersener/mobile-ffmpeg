@@ -427,13 +427,6 @@ static FILE *open_outfile(const char *name) {
   }
 }
 
-static int img_shifted_realloc_required(const aom_image_t *img,
-                                        const aom_image_t *shifted,
-                                        aom_img_fmt_t required_fmt) {
-  return img->d_w != shifted->d_w || img->d_h != shifted->d_h ||
-         required_fmt != shifted->fmt;
-}
-
 static int main_loop(int argc, const char **argv_) {
   aom_codec_ctx_t decoder;
   char *fn = NULL;
@@ -459,7 +452,7 @@ static int main_loop(int argc, const char **argv_) {
   int opt_i420 = 0;
   int opt_raw = 0;
   aom_codec_dec_cfg_t cfg = { 0, 0, 0, CONFIG_LOWBITDEPTH, { 1 } };
-  unsigned int output_bit_depth = 0;
+  unsigned int fixed_output_bit_depth = 0;
   unsigned int is_annexb = 0;
   int frames_corrupted = 0;
   int dec_flags = 0;
@@ -572,7 +565,7 @@ static int main_loop(int argc, const char **argv_) {
     } else if (arg_match(&arg, &continuearg, argi)) {
       keep_going = 1;
     } else if (arg_match(&arg, &outbitdeptharg, argi)) {
-      output_bit_depth = arg_parse_uint(&arg);
+      fixed_output_bit_depth = arg_parse_uint(&arg);
     } else if (arg_match(&arg, &isannexb, argi)) {
       is_annexb = 1;
       input.obu_ctx->is_annexb = 1;
@@ -850,41 +843,15 @@ static int main_loop(int argc, const char **argv_) {
           }
         }
         // Default to codec bit depth if output bit depth not set
-        if (!output_bit_depth && single_file && !do_md5) {
+        unsigned int output_bit_depth;
+        if (!fixed_output_bit_depth && single_file && !do_md5) {
           output_bit_depth = img->bit_depth;
+        } else {
+          output_bit_depth = fixed_output_bit_depth;
         }
         // Shift up or down if necessary
-        if (output_bit_depth != 0) {
-          const aom_img_fmt_t shifted_fmt =
-              output_bit_depth == 8 ? img->fmt & ~AOM_IMG_FMT_HIGHBITDEPTH
-                                    : img->fmt | AOM_IMG_FMT_HIGHBITDEPTH;
-
-          if (shifted_fmt != img->fmt || output_bit_depth != img->bit_depth) {
-            if (img_shifted &&
-                img_shifted_realloc_required(img, img_shifted, shifted_fmt)) {
-              aom_img_free(img_shifted);
-              img_shifted = NULL;
-            }
-            if (img_shifted) {
-              img_shifted->monochrome = img->monochrome;
-            }
-            if (!img_shifted) {
-              img_shifted =
-                  aom_img_alloc(NULL, shifted_fmt, img->d_w, img->d_h, 16);
-              img_shifted->bit_depth = output_bit_depth;
-              img_shifted->monochrome = img->monochrome;
-              img_shifted->csp = img->csp;
-            }
-            if (output_bit_depth > img->bit_depth) {
-              aom_img_upshift(img_shifted, img,
-                              output_bit_depth - img->bit_depth);
-            } else {
-              aom_img_downshift(img_shifted, img,
-                                img->bit_depth - output_bit_depth);
-            }
-            img = img_shifted;
-          }
-        }
+        if (output_bit_depth != 0)
+          aom_shift_img(output_bit_depth, &img, &img_shifted);
 
         aom_input_ctx.width = img->d_w;
         aom_input_ctx.height = img->d_h;
@@ -900,6 +867,11 @@ static int main_loop(int argc, const char **argv_) {
                   y4m_buf, sizeof(y4m_buf), aom_input_ctx.width,
                   aom_input_ctx.height, &aom_input_ctx.framerate,
                   img->monochrome, img->csp, img->fmt, img->bit_depth);
+              if (img->csp == AOM_CSP_COLOCATED) {
+                fprintf(stderr,
+                        "Warning: Y4M lacks a colorspace for colocated "
+                        "chroma. Using a placeholder.\n");
+              }
               if (do_md5) {
                 MD5Update(&md5_ctx, (md5byte *)y4m_buf, (unsigned int)len);
               } else {

@@ -120,6 +120,7 @@ static aom_image_t *img_alloc_helper(
 
     img->img_data = (uint8_t *)aom_memalign(buf_align, (size_t)alloc_size);
     img->img_data_owner = 1;
+    img->sz = (size_t)alloc_size;
   }
 
   if (!img->img_data) goto fail;
@@ -134,7 +135,7 @@ static aom_image_t *img_alloc_helper(
   img->bps = bps;
 
   /* Calculate strides */
-  img->stride[AOM_PLANE_Y] = img->stride[AOM_PLANE_ALPHA] = stride_in_bytes;
+  img->stride[AOM_PLANE_Y] = stride_in_bytes;
   img->stride[AOM_PLANE_U] = img->stride[AOM_PLANE_V] = stride_in_bytes >> xcs;
 
   /* Default viewport to entire image */
@@ -188,12 +189,6 @@ int aom_img_set_rect(aom_image_t *img, unsigned int x, unsigned int y,
           (img->fmt & AOM_IMG_FMT_HIGHBITDEPTH) ? 2 : 1;
       data = img->img_data;
 
-      if (img->fmt & AOM_IMG_FMT_HAS_ALPHA) {
-        img->planes[AOM_PLANE_ALPHA] =
-            data + x * bytes_per_sample + y * img->stride[AOM_PLANE_ALPHA];
-        data += (img->h + 2 * border) * img->stride[AOM_PLANE_ALPHA];
-      }
-
       img->planes[AOM_PLANE_Y] =
           data + x * bytes_per_sample + y * img->stride[AOM_PLANE_Y];
       data += (img->h + 2 * border) * img->stride[AOM_PLANE_Y];
@@ -239,10 +234,6 @@ void aom_img_flip(aom_image_t *img) {
   img->planes[AOM_PLANE_V] += (signed)((img->d_h >> img->y_chroma_shift) - 1) *
                               img->stride[AOM_PLANE_V];
   img->stride[AOM_PLANE_V] = -img->stride[AOM_PLANE_V];
-
-  img->planes[AOM_PLANE_ALPHA] +=
-      (signed)(img->d_h - 1) * img->stride[AOM_PLANE_ALPHA];
-  img->stride[AOM_PLANE_ALPHA] = -img->stride[AOM_PLANE_ALPHA];
 }
 
 void aom_img_free(aom_image_t *img) {

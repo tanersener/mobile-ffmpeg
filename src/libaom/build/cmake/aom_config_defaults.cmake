@@ -135,9 +135,10 @@ set_aom_config_var(CONFIG_INTER_STATS_ONLY 0 NUMBER "AV1 experiment flag.")
 set_aom_config_var(CONFIG_RD_DEBUG 0 NUMBER "AV1 experiment flag.")
 set_aom_config_var(CONFIG_2PASS_PARTITION_SEARCH_LVL 1 NUMBER
                    "AV1 experiment flag.")
-set_aom_config_var(CONFIG_SHARP_SETTINGS 0 NUMBER
-                   "Use sharper encoding settings")
-set_aom_config_var(CONFIG_INTEGERIZE_SGR 1 NUMBER "AV1 experiment flag.")
+set_aom_config_var(CONFIG_SHARP_SETTINGS 0 NUMBER "AV1 experiment flag.")
+set_aom_config_var(CONFIG_ONE_PASS_SVM 0 NUMBER "AV1 experiment flag.")
+set_aom_config_var(CONFIG_DISABLE_FULL_PIXEL_SPLIT_8X8 1 NUMBER
+                   "Disable full_pixel_motion_search_based_split on BLOCK_8X8")
 
 #
 # Variables in this section control optional features of the build system.

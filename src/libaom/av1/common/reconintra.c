@@ -556,33 +556,37 @@ void av1_dr_prediction_z2_c(uint8_t *dst, ptrdiff_t stride, int bw, int bh,
                             const uint8_t *above, const uint8_t *left,
                             int upsample_above, int upsample_left, int dx,
                             int dy) {
-  int r, c, x, y, shift1, shift2, val, base1, base2;
-
   assert(dx > 0);
   assert(dy > 0);
 
   const int min_base_x = -(1 << upsample_above);
+  const int min_base_y = -(1 << upsample_left);
+  (void)min_base_y;
   const int frac_bits_x = 6 - upsample_above;
   const int frac_bits_y = 6 - upsample_left;
-  const int base_inc_x = 1 << upsample_above;
-  x = -dx;
-  for (r = 0; r < bh; ++r, x -= dx, dst += stride) {
-    base1 = x >> frac_bits_x;
-    y = (r << 6) - dy;
-    for (c = 0; c < bw; ++c, base1 += base_inc_x, y -= dy) {
-      if (base1 >= min_base_x) {
-        shift1 = ((x * (1 << upsample_above)) & 0x3F) >> 1;
-        val = above[base1] * (32 - shift1) + above[base1 + 1] * shift1;
+
+  for (int r = 0; r < bh; ++r) {
+    for (int c = 0; c < bw; ++c) {
+      int val;
+      int y = r + 1;
+      int x = (c << 6) - y * dx;
+      const int base_x = x >> frac_bits_x;
+      if (base_x >= min_base_x) {
+        const int shift = ((x * (1 << upsample_above)) & 0x3F) >> 1;
+        val = above[base_x] * (32 - shift) + above[base_x + 1] * shift;
         val = ROUND_POWER_OF_TWO(val, 5);
       } else {
-        base2 = y >> frac_bits_y;
-        assert(base2 >= -(1 << upsample_left));
-        shift2 = ((y * (1 << upsample_left)) & 0x3F) >> 1;
-        val = left[base2] * (32 - shift2) + left[base2 + 1] * shift2;
+        x = c + 1;
+        y = (r << 6) - x * dy;
+        const int base_y = y >> frac_bits_y;
+        assert(base_y >= min_base_y);
+        const int shift = ((y * (1 << upsample_left)) & 0x3F) >> 1;
+        val = left[base_y] * (32 - shift) + left[base_y + 1] * shift;
         val = ROUND_POWER_OF_TWO(val, 5);
       }
       dst[c] = val;
     }
+    dst += stride;
   }
 }
 
@@ -688,30 +692,33 @@ void av1_highbd_dr_prediction_z2_c(uint16_t *dst, ptrdiff_t stride, int bw,
                                    int bh, const uint16_t *above,
                                    const uint16_t *left, int upsample_above,
                                    int upsample_left, int dx, int dy, int bd) {
-  int r, c, x, y, shift, val, base;
-
   (void)bd;
   assert(dx > 0);
   assert(dy > 0);
 
   const int min_base_x = -(1 << upsample_above);
+  const int min_base_y = -(1 << upsample_left);
+  (void)min_base_y;
   const int frac_bits_x = 6 - upsample_above;
   const int frac_bits_y = 6 - upsample_left;
-  for (r = 0; r < bh; ++r) {
-    for (c = 0; c < bw; ++c) {
-      y = r + 1;
-      x = (c << 6) - y * dx;
-      base = x >> frac_bits_x;
-      if (base >= min_base_x) {
-        shift = ((x * (1 << upsample_above)) & 0x3F) >> 1;
-        val = above[base] * (32 - shift) + above[base + 1] * shift;
+
+  for (int r = 0; r < bh; ++r) {
+    for (int c = 0; c < bw; ++c) {
+      int val;
+      int y = r + 1;
+      int x = (c << 6) - y * dx;
+      const int base_x = x >> frac_bits_x;
+      if (base_x >= min_base_x) {
+        const int shift = ((x * (1 << upsample_above)) & 0x3F) >> 1;
+        val = above[base_x] * (32 - shift) + above[base_x + 1] * shift;
         val = ROUND_POWER_OF_TWO(val, 5);
       } else {
         x = c + 1;
         y = (r << 6) - x * dy;
-        base = y >> frac_bits_y;
-        shift = ((y * (1 << upsample_left)) & 0x3F) >> 1;
-        val = left[base] * (32 - shift) + left[base + 1] * shift;
+        const int base_y = y >> frac_bits_y;
+        assert(base_y >= min_base_y);
+        const int shift = ((y * (1 << upsample_left)) & 0x3F) >> 1;
+        val = left[base_y] * (32 - shift) + left[base_y + 1] * shift;
         val = ROUND_POWER_OF_TWO(val, 5);
       }
       dst[c] = val;

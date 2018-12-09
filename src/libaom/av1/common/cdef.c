@@ -107,7 +107,7 @@ void copy_rect8_16bit_to_16bit_c(uint16_t *dst, int dstride,
   }
 }
 
-static void copy_sb8_16(AOM_UNUSED AV1_COMMON *cm, uint16_t *dst, int dstride,
+static void copy_sb8_16(AV1_COMMON *cm, uint16_t *dst, int dstride,
                         const uint8_t *src, int src_voffset, int src_hoffset,
                         int sstride, int vsize, int hsize) {
   if (cm->seq_params.use_highbitdepth) {
@@ -140,6 +140,7 @@ static INLINE void copy_rect(uint16_t *dst, int dstride, const uint16_t *src,
 
 void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
                     MACROBLOCKD *xd) {
+  const CdefInfo *const cdef_info = &cm->cdef_info;
   const int num_planes = av1_num_planes(cm);
   DECLARE_ALIGNED(16, uint16_t, src[CDEF_INBUF_SIZE]);
   uint16_t *linebuf[3];
@@ -231,13 +232,15 @@ void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
           cm->mi_grid_visible[MI_SIZE_64X64 * fbr * cm->mi_stride +
                               MI_SIZE_64X64 * fbc]
               ->cdef_strength;
-      level = cm->cdef_strengths[mbmi_cdef_strength] / CDEF_SEC_STRENGTHS;
+      level =
+          cdef_info->cdef_strengths[mbmi_cdef_strength] / CDEF_SEC_STRENGTHS;
       sec_strength =
-          cm->cdef_strengths[mbmi_cdef_strength] % CDEF_SEC_STRENGTHS;
+          cdef_info->cdef_strengths[mbmi_cdef_strength] % CDEF_SEC_STRENGTHS;
       sec_strength += sec_strength == 3;
-      uv_level = cm->cdef_uv_strengths[mbmi_cdef_strength] / CDEF_SEC_STRENGTHS;
+      uv_level =
+          cdef_info->cdef_uv_strengths[mbmi_cdef_strength] / CDEF_SEC_STRENGTHS;
       uv_sec_strength =
-          cm->cdef_uv_strengths[mbmi_cdef_strength] % CDEF_SEC_STRENGTHS;
+          cdef_info->cdef_uv_strengths[mbmi_cdef_strength] % CDEF_SEC_STRENGTHS;
       uv_sec_strength += uv_sec_strength == 3;
       if ((level == 0 && sec_strength == 0 && uv_level == 0 &&
            uv_sec_strength == 0) ||
@@ -252,8 +255,8 @@ void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
       for (int pli = 0; pli < num_planes; pli++) {
         int coffset;
         int rend, cend;
-        int pri_damping = cm->cdef_pri_damping;
-        int sec_damping = cm->cdef_sec_damping;
+        int pri_damping = cdef_info->cdef_pri_damping;
+        int sec_damping = cdef_info->cdef_sec_damping;
         int hsize = nhb << mi_wide_l2[pli];
         int vsize = nvb << mi_high_l2[pli];
 

@@ -286,19 +286,29 @@ TEST_P(QuantizeTest, DISABLED_Speed) {
   const int16_t *quant_shift = qtab_->quant.y_quant_shift[q];
   const int16_t *dequant = qtab_->dequant.y_dequant_QTX[q];
   const int kNumTests = 5000000;
-  aom_usec_timer timer;
+  aom_usec_timer timer, simd_timer;
 
   FillCoeffRandom();
 
   aom_usec_timer_start(&timer);
   for (int n = 0; n < kNumTests; ++n) {
-    quant_(coeff_ptr, n_coeffs, zbin, round_fp, quant_fp, quant_shift, qcoeff,
-           dqcoeff, dequant, eob, sc->scan, sc->iscan);
+    quant_ref_(coeff_ptr, n_coeffs, zbin, round_fp, quant_fp, quant_shift,
+               qcoeff, dqcoeff, dequant, eob, sc->scan, sc->iscan);
   }
   aom_usec_timer_mark(&timer);
 
+  aom_usec_timer_start(&simd_timer);
+  for (int n = 0; n < kNumTests; ++n) {
+    quant_(coeff_ptr, n_coeffs, zbin, round_fp, quant_fp, quant_shift, qcoeff,
+           dqcoeff, dequant, eob, sc->scan, sc->iscan);
+  }
+  aom_usec_timer_mark(&simd_timer);
+
   const int elapsed_time = static_cast<int>(aom_usec_timer_elapsed(&timer));
-  printf("Elapsed time: %d us\n", elapsed_time);
+  const int simd_elapsed_time =
+      static_cast<int>(aom_usec_timer_elapsed(&simd_timer));
+  printf("c_time = %d \t simd_time = %d \t Gain = %d \n", elapsed_time,
+         simd_elapsed_time, (elapsed_time / simd_elapsed_time));
 }
 
 using ::testing::make_tuple;
@@ -398,14 +408,9 @@ INSTANTIATE_TEST_CASE_P(SSE2, QuantizeTest,
 INSTANTIATE_TEST_CASE_P(
     SSSE3, QuantizeTest,
     ::testing::Values(make_tuple(&aom_quantize_b_c, &aom_quantize_b_ssse3,
-                                 TX_16X16, TYPE_B, AOM_BITS_8)));
-
-// Like libvpx, the ssse3 and avx quantize tests do not pass.
-// https://bugs.chromium.org/p/webm/issues/detail?id=1448
-INSTANTIATE_TEST_CASE_P(
-    DISABLED_SSSE3_32x32, QuantizeTest,
-    ::testing::Values(make_tuple(&aom_quantize_b_32x32_c,
-                                 &aom_quantize_b_32x32_ssse3, TX_16X16, TYPE_B,
+                                 TX_16X16, TYPE_B, AOM_BITS_8),
+                      make_tuple(&aom_quantize_b_32x32_c,
+                                 &aom_quantize_b_32x32_ssse3, TX_32X32, TYPE_B,
                                  AOM_BITS_8)));
 
 #endif  // HAVE_SSSE3 && ARCH_X86_64
@@ -413,13 +418,11 @@ INSTANTIATE_TEST_CASE_P(
 #if HAVE_AVX && ARCH_X86_64
 INSTANTIATE_TEST_CASE_P(
     AVX, QuantizeTest,
-    ::testing::Values(
-        make_tuple(&aom_quantize_b_c, &aom_quantize_b_avx, TX_16X16, TYPE_B,
-                   AOM_BITS_8),
-        // Although these tests will not pass against _c, test them against each
-        // other so there is some minor checking.
-        make_tuple(&aom_quantize_b_32x32_ssse3, &aom_quantize_b_32x32_avx,
-                   TX_32X32, TYPE_B, AOM_BITS_8)));
+    ::testing::Values(make_tuple(&aom_quantize_b_c, &aom_quantize_b_avx,
+                                 TX_16X16, TYPE_B, AOM_BITS_8),
+                      make_tuple(&aom_quantize_b_32x32_c,
+                                 &aom_quantize_b_32x32_avx, TX_32X32, TYPE_B,
+                                 AOM_BITS_8)));
 
 #endif  // HAVE_AVX && ARCH_X86_64
 }  // namespace

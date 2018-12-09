@@ -339,7 +339,7 @@ typedef struct SPEED_FEATURES {
   BLOCK_SIZE always_this_block_size;
 
   // Drop less likely to be picked reference frames in the RD search.
-  // Has three levels for now: 0, 1 and 2, where higher levels prune more
+  // Has four levels for now: 0, 1, 2 and 3, where higher levels prune more
   // aggressively than lower ones. (0 means no pruning).
   int selective_ref_frame;
 
@@ -440,11 +440,18 @@ typedef struct SPEED_FEATURES {
   // Choose a very large value (UINT_MAX) to use 8-tap always
   unsigned int disable_filter_search_var_thresh;
 
-  // A source variance threshold below which wedge search is disabled
+  // Only enable wedge search if the edge strength is greater than
+  // this threshold. A value of 0 signals that this check is disabled.
+  unsigned int disable_wedge_search_edge_thresh;
+
+  // Only enable wedge search if the variance is above this threshold.
   unsigned int disable_wedge_search_var_thresh;
 
   // Whether fast wedge sign estimate is used
   int fast_wedge_sign_estimate;
+
+  // Whether to prune wedge search based on predictor difference
+  int prune_wedge_pred_diff_based;
 
   // These bit masks allow you to enable or disable intra modes for each
   // transform size separately.
@@ -573,6 +580,29 @@ typedef struct SPEED_FEATURES {
 
   // Prune intra mode candidates based on source block gradient stats.
   int intra_angle_estimation;
+
+  // Performs full pixel motion search before none_partition to decide if we
+  // want to split directly without trying other partition types.
+  int full_pixel_motion_search_based_split;
+
+  // Skip obmc or warped motion mode when neighborhood motion field is
+  // identical
+  int skip_obmc_in_uniform_mv_field;
+  int skip_wm_in_uniform_mv_field;
+
+  // skip sharp_filter evaluation based on regular and smooth filter rd for
+  // dual_filter=0 case
+  int skip_sharp_interp_filter_search;
+
+  // prune wedge and compound segment approximate rd evaluation based on
+  // compound average rd/ref_best_rd
+  int prune_comp_type_by_comp_avg;
+
+  // Prune/gate motion mode evaluation based on token based rd
+  // during transform search for inter blocks
+  // Values are 0 (not used) , 1 - 3 with progressively increasing
+  // aggressiveness
+  int prune_motion_mode_level;
 } SPEED_FEATURES;
 
 struct AV1_COMP;

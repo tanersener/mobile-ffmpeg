@@ -801,9 +801,9 @@ static int loop_restoration_row_worker(void *arg1, void *arg2) {
   typedef void (*copy_fun)(const YV12_BUFFER_CONFIG *src_ybc,
                            YV12_BUFFER_CONFIG *dst_ybc, int hstart, int hend,
                            int vstart, int vend);
-  static const copy_fun copy_funs[3] = {
-    aom_yv12_partial_copy_y, aom_yv12_partial_copy_u, aom_yv12_partial_copy_v
-  };
+  static const copy_fun copy_funs[3] = { aom_yv12_partial_coloc_copy_y,
+                                         aom_yv12_partial_coloc_copy_u,
+                                         aom_yv12_partial_coloc_copy_v };
 
   while (1) {
     AV1LrMTInfo *cur_job_info = get_lr_job_info(lr_sync);

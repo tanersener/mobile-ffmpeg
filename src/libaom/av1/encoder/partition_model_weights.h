@@ -2441,6 +2441,465 @@ static const NN_CONFIG av1_rect_partition_nnconfig_128 = {
 #undef NUM_NODES
 #undef LABEL_SIZE
 
+#if CONFIG_ONE_PASS_SVM
+#define FEATURE_SIZE 24
+static const float av1_op_svm_early_term_weights_128[FEATURE_SIZE + 1] = {
+  -4.5893036051f, 6.9065208136f,  -9.1579514692f, 0.1353151366f,
+  -1.0271889653f, -0.0020988254f, -0.0094355949f, 0.0040209656f,
+  0.0073014747f,  0.7939705382f,  0.0254545714f,  0.0557559708f,
+  -0.0339662064f, -0.0496818300f, 0.3053600283f,  0.3699486845f,
+  0.0848271391f,  0.4091075988f,  0.1196729398f,  -0.0038137193f,
+  -0.0773495909f, -0.0651630642f, -0.0123704995f, -0.0036697401f,
+  -4.1930227095f,
+};
+
+static const float av1_op_svm_early_term_weights_64[FEATURE_SIZE + 1] = {
+  -2.7600454480f, 5.6822046712f,  -6.7576830133f, 0.1326457117f,
+  -1.0541818372f, 0.0107782654f,  0.0050469147f,  -0.0021362631f,
+  -0.0135151040f, -0.1020115005f, -0.0283409957f, -0.0176311233f,
+  0.0250648204f,  0.0196228570f,  0.5441528594f,  0.2767320141f,
+  0.1261231351f,  0.2998476408f,  0.1336215695f,  -0.1107823946f,
+  -0.0697279598f, -0.0577520545f, -0.0558441075f, -0.0699750617f,
+  -2.6995991503f,
+};
+
+static const float av1_op_svm_early_term_weights_32[FEATURE_SIZE + 1] = {
+  -0.8950734172f, 1.3559565008f,  -2.6733642653f, 0.2661361319f,
+  -0.0314731140f, 0.0044943456f,  0.0006438044f,  -0.0029066686f,
+  -0.0021903213f, 0.5845049496f,  -0.0003629350f, 0.0006982840f,
+  0.0014157386f,  -0.0017427528f, 0.7078456733f,  0.1600998068f,
+  0.0933852747f,  0.2822125876f,  0.1923826165f,  -0.0905903459f,
+  -0.0564717590f, -0.0591007486f, -0.0692268554f, -0.0677411981f,
+  -0.7101853206f,
+};
+
+static const float av1_op_svm_early_term_weights_16[FEATURE_SIZE + 1] = {
+  -0.1719124013f, -0.3192305362f, -1.1714597182f, 0.4437770294f,
+  -0.0042344643f, 0.0000027764f,  0.0018827450f,  -0.0015555613f,
+  -0.0003250050f, 0.9413693294f,  0.0076188418f,  -0.0067870352f,
+  0.0006329246f,  -0.0013059613f, 0.8596697254f,  0.0635558018f,
+  0.0447224598f,  0.0915706321f,  0.0741662273f,  -0.0269096547f,
+  -0.0244610614f, -0.0281113318f, -0.0326108845f, -0.0350908892f,
+  -0.0307521675f,
+};
+
+static const float av1_op_svm_early_term_mean_128[FEATURE_SIZE] = {
+  940540.3259649610f,    3988285.5905584921f, 575475302.3545289040f,
+  0.5775348803f,         866.9828469502f,     0.2503762393f,
+  0.2501466215f,         0.2513213770f,       0.2481557622f,
+  521994448.3219169378f, 0.2666920631f,       0.2535864361f,
+  0.2481589186f,         0.2315625823f,       100519.1049708007f,
+  12.1299754840f,        0.8279971004f,       12.6664603305f,
+  0.7313258998f,         935.8233056680f,     0.7436563032f,
+  0.7710055018f,         0.7376516970f,       0.6859818720f,
+};
+
+static const float av1_op_svm_early_term_mean_64[FEATURE_SIZE] = {
+  420419.7529613562f,    839754.4414347620f, 129360420.5256031156f,
+  0.6525652037f,         548.8972009954f,    0.2506918565f,
+  0.2488349076f,         0.2501724146f,      0.2503008213f,
+  113132974.7944754064f, 0.2479344278f,      0.2471446791f,
+  0.2524478512f,         0.2524730419f,      91147.9854189453f,
+  10.9642508460f,        0.8936554428f,      11.3877865621f,
+  0.8307555282f,         752.7787491956f,    0.7243363939f,
+  0.7198362119f,         0.7329432336f,      0.7245090283f,
+};
+
+static const float av1_op_svm_early_term_mean_32[FEATURE_SIZE] = {
+  105111.0236438536f,   184296.0939716828f, 29117017.6751756854f,
+  0.6402298612f,        140.2223339218f,    0.2495860872f,
+  0.2496407600f,        0.2506238629f,      0.2501492900f,
+  24480304.9390618578f, 0.2494442027f,      0.2496080963f,
+  0.2504881563f,        0.2504595447f,      60297.6762059058f,
+  9.4279752138f,        0.9287901132f,      9.6516813792f,
+  0.9009173677f,        591.5406335030f,    0.6944486917f,
+  0.6983941982f,        0.6927236901f,      0.6921613649f,
+};
+
+static const float av1_op_svm_early_term_mean_16[FEATURE_SIZE] = {
+  34080.7994802934f, 44108.1176228864f,   7494288.4946180154f, 0.6240636218f,
+  36.4539515827f,    0.2490867417f,       0.2499231014f,       0.2505361492f,
+  0.2504540077f,     5913397.2957480755f, 0.2487482536f,       0.2495500728f,
+  0.2503693302f,     0.2513323434f,       36574.9686737814f,   7.4345592768f,
+  0.9592429205f,     7.6001764585f,       0.9459867777f,       490.4635033056f,
+  0.6626215237f,     0.6580791886f,       0.6655481064f,       0.6589010119f,
+};
+
+static const float av1_op_svm_early_term_std_128[FEATURE_SIZE] = {
+  2054266.2732957317f,    7550554.6241466375f, 1078688147.1656334400f,
+  0.4939517611f,          1414.3139592985f,    0.1504634077f,
+  0.1515907199f,          0.1590329744f,       0.1515653324f,
+  1006422867.8989596367f, 0.1168668155f,       0.1195725959f,
+  0.1195825693f,          0.1123065533f,       195261.0940245980f,
+  4.5876675121f,          0.3773829648f,       4.8017339769f,
+  0.4432700397f,          973.7532938848f,     0.4790027843f,
+  0.5056275222f,          0.5262278749f,       0.4685586148f,
+};
+
+static const float av1_op_svm_early_term_std_64[FEATURE_SIZE] = {
+  1093636.0522712648f,   1749863.5221569177f, 255168612.8025657237f,
+  0.4761552884f,         1084.7927994662f,    0.1099344646f,
+  0.1100619440f,         0.1090853225f,       0.1115303745f,
+  232084513.1365262568f, 0.0759732385f,       0.0762942913f,
+  0.0785624106f,         0.0779284747f,       185687.9441778057f,
+  4.4371901245f,         0.3082781088f,       4.6670562831f,
+  0.3749677061f,         854.3212307408f,     0.4920531348f,
+  0.5073919158f,         0.5054698298f,       0.4904895620f,
+};
+
+static const float av1_op_svm_early_term_std_32[FEATURE_SIZE] = {
+  238229.7484988807f,   400136.8703966461f, 60267828.4581554681f,
+  0.4799328974f,        268.9377064297f,    0.1122938575f,
+  0.1126479260f,        0.1137018559f,      0.1126389337f,
+  52174139.1477040648f, 0.0715628767f,      0.0720997035f,
+  0.0728961434f,        0.0732065300f,      147785.0049793872f,
+  4.2092341484f,        0.2571751131f,      4.3893075417f,
+  0.2987729310f,        769.0253148602f,    0.5027558039f,
+  0.4982811444f,        0.5092312751f,      0.4991214994f,
+};
+
+static const float av1_op_svm_early_term_std_16[FEATURE_SIZE] = {
+  64177.9527087587f,    103729.9987511119f, 16632490.8146969266f,
+  0.4843637247f,        65.8114470725f,     0.0884226846f,
+  0.0912638659f,        0.0914771167f,      0.0916078800f,
+  13364581.3877149168f, 0.0677468925f,      0.0689631274f,
+  0.0689915367f,        0.0702648469f,      111397.2620676765f,
+  3.7858187888f,        0.1977269328f,      3.9420183951f,
+  0.2260437881f,        717.5336868275f,    0.5017939514f,
+  0.5066633533f,        0.5086806985f,      0.5085585987f,
+};
+
+#undef FEATURE_SIZE
+#endif  // CONFIG_ONE_PASS_SVM
+
+// Below are the models used for full_pixel_motion_search_based_split
+// BLOCK_128X128
+#define NUM_HIDDEN_LAYERS_128 1
+#define NUM_FEATURES_128 6
+#define NUM_LAYER_0_UNITS_128 16
+#define NUM_LOGITS_128 1
+
+static const float full_pixel_motion_search_based_split_layer_0_kernel_128[] = {
+  -0.807346f,  0.242298f,   12.9862f,   -1.19161f,  5.21734f,    -1.1363f,
+  -2.39127f,   0.930915f,   -2.44285f,  -2.42966f,  5.73476f,    0.0506879f,
+  -0.234878f,  -0.317875f,  0.361322f,  0.431648f,  -0.39105f,   -0.110225f,
+  -2.46236f,   0.979713f,   -10.5596f,  -7.76653f,  -3.06518f,   2.42554f,
+  0.0492961f,  -0.467176f,  0.130746f,  0.494527f,  -0.0336645f, 0.501755f,
+  0.176486f,   -0.869541f,  7.77757f,   6.81303f,   6.00771f,    7.35696f,
+  0.150731f,   -0.307017f,  -0.437639f, -0.082924f, 0.379107f,   0.452278f,
+  -0.0143836f, -0.183691f,  -0.604698f, -9.2681f,   -2.06087f,   11.0256f,
+  0.0487599f,  -0.249168f,  -0.180407f, 0.304772f,  0.218642f,   -0.406073f,
+  -0.0289919f, -0.794381f,  5.45092f,   5.38374f,   3.25745f,    5.32903f,
+  1.12718f,    -0.0215478f, 2.78552f,   4.8951f,    -0.959671f,  0.694264f,
+  -0.0611219f, -0.331937f,  0.258252f,  -0.495331f, -0.285923f,  0.294713f,
+  -0.119947f,  0.0753204f,  10.2021f,   -5.82147f,  -12.0137f,   3.0365f,
+  0.366697f,   0.142683f,   -3.29731f,  -5.76651f,  -5.62578f,   10.9462f,
+  -0.325459f,  0.092602f,   -0.868027f, -0.691768f, -0.292017f,  -0.00841203f,
+  0.702545f,   -0.612227f,  -7.68881f,  9.52225f,   -1.18581f,   -2.56762f
+};
+
+static const float full_pixel_motion_search_based_split_logits_kernel_128[] = {
+  0.364895f,    0.577553f,  0.115758f,  -0.999496f, 0.124885f, 3.23193f,
+  -0.00386642f, 0.970794f,  0.136637f,  -4.28052f,  -1.49234f, 0.370436f,
+  0.576981f,    -0.469656f, -0.124071f, 1.07669f
+};
+
+static const float full_pixel_motion_search_based_split_layer_0_bias_128[] = {
+  1.32916f,    0.817212f,  0.0f,       -0.921066f, 0.0f,      3.57649f,
+  -0.0204517f, 2.97286f,   0.0f,       5.49957f,   -8.14518f, 0.0f,
+  1.30826f,    -0.349536f, -0.638933f, 5.4496f
+};
+
+static const float full_pixel_motion_search_based_split_logits_bias_128[] = {
+  0.683442f
+};
+
+static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_128 = {
+  NUM_FEATURES_128,
+  NUM_LOGITS_128,
+  NUM_HIDDEN_LAYERS_128,
+  {
+      NUM_LAYER_0_UNITS_128,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_kernel_128,
+      full_pixel_motion_search_based_split_logits_kernel_128,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_bias_128,
+      full_pixel_motion_search_based_split_logits_bias_128,
+  },
+};
+
+static const float full_pixel_motion_search_based_split_thresh_128 = 2.0f;
+
+#undef NUM_HIDDEN_LAYERS_128
+#undef NUM_FEATURES_128
+#undef NUM_LAYER_0_UNITS_128
+#undef NUM_LOGITS_128
+
+// BLOCK_64X64
+#define NUM_HIDDEN_LAYERS_64 1
+#define NUM_FEATURES_64 6
+#define NUM_LAYER_0_UNITS_64 16
+#define NUM_LOGITS_64 1
+
+static const float full_pixel_motion_search_based_split_layer_0_kernel_64[] = {
+  0.0345945f,  -0.394064f,  0.0919978f, 0.270358f,  -0.384502f, -0.504608f,
+  -0.25759f,   0.155981f,   2.62567f,   -10.7204f,  -0.709802f, 8.15948f,
+  0.589866f,   -0.445645f,  -1.68232f,  10.0061f,   -3.17671f,  4.87259f,
+  -0.448886f,  -0.205568f,  -0.462388f, 0.385001f,  -0.451687f, 0.49602f,
+  -0.256708f,  0.803322f,   3.25594f,   0.38541f,   -1.83867f,  -2.15132f,
+  0.936059f,   -0.203056f,  -5.92959f,  -6.24554f,  -6.68631f,  -6.85977f,
+  -0.0407565f, -0.258902f,  0.195053f,  -0.366515f, 0.339543f,  -0.433017f,
+  -2.67026f,   0.385457f,   1.86683f,   1.9501f,    0.0381398f, 1.086f,
+  -0.153729f,  0.173772f,   -42.9029f,  -36.8934f,  -2.892f,    -0.0540691f,
+  0.77469f,    -0.380145f,  2.2689f,    -9.53332f,  1.15712f,   2.86601f,
+  -0.437036f,  0.247132f,   -8.51058f,  -3.62972f,  -8.99449f,  -0.638738f,
+  0.0609263f,  -0.0614603f, 5.42307f,   5.35926f,   5.27437f,   5.26599f,
+  -0.0729677f, 0.0306104f,  -7.77867f,  5.03598f,   -8.17832f,  5.85461f,
+  -0.253269f,  0.164582f,   -4.49713f,  3.83265f,   9.04851f,   -2.85668f,
+  1.22618f,    0.166904f,   -1.51975f,  -4.01576f,  -1.44374f,  -2.22147f,
+  -0.217072f,  -0.0984913f, -0.265515f, 0.360021f,  0.0779512f, 0.361516f
+};
+
+static const float full_pixel_motion_search_based_split_logits_kernel_64[] = {
+  0.470821f, 0.474747f, -0.571292f, 0.403221f,  0.628966f,  -0.617029f,
+  0.501105f, 0.499962f, -1.5451f,   -0.473518f, -0.730568f, -5.55817f,
+  0.776761f, 0.42569f,  0.311925f,  0.469968f
+};
+
+static const float full_pixel_motion_search_based_split_layer_0_bias_64[] = {
+  -0.134085f, 0.0758715f, 1.10419f,  0.0f,       -5.75737f, 1.65494f,
+  0.0f,       3.44047f,   0.394852f, 3.43858f,   3.65871f,  -4.84987f,
+  1.21207f,   -1.7705f,   -5.46469f, -0.0889634f
+};
+
+static const float full_pixel_motion_search_based_split_logits_bias_64[] = {
+  -0.479491f
+};
+
+static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_64 = {
+  NUM_FEATURES_64,
+  NUM_LOGITS_64,
+  NUM_HIDDEN_LAYERS_64,
+  {
+      NUM_LAYER_0_UNITS_64,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_kernel_64,
+      full_pixel_motion_search_based_split_logits_kernel_64,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_bias_64,
+      full_pixel_motion_search_based_split_logits_bias_64,
+  },
+};
+
+static const float full_pixel_motion_search_based_split_thresh_64 = 2.0f;
+
+#undef NUM_HIDDEN_LAYERS_64
+#undef NUM_FEATURES_64
+#undef NUM_LAYER_0_UNITS_64
+#undef NUM_LOGITS_64
+
+// BLOCK_32X32
+#define NUM_HIDDEN_LAYERS_32 1
+#define NUM_FEATURES_32 6
+#define NUM_LAYER_0_UNITS_32 16
+#define NUM_LOGITS_32 1
+
+static const float full_pixel_motion_search_based_split_layer_0_kernel_32[] = {
+  -1.61796f,   0.0585128f,  1.57904f,   1.52703f,   0.367779f, 0.220434f,
+  1.66652f,    -1.77782f,   6.41118f,   4.16976f,   4.97299f,  4.84111f,
+  -0.0956536f, -0.163284f,  -0.143662f, 0.129329f,  0.449659f, -0.528844f,
+  -1.00067f,   1.17203f,    -4.26777f,  -4.78521f,  8.45658f,  -3.49498f,
+  -1.78386f,   0.111488f,   4.176f,     6.31911f,   -10.5369f, 6.26983f,
+  -1.32233f,   1.22999f,    -4.1666f,   -10.0359f,  -4.14779f, -10.4695f,
+  1.83011f,    -0.333152f,  -9.87986f,  -8.11992f,  -8.2775f,  -7.79918f,
+  -0.101404f,  0.00401393f, 8.89046f,   -7.32186f,  -6.59597f, 9.66257f,
+  -1.1492f,    1.23067f,    -3.6341f,   6.59275f,   -3.2373f,  -3.42564f,
+  0.371736f,   -0.140902f,  -2.75715f,  5.92487f,   -7.9185f,  9.13743f,
+  -3.52698f,   -0.191044f,  5.96691f,   6.26327f,   4.36378f,  5.69354f,
+  -0.608845f,  -0.191236f,  -0.482191f, -0.180474f, -3.8838f,  -3.92934f,
+  -1.03191f,   0.994568f,   7.95516f,   -4.0035f,   -2.86266f, -4.96105f,
+  1.75022f,    0.125058f,   -1.52159f,  -3.59304f,  -2.82634f, -2.49556f,
+  -2.05557f,   -0.222577f,  3.7608f,    5.50475f,   2.7046f,   5.25952f,
+  -1.91327f,   -0.0356497f, 1.47611f,   1.27499f,   -1.76108f, -0.578954f
+};
+
+static const float full_pixel_motion_search_based_split_logits_kernel_32[] = {
+  -0.220382f, -0.693902f, 0.424827f, 0.379952f, -0.413791f, -0.326785f,
+  -0.455086f, 0.242402f,  0.307986f, 0.175746f, 0.498901f,  -0.628053f,
+  0.285447f,  0.230052f,  0.415151f, -0.842946f
+};
+
+static const float full_pixel_motion_search_based_split_layer_0_bias_32[] = {
+  -1.80751f, 6.40356f,   -0.0512058f, -4.59163f, -0.369933f, -0.195755f,
+  -0.16648f, -0.599755f, -5.35975f,   -1.21349f, 2.48414f,   1.07096f,
+  -3.66684f, -6.17761f,  4.2159f,     -1.05286f
+};
+
+static const float full_pixel_motion_search_based_split_logits_bias_32[] = {
+  -2.58676f
+};
+
+static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_32 = {
+  NUM_FEATURES_32,
+  NUM_LOGITS_32,
+  NUM_HIDDEN_LAYERS_32,
+  {
+      NUM_LAYER_0_UNITS_32,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_kernel_32,
+      full_pixel_motion_search_based_split_logits_kernel_32,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_bias_32,
+      full_pixel_motion_search_based_split_logits_bias_32,
+  },
+};
+
+static const float full_pixel_motion_search_based_split_thresh_32 = 2.0f;
+
+#undef NUM_HIDDEN_LAYERS_32
+#undef NUM_FEATURES_32
+#undef NUM_LAYER_0_UNITS_32
+#undef NUM_LOGITS_32
+
+// BLOCK_16X16
+#define NUM_HIDDEN_LAYERS_16 1
+#define NUM_FEATURES_16 6
+#define NUM_LAYER_0_UNITS_16 16
+#define NUM_LOGITS_16 1
+
+static const float full_pixel_motion_search_based_split_layer_0_kernel_16[] = {
+  -0.611497f,  -0.0422086f, -0.555957f,   -0.632451f, -0.144179f, -0.152722f,
+  -0.330265f,  -0.419866f,  0.287343f,    0.385295f,  -0.424486f, 0.424281f,
+  2.27442f,    -2.47933f,   5.24731f,     4.33827f,   4.73215f,   3.41909f,
+  1.16058f,    -0.364505f,  0.12207f,     -0.287749f, 0.0509783f, -0.0200119f,
+  1.52907f,    -1.1905f,    -2.56978f,    -3.00186f,  -3.56084f,  -3.89276f,
+  0.00365657f, 1.57125f,    -4.421f,      -2.48803f,  -2.51531f,  -4.28646f,
+  2.52248f,    -1.03377f,   -1.09607f,    -1.44633f,  -1.58736f,  -1.25927f,
+  -1.45841f,   -0.566619f,  -0.246166f,   -0.182289f, -0.238156f, 0.177991f,
+  0.0112509f,  -0.17677f,   -0.485877f,   0.0812852f, 0.104975f,  0.222793f,
+  -0.372858f,  -0.48624f,   -0.00870389f, -0.385019f, 0.405842f,  0.288523f,
+  0.167374f,   -0.204208f,  -8.74148f,    -8.59267f,  -8.42492f,  -8.3778f,
+  -5.57063f,   -0.406818f,  -0.873199f,   -0.896224f, -0.701479f, -0.985736f,
+  -0.625956f,  -0.0446202f, -0.509987f,   -0.321804f, -0.470759f, -0.248556f,
+  -0.369436f,  -0.160828f,  0.0591148f,   0.405218f,  0.142584f,  -0.130106f,
+  0.125321f,   0.0888179f,  7.34822f,     -6.71488f,  -7.06592f,  6.33224f,
+  0.0333619f,  -0.377782f,  0.160767f,    -0.128169f, -0.484818f, -0.311973f
+};
+
+static const float full_pixel_motion_search_based_split_logits_kernel_16[] = {
+  -0.132207f,   0.15176f,   -0.680086f, 0.605921f, -0.43294f,  0.485811f,
+  -0.306286f,   0.551368f,  0.413904f,  0.548748f, -0.437391f, 0.560778f,
+  -0.00685266f, -0.558657f, 0.122127f,  0.260165f
+};
+
+static const float full_pixel_motion_search_based_split_layer_0_bias_16[] = {
+  -0.200928f, -0.074132f, 8.69963f,    -9.00807f,  9.08983f, -6.83586f,
+  -3.89329f,  10.4881f,   -0.0670618f, 0.0f,       9.21614f, 8.41773f,
+  -0.145851f, 0.0f,       -1.43038f,   -0.0460311f
+};
+
+static const float full_pixel_motion_search_based_split_logits_bias_16[] = {
+  -4.19885f
+};
+
+static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_16 = {
+  NUM_FEATURES_16,
+  NUM_LOGITS_16,
+  NUM_HIDDEN_LAYERS_16,
+  {
+      NUM_LAYER_0_UNITS_16,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_kernel_16,
+      full_pixel_motion_search_based_split_logits_kernel_16,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_bias_16,
+      full_pixel_motion_search_based_split_logits_bias_16,
+  },
+};
+
+static const float full_pixel_motion_search_based_split_thresh_16 = 2.0f;
+
+#undef NUM_HIDDEN_LAYERS_16
+#undef NUM_FEATURES_16
+#undef NUM_LAYER_0_UNITS_16
+#undef NUM_LOGITS_16
+
+#if !CONFIG_DISABLE_FULL_PIXEL_SPLIT_8X8
+// BLOCK_8X8
+#define NUM_HIDDEN_LAYERS_8 1
+#define NUM_FEATURES_8 6
+#define NUM_LAYER_0_UNITS_8 16
+#define NUM_LOGITS_8 1
+
+static const float full_pixel_motion_search_based_split_layer_0_kernel_8[] = {
+  0.0370236f,   -0.580211f,  2.0134f,    1.69637f,    2.43181f,   -0.521648f,
+  -0.00375187f, 0.122712f,   -4.74411f,  7.36187f,    5.42574f,   -5.53557f,
+  0.0993344f,   -0.358843f,  0.0765453f, -0.615987f,  -0.754633f, -0.175846f,
+  0.714976f,    0.492862f,   0.346604f,  -1.23922f,   -2.67031f,  2.12749f,
+  1.71511f,     -1.4239f,    2.09396f,   2.42478f,    2.40151f,   2.90487f,
+  0.540813f,    -0.0954257f, -4.57571f,  -4.88078f,   -4.62386f,  -5.75167f,
+  1.35351f,     -1.08114f,   1.43744f,   1.44333f,    0.608153f,  0.193742f,
+  -0.405512f,   -0.155164f,  0.0771456f, -0.473182f,  -0.057984f, 0.140435f,
+  0.743021f,    -0.418589f,  -0.377622f, -0.531411f,  -0.668025f, -0.826607f,
+  1.37834f,     -1.07753f,   0.870466f,  0.516756f,   0.708689f,  0.286795f,
+  -3.97895f,    -0.338629f,  2.79427f,   1.80561f,    1.46275f,   1.50438f,
+  0.0232533f,   -0.43174f,   -0.348251f, 0.0863006f,  0.0321103f, 0.129674f,
+  -1.12024f,    -0.0990596f, -0.283472f, -0.238713f,  -0.239175f, -0.40816f,
+  -0.00106566f, 0.0972736f,  5.19284f,   -3.70862f,   6.39657f,   -5.27588f,
+  -2.08003f,    0.38825f,    2.38771f,   -1.27501f,   -2.45619f,  3.07324f,
+  0.616966f,    -0.451472f,  -0.319365f, 0.00807278f, -0.303261f, -0.351679f
+};
+
+static const float full_pixel_motion_search_based_split_logits_kernel_8[] = {
+  -0.625847f, 0.381323f, 0.342475f, 0.526161f,  -0.665965f, -0.515317f,
+  -0.406218f, 0.568007f, 0.479397f, -0.426116f, 0.615638f,  0.338572f,
+  0.185583f,  0.308031f, 0.260748f, 0.531619f
+};
+
+static const float full_pixel_motion_search_based_split_layer_0_bias_8[] = {
+  4.73775f,  -1.12658f, -0.258038f, -6.06696f, 1.79131f, 2.49609f,
+  4.28388f,  0.0f,      -4.63598f,  3.06034f,  5.31994f, -0.152142f,
+  0.514738f, -1.30098f, 3.00296f,   -3.83481f
+};
+
+static const float full_pixel_motion_search_based_split_logits_bias_8[] = {
+  -3.44508f
+};
+
+static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_8 = {
+  NUM_FEATURES_8,
+  NUM_LOGITS_8,
+  NUM_HIDDEN_LAYERS_8,
+  {
+      NUM_LAYER_0_UNITS_8,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_kernel_8,
+      full_pixel_motion_search_based_split_logits_kernel_8,
+  },
+  {
+      full_pixel_motion_search_based_split_layer_0_bias_8,
+      full_pixel_motion_search_based_split_logits_bias_8,
+  },
+};
+
+static const float full_pixel_motion_search_based_split_thresh_8 = 2.0f;
+
+#undef NUM_HIDDEN_LAYERS_8
+#undef NUM_FEATURES_8
+#undef NUM_LAYER_0_UNITS_8
+#undef NUM_LOGITS_8
+#endif
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

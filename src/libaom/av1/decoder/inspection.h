@@ -75,6 +75,7 @@ struct insp_frame_data {
   // TODO(negge): add per frame CDEF data
   int delta_q_present_flag;
   int delta_q_res;
+  int show_existing_frame;
 };
 
 void ifd_init(insp_frame_data *fd, int frame_width, int frame_height);

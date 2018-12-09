@@ -25,7 +25,6 @@ struct AV1Common;
 typedef struct TileInfo {
   int mi_row_start, mi_row_end;
   int mi_col_start, mi_col_end;
-  int tg_horz_boundary;
   int tile_row;
   int tile_col;
 } TileInfo;
@@ -37,12 +36,6 @@ void av1_tile_init(TileInfo *tile, const struct AV1Common *cm, int row,
 
 void av1_tile_set_row(TileInfo *tile, const struct AV1Common *cm, int row);
 void av1_tile_set_col(TileInfo *tile, const struct AV1Common *cm, int col);
-void av1_get_tile_n_bits(int mi_cols, int *min_log2_tile_cols,
-                         int *max_log2_tile_cols);
-
-// Calculate the correct tile size (width or height) for (1 << log2_tile_num)
-// tiles horizontally or vertically in the frame.
-int get_tile_size(int mi_frame_size, int log2_tile_num, int *ntiles);
 
 int av1_get_sb_rows_in_tile(struct AV1Common *cm, TileInfo tile);
 int av1_get_sb_cols_in_tile(struct AV1Common *cm, TileInfo tile);
@@ -61,6 +54,7 @@ AV1PixelRect av1_get_tile_rect(const TileInfo *tile_info,
 #define MAX_TILE_WIDTH (4096)        // Max Tile width in pixels
 #define MAX_TILE_AREA (4096 * 2304)  // Maximum tile area in pixels
 
+void av1_get_uniform_tile_size(const struct AV1Common *cm, int *w, int *h);
 void av1_get_tile_limits(struct AV1Common *const cm);
 void av1_calculate_tile_cols(struct AV1Common *const cm);
 void av1_calculate_tile_rows(struct AV1Common *const cm);

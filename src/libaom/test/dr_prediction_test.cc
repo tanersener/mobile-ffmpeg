@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2018, Alliance for Open Media. All rights reserved
  *
  * This source code is subject to the terms of the BSD 2 Clause License and
@@ -162,6 +162,7 @@ class DrPredTest : public ::testing::TestWithParam<DrPredFunc<FuncType> > {
 
     for (int i = 0; i < kDstSize; ++i) {
       dst_ref_[i] = 0;
+      dst_tst_[i] = 0;
     }
   }
 
@@ -186,6 +187,10 @@ class DrPredTest : public ::testing::TestWithParam<DrPredFunc<FuncType> > {
                                                 above_, left_, upsample_above_,
                                                 upsample_left_, dx_, dy_, bd_));
       }
+    } else {
+      for (int i = 0; i < kDstSize; ++i) {
+        dst_ref_[i] = dst_tst_[i];
+      }
     }
     aom_usec_timer_mark(&timer);
     const int tst_time = static_cast<int>(aom_usec_timer_elapsed(&timer));
@@ -193,18 +198,21 @@ class DrPredTest : public ::testing::TestWithParam<DrPredFunc<FuncType> > {
     OutputTimes(kNumTests, ref_time, tst_time, tx);
   }
 
-  void RunTest(bool speedtest, int p_angle) {
-    for (int i = 0; i < kBufSize; ++i) {
-      above_data_[i] = left_data_[i] = (1 << bd_) - 1;
+  void RunTest(bool speedtest, bool needsaturation, int p_angle) {
+    if (needsaturation) {
+      for (int i = 0; i < kBufSize; ++i) {
+        above_data_[i] = left_data_[i] = (1 << bd_) - 1;
+      }
     }
-
     for (int tx = 0; tx < TX_SIZES_ALL; ++tx) {
       if (params_.tst_fn == NULL) {
         for (int i = 0; i < kDstSize; ++i) {
           dst_tst_[i] = (1 << bd_) - 1;
+          dst_ref_[i] = (1 << bd_) - 1;
         }
       } else {
         for (int i = 0; i < kDstSize; ++i) {
+          dst_ref_[i] = 0;
           dst_tst_[i] = 0;
         }
       }
@@ -287,7 +295,7 @@ TEST_P(LowbdDrPredTest, SaturatedValues) {
     for (int angle = start_angle_; angle < stop_angle_; ++angle) {
       dx_ = av1_get_dx(angle);
       dy_ = av1_get_dy(angle);
-      if (dx_ && dy_) RunTest(false, angle);
+      if (dx_ && dy_) RunTest(false, true, angle);
     }
   }
 }
@@ -301,7 +309,7 @@ TEST_P(LowbdDrPredTest, DISABLED_Speed) {
       dy_ = av1_get_dy(angle);
       printf("enable_upsample: %d angle: %d ~~~~~~~~~~~~~~~\n",
              enable_upsample_, angle);
-      if (dx_ && dy_) RunTest(true, angle);
+      if (dx_ && dy_) RunTest(true, false, angle);
     }
   }
 }
@@ -325,21 +333,7 @@ TEST_P(HighbdDrPredTest, SaturatedValues) {
     for (int angle = start_angle_; angle < stop_angle_; ++angle) {
       dx_ = av1_get_dx(angle);
       dy_ = av1_get_dy(angle);
-      if (dx_ && dy_) RunTest(false, angle);
-    }
-  }
-}
-
-TEST_P(HighbdDrPredTest, DISABLED_Speed) {
-  const int angles[] = { 3, 45, 87 };
-  for (enable_upsample_ = 0; enable_upsample_ < 2; ++enable_upsample_) {
-    for (int i = 0; i < 3; ++i) {
-      const int angle = angles[i] + start_angle_;
-      dx_ = av1_get_dx(angle);
-      dy_ = av1_get_dy(angle);
-      printf("enable_upsample: %d angle: %d ~~~~~~~~~~~~~~~\n",
-             enable_upsample_, angle);
-      if (dx_ && dy_) RunTest(true, angle);
+      if (dx_ && dy_) RunTest(false, true, angle);
     }
   }
 }
@@ -365,5 +359,73 @@ INSTANTIATE_TEST_CASE_P(
                                NULL, AOM_BITS_10, kZ3Start),
         DrPredFunc<DrPred_Hbd>(&z3_wrapper_hbd<av1_highbd_dr_prediction_z3_c>,
                                NULL, AOM_BITS_12, kZ3Start)));
+
+#if HAVE_AVX2
+INSTANTIATE_TEST_CASE_P(
+    AVX2, HighbdDrPredTest,
+    ::testing::Values(DrPredFunc<DrPred_Hbd>(
+                          &z1_wrapper_hbd<av1_highbd_dr_prediction_z1_c>,
+                          &z1_wrapper_hbd<av1_highbd_dr_prediction_z1_avx2>,
+                          AOM_BITS_8, kZ1Start),
+                      DrPredFunc<DrPred_Hbd>(
+                          &z1_wrapper_hbd<av1_highbd_dr_prediction_z1_c>,
+                          &z1_wrapper_hbd<av1_highbd_dr_prediction_z1_avx2>,
+                          AOM_BITS_10, kZ1Start),
+                      DrPredFunc<DrPred_Hbd>(
+                          &z1_wrapper_hbd<av1_highbd_dr_prediction_z1_c>,
+                          &z1_wrapper_hbd<av1_highbd_dr_prediction_z1_avx2>,
+                          AOM_BITS_12, kZ1Start),
+                      /*DrPredFunc<DrPred_Hbd>(
+                          &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_c>,
+                          &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_avx2>,
+                          AOM_BITS_8, kZ2Start),
+                      DrPredFunc<DrPred_Hbd>(
+                          &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_c>,
+                          &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_avx2>,
+                          AOM_BITS_10, kZ2Start),
+                      DrPredFunc<DrPred_Hbd>(
+                          &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_c>,
+                          &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_avx2>,
+                          AOM_BITS_12, kZ2Start),*/
+                      DrPredFunc<DrPred_Hbd>(
+                          &z3_wrapper_hbd<av1_highbd_dr_prediction_z3_c>,
+                          &z3_wrapper_hbd<av1_highbd_dr_prediction_z3_avx2>,
+                          AOM_BITS_8, kZ3Start),
+                      DrPredFunc<DrPred_Hbd>(
+                          &z3_wrapper_hbd<av1_highbd_dr_prediction_z3_c>,
+                          &z3_wrapper_hbd<av1_highbd_dr_prediction_z3_avx2>,
+                          AOM_BITS_10, kZ3Start),
+                      DrPredFunc<DrPred_Hbd>(
+                          &z3_wrapper_hbd<av1_highbd_dr_prediction_z3_c>,
+                          &z3_wrapper_hbd<av1_highbd_dr_prediction_z3_avx2>,
+                          AOM_BITS_12, kZ3Start)));
+
+TEST_P(HighbdDrPredTest, DISABLED_Speed) {
+  const int angles[] = { 3, 45, 87 };
+  for (enable_upsample_ = 0; enable_upsample_ < 2; ++enable_upsample_) {
+    for (int i = 0; i < 3; ++i) {
+      int angle = angles[i] + start_angle_;
+      dx_ = av1_get_dx(angle);
+      dy_ = av1_get_dy(angle);
+      printf("enable_upsample: %d angle: %d ~~~~~~~~~~~~~~~\n",
+             enable_upsample_, angle);
+      if (dx_ && dy_) RunTest(true, false, angle);
+    }
+  }
+}
+
+TEST_P(HighbdDrPredTest, OperationCheck) {
+  if (params_.tst_fn == NULL) return;
+  // const int angles[] = { 3, 45, 81, 87, 93, 100, 145, 187, 199, 260 };
+  for (enable_upsample_ = 0; enable_upsample_ < 2; ++enable_upsample_) {
+    for (int angle = start_angle_; angle < stop_angle_; angle++) {
+      dx_ = av1_get_dx(angle);
+      dy_ = av1_get_dy(angle);
+      if (dx_ && dy_) RunTest(false, false, angle);
+    }
+  }
+}
+
+#endif  // HAVE_AVX2
 
 }  // namespace

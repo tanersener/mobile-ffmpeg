@@ -70,24 +70,24 @@ static int64_t try_filter_frame(const YV12_BUFFER_CONFIG *sd,
   // TODO(any): please enable multi-thread and remove the flag when loop
   // filter mask is compatible with multi-thread.
   if (cpi->num_workers > 1)
-    av1_loop_filter_frame_mt(cm->frame_to_show, cm, &cpi->td.mb.e_mbd, plane,
+    av1_loop_filter_frame_mt(&cm->cur_frame->buf, cm, &cpi->td.mb.e_mbd, plane,
                              plane + 1, partial_frame,
 #if LOOP_FILTER_BITMASK
                              0,
 #endif
                              cpi->workers, cpi->num_workers, &cpi->lf_row_sync);
   else
-    av1_loop_filter_frame(cm->frame_to_show, cm, &cpi->td.mb.e_mbd,
+    av1_loop_filter_frame(&cm->cur_frame->buf, cm, &cpi->td.mb.e_mbd,
 #if LOOP_FILTER_BITMASK
                           0,
 #endif
                           plane, plane + 1, partial_frame);
 
-  filt_err = aom_get_sse_plane(sd, cm->frame_to_show, plane,
+  filt_err = aom_get_sse_plane(sd, &cm->cur_frame->buf, plane,
                                cm->seq_params.use_highbitdepth);
 
   // Re-instate the unfiltered frame
-  yv12_copy_plane(&cpi->last_frame_uf, cm->frame_to_show, plane);
+  yv12_copy_plane(&cpi->last_frame_uf, &cm->cur_frame->buf, plane);
 
   return filt_err;
 }
@@ -120,7 +120,7 @@ static int search_filter_level(const YV12_BUFFER_CONFIG *sd, AV1_COMP *cpi,
 
   // Set each entry to -1
   memset(ss_err, 0xFF, sizeof(ss_err));
-  yv12_copy_plane(cm->frame_to_show, &cpi->last_frame_uf, plane);
+  yv12_copy_plane(&cm->cur_frame->buf, &cpi->last_frame_uf, plane);
   best_err = try_filter_frame(sd, cpi, filt_mid, partial_frame, plane, dir);
   filt_best = filt_mid;
   ss_err[filt_mid] = best_err;
@@ -213,7 +213,7 @@ void av1_pick_filter_level(const YV12_BUFFER_CONFIG *sd, AV1_COMP *cpi,
     int filt_guess;
     switch (cm->seq_params.bit_depth) {
       case AOM_BITS_8:
-        filt_guess = (cm->frame_type == KEY_FRAME)
+        filt_guess = (cm->current_frame.frame_type == KEY_FRAME)
                          ? ROUND_POWER_OF_TWO(q * 17563 - 421574, 18)
                          : ROUND_POWER_OF_TWO(q * 6017 + 650707, 18);
         break;
@@ -229,7 +229,8 @@ void av1_pick_filter_level(const YV12_BUFFER_CONFIG *sd, AV1_COMP *cpi,
                "or AOM_BITS_12");
         return;
     }
-    if (cm->seq_params.bit_depth != AOM_BITS_8 && cm->frame_type == KEY_FRAME)
+    if (cm->seq_params.bit_depth != AOM_BITS_8 &&
+        cm->current_frame.frame_type == KEY_FRAME)
       filt_guess -= 4;
     // TODO(chengchen): retrain the model for Y, U, V filter levels
     lf->filter_level[0] = clamp(filt_guess, min_filter_level, max_filter_level);

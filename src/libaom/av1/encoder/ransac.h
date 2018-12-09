@@ -22,6 +22,9 @@
 typedef int (*RansacFunc)(int *matched_points, int npoints,
                           int *num_inliers_by_motion, double *params_by_motion,
                           int num_motions);
+typedef int (*RansacFuncDouble)(double *matched_points, int npoints,
+                                int *num_inliers_by_motion,
+                                double *params_by_motion, int num_motions);
 
 /* Each of these functions fits a motion model from a set of
    corresponding points in 2 frames using RANSAC. */
@@ -32,4 +35,16 @@ int ransac_rotzoom(int *matched_points, int npoints, int *num_inliers_by_motion,
 int ransac_translation(int *matched_points, int npoints,
                        int *num_inliers_by_motion, double *params_by_motion,
                        int num_motions);
+int ransac_translation_double_prec(double *matched_points, int npoints,
+                                   int *num_inliers_by_motion,
+                                   double *params_by_motion,
+                                   int num_desired_motions);
+int ransac_rotzoom_double_prec(double *matched_points, int npoints,
+                               int *num_inliers_by_motion,
+                               double *params_by_motion,
+                               int num_desired_motions);
+int ransac_affine_double_prec(double *matched_points, int npoints,
+                              int *num_inliers_by_motion,
+                              double *params_by_motion,
+                              int num_desired_motions);
 #endif  // AOM_AV1_ENCODER_RANSAC_H_

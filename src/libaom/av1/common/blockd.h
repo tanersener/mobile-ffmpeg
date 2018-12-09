@@ -156,8 +156,6 @@ static INLINE int is_masked_compound_type(COMPOUND_TYPE type) {
    modes for the Y blocks to the left and above us; for interframes, there
    is a single probability table. */
 
-typedef int8_t MV_REFERENCE_FRAME;
-
 typedef struct {
   // Number of base colors for Y (0) and UV (1)
   uint8_t palette_size[2];
@@ -166,8 +164,8 @@ typedef struct {
 } PALETTE_MODE_INFO;
 
 typedef struct {
-  uint8_t use_filter_intra;
   FILTER_INTRA_MODE filter_intra_mode;
+  uint8_t use_filter_intra;
 } FILTER_INTRA_MODE_INFO;
 
 static const PREDICTION_MODE fimode_to_intradir[FILTER_INTRA_MODES] = {
@@ -192,6 +190,11 @@ typedef struct RD_STATS {
   int64_t ref_rdcost;
   int zero_rate;
   uint8_t invalid_rate;
+#if CONFIG_ONE_PASS_SVM
+  int eob, eob_0, eob_1, eob_2, eob_3;
+  int64_t rd, rd_0, rd_1, rd_2, rd_3;
+  int64_t y_sse, sse_0, sse_1, sse_2, sse_3;
+#endif
 #if CONFIG_RD_DEBUG
   int txb_coeff_cost[MAX_MB_PLANE];
   int txb_coeff_cost_map[MAX_MB_PLANE][TXB_COEFF_COST_MAP_SIZE]
@@ -205,8 +208,8 @@ typedef struct {
   int wedge_index;
   int wedge_sign;
   DIFFWTD_MASK_TYPE mask_type;
-  uint8_t *seg_mask;
   COMPOUND_TYPE type;
+  uint8_t *seg_mask;
 } INTERINTER_COMPOUND_DATA;
 
 #define INTER_TX_SIZE_BUF_LEN 16
@@ -216,29 +219,15 @@ typedef struct MB_MODE_INFO {
   // Common for both INTER and INTRA blocks
   BLOCK_SIZE sb_type;
   PREDICTION_MODE mode;
-  TX_SIZE tx_size;
-  uint8_t inter_tx_size[INTER_TX_SIZE_BUF_LEN];
-  int8_t skip;
-  int8_t skip_mode;
-  int8_t segment_id;
-  int8_t seg_id_predicted;  // valid only when temporal_update is enabled
-
   // Only for INTRA blocks
   UV_PREDICTION_MODE uv_mode;
 
-  PALETTE_MODE_INFO palette_mode_info;
-  uint8_t use_intrabc;
-
   // Only for INTER blocks
   InterpFilters interp_filters;
-  MV_REFERENCE_FRAME ref_frame[2];
 
   TX_TYPE txk_type[TXK_TYPE_BUF_LEN];
 
   FILTER_INTRA_MODE_INFO filter_intra_mode_info;
-
-  // The actual prediction angle is the base angle + (angle_delta * step).
-  int8_t angle_delta[PLANE_TYPES];
 
   // interintra members
   INTERINTRA_MODE interintra_mode;
@@ -251,10 +240,7 @@ typedef struct MB_MODE_INFO {
   MOTION_MODE motion_mode;
   int overlappable_neighbors[2];
   int_mv mv[2];
-  uint8_t ref_mv_idx;
   PARTITION_TYPE partition;
-  /* deringing gain *per-superblock* */
-  int8_t cdef_strength;
   int current_qindex;
   int delta_lf_from_base;
   int delta_lf[FRAME_LF_COUNT];
@@ -273,6 +259,20 @@ typedef struct MB_MODE_INFO {
 
   int compound_idx;
   int comp_group_idx;
+  PALETTE_MODE_INFO palette_mode_info;
+  MV_REFERENCE_FRAME ref_frame[2];
+  int8_t skip;
+  int8_t skip_mode;
+  uint8_t inter_tx_size[INTER_TX_SIZE_BUF_LEN];
+  TX_SIZE tx_size;
+  int8_t segment_id;
+  int8_t seg_id_predicted;  // valid only when temporal_update is enabled
+  uint8_t use_intrabc;
+  // The actual prediction angle is the base angle + (angle_delta * step).
+  int8_t angle_delta[PLANE_TYPES];
+  /* deringing gain *per-superblock* */
+  int8_t cdef_strength;
+  uint8_t ref_mv_idx;
 } MB_MODE_INFO;
 
 static INLINE int is_intrabc_block(const MB_MODE_INFO *mbmi) {
@@ -428,13 +428,6 @@ typedef struct macroblockd_plane {
 #define BLOCK_OFFSET(x, i) \
   ((x) + (i) * (1 << (tx_size_wide_log2[0] + tx_size_high_log2[0])))
 
-typedef struct RefBuffer {
-  int idx;      // frame buf idx
-  int map_idx;  // frame map idx
-  YV12_BUFFER_CONFIG *buf;
-  struct scale_factors sf;
-} RefBuffer;
-
 typedef struct {
   DECLARE_ALIGNED(16, InterpKernel, vfilter);
   DECLARE_ALIGNED(16, InterpKernel, hfilter);
@@ -496,6 +489,8 @@ typedef struct jnt_comp_params {
   int bck_offset;
 } JNT_COMP_PARAMS;
 
+struct scale_factors;
+
 // Most/all of the pointers are mere pointers to actual arrays are allocated
 // elsewhere. This is mostly for coding convenience.
 typedef struct macroblockd {
@@ -522,8 +517,8 @@ typedef struct macroblockd {
   int mb_to_top_edge;
   int mb_to_bottom_edge;
 
-  /* pointers to reference frames */
-  const RefBuffer *block_refs[2];
+  /* pointers to reference frame scale factors */
+  const struct scale_factors *block_ref_scale_factors[2];
 
   /* pointer to current frame */
   const YV12_BUFFER_CONFIG *cur_buf;
@@ -646,19 +641,19 @@ static INLINE BLOCK_SIZE get_partition_subsize(BLOCK_SIZE bsize,
 static TX_TYPE intra_mode_to_tx_type(const MB_MODE_INFO *mbmi,
                                      PLANE_TYPE plane_type) {
   static const TX_TYPE _intra_mode_to_tx_type[INTRA_MODES] = {
-    DCT_DCT,    // DC
-    ADST_DCT,   // V
-    DCT_ADST,   // H
-    DCT_DCT,    // D45
-    ADST_ADST,  // D135
-    ADST_DCT,   // D117
-    DCT_ADST,   // D153
-    DCT_ADST,   // D207
-    ADST_DCT,   // D63
-    ADST_ADST,  // SMOOTH
-    ADST_DCT,   // SMOOTH_V
-    DCT_ADST,   // SMOOTH_H
-    ADST_ADST,  // PAETH
+    DCT_DCT,    // DC_PRED
+    ADST_DCT,   // V_PRED
+    DCT_ADST,   // H_PRED
+    DCT_DCT,    // D45_PRED
+    ADST_ADST,  // D135_PRED
+    ADST_DCT,   // D113_PRED
+    DCT_ADST,   // D157_PRED
+    DCT_ADST,   // D203_PRED
+    ADST_DCT,   // D67_PRED
+    ADST_ADST,  // SMOOTH_PRED
+    ADST_DCT,   // SMOOTH_V_PRED
+    DCT_ADST,   // SMOOTH_H_PRED
+    ADST_ADST,  // PAETH_PRED
   };
   const PREDICTION_MODE mode =
       (plane_type == PLANE_TYPE_Y) ? mbmi->mode : get_uv_mode(mbmi->uv_mode);
@@ -1045,7 +1040,8 @@ motion_mode_allowed(const WarpedMotionParams *gm_params, const MACROBLOCKD *xd,
     if (!check_num_overlappable_neighbors(mbmi)) return SIMPLE_TRANSLATION;
     assert(!has_second_ref(mbmi));
     if (mbmi->num_proj_ref >= 1 &&
-        (allow_warped_motion && !av1_is_scaled(&(xd->block_refs[0]->sf)))) {
+        (allow_warped_motion &&
+         !av1_is_scaled(xd->block_ref_scale_factors[0]))) {
       if (xd->cur_frame_force_integer_mv) {
         return OBMC_CAUSAL;
       }

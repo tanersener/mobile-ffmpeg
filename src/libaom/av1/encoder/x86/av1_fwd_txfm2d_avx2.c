@@ -1436,45 +1436,6 @@ static INLINE void fidentity16x32_new_avx2(const __m256i *input,
   }
 }
 
-static INLINE void av1_round_shift_array_32_avx2(__m256i *input,
-                                                 __m256i *output,
-                                                 const int size,
-                                                 const int bit) {
-  if (bit > 0) {
-    int i;
-    for (i = 0; i < size; i++) {
-      output[i] = av1_round_shift_32_avx2(input[i], bit);
-    }
-  } else {
-    int i;
-    for (i = 0; i < size; i++) {
-      output[i] = _mm256_slli_epi32(input[i], -bit);
-    }
-  }
-}
-
-static INLINE void av1_round_shift_rect_array_32_avx2(__m256i *input,
-                                                      __m256i *output,
-                                                      const int size,
-                                                      const int bit) {
-  const __m256i sqrt2 = _mm256_set1_epi32(NewSqrt2);
-  if (bit > 0) {
-    int i;
-    for (i = 0; i < size; i++) {
-      const __m256i r0 = av1_round_shift_32_avx2(input[i], bit);
-      const __m256i r1 = _mm256_mullo_epi32(sqrt2, r0);
-      output[i] = av1_round_shift_32_avx2(r1, NewSqrt2Bits);
-    }
-  } else {
-    int i;
-    for (i = 0; i < size; i++) {
-      const __m256i r0 = _mm256_slli_epi32(input[i], -bit);
-      const __m256i r1 = _mm256_mullo_epi32(sqrt2, r0);
-      output[i] = av1_round_shift_32_avx2(r1, NewSqrt2Bits);
-    }
-  }
-}
-
 static INLINE void transpose_32_8x8_avx2(int stride, const __m256i *inputA,
                                          __m256i *output) {
   __m256i temp0 = _mm256_unpacklo_epi32(inputA[0], inputA[2]);
@@ -1539,6 +1500,9 @@ static INLINE void store_rect_buffer_16bit_to_32bit_w16_avx2(
     store_rect_16bit_to_32bit_avx2(in[i], out + i * stride);
   }
 }
+
+typedef void (*transform_1d_avx2)(const __m256i *input, __m256i *output,
+                                  int8_t cos_bit);
 
 static const transform_1d_avx2 col_txfm16x32_arr[TX_TYPES] = {
   fdct16x32_new_avx2,       // DCT_DCT
@@ -1885,8 +1849,8 @@ static void lowbd_fwd_txfm2d_64x32_avx2(const int16_t *input, int32_t *output,
     }
     av1_fdct64_new_avx2(bufA, bufA, cos_bit_row);
     av1_fdct64_new_avx2(bufB, bufB, cos_bit_row);
-    av1_round_shift_rect_array_32_avx2(bufA, bufA, 32, -shift[2]);
-    av1_round_shift_rect_array_32_avx2(bufB, bufB, 32, -shift[2]);
+    av1_round_shift_rect_array_32_avx2(bufA, bufA, 32, -shift[2], NewSqrt2);
+    av1_round_shift_rect_array_32_avx2(bufB, bufB, 32, -shift[2], NewSqrt2);
 
     int32_t *output8 = output + 16 * 32 * i;
     for (int j = 0; j < 4; ++j) {
@@ -1935,8 +1899,8 @@ static void lowbd_fwd_txfm2d_32x64_avx2(const int16_t *input, int32_t *output,
     }
     av1_fdct32_new_avx2(bufA, bufA, cos_bit_row);
     av1_fdct32_new_avx2(bufB, bufB, cos_bit_row);
-    av1_round_shift_rect_array_32_avx2(bufA, bufA, 32, -shift[2]);
-    av1_round_shift_rect_array_32_avx2(bufB, bufB, 32, -shift[2]);
+    av1_round_shift_rect_array_32_avx2(bufA, bufA, 32, -shift[2], NewSqrt2);
+    av1_round_shift_rect_array_32_avx2(bufB, bufB, 32, -shift[2], NewSqrt2);
 
     int32_t *output8 = output + 16 * 32 * i;
     for (int j = 0; j < 4; ++j) {

@@ -11,6 +11,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 #include <set>
 #include <string>
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
@@ -116,7 +117,7 @@ TEST_P(TestVectorTest, MD5Match) {
   SCOPED_TRACE(str);
 
   // Open compressed video file.
-  testing::internal::scoped_ptr<libaom_test::CompressedVideoSource> video;
+  std::unique_ptr<libaom_test::CompressedVideoSource> video;
   if (filename.substr(filename.length() - 3, 3) == "ivf") {
     video.reset(new libaom_test::IVFVideoSource(filename));
   } else if (filename.substr(filename.length() - 4, 4) == "webm" ||

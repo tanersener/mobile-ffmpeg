@@ -1072,13 +1072,6 @@ void av1_loop_restoration_filter_unit(
   }
 }
 
-static void filter_frame_on_tile(int tile_row, int tile_col, void *priv,
-                                 AV1_COMMON *cm) {
-  (void)tile_col;
-  FilterFrameCtxt *ctxt = (FilterFrameCtxt *)priv;
-  ctxt->tile_stripe0 = (tile_row == 0) ? 0 : cm->rst_end_stripe[tile_row - 1];
-}
-
 static void filter_frame_on_unit(const RestorationTileLimits *limits,
                                  const AV1PixelRect *tile_rect,
                                  int rest_unit_idx, void *priv, int32_t *tmpbuf,
@@ -1141,7 +1134,7 @@ void av1_loop_restoration_filter_frame_init(AV1LrStruct *lr_ctxt,
     lr_plane_ctxt->data_stride = frame->strides[is_uv];
     lr_plane_ctxt->dst_stride = lr_ctxt->dst->strides[is_uv];
     lr_plane_ctxt->tile_rect = av1_whole_frame_rect(cm, is_uv);
-    filter_frame_on_tile(LR_TILE_ROW, LR_TILE_COL, lr_plane_ctxt, cm);
+    lr_plane_ctxt->tile_stripe0 = 0;
   }
 }
 
@@ -1150,9 +1143,9 @@ void av1_loop_restoration_copy_planes(AV1LrStruct *loop_rest_ctxt,
   typedef void (*copy_fun)(const YV12_BUFFER_CONFIG *src_ybc,
                            YV12_BUFFER_CONFIG *dst_ybc, int hstart, int hend,
                            int vstart, int vend);
-  static const copy_fun copy_funs[3] = {
-    aom_yv12_partial_copy_y, aom_yv12_partial_copy_u, aom_yv12_partial_copy_v
-  };
+  static const copy_fun copy_funs[3] = { aom_yv12_partial_coloc_copy_y,
+                                         aom_yv12_partial_coloc_copy_u,
+                                         aom_yv12_partial_coloc_copy_v };
 
   for (int plane = 0; plane < num_planes; ++plane) {
     if (cm->rst_info[plane].frame_restoration_type == RESTORE_NONE) continue;

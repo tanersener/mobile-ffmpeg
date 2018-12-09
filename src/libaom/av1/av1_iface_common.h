@@ -52,11 +52,9 @@ static void yuvconfig2image(aom_image_t *img, const YV12_BUFFER_CONFIG *yv12,
   img->planes[AOM_PLANE_Y] = yv12->y_buffer;
   img->planes[AOM_PLANE_U] = yv12->u_buffer;
   img->planes[AOM_PLANE_V] = yv12->v_buffer;
-  img->planes[AOM_PLANE_ALPHA] = NULL;
   img->stride[AOM_PLANE_Y] = yv12->y_stride;
   img->stride[AOM_PLANE_U] = yv12->uv_stride;
   img->stride[AOM_PLANE_V] = yv12->uv_stride;
-  img->stride[AOM_PLANE_ALPHA] = yv12->y_stride;
   if (yv12->flags & YV12_FLAG_HIGHBITDEPTH) {
     // aom_image_t uses byte strides and a pointer to the first byte
     // of the image.
@@ -65,17 +63,16 @@ static void yuvconfig2image(aom_image_t *img, const YV12_BUFFER_CONFIG *yv12,
     img->planes[AOM_PLANE_Y] = (uint8_t *)CONVERT_TO_SHORTPTR(yv12->y_buffer);
     img->planes[AOM_PLANE_U] = (uint8_t *)CONVERT_TO_SHORTPTR(yv12->u_buffer);
     img->planes[AOM_PLANE_V] = (uint8_t *)CONVERT_TO_SHORTPTR(yv12->v_buffer);
-    img->planes[AOM_PLANE_ALPHA] = NULL;
     img->stride[AOM_PLANE_Y] = 2 * yv12->y_stride;
     img->stride[AOM_PLANE_U] = 2 * yv12->uv_stride;
     img->stride[AOM_PLANE_V] = 2 * yv12->uv_stride;
-    img->stride[AOM_PLANE_ALPHA] = 2 * yv12->y_stride;
   }
   img->bps = bps;
   img->user_priv = user_priv;
   img->img_data = yv12->buffer_alloc;
   img->img_data_owner = 0;
   img->self_allocd = 0;
+  img->sz = yv12->frame_size;
 }
 
 static aom_codec_err_t image2yuvconfig(const aom_image_t *img,

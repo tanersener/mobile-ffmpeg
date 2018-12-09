@@ -636,22 +636,19 @@ void av1_jnt_comp_weight_assign(const AV1_COMMON *cm, const MB_MODE_INFO *mbmi,
   }
 
   *use_jnt_comp_avg = 1;
-  const int bck_idx = cm->frame_refs[mbmi->ref_frame[0] - LAST_FRAME].idx;
-  const int fwd_idx = cm->frame_refs[mbmi->ref_frame[1] - LAST_FRAME].idx;
-  const int cur_frame_index = cm->cur_frame->cur_frame_offset;
+  const RefCntBuffer *const bck_buf = get_ref_frame_buf(cm, mbmi->ref_frame[0]);
+  const RefCntBuffer *const fwd_buf = get_ref_frame_buf(cm, mbmi->ref_frame[1]);
+  const int cur_frame_index = cm->cur_frame->order_hint;
   int bck_frame_index = 0, fwd_frame_index = 0;
 
-  if (bck_idx >= 0) {
-    bck_frame_index = cm->buffer_pool->frame_bufs[bck_idx].cur_frame_offset;
-  }
+  if (bck_buf != NULL) bck_frame_index = bck_buf->order_hint;
+  if (fwd_buf != NULL) fwd_frame_index = fwd_buf->order_hint;
 
-  if (fwd_idx >= 0) {
-    fwd_frame_index = cm->buffer_pool->frame_bufs[fwd_idx].cur_frame_offset;
-  }
-
-  int d0 = clamp(abs(get_relative_dist(cm, fwd_frame_index, cur_frame_index)),
+  int d0 = clamp(abs(get_relative_dist(&cm->seq_params.order_hint_info,
+                                       fwd_frame_index, cur_frame_index)),
                  0, MAX_FRAME_DISTANCE);
-  int d1 = clamp(abs(get_relative_dist(cm, cur_frame_index, bck_frame_index)),
+  int d1 = clamp(abs(get_relative_dist(&cm->seq_params.order_hint_info,
+                                       cur_frame_index, bck_frame_index)),
                  0, MAX_FRAME_DISTANCE);
 
   const int order = d0 <= d1;
@@ -801,6 +798,53 @@ void av1_modify_neighbor_predictor_for_obmc(MB_MODE_INFO *mbmi) {
   return;
 }
 
+struct obmc_check_mv_field_ctxt {
+  MB_MODE_INFO *current_mi;
+  int mv_field_check_result;
+};
+
+static INLINE void obmc_check_identical_mv(MACROBLOCKD *xd, int rel_mi_col,
+                                           uint8_t nb_mi_width,
+                                           MB_MODE_INFO *nb_mi, void *fun_ctxt,
+                                           const int num_planes) {
+  (void)xd;
+  (void)rel_mi_col;
+  (void)nb_mi_width;
+  (void)num_planes;
+  struct obmc_check_mv_field_ctxt *ctxt =
+      (struct obmc_check_mv_field_ctxt *)fun_ctxt;
+  const MB_MODE_INFO *current_mi = ctxt->current_mi;
+
+  if (ctxt->mv_field_check_result == 0) return;
+
+  if (nb_mi->ref_frame[0] != current_mi->ref_frame[0] ||
+      nb_mi->mv[0].as_int != current_mi->mv[0].as_int ||
+      nb_mi->interp_filters != current_mi->interp_filters) {
+    ctxt->mv_field_check_result = 0;
+  }
+  return;
+}
+
+// Check if the neighbors' motions used by obmc have same parameters as for
+// the current block. If all the parameters are identical, obmc will produce
+// the same prediction as from regular bmc, therefore we can skip the
+// overlapping operations for less complexity. The parameters checked include
+// reference frame, motion vector, and interpolation filter.
+int av1_check_identical_obmc_mv_field(const AV1_COMMON *cm, MACROBLOCKD *xd,
+                                      int mi_row, int mi_col) {
+  const BLOCK_SIZE bsize = xd->mi[0]->sb_type;
+  struct obmc_check_mv_field_ctxt mv_field_check_ctxt = { xd->mi[0], 1 };
+
+  foreach_overlappable_nb_above(cm, xd, mi_col,
+                                max_neighbor_obmc[mi_size_wide_log2[bsize]],
+                                obmc_check_identical_mv, &mv_field_check_ctxt);
+  foreach_overlappable_nb_left(cm, xd, mi_row,
+                               max_neighbor_obmc[mi_size_high_log2[bsize]],
+                               obmc_check_identical_mv, &mv_field_check_ctxt);
+
+  return mv_field_check_ctxt.mv_field_check_result;
+}
+
 struct obmc_inter_pred_ctxt {
   uint8_t **adjacent;
   int *adjacent_stride;
@@ -922,14 +966,15 @@ void av1_setup_build_prediction_by_above_pred(
   for (int ref = 0; ref < num_refs; ++ref) {
     const MV_REFERENCE_FRAME frame = above_mbmi->ref_frame[ref];
 
-    const RefBuffer *const ref_buf = &ctxt->cm->frame_refs[frame - LAST_FRAME];
-
-    xd->block_refs[ref] = ref_buf;
-    if ((!av1_is_valid_scale(&ref_buf->sf)))
+    const RefCntBuffer *const ref_buf = get_ref_frame_buf(ctxt->cm, frame);
+    const struct scale_factors *const sf =
+        get_ref_scale_factors_const(ctxt->cm, frame);
+    xd->block_ref_scale_factors[ref] = sf;
+    if ((!av1_is_valid_scale(sf)))
       aom_internal_error(xd->error_info, AOM_CODEC_UNSUP_BITSTREAM,
                          "Reference frame has invalid dimensions");
-    av1_setup_pre_planes(xd, ref, ref_buf->buf, ctxt->mi_row, above_mi_col,
-                         &ref_buf->sf, num_planes);
+    av1_setup_pre_planes(xd, ref, &ref_buf->buf, ctxt->mi_row, above_mi_col, sf,
+                         num_planes);
   }
 
   xd->mb_to_left_edge = 8 * MI_SIZE * (-above_mi_col);
@@ -959,14 +1004,16 @@ void av1_setup_build_prediction_by_left_pred(MACROBLOCKD *xd, int rel_mi_row,
   for (int ref = 0; ref < num_refs; ++ref) {
     const MV_REFERENCE_FRAME frame = left_mbmi->ref_frame[ref];
 
-    const RefBuffer *const ref_buf = &ctxt->cm->frame_refs[frame - LAST_FRAME];
+    const RefCntBuffer *const ref_buf = get_ref_frame_buf(ctxt->cm, frame);
+    const struct scale_factors *const ref_scale_factors =
+        get_ref_scale_factors_const(ctxt->cm, frame);
 
-    xd->block_refs[ref] = ref_buf;
-    if ((!av1_is_valid_scale(&ref_buf->sf)))
+    xd->block_ref_scale_factors[ref] = ref_scale_factors;
+    if ((!av1_is_valid_scale(ref_scale_factors)))
       aom_internal_error(xd->error_info, AOM_CODEC_UNSUP_BITSTREAM,
                          "Reference frame has invalid dimensions");
-    av1_setup_pre_planes(xd, ref, ref_buf->buf, left_mi_row, ctxt->mi_col,
-                         &ref_buf->sf, num_planes);
+    av1_setup_pre_planes(xd, ref, &ref_buf->buf, left_mi_row, ctxt->mi_col,
+                         ref_scale_factors, num_planes);
   }
 
   xd->mb_to_top_edge = 8 * MI_SIZE * (-left_mi_row);

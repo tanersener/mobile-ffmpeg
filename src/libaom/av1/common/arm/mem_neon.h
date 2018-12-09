@@ -383,6 +383,15 @@ static INLINE void load_unaligned_u8_4x2(const uint8_t *buf, int stride,
   *tu0 = vset_lane_u32(a, *tu0, 1);
 }
 
+/* These intrinsics require immediate values, so we must use #defines
+   to enforce that. */
+#define store_unaligned_u8_4x1(dst, src, lane)         \
+  do {                                                 \
+    uint32_t a;                                        \
+    a = vget_lane_u32(vreinterpret_u32_u8(src), lane); \
+    memcpy(dst, &a, 4);                                \
+  } while (0)
+
 static INLINE void load_unaligned_u8_2x2(const uint8_t *buf, int stride,
                                          uint16x4_t *tu0) {
   uint16_t a;

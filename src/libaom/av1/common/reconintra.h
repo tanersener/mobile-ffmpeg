@@ -110,7 +110,7 @@ static INLINE int av1_use_intra_edge_upsample(int bs0, int bs1, int delta,
                                               int type) {
   const int d = abs(delta);
   const int blk_wh = bs0 + bs1;
-  if (d <= 0 || d >= 40) return 0;
+  if (d == 0 || d >= 40) return 0;
   return type ? (blk_wh <= 8) : (blk_wh <= 16);
 }
 #ifdef __cplusplus

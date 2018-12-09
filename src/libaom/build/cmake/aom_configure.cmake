@@ -17,9 +17,6 @@ include(FindGit)
 include(FindPerl)
 include(FindThreads)
 
-set(AOM_SUPPORTED_CPU_TARGETS
-    "arm64 armv7 armv7s generic mips32 mips64 ppc x86 x86_64")
-
 include("${AOM_ROOT}/build/cmake/aom_config_defaults.cmake")
 include("${AOM_ROOT}/build/cmake/aom_experiment_deps.cmake")
 include("${AOM_ROOT}/build/cmake/aom_optimization.cmake")
@@ -108,19 +105,12 @@ if(NOT MSVC)
     # work.
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
     if("${AOM_TARGET_SYSTEM}" STREQUAL "Linux" AND "${AOM_TARGET_CPU}" MATCHES
-       "^armv7")
+       "^armv[78]")
       set(AOM_AS_FLAGS ${AOM_AS_FLAGS} --defsym PIC=1)
     else()
       set(AOM_AS_FLAGS ${AOM_AS_FLAGS} -DPIC)
     endif()
   endif()
-endif()
-
-if(NOT "${AOM_SUPPORTED_CPU_TARGETS}" MATCHES "${AOM_TARGET_CPU}")
-  message(FATAL_ERROR
-            "No RTCD support for ${AOM_TARGET_CPU}. Create it, or "
-            "add -DAOM_TARGET_CPU=generic to your cmake command line for a "
-            "generic build of libaom and tools.")
 endif()
 
 if("${AOM_TARGET_CPU}" STREQUAL "x86" OR "${AOM_TARGET_CPU}" STREQUAL "x86_64")
@@ -186,6 +176,12 @@ endif()
 
 if("${AOM_TARGET_SYSTEM}" MATCHES "Darwin\|Linux\|Windows")
   set(CONFIG_OS_SUPPORT 1)
+endif()
+
+# The default _WIN32_WINNT value in MinGW is 0x0502 (Windows XP with SP2). Set
+# it to 0x0601 (Windows 7).
+if("${AOM_TARGET_SYSTEM}" STREQUAL "Windows")
+  add_compiler_flag_if_supported("-D_WIN32_WINNT=0x0601")
 endif()
 
 #
@@ -256,6 +252,7 @@ if(MSVC)
   endif()
 else()
   require_c_flag("-std=c99" YES)
+  require_cxx_flag_nomsvc("-std=c++11" YES)
   add_compiler_flag_if_supported("-Wall")
   add_compiler_flag_if_supported("-Wdisabled-optimization")
   add_compiler_flag_if_supported("-Wextra")

@@ -34,10 +34,10 @@ typedef struct position {
 // clamp_mv_ref
 #define MV_BORDER (16 << 3)  // Allow 16 pels in 1/8th pel units
 
-static INLINE int get_relative_dist(const AV1_COMMON *cm, int a, int b) {
-  if (!cm->seq_params.enable_order_hint) return 0;
+static INLINE int get_relative_dist(const OrderHintInfo *oh, int a, int b) {
+  if (!oh->enable_order_hint) return 0;
 
-  const int bits = cm->seq_params.order_hint_bits_minus_1 + 1;
+  const int bits = oh->order_hint_bits_minus_1 + 1;
 
   assert(bits >= 1);
   assert(a >= 0 && a < (1 << bits));
@@ -169,14 +169,14 @@ static MV_REFERENCE_FRAME ref_frame_map[TOTAL_COMP_REFS][2] = {
 // clang-format on
 
 static INLINE void av1_set_ref_frame(MV_REFERENCE_FRAME *rf,
-                                     int8_t ref_frame_type) {
+                                     MV_REFERENCE_FRAME ref_frame_type) {
   if (ref_frame_type >= REF_FRAMES) {
     rf[0] = ref_frame_map[ref_frame_type - REF_FRAMES][0];
     rf[1] = ref_frame_map[ref_frame_type - REF_FRAMES][1];
   } else {
+    assert(ref_frame_type > NONE_FRAME);
     rf[0] = ref_frame_type;
     rf[1] = NONE_FRAME;
-    assert(ref_frame_type > NONE_FRAME);
   }
 }
 

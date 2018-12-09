@@ -1763,10 +1763,9 @@ int av1_optimize_txb(const struct AV1_COMP *cpi, MACROBLOCK *x, int plane,
   assert(width == (1 << bwl));
   const int tx_type_cost = get_tx_type_cost(cm, x, xd, plane, tx_size, tx_type);
   TxbInfo txb_info = {
-    qcoeff,   levels,       dqcoeff,    tcoeff,  dequant, shift,
-    tx_size,  txs_ctx,      tx_type,    bwl,     width,   height,
-    eob,      seg_eob,      scan_order, txb_ctx, rdmult,  &cm->coeff_ctx_table,
-    iqmatrix, tx_type_cost,
+    qcoeff,     levels,  dqcoeff, tcoeff,   dequant,      shift, tx_size,
+    txs_ctx,    tx_type, bwl,     width,    height,       eob,   seg_eob,
+    scan_order, txb_ctx, rdmult,  iqmatrix, tx_type_cost,
   };
 
   // Hash based trellis (hbt) speed feature: avoid expensive optimize_txb calls

@@ -11,6 +11,7 @@
 #ifndef AOM_TEST_Y4M_VIDEO_SOURCE_H_
 #define AOM_TEST_Y4M_VIDEO_SOURCE_H_
 #include <algorithm>
+#include <memory>
 #include <string>
 
 #include "common/y4minput.h"
@@ -110,7 +111,7 @@ class Y4mVideoSource : public VideoSource {
 
   std::string file_name_;
   FILE *input_file_;
-  testing::internal::scoped_ptr<aom_image_t> img_;
+  std::unique_ptr<aom_image_t> img_;
   unsigned int start_;
   unsigned int limit_;
   unsigned int frame_;

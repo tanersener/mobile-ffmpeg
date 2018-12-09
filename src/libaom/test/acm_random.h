@@ -26,6 +26,7 @@ class ACMRandom {
 
   void Reset(int seed) { random_.Reseed(seed); }
 
+  // Generates a random 31-bit unsigned integer from [0, 2^31).
   uint32_t Rand31(void) {
     return random_.Generate(testing::internal::Random::kMaxRange);
   }

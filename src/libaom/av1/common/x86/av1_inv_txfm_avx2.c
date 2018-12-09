@@ -1577,6 +1577,9 @@ static void idct64_low32_new_avx2(const __m256i *input, __m256i *output,
   idct64_stage11_avx2(output, x);
 }
 
+typedef void (*transform_1d_avx2)(const __m256i *input, __m256i *output,
+                                  int8_t cos_bit);
+
 // 1D functions process 16 pixels at one time.
 static const transform_1d_avx2
     lowbd_txfm_all_1d_zeros_w16_arr[TX_SIZES][ITX_TYPES_1D][4] = {

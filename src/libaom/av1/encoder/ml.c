@@ -15,31 +15,31 @@
 #include "aom_dsp/aom_dsp_common.h"
 #include "av1/encoder/ml.h"
 
-void av1_nn_predict(const float *features, const NN_CONFIG *nn_config,
-                    float *output) {
+// Calculate prediction based on the given input features and neural net config.
+// Assume there are no more than NN_MAX_NODES_PER_LAYER nodes in each hidden
+// layer.
+void av1_nn_predict_c(const float *input_nodes,
+                      const NN_CONFIG *const nn_config, float *const output) {
   int num_input_nodes = nn_config->num_inputs;
   int buf_index = 0;
   float buf[2][NN_MAX_NODES_PER_LAYER];
-  const float *input_nodes = features;
 
   // Propagate hidden layers.
   const int num_layers = nn_config->num_hidden_layers;
   assert(num_layers <= NN_MAX_HIDDEN_LAYERS);
   for (int layer = 0; layer < num_layers; ++layer) {
-    const float *weights = nn_config->weights[layer];
-    const float *bias = nn_config->bias[layer];
+    const float *layer_weights = nn_config->weights[layer];
+    const float *layer_bias = nn_config->bias[layer];
     float *output_nodes = buf[buf_index];
     const int num_output_nodes = nn_config->num_hidden_nodes[layer];
     assert(num_output_nodes < NN_MAX_NODES_PER_LAYER);
     for (int node = 0; node < num_output_nodes; ++node) {
-      float val = 0.0f;
+      float val = layer_bias[node];
       for (int i = 0; i < num_input_nodes; ++i)
-        val += weights[i] * input_nodes[i];
-      val += bias[node];
+        val += layer_weights[node * num_input_nodes + i] * input_nodes[i];
       // ReLU as activation function.
       val = val > 0.0f ? val : 0.0f;  // Could use AOMMAX().
       output_nodes[node] = val;
-      weights += num_input_nodes;
     }
     num_input_nodes = num_output_nodes;
     input_nodes = output_nodes;
@@ -47,14 +47,13 @@ void av1_nn_predict(const float *features, const NN_CONFIG *nn_config,
   }
 
   // Final output layer.
-  const float *weights = nn_config->weights[num_layers];
+  const float *layer_weights = nn_config->weights[num_layers];
+  const float *layer_bias = nn_config->bias[num_layers];
   for (int node = 0; node < nn_config->num_outputs; ++node) {
-    const float *bias = nn_config->bias[num_layers];
-    float val = 0.0f;
+    float val = layer_bias[node];
     for (int i = 0; i < num_input_nodes; ++i)
-      val += weights[i] * input_nodes[i];
-    output[node] = val + bias[node];
-    weights += num_input_nodes;
+      val += layer_weights[node * num_input_nodes + i] * input_nodes[i];
+    output[node] = val;
   }
 }
 

@@ -140,8 +140,8 @@ static int compute_deltaq(const AV1_COMP *cpi, int q, double rate_factor) {
   const CYCLIC_REFRESH *const cr = cpi->cyclic_refresh;
   const RATE_CONTROL *const rc = &cpi->rc;
   int deltaq =
-      av1_compute_qdelta_by_rate(rc, cpi->common.frame_type, q, rate_factor,
-                                 cpi->common.seq_params.bit_depth);
+      av1_compute_qdelta_by_rate(rc, cpi->common.current_frame.frame_type, q,
+                                 rate_factor, cpi->common.seq_params.bit_depth);
   if ((-deltaq) > cr->max_qdelta_perc * q / 100) {
     deltaq = -cr->max_qdelta_perc * q / 100;
   }
@@ -166,15 +166,15 @@ int av1_cyclic_refresh_estimate_bits_at_q(const AV1_COMP *cpi,
   // Take segment weighted average for estimated bits.
   estimated_bits =
       (int)((1.0 - weight_segment1 - weight_segment2) *
-                av1_estimate_bits_at_q(cm->frame_type, cm->base_qindex, mbs,
-                                       correction_factor,
+                av1_estimate_bits_at_q(cm->current_frame.frame_type,
+                                       cm->base_qindex, mbs, correction_factor,
                                        cm->seq_params.bit_depth) +
             weight_segment1 * av1_estimate_bits_at_q(
-                                  cm->frame_type,
+                                  cm->current_frame.frame_type,
                                   cm->base_qindex + cr->qindex_delta[1], mbs,
                                   correction_factor, cm->seq_params.bit_depth) +
             weight_segment2 * av1_estimate_bits_at_q(
-                                  cm->frame_type,
+                                  cm->current_frame.frame_type,
                                   cm->base_qindex + cr->qindex_delta[2], mbs,
                                   correction_factor, cm->seq_params.bit_depth));
   return estimated_bits;
@@ -203,10 +203,11 @@ int av1_cyclic_refresh_rc_bits_per_mb(const AV1_COMP *cpi, int i,
   // Take segment weighted average for bits per mb.
   bits_per_mb =
       (int)((1.0 - weight_segment) *
-                av1_rc_bits_per_mb(cm->frame_type, i, correction_factor,
+                av1_rc_bits_per_mb(cm->current_frame.frame_type, i,
+                                   correction_factor,
                                    cm->seq_params.bit_depth) +
-            weight_segment * av1_rc_bits_per_mb(cm->frame_type, i + deltaq,
-                                                correction_factor,
+            weight_segment * av1_rc_bits_per_mb(cm->current_frame.frame_type,
+                                                i + deltaq, correction_factor,
                                                 cm->seq_params.bit_depth));
   return bits_per_mb;
 }
@@ -496,14 +497,14 @@ void av1_cyclic_refresh_setup(AV1_COMP *const cpi) {
     av1_disable_segmentation(seg);
     return;
   }
-  if (cm->current_video_frame == 0) cr->low_content_avg = 0.0;
+  if (cm->current_frame.frame_number == 0) cr->low_content_avg = 0.0;
   // Don't apply refresh on key frame or enhancement layer frames.
-  if (!apply_cyclic_refresh || cm->frame_type == KEY_FRAME) {
+  if (!apply_cyclic_refresh || cm->current_frame.frame_type == KEY_FRAME) {
     // Set segmentation map to 0 and disable.
     unsigned char *const seg_map = cpi->segmentation_map;
     memset(seg_map, 0, cm->mi_rows * cm->mi_cols);
     av1_disable_segmentation(&cm->seg);
-    if (cm->frame_type == KEY_FRAME) {
+    if (cm->current_frame.frame_type == KEY_FRAME) {
       memset(cr->last_coded_q_map, MAXQ,
              cm->mi_rows * cm->mi_cols * sizeof(*cr->last_coded_q_map));
       cr->sb_index = 0;

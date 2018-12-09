@@ -44,6 +44,11 @@ class InvalidFileTest : public ::libaom_test::DecoderTest,
         << "Result file open failed. Filename: " << res_file_name;
   }
 
+  virtual void DecompressedFrameHook(const aom_image_t &img,
+                                     const unsigned int /*frame_number*/) {
+    EXPECT_NE(img.fb_priv, nullptr);
+  }
+
   virtual bool HandleDecodeResult(
       const aom_codec_err_t res_dec,
       const libaom_test::CompressedVideoSource &video,
@@ -108,6 +113,7 @@ TEST_P(InvalidFileTest, ReturnCode) { RunTest(); }
 
 const DecodeParam kAV1InvalidFileTests[] = {
   { 1, "invalid-bug-1814.ivf" },
+  { 1, "invalid-chromium-906381.ivf" },
   { 1, "invalid-oss-fuzz-9288.ivf" },
   { 4, "invalid-oss-fuzz-9463.ivf" },
   { 1, "invalid-oss-fuzz-9482.ivf" },
@@ -120,6 +126,9 @@ const DecodeParam kAV1InvalidFileTests[] = {
   { 1, "invalid-oss-fuzz-10705.ivf" },
   { 1, "invalid-oss-fuzz-10723.ivf" },
   { 1, "invalid-oss-fuzz-10779.ivf" },
+  { 1, "invalid-oss-fuzz-11477.ivf" },
+  { 1, "invalid-oss-fuzz-11479.ivf" },
+  { 1, "invalid-oss-fuzz-11523.ivf" },
 };
 
 AV1_INSTANTIATE_TEST_CASE(InvalidFileTest,

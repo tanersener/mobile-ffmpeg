@@ -9,6 +9,7 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
+#include <memory>
 #include <string>
 
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
@@ -192,7 +193,7 @@ void EncoderTest::RunLoop(VideoSource *video) {
       cfg_.g_pass = AOM_RC_LAST_PASS;
 
     BeginPassHook(pass);
-    testing::internal::scoped_ptr<Encoder> encoder(
+    std::unique_ptr<Encoder> encoder(
         codec_->CreateEncoder(cfg_, init_flags_, &stats_));
     ASSERT_TRUE(encoder.get() != NULL);
 
@@ -205,7 +206,7 @@ void EncoderTest::RunLoop(VideoSource *video) {
 
     ASSERT_FALSE(::testing::Test::HasFatalFailure());
 
-    testing::internal::scoped_ptr<Decoder> decoder(
+    std::unique_ptr<Decoder> decoder(
         codec_->CreateDecoder(dec_cfg, 0 /* flags */));
 #if CONFIG_AV1_DECODER
     if (decoder->IsAV1()) {

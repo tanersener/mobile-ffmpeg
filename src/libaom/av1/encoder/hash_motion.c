@@ -147,7 +147,8 @@ static void hash_table_add_to_table(hash_table *p_hash_table,
   }
 }
 
-int32_t av1_hash_table_count(hash_table *p_hash_table, uint32_t hash_value) {
+int32_t av1_hash_table_count(const hash_table *p_hash_table,
+                             uint32_t hash_value) {
   if (p_hash_table->p_lookup_table[hash_value] == NULL) {
     return 0;
   } else {

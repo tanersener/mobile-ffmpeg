@@ -510,6 +510,11 @@ int put_accounting(char *buffer) {
 void inspect(void *pbi, void *data) {
   /* Fetch frame data. */
   ifd_inspect(&frame_data, pbi);
+
+  // Show existing frames just show a reference buffer we've already decoded.
+  // There's no information to show.
+  if (frame_data.show_existing_frame) return;
+
   (void)data;
   // We allocate enough space and hope we don't write out of bounds. Totally
   // unsafe but this speeds things up, especially when compiled to Javascript.
@@ -654,25 +659,40 @@ EMSCRIPTEN_KEEPALIVE
 int read_frame() {
   img = NULL;
 
-  if (!have_frame) {
-    if (!aom_video_reader_read_frame(reader)) return EXIT_FAILURE;
-    frame = aom_video_reader_get_frame(reader, &frame_size);
-    have_frame = 1;
-    end_frame = frame + frame_size;
-  }
+  // This loop skips over any frames that are show_existing_frames,  as
+  // there is nothing to analyze.
+  do {
+    if (!have_frame) {
+      if (!aom_video_reader_read_frame(reader)) return EXIT_FAILURE;
+      frame = aom_video_reader_get_frame(reader, &frame_size);
 
-  if (aom_codec_decode(&codec, frame, (unsigned int)frame_size, &adr) !=
-      AOM_CODEC_OK) {
-    die_codec(&codec, "Failed to decode frame.");
-  }
-  frame = adr.buf;
-  if (frame == end_frame) have_frame = 0;
+      have_frame = 1;
+      end_frame = frame + frame_size;
+    }
+
+    if (aom_codec_decode(&codec, frame, (unsigned int)frame_size, &adr) !=
+        AOM_CODEC_OK) {
+      die_codec(&codec, "Failed to decode frame.");
+    }
+
+    frame = adr.buf;
+    if (frame == end_frame) have_frame = 0;
+  } while (adr.show_existing);
 
   int got_any_frames = 0;
   aom_image_t *frame_img;
   struct av1_ref_frame ref_dec;
   ref_dec.idx = adr.idx;
-  if (!aom_codec_control(&codec, AV1_GET_REFERENCE, &ref_dec)) {
+
+  // ref_dec.idx is the index to the reference buffer idx to AV1_GET_REFERENCE
+  // if its -1 the decoder didn't update any reference buffer and the only
+  // way to see the frame is aom_codec_get_frame.
+  if (ref_dec.idx == -1) {
+    aom_codec_iter_t iter = NULL;
+    img = frame_img = aom_codec_get_frame(&codec, &iter);
+    ++frame_count;
+    got_any_frames = 1;
+  } else if (!aom_codec_control(&codec, AV1_GET_REFERENCE, &ref_dec)) {
     img = frame_img = &ref_dec.img;
     ++frame_count;
     got_any_frames = 1;

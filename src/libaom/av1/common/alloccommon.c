@@ -92,6 +92,9 @@ void av1_free_ref_frame_buffers(BufferPool *pool) {
     if (pool->frame_bufs[i].ref_count > 0 &&
         pool->frame_bufs[i].raw_frame_buffer.data != NULL) {
       pool->release_fb_cb(pool->cb_priv, &pool->frame_bufs[i].raw_frame_buffer);
+      pool->frame_bufs[i].raw_frame_buffer.data = NULL;
+      pool->frame_bufs[i].raw_frame_buffer.size = 0;
+      pool->frame_bufs[i].raw_frame_buffer.priv = NULL;
       pool->frame_bufs[i].ref_count = 0;
     }
     aom_free(pool->frame_bufs[i].mvs);
@@ -131,7 +134,6 @@ void av1_alloc_restoration_buffers(AV1_COMMON *cm) {
     const int ext_h = RESTORATION_UNIT_OFFSET + (mi_h << MI_SIZE_LOG2);
     const int tile_stripes = (ext_h + 63) / 64;
     num_stripes += tile_stripes;
-    cm->rst_end_stripe[i] = num_stripes;
   }
 
   // Now we need to allocate enough space to store the line buffers for the
@@ -293,8 +295,8 @@ void av1_remove_common(AV1_COMMON *cm) {
 
   aom_free(cm->fc);
   cm->fc = NULL;
-  aom_free(cm->frame_contexts);
-  cm->frame_contexts = NULL;
+  aom_free(cm->default_frame_context);
+  cm->default_frame_context = NULL;
 }
 
 void av1_init_context_buffers(AV1_COMMON *cm) { cm->setup_mi(cm); }

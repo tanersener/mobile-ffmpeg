@@ -109,23 +109,20 @@ typedef enum {
 
 typedef struct {
   unsigned char index;
-  RATE_FACTOR_LEVEL rf_level[(MAX_LAG_BUFFERS * 2) + 1];
-  FRAME_UPDATE_TYPE update_type[(MAX_LAG_BUFFERS * 2) + 1];
-  unsigned char arf_src_offset[(MAX_LAG_BUFFERS * 2) + 1];
-  unsigned char arf_update_idx[(MAX_LAG_BUFFERS * 2) + 1];
-  unsigned char arf_ref_idx[(MAX_LAG_BUFFERS * 2) + 1];
+  RATE_FACTOR_LEVEL rf_level[MAX_STATIC_GF_GROUP_LENGTH + 1];
+  FRAME_UPDATE_TYPE update_type[MAX_STATIC_GF_GROUP_LENGTH + 1];
+  unsigned char arf_src_offset[MAX_STATIC_GF_GROUP_LENGTH + 1];
+  unsigned char arf_update_idx[MAX_STATIC_GF_GROUP_LENGTH + 1];
+  unsigned char arf_ref_idx[MAX_STATIC_GF_GROUP_LENGTH + 1];
 #if USE_SYMM_MULTI_LAYER
-  unsigned char arf_pos_in_gf[(MAX_LAG_BUFFERS * 2) + 1];
-  unsigned char pyramid_level[(MAX_LAG_BUFFERS * 2) + 1];
+  unsigned char arf_pos_in_gf[MAX_STATIC_GF_GROUP_LENGTH + 1];
+  unsigned char pyramid_level[MAX_STATIC_GF_GROUP_LENGTH + 1];
   unsigned char pyramid_height;
   unsigned char pyramid_lvl_nodes[MAX_PYRAMID_LVL];
-#endif
-  unsigned char brf_src_offset[(MAX_LAG_BUFFERS * 2) + 1];
-  unsigned char bidir_pred_enabled[(MAX_LAG_BUFFERS * 2) + 1];
-  unsigned char ref_fb_idx_map[(MAX_LAG_BUFFERS * 2) + 1][REF_FRAMES];
-  unsigned char refresh_idx[(MAX_LAG_BUFFERS * 2) + 1];
-  unsigned char refresh_flag[(MAX_LAG_BUFFERS * 2) + 1];
-  int bit_allocation[(MAX_LAG_BUFFERS * 2) + 1];
+#endif  // USE_SYMM_MULTI_LAYER
+  unsigned char brf_src_offset[MAX_STATIC_GF_GROUP_LENGTH + 1];
+  unsigned char bidir_pred_enabled[MAX_STATIC_GF_GROUP_LENGTH + 1];
+  int bit_allocation[MAX_STATIC_GF_GROUP_LENGTH + 1];
 } GF_GROUP;
 
 typedef struct {
