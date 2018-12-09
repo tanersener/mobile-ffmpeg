@@ -541,7 +541,7 @@ static int mov_write_eac3_tag(AVIOContext *pb, MOVTrack *track)
         return AVERROR(EINVAL);
 
     info = track->eac3_priv;
-    size = 2 + 4 * (info->num_ind_sub + 1);
+    size = 2 + ((34 * (info->num_ind_sub + 1) + 7) >> 3);
     buf = av_malloc(size);
     if (!buf) {
         size = AVERROR(ENOMEM);
@@ -563,12 +563,12 @@ static int mov_write_eac3_tag(AVIOContext *pb, MOVTrack *track)
         put_bits(&pbc, 4, info->substream[i].num_dep_sub);
         if (!info->substream[i].num_dep_sub) {
             put_bits(&pbc, 1, 0); /* reserved */
-            size--;
         } else {
             put_bits(&pbc, 9, info->substream[i].chan_loc);
         }
     }
     flush_put_bits(&pbc);
+    size = put_bits_count(&pbc) >> 3;
 
     avio_wb32(pb, size + 8);
     ffio_wfourcc(pb, "dec3");
