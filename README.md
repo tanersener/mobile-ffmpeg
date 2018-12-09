@@ -1,4 +1,4 @@
-# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![GitHub release](https://img.shields.io/badge/release-v3.0-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v3.0-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v3.0-blue.svg)
+# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![GitHub release](https://img.shields.io/badge/release-v3.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v3.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v3.1-blue.svg)
 
 FFmpeg for Android and IOS
 
@@ -8,7 +8,7 @@ FFmpeg for Android and IOS
 - Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
 - Supports
     - Both Android and IOS
-    - FFmpeg `v3.4.x`, `v4.0.x` and `v4.1-dev-x` (master) releases
+    - FFmpeg `v3.4.x`, `v4.0.x` and `v4.1` releases
     - 27 external libraries
     
         `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
@@ -33,6 +33,7 @@ FFmpeg for Android and IOS
 #### 1.2 IOS
 - Builds `armv7`, `armv7s`, `arm64`, `i386` and `x86_64` architectures
 - Supports `bzip2`, `zlib` system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` system frameworks
+- Camera and microphone access
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
 - Creates IOS shared/dynamic universal (fat) library
@@ -96,7 +97,7 @@ There are eight different binary packages. Below you can see which system librar
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {`
-        implementation 'com.arthenica:mobile-ffmpeg-full:3.0'
+        implementation 'com.arthenica:mobile-ffmpeg-full:3.1'
     }
     ```
 
@@ -167,7 +168,7 @@ There are eight different binary packages. Below you can see which system librar
 #### 2.2 IOS
 1. Add MobileFFmpeg pod to your `Podfile`
     ```
-    pod 'mobile-ffmpeg-full', '~> 3.0'
+    pod 'mobile-ffmpeg-full', '~> 3.1'
     ```
 
 2. Execute commands.
@@ -201,12 +202,18 @@ There are eight different binary packages. Below you can see which system librar
     MediaInformation *mediaInformation = [MobileFFmpeg getMediaInformation:@"<file path or uri>"];
     ```
 
-6. List enabled external libraries.
+6. Record video and audio using IOS camera
+
+    ```
+    [MobileFFmpeg execute: @"-f avfoundation -r 30 -video_size 1280x720 -pixel_format bgr0 -i 0:0 -vcodec h264_videotoolbox -vsync 2 -f h264 -t 00:00:05 %@", recordFilePath];
+    ```
+
+7. List enabled external libraries.
     ```
     NASArray *externalLibraries = [MobileFFmpegConfig getExternalLibraries];
     ```
 
-7. Enable log callback.
+8. Enable log callback.
     ```
     - (void)logCallback: (int)level :(NSString*)message {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -217,7 +224,7 @@ There are eight different binary packages. Below you can see which system librar
     [MobileFFmpegConfig setLogDelegate:self];
     ```
 
-8. Enable statistics callback.
+9. Enable statistics callback.
     ```
     - (void)statisticsCallback:(Statistics *)newStatistics {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -228,12 +235,12 @@ There are eight different binary packages. Below you can see which system librar
     [MobileFFmpegConfig setStatisticsDelegate:self];
     ```
 
-9. Set log level.
+10. Set log level.
     ```
     [MobileFFmpegConfig setLogLevel:AV_LOG_FATAL];
     ```
 
-10. Register custom fonts directory.
+11. Register custom fonts directory.
     ```
     [MobileFFmpegConfig setFontDirectory:@"<folder with fonts>" with:nil];
     ```
@@ -250,9 +257,9 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 
 - `MobileFFmpeg v1.x` is the previous stable, includes `FFmpeg v3.4.4`
 
-- `MobileFFmpeg v2.x` is the current stable, includes `FFmpeg v4.0.2`
+- `MobileFFmpeg v2.x` is the current stable, includes `FFmpeg v4.0.3`
 
-- `MobileFFmpeg v3.x` is the next stable, includes `FFmpeg v4.1-dev-1517`
+- `MobileFFmpeg v3.x` is the next stable, includes `FFmpeg v4.1-10`
 
 ### 4. Building
 #### 4.1 Prerequisites
@@ -268,7 +275,6 @@ Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg
 2. Android builds require these additional packages.
     - **Android SDK 5.0 Lollipop (API Level 21)** or later
     - **Android NDK r17c** or later with LLDB and CMake
-    - **gradle 4.4** or later
 
 3. IOS builds need these extra packages and tools.
     - **IOS SDK 8.0.x** or later

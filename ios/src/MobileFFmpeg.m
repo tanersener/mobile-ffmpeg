@@ -29,7 +29,7 @@ int execute(int argc, char **argv);
 @implementation MobileFFmpeg
 
 /** Global library version */
-NSString *const MOBILE_FFMPEG_VERSION = @"3.0";
+NSString *const MOBILE_FFMPEG_VERSION = @"3.1";
 
 /** Common return code values */
 int const RETURN_CODE_SUCCESS = 0;

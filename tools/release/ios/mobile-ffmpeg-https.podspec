@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
     s.name              = 'mobile-ffmpeg-https'
     s.version           = 'VERSION'
     s.summary           = 'Mobile FFmpeg Https Dynamic Framework'
-    s.description       = 'Includes FFmpeg v4.1-dev-1517 with gmp v6.1.2 and gnutls v3.5.19 library enabled.'
+    s.description       = 'Includes FFmpeg v4.1-10 with gmp v6.1.2 and gnutls v3.5.19 library enabled.'
     s.homepage          = 'https://github.com/tanersener/mobile-ffmpeg'
 
     s.author            = { 'Taner Sener' => 'tanersener@gmail.com' }
