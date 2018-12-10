@@ -39,11 +39,6 @@ struct NN_CONFIG {
 // output[i] = exp(input[i]) / sum_{k \in [0,n)}(exp(input[k]))
 void av1_nn_softmax(const float *input, float *output, int n);
 
-// Applies the softmax normalization function to the input
-// to get a valid probability distribution in the output:
-// output[i] = exp(input[i]) / sum_{k \in [0,n)}(exp(input[k]))
-void av1_nn_softmax(const float *input, float *output, int n);
-
 #ifdef __cplusplus
 }  // extern "C"
 #endif

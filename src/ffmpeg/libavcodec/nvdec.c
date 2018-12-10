@@ -613,12 +613,6 @@ int ff_nvdec_frame_params(AVCodecContext *avctx,
     if (!frames_ctx->pool)
         return AVERROR(ENOMEM);
 
-    frames_ctx->free = nvdec_free_dummy;
-    frames_ctx->pool = av_buffer_pool_init(0, nvdec_alloc_dummy);
-
-    if (!frames_ctx->pool)
-        return AVERROR(ENOMEM);
-
     switch (sw_desc->comp[0].depth) {
     case 8:
         frames_ctx->sw_format = AV_PIX_FMT_NV12;
