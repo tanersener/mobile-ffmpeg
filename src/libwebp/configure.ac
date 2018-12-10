@@ -1,4 +1,4 @@
-AC_INIT([libwebp], [1.0.0],
+AC_INIT([libwebp], [1.0.1],
         [https://bugs.chromium.org/p/webp],,
         [http://developers.google.com/speed/webp])
 AC_CANONICAL_HOST
@@ -122,31 +122,6 @@ AS_IF([test "$GCC" = "yes" ], [
 AC_SUBST([AM_CFLAGS])
 
 dnl === Check for machine specific flags
-AC_ARG_ENABLE([avx2],
-              AS_HELP_STRING([--disable-avx2],
-                             [Disable detection of AVX2 support
-                              @<:@default=auto@:>@]))
-
-AS_IF([test "x$enable_avx2" != "xno" -a "x$enable_sse4_1" != "xno" \
-         -a "x$enable_sse2" != "xno"], [
-  AVX2_CFLAGS="$INTRINSICS_CFLAGS $AVX2_FLAGS"
-  TEST_AND_ADD_CFLAGS([AVX2_FLAGS], [-mavx2])
-  AS_IF([test -n "$AVX2_FLAGS"], [
-    SAVED_CFLAGS=$CFLAGS
-    CFLAGS="$CFLAGS $AVX2_FLAGS"
-    AC_CHECK_HEADER([immintrin.h],
-                    [AC_DEFINE(WEBP_HAVE_AVX2, [1],
-                     [Set to 1 if AVX2 is supported])],
-                    [AVX2_FLAGS=""],
-                    dnl it's illegal to directly include avx2intrin.h, but it's
-                    dnl included conditionally in immintrin.h, tricky!
-                    [#ifndef __AVX2__
-                     #error avx2 is not enabled
-                     #endif
-                    ])
-    CFLAGS=$SAVED_CFLAGS])
-  AC_SUBST([AVX2_FLAGS])])
-
 AC_ARG_ENABLE([sse4.1],
               AS_HELP_STRING([--disable-sse4.1],
                              [Disable detection of SSE4.1 support
@@ -722,7 +697,7 @@ AC_ARG_ENABLE([libwebpmux],
               AS_HELP_STRING([--enable-libwebpmux],
                              [Build libwebpmux @<:@default=no@:>@]))
 AC_MSG_RESULT(${enable_libwebpmux-no})
-AM_CONDITIONAL([WANT_MUX], [test "$enable_libwebpmux" = "yes"])
+AM_CONDITIONAL([BUILD_MUX], [test "$enable_libwebpmux" = "yes"])
 
 dnl === Check whether libwebpdemux should be built
 AC_MSG_CHECKING(whether libwebpdemux is to be built)
@@ -731,7 +706,7 @@ AC_ARG_ENABLE([libwebpdemux],
                              [Disable libwebpdemux @<:@default=no@:>@]),
               [], [enable_libwebpdemux=yes])
 AC_MSG_RESULT(${enable_libwebpdemux-no})
-AM_CONDITIONAL([WANT_DEMUX], [test "$enable_libwebpdemux" = "yes"])
+AM_CONDITIONAL([BUILD_DEMUX], [test "$enable_libwebpdemux" = "yes"])
 
 dnl === Check whether decoder library should be built.
 AC_MSG_CHECKING(whether decoder library is to be built)
@@ -747,7 +722,7 @@ AC_ARG_ENABLE([libwebpextras],
               AS_HELP_STRING([--enable-libwebpextras],
                              [Build libwebpextras @<:@default=no@:>@]))
 AC_MSG_RESULT(${enable_libwebpextras-no})
-AM_CONDITIONAL([WANT_EXTRAS], [test "$enable_libwebpextras" = "yes"])
+AM_CONDITIONAL([BUILD_EXTRAS], [test "$enable_libwebpextras" = "yes"])
 
 dnl =========================
 

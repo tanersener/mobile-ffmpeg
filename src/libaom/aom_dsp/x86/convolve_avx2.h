@@ -44,10 +44,19 @@ DECLARE_ALIGNED(32, static const uint8_t, filt1_global_avx2[32]) = {
   0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8
 };
 
-DECLARE_ALIGNED(32, static const uint8_t, filt_d4_global_avx2[]) = {
-  0, 1, 2, 3,  1, 2, 3, 4, 2, 3, 4, 5, 3, 4, 5, 6, 0, 1, 2, 3,  1, 2,
-  3, 4, 2, 3,  4, 5, 3, 4, 5, 6, 4, 5, 6, 7, 5, 6, 7, 8, 6, 7,  8, 9,
-  7, 8, 9, 10, 4, 5, 6, 7, 5, 6, 7, 8, 6, 7, 8, 9, 7, 8, 9, 10,
+DECLARE_ALIGNED(32, static const uint8_t, filt2_global_avx2[32]) = {
+  2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10,
+  2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10
+};
+
+DECLARE_ALIGNED(32, static const uint8_t, filt3_global_avx2[32]) = {
+  4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12,
+  4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12
+};
+
+DECLARE_ALIGNED(32, static const uint8_t, filt4_global_avx2[32]) = {
+  6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14,
+  6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14
 };
 
 static INLINE void prepare_coeffs_lowbd(

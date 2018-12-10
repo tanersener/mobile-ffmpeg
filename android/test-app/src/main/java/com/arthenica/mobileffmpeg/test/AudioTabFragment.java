@@ -308,7 +308,7 @@ public class AudioTabFragment extends Fragment implements AdapterView.OnItemSele
             case "opus":
                 return String.format("-hide_banner -y -i %s -c:a libopus -b:a 64k -vbr on -compression_level 10 %s", audioSampleFile, audioOutputFile);
             case "amr":
-                return String.format("-hide_banner -y -i %s -ar 8000 -ab 12.2k %s", audioSampleFile, audioOutputFile);
+                return String.format("-hide_banner -y -i %s -ar 8000 -ab 12.2k -c:a libopencore_amrnb %s", audioSampleFile, audioOutputFile);
             case "ilbc":
                 return String.format("-hide_banner -y -i %s -c:a ilbc -ar 8000 -b:a 15200 %s", audioSampleFile, audioOutputFile);
             case "speex":

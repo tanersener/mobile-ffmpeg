@@ -22,6 +22,11 @@
 extern "C" {
 #endif
 
+typedef enum {
+  ANIM_GIF,
+  ANIM_WEBP
+} AnimatedFileFormat;
+
 typedef struct {
   uint8_t* rgba;         // Decoded and reconstructed full frame.
   int duration;          // Frame duration in milliseconds.
@@ -29,6 +34,7 @@ typedef struct {
 } DecodedFrame;
 
 typedef struct {
+  AnimatedFileFormat format;
   uint32_t canvas_width;
   uint32_t canvas_height;
   uint32_t bgcolor;

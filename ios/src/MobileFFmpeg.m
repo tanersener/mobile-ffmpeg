@@ -29,7 +29,7 @@ int execute(int argc, char **argv);
 @implementation MobileFFmpeg
 
 /** Global library version */
-NSString *const MOBILE_FFMPEG_VERSION = @"3.0";
+NSString *const MOBILE_FFMPEG_VERSION = @"3.1";
 
 /** Common return code values */
 int const RETURN_CODE_SUCCESS = 0;
@@ -123,7 +123,7 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutpu
 + (int)execute: (NSString*)command delimiter:(NSString*)delimiter {
 
     // SPLITTING ARGUMENTS
-    NSArray* argumentArray = [command componentsSeparatedByString:delimiter];
+    NSArray* argumentArray = [command componentsSeparatedByString:(delimiter == nil ? @" ": delimiter)];
     return [self executeWithArguments:argumentArray];
 }
 

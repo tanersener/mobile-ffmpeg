@@ -362,10 +362,10 @@ add_proto qw/void aom_highbd_convolve_copy/, "const uint8_t *src, ptrdiff_t src_
 specialize qw/aom_highbd_convolve_copy sse2 avx2/;
 
 add_proto qw/void aom_highbd_convolve8_horiz/, "const uint8_t *src, ptrdiff_t src_stride, uint8_t *dst, ptrdiff_t dst_stride, const int16_t *filter_x, int x_step_q4, const int16_t *filter_y, int y_step_q4, int w, int h, int bps";
-specialize qw/aom_highbd_convolve8_horiz avx2/, "$sse2_x86_64";
+specialize qw/aom_highbd_convolve8_horiz sse2 avx2/;
 
 add_proto qw/void aom_highbd_convolve8_vert/, "const uint8_t *src, ptrdiff_t src_stride, uint8_t *dst, ptrdiff_t dst_stride, const int16_t *filter_x, int x_step_q4, const int16_t *filter_y, int y_step_q4, int w, int h, int bps";
-specialize qw/aom_highbd_convolve8_vert avx2/, "$sse2_x86_64";
+specialize qw/aom_highbd_convolve8_vert sse2 avx2/;
 
 #
 # Loopfilter
@@ -465,10 +465,6 @@ specialize qw/aom_highbd_lpf_horizontal_4 sse2/;
 
 add_proto qw/void aom_highbd_lpf_horizontal_4_dual/, "uint16_t *s, int pitch, const uint8_t *blimit0, const uint8_t *limit0, const uint8_t *thresh0, const uint8_t *blimit1, const uint8_t *limit1, const uint8_t *thresh1, int bd";
 specialize qw/aom_highbd_lpf_horizontal_4_dual sse2 avx2/;
-
-# Helper functions.
-add_proto qw/void av1_round_shift_array/, "int32_t *arr, int size, int bit";
-specialize "av1_round_shift_array", qw/sse4_1 neon/;
 
 #
 # Encoder functions.

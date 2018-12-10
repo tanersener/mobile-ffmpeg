@@ -17,7 +17,7 @@
 
 static void log_frame_info(AV1_COMMON *cm, const char *str, FILE *f) {
   fprintf(f, "%s", str);
-  fprintf(f, "(Frame %d, Show:%d, Q:%d): \n", cm->current_video_frame,
+  fprintf(f, "(Frame %d, Show:%d, Q:%d): \n", cm->current_frame.frame_number,
           cm->show_frame, cm->base_qindex);
 }
 /* This function dereferences a pointer to the mbmi structure

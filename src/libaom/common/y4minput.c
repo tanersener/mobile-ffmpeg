@@ -823,6 +823,19 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
             "Only progressive scan handled.\n");
     return -1;
   }
+  /* Only support vertical chroma sample position if the input format is
+   * already 420mpeg2. Colocated is not supported in Y4M.
+   */
+  if (csp == AOM_CSP_VERTICAL && strcmp(_y4m->chroma_type, "420mpeg2") != 0) {
+    fprintf(stderr,
+            "Vertical chroma sample position only supported "
+            "for 420mpeg2 input\n");
+    return -1;
+  }
+  if (csp == AOM_CSP_COLOCATED) {
+    fprintf(stderr, "Colocated chroma sample position not supported in Y4M\n");
+    return -1;
+  }
   _y4m->aom_fmt = AOM_IMG_FMT_I420;
   _y4m->bps = 12;
   _y4m->bit_depth = 8;
@@ -1047,14 +1060,8 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
       _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 3 * _y4m->pic_w * _y4m->pic_h;
       _y4m->convert = y4m_convert_444_420jpeg;
     } else {
-      _y4m->aom_fmt = AOM_IMG_FMT_444A;
-      _y4m->bps = 32;
-      _y4m->dst_c_dec_h = _y4m->src_c_dec_h;
-      _y4m->dst_c_dec_v = _y4m->src_c_dec_v;
-      _y4m->dst_buf_read_sz = 4 * _y4m->pic_w * _y4m->pic_h;
-      /*Natively supported: no conversion required.*/
-      _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
-      _y4m->convert = y4m_convert_null;
+      fprintf(stderr, "Unsupported format: 444A\n");
+      return -1;
     }
   } else if (strcmp(_y4m->chroma_type, "mono") == 0) {
     _y4m->src_c_dec_h = _y4m->src_c_dec_v = 0;
@@ -1141,12 +1148,10 @@ int y4m_input_fetch_frame(y4m_input *_y4m, FILE *_fin, aom_image_t *_img) {
   c_w *= bytes_per_sample;
   c_h = (_y4m->pic_h + _y4m->dst_c_dec_v - 1) / _y4m->dst_c_dec_v;
   c_sz = c_w * c_h;
-  _img->stride[AOM_PLANE_Y] = _img->stride[AOM_PLANE_ALPHA] =
-      _y4m->pic_w * bytes_per_sample;
+  _img->stride[AOM_PLANE_Y] = _y4m->pic_w * bytes_per_sample;
   _img->stride[AOM_PLANE_U] = _img->stride[AOM_PLANE_V] = c_w;
   _img->planes[AOM_PLANE_Y] = _y4m->dst_buf;
   _img->planes[AOM_PLANE_U] = _y4m->dst_buf + pic_sz;
   _img->planes[AOM_PLANE_V] = _y4m->dst_buf + pic_sz + c_sz;
-  _img->planes[AOM_PLANE_ALPHA] = _y4m->dst_buf + pic_sz + 2 * c_sz;
   return 1;
 }

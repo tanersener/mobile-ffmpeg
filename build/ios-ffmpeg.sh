@@ -306,6 +306,8 @@ do
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 8 ]]; then
             CONFIGURE_POSTFIX+=" --disable-iconv"
+        elif [[ ${library} -eq 30 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-sdl2"
         elif [[ ${library} -eq 42 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         elif [[ ${library} -eq 43 ]]; then

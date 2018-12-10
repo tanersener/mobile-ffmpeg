@@ -255,20 +255,20 @@ void av1_convolve_2d_copy_sr_sse2(const uint8_t *src, int src_stride,
 
   if (w == 2) {
     do {
-      memcpy(dst, src, 2 * sizeof(*src));
+      memmove(dst, src, 2 * sizeof(*src));
       src += src_stride;
       dst += dst_stride;
-      memcpy(dst, src, 2 * sizeof(*src));
+      memmove(dst, src, 2 * sizeof(*src));
       src += src_stride;
       dst += dst_stride;
       h -= 2;
     } while (h);
   } else if (w == 4) {
     do {
-      memcpy(dst, src, 4 * sizeof(*src));
+      memmove(dst, src, 4 * sizeof(*src));
       src += src_stride;
       dst += dst_stride;
-      memcpy(dst, src, 4 * sizeof(*src));
+      memmove(dst, src, 4 * sizeof(*src));
       src += src_stride;
       dst += dst_stride;
       h -= 2;

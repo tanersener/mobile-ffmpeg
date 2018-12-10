@@ -1,5 +1,3 @@
-/* $Id: tiffgt.c,v 1.15 2015-09-06 20:42:20 bfriesen Exp $ */
-
 /*
  * Copyright (c) 1988-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -29,11 +27,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#if HAVE_UNISTD_H
 #include <unistd.h>
+#endif
 
 #ifdef HAVE_OPENGL_GL_H
 # include <OpenGL/gl.h>
 #else
+# ifdef _WIN32
+#  include <windows.h>
+# endif
 # include <GL/gl.h>
 #endif
 #ifdef HAVE_GLUT_GLUT_H

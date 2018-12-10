@@ -40,7 +40,7 @@ it contain the function LoadTIFFinDIB that load
 a TIFF file and build a memory DIB with it and return the 
 HANDLE (HDIB) of the memory bloc containing this DIB.
 Since DIB is the "natural" bitmap format for Windows 3.1, 95 and NT,
-this function sould be usefull for some Windows 95 (or NT) developer.
+this function should be useful for some Windows 95 (or NT) developer.
 
 
 Sorry for my approximate english ...

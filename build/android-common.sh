@@ -180,7 +180,7 @@ get_android_arch() {
 }
 
 get_common_includes() {
-    echo "-I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/local/include"
+    echo "-I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/local/include"
 }
 
 get_common_cflags() {
@@ -240,7 +240,10 @@ get_app_specific_cflags() {
         xvidcore)
             APP_FLAGS=""
         ;;
-        ffmpeg | shine)
+        ffmpeg)
+            APP_FLAGS="-Wno-unused-function -DBIONIC_IOCTL_NO_SIGNEDNESS_OVERLOAD"
+        ;;
+        shine)
             APP_FLAGS="-Wno-unused-function"
         ;;
         soxr | snappy | libwebp)
@@ -289,7 +292,7 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/lib"
+    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/lib"
 
     case $1 in
         ffmpeg | tesseract)
@@ -731,10 +734,10 @@ EOF
 }
 
 create_zlib_package_config() {
-    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/sysroot/usr
+prefix=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr
 exec_prefix=\${prefix}
 libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib
 includedir=\${prefix}/include
@@ -812,9 +815,9 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20181015-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20181015-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20181015-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20181208-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20181208-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20181208-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
@@ -900,7 +903,7 @@ download_gpl_library_source() {
 }
 
 set_toolchain_clang_paths() {
-    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin
+    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/bin
 
     TARGET_HOST=$(get_target_host)
     
@@ -932,41 +935,8 @@ set_toolchain_clang_paths() {
     prepare_inline_sed
 }
 
-set_toolchain_gcc_paths() {
-    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-${TOOLCHAIN}/bin
-
-    TARGET_HOST=$(get_target_host)
-
-    export AR=${TARGET_HOST}-ar
-    export CC=${TARGET_HOST}-gcc
-    export CXX=${TARGET_HOST}-g++
-
-    if [ "$1" == "x264" ]; then
-        export AS=${CC}
-    else
-        export AS=${TARGET_HOST}-as
-    fi
-
-    export LD=${TARGET_HOST}-ld
-    export RANLIB=${TARGET_HOST}-ranlib
-    export STRIP=${TARGET_HOST}-strip
-
-    export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/android-$(get_target_build)/pkgconfig"
-    export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
-
-    if [ ! -d ${INSTALL_PKG_CONFIG_DIR} ]; then
-        mkdir -p ${INSTALL_PKG_CONFIG_DIR}
-    fi
-
-    if [ ! -f ${ZLIB_PACKAGE_CONFIG_PATH} ]; then
-        create_zlib_package_config
-    fi
-
-    prepare_inline_sed
-}
-
 create_toolchain() {
-    local TOOLCHAIN_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-"${TOOLCHAIN}
+    local TOOLCHAIN_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-"${TOOLCHAIN}
 
     if [ ! -d ${TOOLCHAIN_DIR} ]; then
         ${ANDROID_NDK_ROOT}/build/tools/make_standalone_toolchain.py --arch ${TOOLCHAIN_ARCH} --api ${API} --stl libc++ --install-dir ${TOOLCHAIN_DIR} || exit 1

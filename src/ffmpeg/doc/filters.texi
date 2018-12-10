@@ -10121,6 +10121,8 @@ Default is @code{-1}.
 
 @section geq
 
+Apply generic equation to each pixel.
+
 The filter accepts the following options:
 
 @table @option
@@ -10297,6 +10299,63 @@ gradfun=radius=8
 @end example
 
 @end itemize
+
+@section graphmonitor, agraphmonitor
+Show various filtergraph stats.
+
+With this filter one can debug complete filtergraph.
+Especially issues with links filling with queued frames.
+
+The filter accepts the following options:
+
+@table @option
+@item size, s
+Set video output size. Default is @var{hd720}.
+
+@item opacity, o
+Set video opacity. Default is @var{0.9}. Allowed range is from @var{0} to @var{1}.
+
+@item mode, m
+Set output mode, can be @var{fulll} or @var{compact}.
+In @var{compact} mode only filters with some queued frames have displayed stats.
+
+@item flags, f
+Set flags which enable which stats are shown in video.
+
+Available values for flags are:
+@table @samp
+@item queue
+Display number of queued frames in each link.
+
+@item frame_count_in
+Display number of frames taken from filter.
+
+@item frame_count_out
+Display number of frames given out from filter.
+
+@item pts
+Display current filtered frame pts.
+
+@item time
+Display current filtered frame time.
+
+@item timebase
+Display time base for filter link.
+
+@item format
+Display used format for filter link.
+
+@item size
+Display video size or number of audio channels in case of audio used by filter link.
+
+@item rate
+Display video frame rate or sample rate in case of audio used by filter link.
+@end table
+
+@item rate, r
+Set upper limit for video rate of output stream, Default value is @var{25}.
+This guarantee that output video frame rate will not be higher than this value.
+@end table
 
 @section greyedge
 A color constancy variation filter which estimates scene illumination via grey edge algorithm
@@ -11319,6 +11378,28 @@ Set maximal size in number of frames. Default is 0.
 @item start
 Set first frame of loop. Default is 0.
 @end table
+
+@subsection Examples
+
+@itemize
+@item
+Loop single first frame infinitely:
+@example
+loop=loop=-1:size=1:start=0
+@end example
+
+@item
+Loop single first frame 10 times:
+@example
+loop=loop=10:size=1:start=0
+@end example
+
+@item
+Loop 10 first frames 5 times:
+@example
+loop=loop=5:size=10:start=0
+@end example
+@end itemize
 
 @section lut1d
 
@@ -17798,11 +17879,124 @@ Set the scaling dimension: @code{2} for @code{2xBR}, @code{3} for
 Default is @code{3}.
 @end table
 
+@section xstack
+Stack video inputs into custom layout.
+
+All streams must be of same pixel format.
+
+The filter accept the following option:
+
+@table @option
+@item inputs
+Set number of input streams. Default is 2.
+
+@item layout
+Specify layout of inputs.
+This option requires the desired layout configuration to be explicitly set by the user.
+This sets position of each video input in output. Each input
+is separated by '|'.
+The first number represents the column, and the second number represents the row.
+Numbers start at 0 and are separated by '_'. Optionally one can use wX and hX,
+where X is video input from which to take width or height.
+Multiple values can be used when separated by '+'. In such
+case values are summed together.
+
+@item shortest
+If set to 1, force the output to terminate when the shortest input
+terminates. Default value is 0.
+@end table
+
+@subsection Examples
+
+@itemize
+@item
+Display 4 inputs into 2x2 grid,
+note that if inputs are of different sizes unused gaps might appear,
+as not all of output video is used.
+@example
+xstack=inputs=4:layout=0_0|0_h0|w0_0|w0_h0
+@end example
+
+@item
+Display 4 inputs into 1x4 grid,
+note that if inputs are of different sizes unused gaps might appear,
+as not all of output video is used.
+@example
+xstack=inputs=4:layout=0_0|0_h0|0_h0+h1|0_h0+h1+h2
+@end example
+
+@item
+Display 9 inputs into 3x3 grid,
+note that if inputs are of different sizes unused gaps might appear,
+as not all of output video is used.
+@example
+xstack=inputs=9:layout=w3_0|w3_h0+h2|w3_h0|0_h4|0_0|w3+w1_0|0_h1+h2|w3+w1_h0|w3+w1_h1+h2
+@end example
+@end itemize
+
 @anchor{yadif}
 @section yadif
 
 Deinterlace the input video ("yadif" means "yet another deinterlacing
 filter").
+
+It accepts the following parameters:
+
+
+@table @option
+
+@item mode
+The interlacing mode to adopt. It accepts one of the following values:
+
+@table @option
+@item 0, send_frame
+Output one frame for each frame.
+@item 1, send_field
+Output one frame for each field.
+@item 2, send_frame_nospatial
+Like @code{send_frame}, but it skips the spatial interlacing check.
+@item 3, send_field_nospatial
+Like @code{send_field}, but it skips the spatial interlacing check.
+@end table
+
+The default value is @code{send_frame}.
+
+@item parity
+The picture field parity assumed for the input interlaced video. It accepts one
+of the following values:
+
+@table @option
+@item 0, tff
+Assume the top field is first.
+@item 1, bff
+Assume the bottom field is first.
+@item -1, auto
+Enable automatic detection of field parity.
+@end table
+
+The default value is @code{auto}.
+If the interlacing is unknown or the decoder does not export this information,
+top field first will be assumed.
+
+@item deint
+Specify which frames to deinterlace. Accept one of the following
+values:
+
+@table @option
+@item 0, all
+Deinterlace all frames.
+@item 1, interlaced
+Only deinterlace frames marked as interlaced.
+@end table
+
+The default value is @code{all}.
+@end table
+
+@section yadif_cuda
+
+Deinterlace the input video using the @ref{yadif} algorithm, but implemented
+in CUDA so that it can work as part of a GPU accelerated pipeline with nvdec
+and/or nvenc.
 
 It accepts the following parameters:
 
@@ -20796,6 +20990,7 @@ It accepts the following values:
 @item cauchy
 @item parzen
 @item poisson
+@item bohman
 @end table
 Default is @code{hanning}.
 
@@ -20954,6 +21149,7 @@ It accepts the following values:
 @item cauchy
 @item parzen
 @item poisson
+@item bohman
 @end table
 
 Default value is @code{hann}.
@@ -21117,6 +21313,7 @@ It accepts the following values:
 @item cauchy
 @item parzen
 @item poisson
+@item bohman
 @end table
 Default value is @code{hann}.
 

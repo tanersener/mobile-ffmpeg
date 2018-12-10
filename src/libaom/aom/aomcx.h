@@ -300,9 +300,6 @@ enum aome_enc_control_id {
    *             2 = 4 tile columns
    *             .....
    *             n = 2**n tile columns
-   * The requested tile columns will be capped by encoder based on image size
-   * limitation (The minimum width of a tile column is 256 pixel, the maximum
-   * is 4096).
    *
    * By default, the value is 0, i.e. one single column tile for entire image.
    */
@@ -691,18 +688,6 @@ enum aome_enc_control_id {
    */
   AV1E_SET_MTU,
 
-  /*!\brief Codec control function to set dependent_horz_tiles.
-   *
-   * In encoding and decoding, AV1 allows enabling dependent horizontal tile
-   * The parameter for this control describes the value of this flag,
-   * which has a valid range [0, 1]:
-   *            0 = disable dependent horizontal tile
-   *            1 = enable dependent horizontal tile,
-   *
-   * By default, the value is 0, i.e. disable dependent horizontal tile.
-   */
-  AV1E_SET_TILE_DEPENDENT_ROWS,
-
   /*!\brief Codec control function to set the number of symbols in an ANS data
    * window.
    *
@@ -785,35 +770,6 @@ enum aome_enc_control_id {
    * If AV1E_SET_ENABLE_SUPERRES is 0, then this flag is forced to 0.
    */
   AV1E_SET_ENABLE_SUPERRES,
-
-  /*!\brief Codec control function to set loop_filter_across_tiles_v_enabled
-   * and loop_filter_across_tiles_h_enabled.
-   * In encoding and decoding, AV1 allows disabling loop filter across tile
-   * boundary The parameter for this control describes the value of this flag,
-   * which has a valid range [0, 1]:
-   *            0 = disable loop filter across tile boundary
-   *            1 = enable loop filter across tile boundary
-   *
-   * By default, the value is 1, i.e. enable loop filter across tile boundary.
-   *
-   * Experiment: LOOPFILTERING_ACROSS_TILES_EXT
-   */
-  AV1E_SET_TILE_LOOPFILTER_V,
-  AV1E_SET_TILE_LOOPFILTER_H,
-
-  /*!\brief Codec control function to set loop_filter_across_tiles_enabled.
-   *
-   * In encoding and decoding, AV1 allows disabling loop filter across tile
-   * boundary The parameter for this control describes the value of this flag,
-   * which has a valid range [0, 1]:
-   *            0 = disable loop filter across tile boundary
-   *            1 = enable loop filter across tile boundary
-   *
-   * By default, the value is 1, i.e. enable loop filter across tile boundary.
-   *
-   * Experiment: LOOPFILTERING_ACROSS_TILES
-   */
-  AV1E_SET_TILE_LOOPFILTER,
 
   /*!\brief Codec control function to set the delta q mode
    *
@@ -1015,16 +971,6 @@ AOM_CTRL_USE_TYPE(AV1E_SET_TILE_ROWS, int)
 
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_TPL_MODEL, unsigned int)
 #define AOM_CTRL_AV1E_SET_ENABLE_TPL_MODEL
-
-AOM_CTRL_USE_TYPE(AV1E_SET_TILE_DEPENDENT_ROWS, int)
-#define AOM_CTRL_AV1E_SET_TILE_DEPENDENT_ROWS
-
-AOM_CTRL_USE_TYPE(AV1E_SET_TILE_LOOPFILTER_V, int)
-#define AOM_CTRL_AV1E_SET_TILE_LOOPFILTER_V
-AOM_CTRL_USE_TYPE(AV1E_SET_TILE_LOOPFILTER_H, int)
-#define AOM_CTRL_AV1E_SET_TILE_LOOPFILTER_H
-AOM_CTRL_USE_TYPE(AV1E_SET_TILE_LOOPFILTER, int)
-#define AOM_CTRL_AV1E_SET_TILE_LOOPFILTER
 
 AOM_CTRL_USE_TYPE(AOME_GET_LAST_QUANTIZER, int *)
 #define AOM_CTRL_AOME_GET_LAST_QUANTIZER

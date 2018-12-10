@@ -281,6 +281,7 @@ uint64_t compute_cdef_dist(uint16_t *dst, int dstride, uint16_t *src,
 
 void av1_cdef_search(YV12_BUFFER_CONFIG *frame, const YV12_BUFFER_CONFIG *ref,
                      AV1_COMMON *cm, MACROBLOCKD *xd, int fast) {
+  CdefInfo *const cdef_info = &cm->cdef_info;
   int r, c;
   int fbr, fbc;
   uint16_t *src[3];
@@ -475,23 +476,23 @@ void av1_cdef_search(YV12_BUFFER_CONFIG *frame, const YV12_BUFFER_CONFIG *ref,
       best_tot_mse = tot_mse;
       nb_strength_bits = i;
       for (j = 0; j < 1 << nb_strength_bits; j++) {
-        cm->cdef_strengths[j] = best_lev0[j];
-        cm->cdef_uv_strengths[j] = best_lev1[j];
+        cdef_info->cdef_strengths[j] = best_lev0[j];
+        cdef_info->cdef_uv_strengths[j] = best_lev1[j];
       }
     }
   }
   nb_strengths = 1 << nb_strength_bits;
 
-  cm->cdef_bits = nb_strength_bits;
-  cm->nb_cdef_strengths = nb_strengths;
+  cdef_info->cdef_bits = nb_strength_bits;
+  cdef_info->nb_cdef_strengths = nb_strengths;
   for (i = 0; i < sb_count; i++) {
     int gi;
     int best_gi;
     uint64_t best_mse = (uint64_t)1 << 63;
     best_gi = 0;
-    for (gi = 0; gi < cm->nb_cdef_strengths; gi++) {
-      uint64_t curr = mse[0][i][cm->cdef_strengths[gi]];
-      if (num_planes >= 3) curr += mse[1][i][cm->cdef_uv_strengths[gi]];
+    for (gi = 0; gi < cdef_info->nb_cdef_strengths; gi++) {
+      uint64_t curr = mse[0][i][cdef_info->cdef_strengths[gi]];
+      if (num_planes >= 3) curr += mse[1][i][cdef_info->cdef_uv_strengths[gi]];
       if (curr < best_mse) {
         best_gi = gi;
         best_mse = curr;
@@ -503,18 +504,18 @@ void av1_cdef_search(YV12_BUFFER_CONFIG *frame, const YV12_BUFFER_CONFIG *ref,
 
   if (fast) {
     for (int j = 0; j < nb_strengths; j++) {
-      cm->cdef_strengths[j] =
-          priconv[cm->cdef_strengths[j] / CDEF_SEC_STRENGTHS] *
+      cdef_info->cdef_strengths[j] =
+          priconv[cm->cdef_info.cdef_strengths[j] / CDEF_SEC_STRENGTHS] *
               CDEF_SEC_STRENGTHS +
-          (cm->cdef_strengths[j] % CDEF_SEC_STRENGTHS);
-      cm->cdef_uv_strengths[j] =
-          priconv[cm->cdef_uv_strengths[j] / CDEF_SEC_STRENGTHS] *
+          (cdef_info->cdef_strengths[j] % CDEF_SEC_STRENGTHS);
+      cdef_info->cdef_uv_strengths[j] =
+          priconv[cdef_info->cdef_uv_strengths[j] / CDEF_SEC_STRENGTHS] *
               CDEF_SEC_STRENGTHS +
-          (cm->cdef_uv_strengths[j] % CDEF_SEC_STRENGTHS);
+          (cdef_info->cdef_uv_strengths[j] % CDEF_SEC_STRENGTHS);
     }
   }
-  cm->cdef_pri_damping = pri_damping;
-  cm->cdef_sec_damping = sec_damping;
+  cdef_info->cdef_pri_damping = pri_damping;
+  cdef_info->cdef_sec_damping = sec_damping;
   aom_free(mse[0]);
   aom_free(mse[1]);
   for (pli = 0; pli < num_planes; pli++) {

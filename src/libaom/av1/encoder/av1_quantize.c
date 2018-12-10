@@ -697,7 +697,7 @@ void av1_frame_init_quantizer(AV1_COMP *cpi) {
 void av1_set_quantizer(AV1_COMMON *cm, int q) {
   // quantizer has to be reinitialized with av1_init_quantizer() if any
   // delta_q changes.
-  cm->base_qindex = AOMMAX(cm->delta_q_present_flag, q);
+  cm->base_qindex = AOMMAX(cm->delta_q_info.delta_q_present_flag, q);
   cm->y_dc_delta_q = 0;
   cm->u_dc_delta_q = 0;
   cm->u_ac_delta_q = 0;

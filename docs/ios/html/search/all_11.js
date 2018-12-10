@@ -22,7 +22,7 @@ var searchData=
   ['set_5fencoder_5fid',['set_encoder_id',['../d7/d48/fftools__ffmpeg_8c.html#a861b24f5520382037a477a313641b1cf',1,'fftools_ffmpeg.c']]],
   ['set_5freport_5fcallback',['set_report_callback',['../d7/d48/fftools__ffmpeg_8c.html#a4dd17285e4049bfb915b75d39ff9971e',1,'set_report_callback(void(*callback)(int, float, float, int64_t, int, double, double)):&#160;fftools_ffmpeg.c'],['../d7/db3/fftools__ffmpeg_8h.html#a4dd17285e4049bfb915b75d39ff9971e',1,'set_report_callback(void(*callback)(int, float, float, int64_t, int, double, double)):&#160;fftools_ffmpeg.c']]],
   ['set_5ftty_5fecho',['set_tty_echo',['../d7/d48/fftools__ffmpeg_8c.html#a12f098a569b8925e9a2bc92aba7bae96',1,'fftools_ffmpeg.c']]],
-  ['setaverageframerate_3a',['setAverageFrameRate:',['../dd/ddc/interface_stream_information.html#aeddaa26f5d40a792824b15632776a41d',1,'StreamInformation']]],
+  ['setaverageframerate_3a',['setAverageFrameRate:',['../dd/ddc/interface_stream_information.html#a7455db6ac07a494bcc5fdaeb924b1885',1,'StreamInformation']]],
   ['setbitrate_3a',['setBitrate:',['../d6/dca/interface_media_information.html#acc280a3cf2808bdf7c0dc4fab7def82f',1,'MediaInformation::setBitrate:()'],['../dd/ddc/interface_stream_information.html#ace935648aac62440142ee1f3119ecd1a',1,'StreamInformation::setBitrate:()']]],
   ['setchannellayout_3a',['setChannelLayout:',['../dd/ddc/interface_stream_information.html#aeb46f5acbbe48ec6a50a4acc7f0c3ce9',1,'StreamInformation']]],
   ['setcodec_3a',['setCodec:',['../dd/ddc/interface_stream_information.html#a31c53b62658269aebe971919290fbe59',1,'StreamInformation']]],

@@ -147,7 +147,6 @@ typedef struct VariantStream {
 
     char *fmp4_init_filename;
     char *base_output_dirname;
-    int fmp4_init_mode;
 
     AVStream **streams;
     char codec_attr[128];
@@ -733,7 +732,6 @@ static int hls_mux_init(AVFormatContext *s, VariantStream *vs)
     vs->packets_written = 1;
     vs->start_pos = 0;
     vs->new_start = 1;
-    vs->fmp4_init_mode = 0;
 
     if (hls->segment_type == SEGMENT_TYPE_FMP4) {
         if (hls->max_seg_size > 0) {
@@ -743,7 +741,6 @@ static int hls_mux_init(AVFormatContext *s, VariantStream *vs)
 
         vs->packets_written = 0;
         vs->init_range_length = 0;
-        vs->fmp4_init_mode = !byterange_mode;
         set_http_options(s, &options, hls);
         if ((ret = avio_open_dyn_buf(&oc->pb)) < 0)
             return ret;
@@ -2205,6 +2202,7 @@ static int hls_write_packet(AVFormatContext *s, AVPacket *pkt)
                 avio_flush(oc->pb);
                 range_length = avio_close_dyn_buf(oc->pb, &buffer);
                 avio_write(vs->out, buffer, range_length);
+                av_free(buffer);
                 vs->init_range_length = range_length;
                 avio_open_dyn_buf(&oc->pb);
                 vs->packets_written = 0;
@@ -2231,10 +2229,6 @@ static int hls_write_packet(AVFormatContext *s, AVPacket *pkt)
                 if ((vs->avf->oformat->priv_class && vs->avf->priv_data) && hls->segment_type != SEGMENT_TYPE_FMP4) {
                     av_opt_set(vs->avf->priv_data, "mpegts_flags", "resend_headers", 0);
                 }
-        }
-
-        if (vs->fmp4_init_mode) {
-            vs->number--;
         }
 
         if (hls->segment_type == SEGMENT_TYPE_FMP4) {
@@ -2294,7 +2288,6 @@ static int hls_write_packet(AVFormatContext *s, AVPacket *pkt)
             vs->start_pos += vs->size;
         }
 
-        vs->fmp4_init_mode = 0;
         if (hls->flags & HLS_SINGLE_FILE) {
             vs->number++;
         } else if (hls->max_seg_size > 0) {
@@ -2355,6 +2348,25 @@ static int hls_write_trailer(struct AVFormatContext *s)
             return AVERROR(ENOMEM);
         }
         if ( hls->segment_type == SEGMENT_TYPE_FMP4) {
+            if (!vs->init_range_length) {
+                av_write_frame(vs->avf, NULL); /* Flush any buffered data */
+                avio_flush(oc->pb);
+
+                uint8_t *buffer = NULL;
+                int range_length = avio_close_dyn_buf(oc->pb, &buffer);
+                avio_write(vs->out, buffer, range_length);
+                av_free(buffer);
+                vs->init_range_length = range_length;
+                avio_open_dyn_buf(&oc->pb);
+                vs->packets_written = 0;
+                vs->start_pos = range_length;
+                int byterange_mode = (hls->flags & HLS_SINGLE_FILE) || (hls->max_seg_size > 0);
+                if (!byterange_mode) {
+                    ff_format_io_close(s, &vs->out);
+                    hlsenc_io_close(s, &vs->out, vs->base_output_dirname);
+                }
+            }
+
             int range_length = 0;
             if (!(hls->flags & HLS_SINGLE_FILE)) {
                 ret = hlsenc_io_open(s, &vs->out, vs->avf->url, NULL);
@@ -2368,6 +2380,7 @@ static int hls_write_trailer(struct AVFormatContext *s)
             if (ret < 0) {
                 goto failed;
             }
+            vs->size = range_length;
             ff_format_io_close(s, &vs->out);
         }
 
@@ -2376,8 +2389,6 @@ failed:
         if (oc->pb) {
             if (hls->segment_type != SEGMENT_TYPE_FMP4) {
                 vs->size = avio_tell(vs->avf->pb) - vs->start_pos;
-            } else {
-                vs->size = avio_tell(vs->avf->pb);
             }
             if (hls->segment_type != SEGMENT_TYPE_FMP4)
                 ff_format_io_close(s, &oc->pb);

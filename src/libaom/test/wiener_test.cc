@@ -13,18 +13,19 @@
 
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 
-#include "test/function_equivalence_test.h"
 #include "test/register_state_check.h"
+#include "test/acm_random.h"
+#include "test/util.h"
 
 #include "config/aom_config.h"
 #include "config/aom_dsp_rtcd.h"
 
 #include "aom/aom_integer.h"
+#include "aom_ports/aom_timer.h"
 #include "av1/encoder/pickrst.h"
 
 #define MAX_WIENER_BLOCK 384
 #define MAX_DATA_BLOCK (MAX_WIENER_BLOCK + WIENER_WIN)
-using libaom_test::FunctionEquivalenceTest;
 
 // 8-bit-depth tests
 namespace wiener_lowbd {
@@ -110,8 +111,6 @@ typedef void (*compute_stats_Func)(int wiener_win, const uint8_t *dgd,
                                    int v_start, int v_end, int dgd_stride,
                                    int src_stride, int64_t *M, int64_t *H);
 
-typedef libaom_test::FuncParam<compute_stats_Func> TestFuncs;
-
 ////////////////////////////////////////////////////////////////////////////////
 // 8 bit
 ////////////////////////////////////////////////////////////////////////////////
@@ -122,26 +121,26 @@ class WienerTest : public ::testing::TestWithParam<WienerTestParam> {
  public:
   virtual void SetUp() {
     src_buf = (uint8_t *)aom_memalign(
-        32, MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(uint8_t));
+        32, MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(*src_buf));
     dgd_buf = (uint8_t *)aom_memalign(
-        32, MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(uint8_t));
+        32, MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(*dgd_buf));
     target_func_ = GET_PARAM(0);
   }
   virtual void TearDown() {
     aom_free(src_buf);
     aom_free(dgd_buf);
   }
-  void runWienerTest(const int32_t wiener_win, int32_t run_times);
-  void runWienerTest_ExtremeValues(const int32_t wiener_win);
+  void RunWienerTest(const int32_t wiener_win, int32_t run_times);
+  void RunWienerTest_ExtremeValues(const int32_t wiener_win);
 
  private:
   compute_stats_Func target_func_;
-  ACMRandom rng_;
+  libaom_test::ACMRandom rng_;
   uint8_t *src_buf;
   uint8_t *dgd_buf;
 };
 
-void WienerTest::runWienerTest(const int32_t wiener_win, int32_t run_times) {
+void WienerTest::RunWienerTest(const int32_t wiener_win, int32_t run_times) {
   const int32_t wiener_halfwin = wiener_win >> 1;
   const int32_t wiener_win2 = wiener_win * wiener_win;
   DECLARE_ALIGNED(32, int64_t, M_ref[WIENER_WIN2]);
@@ -194,7 +193,6 @@ void WienerTest::runWienerTest(const int32_t wiener_win, int32_t run_times) {
         break;
       }
     }
-    // ASSERT_EQ(failed, 0);
     for (int i = 0; i < wiener_win2 * wiener_win2; ++i) {
       if (H_ref[i] != H_test[i]) {
         failed = 1;
@@ -207,7 +205,7 @@ void WienerTest::runWienerTest(const int32_t wiener_win, int32_t run_times) {
   }
 }
 
-void WienerTest::runWienerTest_ExtremeValues(const int32_t wiener_win) {
+void WienerTest::RunWienerTest_ExtremeValues(const int32_t wiener_win) {
   const int32_t wiener_halfwin = wiener_win >> 1;
   const int32_t wiener_win2 = wiener_win * wiener_win;
   DECLARE_ALIGNED(32, int64_t, M_ref[WIENER_WIN2]);
@@ -244,7 +242,6 @@ void WienerTest::runWienerTest_ExtremeValues(const int32_t wiener_win) {
         break;
       }
     }
-    // ASSERT_EQ(failed, 0);
     for (int i = 0; i < wiener_win2 * wiener_win2; ++i) {
       if (H_ref[i] != H_test[i]) {
         failed = 1;
@@ -258,18 +255,18 @@ void WienerTest::runWienerTest_ExtremeValues(const int32_t wiener_win) {
 }
 
 TEST_P(WienerTest, RandomValues) {
-  runWienerTest(WIENER_WIN, 1);
-  runWienerTest(WIENER_WIN_CHROMA, 1);
+  RunWienerTest(WIENER_WIN, 1);
+  RunWienerTest(WIENER_WIN_CHROMA, 1);
 }
 
 TEST_P(WienerTest, ExtremeValues) {
-  runWienerTest_ExtremeValues(WIENER_WIN);
-  runWienerTest_ExtremeValues(WIENER_WIN_CHROMA);
+  RunWienerTest_ExtremeValues(WIENER_WIN);
+  RunWienerTest_ExtremeValues(WIENER_WIN_CHROMA);
 }
 
 TEST_P(WienerTest, DISABLED_Speed) {
-  runWienerTest(WIENER_WIN, 200);
-  runWienerTest(WIENER_WIN_CHROMA, 200);
+  RunWienerTest(WIENER_WIN, 200);
+  RunWienerTest(WIENER_WIN_CHROMA, 200);
 }
 
 INSTANTIATE_TEST_CASE_P(C, WienerTest, ::testing::Values(compute_stats_opt_c));
@@ -392,36 +389,34 @@ typedef void (*compute_stats_Func)(int wiener_win, const uint8_t *dgd,
                                    int src_stride, int64_t *M, int64_t *H,
                                    aom_bit_depth_t bit_depth);
 
-typedef libaom_test::FuncParam<compute_stats_Func> TestFuncs;
-
 typedef ::testing::tuple<const compute_stats_Func> WienerTestParam;
 
 class WienerTestHighbd : public ::testing::TestWithParam<WienerTestParam> {
  public:
   virtual void SetUp() {
     src_buf = (uint16_t *)aom_memalign(
-        32, MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(uint16_t));
+        32, MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(*src_buf));
     dgd_buf = (uint16_t *)aom_memalign(
-        32, MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(uint16_t));
+        32, MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(*dgd_buf));
     target_func_ = GET_PARAM(0);
   }
   virtual void TearDown() {
     aom_free(src_buf);
     aom_free(dgd_buf);
   }
-  void runWienerTest(const int32_t wiener_win, int32_t run_times,
+  void RunWienerTest(const int32_t wiener_win, int32_t run_times,
                      aom_bit_depth_t bit_depth);
-  void runWienerTest_ExtremeValues(const int32_t wiener_win,
+  void RunWienerTest_ExtremeValues(const int32_t wiener_win,
                                    aom_bit_depth_t bit_depth);
 
  private:
   compute_stats_Func target_func_;
-  ACMRandom rng_;
+  libaom_test::ACMRandom rng_;
   uint16_t *src_buf;
   uint16_t *dgd_buf;
 };
 
-void WienerTestHighbd::runWienerTest(const int32_t wiener_win,
+void WienerTestHighbd::RunWienerTest(const int32_t wiener_win,
                                      int32_t run_times,
                                      aom_bit_depth_t bit_depth) {
   const int32_t wiener_halfwin = wiener_win >> 1;
@@ -492,7 +487,7 @@ void WienerTestHighbd::runWienerTest(const int32_t wiener_win,
   }
 }
 
-void WienerTestHighbd::runWienerTest_ExtremeValues(const int32_t wiener_win,
+void WienerTestHighbd::RunWienerTest_ExtremeValues(const int32_t wiener_win,
                                                    aom_bit_depth_t bit_depth) {
   const int32_t wiener_halfwin = wiener_win >> 1;
   const int32_t wiener_win2 = wiener_win * wiener_win;
@@ -547,30 +542,30 @@ void WienerTestHighbd::runWienerTest_ExtremeValues(const int32_t wiener_win,
 }
 
 TEST_P(WienerTestHighbd, RandomValues) {
-  runWienerTest(WIENER_WIN, 1, AOM_BITS_8);
-  runWienerTest(WIENER_WIN_CHROMA, 1, AOM_BITS_8);
-  runWienerTest(WIENER_WIN, 1, AOM_BITS_10);
-  runWienerTest(WIENER_WIN_CHROMA, 1, AOM_BITS_10);
-  runWienerTest(WIENER_WIN, 1, AOM_BITS_12);
-  runWienerTest(WIENER_WIN_CHROMA, 1, AOM_BITS_12);
+  RunWienerTest(WIENER_WIN, 1, AOM_BITS_8);
+  RunWienerTest(WIENER_WIN_CHROMA, 1, AOM_BITS_8);
+  RunWienerTest(WIENER_WIN, 1, AOM_BITS_10);
+  RunWienerTest(WIENER_WIN_CHROMA, 1, AOM_BITS_10);
+  RunWienerTest(WIENER_WIN, 1, AOM_BITS_12);
+  RunWienerTest(WIENER_WIN_CHROMA, 1, AOM_BITS_12);
 }
 
 TEST_P(WienerTestHighbd, ExtremeValues) {
-  runWienerTest_ExtremeValues(WIENER_WIN, AOM_BITS_8);
-  runWienerTest_ExtremeValues(WIENER_WIN_CHROMA, AOM_BITS_8);
-  runWienerTest_ExtremeValues(WIENER_WIN, AOM_BITS_10);
-  runWienerTest_ExtremeValues(WIENER_WIN_CHROMA, AOM_BITS_10);
-  runWienerTest_ExtremeValues(WIENER_WIN, AOM_BITS_12);
-  runWienerTest_ExtremeValues(WIENER_WIN_CHROMA, AOM_BITS_12);
+  RunWienerTest_ExtremeValues(WIENER_WIN, AOM_BITS_8);
+  RunWienerTest_ExtremeValues(WIENER_WIN_CHROMA, AOM_BITS_8);
+  RunWienerTest_ExtremeValues(WIENER_WIN, AOM_BITS_10);
+  RunWienerTest_ExtremeValues(WIENER_WIN_CHROMA, AOM_BITS_10);
+  RunWienerTest_ExtremeValues(WIENER_WIN, AOM_BITS_12);
+  RunWienerTest_ExtremeValues(WIENER_WIN_CHROMA, AOM_BITS_12);
 }
 
 TEST_P(WienerTestHighbd, DISABLED_Speed) {
-  runWienerTest(WIENER_WIN, 200, AOM_BITS_8);
-  runWienerTest(WIENER_WIN_CHROMA, 200, AOM_BITS_8);
-  runWienerTest(WIENER_WIN, 200, AOM_BITS_10);
-  runWienerTest(WIENER_WIN_CHROMA, 200, AOM_BITS_10);
-  runWienerTest(WIENER_WIN, 200, AOM_BITS_12);
-  runWienerTest(WIENER_WIN_CHROMA, 200, AOM_BITS_12);
+  RunWienerTest(WIENER_WIN, 200, AOM_BITS_8);
+  RunWienerTest(WIENER_WIN_CHROMA, 200, AOM_BITS_8);
+  RunWienerTest(WIENER_WIN, 200, AOM_BITS_10);
+  RunWienerTest(WIENER_WIN_CHROMA, 200, AOM_BITS_10);
+  RunWienerTest(WIENER_WIN, 200, AOM_BITS_12);
+  RunWienerTest(WIENER_WIN_CHROMA, 200, AOM_BITS_12);
 }
 
 INSTANTIATE_TEST_CASE_P(C, WienerTestHighbd,

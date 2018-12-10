@@ -595,17 +595,21 @@ static int ValidateCommandLine(const CommandLineArguments* const cmd_args,
 
 #define FEATURETYPE_IS_NIL (config->type_ == NIL_FEATURE)
 
-#define CHECK_NUM_ARGS_LESS(NUM, LABEL)                                  \
+#define CHECK_NUM_ARGS_AT_LEAST(NUM, LABEL)                              \
   if (argc < i + (NUM)) {                                                \
     fprintf(stderr, "ERROR: Too few arguments for '%s'.\n", argv[i]);    \
     goto LABEL;                                                          \
   }
 
-#define CHECK_NUM_ARGS_NOT_EQUAL(NUM, LABEL)                             \
-  if (argc != i + (NUM)) {                                               \
+#define CHECK_NUM_ARGS_AT_MOST(NUM, LABEL)                               \
+  if (argc > i + (NUM)) {                                                \
     fprintf(stderr, "ERROR: Too many arguments for '%s'.\n", argv[i]);   \
     goto LABEL;                                                          \
   }
+
+#define CHECK_NUM_ARGS_EXACTLY(NUM, LABEL)                               \
+  CHECK_NUM_ARGS_AT_LEAST(NUM, LABEL);                                   \
+  CHECK_NUM_ARGS_AT_MOST(NUM, LABEL);
 
 // Parses command-line arguments to fill up config object. Also performs some
 // semantic checks.
@@ -627,7 +631,7 @@ static int ParseCommandLine(Config* config) {
         }
         ++i;
       } else if (!strcmp(argv[i], "-duration")) {
-        CHECK_NUM_ARGS_LESS(2, ErrParse);
+        CHECK_NUM_ARGS_AT_LEAST(2, ErrParse);
         if (ACTION_IS_NIL || config->action_type_ == ACTION_DURATION) {
           config->action_type_ = ACTION_DURATION;
         } else {
@@ -657,7 +661,7 @@ static int ParseCommandLine(Config* config) {
         }
         ++i;
       } else if (!strcmp(argv[i], "-frame")) {
-        CHECK_NUM_ARGS_LESS(3, ErrParse);
+        CHECK_NUM_ARGS_AT_LEAST(3, ErrParse);
         if (ACTION_IS_NIL || config->action_type_ == ACTION_SET) {
           config->action_type_ = ACTION_SET;
         } else {
@@ -674,7 +678,7 @@ static int ParseCommandLine(Config* config) {
         ++feature_arg_index;
         i += 3;
       } else if (!strcmp(argv[i], "-loop") || !strcmp(argv[i], "-bgcolor")) {
-        CHECK_NUM_ARGS_LESS(2, ErrParse);
+        CHECK_NUM_ARGS_AT_LEAST(2, ErrParse);
         if (ACTION_IS_NIL || config->action_type_ == ACTION_SET) {
           config->action_type_ = ACTION_SET;
         } else {
@@ -691,11 +695,11 @@ static int ParseCommandLine(Config* config) {
         ++feature_arg_index;
         i += 2;
       } else if (!strcmp(argv[i], "-o")) {
-        CHECK_NUM_ARGS_LESS(2, ErrParse);
+        CHECK_NUM_ARGS_AT_LEAST(2, ErrParse);
         config->output_ = argv[i + 1];
         i += 2;
       } else if (!strcmp(argv[i], "-info")) {
-        CHECK_NUM_ARGS_NOT_EQUAL(2, ErrParse);
+        CHECK_NUM_ARGS_EXACTLY(2, ErrParse);
         if (config->action_type_ != NIL_ACTION) {
           ERROR_GOTO1("ERROR: Multiple actions specified.\n", ErrParse);
         } else {
@@ -742,7 +746,7 @@ static int ParseCommandLine(Config* config) {
           ERROR_GOTO1("ERROR: Multiple features specified.\n", ErrParse);
         }
         if (config->action_type_ == ACTION_SET) {
-          CHECK_NUM_ARGS_LESS(2, ErrParse);
+          CHECK_NUM_ARGS_AT_LEAST(2, ErrParse);
           arg->filename_ = argv[i + 1];
           ++feature_arg_index;
           i += 2;
@@ -751,7 +755,7 @@ static int ParseCommandLine(Config* config) {
         }
       } else if (!strcmp(argv[i], "frame") &&
                  (config->action_type_ == ACTION_GET)) {
-        CHECK_NUM_ARGS_LESS(2, ErrParse);
+        CHECK_NUM_ARGS_AT_LEAST(2, ErrParse);
         config->type_ = FEATURE_ANMF;
         arg->params_ = argv[i + 1];
         ++feature_arg_index;
@@ -836,8 +840,9 @@ static int InitializeConfig(int argc, const char* argv[],
 
 #undef ACTION_IS_NIL
 #undef FEATURETYPE_IS_NIL
-#undef CHECK_NUM_ARGS_LESS
-#undef CHECK_NUM_ARGS_MORE
+#undef CHECK_NUM_ARGS_AT_LEAST
+#undef CHECK_NUM_ARGS_AT_MOST
+#undef CHECK_NUM_ARGS_EXACTLY
 
 //------------------------------------------------------------------------------
 // Processing.

@@ -23,7 +23,7 @@
 # LIABILITY, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE
 # OF THIS SOFTWARE.
 
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 2.8.11) # b/c of use of BUILD_INTERFACE generator expression
 
 # Default policy is from 2.8.9
 cmake_policy(VERSION 2.8.9)
@@ -92,8 +92,9 @@ include(GNUInstallDirs)
 include(CheckCCompilerFlag)
 include(CheckCSourceCompiles)
 include(CheckIncludeFile)
+include(CheckLibraryExists)
 include(CheckTypeSize)
-include(CheckFunctionExists)
+include(CheckSymbolExists)
 enable_testing()
 
 macro(current_date var)
@@ -213,9 +214,6 @@ check_include_file(dlfcn.h     HAVE_DLFCN_H)
 check_include_file(fcntl.h     HAVE_FCNTL_H)
 check_include_file(inttypes.h  HAVE_INTTYPES_H)
 check_include_file(io.h        HAVE_IO_H)
-check_include_file(limits.h    HAVE_LIMITS_H)
-check_include_file(malloc.h    HAVE_MALLOC_H)
-check_include_file(memory.h    HAVE_MEMORY_H)
 check_include_file(search.h    HAVE_SEARCH_H)
 check_include_file(stdint.h    HAVE_STDINT_H)
 check_include_file(string.h    HAVE_STRING_H)
@@ -271,8 +269,6 @@ int main(void){
 
 # Check type sizes
 # NOTE: Could be replaced with C99 <stdint.h>
-check_type_size("signed short" SIZEOF_SIGNED_SHORT)
-check_type_size("unsigned short" SIZEOF_UNSIGNED_SHORT)
 check_type_size("signed int" SIZEOF_SIGNED_INT)
 check_type_size("unsigned int" SIZEOF_UNSIGNED_INT)
 check_type_size("signed long" SIZEOF_SIGNED_LONG)
@@ -388,80 +384,35 @@ endif()
 #              TIFF_SSIZE_T TIFF_SSIZE_FORMAT
 #              TIFF_PTRDIFF_T TIFF_PTRDIFF_FORMAT)
 
-# Nonstandard int types
-check_type_size(INT8 int8)
-set(HAVE_INT8 ${INT8})
-check_type_size(INT16 int16)
-set(HAVE_INT16 ${INT16})
-check_type_size(INT32 int32)
-set(HAVE_INT32 ${INT32})
-
-# Check functions
-set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
-set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${M_LIBRARY})
-check_function_exists(floor HAVE_FLOOR)
-check_function_exists(pow   HAVE_POW)
-check_function_exists(sqrt  HAVE_SQRT)
-set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
-
-check_function_exists(isascii    HAVE_ISASCII)
-check_function_exists(memmove    HAVE_MEMMOVE)
-check_function_exists(memset     HAVE_MEMSET)
-check_function_exists(mmap       HAVE_MMAP)
-check_function_exists(setmode    HAVE_SETMODE)
-check_function_exists(strcasecmp HAVE_STRCASECMP)
-check_function_exists(strchr     HAVE_STRCHR)
-check_function_exists(strrchr    HAVE_STRRCHR)
-check_function_exists(strstr     HAVE_STRSTR)
-check_function_exists(strtol     HAVE_STRTOL)
-check_function_exists(strtol     HAVE_STRTOUL)
-check_function_exists(strtoull   HAVE_STRTOULL)
-check_function_exists(getopt     HAVE_GETOPT)
-check_function_exists(lfind      HAVE_LFIND)
-
-# May be inlined, so check it compiles:
-check_c_source_compiles("
-#include <stdio.h>
-int main(void) {
-  char buf[10];
-  snprintf(buf, 10, \"Test %d\", 1);
-  return 0;
-}"
-  HAVE_SNPRINTF)
+check_symbol_exists(mmap "sys/mman.h" HAVE_MMAP)
+check_symbol_exists(setmode "unistd.h" HAVE_SETMODE)
+check_symbol_exists(snprintf "stdio.h" HAVE_SNPRINTF)
+check_symbol_exists(strcasecmp "strings.h" HAVE_STRCASECMP)
+check_symbol_exists(strtol "stdlib.h" HAVE_STRTOL)
+check_symbol_exists(strtoll "stdlib.h" HAVE_STRTOLL)
+check_symbol_exists(strtoul "stdlib.h" HAVE_STRTOUL)
+check_symbol_exists(strtoull "stdlib.h" HAVE_STRTOULL)
+check_symbol_exists(getopt "unistd.h" HAVE_GETOPT)
+check_symbol_exists(lfind "search.h" HAVE_LFIND)
 
 if(NOT HAVE_SNPRINTF)
   add_definitions(-DNEED_LIBPORT)
 endif()
 
 # CPU bit order
-set(fillorder FILLORDER_MSB2LSB)
+set(HOST_FILLORDER FILLORDER_MSB2LSB)
 if(CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "i.*86.*" OR
    CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "amd64.*" OR
    CMAKE_HOST_SYSTEM_PROCESSOR MATCHES "x86_64.*")
-  set(fillorder FILLORDER_LSB2MSB)
+  set(HOST_FILLORDER FILLORDER_LSB2MSB)
 endif()
-set(HOST_FILLORDER ${fillorder} CACHE STRING "Native CPU bit order")
-mark_as_advanced(HOST_FILLORDER)
 
 # CPU endianness
 include(TestBigEndian)
-test_big_endian(bigendian)
-if (bigendian)
-  set(bigendian ON)
-else()
-  set(bigendian OFF)
-endif()
-set(HOST_BIG_ENDIAN ${bigendian} CACHE STRING "Native CPU bit order")
-mark_as_advanced(HOST_BIG_ENDIAN)
-if (HOST_BIG_ENDIAN)
-  set(HOST_BIG_ENDIAN 1)
-else()
-  set(HOST_BIG_ENDIAN 0)
-endif()
+test_big_endian(HOST_BIG_ENDIAN)
 
 # IEEE floating point
-set(HAVE_IEEEFP 1 CACHE STRING "IEEE floating point is available")
-mark_as_advanced(HAVE_IEEEFP)
+set(HAVE_IEEEFP 1)
 
 report_values(CMAKE_HOST_SYSTEM_PROCESSOR HOST_FILLORDER
               HOST_BIG_ENDIAN HAVE_IEEEFP)
@@ -560,12 +511,9 @@ else()
   set(JBIG_FOUND FALSE)
 endif()
 
-set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
 set(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
 set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES} ${JBIG_INCLUDE_DIR})
-set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${JBIG_LIBRARY})
-check_function_exists(jbg_newlen HAVE_JBG_NEWLEN)
-set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
+check_symbol_exists(jbg_newlen "jbig.h" HAVE_JBG_NEWLEN)
 set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
 
 # liblzma2
@@ -576,6 +524,42 @@ endif()
 set(LZMA_SUPPORT 0)
 if(LIBLZMA_FOUND)
   set(LZMA_SUPPORT 1)
+endif()
+
+# libzstd
+option(zstd "use libzstd (required for ZSTD compression)" ON)
+if (zstd)
+    find_path(ZSTD_INCLUDE_DIR zstd.h)
+    find_library(ZSTD_LIBRARY NAMES zstd)
+    if (ZSTD_INCLUDE_DIR AND ZSTD_LIBRARY)
+        check_library_exists ("${ZSTD_LIBRARY}" ZSTD_decompressStream "" ZSTD_RECENT_ENOUGH)
+        if (ZSTD_RECENT_ENOUGH)
+            set(ZSTD_FOUND TRUE)
+            set(ZSTD_LIBRARIES ${ZSTD_LIBRARY})
+            message(STATUS "Found ZSTD library: ${ZSTD_LIBRARY}")
+        else ()
+            message(WARNING "Found ZSTD library, but not recent enough. Use zstd >= 1.0")
+        endif ()
+    endif ()
+endif()
+set(ZSTD_SUPPORT 0)
+if(ZSTD_FOUND)
+  set(ZSTD_SUPPORT 1)
+endif()
+
+# libwebp
+option(webp "use libwebp (required for WEBP compression)" ON)
+if (webp)
+    find_path(WEBP_INCLUDE_DIR /webp/decode.h)
+    find_library(WEBP_LIBRARY NAMES webp)
+endif()
+set(WEBP_SUPPORT 0)
+set(WEBP_FOUND FALSE)
+if (WEBP_INCLUDE_DIR AND WEBP_LIBRARY)
+  set(WEBP_SUPPORT 1)
+  set(WEBP_FOUND TRUE)
+  set(WEBP_LIBRARIES ${WEBP_LIBRARY})
+  message(STATUS "Found WEBP library: ${WEBP_LIBRARY}")
 endif()
 
 # 8/12-bit jpeg mode
@@ -621,12 +605,8 @@ set(win32_io FALSE)
 if(WIN32)
   set(win32_io TRUE)
 endif()
-set(USE_WIN32_FILEIO ${win32_io} CACHE BOOL "Use win32 IO system (Microsoft Windows only)")
-if (USE_WIN32_FILEIO)
-  set(USE_WIN32_FILEIO TRUE)
-else()
-  set(USE_WIN32_FILEIO FALSE)
-endif()
+
+set(USE_WIN32_FILEIO ${win32_io})
 
 # Orthogonal features
 
@@ -692,6 +672,12 @@ endif()
 if(LIBLZMA_INCLUDE_DIRS)
   list(APPEND TIFF_INCLUDES ${LIBLZMA_INCLUDE_DIRS})
 endif()
+if(ZSTD_INCLUDE_DIR)
+  list(APPEND TIFF_INCLUDES ${ZSTD_INCLUDE_DIR})
+endif()
+if(WEBP_INCLUDE_DIR)
+  list(APPEND TIFF_INCLUDES ${WEBP_INCLUDE_DIR})
+endif()
 
 # Libraries required by libtiff
 set(TIFF_LIBRARY_DEPS)
@@ -712,6 +698,12 @@ if(JBIG_LIBRARIES)
 endif()
 if(LIBLZMA_LIBRARIES)
   list(APPEND TIFF_LIBRARY_DEPS ${LIBLZMA_LIBRARIES})
+endif()
+if(ZSTD_LIBRARIES)
+  list(APPEND TIFF_LIBRARY_DEPS ${ZSTD_LIBRARIES})
+endif()
+if(WEBP_LIBRARIES)
+  list(APPEND TIFF_LIBRARY_DEPS ${WEBP_LIBRARIES})
 endif()
 
 #report_values(TIFF_INCLUDES TIFF_LIBRARY_DEPS)
@@ -756,6 +748,8 @@ message(STATUS "  Old JPEG support:                   ${old-jpeg} (requested) ${
 message(STATUS "  JPEG 8/12 bit dual mode:            ${jpeg12} (requested) ${JPEG12_FOUND} (availability)")
 message(STATUS "  ISO JBIG support:                   ${jbig} (requested) ${JBIG_FOUND} (availability)")
 message(STATUS "  LZMA2 support:                      ${lzma} (requested) ${LIBLZMA_FOUND} (availability)")
+message(STATUS "  ZSTD support:                       ${zstd} (requested) ${ZSTD_FOUND} (availability)")
+message(STATUS "  WEBP support:                       ${webp} (requested) ${WEBP_FOUND} (availability)")
 message(STATUS "")
 message(STATUS "  C++ support:                        ${cxx} (requested) ${CXX_SUPPORT} (availability)")
 message(STATUS "")

@@ -158,16 +158,6 @@ static INLINE void cfl_predict_lbd_c(const int16_t *ac_buf_q3, uint8_t *dst,
   }
 }
 
-// Null function used for invalid tx_sizes
-void cfl_predict_lbd_null(const int16_t *ac_buf_q3, uint8_t *dst,
-                          int dst_stride, int alpha_q3) {
-  (void)ac_buf_q3;
-  (void)dst;
-  (void)dst_stride;
-  (void)alpha_q3;
-  assert(0);
-}
-
 CFL_PREDICT_FN(c, lbd)
 
 void cfl_predict_hbd_c(const int16_t *ac_buf_q3, uint16_t *dst, int dst_stride,
@@ -180,17 +170,6 @@ void cfl_predict_hbd_c(const int16_t *ac_buf_q3, uint16_t *dst, int dst_stride,
     dst += dst_stride;
     ac_buf_q3 += CFL_BUF_LINE;
   }
-}
-
-// Null function used for invalid tx_sizes
-void cfl_predict_hbd_null(const int16_t *ac_buf_q3, uint16_t *dst,
-                          int dst_stride, int alpha_q3, int bd) {
-  (void)ac_buf_q3;
-  (void)dst;
-  (void)dst_stride;
-  (void)alpha_q3;
-  (void)bd;
-  assert(0);
 }
 
 CFL_PREDICT_FN(c, hbd)
@@ -224,24 +203,6 @@ void cfl_predict_block(MACROBLOCKD *const xd, uint8_t *dst, int dst_stride,
     return;
   }
   get_predict_lbd_fn(tx_size)(cfl->ac_buf_q3, dst, dst_stride, alpha_q3);
-}
-
-// Null function used for invalid tx_sizes
-void cfl_subsample_lbd_null(const uint8_t *input, int input_stride,
-                            uint16_t *output_q3) {
-  (void)input;
-  (void)input_stride;
-  (void)output_q3;
-  assert(0);
-}
-
-// Null function used for invalid tx_sizes
-void cfl_subsample_hbd_null(const uint16_t *input, int input_stride,
-                            uint16_t *output_q3) {
-  (void)input;
-  (void)input_stride;
-  (void)output_q3;
-  assert(0);
 }
 
 static void cfl_luma_subsampling_420_lbd_c(const uint8_t *input,

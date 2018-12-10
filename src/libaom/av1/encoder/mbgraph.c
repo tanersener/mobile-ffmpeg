@@ -179,8 +179,8 @@ static void update_mbgraph_mb_stats(AV1_COMP *cpi, MBGRAPH_MB_STATS *stats,
   x->plane[0].src.buf = buf->y_buffer + mb_y_offset;
   x->plane[0].src.stride = buf->y_stride;
 
-  xd->plane[0].dst.buf = get_frame_new_buffer(cm)->y_buffer + mb_y_offset;
-  xd->plane[0].dst.stride = get_frame_new_buffer(cm)->y_stride;
+  xd->plane[0].dst.buf = cm->cur_frame->buf.y_buffer + mb_y_offset;
+  xd->plane[0].dst.stride = cm->cur_frame->buf.y_stride;
 
   // do intra 16x16 prediction
   intra_error = find_best_16x16_intra(cpi, &stats->ref[INTRA_FRAME].m.mode);
@@ -364,7 +364,7 @@ static void separate_arf_mbs(AV1_COMP *cpi) {
 void av1_update_mbgraph_stats(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
   int i, n_frames = av1_lookahead_depth(cpi->lookahead);
-  YV12_BUFFER_CONFIG *golden_ref = get_ref_frame_buffer(cpi, GOLDEN_FRAME);
+  YV12_BUFFER_CONFIG *golden_ref = &get_ref_frame_buf(cm, GOLDEN_FRAME)->buf;
 
   assert(golden_ref != NULL);
 

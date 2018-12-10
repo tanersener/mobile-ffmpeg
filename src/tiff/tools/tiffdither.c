@@ -1,5 +1,3 @@
-/* $Id: tiffdither.c,v 1.16 2015-06-21 01:09:11 bfriesen Exp $ */
-
 /*
  * Copyright (c) 1988-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.

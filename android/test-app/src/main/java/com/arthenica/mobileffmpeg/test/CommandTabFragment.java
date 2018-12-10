@@ -117,7 +117,7 @@ public class CommandTabFragment extends Fragment {
     public void runFFmpeg() {
         clearLog();
 
-        final String ffmpegCommand = commandText.getText().toString();
+        final String ffmpegCommand = String.format("-hide_banner %s", commandText.getText().toString());
 
         android.util.Log.d(MainActivity.TAG, "Testing COMMAND synchronously.");
 
@@ -135,7 +135,7 @@ public class CommandTabFragment extends Fragment {
     public void runFFmpegAsync() {
         clearLog();
 
-        final String ffmpegCommand = commandText.getText().toString();
+        final String ffmpegCommand = String.format("-hide_banner %s", commandText.getText().toString());
 
         android.util.Log.d(MainActivity.TAG, "Testing COMMAND asynchronously.");
 

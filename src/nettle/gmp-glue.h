@@ -57,6 +57,7 @@
 #define mpz_set_n _nettle_mpz_set_n
 #define mpn_set_base256 _nettle_mpn_set_base256
 #define mpn_set_base256_le _nettle_mpn_set_base256_le
+#define mpn_get_base256 _nettle_mpn_get_base256
 #define mpn_get_base256_le _nettle_mpn_get_base256_le
 #define gmp_alloc_limbs _nettle_gmp_alloc_limbs
 #define gmp_free_limbs _nettle_gmp_free_limbs
@@ -80,6 +81,9 @@
 # define cnd_add_n(cnd, rp, ap, n) mpn_addmul_1 ((rp), (ap), (n), (cnd) != 0)
 # define cnd_sub_n(cnd, rp, ap, n) mpn_submul_1 ((rp), (ap), (n), (cnd) != 0)
 #endif
+
+#define NETTLE_OCTET_SIZE_TO_LIMB_SIZE(n) \
+  (((n) * 8 + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
 
 /* Some functions for interfacing between mpz and mpn code. Signs of
    the mpz numbers are generally ignored. */
@@ -146,6 +150,10 @@ mpn_set_base256 (mp_limb_t *rp, mp_size_t rn,
 void
 mpn_set_base256_le (mp_limb_t *rp, mp_size_t rn,
 		    const uint8_t *xp, size_t xn);
+
+void
+mpn_get_base256 (uint8_t *rp, size_t rn,
+	         const mp_limb_t *xp, mp_size_t xn);
 
 void
 mpn_get_base256_le (uint8_t *rp, size_t rn,

@@ -264,6 +264,8 @@ list(APPEND AOM_AV1_ENCODER_INTRIN_SSE2
             "${AOM_ROOT}/av1/encoder/x86/highbd_block_error_intrin_sse2.c"
             "${AOM_ROOT}/av1/encoder/x86/wedge_utils_sse2.c")
 
+list(APPEND AOM_AV1_ENCODER_INTRIN_SSE3 "${AOM_ROOT}/av1/encoder/x86/ml_sse3.c")
+
 list(APPEND AOM_AV1_ENCODER_ASM_SSSE3_X86_64
             "${AOM_ROOT}/av1/encoder/x86/av1_quantize_ssse3_x86_64.asm")
 
@@ -274,6 +276,7 @@ list(APPEND AOM_AV1_ENCODER_INTRIN_SSE4_1
             "${AOM_ROOT}/av1/encoder/x86/corner_match_sse4.c"
             "${AOM_ROOT}/av1/encoder/x86/encodetxb_sse4.c"
             "${AOM_ROOT}/av1/encoder/x86/highbd_fwd_txfm_sse4.c"
+            "${AOM_ROOT}/av1/encoder/x86/rdopt_sse4.c"
             "${AOM_ROOT}/av1/encoder/x86/pickrst_sse4.c")
 
 list(APPEND AOM_AV1_ENCODER_INTRIN_AVX2
@@ -284,6 +287,7 @@ list(APPEND AOM_AV1_ENCODER_INTRIN_AVX2
             "${AOM_ROOT}/av1/encoder/x86/av1_fwd_txfm2d_avx2.c"
             "${AOM_ROOT}/av1/encoder/x86/wedge_utils_avx2.c"
             "${AOM_ROOT}/av1/encoder/x86/encodetxb_avx2.c"
+            "${AOM_ROOT}/av1/encoder/x86/rdopt_avx2.c"
             "${AOM_ROOT}/av1/encoder/x86/pickrst_avx2.c")
 
 list(APPEND AOM_AV1_ENCODER_INTRIN_NEON
@@ -377,6 +381,14 @@ function(setup_av1_targets)
       add_asm_library("aom_av1_encoder_sse2" "AOM_AV1_ENCODER_ASM_SSE2" "aom")
       add_intrinsics_object_library("-msse2" "sse2" "aom_av1_encoder"
                                     "AOM_AV1_ENCODER_INTRIN_SSE2" "aom")
+    endif()
+  endif()
+
+  if(HAVE_SSE3)
+    require_compiler_flag_nomsvc("-msse3" NO)
+    if(CONFIG_AV1_ENCODER)
+      add_intrinsics_object_library("-msse3" "sse3" "aom_av1_encoder"
+                                    "AOM_AV1_ENCODER_INTRIN_SSE3" "aom")
     endif()
   endif()
 

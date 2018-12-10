@@ -74,16 +74,16 @@ typedef struct {
 } CB_COEFF_BUFFER;
 
 typedef struct {
-  int16_t mode_context[MODE_CTX_REF_FRAMES];
   // TODO(angiebird): Reduce the buffer size according to sb_type
   tran_low_t *tcoeff[MAX_MB_PLANE];
   uint16_t *eobs[MAX_MB_PLANE];
   uint8_t *txb_skip_ctx[MAX_MB_PLANE];
   int *dc_sign_ctx[MAX_MB_PLANE];
-  uint8_t ref_mv_count[MODE_CTX_REF_FRAMES];
   CANDIDATE_MV ref_mv_stack[MODE_CTX_REF_FRAMES][MAX_REF_MV_STACK_SIZE];
   int_mv global_mvs[REF_FRAMES];
   int16_t compound_mode_context[MODE_CTX_REF_FRAMES];
+  int16_t mode_context[MODE_CTX_REF_FRAMES];
+  uint8_t ref_mv_count[MODE_CTX_REF_FRAMES];
 } MB_MODE_INFO_EXT;
 
 typedef struct {
@@ -262,12 +262,10 @@ struct macroblock {
   unsigned int pred_sse[REF_FRAMES];
   int pred_mv_sad[REF_FRAMES];
 
-  int *nmvjointcost;
   int nmv_vec_cost[MV_JOINTS];
   int *nmvcost[2];
   int *nmvcost_hp[2];
   int **mv_cost_stack;
-  int **mvcost;
 
   int32_t *wsrc_buf;
   int32_t *mask_buf;
@@ -280,6 +278,12 @@ struct macroblock {
   uint8_t *tmp_obmc_bufs[2];
 
   FRAME_CONTEXT *backup_tile_ctx;
+  // This context will be used to update color_map_cdf pointer which would be
+  // used during pack bitstream. For single thread and tile-multithreading case
+  // this ponter will be same as xd->tile_ctx, but for the case of row-mt:
+  // xd->tile_ctx will point to a temporary context while tile_pb_ctx will point
+  // to the accurate tile context.
+  FRAME_CONTEXT *tile_pb_ctx;
 
 #if CONFIG_COLLECT_INTER_MODE_RD_STATS
   struct inter_modes_info *inter_modes_info;
@@ -397,6 +401,10 @@ struct macroblock {
   int tx_split_prune_flag;  // Flag to skip tx split RD search.
   int recalc_luma_mc_data;  // Flag to indicate recalculation of MC data during
                             // interpolation filter search
+  // The likelihood of an edge existing in the block (using partial Canny edge
+  // detection). For reference, 556 is the value returned for a solid
+  // vertical black/white edge.
+  uint16_t edge_strength;
 };
 
 static INLINE int is_rect_tx_allowed_bsize(BLOCK_SIZE bsize) {

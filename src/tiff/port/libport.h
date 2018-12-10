@@ -1,5 +1,3 @@
-/* $Id: libport.h,v 1.5 2015-08-19 02:31:04 bfriesen Exp $ */
-
 /*
  * Copyright (c) 2009 Frank Warmerdam
  *
@@ -38,8 +36,17 @@ int strcasecmp(const char *s1, const char *s2);
 #  define HAVE_GETOPT 1
 #endif
 
-#if 0
+#if HAVE_STRTOL
+long strtol(const char *nptr, char **endptr, int base);
+#endif
+#if HAVE_STRTOLL
+long long strtoll(const char *nptr, char **endptr, int base);
+#endif
+#if HAVE_STRTOUL
 unsigned long strtoul(const char *nptr, char **endptr, int base);
+#endif
+#if HAVE_STRTOULL
+unsigned long long strtoull(const char *nptr, char **endptr, int base);
 #endif
 
 #if 0

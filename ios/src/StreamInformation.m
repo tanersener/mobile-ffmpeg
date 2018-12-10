@@ -220,8 +220,8 @@
     return averageFrameRate;
 }
 
-- (void)setAverageFrameRate:(NSString*) newAverageFrameRatehn {
-    averageFrameRate = newAverageFrameRatehn;
+- (void)setAverageFrameRate:(NSString*) newAverageFrameRate {
+    averageFrameRate = newAverageFrameRate;
 }
 
 - (NSString*)getRealFrameRate {

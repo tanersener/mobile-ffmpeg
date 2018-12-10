@@ -116,15 +116,11 @@ typedef struct {
   AV1PixelRect tile_rect;
 } RestSearchCtxt;
 
-static void rsc_on_tile(int tile_row, int tile_col, void *priv) {
-  (void)tile_col;
-
+static void rsc_on_tile(void *priv) {
   RestSearchCtxt *rsc = (RestSearchCtxt *)priv;
   set_default_sgrproj(&rsc->sgrproj);
   set_default_wiener(&rsc->wiener);
-
-  rsc->tile_stripe0 =
-      (tile_row == 0) ? 0 : rsc->cm->rst_end_stripe[tile_row - 1];
+  rsc->tile_stripe0 = 0;
 }
 
 static void reset_rsc(RestSearchCtxt *rsc) {
@@ -144,7 +140,7 @@ static void init_rsc(const YV12_BUFFER_CONFIG *src, const AV1_COMMON *cm,
   rsc->rusi = rusi;
   rsc->sf = sf;
 
-  const YV12_BUFFER_CONFIG *dgd = cm->frame_to_show;
+  const YV12_BUFFER_CONFIG *dgd = &cm->cur_frame->buf;
   const int is_uv = plane != AOM_PLANE_Y;
   rsc->plane_width = src->crop_widths[is_uv];
   rsc->plane_height = src->crop_heights[is_uv];
@@ -169,7 +165,7 @@ static int64_t try_restoration_unit(const RestSearchCtxt *rsc,
   const int bit_depth = cm->seq_params.bit_depth;
   const int highbd = cm->seq_params.use_highbitdepth;
 
-  const YV12_BUFFER_CONFIG *fts = cm->frame_to_show;
+  const YV12_BUFFER_CONFIG *fts = &cm->cur_frame->buf;
   // TODO(yunqing): For now, only use optimized LR filter in decoder. Can be
   // also used in encoder.
   const int optimized_lr = 0;
@@ -410,14 +406,12 @@ static int64_t finer_search_pixel_proj_error(
   return err;
 }
 
-#if CONFIG_INTEGERIZE_SGR
 static int64_t signed_rounded_divide(int64_t dividend, int64_t divisor) {
   if (dividend < 0)
     return (dividend - divisor / 2) / divisor;
   else
     return (dividend + divisor / 2) / divisor;
 }
-#endif  // CONFIG_INTEGERIZE_SGR
 
 static void get_proj_subspace(const uint8_t *src8, int width, int height,
                               int src_stride, const uint8_t *dat8,
@@ -425,7 +419,6 @@ static void get_proj_subspace(const uint8_t *src8, int width, int height,
                               int32_t *flt0, int flt0_stride, int32_t *flt1,
                               int flt1_stride, int *xq,
                               const sgr_params_type *params) {
-#if CONFIG_INTEGERIZE_SGR
   int i, j;
   int64_t H[2][2] = { { 0, 0 }, { 0, 0 } };
   int64_t C[2] = { 0, 0 };
@@ -515,94 +508,6 @@ static void get_proj_subspace(const uint8_t *src8, int width, int height,
     else
       xq[1] = (int)signed_rounded_divide(div2 * (1 << SGRPROJ_PRJ_BITS), Det);
   }
-#else   // CONFIG_INTEGERIZE_SGR
-  int i, j;
-  double H[2][2] = { { 0, 0 }, { 0, 0 } };
-  double C[2] = { 0, 0 };
-  double Det;
-  double x[2];
-  const int size = width * height;
-
-  aom_clear_system_state();
-
-  // Default
-  xq[0] = 0;
-  xq[1] = 0;
-  if (!use_highbitdepth) {
-    const uint8_t *src = src8;
-    const uint8_t *dat = dat8;
-    for (i = 0; i < height; ++i) {
-      for (j = 0; j < width; ++j) {
-        const double u = (double)(dat[i * dat_stride + j] << SGRPROJ_RST_BITS);
-        const double s =
-            (double)(src[i * src_stride + j] << SGRPROJ_RST_BITS) - u;
-        const double f1 =
-            (params->r[0] > 0) ? (double)flt0[i * flt0_stride + j] - u : 0;
-        const double f2 =
-            (params->r[1] > 0) ? (double)flt1[i * flt1_stride + j] - u : 0;
-        H[0][0] += f1 * f1;
-        H[1][1] += f2 * f2;
-        H[0][1] += f1 * f2;
-        C[0] += f1 * s;
-        C[1] += f2 * s;
-      }
-    }
-  } else {
-    const uint16_t *src = CONVERT_TO_SHORTPTR(src8);
-    const uint16_t *dat = CONVERT_TO_SHORTPTR(dat8);
-    for (i = 0; i < height; ++i) {
-      for (j = 0; j < width; ++j) {
-        const double u = (double)(dat[i * dat_stride + j] << SGRPROJ_RST_BITS);
-        const double s =
-            (double)(src[i * src_stride + j] << SGRPROJ_RST_BITS) - u;
-        const double f1 =
-            (params->r[0] > 0) ? (double)flt0[i * flt0_stride + j] - u : 0;
-        const double f2 =
-            (params->r[1] > 0) ? (double)flt1[i * flt1_stride + j] - u : 0;
-        H[0][0] += f1 * f1;
-        H[1][1] += f2 * f2;
-        H[0][1] += f1 * f2;
-        C[0] += f1 * s;
-        C[1] += f2 * s;
-      }
-    }
-  }
-  H[0][0] /= size;
-  H[0][1] /= size;
-  H[1][1] /= size;
-  H[1][0] = H[0][1];
-  C[0] /= size;
-  C[1] /= size;
-  if (params->r[0] == 0) {
-    // H matrix is now only the scalar H[1][1]
-    // C vector is now only the scalar C[1]
-    Det = H[1][1];
-    if (Det < 1e-8) return;  // ill-posed, return default values
-    x[0] = 0;
-    x[1] = C[1] / Det;
-
-    xq[0] = 0;
-    xq[1] = (int)rint(x[1] * (1 << SGRPROJ_PRJ_BITS));
-  } else if (params->r[1] == 0) {
-    // H matrix is now only the scalar H[0][0]
-    // C vector is now only the scalar C[0]
-    Det = H[0][0];
-    if (Det < 1e-8) return;  // ill-posed, return default values
-    x[0] = C[0] / Det;
-    x[1] = 0;
-
-    xq[0] = (int)rint(x[0] * (1 << SGRPROJ_PRJ_BITS));
-    xq[1] = 0;
-  } else {
-    Det = (H[0][0] * H[1][1] - H[0][1] * H[1][0]);
-    if (Det < 1e-8) return;  // ill-posed, return default values
-    x[0] = (H[1][1] * C[0] - H[0][1] * C[1]) / Det;
-    x[1] = (H[0][0] * C[1] - H[1][0] * C[0]) / Det;
-
-    xq[0] = (int)rint(x[0] * (1 << SGRPROJ_PRJ_BITS));
-    xq[1] = (int)rint(x[1] * (1 << SGRPROJ_PRJ_BITS));
-  }
-#endif  // CONFIG_INTEGERIZE_SGR
 }
 
 static void encode_xq(int *xq, int *xqd, const sgr_params_type *params) {
@@ -1376,7 +1281,7 @@ static void search_norestore(const RestorationTileLimits *limits,
 
   const int highbd = rsc->cm->seq_params.use_highbitdepth;
   rusi->sse[RESTORE_NONE] = sse_restoration_unit(
-      limits, rsc->src, rsc->cm->frame_to_show, rsc->plane, highbd);
+      limits, rsc->src, &rsc->cm->cur_frame->buf, rsc->plane, highbd);
 
   rsc->sse += rusi->sse[RESTORE_NONE];
 }
@@ -1460,7 +1365,8 @@ static double search_rest_type(RestSearchCtxt *rsc, RestorationType rtype) {
   };
 
   reset_rsc(rsc);
-  rsc_on_tile(LR_TILE_ROW, LR_TILE_COL, rsc);
+  rsc_on_tile(rsc);
+
   av1_foreach_rest_unit_in_plane(rsc->cm, rsc->plane, funs[rtype], rsc,
                                  &rsc->tile_rect, rsc->cm->rst_tmpbuf, NULL);
   return RDCOST_DBL(rsc->x->rdmult, rsc->bits >> 4, rsc->sse);

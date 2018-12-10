@@ -37,7 +37,8 @@ typedef struct _hash_table {
 void av1_hash_table_init(hash_table *p_hash_table, struct macroblock *x);
 void av1_hash_table_destroy(hash_table *p_hash_table);
 void av1_hash_table_create(hash_table *p_hash_table);
-int32_t av1_hash_table_count(hash_table *p_hash_table, uint32_t hash_value);
+int32_t av1_hash_table_count(const hash_table *p_hash_table,
+                             uint32_t hash_value);
 Iterator av1_hash_get_first_iterator(hash_table *p_hash_table,
                                      uint32_t hash_value);
 int32_t av1_has_exact_match(hash_table *p_hash_table, uint32_t hash_value1,

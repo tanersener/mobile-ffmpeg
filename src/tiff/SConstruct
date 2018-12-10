@@ -1,5 +1,3 @@
-# $Id: SConstruct,v 1.4 2007/02/24 15:03:47 dron Exp $
-
 # Tag Image File Format (TIFF) Software
 #
 # Copyright (C) 2005, Andrey Kiselev <dron@ak4719.spb.edu>

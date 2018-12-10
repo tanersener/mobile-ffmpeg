@@ -62,9 +62,8 @@ void usage_exit(void) {
 #define ALIGN_POWER_OF_TWO(value, n) \
   (((value) + ((1 << (n)) - 1)) & ~((1 << (n)) - 1))
 
-// SB size: 64x64
-const uint8_t output_frame_width_in_tiles_minus_1 = 512 / 64 - 1;
-const uint8_t output_frame_height_in_tiles_minus_1 = 512 / 64 - 1;
+const int output_frame_width = 512;
+const int output_frame_height = 512;
 
 // Spec:
 // typedef struct {
@@ -99,7 +98,9 @@ static int get_image_bps(aom_img_fmt_t fmt) {
 void process_tile_list(const TILE_LIST_INFO *tiles, int num_tiles,
                        aom_codec_pts_t tl_pts, unsigned char **frames,
                        const size_t *frame_sizes, aom_codec_ctx_t *codec,
-                       unsigned char *tl_buf, AvxVideoWriter *writer) {
+                       unsigned char *tl_buf, AvxVideoWriter *writer,
+                       uint8_t output_frame_width_in_tiles_minus_1,
+                       uint8_t output_frame_height_in_tiles_minus_1) {
   unsigned char *tl = tl_buf;
   struct aom_write_bit_buffer wb = { tl, 0 };
   unsigned char *saved_obu_size_loc = NULL;
@@ -188,19 +189,6 @@ void process_tile_list(const TILE_LIST_INFO *tiles, int num_tiles,
           writer, tl_buf, tile_list_obu_header_size + tile_list_obu_size,
           tl_pts))
     die_codec(codec, "Failed to copy compressed tile list.");
-}
-
-static int get_image_bps(aom_img_fmt_t fmt) {
-  switch (fmt) {
-    case AOM_IMG_FMT_I420: return 12;
-    case AOM_IMG_FMT_I422: return 16;
-    case AOM_IMG_FMT_I444: return 24;
-    case AOM_IMG_FMT_I42016: return 24;
-    case AOM_IMG_FMT_I42216: return 32;
-    case AOM_IMG_FMT_I44416: return 48;
-    default: die("Invalid image format");
-  }
-  return 0;
 }
 
 int main(int argc, char **argv) {
@@ -358,10 +346,15 @@ int main(int argc, char **argv) {
   if (tl_buf == NULL) die_codec(&codec, "Failed to allocate tile list buffer.");
 
   aom_codec_pts_t tl_pts = num_references;
+  const uint8_t output_frame_width_in_tiles_minus_1 =
+      output_frame_width / tile_width - 1;
+  const uint8_t output_frame_height_in_tiles_minus_1 =
+      output_frame_height / tile_height - 1;
 
   printf("Reading tile list from file.\n");
   char line[1024];
   FILE *tile_list_fptr = fopen(tile_list_file, "r");
+  if (!tile_list_fptr) die_codec(&codec, "Failed to open tile list file.");
   int num_tiles = 0;
   TILE_LIST_INFO tiles[MAX_TILES];
   while ((fgets(line, 1024, tile_list_fptr)) != NULL) {
@@ -370,7 +363,8 @@ int main(int argc, char **argv) {
       // new render frame or because we've hit our max number of tiles per list.
       if (num_tiles > 0) {
         process_tile_list(tiles, num_tiles, tl_pts, frames, frame_sizes, &codec,
-                          tl_buf, writer);
+                          tl_buf, writer, output_frame_width_in_tiles_minus_1,
+                          output_frame_height_in_tiles_minus_1);
         ++tl_pts;
       }
       num_tiles = 0;
@@ -395,7 +389,8 @@ int main(int argc, char **argv) {
   if (num_tiles > 0) {
     // Flush out the last tile list.
     process_tile_list(tiles, num_tiles, tl_pts, frames, frame_sizes, &codec,
-                      tl_buf, writer);
+                      tl_buf, writer, output_frame_width_in_tiles_minus_1,
+                      output_frame_height_in_tiles_minus_1);
     ++tl_pts;
   }
 

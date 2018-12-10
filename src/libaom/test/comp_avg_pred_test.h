@@ -437,8 +437,8 @@ class AV1HighBDJNTCOMPAVGUPSAMPLEDTest
     const int bd = GET_PARAM(0);
     uint16_t pred8[kMaxSize * kMaxSize];
     uint16_t ref8[kMaxSize * kMaxSize];
-    uint16_t output[kMaxSize * kMaxSize];
-    uint16_t output2[kMaxSize * kMaxSize];
+    DECLARE_ALIGNED(16, uint16_t, output[kMaxSize * kMaxSize]);
+    DECLARE_ALIGNED(16, uint16_t, output2[kMaxSize * kMaxSize]);
 
     for (int i = 0; i < h; ++i)
       for (int j = 0; j < w; ++j) {
@@ -500,8 +500,8 @@ class AV1HighBDJNTCOMPAVGUPSAMPLEDTest
     const int bd = GET_PARAM(0);
     uint16_t pred8[kMaxSize * kMaxSize];
     uint16_t ref8[kMaxSize * kMaxSize];
-    uint16_t output[kMaxSize * kMaxSize];
-    uint16_t output2[kMaxSize * kMaxSize];
+    DECLARE_ALIGNED(16, uint16_t, output[kMaxSize * kMaxSize]);
+    DECLARE_ALIGNED(16, uint16_t, output2[kMaxSize * kMaxSize]);
 
     for (int i = 0; i < h; ++i)
       for (int j = 0; j < w; ++j) {

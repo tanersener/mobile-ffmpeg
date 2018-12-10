@@ -1,3 +1,78 @@
+NEWS for the Nettle 3.4.1 release
+
+	This release fixes a few bugs, and makes the RSA private key
+	operations side channel silent. The RSA improvements are
+	contributed by Simo Sorce and Red Hat, and include one new
+	public function, rsa_sec_decrypt, see below.
+
+	All functions using RSA private keys are now side-channel
+	silent, meaning that they try hard to avoid any branches or
+	memory accesses depending on secret data. This applies both to
+	the bignum calculations, which now use GMP's mpn_sec_* family
+	of functions, and the processing of PKCS#1 padding needed for
+	RSA decryption.
+
+	Nettle's ECC functions were already side-channel silent, while
+	the DSA functions still aren't. There's also one caveat
+	regarding the improved RSA functions: due to small table
+	lookups in relevant mpn_sec_* functions in GMP-6.1.2, the
+	lowest and highest few bits of the secret factors p and q may
+	still leak. I'm not aware of any attacks on RSA where knowing
+	a few bits of the factors makes a significant difference. This
+	leak will likely be plugged in later GMP versions.
+
+	Changes in behavior:
+
+	* The functions rsa_decrypt and rsa_decrypt_tr may now clobber
+	  all of the provided message buffer, independent of the
+	  actual message length. They are side-channel silent, in that
+	  branches and memory accesses don't depend on the validity or
+	  length of the message. Side-channel leakage from the
+	  caller's use of length and return value may still provide an
+	  oracle useable for a Bleichenbacher-style chosen ciphertext
+	  attack. Which is why the new function rsa_sec_decrypt is
+	  recommended.
+
+	New features:
+
+	* A new function rsa_sec_decrypt. It differs from
+	  rsa_decrypt_tr in that the length of the decrypted message
+	  is given a priori, and PKCS#1 padding indicating a different
+	  length is treated as an error. For applications that may be
+	  subject to chosen ciphertext attacks, it is recommended to
+	  initialize the message area with random data, call this
+	  function, and ignore the return value. This applies in
+	  particular to RSA-based key exchange in the TLS protocol.
+
+	Bug fixes:
+
+	* Fix bug in pkcs1-conv, missing break statements in the
+	  parsing of PEM input files.
+
+	* Fix link error on the pss-mgf1-test test, affecting builds
+	  without public key support.
+
+	Performance regression:
+
+	* All RSA private key operations employing RSA blinding, i.e.,
+	  rsa_decrypt_tr, rsa_*_sign_tr, the new rsa_sec_decrypt, and
+	  rsa_compute_root_tr, are significantly slower. This is
+	  because (i) RSA blinding now use side-channel silent
+	  operations, (ii) blinding includes a modular inversion, and
+	  (iii) side-channel silent modular inversion, implemented as
+	  mpn_sec_invert, is very expensive. A 60% slowdown for
+	  2048-bit RSA keys have been measured.
+
+	Miscellaneous:
+
+	* Building the public key support of nettle now requires GMP
+	  version 6.0 or later (unless --enable-mini-gmp is used).
+
+	The shared library names are libnettle.so.6.5 and
+	libhogweed.so.4.5, with sonames still libnettle.so.6 and
+	libhogweed.so.4. It is intended to be fully binary compatible
+	with nettle-3.1.
+
 NEWS for the Nettle 3.4 release
 
 	This release fixes bugs and adds a few new features. It also
@@ -121,7 +196,7 @@ NEWS for the Nettle 3.3 release
 	This release fixes a couple of bugs, and improves resistance
 	to side-channel attacks on RSA and DSA private key operations.
 
-	Changes in behavoir:
+	Changes in behavior:
 
 	* Invalid private RSA keys, with an even modulo, are now
 	  rejected by rsa_private_key_prepare. (Earlier versions

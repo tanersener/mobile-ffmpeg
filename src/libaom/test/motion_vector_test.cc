@@ -9,6 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
+#include <memory>
+
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 
 #include "test/codec_factory.h"
@@ -90,7 +92,7 @@ TEST_P(MotionVectorTestLarge, OverallTest) {
   cfg_.g_profile = 0;
   init_flags_ = AOM_CODEC_USE_PSNR;
 
-  testing::internal::scoped_ptr<libaom_test::VideoSource> video;
+  std::unique_ptr<libaom_test::VideoSource> video;
   video.reset(new libaom_test::YUVVideoSource(
       "niklas_640_480_30.yuv", AOM_IMG_FMT_I420, width, height, 30, 1, 0, 3));
 

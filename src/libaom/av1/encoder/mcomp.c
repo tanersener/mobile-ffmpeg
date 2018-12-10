@@ -112,7 +112,7 @@ static int mvsad_err_cost(const MACROBLOCK *x, const MV *mv, const MV *ref,
                           int sad_per_bit) {
   const MV diff = { (mv->row - ref->row) * 8, (mv->col - ref->col) * 8 };
   return ROUND_POWER_OF_TWO(
-      (unsigned)mv_cost(&diff, x->nmvjointcost, x->mvcost) * sad_per_bit,
+      (unsigned)mv_cost(&diff, x->nmv_vec_cost, x->mv_cost_stack) * sad_per_bit,
       AV1_PROB_COST_SHIFT);
 }
 
@@ -901,7 +901,7 @@ unsigned int av1_compute_motion_cost(const AV1_COMP *cpi, MACROBLOCK *const x,
 
   av1_build_inter_predictors_sby(cm, xd, mi_row, mi_col, NULL, bsize);
   mse = vfp->vf(dst, dst_stride, src, src_stride, &sse);
-  mse += mv_err_cost(this_mv, &ref_mv.as_mv, x->nmvjointcost, x->mvcost,
+  mse += mv_err_cost(this_mv, &ref_mv.as_mv, x->nmv_vec_cost, x->mv_cost_stack,
                      x->errorperbit);
   return mse;
 }
@@ -1041,8 +1041,8 @@ static INLINE void calc_int_cost_list(const MACROBLOCK *x,
       cost_list[i + 1] = fn_ptr->vf(what->buf, what->stride,
                                     get_buf_from_mv(in_what, &neighbor_mv),
                                     in_what->stride, &sse) +
-                         mv_err_cost(&neighbor_mv, &fcenter_mv, x->nmvjointcost,
-                                     x->mvcost, x->errorperbit);
+                         mv_err_cost(&neighbor_mv, &fcenter_mv, x->nmv_vec_cost,
+                                     x->mv_cost_stack, x->errorperbit);
     }
   } else {
     for (i = 0; i < 4; i++) {
@@ -1054,8 +1054,8 @@ static INLINE void calc_int_cost_list(const MACROBLOCK *x,
             fn_ptr->vf(what->buf, what->stride,
                        get_buf_from_mv(in_what, &neighbor_mv), in_what->stride,
                        &sse) +
-            mv_err_cost(&neighbor_mv, &fcenter_mv, x->nmvjointcost, x->mvcost,
-                        x->errorperbit);
+            mv_err_cost(&neighbor_mv, &fcenter_mv, x->nmv_vec_cost,
+                        x->mv_cost_stack, x->errorperbit);
     }
   }
 }
@@ -1377,8 +1377,8 @@ int av1_get_mvpred_var(const MACROBLOCK *x, const MV *best_mv,
 
   return vfp->vf(what->buf, what->stride, get_buf_from_mv(in_what, best_mv),
                  in_what->stride, &unused) +
-         (use_mvcost ? mv_err_cost(&mv, center_mv, x->nmvjointcost, x->mvcost,
-                                   x->errorperbit)
+         (use_mvcost ? mv_err_cost(&mv, center_mv, x->nmv_vec_cost,
+                                   x->mv_cost_stack, x->errorperbit)
                      : 0);
 }
 
@@ -1393,8 +1393,8 @@ int av1_get_mvpred_av_var(const MACROBLOCK *x, const MV *best_mv,
 
   return vfp->svaf(get_buf_from_mv(in_what, best_mv), in_what->stride, 0, 0,
                    what->buf, what->stride, &unused, second_pred) +
-         (use_mvcost ? mv_err_cost(&mv, center_mv, x->nmvjointcost, x->mvcost,
-                                   x->errorperbit)
+         (use_mvcost ? mv_err_cost(&mv, center_mv, x->nmv_vec_cost,
+                                   x->mv_cost_stack, x->errorperbit)
                      : 0);
 }
 
@@ -1412,8 +1412,8 @@ int av1_get_mvpred_mask_var(const MACROBLOCK *x, const MV *best_mv,
   return vfp->msvf(what->buf, what->stride, 0, 0,
                    get_buf_from_mv(in_what, best_mv), in_what->stride,
                    second_pred, mask, mask_stride, invert_mask, &unused) +
-         (use_mvcost ? mv_err_cost(&mv, center_mv, x->nmvjointcost, x->mvcost,
-                                   x->errorperbit)
+         (use_mvcost ? mv_err_cost(&mv, center_mv, x->nmv_vec_cost,
+                                   x->mv_cost_stack, x->errorperbit)
                      : 0);
 }
 
@@ -2209,9 +2209,9 @@ int av1_full_pixel_search(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
 
         // for the hashMap
         hash_table *ref_frame_hash =
-            intra
-                ? &cpi->common.cur_frame->hash_table
-                : av1_get_ref_frame_hash_map(cpi, x->e_mbd.mi[0]->ref_frame[0]);
+            intra ? &cpi->common.cur_frame->hash_table
+                  : av1_get_ref_frame_hash_map(&cpi->common,
+                                               x->e_mbd.mi[0]->ref_frame[0]);
 
         av1_get_block_hash_value(
             what, what_stride, block_width, &hash_value1, &hash_value2,
@@ -2301,8 +2301,9 @@ int av1_full_pixel_search(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
                                         mask, vfp, z, pre(y, y_stride, r, c), \
                                         y_stride, sp(c), sp(r), w, h, &sse,   \
                                         use_accurate_subpel_search);          \
-    if ((v = MVC(r, c) + thismse) < besterr) {                                \
-      besterr = v;                                                            \
+    v = mv_err_cost(&this_mv, ref_mv, mvjcost, mvcost, error_per_bit);        \
+    if ((v + thismse) < besterr) {                                            \
+      besterr = v + thismse;                                                  \
       br = r;                                                                 \
       bc = c;                                                                 \
       *distortion = thismse;                                                  \
@@ -2536,8 +2537,8 @@ static int get_obmc_mvpred_var(const MACROBLOCK *x, const int32_t *wsrc,
 
   return vfp->ovf(get_buf_from_mv(in_what, best_mv), in_what->stride, wsrc,
                   mask, &unused) +
-         (use_mvcost ? mv_err_cost(&mv, center_mv, x->nmvjointcost, x->mvcost,
-                                   x->errorperbit)
+         (use_mvcost ? mv_err_cost(&mv, center_mv, x->nmv_vec_cost,
+                                   x->mv_cost_stack, x->errorperbit)
                      : 0);
 }
 

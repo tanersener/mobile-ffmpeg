@@ -23,6 +23,9 @@ extern "C" {
 void av1_resize_plane(const uint8_t *const input, int height, int width,
                       int in_stride, uint8_t *output, int height2, int width2,
                       int out_stride);
+void av1_upscale_plane_double_prec(const double *const input, int height,
+                                   int width, int in_stride, double *output,
+                                   int height2, int width2, int out_stride);
 void av1_resize_frame420(const uint8_t *const y, int y_stride,
                          const uint8_t *const u, const uint8_t *const v,
                          int uv_stride, int height, int width, uint8_t *oy,

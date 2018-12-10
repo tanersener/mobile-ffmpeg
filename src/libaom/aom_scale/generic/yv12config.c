@@ -55,6 +55,13 @@ int aom_realloc_frame_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
   if (width > DECODE_WIDTH_LIMIT || height > DECODE_HEIGHT_LIMIT) return -1;
 #endif
 
+  /* Only support allocating buffers that have a border that's a multiple
+   * of 32. The border restriction is required to get 16-byte alignment of
+   * the start of the chroma rows without introducing an arbitrary gap
+   * between planes, which would break the semantics of things like
+   * aom_img_set_rect(). */
+  if (border & 0x1f) return -3;
+
   if (ybf) {
     const int aom_byte_align = (byte_alignment == 0) ? 1 : byte_alignment;
     const int aligned_width = (width + 7) & ~7;
@@ -109,7 +116,7 @@ int aom_realloc_frame_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
       memset(ybf->buffer_alloc, 0, (size_t)frame_size);
 #endif
 #endif
-    } else if (frame_size > (size_t)ybf->buffer_alloc_sz) {
+    } else if (frame_size > ybf->buffer_alloc_sz) {
       // Allocation to hold larger frame, or first allocation.
       aom_free(ybf->buffer_alloc);
       ybf->buffer_alloc = NULL;
@@ -126,13 +133,6 @@ int aom_realloc_frame_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
       // removed if border is totally removed.
       memset(ybf->buffer_alloc, 0, ybf->buffer_alloc_sz);
     }
-
-    /* Only support allocating buffers that have a border that's a multiple
-     * of 32. The border restriction is required to get 16-byte alignment of
-     * the start of the chroma rows without introducing an arbitrary gap
-     * between planes, which would break the semantics of things like
-     * aom_img_set_rect(). */
-    if (border & 0x1f) return -3;
 
     ybf->y_crop_width = width;
     ybf->y_crop_height = height;

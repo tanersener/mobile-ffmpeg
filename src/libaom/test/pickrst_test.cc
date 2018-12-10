@@ -11,15 +11,16 @@
 
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 
-#include "test/function_equivalence_test.h"
 #include "test/register_state_check.h"
+#include "test/acm_random.h"
+#include "test/util.h"
 
 #include "config/aom_config.h"
 #include "config/aom_dsp_rtcd.h"
 
 #include "aom/aom_integer.h"
+#include "aom_ports/aom_timer.h"
 #include "av1/encoder/pickrst.h"
-using libaom_test::FunctionEquivalenceTest;
 
 #define MAX_DATA_BLOCK 384
 
@@ -30,8 +31,6 @@ typedef int64_t (*lowbd_pixel_proj_error_func)(
     const uint8_t *src8, int width, int height, int src_stride,
     const uint8_t *dat8, int dat_stride, int32_t *flt0, int flt0_stride,
     int32_t *flt1, int flt1_stride, int xq[2], const sgr_params_type *params);
-
-typedef libaom_test::FuncParam<lowbd_pixel_proj_error_func> TestFuncs;
 
 ////////////////////////////////////////////////////////////////////////////////
 // 8 bit
@@ -46,13 +45,17 @@ class PixelProjErrorTest
   virtual void SetUp() {
     target_func_ = GET_PARAM(0);
     src_ = (uint8_t *)(aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK *
-                                  sizeof(uint8_t)));
+                                  sizeof(*src_)));
+    ASSERT_NE(src_, nullptr);
     dgd_ = (uint8_t *)(aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK *
-                                  sizeof(uint8_t)));
+                                  sizeof(*dgd_)));
+    ASSERT_NE(dgd_, nullptr);
     flt0_ = (int32_t *)(aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK *
-                                   sizeof(int32_t)));
+                                   sizeof(*flt0_)));
+    ASSERT_NE(flt0_, nullptr);
     flt1_ = (int32_t *)(aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK *
-                                   sizeof(int32_t)));
+                                   sizeof(*flt1_)));
+    ASSERT_NE(flt1_, nullptr);
   }
   virtual void TearDown() {
     aom_free(src_);
@@ -60,19 +63,19 @@ class PixelProjErrorTest
     aom_free(flt0_);
     aom_free(flt1_);
   }
-  void runPixelProjErrorTest(int32_t run_times);
-  void runPixelProjErrorTest_ExtremeValues();
+  void RunPixelProjErrorTest(int32_t run_times);
+  void RunPixelProjErrorTest_ExtremeValues();
 
  private:
   lowbd_pixel_proj_error_func target_func_;
-  ACMRandom rng_;
+  libaom_test::ACMRandom rng_;
   uint8_t *src_;
   uint8_t *dgd_;
   int32_t *flt0_;
   int32_t *flt1_;
 };
 
-void PixelProjErrorTest::runPixelProjErrorTest(int32_t run_times) {
+void PixelProjErrorTest::RunPixelProjErrorTest(int32_t run_times) {
   int h_end = run_times != 1 ? 128 : (rng_.Rand16() % MAX_DATA_BLOCK) + 1;
   int v_end = run_times != 1 ? 128 : (rng_.Rand16() % MAX_DATA_BLOCK) + 1;
   const int dgd_stride = MAX_DATA_BLOCK;
@@ -124,7 +127,7 @@ void PixelProjErrorTest::runPixelProjErrorTest(int32_t run_times) {
   }
 }
 
-void PixelProjErrorTest::runPixelProjErrorTest_ExtremeValues() {
+void PixelProjErrorTest::RunPixelProjErrorTest_ExtremeValues() {
   const int h_start = 0;
   int h_end = 192;
   const int v_start = 0;
@@ -165,13 +168,13 @@ void PixelProjErrorTest::runPixelProjErrorTest_ExtremeValues() {
   }
 }
 
-TEST_P(PixelProjErrorTest, RandomValues) { runPixelProjErrorTest(1); }
+TEST_P(PixelProjErrorTest, RandomValues) { RunPixelProjErrorTest(1); }
 
 TEST_P(PixelProjErrorTest, ExtremeValues) {
-  runPixelProjErrorTest_ExtremeValues();
+  RunPixelProjErrorTest_ExtremeValues();
 }
 
-TEST_P(PixelProjErrorTest, DISABLED_Speed) { runPixelProjErrorTest(200000); }
+TEST_P(PixelProjErrorTest, DISABLED_Speed) { RunPixelProjErrorTest(200000); }
 
 #if HAVE_SSE4_1
 INSTANTIATE_TEST_CASE_P(SSE4_1, PixelProjErrorTest,
@@ -194,8 +197,6 @@ typedef int64_t (*highbd_pixel_proj_error_func)(
     const uint8_t *dat8, int dat_stride, int32_t *flt0, int flt0_stride,
     int32_t *flt1, int flt1_stride, int xq[2], const sgr_params_type *params);
 
-typedef libaom_test::FuncParam<highbd_pixel_proj_error_func> TestFuncs;
-
 ////////////////////////////////////////////////////////////////////////////////
 // High bit-depth
 ////////////////////////////////////////////////////////////////////////////////
@@ -210,12 +211,16 @@ class PixelProjHighbdErrorTest
     target_func_ = GET_PARAM(0);
     src_ =
         (uint16_t *)aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(*src_));
+    ASSERT_NE(src_, nullptr);
     dgd_ =
         (uint16_t *)aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(*dgd_));
+    ASSERT_NE(dgd_, nullptr);
     flt0_ =
         (int32_t *)aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(*flt0_));
+    ASSERT_NE(flt0_, nullptr);
     flt1_ =
         (int32_t *)aom_malloc(MAX_DATA_BLOCK * MAX_DATA_BLOCK * sizeof(*flt1_));
+    ASSERT_NE(flt1_, nullptr);
   }
   virtual void TearDown() {
     aom_free(src_);
@@ -223,19 +228,19 @@ class PixelProjHighbdErrorTest
     aom_free(flt0_);
     aom_free(flt1_);
   }
-  void runPixelProjErrorTest(int32_t run_times);
-  void runPixelProjErrorTest_ExtremeValues();
+  void RunPixelProjErrorTest(int32_t run_times);
+  void RunPixelProjErrorTest_ExtremeValues();
 
  private:
   highbd_pixel_proj_error_func target_func_;
-  ACMRandom rng_;
+  libaom_test::ACMRandom rng_;
   uint16_t *src_;
   uint16_t *dgd_;
   int32_t *flt0_;
   int32_t *flt1_;
 };
 
-void PixelProjHighbdErrorTest::runPixelProjErrorTest(int32_t run_times) {
+void PixelProjHighbdErrorTest::RunPixelProjErrorTest(int32_t run_times) {
   int h_end = run_times != 1 ? 128 : (rng_.Rand16() % MAX_DATA_BLOCK) + 1;
   int v_end = run_times != 1 ? 128 : (rng_.Rand16() % MAX_DATA_BLOCK) + 1;
   const int dgd_stride = MAX_DATA_BLOCK;
@@ -287,7 +292,7 @@ void PixelProjHighbdErrorTest::runPixelProjErrorTest(int32_t run_times) {
   }
 }
 
-void PixelProjHighbdErrorTest::runPixelProjErrorTest_ExtremeValues() {
+void PixelProjHighbdErrorTest::RunPixelProjErrorTest_ExtremeValues() {
   const int h_start = 0;
   int h_end = 192;
   const int v_start = 0;
@@ -328,14 +333,14 @@ void PixelProjHighbdErrorTest::runPixelProjErrorTest_ExtremeValues() {
   }
 }
 
-TEST_P(PixelProjHighbdErrorTest, RandomValues) { runPixelProjErrorTest(1); }
+TEST_P(PixelProjHighbdErrorTest, RandomValues) { RunPixelProjErrorTest(1); }
 
 TEST_P(PixelProjHighbdErrorTest, ExtremeValues) {
-  runPixelProjErrorTest_ExtremeValues();
+  RunPixelProjErrorTest_ExtremeValues();
 }
 
 TEST_P(PixelProjHighbdErrorTest, DISABLED_Speed) {
-  runPixelProjErrorTest(200000);
+  RunPixelProjErrorTest(200000);
 }
 
 #if HAVE_SSE4_1

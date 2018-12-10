@@ -2,14 +2,16 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 27
+
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 30
-        versionName "3.0"
+        versionCode 210310
+        versionName "3.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         project.archivesBaseName = "mobile-ffmpeg"
     }
+
     buildTypes {
         release {
             minifyEnabled false

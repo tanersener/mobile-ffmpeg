@@ -61,6 +61,10 @@ static void Help(void) {
   printf("\n");
   printf("example: img2webp -loop 2 in0.png -lossy in1.jpg\n"
          "                  -d 80 in2.tiff -o out.webp\n");
+  printf("\nNote: if a single file name is passed as the argument, the "
+         "arguments will be\n");
+  printf("tokenized from this file. The file name must not start with "
+         "the character '-'.\n");
 }
 
 //------------------------------------------------------------------------------

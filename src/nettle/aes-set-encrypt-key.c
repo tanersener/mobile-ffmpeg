@@ -37,6 +37,7 @@
 #endif
 
 #include <assert.h>
+#include <stdlib.h>
 
 #include "aes-internal.h"
 

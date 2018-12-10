@@ -818,7 +818,7 @@ mpz_urandomb (mpz_t r, struct knuth_lfib_ctx *ctx, mp_bitcnt_t bits)
   uint8_t *buf = xalloc (bytes);
 
   knuth_lfib_random (ctx, bytes, buf);
-  buf[bytes-1] &= 0xff >> (8*bytes - bits);
+  buf[0] &= 0xff >> (8*bytes - bits);
   nettle_mpz_set_str_256_u (r, bytes, buf);
   free (buf);
 }

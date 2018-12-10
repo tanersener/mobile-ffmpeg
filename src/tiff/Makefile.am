@@ -31,8 +31,7 @@ ACLOCAL_AMFLAGS = -I m4
 docfiles = \
 	COPYRIGHT \
 	ChangeLog \
-	README \
-	README.vms \
+	README.md \
 	RELEASE-DATE \
 	TODO \
 	VERSION

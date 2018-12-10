@@ -1,5 +1,3 @@
-/* $Id: tiff2rgba.c,v 1.22 2016-08-15 20:06:41 erouault Exp $ */
-
 /*
  * Copyright (c) 1991-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.

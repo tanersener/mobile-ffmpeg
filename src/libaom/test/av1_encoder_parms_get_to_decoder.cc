@@ -9,6 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
+#include <memory>
+
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 
 #include "test/codec_factory.h"
@@ -146,7 +148,7 @@ class AVxEncoderParmsGetToDecoder
 TEST_P(AVxEncoderParmsGetToDecoder, BitstreamParms) {
   init_flags_ = AOM_CODEC_USE_PSNR;
 
-  testing::internal::scoped_ptr<libaom_test::VideoSource> video(
+  std::unique_ptr<libaom_test::VideoSource> video(
       new libaom_test::Y4mVideoSource(test_video_.name, 0, test_video_.frames));
   ASSERT_TRUE(video.get() != NULL);
 

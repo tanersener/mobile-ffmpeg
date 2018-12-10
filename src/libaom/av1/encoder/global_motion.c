@@ -15,8 +15,11 @@
 #include <math.h>
 #include <assert.h>
 
+#include "config/aom_dsp_rtcd.h"
+
 #include "av1/encoder/global_motion.h"
 
+#include "av1/common/convolve.h"
 #include "av1/common/resize.h"
 #include "av1/common/warped_motion.h"
 
@@ -29,6 +32,7 @@
 #define MIN_INLIER_PROB 0.1
 
 #define MIN_TRANS_THRESH (1 * GM_TRANS_DECODE_FACTOR)
+#define USE_GM_FEATURE_BASED 1
 
 // Border over which to compute the global motion
 #define ERRORADV_BORDER 0
@@ -37,21 +41,28 @@
 #define N_LEVELS 5
 // Size of square patches in the disflow dense grid
 #define PATCH_SIZE 5
+// Minimum size of border padding for disflow
+#define MIN_PAD 7
 
 // Struct for an image pyramid
 typedef struct {
   int n_levels;
+  int pad_size;
+  int has_gradient;
   int widths[N_LEVELS];
   int heights[N_LEVELS];
+  int strides[N_LEVELS];
   int level_loc[N_LEVELS];
   unsigned char *level_buffer;
+  double *level_dx_buffer;
+  double *level_dy_buffer;
 } ImagePyramid;
 
 static const double erroradv_tr[] = { 0.65, 0.60, 0.55 };
 static const double erroradv_prod_tr[] = { 20000, 18000, 16000 };
 
-int is_enough_erroradvantage(double best_erroradvantage, int params_cost,
-                             int erroradv_type) {
+int av1_is_enough_erroradvantage(double best_erroradvantage, int params_cost,
+                                 int erroradv_type) {
   assert(erroradv_type < GM_ERRORADV_TR_TYPES);
   return best_erroradvantage < erroradv_tr[erroradv_type] &&
          best_erroradvantage * params_cost < erroradv_prod_tr[erroradv_type];
@@ -90,7 +101,8 @@ static void convert_to_params(const double *params, int32_t *model) {
   }
 }
 
-void convert_model_to_params(const double *params, WarpedMotionParams *model) {
+void av1_convert_model_to_params(const double *params,
+                                 WarpedMotionParams *model) {
   convert_to_params(params, model->wmmat);
   model->wmtype = get_gmtype(model);
   model->invalid = 0;
@@ -146,12 +158,13 @@ static void force_wmtype(WarpedMotionParams *wm, TransformationType wmtype) {
   wm->wmtype = wmtype;
 }
 
-int64_t refine_integerized_param(WarpedMotionParams *wm,
-                                 TransformationType wmtype, int use_hbd, int bd,
-                                 uint8_t *ref, int r_width, int r_height,
-                                 int r_stride, uint8_t *dst, int d_width,
-                                 int d_height, int d_stride, int n_refinements,
-                                 int64_t best_frame_error) {
+int64_t av1_refine_integerized_param(WarpedMotionParams *wm,
+                                     TransformationType wmtype, int use_hbd,
+                                     int bd, uint8_t *ref, int r_width,
+                                     int r_height, int r_stride, uint8_t *dst,
+                                     int d_width, int d_height, int d_stride,
+                                     int n_refinements,
+                                     int64_t best_frame_error) {
   static const int max_trans_model_params[TRANS_TYPES] = { 0, 2, 4, 6 };
   const int border = ERRORADV_BORDER;
   int i = 0, p;
@@ -255,12 +268,11 @@ static unsigned char *downconvert_frame(YV12_BUFFER_CONFIG *frm,
   return buf_8bit;
 }
 
-int compute_global_motion_feature_based(TransformationType type,
-                                        YV12_BUFFER_CONFIG *frm,
-                                        YV12_BUFFER_CONFIG *ref, int bit_depth,
-                                        int *num_inliers_by_motion,
-                                        double *params_by_motion,
-                                        int num_motions) {
+#if USE_GM_FEATURE_BASED
+static int compute_global_motion_feature_based(
+    TransformationType type, YV12_BUFFER_CONFIG *frm, YV12_BUFFER_CONFIG *ref,
+    int bit_depth, int *num_inliers_by_motion, double *params_by_motion,
+    int num_motions) {
   int i;
   int num_frm_corners, num_ref_corners;
   int num_correspondences;
@@ -311,77 +323,330 @@ int compute_global_motion_feature_based(TransformationType type,
   }
   return 0;
 }
+#else
+static INLINE RansacFuncDouble
+get_ransac_double_prec_type(TransformationType type) {
+  switch (type) {
+    case AFFINE: return ransac_affine_double_prec;
+    case ROTZOOM: return ransac_rotzoom_double_prec;
+    case TRANSLATION: return ransac_translation_double_prec;
+    default: assert(0); return NULL;
+  }
+}
 
-static ImagePyramid *alloc_pyramid(int width, int height) {
+double getCubicValue(double p[4], double x) {
+  return p[1] + 0.5 * x *
+                    (p[2] - p[0] +
+                     x * (2.0 * p[0] - 5.0 * p[1] + 4.0 * p[2] - p[3] +
+                          x * (3.0 * (p[1] - p[2]) + p[3] - p[0])));
+}
+
+void get_subcolumn(unsigned char *ref, double col[4], int stride, int x,
+                   int y_start) {
+  int i;
+  for (i = 0; i < 4; ++i) {
+    col[i] = ref[(i + y_start) * stride + x];
+  }
+}
+
+double bicubic(unsigned char *ref, double x, double y, int stride) {
+  double arr[4];
+  int k;
+  int i = (int)x;
+  int j = (int)y;
+  for (k = 0; k < 4; ++k) {
+    double arr_temp[4];
+    get_subcolumn(ref, arr_temp, stride, i + k - 1, j - 1);
+    arr[k] = getCubicValue(arr_temp, y - j);
+  }
+  return getCubicValue(arr, x - i);
+}
+
+// Interpolate a warped block using bicubic interpolation when possible
+unsigned char interpolate(unsigned char *ref, double x, double y, int width,
+                          int height, int stride) {
+  if (x < 0 && y < 0)
+    return ref[0];
+  else if (x < 0 && y > height - 1)
+    return ref[(height - 1) * stride];
+  else if (x > width - 1 && y < 0)
+    return ref[width - 1];
+  else if (x > width - 1 && y > height - 1)
+    return ref[(height - 1) * stride + (width - 1)];
+  else if (x < 0) {
+    int v;
+    int i = (int)y;
+    double a = y - i;
+    if (y > 1 && y < height - 2) {
+      double arr[4];
+      get_subcolumn(ref, arr, stride, 0, i - 1);
+      return clamp((int)(getCubicValue(arr, a) + 0.5), 0, 255);
+    }
+    v = (int)(ref[i * stride] * (1 - a) + ref[(i + 1) * stride] * a + 0.5);
+    return clamp(v, 0, 255);
+  } else if (y < 0) {
+    int v;
+    int j = (int)x;
+    double b = x - j;
+    if (x > 1 && x < width - 2) {
+      double arr[4] = { ref[j - 1], ref[j], ref[j + 1], ref[j + 2] };
+      return clamp((int)(getCubicValue(arr, b) + 0.5), 0, 255);
+    }
+    v = (int)(ref[j] * (1 - b) + ref[j + 1] * b + 0.5);
+    return clamp(v, 0, 255);
+  } else if (x > width - 1) {
+    int v;
+    int i = (int)y;
+    double a = y - i;
+    if (y > 1 && y < height - 2) {
+      double arr[4];
+      get_subcolumn(ref, arr, stride, width - 1, i - 1);
+      return clamp((int)(getCubicValue(arr, a) + 0.5), 0, 255);
+    }
+    v = (int)(ref[i * stride + width - 1] * (1 - a) +
+              ref[(i + 1) * stride + width - 1] * a + 0.5);
+    return clamp(v, 0, 255);
+  } else if (y > height - 1) {
+    int v;
+    int j = (int)x;
+    double b = x - j;
+    if (x > 1 && x < width - 2) {
+      int row = (height - 1) * stride;
+      double arr[4] = { ref[row + j - 1], ref[row + j], ref[row + j + 1],
+                        ref[row + j + 2] };
+      return clamp((int)(getCubicValue(arr, b) + 0.5), 0, 255);
+    }
+    v = (int)(ref[(height - 1) * stride + j] * (1 - b) +
+              ref[(height - 1) * stride + j + 1] * b + 0.5);
+    return clamp(v, 0, 255);
+  } else if (x > 1 && y > 1 && x < width - 2 && y < height - 2) {
+    return clamp((int)(bicubic(ref, x, y, stride) + 0.5), 0, 255);
+  } else {
+    int i = (int)y;
+    int j = (int)x;
+    double a = y - i;
+    double b = x - j;
+    int v = (int)(ref[i * stride + j] * (1 - a) * (1 - b) +
+                  ref[i * stride + j + 1] * (1 - a) * b +
+                  ref[(i + 1) * stride + j] * a * (1 - b) +
+                  ref[(i + 1) * stride + j + 1] * a * b);
+    return clamp(v, 0, 255);
+  }
+}
+
+// Warps a block using flow vector [u, v] and computes the mse
+double compute_warp_and_error(unsigned char *ref, unsigned char *frm, int width,
+                              int height, int stride, double u, double v) {
+  int i, j;
+  double warped, x, y;
+  double mse = 0;
+  double err = 0;
+  for (i = 0; i < height; ++i)
+    for (j = 0; j < width; ++j) {
+      x = (double)j - u;
+      y = (double)i - v;
+      warped = interpolate(ref, x, y, width, height, stride);
+      err = warped - frm[j + i * stride];
+      mse += err * err;
+    }
+
+  mse /= (width * height);
+  return mse;
+}
+
+// Computes the components of the system of equations used to solve for
+// a flow vector. This includes:
+// 1.) The hessian matrix for optical flow. This matrix is in the
+// form of:
+//
+//       M = |sum(dx * dx)  sum(dx * dy)|
+//           |sum(dx * dy)  sum(dy * dy)|
+//
+// 2.)   b = |sum(dx * dt)|
+//           |sum(dy * dt)|
+// Where the sums are computed over a square window of PATCH_SIZE.
+static INLINE void compute_flow_system(const double *dx, const double *dy,
+                                       const double *dt, int stride, double *M,
+                                       double *b) {
+  for (int i = 0; i < PATCH_SIZE; i++) {
+    for (int j = 0; j < PATCH_SIZE; j++) {
+      M[0] += dx[i * stride + j] * dx[i * stride + j];
+      M[1] += dx[i * stride + j] * dy[i * stride + j];
+      M[3] += dy[i * stride + j] * dy[i * stride + j];
+
+      b[0] += dx[i * stride + j] * dt[i * stride + j];
+      b[1] += dy[i * stride + j] * dt[i * stride + j];
+    }
+  }
+  M[2] = M[1];
+}
+
+// Solves a general Mx = b where M is a 2x2 matrix and b is a 2x1 matrix
+static INLINE void solve_2x2_system(const double *M, const double *b,
+                                    double *output_vec) {
+  double M_0 = M[0];
+  double M_3 = M[3];
+  double det = (M_0 * M_3) - (M[1] * M[2]);
+  if (det < 1e-5) {
+    // Handle singular matrix
+    // TODO(sarahparker) compare results using pseudo inverse instead
+    M_0 += 1e-10;
+    M_3 += 1e-10;
+    det = (M_0 * M_3) - (M[1] * M[2]);
+  }
+  const double det_inv = 1 / det;
+  const double mult_b0 = det_inv * b[0];
+  const double mult_b1 = det_inv * b[1];
+  output_vec[0] = M_3 * mult_b0 - M[1] * mult_b1;
+  output_vec[1] = -M[2] * mult_b0 + M_0 * mult_b1;
+}
+
+static INLINE void image_difference(const uint8_t *src, int src_stride,
+                                    const uint8_t *ref, int ref_stride,
+                                    int16_t *dst, int dst_stride, int height,
+                                    int width) {
+  const int block_unit = 8;
+  // Take difference in 8x8 blocks to make use of optimized diff function
+  for (int i = 0; i < height; i += block_unit) {
+    for (int j = 0; j < width; j += block_unit) {
+      aom_subtract_block(block_unit, block_unit, dst + i * dst_stride + j,
+                         dst_stride, src + i * src_stride + j, src_stride,
+                         ref + i * ref_stride + j, ref_stride);
+    }
+  }
+}
+
+// Compute an image gradient using a sobel filter.
+// If dir == 1, compute the x gradient. If dir == 0, compute y. This function
+// assumes the images have been padded so that they can be processed in units
+// of 8.
+static INLINE void sobel_xy_image_gradient(const uint8_t *src, int src_stride,
+                                           double *dst, int dst_stride,
+                                           int height, int width, int dir) {
+  double norm = 1.0 / 8;
+  // TODO(sarahparker) experiment with doing this over larger block sizes
+  const int block_unit = 8;
+  // Filter in 8x8 blocks to eventually make use of optimized convolve function
+  for (int i = 0; i < height; i += block_unit) {
+    for (int j = 0; j < width; j += block_unit) {
+      av1_convolve_2d_sobel_y_c(src + i * src_stride + j, src_stride,
+                                dst + i * dst_stride + j, dst_stride,
+                                block_unit, block_unit, dir, norm);
+    }
+  }
+}
+
+static ImagePyramid *alloc_pyramid(int width, int height, int pad_size,
+                                   int compute_gradient) {
   ImagePyramid *pyr = aom_malloc(sizeof(*pyr));
+  pyr->has_gradient = compute_gradient;
   // 2 * width * height is the upper bound for a buffer that fits
-  // all pyramid levels
-  pyr->level_buffer =
-      aom_malloc(sizeof(*pyr->level_buffer) * 2 * width * height);
+  // all pyramid levels + padding for each level
+  const int buffer_size = sizeof(*pyr->level_buffer) * 2 * width * height +
+                          (width + 2 * pad_size) * 2 * pad_size * N_LEVELS;
+  pyr->level_buffer = aom_malloc(buffer_size);
+  memset(pyr->level_buffer, 0, buffer_size);
+
+  if (compute_gradient) {
+    const int gradient_size =
+        sizeof(*pyr->level_dx_buffer) * 2 * width * height +
+        (width + 2 * pad_size) * 2 * pad_size * N_LEVELS;
+    pyr->level_dx_buffer = aom_malloc(gradient_size);
+    pyr->level_dy_buffer = aom_malloc(gradient_size);
+    memset(pyr->level_dx_buffer, 0, gradient_size);
+    memset(pyr->level_dy_buffer, 0, gradient_size);
+  }
   return pyr;
 }
 
 static void free_pyramid(ImagePyramid *pyr) {
   aom_free(pyr->level_buffer);
+  if (pyr->has_gradient) {
+    aom_free(pyr->level_dx_buffer);
+    aom_free(pyr->level_dy_buffer);
+  }
   aom_free(pyr);
 }
 
 static INLINE void update_level_dims(ImagePyramid *frm_pyr, int level) {
   frm_pyr->widths[level] = frm_pyr->widths[level - 1] >> 1;
   frm_pyr->heights[level] = frm_pyr->heights[level - 1] >> 1;
+  frm_pyr->strides[level] = frm_pyr->widths[level] + 2 * frm_pyr->pad_size;
+  // Point the beginning of the next level buffer to the correct location inside
+  // the padded border
   frm_pyr->level_loc[level] =
       frm_pyr->level_loc[level - 1] +
-      frm_pyr->widths[level - 1] * frm_pyr->heights[level - 1];
+      frm_pyr->strides[level - 1] *
+          (2 * frm_pyr->pad_size + frm_pyr->heights[level - 1]);
 }
 
 // Compute coarse to fine pyramids for a frame
 static void compute_flow_pyramids(unsigned char *frm, const int frm_width,
                                   const int frm_height, const int frm_stride,
-                                  int n_levels, ImagePyramid *frm_pyr) {
-  int cur_width, cur_height, cur_loc;
+                                  int n_levels, int pad_size, int compute_grad,
+                                  ImagePyramid *frm_pyr) {
+  int cur_width, cur_height, cur_stride, cur_loc;
   assert((frm_width >> n_levels) > 0);
   assert((frm_height >> n_levels) > 0);
 
   // Initialize first level
   frm_pyr->n_levels = n_levels;
+  frm_pyr->pad_size = pad_size;
   frm_pyr->widths[0] = frm_width;
   frm_pyr->heights[0] = frm_height;
-  frm_pyr->level_loc[0] = 0;
+  frm_pyr->strides[0] = frm_width + 2 * frm_pyr->pad_size;
+  // Point the beginning of the level buffer to the location inside
+  // the padded border
+  frm_pyr->level_loc[0] =
+      frm_pyr->strides[0] * frm_pyr->pad_size + frm_pyr->pad_size;
   // This essentially copies the original buffer into the pyramid buffer
   // without the original padding
   av1_resize_plane(frm, frm_height, frm_width, frm_stride,
-                   frm_pyr->level_buffer, frm_pyr->heights[0],
-                   frm_pyr->widths[0], frm_pyr->widths[0]);
+                   frm_pyr->level_buffer + frm_pyr->level_loc[0],
+                   frm_pyr->heights[0], frm_pyr->widths[0],
+                   frm_pyr->strides[0]);
 
   // Start at the finest level and resize down to the coarsest level
   for (int level = 1; level < n_levels; ++level) {
     update_level_dims(frm_pyr, level);
     cur_width = frm_pyr->widths[level];
     cur_height = frm_pyr->heights[level];
+    cur_stride = frm_pyr->strides[level];
     cur_loc = frm_pyr->level_loc[level];
 
     av1_resize_plane(frm_pyr->level_buffer + frm_pyr->level_loc[level - 1],
                      frm_pyr->heights[level - 1], frm_pyr->widths[level - 1],
-                     frm_pyr->widths[level - 1],
+                     frm_pyr->strides[level - 1],
                      frm_pyr->level_buffer + cur_loc, cur_height, cur_width,
-                     cur_width);
+                     cur_stride);
 
-    // TODO(sarahparker) Add computation of gradient pyramids here
+    if (compute_grad) {
+      assert(frm_pyr->has_gradient && frm_pyr->level_dx_buffer != NULL &&
+             frm_pyr->level_dy_buffer != NULL);
+      // Computation x gradient
+      sobel_xy_image_gradient(frm_pyr->level_buffer + cur_loc, cur_stride,
+                              frm_pyr->level_dx_buffer + cur_loc, cur_stride,
+                              cur_height, cur_width, 1);
+
+      // Computation y gradient
+      sobel_xy_image_gradient(frm_pyr->level_buffer + cur_loc, cur_stride,
+                              frm_pyr->level_dy_buffer + cur_loc, cur_stride,
+                              cur_height, cur_width, 0);
+    }
   }
 }
 
-int compute_global_motion_disflow_based(TransformationType type,
-                                        YV12_BUFFER_CONFIG *frm,
-                                        YV12_BUFFER_CONFIG *ref, int bit_depth,
-                                        int *num_inliers_by_motion,
-                                        double *params_by_motion,
-                                        int num_motions) {
+static int compute_global_motion_disflow_based(
+    TransformationType type, YV12_BUFFER_CONFIG *frm, YV12_BUFFER_CONFIG *ref,
+    int bit_depth, int *num_inliers_by_motion, double *params_by_motion,
+    int num_motions) {
   unsigned char *frm_buffer = frm->y_buffer;
   unsigned char *ref_buffer = ref->y_buffer;
   const int frm_width = frm->y_width;
   const int frm_height = frm->y_height;
   const int ref_width = ref->y_width;
   const int ref_height = ref->y_height;
+  const int pad_size = AOMMAX(PATCH_SIZE, MIN_PAD);
   assert(frm_width == ref_width);
   assert(frm_height == ref_height);
 
@@ -399,14 +664,24 @@ int compute_global_motion_disflow_based(TransformationType type,
     ref_buffer = downconvert_frame(ref, bit_depth);
   }
 
+  // TODO(sarahparker) We will want to do the source pyramid computation
+  // outside of this function so it doesn't get recomputed for every
+  // reference. We also don't need to compute every pyramid level for the
+  // reference in advance, since lower levels can be overwritten once their
+  // flow field is computed and upscaled. I'll add these optimizations
+  // once the full implementation is working.
   // Allocate frm image pyramids
-  ImagePyramid *frm_pyr = alloc_pyramid(frm_width, frm_height);
+  int compute_gradient = 1;
+  ImagePyramid *frm_pyr =
+      alloc_pyramid(frm_width, frm_height, pad_size, compute_gradient);
   compute_flow_pyramids(frm_buffer, frm_width, frm_height, frm->y_stride,
-                        n_levels, frm_pyr);
+                        n_levels, pad_size, compute_gradient, frm_pyr);
   // Allocate ref image pyramids
-  ImagePyramid *ref_pyr = alloc_pyramid(ref_width, ref_height);
+  compute_gradient = 0;
+  ImagePyramid *ref_pyr =
+      alloc_pyramid(ref_width, ref_height, pad_size, compute_gradient);
   compute_flow_pyramids(ref_buffer, ref_width, ref_height, ref->y_stride,
-                        n_levels, ref_pyr);
+                        n_levels, pad_size, compute_gradient, ref_pyr);
 
   // TODO(sarahparker) Implement the rest of DISFlow, currently only the image
   // pyramid is implemented.
@@ -417,4 +692,20 @@ int compute_global_motion_disflow_based(TransformationType type,
   free_pyramid(frm_pyr);
   free_pyramid(ref_pyr);
   return 0;
+}
+#endif
+
+int av1_compute_global_motion(TransformationType type, YV12_BUFFER_CONFIG *frm,
+                              YV12_BUFFER_CONFIG *ref, int bit_depth,
+                              int *num_inliers_by_motion,
+                              double *params_by_motion, int num_motions) {
+#if USE_GM_FEATURE_BASED
+  return compute_global_motion_feature_based(type, frm, ref, bit_depth,
+                                             num_inliers_by_motion,
+                                             params_by_motion, num_motions);
+#else
+  return compute_global_motion_disflow_based(type, frm, ref, bit_depth,
+                                             num_inliers_by_motion,
+                                             params_by_motion, num_motions);
+#endif
 }

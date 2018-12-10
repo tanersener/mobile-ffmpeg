@@ -1012,9 +1012,52 @@ int main(int argc, const char *argv[]) {
     }
   }
   if ((resize_w | resize_h) > 0) {
+    WebPPicture picture_no_alpha;
+    if (config.exact) {
+      // If -exact, we can't premultiply RGB by A otherwise RGB is lost if A=0.
+      // We rescale an opaque copy and assemble scaled A and non-premultiplied
+      // RGB channels. This is slower but it's a very uncommon use case. Color
+      // leak at sharp alpha edges is possible.
+      if (!WebPPictureCopy(&picture, &picture_no_alpha)) {
+        fprintf(stderr, "Error! Cannot copy temporary picture\n");
+        goto Error;
+      }
+
+      // We enforced picture.use_argb = 1 above. Now, remove the alpha values.
+      {
+        int x, y;
+        uint32_t* argb_no_alpha = picture_no_alpha.argb;
+        for (y = 0; y < picture_no_alpha.height; ++y) {
+          for (x = 0; x < picture_no_alpha.width; ++x) {
+            argb_no_alpha[x] |= 0xff000000;  // Opaque copy.
+          }
+          argb_no_alpha += picture_no_alpha.argb_stride;
+        }
+      }
+
+      if (!WebPPictureRescale(&picture_no_alpha, resize_w, resize_h)) {
+        fprintf(stderr, "Error! Cannot resize temporary picture\n");
+        goto Error;
+      }
+    }
+
     if (!WebPPictureRescale(&picture, resize_w, resize_h)) {
       fprintf(stderr, "Error! Cannot resize picture\n");
       goto Error;
+    }
+
+    if (config.exact) {  // Put back the alpha information.
+      int x, y;
+      uint32_t* argb_no_alpha = picture_no_alpha.argb;
+      uint32_t* argb = picture.argb;
+      for (y = 0; y < picture_no_alpha.height; ++y) {
+        for (x = 0; x < picture_no_alpha.width; ++x) {
+          argb[x] = (argb[x] & 0xff000000) | (argb_no_alpha[x] & 0x00ffffff);
+        }
+        argb_no_alpha += picture_no_alpha.argb_stride;
+        argb += picture.argb_stride;
+      }
+      WebPPictureFree(&picture_no_alpha);
     }
   }
   if (verbose && (crop != 0 || (resize_w | resize_h) > 0)) {
@@ -1047,7 +1090,8 @@ int main(int argc, const char *argv[]) {
   // Write info
   if (dump_file) {
     if (picture.use_argb) {
-      fprintf(stderr, "Warning: can't dump file (-d option) in lossless mode.");
+      fprintf(stderr, "Warning: can't dump file (-d option) "
+                      "in lossless mode.\n");
     } else if (!DumpPicture(&picture, dump_file)) {
       fprintf(stderr, "Warning, couldn't dump picture %s\n", dump_file);
     }

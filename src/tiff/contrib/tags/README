@@ -2,7 +2,7 @@
 NOTE:  Sept/2004 
 
 The following described approach to managing tag extensions has been
-mostly superceeded since libtiff 3.6.0.  The described approach requires
+mostly superseded since libtiff 3.6.0.  The described approach requires
 internal knowledge of the libtiff API and tends to be very fragile 
 in the face of libtiff upgrades.  
 

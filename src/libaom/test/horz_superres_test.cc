@@ -9,6 +9,8 @@
  * PATENTS file, you can obtain it at www.aomedia.org/license/patent.
  */
 
+#include <memory>
+
 #include "third_party/googletest/src/googletest/include/gtest/gtest.h"
 
 #include "av1/encoder/encoder.h"
@@ -152,7 +154,7 @@ class HorzSuperresEndToEndTest
   double GetPsnrThreshold() { return kPSNRThresholds[test_video_idx_]; }
 
   void DoTest() {
-    testing::internal::scoped_ptr<libaom_test::VideoSource> video;
+    std::unique_ptr<libaom_test::VideoSource> video;
     video.reset(new libaom_test::Y4mVideoSource(test_video_param_.filename, 0,
                                                 test_video_param_.limit));
     ASSERT_TRUE(video.get() != NULL);
@@ -275,7 +277,7 @@ class HorzSuperresQThreshEndToEndTest
   double GetPsnrThreshold() { return kPSNRThresholds[test_video_idx_]; }
 
   void DoTest() {
-    testing::internal::scoped_ptr<libaom_test::VideoSource> video;
+    std::unique_ptr<libaom_test::VideoSource> video;
     video.reset(new libaom_test::Y4mVideoSource(test_video_param_.filename, 0,
                                                 test_video_param_.limit));
     ASSERT_TRUE(video.get() != NULL);

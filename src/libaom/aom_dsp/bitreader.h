@@ -71,12 +71,6 @@ static INLINE int aom_reader_has_overflowed(const aom_reader *r) {
   return aom_daala_reader_has_overflowed(r);
 }
 
-// Returns true if the bit reader has tried to decode more data from the buffer
-// than was actually provided.
-static INLINE int aom_reader_has_overflowed(const aom_reader *r) {
-  return aom_daala_reader_has_overflowed(r);
-}
-
 // Returns the position in the bit reader in bits.
 static INLINE uint32_t aom_reader_tell(const aom_reader *r) {
   return aom_daala_reader_tell(r);

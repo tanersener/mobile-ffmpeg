@@ -47,7 +47,7 @@ static INLINE __m128i xx_loadu_128(const void *a) {
 }
 
 static INLINE void xx_storel_32(void *const a, const __m128i v) {
-  int val = _mm_cvtsi128_si32(v);
+  const int val = _mm_cvtsi128_si32(v);
   memcpy(a, &val, sizeof(val));
 }
 

@@ -23,6 +23,7 @@
 #include "webp/decode.h"
 #include "webp/demux.h"
 #include "../imageio/imageio_util.h"
+#include "./gifdec.h"
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -275,6 +276,7 @@ static int ReadAnimatedWebP(const char filename[],
     prev_frame_timestamp = timestamp;
   }
   ok = dump_ok;
+  if (ok) image->format = ANIM_WEBP;
 
  End:
   WebPAnimDecoderDelete(dec);
@@ -368,26 +370,6 @@ static int DGifSavedExtensionToGCB(GifFileType* GifFile, int ImageIndex,
 #if !LOCAL_GIF_PREREQ(5, 1)
 #define DGifCloseFile(a, b) DGifCloseFile(a)
 #endif
-
-static void GIFDisplayError(const GifFileType* const gif, int gif_error) {
-  // libgif 4.2.0 has retired PrintGifError() and added GifErrorString().
-#if LOCAL_GIF_PREREQ(4, 2)
-#if LOCAL_GIF_PREREQ(5, 0)
-  const char* error_str =
-      GifErrorString((gif == NULL) ? gif_error : gif->Error);
-#else
-  const char* error_str = GifErrorString();
-  (void)gif;
-#endif
-  if (error_str == NULL) error_str = "Unknown error";
-  fprintf(stderr, "GIFLib Error %d: %s\n", gif_error, error_str);
-#else
-  (void)gif;
-  fprintf(stderr, "GIFLib Error %d: ", gif_error);
-  PrintGifError();
-  fprintf(stderr, "\n");
-#endif
-}
 
 static int IsKeyFrameGIF(const GifImageDesc* prev_desc, int prev_dispose,
                          const DecodedFrame* const prev_frame,
@@ -687,6 +669,7 @@ static int ReadAnimatedGIF(const char filename[], AnimatedImage* const image,
       }
     }
   }
+  image->format = ANIM_GIF;
   DGifCloseFile(gif, NULL);
   return 1;
 }

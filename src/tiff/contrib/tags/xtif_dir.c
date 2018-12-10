@@ -269,7 +269,7 @@ _XTIFFDefaultDirectory(TIFF *tif)
 		 * Install into TIFF structure.
 		 */
 		TIFFMEMBER(tif,clientdir) = (tidata_t)xt;
-		tif->tif_flags |= XTIFF_INITIALIZED; /* dont do this again! */
+		tif->tif_flags |= XTIFF_INITIALIZED; /* don't do this again! */
 	}
 	
 	/* set up our own defaults */

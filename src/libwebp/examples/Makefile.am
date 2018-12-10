@@ -1,7 +1,7 @@
 AM_CPPFLAGS += -I$(top_builddir)/src -I$(top_srcdir)/src
 
 bin_PROGRAMS =
-if WANT_DEMUX
+if BUILD_DEMUX
   bin_PROGRAMS += dwebp cwebp
 endif
 if BUILD_ANIMDIFF
@@ -13,7 +13,7 @@ endif
 if BUILD_IMG2WEBP
   bin_PROGRAMS += img2webp
 endif
-if WANT_MUX
+if BUILD_MUX
   bin_PROGRAMS += webpmux
 endif
 if BUILD_VWEBP
@@ -28,7 +28,7 @@ noinst_LTLIBRARIES = libexample_util.la
 libexample_util_la_SOURCES = example_util.c example_util.h
 libexample_util_la_LIBADD = ../src/libwebp.la
 
-anim_diff_SOURCES = anim_diff.c anim_util.c anim_util.h
+anim_diff_SOURCES = anim_diff.c anim_util.c anim_util.h gifdec.c gifdec.h
 anim_diff_CPPFLAGS = $(AM_CPPFLAGS) $(GIF_INCLUDES)
 anim_diff_LDADD  =
 anim_diff_LDADD += ../src/demux/libwebpdemux.la
@@ -36,7 +36,7 @@ anim_diff_LDADD += libexample_util.la
 anim_diff_LDADD += ../imageio/libimageio_util.la
 anim_diff_LDADD += $(GIF_LIBS) -lm
 
-anim_dump_SOURCES = anim_dump.c anim_util.c anim_util.h
+anim_dump_SOURCES = anim_dump.c anim_util.c anim_util.h gifdec.c gifdec.h
 anim_dump_CPPFLAGS = $(AM_CPPFLAGS) $(PNG_INCLUDES)
 anim_dump_CPPFLAGS += $(GIF_INCLUDES)
 anim_dump_LDADD  =

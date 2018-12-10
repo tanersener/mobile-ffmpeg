@@ -364,8 +364,6 @@ static const int8_t fadst4_range_mult2[7] = { 0, 2, 4, 3, 3, 3, 3 };
 static const int8_t fadst8_range_mult2[8] = { 0, 0, 1, 3, 3, 5, 5, 5 };
 static const int8_t fadst16_range_mult2[10] = { 0, 0, 1, 3, 3, 5, 5, 7, 7, 7 };
 
-static const int8_t max_fwd_range_mult2_col[5] = { 3, 5, 7, 9, 11 };
-
 static const int8_t fidtx4_range_mult2[1] = { 1 };
 static const int8_t fidtx8_range_mult2[1] = { 2 };
 static const int8_t fidtx16_range_mult2[1] = { 3 };
@@ -389,14 +387,12 @@ const int8_t *fwd_txfm_range_mult2_list[TXFM_TYPES] = {
 };
 
 static INLINE void set_fwd_txfm_non_scale_range(TXFM_2D_FLIP_CFG *cfg) {
-  const int txh_idx = get_txh_idx(cfg->tx_size);
   av1_zero(cfg->stage_range_col);
   av1_zero(cfg->stage_range_row);
 
+  const int8_t *range_mult2_col = fwd_txfm_range_mult2_list[cfg->txfm_type_col];
   if (cfg->txfm_type_col != TXFM_TYPE_INVALID) {
     int stage_num_col = cfg->stage_num_col;
-    const int8_t *range_mult2_col =
-        fwd_txfm_range_mult2_list[cfg->txfm_type_col];
     for (int i = 0; i < stage_num_col; ++i)
       cfg->stage_range_col[i] = (range_mult2_col[i] + 1) >> 1;
   }
@@ -405,9 +401,11 @@ static INLINE void set_fwd_txfm_non_scale_range(TXFM_2D_FLIP_CFG *cfg) {
     int stage_num_row = cfg->stage_num_row;
     const int8_t *range_mult2_row =
         fwd_txfm_range_mult2_list[cfg->txfm_type_row];
-    for (int i = 0; i < stage_num_row; ++i)
+    for (int i = 0; i < stage_num_row; ++i) {
       cfg->stage_range_row[i] =
-          (max_fwd_range_mult2_col[txh_idx] + range_mult2_row[i] + 1) >> 1;
+          (range_mult2_col[cfg->stage_num_col - 1] + range_mult2_row[i] + 1) >>
+          1;
+    }
   }
 }
 

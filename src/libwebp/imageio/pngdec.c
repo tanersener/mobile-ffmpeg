@@ -18,6 +18,9 @@
 #include <stdio.h>
 
 #ifdef WEBP_HAVE_PNG
+#ifndef PNG_USER_MEM_SUPPORTED
+#define PNG_USER_MEM_SUPPORTED  // for png_create_read_struct_2
+#endif
 #include <png.h>
 #include <setjmp.h>   // note: this must be included *after* png.h
 #include <stdlib.h>
@@ -27,9 +30,31 @@
 #include "./imageio_util.h"
 #include "./metadata.h"
 
+#define LOCAL_PNG_VERSION ((PNG_LIBPNG_VER_MAJOR << 8) | PNG_LIBPNG_VER_MINOR)
+#define LOCAL_PNG_PREREQ(maj, min) \
+   (LOCAL_PNG_VERSION >= (((maj) << 8) | (min)))
+
 static void PNGAPI error_function(png_structp png, png_const_charp error) {
   if (error != NULL) fprintf(stderr, "libpng error: %s\n", error);
   longjmp(png_jmpbuf(png), 1);
+}
+
+#if LOCAL_PNG_PREREQ(1,4)
+typedef png_alloc_size_t LocalPngAllocSize;
+#else
+typedef png_size_t LocalPngAllocSize;
+#endif
+
+static png_voidp MallocFunc(png_structp png_ptr, LocalPngAllocSize size) {
+  (void)png_ptr;
+  if (size != (size_t)size) return NULL;
+  if (!ImgIoUtilCheckSizeArgumentsOverflow(size, 1)) return NULL;
+  return (png_voidp)malloc((size_t)size);
+}
+
+static void FreeFunc(png_structp png_ptr, png_voidp ptr) {
+  (void)png_ptr;
+  free(ptr);
 }
 
 // Converts the NULL terminated 'hexstring' which contains 2-byte character
@@ -171,11 +196,10 @@ static int ExtractMetadataFromPNG(png_structp png,
     {
       png_charp name;
       int comp_type;
-#if ((PNG_LIBPNG_VER_MAJOR << 8) | PNG_LIBPNG_VER_MINOR << 0) < \
-    ((1 << 8) | (5 << 0))
-      png_charp profile;
-#else  // >= libpng 1.5.0
+#if LOCAL_PNG_PREREQ(1,5)
       png_bytep profile;
+#else
+      png_charp profile;
 #endif
       png_uint_32 len;
 
@@ -224,7 +248,8 @@ int ReadPNG(const uint8_t* const data, size_t data_size,
   context.data = data;
   context.data_size = data_size;
 
-  png = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+  png = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL,
+                                 NULL, MallocFunc, FreeFunc);
   if (png == NULL) goto End;
 
   png_set_error_fn(png, 0, error_function, NULL);

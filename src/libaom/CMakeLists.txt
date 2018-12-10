@@ -381,7 +381,6 @@ endif()
 
 if(ENABLE_TOOLS)
   if(CONFIG_AV1_DECODER)
-    require_cxx_flag_nomsvc("-std=c++11" NO)
     add_executable(dump_obu "${AOM_GEN_SRC_DIR}/usage_exit.cc"
                    "${AOM_ROOT}/tools/dump_obu.cc"
                    "${AOM_ROOT}/tools/obu_parser.cc"
@@ -391,10 +390,6 @@ if(ENABLE_TOOLS)
 
     list(APPEND AOM_TOOL_TARGETS dump_obu)
     list(APPEND AOM_APP_TARGETS dump_obu)
-
-    if(NOT MSVC)
-      target_compile_options(dump_obu PUBLIC -std=c++11)
-    endif()
 
     # Maintain a separate variable listing only the examples to facilitate
     # installation of example programs into an tools sub directory of
@@ -467,8 +462,6 @@ if(ENABLE_EXAMPLES OR ENABLE_TESTS OR ENABLE_TOOLS)
   endif()
 
   if(CONFIG_WEBM_IO)
-    require_cxx_flag_nomsvc("-std=c++11" NO)
-
     add_library(webm OBJECT ${AOM_LIBWEBM_SOURCES})
     include_directories("${AOM_ROOT}/third_party/libwebm")
     target_compile_definitions(webm PRIVATE __STDC_CONSTANT_MACROS)
@@ -476,7 +469,6 @@ if(ENABLE_EXAMPLES OR ENABLE_TESTS OR ENABLE_TOOLS)
 
     if(NOT MSVC)
       target_compile_options(webm PRIVATE -Wno-shadow)
-      target_compile_options(webm PUBLIC -std=c++11)
     endif()
 
     # Add to existing targets.

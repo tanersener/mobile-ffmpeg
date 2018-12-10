@@ -1,5 +1,3 @@
-/* $Id: pal2rgb.c,v 1.15 2015-06-21 01:09:10 bfriesen Exp $ */
-
 /*
  * Copyright (c) 1988-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -184,8 +182,21 @@ main(int argc, char* argv[])
 	{ unsigned char *ibuf, *obuf;
 	  register unsigned char* pp;
 	  register uint32 x;
-	  ibuf = (unsigned char*)_TIFFmalloc(TIFFScanlineSize(in));
-	  obuf = (unsigned char*)_TIFFmalloc(TIFFScanlineSize(out));
+	  tmsize_t tss_in = TIFFScanlineSize(in);
+	  tmsize_t tss_out = TIFFScanlineSize(out);
+	  if (tss_out / tss_in < 3) {
+		/*
+		 * BUG 2750: The following code does not know about chroma
+		 * subsampling of JPEG data. It assumes that the output buffer is 3x
+		 * the length of the input buffer due to exploding the palette into
+		 * RGB tuples. If this assumption is incorrect, it could lead to a
+		 * buffer overflow. Go ahead and fail now to prevent that.
+		 */
+		fprintf(stderr, "Could not determine correct image size for output. Exiting.\n");
+		return -1;
+      }
+	  ibuf = (unsigned char*)_TIFFmalloc(tss_in);
+	  obuf = (unsigned char*)_TIFFmalloc(tss_out);
 	  switch (config) {
 	  case PLANARCONFIG_CONTIG:
 		for (row = 0; row < imagelength; row++) {
@@ -391,7 +402,23 @@ cpTags(TIFF* in, TIFF* out)
 {
     struct cpTag *p;
     for (p = tags; p < &tags[NTAGS]; p++)
-	cpTag(in, out, p->tag, p->count, p->type);
+    {
+        if( p->tag == TIFFTAG_GROUP3OPTIONS )
+        {
+            uint16 compression;
+            if( !TIFFGetField(in, TIFFTAG_COMPRESSION, &compression) ||
+                    compression != COMPRESSION_CCITTFAX3 )
+                continue;
+        }
+        if( p->tag == TIFFTAG_GROUP4OPTIONS )
+        {
+            uint16 compression;
+            if( !TIFFGetField(in, TIFFTAG_COMPRESSION, &compression) ||
+                    compression != COMPRESSION_CCITTFAX4 )
+                continue;
+        }
+        cpTag(in, out, p->tag, p->count, p->type);
+    }
 }
 #undef NTAGS
 

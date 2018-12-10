@@ -63,14 +63,6 @@ extern "C" {
 #define FRAME_OFFSET_BITS 5
 #define MAX_FRAME_DISTANCE ((1 << FRAME_OFFSET_BITS) - 1)
 
-#define REF_FRAMES_LOG2 3
-#define REF_FRAMES (1 << REF_FRAMES_LOG2)
-
-// REF_FRAMES for the cm->ref_frame_map array, 1 scratch frame for the new
-// frame in cm->new_fb_idx, INTER_REFS_PER_FRAME for scaled references on the
-// encoder in the cpi->scaled_ref_idx array.
-#define FRAME_BUFFERS (REF_FRAMES + 1 + INTER_REFS_PER_FRAME)
-
 // 4 frame filter levels: y plane vertical, y plane horizontal,
 // u plane, and v plane
 #define FRAME_LF_COUNT 4
@@ -252,22 +244,22 @@ typedef enum ATTRIBUTE_PACKED {
 } TX_TYPE_1D;
 
 typedef enum ATTRIBUTE_PACKED {
-  DCT_DCT,    // DCT  in both horizontal and vertical
-  ADST_DCT,   // ADST in vertical, DCT in horizontal
-  DCT_ADST,   // DCT  in vertical, ADST in horizontal
-  ADST_ADST,  // ADST in both directions
-  FLIPADST_DCT,
-  DCT_FLIPADST,
-  FLIPADST_FLIPADST,
-  ADST_FLIPADST,
-  FLIPADST_ADST,
-  IDTX,
-  V_DCT,
-  H_DCT,
-  V_ADST,
-  H_ADST,
-  V_FLIPADST,
-  H_FLIPADST,
+  DCT_DCT,            // DCT in both horizontal and vertical
+  ADST_DCT,           // ADST in vertical, DCT in horizontal
+  DCT_ADST,           // DCT in vertical, ADST in horizontal
+  ADST_ADST,          // ADST in both directions
+  FLIPADST_DCT,       // FLIPADST in vertical, DCT in horizontal
+  DCT_FLIPADST,       // DCT in vertical, FLIPADST in horizontal
+  FLIPADST_FLIPADST,  // FLIPADST in both directions
+  ADST_FLIPADST,      // ADST in vertical, FLIPADST in horizontal
+  FLIPADST_ADST,      // FLIPADST in vertical, ADST in horizontal
+  IDTX,               // Identity in both directions
+  V_DCT,              // DCT in vertical, identity in horizontal
+  H_DCT,              // Identity in vertical, DCT in horizontal
+  V_ADST,             // ADST in vertical, identity in horizontal
+  H_ADST,             // Identity in vertical, ADST in horizontal
+  V_FLIPADST,         // FLIPADST in vertical, identity in horizontal
+  H_FLIPADST,         // Identity in vertical, FLIPADST in horizontal
   TX_TYPES,
 } TX_TYPE;
 
@@ -547,26 +539,45 @@ typedef enum ATTRIBUTE_PACKED {
 #define TXFM_PARTITION_CONTEXTS ((TX_SIZES - TX_8X8) * 6 - 3)
 typedef uint8_t TXFM_CONTEXT;
 
-#define NONE_FRAME -1
-#define INTRA_FRAME 0
-#define LAST_FRAME 1
-#define LAST2_FRAME 2
-#define LAST3_FRAME 3
-#define GOLDEN_FRAME 4
-#define BWDREF_FRAME 5
-#define ALTREF2_FRAME 6
-#define ALTREF_FRAME 7
-#define EXTREF_FRAME REF_FRAMES
-#define LAST_REF_FRAMES (LAST3_FRAME - LAST_FRAME + 1)
+// An enum for single reference types (and some derived values).
+enum ATTRIBUTE_PACKED {
+  NONE_FRAME = -1,
+  INTRA_FRAME,
+  LAST_FRAME,
+  LAST2_FRAME,
+  LAST3_FRAME,
+  GOLDEN_FRAME,
+  BWDREF_FRAME,
+  ALTREF2_FRAME,
+  ALTREF_FRAME,
+  REF_FRAMES,
 
-#define INTER_REFS_PER_FRAME (ALTREF_FRAME - LAST_FRAME + 1)
+  // Extra/scratch reference frame. It may be:
+  // - used to update the ALTREF2_FRAME ref (see lshift_bwd_ref_frames()), or
+  // - updated from ALTREF2_FRAME ref (see rshift_bwd_ref_frames()).
+  EXTREF_FRAME = REF_FRAMES,
 
-#define FWD_REFS (GOLDEN_FRAME - LAST_FRAME + 1)
+  // Number of inter (non-intra) reference types.
+  INTER_REFS_PER_FRAME = ALTREF_FRAME - LAST_FRAME + 1,
+
+  // Number of forward (aka past) reference types.
+  FWD_REFS = GOLDEN_FRAME - LAST_FRAME + 1,
+
+  // Number of backward (aka future) reference types.
+  BWD_REFS = ALTREF_FRAME - BWDREF_FRAME + 1,
+
+  SINGLE_REFS = FWD_REFS + BWD_REFS,
+};
+
+#define REF_FRAMES_LOG2 3
+
+// REF_FRAMES for the cm->ref_frame_map array, 1 scratch frame for the new
+// frame in cm->cur_frame, INTER_REFS_PER_FRAME for scaled references on the
+// encoder in the cpi->scaled_ref_buf array.
+#define FRAME_BUFFERS (REF_FRAMES + 1 + INTER_REFS_PER_FRAME)
+
 #define FWD_RF_OFFSET(ref) (ref - LAST_FRAME)
-#define BWD_REFS (ALTREF_FRAME - BWDREF_FRAME + 1)
 #define BWD_RF_OFFSET(ref) (ref - BWDREF_FRAME)
-
-#define SINGLE_REFS (FWD_REFS + BWD_REFS)
 
 typedef enum ATTRIBUTE_PACKED {
   LAST_LAST2_FRAMES,      // { LAST_FRAME, LAST2_FRAME }
@@ -592,6 +603,10 @@ typedef enum ATTRIBUTE_PACKED {
 //       compound prediction. The use of skip mode, on the other hand, makes it
 //       possible to have a reference pair not listed for explicit signaling.
 #define MODE_CTX_REF_FRAMES (REF_FRAMES + TOTAL_COMP_REFS)
+
+// Note: It includes single and compound references. So, it can take values from
+// NONE_FRAME to (MODE_CTX_REF_FRAMES - 1). Hence, it is not defined as an enum.
+typedef int8_t MV_REFERENCE_FRAME;
 
 typedef enum ATTRIBUTE_PACKED {
   RESTORE_NONE,

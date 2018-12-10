@@ -2,6 +2,8 @@ d5dfb0151c9051f8c85999255645d7a23916d3c0 *hantro_collage_w352h288.yuv
 b87815bf86020c592ccc7a846ba2e28ec8043902 *hantro_odd.yuv
 26b7f64399b84db4b4c9c915d743ec5c2619d4b9 *invalid-bug-1814.ivf
 d3964f9dad9f60363c81b688324d95b4ec7c8038 *invalid-bug-1814.ivf.res
+09aa07e5325b3bb5462182eb30b8ecc914630740 *invalid-chromium-906381.ivf
+09d2af8dd22201dd8d48e5dcfcaed281ff9422c7 *invalid-chromium-906381.ivf.res
 fa06784f23751d8c37be94160fb821e855199af4 *invalid-oss-fuzz-10061.ivf
 b055f06b9a95aaa5697fa26497b592a47843a7c8 *invalid-oss-fuzz-10061.ivf.res
 c9e06c4c7fb7d69fd635a1f606a5e478d60e99cf *invalid-oss-fuzz-10117-mc-buf-use-highbd.ivf
@@ -18,6 +20,12 @@ cf5945085fe85456a1f74bf4cc7998b88b3f4b62 *invalid-oss-fuzz-10705.ivf
 1af486cd2cc83ebeddc76ca7a1c512cc0ec568d5 *invalid-oss-fuzz-10723.ivf.res
 0784acc8931090ec24eba752d6c27e359e68fe7d *invalid-oss-fuzz-10779.ivf
 5d9474c0309b7ca09a182d888f73b37a8fe1362c *invalid-oss-fuzz-10779.ivf.res
+7d37be9357f89a100ced694aee1ca5a6fad35ba9 *invalid-oss-fuzz-11477.ivf
+15932651aacfc4622f0910f728f3f95e08e1753d *invalid-oss-fuzz-11477.ivf.res
+1674787c38ddf82a2e5c804203f04f56a304e8e0 *invalid-oss-fuzz-11479.ivf
+1af486cd2cc83ebeddc76ca7a1c512cc0ec568d5 *invalid-oss-fuzz-11479.ivf.res
+b1a45514f0c59be03c9991cd04882426b9b930fa *invalid-oss-fuzz-11523.ivf
+7c44ac1723c14d98bcb888fbf118c959511519ba *invalid-oss-fuzz-11523.ivf.res
 ccbe4081557eb44820a0e6337c4a094421826b9a *invalid-oss-fuzz-9288.ivf
 67c54283fe1a26ccf02cc991e4f9a1eea3ac5e78 *invalid-oss-fuzz-9288.ivf.res
 c0960f032484579f967881cc025b71cfd7a79ee1 *invalid-oss-fuzz-9463.ivf

@@ -44,7 +44,7 @@ struct aom_codec_alg_priv {
   int img_avail;
   int flushed;
   int invert_tile_order;
-  int last_show_frame;  // Index of last output frame.
+  RefCntBuffer *last_show_frame;  // Last output frame buffer
   int byte_alignment;
   int skip_loop_filter;
   int skip_film_grain;
@@ -317,7 +317,7 @@ static void init_buffer_callbacks(aom_codec_alg_priv_t *ctx) {
     AV1_COMMON *const cm = &frame_worker_data->pbi->common;
     BufferPool *const pool = cm->buffer_pool;
 
-    cm->new_fb_idx = INVALID_IDX;
+    cm->cur_frame = NULL;
     cm->byte_alignment = ctx->byte_alignment;
     cm->skip_loop_filter = ctx->skip_loop_filter;
     cm->skip_film_grain = ctx->skip_film_grain;
@@ -356,7 +356,6 @@ static int frame_worker_hook(void *arg1, void *arg2) {
 
   if (result != 0) {
     // Check decode result in serial decode.
-    frame_worker_data->pbi->cur_buf->buf.corrupted = 1;
     frame_worker_data->pbi->need_resync = 1;
   }
   return !result;
@@ -366,7 +365,7 @@ static aom_codec_err_t init_decoder(aom_codec_alg_priv_t *ctx) {
   int i;
   const AVxWorkerInterface *const winterface = aom_get_worker_interface();
 
-  ctx->last_show_frame = -1;
+  ctx->last_show_frame = NULL;
   ctx->next_output_worker_id = 0;
   ctx->need_resync = 1;
   ctx->num_frame_workers = 1;
@@ -448,7 +447,7 @@ static INLINE void check_resync(aom_codec_alg_priv_t *const ctx,
                                 const AV1Decoder *const pbi) {
   // Clear resync flag if worker got a key frame or intra only frame.
   if (ctx->need_resync == 1 && pbi->need_resync == 0 &&
-      (pbi->common.intra_only || pbi->common.frame_type == KEY_FRAME))
+      frame_is_intra_only(&pbi->common))
     ctx->need_resync = 0;
 }
 
@@ -520,12 +519,16 @@ static aom_codec_err_t decoder_inspect(aom_codec_alg_priv_t *ctx,
   frame_worker_data->pbi->inspect_cb = ctx->inspect_cb;
   frame_worker_data->pbi->inspect_ctx = ctx->inspect_ctx;
   res = av1_receive_compressed_data(frame_worker_data->pbi, data_sz, &data);
+  check_resync(ctx, frame_worker_data->pbi);
+
   if (ctx->frame_workers->had_error)
     return update_error_state(ctx, &frame_worker_data->pbi->common.error);
 
+  data2->idx = -1;
   for (int i = 0; i < REF_FRAMES; ++i)
-    if (cm->ref_frame_map[i] == cm->new_fb_idx) data2->idx = i;
+    if (cm->ref_frame_map[i] == cm->cur_frame) data2->idx = i;
   data2->buf = data;
+  data2->show_existing = cm->show_existing_frame;
   return res;
 }
 #endif
@@ -545,7 +548,6 @@ static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
   // arguments are invalid.
   if (ctx->frame_workers) {
     BufferPool *const pool = ctx->buffer_pool;
-    RefCntBuffer *const frame_bufs = pool->frame_bufs;
     lock_buffer_pool(pool);
     for (int i = 0; i < ctx->num_frame_workers; ++i) {
       AVxWorker *const worker = &ctx->frame_workers[i];
@@ -553,7 +555,7 @@ static aom_codec_err_t decoder_decode(aom_codec_alg_priv_t *ctx,
           (FrameWorkerData *)worker->data1;
       struct AV1Decoder *pbi = frame_worker_data->pbi;
       for (size_t j = 0; j < pbi->num_output_frames; j++) {
-        decrease_ref_count((int)pbi->output_frame_index[j], frame_bufs, pool);
+        decrease_ref_count(pbi->output_frames[j], pool);
       }
       pbi->num_output_frames = 0;
     }
@@ -655,6 +657,7 @@ static aom_image_t *add_grain_if_needed(aom_image_t *img,
 
   if (grain_img_buf) {
     grain_img_buf->user_priv = img->user_priv;
+    grain_img_buf->fb_priv = img->fb_priv;
     if (av1_add_film_grain(grain_params, img, grain_img_buf)) {
       aom_img_free(grain_img_buf);
       grain_img_buf = NULL;
@@ -687,6 +690,8 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
       AVxWorker *const worker = &ctx->frame_workers[ctx->next_output_worker_id];
       FrameWorkerData *const frame_worker_data =
           (FrameWorkerData *)worker->data1;
+      AV1Decoder *const pbi = frame_worker_data->pbi;
+      AV1_COMMON *const cm = &pbi->common;
       ctx->next_output_worker_id =
           (ctx->next_output_worker_id + 1) % ctx->num_frame_workers;
       // Wait for the frame from worker thread.
@@ -699,26 +704,26 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
         aom_film_grain_t *grain_params;
         if (av1_get_raw_frame(frame_worker_data->pbi, *index, &sd,
                               &grain_params) == 0) {
-          AV1Decoder *const pbi = frame_worker_data->pbi;
-          AV1_COMMON *const cm = &pbi->common;
-          RefCntBuffer *const frame_bufs = cm->buffer_pool->frame_bufs;
-          ctx->last_show_frame = cm->new_fb_idx;
+          RefCntBuffer *const output_frame_buf = pbi->output_frames[*index];
+          ctx->last_show_frame = output_frame_buf;
           if (ctx->need_resync) return NULL;
           yuvconfig2image(&ctx->img, sd, frame_worker_data->user_priv);
 
           if (!pbi->ext_tile_debug && cm->large_scale_tile) {
             *index += 1;  // Advance the iterator to point to the next image
+
+            yuvconfig2image(&ctx->img, &pbi->tile_list_outbuf, NULL);
             img = &ctx->img;
-            img->img_data = pbi->tile_list_output;
-            img->sz = pbi->tile_list_size;
             return img;
           }
 
           const int num_planes = av1_num_planes(cm);
           if (pbi->ext_tile_debug && cm->single_tile_decoding &&
               pbi->dec_tile_row >= 0) {
+            int tile_width, tile_height;
+            av1_get_uniform_tile_size(cm, &tile_width, &tile_height);
             const int tile_row = AOMMIN(pbi->dec_tile_row, cm->tile_rows - 1);
-            const int mi_row = tile_row * cm->tile_height;
+            const int mi_row = tile_row * tile_height;
             const int ssy = ctx->img.y_chroma_shift;
             int plane;
             ctx->img.planes[0] += mi_row * MI_SIZE * ctx->img.stride[0];
@@ -728,14 +733,15 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
                     mi_row * (MI_SIZE >> ssy) * ctx->img.stride[plane];
               }
             }
-            ctx->img.d_h =
-                AOMMIN(cm->tile_height, cm->mi_rows - mi_row) * MI_SIZE;
+            ctx->img.d_h = AOMMIN(tile_height, cm->mi_rows - mi_row) * MI_SIZE;
           }
 
           if (pbi->ext_tile_debug && cm->single_tile_decoding &&
               pbi->dec_tile_col >= 0) {
+            int tile_width, tile_height;
+            av1_get_uniform_tile_size(cm, &tile_width, &tile_height);
             const int tile_col = AOMMIN(pbi->dec_tile_col, cm->tile_cols - 1);
-            const int mi_col = tile_col * cm->tile_width;
+            const int mi_col = tile_col * tile_width;
             const int ssx = ctx->img.x_chroma_shift;
             const int is_hbd =
                 (ctx->img.fmt & AOM_IMG_FMT_HIGHBITDEPTH) ? 1 : 0;
@@ -747,11 +753,10 @@ static aom_image_t *decoder_get_frame(aom_codec_alg_priv_t *ctx,
                     mi_col * (MI_SIZE >> ssx) * (1 + is_hbd);
               }
             }
-            ctx->img.d_w =
-                AOMMIN(cm->tile_width, cm->mi_cols - mi_col) * MI_SIZE;
+            ctx->img.d_w = AOMMIN(tile_width, cm->mi_cols - mi_col) * MI_SIZE;
           }
 
-          ctx->img.fb_priv = frame_bufs[cm->new_fb_idx].raw_frame_buffer.priv;
+          ctx->img.fb_priv = output_frame_buf->raw_frame_buffer.priv;
           img = &ctx->img;
           img->temporal_id = cm->temporal_layer_id;
           img->spatial_id = cm->spatial_layer_id;
@@ -903,7 +908,8 @@ static aom_codec_err_t ctrl_get_last_ref_updates(aom_codec_alg_priv_t *ctx,
       AVxWorker *const worker = ctx->frame_workers;
       FrameWorkerData *const frame_worker_data =
           (FrameWorkerData *)worker->data1;
-      *update_info = frame_worker_data->pbi->refresh_frame_flags;
+      *update_info =
+          frame_worker_data->pbi->common.current_frame.refresh_frame_flags;
       return AOM_CODEC_OK;
     } else {
       return AOM_CODEC_ERROR;
@@ -932,11 +938,10 @@ static aom_codec_err_t ctrl_get_frame_corrupted(aom_codec_alg_priv_t *ctx,
       FrameWorkerData *const frame_worker_data =
           (FrameWorkerData *)worker->data1;
       AV1Decoder *const pbi = frame_worker_data->pbi;
-      RefCntBuffer *const frame_bufs = pbi->common.buffer_pool->frame_bufs;
       if (pbi->seen_frame_header && pbi->num_output_frames == 0)
         return AOM_CODEC_ERROR;
-      if (ctx->last_show_frame >= 0)
-        *corrupted = frame_bufs[ctx->last_show_frame].buf.corrupted;
+      if (ctx->last_show_frame != NULL)
+        *corrupted = ctx->last_show_frame->buf.corrupted;
       return AOM_CODEC_OK;
     } else {
       return AOM_CODEC_ERROR;
@@ -1116,8 +1121,27 @@ static aom_codec_err_t ctrl_get_tile_size(aom_codec_alg_priv_t *ctx,
       FrameWorkerData *const frame_worker_data =
           (FrameWorkerData *)worker->data1;
       const AV1_COMMON *const cm = &frame_worker_data->pbi->common;
-      *tile_size =
-          ((cm->tile_width * MI_SIZE) << 16) + cm->tile_height * MI_SIZE;
+      int tile_width, tile_height;
+      av1_get_uniform_tile_size(cm, &tile_width, &tile_height);
+      *tile_size = ((tile_width * MI_SIZE) << 16) + tile_height * MI_SIZE;
+      return AOM_CODEC_OK;
+    } else {
+      return AOM_CODEC_ERROR;
+    }
+  }
+  return AOM_CODEC_INVALID_PARAM;
+}
+
+static aom_codec_err_t ctrl_get_tile_count(aom_codec_alg_priv_t *ctx,
+                                           va_list args) {
+  unsigned int *const tile_count = va_arg(args, unsigned int *);
+
+  if (tile_count) {
+    AVxWorker *const worker = &ctx->frame_workers[ctx->next_output_worker_id];
+    if (worker) {
+      FrameWorkerData *const frame_worker_data =
+          (FrameWorkerData *)worker->data1;
+      *tile_count = frame_worker_data->pbi->tile_count_minus_1 + 1;
       return AOM_CODEC_OK;
     } else {
       return AOM_CODEC_ERROR;
@@ -1292,6 +1316,7 @@ static aom_codec_ctrl_fn_map_t decoder_ctrl_maps[] = {
   { AV1D_GET_BIT_DEPTH, ctrl_get_bit_depth },
   { AV1D_GET_IMG_FORMAT, ctrl_get_img_format },
   { AV1D_GET_TILE_SIZE, ctrl_get_tile_size },
+  { AV1D_GET_TILE_COUNT, ctrl_get_tile_count },
   { AV1D_GET_DISPLAY_SIZE, ctrl_get_render_size },
   { AV1D_GET_FRAME_SIZE, ctrl_get_frame_size },
   { AV1_GET_ACCOUNTING, ctrl_get_accounting },

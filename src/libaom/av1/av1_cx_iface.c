@@ -26,6 +26,10 @@
 #include "av1/encoder/encoder.h"
 #include "av1/encoder/firstpass.h"
 
+#if CONFIG_REDUCED_ENCODER_BORDER
+#include "common/tools_common.h"
+#endif  // CONFIG_REDUCED_ENCODER_BORDER
+
 #define MAG_SIZE (4)
 #define MAX_NUM_ENHANCEMENT_LAYERS 3
 
@@ -286,7 +290,7 @@ static aom_codec_err_t validate_config(aom_codec_alg_priv_t *ctx,
         "or kf_max_dist instead.");
 
   RANGE_CHECK_HI(extra_cfg, motion_vector_unit_test, 2);
-  RANGE_CHECK_HI(extra_cfg, enable_auto_alt_ref, 2);
+  RANGE_CHECK_HI(extra_cfg, enable_auto_alt_ref, 1);
   RANGE_CHECK_HI(extra_cfg, enable_auto_bwd_ref, 2);
   RANGE_CHECK(extra_cfg, cpu_used, 0, 8);
   RANGE_CHECK_HI(extra_cfg, noise_sensitivity, 6);
@@ -1351,12 +1355,6 @@ static aom_codec_err_t encoder_encode(aom_codec_alg_priv_t *ctx,
            -1 != av1_get_compressed_data(cpi, &lib_flags, &frame_size, cx_data,
                                          &dst_time_stamp, &dst_end_time_stamp,
                                          !img, timebase)) {
-      if (cpi->common.seq_params.frame_id_numbers_present_flag) {
-        if (cpi->common.invalid_delta_frame_id_minus_1) {
-          aom_internal_error(&cpi->common.error, AOM_CODEC_ERROR,
-                             "Invalid delta_frame_id_minus_1");
-        }
-      }
       cpi->seq_params_locked = 1;
       if (frame_size) {
         if (ctx->pending_cx_data == 0) ctx->pending_cx_data = cx_data;
@@ -1420,8 +1418,8 @@ static aom_codec_err_t encoder_encode(aom_codec_alg_priv_t *ctx,
 
         is_frame_visible = cpi->common.show_frame;
 
-        has_fwd_keyframe |=
-            (!is_frame_visible && cpi->common.frame_type == KEY_FRAME);
+        has_fwd_keyframe |= (!is_frame_visible &&
+                             cpi->common.current_frame.frame_type == KEY_FRAME);
       }
     }
     if (is_frame_visible) {
@@ -1862,7 +1860,7 @@ static aom_codec_enc_cfg_map_t encoder_usage_cfg_map[] = {
         SCALE_NUMERATOR,  // rc_superres_denominator
         SCALE_NUMERATOR,  // rc_superres_kf_denominator
         63,               // rc_superres_qthresh
-        63,               // rc_superres_kf_qthresh
+        32,               // rc_superres_kf_qthresh
 
         AOM_VBR,      // rc_end_usage
         { NULL, 0 },  // rc_twopass_stats_in

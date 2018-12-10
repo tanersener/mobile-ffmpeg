@@ -16,10 +16,12 @@
 extern "C" {
 #endif
 
+#include "config/av1_rtcd.h"
+
 #define NN_MAX_HIDDEN_LAYERS 10
 #define NN_MAX_NODES_PER_LAYER 128
 
-typedef struct {
+struct NN_CONFIG {
   int num_inputs;         // Number of input nodes, i.e. features.
   int num_outputs;        // Number of output nodes.
   int num_hidden_layers;  // Number of hidden layers, maximum 10.
@@ -29,13 +31,13 @@ typedef struct {
   const float *weights[NN_MAX_HIDDEN_LAYERS + 1];
   // Bias parameters, indexed by layer.
   const float *bias[NN_MAX_HIDDEN_LAYERS + 1];
-} NN_CONFIG;
+};
+// Typedef from struct NN_CONFIG to NN_CONFIG is in rtcd_defs
 
-// Calculate prediction based on the given input features and neural net config.
-// Assume there are no more than NN_MAX_NODES_PER_LAYER nodes in each hidden
-// layer.
-void av1_nn_predict(const float *features, const NN_CONFIG *nn_config,
-                    float *output);
+// Applies the softmax normalization function to the input
+// to get a valid probability distribution in the output:
+// output[i] = exp(input[i]) / sum_{k \in [0,n)}(exp(input[k]))
+void av1_nn_softmax(const float *input, float *output, int n);
 
 // Applies the softmax normalization function to the input
 // to get a valid probability distribution in the output:

@@ -46,8 +46,8 @@ uint32_t av1_decode_frame_headers_and_setup(struct AV1Decoder *pbi,
 
 void av1_decode_tg_tiles_and_wrapup(struct AV1Decoder *pbi, const uint8_t *data,
                                     const uint8_t *data_end,
-                                    const uint8_t **p_data_end, int startTile,
-                                    int endTile, int initialize_flag);
+                                    const uint8_t **p_data_end, int start_tile,
+                                    int end_tile, int initialize_flag);
 
 // Implements the color_config() function in the spec. Reports errors by
 // calling rb->error_handler() or aom_internal_error().

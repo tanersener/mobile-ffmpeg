@@ -1,6 +1,170 @@
+2018-12-04  Niels Möller  <nisse@lysator.liu.se>
+
+	* Released nettle-3.4.1.
+
+2018-11-28  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Update GMP check. Check for the function
+	mpn_sec_div_r, available since GMP-6.0.0.
+
+	* testsuite/rsa-encrypt-test.c (test_main): Fix allocation of
+	decrypted storage. Update test of rsa_decrypt, to allow clobbering
+	of all of the passed in message area.
+
+	* pkcs1-decrypt.c (pkcs1_decrypt): Rewrite as a wrapper around
+	_pkcs1_sec_decrypt_variable. Improves side-channel silence of the
+	only caller, rsa_decrypt.
+
+	* Makefile.in (DISTFILES): Add rsa-internal.h, needed for make
+	dist. Patch from Simo Sorce.
+
+	* rsa-internal.h: Add include of rsa.h.
+
+2018-11-27  Niels Möller  <nisse@lysator.liu.se>
+
+	* rsa-sec-compute-root.c (sec_mul, sec_mod_mul, sec_powm): New
+	local helper functions, with their own itch functions.
+	(_rsa_sec_compute_root_itch, _rsa_sec_compute_root): Rewrote to
+	use helpers, for clarity.
+
+2018-11-26  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/rsa-compute-root-test.c (generate_keypair): Simplify
+	selection of psize and qsize, and fix so that qsize is used.
+	(test_main): Add outer loop, to test with more than one key.
+	Deallocate storage before exiting.
+
+2018-11-25  Niels Möller  <nisse@lysator.liu.se>
+
+	* testsuite/rsa-compute-root-test.c: Renamed, from ...
+	* testsuite/rsa-sec-compute-root-test.c: ... old name.
+
+	* rsa.h (rsa_sec_compute_root_tr): Deleted declaration, moved to ...
+	* rsa-internal.h (_rsa_sec_compute_root_tr): ... new location.
+	* rsa-sign-tr.c (_rsa_sec_compute_root_tr): Renamed, from...
+	(rsa_sec_compute_root_tr): ... old name. Updated callers.
+	(cnd_mpn_zero): Use a volatile-declared mask variable.
+
+	* testsuite/testutils.c (mpz_urandomb) [NETTLE_USE_MINI_GMP]: Fix
+	masking of most significant bits.
+
+	* rsa-decrypt-tr.c (rsa_decrypt_tr): Use
+	NETTLE_OCTET_SIZE_TO_LIMB_SIZE.
+
+	* testsuite/rsa-sec-decrypt-test.c (rsa_decrypt_for_test): Tweak
+	valgrind marking, and document potential leakage of lowest and
+	highest bits of p and q.
+
+	* rsa-sec-compute-root.c (_rsa_sec_compute_root): Avoid calls to
+	mpz_sizeinbase, since that potentially leaks most significant bits
+	of private key parameters a and b.
+
+	* testsuite/pkcs1-sec-decrypt-test.c (pkcs1_decrypt_for_test): Fix
+	valgrind marking of return value.
+
+	Merged below changes from Simo Sorce, to make RSA private key
+	operations side-channel silent.
+
+2018-11-08  Simo Sorce  <simo@redhat.com>
+
+	* rsa-sign.c (rsa_compute_root) [!NETTLE_USE_MINI_GMP]: Use
+	_rsa_sec_compute_root.
+
+	* testsuite/rsa-sec-compute-root-test.c: Add more tests for new
+	side-channel silent functions.
+
+	* rsa-sign.c (rsa_private_key_prepare): Check that qn + cn >= pn,
+	since that is required for one of the GMP calls in
+	_rsa_sec_compute_root.
+
+	* rsa-decrypt-tr.c: Switch to use side-channel silent functions.
+
+	* pkcs1-sec-decrypt.c (_pkcs1_sec_decrypt_variable): New private
+	function. Variable size version for backwards compatibility.
+
+	* testsuite/rsa-sec-decrypt-test.c: Adds more tests.
+
+	* rsa-sec-decrypt.c (rsa_sec_decrypt): New function.
+	Fixed length side-channel silent version of rsa-decrypt.
+	* testsuite/rsa-encrypt-test.c: add tests for the new fucntion.
+
+	* testsuite/pkcs1-sec-decrypt-test.c: Adds tests for
+	_pkcs1_sec_decrypt.
+
+	* gmp-glue.c (mpn_get_base256): New function.
+
+	* pkcs1-sec-decrypt.c (_pkcs1_sec_decrypt): New private function.
+	Fixed length side-channel silent version of pkcs1-decrypt.
+
+	* cnd-memcpy.c (cnd_memcpy): New function.
+	* memops.h: Declare it.
+	* testsuite/cnd-memcpy-test.c: New test case.
+
+	* rsa-sign-tr.c (rsa_sec_compute_root_tr): New function that uses
+	_rsa_sec_compute_root, as well as side-channel silent RSA
+	blinding.
+	(rsa_compute_root_tr) Rewritten as a wrapper around
+	rsa_sec_compute_root_tr.
+	(rsa_sec_blind, rsa_sec_unblind, sec_equal, rsa_sec_check_root)
+	(cnd_mpn_zero): New helper functions.
+	(rsa_sec_compute_root_tr) [NETTLE_USE_MINI_GMP]: Defined as a not
+	side-channel silent wrapper around rsa_compute_root_tr, and the
+	latter function left unchanged.
+
+	* rsa-sec-compute-root.c (_rsa_sec_compute_root_itch)
+	(_rsa_sec_compute_root): New file, new private functions.
+	Side-channel silent version of rsa_compute_root.
+	* rsa-internal.h: New header file with declarations.
+
+	* gmp-glue.h (NETTLE_OCTET_SIZE_TO_LIMB_SIZE): New macro.
+
+2018-11-24  Niels Möller  <nisse@lysator.liu.se>
+
+	* configure.ac: Bump package version to 3.4.1.
+	(LIBNETTLE_MINOR): Bump library version to 6.5.
+	(LIBHOGWEED_MINOR): Bump library version to 4.5.
+
+2018-06-17  Niels Möller  <nisse@lysator.liu.se>
+
+	Backported from master branch.
+	* aclocal.m4 (NETTLE_CHECK_IFUNC): Fix quoting. Patch contributed
+	by Dmitry Eremin-Solenikov.
+	* testsuite/symbols-test: Exclude ____chkstk_darwin symbols,
+	produced by Apple's Xcode 10 compiler. Patch contributed by
+	Dominyk Tiller.
+
+2018-02-18  Niels Möller  <nisse@lysator.liu.se>
+
+	Backported from master branch.
+	* testsuite/Makefile.in (TS_NETTLE_SOURCES): Moved pss-mgf1-test.c...
+	(TS_HOGWEED_SOURCES): ...to here. Fixes link failure in builds
+	without public-key support.
+
+2018-01-16  Niels Möller  <nisse@lysator.liu.se>
+
+	Backported from master branch.
+	* tools/pkcs1-conv.c (convert_file): Add missing break statements.
+
+2018-10-10  Niels Möller  <nisse@lysator.liu.se>
+
+	Backported from master branch.
+	* aes-set-encrypt-key.c: Add missing include of stdlib.h.
+	* des-compat.c: Likewise.
+
+2018-08-09  Niels Möller  <nisse@lysator.liu.se>
+
+	Backported from master branch.
+	* nettle-internal.c (des_set_key_wrapper, des3_set_key_wrapper)
+	(blowfish128_set_key_wrapper): Wrapper functions, to avoid cast
+	between incompatible function types (which gcc-8 warns about).
+	Wrappers are expected to compile to a single jmp instruction.
+
+	* des-compat.c (des_compat_des3_encrypt)
+	(des_compat_des3_decrypt): Change length argument type to size_t.
+
 2017-11-19  Niels Möller  <nisse@lysator.liu.se>
 
-	* Released nettle-3.3.
+	* Released nettle-3.4.
 
 2017-11-12  Niels Möller  <nisse@lysator.liu.se>
 

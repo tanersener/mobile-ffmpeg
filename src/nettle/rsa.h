@@ -88,6 +88,7 @@ extern "C" {
 #define rsa_encrypt nettle_rsa_encrypt
 #define rsa_decrypt nettle_rsa_decrypt
 #define rsa_decrypt_tr nettle_rsa_decrypt_tr
+#define rsa_sec_decrypt nettle_rsa_sec_decrypt
 #define rsa_compute_root nettle_rsa_compute_root
 #define rsa_compute_root_tr nettle_rsa_compute_root_tr
 #define rsa_generate_keypair nettle_rsa_generate_keypair
@@ -422,6 +423,15 @@ rsa_decrypt_tr(const struct rsa_public_key *pub,
 	       void *random_ctx, nettle_random_func *random,	       
 	       size_t *length, uint8_t *message,
 	       const mpz_t gibberish);
+
+/* like rsa_decrypt_tr but with additional side-channel resistance.
+ * NOTE: the length of the final message must be known in advance. */
+int
+rsa_sec_decrypt(const struct rsa_public_key *pub,
+	        const struct rsa_private_key *key,
+	        void *random_ctx, nettle_random_func *random,
+	        size_t length, uint8_t *message,
+	        const mpz_t gibberish);
 
 /* Compute x, the e:th root of m. Calling it with x == m is allowed. */
 void

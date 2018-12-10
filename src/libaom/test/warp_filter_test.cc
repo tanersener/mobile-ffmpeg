@@ -25,18 +25,6 @@ TEST_P(AV1WarpFilterTest, DISABLED_Speed) {
   RunSpeedTest(::testing::get<3>(GET_PARAM(0)));
 }
 
-TEST_P(AV1WarpFilterTest, CheckOutput) {
-  RunCheckOutput(::testing::get<3>(GET_PARAM(0)));
-}
-TEST_P(AV1WarpFilterTest, DISABLED_Speed) {
-  RunSpeedTest(::testing::get<3>(GET_PARAM(0)));
-}
-
-INSTANTIATE_TEST_CASE_P(
-    C, AV1WarpFilterTest,
-    libaom_test::AV1WarpFilter::BuildParams(av1_warp_affine_c));
-
-#if HAVE_SSE4_1
 INSTANTIATE_TEST_CASE_P(
     C, AV1WarpFilterTest,
     libaom_test::AV1WarpFilter::BuildParams(av1_warp_affine_c));

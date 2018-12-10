@@ -359,7 +359,7 @@ TEST_P(ErrorResilienceTestLarge, DropFramesWithoutRecovery) {
 
   // Set an arbitrary set of error frames same as droppable frames.
   unsigned int num_droppable_frames = 3;
-  unsigned int droppable_frame_list[] = { 5, 10, 13 };
+  unsigned int droppable_frame_list[] = { 5, 11, 13 };
   SetDroppableFrames(num_droppable_frames, droppable_frame_list);
   SetErrorFrames(num_droppable_frames, droppable_frame_list);
   ASSERT_NO_FATAL_FAILURE(RunLoop(&video));

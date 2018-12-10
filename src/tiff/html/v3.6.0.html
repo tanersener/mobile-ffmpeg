@@ -64,12 +64,12 @@ TIFFDirectory structure would changing, breaking any dynamically linked
 software that used the private data structures.<p>
 
 Also, any tag not recognised
-by libtiff would not be read and accessable to applications without some
+by libtiff would not be read and accessible to applications without some
 fairly complicated work on the applications part to pre-register the tags
 as exemplified by the support for "Geo"TIFF tags by libgeotiff layered on
 libtiff.  <p>
 
-Amoung other things this approach required the extension code
+Among other things this approach required the extension code
 to access the private libtiff structures ... which made the higher level
 non-libtiff code be locked into a specific version of libtiff at compile time.
 This caused no end of bug reports!<p>

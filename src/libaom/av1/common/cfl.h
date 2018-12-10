@@ -80,14 +80,6 @@ void cfl_store_dc_pred(MACROBLOCKD *const xd, const uint8_t *input,
 void cfl_load_dc_pred(MACROBLOCKD *const xd, uint8_t *dst, int dst_stride,
                       TX_SIZE tx_size, CFL_PRED_TYPE pred_plane);
 
-// Null function used for invalid tx_sizes
-void cfl_subsample_lbd_null(const uint8_t *input, int input_stride,
-                            uint16_t *output_q3);
-
-// Null function used for invalid tx_sizes
-void cfl_subsample_hbd_null(const uint16_t *input, int input_stride,
-                            uint16_t *output_q3);
-
 // Allows the CFL_SUBSAMPLE function to switch types depending on the bitdepth.
 #define CFL_lbd_TYPE uint8_t *cfl_type
 #define CFL_hbd_TYPE uint16_t *cfl_type
@@ -133,21 +125,21 @@ void cfl_subsample_hbd_null(const uint16_t *input, int input_stride,
     subsample_##bd##_##sub##_8x8_##arch,   /* 8x8 */                      \
     subsample_##bd##_##sub##_16x16_##arch, /* 16x16 */                    \
     subsample_##bd##_##sub##_32x32_##arch, /* 32x32 */                    \
-    cfl_subsample_##bd##_null,             /* 64x64 (invalid CFL size) */ \
+    NULL,                                  /* 64x64 (invalid CFL size) */ \
     subsample_##bd##_##sub##_4x8_##arch,   /* 4x8 */                      \
     subsample_##bd##_##sub##_8x4_##arch,   /* 8x4 */                      \
     subsample_##bd##_##sub##_8x16_##arch,  /* 8x16 */                     \
     subsample_##bd##_##sub##_16x8_##arch,  /* 16x8 */                     \
     subsample_##bd##_##sub##_16x32_##arch, /* 16x32 */                    \
     subsample_##bd##_##sub##_32x16_##arch, /* 32x16 */                    \
-    cfl_subsample_##bd##_null,             /* 32x64 (invalid CFL size) */ \
-    cfl_subsample_##bd##_null,             /* 64x32 (invalid CFL size) */ \
+    NULL,                                  /* 32x64 (invalid CFL size) */ \
+    NULL,                                  /* 64x32 (invalid CFL size) */ \
     subsample_##bd##_##sub##_4x16_##arch,  /* 4x16  */                    \
     subsample_##bd##_##sub##_16x4_##arch,  /* 16x4  */                    \
     subsample_##bd##_##sub##_8x32_##arch,  /* 8x32  */                    \
     subsample_##bd##_##sub##_32x8_##arch,  /* 32x8  */                    \
-    cfl_subsample_##bd##_null,             /* 16x64 (invalid CFL size) */ \
-    cfl_subsample_##bd##_null,             /* 64x16 (invalid CFL size) */ \
+    NULL,                                  /* 16x64 (invalid CFL size) */ \
+    NULL,                                  /* 64x16 (invalid CFL size) */ \
   };
 
 // The RTCD script does not support passing in an array, so we wrap it in this
@@ -159,14 +151,6 @@ void cfl_subsample_hbd_null(const uint16_t *input, int input_stride,
   CFL_SUBSAMPLE_FUNCTIONS(arch, 420, hbd) \
   CFL_SUBSAMPLE_FUNCTIONS(arch, 422, hbd) \
   CFL_SUBSAMPLE_FUNCTIONS(arch, 444, hbd)
-
-// Null function used for invalid tx_sizes
-static INLINE void cfl_subtract_average_null(const uint16_t *src,
-                                             int16_t *dst) {
-  (void)dst;
-  (void)src;
-  assert(0);
-}
 
 // Declare a size-specific wrapper for the size-generic function. The compiler
 // will inline the size generic function in here, the advantage is that the size
@@ -201,21 +185,21 @@ static INLINE void cfl_subtract_average_null(const uint16_t *src,
       subtract_average_8x8_##arch,   /* 8x8 */                              \
       subtract_average_16x16_##arch, /* 16x16 */                            \
       subtract_average_32x32_##arch, /* 32x32 */                            \
-      cfl_subtract_average_null,     /* 64x64 (invalid CFL size) */         \
+      NULL,                          /* 64x64 (invalid CFL size) */         \
       subtract_average_4x8_##arch,   /* 4x8 */                              \
       subtract_average_8x4_##arch,   /* 8x4 */                              \
       subtract_average_8x16_##arch,  /* 8x16 */                             \
       subtract_average_16x8_##arch,  /* 16x8 */                             \
       subtract_average_16x32_##arch, /* 16x32 */                            \
       subtract_average_32x16_##arch, /* 32x16 */                            \
-      cfl_subtract_average_null,     /* 32x64 (invalid CFL size) */         \
-      cfl_subtract_average_null,     /* 64x32 (invalid CFL size) */         \
+      NULL,                          /* 32x64 (invalid CFL size) */         \
+      NULL,                          /* 64x32 (invalid CFL size) */         \
       subtract_average_4x16_##arch,  /* 4x16 (invalid CFL size) */          \
       subtract_average_16x4_##arch,  /* 16x4 (invalid CFL size) */          \
       subtract_average_8x32_##arch,  /* 8x32 (invalid CFL size) */          \
       subtract_average_32x8_##arch,  /* 32x8 (invalid CFL size) */          \
-      cfl_subtract_average_null,     /* 16x64 (invalid CFL size) */         \
-      cfl_subtract_average_null,     /* 64x16 (invalid CFL size) */         \
+      NULL,                          /* 16x64 (invalid CFL size) */         \
+      NULL,                          /* 64x16 (invalid CFL size) */         \
     };                                                                      \
     /* Modulo TX_SIZES_ALL to ensure that an attacker won't be able to */   \
     /* index the function pointer array out of bounds. */                   \
@@ -249,14 +233,6 @@ void subtract_average_4x16_c(const uint16_t *src, int16_t *dst);
 #define CFL_PREDICT_X(arch, width, height, bd) \
   CFL_PREDICT_##bd(arch, width, height)
 
-// Null function used for invalid tx_sizes
-void cfl_predict_lbd_null(const int16_t *pred_buf_q3, uint8_t *dst,
-                          int dst_stride, int alpha_q3);
-
-// Null function used for invalid tx_sizes
-void cfl_predict_hbd_null(const int16_t *pred_buf_q3, uint16_t *dst,
-                          int dst_stride, int alpha_q3, int bd);
-
 #define CFL_PREDICT_FN(arch, bd)                                          \
   CFL_PREDICT_X(arch, 4, 4, bd)                                           \
   CFL_PREDICT_X(arch, 4, 8, bd)                                           \
@@ -278,21 +254,21 @@ void cfl_predict_hbd_null(const int16_t *pred_buf_q3, uint16_t *dst,
       predict_##bd##_8x8_##arch,   /* 8x8 */                              \
       predict_##bd##_16x16_##arch, /* 16x16 */                            \
       predict_##bd##_32x32_##arch, /* 32x32 */                            \
-      cfl_predict_##bd##_null,     /* 64x64 (invalid CFL size) */         \
+      NULL,                        /* 64x64 (invalid CFL size) */         \
       predict_##bd##_4x8_##arch,   /* 4x8 */                              \
       predict_##bd##_8x4_##arch,   /* 8x4 */                              \
       predict_##bd##_8x16_##arch,  /* 8x16 */                             \
       predict_##bd##_16x8_##arch,  /* 16x8 */                             \
       predict_##bd##_16x32_##arch, /* 16x32 */                            \
       predict_##bd##_32x16_##arch, /* 32x16 */                            \
-      cfl_predict_##bd##_null,     /* 32x64 (invalid CFL size) */         \
-      cfl_predict_##bd##_null,     /* 64x32 (invalid CFL size) */         \
+      NULL,                        /* 32x64 (invalid CFL size) */         \
+      NULL,                        /* 64x32 (invalid CFL size) */         \
       predict_##bd##_4x16_##arch,  /* 4x16  */                            \
       predict_##bd##_16x4_##arch,  /* 16x4  */                            \
       predict_##bd##_8x32_##arch,  /* 8x32  */                            \
       predict_##bd##_32x8_##arch,  /* 32x8  */                            \
-      cfl_predict_##bd##_null,     /* 16x64 (invalid CFL size) */         \
-      cfl_predict_##bd##_null,     /* 64x16 (invalid CFL size) */         \
+      NULL,                        /* 16x64 (invalid CFL size) */         \
+      NULL,                        /* 64x16 (invalid CFL size) */         \
     };                                                                    \
     /* Modulo TX_SIZES_ALL to ensure that an attacker won't be able to */ \
     /* index the function pointer array out of bounds. */                 \
