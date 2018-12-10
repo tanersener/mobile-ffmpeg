@@ -249,6 +249,12 @@ TEST_P(BlendA64MaskTest8B, DISABLED_Speed) {
 INSTANTIATE_TEST_CASE_P(SSE4_1, BlendA64MaskTest8B,
                         ::testing::Values(TestFuncs(
                             aom_blend_a64_mask_c, aom_blend_a64_mask_sse4_1)));
+#endif  // HAVE_AVX2
+
+#if HAVE_AVX2
+INSTANTIATE_TEST_CASE_P(AVX2, BlendA64MaskTest8B,
+                        ::testing::Values(TestFuncs(aom_blend_a64_mask_sse4_1,
+                                                    aom_blend_a64_mask_avx2)));
 #endif  // HAVE_SSE4_1
 
 #if HAVE_AVX2

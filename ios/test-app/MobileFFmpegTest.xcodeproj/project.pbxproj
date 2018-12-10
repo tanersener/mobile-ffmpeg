@@ -47,6 +47,14 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				34D26CEF210F5D2C005B3A32 /* libavcodec.framework in Embed Frameworks */,
+				34D26CF0210F5D2C005B3A32 /* libavdevice.framework in Embed Frameworks */,
+				34D26CF1210F5D2C005B3A32 /* libavfilter.framework in Embed Frameworks */,
+				34D26CF2210F5D2C005B3A32 /* libavformat.framework in Embed Frameworks */,
+				34D26CF3210F5D2C005B3A32 /* libavutil.framework in Embed Frameworks */,
+				34D26CF4210F5D2C005B3A32 /* libswresample.framework in Embed Frameworks */,
+				34D26CF5210F5D2C005B3A32 /* libswscale.framework in Embed Frameworks */,
+				34D26CF6210F5D2C005B3A32 /* mobileffmpeg.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -151,6 +159,15 @@
 			isa = PBXGroup;
 			children = (
 				34FAE213209F7DDD005CE2AE /* AppDelegate.h */,
+				345745492113B8AD00059043 /* AudioViewController.h */,
+				34FAE216209F7DDD005CE2AE /* CommandViewController.h */,
+				343E66B7210789DE00F95E5B /* Constants.h */,
+				343E66B3210784BD00F95E5B /* HttpsViewController.h */,
+				3457454D2113B8D300059043 /* SubtitleViewController.h */,
+				343E67072107C27600F95E5B /* TabBarController.h */,
+				343E67032107AD0100F95E5B /* Util.h */,
+				34FAE219209F7DDD005CE2AE /* VideoViewController.h */,
+				340FABBC2115A17600B33CE7 /* VidStabViewController.h */,
 				34FAE214209F7DDD005CE2AE /* AppDelegate.m */,
 				34FAE21F209F7DDE005CE2AE /* Assets.xcassets */,
 				345745492113B8AD00059043 /* AudioViewController.h */,

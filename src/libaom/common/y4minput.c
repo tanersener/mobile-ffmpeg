@@ -846,6 +846,10 @@ int y4m_input_open(y4m_input *_y4m, FILE *_fin, char *_skip, int _nskip,
     _y4m->dst_buf_read_sz =
         _y4m->pic_w * _y4m->pic_h +
         2 * ((_y4m->pic_w + 1) / 2) * ((_y4m->pic_h + 1) / 2);
+    if (csp == AOM_CSP_VERTICAL) {
+      fprintf(stderr, "Unsupported conversion from 420jpeg to 420mpeg2\n");
+      return -1;
+    }
     /* Natively supported: no conversion required. */
     _y4m->aux_buf_sz = _y4m->aux_buf_read_sz = 0;
     _y4m->convert = y4m_convert_null;
