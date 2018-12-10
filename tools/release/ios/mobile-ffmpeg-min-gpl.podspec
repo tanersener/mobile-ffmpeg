@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
     s.ios.frameworks    = 'Foundation', 'AudioToolbox', 'CoreImage', 'CoreMotion', 'CoreVideo', 'GameController', 'VideoToolbox'
     s.ios.library       = 'z', 'bz2', 'c++'
       
-    s.source            = { :http => 'https://github.com/tanersener/mobile-ffmpeg/releases/download/v3.0/mobile-ffmpeg-min-gpl-3.0-ios-framework.zip' }
+    s.source            = { :http => 'https://github.com/tanersener/mobile-ffmpeg/releases/download/v3.1/mobile-ffmpeg-min-gpl-3.1-ios-framework.zip' }
     s.ios.vendored_frameworks = 'mobileffmpeg.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework'
 
 end  
