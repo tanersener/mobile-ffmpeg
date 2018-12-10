@@ -3,7 +3,7 @@ layout: default
 ---
 FFmpeg for Android and IOS
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/dev-v3.x/docs/assets/mobile-ffmpeg-logo-v7.png" width="240">
+<img src="https://github.com/tanersener/mobile-ffmpeg/raw/dev-v3.x/docs/assets/mobile-ffmpeg-logo-v7.png" width="240">
 
 ### 1. Features
 - Supports FFmpeg `v3.4.x`, `v4.0.x` and `v4.1` releases
@@ -33,7 +33,6 @@ There are eight different prebuilt packages. Below you can see which external li
 <table>
 <thead>
 <tr>
-<th align="center"></th>
 <th align="center">min</th>
 <th align="center">min-gpl</th>
 <th align="center">https</th>
@@ -46,7 +45,6 @@ There are eight different prebuilt packages. Below you can see which external li
 </thead>
 <tbody>
 <tr>
-<td align="center"><sup>external libraries</sup></td>
 <td align="center">-</td>
 <td align="center"><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
 <td align="center"><sup>gmp</sup><br><sup>gnutls</sup></td>
@@ -55,14 +53,6 @@ There are eight different prebuilt packages. Below you can see which external li
 <td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>kvazaar</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libtheora</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>snappy</sup></td>
 <td align="center"><sup>chromaprint</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>sdl</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>tesseract</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
 <td align="center"><sup>chromaprint</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>sdl</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>tesseract</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>wavpack</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
-</tr>
-<tr>
-<td align="center"><sup>android system libraries</sup></td>
-<td align="center" colspan=8><sup>zlib</sup><br><sup>MediaCodec</sup></td>
-</tr>
-<tr>
-<td align="center"><sup>ios system libraries</sup></td>
-<td align="center" colspan=8><sup>zlib</sup><br><sup>AudioToolbox</sup><br><sup>AVFoundation</sup><br><sup>CoreImage</sup><br><sup>VideoToolbox</sup><br><sup>bzip2</sup></td>
 </tr>
 </tbody>
 </table>
@@ -192,29 +182,29 @@ There are eight different prebuilt packages. Below you can see which external li
 
 7. List enabled external libraries.
     ```
-    NASArray *externalLibraries = [MobileFFmpegConfig getExternalLibraries];
+    NSArray *externalLibraries = [MobileFFmpegConfig getExternalLibraries];
     ```
 
 8. Enable log callback.
     ```
+    [MobileFFmpegConfig setLogDelegate:self];
+
     - (void)logCallback: (int)level :(NSString*)message {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"%@", message);
         });
     }
-    ...
-    [MobileFFmpegConfig setLogDelegate:self];
     ```
 
 9. Enable statistics callback.
     ```
+    [MobileFFmpegConfig setStatisticsDelegate:self];
+
     - (void)statisticsCallback:(Statistics *)newStatistics {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"frame: %d, time: %d\n", newStatistics.getVideoFrameNumber, newStatistics.getTime);
         });
     }
-    ...
-    [MobileFFmpegConfig setStatisticsDelegate:self];
     ```
 
 10. Set log level.

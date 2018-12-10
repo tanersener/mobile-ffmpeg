@@ -210,29 +210,29 @@ There are eight different binary packages. Below you can see which system librar
 
 7. List enabled external libraries.
     ```
-    NASArray *externalLibraries = [MobileFFmpegConfig getExternalLibraries];
+    NSArray *externalLibraries = [MobileFFmpegConfig getExternalLibraries];
     ```
 
 8. Enable log callback.
     ```
+    [MobileFFmpegConfig setLogDelegate:self];
+
     - (void)logCallback: (int)level :(NSString*)message {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"%@", message);
         });
     }
-    ...
-    [MobileFFmpegConfig setLogDelegate:self];
     ```
 
 9. Enable statistics callback.
     ```
+    [MobileFFmpegConfig setStatisticsDelegate:self];
+
     - (void)statisticsCallback:(Statistics *)newStatistics {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"frame: %d, time: %d\n", newStatistics.getVideoFrameNumber, newStatistics.getTime);
         });
     }
-    ...
-    [MobileFFmpegConfig setStatisticsDelegate:self];
     ```
 
 10. Set log level.
