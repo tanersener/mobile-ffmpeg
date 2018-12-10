@@ -1,10 +1,10 @@
 PODS:
-  - mobile-ffmpeg-full (3.0)
-  - NMEasyTipView (1.1)
+  - mobile-ffmpeg-full (3.1)
+  - NMEasyTipView (1.2)
 
 DEPENDENCIES:
-  - mobile-ffmpeg-full (~> 3.0)
-  - NMEasyTipView (~> 1.1)
+  - mobile-ffmpeg-full (~> 3.1)
+  - NMEasyTipView (~> 1.2)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -12,9 +12,9 @@ SPEC REPOS:
     - NMEasyTipView
 
 SPEC CHECKSUMS:
-  mobile-ffmpeg-full: 9a71f22b8b0068773599f2a1a114eea940c8b0a8
-  NMEasyTipView: bc922627c42ac81d18ac5795dc5424b6cdeca798
+  mobile-ffmpeg-full: ab9728f93c506e99cec20e8051140a67e35f99f9
+  NMEasyTipView: 04948bb8ee01b22957095e1427be972115b57d02
 
-PODFILE CHECKSUM: d488e5523889459f8ff485143d97c53e5335368f
+PODFILE CHECKSUM: 3bd865764536ec73fe1691f9e45e7c5fd662d9f7
 
 COCOAPODS: 1.6.0.beta.2

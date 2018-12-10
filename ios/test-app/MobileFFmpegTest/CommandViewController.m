@@ -84,8 +84,8 @@
     
     [[self commandText] endEditing:TRUE];
     
-    NSString *ffmpegCommand = [[self commandText] text];
-
+    NSString *ffmpegCommand = [NSString stringWithFormat:@"-hide_banner %@", [[self commandText] text]];
+    
     NSLog(@"Testing COMMAND synchronously.\n");
     
     NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
@@ -107,7 +107,7 @@
     
     [[self commandText] endEditing:TRUE];
 
-    NSString *ffmpegCommand = [[self commandText] text];
+    NSString *ffmpegCommand = [NSString stringWithFormat:@"-hide_banner %@", [[self commandText] text]];
     
     NSLog(@"Testing COMMAND asynchronously.\n");
     
