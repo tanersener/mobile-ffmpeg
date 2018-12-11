@@ -253,13 +253,12 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/ios_test_app.gif" width="240">
 
-### 3. Versions
+### 3. Releases
 
-- `MobileFFmpeg v1.x` is the previous stable, includes `FFmpeg v3.4.4`
-
-- `MobileFFmpeg v2.x` is the current stable, includes `FFmpeg v4.0.3`
-
-- `MobileFFmpeg v3.x` is the next stable, includes `FFmpeg v4.1-10`
+|        | v1.0 | v1.1 | v1.2 | v2.0 | v2.1 | v2.2 | v3.0 | v3.1 |
+| :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| FFmpeg | 3.4.2 | 3.4.2 | 3.4.4 | 4.0.1 | 4.0.2 | 4.0.3 | 4.1-dev-1517 | v4.1-10 |
+| packages | min<br/>full | min<br/>min-gpl<br/>https<br/>https-gpl<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl |
 
 ### 4. Building
 #### 4.1 Prerequisites
