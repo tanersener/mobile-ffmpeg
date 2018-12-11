@@ -2,7 +2,7 @@
 title: mobile-ffmpeg
 baseurl: "/mobile-ffmpeg"
 locale: "en"
-theme: jekyll-theme-minimal
+theme: jekyll-theme-modernist
 markdown: kramdown
 
 # github section
