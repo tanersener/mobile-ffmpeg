@@ -212,19 +212,24 @@ get_size_optimization_cflags() {
     ARCH_OPTIMIZATION=""
     case ${ARCH} in
         arm-v7a | arm-v7a-neon | arm64-v8a)
-            if [[ $1 -eq libwebp ]]; then
-                ARCH_OPTIMIZATION="-Os"
-            else
-                ARCH_OPTIMIZATION="-Os -finline-limit=64"
-            fi
+            case $1 in
+                ffmpeg)
+                    ARCH_OPTIMIZATION="-flto -Os -ffunction-sections -fdata-sections"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
+                ;;
+            esac
         ;;
         x86 | x86-64)
-            if [[ $1 -eq libvpx ]]; then
-                ARCH_OPTIMIZATION="-O2"
-            else
-                ARCH_OPTIMIZATION="-O2 -finline-limit=300"
-            fi
-
+            case $1 in
+                ffmpeg)
+                    ARCH_OPTIMIZATION="-flto -Os -ffunction-sections -fdata-sections"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
+                ;;
+            esac
         ;;
     esac
 
@@ -277,16 +282,19 @@ get_cflags() {
 get_cxxflags() {
     case $1 in
         gnutls)
-            echo "-std=c++11 -fno-rtti"
+            echo "-std=c++11 -fno-rtti -Os -ffunction-sections -fdata-sections"
+        ;;
+        ffmpeg)
+            echo "-std=c++11 -fno-exceptions -fno-rtti -flto -Os -ffunction-sections -fdata-sections"
         ;;
         opencore-amr)
-            echo ""
+            echo "-Os -ffunction-sections -fdata-sections"
         ;;
         x265)
-            echo "-std=c++11 -fno-exceptions"
+            echo "-std=c++11 -fno-exceptions -Os -ffunction-sections -fdata-sections"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti"
+            echo "-std=c++11 -fno-exceptions -fno-rtti -Os -ffunction-sections -fdata-sections"
         ;;
     esac
 }
@@ -310,10 +318,24 @@ get_common_linked_libraries() {
 get_size_optimization_ldflags() {
     case ${ARCH} in
         arm64-v8a)
-            echo "-Wl,--gc-sections"
+            case $1 in
+                ffmpeg)
+                    echo "-Wl,--gc-sections -flto -O2 -ffunction-sections -fdata-sections -finline-functions"
+                ;;
+                *)
+                    echo "-Wl,--gc-sections -Os -ffunction-sections -fdata-sections"
+                ;;
+            esac
         ;;
         *)
-            echo "-Wl,--gc-sections,--icf=safe"
+            case $1 in
+                ffmpeg)
+                    echo "-Wl,--gc-sections,--icf=safe -flto -O2 -ffunction-sections -fdata-sections -finline-functions"
+                ;;
+                *)
+                    echo "-Wl,--gc-sections,--icf=safe -Os -ffunction-sections -fdata-sections"
+                ;;
+            esac
         ;;
     esac
 }
@@ -340,7 +362,7 @@ get_arch_specific_ldflags() {
 
 get_ldflags() {
     ARCH_FLAGS=$(get_arch_specific_ldflags)
-    OPTIMIZATION_FLAGS=$(get_size_optimization_ldflags)
+    OPTIMIZATION_FLAGS=$(get_size_optimization_ldflags $1)
     COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
 
     echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS}"
