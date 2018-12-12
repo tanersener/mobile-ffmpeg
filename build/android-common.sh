@@ -211,13 +211,23 @@ get_size_optimization_cflags() {
 
     ARCH_OPTIMIZATION=""
     case ${ARCH} in
-        arm-v7a | arm-v7a-neon | arm64-v8a)
+        arm-v7a | arm-v7a-neon)
             case $1 in
                 ffmpeg)
-                    ARCH_OPTIMIZATION="-flto -Os -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="-flto -O2"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="-Os"
+                ;;
+            esac
+        ;;
+        arm64-v8a)
+            case $1 in
+                ffmpeg | nettle)
+                    ARCH_OPTIMIZATION="-flto -fuse-ld=gold -O2"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-Os"
                 ;;
             esac
         ;;
@@ -282,19 +292,19 @@ get_cflags() {
 get_cxxflags() {
     case $1 in
         gnutls)
-            echo "-std=c++11 -fno-rtti -Os -ffunction-sections -fdata-sections"
+            echo "-std=c++11 -fno-rtti"
         ;;
         ffmpeg)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -flto -Os -ffunction-sections -fdata-sections"
+            echo "-std=c++11 -fno-exceptions -fno-rtti -flto -fuse-ld=gold -O2"
         ;;
         opencore-amr)
-            echo "-Os -ffunction-sections -fdata-sections"
+            echo "-Os"
         ;;
         x265)
-            echo "-std=c++11 -fno-exceptions -Os -ffunction-sections -fdata-sections"
+            echo "-std=c++11 -fno-exceptions"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -Os -ffunction-sections -fdata-sections"
+            echo "-std=c++11 -fno-exceptions -fno-rtti"
         ;;
     esac
 }
@@ -319,21 +329,21 @@ get_size_optimization_ldflags() {
     case ${ARCH} in
         arm64-v8a)
             case $1 in
-                ffmpeg)
-                    echo "-Wl,--gc-sections -flto -O2 -ffunction-sections -fdata-sections -finline-functions"
+                ffmpeg | nettle)
+                    echo "-Wl,--gc-sections -flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
-                    echo "-Wl,--gc-sections -Os -ffunction-sections -fdata-sections"
+                    echo "-Wl,--gc-sections -Os"
                 ;;
             esac
         ;;
         *)
             case $1 in
                 ffmpeg)
-                    echo "-Wl,--gc-sections,--icf=safe -flto -O2 -ffunction-sections -fdata-sections -finline-functions"
+                    echo "-Wl,--gc-sections,--icf=safe -flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
-                    echo "-Wl,--gc-sections,--icf=safe -Os -ffunction-sections -fdata-sections"
+                    echo "-Wl,--gc-sections,--icf=safe -Os"
                 ;;
             esac
         ;;
@@ -938,6 +948,12 @@ set_toolchain_clang_paths() {
     else
         export AS=${TARGET_HOST}-as
     fi
+
+    case ${ARCH} in
+        arm64-v8a)
+            export ac_cv_c_bigendian=no
+        ;;
+    esac
 
     export LD=${TARGET_HOST}-ld
     export RANLIB=${TARGET_HOST}-ranlib

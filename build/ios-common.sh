@@ -194,19 +194,46 @@ get_size_optimization_cflags() {
     ARCH_OPTIMIZATION=""
     case ${ARCH} in
         armv7 | armv7s | arm64)
-            if [[ $1 -eq libwebp ]]; then
-                ARCH_OPTIMIZATION="-Os -Wno-ignored-optimization-argument"
-            else
-                ARCH_OPTIMIZATION="-Os -finline-limit=64 -Wno-ignored-optimization-argument"
-            fi
+            case $1 in
+                x264)
+                    ARCH_OPTIMIZATION="-Os"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-flto -Os"
+                ;;
+            esac
         ;;
         i386 | x86-64)
-            if [[ $1 -eq libvpx ]]; then
-                ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
-            else
-                ARCH_OPTIMIZATION="-O2 -finline-limit=300 -Wno-ignored-optimization-argument"
-            fi
+            case $1 in
+                ffmpeg)
+                    ARCH_OPTIMIZATION="-flto -Os -finline-limit=300 -Wno-ignored-optimization-argument"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-flto -Os -finline-limit=300 -Wno-ignored-optimization-argument"
+                ;;
+            esac
+        ;;
+    esac
 
+    echo "${ARCH_OPTIMIZATION}"
+}
+
+get_size_optimization_asm_cflags() {
+
+    ARCH_OPTIMIZATION=""
+    case $1 in
+        jpeg | ffmpeg)
+            case ${ARCH} in
+                armv7 | armv7s | arm64)
+                    ARCH_OPTIMIZATION="-Os"
+                ;;
+                i386 | x86-64)
+                    ARCH_OPTIMIZATION="-flto -Os"
+                ;;
+            esac
+        ;;
+        *)
+            ARCH_OPTIMIZATION=$(get_size_optimization_cflags $1)
         ;;
     esac
 
@@ -282,7 +309,7 @@ get_asmflags() {
     APP_FLAGS=$(get_app_specific_cflags $1)
     COMMON_FLAGS=$(get_common_cflags)
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-        OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+        OPTIMIZATION_FLAGS=$(get_size_optimization_asm_cflags $1)
     else
         OPTIMIZATION_FLAGS=""
     fi
@@ -294,6 +321,7 @@ get_asmflags() {
 
 get_cxxflags() {
     local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags) $(get_min_version_cflags $1)"
+    local OPTIMIZATION_CFLAGS="-flto -Os"
 
     local BITCODE_FLAGS=""
     case ${ARCH} in
@@ -304,22 +332,22 @@ get_cxxflags() {
 
     case $1 in
         x265)
-            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS}"
         ;;
         gnutls)
-            echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS}"
         ;;
         opencore-amr)
-            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
+            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS}"
         ;;
         libwebp | xvidcore)
-            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS}"
         ;;
         libaom)
-            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS}"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS}"
         ;;
     esac
 }
@@ -330,6 +358,18 @@ get_common_linked_libraries() {
 
 get_common_ldflags() {
     echo "-isysroot ${SDK_PATH}"
+}
+
+get_size_optimization_ldflags() {
+    case ${ARCH} in
+        *)
+            case $1 in
+                *)
+                    echo "-flto -Os"
+                ;;
+            esac
+        ;;
+    esac
 }
 
 get_arch_specific_ldflags() {
@@ -355,21 +395,22 @@ get_arch_specific_ldflags() {
 get_ldflags() {
     ARCH_FLAGS=$(get_arch_specific_ldflags)
     LINKED_LIBRARIES=$(get_common_linked_libraries)
+    OPTIMIZATION_FLAGS=$(get_size_optimization_ldflags $1)
     COMMON_FLAGS=$(get_common_ldflags)
 
     case $1 in
         mobile-ffmpeg)
             case ${ARCH} in
                 armv7 | armv7s | arm64)
-                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode"
+                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode ${OPTIMIZATION_FLAGS}"
                 ;;
                 *)
-                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS}"
+                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS}"
                 ;;
             esac
         ;;
         *)
-            echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS}"
+            echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
     esac
 }

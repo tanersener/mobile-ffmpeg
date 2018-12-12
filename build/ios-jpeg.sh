@@ -38,6 +38,7 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
+export ASM_FLAGS=$(get_asmflags ${LIB_NAME})
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -47,6 +48,9 @@ fi
 
 mkdir build || exit 1
 cd build || exit 1
+
+# fixing asm flags
+${SED_INLINE} 's/${CMAKE_C_FLAGS} ${CMAKE_ASM_FLAGS}/${CMAKE_ASM_FLAGS}/g' ${BASEDIR}/src/${LIB_NAME}/simd/CMakeLists.txt
 
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
@@ -61,7 +65,7 @@ cmake -Wno-dev \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
     -DCMAKE_AR="$AR" \
-    -DCMAKE_AS="$AS" \
+    -DCMAKE_ASM_FLAGS="$ASM_FLAGS" \
     -DENABLE_PIC=1 \
     -DENABLE_STATIC=1 \
     -DENABLE_SHARED=0 \

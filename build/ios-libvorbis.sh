@@ -48,6 +48,10 @@ if [[ ${RECONF_libvorbis} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
+# -force_cpusubtype_ALL FLAG REMOVED DUE TO THE FOLLOWING ERROR
+# ld: -force_cpusubtype_ALL and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
+${SED_INLINE} 's/-force_cpusubtype_ALL//g' ${BASEDIR}/src/${LIB_NAME}/configure
+
 ./configure \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
     --with-pic \

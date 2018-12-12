@@ -352,9 +352,9 @@ LINKED_LIBRARIES=$(get_common_linked_libraries);
 COMMON_LDFLAGS=$(get_common_ldflags);
 
 # REORDERED FLAGS
-CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS} ${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
-CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-LDFLAGS="${ARCH_LDFLAGS} ${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS}"
+export CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS} ${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
+export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
+export LDFLAGS="${ARCH_LDFLAGS} ${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -365,9 +365,6 @@ make distclean 2>/dev/null 1>/dev/null
 ./configure \
     --sysroot=${SDK_PATH} \
     --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
-    --extra-cflags="${CFLAGS}" \
-    --extra-cxxflags="${CXXFLAGS}" \
-    --extra-ldflags="${LDFLAGS}" \
     --enable-version3 \
     --arch="${TARGET_ARCH}" \
     --cpu="${TARGET_CPU}" \

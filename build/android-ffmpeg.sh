@@ -303,14 +303,15 @@ echo -n -e "\n${LIB_NAME}: "
 
 make distclean 2>/dev/null 1>/dev/null
 
+export CFLAGS="${HIGH_PRIORITY_INCLUDES} ${CFLAGS}"
+export CXXFLAGS="${CXXFLAGS}"
+export LDFLAGS="${LDFLAGS}"
+
 ./configure \
     --cross-prefix="${TARGET_HOST}-" \
     --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot" \
     --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
-    --extra-cflags="${HIGH_PRIORITY_INCLUDES} ${CFLAGS}" \
-    --extra-cxxflags="${CXXFLAGS}" \
-    --extra-ldflags="${LDFLAGS}" \
     --enable-version3 \
     --arch="${TARGET_ARCH}" \
     --cpu="${TARGET_CPU}" \

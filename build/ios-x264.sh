@@ -47,7 +47,6 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
-ASM_FLAGS=""
 case ${ARCH} in
     i386 |x86-64)
         if ! [ -x "$(command -v nasm)" ]; then
@@ -64,8 +63,8 @@ esac
     --enable-pic \
     --sysroot=${SDK_PATH} \
     --enable-static \
+    --enable-lto \
     --disable-cli \
-    ${ASM_FLAGS} \
     --host=${TARGET_HOST} || exit 1
 
 make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
