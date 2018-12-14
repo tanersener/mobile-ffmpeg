@@ -320,6 +320,7 @@ export LDFLAGS="${LDFLAGS}"
     --enable-cross-compile \
     --enable-pic \
     --enable-jni \
+    --enable-lto \
     --enable-optimizations \
     --enable-swscale \
     --enable-shared \

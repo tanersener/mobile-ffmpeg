@@ -196,20 +196,26 @@ get_size_optimization_cflags() {
         armv7 | armv7s | arm64)
             case $1 in
                 x264)
-                    ARCH_OPTIMIZATION="-Os"
+                    ARCH_OPTIMIZATION="-Oz"
+                ;;
+                x265 | ffmpeg | mobile-ffmpeg)
+                    ARCH_OPTIMIZATION="-flto=thin -Oz"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-flto -Os"
+                    ARCH_OPTIMIZATION="-flto -Oz"
                 ;;
             esac
         ;;
         i386 | x86-64)
             case $1 in
-                ffmpeg)
-                    ARCH_OPTIMIZATION="-flto -Os -finline-limit=300 -Wno-ignored-optimization-argument"
+                x264 | ffmpeg)
+                    ARCH_OPTIMIZATION="-O2"
+                ;;
+                x265)
+                    ARCH_OPTIMIZATION="-flto=thin -O2"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-flto -Os -finline-limit=300 -Wno-ignored-optimization-argument"
+                    ARCH_OPTIMIZATION="-flto -O2"
                 ;;
             esac
         ;;
@@ -225,10 +231,10 @@ get_size_optimization_asm_cflags() {
         jpeg | ffmpeg)
             case ${ARCH} in
                 armv7 | armv7s | arm64)
-                    ARCH_OPTIMIZATION="-Os"
+                    ARCH_OPTIMIZATION="-Oz"
                 ;;
                 i386 | x86-64)
-                    ARCH_OPTIMIZATION="-flto -Os"
+                    ARCH_OPTIMIZATION="-O2"
                 ;;
             esac
         ;;
@@ -321,7 +327,7 @@ get_asmflags() {
 
 get_cxxflags() {
     local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags) $(get_min_version_cflags $1)"
-    local OPTIMIZATION_CFLAGS="-flto -Os"
+    local OPTIMIZATION_CFLAGS="-Oz"
 
     local BITCODE_FLAGS=""
     case ${ARCH} in
@@ -362,10 +368,23 @@ get_common_ldflags() {
 
 get_size_optimization_ldflags() {
     case ${ARCH} in
+        armv7 | armv7s | arm64)
+            case $1 in
+                ffmpeg | mobile-ffmpeg)
+                    echo "-flto=thin -Oz"
+                ;;
+                *)
+                    echo "-flto -Oz"
+                ;;
+            esac
+        ;;
         *)
             case $1 in
+                ffmpeg)
+                    echo "-O2"
+                ;;
                 *)
-                    echo "-flto -Os"
+                    echo "-flto -O2"
                 ;;
             esac
         ;;

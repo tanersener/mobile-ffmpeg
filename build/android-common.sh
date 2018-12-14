@@ -214,20 +214,20 @@ get_size_optimization_cflags() {
         arm-v7a | arm-v7a-neon)
             case $1 in
                 ffmpeg)
-                    ARCH_OPTIMIZATION="-flto -O2"
+                    ARCH_OPTIMIZATION="-flto -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-Os"
+                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
                 ;;
             esac
         ;;
         arm64-v8a)
             case $1 in
                 ffmpeg | nettle)
-                    ARCH_OPTIMIZATION="-flto -fuse-ld=gold -O2"
+                    ARCH_OPTIMIZATION="-flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-Os"
+                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
                 ;;
             esac
         ;;
@@ -292,19 +292,19 @@ get_cflags() {
 get_cxxflags() {
     case $1 in
         gnutls)
-            echo "-std=c++11 -fno-rtti"
+            echo "-std=c++11 -fno-rtti -Os -ffunction-sections -fdata-sections"
         ;;
         ffmpeg)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -flto -fuse-ld=gold -O2"
+            echo "-std=c++11 -fno-exceptions -fno-rtti -flto -O2 -ffunction-sections -fdata-sections"
         ;;
         opencore-amr)
-            echo "-Os"
+            echo "-Os -ffunction-sections -fdata-sections"
         ;;
         x265)
-            echo "-std=c++11 -fno-exceptions"
+            echo "-std=c++11 -fno-exceptions -Os -ffunction-sections -fdata-sections"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti"
+            echo "-std=c++11 -fno-exceptions -fno-rtti -Os -ffunction-sections -fdata-sections"
         ;;
     esac
 }
@@ -333,17 +333,17 @@ get_size_optimization_ldflags() {
                     echo "-Wl,--gc-sections -flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
-                    echo "-Wl,--gc-sections -Os"
+                    echo "-Wl,--gc-sections -Os -ffunction-sections -fdata-sections"
                 ;;
             esac
         ;;
         *)
             case $1 in
                 ffmpeg)
-                    echo "-Wl,--gc-sections,--icf=safe -flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
+                    echo "-Wl,--gc-sections,--icf=safe -flto -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
-                    echo "-Wl,--gc-sections,--icf=safe -Os"
+                    echo "-Wl,--gc-sections,--icf=safe -Os -ffunction-sections -fdata-sections"
                 ;;
             esac
         ;;
