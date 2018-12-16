@@ -61,11 +61,8 @@ case ${ARCH} in
         ${SED_INLINE} 's/-Wl,-read_only_relocs,suppress//g' configure
 
     ;;
-    i386)
+    i386 | x86-64)
         ASM_FLAGS="--disable-assembly"
-    ;;
-    x86-64)
-        ASM_FLAGS=""
     ;;
 esac
 
