@@ -323,7 +323,11 @@ export LDFLAGS="${LDFLAGS}"
     --enable-optimizations \
     --enable-swscale \
     --enable-shared \
-    --enable-v4l2-m2m \
+    --disable-v4l2-m2m \
+    --disable-outdev=v4l2 \
+    --disable-outdev=fbdev \
+    --disable-indev=v4l2 \
+    --disable-indev=fbdev \
     ${SIZE_OPTIONS} \
     --disable-openssl \
     --disable-xmm-clobber-test \
