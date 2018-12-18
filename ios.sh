@@ -536,8 +536,9 @@ XCODE_FOR_MOBILE_FFMPEG=~/.xcode.for.mobile.ffmpeg.sh
 if [[ -f ${XCODE_FOR_MOBILE_FFMPEG} ]]; then
     source ${XCODE_FOR_MOBILE_FFMPEG} 1>>${BASEDIR}/build.log 2>&1
 fi
+DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
 
-echo -e "Using Xcode provided at $(xcode-select -p)\n" 1>>${BASEDIR}/build.log 2>&1
+echo -e "INFO: Using SDK ${DETECTED_IOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>${BASEDIR}/build.log 2>&1
 
 while [ ! $# -eq 0 ]
 do
