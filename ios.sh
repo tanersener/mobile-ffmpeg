@@ -904,6 +904,11 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         cp ${BASEDIR}/LICENSE.LGPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
     fi
 
+    # COPYING STRIP SCRIPT FOR SHARED LIBRARY
+    if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
+        cp ${BASEDIR}/tools/release/ios/strip-frameworks.sh ${MOBILE_FFMPEG_UNIVERSAL} 1>>${BASEDIR}/build.log 2>&1
+    fi
+
     echo -e "Created fat-binary mobileffmpeg successfully.\n" 1>>${BASEDIR}/build.log 2>&1
 
     echo -e "ok\n"
