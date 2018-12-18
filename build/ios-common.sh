@@ -138,18 +138,12 @@ get_sdk_path() {
 }
 
 get_min_version_cflags() {
-    local min_version=${IOS_MIN_VERSION}
-
-    if [ "$1" == "gnutls" ]; then
-        min_version=${GNUTLS_IOS_MIN_VERSION}
-    fi
-
     case ${ARCH} in
         armv7 | armv7s | arm64)
-            echo "-miphoneos-version-min=${min_version}"
+            echo "-miphoneos-version-min=${IOS_MIN_VERSION}"
         ;;
         i386 | x86-64)
-            echo "-mios-simulator-version-min=${min_version}"
+            echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
         ;;
     esac
 }
