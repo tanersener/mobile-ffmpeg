@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 27
-        versionCode 210310
-        versionName "3.1"
+        versionCode 210420
+        versionName "4.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         project.archivesBaseName = "mobile-ffmpeg"
     }
