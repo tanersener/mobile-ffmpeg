@@ -205,26 +205,26 @@ get_size_optimization_cflags() {
         armv7 | armv7s | arm64 | arm64e)
             case $1 in
                 x264)
-                    ARCH_OPTIMIZATION="-Oz"
+                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
                 ;;
                 x265 | ffmpeg | mobile-ffmpeg)
-                    ARCH_OPTIMIZATION="-flto=thin -Oz"
+                    ARCH_OPTIMIZATION="-flto=thin -Oz -Wno-ignored-optimization-argument"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-flto -Oz"
+                    ARCH_OPTIMIZATION="-flto -Oz -Wno-ignored-optimization-argument"
                 ;;
             esac
         ;;
         i386 | x86-64)
             case $1 in
                 x264 | ffmpeg)
-                    ARCH_OPTIMIZATION="-O2"
+                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
                 ;;
                 x265)
-                    ARCH_OPTIMIZATION="-flto=thin -O2"
+                    ARCH_OPTIMIZATION="-flto=thin -O2 -Wno-ignored-optimization-argument"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-flto -O2"
+                    ARCH_OPTIMIZATION="-flto -O2 -Wno-ignored-optimization-argument"
                 ;;
             esac
         ;;
