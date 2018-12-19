@@ -183,7 +183,9 @@ skip_library() {
 }
 
 enable_debug() {
-    export MOBILE_FFMPEG_DEBUG="-d"
+    export MOBILE_FFMPEG_DEBUG="-DDEBUG -g"
+
+    BUILD_TYPE_ID+="debug "
 }
 
 enable_static() {
@@ -628,7 +630,7 @@ if [[ -z ${BUILD_LTS} ]]; then
     enable_main_build
 else
     enable_lts_build
-    BUILD_TYPE_ID="LTS "
+    BUILD_TYPE_ID+="LTS "
 fi
 
 if [[ ! -z ${DISPLAY_HELP} ]]; then

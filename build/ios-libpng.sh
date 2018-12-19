@@ -70,7 +70,7 @@ fi
     ${CPU_SPECIFIC_OPTIONS} \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_libpng_package_config "1.6.35"

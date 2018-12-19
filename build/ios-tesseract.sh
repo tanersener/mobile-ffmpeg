@@ -66,7 +66,7 @@ export LEPTONICA_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/l
 
 ${SED_INLINE} 's/$wl-bind_at_load//g' libtool
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_tesseract_package_config "3.05.02"

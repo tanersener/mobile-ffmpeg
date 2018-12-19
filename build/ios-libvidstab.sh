@@ -76,7 +76,7 @@ cmake -Wno-dev \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
 cp vidstab.pc ${INSTALL_PKG_CONFIG_DIR}

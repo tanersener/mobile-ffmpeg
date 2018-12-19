@@ -61,7 +61,7 @@ cmake -Wno-dev \
     -DFFT_LIB=kissfft \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_chromaprint_package_config "1.4.3"

@@ -5,3 +5,4 @@
 /codec_list.c
 /parser_list.c
 /libavcodec.so.58
+*.dylib.lto.opt.bc

@@ -64,7 +64,7 @@ export ac_cv_c_bigendian=no
 
 ${SED_INLINE} 's/\-lrt//g' ${BASEDIR}/src/${LIB_NAME}/api/Makefile
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_tesseract_package_config "3.05.02"

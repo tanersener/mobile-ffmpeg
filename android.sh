@@ -168,7 +168,9 @@ skip_library() {
 }
 
 enable_debug() {
-    export MOBILE_FFMPEG_DEBUG="-d"
+    export MOBILE_FFMPEG_DEBUG="-DDEBUG -g"
+
+    BUILD_TYPE_ID+="debug "
 }
 
 optimize_for_speed() {
@@ -468,6 +470,7 @@ EOF
 . ${BASEDIR}/build/android-common.sh
 
 GPL_ENABLED="no"
+BUILD_TYPE_ID=""
 
 DETECTED_NDK_VERSION=$(grep -Eo Revision.* ${ANDROID_NDK_ROOT}/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 
@@ -539,8 +542,8 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
-echo -e "Building mobile-ffmpeg for Android\n"
-echo -e -n "INFO: Building mobile-ffmpeg for Android: " 1>>${BASEDIR}/build.log 2>&1
+echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android\n"
+echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 if [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then

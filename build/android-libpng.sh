@@ -70,7 +70,7 @@ fi
     ${CPU_SPECIFIC_OPTIONS} \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
 cp ./*.pc ${INSTALL_PKG_CONFIG_DIR}

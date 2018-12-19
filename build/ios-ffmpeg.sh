@@ -348,19 +348,28 @@ fi
 ARCH_CFLAGS=$(get_arch_specific_cflags);
 APP_CFLAGS=$(get_app_specific_cflags ${LIB_NAME});
 COMMON_CFLAGS=$(get_common_cflags);
-OPTIMIZATION_CFLAGS=$(get_size_optimization_cflags ${LIB_NAME});
+if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+    OPTIMIZATION_CFLAGS="$(get_size_optimization_cflags ${LIB_NAME})"
+else
+    OPTIMIZATION_CFLAGS="${MOBILE_FFMPEG_DEBUG}"
+fi
 MIN_VERSION_CFLAGS=$(get_min_version_cflags);
 COMMON_INCLUDES=$(get_common_includes);
 
 # LDFLAGS PARTS
 ARCH_LDFLAGS=$(get_arch_specific_ldflags);
+if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+    OPTIMIZATION_FLAGS="$(get_size_optimization_ldflags ${LIB_NAME})"
+else
+    OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
+fi
 LINKED_LIBRARIES=$(get_common_linked_libraries);
 COMMON_LDFLAGS=$(get_common_ldflags);
 
 # REORDERED FLAGS
-export CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS} ${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
+export CFLAGS="${ARCH_CFLAGS} ${APP_CFLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_CFLAGS} ${MIN_VERSION_CFLAGS}${FFMPEG_CFLAGS} ${COMMON_INCLUDES}"
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-export LDFLAGS="${ARCH_LDFLAGS} ${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS}"
+export LDFLAGS="${ARCH_LDFLAGS}${FFMPEG_LDFLAGS} ${LINKED_LIBRARIES} ${COMMON_LDFLAGS} ${BITCODE_FLAGS} ${OPTIMIZATION_FLAGS}"
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -429,7 +438,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
+make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"

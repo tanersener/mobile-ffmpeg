@@ -209,7 +209,7 @@ get_arch_specific_cflags() {
 
 get_size_optimization_cflags() {
 
-    ARCH_OPTIMIZATION=""
+    local ARCH_OPTIMIZATION=""
     case ${ARCH} in
         arm-v7a | arm-v7a-neon)
             case $1 in
@@ -243,14 +243,14 @@ get_size_optimization_cflags() {
         ;;
     esac
 
-    LIB_OPTIMIZATION=""
+    local LIB_OPTIMIZATION=""
 
     echo "${ARCH_OPTIMIZATION} ${LIB_OPTIMIZATION}"
 }
 
 get_app_specific_cflags() {
 
-    APP_FLAGS=""
+    local APP_FLAGS=""
     case $1 in
         xvidcore)
             APP_FLAGS=""
@@ -276,35 +276,45 @@ get_app_specific_cflags() {
 }
 
 get_cflags() {
-    ARCH_FLAGS=$(get_arch_specific_cflags)
-    APP_FLAGS=$(get_app_specific_cflags $1)
-    COMMON_FLAGS=$(get_common_cflags)
+    local ARCH_FLAGS=$(get_arch_specific_cflags)
+    local APP_FLAGS=$(get_app_specific_cflags $1)
+    local COMMON_FLAGS=$(get_common_cflags)
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-        OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+        local OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
     else
-        OPTIMIZATION_FLAGS=""
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
     fi
-    COMMON_INCLUDES=$(get_common_includes)
+    local COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_INCLUDES}"
 }
 
 get_cxxflags() {
+    if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+        local OPTIMIZATION_FLAGS="-Os -ffunction-sections -fdata-sections"
+    else
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
+    fi
+
     case $1 in
         gnutls)
-            echo "-std=c++11 -fno-rtti -Os -ffunction-sections -fdata-sections"
+            echo "-std=c++11 -fno-rtti ${OPTIMIZATION_FLAGS}"
         ;;
         ffmpeg)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -flto -O2 -ffunction-sections -fdata-sections"
+            if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+                echo "-std=c++11 -fno-exceptions -fno-rtti -flto -O2 -ffunction-sections -fdata-sections"
+            else
+                echo "-std=c++11 -fno-exceptions -fno-rtti ${MOBILE_FFMPEG_DEBUG}"
+            fi
         ;;
         opencore-amr)
-            echo "-Os -ffunction-sections -fdata-sections"
+            echo "${OPTIMIZATION_FLAGS}"
         ;;
         x265)
-            echo "-std=c++11 -fno-exceptions -Os -ffunction-sections -fdata-sections"
+            echo "-std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS}"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti -Os -ffunction-sections -fdata-sections"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS}"
         ;;
     esac
 }
@@ -371,9 +381,13 @@ get_arch_specific_ldflags() {
 }
 
 get_ldflags() {
-    ARCH_FLAGS=$(get_arch_specific_ldflags)
-    OPTIMIZATION_FLAGS=$(get_size_optimization_ldflags $1)
-    COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
+    local ARCH_FLAGS=$(get_arch_specific_ldflags)
+    if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+        local OPTIMIZATION_FLAGS="$(get_size_optimization_ldflags $1)"
+    else
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
+    fi
+    local COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
 
     echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS}"
 }

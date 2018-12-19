@@ -64,7 +64,7 @@ ${SED_INLINE} 's/-force_cpusubtype_ALL//g' ${BASEDIR}/src/${LIB_NAME}/configure
     --disable-oggtest \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_libvorbis_package_config "1.3.6"

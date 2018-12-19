@@ -367,7 +367,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
+make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"

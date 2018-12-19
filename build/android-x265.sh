@@ -94,7 +94,7 @@ cmake -Wno-dev \
     -DCMAKE_SYSTEM_PROCESSOR="${ARCH}" \
     -DENABLE_SHARED=0 ../source || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_x265_package_config "2.9"
