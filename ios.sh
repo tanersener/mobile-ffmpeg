@@ -197,18 +197,12 @@ optimize_for_speed() {
     export MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED="1"
 }
 
-enable_main_build() {
-    disable_arch "armv7"
-    disable_arch "armv7s"
-}
-
 enable_lts_build() {
     export MOBILE_FFMPEG_LTS_BUILD="1"
 
     # XCODE 7.3 HAS SDK 9.3
     export IOS_MIN_VERSION=9.3
 
-    disable_arch "armv7s"
     disable_arch "arm64e"
 }
 
@@ -631,9 +625,7 @@ do
 done;
 
 # DETECT BUILD TYPE
-if [[ -z ${BUILD_LTS} ]]; then
-    enable_main_build
-else
+if [[ ! -z ${BUILD_LTS} ]]; then
     enable_lts_build
     BUILD_TYPE_ID+="LTS "
 fi
