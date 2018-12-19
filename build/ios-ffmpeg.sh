@@ -344,6 +344,13 @@ else
     SIZE_OPTIONS="";
 fi
 
+# SET DEBUG OPTIONS
+if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+    DEBUG_OPTIONS="--disable-debug";
+else
+    DEBUG_OPTIONS="--enable-debug";
+fi
+
 # CFLAGS PARTS
 ARCH_CFLAGS=$(get_arch_specific_cflags);
 APP_CFLAGS=$(get_app_specific_cflags ${LIB_NAME});
@@ -406,7 +413,7 @@ make distclean 2>/dev/null 1>/dev/null
     --disable-indev=fbdev \
     --disable-openssl \
     --disable-xmm-clobber-test \
-    --disable-debug \
+    ${DEBUG_OPTIONS} \
     --disable-neon-clobber-test \
     --disable-programs \
     --disable-postproc \

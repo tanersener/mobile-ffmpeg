@@ -297,6 +297,13 @@ else
     SIZE_OPTIONS="";
 fi
 
+# SET DEBUG OPTIONS
+if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+    DEBUG_OPTIONS="--disable-debug";
+else
+    DEBUG_OPTIONS="--enable-debug";
+fi
+
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 echo -n -e "\n${LIB_NAME}: "
@@ -332,7 +339,7 @@ export LDFLAGS="${LDFLAGS}"
     ${SIZE_OPTIONS} \
     --disable-openssl \
     --disable-xmm-clobber-test \
-    --disable-debug \
+    ${DEBUG_OPTIONS} \
     --disable-neon-clobber-test \
     --disable-programs \
     --disable-postproc \
