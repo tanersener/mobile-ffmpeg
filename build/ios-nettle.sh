@@ -40,7 +40,7 @@ export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
 OPTIONAL_CPU_SUPPORT=""
 case ${ARCH} in
-    armv7 | armv7s | arm64)
+    armv7 | armv7s | arm64 | arm64e)
         OPTIONAL_CPU_SUPPORT="--enable-arm-neon"
     ;;
     i386 | x86-64)
@@ -58,11 +58,11 @@ if [[ ${RECONF_nettle} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --enable-pic \
     --enable-static \
-    --with-include-path=${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/include \
-    --with-lib-path=${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/lib \
+    --with-include-path=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gmp/include \
+    --with-lib-path=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gmp/lib \
     --disable-shared \
     --disable-mini-gmp \
     --disable-assembler \

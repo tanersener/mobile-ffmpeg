@@ -48,7 +48,7 @@ if [[ ! -f ${BASEDIR}/src/${LIB_NAME}/configure ]] || [[ ${RECONF_libsndfile} -e
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \

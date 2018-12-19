@@ -49,10 +49,10 @@ if [[ ${RECONF_lame} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
-    --with-libiconv-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv \
+    --with-libiconv-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libiconv \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

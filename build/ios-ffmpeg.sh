@@ -66,6 +66,12 @@ case ${ARCH} in
         NEON_FLAG="	--enable-neon"
         BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
     ;;
+    arm64e)
+        TARGET_CPU="armv8.3-a"
+        TARGET_ARCH="aarch64"
+        NEON_FLAG="	--enable-neon"
+        BITCODE_FLAGS="-fembed-bitcode -Wc,-fembed-bitcode"
+    ;;
     i386)
         TARGET_CPU="i386"
         TARGET_ARCH="i386"
@@ -364,7 +370,7 @@ make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
     --sysroot=${SDK_PATH} \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --enable-version3 \
     --arch="${TARGET_ARCH}" \
     --cpu="${TARGET_CPU}" \
@@ -438,28 +444,28 @@ if [ $? -ne 0 ]; then
 fi
 
 # MANUALLY ADD REQUIRED HEADERS
-mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/x86
-mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/arm
-mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/aarch64
-mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavcodec/x86
-mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavcodec/arm
-cp -f ${BASEDIR}/src/ffmpeg/config.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include
-cp -f ${BASEDIR}/src/ffmpeg/libavcodec/mathops.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavcodec
-cp -f ${BASEDIR}/src/ffmpeg/libavcodec/x86/mathops.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavcodec/x86
-cp -f ${BASEDIR}/src/ffmpeg/libavcodec/arm/mathops.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavcodec/arm
-cp -f ${BASEDIR}/src/ffmpeg/libavformat/network.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavformat
-cp -f ${BASEDIR}/src/ffmpeg/libavformat/os_support.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavformat
-cp -f ${BASEDIR}/src/ffmpeg/libavformat/url.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavformat
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/internal.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/libm.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/reverse.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/thread.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/asm.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/x86
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/x86
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/arm/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/arm
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/aarch64/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/aarch64
-cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/emms.h ${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include/libavutil/x86
+mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil/x86
+mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil/arm
+mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil/aarch64
+mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavcodec/x86
+mkdir -p ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavcodec/arm
+cp -f ${BASEDIR}/src/ffmpeg/config.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include
+cp -f ${BASEDIR}/src/ffmpeg/libavcodec/mathops.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavcodec
+cp -f ${BASEDIR}/src/ffmpeg/libavcodec/x86/mathops.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavcodec/x86
+cp -f ${BASEDIR}/src/ffmpeg/libavcodec/arm/mathops.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavcodec/arm
+cp -f ${BASEDIR}/src/ffmpeg/libavformat/network.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavformat
+cp -f ${BASEDIR}/src/ffmpeg/libavformat/os_support.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavformat
+cp -f ${BASEDIR}/src/ffmpeg/libavformat/url.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavformat
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/internal.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/libm.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/reverse.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/thread.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/asm.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil/x86
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil/x86
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/arm/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil/arm
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/aarch64/timer.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil/aarch64
+cp -f ${BASEDIR}/src/ffmpeg/libavutil/x86/emms.h ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include/libavutil/x86
 
 if [ $? -eq 0 ]; then
     echo "ok"

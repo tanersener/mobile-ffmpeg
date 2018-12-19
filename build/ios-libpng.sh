@@ -44,7 +44,7 @@ case ${ARCH} in
     x86 | x86-64)
         CPU_SPECIFIC_OPTIONS+=" --enable-sse=yes"
     ;;
-    armv7 | armv7s | arm64)
+    armv7 | armv7s | arm64 | arm64e)
         CPU_SPECIFIC_OPTIONS+=" --enable-arm-neon=yes"
     ;;
 esac
@@ -59,7 +59,7 @@ if [[ ${RECONF_libpng} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \

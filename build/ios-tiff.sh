@@ -48,11 +48,11 @@ if [[ ${RECONF_tiff} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
-    --with-jpeg-include-dir=${BASEDIR}/prebuilt/ios-$(get_target_host)/jpeg/include \
-    --with-jpeg-lib-dir=${BASEDIR}/prebuilt/ios-$(get_target_host)/jpeg/lib \
+    --with-jpeg-include-dir=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/jpeg/include \
+    --with-jpeg-lib-dir=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/jpeg/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

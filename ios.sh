@@ -4,8 +4,9 @@
 ARCH_ARMV7=0
 ARCH_ARMV7S=1
 ARCH_ARM64=2
-ARCH_I386=3
-ARCH_X86_64=4
+ARCH_ARM64E=3
+ARCH_I386=4
+ARCH_X86_64=5
 
 # LIBRARY INDEXES
 LIBRARY_FONTCONFIG=0
@@ -57,7 +58,7 @@ LIBRARY_VIDEOTOOLBOX=45
 LIBRARY_AVFOUNDATION=46
 
 # ENABLE ARCH
-ENABLED_ARCHITECTURES=(1 1 1 1 1)
+ENABLED_ARCHITECTURES=(1 1 1 1 1 1)
 
 # ENABLE LIBRARIES
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
@@ -66,8 +67,8 @@ export BASEDIR=$(pwd)
 
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
-# MIN XCODE 7.3 HAS SDK 9.3
-export IOS_MIN_VERSION=9.3
+# XCODE 10.1 HAS SDK 11.03
+export IOS_MIN_VERSION=11.03
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
@@ -78,10 +79,11 @@ get_mobile_ffmpeg_version() {
 display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
-    echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built \
-without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. \
-Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
-When compilation ends a universal fat binary and an IOS framework is created with enabled architectures inside.\n"
+    if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default six architectures (armv7, armv7s, arm64, arm64e, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends a universal fat binary and an IOS framework is created with enabled architectures inside.\n"
+    else
+        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends a universal fat binary and an IOS framework is created with enabled architectures inside.\n"
+    fi
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
@@ -93,7 +95,8 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  -V, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
     echo -e "  -s, --static\t\t\tbuild static mobile-ffmpeg libraries (by default shared libraries are built)"
-    echo -e "  -S, --speed\t\t\toptimize for speed instead of size\n"
+    echo -e "  -S, --speed\t\t\toptimize for speed instead of size"
+    echo -e "  -l, --lts\t\t\tbuild lts packages to support sdk 9.3+ devices, does not include arm64e architecture\n"
 
     echo -e "Licensing options:"
 
@@ -104,6 +107,9 @@ When compilation ends a universal fat binary and an IOS framework is created wit
     echo -e "  --disable-armv7\t\tdo not build armv7 platform [yes]"
     echo -e "  --disable-armv7s\t\tdo not build armv7s platform [yes]"
     echo -e "  --disable-arm64\t\tdo not build arm64 platform [yes]"
+    if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+        echo -e "  --disable-arm64e\t\tdo not build arm64e platform [yes]"
+    fi
     echo -e "  --disable-i386\t\tdo not build i386 platform [yes]"
     echo -e "  --disable-x86-64\t\tdo not build x86-64 platform [yes]\n"
 
@@ -161,7 +167,7 @@ display_version() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
     echo -e "\
-$COMMAND $(get_mobile_ffmpeg_version)\n\
+$COMMAND v$(get_mobile_ffmpeg_version)\n\
 Copyright (c) 2018 Taner Sener\n\
 License LGPLv3.0: GNU LGPL version 3 or later\n\
 <https://www.gnu.org/licenses/lgpl-3.0.en.html>\n\
@@ -186,6 +192,15 @@ enable_static() {
 
 optimize_for_speed() {
     export MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED="1"
+}
+
+enable_tls() {
+    export MOBILE_FFMPEG_LTS_BUILD="1"
+
+    # XCODE 7.3 HAS SDK 9.3
+    export IOS_MIN_VERSION=9.3
+
+    disable_arch "arm64e"
 }
 
 reconf_library() {
@@ -387,6 +402,9 @@ set_arch() {
         arm64)
             ENABLED_ARCHITECTURES[ARCH_ARM64]=$2
         ;;
+        arm64e)
+            ENABLED_ARCHITECTURES[ARCH_ARM64E]=$2
+        ;;
         i386)
             ENABLED_ARCHITECTURES[ARCH_I386]=$2
         ;;
@@ -418,7 +436,7 @@ print_enabled_architectures() {
     echo -n "Architectures: "
 
     let enabled=0;
-    for print_arch in {0..4}
+    for print_arch in {0..5}
     do
         if [[ ${ENABLED_ARCHITECTURES[$print_arch]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -531,22 +549,11 @@ create_static_fat_library() {
 
 GPL_ENABLED="no"
 
-# SELECT XCODE VERSION USED FOR BUILDING
-XCODE_FOR_MOBILE_FFMPEG=~/.xcode.for.mobile.ffmpeg.sh
-if [[ -f ${XCODE_FOR_MOBILE_FFMPEG} ]]; then
-    source ${XCODE_FOR_MOBILE_FFMPEG} 1>>${BASEDIR}/build.log 2>&1
-fi
-DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
-
-echo -e "INFO: Using SDK ${DETECTED_IOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>${BASEDIR}/build.log 2>&1
-
 while [ ! $# -eq 0 ]
 do
-
     case $1 in
 	    -h | --help)
-            display_help
-            exit 0
+            DISPLAY_HELP=1
 	    ;;
 	    -V | --version)
             display_version
@@ -565,6 +572,9 @@ do
 	    ;;
 	    -S | --speed)
 	        optimize_for_speed
+	    ;;
+	    -l | --lts)
+	        enable_tls
 	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
@@ -603,6 +613,24 @@ do
     esac
     shift
 done;
+
+if [[ ! -z ${DISPLAY_HELP} ]]; then
+    display_help
+    exit 0
+fi
+
+# SELECT XCODE VERSION USED FOR BUILDING
+XCODE_FOR_MOBILE_FFMPEG=~/.xcode.for.mobile.ffmpeg.sh
+if [[ -f ${XCODE_FOR_MOBILE_FFMPEG} ]]; then
+    source ${XCODE_FOR_MOBILE_FFMPEG} 1>>${BASEDIR}/build.log 2>&1
+fi
+DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
+
+echo -e "INFO: Using SDK ${DETECTED_IOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>${BASEDIR}/build.log 2>&1
+if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ "${DETECTED_IOS_SDK_VERSION}" != "${IOS_MIN_VERSION}" ]]; then
+    echo -e "\n(*) LTS packages should be built using SDK ${IOS_MIN_VERSION} but current configuration uses SDK ${DETECTED_IOS_SDK_VERSION}\n"
+    exit 1
+fi
 
 # BUILD SHARED (DEFAULT) OR STATIC LIBRARIES
 if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
@@ -646,7 +674,7 @@ fi
 
 TARGET_ARCH_LIST=()
 
-for run_arch in {0..4}
+for run_arch in {0..5}
 do
     if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
         export ARCH=$(get_arch_name $run_arch)
@@ -655,8 +683,14 @@ do
         export LIPO="$(xcrun --sdk $(get_sdk_name) -f lipo)"
 
         . ${BASEDIR}/build/main-ios.sh "${ENABLED_LIBRARIES[@]}"
-
-        TARGET_ARCH=$(get_target_arch)
+        case ${ARCH} in
+            x86-64)
+                TARGET_ARCH="x86_64"
+            ;;
+            *)
+                TARGET_ARCH="${ARCH}"
+            ;;
+        esac
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS

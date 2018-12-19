@@ -152,7 +152,7 @@ display_version() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
     echo -e "\
-$COMMAND $(get_mobile_ffmpeg_version)\n\
+$COMMAND v$(get_mobile_ffmpeg_version)\n\
 Copyright (c) 2018 Taner Sener\n\
 License LGPLv3.0: GNU LGPL version 3 or later\n\
 <https://www.gnu.org/licenses/lgpl-3.0.en.html>\n\

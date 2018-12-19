@@ -37,14 +37,16 @@ export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-# note that --disable-runtime-cpu-detect is used for arm
-# using --enable-runtime-cpu-detect cause the following error
-# vpx_ports/arm_cpudetect.c:151:2: error: "--enable-runtime-cpu-detect selected, but no CPU detection method " "available for your platform. Reconfigure with --disable-runtime-cpu-detect."
-
+# PREPARE CPU & ARCH OPTIONS
 TARGET=""
 ASM_FLAGS=""
 case ${ARCH} in
     armv7 | armv7s)
+
+        # note that --disable-runtime-cpu-detect is used for arm
+        # using --enable-runtime-cpu-detect cause the following error
+        # vpx_ports/arm_cpudetect.c:151:2: error: "--enable-runtime-cpu-detect selected, but no CPU detection method " "available for your platform. Reconfigure with --disable-runtime-cpu-detect."
+
         TARGET="$(get_target_arch)-darwin-gcc"
         ASM_FLAGS="--disable-runtime-cpu-detect --enable-neon --enable-neon-asm"
     ;;
@@ -56,6 +58,12 @@ case ${ARCH} in
         #    vst1.64
         ASM_FLAGS="--disable-runtime-cpu-detect --enable-neon"
     ;;
+    arm64e)
+        TARGET="arm64-darwin-gcc"
+
+        # arm64e assembly support disabled
+        ASM_FLAGS="--disable-runtime-cpu-detect"
+    ;;
     i386)
         TARGET="x86-iphonesimulator-gcc"
         ASM_FLAGS="--enable-runtime-cpu-detect --disable-avx512"
@@ -66,12 +74,23 @@ case ${ARCH} in
     ;;
 esac
 
+# PREPARE CONFIGURE OPTIONS
+rm -f ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
+case ${ARCH} in
+    arm64e)
+        cp ${BASEDIR}/tools/make/configure.libvpx.arm64e.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
+    ;;
+    *)
+        cp ${BASEDIR}/tools/make/configure.libvpx.all.sh ${BASEDIR}/src/${LIB_NAME}/build/make/configure.sh
+    ;;
+esac
+
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --target="${TARGET}" \
     --extra-cflags="${CFLAGS}" \
     --extra-cxxflags="${CXXFLAGS}" \

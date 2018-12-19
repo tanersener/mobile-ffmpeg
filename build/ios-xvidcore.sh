@@ -49,7 +49,7 @@ fi
 
 ASM_FLAGS=""
 case ${ARCH} in
-    armv7 | armv7s | arm64)
+    armv7 | armv7s | arm64 | arm64e)
         ASM_FLAGS=""
 
         # REMOVING -flat_namespace OPTION FROM CONFIGURE TO FIX THE FOLLOWING ERROR
@@ -67,7 +67,7 @@ case ${ARCH} in
 esac
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     ${ASM_FLAGS} \
     --host=${TARGET_HOST} || exit 1
 
@@ -79,4 +79,4 @@ create_xvidcore_package_config "1.3.5"
 make install || exit 1
 
 # REMOVE DYNAMIC LIBS
-rm -f ${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME}/lib/libxvidcore.dylib*
+rm -f ${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME}/lib/libxvidcore.dylib*
