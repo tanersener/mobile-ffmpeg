@@ -29,11 +29,11 @@
 }
 
 /**
- * Returns running architecture name.
+ * Returns running cpu architecture name.
  *
- * \return running architecture name as NSString
+ * \return running cpu architecture name as NSString
  */
-+ (NSString*)getArch {
++ (NSString*)getCpuArch {
     NSMutableString *cpu = [[NSMutableString alloc] init];
     size_t size;
     cpu_type_t type;
@@ -62,12 +62,18 @@
             break;
         }
 
+    } else if (type == CPU_TYPE_I386) {
+        [cpu appendString:@"i386"];
+
     } else if (type == CPU_TYPE_ARM64) {
         [cpu appendString:@"arm64"];
 
         switch(subtype) {
             case CPU_SUBTYPE_ARM64_V8:
                 [cpu appendString:@"v8"];
+            break;
+            case CPU_SUBTYPE_ARM64E:
+                [cpu appendString:@"e"];
             break;
         }
 
@@ -112,11 +118,44 @@
                 [cpu appendString:@"v8"];
             break;
         }
+    } else if (type == CPU_TYPE_ARM64_32) {
+        [cpu appendString:@"arm64_32"];
+
+        switch(subtype) {
+            case CPU_SUBTYPE_ARM64_32_V8:
+                [cpu appendString:@"v8"];
+            break;
+        }
     } else {
         [cpu appendString:[NSString stringWithFormat:@"%d", type]];
     }
 
     return cpu;
+}
+
+/**
+ * Returns loaded architecture name.
+ *
+ * \return loaded architecture name as NSString
+ */
++ (NSString*)getArch {
+    NSMutableString *arch = [[NSMutableString alloc] init];
+
+#ifdef MOBILE_FFMPEG_ARMV7
+    [arch appendString:@"armv7"];
+#elif MOBILE_FFMPEG_ARMV7S
+    [arch appendString:@"armv7s"];
+#elif MOBILE_FFMPEG_ARM64
+    [arch appendString:@"arm64"];
+#elif MOBILE_FFMPEG_ARM64E
+    [arch appendString:@"arm64e"];
+#elif MOBILE_FFMPEG_I386
+    [arch appendString:@"i386"];
+#elif MOBILE_FFMPEG_X86_64
+    [arch appendString:@"x86_64"];
+#endif
+
+    return arch;
 }
 
 @end

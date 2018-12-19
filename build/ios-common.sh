@@ -178,22 +178,22 @@ get_common_cflags() {
 get_arch_specific_cflags() {
     case ${ARCH} in
         armv7)
-            echo "-arch armv7 -target $(get_target_host) -march=armv7 -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7 -target $(get_target_host) -march=armv7 -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARMV7"
         ;;
         armv7s)
-            echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARMV7S"
         ;;
         arm64)
-            echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic"
+            echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic -DMOBILE_FFMPEG_ARM64"
         ;;
         arm64e)
-            echo "-arch arm64e -target $(get_target_host) -march=armv8.3-a+dotprod -mcpu=generic"
+            echo "-arch arm64e -target $(get_target_host) -march=armv8.3-a+dotprod -mcpu=generic -DMOBILE_FFMPEG_ARM64E"
         ;;
         i386)
-            echo "-arch i386 -target $(get_target_host) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32"
+            echo "-arch i386 -target $(get_target_host) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_I386"
         ;;
         x86-64)
-            echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel"
+            echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
     esac
 }

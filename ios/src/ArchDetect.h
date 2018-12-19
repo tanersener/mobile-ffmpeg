@@ -28,9 +28,16 @@
 @interface ArchDetect : NSObject
 
 /**
- * Returns running architecture name.
+ * Returns running cpu architecture name.
  *
- * \return running architecture name as NSString
+ * \return running cpu architecture name as NSString
+ */
++ (NSString*)getCpuArch;
+
+/**
+ * Returns loaded architecture name.
+ *
+ * \return loaded architecture name as NSString
  */
 + (NSString*)getArch;
 

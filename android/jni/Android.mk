@@ -4,6 +4,20 @@ $(call import-add-path, $(LOCAL_PATH))
 MY_ARM_MODE := arm
 MY_PATH := ../app/src/main/cpp
 
+# DEFINE ARCH FLAGS
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+    MY_ARCH_FLAGS := ARM_V7A
+endif
+ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
+    MY_ARCH_FLAGS := ARM64_V8A
+endif
+ifeq ($(TARGET_ARCH_ABI), x86)
+    MY_ARCH_FLAGS := X86
+endif
+ifeq ($(TARGET_ARCH_ABI), x86_64)
+    MY_ARCH_FLAGS := X86_64
+endif
+
 include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
 LOCAL_MODULE := cpufeatures
@@ -17,7 +31,7 @@ include $(CLEAR_VARS)
 LOCAL_ARM_MODE := $(MY_ARM_MODE)
 LOCAL_MODULE := mobileffmpeg-abidetect
 LOCAL_SRC_FILES := $(MY_PATH)/mobileffmpeg_abidetect.c
-LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include -I$(NDK_ROOT)/sources/android/cpufeatures
+LOCAL_CFLAGS := -Wall -Wextra -Werror -Wno-unused-parameter -I${LOCAL_PATH}/../../prebuilt/android-$(TARGET_ARCH)/ffmpeg/include -I$(NDK_ROOT)/sources/android/cpufeatures -DMOBILE_FFMPEG_${MY_ARCH_FLAGS}
 LOCAL_LDLIBS := -llog -lz -landroid
 LOCAL_SHARED_LIBRARIES := cpufeatures
 include $(BUILD_SHARED_LIBRARY)

@@ -81,21 +81,25 @@ public class Config {
         Log.i(Config.TAG, "Loading mobile-ffmpeg.");
 
         /* ALL LIBRARIES LOADED AT STARTUP */
-        String abiName = AbiDetect.getAbi();
-        Abi abi = Abi.from(abiName);
+        Abi cpuAbi = Abi.from(AbiDetect.getNativeCpuAbi());
         FFmpeg.class.getName();
 
         /*
          * NEON supported arm-v7a library has a different name
          */
         boolean nativeLibraryLoaded = false;
-        if (abi == Abi.ABI_ARMV7A_NEON) {
+        if (cpuAbi == Abi.ABI_ARMV7A_NEON) {
+
+            /*
+             * IF CPU SUPPORTS ARM-V7A-NEON THE TRY TO LOAD IT FIRST. IF NOT LOAD DEFAULT ARM-V7A
+             */
+
             try {
                 System.loadLibrary("mobileffmpeg-armv7a-neon");
                 nativeLibraryLoaded = true;
+                AbiDetect.setArmV7aNeonLoaded(true);
             } catch (final UnsatisfiedLinkError e) {
                 Log.i(Config.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
-                abi = Abi.ABI_ARMV7A;
             }
         }
 
@@ -103,7 +107,7 @@ public class Config {
             System.loadLibrary("mobileffmpeg");
         }
 
-        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s-%s.", getPackageName(), abi.getName(), getVersion()));
+        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s-%s.", getPackageName(), AbiDetect.getAbi(), getVersion()));
 
         /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
         activeLogLevel = Level.from(getNativeLogLevel());

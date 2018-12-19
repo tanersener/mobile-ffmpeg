@@ -190,19 +190,19 @@ get_common_cflags() {
 get_arch_specific_cflags() {
     case ${ARCH} in
         arm-v7a)
-            echo "-march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp"
+            echo "-march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A"
         ;;
         arm-v7a-neon)
-            echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp"
+            echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A_NEON"
         ;;
         arm64-v8a)
-            echo "-march=armv8-a"
+            echo "-march=armv8-a -DMOBILE_FFMPEG_ARM64_V8A"
         ;;
         x86)
-            echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32"
+            echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_X86"
         ;;
         x86-64)
-            echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel"
+            echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
     esac
 }
