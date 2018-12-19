@@ -96,7 +96,8 @@ display_help() {
     echo -e "  -d, --debug\t\t\tbuild with debug information"
     echo -e "  -s, --static\t\t\tbuild static mobile-ffmpeg libraries (by default shared libraries are built)"
     echo -e "  -S, --speed\t\t\toptimize for speed instead of size"
-    echo -e "  -l, --lts\t\t\tbuild lts packages to support sdk 9.3+ devices, does not include arm64e architecture\n"
+    echo -e "  -l, --lts\t\t\tbuild lts packages to support sdk 9.3+ devices, does not include arm64e architecture"
+    echo -e "  -f, --force\t\t\tignore warnings\n"
 
     echo -e "Licensing options:"
 
@@ -559,6 +560,7 @@ GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_LTS=""
 BUILD_TYPE_ID=""
+BUILD_FORCE=""
 
 while [ ! $# -eq 0 ]
 do
@@ -586,6 +588,9 @@ do
 	    ;;
 	    -l | --lts)
 	        BUILD_LTS="1"
+	    ;;
+	    -f | --force)
+	        BUILD_FORCE="1"
 	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
@@ -648,7 +653,10 @@ DETECTED_IOS_SDK_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
 echo -e "INFO: Using SDK ${DETECTED_IOS_SDK_VERSION} by Xcode provided at $(xcode-select -p)\n" 1>>${BASEDIR}/build.log 2>&1
 if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ "${DETECTED_IOS_SDK_VERSION}" != "${IOS_MIN_VERSION}" ]]; then
     echo -e "\n(*) LTS packages should be built using SDK ${IOS_MIN_VERSION} but current configuration uses SDK ${DETECTED_IOS_SDK_VERSION}\n"
-    exit 1
+
+    if [[ -z ${BUILD_FORCE} ]]; then
+        exit 1
+    fi
 fi
 
 # BUILD SHARED (DEFAULT) OR STATIC LIBRARIES
