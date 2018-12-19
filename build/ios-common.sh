@@ -208,7 +208,7 @@ get_size_optimization_cflags() {
                     ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
                 ;;
                 x265 | ffmpeg | mobile-ffmpeg)
-                    ARCH_OPTIMIZATION="-flto=thin -Oz -Wno-ignored-optimization-argument"
+                    ARCH_OPTIMIZATION="-flto -Oz -Wno-ignored-optimization-argument"
                 ;;
                 *)
                     ARCH_OPTIMIZATION="-flto -Oz -Wno-ignored-optimization-argument"
@@ -221,7 +221,7 @@ get_size_optimization_cflags() {
                     ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
                 ;;
                 x265)
-                    ARCH_OPTIMIZATION="-flto=thin -O2 -Wno-ignored-optimization-argument"
+                    ARCH_OPTIMIZATION="-flto -O2 -Wno-ignored-optimization-argument"
                 ;;
                 *)
                     ARCH_OPTIMIZATION="-flto -O2 -Wno-ignored-optimization-argument"
@@ -240,7 +240,7 @@ get_size_optimization_asm_cflags() {
         jpeg | ffmpeg)
             case ${ARCH} in
                 armv7 | armv7s | arm64 | arm64e)
-                    ARCH_OPTIMIZATION="-Oz"
+                    ARCH_OPTIMIZATION="-flto -Oz"
                 ;;
                 i386 | x86-64)
                     ARCH_OPTIMIZATION="-O2"
@@ -270,7 +270,7 @@ get_app_specific_cflags() {
             esac
         ;;
         ffmpeg)
-            APP_FLAGS="-Wno-unused-function -DPIC"
+            APP_FLAGS="-Wno-unused-function -Wno-deprecated-declarations -DPIC"
         ;;
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
@@ -337,7 +337,7 @@ get_asmflags() {
 get_cxxflags() {
     local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags) $(get_min_version_cflags $1)"
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-        local OPTIMIZATION_FLAGS="-Oz"
+        local OPTIMIZATION_FLAGS="-flto -Oz"
     else
         local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
     fi
@@ -384,10 +384,10 @@ get_size_optimization_ldflags() {
         armv7 | armv7s | arm64 | arm64e)
             case $1 in
                 ffmpeg | mobile-ffmpeg)
-                    echo "-flto=thin -Oz"
+                    echo "-flto -Oz -dead_strip -dead_strip_dylibs"
                 ;;
                 *)
-                    echo "-flto -Oz"
+                    echo "-flto -Oz -dead_strip -dead_strip_dylibs"
                 ;;
             esac
         ;;
