@@ -67,8 +67,8 @@ export BASEDIR=$(pwd)
 
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
-# XCODE 10.1 HAS SDK 11.03
-export IOS_MIN_VERSION=11.03
+# //@TEST THIS AND INCREASE IF NECESSARY
+export IOS_MIN_VERSION=9.3
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
@@ -194,12 +194,18 @@ optimize_for_speed() {
     export MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED="1"
 }
 
-enable_tls() {
+enable_main_build() {
+    disable_arch "armv7"
+    disable_arch "armv7s"
+}
+
+enable_lts_build() {
     export MOBILE_FFMPEG_LTS_BUILD="1"
 
     # XCODE 7.3 HAS SDK 9.3
     export IOS_MIN_VERSION=9.3
 
+    disable_arch "armv7s"
     disable_arch "arm64e"
 }
 
@@ -548,12 +554,15 @@ create_static_fat_library() {
 . ${BASEDIR}/build/ios-common.sh
 
 GPL_ENABLED="no"
+DISPLAY_HELP=""
+BUILD_LTS=""
+BUILD_TYPE_ID=""
 
 while [ ! $# -eq 0 ]
 do
     case $1 in
 	    -h | --help)
-            DISPLAY_HELP=1
+            DISPLAY_HELP="1"
 	    ;;
 	    -V | --version)
             display_version
@@ -574,7 +583,7 @@ do
 	        optimize_for_speed
 	    ;;
 	    -l | --lts)
-	        enable_tls
+	        BUILD_LTS="1"
 	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
@@ -614,6 +623,14 @@ do
     shift
 done;
 
+# DETECT BUILD TYPE
+if [[ -z ${BUILD_LTS} ]]; then
+    enable_main_build
+else
+    enable_lts_build
+    BUILD_TYPE_ID="LTS "
+fi
+
 if [[ ! -z ${DISPLAY_HELP} ]]; then
     display_help
     exit 0
@@ -634,12 +651,12 @@ fi
 
 # BUILD SHARED (DEFAULT) OR STATIC LIBRARIES
 if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
-    echo -e "Building mobile-ffmpeg shared library for IOS\n"
+    echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}shared library for IOS\n"
 else
-    echo -e "Building mobile-ffmpeg static library for IOS\n"
+    echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}static library for IOS\n"
 fi
 
-echo -e -n "INFO: Building mobile-ffmpeg for IOS: " 1>>${BASEDIR}/build.log 2>&1
+echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_TYPE_ID}for IOS: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 print_enabled_architectures
