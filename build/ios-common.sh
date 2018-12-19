@@ -980,6 +980,10 @@ set_toolchain_clang_paths() {
             exit 1
         fi
         (chmod +x ${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl 1>>${BASEDIR}/build.log 2>&1) || exit 1
+
+        # patch gas-preprocessor.pl against the following warning
+        # Unescaped left brace in regex is deprecated here (and will be fatal in Perl 5.32), passed through in regex; marked by <-- HERE in m/(?:ld|st)\d\s+({ <-- HERE \s*v(\d+)\.(\d[bhsdBHSD])\s*-\s*v(\d+)\.(\d[bhsdBHSD])\s*})/ at /Users/taner/Projects/mobile-ffmpeg/.tmp/gas-preprocessor.pl line 1065.
+        sed -i .tmp "s/s\+({/s\+(\\\\{/g;s/s\*})/s\*\\\\})/g" ${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl
     fi
 
     LOCAL_GAS_PREPROCESSOR="${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl"
