@@ -65,10 +65,6 @@
     playerFrame.layer.cornerRadius = 5.0f;
 }
 
-+ (void)applyTooltipStyle: (RCEasyTipPreferences*) preferences {
-    preferences.drawing.backgroundColor = [UIColor colorWithDisplayP3Red:52.0/256 green:152.0/256 blue:219.0/256 alpha:1.0];
-}
-
 + (void)alert: (UIViewController*)controller withTitle:(NSString*)title message:(NSString*)message andButtonText:(NSString*)buttonText {
     UIAlertController* alert = [UIAlertController
                                 alertControllerWithTitle:title

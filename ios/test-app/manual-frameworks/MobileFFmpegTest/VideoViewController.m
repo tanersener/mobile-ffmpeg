@@ -23,7 +23,6 @@
 #import <AVKit/AVKit.h>
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
-#import "RCEasyTipView.h"
 #import "VideoViewController.h"
 
 @interface VideoViewController ()
@@ -51,9 +50,6 @@
     // Loading view
     UIAlertController *alertController;
     UIActivityIndicatorView* indicator;
-
-    // Tooltip view reference
-    RCEasyTipView *tooltip;
     
     Statistics *statistics;
 }
@@ -73,19 +69,7 @@
     [Util applyPickerViewStyle: self.videoCodecPicker];
     [Util applyVideoPlayerFrameStyle: self.videoPlayerFrame];
     [Util applyHeaderStyle: self.header];
-    
-    // TOOLTIP INIT
-    RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
-    [Util applyTooltipStyle: preferences];
-    preferences.drawing.arrowPostion = Top;
-    preferences.animating.showDuration = 1.0;
-    preferences.animating.dismissDuration = VIDEO_TEST_TOOLTIP_DURATION;
-    preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
-    preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-    
-    tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
-    tooltip.text = VIDEO_TEST_TOOLTIP_TEXT;
-    
+
     // VIDEO PLAYER INIT
     player = [[AVQueuePlayer alloc] init];
     playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
@@ -364,16 +348,6 @@
 - (void)setActive {
     [MobileFFmpegConfig setLogDelegate:self];
     [MobileFFmpegConfig setStatisticsDelegate:self];
-    [self hideTooltip];
-    [self showTooltip];
-}
-
-- (void)hideTooltip {
-    [tooltip dismissWithCompletion:nil];
-}
-
-- (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.encodeButton withinSuperView:self.view];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {

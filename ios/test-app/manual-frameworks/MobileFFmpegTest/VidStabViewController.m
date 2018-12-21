@@ -23,7 +23,6 @@
 #import <AVKit/AVKit.h>
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
-#import "RCEasyTipView.h"
 #import "VidStabViewController.h"
 
 @interface VidStabViewController ()
@@ -45,9 +44,6 @@
 
     // Loading view
     UIActivityIndicatorView* indicator;
-
-    // Tooltip view reference
-    RCEasyTipView *tooltip;
 }
 
 - (void)viewDidLoad {
@@ -58,18 +54,6 @@
     [Util applyVideoPlayerFrameStyle: self.videoPlayerFrame];
     [Util applyVideoPlayerFrameStyle: self.stabilizedVideoPlayerFrame];
     [Util applyHeaderStyle: self.header];
-    
-    // TOOLTIP INIT
-    RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
-    [Util applyTooltipStyle: preferences];
-    preferences.drawing.arrowPostion = Top;
-    preferences.animating.showDuration = 1.0;
-    preferences.animating.dismissDuration = VIDSTAB_TEST_TOOLTIP_DURATION;
-    preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
-    preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-    
-    tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
-    tooltip.text = VIDSTAB_TEST_TOOLTIP_TEXT;
 
     // VIDEO PLAYER INIT
     player = [[AVQueuePlayer alloc] init];
@@ -289,16 +273,6 @@
 
 - (void)setActive {
     [MobileFFmpegConfig setLogDelegate:self];
-    [self hideTooltip];
-    [self showTooltip];
-}
-
-- (void)hideTooltip {
-    [tooltip dismissWithCompletion:nil];
-}
-
-- (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.stabilizeVideoButton withinSuperView:self.view];
 }
 
 + (NSString*)generateVideoCreateScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile {

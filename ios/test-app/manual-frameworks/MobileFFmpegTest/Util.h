@@ -21,7 +21,6 @@
 
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
-#import "RCEasyTipView.h"
 
 @interface Util : NSObject
 
@@ -31,7 +30,6 @@
 + (void)applyOutputTextStyle: (UITextView*) textView;
 + (void)applyPickerViewStyle: (UIPickerView*) pickerView;
 + (void)applyVideoPlayerFrameStyle: (UILabel*) playerFrame;
-+ (void)applyTooltipStyle: (RCEasyTipPreferences*)preferences;
 + (void)alert: (UIViewController*)controller withTitle:(NSString*)title message:(NSString*)message andButtonText:(NSString*)buttonText;
 
 @end

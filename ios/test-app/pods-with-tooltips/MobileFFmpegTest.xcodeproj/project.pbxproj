@@ -25,22 +25,6 @@
 		348439ED20B2EFAF001A3990 /* pyramid.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EA20B2EFAF001A3990 /* pyramid.jpg */; };
 		348439EE20B2EFAF001A3990 /* tajmahal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EB20B2EFAF001A3990 /* tajmahal.jpg */; };
 		348439EF20B2EFAF001A3990 /* colosseum.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EC20B2EFAF001A3990 /* colosseum.jpg */; };
-		34A65DD421CCECFA002B5E28 /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCC21CCECFA002B5E28 /* mobileffmpeg.framework */; };
-		34A65DD521CCECFA002B5E28 /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCD21CCECFA002B5E28 /* libswscale.framework */; };
-		34A65DD621CCECFA002B5E28 /* libavcodec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCE21CCECFA002B5E28 /* libavcodec.framework */; };
-		34A65DD721CCECFA002B5E28 /* libavfilter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCF21CCECFA002B5E28 /* libavfilter.framework */; };
-		34A65DD821CCECFA002B5E28 /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD021CCECFA002B5E28 /* libavformat.framework */; };
-		34A65DD921CCECFA002B5E28 /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD121CCECFA002B5E28 /* libavdevice.framework */; };
-		34A65DDA21CCECFA002B5E28 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD221CCECFA002B5E28 /* libswresample.framework */; };
-		34A65DDB21CCECFA002B5E28 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD321CCECFA002B5E28 /* libavutil.framework */; };
-		34A65DDC21CCEE8B002B5E28 /* libavcodec.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCE21CCECFA002B5E28 /* libavcodec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DDD21CCEE8B002B5E28 /* libavdevice.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD121CCECFA002B5E28 /* libavdevice.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DDE21CCEE8B002B5E28 /* libavfilter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCF21CCECFA002B5E28 /* libavfilter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DDF21CCEE8B002B5E28 /* libavformat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD021CCECFA002B5E28 /* libavformat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DE021CCEE8B002B5E28 /* libavutil.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD321CCECFA002B5E28 /* libavutil.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DE121CCEE8B002B5E28 /* libswresample.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD221CCECFA002B5E28 /* libswresample.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DE221CCEE8B002B5E28 /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCD21CCECFA002B5E28 /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DE321CCEE8B002B5E28 /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCC21CCECFA002B5E28 /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34BB547C2109D44800606B7C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB547B2109D44800606B7C /* Constants.m */; };
 		34DC789B21215B5800C3486C /* truenorg.otf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789721215B5800C3486C /* truenorg.otf */; };
 		34DC789C21215B5800C3486C /* subtitle.srt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789821215B5800C3486C /* subtitle.srt */; };
@@ -53,6 +37,7 @@
 		34FAE220209F7DDE005CE2AE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 34FAE21F209F7DDE005CE2AE /* Assets.xcassets */; };
 		34FAE223209F7DDE005CE2AE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 34FAE221209F7DDE005CE2AE /* LaunchScreen.storyboard */; };
 		34FAE226209F7DDE005CE2AE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 34FAE225209F7DDE005CE2AE /* main.m */; };
+		8A776E4D8F4EB85888ADFB99 /* Pods_MobileFFmpegTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4B824D376F9CD476C761D40 /* Pods_MobileFFmpegTest.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -62,14 +47,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				34A65DDC21CCEE8B002B5E28 /* libavcodec.framework in Embed Frameworks */,
-				34A65DDD21CCEE8B002B5E28 /* libavdevice.framework in Embed Frameworks */,
-				34A65DDE21CCEE8B002B5E28 /* libavfilter.framework in Embed Frameworks */,
-				34A65DDF21CCEE8B002B5E28 /* libavformat.framework in Embed Frameworks */,
-				34A65DE021CCEE8B002B5E28 /* libavutil.framework in Embed Frameworks */,
-				34A65DE121CCEE8B002B5E28 /* libswresample.framework in Embed Frameworks */,
-				34A65DE221CCEE8B002B5E28 /* libswscale.framework in Embed Frameworks */,
-				34A65DE321CCEE8B002B5E28 /* mobileffmpeg.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -77,6 +54,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		09762EB4030C758C5727BD68 /* Pods-MobileFFmpegTest.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobileFFmpegTest.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest.debug.xcconfig"; sourceTree = "<group>"; };
 		340FABBC2115A17600B33CE7 /* VidStabViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VidStabViewController.h; sourceTree = "<group>"; };
 		340FABBD2115A17600B33CE7 /* VidStabViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VidStabViewController.m; sourceTree = "<group>"; };
 		3423D266217F7CC100C3C7ED /* MediaInformationParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaInformationParserTests.m; sourceTree = "<group>"; };
@@ -95,14 +73,6 @@
 		348439EA20B2EFAF001A3990 /* pyramid.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pyramid.jpg; sourceTree = "<group>"; };
 		348439EB20B2EFAF001A3990 /* tajmahal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tajmahal.jpg; sourceTree = "<group>"; };
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
-		34A65DCC21CCECFA002B5E28 /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = mobileffmpeg.framework; sourceTree = "<group>"; };
-		34A65DCD21CCECFA002B5E28 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswscale.framework; sourceTree = "<group>"; };
-		34A65DCE21CCECFA002B5E28 /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavcodec.framework; sourceTree = "<group>"; };
-		34A65DCF21CCECFA002B5E28 /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavfilter.framework; sourceTree = "<group>"; };
-		34A65DD021CCECFA002B5E28 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavformat.framework; sourceTree = "<group>"; };
-		34A65DD121CCECFA002B5E28 /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavdevice.framework; sourceTree = "<group>"; };
-		34A65DD221CCECFA002B5E28 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswresample.framework; sourceTree = "<group>"; };
-		34A65DD321CCECFA002B5E28 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavutil.framework; sourceTree = "<group>"; };
 		34BB547B2109D44800606B7C /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		34DC789721215B5800C3486C /* truenorg.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = truenorg.otf; sourceTree = "<group>"; };
 		34DC789821215B5800C3486C /* subtitle.srt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = subtitle.srt; sourceTree = "<group>"; };
@@ -120,6 +90,8 @@
 		34FAE222209F7DDE005CE2AE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		34FAE224209F7DDE005CE2AE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		34FAE225209F7DDE005CE2AE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		A04B0F58907D37C77D77BCB2 /* Pods-MobileFFmpegTest.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MobileFFmpegTest.release.xcconfig"; path = "Pods/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest.release.xcconfig"; sourceTree = "<group>"; };
+		F4B824D376F9CD476C761D40 /* Pods_MobileFFmpegTest.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MobileFFmpegTest.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,14 +99,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34A65DD621CCECFA002B5E28 /* libavcodec.framework in Frameworks */,
-				34A65DD521CCECFA002B5E28 /* libswscale.framework in Frameworks */,
-				34A65DD821CCECFA002B5E28 /* libavformat.framework in Frameworks */,
-				34A65DD421CCECFA002B5E28 /* mobileffmpeg.framework in Frameworks */,
-				34A65DDB21CCECFA002B5E28 /* libavutil.framework in Frameworks */,
-				34A65DDA21CCECFA002B5E28 /* libswresample.framework in Frameworks */,
-				34A65DD721CCECFA002B5E28 /* libavfilter.framework in Frameworks */,
-				34A65DD921CCECFA002B5E28 /* libavdevice.framework in Frameworks */,
+				8A776E4D8F4EB85888ADFB99 /* Pods_MobileFFmpegTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -158,14 +123,7 @@
 		3498DC65209F7F1C005F5883 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				34A65DCE21CCECFA002B5E28 /* libavcodec.framework */,
-				34A65DD121CCECFA002B5E28 /* libavdevice.framework */,
-				34A65DCF21CCECFA002B5E28 /* libavfilter.framework */,
-				34A65DD021CCECFA002B5E28 /* libavformat.framework */,
-				34A65DD321CCECFA002B5E28 /* libavutil.framework */,
-				34A65DD221CCECFA002B5E28 /* libswresample.framework */,
-				34A65DCD21CCECFA002B5E28 /* libswscale.framework */,
-				34A65DCC21CCECFA002B5E28 /* mobileffmpeg.framework */,
+				F4B824D376F9CD476C761D40 /* Pods_MobileFFmpegTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -177,6 +135,7 @@
 				34FAE212209F7DDD005CE2AE /* MobileFFmpegTest */,
 				34FAE211209F7DDD005CE2AE /* Products */,
 				3498DC65209F7F1C005F5883 /* Frameworks */,
+				429F8E77B10AE032C315C907 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -222,6 +181,15 @@
 			path = MobileFFmpegTest;
 			sourceTree = "<group>";
 		};
+		429F8E77B10AE032C315C907 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				09762EB4030C758C5727BD68 /* Pods-MobileFFmpegTest.debug.xcconfig */,
+				A04B0F58907D37C77D77BCB2 /* Pods-MobileFFmpegTest.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -247,13 +215,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 34FAE229209F7DDE005CE2AE /* Build configuration list for PBXNativeTarget "MobileFFmpegTest" */;
 			buildPhases = (
+				5E094331BD641A4FE317B9CB /* [CP] Check Pods Manifest.lock */,
 				34FAE20C209F7DDD005CE2AE /* Sources */,
 				34FAE20D209F7DDD005CE2AE /* Frameworks */,
 				34FAE20E209F7DDD005CE2AE /* Resources */,
 				34F9744020A1A200004A1F68 /* Headers */,
 				3452D8CF20A373640045E6B0 /* Embed Frameworks */,
+				DFE64F47D0B2AA62D946772E /* [CP] Embed Pods Frameworks */,
 				34DFD8C121C8187400D6551D /* ShellScript */,
-				34A65DE421CCF209002B5E28 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -319,23 +288,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		34A65DE421CCF209002B5E28 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libswresample.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavfilter.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavformat.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavutil.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libswscale.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavdevice.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavcodec.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/mobileffmpeg.framework/strip-frameworks.sh\"\n";
-		};
 		34DFD8C121C8187400D6551D /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -348,6 +300,58 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "echo \"Applying patch for https://github.com/tanersener/mobile-ffmpeg/issues/18\"\ncd \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\n\nINFO_PLIST_FILES=$(find . -name Info.plist | grep 'libswresample\\|libavfilter\\|libavformat\\|libavutil\\|libswscale\\|libavdevice\\|libavcodec\\|mobileffmpeg')\n\nfor INFO_PLIST in ${INFO_PLIST_FILES};\ndo\nexisting_key_line_number=$(sed -n '/MinimumOS/=' ${INFO_PLIST})\nif [[ -z ${existing_key_line_number} ]]; then\nsed -i .tmp \"s/<\\/dict/    <key>MinimumOSVersion<\\/key>\\\\\n<string>9.3<\\/string>\\\\\n<\\/dict/g\" ${INFO_PLIST}\nrm -f \"${INFO_PLIST}.tmp\"\necho \"Patch added MinimumOSVersion key & value at ${INFO_PLIST}\"\nelse\nsed -i .tmp \"$((existing_key_line_number+1))s/.*/        <string>9.3<\\/string>/\" ${INFO_PLIST}\nrm -f \"${INFO_PLIST}.tmp\"\necho \"Patch replaced MinimumOSVersion value at ${INFO_PLIST}\"\nfi\ndone\n";
+		};
+		5E094331BD641A4FE317B9CB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-MobileFFmpegTest-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DFE64F47D0B2AA62D946772E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/NMEasyTipView/NMEasyTipView.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/mobileffmpeg.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavcodec.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavdevice.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavfilter.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavformat.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libavutil.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libswresample.framework",
+				"${PODS_ROOT}/mobile-ffmpeg-full/libswscale.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NMEasyTipView.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/mobileffmpeg.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavcodec.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavdevice.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavfilter.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavformat.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavutil.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libswresample.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libswscale.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -511,6 +515,7 @@
 		};
 		34FAE22A209F7DDE005CE2AE /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 09762EB4030C758C5727BD68 /* Pods-MobileFFmpegTest.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -524,7 +529,7 @@
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobileFFmpegTest/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = "$(inherited)";
@@ -537,6 +542,7 @@
 		};
 		34FAE22B209F7DDE005CE2AE /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A04B0F58907D37C77D77BCB2 /* Pods-MobileFFmpegTest.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -550,7 +556,7 @@
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobileFFmpegTest/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
-				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
 				OTHER_LDFLAGS = "$(inherited)";

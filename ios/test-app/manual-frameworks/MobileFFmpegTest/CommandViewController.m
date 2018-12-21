@@ -22,7 +22,6 @@
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
 #import "CommandViewController.h"
-#import "RCEasyTipView.h"
 
 @interface CommandViewController ()
 
@@ -35,9 +34,6 @@
 @end
 
 @implementation CommandViewController {
-
-    // Tooltip view reference
-    RCEasyTipView *tooltip;    
 }
 
 - (void)viewDidLoad {
@@ -50,19 +46,7 @@
     [Util applyOutputTextStyle: self.outputText];
     [Util applyHeaderStyle: self.header];
 
-    // TOOLTIP INIT
-    RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
-    [Util applyTooltipStyle: preferences];
-    preferences.drawing.arrowPostion = Top;
-    preferences.animating.showDuration = 1.0;
-    preferences.animating.dismissDuration = COMMAND_TEST_TOOLTIP_DURATION;
-    preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
-    preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-
-    tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
-    tooltip.text = COMMAND_TEST_TOOLTIP_TEXT;
-    
-    dispatch_async(dispatch_get_main_queue(), ^{        
+    dispatch_async(dispatch_get_main_queue(), ^{
         [self setActive];
     });
 }
@@ -78,8 +62,6 @@
 }
 
 - (IBAction)runAction:(id)sender {
-    [self hideTooltip];
-    
     [self clearOutput];
     
     [[self commandText] endEditing:TRUE];
@@ -101,8 +83,6 @@
 }
 
 - (IBAction)runAsyncAction:(id)sender {
-    [self hideTooltip];
-    
     [self clearOutput];
     
     [[self commandText] endEditing:TRUE];
@@ -128,16 +108,6 @@
 
 - (void)setActive {
     [MobileFFmpegConfig setLogDelegate:self];
-    [self hideTooltip];
-    [self showTooltip];
-}
-
-- (void)hideTooltip {
-    [tooltip dismissWithCompletion:nil];
-}
-
-- (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.commandText withinSuperView:self.view];
 }
 
 - (void)clearOutput {

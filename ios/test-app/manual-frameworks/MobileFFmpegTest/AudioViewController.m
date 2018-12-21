@@ -22,7 +22,6 @@
 #import <mobileffmpeg/MobileFFmpegConfig.h>
 #import <mobileffmpeg/MobileFFmpeg.h>
 #import "AudioViewController.h"
-#import "RCEasyTipView.h"
 
 @interface AudioViewController ()
 
@@ -43,9 +42,6 @@
 
     // Loading view
     UIActivityIndicatorView* indicator;
-
-    // Tooltip view reference
-    RCEasyTipView *tooltip;
 }
 
 - (void)viewDidLoad {
@@ -63,18 +59,6 @@
     [Util applyButtonStyle: self.encodeButton];
     [Util applyOutputTextStyle: self.outputText];
     [Util applyHeaderStyle: self.header];
-    
-    // TOOLTIP INIT
-    RCEasyTipPreferences *preferences = [[RCEasyTipPreferences alloc] initWithDefaultPreferences];
-    [Util applyTooltipStyle: preferences];
-    preferences.drawing.arrowPostion = Top;
-    preferences.animating.showDuration = 1.0;
-    preferences.animating.dismissDuration = AUDIO_TEST_TOOLTIP_DURATION;
-    preferences.animating.dismissTransform = CGAffineTransformMakeTranslation(0, -15);
-    preferences.animating.showInitialTransform = CGAffineTransformMakeTranslation(0, -15);
-    
-    tooltip = [[RCEasyTipView alloc] initWithPreferences:preferences];
-    tooltip.text = AUDIO_TEST_TOOLTIP_TEXT;
 
     // BUTTON DISABLED UNTIL AUDIO SAMPLE IS CREATED
     [self.encodeButton setEnabled:false];
@@ -268,16 +252,6 @@
 
 - (void)setActive {
     [MobileFFmpegConfig setLogDelegate:self];
-    [self hideTooltip];
-    [self showTooltip];
-}
-
-- (void)hideTooltip {
-    [tooltip dismissWithCompletion:nil];
-}
-
-- (void)showTooltip {
-    [tooltip showAnimated:YES forView:self.encodeButton withinSuperView:self.view];
 }
 
 - (void)clearOutput {
