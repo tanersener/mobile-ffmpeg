@@ -88,7 +88,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
     echo -e "  -V, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
-    echo -e "  -S, --speed\t\t\toptimize for speed instead of size\n"
+    echo -e "  -s, --speed\t\t\toptimize for speed instead of size\n"
 
     echo -e "Licensing options:"
 
@@ -496,7 +496,7 @@ do
         -d | --debug)
             enable_debug
 	    ;;
-        -S | --speed)
+        -s | --speed)
 	        optimize_for_speed
 	    ;;
         --reconf-*)

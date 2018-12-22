@@ -42,12 +42,8 @@ export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/lib -framework Foundation -framework CoreVideo -lavdevice"
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
-# BUILD SHARED (DEFAULT) OR STATIC LIBRARIES
-if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
-    BUILD_LIBRARY_OPTIONS="--enable-shared --disable-static";
-else
-    BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
-fi
+# ALWAYS BUILD STATIC LIBRARIES
+BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
 
 cd ${BASEDIR}/ios || exit 1
 

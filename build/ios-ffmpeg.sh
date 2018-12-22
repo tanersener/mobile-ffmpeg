@@ -330,12 +330,8 @@ do
     fi
 done
 
-# BUILD SHARED (DEFAULT) OR STATIC LIBRARIES
-if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
-    BUILD_LIBRARY_OPTIONS="--enable-shared --disable-static";
-else
-    BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
-fi
+# ALWAYS BUILD STATIC LIBRARIES
+BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
 
 # OPTIMIZE FOR SPEED INSTEAD OF SIZE
 if [[ -z ${MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED} ]]; then
