@@ -33,14 +33,6 @@
 		34A65DD921CCECFA002B5E28 /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD121CCECFA002B5E28 /* libavdevice.framework */; };
 		34A65DDA21CCECFA002B5E28 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD221CCECFA002B5E28 /* libswresample.framework */; };
 		34A65DDB21CCECFA002B5E28 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD321CCECFA002B5E28 /* libavutil.framework */; };
-		34A65DDC21CCEE8B002B5E28 /* libavcodec.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCE21CCECFA002B5E28 /* libavcodec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DDD21CCEE8B002B5E28 /* libavdevice.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD121CCECFA002B5E28 /* libavdevice.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DDE21CCEE8B002B5E28 /* libavfilter.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCF21CCECFA002B5E28 /* libavfilter.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DDF21CCEE8B002B5E28 /* libavformat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD021CCECFA002B5E28 /* libavformat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DE021CCEE8B002B5E28 /* libavutil.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD321CCECFA002B5E28 /* libavutil.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DE121CCEE8B002B5E28 /* libswresample.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD221CCECFA002B5E28 /* libswresample.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DE221CCEE8B002B5E28 /* libswscale.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCD21CCECFA002B5E28 /* libswscale.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		34A65DE321CCEE8B002B5E28 /* mobileffmpeg.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCC21CCECFA002B5E28 /* mobileffmpeg.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		34BB547C2109D44800606B7C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB547B2109D44800606B7C /* Constants.m */; };
 		34DC789B21215B5800C3486C /* truenorg.otf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789721215B5800C3486C /* truenorg.otf */; };
 		34DC789C21215B5800C3486C /* subtitle.srt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789821215B5800C3486C /* subtitle.srt */; };
@@ -62,14 +54,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				34A65DDC21CCEE8B002B5E28 /* libavcodec.framework in Embed Frameworks */,
-				34A65DDD21CCEE8B002B5E28 /* libavdevice.framework in Embed Frameworks */,
-				34A65DDE21CCEE8B002B5E28 /* libavfilter.framework in Embed Frameworks */,
-				34A65DDF21CCEE8B002B5E28 /* libavformat.framework in Embed Frameworks */,
-				34A65DE021CCEE8B002B5E28 /* libavutil.framework in Embed Frameworks */,
-				34A65DE121CCEE8B002B5E28 /* libswresample.framework in Embed Frameworks */,
-				34A65DE221CCEE8B002B5E28 /* libswscale.framework in Embed Frameworks */,
-				34A65DE321CCEE8B002B5E28 /* mobileffmpeg.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -252,8 +236,6 @@
 				34FAE20E209F7DDD005CE2AE /* Resources */,
 				34F9744020A1A200004A1F68 /* Headers */,
 				3452D8CF20A373640045E6B0 /* Embed Frameworks */,
-				34DFD8C121C8187400D6551D /* ShellScript */,
-				34A65DE421CCF209002B5E28 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -317,39 +299,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		34A65DE421CCF209002B5E28 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libswresample.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavfilter.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavformat.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavutil.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libswscale.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavdevice.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/libavcodec.framework/strip-frameworks.sh\"\nbash \"$BUILT_PRODUCTS_DIR/$FRAMEWORKS_FOLDER_PATH/mobileffmpeg.framework/strip-frameworks.sh\"\n";
-		};
-		34DFD8C121C8187400D6551D /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "echo \"Applying patch for https://github.com/tanersener/mobile-ffmpeg/issues/18\"\ncd \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\n\nINFO_PLIST_FILES=$(find . -name Info.plist | grep 'libswresample\\|libavfilter\\|libavformat\\|libavutil\\|libswscale\\|libavdevice\\|libavcodec\\|mobileffmpeg')\n\nfor INFO_PLIST in ${INFO_PLIST_FILES};\ndo\nexisting_key_line_number=$(sed -n '/MinimumOS/=' ${INFO_PLIST})\nif [[ -z ${existing_key_line_number} ]]; then\nsed -i .tmp \"s/<\\/dict/    <key>MinimumOSVersion<\\/key>\\\\\n<string>9.3<\\/string>\\\\\n<\\/dict/g\" ${INFO_PLIST}\nrm -f \"${INFO_PLIST}.tmp\"\necho \"Patch added MinimumOSVersion key & value at ${INFO_PLIST}\"\nelse\nsed -i .tmp \"$((existing_key_line_number+1))s/.*/        <string>9.3<\\/string>/\" ${INFO_PLIST}\nrm -f \"${INFO_PLIST}.tmp\"\necho \"Patch replaced MinimumOSVersion value at ${INFO_PLIST}\"\nfi\ndone\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		34FAE20C209F7DDD005CE2AE /* Sources */ = {
@@ -445,7 +394,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -500,7 +449,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				OTHER_LIBTOOLFLAGS = "-liconv";
@@ -523,7 +472,6 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobileFFmpegTest/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
@@ -549,7 +497,6 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobileFFmpegTest/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "@loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";

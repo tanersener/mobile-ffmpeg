@@ -384,10 +384,10 @@ get_size_optimization_ldflags() {
         armv7 | armv7s | arm64 | arm64e)
             case $1 in
                 ffmpeg | mobile-ffmpeg)
-                    echo "-flto -Oz -dead_strip -dead_strip_dylibs"
+                    echo "-flto -Oz -dead_strip"
                 ;;
                 *)
-                    echo "-flto -Oz -dead_strip -dead_strip_dylibs"
+                    echo "-flto -Oz -dead_strip"
                 ;;
             esac
         ;;
