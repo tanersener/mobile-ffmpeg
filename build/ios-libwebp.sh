@@ -48,10 +48,10 @@ mkdir build;
 cd build
 
 # OVERRIDING INCLUDE PATH ORDER
-CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/giflib/include \
--I${BASEDIR}/prebuilt/ios-$(get_target_host)/jpeg/include \
--I${BASEDIR}/prebuilt/ios-$(get_target_host)/libpng/include \
--I${BASEDIR}/prebuilt/ios-$(get_target_host)/tiff/include $CFLAGS"
+CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/giflib/include \
+-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/jpeg/include \
+-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng/include \
+-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/tiff/include $CFLAGS"
 
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
@@ -67,13 +67,13 @@ cmake -Wno-dev \
     -DCMAKE_LINKER="$LD" \
     -DCMAKE_AR="$AR" \
     -DCMAKE_AS="$AS" \
-    -DGIF_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_host)/giflib/include \
-    -DJPEG_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_host)/jpeg/include \
-    -DJPEG_LIBRARY=${BASEDIR}/prebuilt/ios-$(get_target_host)/jpeg/lib \
-    -DPNG_PNG_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_host)/libpng/include \
-    -DPNG_LIBRARY=${BASEDIR}/prebuilt/ios-$(get_target_host)/libpng/lib \
-    -DTIFF_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_host)/tiff/include \
-    -DTIFF_LIBRARY=${BASEDIR}/prebuilt/ios-$(get_target_host)/tiff/lib \
+    -DGIF_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/giflib/include \
+    -DJPEG_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/jpeg/include \
+    -DJPEG_LIBRARY=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/jpeg/lib \
+    -DPNG_PNG_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng/include \
+    -DPNG_LIBRARY=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng/lib \
+    -DTIFF_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/tiff/include \
+    -DTIFF_LIBRARY=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/tiff/lib \
     -DZLIB_INCLUDE_DIR=${SDK_PATH}/usr/include \
     -DZLIB_LIBRARY=${SDK_PATH}/usr/lib \
     -DGLUT_INCLUDE_DIR= \
