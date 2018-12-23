@@ -11,6 +11,9 @@
 		340FABBF2115A17600B33CE7 /* VidStabViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 340FABBD2115A17600B33CE7 /* VidStabViewController.m */; };
 		3423D267217F7CC100C3C7ED /* MediaInformationParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3423D266217F7CC100C3C7ED /* MediaInformationParserTests.m */; };
 		3423D269217F7D4E00C3C7ED /* MediaInformationParserTests.h in Headers */ = {isa = PBXBuildFile; fileRef = 3423D268217F7D4E00C3C7ED /* MediaInformationParserTests.h */; };
+		343165D121D136FC001A7185 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 343165D021D136FC001A7185 /* libz.tbd */; };
+		343165D321D13704001A7185 /* libbz2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 343165D221D13704001A7185 /* libbz2.tbd */; };
+		3431662B21D13B0A001A7185 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3431662A21D13B0A001A7185 /* libc++.tbd */; };
 		343E66B5210784BD00F95E5B /* HttpsViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E66B3210784BD00F95E5B /* HttpsViewController.h */; };
 		343E66B6210784BD00F95E5B /* HttpsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 343E66B4210784BD00F95E5B /* HttpsViewController.m */; };
 		343E66B9210789DE00F95E5B /* Constants.h in Headers */ = {isa = PBXBuildFile; fileRef = 343E66B7210789DE00F95E5B /* Constants.h */; };
@@ -25,14 +28,6 @@
 		348439ED20B2EFAF001A3990 /* pyramid.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EA20B2EFAF001A3990 /* pyramid.jpg */; };
 		348439EE20B2EFAF001A3990 /* tajmahal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EB20B2EFAF001A3990 /* tajmahal.jpg */; };
 		348439EF20B2EFAF001A3990 /* colosseum.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EC20B2EFAF001A3990 /* colosseum.jpg */; };
-		34A65DD421CCECFA002B5E28 /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCC21CCECFA002B5E28 /* mobileffmpeg.framework */; };
-		34A65DD521CCECFA002B5E28 /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCD21CCECFA002B5E28 /* libswscale.framework */; };
-		34A65DD621CCECFA002B5E28 /* libavcodec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCE21CCECFA002B5E28 /* libavcodec.framework */; };
-		34A65DD721CCECFA002B5E28 /* libavfilter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DCF21CCECFA002B5E28 /* libavfilter.framework */; };
-		34A65DD821CCECFA002B5E28 /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD021CCECFA002B5E28 /* libavformat.framework */; };
-		34A65DD921CCECFA002B5E28 /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD121CCECFA002B5E28 /* libavdevice.framework */; };
-		34A65DDA21CCECFA002B5E28 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD221CCECFA002B5E28 /* libswresample.framework */; };
-		34A65DDB21CCECFA002B5E28 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34A65DD321CCECFA002B5E28 /* libavutil.framework */; };
 		34BB547C2109D44800606B7C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB547B2109D44800606B7C /* Constants.m */; };
 		34DC789B21215B5800C3486C /* truenorg.otf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789721215B5800C3486C /* truenorg.otf */; };
 		34DC789C21215B5800C3486C /* subtitle.srt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789821215B5800C3486C /* subtitle.srt */; };
@@ -65,6 +60,12 @@
 		340FABBD2115A17600B33CE7 /* VidStabViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VidStabViewController.m; sourceTree = "<group>"; };
 		3423D266217F7CC100C3C7ED /* MediaInformationParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MediaInformationParserTests.m; sourceTree = "<group>"; };
 		3423D268217F7D4E00C3C7ED /* MediaInformationParserTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MediaInformationParserTests.h; sourceTree = "<group>"; };
+		343165D021D136FC001A7185 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		343165D221D13704001A7185 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
+		3431662A21D13B0A001A7185 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		3431662C21D13C3D001A7185 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		3431662D21D13C4A001A7185 /* GameController.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameController.framework; path = System/Library/Frameworks/GameController.framework; sourceTree = SDKROOT; };
+		3431662E21D13C58001A7185 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		343E66B3210784BD00F95E5B /* HttpsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpsViewController.h; sourceTree = "<group>"; };
 		343E66B4210784BD00F95E5B /* HttpsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpsViewController.m; sourceTree = "<group>"; };
 		343E66B7210789DE00F95E5B /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
@@ -79,14 +80,6 @@
 		348439EA20B2EFAF001A3990 /* pyramid.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pyramid.jpg; sourceTree = "<group>"; };
 		348439EB20B2EFAF001A3990 /* tajmahal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tajmahal.jpg; sourceTree = "<group>"; };
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
-		34A65DCC21CCECFA002B5E28 /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = mobileffmpeg.framework; sourceTree = "<group>"; };
-		34A65DCD21CCECFA002B5E28 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswscale.framework; sourceTree = "<group>"; };
-		34A65DCE21CCECFA002B5E28 /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavcodec.framework; sourceTree = "<group>"; };
-		34A65DCF21CCECFA002B5E28 /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavfilter.framework; sourceTree = "<group>"; };
-		34A65DD021CCECFA002B5E28 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavformat.framework; sourceTree = "<group>"; };
-		34A65DD121CCECFA002B5E28 /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavdevice.framework; sourceTree = "<group>"; };
-		34A65DD221CCECFA002B5E28 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswresample.framework; sourceTree = "<group>"; };
-		34A65DD321CCECFA002B5E28 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavutil.framework; sourceTree = "<group>"; };
 		34BB547B2109D44800606B7C /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		34DC789721215B5800C3486C /* truenorg.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = truenorg.otf; sourceTree = "<group>"; };
 		34DC789821215B5800C3486C /* subtitle.srt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = subtitle.srt; sourceTree = "<group>"; };
@@ -111,14 +104,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				34A65DD621CCECFA002B5E28 /* libavcodec.framework in Frameworks */,
-				34A65DD521CCECFA002B5E28 /* libswscale.framework in Frameworks */,
-				34A65DD821CCECFA002B5E28 /* libavformat.framework in Frameworks */,
-				34A65DD421CCECFA002B5E28 /* mobileffmpeg.framework in Frameworks */,
-				34A65DDB21CCECFA002B5E28 /* libavutil.framework in Frameworks */,
-				34A65DDA21CCECFA002B5E28 /* libswresample.framework in Frameworks */,
-				34A65DD721CCECFA002B5E28 /* libavfilter.framework in Frameworks */,
-				34A65DD921CCECFA002B5E28 /* libavdevice.framework in Frameworks */,
+				343165D121D136FC001A7185 /* libz.tbd in Frameworks */,
+				3431662B21D13B0A001A7185 /* libc++.tbd in Frameworks */,
+				343165D321D13704001A7185 /* libbz2.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -142,14 +130,12 @@
 		3498DC65209F7F1C005F5883 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				34A65DCE21CCECFA002B5E28 /* libavcodec.framework */,
-				34A65DD121CCECFA002B5E28 /* libavdevice.framework */,
-				34A65DCF21CCECFA002B5E28 /* libavfilter.framework */,
-				34A65DD021CCECFA002B5E28 /* libavformat.framework */,
-				34A65DD321CCECFA002B5E28 /* libavutil.framework */,
-				34A65DD221CCECFA002B5E28 /* libswresample.framework */,
-				34A65DCD21CCECFA002B5E28 /* libswscale.framework */,
-				34A65DCC21CCECFA002B5E28 /* mobileffmpeg.framework */,
+				3431662E21D13C58001A7185 /* CoreMotion.framework */,
+				3431662D21D13C4A001A7185 /* GameController.framework */,
+				3431662C21D13C3D001A7185 /* VideoToolbox.framework */,
+				3431662A21D13B0A001A7185 /* libc++.tbd */,
+				343165D221D13704001A7185 /* libbz2.tbd */,
+				343165D021D136FC001A7185 /* libz.tbd */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -394,7 +380,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -449,7 +435,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				OTHER_LIBTOOLFLAGS = "-liconv";

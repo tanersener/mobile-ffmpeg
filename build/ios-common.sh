@@ -68,6 +68,33 @@ get_library_name() {
     esac
 }
 
+get_package_config_file_name() {
+    case $1 in
+        1) echo "freetype2" ;;
+        5) echo "libmp3lame" ;;
+        8) echo "theora" ;;
+        9) echo "vorbis" ;;
+        10) echo "vpx" ;;
+        12) echo "libxml-2.0" ;;
+        13) echo "opencore-amrnb" ;;
+        21) echo "vidstab" ;;
+        26) echo "aom" ;;
+        27) echo "libchromaprint" ;;
+        29) echo "sdl2" ;;
+        32) echo "libjpeg" ;;
+        33) echo "ogg" ;;
+        35) echo "uuid" ;;
+        37) echo "libtiff-4" ;;
+        39) echo "sndfile" ;;
+        40) echo "lept" ;;
+        *) echo $(get_library_name $1)
+    esac
+}
+
+to_capital_case() {
+    echo "$(echo ${1:0:1} | tr '[a-z]' '[A-Z]')${1:1}"
+}
+
 get_static_archive_name() {
     case $1 in
         5) echo "libmp3lame.a" ;;

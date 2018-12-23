@@ -68,7 +68,7 @@ export BASEDIR=$(pwd)
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
 # //@TEST THIS AND INCREASE IF NECESSARY
-export IOS_MIN_VERSION=9.3
+export IOS_MIN_VERSION=12.1
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
@@ -532,6 +532,10 @@ EOF
 }
 
 create_static_fat_library() {
+    local FAT_LIBRARY_PATH=${BASEDIR}/prebuilt/ios-universal/$2-universal
+
+    mkdir -p ${FAT_LIBRARY_PATH}/lib 1>>${BASEDIR}/build.log 2>&1
+
     LIPO_COMMAND="${LIPO} -create"
 
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
@@ -539,11 +543,49 @@ create_static_fat_library() {
         LIPO_COMMAND+=" $(find ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin -name $1)"
     done
 
-    LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/$1"
+    LIPO_COMMAND+=" -output ${FAT_LIBRARY_PATH}/lib/$1"
 
     RC=$(${LIPO_COMMAND} 1>>${BASEDIR}/build.log 2>&1)
 
     echo ${RC}
+}
+
+# 1 - library name
+# 2 - static library name
+# 3 - library version
+create_static_framework() {
+    local FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-framework/$1.framework
+
+    mkdir -p ${FRAMEWORK_PATH} 1>>${BASEDIR}/build.log 2>&1
+
+    local CAPITAL_CASE_LIBRARY_NAME=$(to_capital_case $1)
+
+    build_info_plist "${FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.mobileffmpeg.${CAPITAL_CASE_LIBRARY_NAME}" "$3" "$3"
+
+    cp ${BASEDIR}/prebuilt/ios-universal/$1-universal/lib/$2 ${FRAMEWORK_PATH}/$1 1>>${BASEDIR}/build.log 2>&1
+
+    echo "$?"
+}
+
+get_external_library_license_path() {
+    case $1 in
+        1) echo "${BASEDIR}/src/$(get_library_name $1)/docs/LICENSE.TXT" ;;
+        3) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
+        7) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LIB" ;;
+        25) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LGPL" ;;
+        27) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md" ;;
+        29) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.txt" ;;
+        32) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
+        36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
+        37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
+        40) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
+        4 | 10 | 13 | 19 | 21 | 26 | 34) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
+        *) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING" ;;
+    esac
+}
+
+get_external_library_version() {
+    echo "$(grep Version ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/pkgconfig/$1.pc 2>>${BASEDIR}/build.log | sed 's/Version://g;s/\ //g')"
 }
 
 # ENABLE COMMON FUNCTIONS
@@ -719,17 +761,442 @@ BUILD_LIBRARY_EXTENSION="a";
 
 if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
-    echo -e -n "\n\nCreating fat-binary under prebuilt/ios-universal: "
-
-    MOBILE_FFMPEG_UNIVERSAL=${BASEDIR}/prebuilt/ios-universal/mobile-ffmpeg-universal
+    echo -e -n "\n\nCreating frameworks under prebuilt: "
 
     # BUILDING UNIVERSAL LIBRARIES
     rm -rf ${BASEDIR}/prebuilt/ios-universal 1>>${BASEDIR}/build.log 2>&1
+    mkdir -p ${BASEDIR}/prebuilt/ios-universal 1>>${BASEDIR}/build.log 2>&1
 
-    mkdir -p ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
-    mkdir -p ${MOBILE_FFMPEG_UNIVERSAL}/lib 1>>${BASEDIR}/build.log 2>&1
+    # 1. EXTERNAL LIBRARIES
+    for library in {0..40}
+    do
+        if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 
-    # BUILDING FFMPEG FAT BINARY
+            library_name=$(get_library_name ${library})
+            package_config_file_name=$(get_package_config_file_name ${library})
+            library_version=$(get_external_library_version ${package_config_file_name})
+            capital_case_library_name=$(to_capital_case ${library_name})
+            if [[ -z ${library_version} ]]; then
+                echo -e "Failed to detect version for ${library_name} from ${package_config_file_name}.pc\n" 1>>${BASEDIR}/build.log 2>&1
+                echo -e "failed\n"
+                exit 1
+            fi
+
+            echo -e "Creating fat library for ${library_name}\n" 1>>${BASEDIR}/build.log 2>&1
+
+            if [[ ${LIBRARY_LIBICONV} == $library ]]; then
+
+                LIBRARY_CREATED=$(create_static_fat_library "libiconv.a" "libiconv")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                LIBRARY_CREATED=$(create_static_fat_library "libcharset.a" "libcharset")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libiconv" "libiconv.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libcharset" "libcharset.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libiconv-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libcharset-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libiconv.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libcharset.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+            elif [[ ${LIBRARY_LIBTHEORA} == $library ]]; then
+
+                LIBRARY_CREATED=$(create_static_fat_library "libtheora.a" "libtheora")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                LIBRARY_CREATED=$(create_static_fat_library "libtheoraenc.a" "libtheoraenc")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                LIBRARY_CREATED=$(create_static_fat_library "libtheoradec.a" "libtheoradec")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libtheora" "libtheora.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libtheoraenc" "libtheoraenc.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libtheoradec" "libtheoradec.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libtheora-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libtheoraenc-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libtheoradec-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libtheora.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libtheoraenc.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libtheoradec.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+            elif [[ ${LIBRARY_LIBVORBIS} == $library ]]; then
+
+                LIBRARY_CREATED=$(create_static_fat_library "libvorbisfile.a" "libvorbisfile")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                LIBRARY_CREATED=$(create_static_fat_library "libvorbisenc.a" "libvorbisenc")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                LIBRARY_CREATED=$(create_static_fat_library "libvorbis.a" "libvorbis")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libvorbisfile" "libvorbisfile.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libvorbisenc" "libvorbisenc.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libvorbis" "libvorbis.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libvorbisfile-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libvorbisenc-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libvorbis-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libvorbisfile.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libvorbisenc.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libvorbis.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+            elif [[ ${LIBRARY_LIBWEBP} == $library ]]; then
+
+                LIBRARY_CREATED=$(create_static_fat_library "libwebpdecoder.a" "libwebpdecoder")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                LIBRARY_CREATED=$(create_static_fat_library "libwebpdemux.a" "libwebpdemux")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                LIBRARY_CREATED=$(create_static_fat_library "libwebp.a" "libwebp")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libwebpdecoder" "libwebpdecoder.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libwebpdemux" "libwebpdemux.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libwebp" "libwebp.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libwebpdecoder-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libwebpdemux-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libwebp-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libwebpdecoder.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libwebpdemux.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libwebp.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+
+            elif [[ ${LIBRARY_OPENCOREAMR} == $library ]]; then
+
+                LIBRARY_CREATED=$(create_static_fat_library "libopencore-amrwb.a" "libopencore-amrwb")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                LIBRARY_CREATED=$(create_static_fat_library "libopencore-amrnb.a" "libopencore-amrnb")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libopencore-amrwb" "libopencore-amrwb.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libopencore-amrnb" "libopencore-amrnb.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libopencore-amrwb-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libopencore-amrnb-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libopencore-amrwb.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libopencore-amrnb.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+            elif [[ ${LIBRARY_NETTLE} == $library ]]; then
+
+                LIBRARY_CREATED=$(create_static_fat_library "libnettle.a" "libnettle")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                LIBRARY_CREATED=$(create_static_fat_library "libhogweed.a" "libhogweed")
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libnettle" "libnettle.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework "libhogweed" "libhogweed.a" $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libnettle-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/libhogweed-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libnettle.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/libhogweed.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+            else
+                library_name=$(get_library_name $((library)))
+                static_archive_name=$(get_static_archive_name $((library)))
+                LIBRARY_CREATED=$(create_static_fat_library $static_archive_name $library_name)
+                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                FRAMEWORK_CREATED=$(create_static_framework $library_name $static_archive_name $library_version)
+                if [[ ${FRAMEWORK_CREATED} -ne 0 ]]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-universal/${library_name}-universal/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+                $(cp $(get_external_library_license_path ${library}) ${BASEDIR}/prebuilt/ios-framework/${library_name}.framework/LICENSE 1>>${BASEDIR}/build.log 2>&1)
+                if [ $? -ne 0 ]; then
+                    echo -e "failed\n"
+                    exit 1
+                fi
+
+            fi
+
+        fi
+    done
+
+    # 2. FFMPEG
+    FFMPEG_UNIVERSAL=${BASEDIR}/prebuilt/ios-universal/ffmpeg-universal
+    mkdir -p ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    mkdir -p ${FFMPEG_UNIVERSAL}/lib 1>>${BASEDIR}/build.log 2>&1
+
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/ffmpeg/include/* ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/ffmpeg/include/config.h ${FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+
     for FFMPEG_LIB in ${FFMPEG_LIBS}
     do
         LIPO_COMMAND="${LIPO} -create"
@@ -739,7 +1206,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
             LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/ffmpeg/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
         done
 
-        LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
+        LIPO_COMMAND+=" -output ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION}"
 
         ${LIPO_COMMAND} 1>>${BASEDIR}/build.log 2>&1
 
@@ -748,199 +1215,12 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
             exit 1
         fi
 
-        echo -e "Created fat-binary ${FFMPEG_LIB} successfully.\n" 1>>${BASEDIR}/build.log 2>&1
-    done
-
-    # BUILDING MOBILE FFMPEG FAT BINARY
-    LIPO_COMMAND="${LIPO} -create"
-
-    for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
-    do
-        LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
-    done
-
-    LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
-
-    ${LIPO_COMMAND} 1>>${BASEDIR}/build.log 2>&1
-
-    if [ $? -ne 0 ]; then
-        echo -e "failed\n"
-        exit 1
-    fi
-
-    for library in {0..40}
-    do
-        if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
-
-            library_name=$(get_library_name $((library)))
-
-            echo -e "Creating fat library for ${library_name}\n" 1>>${BASEDIR}/build.log 2>&1
-
-            if [[ ${LIBRARY_LIBICONV} == $library ]]; then
-
-                LIBRARY_CREATED=$(create_static_fat_library "libiconv.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libcharset.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-            elif [[ ${LIBRARY_LIBTHEORA} == $library ]]; then
-
-                LIBRARY_CREATED=$(create_static_fat_library "libtheora.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libtheoraenc.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libtheoradec.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-            elif [[ ${LIBRARY_LIBVORBIS} == $library ]]; then
-
-                LIBRARY_CREATED=$(create_static_fat_library "libvorbisfile.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libvorbisenc.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libvorbis.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-            elif [[ ${LIBRARY_LIBWEBP} == $library ]]; then
-
-                LIBRARY_CREATED=$(create_static_fat_library "libwebpdecoder.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libwebpdemux.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libwebp.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-            elif [[ ${LIBRARY_OPENCOREAMR} == $library ]]; then
-
-                LIBRARY_CREATED=$(create_static_fat_library "libopencore-amrwb.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libopencore-amrnb.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-            elif [[ ${LIBRARY_NETTLE} == $library ]]; then
-
-                LIBRARY_CREATED=$(create_static_fat_library "libnettle.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-                LIBRARY_CREATED=$(create_static_fat_library "libhogweed.a")
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-
-            else
-                static_archive_name=$(get_static_archive_name $((library)))
-                LIBRARY_CREATED=$(create_static_fat_library $static_archive_name)
-                if [[ ${LIBRARY_CREATED} -ne 0 ]]; then
-                    echo -e "failed\n"
-                    exit 1
-                fi
-            fi
-
-        fi
-    done
-
-    # COPYING HEADERS
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
-    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
-
-    # COPYING THE LICENSE
-    if  [ ${GPL_ENABLED} == "yes" ]; then
-        cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
-    else
-        cp ${BASEDIR}/LICENSE.LGPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
-    fi
-
-    echo -e "Created fat-binary mobileffmpeg successfully.\n" 1>>${BASEDIR}/build.log 2>&1
-
-    echo -e "ok\n"
-
-    # BUILDING MOBILE FFMPEG FRAMEWORK
-    echo -e -n "\nCreating mobileffmpeg.framework under prebuilt/ios-framework: "
-
-    MOBILE_FFMPEG_VERSION=$(get_mobile_ffmpeg_version)
-
-    FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-framework/mobileffmpeg.framework
-
-    rm -rf ${FRAMEWORK_PATH} 1>>${BASEDIR}/build.log 2>&1
-    mkdir -p ${FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
-
-    cp -r ${MOBILE_FFMPEG_UNIVERSAL}/include/* ${FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
-    cp ${MOBILE_FFMPEG_UNIVERSAL}/include/config.h ${FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
-    cp ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION} ${FRAMEWORK_PATH}/mobileffmpeg 1>>${BASEDIR}/build.log 2>&1
-
-    # COPYING THE LICENSE
-    if  [ ${GPL_ENABLED} == "yes" ]; then
-
-        # GPLv3.0
-        cp ${BASEDIR}/LICENSE.GPLv3 ${FRAMEWORK_PATH}/LICENSE 1>>${BASEDIR}/build.log 2>&1
-    else
-
-        # LGPLv3.0
-        cp ${BASEDIR}/LICENSE.LGPLv3 ${FRAMEWORK_PATH}/LICENSE 1>>${BASEDIR}/build.log 2>&1
-    fi
-
-    build_info_plist "${FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
-
-    # BUILDING SUB FRAMEWORKS
-
-    for FFMPEG_LIB in ${FFMPEG_LIBS}
-    do
         FFMPEG_LIB_UPPERCASE=$(echo ${FFMPEG_LIB} | tr '[a-z]' '[A-Z]')
+        FFMPEG_LIB_CAPITALCASE=$(to_capital_case ${FFMPEG_LIB})
 
-        FFMPEG_LIB_MAJOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR" ${MOBILE_FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR//g;s/\ //g")
-        FFMPEG_LIB_MINOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR" ${MOBILE_FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR//g;s/\ //g")
-        FFMPEG_LIB_MICRO=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO" ${MOBILE_FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/version.h | sed "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO//g;s/\ //g")
+        FFMPEG_LIB_MAJOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR" ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MAJOR//g;s/\ //g")
+        FFMPEG_LIB_MINOR=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR" ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/version.h | sed -e "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MINOR//g;s/\ //g")
+        FFMPEG_LIB_MICRO=$(grep "#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO" ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/version.h | sed "s/#define ${FFMPEG_LIB_UPPERCASE}_VERSION_MICRO//g;s/\ //g")
 
         FFMPEG_LIB_VERSION="${FFMPEG_LIB_MAJOR}.${FFMPEG_LIB_MINOR}.${FFMPEG_LIB_MICRO}"
 
@@ -949,8 +1229,8 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         rm -rf ${FFMPEG_LIB_FRAMEWORK_PATH} 1>>${BASEDIR}/build.log 2>&1
         mkdir -p ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
 
-        cp -r ${MOBILE_FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/* ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
-        cp ${MOBILE_FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION} ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB} 1>>${BASEDIR}/build.log 2>&1
+        cp -r ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/* ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
+        cp ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION} ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB} 1>>${BASEDIR}/build.log 2>&1
 
         # COPYING THE LICENSE
         if  [ ${GPL_ENABLED} == "yes" ]; then
@@ -963,9 +1243,55 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
             cp ${BASEDIR}/LICENSE.LGPLv3 ${FFMPEG_LIB_FRAMEWORK_PATH}/LICENSE 1>>${BASEDIR}/build.log 2>&1
         fi
 
-        build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.mobileffmpeg.FFmpeg${FFMPEG_LIB}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
+        build_info_plist "${FFMPEG_LIB_FRAMEWORK_PATH}/Info.plist" "${FFMPEG_LIB}" "com.arthenica.mobileffmpeg.${FFMPEG_LIB_CAPITALCASE}" "${FFMPEG_LIB_VERSION}" "${FFMPEG_LIB_VERSION}"
 
+        echo -e "Created ${FFMPEG_LIB} framework successfully.\n" 1>>${BASEDIR}/build.log 2>&1
     done
+
+    # COPYING THE LICENSE
+    if  [ ${GPL_ENABLED} == "yes" ]; then
+        cp ${BASEDIR}/LICENSE.GPLv3 ${FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
+    else
+        cp ${BASEDIR}/LICENSE.LGPLv3 ${FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
+    fi
+
+    # 3. MOBILE FFMPEG
+    MOBILE_FFMPEG_VERSION=$(get_mobile_ffmpeg_version)
+    MOBILE_FFMPEG_UNIVERSAL=${BASEDIR}/prebuilt/ios-universal/mobile-ffmpeg-universal
+    MOBILE_FFMPEG_FRAMEWORK_PATH=${BASEDIR}/prebuilt/ios-framework/mobileffmpeg.framework
+    mkdir -p ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    mkdir -p ${MOBILE_FFMPEG_UNIVERSAL}/lib 1>>${BASEDIR}/build.log 2>&1
+    rm -rf ${MOBILE_FFMPEG_FRAMEWORK_PATH} 1>>${BASEDIR}/build.log 2>&1
+    mkdir -p ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
+
+    LIPO_COMMAND="${LIPO} -create"
+    for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
+    do
+        LIPO_COMMAND+=" ${BASEDIR}/prebuilt/ios-${TARGET_ARCH}-ios-darwin/mobile-ffmpeg/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
+    done
+    LIPO_COMMAND+=" -output ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION}"
+
+    ${LIPO_COMMAND} 1>>${BASEDIR}/build.log 2>&1
+
+    if [ $? -ne 0 ]; then
+        echo -e "failed\n"
+        exit 1
+    fi
+
+    cp -r ${BASEDIR}/prebuilt/ios-${TARGET_ARCH_LIST[0]}-ios-darwin/mobile-ffmpeg/include/* ${MOBILE_FFMPEG_UNIVERSAL}/include 1>>${BASEDIR}/build.log 2>&1
+    cp -r ${MOBILE_FFMPEG_UNIVERSAL}/include/* ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
+    cp ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_FRAMEWORK_PATH}/mobileffmpeg 1>>${BASEDIR}/build.log 2>&1
+
+    # COPYING THE LICENSE
+    if  [ ${GPL_ENABLED} == "yes" ]; then
+        cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
+        cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_FRAMEWORK_PATH}/LICENSE 1>>${BASEDIR}/build.log 2>&1
+    else
+        cp ${BASEDIR}/LICENSE.LGPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
+        cp ${BASEDIR}/LICENSE.LGPLv3 ${MOBILE_FFMPEG_FRAMEWORK_PATH}/LICENSE 1>>${BASEDIR}/build.log 2>&1
+    fi
+
+    build_info_plist "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
 
     echo -e "Created mobile-ffmpeg.framework successfully.\n" 1>>${BASEDIR}/build.log 2>&1
 
