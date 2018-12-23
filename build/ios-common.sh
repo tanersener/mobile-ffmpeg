@@ -240,7 +240,7 @@ get_size_optimization_asm_cflags() {
         jpeg | ffmpeg)
             case ${ARCH} in
                 armv7 | armv7s | arm64 | arm64e)
-                    ARCH_OPTIMIZATION="-flto -Oz"
+                    ARCH_OPTIMIZATION="-Oz"
                 ;;
                 i386 | x86-64)
                     ARCH_OPTIMIZATION="-O2"

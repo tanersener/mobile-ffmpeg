@@ -520,9 +520,9 @@ build_info_plist() {
 	<string>????</string>
 	<key>MinimumOSVersion</key>
 	<string>${IOS_MIN_VERSION}</string>
-    <key>CFBundleSupportedPlatforms</key>
-    <array>
-        <string>iPhoneOS</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
 	</array>
 	<key>NSPrincipalClass</key>
 	<string></string>
