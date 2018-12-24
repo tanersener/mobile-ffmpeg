@@ -67,8 +67,8 @@ export BASEDIR=$(pwd)
 
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
-# //@TEST THIS AND INCREASE IF NECESSARY
-export IOS_MIN_VERSION=12.1
+# USE SDK VERSION AS IOS_MIN_VERSION
+export IOS_MIN_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
