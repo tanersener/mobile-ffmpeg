@@ -641,7 +641,7 @@ SDL_GetNumVideoDisplays(void)
     return _this->num_displays;
 }
 
-static int
+int
 SDL_GetIndexOfDisplay(SDL_VideoDisplay *display)
 {
     int displayIndex;
@@ -737,6 +737,17 @@ SDL_GetDisplayDPI(int displayIndex, float * ddpi, float * hdpi, float * vdpi)
     }
 
     return -1;
+}
+
+SDL_DisplayOrientation
+SDL_GetDisplayOrientation(int displayIndex)
+{
+    SDL_VideoDisplay *display;
+
+    CHECK_DISPLAY_INDEX(displayIndex, SDL_ORIENTATION_UNKNOWN);
+
+    display = &_this->displays[displayIndex];
+    return display->orientation;
 }
 
 SDL_bool
@@ -1000,13 +1011,21 @@ SDL_SetDisplayModeForDisplay(SDL_VideoDisplay * display, const SDL_DisplayMode *
 
     /* Actually change the display mode */
     if (!_this->SetDisplayMode) {
-        return SDL_SetError("Video driver doesn't support changing display mode");
+        return SDL_SetError("SDL video driver doesn't support changing display mode");
     }
     if (_this->SetDisplayMode(_this, display, &display_mode) < 0) {
         return -1;
     }
     display->current_mode = display_mode;
     return 0;
+}
+
+SDL_VideoDisplay *
+SDL_GetDisplay(int displayIndex)
+{
+    CHECK_DISPLAY_INDEX(displayIndex, NULL);
+
+    return &_this->displays[displayIndex];
 }
 
 int
@@ -1289,8 +1308,15 @@ SDL_UpdateFullscreenMode(SDL_Window * window, SDL_bool fullscreen)
 
                 /* Generate a mode change event here */
                 if (resized) {
+#ifndef ANDROID
+                    // Android may not resize the window to exactly what our fullscreen mode is, especially on
+                    // windowed Android environments like the Chromebook or Samsung DeX.  Given this, we shouldn't
+                    // use fullscreen_mode.w and fullscreen_mode.h, but rather get our current native size.  As such,
+                    // Android's SetWindowFullscreen will generate the window event for us with the proper final size.
+
                     SDL_SendWindowEvent(other, SDL_WINDOWEVENT_RESIZED,
                                         fullscreen_mode.w, fullscreen_mode.h);
+#endif
                 } else {
                     SDL_OnWindowResized(other);
                 }
@@ -1322,11 +1348,45 @@ SDL_UpdateFullscreenMode(SDL_Window * window, SDL_bool fullscreen)
 }
 
 #define CREATE_FLAGS \
-    (SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_SKIP_TASKBAR | SDL_WINDOW_POPUP_MENU | SDL_WINDOW_UTILITY | SDL_WINDOW_TOOLTIP | SDL_WINDOW_VULKAN)
+    (SDL_WINDOW_OPENGL | SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_ALWAYS_ON_TOP | SDL_WINDOW_SKIP_TASKBAR | SDL_WINDOW_POPUP_MENU | SDL_WINDOW_UTILITY | SDL_WINDOW_TOOLTIP | SDL_WINDOW_VULKAN | SDL_WINDOW_MINIMIZED)
+
+static SDL_INLINE SDL_bool
+IsAcceptingDragAndDrop(void)
+{
+    if ((SDL_GetEventState(SDL_DROPFILE) == SDL_ENABLE) ||
+        (SDL_GetEventState(SDL_DROPTEXT) == SDL_ENABLE)) {
+        return SDL_TRUE;
+    }
+    return SDL_FALSE;
+}
+
+/* prepare a newly-created window */
+static SDL_INLINE void
+PrepareDragAndDropSupport(SDL_Window *window)
+{
+    if (_this->AcceptDragAndDrop) {
+        _this->AcceptDragAndDrop(window, IsAcceptingDragAndDrop());
+    }
+}
+
+/* toggle d'n'd for all existing windows. */
+void
+SDL_ToggleDragAndDropSupport(void)
+{
+    if (_this && _this->AcceptDragAndDrop) {
+        const SDL_bool enable = IsAcceptingDragAndDrop();
+        SDL_Window *window;
+        for (window = _this->windows; window; window = window->next) {
+            _this->AcceptDragAndDrop(window, enable);
+        }
+    }
+}
 
 static void
 SDL_FinishWindowCreation(SDL_Window *window, Uint32 flags)
 {
+    PrepareDragAndDropSupport(window);
+
     if (flags & SDL_WINDOW_MAXIMIZED) {
         SDL_MaximizeWindow(window);
     }
@@ -1383,7 +1443,9 @@ SDL_CreateWindow(const char *title, int x, int y, int w, int h, Uint32 flags)
 #endif
     if (flags & SDL_WINDOW_OPENGL) {
         if (!_this->GL_CreateContext) {
-            SDL_SetError("No OpenGL support in video driver");
+            SDL_SetError("OpenGL support is either not configured in SDL "
+                         "or not available in current SDL video driver "
+                         "(%s) or platform", _this->name);
             return NULL;
         }
         if (SDL_GL_LoadLibrary(NULL) < 0) {
@@ -1394,7 +1456,8 @@ SDL_CreateWindow(const char *title, int x, int y, int w, int h, Uint32 flags)
     if (flags & SDL_WINDOW_VULKAN) {
         if (!_this->Vulkan_CreateSurface) {
             SDL_SetError("Vulkan support is either not configured in SDL "
-                         "or not available in video driver");
+                         "or not available in current SDL video driver "
+                         "(%s) or platform", _this->name);
             return NULL;
         }
         if (flags & SDL_WINDOW_OPENGL) {
@@ -1477,6 +1540,15 @@ SDL_CreateWindow(const char *title, int x, int y, int w, int h, Uint32 flags)
         return NULL;
     }
 
+    /* Clear minimized if not on windows, only windows handles it at create rather than FinishWindowCreation,
+     * but it's important or window focus will get broken on windows!
+     */
+#if !defined(__WIN32__)
+    if (window->flags & SDL_WINDOW_MINIMIZED) {
+        window->flags &= ~SDL_WINDOW_MINIMIZED;
+    }
+#endif
+
 #if __WINRT__ && (NTDDI_VERSION < NTDDI_WIN10)
     /* HACK: WinRT 8.x apps can't choose whether or not they are fullscreen
        or not.  The user can choose this, via OS-provided UI, but this can't
@@ -1535,6 +1607,9 @@ SDL_CreateWindowFrom(const void *data)
         SDL_DestroyWindow(window);
         return NULL;
     }
+
+    PrepareDragAndDropSupport(window);
+
     return window;
 }
 
@@ -1544,7 +1619,9 @@ SDL_RecreateWindow(SDL_Window * window, Uint32 flags)
     SDL_bool loaded_opengl = SDL_FALSE;
 
     if ((flags & SDL_WINDOW_OPENGL) && !_this->GL_CreateContext) {
-        return SDL_SetError("No OpenGL support in video driver");
+        return SDL_SetError("OpenGL support is either not configured in SDL "
+                            "or not available in current SDL video driver "
+                            "(%s) or platform", _this->name);
     }
 
     if (window->flags & SDL_WINDOW_FOREIGN) {
@@ -2787,7 +2864,7 @@ SDL_GL_LoadLibrary(const char *path)
         retval = 0;
     } else {
         if (!_this->GL_LoadLibrary) {
-            return SDL_SetError("No dynamic GL support in video driver");
+            return SDL_SetError("No dynamic GL support in current SDL video driver (%s)", _this->name);
         }
         retval = _this->GL_LoadLibrary(_this, path);
     }
@@ -2818,7 +2895,7 @@ SDL_GL_GetProcAddress(const char *proc)
             SDL_SetError("No GL driver has been loaded");
         }
     } else {
-        SDL_SetError("No dynamic GL support in video driver");
+        SDL_SetError("No dynamic GL support in current SDL video driver (%s)", _this->name);
     }
     return func;
 }
@@ -3774,6 +3851,8 @@ SDL_ShowMessageBox(const SDL_MessageBoxData *messageboxdata, int *buttonid)
 
     if (!messageboxdata) {
         return SDL_InvalidParamError("messageboxdata");
+    } else if (messageboxdata->numbuttons < 0) {
+        return SDL_SetError("Invalid number of buttons");
     }
 
     current_window = SDL_GetKeyboardFocus();
@@ -3983,7 +4062,9 @@ int SDL_Vulkan_LoadLibrary(const char *path)
         retval = 0;
     } else {
         if (!_this->Vulkan_LoadLibrary) {
-            return SDL_SetError("No Vulkan support in video driver");
+            return SDL_SetError("Vulkan support is either not configured in SDL "
+                                "or not available in current SDL video driver "
+                                "(%s) or platform", _this->name);
         }
         retval = _this->Vulkan_LoadLibrary(_this, path);
     }
@@ -4024,11 +4105,14 @@ void SDL_Vulkan_UnloadLibrary(void)
 
 SDL_bool SDL_Vulkan_GetInstanceExtensions(SDL_Window *window, unsigned *count, const char **names)
 {
-    CHECK_WINDOW_MAGIC(window, SDL_FALSE);
+    if (window) {
+        CHECK_WINDOW_MAGIC(window, SDL_FALSE);
 
-    if (!(window->flags & SDL_WINDOW_VULKAN)) {
-        SDL_SetError(NOT_A_VULKAN_WINDOW);
-        return SDL_FALSE;
+        if (!(window->flags & SDL_WINDOW_VULKAN))
+        {
+            SDL_SetError(NOT_A_VULKAN_WINDOW);
+            return SDL_FALSE;
+        }
     }
 
     if (!count) {

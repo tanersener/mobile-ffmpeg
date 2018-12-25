@@ -22,6 +22,7 @@
 #include "SDL_config.h"
 #else
 #include "../SDL_internal.h"
+#include "SDL_simd.h"
 #endif
 
 #if defined(__WIN32__)
@@ -38,6 +39,7 @@
 /* CPU feature detection for SDL */
 
 #include "SDL_cpuinfo.h"
+#include "SDL_assert.h"
 
 #ifdef HAVE_SYSCONF
 #include <unistd.h>
@@ -76,18 +78,19 @@
 #endif
 #endif
 
-#define CPU_HAS_RDTSC   0x00000001
-#define CPU_HAS_ALTIVEC 0x00000002
-#define CPU_HAS_MMX     0x00000004
-#define CPU_HAS_3DNOW   0x00000008
-#define CPU_HAS_SSE     0x00000010
-#define CPU_HAS_SSE2    0x00000020
-#define CPU_HAS_SSE3    0x00000040
-#define CPU_HAS_SSE41   0x00000100
-#define CPU_HAS_SSE42   0x00000200
-#define CPU_HAS_AVX     0x00000400
-#define CPU_HAS_AVX2    0x00000800
-#define CPU_HAS_NEON    0x00001000
+#define CPU_HAS_RDTSC   (1 << 0)
+#define CPU_HAS_ALTIVEC (1 << 1)
+#define CPU_HAS_MMX     (1 << 2)
+#define CPU_HAS_3DNOW   (1 << 3)
+#define CPU_HAS_SSE     (1 << 4)
+#define CPU_HAS_SSE2    (1 << 5)
+#define CPU_HAS_SSE3    (1 << 6)
+#define CPU_HAS_SSE41   (1 << 7)
+#define CPU_HAS_SSE42   (1 << 8)
+#define CPU_HAS_AVX     (1 << 9)
+#define CPU_HAS_AVX2    (1 << 10)
+#define CPU_HAS_NEON    (1 << 11)
+#define CPU_HAS_AVX512F (1 << 12)
 
 #if SDL_ALTIVEC_BLITTERS && HAVE_SETJMP && !__MACOSX__ && !__OpenBSD__
 /* This is the brute force way of detecting instruction sets...
@@ -246,6 +249,7 @@ done:
 static int CPU_CPUIDFeatures[4];
 static int CPU_CPUIDMaxFunction = 0;
 static SDL_bool CPU_OSSavesYMM = SDL_FALSE;
+static SDL_bool CPU_OSSavesZMM = SDL_FALSE;
 
 static void
 CPU_calcCPUIDFeatures(void)
@@ -266,7 +270,7 @@ CPU_calcCPUIDFeatures(void)
 
                 /* Check to make sure we can call xgetbv */
                 if (c & 0x08000000) {
-                    /* Call xgetbv to see if YMM register state is saved */
+                    /* Call xgetbv to see if YMM (etc) register state is saved */
 #if defined(__GNUC__) && (defined(i386) || defined(__x86_64__))
                     __asm__(".byte 0x0f, 0x01, 0xd0" : "=a" (a) : "c" (0) : "%edx");
 #elif defined(_MSC_VER) && (defined(_M_IX86) || defined(_M_X64)) && (_MSC_FULL_VER >= 160040219) /* VS2010 SP1 */
@@ -280,6 +284,7 @@ CPU_calcCPUIDFeatures(void)
                     }
 #endif
                     CPU_OSSavesYMM = ((a & 6) == 6) ? SDL_TRUE : SDL_FALSE;
+                    CPU_OSSavesZMM = (CPU_OSSavesYMM && ((a & 0xe0) == 0xe0)) ? SDL_TRUE : SDL_FALSE;
                 }
             }
         }
@@ -396,6 +401,18 @@ CPU_haveAVX2(void)
         (void) a; (void) b; (void) c; (void) d;  /* compiler warnings... */
         cpuid(7, a, b, c, d);
         return (b & 0x00000020);
+    }
+    return 0;
+}
+
+static int
+CPU_haveAVX512F(void)
+{
+    if (CPU_OSSavesZMM && (CPU_CPUIDMaxFunction >= 7)) {
+        int a, b, c, d;
+        (void) a; (void) b; (void) c; (void) d;  /* compiler warnings... */
+        cpuid(7, a, b, c, d);
+        return (b & 0x00010000);
     }
     return 0;
 }
@@ -571,6 +588,7 @@ SDL_GetCPUCacheLineSize(void)
 }
 
 static Uint32 SDL_CPUFeatures = 0xFFFFFFFF;
+static Uint32 SDL_SIMDAlignment = 0xFFFFFFFF;
 
 static Uint32
 SDL_GetCPUFeatures(void)
@@ -578,41 +596,57 @@ SDL_GetCPUFeatures(void)
     if (SDL_CPUFeatures == 0xFFFFFFFF) {
         CPU_calcCPUIDFeatures();
         SDL_CPUFeatures = 0;
+        SDL_SIMDAlignment = 4;  /* a good safe base value */
         if (CPU_haveRDTSC()) {
             SDL_CPUFeatures |= CPU_HAS_RDTSC;
         }
         if (CPU_haveAltiVec()) {
             SDL_CPUFeatures |= CPU_HAS_ALTIVEC;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveMMX()) {
             SDL_CPUFeatures |= CPU_HAS_MMX;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 8);
         }
         if (CPU_have3DNow()) {
             SDL_CPUFeatures |= CPU_HAS_3DNOW;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 8);
         }
         if (CPU_haveSSE()) {
             SDL_CPUFeatures |= CPU_HAS_SSE;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveSSE2()) {
             SDL_CPUFeatures |= CPU_HAS_SSE2;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveSSE3()) {
             SDL_CPUFeatures |= CPU_HAS_SSE3;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveSSE41()) {
             SDL_CPUFeatures |= CPU_HAS_SSE41;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveSSE42()) {
             SDL_CPUFeatures |= CPU_HAS_SSE42;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
         if (CPU_haveAVX()) {
             SDL_CPUFeatures |= CPU_HAS_AVX;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 32);
         }
         if (CPU_haveAVX2()) {
             SDL_CPUFeatures |= CPU_HAS_AVX2;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 32);
+        }
+        if (CPU_haveAVX512F()) {
+            SDL_CPUFeatures |= CPU_HAS_AVX512F;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 64);
         }
         if (CPU_haveNEON()) {
             SDL_CPUFeatures |= CPU_HAS_NEON;
+            SDL_SIMDAlignment = SDL_max(SDL_SIMDAlignment, 16);
         }
     }
     return SDL_CPUFeatures;
@@ -686,6 +720,12 @@ SDL_HasAVX2(void)
 }
 
 SDL_bool
+SDL_HasAVX512F(void)
+{
+    return CPU_FEATURE_AVAILABLE(CPU_HAS_AVX512F);
+}
+
+SDL_bool
 SDL_HasNEON(void)
 {
     return CPU_FEATURE_AVAILABLE(CPU_HAS_NEON);
@@ -745,6 +785,44 @@ SDL_GetSystemRAM(void)
 }
 
 
+size_t
+SDL_SIMDGetAlignment(void)
+{
+    if (SDL_SIMDAlignment == 0xFFFFFFFF) {
+        SDL_GetCPUFeatures();  /* make sure this has been calculated */
+    }
+    SDL_assert(SDL_SIMDAlignment != 0);
+    return SDL_SIMDAlignment;
+}
+
+void *
+SDL_SIMDAlloc(const size_t len)
+{
+    const size_t alignment = SDL_SIMDGetAlignment();
+    const size_t padding = alignment - (len % alignment);
+    const size_t padded = (padding != alignment) ? (len + padding) : len;
+    Uint8 *retval = NULL;
+    Uint8 *ptr = (Uint8 *) SDL_malloc(padded + alignment + sizeof (void *));
+    if (ptr) {
+        /* store the actual malloc pointer right before our aligned pointer. */
+        retval = ptr + sizeof (void *);
+        retval += alignment - (((size_t) retval) % alignment);
+        *(((void **) retval) - 1) = ptr;
+    }
+    return retval;
+}
+
+void
+SDL_SIMDFree(void *ptr)
+{
+    if (ptr) {
+        void **realptr = (void **) ptr;
+        realptr--;
+        SDL_free(*(((void **) ptr) - 1));
+    }
+}
+
+
 #ifdef TEST_MAIN
 
 #include <stdio.h>
@@ -767,6 +845,7 @@ main()
     printf("SSE4.2: %d\n", SDL_HasSSE42());
     printf("AVX: %d\n", SDL_HasAVX());
     printf("AVX2: %d\n", SDL_HasAVX2());
+    printf("AVX-512F: %d\n", SDL_HasAVX512F());
     printf("NEON: %d\n", SDL_HasNEON());
     printf("RAM: %d MB\n", SDL_GetSystemRAM());
     return 0;

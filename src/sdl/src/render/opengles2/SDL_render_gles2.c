@@ -553,18 +553,6 @@ static void GLES2_UnlockTexture(SDL_Renderer *renderer, SDL_Texture *texture);
 static int GLES2_SetRenderTarget(SDL_Renderer * renderer, SDL_Texture * texture);
 static void GLES2_DestroyTexture(SDL_Renderer *renderer, SDL_Texture *texture);
 
-static GLenum
-GetScaleQuality(void)
-{
-    const char *hint = SDL_GetHint(SDL_HINT_RENDER_SCALE_QUALITY);
-
-    if (!hint || *hint == '0' || SDL_strcasecmp(hint, "nearest") == 0) {
-        return GL_NEAREST;
-    } else {
-        return GL_LINEAR;
-    }
-}
-
 static int
 GLES2_CreateTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 {
@@ -625,7 +613,7 @@ GLES2_CreateTexture(SDL_Renderer *renderer, SDL_Texture *texture)
     data->nv12 = ((texture->format == SDL_PIXELFORMAT_NV12) || (texture->format == SDL_PIXELFORMAT_NV21));
     data->texture_u = 0;
     data->texture_v = 0;
-    scaleMode = GetScaleQuality();
+    scaleMode = (texture->scaleMode == SDL_ScaleModeNearest) ? GL_NEAREST : GL_LINEAR;
 
     /* Allocate a blob for image renderdata */
     if (texture->access == SDL_TEXTUREACCESS_STREAMING) {
@@ -730,6 +718,10 @@ GLES2_TexSubImage2D(GLES2_DriverContext *data, GLenum target, GLint xoffset, GLi
     Uint8 *src;
     int src_pitch;
     int y;
+
+    if ((width == 0) || (height == 0) || (bpp == 0)) {
+        return 0;  /* nothing to do */
+    }
 
     /* Reformat the texture data into a tightly packed array */
     src_pitch = width * bpp;
@@ -1542,7 +1534,7 @@ GLES2_UpdateVertexBuffer(SDL_Renderer *renderer, GLES2_Attribute attr,
     GLES2_DriverContext *data = (GLES2_DriverContext *)renderer->driverdata;
 
 #if !SDL_GLES2_USE_VBOS
-    data->glVertexAttribPointer(attr, attr == GLES2_ATTRIBUTE_ANGLE ? 1 : 2, GL_FLOAT, GL_FALSE, 0, vertexData);
+    data->glVertexAttribPointer(attr, 2, GL_FLOAT, GL_FALSE, 0, vertexData);
 #else
     if (!data->vertex_buffers[attr]) {
         data->glGenBuffers(1, &data->vertex_buffers[attr]);
@@ -1557,7 +1549,7 @@ GLES2_UpdateVertexBuffer(SDL_Renderer *renderer, GLES2_Attribute attr,
         data->glBufferSubData(GL_ARRAY_BUFFER, 0, dataSizeInBytes, vertexData);
     }
 
-    data->glVertexAttribPointer(attr, attr == GLES2_ATTRIBUTE_ANGLE ? 1 : 2, GL_FLOAT, GL_FALSE, 0, 0);
+    data->glVertexAttribPointer(attr, 2, GL_FLOAT, GL_FALSE, 0, 0);
 #endif
 
     return 0;
@@ -1873,8 +1865,9 @@ GLES2_RenderCopyEx(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect 
     GLfloat vertices[8];
     GLfloat texCoords[8];
     GLfloat translate[8];
-    GLfloat fAngle[4];
+    GLfloat fAngle[8];
     GLfloat tmp;
+    float radian_angle;
 
     GLES2_ActivateRenderer(renderer);
 
@@ -1884,7 +1877,11 @@ GLES2_RenderCopyEx(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect 
 
     data->glEnableVertexAttribArray(GLES2_ATTRIBUTE_CENTER);
     data->glEnableVertexAttribArray(GLES2_ATTRIBUTE_ANGLE);
-    fAngle[0] = fAngle[1] = fAngle[2] = fAngle[3] = (GLfloat)(360.0f - angle);
+
+    radian_angle = (float)(M_PI * (360.0 - angle) / 180.0);
+    fAngle[0] = fAngle[2] = fAngle[4] = fAngle[6] = (GLfloat)SDL_sin(radian_angle);
+    /* render expects cos value - 1 (see GLES2_VertexSrc_Default_) */
+    fAngle[1] = fAngle[3] = fAngle[5] = fAngle[7] = (GLfloat)SDL_cos(radian_angle) - 1.0f;
     /* Calculate the center of rotation */
     translate[0] = translate[2] = translate[4] = translate[6] = (center->x + dstrect->x);
     translate[1] = translate[3] = translate[5] = translate[7] = (center->y + dstrect->y);
@@ -1913,7 +1910,7 @@ GLES2_RenderCopyEx(SDL_Renderer *renderer, SDL_Texture *texture, const SDL_Rect 
     data->glVertexAttribPointer(GLES2_ATTRIBUTE_CENTER, 2, GL_FLOAT, GL_FALSE, 0, translate);
     data->glVertexAttribPointer(GLES2_ATTRIBUTE_POSITION, 2, GL_FLOAT, GL_FALSE, 0, vertices);*/
 
-    GLES2_UpdateVertexBuffer(renderer, GLES2_ATTRIBUTE_ANGLE, fAngle, 4 * sizeof(GLfloat));
+    GLES2_UpdateVertexBuffer(renderer, GLES2_ATTRIBUTE_ANGLE, fAngle, 8 * sizeof(GLfloat));
     GLES2_UpdateVertexBuffer(renderer, GLES2_ATTRIBUTE_CENTER, translate, 8 * sizeof(GLfloat));
     GLES2_UpdateVertexBuffer(renderer, GLES2_ATTRIBUTE_POSITION, vertices, 8 * sizeof(GLfloat));
 
@@ -1940,6 +1937,7 @@ GLES2_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
 {
     GLES2_DriverContext *data = (GLES2_DriverContext *)renderer->driverdata;
     Uint32 temp_format = renderer->target ? renderer->target->format : SDL_PIXELFORMAT_ABGR8888;
+    size_t buflen;
     void *temp_pixels;
     int temp_pitch;
     Uint8 *src, *dst, *tmp;
@@ -1949,7 +1947,12 @@ GLES2_RenderReadPixels(SDL_Renderer * renderer, const SDL_Rect * rect,
     GLES2_ActivateRenderer(renderer);
 
     temp_pitch = rect->w * SDL_BYTESPERPIXEL(temp_format);
-    temp_pixels = SDL_malloc(rect->h * temp_pitch);
+    buflen = (size_t) (rect->h * temp_pitch);
+    if (buflen == 0) {
+        return 0;  /* nothing to do. */
+    }
+
+    temp_pixels = SDL_malloc(buflen);
     if (!temp_pixels) {
         return SDL_OutOfMemory();
     }

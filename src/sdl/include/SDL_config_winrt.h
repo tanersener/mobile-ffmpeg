@@ -97,6 +97,11 @@ typedef unsigned int uintptr_t;
 #if WINAPI_FAMILY != WINAPI_FAMILY_PHONE_APP
 #define HAVE_XINPUT_H 1
 #endif
+
+#define HAVE_MMDEVICEAPI_H 1
+#define HAVE_AUDIOCLIENT_H 1
+#define HAVE_ENDPOINTVOLUME_H 1
+
 #define HAVE_LIBC 1
 #define STDC_HEADERS 1
 #define HAVE_CTYPE_H 1
@@ -155,6 +160,8 @@ typedef unsigned int uintptr_t;
 #define HAVE__COPYSIGN 1
 #define HAVE_COS    1
 #define HAVE_COSF   1
+#define HAVE_EXP    1
+#define HAVE_EXPF   1
 #define HAVE_FABS   1
 #define HAVE_FABSF  1
 #define HAVE_FLOOR  1
@@ -189,6 +196,9 @@ typedef unsigned int uintptr_t;
 #define SDL_JOYSTICK_XINPUT 1
 #define SDL_HAPTIC_XINPUT   1
 #endif
+
+/* Enable the dummy sensor driver */
+#define SDL_SENSOR_DUMMY  1
 
 /* Enable various shared object loading systems */
 #define SDL_LOADSO_WINDOWS  1
