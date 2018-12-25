@@ -2070,15 +2070,15 @@ static int mxf_parse_physical_source_package(MXFContext *mxf, MXFTrack *source_t
                 continue;
             }
 
-        if (physical_track->edit_rate.num <= 0 ||
-            physical_track->edit_rate.den <= 0) {
-            av_log(mxf->fc, AV_LOG_WARNING,
-                   "Invalid edit rate (%d/%d) found on structural"
-                   " component #%d, defaulting to 25/1\n",
-                   physical_track->edit_rate.num,
-                   physical_track->edit_rate.den, i);
-            physical_track->edit_rate = (AVRational){25, 1};
-        }
+            if (physical_track->edit_rate.num <= 0 ||
+                physical_track->edit_rate.den <= 0) {
+                av_log(mxf->fc, AV_LOG_WARNING,
+                       "Invalid edit rate (%d/%d) found on structural"
+                       " component #%d, defaulting to 25/1\n",
+                       physical_track->edit_rate.num,
+                       physical_track->edit_rate.den, i);
+                physical_track->edit_rate = (AVRational){25, 1};
+            }
 
             for (k = 0; k < physical_track->sequence->structural_components_count; k++) {
                 if (!(mxf_tc = mxf_resolve_timecode_component(mxf, &physical_track->sequence->structural_components_refs[k])))
@@ -2432,6 +2432,18 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
                 default:
                     av_log(mxf->fc, AV_LOG_INFO, "Unknown frame layout type: %d\n", descriptor->frame_layout);
             }
+
+            if (st->codecpar->codec_id == AV_CODEC_ID_PRORES) {
+                switch (descriptor->essence_codec_ul[14]) {
+                case 1: st->codecpar->codec_tag = MKTAG('a','p','c','o'); break;
+                case 2: st->codecpar->codec_tag = MKTAG('a','p','c','s'); break;
+                case 3: st->codecpar->codec_tag = MKTAG('a','p','c','n'); break;
+                case 4: st->codecpar->codec_tag = MKTAG('a','p','c','h'); break;
+                case 5: st->codecpar->codec_tag = MKTAG('a','p','4','h'); break;
+                case 6: st->codecpar->codec_tag = MKTAG('a','p','4','x'); break;
+                }
+            }
+
             if (st->codecpar->codec_id == AV_CODEC_ID_RAWVIDEO) {
                 st->codecpar->format = descriptor->pix_fmt;
                 if (st->codecpar->format == AV_PIX_FMT_NONE) {
@@ -2544,23 +2556,24 @@ fail_and_free:
 static int64_t mxf_timestamp_to_int64(uint64_t timestamp)
 {
     struct tm time = { 0 };
+    int msecs;
     time.tm_year = (timestamp >> 48) - 1900;
     time.tm_mon  = (timestamp >> 40 & 0xFF) - 1;
     time.tm_mday = (timestamp >> 32 & 0xFF);
     time.tm_hour = (timestamp >> 24 & 0xFF);
     time.tm_min  = (timestamp >> 16 & 0xFF);
     time.tm_sec  = (timestamp >> 8  & 0xFF);
+    msecs        = (timestamp & 0xFF) * 4;
 
-    /* msvcrt versions of strftime calls the invalid parameter handler
-     * (aborting the process if one isn't set) if the parameters are out
-     * of range. */
+    /* Clip values for legacy reasons. Maybe we should return error instead? */
     time.tm_mon  = av_clip(time.tm_mon,  0, 11);
     time.tm_mday = av_clip(time.tm_mday, 1, 31);
     time.tm_hour = av_clip(time.tm_hour, 0, 23);
     time.tm_min  = av_clip(time.tm_min,  0, 59);
     time.tm_sec  = av_clip(time.tm_sec,  0, 59);
+    msecs        = av_clip(msecs, 0, 999);
 
-    return (int64_t)av_timegm(&time) * 1000000;
+    return (int64_t)av_timegm(&time) * 1000000 + msecs * 1000;
 }
 
 #define SET_STR_METADATA(pb, name, str) do { \
@@ -2578,7 +2591,7 @@ static int64_t mxf_timestamp_to_int64(uint64_t timestamp)
 
 #define SET_TS_METADATA(pb, name, var, str) do { \
     var = avio_rb64(pb); \
-    if ((ret = avpriv_dict_set_timestamp(&s->metadata, name, mxf_timestamp_to_int64(var)) < 0)) \
+    if (var && (ret = avpriv_dict_set_timestamp(&s->metadata, name, mxf_timestamp_to_int64(var))) < 0) \
         return ret; \
 } while (0)
 

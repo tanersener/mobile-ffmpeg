@@ -46,7 +46,7 @@
 enum DisplayMode  { COMBINED, SEPARATE, NB_MODES };
 enum DataMode     { D_MAGNITUDE, D_PHASE, NB_DMODES };
 enum DisplayScale { LINEAR, SQRT, CBRT, LOG, FOURTHRT, FIFTHRT, NB_SCALES };
-enum ColorMode    { CHANNEL, INTENSITY, RAINBOW, MORELAND, NEBULAE, FIRE, FIERY, FRUIT, COOL, MAGMA, GREEN, NB_CLMODES };
+enum ColorMode    { CHANNEL, INTENSITY, RAINBOW, MORELAND, NEBULAE, FIRE, FIERY, FRUIT, COOL, MAGMA, GREEN, VIRIDIS, PLASMA, CIVIDIS, TERRAIN, NB_CLMODES };
 enum SlideMode    { REPLACE, SCROLL, FULLFRAME, RSCROLL, NB_SLIDES };
 enum Orientation  { VERTICAL, HORIZONTAL, NB_ORIENTATIONS };
 
@@ -123,6 +123,10 @@ static const AVOption showspectrum_options[] = {
         { "cool",      "cool based coloring",             0, AV_OPT_TYPE_CONST, {.i64=COOL},      0, 0, FLAGS, "color" },
         { "magma",     "magma based coloring",            0, AV_OPT_TYPE_CONST, {.i64=MAGMA},     0, 0, FLAGS, "color" },
         { "green",     "green based coloring",            0, AV_OPT_TYPE_CONST, {.i64=GREEN},     0, 0, FLAGS, "color" },
+        { "viridis",   "viridis based coloring",          0, AV_OPT_TYPE_CONST, {.i64=VIRIDIS},   0, 0, FLAGS, "color" },
+        { "plasma",    "plasma based coloring",           0, AV_OPT_TYPE_CONST, {.i64=PLASMA},    0, 0, FLAGS, "color" },
+        { "cividis",   "cividis based coloring",          0, AV_OPT_TYPE_CONST, {.i64=CIVIDIS},   0, 0, FLAGS, "color" },
+        { "terrain",   "terrain based coloring",          0, AV_OPT_TYPE_CONST, {.i64=TERRAIN},   0, 0, FLAGS, "color" },
     { "scale", "set display scale", OFFSET(scale), AV_OPT_TYPE_INT, {.i64=SQRT}, LINEAR, NB_SCALES-1, FLAGS, "scale" },
         { "lin",  "linear",      0, AV_OPT_TYPE_CONST, {.i64=LINEAR}, 0, 0, FLAGS, "scale" },
         { "sqrt", "square root", 0, AV_OPT_TYPE_CONST, {.i64=SQRT},   0, 0, FLAGS, "scale" },
@@ -248,11 +252,42 @@ static const struct ColorTable {
     { 0.35,            85/256.,     (138-128)/256.,      (179-128)/256. },
     { 0.48,            96/256.,     (128-128)/256.,      (189-128)/256. },
     { 0.64,           128/256.,     (103-128)/256.,      (214-128)/256. },
-    { 0.78,           167/256.,      (85-128)/256.,      (174-128)/256. },
-    {    1,           205/256.,      (80-128)/256.,      (152-128)/256. }},
+    { 0.92,           205/256.,      (80-128)/256.,      (152-128)/256. },
+    {    1,                  1,                  0,                   0 }},
     [GREEN] = {
     {    0,                  0,                  0,                   0 },
     {  .75,                 .5,                  0,                 -.5 },
+    {    1,                  1,                  0,                   0 }},
+    [VIRIDIS] = {
+    {    0,                  0,                  0,                   0 },
+    { 0.10,          0x39/255.,   (0x9D -128)/255.,    (0x8F -128)/255. },
+    { 0.23,          0x5C/255.,   (0x9A -128)/255.,    (0x68 -128)/255. },
+    { 0.35,          0x69/255.,   (0x93 -128)/255.,    (0x57 -128)/255. },
+    { 0.48,          0x76/255.,   (0x88 -128)/255.,    (0x4B -128)/255. },
+    { 0.64,          0x8A/255.,   (0x72 -128)/255.,    (0x4F -128)/255. },
+    { 0.80,          0xA3/255.,   (0x50 -128)/255.,    (0x66 -128)/255. },
+    {    1,          0xCC/255.,   (0x2F -128)/255.,    (0x87 -128)/255. }},
+    [PLASMA] = {
+    {    0,                  0,                  0,                   0 },
+    { 0.10,          0x27/255.,   (0xC2 -128)/255.,    (0x82 -128)/255. },
+    { 0.58,          0x5B/255.,   (0x9A -128)/255.,    (0xAE -128)/255. },
+    { 0.70,          0x89/255.,   (0x44 -128)/255.,    (0xAB -128)/255. },
+    { 0.80,          0xB4/255.,   (0x2B -128)/255.,    (0x9E -128)/255. },
+    { 0.91,          0xD2/255.,   (0x38 -128)/255.,    (0x92 -128)/255. },
+    {    1,                  1,                  0,                  0. }},
+    [CIVIDIS] = {
+    {    0,                  0,                  0,                   0 },
+    { 0.20,          0x28/255.,   (0x98 -128)/255.,    (0x6F -128)/255. },
+    { 0.50,          0x48/255.,   (0x95 -128)/255.,    (0x74 -128)/255. },
+    { 0.63,          0x69/255.,   (0x84 -128)/255.,    (0x7F -128)/255. },
+    { 0.76,          0x89/255.,   (0x75 -128)/255.,    (0x84 -128)/255. },
+    { 0.90,          0xCE/255.,   (0x35 -128)/255.,    (0x95 -128)/255. },
+    {    1,                  1,                  0,                  0. }},
+    [TERRAIN] = {
+    {    0,                  0,                  0,                   0 },
+    { 0.15,                  0,                 .5,                   0 },
+    { 0.60,                  1,                -.5,                 -.5 },
+    { 0.85,                  1,                -.5,                  .5 },
     {    1,                  1,                  0,                   0 }},
 };
 
@@ -483,6 +518,10 @@ static void color_range(ShowSpectrumContext *s, int ch,
         case FRUIT:
         case COOL:
         case GREEN:
+        case VIRIDIS:
+        case PLASMA:
+        case CIVIDIS:
+        case TERRAIN:
         case MAGMA:
         case INTENSITY:
             *uf = *yf;
@@ -1397,6 +1436,10 @@ static const AVOption showspectrumpic_options[] = {
         { "cool",      "cool based coloring",             0, AV_OPT_TYPE_CONST, {.i64=COOL},      0, 0, FLAGS, "color" },
         { "magma",     "magma based coloring",            0, AV_OPT_TYPE_CONST, {.i64=MAGMA},     0, 0, FLAGS, "color" },
         { "green",     "green based coloring",            0, AV_OPT_TYPE_CONST, {.i64=GREEN},     0, 0, FLAGS, "color" },
+        { "viridis",   "viridis based coloring",          0, AV_OPT_TYPE_CONST, {.i64=VIRIDIS},   0, 0, FLAGS, "color" },
+        { "plasma",    "plasma based coloring",           0, AV_OPT_TYPE_CONST, {.i64=PLASMA},    0, 0, FLAGS, "color" },
+        { "cividis",   "cividis based coloring",          0, AV_OPT_TYPE_CONST, {.i64=CIVIDIS},   0, 0, FLAGS, "color" },
+        { "terrain",   "terrain based coloring",          0, AV_OPT_TYPE_CONST, {.i64=TERRAIN},   0, 0, FLAGS, "color" },
     { "scale", "set display scale", OFFSET(scale), AV_OPT_TYPE_INT, {.i64=LOG}, 0, NB_SCALES-1, FLAGS, "scale" },
         { "lin",  "linear",      0, AV_OPT_TYPE_CONST, {.i64=LINEAR}, 0, 0, FLAGS, "scale" },
         { "sqrt", "square root", 0, AV_OPT_TYPE_CONST, {.i64=SQRT},   0, 0, FLAGS, "scale" },

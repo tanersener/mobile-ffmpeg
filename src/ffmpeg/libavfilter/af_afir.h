@@ -44,7 +44,10 @@ typedef struct AudioFIRContext {
     float max_ir_len;
     int response;
     int w, h;
+    AVRational frame_rate;
     int ir_channel;
+    int minp;
+    int maxp;
 
     float gain;
 
@@ -63,8 +66,6 @@ typedef struct AudioFIRContext {
     int nb_coef_channels;
     int one2many;
     int nb_samples;
-    int want_skip;
-    int need_padding;
 
     RDFTContext **rdft, **irdft;
     float **sum;

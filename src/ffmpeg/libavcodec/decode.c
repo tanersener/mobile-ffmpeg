@@ -281,10 +281,6 @@ int ff_decode_bsfs_init(AVCodecContext *avctx)
             bsfs_str++;
     }
 
-    ret = avcodec_parameters_to_context(avctx, s->bsfs[s->nb_bsfs - 1]->par_out);
-    if (ret < 0)
-        return ret;
-
     return 0;
 fail:
     ff_decode_bsfs_uninit(avctx);
@@ -1382,6 +1378,7 @@ int ff_get_format(AVCodecContext *avctx, const enum AVPixelFormat *fmt)
         if (i == n) {
             av_log(avctx, AV_LOG_ERROR, "Invalid return from get_format(): "
                    "%s not in possible list.\n", desc->name);
+            ret = AV_PIX_FMT_NONE;
             break;
         }
 

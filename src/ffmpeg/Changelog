@@ -1,6 +1,19 @@
 Entries are sorted chronologically from oldest to youngest within each release,
 releases are sorted from youngest to oldest.
 
+version <next>:
+- tpad filter
+- AV1 decoding support through libdav1d
+- dedot filter
+- chromashift and rgbashift filters
+- freezedetect filter
+- truehd_core bitstream filter
+- dhav demuxer
+- PCM-DVD encoder
+- GIF parser
+- vividas demuxer
+
+
 version 4.1:
 - deblock filter
 - tmix filter

@@ -263,6 +263,10 @@ static void dump_video_param(AVCodecContext *avctx, QSVEncContext *q,
                print_threestate(co->NalHrdConformance), print_threestate(co->SingleSeiNalUnit),
                print_threestate(co->VuiVclHrdParameters), print_threestate(co->VuiNalHrdParameters));
     }
+
+    av_log(avctx, AV_LOG_VERBOSE, "FrameRateExtD: %"PRIu32"; FrameRateExtN: %"PRIu32" \n",
+           info->FrameInfo.FrameRateExtD, info->FrameInfo.FrameRateExtN);
+
 }
 
 static int select_rc_mode(AVCodecContext *avctx, QSVEncContext *q)
@@ -444,6 +448,13 @@ static int init_video_param(AVCodecContext *avctx, QSVEncContext *q)
     const AVPixFmtDescriptor *desc;
     float quant;
     int ret;
+    mfxVersion ver;
+
+    ret = MFXQueryVersion(q->session,&ver);
+    if (ret != MFX_ERR_NONE) {
+        av_log(avctx, AV_LOG_ERROR, "Error getting the session handle\n");
+        return AVERROR_UNKNOWN;
+    }
 
     ret = ff_qsv_codec_id_to_mfx(avctx->codec_id);
     if (ret < 0)
@@ -493,10 +504,10 @@ static int init_video_param(AVCodecContext *avctx, QSVEncContext *q)
     q->param.mfx.FrameInfo.BitDepthChroma = desc->comp[0].depth;
     q->param.mfx.FrameInfo.Shift          = desc->comp[0].depth > 8;
 
-    // TODO:  detect version of MFX--if the minor version is greater than
-    // or equal to 19, then can use the same alignment settings as H.264
-    // for HEVC
-    q->width_align = avctx->codec_id == AV_CODEC_ID_HEVC ? 32 : 16;
+    // If the minor version is greater than or equal to 19,
+    // then can use the same alignment settings as H.264 for HEVC
+    q->width_align = (avctx->codec_id != AV_CODEC_ID_HEVC ||
+                      QSV_RUNTIME_VERSION_ATLEAST(ver, 1, 19)) ? 16 : 32;
     q->param.mfx.FrameInfo.Width = FFALIGN(avctx->width, q->width_align);
 
     if (avctx->flags & AV_CODEC_FLAG_INTERLACED_DCT) {
@@ -611,8 +622,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
 
         q->extparam_internal[q->nb_extparam_internal++] = (mfxExtBuffer *)&q->extco;
 
-#if QSV_HAVE_CO2
         if (avctx->codec_id == AV_CODEC_ID_H264) {
+#if QSV_HAVE_CO2
             q->extco2.Header.BufferId     = MFX_EXTBUFF_CODING_OPTION2;
             q->extco2.Header.BufferSz     = sizeof(q->extco2);
 
@@ -641,11 +652,10 @@ FF_ENABLE_DEPRECATION_WARNINGS
             q->extco2.Trellis = q->trellis;
 #endif
 
-#if QSV_HAVE_LA_DS
+#if QSV_VERSION_ATLEAST(1, 8)
             q->extco2.LookAheadDS = q->look_ahead_downsampling;
-#endif
+            q->extco2.RepeatPPS   = q->repeat_pps ? MFX_CODINGOPTION_ON : MFX_CODINGOPTION_OFF;
 
-#if QSV_HAVE_BREF_TYPE
 #if FF_API_PRIVATE_OPT
 FF_DISABLE_DEPRECATION_WARNINGS
             if (avctx->b_frame_strategy >= 0)
@@ -675,13 +685,10 @@ FF_ENABLE_DEPRECATION_WARNINGS
             }
 #endif
             q->extparam_internal[q->nb_extparam_internal++] = (mfxExtBuffer *)&q->extco2;
-        }
 #endif
+
 #if QSV_HAVE_MF
-        if (avctx->codec_id == AV_CODEC_ID_H264) {
-            mfxVersion    ver;
-            ret = MFXQueryVersion(q->session,&ver);
-            if (ret >= MFX_ERR_NONE && QSV_RUNTIME_VERSION_ATLEAST(ver, 1, 25)) {
+            if (QSV_RUNTIME_VERSION_ATLEAST(ver, 1, 25)) {
                 q->extmfp.Header.BufferId     = MFX_EXTBUFF_MULTI_FRAME_PARAM;
                 q->extmfp.Header.BufferSz     = sizeof(q->extmfp);
 
@@ -689,8 +696,8 @@ FF_ENABLE_DEPRECATION_WARNINGS
                 av_log(avctx,AV_LOG_VERBOSE,"MFMode:%d\n", q->extmfp.MFMode);
                 q->extparam_internal[q->nb_extparam_internal++] = (mfxExtBuffer *)&q->extmfp;
             }
-        }
 #endif
+        }
     }
 
     if (!check_enc_param(avctx,q)) {
@@ -1192,6 +1199,13 @@ static int encode_frame(AVCodecContext *avctx, QSVEncContext *q,
     if (qsv_frame) {
         surf = &qsv_frame->surface;
         enc_ctrl = &qsv_frame->enc_ctrl;
+        memset(enc_ctrl, 0, sizeof(mfxEncodeCtrl));
+
+        if (frame->pict_type == AV_PICTURE_TYPE_I) {
+            enc_ctrl->FrameType = MFX_FRAMETYPE_I | MFX_FRAMETYPE_REF;
+            if (q->forced_idr)
+                enc_ctrl->FrameType |= MFX_FRAMETYPE_IDR;
+        }
     }
 
     ret = av_new_packet(&new_pkt, q->packet_size);
@@ -1330,6 +1344,13 @@ int ff_qsv_encode(AVCodecContext *avctx, QSVEncContext *q,
             pict_type = AV_PICTURE_TYPE_P;
         else if (bs->FrameType & MFX_FRAMETYPE_B || bs->FrameType & MFX_FRAMETYPE_xB)
             pict_type = AV_PICTURE_TYPE_B;
+        else if (bs->FrameType == MFX_FRAMETYPE_UNKNOWN) {
+            pict_type = AV_PICTURE_TYPE_NONE;
+            av_log(avctx, AV_LOG_WARNING, "Unkown FrameType, set pict_type to AV_PICTURE_TYPE_NONE.\n");
+        } else {
+            av_log(avctx, AV_LOG_ERROR, "Invalid FrameType:%d.\n", bs->FrameType);
+            return AVERROR_INVALIDDATA;
+        }
 
 #if FF_API_CODED_FRAME
 FF_DISABLE_DEPRECATION_WARNINGS
