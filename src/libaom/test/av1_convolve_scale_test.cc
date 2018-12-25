@@ -286,13 +286,13 @@ class ConvolveScaleTestBase : public ::testing::Test {
   }
 
   void SetConvParamOffset(int i, int j, int is_compound, int do_average,
-                          int use_jnt_comp_avg) {
+                          int use_dist_wtd_comp_avg) {
     if (i == -1 && j == -1) {
-      convolve_params_.use_jnt_comp_avg = use_jnt_comp_avg;
+      convolve_params_.use_dist_wtd_comp_avg = use_dist_wtd_comp_avg;
       convolve_params_.is_compound = is_compound;
       convolve_params_.do_average = do_average;
     } else {
-      convolve_params_.use_jnt_comp_avg = use_jnt_comp_avg;
+      convolve_params_.use_dist_wtd_comp_avg = use_dist_wtd_comp_avg;
       convolve_params_.fwd_offset = quant_dist_lookup_table[i][j][0];
       convolve_params_.bck_offset = quant_dist_lookup_table[i][j][1];
       convolve_params_.is_compound = is_compound;
@@ -312,12 +312,12 @@ class ConvolveScaleTestBase : public ::testing::Test {
 
       is_compound = 1;
       for (int do_average = 0; do_average < 2; do_average++) {
-        for (int use_jnt_comp_avg = 0; use_jnt_comp_avg < 2;
-             use_jnt_comp_avg++) {
+        for (int use_dist_wtd_comp_avg = 0; use_dist_wtd_comp_avg < 2;
+             use_dist_wtd_comp_avg++) {
           for (int j = 0; j < 2; ++j) {
             for (int k = 0; k < 4; ++k) {
               SetConvParamOffset(j, k, is_compound, do_average,
-                                 use_jnt_comp_avg);
+                                 use_dist_wtd_comp_avg);
               Prep(&rnd);
               RunOne(true);
               RunOne(false);

@@ -187,15 +187,23 @@ void av1_configure_buffer_updates_firstpass(struct AV1_COMP *cpi,
 // Post encode update of the rate control parameters for 2-pass
 void av1_twopass_postencode_update(struct AV1_COMP *cpi);
 
-static INLINE int get_number_of_extra_arfs(int interval, int arf_pending) {
-  if (arf_pending && MAX_EXT_ARFS > 0)
-    return interval >= MIN_EXT_ARF_INTERVAL * (MAX_EXT_ARFS + 1)
-               ? MAX_EXT_ARFS
-               : interval >= MIN_EXT_ARF_INTERVAL * MAX_EXT_ARFS
-                     ? MAX_EXT_ARFS - 1
-                     : 0;
-  else
-    return 0;
+static INLINE int get_number_of_extra_arfs(int interval, int arf_pending,
+                                           int max_pyr_height) {
+  // Max extra (internal) alt-refs allowed based on interval.
+  int extra_arfs_from_interval = 0;
+  if (arf_pending && MAX_EXT_ARFS > 0) {
+    extra_arfs_from_interval =
+        (interval >= MIN_EXT_ARF_INTERVAL * (MAX_EXT_ARFS + 1))
+            ? MAX_EXT_ARFS
+            : (interval >= MIN_EXT_ARF_INTERVAL * MAX_EXT_ARFS)
+                  ? MAX_EXT_ARFS - 1
+                  : 0;
+  }
+  // Max extra (internal) alt-refs allowed based on max pyramid height.
+  assert(max_pyr_height >= 1);
+  const int ext_arfs_from_max_height = max_pyr_height - 1;
+  // Finally, min of the two above is our actual max allowance.
+  return AOMMIN(extra_arfs_from_interval, ext_arfs_from_max_height);
 }
 
 #ifdef __cplusplus

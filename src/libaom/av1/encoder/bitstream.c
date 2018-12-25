@@ -1145,7 +1145,7 @@ static void pack_inter_mode_mvs(AV1_COMP *cpi, const int mi_row,
         if (mbmi->compound_idx)
           assert(mbmi->interinter_comp.type == COMPOUND_AVERAGE);
 
-        if (cm->seq_params.order_hint_info.enable_jnt_comp) {
+        if (cm->seq_params.order_hint_info.enable_dist_wtd_comp) {
           const int comp_index_ctx = get_comp_index_context(cm, xd);
           aom_write_symbol(w, mbmi->compound_idx,
                            ec_ctx->compound_index_cdf[comp_index_ctx], 2);
@@ -2190,6 +2190,13 @@ static void write_ext_tile_info(const AV1_COMMON *const cm,
   }
 }
 
+// Stores the location and size of a tile's data in the bitstream.  Used for
+// later identifying identical tiles
+typedef struct TileBufferEnc {
+  uint8_t *data;
+  size_t size;
+} TileBufferEnc;
+
 static INLINE int find_identical_tile(
     const int tile_row, const int tile_col,
     TileBufferEnc (*const tile_buffers)[MAX_TILE_COLS]) {
@@ -2209,18 +2216,18 @@ static INLINE int find_identical_tile(
     int col_offset = candidate_offset[0].col;
     int row = tile_row - row_offset;
     int col = tile_col - col_offset;
-    uint8_t tile_hdr;
     const uint8_t *tile_data;
     TileBufferEnc *candidate;
 
     if (row < 0 || col < 0) continue;
 
-    tile_hdr = *(tile_buffers[row][col].data);
+    const uint32_t tile_hdr = mem_get_le32(tile_buffers[row][col].data);
 
-    // Read out tcm bit
-    if ((tile_hdr >> 7) == 1) {
-      // The candidate is a copy tile itself
-      row_offset += tile_hdr & 0x7f;
+    // Read out tile-copy-mode bit:
+    if ((tile_hdr >> 31) == 1) {
+      // The candidate is a copy tile itself: the offset is stored in bits
+      // 30 through 24 inclusive.
+      row_offset += (tile_hdr >> 24) & 0x7f;
       row = tile_row - row_offset;
     }
 
@@ -2617,7 +2624,7 @@ static void write_sequence_header(const SequenceHeader *const seq_params,
     aom_wb_write_bit(wb, seq_params->order_hint_info.enable_order_hint);
 
     if (seq_params->order_hint_info.enable_order_hint) {
-      aom_wb_write_bit(wb, seq_params->order_hint_info.enable_jnt_comp);
+      aom_wb_write_bit(wb, seq_params->order_hint_info.enable_dist_wtd_comp);
       aom_wb_write_bit(wb, seq_params->order_hint_info.enable_ref_frame_mvs);
     }
     if (seq_params->force_screen_content_tools == 2) {
@@ -2832,15 +2839,6 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
   }
   if (!seq_params->reduced_still_picture_hdr) {
     if (encode_show_existing_frame(cm)) {
-      RefCntBuffer *const frame_to_show =
-          cm->ref_frame_map[cpi->existing_fb_idx_to_show];
-
-      if (frame_to_show == NULL || frame_to_show->ref_count < 1) {
-        aom_internal_error(&cm->error, AOM_CODEC_UNSUP_BITSTREAM,
-                           "Buffer does not contain a reconstructed frame");
-      }
-      assign_frame_buffer_p(&cm->cur_frame, frame_to_show);
-
       aom_wb_write_bit(wb, 1);  // show_existing_frame
       aom_wb_write_literal(wb, cpi->existing_fb_idx_to_show, 3);
 
@@ -2853,13 +2851,6 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
         int display_frame_id = cm->ref_frame_id[cpi->existing_fb_idx_to_show];
         aom_wb_write_literal(wb, display_frame_id, frame_id_len);
       }
-
-      if (cm->reset_decoder_state && frame_to_show->frame_type != KEY_FRAME) {
-        aom_internal_error(
-            &cm->error, AOM_CODEC_UNSUP_BITSTREAM,
-            "show_existing_frame to reset state on KEY_FRAME only");
-      }
-
       return;
     } else {
       aom_wb_write_bit(wb, 0);  // show_existing_frame
@@ -2967,18 +2958,6 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
       current_frame->frame_type == INTRA_ONLY_FRAME)
     aom_wb_write_literal(wb, current_frame->refresh_frame_flags, REF_FRAMES);
 
-  // For non-keyframes, we need to update the buffer of reference frame ids.
-  // If more than one frame is refreshed, it doesn't matter which one we pick,
-  // so pick the first.  LST sometimes doesn't refresh any: this is ok
-  if (current_frame->frame_type != KEY_FRAME) {
-    for (int i = 0; i < REF_FRAMES; i++) {
-      if (current_frame->refresh_frame_flags & (1 << i)) {
-        cm->fb_of_context_type[cm->frame_context_idx] = i;
-        break;
-      }
-    }
-  }
-
   if (!frame_is_intra_only(cm) || current_frame->refresh_frame_flags != 0xff) {
     // Write all ref frame order hints if error_resilient_mode == 1
     if (cm->error_resilient_mode &&
@@ -2996,8 +2975,6 @@ static void write_uncompressed_header_obu(AV1_COMP *cpi,
     assert(!av1_superres_scaled(cm) || !cm->allow_intrabc);
     if (cm->allow_screen_content_tools && !av1_superres_scaled(cm))
       aom_wb_write_bit(wb, cm->allow_intrabc);
-    // all eight fbs are refreshed, pick one that will live long enough
-    cm->fb_of_context_type[REGULAR_FRAME] = 0;
   } else {
     if (current_frame->frame_type == INTRA_ONLY_FRAME) {
       write_frame_size(cm, frame_size_override_flag, wb);
@@ -3468,7 +3445,8 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
   AV1_COMMON *const cm = &cpi->common;
   aom_writer mode_bc;
   int tile_row, tile_col;
-  TileBufferEnc(*const tile_buffers)[MAX_TILE_COLS] = cpi->tile_buffers;
+  // Store the location and size of each tile's data in the bitstream:
+  TileBufferEnc tile_buffers[MAX_TILE_ROWS][MAX_TILE_COLS];
   uint32_t total_size = 0;
   const int tile_cols = cm->tile_cols;
   const int tile_rows = cm->tile_rows;
@@ -3489,7 +3467,7 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
   const int have_tiles = tile_cols * tile_rows > 1;
   int first_tg = 1;
 
-  cm->largest_tile_id = 0;
+  cpi->largest_tile_id = 0;
 
   if (cm->large_scale_tile) {
     // For large_scale_tile case, we always have only one tile group, so it can
@@ -3557,7 +3535,7 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
         // Record the maximum tile size we see, so we can compact headers later.
         if (tile_size > max_tile_size) {
           max_tile_size = tile_size;
-          cm->largest_tile_id = tile_cols * tile_row + tile_col;
+          cpi->largest_tile_id = tile_cols * tile_row + tile_col;
         }
 
         if (have_tiles) {
@@ -3575,6 +3553,9 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
             const int identical_tile_offset =
                 find_identical_tile(tile_row, tile_col, tile_buffers);
 
+            // Indicate a copy-tile by setting the most significant bit.
+            // The row-offset to copy from is stored in the highest byte.
+            // remux_tiles will move these around later
             if (identical_tile_offset > 0) {
               tile_size = 0;
               tile_header = identical_tile_offset | 0x80;
@@ -3698,7 +3679,7 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
       curr_tg_data_size += (tile_size + (is_last_tile_in_tg ? 0 : 4));
       buf->size = tile_size;
       if (tile_size > max_tile_size) {
-        cm->largest_tile_id = tile_cols * tile_row + tile_col;
+        cpi->largest_tile_id = tile_cols * tile_row + tile_col;
         max_tile_size = tile_size;
       }
 
@@ -3733,7 +3714,7 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
           // Force context update tile to be the first tile in error
           // resiliant mode as the duplicate frame headers will have
           // context_update_tile_id set to 0
-          cm->largest_tile_id = 0;
+          cpi->largest_tile_id = 0;
 
           // Rewrite the OBU header to change the OBU type to Redundant Frame
           // Header.
@@ -3756,7 +3737,7 @@ static uint32_t write_tiles_in_tg_obus(AV1_COMP *const cpi, uint8_t *const dst,
     // Fill in context_update_tile_id indicating the tile to use for the
     // cdf update. The encoder currently sets it to the largest tile
     // (but is up to the encoder)
-    aom_wb_overwrite_literal(saved_wb, cm->largest_tile_id,
+    aom_wb_overwrite_literal(saved_wb, cpi->largest_tile_id,
                              cm->log2_tile_cols + cm->log2_tile_rows);
     // If more than one tile group. tile_size_bytes takes the default value 4
     // and does not need to be set. For a single tile group it is set in the

@@ -48,6 +48,7 @@ struct av1_extracfg {
   unsigned int arnr_strength;
   unsigned int min_gf_interval;
   unsigned int max_gf_interval;
+  unsigned int gf_max_pyr_height;
   aom_tune_metric tuning;
   unsigned int cq_level;  // constrained quality level
   unsigned int rc_max_intra_bitrate_pct;
@@ -56,6 +57,7 @@ struct av1_extracfg {
   unsigned int lossless;
   unsigned int enable_cdef;
   unsigned int enable_restoration;
+  unsigned int enable_obmc;
   unsigned int disable_trellis_quant;
   unsigned int enable_qm;
   unsigned int qm_y;
@@ -71,7 +73,7 @@ struct av1_extracfg {
 
   aom_timing_info_type_t timing_info_type;
   unsigned int frame_parallel_decoding_mode;
-  int use_dual_filter;
+  int enable_dual_filter;
   AQ_MODE aq_mode;
   DELTAQ_MODE deltaq_mode;
   unsigned int frame_periodic_boost;
@@ -93,13 +95,26 @@ struct av1_extracfg {
   const char *film_grain_table_filename;
   unsigned int motion_vector_unit_test;
   unsigned int cdf_update_mode;
-  int enable_order_hint;
-  int enable_jnt_comp;
-  int enable_ref_frame_mvs;  // sequence level
-  int allow_ref_frame_mvs;   // frame level
-  int enable_warped_motion;  // sequence level
-  int allow_warped_motion;   // frame level
+  int enable_rect_partitions;    // enable rectangular partitions for sequence
+  int enable_intra_edge_filter;  // enable intra-edge filter for sequence
+  int enable_order_hint;         // enable order hint for sequence
+  int enable_tx64;               // enable 64-pt transform usage for sequence
+  int enable_dist_wtd_comp;      // enable dist wtd compound for sequence
+  int enable_ref_frame_mvs;      // sequence level
+  int allow_ref_frame_mvs;       // frame level
+  int enable_masked_comp;        // enable masked compound for sequence
+  int enable_interintra_comp;    // enable interintra compound for sequence
+  int enable_smooth_interintra;  // enable smooth interintra mode usage
+  int enable_diff_wtd_comp;      // enable diff-wtd compound usage
+  int enable_interinter_wedge;   // enable interinter-wedge compound usage
+  int enable_interintra_wedge;   // enable interintra-wedge compound usage
+  int enable_global_motion;      // enable global motion usage for sequence
+  int enable_warped_motion;      // sequence level
+  int allow_warped_motion;       // frame level
+  int enable_filter_intra;       // enable filter intra for sequence
   int enable_superres;
+  int enable_palette;
+  int enable_intrabc;
 #if CONFIG_DENOISE
   float noise_level;
   int noise_block_size;
@@ -107,6 +122,7 @@ struct av1_extracfg {
 
   unsigned int chroma_subsampling_x;
   unsigned int chroma_subsampling_y;
+  int reduced_tx_type_set;
 };
 
 static struct av1_extracfg default_extra_cfg = {
@@ -124,6 +140,7 @@ static struct av1_extracfg default_extra_cfg = {
   5,                       // arnr_strength
   0,                       // min_gf_interval; 0 -> default decision
   0,                       // max_gf_interval; 0 -> default decision
+  4,                       // gf_max_pyr_height
   AOM_TUNE_PSNR,           // tuning
   10,                      // cq_level
   0,                       // rc_max_intra_bitrate_pct
@@ -132,6 +149,7 @@ static struct av1_extracfg default_extra_cfg = {
   0,                       // lossless
   !CONFIG_SHARP_SETTINGS,  // enable_cdef
   1,                       // enable_restoration
+  1,                       // enable_obmc
   0,                       // disable_trellis_quant
   0,                       // enable_qm
   DEFAULT_QM_Y,            // qm_y
@@ -167,19 +185,33 @@ static struct av1_extracfg default_extra_cfg = {
   0,                            // film_grain_table_filename
   0,                            // motion_vector_unit_test
   1,                            // CDF update mode
+  1,                            // enable rectangular partitions
+  1,                            // enable intra edge filter
   1,                            // frame order hint
-  1,                            // jnt_comp
+  1,                            // enable 64-pt transform usage
+  1,                            // dist-wtd compound
   1,                            // enable_ref_frame_mvs sequence level
   1,                            // allow ref_frame_mvs frame level
+  1,                            // enable masked compound at sequence level
+  1,                            // enable interintra compound at sequence level
+  1,                            // enable smooth interintra mode
+  1,                            // enable difference-weighted compound
+  1,                            // enable interinter wedge compound
+  1,                            // enable interintra wedge compound
+  1,                            // enable_global_motion usage
   1,                            // enable_warped_motion at sequence level
   1,                            // allow_warped_motion at frame level
+  1,                            // enable filter intra at sequence level
   1,                            // superres
+  1,                            // enable palette
+  1,                            // enable intrabc
 #if CONFIG_DENOISE
   0,   // noise_level
   32,  // noise_block_size
 #endif
   0,  // chroma_subsampling_x
   0,  // chroma_subsampling_y
+  0,  // reduced_tx_type_set
 };
 
 struct aom_codec_alg_priv {
@@ -266,6 +298,7 @@ static aom_codec_err_t validate_config(aom_codec_alg_priv_t *ctx,
     RANGE_CHECK(extra_cfg, max_gf_interval, MAX(2, extra_cfg->min_gf_interval),
                 (MAX_LAG_BUFFERS - 1));
   }
+  RANGE_CHECK(extra_cfg, gf_max_pyr_height, 1, 4);
 
   RANGE_CHECK_HI(cfg, rc_resize_mode, RESIZE_MODES - 1);
   RANGE_CHECK(cfg, rc_resize_denominator, SCALE_NUMERATOR,
@@ -522,6 +555,9 @@ static aom_codec_err_t set_encoder_config(
 
   oxcf->enable_cdef = extra_cfg->enable_cdef;
   oxcf->enable_restoration = extra_cfg->enable_restoration;
+  oxcf->enable_obmc = extra_cfg->enable_obmc;
+  oxcf->enable_palette = extra_cfg->enable_palette;
+  oxcf->enable_intrabc = extra_cfg->enable_intrabc;
   oxcf->disable_trellis_quant = extra_cfg->disable_trellis_quant;
   oxcf->using_qm = extra_cfg->enable_qm;
   oxcf->qm_y = extra_cfg->qm_y;
@@ -529,6 +565,7 @@ static aom_codec_err_t set_encoder_config(
   oxcf->qm_v = extra_cfg->qm_v;
   oxcf->qm_minlevel = extra_cfg->qm_min;
   oxcf->qm_maxlevel = extra_cfg->qm_max;
+  oxcf->reduced_tx_type_set = extra_cfg->reduced_tx_type_set;
 #if CONFIG_DIST_8X8
   oxcf->using_dist_8x8 = extra_cfg->enable_dist_8x8;
   if (extra_cfg->tuning == AOM_TUNE_CDEF_DIST ||
@@ -623,6 +660,7 @@ static aom_codec_err_t set_encoder_config(
   oxcf->arnr_strength = extra_cfg->arnr_strength;
   oxcf->min_gf_interval = extra_cfg->min_gf_interval;
   oxcf->max_gf_interval = extra_cfg->max_gf_interval;
+  oxcf->gf_max_pyr_height = extra_cfg->gf_max_pyr_height;
 
   oxcf->tuning = extra_cfg->tuning;
   oxcf->content = extra_cfg->content;
@@ -659,16 +697,31 @@ static aom_codec_err_t set_encoder_config(
 
   oxcf->monochrome = cfg->monochrome;
   oxcf->full_still_picture_hdr = cfg->full_still_picture_hdr;
-  oxcf->enable_dual_filter = extra_cfg->use_dual_filter;
+  oxcf->enable_dual_filter = extra_cfg->enable_dual_filter;
+  oxcf->enable_rect_partitions = extra_cfg->enable_rect_partitions;
+  oxcf->enable_intra_edge_filter = extra_cfg->enable_intra_edge_filter;
+  oxcf->enable_tx64 = extra_cfg->enable_tx64;
   oxcf->enable_order_hint = extra_cfg->enable_order_hint;
-  oxcf->enable_jnt_comp =
-      extra_cfg->enable_jnt_comp & extra_cfg->enable_order_hint;
+  oxcf->enable_dist_wtd_comp =
+      extra_cfg->enable_dist_wtd_comp & extra_cfg->enable_order_hint;
+  oxcf->enable_masked_comp = extra_cfg->enable_masked_comp;
+  oxcf->enable_diff_wtd_comp =
+      extra_cfg->enable_masked_comp & extra_cfg->enable_diff_wtd_comp;
+  oxcf->enable_interinter_wedge =
+      extra_cfg->enable_masked_comp & extra_cfg->enable_interinter_wedge;
+  oxcf->enable_interintra_comp = extra_cfg->enable_interintra_comp;
+  oxcf->enable_smooth_interintra =
+      extra_cfg->enable_interintra_comp && extra_cfg->enable_smooth_interintra;
+  oxcf->enable_interintra_wedge =
+      extra_cfg->enable_interintra_comp & extra_cfg->enable_interintra_wedge;
   oxcf->enable_ref_frame_mvs =
       extra_cfg->enable_ref_frame_mvs & extra_cfg->enable_order_hint;
 
+  oxcf->enable_global_motion = extra_cfg->enable_global_motion;
   oxcf->enable_warped_motion = extra_cfg->enable_warped_motion;
   oxcf->allow_warped_motion =
       extra_cfg->allow_warped_motion & extra_cfg->enable_warped_motion;
+  oxcf->enable_filter_intra = extra_cfg->enable_filter_intra;
 
   oxcf->enable_superres =
       (oxcf->superres_mode != SUPERRES_NONE) && extra_cfg->enable_superres;
@@ -939,6 +992,13 @@ static aom_codec_err_t ctrl_set_enable_restoration(aom_codec_alg_priv_t *ctx,
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
+static aom_codec_err_t ctrl_set_enable_obmc(aom_codec_alg_priv_t *ctx,
+                                            va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_obmc = CAST(AV1E_SET_ENABLE_OBMC, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
 static aom_codec_err_t ctrl_set_disable_trellis_quant(aom_codec_alg_priv_t *ctx,
                                                       va_list args) {
   struct av1_extracfg extra_cfg = ctx->extra_cfg;
@@ -1007,10 +1067,26 @@ static aom_codec_err_t ctrl_set_timing_info_type(aom_codec_alg_priv_t *ctx,
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
-static aom_codec_err_t ctrl_set_enable_df(aom_codec_alg_priv_t *ctx,
-                                          va_list args) {
+static aom_codec_err_t ctrl_set_enable_dual_filter(aom_codec_alg_priv_t *ctx,
+                                                   va_list args) {
   struct av1_extracfg extra_cfg = ctx->extra_cfg;
-  extra_cfg.use_dual_filter = CAST(AV1E_SET_ENABLE_DF, args);
+  extra_cfg.enable_dual_filter = CAST(AV1E_SET_ENABLE_DUAL_FILTER, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_rect_partitions(
+    aom_codec_alg_priv_t *ctx, va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_rect_partitions =
+      CAST(AV1E_SET_ENABLE_RECT_PARTITIONS, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_intra_edge_filter(
+    aom_codec_alg_priv_t *ctx, va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_intra_edge_filter =
+      CAST(AV1E_SET_ENABLE_INTRA_EDGE_FILTER, args);
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
@@ -1021,10 +1097,17 @@ static aom_codec_err_t ctrl_set_enable_order_hint(aom_codec_alg_priv_t *ctx,
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
-static aom_codec_err_t ctrl_set_enable_jnt_comp(aom_codec_alg_priv_t *ctx,
-                                                va_list args) {
+static aom_codec_err_t ctrl_set_enable_tx64(aom_codec_alg_priv_t *ctx,
+                                            va_list args) {
   struct av1_extracfg extra_cfg = ctx->extra_cfg;
-  extra_cfg.enable_jnt_comp = CAST(AV1E_SET_ENABLE_JNT_COMP, args);
+  extra_cfg.enable_tx64 = CAST(AV1E_SET_ENABLE_TX64, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_dist_wtd_comp(aom_codec_alg_priv_t *ctx,
+                                                     va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_dist_wtd_comp = CAST(AV1E_SET_ENABLE_DIST_WTD_COMP, args);
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
@@ -1042,6 +1125,59 @@ static aom_codec_err_t ctrl_set_allow_ref_frame_mvs(aom_codec_alg_priv_t *ctx,
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
+static aom_codec_err_t ctrl_set_enable_masked_comp(aom_codec_alg_priv_t *ctx,
+                                                   va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_masked_comp = CAST(AV1E_SET_ENABLE_MASKED_COMP, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_interintra_comp(
+    aom_codec_alg_priv_t *ctx, va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_interintra_comp =
+      CAST(AV1E_SET_ENABLE_INTERINTRA_COMP, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_smooth_interintra(
+    aom_codec_alg_priv_t *ctx, va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_smooth_interintra =
+      CAST(AV1E_SET_ENABLE_SMOOTH_INTERINTRA, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_diff_wtd_comp(aom_codec_alg_priv_t *ctx,
+                                                     va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_diff_wtd_comp = CAST(AV1E_SET_ENABLE_DIFF_WTD_COMP, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_interinter_wedge(
+    aom_codec_alg_priv_t *ctx, va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_interinter_wedge =
+      CAST(AV1E_SET_ENABLE_INTERINTER_WEDGE, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_interintra_wedge(
+    aom_codec_alg_priv_t *ctx, va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_interintra_wedge =
+      CAST(AV1E_SET_ENABLE_INTERINTRA_WEDGE, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_global_motion(aom_codec_alg_priv_t *ctx,
+                                                     va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_global_motion = CAST(AV1E_SET_ENABLE_GLOBAL_MOTION, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
 static aom_codec_err_t ctrl_set_enable_warped_motion(aom_codec_alg_priv_t *ctx,
                                                      va_list args) {
   struct av1_extracfg extra_cfg = ctx->extra_cfg;
@@ -1056,10 +1192,31 @@ static aom_codec_err_t ctrl_set_allow_warped_motion(aom_codec_alg_priv_t *ctx,
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
+static aom_codec_err_t ctrl_set_enable_filter_intra(aom_codec_alg_priv_t *ctx,
+                                                    va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_filter_intra = CAST(AV1E_SET_ENABLE_FILTER_INTRA, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
 static aom_codec_err_t ctrl_set_enable_superres(aom_codec_alg_priv_t *ctx,
                                                 va_list args) {
   struct av1_extracfg extra_cfg = ctx->extra_cfg;
   extra_cfg.enable_superres = CAST(AV1E_SET_ENABLE_SUPERRES, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_palette(aom_codec_alg_priv_t *ctx,
+                                               va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_palette = CAST(AV1E_SET_ENABLE_PALETTE, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_enable_intrabc(aom_codec_alg_priv_t *ctx,
+                                               va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.enable_intrabc = CAST(AV1E_SET_ENABLE_INTRABC, args);
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
@@ -1096,6 +1253,13 @@ static aom_codec_err_t ctrl_set_aq_mode(aom_codec_alg_priv_t *ctx,
                                         va_list args) {
   struct av1_extracfg extra_cfg = ctx->extra_cfg;
   extra_cfg.aq_mode = CAST(AV1E_SET_AQ_MODE, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_reduced_tx_type_set(aom_codec_alg_priv_t *ctx,
+                                                    va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.reduced_tx_type_set = CAST(AV1E_SET_REDUCED_TX_TYPE_SET, args);
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
@@ -1149,6 +1313,13 @@ static aom_codec_err_t ctrl_set_max_gf_interval(aom_codec_alg_priv_t *ctx,
                                                 va_list args) {
   struct av1_extracfg extra_cfg = ctx->extra_cfg;
   extra_cfg.max_gf_interval = CAST(AV1E_SET_MAX_GF_INTERVAL, args);
+  return update_extra_cfg(ctx, &extra_cfg);
+}
+
+static aom_codec_err_t ctrl_set_gf_max_pyr_height(aom_codec_alg_priv_t *ctx,
+                                                  va_list args) {
+  struct av1_extracfg extra_cfg = ctx->extra_cfg;
+  extra_cfg.gf_max_pyr_height = CAST(AV1E_SET_GF_MAX_PYRAMID_HEIGHT, args);
   return update_extra_cfg(ctx, &extra_cfg);
 }
 
@@ -1767,6 +1938,7 @@ static aom_codec_ctrl_fn_map_t encoder_ctrl_maps[] = {
   { AV1E_SET_LOSSLESS, ctrl_set_lossless },
   { AV1E_SET_ENABLE_CDEF, ctrl_set_enable_cdef },
   { AV1E_SET_ENABLE_RESTORATION, ctrl_set_enable_restoration },
+  { AV1E_SET_ENABLE_OBMC, ctrl_set_enable_obmc },
   { AV1E_SET_DISABLE_TRELLIS_QUANT, ctrl_set_disable_trellis_quant },
   { AV1E_SET_ENABLE_QM, ctrl_set_enable_qm },
   { AV1E_SET_QM_Y, ctrl_set_qm_y },
@@ -1783,15 +1955,29 @@ static aom_codec_ctrl_fn_map_t encoder_ctrl_maps[] = {
   { AV1E_SET_FRAME_PARALLEL_DECODING, ctrl_set_frame_parallel_decoding_mode },
   { AV1E_SET_ERROR_RESILIENT_MODE, ctrl_set_error_resilient_mode },
   { AV1E_SET_S_FRAME_MODE, ctrl_set_s_frame_mode },
-  { AV1E_SET_ENABLE_DF, ctrl_set_enable_df },
+  { AV1E_SET_ENABLE_RECT_PARTITIONS, ctrl_set_enable_rect_partitions },
+  { AV1E_SET_ENABLE_DUAL_FILTER, ctrl_set_enable_dual_filter },
+  { AV1E_SET_ENABLE_INTRA_EDGE_FILTER, ctrl_set_enable_intra_edge_filter },
   { AV1E_SET_ENABLE_ORDER_HINT, ctrl_set_enable_order_hint },
-  { AV1E_SET_ENABLE_JNT_COMP, ctrl_set_enable_jnt_comp },
+  { AV1E_SET_ENABLE_TX64, ctrl_set_enable_tx64 },
+  { AV1E_SET_ENABLE_DIST_WTD_COMP, ctrl_set_enable_dist_wtd_comp },
   { AV1E_SET_ENABLE_REF_FRAME_MVS, ctrl_set_enable_ref_frame_mvs },
   { AV1E_SET_ALLOW_REF_FRAME_MVS, ctrl_set_allow_ref_frame_mvs },
+  { AV1E_SET_ENABLE_MASKED_COMP, ctrl_set_enable_masked_comp },
+  { AV1E_SET_ENABLE_INTERINTRA_COMP, ctrl_set_enable_interintra_comp },
+  { AV1E_SET_ENABLE_SMOOTH_INTERINTRA, ctrl_set_enable_smooth_interintra },
+  { AV1E_SET_ENABLE_DIFF_WTD_COMP, ctrl_set_enable_diff_wtd_comp },
+  { AV1E_SET_ENABLE_INTERINTER_WEDGE, ctrl_set_enable_interinter_wedge },
+  { AV1E_SET_ENABLE_INTERINTRA_WEDGE, ctrl_set_enable_interintra_wedge },
+  { AV1E_SET_ENABLE_GLOBAL_MOTION, ctrl_set_enable_global_motion },
   { AV1E_SET_ENABLE_WARPED_MOTION, ctrl_set_enable_warped_motion },
   { AV1E_SET_ALLOW_WARPED_MOTION, ctrl_set_allow_warped_motion },
+  { AV1E_SET_ENABLE_FILTER_INTRA, ctrl_set_enable_filter_intra },
   { AV1E_SET_ENABLE_SUPERRES, ctrl_set_enable_superres },
+  { AV1E_SET_ENABLE_PALETTE, ctrl_set_enable_palette },
+  { AV1E_SET_ENABLE_INTRABC, ctrl_set_enable_intrabc },
   { AV1E_SET_AQ_MODE, ctrl_set_aq_mode },
+  { AV1E_SET_REDUCED_TX_TYPE_SET, ctrl_set_reduced_tx_type_set },
   { AV1E_SET_DELTAQ_MODE, ctrl_set_deltaq_mode },
   { AV1E_SET_FRAME_PERIODIC_BOOST, ctrl_set_frame_periodic_boost },
   { AV1E_SET_TUNE_CONTENT, ctrl_set_tune_content },
@@ -1804,6 +1990,7 @@ static aom_codec_ctrl_fn_map_t encoder_ctrl_maps[] = {
   { AV1E_SET_NOISE_SENSITIVITY, ctrl_set_noise_sensitivity },
   { AV1E_SET_MIN_GF_INTERVAL, ctrl_set_min_gf_interval },
   { AV1E_SET_MAX_GF_INTERVAL, ctrl_set_max_gf_interval },
+  { AV1E_SET_GF_MAX_PYRAMID_HEIGHT, ctrl_set_gf_max_pyr_height },
   { AV1E_SET_RENDER_SIZE, ctrl_set_render_size },
   { AV1E_SET_SUPERBLOCK_SIZE, ctrl_set_superblock_size },
   { AV1E_SET_SINGLE_TILE_DECODING, ctrl_set_single_tile_decoding },

@@ -121,8 +121,6 @@ set_aom_config_var(CONFIG_SIZE_LIMIT 0 NUMBER "Limit max decode width/height.")
 set_aom_config_var(CONFIG_SPATIAL_RESAMPLING 1 NUMBER "Spatial resampling.")
 set_aom_config_var(DECODE_HEIGHT_LIMIT 0 NUMBER "Set limit for decode height.")
 set_aom_config_var(DECODE_WIDTH_LIMIT 0 NUMBER "Set limit for decode width.")
-set_aom_config_var(CONFIG_GLOBAL_MOTION_SEARCH 1 NUMBER
-                   "Global motion search flag.")
 
 # AV1 experiment flags.
 set_aom_config_var(CONFIG_COLLECT_INTER_MODE_RD_STATS 1 NUMBER

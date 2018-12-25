@@ -640,7 +640,7 @@ void av1_warp_affine_neon(const int32_t *mat, const uint8_t *ref, int width,
             uint16x4_t tmp16_lo = vld1_u16(p);
             int32x4_t tmp32_lo = vreinterpretq_s32_u32(vmovl_u16(tmp16_lo));
             int16x4_t tmp16_low;
-            if (conv_params->use_jnt_comp_avg) {
+            if (conv_params->use_dist_wtd_comp_avg) {
               res_lo = vmulq_s32(res_lo, bwd);
               tmp32_lo = vmulq_s32(tmp32_lo, fwd);
               tmp32_lo = vaddq_s32(tmp32_lo, res_lo);
@@ -671,7 +671,7 @@ void av1_warp_affine_neon(const int32_t *mat, const uint8_t *ref, int width,
               uint16x4_t tmp16_hi = vld1_u16(p4);
               int32x4_t tmp32_hi = vreinterpretq_s32_u32(vmovl_u16(tmp16_hi));
               int16x4_t tmp16_high;
-              if (conv_params->use_jnt_comp_avg) {
+              if (conv_params->use_dist_wtd_comp_avg) {
                 res_hi = vmulq_s32(res_hi, bwd);
                 tmp32_hi = vmulq_s32(tmp32_hi, fwd);
                 tmp32_hi = vaddq_s32(tmp32_hi, res_hi);

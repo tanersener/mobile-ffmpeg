@@ -108,7 +108,7 @@ class AV1JNTCOMPAVGTest : public ::testing::TestWithParam<JNTCOMPAVGParam> {
     const int in_h = block_size_high[block_idx];
 
     JNT_COMP_PARAMS jnt_comp_params;
-    jnt_comp_params.use_jnt_comp_avg = 1;
+    jnt_comp_params.use_dist_wtd_comp_avg = 1;
 
     for (int ii = 0; ii < 2; ii++) {
       for (int jj = 0; jj < 4; jj++) {
@@ -153,7 +153,7 @@ class AV1JNTCOMPAVGTest : public ::testing::TestWithParam<JNTCOMPAVGParam> {
     const int in_h = block_size_high[block_idx];
 
     JNT_COMP_PARAMS jnt_comp_params;
-    jnt_comp_params.use_jnt_comp_avg = 1;
+    jnt_comp_params.use_dist_wtd_comp_avg = 1;
 
     jnt_comp_params.fwd_offset = quant_dist_lookup_table[0][0][0];
     jnt_comp_params.bck_offset = quant_dist_lookup_table[0][0][1];
@@ -212,7 +212,7 @@ class AV1JNTCOMPAVGUPSAMPLEDTest
     const int in_h = block_size_high[block_idx];
 
     JNT_COMP_PARAMS jnt_comp_params;
-    jnt_comp_params.use_jnt_comp_avg = 1;
+    jnt_comp_params.use_dist_wtd_comp_avg = 1;
     int sub_x_q3, sub_y_q3;
     int subpel_search;
     for (subpel_search = USE_4_TAPS; subpel_search <= USE_8_TAPS;
@@ -273,7 +273,7 @@ class AV1JNTCOMPAVGUPSAMPLEDTest
     const int in_h = block_size_high[block_idx];
 
     JNT_COMP_PARAMS jnt_comp_params;
-    jnt_comp_params.use_jnt_comp_avg = 1;
+    jnt_comp_params.use_dist_wtd_comp_avg = 1;
 
     jnt_comp_params.fwd_offset = quant_dist_lookup_table[0][0][0];
     jnt_comp_params.bck_offset = quant_dist_lookup_table[0][0][1];
@@ -339,7 +339,7 @@ class AV1HighBDJNTCOMPAVGTest
     const int in_h = block_size_high[block_idx];
 
     JNT_COMP_PARAMS jnt_comp_params;
-    jnt_comp_params.use_jnt_comp_avg = 1;
+    jnt_comp_params.use_dist_wtd_comp_avg = 1;
 
     for (int ii = 0; ii < 2; ii++) {
       for (int jj = 0; jj < 4; jj++) {
@@ -388,7 +388,7 @@ class AV1HighBDJNTCOMPAVGTest
     const int in_h = block_size_high[block_idx];
 
     JNT_COMP_PARAMS jnt_comp_params;
-    jnt_comp_params.use_jnt_comp_avg = 1;
+    jnt_comp_params.use_dist_wtd_comp_avg = 1;
 
     jnt_comp_params.fwd_offset = quant_dist_lookup_table[0][0][0];
     jnt_comp_params.bck_offset = quant_dist_lookup_table[0][0][1];
@@ -449,7 +449,7 @@ class AV1HighBDJNTCOMPAVGUPSAMPLEDTest
     const int in_h = block_size_high[block_idx];
 
     JNT_COMP_PARAMS jnt_comp_params;
-    jnt_comp_params.use_jnt_comp_avg = 1;
+    jnt_comp_params.use_dist_wtd_comp_avg = 1;
     int sub_x_q3, sub_y_q3;
     int subpel_search;
     for (subpel_search = USE_4_TAPS; subpel_search <= USE_8_TAPS;
@@ -512,7 +512,7 @@ class AV1HighBDJNTCOMPAVGUPSAMPLEDTest
     const int in_h = block_size_high[block_idx];
 
     JNT_COMP_PARAMS jnt_comp_params;
-    jnt_comp_params.use_jnt_comp_avg = 1;
+    jnt_comp_params.use_dist_wtd_comp_avg = 1;
 
     jnt_comp_params.fwd_offset = quant_dist_lookup_table[0][0][0];
     jnt_comp_params.bck_offset = quant_dist_lookup_table[0][0][1];

@@ -696,7 +696,7 @@ static INLINE void dec_build_inter_predictors(const AV1_COMMON *cm,
         assert(bw < 8 || bh < 8);
         ConvolveParams conv_params = get_conv_params_no_round(
             0, plane, xd->tmp_conv_dst, tmp_dst_stride, is_compound, xd->bd);
-        conv_params.use_jnt_comp_avg = 0;
+        conv_params.use_dist_wtd_comp_avg = 0;
         struct buf_2d *const dst_buf = &pd->dst;
         uint8_t *dst = dst_buf->buf + dst_buf->stride * y + x;
 
@@ -801,9 +801,9 @@ static INLINE void dec_build_inter_predictors(const AV1_COMMON *cm,
 
     ConvolveParams conv_params = get_conv_params_no_round(
         0, plane, xd->tmp_conv_dst, MAX_SB_SIZE, is_compound, xd->bd);
-    av1_jnt_comp_weight_assign(cm, mi, 0, &conv_params.fwd_offset,
-                               &conv_params.bck_offset,
-                               &conv_params.use_jnt_comp_avg, is_compound);
+    av1_dist_wtd_comp_weight_assign(
+        cm, mi, 0, &conv_params.fwd_offset, &conv_params.bck_offset,
+        &conv_params.use_dist_wtd_comp_avg, is_compound);
 
     for (ref = 0; ref < 1 + is_compound; ++ref) {
       const struct scale_factors *const sf =
@@ -4518,7 +4518,7 @@ void av1_read_sequence_header(AV1_COMMON *cm, struct aom_read_bit_buffer *rb,
     seq_params->enable_warped_motion = 0;
     seq_params->enable_dual_filter = 0;
     seq_params->order_hint_info.enable_order_hint = 0;
-    seq_params->order_hint_info.enable_jnt_comp = 0;
+    seq_params->order_hint_info.enable_dist_wtd_comp = 0;
     seq_params->order_hint_info.enable_ref_frame_mvs = 0;
     seq_params->force_screen_content_tools = 2;  // SELECT_SCREEN_CONTENT_TOOLS
     seq_params->force_integer_mv = 2;            // SELECT_INTEGER_MV
@@ -4530,7 +4530,7 @@ void av1_read_sequence_header(AV1_COMMON *cm, struct aom_read_bit_buffer *rb,
     seq_params->enable_dual_filter = aom_rb_read_bit(rb);
 
     seq_params->order_hint_info.enable_order_hint = aom_rb_read_bit(rb);
-    seq_params->order_hint_info.enable_jnt_comp =
+    seq_params->order_hint_info.enable_dist_wtd_comp =
         seq_params->order_hint_info.enable_order_hint ? aom_rb_read_bit(rb) : 0;
     seq_params->order_hint_info.enable_ref_frame_mvs =
         seq_params->order_hint_info.enable_order_hint ? aom_rb_read_bit(rb) : 0;
@@ -4716,6 +4716,18 @@ static void generate_next_ref_frame_map(AV1Decoder *const pbi) {
   pbi->hold_ref_buf = 1;
 }
 
+// If the refresh_frame_flags bitmask is set, update reference frame id values
+// and mark frames as valid for reference.
+static void update_ref_frame_id(AV1_COMMON *const cm, int frame_id) {
+  int refresh_frame_flags = cm->current_frame.refresh_frame_flags;
+  for (int i = 0; i < REF_FRAMES; i++) {
+    if ((refresh_frame_flags >> i) & 1) {
+      cm->ref_frame_id[i] = frame_id;
+      cm->valid_for_referencing[i] = 1;
+    }
+  }
+}
+
 static void show_existing_frame_reset(AV1Decoder *const pbi,
                                       int existing_frame_idx) {
   AV1_COMMON *const cm = &pbi->common;
@@ -4735,20 +4747,10 @@ static void show_existing_frame_reset(AV1Decoder *const pbi,
     pbi->need_resync = 0;
   }
 
+  // Note that the displayed frame must be valid for referencing in order to
+  // have been selected.
   if (cm->seq_params.frame_id_numbers_present_flag) {
-    /* If bitmask is set, update reference frame id values and
-       mark frames as valid for reference.
-       Note that the displayed frame be valid for referencing
-       in order to have been selected.
-    */
-    int refresh_frame_flags = cm->current_frame.refresh_frame_flags;
-    int display_frame_id = cm->ref_frame_id[existing_frame_idx];
-    for (int i = 0; i < REF_FRAMES; i++) {
-      if ((refresh_frame_flags >> i) & 1) {
-        cm->ref_frame_id[i] = display_frame_id;
-        cm->valid_for_referencing[i] = 1;
-      }
-    }
+    update_ref_frame_id(cm, cm->ref_frame_id[existing_frame_idx]);
   }
 
   cm->refresh_frame_context = REFRESH_FRAME_CONTEXT_DISABLED;
@@ -4764,8 +4766,10 @@ static INLINE void reset_frame_buffers(AV1_COMMON *cm) {
   int i;
 
   // We have not stored any references to frame buffers in
-  // cm->next_ref_frame_map, so we can directly reset it to all -1.
-  memset(&cm->next_ref_frame_map, -1, sizeof(cm->next_ref_frame_map));
+  // cm->next_ref_frame_map, so we can directly reset it to all NULL.
+  for (i = 0; i < REF_FRAMES; ++i) {
+    cm->next_ref_frame_map[i] = NULL;
+  }
 
   lock_buffer_pool(cm->buffer_pool);
   reset_ref_frame_map(cm);
@@ -5228,15 +5232,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
   cm->cur_frame->frame_type = current_frame->frame_type;
 
   if (seq_params->frame_id_numbers_present_flag) {
-    /* If bitmask is set, update reference frame id values and
-       mark frames as valid for reference */
-    int refresh_frame_flags = current_frame->refresh_frame_flags;
-    for (int i = 0; i < REF_FRAMES; i++) {
-      if ((refresh_frame_flags >> i) & 1) {
-        cm->ref_frame_id[i] = cm->current_frame_id;
-        cm->valid_for_referencing[i] = 1;
-      }
-    }
+    update_ref_frame_id(cm, cm->current_frame_id);
   }
 
   const int might_bwd_adapt =

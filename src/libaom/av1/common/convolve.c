@@ -290,7 +290,7 @@ void av1_jnt_convolve_2d_c(const uint8_t *src, int src_stride, uint8_t *dst8,
       CONV_BUF_TYPE res = ROUND_POWER_OF_TWO(sum, conv_params->round_1);
       if (conv_params->do_average) {
         int32_t tmp = dst[y * dst_stride + x];
-        if (conv_params->use_jnt_comp_avg) {
+        if (conv_params->use_dist_wtd_comp_avg) {
           tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
           tmp = tmp >> DIST_PRECISION_BITS;
         } else {
@@ -341,7 +341,7 @@ void av1_jnt_convolve_y_c(const uint8_t *src, int src_stride, uint8_t *dst8,
 
       if (conv_params->do_average) {
         int32_t tmp = dst[y * dst_stride + x];
-        if (conv_params->use_jnt_comp_avg) {
+        if (conv_params->use_dist_wtd_comp_avg) {
           tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
           tmp = tmp >> DIST_PRECISION_BITS;
         } else {
@@ -391,7 +391,7 @@ void av1_jnt_convolve_x_c(const uint8_t *src, int src_stride, uint8_t *dst8,
 
       if (conv_params->do_average) {
         int32_t tmp = dst[y * dst_stride + x];
-        if (conv_params->use_jnt_comp_avg) {
+        if (conv_params->use_dist_wtd_comp_avg) {
           tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
           tmp = tmp >> DIST_PRECISION_BITS;
         } else {
@@ -434,7 +434,7 @@ void av1_jnt_convolve_2d_copy_c(const uint8_t *src, int src_stride,
 
       if (conv_params->do_average) {
         int32_t tmp = dst[y * dst_stride + x];
-        if (conv_params->use_jnt_comp_avg) {
+        if (conv_params->use_dist_wtd_comp_avg) {
           tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
           tmp = tmp >> DIST_PRECISION_BITS;
         } else {
@@ -511,7 +511,7 @@ void av1_convolve_2d_scale_c(const uint8_t *src, int src_stride, uint8_t *dst8,
       if (conv_params->is_compound) {
         if (conv_params->do_average) {
           int32_t tmp = dst16[y * dst16_stride + x];
-          if (conv_params->use_jnt_comp_avg) {
+          if (conv_params->use_dist_wtd_comp_avg) {
             tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
             tmp = tmp >> DIST_PRECISION_BITS;
           } else {
@@ -799,7 +799,7 @@ void av1_highbd_jnt_convolve_2d_c(const uint16_t *src, int src_stride,
       CONV_BUF_TYPE res = ROUND_POWER_OF_TWO(sum, conv_params->round_1);
       if (conv_params->do_average) {
         int32_t tmp = dst[y * dst_stride + x];
-        if (conv_params->use_jnt_comp_avg) {
+        if (conv_params->use_dist_wtd_comp_avg) {
           tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
           tmp = tmp >> DIST_PRECISION_BITS;
         } else {
@@ -851,7 +851,7 @@ void av1_highbd_jnt_convolve_x_c(const uint16_t *src, int src_stride,
 
       if (conv_params->do_average) {
         int32_t tmp = dst[y * dst_stride + x];
-        if (conv_params->use_jnt_comp_avg) {
+        if (conv_params->use_dist_wtd_comp_avg) {
           tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
           tmp = tmp >> DIST_PRECISION_BITS;
         } else {
@@ -902,7 +902,7 @@ void av1_highbd_jnt_convolve_y_c(const uint16_t *src, int src_stride,
 
       if (conv_params->do_average) {
         int32_t tmp = dst[y * dst_stride + x];
-        if (conv_params->use_jnt_comp_avg) {
+        if (conv_params->use_dist_wtd_comp_avg) {
           tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
           tmp = tmp >> DIST_PRECISION_BITS;
         } else {
@@ -943,7 +943,7 @@ void av1_highbd_jnt_convolve_2d_copy_c(
       res += round_offset;
       if (conv_params->do_average) {
         int32_t tmp = dst[y * dst_stride + x];
-        if (conv_params->use_jnt_comp_avg) {
+        if (conv_params->use_dist_wtd_comp_avg) {
           tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
           tmp = tmp >> DIST_PRECISION_BITS;
         } else {
@@ -1019,7 +1019,7 @@ void av1_highbd_convolve_2d_scale_c(const uint16_t *src, int src_stride,
       if (conv_params->is_compound) {
         if (conv_params->do_average) {
           int32_t tmp = dst16[y * dst16_stride + x];
-          if (conv_params->use_jnt_comp_avg) {
+          if (conv_params->use_dist_wtd_comp_avg) {
             tmp = tmp * conv_params->fwd_offset + res * conv_params->bck_offset;
             tmp = tmp >> DIST_PRECISION_BITS;
           } else {

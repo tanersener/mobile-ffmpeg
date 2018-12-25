@@ -26,7 +26,7 @@ typedef struct ConvolveParams {
   int round_1;
   int plane;
   int is_compound;
-  int use_jnt_comp_avg;
+  int use_dist_wtd_comp_avg;
   int fwd_offset;
   int bck_offset;
 } ConvolveParams;

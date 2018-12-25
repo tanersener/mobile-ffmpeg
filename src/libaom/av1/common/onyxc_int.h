@@ -224,9 +224,9 @@ typedef struct {
   int enable_order_hint;           // 0 - disable order hint, and related tools
   int order_hint_bits_minus_1;
                                    // jnt_comp, ref_frame_mvs, frame_sign_bias
-                                   // if 0, enable_jnt_comp and
+                                   // if 0, enable_dist_wtd_comp and
                                    // enable_ref_frame_mvs must be set zs 0.
-  int enable_jnt_comp;             // 0 - disable joint compound modes
+  int enable_dist_wtd_comp;        // 0 - disable dist-wtd compound modes
                                    // 1 - enable it
   int enable_ref_frame_mvs;        // 0 - disable ref frame mvs
                                    // 1 - enable it
@@ -333,7 +333,6 @@ typedef struct AV1Common {
   aom_op_timing_info_t op_frame_timing[MAX_NUM_OPERATING_POINTS + 1];
   uint32_t frame_presentation_time;
 
-  int largest_tile_id;
   int context_update_tile_id;
 
   // Scale of the current frame with respect to itself.
@@ -500,8 +499,6 @@ typedef struct AV1Common {
 
   FRAME_CONTEXT *fc;              /* this frame entropy */
   FRAME_CONTEXT *default_frame_context;
-  unsigned int frame_context_idx; /* Context to use/update */
-  int fb_of_context_type[REF_FRAMES];
   int primary_ref_frame;
 
   int error_resilient_mode;

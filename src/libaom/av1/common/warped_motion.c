@@ -485,7 +485,7 @@ void av1_highbd_warp_affine_c(const int32_t *mat, const uint16_t *ref,
               uint16_t *dst16 =
                   &pred[(i - p_row + k + 4) * p_stride + (j - p_col + l + 4)];
               int32_t tmp32 = *p;
-              if (conv_params->use_jnt_comp_avg) {
+              if (conv_params->use_dist_wtd_comp_avg) {
                 tmp32 = tmp32 * conv_params->fwd_offset +
                         sum * conv_params->bck_offset;
                 tmp32 = tmp32 >> DIST_PRECISION_BITS;
@@ -563,7 +563,7 @@ static int64_t highbd_warp_error(
   uint16_t tmp[WARP_ERROR_BLOCK * WARP_ERROR_BLOCK];
 
   ConvolveParams conv_params = get_conv_params(0, 0, bd);
-  conv_params.use_jnt_comp_avg = 0;
+  conv_params.use_dist_wtd_comp_avg = 0;
   for (int i = p_row; i < p_row + p_height; i += WARP_ERROR_BLOCK) {
     for (int j = p_col; j < p_col + p_width; j += WARP_ERROR_BLOCK) {
       // avoid warping extra 8x8 blocks in the padded region of the frame
@@ -773,7 +773,7 @@ void av1_warp_affine_c(const int32_t *mat, const uint8_t *ref, int width,
               uint8_t *dst8 =
                   &pred[(i - p_row + k + 4) * p_stride + (j - p_col + l + 4)];
               int32_t tmp32 = *p;
-              if (conv_params->use_jnt_comp_avg) {
+              if (conv_params->use_dist_wtd_comp_avg) {
                 tmp32 = tmp32 * conv_params->fwd_offset +
                         sum * conv_params->bck_offset;
                 tmp32 = tmp32 >> DIST_PRECISION_BITS;
@@ -846,7 +846,7 @@ static int64_t warp_error(WarpedMotionParams *wm, const uint8_t *const ref,
   int error_bsize_h = AOMMIN(p_height, WARP_ERROR_BLOCK);
   uint8_t tmp[WARP_ERROR_BLOCK * WARP_ERROR_BLOCK];
   ConvolveParams conv_params = get_conv_params(0, 0, 8);
-  conv_params.use_jnt_comp_avg = 0;
+  conv_params.use_dist_wtd_comp_avg = 0;
 
   for (int i = p_row; i < p_row + p_height; i += WARP_ERROR_BLOCK) {
     for (int j = p_col; j < p_col + p_width; j += WARP_ERROR_BLOCK) {

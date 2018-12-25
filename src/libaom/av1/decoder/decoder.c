@@ -330,8 +330,8 @@ static void release_frame_buffers(AV1Decoder *pbi) {
   if (pbi->hold_ref_buf) {
     for (int ref_index = 0; ref_index < REF_FRAMES; ++ref_index) {
       decrease_ref_count(cm->next_ref_frame_map[ref_index], pool);
+      cm->next_ref_frame_map[ref_index] = NULL;
     }
-    memset(&cm->next_ref_frame_map, -1, sizeof(cm->next_ref_frame_map));
     pbi->hold_ref_buf = 0;
   }
   // Release current frame.

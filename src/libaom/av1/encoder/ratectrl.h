@@ -37,22 +37,15 @@ extern "C" {
 #define CUSTOMIZED_GF 1
 
 #if CONFIG_FIX_GF_LENGTH
-#define FIXED_GF_LENGTH 16
+// Minimum and maximum height for the new pyramid structure.
+// (Old structure supports height = 1, but does NOT support height = 4).
+#define MIN_PYRAMID_LVL 2
 #define MAX_PYRAMID_LVL 4
-// We allow a frame to have at most two left/right descendants before changing
-// them into to a subtree, i.e., we allow the following structure:
-/*                    OUT_OF_ORDER_FRAME
-                     / /              \ \
-(two left children) F F                F F (two right children) */
-// Therefore the max gf size supported by 4 layer structure is
-// 1 (KEY/OVERLAY) + 1 + 2 + 4 + 16 (two children on both side of their parent)
-#define MAX_PYRAMID_SIZE 24
 #define USE_SYMM_MULTI_LAYER 1
 #define REDUCE_LAST_ALT_BOOST 1
 #define REDUCE_LAST_GF_LENGTH 1
 #define MULTI_LVL_BOOST_VBR_CQ 1
 #else
-#define MAX_PYRAMID_SIZE 16
 #define USE_SYMM_MULTI_LAYER 0
 #define REDUCE_LAST_ALT_BOOST 0
 #define REDUCE_LAST_GF_LENGTH 0
@@ -195,7 +188,12 @@ int av1_rc_get_default_min_gf_interval(int width, int height, double framerate);
 // Note av1_rc_get_default_max_gf_interval() requires the min_gf_interval to
 // be passed in to ensure that the max_gf_interval returned is at least as bis
 // as that.
-int av1_rc_get_default_max_gf_interval(double framerate, int min_frame_rate);
+int av1_rc_get_default_max_gf_interval(double framerate, int min_frame_rate,
+                                       int max_pyr_height);
+
+#if CONFIG_FIX_GF_LENGTH
+int av1_rc_get_fixed_gf_length(int max_pyr_height);
+#endif  // CONFIG_FIX_GF_LENGTH
 
 // Generally at the high level, the following flow is expected
 // to be enforced for rate control:

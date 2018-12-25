@@ -1588,7 +1588,7 @@ void check_frame_params(GF_GROUP *const gf_group, int gf_interval,
   }
 
   fprintf(fid, "number of nodes in each level: \n");
-  for (int i = 0; i < MAX_PYRAMID_LVL; ++i) {
+  for (int i = 0; i < gf_group->pyramid_height; ++i) {
     fprintf(fid, "lvl %d: %d ", i, gf_group->pyramid_lvl_nodes[i]);
   }
   fprintf(fid, "\n");
@@ -1653,7 +1653,7 @@ static void set_multi_layer_params(GF_GROUP *const gf_group, int l, int r,
 }
 
 static INLINE unsigned char get_pyramid_height(int pyramid_width) {
-  assert(pyramid_width <= 16 && pyramid_width >= 4 &&
+  assert(pyramid_width <= MAX_GF_INTERVAL && pyramid_width >= MIN_GF_INTERVAL &&
          "invalid gf interval for pyramid structure");
 
   return pyramid_width > 12 ? 4 : (pyramid_width > 6 ? 3 : 2);
@@ -1690,14 +1690,49 @@ static int construct_multi_layer_gf_structure(GF_GROUP *const gf_group,
   return frame_index;
 }
 
+// Given the maximum allowed height of the pyramid structure, return the maximum
+// GF length supported by the same.
+static INLINE int get_max_gf_length(int max_pyr_height) {
+#if CONFIG_FIX_GF_LENGTH
+  // We allow a frame to have at most two left/right descendants before changing
+  // them into to a subtree, i.e., we allow the following structure:
+  /*                    OUT_OF_ORDER_FRAME
+                       / /              \ \
+  (two left children) F F                F F (two right children) */
+  // For example, the max gf size supported by 4 layer structure is:
+  // 1 (KEY/OVERLAY) + 1 + 2 + 4 + 16 (two children on both side of their
+  // parent)
+  switch (max_pyr_height) {
+    case 2: return 6;   // = 1 (KEY/OVERLAY) + 1 + 4
+    case 3: return 12;  // = 1 (KEY/OVERLAY) + 1 + 2 + 8
+    case 4: return 24;  // = 1 (KEY/OVERLAY) + 1 + 2 + 4 + 16
+    case 1:
+      return MAX_GF_INTERVAL;  // Special case: uses the old pyramid structure.
+    default: assert(0 && "Invalid max_pyr_height"); return -1;
+  }
+#else
+  return 16;
+#endif  // CONFIG_FIX_GF_LENGTH
+}
+
+// Given the maximum allowed height of the pyramid structure, return the fixed
+// GF length to be used.
+int av1_rc_get_fixed_gf_length(int max_pyr_height) {
+  const int max_gf_length_allowed = get_max_gf_length(max_pyr_height);
+  return AOMMIN(max_gf_length_allowed, MAX_GF_INTERVAL);
+}
+
 static void define_customized_gf_group_structure(AV1_COMP *cpi) {
   RATE_CONTROL *const rc = &cpi->rc;
   TWO_PASS *const twopass = &cpi->twopass;
   GF_GROUP *const gf_group = &twopass->gf_group;
   const int key_frame = cpi->common.current_frame.frame_type == KEY_FRAME;
 
-  assert(rc->baseline_gf_interval >= 4 &&
-         rc->baseline_gf_interval <= MAX_PYRAMID_SIZE);
+  assert(rc->baseline_gf_interval >= MIN_GF_INTERVAL &&
+         rc->baseline_gf_interval <=
+             get_max_gf_length(cpi->oxcf.gf_max_pyr_height));
+  assert(cpi->oxcf.gf_max_pyr_height >= MIN_PYRAMID_LVL &&
+         cpi->oxcf.gf_max_pyr_height <= MAX_PYRAMID_LVL);
 
   const int gf_update_frames =
       construct_multi_layer_gf_structure(gf_group, rc->baseline_gf_interval);
@@ -1897,9 +1932,11 @@ static void define_gf_group_structure(AV1_COMP *cpi) {
   RATE_CONTROL *const rc = &cpi->rc;
 
 #if USE_SYMM_MULTI_LAYER
+  const int max_pyr_height = cpi->oxcf.gf_max_pyr_height;
   const int valid_customized_gf_length =
-      rc->baseline_gf_interval >= 4 &&
-      rc->baseline_gf_interval <= MAX_PYRAMID_SIZE;
+      max_pyr_height >= MIN_PYRAMID_LVL && max_pyr_height <= MAX_PYRAMID_LVL &&
+      rc->baseline_gf_interval >= MIN_GF_INTERVAL &&
+      rc->baseline_gf_interval <= get_max_gf_length(max_pyr_height);
   // used the new structure only if extra_arf is allowed
   if (valid_customized_gf_length && rc->source_alt_ref_pending &&
       cpi->extra_arf_allowed > 0) {
@@ -2508,9 +2545,9 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
         decay_accumulator *
         calc_frame_boost(cpi, &next_frame, this_frame_mv_in_out, GF_MAX_BOOST);
 #if CONFIG_FIX_GF_LENGTH
-    // If almost totally static, we will not use the FIXED_GF_LENGTH later, so
-    // we can continue for more frames.
-    if (i >= (FIXED_GF_LENGTH + 1) &&
+    // If almost totally static, we will not use the the fixed GF length later,
+    // so we can continue for more frames.
+    if (i >= (av1_rc_get_fixed_gf_length(oxcf->gf_max_pyr_height) + 1) &&
         !is_almost_static(zero_motion_accumulator,
                           twopass->kf_zeromotion_pct)) {
       break;
@@ -2644,7 +2681,7 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
                 AOMMAX(MIN_FWD_KF_INTERVAL, rc->min_gf_interval)) &&
                (rc->frames_to_key != i)) {
       // if possible, merge the last two gf groups
-      if (rc->frames_to_key <= MAX_PYRAMID_SIZE) {
+      if (rc->frames_to_key <= get_max_gf_length(oxcf->gf_max_pyr_height)) {
         rc->baseline_gf_interval = rc->frames_to_key;
         // if merging the last two gf groups creates a group that is too long,
         // split them and force the last gf group to be the MIN_FWD_KF_INTERVAL
@@ -2673,16 +2710,23 @@ static void define_gf_group(AV1_COMP *cpi, FIRSTPASS_STATS *this_frame) {
   if (!cpi->extra_arf_allowed) {
     cpi->num_extra_arfs = 0;
   } else {
+    // Calculate 'num_extra_arfs' (internal alt-refs) that we are allowed.
+    // Note: When new pyramid structure is used through
+    // 'define_customized_gf_group_structure()' function, this value is
+    // overridden.
 #if USE_SYMM_MULTI_LAYER
-    if (rc->baseline_gf_interval == 4 && rc->source_alt_ref_pending)
+    if (rc->baseline_gf_interval == MIN_GF_INTERVAL &&
+        rc->source_alt_ref_pending) {
       cpi->num_extra_arfs = 1;
-    else
-      cpi->num_extra_arfs = get_number_of_extra_arfs(
-          rc->baseline_gf_interval, rc->source_alt_ref_pending);
+    } else {
+      cpi->num_extra_arfs = get_number_of_extra_arfs(rc->baseline_gf_interval,
+                                                     rc->source_alt_ref_pending,
+                                                     oxcf->gf_max_pyr_height);
+    }
 #else
-    // Compute how many extra alt_refs we can have
     cpi->num_extra_arfs = get_number_of_extra_arfs(rc->baseline_gf_interval,
-                                                   rc->source_alt_ref_pending);
+                                                   rc->source_alt_ref_pending,
+                                                   oxcf->gf_max_pyr_height);
 #endif  // USE_SYMM_MULTI_LAYER
   }
 

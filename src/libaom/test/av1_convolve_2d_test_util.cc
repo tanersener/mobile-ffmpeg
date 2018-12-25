@@ -201,8 +201,8 @@ void AV1JntConvolve2DTest::RunCheckOutput(convolve_2d_func test_impl) {
             get_conv_params_no_round(do_average, 0, output2, MAX_SB_SIZE, 1, 8);
 
         // Test special case where jnt_comp_avg is not used
-        conv_params1.use_jnt_comp_avg = 0;
-        conv_params2.use_jnt_comp_avg = 0;
+        conv_params1.use_dist_wtd_comp_avg = 0;
+        conv_params2.use_dist_wtd_comp_avg = 0;
 
         const int subx_range = has_subx ? 16 : 1;
         const int suby_range = has_suby ? 16 : 1;
@@ -247,8 +247,8 @@ void AV1JntConvolve2DTest::RunCheckOutput(convolve_2d_func test_impl) {
         // Test different combination of fwd and bck offset weights
         for (int k = 0; k < 2; ++k) {
           for (int l = 0; l < 4; ++l) {
-            conv_params1.use_jnt_comp_avg = 1;
-            conv_params2.use_jnt_comp_avg = 1;
+            conv_params1.use_dist_wtd_comp_avg = 1;
+            conv_params2.use_dist_wtd_comp_avg = 1;
             conv_params1.fwd_offset = quant_dist_lookup_table[k][l][0];
             conv_params1.bck_offset = quant_dist_lookup_table[k][l][1];
             conv_params2.fwd_offset = quant_dist_lookup_table[k][l][0];
@@ -333,7 +333,7 @@ void AV1JntConvolve2DTest::RunSpeedTest(convolve_2d_func test_impl) {
   ConvolveParams conv_params =
       get_conv_params_no_round(do_average, 0, output, MAX_SB_SIZE, 1, 8);
 
-  conv_params.use_jnt_comp_avg = 0;
+  conv_params.use_dist_wtd_comp_avg = 0;
 
   // Choose random locations within the source block
   const int offset_r = 3 + rnd_.PseudoUniform(h - out_h - 7);
@@ -541,7 +541,7 @@ void AV1HighbdJntConvolve2DTest::RunSpeedTest(
       get_conv_params_no_round(do_average, 0, output, MAX_SB_SIZE, 1, bd);
 
   // Test special case where jnt_comp_avg is not used
-  conv_params.use_jnt_comp_avg = 0;
+  conv_params.use_dist_wtd_comp_avg = 0;
 
   subx = 0;
   suby = 0;
@@ -602,8 +602,8 @@ void AV1HighbdJntConvolve2DTest::RunCheckOutput(
             do_average, 0, output2, MAX_SB_SIZE, 1, bd);
 
         // Test special case where jnt_comp_avg is not used
-        conv_params1.use_jnt_comp_avg = 0;
-        conv_params2.use_jnt_comp_avg = 0;
+        conv_params1.use_dist_wtd_comp_avg = 0;
+        conv_params2.use_dist_wtd_comp_avg = 0;
 
         const int subx_range = has_subx ? 16 : 1;
         const int suby_range = has_suby ? 16 : 1;
@@ -648,8 +648,8 @@ void AV1HighbdJntConvolve2DTest::RunCheckOutput(
         // Test different combination of fwd and bck offset weights
         for (int k = 0; k < 2; ++k) {
           for (int l = 0; l < 4; ++l) {
-            conv_params1.use_jnt_comp_avg = 1;
-            conv_params2.use_jnt_comp_avg = 1;
+            conv_params1.use_dist_wtd_comp_avg = 1;
+            conv_params2.use_dist_wtd_comp_avg = 1;
             conv_params1.fwd_offset = quant_dist_lookup_table[k][l][0];
             conv_params1.bck_offset = quant_dist_lookup_table[k][l][1];
             conv_params2.fwd_offset = quant_dist_lookup_table[k][l][0];

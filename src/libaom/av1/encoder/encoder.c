@@ -367,6 +367,30 @@ static BLOCK_SIZE select_sb_size(const AV1_COMP *const cpi) {
   return BLOCK_128X128;
 }
 
+static int get_current_frame_ref_type(const AV1_COMP *const cpi) {
+  const AV1_COMMON *const cm = &cpi->common;
+  const GF_GROUP *const gf_group = &cpi->twopass.gf_group;
+  // We choose the reference "type" of this frame from the flags which indicate
+  // which reference frames will be refreshed by it.  More than one of these
+  // flags may be set, so the order here implies an order of precedence.
+
+  if (frame_is_intra_only(cm) || cm->error_resilient_mode ||
+      cm->force_primary_ref_none)
+    return REGULAR_FRAME;
+  else if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE)
+    return EXT_ARF_FRAME;
+  else if (cpi->refresh_alt_ref_frame)
+    return ARF_FRAME;
+  else if (cpi->rc.is_src_frame_alt_ref)
+    return OVERLAY_FRAME;
+  else if (cpi->refresh_golden_frame)
+    return GLD_FRAME;
+  else if (cpi->refresh_bwd_ref_frame)
+    return BRF_FRAME;
+  else
+    return REGULAR_FRAME;
+}
+
 static void setup_frame(AV1_COMP *cpi) {
   AV1_COMMON *const cm = &cpi->common;
   // Set up entropy context depending on frame type. The decoder mandates
@@ -380,27 +404,13 @@ static void setup_frame(AV1_COMP *cpi) {
       cm->force_primary_ref_none) {
     av1_setup_past_independence(cm);
     for (int i = 0; i < REF_FRAMES; i++) {
-      cm->fb_of_context_type[i] = -1;
+      cpi->fb_of_context_type[i] = -1;
     }
-    cm->fb_of_context_type[REGULAR_FRAME] =
+    cpi->fb_of_context_type[REGULAR_FRAME] =
         cm->show_frame ? get_ref_frame_map_idx(cm, GOLDEN_FRAME)
                        : get_ref_frame_map_idx(cm, ALTREF_FRAME);
-    cm->frame_context_idx = REGULAR_FRAME;
   } else {
-    const GF_GROUP *gf_group = &cpi->twopass.gf_group;
-    if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE)
-      cm->frame_context_idx = EXT_ARF_FRAME;
-    else if (cpi->refresh_alt_ref_frame)
-      cm->frame_context_idx = ARF_FRAME;
-    else if (cpi->rc.is_src_frame_alt_ref)
-      cm->frame_context_idx = OVERLAY_FRAME;
-    else if (cpi->refresh_golden_frame)
-      cm->frame_context_idx = GLD_FRAME;
-    else if (cpi->refresh_bwd_ref_frame)
-      cm->frame_context_idx = BRF_FRAME;
-    else
-      cm->frame_context_idx = REGULAR_FRAME;
-    int wanted_fb = cm->fb_of_context_type[cm->frame_context_idx];
+    int wanted_fb = cpi->fb_of_context_type[get_current_frame_ref_type(cpi)];
     for (int ref_frame = LAST_FRAME; ref_frame <= ALTREF_FRAME; ref_frame++) {
       int fb = get_ref_frame_map_idx(cm, ref_frame);
       if (fb == wanted_fb) {
@@ -1120,8 +1130,8 @@ static void init_seq_coding_tools(SequenceHeader *seq, AV1_COMMON *cm,
   seq->delta_frame_id_length = DELTA_FRAME_ID_LENGTH;
 
   seq->enable_dual_filter = oxcf->enable_dual_filter;
-  seq->order_hint_info.enable_jnt_comp = oxcf->enable_jnt_comp;
-  seq->order_hint_info.enable_jnt_comp &=
+  seq->order_hint_info.enable_dist_wtd_comp = oxcf->enable_dist_wtd_comp;
+  seq->order_hint_info.enable_dist_wtd_comp &=
       seq->order_hint_info.enable_order_hint;
   seq->order_hint_info.enable_ref_frame_mvs = oxcf->enable_ref_frame_mvs;
   seq->order_hint_info.enable_ref_frame_mvs &=
@@ -1130,10 +1140,10 @@ static void init_seq_coding_tools(SequenceHeader *seq, AV1_COMMON *cm,
   seq->enable_cdef = oxcf->enable_cdef;
   seq->enable_restoration = oxcf->enable_restoration;
   seq->enable_warped_motion = oxcf->enable_warped_motion;
-  seq->enable_interintra_compound = 1;
-  seq->enable_masked_compound = 1;
-  seq->enable_intra_edge_filter = 1;
-  seq->enable_filter_intra = 1;
+  seq->enable_interintra_compound = oxcf->enable_interintra_comp;
+  seq->enable_masked_compound = oxcf->enable_masked_comp;
+  seq->enable_intra_edge_filter = oxcf->enable_intra_edge_filter;
+  seq->enable_filter_intra = oxcf->enable_filter_intra;
 
   set_bitstream_level_tier(seq, cm, oxcf);
 
@@ -4582,10 +4592,46 @@ static int get_refresh_frame_flags(const AV1_COMP *const cpi) {
 
 static void finalize_encoded_frame(AV1_COMP *const cpi) {
   AV1_COMMON *const cm = &cpi->common;
+  CurrentFrame *const current_frame = &cm->current_frame;
 
   // This bitfield indicates which reference frame slots will be overwritten by
   // the current frame
-  cm->current_frame.refresh_frame_flags = get_refresh_frame_flags(cpi);
+  current_frame->refresh_frame_flags = get_refresh_frame_flags(cpi);
+
+  if (!encode_show_existing_frame(cm)) {
+    // Refresh fb_of_context_type[]: see encoder.h for explanation
+    if (current_frame->frame_type == KEY_FRAME) {
+      // All ref frames are refreshed, pick one that will live long enough
+      cpi->fb_of_context_type[REGULAR_FRAME] = 0;
+    } else {
+      // If more than one frame is refreshed, it doesn't matter which one we
+      // pick so pick the first.  LST sometimes doesn't refresh any: this is ok
+      const int current_frame_ref_type = get_current_frame_ref_type(cpi);
+      for (int i = 0; i < REF_FRAMES; i++) {
+        if (current_frame->refresh_frame_flags & (1 << i)) {
+          cpi->fb_of_context_type[current_frame_ref_type] = i;
+          break;
+        }
+      }
+    }
+  }
+
+  if (!cm->seq_params.reduced_still_picture_hdr &&
+      encode_show_existing_frame(cm)) {
+    RefCntBuffer *const frame_to_show =
+        cm->ref_frame_map[cpi->existing_fb_idx_to_show];
+
+    if (frame_to_show == NULL || frame_to_show->ref_count < 1) {
+      aom_internal_error(&cm->error, AOM_CODEC_UNSUP_BITSTREAM,
+                         "Buffer does not contain a reconstructed frame");
+    }
+    assign_frame_buffer_p(&cm->cur_frame, frame_to_show);
+    if (cm->reset_decoder_state && frame_to_show->frame_type != KEY_FRAME) {
+      aom_internal_error(
+          &cm->error, AOM_CODEC_UNSUP_BITSTREAM,
+          "show_existing_frame to reset state on KEY_FRAME only");
+    }
+  }
 }
 
 static int encode_with_recode_loop(AV1_COMP *cpi, size_t *size, uint8_t *dest) {
@@ -5377,7 +5423,7 @@ static int encode_frame_to_data_rate(AV1_COMP *cpi, size_t *size, uint8_t *dest,
 #endif  // CONFIG_ENTROPY_STATS
 
   if (cm->refresh_frame_context == REFRESH_FRAME_CONTEXT_BACKWARD) {
-    *cm->fc = cpi->tile_data[cm->largest_tile_id].tctx;
+    *cm->fc = cpi->tile_data[cpi->largest_tile_id].tctx;
     av1_reset_cdf_symbol_counters(cm->fc);
   }
 

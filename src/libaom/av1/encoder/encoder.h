@@ -215,6 +215,7 @@ typedef struct AV1EncoderConfig {
   DELTAQ_MODE deltaq_mode;
   int enable_cdef;
   int enable_restoration;
+  int enable_obmc;
   int disable_trellis_quant;
   int using_qm;
   int qm_y;
@@ -274,6 +275,7 @@ typedef struct AV1EncoderConfig {
 
   int min_gf_interval;
   int max_gf_interval;
+  int gf_max_pyr_height;
 
   int row_mt;
   int tile_columns;
@@ -321,13 +323,26 @@ typedef struct AV1EncoderConfig {
   int enable_dual_filter;
   unsigned int motion_vector_unit_test;
   const cfg_options_t *cfg;
+  int enable_rect_partitions;
+  int enable_intra_edge_filter;
+  int enable_tx64;
   int enable_order_hint;
-  int enable_jnt_comp;
+  int enable_dist_wtd_comp;
   int enable_ref_frame_mvs;
   unsigned int allow_ref_frame_mvs;
+  int enable_masked_comp;
+  int enable_interintra_comp;
+  int enable_smooth_interintra;
+  int enable_diff_wtd_comp;
+  int enable_interinter_wedge;
+  int enable_interintra_wedge;
+  int enable_global_motion;
   int enable_warped_motion;
   int allow_warped_motion;
+  int enable_filter_intra;
   int enable_superres;
+  int enable_palette;
+  int enable_intrabc;
   unsigned int save_as_annexb;
 
 #if CONFIG_DENOISE
@@ -337,6 +352,7 @@ typedef struct AV1EncoderConfig {
 
   unsigned int chroma_subsampling_x;
   unsigned int chroma_subsampling_y;
+  int reduced_tx_type_set;
 } AV1EncoderConfig;
 
 static INLINE int is_lossless_requested(const AV1EncoderConfig *cfg) {
@@ -575,11 +591,6 @@ typedef struct {
   YV12_BUFFER_CONFIG buf;
 } EncRefCntBuffer;
 
-typedef struct TileBufferEnc {
-  uint8_t *data;
-  size_t size;
-} TileBufferEnc;
-
 typedef struct AV1_COMP {
   QUANTS quants;
   ThreadData td;
@@ -636,6 +647,12 @@ typedef struct AV1_COMP {
   int refresh_bwd_ref_frame;
   int refresh_alt2_ref_frame;
   int refresh_alt_ref_frame;
+
+  // For each type of reference frame, this contains the index of a reference
+  // frame buffer for a reference frame of the same type.  We use this to
+  // choose our primary reference frame (which is the most recent reference
+  // frame of the same type as the current frame).
+  int fb_of_context_type[REF_FRAMES];
 
 #if USE_SYMM_MULTI_LAYER
   // When true, a new rule for backward (future) reference frames is in effect:
@@ -779,8 +796,7 @@ typedef struct AV1_COMP {
 
   TOKENEXTRA *tile_tok[MAX_TILE_ROWS][MAX_TILE_COLS];
   TOKENLIST *tplist[MAX_TILE_ROWS][MAX_TILE_COLS];
-
-  TileBufferEnc tile_buffers[MAX_TILE_ROWS][MAX_TILE_COLS];
+  int largest_tile_id;
 
   int resize_state;
   int resize_avg_qp;
