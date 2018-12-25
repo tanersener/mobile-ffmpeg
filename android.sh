@@ -62,8 +62,8 @@ export BASEDIR=$(pwd)
 
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
-# USING API LEVEL 21 / Android 5.0 (LOLLIPOP)
-export API=21
+# USING API LEVEL 24 / Android 7.0 (NOUGAT)
+export API=24
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep '#define MOBILE_FFMPEG_VERSION' ${BASEDIR}/android/app/src/main/cpp/mobileffmpeg.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
@@ -88,7 +88,8 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
     echo -e "  -V, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
-    echo -e "  -s, --speed\t\t\toptimize for speed instead of size\n"
+    echo -e "  -s, --speed\t\t\toptimize for speed instead of size"
+    echo -e "  -l, --lts\t\t\tbuild lts packages to support API 21+ devices\n"
 
     echo -e "Licensing options:"
 
@@ -175,6 +176,13 @@ enable_debug() {
 
 optimize_for_speed() {
     export MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED="1"
+}
+
+enable_lts_build() {
+    export MOBILE_FFMPEG_LTS_BUILD="1"
+
+    # USING API LEVEL 21 / Android 5.0 (LOLLIPOP)
+    export API=21
 }
 
 reconf_library() {
@@ -459,7 +467,7 @@ APP_ABI := ${ANDROID_ARCHITECTURES}
 
 APP_STL := c++_shared
 
-APP_PLATFORM := android-21
+APP_PLATFORM := android-${API}
 
 APP_CFLAGS := -O3 -DANDROID -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable
 EOF
@@ -469,20 +477,21 @@ EOF
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
-GPL_ENABLED="no"
-BUILD_TYPE_ID=""
-
 DETECTED_NDK_VERSION=$(grep -Eo Revision.* ${ANDROID_NDK_ROOT}/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 
 echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>${BASEDIR}/build.log 2>&1
+
+GPL_ENABLED="no"
+DISPLAY_HELP=""
+BUILD_LTS=""
+BUILD_TYPE_ID=""
 
 while [ ! $# -eq 0 ]
 do
 
     case $1 in
 	    -h | --help)
-            display_help
-            exit 0
+            DISPLAY_HELP="1"
 	    ;;
 	    -V | --version)
             display_version
@@ -498,6 +507,9 @@ do
 	    ;;
         -s | --speed)
 	        optimize_for_speed
+	    ;;
+        -l | --lts)
+	        BUILD_LTS="1"
 	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
@@ -537,6 +549,17 @@ do
     shift
 done;
 
+# DETECT BUILD TYPE
+if [[ ! -z ${BUILD_LTS} ]]; then
+    enable_lts_build
+    BUILD_TYPE_ID+="LTS "
+fi
+
+if [[ ! -z ${DISPLAY_HELP} ]]; then
+    display_help
+    exit 0
+fi
+
 if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     echo "ANDROID_NDK_ROOT not defined"
     exit 1
@@ -546,7 +569,8 @@ echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android\n"
 echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
-if [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
+# PERFORM THIS CHECK ONLY ON LTS
+if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
     ENABLED_ARCHITECTURES[0]=1
 
     echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n"
