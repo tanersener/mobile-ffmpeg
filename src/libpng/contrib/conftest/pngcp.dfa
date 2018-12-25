@@ -52,6 +52,6 @@ option TEXT on
 option USER_LIMITS on
 option SET_USER_LIMITS on
 
-# these are are just required for specific customizations
+# these are just required for specific customizations
 option WRITE_CUSTOMIZE_ZTXT_COMPRESSION on
 option WRITE_CUSTOMIZE_COMPRESSION on

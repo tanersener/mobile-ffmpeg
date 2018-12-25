@@ -331,8 +331,8 @@ static int check_one_character(checkfp_command *co, checkfp_control c, int ch)
     */
    size_t index = 0;
    const char test = (char)ch;
-   const int number_is_valid = png_check_fp_number(&test, 1, &c.state, &index);
-   const int character_accepted = (index == 1);
+   int number_is_valid = png_check_fp_number(&test, 1, &c.state, &index);
+   int character_accepted = (index == 1);
 
    if (c.check_state != exponent && isdigit(ch) && ch != '0')
       c.is_zero = 0;

@@ -372,7 +372,7 @@ print_opts(png_uint_32 opts)
  */
 #define FORMAT_COUNT 64
 #define FORMAT_MASK 0x3f
-static PNG_CONST char * PNG_CONST format_names[FORMAT_COUNT] =
+static const char * const format_names[FORMAT_COUNT] =
 {
    "sRGB-gray",
    "sRGB-gray+alpha",
@@ -2346,8 +2346,8 @@ static int
 logpixel(const Transform *transform, png_uint_32 x, png_uint_32 y,
    const Pixel *in, const Pixel *calc, const Pixel *out, const char *reason)
 {
-   const png_uint_32 in_format = transform->in_image->image.format;
-   const png_uint_32 out_format = transform->out_image->image.format;
+   png_uint_32 in_format = transform->in_image->image.format;
+   png_uint_32 out_format = transform->out_image->image.format;
 
    png_uint_32 back_format = out_format & ~PNG_FORMAT_FLAG_ALPHA;
    const char *via_linear = "";
@@ -2602,12 +2602,12 @@ compare_two_images(Image *a, Image *b, int via_linear,
    ptrdiff_t strideb = b->stride;
    png_const_bytep rowa = a->buffer+16;
    png_const_bytep rowb = b->buffer+16;
-   const png_uint_32 width = a->image.width;
-   const png_uint_32 height = a->image.height;
-   const png_uint_32 formata = a->image.format;
-   const png_uint_32 formatb = b->image.format;
-   const unsigned int a_sample = PNG_IMAGE_SAMPLE_SIZE(formata);
-   const unsigned int b_sample = PNG_IMAGE_SAMPLE_SIZE(formatb);
+   png_uint_32 width = a->image.width;
+   png_uint_32 height = a->image.height;
+   png_uint_32 formata = a->image.format;
+   png_uint_32 formatb = b->image.format;
+   unsigned int a_sample = PNG_IMAGE_SAMPLE_SIZE(formata);
+   unsigned int b_sample = PNG_IMAGE_SAMPLE_SIZE(formatb);
    int alpha_added, alpha_removed;
    int bchannels;
    png_uint_32 y;
@@ -2726,7 +2726,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
                result = 0;
          }
 
-         /* If reqested copy the error values back from the Transform. */
+         /* If requested, copy the error values back from the Transform. */
          if (a->opts & ACCUMULATE)
          {
             tr.error_ptr[0] = tr.error[0];
@@ -2790,8 +2790,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
       (formata & (formatb ^ PNG_FORMAT_FLAG_COLOR) & PNG_FORMAT_FLAG_COLOR)))
    {
       /* Was an alpha channel changed? */
-      const png_uint_32 alpha_changed = (formata ^ formatb) &
-         PNG_FORMAT_FLAG_ALPHA;
+      png_uint_32 alpha_changed = (formata ^ formatb) & PNG_FORMAT_FLAG_ALPHA;
 
       /* Was an alpha channel removed?  (The third test.)  If so the direct
        * comparison is only possible if the input alpha is opaque.
@@ -2932,7 +2931,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
       }
    }
 
-   /* If reqested copy the error values back from the Transform. */
+   /* If requested, copy the error values back from the Transform. */
    if (a->opts & ACCUMULATE)
    {
       tr.error_ptr[0] = tr.error[0];
@@ -3627,7 +3626,7 @@ main(int argc, char **argv)
 
          if (arg[0] == '-')
          {
-            const int term = (arg[1] == '0' ? 0 : '\n');
+            int term = (arg[1] == '0' ? 0 : '\n');
             unsigned int ich = 0;
 
             /* Loop reading files, use a static buffer to simplify this and just
