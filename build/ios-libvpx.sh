@@ -61,8 +61,7 @@ case ${ARCH} in
     arm64e)
         TARGET="arm64-darwin-gcc"
 
-        # arm64e assembly support disabled
-        ASM_FLAGS="--disable-runtime-cpu-detect"
+        ASM_FLAGS="--disable-runtime-cpu-detect --enable-neon"
     ;;
     i386)
         TARGET="x86-iphonesimulator-gcc"
