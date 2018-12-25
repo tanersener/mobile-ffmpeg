@@ -184,7 +184,11 @@ get_common_includes() {
 }
 
 get_common_cflags() {
-    echo "-fstrict-aliasing -fPIC -DANDROID -D__ANDROID__ -D__ANDROID_API__=${API}"
+    if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+        local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
+    fi
+
+    echo "-fstrict-aliasing -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
 }
 
 get_arch_specific_cflags() {
@@ -323,7 +327,14 @@ get_common_linked_libraries() {
     local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/lib"
 
     case $1 in
-        ffmpeg | tesseract)
+        ffmpeg)
+            if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+                echo "-lc -lm -ldl -llog -lcamera2ndk -lmediandk -lc++_shared ${COMMON_LIBRARY_PATHS}"
+            else
+                echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
+            fi
+        ;;
+        tesseract)
             echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
         ;;
         libvpx)

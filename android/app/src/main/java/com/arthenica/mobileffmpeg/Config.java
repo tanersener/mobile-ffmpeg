@@ -520,4 +520,11 @@ public class Config {
      */
     native static String getNativeBuildConf();
 
+    /**
+     * <p>Returns whether MobileFFmpeg release is a long term release or not.
+     *
+     * @return YES or NO
+     */
+    native static boolean isNativeLTSBuild();
+
 }

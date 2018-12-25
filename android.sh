@@ -458,6 +458,10 @@ print_enabled_libraries() {
 }
 
 build_application_mk() {
+    if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+        local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
+    fi
+
     rm -f ${BASEDIR}/android/jni/Application.mk
 
     cat > "${BASEDIR}/android/jni/Application.mk" << EOF
@@ -469,7 +473,7 @@ APP_STL := c++_shared
 
 APP_PLATFORM := android-${API}
 
-APP_CFLAGS := -O3 -DANDROID -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable
+APP_CFLAGS := -O3 -DANDROID ${LTS_BUILD__FLAG}-Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable
 EOF
 }
 

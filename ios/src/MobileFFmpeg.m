@@ -65,7 +65,24 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutpu
  * \return MobileFFmpeg version string
  */
 + (NSString*)getVersion {
-    return MOBILE_FFMPEG_VERSION;
+    if ([MobileFFmpeg isLTSBuild] == 1) {
+        return [NSString stringWithFormat:@"%@-lts", MOBILE_FFMPEG_VERSION];
+    } else {
+        return MOBILE_FFMPEG_VERSION;
+    }
+}
+
+/**
+ * Returns whether MobileFFmpeg release is a long term release or not.
+ *
+ * \return YES=1 or NO=0
+ */
++ (int)isLTSBuild {
+    #if defined(MOBILE_FFMPEG_LTS)
+        return 1;
+    #else
+        return 0;
+    #endif
 }
 
 /**

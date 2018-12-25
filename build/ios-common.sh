@@ -192,12 +192,16 @@ get_common_includes() {
 }
 
 get_common_cflags() {
+    if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+        local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
+    fi
+
     case ${ARCH} in
         i386 | x86-64)
-            echo "-fstrict-aliasing -DIOS -isysroot ${SDK_PATH}"
+            echo "-fstrict-aliasing -DIOS ${LTS_BUILD__FLAG}-isysroot ${SDK_PATH}"
         ;;
         *)
-            echo "-fstrict-aliasing -fembed-bitcode -DIOS -isysroot ${SDK_PATH}"
+            echo "-fstrict-aliasing -fembed-bitcode -DIOS ${LTS_BUILD__FLAG}-isysroot ${SDK_PATH}"
         ;;
     esac
 }
