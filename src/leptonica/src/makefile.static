@@ -152,7 +152,7 @@ LIBRARIAN_SHARED =	gcc -shared
 #  Links are created among the files <libname>.X.Y,
 #  <libname>.X, and <libname>, where Y is the minor revision number.
 MAJOR_REV = 1
-MINOR_REV = 76
+MINOR_REV = 77
 PATCH_REV = 0
 
 #########################################################
@@ -170,9 +170,10 @@ LEPTLIB_C =	adaptmap.c affine.c \
 		bilateral.c bilinear.c binarize.c \
 		binexpand.c binreduce.c \
 		blend.c bmf.c bmpio.c bmpiostub.c \
-		bootnumgen1.c bootnumgen2.c bootnumgen3.c \
+		bootnumgen1.c bootnumgen2.c \
+		bootnumgen3.c bootnumgen4.c \
 		boxbasic.c boxfunc1.c boxfunc2.c \
-		boxfunc3.c boxfunc4.c \
+		boxfunc3.c boxfunc4.c boxfunc5.c \
 		bytearray.c ccbord.c ccthin.c classapp.c \
 		colorcontent.c coloring.c \
 		colormap.c colormorph.c \

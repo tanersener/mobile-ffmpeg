@@ -301,7 +301,7 @@ L_WSHED  *wshed;
  *          grabs some regions belonging to existing watersheds.
  *          See prog/watershedtest.c for testing.
  */
-l_int32
+l_ok
 wshedApply(L_WSHED  *wshed)
 {
 char      two_new_watersheds[] = "Two new watersheds";
@@ -1030,7 +1030,7 @@ debugWshedMerge(L_WSHED *wshed,
  * \param[out]   pnalevels   [optional] watershed levels
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 wshedBasins(L_WSHED  *wshed,
             PIXA    **ppixa,
             NUMA    **pnalevels)

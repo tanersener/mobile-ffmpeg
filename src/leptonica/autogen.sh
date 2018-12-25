@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#  autobuild
+#  autogen.sh
 
 libtoolize -c -f || glibtoolize -c -f
 aclocal

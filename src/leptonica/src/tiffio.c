@@ -101,6 +101,7 @@
 #endif  /* HAVE_CONFIG_H */
 
 #include <string.h>
+#include <math.h>   /* for isnan */
 #include <sys/types.h>
 #ifndef _MSC_VER
 #include <unistd.h>
@@ -144,9 +145,6 @@ static l_int32   getTiffCompressedFormat(l_uint16 tiffcomp);
     /* Static function for memory I/O */
 static TIFF     *fopenTiffMemstream(const char *filename, const char *operation,
                                     l_uint8 **pdata, size_t *pdatasize);
-
-    /* Static dummy warning/error handler */
-static void  dummyHandler(const char *module, const char *fmt, va_list ap) {};
 
     /* This structure defines a transform to be performed on a TIFF image
      * (note that the same transformation can be represented in
@@ -355,7 +353,7 @@ lept_size_proc(thandle_t  cookie)
  * \brief   pixReadTiff()
  *
  * \param[in]    filename
- * \param[in]    n page number 0 based
+ * \param[in]    n           page number 0 based
  * \return  pix, or NULL on error
  *
  * <pre>
@@ -393,8 +391,8 @@ PIX   *pix;
 /*!
  * \brief   pixReadStreamTiff()
  *
- * \param[in]    fp file stream
- * \param[in]    n page number: 0 based
+ * \param[in]    fp    file stream
+ * \param[in]    n     page number: 0 based
  * \return  pix, or NULL on error or if there are no more images in the file
  *
  * <pre>
@@ -435,7 +433,7 @@ TIFF  *tif;
 /*!
  * \brief   pixReadFromTiffStream()
  *
- * \param[in]    tif TIFF handle
+ * \param[in]    tif    TIFF handle
  * \return  pix, or NULL on error
  *
  * <pre>
@@ -447,7 +445,7 @@ TIFF  *tif;
  *          We do not handle 3 spp, 16 bpp (48 bits/pixel)
  *      (2) For colormapped images, we support 8 bits/color in the palette.
  *          Tiff colormaps have 16 bits/color, and we reduce them to 8.
- *      (3) Quoting the libtiff documenation at
+ *      (3) Quoting the libtiff documentation at
  *               http://libtiff.maptools.org/libtiff.html
  *          "libtiff provides a high-level interface for reading image data
  *          from a TIFF file. This interface handles the details of data
@@ -468,14 +466,14 @@ TIFF  *tif;
 static PIX *
 pixReadFromTiffStream(TIFF  *tif)
 {
+char      *text;
 l_uint8   *linebuf, *data;
 l_uint16   spp, bps, bpp, photometry, tiffcomp, orientation;
 l_uint16  *redmap, *greenmap, *bluemap;
 l_int32    d, wpl, bpl, comptype, i, j, ncolors, rval, gval, bval;
 l_int32    xres, yres;
-l_uint32   w, h, tiffbpl, tiffword;
-l_uint32  *line, *ppixel, *tiffdata;
-l_uint32   read_oriented;
+l_uint32   w, h, tiffbpl, tiffword, read_oriented;
+l_uint32  *line, *ppixel, *tiffdata, *pixdata;
 PIX       *pix;
 PIXCMAP   *cmap;
 
@@ -489,16 +487,22 @@ PIXCMAP   *cmap;
         /* Use default fields for bps and spp */
     TIFFGetFieldDefaulted(tif, TIFFTAG_BITSPERSAMPLE, &bps);
     TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &spp);
-    bpp = bps * spp;
-    if (bpp > 32)
-        L_WARNING("bpp = %d; stripping 16 bit rgb samples down to 8\n",
-                  procName, bpp);
+    if (bps != 1 && bps != 2 && bps != 4 && bps != 8 && bps != 16) {
+        L_ERROR("invalid bps = %d\n", procName, bps);
+        return NULL;
+    }
     if (spp == 1)
         d = bps;
     else if (spp == 3 || spp == 4)
         d = 32;
     else
         return (PIX *)ERROR_PTR("spp not in set {1,3,4}", procName, NULL);
+    bpp = bps * spp;
+    if (bpp > 32) {  /* for rgb or rgba only */
+        L_WARNING("bpp = %d; stripping 16 bit rgb samples down to 8\n",
+                  procName, bpp);
+        bps = 8;
+    }
 
     TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
     TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
@@ -511,8 +515,14 @@ PIXCMAP   *cmap;
     wpl = pixGetWpl(pix);
     bpl = 4 * wpl;
 
-        /* Read the data */
-    if (spp == 1) {
+    TIFFGetFieldDefaulted(tif, TIFFTAG_COMPRESSION, &tiffcomp);
+
+        /* Thanks to Jeff Breidenbach, we now support reading 8 bpp
+         * images encoded in the long-deprecated old jpeg format,
+         * COMPRESSION_OJPEG.  TIFFReadScanline() fails on this format,
+         * so we use RGBA reading, which generates a 4 spp image, and
+         * pull out the red component. */
+    if (spp == 1 && tiffcomp != COMPRESSION_OJPEG) {
         linebuf = (l_uint8 *)LEPT_CALLOC(tiffbpl + 1, sizeof(l_uint8));
         for (i = 0 ; i < h ; i++) {
             if (TIFFReadScanline(tif, linebuf, i, 0) < 0) {
@@ -520,7 +530,7 @@ PIXCMAP   *cmap;
                 pixDestroy(&pix);
                 return (PIX *)ERROR_PTR("line read fail", procName, NULL);
             }
-            memcpy((char *)data, (char *)linebuf, tiffbpl);
+            memcpy(data, linebuf, tiffbpl);
             data += bpl;
         }
         if (bps <= 8)
@@ -529,9 +539,9 @@ PIXCMAP   *cmap;
             pixEndianTwoByteSwap(pix);
         LEPT_FREE(linebuf);
     }
-    else {  /* rgb */
-        if ((tiffdata = (l_uint32 *)LEPT_CALLOC(w * h, sizeof(l_uint32)))
-            == NULL) {
+    else {  /* rgb or old jpeg */
+        if ((tiffdata = (l_uint32 *)LEPT_CALLOC((size_t)w * h,
+                                                 sizeof(l_uint32))) == NULL) {
             pixDestroy(&pix);
             return (PIX *)ERROR_PTR("calloc fail for tiffdata", procName, NULL);
         }
@@ -545,16 +555,28 @@ PIXCMAP   *cmap;
             read_oriented = 1;
         }
 
-        line = pixGetData(pix);
-        for (i = 0 ; i < h ; i++, line += wpl) {
-            for (j = 0, ppixel = line; j < w; j++) {
-                    /* TIFFGet* are macros */
-                tiffword = tiffdata[i * w + j];
-                rval = TIFFGetR(tiffword);
-                gval = TIFFGetG(tiffword);
-                bval = TIFFGetB(tiffword);
-                composeRGBPixel(rval, gval, bval, ppixel);
-                ppixel++;
+        if (spp == 1) {  /* 8 bpp, old jpeg format */
+            pixdata = pixGetData(pix);
+            for (i = 0; i < h; i++) {
+                line = pixdata + i * wpl;
+                for (j = 0; j < w; j++) {
+                    tiffword = tiffdata[i * w + j];
+                    rval = TIFFGetR(tiffword);
+                    SET_DATA_BYTE(line, j, rval);
+                }
+            }
+        } else {  /* standard rgb */
+            line = pixGetData(pix);
+            for (i = 0; i < h; i++, line += wpl) {
+                for (j = 0, ppixel = line; j < w; j++) {
+                        /* TIFFGet* are macros */
+                    tiffword = tiffdata[i * w + j];
+                    rval = TIFFGetR(tiffword);
+                    gval = TIFFGetG(tiffword);
+                    bval = TIFFGetB(tiffword);
+                    composeRGBPixel(rval, gval, bval, ppixel);
+                    ppixel++;
+                }
             }
         }
         LEPT_FREE(tiffdata);
@@ -621,6 +643,9 @@ PIXCMAP   *cmap;
         }
     }
 
+    text = NULL;
+    TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &text);
+    if (text) pixSetText(pix, text);
     return pix;
 }
 
@@ -633,10 +658,10 @@ PIXCMAP   *cmap;
  * \brief   pixWriteTiff()
  *
  * \param[in]    filename   to write to
- * \param[in]    pix
+ * \param[in]    pix        any depth, colormap will be removed
  * \param[in]    comptype   IFF_TIFF, IFF_TIFF_RLE, IFF_TIFF_PACKBITS,
  *                          IFF_TIFF_G3, IFF_TIFF_G4,
- *                          IFF_TIFF_LZW, IFF_TIFF_ZIP
+ *                          IFF_TIFF_LZW, IFF_TIFF_ZIP, IFF_TIFF_JPEG
  * \param[in]    modestr    "a" or "w"
  * \return  0 if OK, 1 on error
  *
@@ -650,7 +675,7 @@ PIXCMAP   *cmap;
  *          with the number of images in the file.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteTiff(const char  *filename,
              PIX         *pix,
              l_int32      comptype,
@@ -668,7 +693,7 @@ pixWriteTiff(const char  *filename,
  * \param[in]    pix
  * \param[in]    comptype   IFF_TIFF, IFF_TIFF_RLE, IFF_TIFF_PACKBITS,
  *                          IFF_TIFF_G3, IFF_TIFF_G4,
- *                          IFF_TIFF_LZW, IFF_TIFF_ZIP
+ *                          IFF_TIFF_LZW, IFF_TIFF_ZIP, IFF_TIFF_JPEG
  * \param[in]    modestr    "a" or "w"
  * \param[in]    natags [optional] NUMA of custom tiff tags
  * \param[in]    savals [optional] SARRAY of values
@@ -707,7 +732,7 @@ pixWriteTiff(const char  *filename,
  *              extra size value, stored in nasizes, they must be
  *              written first!
  */
-l_int32
+l_ok
 pixWriteTiffCustom(const char  *filename,
                    PIX         *pix,
                    l_int32      comptype,
@@ -718,6 +743,7 @@ pixWriteTiffCustom(const char  *filename,
                    NUMA        *nasizes)
 {
 l_int32  ret;
+PIX     *pix1;
 TIFF    *tif;
 
     PROCNAME("pixWriteTiffCustom");
@@ -726,13 +752,19 @@ TIFF    *tif;
         return ERROR_INT("filename not defined", procName, 1);
     if (!pix)
         return ERROR_INT("pix not defined", procName, 1);
+    if (pixGetColormap(pix))
+        pix1 = pixRemoveColormap(pix, REMOVE_CMAP_BASED_ON_SRC);
+    else
+        pix1 = pixClone(pix);
 
-    if ((tif = openTiff(filename, modestr)) == NULL)
+    if ((tif = openTiff(filename, modestr)) == NULL) {
+        pixDestroy(&pix1);
         return ERROR_INT("tif not opened", procName, 1);
-    ret = pixWriteToTiffStream(tif, pix, comptype, natags, savals,
+    }
+    ret = pixWriteToTiffStream(tif, pix1, comptype, natags, savals,
                                satypes, nasizes);
     TIFFClose(tif);
-
+    pixDestroy(&pix1);
     return ret;
 }
 
@@ -747,18 +779,19 @@ TIFF    *tif;
  * \param[in]    pix
  * \param[in]    comptype IFF_TIFF, IFF_TIFF_RLE, IFF_TIFF_PACKBITS,
  *                        IFF_TIFF_G3, IFF_TIFF_G4,
- *                        IFF_TIFF_LZW, IFF_TIFF_ZIP
+ *                        IFF_TIFF_LZW, IFF_TIFF_ZIP, IFF_TIFF_JPEG
  * \return  0 if OK, 1 on error
  *
  * <pre>
  * Notes:
  *      (1) This writes a single image to a file stream opened for writing.
- *      (2) For images with bpp > 1, this resets the comptype, if
+ *      (2) This removes any existing colormaps.
+ *      (3) For images with bpp > 1, this resets the comptype, if
  *          necessary, to write uncompressed data.
- *      (3) G3 and G4 are only defined for 1 bpp.
- *      (4) We only allow PACKBITS for bpp = 1, because for bpp > 1
+ *      (4) G3 and G4 are only defined for 1 bpp.
+ *      (5) We only allow PACKBITS for bpp = 1, because for bpp > 1
  *          it typically expands images that are not synthetically generated.
- *      (5) G4 compression is typically about twice as good as G3.
+ *      (6) G4 compression is typically about twice as good as G3.
  *          G4 is excellent for binary compression of text/line-art,
  *          but terrible for halftones and dithered patterns.  (In
  *          fact, G4 on halftones can give a file that is larger
@@ -766,7 +799,7 @@ TIFF    *tif;
  *          regions, it is usually better to compress with png.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteStreamTiff(FILE    *fp,
                    PIX     *pix,
                    l_int32  comptype)
@@ -782,16 +815,17 @@ pixWriteStreamTiff(FILE    *fp,
  * \param[in]    pix
  * \param[in]    comptype IFF_TIFF, IFF_TIFF_RLE, IFF_TIFF_PACKBITS,
  *                        IFF_TIFF_G3, IFF_TIFF_G4,
- *                        IFF_TIFF_LZW, IFF_TIFF_ZIP
+ *                        IFF_TIFF_LZW, IFF_TIFF_ZIP, IFF_TIFF_JPEG
  * \param[in]    modestr  "w" or "a"
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixWriteStreamTiffWA(FILE        *fp,
                      PIX         *pix,
                      l_int32      comptype,
                      const char  *modestr)
 {
+PIX   *pix1;
 TIFF  *tif;
 
     PROCNAME("pixWriteStreamTiffWA");
@@ -803,21 +837,30 @@ TIFF  *tif;
     if (strcmp(modestr, "w") && strcmp(modestr, "a"))
         return ERROR_INT("modestr not 'w' or 'a'", procName, 1 );
 
-    if (pixGetDepth(pix) != 1 && comptype != IFF_TIFF &&
-        comptype != IFF_TIFF_LZW && comptype != IFF_TIFF_ZIP) {
+    if (pixGetColormap(pix))
+        pix1 = pixRemoveColormap(pix, REMOVE_CMAP_BASED_ON_SRC);
+    else
+        pix1 = pixClone(pix);
+    if (pixGetDepth(pix1) != 1 && comptype != IFF_TIFF &&
+        comptype != IFF_TIFF_LZW && comptype != IFF_TIFF_ZIP &&
+        comptype != IFF_TIFF_JPEG) {
         L_WARNING("invalid compression type for bpp > 1\n", procName);
         comptype = IFF_TIFF_ZIP;
     }
 
-    if ((tif = fopenTiff(fp, modestr)) == NULL)
+    if ((tif = fopenTiff(fp, modestr)) == NULL) {
+        pixDestroy(&pix1);
         return ERROR_INT("tif not opened", procName, 1);
+    }
 
-    if (pixWriteToTiffStream(tif, pix, comptype, NULL, NULL, NULL, NULL)) {
+    if (pixWriteToTiffStream(tif, pix1, comptype, NULL, NULL, NULL, NULL)) {
+        pixDestroy(&pix1);
         TIFFCleanup(tif);
         return ERROR_INT("tif write error", procName, 1);
     }
 
     TIFFCleanup(tif);
+    pixDestroy(&pix1);
     return 0;
 }
 
@@ -825,16 +868,17 @@ TIFF  *tif;
 /*!
  * \brief   pixWriteToTiffStream()
  *
- * \param[in]    tif data structure, opened to a file
+ * \param[in]    tif       data structure, opened to a file
  * \param[in]    pix
  * \param[in]    comptype  IFF_TIFF: for any image; no compression
  *                         IFF_TIFF_RLE, IFF_TIFF_PACKBITS: for 1 bpp only
  *                         IFF_TIFF_G4 and IFF_TIFF_G3: for 1 bpp only
- *                         IFF_TIFF_LZW, IFF_TIFF_ZIP: for any image
- *               natags ([optional] NUMA of custom tiff tags
- * \param[in]    savals [optional] SARRAY of values
- * \param[in]    satypes [optional] SARRAY of types
- * \param[in]    nasizes [optional] NUMA of sizes
+ *                         IFF_TIFF_LZW, IFF_TIFF_ZIP: lossless for any image
+ *                         IFF_TIFF_JPEG: lossy 8 bpp gray or rgb
+ * \param[in]    natags    [optional] NUMA of custom tiff tags
+ * \param[in]    savals    [optional] SARRAY of values
+ * \param[in]    satypes   [optional] SARRAY of types
+ * \param[in]    nasizes   [optional] NUMA of sizes
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -958,6 +1002,8 @@ char      *text;
         TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_LZW);
     } else if (comptype == IFF_TIFF_ZIP) {
         TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_ADOBE_DEFLATE);
+    } else if (comptype == IFF_TIFF_JPEG) {
+        TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_JPEG);
     } else {
         L_WARNING("unknown tiff compression; using none\n", procName);
         TIFFSetField(tif, TIFFTAG_COMPRESSION, COMPRESSION_NONE);
@@ -985,7 +1031,7 @@ char      *text;
             pixt = pixEndianByteSwapNew(pix);
         data = (l_uint8 *)pixGetData(pixt);
         for (i = 0; i < h; i++, data += bpl) {
-            memcpy((char *)linebuf, (char *)data, tiffbpl);
+            memcpy(linebuf, data, tiffbpl);
             if (TIFFWriteScanline(tif, linebuf, i, 0) < 0)
                 break;
         }
@@ -1021,10 +1067,10 @@ char      *text;
  * \brief   writeCustomTiffTags()
  *
  * \param[in]    tif
- * \param[in]    natags [optional] NUMA of custom tiff tags
- * \param[in]    savals [optional] SARRAY of values
- * \param[in]    satypes [optional] SARRAY of types
- * \param[in]    nasizes [optional] NUMA of sizes
+ * \param[in]    natags   [optional] NUMA of custom tiff tags
+ * \param[in]    savals   [optional] SARRAY of values
+ * \param[in]    satypes  [optional] SARRAY of types
+ * \param[in]    nasizes  [optional] NUMA of sizes
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1146,7 +1192,7 @@ l_uint32   uval, uval2;
  * \brief   pixReadFromMultipageTiff()
  *
  * \param[in]      fname     filename
- * \param[in,out]  &offset   set offset to 0 for first image
+ * \param[in,out]  poffset   set offset to 0 for first image
  * \return  pix, or NULL on error or if previous call returned the last image
  *
  * <pre>
@@ -1219,7 +1265,7 @@ TIFF    *tif;
 /*!
  * \brief   pixaReadMultipageTiff()
  *
- * \param[in]    filename input tiff file
+ * \param[in]    filename    input tiff file
  * \return  pixa of page images, or NULL on error
  */
 PIXA *
@@ -1271,7 +1317,7 @@ TIFF    *tif;
 /*!
  * \brief   pixaWriteMultipageTiff()
  *
- * \param[in]    filename   input tiff file
+ * \param[in]    fname      input tiff file
  * \param[in]    pixa       any depth; colormap will be removed
  * \return  0 if OK, 1 on error
  *
@@ -1282,7 +1328,7 @@ TIFF    *tif;
  *          about 1 second.
  * </pre>
  */
-l_int32
+l_ok
 pixaWriteMultipageTiff(const char  *fname,
                        PIXA        *pixa)
 {
@@ -1343,7 +1389,7 @@ PIX         *pix1, *pix2;
  *          written, apply the method used in pixaWriteMultipageTiff().
  * </pre>
  */
-l_int32
+l_ok
 writeMultipageTiff(const char  *dirin,
                    const char  *substr,
                    const char  *fileout)
@@ -1370,8 +1416,8 @@ SARRAY  *sa;
 /*!
  * \brief   writeMultipageTiffSA()
  *
- * \param[in]    sa string array of full path names
- * \param[in]    fileout output ps file
+ * \param[in]    sa       string array of full path names
+ * \param[in]    fileout  output ps file
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1379,7 +1425,7 @@ SARRAY  *sa;
  *      (1) See writeMultipageTiff()
  * </pre>
  */
-l_int32
+l_ok
 writeMultipageTiffSA(SARRAY      *sa,
                      const char  *fileout)
 {
@@ -1435,11 +1481,11 @@ PIX         *pix, *pix1;
 /*!
  * \brief   fprintTiffInfo()
  *
- * \param[in]    fpout stream for output of tag data
- * \param[in]    tiffile input
+ * \param[in]    fpout    stream for output of tag data
+ * \param[in]    tiffile  input
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 fprintTiffInfo(FILE        *fpout,
                const char  *tiffile)
 {
@@ -1468,11 +1514,11 @@ TIFF  *tif;
 /*!
  * \brief   tiffGetCount()
  *
- * \param[in]    fp file stream opened for read
- * \param[out]   pn number of images
+ * \param[in]    fp   file stream opened for read
+ * \param[out]   pn   number of images
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 tiffGetCount(FILE     *fp,
              l_int32  *pn)
 {
@@ -1510,8 +1556,8 @@ TIFF    *tif;
 /*!
  * \brief   getTiffResolution()
  *
- * \param[in]    fp file stream opened for read
- * \param[out]   pxres, pyres resolution in ppi
+ * \param[in]    fp            file stream opened for read
+ * \param[out]   pxres, pyres  resolution in ppi
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -1520,7 +1566,7 @@ TIFF    *tif;
  *          the returned resolution values are 0 (designating 'unknown').
  * </pre>
  */
-l_int32
+l_ok
 getTiffResolution(FILE     *fp,
                   l_int32  *pxres,
                   l_int32  *pyres)
@@ -1546,8 +1592,8 @@ TIFF  *tif;
 /*!
  * \brief   getTiffStreamResolution()
  *
- * \param[in]    tif TIFF handle opened for read
- * \param[out]   pxres, pyres resolution in ppi
+ * \param[in]    tif            TIFF handle opened for read
+ * \param[out]   pxres, pyres   resolution in ppi
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -1577,10 +1623,15 @@ l_float32  fxres, fyres;
     foundxres = TIFFGetField(tif, TIFFTAG_XRESOLUTION, &fxres);
     foundyres = TIFFGetField(tif, TIFFTAG_YRESOLUTION, &fyres);
     if (!foundxres && !foundyres) return 1;
+    if (isnan(fxres) || isnan(fyres)) return 1;
     if (!foundxres && foundyres)
         fxres = fyres;
     else if (foundxres && !foundyres)
         fyres = fxres;
+
+        /* Avoid overflow into int32; set max fxres and fyres to 5 x 10^8 */
+    if (fxres < 0 || fxres > (1L << 29) || fyres < 0 || fyres > (1L << 29))
+        return ERROR_INT("fxres and/or fyres values are invalid", procName, 1);
 
     if (resunit == RESUNIT_CENTIMETER) {  /* convert to ppi */
         *pxres = (l_int32)(2.54 * fxres + 0.5);
@@ -1601,14 +1652,14 @@ l_float32  fxres, fyres;
  * \brief   readHeaderTiff()
  *
  * \param[in]    filename
- * \param[in]    n page image number: 0-based
- * \param[out]   pwidth width
- * \param[out]   pheight height
- * \param[out]   pbps bits per sample -- 1, 2, 4 or 8
- * \param[out]   pspp  samples per pixel -- 1 or 3
- * \param[out]   pres [optional]  resolution in x dir; NULL to ignore
- * \param[out]   pcmap [optional]  colormap exists; input NULL to ignore
- * \param[out]   pformat [optional]  tiff format; input NULL to ignore
+ * \param[in]    n          page image number: 0-based
+ * \param[out]   pw         [optional] width
+ * \param[out]   ph         [optional] height
+ * \param[out]   pbps       [optional] bits per sample -- 1, 2, 4 or 8
+ * \param[out]   pspp       [optional] samples per pixel -- 1 or 3
+ * \param[out]   pres       [optional] resolution in x dir; NULL to ignore
+ * \param[out]   pcmap      [optional] colormap exists; input NULL to ignore
+ * \param[out]   pformat    [optional] tiff format; input NULL to ignore
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1617,11 +1668,11 @@ l_float32  fxres, fyres;
  *      (2) If %n is equal to or greater than the number of images, returns 1.
  * </pre>
  */
-l_int32
+l_ok
 readHeaderTiff(const char *filename,
                l_int32     n,
-               l_int32    *pwidth,
-               l_int32    *pheight,
+               l_int32    *pw,
+               l_int32    *ph,
                l_int32    *pbps,
                l_int32    *pspp,
                l_int32    *pres,
@@ -1633,18 +1684,21 @@ FILE    *fp;
 
     PROCNAME("readHeaderTiff");
 
-    if (!filename)
-        return ERROR_INT("filename not defined", procName, 1);
-    if (!pwidth || !pheight || !pbps || !pspp)
-        return ERROR_INT("input ptr(s) not all defined", procName, 1);
-    *pwidth = *pheight = *pbps = *pspp = 0;
+    if (pw) *pw = 0;
+    if (ph) *ph = 0;
+    if (pbps) *pbps = 0;
+    if (pspp) *pspp = 0;
     if (pres) *pres = 0;
     if (pcmap) *pcmap = 0;
+    if (pformat) *pformat = 0;
+    if (!filename)
+        return ERROR_INT("filename not defined", procName, 1);
+    if (!pw && !ph && !pbps && !pspp && !pres && !pcmap && !pformat)
+        return ERROR_INT("no results requested", procName, 1);
 
     if ((fp = fopenReadStream(filename)) == NULL)
         return ERROR_INT("image file not found", procName, 1);
-    ret = freadHeaderTiff(fp, n, pwidth, pheight, pbps, pspp,
-                          pres, pcmap, pformat);
+    ret = freadHeaderTiff(fp, n, pw, ph, pbps, pspp, pres, pcmap, pformat);
     fclose(fp);
     return ret;
 }
@@ -1653,15 +1707,15 @@ FILE    *fp;
 /*!
  * \brief   freadHeaderTiff()
  *
- * \param[in]    fp file stream
- * \param[in]    n page image number: 0-based
- * \param[out]   pwidth width
- * \param[out]   pheight height
- * \param[out]   pbps bits per sample -- 1, 2, 4 or 8
- * \param[out]   pspp  samples per pixel -- 1 or 3
- * \param[out]   pres [optional]  resolution in x dir; NULL to ignore
- * \param[out]   pcmap [optional]  colormap exists; input NULL to ignore
- * \param[out]   pformat [optional]  tiff format; input NULL to ignore
+ * \param[in]    fp       file stream
+ * \param[in]    n        page image number: 0-based
+ * \param[out]   pw       [optional] width
+ * \param[out]   ph       [optional] height
+ * \param[out]   pbps     [optional] bits per sample -- 1, 2, 4 or 8
+ * \param[out]   pspp     [optional] samples per pixel -- 1 or 3
+ * \param[out]   pres     [optional] resolution in x dir; NULL to ignore
+ * \param[out]   pcmap    [optional] colormap exists; input NULL to ignore
+ * \param[out]   pformat  [optional] tiff format; input NULL to ignore
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1670,11 +1724,11 @@ FILE    *fp;
  *      (2) If %n is equal to or greater than the number of images, returns 1.
  * </pre>
  */
-l_int32
+l_ok
 freadHeaderTiff(FILE     *fp,
                 l_int32   n,
-                l_int32  *pwidth,
-                l_int32  *pheight,
+                l_int32  *pw,
+                l_int32  *ph,
                 l_int32  *pbps,
                 l_int32  *pspp,
                 l_int32  *pres,
@@ -1686,22 +1740,26 @@ TIFF    *tif;
 
     PROCNAME("freadHeaderTiff");
 
+    if (pw) *pw = 0;
+    if (ph) *ph = 0;
+    if (pbps) *pbps = 0;
+    if (pspp) *pspp = 0;
+    if (pres) *pres = 0;
+    if (pcmap) *pcmap = 0;
+    if (pformat) *pformat = 0;
     if (!fp)
         return ERROR_INT("stream not defined", procName, 1);
     if (n < 0)
         return ERROR_INT("image index must be >= 0", procName, 1);
-    if (!pwidth || !pheight || !pbps || !pspp)
-        return ERROR_INT("input ptr(s) not all defined", procName, 1);
-    *pwidth = *pheight = *pbps = *pspp = 0;
-    if (pres) *pres = 0;
-    if (pcmap) *pcmap = 0;
-    if (pformat) *pformat = 0;
+    if (!pw && !ph && !pbps && !pspp && !pres && !pcmap && !pformat)
+        return ERROR_INT("no results requested", procName, 1);
 
     findFileFormatStream(fp, &format);
     if (format != IFF_TIFF &&
         format != IFF_TIFF_G3 && format != IFF_TIFF_G4 &&
         format != IFF_TIFF_RLE && format != IFF_TIFF_PACKBITS &&
-        format != IFF_TIFF_LZW && format != IFF_TIFF_ZIP)
+        format != IFF_TIFF_LZW && format != IFF_TIFF_ZIP &&
+        format != IFF_TIFF_JPEG)
         return ERROR_INT("file not tiff format", procName, 1);
 
     if ((tif = fopenTiff(fp, "r")) == NULL)
@@ -1712,8 +1770,7 @@ TIFF    *tif;
             return ERROR_INT("image n not found in file", procName, 1);
     }
 
-    ret = tiffReadHeaderTiff(tif, pwidth, pheight, pbps, pspp,
-                             pres, pcmap, pformat);
+    ret = tiffReadHeaderTiff(tif, pw, ph, pbps, pspp, pres, pcmap, pformat);
     TIFFCleanup(tif);
     return ret;
 }
@@ -1722,16 +1779,16 @@ TIFF    *tif;
 /*!
  * \brief   readHeaderMemTiff()
  *
- * \param[in]    cdata const; tiff-encoded
- * \param[in]    size size of data
- * \param[in]    n page image number: 0-based
- * \param[out]   pwidth width
- * \param[out]   pheight height
- * \param[out]   pbps bits per sample -- 1, 2, 4 or 8
- * \param[out]   pspp  samples per pixel -- 1 or 3
- * \param[out]   pres [optional]  resolution in x dir; NULL to ignore
- * \param[out]   pcmap [optional]  colormap exists; input NULL to ignore
- * \param[out]   pformat [optional]  tiff format; input NULL to ignore
+ * \param[in]    cdata     const; tiff-encoded
+ * \param[in]    size      size of data
+ * \param[in]    n         page image number: 0-based
+ * \param[out]   pw        [optional] width
+ * \param[out]   ph        [optional] height
+ * \param[out]   pbps      [optional] bits per sample -- 1, 2, 4 or 8
+ * \param[out]   pspp      [optional] samples per pixel -- 1 or 3
+ * \param[out]   pres      [optional] resolution in x dir; NULL to ignore
+ * \param[out]   pcmap     [optional] colormap exists; input NULL to ignore
+ * \param[out]   pformat   [optional] tiff format; input NULL to ignore
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1739,12 +1796,12 @@ TIFF    *tif;
  *      (1) Use TIFFClose(); TIFFCleanup() doesn't free internal memstream.
  * </pre>
  */
-l_int32
+l_ok
 readHeaderMemTiff(const l_uint8  *cdata,
                   size_t          size,
                   l_int32         n,
-                  l_int32        *pwidth,
-                  l_int32        *pheight,
+                  l_int32        *pw,
+                  l_int32        *ph,
                   l_int32        *pbps,
                   l_int32        *pspp,
                   l_int32        *pres,
@@ -1757,14 +1814,17 @@ TIFF     *tif;
 
     PROCNAME("readHeaderMemTiff");
 
-    if (!cdata)
-        return ERROR_INT("cdata not defined", procName, 1);
-    if (!pwidth || !pheight || !pbps || !pspp)
-        return ERROR_INT("input ptr(s) not all defined", procName, 1);
-    *pwidth = *pheight = *pbps = *pspp = 0;
+    if (pw) *pw = 0;
+    if (ph) *ph = 0;
+    if (pbps) *pbps = 0;
+    if (pspp) *pspp = 0;
     if (pres) *pres = 0;
     if (pcmap) *pcmap = 0;
     if (pformat) *pformat = 0;
+    if (!pw && !ph && !pbps && !pspp && !pres && !pcmap && !pformat)
+        return ERROR_INT("no results requested", procName, 1);
+    if (!cdata)
+        return ERROR_INT("cdata not defined", procName, 1);
 
         /* Open a tiff stream to memory */
     data = (l_uint8 *)cdata;  /* we're really not going to change this */
@@ -1778,8 +1838,7 @@ TIFF     *tif;
         }
     }
 
-    ret = tiffReadHeaderTiff(tif, pwidth, pheight, pbps, pspp,
-                             pres, pcmap, pformat);
+    ret = tiffReadHeaderTiff(tif, pw, ph, pbps, pspp, pres, pcmap, pformat);
     TIFFClose(tif);
     return ret;
 }
@@ -1789,19 +1848,19 @@ TIFF     *tif;
  * \brief   tiffReadHeaderTiff()
  *
  * \param[in]    tif
- * \param[out]   pwidth width
- * \param[out]   pheight height
- * \param[out]   pbps bits per sample -- 1, 2, 4 or 8
- * \param[out]   pspp  samples per pixel -- 1 or 3
- * \param[out]   pres [optional]  resolution in x dir; NULL to ignore
- * \param[out]   pcmap [optional]  cmap exists; input NULL to ignore
- * \param[out]   pformat [optional]  tiff format; input NULL to ignore
+ * \param[out]   pw        [optional] width
+ * \param[out]   ph        [optional] height
+ * \param[out]   pbps      [optional] bits per sample -- 1, 2, 4 or 8
+ * \param[out]   pspp      [optional] samples per pixel -- 1 or 3
+ * \param[out]   pres      [optional] resolution in x dir; NULL to ignore
+ * \param[out]   pcmap     [optional] cmap exists; input NULL to ignore
+ * \param[out]   pformat   [optional] tiff format; input NULL to ignore
  * \return  0 if OK, 1 on error
  */
 static l_int32
 tiffReadHeaderTiff(TIFF     *tif,
-                   l_int32  *pwidth,
-                   l_int32  *pheight,
+                   l_int32  *pw,
+                   l_int32  *ph,
                    l_int32  *pbps,
                    l_int32  *pspp,
                    l_int32  *pres,
@@ -1819,27 +1878,32 @@ l_uint32   w, h;
     if (!tif)
         return ERROR_INT("tif not opened", procName, 1);
 
-    TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
-    *pwidth = w;
-    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
-    *pheight = h;
-    TIFFGetFieldDefaulted(tif, TIFFTAG_BITSPERSAMPLE, &bps);
-    *pbps = bps;
-    TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &spp);
-    *pspp = spp;
-
+    if (pw) {
+        TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
+        *pw = w;
+    }
+    if (ph) {
+        TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
+        *ph = h;
+    }
+    if (pbps) {
+        TIFFGetFieldDefaulted(tif, TIFFTAG_BITSPERSAMPLE, &bps);
+        *pbps = bps;
+    }
+    if (pspp) {
+        TIFFGetFieldDefaulted(tif, TIFFTAG_SAMPLESPERPIXEL, &spp);
+        *pspp = spp;
+    }
     if (pres) {
         *pres = 300;  /* default ppi */
         if (getTiffStreamResolution(tif, &xres, &yres) == 0)
             *pres = (l_int32)xres;
     }
-
     if (pcmap) {
         *pcmap = 0;
         if (TIFFGetField(tif, TIFFTAG_COLORMAP, &rmap, &gmap, &bmap))
             *pcmap = 1;
     }
-
     if (pformat) {
         TIFFGetFieldDefaulted(tif, TIFFTAG_COMPRESSION, &tiffcomp);
         *pformat = getTiffCompressedFormat(tiffcomp);
@@ -1851,8 +1915,8 @@ l_uint32   w, h;
 /*!
  * \brief   findTiffCompression()
  *
- * \param[in]    fp file stream; must be rewound to BOF
- * \param[out]   pcomptype compression type
+ * \param[in]    fp         file stream; must be rewound to BOF
+ * \param[out]   pcomptype  compression type
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1867,7 +1931,7 @@ l_uint32   w, h;
  *          file, it must be rewound to BOF after calling this function.
  * </pre>
  */
-l_int32
+l_ok
 findTiffCompression(FILE     *fp,
                     l_int32  *pcomptype)
 {
@@ -1894,7 +1958,7 @@ TIFF     *tif;
 /*!
  * \brief   getTiffCompressedFormat()
  *
- * \param[in]    tiffcomp defined in tiff.h
+ * \param[in]    tiffcomp    defined in tiff.h
  * \return  compression format defined in imageio.h
  *
  * <pre>
@@ -1930,6 +1994,9 @@ l_int32  comptype;
     case COMPRESSION_ADOBE_DEFLATE:
         comptype = IFF_TIFF_ZIP;
         break;
+    case COMPRESSION_JPEG:
+        comptype = IFF_TIFF_JPEG;
+        break;
     default:
         comptype = IFF_TIFF;
         break;
@@ -1945,14 +2012,14 @@ l_int32  comptype;
  * \brief   extractG4DataFromFile()
  *
  * \param[in]    filein
- * \param[out]   pdata binary data of ccitt g4 encoded stream
- * \param[out]   pnbytes size of binary data
- * \param[out]   pw [optional] image width
- * \param[out]   ph [optional] image height
- * \param[out]   pminisblack [optional] boolean
+ * \param[out]   pdata         binary data of ccitt g4 encoded stream
+ * \param[out]   pnbytes       size of binary data
+ * \param[out]   pw            [optional] image width
+ * \param[out]   ph            [optional] image height
+ * \param[out]   pminisblack   [optional] boolean
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 extractG4DataFromFile(const char  *filein,
                       l_uint8    **pdata,
                       size_t      *pnbytes,
@@ -2050,8 +2117,8 @@ TIFF     *tif;
 /*!
  * \brief   fopenTiff()
  *
- * \param[in]    fp file stream
- * \param[in]    modestring "r", "w", ...
+ * \param[in]    fp           file stream
+ * \param[in]    modestring   "r", "w", ...
  * \return  tiff data structure, opened for a file descriptor
  *
  * <pre>
@@ -2078,7 +2145,8 @@ fopenTiff(FILE        *fp,
     if (!modestring)
         return (TIFF *)ERROR_PTR("modestring not defined", procName, NULL);
 
-    TIFFSetWarningHandler(dummyHandler);  /* disable warnings */
+    TIFFSetWarningHandler(NULL);  /* disable warnings */
+    TIFFSetErrorHandler(NULL);  /* disable error messages */
 
     fseek(fp, 0, SEEK_SET);
     return TIFFClientOpen("TIFFstream", modestring, (thandle_t)fp,
@@ -2094,7 +2162,7 @@ fopenTiff(FILE        *fp,
  * \brief   openTiff()
  *
  * \param[in]    filename
- * \param[in]    modestring "r", "w", ...
+ * \param[in]    modestring   "r", "w", ...
  * \return  tiff data structure
  *
  * <pre>
@@ -2116,7 +2184,8 @@ TIFF  *tif;
     if (!modestring)
         return (TIFF *)ERROR_PTR("modestring not defined", procName, NULL);
 
-    TIFFSetWarningHandler(dummyHandler);  /* disable warnings */
+    TIFFSetWarningHandler(NULL);  /* disable warnings */
+    TIFFSetErrorHandler(NULL);  /* disable error messages */
 
     fname = genPathname(filename, NULL);
     tif = TIFFOpen(fname, modestring);
@@ -2352,10 +2421,10 @@ tiffUnmapCallback(thandle_t  handle,
 /*!
  * \brief   fopenTiffMemstream()
  *
- * \param[in]    filename for error output; can be ""
- * \param[in]    operation "w" for write, "r" for read
- * \param[out]   pdata written data
- * \param[out]   pdatasize size of written data
+ * \param[in]    filename    for error output; can be ""
+ * \param[in]    operation   "w" for write, "r" for read
+ * \param[out]   pdata       written data
+ * \param[out]   pdatasize   size of written data
  * \return  tiff data structure, opened for write to memory
  *
  * <pre>
@@ -2376,6 +2445,7 @@ fopenTiffMemstream(const char  *filename,
                    size_t      *pdatasize)
 {
 L_MEMSTREAM  *mstream;
+TIFF         *tif;
 
     PROCNAME("fopenTiffMemstream");
 
@@ -2395,22 +2465,26 @@ L_MEMSTREAM  *mstream;
     else
         mstream = memstreamCreateForWrite(pdata, pdatasize);
 
-    TIFFSetWarningHandler(dummyHandler);  /* disable warnings */
+    TIFFSetWarningHandler(NULL);  /* disable warnings */
+    TIFFSetErrorHandler(NULL);  /* disable error messages */
 
-    return TIFFClientOpen(filename, operation, (thandle_t)mstream,
-                          tiffReadCallback, tiffWriteCallback,
-                          tiffSeekCallback, tiffCloseCallback,
-                          tiffSizeCallback, tiffMapCallback,
-                          tiffUnmapCallback);
+    tif = TIFFClientOpen(filename, operation, (thandle_t)mstream,
+                         tiffReadCallback, tiffWriteCallback,
+                         tiffSeekCallback, tiffCloseCallback,
+                         tiffSizeCallback, tiffMapCallback,
+                         tiffUnmapCallback);
+    if (!tif)
+        LEPT_FREE(mstream);
+    return tif;
 }
 
 
 /*!
  * \brief   pixReadMemTiff()
  *
- * \param[in]    cdata const; tiff-encoded
- * \param[in]    size size of cdata
- * \param[in]    n page image number: 0-based
+ * \param[in]    cdata    const; tiff-encoded
+ * \param[in]    size     size of cdata
+ * \param[in]    n        page image number: 0-based
  * \return  pix, or NULL on error
  *
  * <pre>
@@ -2472,7 +2546,7 @@ TIFF     *tif;
  *
  * \param[in]    cdata      const; tiff-encoded
  * \param[in]    size       size of cdata
- * \param[in,out]  &offset  set offset to 0 for first image
+ * \param[in,out]  poffset  set offset to 0 for first image
  * \return  pix, or NULL on error or if previous call returned the last image
  *
  * <pre>
@@ -2537,8 +2611,8 @@ TIFF     *tif;
 /*!
  * \brief   pixaReadMemMultipageTiff()
  *
- * \param[in]    data      const; multiple pages; tiff-encoded
- * \param[in]    size      size of cdata
+ * \param[in]    data    const; multiple pages; tiff-encoded
+ * \param[in]    size    size of cdata
  * \return  pixa, or NULL on error
  *
  * <pre>
@@ -2572,9 +2646,9 @@ PIXA   *pixa;
 /*!
  * \brief   pixaWriteMemMultipageTiff()
  *
- * \param[in]    cdata     const; tiff-encoded
- * \param[in]    size      size of cdata
- * \param[in]    pixa      any depth; colormap will be removed
+ * \param[out]    pdata   const; tiff-encoded
+ * \param[out]    psize   size of data
+ * \param[in]     pixa    any depth; colormap will be removed
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2586,7 +2660,7 @@ PIXA   *pixa;
  *          does not work with the tiff directory.
  * </pre>
  */
-l_int32
+l_ok
 pixaWriteMemMultipageTiff(l_uint8  **pdata,
                           size_t    *psize,
                           PIXA      *pixa)
@@ -2640,19 +2714,19 @@ PIX     *pix1, *pix2;
 /*!
  * \brief   pixWriteMemTiff()
  *
- * \param[out]   pdata data of tiff compressed image
- * \param[out]   psize size of returned data
+ * \param[out]   pdata     data of tiff compressed image
+ * \param[out]   psize     size of returned data
  * \param[in]    pix
- * \param[in]    comptype IFF_TIFF, IFF_TIFF_RLE, IFF_TIFF_PACKBITS,
- *                        IFF_TIFF_G3, IFF_TIFF_G4,
- *                        IFF_TIFF_LZW, IFF_TIFF_ZIP
+ * \param[in]    comptype  IFF_TIFF, IFF_TIFF_RLE, IFF_TIFF_PACKBITS,
+ *                         IFF_TIFF_G3, IFF_TIFF_G4,
+ *                         IFF_TIFF_LZW, IFF_TIFF_ZIP, IFF_TIFF_JPEG
  * \return  0 if OK, 1 on error
  *
  *  Usage:
  *      1) See pixWriteTiff(.  This version writes to
  *          memory instead of to a file.
  */
-l_int32
+l_ok
 pixWriteMemTiff(l_uint8  **pdata,
                 size_t    *psize,
                 PIX       *pix,
@@ -2666,16 +2740,16 @@ pixWriteMemTiff(l_uint8  **pdata,
 /*!
  * \brief   pixWriteMemTiffCustom()
  *
- * \param[out]   pdata data of tiff compressed image
- * \param[out]   psize size of returned data
+ * \param[out]   pdata     data of tiff compressed image
+ * \param[out]   psize     size of returned data
  * \param[in]    pix
- * \param[in]    comptype IFF_TIFF, IFF_TIFF_RLE, IFF_TIFF_PACKBITS,
- *                        IFF_TIFF_G3, IFF_TIFF_G4,
- *                        IFF_TIFF_LZW, IFF_TIFF_ZIP
- * \param[in]    natags [optional] NUMA of custom tiff tags
- * \param[in]    savals [optional] SARRAY of values
- * \param[in]    satypes [optional] SARRAY of types
- * \param[in]    nasizes [optional] NUMA of sizes
+ * \param[in]    comptype  IFF_TIFF, IFF_TIFF_RLE, IFF_TIFF_PACKBITS,
+ *                         IFF_TIFF_G3, IFF_TIFF_G4,
+ *                         IFF_TIFF_LZW, IFF_TIFF_ZIP, IFF_TIFF_JPEG
+ * \param[in]    natags    [optional] NUMA of custom tiff tags
+ * \param[in]    savals    [optional] SARRAY of values
+ * \param[in]    satypes   [optional] SARRAY of types
+ * \param[in]    nasizes   [optional] NUMA of sizes
  * \return  0 if OK, 1 on error
  *
  *  Usage:
@@ -2683,7 +2757,7 @@ pixWriteMemTiff(l_uint8  **pdata,
  *          memory instead of to a file.
  *      2) Use TIFFClose(); TIFFCleanup( doesn't free internal memstream.
  */
-l_int32
+l_ok
 pixWriteMemTiffCustom(l_uint8  **pdata,
                       size_t    *psize,
                       PIX       *pix,
@@ -2705,7 +2779,8 @@ TIFF    *tif;
     if (!pix)
         return ERROR_INT("&pix not defined", procName, 1);
     if (pixGetDepth(pix) != 1 && comptype != IFF_TIFF &&
-        comptype != IFF_TIFF_LZW && comptype != IFF_TIFF_ZIP) {
+        comptype != IFF_TIFF_LZW && comptype != IFF_TIFF_ZIP &&
+        comptype != IFF_TIFF_JPEG) {
         L_WARNING("invalid compression type for bpp > 1\n", procName);
         comptype = IFF_TIFF_ZIP;
     }

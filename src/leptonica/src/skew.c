@@ -355,7 +355,7 @@ PIX       *pixb, *pixd;
  * \param[in]    pixs  1 bpp
  * \param[out]   pangle   angle required to deskew, in degrees
  * \param[out]   pconf    confidence value is ratio max/min scores
- * \return  0 if OK, 1 on error or if angle measurment not valid
+ * \return  0 if OK, 1 on error or if angle measurement not valid
  *
  * <pre>
  * Notes:
@@ -366,7 +366,7 @@ PIX       *pixb, *pixd;
  *          Clockwise rotations are positive angles.
  * </pre>
  */
-l_int32
+l_ok
 pixFindSkew(PIX        *pixs,
             l_float32  *pangle,
             l_float32  *pconf)
@@ -402,7 +402,7 @@ pixFindSkew(PIX        *pixs,
  * \param[in]    reduction  factor = 1, 2, 4 or 8
  * \param[in]    sweeprange   half the full range; assumed about 0; in degrees
  * \param[in]    sweepdelta   angle increment of sweep; in degrees
- * \return  0 if OK, 1 on error or if angle measurment not valid
+ * \return  0 if OK, 1 on error or if angle measurement not valid
  *
  * <pre>
  * Notes:
@@ -410,7 +410,7 @@ pixFindSkew(PIX        *pixs,
  *      (2) Caller must check the return value for validity of the result.
  * </pre>
  */
-l_int32
+l_ok
 pixFindSkewSweep(PIX        *pixs,
                  l_float32  *pangle,
                  l_int32     reduction,
@@ -538,7 +538,7 @@ cleanup:
  * \param[in]    sweeprange   half the full range, assumed about 0; in degrees
  * \param[in]    sweepdelta   angle increment of sweep; in degrees
  * \param[in]    minbsdelta   min binary search increment angle; in degrees
- * \return  0 if OK, 1 on error or if angle measurment not valid
+ * \return  0 if OK, 1 on error or if angle measurement not valid
  *
  * <pre>
  * Notes:
@@ -554,7 +554,7 @@ cleanup:
  *      (4) See also notes in pixFindSkewSweepAndSearchScore()
  * </pre>
  */
-l_int32
+l_ok
 pixFindSkewSweepAndSearch(PIX        *pixs,
                           l_float32  *pangle,
                           l_float32  *pconf,
@@ -585,7 +585,7 @@ pixFindSkewSweepAndSearch(PIX        *pixs,
  *                            in degrees
  * \param[in]    sweepdelta   angle increment of sweep; in degrees
  * \param[in]    minbsdelta   min binary search increment angle; in degrees
- * \return  0 if OK, 1 on error or if angle measurment not valid
+ * \return  0 if OK, 1 on error or if angle measurement not valid
  *
  * <pre>
  * Notes:
@@ -608,7 +608,7 @@ pixFindSkewSweepAndSearch(PIX        *pixs,
  *      (4) By default, the shear is about the UL corner.
  * </pre>
  */
-l_int32
+l_ok
 pixFindSkewSweepAndSearchScore(PIX        *pixs,
                                l_float32  *pangle,
                                l_float32  *pconf,
@@ -644,7 +644,7 @@ pixFindSkewSweepAndSearchScore(PIX        *pixs,
  * \param[in]    sweepdelta   angle increment of sweep; in degrees
  * \param[in]    minbsdelta   min binary search increment angle; in degrees
  * \param[in]    pivot  L_SHEAR_ABOUT_CORNER, L_SHEAR_ABOUT_CENTER
- * \return  0 if OK, 1 on error or if angle measurment not valid
+ * \return  0 if OK, 1 on error or if angle measurement not valid
  *
  * <pre>
  * Notes:
@@ -657,7 +657,7 @@ pixFindSkewSweepAndSearchScore(PIX        *pixs,
  *          loses too much of the image.
  * </pre>
  */
-l_int32
+l_ok
 pixFindSkewSweepAndSearchScorePivot(PIX        *pixs,
                                     l_float32  *pangle,
                                     l_float32  *pconf,
@@ -987,7 +987,7 @@ cleanup:
  *              confprior  (amount by which confidence of 90 degree rotated
  *                          result is reduced when comparing with unrotated
  *                          confidence value)
- *      Return: 0 if OK, 1 on error or if angle measurment not valid
+ *      Return: 0 if OK, 1 on error or if angle measurement not valid
  *
  *  Notes:
  *      (1) This searches for the skew angle, first in the range
@@ -1101,7 +1101,7 @@ PIX       *pixr;
  *           ~ not more than 5% of the image width
  * </pre>
  */
-l_int32
+l_ok
 pixFindDifferentialSquareSum(PIX        *pixs,
                              l_float32  *psum)
 {
@@ -1174,7 +1174,7 @@ NUMA      *na;
  *      (2) If there are no fg pixels, hratio and vratio are returned as 0.0.
  * </pre>
  */
-l_int32
+l_ok
 pixFindNormalizedSquareSum(PIX        *pixs,
                            l_float32  *phratio,
                            l_float32  *pvratio,

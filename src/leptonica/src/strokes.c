@@ -71,7 +71,7 @@
  *      (1) Returns half the number of fg boundary pixels.
  * </pre>
  */
-l_int32
+l_ok
 pixFindStrokeLength(PIX      *pixs,
                     l_int32  *tab8,
                     l_int32  *plength)
@@ -119,7 +119,7 @@ PIX      *pix1;
  *          the noise. It is typically about 0.15.
  * </pre>
  */
-l_int32
+l_ok
 pixFindStrokeWidth(PIX        *pixs,
                    l_float32   thresh,
                    l_int32    *tab8,
@@ -289,7 +289,7 @@ PIXA      *pixad;
 /*!
  * \brief   pixModifyStrokeWidth()
  *
- * \param[in]   pixa  of 1 bpp pix
+ * \param[in]   pixs  of 1 bpp pix
  * \param[in]   width  measured average stroke width
  * \param[in]   targetw  desired stroke width
  * \return  pix  with modified stroke width, or NULL on error
@@ -299,7 +299,7 @@ pixModifyStrokeWidth(PIX       *pixs,
                      l_float32  width,
                      l_float32  targetw)
 {
-char     buf[16];
+char     buf[32];
 l_int32  diff, size;
 
     PROCNAME("pixModifyStrokeWidth");

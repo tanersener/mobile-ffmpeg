@@ -34,6 +34,8 @@
  *         L_RECOG            *recogCreateFromPixaNoFinish()
  *         L_RECOG            *recogCreate()
  *         void                recogDestroy()
+ *
+ *      Recog accessors
  *         l_int32             recogGetCount()
  *         l_int32             recogSetParams()
  *         static l_int32      recogGetCharsetSize()
@@ -212,12 +214,12 @@ static l_int32 recogAddAllSamples(L_RECOG **precog, PIXAA *paa, l_int32 debug);
 /*!
  * \brief   recogCreateFromRecog()
  *
- * \param[in]    recs source recog with arbitrary input parameters
- * \param[in]    scalew  scale all widths to this; use 0 otherwise
- * \param[in]    scaleh  scale all heights to this; use 0 otherwise
- * \param[in]    linew   width of normalized strokes; use 0 to skip
- * \param[in]    threshold for binarization; typically ~128
- * \param[in]    maxyshift from nominal centroid alignment; default is 1
+ * \param[in]    recs        source recog with arbitrary input parameters
+ * \param[in]    scalew      scale all widths to this; use 0 otherwise
+ * \param[in]    scaleh      scale all heights to this; use 0 otherwise
+ * \param[in]    linew       width of normalized strokes; use 0 to skip
+ * \param[in]    threshold   for binarization; typically ~128
+ * \param[in]    maxyshift   from nominal centroid alignment; default is 1
  * \return  recd, or NULL on error
  *
  * <pre>
@@ -229,12 +231,12 @@ static l_int32 recogAddAllSamples(L_RECOG **precog, PIXAA *paa, l_int32 debug);
  * </pre>
  */
 L_RECOG *
-recogCreateFromRecog(L_RECOG     *recs,
-                     l_int32      scalew,
-                     l_int32      scaleh,
-                     l_int32      linew,
-                     l_int32      threshold,
-                     l_int32      maxyshift)
+recogCreateFromRecog(L_RECOG  *recs,
+                     l_int32   scalew,
+                     l_int32   scaleh,
+                     l_int32   linew,
+                     l_int32   threshold,
+                     l_int32   maxyshift)
 {
 L_RECOG  *recd;
 PIXA     *pixa;
@@ -255,12 +257,12 @@ PIXA     *pixa;
 /*!
  * \brief   recogCreateFromPixa()
  *
- * \param[in]    pixa of labeled, 1 bpp images
- * \param[in]    scalew  scale all widths to this; use 0 otherwise
- * \param[in]    scaleh  scale all heights to this; use 0 otherwise
- * \param[in]    linew   width of normalized strokes; use 0 to skip
- * \param[in]    threshold for binarization; typically ~150
- * \param[in]    maxyshift from nominal centroid alignment; default is 1
+ * \param[in]    pixa         of labeled, 1 bpp images
+ * \param[in]    scalew       scale all widths to this; use 0 otherwise
+ * \param[in]    scaleh       scale all heights to this; use 0 otherwise
+ * \param[in]    linew        width of normalized strokes; use 0 to skip
+ * \param[in]    threshold    for binarization; typically ~150
+ * \param[in]    maxyshift    from nominal centroid alignment; default is 1
  * \return  recog, or NULL on error
  *
  * <pre>
@@ -305,12 +307,12 @@ L_RECOG  *recog;
 /*!
  * \brief   recogCreateFromPixaNoFinish()
  *
- * \param[in]    pixa of labeled, 1 bpp images
- * \param[in]    scalew  scale all widths to this; use 0 otherwise
- * \param[in]    scaleh  scale all heights to this; use 0 otherwise
- * \param[in]    linew   width of normalized strokes; use 0 to skip
- * \param[in]    threshold for binarization; typically ~150
- * \param[in]    maxyshift from nominal centroid alignment; default is 1
+ * \param[in]    pixa         of labeled, 1 bpp images
+ * \param[in]    scalew       scale all widths to this; use 0 otherwise
+ * \param[in]    scaleh       scale all heights to this; use 0 otherwise
+ * \param[in]    linew        width of normalized strokes; use 0 to skip
+ * \param[in]    threshold    for binarization; typically ~150
+ * \param[in]    maxyshift    from nominal centroid alignment; default is 1
  * \return  recog, or NULL on error
  *
  * <pre>
@@ -375,11 +377,11 @@ L_RECOG  *recog;
 /*!
  * \brief   recogCreate()
  *
- * \param[in]    scalew  scale all widths to this; use 0 otherwise
- * \param[in]    scaleh  scale all heights to this; use 0 otherwise
- * \param[in]    linew   width of normalized strokes; use 0 to skip
- * \param[in]    threshold for binarization; typically ~128; 0 for default
- * \param[in]    maxyshift from nominal centroid alignment; default is 1
+ * \param[in]    scalew       scale all widths to this; use 0 otherwise
+ * \param[in]    scaleh       scale all heights to this; use 0 otherwise
+ * \param[in]    linew        width of normalized strokes; use 0 to skip
+ * \param[in]    threshold    for binarization; typically ~128; 0 for default
+ * \param[in]    maxyshift    from nominal centroid alignment; default is 1
  * \return  recog, or NULL on error
  *
  * <pre>
@@ -403,11 +405,11 @@ L_RECOG  *recog;
  * </pre>
  */
 L_RECOG *
-recogCreate(l_int32      scalew,
-            l_int32      scaleh,
-            l_int32      linew,
-            l_int32      threshold,
-            l_int32      maxyshift)
+recogCreate(l_int32  scalew,
+            l_int32  scaleh,
+            l_int32  linew,
+            l_int32  threshold,
+            l_int32  maxyshift)
 {
 L_RECOG  *recog;
 
@@ -469,7 +471,7 @@ L_RECOG  *recog;
 /*!
  * \brief   recogDestroy()
  *
- * \param[in,out]   precog will be set to null before returning
+ * \param[in,out]   precog    will be set to null before returning
  * \return  void
  */
 void
@@ -519,6 +521,9 @@ L_RECOG  *recog;
 }
 
 
+/*------------------------------------------------------------------------*
+ *                              Recog accessors                           *
+ *------------------------------------------------------------------------*/
 /*!
  * \brief   recogGetCount()
  *
@@ -539,15 +544,15 @@ recogGetCount(L_RECOG  *recog)
 /*!
  * \brief   recogSetParams()
  *
- * \param[in]    recog         to be padded, if necessary
- * \param[in]    type          type of char set; -1 for default;
- *                               see enum in recog.h
- * \param[in]    min_nopad     min number in a class without padding;
- *                               use -1 for default
- * \param[in]    max_wh_ratio  max width/height ratio allowed for splitting;
- *                               use -1.0 for default
- * \param[in]    max_ht_ratio  max of max/min averaged template height ratio;
- *                               use -1.0 for default
+ * \param[in]    recog          to be padded, if necessary
+ * \param[in]    type           type of char set; -1 for default;
+ *                              see enum in recog.h
+ * \param[in]    min_nopad      min number in a class without padding;
+ *                              use -1 for default
+ * \param[in]    max_wh_ratio   max width/height ratio allowed for splitting;
+ *                              use -1.0 for default
+ * \param[in]    max_ht_ratio   max of max/min averaged template height ratio;
+ *                              use -1.0 for default
  * \return       0 if OK, 1 on error
  *
  * <pre>
@@ -563,14 +568,13 @@ recogGetCount(L_RECOG  *recog)
  *          the templates do not satisfy it.
  * </pre>
  */
-l_int32
+l_ok
 recogSetParams(L_RECOG   *recog,
                l_int32    type,
                l_int32    min_nopad,
                l_float32  max_wh_ratio,
                l_float32  max_ht_ratio)
 {
-
     PROCNAME("recogSetParams");
 
     if (!recog)
@@ -590,7 +594,7 @@ recogSetParams(L_RECOG   *recog,
 /*!
  * \brief   recogGetCharsetSize()
  *
- * \param[in]    type of charset
+ * \param[in]    type     of charset
  * \return  size of charset, or 0 if unknown or on error
  */
 static l_int32
@@ -625,10 +629,10 @@ recogGetCharsetSize(l_int32  type)
 /*!
  * \brief   recogGetClassIndex()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[in]    val integer value; can be up to 3 bytes for UTF-8
- * \param[in]    text text from which %val was derived; used if not found
- * \param[out]   pindex index into dna_tochar
+ * \param[in]    recog     with LUT's pre-computed
+ * \param[in]    val       integer value; can be up to 3 bytes for UTF-8
+ * \param[in]    text      text from which %val was derived; used if not found
+ * \param[out]   pindex    index into dna_tochar
  * \return  0 if found; 1 if not found and added; 2 on error.
  *
  * <pre>
@@ -687,11 +691,11 @@ l_int32  i, n, ival;
  * \brief   recogStringToIndex()
  *
  * \param[in]    recog
- * \param[in]    text text string for some class
- * \param[out]   pindex index for that class; -1 if not found
+ * \param[in]    text     text string for some class
+ * \param[out]   pindex   index for that class; -1 if not found
  * \return  0 if OK, 1 on error not finding the string is an error
  */
-l_int32
+l_ok
 recogStringToIndex(L_RECOG  *recog,
                    char     *text,
                    l_int32  *pindex)
@@ -732,9 +736,9 @@ l_int32  i, n, diff;
  * \brief   recogGetClassString()
  *
  * \param[in]    recog
- * \param[in]    index into array of char types
- * \param[out]   pcharstr string representation;
- *                        returns an empty string on error
+ * \param[in]    index       into array of char types
+ * \param[out]   pcharstr    string representation;
+ *                           returns an empty string on error
  * \return  0 if found, 1 on error
  *
  * <pre>
@@ -768,13 +772,13 @@ recogGetClassString(L_RECOG  *recog,
 /*!
  * \brief   l_convertCharstrToInt()
  *
- * \param[in]    str input string representing one UTF-8 character;
- *                   not more than 4 bytes
- * \param[out]   pval integer value for the input.  Think of it
- *                    as a 1-to-1 hash code.
+ * \param[in]    str     input string representing one UTF-8 character;
+ *                       not more than 4 bytes
+ * \param[out]   pval    integer value for the input.  Think of it
+ *                       as a 1-to-1 hash code.
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_convertCharstrToInt(const char  *str,
                       l_int32     *pval)
 {
@@ -859,7 +863,7 @@ L_RECOG  *recog;
 /*!
  * \brief   recogReadStream()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp     file stream
  * \return  recog, or NULL on error
  */
 L_RECOG *
@@ -943,8 +947,8 @@ SARRAY   *sa_text;
 /*!
  * \brief   recogReadMem()
  *
- * \param[in]    data  serialization of recog (not ascii)
- * \param[in]    size  of data in bytes
+ * \param[in]    data    serialization of recog (not ascii)
+ * \param[in]    size    of data in bytes
  * \return  recog, or NULL on error
  */
 L_RECOG *
@@ -984,7 +988,7 @@ L_RECOG  *recog;
  *          first place.  See the notes in recogRead() for the rationale.
  * </pre>
  */
-l_int32
+l_ok
 recogWrite(const char  *filename,
            L_RECOG     *recog)
 {
@@ -1011,11 +1015,11 @@ FILE    *fp;
 /*!
  * \brief   recogWriteStream()
  *
- * \param[in]    fp file stream opened for "wb"
+ * \param[in]    fp      file stream opened for "wb"
  * \param[in]    recog
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 recogWriteStream(FILE     *fp,
                  L_RECOG  *recog)
 {
@@ -1046,8 +1050,8 @@ recogWriteStream(FILE     *fp,
 /*!
  * \brief   recogWriteMem()
  *
- * \param[out]   pdata data of serialized recog (not ascii)
- * \param[out]   psize size of returned data
+ * \param[out]   pdata    data of serialized recog (not ascii)
+ * \param[out]   psize    size of returned data
  * \param[in]    recog
  * \return  0 if OK, 1 on error
  *
@@ -1056,7 +1060,7 @@ recogWriteStream(FILE     *fp,
  *      (1) Serializes a recog in memory and puts the result in a buffer.
  * </pre>
  */
-l_int32
+l_ok
 recogWriteMem(l_uint8  **pdata,
               size_t    *psize,
               L_RECOG   *recog)
@@ -1165,8 +1169,8 @@ PIXAA   *paa;
 /*!
  * \brief   recogAddAllSamples()
  *
- * \param[in]    precog  addr of recog
- * \param[in]    paa     pixaa from previously trained recog
+ * \param[in]    precog    addr of recog
+ * \param[in]    paa       pixaa from previously trained recog
  * \param[in]    debug
  * \return  0 if OK, 1 on error
  *

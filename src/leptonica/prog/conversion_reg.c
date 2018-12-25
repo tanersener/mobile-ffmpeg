@@ -70,7 +70,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixs1, 100, 100, "1 bpp, no cmap", 1);
         pixDisplayWithTitle(pix2, 500, 100, "1 bpp, no cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 1 bpp <==> 8 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 1 bpp <==> 8 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 1 bpp <==> 8 bpp\n");
     pixDestroy(&pix1);
@@ -88,7 +88,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pix2, 100, 100, "2 bpp, no cmap", 1);
         pixDisplayWithTitle(pix4, 500, 100, "2 bpp, no cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 2 bpp <==> 8 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 2 bpp <==> 8 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 2 bpp <==> 8 bpp\n");
     pix5 = pixConvertTo8(pixs2, TRUE);
@@ -99,7 +99,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixs2, 100, 100, "2 bpp, cmap", 1);
         pixDisplayWithTitle(pix6, 500, 100, "2 bpp, cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 2 bpp <==> 8 bpp; cmap",
+        sarrayAddString(sa, "conversion 2 bpp <==> 8 bpp; cmap",
                         L_COPY);
     } else
         fprintf(stderr, "OK: conversion 2 bpp <==> 8 bpp; cmap\n");
@@ -122,7 +122,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pix2, 100, 100, "4 bpp, no cmap", 1);
         pixDisplayWithTitle(pix4, 500, 100, "4 bpp, no cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 4 bpp <==> 8 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 4 bpp <==> 8 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 4 bpp <==> 8 bpp\n");
     pix5 = pixConvertTo8(pixs4, TRUE);
@@ -133,7 +133,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixs4, 100, 100, "4 bpp, cmap", 1);
         pixDisplayWithTitle(pix6, 500, 100, "4 bpp, cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 4 bpp <==> 8 bpp, cmap",
+        sarrayAddString(sa, "conversion 4 bpp <==> 8 bpp, cmap",
                         L_COPY);
     } else
         fprintf(stderr, "OK: conversion 4 bpp <==> 8 bpp; cmap\n");
@@ -155,7 +155,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixs2, 100, 100, "2 bpp, cmap", 1);
         pixDisplayWithTitle(pix4, 500, 100, "2 bpp, cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 2 bpp <==> 2 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 2 bpp <==> 2 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 2 bpp <==> 2 bpp\n");
     pixDestroy(&pix1);
@@ -174,7 +174,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixs4, 100, 100, "4 bpp, cmap", 1);
         pixDisplayWithTitle(pix4, 500, 100, "4 bpp, cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 4 bpp <==> 4 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 4 bpp <==> 4 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 4 bpp <==> 4 bpp\n");
     pixDestroy(&pix1);
@@ -191,7 +191,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pix1, 100, 100, "8 bpp, cmap", 1);
         pixDisplayWithTitle(pix2, 500, 100, "8 bpp, no cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 8 bpp <==> 8 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 8 bpp <==> 8 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 8 bpp <==> 8 bpp\n");
     pixDestroy(&pix1);
@@ -207,7 +207,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pix2, 100, 100, "32 bpp", 1);
         pixDisplayWithTitle(pix3, 500, 100, "32 bpp", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 2 bpp ==> 32 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 2 bpp ==> 32 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 2 bpp <==> 32 bpp\n");
     cmap = pixGetColormap(pixc2);
@@ -218,7 +218,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixc2, 100, 100, "4 bpp, cmap", 1);
         pixDisplayWithTitle(pix4, 500, 100, "4 bpp, cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 2 bpp <==> 32 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 2 bpp <==> 32 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 2 bpp <==> 32 bpp\n");
     pixDestroy(&pix1);
@@ -236,7 +236,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pix2, 100, 100, "32 bpp", 1);
         pixDisplayWithTitle(pix3, 500, 100, "32 bpp", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 4 bpp ==> 32 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 4 bpp ==> 32 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 4 bpp <==> 32 bpp\n");
     cmap = pixGetColormap(pixc4);
@@ -247,7 +247,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixc4, 100, 100, "4 bpp, cmap", 1);
         pixDisplayWithTitle(pix4, 500, 100, "4 bpp, cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 4 bpp <==> 32 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 4 bpp <==> 32 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 4 bpp <==> 32 bpp\n");
     pixDestroy(&pix1);
@@ -264,7 +264,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixs8, 100, 100, "8 bpp", 1);
         pixDisplayWithTitle(pix2, 500, 100, "8 bpp", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 8 bpp <==> 32 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 8 bpp <==> 32 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 8 bpp <==> 32 bpp\n");
     pixDestroy(&pix1);
@@ -279,7 +279,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixs8, 100, 100, "8 bpp", 1);
         pixDisplayWithTitle(pix2, 500, 100, "8 bpp", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 8 bpp <==> 16 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 8 bpp <==> 16 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 8 bpp <==> 16 bpp\n");
     pixDestroy(&pix1);
@@ -294,7 +294,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixs16, 100, 100, "16 bpp", 1);
         pixDisplayWithTitle(pix2, 500, 100, "16 bpp", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 16 bpp <==> 8 bpp", L_COPY);
+        sarrayAddString(sa, "conversion 16 bpp <==> 8 bpp", L_COPY);
     } else
         fprintf(stderr, "OK: conversion 16 bpp <==> 8 bpp\n");
     pixDestroy(&pix1);
@@ -311,7 +311,7 @@ L_REGPARAMS  *rp;
         pixDisplayWithTitle(pixc8, 100, 100, "8 bpp cmap", 1);
         pixDisplayWithTitle(pix2, 500, 100, "8 bpp cmap", 1);
         error = TRUE;
-        sarrayAddString(sa, (char *)"conversion 8 bpp cmap <==> 32 bpp cmap",
+        sarrayAddString(sa, "conversion 8 bpp cmap <==> 32 bpp cmap",
                         L_COPY);
     } else
         fprintf(stderr, "OK: conversion 8 bpp <==> 32 bpp\n");

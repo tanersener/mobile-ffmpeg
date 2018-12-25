@@ -186,8 +186,8 @@ pixDitherToBinary(PIX  *pixs)
  * \brief   pixDitherToBinarySpec()
  *
  * \param[in]    pixs
- * \param[in]    lowerclip lower clip distance to black; use 0 for default
- * \param[in]    upperclip upper clip distance to white; use 0 for default
+ * \param[in]    lowerclip   lower clip distance to black; use 0 for default
+ * \param[in]    upperclip   upper clip distance to white; use 0 for default
  * \return  pixd dithered binary, or NULL on error
  *
  * <pre>
@@ -296,12 +296,12 @@ l_uint32  *lined;
 /*!
  * \brief   ditherToBinaryLineLow()
  *
- * \param[in]    lined  ptr to beginning of dest line
- *              w   (width of image in pixels
- * \param[in]    bufs1 buffer of current source line
- * \param[in]    bufs2 buffer of next source line
- * \param[in]    lowerclip lower clip distance to black
- * \param[in]    upperclip upper clip distance to white
+ * \param[in]    lined         ptr to beginning of dest line
+ * \param[in]    w             width of image in pixels
+ * \param[in]    bufs1         buffer of current source line
+ * \param[in]    bufs2         buffer of next source line
+ * \param[in]    lowerclip     lower clip distance to black
+ * \param[in]    upperclip     upper clip distance to white
  * \param[in]    lastlineflag  0 if not last dest line, 1 if last dest line
  * \return  void
  *
@@ -425,8 +425,8 @@ l_uint8   fval1, fval2, rval, bval, dval;
 /*!
  * \brief   pixThresholdToBinary()
  *
- * \param[in]    pixs 4 or 8 bpp
- * \param[in]    thresh threshold value
+ * \param[in]    pixs     4 or 8 bpp
+ * \param[in]    thresh   threshold value
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -611,7 +611,8 @@ l_uint32 sword, dword;
                 }
                 gval = (sword >> 24) & 0xff;
                 sword <<= 8;
-                dword |= (((gval - thresh) >> 31) & 1) << (31 - (j & 31));
+                dword |= (l_uint64)(((gval - thresh) >> 31) & 1)
+                             << (31 - (j & 31));
             }
             lined[dcount] = dword;
         }
@@ -636,8 +637,8 @@ l_uint32 sword, dword;
 /*!
  * \brief   pixVarThresholdToBinary()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    pixg 8 bpp; contains threshold values for each pixel
+ * \param[in]    pixs    8 bpp
+ * \param[in]    pixg    8 bpp; contains threshold values for each pixel
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -697,9 +698,9 @@ PIX       *pixd;
 /*!
  * \brief   pixAdaptThresholdToBinary()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    pixm [optional] 1 bpp image mask; can be null
- * \param[in]    gamma gamma correction; must be > 0.0; typically ~1.0
+ * \param[in]    pixs    8 bpp
+ * \param[in]    pixm    [optional] 1 bpp image mask; can be null
+ * \param[in]    gamma   gamma correction; must be > 0.0; typically ~1.0
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -738,12 +739,12 @@ pixAdaptThresholdToBinary(PIX       *pixs,
 /*!
  * \brief   pixAdaptThresholdToBinaryGen()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    pixm [optional] 1 bpp image mask; can be null
- * \param[in]    gamma gamma correction; must be > 0.0; typically ~1.0
- * \param[in]    blackval dark value to set to black (0)
- * \param[in]    whiteval light value to set to white (255)
- * \param[in]    thresh final threshold for binarization
+ * \param[in]    pixs       8 bpp
+ * \param[in]    pixm       [optional] 1 bpp image mask; can be null
+ * \param[in]    gamma      gamma correction; must be > 0.0; typically ~1.0
+ * \param[in]    blackval   dark value to set to black (0)
+ * \param[in]    whiteval   light value to set to white (255)
+ * \param[in]    thresh     final threshold for binarization
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -790,9 +791,9 @@ PIX  *pix1, *pixd;
 /*!
  * \brief   pixGenerateMaskByValue()
  *
- * \param[in]    pixs 2, 4 or 8 bpp, or colormapped
- * \param[in]    val of pixels for which we set 1 in dest
- * \param[in]    usecmap 1 to retain cmap values; 0 to convert to gray
+ * \param[in]    pixs      2, 4 or 8 bpp, or colormapped
+ * \param[in]    val       of pixels for which we set 1 in dest
+ * \param[in]    usecmap   1 to retain cmap values; 0 to convert to gray
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -873,14 +874,15 @@ PIX       *pixg, *pixd;
 /*!
  * \brief   pixGenerateMaskByBand()
  *
- * \param[in]    pixs 2, 4 or 8 bpp, or colormapped
- * \param[in]    lower, upper two pixel values from which a range, either
- *                            between (inband) or outside of (!inband),
- *                            determines which pixels in pixs cause us to
- *                            set a 1 in the dest mask
- * \param[in]    inband 1 for finding pixels in [lower, upper];
- *                      0 for finding pixels in [0, lower) union (upper, 255]
- * \param[in]    usecmap 1 to retain cmap values; 0 to convert to gray
+ * \param[in]    pixs           2, 4 or 8 bpp, or colormapped
+ * \param[in]    lower, upper   two pixel values from which a range, either
+ *                              between (inband) or outside of (!inband),
+ *                              determines which pixels in pixs cause us to
+ *                              set a 1 in the dest mask
+ * \param[in]    inband         1 for finding pixels in [lower, upper];
+ *                              0 for finding pixels in
+ *                              [0, lower) union (upper, 255]
+ * \param[in]    usecmap        1 to retain cmap values; 0 to convert to gray
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -973,9 +975,9 @@ PIX       *pixg, *pixd;
 /*!
  * \brief   pixDitherTo2bpp()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    cmapflag 1 to generate a colormap
- * \return  pixd dithered 2 bpp, or NULL on error
+ * \param[in]    pixs       8 bpp
+ * \param[in]    cmapflag   1 to generate a colormap
+ * \return  pixd dithered   2 bpp, or NULL on error
  *
  *  An analog of the Floyd-Steinberg error diffusion dithering
  *  algorithm is used to "dibitize" an 8 bpp grayscale image
@@ -1028,11 +1030,11 @@ pixDitherTo2bpp(PIX     *pixs,
 /*!
  * \brief   pixDitherTo2bppSpec()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    lowerclip lower clip distance to black; use 0 for default
- * \param[in]    upperclip upper clip distance to white; use 0 for default
- * \param[in]    cmapflag 1 to generate a colormap
- * \return  pixd dithered 2 bpp, or NULL on error
+ * \param[in]    pixs        8 bpp
+ * \param[in]    lowerclip   lower clip distance to black; use 0 for default
+ * \param[in]    upperclip   upper clip distance to white; use 0 for default
+ * \param[in]    cmapflag    1 to generate a colormap
+ * \return  pixd dithered    2 bpp, or NULL on error
  *
  * <pre>
  * Notes:
@@ -1161,14 +1163,14 @@ l_uint32    *lined;
 /*!
  * \brief   ditherTo2bppLineLow()
  *
- * \param[in]    lined  ptr to beginning of dest line
- *              w   (width of image in pixels
- * \param[in]    bufs1 buffer of current source line
- * \param[in]    bufs2 buffer of next source line
- * \param[in]    tabval value to assign for current pixel
- * \param[in]    tab38 excess value to give to neighboring 3/8 pixels
- * \param[in]    tab14 excess value to give to neighboring 1/4 pixel
- * \param[in]    lastlineflag  0 if not last dest line, 1 if last dest line
+ * \param[in]    lined          ptr to beginning of dest line
+ * \param[in]    w              width of image in pixels
+ * \param[in]    bufs1          buffer of current source line
+ * \param[in]    bufs2          buffer of next source line
+ * \param[in]    tabval         value to assign for current pixel
+ * \param[in]    tab38          excess value to give to neighboring 3/8 pixels
+ * \param[in]    tab14          excess value to give to neighboring 1/4 pixel
+ * \param[in]    lastlineflag   0 if not last dest line, 1 if last dest line
  * \return  void
  *
  *  Dispatches error diffusion dithering for
@@ -1254,11 +1256,11 @@ l_uint8  rval, bval, dval;
 /*!
  * \brief   make8To2DitherTables()
  *
- * \param[out]  ptabval value assigned to output pixel; 0, 1, 2 or 3
- * \param[out]  ptab38  amount propagated to pixels left and below
- * \param[out]  ptab14  amount propagated to pixel to left and down
- * \param[in]   cliptoblack values near 0 where the excess is not propagated
- * \param[in]   cliptowhite values near 255 where the deficit is not propagated
+ * \param[out]  ptabval      value assigned to output pixel; 0, 1, 2 or 3
+ * \param[out]  ptab38       amount propagated to pixels left and below
+ * \param[out]  ptab14       amount propagated to pixel to left and down
+ * \param[in]   cliptoblack  values near 0 where the excess is not propagated
+ * \param[in]   cliptowhite  values near 255 where the deficit is not propagated
  *
  * \return  0 if OK, 1 on error
  */
@@ -1271,8 +1273,6 @@ make8To2DitherTables(l_int32 **ptabval,
 {
 l_int32   i;
 l_int32  *tabval, *tab38, *tab14;
-
-    PROCNAME("make8To2DitherTables");
 
         /* 3 lookup tables: 2-bit value, (3/8)excess, and (1/4)excess */
     tabval = (l_int32 *)LEPT_CALLOC(256, sizeof(l_int32));
@@ -1328,9 +1328,9 @@ l_int32  *tabval, *tab38, *tab14;
 /*!
  * \brief   pixThresholdTo2bpp()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    nlevels equally spaced; must be between 2 and 4
- * \param[in]    cmapflag 1 to build colormap; 0 otherwise
+ * \param[in]    pixs       8 bpp
+ * \param[in]    nlevels    equally spaced; must be between 2 and 4
+ * \param[in]    cmapflag   1 to build colormap; 0 otherwise
  * \return  pixd 2 bpp, optionally with colormap, or NULL on error
  *
  * <pre>
@@ -1468,9 +1468,9 @@ l_uint32  *lines, *lined;
 /*!
  * \brief   pixThresholdTo4bpp()
  *
- * \param[in]    pixs 8 bpp, can have colormap
- * \param[in]    nlevels equally spaced; must be between 2 and 16
- * \param[in]    cmapflag 1 to build colormap; 0 otherwise
+ * \param[in]    pixs      8 bpp, can have colormap
+ * \param[in]    nlevels   equally spaced; must be between 2 and 16
+ * \param[in]    cmapflag  1 to build colormap; 0 otherwise
  * \return  pixd 4 bpp, optionally with colormap, or NULL on error
  *
  * <pre>
@@ -1611,9 +1611,9 @@ l_uint32  *lines, *lined;
 /*!
  * \brief   pixThresholdOn8bpp()
  *
- * \param[in]    pixs 8 bpp, can have colormap
- * \param[in]    nlevels equally spaced; must be between 2 and 256
- * \param[in]    cmapflag 1 to build colormap; 0 otherwise
+ * \param[in]    pixs       8 bpp, can have colormap
+ * \param[in]    nlevels    equally spaced; must be between 2 and 256
+ * \param[in]    cmapflag   1 to build colormap; 0 otherwise
  * \return  pixd 8 bpp, optionally with colormap, or NULL on error
  *
  * <pre>
@@ -1689,12 +1689,12 @@ PIXCMAP   *cmap;
 /*!
  * \brief   pixThresholdGrayArb()
  *
- * \param[in]    pixs 8 bpp grayscale; can have colormap
- * \param[in]    edgevals string giving edge value of each bin
- * \param[in]    outdepth 0, 2, 4 or 8 bpp; 0 is default for min depth
- * \param[in]    use_average 1 if use the average pixel value in colormap
- * \param[in]    setblack 1 if darkest color is set to black
- * \param[in]    setwhite 1 if lightest color is set to white
+ * \param[in]    pixs          8 bpp grayscale; can have colormap
+ * \param[in]    edgevals      string giving edge value of each bin
+ * \param[in]    outdepth      0, 2, 4 or 8 bpp; 0 is default for min depth
+ * \param[in]    use_average   1 if use the average pixel value in colormap
+ * \param[in]    setblack      1 if darkest color is set to black
+ * \param[in]    setwhite      1 if lightest color is set to white
  * \return  pixd 2, 4 or 8 bpp quantized image with colormap,
  *                    or NULL on error
  *
@@ -1829,7 +1829,7 @@ PIXCMAP   *cmap;
 /*!
  * \brief   makeGrayQuantIndexTable()
  *
- * \param[in]    nlevels number of output levels
+ * \param[in]    nlevels    number of output levels
  * \return  table maps input gray level to colormap index,
  *                     or NULL on error
  * <pre>
@@ -1866,8 +1866,8 @@ l_int32    i, j, thresh;
 /*!
  * \brief   makeGrayQuantTargetTable()
  *
- * \param[in]    nlevels number of output levels
- * \param[in]    depth of dest pix, in bpp; 2, 4 or 8 bpp
+ * \param[in]    nlevels    number of output levels
+ * \param[in]    depth      of dest pix, in bpp; 2, 4 or 8 bpp
  * \return  table maps input gray level to thresholded gray level,
  *                     or NULL on error
  *
@@ -1927,10 +1927,10 @@ l_int32    i, j, thresh, maxval, quantval;
 /*!
  * \brief   makeGrayQuantTableArb()
  *
- * \param[in]    na numa of bin boundaries
- * \param[in]    outdepth of colormap: 1, 2, 4 or 8
- * \param[out]   ptab table mapping input gray level to cmap index
- * \param[out]   pcmap colormap
+ * \param[in]    na         numa of bin boundaries
+ * \param[in]    outdepth   of colormap: 1, 2, 4 or 8
+ * \param[out]   ptab       table mapping input gray level to cmap index
+ * \param[out]   pcmap      colormap
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1948,7 +1948,7 @@ l_int32    i, j, thresh, maxval, quantval;
  *          of bins must not exceed 2^outdepth.
  * </pre>
  */
-l_int32
+l_ok
 makeGrayQuantTableArb(NUMA      *na,
                       l_int32    outdepth,
                       l_int32  **ptab,
@@ -2002,10 +2002,10 @@ PIXCMAP  *cmap;
 /*!
  * \brief   makeGrayQuantColormapArb()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    tab table mapping input gray level to cmap index
- * \param[in]    outdepth of colormap: 1, 2, 4 or 8
- * \param[out]   pcmap colormap
+ * \param[in]    pixs       8 bpp
+ * \param[in]    tab        table mapping input gray level to cmap index
+ * \param[in]    outdepth   of colormap: 1, 2, 4 or 8
+ * \param[out]   pcmap      colormap
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2102,12 +2102,12 @@ l_uint32  *line, *data;
 /*!
  * \brief   pixGenerateMaskByBand32()
  *
- * \param[in]    pixs 32 bpp
- * \param[in]    refval reference rgb value
- * \param[in]    delm max amount below the ref value for any component
- * \param[in]    delp max amount above the ref value for any component
- * \param[in]    fractm fractional amount below ref value for all components
- * \param[in]    fractp fractional amount above ref value for all components
+ * \param[in]    pixs     32 bpp
+ * \param[in]    refval   reference rgb value
+ * \param[in]    delm     max amount below the ref value for any component
+ * \param[in]    delp     max amount above the ref value for any component
+ * \param[in]    fractm   fractional amount below ref value for all components
+ * \param[in]    fractp   fractional amount above ref value for all components
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -2205,10 +2205,10 @@ PIX       *pixd;
 /*!
  * \brief   pixGenerateMaskByDiscr32()
  *
- * \param[in]    pixs 32 bpp
- * \param[in]    refval1 reference rgb value
- * \param[in]    refval2 reference rgb value
- * \param[in]    distflag L_MANHATTAN_DISTANCE, L_EUCLIDEAN_DISTANCE
+ * \param[in]    pixs       32 bpp
+ * \param[in]    refval1    reference rgb value
+ * \param[in]    refval2    reference rgb value
+ * \param[in]    distflag   L_MANHATTAN_DISTANCE, L_EUCLIDEAN_DISTANCE
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -2290,16 +2290,16 @@ PIX       *pixd;
 /*!
  * \brief   pixGrayQuantFromHisto()
  *
- * \param[in]    pixd [optional] quantized pix with cmap; can be null
- * \param[in]    pixs 8 bpp gray input pix; not cmapped
- * \param[in]    pixm [optional] mask over pixels in pixs to quantize
- * \param[in]    minfract minimum fraction of pixels in a set of adjacent
- *                        histo bins that causes the set to be automatically
- *                        set aside as a color in the colormap; must be
- *                        at least 0.01
- * \param[in]    maxsize maximum number of adjacent bins allowed to represent
- *                       a color, regardless of the population of pixels
- *                       in the bins; must be at least 2
+ * \param[in]    pixd       [optional] quantized pix with cmap; can be null
+ * \param[in]    pixs       8 bpp gray input pix; not cmapped
+ * \param[in]    pixm       [optional] mask over pixels in pixs to quantize
+ * \param[in]    minfract   minimum fraction of pixels in a set of adjacent
+ *                          histo bins that causes the set to be automatically
+ *                          set aside as a color in the colormap; must be
+ *                          at least 0.01
+ * \param[in]    maxsize    maximum number of adjacent bins allowed to represent
+ *                          a color, regardless of the population of pixels
+ *                          in the bins; must be at least 2
  * \return  pixd 8 bpp, cmapped, or NULL on error
  *
  * <pre>
@@ -2452,16 +2452,16 @@ PIXCMAP   *cmap;
 /*!
  * \brief   numaFillCmapFromHisto()
  *
- * \param[in]    na histogram of gray values
- * \param[in]    cmap 8 bpp cmap, possibly initialized with color value
- * \param[in]    minfract minimum fraction of pixels in a set of adjacent
- *                        histo bins that causes the set to be automatically
- *                        set aside as a color in the colormap; must be
- *                        at least 0.01
- * \param[in]    maxsize maximum number of adjacent bins allowed to represent
- *                       a color, regardless of the population of pixels
- *                       in the bins; must be at least 2
- * \param[out]  plut lookup table from gray value to colormap index
+ * \param[in]    na         histogram of gray values
+ * \param[in]    cmap       8 bpp cmap, possibly initialized with color value
+ * \param[in]    minfract   minimum fraction of pixels in a set of adjacent
+ *                          histo bins that causes the set to be automatically
+ *                          set aside as a color in the colormap; must be
+ *                          at least 0.01
+ * \param[in]    maxsize    maximum number of adjacent bins allowed to represent
+ *                          a color, regardless of the population of pixels
+ *                          in the bins; must be at least 2
+ * \param[out]  plut        lookup table from gray value to colormap index
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2548,9 +2548,9 @@ l_float32  total;
 /*!
  * \brief   pixGrayQuantFromCmap()
  *
- * \param[in]    pixs 8 bpp grayscale without cmap
- * \param[in]    cmap to quantize to; of dest pix
- * \param[in]    mindepth minimum depth of pixd: can be 2, 4 or 8 bpp
+ * \param[in]    pixs       8 bpp grayscale without cmap
+ * \param[in]    cmap       to quantize to; of dest pix
+ * \param[in]    mindepth   minimum depth of pixd: can be 2, 4 or 8 bpp
  * \return  pixd 2, 4 or 8 bpp, colormapped, or NULL on error
  *
  * <pre>
@@ -2643,8 +2643,8 @@ PIX       *pixd;
  * \brief   pixDitherToBinaryLUT()
  *
  * \param[in]    pixs
- * \param[in]    lowerclip lower clip distance to black; use -1 for default
- * \param[in]    upperclip upper clip distance to white; use -1 for default
+ * \param[in]    lowerclip  lower clip distance to black; use -1 for default
+ * \param[in]    upperclip  upper clip distance to white; use -1 for default
  * \return  pixd dithered binary, or NULL on error
  *
  *  We don't need two implementations of Floyd-Steinberg dithering,
@@ -2763,14 +2763,14 @@ l_uint32    *lined;
 /*!
  * \brief   ditherToBinaryLineLUTLow()
  *
- * \param[in]    lined  ptr to beginning of dest line
- *              w   (width of image in pixels
- * \param[in]    bufs1 buffer of current source line
- * \param[in]    bufs2 buffer of next source line
- * \param[in]    tabval value to assign for current pixel
- * \param[in]    tab38 excess value to give to neighboring 3/8 pixels
- * \param[in]    tab14 excess value to give to neighboring 1/4 pixel
- * \param[in]    lastlineflag  0 if not last dest line, 1 if last dest line
+ * \param[in]    lined          ptr to beginning of dest line
+ * \param[in]    w              width of image in pixels
+ * \param[in]    bufs1          buffer of current source line
+ * \param[in]    bufs2          buffer of next source line
+ * \param[in]    tabval         value to assign for current pixel
+ * \param[in]    tab38          excess value to give to neighboring 3/8 pixels
+ * \param[in]    tab14          excess value to give to neighboring 1/4 pixel
+ * \param[in]    lastlineflag   0 if not last dest line, 1 if last dest line
  * \return  void
  */
 void
@@ -2854,15 +2854,15 @@ l_uint8  rval, bval, dval;
 /*!
  * \brief   make8To1DitherTables()
  *
- * \param[out]  ptabval value assigned to output pixel; 0 or 1
- * \param[out]  ptab38  amount propagated to pixels left and below
- * \param[out]  ptab14  amount propagated to pixel to left and down
- * \param[in]   lowerclip values near 0 where the excess is not propagated
- * \param[in]   upperclip values near 255 where the deficit is not propagated
+ * \param[out]  ptabval     value assigned to output pixel; 0 or 1
+ * \param[out]  ptab38      amount propagated to pixels left and below
+ * \param[out]  ptab14      amount propagated to pixel to left and down
+ * \param[in]   lowerclip   values near 0 where the excess is not propagated
+ * \param[in]   upperclip   values near 255 where the deficit is not propagated
  *
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 make8To1DitherTables(l_int32 **ptabval,
                      l_int32 **ptab38,
                      l_int32 **ptab14,

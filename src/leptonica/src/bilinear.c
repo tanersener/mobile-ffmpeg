@@ -772,7 +772,7 @@ PTA     *ptad2, *ptas2;
  * bilinearXFormPt.
  * </pre>
  */
-l_int32
+l_ok
 getBilinearXformCoeffs(PTA         *ptas,
                        PTA         *ptad,
                        l_float32  **pvc)
@@ -865,7 +865,7 @@ l_float32  *a[8];  /* 8x8 matrix A  */
  *      (2) It does not check ptrs for returned data!
  * </pre>
  */
-l_int32
+l_ok
 bilinearXformSampledPt(l_float32  *vc,
                        l_int32     x,
                        l_int32     y,
@@ -898,7 +898,7 @@ bilinearXformSampledPt(l_float32  *vc,
  *      (2) It does not check ptrs for returned data!
  * </pre>
  */
-l_int32
+l_ok
 bilinearXformPt(l_float32  *vc,
                 l_int32     x,
                 l_int32     y,

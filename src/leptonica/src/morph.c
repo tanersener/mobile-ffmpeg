@@ -1088,7 +1088,7 @@ l_int32  factor1, factor2;
  *          If size > 1, then factor1 > 1.
  * </pre>
  */
-l_int32
+l_ok
 selectComposableSizes(l_int32   size,
                       l_int32  *pfactor1,
                       l_int32  *pfactor2)

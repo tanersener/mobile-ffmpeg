@@ -29,6 +29,16 @@
  * \file  ptafunc1.c
  * <pre>
  *
+ *      --------------------------------------
+ *      This file has these Pta utilities:
+ *         - simple rearrangements
+ *         - geometric analysis
+ *         - min/max and filtering
+ *         - least squares fitting
+ *         - interconversions with Pix and Numa
+ *         - display into a pix
+ *      --------------------------------------
+ *
  *      Simple rearrangements
  *           PTA      *ptaSubsample()
  *           l_int32   ptaJoin()
@@ -150,7 +160,7 @@ PTA       *ptad;
  *      (3) if ptas == NULL, this is a no-op
  * </pre>
  */
-l_int32
+l_ok
 ptaJoin(PTA     *ptad,
         PTA     *ptas,
         l_int32  istart,
@@ -198,7 +208,7 @@ l_int32  n, i, x, y;
  *      (3) if ptas == NULL, this is a no-op
  * </pre>
  */
-l_int32
+l_ok
 ptaaJoin(PTAA    *ptaad,
          PTAA    *ptaas,
          l_int32  istart,
@@ -367,7 +377,7 @@ PTA     *ptad;
  *
  * \param[in]    ptas
  * \param[in]    first    use 0 to select from the beginning
- * \param[in]    last     use 0 to select to the end
+ * \param[in]    last     use -1 to select to the end
  * \return  ptad, or NULL on error
  */
 PTA *
@@ -388,9 +398,14 @@ PTA       *ptad;
         return ptaCopy(ptas);
     }
     first = L_MAX(0, first);
-    if (last <= 0) last = n - 1;
+    if (last < 0) last = n - 1;
     if (first >= n)
         return (PTA *)ERROR_PTR("invalid first", procName, NULL);
+    if (last >= n) {
+        L_WARNING("last = %d is beyond max index = %d; adjusting\n",
+                  procName, last, n - 1);
+        last = n - 1;
+    }
     if (first > last)
         return (PTA *)ERROR_PTR("first > last", procName, NULL);
 
@@ -464,7 +479,7 @@ l_int32  n, i, x, y, minx, maxx, miny, maxy;
  *          example, the pts can represent a general function y(x).
  * </pre>
  */
-l_int32
+l_ok
 ptaGetRange(PTA        *pta,
             l_float32  *pminx,
             l_float32  *pmaxx,
@@ -837,7 +852,7 @@ l_float64  ang;
  * \return  0 if OK, 1 on error.  If pta is empty, requested
  *              values are returned as -1.0.
  */
-l_int32
+l_ok
 ptaGetMinMax(PTA        *pta,
              l_float32  *pxmin,
              l_float32  *pymin,
@@ -1025,7 +1040,7 @@ PTA      *ptad;
  *          Get the nax array using ptaGetArrays(pta, &nax, NULL);
  * </pre>
  */
-l_int32
+l_ok
 ptaGetLinearLSF(PTA        *pta,
                 l_float32  *pa,
                 l_float32  *pb,
@@ -1126,7 +1141,7 @@ l_float32  *xa, *ya;
  *          Get the nax array using ptaGetArrays(pta, &nax, NULL);
  * </pre>
  */
-l_int32
+l_ok
 ptaGetQuadraticLSF(PTA        *pta,
                    l_float32  *pa,
                    l_float32  *pb,
@@ -1239,7 +1254,7 @@ l_float32   g[3];
  *          Get the nax array using ptaGetArrays(pta, &nax, NULL);
  * </pre>
  */
-l_int32
+l_ok
 ptaGetCubicLSF(PTA        *pta,
                l_float32  *pa,
                l_float32  *pb,
@@ -1369,7 +1384,7 @@ l_float32   g[4];
  *          Get the nax array using ptaGetArrays(pta, &nax, NULL);
  * </pre>
  */
-l_int32
+l_ok
 ptaGetQuarticLSF(PTA        *pta,
                  l_float32  *pa,
                  l_float32  *pb,
@@ -1505,7 +1520,7 @@ l_float32   g[5];
  *          is likely to be.
  * </pre>
  */
-l_int32
+l_ok
 ptaNoisyLinearLSF(PTA        *pta,
                   l_float32   factor,
                   PTA       **pptad,
@@ -1592,7 +1607,7 @@ PTA       *ptad;
  *          a quadratic LSF on the resulting points.
  * </pre>
  */
-l_int32
+l_ok
 ptaNoisyQuadraticLSF(PTA        *pta,
                      l_float32   factor,
                      PTA       **pptad,
@@ -1672,7 +1687,7 @@ PTA       *ptad;
  * \param[out]  py y = a * x + b
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 applyLinearFit(l_float32   a,
                   l_float32   b,
                   l_float32   x,
@@ -1696,7 +1711,7 @@ applyLinearFit(l_float32   a,
  * \param[out]  py y = a * x^2 + b * x + c
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 applyQuadraticFit(l_float32   a,
                   l_float32   b,
                   l_float32   c,
@@ -1721,7 +1736,7 @@ applyQuadraticFit(l_float32   a,
  * \param[out]  py y = a * x^3 + b * x^2  + c * x + d
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 applyCubicFit(l_float32   a,
               l_float32   b,
               l_float32   c,
@@ -1747,7 +1762,7 @@ applyCubicFit(l_float32   a,
  * \param[out]  py y = a * x^4 + b * x^3  + c * x^2 + d * x + e
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 applyQuarticFit(l_float32   a,
                 l_float32   b,
                 l_float32   c,
@@ -1788,7 +1803,7 @@ l_float32  x2;
  *      (3) If the image is RGB, three separate plots are generated.
  * </pre>
  */
-l_int32
+l_ok
 pixPlotAlongPta(PIX         *pixs,
                 PTA         *pta,
                 l_int32      outformat,
@@ -2161,9 +2176,9 @@ PTAA      *ptaa;
 /*!
  * \brief   ptaGetNeighborPixLocs()
  *
- * \param[in]    pixs any depth
- * \param[in]    x, y pixel from which we search for nearest neighbors
- *              conn (4 or 8 connectivity
+ * \param[in]    pixs    any depth
+ * \param[in]    x, y    pixel from which we search for nearest neighbors
+ * \param[in]    conn    4 or 8 connectivity
  * \return  pta, or NULL on error
  *
  * <pre>
@@ -2294,7 +2309,7 @@ PTA       *pta;
  * \param[out]  pnay    addr of nay
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptaConvertToNuma(PTA    *pta,
                  NUMA  **pnax,
                  NUMA  **pnay)

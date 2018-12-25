@@ -201,6 +201,8 @@ PIX     *pixd;
         return (PIX *)ERROR_PTR("depth not 8 or 32", procName, NULL);
 
     pixd = pixBackgroundNormSimple(pixs, pixim, pixg);
+    if (!pixd)
+        return (PIX *)ERROR_PTR("background norm failedd", procName, NULL);
     pixGammaTRC(pixd, pixd, gamma, blackval, whiteval);
     return pixd;
 }
@@ -345,10 +347,13 @@ PIX     *pixmr, *pixmg, *pixmb, *pixmri, *pixmgi, *pixmbi;
         }
 
         pixmi = pixGetInvBackgroundMap(pixm, bgval, smoothx, smoothy);
-        if (!pixmi)
-            ERROR_PTR("pixmi not made", procName, NULL);
-        else
+        if (!pixmi) {
+            L_WARNING("pixmi not made; return a copy of source\n", procName);
+            pixDestroy(&pixm);
+            return pixCopy(NULL, pixs);
+        } else {
             pixd = pixApplyInvBackgroundGrayMap(pixs, pixmi, sx, sy);
+        }
 
         pixDestroy(&pixm);
         pixDestroy(&pixmi);
@@ -368,11 +373,13 @@ PIX     *pixmr, *pixmg, *pixmb, *pixmri, *pixmgi, *pixmbi;
         pixmri = pixGetInvBackgroundMap(pixmr, bgval, smoothx, smoothy);
         pixmgi = pixGetInvBackgroundMap(pixmg, bgval, smoothx, smoothy);
         pixmbi = pixGetInvBackgroundMap(pixmb, bgval, smoothx, smoothy);
-        if (!pixmri || !pixmgi || !pixmbi)
-            ERROR_PTR("not all pixm*i are made", procName, NULL);
-        else
+        if (!pixmri || !pixmgi || !pixmbi) {
+            L_WARNING("not all pixm*i are made; return src copy\n", procName);
+            pixd = pixCopy(NULL, pixs);
+        } else {
             pixd = pixApplyInvBackgroundRGBMap(pixs, pixmri, pixmgi, pixmbi,
                                                sx, sy);
+        }
 
         pixDestroy(&pixmr);
         pixDestroy(&pixmg);
@@ -539,7 +546,7 @@ PIX       *pixmr, *pixmg, *pixmb, *pixmri, *pixmgi, *pixmbi;
  *        of the input pixs.
  * </pre>
  */
-l_int32
+l_ok
 pixBackgroundNormGrayArray(PIX     *pixs,
                            PIX     *pixim,
                            l_int32  sx,
@@ -616,7 +623,7 @@ PIX     *pixm;
  *        of each component of the input pixs.
  * </pre>
  */
-l_int32
+l_ok
 pixBackgroundNormRGBArrays(PIX     *pixs,
                            PIX     *pixim,
                            PIX     *pixg,
@@ -699,7 +706,7 @@ PIX     *pixmr, *pixmg, *pixmb;
  *        of the input pixs.
  * </pre>
  */
-l_int32
+l_ok
 pixBackgroundNormGrayArrayMorph(PIX     *pixs,
                                 PIX     *pixim,
                                 l_int32  reduction,
@@ -764,7 +771,7 @@ PIX     *pixm;
  *        of each component of the input pixs.
  * </pre>
  */
-l_int32
+l_ok
 pixBackgroundNormRGBArraysMorph(PIX     *pixs,
                                 PIX     *pixim,
                                 l_int32  reduction,
@@ -841,7 +848,7 @@ PIX     *pixmr, *pixmg, *pixmb;
  *          and finally smoothed in each image region.
  * </pre>
  */
-l_int32
+l_ok
 pixGetBackgroundGrayMap(PIX     *pixs,
                         PIX     *pixim,
                         l_int32  sx,
@@ -1019,7 +1026,7 @@ PIX       *pixd, *piximi, *pixb, *pixf, *pixims;
  *          from the green component only, used, and destroyed.
  * </pre>
  */
-l_int32
+l_ok
 pixGetBackgroundRGBMap(PIX     *pixs,
                        PIX     *pixim,
                        PIX     *pixg,
@@ -1204,7 +1211,7 @@ PIX       *pixmr, *pixmg, *pixmb;
  * \param[out]   ppixm grayscale map
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixGetBackgroundGrayMapMorph(PIX     *pixs,
                              PIX     *pixim,
                              l_int32  reduction,
@@ -1295,7 +1302,7 @@ PIX       *pixm, *pix1, *pix2, *pix3, *pixims;
  * \param[out]   ppixmb blue component map
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixGetBackgroundRGBMapMorph(PIX     *pixs,
                             PIX     *pixim,
                             l_int32  reduction,
@@ -1449,7 +1456,7 @@ PIX       *pixm, *pixmr, *pixmg, *pixmb, *pix1, *pix2, *pix3, *pixims;
  *      (4) If w is the map width, nx = w or nx = w - 1; ditto for h and ny.
  * </pre>
  */
-l_int32
+l_ok
 pixFillMapHoles(PIX     *pix,
                 l_int32  nx,
                 l_int32  ny,
@@ -1624,7 +1631,7 @@ PIX      *pixd;
  *          be inefficient if used where there are many small components.
  * </pre>
  */
-l_int32
+l_ok
 pixSmoothConnectedRegions(PIX     *pixs,
                           PIX     *pixm,
                           l_int32  factor)
@@ -1713,7 +1720,7 @@ PIXA      *pixa;
  *            ~ paint the 'image' regions black
  * </pre>
  */
-l_int32
+l_ok
 pixGetForegroundGrayMap(PIX     *pixs,
                         PIX     *pixim,
                         l_int32  sx,
@@ -2379,7 +2386,7 @@ l_float32  rfract, gfract, bfract, maxfract;
  *          an example of this.
  * </pre>
  */
-l_int32
+l_ok
 pixThresholdSpreadNorm(PIX       *pixs,
                        l_int32    filtertype,
                        l_int32    edgethresh,
@@ -2640,7 +2647,7 @@ PIX  *pixmin, *pixmax;
  *      (2) See pixContrastNorm() for usage.
  * </pre>
  */
-l_int32
+l_ok
 pixMinMaxTiles(PIX     *pixs,
                l_int32  sx,
                l_int32  sy,
@@ -2731,7 +2738,7 @@ PIX     *pixmin1, *pixmax1, *pixmin2, *pixmax2;
  *          caller should check return value.
  * </pre>
  */
-l_int32
+l_ok
 pixSetLowContrast(PIX     *pixs1,
                   PIX     *pixs2,
                   l_int32  mindiff)
@@ -2864,9 +2871,9 @@ l_uint32  *data, *datamin, *datamax, *line, *tline, *linemin, *linemax;
             xoff = sx * j;
             minval = GET_DATA_BYTE(linemin, j);
             maxval = GET_DATA_BYTE(linemax, j);
-            if (maxval == minval) {  /* this is bad */
-/*                fprintf(stderr, "should't happen! i,j = %d,%d, minval = %d\n",
-                        i, j, minval); */
+            if (maxval == minval) {
+                L_ERROR("shouldn't happen! i,j = %d,%d, minval = %d\n",
+                        procName, i, j, minval);
                 continue;
             }
             if ((ia = iaaGetLinearTRC(iaa, maxval - minval)) == NULL) {

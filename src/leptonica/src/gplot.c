@@ -259,7 +259,7 @@ GPLOT  *gplot;
  *          quotes and backquotes, but not single quotes.
  * </pre>
  */
-l_int32
+l_ok
 gplotAddPlot(GPLOT       *gplot,
              NUMA        *nax,
              NUMA        *nay,
@@ -339,7 +339,7 @@ SARRAY    *sa;
  *      (2) Call this function to set semi-log or log-log scaling.
  * </pre>
  */
-l_int32
+l_ok
 gplotSetScaling(GPLOT   *gplot,
                 l_int32  scaling)
 {
@@ -375,17 +375,26 @@ gplotSetScaling(GPLOT   *gplot,
  *      (4) The gnuplot program for windows is wgnuplot.exe.
  * </pre>
  */
-l_int32
+l_ok
 gplotMakeOutput(GPLOT  *gplot)
 {
 char     buf[L_BUFSIZE];
 char    *cmdname;
-l_int32  ignore;
 
     PROCNAME("gplotMakeOutput");
 
     if (!gplot)
         return ERROR_INT("gplot not defined", procName, 1);
+
+    if (!LeptDebugOK) {
+        L_INFO("running gnuplot is disabled; "
+               "use setLeptDebugOK(1) to enable\n", procName);
+        return 0;
+    }
+
+#ifdef OS_IOS /* iOS 11 does not support system() */
+    return ERROR_INT("iOS 11 does not support system()", procName, 0);
+#endif /* OS_IOS */
 
     gplotGenCommandFile(gplot);
     gplotGenDataFiles(gplot);
@@ -397,16 +406,7 @@ l_int32  ignore;
     snprintf(buf, L_BUFSIZE, "wgnuplot %s", cmdname);
 #endif  /* _WIN32 */
 
-#ifndef OS_IOS /* iOS 11 does not support system() */
-    if (LeptDebugOK) {
-        ignore = system(buf);  /* gnuplot || wgnuplot */
-    } else {
-        L_INFO("running gnuplot is disabled; use setLeptDebugOK(1) to enable\n",
-               procName);
-        return 0;
-    }
-#endif /* !OS_IOS */
-
+    callSystemDebug(buf);  /* gnuplot || wgnuplot */
     LEPT_FREE(cmdname);
     return 0;
 }
@@ -418,7 +418,7 @@ l_int32  ignore;
  * \param[in]    gplot
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 gplotGenCommandFile(GPLOT  *gplot)
 {
 char     buf[L_BUFSIZE];
@@ -524,7 +524,7 @@ FILE    *fp;
  *          rewritten by calling fopenWriteStream(), and we use fopen().
  * </pre>
  */
-l_int32
+l_ok
 gplotGenDataFiles(GPLOT  *gplot)
 {
 char    *plotdata, *dataname;
@@ -571,7 +571,7 @@ FILE    *fp;
  *          different %outroot to avoid overwriting the output files.
  * </pre>
  */
-l_int32
+l_ok
 gplotSimple1(NUMA        *na,
              l_int32      outformat,
              const char  *outroot,
@@ -600,7 +600,7 @@ gplotSimple1(NUMA        *na,
  *          different %outroot to avoid overwriting the output files.
  * </pre>
  */
-l_int32
+l_ok
 gplotSimple2(NUMA        *na1,
              NUMA        *na2,
              l_int32      outformat,
@@ -631,7 +631,7 @@ gplotSimple2(NUMA        *na1,
  *          different %outroot to avoid overwriting the output files.
  * </pre>
  */
-l_int32
+l_ok
 gplotSimpleN(NUMAA       *naa,
              l_int32      outformat,
              const char  *outroot,
@@ -664,7 +664,7 @@ gplotSimpleN(NUMAA       *naa,
  *          different %outroot to avoid overwriting the output files.
  * </pre>
  */
-l_int32
+l_ok
 gplotSimpleXY1(NUMA        *nax,
                NUMA        *nay,
                l_int32      plotstyle,
@@ -719,7 +719,7 @@ GPLOT  *gplot;
  *          different %outroot to avoid overwriting the output files.
  * </pre>
  */
-l_int32
+l_ok
 gplotSimpleXY2(NUMA        *nax,
                NUMA        *nay1,
                NUMA        *nay2,
@@ -775,7 +775,7 @@ GPLOT  *gplot;
  *          different %outroot to avoid overwriting the output files.
  * </pre>
  */
-l_int32
+l_ok
 gplotSimpleXYN(NUMA        *nax,
                NUMAA       *naay,
                l_int32      plotstyle,
@@ -908,7 +908,7 @@ GPLOT   *gplot;
  * \param[in]    gplot
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 gplotWrite(const char  *filename,
            GPLOT       *gplot)
 {

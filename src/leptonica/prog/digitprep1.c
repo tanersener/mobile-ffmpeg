@@ -38,7 +38,7 @@ static const l_int32  HEIGHT = 32;  /* pixels */
 int main(int    argc,
          char **argv)
 {
-char         buf[8];
+char         buf[16];
 l_int32      i, n, h;
 l_float32    scalefact;
 BOXA        *boxa;

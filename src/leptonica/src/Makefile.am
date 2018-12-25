@@ -2,7 +2,7 @@ AM_CFLAGS = $(DEBUG_FLAGS)
 AM_CPPFLAGS = $(ZLIB_CFLAGS) $(LIBPNG_CFLAGS) $(JPEG_CFLAGS) $(LIBTIFF_CFLAGS) $(LIBWEBP_CFLAGS) $(LIBJP2K_CFLAGS)
 
 lib_LTLIBRARIES = liblept.la
-liblept_la_LIBADD = $(LIBM) $(ZLIB_LIBS) $(LIBPNG_LIBS) $(JPEG_LIBS) $(GIFLIB_LIBS) $(LIBTIFF_LIBS) $(LIBWEBP_LIBS) $(LIBJP2K_LIBS) $(GDI_LIBS)
+liblept_la_LIBADD = $(LIBPNG_LIBS) $(JPEG_LIBS) $(GIFLIB_LIBS) $(LIBTIFF_LIBS) $(LIBWEBP_LIBS) $(LIBJP2K_LIBS) $(GDI_LIBS) $(LIBM) $(ZLIB_LIBS)
 
 liblept_la_LDFLAGS = -no-undefined -version-info 5:3:0
 
@@ -12,9 +12,11 @@ liblept_la_SOURCES = adaptmap.c affine.c                        \
  bilateral.c bilinear.c binarize.c                              \
  binexpand.c binreduce.c                                        \
  blend.c bmf.c bmpio.c bmpiostub.c                              \
- bootnumgen1.c bootnumgen2.c bootnumgen3.c                      \
- boxbasic.c boxfunc1.c boxfunc2.c boxfunc3.c boxfunc4.c         \
- bytearray.c ccbord.c ccthin.c classapp.c                       \
+ bootnumgen1.c bootnumgen2.c                                    \
+ bootnumgen3.c bootnumgen4.c                                    \
+ boxbasic.c boxfunc1.c boxfunc2.c boxfunc3.c                    \
+ boxfunc4.c boxfunc5.c bytearray.c                              \
+ ccbord.c ccthin.c classapp.c                                   \
  colorcontent.c coloring.c                                      \
  colormap.c colormorph.c	                                \
  colorquant1.c colorquant2.c                                    \

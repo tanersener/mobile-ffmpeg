@@ -470,6 +470,7 @@ PIXCMAP     *cmap;
         if (!cmap) {
             pixInvert(pix, pix);
         } else {
+            L_INFO("removing opaque cmap from 1 bpp\n", procName);
             pix1 = pixRemoveColormap(pix, REMOVE_CMAP_BASED_ON_SRC);
             pixDestroy(&pix);
             pix = pix1;
@@ -498,10 +499,10 @@ PIXCMAP     *cmap;
  * \brief   readHeaderPng()
  *
  * \param[in]    filename
- * \param[out]   pw [optional]
- *           [out]   ph ([optional]
- *           [out]   pbps ([optional]  bits/sample
- * \param[out]   pspp [optional]  samples/pixel
+ * \param[out]   pw      [optional]
+ * \param[out]   ph      [optional]
+ * \param[out]   pbps    [optional]  bits/sample
+ * \param[out]   pspp    [optional]  samples/pixel
  * \param[out]   piscmap [optional]
  * \return  0 if OK, 1 on error
  *
@@ -513,7 +514,7 @@ PIXCMAP     *cmap;
  *          When a gray+alpha is read, it is converted to 32 bpp RGBA.
  * </pre>
  */
-l_int32
+l_ok
 readHeaderPng(const char *filename,
               l_int32    *pw,
               l_int32    *ph,
@@ -544,12 +545,12 @@ FILE    *fp;
 /*!
  * \brief   freadHeaderPng()
  *
- * \param[in]    fp file stream
- * \param[out]   pw [optional]
- *           [out]   ph ([optional]
- *           [out]   pbps ([optional]  bits/sample
- * \param[out]   pspp [optional]  samples/pixel
- * \param[out]   piscmap [optional]
+ * \param[in]    fp       file stream
+ * \param[out]   pw       [optional]
+ * \param[out]   ph       [optional]
+ * \param[out]   pbps     [optional]  bits/sample
+ * \param[out]   pspp     [optional]  samples/pixel
+ * \param[out]   piscmap  [optional]
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -557,7 +558,7 @@ FILE    *fp;
  *      (1) See readHeaderPng().  We only need the first 40 bytes in the file.
  * </pre>
  */
-l_int32
+l_ok
 freadHeaderPng(FILE     *fp,
                l_int32  *pw,
                l_int32  *ph,
@@ -592,11 +593,11 @@ l_uint8  data[40];
  * \brief   readHeaderMemPng()
  *
  * \param[in]    data
- * \param[in]    size 40 bytes is sufficient
- * \param[out]   pw [optional]
- *           [out]   ph ([optional]
- *           [out]   pbps ([optional]  bits/sample
- * \param[out]   pspp [optional]  samples/pixel
+ * \param[in]    size    40 bytes is sufficient
+ * \param[out]   pw      [optional]
+ * \param[out]   ph      [optional]
+ * \param[out]   pbps    [optional]  bits/sample
+ * \param[out]   pspp    [optional]  samples/pixel
  * \param[out]   piscmap [optional]  input NULL to ignore
  * \return  0 if OK, 1 on error
  *
@@ -614,7 +615,7 @@ l_uint8  data[40];
  *            4 and 6 have separate alpha samples with each pixel.
  * </pre>
  */
-l_int32
+l_ok
 readHeaderMemPng(const l_uint8  *data,
                  size_t          size,
                  l_int32        *pw,
@@ -757,7 +758,7 @@ png_infop    info_ptr;
  * \param[out]   pinterlaced 1 if interlaced png; 0 otherwise
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 isPngInterlaced(const char *filename,
                 l_int32    *pinterlaced)
 {
@@ -786,13 +787,13 @@ FILE    *fp;
 
 
 /*
- *  fgetPngColormapInfo()
+ * \brief   fgetPngColormapInfo()
  *
- *      Input:  fp (file stream opened for read)
- *              &cmap (optional <return>; use NULL to skip)
- *              &transparency (optional <return> 1 if colormapped with
- *                transparency, 0 otherwise; use NULL to skip)
- *      Return: 0 if OK; 1 on error
+ * \param[in]    fp     file stream opened for read
+ * \param[out]   pcmap  optional; use NULL to skip
+ * \param[out]   ptransparency   optional; 1 if colormapped with
+ *                      transparency, 0 otherwise; use NULL to skip
+ * \return  0 if OK, 1 on error
  *
  *  Notes:
  *      (1) The transparency information in a png is in the tRNA array,
@@ -801,7 +802,7 @@ FILE    *fp;
  *          transparency.
  *      (2) Side-effect: this rewinds the stream.
  */
-l_int32
+l_ok
 fgetPngColormapInfo(FILE      *fp,
                     PIXCMAP  **pcmap,
                     l_int32   *ptransparency)
@@ -902,7 +903,7 @@ png_infop    info_ptr;
  *          When using pixWrite(), no field is given for gamma.
  * </pre>
  */
-l_int32
+l_ok
 pixWritePng(const char  *filename,
             PIX         *pix,
             l_float32    gamma)
@@ -1002,7 +1003,7 @@ FILE  *fp;
  *          to a 4 spp rgba image.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteStreamPng(FILE      *fp,
                   PIX       *pix,
                   l_float32  gamma)
@@ -1246,7 +1247,7 @@ char        *text;
  *          compression integers given above, you must include zlib.h.
  * </pre>
  */
-l_int32
+l_ok
 pixSetZlibCompression(PIX     *pix,
                       l_int32  compval)
 {
@@ -1461,6 +1462,9 @@ memio_png_read_data(png_structp  png_ptr,
 MEMIODATA  *thing;
 
     thing = (MEMIODATA *)png_get_io_ptr(png_ptr);
+    if (byteCountToRead > (thing->m_Size - thing->m_Count)) {
+        png_error(png_ptr, "read error in memio_png_read_data");
+    }
     memcpy(outBytes, thing->m_Buffer + thing->m_Count, byteCountToRead);
     thing->m_Count += byteCountToRead;
 }
@@ -1851,7 +1855,7 @@ MEMIODATA    state;
  *      (1) See pixWriteStreamPng()
  * </pre>
  */
-l_int32
+l_ok
 pixWriteMemPng(l_uint8  **pfiledata,
                size_t    *pfilesize,
                PIX       *pix,
@@ -2101,4 +2105,3 @@ MEMIODATA    state;
 /* --------------------------------------------*/
 #endif  /* HAVE_LIBPNG */
 /* --------------------------------------------*/
-

@@ -106,8 +106,9 @@ enum {
     IFF_JP2            = 14,
     IFF_WEBP           = 15,
     IFF_LPDF           = 16,
-    IFF_DEFAULT        = 17,
-    IFF_SPIX           = 18
+    IFF_TIFF_JPEG      = 17,
+    IFF_DEFAULT        = 18,
+    IFF_SPIX           = 19
 };
 
 

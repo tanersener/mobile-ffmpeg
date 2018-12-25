@@ -134,7 +134,7 @@ static const l_int32  MAX_SEL_SCALEFACTOR = 31;  /* should be big enough */
  *        line.  As another example, if you have 7 added pixels and a
  *        distance of 2, you can use a runlength up to 5 to guarantee
  *        that the miss element is recorded.  We give a warning if the
- *        contraint does not guarantee a miss element outside the
+ *        constraint does not guarantee a miss element outside the
  *        image proper.
  *    (5) The input pix, as extended by the extra pixels on selected sides,
  *        can optionally be returned.  For debugging, call

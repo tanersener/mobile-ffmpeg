@@ -233,7 +233,7 @@ PIXA    *pixa;
  * \param[out]   pw character width; -1 if not printable
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 bmfGetWidth(L_BMF    *bmf,
             char      chr,
             l_int32  *pw)
@@ -272,7 +272,7 @@ PIXA    *pixa;
  * \param[out]   pbaseline  distance below UL corner of bitmap char
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 bmfGetBaseline(L_BMF    *bmf,
                char      chr,
                l_int32  *pbaseline)
@@ -368,7 +368,7 @@ PIXA     *pixa;
  *          nine font sizes, to generate all the font pixa files.
  * </pre>
  */
-l_int32
+l_ok
 pixaSaveFont(const char  *indir,
              const char  *outdir,
              l_int32      fontsize)

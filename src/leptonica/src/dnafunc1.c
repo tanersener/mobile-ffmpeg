@@ -46,7 +46,7 @@
  *          L_DNA       *l_dnaDiffAdjValues()
  *
  *
- * This file contains an implemention on sets of doubles (or integers)
+ * This file contains an implementation on sets of doubles (or integers)
  * that uses an underlying tree (rbtree).  The keys stored in the tree
  * are simply the double array values in the dna.  Use of a DnaHash
  * is typically more efficient, with O(1) in lookup and insertion.
@@ -75,7 +75,7 @@
  *      (3) if das == NULL, this is a no-op
  * </pre>
  */
-l_int32
+l_ok
 l_dnaJoin(L_DNA   *dad,
           L_DNA   *das,
           l_int32  istart,

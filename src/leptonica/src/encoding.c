@@ -92,7 +92,7 @@ static l_int32 convertChunkToAscii85(l_uint8 *inarray, l_int32 insize,
  * <pre>
  * Notes:
  *      (1) The input character data is unrestricted binary.
- *          The ouput encoded data consists of the 64 characters
+ *          The output encoded data consists of the 64 characters
  *          in the base64 set, plus newlines and the pad character '='.
  * </pre>
  */
@@ -621,8 +621,8 @@ l_int32  i, j, flatindex, flatsize, outindex, nlines, linewithpad, linecount;
     nlines = (flatsize + linechars - 1) / linechars;
     linewithpad = leadspace + linechars + 1;  /* including newline */
     if (addquotes) linewithpad += 2;
-    if ((outa = (char *)LEPT_CALLOC(nlines * linewithpad, sizeof(char)))
-        == NULL) {
+    if ((outa = (char *)LEPT_CALLOC((size_t)nlines * linewithpad,
+                                    sizeof(char))) == NULL) {
         LEPT_FREE(flata);
         return (char *)ERROR_PTR("outa not made", procName, NULL);
     }

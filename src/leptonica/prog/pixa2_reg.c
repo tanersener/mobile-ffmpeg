@@ -56,7 +56,7 @@ L_REGPARAMS  *rp;
     sarrayDestroy(&sa1);
     sarrayDestroy(&sa2);
     sarrayDestroy(&sa4);
-    sarrayWriteStream(stderr, sa3);
+    if (rp->display) sarrayWriteStream(stderr, sa3);
 
     /* ---------------- Use replace to fill up a pixa -------------------*/
     pixa = pixaCreate(1);

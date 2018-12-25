@@ -269,7 +269,7 @@ PIXCMAP   *cmap;
  *            h = 200       blue
  * </pre>
  */
-l_int32
+l_ok
 convertRGBToHSV(l_int32   rval,
                 l_int32   gval,
                 l_int32   bval,
@@ -331,7 +331,7 @@ l_float32  h;
  *          and their interpretation in color space.
  * </pre>
  */
-l_int32
+l_ok
 convertHSVToRGB(l_int32   hval,
                 l_int32   sval,
                 l_int32   vval,
@@ -420,7 +420,7 @@ l_float32 h, f, s;
  *      ~ replaces: r --> h, g --> s, b --> v
  * </pre>
  */
-l_int32
+l_ok
 pixcmapConvertRGBToHSV(PIXCMAP  *cmap)
 {
 l_int32   i, ncolors, rval, gval, bval, hval, sval, vval;
@@ -453,7 +453,7 @@ l_int32   i, ncolors, rval, gval, bval, hval, sval, vval;
  *      ~ replaces: h --> r, s --> g, v --> b
  * </pre>
  */
-l_int32
+l_ok
 pixcmapConvertHSVToRGB(PIXCMAP  *cmap)
 {
 l_int32   i, ncolors, rval, gval, bval, hval, sval, vval;
@@ -1249,7 +1249,7 @@ PIX       *pixt, *pixd;
  *          pixd = pixaDisplayTiledInRows(pixa, 32, 1000, 1.0, 0, 30, 2);
  * </pre>
  */
-l_int32
+l_ok
 pixFindHistoPeaksHSV(PIX       *pixs,
                      l_int32    type,
                      l_int32    width,
@@ -1578,7 +1578,7 @@ PIXCMAP   *cmap;
  *            V [16 ... 240]
  * </pre>
  */
-l_int32
+l_ok
 convertRGBToYUV(l_int32   rval,
                 l_int32   gval,
                 l_int32   bval,
@@ -1626,7 +1626,7 @@ l_float32  norm;
  *          r,g,b components to the range [0, 255], and do not test input.
  * </pre>
  */
-l_int32
+l_ok
 convertYUVToRGB(l_int32   yval,
                 l_int32   uval,
                 l_int32   vval,
@@ -1674,7 +1674,7 @@ l_float32  norm, ym, um, vm;
  *      ~ replaces: r --> y, g --> u, b --> v
  * </pre>
  */
-l_int32
+l_ok
 pixcmapConvertRGBToYUV(PIXCMAP  *cmap)
 {
 l_int32   i, ncolors, rval, gval, bval, yval, uval, vval;
@@ -1707,7 +1707,7 @@ l_int32   i, ncolors, rval, gval, bval, yval, uval, vval;
  *      ~ replaces: y --> r, u --> g, v --> b
  * </pre>
  */
-l_int32
+l_ok
 pixcmapConvertYUVToRGB(PIXCMAP  *cmap)
 {
 l_int32   i, ncolors, rval, gval, bval, yval, uval, vval;
@@ -1875,7 +1875,7 @@ FPIX       *fpix;
  *          values.
  * </pre>
  */
-l_int32
+l_ok
 convertRGBToXYZ(l_int32     rval,
                 l_int32     gval,
                 l_int32     bval,
@@ -1917,7 +1917,7 @@ convertRGBToXYZ(l_int32     rval,
  *            * if blackout == 1, the output color will be set to black
  * </pre>
  */
-l_int32
+l_ok
 convertXYZToRGB(l_float32  fxval,
                 l_float32  fyval,
                 l_float32  fzval,
@@ -2105,7 +2105,7 @@ FPIXA      *fpixad;
  * \param[out]   plval, paval, pbval lab values
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 convertXYZToLAB(l_float32   xval,
                 l_float32   yval,
                 l_float32   zval,
@@ -2145,7 +2145,7 @@ l_float32  xn, yn, zn, fx, fy, fz;
  * \param[out]   pxval, pyval, pzval xyz values
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 convertLABToXYZ(l_float32   lval,
                 l_float32   aval,
                 l_float32   bval,
@@ -2354,7 +2354,7 @@ FPIX       *fpix;
  *          values.
  * </pre>
  */
-l_int32
+l_ok
 convertRGBToLAB(l_int32     rval,
                 l_int32     gval,
                 l_int32     bval,
@@ -2391,7 +2391,7 @@ l_float32  fxval, fyval, fzval;
  *          components are set to the closest valid color.
  * </pre>
  */
-l_int32
+l_ok
 convertLABToRGB(l_float32  flval,
                 l_float32  faval,
                 l_float32  fbval,

@@ -28,6 +28,13 @@
  * \file  ptafunc2.c
  * <pre>
  *
+ *      --------------------------------------
+ *      This file has these Pta utilities:
+ *         - sorting
+ *         - ordered set operations
+ *         - hash map operations
+ *      --------------------------------------
+ *
  *      Sorting
  *           PTA        *ptaSort()
  *           l_int32     ptaGetSortIndex()
@@ -128,7 +135,7 @@ NUMA  *naindex;
  *                        original array
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptaGetSortIndex(PTA     *ptas,
                 l_int32  sorttype,
                 l_int32  sortorder,
@@ -253,7 +260,7 @@ PTAA    *ptaad;
  * \param[out]   pval     &rankval: the x or y value at %fract
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptaGetRankValue(PTA        *pta,
                 l_float32   fract,
                 PTA        *ptasort,
@@ -539,7 +546,7 @@ PTA  *pta3, *ptad;
  *          lookup within the dna in each bucket.
  * </pre>
  */
-l_int32
+l_ok
 ptaRemoveDupsByHash(PTA         *ptas,
                     PTA        **pptad,
                     L_DNAHASH  **pdahash)
@@ -670,7 +677,7 @@ PTA        *pta_small, *pta_big, *ptad;
  *          index into %pta to check if the point (x,y) has been found before.
  * </pre>
  */
-l_int32
+l_ok
 ptaFindPtByHash(PTA        *pta,
                 L_DNAHASH  *dahash,
                 l_int32     x,

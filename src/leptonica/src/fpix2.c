@@ -28,6 +28,7 @@
  * \file fpix2.c
  * <pre>
  *
+ *    ------------------------------------------
  *    This file has these FPix utilities:
  *       ~ interconversions with pix, fpix, dpix
  *       ~ min and max values
@@ -37,6 +38,7 @@
  *       ~ border functions
  *       ~ simple rasterop (source --> dest)
  *       ~ geometric transforms
+ *    ------------------------------------------
  *
  *    Interconversions between Pix, FPix and DPix
  *          FPIX          *pixConvertToFPix()
@@ -685,7 +687,7 @@ FPIX       *fpix;
  * \param[out]   pyminloc [optional] y location of min
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 fpixGetMin(FPIX       *fpix,
            l_float32  *pminval,
            l_int32    *pxminloc,
@@ -738,7 +740,7 @@ l_float32   minval;
  * \param[out]   pymaxloc [optional] y location of max
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 fpixGetMax(FPIX       *fpix,
            l_float32  *pmaxval,
            l_int32    *pxmaxloc,
@@ -791,7 +793,7 @@ l_float32   maxval;
  * \param[out]   pyminloc [optional] y location of min
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 dpixGetMin(DPIX       *dpix,
            l_float64  *pminval,
            l_int32    *pxminloc,
@@ -844,7 +846,7 @@ l_float64   minval;
  * \param[out]   pymaxloc [optional] y location of max
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 dpixGetMax(DPIX       *dpix,
            l_float64  *pmaxval,
            l_int32    *pxmaxloc,
@@ -1159,7 +1161,7 @@ l_float32  *datas, *datad, *lines, *lined;
  *          is done first.
  * </pre>
  */
-l_int32
+l_ok
 fpixAddMultConstant(FPIX      *fpix,
                     l_float32  addc,
                     l_float32  multc)
@@ -1278,7 +1280,7 @@ l_float64  *datas, *datad, *lines, *lined;
  *          is done first.
  * </pre>
  */
-l_int32
+l_ok
 dpixAddMultConstant(DPIX      *dpix,
                     l_float64  addc,
                     l_float64  multc)
@@ -1325,7 +1327,7 @@ l_float64  *line, *data;
  * \param[in]    inval to set at each pixel
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 fpixSetAllArbitrary(FPIX      *fpix,
                     l_float32  inval)
 {
@@ -1356,7 +1358,7 @@ l_float32  *data, *line;
  * \param[in]    inval to set at each pixel
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 dpixSetAllArbitrary(DPIX      *dpix,
                     l_float64  inval)
 {
@@ -1656,7 +1658,7 @@ FPIX      *fpixd;
  *          the result is valid:  use for in-place with caution!
  * </pre>
  */
-l_int32
+l_ok
 fpixRasterop(FPIX    *fpixd,
              l_int32  dx,
              l_int32  dy,
@@ -2265,7 +2267,7 @@ FPIX       *fpixd;
  *          avoids "jaggies" when rendering sharp edges.
  * </pre>
  */
-l_int32
+l_ok
 linearInterpolatePixelFloat(l_float32  *datas,
                             l_int32     w,
                             l_int32     h,

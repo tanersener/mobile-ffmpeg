@@ -223,7 +223,7 @@ PIXCMAP  *cmap;
  *          more efficient without affecting the final result.
  * </pre>
  */
-l_int32
+l_ok
 pixColorGray(PIX     *pixs,
              BOX     *box,
              l_int32  type,
@@ -774,7 +774,7 @@ l_uint32  *line, *data;
  *          will be invariant.
  * </pre>
  */
-l_int32
+l_ok
 pixelLinearMapToTargetColor(l_uint32   scolor,
                             l_uint32   srcmap,
                             l_uint32   dstmap,
@@ -960,7 +960,7 @@ cleanup:
  *          the src --> dest shift.
  * </pre>
  */
-l_int32
+l_ok
 pixelShiftByComponent(l_int32    rval,
                       l_int32    gval,
                       l_int32    bval,
@@ -1019,7 +1019,7 @@ l_int32  rsval, rdval, gsval, gdval, bsval, bdval, rs, gs, bs;
  *          the resulting pixel is black; %fraction == 1 results in white.
  * </pre>
  */
-l_int32
+l_ok
 pixelFractionalShift(l_int32    rval,
                      l_int32    gval,
                      l_int32    bval,

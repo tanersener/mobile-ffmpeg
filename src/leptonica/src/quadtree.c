@@ -88,7 +88,7 @@
  *          single value; level 1 has 4 values; level 2 has 16; etc.
  * </pre>
  */
-l_int32
+l_ok
 pixQuadtreeMean(PIX     *pixs,
                 l_int32  nlevels,
                 PIX     *pix_ma,
@@ -165,7 +165,7 @@ PIX       *pix_mac;
  *          and root variance values.
  * </pre>
  */
-l_int32
+l_ok
 pixQuadtreeVariance(PIX     *pixs,
                     l_int32  nlevels,
                     PIX     *pix_ma,
@@ -261,7 +261,7 @@ DPIX      *dpix_msac;  /* msa clone */
  *          rectangle in O(1), independent of the size of the rectangle.
  * </pre>
  */
-l_int32
+l_ok
 pixMeanInRectangle(PIX        *pixs,
                    BOX        *box,
                    PIX        *pixma,
@@ -337,7 +337,7 @@ BOX       *boxc;
  *          independent of the size of the rectangle.
  * </pre>
  */
-l_int32
+l_ok
 pixVarianceInRectangle(PIX        *pixs,
                        BOX        *box,
                        PIX        *pix_ma,
@@ -526,7 +526,7 @@ BOXAA    *baa;
  *             (x/2, y/2)
  * </pre>
  */
-l_int32
+l_ok
 quadtreeGetParent(FPIXA      *fpixa,
                   l_int32     level,
                   l_int32     x,
@@ -569,7 +569,7 @@ l_int32  n;
  *             (2x, 2y), (2x+1, 2y), (2x, 2y+1), (2x+1, 2y+1)
  * </pre>
  */
-l_int32
+l_ok
 quadtreeGetChildren(FPIXA      *fpixa,
                     l_int32     level,
                     l_int32     x,

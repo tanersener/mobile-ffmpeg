@@ -106,7 +106,7 @@ static const char *str_ital3 = " x"
  *          more appropriate for a typical font scanned at 200 ppi.
  * </pre>
  */
-l_int32
+l_ok
 pixItalicWords(PIX     *pixs,
                BOXA    *boxaw,
                PIX     *pixw,

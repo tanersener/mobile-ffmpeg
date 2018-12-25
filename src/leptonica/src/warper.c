@@ -594,10 +594,9 @@ pixWarpStereoscopic(PIX     *pixs,
 l_int32    w, h, zshift;
 l_float32  angle;
 BOX       *boxleft, *boxright;
-PIX       *pixt, *pixt2, *pixt3;
-PIX       *pixr, *pixg, *pixb;
+PIX       *pix1, *pix2, *pix3, *pix4, *pixr, *pixg, *pixb;
 PIX       *pixv1, *pixv2, *pixv3, *pixv4;
-PIX       *pixr1, *pixr2, *pixr3, *pixr4, *pixrs, *pixrss;
+PIX       *pixrs, *pixrss;
 PIX       *pixd;
 
     PROCNAME("pixWarpStereoscopic");
@@ -606,7 +605,7 @@ PIX       *pixd;
         return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
 
         /* Convert to the output depth, 32 bpp. */
-    pixt = pixConvertTo32(pixs);
+    pix1 = pixConvertTo32(pixs);
 
         /* If requested, do a quad vertical shearing, pushing pixels up
          * or down, depending on their distance from the centerline. */
@@ -614,31 +613,31 @@ PIX       *pixd;
     boxleft = boxCreate(0, 0, w / 2, h);
     boxright = boxCreate(w / 2, 0, w - w / 2, h);
     if (ybendt != 0 || ybendb != 0) {
-        pixv1 = pixClipRectangle(pixt, boxleft, NULL);
-        pixv2 = pixClipRectangle(pixt, boxright, NULL);
+        pixv1 = pixClipRectangle(pix1, boxleft, NULL);
+        pixv2 = pixClipRectangle(pix1, boxright, NULL);
         pixv3 = pixQuadraticVShear(pixv1, L_WARP_TO_LEFT, ybendt,
                                           ybendb, L_INTERPOLATED,
                                           L_BRING_IN_WHITE);
         pixv4 = pixQuadraticVShear(pixv2, L_WARP_TO_RIGHT, ybendt,
                                           ybendb, L_INTERPOLATED,
                                           L_BRING_IN_WHITE);
-        pixt2 = pixCreate(w, h, 32);
-        pixRasterop(pixt2, 0, 0, w / 2, h, PIX_SRC, pixv3, 0, 0);
-        pixRasterop(pixt2, w / 2, 0, w - w / 2, h, PIX_SRC, pixv4, 0, 0);
+        pix2 = pixCreate(w, h, 32);
+        pixRasterop(pix2, 0, 0, w / 2, h, PIX_SRC, pixv3, 0, 0);
+        pixRasterop(pix2, w / 2, 0, w - w / 2, h, PIX_SRC, pixv4, 0, 0);
         pixDestroy(&pixv1);
         pixDestroy(&pixv2);
         pixDestroy(&pixv3);
         pixDestroy(&pixv4);
     } else {
-        pixt2 = pixClone(pixt);
+        pix2 = pixClone(pix1);
     }
+    pixDestroy(&pix1);
 
         /* Split out the 3 components */
-    pixr = pixGetRGBComponent(pixt2, COLOR_RED);
-    pixg = pixGetRGBComponent(pixt2, COLOR_GREEN);
-    pixb = pixGetRGBComponent(pixt2, COLOR_BLUE);
-    pixDestroy(&pixt);
-    pixDestroy(&pixt2);
+    pixr = pixGetRGBComponent(pix2, COLOR_RED);
+    pixg = pixGetRGBComponent(pix2, COLOR_GREEN);
+    pixb = pixGetRGBComponent(pix2, COLOR_BLUE);
+    pixDestroy(&pix2);
 
         /* The direction of the stereo disparity below is set
          * for the red filter to be over the left eye.  If the red
@@ -654,19 +653,19 @@ PIX       *pixd;
     if (zbend == 0) {
         pixrs = pixClone(pixr);
     } else {
-        pixr1 = pixClipRectangle(pixr, boxleft, NULL);
-        pixr2 = pixClipRectangle(pixr, boxright, NULL);
-        pixr3 = pixStretchHorizontal(pixr1, L_WARP_TO_LEFT, L_QUADRATIC_WARP,
+        pix1 = pixClipRectangle(pixr, boxleft, NULL);
+        pix2 = pixClipRectangle(pixr, boxright, NULL);
+        pix3 = pixStretchHorizontal(pix1, L_WARP_TO_LEFT, L_QUADRATIC_WARP,
                                      zbend, L_INTERPOLATED, L_BRING_IN_WHITE);
-        pixr4 = pixStretchHorizontal(pixr2, L_WARP_TO_RIGHT, L_QUADRATIC_WARP,
+        pix4 = pixStretchHorizontal(pix2, L_WARP_TO_RIGHT, L_QUADRATIC_WARP,
                                      zbend, L_INTERPOLATED, L_BRING_IN_WHITE);
         pixrs = pixCreate(w, h, 8);
-        pixRasterop(pixrs, 0, 0, w / 2, h, PIX_SRC, pixr3, 0, 0);
-        pixRasterop(pixrs, w / 2, 0, w - w / 2, h, PIX_SRC, pixr4, 0, 0);
-        pixDestroy(&pixr1);
-        pixDestroy(&pixr2);
-        pixDestroy(&pixr3);
-        pixDestroy(&pixr4);
+        pixRasterop(pixrs, 0, 0, w / 2, h, PIX_SRC, pix3, 0, 0);
+        pixRasterop(pixrs, w / 2, 0, w - w / 2, h, PIX_SRC, pix4, 0, 0);
+        pixDestroy(&pix1);
+        pixDestroy(&pix2);
+        pixDestroy(&pix3);
+        pixDestroy(&pix4);
     }
 
         /* Perform a combination of horizontal shift and shear of
@@ -677,11 +676,12 @@ PIX       *pixd;
     } else if (zshiftt == zshiftb) {
         pixrss = pixTranslate(NULL, pixrs, zshiftt, 0, L_BRING_IN_WHITE);
     } else {
-        angle = (l_float32)(zshiftb - zshiftt) / (l_float32)pixGetHeight(pixrs);
+        angle = (l_float32)(zshiftb - zshiftt) /
+                L_MAX(1.0, (l_float32)pixGetHeight(pixrs));
         zshift = (zshiftt + zshiftb) / 2;
-        pixt3 = pixTranslate(NULL, pixrs, zshift, 0, L_BRING_IN_WHITE);
-        pixrss = pixHShearLI(pixt3, h / 2, angle, L_BRING_IN_WHITE);
-        pixDestroy(&pixt3);
+        pix1 = pixTranslate(NULL, pixrs, zshift, 0, L_BRING_IN_WHITE);
+        pixrss = pixHShearLI(pix1, h / 2, angle, L_BRING_IN_WHITE);
+        pixDestroy(&pix1);
     }
 
         /* Combine the unchanged cyan (g,b) image with the shifted red */

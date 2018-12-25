@@ -94,7 +94,7 @@ SARRAY   *sa;
     for (i = 0; i < 2; i++) {
         fname = sarrayGetString(sa, i, L_NOCOPY);
         pixa2 = pixaRead(fname);
-        pixaSetText(pixa2, NULL);
+        pixaSetText(pixa2, NULL, NULL);
 
             /* Train a new recognizer from the boot and unlabeled samples */
         pixa3 = recogTrainFromBoot(recogboot, pixa2, 0.65, 128, 1);
@@ -116,7 +116,7 @@ SARRAY   *sa;
 
         /* Generate the boot recog, and show the unscaled and scaled
          * versions of the templates */
-    recogboot = recogMakeBootDigitRecog(40, linew, 1, 1);
+    recogboot = recogMakeBootDigitRecog(0, 40, linew, 1, 1);
     recogWrite("/tmp/lept/recog/boot2.rec", recogboot);
     recogShowContent(stderr, recogboot, 3, 1);
 
@@ -125,7 +125,7 @@ SARRAY   *sa;
     for (i = 0; i < 2; i++) {
         fname = sarrayGetString(sa, i, L_NOCOPY);
         pixa2 = pixaRead(fname);
-        pixaSetText(pixa2, NULL);
+        pixaSetText(pixa2, NULL, NULL);
 
             /* Train a new recognizer from the boot and unlabeled samples */
         pixa3 = recogTrainFromBoot(recogboot, pixa2, 0.65, 128, 1);
@@ -166,7 +166,7 @@ SARRAY   *sa;
     /*      Show operation of the default bootstrap recognizer     */
     /* ----------------------------------------------------------- */
 
-    recog1 = recogMakeBootDigitRecog(40, 0, 1, 0);
+    recog1 = recogMakeBootDigitRecog(0, 40, 0, 1, 0);
     pix1 = pixRead("test-87220.59.png");
     recogIdentifyMultiple(recog1, pix1, 0, 1, &boxa1, NULL, NULL, 0);
     sa = recogExtractNumbers(recog1, boxa1, 0.75, -1, &baa, &naa);

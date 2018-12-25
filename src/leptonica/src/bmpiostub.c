@@ -45,7 +45,7 @@ PIX * pixReadStreamBmp(FILE *fp)
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteStreamBmp(FILE *fp, PIX *pix)
+l_ok pixWriteStreamBmp(FILE *fp, PIX *pix)
 {
     return ERROR_INT("function not present", "pixWriteStreamBmp", 1);
 }
@@ -59,7 +59,7 @@ PIX * pixReadMemBmp(const l_uint8 *cdata, size_t size)
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteMemBmp(l_uint8 **pdata, size_t *psize, PIX *pix)
+l_ok pixWriteMemBmp(l_uint8 **pdata, size_t *psize, PIX *pix)
 {
     return ERROR_INT("function not present", "pixWriteMemBmp", 1);
 }

@@ -562,7 +562,7 @@ l_int32  **array;
  *          selname if the sel already has a name.
  * </pre>
  */
-l_int32
+l_ok
 selaAddSel(SELA        *sela,
            SEL         *sel,
            const char  *selname,
@@ -706,7 +706,7 @@ selGetName(SEL  *sel)
  *      (2) If name is not defined, just clears any existing sel name.
  * </pre>
  */
-l_int32
+l_ok
 selSetName(SEL         *sel,
            const char  *name)
 {
@@ -728,7 +728,7 @@ selSetName(SEL         *sel,
  * \param[in]    psel   [optional] sel (not a copy)
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 selaFindSelByName(SELA        *sela,
                   const char  *name,
                   l_int32     *pindex,
@@ -777,7 +777,7 @@ SEL     *sel;
  * \param[out]   ptype  SEL_HIT, SEL_MISS, SEL_DONT_CARE
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 selGetElement(SEL      *sel,
               l_int32   row,
               l_int32   col,
@@ -817,7 +817,7 @@ selGetElement(SEL      *sel,
  *          direction of the rasterop.
  * </pre>
  */
-l_int32
+l_ok
 selSetElement(SEL     *sel,
               l_int32  row,
               l_int32  col,
@@ -846,7 +846,7 @@ selSetElement(SEL     *sel,
  * \param[out]   psy, psx, pcy, pcx [optional]  each can be null
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 selGetParameters(SEL      *sel,
                  l_int32  *psy,
                  l_int32  *psx,
@@ -876,7 +876,7 @@ selGetParameters(SEL      *sel,
  * \param[in]    cy, cx
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 selSetOrigin(SEL     *sel,
              l_int32  cy,
              l_int32  cx)
@@ -898,7 +898,7 @@ selSetOrigin(SEL     *sel,
  * \param[out]   ptype  SEL_HIT, SEL_MISS, SEL_DONT_CARE
  * \return  0 if OK; 1 on error or if origin is not found
  */
-l_int32
+l_ok
 selGetTypeAtOrigin(SEL      *sel,
                    l_int32  *ptype)
 {
@@ -1100,7 +1100,7 @@ SELA    *selabasic, *selacomb;
  *      (2) All returned strings are copies that must be freed.
  * </pre>
  */
-l_int32
+l_ok
 getCompositeParameters(l_int32   size,
                        l_int32  *psize1,
                        l_int32  *psize2,
@@ -1189,7 +1189,7 @@ SARRAY  *sa;
  *        is +x to the cx.  This is a positive xp shift.
  * </pre>
  */
-l_int32
+l_ok
 selFindMaxTranslations(SEL      *sel,
                        l_int32  *pxp,
                        l_int32  *pyp,
@@ -1460,7 +1460,7 @@ SEL     *sel;
  * \param[in]    sela
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 selaWrite(const char  *fname,
           SELA        *sela)
 {
@@ -1489,7 +1489,7 @@ FILE  *fp;
  * \param[in]    sela
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 selaWriteStream(FILE  *fp,
                 SELA  *sela)
 {
@@ -1522,7 +1522,7 @@ SEL     *sel;
  * \param[in]    sel
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 selWrite(const char  *fname,
          SEL         *sel)
 {
@@ -1551,7 +1551,7 @@ FILE  *fp;
  * \param[in]    sel
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 selWriteStream(FILE  *fp,
                SEL   *sel)
 {
@@ -1630,7 +1630,7 @@ char     ch;
         return (SEL *)ERROR_PTR("height must be > 0", procName, NULL);
     if (w < 1)
         return (SEL *)ERROR_PTR("width must be > 0", procName, NULL);
-    if (strlen(text) != w * h)
+    if (strlen(text) != (size_t)w * h)
         return (SEL *)ERROR_PTR("text size != w * h", procName, NULL);
 
     sel = selCreate(h, w, name);
@@ -2106,8 +2106,8 @@ char  *basename, *selname;
  * </pre>
  */
 SEL *
-selCreateFromColorPix(PIX   *pixs,
-                      char  *selname)
+selCreateFromColorPix(PIX         *pixs,
+                      const char  *selname)
 {
 PIXCMAP  *cmap;
 SEL      *sel;

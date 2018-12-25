@@ -263,7 +263,7 @@ PIXA     *pixa;
  *          and representing the background value (index 0) in the pix.
  * </pre>
  */
-l_int32
+l_ok
 pixConnCompIncrInit(PIX     *pixs,
                     l_int32  conn,
                     PIX    **ppixd,
@@ -477,7 +477,7 @@ PTA      *ptas, *ptad;
  *          neighbor values is 4.
  * </pre>
  */
-l_int32
+l_ok
 pixGetSortedNeighborValues(PIX       *pixs,
                            l_int32    x,
                            l_int32    y,

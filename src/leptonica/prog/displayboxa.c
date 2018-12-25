@@ -27,14 +27,15 @@
 /*
  * displayboxa.c
  *
- *        displayboxa filein width fileout [fontdir]
+ *        displayboxa filein first last width fileout
  *
  *   This reads a boxa from file and generates a composite view of the
  *   boxes, one per "page", tiled in rows.
+ *   Set last == -1 to go to the end.
  *   The pix that backs each box is chosen to be the minimum size that
  *   supports every box in the boxa.  Each pix (and the box it backs)
  *   is scaled so that the pix width is @width in pixels.
- *   If @fontdir is specified, the number of each box is written below it.
+ *   The number of each box is written below the box.
  *
  *   The minimum allowed width of the backing pix is 30, and the default
  *   width is 100.
@@ -46,20 +47,22 @@ int main(int    argc,
          char **argv)
 {
 char        *filein, *fileout;
-l_int32      w, h, width, sep;
+l_int32      w, h, width, sep, first, last;
 l_float32    scalefact;
 BOXA        *boxa1, *boxa2;
 PIX         *pixd;
 static char  mainName[] = "displayboxa";
 
-    if (argc != 4) {
+    if (argc != 6) {
         fprintf(stderr, "Syntax error in displayboxa:\n"
-           "   displayboxa filein width fileout\n");
+           "   displayboxa filein first last width fileout\n");
          return 1;
     }
     filein = argv[1];
-    width = atoi(argv[2]);
-    fileout = argv[3];
+    first = atoi(argv[2]);
+    last = atoi(argv[3]);
+    width = atoi(argv[4]);
+    fileout = argv[5];
     if (width < 30) {
         L_ERROR("width too small; setting to 100\n", mainName);
         width = 100;
@@ -72,7 +75,7 @@ static char  mainName[] = "displayboxa";
     scalefact = (l_float32)width / (l_float32)w;
     boxa2 = boxaTransform(boxa1, 0, 0, scalefact, scalefact);
     sep = L_MIN(width / 5, 20);
-    pixd = boxaDisplayTiled(boxa2, NULL, 1500, 2, 1.0, 0, sep, 2);
+    pixd = boxaDisplayTiled(boxa2, NULL, first, last, 1500, 2, 1.0, 0, sep, 2);
     pixWrite(fileout, pixd, IFF_PNG);
     pixDisplay(pixd, 100, 100);
 

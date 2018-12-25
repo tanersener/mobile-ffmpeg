@@ -111,8 +111,8 @@
  *
  *  The ascender/descender signal is useful for determining text
  *  orientation in Roman alphabets because the incidence of letters
- *  with straight-line ascenders (b, d, h, k, l, <t>) outnumber
- *  those with descenders (<g>, p, q).  The letters <t> and <g>
+ *  with straight-line ascenders (b, d, h, k, l, 't') outnumber
+ *  those with descenders ('g', p, q).  The letters 't' and 'g'
  *  will respond variably to the filter, depending on the type face.
  *
  *  What about the mirror image situations?  These aren't common
@@ -256,8 +256,6 @@ PIX       *pix1;
     if (!pixs || pixGetDepth(pixs) != 1)
         return (PIX *)ERROR_PTR("pixs undefined or not 1 bpp", procName, NULL);
 
-    lept_mkdir("lept/orient");
-
         /* Get confidences for orientation */
     pixUpDownDetectDwa(pixs, &upconf, 0, debug);
     pix1 = pixRotate90(pixs, 1);
@@ -366,7 +364,7 @@ PIX       *pix1;
  *      (7) Uses rasterop implementation of HMT.
  * </pre>
  */
-l_int32
+l_ok
 pixOrientDetect(PIX        *pixs,
                 l_float32  *pupconf,
                 l_float32  *pleftconf,
@@ -383,8 +381,6 @@ PIX  *pix1;
         return ERROR_INT("nothing to do", procName, 1);
     if (mincount == 0)
         mincount = DEFAULT_MIN_UP_DOWN_COUNT;
-
-    lept_mkdir("lept/orient");
 
     if (pupconf)
         pixUpDownDetect(pixs, pupconf, mincount, debug);
@@ -427,7 +423,7 @@ PIX  *pix1;
  *            L_TEXT_ORIENT_RIGHT:    landscape, text up facing right
  * </pre>
  */
-l_int32
+l_ok
 makeOrientDecision(l_float32  upconf,
                    l_float32  leftconf,
                    l_float32  minupconf,
@@ -446,8 +442,6 @@ l_float32  absupconf, absleftconf;
         L_INFO("not enough confidence to get orientation\n", procName);
         return 0;
     }
-
-    lept_mkdir("lept/orient");
 
     if (minupconf == 0.0)
         minupconf = DEFAULT_MIN_UP_DOWN_CONF;
@@ -506,7 +500,7 @@ l_float32  absupconf, absleftconf;
  *          and not rotated at a 90 degree angle.
  * </pre>
  */
-l_int32
+l_ok
 pixUpDownDetect(PIX        *pixs,
                 l_float32  *pconf,
                 l_int32     mincount,
@@ -554,7 +548,7 @@ pixUpDownDetect(PIX        *pixs,
  *          is going too far -- components will get merged.
  * </pre>
  */
-l_int32
+l_ok
 pixUpDownDetectGeneral(PIX        *pixs,
                        l_float32  *pconf,
                        l_int32     mincount,
@@ -578,7 +572,9 @@ SEL       *sel1, *sel2, *sel3, *sel4;
     if (npixels < 0)
         npixels = 0;
 
-    lept_mkdir("lept/orient");
+    if (debug) {
+        lept_mkdir("lept/orient");
+    }
 
     sel1 = selCreateFromString(textsel1, 5, 6, NULL);
     sel2 = selCreateFromString(textsel2, 5, 6, NULL);
@@ -695,7 +691,7 @@ SEL       *sel1, *sel2, *sel3, *sel4;
  *      (3) This runs about 2.5 times faster than the pixOrientDetect().
  * </pre>
  */
-l_int32
+l_ok
 pixOrientDetectDwa(PIX        *pixs,
                    l_float32  *pupconf,
                    l_float32  *pleftconf,
@@ -748,7 +744,7 @@ PIX  *pix1;
  *          and not rotated at a 90 degree angle.
  * </pre>
  */
-l_int32
+l_ok
 pixUpDownDetectDwa(PIX       *pixs,
                   l_float32  *pconf,
                   l_int32     mincount,
@@ -773,7 +769,7 @@ pixUpDownDetectDwa(PIX       *pixs,
  *      (1) See the notes in pixUpDownDetectGeneral() for usage.
  * </pre>
  */
-l_int32
+l_ok
 pixUpDownDetectGeneralDwa(PIX        *pixs,
                           l_float32  *pconf,
                           l_int32     mincount,
@@ -799,8 +795,6 @@ PIX       *pixt, *pix0, *pix1, *pix2, *pix3, *pixm;
         mincount = DEFAULT_MIN_UP_DOWN_COUNT;
     if (npixels < 0)
         npixels = 0;
-
-    lept_mkdir("lept/orient");
 
         /* One of many reasonable pre-filtering sequences: (1, 8) and (30, 1).
          * This closes holes in x-height characters and joins them at
@@ -871,7 +865,10 @@ PIX       *pixt, *pix0, *pix1, *pix2, *pix3, *pixm;
         *pconf = 2. * ((nup - ndown) / sqrt(nup + ndown));
 
     if (debug) {
-        if (pixm) pixWriteDebug("/tmp/lept/orient/pixm2.png", pixm, IFF_PNG);
+        if (pixm) {
+            lept_mkdir("lept/orient");
+            pixWriteDebug("/tmp/lept/orient/pixm2.png", pixm, IFF_PNG);
+        }
         fprintf(stderr, "nup = %7.3f, ndown = %7.3f, conf = %7.3f\n",
                 nup, ndown, *pconf);
         if (*pconf > DEFAULT_MIN_UP_DOWN_CONF)
@@ -930,7 +927,7 @@ PIX       *pixt, *pix0, *pix1, *pix2, *pix3, *pixm;
  *          of morphology!
  * </pre>
  */
-l_int32
+l_ok
 pixMirrorDetect(PIX        *pixs,
                 l_float32  *pconf,
                 l_int32     mincount,
@@ -950,6 +947,10 @@ SEL       *sel1, *sel2;
         return ERROR_INT("pixs not defined or not 1 bpp", procName, 1);
     if (mincount == 0)
         mincount = DEFAULT_MIN_MIRROR_FLIP_COUNT;
+
+    if (debug) {
+        lept_mkdir("lept/orient");
+    }
 
     sel1 = selCreateFromString(textsel1, 5, 6, NULL);
     sel2 = selCreateFromString(textsel2, 5, 6, NULL);
@@ -1021,7 +1022,7 @@ SEL       *sel1, *sel2;
  *      (2) See notes in pixMirrorDetect().
  * </pre>
  */
-l_int32
+l_ok
 pixMirrorDetectDwa(PIX        *pixs,
                    l_float32  *pconf,
                    l_int32     mincount,

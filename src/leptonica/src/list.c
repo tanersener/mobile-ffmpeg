@@ -135,12 +135,12 @@
  *      When you are only applying some function to each element
  *      in a list, you can go either forwards or backwards.
  *      To run through a list forwards, use:
- *
+ * \code
  *          for (elem = head; elem; elem = nextelem) {
  *              nextelem = elem->next;   (in case we destroy elem)
  *              <do something with elem->data>
  *          }
- *
+ * \endcode
  *      To run through a list backwards, find the tail and use:
  *
  *          for (elem = tail; elem; elem = prevelem) {
@@ -151,7 +151,7 @@
  *      Even though these patterns are very simple, they are so common
  *      that we've provided macros for them in list.h.  Using the
  *      macros, this becomes:
- *
+ * \code
  *          L_BEGIN_LIST_FORWARD(head, elem)
  *              <do something with elem->data>
  *          L_END_LIST
@@ -159,7 +159,7 @@
  *          L_BEGIN_LIST_REVERSE(tail, elem)
  *              <do something with elem->data>
  *          L_END_LIST
- *
+ * \endcode
  *      Note again that with macros, the application programmer does
  *      not need to refer explicitly to next and prev fields.  Also,
  *      in the reverse case, note that we do not explicitly
@@ -169,23 +169,23 @@
  *
  *      Some special cases are simpler.  For example, when
  *      removing all items from the head of the list, you can use
- *
+ * \code
  *          while (head) {
  *              obj = listRemoveFromHead(&head);
  *              <do something with obj>
  *          }
- *
+ * \endcode
  *      Removing successive elements from the tail is equally simple:
- *
+ * \code
  *          while (tail) {
  *              obj = listRemoveFromTail(&head, &tail);
  *              <do something with obj>
  *          }
- *
+ * \endcode
  *      When removing an arbitrary element from a list, use
- *
+ * \code
  *              obj = listRemoveElement(&head, elem);
- *
+ * \endcode
  *      All the listRemove*() functions hand you the object,
  *      destroy the list cell to which it was attached, and
  *      reset the list pointers if necessary.
@@ -273,7 +273,7 @@ DLLIST  *elem, *next, *head;
  *          before calling this function.
  * </pre>
  */
-l_int32
+l_ok
 listAddToHead(DLLIST  **phead,
               void     *data)
 {
@@ -327,7 +327,7 @@ DLLIST  *cell, *head;
  *               will be found and updated.
  * </pre>
  */
-l_int32
+l_ok
 listAddToTail(DLLIST  **phead,
               DLLIST  **ptail,
               void     *data)
@@ -382,14 +382,15 @@ DLLIST  *cell, *head, *tail;
  *          head and elem must be null.
  *      (2) If you are searching through a list, looking for a condition
  *          to add an element, you can do something like this:
+ * \code
  *            L_BEGIN_LIST_FORWARD(head, elem)
  *                <identify an elem to insert before>
  *                listInsertBefore(&head, elem, data);
  *            L_END_LIST
- *
+ * \endcode
  * </pre>
  */
-l_int32
+l_ok
 listInsertBefore(DLLIST  **phead,
                  DLLIST   *elem,
                  void     *data)
@@ -446,13 +447,15 @@ DLLIST  *cell, *head;
  *          in the call to allow "consing" up from NULL.
  *      (2) If you are searching through a list, looking for a condition
  *          to add an element, you can do something like this:
+ * \code
  *            L_BEGIN_LIST_FORWARD(head, elem)
  *                <identify an elem to insert after>
  *                listInsertAfter(&head, elem, data);
  *            L_END_LIST
+ * \endcode
  * </pre>
  */
-l_int32
+l_ok
 listInsertAfter(DLLIST  **phead,
                 DLLIST   *elem,
                 void     *data)
@@ -744,7 +747,7 @@ DLLIST  *elem;
  *      (1) This reverses the list in-place.
  * </pre>
  */
-l_int32
+l_ok
 listReverse(DLLIST  **phead)
 {
 void    *obj;  /* whatever */
@@ -781,7 +784,7 @@ DLLIST  *head, *rhead;
  *      (2) Both input ptrs must exist, though either can have the value NULL.
  * </pre>
  */
-l_int32
+l_ok
 listJoin(DLLIST  **phead1,
          DLLIST  **phead2)
 {

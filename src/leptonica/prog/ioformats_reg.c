@@ -488,6 +488,8 @@ part6:
     pixWrite(tempname, pix, IFF_PNM);
     if (get_header_data(tempname, IFF_PNM)) success = FALSE;
     pixDestroy(&pix);
+
+        /* These tiff formats work on 1 bpp images */
     pix = pixRead(FILE_1BPP);
     pixWrite(tempname, pix, IFF_TIFF_G3);
     if (get_header_data(tempname, IFF_TIFF_G3)) success = FALSE;
@@ -636,7 +638,8 @@ PIX       *pixd = NULL;
         return 1;
     }
 
-    if (format == IFF_JFIF_JPEG || format == IFF_JP2 || format == IFF_WEBP) {
+    if (format == IFF_JFIF_JPEG || format == IFF_JP2 ||
+        format == IFF_WEBP || format == IFF_TIFF_JPEG) {
         ds = pixGetDepth(pixs);
         dd = pixGetDepth(pixd);
         if (dd == 8) {
@@ -724,7 +727,7 @@ size_t      size1, size2;
     if (true_format == IFF_TIFF_G3 || true_format == IFF_TIFF_G4 ||
         true_format == IFF_TIFF_ZIP || true_format == IFF_TIFF_LZW ||
         true_format == IFF_TIFF_PACKBITS || true_format == IFF_TIFF_RLE ||
-        true_format == IFF_TIFF)
+        true_format == IFF_TIFF_JPEG || true_format == IFF_TIFF)
         return 0;
 #endif  /* !HAVE_LIBTIFF */
 
@@ -736,7 +739,10 @@ size_t      size1, size2;
     if (ret1)
         fprintf(stderr, "Error: couldn't read header data: %s\n", filename);
     else {
-        if (format1 > IFF_PNG && format1 < IFF_PNM) {
+        if (format1 == IFF_TIFF || format1 == IFF_TIFF_PACKBITS ||
+            format1 == IFF_TIFF_RLE || format1 == IFF_TIFF_G3 ||
+            format1 == IFF_TIFF_G4 || format1 == IFF_TIFF_LZW ||
+            format1 == IFF_TIFF_ZIP || format1 == IFF_TIFF_JPEG) {
             tiff_compression_name = get_tiff_compression_name(format1);
             fprintf(stderr, "Format data for image %s with format %s:\n"
                 "  nbytes = %lu, size (w, h, d) = (%d, %d, %d)\n"
@@ -796,6 +802,8 @@ get_tiff_compression_name(l_int32  format)
         tiff_compression_name =  "tiff_rle";
     else if (format == IFF_TIFF_PACKBITS)
         tiff_compression_name =  "tiff_packbits";
+    else if (format == IFF_TIFF_JPEG)
+        tiff_compression_name =  "tiff_jpeg";
     else if (format == IFF_TIFF)
         tiff_compression_name = "tiff_uncompressed";
     else

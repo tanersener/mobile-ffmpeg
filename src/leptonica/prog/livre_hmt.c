@@ -33,7 +33,7 @@
  *    (1) The Sel is displayed with the hit and miss elements in color.
  *
  *    (2) We produce several 4 bpp colormapped renditions,
- *        with the matched pattern either hightlighted or removed.
+ *        with the matched pattern either highlighted or removed.
  *
  *    (3) For figures in the Document Image Applications chapter:
  *           fig 7:  livre_hmt 1 8

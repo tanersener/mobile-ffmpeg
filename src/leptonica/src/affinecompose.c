@@ -75,7 +75,7 @@
  *             v' = Av
  *          where v and v' are 1x3 column vectors in the form
  *             v = [x, y, 1]^    ^ denotes transpose
- *          and the affine tranlation matrix is
+ *          and the affine translation matrix is
  *             A = [ 1   0   tx
  *                   0   1   ty
  *                   0   0    1  ]
@@ -524,7 +524,7 @@ BOXA  *boxad;
  * \param[in]    size matrix is %size x %size; vectors are length %size
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_productMatVec(l_float32  *mat,
                 l_float32  *vecs,
                 l_float32  *vecd,
@@ -560,7 +560,7 @@ l_int32  i, j;
  * \param[in]    size of matrices
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_productMat2(l_float32  *mat1,
               l_float32  *mat2,
               l_float32  *matd,
@@ -599,7 +599,7 @@ l_int32  i, j, k, index;
  * \param[in]    size  of matrices
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_productMat3(l_float32  *mat1,
               l_float32  *mat2,
               l_float32  *mat3,
@@ -619,8 +619,8 @@ l_float32  *matt;
     if (!matd)
         return ERROR_INT("result matrix not defined", procName, 1);
 
-    if ((matt = (l_float32 *)LEPT_CALLOC(size * size, sizeof(l_float32)))
-        == NULL)
+    if ((matt = (l_float32 *)LEPT_CALLOC((size_t)size * size,
+                                         sizeof(l_float32))) == NULL)
         return ERROR_INT("matt not made", procName, 1);
     l_productMat2(mat1, mat2, matt, size);
     l_productMat2(matt, mat3, matd, size);
@@ -640,7 +640,7 @@ l_float32  *matt;
  * \param[in]    size  of matrices
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_productMat4(l_float32  *mat1,
               l_float32  *mat2,
               l_float32  *mat3,
@@ -661,8 +661,8 @@ l_float32  *matt;
     if (!matd)
         return ERROR_INT("result matrix not defined", procName, 1);
 
-    if ((matt = (l_float32 *)LEPT_CALLOC(size * size, sizeof(l_float32)))
-         == NULL)
+    if ((matt = (l_float32 *)LEPT_CALLOC((size_t)size * size,
+                                         sizeof(l_float32))) == NULL)
         return ERROR_INT("matt not made", procName, 1);
     l_productMat3(mat1, mat2, mat3, matt, size);
     l_productMat2(matt, mat4, matd, size);

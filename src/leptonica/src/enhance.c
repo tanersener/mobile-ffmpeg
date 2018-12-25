@@ -783,9 +783,8 @@ pixTRCMap(PIX   *pixs,
           NUMA  *na)
 {
 l_int32    w, h, d, wm, hm, wpl, wplm, i, j, sval8, dval8;
-l_int32   *tab;
 l_uint32   sval32, dval32;
-l_uint32  *data, *datam, *line, *linem;
+l_uint32  *data, *datam, *line, *linem, *tab;
 
     PROCNAME("pixTRCMap");
 
@@ -805,7 +804,7 @@ l_uint32  *data, *datam, *line, *linem;
             return ERROR_INT("pixm not 1 bpp", procName, 1);
     }
 
-    tab = numaGetIArray(na);  /* get the array for efficiency */
+    tab = (l_uint32 *)numaGetIArray(na);  /* get the array for efficiency */
     wpl = pixGetWpl(pixs);
     data = pixGetData(pixs);
     if (!pixm) {
@@ -1730,7 +1729,7 @@ l_uint32  *data, *line;
  *          and calibration of the printer.  This function can be used
  *          to iteratively match a color print to the original.  On each
  *          iteration, the center offsets are set to the best match so
- *          far, and the @delta increments are typically reduced.
+ *          far, and the %delta increments are typically reduced.
  * </pre>
  */
 PIX *
@@ -1742,7 +1741,7 @@ pixMosaicColorShiftRGB(PIX       *pixs,
                        l_int32    nincr)
 {
 char       buf[64];
-l_int32    i, j;
+l_int32    i;
 l_float32  del;
 L_BMF     *bmf;
 PIX       *pix1, *pix2, *pix3;
@@ -1905,7 +1904,7 @@ PIX       *pixd;
 /*!
  * \brief   pixDarkenGray()
  *
- * \param[in]    pixd     [optional] can be null or equal to pixs
+ * \param[in]    pixd      [optional] can be null or equal to pixs
  * \param[in]    pixs      32 bpp rgb
  * \param[in]    thresh    pixels with max component >= %thresh are unchanged
  * \param[in]    satlimit  pixels with saturation >= %satlimit are unchanged
@@ -1914,9 +1913,9 @@ PIX       *pixd;
  * <pre>
  * Notes:
  *      (1) This darkens gray pixels, by a fraction (sat/%satlimit), where
- *          the sat, the saturation, is the component difference (max - min).
+ *          the saturation, sat, is the component difference (max - min).
  *          The pixel value is unchanged if sat >= %satlimit.  A typical
- *          value of %satlimit might be 50; the larger the value, the
+ *          value of %satlimit might be 40; the larger the value, the
  *          more that pixels with a smaller saturation will be darkened.
  *      (2) Pixels with max component >= %thresh are unchanged. This can be
  *          used to prevent bright pixels with low saturation from being

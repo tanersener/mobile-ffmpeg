@@ -391,7 +391,7 @@ PIX       *pix1, *pix2, *pixd;
  *          only blits in 0 or 1 bits, not an arbitrary colormap index.
  * </pre>
  */
-l_int32
+l_ok
 pixRotateShearIP(PIX       *pixs,
                  l_int32    xcen,
                  l_int32    ycen,
@@ -458,7 +458,7 @@ pixRotateShearCenter(PIX       *pixs,
  * \param[in]    incolor L_BRING_IN_WHITE, L_BRING_IN_BLACK
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRotateShearCenterIP(PIX       *pixs,
                        l_float32  angle,
                        l_int32    incolor)

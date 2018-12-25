@@ -60,7 +60,7 @@ PIX * pixReadStreamJp2k(FILE *fp, l_uint32 reduction, BOX *box,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteJp2k(const char *filename, PIX *pix, l_int32 quality,
+l_ok pixWriteJp2k(const char *filename, PIX *pix, l_int32 quality,
                      l_int32 nlevels, l_int32 hint, l_int32 debug)
 {
     return ERROR_INT("function not present", "pixWriteJp2k", 1);
@@ -68,7 +68,7 @@ l_int32 pixWriteJp2k(const char *filename, PIX *pix, l_int32 quality,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteStreamJp2k(FILE *fp, PIX *pix, l_int32 quality,
+l_ok pixWriteStreamJp2k(FILE *fp, PIX *pix, l_int32 quality,
                            l_int32 nlevels, l_int32 hint, l_int32 debug)
 {
     return ERROR_INT("function not present", "pixWriteStreamJp2k", 1);
@@ -84,7 +84,7 @@ PIX * pixReadMemJp2k(const l_uint8 *data, size_t size, l_uint32 reduction,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteMemJp2k(l_uint8 **pdata, size_t *psize, PIX *pix,
+l_ok pixWriteMemJp2k(l_uint8 **pdata, size_t *psize, PIX *pix,
                         l_int32 quality, l_int32 nlevels, l_int32 hint,
                         l_int32 debug)
 {

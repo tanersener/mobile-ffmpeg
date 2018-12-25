@@ -1,3 +1,5 @@
+type: lib
+
 files:
     - src/.*\.h
     - src/.*\.c

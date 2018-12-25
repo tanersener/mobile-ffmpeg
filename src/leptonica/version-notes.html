@@ -77,7 +77,7 @@ This work is licensed under a <a rel="license" href="http://creativecommons.org/
 
 
 <h2 align=center>Version Notes for Leptonica</h2>
-<h3 align=center>19 Apr 2018</h3>
+<h3 align=center>14 Dec 2018</h3>
 
 <hr>
 <h2 align=center>  <IMG SRC="moller52.jpg" border=1 ALIGN_MIDDLE> </h2>
@@ -88,6 +88,73 @@ Note: The following are highlights of the changes in each version.
 They are <i>not</i> a complete listing of the modifications.
 
 <pre>
+
+1.77.0  14 Dec 18
+        Here is the current status of CVE issues with leptonica; see
+          https://security-tracker.debian.org/tracker/source-package/leptonlib
+        * CVE-2018-7442: potential injection attack because '/' is allowed
+          in gplot rootdir.
+          Functions using this command have been disabled by default in the 
+          distribution, starting with 1.76.0.  As for the specific issue, it 
+          is impossible to specify a general path without using the standard
+          directory subdivider '/'.
+        * CVE-2018-7186: number of characters not limited in fscanf or sscanf,
+          allowing possible attack with buffer overflow.
+          This has been fixed in 1.75.3.
+        * CVE-2018-3836: command injection vulnerability in gplotMakeOutput().
+          This has been fixed in 1.75.3, using stringCheckForChars() to block
+          rootnames containing any of: ;&|>"?*$()/<
+        * CVE-2017-18196: duplicated path components.
+          This was fixed in 1.75.3.
+        * CVE-2018-7441: hardcoded /tmp pathnames.
+          These are all wrapped in special debug functions that are not
+          enabled by default in the distribution, starting with 1.76.0.
+        * CVE-2018-7247: input 'rootname' can overflow a buffer.
+          This was fixed in 1.76.0, using snprintf().
+        * CVE-2018-7440: command injection in gplotMakeOutput using $(command).
+          Fixed in 1.75.3, which blocks '$' as well as 11 other characters.
+        Wrapped the few 'system' calls in an extra layer of debug code.
+        More coverity scan fixes; defects are about 1 per 10,000 source lines.
+        New regression tests: numa1_reg, numa2_reg, lowaccess_reg,
+          pixmem_reg.
+        New non-regression test programs: histoduptest
+        Juergen Buchmueller is working on Lua bindings.  He typedef'd l_ok
+          and used it in 1100 functions that return a success/failure status.
+          He also helped clean up remaining issues in the doxygen-generated
+          documentation.
+        Using a packed struct for bmp headers to avoid crash on
+          some big-endians.
+        Fixed a bug in the prototype parser for xtractprotos that was
+          surfaced by a typedef declaration for the bmp headers.
+        Cleaned up IOS guards to avoid compiling a system(3) call on IOS.
+        Renamed autobuild --> autogen.sh
+        Added some basic pixa functions for rotation and translation.
+        Added an iterative method to find rectangular coverings for
+          arbitrary connected components.
+        Converted two tests to reg tests running in alltests_reg:
+          ptra1_reg, ptra2_reg
+        Enabled read/write for standard jpeg compressed tiff images.
+        Enabled reading for the old (deprecated) jpeg-encoded tiffs.
+        Fix range selectors for pixa, pixaa, boxa, boxaa, pta:
+          Now, last = -1 goes to the end.
+        When reading tiff --> pix, insert IMAGEDESCRIPTION into text field.
+        Converted iotest to reg test iomisc_reg; added to alltests_reg
+        Converted rasterop_reg into a standard regression test; added
+          to alltests_reg.
+        Converted boxa2_reg and fhmtauto_reg into standard regression tests;
+          added to alltests_reg.
+        Split boxa sequence functions out of boxfunc4.c, into a new boxfunc5.c.
+        Simplified bmp header and made reading more clearly endian
+          agnostic (Juergen Buchmueller)
+        New boxa3_reg regression test. This tests sequences of boxes
+          by two new boxfunctions in boxfunc5.c.
+        New bootnumgen4.c for more digit templates.
+        Rename prog/recog_bootnum.c --> prog/recog_bootname1.c
+        New in prog: recog_bootnum2.c, recog_bootnum3.c, recogtest7.c
+        Fixed uninitialized data in pixCentroid() on 1 bpp pix.
+        New reg test: bytea_reg.c.  (removed byteatest.c)
+        Fixed bug in non-transcoding pdf generation from 1 bpp png.
+        Added LGTM to static analyzers that run over the library.
 
 1.76.0  1 May 18
         Modify infrastructure to fix outstanding security issues. By default,
@@ -212,10 +279,11 @@ They are <i>not</i> a complete listing of the modifications.
        Removed use of pixDisplayWrite() in the library; still in some progs.
        Improved test for endianness in makefile.static; no longer requires
        any local files or building and running a program.
-       Modified all files for doxygen output (spearheaded by Jurgen Buchmuller)
+       Modified all files for doxygen output (spearheaded by
+          Juergen Buchmueller)
        Improved plotting of the boxes in a boxa.
        Replaced the slow point hash function with a simple fast one.
-       Added pam (4 component) format writing to pnmio.c (Jurgen Buchmuller)
+       Added pam (4 component) format writing to pnmio.c (Juergen Buchmueller)
        Improved rendering of pixa in side/by/sides.
        Better utilities for pixa and pixacomp.
        Add read/write serialization functions from/to memory for all
@@ -1363,7 +1431,7 @@ They are <i>not</i> a complete listing of the modifications.
        Compiled everything with g++ to make strictly ansi C compatible.
        Added interface gplotFromFile() for simple file-based plotting with 
        gnuplot 3.7.2.   Added functions to convert 2, 4 and 8 bpp
-       color-mapped (i.e., palletted) images to 24 bpp color or
+       color-mapped (i.e., paletted) images to 24 bpp color or
        8 bpp grayscale.  Added several jbig2 application cores that
        only require a simple wrapper to make into programs.
 

@@ -38,14 +38,14 @@
 #if  !USE_PSIO   /* defined in environ.h */
 /* --------------------------------------------*/
 
-l_int32 pixWritePSEmbed(const char *filein, const char *fileout)
+l_ok pixWritePSEmbed(const char *filein, const char *fileout)
 {
     return ERROR_INT("function not present", "pixWritePSEmbed", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteStreamPS(FILE *fp, PIX *pix, BOX *box, l_int32 res,
+l_ok pixWriteStreamPS(FILE *fp, PIX *pix, BOX *box, l_int32 res,
                          l_float32 scale)
 {
     return ERROR_INT("function not present", "pixWriteStreamPS", 1);
@@ -89,27 +89,27 @@ void convertByteToHexAscii(l_uint8 byteval, char *pnib1, char *pnib2)
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertJpegToPSEmbed(const char *filein, const char *fileout)
+l_ok convertJpegToPSEmbed(const char *filein, const char *fileout)
 {
     return ERROR_INT("function not present", "convertJpegToPSEmbed", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertJpegToPS(const char *filein, const char *fileout,
-                        const char *operation, l_int32 x, l_int32 y,
-                        l_int32 res, l_float32 scale, l_int32 pageno,
-                        l_int32 endpage)
+l_ok convertJpegToPS(const char *filein, const char *fileout,
+                     const char *operation, l_int32 x, l_int32 y,
+                     l_int32 res, l_float32 scale, l_int32 pageno,
+                     l_int32 endpage)
 {
     return ERROR_INT("function not present", "convertJpegToPS", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertJpegToPSString(const char *filein, char **poutstr,
-                              l_int32 *pnbytes, l_int32 x, l_int32 y,
-                              l_int32 res, l_float32 scale, l_int32 pageno,
-                              l_int32 endpage)
+l_ok convertJpegToPSString(const char *filein, char **poutstr,
+                           l_int32 *pnbytes, l_int32 x, l_int32 y,
+                           l_int32 res, l_float32 scale, l_int32 pageno,
+                           l_int32 endpage)
 {
     return ERROR_INT("function not present", "convertJpegToPSString", 1);
 }
@@ -125,27 +125,27 @@ char * generateJpegPS(const char *filein, L_COMP_DATA *cid,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertG4ToPSEmbed(const char *filein, const char *fileout)
+l_ok convertG4ToPSEmbed(const char *filein, const char *fileout)
 {
     return ERROR_INT("function not present", "convertG4ToPSEmbed", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertG4ToPS(const char *filein, const char *fileout,
-                      const char *operation, l_int32 x, l_int32 y,
-                      l_int32 res, l_float32 scale, l_int32 pageno,
-                      l_int32 maskflag, l_int32 endpage)
+l_ok convertG4ToPS(const char *filein, const char *fileout,
+                   const char *operation, l_int32 x, l_int32 y,
+                   l_int32 res, l_float32 scale, l_int32 pageno,
+                   l_int32 maskflag, l_int32 endpage)
 {
     return ERROR_INT("function not present", "convertG4ToPS", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertG4ToPSString(const char *filein, char **poutstr,
-                            l_int32 *pnbytes, l_int32 x, l_int32 y,
-                            l_int32 res, l_float32 scale, l_int32 pageno,
-                            l_int32 maskflag, l_int32 endpage)
+l_ok convertG4ToPSString(const char *filein, char **poutstr,
+                         l_int32 *pnbytes, l_int32 x, l_int32 y,
+                         l_int32 res, l_float32 scale, l_int32 pageno,
+                         l_int32 maskflag, l_int32 endpage)
 {
     return ERROR_INT("function not present", "convertG4ToPSString", 1);
 }
@@ -161,35 +161,35 @@ char * generateG4PS(const char *filein, L_COMP_DATA *cid, l_float32 xpt,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertTiffMultipageToPS(const char *filein, const char *fileout,
-                                 l_float32 fillfract)
+l_ok convertTiffMultipageToPS(const char *filein, const char *fileout,
+                              l_float32 fillfract)
 {
     return ERROR_INT("function not present", "convertTiffMultipageToPS", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertFlateToPSEmbed(const char *filein, const char *fileout)
+l_ok convertFlateToPSEmbed(const char *filein, const char *fileout)
 {
     return ERROR_INT("function not present", "convertFlateToPSEmbed", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertFlateToPS(const char *filein, const char *fileout,
-                         const char *operation, l_int32 x, l_int32 y,
-                         l_int32 res, l_float32 scale, l_int32 pageno,
-                         l_int32 endpage)
+l_ok convertFlateToPS(const char *filein, const char *fileout,
+                      const char *operation, l_int32 x, l_int32 y,
+                      l_int32 res, l_float32 scale, l_int32 pageno,
+                      l_int32 endpage)
 {
     return ERROR_INT("function not present", "convertFlateToPS", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertFlateToPSString(const char *filein, char **poutstr,
-                               l_int32 *pnbytes, l_int32 x, l_int32 y,
-                               l_int32 res, l_float32 scale,
-                               l_int32 pageno, l_int32 endpage)
+l_ok convertFlateToPSString(const char *filein, char **poutstr,
+                            l_int32 *pnbytes, l_int32 x, l_int32 y,
+                            l_int32 res, l_float32 scale,
+                            l_int32 pageno, l_int32 endpage)
 {
     return ERROR_INT("function not present", "convertFlateToPSString", 1);
 }
@@ -205,8 +205,8 @@ char * generateFlatePS(const char *filein, L_COMP_DATA *cid,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteMemPS(l_uint8 **pdata, size_t *psize, PIX *pix, BOX *box,
-                      l_int32 res, l_float32 scale)
+l_ok pixWriteMemPS(l_uint8 **pdata, size_t *psize, PIX *pix, BOX *box,
+                   l_int32 res, l_float32 scale)
 {
     return ERROR_INT("function not present", "pixWriteMemPS", 1);
 }

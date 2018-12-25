@@ -450,7 +450,7 @@ CCBORD  *ccb;
  * \param[in]    ccb to be added by insertion
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ccbaAddCcb(CCBORDA  *ccba,
            CCBORD   *ccb)
 {
@@ -523,11 +523,13 @@ ccbaGetCount(CCBORDA  *ccba)
  * \brief   ccbaGetCcb()
  *
  * \param[in]    ccba
+ * \param[in]    index
  * \return  ccb, or NULL on error
  *
  * <pre>
  * Notes:
  *      (1) This returns a clone of the ccb; it must be destroyed
+ * </pre>
  */
 CCBORD *
 ccbaGetCcb(CCBORDA  *ccba,
@@ -888,7 +890,7 @@ PTA     *ptaloc, *ptad;
  *          and we do not store the second pixel again.
  * </pre>
  */
-l_int32
+l_ok
 pixGetOuterBorder(CCBORD   *ccb,
                   PIX      *pixs,
                   BOX      *box)
@@ -976,7 +978,7 @@ PIX       *pixb;  /* with 1 pixel border */
  *          exterior borders
  * </pre>
  */
-l_int32
+l_ok
 pixGetHoleBorder(CCBORD   *ccb,
                  PIX      *pixs,
                  BOX      *box,
@@ -1154,7 +1156,7 @@ l_int32  dx, dy;
  *          relative to each c.c., to find the global pixel locations,
  *          and stores them in the global ptaa.
  */
-l_int32
+l_ok
 ccbaGenerateGlobalLocs(CCBORDA  *ccba)
 {
 l_int32  ncc, nb, n, i, j, k, xul, yul, x, y;
@@ -1225,7 +1227,7 @@ PTA     *ptal, *ptag;
  *          indexing into a 2-d 3x3 array (dirtab).
  * </pre>
  */
-l_int32
+l_ok
 ccbaGenerateStepChains(CCBORDA  *ccba)
 {
 l_int32  ncc, nb, n, i, j, k;
@@ -1299,7 +1301,7 @@ PTAA    *ptaal;  /* local chain code */
  *          pixel locations are relative to the c.c.
  * </pre>
  */
-l_int32
+l_ok
 ccbaStepChainsToPixCoords(CCBORDA  *ccba,
                           l_int32   coordtype)
 {
@@ -1399,7 +1401,7 @@ PTA     *ptas, *ptan;
  *          when all border points are listed.
  * </pre>
  */
-l_int32
+l_ok
 ccbaGenerateSPGlobalLocs(CCBORDA  *ccba,
                          l_int32   ptsflag)
 {
@@ -1516,7 +1518,7 @@ PTA     *ptal, *ptag;
  *          The single path is saved in the ccb.
  * </pre>
  */
-l_int32
+l_ok
 ccbaGenerateSinglePath(CCBORDA  *ccba)
 {
 l_int32   i, j, k, ncc, nb, ncut, npt, dir, len, state, lostholes;
@@ -2189,7 +2191,7 @@ PTA     *pta;
  * \param[in]    ccba
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ccbaWrite(const char  *filename,
           CCBORDA     *ccba)
 {
@@ -2241,7 +2243,7 @@ FILE  *fp;
  *                   end in z8 or 88  1B
  * \endcode
  */
-l_int32
+l_ok
 ccbaWriteStream(FILE     *fp,
                 CCBORDA  *ccba)
 {
@@ -2422,9 +2424,9 @@ NUMAA    *step;
         return (CCBORDA *)ERROR_PTR("dataout not made", procName, NULL);
 
     offset = 18;
-    memcpy((void *)strbuf, (void *)dataout, offset);
+    memcpy(strbuf, dataout, offset);
     strbuf[17] = '\0';
-    if (strncmp(strbuf, "ccba:", 5) != 0) {
+    if (memcmp(strbuf, "ccba:", 5) != 0) {
         LEPT_FREE(dataout);
         return (CCBORDA *)ERROR_PTR("file not type ccba", procName, NULL);
     }
@@ -2435,9 +2437,9 @@ NUMAA    *step;
         return (CCBORDA *)ERROR_PTR("ccba not made", procName, NULL);
     }
 
-    memcpy((void *)&width, (void *)(dataout + offset), 4);
+    memcpy(&width, dataout + offset, 4);
     offset += 4;
-    memcpy((void *)&height, (void *)(dataout + offset), 4);
+    memcpy(&height, dataout + offset, 4);
     offset += 4;
     ccba->w = width;
     ccba->h = height;
@@ -2447,29 +2449,29 @@ NUMAA    *step;
         ccb = ccbCreate(NULL);
         ccbaAddCcb(ccba, ccb);
 
-        memcpy((void *)&xoff, (void *)(dataout + offset), 4);
+        memcpy(&xoff, dataout + offset, 4);
         offset += 4;
-        memcpy((void *)&yoff, (void *)(dataout + offset), 4);
+        memcpy(&yoff, dataout + offset, 4);
         offset += 4;
-        memcpy((void *)&w, (void *)(dataout + offset), 4);
+        memcpy(&w, dataout + offset, 4);
         offset += 4;
-        memcpy((void *)&h, (void *)(dataout + offset), 4);
+        memcpy(&h, dataout + offset, 4);
         offset += 4;
         box = boxCreate(xoff, yoff, w, h);
         boxaAddBox(ccb->boxa, box, L_INSERT);
 /*        fprintf(stderr, "xoff = %d, yoff = %d, w = %d, h = %d\n",
                 xoff, yoff, w, h); */
 
-        memcpy((void *)&nb, (void *)(dataout + offset), 4);
+        memcpy(&nb, dataout + offset, 4);
         offset += 4;
 /*        fprintf(stderr, "num borders = %d\n", nb); */
         step = numaaCreate(nb);
         ccb->step = step;
 
         for (j = 0; j < nb; j++) {  /* should be nb */
-            memcpy((void *)&startx, (void *)(dataout + offset), 4);
+            memcpy(&startx, dataout + offset, 4);
             offset += 4;
-            memcpy((void *)&starty, (void *)(dataout + offset), 4);
+            memcpy(&starty, dataout + offset, 4);
             offset += 4;
             ptaAddPt(ccb->start, startx, starty);
 /*            fprintf(stderr, "startx = %d, starty = %d\n", startx, starty); */
@@ -2509,7 +2511,7 @@ NUMAA    *step;
  * \param[in]    ccba
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ccbaWriteSVG(const char  *filename,
              CCBORDA     *ccba)
 {

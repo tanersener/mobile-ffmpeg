@@ -33,7 +33,9 @@
  *    |=============================================================|
  *    | Some of these functions require libtiff, libjpeg and libz.  |
  *    | If you do not have these libraries, you must set            |
+ *    | \code                                                       |
  *    |     #define  USE_PSIO     0                                 |
+ *    | \endcode                                                    |
  *    | in environ.h.  This will link psio2stub.c                   |
  *    |=============================================================|
  *
@@ -146,7 +148,7 @@ static const l_float32  DEFAULT_FILL_FRACTION = 0.95;
  *          8.5 x 11.0 inch page.
  * </pre>
  */
-l_int32
+l_ok
 pixWritePSEmbed(const char  *filein,
                 const char  *fileout)
 {
@@ -199,7 +201,7 @@ PIX       *pix;
  *      (2) For details on use of parameters, see pixWriteStringPS().
  * </pre>
  */
-l_int32
+l_ok
 pixWriteStreamPS(FILE      *fp,
                  PIX       *pix,
                  BOX       *box,
@@ -431,19 +433,19 @@ SARRAY  *sa;
 
     if ((sa = sarrayCreate(0)) == NULL)
         return (char *)ERROR_PTR("sa not made", procName, NULL);
-    sarrayAddString(sa, (char *)"%!Adobe-PS", L_COPY);
+    sarrayAddString(sa, "%!Adobe-PS", L_COPY);
     if (boxflag == 0) {
         snprintf(bigbuf, sizeof(bigbuf),
                  "%%%%BoundingBox: %7.2f %7.2f %7.2f %7.2f",
                  xpt, ypt, xpt + wpt, ypt + hpt);
         sarrayAddString(sa, bigbuf, L_COPY);
     } else {  /* boxflag == 1 */
-        sarrayAddString(sa, (char *)"gsave", L_COPY);
+        sarrayAddString(sa, "gsave", L_COPY);
     }
 
     if (d == 1)
         sarrayAddString(sa,
-              (char *)"{1 exch sub} settransfer    %invert binary", L_COPY);
+              "{1 exch sub} settransfer    %invert binary", L_COPY);
 
     snprintf(bigbuf, sizeof(bigbuf),
             "/bpl %d string def         %%bpl as a string", psbpl);
@@ -465,27 +467,27 @@ SARRAY  *sa;
     if (boxflag == 0) {
         if (d == 1 || d == 8)
             sarrayAddString(sa,
-                (char *)"{currentfile bpl readhexstring pop} image", L_COPY);
+                "{currentfile bpl readhexstring pop} image", L_COPY);
         else  /* d == 32 */
             sarrayAddString(sa,
-              (char *)"{currentfile bpl readhexstring pop} false 3 colorimage",
-              L_COPY);
+                "{currentfile bpl readhexstring pop} false 3 colorimage",
+                L_COPY);
     } else {  /* boxflag == 1 */
         if (d == 1 || d == 8)
             sarrayAddString(sa,
-              (char *)"{currentfile bpl readhexstring pop} bind image", L_COPY);
+                "{currentfile bpl readhexstring pop} bind image", L_COPY);
         else  /* d == 32 */
             sarrayAddString(sa,
-          (char *)"{currentfile bpl readhexstring pop} bind false 3 colorimage",
-                 L_COPY);
+                "{currentfile bpl readhexstring pop} bind false 3 colorimage",
+                L_COPY);
     }
 
     sarrayAddString(sa, hexdata, L_INSERT);
 
     if (boxflag == 0)
-        sarrayAddString(sa, (char *)"\nshowpage", L_COPY);
+        sarrayAddString(sa, "\nshowpage", L_COPY);
     else  /* boxflag == 1 */
-        sarrayAddString(sa, (char *)"\ngrestore", L_COPY);
+        sarrayAddString(sa, "\ngrestore", L_COPY);
 
     outstr = sarrayToString(sa, 1);
     sarrayDestroy(&sa);
@@ -637,7 +639,7 @@ l_uint8  nib;
  *          8.5 x 11.0 inch page.
  * </pre>
  */
-l_int32
+l_ok
 convertJpegToPSEmbed(const char  *filein,
                      const char  *fileout)
 {
@@ -752,7 +754,7 @@ L_COMP_DATA  *cid;
  *          a page directory, which viewers use for navigation.
  * </pre>
  */
-l_int32
+l_ok
 convertJpegToPS(const char  *filein,
                 const char  *fileout,
                 const char  *operation,
@@ -811,7 +813,7 @@ l_int32  nbytes;
  *      (1) For usage, see convertJpegToPS()
  * </pre>
  */
-l_int32
+l_ok
 convertJpegToPSString(const char  *filein,
                       char       **poutstr,
                       l_int32     *pnbytes,
@@ -932,14 +934,14 @@ SARRAY  *sa;
     if ((sa = sarrayCreate(50)) == NULL)
         return (char *)ERROR_PTR("sa not made", procName, NULL);
 
-    sarrayAddString(sa, (char *)"%!PS-Adobe-3.0", L_COPY);
-    sarrayAddString(sa, (char *)"%%Creator: leptonica", L_COPY);
+    sarrayAddString(sa, "%!PS-Adobe-3.0", L_COPY);
+    sarrayAddString(sa, "%%Creator: leptonica", L_COPY);
     if (filein)
         snprintf(bigbuf, sizeof(bigbuf), "%%%%Title: %s", filein);
     else
         snprintf(bigbuf, sizeof(bigbuf), "%%%%Title: Jpeg compressed PS");
     sarrayAddString(sa, bigbuf, L_COPY);
-    sarrayAddString(sa, (char *)"%%DocumentData: Clean7Bit", L_COPY);
+    sarrayAddString(sa, "%%DocumentData: Clean7Bit", L_COPY);
 
     if (var_PS_WRITE_BOUNDING_BOX == 1) {
         snprintf(bigbuf, sizeof(bigbuf),
@@ -948,16 +950,15 @@ SARRAY  *sa;
         sarrayAddString(sa, bigbuf, L_COPY);
     }
 
-    sarrayAddString(sa, (char *)"%%LanguageLevel: 2", L_COPY);
-    sarrayAddString(sa, (char *)"%%EndComments", L_COPY);
+    sarrayAddString(sa, "%%LanguageLevel: 2", L_COPY);
+    sarrayAddString(sa, "%%EndComments", L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "%%%%Page: %d %d", pageno, pageno);
     sarrayAddString(sa, bigbuf, L_COPY);
 
-    sarrayAddString(sa, (char *)"save", L_COPY);
+    sarrayAddString(sa, "save", L_COPY);
     sarrayAddString(sa,
-           (char *)"/RawData currentfile /ASCII85Decode filter def", L_COPY);
-    sarrayAddString(sa,
-           (char *)"/Data RawData << >> /DCTDecode filter def", L_COPY);
+                    "/RawData currentfile /ASCII85Decode filter def", L_COPY);
+    sarrayAddString(sa, "/Data RawData << >> /DCTDecode filter def", L_COPY);
 
     snprintf(bigbuf, sizeof(bigbuf),
         "%7.2f %7.2f translate         %%set image origin in pts", xpt, ypt);
@@ -968,13 +969,13 @@ SARRAY  *sa;
     sarrayAddString(sa, bigbuf, L_COPY);
 
     if (spp == 1)
-        sarrayAddString(sa, (char *)"/DeviceGray setcolorspace", L_COPY);
+        sarrayAddString(sa, "/DeviceGray setcolorspace", L_COPY);
     else if (spp == 3)
-        sarrayAddString(sa, (char *)"/DeviceRGB setcolorspace", L_COPY);
+        sarrayAddString(sa, "/DeviceRGB setcolorspace", L_COPY);
     else  /*spp == 4 */
-        sarrayAddString(sa, (char *)"/DeviceCMYK setcolorspace", L_COPY);
+        sarrayAddString(sa, "/DeviceCMYK setcolorspace", L_COPY);
 
-    sarrayAddString(sa, (char *)"{ << /ImageType 1", L_COPY);
+    sarrayAddString(sa, "{ << /ImageType 1", L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "     /Width %d", w);
     sarrayAddString(sa, bigbuf, L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "     /Height %d", h);
@@ -982,24 +983,24 @@ SARRAY  *sa;
     snprintf(bigbuf, sizeof(bigbuf),
             "     /ImageMatrix [ %d 0 0 %d 0 %d ]", w, -h, h);
     sarrayAddString(sa, bigbuf, L_COPY);
-    sarrayAddString(sa, (char *)"     /DataSource Data", L_COPY);
+    sarrayAddString(sa, "     /DataSource Data", L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "     /BitsPerComponent %d", bps);
     sarrayAddString(sa, bigbuf, L_COPY);
 
     if (spp == 1)
-        sarrayAddString(sa, (char *)"     /Decode [0 1]", L_COPY);
+        sarrayAddString(sa, "     /Decode [0 1]", L_COPY);
     else if (spp == 3)
-        sarrayAddString(sa, (char *)"     /Decode [0 1 0 1 0 1]", L_COPY);
+        sarrayAddString(sa, "     /Decode [0 1 0 1 0 1]", L_COPY);
     else   /* spp == 4 */
-        sarrayAddString(sa, (char *)"     /Decode [0 1 0 1 0 1 0 1]", L_COPY);
+        sarrayAddString(sa, "     /Decode [0 1 0 1 0 1 0 1]", L_COPY);
 
-    sarrayAddString(sa, (char *)"  >> image", L_COPY);
-    sarrayAddString(sa, (char *)"  Data closefile", L_COPY);
-    sarrayAddString(sa, (char *)"  RawData flushfile", L_COPY);
+    sarrayAddString(sa, "  >> image", L_COPY);
+    sarrayAddString(sa, "  Data closefile", L_COPY);
+    sarrayAddString(sa, "  RawData flushfile", L_COPY);
     if (endpage == TRUE)
-        sarrayAddString(sa, (char *)"  showpage", L_COPY);
-    sarrayAddString(sa, (char *)"  restore", L_COPY);
-    sarrayAddString(sa, (char *)"} exec", L_COPY);
+        sarrayAddString(sa, "  showpage", L_COPY);
+    sarrayAddString(sa, "  restore", L_COPY);
+    sarrayAddString(sa, "} exec", L_COPY);
 
         /* Insert the ascii85 jpeg data; this is now owned by sa */
     sarrayAddString(sa, cid->data85, L_INSERT);
@@ -1034,7 +1035,7 @@ SARRAY  *sa;
  *      (4) We paint this through a mask, over whatever is below.
  * </pre>
  */
-l_int32
+l_ok
 convertG4ToPSEmbed(const char  *filein,
                    const char  *fileout)
 {
@@ -1140,7 +1141,7 @@ L_COMP_DATA  *cid;
  *          a page directory, which viewers use for navigation.
  * </pre>
  */
-l_int32
+l_ok
 convertG4ToPS(const char  *filein,
               const char  *fileout,
               const char  *operation,
@@ -1203,7 +1204,7 @@ l_int32  nbytes;
  *      (2) For usage, see convertG4ToPS().
  * </pre>
  */
-l_int32
+l_ok
 convertG4ToPSString(const char  *filein,
                     char       **poutstr,
                     l_int32     *pnbytes,
@@ -1325,14 +1326,14 @@ SARRAY  *sa;
     if ((sa = sarrayCreate(50)) == NULL)
         return (char *)ERROR_PTR("sa not made", procName, NULL);
 
-    sarrayAddString(sa, (char *)"%!PS-Adobe-3.0", L_COPY);
-    sarrayAddString(sa, (char *)"%%Creator: leptonica", L_COPY);
+    sarrayAddString(sa, "%!PS-Adobe-3.0", L_COPY);
+    sarrayAddString(sa, "%%Creator: leptonica", L_COPY);
     if (filein)
         snprintf(bigbuf, sizeof(bigbuf), "%%%%Title: %s", filein);
     else
         snprintf(bigbuf, sizeof(bigbuf), "%%%%Title: G4 compressed PS");
     sarrayAddString(sa, bigbuf, L_COPY);
-    sarrayAddString(sa, (char *)"%%DocumentData: Clean7Bit", L_COPY);
+    sarrayAddString(sa, "%%DocumentData: Clean7Bit", L_COPY);
 
     if (var_PS_WRITE_BOUNDING_BOX == 1) {
         snprintf(bigbuf, sizeof(bigbuf),
@@ -1341,13 +1342,13 @@ SARRAY  *sa;
         sarrayAddString(sa, bigbuf, L_COPY);
     }
 
-    sarrayAddString(sa, (char *)"%%LanguageLevel: 2", L_COPY);
-    sarrayAddString(sa, (char *)"%%EndComments", L_COPY);
+    sarrayAddString(sa, "%%LanguageLevel: 2", L_COPY);
+    sarrayAddString(sa, "%%EndComments", L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "%%%%Page: %d %d", pageno, pageno);
     sarrayAddString(sa, bigbuf, L_COPY);
 
-    sarrayAddString(sa, (char *)"save", L_COPY);
-    sarrayAddString(sa, (char *)"100 dict begin", L_COPY);
+    sarrayAddString(sa, "save", L_COPY);
+    sarrayAddString(sa, "100 dict begin", L_COPY);
 
     snprintf(bigbuf, sizeof(bigbuf),
         "%7.2f %7.2f translate         %%set image origin in pts", xpt, ypt);
@@ -1357,13 +1358,13 @@ SARRAY  *sa;
         "%7.2f %7.2f scale             %%set image size in pts", wpt, hpt);
     sarrayAddString(sa, bigbuf, L_COPY);
 
-    sarrayAddString(sa, (char *)"/DeviceGray setcolorspace", L_COPY);
+    sarrayAddString(sa, "/DeviceGray setcolorspace", L_COPY);
 
-    sarrayAddString(sa, (char *)"{", L_COPY);
+    sarrayAddString(sa, "{", L_COPY);
     sarrayAddString(sa,
-          (char *)"  /RawData currentfile /ASCII85Decode filter def", L_COPY);
-    sarrayAddString(sa, (char *)"  << ", L_COPY);
-    sarrayAddString(sa, (char *)"    /ImageType 1", L_COPY);
+          "  /RawData currentfile /ASCII85Decode filter def", L_COPY);
+    sarrayAddString(sa, "  << ", L_COPY);
+    sarrayAddString(sa, "    /ImageType 1", L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "    /Width %d", w);
     sarrayAddString(sa, bigbuf, L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "    /Height %d", h);
@@ -1371,39 +1372,39 @@ SARRAY  *sa;
     snprintf(bigbuf, sizeof(bigbuf),
              "    /ImageMatrix [ %d 0 0 %d 0 %d ]", w, -h, h);
     sarrayAddString(sa, bigbuf, L_COPY);
-    sarrayAddString(sa, (char *)"    /BitsPerComponent 1", L_COPY);
-    sarrayAddString(sa, (char *)"    /Interpolate true", L_COPY);
+    sarrayAddString(sa, "    /BitsPerComponent 1", L_COPY);
+    sarrayAddString(sa, "    /Interpolate true", L_COPY);
     if (cid->minisblack)
-        sarrayAddString(sa, (char *)"    /Decode [1 0]", L_COPY);
+        sarrayAddString(sa, "    /Decode [1 0]", L_COPY);
     else  /* miniswhite; typical for 1 bpp */
-        sarrayAddString(sa, (char *)"    /Decode [0 1]", L_COPY);
-    sarrayAddString(sa, (char *)"    /DataSource RawData", L_COPY);
-    sarrayAddString(sa, (char *)"        <<", L_COPY);
-    sarrayAddString(sa, (char *)"          /K -1", L_COPY);
+        sarrayAddString(sa, "    /Decode [0 1]", L_COPY);
+    sarrayAddString(sa, "    /DataSource RawData", L_COPY);
+    sarrayAddString(sa, "        <<", L_COPY);
+    sarrayAddString(sa, "          /K -1", L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "          /Columns %d", w);
     sarrayAddString(sa, bigbuf, L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "          /Rows %d", h);
     sarrayAddString(sa, bigbuf, L_COPY);
-    sarrayAddString(sa, (char *)"        >> /CCITTFaxDecode filter", L_COPY);
+    sarrayAddString(sa, "        >> /CCITTFaxDecode filter", L_COPY);
     if (maskflag == TRUE)  /* just paint through the fg */
-        sarrayAddString(sa, (char *)"  >> imagemask", L_COPY);
+        sarrayAddString(sa, "  >> imagemask", L_COPY);
     else  /* Paint full image */
-        sarrayAddString(sa, (char *)"  >> image", L_COPY);
-    sarrayAddString(sa, (char *)"  RawData flushfile", L_COPY);
+        sarrayAddString(sa, "  >> image", L_COPY);
+    sarrayAddString(sa, "  RawData flushfile", L_COPY);
     if (endpage == TRUE)
-        sarrayAddString(sa, (char *)"  showpage", L_COPY);
-    sarrayAddString(sa, (char *)"}", L_COPY);
+        sarrayAddString(sa, "  showpage", L_COPY);
+    sarrayAddString(sa, "}", L_COPY);
 
-    sarrayAddString(sa, (char *)"%%BeginData:", L_COPY);
-    sarrayAddString(sa, (char *)"exec", L_COPY);
+    sarrayAddString(sa, "%%BeginData:", L_COPY);
+    sarrayAddString(sa, "exec", L_COPY);
 
         /* Insert the ascii85 ccittg4 data; this is now owned by sa */
     sarrayAddString(sa, cid->data85, L_INSERT);
 
         /* Concat the trailing data */
-    sarrayAddString(sa, (char *)"%%EndData", L_COPY);
-    sarrayAddString(sa, (char *)"end", L_COPY);
-    sarrayAddString(sa, (char *)"restore", L_COPY);
+    sarrayAddString(sa, "%%EndData", L_COPY);
+    sarrayAddString(sa, "end", L_COPY);
+    sarrayAddString(sa, "restore", L_COPY);
 
     outstr = sarrayToString(sa, 1);
     sarrayDestroy(&sa);
@@ -1433,7 +1434,7 @@ SARRAY  *sa;
  *          aspect ratio.
  * </pre>
  */
-l_int32
+l_ok
 convertTiffMultipageToPS(const char  *filein,
                          const char  *fileout,
                          l_float32    fillfract)
@@ -1513,7 +1514,7 @@ FILE      *fp;
  *          8.5 x 11.0 inch page.
  * </pre>
  */
-l_int32
+l_ok
 convertFlateToPSEmbed(const char  *filein,
                       const char  *fileout)
 {
@@ -1626,7 +1627,7 @@ L_COMP_DATA  *cid;
  *          a page directory, which viewers use for navigation.
  * </pre>
  */
-l_int32
+l_ok
 convertFlateToPS(const char  *filein,
                  const char  *fileout,
                  const char  *operation,
@@ -1692,7 +1693,7 @@ l_int32  nbytes, ret;
  *  Usage:  See convertFlateToPS()
  * </pre>
  */
-l_int32
+l_ok
 convertFlateToPSString(const char  *filein,
                        char       **poutstr,
                        l_int32     *pnbytes,
@@ -1803,14 +1804,14 @@ SARRAY  *sa;
     if ((sa = sarrayCreate(50)) == NULL)
         return (char *)ERROR_PTR("sa not made", procName, NULL);
 
-    sarrayAddString(sa, (char *)"%!PS-Adobe-3.0 EPSF-3.0", L_COPY);
-    sarrayAddString(sa, (char *)"%%Creator: leptonica", L_COPY);
+    sarrayAddString(sa, "%!PS-Adobe-3.0 EPSF-3.0", L_COPY);
+    sarrayAddString(sa, "%%Creator: leptonica", L_COPY);
     if (filein)
         snprintf(bigbuf, sizeof(bigbuf), "%%%%Title: %s", filein);
     else
         snprintf(bigbuf, sizeof(bigbuf), "%%%%Title: Flate compressed PS");
     sarrayAddString(sa, bigbuf, L_COPY);
-    sarrayAddString(sa, (char *)"%%DocumentData: Clean7Bit", L_COPY);
+    sarrayAddString(sa, "%%DocumentData: Clean7Bit", L_COPY);
 
     if (var_PS_WRITE_BOUNDING_BOX == 1) {
         snprintf(bigbuf, sizeof(bigbuf),
@@ -1819,12 +1820,12 @@ SARRAY  *sa;
         sarrayAddString(sa, bigbuf, L_COPY);
     }
 
-    sarrayAddString(sa, (char *)"%%LanguageLevel: 3", L_COPY);
-    sarrayAddString(sa, (char *)"%%EndComments", L_COPY);
+    sarrayAddString(sa, "%%LanguageLevel: 3", L_COPY);
+    sarrayAddString(sa, "%%EndComments", L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "%%%%Page: %d %d", pageno, pageno);
     sarrayAddString(sa, bigbuf, L_COPY);
 
-    sarrayAddString(sa, (char *)"save", L_COPY);
+    sarrayAddString(sa, "save", L_COPY);
     snprintf(bigbuf, sizeof(bigbuf),
            "%7.2f %7.2f translate         %%set image origin in pts", xpt, ypt);
     sarrayAddString(sa, bigbuf, L_COPY);
@@ -1839,21 +1840,21 @@ SARRAY  *sa;
                  "[ /Indexed /DeviceRGB %d          %%set colormap type/size",
                  cid->ncolors - 1);
         sarrayAddString(sa, bigbuf, L_COPY);
-        sarrayAddString(sa, (char *)"  <~", L_COPY);
+        sarrayAddString(sa, "  <~", L_COPY);
         sarrayAddString(sa, cid->cmapdata85, L_INSERT);
-        sarrayAddString(sa, (char *)"  ] setcolorspace", L_COPY);
+        sarrayAddString(sa, "  ] setcolorspace", L_COPY);
     } else if (spp == 1) {
-        sarrayAddString(sa, (char *)"/DeviceGray setcolorspace", L_COPY);
+        sarrayAddString(sa, "/DeviceGray setcolorspace", L_COPY);
     } else {  /* spp == 3 */
-        sarrayAddString(sa, (char *)"/DeviceRGB setcolorspace", L_COPY);
+        sarrayAddString(sa, "/DeviceRGB setcolorspace", L_COPY);
     }
 
     sarrayAddString(sa,
-              (char *)"/RawData currentfile /ASCII85Decode filter def", L_COPY);
+                    "/RawData currentfile /ASCII85Decode filter def", L_COPY);
     sarrayAddString(sa,
-              (char *)"/Data RawData << >> /FlateDecode filter def", L_COPY);
+                    "/Data RawData << >> /FlateDecode filter def", L_COPY);
 
-    sarrayAddString(sa, (char *)"{ << /ImageType 1", L_COPY);
+    sarrayAddString(sa, "{ << /ImageType 1", L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "     /Width %d", w);
     sarrayAddString(sa, bigbuf, L_COPY);
     snprintf(bigbuf, sizeof(bigbuf), "     /Height %d", h);
@@ -1865,24 +1866,24 @@ SARRAY  *sa;
     sarrayAddString(sa, bigbuf, L_COPY);
 
     if (cid->cmapdata85) {
-        sarrayAddString(sa, (char *)"     /Decode [0 255]", L_COPY);
+        sarrayAddString(sa, "     /Decode [0 255]", L_COPY);
     } else if (spp == 1) {
         if (bps == 1)  /* miniswhite photometry */
-            sarrayAddString(sa, (char *)"     /Decode [1 0]", L_COPY);
+            sarrayAddString(sa, "     /Decode [1 0]", L_COPY);
         else  /* bps > 1 */
-            sarrayAddString(sa, (char *)"     /Decode [0 1]", L_COPY);
+            sarrayAddString(sa, "     /Decode [0 1]", L_COPY);
     } else {  /* spp == 3 */
-        sarrayAddString(sa, (char *)"     /Decode [0 1 0 1 0 1]", L_COPY);
+        sarrayAddString(sa, "     /Decode [0 1 0 1 0 1]", L_COPY);
     }
 
-    sarrayAddString(sa, (char *)"     /DataSource Data", L_COPY);
-    sarrayAddString(sa, (char *)"  >> image", L_COPY);
-    sarrayAddString(sa, (char *)"  Data closefile", L_COPY);
-    sarrayAddString(sa, (char *)"  RawData flushfile", L_COPY);
+    sarrayAddString(sa, "     /DataSource Data", L_COPY);
+    sarrayAddString(sa, "  >> image", L_COPY);
+    sarrayAddString(sa, "  Data closefile", L_COPY);
+    sarrayAddString(sa, "  RawData flushfile", L_COPY);
     if (endpage == TRUE)
-        sarrayAddString(sa, (char *)"  showpage", L_COPY);
-    sarrayAddString(sa, (char *)"  restore", L_COPY);
-    sarrayAddString(sa, (char *)"} exec", L_COPY);
+        sarrayAddString(sa, "  showpage", L_COPY);
+    sarrayAddString(sa, "  restore", L_COPY);
+    sarrayAddString(sa, "} exec", L_COPY);
 
         /* Insert the ascii85 gzipped data; this is now owned by sa */
     sarrayAddString(sa, cid->data85, L_INSERT);
@@ -1917,7 +1918,7 @@ SARRAY  *sa;
  *          writes uncompressed image data to memory.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteMemPS(l_uint8  **pdata,
               size_t    *psize,
               PIX       *pix,
@@ -1950,7 +1951,7 @@ pixWriteMemPS(l_uint8  **pdata,
  * \param[in]    h image height, pixels
  * \param[in]    fillfract fraction in linear dimension of full page, not
  *                         to be exceeded; use 0 for default
- * \return  0 if OK, 1 on error
+ * \return  resolution
  */
 l_int32
 getResLetterPage(l_int32    w,
@@ -1975,7 +1976,7 @@ l_int32  resw, resh, res;
  * \param[in]    h image height, pixels
  * \param[in]    fillfract fraction in linear dimension of full page, not
  *                        to be exceeded; use 0 for default
- * \return  0 if OK, 1 on error
+ * \return  resolution
  */
 l_int32
 getResA4Page(l_int32    w,

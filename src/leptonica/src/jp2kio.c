@@ -468,7 +468,7 @@ PIX               *pix = NULL;
  *      (4) For now, we only support 1 "layer" for quality.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteJp2k(const char  *filename,
              PIX         *pix,
              l_int32      quality,
@@ -515,7 +515,7 @@ FILE  *fp;
  *    https://github.com/OpenJPEG/openjpeg/blob/master/tests/test_tile_encoder.c
  * </pre>
  */
-l_int32
+l_ok
 pixWriteStreamJp2k(FILE    *fp,
                    PIX     *pix,
                    l_int32  quality,
@@ -821,7 +821,7 @@ PIX      *pix;
  *          memory instead of to a file stream.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteMemJp2k(l_uint8  **pdata,
                 size_t    *psize,
                 PIX       *pix,

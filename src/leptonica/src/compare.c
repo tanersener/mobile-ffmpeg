@@ -146,7 +146,7 @@ static l_int32 pixCompareTilesByHisto(PIX *pix1, PIX *pix2, l_int32 maxgray,
  *          in the image part of the data array must be identical.
  * </pre>
  */
-l_int32
+l_ok
 pixEqual(PIX      *pix1,
          PIX      *pix2,
          l_int32  *psame)
@@ -172,7 +172,7 @@ pixEqual(PIX      *pix1,
  *          the alpha component in the comparison.
  * </pre>
  */
-l_int32
+l_ok
 pixEqualWithAlpha(PIX      *pix1,
                   PIX      *pix2,
                   l_int32   use_alpha,
@@ -374,7 +374,7 @@ PIXCMAP   *cmap1, *cmap2;
  *          slow brute force.
  * </pre>
  */
-l_int32
+l_ok
 pixEqualWithCmap(PIX      *pix1,
                  PIX      *pix2,
                  l_int32  *psame)
@@ -470,7 +470,7 @@ PIXCMAP   *cmap1, *cmap2;
  *          compared.
  * </pre>
  */
-l_int32
+l_ok
 cmapEqual(PIXCMAP  *cmap1,
           PIXCMAP  *cmap2,
           l_int32   ncomps,
@@ -528,7 +528,7 @@ l_int32  n1, n2, i, rval1, rval2, gval1, gval2, bval1, bval2, aval1, aval2;
  *          has color entries that are actually used in the image.
  * </pre>
  */
-l_int32
+l_ok
 pixUsesCmapColor(PIX      *pixs,
                  l_int32  *pcolor)
 {
@@ -594,7 +594,7 @@ PIXCMAP  *cmap;
  *          is not enforced.  Instead, the UL corners are aligned.
  * </pre>
  */
-l_int32
+l_ok
 pixCorrelationBinary(PIX        *pix1,
                      PIX        *pix2,
                      l_float32  *pval)
@@ -708,7 +708,7 @@ PIXCMAP  *cmap;
  *      (3) The total number of pixels is determined by pix1.
  * </pre>
  */
-l_int32
+l_ok
 pixCompareBinary(PIX        *pix1,
                  PIX        *pix2,
                  l_int32     comptype,
@@ -784,7 +784,7 @@ PIX      *pixt;
  *          the RMS differences for each of the components.
  * </pre>
  */
-l_int32
+l_ok
 pixCompareGrayOrRGB(PIX        *pix1,
                     PIX        *pix2,
                     l_int32     comptype,
@@ -855,7 +855,7 @@ PIX     *pixt1, *pixt2;
  *                output files.
  * </pre>
  */
-l_int32
+l_ok
 pixCompareGray(PIX        *pix1,
                PIX        *pix2,
                l_int32     comptype,
@@ -964,7 +964,7 @@ PIX            *pixt;
  *                output files.
  * </pre>
  */
-l_int32
+l_ok
 pixCompareRGB(PIX        *pix1,
               PIX        *pix2,
               l_int32     comptype,
@@ -1120,7 +1120,7 @@ PIX            *pixr, *pixg, *pixb;
  *      (4) The result, pixdiff, contains one pixel for each source tile.
  * </pre>
  */
-l_int32
+l_ok
 pixCompareTiled(PIX     *pix1,
                 PIX     *pix2,
                 l_int32  sx,
@@ -1299,7 +1299,7 @@ NUMA       *nah, *nan, *nad;
  *          saved in the histogram.
  * </pre>
  */
-l_int32
+l_ok
 pixTestForSimilarity(PIX       *pix1,
                      PIX       *pix2,
                      l_int32    factor,
@@ -1378,7 +1378,7 @@ l_float32   fractdiff, avediff;
  *          that the two pix will be considered similar.
  * </pre>
  */
-l_int32
+l_ok
 pixGetDifferenceStats(PIX        *pix1,
                       PIX        *pix2,
                       l_int32     factor,
@@ -1611,7 +1611,7 @@ PIX        *pixt1, *pixt2;
  *          below the threshold.
  * </pre>
  */
-l_int32
+l_ok
 pixGetPerceptualDiff(PIX        *pixs1,
                      PIX        *pixs2,
                      l_int32     sampling,
@@ -1774,7 +1774,7 @@ PIX     *pix10, *pix11;
  *          about 10^(-48).
  * </pre>
  */
-l_int32
+l_ok
 pixGetPSNR(PIX        *pix1,
            PIX        *pix2,
            l_int32     factor,
@@ -1852,13 +1852,14 @@ l_float32  mse;  /* mean squared error */
  *
  * \param[in]    pixa        any depth; colormap OK
  * \param[in]    minratio    requiring sizes be compatible; < 1.0
- * \param[in]    factor      subsampling; >= 1
  * \param[in]    textthresh  threshold for text/photo; use 0 for default
+ * \param[in]    factor      subsampling; >= 1
  * \param[in]    nx, ny      num subregions to use for histograms; e.g. 3x3
  * \param[in]    simthresh   threshold for similarity; use 0 for default
  * \param[out]   pnai array  giving similarity class indices
  * \param[out]   pscores     [optional] score matrix as 1-D array of size N^2
  * \param[out]   ppixd       [optional] pix of similarity classes
+ * \param[in]    debug       1 to output histograms; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1888,7 +1889,7 @@ l_float32  mse;  /* mean squared error */
  *          on the implementation.
  * </pre>
  */
-l_int32
+l_ok
 pixaComparePhotoRegionsByHisto(PIXA        *pixa,
                                l_float32    minratio,
                                l_float32    textthresh,
@@ -1898,10 +1899,11 @@ pixaComparePhotoRegionsByHisto(PIXA        *pixa,
                                l_float32    simthresh,
                                NUMA       **pnai,
                                l_float32  **pscores,
-                               PIX        **ppixd)
+                               PIX        **ppixd,
+                               l_int32      debug)
 {
 char       *text;
-l_int32     i, j, n, w, h, w1, h1, w2, h2, ival, index;
+l_int32     i, j, n, w, h, w1, h1, w2, h2, ival, index, classid;
 l_float32   score;
 l_float32  *scores;
 NUMA       *nai, *naw, *nah;
@@ -1939,8 +1941,9 @@ PIX        *pix;
         pix = pixaGetPix(pixa, i, L_CLONE);
         text = pixGetText(pix);
         pixSetResolution(pix, 150, 150);
+        index = (debug) ? i : 0;
         pixGenPhotoHistos(pix, NULL, factor, textthresh, nx, ny,
-                          &naa, &w, &h, FALSE);
+                          &naa, &w, &h, index);
         n3a[i] = naa;
         numaAddNumber(naw, w);
         numaAddNumber(nah, h);
@@ -1953,23 +1956,24 @@ PIX        *pix;
 
         /* Do the comparisons.  We are making a set of classes, where
          * all similar images are placed in the same class.  There are
-         * 'n' input images.  The classes are labeled by 'index' (all
-         * similar images get the same 'index' value), and 'nai' maps
-         * the index of the image in the input array to the index
+         * 'n' input images.  The classes are labeled by 'classid' (all
+         * similar images get the same 'classid' value), and 'nai' maps
+         * the classid of the image in the input array to the classid
          * of the similarity class.  */
-    if ((scores = (l_float32 *)LEPT_CALLOC(n * n, sizeof(l_float32))) == NULL) {
+    if ((scores = (l_float32 *)LEPT_CALLOC((size_t)n * n, sizeof(l_float32)))
+             == NULL) {
         L_ERROR("calloc fail for scores\n", procName);
         goto cleanup;
     }
-    nai = numaMakeConstant(-1, n);  /* index */
-    for (i = 0, index = 0; i < n; i++) {
+    nai = numaMakeConstant(-1, n);  /* classid array */
+    for (i = 0, classid = 0; i < n; i++) {
         scores[n * i + i] = 1.0;
         numaGetIValue(nai, i, &ival);
         if (ival != -1)  /* already set */
             continue;
-        numaSetValue(nai, i, index);
+        numaSetValue(nai, i, classid);
         if (n3a[i] == NULL) {  /* not a photo */
-            index++;
+            classid++;
             continue;
         }
         numaGetIValue(naw, i, &w1);
@@ -1988,12 +1992,13 @@ PIX        *pix;
             scores[n * j + i] = score;  /* the score array is symmetric */
 /*            fprintf(stderr, "score = %5.3f\n", score); */
             if (score > simthresh) {
-                numaSetValue(nai, j, index);
-                fprintf(stderr, "Setting %d similar to %d, in class %d\n",
-                        j, i, index);
+                numaSetValue(nai, j, classid);
+                fprintf(stderr,
+                        "Setting %d similar to %d, in class %d; score %5.3f\n",
+                        j, i, classid, score);
             }
         }
-        index++;
+        classid++;
     }
     *pnai = nai;
 
@@ -2096,7 +2101,7 @@ cleanup:
  *          the images, histograms and score.
  * </pre>
  */
-l_int32
+l_ok
 pixComparePhotoRegionsByHisto(PIX        *pix1,
                               PIX        *pix2,
                               BOX        *box1,
@@ -2108,7 +2113,7 @@ pixComparePhotoRegionsByHisto(PIX        *pix1,
                               l_float32  *pscore,
                               l_int32     debugflag)
 {
-l_int32    w1, h1, w2, h2, w1c, h1c, w2c, h2c;
+l_int32    w1, h1, w2, h2, w1c, h1c, w2c, h2c, debugindex;
 l_float32  wratio, hratio;
 NUMAA     *naa1, *naa2;
 PIX       *pix3, *pix4;
@@ -2128,8 +2133,11 @@ PIXA      *pixa;
     if (nx < 1 || ny < 1)
         return ERROR_INT("nx and ny must both be > 0", procName, 1);
 
-    if (debugflag)
+    debugindex = 0;
+    if (debugflag) {
         lept_mkdir("lept/comp");
+        debugindex = 666;  /* arbitrary number used for naming output */
+    }
 
         /* Initial filter by size */
     if (box1)
@@ -2153,7 +2161,7 @@ PIXA      *pixa;
     else
         pix3 = pixClone(pix1);
     pixGenPhotoHistos(pix3, NULL, factor, 0, nx, ny,
-                      &naa1, &w1c, &h1c, debugflag);
+                      &naa1, &w1c, &h1c, debugindex);
     pixDestroy(&pix3);
     if (!naa1) return 0;
     if (box2)
@@ -2161,7 +2169,7 @@ PIXA      *pixa;
     else
         pix4 = pixClone(pix2);
     pixGenPhotoHistos(pix4, NULL, factor, 0, nx, ny,
-                      &naa2, &w2c, &h2c, debugflag);
+                      &naa2, &w2c, &h2c, debugindex);
     pixDestroy(&pix4);
     if (!naa2) return 0;
 
@@ -2184,7 +2192,7 @@ PIXA      *pixa;
  * \param[out]   pnaa      nx * ny 256-entry gray histograms
  * \param[out]   pw        width of image used to make histograms
  * \param[out]   ph        height of image used to make histograms
- * \param[in]    debugflag 1 for debug output; 0 for no debugging
+ * \param[in]    debugindex  0 for no debugging; positive integer otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2199,11 +2207,11 @@ PIXA      *pixa;
  *      (4) For an efficient representation of the histogram, normalize
  *          using a multiplicative factor so that the number in the
  *          maximum bucket is 255.  It then takes 256 bytes to store.
- *      (5) With debug on, you get a pdf that shows, for each tile,
+ *      (5) With %debugindex > 0, this makes a pdf that shows, for each tile,
  *          the images and histograms.
  * </pre>
  */
-l_int32
+l_ok
 pixGenPhotoHistos(PIX        *pixs,
                   BOX        *box,
                   l_int32     factor,
@@ -2213,8 +2221,9 @@ pixGenPhotoHistos(PIX        *pixs,
                   NUMAA     **pnaa,
                   l_int32    *pw,
                   l_int32    *ph,
-                  l_int32     debugflag)
+                  l_int32     debugindex)
 {
+char    buf[64];
 NUMAA  *naa;
 PIX    *pix1, *pix2, *pix3, *pixm;
 PIXA   *pixa;
@@ -2237,7 +2246,7 @@ PIXA   *pixa;
     if (thresh <= 0.0) thresh = 1.3;  /* default */
 
     pixa = NULL;
-    if (debugflag) {
+    if (debugindex > 0) {
         pixa = pixaCreate(0);
         lept_mkdir("lept/comp");
     }
@@ -2259,7 +2268,7 @@ PIXA   *pixa;
     pixSetMaskedGeneral(pix3, pixm, 255, 0, 0);
     pixDestroy(&pixm);
 
-    if (debugflag) {
+    if (debugindex > 0) {
         PIX   *pix4, *pix5, *pix6, *pix7, *pix8;
         PIXA  *pixa2;
         pix4 = pixConvertTo32(pix2);
@@ -2287,9 +2296,10 @@ PIXA   *pixa;
     }
 
     if (pixa) {
-        fprintf(stderr, "Writing to /tmp/lept/comp/tiledhistos.pdf\n");
-        pixaConvertToPdf(pixa, 300, 1.0, L_FLATE_ENCODE, 0, NULL,
-                         "/tmp/lept/comp/tiledhistos.pdf");
+        snprintf(buf, sizeof(buf), "/tmp/lept/comp/tiledhistos.%d.pdf",
+                 debugindex);
+        fprintf(stderr, "Writing to %s\n", buf);
+        pixaConvertToPdf(pixa, 300, 1.0, L_FLATE_ENCODE, 0, NULL, buf);
         pixaDestroy(&pixa);
     }
 
@@ -2367,7 +2377,7 @@ PIX       *pix1, *pixd;
  *          darker the pixel, the more weight it is given.
  * </pre>
  */
-l_int32
+l_ok
 pixCentroid8(PIX        *pixs,
              l_int32     factor,
              l_float32  *pcx,
@@ -2445,7 +2455,7 @@ PIX       *pix1;
  *      (5) Use %pixadebug == NULL unless debug output is requested.
  * </pre>
  */
-l_int32
+l_ok
 pixDecideIfPhotoImage(PIX       *pix,
                       l_int32    factor,
                       l_int32    nx,
@@ -2461,7 +2471,7 @@ L_BMF     *bmf;
 NUMA      *na1, *na2, *na3, *narv;
 NUMAA     *naa;
 PIX       *pix1;
-PIXA      *pixa, *pixa2;
+PIXA      *pixa, *pixa2, *pixa3;
 
     PROCNAME("pixDecideIfPhotoImage");
 
@@ -2484,6 +2494,10 @@ PIXA      *pixa, *pixa2;
     n = nx * ny;
     bmf = (pixadebug) ? bmfCreate(NULL, 6) : NULL;
     naa = numaaCreate(n);
+    if (pixadebug) {
+        lept_rmdir("lept/compplot");
+        lept_mkdir("lept/compplot");
+    }
     for (i = 0; i < n; i++) {
         pix1 = pixaGetPix(pixa, i, L_CLONE);
 
@@ -2494,7 +2508,7 @@ PIXA      *pixa, *pixa2;
         numaGetMax(na2, &maxval, NULL);
         na3 = numaTransform(na2, 0, 255.0 / maxval);
         if (pixadebug) {
-            snprintf(buf, sizeof(buf), "/tmp/lept/comp/plot.%d", i);
+            snprintf(buf, sizeof(buf), "/tmp/lept/compplot/plot.%d", i);
             gplotSimple1(na3, GPLOT_PNG, buf, "Histos");
         }
 
@@ -2504,9 +2518,14 @@ PIXA      *pixa, *pixa2;
         pixDestroy(&pix1);
     }
     if (pixadebug) {
-        pixa2 = pixaReadFiles("/tmp/lept/comp", ".png");
-        pixaJoin(pixa, pixa2, 0, -1);
+        pix1 = pixaDisplayTiledInColumns(pixa, 3, 1.0, 30, 2);
+        pixaAddPix(pixadebug, pix1, L_INSERT);
+        pixa2 = pixaReadFiles("/tmp/lept/compplot", ".png");
+        pixa3 = pixaScale(pixa2, 0.4, 0.4);
+        pix1 = pixaDisplayTiledInColumns(pixa3, 3, 1.0, 30, 2);
+        pixaAddPix(pixadebug, pix1, L_INSERT);
         pixaDestroy(&pixa2);
+        pixaDestroy(&pixa3);
     }
 
         /* Compute the standard deviation between these histos to decide
@@ -2568,7 +2587,7 @@ PIXA      *pixa, *pixa2;
  *      (2) The input pixadebug is null unless debug output is requested.
  * </pre>
  */
-l_int32
+l_ok
 compareTilesByHisto(NUMAA      *naa1,
                     NUMAA      *naa2,
                     l_float32   minratio,
@@ -2736,7 +2755,7 @@ NUMA      *na1, *na2, *nadist, *nascore;
  *              to determine whether it is photo or line graphics.
  * </pre>
  */
-l_int32
+l_ok
 pixCompareGrayByHisto(PIX        *pix1,
                       PIX        *pix2,
                       BOX        *box1,
@@ -2989,7 +3008,7 @@ PIXA      *pixa1, *pixa2;
  *          Black pixels have weight 255; white pixels have weight 0.
  * </pre>
  */
-l_int32
+l_ok
 pixCropAlignedToCentroid(PIX     *pix1,
                          PIX     *pix2,
                          l_int32  factor,
@@ -3201,7 +3220,7 @@ NUMAA   *naa;
  *          has fg pixels.
  * </pre>
  */
-l_int32
+l_ok
 pixCompareWithTranslation(PIX        *pix1,
                           PIX        *pix2,
                           l_int32     thresh,
@@ -3355,7 +3374,7 @@ PIXA      *pixa1, *pixa2, *pixadb;
  *          in pixCompareWithTranslation().
  * </pre>
  */
-l_int32
+l_ok
 pixBestCorrelation(PIX        *pix1,
                    PIX        *pix2,
                    l_int32     area1,

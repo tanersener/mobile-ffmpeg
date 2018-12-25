@@ -427,7 +427,7 @@ SARRAY   *sa;
  *          the requested color, or something similar to it.
  * </pre>
  */
-l_int32
+l_ok
 pixSetTextblock(PIX         *pixs,
                 L_BMF       *bmf,
                 const char  *textstr,
@@ -540,7 +540,7 @@ PIXCMAP  *cmap;
  *          the requested color, or something similar to it.
  * </pre>
  */
-l_int32
+l_ok
 pixSetTextline(PIX         *pixs,
                L_BMF       *bmf,
                const char  *textstr,
@@ -776,7 +776,7 @@ PIXA    *pixad;
  *          is used to generate a pdf.  Suggest using 1.0 for scalefactor.
  * </pre>
  */
-l_int32
+l_ok
 pixaAddPixWithText(PIXA        *pixa,
                    PIX         *pixs,
                    l_int32      reduction,
@@ -975,7 +975,7 @@ NUMA    *na;
  *                 font represented by the bmf
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 bmfGetStringWidth(L_BMF       *bmf,
                   const char  *textstr,
                   l_int32     *pw)

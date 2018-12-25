@@ -36,7 +36,6 @@
  *           L_BYTEA      *l_byteaInitFromFile()
  *           L_BYTEA      *l_byteaInitFromStream()
  *           L_BYTEA      *l_byteaCopy()
- *           L_BYTEA      *l_byteaClone()
  *           void          l_byteaDestroy()
  *
  *      Accessors
@@ -80,7 +79,7 @@ static l_int32 l_byteaExtendArrayToSize(L_BYTEA *ba, size_t size);
 /*!
  * \brief   l_byteaCreate()
  *
- * \param[in]    nbytes determines initial size of data array
+ * \param[in]    nbytes    determines initial size of data array
  * \return  l_bytea, or NULL on error
  *
  * <pre>
@@ -114,13 +113,13 @@ L_BYTEA  *ba;
 /*!
  * \brief   l_byteaInitFromMem()
  *
- * \param[in]    data to be copied to the array
- * \param[in]    size amount of data
+ * \param[in]    data    to be copied to the array
+ * \param[in]    size    amount of data
  * \return  l_bytea, or NULL on error
  */
 L_BYTEA *
-l_byteaInitFromMem(l_uint8  *data,
-                   size_t    size)
+l_byteaInitFromMem(const l_uint8  *data,
+                   size_t          size)
 {
 L_BYTEA  *ba;
 
@@ -169,7 +168,7 @@ L_BYTEA  *ba;
 /*!
  * \brief   l_byteaInitFromStream()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp    file stream
  * \return  l_bytea, or NULL on error
  */
 L_BYTEA *
@@ -200,8 +199,8 @@ L_BYTEA  *ba;
 /*!
  * \brief   l_byteaCopy()
  *
- * \param[in]    bas  source lba
- * \param[in]    copyflag L_COPY, L_CLONE
+ * \param[in]    bas        source lba
+ * \param[in]    copyflag   L_COPY, L_CLONE
  * \return  clone or copy of bas, or NULL on error
  *
  * <pre>
@@ -230,7 +229,7 @@ l_byteaCopy(L_BYTEA  *bas,
 /*!
  * \brief   l_byteaDestroy()
  *
- * \param[in,out]   pba will be set to null before returning
+ * \param[in,out]   pba    will be set to null before returning
  * \return  void
  *
  * <pre>
@@ -292,7 +291,7 @@ l_byteaGetSize(L_BYTEA  *ba)
  * \brief   l_byteaGetData()
  *
  * \param[in]    ba
- * \param[out]   psize size of data in lba
+ * \param[out]   psize     size of data in lba
  * \return  ptr to existing data array, or NULL on error
  *
  * <pre>
@@ -320,7 +319,7 @@ l_byteaGetData(L_BYTEA  *ba,
  * \brief   l_byteaCopyData()
  *
  * \param[in]    ba
- * \param[out]   psize size of data in lba
+ * \param[out]   psize     size of data in lba
  * \return  copy of data in use in the data array, or NULL on error.
  *
  * <pre>
@@ -355,14 +354,14 @@ l_uint8  *data;
  * \brief   l_byteaAppendData()
  *
  * \param[in]    ba
- * \param[in]    newdata byte array to be appended
- * \param[in]    newbytes size of data array
+ * \param[in]    newdata    byte array to be appended
+ * \param[in]    newbytes   size of data array
  * \return  0 if OK, 1 on error
  */
-l_int32
-l_byteaAppendData(L_BYTEA  *ba,
-                  l_uint8  *newdata,
-                  size_t    newbytes)
+l_ok
+l_byteaAppendData(L_BYTEA        *ba,
+                  const l_uint8  *newdata,
+                  size_t          newbytes)
 {
 size_t  size, nalloc, reqsize;
 
@@ -379,7 +378,7 @@ size_t  size, nalloc, reqsize;
     if (nalloc < reqsize)
         l_byteaExtendArrayToSize(ba, 2 * reqsize);
 
-    memcpy((char *)(ba->data + size), (char *)newdata, newbytes);
+    memcpy(ba->data + size, newdata, newbytes);
     ba->size += newbytes;
     return 0;
 }
@@ -389,12 +388,12 @@ size_t  size, nalloc, reqsize;
  * \brief   l_byteaAppendString()
  *
  * \param[in]    ba
- * \param[in]    str null-terminated string to be appended
+ * \param[in]    str    null-terminated string to be appended
  * \return  0 if OK, 1 on error
  */
-l_int32
-l_byteaAppendString(L_BYTEA  *ba,
-                    char     *str)
+l_ok
+l_byteaAppendString(L_BYTEA     *ba,
+                    const char  *str)
 {
 size_t  size, len, nalloc, reqsize;
 
@@ -422,7 +421,7 @@ size_t  size, len, nalloc, reqsize;
  * \brief   l_byteaExtendArrayToSize()
  *
  * \param[in]    ba
- * \param[in]    size new size of lba data array
+ * \param[in]    size    new size of lba data array
  * \return  0 if OK; 1 on error
  */
 static l_int32
@@ -452,8 +451,8 @@ l_byteaExtendArrayToSize(L_BYTEA  *ba,
  * \brief   l_byteaJoin()
  *
  * \param[in]       ba1
- * \param[in,out]   pba2 data array is added to the one in ba1, and
- *                       then ba2 is destroyed
+ * \param[in,out]   pba2    data array is added to the one in ba1;
+ *                          then ba2 is destroyed and its pointer is nulled.
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -461,7 +460,7 @@ l_byteaExtendArrayToSize(L_BYTEA  *ba,
  *      (1) It is a no-op, not an error, for %ba2 to be null.
  * </pre>
  */
-l_int32
+l_ok
 l_byteaJoin(L_BYTEA   *ba1,
             L_BYTEA  **pba2)
 {
@@ -488,12 +487,12 @@ L_BYTEA  *ba2;
 /*!
  * \brief   l_byteaSplit()
  *
- * \param[in]    ba1 lba to split; array bytes nulled beyond the split loc
- * \param[in]    splitloc location in ba1 to split; ba2 begins there
- * \param[out]   pba2 with data starting at splitloc
+ * \param[in]    ba1       lba to split; array bytes nulled beyond the split loc
+ * \param[in]    splitloc  location in ba1 to split; ba2 begins there
+ * \param[out]   pba2      with data starting at splitloc
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_byteaSplit(L_BYTEA   *ba1,
              size_t     splitloc,
              L_BYTEA  **pba2)
@@ -531,16 +530,16 @@ size_t    nbytes1, nbytes2;
  * \brief   l_byteaFindEachSequence()
  *
  * \param[in]    ba
- * \param[in]    sequence subarray of bytes to find in data
- * \param[in]    seqlen length of sequence, in bytes
- * \param[out]   pda byte positions of each occurrence of %sequence
+ * \param[in]    sequence   subarray of bytes to find in data
+ * \param[in]    seqlen     length of sequence, in bytes
+ * \param[out]   pda        byte positions of each occurrence of %sequence
  * \return  0 if OK, 1 on error
  */
-l_int32
-l_byteaFindEachSequence(L_BYTEA   *ba,
-                        l_uint8   *sequence,
-                        l_int32    seqlen,
-                        L_DNA    **pda)
+l_ok
+l_byteaFindEachSequence(L_BYTEA        *ba,
+                        const l_uint8  *sequence,
+                        size_t          seqlen,
+                        L_DNA         **pda)
 {
 l_uint8  *data;
 size_t    size;
@@ -567,18 +566,18 @@ size_t    size;
 /*!
  * \brief   l_byteaWrite()
  *
- * \param[in]    fname output file
+ * \param[in]    fname      output file
  * \param[in]    ba
- * \param[in]    startloc first byte to output
- * \param[in]    endloc last byte to output; use 0 to write to the
- *                      end of the data array
+ * \param[in]    startloc   first byte to output
+ * \param[in]    nbytes     number of bytes to write; use 0 to write to
+ *                          the end of the data array
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_byteaWrite(const char  *fname,
              L_BYTEA     *ba,
              size_t       startloc,
-             size_t       endloc)
+             size_t       nbytes)
 {
 l_int32  ret;
 FILE    *fp;
@@ -592,7 +591,7 @@ FILE    *fp;
 
     if ((fp = fopenWriteStream(fname, "wb")) == NULL)
         return ERROR_INT("stream not opened", procName, 1);
-    ret = l_byteaWriteStream(fp, ba, startloc, endloc);
+    ret = l_byteaWriteStream(fp, ba, startloc, nbytes);
     fclose(fp);
     return ret;
 }
@@ -601,21 +600,21 @@ FILE    *fp;
 /*!
  * \brief   l_byteaWriteStream()
  *
- * \param[in]    fp file stream opened for binary write
+ * \param[in]    fp         file stream opened for binary write
  * \param[in]    ba
- * \param[in]    startloc first byte to output
- * \param[in]    endloc last byte to output; use 0 to write to the
- *                      end of the data array
+ * \param[in]    startloc   first byte to output
+ * \param[in]    nbytes     number of bytes to write; use 0 to write to
+ *                          the end of the data array
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_byteaWriteStream(FILE     *fp,
                    L_BYTEA  *ba,
                    size_t    startloc,
-                   size_t    endloc)
+                   size_t    nbytes)
 {
 l_uint8  *data;
-size_t    size, nbytes;
+size_t    size, maxbytes;
 
     PROCNAME("l_byteaWriteStream");
 
@@ -625,12 +624,11 @@ size_t    size, nbytes;
         return ERROR_INT("ba not defined", procName, 1);
 
     data = l_byteaGetData(ba, &size);
+    startloc = L_MAX(0, startloc);
     if (startloc >= size)
         return ERROR_INT("invalid startloc", procName, 1);
-    if (endloc == 0) endloc = size - 1;
-    nbytes = endloc - startloc + 1;
-    if (nbytes < 1)
-        return ERROR_INT("endloc must be >= startloc", procName, 1);
+    maxbytes = size - startloc;
+    nbytes = (nbytes == 0) ? maxbytes : L_MIN(nbytes, maxbytes);
 
     fwrite(data + startloc, 1, nbytes, fp);
     return 0;

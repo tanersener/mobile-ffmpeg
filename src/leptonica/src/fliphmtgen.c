@@ -74,9 +74,9 @@ static void  fhmt_1_3(l_uint32 *, l_int32, l_int32, l_int32, l_uint32 *, l_int32
  *           can have any number of misses.
  */
 PIX *
-pixFlipFHMTGen(PIX   *pixd,
-               PIX   *pixs,
-               char  *selname)
+pixFlipFHMTGen(PIX         *pixd,
+               PIX         *pixs,
+               const char  *selname)
 {
 l_int32    i, index, found, w, h, wpls, wpld;
 l_uint32  *datad, *datas, *datat;

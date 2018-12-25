@@ -178,7 +178,7 @@ static l_int32   var_WRITE_DATE_AND_VERSION = 1;
  *      (3) See comments in convertToPdf().
  * </pre>
  */
-l_int32
+l_ok
 pixConvertToPdfData(PIX          *pix,
                     l_int32       type,
                     l_int32       quality,
@@ -303,7 +303,7 @@ L_PDF_DATA   *lpd = NULL;
  *          this parent.
  * </pre>
  */
-l_int32
+l_ok
 ptraConcatenatePdfToData(L_PTRA    *pa_data,
                          SARRAY    *sa,
                          l_uint8  **pdata,
@@ -467,7 +467,7 @@ NUMAA    *naa_objs;  /* object mapping numbers to new values */
  *          convertTiffMultipageToPS()
  * </pre>
  */
-l_int32
+l_ok
 convertTiffMultipageToPdf(const char  *filein,
                           const char  *fileout)
 {
@@ -516,7 +516,7 @@ FILE    *fp;
  *          in the future.
  * </pre>
  */
-l_int32
+l_ok
 l_generateCIDataForPdf(const char    *fname,
                        PIX           *pix,
                        l_int32        quality,
@@ -623,21 +623,22 @@ PIXCMAP      *cmap = NULL;
     findFileFormat(fname, &format);
     spp = 0;  /* init to spp != 4 if not png */
     interlaced = 0;  /* initialize to no interlacing */
+    bps = 0;  /* initialize to a nonsense value */
     if (format == IFF_PNG) {
         isPngInterlaced(fname, &interlaced);
-        readHeaderPng(fname, NULL, NULL, NULL, &spp, NULL);
+        readHeaderPng(fname, NULL, NULL, &bps, &spp, NULL);
     }
 
         /* PDF is capable of inlining some types of PNG files, but not all
-           of them. We need to transcode anything with interlacing or an
-           alpha channel.
+           of them. We need to transcode anything with interlacing, an
+           alpha channel, or 1 bpp (which would otherwise be photo-inverted).
 
            Be careful with spp. Any PNG image file with an alpha
            channel is converted on reading to RGBA (spp == 4). This
            includes the (gray + alpha) format with spp == 2. You
            will get different results if you look at spp via
            readHeaderPng() versus pixGetSpp() */
-    if (format != IFF_PNG || interlaced || spp == 4 || spp == 2) {
+    if (format != IFF_PNG || interlaced || bps == 1 || spp == 4 || spp == 2) {
         if (!pixs)
             pix = pixRead(fname);
         else
@@ -705,14 +706,14 @@ PIXCMAP      *cmap = NULL;
         }
 
             /* Is it a data chunk? */
-        if (strncmp((const char *)(pngcomp + i - 4), "IDAT", 4) == 0) {
+        if (memcmp(pngcomp + i - 4, "IDAT", 4) == 0) {
             memcpy(datacomp + nbytescomp, pngcomp + i, n);
             nbytescomp += n;
         }
 
             /* Is it a palette chunk? */
         if (cmapflag && !cmap &&
-            strncmp((const char *)(pngcomp + i - 4), "PLTE", 4) == 0) {
+            memcmp(pngcomp + i - 4, "PLTE", 4) == 0) {
             if ((n / 3) > (1 << bps)) {
                 LEPT_FREE(pngcomp);
                 LEPT_FREE(datacomp);
@@ -939,7 +940,7 @@ L_COMP_DATA  *cid;
  *          the format and attempts to generate the CID without transcoding.
  * </pre>
  */
-l_int32
+l_ok
 l_generateCIData(const char    *fname,
                  l_int32        type,
                  l_int32        quality,
@@ -1035,7 +1036,7 @@ PIX          *pix;
  *           ~ 1 for ascii85 (5 for 4) encoded binary data
  * </pre>
  */
-l_int32
+l_ok
 pixGenerateCIData(PIX           *pixs,
                   l_int32        type,
                   l_int32        quality,
@@ -1423,7 +1424,7 @@ FILE         *fp;
  *          lpd and destroyed by this function.
  * </pre>
  */
-l_int32
+l_ok
 cidConvertToPdfData(L_COMP_DATA  *cid,
                     const char   *title,
                     l_uint8     **pdata,
@@ -1569,12 +1570,12 @@ SARRAY  *sa;
     l_dnaAddNumber(lpd->objsize, strlen(lpd->obj1));
 
     sa = sarrayCreate(0);
-    sarrayAddString(sa, (char *)"2 0 obj\n"
-                                 "<<\n", L_COPY);
+    sarrayAddString(sa, "2 0 obj\n"
+                        "<<\n", L_COPY);
     if (var_WRITE_DATE_AND_VERSION) {
         datestr = l_getFormattedDate();
         snprintf(buf, sizeof(buf), "/CreationDate (D:%s)\n", datestr);
-        sarrayAddString(sa, (char *)buf, L_COPY);
+        sarrayAddString(sa, buf, L_COPY);
         LEPT_FREE(datestr);
         version = getLeptonicaVersion();
         snprintf(buf, sizeof(buf),
@@ -1583,18 +1584,18 @@ SARRAY  *sa;
     } else {
         snprintf(buf, sizeof(buf), "/Producer (leptonica)\n");
     }
-    sarrayAddString(sa, (char *)buf, L_COPY);
+    sarrayAddString(sa, buf, L_COPY);
     if (lpd->title) {
         char *hexstr;
         if ((hexstr = generateEscapeString(lpd->title)) != NULL) {
             snprintf(buf, sizeof(buf), "/Title %s\n", hexstr);
-            sarrayAddString(sa, (char *)buf, L_COPY);
+            sarrayAddString(sa, buf, L_COPY);
         } else {
             L_ERROR("title string is not ascii\n", procName);
         }
         LEPT_FREE(hexstr);
     }
-    sarrayAddString(sa, (char *)">>\n"
+    sarrayAddString(sa, ">>\n"
                                 "endobj\n", L_COPY);
     lpd->obj2 = sarrayToString(sa, 0);
     l_dnaAddNumber(lpd->objsize, strlen(lpd->obj2));
@@ -1631,6 +1632,7 @@ SARRAY  *sa;
  *          that the data is to be interpreted as big-endian, 4 bytes
  *          at a time.  For ascii, the first two bytes are 0 and the
  *          last two bytes are less than 0x80.
+ * </pre>
  */
 static char  *
 generateEscapeString(const char  *str)
@@ -2015,11 +2017,11 @@ SARRAY  *sa;
     snprintf(buf, sizeof(buf), "xref\n"
                                "0 %d\n"
                                "0000000000 65535 f \n", n);
-    sarrayAddString(sa, (char *)buf, L_COPY);
+    sarrayAddString(sa, buf, L_COPY);
     for (i = 1; i < n; i++) {
         l_dnaGetIValue(daloc, i, &linestart);
         snprintf(buf, sizeof(buf), "%010d 00000 n \n", linestart);
-        sarrayAddString(sa, (char *)buf, L_COPY);
+        sarrayAddString(sa, buf, L_COPY);
     }
 
     l_dnaGetIValue(daloc, n, &xrefloc);
@@ -2032,7 +2034,7 @@ SARRAY  *sa;
                                "startxref\n"
                                "%d\n"
                                "%%%%EOF\n", n, xrefloc);
-    sarrayAddString(sa, (char *)buf, L_COPY);
+    sarrayAddString(sa, buf, L_COPY);
     outstr = sarrayToString(sa, 0);
     sarrayDestroy(&sa);
     return outstr;
@@ -2079,12 +2081,12 @@ L_COMP_DATA  *cid;
 
     sizes = l_dnaGetIArray(lpd->objsize);
     locs = l_dnaGetIArray(lpd->objloc);
-    memcpy((char *)data, lpd->id, sizes[0]);
-    memcpy((char *)(data + locs[1]), lpd->obj1, sizes[1]);
-    memcpy((char *)(data + locs[2]), lpd->obj2, sizes[2]);
-    memcpy((char *)(data + locs[3]), lpd->obj3, sizes[3]);
-    memcpy((char *)(data + locs[4]), lpd->obj4, sizes[4]);
-    memcpy((char *)(data + locs[5]), lpd->obj5, sizes[5]);
+    memcpy(data, lpd->id, sizes[0]);
+    memcpy(data + locs[1], lpd->obj1, sizes[1]);
+    memcpy(data + locs[2], lpd->obj2, sizes[2]);
+    memcpy(data + locs[3], lpd->obj3, sizes[3]);
+    memcpy(data + locs[4], lpd->obj4, sizes[4]);
+    memcpy(data + locs[5], lpd->obj5, sizes[5]);
 
         /* Each image has 3 parts: variable preamble, the compressed
          * data stream, and the fixed poststream. */
@@ -2097,21 +2099,21 @@ L_COMP_DATA  *cid;
         }
         str = sarrayGetString(lpd->saprex, i, L_NOCOPY);
         len = strlen(str);
-        memcpy((char *)(data + locs[6 + i]), str, len);
-        memcpy((char *)(data + locs[6 + i] + len),
-               (char *)cid->datacomp, cid->nbytescomp);
-        memcpy((char *)(data + locs[6 + i] + len + cid->nbytescomp),
+        memcpy(data + locs[6 + i], str, len);
+        memcpy(data + locs[6 + i] + len,
+               cid->datacomp, cid->nbytescomp);
+        memcpy(data + locs[6 + i] + len + cid->nbytescomp,
                lpd->poststream, strlen(lpd->poststream));
     }
 
         /* Each colormap is simply a stored string */
     for (i = 0; i < lpd->ncmap; i++) {
         str = sarrayGetString(lpd->sacmap, i, L_NOCOPY);
-        memcpy((char *)(data + locs[6 + nimages + i]), str, strlen(str));
+        memcpy(data + locs[6 + nimages + i], str, strlen(str));
     }
 
         /* And finally the trailer */
-    memcpy((char *)(data + lpd->xrefloc), lpd->trailer, strlen(lpd->trailer));
+    memcpy(data + lpd->xrefloc, lpd->trailer, strlen(lpd->trailer));
     LEPT_FREE(sizes);
     LEPT_FREE(locs);
     return 0;
@@ -2148,7 +2150,7 @@ SARRAY   *sa;
     if (!bas)
         return ERROR_INT("bas not defined", procName, 1);
     data = l_byteaGetData(bas, &size);
-    if (strncmp((char *)data, "%PDF-1.", 7) != 0)
+    if (memcmp(data, "%PDF-1.", 7) != 0)
         return ERROR_INT("PDF header signature not found", procName, 1);
 
         /* Search for "startxref" starting 50 bytes from the EOF */

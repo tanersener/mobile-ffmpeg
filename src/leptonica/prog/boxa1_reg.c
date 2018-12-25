@@ -110,7 +110,7 @@ L_REGPARAMS  *rp;
     boxaGetExtent(boxa2, &w, &h, NULL);
     scalefact = (l_float32)width / (l_float32)w;
     boxa3 = boxaTransform(boxa2, 0, 0, scalefact, scalefact);
-    pix1 = boxaDisplayTiled(boxa3, NULL, 1500, 2, 1.0, 0, 3, 2);
+    pix1 = boxaDisplayTiled(boxa3, NULL, 0, -1, 1500, 2, 1.0, 0, 3, 2);
     regTestWritePixAndCheck(rp, pix1, IFF_PNG);  /* 12 */
     pixDisplayWithTitle(pix1, 600, 0, NULL, rp->display);
     pixDestroy(&pix1);
@@ -126,7 +126,7 @@ L_REGPARAMS  *rp;
     boxaGetExtent(boxa2, &w, &h, NULL);
     scalefact = (l_float32)width / (l_float32)w;
     boxa3 = boxaTransform(boxa2, 0, 0, scalefact, scalefact);
-    pix1 = boxaDisplayTiled(boxa3, NULL, 1500, 2, 1.0, 0, 3, 2);
+    pix1 = boxaDisplayTiled(boxa3, NULL, 0, -1, 1500, 2, 1.0, 0, 3, 2);
     regTestWritePixAndCheck(rp, pix1, IFF_PNG);  /* 13 */
     pixDisplayWithTitle(pix1, 800, 0, NULL, rp->display);
     pixDestroy(&pix1);
@@ -162,7 +162,7 @@ L_REGPARAMS  *rp;
     boxaGetExtent(boxa2, &w, &h, NULL);
     scalefact = (l_float32)width / (l_float32)w;
     boxa3 = boxaTransform(boxa2, 0, 0, scalefact, scalefact);
-    pix1 = boxaDisplayTiled(boxa3, NULL, 1500, 2, 1.0, 0, 3, 2);
+    pix1 = boxaDisplayTiled(boxa3, NULL, 0, -1, 1500, 2, 1.0, 0, 3, 2);
     regTestWritePixAndCheck(rp, pix1, IFF_PNG);  /* 17 */
     pixDisplayWithTitle(pix1, 1000, 0, NULL, rp->display);
     pixDestroy(&pix1);

@@ -35,7 +35,9 @@
  *    |=============================================================|
  *    | Some of these functions require libtiff, libjpeg, and libz  |
  *    | If you do not have these libraries, you must set            |
+ *    | \code                                                       |
  *    |      #define  USE_PDFIO     0                               |
+ *    | \endcode                                                    |
  *    | in environ.h.  This will link pdfiostub.c                   |
  *    |=============================================================|
  *
@@ -233,7 +235,7 @@ static const l_int32  DEFAULT_INPUT_RES = 300;
  *          or not it has a colormap.
  * </pre>
  */
-l_int32
+l_ok
 convertFilesToPdf(const char  *dirname,
                   const char  *substr,
                   l_int32      res,
@@ -281,7 +283,7 @@ SARRAY  *sa;
  *      (1) See convertFilesToPdf().
  * </pre>
  */
-l_int32
+l_ok
 saConvertFilesToPdf(SARRAY      *sa,
                     l_int32      res,
                     l_float32    scalefactor,
@@ -334,7 +336,7 @@ size_t    nbytes;
  *      (1) See convertFilesToPdf().
  * </pre>
  */
-l_int32
+l_ok
 saConvertFilesToPdfData(SARRAY      *sa,
                         l_int32      res,
                         l_float32    scalefactor,
@@ -436,6 +438,7 @@ L_PTRA      *pa_data;
  *
  * \param[in]    pix
  * \param[out]   ptype L_G4_ENCODE, L_JPEG_ENCODE, L_FLATE_ENCODE
+ * \return  0 if OK, 1 on error
  *
  * <pre>
  * Notes:
@@ -450,7 +453,7 @@ L_PTRA      *pa_data;
  *          twice the compression as jpeg with quality = 75.
  * </pre>
  */
-l_int32
+l_ok
 selectDefaultPdfEncoding(PIX      *pix,
                          l_int32  *ptype)
 {
@@ -513,7 +516,7 @@ PIXCMAP  *cmap;
  *          the images must be read and recompressed.
  * </pre>
  */
-l_int32
+l_ok
 convertUnscaledFilesToPdf(const char  *dirname,
                           const char  *substr,
                           const char  *title,
@@ -551,7 +554,7 @@ SARRAY  *sa;
  *      (1) See convertUnscaledFilesToPdf().
  * </pre>
  */
-l_int32
+l_ok
 saConvertUnscaledFilesToPdf(SARRAY      *sa,
                             const char  *title,
                             const char  *fileout)
@@ -589,7 +592,7 @@ size_t    nbytes;
  * \param[out]   pnbytes size of output pdf data
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 saConvertUnscaledFilesToPdfData(SARRAY      *sa,
                                 const char  *title,
                                 l_uint8    **pdata,
@@ -661,7 +664,7 @@ L_PTRA       *pa_data;
  * \param[out]   pnbytes size of output pdf data
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 convertUnscaledToPdfData(const char  *fname,
                          const char  *title,
                          l_uint8    **pdata,
@@ -745,7 +748,7 @@ L_COMP_DATA  *cid;
  *          or not it has a colormap.
  * </pre>
  */
-l_int32
+l_ok
 pixaConvertToPdf(PIXA        *pixa,
                  l_int32      res,
                  l_float32    scalefactor,
@@ -797,7 +800,7 @@ size_t    nbytes;
  *      (1) See pixaConvertToPdf().
  * </pre>
  */
-l_int32
+l_ok
 pixaConvertToPdfData(PIXA        *pixa,
                      l_int32      res,
                      l_float32    scalefactor,
@@ -943,7 +946,7 @@ L_PTRA   *pa_data;
  *              some are explicitly created for viewing on a display.
  * </pre>
  */
-l_int32
+l_ok
 convertToPdf(const char   *filein,
              l_int32       type,
              l_int32       quality,
@@ -1014,7 +1017,7 @@ size_t    nbytes;
  *      (2) See comments in convertToPdf().
  * </pre>
  */
-l_int32
+l_ok
 convertImageDataToPdf(l_uint8      *imdata,
                       size_t        size,
                       l_int32       type,
@@ -1079,7 +1082,7 @@ PIX     *pix;
  *      (2) See comments in convertToPdf().
  * </pre>
  */
-l_int32
+l_ok
 convertToPdfData(const char   *filein,
                  l_int32       type,
                  l_int32       quality,
@@ -1147,7 +1150,7 @@ PIX  *pix;
  *      (2) See comments in convertToPdf().
  * </pre>
  */
-l_int32
+l_ok
 convertImageDataToPdfData(l_uint8      *imdata,
                           size_t        size,
                           l_int32       type,
@@ -1216,7 +1219,7 @@ PIX     *pix;
  *      (3) See comments in convertToPdf().
  * </pre>
  */
-l_int32
+l_ok
 pixConvertToPdf(PIX          *pix,
                 l_int32       type,
                 l_int32       quality,
@@ -1279,7 +1282,7 @@ size_t    nbytes;
  *          encoding for everything else.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteStreamPdf(FILE        *fp,
                   PIX         *pix,
                   l_int32      res,
@@ -1328,7 +1331,7 @@ size_t    nbytes, nbytes_written;
  *          encoding for everything else.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteMemPdf(l_uint8    **pdata,
                size_t      *pnbytes,
                PIX         *pix,
@@ -1408,7 +1411,7 @@ PIXCMAP  *cmap;
  *          and %type == L_G4_ENCODE.
  * </pre>
  */
-l_int32
+l_ok
 convertSegmentedFilesToPdf(const char  *dirname,
                            const char  *substr,
                            l_int32      res,
@@ -1637,7 +1640,7 @@ SARRAY  *sa;
  *                      pix  -->  data      (pixConvertToPdfDataSegmented)
  * </pre>
  */
-l_int32
+l_ok
 convertToPdfSegmented(const char  *filein,
                       l_int32      res,
                       l_int32      type,
@@ -1697,7 +1700,7 @@ PIX     *pixs;
  *      (1) See convertToPdfSegmented() for details.
  * </pre>
  */
-l_int32
+l_ok
 pixConvertToPdfSegmented(PIX         *pixs,
                          l_int32      res,
                          l_int32      type,
@@ -1760,7 +1763,7 @@ size_t    nbytes;
  *      (2) Typically, %scalefactor is < 1.0.  The image regions are
  * </pre>
  */
-l_int32
+l_ok
 convertToPdfDataSegmented(const char  *filein,
                           l_int32      res,
                           l_int32      type,
@@ -1827,7 +1830,7 @@ PIX     *pixs;
  *      (1) See convertToPdfSegmented() for details.
  * </pre>
  */
-l_int32
+l_ok
 pixConvertToPdfDataSegmented(PIX         *pixs,
                              l_int32      res,
                              l_int32      type,
@@ -1991,7 +1994,7 @@ L_PDF_DATA  *lpd;
  *          before concatenation.
  * </pre>
  */
-l_int32
+l_ok
 concatenatePdf(const char  *dirname,
                const char  *substr,
                const char  *fileout)
@@ -2026,7 +2029,7 @@ SARRAY  *sa;
  *      (1) This only works with leptonica-formatted single-page pdf files.
  * </pre>
  */
-l_int32
+l_ok
 saConcatenatePdf(SARRAY      *sa,
                  const char  *fileout)
 {
@@ -2062,7 +2065,7 @@ size_t    nbytes;
  *      (1) This only works with leptonica-formatted single-page pdf files.
  * </pre>
  */
-l_int32
+l_ok
 ptraConcatenatePdf(L_PTRA      *pa,
                    const char  *fileout)
 {
@@ -2106,7 +2109,7 @@ size_t    nbytes;
  *          before concatenation.
  * </pre>
  */
-l_int32
+l_ok
 concatenatePdfToData(const char  *dirname,
                      const char  *substr,
                      l_uint8    **pdata,
@@ -2147,7 +2150,7 @@ SARRAY  *sa;
  *      (1) This only works with leptonica-formatted single-page pdf files.
  * </pre>
  */
-l_int32
+l_ok
 saConcatenatePdfToData(SARRAY    *sa,
                        l_uint8  **pdata,
                        size_t    *pnbytes)

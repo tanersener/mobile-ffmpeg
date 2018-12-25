@@ -238,7 +238,7 @@ L_PTRA  *pa;
  *          items in the array is entirely arbitrary.
  * </pre>
  */
-l_int32
+l_ok
 ptraAdd(L_PTRA  *pa,
         void    *item)
 {
@@ -332,7 +332,7 @@ ptraExtendArray(L_PTRA  *pa)
  *          randomly to the ptr array.
  * </pre>
  */
-l_int32
+l_ok
 ptraInsert(L_PTRA  *pa,
            l_int32  index,
            void    *item,
@@ -549,7 +549,7 @@ void    *olditem;
  * \param[in]    index2
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptraSwap(L_PTRA  *pa,
          l_int32  index1,
          l_int32  index2)
@@ -586,7 +586,7 @@ void    *item;
  *      (2) This does not change the size of the array of ptrs.
  * </pre>
  */
-l_int32
+l_ok
 ptraCompactArray(L_PTRA  *pa)
 {
 l_int32  i, imax, nactual, index;
@@ -621,7 +621,7 @@ l_int32  i, imax, nactual, index;
  * \param[in]    pa ptra
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptraReverse(L_PTRA  *pa)
 {
 l_int32  i, imax;
@@ -645,7 +645,7 @@ l_int32  i, imax;
  * \param[in]    pa2 appended to pa1, and emptied of items; can be null
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptraJoin(L_PTRA  *pa1,
          L_PTRA  *pa2)
 {
@@ -695,7 +695,7 @@ void    *item;
  *      (3) If there are no items in the array, this returns %maxindex = -1.
  * </pre>
  */
-l_int32
+l_ok
 ptraGetMaxIndex(L_PTRA   *pa,
                 l_int32  *pmaxindex)
 {
@@ -723,7 +723,7 @@ ptraGetMaxIndex(L_PTRA   *pa,
  *          will be smaller than pa->n if the array is not compacted.
  * </pre>
  */
-l_int32
+l_ok
 ptraGetActualCount(L_PTRA   *pa,
                    l_int32  *pcount)
 {
@@ -863,7 +863,7 @@ L_PTRAA  *paa;
  * \param[out]   psize size of ptr array
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptraaGetSize(L_PTRAA  *paa,
              l_int32  *psize)
 {
@@ -894,7 +894,7 @@ ptraaGetSize(L_PTRAA  *paa,
  *          on error, the Ptra remains owned by the caller.
  * </pre>
  */
-l_int32
+l_ok
 ptraaInsertPtra(L_PTRAA  *paa,
                 l_int32   index,
                 L_PTRA   *pa)
@@ -911,7 +911,7 @@ l_int32  n;
     if (index < 0 || index >= n)
         return ERROR_INT("invalid index", procName, 1);
     if (paa->ptra[index] != NULL)
-        return ERROR_INT("ptra alread stored at index", procName, 1);
+        return ERROR_INT("ptra already stored at index", procName, 1);
 
     paa->ptra[index] = pa;
     return 0;

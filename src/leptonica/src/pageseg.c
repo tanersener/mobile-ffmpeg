@@ -98,7 +98,7 @@ static const l_int32  MinHeight = 100;
  *      (2) Passing in %pixadb enables debug output.
  * </pre>
  */
-l_int32
+l_ok
 pixGetRegionsBinary(PIX   *pixs,
                     PIX  **ppixhm,
                     PIX  **ppixtm,
@@ -273,10 +273,10 @@ pixGenHalftoneMask(PIX      *pixs,
 /*!
  * \brief   pixGenerateHalftoneMask()
  *
- * \param[in]    pixs 1 bpp, assumed to be 150 to 200 ppi
- * \param[out]   ppixtext [optional] text part of pixs
- * \param[out]   phtfound [optional] 1 if the mask is not empty
- * \param[in]    pixadb  input for collecting debug pix; use NULL to skip
+ * \param[in]    pixs      1 bpp, assumed to be 150 to 200 ppi
+ * \param[out]   ppixtext  [optional] text part of pixs
+ * \param[out]   phtfound  [optional] 1 if the mask is not empty
+ * \param[in]    pixadb    input for collecting debug pix; use NULL to skip
  * \return  pixd halftone mask, or NULL on error
  *
  * <pre>
@@ -352,10 +352,10 @@ PIX     *pix1, *pix2, *pixhs, *pixhm, *pixd;
 /*!
  * \brief   pixGenTextlineMask()
  *
- * \param[in]    pixs 1 bpp, assumed to be 150 to 200 ppi
- * \param[out]   ppixvws vertical whitespace mask
- * \param[out]   ptlfound [optional] 1 if the mask is not empty
- * \param[in]    pixadb  input for collecting debug pix; use NULL to skip
+ * \param[in]    pixs      1 bpp, assumed to be 150 to 200 ppi
+ * \param[out]   ppixvws   vertical whitespace mask
+ * \param[out]   ptlfound  [optional] 1 if the mask is not empty
+ * \param[in]    pixadb    input for collecting debug pix; use NULL to skip
  * \return  pixd textline mask, or NULL on error
  *
  * <pre>
@@ -442,9 +442,9 @@ PIX     *pix1, *pix2, *pixvws, *pixd;
 /*!
  * \brief   pixGenTextblockMask()
  *
- * \param[in]    pixs 1 bpp, textline mask, assumed to be 150 to 200 ppi
- * \param[in]    pixvws vertical white space mask
- * \param[in]    pixadb  input for collecting debug pix; use NULL to skip
+ * \param[in]    pixs     1 bpp, textline mask, assumed to be 150 to 200 ppi
+ * \param[in]    pixvws   vertical white space mask
+ * \param[in]    pixadb   input for collecting debug pix; use NULL to skip
  * \return  pixd textblock mask, or NULL on error
  *
  * <pre>
@@ -552,7 +552,6 @@ pixFindPageForeground(PIX     *pixs,
                       l_int32  showmorph,
                       PIXAC   *pixac)
 {
-char     buf[64];
 l_int32  flag, nbox, intersects;
 l_int32  w, h, bx, by, bw, bh, left, right, top, bottom;
 PIX     *pixb, *pixb2, *pixseed, *pixsf, *pixm, *pix1, *pixg2;
@@ -675,7 +674,7 @@ BOXA    *ba1, *ba2;
  *          (possibly split) components are extracted.
  * </pre>
  */
-l_int32
+l_ok
 pixSplitIntoCharacters(PIX     *pixs,
                        l_int32  minw,
                        l_int32  minh,
@@ -761,11 +760,11 @@ PIXA   *pixa1, *pixadb;
 /*!
  * \brief   pixSplitComponentWithProfile()
  *
- * \param[in]    pixs 1 bpp, exactly one connected component
- * \param[in]    delta distance used in extrema finding in a numa; typ. 10
- * \param[in]    mindel minimum required difference between profile minimum
- *                      and profile values +2 and -2 away; typ. 7
- * \param[out]   ppixdebug [optional] debug image of splitting
+ * \param[in]    pixs       1 bpp, exactly one connected component
+ * \param[in]    delta      distance used in extrema finding in a numa; typ. 10
+ * \param[in]    mindel     minimum required difference between profile
+ *                          minimum and profile values +2 and -2 away; typ. 7
+ * \param[out]   ppixdebug  [optional] debug image of splitting
  * \return  boxa of c.c. after splitting, or NULL on error
  *
  * <pre>
@@ -889,16 +888,16 @@ PIX      *pix1, *pixdb;
 /*!
  * \brief   pixExtractTextlines()
  *
- * \param[in]    pixs       any depth, assumed to have nearly horizontal text
- * \param[in]    maxw, maxh initial filtering: remove any components in pixs
- *                          with components larger than maxw or maxh
- * \param[in]    minw, minh final filtering: remove extracted 'lines'
- *                          with sizes smaller than minw or minh; use
- *                          0 for default.
- * \param[in]    adjw, adjh final adjustment of boxes representing each
- *                          text line.  If > 0, these increase the box
- *                          size at each edge by this amount.
- * \param[in]    pixadb     pixa for saving intermediate steps; NULL to omit
+ * \param[in]    pixs        any depth, assumed to have nearly horizontal text
+ * \param[in]    maxw, maxh  initial filtering: remove any components in pixs
+ *                           with components larger than maxw or maxh
+ * \param[in]    minw, minh  final filtering: remove extracted 'lines'
+ *                           with sizes smaller than minw or minh; use
+ *                           0 for default.
+ * \param[in]    adjw, adjh  final adjustment of boxes representing each
+ *                           text line.  If > 0, these increase the box
+ *                           size at each edge by this amount.
+ * \param[in]    pixadb      pixa for saving intermediate steps; NULL to omit
  * \return  pixa of textline images, including bounding boxes, or
  *                    NULL on error
  *
@@ -1037,14 +1036,14 @@ PIXA    *pixa1, *pixa2, *pixa3;
 /*!
  * \brief   pixExtractRawTextlines()
  *
- * \param[in]    pixs       any depth, assumed to have nearly horizontal text
- * \param[in]    maxw, maxh initial filtering: remove any components in pixs
- *                          with components larger than maxw or maxh;
- *                          use 0 for default values.
- * \param[in]    adjw, adjh final adjustment of boxes representing each
- *                          text line.  If > 0, these increase the box
- *                          size at each edge by this amount.
- * \param[in]    pixadb     pixa for saving intermediate steps; NULL to omit
+ * \param[in]    pixs        any depth, assumed to have nearly horizontal text
+ * \param[in]    maxw, maxh  initial filtering: remove any components in pixs
+ *                           with components larger than maxw or maxh;
+ *                           use 0 for default values.
+ * \param[in]    adjw, adjh  final adjustment of boxes representing each
+ *                           text line.  If > 0, these increase the box
+ *                           size at each edge by this amount.
+ * \param[in]    pixadb      pixa for saving intermediate steps; NULL to omit
  * \return  pixa of textline images, including bounding boxes, or
  *                    NULL on error
  *
@@ -1200,7 +1199,7 @@ PIXA    *pixa1, *pixa2;
  *      (4) For debug output, input a pre-allocated pixa.
  * </pre>
  */
-l_int32
+l_ok
 pixCountTextColumns(PIX       *pixs,
                     l_float32  deltafract,
                     l_float32  peakfract,
@@ -1348,7 +1347,7 @@ PIX       *pix1, *pix2, *pix3, *pix4, *pix5;
  *      (7) For debug output, input a pre-allocated pixa.
  * </pre>
  */
-l_int32
+l_ok
 pixDecideIfText(PIX      *pixs,
                 BOX      *box,
                 l_int32  *pistext,
@@ -1416,7 +1415,7 @@ SEL       *sel1;
     }
 
     if (pixadb) {
-        bmf = bmfCreate(NULL, 8);
+        bmf = bmfCreate(NULL, 6);
         pixaAddPixWithText(pixadb, pix1, 1, bmf, "threshold/crop to binary",
                            0x0000ff00, L_ADD_BELOW);
         pixaAddPixWithText(pixadb, pix3, 2, bmf, "hit-miss for vertical line",
@@ -1508,13 +1507,13 @@ SEL       *sel1;
 /*!
  * \brief   pixFindThreshFgExtent()
  *
- * \param[in]    pixs      1 bpp
- * \param[in]    thresh    threshold number of pixels in row
- * \param[out]   ptop      [optional] location of top of region
- * \param[out]   pbot      [optional] location of bottom of region
+ * \param[in]    pixs     1 bpp
+ * \param[in]    thresh   threshold number of pixels in row
+ * \param[out]   ptop     [optional] location of top of region
+ * \param[out]   pbot     [optional] location of bottom of region
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixFindThreshFgExtent(PIX      *pixs,
                       l_int32   thresh,
                       l_int32  *ptop,
@@ -1604,7 +1603,7 @@ NUMA     *na;
  *      (9) For debug output, input a pre-allocated pixa.
  * </pre>
  */
-l_int32
+l_ok
 pixDecideIfTable(PIX      *pixs,
                  BOX      *box,
                  l_int32   orient,
@@ -1748,7 +1747,7 @@ PIX     *pix1, *pix2, *pix3, *pix4, *pix5, *pix6, *pix7, *pix8, *pix9;
  *                          300 ppi; use 0 to skip scaling.
  * \return  pixd if OK, NULL on error
  *
- * </pre>
+ * <pre>
  * Notes:
  *      (1) This handles some common pre-processing operations,
  *          where the page segmentation algorithm takes a 1 bpp image.
@@ -1839,7 +1838,7 @@ PIX       *pix1, *pix2, *pix3, *pix4, *pix5;
  *      (1) Caller should check that return bg value is > 0.
  * </pre>
  */
-l_int32
+l_ok
 pixEstimateBackground(PIX       *pixs,
                       l_int32    darkthresh,
                       l_float32  edgecrop,
@@ -1923,7 +1922,7 @@ PIX       *pix1, *pix2, *pixm;
  *          the largest 50 boxes takes about 0.2 seconds.
  * </pre>
  */
-l_int32
+l_ok
 pixFindLargeRectangles(PIX          *pixs,
                        l_int32       polarity,
                        l_int32       nrect,
@@ -2026,7 +2025,7 @@ PIX     *pix;
  *          then found by taking the Max.
  * </pre>
  */
-l_int32
+l_ok
 pixFindLargestRectangle(PIX         *pixs,
                         l_int32      polarity,
                         BOX        **pbox,

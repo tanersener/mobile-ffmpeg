@@ -455,7 +455,7 @@ pixVShearCenter(PIX       *pixd,
  *          pushing increasingly leftward (-x) with increasing y.
  * </pre>
  */
-l_int32
+l_ok
 pixHShearIP(PIX       *pixs,
             l_int32    yloc,
             l_float32  radang,
@@ -530,7 +530,7 @@ l_float32  tanangle, invangle;
  *          pushing increasingly downward (+y) with increasing x.
  * </pre>
  */
-l_int32
+l_ok
 pixVShearIP(PIX       *pixs,
             l_int32    xloc,
             l_float32  radang,

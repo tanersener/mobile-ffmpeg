@@ -142,17 +142,18 @@ am_liblept_la_OBJECTS = adaptmap.lo affine.lo affinecompose.lo \
 	arrayaccess.lo bardecode.lo baseline.lo bbuffer.lo \
 	bilateral.lo bilinear.lo binarize.lo binexpand.lo binreduce.lo \
 	blend.lo bmf.lo bmpio.lo bmpiostub.lo bootnumgen1.lo \
-	bootnumgen2.lo bootnumgen3.lo boxbasic.lo boxfunc1.lo \
-	boxfunc2.lo boxfunc3.lo boxfunc4.lo bytearray.lo ccbord.lo \
-	ccthin.lo classapp.lo colorcontent.lo coloring.lo colormap.lo \
-	colormorph.lo colorquant1.lo colorquant2.lo colorseg.lo \
-	colorspace.lo compare.lo conncomp.lo convertfiles.lo \
-	convolve.lo correlscore.lo dewarp1.lo dewarp2.lo dewarp3.lo \
-	dewarp4.lo dnabasic.lo dnafunc1.lo dnahash.lo dwacomb.2.lo \
-	dwacomblow.2.lo edge.lo encoding.lo enhance.lo fhmtauto.lo \
-	fhmtgen.1.lo fhmtgenlow.1.lo finditalic.lo flipdetect.lo \
-	fliphmtgen.lo fmorphauto.lo fmorphgen.1.lo fmorphgenlow.1.lo \
-	fpix1.lo fpix2.lo gifio.lo gifiostub.lo gplot.lo graphics.lo \
+	bootnumgen2.lo bootnumgen3.lo bootnumgen4.lo boxbasic.lo \
+	boxfunc1.lo boxfunc2.lo boxfunc3.lo boxfunc4.lo boxfunc5.lo \
+	bytearray.lo ccbord.lo ccthin.lo classapp.lo colorcontent.lo \
+	coloring.lo colormap.lo colormorph.lo colorquant1.lo \
+	colorquant2.lo colorseg.lo colorspace.lo compare.lo \
+	conncomp.lo convertfiles.lo convolve.lo correlscore.lo \
+	dewarp1.lo dewarp2.lo dewarp3.lo dewarp4.lo dnabasic.lo \
+	dnafunc1.lo dnahash.lo dwacomb.2.lo dwacomblow.2.lo edge.lo \
+	encoding.lo enhance.lo fhmtauto.lo fhmtgen.1.lo \
+	fhmtgenlow.1.lo finditalic.lo flipdetect.lo fliphmtgen.lo \
+	fmorphauto.lo fmorphgen.1.lo fmorphgenlow.1.lo fpix1.lo \
+	fpix2.lo gifio.lo gifiostub.lo gplot.lo graphics.lo \
 	graymorph.lo grayquant.lo heap.lo jbclass.lo jp2kheader.lo \
 	jp2kheaderstub.lo jp2kio.lo jp2kiostub.lo jpegio.lo \
 	jpegiostub.lo kernel.lo leptwin.lo libversions.lo list.lo \
@@ -385,7 +386,7 @@ top_srcdir = @top_srcdir@
 AM_CFLAGS = $(DEBUG_FLAGS)
 AM_CPPFLAGS = $(ZLIB_CFLAGS) $(LIBPNG_CFLAGS) $(JPEG_CFLAGS) $(LIBTIFF_CFLAGS) $(LIBWEBP_CFLAGS) $(LIBJP2K_CFLAGS)
 lib_LTLIBRARIES = liblept.la
-liblept_la_LIBADD = $(LIBM) $(ZLIB_LIBS) $(LIBPNG_LIBS) $(JPEG_LIBS) $(GIFLIB_LIBS) $(LIBTIFF_LIBS) $(LIBWEBP_LIBS) $(LIBJP2K_LIBS) $(GDI_LIBS)
+liblept_la_LIBADD = $(LIBPNG_LIBS) $(JPEG_LIBS) $(GIFLIB_LIBS) $(LIBTIFF_LIBS) $(LIBWEBP_LIBS) $(LIBJP2K_LIBS) $(GDI_LIBS) $(LIBM) $(ZLIB_LIBS)
 liblept_la_LDFLAGS = -no-undefined -version-info 5:3:0
 liblept_la_SOURCES = adaptmap.c affine.c                        \
  affinecompose.c arrayaccess.c                                  \
@@ -393,9 +394,11 @@ liblept_la_SOURCES = adaptmap.c affine.c                        \
  bilateral.c bilinear.c binarize.c                              \
  binexpand.c binreduce.c                                        \
  blend.c bmf.c bmpio.c bmpiostub.c                              \
- bootnumgen1.c bootnumgen2.c bootnumgen3.c                      \
- boxbasic.c boxfunc1.c boxfunc2.c boxfunc3.c boxfunc4.c         \
- bytearray.c ccbord.c ccthin.c classapp.c                       \
+ bootnumgen1.c bootnumgen2.c                                    \
+ bootnumgen3.c bootnumgen4.c                                    \
+ boxbasic.c boxfunc1.c boxfunc2.c boxfunc3.c                    \
+ boxfunc4.c boxfunc5.c bytearray.c                              \
+ ccbord.c ccthin.c classapp.c                                   \
  colorcontent.c coloring.c                                      \
  colormap.c colormorph.c	                                \
  colorquant1.c colorquant2.c                                    \
@@ -559,11 +562,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bootnumgen1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bootnumgen2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bootnumgen3.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bootnumgen4.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxbasic.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxfunc1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxfunc2.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxfunc3.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxfunc4.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxfunc5.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bytearray.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccbord.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccthin.Plo@am__quote@

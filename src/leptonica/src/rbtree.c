@@ -147,7 +147,7 @@ l_rbtreeCreate(l_int32  keytype)
  * \brief   l_rbtreeLookup()
  *
  * \param[in]   t        rbtree, including root node
- * \param[in    key      find a node with this key
+ * \param[in]   key      find a node with this key
  * \return    &value     a pointer to a union, if the node exists; else NULL
  */
 RB_TYPE *
@@ -271,7 +271,7 @@ node  *n, *child;
 /*!
  * \brief   l_rbtreeDestroy()
  *
- * \param[in]   &t     ptr to rbtree
+ * \param[in]   pt     ptr to rbtree
  * \return      void
  *
  * <pre>
@@ -446,7 +446,7 @@ l_rbtreeGetPrev(L_RBTREE_NODE  *n)
 /*!
  * \brief   l_rbtreeGetCount()
  *
- * \param[in   t      rbtree
+ * \param[in]  t      rbtree
  * \return     count  the number of nodes in the tree, or 0 on error
  */
 l_int32

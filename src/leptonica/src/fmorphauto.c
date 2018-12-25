@@ -239,7 +239,7 @@ static char wplstrm[][10] = {"- wpls", "- wpls2", "- wpls3", "- wpls4",
  *      (2) See fmorphautogen1() and fmorphautogen2() for details.
  * </pre>
  */
-l_int32
+l_ok
 fmorphautogen(SELA        *sela,
               l_int32      fileindex,
               const char  *filename)
@@ -274,12 +274,12 @@ l_int32  ret1, ret2;
  *          opening or closing for any of the sels in the input sela.
  *      (2) The fileindex parameter is inserted into the output
  *          filename, as described below.
- *      (3) If filename == NULL, the output file is fmorphgen.<n>.c,
- *          where <n> is equal to the 'fileindex' parameter.
- *      (4) If filename != NULL, the output file is <filename>.<n>.c.
+ *      (3) If filename == NULL, the output file is fmorphgen.[n].c,
+ *          where [n] is equal to the %fileindex parameter.
+ *      (4) If filename != NULL, the output file is [%filename].[n].c.
  * </pre>
  */
-l_int32
+l_ok
 fmorphautogen1(SELA        *sela,
                l_int32      fileindex,
                const char  *filename)
@@ -482,9 +482,9 @@ SARRAY  *sa1, *sa2, *sa3;
  *          in the input sela.
  *      (2) The fileindex parameter is inserted into the output
  *          filename, as described below.
- *      (3) If filename == NULL, the output file is fmorphgenlow.<n>.c,
- *          where <n> is equal to the 'fileindex' parameter.
- *      (4) If filename != NULL, the output file is <filename>low.<n>.c.
+ *      (3) If filename == NULL, the output file is fmorphgenlow.[n].c,
+ *          where [n] is equal to the 'fileindex' parameter.
+ *      (4) If filename != NULL, the output file is [filename]low.[n].c.
  */
 l_int32
 fmorphautogen2(SELA        *sela,
