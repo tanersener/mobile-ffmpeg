@@ -574,7 +574,7 @@ echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android: " 
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 # PERFORM THIS CHECK ONLY ON LTS
-if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
+if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
     ENABLED_ARCHITECTURES[0]=1
 
     echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n"
