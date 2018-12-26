@@ -51,13 +51,6 @@ extern int const RETURN_CODE_CANCEL;
 + (NSString*)getVersion;
 
 /**
- * Returns whether MobileFFmpeg release is a long term release or not.
- *
- * \return YES=1 or NO=0
- */
-+ (int)isLTSBuild;
-
-/**
  * Synchronously executes FFmpeg with arguments provided.
  *
  * \param FFmpeg command options/arguments as string array

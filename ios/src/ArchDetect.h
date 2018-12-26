@@ -41,4 +41,11 @@
  */
 + (NSString*)getArch;
 
+/**
+ * Returns whether MobileFFmpeg release is a long term release or not.
+ *
+ * \return YES=1 or NO=0
+ */
++ (int)isLTSBuild;
+
 @end
