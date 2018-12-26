@@ -766,6 +766,8 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     # BUILDING UNIVERSAL LIBRARIES
     rm -rf ${BASEDIR}/prebuilt/ios-universal 1>>${BASEDIR}/build.log 2>&1
     mkdir -p ${BASEDIR}/prebuilt/ios-universal 1>>${BASEDIR}/build.log 2>&1
+    rm -rf ${BASEDIR}/prebuilt/ios-framework 1>>${BASEDIR}/build.log 2>&1
+    mkdir -p ${BASEDIR}/prebuilt/ios-framework 1>>${BASEDIR}/build.log 2>&1
 
     # 1. EXTERNAL LIBRARIES
     for library in {0..40}

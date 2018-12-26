@@ -477,13 +477,16 @@ APP_CFLAGS := -O3 -DANDROID ${LTS_BUILD__FLAG}-Wall -Wno-deprecated-declarations
 EOF
 }
 
-
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/android-common.sh
 
 DETECTED_NDK_VERSION=$(grep -Eo Revision.* ${ANDROID_NDK_ROOT}/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 
 echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>${BASEDIR}/build.log 2>&1
+
+# CLEAR OLD NATIVE LIBS
+rm -rf ${BASEDIR}/android/libs 1>>${BASEDIR}/build.log 2>&1
+rm -rf ${BASEDIR}/android/obj 1>>${BASEDIR}/build.log 2>&1
 
 GPL_ENABLED="no"
 DISPLAY_HELP=""
@@ -554,9 +557,13 @@ do
 done;
 
 # DETECT BUILD TYPE
+rm -f ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
 if [[ ! -z ${BUILD_LTS} ]]; then
     enable_lts_build
     BUILD_TYPE_ID+="LTS "
+    cp ${BASEDIR}/tools/ndk/Android.lts.mk ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
+else
+    cp ${BASEDIR}/tools/ndk/Android.mk ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
 fi
 
 if [[ ! -z ${DISPLAY_HELP} ]]; then

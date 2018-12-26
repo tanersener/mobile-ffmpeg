@@ -17,8 +17,8 @@ buildscript {
 android {
     compileSdkVersion 27
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 27
+        minSdkVersion Integer.parseInt(releaseMinSdk)
+        targetSdkVersion Integer.parseInt(releaseTargetSdk)
         versionCode Integer.parseInt(releaseVersionCode)
         versionName releaseVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"

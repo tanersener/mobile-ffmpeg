@@ -8,7 +8,7 @@ export SOURCE_PACKAGE="${BASEDIR}/../../prebuilt/ios-framework"
 export COCOA_PACKAGE="${BASEDIR}/../../prebuilt/ios-cocoa"
 export UNIVERSAL_PACKAGE="${BASEDIR}/../../prebuilt/ios-universal"
 export ALL_UNIVERSAL_PACKAGES="${BASEDIR}/../../prebuilt/ios-all-universal"
-export CUSTOM_OPTIONS="--disable-armv7 --disable-armv7s --disable-i386 --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox"
+export CUSTOM_OPTIONS="--disable-armv7s --lts --enable-ios-zlib --enable-ios-bzip2 --enable-ios-coreimage --enable-ios-avfoundation --enable-ios-audiotoolbox --enable-ios-videotoolbox"
 export GPL_PACKAGES="--enable-gpl --enable-libvidstab --enable-x264 --enable-x265 --enable-xvidcore"
 export FULL_PACKAGES="--enable-fontconfig --enable-freetype --enable-fribidi --enable-gmp --enable-gnutls --enable-kvazaar --enable-lame --enable-libaom --enable-libass --enable-libiconv --enable-libilbc --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libxml2 --enable-opencore-amr --enable-opus --enable-shine --enable-snappy --enable-soxr --enable-speex --enable-twolame --enable-wavpack"
 
@@ -64,39 +64,39 @@ mkdir -p ${COCOA_PACKAGE} || exit 1
 # MIN RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh ${CUSTOM_OPTIONS} || exit 1
-create_package "min" "$1" || exit 1
+create_package "min" "$1.LTS" || exit 1
 
 # MIN-GPL RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh ${CUSTOM_OPTIONS} ${GPL_PACKAGES} || exit 1
-create_package "min-gpl" "$1" || exit 1
+create_package "min-gpl" "$1.LTS" || exit 1
 
 # HTTPS RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh ${CUSTOM_OPTIONS} --enable-gnutls --enable-gmp || exit 1
-create_package "https" "$1" || exit 1
+create_package "https" "$1.LTS" || exit 1
 
 # HTTPS-GPL RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh ${CUSTOM_OPTIONS} --enable-gnutls --enable-gmp ${GPL_PACKAGES} || exit 1
-create_package "https-gpl" "$1" || exit 1
+create_package "https-gpl" "$1.LTS" || exit 1
 
 # AUDIO RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh ${CUSTOM_OPTIONS} --enable-lame --enable-libilbc --enable-libvorbis --enable-opencore-amr --enable-opus --enable-shine --enable-soxr --enable-speex --enable-twolame --enable-wavpack || exit 1
-create_package "audio" "$1" || exit 1
+create_package "audio" "$1.LTS" || exit 1
 
 # VIDEO RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh ${CUSTOM_OPTIONS} --enable-fontconfig --enable-freetype --enable-fribidi --enable-kvazaar --enable-libaom --enable-libass --enable-libiconv --enable-libtheora --enable-libvpx --enable-snappy --enable-libwebp || exit 1
-create_package "video" "$1" || exit 1
+create_package "video" "$1.LTS" || exit 1
 
 # FULL RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh ${CUSTOM_OPTIONS} ${FULL_PACKAGES} || exit 1
-create_package "full" "$1" || exit 1
+create_package "full" "$1.LTS" || exit 1
 
 # FULL-GPL RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh ${CUSTOM_OPTIONS} ${FULL_PACKAGES} ${GPL_PACKAGES} || exit 1
-create_package "full-gpl" "$1" || exit 1
+create_package "full-gpl" "$1.LTS" || exit 1
