@@ -15,7 +15,7 @@ buildscript {
 }
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion Integer.parseInt(releaseTargetSdk)
     defaultConfig {
         minSdkVersion Integer.parseInt(releaseMinSdk)
         targetSdkVersion Integer.parseInt(releaseTargetSdk)
