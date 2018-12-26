@@ -561,6 +561,7 @@ rm -f ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
 if [[ ! -z ${BUILD_LTS} ]]; then
     enable_lts_build
     BUILD_TYPE_ID+="LTS "
+
     cp ${BASEDIR}/tools/ndk/Android.lts.mk ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
 else
     cp ${BASEDIR}/tools/ndk/Android.mk ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
