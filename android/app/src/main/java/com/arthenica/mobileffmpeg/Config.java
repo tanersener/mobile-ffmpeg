@@ -89,17 +89,21 @@ public class Config {
          */
         boolean nativeLibraryLoaded = false;
         if (cpuAbi == Abi.ABI_ARMV7A_NEON) {
+            if (isNativeLTSBuild()) {
 
-            /*
-             * IF CPU SUPPORTS ARM-V7A-NEON THE TRY TO LOAD IT FIRST. IF NOT LOAD DEFAULT ARM-V7A
-             */
+                /*
+                 * IF CPU SUPPORTS ARM-V7A-NEON THE TRY TO LOAD IT FIRST. IF NOT LOAD DEFAULT ARM-V7A
+                 */
 
-            try {
-                System.loadLibrary("mobileffmpeg-armv7a-neon");
-                nativeLibraryLoaded = true;
+                try {
+                    System.loadLibrary("mobileffmpeg-armv7a-neon");
+                    nativeLibraryLoaded = true;
+                    AbiDetect.setArmV7aNeonLoaded(true);
+                } catch (final UnsatisfiedLinkError e) {
+                    Log.i(Config.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
+                }
+            } else {
                 AbiDetect.setArmV7aNeonLoaded(true);
-            } catch (final UnsatisfiedLinkError e) {
-                Log.i(Config.TAG, "NEON supported armeabi-v7a library not found. Loading default armeabi-v7a library.", e);
             }
         }
 
