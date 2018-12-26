@@ -89,7 +89,7 @@ public class Config {
          */
         boolean nativeLibraryLoaded = false;
         if (cpuAbi == Abi.ABI_ARMV7A_NEON) {
-            if (isNativeLTSBuild()) {
+            if (AbiDetect.isNativeLTSBuild()) {
 
                 /*
                  * IF CPU SUPPORTS ARM-V7A-NEON THE TRY TO LOAD IT FIRST. IF NOT LOAD DEFAULT ARM-V7A
@@ -523,12 +523,5 @@ public class Config {
      * @return build configuration string
      */
     native static String getNativeBuildConf();
-
-    /**
-     * <p>Returns whether MobileFFmpeg release is a long term release or not.
-     *
-     * @return YES or NO
-     */
-    native static boolean isNativeLTSBuild();
 
 }

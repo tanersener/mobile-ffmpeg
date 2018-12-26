@@ -79,7 +79,7 @@ public class FFmpeg {
      * @return MobileFFmpeg version
      */
     public static String getVersion() {
-        if (Config.isNativeLTSBuild()) {
+        if (AbiDetect.isNativeLTSBuild()) {
             return String.format("%s-lts", Config.getNativeVersion());
         } else {
             return Config.getNativeVersion();
@@ -189,7 +189,7 @@ public class FFmpeg {
      * @return YES or NO
      */
     public static boolean isLTSBuild() {
-        return Config.isNativeLTSBuild();
+        return AbiDetect.isNativeLTSBuild();
     }
 
 }

@@ -113,3 +113,18 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeCpu
         return (*env)->NewStringUTF(env, ABI_UNKNOWN);
     }
 }
+
+/**
+ * Returns whether MobileFFmpeg release is a long term release or not.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ * \return YES or NO
+ */
+JNIEXPORT jboolean JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_isNativeLTSBuild(JNIEnv *env, jclass object) {
+    #if defined(MOBILE_FFMPEG_LTS)
+        return JNI_TRUE;
+    #else
+        return JNI_FALSE;
+    #endif
+}
