@@ -67,6 +67,12 @@ export BASEDIR=$(pwd)
 
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
 
+# CHECKING IF XCODE IS INSTALLED
+if ! [ -x "$(command -v xcrun)" ]; then
+    echo -e "\n(*) xcrun command not found. Please check your Xcode installation.\n"
+    exit 1
+fi
+
 # USE SDK VERSION AS IOS_MIN_VERSION
 export IOS_MIN_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
 
@@ -717,12 +723,6 @@ do
         fi
     fi
 done
-
-# CHECKING IF XCODE IS INSTALLED
-if ! [ -x "$(command -v xcrun)" ]; then
-    echo -e "\n(*) xcrun command not found. Please check your Xcode installation.\n"
-    exit 1
-fi
 
 TARGET_ARCH_LIST=()
 
