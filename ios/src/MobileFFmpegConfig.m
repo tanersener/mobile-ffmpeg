@@ -369,7 +369,6 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 
 + (void)initialize {
     supportedExternalLibraries = [[NSMutableArray alloc] init];
-    [supportedExternalLibraries addObject:@"chromaprint"];
     [supportedExternalLibraries addObject:@"fontconfig"];
     [supportedExternalLibraries addObject:@"freetype"];
     [supportedExternalLibraries addObject:@"fribidi"];
@@ -390,11 +389,9 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     [supportedExternalLibraries addObject:@"opencore-amr"];
     [supportedExternalLibraries addObject:@"opus"];
     [supportedExternalLibraries addObject:@"shine"];
-    [supportedExternalLibraries addObject:@"sdl"];
     [supportedExternalLibraries addObject:@"snappy"];
     [supportedExternalLibraries addObject:@"soxr"];
     [supportedExternalLibraries addObject:@"speex"];
-    [supportedExternalLibraries addObject:@"tesseract"];
     [supportedExternalLibraries addObject:@"twolame"];
     [supportedExternalLibraries addObject:@"wavpack"];
     [supportedExternalLibraries addObject:@"x264"];
@@ -670,8 +667,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     }
 
     if (fullGpl) {
-        if ([enabledLibraryArray containsObject:@"chromaprint"] &&
-            [enabledLibraryArray containsObject:@"fontconfig"] &&
+        if ([enabledLibraryArray containsObject:@"fontconfig"] &&
             [enabledLibraryArray containsObject:@"freetype"] &&
             [enabledLibraryArray containsObject:@"fribidi"] &&
             [enabledLibraryArray containsObject:@"gmp"] &&
@@ -691,11 +687,9 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
             [enabledLibraryArray containsObject:@"opencore-amr"] &&
             [enabledLibraryArray containsObject:@"opus"] &&
             [enabledLibraryArray containsObject:@"shine"] &&
-            [enabledLibraryArray containsObject:@"sdl"] &&
             [enabledLibraryArray containsObject:@"snappy"] &&
             [enabledLibraryArray containsObject:@"soxr"] &&
             [enabledLibraryArray containsObject:@"speex"] &&
-            [enabledLibraryArray containsObject:@"tesseract"] &&
             [enabledLibraryArray containsObject:@"twolame"] &&
             [enabledLibraryArray containsObject:@"wavpack"] &&
             [enabledLibraryArray containsObject:@"x264"] &&
@@ -708,8 +702,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     }
 
     if (full) {
-        if ([enabledLibraryArray containsObject:@"chromaprint"] &&
-            [enabledLibraryArray containsObject:@"fontconfig"] &&
+        if ([enabledLibraryArray containsObject:@"fontconfig"] &&
             [enabledLibraryArray containsObject:@"freetype"] &&
             [enabledLibraryArray containsObject:@"fribidi"] &&
             [enabledLibraryArray containsObject:@"gmp"] &&
@@ -728,11 +721,9 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
             [enabledLibraryArray containsObject:@"opencore-amr"] &&
             [enabledLibraryArray containsObject:@"opus"] &&
             [enabledLibraryArray containsObject:@"shine"] &&
-            [enabledLibraryArray containsObject:@"sdl"] &&
             [enabledLibraryArray containsObject:@"snappy"] &&
             [enabledLibraryArray containsObject:@"soxr"] &&
             [enabledLibraryArray containsObject:@"speex"] &&
-            [enabledLibraryArray containsObject:@"tesseract"] &&
             [enabledLibraryArray containsObject:@"twolame"] &&
             [enabledLibraryArray containsObject:@"wavpack"]) {
             return @"full";
