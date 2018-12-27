@@ -47,8 +47,11 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 make distclean 2>/dev/null 1>/dev/null
 
+ASM_FLAGS=""
 case ${ARCH} in
     i386 |x86-64)
+        ASM_FLAGS="--disable-assembly"
+
         if ! [ -x "$(command -v nasm)" ]; then
             echo -e "(*) nasm command not found\n"
             exit 1
@@ -63,7 +66,7 @@ esac
     --enable-pic \
     --sysroot=${SDK_PATH} \
     --enable-static \
-    --enable-lto \
+    ${ASM_FLAGS} \
     --disable-cli \
     --host=${TARGET_HOST} || exit 1
 
