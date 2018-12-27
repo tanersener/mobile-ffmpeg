@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
 
     s.platform          = :ios
     s.requires_arc      = true
-    s.ios.deployment_target = '8.0'
+    s.ios.deployment_target = '9.3'
     s.ios.frameworks    = 'Foundation', 'AudioToolbox', 'CoreImage', 'CoreMotion', 'CoreVideo', 'GameController', 'VideoToolbox'
     s.libraries         = 'z', 'bz2', 'c++'
       
