@@ -34,7 +34,6 @@ class Packages {
 
     static {
         supportedExternalLibraries = new ArrayList<>();
-        supportedExternalLibraries.add("chromaprint");
         supportedExternalLibraries.add("fontconfig");
         supportedExternalLibraries.add("freetype");
         supportedExternalLibraries.add("fribidi");
@@ -55,11 +54,9 @@ class Packages {
         supportedExternalLibraries.add("opencore-amr");
         supportedExternalLibraries.add("opus");
         supportedExternalLibraries.add("shine");
-        supportedExternalLibraries.add("sdl");
         supportedExternalLibraries.add("snappy");
         supportedExternalLibraries.add("soxr");
         supportedExternalLibraries.add("speex");
-        supportedExternalLibraries.add("tesseract");
         supportedExternalLibraries.add("twolame");
         supportedExternalLibraries.add("wavpack");
         supportedExternalLibraries.add("x264");
@@ -134,8 +131,7 @@ class Packages {
         }
 
         if (fullGpl) {
-            if (externalLibraryList.contains("chromaprint") &&
-                    externalLibraryList.contains("fontconfig") &&
+            if (externalLibraryList.contains("fontconfig") &&
                     externalLibraryList.contains("freetype") &&
                     externalLibraryList.contains("fribidi") &&
                     externalLibraryList.contains("gmp") &&
@@ -155,11 +151,9 @@ class Packages {
                     externalLibraryList.contains("opencore-amr") &&
                     externalLibraryList.contains("opus") &&
                     externalLibraryList.contains("shine") &&
-                    externalLibraryList.contains("sdl") &&
                     externalLibraryList.contains("snappy") &&
                     externalLibraryList.contains("soxr") &&
                     externalLibraryList.contains("speex") &&
-                    externalLibraryList.contains("tesseract") &&
                     externalLibraryList.contains("twolame") &&
                     externalLibraryList.contains("wavpack") &&
                     externalLibraryList.contains("x264") &&
@@ -172,8 +166,7 @@ class Packages {
         }
 
         if (full) {
-            if (externalLibraryList.contains("chromaprint") &&
-                    externalLibraryList.contains("fontconfig") &&
+            if (externalLibraryList.contains("fontconfig") &&
                     externalLibraryList.contains("freetype") &&
                     externalLibraryList.contains("fribidi") &&
                     externalLibraryList.contains("gmp") &&
@@ -192,11 +185,9 @@ class Packages {
                     externalLibraryList.contains("opencore-amr") &&
                     externalLibraryList.contains("opus") &&
                     externalLibraryList.contains("shine") &&
-                    externalLibraryList.contains("sdl") &&
                     externalLibraryList.contains("snappy") &&
                     externalLibraryList.contains("soxr") &&
                     externalLibraryList.contains("speex") &&
-                    externalLibraryList.contains("tesseract") &&
                     externalLibraryList.contains("twolame") &&
                     externalLibraryList.contains("wavpack")) {
                 return "full";
