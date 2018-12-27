@@ -88,6 +88,7 @@ set(include_files_list
     stdbool.h
     stdint.h
     stdlib.h
+    strings.h
     string.h
     sys/ipc.h
     sys/shm.h
@@ -106,6 +107,7 @@ set(include_files_list
 check_includes(include_files_list)
 
 set(functions_list
+    getline
     snprintf
 )
 check_functions(functions_list)
@@ -118,12 +120,6 @@ set(types_list
     _Bool
 )
 check_types(types_list)
-
-set(PACKAGE_VERSION "${VERSION_PLAIN}")
-file(APPEND ${AUTOCONFIG_SRC} "
-/* Version number */
-#cmakedefine PACKAGE_VERSION \"${VERSION_PLAIN}\"
-")
 
 test_big_endian(WORDS_BIGENDIAN)
 

@@ -55,3 +55,4 @@ abstract class SVAbstractMenuItem {
    */
   public void performAction(SVWindow window, SVEventType eventType) {}
 }
+

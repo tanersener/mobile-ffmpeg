@@ -59,7 +59,9 @@ export LEPTONICA_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/l
     --disable-fast-install \
     --disable-debug \
     --disable-graphics \
+    --disable-cube \
     --disable-tessdata-prefix \
+    --disable-largefile \
     --host=${TARGET_HOST} || exit 1
 
 ${SED_INLINE} 's/$wl-bind_at_load//g' libtool
@@ -67,6 +69,6 @@ ${SED_INLINE} 's/$wl-bind_at_load//g' libtool
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_tesseract_package_config "4.0.0"
+create_tesseract_package_config "3.05.02"
 
 make install || exit 1

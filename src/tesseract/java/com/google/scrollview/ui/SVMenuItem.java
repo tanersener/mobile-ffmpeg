@@ -58,3 +58,4 @@ class SVMenuItem extends SVAbstractMenuItem {
     return value;
   }
 }
+

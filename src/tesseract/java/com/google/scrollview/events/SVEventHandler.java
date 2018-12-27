@@ -28,7 +28,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.Window;
 
 import javax.swing.Timer;
 
@@ -263,10 +262,7 @@ public class SVEventHandler extends PBasicInputEventHandler implements
   public void windowClosing(WindowEvent e) {
     processEvent(new SVEvent(SVEventType.SVET_DESTROY, svWindow, lastXMove,
         lastYMove, 0, 0, null));
-    Window w = e.getWindow();
-    if (w != null) {
-      w.dispose();
-    }
+    e.getWindow().dispose();
     SVWindow.nrWindows--;
     if (SVWindow.nrWindows == 0) {
       processEvent(new SVEvent(SVEventType.SVET_EXIT, svWindow, lastXMove,
