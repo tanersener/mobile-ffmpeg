@@ -57,9 +57,7 @@ export ac_cv_c_bigendian=no
     --disable-fast-install \
     --disable-debug \
     --disable-graphics \
-    --disable-cube \
     --disable-tessdata-prefix \
-    --disable-largefile \
     --host=${TARGET_HOST} || exit 1
 
 ${SED_INLINE} 's/\-lrt//g' ${BASEDIR}/src/${LIB_NAME}/api/Makefile
@@ -67,6 +65,6 @@ ${SED_INLINE} 's/\-lrt//g' ${BASEDIR}/src/${LIB_NAME}/api/Makefile
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_tesseract_package_config "3.05.02"
+create_tesseract_package_config "4.0.0"
 
 make install || exit 1
