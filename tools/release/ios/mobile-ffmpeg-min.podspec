@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
     s.platform          = :ios
     s.requires_arc      = true
     s.ios.deployment_target = '9.3'
-    s.ios.frameworks    = 'Foundation', 'AudioToolbox', 'CoreImage', 'CoreMotion', 'CoreVideo', 'GameController', 'VideoToolbox'
+    s.ios.frameworks    = 'AudioToolbox','AVFoundation','CoreMedia','VideoToolbox'
     s.libraries         = 'z', 'bz2', 'c++'
       
     s.source            = { :http => 'https://github.com/tanersener/mobile-ffmpeg/releases/download/vVERSION/mobile-ffmpeg-min-VERSION-ios-framework.zip' }
