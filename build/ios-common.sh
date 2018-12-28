@@ -235,10 +235,10 @@ get_size_optimization_cflags() {
     case ${ARCH} in
         armv7 | armv7s | arm64 | arm64e)
             case $1 in
-                x264)
+                x264 | x265)
                     ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
                 ;;
-                x265 | ffmpeg | mobile-ffmpeg)
+                ffmpeg | mobile-ffmpeg)
                     ARCH_OPTIMIZATION="-flto -Oz -Wno-ignored-optimization-argument"
                 ;;
                 *)
@@ -301,7 +301,7 @@ get_app_specific_cflags() {
             esac
         ;;
         ffmpeg)
-            APP_FLAGS="-Wno-unused-function -Wno-deprecated-declarations -DPIC"
+            APP_FLAGS="-Wno-unused-function -Wno-deprecated-declarations"
         ;;
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
@@ -382,7 +382,7 @@ get_cxxflags() {
 
     case $1 in
         x265)
-            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
+            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         gnutls)
             echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
