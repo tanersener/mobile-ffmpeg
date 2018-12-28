@@ -61,6 +61,9 @@ fi
 rm -rf ${COCOA_PACKAGE}
 mkdir -p ${COCOA_PACKAGE} || exit 1
 
+rm -rf ${ALL_UNIVERSAL_PACKAGES}
+mkdir -p ${ALL_UNIVERSAL_PACKAGES} || exit 1
+
 # MIN RELEASE
 cd ${BASEDIR}/../.. || exit 1
 ./ios.sh ${CUSTOM_OPTIONS} || exit 1
