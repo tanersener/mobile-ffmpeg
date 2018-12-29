@@ -222,7 +222,6 @@
 				34F9744020A1A200004A1F68 /* Headers */,
 				3452D8CF20A373640045E6B0 /* Embed Frameworks */,
 				DFE64F47D0B2AA62D946772E /* [CP] Embed Pods Frameworks */,
-				34DFD8C121C8187400D6551D /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -288,19 +287,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		34DFD8C121C8187400D6551D /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "echo \"Applying patch for https://github.com/tanersener/mobile-ffmpeg/issues/18\"\ncd \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}\"\n\nINFO_PLIST_FILES=$(find . -name Info.plist | grep 'libswresample\\|libavfilter\\|libavformat\\|libavutil\\|libswscale\\|libavdevice\\|libavcodec\\|mobileffmpeg')\n\nfor INFO_PLIST in ${INFO_PLIST_FILES};\ndo\nexisting_key_line_number=$(sed -n '/MinimumOS/=' ${INFO_PLIST})\nif [[ -z ${existing_key_line_number} ]]; then\nsed -i .tmp \"s/<\\/dict/    <key>MinimumOSVersion<\\/key>\\\\\n<string>9.3<\\/string>\\\\\n<\\/dict/g\" ${INFO_PLIST}\nrm -f \"${INFO_PLIST}.tmp\"\necho \"Patch added MinimumOSVersion key & value at ${INFO_PLIST}\"\nelse\nsed -i .tmp \"$((existing_key_line_number+1))s/.*/        <string>9.3<\\/string>/\" ${INFO_PLIST}\nrm -f \"${INFO_PLIST}.tmp\"\necho \"Patch replaced MinimumOSVersion value at ${INFO_PLIST}\"\nfi\ndone\n";
-		};
 		5E094331BD641A4FE317B9CB /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -327,26 +313,10 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-MobileFFmpegTest/Pods-MobileFFmpegTest-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/NMEasyTipView/NMEasyTipView.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full/mobileffmpeg.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full/libavcodec.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full/libavdevice.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full/libavfilter.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full/libavformat.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full/libavutil.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full/libswresample.framework",
-				"${PODS_ROOT}/mobile-ffmpeg-full/libswscale.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/NMEasyTipView.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/mobileffmpeg.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavcodec.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavdevice.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavfilter.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavformat.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libavutil.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libswresample.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libswscale.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -528,7 +498,7 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobileFFmpegTest/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
@@ -555,7 +525,7 @@
 				);
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = MobileFFmpegTest/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_CODE_SIGN_FLAGS = "--deep";
