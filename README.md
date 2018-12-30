@@ -256,7 +256,7 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 
 ### 3. Versions
 
-`MobileFFmpeg` uses the same version number as `FFmpeg` since `v4.2`. Before that, `MobileFFmpeg` version number of a release and `FFmpeg` version number included in that release was different, as shown in the following table. 
+`MobileFFmpeg` uses the same version number as `FFmpeg` since `v4.2`. Before that, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different, as shown in the following table. 
 
 |        | v1.0 | v1.1 | v1.2 | v2.0 | v2.1 | v2.2 | v3.0 | v3.1 | v4.2 |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
@@ -265,13 +265,13 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 
 ### 4. LTS Releases
 
-Starting from `v4.2`, `MobileFFmpeg` releases publish two variants of the same release: `Main Release` and `LTS Release`. 
+Starting from `v4.2`, `MobileFFmpeg` binaries are published in two different variants: `Main Release` and `LTS Release`. 
 
 - Main releases include complete functionality of the library and support the latest SDK/API features
 
-- LTS releases are customized to support a wide range of devices. They are built using older API/SDK versions so some features are not available for them
+- LTS releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them
 
-This table shows the differences between two release variants.
+This table shows the differences between two variants.
 
 |        | Main Release | LTS Release |
 | :----: | :----: | :----: |
@@ -281,7 +281,6 @@ This table shows the differences between two release variants.
 | IOS SDK | 12.1 | 9.3 |
 | Xcode Support | 10.1 | 7.3.1 |
 | IOS Architectures | arm64<br/>arm64e<br/>x86-64</br> | armv7<br/>arm64<br/>i386<br/>x86-64</br> |
-
 
 ### 5. Building
 #### 5.1 Prerequisites
@@ -324,6 +323,10 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 ```
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/ios_custom.gif" width="600">
+
+##### 5.2.3 Building LTS Binaries
+
+Use `--lts` option to build lts binaries for each platform.
 
 #### 5.3 GPL Support
 It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1` 
