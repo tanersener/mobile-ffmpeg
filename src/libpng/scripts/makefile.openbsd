@@ -11,7 +11,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	16
-SHLIB_MINOR=	1.6.35
+SHLIB_MINOR=	1.6.36
 
 LIB=	png
 SRCS=	png.c pngerror.c pngget.c pngmem.c pngpread.c \
@@ -28,7 +28,7 @@ NOPROFILE= Yes
 CLEANFILES+= pngtest.o pngtest pnglibconf.h
 
 MAN=	libpng.3 libpngpf.3 png.5
-DOCS=	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
+DOCS=	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO \
 	libpng-manual.txt
 
 # Pre-built configuration

@@ -226,6 +226,7 @@ External library support:
   --enable-libcelt         enable CELT decoding via libcelt [no]
   --enable-libcdio         enable audio CD grabbing with libcdio [no]
   --enable-libcodec2       enable codec2 en/decoding using libcodec2 [no]
+  --enable-libdav1d        enable AV1 decoding via libdav1d [no]
   --enable-libdavs2        enable AVS2 decoding via libdavs2 [no]
   --enable-libdc1394       enable IIDC-1394 grabbing using libdc1394
                            and libraw1394 [no]
@@ -379,7 +380,7 @@ Toolchain options:
   --host-cppflags=HCPPFLAGS use HCPPFLAGS when compiling for host
   --host-ld=HOSTLD         use host linker HOSTLD
   --host-ldflags=HLDFLAGS  use HLDFLAGS when linking for host
-  --host-libs=HLIBS        use libs HLIBS when linking for host
+  --host-extralibs=HLIBS   use libs HLIBS when linking for host
   --host-os=OS             compiler host OS [$target_os]
   --extra-cflags=ECFLAGS   add ECFLAGS to CFLAGS [$CFLAGS]
   --extra-cxxflags=ECFLAGS add ECFLAGS to CXXFLAGS [$CXXFLAGS]
@@ -472,7 +473,7 @@ Developer options (useful when working on FFmpeg itself):
   --random-seed=VALUE      seed value for --enable/disable-random
   --disable-valgrind-backtrace do not print a backtrace under Valgrind
                            (only applies to --disable-optimizations builds)
-  --enable-osfuzz          Enable building fuzzer tool
+  --enable-ossfuzz         Enable building fuzzer tool
   --libfuzzer=PATH         path to libfuzzer
   --ignore-tests=TESTS     comma-separated list (without "fate-" prefix
                            in the name) of tests whose result is ignored
@@ -1712,6 +1713,7 @@ EXTERNAL_LIBRARY_LIST="
     libcaca
     libcelt
     libcodec2
+    libdav1d
     libdc1394
     libdrm
     libflite
@@ -2335,6 +2337,7 @@ CONFIG_EXTRA="
     rtpdec
     rtpenc_chain
     rv34dsp
+    scene_sad
     sinewin
     snappy
     srtp
@@ -2433,6 +2436,7 @@ CMDLINE_SET="
     tempprefix
     toolchain
     valgrind
+    windres
     x86asmexe
 "
 
@@ -3043,6 +3047,7 @@ hevc_metadata_bsf_select="cbs_h265"
 mjpeg2jpeg_bsf_select="jpegtables"
 mpeg2_metadata_bsf_select="cbs_mpeg2"
 trace_headers_bsf_select="cbs"
+truehd_core_bsf_select="mlp_parser"
 vp9_metadata_bsf_select="cbs_vp9"
 
 # external libraries
@@ -3091,6 +3096,7 @@ libaom_av1_encoder_select="extract_extradata_bsf"
 libcelt_decoder_deps="libcelt"
 libcodec2_decoder_deps="libcodec2"
 libcodec2_encoder_deps="libcodec2"
+libdav1d_decoder_deps="libdav1d"
 libdavs2_decoder_deps="libdavs2"
 libfdk_aac_decoder_deps="libfdk_aac"
 libfdk_aac_encoder_deps="libfdk_aac"
@@ -3398,7 +3404,8 @@ find_rect_filter_deps="avcodec avformat gpl"
 firequalizer_filter_deps="avcodec"
 firequalizer_filter_select="rdft"
 flite_filter_deps="libflite"
-framerate_filter_select="pixelutils"
+framerate_filter_select="scene_sad"
+freezedetect_filter_select="scene_sad"
 frei0r_filter_deps="frei0r libdl"
 frei0r_src_filter_deps="frei0r libdl"
 fspp_filter_deps="gpl"
@@ -3414,6 +3421,7 @@ mcdeint_filter_deps="avcodec gpl"
 movie_filter_deps="avcodec avformat"
 mpdecimate_filter_deps="gpl"
 mpdecimate_filter_select="pixelutils"
+minterpolate_filter_select="scene_sad"
 mptestsrc_filter_deps="gpl"
 negate_filter_deps="lut_filter"
 nnedi_filter_deps="gpl"
@@ -3442,7 +3450,7 @@ sab_filter_deps="gpl swscale"
 scale2ref_filter_deps="swscale"
 scale_filter_deps="swscale"
 scale_qsv_filter_deps="libmfx"
-select_filter_select="pixelutils"
+select_filter_select="scene_sad"
 sharpness_vaapi_filter_deps="vaapi"
 showcqt_filter_deps="avcodec avformat swscale"
 showcqt_filter_suggest="libfontconfig libfreetype"
@@ -3473,6 +3481,7 @@ tinterlace_merge_test_deps="tinterlace_filter"
 tinterlace_pad_test_deps="tinterlace_filter"
 tonemap_filter_deps="const_nan"
 tonemap_opencl_filter_deps="opencl const_nan"
+transpose_opencl_filter_deps="opencl"
 unsharp_opencl_filter_deps="opencl"
 uspp_filter_deps="gpl avcodec"
 vaguedenoiser_filter_deps="gpl"
@@ -3601,6 +3610,7 @@ host_os=$target_os_default
 if test "$target_os_default" = aix; then
     arch_default=$(uname -p)
     strip_default="strip -X32_64"
+    nm_default="nm -g -X32_64"
 else
     arch_default=$(uname -m)
 fi
@@ -3717,8 +3727,7 @@ find_things_extern(){
 
 find_filters_extern(){
     file=$source_path/$1
-    #sed -n "s/^extern AVFilter ff_\([avfsinkrc]\{2,5\}\)_\(\w\+\);/\2_filter/p" $file
-    sed -E -n "s/^extern AVFilter ff_([avfsinkrc]{2,5})_([a-zA-Z0-9_]+);/\2_filter/p" $file
+    sed -n 's/^extern AVFilter ff_[avfsinkrc]\{2,5\}_\([[:alnum:]_]\{1,\}\);/\1_filter/p' $file
 }
 
 FILTER_LIST=$(find_filters_extern libavfilter/allfilters.c)
@@ -4121,6 +4130,11 @@ if test -n "$cross_prefix"; then
     enable cross_compile
 fi
 
+set_default target_os
+if test "$target_os" = android; then
+    cc_default="clang"
+fi
+
 ar_default="${cross_prefix}${ar_default}"
 cc_default="${cross_prefix}${cc_default}"
 cxx_default="${cross_prefix}${cxx_default}"
@@ -4137,7 +4151,7 @@ windres_default="${cross_prefix}${windres_default}"
 sysinclude_default="${sysroot}/usr/include"
 
 set_default arch cc cxx doxygen pkg_config ranlib strip sysinclude \
-    target_exec target_os x86asmexe nvcc
+    target_exec x86asmexe nvcc
 enabled cross_compile || host_cc_default=$cc
 set_default host_cc
 
@@ -4841,7 +4855,6 @@ elif enabled mips; then
                 enable fast_cmov
                 enable fast_unaligned
                 disable aligned_stack
-                disable mipsfpu
                 disable mipsdsp
                 disable mipsdspr2
                 # When gcc version less than 5.3.0, add -fno-expensive-optimizations flag.
@@ -5136,6 +5149,7 @@ case $target_os in
             echo "hwcap_1 = OVERRIDE;" > mapfile &&
             add_ldflags -Wl,-M,mapfile
         nm_default='nm -P -g'
+        striptype=""
         version_script='-M'
         VERSION_SCRIPT_POSTPROCESS_CMD='perl $(SRC_PATH)/compat/solaris/make_sunver.pl - $(OBJS)'
         ;;
@@ -5289,7 +5303,6 @@ case $target_os in
         network_extralibs="-lsocket"
         objformat="coff"
         enable dos_paths
-        add_cppflags -U__STRICT_ANSI__
         ;;
     linux)
         enable section_data_rel_ro
@@ -5458,6 +5471,11 @@ EOF
     elif test_${pfx}cpp_condition sys/brand.h "defined LABELED_BRAND_NAME"; then
         eval ${pfx}libc_type=solaris
         add_${pfx}cppflags -D__EXTENSIONS__ -D_XOPEN_SOURCE=600
+    elif test_${pfx}cpp_condition sys/version.h "defined __DJGPP__"; then
+        eval ${pfx}libc_type=djgpp
+        add_cppflags -U__STRICT_ANSI__
+        add_cflags "-include $source_path/compat/djgpp/math.h"
+        add_compat djgpp/math.o
     fi
     test_${pfx}cc <<EOF
 #include <time.h>
@@ -6053,11 +6071,11 @@ enabled chromaprint       && require chromaprint chromaprint.h chromaprint_get_v
 enabled decklink          && { require_headers DeckLinkAPI.h &&
                                { test_cpp_condition DeckLinkAPIVersion.h "BLACKMAGIC_DECKLINK_API_VERSION >= 0x0a090500" || die "ERROR: Decklink API version must be >= 10.9.5."; } }
 enabled libndi_newtek     && require_headers Processing.NDI.Lib.h
-enabled frei0r            && require_headers frei0r.h
+enabled frei0r            && require_headers "frei0r.h dlfcn.h"
 enabled gmp               && require gmp gmp.h mpz_export -lgmp
 enabled gnutls            && require_pkg_config gnutls gnutls gnutls/gnutls.h gnutls_global_init
 enabled jni               && { [ $target_os = "android" ] && check_headers jni.h && enabled pthreads || die "ERROR: jni not found"; }
-enabled ladspa            && require_headers ladspa.h
+enabled ladspa            && require_headers "ladspa.h dlfcn.h"
 enabled libaom            && require_pkg_config libaom "aom >= 1.0.0" aom/aom_codec.h aom_codec_version
 enabled lv2               && require_pkg_config lv2 lilv-0 "lilv/lilv.h" lilv_world_new
 enabled libiec61883       && require libiec61883 libiec61883/iec61883.h iec61883_cmp_connect -lraw1394 -lavc1394 -lrom1394 -liec61883
@@ -6069,7 +6087,8 @@ enabled libcelt           && require libcelt celt/celt.h celt_decode -lcelt0 &&
                                die "ERROR: libcelt must be installed and version must be >= 0.11.0."; }
 enabled libcaca           && require_pkg_config libcaca caca caca.h caca_create_canvas
 enabled libcodec2         && require libcodec2 codec2/codec2.h codec2_create -lcodec2
-enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.5.115" davs2.h davs2_decoder_open
+enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.1.0" "dav1d/dav1d.h" dav1d_version
+enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.6.0" davs2.h davs2_decoder_open
 enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
 enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
 enabled libfdk_aac        && { check_pkg_config libfdk_aac fdk-aac "fdk-aac/aacenc_lib.h" aacEncOpen ||
@@ -6185,7 +6204,7 @@ enabled libx264           && { check_pkg_config libx264 x264 "stdint.h x264.h" x
 enabled libx265           && require_pkg_config libx265 x265 x265.h x265_api_get &&
                              require_cpp_condition libx265 x265.h "X265_BUILD >= 68"
 enabled libxavs           && require libxavs "stdint.h xavs.h" xavs_encoder_encode "-lxavs $pthreads_extralibs $libm_extralibs"
-enabled libxavs2          && require_pkg_config libxavs2 "xavs2 >= 1.2.77" "stdint.h xavs2.h" xavs2_api_get
+enabled libxavs2          && require_pkg_config libxavs2 "xavs2 >= 1.3.0" "stdint.h xavs2.h" xavs2_api_get
 enabled libxvid           && require libxvid xvid.h xvid_global -lxvidcore
 enabled libzimg           && require_pkg_config libzimg "zimg >= 2.7.0" zimg.h zimg_get_api_version
 enabled libzmq            && require_pkg_config libzmq libzmq zmq.h zmq_ctx_new
@@ -6500,6 +6519,7 @@ check_disable_warning -Wno-format-zero-length
 check_disable_warning -Wno-pointer-sign
 check_disable_warning -Wno-unused-const-variable
 check_disable_warning -Wno-bool-operation
+check_disable_warning -Wno-char-subscripts
 
 check_disable_warning_headers(){
     warning_flag=-W${1#-Wno-}
@@ -6782,10 +6802,17 @@ check_deps $CONFIG_LIST       \
 enabled threads && ! enabled pthreads && ! enabled atomics_native && die "non pthread threading without atomics not supported, try adding --enable-pthreads or --cpu=i486 or higher if you are on x86"
 enabled avresample && warn "Building with deprecated library libavresample"
 
-if test $target_os = "haiku"; then
+case $target_os in
+haiku)
     disable memalign
     disable posix_memalign
-fi
+    ;;
+*-dos|freedos|opendos)
+    if test_cpp_condition sys/version.h "defined(__DJGPP__) && __DJGPP__ == 2 && __DJGPP_MINOR__ == 5"; then
+        disable memalign
+    fi
+    ;;
+esac
 
 flatten_extralibs(){
     nested_entries=

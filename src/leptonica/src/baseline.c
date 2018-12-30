@@ -384,7 +384,7 @@ PTA       *ptas, *ptad;
  *          to remove keystoning in the src.
  * </pre>
  */
-l_int32
+l_ok
 pixGetLocalSkewTransform(PIX       *pixs,
                          l_int32    nslices,
                          l_int32    redsweep,

@@ -49,10 +49,10 @@ if [[ ${RECONF_fontconfig} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
-    --with-libiconv-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv \
-    --with-expat=${BASEDIR}/prebuilt/ios-$(get_target_host)/expat \
+    --with-libiconv-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libiconv \
+    --with-expat=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/expat \
     --without-libintl-prefix \
     --enable-static \
     --disable-shared \
@@ -67,7 +67,7 @@ fi
 rm -f ${BASEDIR}/src/${LIB_NAME}/test/test-bz106632.c
 cp ${BASEDIR}/src/${LIB_NAME}/test/test-bz106618.c ${BASEDIR}/src/${LIB_NAME}/test/test-bz106632.c
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_fontconfig_package_config "2.13.1"

@@ -67,7 +67,7 @@ int main(int    argc,
 {
 char        *filein, *printer, *extra, *fname;
 char         buffer[512];
-l_int32      i, w, h, ignore;
+l_int32      i, w, h, ret;
 l_float32    scale;
 FILE        *fp;
 PIX         *pixs, *pix1;
@@ -89,7 +89,7 @@ static char  mainName[] = "printimage";
          "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n");
 
     setLeptDebugOK(1);
-    lept_rm(NULL, "print_image.ps");
+    (void)lept_rm(NULL, "print_image.ps");
 
     if ((pixs = pixRead(filein)) == NULL)
         return ERROR_INT("pixs not made", mainName, 1);
@@ -119,11 +119,11 @@ static char  mainName[] = "printimage";
     }
     if (!extra) {
         snprintf(buffer, sizeof(buffer), "lpr %s -P%s &", fname, printer);
-        ignore = system(buffer);
+        ret = system(buffer);
     } else {
         snprintf(buffer, sizeof(buffer), "lpr %s -P%s %s &",
                  fname, printer, extra);
-        ignore = system(buffer);
+        ret = system(buffer);
     }
 
     lept_free(fname);

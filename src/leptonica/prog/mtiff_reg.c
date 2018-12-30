@@ -323,32 +323,32 @@ L_REGPARAMS  *rp;
     numaAddNumber(naflags, 700);
     str = "<xmp>This is a Fake XMP packet</xmp>\n<text>Guess what ...?</text>";
     length = strlen(str);
-    sarrayAddString(savals, (char *)str, L_COPY);
-    sarrayAddString(satypes, (char *)"char*", L_COPY);
+    sarrayAddString(savals, str, L_COPY);
+    sarrayAddString(satypes, "char*", L_COPY);
     numaAddNumber(nasizes, length);  /* get it all */
 
     numaAddNumber(naflags, 269);  /* DOCUMENTNAME */
-    sarrayAddString(savals, (char *)"One silly title", L_COPY);
-    sarrayAddString(satypes, (char *)"const char*", L_COPY);
+    sarrayAddString(savals, "One silly title", L_COPY);
+    sarrayAddString(satypes, "const char*", L_COPY);
     numaAddNumber(naflags, 270);  /* IMAGEDESCRIPTION */
-    sarrayAddString(savals, (char *)"One page of text", L_COPY);
-    sarrayAddString(satypes, (char *)"const char*", L_COPY);
+    sarrayAddString(savals, "One page of text", L_COPY);
+    sarrayAddString(satypes, "const char*", L_COPY);
         /* the max sample is used by rendering programs
          * to scale the dynamic range */
     numaAddNumber(naflags, 281);  /* MAXSAMPLEVALUE */
-    sarrayAddString(savals, (char *)"4", L_COPY);
-    sarrayAddString(satypes, (char *)"l_uint16", L_COPY);
+    sarrayAddString(savals, "4", L_COPY);
+    sarrayAddString(satypes, "l_uint16", L_COPY);
         /* note that date is required to be a 20 byte string */
     numaAddNumber(naflags, 306);  /* DATETIME */
-    sarrayAddString(savals, (char *)"2004:10:11 09:35:15", L_COPY);
-    sarrayAddString(satypes, (char *)"const char*", L_COPY);
+    sarrayAddString(savals, "2004:10:11 09:35:15", L_COPY);
+    sarrayAddString(satypes, "const char*", L_COPY);
         /* note that page number requires 2 l_uint16 input */
     numaAddNumber(naflags, 297);  /* PAGENUMBER */
-    sarrayAddString(savals, (char *)"1-412", L_COPY);
-    sarrayAddString(satypes, (char *)"l_uint16-l_uint16", L_COPY);
+    sarrayAddString(savals, "1-412", L_COPY);
+    sarrayAddString(satypes, "l_uint16-l_uint16", L_COPY);
     pixWriteTiffCustom("/tmp/lept/tiff/tags.tif", pix, IFF_TIFF_G4, "w", naflags,
                        savals, satypes, nasizes);
-    fprintTiffInfo(stderr, (char *)"/tmp/lept/tiff/tags.tif");
+    fprintTiffInfo(stderr, "/tmp/lept/tiff/tags.tif");
     fprintf(stderr, "num flags = %d\n", numaGetCount(naflags));
     fprintf(stderr, "num sizes = %d\n", numaGetCount(nasizes));
     fprintf(stderr, "num vals = %d\n", sarrayGetCount(savals));

@@ -31,6 +31,7 @@
  *               PIX      *pixScale()
  *               PIX      *pixScaleToSizeRel()
  *               PIX      *pixScaleToSize()
+ *               PIX      *pixScaleToResolution()
  *               PIX      *pixScaleGeneral()
  *
  *         Linearly interpreted (usually up-) scaling
@@ -340,6 +341,45 @@ l_float32  scalex, scaley;
     }
 
     return pixScale(pixs, scalex, scaley);
+}
+
+
+/*!
+ * \brief   pixScaleToResolution()
+ *
+ * \param[in]    pixs
+ * \param[in]    target      desired resolution
+ * \param[in]    assumed     assumed resolution if not defined; typ. 300.
+ * \param[out]   pscalefact  [optional] actual scaling factor used
+ * \return  pixd, or NULL on error
+ */
+PIX *
+pixScaleToResolution(PIX        *pixs,
+                     l_float32   target,
+                     l_float32   assumed,
+                     l_float32  *pscalefact)
+{
+l_int32    xres;
+l_float32  factor;
+
+    PROCNAME("pixScaleToResolution");
+
+    if (pscalefact) *pscalefact = 1.0;
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    if (target <= 0)
+        return (PIX *)ERROR_PTR("target resolution <= 0", procName, NULL);
+
+    xres = pixGetXRes(pixs);
+    if (xres <= 0) {
+        if (assumed == 0)
+            return pixCopy(NULL, pixs);
+        xres = assumed;
+    }
+    factor = target / (l_float32)xres;
+    if (pscalefact) *pscalefact = factor;
+
+    return pixScale(pixs, factor, factor);
 }
 
 
@@ -1747,9 +1787,9 @@ PIX       *pixs, *pixd;
 /*!
  * \brief   pixScaleSmoothToSize()
  *
- * \param[in]    pix 2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
- * \param[in]    wd  target width; use 0 if using height as target
- * \param[in]    hd  target height; use 0 if using width as target
+ * \param[in]    pixs 2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
+ * \param[in]    wd   target width; use 0 if using height as target
+ * \param[in]    hd   target height; use 0 if using width as target
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -2037,9 +2077,9 @@ PIX       *pixs, *pixd;
 /*!
  * \brief   pixScaleAreaMapToSize()
  *
- * \param[in]    pix 2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
- * \param[in]    wd  target width; use 0 if using height as target
- * \param[in]    hd  target height; use 0 if using width as target
+ * \param[in]    pixs 2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
+ * \param[in]    wd   target width; use 0 if using height as target
+ * \param[in]    hd   target height; use 0 if using width as target
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -3002,7 +3042,7 @@ scaleBySamplingLow(l_uint32  *datad,
                    l_int32    d,
                    l_int32    wpls)
 {
-l_int32    i, j, bpld;
+l_int32    i, j;
 l_int32    xs, prevxs, sval;
 l_int32   *srow, *scol;
 l_uint32   csval;
@@ -3014,9 +3054,8 @@ l_float32  wratio, hratio;
     if (d != 2 && d != 4 && d !=8 && d != 16 && d != 32)
         return ERROR_INT("pixel depth not supported", procName, 1);
 
-        /* clear dest */
-    bpld = 4 * wpld;
-    memset((char *)datad, 0, hd * bpld);
+        /* Clear dest */
+    memset(datad, 0, 4LL * hd * wpld);
 
         /* the source row corresponding to dest row i ==> srow[i]
          * the source col corresponding to dest col j ==> scol[j]  */
@@ -3100,7 +3139,7 @@ l_float32  wratio, hratio;
             }
         } else {  /* lines == prevlines; copy prev dest row */
             prevlined = lined - wpld;
-            memcpy((char *)lined, (char *)prevlined, bpld);
+            memcpy(lined, prevlined, 4 * wpld);
         }
         prevlines = lines;
     }
@@ -3145,7 +3184,7 @@ l_float32  wratio, hratio, norm;
     PROCNAME("scaleSmoothLow");
 
         /* Clear dest */
-    memset((char *)datad, 0, 4 * wpld * hd);
+    memset(datad, 0, 4LL * wpld * hd);
 
         /* Each dest pixel at (j,i) is computed as the average
            of size^2 corresponding src pixels.
@@ -3204,9 +3243,7 @@ l_float32  wratio, hratio, norm;
                 rval = (l_int32)((l_float32)rval * norm);
                 gval = (l_int32)((l_float32)gval * norm);
                 bval = (l_int32)((l_float32)bval * norm);
-                *(lined + j) = rval << L_RED_SHIFT |
-                               gval << L_GREEN_SHIFT |
-                               bval << L_BLUE_SHIFT;
+                composeRGBPixel(rval, gval, bval, lined + j);
             }
         }
     }
@@ -3626,7 +3663,7 @@ scaleBinaryLow(l_uint32  *datad,
                l_int32    hs,
                l_int32    wpls)
 {
-l_int32    i, j, bpld;
+l_int32    i, j;
 l_int32    xs, prevxs, sval;
 l_int32   *srow, *scol;
 l_uint32  *lines, *prevlines, *lined, *prevlined;
@@ -3634,9 +3671,8 @@ l_float32  wratio, hratio;
 
     PROCNAME("scaleBinaryLow");
 
-        /* clear dest */
-    bpld = 4 * wpld;
-    memset((char *)datad, 0, hd * bpld);
+        /* Clear dest */
+    memset(datad, 0, 4LL * hd * wpld);
 
         /* The source row corresponding to dest row i ==> srow[i]
          * The source col corresponding to dest col j ==> scol[j]  */
@@ -3674,7 +3710,7 @@ l_float32  wratio, hratio;
             }
         } else {  /* lines == prevlines; copy prev dest row */
             prevlined = lined - wpld;
-            memcpy((char *)lined, (char *)prevlined, bpld);
+            memcpy(lined, prevlined, 4 * wpld);
         }
         prevlines = lines;
     }

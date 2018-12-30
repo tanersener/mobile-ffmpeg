@@ -537,7 +537,7 @@ void av1_highbd_warp_affine_sse4_1(const int32_t *mat, const uint16_t *ref,
             __m128i *const dst16 = (__m128i *)&pred[(i + k + 4) * p_stride + j];
             __m128i p_32 = _mm_cvtepu16_epi32(_mm_loadl_epi64(p));
 
-            if (conv_params->use_jnt_comp_avg) {
+            if (conv_params->use_dist_wtd_comp_avg) {
               res_lo = _mm_add_epi32(_mm_mullo_epi32(p_32, wt0),
                                      _mm_mullo_epi32(res_lo, wt1));
               res_lo = _mm_srai_epi32(res_lo, DIST_PRECISION_BITS);
@@ -570,7 +570,7 @@ void av1_highbd_warp_affine_sse4_1(const int32_t *mat, const uint16_t *ref,
                   (__m128i *)&pred[(i + k + 4) * p_stride + j + 4];
               __m128i p4_32 = _mm_cvtepu16_epi32(_mm_loadl_epi64(p4));
 
-              if (conv_params->use_jnt_comp_avg) {
+              if (conv_params->use_dist_wtd_comp_avg) {
                 res_hi = _mm_add_epi32(_mm_mullo_epi32(p4_32, wt0),
                                        _mm_mullo_epi32(res_hi, wt1));
                 res_hi = _mm_srai_epi32(res_hi, DIST_PRECISION_BITS);

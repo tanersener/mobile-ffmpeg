@@ -111,7 +111,7 @@
  *      (4) For 8 and 16 bpp, if val < 0 the result is clipped to 0.
  * </pre>
  */
-l_int32
+l_ok
 pixAddConstantGray(PIX      *pixs,
                    l_int32   val)
 {
@@ -182,7 +182,7 @@ l_uint32  *data, *line;
  *      (3) For 8 and 16 bpp, the result is clipped to 0xff and 0xffff, rsp.
  * </pre>
  */
-l_int32
+l_ok
 pixMultConstantGray(PIX       *pixs,
                     l_float32  val)
 {
@@ -715,7 +715,7 @@ PIX       *pixd;
  *      (3) The alignment is to the origin [UL corner] of pixs & pixd.
  * </pre>
  */
-l_int32
+l_ok
 pixAccumulate(PIX     *pixd,
               PIX     *pixs,
               l_int32  op)
@@ -814,7 +814,7 @@ l_uint32  *datas, *datad, *lines, *lined;
  *      (3) The result is returned with the offset back in place.
  * </pre>
  */
-l_int32
+l_ok
 pixMultConstAccumulate(PIX       *pixs,
                        l_float32  factor,
                        l_uint32   offset)
@@ -1424,6 +1424,7 @@ PIX        *pixd;
  *          Otherwise, the product will overflow a uint8.  In use, factor
  *          is the same for all pixels in a pix.
  *      (2) No scaling is performed on the transparency ("A") component.
+ * </pre>
  */
 l_uint32
 linearScaleRGBVal(l_uint32   sval,

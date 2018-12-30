@@ -16,8 +16,8 @@
 
 # Makefile.am, the source file for Makefile.in (and hence Makefile), is
 #
+# Copyright (c) 2018 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
-# Last changed in libpng 1.6.25 [September 1, 2016]
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -106,7 +106,8 @@ check_PROGRAMS = pngtest$(EXEEXT) pngunknown$(EXEEXT) \
 @HAVE_CLOCK_GETTIME_TRUE@am__append_1 = timepng
 bin_PROGRAMS = pngfix$(EXEEXT) png-fix-itxt$(EXEEXT)
 @PNG_ARM_NEON_TRUE@am__append_2 = arm/arm_init.c\
-@PNG_ARM_NEON_TRUE@	arm/filter_neon.S arm/filter_neon_intrinsics.c
+@PNG_ARM_NEON_TRUE@	arm/filter_neon.S arm/filter_neon_intrinsics.c \
+@PNG_ARM_NEON_TRUE@	arm/palette_neon_intrinsics.c
 
 @PNG_MIPS_MSA_TRUE@am__append_3 = mips/mips_init.c\
 @PNG_MIPS_MSA_TRUE@	mips/filter_msa_intrinsics.c
@@ -183,12 +184,14 @@ am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST = png.c \
 	pngwtran.c pngwutil.c png.h pngconf.h pngdebug.h pnginfo.h \
 	pngpriv.h pngstruct.h pngusr.dfa arm/arm_init.c \
 	arm/filter_neon.S arm/filter_neon_intrinsics.c \
-	mips/mips_init.c mips/filter_msa_intrinsics.c \
-	intel/intel_init.c intel/filter_sse2_intrinsics.c \
-	powerpc/powerpc_init.c powerpc/filter_vsx_intrinsics.c
+	arm/palette_neon_intrinsics.c mips/mips_init.c \
+	mips/filter_msa_intrinsics.c intel/intel_init.c \
+	intel/filter_sse2_intrinsics.c powerpc/powerpc_init.c \
+	powerpc/filter_vsx_intrinsics.c
 am__dirstamp = $(am__leading_dot)dirstamp
 @PNG_ARM_NEON_TRUE@am__objects_1 = arm/arm_init.lo arm/filter_neon.lo \
-@PNG_ARM_NEON_TRUE@	arm/filter_neon_intrinsics.lo
+@PNG_ARM_NEON_TRUE@	arm/filter_neon_intrinsics.lo \
+@PNG_ARM_NEON_TRUE@	arm/palette_neon_intrinsics.lo
 @PNG_MIPS_MSA_TRUE@am__objects_2 = mips/mips_init.lo \
 @PNG_MIPS_MSA_TRUE@	mips/filter_msa_intrinsics.lo
 @PNG_INTEL_SSE_TRUE@am__objects_3 = intel/intel_init.lo \
@@ -266,6 +269,7 @@ am__depfiles_remade = ./$(DEPDIR)/png.Plo ./$(DEPDIR)/pngerror.Plo \
 	./$(DEPDIR)/pngwtran.Plo ./$(DEPDIR)/pngwutil.Plo \
 	arm/$(DEPDIR)/arm_init.Plo arm/$(DEPDIR)/filter_neon.Plo \
 	arm/$(DEPDIR)/filter_neon_intrinsics.Plo \
+	arm/$(DEPDIR)/palette_neon_intrinsics.Plo \
 	contrib/libtests/$(DEPDIR)/pngimage.Po \
 	contrib/libtests/$(DEPDIR)/pngstest.Po \
 	contrib/libtests/$(DEPDIR)/pngunknown.Po \
@@ -530,7 +534,7 @@ TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 	$(TEST_LOG_FLAGS)
 am__DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in $(srcdir)/libpng-config.in \
-	$(srcdir)/libpng.pc.in INSTALL README TODO compile \
+	$(srcdir)/libpng.pc.in AUTHORS INSTALL README TODO compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing \
 	test-driver
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -780,7 +784,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 # from those directories being included.  This only works if the configure is
 # not done in the source directory!
 EXTRA_DIST = \
-	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
+	ANNOUNCE AUTHORS CHANGES INSTALL LICENSE README TODO TRADEMARK \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
 	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
@@ -972,6 +976,8 @@ arm/arm_init.lo: arm/$(am__dirstamp) arm/$(DEPDIR)/$(am__dirstamp)
 arm/filter_neon.lo: arm/$(am__dirstamp) arm/$(DEPDIR)/$(am__dirstamp)
 arm/filter_neon_intrinsics.lo: arm/$(am__dirstamp) \
 	arm/$(DEPDIR)/$(am__dirstamp)
+arm/palette_neon_intrinsics.lo: arm/$(am__dirstamp) \
+	arm/$(DEPDIR)/$(am__dirstamp)
 mips/$(am__dirstamp):
 	@$(MKDIR_P) mips
 	@: > mips/$(am__dirstamp)
@@ -1140,6 +1146,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_init.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/filter_neon.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/filter_neon_intrinsics.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/palette_neon_intrinsics.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngimage.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngstest.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngunknown.Po@am__quote@ # am--include-marker
@@ -2076,6 +2083,7 @@ distclean: distclean-am
 	-rm -f arm/$(DEPDIR)/arm_init.Plo
 	-rm -f arm/$(DEPDIR)/filter_neon.Plo
 	-rm -f arm/$(DEPDIR)/filter_neon_intrinsics.Plo
+	-rm -f arm/$(DEPDIR)/palette_neon_intrinsics.Plo
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngunknown.Po
@@ -2160,6 +2168,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f arm/$(DEPDIR)/arm_init.Plo
 	-rm -f arm/$(DEPDIR)/filter_neon.Plo
 	-rm -f arm/$(DEPDIR)/filter_neon_intrinsics.Plo
+	-rm -f arm/$(DEPDIR)/palette_neon_intrinsics.Plo
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngunknown.Po

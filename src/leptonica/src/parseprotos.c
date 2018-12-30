@@ -90,10 +90,10 @@ static l_int32 getOffsetForMatchingRP(SARRAY *sa, l_int32 start,
  *          without cpp comment lines, typically when there are no
  *          comments in the source that immediately precede the function.
  *      (3) Plan 2.  Consider the keywords in the language that start
- *          parts of the cpp file.  Some, like 'typedef', 'enum',
- *          'union' and 'struct', are followed after a while by '{',
- *          and eventually end with '}, plus an optional token and a
- *          final ';'  Others, like 'extern' and 'static', are never
+ *          parts of the cpp file.  Some, like 'enum', 'union' and
+ *          'struct', are followed after a while by '{', and eventually
+ *          end with '}, plus an optional token and a final ';'.
+ *          Others, like 'extern', 'static' and 'typedef', are never
  *          the beginnings of global function definitions.   Function
  *          prototypes have one or more sets of '(' followed eventually
  *          by a ')', and end with ';'.  But function definitions have
@@ -108,7 +108,8 @@ static l_int32 getOffsetForMatchingRP(SARRAY *sa, l_int32 start,
  *          the only keyword we need to consider is 'static'.
  *      (4) Plan 3.  Consider the parentheses and braces for various
  *          declarations.  A struct, enum, or union has a pair of
- *          braces followed by a semicolon.  They cannot have parentheses
+ *          braces followed by a semicolon.  With the exception of an
+ *          __attribute__ declaration for a struct, they cannot have parentheses
  *          before the left brace, but a struct can have lots of parentheses
  *          within the brace set.  A function prototype has no braces.
  *          A function declaration can have sets of left and right
@@ -166,22 +167,27 @@ SARRAY  *sa, *saout, *satest;
                 start, stop, charindex); */
         str = captureProtoSignature(sa, start, stop, charindex);
 
-            /* Make sure that the signature found by cpp is neither
-             * static nor extern.  We get 'extern' declarations from
-             * header files, and with some versions of cpp running on
+            /* Make sure that the signature found by cpp does not begin with
+             * static, extern or typedef.  We get 'extern' declarations
+             * from header files, and with some versions of cpp running on
              * #include <sys/stat.h> we get something of the form:
              *    extern ... (( ... )) ... ( ... ) { ...
              * For this, the 1st '(' is the lp, the 2nd ')' is the rp,
-             * and there is a lot of garbage between the rp and the lb.
+             * and there is a lot of garbage between the rp and the lp.
              * It is easiest to simply reject any signature that starts
              * with 'extern'.  Note also that an 'extern' token has been
              * prepended to each prototype, so the 'static' or
              * 'extern' keywords we are looking for, if they exist,
-             * would be the second word. */
+             * would be the second word.  We also have a typedef in
+             * bmpio.c that has the form:
+             *    typedef struct __attribute__((....)) { ...} ... ;
+             * This is avoided by blacklisting 'typedef' along with 'extern'
+             * and 'static'. */
         satest = sarrayCreateWordsFromString(str);
         secondword = sarrayGetString(satest, 1, L_NOCOPY);
         if (strcmp(secondword, "static") &&  /* not static */
-            strcmp(secondword, "extern")) {  /* not extern */
+            strcmp(secondword, "extern") &&  /* not extern */
+            strcmp(secondword, "typedef")) {  /* not typedef */
             if (prestring) {  /* prepend it to the prototype */
                 newstr = stringJoin(prestring, str);
                 sarrayAddString(saout, newstr, L_INSERT);

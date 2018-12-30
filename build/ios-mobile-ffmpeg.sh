@@ -37,17 +37,13 @@ TARGET_HOST=$(get_target_host)
 COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
 COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/include"
+export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/include"
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/ffmpeg/lib -framework Foundation -framework CoreVideo -lavdevice"
+export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ffmpeg/lib -framework Foundation -framework CoreVideo -lavdevice"
 export PKG_CONFIG_LIBDIR="${INSTALL_PKG_CONFIG_DIR}"
 
-# BUILD SHARED (DEFAULT) OR STATIC LIBRARIES
-if [[ -z ${MOBILE_FFMPEG_STATIC} ]]; then
-    BUILD_LIBRARY_OPTIONS="--enable-shared --disable-static";
-else
-    BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
-fi
+# ALWAYS BUILD STATIC LIBRARIES
+BUILD_LIBRARY_OPTIONS="--enable-static --disable-shared";
 
 cd ${BASEDIR}/ios || exit 1
 
@@ -72,7 +68,7 @@ ${SED_INLINE} 's/$wl-undefined //g' configure
 ${SED_INLINE} 's/${wl}suppress//g' configure
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     ${BUILD_LIBRARY_OPTIONS} \
@@ -86,7 +82,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
+make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -ne 0 ]; then
     echo "failed"

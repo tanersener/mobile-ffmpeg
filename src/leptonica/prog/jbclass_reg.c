@@ -75,8 +75,8 @@ L_REGPARAMS  *rp;
     pixDestroy(&pix2);
     boxDestroy(&box);
     sa = sarrayCreate(2);
-    sarrayAddString(sa, (char *)"/tmp/lept/class/pix1.tif", L_COPY);
-    sarrayAddString(sa, (char *)"/tmp/lept/class/pix2.tif", L_COPY);
+    sarrayAddString(sa, "/tmp/lept/class/pix1.tif", L_COPY);
+    sarrayAddString(sa, "/tmp/lept/class/pix2.tif", L_COPY);
 
     /*--------------------------------------------------------------*/
 

@@ -707,3 +707,51 @@ SDL_DYNAPI_PROC(SDL_bool,SDL_IsAndroidTV,(void),(),return)
 #endif
 SDL_DYNAPI_PROC(double,SDL_log10,(double a),(a),return)
 SDL_DYNAPI_PROC(float,SDL_log10f,(float a),(a),return)
+SDL_DYNAPI_PROC(char*,SDL_GameControllerMappingForDeviceIndex,(int a),(a),return)
+#ifdef __LINUX__
+SDL_DYNAPI_PROC(int,SDL_LinuxSetThreadPriority,(Sint64 a, int b),(a,b),return)
+#endif
+SDL_DYNAPI_PROC(SDL_bool,SDL_HasAVX512F,(void),(),return)
+#ifdef __ANDROID__
+SDL_DYNAPI_PROC(SDL_bool,SDL_IsChromebook,(void),(),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_IsDeXMode,(void),(),return)
+SDL_DYNAPI_PROC(void,SDL_AndroidBackButton,(void),(),return)
+#endif
+SDL_DYNAPI_PROC(double,SDL_exp,(double a),(a),return)
+SDL_DYNAPI_PROC(float,SDL_expf,(float a),(a),return)
+SDL_DYNAPI_PROC(wchar_t*,SDL_wcsdup,(const wchar_t *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_GameControllerRumble,(SDL_GameController *a, Uint16 b, Uint16 c, Uint32 d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(int,SDL_JoystickRumble,(SDL_Joystick *a, Uint16 b, Uint16 c, Uint32 d),(a,b,c,d),return)
+SDL_DYNAPI_PROC(int,SDL_NumSensors,(void),(),return)
+SDL_DYNAPI_PROC(const char*,SDL_SensorGetDeviceName,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_SensorType,SDL_SensorGetDeviceType,(int a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_SensorGetDeviceNonPortableType,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_SensorID,SDL_SensorGetDeviceInstanceID,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_Sensor*,SDL_SensorOpen,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_Sensor*,SDL_SensorFromInstanceID,(SDL_SensorID a),(a),return)
+SDL_DYNAPI_PROC(const char*,SDL_SensorGetName,(SDL_Sensor *a),(a),return)
+SDL_DYNAPI_PROC(SDL_SensorType,SDL_SensorGetType,(SDL_Sensor *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_SensorGetNonPortableType,(SDL_Sensor *a),(a),return)
+SDL_DYNAPI_PROC(SDL_SensorID,SDL_SensorGetInstanceID,(SDL_Sensor *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_SensorGetData,(SDL_Sensor *a, float *b, int c),(a,b,c),return)
+SDL_DYNAPI_PROC(void,SDL_SensorClose,(SDL_Sensor *a),(a),)
+SDL_DYNAPI_PROC(void,SDL_SensorUpdate,(void),(),)
+SDL_DYNAPI_PROC(SDL_bool,SDL_IsTablet,(void),(),return)
+SDL_DYNAPI_PROC(SDL_DisplayOrientation,SDL_GetDisplayOrientation,(int a),(a),return)
+SDL_DYNAPI_PROC(SDL_bool,SDL_HasColorKey,(SDL_Surface *a),(a),return)
+
+#ifdef SDL_CreateThreadWithStackSize
+#undef SDL_CreateThreadWithStackSize
+#endif
+
+#if defined(__WIN32__) && !defined(HAVE_LIBC)
+SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThreadWithStackSize,(SDL_ThreadFunction a, const char *b, const size_t c, void *d, pfnSDL_CurrentBeginThread e, pfnSDL_CurrentEndThread f),(a,b,c,d,e,f),return)
+#elif defined(__OS2__)
+SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThreadWithStackSize,(SDL_ThreadFunction a, const char *b, const size_t c, void *d, pfnSDL_CurrentBeginThread e, pfnSDL_CurrentEndThread f),(a,b,c,d,e,f),return)
+#else
+SDL_DYNAPI_PROC(SDL_Thread*,SDL_CreateThreadWithStackSize,(SDL_ThreadFunction a, const char *b, const size_t c, void *d),(a,b,c,d),return)
+#endif
+
+SDL_DYNAPI_PROC(int,SDL_JoystickGetDevicePlayerIndex,(int a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_JoystickGetPlayerIndex,(SDL_Joystick *a),(a),return)
+SDL_DYNAPI_PROC(int,SDL_GameControllerGetPlayerIndex,(SDL_GameController *a),(a),return)

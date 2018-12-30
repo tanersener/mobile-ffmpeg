@@ -66,7 +66,7 @@ cmake -Wno-dev \
     -DWITH_JAVA=0 \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) .. || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
 cp ${BASEDIR}/src/${LIB_NAME}/build/pkgscripts/libjpeg.pc ${INSTALL_PKG_CONFIG_DIR}

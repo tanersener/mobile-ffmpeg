@@ -48,7 +48,7 @@ if [[ ${RECONF_wavpack} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --without-iconv \
@@ -59,7 +59,7 @@ fi
     --disable-tests \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
 cp ./*.pc ${INSTALL_PKG_CONFIG_DIR}

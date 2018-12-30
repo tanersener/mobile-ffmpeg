@@ -437,6 +437,74 @@ static const arg_def_t enable_restoration =
     ARG_DEF(NULL, "enable-restoration", 1,
             "Enable the loop restoration filter (0: false, "
             "1: true (default))");
+static const arg_def_t enable_rect_partitions =
+    ARG_DEF(NULL, "enable-rect-partitions", 1,
+            "Enable rectangular partitions "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_dual_filter =
+    ARG_DEF(NULL, "enable-dual-filter", 1,
+            "Enable dual filter "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_intra_edge_filter =
+    ARG_DEF(NULL, "enable-intra-edge-filter", 1,
+            "Enable intra edge filtering "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_order_hint =
+    ARG_DEF(NULL, "enable-order-hint", 1,
+            "Enable order hint "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_tx64 =
+    ARG_DEF(NULL, "enable-tx64", 1,
+            "Enable 64-pt transform (0: false, 1: true (default))");
+static const arg_def_t enable_dist_wtd_comp =
+    ARG_DEF(NULL, "enable-dist-wtd-comp", 1,
+            "Enable distance-weighted compound "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_masked_comp =
+    ARG_DEF(NULL, "enable-masked-comp", 1,
+            "Enable masked (wedge/diff-wtd) compound "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_interintra_comp =
+    ARG_DEF(NULL, "enable-interintra-comp", 1,
+            "Enable interintra compound "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_smooth_interintra =
+    ARG_DEF(NULL, "enable-smooth-interintra", 1,
+            "Enable smooth interintra mode "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_diff_wtd_comp =
+    ARG_DEF(NULL, "enable-diff-wtd-comp", 1,
+            "Enable difference-weighted compound "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_interinter_wedge =
+    ARG_DEF(NULL, "enable-interinter-wedge", 1,
+            "Enable interinter wedge compound "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_interintra_wedge =
+    ARG_DEF(NULL, "enable-interintra-wedge", 1,
+            "Enable interintra wedge compound "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_global_motion =
+    ARG_DEF(NULL, "enable-global-motion", 1,
+            "Enable global motion "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_warped_motion =
+    ARG_DEF(NULL, "enable-warped-motion", 1,
+            "Enable local warped motion "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_filter_intra =
+    ARG_DEF(NULL, "enable-filter-intra", 1,
+            "Enable filter intra prediction mode "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_obmc = ARG_DEF(
+    NULL, "enable-obmc", 1, "Enable OBMC (0: false, 1: true (default))");
+static const arg_def_t enable_palette =
+    ARG_DEF(NULL, "enable-palette", 1,
+            "Enable palette prediction mode (0: false, 1: true (default))");
+static const arg_def_t enable_intrabc =
+    ARG_DEF(NULL, "enable-intrabc", 1,
+            "Enable intra block copy prediction mode "
+            "(0: false, 1: true (default))");
 static const arg_def_t disable_trellis_quant =
     ARG_DEF(NULL, "disable-trellis-quant", 1,
             "Disable trellis optimization of quantized coefficients (0: false ("
@@ -448,6 +516,8 @@ static const arg_def_t qm_min = ARG_DEF(
     NULL, "qm-min", 1, "Min quant matrix flatness (0..15), default is 8");
 static const arg_def_t qm_max = ARG_DEF(
     NULL, "qm-max", 1, "Max quant matrix flatness (0..15), default is 15");
+static const arg_def_t reduced_tx_type_set = ARG_DEF(
+    NULL, "reduced-tx-type-set", 1, "Use reduced set of transform types");
 #if CONFIG_DIST_8X8
 static const arg_def_t enable_dist_8x8 =
     ARG_DEF(NULL, "enable-dist-8x8", 1,
@@ -515,6 +585,9 @@ static const arg_def_t min_gf_interval = ARG_DEF(
 static const arg_def_t max_gf_interval = ARG_DEF(
     NULL, "max-gf-interval", 1,
     "max gf/arf frame interval (default 0, indicating in-built behavior)");
+static const arg_def_t gf_max_pyr_height =
+    ARG_DEF(NULL, "gf-max-pyr-height", 1,
+            "maximum height for GF group pyramid structure (1 to 4 (default))");
 
 static const struct arg_enum_list color_primaries_enum[] = {
   { "bt709", AOM_CICP_CP_BT_709 },
@@ -638,10 +711,29 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &lossless,
                                        &enable_cdef,
                                        &enable_restoration,
+                                       &enable_rect_partitions,
+                                       &enable_dual_filter,
+                                       &enable_intra_edge_filter,
+                                       &enable_order_hint,
+                                       &enable_tx64,
+                                       &enable_dist_wtd_comp,
+                                       &enable_masked_comp,
+                                       &enable_interintra_comp,
+                                       &enable_smooth_interintra,
+                                       &enable_diff_wtd_comp,
+                                       &enable_interinter_wedge,
+                                       &enable_interintra_wedge,
+                                       &enable_global_motion,
+                                       &enable_warped_motion,
+                                       &enable_filter_intra,
+                                       &enable_obmc,
+                                       &enable_palette,
+                                       &enable_intrabc,
                                        &disable_trellis_quant,
                                        &enable_qm,
                                        &qm_min,
                                        &qm_max,
+                                       &reduced_tx_type_set,
 #if CONFIG_DIST_8X8
                                        &enable_dist_8x8,
 #endif
@@ -659,6 +751,7 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &input_chroma_sample_position,
                                        &min_gf_interval,
                                        &max_gf_interval,
+                                       &gf_max_pyr_height,
                                        &superblock_size,
                                        &num_tg,
                                        &mtu_size,
@@ -696,10 +789,29 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_LOSSLESS,
                                         AV1E_SET_ENABLE_CDEF,
                                         AV1E_SET_ENABLE_RESTORATION,
+                                        AV1E_SET_ENABLE_RECT_PARTITIONS,
+                                        AV1E_SET_ENABLE_DUAL_FILTER,
+                                        AV1E_SET_ENABLE_INTRA_EDGE_FILTER,
+                                        AV1E_SET_ENABLE_ORDER_HINT,
+                                        AV1E_SET_ENABLE_TX64,
+                                        AV1E_SET_ENABLE_DIST_WTD_COMP,
+                                        AV1E_SET_ENABLE_MASKED_COMP,
+                                        AV1E_SET_ENABLE_INTERINTRA_COMP,
+                                        AV1E_SET_ENABLE_SMOOTH_INTERINTRA,
+                                        AV1E_SET_ENABLE_DIFF_WTD_COMP,
+                                        AV1E_SET_ENABLE_INTERINTER_WEDGE,
+                                        AV1E_SET_ENABLE_INTERINTRA_WEDGE,
+                                        AV1E_SET_ENABLE_GLOBAL_MOTION,
+                                        AV1E_SET_ENABLE_WARPED_MOTION,
+                                        AV1E_SET_ENABLE_FILTER_INTRA,
+                                        AV1E_SET_ENABLE_OBMC,
+                                        AV1E_SET_ENABLE_PALETTE,
+                                        AV1E_SET_ENABLE_INTRABC,
                                         AV1E_SET_DISABLE_TRELLIS_QUANT,
                                         AV1E_SET_ENABLE_QM,
                                         AV1E_SET_QM_MIN,
                                         AV1E_SET_QM_MAX,
+                                        AV1E_SET_REDUCED_TX_TYPE_SET,
 #if CONFIG_DIST_8X8
                                         AV1E_SET_ENABLE_DIST_8X8,
 #endif
@@ -717,6 +829,7 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_CHROMA_SAMPLE_POSITION,
                                         AV1E_SET_MIN_GF_INTERVAL,
                                         AV1E_SET_MAX_GF_INTERVAL,
+                                        AV1E_SET_GF_MAX_PYRAMID_HEIGHT,
                                         AV1E_SET_SUPERBLOCK_SIZE,
                                         AV1E_SET_NUM_TG,
                                         AV1E_SET_MTU,
@@ -728,10 +841,6 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_DENOISE_BLOCK_SIZE,
 #endif
                                         AV1E_SET_ENABLE_REF_FRAME_MVS,
-                                        AV1E_SET_ENABLE_DF,
-                                        AV1E_SET_ENABLE_ORDER_HINT,
-                                        AV1E_SET_ENABLE_JNT_COMP,
-                                        AV1E_SET_ENABLE_SUPERRES,
                                         0 };
 #endif  // CONFIG_AV1_ENCODER
 

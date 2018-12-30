@@ -316,7 +316,7 @@ ptaClone(PTA  *pta)
  *      This only resets the Pta::n field, for reuse
  * </pre>
  */
-l_int32
+l_ok
 ptaEmpty(PTA  *pta)
 {
     PROCNAME("ptaEmpty");
@@ -338,7 +338,7 @@ ptaEmpty(PTA  *pta)
  * \param[in]    x, y
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptaAddPt(PTA       *pta,
          l_float32  x,
          l_float32  y)
@@ -400,7 +400,7 @@ ptaExtendArrays(PTA  *pta)
  * \param[in]    x, y point values
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptaInsertPt(PTA     *pta,
             l_int32  index,
             l_int32  x,
@@ -443,7 +443,7 @@ l_int32  i, n;
  *          because the function is O(n).
  * </pre>
  */
-l_int32
+l_ok
 ptaRemovePt(PTA     *pta,
             l_int32  index)
 {
@@ -521,7 +521,7 @@ ptaGetCount(PTA  *pta)
  * \param[out]   py [optional] float y value
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptaGetPt(PTA        *pta,
          l_int32     index,
          l_float32  *px,
@@ -551,7 +551,7 @@ ptaGetPt(PTA        *pta,
  * \param[out]   py [optional] integer y value
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptaGetIPt(PTA      *pta,
           l_int32   index,
           l_int32  *px,
@@ -580,7 +580,7 @@ ptaGetIPt(PTA      *pta,
  * \param[in]    x, y
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptaSetPt(PTA       *pta,
          l_int32    index,
          l_float32  x,
@@ -612,7 +612,7 @@ ptaSetPt(PTA       *pta,
  *      (1) This copies the internal arrays into new Numas.
  * </pre>
  */
-l_int32
+l_ok
 ptaGetArrays(PTA    *pta,
              NUMA  **pnax,
              NUMA  **pnay)
@@ -778,7 +778,7 @@ PTA   *pta;
  *          or cleared by the function setLeptDebugOK().
  * </pre>
  */
-l_int32
+l_ok
 ptaWriteDebug(const char  *filename,
               PTA         *pta,
               l_int32      type)
@@ -802,7 +802,7 @@ ptaWriteDebug(const char  *filename,
  * \param[in]    type  0 for float values; 1 for integer values
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptaWrite(const char  *filename,
          PTA         *pta,
          l_int32      type)
@@ -835,7 +835,7 @@ FILE    *fp;
  * \param[in]    type  0 for float values; 1 for integer values
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptaWriteStream(FILE    *fp,
                PTA     *pta,
                l_int32  type)
@@ -884,7 +884,7 @@ l_float32  x, y;
  *      (1) Serializes a pta in memory and puts the result in a buffer.
  * </pre>
  */
-l_int32
+l_ok
 ptaWriteMem(l_uint8  **pdata,
             size_t    *psize,
             PTA       *pta,
@@ -1000,7 +1000,7 @@ PTAA    *ptaa;
  * \param[in]    copyflag  L_INSERT, L_COPY, L_CLONE
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptaaAddPta(PTAA    *ptaa,
            PTA     *pta,
            l_int32  copyflag)
@@ -1121,7 +1121,7 @@ ptaaGetPta(PTAA    *ptaa,
  * \param[out]   py [optional] float y value
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptaaGetPt(PTAA       *ptaa,
            l_int32     ipta,
            l_int32     jpt,
@@ -1161,7 +1161,7 @@ PTA  *pta;
  * \param[in]    pta to be replicated into the entire ptr array
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptaaInitFull(PTAA  *ptaa,
              PTA   *pta)
 {
@@ -1200,7 +1200,7 @@ PTA     *ptat;
  *      (2) If the index is invalid, return 1 (error)
  * </pre>
  */
-l_int32
+l_ok
 ptaaReplacePta(PTAA    *ptaa,
                l_int32  index,
                PTA     *pta)
@@ -1231,7 +1231,7 @@ l_int32  n;
  * \param[in]    x,y point coordinates
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptaaAddPt(PTAA      *ptaa,
           l_int32    ipta,
           l_float32  x,
@@ -1266,7 +1266,7 @@ PTA  *pta;
  *          and resets the count.
  * </pre>
  */
-l_int32
+l_ok
 ptaaTruncate(PTAA  *ptaa)
 {
 l_int32  i, n, np;
@@ -1411,7 +1411,7 @@ PTAA  *ptaa;
  *          or cleared by the function setLeptDebugOK().
  * </pre>
  */
-l_int32
+l_ok
 ptaaWriteDebug(const char  *filename,
                PTAA        *ptaa,
                l_int32      type)
@@ -1435,7 +1435,7 @@ ptaaWriteDebug(const char  *filename,
  * \param[in]    type  0 for float values; 1 for integer values
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 ptaaWrite(const char  *filename,
           PTAA        *ptaa,
           l_int32      type)
@@ -1468,7 +1468,7 @@ FILE    *fp;
  * \param[in]    type  0 for float values; 1 for integer values
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 ptaaWriteStream(FILE    *fp,
                 PTAA    *ptaa,
                 l_int32  type)
@@ -1510,7 +1510,7 @@ PTA     *pta;
  *      (1) Serializes a ptaa in memory and puts the result in a buffer.
  * </pre>
  */
-l_int32
+l_ok
 ptaaWriteMem(l_uint8  **pdata,
              size_t    *psize,
              PTAA      *ptaa,

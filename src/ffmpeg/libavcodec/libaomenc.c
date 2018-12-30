@@ -71,7 +71,6 @@ typedef struct AOMEncoderContext {
     int crf;
     int static_thresh;
     int drop_threshold;
-    int noise_sensitivity;
     uint64_t sse[4];
     int have_sse; /**< true if we have pending sse[] */
     uint64_t frame_number;
@@ -79,6 +78,7 @@ typedef struct AOMEncoderContext {
     int tile_cols_log2, tile_rows_log2;
     aom_superblock_size_t superblock_size;
     int uniform_tiles;
+    int row_mt;
 } AOMContext;
 
 static const char *const ctlidstr[] = {
@@ -93,6 +93,9 @@ static const char *const ctlidstr[] = {
     [AV1E_SET_SUPERBLOCK_SIZE]  = "AV1E_SET_SUPERBLOCK_SIZE",
     [AV1E_SET_TILE_COLUMNS]     = "AV1E_SET_TILE_COLUMNS",
     [AV1E_SET_TILE_ROWS]        = "AV1E_SET_TILE_ROWS",
+#ifdef AOM_CTRL_AV1E_SET_ROW_MT
+    [AV1E_SET_ROW_MT]           = "AV1E_SET_ROW_MT",
+#endif
 };
 
 static av_cold void log_encoder_error(AVCodecContext *avctx, const char *desc)
@@ -192,7 +195,12 @@ static av_cold void free_frame_list(struct FrameListData *list)
 }
 
 static av_cold int codecctl_int(AVCodecContext *avctx,
-                                enum aome_enc_control_id id, int val)
+#ifdef UENUM1BYTE
+                                aome_enc_control_id id,
+#else
+                                enum aome_enc_control_id id,
+#endif
+                                int val)
 {
     AOMContext *ctx = avctx->priv_data;
     char buf[80];
@@ -288,7 +296,7 @@ static int set_pix_fmt(AVCodecContext *avctx, aom_codec_caps_t codec_caps,
 
 static void set_color_range(AVCodecContext *avctx)
 {
-    enum aom_color_range aom_cr;
+    aom_color_range_t aom_cr;
     switch (avctx->color_range) {
     case AVCOL_RANGE_UNSPECIFIED:
     case AVCOL_RANGE_MPEG:       aom_cr = AOM_CR_STUDIO_RANGE; break;
@@ -505,7 +513,8 @@ static av_cold int aom_init(AVCodecContext *avctx,
     enccfg.g_h            = avctx->height;
     enccfg.g_timebase.num = avctx->time_base.num;
     enccfg.g_timebase.den = avctx->time_base.den;
-    enccfg.g_threads      = avctx->thread_count ? avctx->thread_count : av_cpu_count();
+    enccfg.g_threads      =
+        FFMIN(avctx->thread_count ? avctx->thread_count : av_cpu_count(), 64);
 
     if (ctx->lag_in_frames >= 0)
         enccfg.g_lag_in_frames = ctx->lag_in_frames;
@@ -649,6 +658,10 @@ static av_cold int aom_init(AVCodecContext *avctx,
         codecctl_int(avctx, AV1E_SET_TILE_COLUMNS, ctx->tile_cols_log2);
         codecctl_int(avctx, AV1E_SET_TILE_ROWS,    ctx->tile_rows_log2);
     }
+
+#ifdef AOM_CTRL_AV1E_SET_ROW_MT
+    codecctl_int(avctx, AV1E_SET_ROW_MT, ctx->row_mt);
+#endif
 
     // provide dummy value to initialize wrapper, values will be updated each _encode()
     aom_img_wrap(&ctx->rawimg, img_fmt, avctx->width, avctx->height, 1,
@@ -980,14 +993,15 @@ static const AVOption options[] = {
     { "crf",              "Select the quality for constant quality mode", offsetof(AOMContext, crf), AV_OPT_TYPE_INT, {.i64 = -1}, -1, 63, VE },
     { "static-thresh",    "A change threshold on blocks below which they will be skipped by the encoder", OFFSET(static_thresh), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, INT_MAX, VE },
     { "drop-threshold",   "Frame drop threshold", offsetof(AOMContext, drop_threshold), AV_OPT_TYPE_INT, {.i64 = 0 }, INT_MIN, INT_MAX, VE },
-    { "noise-sensitivity", "Noise sensitivity", OFFSET(noise_sensitivity), AV_OPT_TYPE_INT, {.i64 = 0 }, 0, 4, VE},
     { "tiles",            "Tile columns x rows", OFFSET(tile_cols), AV_OPT_TYPE_IMAGE_SIZE, { .str = NULL }, 0, 0, VE },
     { "tile-columns",     "Log2 of number of tile columns to use", OFFSET(tile_cols_log2), AV_OPT_TYPE_INT, {.i64 = -1}, -1, 6, VE},
     { "tile-rows",        "Log2 of number of tile rows to use",    OFFSET(tile_rows_log2), AV_OPT_TYPE_INT, {.i64 = -1}, -1, 6, VE},
+    { "row-mt",           "Enable row based multi-threading",      OFFSET(row_mt),         AV_OPT_TYPE_BOOL, {.i64 = 0},  0, 1, VE},
     { NULL }
 };
 
 static const AVCodecDefault defaults[] = {
+    { "b",          "256*1000" },
     { "qmin",             "-1" },
     { "qmax",             "-1" },
     { "g",                "-1" },

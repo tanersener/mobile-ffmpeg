@@ -50,6 +50,8 @@ make distclean 2>/dev/null 1>/dev/null
 ASM_FLAGS=""
 case ${ARCH} in
     i386 |x86-64)
+        ASM_FLAGS="--disable-assembly"
+
         if ! [ -x "$(command -v nasm)" ]; then
             echo -e "(*) nasm command not found\n"
             exit 1
@@ -60,15 +62,15 @@ case ${ARCH} in
 esac
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --enable-pic \
     --sysroot=${SDK_PATH} \
     --enable-static \
-    --disable-cli \
     ${ASM_FLAGS} \
+    --disable-cli \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
 cp x264.pc ${INSTALL_PKG_CONFIG_DIR}

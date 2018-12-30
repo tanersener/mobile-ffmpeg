@@ -204,7 +204,7 @@ PIXTILING  *pt;
  * \param[out]   pny [optional] ny; can be null
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixTilingGetCount(PIXTILING  *pt,
                   l_int32    *pnx,
                   l_int32    *pny)
@@ -227,7 +227,7 @@ pixTilingGetCount(PIXTILING  *pt,
  * \param[out]   ph [optional] tile height; can be null
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixTilingGetSize(PIXTILING  *pt,
                  l_int32    *pw,
                  l_int32    *ph)
@@ -364,7 +364,7 @@ PIX     *pixs, *pixt, *pixd;
  *          to strip the added boundary pixels when painting.
  * </pre>
  */
-l_int32
+l_ok
 pixTilingNoStripOnPaint(PIXTILING  *pt)
 {
     PROCNAME("pixTilingNoStripOnPaint");
@@ -386,7 +386,7 @@ pixTilingNoStripOnPaint(PIXTILING  *pt)
  * \param[in]    pt pixtiling struct
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixTilingPaintTile(PIX        *pixd,
                    l_int32     i,
                    l_int32     j,

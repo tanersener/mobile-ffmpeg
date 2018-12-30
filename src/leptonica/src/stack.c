@@ -163,7 +163,7 @@ L_STACK  *lstack;
  * \param[in]    item to be added to the lstack
  * \return  0 if OK; 1 on error.
  */
-l_int32
+l_ok
 lstackAdd(L_STACK  *lstack,
           void     *item)
 {
@@ -266,7 +266,7 @@ lstackGetCount(L_STACK  *lstack)
  * \param[in]    lstack
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 lstackPrint(FILE     *fp,
             L_STACK  *lstack)
 {

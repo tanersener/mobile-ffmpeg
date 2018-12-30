@@ -110,7 +110,7 @@ static BOXA *boxaApplyDisparity(L_DEWARP *dew, BOXA *boxa, l_int32 direction,
  *          these hold approximately 16 bytes for each pixel in pixs.
  * </pre>
  */
-l_int32
+l_ok
 dewarpaApplyDisparity(L_DEWARPA   *dewa,
                       l_int32      pageno,
                       PIX         *pixs,
@@ -533,7 +533,7 @@ PIX        *pixd;
  *      (4) If an error occurs, a copy of the input boxa is returned.
  * </pre>
  */
-l_int32
+l_ok
 dewarpaApplyDisparityBoxa(L_DEWARPA   *dewa,
                           l_int32      pageno,
                           PIX         *pixs,
@@ -725,7 +725,7 @@ PTA        *ptas, *ptad;
  *          resolution arrays can be reconstructed.
  * </pre>
  */
-l_int32
+l_ok
 dewarpMinimize(L_DEWARP  *dew)
 {
 L_DEWARP  *dewt;
@@ -781,7 +781,7 @@ L_DEWARP  *dewt;
  *              four directions.
  * </pre>
  */
-l_int32
+l_ok
 dewarpPopulateFullRes(L_DEWARP  *dew,
                       PIX       *pix,
                       l_int32    x,

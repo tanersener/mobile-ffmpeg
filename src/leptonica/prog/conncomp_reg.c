@@ -31,6 +31,9 @@
  *      connected), including regeneration of the original
  *      image from the components.  This is also an implicit
  *      test of rasterop.
+ *
+ *      Also tests iterative covering of connected components by
+ *      minimum spanning rectangles.
  */
 
 #include "allheaders.h"
@@ -39,11 +42,11 @@ int main(int    argc,
          char **argv)
 {
 l_uint8      *array1, *array2;
-l_int32       n1, n2, n3;
+l_int32       i, n1, n2, n3;
 size_t        size1, size2;
 FILE         *fp;
 BOXA         *boxa1, *boxa2;
-PIX          *pixs, *pix1;
+PIX          *pixs, *pix1, *pix2, *pix3;
 PIXA         *pixa1;
 PIXCMAP      *cmap;
 L_REGPARAMS  *rp;
@@ -95,7 +98,6 @@ L_REGPARAMS  *rp;
     boxaDestroy(&boxa2);
     pixDestroy(&pix1);
 
-
     /* --------------------------------------------------------------- *
      *                        Test boxa I/O                            *
      * --------------------------------------------------------------- */
@@ -118,7 +120,6 @@ L_REGPARAMS  *rp;
     boxaDestroy(&boxa1);
     boxaDestroy(&boxa2);
 
-
     /* --------------------------------------------------------------- *
      *    Just for fun, display each component as a random color in    *
      *    cmapped 8 bpp.  Background is color 0; it is set to white.   *
@@ -128,12 +129,32 @@ L_REGPARAMS  *rp;
     cmap = pixGetColormap(pix1);
     pixcmapResetColor(cmap, 0, 255, 255, 255);  /* reset background to white */
     regTestWritePixAndCheck(rp, pix1, IFF_PNG);  /* 11 */
-    if (rp->display) pixDisplay(pix1, 100, 100);
+    if (rp->display) pixDisplay(pix1, 100, 0);
     boxaDestroy(&boxa1);
     pixDestroy(&pix1);
     pixaDestroy(&pixa1);
-
     pixDestroy(&pixs);
+
+    /* --------------------------------------------------------------- *
+     *  Test iterative covering of connected components by rectangles  *
+     * --------------------------------------------------------------- */
+    pixa1 = pixaCreate(0);
+    pix1 = pixRead("rabi.png");
+    pix2 = pixReduceRankBinaryCascade(pix1, 1, 1, 1, 0);
+    regTestWritePixAndCheck(rp, pix2, IFF_PNG);  /* 12 -  */
+    pixaAddPix(pixa1, pix2, L_INSERT);
+    for (i = 1; i < 6; i++) {
+        pix3 = pixMakeCoveringOfRectangles(pix2, i);
+        regTestWritePixAndCheck(rp, pix3, IFF_PNG);  /* 13 - 17 */
+        pixaAddPix(pixa1, pix3, L_INSERT);
+    }
+    pix3 = pixaDisplayTiledInRows(pixa1, 1, 2500, 1.0, 0, 30, 0);
+    regTestWritePixAndCheck(rp, pix3, IFF_PNG);  /* 18 */
+    pixDisplayWithTitle(pix3, 100, 900, NULL, rp->display);
+    pixDestroy(&pix1);
+    pixDestroy(&pix3);
+    pixaDestroy(&pixa1);
+
     return regTestCleanup(rp);
 }
 

@@ -175,7 +175,7 @@
  *          correction or dark filtering.
  * </pre>
  */
-l_int32
+l_ok
 pixColorContent(PIX     *pixs,
                 l_int32  rwhite,
                 l_int32  gwhite,
@@ -674,7 +674,7 @@ PIXCMAP   *cmap;
  *          that can be occupied.
  * </pre>
  */
-l_int32
+l_ok
 pixColorFraction(PIX        *pixs,
                  l_int32     darkthresh,
                  l_int32     lightthresh,
@@ -801,7 +801,7 @@ l_uint32  *data, *line;
  *          This is done here in debug mode.
  * </pre>
  */
-l_int32
+l_ok
 pixFindColorRegions(PIX        *pixs,
                     PIX        *pixm,
                     l_int32     factor,
@@ -1018,7 +1018,7 @@ PIX       *pix1, *pix2, *pix3, *pix4, *pix5, *pixm1, *pixm2, *pixm3;
  *          to obtain a clean image by quantizing this noise away.
  * </pre>
  */
-l_int32
+l_ok
 pixNumSignificantGrayColors(PIX       *pixs,
                             l_int32    darkthresh,
                             l_int32    lightthresh,
@@ -1141,7 +1141,7 @@ NUMA    *na;
  *          in the white background of grayscale or color images.
  * </pre>
  */
-l_int32
+l_ok
 pixColorsForQuantization(PIX      *pixs,
                          l_int32   thresh,
                          l_int32  *pncolors,
@@ -1283,7 +1283,7 @@ PIXCMAP   *cmap;
  *          greater than 256, this returns 0 in 'ncolors'.
  * </pre>
  */
-l_int32
+l_ok
 pixNumColors(PIX      *pixs,
              l_int32   factor,
              l_int32  *pncolors)
@@ -1391,7 +1391,7 @@ PIXCMAP   *cmap;
  *               pixDisplayColorArray(array, ncolors, ...);
  * </pre>
  */
-l_int32
+l_ok
 pixGetMostPopulatedColors(PIX        *pixs,
                           l_int32     sigbits,
                           l_int32     factor,
@@ -1580,7 +1580,7 @@ NUMA       *na;
  *             r7 r6 r5 g7 g6 g5 b7 b6 b5
  * </pre>
  */
-l_int32
+l_ok
 makeRGBIndexTables(l_uint32  **prtab,
                    l_uint32  **pgtab,
                    l_uint32  **pbtab,
@@ -1670,7 +1670,7 @@ l_uint32  *rtab, *gtab, *btab;
  *          The extra bit that is OR'd accomplishes this.
  * </pre>
  */
-l_int32
+l_ok
 getRGBFromIndex(l_uint32  index,
                 l_int32   sigbits,
                 l_int32  *prval,
@@ -1753,7 +1753,7 @@ getRGBFromIndex(l_uint32  index,
  *          sensitivity to red, and fewer false positives.
  * </pre>
  */
-l_int32
+l_ok
 pixHasHighlightRed(PIX        *pixs,
                    l_int32     factor,
                    l_float32   fract,

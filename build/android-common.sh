@@ -131,7 +131,11 @@ get_target_build() {
             echo "arm"
         ;;
         arm-v7a-neon)
-            echo "arm/neon"
+            if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+                echo "arm/neon"
+            else
+                echo "arm"
+            fi
         ;;
         arm64-v8a)
             echo "arm64"
@@ -184,58 +188,77 @@ get_common_includes() {
 }
 
 get_common_cflags() {
-    echo "-fstrict-aliasing -fPIC -DANDROID -D__ANDROID__ -D__ANDROID_API__=${API}"
+    if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+        local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
+    fi
+
+    echo "-fstrict-aliasing -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
 }
 
 get_arch_specific_cflags() {
     case ${ARCH} in
         arm-v7a)
-            echo "-march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp"
+            echo "-march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A"
         ;;
         arm-v7a-neon)
-            echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp"
+            echo "-march=armv7-a -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARM_V7A_NEON"
         ;;
         arm64-v8a)
-            echo "-march=armv8-a"
+            echo "-march=armv8-a -DMOBILE_FFMPEG_ARM64_V8A"
         ;;
         x86)
-            echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32"
+            echo "-march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_X86"
         ;;
         x86-64)
-            echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel"
+            echo "-march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
     esac
 }
 
 get_size_optimization_cflags() {
 
-    ARCH_OPTIMIZATION=""
+    local ARCH_OPTIMIZATION=""
     case ${ARCH} in
-        arm-v7a | arm-v7a-neon | arm64-v8a)
-            if [[ $1 -eq libwebp ]]; then
-                ARCH_OPTIMIZATION="-Os"
-            else
-                ARCH_OPTIMIZATION="-Os -finline-limit=64"
-            fi
+        arm-v7a | arm-v7a-neon)
+            case $1 in
+                ffmpeg)
+                    ARCH_OPTIMIZATION="-flto -O2 -ffunction-sections -fdata-sections"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
+                ;;
+            esac
+        ;;
+        arm64-v8a)
+            case $1 in
+                ffmpeg | nettle)
+                    ARCH_OPTIMIZATION="-flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
+                ;;
+            esac
         ;;
         x86 | x86-64)
-            if [[ $1 -eq libvpx ]]; then
-                ARCH_OPTIMIZATION="-O2"
-            else
-                ARCH_OPTIMIZATION="-O2 -finline-limit=300"
-            fi
-
+            case $1 in
+                ffmpeg)
+                    ARCH_OPTIMIZATION="-flto -Os -ffunction-sections -fdata-sections"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
+                ;;
+            esac
         ;;
     esac
 
-    LIB_OPTIMIZATION=""
+    local LIB_OPTIMIZATION=""
 
     echo "${ARCH_OPTIMIZATION} ${LIB_OPTIMIZATION}"
 }
 
 get_app_specific_cflags() {
 
-    APP_FLAGS=""
+    local APP_FLAGS=""
     case $1 in
         xvidcore)
             APP_FLAGS=""
@@ -261,32 +284,45 @@ get_app_specific_cflags() {
 }
 
 get_cflags() {
-    ARCH_FLAGS=$(get_arch_specific_cflags)
-    APP_FLAGS=$(get_app_specific_cflags $1)
-    COMMON_FLAGS=$(get_common_cflags)
+    local ARCH_FLAGS=$(get_arch_specific_cflags)
+    local APP_FLAGS=$(get_app_specific_cflags $1)
+    local COMMON_FLAGS=$(get_common_cflags)
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-        OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+        local OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
     else
-        OPTIMIZATION_FLAGS=""
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
     fi
-    COMMON_INCLUDES=$(get_common_includes)
+    local COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_INCLUDES}"
 }
 
 get_cxxflags() {
+    if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+        local OPTIMIZATION_FLAGS="-Os -ffunction-sections -fdata-sections"
+    else
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
+    fi
+
     case $1 in
         gnutls)
-            echo "-std=c++11 -fno-rtti"
+            echo "-std=c++11 -fno-rtti ${OPTIMIZATION_FLAGS}"
+        ;;
+        ffmpeg)
+            if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+                echo "-std=c++11 -fno-exceptions -fno-rtti -flto -O2 -ffunction-sections -fdata-sections"
+            else
+                echo "-std=c++11 -fno-exceptions -fno-rtti ${MOBILE_FFMPEG_DEBUG}"
+            fi
         ;;
         opencore-amr)
-            echo ""
+            echo "${OPTIMIZATION_FLAGS}"
         ;;
         x265)
-            echo "-std=c++11 -fno-exceptions"
+            echo "-std=c++11 -fno-exceptions ${OPTIMIZATION_FLAGS}"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${OPTIMIZATION_FLAGS}"
         ;;
     esac
 }
@@ -295,7 +331,14 @@ get_common_linked_libraries() {
     local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/lib"
 
     case $1 in
-        ffmpeg | tesseract)
+        ffmpeg)
+            if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+                echo "-lc -lm -ldl -llog -lcamera2ndk -lmediandk -lc++_shared ${COMMON_LIBRARY_PATHS}"
+            else
+                echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
+            fi
+        ;;
+        tesseract)
             echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
         ;;
         libvpx)
@@ -310,10 +353,24 @@ get_common_linked_libraries() {
 get_size_optimization_ldflags() {
     case ${ARCH} in
         arm64-v8a)
-            echo "-Wl,--gc-sections"
+            case $1 in
+                ffmpeg | nettle)
+                    echo "-Wl,--gc-sections -flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
+                ;;
+                *)
+                    echo "-Wl,--gc-sections -Os -ffunction-sections -fdata-sections"
+                ;;
+            esac
         ;;
         *)
-            echo "-Wl,--gc-sections,--icf=safe"
+            case $1 in
+                ffmpeg)
+                    echo "-Wl,--gc-sections,--icf=safe -flto -O2 -ffunction-sections -fdata-sections -finline-functions"
+                ;;
+                *)
+                    echo "-Wl,--gc-sections,--icf=safe -Os -ffunction-sections -fdata-sections"
+                ;;
+            esac
         ;;
     esac
 }
@@ -339,9 +396,13 @@ get_arch_specific_ldflags() {
 }
 
 get_ldflags() {
-    ARCH_FLAGS=$(get_arch_specific_ldflags)
-    OPTIMIZATION_FLAGS=$(get_size_optimization_ldflags)
-    COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
+    local ARCH_FLAGS=$(get_arch_specific_ldflags)
+    if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+        local OPTIMIZATION_FLAGS="$(get_size_optimization_ldflags $1)"
+    else
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
+    fi
+    local COMMON_LINKED_LIBS=$(get_common_linked_libraries $1)
 
     echo "${ARCH_FLAGS} ${OPTIMIZATION_FLAGS} ${COMMON_LINKED_LIBS}"
 }
@@ -815,9 +876,9 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20181208-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20181208-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20181208-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20181224-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20181224-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20181224-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
@@ -916,6 +977,12 @@ set_toolchain_clang_paths() {
     else
         export AS=${TARGET_HOST}-as
     fi
+
+    case ${ARCH} in
+        arm64-v8a)
+            export ac_cv_c_bigendian=no
+        ;;
+    esac
 
     export LD=${TARGET_HOST}-ld
     export RANLIB=${TARGET_HOST}-ranlib

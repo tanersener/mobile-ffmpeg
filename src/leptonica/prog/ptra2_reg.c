@@ -35,24 +35,38 @@
 
 #include "allheaders.h"
 
-void BoxaSortTest(const char *fname, l_int32 index, const char *text);
-void PixaSortTest(const char *fname, l_int32 index, const char *text);
+void BoxaSortTest(L_REGPARAMS *rp, const char *fname, l_int32 index,
+                  const char *text);
+void PixaSortTest(L_REGPARAMS *rp, const char *fname, l_int32 index,
+                  const char *text);
 
 int main(int    argc,
          char **argv)
 {
-    BoxaSortTest("feyn-fract.tif", 1, "Boxa sort test on small image");
-    BoxaSortTest("feyn.tif", 2, "Boxa sort test on large image");
-    PixaSortTest("feyn-fract.tif", 3, "Pixa sort test on small image");
-    PixaSortTest("feyn.tif", 4, "Pixa sort test on large image");
-    return 0;
+L_REGPARAMS  *rp;
+
+    if (regTestSetup(argc, argv, &rp))
+        return 1;
+
+    lept_mkdir("lept/ptra");
+
+        /* 0 - 8 */
+    BoxaSortTest(rp, "feyn-fract.tif", 1, "Boxa sort test on small image");
+        /* 9 - 17 */
+    BoxaSortTest(rp, "feyn.tif", 2, "Boxa sort test on large image");
+        /* 18 - 27 */
+    PixaSortTest(rp, "feyn-fract.tif", 3, "Pixa sort test on small image");
+        /* 28 - 37 */
+    PixaSortTest(rp, "feyn.tif", 4, "Pixa sort test on large image");
+    return regTestCleanup(rp);
 }
 
 
 void
-BoxaSortTest(const char  *fname,
-             l_int32      index,
-             const char  *text)
+BoxaSortTest(L_REGPARAMS  *rp,
+             const char   *fname,
+             l_int32       index,
+             const char   *text)
 {
 l_int32   i, n, m, imax, w, h, x, count, same;
 BOX      *box;
@@ -61,42 +75,40 @@ NUMA     *na, *nad1, *nad2, *nad3, *naindex;
 PIX      *pixs;
 L_PTRA   *pa, *pad, *paindex;
 L_PTRAA  *paa;
-char     buf[256];
+char      buf[256];
 
-    setLeptDebugOK(1);
-    lept_mkdir("lept/ptra");
-
-    fprintf(stderr, "\nTest %d: %s\n", index, text);
+    fprintf(stderr, "Test %d: %s\n", index, text);
     pixs = pixRead(fname);
     boxa = pixConnComp(pixs, NULL, 8);
 
         /* Sort by x */
     boxa1 = boxaSort(boxa, L_SORT_BY_X, L_SORT_INCREASING, &nad1);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/boxa1.%d.ba", index);
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/boxa1.%d.ba", index);
     boxaWrite(buf, boxa1);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/nad1.%d.na", index);
+    regTestCheckFile(rp, buf);  /* 0 */
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/nad1.%d.na", index);
     numaWrite(buf, nad1);
+    regTestCheckFile(rp, buf);  /* 1 */
 
-    startTimer();
     boxa2 = boxaBinSort(boxa, L_SORT_BY_X, L_SORT_INCREASING, &nad2);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/boxa2.%d.ba", index);
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/boxa2.%d.ba", index);
     boxaWrite(buf, boxa2);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/nad2.%d.na", index);
+    regTestCheckFile(rp, buf);  /* 2 */
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/nad2.%d.na", index);
     numaWrite(buf, nad2);
+    regTestCheckFile(rp, buf);  /* 3 */
 
-    boxaEqual(boxa1, boxa2, 0, &naindex, &same);
-    if (same)
+    boxaEqual(boxa1, boxa2, 0, NULL, &same);
+    regTestCompareValues(rp, 1, same, 0.0);  /* 4 */
+    if (rp->display && same)
         fprintf(stderr, "boxa1 and boxa2 are identical\n");
-    else
-        fprintf(stderr, "boxa1 and boxa2 are not identical\n");
-    numaDestroy(&naindex);
     boxaEqual(boxa1, boxa2, 2, &naindex, &same);
-    if (same)
+    regTestCompareValues(rp, 1, same, 0.0);  /* 5 */
+    if (rp->display && same)
         fprintf(stderr, "boxa1 and boxa2 are same at maxdiff = 2\n");
-    else
-        fprintf(stderr, "boxa1 and boxa2 differ at maxdiff = 2\n");
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/naindex.%d.na", index);
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/naindex.%d.na", index);
     numaWrite(buf, naindex);
+    regTestCheckFile(rp, buf);  /* 6 */
     numaDestroy(&naindex);
     boxaDestroy(&boxa1);
     numaDestroy(&nad1);
@@ -105,12 +117,11 @@ char     buf[256];
         /* Now do this stuff with ptra and ptraa */
         /* First, store the boxes in a ptraa, where each ptra contains
          * the boxes, and store the sort index in a ptra of numa */
-    startTimer();
     pixGetDimensions(pixs, &w, &h, NULL);
     paa = ptraaCreate(w);
     paindex = ptraCreate(w);
     n = boxaGetCount(boxa);
-    fprintf(stderr, "n = %d\n", n);
+    if (rp->display) fprintf(stderr, "n = %d\n", n);
     for (i = 0; i < n; i++) {
         box = boxaGetBox(boxa, i, L_CLONE);
         boxGetGeometry(box, &x, NULL, NULL, NULL);
@@ -125,9 +136,8 @@ char     buf[256];
         ptraAdd(pa, box);
         numaAddNumber(na, i);
     }
-
     ptraGetActualCount(paindex, &count);
-    fprintf(stderr, "count = %d\n", count);
+    if (rp->display) fprintf(stderr, "count = %d\n", count);
 
         /* Flatten the ptraa to a ptra containing all the boxes
          * in sorted order, and put them in a boxa */
@@ -147,24 +157,24 @@ char     buf[256];
          * a single Numa */
     ptraGetMaxIndex(paindex, &imax);
     nad3 = numaCreate(0);
-    fprintf(stderr, "imax = %d\n", imax);
+    if (rp->display) fprintf(stderr, "imax = %d\n\n", imax);
     for (i = 0; i <= imax; i++) {
         na = (NUMA *)ptraRemove(paindex, i, L_NO_COMPACTION);
         numaJoin(nad3, na, 0, -1);
         numaDestroy(&na);
     }
 
-    fprintf(stderr, "Time for sort: %7.3f sec\n", stopTimer());
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/boxa3.%d.ba", index);
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/boxa3.%d.ba", index);
     boxaWrite(buf, boxa3);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/nad3.%d.na", index);
+    regTestCheckFile(rp, buf);  /* 7 */
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/nad3.%d.na", index);
     numaWrite(buf, nad3);
+    regTestCheckFile(rp, buf);  /* 8 */
 
     boxaDestroy(&boxa2);
     boxaDestroy(&boxa3);
     numaDestroy(&nad3);
     ptraDestroy(&paindex, FALSE, FALSE);
-
     pixDestroy(&pixs);
     boxaDestroy(&boxa);
     return;
@@ -172,9 +182,10 @@ char     buf[256];
 
 
 void
-PixaSortTest(const char  *fname,
-             l_int32      index,
-             const char  *text)
+PixaSortTest(L_REGPARAMS  *rp,
+             const char   *fname,
+             l_int32       index,
+             const char   *text)
 {
 l_int32  same;
 BOXA    *boxa, *boxa1, *boxa2;
@@ -183,60 +194,54 @@ PIX     *pixs;
 PIXA    *pixa, *pixa1, *pixa2;
 char     buf[256];
 
-    fprintf(stderr, "\nTest %d: %s\n", index, text);
+    fprintf(stderr, "Test %d: %s\n", index, text);
     pixs = pixRead(fname);
     boxa = pixConnComp(pixs, &pixa, 8);
 
-    startTimer();
     pixa1 = pixaSort(pixa, L_SORT_BY_X, L_SORT_INCREASING, &nap1, L_CLONE);
-    fprintf(stderr, "Time for pixa sort: %7.3f sec\n", stopTimer());
     boxa1 = pixaGetBoxa(pixa1, L_CLONE);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/bap1.%d.ba", index);
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/bap1.%d.ba", index);
     boxaWrite(buf, boxa1);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/nap1.%d.na", index);
+    regTestCheckFile(rp, buf);  /* 0 */
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/nap1.%d.na", index);
     numaWrite(buf, nap1);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/pixa1.%d.pa", index);
+    regTestCheckFile(rp, buf);  /* 1 */
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/pixa1.%d.pa", index);
     pixaWrite(buf, pixa1);
+    regTestCheckFile(rp, buf);  /* 2 */
 
-    startTimer();
     pixa2 = pixaBinSort(pixa, L_SORT_BY_X, L_SORT_INCREASING, &nap2, L_CLONE);
-    fprintf(stderr, "Time for pixa sort: %7.3f sec\n", stopTimer());
     boxa2 = pixaGetBoxa(pixa2, L_CLONE);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/bap2.%d.ba", index);
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/bap2.%d.ba", index);
     boxaWrite(buf, boxa2);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/nap2.%d.na", index);
+    regTestCheckFile(rp, buf);  /* 3 */
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/nap2.%d.na", index);
     numaWrite(buf, nap2);
-    snprintf(buf, sizeof(buf), "/tmp/lept/prta/pixa2.%d.pa", index);
+    regTestCheckFile(rp, buf);  /* 4 */
+    snprintf(buf, sizeof(buf), "/tmp/lept/ptra/pixa2.%d.pa", index);
     pixaWrite(buf, pixa2);
+    regTestCheckFile(rp, buf);  /* 5 */
 
-    startTimer();
     boxaEqual(boxa1, boxa2, 0, &naindex, &same);
-    fprintf(stderr, "Time for boxaEqual: %7.3f sec\n", stopTimer());
-    if (same)
+    regTestCompareValues(rp, 1, same, 0.0);  /* 6 */
+    if (rp->display && same)
         fprintf(stderr, "boxa1 and boxa2 are identical\n");
-    else
-        fprintf(stderr, "boxa1 and boxa2 are not identical\n");
     numaDestroy(&naindex);
     boxaEqual(boxa1, boxa2, 3, &naindex, &same);
-    if (same)
-        fprintf(stderr, "boxa1 and boxa2 are same at maxdiff = 3\n");
-    else
-        fprintf(stderr, "boxa1 and boxa2 differ at maxdiff = 3\n");
+    regTestCompareValues(rp, 1, same, 0.0);  /* 7 */
+    if (rp->display && same)
+        fprintf(stderr, "boxa1 and boxa2 are same at maxdiff = 2\n");
     numaDestroy(&naindex);
 
-    startTimer();
     pixaEqual(pixa1, pixa2, 0, &naindex, &same);
-    fprintf(stderr, "Time for pixaEqual: %7.3f sec\n", stopTimer());
-    if (same)
+    regTestCompareValues(rp, 1, same, 0.0);  /* 8 */
+    if (rp->display && same)
         fprintf(stderr, "pixa1 and pixa2 are identical\n");
-    else
-        fprintf(stderr, "pixa1 and pixa2 are not identical\n");
     numaDestroy(&naindex);
     pixaEqual(pixa1, pixa2, 3, &naindex, &same);
-    if (same)
-        fprintf(stderr, "pixa1 and pixa2 are same at maxdiff = 3\n");
-    else
-        fprintf(stderr, "pixa1 and pixa2 differ at maxdiff = 3\n");
+    regTestCompareValues(rp, 1, same, 0.0);  /* 9 */
+    if (rp->display && same)
+        fprintf(stderr, "pixa1 and pixa2 are same at maxdiff = 2\n\n");
     numaDestroy(&naindex);
 
     boxaDestroy(&boxa);

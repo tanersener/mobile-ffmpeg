@@ -49,9 +49,8 @@
 {
     if ((self = [super initWithFrame:frame])) {
         self.tag = METALVIEW_TAG;
-        /* Set the desired scale. The default drawableSize of a CAMetalLayer
-         * is its bounds x its scale so nothing further needs to be done. */
         self.layer.contentsScale = scale;
+        [self updateDrawableSize];
     }
 
     return self;
@@ -61,6 +60,15 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    [self updateDrawableSize];
+}
+
+- (void)updateDrawableSize
+{
+    CGSize size = self.bounds.size;
+    size.width *= self.layer.contentsScale;
+    size.height *= self.layer.contentsScale;
+    ((CAMetalLayer *)self.layer).drawableSize = size;
 }
 
 @end
@@ -72,9 +80,9 @@ UIKit_Mtl_AddMetalView(SDL_Window* window)
     SDL_uikitview *view = (SDL_uikitview*)data.uiwindow.rootViewController.view;
     CGFloat scale = 1.0;
 
-	if ([view isKindOfClass:[SDL_uikitmetalview class]]) {
-		return (SDL_uikitmetalview *)view;
-	}
+    if ([view isKindOfClass:[SDL_uikitmetalview class]]) {
+        return (SDL_uikitmetalview *)view;
+    }
 
     if (window->flags & SDL_WINDOW_ALLOW_HIGHDPI) {
         /* Set the scale to the natural scale factor of the screen - then

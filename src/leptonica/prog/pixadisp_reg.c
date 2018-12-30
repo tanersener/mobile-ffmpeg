@@ -38,7 +38,7 @@ int main(int    argc,
 l_int32       ws, hs, ncols;
 BOX          *box;
 BOXA         *boxa;
-PIX          *pixs, *pix32, *pix1, *pix2, *pix3;
+PIX          *pixs, *pix32, *pix1, *pix2, *pix3, *pix4;
 PIXA         *pixa, *pixa1, *pixa2, *pixa3;
 L_REGPARAMS  *rp;
 
@@ -126,6 +126,24 @@ L_REGPARAMS  *rp;
     pixaAddPix(pixa, pix2, L_INSERT);
     pixaDestroy(&pixa1);
     pixDestroy(&pix32);
+
+        /* pixaMakeFromTiledPix() and pixaDisplayOnLattice()  */
+    pix1 = pixRead("sevens.tif");
+    pixa1 = pixaMakeFromTiledPix(pix1, 20, 30, 0, 0, NULL);
+    pix2 = pixaDisplayOnLattice(pixa1, 20, 30, NULL, NULL);
+    regTestComparePix(rp, pix1, pix2);  /* 10 */
+    pix3 = pixaDisplayOnLattice(pixa1, 20, 30, NULL, &boxa);
+    pixa2 = pixaMakeFromTiledPix(pix3, 0, 0, 0, 0, boxa);
+    pix4 = pixaDisplayOnLattice(pixa2, 20, 30, NULL, NULL);
+    regTestComparePix(rp, pix2, pix4);  /* 11 */
+    pixaAddPix(pixa, pixScale(pix4, 2.5, 2.5), L_INSERT);
+    pixDestroy(&pix1);
+    pixDestroy(&pix2);
+    pixDestroy(&pix3);
+    pixDestroy(&pix4);
+    boxaDestroy(&boxa);
+    pixaDestroy(&pixa1);
+    pixaDestroy(&pixa2);
 
     if (rp->display) {
         lept_mkdir("lept/padisp");

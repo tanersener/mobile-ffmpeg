@@ -11,7 +11,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 
 # In-source builds are disabled.
-if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+if ("${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_BINARY_DIR}")
     message(FATAL_ERROR
         "CMake generation is not possible within the source directory!"
         "\n Remove the CMakeCache.txt file and try again from another folder, e.g.:"
@@ -23,9 +23,9 @@ if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     )
 endif()
 
-set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${EXECUTABLE_OUTPUT_PATH}")
 
 # Use solution folders.
@@ -41,7 +41,7 @@ set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake Targets")
 project(leptonica C CXX)
 
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 76)
+set(VERSION_MINOR 77)
 set(VERSION_PATCH 0)
 set(VERSION_PLAIN ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
@@ -101,8 +101,8 @@ endif()
 #
 ###############################################################################
 
-set(AUTOCONFIG_SRC ${CMAKE_BINARY_DIR}/config_auto.h.in)
-set(AUTOCONFIG ${CMAKE_BINARY_DIR}/src/config_auto.h)
+set(AUTOCONFIG_SRC ${CMAKE_CURRENT_BINARY_DIR}/config_auto.h.in)
+set(AUTOCONFIG ${CMAKE_CURRENT_BINARY_DIR}/src/config_auto.h)
 
 include(Configure)
 
@@ -111,11 +111,11 @@ configure_file(${AUTOCONFIG_SRC} ${AUTOCONFIG} @ONLY)
 set(INCLUDE_DIR "${CMAKE_INSTALL_PREFIX}/include" "${CMAKE_INSTALL_PREFIX}/include/leptonica")
 
 configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/templates/LeptonicaConfig-version.cmake.in
-    ${CMAKE_BINARY_DIR}/LeptonicaConfig-version.cmake @ONLY)
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/LeptonicaConfig-version.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/LeptonicaConfig-version.cmake @ONLY)
 configure_file(
-    ${CMAKE_SOURCE_DIR}/cmake/templates/LeptonicaConfig.cmake.in
-    ${CMAKE_BINARY_DIR}/LeptonicaConfig.cmake @ONLY)
+    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/templates/LeptonicaConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/LeptonicaConfig.cmake @ONLY)
 
 ###############################################################################
 #
@@ -140,8 +140,8 @@ get_target_property(leptonica_OUTPUT_NAME leptonica OUTPUT_NAME)
 configure_file(lept.pc.cmake ${CMAKE_CURRENT_BINARY_DIR}/lept.pc @ONLY)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lept.pc DESTINATION lib/pkgconfig)
 install(FILES
-    ${CMAKE_BINARY_DIR}/LeptonicaConfig.cmake
-    ${CMAKE_BINARY_DIR}/LeptonicaConfig-version.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/LeptonicaConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/LeptonicaConfig-version.cmake
     DESTINATION cmake)
 
 ###############################################################################

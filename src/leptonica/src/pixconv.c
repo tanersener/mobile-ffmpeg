@@ -325,8 +325,8 @@ pixRemoveColormap(PIX     *pixs,
 l_int32    sval, rval, gval, bval, val0, val1;
 l_int32    i, j, k, w, h, d, wpls, wpld, ncolors, count;
 l_int32    opaque, colorfound, blackwhite;
-l_int32   *rmap, *gmap, *bmap, *amap, *graymap;
-l_uint32  *datas, *lines, *datad, *lined, *lut;
+l_int32   *rmap, *gmap, *bmap, *amap;
+l_uint32  *datas, *lines, *datad, *lined, *lut, *graymap;
 l_uint32   sword, dword;
 PIXCMAP   *cmap;
 PIX       *pixd;
@@ -400,11 +400,11 @@ PIX       *pixd;
         pixCopyInputFormat(pixd, pixs);
         datad = pixGetData(pixd);
         wpld = pixGetWpl(pixd);
-        graymap = (l_int32 *)LEPT_CALLOC(ncolors, sizeof(l_int32));
+        graymap = (l_uint32 *)LEPT_CALLOC(ncolors, sizeof(l_int32));
         for (i = 0; i < pixcmapGetCount(cmap); i++) {
-            graymap[i] = (l_int32)(L_RED_WEIGHT * rmap[i] +
-                                   L_GREEN_WEIGHT * gmap[i] +
-                                   L_BLUE_WEIGHT * bmap[i] + 0.5);
+            graymap[i] = (l_uint32)(L_RED_WEIGHT * rmap[i] +
+                                    L_GREEN_WEIGHT * gmap[i] +
+                                    L_BLUE_WEIGHT * bmap[i] + 0.5);
         }
         for (i = 0; i < h; i++) {
             lines = datas + i * wpls;
@@ -609,7 +609,7 @@ cleanup_arrays:
  *      (1) If pixs has a colormap, this is a no-op.
  * </pre>
  */
-l_int32
+l_ok
 pixAddGrayColormap8(PIX  *pixs)
 {
 PIXCMAP  *cmap;
@@ -1584,7 +1584,7 @@ PIXCMAP   *cmap;
  *      (4) If the image already has a colormap, it returns a clone.
  * </pre>
  */
-l_int32
+l_ok
 pixQuantizeIfFewColors(PIX     *pixs,
                        l_int32  maxcolors,
                        l_int32  mingraycolors,
@@ -2398,7 +2398,7 @@ l_uint32  *tab, *datas, *datad, *lines, *lined;
     val[0] = val0;
     val[1] = val1;
     for (index = 0; index < 16; index++) {
-        tab[index] = (val[(index >> 3) & 1] << 24) |
+        tab[index] = ((l_uint32)val[(index >> 3) & 1] << 24) |
                      (val[(index >> 2) & 1] << 16) |
                      (val[(index >> 1) & 1] << 8) | val[index & 1];
     }
@@ -3207,7 +3207,7 @@ l_int32  d;
 /*!
  * \brief   pixConvertTo32()
  *
- * \param[in]    pixs    1, 2, 4, 8, 16 or 32 bpp
+ * \param[in]    pixs    1, 2, 4, 8, 16, 24 or 32 bpp
  * \return  pixd 32 bpp, or NULL on error
  *
  *  Usage: Top-level function, with simple default values for unpacking.
@@ -3274,7 +3274,7 @@ PIX     *pix1, *pixd;
 /*!
  * \brief   pixConvertTo32BySampling()
  *
- * \param[in]    pixs    1, 2, 4, 8, 16 or 32 bpp
+ * \param[in]    pixs    1, 2, 4, 8, 16, 24 or 32 bpp
  * \param[in]    factor  submsampling factor; integer >= 1
  * \return  pixd 32 bpp, or NULL on error
  *
@@ -3680,7 +3680,7 @@ pixRemoveAlpha(PIX *pixs)
  * \brief   pixAddAlphaTo1bpp()
  *
  * \param[in]    pixd    [optional] 1 bpp, can be null or equal to pixs
- *               pixs    1 bpp
+ * \param[in]    pixs    1 bpp
  * \return  pixd 1 bpp with colormap and non-opaque alpha,
  *                    or NULL on error
  *

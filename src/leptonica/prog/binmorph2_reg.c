@@ -37,7 +37,7 @@
 
 static const l_int32  MAX_SEL_SIZE = 120;
 
-static void writeResult(char *sequence, l_int32 same);
+static void writeResult(const char *sequence, l_int32 same);
 
 
 int main(int    argc,
@@ -167,7 +167,7 @@ static char  mainName[] = "binmorph2_reg";
 }
 
 
-static void writeResult(char *sequence,
+static void writeResult(const char *sequence,
                         l_int32 same)
 {
     if (same)

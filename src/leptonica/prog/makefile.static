@@ -142,8 +142,8 @@ SRC =		adaptmap_reg.c adaptnorm_reg.c affine_reg.c \
 		binmorph3_reg.c binmorph4_reg.c binmorph5_reg.c \
 		blackwhite_reg.c \
 		blend1_reg.c blend2_reg.c blend3_reg.c blend4_reg.c \
-		blend5_reg.c boxa1_reg.c boxa2_reg.c \
-		ccthin1_reg.c ccthin2_reg.c \
+		blend5_reg.c boxa1_reg.c boxa2_reg.c boxa3_reg.c \
+		bytea_reg.c ccthin1_reg.c ccthin2_reg.c \
 		cmapquant_reg.c colorcontent_reg.c \
 		coloring_reg.c colorize_reg.c \
 		colormask_reg.c colormorph_reg.c colorquant_reg.c \
@@ -163,7 +163,8 @@ SRC =		adaptmap_reg.c adaptnorm_reg.c affine_reg.c \
 		grayfill_reg.c graymorph1_reg.c \
 		graymorph2_reg.c  grayquant_reg.c \
 		hardlight_reg.c heap_reg.c \
-		insert_reg.c ioformats_reg.c italic_reg.c \
+		insert_reg.c ioformats_reg.c \
+		iomisc_reg.c italic_reg.c \
 		jbclass_reg.c jp2kio_reg.c jpegio_reg.c kernel_reg.c \
 		label_reg.c lineremoval_reg.c locminmax_reg.c \
 		logicops_reg.c lowaccess_reg.c \
@@ -179,8 +180,8 @@ SRC =		adaptmap_reg.c adaptnorm_reg.c affine_reg.c \
 		projection_reg.c projective_reg.c \
 		psio_reg.c psioseg_reg.c \
 		pta_reg.c ptra1_reg.c ptra2_reg.c quadtree_reg.c \
-		rank_reg.c rankbin_reg.c rankhisto_reg.c \
-		rasterop_reg.c rasteropip_reg.c \
+		rankbin_reg.c rankhisto_reg.c rank_reg.c \
+		rasteropip_reg.c rasterop_reg.c \
 		rotate1_reg.c rotate2_reg.c rotateorth_reg.c \
 		scale_reg.c seedspread_reg.c selio_reg.c \
 		shear1_reg.c shear2_reg.c skew_reg.c \
@@ -195,7 +196,7 @@ SRC =		adaptmap_reg.c adaptnorm_reg.c affine_reg.c \
 		autogentest1.c autogentest2.c barcodetest.c \
 		binarizefiles.c binarize_set.c bincompare.c \
 		blendcmaptest.c buffertest.c \
-		byteatest.c ccbordtest.c cctest1.c \
+		ccbordtest.c cctest1.c \
 		cleanpdf.c colorsegtest.c comparepages.c \
 		comparepixa.c comparetest.c \
 		concatpdf.c contrasttest.c \
@@ -214,7 +215,8 @@ SRC =		adaptmap_reg.c adaptnorm_reg.c affine_reg.c \
 		flipselgen.c fmorphautogen.c \
 		fpixcontours.c gammatest.c \
 		graphicstest.c graymorphtest.c \
-		hashtest.c histotest.c htmlviewer.c iotest.c \
+		hashtest.c histoduptest.c histotest.c \
+		htmlviewer.c \
 		jbcorrelation.c jbrankhaus.c jbwords.c \
 		listtest.c livre_adapt.c livre_hmt.c \
 		livre_makefigs.c livre_orient.c \
@@ -226,9 +228,10 @@ SRC =		adaptmap_reg.c adaptnorm_reg.c affine_reg.c \
 		partitiontest.c pdfiotest.c percolatetest.c \
 		pixaatest.c pixafileinfo.c plottest.c \
 		printimage.c printsplitimage.c printtiff.c \
-		rbtreetest.c recog_bootnum.c recogsort.c \
-		recogtest1.c recogtest2.c recogtest3.c \
-		recogtest4.c recogtest5.c recogtest6.c \
+		rbtreetest.c \
+		recog_bootnum1.c recog_bootnum2.c recog_bootnum3.c \
+		recogsort.c recogtest1.c recogtest2.c recogtest3.c \
+		recogtest4.c recogtest5.c recogtest6.c recogtest7.c \
 		reducetest.c removecmap.c \
 		renderfonts.c rotatefastalt.c \
 		rotateorthtest1.c rotatetest1.c \
@@ -369,6 +372,12 @@ boxa1_reg:	boxa1_reg.o $(LEPTLIB)
 boxa2_reg:	boxa2_reg.o $(LEPTLIB)
 	$(CC) -o boxa2_reg boxa2_reg.o $(ALL_LIBS) $(EXTRALIBS)
 
+boxa3_reg:	boxa3_reg.o $(LEPTLIB)
+	$(CC) -o boxa3_reg boxa3_reg.o $(ALL_LIBS) $(EXTRALIBS)
+
+bytea_reg:	bytea_reg.o $(LEPTLIB)
+	$(CC) -o bytea_reg bytea_reg.o $(ALL_LIBS) $(EXTRALIBS)
+
 ccthin1_reg:	ccthin1_reg.o $(LEPTLIB)
 	$(CC) -o ccthin1_reg ccthin1_reg.o $(ALL_LIBS) $(EXTRALIBS)
 
@@ -506,6 +515,9 @@ insert_reg:	insert_reg.o $(LEPTLIB)
 
 ioformats_reg:	ioformats_reg.o $(LEPTLIB)
 	$(CC) -o ioformats_reg ioformats_reg.o $(ALL_LIBS) $(EXTRALIBS)
+
+iomisc_reg:	iomisc_reg.o $(LEPTLIB)
+	$(CC) -o iomisc_reg iomisc_reg.o $(ALL_LIBS) $(EXTRALIBS)
 
 italic_reg:	italic_reg.o $(LEPTLIB)
 	$(CC) -o italic_reg italic_reg.o $(ALL_LIBS) $(EXTRALIBS)
@@ -750,9 +762,6 @@ blendcmaptest:	blendcmaptest.o $(LEPTLIB)
 buffertest:	buffertest.o $(LEPTLIB)
 	$(CC) -o buffertest buffertest.o $(ALL_LIBS) $(EXTRALIBS)
 
-byteatest:	byteatest.o $(LEPTLIB)
-	$(CC) -o byteatest byteatest.o $(ALL_LIBS) $(EXTRALIBS)
-
 ccbordtest:	ccbordtest.o $(LEPTLIB)
 	$(CC) -o ccbordtest ccbordtest.o $(ALL_LIBS) $(EXTRALIBS)
 
@@ -897,14 +906,14 @@ graymorphtest:	graymorphtest.o $(LEPTLIB)
 hashtest:	hashtest.o $(LEPTLIB)
 	$(CC) -o hashtest hashtest.o $(ALL_LIBS) $(EXTRALIBS)
 
+histoduptest:	histoduptest.o $(LEPTLIB)
+	$(CC) -o histoduptest histoduptest.o $(ALL_LIBS) $(EXTRALIBS)
+
 histotest:	histotest.o $(LEPTLIB)
 	$(CC) -o histotest histotest.o $(ALL_LIBS) $(EXTRALIBS)
 
 htmlviewer:	htmlviewer.o $(LEPTLIB)
 	$(CC) -o htmlviewer htmlviewer.o $(ALL_LIBS) $(EXTRALIBS)
-
-iotest:		iotest.o $(LEPTLIB)
-	$(CC) -o iotest iotest.o $(ALL_LIBS) $(EXTRALIBS)
 
 jbcorrelation:	jbcorrelation.o $(LEPTLIB)
 	$(CC) -o jbcorrelation jbcorrelation.o $(ALL_LIBS) $(EXTRALIBS)
@@ -999,8 +1008,14 @@ printtiff:	printtiff.o $(LEPTLIB)
 rbtreetest:	rbtreetest.o $(LEPTLIB)
 	$(CC) -o rbtreetest rbtreetest.o $(ALL_LIBS) $(EXTRALIBS)
 
-recog_bootnum:	recog_bootnum.o $(LEPTLIB)
-	$(CC) -o recog_bootnum recog_bootnum.o $(ALL_LIBS) $(EXTRALIBS)
+recog_bootnum1:	recog_bootnum1.o $(LEPTLIB)
+	$(CC) -o recog_bootnum1 recog_bootnum1.o $(ALL_LIBS) $(EXTRALIBS)
+
+recog_bootnum2:	recog_bootnum2.o $(LEPTLIB)
+	$(CC) -o recog_bootnum2 recog_bootnum2.o $(ALL_LIBS) $(EXTRALIBS)
+
+recog_bootnum3:	recog_bootnum3.o $(LEPTLIB)
+	$(CC) -o recog_bootnum3 recog_bootnum3.o $(ALL_LIBS) $(EXTRALIBS)
 
 recogsort:	recogsort.o $(LEPTLIB)
 	$(CC) -o recogsort recogsort.o $(ALL_LIBS) $(EXTRALIBS)
@@ -1022,6 +1037,9 @@ recogtest5:	recogtest5.o $(LEPTLIB)
 
 recogtest6:	recogtest6.o $(LEPTLIB)
 	$(CC) -o recogtest6 recogtest6.o $(ALL_LIBS) $(EXTRALIBS)
+
+recogtest7:	recogtest7.o $(LEPTLIB)
+	$(CC) -o recogtest7 recogtest7.o $(ALL_LIBS) $(EXTRALIBS)
 
 reducetest:	reducetest.o $(LEPTLIB)
 	$(CC) -o reducetest reducetest.o $(ALL_LIBS) $(EXTRALIBS)

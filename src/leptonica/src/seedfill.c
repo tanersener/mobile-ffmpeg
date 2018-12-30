@@ -919,7 +919,7 @@ PIXA      *pixa;
  *            on  Image Processing, vol. 2, no. 2, pp. 176-201, 1993.
  * </pre>
  */
-l_int32
+l_ok
 pixSeedfillGray(PIX     *pixs,
                 PIX     *pixm,
                 l_int32  connectivity)
@@ -978,7 +978,7 @@ l_uint32  *datas, *datam;
  *          inverting both the seed and mask.
  * </pre>
  */
-l_int32
+l_ok
 pixSeedfillGrayInv(PIX     *pixs,
                    PIX     *pixm,
                    l_int32  connectivity)
@@ -1965,7 +1965,7 @@ L_QUEUE  *lq_pixel;
  *            on  Image Processing, vol. 2, no. 2, pp. 176-201, 1993.
  * </pre>
  */
-l_int32
+l_ok
 pixSeedfillGraySimple(PIX     *pixs,
                       PIX     *pixm,
                       l_int32  connectivity)
@@ -2036,7 +2036,7 @@ PIX       *pixt;
  *          corresponding mask pixel.
  * </pre>
  */
-l_int32
+l_ok
 pixSeedfillGrayInvSimple(PIX     *pixs,
                          PIX     *pixm,
                          l_int32  connectivity)
@@ -3014,7 +3014,7 @@ l_uint32  *linet, *lined;
  *          further operations.
  * </pre>
  */
-l_int32
+l_ok
 pixLocalExtrema(PIX     *pixs,
                 l_int32  maxmin,
                 l_int32  minmax,
@@ -3186,7 +3186,7 @@ PIXA      *pixa;
  *      (3) The generated masks can be used as markers for further operations.
  * </pre>
  */
-l_int32
+l_ok
 pixSelectedLocalExtrema(PIX     *pixs,
                         l_int32  mindist,
                         PIX    **ppixmin,
@@ -3313,7 +3313,7 @@ PIX       *pixd;
  *          operation.  Not yet implemented.
  * </pre>
  */
-l_int32
+l_ok
 pixSelectMinInConnComp(PIX    *pixs,
                        PIX    *pixm,
                        PTA   **ppta,

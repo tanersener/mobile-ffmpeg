@@ -57,6 +57,11 @@
  *           PIXA     *pixaConstrainedSelect()
  *           l_int32   pixaSelectToPdf()
  *
+ *      Generate pixa from tiled images
+ *           PIXA     *pixaMakeFromTiledPixa()
+ *           PIXA     *pixaMakeFromTiledPix()
+ *           l_int32   pixGetTileCount()
+ *
  *      Pixa display into multiple tiles
  *           PIXA     *pixaDisplayMultiTiled()
  *
@@ -513,7 +518,10 @@ PIXA    *pixa1, *pixa2;
  *      (2) If any pix has a colormap, all pix are rendered in rgb.
  *      (3) This is useful when putting bitmaps of components,
  *          such as characters, into a single image.
- *      (4) The boxa gives the location of each image.  The UL corner
+ *      (4) Save the number of tiled images in the text field of the pix,
+ *          in the format: n = %d.  This survives write/read into png files,
+ *          for example.
+ *      (5) The boxa gives the location of each image.  The UL corner
  *          of each image is on a lattice cell corner.  Omitted images
  *          (due to size) are assigned an invalid width and height of 0.
  * </pre>
@@ -525,7 +533,8 @@ pixaDisplayOnLattice(PIXA     *pixa,
                      l_int32  *pncols,
                      BOXA    **pboxa)
 {
-l_int32  n, nw, nh, w, h, d, wt, ht, res;
+char     buf[16];
+l_int32  n, nw, nh, w, h, d, wt, ht, res, samedepth;
 l_int32  index, i, j, hascmap;
 BOX     *box;
 BOXA    *boxa;
@@ -539,14 +548,12 @@ PIXA    *pixa1;
     if (!pixa)
         return (PIX *)ERROR_PTR("pixa not defined", procName, NULL);
 
-        /* If any pix have colormaps, generate rgb */
+        /* If any pix have colormaps, or if the depths differ, generate rgb */
     if ((n = pixaGetCount(pixa)) == 0)
         return (PIX *)ERROR_PTR("no components", procName, NULL);
-    pix1 = pixaGetPix(pixa, 0, L_CLONE);
-    res = pixGetXRes(pix1);
-    pixDestroy(&pix1);
     pixaAnyColormaps(pixa, &hascmap);
-    if (hascmap) {
+    pixaVerifyDepth(pixa, &samedepth, NULL);
+    if (hascmap || !samedepth) {
         pixa1 = pixaCreate(n);
         for (i = 0; i < n; i++) {
             pix1 = pixaGetPix(pixa, i, L_CLONE);
@@ -565,8 +572,11 @@ PIXA    *pixa1;
     w = cellw * nw;
     h = cellh * nh;
 
-        /* Use the first pix in pixa to determine the output depth.  */
-    pixaGetPixDimensions(pixa1, 0, NULL, NULL, &d);
+        /* Use the first pix to determine output depth and resolution  */
+    pix1 = pixaGetPix(pixa1, 0, L_CLONE);
+    d = pixGetDepth(pix1);
+    res = pixGetXRes(pix1);
+    pixDestroy(&pix1);
     if ((pixd = pixCreate(w, h, d)) == NULL) {
         pixaDestroy(&pixa1);
         return (PIX *)ERROR_PTR("pixd not made", procName, NULL);
@@ -595,6 +605,10 @@ PIXA    *pixa1;
             pixDestroy(&pix1);
         }
     }
+
+        /* Save the number of tiles in the text field */
+    snprintf(buf, sizeof(buf), "n = %d", boxaGetCount(boxa));
+    pixSetText(pixd, buf);
 
     if (pncols) *pncols = nw;
     if (pboxa)
@@ -815,7 +829,7 @@ PIXA    *pixa1;
  *            pix1 = pixaDisplayTiledInRows(pixa1, 1, 1500, 1.0, 0, 30, 0);
  *            char *boxatxt = pixGetText(pix1);
  *            boxa1 = boxaReadMem((l_uint8 *)boxatxt, strlen(boxatxt));
- *            pixa2 = pixaCreateFromBoxa(pix1, boxa1, NULL);
+ *            pixa2 = pixaCreateFromBoxa(pix1, boxa1, 0, 0, NULL);
  * </pre>
  */
 PIX *
@@ -2002,7 +2016,7 @@ PIXA    *pixad;
  *          and then call this function with the specified color
  * </pre>
  */
-l_int32
+l_ok
 pixaSelectToPdf(PIXA        *pixas,
                 l_int32      first,
                 l_int32      last,
@@ -2059,7 +2073,210 @@ PIXA    *pixa1, *pixa2;
 
 
 /*---------------------------------------------------------------------*
- *                     Pixa display into multiple tiles                *
+ *                    Generate pixa from tiled images                  *
+ *---------------------------------------------------------------------*/
+/*!
+ * \brief   pixaMakeFromTiledPixa()
+ *
+ * \param[in]    pixas    of mosaiced templates, one for each digit
+ * \param[in]    w        width of samples (use 0 for default = 20)
+ * \param[in]    h        height of samples (use 0 for default = 30)
+ * \param[in]    nsamp    number of requested samples (use 0 for default = 100)
+ * \return  pixa of individual, scaled templates, or NULL on error
+ *
+ * <pre>
+ * Notes:
+ *      (1) This converts from a compressed representation of 1 bpp digit
+ *          templates to a pixa where each pix has a single labeled template.
+ *      (2) The mosaics hold 100 templates each, and the number of templates
+ *          %nsamp selected for each digit can be between 1 and 100.
+ *      (3) Each mosaic has the number of images written in the text field,
+ *          and the i-th pix contains samples of the i-th digit.  That value
+ *          is written into the text field of each template in the output.
+ * </pre>
+ */
+PIXA *
+pixaMakeFromTiledPixa(PIXA    *pixas,
+                      l_int32  w,
+                      l_int32  h,
+                      l_int32  nsamp)
+{
+char     buf[8];
+l_int32  ntiles, i;
+PIX     *pix1;
+PIXA    *pixad, *pixa1;
+
+    PROCNAME("pixaMakeFromTiledPixa");
+
+    if (!pixas)
+        return (PIXA *)ERROR_PTR("pixas not defined", procName, NULL);
+    if (nsamp > 1000)
+        return (PIXA *)ERROR_PTR("nsamp too large; typ. 100", procName, NULL);
+
+    if (w <= 0) w = 20;
+    if (h <= 0) h = 30;
+    if (nsamp <= 0) nsamp = 100;
+
+        /* pixas has 10 pix of mosaic'd digits.  Each of these images
+         * must be extracted into a pixa of templates, where each template
+         * is labeled with the digit value, and then selectively
+         * concatenated into an output pixa. */
+    pixad = pixaCreate(10 * nsamp);
+    for (i = 0; i < 10; i++) {
+        pix1 = pixaGetPix(pixas, i, L_CLONE);
+        pixGetTileCount(pix1, &ntiles);
+        if (nsamp > ntiles)
+            L_WARNING("requested %d; only %d tiles\n", procName, nsamp, ntiles);
+        pixa1 = pixaMakeFromTiledPix(pix1, w, h, 0, nsamp, NULL);
+        snprintf(buf, sizeof(buf), "%d", i);
+        pixaSetText(pixa1, buf, NULL);
+        pixaJoin(pixad, pixa1, 0, -1);
+        pixaDestroy(&pixa1);
+        pixDestroy(&pix1);
+    }
+    return pixad;
+}
+
+
+/*!
+ * \brief   pixaMakeFromTiledPix()
+ *
+ * \param[in]    pixs        any depth; colormap OK
+ * \param[in]    w           width of each tile
+ * \param[in]    h           height of each tile
+ * \param[in]    start       first tile to use
+ * \param[in]    num         number of tiles; use 0 to go to the end
+ * \param[in]    boxa        [optional] location of rectangular regions
+ *                           to be extracted
+ * \return  pixa if OK, NULL on error
+ *
+ * <pre>
+ * Notes:
+ *      (1) Operations that generate a pix by tiling from a pixa, and
+ *          the inverse that generate a pixa from tiles of a pix,
+ *          are useful.  One such pair is pixaDisplayUnsplit() and
+ *          pixaSplitPix().  This function is a very simple one that
+ *          generates a pixa from tiles of a pix. There are two cases:
+ *            - the tiles can all be the same size (the inverse of
+ *              pixaDisplayOnLattice(), or
+ *            - the tiles can differ in size, where there is an
+ *              associated boxa (the inverse of pixaCreateFromBoxa().
+ *      (2) If all tiles are the same size, %w by %h, use %boxa = NULL.
+ *          If the tiles differ in size, use %boxa to extract the
+ *          individual images (%w and %h are then ignored).
+ *      (3) If the pix was made by pixaDisplayOnLattice(), the number
+ *          of tiled images is written into the text field, in the format
+ *               n = <number>.
+ *      (4) Typical usage: a set of character templates all scaled to
+ *          the same size can be stored on a lattice of that size in
+ *          a pix, and this function can regenerate the pixa.  If the
+ *          templates differ in size, a boxa generated when the tiled
+ *          pix was made can be used to indicate the location of
+ *          the templates.
+ * </pre>
+ */
+PIXA *
+pixaMakeFromTiledPix(PIX     *pixs,
+                     l_int32  w,
+                     l_int32  h,
+                     l_int32  start,
+                     l_int32  num,
+                     BOXA    *boxa)
+{
+char     *text;
+l_int32   i, j, k, ws, hs, d, nx, ny, n, n_isvalid, ntiles, nmax;
+PIX      *pix1;
+PIXA     *pixa1;
+PIXCMAP  *cmap;
+
+    PROCNAME("pixaMakeFromTiledPix");
+
+    if (!pixs)
+        return (PIXA *)ERROR_PTR("pixs not defined", procName, NULL);
+    if (!boxa && (w <= 0 || h <= 0))
+        return (PIXA *)ERROR_PTR("w and h must be > 0", procName, NULL);
+
+    if (boxa)  /* general case */
+       return pixaCreateFromBoxa(pixs, boxa, start, num, NULL);
+
+        /* All tiles are the same size */
+    pixGetDimensions(pixs, &ws, &hs, &d);
+    nx = ws / w;
+    ny = hs / h;
+    if (nx < 1 || ny < 1)
+        return (PIXA *)ERROR_PTR("invalid dimensions", procName, NULL);
+    if (nx * w != ws || ny * h != hs)
+        L_WARNING("some tiles will be clipped\n", procName);
+
+        /* Check the text field of the pix.  It may tell how many
+         * tiles hold valid data.  If a valid value is not found,
+         * assume all (nx * ny) tiles are valid.  */
+    pixGetTileCount(pixs, &n);
+    n_isvalid = (n <= nx * ny && n > nx * (ny - 1)) ? TRUE : FALSE;
+    ntiles = (n_isvalid) ? n : nx * ny;
+    nmax = ntiles - start;  /* max available from start */
+    num = (num == 0) ? nmax : L_MIN(num, nmax);
+
+        /* Extract the tiles */
+    if ((pixa1 = pixaCreate(num)) == NULL) {
+        return (PIXA *)ERROR_PTR("pixa1 not made", procName, NULL);
+    }
+    cmap = pixGetColormap(pixs);
+    for (i = 0, k = 0; i < ny; i++) {
+        for (j = 0; j < nx; j++, k++) {
+            if (k < start) continue;
+            if (k >= start + num) break;
+            pix1 = pixCreate(w, h, d);
+            if (cmap) pixSetColormap(pix1, pixcmapCopy(cmap));
+            pixRasterop(pix1, 0, 0, w, h, PIX_SRC, pixs, j * w, i * h);
+            pixaAddPix(pixa1, pix1, L_INSERT);
+        }
+    }
+    return pixa1;
+}
+
+
+/*!
+ * \brief   pixGetTileCount()
+ *
+ * \param[in]    pix
+ * \param[out]  *pn     number embedded in pix text field
+ * \return  0 if OK, 1 on error
+ *
+ * <pre>
+ * Notes:
+ *      (1) If the pix was made by pixaDisplayOnLattice(), the number
+ *          of tiled images is written into the text field, in the format
+ *               n = <number>.
+ *      (2) This returns 0 if the data is not in the text field, or on error.
+ * </pre>
+ */
+l_ok
+pixGetTileCount(PIX      *pix,
+                l_int32  *pn)
+{
+char    *text;
+l_int32  n;
+
+    PROCNAME("pixGetTileCount");
+
+    if (!pn)
+        return ERROR_INT("&n not defined", procName, 1);
+    *pn = 0;
+    if (!pix)
+        return ERROR_INT("pix not defined", procName, 1);
+
+    text = pixGetText(pix);
+    if (text && strlen(text) > 4) {
+        if (sscanf(text, "n = %d", &n) == 1)
+            *pn = n;
+    }
+    return 0;
+}
+
+
+/*---------------------------------------------------------------------*
+ *                    Pixa display into multiple tiles                 *
  *---------------------------------------------------------------------*/
 /*!
  * \brief   pixaDisplayMultiTiled()
@@ -2161,7 +2378,7 @@ PIXA    *pixa1, *pixa2, *pixad;
  *          full resolution.
  * </pre>
  */
-l_int32
+l_ok
 pixaSplitIntoFiles(PIXA      *pixas,
                    l_int32    nsplit,
                    l_float32  scale,
@@ -2250,7 +2467,7 @@ PIXA    *pixa1;
  *          rendered below it.
  * </pre>
  */
-l_int32
+l_ok
 convertToNUpFiles(const char  *dir,
                   const char  *substr,
                   l_int32      nx,
@@ -2491,7 +2708,7 @@ PIXA      *pixa1, *pixad;
  *          is printed out below each pair.
  * </pre>
  */
-l_int32
+l_ok
 pixaCompareInPdf(PIXA        *pixa1,
                  PIXA        *pixa2,
                  l_int32      nx,

@@ -56,7 +56,7 @@
    defined(PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED)
 
 #if PNG_LIBPNG_VER < 10500
-/* This deliberately lacks the PNG_CONST. */
+/* This deliberately lacks the const. */
 typedef png_byte *png_const_bytep;
 
 /* This is copied from 1.5.1 png.h: */

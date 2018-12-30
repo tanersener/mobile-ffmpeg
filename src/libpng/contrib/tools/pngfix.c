@@ -772,7 +772,7 @@ skip_chunk_type(const struct global *global, png_uint_32 type)
          return 0;
 
       /* Chunks that specify gamma encoding which should therefore only be
-       * removed the the user insists:
+       * removed if the user insists:
        */
       case png_gAMA: case png_sRGB:
          if (global->skip >= SKIP_ALL)
@@ -2514,7 +2514,7 @@ zlib_run(struct zlib *zlib)
        */
       for (;;)
       {
-         const unsigned int count = list->count;
+         unsigned int count = list->count;
          unsigned int i;
 
          for (i = 0; i<count; ++i)
@@ -2791,7 +2791,7 @@ process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
     * to read_chunk.
     */
 {
-   const png_uint_32 type = file->type;
+   png_uint_32 type = file->type;
 
    if (file->global->verbose > 1)
    {
@@ -3152,7 +3152,7 @@ read_chunk(struct file *file)
       }
    }
 
-   /* Control gets to here if the the stream seems invalid or damaged in some
+   /* Control gets to here if the stream seems invalid or damaged in some
     * way.  Either there was a problem reading all the expected data (this
     * chunk's data, its CRC and the length and type of the next chunk) or the
     * next chunk length/type are invalid.  Notice that the cases that end up
@@ -3710,7 +3710,7 @@ usage(const char *prog)
 "            practice most programs will ignore it.",
 "        bKGD [transform]: This is used by libpng transforms."
 "    --max=<number>:",
-"      Use IDAT chunks sized <number>.  If no number is given the the IDAT",
+"      Use IDAT chunks sized <number>.  If no number is given the IDAT",
 "      chunks will be the maximum size permitted; 2^31-1 bytes.  If the option",
 "      is omitted the original chunk sizes will not be changed.  When the",
 "      option is given --strip=unsafe is set automatically. This may be",

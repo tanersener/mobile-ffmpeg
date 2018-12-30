@@ -917,7 +917,7 @@ l_int32  x2, y2;  /* the point at the other end of the line */
  * \param[out]   px, py location of point
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 locatePtRadially(l_int32     xr,
                  l_int32     yr,
                  l_float64   dist,
@@ -959,7 +959,7 @@ locatePtRadially(l_int32     xr,
  *      (3) See makePlotPtaFromNumaGen() for more details.
  * </pre>
  */
-l_int32
+l_ok
 pixRenderPlotFromNuma(PIX     **ppix,
                       NUMA     *na,
                       l_int32   plotloc,
@@ -1073,7 +1073,7 @@ l_int32  orient, refpos;
  *      (3) See makePlotPtaFromNumaGen() for other input parameters.
  * </pre>
  */
-l_int32
+l_ok
 pixRenderPlotFromNumaGen(PIX     **ppix,
                          NUMA     *na,
                          l_int32   orient,
@@ -1250,7 +1250,7 @@ PTA       *pta1, *pta2, *ptad;
  *          pixRenderBox() and pixRenderBoxa(), that call pixRenderPta().
  * </pre>
  */
-l_int32
+l_ok
 pixRenderPta(PIX     *pix,
              PTA     *pta,
              l_int32  op)
@@ -1339,7 +1339,7 @@ l_int32  i, n, x, y, w, h, d, maxval;
  *      (4) This function clips the rendering to the pix.
  * </pre>
  */
-l_int32
+l_ok
 pixRenderPtaArb(PIX     *pix,
                 PTA     *pta,
                 l_uint8  rval,
@@ -1406,6 +1406,7 @@ PIXCMAP  *cmap;
  * \param[in]    pix  32 bpp rgb
  * \param[in]    pta  arbitrary set of points
  * \param[in]    rval, gval, bval
+ * \param[in]    fract
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1413,7 +1414,7 @@ PIXCMAP  *cmap;
  *      (1) This function clips the rendering to the pix.
  * </pre>
  */
-l_int32
+l_ok
 pixRenderPtaBlend(PIX     *pix,
                   PTA     *pta,
                   l_uint8  rval,
@@ -1478,7 +1479,7 @@ l_float32  frval, fgval, fbval;
  * \param[in]    op  one of L_SET_PIXELS, L_CLEAR_PIXELS, L_FLIP_PIXELS
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderLine(PIX     *pix,
               l_int32  x1,
               l_int32  y1,
@@ -1518,7 +1519,7 @@ PTA  *pta;
  * \param[in]    rval, gval, bval
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderLineArb(PIX     *pix,
                  l_int32  x1,
                  l_int32  y1,
@@ -1559,7 +1560,7 @@ PTA  *pta;
  * \param[in]    fract
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderLineBlend(PIX       *pix,
                    l_int32    x1,
                    l_int32    y1,
@@ -1599,7 +1600,7 @@ PTA  *pta;
  * \param[in]    op  one of L_SET_PIXELS, L_CLEAR_PIXELS, L_FLIP_PIXELS
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderBox(PIX     *pix,
              BOX     *box,
              l_int32  width,
@@ -1637,7 +1638,7 @@ PTA  *pta;
  * \param[in]    rval, gval, bval
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderBoxArb(PIX     *pix,
                 BOX     *box,
                 l_int32  width,
@@ -1677,7 +1678,7 @@ PTA  *pta;
  *                      if 0.0; no transparency if 1.0)
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderBoxBlend(PIX       *pix,
                   BOX       *box,
                   l_int32    width,
@@ -1716,7 +1717,7 @@ PTA  *pta;
  * \param[in]    op  one of L_SET_PIXELS, L_CLEAR_PIXELS, L_FLIP_PIXELS
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderBoxa(PIX     *pix,
               BOXA    *boxa,
               l_int32  width,
@@ -1754,7 +1755,7 @@ PTA  *pta;
  * \param[in]    rval, gval, bval
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderBoxaArb(PIX     *pix,
                  BOXA    *boxa,
                  l_int32  width,
@@ -1795,7 +1796,7 @@ PTA  *pta;
  * \param[in]    removedups  1 to remove; 0 otherwise
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderBoxaBlend(PIX       *pix,
                    BOXA      *boxa,
                    l_int32    width,
@@ -1838,7 +1839,7 @@ PTA  *pta;
  * \param[in]    op  one of L_SET_PIXELS, L_CLEAR_PIXELS, L_FLIP_PIXELS
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderHashBox(PIX     *pix,
                  BOX     *box,
                  l_int32  spacing,
@@ -1888,7 +1889,7 @@ PTA  *pta;
  * \param[in]    rval, gval, bval
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderHashBoxArb(PIX     *pix,
                     BOX     *box,
                     l_int32  spacing,
@@ -1940,7 +1941,7 @@ PTA  *pta;
  *                      if 0.0; no transparency if 1.0)
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderHashBoxBlend(PIX       *pix,
                       BOX       *box,
                       l_int32    spacing,
@@ -1998,7 +1999,7 @@ PTA  *pta;
  *          translated by (%x,%y) relative to the origin of %pix.
  * </pre>
  */
-l_int32
+l_ok
 pixRenderHashMaskArb(PIX     *pix,
                      PIX     *pixm,
                      l_int32  x,
@@ -2066,7 +2067,7 @@ PTA     *pta1, *pta2;
  * \param[in]    op  one of L_SET_PIXELS, L_CLEAR_PIXELS, L_FLIP_PIXELS
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderHashBoxa(PIX     *pix,
                   BOXA    *boxa,
                   l_int32  spacing,
@@ -2116,7 +2117,7 @@ PTA  *pta;
  * \param[in]    rval, gval, bval
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderHashBoxaArb(PIX     *pix,
                      BOXA    *boxa,
                      l_int32  spacing,
@@ -2168,7 +2169,7 @@ PTA  *pta;
  *                      if 0.0; no transparency if 1.0)
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderHashBoxaBlend(PIX       *pix,
                        BOXA      *boxa,
                        l_int32    spacing,
@@ -2222,7 +2223,7 @@ PTA  *pta;
  *      This renders a closed contour.
  * </pre>
  */
-l_int32
+l_ok
 pixRenderPolyline(PIX     *pix,
                   PTA     *ptas,
                   l_int32  width,
@@ -2267,7 +2268,7 @@ PTA  *pta;
  *      This renders a closed contour.
  * </pre>
  */
-l_int32
+l_ok
 pixRenderPolylineArb(PIX     *pix,
                      PTA     *ptas,
                      l_int32  width,
@@ -2310,7 +2311,7 @@ PTA  *pta;
  * \param[in]    removedups  1 to remove; 0 otherwise
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderPolylineBlend(PIX       *pix,
                        PTA       *ptas,
                        l_int32    width,
@@ -2351,7 +2352,7 @@ PTA  *pta;
  * \param[in]    rval, gval, bval
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixRenderGridArb(PIX     *pix,
                  l_int32  nx,
                  l_int32  ny,

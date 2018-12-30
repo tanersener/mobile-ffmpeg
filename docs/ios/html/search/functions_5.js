@@ -20,6 +20,7 @@ var searchData=
   ['getchannellayout',['getChannelLayout',['../dd/ddc/interface_stream_information.html#a2bd6bdfea6652e7c0641ca3a64764d61',1,'StreamInformation']]],
   ['getcodec',['getCodec',['../dd/ddc/interface_stream_information.html#a5e896eb85cba4b117733565651a05513',1,'StreamInformation']]],
   ['getcodectimebase',['getCodecTimeBase',['../dd/ddc/interface_stream_information.html#adbc3359673c9d1f7861ebc15d2cf514a',1,'StreamInformation']]],
+  ['getcpuarch',['getCpuArch',['../dd/d2b/interface_arch_detect.html#a1eba0adefde2e127648559f92b9b5208',1,'ArchDetect']]],
   ['getdisplayaspectratio',['getDisplayAspectRatio',['../dd/ddc/interface_stream_information.html#a92f90d55de571d20d6eb49628ff0c43a',1,'StreamInformation']]],
   ['getduration',['getDuration',['../d6/dca/interface_media_information.html#a461ba6f49d72d46bee700fa997d719a4',1,'MediaInformation']]],
   ['getexternallibraries',['getExternalLibraries',['../df/d45/interface_mobile_f_fmpeg_config.html#a17a80daa4903d8e7b4490c42f85396c9',1,'MobileFFmpegConfig']]],

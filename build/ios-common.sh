@@ -68,6 +68,33 @@ get_library_name() {
     esac
 }
 
+get_package_config_file_name() {
+    case $1 in
+        1) echo "freetype2" ;;
+        5) echo "libmp3lame" ;;
+        8) echo "theora" ;;
+        9) echo "vorbis" ;;
+        10) echo "vpx" ;;
+        12) echo "libxml-2.0" ;;
+        13) echo "opencore-amrnb" ;;
+        21) echo "vidstab" ;;
+        26) echo "aom" ;;
+        27) echo "libchromaprint" ;;
+        29) echo "sdl2" ;;
+        32) echo "libjpeg" ;;
+        33) echo "ogg" ;;
+        35) echo "uuid" ;;
+        37) echo "libtiff-4" ;;
+        39) echo "sndfile" ;;
+        40) echo "lept" ;;
+        *) echo $(get_library_name $1)
+    esac
+}
+
+to_capital_case() {
+    echo "$(echo ${1:0:1} | tr '[a-z]' '[A-Z]')${1:1}"
+}
+
 get_static_archive_name() {
     case $1 in
         5) echo "libmp3lame.a" ;;
@@ -95,8 +122,9 @@ get_arch_name() {
         0) echo "armv7" ;;
         1) echo "armv7s" ;;
         2) echo "arm64" ;;
-        3) echo "i386" ;;
-        4) echo "x86-64" ;;
+        3) echo "arm64e" ;;
+        4) echo "i386" ;;
+        5) echo "x86-64" ;;
     esac
 }
 
@@ -104,9 +132,20 @@ get_target_host() {
     echo "$(get_target_arch)-ios-darwin"
 }
 
+get_target_build_directory() {
+    case ${ARCH} in
+        x86-64)
+            echo "x86_64-ios-darwin"
+        ;;
+        *)
+            echo "${ARCH}-ios-darwin"
+        ;;
+    esac
+}
+
 get_target_arch() {
     case ${ARCH} in
-        arm64)
+        arm64 | arm64e)
             echo "aarch64"
         ;;
         x86-64)
@@ -124,7 +163,7 @@ get_target_sdk() {
 
 get_sdk_name() {
     case ${ARCH} in
-        armv7 | armv7s | arm64)
+        armv7 | armv7s | arm64 | arm64e)
             echo "iphoneos"
         ;;
         i386 | x86-64)
@@ -138,18 +177,12 @@ get_sdk_path() {
 }
 
 get_min_version_cflags() {
-    local min_version=${IOS_MIN_VERSION}
-
-    if [ "$1" == "gnutls" ]; then
-        min_version=${GNUTLS_IOS_MIN_VERSION}
-    fi
-
     case ${ARCH} in
-        armv7 | armv7s | arm64)
-            echo "-miphoneos-version-min=${min_version}"
+        armv7 | armv7s | arm64 | arm64e)
+            echo "-miphoneos-version-min=${IOS_MIN_VERSION}"
         ;;
         i386 | x86-64)
-            echo "-mios-simulator-version-min=${min_version}"
+            echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
         ;;
     esac
 }
@@ -159,12 +192,16 @@ get_common_includes() {
 }
 
 get_common_cflags() {
+    if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+        local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
+    fi
+
     case ${ARCH} in
         i386 | x86-64)
-            echo "-fstrict-aliasing -DIOS -isysroot ${SDK_PATH}"
+            echo "-fstrict-aliasing -DIOS ${LTS_BUILD__FLAG}-isysroot ${SDK_PATH}"
         ;;
         *)
-            echo "-fstrict-aliasing -fembed-bitcode -DIOS -isysroot ${SDK_PATH}"
+            echo "-fstrict-aliasing -fembed-bitcode -DIOS ${LTS_BUILD__FLAG}-isysroot ${SDK_PATH}"
         ;;
     esac
 }
@@ -172,41 +209,77 @@ get_common_cflags() {
 get_arch_specific_cflags() {
     case ${ARCH} in
         armv7)
-            echo "-arch armv7 -target $(get_target_host) -march=armv7 -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7 -target $(get_target_host) -march=armv7 -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARMV7"
         ;;
         armv7s)
-            echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp"
+            echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARMV7S"
         ;;
         arm64)
-            echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic"
+            echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic -DMOBILE_FFMPEG_ARM64"
+        ;;
+        arm64e)
+            echo "-arch arm64e -target $(get_target_host) -march=armv8.3-a+dotprod -mcpu=generic -DMOBILE_FFMPEG_ARM64E"
         ;;
         i386)
-            echo "-arch i386 -target $(get_target_host) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32"
+            echo "-arch i386 -target $(get_target_host) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_I386"
         ;;
         x86-64)
-            echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel"
+            echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
         ;;
     esac
 }
 
 get_size_optimization_cflags() {
 
-    ARCH_OPTIMIZATION=""
+    local ARCH_OPTIMIZATION=""
     case ${ARCH} in
-        armv7 | armv7s | arm64)
-            if [[ $1 -eq libwebp ]]; then
-                ARCH_OPTIMIZATION="-Os -Wno-ignored-optimization-argument"
-            else
-                ARCH_OPTIMIZATION="-Os -finline-limit=64 -Wno-ignored-optimization-argument"
-            fi
+        armv7 | armv7s | arm64 | arm64e)
+            case $1 in
+                x264 | x265)
+                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
+                ;;
+                ffmpeg | mobile-ffmpeg)
+                    ARCH_OPTIMIZATION="-flto -Oz -Wno-ignored-optimization-argument"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-flto -Oz -Wno-ignored-optimization-argument"
+                ;;
+            esac
         ;;
         i386 | x86-64)
-            if [[ $1 -eq libvpx ]]; then
-                ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
-            else
-                ARCH_OPTIMIZATION="-O2 -finline-limit=300 -Wno-ignored-optimization-argument"
-            fi
+            case $1 in
+                x264 | ffmpeg)
+                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
+                ;;
+                x265)
+                    ARCH_OPTIMIZATION="-flto -O2 -Wno-ignored-optimization-argument"
+                ;;
+                *)
+                    ARCH_OPTIMIZATION="-flto -O2 -Wno-ignored-optimization-argument"
+                ;;
+            esac
+        ;;
+    esac
 
+    echo "${ARCH_OPTIMIZATION}"
+}
+
+get_size_optimization_asm_cflags() {
+
+    local ARCH_OPTIMIZATION=""
+    case $1 in
+        jpeg | ffmpeg)
+            case ${ARCH} in
+                armv7 | armv7s | arm64 | arm64e)
+                    ARCH_OPTIMIZATION="-Oz"
+                ;;
+                i386 | x86-64)
+                    ARCH_OPTIMIZATION="-O2"
+                ;;
+            esac
+        ;;
+        *)
+            ARCH_OPTIMIZATION=$(get_size_optimization_cflags $1)
         ;;
     esac
 
@@ -215,11 +288,11 @@ get_size_optimization_cflags() {
 
 get_app_specific_cflags() {
 
-    APP_FLAGS=""
+    local APP_FLAGS=""
     case $1 in
         fontconfig)
             case ${ARCH} in
-                armv7 | armv7s | arm64)
+                armv7 | armv7s | arm64 | arm64e)
                     APP_FLAGS="-std=c99 -Wno-unused-function -D__IPHONE_OS_MIN_REQUIRED -D__IPHONE_VERSION_MIN_REQUIRED=30000"
                 ;;
                 *)
@@ -228,7 +301,7 @@ get_app_specific_cflags() {
             esac
         ;;
         ffmpeg)
-            APP_FLAGS="-Wno-unused-function -DPIC"
+            APP_FLAGS="-Wno-unused-function -Wno-deprecated-declarations"
         ;;
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
@@ -263,42 +336,47 @@ get_app_specific_cflags() {
 }
 
 get_cflags() {
-    ARCH_FLAGS=$(get_arch_specific_cflags)
-    APP_FLAGS=$(get_app_specific_cflags $1)
-    COMMON_FLAGS=$(get_common_cflags)
+    local ARCH_FLAGS=$(get_arch_specific_cflags)
+    local APP_FLAGS=$(get_app_specific_cflags $1)
+    local COMMON_FLAGS=$(get_common_cflags)
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-        OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+        local OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
     else
-        OPTIMIZATION_FLAGS=""
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
     fi
-    MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
-    COMMON_INCLUDES=$(get_common_includes)
+    local MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
+    local COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${MIN_VERSION_FLAGS} ${COMMON_INCLUDES}"
 }
 
 get_asmflags() {
-    ARCH_FLAGS=$(get_arch_specific_cflags)
-    APP_FLAGS=$(get_app_specific_cflags $1)
-    COMMON_FLAGS=$(get_common_cflags)
+    local ARCH_FLAGS=$(get_arch_specific_cflags)
+    local APP_FLAGS=$(get_app_specific_cflags $1)
+    local COMMON_FLAGS=$(get_common_cflags)
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-        OPTIMIZATION_FLAGS=$(get_size_optimization_cflags $1)
+        local OPTIMIZATION_FLAGS=$(get_size_optimization_asm_cflags $1)
     else
-        OPTIMIZATION_FLAGS=""
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
     fi
-    MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
-    COMMON_INCLUDES=$(get_common_includes)
+    local MIN_VERSION_FLAGS=$(get_min_version_cflags $1)
+    local COMMON_INCLUDES=$(get_common_includes)
 
     echo "${ARCH_FLAGS} ${APP_FLAGS} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS} ${MIN_VERSION_FLAGS} ${COMMON_INCLUDES}"
 }
 
 get_cxxflags() {
     local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags) $(get_min_version_cflags $1)"
+    if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+        local OPTIMIZATION_FLAGS="-flto -Oz"
+    else
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
+    fi
 
     local BITCODE_FLAGS=""
     case ${ARCH} in
-        armv7 | armv7s | arm64)
-            BITCODE_FLAGS="-fembed-bitcode"
+        armv7 | armv7s | arm64 | arm64e)
+            local BITCODE_FLAGS="-fembed-bitcode"
         ;;
     esac
 
@@ -307,19 +385,19 @@ get_cxxflags() {
             echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
         ;;
         gnutls)
-            echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
         opencore-amr)
-            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
+            echo "-fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
         libwebp | xvidcore)
-            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} -fno-common -DPIC ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
         libaom)
-            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
         *)
-            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS}"
+            echo "-std=c++11 -fno-exceptions -fno-rtti ${BITCODE_FLAGS} ${COMMON_CFLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
     esac
 }
@@ -330,6 +408,31 @@ get_common_linked_libraries() {
 
 get_common_ldflags() {
     echo "-isysroot ${SDK_PATH}"
+}
+
+get_size_optimization_ldflags() {
+    case ${ARCH} in
+        armv7 | armv7s | arm64 | arm64e)
+            case $1 in
+                ffmpeg | mobile-ffmpeg)
+                    echo "-flto -Oz -dead_strip"
+                ;;
+                *)
+                    echo "-flto -Oz -dead_strip"
+                ;;
+            esac
+        ;;
+        *)
+            case $1 in
+                ffmpeg)
+                    echo "-O2"
+                ;;
+                *)
+                    echo "-flto -O2"
+                ;;
+            esac
+        ;;
+    esac
 }
 
 get_arch_specific_ldflags() {
@@ -343,6 +446,9 @@ get_arch_specific_ldflags() {
         arm64)
             echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode"
         ;;
+        arm64e)
+            echo "-arch arm64e -march=armv8.3-a+dotprod -fembed-bitcode"
+        ;;
         i386)
             echo "-arch i386 -march=i386"
         ;;
@@ -353,23 +459,28 @@ get_arch_specific_ldflags() {
 }
 
 get_ldflags() {
-    ARCH_FLAGS=$(get_arch_specific_ldflags)
-    LINKED_LIBRARIES=$(get_common_linked_libraries)
-    COMMON_FLAGS=$(get_common_ldflags)
+    local ARCH_FLAGS=$(get_arch_specific_ldflags)
+    local LINKED_LIBRARIES=$(get_common_linked_libraries)
+    if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
+        local OPTIMIZATION_FLAGS="$(get_size_optimization_ldflags $1)"
+    else
+        local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
+    fi
+    local COMMON_FLAGS=$(get_common_ldflags)
 
     case $1 in
         mobile-ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64)
-                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode"
+                armv7 | armv7s | arm64 | arm64e)
+                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode ${OPTIMIZATION_FLAGS}"
                 ;;
                 *)
-                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS}"
+                    echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS}"
                 ;;
             esac
         ;;
         *)
-            echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS}"
+            echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} ${OPTIMIZATION_FLAGS}"
         ;;
     esac
 }
@@ -378,7 +489,7 @@ create_fontconfig_package_config() {
     local FONTCONFIG_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/fontconfig.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/fontconfig
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/fontconfig
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -403,7 +514,7 @@ create_freetype_package_config() {
     local FREETYPE_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/freetype2.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/freetype
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/freetype
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -424,7 +535,7 @@ create_giflib_package_config() {
     local GIFLIB_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/giflib.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/giflib
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/giflib
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -443,7 +554,7 @@ create_gmp_package_config() {
     local GMP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gmp.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gmp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -462,7 +573,7 @@ create_gnutls_package_config() {
     local GNUTLS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/gnutls.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/gnutls
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gnutls
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -482,7 +593,7 @@ create_libmp3lame_package_config() {
     local LAME_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libmp3lame.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/lame
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/lame
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -501,7 +612,7 @@ create_libiconv_package_config() {
     local LIB_ICONV_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libiconv.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libiconv
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -520,7 +631,7 @@ create_libpng_package_config() {
     local LIBPNG_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libpng.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libpng
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -538,7 +649,7 @@ create_libvorbis_package_config() {
     local LIBVORBIS_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/vorbis.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvorbis
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -553,7 +664,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisenc.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvorbis
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -569,7 +680,7 @@ Cflags: -I\${includedir}
 EOF
 
 cat > "${INSTALL_PKG_CONFIG_DIR}/vorbisfile.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libvorbis
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libvorbis
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -589,7 +700,7 @@ create_libwebp_package_config() {
     local LIB_WEBP_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libwebp.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libwebp
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libwebp
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -608,7 +719,7 @@ create_libxml2_package_config() {
     local LIBXML2_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/libxml-2.0.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libxml2
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libxml2
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -628,7 +739,7 @@ create_snappy_package_config() {
     local SNAPPY_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/snappy.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/snappy
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/snappy
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -647,7 +758,7 @@ create_soxr_package_config() {
     local SOXR_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/soxr.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/soxr
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/soxr
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -666,7 +777,7 @@ create_tesseract_package_config() {
     local TESSERACT_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/tesseract.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/tesseract
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/tesseract
 exec_prefix=\${prefix}
 bindir=\${exec_prefix}/bin
 datarootdir=\${prefix}/share
@@ -689,7 +800,7 @@ create_uuid_package_config() {
     local UUID_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/uuid.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libuuid
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libuuid
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
@@ -707,7 +818,7 @@ create_xvidcore_package_config() {
     local XVIDCORE_VERSION="$1"
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/xvidcore.pc" << EOF
-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/xvidcore
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/xvidcore
 exec_prefix=\${prefix}
 libdir=\${prefix}/lib
 includedir=\${prefix}/include
@@ -806,9 +917,9 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20181208-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20181208-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20181208-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20181224-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20181224-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20181224-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
@@ -900,6 +1011,10 @@ set_toolchain_clang_paths() {
             exit 1
         fi
         (chmod +x ${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl 1>>${BASEDIR}/build.log 2>&1) || exit 1
+
+        # patch gas-preprocessor.pl against the following warning
+        # Unescaped left brace in regex is deprecated here (and will be fatal in Perl 5.32), passed through in regex; marked by <-- HERE in m/(?:ld|st)\d\s+({ <-- HERE \s*v(\d+)\.(\d[bhsdBHSD])\s*-\s*v(\d+)\.(\d[bhsdBHSD])\s*})/ at /Users/taner/Projects/mobile-ffmpeg/.tmp/gas-preprocessor.pl line 1065.
+        sed -i .tmp "s/s\+({/s\+(\\\\{/g;s/s\*})/s\*\\\\})/g" ${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl
     fi
 
     LOCAL_GAS_PREPROCESSOR="${MOBILE_FFMPEG_TMPDIR}/gas-preprocessor.pl"
@@ -925,7 +1040,7 @@ set_toolchain_clang_paths() {
                 export AS="${LOCAL_GAS_PREPROCESSOR} -arch arm -- ${CC} ${LOCAL_ASMFLAGS}"
             fi
         ;;
-        arm64)
+        arm64 | arm64e)
             if [ "$1" == "x265" ]; then
                 export AS="${LOCAL_GAS_PREPROCESSOR}"
                 export AS_ARGUMENTS="-arch aarch64"
@@ -943,7 +1058,7 @@ set_toolchain_clang_paths() {
     export RANLIB="$(xcrun --sdk $(get_sdk_name) -f ranlib)"
     export STRIP="$(xcrun --sdk $(get_sdk_name) -f strip)"
 
-    export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/ios-$(get_target_host)/pkgconfig"
+    export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
     export BZIP2_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/bzip2.pc"
 

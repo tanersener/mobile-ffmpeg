@@ -8,7 +8,8 @@ com pnglibconf.h - library build configuration
 com
 version
 com
-com Copyright (c) 1998-2017 Glenn Randers-Pehrson
+com Copyright (c) 2018 Cosmin Truta
+com Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
 com
 com This code is released under the libpng license.
 com For conditions of distribution and use, see the disclaimer

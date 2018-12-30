@@ -97,21 +97,39 @@ typedef uintptr_t l_uintptr_t;
  *  non-functioning stubs to be linked.
  */
 #if !defined(HAVE_CONFIG_H) && !defined(ANDROID_BUILD) && !defined(OS_IOS)
-#define  HAVE_LIBJPEG       1
-#define  HAVE_LIBTIFF       1
-#define  HAVE_LIBPNG        1
-#define  HAVE_LIBZ          1
-#define  HAVE_LIBGIF        0
-#define  HAVE_LIBUNGIF      0
-#define  HAVE_LIBWEBP       0
-#define  HAVE_LIBJP2K       0
 
-/*-------------------------------------------------------------------------*
- * Leptonica supports OpenJPEG 2.0+.  If you have a version of openjpeg    *
- * (HAVE_LIBJP2K == 1) that is >= 2.0, set the path to the openjpeg.h      *
- * header in angle brackets here.                                          *
- *-------------------------------------------------------------------------*/
-#define  LIBJP2K_HEADER   <openjpeg-2.3/openjpeg.h>
+  #if !defined(HAVE_LIBJPEG)
+  #define  HAVE_LIBJPEG       1
+  #endif
+  #if !defined(HAVE_LIBTIFF)
+  #define  HAVE_LIBTIFF       1
+  #endif
+  #if !defined(HAVE_LIBPNG)
+  #define  HAVE_LIBPNG        1
+  #endif
+  #if !defined(HAVE_LIBZ)
+  #define  HAVE_LIBZ          1
+  #endif
+  #if !defined(HAVE_LIBGIF)
+  #define  HAVE_LIBGIF        0
+  #endif
+  #if !defined(HAVE_LIBUNGIF)
+  #define  HAVE_LIBUNGIF      0
+  #endif
+  #if !defined(HAVE_LIBWEBP)
+  #define  HAVE_LIBWEBP       0
+  #endif
+  #if !defined(HAVE_LIBJP2K)
+  #define  HAVE_LIBJP2K       0
+  #endif
+
+  /*-----------------------------------------------------------------------*
+   * Leptonica supports OpenJPEG 2.0+.  If you have a version of openjpeg  *
+   * (HAVE_LIBJP2K == 1) that is >= 2.0, set the path to the openjpeg.h    *
+   * header in angle brackets here.                                        *
+   *-----------------------------------------------------------------------*/
+  #define  LIBJP2K_HEADER   <openjpeg-2.3/openjpeg.h>
+
 #endif  /* ! HAVE_CONFIG_H etc. */
 
 /*--------------------------------------------------------------------*
@@ -171,6 +189,7 @@ typedef uintptr_t l_uintptr_t;
 /*--------------------------------------------------------------------*
  *                          Built-in types                            *
  *--------------------------------------------------------------------*/
+typedef int                     l_ok;    /*!< return type 0 if OK, 1 on error */
 typedef signed char             l_int8;     /*!< signed 8-bit value */
 typedef unsigned char           l_uint8;    /*!< unsigned 8-bit value */
 typedef short                   l_int16;    /*!< signed 16-bit value */
@@ -216,7 +235,7 @@ LEPT_DLL extern l_int32  LeptDebugOK;  /* default is 0 */
 #endif
 
 #ifndef L_ABS
-/*! Absoulute value of %x */
+/*! Absolute value of %x */
 #define L_ABS(x)     (((x) < 0) ? (-1 * (x)) : (x))
 #endif
 

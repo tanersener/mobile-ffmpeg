@@ -48,7 +48,7 @@ if [[ ${RECONF_libuuid} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \
@@ -56,7 +56,7 @@ fi
     --disable-fast-install \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # AUTO-GENERATED PKG-CONFIG FILE IS WRONG. CREATING IT MANUALLY
 create_uuid_package_config "1.0.3"

@@ -63,7 +63,7 @@
  *          output directory are retained except for the extension.
  * </pre>
  */
-l_int32
+l_ok
 convertFilesTo1bpp(const char  *dirin,
                    const char  *substr,
                    l_int32      upscaling,

@@ -66,12 +66,12 @@ static const l_int32  MAX_JP2K_HEIGHT = 100000;
  *
  * \param[in]    filename
  * \param[out]   pw [optional]
- *           [out]   ph ([optional]
- *           [out]   pbps ([optional]  bits/sample
+ * \param[out]   ph [optional]
+ * \param[out]   pbps [optional]  bits/sample
  * \param[out]   pspp [optional]  samples/pixel
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 readHeaderJp2k(const char *filename,
                l_int32    *pw,
                l_int32    *ph,
@@ -103,12 +103,12 @@ FILE    *fp;
  *
  * \param[in]    fp file stream opened for read
  * \param[out]   pw [optional]
- *           [out]   ph ([optional]
- *           [out]   pbps ([optional]  bits/sample
+ * \param[out]   ph [optional]
+ * \param[out]   pbps [optional]  bits/sample
  * \param[out]   pspp [optional]  samples/pixel
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 freadHeaderJp2k(FILE     *fp,
                 l_int32  *pw,
                 l_int32  *ph,
@@ -144,8 +144,8 @@ l_int32  nread;
  * \param[in]    data
  * \param[in]    size at least 80
  * \param[out]   pw [optional]
- *           [out]   ph ([optional]
- *           [out]   pbps ([optional]  bits/sample
+ * \param[out]   ph [optional]
+ * \param[out]   pbps [optional]  bits/sample
  * \param[out]   pspp [optional]  samples/pixel
  * \return  0 if OK, 1 on error
  *
@@ -163,7 +163,7 @@ l_int32  nread;
  *               bps:  1 byte   (contains bps - 1)
  * </pre>
  */
-l_int32
+l_ok
 readHeaderMemJp2k(const l_uint8  *data,
                   size_t          size,
                   l_int32        *pw,
@@ -198,6 +198,9 @@ l_uint8  ihdr[4] = {0x69, 0x68, 0x64, 0x72};  /* 'ihdr' */
 #endif  /* DEBUG_IHDR */
 
     windex = loc / 4 + 1;
+    if (4 * (windex + 2) + 2 >= size)
+        return ERROR_INT("image parameters end are outside of header",
+                         procName, 1);
     val = *((l_uint32 *)data + windex);
     h = convertOnLittleEnd32(val);
     val = *((l_uint32 *)data + windex + 1);

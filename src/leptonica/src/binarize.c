@@ -65,7 +65,7 @@
  *          that use background normalization with other techniques.
  *      (3) Sauvola binarization computes a local threshold based on
  *          the local average and square average.  It takes two constants:
- *          the window size for the measurment at each pixel and a
+ *          the window size for the measurement at each pixel and a
  *          parameter that determines the amount of normalized local
  *          standard deviation to subtract from the local average value.
  *      (4) pixThresholdByCC() uses the numbers of 4 and 8 connected
@@ -136,7 +136,7 @@
  *          of the problem noted in (3) above for tiling.  Use Sauvola.
  * </pre>
  */
-l_int32
+l_ok
 pixOtsuAdaptiveThreshold(PIX       *pixs,
                          l_int32    sx,
                          l_int32    sy,
@@ -463,7 +463,7 @@ PIX      *pixn, *pixm, *pixd, *pix1, *pix2, *pix3, *pix4;
  *          See pixSauvolaBinarize() for details.
  * </pre>
  */
-l_int32
+l_ok
 pixSauvolaBinarizeTiled(PIX       *pixs,
                         l_int32    whsize,
                         l_float32  factor,
@@ -590,7 +590,7 @@ PIXTILING  *pt;
  *          0.2 and 0.5.
  * </pre>
  */
-l_int32
+l_ok
 pixSauvolaBinarize(PIX       *pixs,
                    l_int32    whsize,
                    l_float32  factor,
@@ -882,7 +882,7 @@ PIX       *pixd;
  *          which the caller should check.
  * </pre>
  */
-l_int32
+l_ok
 pixThresholdByConnComp(PIX       *pixs,
                        PIX       *pixm,
                        l_int32    start,

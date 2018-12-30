@@ -680,7 +680,7 @@ PIXA    *pixa;
  *        of the Sel used to align pixp with pixs.
  * </pre>
  */
-l_int32
+l_ok
 pixRemoveMatchedPattern(PIX     *pixs,
                         PIX     *pixp,
                         PIX     *pixe,
@@ -1519,11 +1519,12 @@ PTA       *pta;
  *
  * <pre>
  * Notes:
- *      (1) Any table not passed in will be made internally and destroyed
+ *      (1) The sum and centroid tables are only used for 1 bpp.
+ *      (2) Any table not passed in will be made internally and destroyed
  *          after use.
  * </pre>
  */
-l_int32
+l_ok
 pixCentroid(PIX        *pix,
             l_int32    *centtab,
             l_int32    *sumtab,
@@ -1548,14 +1549,15 @@ l_int32   *ctab, *stab;
     if (d != 1 && d != 8)
         return ERROR_INT("pix not 1 or 8 bpp", procName, 1);
 
-    if (!centtab)
-        ctab = makePixelCentroidTab8();
-    else
-        ctab = centtab;
-    if (!sumtab)
-        stab = makePixelSumTab8();
-    else
-        stab = sumtab;
+    ctab = centtab;
+    stab = sumtab;
+    if (d == 1) {
+        pixSetPadBits(pix, 0);
+        if (!centtab)
+            ctab = makePixelCentroidTab8();
+        if (!sumtab)
+            stab = makePixelSumTab8();
+    }
 
     data = pixGetData(pix);
     wpl = pixGetWpl(pix);

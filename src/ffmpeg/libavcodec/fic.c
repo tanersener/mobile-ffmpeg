@@ -173,9 +173,11 @@ static int fic_decode_slice(AVCodecContext *avctx, void *tdata)
     int slice_h  = tctx->slice_h;
     int src_size = tctx->src_size;
     int y_off    = tctx->y_off;
-    int x, y, p;
+    int x, y, p, ret;
 
-    init_get_bits(&gb, src, src_size * 8);
+    ret = init_get_bits8(&gb, src, src_size);
+    if (ret < 0)
+        return ret;
 
     for (p = 0; p < 3; p++) {
         int stride   = ctx->frame->linesize[p];
@@ -380,6 +382,8 @@ static int fic_decode_frame(AVCodecContext *avctx, void *data,
             slice_h      = FFALIGN(avctx->height - ctx->slice_h * (nslices - 1), 16);
         } else {
             slice_size = AV_RB32(src + tsize + FIC_HEADER_SIZE + slice * 4 + 4);
+            if (slice_size < slice_off)
+                return AVERROR_INVALIDDATA;
         }
 
         if (slice_size < slice_off || slice_size > msize)

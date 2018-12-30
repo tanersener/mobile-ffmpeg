@@ -47,11 +47,11 @@ if [[ ! -f ${BASEDIR}/src/${LIB_NAME}/configure ]] || [[ ${RECONF_tesseract} -eq
     autoreconf_library ${LIB_NAME}
 fi
 
-export LEPTONICA_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/leptonica/include/leptonica"
-export LEPTONICA_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/leptonica/lib -llept"
+export LEPTONICA_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/leptonica/include/leptonica"
+export LEPTONICA_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/leptonica/lib -llept"
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \
@@ -66,7 +66,7 @@ export LEPTONICA_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/leptonica/li
 
 ${SED_INLINE} 's/$wl-bind_at_load//g' libtool
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_tesseract_package_config "3.05.02"

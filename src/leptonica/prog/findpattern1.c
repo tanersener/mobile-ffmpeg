@@ -109,7 +109,7 @@ static char  mainName[] = "findpattern1";
     pixSetColormap(pix3, cmap);
     pixWrite(fileout, pix3, IFF_PNG);
 
-        /* Display outut with a red outline around each located pattern */
+        /* Display output with a red outline around each located pattern */
     boxa1 = pixConnCompBB(pix2, 8);
     n = boxaGetCount(boxa1);
     boxa2 = boxaCreate(n);

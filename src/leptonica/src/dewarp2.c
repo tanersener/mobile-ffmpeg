@@ -77,7 +77,7 @@ static l_int32 pixRenderHorizEndPoints(PIX *pixs, PTA *ptal, PTA *ptar,
 
 
 #ifndef  NO_CONSOLE_IO
-#define  DEBUG_TEXTLINE_CENTERS    0   /* set this to 1 for debuging */
+#define  DEBUG_TEXTLINE_CENTERS    0   /* set this to 1 for debugging */
 #define  DEBUG_SHORT_LINES         0   /* ditto */
 #else
 #define  DEBUG_TEXTLINE_CENTERS    0   /* always must be 0 */
@@ -144,7 +144,7 @@ static const l_float32   L_ALLOWED_W_FRACT = 0.05;  /* no bigger */
  *          longest textlines.
  * </pre>
  */
-l_int32
+l_ok
 dewarpBuildPageModel(L_DEWARP    *dew,
                      const char  *debugfile)
 {
@@ -290,13 +290,13 @@ PTAA    *ptaa1, *ptaa2;
  *          a pdf.  Non-pix debug output goes to /tmp.
  * </pre>
  */
-l_int32
+l_ok
 dewarpFindVertDisparity(L_DEWARP  *dew,
                         PTAA      *ptaa,
                         l_int32    rotflag)
 {
 l_int32     i, j, nlines, npts, nx, ny, sampling;
-l_float32   c0, c1, c2, x, y, midy, val, medval, medvar, minval, maxval;
+l_float32   c0, c1, c2, x, y, midy, val, medval, meddev, minval, maxval;
 l_float32  *famidys;
 NUMA       *nax, *nafit, *nacurve0, *nacurve1, *nacurves;
 NUMA       *namidy, *namidys, *namidysi;
@@ -374,15 +374,15 @@ FPIX       *fpix;
          * the line curvatures.  It is not rejecting lines based on
          * the magnitude of the curvature.  That is done when constraints
          * are applied for valid models. */
-    numaGetMedianVariation(nacurve0, &medval, &medvar);
+    numaGetMedianDevFromMedian(nacurve0, &medval, &meddev);
     L_INFO("\nPage %d\n", procName, dew->pageno);
-    L_INFO("Pass 1: Curvature: medval = %f, medvar = %f\n",
-           procName, medval, medvar);
+    L_INFO("Pass 1: Curvature: medval = %f, meddev = %f\n",
+           procName, medval, meddev);
     ptaa1 = ptaaCreate(nlines);
     nacurve1 = numaCreate(nlines);
     for (i = 0; i < nlines; i++) {  /* for each line */
         numaGetFValue(nacurve0, i, &val);
-        if (L_ABS(val - medval) > 7.0 * medvar)  /* TODO: reduce to ~ 3.0 */
+        if (L_ABS(val - medval) > 7.0 * meddev)  /* TODO: reduce to ~ 3.0 */
             continue;
         pta = ptaaGetPta(ptaa0, i, L_CLONE);
         ptaaAddPta(ptaa1, pta, L_INSERT);
@@ -554,7 +554,7 @@ FPIX       *fpix;
  *      (5) Debug output goes to /tmp/lept/dewmod/ for collection into a pdf.
  * </pre>
  */
-l_int32
+l_ok
 dewarpFindHorizDisparity(L_DEWARP  *dew,
                          PTAA      *ptaa)
 {
@@ -1195,7 +1195,7 @@ PTA       *ptau1, *ptau2, *ptad1, *ptad2;
     }
 
         /* Check the lower half */
-    ptad1 = ptaSelectRange(ptas, n / 2 + 1, 0);
+    ptad1 = ptaSelectRange(ptas, n / 2 + 1, -1);
     ptaGetRankValue(ptad1, 0.5, NULL, L_SORT_BY_Y, &rval);
     nd = ptaGetCount(ptad1);
     ptad2 = ptaCreate(nd);
@@ -1352,7 +1352,7 @@ NUMA      *naerr;
  *          disparity only if the absolute value of the fractional
  *          difference equals or exceeds this threshold.
  *      (2) %parity indicates where the binding is: on the left for
- *          %parity == 0 and on the right for @parity == 1.
+ *          %parity == 0 and on the right for %parity == 1.
  *      (3) This takes a 1 bpp %pixb where both vertical and horizontal
  *          disparity have been applied, so the text lines are straight and,
  *          more importantly, the line end points are vertically aligned.
@@ -1374,7 +1374,7 @@ NUMA      *naerr;
  *      (6) Debug output goes to /tmp/lept/dewmod/ for collection into a pdf.
  * </pre>
  */
-l_int32
+l_ok
 dewarpFindHorizSlopeDisparity(L_DEWARP  *dew,
                               PIX       *pixb,
                               l_float32  fractthresh,
@@ -1602,7 +1602,7 @@ FPIX      *fpix;
  *          See notes there.
  * </pre>
  */
-l_int32
+l_ok
 dewarpBuildLineModel(L_DEWARP    *dew,
                      l_int32      opensize,
                      const char  *debugfile)
@@ -1786,7 +1786,7 @@ PTAA    *ptaa1, *ptaa2;
  *      (1) This tests if a model has been built, not if it is valid.
  * </pre>
  */
-l_int32
+l_ok
 dewarpaModelStatus(L_DEWARPA  *dewa,
                    l_int32     pageno,
                    l_int32    *pvsuccess,

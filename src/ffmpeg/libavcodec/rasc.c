@@ -215,7 +215,7 @@ static int decode_move(AVCodecContext *avctx,
     bytestream2_skip(gb, 8);
     compression = bytestream2_get_le32(gb);
 
-    if (nb_moves > INT32_MAX / 16)
+    if (nb_moves > INT32_MAX / 16 || nb_moves > avctx->width * avctx->height)
         return AVERROR_INVALIDDATA;
 
     uncompressed_size = 16 * nb_moves;
@@ -679,6 +679,9 @@ static int decode_frame(AVCodecContext *avctx,
 
     while (bytestream2_get_bytes_left(gb) > 0) {
         unsigned type, size = 0;
+
+        if (bytestream2_get_bytes_left(gb) < 8)
+            return AVERROR_INVALIDDATA;
 
         type = bytestream2_get_le32(gb);
         if (type == KBND || type == BNDL) {

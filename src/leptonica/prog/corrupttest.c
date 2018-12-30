@@ -31,13 +31,17 @@
  *     a specified location.  The parameters @loc and @size are fractions
  *     of the entire file (between 0.0 and 1.0).
  *
- *     Syntax:  corrupttest <file> [loc size]
+ *     Syntax:  corrupttest <file> <deletion> [loc size]
  *
- *     Use: "fuzz testing" jpeg and png reading, under corruption by
- *     random byte permutation or by deletion of part of the compressed file.
+ *        where <deletion> == 1 means that bytes are deleted
+ *              <deletion> == 0 means that random bytes are substituted
+ *
+ *     Use: "fuzz testing" jpeg, png, tiff, bmp, webp and pnm reading,
+ *          under corruption by either random byte substitution or
+ *          deletion of part of the compressed file.
  *
  *     For example,
- *          corrupttest rabi.png 0.0001 0.0001
+ *          corrupttest rabi.png 0 0.0001 0.0001
  *     which tests read functions on rabi.png after 23 bytes (0.01%)
  *     starting at byte 23 have been randomly permuted, emits the following:
  *      > Info in fileCorruptByMutation: Randomizing 23 bytes at location 23
@@ -52,47 +56,46 @@
 #include "string.h"
 #include "allheaders.h"
 
-    /* ------------------------------------------------------------------ */
-    /*  Set this to TRUE for deletion; FALSE for random byte permutation  */
-    /* ------------------------------------------------------------------ */
-// static const l_int32  Deletion = TRUE;
-static const l_int32  Deletion = FALSE;
+static const char *corruptfile = "/tmp/lept/corrupt/badfile";
 
 int main(int     argc,
          char  **argv)
 {
 size_t       filesize;
 l_float32    loc, size;
-l_int32      i, j, w, xres, yres, format, ret, nwarn, hint;
+l_float32    coeff1[15], coeff2[25];
+l_int32      i, j, w, xres, yres, format, ret, nwarn, hint, deletion, show;
 l_uint8     *comment, *filedata;
 char        *filein;
+size_t       nbytes;
 FILE        *fp;
 PIX         *pix;
 static char  mainName[] = "corrupttest";
 
-    if (argc != 2 && argc != 4)
-        return ERROR_INT("syntax: corrupttest filein [loc size]", mainName, 1);
+    if (argc != 3 && argc != 5)
+        return ERROR_INT("syntax: corrupttest filein deletion [loc size]",
+        mainName, 1);
     filein = argv[1];
+    deletion = atoi(argv[2]);
     findFileFormat(filein, &format);
+    nbytes = nbytesInFile(filein);
+    fprintf(stderr, "file size: %lu bytes\n", (unsigned long)nbytes);
 
     setLeptDebugOK(1);
     lept_mkdir("lept/corrupt");
 
     hint = 0;
-    if (argc == 4) {  /* Single test */
-        loc = atof(argv[2]);
-        size = atof(argv[3]);
-        if (Deletion == TRUE) {
-            fileCorruptByDeletion(filein, loc, size,
-                                  "/tmp/lept/corrupt/junkout");
+    if (argc == 5) {  /* Single test */
+        loc = atof(argv[3]);
+        size = atof(argv[4]);
+        if (deletion == TRUE) {
+            fileCorruptByDeletion(filein, loc, size, corruptfile);
         } else {  /* mutation */
-            fileCorruptByMutation(filein, loc, size,
-                                  "/tmp/lept/corrupt/junkout");
+            fileCorruptByMutation(filein, loc, size, corruptfile);
         }
-        fp = fopenReadStream("/tmp/lept/corrupt/junkout");
+        fp = fopenReadStream(corruptfile);
         if (format == IFF_JFIF_JPEG) {
-            if ((pix = pixReadJpeg("/tmp/lept/corrupt/junkout", 0, 1,
-                                   &nwarn, hint)) != NULL) {
+            if ((pix = pixReadJpeg(corruptfile, 0, 1, &nwarn, hint)) != NULL) {
                 pixDisplay(pix, 100, 100);
                 pixDestroy(&pix);
             }
@@ -104,32 +107,58 @@ static char  mainName[] = "corrupttest";
                 lept_free(comment);
             }
         } else if (format == IFF_PNG) {
-            if ((pix = pixRead("/tmp/lept/corrupt/junkout")) != NULL) {
+            if ((pix = pixRead(corruptfile)) != NULL) {
                 pixDisplay(pix, 100, 100);
                 pixDestroy(&pix);
             }
             freadHeaderPng(fp, &w, NULL, NULL, NULL, NULL);
             fgetPngResolution(fp, &xres, &yres);
+        } else if (format == IFF_WEBP) {
+            if ((pix = pixRead(corruptfile)) != NULL) {
+                pixDisplay(pix, 100, 100);
+                pixDestroy(&pix);
+            }
+            readHeaderWebP(corruptfile, &w, NULL, NULL);
         } else if (format == IFF_PNM) {
+            if ((pix = pixRead(corruptfile)) != NULL) {
+                pixDisplay(pix, 100, 100);
+                pixDestroy(&pix);
+            }
             freadHeaderPnm(fp, &w, NULL, NULL, NULL, NULL, NULL);
         }
         fclose(fp);
         return 0;
     }
 
-        /* Multiple test (argc == 2) */
-    for (i = 0; i < 50; i++) {
-        loc = 0.02 * i;
-        for (j = 1; j < 11; j++) {
-            size = 0.001 * j;
+        /* Generate coefficients so that the size of the mangled
+         * or deleted data can range from 0.001% to 1% of the file,
+         * and the location of deleted data ranges from 0.001%
+         * to 90% of the file. */
+    for (i = 0; i < 15; i++) {
+        if (i < 5) coeff1[i] = 0.00001;
+        else if (i < 10) coeff1[i] = 0.0001;
+        else coeff1[i] = 0.001;
+    }
+    for (i = 0; i < 25; i++) {
+        if (i < 5) coeff2[i] = 0.00001;
+        else if (i < 10) coeff2[i] = 0.0001;
+        else if (i < 15) coeff2[i] = 0.001;
+        else if (i < 20) coeff2[i] = 0.01;
+        else coeff2[i] = 0.1;
+    }
+ 
+        /* Multiple test (argc == 3) */
+    show = TRUE;
+    for (i = 0; i < 25; i++) {
+        loc = coeff2[i] * (2 * (i % 5) + 1);
+        for (j = 0; j < 15; j++) {
+            size = coeff1[j] * (2 * (j % 5) + 1);
 
                 /* Write corrupt file */
-            if (Deletion == TRUE) {
-                fileCorruptByDeletion(filein, loc, size,
-                                      "/tmp/lept/corrupt/junkout");
+            if (deletion == TRUE) {
+                fileCorruptByDeletion(filein, loc, size, corruptfile);
             } else {
-                fileCorruptByMutation(filein, loc, size,
-                                      "/tmp/lept/corrupt/junkout");
+                fileCorruptByMutation(filein, loc, size, corruptfile);
             }
 
                 /* Attempt to read the file */
@@ -141,40 +170,99 @@ static char  mainName[] = "corrupttest";
                  * corrupted image.  In the situation where only a few
                  * bytes are removed, a corrupted image will occasionally
                  * have nwarn == 0 even though it's visually defective.  */
-                pix = pixReadJpeg("/tmp/lept/corrupt/junkout", 0, 1, &nwarn, 0);
-                if (pix && nwarn != 1 && Deletion == TRUE) {
+                pix = pixReadJpeg(corruptfile, 0, 1, &nwarn, 0);
+                if (pix && nwarn != 1 && deletion == TRUE) {
                     fprintf(stderr, "nwarn[%d,%d] = %d\n", j, i, nwarn);
-                    pixDisplay(pix, 20 * i, 50 * j);  /* show the outliers */
+                    if (show) pixDisplay(pix, 20 * i, 30 * j);
+                    show = FALSE;
                 }
-            } else if (format == IFF_PNG)  {
-                pix = pixRead("/tmp/lept/corrupt/junkout");
+            } else if (format == IFF_PNG) {
+                pix = pixRead(corruptfile);
                 if (pix) {
                     fprintf(stderr, "pix[%d,%d] is read\n", j, i);
-                    pixDisplay(pix, 20 * i, 50 * j);  /* show the outliers */
+                    if (show) pixDisplay(pix, 20 * i, 30 * j);
+                    show = FALSE;
                 }
                 pixDestroy(&pix);
-                filedata = l_binaryRead("/tmp/lept/corrupt/junkout", &filesize);
+                filedata = l_binaryRead(corruptfile, &filesize);
                 pix = pixReadMemPng(filedata, filesize);
                 lept_free(filedata);
+            } else if (format == IFF_TIFF || format == IFF_TIFF_PACKBITS ||
+                       format == IFF_TIFF_RLE || format == IFF_TIFF_G3 ||
+                       format == IFF_TIFF_G4 || format == IFF_TIFF_LZW ||
+                       format == IFF_TIFF_ZIP) {
+                /* A corrupted pix is often returned, as long as the
+                 * header is not damaged, so we do not display them.  */
+                pix = pixRead(corruptfile);
+                if (pix) fprintf(stderr, "pix[%d,%d] is read\n", j, i);
+                pixDestroy(&pix);
+                filedata = l_binaryRead(corruptfile, &filesize);
+                pix = pixReadMemTiff(filedata, filesize, 0);
+                if (!pix) fprintf(stderr, "no pix!\n");
+                lept_free(filedata);
+            } else if (format == IFF_BMP) {
+                /* A corrupted pix is always returned if the header is
+                 * not damaged, so we do not display them.  */
+                pix = pixRead(corruptfile);
+                if (pix) fprintf(stderr, "pix[%d,%d] is read\n", j, i);
+                pixDestroy(&pix);
+                filedata = l_binaryRead(corruptfile, &filesize);
+                pix = pixReadMemBmp(filedata, filesize);
+                lept_free(filedata);
+            } else if (format == IFF_WEBP) {
+                /* A corrupted pix is always returned if the header is
+                 * not damaged, so we do not display them.  */
+                pix = pixRead(corruptfile);
+                if (pix) fprintf(stderr, "pix[%d,%d] is read\n", j, i);
+                pixDestroy(&pix);
+                filedata = l_binaryRead(corruptfile, &filesize);
+                pix = pixReadMemWebP(filedata, filesize);
+                lept_free(filedata);
+            } else if (format == IFF_PNM) {
+                /* A corrupted pix is always returned if the header is
+                 * not damaged, so we do not display them.  */
+                pix = pixRead(corruptfile);
+                if (pix) fprintf(stderr, "pix[%d,%d] is read\n", j, i);
+                pixDestroy(&pix);
+                filedata = l_binaryRead(corruptfile, &filesize);
+                pix = pixReadMemPnm(filedata, filesize);
+                lept_free(filedata);
+            } else {
+                fprintf(stderr, "Format %d unknown\n", format);
+                continue;
             }
 
                 /* Effect of 1% byte mangling from interior of data stream */
-            if (pix && j == 10 && i == 10 && Deletion == FALSE)
+            if (pix && j == 14 && i == 10 && deletion == FALSE)
                 pixDisplay(pix, 0, 0);
             pixDestroy(&pix);
 
                 /* Attempt to read the header and the resolution */
-            fp = fopenReadStream("/tmp/lept/corrupt/junkout");
+            fp = fopenReadStream(corruptfile);
             if (format == IFF_JFIF_JPEG) {
                 freadHeaderJpeg(fp, &w, NULL, NULL, NULL, NULL);
-                fgetJpegResolution(fp, &xres, &yres);
-                fprintf(stderr, "w = %d, xres = %d, yres = %d\n",
-                        w, xres, yres);
+                if (fgetJpegResolution(fp, &xres, &yres) == 0)
+                    fprintf(stderr, "w = %d, xres = %d, yres = %d\n",
+                    w, xres, yres);
             } else if (format == IFF_PNG)  {
                 freadHeaderPng(fp, &w, NULL, NULL, NULL, NULL);
-                fgetPngResolution(fp, &xres, &yres);
+                if (fgetPngResolution(fp, &xres, &yres) == 0)
+                    fprintf(stderr, "w = %d, xres = %d, yres = %d\n",
+                    w, xres, yres);
+            } else if (format == IFF_TIFF || format == IFF_TIFF_PACKBITS ||
+                       format == IFF_TIFF_RLE || format == IFF_TIFF_G3 ||
+                       format == IFF_TIFF_G4 || format == IFF_TIFF_LZW ||
+                       format == IFF_TIFF_ZIP) {
+                freadHeaderTiff(fp, 0, &w, NULL, NULL, NULL, NULL, NULL, NULL);
+                getTiffResolution(fp, &xres, &yres);
                 fprintf(stderr, "w = %d, xres = %d, yres = %d\n",
                         w, xres, yres);
+            } else if (format == IFF_WEBP)  {
+                if (readHeaderWebP(corruptfile, &w, NULL, NULL) == 0)
+                    fprintf(stderr, "w = %d\n", w);
+            } else if (format == IFF_PNM)  {
+                if (freadHeaderPnm(fp, &w, NULL, NULL, NULL, NULL, NULL) == 0)
+                    fprintf(stderr, "w = %d\n", w);
             }
             fclose(fp);
         }

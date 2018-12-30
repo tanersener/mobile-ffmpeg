@@ -194,6 +194,8 @@ typedef enum {
   REFERENCE_PARTITION
 } PARTITION_SEARCH_TYPE;
 
+typedef enum { EIGHTH_PEL, QUARTER_PEL, HALF_PEL, FULL_PEL } SUBPEL_FORCE_STOP;
+
 typedef struct MV_SPEED_FEATURES {
   // Motion search method (Diamond, NSTEP, Hex, Big Diamond, Square, etc).
   SEARCH_METHODS search_method;
@@ -215,8 +217,8 @@ typedef struct MV_SPEED_FEATURES {
   // Maximum number of steps in logarithmic subpel search before giving up.
   int subpel_iters_per_step;
 
-  // Control when to stop subpel search
-  int subpel_force_stop;
+  // When to stop subpel search.
+  SUBPEL_FORCE_STOP subpel_force_stop;
 } MV_SPEED_FEATURES;
 
 #define MAX_MESH_STEP 4

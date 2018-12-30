@@ -119,7 +119,7 @@
  *  must work on scaled images.
  *
  *  Here are the steps in doing recog training:
- *  A. Generate a BAR from any exising labeled templates
+ *  A. Generate a BAR from any existing labeled templates
  *    (1) Create a recog and add the templates, using recogAddSample().
  *        This stores the unscaled templates.
  *        [Note: this can be done in one step if the labeled templates are put
@@ -153,7 +153,7 @@
  *  (3) For each candidate, find the average correlation with other
  *      members of its class, and remove those that have a relatively
  *      low average correlation.  This is similar to (1), gives comparable
- *      results and becauses it does not use average templates, it requires
+ *      results and because it does not use average templates, it requires
  *      a bit more computation.
  * </pre>
  */
@@ -193,11 +193,11 @@ static const l_float32  LOWER_SCORE_THRESHOLD = 0.5;  /* templates can be
 /*!
  * \brief   recogTrainLabeled()
  *
- * \param[in]    recog in training mode
- * \param[in]    pixs if depth > 1, will be thresholded to 1 bpp
- * \param[in]    box [optional] cropping box
- * \param[in]    text [optional] if null, use text field in pix
- * \param[in]    debug 1 to display images of samples not captured
+ * \param[in]    recog     in training mode
+ * \param[in]    pixs      if depth > 1, will be thresholded to 1 bpp
+ * \param[in]    box       [optional] cropping box
+ * \param[in]    text      [optional] if null, use text field in pix
+ * \param[in]    debug     1 to display images of samples not captured
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -208,7 +208,7 @@ static const l_float32  LOWER_SCORE_THRESHOLD = 0.5;  /* templates can be
  *          of the character image.
  * </pre>
  */
-l_int32
+l_ok
 recogTrainLabeled(L_RECOG  *recog,
                   PIX      *pixs,
                   BOX      *box,
@@ -257,7 +257,7 @@ PIX     *pix;
  *          of one character where the charval is inserted into the pix.
  * </pre>
  */
-l_int32
+l_ok
 recogProcessLabeled(L_RECOG  *recog,
                     PIX      *pixs,
                     BOX      *box,
@@ -348,7 +348,7 @@ PIX     *pix1, *pix2, *pix3, *pix4;
  *          the pixaa_u array is extended by adding a pixa to hold them.
  * </pre>
  */
-l_int32
+l_ok
 recogAddSample(L_RECOG  *recog,
                PIX      *pix,
                l_int32   debug)
@@ -462,7 +462,7 @@ PIX     *pix1, *pix2;
 /*!
  * \brief   recogAverageSamples()
  *
- * \param[in]   precog      addr of existing recog; may be destroyed
+ * \param[in]   precog    addr of existing recog; may be destroyed
  * \param[in]   debug
  * \return  0 on success, 1 on failure
  *
@@ -644,11 +644,11 @@ L_RECOG   *recog;
 /*!
  * \brief   pixaAccumulateSamples()
  *
- * \param[in]    pixa of samples from the same class, 1 bpp
- * \param[in]    pta [optional] of centroids of the samples
- * \param[out]   ppixd accumulated samples, 8 bpp
- * \param[out]   px [optional] average x coordinate of centroids
- * \param[out]   py [optional] average y coordinate of centroids
+ * \param[in]    pixa     of samples from the same class, 1 bpp
+ * \param[in]    pta      [optional] of centroids of the samples
+ * \param[out]   ppixd    accumulated samples, 8 bpp
+ * \param[out]   px       [optional] average x coordinate of centroids
+ * \param[out]   py       [optional] average y coordinate of centroids
  * \return  0 on success, 1 on failure
  *
  * <pre>
@@ -779,7 +779,7 @@ PTA       *ptac;
  *          unscaled and modified.
  * </pre>
  */
-l_int32
+l_ok
 recogTrainingFinished(L_RECOG  **precog,
                       l_int32    modifyflag,
                       l_int32    minsize,
@@ -945,8 +945,8 @@ NUMA      *na;
  * \param[in]   setsize       size of character set (number of classes)
  * \param[in]   maxkeep       max number of templates to keep in a class
  * \param[in]   max_ht_ratio  max allowed height ratio (see below)
- * \param[out]  pna     [optional] debug output, giving the number in each
- *                      class after filtering; use NULL to skip
+ * \param[out]  pna           [optional] debug output, giving the number
+ *                            in each class after filtering; use NULL to skip
  * \return  pixa   filtered templates, or NULL on error
  *
  * <pre>
@@ -1032,14 +1032,14 @@ PIXAA     *paa;
 /*!
  * \brief   recogSortPixaByClass()
  *
- * \param[in]   pixa          labeled templates
- * \param[in]   setsize       size of character set (number of classes)
+ * \param[in]   pixa       labeled templates
+ * \param[in]   setsize    size of character set (number of classes)
  * \return  paa   pixaa where each pixa has templates for one class,
  *                or null on error
  */
 PIXAA *
-recogSortPixaByClass(PIXA      *pixa,
-                     l_int32    setsize)
+recogSortPixaByClass(PIXA    *pixa,
+                     l_int32  setsize)
 {
 PIXAA    *paa;
 L_RECOG  *recog;
@@ -1077,7 +1077,7 @@ L_RECOG  *recog;
  *          if it fails, the input recog is destroyed.
  * </pre>
  */
-l_int32
+l_ok
 recogRemoveOutliers1(L_RECOG  **precog,
                      l_float32  minscore,
                      l_int32    mintarget,
@@ -1227,7 +1227,7 @@ L_RECOG   *recog;
         }
         pixDestroy(&pix1);
 
-            /* Find the rankscore, corresonding to the 1.0 - minfract.
+            /* Find the rankscore, corresponding to the 1.0 - minfract.
              * To attempt to maintain the minfract of templates, use as a
              * cutoff the minimum of minscore and the rank score.  However,
              * no template is saved with an actual score less than
@@ -1280,11 +1280,11 @@ L_RECOG   *recog;
 /*!
  * \brief   recogRemoveOutliers2()
  *
- * \param[in]   precog       addr of recog with unscaled labeled templates
- * \param[in]   minscore     keep everything with at least this score
- * \param[in]   minsize      minimum number of samples required for a class
- * \param[out]  ppixsave     [optional debug] saved templates, with scores
- * \param[out]  ppixrem      [optional debug] removed templates, with scores
+ * \param[in]   precog      addr of recog with unscaled labeled templates
+ * \param[in]   minscore    keep everything with at least this score
+ * \param[in]   minsize     minimum number of samples required for a class
+ * \param[out]  ppixsave    [optional debug] saved templates, with scores
+ * \param[out]  ppixrem     [optional debug] removed templates, with scores
  * \return  0 if OK, 1 on error.
  *
  * <pre>
@@ -1295,7 +1295,7 @@ L_RECOG   *recog;
  *          if it fails, the input recog is destroyed.
  * </pre>
  */
-l_int32
+l_ok
 recogRemoveOutliers2(L_RECOG  **precog,
                      l_float32  minscore,
                      l_int32    minsize,
@@ -1458,11 +1458,11 @@ L_RECOG   *recog;
 /*!
  * \brief   recogTrainFromBoot()
  *
- * \param[in]    recogboot  labeled boot recognizer
- * \param[in]    pixas      set of unlabeled input characters
- * \param[in]    minscore   min score for accepting the example; e.g., 0.75
- * \param[in]    threshold  for binarization, if needed
- * \param[in]    debug      1 for debug output saved to recogboot; 0 otherwise
+ * \param[in]    recogboot   labeled boot recognizer
+ * \param[in]    pixas       set of unlabeled input characters
+ * \param[in]    minscore    min score for accepting the example; e.g., 0.75
+ * \param[in]    threshold   for binarization, if needed
+ * \param[in]    debug       1 for debug output saved to recogboot; 0 otherwise
  * \return  pixad   labeled version of input pixas, trained on a BSR,
  *                  or NULL on error
  *
@@ -1573,10 +1573,10 @@ PIXA      *pixa1, *pixa2, *pixa3, *pixad;
 /*!
  * \brief   recogPadDigitTrainingSet()
  *
- * \param[in/out]   precog   trained; if padding is needed, it is replaced
- *                           by a a new padded recog
- * \param[in]       scaleh   must be > 0; suggest ~40.
- * \param[in]       linew    use 0 for original scanned images
+ * \param[in,out]   precog    trained; if padding is needed, it is replaced
+ *                            by a a new padded recog
+ * \param[in]       scaleh    must be > 0; suggest ~40.
+ * \param[in]       linew     use 0 for original scanned images
  * \return       0 if OK, 1 on error
  *
  * <pre>
@@ -1588,7 +1588,7 @@ PIXA      *pixa1, *pixa2, *pixa3, *pixad;
  *          %scaleh and %linew.
  * </pre>
  */
-l_int32
+l_ok
 recogPadDigitTrainingSet(L_RECOG  **precog,
                          l_int32    scaleh,
                          l_int32    linew)
@@ -1783,7 +1783,7 @@ PIXA    *pixa1, *pixa2;
         return (PIXA *)ERROR_PTR("boot charset not available", procName, NULL);
 
         /* Make boot recog templates */
-    pixa1 = recogMakeBootDigitTemplates(0);
+    pixa1 = recogMakeBootDigitTemplates(0, 0);
     n = pixaGetCount(pixa1);
 
         /* Extract the unscaled templates from %recog */
@@ -1812,7 +1812,7 @@ PIXA    *pixa1, *pixa2;
 /*!
  * \brief   recogCharsetAvailable()
  *
- * \param[in]    type of charset for padding
+ * \param[in]    type     of charset for padding
  * \return  1 if available; 0 if not.
  */
 static l_int32
@@ -1850,30 +1850,35 @@ l_int32  ret;
 /*!
  * \brief   recogMakeBootDigitRecog()
  *
- * \param[in]    scaleh   scale all heights to this; typ. use 40
- * \param[in]    linew    normalized line width; typ. use 5; 0 to skip
- * \param[in]    maxyshift from nominal centroid alignment; typically 0 or 1
- * \param[in]    debug  1 for showing templates; 0 otherwise
+ * \param[in]    nsamp       number of samples of each digit; or 0
+ * \param[in]    scaleh      scale all heights to this; typ. use 40
+ * \param[in]    linew       normalized line width; typ. use 5; 0 to skip
+ * \param[in]    maxyshift   from nominal centroid alignment; typically 0 or 1
+ * \param[in]    debug       1 for showing templates; 0 otherwise
  * \return  recog, or NULL on error
  *
  * <pre>
  * Notes:
  *     (1) This takes a set of pre-computed, labeled pixa of single
- *         digits, and generates a recognizer where the character templates
- *         that will be used are derived from the boot-generated pixa:
- *         - extending by replicating the set with different widths,
- *           keeping the height the same
+ *         digits, and generates a recognizer from them.
+ *         The templates used in the recognizer can be modified by:
  *         - scaling (isotropically to fixed height)
- *         - optionally generating a skeleton and thickening so that
- *           all strokes have the same width.
+ *         - generating a skeleton and thickening so that all strokes
+ *           have the same width.
  *     (2) The resulting templates are scaled versions of either the
  *         input bitmaps or images with fixed line widths.  To use the
  *         input bitmaps, set %linew = 0; otherwise, set %linew to the
  *         desired line width.
+ *     (3) If %nsamp == 0, this uses and extends the output from
+ *         three boot generators:
+ *            l_bootnum_gen1, l_bootnum_gen2, l_bootnum_gen3.
+ *         Otherwise, it uses exactly %nsamp templates of each digit,
+ *         extracted by l_bootnum_gen4.
  * </pre>
  */
 L_RECOG  *
-recogMakeBootDigitRecog(l_int32  scaleh,
+recogMakeBootDigitRecog(l_int32  nsamp,
+                        l_int32  scaleh,
                         l_int32  linew,
                         l_int32  maxyshift,
                         l_int32  debug)
@@ -1883,7 +1888,7 @@ PIXA     *pixa;
 L_RECOG  *recog;
 
         /* Get the templates, extended by horizontal scaling */
-    pixa = recogMakeBootDigitTemplates(debug);
+    pixa = recogMakeBootDigitTemplates(nsamp, debug);
 
         /* Make the boot recog; recogModifyTemplate() will scale the
          * templates and optionally turn them into strokes of fixed width. */
@@ -1899,7 +1904,8 @@ L_RECOG  *recog;
 /*!
  * \brief   recogMakeBootDigitTemplates()
  *
- * \param[in]    debug  1 for display of templates
+ * \param[in]    nsamp     number of samples of each digit; or 0
+ * \param[in]    debug     1 for display of templates
  * \return  pixa   of templates; or NULL on error
  *
  * <pre>
@@ -1908,12 +1914,25 @@ L_RECOG  *recog;
  * </pre>
  */
 PIXA  *
-recogMakeBootDigitTemplates(l_int32  debug)
+recogMakeBootDigitTemplates(l_int32  nsamp,
+                            l_int32  debug)
 {
-NUMA  *na;
+NUMA  *na1;
 PIX   *pix1, *pix2, *pix3;
 PIXA  *pixa1, *pixa2, *pixa3;
 
+    if (nsamp > 0) {
+        pixa1 = l_bootnum_gen4(nsamp);
+        if (debug) {
+            pix1 = pixaDisplayTiledWithText(pixa1, 1500, 1.0, 10,
+                                            2, 6, 0xff000000);
+            pixDisplay(pix1, 0, 0);
+            pixDestroy(&pix1);
+        }
+        return pixa1;
+    }
+
+        /* Else, generate from 3 pixa */
     pixa1 = l_bootnum_gen1();
     pixa2 = l_bootnum_gen2();
     pixa3 = l_bootnum_gen3();
@@ -1934,14 +1953,14 @@ PIXA  *pixa1, *pixa2, *pixa3;
     pixaDestroy(&pixa3);
 
         /* Extend by horizontal scaling */
-    na = numaCreate(4);
-    numaAddNumber(na, 0.9);
-    numaAddNumber(na, 1.1);
-    numaAddNumber(na, 1.2);
-    pixa2 = pixaExtendByScaling(pixa1, na, L_HORIZ, 1);
+    na1 = numaCreate(4);
+    numaAddNumber(na1, 0.9);
+    numaAddNumber(na1, 1.1);
+    numaAddNumber(na1, 1.2);
+    pixa2 = pixaExtendByScaling(pixa1, na1, L_HORIZ, 1);
 
     pixaDestroy(&pixa1);
-    numaDestroy(&na);
+    numaDestroy(&na1);
     return pixa2;
 }
 
@@ -1952,13 +1971,13 @@ PIXA  *pixa1, *pixa2, *pixa3;
 /*!
  * \brief   recogShowContent()
  *
- * \param[in]    fp file  stream
+ * \param[in]    fp       file stream
  * \param[in]    recog
  * \param[in]    index    for naming of output files of template images
- * \param[in]    display  1 for showing template images, 0 otherwise
+ * \param[in]    display  1 for showing template images; 0 otherwise
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 recogShowContent(FILE     *fp,
                  L_RECOG  *recog,
                  l_int32   index,
@@ -2041,7 +2060,7 @@ NUMA    *na;
  *      (3) Destroys the recog if the averaging function finds any bad classes.
  * </pre>
  */
-l_int32
+l_ok
 recogDebugAverages(L_RECOG  **precog,
                    l_int32    debug)
 {
@@ -2291,9 +2310,10 @@ PIXA  *pixa;
  * \brief   recogShowMatchesInRange()
  *
  * \param[in]    recog
- * \param[in]    pixa of 1 bpp images to match
- * \param[in]    minscore, maxscore range to include output
- * \param[in]    display to display the result
+ * \param[in]    pixa        of 1 bpp images to match
+ * \param[in]    minscore    min score to include output
+ * \param[in]    maxscore    max score to include output
+ * \param[in]    display     1 to display the result
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2307,12 +2327,12 @@ PIXA  *pixa;
  *          to filter a range of scores.
  * </pre>
  */
-l_int32
-recogShowMatchesInRange(L_RECOG     *recog,
-                        PIXA        *pixa,
-                        l_float32    minscore,
-                        l_float32    maxscore,
-                        l_int32      display)
+l_ok
+recogShowMatchesInRange(L_RECOG   *recog,
+                        PIXA      *pixa,
+                        l_float32  minscore,
+                        l_float32  maxscore,
+                        l_int32    display)
 {
 l_int32    i, n, index, depth;
 l_float32  score;
@@ -2379,11 +2399,11 @@ PIXA      *pixa1, *pixa2;
  * \brief   recogShowMatch()
  *
  * \param[in]    recog
- * \param[in]    pix1  input pix; several possibilities
- * \param[in]    pix2  [optional] matching template
- * \param[in]    box  [optional] region in pix1 for which pix2 matches
- * \param[in]    index  index of matching template; use -1 to disable printing
- * \param[in]    score  score of match
+ * \param[in]    pix1    input pix; several possibilities
+ * \param[in]    pix2    [optional] matching template
+ * \param[in]    box     [optional] region in pix1 for which pix2 matches
+ * \param[in]    index   index of matching template; use -1 to disable printing
+ * \param[in]    score   score of match
  * \return  pixd pair of images, showing input pix and best template,
  *                    optionally with matching information, or NULL on error.
  *

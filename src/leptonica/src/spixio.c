@@ -122,7 +122,7 @@ PIX      *pix;
  *      (1) If there is a colormap, iscmap is returned as 1; else 0.
  * </pre>
  */
-l_int32
+l_ok
 readHeaderSpix(const char *filename,
                l_int32    *pwidth,
                l_int32    *pheight,
@@ -163,7 +163,7 @@ FILE    *fp;
  *      (1) If there is a colormap, iscmap is returned as 1; else 0.
  * </pre>
  */
-l_int32
+l_ok
 freadHeaderSpix(FILE     *fp,
                 l_int32  *pwidth,
                 l_int32  *pheight,
@@ -207,7 +207,7 @@ l_uint32  data[6];
  *      (1) If there is a colormap, iscmap is returned as 1; else 0.
  * </pre>
  */
-l_int32
+l_ok
 sreadHeaderSpix(const l_uint32  *data,
                 l_int32         *pwidth,
                 l_int32         *pheight,
@@ -261,7 +261,7 @@ l_int32  d, ncolors;
  * \param[in]    pix
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 pixWriteStreamSpix(FILE  *fp,
                    PIX   *pix)
 {
@@ -309,7 +309,7 @@ pixReadMemSpix(const l_uint8  *data,
  * \param[in]    pix      all depths; colormap OK
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixWriteMemSpix(l_uint8  **pdata,
                 size_t    *psize,
                 PIX       *pix)
@@ -342,7 +342,7 @@ pixWriteMemSpix(l_uint8  **pdata,
  *            rdata     (rdatasize)
  * </pre>
  */
-l_int32
+l_ok
 pixSerializeToMemory(PIX        *pixs,
                      l_uint32  **pdata,
                      size_t     *pnbytes)
@@ -391,10 +391,10 @@ PIXCMAP   *cmap;
     data[4] = wpl;
     data[5] = ncolors;
     if (ncolors > 0)
-        memcpy((char *)(data + 6), (char *)cdata, 4 * ncolors);
+        memcpy(data + 6, cdata, 4 * ncolors);
     index = 6 + ncolors;
     data[index] = rdatasize;
-    memcpy((char *)(data + index + 1), (char *)rdata, rdatasize);
+    memcpy(data + index + 1, rdata, rdatasize);
 
 #if  DEBUG_SERIALIZE
     fprintf(stderr, "Serialize:   "
@@ -434,8 +434,10 @@ PIXCMAP   *cmap;
 
     if (!data)
         return (PIX *)ERROR_PTR("data not defined", procName, NULL);
-    if (nbytes < 28)
-        return (PIX *)ERROR_PTR("invalid data", procName, NULL);
+    if (nbytes < 28 || nbytes > ((1LL << 31) - 1)) {
+        L_ERROR("invalid nbytes = %lu\n", procName, (unsigned long)nbytes);
+        return NULL;
+    }
 
     id = (char *)data;
     if (id[0] != 's' || id[1] != 'p' || id[2] != 'i' || id[3] != 'x')
@@ -444,7 +446,6 @@ PIXCMAP   *cmap;
     h = data[2];
     d = data[3];
     ncolors = data[5];
-    imdata_size = data[6 + ncolors];
 
         /* Sanity checks on the amount of image data */
     if (w < 1 || w > L_MAX_ALLOWED_WIDTH)
@@ -453,7 +454,7 @@ PIXCMAP   *cmap;
         return (PIX *)ERROR_PTR("invalid height", procName, NULL);
     if (1LL * w * h > L_MAX_ALLOWED_AREA)
         return (PIX *)ERROR_PTR("area too large", procName, NULL);
-    if (ncolors < 0 || ncolors > 256)
+    if (ncolors < 0 || ncolors > 256 || ncolors + 6 >= nbytes/sizeof(l_int32))
         return (PIX *)ERROR_PTR("invalid ncolors", procName, NULL);
     if ((pix1 = pixCreateHeader(w, h, d)) == NULL)  /* just make the header */
         return (PIX *)ERROR_PTR("failed to make header", procName, NULL);
@@ -480,7 +481,7 @@ PIXCMAP   *cmap;
     }
 
     imdata = pixGetData(pixd);
-    memcpy((char *)imdata, (char *)(data + 7 + ncolors), imdata_size);
+    memcpy(imdata, data + 7 + ncolors, imdata_size);
 
 #if  DEBUG_SERIALIZE
     fprintf(stderr, "Deserialize: "

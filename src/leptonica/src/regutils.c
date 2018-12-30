@@ -115,7 +115,7 @@ static char *getRootNameFromArgv0(const char *argv0);
  *      (2) See regutils.h for examples of usage.
  * </pre>
  */
-l_int32
+l_ok
 regTestSetup(l_int32        argc,
              char         **argv,
              L_REGPARAMS  **prp)
@@ -204,7 +204,7 @@ L_REGPARAMS  *rp;
  *          output file /tmp/lept/reg_results.txt.
  * </pre>
  */
-l_int32
+l_ok
 regTestCleanup(L_REGPARAMS  *rp)
 {
 char     result[512];
@@ -267,7 +267,7 @@ size_t   nbytes;
  * \param[in]    delta   allowed max absolute difference
  * \return  0 if OK, 1 on error a failure in comparison is not an error
  */
-l_int32
+l_ok
 regTestCompareValues(L_REGPARAMS  *rp,
                      l_float32     val1,
                      l_float32     val2,
@@ -311,7 +311,7 @@ l_float32  diff;
  * \param[in]    bytes2    size of string2
  * \return  0 if OK, 1 on error a failure in comparison is not an error
  */
-l_int32
+l_ok
 regTestCompareStrings(L_REGPARAMS  *rp,
                       l_uint8      *string1,
                       size_t        bytes1,
@@ -377,7 +377,7 @@ char     buf[256];
  *          this writes to stderr.
  * </pre>
  */
-l_int32
+l_ok
 regTestComparePix(L_REGPARAMS  *rp,
                   PIX          *pix1,
                   PIX          *pix2)
@@ -437,7 +437,7 @@ l_int32  same;
  *          %maxfract for success, set this to 1.
  * </pre>
  */
-l_int32
+l_ok
 regTestCompareSimilarPix(L_REGPARAMS  *rp,
                          PIX          *pix1,
                          PIX          *pix2,
@@ -488,19 +488,22 @@ l_int32  w, h, factor, similar;
  * <pre>
  * Notes:
  *      (1) This function does one of three things, depending on the mode:
- *           * "generate": makes a "golden" file as a copy %localname.
+ *           * "generate": makes a "golden" file as a copy of %localname.
  *           * "compare": compares %localname contents with the golden file
- *           * "display": makes the %localname file but does no comparison
+ *           * "display": this does nothing
  *      (2) The canonical format of the golden filenames is:
- *            /tmp/lept/golden/<root of main name>_golden.<index>.
- *                                                       <ext of localname>
+ *            /tmp/lept/golden/[root of main name]_golden.[index].
+ *                                                       [ext of localname]
  *          e.g.,
  *             /tmp/lept/golden/maze_golden.0.png
- *          It is important to add an extension to the local name, because
- *          the extension is added to the name of the golden file.
+ *      (3) The local file can be made in any subdirectory of /tmp/lept,
+ *          including /tmp/lept/regout/.
+ *      (4) It is important to add an extension to the local name, such as
+ *             /tmp/lept/maze/file1.png    (extension ".png")
+ *          because the extension is added to the name of the golden file.
  * </pre>
  */
-l_int32
+l_ok
 regTestCheckFile(L_REGPARAMS  *rp,
                  const char   *localname)
 {
@@ -601,13 +604,13 @@ PIX     *pix1, *pix2;
  * Notes:
  *      (1) This only does something in "compare" mode.
  *      (2) The canonical format of the golden filenames is:
- *            /tmp/lept/golden/<root of main name>_golden.<index>.
- *                                                      <ext of localname>
+ *            /tmp/lept/golden/[root of main name]_golden.[index].
+ *                                                      [ext of localname]
  *          e.g.,
  *            /tmp/lept/golden/maze_golden.0.png
  * </pre>
  */
-l_int32
+l_ok
 regTestCompareFiles(L_REGPARAMS  *rp,
                     l_int32       index1,
                     l_int32       index2)
@@ -691,7 +694,7 @@ SARRAY  *sa;
  *             (b) make a local file and "compare" with the golden file
  *             (c) make a local file and "display" the results
  *      (2) The canonical format of the local filename is:
- *            /tmp/lept/regout/<root of main name>.<count>.<format extension>
+ *            /tmp/lept/regout/[root of main name].[count].[format extension]
  *          e.g., for scale_reg,
  *            /tmp/lept/regout/scale.0.png
  *          The golden file name mirrors this in the usual way.
@@ -700,7 +703,7 @@ SARRAY  *sa;
  *          only requires that all pixels in the decoded pix are identical.
  * </pre>
  */
-l_int32
+l_ok
 regTestWritePixAndCheck(L_REGPARAMS  *rp,
                         PIX          *pix,
                         l_int32       format)
@@ -742,7 +745,7 @@ char  namebuf[256];
  *
  * \param[in]    rp      regtest parameters
  * \param[in]    data    to be written
- * \param[in]    size    of data to be written
+ * \param[in]    nbytes  of data to be written
  * \param[in]    ext     filename extension (e.g.: "ba", "pta")
  * \return  0 if OK, 1 on error a failure in comparison is not an error
  *
@@ -754,7 +757,7 @@ char  namebuf[256];
  *             (b) make a local file and "compare" with the golden file
  *             (c) make a local file and "display" the results
  *      (2) The canonical format of the local filename is:
- *            /tmp/lept/regout/<root of main name>.<count>.<ext>
+ *            /tmp/lept/regout/[root of main name].[count].[ext]
  *          e.g., for the first boxaa in quadtree_reg,
  *            /tmp/lept/regout/quadtree.0.baa
  *          The golden file name mirrors this in the usual way.
@@ -766,7 +769,7 @@ char  namebuf[256];
  *          the files to be identical.
  * </pre>
  */
-l_int32
+l_ok
 regTestWriteDataAndCheck(L_REGPARAMS  *rp,
                          void         *data,
                          size_t        nbytes,
@@ -814,6 +817,8 @@ char  namebuf[256];
  *          written file.  The latter case lets you read a pix from a
  *          file that has just been written with regTestWritePixAndCheck(),
  *          which is useful for testing formatted read/write functions.
+ *
+ * </pre>
  */
 char *
 regTestGenLocalFilename(L_REGPARAMS  *rp,

@@ -132,6 +132,16 @@ SDL_GetRenderDriverInfo(int index, SDL_RendererInfo * info)
 #endif
 }
 
+static void GetWindowViewportValues(SDL_Renderer *renderer, int *logical_w, int *logical_h, SDL_Rect *viewport, SDL_FPoint *scale)
+{
+    SDL_LockMutex(renderer->target_mutex);
+    *logical_w = renderer->target ? renderer->logical_w_backup : renderer->logical_w;
+    *logical_h = renderer->target ? renderer->logical_h_backup : renderer->logical_h;
+    *viewport = renderer->target ? renderer->viewport_backup : renderer->viewport;
+    *scale = renderer->target ? renderer->scale_backup : renderer->scale;
+    SDL_UnlockMutex(renderer->target_mutex);
+}
+
 static int SDLCALL
 SDL_RendererEventWatch(void *userdata, SDL_Event *event)
 {
@@ -197,35 +207,51 @@ SDL_RendererEventWatch(void *userdata, SDL_Event *event)
         }
     } else if (event->type == SDL_MOUSEMOTION) {
         SDL_Window *window = SDL_GetWindowFromID(event->motion.windowID);
-        if (renderer->logical_w && window == renderer->window) {
-            event->motion.x -= (int)(renderer->viewport.x * renderer->dpi_scale.x);
-            event->motion.y -= (int)(renderer->viewport.y * renderer->dpi_scale.y);
-            event->motion.x = (int)(event->motion.x / (renderer->scale.x * renderer->dpi_scale.x));
-            event->motion.y = (int)(event->motion.y / (renderer->scale.y * renderer->dpi_scale.y));
-            if (event->motion.xrel > 0) {
-                event->motion.xrel = SDL_max(1, (int)(event->motion.xrel / (renderer->scale.x * renderer->dpi_scale.x)));
-            } else if (event->motion.xrel < 0) {
-                event->motion.xrel = SDL_min(-1, (int)(event->motion.xrel / (renderer->scale.x * renderer->dpi_scale.x)));
-            }
-            if (event->motion.yrel > 0) {
-                event->motion.yrel = SDL_max(1, (int)(event->motion.yrel / (renderer->scale.y * renderer->dpi_scale.y)));
-            } else if (event->motion.yrel < 0) {
-                event->motion.yrel = SDL_min(-1, (int)(event->motion.yrel / (renderer->scale.y * renderer->dpi_scale.y)));
+        if (window == renderer->window) {
+            int logical_w, logical_h;
+            SDL_Rect viewport;
+            SDL_FPoint scale;
+            GetWindowViewportValues(renderer, &logical_w, &logical_h, &viewport, &scale);
+            if (logical_w) {
+                event->motion.x -= (int)(viewport.x * renderer->dpi_scale.x);
+                event->motion.y -= (int)(viewport.y * renderer->dpi_scale.y);
+                event->motion.x = (int)(event->motion.x / (scale.x * renderer->dpi_scale.x));
+                event->motion.y = (int)(event->motion.y / (scale.y * renderer->dpi_scale.y));
+                if (event->motion.xrel > 0) {
+                    event->motion.xrel = SDL_max(1, (int)(event->motion.xrel / (scale.x * renderer->dpi_scale.x)));
+                } else if (event->motion.xrel < 0) {
+                    event->motion.xrel = SDL_min(-1, (int)(event->motion.xrel / (scale.x * renderer->dpi_scale.x)));
+                }
+                if (event->motion.yrel > 0) {
+                    event->motion.yrel = SDL_max(1, (int)(event->motion.yrel / (scale.y * renderer->dpi_scale.y)));
+                } else if (event->motion.yrel < 0) {
+                    event->motion.yrel = SDL_min(-1, (int)(event->motion.yrel / (scale.y * renderer->dpi_scale.y)));
+                }
             }
         }
     } else if (event->type == SDL_MOUSEBUTTONDOWN ||
                event->type == SDL_MOUSEBUTTONUP) {
         SDL_Window *window = SDL_GetWindowFromID(event->button.windowID);
-        if (renderer->logical_w && window == renderer->window) {
-            event->button.x -= (int)(renderer->viewport.x * renderer->dpi_scale.x);
-            event->button.y -= (int)(renderer->viewport.y * renderer->dpi_scale.y);
-            event->button.x = (int)(event->button.x / (renderer->scale.x * renderer->dpi_scale.x));
-            event->button.y = (int)(event->button.y / (renderer->scale.y * renderer->dpi_scale.y));
+        if (window == renderer->window) {
+            int logical_w, logical_h;
+            SDL_Rect viewport;
+            SDL_FPoint scale;
+            GetWindowViewportValues(renderer, &logical_w, &logical_h, &viewport, &scale);
+            if (logical_w) {
+                event->button.x -= (int)(viewport.x * renderer->dpi_scale.x);
+                event->button.y -= (int)(viewport.y * renderer->dpi_scale.y);
+                event->button.x = (int)(event->button.x / (scale.x * renderer->dpi_scale.x));
+                event->button.y = (int)(event->button.y / (scale.y * renderer->dpi_scale.y));
+            }
         }
     } else if (event->type == SDL_FINGERDOWN ||
                event->type == SDL_FINGERUP ||
                event->type == SDL_FINGERMOTION) {
-        if (renderer->logical_w) {
+        int logical_w, logical_h;
+        SDL_Rect viewport;
+        SDL_FPoint scale;
+        GetWindowViewportValues(renderer, &logical_w, &logical_h, &viewport, &scale);
+        if (logical_w) {
             int w = 1;
             int h = 1;
             SDL_GetRendererOutputSize(renderer, &w, &h);
@@ -233,18 +259,18 @@ SDL_RendererEventWatch(void *userdata, SDL_Event *event)
             event->tfinger.x *= (w - 1);
             event->tfinger.y *= (h - 1);
 
-            event->tfinger.x -= (renderer->viewport.x * renderer->dpi_scale.x);
-            event->tfinger.y -= (renderer->viewport.y * renderer->dpi_scale.y);
-            event->tfinger.x = (event->tfinger.x / (renderer->scale.x * renderer->dpi_scale.x));
-            event->tfinger.y = (event->tfinger.y / (renderer->scale.y * renderer->dpi_scale.y));
+            event->tfinger.x -= (viewport.x * renderer->dpi_scale.x);
+            event->tfinger.y -= (viewport.y * renderer->dpi_scale.y);
+            event->tfinger.x = (event->tfinger.x / (scale.x * renderer->dpi_scale.x));
+            event->tfinger.y = (event->tfinger.y / (scale.y * renderer->dpi_scale.y));
 
-            if (renderer->logical_w > 1) {
-                event->tfinger.x = event->tfinger.x / (renderer->logical_w - 1);
+            if (logical_w > 1) {
+                event->tfinger.x = event->tfinger.x / (logical_w - 1);
             } else {
                 event->tfinger.x = 0.5f;
             }
-            if (renderer->logical_h > 1) {
-                event->tfinger.y = event->tfinger.y / (renderer->logical_h - 1);
+            if (logical_h > 1) {
+                event->tfinger.y = event->tfinger.y / (logical_h - 1);
             } else {
                 event->tfinger.y = 0.5f;
             }
@@ -345,6 +371,7 @@ SDL_CreateRenderer(SDL_Window * window, int index, Uint32 flags)
     if (renderer) {
         renderer->magic = &renderer_magic;
         renderer->window = window;
+        renderer->target_mutex = SDL_CreateMutex();
         renderer->scale.x = 1.0f;
         renderer->scale.y = 1.0f;
         renderer->dpi_scale.x = 1.0f;
@@ -392,6 +419,7 @@ SDL_CreateSoftwareRenderer(SDL_Surface * surface)
 
     if (renderer) {
         renderer->magic = &renderer_magic;
+        renderer->target_mutex = SDL_CreateMutex();
         renderer->scale.x = 1.0f;
         renderer->scale.y = 1.0f;
 
@@ -493,6 +521,22 @@ GetClosestSupportedFormat(SDL_Renderer * renderer, Uint32 format)
     return renderer->info.texture_formats[0];
 }
 
+
+static SDL_ScaleMode SDL_GetScaleMode(void)
+{
+    const char *hint = SDL_GetHint(SDL_HINT_RENDER_SCALE_QUALITY);
+
+    if (!hint || SDL_strcasecmp(hint, "nearest") == 0) {
+        return SDL_ScaleModeNearest;
+    } else if (SDL_strcasecmp(hint, "linear") == 0) {
+        return SDL_ScaleModeLinear;
+    } else if (SDL_strcasecmp(hint, "best") == 0) {
+        return SDL_ScaleModeBest;
+    } else {
+        return (SDL_ScaleMode)SDL_atoi(hint);
+    }
+}
+
 SDL_Texture *
 SDL_CreateTexture(SDL_Renderer * renderer, Uint32 format, int access, int w, int h)
 {
@@ -534,6 +578,7 @@ SDL_CreateTexture(SDL_Renderer * renderer, Uint32 format, int access, int w, int
     texture->g = 255;
     texture->b = 255;
     texture->a = 255;
+    texture->scaleMode = SDL_GetScaleMode();
     texture->renderer = renderer;
     texture->next = renderer->textures;
     if (renderer->textures) {
@@ -605,7 +650,7 @@ SDL_CreateTextureFromSurface(SDL_Renderer * renderer, SDL_Surface * surface)
 
     /* See what the best texture format is */
     fmt = surface->format;
-    if (fmt->Amask || SDL_GetColorKey(surface, NULL) == 0) {
+    if (fmt->Amask || SDL_HasColorKey(surface)) {
         needAlpha = SDL_TRUE;
     } else {
         needAlpha = SDL_FALSE;
@@ -664,7 +709,7 @@ SDL_CreateTextureFromSurface(SDL_Renderer * renderer, SDL_Surface * surface)
         SDL_GetSurfaceAlphaMod(surface, &a);
         SDL_SetTextureAlphaMod(texture, a);
 
-        if (SDL_GetColorKey(surface, NULL) == 0) {
+        if (SDL_HasColorKey(surface)) {
             /* We converted to a texture with alpha format */
             SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
         } else {
@@ -1187,6 +1232,8 @@ SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)
         }
     }
 
+    SDL_LockMutex(renderer->target_mutex);
+
     if (texture && !renderer->target) {
         /* Make a backup of the viewport */
         renderer->viewport_backup = renderer->viewport;
@@ -1199,6 +1246,7 @@ SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)
     renderer->target = texture;
 
     if (renderer->SetRenderTarget(renderer, texture) < 0) {
+        SDL_UnlockMutex(renderer->target_mutex);
         return -1;
     }
 
@@ -1221,6 +1269,9 @@ SDL_SetRenderTarget(SDL_Renderer *renderer, SDL_Texture *texture)
         renderer->logical_w = renderer->logical_w_backup;
         renderer->logical_h = renderer->logical_h_backup;
     }
+
+    SDL_UnlockMutex(renderer->target_mutex);
+
     if (renderer->UpdateViewport(renderer) < 0) {
         return -1;
     }
@@ -1259,6 +1310,7 @@ UpdateLogicalSize(SDL_Renderer *renderer)
 
     hint = SDL_GetHint(SDL_HINT_RENDER_LOGICAL_SIZE_MODE);
     if (hint && (*hint == '1' || SDL_strcasecmp(hint, "overscan") == 0))  {
+#if SDL_VIDEO_RENDER_D3D
         SDL_bool overscan_supported = SDL_TRUE;
         /* Unfortunately, Direct3D 9 doesn't support negative viewport numbers
            which the overscan implementation relies on.
@@ -1269,6 +1321,9 @@ UpdateLogicalSize(SDL_Renderer *renderer)
         if (overscan_supported) {
             scale_policy = 1;
         }
+#else
+        scale_policy = 1;
+#endif
     }
 
     want_aspect = (float)renderer->logical_w / renderer->logical_h;
@@ -2085,6 +2140,10 @@ SDL_DestroyRenderer(SDL_Renderer * renderer)
 
     /* It's no longer magical... */
     renderer->magic = NULL;
+
+    /* Free the target mutex */
+    SDL_DestroyMutex(renderer->target_mutex);
+    renderer->target_mutex = NULL;
 
     /* Free the renderer instance */
     renderer->DestroyRenderer(renderer);

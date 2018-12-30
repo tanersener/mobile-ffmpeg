@@ -178,12 +178,12 @@ struct callback_data {
  * \brief   pixReadJpeg()
  *
  * \param[in]    filename
- * \param[in]    cmapflag 0 for no colormap in returned pix;
- *                        1 to return an 8 bpp cmapped pix if spp = 3 or 4
- * \param[in]    reduction scaling factor: 1, 2, 4 or 8
- * \param[out]   pnwarn [optional] number of warnings about
- *                       corrupted data
- * \param[in]    hint a bitwise OR of L_JPEG_* values; 0 for default
+ * \param[in]    cmapflag   0 for no colormap in returned pix;
+ *                          1 to return an 8 bpp cmapped pix if spp = 3 or 4
+ * \param[in]    reduction  scaling factor: 1, 2, 4 or 8
+ * \param[out]   pnwarn     [optional] number of warnings about
+ *                          corrupted data
+ * \param[in]    hint       a bitwise OR of L_JPEG_* values; 0 for default
  * \return  pix, or NULL on error
  *
  * <pre>
@@ -252,12 +252,12 @@ PIX      *pix;
 /*!
  * \brief   pixReadStreamJpeg()
  *
- * \param[in]    fp file stream
- * \param[in]    cmapflag 0 for no colormap in returned pix;
- *                        1 to return an 8 bpp cmapped pix if spp = 3 or 4
- * \param[in]    reduction scaling factor: 1, 2, 4 or 8
- * \param[out]   pnwarn [optional] number of warnings
- * \param[in]    hint a bitwise OR of L_JPEG_* values; 0 for default
+ * \param[in]    fp         file stream
+ * \param[in]    cmapflag   0 for no colormap in returned pix;
+ *                          1 to return an 8 bpp cmapped pix if spp = 3 or 4
+ * \param[in]    reduction  scaling factor: 1, 2, 4 or 8
+ * \param[out]   pnwarn     [optional] number of warnings
+ * \param[in]    hint       a bitwise OR of L_JPEG_* values; 0 for default
  * \return  pix, or NULL on error
  *
  *  Usage: see pixReadJpeg
@@ -337,7 +337,7 @@ jmp_buf                        jmpbuf;  /* must be local to the function */
                                 procName, NULL);
     }
     if ((spp == 3 && cmapflag == 0) || ycck || cmyk) {  /* rgb or 4 bpp color */
-        rowbuffer = (JSAMPROW)LEPT_CALLOC(sizeof(JSAMPLE), spp * w);
+        rowbuffer = (JSAMPROW)LEPT_CALLOC(sizeof(JSAMPLE), (size_t)spp * w);
         pix = pixCreate(w, h, 32);
     } else {  /* 8 bpp gray or colormapped */
         rowbuffer = (JSAMPROW)LEPT_CALLOC(sizeof(JSAMPLE), w);
@@ -496,14 +496,14 @@ jmp_buf                        jmpbuf;  /* must be local to the function */
  * \brief   readHeaderJpeg()
  *
  * \param[in]    filename
- * \param[out]   pw [optional]
- *           [out]   ph ([optional]
- *           [out]   pspp ([optional]  samples/pixel
- * \param[out]   pycck [optional]  1 if ycck color space; 0 otherwise
- * \param[out]   pcmyk [optional]  1 if cmyk color space; 0 otherwise
+ * \param[out]   pw     [optional]
+ * \param[out]   ph     [optional]
+ * \param[out]   pspp   [optional] samples/pixel
+ * \param[out]   pycck  [optional] 1 if ycck color space; 0 otherwise
+ * \param[out]   pcmyk  [optional] 1 if cmyk color space; 0 otherwise
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 readHeaderJpeg(const char  *filename,
                l_int32     *pw,
                l_int32     *ph,
@@ -537,15 +537,15 @@ FILE    *fp;
 /*!
  * \brief   freadHeaderJpeg()
  *
- * \param[in]    fp file stream
- * \param[out]   pw [optional]
- *           [out]   ph ([optional]
- *           [out]   pspp ([optional]  samples/pixel
- * \param[out]   pycck [optional]  1 if ycck color space; 0 otherwise
- * \param[out]   pcmyk [optional]  1 if cmyk color space; 0 otherwise
+ * \param[in]    fp     file stream
+ * \param[out]   pw     [optional]
+ * \param[out]   ph     [optional]
+ * \param[out]   pspp   [optional]  samples/pixel
+ * \param[out]   pycck  [optional]  1 if ycck color space; 0 otherwise
+ * \param[out]   pcmyk  [optional]  1 if cmyk color space; 0 otherwise
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 freadHeaderJpeg(FILE     *fp,
                 l_int32  *pw,
                 l_int32  *ph,
@@ -601,16 +601,18 @@ jmp_buf                        jmpbuf;  /* must be local to the function */
 
 
 /*
- *  fgetJpegResolution()
+ * \brief   fgetJpegResolution()
  *
- *      Input:  fp (file stream opened for read)
- *              &xres, &yres (<return> resolution in ppi)
- *      Return: 0 if OK; 1 on error
+ * \param[in]    fp             file stream
+ * \param[out]   pxres, pyres   resolutions
+ * \return   0 if OK; 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) If neither resolution field is set, this is not an error;
  *          the returned resolution values are 0 (designating 'unknown').
  *      (2) Side-effect: this rewinds the stream.
+ * </pre>
  */
 l_int32
 fgetJpegResolution(FILE     *fp,
@@ -661,14 +663,16 @@ jmp_buf                        jmpbuf;  /* must be local to the function */
 
 
 /*
- *  fgetJpegComment()
+ * \brief   fgetJpegComment()
  *
- *      Input:  fp (file stream opened for read)
- *              &comment (<return> comment)
- *      Return: 0 if OK; 1 on error
+ * \param[in]    fp        file stream opened for read
+ * \param[out]   pcomment  comment
+ * \return   0 if OK; 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) Side-effect: this rewinds the stream.
+ * </pre>
  */
 l_int32
 fgetJpegComment(FILE      *fp,
@@ -719,12 +723,12 @@ struct callback_data           cb_data;  /* contains local jmp_buf */
  * \brief   pixWriteJpeg()
  *
  * \param[in]    filename
- * \param[in]    pix  any depth; cmap is OK
- * \param[in]    quality 1 - 100; 75 is default
- * \param[in]    progressive 0 for baseline sequential; 1 for progressive
+ * \param[in]    pix           any depth; cmap is OK
+ * \param[in]    quality       1 - 100; 75 is default
+ * \param[in]    progressive   0 for baseline sequential; 1 for progressive
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 pixWriteJpeg(const char  *filename,
              PIX         *pix,
              l_int32      quality,
@@ -755,10 +759,10 @@ FILE  *fp;
 /*!
  * \brief   pixWriteStreamJpeg()
  *
- * \param[in]    fp file stream
- * \param[in]    pixs  any depth; cmap is OK
- * \param[in]    quality  1 - 100; 75 is default value; 0 is also default
- * \param[in]    progressive 0 for baseline sequential; 1 for progressive
+ * \param[in]    fp           file stream
+ * \param[in]    pixs         any depth; cmap is OK
+ * \param[in]    quality      1 - 100; 75 is default value; 0 is also default
+ * \param[in]    progressive  0 for baseline sequential; 1 for progressive
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -785,7 +789,7 @@ FILE  *fp;
  *          for luminosity and a lower resolution one for the chromas.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteStreamJpeg(FILE    *fp,
                    PIX     *pixs,
                    l_int32  quality,
@@ -965,14 +969,14 @@ jmp_buf                      jmpbuf;  /* must be local to the function */
 /*!
  * \brief   pixReadMemJpeg()
  *
- * \param[in]    data const; jpeg-encoded
- * \param[in]    size of data
- * \param[in]    cmflag colormap flag 0 means return RGB image if color;
- *                      1 means create a colormap and return
- *                      an 8 bpp colormapped image if color
- * \param[in]    reduction scaling factor: 1, 2, 4 or 8
- * \param[out]   pnwarn [optional] number of warnings
- * \param[in]    hint a bitwise OR of L_JPEG_* values; 0 for default
+ * \param[in]    data       const; jpeg-encoded
+ * \param[in]    size       of data
+ * \param[in]    cmflag     colormap flag 0 means return RGB image if color;
+ *                          1 means create a colormap and return
+ *                          an 8 bpp colormapped image if color
+ * \param[in]    reduction  scaling factor: 1, 2, 4 or 8
+ * \param[out]   pnwarn     [optional] number of warnings
+ * \param[in]    hint       a bitwise OR of L_JPEG_* values; 0 for default
  * \return  pix, or NULL on error
  *
  * <pre>
@@ -1030,7 +1034,7 @@ PIX      *pix;
  * \param[out]   pcmyk   [optional] 1 if cmyk color space; 0 otherwise
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 readHeaderMemJpeg(const l_uint8  *data,
                   size_t          size,
                   l_int32        *pw,
@@ -1071,7 +1075,7 @@ FILE    *fp;
  * \param[out]  pyres   [optional]
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 readResolutionMemJpeg(const l_uint8  *data,
                       size_t          size,
                       l_int32        *pxres,
@@ -1100,11 +1104,11 @@ FILE    *fp;
 /*!
  * \brief   pixWriteMemJpeg()
  *
- * \param[out]   pdata data of jpeg compressed image
- * \param[out]   psize size of returned data
- * \param[in]    pix  any depth; cmap is OK
- * \param[in]    quality  1 - 100; 75 is default value; 0 is also default
- * \param[in]    progressive 0 for baseline sequential; 1 for progressive
+ * \param[out]   pdata        data of jpeg compressed image
+ * \param[out]   psize        size of returned data
+ * \param[in]    pix          any depth; cmap is OK
+ * \param[in]    quality      1 - 100; 75 is default value; 0 is also default
+ * \param[in]    progressive  0 for baseline sequential; 1 for progressive
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1113,7 +1117,7 @@ FILE    *fp;
  *          memory instead of to a file stream.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteMemJpeg(l_uint8  **pdata,
                 size_t    *psize,
                 PIX       *pix,
@@ -1163,7 +1167,7 @@ FILE    *fp;
  * \brief   pixSetChromaSampling()
  *
  * \param[in]    pix
- * \param[in]    sampling 1 for subsampling; 0 for no subsampling
+ * \param[in]    sampling    1 for subsampling; 0 for no subsampling
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1174,7 +1178,7 @@ FILE    *fp;
  *          jpeg writing, call this with %sampling == 0.
  * </pre>
  */
-l_int32
+l_ok
 pixSetChromaSampling(PIX     *pix,
                      l_int32  sampling)
 {

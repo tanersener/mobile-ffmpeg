@@ -80,4 +80,3 @@ kernel*.bin
 *.dll
 *.exe
 *.lnk
-/libtool.tmp

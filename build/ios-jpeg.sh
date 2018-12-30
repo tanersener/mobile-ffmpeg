@@ -38,6 +38,7 @@ TARGET_HOST=$(get_target_host)
 export CFLAGS=$(get_cflags ${LIB_NAME})
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
+export ASM_FLAGS=$(get_asmflags ${LIB_NAME})
 
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
@@ -48,6 +49,9 @@ fi
 mkdir build || exit 1
 cd build || exit 1
 
+# fixing asm flags
+${SED_INLINE} 's/${CMAKE_C_FLAGS} ${CMAKE_ASM_FLAGS}/${CMAKE_ASM_FLAGS}/g' ${BASEDIR}/src/${LIB_NAME}/simd/CMakeLists.txt
+
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
@@ -56,12 +60,12 @@ cmake -Wno-dev \
     -DCMAKE_SYSROOT="${SDK_PATH}" \
     -DCMAKE_FIND_ROOT_PATH="${SDK_PATH}" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME}" \
+    -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME}" \
     -DCMAKE_SYSTEM_NAME=Darwin \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
     -DCMAKE_AR="$AR" \
-    -DCMAKE_AS="$AS" \
+    -DCMAKE_ASM_FLAGS="$ASM_FLAGS" \
     -DENABLE_PIC=1 \
     -DENABLE_STATIC=1 \
     -DENABLE_SHARED=0 \
@@ -72,7 +76,7 @@ cmake -Wno-dev \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
 cp ${BASEDIR}/src/${LIB_NAME}/build/pkgscripts/libjpeg.pc ${INSTALL_PKG_CONFIG_DIR}

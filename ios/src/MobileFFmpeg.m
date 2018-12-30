@@ -29,7 +29,7 @@ int execute(int argc, char **argv);
 @implementation MobileFFmpeg
 
 /** Global library version */
-NSString *const MOBILE_FFMPEG_VERSION = @"3.1";
+NSString *const MOBILE_FFMPEG_VERSION = @"4.2";
 
 /** Common return code values */
 int const RETURN_CODE_SUCCESS = 0;
@@ -65,7 +65,11 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutpu
  * \return MobileFFmpeg version string
  */
 + (NSString*)getVersion {
-    return MOBILE_FFMPEG_VERSION;
+    if ([ArchDetect isLTSBuild] == 1) {
+        return [NSString stringWithFormat:@"%@-lts", MOBILE_FFMPEG_VERSION];
+    } else {
+        return MOBILE_FFMPEG_VERSION;
+    }
 }
 
 /**

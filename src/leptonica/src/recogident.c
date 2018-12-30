@@ -132,14 +132,14 @@ static void l_showIndicatorSplitValues(NUMA *na1, NUMA *na2, NUMA *na3,
 /*!
  * \brief   recogIdentifyMultiple()
  *
- * \param[in]    recog      with training finished
- * \param[in]    pixs       containing typically a small number of characters
- * \param[in]    minh       remove shorter components; use 0 for default
- * \param[in]    skipsplit  1 to skip the splitting step
- * \param[out]   pboxa [optional] locations of identified components
- * \param[out]   ppixa [optional] images of identified components
- * \param[out]   ppixdb [optional] debug pix: inputs and best fits
- * \param[in]    debugsplit 1 returns pix split debugging images
+ * \param[in]    recog       with training finished
+ * \param[in]    pixs        containing typically a small number of characters
+ * \param[in]    minh        remove shorter components; use 0 for default
+ * \param[in]    skipsplit   1 to skip the splitting step
+ * \param[out]   pboxa       [optional] locations of identified components
+ * \param[out]   ppixa       [optional] images of identified components
+ * \param[out]   ppixdb      [optional] debug pix: inputs and best fits
+ * \param[in]    debugsplit  1 returns pix split debugging images
  * \return  0 if OK; 1 if nothing is found; 2 for other errors.
  *
  * <pre>
@@ -154,7 +154,7 @@ static void l_showIndicatorSplitValues(NUMA *na1, NUMA *na2, NUMA *na3,
  *          extracted subimages.
  * </pre>
  */
-l_int32
+l_ok
 recogIdentifyMultiple(L_RECOG  *recog,
                       PIX      *pixs,
                       l_int32   minh,
@@ -218,12 +218,12 @@ PIXA    *pixa;
  * \brief   recogSplitIntoCharacters()
  *
  * \param[in]    recog
- * \param[in]    pixs      1 bpp, contains only mostly deskewed text
- * \param[in]    minh      remove shorter components; use 0 for default
- * \param[in]    skipsplit 1 to skip the splitting step
- * \param[out]   pboxa     character bounding boxes
- * \param[out]   ppixa     character images
- * \param[in]    debug     1 for results written to pixadb_split
+ * \param[in]    pixs        1 bpp, contains only mostly deskewed text
+ * \param[in]    minh        remove shorter components; use 0 for default
+ * \param[in]    skipsplit   1 to skip the splitting step
+ * \param[out]   pboxa       character bounding boxes
+ * \param[out]   ppixa       character images
+ * \param[in]    debug       1 for results written to pixadb_split
  * \return  0 if OK, 1 on error or if no components are returned
  *
  * <pre>
@@ -237,12 +237,12 @@ PIXA    *pixa;
  *          row-major (2D) order, and the smaller of overlapping
  *          components are removed if they satisfy conditions of
  *          relative size and fractional overlap.
- *      (3) Note that the spliting function uses unscaled templates
+ *      (3) Note that the splitting function uses unscaled templates
  *          and does not bother returning the class results and scores.
- *          Thes are more accurately found later using the scaled templates.
+ *          These are more accurately found later using the scaled templates.
  * </pre>
  */
-l_int32
+l_ok
 recogSplitIntoCharacters(L_RECOG  *recog,
                          PIX      *pixs,
                          l_int32   minh,
@@ -380,13 +380,13 @@ PIXA    *pixa;
 /*!
  * \brief   recogCorrelationBestRow()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[in]    pixs typically of multiple touching characters, 1 bpp
- * \param[out]   pboxa bounding boxs of best fit character
- * \param[out]   pnascore [optional] correlation scores
- * \param[out]   pnaindex [optional] indices of classes
- * \param[out]   psachar [optional] array of character strings
- * \param[in]    debug 1 for results written to pixadb_split
+ * \param[in]    recog       with LUT's pre-computed
+ * \param[in]    pixs        typically of multiple touching characters, 1 bpp
+ * \param[out]   pboxa       bounding boxs of best fit character
+ * \param[out]   pnascore    [optional] correlation scores
+ * \param[out]   pnaindex    [optional] indices of classes
+ * \param[out]   psachar     [optional] array of character strings
+ * \param[in]    debug       1 for results written to pixadb_split
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -397,7 +397,7 @@ PIXA    *pixa;
  *      (2) Matching is to the average, and without character scaling.
  * </pre>
  */
-l_int32
+l_ok
 recogCorrelationBestRow(L_RECOG  *recog,
                         PIX      *pixs,
                         BOXA    **pboxa,
@@ -560,13 +560,13 @@ l_int32    iter;
 /*!
  * \brief   recogCorrelationBestChar()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[in]    pixs can be of multiple touching characters, 1 bpp
- * \param[out]   pbox bounding box of best fit character
- * \param[out]   pscore correlation score
- * \param[out]   pindex [optional] index of class
- * \param[out]   pcharstr [optional] character string of class
- * \param[out]   ppixdb [optional] debug pix showing input and best fit
+ * \param[in]    recog       with LUT's pre-computed
+ * \param[in]    pixs        can be of multiple touching characters, 1 bpp
+ * \param[out]   pbox        bounding box of best fit character
+ * \param[out]   pscore      correlation score
+ * \param[out]   pindex      [optional] index of class
+ * \param[out]   pcharstr    [optional] character string of class
+ * \param[out]   ppixdb      [optional] debug pix showing input and best fit
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -579,7 +579,7 @@ l_int32    iter;
  *      (2) Matching is to the average templates, without character scaling.
  * </pre>
  */
-l_int32
+l_ok
 recogCorrelationBestChar(L_RECOG    *recog,
                          PIX        *pixs,
                          BOX       **pbox,
@@ -686,21 +686,22 @@ PIX       *pix1, *pix2;
 /*!
  * \brief   pixCorrelationBestShift()
  *
- * \param[in]    pix1   1 bpp, the unknown image; typically larger
- * \param[in]    pix2   1 bpp, the matching template image)
- * \param[in]    nasum1 vertical column pixel sums for pix1
- * \param[in]    namoment1  vertical column first moment of pixels for pix1
- * \param[in]    area2  number of on pixels in pix2
- * \param[in]    ycent2  y component of centroid of pix2
- * \param[in]    maxyshift  max y shift of pix2 around the location where
- *                          the centroids of pix2 and a windowed part of pix1
- *                          are vertically aligned
- * \param[in]    tab8 [optional] sum tab for ON pixels in byte; can be NULL
- * \param[out]   pdelx [optional] best x shift of pix2 relative to pix1
- *           [out]   pdely ([optional] best y shift of pix2 relative to pix1
- *           [out]   pscore ([optional] maximum score found; can be NULL
- * \param[in]    debugflag <= 0 to skip; positive to generate output.
- *                         The integer is used to label the debug image.
+ * \param[in]    pix1        1 bpp, the unknown image; typically larger
+ * \param[in]    pix2        1 bpp, the matching template image)
+ * \param[in]    nasum1      vertical column pixel sums for pix1
+ * \param[in]    namoment1   vertical column first moment of pixels for pix1
+ * \param[in]    area2       number of on pixels in pix2
+ * \param[in]    ycent2      y component of centroid of pix2
+ * \param[in]    maxyshift   max y shift of pix2 around the location where
+ *                           the centroids of pix2 and a windowed part of pix1
+ *                           are vertically aligned
+ * \param[in]    tab8        [optional] sum tab for ON pixels in byte;
+ *                           can be NULL
+ * \param[out]   pdelx       [optional] best x shift of pix2 relative to pix1
+ * \param[out]   pdely       [optional] best y shift of pix2 relative to pix1
+ * \param[out]   pscore      [optional] maximum score found; can be NULL
+ * \param[in]    debugflag   <= 0 to skip; positive to generate output;
+ *                           the integer is used to label the debug image.
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -860,8 +861,8 @@ PIX        *pixt, *pixt1, *pixt2;
  * \brief   recogIdentifyPixa()
  *
  * \param[in]    recog
- * \param[in]    pixa of 1 bpp images to match
- * \param[out]   ppixdb [optional] pix showing inputs and best fits
+ * \param[in]    pixa     of 1 bpp images to match
+ * \param[out]   ppixdb   [optional] pix showing inputs and best fits
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -874,7 +875,7 @@ PIX        *pixt, *pixt1, *pixt2;
  *          for the best correlation match.
  * </pre>
  */
-l_int32
+l_ok
 recogIdentifyPixa(L_RECOG  *recog,
                   PIXA     *pixa,
                   PIX     **ppixdb)
@@ -944,9 +945,9 @@ L_RCH     *rch;
 /*!
  * \brief   recogIdentifyPix()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[in]    pixs of a single character, 1 bpp
- * \param[out]   ppixdb [optional] debug pix showing input and best fit
+ * \param[in]    recog     with LUT's pre-computed
+ * \param[in]    pixs      of a single character, 1 bpp
+ * \param[out]   ppixdb    [optional] debug pix showing input and best fit
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -967,7 +968,7 @@ L_RCH     *rch;
  *          as an actual probability.
  * </pre>
  */
-l_int32
+l_ok
 recogIdentifyPix(L_RECOG  *recog,
                  PIX      *pixs,
                  PIX     **ppixdb)
@@ -1116,7 +1117,7 @@ PTA       *pta;
  *          string id into the rch.
  * </pre>
  */
-l_int32
+l_ok
 recogSkipIdentify(L_RECOG  *recog)
 {
     PROCNAME("recogSkipIdentify");
@@ -1162,7 +1163,7 @@ L_RCHA  *rcha;
 /*!
  * \brief   rchaDestroy()
  *
- * \param[in,out]  prcha to be nulled
+ * \param[in,out]   prcha     to be nulled
  */
 void
 rchaDestroy(L_RCHA  **prcha)
@@ -1194,13 +1195,13 @@ L_RCHA  *rcha;
 /*!
  * \brief   rchCreate()
  *
- * \param[in]    index index of best template
- * \param[in]    score correlation score of best template
- * \param[in]    text character string of best template
- * \param[in]    sample index of best sample; -1 if averages are used
- * \param[in]    xloc x-location of template: delx + shiftx
- * \param[in]    yloc y-location of template: dely + shifty
- * \param[in]    width width of best template
+ * \param[in]    index    index of best template
+ * \param[in]    score    correlation score of best template
+ * \param[in]    text     character string of best template
+ * \param[in]    sample   index of best sample; -1 if averages are used
+ * \param[in]    xloc     x-location of template: delx + shiftx
+ * \param[in]    yloc     y-location of template: dely + shifty
+ * \param[in]    width    width of best template
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1262,13 +1263,13 @@ L_RCH  *rch;
  * \brief   rchaExtract()
  *
  * \param[in]    rcha
- * \param[out]   pnaindex [optional] indices of best templates
- * \param[out]   pnascore [optional] correl scores of best templates
- * \param[out]   psatext [optional] character strings of best templates
- * \param[out]   pnasample [optional] indices of best samples
- * \param[out]   pnaxloc [optional] x-locations of templates
- * \param[out]   pnayloc [optional] y-locations of templates
- * \param[out]   pnawidth [optional] widths of best templates
+ * \param[out]   pnaindex    [optional] indices of best templates
+ * \param[out]   pnascore    [optional] correl scores of best templates
+ * \param[out]   psatext     [optional] character strings of best templates
+ * \param[out]   pnasample   [optional] indices of best samples
+ * \param[out]   pnaxloc     [optional] x-locations of templates
+ * \param[out]   pnayloc     [optional] y-locations of templates
+ * \param[out]   pnawidth    [optional] widths of best templates
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1277,7 +1278,7 @@ L_RCH  *rch;
  *          be destroyed by the caller.
  * </pre>
  */
-l_int32
+l_ok
 rchaExtract(L_RCHA   *rcha,
             NUMA    **pnaindex,
             NUMA    **pnascore,
@@ -1314,16 +1315,16 @@ rchaExtract(L_RCHA   *rcha,
  * \brief   rchExtract()
  *
  * \param[in]    rch
- * \param[out]   pindex [optional] index of best template
- * \param[out]   pscore [optional] correlation score of best template
- * \param[out]   ptext [optional] character string of best template
- * \param[out]   psample [optional] index of best sample
- * \param[out]   pxloc [optional] x-location of template
- * \param[out]   pyloc [optional] y-location of template
- * \param[out]   pwidth [optional] width of best template
+ * \param[out]   pindex    [optional] index of best template
+ * \param[out]   pscore    [optional] correlation score of best template
+ * \param[out]   ptext     [optional] character string of best template
+ * \param[out]   psample   [optional] index of best sample
+ * \param[out]   pxloc     [optional] x-location of template
+ * \param[out]   pyloc     [optional] y-location of template
+ * \param[out]   pwidth    [optional] width of best template
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 rchExtract(L_RCH      *rch,
            l_int32    *pindex,
            l_float32  *pscore,
@@ -1359,8 +1360,8 @@ rchExtract(L_RCH      *rch,
 /*!
  * \brief   transferRchToRcha()
  *
- * \param[in]    rch source of data
- * \param[in]    rcha append to arrays in this destination
+ * \param[in]    rch     source of data
+ * \param[in]    rcha    append to arrays in this destination
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1398,9 +1399,9 @@ transferRchToRcha(L_RCH   *rch,
 /*!
  * \brief   recogProcessToIdentify()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[in]    pixs typ. single character, possibly d > 1 and uncropped
- * \param[in]    pad extra pixels added to left and right sides
+ * \param[in]    recog     with LUT's pre-computed
+ * \param[in]    pixs      typ. single character, possibly d > 1 and uncropped
+ * \param[in]    pad       extra pixels added to left and right sides
  * \return  pixd 1 bpp, clipped to foreground, or NULL if there
  *                    are no fg pixels or on error.
  *
@@ -1594,12 +1595,12 @@ l_float32  aspratio, fract;
  * \brief   recogExtractNumbers()
  *
  * \param[in]    recog
- * \param[in]    boxas location of components
- * \param[in]    scorethresh min score for which we accept a component
- * \param[in]    spacethresh max horizontal distance allowed between digits,
- *                           use -1 for default
- * \param[out]   pbaa [optional] bounding boxes of identified numbers
- * \param[out]   pnaa [optional] scores of identified digits
+ * \param[in]    boxas         location of components
+ * \param[in]    scorethresh   min score for which we accept a component
+ * \param[in]    spacethresh   max horizontal distance allowed between digits;
+ *                             use -1 for default
+ * \param[out]   pbaa          [optional] bounding boxes of identified numbers
+ * \param[out]   pnaa          [optional] scores of identified digits
  * \return  sa of identified numbers, or NULL on error
  *
  * <pre>
@@ -1742,11 +1743,11 @@ SARRAY    *satext, *sa, *saout;
 /*!
  * \brief   showExtractNumbers()
  *
- * \param[in]    pixs   input 1 bpp image
- * \param[in]    sa     recognized text strings
- * \param[in]    baa    boxa array for location of characters in each string
- * \param[in]    naa    numa array for scores of characters in each string
- * \param[out]   ppixdb  [optional] input pixs with identified chars outlined
+ * \param[in]    pixs     input 1 bpp image
+ * \param[in]    sa       recognized text strings
+ * \param[in]    baa      boxa array for location of characters in each string
+ * \param[in]    naa      numa array for scores of characters in each string
+ * \param[out]   ppixdb   [optional] input pixs with identified chars outlined
  * \return  pixa   of identified strings with text and scores, or NULL on error
  *
  * <pre>
@@ -1835,7 +1836,7 @@ PIXA      *pixa;
 /*!
  * \brief   l_showIndicatorSplitValues()
  *
- * \param[in]  na1, na2, na3, na4, na5, na6  6 indicator array
+ * \param[in]   na1, na2, na3, na4, na5, na6      6 indicator array
  *
  * <pre>
  * Notes:

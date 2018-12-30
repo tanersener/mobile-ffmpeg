@@ -976,7 +976,7 @@ PIX       *pixt, *pixd;
  *          of the size of the convolution kernel.
  * </pre>
  */
-l_int32
+l_ok
 pixWindowedStats(PIX     *pixs,
                  l_int32  wc,
                  l_int32  hc,
@@ -1276,7 +1276,7 @@ cleanup:
  *            ~ for rms deviation, simply convert the output fpix to pix,
  * </pre>
  */
-l_int32
+l_ok
 pixWindowedVariance(PIX    *pixm,
                     PIX    *pixms,
                     FPIX  **pfpixv,

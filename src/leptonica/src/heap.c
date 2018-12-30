@@ -182,7 +182,7 @@ L_HEAP  *lh;
  * \param[in]    item to be added to the tail of the heap
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 lheapAdd(L_HEAP  *lh,
          void    *item)
 {
@@ -300,7 +300,7 @@ lheapGetCount(L_HEAP  *lh)
  *          is in the correct position already vis-a-vis the child.
  * </pre>
  */
-l_int32
+l_ok
 lheapSwapUp(L_HEAP  *lh,
             l_int32  index)
 {
@@ -366,7 +366,7 @@ l_float32  valp, valc;
  *          than or equal to both children).
  * </pre>
  */
-l_int32
+l_ok
 lheapSwapDown(L_HEAP  *lh)
 {
 l_int32    ip;  /* index to heap for parent; 1 larger than array index */
@@ -449,7 +449,7 @@ l_float32  valp, valcl, valcr;
  *          in heap order for the direction given, this has no effect.
  * </pre>
  */
-l_int32
+l_ok
 lheapSort(L_HEAP  *lh)
 {
 l_int32  i;
@@ -483,7 +483,7 @@ l_int32  i;
  *          then reversed to put it in the original order.
  * </pre>
  */
-l_int32
+l_ok
 lheapSortStrictOrder(L_HEAP  *lh)
 {
 l_int32  i, index, size;
@@ -520,7 +520,7 @@ l_int32  i, index, size;
  * \param[in]    lh heap
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 lheapPrint(FILE    *fp,
            L_HEAP  *lh)
 {

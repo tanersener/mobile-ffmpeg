@@ -189,7 +189,7 @@
  *  There is a total of 4*3*2 = 24 ways these pairs can be permuted.
  * </pre>
  */
-l_int32
+l_ok
 pixRasterop(PIX     *pixd,
             l_int32  dx,
             l_int32  dy,
@@ -265,7 +265,7 @@ l_int32  dd;
  *          is brought in.
  * </pre>
  */
-l_int32
+l_ok
 pixRasteropVip(PIX     *pixd,
                l_int32  bx,
                l_int32  bw,
@@ -343,7 +343,7 @@ PIXCMAP  *cmap;
  *          is brought in.
  * </pre>
  */
-l_int32
+l_ok
 pixRasteropHip(PIX     *pixd,
                l_int32  by,
                l_int32  bh,
@@ -457,7 +457,7 @@ pixTranslate(PIX     *pixd,
  * \param[in]    incolor  L_BRING_IN_WHITE, L_BRING_IN_BLACK
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 pixRasteropIP(PIX     *pixd,
               l_int32  hshift,
               l_int32  vshift,
@@ -498,7 +498,7 @@ l_int32  w, h;
  *        of pixd is larger than pixs, some pixels in pixd will be unchanged
  * </pre>
  */
-l_int32
+l_ok
 pixRasteropFullImage(PIX     *pixd,
                      PIX     *pixs,
                      l_int32  op)

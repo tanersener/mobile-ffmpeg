@@ -1190,7 +1190,8 @@ PIX       *pixd;
  * \brief   pixScaleGrayRankCascade()
  *
  * \param[in]    pixs 8 bpp, not cmapped
- * \param[in]    level1, ... level4 rank thresholds, in set {0, 1, 2, 3, 4}
+ * \param[in]    level1, level2, level3, level4 rank thresholds,
+ *                                              in set {0, 1, 2, 3, 4}
  * \return  pixd 8 bpp, downscaled by up to 16x
  *
  * <pre>
@@ -1353,7 +1354,7 @@ PIX       *pixd;
  *      (1) This scales the alpha component of pixs and inserts into pixd.
  * </pre>
  */
-l_int32
+l_ok
 pixScaleAndTransferAlpha(PIX       *pixd,
                          PIX       *pixs,
                          l_float32  scalex,
@@ -2268,7 +2269,7 @@ l_float32  ratio, w1, w2;
     PROCNAME("scaleMipmapLow");
 
         /* Clear dest */
-    memset((char *)datad, 0, 4 * wpld * hd);
+    memset(datad, 0, 4LL * wpld * hd);
 
         /* Each dest pixel at (j,i) is computed by interpolating
            between the two src images at the corresponding location.

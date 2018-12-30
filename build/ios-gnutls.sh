@@ -38,20 +38,20 @@ COMMON_CFLAGS=$(get_cflags ${LIB_NAME})
 COMMON_CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 COMMON_LDFLAGS=$(get_ldflags ${LIB_NAME})
 
-export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/include"
+export CFLAGS="${COMMON_CFLAGS} -I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libiconv/include"
 export CXXFLAGS="${COMMON_CXXFLAGS}"
-export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv/lib"
+export LDFLAGS="${COMMON_LDFLAGS} -L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libiconv/lib"
 
-export NETTLE_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/nettle/include"
-export NETTLE_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/nettle/lib"
-export HOGWEED_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/nettle/include"
-export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/nettle/lib"
-export GMP_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/include"
-export GMP_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/gmp/lib"
+export NETTLE_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/nettle/include"
+export NETTLE_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/nettle/lib"
+export HOGWEED_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/nettle/include"
+export HOGWEED_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/nettle/lib"
+export GMP_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gmp/include"
+export GMP_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/gmp/lib"
 
 HARDWARE_ACCELERATION=""
 case ${ARCH} in
-    arm64)
+    arm64 | arm64e)
 
         # HARDWARE ACCELERATION IS DISABLED DUE TO THE FOLLOWING ERROR
         #
@@ -74,7 +74,7 @@ if [[ ${RECONF_gnutls} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --with-included-libtasn1 \
@@ -95,7 +95,7 @@ fi
     --disable-maintainer-mode \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_gnutls_package_config "3.5.19"

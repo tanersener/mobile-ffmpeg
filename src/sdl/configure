@@ -785,6 +785,7 @@ enable_render
 enable_events
 enable_joystick
 enable_haptic
+enable_sensor
 enable_power
 enable_filesystem
 enable_threads
@@ -866,7 +867,9 @@ enable_input_tslib
 enable_pthreads
 enable_pthread_sem
 enable_directx
+enable_wasapi
 enable_sdl_dlopen
+enable_hidapi
 enable_clock_gettime
 enable_rpath
 enable_render_d3d
@@ -1521,6 +1524,7 @@ Optional Features:
   --enable-joystick       Enable the joystick subsystem [[default=yes]]
   --enable-haptic         Enable the haptic (force feedback) subsystem
                           [[default=yes]]
+  --enable-sensor         Enable the sensor subsystem [[default=yes]]
   --enable-power          Enable the power subsystem [[default=yes]]
   --enable-filesystem     Enable the filesystem subsystem [[default=yes]]
   --enable-threads        Enable the threading subsystem [[default=yes]]
@@ -1572,7 +1576,7 @@ Optional Features:
                           QtWayland server support for Wayland video driver
                           [[default=yes]]
   --enable-wayland-shared dynamically load Wayland support [[default=maybe]]
-  --enable-video-mir      use Mir video driver [[default=yes]]
+  --enable-video-mir      use Mir video driver [[default=no]]
   --enable-mir-shared     dynamically load Mir support [[default=maybe]]
   --enable-video-rpi      use Raspberry Pi video driver [[default=yes]]
   --enable-video-x11      use X11 video driver [[default=yes]]
@@ -1620,7 +1624,10 @@ Optional Features:
                           [[default=yes]]
   --enable-pthread-sem    use pthread semaphores [[default=yes]]
   --enable-directx        use DirectX for Windows audio/video [[default=yes]]
+  --enable-wasapi         use the Windows WASAPI audio driver [[default=yes]]
   --enable-sdl-dlopen     use dlopen for shared object loading [[default=yes]]
+  --enable-hidapi         use HIDAPI for low level joystick drivers
+                          [[default=no]]
   --enable-clock_gettime  use clock_gettime() instead of gettimeofday() on
                           UNIX [[default=yes]]
   --enable-rpath          use an rpath when linking SDL [[default=yes]]
@@ -2712,9 +2719,9 @@ orig_CFLAGS="$CFLAGS"
 #
 SDL_MAJOR_VERSION=2
 SDL_MINOR_VERSION=0
-SDL_MICRO_VERSION=8
+SDL_MICRO_VERSION=9
 SDL_INTERFACE_AGE=0
-SDL_BINARY_AGE=8
+SDL_BINARY_AGE=9
 SDL_VERSION=$SDL_MAJOR_VERSION.$SDL_MINOR_VERSION.$SDL_MICRO_VERSION
 
 
@@ -15752,10 +15759,17 @@ EXTRA_LDFLAGS="$BASE_LDFLAGS"
 #    fi
 #done
 SDL_CFLAGS="$BASE_CFLAGS"
-SDL_LIBS="-lSDL2 $BASE_LDFLAGS"
-CPPFLAGS="$CPPFLAGS $EXTRA_CFLAGS"
-CFLAGS="$CFLAGS $EXTRA_CFLAGS"
-LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS"
+SDL_LIBS="-lSDL2"
+if test "x$BASE_LDFLAGS" != x; then
+    SDL_LIBS="$SDL_LIBS $BASE_LDFLAGS"
+fi
+if test "x$EXTRA_CFLAGS" != x; then
+    CPPFLAGS="$CPPFLAGS $EXTRA_CFLAGS"
+    CFLAGS="$CFLAGS $EXTRA_CFLAGS"
+fi
+if test "x$EXTRA_LDFLAGS" != x; then
+    LDFLAGS="$LDFLAGS $EXTRA_LDFLAGS"
+fi
 
 base_libdir=`echo \${libdir} | sed 's/.*\/\(.*\)/\1/; q'`
 
@@ -16690,7 +16704,7 @@ if test "x$ac_cv_lib_m_pow" = xyes; then :
   LIBS="$LIBS -lm"; EXTRA_LDFLAGS="$EXTRA_LDFLAGS -lm"
 fi
 
-    for ac_func in acos acosf asin asinf atan atanf atan2 atan2f ceil ceilf copysign copysignf cos cosf fabs fabsf floor floorf fmod fmodf log logf log10 log10f pow powf scalbn scalbnf sin sinf sqrt sqrtf tan tanf
+    for ac_func in acos acosf asin asinf atan atanf atan2 atan2f ceil ceilf copysign copysignf cos cosf exp expf fabs fabsf floor floorf fmod fmodf log logf log10 log10f pow powf scalbn scalbnf sin sinf sqrt sqrtf tan tanf
 do :
   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 ac_fn_c_check_func "$LINENO" "$ac_func" "$as_ac_var"
@@ -16764,7 +16778,7 @@ $as_echo "#define HAVE_SA_SIGACTION 1" >>confdefs.h
 fi
 
 
-	    for ac_header in libunwind.h
+        for ac_header in libunwind.h
 do :
   ac_fn_c_check_header_mongrel "$LINENO" "libunwind.h" "ac_cv_header_libunwind_h" "$ac_includes_default"
 if test "x$ac_cv_header_libunwind_h" = xyes; then :
@@ -16872,6 +16886,7 @@ SOURCES="$SOURCES $srcdir/src/power/*.c"
 #SOURCES="$SOURCES $srcdir/src/filesystem/*.c"
 SOURCES="$SOURCES $srcdir/src/render/*.c"
 SOURCES="$SOURCES $srcdir/src/render/*/*.c"
+SOURCES="$SOURCES $srcdir/src/sensor/*.c"
 SOURCES="$SOURCES $srcdir/src/stdlib/*.c"
 SOURCES="$SOURCES $srcdir/src/thread/*.c"
 SOURCES="$SOURCES $srcdir/src/timer/*.c"
@@ -16976,6 +16991,20 @@ $as_echo "#define SDL_HAPTIC_DISABLED 1" >>confdefs.h
 
 else
     SUMMARY_modules="${SUMMARY_modules} haptic"
+fi
+# Check whether --enable-sensor was given.
+if test "${enable_sensor+set}" = set; then :
+  enableval=$enable_sensor;
+else
+  enable_sensor=yes
+fi
+
+if test x$enable_sensor != xyes; then
+
+$as_echo "#define SDL_SENSOR_DISABLED 1" >>confdefs.h
+
+else
+    SUMMARY_modules="${SUMMARY_modules} sensor"
 fi
 # Check whether --enable-power was given.
 if test "${enable_power+set}" = set; then :
@@ -18368,7 +18397,7 @@ fi
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking for PulseAudio $PULSEAUDIO_REQUIRED_VERSION support" >&5
 $as_echo_n "checking for PulseAudio $PULSEAUDIO_REQUIRED_VERSION support... " >&6; }
         if test x$PKG_CONFIG != xno; then
-        if $PKG_CONFIG --atleast-pkgconfig-version 0.7 && $PKG_CONFIG --atleast-version $PULSEAUDIO_REQUIRED_VERSION libpulse-simple; then
+            if $PKG_CONFIG --atleast-pkgconfig-version 0.7 && $PKG_CONFIG --atleast-version $PULSEAUDIO_REQUIRED_VERSION libpulse-simple; then
                 PULSEAUDIO_CFLAGS=`$PKG_CONFIG --cflags libpulse-simple`
                 PULSEAUDIO_LIBS=`$PKG_CONFIG --libs libpulse-simple`
                 audio_pulseaudio=yes
@@ -19202,8 +19231,6 @@ $as_echo_n "checking for Wayland support... " >&6; }
                 WAYLAND_CFLAGS=`$PKG_CONFIG --cflags wayland-client wayland-egl wayland-cursor xkbcommon`
                 WAYLAND_LIBS=`$PKG_CONFIG --libs wayland-client wayland-egl wayland-cursor xkbcommon`
                 WAYLAND_SCANNER=`$PKG_CONFIG --variable=wayland_scanner wayland-scanner`
-                WAYLAND_CORE_PROTOCOL_DIR=`$PKG_CONFIG --variable=pkgdatadir wayland-client`
-                WAYLAND_PROTOCOLS_DIR=`$PKG_CONFIG --variable=pkgdatadir wayland-protocols`
                 video_wayland=yes
             fi
         fi
@@ -19220,9 +19247,8 @@ $as_echo "#define SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH 1" >>confdefs.h
 
             fi
 
-            WAYLAND_PROTOCOLS_UNSTABLE="relative-pointer-unstable-v1 pointer-constraints-unstable-v1 xdg-shell-unstable-v6"
-
-            SOURCES="$SOURCES $srcdir/src/video/wayland/*.c"
+            WAYLAND_SOURCES="$srcdir/src/video/wayland/*.c"
+            SOURCES="$SOURCES $WAYLAND_SOURCES"
             EXTRA_CFLAGS="$EXTRA_CFLAGS $WAYLAND_CFLAGS -I\$(gen)"
             # Check whether --enable-wayland-shared was given.
 if test "${enable_wayland_shared+set}" = set; then :
@@ -19300,7 +19326,7 @@ CheckMir()
 if test "${enable_video_mir+set}" = set; then :
   enableval=$enable_video_mir;
 else
-  enable_video_mir=yes
+  enable_video_mir=no
 fi
 
 
@@ -20457,7 +20483,7 @@ $as_echo_n "checking for XGenericEvent... " >&6; }
             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-              	#include <X11/Xlib.h>
+                #include <X11/Xlib.h>
 
 int
 main ()
@@ -20801,13 +20827,13 @@ $as_echo "#define SDL_VIDEO_DRIVER_X11_XINPUT2 1" >>confdefs.h
 
                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for xinput2 multitouch" >&5
 $as_echo_n "checking for xinput2 multitouch... " >&6; }
-            	have_xinput2_multitouch=no
-            	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+                have_xinput2_multitouch=no
+                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-              		#include <X11/Xlib.h>
-             		#include <X11/Xproto.h>
-			#include <X11/extensions/XInput2.h>
+                    #include <X11/Xlib.h>
+                    #include <X11/Xproto.h>
+                    #include <X11/extensions/XInput2.h>
 
 int
 main ()
@@ -20822,14 +20848,14 @@ XITouchClassInfo *t;
 _ACEOF
 if ac_fn_c_try_compile "$LINENO"; then :
 
-            	have_xinput2_multitouch=yes
-            	$as_echo "#define SDL_VIDEO_DRIVER_X11_XINPUT2_SUPPORTS_MULTITOUCH 1" >>confdefs.h
+                    have_xinput2_multitouch=yes
+                    $as_echo "#define SDL_VIDEO_DRIVER_X11_XINPUT2_SUPPORTS_MULTITOUCH 1" >>confdefs.h
 
-                SUMMARY_video_x11="${SUMMARY_video_x11} xinput2_multitouch"
+                    SUMMARY_video_x11="${SUMMARY_video_x11} xinput2_multitouch"
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-            	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_xinput2_multitouch" >&5
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: $have_xinput2_multitouch" >&5
 $as_echo "$have_xinput2_multitouch" >&6; }
             fi
             # Check whether --enable-video-x11-xrandr was given.
@@ -21475,6 +21501,9 @@ fi
 
 $as_echo "#define SDL_VIDEO_DRIVER_DIRECTFB 1" >>confdefs.h
 
+
+$as_echo "#define SDL_VIDEO_RENDER_DIRECTFB 1" >>confdefs.h
+
             SOURCES="$SOURCES $srcdir/src/video/directfb/*.c"
             EXTRA_CFLAGS="$EXTRA_CFLAGS $DIRECTFB_CFLAGS"
 
@@ -22015,6 +22044,24 @@ $as_echo "#define SDL_VIDEO_OPENGL_CGL 1" >>confdefs.h
 $as_echo "#define SDL_VIDEO_RENDER_OGL 1" >>confdefs.h
 
         SUMMARY_video="${SUMMARY_video} opengl"
+    fi
+}
+
+CheckMacGLES()
+{
+    if test x$enable_video = xyes -a x$enable_video_opengles = xyes; then
+        video_opengl_egl=yes
+
+$as_echo "#define SDL_VIDEO_OPENGL_EGL 1" >>confdefs.h
+
+        video_opengles_v2=yes
+
+$as_echo "#define SDL_VIDEO_OPENGL_ES2 1" >>confdefs.h
+
+
+$as_echo "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
+
+        SUMMARY_video="${SUMMARY_video} opengl_es2"
     fi
 }
 
@@ -23118,20 +23165,6 @@ if test "x$ac_cv_header_xinput_h" = xyes; then :
 fi
 
 
-        ac_fn_c_check_header_mongrel "$LINENO" "mmdeviceapi.h" "ac_cv_header_mmdeviceapi_h" "$ac_includes_default"
-if test "x$ac_cv_header_mmdeviceapi_h" = xyes; then :
-  have_wasapi=yes
-fi
-
-
-        ac_fn_c_check_header_mongrel "$LINENO" "audioclient.h" "ac_cv_header_audioclient_h" "$ac_includes_default"
-if test "x$ac_cv_header_audioclient_h" = xyes; then :
-
-else
-  have_wasapi=no
-fi
-
-
         cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -23218,6 +23251,45 @@ $as_echo "#define HAVE_XINPUT_STATE_EX 1" >>confdefs.h
             ;;
         esac
     fi
+
+    ac_fn_c_check_header_mongrel "$LINENO" "mmdeviceapi.h" "ac_cv_header_mmdeviceapi_h" "$ac_includes_default"
+if test "x$ac_cv_header_mmdeviceapi_h" = xyes; then :
+  have_wasapi=yes
+fi
+
+
+    if test x$have_wasapi = xyes; then
+        $as_echo "#define HAVE_MMDEVICEAPI_H 1" >>confdefs.h
+
+    fi
+    ac_fn_c_check_header_mongrel "$LINENO" "audioclient.h" "ac_cv_header_audioclient_h" "$ac_includes_default"
+if test "x$ac_cv_header_audioclient_h" = xyes; then :
+
+else
+  have_wasapi=no
+fi
+
+
+    if test x$have_wasapi = xyes; then
+        $as_echo "#define HAVE_AUDIOCLIENT_H 1" >>confdefs.h
+
+    fi
+
+    ac_fn_c_check_header_mongrel "$LINENO" "endpointvolume.h" "ac_cv_header_endpointvolume_h" "$ac_includes_default"
+if test "x$ac_cv_header_endpointvolume_h" = xyes; then :
+  $as_echo "#define HAVE_ENDPOINTVOLUME_H 1" >>confdefs.h
+
+fi
+
+
+
+    # Check whether --enable-wasapi was given.
+if test "${enable_wasapi+set}" = set; then :
+  enableval=$enable_wasapi;
+else
+  enable_wasapi=yes
+fi
+
 }
 
 CheckDLOPEN()
@@ -23696,6 +23768,93 @@ $as_echo "#define SDL_JOYSTICK_USBHID 1" >>confdefs.h
     esac
 }
 
+CheckHIDAPI()
+{
+    # The hidraw support doesn't catch Xbox, PS4 and Nintendo controllers,
+    # so we'll just use libusb when it's available.
+    #
+    # Except that libusb requires root permissions to open devices, so that's not generally useful, and we'll disable this by default.
+    # Check whether --enable-hidapi was given.
+if test "${enable_hidapi+set}" = set; then :
+  enableval=$enable_hidapi;
+else
+  enable_hidapi=no
+fi
+
+    if test x$enable_joystick = xyes -a x$enable_hidapi = xyes; then
+        hidapi_support=no
+        # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PKG_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
+  ;;
+esac
+fi
+PKG_CONFIG=$ac_cv_path_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKG_CONFIG" >&5
+$as_echo "$PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+        if test x$PKG_CONFIG != xno; then
+            LIBUSB_CFLAGS=`$PKG_CONFIG --cflags libusb-1.0`
+            LIBUSB_LDFLAGS=`$PKG_CONFIG --libs libusb-1.0`
+            save_CFLAGS="$CFLAGS"
+            CFLAGS="$save_CFLAGS $LIBUSB_CFLAGS"
+            ac_fn_c_check_header_mongrel "$LINENO" "libusb.h" "ac_cv_header_libusb_h" "$ac_includes_default"
+if test "x$ac_cv_header_libusb_h" = xyes; then :
+  have_libusb_h=yes
+fi
+
+
+            CFLAGS="$save_CFLAGS"
+        fi
+        if test x$have_libusb_h = xyes; then
+            hidapi_support=yes
+
+$as_echo "#define SDL_JOYSTICK_HIDAPI 1" >>confdefs.h
+
+            EXTRA_CFLAGS="$EXTRA_CFLAGS -I$srcdir/src/hidapi/hidapi"
+            SOURCES="$SOURCES $srcdir/src/joystick/hidapi/*.c"
+            SOURCES="$SOURCES $srcdir/src/hidapi/libusb/hid.c"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS $LIBUSB_CFLAGS"
+            EXTRA_LDFLAGS="$EXTRA_LDFLAGS $LIBUSB_LDFLAGS"
+        fi
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for hidapi support" >&5
+$as_echo_n "checking for hidapi support... " >&6; }
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $hidapi_support" >&5
+$as_echo "$hidapi_support" >&6; }
+    fi
+}
+
 CheckClockGettime()
 {
     # Check whether --enable-clock_gettime was given.
@@ -23907,6 +24066,7 @@ case "$host" in
         esac
         CheckTslib
         CheckUSBHID
+        CheckHIDAPI
         CheckPTHREAD
         CheckClockGettime
         CheckLinuxVersion
@@ -23992,6 +24152,18 @@ $as_echo "#define SDL_HAPTIC_ANDROID 1" >>confdefs.h
 
                 SOURCES="$SOURCES $srcdir/src/haptic/android/*.c"
                 have_haptic=yes
+            ;;
+          esac
+        fi
+        # Set up files for the sensor library
+        if test x$enable_sensor = xyes; then
+          case $ARCH in
+            android)
+
+$as_echo "#define SDL_SENSOR_ANDROID 1" >>confdefs.h
+
+                SOURCES="$SOURCES $srcdir/src/sensor/android/*.c"
+                have_sensor=yes
             ;;
           esac
         fi
@@ -24113,10 +24285,11 @@ $as_echo "#define SDL_AUDIO_DRIVER_DSOUND 1" >>confdefs.h
 
                 SOURCES="$SOURCES $srcdir/src/audio/directsound/*.c"
             fi
-            if test x$have_wasapi = xyes; then
+            if test x$have_wasapi = xyes -a x$enable_wasapi = xyes; then
 
 $as_echo "#define SDL_AUDIO_DRIVER_WASAPI 1" >>confdefs.h
 
+                SUMMARY_audio="${SUMMARY_audio} wasapi"
                 SOURCES="$SOURCES $srcdir/src/audio/wasapi/*.c"
             fi
             have_audio=yes
@@ -24140,7 +24313,13 @@ $as_echo "#define SDL_JOYSTICK_DINPUT 1" >>confdefs.h
 $as_echo "#define SDL_JOYSTICK_WINMM 1" >>confdefs.h
 
             fi
+
+$as_echo "#define SDL_JOYSTICK_HIDAPI 1" >>confdefs.h
+
             SOURCES="$SOURCES $srcdir/src/joystick/windows/*.c"
+            SOURCES="$SOURCES $srcdir/src/joystick/hidapi/*.c"
+            SOURCES="$SOURCES $srcdir/src/hidapi/windows/hid.c"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS -I$srcdir/src/hidapi/hidapi"
             have_joystick=yes
         fi
         if test x$enable_haptic = xyes; then
@@ -24204,7 +24383,7 @@ $as_echo "#define SDL_LOADSO_WINDOWS 1" >>confdefs.h
         else
             LIBUUID=-luuid
         fi
-        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lversion $LIBUUID -static-libgcc"
+        EXTRA_LDFLAGS="$EXTRA_LDFLAGS -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion $LIBUUID -static-libgcc"
         # The Windows platform requires special setup
         VERSION_SOURCES="$srcdir/src/main/windows/*.rc"
         SDLMAIN_SOURCES="$srcdir/src/main/windows/*.c"
@@ -24461,6 +24640,7 @@ $as_echo "#define SDL_VIDEO_RENDER_OGL_ES2 1" >>confdefs.h
         CheckMETAL
         CheckX11
         CheckMacGL
+        CheckMacGLES
         CheckOpenGLX11
         CheckVulkan
         CheckPTHREAD
@@ -24480,7 +24660,13 @@ $as_echo "#define SDL_AUDIO_DRIVER_COREAUDIO 1" >>confdefs.h
 
 $as_echo "#define SDL_JOYSTICK_IOKIT 1" >>confdefs.h
 
+
+$as_echo "#define SDL_JOYSTICK_HIDAPI 1" >>confdefs.h
+
             SOURCES="$SOURCES $srcdir/src/joystick/darwin/*.c"
+            SOURCES="$SOURCES $srcdir/src/joystick/hidapi/*.c"
+            SOURCES="$SOURCES $srcdir/src/hidapi/mac/hid.c"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS -I$srcdir/src/hidapi/hidapi"
             have_joystick=yes
         fi
         # Set up files for the haptic library
@@ -24633,7 +24819,7 @@ esac
 if test x$have_joystick != xyes; then
     if test x$enable_joystick = xyes; then
 
-$as_echo "#define SDL_JOYSTICK_DISABLED 1" >>confdefs.h
+$as_echo "#define SDL_JOYSTICK_DUMMY 1" >>confdefs.h
 
     fi
     SOURCES="$SOURCES $srcdir/src/joystick/dummy/*.c"
@@ -24641,10 +24827,18 @@ fi
 if test x$have_haptic != xyes; then
     if test x$enable_haptic = xyes; then
 
-$as_echo "#define SDL_HAPTIC_DISABLED 1" >>confdefs.h
+$as_echo "#define SDL_HAPTIC_DUMMY 1" >>confdefs.h
 
     fi
     SOURCES="$SOURCES $srcdir/src/haptic/dummy/*.c"
+fi
+if test x$have_sensor != xyes; then
+    if test x$enable_sensor = xyes; then
+
+$as_echo "#define SDL_SENSOR_DUMMY 1" >>confdefs.h
+
+    fi
+    SOURCES="$SOURCES $srcdir/src/sensor/dummy/*.c"
 fi
 if test x$have_threads != xyes; then
     if test x$enable_threads = xyes; then
@@ -24684,54 +24878,27 @@ fi
 SDLTEST_SOURCES="$srcdir/src/test/*.c"
 
 if test x$video_wayland = xyes; then
-    WAYLAND_CORE_PROTOCOL_SOURCE='$(gen)/wayland-protocol.c'
-    WAYLAND_CORE_PROTOCOL_HEADER='$(gen)/wayland-client-protocol.h'
-    WAYLAND_PROTOCOLS_UNSTABLE_SOURCES=`echo $WAYLAND_PROTOCOLS_UNSTABLE |\
-        sed 's,[^ ]\+,\\$(gen)/&-protocol.c,g'`
-    WAYLAND_PROTOCOLS_UNSTABLE_HEADERS=`echo $WAYLAND_PROTOCOLS_UNSTABLE |\
-        sed 's,[^ ]\+,\\$(gen)/&-client-protocol.h,g'`
-    GEN_SOURCES="$GEN_SOURCES $WAYLAND_CORE_PROTOCOL_SOURCE $WAYLAND_PROTOCOLS_UNSTABLE_SOURCES"
-    GEN_HEADERS="$GEN_HEADERS $WAYLAND_CORE_PROTOCOL_HEADER $WAYLAND_PROTOCOLS_UNSTABLE_HEADERS"
+    WAYLAND_PROTOCOLS=`cd $srcdir/wayland-protocols ; for p in *.xml ; do echo -n "\$p" |sed 's,\\.xml\$, ,g' ; done`
+    WAYLAND_PROTOCOLS_SOURCES=`for p in $WAYLAND_PROTOCOLS ; do echo -n "\\$(gen)/\$p-protocol.c " ; done`
+    WAYLAND_PROTOCOLS_HEADERS=`for p in $WAYLAND_PROTOCOLS ; do echo -n "\\$(gen)/\$p-client-protocol.h " ; done`
+    GEN_SOURCES="$GEN_SOURCES $WAYLAND_PROTOCOLS_SOURCES"
+    GEN_HEADERS="$GEN_HEADERS $WAYLAND_PROTOCOLS_HEADERS"
 
-    WAYLAND_CORE_PROTOCOL_SOURCE_DEPENDS="
-$WAYLAND_CORE_PROTOCOL_SOURCE: $WAYLAND_CORE_PROTOCOL_DIR/wayland.xml
-	\$(SHELL) \$(auxdir)/mkinstalldirs \$(gen)
-	\$(RUN_CMD_GEN)\$(WAYLAND_SCANNER) code \$< \$@"
-
-    WAYLAND_CORE_PROTOCOL_HEADER_DEPENDS="
-$WAYLAND_CORE_PROTOCOL_HEADER: $WAYLAND_CORE_PROTOCOL_DIR/wayland.xml
-	\$(SHELL) \$(auxdir)/mkinstalldirs \$(gen)
-	\$(RUN_CMD_GEN)\$(WAYLAND_SCANNER) client-header \$< \$@"
-
-    WAYLAND_CORE_PROTOCOL_OBJECT="
-\$(objects)/`echo $WAYLAND_CORE_PROTOCOL_SOURCE | sed 's/\$(gen)\/\(.*\).c$/\1.lo/'`: $WAYLAND_CORE_PROTOCOL_SOURCE
-	\$(RUN_CMD_CC)\$(LIBTOOL) --tag=CC --mode=compile \$(CC) \$(CFLAGS) \$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \$< -o \$@"
-
-    WAYLAND_PROTOCOLS_CLIENT_HEADER_UNSTABLE_DEPENDS=`for p in $WAYLAND_PROTOCOLS_UNSTABLE;\
-        do echo ; echo \$p | sed\
-        "s,^\\([a-z\\-]\\+\\)-unstable-\\(v[0-9]\+\\)\$,\\$(gen)/&-client-protocol.h: $WAYLAND_PROTOCOLS_DIR/unstable/\1/&.xml\\\\
-	\\$(SHELL) \\$(auxdir)/mkinstalldirs \\$(gen)\\\\
-	\\$(RUN_CMD_GEN)\\$(WAYLAND_SCANNER) client-header \\$< \\$@," ; done`
-
-    WAYLAND_PROTOCOLS_CODE_UNSTABLE_DEPENDS=`for p in $WAYLAND_PROTOCOLS_UNSTABLE;\
-        do echo ; echo \$p | sed\
-        "s,^\\([a-z\\-]\\+\\)-unstable-\\(v[0-9]\+\\)\$,\\$(gen)/&-protocol.c: $WAYLAND_PROTOCOLS_DIR/unstable/\1/&.xml\\\\
-	\\$(SHELL) \\$(auxdir)/mkinstalldirs \\$(gen)\\\\
-	\\$(RUN_CMD_GEN)\\$(WAYLAND_SCANNER) code \\$< \\$@," ; done`
-
-    WAYLAND_PROTOCOLS_OBJECTS_UNSTABLE=`for p in $WAYLAND_PROTOCOLS_UNSTABLE;\
-        do echo ; echo \$p | sed\
-        "s,^\\([a-z\\-]\\+\\)-unstable-\\(v[0-9]\+\\)\$,\\\$(objects)/&-protocol.lo: \\$(gen)/&-protocol.c \\$(gen)/&-client-protocol.h\\\\
-	\\$(RUN_CMD_CC)\\$(LIBTOOL) --tag=CC --mode=compile \\$(CC) \\$(CFLAGS) \\$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \\$< -o \\$@," ; done`
-
-    WAYLAND_PROTOCOLS_DEPENDS="
-$WAYLAND_CORE_PROTOCOL_SOURCE_DEPENDS
-$WAYLAND_CORE_PROTOCOL_HEADER_DEPENDS
-$WAYLAND_CORE_PROTOCOL_OBJECT
-$WAYLAND_PROTOCOLS_CLIENT_HEADER_UNSTABLE_DEPENDS
-$WAYLAND_PROTOCOLS_CODE_UNSTABLE_DEPENDS
-$WAYLAND_PROTOCOLS_OBJECTS_UNSTABLE
-"
+    WAYLAND_PROTOCOLS_DEPENDS=`for p in $WAYLAND_PROTOCOLS ; do\
+        echo ;\
+        echo "\\$(gen)/\$p-client-protocol.h: \\$(srcdir)/wayland-protocols/\$p.xml" ;\
+        echo "	@\\$(SHELL) \\$(auxdir)/mkinstalldirs \\$(gen)" ;\
+        echo "	\\$(RUN_CMD_GEN)\\$(WAYLAND_SCANNER) client-header \\$< \\$@" ;\
+        echo ;\
+        echo "\\$(gen)/\$p-protocol.c: \\$(srcdir)/wayland-protocols/\$p.xml" ;\
+        echo "	@\\$(SHELL) \\$(auxdir)/mkinstalldirs \\$(gen)" ;\
+        echo "	\\$(RUN_CMD_GEN)\\$(WAYLAND_SCANNER) code \\$< \\$@" ;\
+        echo ;\
+        echo "\\$(objects)/\$p-protocol.lo: \\$(gen)/\$p-protocol.c \\$(gen)/\$p-client-protocol.h" ;\
+        echo "	\\$(RUN_CMD_CC)\\$(LIBTOOL) --tag=CC --mode=compile \\$(CC) \\$(CFLAGS) \\$(EXTRA_CFLAGS) $DEPENDENCY_TRACKING_OPTIONS -c \\$< -o \\$@" ;\
+        done ;\
+        echo ;\
+        for s in $WAYLAND_SOURCES ; do echo -n "\$s:" ; for p in $WAYLAND_PROTOCOLS ; do echo -n " \\$(gen)/\$p-client-protocol.h" ; done ; echo ; done ; echo`
 fi
 
 OBJECTS=`echo $SOURCES`

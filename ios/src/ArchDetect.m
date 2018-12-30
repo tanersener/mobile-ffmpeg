@@ -29,11 +29,11 @@
 }
 
 /**
- * Returns running architecture name.
+ * Returns running cpu architecture name.
  *
- * \return running architecture name as NSString
+ * \return running cpu architecture name as NSString
  */
-+ (NSString*)getArch {
++ (NSString*)getCpuArch {
     NSMutableString *cpu = [[NSMutableString alloc] init];
     size_t size;
     cpu_type_t type;
@@ -62,6 +62,9 @@
             break;
         }
 
+    } else if (type == CPU_TYPE_I386) {
+        [cpu appendString:@"i386"];
+
     } else if (type == CPU_TYPE_ARM64) {
         [cpu appendString:@"arm64"];
 
@@ -69,6 +72,13 @@
             case CPU_SUBTYPE_ARM64_V8:
                 [cpu appendString:@"v8"];
             break;
+
+            #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 120100
+            case CPU_SUBTYPE_ARM64E:
+                [cpu appendString:@"e"];
+            break;
+            #endif
+
         }
 
     } else if (type == CPU_TYPE_ARM) {
@@ -112,11 +122,61 @@
                 [cpu appendString:@"v8"];
             break;
         }
+
+    #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && __IPHONE_OS_VERSION_MAX_ALLOWED >= 120100
+    } else if (type == CPU_TYPE_ARM64_32) {
+        [cpu appendString:@"arm64_32"];
+
+        switch(subtype) {
+            case CPU_SUBTYPE_ARM64_32_V8:
+                [cpu appendString:@"v8"];
+            break;
+        }
+    #endif
+
     } else {
         [cpu appendString:[NSString stringWithFormat:@"%d", type]];
     }
 
     return cpu;
+}
+
+/**
+ * Returns loaded architecture name.
+ *
+ * \return loaded architecture name as NSString
+ */
++ (NSString*)getArch {
+    NSMutableString *arch = [[NSMutableString alloc] init];
+
+#ifdef MOBILE_FFMPEG_ARMV7
+    [arch appendString:@"armv7"];
+#elif MOBILE_FFMPEG_ARMV7S
+    [arch appendString:@"armv7s"];
+#elif MOBILE_FFMPEG_ARM64
+    [arch appendString:@"arm64"];
+#elif MOBILE_FFMPEG_ARM64E
+    [arch appendString:@"arm64e"];
+#elif MOBILE_FFMPEG_I386
+    [arch appendString:@"i386"];
+#elif MOBILE_FFMPEG_X86_64
+    [arch appendString:@"x86_64"];
+#endif
+
+    return arch;
+}
+
+/**
+ * Returns whether MobileFFmpeg release is a long term release or not.
+ *
+ * \return YES=1 or NO=0
+ */
++ (int)isLTSBuild {
+    #if defined(MOBILE_FFMPEG_LTS)
+        return 1;
+    #else
+        return 0;
+    #endif
 }
 
 @end

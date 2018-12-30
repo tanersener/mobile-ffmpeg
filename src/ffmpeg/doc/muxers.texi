@@ -94,21 +94,23 @@ compatibility with software that only supports a single audio stream in AVI
 @anchor{chromaprint}
 @section chromaprint
 
-Chromaprint fingerprinter
+Chromaprint fingerprinter.
 
-This muxer feeds audio data to the Chromaprint library, which generates
-a fingerprint for the provided audio data. It takes a single signed
-native-endian 16-bit raw audio stream.
+This muxer feeds audio data to the Chromaprint library,
+which generates a fingerprint for the provided audio data. See @url{https://acoustid.org/chromaprint}
+
+It takes a single signed native-endian 16-bit raw audio stream of at most 2 channels.
 
 @subsection Options
 
 @table @option
 @item silence_threshold
-Threshold for detecting silence, ranges from 0 to 32767. -1 for default
-(required for use with the AcoustID service).
+Threshold for detecting silence, ranges from -1 to 32767. -1 disables silence detection and
+is required for use with the AcoustID service. Default is -1.
 
 @item algorithm
-Algorithm index to fingerprint with.
+Version of algorithm to fingerprint with. Range is 0 to 4. Version 2 requires that silence
+detection be enabled. Default is 1.
 
 @item fp_format
 Format to output the fingerprint as. Accepts the following options:
@@ -120,7 +122,7 @@ Binary raw fingerprint
 Binary compressed fingerprint
 
 @item base64
-Base64 compressed fingerprint
+Base64 compressed fingerprint @emph{(default)}
 
 @end table
 
@@ -245,11 +247,11 @@ Enable (1) or disable (0) use of SegmentTimeline in SegmentTemplate.
 @item -single_file @var{single_file}
 Enable (1) or disable (0) storing all segments in one file, accessed using byte ranges.
 @item -single_file_name @var{file_name}
-DASH-templated name to be used for baseURL. Implies @var{single_file} set to "1".
+DASH-templated name to be used for baseURL. Implies @var{single_file} set to "1". In the template, "$ext$" is replaced with the file name extension specific for the segment format.
 @item -init_seg_name @var{init_name}
-DASH-templated name to used for the initialization segment. Default is "init-stream$RepresentationID$.m4s"
+DASH-templated name to used for the initialization segment. Default is "init-stream$RepresentationID$.$ext$". "$ext$" is replaced with the file name extension specific for the segment format.
 @item -media_seg_name @var{segment_name}
-DASH-templated name to used for the media segments. Default is "chunk-stream$RepresentationID$-$Number%05d$.m4s"
+DASH-templated name to used for the media segments. Default is "chunk-stream$RepresentationID$-$Number%05d$.$ext$". "$ext$" is replaced with the file name extension specific for the segment format.
 @item -utc_timing_url @var{utc_url}
 URL of the page that will return the UTC timestamp in ISO format. Example: "https://time.akamai.com/?iso"
 @item method @var{method}
@@ -289,13 +291,27 @@ Set container format (mp4/webm) options using a @code{:} separated list of
 key=value parameters. Values containing @code{:} special characters must be
 escaped.
 
-@item dash_segment_type @var{dash_segment_type}
+@item -dash_segment_type @var{dash_segment_type}
 Possible values:
+@item auto
+If this flag is set, the dash segment files format will be selected based on the stream codec. This is the default mode.
+
 @item mp4
-If this flag is set, the dash segment files will be in in ISOBMFF format. This is the default format.
+If this flag is set, the dash segment files will be in in ISOBMFF format.
 
 @item webm
 If this flag is set, the dash segment files will be in in WebM format.
+
+@item -ignore_io_errors @var{ignore_io_errors}
+Ignore IO errors during open and write. Useful for long-duration runs with network output.
+
+@item -lhls @var{lhls}
+Enable Low-latency HLS(LHLS). Adds #EXT-X-PREFETCH tag with current segment's URI.
+Apple doesn't have an official spec for LHLS. Meanwhile hls.js player folks are
+trying to standardize a open LHLS spec. The draft spec is available in https://github.com/video-dev/hlsjs-rfcs/blob/lhls-spec/proposals/0001-lhls.md
+This option will also try to comply with the above open spec, till Apple's spec officially supports it.
+Applicable only when @var{streaming} and @var{hls_playlist} options are enabled.
+This is an experimental feature.
 
 @end table
 
@@ -1012,6 +1028,9 @@ Use persistent HTTP connections. Applicable only for HTTP output.
 @item timeout
 Set timeout for socket I/O operations. Applicable only for HTTP output.
 
+@item -ignore_io_errors
+Ignore IO errors during open, write and delete. Useful for long-duration runs with network output.
+
 @end table
 
 @anchor{ico}
@@ -1319,6 +1338,10 @@ more efficient), but with this option set, the muxer writes one moof/mdat
 pair for each track, making it easier to separate tracks.
 
 This option is implicitly set when writing ismv (Smooth Streaming) files.
+@item -movflags skip_sidx
+Skip writing of sidx atom. When bitrate overhead due to sidx atom is high,
+this option could be used for cases where sidx atom is not mandatory.
+When global_sidx flag is enabled, this option will be ignored.
 @item -movflags faststart
 Run a second pass moving the index (moov atom) to the beginning of the file.
 This operation can take a while, and will not work in various situations such

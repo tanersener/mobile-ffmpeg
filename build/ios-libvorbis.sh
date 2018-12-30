@@ -48,8 +48,12 @@ if [[ ${RECONF_libvorbis} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
+# -force_cpusubtype_ALL FLAG REMOVED DUE TO THE FOLLOWING ERROR
+# ld: -force_cpusubtype_ALL and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
+${SED_INLINE} 's/-force_cpusubtype_ALL//g' ${BASEDIR}/src/${LIB_NAME}/configure
+
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \
@@ -60,7 +64,7 @@ fi
     --disable-oggtest \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_libvorbis_package_config "1.3.6"

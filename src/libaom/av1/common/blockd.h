@@ -484,7 +484,7 @@ typedef struct cfl_ctx {
 } CFL_CTX;
 
 typedef struct jnt_comp_params {
-  int use_jnt_comp_avg;
+  int use_dist_wtd_comp_avg;
   int fwd_offset;
   int bck_offset;
 } JNT_COMP_PARAMS;

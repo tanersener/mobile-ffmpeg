@@ -125,6 +125,7 @@ L_REGPARAMS  *rp;
     pix8 = pixApplyInvBackgroundGrayMap(pixs, pix7, 7, 7);
     pixaAddPix(pixa1, pix8, L_INSERT);
     regTestWritePixAndCheck(rp, pix8, IFF_JFIF_JPEG);  /* 13 */
+    pixDestroy(&pix6);
     pixDestroy(&pix7);
 
         /* Process the result for gray and binary output */

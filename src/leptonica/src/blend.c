@@ -1227,7 +1227,7 @@ PIX       *pixc, *pix1, *pix2;
  *          need not be the same size.
  *      (2) Each pixel in pixb is multiplied by 'factor' divided by 255, and
  *          clipped to the range [0 ... 1].  This gives the fade fraction
- *          to be appied to pixs.  Fade either to white (L_BLEND_TO_WHITE)
+ *          to be applied to pixs.  Fade either to white (L_BLEND_TO_WHITE)
  *          or to black (L_BLEND_TO_BLACK).
  * </pre>
  */
@@ -1551,7 +1551,7 @@ static l_int32 blendHardLightComponents(l_int32    a,
  *          for sindex.
  * </pre>
  */
-l_int32
+l_ok
 pixBlendCmap(PIX     *pixs,
              PIX     *pixb,
              l_int32  x,
@@ -2168,13 +2168,13 @@ PIX  *pixd, *pix1, *pix2, *pix3, *pix4;
  * <pre>
  * Notes:
  *      (1) In-place operation.
- *      (2) Maximum fading fraction @maxfade occurs at the edge of the image,
- *          and the fraction goes to 0 at the fractional distance @distfract
- *          from the edge.  @maxfade must be in [0, 1].
- *      (3) @distrfact must be in [0, 1], and typically it would be <= 0.5.
+ *      (2) Maximum fading fraction %maxfade occurs at the edge of the image,
+ *          and the fraction goes to 0 at the fractional distance %distfract
+ *          from the edge.  %maxfade must be in [0, 1].
+ *      (3) %distrfact must be in [0, 1], and typically it would be <= 0.5.
  * </pre>
  */
-l_int32
+l_ok
 pixLinearEdgeFade(PIX       *pixs,
                   l_int32    dir,
                   l_int32    fadeto,

@@ -207,7 +207,7 @@ L_KERNEL  *keld;
  * \param[out]   pval
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 kernelGetElement(L_KERNEL   *kel,
                  l_int32     row,
                  l_int32     col,
@@ -239,7 +239,7 @@ kernelGetElement(L_KERNEL   *kel,
  * \param[in]    val
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 kernelSetElement(L_KERNEL  *kel,
                  l_int32    row,
                  l_int32    col,
@@ -266,7 +266,7 @@ kernelSetElement(L_KERNEL  *kel,
  * \param[out]   psy, psx, pcy, pcx [optional]  each can be null
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 kernelGetParameters(L_KERNEL  *kel,
                     l_int32   *psy,
                     l_int32   *psx,
@@ -296,7 +296,7 @@ kernelGetParameters(L_KERNEL  *kel,
  * \param[in]    cy, cx
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 kernelSetOrigin(L_KERNEL  *kel,
                 l_int32    cy,
                 l_int32    cx)
@@ -318,7 +318,7 @@ kernelSetOrigin(L_KERNEL  *kel,
  * \param[out]   psum sum of all kernel values
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 kernelGetSum(L_KERNEL   *kel,
              l_float32  *psum)
 {
@@ -350,7 +350,7 @@ l_int32    sx, sy, i, j;
  * \param[out]   pmax [optional] maximum value
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 kernelGetMinMax(L_KERNEL   *kel,
                 l_float32  *pmin,
                 l_float32  *pmax)
@@ -594,7 +594,7 @@ L_KERNEL  *kel;
  * \param[in]    kel kernel
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 kernelWrite(const char  *fname,
             L_KERNEL    *kel)
 {
@@ -623,7 +623,7 @@ FILE  *fp;
  * \param[in]    kel
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 kernelWriteStream(FILE      *fp,
                   L_KERNEL  *kel)
 {
@@ -1187,7 +1187,7 @@ L_KERNEL  *kel;
  *          makeGaussianKernel().
  * </pre>
  */
-l_int32
+l_ok
 makeGaussianKernelSep(l_int32    halfheight,
                       l_int32    halfwidth,
                       l_float32  stdev,

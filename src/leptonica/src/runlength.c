@@ -368,7 +368,7 @@ PIX       *pixt, *pixd;
  *          the maximum number of runs in the raster line.
  * </pre>
  */
-l_int32
+l_ok
 pixFindHorizontalRuns(PIX      *pix,
                       l_int32   y,
                       l_int32  *xstart,
@@ -445,7 +445,7 @@ l_uint32  *line;
  *          the maximum number of runs in the raster line.
  * </pre>
  */
-l_int32
+l_ok
 pixFindVerticalRuns(PIX      *pix,
                     l_int32   x,
                     l_int32  *ystart,
@@ -574,7 +574,7 @@ NUMA    *nasize;
  *          this function.
  * </pre>
  */
-l_int32
+l_ok
 pixFindMaxHorizontalRunOnLine(PIX      *pix,
                               l_int32   y,
                               l_int32  *pxstart,
@@ -648,7 +648,7 @@ l_uint32  *line;
  *          this function.
  * </pre>
  */
-l_int32
+l_ok
 pixFindMaxVerticalRunOnLine(PIX      *pix,
                             l_int32   x,
                             l_int32  *pystart,
@@ -729,7 +729,7 @@ l_uint32  *data, *line;
  *          not within a run the value 0.
  * </pre>
  */
-l_int32
+l_ok
 runlengthMembershipOnLine(l_int32  *buffer,
                           l_int32   size,
                           l_int32   depth,

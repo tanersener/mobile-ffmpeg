@@ -148,7 +148,7 @@ SARRAY       *sa;
         /* Make a pixacomp from files, and join */
     sa = sarrayCreate(0);
     for (i = 0; i < 6; i++)
-        sarrayAddString(sa, (char *)fnames[i], L_COPY);
+        sarrayAddString(sa, fnames[i], L_COPY);
     pixac1 = pixacompCreateFromSA(sa, IFF_DEFAULT);
     pixacompJoin(pixac1, pixac, 0, -1);
     pixa1 = pixaCreateFromPixacomp(pixac1, L_COPY);

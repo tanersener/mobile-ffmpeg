@@ -21,6 +21,7 @@
 #define _POSIX_SOURCE 1
 #define _ISOC99_SOURCE 1 /* For floating point */
 #define _GNU_SOURCE 1 /* For the floating point exception extension */
+#define _BSD_SOURCE 1 /* For the floating point exception extension */
 
 #include <signal.h>
 #include <stdio.h>
@@ -961,7 +962,7 @@ bits_of(png_uint_32 num)
    return b; /* 0..32 */
 }
 
-/* Main interface to file storeage, after writing a new PNG file (see the API
+/* Main interface to file storage, after writing a new PNG file (see the API
  * below) call store_storefile to store the result with the given name and id.
  */
 static void
@@ -2589,7 +2590,7 @@ static double digitize(double value, int depth, int do_round)
     * rounding and 'do_round' should be 1, if it is 0 the digitized value will
     * be truncated.
     */
-   const unsigned int digitization_factor = (1U << depth) -1;
+   unsigned int digitization_factor = (1U << depth) - 1;
 
    /* Limiting the range is done as a convenience to the caller - it's easier to
     * do it once here than every time at the call site.
@@ -3687,8 +3688,8 @@ init_standard_palette(png_store *ps, png_structp pp, png_infop pi, int npalette,
 
 #ifdef PNG_WRITE_tRNS_SUPPORTED
 static void
-set_random_tRNS(png_structp pp, png_infop pi, const png_byte colour_type,
-   const int bit_depth)
+set_random_tRNS(png_structp pp, png_infop pi, png_byte colour_type,
+   int bit_depth)
 {
    /* To make this useful the tRNS color needs to match at least one pixel.
     * Random values are fine for gray, including the 16-bit case where we know
@@ -3696,7 +3697,7 @@ set_random_tRNS(png_structp pp, png_infop pi, const png_byte colour_type,
     * method as only 65536 different RGB values are generated.
     */
    png_color_16 tRNS;
-   const png_uint_16 mask = (png_uint_16)((1U << bit_depth)-1);
+   png_uint_16 mask = (png_uint_16)((1U << bit_depth)-1);
 
    R8(tRNS); /* makes unset fields random */
 
@@ -4337,7 +4338,7 @@ make_size_image(png_store* const ps, png_byte const colour_type,
 
       /* Make a name and get an appropriate id for the store: */
       char name[FILE_NAME_SIZE];
-      const png_uint_32 id = FILEID(colour_type, bit_depth, 0/*palette*/,
+      png_uint_32 id = FILEID(colour_type, bit_depth, 0/*palette*/,
          interlace_type, w, h, do_interlace);
 
       standard_name_from_id(name, sizeof name, 0, id);
@@ -4413,7 +4414,7 @@ make_size_image(png_store* const ps, png_byte const colour_type,
          for (pass=0; pass<npasses; ++pass)
          {
             /* The following two are for checking the macros: */
-            const png_uint_32 wPass = PNG_PASS_COLS(w, pass);
+            png_uint_32 wPass = PNG_PASS_COLS(w, pass);
 
             /* If do_interlace is set we don't call png_write_row for every
              * row because some of them are empty.  In fact, for a 1x1 image,
@@ -4645,7 +4646,7 @@ make_error(png_store* const ps, png_byte const colour_type,
    Try
    {
       png_infop pi;
-      const png_structp pp = set_store_for_write(ps, &pi, name);
+      png_structp pp = set_store_for_write(ps, &pi, name);
       png_uint_32 w, h;
       gnu_volatile(pp)
 
@@ -4705,7 +4706,7 @@ make_error(png_store* const ps, png_byte const colour_type,
       else
       {
          /* Now write the whole image, just to make sure that the detected, or
-          * undetected, errro has not created problems inside libpng.  This
+          * undetected, error has not created problems inside libpng.  This
           * doesn't work if there was a png_error in png_write_info because that
           * can abort before PLTE was written.
           */
@@ -5468,14 +5469,14 @@ progressive_row(png_structp ppIn, png_bytep new_row, png_uint_32 y, int pass)
 
 static void
 sequential_row(standard_display *dp, png_structp pp, png_infop pi,
-    const int iImage, const int iDisplay)
+    int iImage, int iDisplay)
 {
-   const int         npasses = dp->npasses;
-   const int         do_interlace = dp->do_interlace &&
+   int npasses = dp->npasses;
+   int do_interlace = dp->do_interlace &&
       dp->interlace_type == PNG_INTERLACE_ADAM7;
-   const png_uint_32 height = standard_height(pp, dp->id);
-   const png_uint_32 width = standard_width(pp, dp->id);
-   const png_store*  ps = dp->ps;
+   png_uint_32 height = standard_height(pp, dp->id);
+   png_uint_32 width = standard_width(pp, dp->id);
+   const png_store* ps = dp->ps;
    int pass;
 
    for (pass=0; pass<npasses; ++pass)
@@ -5869,7 +5870,7 @@ test_size(png_modifier* const pm, png_byte const colour_type,
     */
    static const png_byte hinc[] = {1, 3, 11, 1, 5};
    static const png_byte winc[] = {1, 9, 5, 7, 1};
-   const int save_bdlo = bdlo;
+   int save_bdlo = bdlo;
 
    for (; bdlo <= bdhi; ++bdlo)
    {
@@ -6077,12 +6078,12 @@ image_pixel_init(image_pixel *this, png_const_bytep row, png_byte colour_type,
     png_byte bit_depth, png_uint_32 x, store_palette palette,
     const image_pixel *format /*from pngvalid transform of input*/)
 {
-   const png_byte sample_depth = (png_byte)(colour_type ==
-      PNG_COLOR_TYPE_PALETTE ? 8 : bit_depth);
-   const unsigned int max = (1U<<sample_depth)-1;
-   const int swap16 = (format != 0 && format->swap16);
-   const int littleendian = (format != 0 && format->littleendian);
-   const int sig_bits = (format != 0 && format->sig_bits);
+   png_byte sample_depth =
+      (png_byte)(colour_type == PNG_COLOR_TYPE_PALETTE ? 8 : bit_depth);
+   unsigned int max = (1U<<sample_depth)-1;
+   int swap16 = (format != 0 && format->swap16);
+   int littleendian = (format != 0 && format->littleendian);
+   int sig_bits = (format != 0 && format->sig_bits);
 
    /* Initially just set everything to the same number and the alpha to opaque.
     * Note that this currently assumes a simple palette where entry x has colour
@@ -6100,7 +6101,7 @@ image_pixel_init(image_pixel *this, png_const_bytep row, png_byte colour_type,
       /* This permits the caller to default to the sample value. */
       if (palette != 0)
       {
-         const unsigned int i = this->palette_index;
+         unsigned int i = this->palette_index;
 
          this->red = palette[i].red;
          this->green = palette[i].green;
@@ -6431,8 +6432,8 @@ static void
 image_transform_mod_end(const image_transform *this, image_pixel *that,
     png_const_structp pp, const transform_display *display)
 {
-   const unsigned int scale = (1U<<that->sample_depth)-1;
-   const int sig_bits = that->sig_bits;
+   unsigned int scale = (1U<<that->sample_depth)-1;
+   int sig_bits = that->sig_bits;
 
    UNUSED(this)
    UNUSED(pp)
@@ -6755,19 +6756,19 @@ transform_image_validate(transform_display *dp, png_const_structp pp,
 {
    /* Constants for the loop below: */
    const png_store* const ps = dp->this.ps;
-   const png_byte in_ct = dp->this.colour_type;
-   const png_byte in_bd = dp->this.bit_depth;
-   const png_uint_32 w = dp->this.w;
-   const png_uint_32 h = dp->this.h;
-   const png_byte out_ct = dp->output_colour_type;
-   const png_byte out_bd = dp->output_bit_depth;
-   const png_byte sample_depth = (png_byte)(out_ct ==
-      PNG_COLOR_TYPE_PALETTE ? 8 : out_bd);
-   const png_byte red_sBIT = dp->this.red_sBIT;
-   const png_byte green_sBIT = dp->this.green_sBIT;
-   const png_byte blue_sBIT = dp->this.blue_sBIT;
-   const png_byte alpha_sBIT = dp->this.alpha_sBIT;
-   const int have_tRNS = dp->this.is_transparent;
+   png_byte in_ct = dp->this.colour_type;
+   png_byte in_bd = dp->this.bit_depth;
+   png_uint_32 w = dp->this.w;
+   png_uint_32 h = dp->this.h;
+   png_byte out_ct = dp->output_colour_type;
+   png_byte out_bd = dp->output_bit_depth;
+   png_byte sample_depth =
+      (png_byte)(out_ct == PNG_COLOR_TYPE_PALETTE ? 8 : out_bd);
+   png_byte red_sBIT = dp->this.red_sBIT;
+   png_byte green_sBIT = dp->this.green_sBIT;
+   png_byte blue_sBIT = dp->this.blue_sBIT;
+   png_byte alpha_sBIT = dp->this.alpha_sBIT;
+   int have_tRNS = dp->this.is_transparent;
    double digitization_error;
 
    store_palette out_palette;
@@ -6928,7 +6929,7 @@ transform_end(png_structp ppIn, png_infop pi)
 
 /* A single test run. */
 static void
-transform_test(png_modifier *pmIn, const png_uint_32 idIn,
+transform_test(png_modifier *pmIn, png_uint_32 idIn,
     const image_transform* transform_listIn, const char * const name)
 {
    transform_display d;
@@ -7763,7 +7764,7 @@ static void
 image_transform_png_set_rgb_to_gray_set(const image_transform *this,
     transform_display *that, png_structp pp, png_infop pi)
 {
-   const int error_action = 1; /* no error, no defines in png.h */
+   int error_action = 1; /* no error, no defines in png.h */
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
       png_set_rgb_to_gray(pp, error_action, data.red_to_set, data.green_to_set);
@@ -7904,10 +7905,10 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
 #  if DIGITIZE
       {
          png_modifier *pm = display->pm;
-         const unsigned int sample_depth = that->sample_depth;
-         const unsigned int calc_depth = (pm->assume_16_bit_calculations ? 16 :
+         unsigned int sample_depth = that->sample_depth;
+         unsigned int calc_depth = (pm->assume_16_bit_calculations ? 16 :
             sample_depth);
-         const unsigned int gamma_depth =
+         unsigned int gamma_depth =
             (sample_depth == 16 ?
                display->max_gamma_8 :
                (pm->assume_16_bit_calculations ?
@@ -8001,7 +8002,7 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
             b * data.blue_coefficient;
 
          {
-            const int do_round = data.gamma != 1 || calc_depth == 16;
+            int do_round = data.gamma != 1 || calc_depth == 16;
             const double ce = 2. / 32768;
 
             graylo = DD(rlo * (data.red_coefficient-ce) +
@@ -8625,7 +8626,7 @@ image_transform_png_set_filler_mod(const image_transform *this,
        (that->colour_type == PNG_COLOR_TYPE_RGB ||
         that->colour_type == PNG_COLOR_TYPE_GRAY))
    {
-      const unsigned int max = (1U << that->bit_depth)-1;
+      unsigned int max = (1U << that->bit_depth)-1;
       that->alpha = data.filler & max;
       that->alphaf = ((double)that->alpha) / max;
       that->alphae = 0;
@@ -8692,7 +8693,7 @@ image_transform_png_set_add_alpha_mod(const image_transform *this,
        (that->colour_type == PNG_COLOR_TYPE_RGB ||
         that->colour_type == PNG_COLOR_TYPE_GRAY))
    {
-      const unsigned int max = (1U << that->bit_depth)-1;
+      unsigned int max = (1U << that->bit_depth)-1;
       that->alpha = data.filler & max;
       that->alphaf = ((double)that->alpha) / max;
       that->alphae = 0;
@@ -8883,7 +8884,7 @@ image_transform_png_set_shift_set(const image_transform *this,
     * field is randomized independently.  This acts as a check that
     * libpng does use the correct field.
     */
-   const unsigned int depth = that->this.bit_depth;
+   unsigned int depth = that->this.bit_depth;
 
    data.red = (png_byte)/*SAFE*/(random_mod(depth)+1);
    data.green = (png_byte)/*SAFE*/(random_mod(depth)+1);
@@ -9298,12 +9299,12 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
          int mode = dp->do_background - ALPHA_MODE_OFFSET;
 
          /* The gamma value is the output gamma, and is in the standard,
-          * non-inverted, represenation.  It provides a default for the PNG file
+          * non-inverted, representation.  It provides a default for the PNG file
           * gamma, but since the file has a gAMA chunk this does not matter.
           */
          const double sg = dp->screen_gamma;
 #        ifndef PNG_FLOATING_POINT_SUPPORTED
-            const png_fixed_point g = fix(sg);
+            png_fixed_point g = fix(sg);
 #        endif
 
 #        ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -9351,7 +9352,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
           */
          const double bg = dp->background_gamma;
 #        ifndef PNG_FLOATING_POINT_SUPPORTED
-            const png_fixed_point g = fix(bg);
+            png_fixed_point g = fix(bg);
 #        endif
 
 #        ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -9425,7 +9426,7 @@ static void
 init_validate_info(validate_info *vi, gamma_display *dp, png_const_structp pp,
     int in_depth, int out_depth)
 {
-   const unsigned int outmax = (1U<<out_depth)-1;
+   unsigned int outmax = (1U<<out_depth)-1;
 
    vi->pp = pp;
    vi->dp = dp;
@@ -9587,14 +9588,14 @@ gamma_component_compose(int do_background, double input_sample, double alpha,
 /* This API returns the encoded *input* component, in the range 0..1 */
 static double
 gamma_component_validate(const char *name, const validate_info *vi,
-    const unsigned int id, const unsigned int od,
+    unsigned int id, unsigned int od,
     const double alpha /* <0 for the alpha channel itself */,
     const double background /* component background value */)
 {
-   const unsigned int isbit = id >> vi->isbit_shift;
-   const unsigned int sbit_max = vi->sbit_max;
-   const unsigned int outmax = vi->outmax;
-   const int do_background = vi->do_background;
+   unsigned int isbit = id >> vi->isbit_shift;
+   unsigned int sbit_max = vi->sbit_max;
+   unsigned int outmax = vi->outmax;
+   int do_background = vi->do_background;
 
    double i;
 
@@ -10160,13 +10161,13 @@ gamma_image_validate(gamma_display *dp, png_const_structp pp,
 {
    /* Get some constants derived from the input and output file formats: */
    const png_store* const ps = dp->this.ps;
-   const png_byte in_ct = dp->this.colour_type;
-   const png_byte in_bd = dp->this.bit_depth;
-   const png_uint_32 w = dp->this.w;
-   const png_uint_32 h = dp->this.h;
+   png_byte in_ct = dp->this.colour_type;
+   png_byte in_bd = dp->this.bit_depth;
+   png_uint_32 w = dp->this.w;
+   png_uint_32 h = dp->this.h;
    const size_t cbRow = dp->this.cbRow;
-   const png_byte out_ct = png_get_color_type(pp, pi);
-   const png_byte out_bd = png_get_bit_depth(pp, pi);
+   png_byte out_ct = png_get_color_type(pp, pi);
+   png_byte out_bd = png_get_bit_depth(pp, pi);
 
    /* There are three sources of error, firstly the quantization in the
     * file encoding, determined by sbit and/or the file depth, secondly
@@ -10207,11 +10208,11 @@ gamma_image_validate(gamma_display *dp, png_const_structp pp,
     * The basic tests below do not do this, however if 'use_input_precision'
     * is set a subsequent test is performed above.
     */
-   const unsigned int samples_per_pixel = (out_ct & 2U) ? 3U : 1U;
+   unsigned int samples_per_pixel = (out_ct & 2U) ? 3U : 1U;
    int processing;
    png_uint_32 y;
    const store_palette_entry *in_palette = dp->this.palette;
-   const int in_is_transparent = dp->this.is_transparent;
+   int in_is_transparent = dp->this.is_transparent;
    int process_tRNS;
    int out_npalette = -1;
    int out_is_transparent = 0; /* Just refers to the palette case */
@@ -10259,9 +10260,9 @@ gamma_image_validate(gamma_display *dp, png_const_structp pp,
             double alpha = 1; /* serves as a flag value */
 
             /* Record the palette index for index images. */
-            const unsigned int in_index =
+            unsigned int in_index =
                in_ct == 3 ? sample(std, 3, in_bd, x, 0, 0, 0) : 256;
-            const unsigned int out_index =
+            unsigned int out_index =
                out_ct == 3 ? sample(std, 3, out_bd, x, 0, 0, 0) : 256;
 
             /* Handle input alpha - png_set_background will cause the output
@@ -10270,7 +10271,7 @@ gamma_image_validate(gamma_display *dp, png_const_structp pp,
             if ((in_ct & PNG_COLOR_MASK_ALPHA) != 0 ||
                 (in_ct == 3 && in_is_transparent))
             {
-               const unsigned int input_alpha = in_ct == 3 ?
+               unsigned int input_alpha = in_ct == 3 ?
                   dp->this.palette[in_index].alpha :
                   sample(std, in_ct, in_bd, x, samples_per_pixel, 0, 0);
 
@@ -10395,14 +10396,14 @@ gamma_end(png_structp ppIn, png_infop pi)
  * maxpc:  maximum percentage error (as a percentage)
  */
 static void
-gamma_test(png_modifier *pmIn, const png_byte colour_typeIn,
-    const png_byte bit_depthIn, const int palette_numberIn,
-    const int interlace_typeIn,
+gamma_test(png_modifier *pmIn, png_byte colour_typeIn,
+    png_byte bit_depthIn, int palette_numberIn,
+    int interlace_typeIn,
     const double file_gammaIn, const double screen_gammaIn,
-    const png_byte sbitIn, const int threshold_testIn,
+    png_byte sbitIn, int threshold_testIn,
     const char *name,
-    const int use_input_precisionIn, const int scale16In,
-    const int expand16In, const int do_backgroundIn,
+    int use_input_precisionIn, int scale16In,
+    int expand16In, int do_backgroundIn,
     const png_color_16 *bkgd_colorIn, double bkgd_gammaIn)
 {
    gamma_display d;
@@ -10606,11 +10607,11 @@ perform_gamma_threshold_tests(png_modifier *pm)
 }
 
 static void gamma_transform_test(png_modifier *pm,
-   const png_byte colour_type, const png_byte bit_depth,
-   const int palette_number,
-   const int interlace_type, const double file_gamma,
-   const double screen_gamma, const png_byte sbit,
-   const int use_input_precision, const int scale16)
+   png_byte colour_type, png_byte bit_depth,
+   int palette_number,
+   int interlace_type, const double file_gamma,
+   const double screen_gamma, png_byte sbit,
+   int use_input_precision, int scale16)
 {
    size_t pos = 0;
    char name[64];
@@ -10767,12 +10768,12 @@ static void perform_gamma_scale16_tests(png_modifier *pm)
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
    defined(PNG_READ_ALPHA_MODE_SUPPORTED)
 static void gamma_composition_test(png_modifier *pm,
-   const png_byte colour_type, const png_byte bit_depth,
-   const int palette_number,
-   const int interlace_type, const double file_gamma,
+   png_byte colour_type, png_byte bit_depth,
+   int palette_number,
+   int interlace_type, const double file_gamma,
    const double screen_gamma,
-   const int use_input_precision, const int do_background,
-   const int expand_16)
+   int use_input_precision, int do_background,
+   int expand_16)
 {
    size_t pos = 0;
    png_const_charp base;

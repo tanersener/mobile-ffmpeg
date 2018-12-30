@@ -249,7 +249,7 @@ pixaccGetOffset(PIXACC  *pixacc)
  * \param[in]    pix to be added
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixaccAdd(PIXACC  *pixacc,
           PIX     *pix)
 {
@@ -271,7 +271,7 @@ pixaccAdd(PIXACC  *pixacc,
  * \param[in]    pix to be subtracted
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixaccSubtract(PIXACC  *pixacc,
                PIX     *pix)
 {
@@ -293,7 +293,7 @@ pixaccSubtract(PIXACC  *pixacc,
  * \param[in]    factor
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixaccMultConst(PIXACC    *pixacc,
                 l_float32  factor)
 {
@@ -321,7 +321,7 @@ pixaccMultConst(PIXACC    *pixacc,
  *          constant %factor.  It then adds that into %pixacc.
  * </pre>
  */
-l_int32
+l_ok
 pixaccMultConstAccumulate(PIXACC    *pixacc,
                           PIX       *pix,
                           l_float32  factor)

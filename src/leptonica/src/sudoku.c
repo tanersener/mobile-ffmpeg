@@ -558,7 +558,7 @@ l_int32  blockrow, blockcol, blockstart, rowindex, locindex;
  *          most likely to be unique.
  * </pre>
  */
-l_int32
+l_ok
 sudokuTestUniqueness(l_int32  *array,
                      l_int32  *punique)
 {

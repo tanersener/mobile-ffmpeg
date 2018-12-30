@@ -141,7 +141,7 @@ static L_PIX_MEM_STORE  *CustomPMS = NULL;
  *
  * \param[in]    minsize of data chunk that can be supplied by pms
  * \param[in]    smallest bytes of the smallest pre-allocated data chunk.
- *              numalloc (array with the number of data chunks for each
+ * \param[in]    numalloc array with the number of data chunks for each
  *                        size that are in the memory store
  * \param[in]    logfile use for debugging; null otherwise
  * \return  0 if OK, 1 on error
@@ -164,7 +164,7 @@ static L_PIX_MEM_STORE  *CustomPMS = NULL;
  *          per process.
  * </pre>
  */
-l_int32
+l_ok
 pmsCreate(size_t       minsize,
           size_t       smallest,
           NUMA        *numalloc,
@@ -433,7 +433,7 @@ L_PIX_MEM_STORE  *pms;
  * \param[out]  plevel  -1 if either too small or too large
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pmsGetLevelForAlloc(size_t    nbytes,
                     l_int32  *plevel)
 {
@@ -472,7 +472,7 @@ L_PIX_MEM_STORE  *pms;
  *                     outside the store
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pmsGetLevelForDealloc(void     *data,
                       l_int32  *plevel)
 {

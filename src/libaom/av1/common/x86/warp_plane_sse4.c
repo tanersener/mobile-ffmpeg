@@ -577,7 +577,7 @@ static INLINE void store_vertical_filter_output(
       __m128i *const dst8 = (__m128i *)&pred[(i + k + 4) * p_stride + j];
       const __m128i p_16 = _mm_loadl_epi64(p);
 
-      if (conv_params->use_jnt_comp_avg) {
+      if (conv_params->use_dist_wtd_comp_avg) {
         const __m128i p_16_lo = _mm_unpacklo_epi16(p_16, temp_lo_16);
         const __m128i wt_res_lo = _mm_madd_epi16(p_16_lo, *wt);
         const __m128i shifted_32 =
@@ -610,7 +610,7 @@ static INLINE void store_vertical_filter_output(
             (__m128i *)&pred[(i + k + 4) * p_stride + j + 4];
         const __m128i p4_16 = _mm_loadl_epi64(p4);
 
-        if (conv_params->use_jnt_comp_avg) {
+        if (conv_params->use_dist_wtd_comp_avg) {
           const __m128i p_16_hi = _mm_unpacklo_epi16(p4_16, temp_hi_16);
           const __m128i wt_res_hi = _mm_madd_epi16(p_16_hi, *wt);
           const __m128i shifted_32 =

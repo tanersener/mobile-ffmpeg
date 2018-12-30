@@ -56,7 +56,7 @@ PIX * pixReadMemWebP(const l_uint8 *filedata, size_t filesize)
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 readHeaderWebP(const char *filename, l_int32 *pw, l_int32 *ph,
+l_ok readHeaderWebP(const char *filename, l_int32 *pw, l_int32 *ph,
                        l_int32 *pspp)
 {
     return ERROR_INT("function not present", "readHeaderWebP", 1);
@@ -64,7 +64,7 @@ l_int32 readHeaderWebP(const char *filename, l_int32 *pw, l_int32 *ph,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 readHeaderMemWebP(const l_uint8 *data, size_t size,
+l_ok readHeaderMemWebP(const l_uint8 *data, size_t size,
                           l_int32 *pw, l_int32 *ph, l_int32 *pspp)
 {
     return ERROR_INT("function not present", "readHeaderMemWebP", 1);
@@ -72,7 +72,7 @@ l_int32 readHeaderMemWebP(const l_uint8 *data, size_t size,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteWebP(const char *filename, PIX *pixs, l_int32 quality,
+l_ok pixWriteWebP(const char *filename, PIX *pixs, l_int32 quality,
                      l_int32 lossless)
 {
     return ERROR_INT("function not present", "pixWriteWebP", 1);
@@ -80,7 +80,7 @@ l_int32 pixWriteWebP(const char *filename, PIX *pixs, l_int32 quality,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteStreamWebP(FILE *fp, PIX *pixs, l_int32 quality,
+l_ok pixWriteStreamWebP(FILE *fp, PIX *pixs, l_int32 quality,
                            l_int32 lossless)
 {
     return ERROR_INT("function not present", "pixWriteStreamWebP", 1);
@@ -88,7 +88,7 @@ l_int32 pixWriteStreamWebP(FILE *fp, PIX *pixs, l_int32 quality,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteMemWebP(l_uint8 **pencdata, size_t *pencsize, PIX *pixs,
+l_ok pixWriteMemWebP(l_uint8 **pencdata, size_t *pencsize, PIX *pixs,
                         l_int32 quality, l_int32 lossless)
 {
     return ERROR_INT("function not present", "pixWriteMemWebP", 1);

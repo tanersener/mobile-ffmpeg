@@ -64,6 +64,7 @@ static const l_int32  L_MAX_ALLOWED_NUM_COLORS = 256;
 static const l_int32  L_MAX_ALLOWED_WIDTH = 1000000;
 static const l_int32  L_MAX_ALLOWED_HEIGHT = 1000000;
 static const l_int64  L_MAX_ALLOWED_PIXELS = 400000000LL;
+static const l_int32  L_MAX_ALLOWED_RES = 10000000;  /* pixels/meter */
 
 #ifndef  NO_CONSOLE_IO
 #define  DEBUG     0
@@ -121,14 +122,19 @@ pixReadMemBmp(const l_uint8  *cdata,
 {
 l_uint8    pel[4];
 l_uint8   *cmapBuf, *fdata, *data;
-l_int16    bftype, offset, depth, d;
-l_int32    width, height, height_neg, xres, yres, compression, imagebytes;
+l_int16    bftype, depth, d;
+l_int32    offset, width, height, height_neg, xres, yres, compression, imagebytes;
 l_int32    cmapbytes, cmapEntries;
 l_int32    fdatabpl, extrabytes, pixWpl, pixBpl, i, j, k;
 l_uint32  *line, *pixdata, *pword;
 l_int64    npixels;
 BMP_FH    *bmpfh;
+#if defined(__GNUC__)
+BMP_HEADER *bmph;
+#define bmpih (&bmph->bmpih)
+#else
 BMP_IH    *bmpih;
+#endif
 PIX       *pix, *pix1;
 PIXCMAP   *cmap;
 
@@ -141,19 +147,24 @@ PIXCMAP   *cmap;
 
         /* Verify this is an uncompressed bmp */
     bmpfh = (BMP_FH *)cdata;
-    bftype = convertOnBigEnd16(bmpfh->bfType);
+    bftype = bmpfh->bfType[0] + ((l_int32)bmpfh->bfType[1] << 8);
     if (bftype != BMP_ID)
         return (PIX *)ERROR_PTR("not bmf format", procName, NULL);
+#if defined(__GNUC__)
+    bmph = (BMP_HEADER *)bmpfh;
+#else
     bmpih = (BMP_IH *)(cdata + BMP_FHBYTES);
-    if (!bmpih)
-        return (PIX *)ERROR_PTR("bmpih not defined", procName, NULL);
+#endif
     compression = convertOnBigEnd32(bmpih->biCompression);
     if (compression != 0)
         return (PIX *)ERROR_PTR("cannot read compressed BMP files",
                                 procName, NULL);
 
         /* Read the rest of the useful header information */
-    offset = convertOnBigEnd16(bmpfh->bfOffBits);
+    offset = bmpfh->bfOffBits[0];
+    offset += (l_int32)bmpfh->bfOffBits[1] << 8;
+    offset += (l_int32)bmpfh->bfOffBits[2] << 16;
+    offset += (l_int32)bmpfh->bfOffBits[3] << 24;
     width = convertOnBigEnd32(bmpih->biWidth);
     height = convertOnBigEnd32(bmpih->biHeight);
     depth = convertOnBigEnd16(bmpih->biBitCount);
@@ -162,8 +173,8 @@ PIXCMAP   *cmap;
     yres = convertOnBigEnd32(bmpih->biYPelsPerMeter);
 
         /* Some sanity checking.  We impose limits on the image
-         * dimensions and number of pixels.  We make sure the file
-         * is the correct size to hold the amount of uncompressed data
+         * dimensions, resolution and number of pixels.  We make sure the
+         * file is the correct size to hold the amount of uncompressed data
          * that is specified in the header.  The number of colormap
          * entries is checked: it can be either 0 (no cmap) or some
          * number between 2 and 256.
@@ -174,13 +185,17 @@ PIXCMAP   *cmap;
         return (PIX *)ERROR_PTR("width < 1", procName, NULL);
     if (width > L_MAX_ALLOWED_WIDTH)
         return (PIX *)ERROR_PTR("width too large", procName, NULL);
+    if (height == 0 || height < -L_MAX_ALLOWED_HEIGHT ||
+        height > L_MAX_ALLOWED_HEIGHT)
+        return (PIX *)ERROR_PTR("invalid height", procName, NULL);
+    if (xres < 0 || xres > L_MAX_ALLOWED_RES ||
+        yres < 0 || yres > L_MAX_ALLOWED_RES)
+        return (PIX *)ERROR_PTR("invalid resolution", procName, NULL);
     height_neg = 0;
     if (height < 0) {
         height_neg = 1;
         height = -height;
     }
-    if (height == 0 || height > L_MAX_ALLOWED_HEIGHT)
-        return (PIX *)ERROR_PTR("invalid height", procName, NULL);
     npixels = 1LL * width * height;
     if (npixels > L_MAX_ALLOWED_PIXELS)
         return (PIX *)ERROR_PTR("npixels too large", procName, NULL);
@@ -340,7 +355,7 @@ PIXCMAP   *cmap;
  * \param[in]    pix    all depths
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixWriteStreamBmp(FILE  *fp,
                   PIX   *pix)
 {
@@ -385,7 +400,7 @@ size_t    size, nbytes;
  *          a simple memcpy for bmp output.
  * </pre>
  */
-l_int32
+l_ok
 pixWriteMemBmp(l_uint8  **pfdata,
                size_t    *pfsize,
                PIX       *pixs)
@@ -402,7 +417,12 @@ l_uint32    offbytes, fimagebytes;
 l_uint32   *line, *pword;
 size_t      fsize;
 BMP_FH     *bmpfh;
+#if defined(__GNUC__)
+BMP_HEADER *bmph;
+#define bmpih (&bmph->bmpih)
+#else
 BMP_IH     *bmpih;
+#endif
 PIX        *pix;
 PIXCMAP    *cmap;
 RGBA_QUAD  *pquad;
@@ -487,16 +507,25 @@ RGBA_QUAD  *pquad;
     *pfdata = fdata;
     *pfsize = fsize;
 
-        /* Convert to little-endian and write the file header data */
+        /* Write little-endian file header data */
     bmpfh = (BMP_FH *)fdata;
-    bmpfh->bfType = convertOnBigEnd16(BMP_ID);
-    bmpfh->bfSize = convertOnBigEnd16(fsize & 0x0000ffff);
-    bmpfh->bfFill1 = convertOnBigEnd16((fsize >> 16) & 0x0000ffff);
-    bmpfh->bfOffBits = convertOnBigEnd16(offbytes & 0x0000ffff);
-    bmpfh->bfFill2 = convertOnBigEnd16((offbytes >> 16) & 0x0000ffff);
+    bmpfh->bfType[0] = (l_uint8)(BMP_ID >> 0);
+    bmpfh->bfType[1] = (l_uint8)(BMP_ID >> 8);
+    bmpfh->bfSize[0] = (l_uint8)(fsize >>  0);
+    bmpfh->bfSize[1] = (l_uint8)(fsize >>  8);
+    bmpfh->bfSize[2] = (l_uint8)(fsize >> 16);
+    bmpfh->bfSize[3] = (l_uint8)(fsize >> 24);
+    bmpfh->bfOffBits[0] = (l_uint8)(offbytes >>  0);
+    bmpfh->bfOffBits[1] = (l_uint8)(offbytes >>  8);
+    bmpfh->bfOffBits[2] = (l_uint8)(offbytes >> 16);
+    bmpfh->bfOffBits[3] = (l_uint8)(offbytes >> 24);
 
         /* Convert to little-endian and write the info header data */
+#if defined(__GNUC__)
+    bmph = (BMP_HEADER *)bmpfh;
+#else
     bmpih = (BMP_IH *)(fdata + BMP_FHBYTES);
+#endif
     bmpih->biSize = convertOnBigEnd32(BMP_IHBYTES);
     bmpih->biWidth = convertOnBigEnd32(w);
     bmpih->biHeight = convertOnBigEnd32(h);

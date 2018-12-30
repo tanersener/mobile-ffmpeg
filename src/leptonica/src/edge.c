@@ -305,7 +305,7 @@ PIX       *pixd;
  *          this is not required.
  * </pre>
  */
-l_int32
+l_ok
 pixMeasureEdgeSmoothness(PIX         *pixs,
                          l_int32      side,
                          l_int32      minjump,

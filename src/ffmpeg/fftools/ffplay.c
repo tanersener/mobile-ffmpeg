@@ -861,31 +861,27 @@ static void calculate_display_rect(SDL_Rect *rect,
                                    int scr_xleft, int scr_ytop, int scr_width, int scr_height,
                                    int pic_width, int pic_height, AVRational pic_sar)
 {
-    float aspect_ratio;
-    int width, height, x, y;
+    AVRational aspect_ratio = pic_sar;
+    int64_t width, height, x, y;
 
-    if (pic_sar.num == 0)
-        aspect_ratio = 0;
-    else
-        aspect_ratio = av_q2d(pic_sar);
+    if (av_cmp_q(aspect_ratio, av_make_q(0, 1)) <= 0)
+        aspect_ratio = av_make_q(1, 1);
 
-    if (aspect_ratio <= 0.0)
-        aspect_ratio = 1.0;
-    aspect_ratio *= (float)pic_width / (float)pic_height;
+    aspect_ratio = av_mul_q(aspect_ratio, av_make_q(pic_width, pic_height));
 
     /* XXX: we suppose the screen has a 1.0 pixel ratio */
     height = scr_height;
-    width = lrint(height * aspect_ratio) & ~1;
+    width = av_rescale(height, aspect_ratio.num, aspect_ratio.den) & ~1;
     if (width > scr_width) {
         width = scr_width;
-        height = lrint(width / aspect_ratio) & ~1;
+        height = av_rescale(width, aspect_ratio.den, aspect_ratio.num) & ~1;
     }
     x = (scr_width - width) / 2;
     y = (scr_height - height) / 2;
     rect->x = scr_xleft + x;
     rect->y = scr_ytop  + y;
-    rect->w = FFMAX(width,  1);
-    rect->h = FFMAX(height, 1);
+    rect->w = FFMAX((int)width,  1);
+    rect->h = FFMAX((int)height, 1);
 }
 
 static void get_sdl_pix_fmt_and_blendmode(int format, Uint32 *sdl_pix_fmt, SDL_BlendMode *sdl_blendmode)
@@ -1326,7 +1322,11 @@ static void sigterm_handler(int sig)
 static void set_default_window_size(int width, int height, AVRational sar)
 {
     SDL_Rect rect;
-    calculate_display_rect(&rect, 0, 0, INT_MAX, height, width, height, sar);
+    int max_width  = screen_width  ? screen_width  : INT_MAX;
+    int max_height = screen_height ? screen_height : INT_MAX;
+    if (max_width == INT_MAX && max_height == INT_MAX)
+        max_height = height;
+    calculate_display_rect(&rect, 0, 0, max_width, max_height, width, height, sar);
     default_width  = rect.w;
     default_height = rect.h;
 }
@@ -1335,13 +1335,8 @@ static int video_open(VideoState *is)
 {
     int w,h;
 
-    if (screen_width) {
-        w = screen_width;
-        h = screen_height;
-    } else {
-        w = default_width;
-        h = default_height;
-    }
+    w = screen_width ? screen_width : default_width;
+    h = screen_height ? screen_height : default_height;
 
     if (!window_title)
         window_title = input_filename;

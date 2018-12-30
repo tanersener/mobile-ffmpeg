@@ -190,8 +190,8 @@ SARRAY  *sa;
  * \return  sarray, or NULL on error
  */
 SARRAY *
-sarrayCreateInitialized(l_int32  n,
-                        char    *initstr)
+sarrayCreateInitialized(l_int32      n,
+                        const char  *initstr)
 {
 l_int32  i;
 SARRAY  *sa;
@@ -442,10 +442,10 @@ sarrayClone(SARRAY  *sa)
  *          equivalent to L_NOCOPY.
  * </pre>
  */
-l_int32
-sarrayAddString(SARRAY  *sa,
-                char    *string,
-                l_int32  copyflag)
+l_ok
+sarrayAddString(SARRAY      *sa,
+                const char  *string,
+                l_int32      copyflag)
 {
 l_int32  n;
 
@@ -465,9 +465,8 @@ l_int32  n;
     if (copyflag == L_COPY)
         sa->array[n] = stringNew(string);
     else  /* L_INSERT or L_NOCOPY */
-        sa->array[n] = string;
+        sa->array[n] = (char *)string;
     sa->n++;
-
     return 0;
 }
 
@@ -554,7 +553,7 @@ l_int32  i, n, nalloc;
  *          current count.
  * </pre>
  */
-l_int32
+l_ok
 sarrayReplaceString(SARRAY  *sa,
                     l_int32  index,
                     char    *newstr,
@@ -591,7 +590,7 @@ l_int32  n;
  * \param[in]    sa string array
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 sarrayClear(SARRAY  *sa)
 {
 l_int32  i;
@@ -723,7 +722,7 @@ sarrayGetRefcount(SARRAY  *sa)
  * \param[in]    delta change to be applied
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 sarrayChangeRefcount(SARRAY  *sa,
                      l_int32  delta)
 {
@@ -877,7 +876,7 @@ l_int32  n, i, last, size, index, len;
  *      (1) Copies of the strings in sarray2 are added to sarray1.
  * </pre>
  */
-l_int32
+l_ok
 sarrayJoin(SARRAY  *sa1,
            SARRAY  *sa2)
 {
@@ -917,7 +916,7 @@ l_int32  n, i;
  *      (3) Use end == -1 to append to the end of sa2.
  * </pre>
  */
-l_int32
+l_ok
 sarrayAppendRange(SARRAY  *sa1,
                   SARRAY  *sa2,
                   l_int32  start,
@@ -969,10 +968,10 @@ l_int32  n, i;
  *          find a valid string at each index.
  * </pre>
  */
-l_int32
-sarrayPadToSameSize(SARRAY  *sa1,
-                    SARRAY  *sa2,
-                    char    *padstring)
+l_ok
+sarrayPadToSameSize(SARRAY      *sa1,
+                    SARRAY      *sa2,
+                    const char  *padstring)
 {
 l_int32  i, n1, n2;
 
@@ -1112,6 +1111,7 @@ char  *cstr, *substr, *saveptr;
         return ERROR_INT("separators not defined", procName, 1);
 
     cstr = stringNew(str);  /* preserves const-ness of input str */
+    saveptr = NULL;
     substr = strtokSafe(cstr, separators, &saveptr);
     if (substr)
         sarrayAddString(sa, substr, L_INSERT);
@@ -1473,7 +1473,7 @@ SARRAY  *sa;
  * \param[in]    sa string array
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 sarrayWrite(const char  *filename,
             SARRAY      *sa)
 {
@@ -1510,7 +1510,7 @@ FILE    *fp;
  *          off by sarrayReadStream().
  * </pre>
  */
-l_int32
+l_ok
 sarrayWriteStream(FILE    *fp,
                   SARRAY  *sa)
 {
@@ -1549,7 +1549,7 @@ l_int32  i, n, len;
  *      (1) Serializes a sarray in memory and puts the result in a buffer.
  * </pre>
  */
-l_int32
+l_ok
 sarrayWriteMem(l_uint8  **pdata,
                size_t    *psize,
                SARRAY    *sa)
@@ -1597,7 +1597,7 @@ FILE    *fp;
  * \param[in]    sa
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 sarrayAppend(const char  *filename,
              SARRAY      *sa)
 {
@@ -1796,11 +1796,11 @@ SARRAY  *saout;
          * of the sarray.  */
     num = 0;
     for (i = nfiles - 1; i >= 0; i--) {
-      fname = sarrayGetString(sa, i, L_NOCOPY);
-      num = extractNumberFromFilename(fname, numpre, numpost);
-      if (num < 0) continue;
-      num = L_MIN(num + 1, maxnum);
-      break;
+        fname = sarrayGetString(sa, i, L_NOCOPY);
+        num = extractNumberFromFilename(fname, numpre, numpost);
+        if (num < 0) continue;
+        num = L_MIN(num + 1, maxnum);
+        break;
     }
 
     if (num <= 0)  /* none found */
@@ -1808,16 +1808,17 @@ SARRAY  *saout;
 
         /* Insert pathnames into the output sarray.
          * Ignore numbers that are out of the range of sarray. */
-    saout = sarrayCreateInitialized(num, (char *)"");
+    saout = sarrayCreateInitialized(num, "");
     for (i = 0; i < nfiles; i++) {
-      fname = sarrayGetString(sa, i, L_NOCOPY);
-      index = extractNumberFromFilename(fname, numpre, numpost);
-      if (index < 0 || index >= num) continue;
-      str = sarrayGetString(saout, index, L_NOCOPY);
-      if (str[0] != '\0')
-          L_WARNING("\n  Multiple files with same number: %d\n",
-                    procName, index);
-      sarrayReplaceString(saout, index, fname, L_COPY);
+        fname = sarrayGetString(sa, i, L_NOCOPY);
+        index = extractNumberFromFilename(fname, numpre, numpost);
+        if (index < 0 || index >= num) continue;
+        str = sarrayGetString(saout, index, L_NOCOPY);
+        if (str[0] != '\0') {
+            L_WARNING("\n  Multiple files with same number: %d\n",
+                      procName, index);
+        }
+        sarrayReplaceString(saout, index, fname, L_COPY);
     }
 
     return saout;

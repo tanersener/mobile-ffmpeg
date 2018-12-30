@@ -44,7 +44,7 @@ case ${ARCH} in
     x86 | x86-64)
         CPU_SPECIFIC_OPTIONS+=" --enable-sse=yes"
     ;;
-    armv7 | armv7s | arm64)
+    armv7 | armv7s | arm64 | arm64e)
         CPU_SPECIFIC_OPTIONS+=" --enable-arm-neon=yes"
     ;;
 esac
@@ -59,7 +59,7 @@ if [[ ${RECONF_libpng} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
     --enable-static \
@@ -70,9 +70,9 @@ fi
     ${CPU_SPECIFIC_OPTIONS} \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libpng_package_config "1.6.35"
+create_libpng_package_config "1.6.36"
 
 make install || exit 1

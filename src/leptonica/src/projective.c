@@ -771,7 +771,7 @@ PTA     *ptad2, *ptas2;
  *  that is implemented in projectiveXformSampled and
  *  projectiveXFormInterpolated.
  */
-l_int32
+l_ok
 getProjectiveXformCoeffs(PTA         *ptas,
                          PTA         *ptad,
                          l_float32  **pvc)
@@ -872,7 +872,7 @@ l_float32  *a[8];  /* 8x8 matrix A  */
  *      (2) It does not check ptrs for returned data!
  * </pre>
  */
-l_int32
+l_ok
 projectiveXformSampledPt(l_float32  *vc,
                          l_int32     x,
                          l_int32     y,
@@ -907,7 +907,7 @@ l_float32  factor;
  *      (2) It does not check ptrs for returned data!
  * </pre>
  */
-l_int32
+l_ok
 projectiveXformPt(l_float32  *vc,
                   l_int32     x,
                   l_int32     y,

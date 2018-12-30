@@ -263,7 +263,7 @@ L_DNA   *da;
  * \param[in]    value  float value to be appended to the specific dna
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 l_dnaHashAdd(L_DNAHASH  *dahash,
              l_uint64    key,
              l_float64   value)
@@ -346,7 +346,7 @@ L_DNAHASH  *dahash;
  *              l_dnaFindValByHash(dad, dahash, val, &index)
  * </pre>
  */
-l_int32
+l_ok
 l_dnaRemoveDupsByHash(L_DNA       *das,
                       L_DNA      **pdad,
                       L_DNAHASH  **pdahash)
@@ -417,7 +417,7 @@ L_DNAHASH  *dahash;
  *                  icount = 0;
  * </pre>
  */
-l_int32
+l_ok
 l_dnaMakeHistoByHash(L_DNA       *das,
                      L_DNAHASH  **pdahash,
                      L_DNA      **pdav,
@@ -549,7 +549,7 @@ L_DNA      *da_small, *da_big, *dad;
  *                the dna of indices looking for %val in %da.
  * </pre>
  */
-l_int32
+l_ok
 l_dnaFindValByHash(L_DNA      *da,
                    L_DNAHASH  *dahash,
                    l_float64   val,

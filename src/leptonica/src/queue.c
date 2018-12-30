@@ -183,7 +183,7 @@ L_QUEUE  *lq;
  *          Finally, add the item to the tail of the queue.
  * </pre>
  */
-l_int32
+l_ok
 lqueueAdd(L_QUEUE  *lq,
           void     *item)
 {
@@ -301,7 +301,7 @@ lqueueGetCount(L_QUEUE  *lq)
  * \param[in]    lq lqueue
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 lqueuePrint(FILE     *fp,
             L_QUEUE  *lq)
 {

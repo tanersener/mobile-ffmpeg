@@ -94,7 +94,7 @@
  *          this region unchanged.
  * </pre>
  */
-l_int32
+l_ok
 pixSetSelectCmap(PIX     *pixs,
                  BOX     *box,
                  l_int32  sindex,
@@ -215,7 +215,7 @@ PIXCMAP   *cmap;
  *          second because their value exceeds the size of the map.
  * </pre>
  */
-l_int32
+l_ok
 pixColorGrayRegionsCmap(PIX     *pixs,
                         BOXA    *boxa,
                         l_int32  type,
@@ -323,7 +323,7 @@ PIXCMAP   *cmap;
  *          original pixel color.
  * </pre>
  */
-l_int32
+l_ok
 pixColorGrayCmap(PIX     *pixs,
                  BOX     *box,
                  l_int32  type,
@@ -391,7 +391,7 @@ PIXCMAP  *cmap;
  *          for this expansion, it returns 1 (error).
  * </pre>
  */
-l_int32
+l_ok
 pixColorGrayMaskedCmap(PIX     *pixs,
                        PIX     *pixm,
                        l_int32  type,
@@ -488,7 +488,7 @@ PIXCMAP   *cmap;
  *      (5) See pixColorGrayCmap() for usage.
  * </pre>
  */
-l_int32
+l_ok
 addColorizedGrayToCmap(PIXCMAP  *cmap,
                        l_int32   type,
                        l_int32   rval,
@@ -579,7 +579,7 @@ NUMA    *na;
  *          is full, an error is returned.
  * </pre>
  */
-l_int32
+l_ok
 pixSetSelectMaskedCmap(PIX     *pixs,
                        PIX     *pixm,
                        l_int32  x,
@@ -689,7 +689,7 @@ PIXCMAP   *cmap;
  *          colormap is already full.
  * </pre>
  */
-l_int32
+l_ok
 pixSetMaskedCmap(PIX      *pixs,
                  PIX      *pixm,
                  l_int32   x,

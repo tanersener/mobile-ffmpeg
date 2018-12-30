@@ -75,12 +75,12 @@ This work is licensed under a <a rel="license" href="http://creativecommons.org/
  -  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *====================================================================*/
 
-README (version 1.76.0)
-File update: 1 May 2018
+README (version 1.77.0)
+File update: 14 Dec 2018
 ---------------------------
 
-gunzip leptonica-1.76.0.tar.gz
-tar -xvf leptonica-1.76.0.tar
+gunzip leptonica-1.77.0.tar.gz
+tar -xvf leptonica-1.77.0.tar
 
 </pre>
 
@@ -89,6 +89,7 @@ tar -xvf leptonica-1.76.0.tar
 <P>
 <A HREF="#BUILDING">Building leptonica</A><br>
 <A HREF="#DEPENDENCIES">I/O libraries leptonica is dependent on</A><br>
+<A HREF="#DOXYGEN">Generating documentation using doxygen</A><br>
 <A HREF="#DEVELOP">Developing with leptonica</A><br>
 <A HREF="#CONTENTS">What's in leptonica?</A><br>
 <P>
@@ -116,7 +117,7 @@ Building leptonica
   Libraries, executables and prototypes are easily made, as described below.
 
   When you extract from the archive, all files are put in a
-  subdirectory 'leptonica-1.76.0'.  In that directory you will
+  subdirectory 'leptonica-1.77.0'.  In that directory you will
   find a src directory containing the source files for the library,
   and a prog directory containing source files for various
   testing and example programs.
@@ -251,7 +252,7 @@ Building leptonica
             make install
 
        Configure also supports building in a separate directory from the
-       source.  Run "/(path-to)/leptonica-1.76.0/configure" and then "make"
+       source.  Run "/(path-to)/leptonica-1.77.0/configure" and then "make"
        from the desired build directory.
 
        Configure has a number of useful options; run "configure --help" for
@@ -446,6 +447,23 @@ I/O libraries leptonica is dependent on
 </pre>
 
 
+<h2> <A NAME="DOXYGEN">
+Generating documentation using doxygen
+</h2>
+
+<pre>
+The source code is set up to allow generation of documentation using doxygen.
+To do this:
+(1) Download the Debian doxygen package:
+     sudo apt-get install doxygen
+(2) In the root client directory containing Doxyfile:
+     doxygen Doxyfile
+The documentation will be generated in a 'doc' subdirectory, accessible
+from this file (relative to the root)
+    ./doc/html/index.html
+</pre>
+
+
 <h2> <A NAME="DEVELOP">
 Developing with leptonica
 </h2>
@@ -488,7 +506,7 @@ that you are using the static makefiles and customizing environ.h.
 2. Global parameter to enable development and testing
 
    For security reasons, with the exception of the regression utility
-   (regutils.c), leptonica as shipped (starting with 1.76) does not allow:
+   (regutils.c), leptonica as shipped (starting with 1.77) does not allow:
       * 'system(3)' fork/exec
       * writes to temp files with compiled-in names
    System calls are used either to run gnuplot or display an image on
@@ -1096,13 +1114,13 @@ What's in leptonica?
    http://code.google.com/p/leptonica, as well as all versions after 1.60.
    These have now been transferred by Egor Pugin to github:
        github.com/danbloomberg/leptonica
-   where all releases (1.42 - 1.76.0) are available; e.g.,
-       https://github.com/DanBloomberg/leptonica/releases/tag/1.76.0
+   where all releases (1.42 - 1.77.0) are available; e.g.,
+       https://github.com/DanBloomberg/leptonica/releases/tag/1.77.0
    Most recent releases from 1.67 are also available at
        leptonica.org/download.html
    Note that if you are downloading from github, the releases are more
    likely to be stable than the master.  Also, if you download from
-   the master you need to run the autobuild script to generate the
+   the master you need to run the autogen.sh script to generate the
    configure program and the Makefiles.
 
    The number of downloads of leptonica increased by nearly an order
@@ -1118,6 +1136,7 @@ What's in leptonica?
         1.74 : 5.1.0
         1.75 : 5.2.0
         1.76 : 5.3.0
+        1.77 : 5.3.0
 
    A brief version chronology is maintained in version-notes.html.
    Starting with gcc 4.3.3, error warnings (-Werror) are given for

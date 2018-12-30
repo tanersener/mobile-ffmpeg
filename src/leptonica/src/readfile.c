@@ -88,6 +88,7 @@ static const char *FILE_RLE  =  "/tmp/lept/format/file_rle.tif";
 static const char *FILE_PB   =  "/tmp/lept/format/file_packbits.tif";
 static const char *FILE_LZW  =  "/tmp/lept/format/file_lzw.tif";
 static const char *FILE_ZIP  =  "/tmp/lept/format/file_zip.tif";
+static const char *FILE_TIFF_JPEG =  "/tmp/lept/format/file_jpeg.tif";
 static const char *FILE_TIFF =  "/tmp/lept/format/file.tif";
 static const char *FILE_JPG  =  "/tmp/lept/format/file.jpg";
 static const char *FILE_GIF  =  "/tmp/lept/format/file.gif";
@@ -317,9 +318,10 @@ PIX *
 pixReadStream(FILE    *fp,
               l_int32  hint)
 {
-l_int32   format, ret;
+l_int32   format, ret, valid;
 l_uint8  *comment;
 PIX      *pix;
+PIXCMAP  *cmap;
 
     PROCNAME("pixReadStream");
 
@@ -356,6 +358,7 @@ PIX      *pix;
     case IFF_TIFF_G4:
     case IFF_TIFF_LZW:
     case IFF_TIFF_ZIP:
+    case IFF_TIFF_JPEG:
         if ((pix = pixReadStreamTiff(fp, 0)) == NULL)  /* page 0 by default */
             return (PIX *)ERROR_PTR("tiff: no pix returned", procName, NULL);
         break;
@@ -399,8 +402,16 @@ PIX      *pix;
         break;
     }
 
-    if (pix)
+    if (pix) {
         pixSetInputFormat(pix, format);
+        if ((cmap = pixGetColormap(pix))) {
+            pixcmapIsValid(cmap, &valid);
+            if (!valid) {
+                pixDestroy(&pix);
+                return (PIX *)ERROR_PTR("invalid colormap", procName, NULL);
+            }
+        }
+    }
     return pix;
 }
 
@@ -427,7 +438,7 @@ PIX      *pix;
  *          from which we extract the "header" information.
  * </pre>
  */
-l_int32
+l_ok
 pixReadHeader(const char  *filename,
               l_int32     *pformat,
               l_int32     *pw,
@@ -491,6 +502,7 @@ PIX     *pix;
     case IFF_TIFF_G4:
     case IFF_TIFF_LZW:
     case IFF_TIFF_ZIP:
+    case IFF_TIFF_JPEG:
             /* Reading page 0 by default; possibly redefine format */
         ret = readHeaderTiff(filename, 0, &w, &h, &bps, &spp, NULL, &iscmap,
                              &format);
@@ -564,7 +576,7 @@ PIX     *pix;
  * \param[out]   pformat    found format
  * \return  0 if OK, 1 on error or if format is not recognized
  */
-l_int32
+l_ok
 findFileFormat(const char  *filename,
                l_int32     *pformat)
 {
@@ -599,7 +611,7 @@ FILE    *fp;
  *      (1) Important: Side effect -- this resets fp to BOF.
  * </pre>
  */
-l_int32
+l_ok
 findFileFormatStream(FILE     *fp,
                      l_int32  *pformat)
 {
@@ -618,7 +630,7 @@ l_int32  format;
     if (fnbytesInFile(fp) < 12)
         return ERROR_INT("truncated file", procName, 1);
 
-    if (fread((char *)&firstbytes, 1, 12, fp) != 12)
+    if (fread(&firstbytes, 1, 12, fp) != 12)
         return ERROR_INT("failed to read first 12 bytes of file", procName, 1);
     rewind(fp);
 
@@ -650,7 +662,7 @@ l_int32  format;
  *          compression is then determined using findTiffCompression().
  * </pre>
  */
-l_int32
+l_ok
 findFileFormatBuffer(const l_uint8  *buf,
                      l_int32        *pformat)
 {
@@ -734,8 +746,8 @@ l_uint16  twobytepw;
     }
 
         /* Check for both types of jp2k file */
-    if (strncmp((const char *)buf, (char *)JP2K_CODESTREAM, 4) == 0 ||
-        strncmp((const char *)buf, (char *)JP2K_IMAGE_DATA, 12) == 0) {
+    if (memcmp(buf, JP2K_CODESTREAM, 4) == 0 ||
+        memcmp(buf, JP2K_IMAGE_DATA, 12) == 0) {
         *pformat = IFF_JP2;
         return 0;
     }
@@ -793,7 +805,7 @@ l_int32  format;
     if (format == IFF_TIFF || format == IFF_TIFF_PACKBITS ||
         format == IFF_TIFF_RLE || format == IFF_TIFF_G3 ||
         format == IFF_TIFF_G4 || format == IFF_TIFF_LZW ||
-        format == IFF_TIFF_ZIP)
+        format == IFF_TIFF_ZIP || format == IFF_TIFF_JPEG)
         return 1;
     else
         return 0;
@@ -827,8 +839,9 @@ PIX *
 pixReadMem(const l_uint8  *data,
            size_t          size)
 {
-l_int32  format;
-PIX     *pix;
+l_int32   format, valid;
+PIX      *pix;
+PIXCMAP  *cmap;
 
     PROCNAME("pixReadMem");
 
@@ -908,13 +921,20 @@ PIX     *pix;
     }
 
         /* Set the input format.  For tiff reading from memory we lose
-         * the actual input format; for 1 bpp, default to G4.  */
+         * the actual input format; for 1 bpp, default to G4.  Also
+         * verify that the colormap is valid.  */
     if (pix) {
         if (format == IFF_TIFF && pixGetDepth(pix) == 1)
             format = IFF_TIFF_G4;
         pixSetInputFormat(pix, format);
+        if ((cmap = pixGetColormap(pix))) {
+            pixcmapIsValid(cmap, &valid);
+            if (!valid) {
+                pixDestroy(&pix);
+                return (PIX *)ERROR_PTR("invalid colormap", procName, NULL);
+            }
+        }
     }
-
     return pix;
 }
 
@@ -944,7 +964,7 @@ PIX     *pix;
  *          the format, which we require.
  * </pre>
  */
-l_int32
+l_ok
 pixReadHeaderMem(const l_uint8  *data,
                  size_t          size,
                  l_int32        *pformat,
@@ -1005,6 +1025,7 @@ PIX     *pix;
     case IFF_TIFF_G4:
     case IFF_TIFF_LZW:
     case IFF_TIFF_ZIP:
+    case IFF_TIFF_JPEG:
             /* Reading page 0 by default; possibly redefine format */
         ret = readHeaderMemTiff(data, size, 0, &w, &h, &bps, &spp,
                                 NULL, &iscmap, &format);
@@ -1076,7 +1097,7 @@ extern const char *ImageFileFormatExtensions[];
  * \brief   writeImageFileInfo()
  *
  * \param[in]    filename    input file
- * \param[in]    fp          output file stream
+ * \param[in]    fpout       output file stream
  * \param[in]    headeronly  1 to read only the header; 0 to read both
  *                           the header and the input file
  * \return  0 if OK; 1 on error
@@ -1090,7 +1111,7 @@ extern const char *ImageFileFormatExtensions[];
  *          var_PNG_STRIP_16_TO_8 to 1 (the default).
  * </pre>
  */
-l_int32
+l_ok
 writeImageFileInfo(const char  *filename,
                    FILE        *fpout,
                    l_int32      headeronly)
@@ -1258,7 +1279,7 @@ PIXCMAP  *cmap;
  *          or HAVE_LIBTIFF are 0, respectively.
  * </pre>
  */
-l_int32
+l_ok
 ioFormatTest(const char  *filename)
 {
 l_int32    w, h, d, depth, equal, problems;
@@ -1402,6 +1423,37 @@ PIXCMAP   *cmap;
         problems = TRUE;
     }
     pixDestroy(&pix1);
+
+        /* tiff jpeg encoding works for grayscale and rgb */
+    if (d == 8 || d == 32) {
+        PIX  *pixc1;
+        L_INFO("write/read jpeg compressed tiff\n", procName);
+        if (d == 8 && pixGetColormap(pixc)) {
+            pixc1 = pixRemoveColormap(pixc, REMOVE_CMAP_BASED_ON_SRC);
+            pixWrite(FILE_TIFF_JPEG, pixc1, IFF_TIFF_JPEG);
+            if ((pix1 = pixRead(FILE_TIFF_JPEG)) == NULL) {
+                L_INFO(" did not read FILE_TIFF_JPEG\n", procName);
+                problems = TRUE;
+            }
+            pixDestroy(&pixc1);
+        } else {
+            pixWrite(FILE_TIFF_JPEG, pixc, IFF_TIFF_JPEG);
+            pix1 = pixRead(FILE_TIFF_JPEG);
+            if (d == 8) {
+                pixCompareGray(pix1, pixc, L_COMPARE_ABS_DIFF, 0, NULL, &diff,
+                               NULL, NULL);
+            } else {
+                pixCompareRGB(pix1, pixc, L_COMPARE_ABS_DIFF, 0, NULL, &diff,
+                              NULL, NULL);
+            }
+            if (diff > 8.0) {
+                L_INFO("   **** bad tiff jpeg compressed image: "
+                       "d = %d, diff = %5.2f ****\n", procName, d, diff);
+                problems = TRUE;
+            }
+        }
+        pixDestroy(&pix1);
+    }
 
         /* tiff g4, g3, rle and packbits work for 1 bpp */
     if (d == 1) {

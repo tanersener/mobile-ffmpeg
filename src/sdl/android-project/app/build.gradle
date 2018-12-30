@@ -8,22 +8,21 @@ else {
 }
 
 android {
-    compileSdkVersion 19
-    buildToolsVersion "26.0.1"
+    compileSdkVersion 26
     defaultConfig {
         if (buildAsApplication) {
             applicationId "org.libsdl.app"
         }
         minSdkVersion 14
-        targetSdkVersion 19
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
             ndkBuild {
                 arguments "APP_PLATFORM=android-14"
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
             }
         }
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {
@@ -60,9 +59,5 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    testCompile 'junit:junit:4.12'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
 }

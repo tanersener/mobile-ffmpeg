@@ -55,6 +55,7 @@ TARGETS = \
 	testrumble$(EXE) \
 	testscale$(EXE) \
 	testsem$(EXE) \
+	testsensor$(EXE) \
 	testshader$(EXE) \
 	testshape$(EXE) \
 	testsprite2$(EXE) \
@@ -240,6 +241,9 @@ testscale$(EXE): $(srcdir)/testscale.c
 testsem$(EXE): $(srcdir)/testsem.c
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
 
+testsensor$(EXE): $(srcdir)/testsensor.c
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
 testshader$(EXE): $(srcdir)/testshader.c
 	$(CC) -o $@ $^ $(CFLAGS) $(LIBS) @GLLIB@ @MATHLIB@
 
@@ -313,7 +317,10 @@ distclean: clean
 %.wav: $(srcdir)/%.wav
 	cp $< $@
 
-copydatafiles: copybmpfiles copywavfiles
+%.dat: $(srcdir)/%.dat
+	cp $< $@
+
+copydatafiles: copybmpfiles copywavfiles copydatfiles
 .PHONY : copydatafiles
 
 copybmpfiles: $(foreach bmp,$(wildcard $(srcdir)/*.bmp),$(notdir $(bmp)))
@@ -321,4 +328,7 @@ copybmpfiles: $(foreach bmp,$(wildcard $(srcdir)/*.bmp),$(notdir $(bmp)))
 
 copywavfiles: $(foreach wav,$(wildcard $(srcdir)/*.wav),$(notdir $(wav)))
 .PHONY : copywavfiles
+
+copydatfiles: $(foreach dat,$(wildcard $(srcdir)/*.dat),$(notdir $(dat)))
+.PHONY : copydatfiles
 

@@ -40,34 +40,34 @@
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixConvertToPdfData(PIX *pix, l_int32 type, l_int32 quality,
-                            l_uint8 **pdata, size_t *pnbytes,
-                            l_int32 x, l_int32 y, l_int32 res,
-                            const char *title,
-                            L_PDF_DATA **plpd, l_int32 position)
+l_ok pixConvertToPdfData(PIX *pix, l_int32 type, l_int32 quality,
+                         l_uint8 **pdata, size_t *pnbytes,
+                         l_int32 x, l_int32 y, l_int32 res,
+                         const char *title,
+                         L_PDF_DATA **plpd, l_int32 position)
 {
     return ERROR_INT("function not present", "pixConvertToPdfData", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 ptraConcatenatePdfToData(L_PTRA *pa_data, SARRAY *sa,
-                                 l_uint8 **pdata, size_t *pnbytes)
+l_ok ptraConcatenatePdfToData(L_PTRA *pa_data, SARRAY *sa,
+                              l_uint8 **pdata, size_t *pnbytes)
 {
     return ERROR_INT("function not present", "ptraConcatenatePdfToData", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 convertTiffMultipageToPdf(const char *filein, const char *fileout)
+l_ok convertTiffMultipageToPdf(const char *filein, const char *fileout)
 {
     return ERROR_INT("function not present", "convertTiffMultipageToPdf", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 l_generateCIDataForPdf(const char *fname, PIX *pix, l_int32 quality,
-                               L_COMP_DATA **pcid)
+l_ok l_generateCIDataForPdf(const char *fname, PIX *pix, l_int32 quality,
+                            L_COMP_DATA **pcid)
 {
     return ERROR_INT("function not present", "l_generateCIDataForPdf", 1);
 }
@@ -99,24 +99,16 @@ L_COMP_DATA * l_generateJpegDataMem(l_uint8 *data, size_t nbytes,
 
 /* ----------------------------------------------------------------------*/
 
-L_COMP_DATA * l_generateJp2kData(const char *fname)
-{
-    return (L_COMP_DATA *)ERROR_PTR("function not present",
-                                    "l_generateJp2kData", NULL);
-}
-
-/* ----------------------------------------------------------------------*/
-
-l_int32 l_generateCIData(const char *fname, l_int32 type, l_int32 quality,
-                         l_int32 ascii85, L_COMP_DATA **pcid)
+l_ok l_generateCIData(const char *fname, l_int32 type, l_int32 quality,
+                      l_int32 ascii85, L_COMP_DATA **pcid)
 {
     return ERROR_INT("function not present", "l_generateCIData", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixGenerateCIData(PIX *pixs, l_int32 type, l_int32 quality,
-                          l_int32 ascii85, L_COMP_DATA **pcid)
+l_ok pixGenerateCIData(PIX *pixs, l_int32 type, l_int32 quality,
+                       l_int32 ascii85, L_COMP_DATA **pcid)
 {
     return ERROR_INT("function not present", "pixGenerateCIData", 1);
 }
@@ -139,8 +131,8 @@ L_COMP_DATA * l_generateG4Data(const char *fname, l_int32 ascii85flag)
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 cidConvertToPdfData(L_COMP_DATA *cid, const char *title,
-                            l_uint8 **pdata, size_t *pnbytes)
+l_ok cidConvertToPdfData(L_COMP_DATA *cid, const char *title,
+                         l_uint8 **pdata, size_t *pnbytes)
 {
     return ERROR_INT("function not present", "cidConvertToPdfData", 1);
 }

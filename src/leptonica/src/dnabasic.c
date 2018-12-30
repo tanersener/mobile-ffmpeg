@@ -411,7 +411,7 @@ l_dnaClone(L_DNA  *da)
  *          the array appears to be empty.
  * </pre>
  */
-l_int32
+l_ok
 l_dnaEmpty(L_DNA  *da)
 {
     PROCNAME("l_dnaEmpty");
@@ -435,7 +435,7 @@ l_dnaEmpty(L_DNA  *da)
  * \param[in]    val  float or int to be added; stored as a float
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaAddNumber(L_DNA     *da,
                l_float64  val)
 {
@@ -496,7 +496,7 @@ l_dnaExtendArray(L_DNA  *da)
  *
  * </pre>
  */
-l_int32
+l_ok
 l_dnaInsertNumber(L_DNA      *da,
                   l_int32    index,
                   l_float64  val)
@@ -535,7 +535,7 @@ l_int32  i, n;
  *          because the function is O(n).
  * </pre>
  */
-l_int32
+l_ok
 l_dnaRemoveNumber(L_DNA   *da,
                   l_int32  index)
 {
@@ -564,7 +564,7 @@ l_int32  i, n;
  * \param[in]    val new value to replace old one
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaReplaceNumber(L_DNA     *da,
                    l_int32    index,
                    l_float64  val)
@@ -620,7 +620,7 @@ l_dnaGetCount(L_DNA  *da)
  *      (3) All the previously unused values in da are set to 0.0.
  * </pre>
  */
-l_int32
+l_ok
 l_dnaSetCount(L_DNA   *da,
               l_int32  newcount)
 {
@@ -654,7 +654,7 @@ l_dnaSetCount(L_DNA   *da,
  *          decide if a 0.0 in the returned ival is valid.
  * </pre>
  */
-l_int32
+l_ok
 l_dnaGetDValue(L_DNA      *da,
                l_int32     index,
                l_float64  *pval)
@@ -689,7 +689,7 @@ l_dnaGetDValue(L_DNA      *da,
  *          decide if a 0 in the returned ival is valid.
  * </pre>
  */
-l_int32
+l_ok
 l_dnaGetIValue(L_DNA    *da,
                l_int32   index,
                l_int32  *pival)
@@ -721,7 +721,7 @@ l_float64  val;
  * \param[in]    val  to set element
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 l_dnaSetValue(L_DNA     *da,
               l_int32    index,
               l_float64  val)
@@ -746,7 +746,7 @@ l_dnaSetValue(L_DNA     *da,
  * \param[in]    diff  increment if diff > 0 or decrement if diff < 0
  * \return  0 if OK; 1 on error
  */
-l_int32
+l_ok
 l_dnaShiftValue(L_DNA     *da,
                 l_int32    index,
                 l_float64  diff)
@@ -877,7 +877,7 @@ l_dnaGetRefcount(L_DNA  *da)
  * \param[in]    delta change to be applied
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaChangeRefcount(L_DNA   *da,
                     l_int32  delta)
 {
@@ -898,7 +898,7 @@ l_dnaChangeRefcount(L_DNA   *da,
  * \param[out]   pdelx [optional] delx
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaGetParameters(L_DNA     *da,
                    l_float64  *pstartx,
                    l_float64  *pdelx)
@@ -928,7 +928,7 @@ l_dnaGetParameters(L_DNA     *da,
  *                    function at equal intervals of size %delx
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaSetParameters(L_DNA     *da,
                    l_float64  startx,
                    l_float64  delx)
@@ -951,7 +951,7 @@ l_dnaSetParameters(L_DNA     *da,
  * \param[in]    das source DNuma
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaCopyParameters(L_DNA  *dad,
                     L_DNA  *das)
 {
@@ -1052,7 +1052,7 @@ L_DNA     *da;
  * \param[in]    filename, da
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaWrite(const char  *filename,
            L_DNA       *da)
 {
@@ -1083,7 +1083,7 @@ FILE    *fp;
  * \param[in]    da
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaWriteStream(FILE   *fp,
                  L_DNA  *da)
 {
@@ -1190,7 +1190,7 @@ L_DNA   *da;
  *          index, and resets the count.
  * </pre>
  */
-l_int32
+l_ok
 l_dnaaTruncate(L_DNAA  *daa)
 {
 l_int32  i, n, nn;
@@ -1261,7 +1261,7 @@ L_DNAA  *daa;
  * \param[in]    copyflag  L_INSERT, L_COPY, L_CLONE
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaaAddDna(L_DNAA  *daa,
              L_DNA   *da,
              l_int32  copyflag)
@@ -1434,7 +1434,7 @@ l_dnaaGetDna(L_DNAA  *daa,
  *      (2) If the index is invalid, return 1 (error)
  * </pre>
  */
-l_int32
+l_ok
 l_dnaaReplaceDna(L_DNAA  *daa,
                  l_int32  index,
                  L_DNA   *da)
@@ -1466,7 +1466,7 @@ l_int32  n;
  * \param[out]   pval double value
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaaGetValue(L_DNAA     *daa,
                l_int32     i,
                l_int32     j,
@@ -1506,7 +1506,7 @@ L_DNA   *da;
  *      (1) Adds to an existing l_dna only.
  * </pre>
  */
-l_int32
+l_ok
 l_dnaaAddNumber(L_DNAA    *daa,
                 l_int32    index,
                 l_float64  val)
@@ -1609,7 +1609,7 @@ L_DNAA    *daa;
  * \param[in]    filename, daa
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaaWrite(const char  *filename,
             L_DNAA      *daa)
 {
@@ -1640,7 +1640,7 @@ FILE    *fp;
  * \param[in]    daa
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 l_dnaaWriteStream(FILE    *fp,
                   L_DNAA  *daa)
 {

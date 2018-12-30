@@ -33,7 +33,9 @@
  *    |=============================================================|
  *    | Some of these functions require libtiff, libjpeg and libz.  |
  *    | If you do not have these libraries, you must set            |
+ *    | \code                                                       |
  *    |     #define  USE_PSIO     0                                 |
+ *    | \endcode                                                    |
  *    | in environ.h.  This will link psio1stub.c                   |
  *    |=============================================================|
  *
@@ -111,15 +113,16 @@
  *                Convert files in a directory to PS           *
  *-------------------------------------------------------------*/
 /*
- *  convertFilesToPS()
+ * \brief   convertFilesToPS()
  *
- *      Input:  dirin (input directory)
- *              substr (<optional> substring filter on filenames; can be NULL)
- *              res (typ. 300 or 600 ppi)
- *              fileout (output ps file)
- *      Return: 0 if OK, 1 on error
+ * \param[in]  dirin    input directory
+ * \param[in]  substr   [optional] substring filter on filenames; can be NULL
+ * \param[in]  res      typ. 300 or 600 ppi
+ * \param[in]  fileout  output ps file
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This generates a PS file for all image files in a specified
  *          directory that contain the substr pattern to be matched.
  *      (2) Each image is written to a separate page in the output PS file.
@@ -145,8 +148,9 @@
  *          the image to the output resolution before wrapping in PS.
  *      (6) The "canvas" on which the image is rendered, at the given
  *          output resolution, is a standard page size (8.5 x 11 in).
+ * </pre>
  */
-l_int32
+l_ok
 convertFilesToPS(const char  *dirin,
                  const char  *substr,
                  l_int32      res,
@@ -180,17 +184,20 @@ SARRAY  *sa;
 
 
 /*
- *  sarrayConvertFilesToPS()
+
+ * \brief    sarrayConvertFilesToPS()
  *
- *      Input:  sarray (of full path names)
- *              res (typ. 300 or 600 ppi)
- *              fileout (output ps file)
- *      Return: 0 if OK, 1 on error
+ * \param[in]  sarray   of full path names
+ * \param[in]  res      typ. 300 or 600 ppi
+ * \param[in]  fileout  output ps file
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
- *      (1) See convertFilesToPS()
+ * <pre>
+ * Notes:
+ *     (1) See convertFilesToPS()
+ * </pre>
  */
-l_int32
+l_ok
 sarrayConvertFilesToPS(SARRAY      *sa,
                        l_int32      res,
                        const char  *fileout)
@@ -228,15 +235,17 @@ l_int32  i, nfiles, index, firstfile, ret, format;
 
 
 /*
- *  convertFilesFittedToPS()
+ * \brief   convertFilesFittedToPS()
  *
- *      Input:  dirin (input directory)
- *              substr (<optional> substring filter on filenames; can be NULL)
- *              xpts, ypts (desired size in printer points; use 0 for default)
- *              fileout (output ps file)
- *      Return: 0 if OK, 1 on error
+ * \param[in]  dirin    input directory
+ * \param[in]  substr   [optional] substring filter on filenames; can be NULL)
+ * \param[in]  xpts     desired size in printer points; use 0 for default
+ * \param[in]  ypts     desired size in printer points; use 0 for default
+ * \param[in]  fileout  output ps file
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This generates a PS file for all files in a specified directory
  *          that contain the substr pattern to be matched.
  *      (2) Each image is written to a separate page in the output PS file.
@@ -254,8 +263,9 @@ l_int32  i, nfiles, index, firstfile, ret, format;
  *      (5) The size of the PostScript file is independent of the resolution,
  *          because the entire file is encoded.  The %xpts and %ypts
  *          parameter tells the PS decomposer how to render the page.
+ * </pre>
  */
-l_int32
+l_ok
 convertFilesFittedToPS(const char  *dirin,
                        const char  *substr,
                        l_float32    xpts,
@@ -294,17 +304,20 @@ SARRAY  *sa;
 
 
 /*
- *  sarrayConvertFilesFittedToPS()
+ * \brief  sarrayConvertFilesFittedToPS()
  *
- *      Input:  sarray (of full path names)
- *              xpts, ypts (desired size in printer points; use 0 for default)
- *              fileout (output ps file)
- *      Return: 0 if OK, 1 on error
+ * \param[in]  sarray   of full path names
+ * \param[in]  xpts     desired size in printer points; use 0 for default
+ * \param[in]  ypts     desired size in printer points; use 0 for default
+ * \param[in]  fileout  output ps file
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
- *      (1) See convertFilesFittedToPS()
+ * <pre>
+ * Notes:
+ *     (1) See convertFilesFittedToPS()
+ * </pre>
  */
-l_int32
+l_ok
 sarrayConvertFilesFittedToPS(SARRAY      *sa,
                              l_float32    xpts,
                              l_float32    ypts,
@@ -353,17 +366,17 @@ l_int32  ret, i, w, h, nfiles, index, firstfile, format, res;
 
 
 /*
- *  writeImageCompressedToPSFile()
+ * \brief   writeImageCompressedToPSFile()
  *
- *      Input:  filein (input image file)
- *              fileout (output ps file)
- *              res (output printer resolution)
- *              &firstfile (<input and return> 1 if the first image;
- *                          0 otherwise)
- *              &index (<input and return> index of image in output ps file)
- *      Return: 0 if OK, 1 on error
+ * \param[in]     filein      input image file
+ * \param[in]     fileout     output ps file
+ * \param[in]     res         output printer resolution
+ * \param[in,out] pfirstfile  1 if the first image; 0 otherwise
+ * \param[in,out] pindex      index of image in output ps file
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This wraps a single page image in PS.
  *      (2) The input file can be in any format.  It is compressed as follows:
  *             * if in tiffg4  -->  use ccittg4
@@ -372,8 +385,9 @@ l_int32  ret, i, w, h, nfiles, index, firstfile, format, res;
  *      (3) Before the first call, set %firstpage = 1.  After writing
  *          the first page, it will be set to 0.
  *      (4) %index is incremented if the page is successfully written.
+ * </pre>
  */
-l_int32
+l_ok
 writeImageCompressedToPSFile(const char  *filein,
                              const char  *fileout,
                              l_int32      res,
@@ -426,25 +440,26 @@ l_int32      format, retval;
  *              Convert mixed text/image files to PS           *
  *-------------------------------------------------------------*/
 /*
- *  convertSegmentedPagesToPS()
+ * \brief  convertSegmentedPagesToPS()
  *
- *      Input:  pagedir (input page image directory)
- *              pagestr (<optional> substring filter on page filenames;
- *                       can be NULL)
- *              page_numpre (number of characters in page name before number)
- *              maskdir (input mask image directory)
- *              maskstr (<optional> substring filter on mask filenames;
- *                       can be NULL)
- *              mask_numpre (number of characters in mask name before number)
- *              numpost (number of characters in names after number)
- *              maxnum (only consider page numbers up to this value)
- *              textscale (scale of text output relative to pixs)
- *              imagescale (scale of image output relative to pixs)
- *              threshold (for binarization; typ. about 190; 0 for default)
- *              fileout (output ps file)
- *      Return: 0 if OK, 1 on error
+ * \param[in]     pagedir      input page image directory
+ * \param[in]     pagestr      [optional] substring filter on page filenames;
+ *                             can be NULL
+ * \param[in]     page_numpre  number of characters in page name before number
+ * \param[in]     maskdir      input mask image directory
+ * \param[in]     maskstr      [optional] substring filter on mask filenames;
+ *                             can be NULL
+ * \param[in]     mask_numpre  number of characters in mask name before number
+ * \param[in]     numpost      number of characters in names after number
+ * \param[in]     maxnum       only consider page numbers up to this value
+ * \param[in]     textscale    scale of text output relative to pixs
+ * \param[in]     imagescale   scale of image output relative to pixs
+ * \param[in]     threshold    for binarization; typ. about 190; 0 for default
+ * \param[in]     fileout      output ps file
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This generates a PS file for all page image and mask files in two
  *          specified directories and that contain the page numbers as
  *          specified below.  The two directories can be the same, in which
@@ -477,8 +492,9 @@ l_int32      format, retval;
  *          of any pixels -- use a mask in the mask directory that is
  *          full size with all pixels set to 1.  If the page is 1 bpp,
  *          it is not necessary to have a mask.
+ * </pre>
  */
-l_int32
+l_ok
 convertSegmentedPagesToPS(const char  *pagedir,
                           const char  *pagestr,
                           l_int32      page_numpre,
@@ -514,7 +530,7 @@ SARRAY  *sapage, *samask;
                                              page_numpre, numpost, maxnum);
     samask = getNumberedPathnamesInDirectory(maskdir, maskstr,
                                              mask_numpre, numpost, maxnum);
-    sarrayPadToSameSize(sapage, samask, (char *)"");
+    sarrayPadToSameSize(sapage, samask, "");
     if ((npages = sarrayGetCount(sapage)) == 0) {
         sarrayDestroy(&sapage);
         sarrayDestroy(&samask);
@@ -541,18 +557,19 @@ SARRAY  *sapage, *samask;
 
 
 /*
- *  pixWriteSegmentedPageToPS()
+ * \brief   pixWriteSegmentedPageToPS()
  *
- *      Input:  pixs (all depths; colormap ok)
- *              pixm (<optional> 1 bpp segmentation mask over image region)
- *              textscale (scale of text output relative to pixs)
- *              imagescale (scale of image output relative to pixs)
- *              threshold (threshold for binarization; typ. 190)
- *              pageno (page number in set; use 1 for new output file)
- *              fileout (output ps file)
- *      Return: 0 if OK, 1 on error
+ * \param[in]     pixs      all depths; colormap ok
+ * \param[in]     pixm      [optional] 1 bpp segmentation mask over image region
+ * \param[in]     textscale   scale of text output relative to pixs
+ * \param[in]     imagescale  scale of image output relative to pixs
+ * \param[in]     threshold   for binarization; typ. about 190; 0 for default
+ * \param[in]     pageno    page number in set; use 1 for new output file
+ * \param[in]     fileout   output ps file
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This generates the PS string for a mixed text/image page,
  *          and adds it to an existing file if %pageno > 1.
  *          The PS output is determined by fitting the result to
@@ -573,8 +590,9 @@ SARRAY  *sapage, *samask;
  *          sequential page numbers with the same output file.  It can
  *          also be used to write separate PS files for each page,
  *          by using different output files with %pageno = 0 or 1.
+ * </pre>
  */
-l_int32
+l_ok
 pixWriteSegmentedPageToPS(PIX         *pixs,
                           PIX         *pixm,
                           l_float32    textscale,
@@ -689,17 +707,18 @@ PIX       *pixmi, *pixmis, *pixt, *pixg, *pixsc, *pixb, *pixc;
 
 
 /*
- *  pixWriteMixedToPS()
+ * \brief  pixWriteMixedToPS()
  *
- *      Input:  pixb (<optionall> 1 bpp "mask"; typically for text)
- *              pixc (<optional> 8 or 32 bpp image regions)
- *              scale (relative scale factor for rendering pixb
- *                    relative to pixc; typ. 4.0)
- *              pageno (page number in set; use 1 for new output file)
- *              fileout (output ps file)
- *      Return: 0 if OK, 1 on error
+ * \param[in]     pixb      [optional] 1 bpp mask; typically for text
+ * \param[in]     pixc      [optional] 8 or 32 bpp image regions
+ * \param[in]     scale     scale factor for rendering pixb, relative to pixc;
+ *                          typ. 4.0
+ * \param[in]     pageno    page number in set; use 1 for new output file
+ * \param[in]     fileout   output ps file
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This low level function generates the PS string for a mixed
  *          text/image page, and adds it to an existing file if
  *          %pageno > 1.
@@ -722,8 +741,9 @@ PIX       *pixmi, *pixmis, *pixt, *pixg, *pixsc, *pixb, *pixc;
  *          because ghostscript's ps2pdf is flaky when the latter is used.
  *      (7) The actual output resolution is determined by fitting the
  *          result to a letter-size (8.5 x 11 inch) page.
+ * <pre>
  */
-l_int32
+l_ok
 pixWriteMixedToPS(PIX         *pixb,
                   PIX         *pixc,
                   l_float32    scale,
@@ -787,14 +807,15 @@ l_int32      resb, resc, endpage, maskop, ret;
  *            Convert any image file to PS for embedding       *
  *-------------------------------------------------------------*/
 /*
- *  convertToPSEmbed()
+ * \brief  convertToPSEmbed()
  *
- *      Input:  filein (input image file -- any format)
- *              fileout (output ps file)
- *              level (compression: 1 (uncompressed), 2 or 3)
- *      Return: 0 if OK, 1 on error
+ * \param[in]     filein    input image file, any format
+ * \param[in]     fileout   output ps file
+ * \param[in]     level     PostScript compression: 1 (uncompressed), 2 or 3
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This is a wrapper function that generates a PS file with
  *          a bounding box, from any input image file.
  *      (2) Do the best job of compression given the specified level.
@@ -807,8 +828,9 @@ l_int32      resb, resc, endpage, maskop, ret;
  *      (4) The bounding box is required when a program such as TeX
  *          (through epsf) places and rescales the image.  It is
  *          sized for fitting the image to an 8.5 x 11.0 inch page.
+ * </pre>
  */
-l_int32
+l_ok
 convertToPSEmbed(const char  *filein,
                  const char  *fileout,
                  l_int32      level)
@@ -885,15 +907,16 @@ PIX     *pix, *pixs;
  *              Write all images in a pixa out to PS           *
  *-------------------------------------------------------------*/
 /*
- *  pixaWriteCompressedToPS()
+ * \brief  pixaWriteCompressedToPS()
  *
- *      Input:  pixa (any set of images)
- *              fileout (output ps file)
- *              res (of input image)
- *              level (compression: 2 or 3)
- *      Return: 0 if OK, 1 on error
+ * \param[in]     pixa      any set of images
+ * \param[in]     fileout   output ps file
+ * \param[in]     res       of input image
+ * \param[in]     level     PostScript compression: 1 (uncompressed), 2 or 3
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This generates a PS file of multiple page images, all
  *          with bounding boxes.
  *      (2) It compresses to:
@@ -906,8 +929,9 @@ PIX     *pix, *pixs;
  *              16 bpp:               flate
  *              32 bpp:               jpeg
  *      (3) To generate a pdf, use: ps2pdf <infile.ps> <outfile.pdf>
+ * </pre>
  */
-l_int32
+l_ok
 pixaWriteCompressedToPS(PIXA        *pixa,
                         const char  *fileout,
                         l_int32      res,

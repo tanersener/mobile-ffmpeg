@@ -170,7 +170,7 @@ static l_int32 pixcompFastConvertToPdfData(PIXC *pixc, const char *title,
  * \brief   pixcompCreateFromPix()
  *
  * \param[in]    pix
- * \param[in]    comptype IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
+ * \param[in]    comptype   IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
  * \return  pixc, or NULL on error
  *
  * <pre>
@@ -226,9 +226,9 @@ PIXC     *pixc;
 /*!
  * \brief   pixcompCreateFromString()
  *
- * \param[in]    data compressed string
- * \param[in]    size number of bytes
- * \param[in]    copyflag L_INSERT or L_COPY
+ * \param[in]    data        compressed string
+ * \param[in]    size        number of bytes
+ * \param[in]    copyflag    L_INSERT or L_COPY
  * \return  pixc, or NULL on error
  *
  * <pre>
@@ -276,7 +276,7 @@ PIXC    *pixc;
  * \brief   pixcompCreateFromFile()
  *
  * \param[in]    filename
- * \param[in]    comptype IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
+ * \param[in]    comptype    IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
  * \return  pixc, or NULL on error
  *
  * <pre>
@@ -342,7 +342,7 @@ PIXC     *pixc;
 /*!
  * \brief   pixcompDestroy()
  *
- * \param[in,out]   ppixc will be nulled
+ * \param[in,out]   ppixc   use ptr address so it will be nulled
  * \return  void
  *
  * <pre>
@@ -408,7 +408,7 @@ PIXC     *pixcd;
     size = pixcs->size;
     datas = pixcs->data;
     datad = (l_uint8 *)LEPT_CALLOC(size, sizeof(l_int8));
-    memcpy((char*)datad, (char*)datas, size);
+    memcpy(datad, datas, size);
     pixcd->data = datad;
     pixcd->size = size;
     return pixcd;
@@ -422,10 +422,10 @@ PIXC     *pixcd;
  * \brief   pixcompGetDimensions()
  *
  * \param[in]    pixc
- * \param[out]   pw, ph, pd [optional]
+ * \param[out]   pw, ph, pd    [optional]
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixcompGetDimensions(PIXC     *pixc,
                      l_int32  *pw,
                      l_int32  *ph,
@@ -446,10 +446,10 @@ pixcompGetDimensions(PIXC     *pixc,
  * \brief   pixcompGetParameters()
  *
  * \param[in]    pixc
- * \param[out]   pxres, pyres, pcomptype, pcmapflag [all optional]
+ * \param[out]   pxres, pyres, pcomptype, pcmapflag   [optional]
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixcompGetParameters(PIXC     *pixc,
                      l_int32  *pxres,
                      l_int32  *pyres,
@@ -474,10 +474,10 @@ pixcompGetParameters(PIXC     *pixc,
 /*!
  * \brief   pixcompDetermineFormat()
  *
- * \param[in]    comptype IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
- * \param[in]    d pix depth
- * \param[in]    cmapflag 1 if pix to be compressed as a colormap; 0 otherwise
- * \param[out]   pformat return IFF_TIFF, IFF_PNG or IFF_JFIF_JPEG
+ * \param[in]    comptype   IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
+ * \param[in]    d          pix depth
+ * \param[in]    cmapflag   1 if pix to be compressed as a colormap; 0 otherwise
+ * \param[out]   pformat    IFF_TIFF, IFF_PNG or IFF_JFIF_JPEG
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -491,7 +491,7 @@ pixcompGetParameters(PIXC     *pixc,
  *          %comptype, this selects IFF_PNG, which can compress all pix.
  * </pre>
  */
-l_int32
+l_ok
 pixcompDetermineFormat(l_int32   comptype,
                        l_int32   d,
                        l_int32   cmapflag,
@@ -583,7 +583,7 @@ PIX     *pix;
 /*!
  * \brief   pixacompCreate()
  *
- * \param[in]    n  initial number of ptrs
+ * \param[in]    n    initial number of ptrs
  * \return  pixac, or NULL on error
  */
 PIXAC *
@@ -618,11 +618,11 @@ PIXAC  *pixac;
 /*!
  * \brief   pixacompCreateWithInit()
  *
- * \param[in]    n  initial number of ptrs
- * \param[in]    offset difference: accessor index - pixacomp array index
- * \param[in]    pix [optional] initialize each ptr in pixacomp to this pix;
- *                   can be NULL
- * \param[in]    comptype IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
+ * \param[in]    n          initial number of ptrs
+ * \param[in]    offset     difference: accessor index - pixacomp array index
+ * \param[in]    pix        [optional] initialize each ptr in pixacomp
+ *                          to this pix; can be NULL
+ * \param[in]    comptype   IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
  * \return  pixac, or NULL on error
  *
  * <pre>
@@ -701,8 +701,8 @@ PIXAC   *pixac;
  * \brief   pixacompCreateFromPixa()
  *
  * \param[in]    pixa
- * \param[in]    comptype IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
- * \param[in]    accesstype L_COPY, L_CLONE, L_COPY_CLONE
+ * \param[in]    comptype    IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
+ * \param[in]    accesstype  L_COPY, L_CLONE, L_COPY_CLONE
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -759,8 +759,8 @@ PIXAC   *pixac;
  * \brief   pixacompCreateFromFiles()
  *
  * \param[in]    dirname
- * \param[in]    substr [optional] substring filter on filenames; can be null
- * \param[in]    comptype IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
+ * \param[in]    substr    [optional] substring filter on filenames; can be null
+ * \param[in]    comptype  IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
  * \return  pixac, or NULL on error
  *
  * <pre>
@@ -803,8 +803,8 @@ SARRAY   *sa;
 /*!
  * \brief   pixacompCreateFromSA()
  *
- * \param[in]    sa full pathnames for all files
- * \param[in]    comptype IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
+ * \param[in]    sa         full pathnames for all files
+ * \param[in]    comptype   IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
  * \return  pixac, or NULL on error
  *
  * <pre>
@@ -849,7 +849,7 @@ PIXAC   *pixac;
 /*!
  * \brief   pixacompDestroy()
  *
- * \param[in,out]   ppixac to be nulled
+ * \param[in,out]   ppixac   use ptr address so it will be nulled
  * \return  void
  *
  * <pre>
@@ -891,8 +891,8 @@ PIXAC   *pixac;
  * \brief   pixacompAddPix()
  *
  * \param[in]    pixac
- * \param[in]    pix  to be added
- * \param[in]    comptype IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
+ * \param[in]    pix        to be added
+ * \param[in]    comptype   IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -904,7 +904,7 @@ PIXAC   *pixac;
  *          The input pix is not affected.
  * </pre>
  */
-l_int32
+l_ok
 pixacompAddPix(PIXAC   *pixac,
                PIX     *pix,
                l_int32  comptype)
@@ -935,8 +935,8 @@ PIXC    *pixc;
  * \brief   pixacompAddPixcomp()
  *
  * \param[in]    pixac
- * \param[in]    pixc  to be added by insertion
- * \param[in]    copyflag L_INSERT, L_COPY
+ * \param[in]    pixc       to be added by insertion
+ * \param[in]    copyflag   L_INSERT, L_COPY
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -946,7 +946,7 @@ PIXC    *pixc;
  *          or destroy a pixc that has been L_INSERTed.
  * </pre>
  */
-l_int32
+l_ok
 pixacompAddPixcomp(PIXAC   *pixac,
                    PIXC    *pixc,
                    l_int32  copyflag)
@@ -1011,9 +1011,9 @@ pixacompExtendArray(PIXAC  *pixac)
  * \brief   pixacompReplacePix()
  *
  * \param[in]    pixac
- * \param[in]    index caller's view of index within pixac; includes offset
- * \param[in]    pix  owned by the caller
- * \param[in]    comptype IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
+ * \param[in]    index      caller's view of index within pixac; includes offset
+ * \param[in]    pix        owned by the caller
+ * \param[in]    comptype   IFF_DEFAULT, IFF_TIFF_G4, IFF_PNG, IFF_JFIF_JPEG
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -1024,7 +1024,7 @@ pixacompExtendArray(PIXAC  *pixac)
  *          into the pixac.
  * </pre>
  */
-l_int32
+l_ok
 pixacompReplacePix(PIXAC   *pixac,
                    l_int32  index,
                    PIX     *pix,
@@ -1057,8 +1057,8 @@ PIXC    *pixc;
  * \brief   pixacompReplacePixcomp()
  *
  * \param[in]    pixac
- * \param[in]    index caller's view of index within pixac; includes offset
- * \param[in]    pixc  to replace existing one, which is destroyed
+ * \param[in]    index   caller's view of index within pixac; includes offset
+ * \param[in]    pixc    to replace existing one, which is destroyed
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -1069,7 +1069,7 @@ PIXC    *pixc;
  *          must not destroy it.
  * </pre>
  */
-l_int32
+l_ok
 pixacompReplacePixcomp(PIXAC   *pixac,
                        l_int32  index,
                        PIXC    *pixc)
@@ -1101,10 +1101,10 @@ PIXC    *pixct;
  *
  * \param[in]    pixac
  * \param[in]    box
- * \param[in]    copyflag L_INSERT, L_COPY
+ * \param[in]    copyflag   L_INSERT, L_COPY
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixacompAddBox(PIXAC   *pixac,
                BOX     *box,
                l_int32  copyflag)
@@ -1148,8 +1148,8 @@ pixacompGetCount(PIXAC  *pixac)
  * \brief   pixacompGetPixcomp()
  *
  * \param[in]    pixac
- * \param[in]    index caller's view of index within pixac; includes offset
- * \param[in]    copyflag L_NOCOPY, L_COPY
+ * \param[in]    index      caller's view of index within pixac; includes offset
+ * \param[in]    copyflag   L_NOCOPY, L_COPY
  * \return  pixc, or NULL on error
  *
  * <pre>
@@ -1188,7 +1188,7 @@ l_int32  aindex;
  * \brief   pixacompGetPix()
  *
  * \param[in]    pixac
- * \param[in]    index caller's view of index within pixac; includes offset
+ * \param[in]    index   caller's view of index within pixac; includes offset
  * \return  pix, or NULL on error
  *
  * <pre>
@@ -1221,8 +1221,9 @@ PIXC    *pixc;
  * \brief   pixacompGetPixDimensions()
  *
  * \param[in]    pixac
- * \param[in]    index caller's view of index within pixac; includes offset
- * \param[out]   pw, ph, pd [optional]  each can be null
+ * \param[in]    index       caller's view of index within pixac;
+ *                           includes offset
+ * \param[out]   pw, ph, pd  [optional] each can be null
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1231,7 +1232,7 @@ PIXC    *pixc;
  *          to get the actual index into the ptr array.
  * </pre>
  */
-l_int32
+l_ok
 pixacompGetPixDimensions(PIXAC    *pixac,
                          l_int32   index,
                          l_int32  *pw,
@@ -1260,7 +1261,7 @@ PIXC    *pixc;
  * \brief   pixacompGetBoxa()
  *
  * \param[in]    pixac
- * \param[in]    accesstype  L_COPY, L_CLONE, L_COPY_CLONE
+ * \param[in]    accesstype   L_COPY, L_CLONE, L_COPY_CLONE
  * \return  boxa, or NULL on error
  */
 BOXA *
@@ -1303,8 +1304,9 @@ pixacompGetBoxaCount(PIXAC  *pixac)
  * \brief   pixacompGetBox()
  *
  * \param[in]    pixac
- * \param[in]    index caller's view of index within pixac; includes offset
- * \param[in]    accesstype  L_COPY or L_CLONE
+ * \param[in]    index        caller's view of index within pixac;
+ *                            includes offset
+ * \param[in]    accesstype   L_COPY or L_CLONE
  * \return  box if null, not automatically an error, or NULL on error
  *
  * <pre>
@@ -1357,8 +1359,9 @@ BOX     *box;
  * \brief   pixacompGetBoxGeometry()
  *
  * \param[in]    pixac
- * \param[in]    index caller's view of index within pixac; includes offset
- * \param[out]   px, py, pw, ph [optional]  each can be null
+ * \param[in]    index            caller's view of index within pixac;
+ *                                includes offset
+ * \param[out]   px, py, pw, ph   [optional] each can be null
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1367,7 +1370,7 @@ BOX     *box;
  *          to get the actual index into the ptr array.
  * </pre>
  */
-l_int32
+l_ok
 pixacompGetBoxGeometry(PIXAC    *pixac,
                        l_int32   index,
                        l_int32  *px,
@@ -1422,7 +1425,7 @@ pixacompGetOffset(PIXAC   *pixac)
  * \brief   pixacompSetOffset()
  *
  * \param[in]    pixac
- * \param[in]    offset non-negative
+ * \param[in]    offset    non-negative
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1432,7 +1435,7 @@ pixacompGetOffset(PIXAC   *pixac)
  *          By default it is 0.
  * </pre>
  */
-l_int32
+l_ok
 pixacompSetOffset(PIXAC   *pixac,
                   l_int32  offset)
 {
@@ -1452,7 +1455,7 @@ pixacompSetOffset(PIXAC   *pixac,
  * \brief   pixaCreateFromPixacomp()
  *
  * \param[in]    pixac
- * \param[in]    accesstype L_COPY, L_CLONE, L_COPY_CLONE; for boxa
+ * \param[in]    accesstype   L_COPY, L_CLONE, L_COPY_CLONE; for boxa
  * \return  pixa if OK, or NULL on error
  *
  * <pre>
@@ -1506,10 +1509,10 @@ PIXA    *pixa;
 /*!
  * \brief   pixacompJoin()
  *
- * \param[in]    pixacd  dest pixac; add to this one
- * \param[in]    pixacs  [optional] source pixac; add from this one
- * \param[in]    istart  starting index in pixacs
- * \param[in]    iend  ending index in pixacs; use -1 to cat all
+ * \param[in]    pixacd    dest pixac; add to this one
+ * \param[in]    pixacs    [optional] source pixac; add from this one
+ * \param[in]    istart    starting index in pixacs
+ * \param[in]    iend      ending index in pixacs; use -1 to cat all
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1520,7 +1523,7 @@ PIXA    *pixa;
  *      (4) If pixacs is NULL or contains no pixc, this is a no-op.
  * </pre>
  */
-l_int32
+l_ok
 pixacompJoin(PIXAC   *pixacd,
              PIXAC   *pixacs,
              l_int32  istart,
@@ -1563,8 +1566,8 @@ PIXC    *pixc;
 /*!
  * \brief   pixacompInterleave()
  *
- * \param[in]    pixac1  first src pixac
- * \param[in]    pixac2  second src pixac
+ * \param[in]    pixac1    first src pixac
+ * \param[in]    pixac2    second src pixac
  * \return  pixacd  interleaved from sources, or NULL on error.
  *
  * <pre>
@@ -1659,7 +1662,7 @@ PIXAC  *pixac;
 /*!
  * \brief   pixacompReadStream()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp   file stream
  * \return  pixac, or NULL on error
  */
 PIXAC *
@@ -1751,8 +1754,8 @@ PIXAC    *pixac;
 /*!
  * \brief   pixacompReadMem()
  *
- * \param[in]    data const; pixacomp format
- * \param[in]    size of data
+ * \param[in]    data     in pixacomp format
+ * \param[in]    size     of data
  * \return  pixac, or NULL on error
  *
  * <pre>
@@ -1795,7 +1798,7 @@ PIXAC  *pixac;
  *          can be stored in tiffg4, png and jpg formats.
  * </pre>
  */
-l_int32
+l_ok
 pixacompWrite(const char  *filename,
               PIXAC       *pixac)
 {
@@ -1822,11 +1825,11 @@ FILE    *fp;
 /*!
  * \brief   pixacompWriteStream()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp     file stream
  * \param[in]    pixac
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixacompWriteStream(FILE   *fp,
                     PIXAC  *pixac)
 {
@@ -1864,8 +1867,8 @@ PIXC    *pixc;
 /*!
  * \brief   pixacompWriteMem()
  *
- * \param[out]   pdata  serialized data of pixac
- * \param[out]   psize  size of serialized data
+ * \param[out]   pdata   serialized data of pixac
+ * \param[out]   psize   size of serialized data
  * \param[in]    pixac
  * \return  0 if OK, 1 on error
  *
@@ -1874,7 +1877,7 @@ PIXC    *pixc;
  *      (1) Serializes a pixac in memory and puts the result in a buffer.
  * </pre>
  */
-l_int32
+l_ok
 pixacompWriteMem(l_uint8  **pdata,
                  size_t    *psize,
                  PIXAC     *pixac)
@@ -1921,15 +1924,16 @@ FILE    *fp;
 /*!
  * \brief   pixacompConvertToPdf()
  *
- * \param[in]    pixac containing images all at the same resolution
- * \param[in]    res override the resolution of each input image, in ppi;
- *                   use 0 to respect the resolution embedded in the input
- * \param[in]    scalefactor scaling factor applied to each image; > 0.0
- * \param[in]    type encoding type (L_JPEG_ENCODE, L_G4_ENCODE,
- *                    L_FLATE_ENCODE, or L_DEFAULT_ENCODE for default
- * \param[in]    quality used for JPEG only; 0 for default (75)
- * \param[in]    title [optional] pdf title
- * \param[in]    fileout pdf file of all images
+ * \param[in]    pixac         containing images all at the same resolution
+ * \param[in]    res           override the resolution of each input image,
+ *                             in ppi; 0 to respect the resolution embedded
+ *                             in the input
+ * \param[in]    scalefactor   scaling factor applied to each image; > 0.0
+ * \param[in]    type          encoding type (L_JPEG_ENCODE, L_G4_ENCODE,
+ *                             L_FLATE_ENCODE, or L_DEFAULT_ENCODE for default
+ * \param[in]    quality       used for JPEG only; 0 for default (75)
+ * \param[in]    title         [optional] pdf title
+ * \param[in]    fileout       pdf file of all images
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1948,7 +1952,7 @@ FILE    *fp;
  *          write the data out to file.
  * </pre>
  */
-l_int32
+l_ok
 pixacompConvertToPdf(PIXAC       *pixac,
                      l_int32      res,
                      l_float32    scalefactor,
@@ -1984,15 +1988,15 @@ size_t    nbytes;
 /*!
  * \brief   pixacompConvertToPdfData()
  *
- * \param[in]    pixac containing images all at the same resolution
- * \param[in]    res input resolution of all images
- * \param[in]    scalefactor scaling factor applied to each image; > 0.0
- * \param[in]    type encoding type (L_JPEG_ENCODE, L_G4_ENCODE,
- *                    L_FLATE_ENCODE, or L_DEFAULT_ENCODE for default
- * \param[in]    quality used for JPEG only; 0 for default (75)
- * \param[in]    title [optional] pdf title
- * \param[out]   pdata output pdf data (of all images
- * \param[out]   pnbytes size of output pdf data
+ * \param[in]    pixac         containing images all at the same resolution
+ * \param[in]    res           input resolution of all images
+ * \param[in]    scalefactor   scaling factor applied to each image; > 0.0
+ * \param[in]    type          encoding type (L_JPEG_ENCODE, L_G4_ENCODE,
+ *                             L_FLATE_ENCODE, or L_DEFAULT_ENCODE for default
+ * \param[in]    quality       used for JPEG only; 0 for default (75)
+ * \param[in]    title         [optional] pdf title
+ * \param[out]   pdata         output pdf data (of all images
+ * \param[out]   pnbytes       size of output pdf data
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2000,7 +2004,7 @@ size_t    nbytes;
  *      (1) See pixacompConvertToPdf().
  * </pre>
  */
-l_int32
+l_ok
 pixacompConvertToPdfData(PIXAC       *pixac,
                          l_int32      res,
                          l_float32    scalefactor,
@@ -2096,11 +2100,10 @@ L_PTRA   *pa_data;
 /*!
  * \brief   pixacompFastConvertToPdfData()
  *
- * \param[in]    pixac containing images all at the same resolution
- * \param[in]    res input resolution of all images
- * \param[in]    title [optional] pdf title
- * \param[out]   pdata output pdf data (of all images
- * \param[out]   pnbytes size of output pdf data
+ * \param[in]    pixac     containing images all at the same resolution
+ * \param[in]    title     [optional] pdf title
+ * \param[out]   pdata     output pdf data (of all images
+ * \param[out]   pnbytes   size of output pdf data
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2112,7 +2115,7 @@ L_PTRA   *pa_data;
  *          the resolution embedded in each jpeg file is correct.
  * </pre>
  */
-l_int32
+l_ok
 pixacompFastConvertToPdfData(PIXAC       *pixac,
                              const char  *title,
                              l_uint8    **pdata,
@@ -2182,10 +2185,10 @@ L_PTRA   *pa_data;
 /*!
  * \brief   pixcompFastConvertToPdfData()
  *
- * \param[in]    pixc   containing images all at the same resolution
- * \param[in]    title [optional] pdf title
- * \param[out]   pdata output pdf data (of all images
- * \param[out]   pnbytes size of output pdf data
+ * \param[in]    pixc      containing images all at the same resolution
+ * \param[in]    title     [optional] pdf title
+ * \param[out]   pdata     output pdf data (of all images
+ * \param[out]   pnbytes   size of output pdf data
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2232,12 +2235,12 @@ L_COMP_DATA  *cid;
 /*!
  * \brief   pixacompWriteStreamInfo()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp      file stream
  * \param[in]    pixac
- * \param[in]    text [optional] identifying string; can be null
+ * \param[in]    text    [optional] identifying string; can be null
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixacompWriteStreamInfo(FILE        *fp,
                         PIXAC       *pixac,
                         const char  *text)
@@ -2276,12 +2279,12 @@ PIXC    *pixc;
 /*!
  * \brief   pixcompWriteStreamInfo()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp     file stream
  * \param[in]    pixc
- * \param[in]    text [optional] identifying string; can be null
+ * \param[in]    text   [optional] identifying string; can be null
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixcompWriteStreamInfo(FILE        *fp,
                        PIXC        *pixc,
                        const char  *text)
@@ -2319,14 +2322,14 @@ pixcompWriteStreamInfo(FILE        *fp,
  * \brief   pixacompDisplayTiledAndScaled()
  *
  * \param[in]    pixac
- * \param[in]    outdepth output depth: 1, 8 or 32 bpp
- * \param[in]    tilewidth each pix is scaled to this width
- * \param[in]    ncols number of tiles in each row
- * \param[in]    background 0 for white, 1 for black; this is the color
- *                 of the spacing between the images
- * \param[in]    spacing  between images, and on outside
- * \param[in]    border width of additional black border on each image;
- *                      use 0 for no border
+ * \param[in]    outdepth     output depth: 1, 8 or 32 bpp
+ * \param[in]    tilewidth    each pix is scaled to this width
+ * \param[in]    ncols        number of tiles in each row
+ * \param[in]    background   0 for white, 1 for black; this is the color
+ *                            of the spacing between the images
+ * \param[in]    spacing      between images, and on outside
+ * \param[in]    border       width of additional black border on each image;
+ *                            use 0 for no border
  * \return  pix of tiled images, or NULL on error
  *
  * <pre>
@@ -2368,10 +2371,10 @@ PIXA  *pixa;
  * \brief   pixacompWriteFiles()
  *
  * \param[in]    pixac
- * \param[in]    subdir (subdirectory of /tmp)
+ * \param[in]    subdir    subdirectory of /tmp
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 pixacompWriteFiles(PIXAC       *pixac,
                    const char  *subdir)
 {
@@ -2411,7 +2414,7 @@ extern const char *ImageFileFormatExtensions[];
  *          generated by appending the format extension to %rootname.
  * </pre>
  */
-l_int32
+l_ok
 pixcompWriteFile(const char  *rootname,
                  PIXC        *pixc)
 {
@@ -2427,5 +2430,3 @@ char   buf[128];
     l_binaryWrite(buf, "w", pixc->data, pixc->size);
     return 0;
 }
-
-

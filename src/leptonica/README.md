@@ -3,6 +3,8 @@
 [![Build Status](https://travis-ci.org/DanBloomberg/leptonica.svg?branch=master)](https://travis-ci.org/DanBloomberg/leptonica)
 [![Build status](https://ci.appveyor.com/api/projects/status/vsk607rr6n4j2tmk?svg=true)](https://ci.appveyor.com/project/DanBloomberg/leptonica)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/leptonica/badge.svg)](https://scan.coverity.com/projects/leptonica)
+[![Code Quality: Cpp](https://img.shields.io/lgtm/grade/cpp/g/DanBloomberg/leptonica.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/DanBloomberg/leptonica/context:cpp)
+[![Total Alerts](https://img.shields.io/lgtm/alerts/g/DanBloomberg/leptonica.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/DanBloomberg/leptonica/alerts)
 
 www.leptonica.org
 
@@ -74,4 +76,4 @@ www.leptonica.org
   * Jeff Breidenbach: Jeff has built every Debian distribution for Leptonica. He has also made many improvements to formatted image I/O, including tiff, png and pdf. He is a continuous advocate for simplification.
   * Egor Pugin: Egor is co-maintainer of Leptonica on GitHub. He ported everything, including all the old distributions, from Google Code when it shut down. He set Leptonica up for appveyor and travis testing, and has implemented the cppan project, which simplifies building executables on Windows.
   * Jürgen Buchmüller: Jürgen wrote text converters to modify Leptonica source code so that it generates documentation using doxygen. He also wrote tiff wrappers for memory I/O.
-  * Stefan Weil:: Stefan has worked from the beginning to clean up the Leptonica github distribution, including removing errors in the source code.  He also suggested and implemented the use of Coverity Scan.
+  * Stefan Weil: Stefan has worked from the beginning to clean up the Leptonica GitHub distribution, including removing errors in the source code.  He also suggested and implemented the use of Coverity Scan.

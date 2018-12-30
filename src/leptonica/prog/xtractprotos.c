@@ -166,15 +166,15 @@ static char  mainName[] = "xtractprotos";
 
         /* First the extern C head */
     sa = sarrayCreate(0);
-    sarrayAddString(sa, (char *)"/*", L_COPY);
+    sarrayAddString(sa, "/*", L_COPY);
     snprintf(buf, L_BUFSIZE,
              " *  These prototypes were autogen'd by xtractprotos, v. %s",
              version);
     sarrayAddString(sa, buf, L_COPY);
-    sarrayAddString(sa, (char *)" */", L_COPY);
-    sarrayAddString(sa, (char *)"#ifdef __cplusplus", L_COPY);
-    sarrayAddString(sa, (char *)"extern \"C\" {", L_COPY);
-    sarrayAddString(sa, (char *)"#endif  /* __cplusplus */\n", L_COPY);
+    sarrayAddString(sa, " */", L_COPY);
+    sarrayAddString(sa, "#ifdef __cplusplus", L_COPY);
+    sarrayAddString(sa, "extern \"C\" {", L_COPY);
+    sarrayAddString(sa, "#endif  /* __cplusplus */\n", L_COPY);
     str = sarrayToString(sa, 1);
     l_byteaAppendString(ba, str);
     lept_free(str);
@@ -215,9 +215,9 @@ static char  mainName[] = "xtractprotos";
 
         /* Lastly the extern C tail */
     sa = sarrayCreate(0);
-    sarrayAddString(sa, (char *)"\n#ifdef __cplusplus", L_COPY);
-    sarrayAddString(sa, (char *)"}", L_COPY);
-    sarrayAddString(sa, (char *)"#endif  /* __cplusplus */", L_COPY);
+    sarrayAddString(sa, "\n#ifdef __cplusplus", L_COPY);
+    sarrayAddString(sa, "}", L_COPY);
+    sarrayAddString(sa, "#endif  /* __cplusplus */", L_COPY);
     str = sarrayToString(sa, 1);
     l_byteaAppendString(ba, str);
     lept_free(str);

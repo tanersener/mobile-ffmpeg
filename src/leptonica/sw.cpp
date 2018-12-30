@@ -1,8 +1,7 @@
-void build(Solution &sln)
+void build(Solution &s)
 {
-    auto &s = sln.addDirectory("demo");
-    auto &leptonica = s.addTarget<LibraryTarget>("danbloomberg.leptonica", "1.74.4");
-    leptonica.Source = Git("https://github.com/DanBloomberg/leptonica", "{v}");
+    auto &leptonica = s.addTarget<LibraryTarget>("danbloomberg.leptonica", "1.76.0");
+    leptonica += Git("https://github.com/DanBloomberg/leptonica", "{v}");
 
     leptonica.setChecks("leptonica");
 
@@ -25,12 +24,12 @@ void build(Solution &sln)
     leptonica.Public += "HAVE_CONFIG_H"_d;
     leptonica.Private += sw::Shared, "LIBLEPT_EXPORTS"_d;
 
-    leptonica += "pub.cppan2.demo.gif-5"_dep;
-    leptonica += "pub.cppan2.demo.jpeg-9"_dep;
-    leptonica += "pub.cppan2.demo.uclouvain.openjpeg.openjp2-2"_dep;
-    leptonica += "pub.cppan2.demo.png-1"_dep;
-    leptonica += "pub.cppan2.demo.tiff-4"_dep;
-    leptonica += "pub.cppan2.demo.webp-0"_dep;
+    leptonica += "org.sw.demo.gif-5"_dep;
+    leptonica += "org.sw.demo.jpeg-9"_dep;
+    leptonica += "org.sw.demo.uclouvain.openjpeg.openjp2-2"_dep;
+    leptonica += "org.sw.demo.glennrp.png-1"_dep;
+    leptonica += "org.sw.demo.tiff-4"_dep;
+    leptonica += "org.sw.demo.webmproject.webp-*"_dep;
 
     if (leptonica.Variables["WORDS_BIGENDIAN"] == "1")
         leptonica.Variables["ENDIANNESS"] = "L_BIG_ENDIAN";
@@ -45,7 +44,10 @@ void build(Solution &sln)
     if (s.Settings.Native.CompilerType == CompilerType::MSVC)
     {
         for (auto *f : leptonica.gatherSourceFiles())
-            f->BuildAs = NativeSourceFile::CPP;
+        {
+            //f->BuildAs = NativeSourceFile::CPP;
+            f->args.push_back("-TP");
+        }
     }
 
     if (s.Settings.TargetOS.Type == OSType::Windows)

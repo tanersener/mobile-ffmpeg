@@ -371,7 +371,7 @@ void av1_jnt_convolve_2d_copy_sse2(const uint8_t *src, int src_stride,
   const int bits =
       FILTER_BITS * 2 - conv_params->round_1 - conv_params->round_0;
   const int do_average = conv_params->do_average;
-  const int use_jnt_comp_avg = conv_params->use_jnt_comp_avg;
+  const int use_dist_wtd_comp_avg = conv_params->use_dist_wtd_comp_avg;
   const __m128i zero = _mm_setzero_si128();
   const __m128i left_shift = _mm_cvtsi32_si128(bits);
   int i, j;
@@ -411,14 +411,14 @@ void av1_jnt_convolve_2d_copy_sse2(const uint8_t *src, int src_stride,
           const __m128i data_ref_0_hi =
               _mm_loadu_si128((__m128i *)(&dst[j + 8]));
 
-          const __m128i comp_avg_res_lo =
-              comp_avg(&data_ref_0_lo, &res_unsigned_lo, &wt, use_jnt_comp_avg);
+          const __m128i comp_avg_res_lo = comp_avg(
+              &data_ref_0_lo, &res_unsigned_lo, &wt, use_dist_wtd_comp_avg);
 
           const __m128i round_result_lo = convolve_rounding(
               &comp_avg_res_lo, &offset_const, &rounding_const, rounding_shift);
 
-          const __m128i comp_avg_res_hi =
-              comp_avg(&data_ref_0_hi, &res_unsigned_hi, &wt, use_jnt_comp_avg);
+          const __m128i comp_avg_res_hi = comp_avg(
+              &data_ref_0_hi, &res_unsigned_hi, &wt, use_dist_wtd_comp_avg);
 
           const __m128i round_result_hi = convolve_rounding(
               &comp_avg_res_hi, &offset_const, &rounding_const, rounding_shift);
@@ -449,7 +449,7 @@ void av1_jnt_convolve_2d_copy_sse2(const uint8_t *src, int src_stride,
           const __m128i data_ref_0 = _mm_loadu_si128((__m128i *)(&dst[j]));
 
           const __m128i comp_avg_res =
-              comp_avg(&data_ref_0, &res_unsigned, &wt, use_jnt_comp_avg);
+              comp_avg(&data_ref_0, &res_unsigned, &wt, use_dist_wtd_comp_avg);
 
           const __m128i round_result = convolve_rounding(
               &comp_avg_res, &offset_const, &rounding_const, rounding_shift);

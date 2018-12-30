@@ -79,7 +79,11 @@ public class FFmpeg {
      * @return MobileFFmpeg version
      */
     public static String getVersion() {
-        return Config.getNativeVersion();
+        if (AbiDetect.isNativeLTSBuild()) {
+            return String.format("%s-lts", Config.getNativeVersion());
+        } else {
+            return Config.getNativeVersion();
+        }
     }
 
     /**
@@ -177,6 +181,15 @@ public class FFmpeg {
             Log.i(Config.TAG, Config.getSystemCommandOutput());
             return null;
         }
+    }
+
+    /**
+     * <p>Returns whether MobileFFmpeg release is a long term release or not.
+     *
+     * @return YES or NO
+     */
+    public static boolean isLTSBuild() {
+        return AbiDetect.isNativeLTSBuild();
     }
 
 }

@@ -29,18 +29,18 @@
  * <pre>
  *
  *      Top-level jb2 correlation and rank-hausdorff
- *
  *         l_int32         jbCorrelation()
  *         l_int32         jbRankHaus()
  *
  *      Extract and classify words in textline order
- *
  *         JBCLASSER      *jbWordsInTextlines()
  *         l_int32         pixGetWordsInTextlines()
  *         l_int32         pixGetWordBoxesInTextlines()
  *
- *      Use word bounding boxes to compare page images
+ *      Extract word and character bounding boxes
+ *         l_int32         pixFindWordAndCharacterBoxes()
  *
+ *      Use word bounding boxes to compare page images
  *         NUMAA          *boxaExtractSortedPattern()
  *         l_int32         numaaCompareImagesByBoxes()
  *         static l_int32  testLineAlignmentX()
@@ -74,14 +74,14 @@ static void printRowIndices(l_int32 *index1, l_int32 n1,
 /*!
  * \brief   jbCorrelation()
  *
- * \param[in]    dirin directory of input images
- * \param[in]    thresh typically ~0.8
- * \param[in]    weight typically ~0.6
- * \param[in]    components JB_CONN_COMPS, JB_CHARACTERS, JB_WORDS
- * \param[in]    rootname for output files
- * \param[in]    firstpage 0-based
- * \param[in]    npages use 0 for all pages in dirin
- * \param[in]    renderflag 1 to render from templates; 0 to skip
+ * \param[in]    dirin        directory of input images
+ * \param[in]    thresh       typically ~0.8
+ * \param[in]    weight       typically ~0.6
+ * \param[in]    components   JB_CONN_COMPS, JB_CHARACTERS, JB_WORDS
+ * \param[in]    rootname     for output files
+ * \param[in]    firstpage    0-based
+ * \param[in]    npages       use 0 for all pages in dirin
+ * \param[in]    renderflag   1 to render from templates; 0 to skip
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -92,7 +92,7 @@ static void printRowIndices(l_int32 *index1, l_int32 n1,
  *          for debugging)
  * </pre>
  */
-l_int32
+l_ok
 jbCorrelation(const char  *dirin,
               l_float32    thresh,
               l_float32    weight,
@@ -158,14 +158,14 @@ SARRAY     *safiles;
 /*!
  * \brief   jbRankHaus()
  *
- * \param[in]    dirin directory of input images
- * \param[in]    size of Sel used for dilation; typ. 2
- * \param[in]    rank rank value of match; typ. 0.97
- * \param[in]    components JB_CONN_COMPS, JB_CHARACTERS, JB_WORDS
- * \param[in]    rootname for output files
- * \param[in]    firstpage 0-based
- * \param[in]    npages use 0 for all pages in dirin
- * \param[in]    renderflag 1 to render from templates; 0 to skip
+ * \param[in]    dirin         directory of input images
+ * \param[in]    size          of Sel used for dilation; typ. 2
+ * \param[in]    rank          rank value of match; typ. 0.97
+ * \param[in]    components    JB_CONN_COMPS, JB_CHARACTERS, JB_WORDS
+ * \param[in]    rootname      for output files
+ * \param[in]    firstpage     0-based
+ * \param[in]    npages        use 0 for all pages in dirin
+ * \param[in]    renderflag    1 to render from templates; 0 to skip
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -174,7 +174,7 @@ SARRAY     *safiles;
  *          for debugging)
  * </pre>
  */
-l_int32
+l_ok
 jbRankHaus(const char  *dirin,
            l_int32      size,
            l_float32    rank,
@@ -244,15 +244,15 @@ SARRAY     *safiles;
 /*!
  * \brief   jbWordsInTextlines()
  *
- * \param[in]    dirin directory of input pages
- * \param[in]    reduction 1 for full res; 2 for half-res
- * \param[in]    maxwidth of word mask components, to be kept
- * \param[in]    maxheight of word mask components, to be kept
- * \param[in]    thresh on correlation; 0.80 is reasonable
- * \param[in]    weight for handling thick text; 0.6 is reasonable
- * \param[out]   pnatl numa with textline index for each component
- * \param[in]    firstpage 0-based
- * \param[in]    npages use 0 for all pages in dirin
+ * \param[in]    dirin       directory of input pages
+ * \param[in]    reduction   1 for full res; 2 for half-res
+ * \param[in]    maxwidth    of word mask components, to be kept
+ * \param[in]    maxheight   of word mask components, to be kept
+ * \param[in]    thresh      on correlation; 0.80 is reasonable
+ * \param[in]    weight      for handling thick text; 0.6 is reasonable
+ * \param[out]   pnatl       numa with textline index for each component
+ * \param[in]    firstpage   0-based
+ * \param[in]    npages      use 0 for all pages in dirin
  * \return  classer for the set of pages
  *
  * <pre>
@@ -333,12 +333,14 @@ SARRAY     *safiles;
 /*!
  * \brief   pixGetWordsInTextlines()
  *
- * \param[in]    pixs 1 bpp, typ. 75 - 150 ppi
- * \param[in]    minwidth, minheight of saved components; smaller are discarded
- * \param[in]    maxwidth, maxheight of saved components; larger are discarded
- * \param[out]   pboxad word boxes sorted in textline line order
- * \param[out]   ppixad word images sorted in textline line order
- * \param[out]   pnai index of textline for each word
+ * \param[in]    pixs        1 bpp, typ. 75 - 150 ppi
+ * \param[in]    minwidth    of saved components; smaller are discarded
+ * \param[in]    minheight   of saved components; smaller are discarded
+ * \param[in]    maxwidth    of saved components; larger are discarded
+ * \param[in]    maxheight   of saved components; larger are discarded
+ * \param[out]   pboxad      word boxes sorted in textline line order
+ * \param[out]   ppixad      word images sorted in textline line order
+ * \param[out]   pnai        index of textline for each word
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -374,7 +376,7 @@ SARRAY     *safiles;
  *          to generate tall components that will be eliminated in pixf.
  * </pre>
  */
-l_int32
+l_ok
 pixGetWordsInTextlines(PIX     *pixs,
                        l_int32  minwidth,
                        l_int32  minheight,
@@ -406,7 +408,7 @@ PIXAA   *paa;
                            &boxa1, NULL, NULL);
 
         /* Generate a pixa of the word images */
-    pixa1 = pixaCreateFromBoxa(pixs, boxa1, NULL);  /* mask over each word */
+    pixa1 = pixaCreateFromBoxa(pixs, boxa1, 0, 0, NULL);
 
         /* Sort the bounding boxes of these words by line.  We use the
          * index mapping to allow identical sorting of the pixa. */
@@ -433,11 +435,13 @@ PIXAA   *paa;
 /*!
  * \brief   pixGetWordBoxesInTextlines()
  *
- * \param[in]    pixs 1 bpp, typ. 300 ppi
- * \param[in]    minwidth, minheight of saved components; smaller are discarded
- * \param[in]    maxwidth, maxheight of saved components; larger are discarded
- * \param[out]   pboxad word boxes sorted in textline line order
- * \param[out]   pnai [optional] index of textline for each word
+ * \param[in]    pixs        1 bpp, typ. 75 - 150 ppi
+ * \param[in]    minwidth    of saved components; smaller are discarded
+ * \param[in]    minheight   of saved components; smaller are discarded
+ * \param[in]    maxwidth    of saved components; larger are discarded
+ * \param[in]    maxheight   of saved components; larger are discarded
+ * \param[out]   pboxad      word boxes sorted in textline line order
+ * \param[out]   pnai        [optional] index of textline for each word
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -449,7 +453,7 @@ PIXAA   *paa;
  *          See pixGetWordsInTextlines() for more details.
  * </pre>
  */
-l_int32
+l_ok
 pixGetWordBoxesInTextlines(PIX     *pixs,
                            l_int32  minwidth,
                            l_int32  minheight,
@@ -492,13 +496,160 @@ NUMA    *nai;
 
 
 /*------------------------------------------------------------------*
+ *             Extract word and character bounding boxes            *
+ *------------------------------------------------------------------*/
+/*!
+ * \brief   pixFindWordAndCharacterBoxes()
+ *
+ * \param[in]    pixs        2, 4, 8 or 32 bpp; colormap OK; typ. 300 ppi
+ * \param[in]    boxs        [optional] region to select in pixs
+ * \param[in]    thresh      binarization threshold (typ. 100 - 150)
+ * \param[out]   pboxaw      return the word boxes
+ * \param[out]   pboxaac     return the character boxes
+ * \param[in]    debugdir    [optional] for debug images; use NULL to skip
+ * \return  0 if OK, 1 on error
+ *
+ * <pre>
+ * Notes:
+ *      (1) If %boxs == NULL, the entire input image is used.
+ *      (2) Having an input pix that is not 1bpp is necessary to reduce
+ *          touching characters by using a low binarization threshold.
+ *          Suggested thresholds are between 100 and 150.
+ *      (3) The coordinates in the output boxes are global, with respect
+ *          to the input image.
+ * </pre>
+ */
+l_ok
+pixFindWordAndCharacterBoxes(PIX         *pixs,
+                             BOX         *boxs,
+                             l_int32      thresh,
+                             BOXA       **pboxaw,
+                             BOXAA      **pboxaac,
+                             const char  *debugdir)
+{
+char      *debugfile, *subdir;
+l_int32    i, xs, ys, xb, yb, nb;
+l_float32  scalefact;
+BOX       *box1, *box2;
+BOXA      *boxa1, *boxa1a, *boxa2, *boxa3, *boxa4, *boxa5, *boxaw;
+BOXAA     *boxaac;
+PIX       *pix1, *pix2, *pix3, *pix3a, *pix4, *pix5;
+
+    PROCNAME("pixFindWordAndCharacterBoxes");
+
+    if (pboxaw) *pboxaw = NULL;
+    if (pboxaac) *pboxaac = NULL;
+    if (!pboxaw || !pboxaac)
+        return ERROR_INT("&boxaw and &boxaac not defined", procName, 1);
+    if (!pixs || pixGetDepth(pixs) == 1)
+        return ERROR_INT("pixs not defined or 1 bpp", procName, 1);
+    if (thresh > 150)
+        L_WARNING("threshold is %d; may be too high\n", procName, thresh);
+
+    if (boxs) {
+        if ((pix1 = pixClipRectangle(pixs, boxs, NULL)) == NULL)
+            return ERROR_INT("pix1 not made", procName, 1);
+        boxGetGeometry(boxs, &xs, &ys, NULL, NULL);
+    } else {
+        pix1 = pixClone(pixs);
+        xs = ys = 0;
+    }
+
+        /* Convert pix1 to 8 bpp gray if necessary */
+    pix2 = pixConvertTo8(pix1, FALSE);
+
+        /* To find the words and letters, work with 1 bpp images and use
+         * a low threshold to reduce the number of touching characters. */
+    pix3 = pixConvertTo1(pix2, thresh);
+
+        /* Work at about 120 ppi to find the word bounding boxes. */
+    pix3a = pixScaleToResolution(pix3, 120.0, 300.0, &scalefact);
+
+        /* First find the words, removing the very small things like
+         * dots over the 'i' that weren't included in word boxes. */
+    pixGetWordBoxesInTextlines(pix3a, 1, 4, 150, 40, &boxa1a, NULL);
+    boxa1 = boxaTransform(boxa1a, 0, 0, 1.0 / scalefact, 1.0 / scalefact);
+    if (debugdir) {
+        subdir = stringReplaceSubstr(debugdir, "/tmp/", "", NULL, NULL);
+        lept_mkdir(subdir);
+        LEPT_FREE(subdir);
+        pix4 = pixConvertTo32(pix2);
+        pixRenderBoxaArb(pix4, boxa1, 2, 255, 0, 0);
+        debugfile = stringJoin(debugdir, "/words.png");
+        pixWrite(debugfile, pix4, IFF_PNG);
+        pixDestroy(&pix4);
+        LEPT_FREE(debugfile);
+    }
+
+        /* Now find the letters at 300 ppi */
+    nb = boxaGetCount(boxa1);
+    boxaw = boxaCreate(nb);
+    boxaac = boxaaCreate(nb);
+    *pboxaw = boxaw;
+    *pboxaac = boxaac;
+    for (i = 0; i < nb; i++) {
+        box1 = boxaGetBox(boxa1, i, L_COPY);
+        boxGetGeometry(box1, &xb, &yb, NULL, NULL);
+        pix4 = pixClipRectangle(pix3, box1, NULL);
+            /* Join detached parts of characters vertically */
+        pix5 = pixMorphSequence(pix4, "c1.10", 0);
+            /* The connected components should mostly be characters */
+        boxa2 = pixConnCompBB(pix5, 4);
+            /* Remove very small pieces */
+        boxa3 = boxaSelectBySize(boxa2, 2, 5, L_SELECT_IF_BOTH,
+                                 L_SELECT_IF_GTE, NULL);
+            /* Order left to right */
+        boxa4 = boxaSort(boxa3, L_SORT_BY_X, L_SORT_INCREASING, NULL);
+            /* Express locations with reference to the full input image */
+        boxa5 = boxaTransform(boxa4, xs + xb, ys + yb, 1.0, 1.0);
+        box2 = boxTransform(box1, xs, ys, 1.0, 1.0);
+
+            /* Ignore any boxa with no boxes after size filtering */
+        if (boxaGetCount(boxa5) > 0) {
+            boxaAddBox(boxaw, box2, L_INSERT);
+            boxaaAddBoxa(boxaac, boxa5, L_INSERT);
+        } else {
+            boxDestroy(&box2);
+            boxaDestroy(&boxa5);
+        }
+        boxDestroy(&box1);
+        pixDestroy(&pix4);
+        pixDestroy(&pix5);
+        boxaDestroy(&boxa2);
+        boxaDestroy(&boxa3);
+        boxaDestroy(&boxa4);
+    }
+    pixDestroy(&pix1);
+    pixDestroy(&pix2);
+    pixDestroy(&pix3);
+    pixDestroy(&pix3a);
+    boxaDestroy(&boxa1);
+    boxaDestroy(&boxa1a);
+    if (debugdir) {
+        pix4 = pixConvertTo32(pixs);
+        boxa2 = boxaaFlattenToBoxa(boxaac, NULL, L_COPY);
+        pixRenderBoxaArb(pix4, boxa2, 2, 255, 0, 0);
+        boxa3 = boxaAdjustSides(boxaw, -2, 2, -2, 2);
+        pixRenderBoxaArb(pix4, boxa3, 2, 0, 255, 0);
+        debugfile = stringJoin(debugdir, "/chars.png");
+        pixWrite(debugfile, pix4, IFF_PNG);
+        pixDestroy(&pix4);
+        boxaDestroy(&boxa2);
+        boxaDestroy(&boxa3);
+        LEPT_FREE(debugfile);
+    }
+    return 0;
+}
+
+
+/*------------------------------------------------------------------*
  *           Use word bounding boxes to compare page images         *
  *------------------------------------------------------------------*/
 /*!
  * \brief   boxaExtractSortedPattern()
  *
- * \param[in]    boxa typ. of word bounding boxes, in textline order
- * \param[in]    na   index of textline for each box in boxa
+ * \param[in]    boxa    typ. of word bounding boxes, in textline order
+ * \param[in]    na      index of textline for each box in boxa
  * \return  naa NUMAA, where each numa represents one textline,
  *                   or NULL on error
  *
@@ -558,16 +709,16 @@ NUMAA   *naa;
 /*!
  * \brief   numaaCompareImagesByBoxes()
  *
- * \param[in]    naa1 for image 1, formatted by boxaExtractSortedPattern()
- * \param[in]    naa2 ditto; for image 2
- * \param[in]    nperline number of box regions to be used in each textline
- * \param[in]    nreq number of complete row matches required
- * \param[in]    maxshiftx max allowed x shift between two patterns, in pixels
- * \param[in]    maxshifty max allowed y shift between two patterns, in pixels
- * \param[in]    delx max allowed difference in x data, after alignment
- * \param[in]    dely max allowed difference in y data, after alignment
- * \param[out]   psame 1 if %nreq row matches are found; 0 otherwise
- * \param[in]    debugflag 1 for debug output
+ * \param[in]    naa1       for image 1, formatted by boxaExtractSortedPattern()
+ * \param[in]    naa2       for image 2, formatted by boxaExtractSortedPattern()
+ * \param[in]    nperline   number of box regions to be used in each textline
+ * \param[in]    nreq       number of complete row matches required
+ * \param[in]    maxshiftx  max allowed x shift between two patterns, in pixels
+ * \param[in]    maxshifty  max allowed y shift between two patterns, in pixels
+ * \param[in]    delx       max allowed difference in x data, after alignment
+ * \param[in]    dely       max allowed difference in y data, after alignment
+ * \param[out]   psame      1 if %nreq row matches are found; 0 otherwise
+ * \param[in]    debugflag  1 for debug output
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -599,7 +750,7 @@ NUMAA   *naa;
  *              than (%delx, %dely).
  * </pre>
  */
-l_int32
+l_ok
 numaaCompareImagesByBoxes(NUMAA    *naa1,
                           NUMAA    *naa2,
                           l_int32   nperline,
@@ -759,23 +910,27 @@ l_int32  i, xl1, xr1, xl2, xr2, diffl, diffr;
 
 
 /*
- *  countAlignedMatches()
- *      Input:  nai1, nai2 (numas of row pairs for matches)
- *              nasx, nasy (numas of x and y shifts for the matches)
- *              n1, n2 (number of rows in images 1 and 2)
- *              delx, dely (allowed difference in shifts of the match,
- *                          compared to the reference match)
- *              nreq (number of required aligned matches)
- *              &same (<return> 1 if %nreq row matches are found; 0 otherwise)
- *      Return: 0 if OK, 1 on error
+ * \brief   countAlignedMatches()
  *
- *  Notes:
+ * \param[in]    nai1, nai2   numas of row pairs for matches
+ * \param[in]    nasx, nasy   numas of x and y shifts for the matches
+ * \param[in]    n1, n2       number of rows in images 1 and 2
+ * \param[in]    delx, dely   allowed difference in shifts of the match,
+ *                            compared to the reference match
+ * \param[in]    nre1         number of required aligned matches
+ * \param[out]   psame        return 1 if %nreq row matches are found;
+ *                            0 otherwise
+ * \return  0 if OK, 1 on error
+ *
+ * <pre>
+ * Notes:
  *      (1) This takes 4 input arrays giving parameters of all the
  *          line matches.  It looks for the maximum set of aligned
  *          matches (matches with approximately the same overall shifts)
  *          that do not use rows from either image more than once.
+ * </pre>
  */
-static l_int32
+static l_ok
 countAlignedMatches(NUMA     *nai1,
                     NUMA     *nai2,
                     NUMA     *nasx,

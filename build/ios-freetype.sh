@@ -44,11 +44,11 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 # OVERRIDING PKG-CONFIG
-export LIBPNG_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_host)/libpng/include"
-export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/libpng/lib"
+export LIBPNG_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng/include"
+export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng/lib"
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-zlib \
     --with-png \
@@ -65,7 +65,7 @@ export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_host)/libpng/lib"
     --disable-mmap \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_freetype_package_config "22.0.16"

@@ -1446,7 +1446,7 @@ test_one_file(struct display *dp, const char *filename)
        * unsigned, because some transforms are negative on a 16-bit system.
        */
       unsigned int active = dp->active_transforms;
-      const int exhaustive = (dp->options & EXHAUSTIVE) != 0;
+      int exhaustive = (dp->options & EXHAUSTIVE) != 0;
       unsigned int current = first_transform(active);
       unsigned int bad_transforms = 0;
       unsigned int bad_combo = ~0U;    /* bitwise AND of failing transforms */
@@ -1572,7 +1572,7 @@ do_test(struct display *dp, const char *file)
 }
 
 int
-main(const int argc, const char * const * const argv)
+main(int argc, char **argv)
 {
    /* For each file on the command line test it with a range of transforms */
    int option_end, ilog = 0;
@@ -1674,7 +1674,7 @@ main(const int argc, const char * const * const argv)
          /* Here on any return, including failures, except user/internal issues
           */
          {
-            const int pass = (d.options & STRICT) ?
+            int pass = (d.options & STRICT) ?
                RESULT_STRICT(d.results) : RESULT_RELAXED(d.results);
 
             if (!pass)

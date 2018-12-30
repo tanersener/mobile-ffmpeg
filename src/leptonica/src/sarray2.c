@@ -427,7 +427,7 @@ RB_TYPE   key;
  *          lookup within the dna in each bucket.
  * </pre>
  */
-l_int32
+l_ok
 sarrayRemoveDupsByHash(SARRAY      *sas,
                        SARRAY     **psad,
                        L_DNAHASH  **pdahash)
@@ -559,7 +559,7 @@ SARRAY     *sa_small, *sa_big, *sad;
  *          index into sa to check if %str has been found before.
  * </pre>
  */
-l_int32
+l_ok
 sarrayFindStringByHash(SARRAY      *sa,
                        L_DNAHASH   *dahash,
                        const char  *str,
@@ -684,7 +684,7 @@ SARRAY  *sa;
  *          key and val strings to have white space (e.g., multiple words).
  * </pre>
  */
-l_int32
+l_ok
 sarrayLookupCSKV(SARRAY      *sa,
                  const char  *keystring,
                  char       **pvalstring)

@@ -56,32 +56,32 @@ PIX * pixReadStreamTiff(FILE *fp, l_int32 n)
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteTiff(const char *filename, PIX *pix, l_int32 comptype,
-                     const char *modestring)
+l_ok pixWriteTiff(const char *filename, PIX *pix, l_int32 comptype,
+                  const char *modestring)
 {
     return ERROR_INT("function not present", "pixWriteTiff", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteTiffCustom(const char *filename, PIX *pix, l_int32 comptype,
-                           const char *modestring, NUMA *natags,
-                           SARRAY *savals, SARRAY *satypes, NUMA *nasizes)
+l_ok pixWriteTiffCustom(const char *filename, PIX *pix, l_int32 comptype,
+                        const char *modestring, NUMA *natags,
+                        SARRAY *savals, SARRAY *satypes, NUMA *nasizes)
 {
     return ERROR_INT("function not present", "pixWriteTiffCustom", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteStreamTiff(FILE *fp, PIX *pix, l_int32 comptype)
+l_ok pixWriteStreamTiff(FILE *fp, PIX *pix, l_int32 comptype)
 {
     return ERROR_INT("function not present", "pixWriteStreamTiff", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteStreamTiffWA(FILE *fp, PIX *pix, l_int32 comptype,
-                             const char *modestr)
+l_ok pixWriteStreamTiffWA(FILE *fp, PIX *pix, l_int32 comptype,
+                          const char *modestr)
 {
     return ERROR_INT("function not present", "pixWriteStreamTiffWA", 1);
 }
@@ -104,87 +104,87 @@ PIXA * pixaReadMultipageTiff(const char *filename)
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixaWriteMultipageTiff(const char *filename, PIXA *pixa)
+l_ok pixaWriteMultipageTiff(const char *filename, PIXA *pixa)
 {
     return ERROR_INT("function not present", "pixaWriteMultipageTiff", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 writeMultipageTiff(const char *dirin, const char *substr,
-                           const char *fileout)
+l_ok writeMultipageTiff(const char *dirin, const char *substr,
+                        const char *fileout)
 {
     return ERROR_INT("function not present", "writeMultipageTiff", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 writeMultipageTiffSA(SARRAY *sa, const char *fileout)
+l_ok writeMultipageTiffSA(SARRAY *sa, const char *fileout)
 {
     return ERROR_INT("function not present", "writeMultipageTiffSA", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 fprintTiffInfo(FILE *fpout, const char *tiffile)
+l_ok fprintTiffInfo(FILE *fpout, const char *tiffile)
 {
     return ERROR_INT("function not present", "fprintTiffInfo", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 tiffGetCount(FILE *fp, l_int32 *pn)
+l_ok tiffGetCount(FILE *fp, l_int32 *pn)
 {
     return ERROR_INT("function not present", "tiffGetCount", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 getTiffResolution(FILE *fp, l_int32 *pxres, l_int32 *pyres)
+l_ok getTiffResolution(FILE *fp, l_int32 *pxres, l_int32 *pyres)
 {
     return ERROR_INT("function not present", "getTiffResolution", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 readHeaderTiff(const char *filename, l_int32 n, l_int32 *pwidth,
-                       l_int32 *pheight, l_int32 *pbps, l_int32 *pspp,
-                       l_int32 *pres, l_int32 *pcmap, l_int32 *pformat)
+l_ok readHeaderTiff(const char *filename, l_int32 n, l_int32 *pwidth,
+                    l_int32 *pheight, l_int32 *pbps, l_int32 *pspp,
+                    l_int32 *pres, l_int32 *pcmap, l_int32 *pformat)
 {
     return ERROR_INT("function not present", "readHeaderTiff", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 freadHeaderTiff(FILE *fp, l_int32 n, l_int32 *pwidth,
-                        l_int32 *pheight, l_int32 *pbps, l_int32 *pspp,
-                        l_int32 *pres, l_int32 *pcmap, l_int32 *pformat)
+l_ok freadHeaderTiff(FILE *fp, l_int32 n, l_int32 *pwidth,
+                     l_int32 *pheight, l_int32 *pbps, l_int32 *pspp,
+                     l_int32 *pres, l_int32 *pcmap, l_int32 *pformat)
 {
     return ERROR_INT("function not present", "freadHeaderTiff", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 readHeaderMemTiff(const l_uint8 *cdata, size_t size, l_int32 n,
-                          l_int32 *pwidth, l_int32 *pheight, l_int32 *pbps,
-                          l_int32 *pspp, l_int32 *pres, l_int32 *pcmap,
-                          l_int32 *pformat)
+l_ok readHeaderMemTiff(const l_uint8 *cdata, size_t size, l_int32 n,
+                       l_int32 *pwidth, l_int32 *pheight, l_int32 *pbps,
+                       l_int32 *pspp, l_int32 *pres, l_int32 *pcmap,
+                       l_int32 *pformat)
 {
     return ERROR_INT("function not present", "readHeaderMemTiff", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 findTiffCompression(FILE *fp, l_int32 *pcomptype)
+l_ok findTiffCompression(FILE *fp, l_int32 *pcomptype)
 {
     return ERROR_INT("function not present", "findTiffCompression", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 extractG4DataFromFile(const char *filein, l_uint8 **pdata,
-                              size_t *pnbytes, l_int32 *pw,
-                              l_int32 *ph, l_int32 *pminisblack)
+l_ok extractG4DataFromFile(const char *filein, l_uint8 **pdata,
+                           size_t *pnbytes, l_int32 *pw,
+                           l_int32 *ph, l_int32 *pminisblack)
 {
     return ERROR_INT("function not present", "extractG4DataFromFile", 1);
 }
@@ -215,14 +215,14 @@ PIXA * pixaReadMemMultipageTiff(const l_uint8 *data, size_t size)
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixaWriteMemMultipageTiff(l_uint8 **pdata, size_t *psize, PIXA *pixa)
+l_ok pixaWriteMemMultipageTiff(l_uint8 **pdata, size_t *psize, PIXA *pixa)
 {
     return ERROR_INT("function not present", "pixaWriteMemMultipageTiff", 1);
 }
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteMemTiff(l_uint8 **pdata, size_t *psize, PIX *pix,
+l_ok pixWriteMemTiff(l_uint8 **pdata, size_t *psize, PIX *pix,
                         l_int32 comptype)
 {
     return ERROR_INT("function not present", "pixWriteMemTiff", 1);
@@ -230,9 +230,9 @@ l_int32 pixWriteMemTiff(l_uint8 **pdata, size_t *psize, PIX *pix,
 
 /* ----------------------------------------------------------------------*/
 
-l_int32 pixWriteMemTiffCustom(l_uint8 **pdata, size_t *psize, PIX *pix,
-                              l_int32 comptype, NUMA *natags, SARRAY *savals,
-                              SARRAY *satypes, NUMA *nasizes)
+l_ok pixWriteMemTiffCustom(l_uint8 **pdata, size_t *psize, PIX *pix,
+                           l_int32 comptype, NUMA *natags, SARRAY *savals,
+                           SARRAY *satypes, NUMA *nasizes)
 {
     return ERROR_INT("function not present", "pixWriteMemTiffCustom", 1);
 }

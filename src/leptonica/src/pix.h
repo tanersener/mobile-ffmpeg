@@ -78,7 +78,7 @@
  *         Sorting flags (by type and direction)
  *         Blending flags
  *         Graphics pixel setting flags
- *         Size filtering flags
+ *         Size and location filter flags
  *         Color component selection flags
  *         16-bit conversion flags
  *         Rotation and shear flags
@@ -790,6 +790,23 @@ enum {
  *                     Size and location filter flags                      *
  *-------------------------------------------------------------------------*/
 
+/*! Size comparison filter flags */
+enum {
+    L_SELECT_IF_LT = 1,         /*!< save if value is less than threshold  */
+    L_SELECT_IF_GT = 2,         /*!< save if value is more than threshold  */
+    L_SELECT_IF_LTE = 3,        /*!< save if value is <= to the threshold  */
+    L_SELECT_IF_GTE = 4         /*!< save if value is >= to the threshold  */
+};
+
+/*! Size selection flags for 1 bpp pix foreground components */
+enum {
+    L_SELECT_BY_WIDTH = 1,          /*!< select by width                   */
+    L_SELECT_BY_HEIGHT = 2,         /*!< select by height                  */
+    L_SELECT_BY_MAX_DIMENSION = 3,  /*!< select by max of width and height */
+    L_SELECT_BY_AREA = 4,           /*!< select by foreground area         */
+    L_SELECT_BY_PERIMETER = 5       /*!< select by perimeter               */
+};
+
 /*! Location filter flags */
 enum {
     L_SELECT_WIDTH = 1,         /*!< width must satisfy constraint         */
@@ -802,12 +819,11 @@ enum {
                                 /*!< and yval must satisfy                 */
 };
 
-/*! Size filter flags */
+/*! Boxa modification flags */
 enum {
-    L_SELECT_IF_LT = 1,         /*!< save if value is less than threshold  */
-    L_SELECT_IF_GT = 2,         /*!< save if value is more than threshold  */
-    L_SELECT_IF_LTE = 3,        /*!< save if value is <= to the threshold  */
-    L_SELECT_IF_GTE = 4         /*!< save if value is >= to the threshold  */
+    L_CHECK_WIDTH = 1,          /*!< check and possibly modify width       */
+    L_CHECK_HEIGHT = 2,         /*!< check and possibly modify height      */
+    L_CHECK_BOTH = 3            /*!< check and possibly modify both        */
 };
 
 
@@ -1128,13 +1144,13 @@ enum {
  *                            Horizontal warp                              *
  *-------------------------------------------------------------------------*/
 
-/*! Horizonal warp direction */
+/*! Horizontal warp direction */
 enum {
     L_WARP_TO_LEFT = 1,    /*!< increasing stretch or contraction to left  */
     L_WARP_TO_RIGHT = 2    /*!< increasing stretch or contraction to right */
 };
 
-/*! Horizonal warp stretch mode */
+/*! Horizontal warp stretch mode */
 enum {
     L_LINEAR_WARP = 1,     /*!< stretch or contraction grows linearly      */
     L_QUADRATIC_WARP = 2   /*!< stretch or contraction grows quadratically */

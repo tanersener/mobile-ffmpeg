@@ -64,7 +64,7 @@ SARRAY   *sa1;
     boxatxt = pixGetText(pix1);
     fprintf(stderr, "%s\n", boxatxt);
     boxa1 = boxaReadMem((l_uint8 *)boxatxt, strlen(boxatxt));
-    pixa1 = pixaCreateFromBoxa(pix1, boxa1, NULL);
+    pixa1 = pixaCreateFromBoxa(pix1, boxa1, 0, 0, NULL);
     pixDestroy(&pix1);  /* destroys boxa1 */
 
         /* Identify components in the sample data */

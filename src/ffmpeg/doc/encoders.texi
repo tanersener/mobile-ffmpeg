@@ -1370,6 +1370,118 @@ makes it possible to store non-rgb pix_fmts.
 
 @end table
 
+@section libaom-av1
+
+libaom AV1 encoder wrapper.
+
+Requires the presence of the libaom headers and library during
+configuration.  You need to explicitly configure the build with
+@code{--enable-libaom}.
+
+@subsection Options
+
+The wrapper supports the following standard libavcodec options:
+
+@table @option
+
+@item b
+Set bitrate target in bits/second.  By default this will use
+variable-bitrate mode.  If @option{maxrate} and @option{minrate} are
+also set to the same value then it will use constant-bitrate mode,
+otherwise if @option{crf} is set as well then it will use
+constrained-quality mode.
+
+@item g keyint_min
+Set key frame placement.  The GOP size sets the maximum distance between
+key frames; if zero the output stream will be intra-only.  The minimum
+distance is ignored unless it is the same as the GOP size, in which case
+key frames will always appear at a fixed interval.  Not set by default,
+so without this option the library has completely free choice about
+where to place key frames.
+
+@item qmin qmax
+Set minimum/maximum quantisation values.  Valid range is from 0 to 63
+(warning: this does not match the quantiser values actually used by AV1
+- divide by four to map real quantiser values to this range).  Defaults
+to min/max (no constraint).
+
+@item minrate maxrate bufsize rc_init_occupancy
+Set rate control buffering parameters.  Not used if not set - defaults
+to unconstrained variable bitrate.
+
+@item threads
+Set the number of threads to use while encoding.  This may require the
+@option{tiles} or @option{row-mt} options to also be set to actually
+use the specified number of threads fully. Defaults to the number of
+hardware threads supported by the host machine.
+
+@item profile
+Set the encoding profile.  Defaults to using the profile which matches
+the bit depth and chroma subsampling of the input.
+
+@end table
+
+The wrapper also has some specific options:
+
+@table @option
+
+@item cpu-used
+Set the quality/encoding speed tradeoff.  Valid range is from 0 to 8,
+higher numbers indicating greater speed and lower quality.  The default
+value is 1, which will be slow and high quality.
+
+@item auto-alt-ref
+Enable use of alternate reference frames.  Defaults to the internal
+default of the library.
+
+@item lag-in-frames
+Set the maximum number of frames which the encoder may keep in flight
+at any one time for lookahead purposes.  Defaults to the internal
+default of the library.
+
+@item error-resilience
+Enable error resilience features:
+@table @option
+@item default
+Improve resilience against losses of whole frames.
+@end table
+Not enabled by default.
+
+@item crf
+Set the quality/size tradeoff for constant-quality (no bitrate target)
+and constrained-quality (with maximum bitrate target) modes. Valid
+range is 0 to 63, higher numbers indicating lower quality and smaller
+output size.  Only used if set; by default only the bitrate target is
+used.
+
+@item static-thresh
+Set a change threshold on blocks below which they will be skipped by
+the encoder.  Defined in arbitrary units as a nonnegative integer,
+defaulting to zero (no blocks are skipped).
+
+@item drop-threshold
+Set a threshold for dropping frames when close to rate control bounds.
+Defined as a percentage of the target buffer - when the rate control
+buffer falls below this percentage, frames will be dropped until it
+has refilled above the threshold.  Defaults to zero (no frames are
+dropped).
+
+@item tiles
+Set the number of tiles to encode the input video with, as columns x
+rows.  Larger numbers allow greater parallelism in both encoding and
+decoding, but may decrease coding efficiency.  Defaults to the minimum
+number of tiles required by the size of the input video (this is 1x1
+(that is, a single tile) for sizes up to and including 4K).
+
+@item tile-columns tile-rows
+Set the number of tiles as log2 of the number of tile rows and columns.
+Provided for compatibility with libvpx/VP9.
+
+@item row-mt (Requires libaom >= 1.0.0-759-g90a15f4f2)
+Enable row based multi-threading. Disabled by default.
+
+@end table
+
 @section libkvazaar
 
 Kvazaar H.265/HEVC encoder.
@@ -1641,6 +1753,7 @@ means unlimited.
 @table @option
 @item auto-alt-ref
 Enable use of alternate reference frames (2-pass only).
+Values greater than 1 enable multi-layer alternate reference frames (VP9 only).
 @item arnr-max-frames
 Set altref noise reduction max frame count.
 @item arnr-type
@@ -1653,6 +1766,38 @@ Set number of frames to look ahead for frametype and ratecontrol.
 
 @item error-resilient
 Enable error resiliency features.
+
+@item sharpness @var{integer}
+Increase sharpness at the expense of lower PSNR.
+The valid range is [0, 7].
+
+@item VP8-specific options
+@table @option
+@item ts-parameters
+Sets the temporal scalability configuration using a :-separated list of
+key=value pairs. For example, to specify temporal scalability parameters
+with @code{ffmpeg}:
+@example
+ffmpeg -i INPUT -c:v libvpx -ts-parameters ts_number_layers=3:\
+ts_target_bitrate=250000,500000,1000000:ts_rate_decimator=4,2,1:\
+ts_periodicity=4:ts_layer_id=0,2,1,2 OUTPUT
+@end example
+Below is a brief explanation of each of the parameters, please
+refer to @code{struct vpx_codec_enc_cfg} in @code{vpx/vpx_encoder.h} for more
+details.
+@table @option
+@item ts_number_layers
+Number of temporal coding layers.
+@item ts_target_bitrate
+Target bitrate for each temporal layer.
+@item ts_rate_decimator
+Frame rate decimation factor for each temporal layer.
+@item ts_periodicity
+Length of the sequence defining frame temporal layer membership.
+@item ts_layer_id
+Template defining the membership of frames to temporal layers.
+@end table
+@end table
 
 @item VP9-specific options
 @table @option
@@ -1692,6 +1837,8 @@ Corpus VBR mode is a variant of standard VBR where the complexity distribution
 midpoint is passed in rather than calculated for a specific clip or chunk.
 
 The valid range is [0, 10000]. 0 (default) uses standard VBR.
+@item enable-tpl @var{boolean}
+Enable temporal dependency model.
 @end table
 
 @end table
@@ -2177,6 +2324,52 @@ For example to specify libx265 encoding options with @option{-x265-params}:
 
 @example
 ffmpeg -i input -c:v libx265 -x265-params crf=26:psy-rd=1 output.mp4
+@end example
+@end table
+
+@section libxavs2
+
+xavs2 AVS2-P2/IEEE1857.4 encoder wrapper.
+
+This encoder requires the presence of the libxavs2 headers and library
+during configuration. You need to explicitly configure the build with
+@option{--enable-libxavs2}.
+
+@subsection Options
+
+@table @option
+@item lcu_row_threads
+Set the number of parallel threads for rows from 1 to 8 (default 5).
+
+@item initial_qp
+Set the xavs2 quantization parameter from 1 to 63 (default 34). This is
+used to set the initial qp for the first frame.
+
+@item qp
+Set the xavs2 quantization parameter from 1 to 63 (default 34). This is
+used to set the qp value under constant-QP mode.
+
+@item max_qp
+Set the max qp for rate control from 1 to 63 (default 55).
+
+@item min_qp
+Set the min qp for rate control from 1 to 63 (default 20).
+
+@item speed_level
+Set the Speed level from 0 to 9 (default 0). Higher is better but slower.
+
+@item log_level
+Set the log level from -1 to 3 (default 0). -1: none, 0: error,
+1: warning, 2: info, 3: debug.
+
+@item xavs2-params
+Set xavs2 options using a list of @var{key}=@var{value} couples separated
+by ":".
+
+For example to specify libxavs2 encoding options with @option{-xavs2-params}:
+
+@example
+ffmpeg -i input -c:v libxavs2 -xavs2-params preset_level=5 output.avs2
 @end example
 @end table
 
@@ -2789,52 +2982,6 @@ reduce perception. Use in bogus benchmarks.
 Reduces detail but attempts to preserve color at extremely low bitrates.
 @end itemize
 
-@end table
-
-@section libxavs2
-
-xavs2 AVS2-P2/IEEE1857.4 encoder wrapper.
-
-This encoder requires the presence of the libxavs2 headers and library
-during configuration. You need to explicitly configure the build with
-@option{--enable-libxavs2}.
-
-@subsection Options
-
-@table @option
-@item lcu_row_threads
-Set the number of parallel threads for rows from 1 to 8 (default 5).
-
-@item initial_qp
-Set the xavs2 quantization parameter from 1 to 63 (default 34). This is
-used to set the initial qp for the first frame.
-
-@item qp
-Set the xavs2 quantization parameter from 1 to 63 (default 34). This is
-used to set the qp value under constant-QP mode.
-
-@item max_qp
-Set the max qp for rate control from 1 to 63 (default 55).
-
-@item min_qp
-Set the min qp for rate control from 1 to 63 (default 20).
-
-@item speed_level
-Set the Speed level from 0 to 9 (default 0). Higher is better but slower.
-
-@item log_level
-Set the log level from -1 to 3 (default 0). -1: none, 0: error,
-1: warning, 2: info, 3: debug.
-
-@item xavs2-params
-Set xavs2 options using a list of @var{key}=@var{value} couples separated
-by ":".
-
-For example to specify libxavs2 encoding options with @option{-xavs2-params}:
-
-@example
-ffmpeg -i input -c:v libxavs2 -xavs2-params preset_level=5 output.avs2
-@end example
 @end table
 
 @c man end VIDEO ENCODERS

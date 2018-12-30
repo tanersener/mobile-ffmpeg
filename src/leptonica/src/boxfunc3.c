@@ -78,9 +78,9 @@ static l_int32 pixSearchForRectangle(PIX *pixs, BOX *boxs, l_int32 minsum,
 /*!
  * \brief   pixMaskConnComp()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    connectivity 4 or 8
- * \param[out]   pboxa [optional] bounding boxes of c.c.
+ * \param[in]    pixs           1 bpp
+ * \param[in]    connectivity   4 or 8
+ * \param[out]   pboxa          [optional] bounding boxes of c.c.
  * \return  pixd 1 bpp mask over the c.c., or NULL on error
  *
  * <pre>
@@ -121,10 +121,10 @@ PIX   *pixd;
 /*!
  * \brief   pixMaskBoxa()
  *
- * \param[in]    pixd [optional] may be NULL
- * \param[in]    pixs any depth; not cmapped
- * \param[in]    boxa of boxes, to paint
- * \param[in]    op L_SET_PIXELS, L_CLEAR_PIXELS, L_FLIP_PIXELS
+ * \param[in]    pixd    [optional] may be NULL
+ * \param[in]    pixs    any depth; not cmapped
+ * \param[in]    boxa    of boxes, to paint
+ * \param[in]    op      L_SET_PIXELS, L_CLEAR_PIXELS, L_FLIP_PIXELS
  * \return  pixd with masking op over the boxes, or NULL on error
  *
  * <pre>
@@ -191,9 +191,9 @@ BOX     *box;
 /*!
  * \brief   pixPaintBoxa()
  *
- * \param[in]    pixs any depth, can be cmapped
- * \param[in]    boxa of boxes, to paint
- * \param[in]    val rgba color to paint
+ * \param[in]    pixs    any depth, can be cmapped
+ * \param[in]    boxa    of boxes, to paint
+ * \param[in]    val     rgba color to paint
  * \return  pixd with painted boxes, or NULL on error
  *
  * <pre>
@@ -274,9 +274,9 @@ PIXCMAP  *cmap;
 /*!
  * \brief   pixSetBlackOrWhiteBoxa()
  *
- * \param[in]    pixs any depth, can be cmapped
- * \param[in]    boxa [optional] of boxes, to clear or set
- * \param[in]    op L_SET_BLACK, L_SET_WHITE
+ * \param[in]    pixs    any depth, can be cmapped
+ * \param[in]    boxa    [optional] of boxes, to clear or set
+ * \param[in]    op      L_SET_BLACK, L_SET_WHITE
  * \return  pixd with boxes filled with white or black, or NULL on error
  */
 PIX *
@@ -348,8 +348,8 @@ PIXCMAP  *cmap;
 /*!
  * \brief   pixPaintBoxaRandom()
  *
- * \param[in]    pixs any depth, can be cmapped
- * \param[in]    boxa of boxes, to paint
+ * \param[in]    pixs    any depth, can be cmapped
+ * \param[in]    boxa    of boxes, to paint
  * \return  pixd with painted boxes, or NULL on error
  *
  * <pre>
@@ -416,9 +416,9 @@ PIXCMAP  *cmap;
 /*!
  * \brief   pixBlendBoxaRandom()
  *
- * \param[in]    pixs any depth; can be cmapped
- * \param[in]    boxa of boxes, to blend/paint
- * \param[in]    fract of box color to use
+ * \param[in]    pixs    any depth; can be cmapped
+ * \param[in]    boxa    of boxes, to blend/paint
+ * \param[in]    fract   of box color to use
  * \return  pixd 32 bpp, with blend/painted boxes, or NULL on error
  *
  * <pre>
@@ -479,10 +479,10 @@ PIXCMAP  *cmap;
 /*!
  * \brief   pixDrawBoxa()
  *
- * \param[in]    pixs any depth; can be cmapped
- * \param[in]    boxa of boxes, to draw
- * \param[in]    width of lines
- * \param[in]    val rgba color to draw
+ * \param[in]    pixs    any depth; can be cmapped
+ * \param[in]    boxa    of boxes, to draw
+ * \param[in]    width   of lines
+ * \param[in]    val     rgba color to draw
  * \return  pixd with outlines of boxes added, or NULL on error
  *
  * <pre>
@@ -543,9 +543,9 @@ PIXCMAP  *cmap;
 /*!
  * \brief   pixDrawBoxaRandom()
  *
- * \param[in]    pixs any depth, can be cmapped
- * \param[in]    boxa of boxes, to draw
- * \param[in]    width thickness of line
+ * \param[in]    pixs     any depth, can be cmapped
+ * \param[in]    boxa     of boxes, to draw
+ * \param[in]    width    thickness of line
  * \return  pixd with box outlines drawn, or NULL on error
  *
  * <pre>
@@ -627,6 +627,7 @@ PTAA     *ptaa;
  *          If %pixs is NULL, the dimensions of %pixd are determined by
  *            - %w and %h if both are > 0, or
  *            - the minimum size required using all boxes in %baa.
+ *
  * </pre>
  */
 PIX *
@@ -693,16 +694,16 @@ PIXCMAP  *cmap;
 /*!
  * \brief   pixaDisplayBoxaa()
  *
- * \param[in]    pixas any depth, can be cmapped
- * \param[in]    baa  boxes to draw on input pixa
- * \param[in]    colorflag  (L_DRAW_RED, L_DRAW_GREEN, etc)
- * \param[in]    width thickness of lines
+ * \param[in]    pixas       any depth, can be cmapped
+ * \param[in]    baa         boxes to draw on input pixa
+ * \param[in]    colorflag   L_DRAW_RED, L_DRAW_GREEN, etc
+ * \param[in]    width       thickness of lines
  * \return  pixa with box outlines drawn on each pix, or NULL on error
  *
  * <pre>
  * Notes:
  *      (1) All pix in %pixas that are not rgb are converted to rgb.
- *      (2) Each boxa in @baa contains boxes that will be drawn on
+ *      (2) Each boxa in %baa contains boxes that will be drawn on
  *          the corresponding pix in %pixas.
  *      (3) The color of the boxes drawn on each pix are selected with
  *          %colorflag:
@@ -799,13 +800,13 @@ PIXA      *pixad;
 /*!
  * \brief   pixSplitIntoBoxa()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    minsum  minimum pixels to trigger propagation
- * \param[in]    skipdist distance before computing sum for propagation
- * \param[in]    delta difference required to stop propagation
- * \param[in]    maxbg maximum number of allowed bg pixels in ref scan
- * \param[in]    maxcomps use 0 for unlimited number of subdivided components
- * \param[in]    remainder set to 1 to get b.b. of remaining stuff
+ * \param[in]    pixs       1 bpp
+ * \param[in]    minsum     minimum pixels to trigger propagation
+ * \param[in]    skipdist   distance before computing sum for propagation
+ * \param[in]    delta      difference required to stop propagation
+ * \param[in]    maxbg      maximum number of allowed bg pixels in ref scan
+ * \param[in]    maxcomps   use 0 for unlimited number of subdivided components
+ * \param[in]    remainder  set to 1 to get b.b. of remaining stuff
  * \return  boxa of rectangles covering the fg of pixs, or NULL on error
  *
  * <pre>
@@ -873,14 +874,14 @@ PIXA    *pixas;
 /*!
  * \brief   pixSplitComponentIntoBoxa()
  *
- * \param[in]    pix 1 bpp
- * \param[in]    box [optional] location of pix w/rt an origin
- * \param[in]    minsum  minimum pixels to trigger propagation
- * \param[in]    skipdist distance before computing sum for propagation
- * \param[in]    delta difference required to stop propagation
- * \param[in]    maxbg maximum number of allowed bg pixels in ref scan
- * \param[in]    maxcomps use 0 for unlimited number of subdivided components
- * \param[in]    remainder set to 1 to get b.b. of remaining stuff
+ * \param[in]    pix        1 bpp
+ * \param[in]    box        [optional] location of pix w/rt an origin
+ * \param[in]    minsum     minimum pixels to trigger propagation
+ * \param[in]    skipdist   distance before computing sum for propagation
+ * \param[in]    delta      difference required to stop propagation
+ * \param[in]    maxbg      maximum number of allowed bg pixels in ref scan
+ * \param[in]    maxcomps   use 0 for unlimited number of subdivided components
+ * \param[in]    remainder  set to 1 to get b.b. of remaining stuff
  * \return  boxa of rectangles covering the fg of pix, or NULL on error
  *
  * <pre>
@@ -1033,15 +1034,15 @@ PIX     *pixs;
 /*!
  * \brief   pixSearchForRectangle()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    boxs current region to investigate
- * \param[in]    minsum  minimum pixels to trigger propagation
- * \param[in]    skipdist distance before computing sum for propagation
- * \param[in]    delta difference required to stop propagation
- * \param[in]    maxbg maximum number of allowed bg pixels in ref scan
- * \param[in]    sideflag side to search from
- * \param[in]    boxat add result of rectangular region found here
- * \param[in]    nascore add score for this rectangle here
+ * \param[in]    pixs       1 bpp
+ * \param[in]    boxs       current region to investigate
+ * \param[in]    minsum     minimum pixels to trigger propagation
+ * \param[in]    skipdist   distance before computing sum for propagation
+ * \param[in]    delta      difference required to stop propagation
+ * \param[in]    maxbg      maximum number of allowed bg pixels in ref scan
+ * \param[in]    sideflag   side to search from
+ * \param[in]    boxat      add result of rectangular region found here
+ * \param[in]    nascore    add score for this rectangle here
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1288,8 +1289,8 @@ success:
  * \brief   makeMosaicStrips()
  *
  * \param[in]    w, h
- * \param[in]    direction L_SCAN_HORIZONTAL or L_SCAN_VERTICAL
- * \param[in]    size of strips in the scan direction
+ * \param[in]    direction    L_SCAN_HORIZONTAL or L_SCAN_VERTICAL
+ * \param[in]    size         of strips in the scan direction
  * \return  boxa, or NULL on error
  *
  * <pre>
@@ -1355,12 +1356,11 @@ BOXA    *boxa;
  * \brief   boxaCompareRegions()
  *
  * \param[in]    boxa1, boxa2
- * \param[in]    areathresh minimum area of boxes to be considered
- * \param[out]   pnsame  true if same number of boxes
- * \param[out]   pdiffarea fractional difference in total area
- * \param[out]   pdiffxor [optional] fractional difference
- *                         in xor of regions
- * \param[out]   ppixdb [optional] debug pix showing two boxa
+ * \param[in]    areathresh  minimum area of boxes to be considered
+ * \param[out]   pnsame      true if same number of boxes
+ * \param[out]   pdiffarea   fractional difference in total area
+ * \param[out]   pdiffxor    [optional] fractional difference in xor of regions
+ * \param[out]   ppixdb      [optional] debug pix showing two boxa
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1383,7 +1383,7 @@ BOXA    *boxa;
  *          segmentation mask for text or images from two pages.
  * </pre>
  */
-l_int32
+l_ok
 boxaCompareRegions(BOXA       *boxa1,
                    BOXA       *boxa2,
                    l_int32     areathresh,
@@ -1505,10 +1505,10 @@ PIXA     *pixa;
 /*!
  * \brief   pixSelectLargeULComp()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    areaslop fraction near but less than 1.0
- * \param[in]    yslop number of pixels in y direction
- * \param[in]    connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    areaslop       fraction near but less than 1.0
+ * \param[in]    yslop          number of pixels in y direction
+ * \param[in]    connectivity   4 or 8
  * \return  box, or NULL on error
  *
  * <pre>
@@ -1558,9 +1558,9 @@ BOXA  *boxa1;
 /*!
  * \brief   boxaSelectLargeULBox()
  *
- * \param[in]    boxas 1 bpp
- * \param[in]    areaslop fraction near but less than 1.0
- * \param[in]    yslop number of pixels in y direction
+ * \param[in]    boxas      1 bpp
+ * \param[in]    areaslop   fraction near but less than 1.0
+ * \param[in]    yslop      number of pixels in y direction
  * \return  box, or NULL on error
  *
  * <pre>

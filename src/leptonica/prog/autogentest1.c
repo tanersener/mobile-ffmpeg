@@ -68,7 +68,7 @@ L_STRCODE  *strc;
     strcodeFinalize(&strc, NULL);
 
         /* Method 2: generate autogen.138.c and autogen.138.c  */
-    l_binaryWrite("/tmp/lept/auto/fontnames.txt", "w", (char *)filetext,
+    l_binaryWrite("/tmp/lept/auto/fontnames.txt", "w", filetext,
                   strlen(filetext));
     strcodeCreateFromFile("/tmp/lept/auto/fontnames.txt", 138, NULL);
     return 0;

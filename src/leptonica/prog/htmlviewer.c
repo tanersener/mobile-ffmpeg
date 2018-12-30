@@ -61,7 +61,7 @@ static const l_int32  MIN_VIEW_WIDTH = 300;
 static l_int32 pixHtmlViewer(const char *dirin, const char *dirout,
                              const char  *rootname, l_int32 thumbwidth,
                              l_int32 viewwidth);
-static void WriteFormattedPix(char *fname, PIX *pix);
+static void WriteFormattedPix(const char *fname, PIX *pix);
 
 
 int main(int    argc,
@@ -267,8 +267,8 @@ SARRAY    *safiles, *sathumbs, *saviews, *sahtml, *salink;
 }
 
 static void
-WriteFormattedPix(char  *fname,
-                  PIX   *pix)
+WriteFormattedPix(const char *fname,
+                  PIX        *pix)
 {
 l_int32  d;
 

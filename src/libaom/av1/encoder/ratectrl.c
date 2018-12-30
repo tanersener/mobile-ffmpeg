@@ -250,12 +250,10 @@ int av1_rc_get_default_min_gf_interval(int width, int height,
   // 4K60: 12
 }
 
-int av1_rc_get_default_max_gf_interval(double framerate, int min_gf_interval) {
+int av1_rc_get_default_max_gf_interval(double framerate, int min_gf_interval,
+                                       int max_pyr_height) {
   int interval = AOMMIN(MAX_GF_INTERVAL, (int)(framerate * 0.75));
-  interval += (interval & 0x01);  // Round to even value
-#if CONFIG_FIX_GF_LENGTH
-  interval = AOMMAX(FIXED_GF_LENGTH, interval);
-#endif
+  interval = AOMMAX(av1_rc_get_fixed_gf_length(max_pyr_height), interval);
   return AOMMAX(interval, min_gf_interval);
 }
 
@@ -312,7 +310,7 @@ void av1_rc_init(const AV1EncoderConfig *oxcf, int pass, RATE_CONTROL *rc) {
         oxcf->width, oxcf->height, oxcf->init_framerate);
   if (rc->max_gf_interval == 0)
     rc->max_gf_interval = av1_rc_get_default_max_gf_interval(
-        oxcf->init_framerate, rc->min_gf_interval);
+        oxcf->init_framerate, rc->min_gf_interval, oxcf->gf_max_pyr_height);
   rc->baseline_gf_interval = (rc->min_gf_interval + rc->max_gf_interval) / 2;
 }
 
@@ -1849,7 +1847,7 @@ void av1_rc_set_gf_interval_range(const AV1_COMP *const cpi,
           oxcf->width, oxcf->height, cpi->framerate);
     if (rc->max_gf_interval == 0)
       rc->max_gf_interval = av1_rc_get_default_max_gf_interval(
-          cpi->framerate, rc->min_gf_interval);
+          cpi->framerate, rc->min_gf_interval, oxcf->gf_max_pyr_height);
 
     // Extended max interval for genuinely static scenes like slide shows.
     rc->static_scene_max_gf_interval = MAX_STATIC_GF_GROUP_LENGTH;

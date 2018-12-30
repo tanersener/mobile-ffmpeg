@@ -1558,7 +1558,7 @@ PIX     *pixt1, *pixt2, *pixt3;
  *             w' = 63 + (n - 1) * 62 + f1 * f2 - 1
  * </pre>
  */
-l_int32
+l_ok
 getExtendedCompositeParameters(l_int32   size,
                                l_int32  *pn,
                                l_int32  *pextra,

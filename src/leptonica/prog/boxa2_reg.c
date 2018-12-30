@@ -27,8 +27,9 @@
 /*
  *  boxa2_reg.c
  *
- *  Operations that can search for anomalous sized boxes in a boxa
- *  where the widths and heights of the boxes are expected to be similar.
+ *  Low-level statistical operations that can be used to identify anomalous
+ *  sized boxes in a boxa, where the widths and heights of the boxes
+ *  are expected to be similar.
  *
  *  This tests a number of operations on boxes in a boxa, including
  *  separating them into subsets of different parity.
@@ -39,24 +40,23 @@
 l_int32 main(int    argc,
              char **argv)
 {
-l_int32      i, w, h, n, val, ne, no, nbins, minw, maxw, minh, maxh;
-l_int32      mine, mino, maxe, maxo;
-l_int32      w_diff, h_diff, median_w_diff, median_h_diff;
-l_int32      noutw, nouth;
-l_float32    medwe, medhe, medwo, medho;
-BOXA        *boxa1, *boxa2, *boxae, *boxao;
-NUMA        *na1, *nawe, *nahe, *nawo, *naho;
-NUMA        *nadiffw, *nadiffh;  /* diff from median w and h */
-NUMA        *naiw, *naih;  /* indicator arrays for small outlier dimensions */
-NUMA        *narbwe, *narbhe, *narbwo, *narbho;  /* rank-binned w and h */
-PIX         *pix1;
-PIXA        *pixa1;
-static char  mainName[] = "boxa2_reg";
+l_int32       i, w, h, n, val, ne, no, nbins, minw, maxw, minh, maxh;
+l_int32       mine, mino, maxe, maxo;
+l_int32       w_diff, h_diff, median_w_diff, median_h_diff;
+l_int32       noutw, nouth;
+l_float32     medwe, medhe, medwo, medho;
+BOXA         *boxa1, *boxa2, *boxae, *boxao;
+NUMA         *na1, *nawe, *nahe, *nawo, *naho;
+NUMA         *nadiffw, *nadiffh;  /* diff from median w and h */
+NUMA         *naiw, *naih;  /* indicator arrays for small outlier dimensions */
+NUMA         *narbwe, *narbhe, *narbwo, *narbho;  /* rank-binned w and h */
+PIX          *pix1;
+PIXA         *pixa1;
+L_REGPARAMS  *rp;
 
-    if (argc != 1)
-        return ERROR_INT(" Syntax: boxa2_reg", mainName, 1);
+    if (regTestSetup(argc, argv, &rp))
+        return 1;
 
-    setLeptDebugOK(1);
     lept_mkdir("lept/boxa");
     boxa1 = boxaRead("boxa4.ba");
 
@@ -84,8 +84,12 @@ static char  mainName[] = "boxa2_reg";
         /* Find the median even/odd differences for width and height */
     median_w_diff = L_ABS(medwe - medwo);
     median_h_diff = L_ABS(medhe - medho);
-    fprintf(stderr, "difference of e/o median widths = %d\n", median_w_diff);
-    fprintf(stderr, "difference of e/o median heights = %d\n", median_h_diff);
+    regTestCompareValues(rp, 210, median_w_diff, 0.0);  /* 0 */
+    regTestCompareValues(rp, 15, median_h_diff, 0.0);  /* 1 */
+    if (rp->display) {
+        fprintf(stderr, "diff of e/o median widths = %d\n", median_w_diff);
+        fprintf(stderr, "diff of e/o median heights = %d\n", median_h_diff);
+    }
 
         /* Find the differences of box width and height from the median */
     nadiffw = numaMakeConstant(0, n);
@@ -122,8 +126,15 @@ static char  mainName[] = "boxa2_reg";
     naih = numaMakeThresholdIndicator(nadiffh, 90, L_SELECT_IF_GT);
     numaGetCountRelativeToZero(naiw, L_GREATER_THAN_ZERO, &noutw);
     numaGetCountRelativeToZero(naih, L_GREATER_THAN_ZERO, &nouth);
-    fprintf(stderr, "num width outliers = %d, num height outliers = %d\n",
-            noutw, nouth);
+    regTestCompareValues(rp, 24, noutw, 0.0);  /* 2 */
+    regTestCompareValues(rp, 0, nouth, 0.0);  /* 3 */
+    if (rp->display)
+        fprintf(stderr, "num width outliers = %d, num height outliers = %d\n",
+                noutw, nouth);
+    numaDestroy(&nadiffw);
+    numaDestroy(&nadiffh);
+    numaDestroy(&naiw);
+    numaDestroy(&naih);
 
         /* Find the rank bins for width and height */
     nbins = L_MAX(5, ne / 50);  // up to 50 pages/bin
@@ -155,8 +166,11 @@ static char  mainName[] = "boxa2_reg";
     numaDestroy(&narbhe);
     numaDestroy(&narbwo);
     numaDestroy(&narbho);
-    fprintf(stderr, "Binned rank results: w_diff = %d, h_diff = %d\n",
-                     w_diff, h_diff);
+    regTestCompareValues(rp, 409, w_diff, 0.0);  /* 4 */
+    regTestCompareValues(rp, 49, h_diff, 0.0);  /* 5 */
+    if (rp->display)
+        fprintf(stderr, "Binned rank results: w_diff = %d, h_diff = %d\n",
+                w_diff, h_diff);
 
         /* Plot the results */
     if (noutw > 0 || nouth > 0) {
@@ -166,11 +180,13 @@ static char  mainName[] = "boxa2_reg";
         boxaPlotSizes(boxao, "odd", NULL, NULL, &pix1);
         pixaAddPix(pixa1, pix1, L_INSERT);
         pix1 = pixaDisplayTiledInRows(pixa1, 32, 1500, 1.0, 0, 30, 2);
-        pixDisplay(pix1, 100, 100);
+        regTestWritePixAndCheck(rp, pix1, IFF_PNG);  /* 6 */
+        pixDisplayWithTitle(pix1, 100, 100, NULL, rp->display);
         pixDestroy(&pix1);
         pixaDestroy(&pixa1);
     }
 
-    return 0;
+    boxaDestroy(&boxae);
+    boxaDestroy(&boxao);
+    return regTestCleanup(rp);
 }
-

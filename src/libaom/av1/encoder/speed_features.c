@@ -225,7 +225,6 @@ static void set_good_speed_features_framesize_independent(AV1_COMP *cpi,
     sf->tx_type_search.skip_tx_search = 1;
     sf->tx_type_search.ml_tx_split_thresh = 40;
     sf->model_based_prune_tx_search_level = 0;
-    sf->model_based_post_interp_filter_breakout = 0;
     // TODO(angiebird): Re-evaluate the impact of inter_mode_rd_model_estimation
     // on speed 1
     sf->inter_mode_rd_model_estimation = 0;
@@ -295,7 +294,6 @@ static void set_good_speed_features_framesize_independent(AV1_COMP *cpi,
 
   if (speed >= 4) {
     sf->use_intra_txb_hash = 0;
-    sf->use_inter_txb_hash = 0;
     sf->use_mb_rd_hash = 0;
     sf->tx_type_search.fast_intra_tx_type_search = 1;
     sf->tx_type_search.fast_inter_tx_type_search = 1;
@@ -361,7 +359,7 @@ static void set_good_speed_features_framesize_independent(AV1_COMP *cpi,
   }
   if (speed >= 8) {
     sf->mv.search_method = FAST_DIAMOND;
-    sf->mv.subpel_force_stop = 2;
+    sf->mv.subpel_force_stop = HALF_PEL;
     sf->lpf_pick = LPF_PICK_MINIMAL_LPF;
   }
 }
@@ -407,7 +405,7 @@ void av1_set_speed_features_framesize_independent(AV1_COMP *cpi) {
   sf->recode_loop = ALLOW_RECODE;
   sf->mv.subpel_search_method = SUBPEL_TREE;
   sf->mv.subpel_iters_per_step = 2;
-  sf->mv.subpel_force_stop = 0;
+  sf->mv.subpel_force_stop = EIGHTH_PEL;
 #if DISABLE_TRELLISQ_SEARCH == 2
   sf->optimize_coefficients = !is_lossless_requested(&cpi->oxcf)
                                   ? FINAL_PASS_TRELLIS_OPT
@@ -473,7 +471,8 @@ void av1_set_speed_features_framesize_independent(AV1_COMP *cpi) {
   sf->two_pass_partition_search = 0;
   sf->mode_pruning_based_on_two_pass_partition_search = 0;
   sf->use_intra_txb_hash = 0;
-  sf->use_inter_txb_hash = 1;
+  // TODO(any) : clean use_inter_txb_hash code
+  sf->use_inter_txb_hash = 0;
   sf->use_mb_rd_hash = 1;
   sf->optimize_b_precheck = 0;
   sf->jnt_comp_fast_tx_search = 0;

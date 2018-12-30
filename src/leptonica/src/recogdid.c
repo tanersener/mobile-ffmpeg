@@ -188,10 +188,10 @@ static const l_float32  DefaultAlpha4[] = {0.95f, 0.9f, 0.75f, 0.25f};
 /*!
  * \brief   recogDecode()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[in]    pixs typically of multiple touching characters, 1 bpp
- * \param[in]    nlevels of templates; 2 for now
- * \param[out]   ppixdb [optional] debug result; can be null
+ * \param[in]    recog      with LUT's pre-computed
+ * \param[in]    pixs       typically of multiple touching characters, 1 bpp
+ * \param[in]    nlevels    of templates; 2 for now
+ * \param[out]   ppixdb     [optional] debug result; can be null
  * \return  boxa  segmentation of pixs into characters, or NULL on error
  *
  * <pre>
@@ -269,9 +269,9 @@ PIXA    *pixa;
 /*!
  * \brief   recogPrepareForDecoding()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[in]    pixs typically of multiple touching characters, 1 bpp
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    recog    with LUT's pre-computed
+ * \param[in]    pixs     typically of multiple touching characters, 1 bpp
+ * \param[in]    debug    1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -337,8 +337,8 @@ L_RDID  *did;
  * \brief   recogMakeDecodingArray()
  *
  * \param[in]    recog
- * \param[in]    index of averaged template
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    index     of averaged template
+ * \param[in]    debug     1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -448,8 +448,8 @@ L_RDID   *did;
 /*!
  * \brief   recogRunViterbi()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[out]   ppixdb [optional] debug result; can be null
+ * \param[in]    recog     with LUT's pre-computed
+ * \param[out]   ppixdb    [optional] debug result; can be null
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -520,6 +520,8 @@ L_RDID     *did;
     didscore = did->trellisscore;
     didtempl = did->trellistempl;
     area2 = numaGetIArray(recog->nasum_u);
+    besttempl = 0;  /* just tells compiler it is initialized */
+    maxscore = 0.0;  /* ditto */
     for (x = minsetw; x < w1; x++) {  /* will always get a score */
         first = TRUE;
         for (i = 0; i < narray; i++) {
@@ -600,8 +602,8 @@ L_RDID     *did;
 /*!
  * \brief   recogRescoreDidResult()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[out]   ppixdb [optional] debug result; can be null
+ * \param[in]    recog     with LUT's pre-computed
+ * \param[out]   ppixdb    [optional] debug result; can be null
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -661,8 +663,8 @@ L_RDID    *did;
 /*!
  * \brief   recogShowPath()
  *
- * \param[in]    recog with LUT's pre-computed
- * \param[in]    select 0 for Viterbi; 1 for rescored
+ * \param[in]    recog     with LUT's pre-computed
+ * \param[in]    select    0 for Viterbi; 1 for rescored
  * \return  pix debug output), or NULL on error
  */
 static PIX *
@@ -738,10 +740,10 @@ L_RDID    *did;
  * \brief   recogCreateDid()
  *
  * \param[in]    recog
- * \param[in]    pixs of 1 bpp image to match
+ * \param[in]    pixs     of 1 bpp image to match
  * \return  0 if OK, 1 on error
  */
-l_int32
+l_ok
 recogCreateDid(L_RECOG  *recog,
                PIX      *pixs)
 {
@@ -812,7 +814,7 @@ L_RDID  *did;
  *          only be destroyed using this function.
  * </pre>
  */
-l_int32
+l_ok
 recogDestroyDid(L_RECOG  *recog)
 {
 l_int32  i;
@@ -919,10 +921,10 @@ L_RDID  *did;
  * \brief   recogGetWindowedArea()
  *
  * \param[in]    recog
- * \param[in]    index of template
- * \param[in]    x pixel position of left hand edge of template
- * \param[out]   pdely y shift of template relative to pix1
- * \param[out]   pwsum number of fg pixels in window of pixs
+ * \param[in]    index     of template
+ * \param[in]    x pixel   position of left hand edge of template
+ * \param[out]   pdely     y shift of template relative to pix1
+ * \param[out]   pwsum     number of fg pixels in window of pixs
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -999,7 +1001,7 @@ L_RDID  *did;
  *          fg templates), we use beta[1-3] and gamma[1-3].
  * </pre>
  */
-l_int32
+l_ok
 recogSetChannelParams(L_RECOG  *recog,
                       l_int32   nlevels)
 {
@@ -1034,9 +1036,9 @@ L_RDID           *did;
 /*!
  * \brief   recogTransferRchToDid()
  *
- * \param[in]    recog with rch and did defined
- * \param[in]    x left edge of extracted region, relative to decoded line
- * \param[in]    y top edge of extracted region, relative to input image
+ * \param[in]    recog   with rch and did defined
+ * \param[in]    x       left edge of extracted region, relative to decoded line
+ * \param[in]    y       top edge of extracted region, relative to input image
  * \return  0 if OK, 1 on error
  *
  * <pre>

@@ -6,9 +6,9 @@ FFmpeg for Android and IOS
 <img src="https://github.com/tanersener/mobile-ffmpeg/raw/dev-v3.x/docs/assets/mobile-ffmpeg-logo-v7.png" width="240">
 
 ### 1. Features
-- Supports FFmpeg `v3.4.x`, `v4.0.x` and `v4.1` releases
+- Supports FFmpeg `v3.4.x`, `v4.0.x`, `v4.1` and `v4.2-dev` releases
 - Use prebuilt binaries available under `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
-- Includes 27 external libraries, 4 GPL libraries and 10 architectures in total
+- Includes 27 external libraries, 4 GPL libraries and 11 architectures in total
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
 - Includes cross-compile instructions for 43 open-source libraries
 
@@ -17,12 +17,12 @@ FFmpeg for Android and IOS
 - Builds `arm-v7a`, `arm-v7a-neon`, `arm64-v8a`, `x86` and `x86_64` Android architectures
 - Supports `zlib` and `MediaCodec` Android system libraries
 - Creates Android archive with .aar extension
-- Builds `armv7`, `armv7s`, `arm64`, `i386` and `x86_64` IOS architectures
+- Builds `armv7`, `armv7s`, `arm64`, `arm64e`, `i386` and `x86_64` IOS architectures
 - Supports `bzip2`, `zlib` IOS system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` IOS system frameworks
-- IOS Camera and microphone access
+- Android Camera access on [supported devices](https://developer.android.com/ndk/guides/stable_apis#camera)
+- IOS Camera access
 - `ARC` enabled IOS library
-- Creates IOS dynamic universal (fat) library
-- Creates IOS dynamic framework for IOS 8 or later
+- Creates static framework and static universal (fat) library (.a) on IOS
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 
 ### 2. Using
@@ -49,10 +49,10 @@ There are eight different prebuilt packages. Below you can see which external li
 <td align="center"><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
 <td align="center"><sup>gmp</sup><br><sup>gnutls</sup></td>
 <td align="center"><sup>gmp</sup><br><sup>gnutls</sup><br><sup>vid.stab</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
-<td align="center"><sup>chromaprint</sup><br><sup>lame</sup><br><sup>libilbc</sup><br><sup>libvorbis</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
+<td align="center"><sup>lame</sup><br><sup>libilbc</sup><br><sup>libvorbis</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
 <td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>kvazaar</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libtheora</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>snappy</sup></td>
-<td align="center"><sup>chromaprint</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>sdl</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>tesseract</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
-<td align="center"><sup>chromaprint</sup><br><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>sdl</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>tesseract</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>wavpack</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
+<td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>wavpack</sup></td>
+<td align="center"><sup>fontconfig</sup><br><sup>freetype</sup><br><sup>fribidi</sup><br><sup>gmp</sup><br><sup>gnutls</sup><br><sup>kvazaar</sup><br><sup>lame</sup><br><sup>libaom</sup><br><sup>libass</sup><br><sup>libiconv</sup><br><sup>libilbc</sup><br><sup>libtheora</sup><br><sup>libvorbis</sup><br><sup>libvpx</sup><br><sup>libwebp</sup><br><sup>libxml2</sup><br><sup>opencore-amr</sup><br><sup>opus</sup><br><sup>shine</sup><br><sup>snappy</sup><br><sup>soxr</sup><br><sup>speex</sup><br><sup>twolame</sup><br><sup>vid.stab</sup><br><sup>wavpack</sup><br><sup>x264</sup><br><sup>x265</sup><br><sup>xvidcore</sup></td>
 </tr>
 </tbody>
 </table>
@@ -64,12 +64,13 @@ There are eight different prebuilt packages. Below you can see which external li
  - `chromaprint`, `vid.stab` and `x265` are supported since `v2.1`
 
  - `sdl`, `tesseract`, `twolame` external libraries; `zlib`, `MediaCodec` Android system libraries; `bzip2`, `zlib` IOS system libraries and `AudioToolbox`, `CoreImage`, `VideoToolbox`, `AVFoundation` IOS system frameworks are supported since `v3.0`
+ - Since `v4.2`, `chromaprint`, `sdl` and `tesseract` libraries are not included in binary releases. You can still build them and include in your releases
 
 #### 2.1 Android
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {`
-        implementation 'com.arthenica:mobile-ffmpeg-full:3.1'
+        implementation 'com.arthenica:mobile-ffmpeg-full:4.2'
     }
     ```
 
@@ -140,7 +141,7 @@ There are eight different prebuilt packages. Below you can see which external li
 #### 2.2 IOS
 1. Add MobileFFmpeg pod to your `Podfile`
     ```
-    pod 'mobile-ffmpeg-full', '~> 3.1'
+    pod 'mobile-ffmpeg-full', '~> 4.2'
     ```
 
 2. Execute commands.
@@ -219,14 +220,34 @@ There are eight different prebuilt packages. Below you can see which external li
 
 ### 3. Versions
 
-- `MobileFFmpeg v1.x` is the previous stable, includes `FFmpeg v3.4.4`
+`MobileFFmpeg` uses the same version number as `FFmpeg` since `v4.2`. Before that, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different, as shown in the following table. 
 
-- `MobileFFmpeg v2.x` is the current stable, includes `FFmpeg v4.0.3`
+|        | v1.0 | v1.1 | v1.2 | v2.0 | v2.1 | v2.2 | v3.0 | v3.1 | v4.2 |
+| :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
+| FFmpeg | 3.4.2 | 3.4.2 | 3.4.4 | 4.0.1 | 4.0.2 | 4.0.3 | 4.1-dev-1517 | v4.1-10 | v4.2-dev-480 |
+| packages | min<br/>full | min<br/>min-gpl<br/>https<br/>https-gpl<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl |
 
-- `MobileFFmpeg v3.x` is the next stable, includes `FFmpeg v4.1-10`
+### 4. LTS Releases
+
+Starting from `v4.2`, `MobileFFmpeg` binaries are published in two different variants: `Main Release` and `LTS Release`. 
+
+- Main releases include complete functionality of the library and support the latest SDK/API features
+
+- LTS releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them
+
+This table shows the differences between two variants.
+
+|        | Main Release | LTS Release |
+| :----: | :----: | :----: |
+| Android API Level | 24 | 21 | 
+| Android Camera Access | x | - |
+| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> |
+| IOS SDK | 12.1 | 9.3 |
+| Xcode Support | 10.1 | 7.3.1 |
+| IOS Architectures | arm64<br/>arm64e<br/>x86-64</br> | armv7<br/>arm64<br/>i386<br/>x86-64</br> |
     
-### 4. Building
-#### 4.1 Prerequisites
+### 5. Building
+#### 5.1 Prerequisites
 1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
 
     ```
@@ -241,11 +262,11 @@ There are eight different prebuilt packages. Below you can see which external li
     - **Xcode 7.3.1** or later
     - **Command Line Tools**
 
-#### 4.2 Build Scripts
+#### 5.2 Build Scripts
 Use `android.sh` and `ios.sh` to build MobileFFmpeg for each platform.
 After a successful build, compiled FFmpeg and MobileFFmpeg libraries can be found under `prebuilt` directory.
 
-##### 4.2.1 Android
+##### 5.2.1 Android
 ```
 export ANDROID_NDK_ROOT=<Android NDK Path>
 ./android.sh
@@ -253,27 +274,27 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/raw/master/docs/assets/android_custom.gif" width="600">
 
-##### 4.2.2 IOS
+##### 5.2.2 IOS
 ```
 ./ios.sh
 ```
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/raw/master/docs/assets/ios_custom.gif" width="600">
 
-#### 4.3 GPL Support
+#### 5.3 GPL Support
 It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1` 
 from the top level build scripts.
 Their source code is not included in the repository and downloaded when enabled.
 
-#### 4.4 External Libraries
+#### 5.4 External Libraries
 `build` directory includes build scripts for external libraries. There are two scripts for each library, one for Android
 and one for IOS. They include all options/flags used to cross-compile the libraries.
 
-### 5. Documentation
+### 6. Documentation
 
 A more detailed documentation is available at [Wiki](https://github.com/tanersener/mobile-ffmpeg/wiki).
 
-### 6. License
+### 7. License
 
 This project is licensed under the LGPL v3.0. However, if source code is built using optional `--enable-gpl` flag or 
 prebuilt binaries with `-gpl` postfix are used then MobileFFmpeg is subject to the GPL v3.0 license.
@@ -286,7 +307,7 @@ In test applications, fonts embedded are licensed under the [SIL Open Font Licen
 
 Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
 
-### 7. See Also
+### 8. See Also
 
 - [libav gas-preprocessor](https://github.com/libav/gas-preprocessor/raw/master/gas-preprocessor.pl)
 - [FFmpeg API Documentation](https://ffmpeg.org/doxygen/4.0/index.html)

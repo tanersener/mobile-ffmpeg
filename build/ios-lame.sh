@@ -49,10 +49,10 @@ if [[ ${RECONF_lame} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
-    --with-libiconv-prefix=${BASEDIR}/prebuilt/ios-$(get_target_host)/libiconv \
+    --with-libiconv-prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libiconv \
     --enable-static \
     --disable-shared \
     --disable-fast-install \
@@ -62,7 +62,7 @@ fi
     --disable-gtktest \
     --host=${TARGET_HOST} || exit 1
 
-make ${MOBILE_FFMPEG_DEBUG} -j$(get_cpu_count) || exit 1
+make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
 create_libmp3lame_package_config "3.100"

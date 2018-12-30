@@ -408,7 +408,7 @@ PIXCMAP   *cmap;
  *          pixel in the image.
  * </pre>
  */
-l_int32
+l_ok
 pixAssignToNearestColor(PIX      *pixd,
                         PIX      *pixs,
                         PIX      *pixm,
@@ -508,7 +508,7 @@ cleanup_arrays:
  *          small sets of intercolated pixels of a different color.
  * </pre>
  */
-l_int32
+l_ok
 pixColorSegmentClean(PIX      *pixs,
                      l_int32   selsize,
                      l_int32  *countarray)
@@ -580,7 +580,7 @@ PIXCMAP   *cmap;
  *          we find the nearest colormap color  to the original rgb color.
  * </pre>
  */
-l_int32
+l_ok
 pixColorSegmentRemoveColors(PIX     *pixd,
                             PIX     *pixs,
                             l_int32  finalcolors)

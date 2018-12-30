@@ -37,7 +37,7 @@ void av1_highbd_jnt_convolve_2d_copy_sse4_1(
       FILTER_BITS * 2 - conv_params->round_1 - conv_params->round_0;
   const __m128i left_shift = _mm_cvtsi32_si128(bits);
   const int do_average = conv_params->do_average;
-  const int use_jnt_comp_avg = conv_params->use_jnt_comp_avg;
+  const int use_dist_wtd_comp_avg = conv_params->use_dist_wtd_comp_avg;
   const int w0 = conv_params->fwd_offset;
   const int w1 = conv_params->bck_offset;
   const __m128i wt0 = _mm_set1_epi32(w0);
@@ -75,15 +75,17 @@ void av1_highbd_jnt_convolve_2d_copy_sse4_1(
           const __m128i res_unsigned_lo =
               _mm_add_epi32(res_32b_lo, offset_const);
 
-          const __m128i comp_avg_res_lo = highbd_comp_avg_sse4_1(
-              &data_ref_0_lo, &res_unsigned_lo, &wt0, &wt1, use_jnt_comp_avg);
+          const __m128i comp_avg_res_lo =
+              highbd_comp_avg_sse4_1(&data_ref_0_lo, &res_unsigned_lo, &wt0,
+                                     &wt1, use_dist_wtd_comp_avg);
 
           const __m128i res_32b_hi = _mm_unpackhi_epi16(res, zero);
           const __m128i res_unsigned_hi =
               _mm_add_epi32(res_32b_hi, offset_const);
 
-          const __m128i comp_avg_res_hi = highbd_comp_avg_sse4_1(
-              &data_ref_0_hi, &res_unsigned_hi, &wt0, &wt1, use_jnt_comp_avg);
+          const __m128i comp_avg_res_hi =
+              highbd_comp_avg_sse4_1(&data_ref_0_hi, &res_unsigned_hi, &wt0,
+                                     &wt1, use_dist_wtd_comp_avg);
 
           const __m128i round_result_lo = highbd_convolve_rounding_sse2(
               &comp_avg_res_lo, &offset_const, &rounding_const, rounding_shift);
@@ -132,9 +134,9 @@ void av1_highbd_jnt_convolve_2d_copy_sse4_1(
               _mm_add_epi32(res_32b_hi, offset_const);
 
           const __m128i comp_avg_res_lo = highbd_comp_avg_sse4_1(
-              &data_ref_0, &res_unsigned_lo, &wt0, &wt1, use_jnt_comp_avg);
+              &data_ref_0, &res_unsigned_lo, &wt0, &wt1, use_dist_wtd_comp_avg);
           const __m128i comp_avg_res_hi = highbd_comp_avg_sse4_1(
-              &data_ref_1, &res_unsigned_hi, &wt0, &wt1, use_jnt_comp_avg);
+              &data_ref_1, &res_unsigned_hi, &wt0, &wt1, use_dist_wtd_comp_avg);
 
           const __m128i round_result_lo = highbd_convolve_rounding_sse2(
               &comp_avg_res_lo, &offset_const, &rounding_const, rounding_shift);
@@ -179,7 +181,7 @@ void av1_highbd_jnt_convolve_2d_sse4_1(
   int im_stride = MAX_SB_SIZE;
   int i, j;
   const int do_average = conv_params->do_average;
-  const int use_jnt_comp_avg = conv_params->use_jnt_comp_avg;
+  const int use_dist_wtd_comp_avg = conv_params->use_dist_wtd_comp_avg;
   const int fo_vert = filter_params_y->taps / 2 - 1;
   const int fo_horiz = filter_params_x->taps / 2 - 1;
   const uint16_t *const src_ptr = src - fo_vert * src_stride - fo_horiz;
@@ -359,8 +361,9 @@ void av1_highbd_jnt_convolve_2d_sse4_1(
 
             const __m128i data_ref_0 = _mm_cvtepu16_epi32(data_0);
 
-            const __m128i comp_avg_res = highbd_comp_avg_sse4_1(
-                &data_ref_0, &res_unsigned_lo, &wt0, &wt1, use_jnt_comp_avg);
+            const __m128i comp_avg_res =
+                highbd_comp_avg_sse4_1(&data_ref_0, &res_unsigned_lo, &wt0,
+                                       &wt1, use_dist_wtd_comp_avg);
 
             const __m128i round_result = highbd_convolve_rounding_sse2(
                 &comp_avg_res, &offset_const, &rounding_const, rounding_shift);
@@ -391,10 +394,12 @@ void av1_highbd_jnt_convolve_2d_sse4_1(
             const __m128i data_ref_0_lo = _mm_cvtepu16_epi32(data_lo);
             const __m128i data_ref_0_hi = _mm_cvtepu16_epi32(data_hi);
 
-            const __m128i comp_avg_res_lo = highbd_comp_avg_sse4_1(
-                &data_ref_0_lo, &res_unsigned_lo, &wt0, &wt1, use_jnt_comp_avg);
-            const __m128i comp_avg_res_hi = highbd_comp_avg_sse4_1(
-                &data_ref_0_hi, &res_unsigned_hi, &wt0, &wt1, use_jnt_comp_avg);
+            const __m128i comp_avg_res_lo =
+                highbd_comp_avg_sse4_1(&data_ref_0_lo, &res_unsigned_lo, &wt0,
+                                       &wt1, use_dist_wtd_comp_avg);
+            const __m128i comp_avg_res_hi =
+                highbd_comp_avg_sse4_1(&data_ref_0_hi, &res_unsigned_hi, &wt0,
+                                       &wt1, use_dist_wtd_comp_avg);
 
             const __m128i round_result_lo =
                 highbd_convolve_rounding_sse2(&comp_avg_res_lo, &offset_const,
