@@ -86,9 +86,9 @@ display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
     if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default six architectures (armv7, armv7s, arm64, arm64e, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends a universal fat binary and an IOS framework is created with enabled architectures inside.\n"
+        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default six architectures (armv7, armv7s, arm64, arm64e, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and IOS frameworks are created with enabled architectures inside.\n"
     else
-        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends a universal fat binary and an IOS framework is created with enabled architectures inside.\n"
+        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and IOS frameworks are created with enabled architectures inside.\n"
     fi
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
