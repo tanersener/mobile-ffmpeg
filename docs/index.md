@@ -69,7 +69,7 @@ There are eight different prebuilt packages. Below you can see which external li
 #### 2.1 Android
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
-    dependencies {`
+    dependencies {
         implementation 'com.arthenica:mobile-ffmpeg-full:4.2'
     }
     ```
@@ -102,15 +102,20 @@ There are eight different prebuilt packages. Below you can see which external li
 
 5. Get media information for a file.
     ```
-    MediaInformation info = FFmpeg.getMediaInformation('<file path or uri>');
+    MediaInformation info = FFmpeg.getMediaInformation("<file path or uri>");
     ```
 
-6. List enabled external libraries.
+6. Record video and audio using Android camera.
+    ```
+    FFmpeg.execute("-f android_camera -i 0:0 -r 30 -pixel_format bgr0 -t 00:00:05 <record file path>");
+    ```
+
+7. List enabled external libraries.
     ```
     List<String> externalLibraries = Config.getExternalLibraries();
     ```
 
-7. Enable log callback.
+8. Enable log callback.
     ```
     Config.enableLogCallback(new LogCallback() {
         public void apply(LogMessage message) {
@@ -119,7 +124,7 @@ There are eight different prebuilt packages. Below you can see which external li
     });
     ```
 
-8. Enable statistics callback.
+9. Enable statistics callback.
     ```
     Config.enableStatisticsCallback(new StatisticsCallback() {
         public void apply(Statistics newStatistics) {
@@ -128,12 +133,12 @@ There are eight different prebuilt packages. Below you can see which external li
     });
     ```
 
-9. Set log level.
+10. Set log level.
     ```
     Config.setLogLevel(Level.AV_LOG_FATAL);
     ```
 
-10. Register custom fonts directory.
+11. Register custom fonts directory.
     ```
     Config.setFontDirectory(this, "<folder with fonts>", Collections.EMPTY_MAP);
     ```
