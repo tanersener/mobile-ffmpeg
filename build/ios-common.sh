@@ -239,10 +239,10 @@ get_size_optimization_cflags() {
                     ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
                 ;;
                 ffmpeg | mobile-ffmpeg)
-                    ARCH_OPTIMIZATION="-flto -Oz -Wno-ignored-optimization-argument"
+                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-flto -Oz -Wno-ignored-optimization-argument"
+                    ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
                 ;;
             esac
         ;;
@@ -252,10 +252,10 @@ get_size_optimization_cflags() {
                     ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
                 ;;
                 x265)
-                    ARCH_OPTIMIZATION="-flto -O2 -Wno-ignored-optimization-argument"
+                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
                 ;;
                 *)
-                    ARCH_OPTIMIZATION="-flto -O2 -Wno-ignored-optimization-argument"
+                    ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
                 ;;
             esac
         ;;
@@ -368,7 +368,7 @@ get_asmflags() {
 get_cxxflags() {
     local COMMON_CFLAGS="$(get_common_cflags $1) $(get_common_includes $1) $(get_arch_specific_cflags) $(get_min_version_cflags $1)"
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-        local OPTIMIZATION_FLAGS="-flto -Oz"
+        local OPTIMIZATION_FLAGS="-Oz"
     else
         local OPTIMIZATION_FLAGS="${MOBILE_FFMPEG_DEBUG}"
     fi
@@ -415,10 +415,10 @@ get_size_optimization_ldflags() {
         armv7 | armv7s | arm64 | arm64e)
             case $1 in
                 ffmpeg | mobile-ffmpeg)
-                    echo "-flto -Oz -dead_strip"
+                    echo "-Oz -dead_strip"
                 ;;
                 *)
-                    echo "-flto -Oz -dead_strip"
+                    echo "-Oz -dead_strip"
                 ;;
             esac
         ;;
@@ -428,7 +428,7 @@ get_size_optimization_ldflags() {
                     echo "-O2"
                 ;;
                 *)
-                    echo "-flto -O2"
+                    echo "-O2"
                 ;;
             esac
         ;;
