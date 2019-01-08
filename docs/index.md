@@ -246,7 +246,7 @@ This table shows the differences between two variants.
 | :----: | :----: | :----: |
 | Android API Level | 24 | 21 | 
 | Android Camera Access | x | - |
-| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> |
+| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64 |
 | IOS SDK | 12.1 | 9.3 |
 | Xcode Support | 10.1 | 7.3.1 |
 | IOS Architectures | arm64<br/>arm64e<br/>x86-64 | armv7<br/>arm64<br/>i386<br/>x86-64 |
