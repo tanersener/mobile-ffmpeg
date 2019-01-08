@@ -2,7 +2,7 @@
 
 FFmpeg for Android and IOS
 
-<img src="https://github.com/tanersener/mobile-ffmpeg/blob/dev-v3.x/docs/assets/mobile-ffmpeg-logo-v7.png" width="320">
+<img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/mobile-ffmpeg-logo-v7.png" width="320">
 
 ### 1. Features
 - Use binaries available at `Github`/`JCenter`/`CocoaPods` or build your own version with external libraries you need
