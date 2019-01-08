@@ -354,7 +354,7 @@ prebuilt binaries with `-gpl` postfix are used then MobileFFmpeg is subject to t
 
 Source code of FFmpeg and external libraries is included in compliance with their individual licenses.
 
-`strip-frameworks.sh` script included and distributed is published under the [Apache License version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+`strip-frameworks.sh` script included and distributed (until v4.x) is published under the [Apache License version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
 In test applications, fonts embedded are licensed under the [SIL Open Font License](https://opensource.org/licenses/OFL-1.1); other digital assets are published in the public domain.
 
