@@ -7,6 +7,7 @@ Pod::Spec.new do |s|
     DESC
 
     s.homepage          = "https://github.com/tanersener/mobile-ffmpeg"
+    s.documentation_url = "https://github.com/tanersener/mobile-ffmpeg/"
 
     s.author            = { "Taner Sener" => "tanersener@gmail.com" }
     s.license           = { :type => "LGPL-3.0", :file => "mobileffmpeg.framework/LICENSE" }
