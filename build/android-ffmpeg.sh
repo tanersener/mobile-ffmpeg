@@ -314,14 +314,19 @@ export CFLAGS="${HIGH_PRIORITY_INCLUDES} ${CFLAGS}"
 export CXXFLAGS="${CXXFLAGS}"
 export LDFLAGS="${LDFLAGS}"
 
+# USE HIGHER LIMITS FOR FFMPEG LINKING
+ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
+
 ./configure \
     --cross-prefix="${TARGET_HOST}-" \
-    --sysroot="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot" \
+    --sysroot="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \
     --prefix="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     --pkg-config="${HOST_PKG_CONFIG_PATH}" \
     --enable-version3 \
     --arch="${TARGET_ARCH}" \
     --cpu="${TARGET_CPU}" \
+    --cc="${CC}" \
+    --cxx="${CXX}" \
     --target-os=android \
     ${ASM_FLAGS} \
     --enable-cross-compile \
