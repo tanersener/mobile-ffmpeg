@@ -19,6 +19,7 @@
 static const char *base = NULL;
 static int escape = 0;
 static int debug = 0;
+static int relative = 0;
 
 static void handleURI(const char *str) {
     int ret;
@@ -57,7 +58,12 @@ static void handleURI(const char *str) {
 	    }
 	}
     } else {
-	res = xmlBuildURI((xmlChar *)str, (xmlChar *) base);
+	if (relative) {
+	    res = xmlBuildRelativeURI((xmlChar *)str, (xmlChar *) base);
+	} else {
+	    res = xmlBuildURI((xmlChar *)str, (xmlChar *) base);
+	}
+
 	if (res != NULL) {
 	    printf("%s\n", (char *) res);
 	}
@@ -74,6 +80,11 @@ static void handleURI(const char *str) {
 int main(int argc, char **argv) {
     int i, arg = 1;
 
+    if ((argc > arg) && (argv[arg] != NULL) &&
+	(!strcmp(argv[arg], "--relative"))) {
+	arg++;
+	relative++;
+    }
     if ((argc > arg) && (argv[arg] != NULL) &&
 	((!strcmp(argv[arg], "-base")) || (!strcmp(argv[arg], "--base")))) {
 	arg++;

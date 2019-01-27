@@ -4413,9 +4413,10 @@ launchTests(testDescPtr tst) {
     char *result;
     char *error;
     int mem;
-    xmlCharEncodingHandlerPtr ebcdicHandler;
+    xmlCharEncodingHandlerPtr ebcdicHandler, eucJpHandler;
 
     ebcdicHandler = xmlGetCharEncodingHandler(XML_CHAR_ENCODING_EBCDIC);
+    eucJpHandler = xmlGetCharEncodingHandler(XML_CHAR_ENCODING_EUC_JP);
 
     if (tst == NULL) return(-1);
     if (tst->in != NULL) {
@@ -4426,8 +4427,10 @@ launchTests(testDescPtr tst) {
 	for (i = 0;i < globbuf.gl_pathc;i++) {
 	    if (!checkTestFile(globbuf.gl_pathv[i]))
 	        continue;
-            if ((ebcdicHandler == NULL) &&
-                (strstr(globbuf.gl_pathv[i], "ebcdic") != NULL))
+            if (((ebcdicHandler == NULL) &&
+                 (strstr(globbuf.gl_pathv[i], "ebcdic") != NULL)) ||
+                ((eucJpHandler == NULL) &&
+                 (strstr(globbuf.gl_pathv[i], "icu_parse_test") != NULL)))
                 continue;
 	    if (tst->suffix != NULL) {
 		result = resultFilename(globbuf.gl_pathv[i], tst->out,
@@ -4496,6 +4499,7 @@ launchTests(testDescPtr tst) {
     }
 
     xmlCharEncCloseFunc(ebcdicHandler);
+    xmlCharEncCloseFunc(eucJpHandler);
 
     return(err);
 }

@@ -709,6 +709,73 @@ to the <a href="http://git.gnome.org/browse/libxml2/">GIT</a> code base.</p>
 
 <p>Here is the list of public releases:</p>
 
+<h3>v2.9.9: Jan 03 2019</h3>
+<ul>
+  <li>Security:<br/>
+  CVE-2018-9251 CVE-2018-14567 Fix infinite loop in LZMA decompression (Nick Wellnhofer),<br/>
+  CVE-2018-14404 Fix nullptr deref with XPath logic ops (Nick Wellnhofer),<br/>
+  </li>
+
+  <li>Documentation:<br/>
+  reader: Fix documentation comment (Mohammed Sadiq)<br/>
+  </li>
+
+  <li>Portability:<br/>
+  Fix MSVC build with lzma (Nick Wellnhofer),<br/>
+  Variables need 'extern' in static lib on Cygwin (Michael Haubenwallner),<br/>
+  Really declare dllexport/dllimport for Cygwin (Michael Haubenwallner),<br/>
+  Merge branch 'patch-2' into 'master' (Nick Wellnhofer),<br/>
+  Change dir to $THEDIR after ACLOCAL_PATH check autoreconf creates aclocal.m4 in $srcdir (Vitaly Buka),<br/>
+  Improve error message if pkg.m4 couldn't be found (Nick Wellnhofer),<br/>
+  NaN and Inf fixes for pre-C99 compilers (Nick Wellnhofer)<br/>
+  </li>
+
+  <li>Bug Fixes:<br/>
+  Revert "Support xmlTextReaderNextSibling w/o preparsed doc" (Nick Wellnhofer),<br/>
+  Fix building relative URIs (Thomas Holder),<br/>
+  Problem with data in interleave in RelaxNG validation (Nikolai Weibull),<br/>
+  Fix memory leak in xmlSwitchInputEncodingInt error path (Nick Wellnhofer),<br/>
+  Set doc on element obtained from freeElems (Nick Wellnhofer),<br/>
+  Fix HTML serialization with UTF-8 encoding (Nick Wellnhofer),<br/>
+  Use actual doc in xmlTextReaderRead*Xml (Nick Wellnhofer),<br/>
+  Unlink node before freeing it in xmlSAX2StartElement (Nick Wellnhofer),<br/>
+  Check return value of nodePush in xmlSAX2StartElement (Nick Wellnhofer),<br/>
+  Free input buffer in xmlHaltParser (Nick Wellnhofer),<br/>
+  Reset HTML parser input pointers on encoding failure (Nick Wellnhofer),<br/>
+  Don't run icu_parse_test if EUC-JP is unsupported (Nick Wellnhofer),<br/>
+  Fix xmlSchemaValidCtxtPtr reuse memory leak (Greg Hildstrom),<br/>
+  Fix xmlTextReaderNext with preparsed document (Felix Bünemann),<br/>
+  Remove stray character from comment (Nick Wellnhofer),<br/>
+  Remove a misleading line from xmlCharEncOutput (Andrey Bienkowski),<br/>
+  HTML noscript should not close p (Daniel Veillard),<br/>
+  Don't change context node in xmlXPathRoot (Nick Wellnhofer),<br/>
+  Stop using XPATH_OP_RESET (Nick Wellnhofer),<br/>
+  Revert "Change calls to xmlCharEncInput to set flush false" (Nick Wellnhofer)<br/>
+  </li>
+
+  <li>Improvements:<br/>
+  Fix "Problem with data in interleave in RelaxNG validation" (Nikolai Weibull),<br/>
+  cleanup: remove some unreachable code (Thomas Holder),<br/>
+  add --relative to testURI (Thomas Holder),<br/>
+  Remove redefined starts and defines inside include elements (Nikolai Weibull),<br/>
+  Allow choice within choice in nameClass in RELAX NG (Nikolai Weibull),<br/>
+  Look inside divs for starts and defines inside include (Nikolai Weibull),<br/>
+  Add compile and libxml2-config.cmake to .gitignore (Nikolai Weibull),<br/>
+  Stop using doc-&gt;charset outside parser code (Nick Wellnhofer),<br/>
+  Add newlines to 'xmllint --xpath' output (Nick Wellnhofer),<br/>
+  Don't include SAX.h from globals.h (Nick Wellnhofer),<br/>
+  Support xmlTextReaderNextSibling w/o preparsed doc (Felix Bünemann),<br/>
+  Don't instruct user to run make when autogen.sh failed (林博仁(Buo-ren Lin)),<br/>
+  Run Travis ASan tests with "sudo: required" (Nick Wellnhofer),<br/>
+  Improve restoring of context size and position (Nick Wellnhofer),<br/>
+  Simplify and harden nodeset filtering (Nick Wellnhofer),<br/>
+  Avoid unnecessary backups of the context node (Nick Wellnhofer),<br/>
+  Fix inconsistency in xmlXPathIsInf (Nick Wellnhofer)<br/>
+  </li>
+
+  <li>Cleanups:<br/>
+  </li>
+</ul>
 <h3>v2.9.8: Mar 05 2018</h3>
 <ul>
   <li>Portability:<br/>

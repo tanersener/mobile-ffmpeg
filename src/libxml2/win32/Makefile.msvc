@@ -244,6 +244,12 @@ XML_OBJS_A_DLL = $(XML_INTDIR_A_DLL)\buf.obj\
 	$(XML_INTDIR_A_DLL)\xpointer.obj\
 	$(XML_INTDIR_A_DLL)\xmlstring.obj
 
+!if "$(WITH_LZMA)" == "1"
+XML_OBJS = $(XML_OBJS) $(XML_INTDIR)\xzlib.obj
+XML_OBJS_A = $(XML_OBJS_A) $(XML_INTDIR_A)\xzlib.obj
+XML_OBJS_A_DLL = $(XML_OBJS_A_DLL) $(XML_INTDIR_A_DLL)\xzlib.obj
+!endif
+
 # Xmllint and friends executables.
 UTILS = $(BINDIR)\xmllint.exe\
 	$(BINDIR)\xmlcatalog.exe\
