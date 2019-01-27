@@ -83,23 +83,23 @@ static int davs2_dump_frames(AVCodecContext *avctx, davs2_picture_t *pic, int *g
     }
 
     switch (pic->type) {
-        case DAVS2_PIC_I:
-        case DAVS2_PIC_G:
-            frame->pict_type = AV_PICTURE_TYPE_I;
-            break;
-        case DAVS2_PIC_P:
-        case DAVS2_PIC_S:
-            frame->pict_type = AV_PICTURE_TYPE_P;
-            break;
-        case DAVS2_PIC_B:
-            frame->pict_type = AV_PICTURE_TYPE_B;
-            break;
-        case DAVS2_PIC_F:
-            frame->pict_type = AV_PICTURE_TYPE_S;
-            break;
-        default:
-            av_log(avctx, AV_LOG_ERROR, "Decoder error: unknown frame type\n");
-            return AVERROR_EXTERNAL;
+    case DAVS2_PIC_I:
+    case DAVS2_PIC_G:
+        frame->pict_type = AV_PICTURE_TYPE_I;
+        break;
+    case DAVS2_PIC_P:
+    case DAVS2_PIC_S:
+        frame->pict_type = AV_PICTURE_TYPE_P;
+        break;
+    case DAVS2_PIC_B:
+        frame->pict_type = AV_PICTURE_TYPE_B;
+        break;
+    case DAVS2_PIC_F:
+        frame->pict_type = AV_PICTURE_TYPE_S;
+        break;
+    default:
+        av_log(avctx, AV_LOG_ERROR, "Decoder error: unknown frame type\n");
+        return AVERROR_EXTERNAL;
     }
 
     for (plane = 0; plane < 3; ++plane) {
@@ -205,7 +205,7 @@ AVCodec ff_libdavs2_decoder = {
     .init           = davs2_init,
     .close          = davs2_end,
     .decode         = davs2_decode_frame,
-    .capabilities   =  AV_CODEC_CAP_DELAY,//AV_CODEC_CAP_DR1 |
+    .capabilities   =  AV_CODEC_CAP_DELAY | AV_CODEC_CAP_AUTO_THREADS,
     .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV420P,
                                                      AV_PIX_FMT_NONE },
     .wrapper_name   = "libdavs2",

@@ -452,6 +452,7 @@ enum AVCodecID {
     AV_CODEC_ID_MWSC,
     AV_CODEC_ID_WCMV,
     AV_CODEC_ID_RASC,
+    AV_CODEC_ID_HYMT,
 
     /* various PCM "codecs" */
     AV_CODEC_ID_FIRST_AUDIO = 0x10000,     ///< A dummy id pointing at the start of audio codecs
@@ -645,6 +646,7 @@ enum AVCodecID {
     AV_CODEC_ID_APTX_HD,
     AV_CODEC_ID_SBC,
     AV_CODEC_ID_ATRAC9,
+    AV_CODEC_ID_HCOM,
 
     /* subtitle codecs */
     AV_CODEC_ID_FIRST_SUBTITLE = 0x17000,          ///< A dummy ID pointing at the start of subtitle codecs.
@@ -1117,17 +1119,29 @@ typedef struct AVCPBProperties {
      * Maximum bitrate of the stream, in bits per second.
      * Zero if unknown or unspecified.
      */
+#if FF_API_UNSANITIZED_BITRATES
     int max_bitrate;
+#else
+    int64_t max_bitrate;
+#endif
     /**
      * Minimum bitrate of the stream, in bits per second.
      * Zero if unknown or unspecified.
      */
+#if FF_API_UNSANITIZED_BITRATES
     int min_bitrate;
+#else
+    int64_t min_bitrate;
+#endif
     /**
      * Average bitrate of the stream, in bits per second.
      * Zero if unknown or unspecified.
      */
+#if FF_API_UNSANITIZED_BITRATES
     int avg_bitrate;
+#else
+    int64_t avg_bitrate;
+#endif
 
     /**
      * The size of the buffer to which the ratecontrol is applied, in bits.

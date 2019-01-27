@@ -1691,6 +1691,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .long_name = NULL_IF_CONFIG_SMALL("RemotelyAnywhere Screen Capture"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
+    {
+        .id        = AV_CODEC_ID_HYMT,
+        .type      = AVMEDIA_TYPE_VIDEO,
+        .name      = "hymt",
+        .long_name = NULL_IF_CONFIG_SMALL("HuffYUV MT"),
+        .props     = AV_CODEC_PROP_INTRA_ONLY | AV_CODEC_PROP_LOSSLESS,
+    },
 
     /* various PCM "codecs" */
     {
@@ -2934,6 +2941,13 @@ static const AVCodecDescriptor codec_descriptors[] = {
         .type      = AVMEDIA_TYPE_AUDIO,
         .name      = "atrac9",
         .long_name = NULL_IF_CONFIG_SMALL("ATRAC9 (Adaptive TRansform Acoustic Coding 9)"),
+        .props     = AV_CODEC_PROP_LOSSY,
+    },
+    {
+        .id        = AV_CODEC_ID_HCOM,
+        .type      = AVMEDIA_TYPE_AUDIO,
+        .name      = "hcom",
+        .long_name = NULL_IF_CONFIG_SMALL("HCOM Audio"),
         .props     = AV_CODEC_PROP_LOSSY,
     },
 

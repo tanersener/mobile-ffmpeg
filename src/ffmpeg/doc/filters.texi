@@ -683,6 +683,7 @@ Set list of delays in milliseconds for each channel separated by '|'.
 Unused delays will be silently ignored. If number of given delays is
 smaller than number of channels all remaining channels will not be delayed.
 If you want to delay exact number of samples, append 'S' to number.
+If you want instead to delay in seconds, append 's' to number.
 @end table
 
 @subsection Examples
@@ -957,6 +958,8 @@ select double-exponential seat
 select double-exponential sigmoid
 @item losi
 select logistic sigmoid
+@item nofade
+no fade applied
 @end table
 @end table
 
@@ -1165,7 +1168,7 @@ up to 60 seconds long.
 
 It can be used as component for digital crossover filters,
 room equalization, cross talk cancellation, wavefield synthesis,
-auralization, ambiophonics and ambisonics.
+auralization, ambiophonics, ambisonics and spatialization.
 
 This filter uses second stream as FIR coefficients.
 If second stream holds single channel, it will be used
@@ -1231,14 +1234,14 @@ Set video stream size. This option is used only when @var{response} is enabled.
 Set video stream frame rate. This option is used only when @var{response} is enabled.
 
 @item minp
-Set minimal partition size used for convolution. Default is @var{16}.
-Allowed range is from @var{16} to @var{65536}.
+Set minimal partition size used for convolution. Default is @var{8192}.
+Allowed range is from @var{8} to @var{32768}.
 Lower values decreases latency at cost of higher CPU usage.
 
 @item maxp
-Set maximal partition size used for convolution. Default is @var{65536}.
-Allowed range is from @var{16} to @var{65536}.
-Lower values decreases latency at cost of higher CPU usage.
+Set maximal partition size used for convolution. Default is @var{8192}.
+Allowed range is from @var{8} to @var{32768}.
+Lower values may increase CPU usage.
 @end table
 
 @subsection Examples
@@ -1747,6 +1750,29 @@ error is returned.
 
 Full filter invocation with asendcmd may look like this:
 asendcmd=c='4.0 anequalizer change 0|f=200|w=50|g=1',anequalizer=...
+@end table
+
+@section anlmdn
+
+Reduce broadband noise in audio samples using Non-Local Means algorithm.
+
+Each sample is adjusted by looking for other samples with similar contexts. This
+context similarity is defined by comparing their surrounding patches of size
+@option{p}. Patches are searched in an area of @option{r} around the sample.
+
+The filter accepts the following options.
+
+@table @option
+@item s
+Set denoising strength. Allowed range is from 0.00001 to 10. Default value is 0.00001.
+
+@item p
+Set patch radius duration. Allowed range is from 1 to 100 milliseconds.
+Default value is 2 milliseconds.
+
+@item r
+Set research radius duration. Allowed range is from 2 to 300 milliseconds.
+Default value is 6 milliseconds.
 @end table
 
 @section anull
@@ -11888,6 +11914,33 @@ This filter accepts the following options:
 Set which planes will be processed as bitmap, unprocessed planes will be
 copied from first stream.
 By default value 0xf, all planes will be processed.
+@end table
+
+@section maskfun
+Create mask from input video.
+
+For example it is useful to create motion masks after @code{tblend} filter.
+
+This filter accepts the following options:
+
+@table @option
+@item low
+Set low threshold. Any pixel component lower or exact than this value will be set to 0.
+
+@item high
+Set high threshold. Any pixel component higher than this value will be set to max value
+allowed for current pixel format.
+
+@item planes
+Set planes to filter, by default all available planes are filtered.
+
+@item fill
+Fill all frame pixels with this value.
+
+@item sum
+Set max average pixel value for frame. If sum of all pixel components is higher that this
+average, output frame will be completely filled with value set by @var{fill} option.
+Typically useful for scene changes when used in combination with @code{tblend} filter.
 @end table
 
 @section mcdeint
