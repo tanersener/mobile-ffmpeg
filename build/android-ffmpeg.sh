@@ -299,7 +299,7 @@ fi
 
 # SET DEBUG OPTIONS
 if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-    DEBUG_OPTIONS="--disable-debug";
+    DEBUG_OPTIONS="--disable-debug --enable-lto";
 else
     DEBUG_OPTIONS="--enable-debug";
 fi
@@ -327,7 +327,6 @@ export LDFLAGS="${LDFLAGS}"
     --enable-cross-compile \
     --enable-pic \
     --enable-jni \
-    --enable-lto \
     --enable-optimizations \
     --enable-swscale \
     --enable-shared \
