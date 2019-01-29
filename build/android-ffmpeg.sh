@@ -299,7 +299,7 @@ fi
 
 # SET DEBUG OPTIONS
 if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-    DEBUG_OPTIONS="--disable-debug";
+    DEBUG_OPTIONS="--disable-debug --enable-lto";
 else
     DEBUG_OPTIONS="--enable-debug";
 fi
@@ -332,7 +332,6 @@ ulimit -n 2048 1>>${BASEDIR}/build.log 2>&1
     --enable-cross-compile \
     --enable-pic \
     --enable-jni \
-    --enable-lto \
     --enable-optimizations \
     --enable-swscale \
     --enable-shared \
