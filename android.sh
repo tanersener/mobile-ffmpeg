@@ -169,7 +169,7 @@ skip_library() {
 }
 
 enable_debug() {
-    export MOBILE_FFMPEG_DEBUG="-DDEBUG -g"
+    export MOBILE_FFMPEG_DEBUG="-g"
 
     BUILD_TYPE_ID+="debug "
 }
