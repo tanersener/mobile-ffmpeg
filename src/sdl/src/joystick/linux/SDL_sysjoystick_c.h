@@ -19,9 +19,6 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef SDL_sysjoystick_c_h_
-#define SDL_sysjoystick_c_h_
-
 #include <linux/input.h>
 
 struct SDL_joylist_item;
@@ -33,10 +30,6 @@ struct joystick_hwdata
     struct SDL_joylist_item *item;
     SDL_JoystickGUID guid;
     char *fname;                /* Used in haptic subsystem */
-
-    SDL_bool ff_rumble;
-    SDL_bool ff_sine;
-    struct ff_effect effect;
 
     /* The current Linux joystick driver maps hats to two axes */
     struct hwdata_hat
@@ -63,7 +56,5 @@ struct joystick_hwdata
     /* Steam Controller support */
     SDL_bool m_bSteamController;
 };
-
-#endif /* SDL_sysjoystick_c_h_ */
 
 /* vi: set ts=4 sw=4 expandtab: */

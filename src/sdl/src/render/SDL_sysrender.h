@@ -25,19 +25,11 @@
 
 #include "SDL_render.h"
 #include "SDL_events.h"
-#include "SDL_mutex.h"
 #include "SDL_yuv_sw_c.h"
 
 /* The SDL 2D rendering system */
 
 typedef struct SDL_RenderDriver SDL_RenderDriver;
-
-typedef enum
-{
-    SDL_ScaleModeNearest,
-    SDL_ScaleModeLinear,
-    SDL_ScaleModeBest
-} SDL_ScaleMode;
 
 typedef struct
 {
@@ -63,7 +55,6 @@ struct SDL_Texture
     int h;                      /**< The height of the texture */
     int modMode;                /**< The texture modulation mode */
     SDL_BlendMode blendMode;    /**< The texture blend mode */
-    SDL_ScaleMode scaleMode;    /**< The texture scale mode */
     Uint8 r, g, b, a;           /**< Texture modulation values */
 
     SDL_Renderer *renderer;
@@ -173,7 +164,6 @@ struct SDL_Renderer
     /* The list of textures */
     SDL_Texture *textures;
     SDL_Texture *target;
-    SDL_mutex *target_mutex;
 
     Uint8 r, g, b, a;                   /**< Color for drawing operations values */
     SDL_BlendMode blendMode;            /**< The drawing blend mode */

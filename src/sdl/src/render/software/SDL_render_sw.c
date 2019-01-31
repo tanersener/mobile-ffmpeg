@@ -588,6 +588,18 @@ SW_RenderCopy(SDL_Renderer * renderer, SDL_Texture * texture,
 }
 
 static int
+GetScaleQuality(void)
+{
+    const char *hint = SDL_GetHint(SDL_HINT_RENDER_SCALE_QUALITY);
+
+    if (!hint || *hint == '0' || SDL_strcasecmp(hint, "nearest") == 0) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+static int
 SW_RenderCopyEx(SDL_Renderer * renderer, SDL_Texture * texture,
                 const SDL_Rect * srcrect, const SDL_FRect * dstrect,
                 const double angle, const SDL_FPoint * center, const SDL_RendererFlip flip)
@@ -657,11 +669,6 @@ SW_RenderCopyEx(SDL_Renderer * renderer, SDL_Texture * texture,
         blitRequired = SDL_TRUE;
     }
 
-    /* srcrect is not selecting the whole src surface, so cropping is needed */
-    if (!(srcrect->w == src->w && srcrect->h == src->h && srcrect->x == 0 && srcrect->y == 0)) {
-        blitRequired = SDL_TRUE;
-    }
-
     /* The color and alpha modulation has to be applied before the rotation when using the NONE and MOD blend modes. */
     if ((blendmode == SDL_BLENDMODE_NONE || blendmode == SDL_BLENDMODE_MOD) && (alphaMod & rMod & gMod & bMod) != 255) {
         applyModulation = SDL_TRUE;
@@ -710,7 +717,7 @@ SW_RenderCopyEx(SDL_Renderer * renderer, SDL_Texture * texture,
 
     if (!retval) {
         SDLgfx_rotozoomSurfaceSizeTrig(tmp_rect.w, tmp_rect.h, angle, &dstwidth, &dstheight, &cangle, &sangle);
-        src_rotated = SDLgfx_rotateSurface(src_clone, angle, dstwidth/2, dstheight/2, (texture->scaleMode == SDL_ScaleModeNearest) ? 0 : 1, flip & SDL_FLIP_HORIZONTAL, flip & SDL_FLIP_VERTICAL, dstwidth, dstheight, cangle, sangle);
+        src_rotated = SDLgfx_rotateSurface(src_clone, angle, dstwidth/2, dstheight/2, GetScaleQuality(), flip & SDL_FLIP_HORIZONTAL, flip & SDL_FLIP_VERTICAL, dstwidth, dstheight, cangle, sangle);
         if (src_rotated == NULL) {
             retval = -1;
         }

@@ -44,7 +44,7 @@ SDLTEST_OBJECTS = @SDLTEST_OBJECTS@
 
 WAYLAND_SCANNER = @WAYLAND_SCANNER@
 
-SRC_DIST = *.txt acinclude Android.mk autogen.sh android-project build-scripts cmake cmake_uninstall.cmake.in configure configure.in debian docs include Makefile.* sdl2-config.cmake.in sdl2-config.in sdl2.m4 sdl2.pc.in SDL2.spec.in SDL2Config.cmake src test VisualC.html VisualC VisualC-WinRT Xcode Xcode-iOS wayland-protocols
+SRC_DIST = *.txt acinclude Android.mk autogen.sh android-project build-scripts cmake cmake_uninstall.cmake.in configure configure.in debian docs include Makefile.* sdl2-config.cmake.in sdl2-config.in sdl2.m4 sdl2.pc.in SDL2.spec.in SDL2Config.cmake src test VisualC.html VisualC VisualC-WinRT Xcode Xcode-iOS
 GEN_DIST = SDL2.spec
 
 ifneq ($V,1)
@@ -101,7 +101,6 @@ HDRS = \
 	SDL_render.h \
 	SDL_rwops.h \
 	SDL_scancode.h \
-	SDL_sensor.h \
 	SDL_shape.h \
 	SDL_stdinc.h \
 	SDL_surface.h \

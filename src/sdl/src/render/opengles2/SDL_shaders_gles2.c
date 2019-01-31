@@ -30,24 +30,20 @@
 /*************************************************************************************************
  * Vertex/fragment shader source                                                                 *
  *************************************************************************************************/
-/* Notes on a_angle:
-   * It is a vector containing sin and cos for rotation matrix
-   * To get correct rotation for most cases when a_angle is disabled cos
-     value is decremented by 1.0 to get proper output with 0.0 which is
-     default value
-*/
+
 static const Uint8 GLES2_VertexSrc_Default_[] = " \
     uniform mat4 u_projection; \
     attribute vec2 a_position; \
     attribute vec2 a_texCoord; \
-    attribute vec2 a_angle; \
+    attribute float a_angle; \
     attribute vec2 a_center; \
     varying vec2 v_texCoord; \
     \
     void main() \
     { \
-        float s = a_angle[0]; \
-        float c = a_angle[1] + 1.0; \
+        float angle = radians(a_angle); \
+        float c = cos(angle); \
+        float s = sin(angle); \
         mat2 rotationMatrix = mat2(c, -s, s, c); \
         vec2 position = rotationMatrix * (a_position - a_center) + a_center; \
         v_texCoord = a_texCoord; \

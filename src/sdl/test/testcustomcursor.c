@@ -73,24 +73,6 @@ init_color_cursor(const char *file)
     SDL_Cursor *cursor = NULL;
     SDL_Surface *surface = SDL_LoadBMP(file);
     if (surface) {
-        if (surface->format->palette) {
-            SDL_SetColorKey(surface, 1, *(Uint8 *) surface->pixels);
-        } else {
-            switch (surface->format->BitsPerPixel) {
-            case 15:
-                SDL_SetColorKey(surface, 1, (*(Uint16 *)surface->pixels) & 0x00007FFF);
-                break;
-            case 16:
-                SDL_SetColorKey(surface, 1, *(Uint16 *)surface->pixels);
-                break;
-            case 24:
-                SDL_SetColorKey(surface, 1, (*(Uint32 *)surface->pixels) & 0x00FFFFFF);
-                break;
-            case 32:
-                SDL_SetColorKey(surface, 1, *(Uint32 *)surface->pixels);
-                break;
-            }
-        }
         cursor = SDL_CreateColorCursor(surface, 0, 0);
         SDL_FreeSurface(surface);
     }
@@ -134,9 +116,7 @@ init_system_cursor(const char *image[])
 
 static SDLTest_CommonState *state;
 int done;
-static SDL_Cursor *cursors[1+SDL_NUM_SYSTEM_CURSORS];
-static int current_cursor;
-static int show_cursor;
+SDL_Cursor *cursor = NULL;
 
 /* Call this instead of exit(), so we can clean up SDL: atexit() is evil. */
 static void
@@ -154,18 +134,6 @@ loop()
     /* Check for events */
     while (SDL_PollEvent(&event)) {
         SDLTest_CommonEvent(state, &event, &done);
-        if (event.type == SDL_MOUSEBUTTONDOWN) {
-            if (event.button.button == SDL_BUTTON_LEFT) {
-                ++current_cursor;
-                if (current_cursor == SDL_arraysize(cursors)) {
-                    current_cursor = 0;
-                }
-                SDL_SetCursor(cursors[current_cursor]);
-            } else {
-                show_cursor = !show_cursor;
-                SDL_ShowCursor(show_cursor);
-            }
-        }
     }
     
     for (i = 0; i < state->num_windows; ++i) {
@@ -220,22 +188,15 @@ main(int argc, char *argv[])
     }
 
     if (color_cursor) {
-        cursors[0] = init_color_cursor(color_cursor);
+        cursor = init_color_cursor(color_cursor);
     } else {
-        cursors[0] = init_system_cursor(arrow);
+        cursor = init_system_cursor(arrow);
     }
-    if (!cursors[0]) {
+    if (!cursor) {
         SDL_Log("Error, couldn't create cursor\n");
         quit(2);
     }
-    for (i = 0; i < SDL_NUM_SYSTEM_CURSORS; ++i) {
-        cursors[1+i] = SDL_CreateSystemCursor((SDL_SystemCursor)i);
-        if (!cursors[1+i]) {
-            SDL_Log("Error, couldn't create system cursor %d\n", i);
-            quit(2);
-        }
-    }
-    SDL_SetCursor(cursors[0]);
+    SDL_SetCursor(cursor);
 
     /* Main render loop */
     done = 0;
@@ -247,13 +208,9 @@ main(int argc, char *argv[])
     }
 #endif
 
-    for (i = 0; i < SDL_arraysize(cursors); ++i) {
-        SDL_FreeCursor(cursors[i]);
-    }
+    SDL_FreeCursor(cursor);
     quit(0);
 
     /* keep the compiler happy ... */
     return(0);
 }
-
-/* vi: set ts=4 sw=4 expandtab: */

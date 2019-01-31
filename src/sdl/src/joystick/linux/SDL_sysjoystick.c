@@ -29,11 +29,10 @@
 /* This is the Linux implementation of the SDL joystick API */
 
 #include <sys/stat.h>
-#include <errno.h>              /* errno, strerror */
-#include <fcntl.h>
-#include <limits.h>             /* For the definition of PATH_MAX */
-#include <sys/ioctl.h>
 #include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <limits.h>             /* For the definition of PATH_MAX */
 #include <linux/joystick.h>
 
 #include "SDL_assert.h"
@@ -44,7 +43,6 @@
 #include "../SDL_joystick_c.h"
 #include "../steam/SDL_steamcontroller.h"
 #include "SDL_sysjoystick_c.h"
-#include "../hidapi/SDL_hidapijoystick_c.h"
 
 /* This isn't defined in older Linux kernel headers */
 #ifndef SYN_DROPPED
@@ -78,6 +76,7 @@ typedef struct SDL_joylist_item
 static SDL_joylist_item *SDL_joylist = NULL;
 static SDL_joylist_item *SDL_joylist_tail = NULL;
 static int numjoysticks = 0;
+static int instance_counter = 0;
 
 
 #define test_bit(nr, addr) \
@@ -210,13 +209,6 @@ IsJoystick(int fd, char *namebuf, const size_t namebuflen, SDL_JoystickGUID *gui
         return 0;
     }
 
-#ifdef SDL_JOYSTICK_HIDAPI
-    if (HIDAPI_IsDevicePresent(inpid.vendor, inpid.product, inpid.version)) {
-        /* The HIDAPI driver is taking care of this device */
-        return 0;
-    }
-#endif
-
     /* Check the joystick blacklist */
     id = MAKE_VIDPID(inpid.vendor, inpid.product);
     for (i = 0; i < SDL_arraysize(joystick_blacklist); ++i) {
@@ -247,7 +239,8 @@ IsJoystick(int fd, char *namebuf, const size_t namebuflen, SDL_JoystickGUID *gui
         SDL_strlcpy((char*)guid16, namebuf, sizeof(guid->data) - 4);
     }
 
-    if (SDL_ShouldIgnoreJoystick(namebuf, *guid)) {
+    if (SDL_IsGameControllerNameAndGUID(namebuf, *guid) &&
+        SDL_ShouldIgnoreGameController(namebuf, *guid)) {
         return 0;
     }
     return 1;
@@ -332,14 +325,14 @@ MaybeAddDevice(const char *path)
     item->name = SDL_strdup(namebuf);
     item->guid = guid;
 
-    if ((item->path == NULL) || (item->name == NULL)) {
+    if ( (item->path == NULL) || (item->name == NULL) ) {
          SDL_free(item->path);
          SDL_free(item->name);
          SDL_free(item);
          return -1;
     }
 
-    item->device_instance = SDL_GetNextJoystickInstanceID();
+    item->device_instance = instance_counter++;
     if (SDL_joylist_tail == NULL) {
         SDL_joylist = SDL_joylist_tail = item;
     } else {
@@ -350,7 +343,7 @@ MaybeAddDevice(const char *path)
     /* Need to increment the joystick count before we post the event */
     ++numjoysticks;
 
-    SDL_PrivateJoystickAdded(item->device_instance);
+    SDL_PrivateJoystickAdded(numjoysticks - 1);
 
     return numjoysticks;
 }
@@ -416,7 +409,7 @@ JoystickInitWithoutUdev(void)
         MaybeAddDevice(path);
     }
 
-    return 0;
+    return numjoysticks;
 }
 #endif
 
@@ -437,7 +430,7 @@ JoystickInitWithUdev(void)
     /* Force a scan to build the initial device list */
     SDL_UDEV_Scan();
 
-    return 0;
+    return numjoysticks;
 }
 #endif
 
@@ -462,7 +455,7 @@ static SDL_bool SteamControllerConnectedCallback(const char *name, SDL_JoystickG
          return SDL_FALSE;
     }
 
-    *device_instance = item->device_instance = SDL_GetNextJoystickInstanceID();
+    *device_instance = item->device_instance = instance_counter++;
     if (SDL_joylist_tail == NULL) {
         SDL_joylist = SDL_joylist_tail = item;
     } else {
@@ -473,7 +466,7 @@ static SDL_bool SteamControllerConnectedCallback(const char *name, SDL_JoystickG
     /* Need to increment the joystick count before we post the event */
     ++numjoysticks;
 
-    SDL_PrivateJoystickAdded(item->device_instance);
+    SDL_PrivateJoystickAdded(numjoysticks - 1);
 
     return SDL_TRUE;
 }
@@ -512,8 +505,8 @@ static void SteamControllerDisconnectedCallback(int device_instance)
     }
 }
 
-static int
-LINUX_JoystickInit(void)
+int
+SDL_SYS_JoystickInit(void)
 {
     /* First see if the user specified one or more joysticks to use */
     if (SDL_getenv("SDL_JOYSTICK_DEVICE") != NULL) {
@@ -541,14 +534,14 @@ LINUX_JoystickInit(void)
 #endif
 }
 
-static int
-LINUX_JoystickGetCount(void)
+int
+SDL_SYS_NumJoysticks(void)
 {
     return numjoysticks;
 }
 
-static void
-LINUX_JoystickDetect(void)
+void
+SDL_SYS_JoystickDetect(void)
 {
 #if SDL_USE_LIBUDEV
     SDL_UDEV_Poll();
@@ -576,27 +569,14 @@ JoystickByDevIndex(int device_index)
 }
 
 /* Function to get the device-dependent name of a joystick */
-static const char *
-LINUX_JoystickGetDeviceName(int device_index)
+const char *
+SDL_SYS_JoystickNameForDeviceIndex(int device_index)
 {
     return JoystickByDevIndex(device_index)->name;
 }
 
-static int
-LINUX_JoystickGetDevicePlayerIndex(int device_index)
-{
-    return -1;
-}
-
-static SDL_JoystickGUID
-LINUX_JoystickGetDeviceGUID( int device_index )
-{
-    return JoystickByDevIndex(device_index)->guid;
-}
-
 /* Function to perform the mapping from device index to the instance id for this index */
-static SDL_JoystickID
-LINUX_JoystickGetDeviceInstanceID(int device_index)
+SDL_JoystickID SDL_SYS_GetInstanceIdOfDeviceIndex(int device_index)
 {
     return JoystickByDevIndex(device_index)->device_instance;
 }
@@ -644,7 +624,6 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
     unsigned long keybit[NBITS(KEY_MAX)] = { 0 };
     unsigned long absbit[NBITS(ABS_MAX)] = { 0 };
     unsigned long relbit[NBITS(REL_MAX)] = { 0 };
-    unsigned long ffbit[NBITS(FF_MAX)] = { 0 };
 
     /* See if this device uses the new unified event API */
     if ((ioctl(fd, EVIOCGBIT(EV_KEY, sizeof(keybit)), keybit) >= 0) &&
@@ -740,15 +719,6 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
             }
         }
     }
-
-    if (ioctl(fd, EVIOCGBIT(EV_FF, sizeof(ffbit)), ffbit) >= 0) {
-        if (test_bit(FF_RUMBLE, ffbit)) {
-            joystick->hwdata->ff_rumble = SDL_TRUE;
-        }
-        if (test_bit(FF_SINE, ffbit)) {
-            joystick->hwdata->ff_sine = SDL_TRUE;
-        }
-    }
 }
 
 
@@ -757,8 +727,8 @@ ConfigJoystick(SDL_Joystick * joystick, int fd)
    This should fill the nbuttons and naxes fields of the joystick structure.
    It returns 0, or -1 if there is an error.
  */
-static int
-LINUX_JoystickOpen(SDL_Joystick * joystick, int device_index)
+int
+SDL_SYS_JoystickOpen(SDL_Joystick * joystick, int device_index)
 {
     SDL_joylist_item *item = JoystickByDevIndex(device_index);
 
@@ -774,7 +744,6 @@ LINUX_JoystickOpen(SDL_Joystick * joystick, int device_index)
     }
     joystick->hwdata->item = item;
     joystick->hwdata->guid = item->guid;
-    joystick->hwdata->effect.id = -1;
     joystick->hwdata->m_bSteamController = item->m_bSteamController;
 
     if (item->m_bSteamController) {
@@ -783,7 +752,7 @@ LINUX_JoystickOpen(SDL_Joystick * joystick, int device_index)
                                      &joystick->naxes,
                                      &joystick->nhats);
     } else {
-        int fd = open(item->path, O_RDWR, 0);
+        int fd = open(item->path, O_RDONLY, 0);
         if (fd < 0) {
             SDL_free(joystick->hwdata);
             joystick->hwdata = NULL;
@@ -815,42 +784,10 @@ LINUX_JoystickOpen(SDL_Joystick * joystick, int device_index)
     return (0);
 }
 
-static int
-LINUX_JoystickRumble(SDL_Joystick * joystick, Uint16 low_frequency_rumble, Uint16 high_frequency_rumble, Uint32 duration_ms)
+/* Function to determine if this joystick is attached to the system right now */
+SDL_bool SDL_SYS_JoystickAttached(SDL_Joystick *joystick)
 {
-    struct input_event event;
-
-    if (joystick->hwdata->ff_rumble) {
-        struct ff_effect *effect = &joystick->hwdata->effect;
-
-        effect->type = FF_RUMBLE;
-        effect->replay.length = SDL_min(duration_ms, 32767);
-        effect->u.rumble.strong_magnitude = low_frequency_rumble;
-        effect->u.rumble.weak_magnitude = high_frequency_rumble;
-    } else if (joystick->hwdata->ff_sine) {
-        /* Scale and average the two rumble strengths */
-        Sint16 magnitude = (Sint16)(((low_frequency_rumble / 2) + (high_frequency_rumble / 2)) / 2);
-        struct ff_effect *effect = &joystick->hwdata->effect;
-
-        effect->type = FF_PERIODIC;
-        effect->replay.length = SDL_min(duration_ms, 32767);
-        effect->u.periodic.waveform = FF_SINE;
-        effect->u.periodic.magnitude = magnitude;
-    } else {
-        return SDL_Unsupported();
-    }
-
-    if (ioctl(joystick->hwdata->fd, EVIOCSFF, &joystick->hwdata->effect) < 0) {
-        return SDL_SetError("Couldn't update rumble effect: %s", strerror(errno));
-    }
-
-    event.type = EV_FF;
-    event.code = joystick->hwdata->effect.id;
-    event.value = 1;
-    if (write(joystick->hwdata->fd, &event, sizeof(event)) < 0) {
-        return SDL_SetError("Couldn't start rumble effect: %s", strerror(errno));
-    }
-    return 0;
+    return joystick->hwdata->item != NULL;
 }
 
 static SDL_INLINE void
@@ -1026,8 +963,8 @@ HandleInputEvents(SDL_Joystick * joystick)
     }
 }
 
-static void
-LINUX_JoystickUpdate(SDL_Joystick * joystick)
+void
+SDL_SYS_JoystickUpdate(SDL_Joystick * joystick)
 {
     int i;
 
@@ -1053,14 +990,10 @@ LINUX_JoystickUpdate(SDL_Joystick * joystick)
 }
 
 /* Function to close a joystick after use */
-static void
-LINUX_JoystickClose(SDL_Joystick * joystick)
+void
+SDL_SYS_JoystickClose(SDL_Joystick * joystick)
 {
     if (joystick->hwdata) {
-        if (joystick->hwdata->effect.id >= 0) {
-            ioctl(joystick->hwdata->fd, EVIOCRMFF, joystick->hwdata->effect.id);
-            joystick->hwdata->effect.id = -1;
-        }
         if (joystick->hwdata->fd >= 0) {
             close(joystick->hwdata->fd);
         }
@@ -1075,8 +1008,8 @@ LINUX_JoystickClose(SDL_Joystick * joystick)
 }
 
 /* Function to perform any system-specific joystick related cleanup */
-static void
-LINUX_JoystickQuit(void)
+void
+SDL_SYS_JoystickQuit(void)
 {
     SDL_joylist_item *item = NULL;
     SDL_joylist_item *next = NULL;
@@ -1091,6 +1024,7 @@ LINUX_JoystickQuit(void)
     SDL_joylist = SDL_joylist_tail = NULL;
 
     numjoysticks = 0;
+    instance_counter = 0;
 
 #if SDL_USE_LIBUDEV
     SDL_UDEV_DelCallback(joystick_udev_callback);
@@ -1100,21 +1034,15 @@ LINUX_JoystickQuit(void)
     SDL_QuitSteamControllers();
 }
 
-SDL_JoystickDriver SDL_LINUX_JoystickDriver =
+SDL_JoystickGUID SDL_SYS_JoystickGetDeviceGUID( int device_index )
 {
-    LINUX_JoystickInit,
-    LINUX_JoystickGetCount,
-    LINUX_JoystickDetect,
-    LINUX_JoystickGetDeviceName,
-    LINUX_JoystickGetDevicePlayerIndex,
-    LINUX_JoystickGetDeviceGUID,
-    LINUX_JoystickGetDeviceInstanceID,
-    LINUX_JoystickOpen,
-    LINUX_JoystickRumble,
-    LINUX_JoystickUpdate,
-    LINUX_JoystickClose,
-    LINUX_JoystickQuit,
-};
+    return JoystickByDevIndex(device_index)->guid;
+}
+
+SDL_JoystickGUID SDL_SYS_JoystickGetGUID(SDL_Joystick * joystick)
+{
+    return joystick->hwdata->guid;
+}
 
 #endif /* SDL_JOYSTICK_LINUX */
 

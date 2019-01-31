@@ -30,13 +30,13 @@ extern "C" {
 
 #include "../SDL_sysvideo.h"
 
-extern int HAIKU_CreateWindowFramebuffer(_THIS, SDL_Window * window,
+extern int BE_CreateWindowFramebuffer(_THIS, SDL_Window * window,
                                        Uint32 * format,
                                        void ** pixels, int *pitch);
-extern int HAIKU_UpdateWindowFramebuffer(_THIS, SDL_Window * window,
+extern int BE_UpdateWindowFramebuffer(_THIS, SDL_Window * window,
                                        const SDL_Rect * rects, int numrects);
-extern void HAIKU_DestroyWindowFramebuffer(_THIS, SDL_Window * window);
-extern int32 HAIKU_DrawThread(void *data);
+extern void BE_DestroyWindowFramebuffer(_THIS, SDL_Window * window);
+extern int32 BE_DrawThread(void *data);
 
 #ifdef __cplusplus
 }

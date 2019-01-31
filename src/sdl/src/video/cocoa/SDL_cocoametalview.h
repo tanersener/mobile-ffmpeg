@@ -39,15 +39,15 @@
 
 #define METALVIEW_TAG 255
 
-@interface SDL_cocoametalview : NSView
+@interface SDL_cocoametalview : NSView {
+    NSInteger _tag;
+}
 
 - (instancetype)initWithFrame:(NSRect)frame
-                      highDPI:(BOOL)highDPI;
+                        scale:(CGFloat)scale;
 
 /* Override superclass tag so this class can set it. */
 @property (assign, readonly) NSInteger tag;
-
-@property (nonatomic) BOOL highDPI;
 
 @end
 

@@ -97,11 +97,6 @@ GetWindowStyle(SDL_Window * window)
         if (window->flags & SDL_WINDOW_RESIZABLE) {
             style |= STYLE_RESIZABLE;
         }
-
-        /* Need to set initialize minimize style, or when we call ShowWindow with WS_MINIMIZE it will activate a random window */
-        if (window->flags & SDL_WINDOW_MINIMIZED) {
-            style |= WS_MINIMIZE;
-        }
     }
     return style;
 }
@@ -220,6 +215,8 @@ SetupWindowData(_THIS, SDL_Window * window, HWND hwnd, HWND parent, SDL_bool cre
             if ((window->windowed.w && window->windowed.w != w) || (window->windowed.h && window->windowed.h != h)) {
                 /* We tried to create a window larger than the desktop and Windows didn't allow it.  Override! */
                 int x, y;
+                int w, h;
+
                 /* Figure out what the window area will be */
                 WIN_AdjustWindowRect(window, &x, &y, &w, &h, SDL_FALSE);
                 SetWindowPos(hwnd, HWND_NOTOPMOST, x, y, w, h, SWP_NOCOPYBITS | SWP_NOZORDER | SWP_NOACTIVATE);
@@ -290,6 +287,9 @@ SetupWindowData(_THIS, SDL_Window * window, HWND hwnd, HWND parent, SDL_bool cre
         videodata->RegisterTouchWindow(hwnd, (TWF_FINETOUCH|TWF_WANTPALM));
     }
 
+    /* Enable dropping files */
+    DragAcceptFiles(hwnd, TRUE);
+
     data->initializing = SDL_FALSE;
 
     /* All done! */
@@ -334,10 +334,6 @@ WIN_CreateWindow(_THIS, SDL_Window * window)
 
     /* Inform Windows of the frame change so we can respond to WM_NCCALCSIZE */
     SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOSIZE | SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
-
-    if (window->flags & SDL_WINDOW_MINIMIZED) {
-        ShowWindow(hwnd, SW_SHOWMINNOACTIVE);
-    }
 
     if (!(window->flags & SDL_WINDOW_OPENGL)) {
         return 0;
@@ -411,11 +407,13 @@ WIN_CreateWindowFrom(_THIS, SDL_Window * window, const void *data)
             SDL_sscanf(hint, "%p", (void**)&otherWindow);
 
             /* Do some error checking on the pointer */
-            if (otherWindow != NULL && otherWindow->magic == &_this->window_magic) {
+            if (otherWindow != NULL && otherWindow->magic == &_this->window_magic)
+            {
                 /* If the otherWindow has SDL_WINDOW_OPENGL set, set it for the new window as well */
-                if (otherWindow->flags & SDL_WINDOW_OPENGL) {
+                if (otherWindow->flags & SDL_WINDOW_OPENGL)
+                {
                     window->flags |= SDL_WINDOW_OPENGL;
-                    if (!WIN_GL_SetPixelFormatFrom(_this, otherWindow, window)) {
+                    if(!WIN_GL_SetPixelFormatFrom(_this, otherWindow, window)) {
                         return -1;
                     }
                 }
@@ -548,17 +546,8 @@ WIN_GetWindowBordersSize(_THIS, SDL_Window * window, int *top, int *left, int *b
 void
 WIN_ShowWindow(_THIS, SDL_Window * window)
 {
-    DWORD style;
-    HWND hwnd;
-    int nCmdShow;
-    
-    hwnd = ((SDL_WindowData *)window->driverdata)->hwnd;
-    nCmdShow = SW_SHOW;
-    style = GetWindowLong(hwnd, GWL_EXSTYLE);
-    if (style & WS_EX_NOACTIVATE) {
-        nCmdShow = SW_SHOWNOACTIVATE;
-    }
-    ShowWindow(hwnd, nCmdShow);
+    HWND hwnd = ((SDL_WindowData *) window->driverdata)->hwnd;
+    ShowWindow(hwnd, SW_SHOW);
 }
 
 void
@@ -902,13 +891,8 @@ WIN_UpdateClipCursor(SDL_Window *window)
 {
     SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
     SDL_Mouse *mouse = SDL_GetMouse();
-    RECT rect;
 
-    if (data->in_title_click || data->focus_click_pending) {
-        return;
-    }
-    if (data->skip_update_clipcursor) {
-        data->skip_update_clipcursor = SDL_FALSE;
+    if (data->focus_click_pending) {
         return;
     }
 
@@ -916,6 +900,7 @@ WIN_UpdateClipCursor(SDL_Window *window)
         (window->flags & SDL_WINDOW_INPUT_FOCUS)) {
         if (mouse->relative_mode && !mouse->relative_mode_warp) {
             LONG cx, cy;
+            RECT rect;
             GetWindowRect(data->hwnd, &rect);
 
             cx = (rect.left + rect.right) / 2;
@@ -927,21 +912,17 @@ WIN_UpdateClipCursor(SDL_Window *window)
             rect.top = cy - 1;
             rect.bottom = cy + 1;
 
-            if (ClipCursor(&rect)) {
-                data->cursor_clipped_rect = rect;
-            }
+            ClipCursor(&rect);
         } else {
+            RECT rect;
             if (GetClientRect(data->hwnd, &rect) && !IsRectEmpty(&rect)) {
                 ClientToScreen(data->hwnd, (LPPOINT) & rect);
                 ClientToScreen(data->hwnd, (LPPOINT) & rect + 1);
-                if (ClipCursor(&rect)) {
-                    data->cursor_clipped_rect = rect;
-                }
+                ClipCursor(&rect);
             }
         }
-    } else if (GetClipCursor(&rect) && SDL_memcmp(&rect, &data->cursor_clipped_rect, sizeof(rect)) == 0) {
+    } else {
         ClipCursor(NULL);
-        SDL_zero(data->cursor_clipped_rect);
     }
 }
 
@@ -982,13 +963,6 @@ WIN_SetWindowOpacity(_THIS, SDL_Window * window, float opacity)
     }
 
     return 0;
-}
-
-void
-WIN_AcceptDragAndDrop(SDL_Window * window, SDL_bool accept)
-{
-    const SDL_WindowData *data = (SDL_WindowData *) window->driverdata;
-    DragAcceptFiles(data->hwnd, accept ? TRUE : FALSE);
 }
 
 #endif /* SDL_VIDEO_DRIVER_WINDOWS */

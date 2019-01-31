@@ -83,9 +83,7 @@ static Uint32
 _colorkey(SDL_Surface *src)
 {
     Uint32 key = 0;
-    if (SDL_HasColorKey(src)) {
-        SDL_GetColorKey(src, &key);
-    }
+    SDL_GetColorKey(src, &key);
     return key;
 }
 
@@ -426,10 +424,8 @@ SDLgfx_rotateSurface(SDL_Surface * src, double angle, int centerx, int centery, 
     if (src == NULL)
         return NULL;
 
-    if (SDL_HasColorKey(src)) {
-        if (SDL_GetColorKey(src, &colorkey) == 0) {
-            colorKeyAvailable = SDL_TRUE;
-        }
+    if (SDL_GetColorKey(src, &colorkey) == 0) {
+        colorKeyAvailable = SDL_TRUE;
     }
 
     /* This function requires a 32-bit surface or 8-bit surface with a colorkey */

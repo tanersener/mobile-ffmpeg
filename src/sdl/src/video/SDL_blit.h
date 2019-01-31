@@ -126,7 +126,7 @@ extern SDL_BlitFunc SDL_CalculateBlitA(SDL_Surface * surface);
     b = SDL_expand_byte[fmt->Bloss][((Pixel&fmt->Bmask)>>fmt->Bshift)]; \
 }
 #define RGB_FROM_RGB565(Pixel, r, g, b)                                 \
-{                                                                       \
+    {                                                                   \
     r = SDL_expand_byte[3][((Pixel&0xF800)>>11)];                       \
     g = SDL_expand_byte[2][((Pixel&0x07E0)>>5)];                        \
     b = SDL_expand_byte[3][(Pixel&0x001F)];                             \
@@ -262,18 +262,18 @@ do {                                                                    \
 {                                                                       \
     switch (bpp) {                                                      \
         case 1: {                                                       \
-            Uint8 _Pixel;                                               \
+            Uint8 Pixel;                                                \
                                                                         \
-            PIXEL_FROM_RGB(_Pixel, fmt, r, g, b);                       \
-            *((Uint8 *)(buf)) = _Pixel;                                 \
+            PIXEL_FROM_RGB(Pixel, fmt, r, g, b);                        \
+            *((Uint8 *)(buf)) = Pixel;                                  \
         }                                                               \
         break;                                                          \
                                                                         \
         case 2: {                                                       \
-            Uint16 _Pixel;                                              \
+            Uint16 Pixel;                                               \
                                                                         \
-            PIXEL_FROM_RGB(_Pixel, fmt, r, g, b);                       \
-            *((Uint16 *)(buf)) = _Pixel;                                \
+            PIXEL_FROM_RGB(Pixel, fmt, r, g, b);                        \
+            *((Uint16 *)(buf)) = Pixel;                                 \
         }                                                               \
         break;                                                          \
                                                                         \
@@ -291,10 +291,10 @@ do {                                                                    \
         break;                                                          \
                                                                         \
         case 4: {                                                       \
-            Uint32 _Pixel;                                              \
+            Uint32 Pixel;                                               \
                                                                         \
-            PIXEL_FROM_RGB(_Pixel, fmt, r, g, b);                       \
-            *((Uint32 *)(buf)) = _Pixel;                                \
+            PIXEL_FROM_RGB(Pixel, fmt, r, g, b);                        \
+            *((Uint32 *)(buf)) = Pixel;                                 \
         }                                                               \
         break;                                                          \
     }                                                                   \

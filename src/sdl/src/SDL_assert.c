@@ -120,17 +120,10 @@ static void SDL_GenerateAssertionReport(void)
 }
 
 
-#if defined(__WATCOMC__)
-#pragma aux SDL_ExitProcess aborts;
-#endif
-static void SDL_ExitProcess(int exitcode)
+static SDL_NORETURN void SDL_ExitProcess(int exitcode)
 {
 #ifdef __WIN32__
-    /* "if you do not know the state of all threads in your process, it is
-       better to call TerminateProcess than ExitProcess"
-       https://msdn.microsoft.com/en-us/library/windows/desktop/ms682658(v=vs.85).aspx */
-    TerminateProcess(GetCurrentProcess(), exitcode);
-
+    ExitProcess(exitcode);
 #elif defined(__EMSCRIPTEN__)
     emscripten_cancel_main_loop();  /* this should "kill" the app. */
     emscripten_force_exit(exitcode);  /* this should "kill" the app. */
@@ -141,10 +134,7 @@ static void SDL_ExitProcess(int exitcode)
 }
 
 
-#if defined(__WATCOMC__)
-#pragma aux SDL_AbortAssertion aborts;
-#endif
-static void SDL_AbortAssertion(void)
+static SDL_NORETURN void SDL_AbortAssertion(void)
 {
     SDL_Quit();
     SDL_ExitProcess(42);

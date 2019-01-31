@@ -53,11 +53,10 @@
 #endif
 
 #if defined(__WATCOMC__) && defined(__386__)
-SDL_COMPILE_TIME_ASSERT(intsize, 4==sizeof(int));
 #define HAVE_WATCOM_ATOMICS
 extern _inline int _SDL_xchg_watcom(volatile int *a, int v);
 #pragma aux _SDL_xchg_watcom = \
-  "lock xchg [ecx], eax" \
+  "xchg [ecx], eax" \
   parm [ecx] [eax] \
   value [eax] \
   modify exact [eax];

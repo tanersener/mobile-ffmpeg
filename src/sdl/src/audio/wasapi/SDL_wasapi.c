@@ -725,12 +725,6 @@ WASAPI_ThreadDeinit(_THIS)
     WASAPI_PlatformThreadDeinit(this);
 }
 
-void
-WASAPI_BeginLoopIteration(_THIS)
-{
-	/* no-op. */
-}
-
 static void
 WASAPI_Deinitialize(void)
 {
