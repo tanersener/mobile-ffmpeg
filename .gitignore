@@ -2,3 +2,4 @@
 /prebuilt/
 *.DS_Store
 /.tmp/
+*~

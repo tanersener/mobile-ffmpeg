@@ -131,6 +131,11 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static kvazaar)"
                 CONFIGURE_POSTFIX+=" --enable-libkvazaar"
             ;;
+            ladspa)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags ladspa)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static ladspa)"
+                CONFIGURE_POSTFIX+=" --enable-ladspa"
+            ;;
             lame)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags libmp3lame)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libmp3lame)"
@@ -314,17 +319,17 @@ do
             CONFIGURE_POSTFIX+=" --disable-iconv"
         elif [[ ${library} -eq 30 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 42 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-zlib"
         elif [[ ${library} -eq 43 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
+            CONFIGURE_POSTFIX+=" --disable-zlib"
         elif [[ ${library} -eq 44 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-coreimage"
+            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
         elif [[ ${library} -eq 45 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-bzlib"
+            CONFIGURE_POSTFIX+=" --disable-coreimage"
         elif [[ ${library} -eq 46 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-videotoolbox"
+            CONFIGURE_POSTFIX+=" --disable-bzlib"
         elif [[ ${library} -eq 47 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-videotoolbox"
+        elif [[ ${library} -eq 48 ]]; then
             CONFIGURE_POSTFIX+=" --disable-avfoundation"
         fi
     fi

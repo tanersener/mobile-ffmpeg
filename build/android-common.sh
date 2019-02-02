@@ -59,8 +59,9 @@ get_library_name() {
         38) echo "expat" ;;
         39) echo "libsndfile" ;;
         40) echo "leptonica" ;;
-        41) echo "android-zlib" ;;
-        42) echo "android-media-codec" ;;
+        41) echo "ladspa" ;;
+        42) echo "android-zlib" ;;
+        43) echo "android-media-codec" ;;
     esac
 }
 
@@ -567,6 +568,25 @@ Cflags: -I\${includedir}
 EOF
 }
 
+create_ladspa_package_config() {
+    local LADSPA_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/ladspa.pc" << EOF
+prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/ladspa
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: ladspa
+Description: ladspa plugin library
+Version: ${LADSPA_VERSION}
+
+Requires:
+Libs:
+Cflags: -I\${includedir}
+EOF
+}
+
 create_libmp3lame_package_config() {
     local LAME_VERSION="$1"
 
@@ -967,7 +987,7 @@ set_toolchain_clang_paths() {
     export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/bin
 
     TARGET_HOST=$(get_target_host)
-    
+
     export AR=${TARGET_HOST}-ar
     export CC=${TARGET_HOST}-clang
     export CXX=${TARGET_HOST}-clang++

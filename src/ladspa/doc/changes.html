@@ -1,0 +1,205 @@
+<HTML>
+  <HEAD>
+    <TITLE>LADSPA SDK Documentation</TITLE>
+    <META NAME="DESCRIPTION"
+          CONTENT="LADSPA SDK Documentation">
+  </HEAD>
+  <BODY BGCOLOR=#FFFFFF>
+    <CENTER><IMG BORDER=0 SRC="/images/top.jpg"></CENTER>
+    
+    <HR/>
+    
+    <CENTER><IMG BORDER=0 SRC="/images/ladspa.jpg"></CENTER>
+
+<H1>Changes</H1>
+
+<P>[Version numbers relate to the SDK, not the <CODE>ladspa.h</CODE>
+  header file itself.]</P>
+
+<H2>Version 1.01 - 2 Apr 2000</H2>
+<UL>
+
+  <LI>Initial Release with header file, limited documentation, three
+    plugins and two hosts.</LI>
+
+</UL>
+
+<H2>Version 1.02 - 4 May 2000</H2>
+<UL>
+
+  <LI>Introduction of version numbering for SDK.</LI>
+
+  <LI>Plugins added, bringing basic example set to ten. Further
+    development of basic plugins for serious use shifted away to the CMT
+    project.</LI>
+
+  <LI>Bug fix to applyplugin when handling channel count changes.</LI>
+
+  <LI>Introduce support for the <CODE>LADSPA_PATH</CODE> environment
+    variable to both example hosts.</LI>
+
+</UL>
+
+<H2>Version 1.03 - 4 May 2000</H2>
+<UL>
+
+  <LI>Documentation Converted to HTML.</LI>
+
+</UL>
+
+<H2>Version 1.04 - 11 May 2000</H2>
+<UL>
+
+  <LI>Use <CODE>_init()</CODE> and <CODE>_fini()</CODE> in example
+    plugins.</LI>
+
+</UL>
+
+<H2>Version 1.05 - 14 May 2000</H2>
+<UL>
+
+  <LI>Updated to correspond to http://www.ladspa.org/.</LI>
+
+</UL>
+
+<H2>Version 1.06 - 18 May 2000</H2>
+<UL>
+
+  <LI>Add listplugins program.</LI>
+
+</UL>
+
+<H2>Version 1.07 - 24 Sep 2000</H2>
+<UL>
+
+  <LI>Discourage reliance on LD_LIBRARY_PATH by stopping analyseplugin
+    and applyplugin from searching it when looking for LADSPA
+    plugins.</LI>
+
+</UL>
+
+<H2>Version 1.08 - 30 Sep 2000</H2>
+<UL>
+
+  <LI>Use constructor/destructor rather than _fini() and _init() in
+    C++. Use C++ for linkage.</LI>
+
+</UL>
+
+<H2>Version 1.09 - 4 Nov 2000</H2>
+<UL>
+
+  <LI>Add optional plugin label parameter to analyseplugin.</LI>
+
+</UL>
+
+<H2>Version 1.10 - 8 May 2001</H2>
+<UL>
+
+  <LI>Introduction of LGPL license.</LI>
+
+  <LI>Removal of superfluous semicolon on line 492 of header file.</LI>
+
+</UL>
+
+<H2>Version 1.11 - 21 Jul 2001</H2>
+<UL>
+
+  <LI>Remove memory leak in search code.</LI>
+
+</UL>
+
+<H2>Version 1.12 - 7 Aug 2002</H2>
+<UL>
+
+  <LI>Update for LADSPA v1.1 (default values and 1.0f=0dB).</LI>
+
+</UL>
+
+<H2>Version 1.13 - 6 Nov 2007</H2>
+<UL>
+
+  <LI>Fix compile error in sine.cpp (GCC4).</LI>
+
+  <LI>Fix typo in text output by analyseplugin.</LI>
+
+  <LI>Extra usage text in analyseplugin and applyplugin.</LI>
+
+  <LI>Replace strdup() with localStrdup() in sine.cpp to avoid
+    malloc/new mismatch.</LI>
+
+  <LI>Remove "local" part from install directories.</LI>
+
+</UL>
+
+<H2>Version 1.14 - 3 Jan 2019</H2>
+<UL>
+
+  <LI>Rename Makefile.</LI>
+  
+  <LI>Modernise C++ #include style.</LI>
+
+  <LI>Make some globals static.</LI>
+
+  <LI>Use mkdir -p rather than mkdirhier during build.</LI>
+
+  <LI>Use GCC export map to ensure only the ladspa_descriptor()
+    exported.</LI>
+
+  <LI>Put libraries at the end of link instructions.</LI>
+
+  <LI>Package with version number in archive and directory names.</LI>
+
+  <LI>Tweaks to documentation processing.</LI>
+  
+  <LI>Fix bug in LADSPA plugin search which did not handle shared
+    libraries that are not plugins correctly.</LI>
+
+  <LI>Introduce a default LADSPA plugin search path.</LI>
+  
+</UL>
+
+<H2>Version 1.15 - 6 Jan 2019</H2>
+<UL>
+
+  <LI>Perform macro string expansion in C code rather than in Makefile
+    for better portability.</LI>
+
+  <LI>Modernise init()/fini() style in GNU C plugin builds (not C++),
+    tweak link line to correspond.</LI>
+  
+</UL>
+
+<HR/>
+
+<H1>LADSPA SDK Index</H1>
+
+<UL>
+  <LI><A HREF="overview.html">Overview</A></LI>
+  <LI><A HREF="background.html">Background</A></LI>
+  <LI><A HREF="download.html">Download</A></LI>
+  <LI><A HREF="installation.html">Installation</A></LI>
+  <LI><A HREF="shared_plugins.html">How to Share Plugins between Hosts</A></LI>
+  <LI><A HREF="ladspa.h.txt">LADSPA API Header File</A></LI>
+  <LI><A HREF="license.html">License (LGPL) for This Release</A></LI>
+  <LI><A HREF="example_plugins.html">Example Plugins</A></LI>
+  <LI><A HREF="changes.html">Change History</A></LI>
+  <LI><A HREF="unique_ids.html">Unique Plugin IDs</A></LI>
+</UL>
+
+<H2>Other Links</H2>
+
+<UL>
+  <LI>
+    The <A HREF="http://www.ladspa.org/cmt/overview.html">CMT LADSPA
+      Plugin Library</A>
+  </LI>
+</UL>
+
+
+    <HR/>
+
+    <CENTER><IMG BORDER=0 SRC="/images/base.jpg"></CENTER>
+
+  </BODY>
+</HTML>

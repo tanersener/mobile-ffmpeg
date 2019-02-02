@@ -59,12 +59,13 @@ get_library_name() {
         38) echo "expat" ;;
         39) echo "libsndfile" ;;
         40) echo "leptonica" ;;
-        41) echo "ios-zlib" ;;
-        42) echo "ios-audiotoolbox" ;;
-        43) echo "ios-coreimage" ;;
-        44) echo "ios-bzip2" ;;
-        45) echo "ios-videotoolbox" ;;
-        46) echo "ios-avfoundation" ;;
+        41) echo "ladspa" ;;
+        42) echo "ios-zlib" ;;
+        43) echo "ios-audiotoolbox" ;;
+        44) echo "ios-coreimage" ;;
+        45) echo "ios-bzip2" ;;
+        46) echo "ios-videotoolbox" ;;
+        47) echo "ios-avfoundation" ;;
     esac
 }
 
@@ -589,6 +590,25 @@ Libs.private: -lgmp
 EOF
 }
 
+create_ladspa_package_config() {
+    local LADSPA_VERSION="$1"
+
+    cat > "${INSTALL_PKG_CONFIG_DIR}/ladspa.pc" << EOF
+prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/ladspa
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+Name: ladspa
+Description: ladspa plugin library
+Version: ${LADSPA_VERSION}
+
+Requires:
+Libs:
+Cflags: -I\${includedir}
+EOF
+}
+
 create_libmp3lame_package_config() {
     local LAME_VERSION="$1"
 
@@ -1023,7 +1043,7 @@ set_toolchain_clang_paths() {
     fi
 
     TARGET_HOST=$(get_target_host)
-    
+
     export AR="$(xcrun --sdk $(get_sdk_name) -f ar)"
     export CC="$(xcrun --sdk $(get_sdk_name) -f clang)"
     export OBJC="$(xcrun --sdk $(get_sdk_name) -f clang)"

@@ -9,18 +9,18 @@ FFmpeg for Android and IOS
 - Supports
     - Both Android and IOS
     - FFmpeg `v3.4.x`, `v4.0.x`, `v4.1` and `v4.2-dev` releases
-    - 27 external libraries
-    
-        `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
-    
+    - 28 external libraries
+
+        `chromaprint`, `fontconfig`, `freetype`, `fribidi`, `gmp`, `gnutls`, `kvazaar`, `ladspa`, `lame`, `libaom`, `libass`, `libiconv`, `libilbc`, `libtheora`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `twolame`, `wavpack`
+
     - 4 external libraries with GPL license
-    
+
         `vid.stab`, `x264`, `x265`, `xvidcore`
 
 - Exposes both FFmpeg library and MobileFFmpeg wrapper library capabilities
-- Includes cross-compile instructions for 43 open-source libraries
-    
-    `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
+- Includes cross-compile instructions for 44 open-source libraries
+
+    `chromaprint`, `expat`, `ffmpeg`, `fontconfig`, `freetype`, `fribidi`, `giflib`, `gmp`, `gnutls`, `kvazaar`, `ladspa`, `lame`, `leptonica`, `libaom`, `libass`, `libiconv`, `libilbc`, `libjpeg`, `libjpeg-turbo`, `libogg`, `libpng`, `libsndfile`, `libtheora`, `libuuid`, `libvorbis`, `libvpx`, `libwebp`, `libxml2`, `nettle`, `opencore-amr`, `opus`, `sdl`, `shine`, `snappy`, `soxr`, `speex`, `tesseract`, `tiff`, `twolame`, `vid.stab`, `wavpack`, `x264`, `x265`, `xvidcore`
 
 - Licensed under LGPL 3.0, can be customized to support GPL v3.0
 
@@ -38,11 +38,11 @@ FFmpeg for Android and IOS
 - Camera access
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
-- Creates static framework and static universal (fat) library (.a) 
+- Creates static framework and static universal (fat) library (.a)
 - Supports Xcode 7.3.1 or later
 
 ### 2. Using
-Binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org). 
+Binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org).
 
 Refer to [Using IOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-IOS-Universal-Binaries) guide to import IOS universal binaries released at [Github](https://github.com/tanersener/mobile-ffmpeg/releases).
 
@@ -113,7 +113,7 @@ There are eight different binary packages. Below you can see which system librar
     ```
     int rc = FFmpeg.getLastReturnCode();
     String output = FFmpeg.getLastCommandOutput();
- 
+
     if (rc == RETURN_CODE_SUCCESS) {
         Log.i(Config.TAG, "Command execution completed successfully.");
     } else if (rc == RETURN_CODE_CANCEL) {
@@ -183,7 +183,7 @@ There are eight different binary packages. Below you can see which system librar
 
     [MobileFFmpeg execute: @"-i file1.mp4 -c:v mpeg4 file2.mp4"];
     ```
-    
+
 3. Check execution output.
     ```
     int rc = [MobileFFmpeg getLastReturnCode];
@@ -250,18 +250,18 @@ There are eight different binary packages. Below you can see which system librar
     ```
     [MobileFFmpegConfig setFontDirectory:@"<folder with fonts>" with:nil];
     ```
-    
+
 #### 2.3 Test Application
 You can see how MobileFFmpeg is used inside an application by running test applications provided.
-There is an Android test application under the `android/test-app` folder and an IOS test application, which requires 
-`Xcode 9.x` or later, under the `ios/test-app` folder. Both applications are identical and supports command 
+There is an Android test application under the `android/test-app` folder and an IOS test application, which requires
+`Xcode 9.x` or later, under the `ios/test-app` folder. Both applications are identical and supports command
 execution, video encoding, accessing https, encoding audio, burning subtitles and video stabilization.
 
 <img src="https://github.com/tanersener/mobile-ffmpeg/blob/master/docs/assets/ios_test_app.gif" width="240">
 
 ### 3. Versions
 
-`MobileFFmpeg` uses the same version number as `FFmpeg` since `v4.2`. Before that, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different, as shown in the following table. 
+`MobileFFmpeg` uses the same version number as `FFmpeg` since `v4.2`. Before that, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different, as shown in the following table.
 
 |        | v1.0 | v1.1 | v1.2 | v2.0 | v2.1 | v2.2 | v3.0 | v3.1 | v4.2 |
 | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
@@ -270,7 +270,7 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 
 ### 4. LTS Releases
 
-Starting from `v4.2`, `MobileFFmpeg` binaries are published in two different variants: `Main Release` and `LTS Release`. 
+Starting from `v4.2`, `MobileFFmpeg` binaries are published in two different variants: `Main Release` and `LTS Release`.
 
 - Main releases include complete functionality of the library and support the latest SDK/API features
 
@@ -280,7 +280,7 @@ This table shows the differences between two variants.
 
 |        | Main Release | LTS Release |
 | :----: | :----: | :----: |
-| Android API Level | 24 | 21 | 
+| Android API Level | 24 | 21 |
 | Android Camera Access | x | - |
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> |
 | IOS SDK | 12.1 | 9.3 |
@@ -314,7 +314,7 @@ After a successful build, compiled FFmpeg and MobileFFmpeg libraries can be foun
 Both `android.sh` and `ios.sh` can be customized to override default settings,
 [android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) and
 [ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) wiki pages include all available build options.
-##### 5.2.1 Android 
+##### 5.2.1 Android
 ```
 export ANDROID_NDK_ROOT=<Android NDK Path>
 ./android.sh
@@ -334,13 +334,13 @@ export ANDROID_NDK_ROOT=<Android NDK Path>
 Use `--lts` option to build lts binaries for each platform.
 
 #### 5.3 GPL Support
-It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1` 
+It is possible to enable GPL licensed libraries `x264`, `xvidcore` since `v1.1` and `vid.stab`, `x265` since `v2.1`
 from the top level build scripts.
 Their source code is not included in the repository and downloaded when enabled.
 
 #### 5.4 External Libraries
 `build` directory includes build scripts for external libraries. There are two scripts for each library, one for Android
-and one for IOS. They include all options/flags used to cross-compile the libraries. `ASM` is enabled by most of them, 
+and one for IOS. They include all options/flags used to cross-compile the libraries. `ASM` is enabled by most of them,
 exceptions are listed under the [ASM Support](https://github.com/tanersener/mobile-ffmpeg/wiki/ASM-Support) page.
 
 ### 6. Documentation
@@ -349,7 +349,7 @@ A more detailed documentation is available at [Wiki](https://github.com/tanersen
 
 ### 7. License
 
-This project is licensed under the LGPL v3.0. However, if source code is built using optional `--enable-gpl` flag or 
+This project is licensed under the LGPL v3.0. However, if source code is built using optional `--enable-gpl` flag or
 prebuilt binaries with `-gpl` postfix are used then MobileFFmpeg is subject to the GPL v3.0 license.
 
 Source code of FFmpeg and external libraries is included in compliance with their individual licenses.

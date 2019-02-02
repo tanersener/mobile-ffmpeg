@@ -1,0 +1,69 @@
+<HTML>
+  <HEAD>
+    <TITLE>LADSPA SDK Documentation</TITLE>
+    <META NAME="DESCRIPTION"
+          CONTENT="LADSPA SDK Documentation">
+  </HEAD>
+  <BODY BGCOLOR=#FFFFFF>
+    <CENTER><IMG BORDER=0 SRC="/images/top.jpg"></CENTER>
+    
+    <HR/>
+    
+    <CENTER><IMG BORDER=0 SRC="/images/ladspa.jpg"></CENTER>
+
+<H1>Shared Plugins</H1>
+
+<P>Plugins may be used by a range of different hosts. However, the
+host needs to be able to find the plugins. Hosts vary, however the
+recommended method uses the environment variable
+<CODE>LADSPA_PATH</CODE>. If present, this should contain a
+colon-separated path indicating directories that should be searched
+(in order) when loading plugin types.</P>
+
+<P>It is recommended for standard Linux distributions such as RedHat,
+that this plugin path should be
+<CODE>/home/&lt;user&gt;/.ladspa:/usr/local/lib/ladspa:/usr/lib/ladspa</CODE>.
+Plugins can then be installed into <CODE>/usr/local/lib/ladspa/</CODE>
+or <CODE>/usr/lib/ladspa/</CODE>.</P>
+
+<P>You may wish to add a line such as the following to your
+.bash_profile login file (if you use Bash): <CODE>export
+LADSPA_PATH=$LADSPA_PATH:/home/&lt;user&gt;/.ladspa:/usr/local/lib/ladspa:/usr/lib/ladspa</CODE></P>
+
+<P>To list the plugins that can be found on your
+<CODE>LADSPA_PATH</CODE>, run the <CODE>listplugins</CODE>
+program.</P>
+
+<HR/>
+
+<H1>LADSPA SDK Index</H1>
+
+<UL>
+  <LI><A HREF="overview.html">Overview</A></LI>
+  <LI><A HREF="background.html">Background</A></LI>
+  <LI><A HREF="download.html">Download</A></LI>
+  <LI><A HREF="installation.html">Installation</A></LI>
+  <LI><A HREF="shared_plugins.html">How to Share Plugins between Hosts</A></LI>
+  <LI><A HREF="ladspa.h.txt">LADSPA API Header File</A></LI>
+  <LI><A HREF="license.html">License (LGPL) for This Release</A></LI>
+  <LI><A HREF="example_plugins.html">Example Plugins</A></LI>
+  <LI><A HREF="changes.html">Change History</A></LI>
+  <LI><A HREF="unique_ids.html">Unique Plugin IDs</A></LI>
+</UL>
+
+<H2>Other Links</H2>
+
+<UL>
+  <LI>
+    The <A HREF="http://www.ladspa.org/cmt/overview.html">CMT LADSPA
+      Plugin Library</A>
+  </LI>
+</UL>
+
+
+    <HR/>
+
+    <CENTER><IMG BORDER=0 SRC="/images/base.jpg"></CENTER>
+
+  </BODY>
+</HTML>
