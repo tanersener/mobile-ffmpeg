@@ -644,7 +644,7 @@ do
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
         # CLEAR FLAGS
-        for library in {1..43}
+        for library in {1..44}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
