@@ -50,18 +50,19 @@ LIBRARY_TIFF=37
 LIBRARY_EXPAT=38
 LIBRARY_SNDFILE=39
 LIBRARY_LEPTONICA=40
-LIBRARY_ZLIB=41
-LIBRARY_AUDIOTOOLBOX=42
-LIBRARY_COREIMAGE=43
-LIBRARY_BZIP2=44
-LIBRARY_VIDEOTOOLBOX=45
-LIBRARY_AVFOUNDATION=46
+LIBRARY_LADSPA=41
+LIBRARY_ZLIB=42
+LIBRARY_AUDIOTOOLBOX=43
+LIBRARY_COREIMAGE=44
+LIBRARY_BZIP2=45
+LIBRARY_VIDEOTOOLBOX=46
+LIBRARY_AVFOUNDATION=47
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -135,6 +136,7 @@ display_help() {
     echo -e "  --enable-gmp\t\t\tbuild with gmp [no]"
     echo -e "  --enable-gnutls\t\tbuild with gnutls [no]"
     echo -e "  --enable-kvazaar\t\tbuild with kvazaar [no]"
+    echo -e "  --enable-ladspa\t\t\tbuild with ladspa [no]"
     echo -e "  --enable-lame\t\t\tbuild with lame [no]"
     echo -e "  --enable-libaom\t\tbuild with libaom [no]"
     echo -e "  --enable-libass\t\tbuild with libass [no]"
@@ -273,6 +275,9 @@ set_library() {
         ;;
         kvazaar)
             ENABLED_LIBRARIES[LIBRARY_KVAZAAR]=$2
+        ;;
+        ladspa)
+            ENABLED_LIBRARIES[LIBRARY_LADSPA]=$2
         ;;
         lame)
             ENABLED_LIBRARIES[LIBRARY_LAME]=$2
@@ -464,7 +469,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {41..46}
+    for library in {42..47}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -476,7 +481,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..30}
+    for library in {0..41}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -585,6 +590,7 @@ get_external_library_license_path() {
         36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
         37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
         40) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
+        41) echo "${BASEDIR}/src/$(get_library_name $1)/doc/COPYING" ;;
         4 | 10 | 13 | 19 | 21 | 26 | 34) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
         *) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING" ;;
     esac

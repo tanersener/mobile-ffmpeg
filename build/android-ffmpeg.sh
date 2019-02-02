@@ -119,6 +119,11 @@ do
                 LDFLAGS+=" $(pkg-config --libs --static kvazaar)"
                 CONFIGURE_POSTFIX+=" --enable-libkvazaar"
             ;;
+            ladspa)
+                CFLAGS+=" $(pkg-config --cflags ladspa)"
+                LDFLAGS+=" $(pkg-config --libs --static ladspa)"
+                CONFIGURE_POSTFIX+=" --enable-ladspa"
+            ;;
             lame)
                 CFLAGS+=" $(pkg-config --cflags libmp3lame)"
                 LDFLAGS+=" $(pkg-config --libs --static libmp3lame)"

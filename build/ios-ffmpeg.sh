@@ -131,6 +131,11 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static kvazaar)"
                 CONFIGURE_POSTFIX+=" --enable-libkvazaar"
             ;;
+            ladspa)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags ladspa)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static ladspa)"
+                CONFIGURE_POSTFIX+=" --enable-ladspa"
+            ;;
             lame)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags libmp3lame)"
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static libmp3lame)"

@@ -49,14 +49,15 @@ LIBRARY_TIFF=37
 LIBRARY_EXPAT=38
 LIBRARY_SNDFILE=39
 LIBRARY_LEPTONICA=40
-LIBRARY_ZLIB=41
-LIBRARY_MEDIA_CODEC=42
+LIBRARY_LADSPA=41
+LIBRARY_ZLIB=42
+LIBRARY_MEDIA_CODEC=43
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -79,7 +80,7 @@ without any external libraries enabled. Options can be used to disable ABIs and/
 Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. \
 When compilation ends an Android Archive (AAR) file is created with enabled platforms inside.\n"
 
-    echo -e "Usage: ./"$COMMAND" [OPTION]...\n"   
+    echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
     echo -e "Specify environment variables as VARIABLE=VALUE to override default build options.\n"
 
@@ -115,6 +116,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  --enable-gmp\t\t\tbuild with gmp [no]"
     echo -e "  --enable-gnutls\t\tbuild with gnutls [no]"
     echo -e "  --enable-kvazaar\t\tbuild with kvazaar [no]"
+    echo -e "  --enable-ladspa\t\t\tbuild with ladspa [no]"
     echo -e "  --enable-lame\t\t\tbuild with lame [no]"
     echo -e "  --enable-libaom\t\tbuild with libaom [no]"
     echo -e "  --enable-libass\t\tbuild with libass [no]"
@@ -239,6 +241,9 @@ set_library() {
         ;;
         kvazaar)
             ENABLED_LIBRARIES[LIBRARY_KVAZAAR]=$2
+        ;;
+        ladspa)
+            ENABLED_LIBRARIES[LIBRARY_LADSPA]=$2
         ;;
         lame)
             ENABLED_LIBRARIES[LIBRARY_LAME]=$2
@@ -427,7 +432,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {41..42}
+    for library in {42..43}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -439,7 +444,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..30}
+    for library in {0..41}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
