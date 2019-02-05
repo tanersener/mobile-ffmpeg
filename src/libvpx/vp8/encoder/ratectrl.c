@@ -996,7 +996,7 @@ static void calc_pframe_target_size(VP8_COMP *cpi) {
            * bits on this frame even if it is a contructed arf.
            * The active maximum quantizer insures that an appropriate
            * number of bits will be spent if needed for contstructed ARFs.
-          */
+           */
           cpi->this_frame_target = 0;
         }
 
@@ -1052,9 +1052,8 @@ void vp8_update_rate_correction_factors(VP8_COMP *cpi, int damp_var) {
    * overflow when values are large
    */
   projected_size_based_on_q =
-      (int)(((.5 +
-              rate_correction_factor *
-                  vp8_bits_per_mb[cpi->common.frame_type][Q]) *
+      (int)(((.5 + rate_correction_factor *
+                       vp8_bits_per_mb[cpi->common.frame_type][Q]) *
              cpi->common.MBs) /
             (1 << BPER_MB_NORMBITS));
 
@@ -1465,7 +1464,7 @@ int vp8_drop_encodedframe_overshoot(VP8_COMP *cpi, int Q) {
       (cpi->oxcf.screen_content_mode == 2 ||
        (cpi->drop_frames_allowed &&
         (force_drop_overshoot ||
-         (cpi->rate_correction_factor < (4.0f * MIN_BPB_FACTOR) &&
+         (cpi->rate_correction_factor < (8.0f * MIN_BPB_FACTOR) &&
           cpi->frames_since_last_drop_overshoot > (int)cpi->framerate))))) {
     // Note: the "projected_frame_size" from encode_frame() only gives estimate
     // of mode/motion vector rate (in non-rd mode): so below we only require

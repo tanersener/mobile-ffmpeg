@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP9_ENCODER_VP9_MCOMP_H_
-#define VP9_ENCODER_VP9_MCOMP_H_
+#ifndef VPX_VP9_ENCODER_VP9_MCOMP_H_
+#define VPX_VP9_ENCODER_VP9_MCOMP_H_
 
 #include "vp9/encoder/vp9_block.h"
 #include "vpx_dsp/variance.h"
@@ -59,14 +59,15 @@ struct SPEED_FEATURES;
 int vp9_init_search_range(int size);
 
 int vp9_refining_search_sad(const struct macroblock *x, struct mv *ref_mv,
-                            int sad_per_bit, int distance,
+                            int error_per_bit, int search_range,
                             const struct vp9_variance_vtable *fn_ptr,
                             const struct mv *center_mv);
 
 // Perform integral projection based motion estimation.
 unsigned int vp9_int_pro_motion_estimation(const struct VP9_COMP *cpi,
                                            MACROBLOCK *x, BLOCK_SIZE bsize,
-                                           int mi_row, int mi_col);
+                                           int mi_row, int mi_col,
+                                           const MV *ref_mv);
 
 typedef uint32_t(fractional_mv_step_fp)(
     const MACROBLOCK *x, MV *bestmv, const MV *ref_mv, int allow_hp,
@@ -74,7 +75,7 @@ typedef uint32_t(fractional_mv_step_fp)(
     int forced_stop,  // 0 - full, 1 - qtr only, 2 - half only
     int iters_per_step, int *cost_list, int *mvjcost, int *mvcost[2],
     uint32_t *distortion, uint32_t *sse1, const uint8_t *second_pred, int w,
-    int h);
+    int h, int use_accurate_subpel_search);
 
 extern fractional_mv_step_fp vp9_find_best_sub_pixel_tree;
 extern fractional_mv_step_fp vp9_find_best_sub_pixel_tree_pruned;
@@ -106,6 +107,9 @@ int vp9_refining_search_8p_c(const MACROBLOCK *x, MV *ref_mv, int error_per_bit,
 
 struct VP9_COMP;
 
+// "mvp_full" is the MV search starting point;
+// "ref_mv" is the context reference MV;
+// "tmp_mv" is the searched best MV.
 int vp9_full_pixel_search(struct VP9_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
                           MV *mvp_full, int step_param, int search_method,
                           int error_per_bit, int *cost_list, const MV *ref_mv,
@@ -115,8 +119,38 @@ void vp9_set_subpel_mv_search_range(MvLimits *subpel_mv_limits,
                                     const MvLimits *umv_window_limits,
                                     const MV *ref_mv);
 
+#if CONFIG_NON_GREEDY_MV
+#define NB_MVS_NUM 4
+struct TplDepStats;
+double vp9_refining_search_sad_new(const MACROBLOCK *x, MV *best_full_mv,
+                                   double *best_mv_dist, double *best_mv_cost,
+                                   double lambda, int search_range,
+                                   const vp9_variance_fn_ptr_t *fn_ptr,
+                                   const int_mv *nb_full_mvs, int full_mv_num);
+
+double vp9_full_pixel_diamond_new(const struct VP9_COMP *cpi, MACROBLOCK *x,
+                                  MV *mvp_full, int step_param, double lambda,
+                                  int do_refine,
+                                  const vp9_variance_fn_ptr_t *fn_ptr,
+                                  const int_mv *nb_full_mvs, int full_mv_num,
+                                  MV *best_mv, double *best_mv_dist,
+                                  double *best_mv_cost);
+
+double vp9_nb_mvs_inconsistency(const MV *mv, const int_mv *nb_mvs, int mv_num);
+static INLINE MV get_full_mv(const MV *mv) {
+  MV out_mv;
+  out_mv.row = mv->row >> 3;
+  out_mv.col = mv->col >> 3;
+  return out_mv;
+}
+
+struct TplDepFrame;
+void vp9_prepare_nb_full_mvs(const struct TplDepFrame *tpl_frame, int mi_row,
+                             int mi_col, int rf_idx, BLOCK_SIZE bsize,
+                             int_mv *nb_full_mvs);
+#endif  // CONFIG_NON_GREEDY_MV
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // VP9_ENCODER_VP9_MCOMP_H_
+#endif  // VPX_VP9_ENCODER_VP9_MCOMP_H_

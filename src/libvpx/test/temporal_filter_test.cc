@@ -45,6 +45,9 @@ void reference_filter(const Buffer<uint8_t> &a, const Buffer<uint8_t> &b, int w,
     rounding = 1 << (filter_strength - 1);
   }
 
+  ASSERT_TRUE(a.TopLeftPixel() != NULL);
+  ASSERT_TRUE(b.TopLeftPixel() != NULL);
+  ASSERT_TRUE(diff_sq.TopLeftPixel() != NULL);
   // Calculate all the differences. Avoids re-calculating a bunch of extra
   // values.
   for (int height = 0; height < h; ++height) {

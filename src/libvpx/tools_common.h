@@ -7,8 +7,8 @@
  *  in the file PATENTS.  All contributing project authors may
  *  be found in the AUTHORS file in the root of the source tree.
  */
-#ifndef TOOLS_COMMON_H_
-#define TOOLS_COMMON_H_
+#ifndef VPX_TOOLS_COMMON_H_
+#define VPX_TOOLS_COMMON_H_
 
 #include <stdio.h>
 
@@ -33,6 +33,7 @@ typedef int64_t FileOffset;
 #define ftello ftello64
 typedef off64_t FileOffset;
 #elif CONFIG_OS_SUPPORT
+#include <sys/types.h> /* NOLINT */
 typedef off_t FileOffset;
 /* Use 32-bit file operations in WebM file format when building ARM
  * executables (.axf) with RVCT. */
@@ -163,4 +164,4 @@ void vpx_img_truncate_16_to_8(vpx_image_t *dst, vpx_image_t *src);
 } /* extern "C" */
 #endif
 
-#endif  // TOOLS_COMMON_H_
+#endif  // VPX_TOOLS_COMMON_H_

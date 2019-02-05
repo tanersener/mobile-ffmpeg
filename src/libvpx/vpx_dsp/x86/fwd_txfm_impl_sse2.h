@@ -778,6 +778,7 @@ void FDCT16x16_2D(const int16_t *input, tran_low_t *output, int stride) {
             return;
           }
 #endif  // DCT_HIGH_BIT_DEPTH
+
           // Interleave to do the multiply by constants which gets us
           // into 32 bits.
           {
@@ -834,6 +835,7 @@ void FDCT16x16_2D(const int16_t *input, tran_low_t *output, int stride) {
               return;
             }
 #endif  // DCT_HIGH_BIT_DEPTH
+
             // Interleave to do the multiply by constants which gets us
             // into 32 bits.
             {

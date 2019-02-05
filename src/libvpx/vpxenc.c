@@ -342,7 +342,8 @@ static const arg_def_t *kf_args[] = { &kf_min_dist, &kf_max_dist, &kf_disabled,
 static const arg_def_t noise_sens =
     ARG_DEF(NULL, "noise-sensitivity", 1, "Noise sensitivity (frames to blur)");
 static const arg_def_t sharpness =
-    ARG_DEF(NULL, "sharpness", 1, "Loop filter sharpness (0..7)");
+    ARG_DEF(NULL, "sharpness", 1,
+            "Increase sharpness at the expense of lower PSNR. (0..7)");
 static const arg_def_t static_thresh =
     ARG_DEF(NULL, "static-thresh", 1, "Motion detection threshold");
 static const arg_def_t auto_altref =
@@ -351,7 +352,8 @@ static const arg_def_t arnr_maxframes =
     ARG_DEF(NULL, "arnr-maxframes", 1, "AltRef max frames (0..15)");
 static const arg_def_t arnr_strength =
     ARG_DEF(NULL, "arnr-strength", 1, "AltRef filter strength (0..6)");
-static const arg_def_t arnr_type = ARG_DEF(NULL, "arnr-type", 1, "AltRef type");
+static const arg_def_t arnr_type =
+    ARG_DEF(NULL, "arnr-type", 1, "AltRef filter type (1..3)");
 static const struct arg_enum_list tuning_enum[] = {
   { "psnr", VP8_TUNE_PSNR }, { "ssim", VP8_TUNE_SSIM }, { NULL, 0 }
 };
@@ -411,6 +413,10 @@ static const arg_def_t tile_cols =
 static const arg_def_t tile_rows =
     ARG_DEF(NULL, "tile-rows", 1,
             "Number of tile rows to use, log2 (set to 0 while threads > 1)");
+
+static const arg_def_t enable_tpl_model =
+    ARG_DEF(NULL, "enable-tpl", 1, "Enable temporal dependency model");
+
 static const arg_def_t lossless =
     ARG_DEF(NULL, "lossless", 1, "Lossless mode (0: false (default), 1: true)");
 static const arg_def_t frame_parallel_decoding = ARG_DEF(
@@ -496,6 +502,7 @@ static const arg_def_t *vp9_args[] = { &cpu_used_vp9,
                                        &static_thresh,
                                        &tile_cols,
                                        &tile_rows,
+                                       &enable_tpl_model,
                                        &arnr_maxframes,
                                        &arnr_strength,
                                        &arnr_type,
@@ -527,6 +534,7 @@ static const int vp9_arg_ctrl_map[] = { VP8E_SET_CPUUSED,
                                         VP8E_SET_STATIC_THRESHOLD,
                                         VP9E_SET_TILE_COLUMNS,
                                         VP9E_SET_TILE_ROWS,
+                                        VP9E_SET_TPL,
                                         VP8E_SET_ARNR_MAXFRAMES,
                                         VP8E_SET_ARNR_STRENGTH,
                                         VP8E_SET_ARNR_TYPE,
@@ -552,7 +560,7 @@ static const int vp9_arg_ctrl_map[] = { VP8E_SET_CPUUSED,
 
 static const arg_def_t *no_args[] = { NULL };
 
-void show_help(FILE *fout, int shorthelp) {
+static void show_help(FILE *fout, int shorthelp) {
   int i;
   const int num_encoder = get_vpx_encoder_count();
 
@@ -1278,8 +1286,8 @@ static int parse_stream_params(struct VpxEncoderConfig *global,
           match = 1;
 
           /* Point either to the next free element or the first
-          * instance of this control.
-          */
+           * instance of this control.
+           */
           for (j = 0; j < config->arg_ctrl_cnt; j++)
             if (ctrl_args_map != NULL &&
                 config->arg_ctrls[j][0] == ctrl_args_map[i])
@@ -1614,14 +1622,14 @@ static void encode_frame(struct stream_state *stream,
             vpx_img_alloc(NULL, VPX_IMG_FMT_I42016, cfg->g_w, cfg->g_h, 16);
       }
       I420Scale_16(
-          (uint16 *)img->planes[VPX_PLANE_Y], img->stride[VPX_PLANE_Y] / 2,
-          (uint16 *)img->planes[VPX_PLANE_U], img->stride[VPX_PLANE_U] / 2,
-          (uint16 *)img->planes[VPX_PLANE_V], img->stride[VPX_PLANE_V] / 2,
-          img->d_w, img->d_h, (uint16 *)stream->img->planes[VPX_PLANE_Y],
+          (uint16_t *)img->planes[VPX_PLANE_Y], img->stride[VPX_PLANE_Y] / 2,
+          (uint16_t *)img->planes[VPX_PLANE_U], img->stride[VPX_PLANE_U] / 2,
+          (uint16_t *)img->planes[VPX_PLANE_V], img->stride[VPX_PLANE_V] / 2,
+          img->d_w, img->d_h, (uint16_t *)stream->img->planes[VPX_PLANE_Y],
           stream->img->stride[VPX_PLANE_Y] / 2,
-          (uint16 *)stream->img->planes[VPX_PLANE_U],
+          (uint16_t *)stream->img->planes[VPX_PLANE_U],
           stream->img->stride[VPX_PLANE_U] / 2,
-          (uint16 *)stream->img->planes[VPX_PLANE_V],
+          (uint16_t *)stream->img->planes[VPX_PLANE_V],
           stream->img->stride[VPX_PLANE_V] / 2, stream->img->d_w,
           stream->img->d_h, kFilterBox);
       img = stream->img;
@@ -2215,9 +2223,9 @@ int main(int argc, const char **argv_) {
 
     if (!global.quiet) {
       FOREACH_STREAM(fprintf(
-          stderr, "\rPass %d/%d frame %4d/%-4d %7" PRId64 "B %7" PRId64
-                  "b/f %7" PRId64 "b/s"
-                  " %7" PRId64 " %s (%.2f fps)\033[K\n",
+          stderr,
+          "\rPass %d/%d frame %4d/%-4d %7" PRId64 "B %7" PRId64 "b/f %7" PRId64
+          "b/s %7" PRId64 " %s (%.2f fps)\033[K\n",
           pass + 1, global.passes, frames_in, stream->frames_out,
           (int64_t)stream->nbytes,
           seen_frames ? (int64_t)(stream->nbytes * 8 / seen_frames) : 0,

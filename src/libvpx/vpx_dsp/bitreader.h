@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VPX_DSP_BITREADER_H_
-#define VPX_DSP_BITREADER_H_
+#ifndef VPX_VPX_DSP_BITREADER_H_
+#define VPX_VPX_DSP_BITREADER_H_
 
 #include <stddef.h>
 #include <limits.h>
@@ -94,7 +94,7 @@ static INLINE int vpx_read(vpx_reader *r, int prob) {
   }
 
   {
-    register int shift = vpx_norm[range];
+    const unsigned char shift = vpx_norm[(unsigned char)range];
     range <<= shift;
     value <<= shift;
     count -= shift;
@@ -131,4 +131,4 @@ static INLINE int vpx_read_tree(vpx_reader *r, const vpx_tree_index *tree,
 }  // extern "C"
 #endif
 
-#endif  // VPX_DSP_BITREADER_H_
+#endif  // VPX_VPX_DSP_BITREADER_H_

@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP8_COMMON_TREECODER_H_
-#define VP8_COMMON_TREECODER_H_
+#ifndef VPX_VP8_COMMON_TREECODER_H_
+#define VPX_VP8_COMMON_TREECODER_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -79,4 +79,4 @@ void vp8bc_tree_probs_from_distribution(int n, /* n = size of alphabet */
 }  // extern "C"
 #endif
 
-#endif  // VP8_COMMON_TREECODER_H_
+#endif  // VPX_VP8_COMMON_TREECODER_H_

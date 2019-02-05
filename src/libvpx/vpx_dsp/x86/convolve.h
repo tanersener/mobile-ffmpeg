@@ -7,8 +7,8 @@
  *  in the file PATENTS.  All contributing project authors may
  *  be found in the AUTHORS file in the root of the source tree.
  */
-#ifndef VPX_DSP_X86_CONVOLVE_H_
-#define VPX_DSP_X86_CONVOLVE_H_
+#ifndef VPX_VPX_DSP_X86_CONVOLVE_H_
+#define VPX_VPX_DSP_X86_CONVOLVE_H_
 
 #include <assert.h>
 
@@ -23,44 +23,59 @@ typedef void filter8_1dfunction(const uint8_t *src_ptr, ptrdiff_t src_pitch,
 #define FUN_CONV_1D(name, offset, step_q4, dir, src_start, avg, opt)         \
   void vpx_convolve8_##name##_##opt(                                         \
       const uint8_t *src, ptrdiff_t src_stride, uint8_t *dst,                \
-      ptrdiff_t dst_stride, const InterpKernel *filter_kernel, int x0_q4,    \
+      ptrdiff_t dst_stride, const InterpKernel *filter, int x0_q4,           \
       int x_step_q4, int y0_q4, int y_step_q4, int w, int h) {               \
-    const int16_t *filter = filter_kernel[offset];                           \
+    const int16_t *filter_row = filter[offset];                              \
     (void)x0_q4;                                                             \
     (void)x_step_q4;                                                         \
     (void)y0_q4;                                                             \
     (void)y_step_q4;                                                         \
-    assert(filter[3] != 128);                                                \
+    assert(filter_row[3] != 128);                                            \
     assert(step_q4 == 16);                                                   \
-    if (filter[0] | filter[1] | filter[2]) {                                 \
+    if (filter_row[0] | filter_row[1] | filter_row[6] | filter_row[7]) {     \
       while (w >= 16) {                                                      \
         vpx_filter_block1d16_##dir##8_##avg##opt(src_start, src_stride, dst, \
-                                                 dst_stride, h, filter);     \
+                                                 dst_stride, h, filter_row); \
         src += 16;                                                           \
         dst += 16;                                                           \
         w -= 16;                                                             \
       }                                                                      \
       if (w == 8) {                                                          \
         vpx_filter_block1d8_##dir##8_##avg##opt(src_start, src_stride, dst,  \
-                                                dst_stride, h, filter);      \
+                                                dst_stride, h, filter_row);  \
       } else if (w == 4) {                                                   \
         vpx_filter_block1d4_##dir##8_##avg##opt(src_start, src_stride, dst,  \
-                                                dst_stride, h, filter);      \
+                                                dst_stride, h, filter_row);  \
+      }                                                                      \
+    } else if (filter_row[2] | filter_row[5]) {                              \
+      while (w >= 16) {                                                      \
+        vpx_filter_block1d16_##dir##4_##avg##opt(src_start, src_stride, dst, \
+                                                 dst_stride, h, filter_row); \
+        src += 16;                                                           \
+        dst += 16;                                                           \
+        w -= 16;                                                             \
+      }                                                                      \
+      if (w == 8) {                                                          \
+        vpx_filter_block1d8_##dir##4_##avg##opt(src_start, src_stride, dst,  \
+                                                dst_stride, h, filter_row);  \
+      } else if (w == 4) {                                                   \
+        vpx_filter_block1d4_##dir##4_##avg##opt(src_start, src_stride, dst,  \
+                                                dst_stride, h, filter_row);  \
       }                                                                      \
     } else {                                                                 \
       while (w >= 16) {                                                      \
         vpx_filter_block1d16_##dir##2_##avg##opt(src, src_stride, dst,       \
-                                                 dst_stride, h, filter);     \
+                                                 dst_stride, h, filter_row); \
         src += 16;                                                           \
         dst += 16;                                                           \
         w -= 16;                                                             \
       }                                                                      \
       if (w == 8) {                                                          \
         vpx_filter_block1d8_##dir##2_##avg##opt(src, src_stride, dst,        \
-                                                dst_stride, h, filter);      \
+                                                dst_stride, h, filter_row);  \
       } else if (w == 4) {                                                   \
         vpx_filter_block1d4_##dir##2_##avg##opt(src, src_stride, dst,        \
-                                                dst_stride, h, filter);      \
+                                                dst_stride, h, filter_row);  \
       }                                                                      \
     }                                                                        \
   }
@@ -106,64 +121,86 @@ typedef void highbd_filter8_1dfunction(const uint16_t *src_ptr,
                                        unsigned int output_height,
                                        const int16_t *filter, int bd);
 
-#define HIGH_FUN_CONV_1D(name, offset, step_q4, dir, src_start, avg, opt)     \
-  void vpx_highbd_convolve8_##name##_##opt(                                   \
-      const uint16_t *src, ptrdiff_t src_stride, uint16_t *dst,               \
-      ptrdiff_t dst_stride, const InterpKernel *filter_kernel, int x0_q4,     \
-      int x_step_q4, int y0_q4, int y_step_q4, int w, int h, int bd) {        \
-    const int16_t *filter = filter_kernel[offset];                            \
-    if (step_q4 == 16 && filter[3] != 128) {                                  \
-      if (filter[0] | filter[1] | filter[2]) {                                \
-        while (w >= 16) {                                                     \
-          vpx_highbd_filter_block1d16_##dir##8_##avg##opt(                    \
-              src_start, src_stride, dst, dst_stride, h, filter, bd);         \
-          src += 16;                                                          \
-          dst += 16;                                                          \
-          w -= 16;                                                            \
-        }                                                                     \
-        while (w >= 8) {                                                      \
-          vpx_highbd_filter_block1d8_##dir##8_##avg##opt(                     \
-              src_start, src_stride, dst, dst_stride, h, filter, bd);         \
-          src += 8;                                                           \
-          dst += 8;                                                           \
-          w -= 8;                                                             \
-        }                                                                     \
-        while (w >= 4) {                                                      \
-          vpx_highbd_filter_block1d4_##dir##8_##avg##opt(                     \
-              src_start, src_stride, dst, dst_stride, h, filter, bd);         \
-          src += 4;                                                           \
-          dst += 4;                                                           \
-          w -= 4;                                                             \
-        }                                                                     \
-      } else {                                                                \
-        while (w >= 16) {                                                     \
-          vpx_highbd_filter_block1d16_##dir##2_##avg##opt(                    \
-              src, src_stride, dst, dst_stride, h, filter, bd);               \
-          src += 16;                                                          \
-          dst += 16;                                                          \
-          w -= 16;                                                            \
-        }                                                                     \
-        while (w >= 8) {                                                      \
-          vpx_highbd_filter_block1d8_##dir##2_##avg##opt(                     \
-              src, src_stride, dst, dst_stride, h, filter, bd);               \
-          src += 8;                                                           \
-          dst += 8;                                                           \
-          w -= 8;                                                             \
-        }                                                                     \
-        while (w >= 4) {                                                      \
-          vpx_highbd_filter_block1d4_##dir##2_##avg##opt(                     \
-              src, src_stride, dst, dst_stride, h, filter, bd);               \
-          src += 4;                                                           \
-          dst += 4;                                                           \
-          w -= 4;                                                             \
-        }                                                                     \
-      }                                                                       \
-    }                                                                         \
-    if (w) {                                                                  \
-      vpx_highbd_convolve8_##name##_c(src, src_stride, dst, dst_stride,       \
-                                      filter_kernel, x0_q4, x_step_q4, y0_q4, \
-                                      y_step_q4, w, h, bd);                   \
-    }                                                                         \
+#define HIGH_FUN_CONV_1D(name, offset, step_q4, dir, src_start, avg, opt)  \
+  void vpx_highbd_convolve8_##name##_##opt(                                \
+      const uint16_t *src, ptrdiff_t src_stride, uint16_t *dst,            \
+      ptrdiff_t dst_stride, const InterpKernel *filter, int x0_q4,         \
+      int x_step_q4, int y0_q4, int y_step_q4, int w, int h, int bd) {     \
+    const int16_t *filter_row = filter[offset];                            \
+    if (step_q4 == 16 && filter_row[3] != 128) {                           \
+      if (filter_row[0] | filter_row[1] | filter_row[6] | filter_row[7]) { \
+        while (w >= 16) {                                                  \
+          vpx_highbd_filter_block1d16_##dir##8_##avg##opt(                 \
+              src_start, src_stride, dst, dst_stride, h, filter_row, bd);  \
+          src += 16;                                                       \
+          dst += 16;                                                       \
+          w -= 16;                                                         \
+        }                                                                  \
+        while (w >= 8) {                                                   \
+          vpx_highbd_filter_block1d8_##dir##8_##avg##opt(                  \
+              src_start, src_stride, dst, dst_stride, h, filter_row, bd);  \
+          src += 8;                                                        \
+          dst += 8;                                                        \
+          w -= 8;                                                          \
+        }                                                                  \
+        while (w >= 4) {                                                   \
+          vpx_highbd_filter_block1d4_##dir##8_##avg##opt(                  \
+              src_start, src_stride, dst, dst_stride, h, filter_row, bd);  \
+          src += 4;                                                        \
+          dst += 4;                                                        \
+          w -= 4;                                                          \
+        }                                                                  \
+      } else if (filter_row[2] | filter_row[5]) {                          \
+        while (w >= 16) {                                                  \
+          vpx_highbd_filter_block1d16_##dir##4_##avg##opt(                 \
+              src_start, src_stride, dst, dst_stride, h, filter_row, bd);  \
+          src += 16;                                                       \
+          dst += 16;                                                       \
+          w -= 16;                                                         \
+        }                                                                  \
+        while (w >= 8) {                                                   \
+          vpx_highbd_filter_block1d8_##dir##4_##avg##opt(                  \
+              src_start, src_stride, dst, dst_stride, h, filter_row, bd);  \
+          src += 8;                                                        \
+          dst += 8;                                                        \
+          w -= 8;                                                          \
+        }                                                                  \
+        while (w >= 4) {                                                   \
+          vpx_highbd_filter_block1d4_##dir##4_##avg##opt(                  \
+              src_start, src_stride, dst, dst_stride, h, filter_row, bd);  \
+          src += 4;                                                        \
+          dst += 4;                                                        \
+          w -= 4;                                                          \
+        }                                                                  \
+      } else {                                                             \
+        while (w >= 16) {                                                  \
+          vpx_highbd_filter_block1d16_##dir##2_##avg##opt(                 \
+              src, src_stride, dst, dst_stride, h, filter_row, bd);        \
+          src += 16;                                                       \
+          dst += 16;                                                       \
+          w -= 16;                                                         \
+        }                                                                  \
+        while (w >= 8) {                                                   \
+          vpx_highbd_filter_block1d8_##dir##2_##avg##opt(                  \
+              src, src_stride, dst, dst_stride, h, filter_row, bd);        \
+          src += 8;                                                        \
+          dst += 8;                                                        \
+          w -= 8;                                                          \
+        }                                                                  \
+        while (w >= 4) {                                                   \
+          vpx_highbd_filter_block1d4_##dir##2_##avg##opt(                  \
+              src, src_stride, dst, dst_stride, h, filter_row, bd);        \
+          src += 4;                                                        \
+          dst += 4;                                                        \
+          w -= 4;                                                          \
+        }                                                                  \
+      }                                                                    \
+    }                                                                      \
+    if (w) {                                                               \
+      vpx_highbd_convolve8_##name##_c(src, src_stride, dst, dst_stride,    \
+                                      filter, x0_q4, x_step_q4, y0_q4,     \
+                                      y_step_q4, w, h, bd);                \
+    }                                                                      \
   }
 
 #define HIGH_FUN_CONV_2D(avg, opt)                                             \
@@ -200,4 +237,4 @@ typedef void highbd_filter8_1dfunction(const uint16_t *src_ptr,
   }
 #endif  // CONFIG_VP9_HIGHBITDEPTH
 
-#endif  // VPX_DSP_X86_CONVOLVE_H_
+#endif  // VPX_VPX_DSP_X86_CONVOLVE_H_

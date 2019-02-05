@@ -186,16 +186,19 @@ const vpx_prob vp9_kf_partition_probs[PARTITION_CONTEXTS][PARTITION_TYPES - 1] =
       { 93, 24, 99 },   // a split, l not split
       { 85, 119, 44 },  // l split, a not split
       { 62, 59, 67 },   // a/l both split
+
       // 16x16 -> 8x8
       { 149, 53, 53 },  // a/l both not split
       { 94, 20, 48 },   // a split, l not split
       { 83, 53, 24 },   // l split, a not split
       { 52, 18, 18 },   // a/l both split
+
       // 32x32 -> 16x16
       { 150, 40, 39 },  // a/l both not split
       { 78, 12, 26 },   // a split, l not split
       { 67, 33, 11 },   // l split, a not split
       { 24, 7, 5 },     // a/l both split
+
       // 64x64 -> 32x32
       { 174, 35, 49 },  // a/l both not split
       { 68, 11, 27 },   // a split, l not split

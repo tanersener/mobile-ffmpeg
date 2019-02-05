@@ -136,9 +136,8 @@ uint64 WriteBlock(IMkvWriter* writer, const Frame* const frame, int64 timecode,
     return false;
   }
 
-  if (!frame->is_key() &&
-      !WriteEbmlElement(writer, libwebm::kMkvReferenceBlock,
-                        reference_block_timestamp)) {
+  if (!frame->is_key() && !WriteEbmlElement(writer, libwebm::kMkvReferenceBlock,
+                                            reference_block_timestamp)) {
     return false;
   }
 

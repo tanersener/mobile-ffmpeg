@@ -10,8 +10,11 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <memory>
 #include <set>
 #include <string>
+#include <tuple>
+
 #include "third_party/googletest/src/include/gtest/gtest.h"
 #include "../tools_common.h"
 #include "./vpx_config.h"
@@ -31,7 +34,7 @@ namespace {
 const int kThreads = 0;
 const int kFileName = 1;
 
-typedef std::tr1::tuple<int, const char *> DecodeParam;
+typedef std::tuple<int, const char *> DecodeParam;
 
 class TestVectorTest : public ::libvpx_test::DecoderTest,
                        public ::libvpx_test::CodecTestWithParam<DecodeParam> {
@@ -88,19 +91,19 @@ class TestVectorTest : public ::libvpx_test::DecoderTest,
 // the test failed.
 TEST_P(TestVectorTest, MD5Match) {
   const DecodeParam input = GET_PARAM(1);
-  const std::string filename = std::tr1::get<kFileName>(input);
+  const std::string filename = std::get<kFileName>(input);
   vpx_codec_flags_t flags = 0;
   vpx_codec_dec_cfg_t cfg = vpx_codec_dec_cfg_t();
   char str[256];
 
-  cfg.threads = std::tr1::get<kThreads>(input);
+  cfg.threads = std::get<kThreads>(input);
 
   snprintf(str, sizeof(str) / sizeof(str[0]) - 1, "file: %s threads: %d",
            filename.c_str(), cfg.threads);
   SCOPED_TRACE(str);
 
   // Open compressed video file.
-  testing::internal::scoped_ptr<libvpx_test::CompressedVideoSource> video;
+  std::unique_ptr<libvpx_test::CompressedVideoSource> video;
   if (filename.substr(filename.length() - 3, 3) == "ivf") {
     video.reset(new libvpx_test::IVFVideoSource(filename));
   } else if (filename.substr(filename.length() - 4, 4) == "webm") {

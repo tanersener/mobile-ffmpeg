@@ -130,6 +130,12 @@ TEST_P(VP9IntraPredTest, IntraPredTests) {
   RunTest(left_col, above_data, dst, ref_dst);
 }
 
+// Instantiate a token test to avoid -Wuninitialized warnings when none of the
+// other tests are enabled.
+INSTANTIATE_TEST_CASE_P(
+    C, VP9IntraPredTest,
+    ::testing::Values(IntraPredParam(&vpx_d45_predictor_4x4_c,
+                                     &vpx_d45_predictor_4x4_c, 4, 8)));
 #if HAVE_SSE2
 INSTANTIATE_TEST_CASE_P(
     SSE2, VP9IntraPredTest,

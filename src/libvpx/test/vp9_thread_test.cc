@@ -147,7 +147,6 @@ TEST(VPxWorkerThreadTest, TestInterfaceAPI) {
 
 // -----------------------------------------------------------------------------
 // Multi-threaded decode tests
-
 #if CONFIG_WEBM_IO
 struct FileList {
   const char *name;
