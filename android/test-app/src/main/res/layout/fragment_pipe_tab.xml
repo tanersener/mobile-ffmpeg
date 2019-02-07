@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context=".PipeTabFragment">
+
+    <LinearLayout
+        android:id="@+id/createButtonLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/createButton"
+            android:layout_width="90dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/rounded_button"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:text="@string/video_create_button_text"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <VideoView
+        android:id="@+id/videoPlayerFrame"
+        android:layout_width="wrap_content"
+        android:background="@drawable/rounded_video_frame"
+        android:layout_height="0dp"
+        android:layout_gravity="bottom"
+        android:layout_margin="20dp"
+        android:layout_weight="1" />
+</LinearLayout>

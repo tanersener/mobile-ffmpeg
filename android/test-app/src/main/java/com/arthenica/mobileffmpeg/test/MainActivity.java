@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final ViewPager viewPager = findViewById(R.id.pager);
-        viewPager.setAdapter(new PagerAdapter(getSupportFragmentManager(), this, 6));
+        viewPager.setAdapter(new PagerAdapter(getSupportFragmentManager(), this, 7));
 
         waitForUIAction();
 

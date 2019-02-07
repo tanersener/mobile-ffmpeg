@@ -55,6 +55,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
             case 5: {
                 return VidStabTabFragment.newInstance(mainActivity);
             }
+            case 6: {
+                return PipeTabFragment.newInstance(mainActivity);
+            }
             default: {
                 return null;
             }
@@ -86,6 +89,9 @@ public class PagerAdapter extends FragmentPagerAdapter {
             }
             case 5: {
                 return mainActivity.getString(R.string.vidstab_tab);
+            }
+            case 6: {
+                return mainActivity.getString(R.string.pipe_tab);
             }
             default: {
                 return null;

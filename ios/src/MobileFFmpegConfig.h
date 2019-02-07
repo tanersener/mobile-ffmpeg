@@ -148,4 +148,21 @@ extern NSString *const LIB_NAME;
  */
 + (NSArray*)getExternalLibraries;
 
+/**
+ * Creates a new named pipe to use in FFmpeg operations.
+ *
+ * Please note that creator is responsible of closing created pipes.
+ *
+ * \param application context to access application data
+ * \return the full path of named pipe
+ */
++ (NSString*)registerNewFFmpegPipe;
+
+/**
+ * Closes a previously created FFmpeg pipe.
+ *
+ * \param ffmpegPipePath full path of ffmpeg pipe
+ */
++ (void)closeFFmpegPipe: (NSString*)ffmpegPipePath;
+
 @end

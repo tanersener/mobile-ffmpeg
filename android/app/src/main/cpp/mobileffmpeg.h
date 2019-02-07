@@ -110,4 +110,11 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEn
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf(JNIEnv *, jclass);
 
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    registerNewNativeFFmpegPipe
+ * Signature: (Ljava/lang/String)I;
+ */
+JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFFmpegPipe(JNIEnv *env, jclass object, jstring ffmpegPipePath);
+
 #endif /* MOBILE_FFMPEG_H */

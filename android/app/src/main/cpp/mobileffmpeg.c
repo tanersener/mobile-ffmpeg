@@ -18,6 +18,10 @@
  */
 
 /*
+ * CHANGES 02.2019
+ * --------------------------------------------------------
+ * - registerNewNativeFFmpegPipe() method added
+ *
  * CHANGES 10.2018
  * --------------------------------------------------------
  * - getBuildConf method added
@@ -32,6 +36,8 @@
  */
 
 #include <pthread.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "config.h"
 #include "libavutil/bprint.h"
@@ -681,4 +687,18 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEn
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf(JNIEnv *env, jclass object) {
     return (*env)->NewStringUTF(env, FFMPEG_CONFIGURATION);
+}
+
+/**
+ * Creates natively a new named pipe to use in FFmpeg operations.
+ *
+ * \param env pointer to native method interface
+ * \param object reference to the class on which this method is invoked
+ * \param full path of ffmpeg pipe
+ * \return zero on successful creation, non-zero on error
+ */
+JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFFmpegPipe(JNIEnv *env, jclass object, jstring ffmpegPipePath) {
+    const char *ffmpegPipePathString = (*env)->GetStringUTFChars(env, ffmpegPipePath, 0);
+
+    return mkfifo(ffmpegPipePathString, S_IRWXU | S_IRWXG | S_IROTH);
 }
