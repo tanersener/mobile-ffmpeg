@@ -26,6 +26,7 @@
 #import "AudioViewController.h"
 #import "SubtitleViewController.h"
 #import "VidStabViewController.h"
+#import "PipeViewController.h"
 
 @interface TabBarController () <UITabBarControllerDelegate>
 
@@ -63,6 +64,9 @@
     } else if ([viewController isKindOfClass:[VidStabViewController class]]) {
         VidStabViewController* vidStabView = (VidStabViewController*)viewController;
         [vidStabView setActive];
+    } else if ([viewController isKindOfClass:[PipeViewController class]]) {
+        PipeViewController* pipeView = (PipeViewController*)viewController;
+        [pipeView setActive];
     }
 }
 

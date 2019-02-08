@@ -178,6 +178,9 @@
 		34AC269821CD57F800E21ED8 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AC269721CD57F800E21ED8 /* libz.tbd */; };
 		34AC269A21CD582100E21ED8 /* VideoToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 34AC269921CD582100E21ED8 /* VideoToolbox.framework */; };
 		34BB547C2109D44800606B7C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB547B2109D44800606B7C /* Constants.m */; };
+		34D05970220DC63000E44C62 /* PipeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34D0596E220DC63000E44C62 /* PipeViewController.m */; };
+		34D05971220DC63000E44C62 /* PipeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 34D0596F220DC63000E44C62 /* PipeViewController.h */; };
+		34D05973220DC6F600E44C62 /* libx264.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34D05972220DC6F600E44C62 /* libx264.a */; };
 		34DC789B21215B5800C3486C /* truenorg.otf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789721215B5800C3486C /* truenorg.otf */; };
 		34DC789C21215B5800C3486C /* subtitle.srt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789821215B5800C3486C /* subtitle.srt */; };
 		34DC789D21215B5800C3486C /* doppioone_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789921215B5800C3486C /* doppioone_regular.ttf */; };
@@ -376,6 +379,9 @@
 		34AC269721CD57F800E21ED8 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		34AC269921CD582100E21ED8 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		34BB547B2109D44800606B7C /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
+		34D0596E220DC63000E44C62 /* PipeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PipeViewController.m; sourceTree = "<group>"; };
+		34D0596F220DC63000E44C62 /* PipeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PipeViewController.h; sourceTree = "<group>"; };
+		34D05972220DC6F600E44C62 /* libx264.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libx264.a; path = "mobile-ffmpeg-universal/lib/libx264.a"; sourceTree = "<group>"; };
 		34DC789721215B5800C3486C /* truenorg.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = truenorg.otf; sourceTree = "<group>"; };
 		34DC789821215B5800C3486C /* subtitle.srt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = subtitle.srt; sourceTree = "<group>"; };
 		34DC789921215B5800C3486C /* doppioone_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = doppioone_regular.ttf; sourceTree = "<group>"; };
@@ -399,6 +405,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34D05973220DC6F600E44C62 /* libx264.a in Frameworks */,
 				34AC269A21CD582100E21ED8 /* VideoToolbox.framework in Frameworks */,
 				34AC269821CD57F800E21ED8 /* libz.tbd in Frameworks */,
 				34AC269621CD57EF00E21ED8 /* libbz2.tbd in Frameworks */,
@@ -419,6 +426,7 @@
 		3468738221CD2ACB00D242EF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				34D05972220DC6F600E44C62 /* libx264.a */,
 				34AC269921CD582100E21ED8 /* VideoToolbox.framework */,
 				34AC269721CD57F800E21ED8 /* libz.tbd */,
 				34AC269521CD57EF00E21ED8 /* libbz2.tbd */,
@@ -730,6 +738,8 @@
 		34FAE212209F7DDD005CE2AE /* MobileFFmpegTest */ = {
 			isa = PBXGroup;
 			children = (
+				34D0596F220DC63000E44C62 /* PipeViewController.h */,
+				34D0596E220DC63000E44C62 /* PipeViewController.m */,
 				34FAE213209F7DDD005CE2AE /* AppDelegate.h */,
 				34FAE214209F7DDD005CE2AE /* AppDelegate.m */,
 				34FAE21F209F7DDE005CE2AE /* Assets.xcassets */,
@@ -862,6 +872,7 @@
 				34AC268321CD576900E21ED8 /* dxva2.h in Headers */,
 				34AC264F21CD576900E21ED8 /* imgutils.h in Headers */,
 				34AC268721CD576900E21ED8 /* fftools_cmdutils.h in Headers */,
+				34D05971220DC63000E44C62 /* PipeViewController.h in Headers */,
 				34AC262321CD576900E21ED8 /* file.h in Headers */,
 				34AC261421CD576900E21ED8 /* murmur3.h in Headers */,
 				34AC261021CD576900E21ED8 /* hwcontext_mediacodec.h in Headers */,
@@ -1002,6 +1013,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34D05970220DC63000E44C62 /* PipeViewController.m in Sources */,
 				34FAE21B209F7DDD005CE2AE /* VideoViewController.m in Sources */,
 				34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */,
 				34FAE226209F7DDE005CE2AE /* main.m in Sources */,
@@ -1091,7 +1103,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CODE_SIGN_FLAGS = "";
@@ -1146,7 +1158,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CODE_SIGN_FLAGS = "";
 				OTHER_LIBTOOLFLAGS = "-liconv";

@@ -4,7 +4,6 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13174"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -146,7 +145,6 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="encodeClicked:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="TkV-i2-hCw"/>
                                     <action selector="stabilizedVideoClicked:" destination="LcP-dY-3WS" eventType="touchUpInside" id="MIf-Nt-emE"/>
                                 </connections>
                             </button>
@@ -243,7 +241,6 @@
                                 </userDefinedRuntimeAttributes>
                                 <connections>
                                     <action selector="burnSubtitlesClicked:" destination="CNM-FA-Rhq" eventType="touchUpInside" id="dop-DL-Qpa"/>
-                                    <action selector="encodeClicked:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="dHF-56-zgf"/>
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tHy-Oy-kEf">
@@ -464,6 +461,7 @@
                         <segue destination="e0F-AO-I4l" kind="relationship" relationship="viewControllers" id="unG-Lq-f6h"/>
                         <segue destination="CNM-FA-Rhq" kind="relationship" relationship="viewControllers" id="Gwq-Hc-lYe"/>
                         <segue destination="LcP-dY-3WS" kind="relationship" relationship="viewControllers" id="g2u-V2-MIe"/>
+                        <segue destination="edn-dz-Nyo" kind="relationship" relationship="viewControllers" id="yCs-eS-nWM"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HuB-VB-40B" sceneMemberID="firstResponder"/>
@@ -505,7 +503,6 @@
                                     </userDefinedRuntimeAttribute>
                                 </userDefinedRuntimeAttributes>
                                 <connections>
-                                    <action selector="encodeClicked:" destination="8rJ-Kc-sve" eventType="touchUpInside" id="7CX-jm-29D"/>
                                     <action selector="encodeClicked:" destination="e0F-AO-I4l" eventType="touchUpInside" id="hFC-cN-iWt"/>
                                 </connections>
                             </button>
@@ -563,6 +560,81 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="WfT-AF-5Oq" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-705" y="188"/>
+        </scene>
+        <!--Pipe-->
+        <scene sceneID="dOH-eA-5KG">
+            <objects>
+                <viewController title="Pipe" id="edn-dz-Nyo" customClass="PipeViewController" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="R8m-Wr-mbD">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="MobileFFmpegTest" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0mn-9V-HUc">
+                                <rect key="frame" x="0.0" y="20" width="320" height="50"/>
+                                <color key="backgroundColor" red="0.95686274510000002" green="0.40784313729999999" blue="0.25882352939999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="e3n-Vk-IPq"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="18"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qP7-h5-j9B">
+                                <rect key="frame" x="20" y="192" width="280" height="307"/>
+                                <color key="tintColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8Jh-ij-pAm" userLabel="Create Button">
+                                <rect key="frame" x="120" y="130" width="80" height="32"/>
+                                <color key="backgroundColor" red="0.94117647059999998" green="0.94117647059999998" blue="0.96078431369999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="32" id="3ks-dN-8IO"/>
+                                    <constraint firstAttribute="width" constant="80" id="jQF-p4-rEF"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="15"/>
+                                <state key="normal" title="CREATE">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <userDefinedRuntimeAttributes>
+                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                        <integer key="value" value="5"/>
+                                    </userDefinedRuntimeAttribute>
+                                </userDefinedRuntimeAttributes>
+                                <connections>
+                                    <action selector="createClicked:" destination="edn-dz-Nyo" eventType="touchUpInside" id="UAJ-Vb-fsh"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="0mn-9V-HUc" firstAttribute="leading" secondItem="qRF-26-5Eg" secondAttribute="leading" id="9Sz-pz-IfS"/>
+                            <constraint firstItem="qRF-26-5Eg" firstAttribute="bottom" secondItem="qP7-h5-j9B" secondAttribute="bottom" constant="20" id="BAu-TZ-D8s"/>
+                            <constraint firstItem="0mn-9V-HUc" firstAttribute="trailing" secondItem="qRF-26-5Eg" secondAttribute="trailing" id="Bq8-lQ-RdP"/>
+                            <constraint firstItem="qP7-h5-j9B" firstAttribute="centerX" secondItem="R8m-Wr-mbD" secondAttribute="centerX" id="CvR-Va-mgY"/>
+                            <constraint firstAttribute="trailing" secondItem="qP7-h5-j9B" secondAttribute="trailing" constant="20" id="MaF-P4-FFa"/>
+                            <constraint firstItem="8Jh-ij-pAm" firstAttribute="centerX" secondItem="R8m-Wr-mbD" secondAttribute="centerX" id="PjS-R9-FoY"/>
+                            <constraint firstItem="qP7-h5-j9B" firstAttribute="leading" secondItem="R8m-Wr-mbD" secondAttribute="leading" constant="20" id="RDV-5U-wMW"/>
+                            <constraint firstItem="0mn-9V-HUc" firstAttribute="top" secondItem="qRF-26-5Eg" secondAttribute="top" id="bQr-Vt-R9k"/>
+                            <constraint firstItem="qP7-h5-j9B" firstAttribute="top" secondItem="8Jh-ij-pAm" secondAttribute="bottom" constant="30" id="ecT-1U-wsO"/>
+                            <constraint firstItem="8Jh-ij-pAm" firstAttribute="top" secondItem="0mn-9V-HUc" secondAttribute="bottom" constant="60" id="smL-6q-LXJ"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="qRF-26-5Eg"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="PIPE" id="hH3-vT-6nS">
+                        <offsetWrapper key="titlePositionAdjustment" horizontal="0.0" vertical="-16"/>
+                    </tabBarItem>
+                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
+                    <connections>
+                        <outlet property="createButton" destination="8Jh-ij-pAm" id="fYa-Y2-W4d"/>
+                        <outlet property="header" destination="0mn-9V-HUc" id="60O-8C-lc4"/>
+                        <outlet property="videoPlayerFrame" destination="qP7-h5-j9B" id="6Fc-jM-wDH"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="PPR-Et-aGw" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1250.625" y="186.97183098591549"/>
         </scene>
     </scenes>
 </document>

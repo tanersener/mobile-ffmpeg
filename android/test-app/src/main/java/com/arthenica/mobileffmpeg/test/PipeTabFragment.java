@@ -22,6 +22,7 @@ package com.arthenica.mobileffmpeg.test;
 import android.app.AlertDialog;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -132,7 +133,7 @@ public class PipeTabFragment extends Fragment {
 
     void startAsyncCatImageProcess(final String imagePath, final String namedPipePath) {
         AsyncCatImageTask asyncTask = new AsyncCatImageTask();
-        asyncTask.execute(imagePath, namedPipePath);
+        asyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, imagePath, namedPipePath);
     }
 
     public void createVideo() {
@@ -154,9 +155,7 @@ public class PipeTabFragment extends Fragment {
                 videoFile.delete();
             }
 
-            final String videoCodec = "mpeg4";
-
-            Log.d(TAG, String.format("Testing PIPE with '%s' codec", videoCodec));
+            Log.d(TAG, "Testing PIPE with 'mpeg4' codec");
 
             showProgressDialog();
 
@@ -164,7 +163,7 @@ public class PipeTabFragment extends Fragment {
             mainActivity.resourceToFile(R.drawable.pyramid, image2File);
             mainActivity.resourceToFile(R.drawable.tajmahal, image3File);
 
-            final String ffmpegCommand = Video.generateCreateVideoWithPipesScript(pipe1, pipe2, pipe3, videoFile.getAbsolutePath(), videoCodec, "");
+            final String ffmpegCommand = Video.generateCreateVideoWithPipesScript(pipe1, pipe2, pipe3, videoFile.getAbsolutePath());
 
             Log.d(TAG, String.format("FFmpeg process started with arguments\n'%s'", ffmpegCommand));
 
@@ -194,6 +193,7 @@ public class PipeTabFragment extends Fragment {
                 }
             }, ffmpegCommand);
 
+            // START ASYNC PROCESSES AFTER INITIATING FFMPEG COMMAND
             startAsyncCatImageProcess(image1File.getAbsolutePath(), pipe1);
             startAsyncCatImageProcess(image2File.getAbsolutePath(), pipe2);
             startAsyncCatImageProcess(image3File.getAbsolutePath(), pipe3);
