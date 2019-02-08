@@ -30,21 +30,21 @@
 /**
  * Returns running cpu architecture name.
  *
- * \return running cpu architecture name as NSString
+ * @return running cpu architecture name as NSString
  */
 + (NSString*)getCpuArch;
 
 /**
  * Returns loaded architecture name.
  *
- * \return loaded architecture name as NSString
+ * @return loaded architecture name as NSString
  */
 + (NSString*)getArch;
 
 /**
  * Returns whether MobileFFmpeg release is a long term release or not.
  *
- * \return YES=1 or NO=0
+ * @return YES=1 or NO=0
  */
 + (int)isLTSBuild;
 

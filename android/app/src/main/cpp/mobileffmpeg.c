@@ -240,6 +240,9 @@ void monitorNotify() {
 
 /**
  * Adds log data to the end of callback data list.
+ *
+ * @param level log level
+ * @param data log data
  */
 void logCallbackDataAdd(int level, const char *data) {
 
@@ -351,10 +354,10 @@ struct CallbackData *callbackDataRemove() {
 /**
  * Callback function for FFmpeg logs.
  *
- * \param pointer to AVClass struct
- * \param level
- * \param format
- * \param arguments
+ * @param ptr pointer to AVClass struct
+ * @param level log level
+ * @param format format string
+ * @param vargs arguments
  */
 void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs) {
     char line[LOG_LINE_SIZE];
@@ -387,13 +390,13 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
 /**
  * Callback function for FFmpeg statistics.
  *
- * \param frameNumber last processed frame number
- * \param fps frames processed per second
- * \param quality quality of the output stream (video only)
- * \param size size in bytes
- * \param time processed output duration
- * \param bitrate output bit rate in kbits/s
- * \param speed processing speed = processed duration / operation duration
+ * @param frameNumber last processed frame number
+ * @param fps frames processed per second
+ * @param quality quality of the output stream (video only)
+ * @param size size in bytes
+ * @param time processed output duration
+ * @param bitrate output bit rate in kbits/s
+ * @param speed processing speed = processed duration / operation duration
  */
 void mobileffmpeg_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
     statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
@@ -468,9 +471,9 @@ void *callbackThreadFunction() {
 /**
  * Called when 'mobileffmpeg' native library is loaded.
  *
- * \param vm pointer to the running virtual machine
- * \param reserved reserved
- * \return JNI version needed by 'mobileffmpeg' library
+ * @param vm pointer to the running virtual machine
+ * @param reserved reserved
+ * @return JNI version needed by 'mobileffmpeg' library
  */
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
@@ -522,9 +525,9 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 /**
  * Sets log level.
  *
- * \param env pointer to native method interface
- * \param reference to the class on which this method is invoked
- * \param log level
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @param level log level
  */
 JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel(JNIEnv *env, jclass object, jint level) {
     av_log_set_level(level);
@@ -533,8 +536,8 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeLogLevel(
 /**
  * Returns current log level.
  *
- * \param env pointer to native method interface
- * \param reference to the class on which this method is invoked
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
  */
 JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel(JNIEnv *env, jclass object) {
     return av_log_get_level();
@@ -543,8 +546,8 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeLogLevel(
 /**
  * Enables log and statistics redirection.
  *
- * \param env pointer to native method interface
- * \param reference to the class on which this method is invoked
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
  */
 JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_enableNativeRedirection(JNIEnv *env, jclass object) {
     mutexLock();
@@ -570,8 +573,8 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_enableNativeRedire
 /**
  * Disables log and statistics redirection.
  *
- * \param env pointer to native method interface
- * \param reference to the class on which this method is invoked
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
  */
 JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_disableNativeRedirection(JNIEnv *env, jclass object) {
 
@@ -594,9 +597,9 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_disableNativeRedir
 /**
  * Returns FFmpeg version bundled within the library natively.
  *
- * \param env pointer to native method interface
- * \param object reference to the class on which this method is invoked
- * \return FFmpeg version string
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return FFmpeg version string
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeFFmpegVersion(JNIEnv *env, jclass object) {
     return (*env)->NewStringUTF(env, FFMPEG_VERSION);
@@ -605,9 +608,9 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeFFmpeg
 /**
  * Returns MobileFFmpeg library version natively.
  *
- * \param env pointer to native method interface
- * \param object reference to the class on which this method is invoked
- * \return MobileFFmpeg version string
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return MobileFFmpeg version string
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeVersion(JNIEnv *env, jclass object) {
     return (*env)->NewStringUTF(env, MOBILE_FFMPEG_VERSION);
@@ -616,10 +619,10 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeVersio
 /**
  * Synchronously executes FFmpeg command natively with arguments provided.
  *
- * \param env pointer to native method interface
- * \param object reference to the class on which this method is invoked
- * \param stringArray reference to the object holding FFmpeg command arguments
- * \return zero on successful execution, non-zero on error
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @param stringArray reference to the object holding FFmpeg command arguments
+ * @return zero on successful execution, non-zero on error
  */
 JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIEnv *env, jclass object, jobjectArray stringArray) {
     jstring *tempArray = NULL;
@@ -671,8 +674,8 @@ JNIEXPORT jint JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeExecute(JNIE
 /**
  * Cancels an ongoing operation natively.
  *
- * \param env pointer to native method interface
- * \param object reference to the class on which this method is invoked
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
  */
 JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEnv *env, jclass object) {
     cancel_operation();
@@ -681,9 +684,9 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEn
 /**
  * Returns build configuration for FFmpeg.
  *
- * \param env pointer to native method interface
- * \param object reference to the class on which this method is invoked
- * \return build configuration string
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return build configuration string
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf(JNIEnv *env, jclass object) {
     return (*env)->NewStringUTF(env, FFMPEG_CONFIGURATION);
@@ -692,10 +695,10 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildC
 /**
  * Creates natively a new named pipe to use in FFmpeg operations.
  *
- * \param env pointer to native method interface
- * \param object reference to the class on which this method is invoked
- * \param full path of ffmpeg pipe
- * \return zero on successful creation, non-zero on error
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @param ffmpegPipePath full path of ffmpeg pipe
+ * @return zero on successful creation, non-zero on error
  */
 JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFFmpegPipe(JNIEnv *env, jclass object, jstring ffmpegPipePath) {
     const char *ffmpegPipePathString = (*env)->GetStringUTFChars(env, ffmpegPipePath, 0);

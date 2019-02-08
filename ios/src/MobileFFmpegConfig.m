@@ -164,6 +164,9 @@ void callbackNotify() {
 
 /**
  * Adds log data to the end of callback data list.
+ *
+ * @param level log level
+ * @param logData log data
  */
 void logCallbackDataAdd(int level, NSString *logData) {
     CallbackData *callbackData = [[CallbackData alloc] initWithLogLevel:level data:logData];
@@ -211,10 +214,10 @@ CallbackData *callbackDataRemove() {
 /**
  * Callback function for FFmpeg logs.
  *
- * \param pointer to AVClass struct
- * \param level
- * \param format
- * \param arguments
+ * @param ptr pointer to AVClass struct
+ * @param level log level
+ * @param format format string
+ * @param vargs arguments
  */
 void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs) {
 
@@ -235,13 +238,13 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
 /**
  * Callback function for FFmpeg statistics.
  *
- * \param frameNumber last processed frame number
- * \param fps frames processed per second
- * \param quality quality of the output stream (video only)
- * \param size size in bytes
- * \param time processed output duration
- * \param bitrate output bit rate in kbits/s
- * \param speed processing speed = processed duration / operation duration
+ * @param frameNumber last processed frame number
+ * @param fps frames processed per second
+ * @param quality quality of the output stream (video only)
+ * @param size size in bytes
+ * @param time processed output duration
+ * @param bitrate output bit rate in kbits/s
+ * @param speed processing speed = processed duration / operation duration
  */
 void mobileffmpeg_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
     statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
@@ -333,10 +336,10 @@ static int systemCommandOutputContainsPattern(NSArray *patternList) {
 /**
  * Executes system command. System command is not logged to output.
  *
- * \param arguments command arguments
- * \param commandOutputEndPatternList list of patterns which will indicate that operation has ended
- * \param timeout execution timeout
- * \return return code
+ * @param arguments command arguments
+ * @param commandOutputEndPatternList list of patterns which will indicate that operation has ended
+ * @param timeout execution timeout
+ * @return return code
  */
 int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPatternList, long timeout) {
     systemCommandOutput = [[NSMutableString alloc] init];
@@ -363,7 +366,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns build configuration for FFmpeg.
  *
- * \return build configuration string
+ * @return build configuration string
  */
 + (NSString*)getBuildConf;
 
@@ -464,7 +467,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns log level.
  *
- * \return log level
+ * @return log level
  */
 + (int)getLogLevel {
     return av_log_get_level();
@@ -473,7 +476,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Sets log level.
  *
- * \param log level
+ * @param level log level
  */
 + (void)setLogLevel: (int)level {
     av_log_set_level(level);
@@ -482,8 +485,8 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Converts int log level to string.
  *
- * \param level value
- * \return string value
+ * @param level value
+ * @return string value
  */
 + (NSString*)logLevelToString: (int)level {
     switch (level) {
@@ -503,7 +506,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Sets a LogDelegate. logCallback method inside LogDelegate is used to redirect logs.
  *
- * \param new log delegate
+ * @param newLogDelegate new log delegate
  */
 + (void)setLogDelegate: (id<LogDelegate>)newLogDelegate {
     logDelegate = newLogDelegate;
@@ -512,7 +515,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Sets a StatisticsDelegate.
  *
- * \param statistics delegate
+ * @param newStatisticsDelegate statistics delegate
  */
 + (void)setStatisticsDelegate: (id<StatisticsDelegate>)newStatisticsDelegate {
     statisticsDelegate = newStatisticsDelegate;
@@ -521,7 +524,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns the last received statistics data.
  *
- * \return last received statistics data
+ * @return last received statistics data
  */
 + (Statistics*)getLastReceivedStatistics {
     return lastReceivedStatistics;
@@ -537,7 +540,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Sets and overrides fontconfig configuration directory.
  *
- * \param directory which contains fontconfig configuration (fonts.conf)
+ * @param path directory which contains fontconfig configuration (fonts.conf)
  */
 + (void)setFontconfigConfigurationPath: (NSString*)path {
     if (path != nil) {
@@ -551,8 +554,8 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
  * Note that you need to build MobileFFmpeg with fontconfig
  * enabled or use a prebuilt package with fontconfig inside to use this feature.
  *
- * \param directory which contains fonts (.ttf and .otf files)
- * \param custom font name mappings, useful to access your fonts with more friendly names
+ * @param fontDirectoryPath directory which contains fonts (.ttf and .otf files)
+ * @param fontNameMapping custom font name mappings, useful to access your fonts with more friendly names
  */
 + (void)setFontDirectory: (NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping {
     NSError *error = nil;
@@ -621,7 +624,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns build configuration for FFmpeg.
  *
- * \return build configuration string
+ * @return build configuration string
  */
 + (NSString*)getBuildConf {
     return [NSString stringWithUTF8String:FFMPEG_CONFIGURATION];
@@ -630,7 +633,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns package name.
  *
- * \return guessed package name according to supported external libraries
+ * @return guessed package name according to supported external libraries
  */
 + (NSString*)getPackageName {
     NSArray *enabledLibraryArray = [MobileFFmpegConfig getExternalLibraries];
@@ -812,7 +815,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns supported external libraries.
  *
- * \return array of supported external libraries
+ * @return array of supported external libraries
  */
 + (NSArray*)getExternalLibraries {
     NSString *buildConfiguration = [MobileFFmpegConfig getBuildConf];
@@ -839,8 +842,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
  *
  * Please note that creator is responsible of closing created pipes.
  *
- * \param application context to access application data
- * \return the full path of named pipe
+ * @return the full path of named pipe
  */
 + (NSString*)registerNewFFmpegPipe {
 
@@ -864,7 +866,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Closes a previously created FFmpeg pipe.
  *
- * \param ffmpegPipePath full path of ffmpeg pipe
+ * @param ffmpegPipePath full path of ffmpeg pipe
  */
 + (void)closeFFmpegPipe: (NSString*)ffmpegPipePath {
     NSFileManager *fileManager = [NSFileManager defaultManager];

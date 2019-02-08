@@ -32,9 +32,9 @@ JNINativeMethod abiDetectMethods[] = {
 /**
  * Called when 'abidetect' native library is loaded.
  *
- * \param vm pointer to the running virtual machine
- * \param reserved reserved
- * \return JNI version needed by 'abidetect' library
+ * @param vm pointer to the running virtual machine
+ * @param reserved reserved
+ * @return JNI version needed by 'abidetect' library
  */
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
@@ -60,9 +60,9 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 /**
  * Returns loaded ABI name.
  *
- * \param env pointer to native method interface
- * \param object reference to the class on which this method is invoked
- * \return loaded ABI name as UTF string
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return loaded ABI name as UTF string
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeAbi(JNIEnv *env, jclass object) {
 
@@ -83,9 +83,9 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeAbi
 /**
  * Returns ABI name of the running cpu.
  *
- * \param env pointer to native method interface
- * \param object reference to the class on which this method is invoked
- * \return ABI name of the running cpu as UTF string
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return ABI name of the running cpu as UTF string
  */
 JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeCpuAbi(JNIEnv *env, jclass object) {
     AndroidCpuFamily family = android_getCpuFamily();
@@ -117,9 +117,9 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeCpu
 /**
  * Returns whether MobileFFmpeg release is a long term release or not.
  *
- * \param env pointer to native method interface
- * \param object reference to the class on which this method is invoked
- * \return YES or NO
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return YES or NO
  */
 JNIEXPORT jboolean JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_isNativeLTSBuild(JNIEnv *env, jclass object) {
     #if defined(MOBILE_FFMPEG_LTS)

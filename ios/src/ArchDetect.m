@@ -31,7 +31,7 @@
 /**
  * Returns running cpu architecture name.
  *
- * \return running cpu architecture name as NSString
+ * @return running cpu architecture name as NSString
  */
 + (NSString*)getCpuArch {
     NSMutableString *cpu = [[NSMutableString alloc] init];
@@ -144,7 +144,7 @@
 /**
  * Returns loaded architecture name.
  *
- * \return loaded architecture name as NSString
+ * @return loaded architecture name as NSString
  */
 + (NSString*)getArch {
     NSMutableString *arch = [[NSMutableString alloc] init];
@@ -169,7 +169,7 @@
 /**
  * Returns whether MobileFFmpeg release is a long term release or not.
  *
- * \return YES=1 or NO=0
+ * @return YES=1 or NO=0
  */
 + (int)isLTSBuild {
     #if defined(MOBILE_FFMPEG_LTS)
