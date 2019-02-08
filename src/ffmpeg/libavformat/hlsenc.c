@@ -153,6 +153,8 @@ typedef struct VariantStream {
     CodecAttributeStatus attr_status;
     unsigned int nb_streams;
     int m3u8_created; /* status of media play-list creation */
+    int is_default; /* default status of audio group */
+    char *language; /* audio lauguage name */
     char *agroup; /* audio group name */
     char *ccgroup; /* closed caption group name */
     char *baseurl;
@@ -228,6 +230,8 @@ typedef struct HLSContext {
     AVIOContext *sub_m3u8_out;
     int64_t timeout;
     int ignore_io_errors;
+    int has_default_key; /* has DEFAULT field of var_stream_map */
+    int has_video_m3u8; /* has video stream m3u8 list */
 } HLSContext;
 
 static int hlsenc_io_open(AVFormatContext *s, AVIOContext **pb, char *filename,
@@ -1258,7 +1262,7 @@ static int create_master_playlist(AVFormatContext *s,
             goto fail;
         }
 
-        ff_hls_write_audio_rendition(hls->m3u8_out, vs->agroup, m3u8_rel_name, 0, 1);
+        ff_hls_write_audio_rendition(hls->m3u8_out, vs->agroup, m3u8_rel_name, vs->language, i, hls->has_default_key ? vs->is_default : 1);
 
         av_freep(&m3u8_rel_name);
     }
@@ -1336,8 +1340,15 @@ static int create_master_playlist(AVFormatContext *s,
                         vs->ccgroup);
         }
 
-        ff_hls_write_stream_info(vid_st, hls->m3u8_out, bandwidth, m3u8_rel_name,
-                aud_st ? vs->agroup : NULL, vs->codec_attr, ccgroup);
+        if (!hls->has_default_key || !hls->has_video_m3u8) {
+            ff_hls_write_stream_info(vid_st, hls->m3u8_out, bandwidth, m3u8_rel_name,
+                    aud_st ? vs->agroup : NULL, vs->codec_attr, ccgroup);
+        } else {
+            if (vid_st) {
+                ff_hls_write_stream_info(vid_st, hls->m3u8_out, bandwidth, m3u8_rel_name,
+                                         aud_st ? vs->agroup : NULL, vs->codec_attr, ccgroup);
+            }
+        }
 
         av_freep(&m3u8_rel_name);
     }
@@ -1819,7 +1830,7 @@ static int parse_variant_stream_mapstring(AVFormatContext *s)
     /**
      * Expected format for var_stream_map string is as below:
      * "a:0,v:0 a:1,v:1"
-     * "a:0,agroup:a0 a:1,agroup:a1 v:0,agroup:a0  v:1,agroup:a1"
+     * "a:0,agroup:a0,default:1,language:ENG a:1,agroup:a1,defalut:0 v:0,agroup:a0  v:1,agroup:a1"
      * This string specifies how to group the audio, video and subtitle streams
      * into different variant streams. The variant stream groups are separated
      * by space.
@@ -1850,6 +1861,7 @@ static int parse_variant_stream_mapstring(AVFormatContext *s)
         if (nb_varstreams < hls->nb_varstreams) {
             vs = &(hls->var_streams[nb_varstreams]);
             vs->var_stream_idx = nb_varstreams;
+            vs->is_default = 0;
             nb_varstreams++;
         } else
             return AVERROR(EINVAL);
@@ -1868,8 +1880,17 @@ static int parse_variant_stream_mapstring(AVFormatContext *s)
         nb_streams = 0;
         while (keyval = av_strtok(varstr, ",", &saveptr2)) {
             varstr = NULL;
-
-            if (av_strstart(keyval, "agroup:", &val)) {
+            if (av_strstart(keyval, "language:", &val)) {
+                vs->language = av_strdup(val);
+                if (!vs->language)
+                    return AVERROR(ENOMEM);
+                continue;
+            } else if (av_strstart(keyval, "default:", &val)) {
+                vs->is_default = (!av_strncasecmp(val, "YES", strlen("YES")) ||
+                                  (!av_strncasecmp(val, "1", strlen("1"))));
+                hls->has_default_key = 1;
+                continue;
+            } else if (av_strstart(keyval, "agroup:", &val)) {
                 vs->agroup = av_strdup(val);
                 if (!vs->agroup)
                     return AVERROR(ENOMEM);
@@ -1881,6 +1902,7 @@ static int parse_variant_stream_mapstring(AVFormatContext *s)
                 continue;
             } else if (av_strstart(keyval, "v:", &val)) {
                 codec_type = AVMEDIA_TYPE_VIDEO;
+                hls->has_video_m3u8 = 1;
             } else if (av_strstart(keyval, "a:", &val)) {
                 codec_type = AVMEDIA_TYPE_AUDIO;
             } else if (av_strstart(keyval, "s:", &val)) {
@@ -2375,6 +2397,7 @@ static void hls_free_variant_streams(struct HLSContext *hls)
         av_freep(&vs->m3u8_name);
         av_freep(&vs->streams);
         av_freep(&vs->agroup);
+        av_freep(&vs->language);
         av_freep(&vs->ccgroup);
         av_freep(&vs->baseurl);
     }
@@ -2519,6 +2542,8 @@ static int hls_init(AVFormatContext *s)
     int vtt_basename_size = 0;
     int fmp4_init_filename_len = strlen(hls->fmp4_init_filename) + 1;
 
+    hls->has_default_key = 0;
+    hls->has_video_m3u8 = 0;
     ret = update_variant_stream_info(s);
     if (ret < 0) {
         av_log(s, AV_LOG_ERROR, "Variant stream info update failed with status %x\n",
@@ -2824,6 +2849,7 @@ fail:
             av_freep(&vs->m3u8_name);
             av_freep(&vs->vtt_m3u8_name);
             av_freep(&vs->streams);
+            av_freep(&vs->language);
             av_freep(&vs->agroup);
             av_freep(&vs->ccgroup);
             av_freep(&vs->baseurl);

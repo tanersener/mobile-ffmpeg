@@ -353,6 +353,8 @@ static int decode_dlta(AVCodecContext *avctx,
     compression = bytestream2_get_le32(gb);
 
     if (compression == 1) {
+        if (w * h * s->bpp * 3 < uncompressed_size)
+            return AVERROR_INVALIDDATA;
         ret = decode_zlib(avctx, avpkt, size, uncompressed_size);
         if (ret < 0)
             return ret;
@@ -721,11 +723,11 @@ static int decode_frame(AVCodecContext *avctx,
             return ret;
     }
 
-    if ((ret = ff_get_buffer(avctx, s->frame, 0)) < 0)
-        return ret;
-
     if (!s->frame2->data[0] || !s->frame1->data[0])
         return AVERROR_INVALIDDATA;
+
+    if ((ret = ff_get_buffer(avctx, s->frame, 0)) < 0)
+        return ret;
 
     copy_plane(avctx, s->frame2, s->frame);
     if (avctx->pix_fmt == AV_PIX_FMT_PAL8)
