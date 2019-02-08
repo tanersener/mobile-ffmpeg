@@ -65,12 +65,6 @@ fi
 mkdir cmake-build || exit 1
 cd cmake-build || exit 1
 
-# apply detect512 patch
-rc=$(download "https://bitbucket.org/multicoreware/x265/issues/attachments/442/multicoreware/x265/1539002893.24/442/enable512.diff" "enable512.diff")
-cd ${BASEDIR}/src/${LIB_NAME}/source/common
-patch -p3 < ${MOBILE_FFMPEG_TMPDIR}/enable512.diff
-cd ${BASEDIR}/src/${LIB_NAME}/cmake-build
-
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
@@ -97,6 +91,6 @@ cmake -Wno-dev \
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_x265_package_config "2.9"
+create_x265_package_config "3.0"
 
 make install || exit 1

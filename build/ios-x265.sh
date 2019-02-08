@@ -67,12 +67,6 @@ fi
 mkdir cmake-build || exit 1
 cd cmake-build || exit 1
 
-# apply detect512 patch
-rc=$(download "https://bitbucket.org/multicoreware/x265/issues/attachments/442/multicoreware/x265/1539002893.24/442/enable512.diff" "enable512.diff")
-cd ${BASEDIR}/src/${LIB_NAME}/source/common
-patch -p3 < ${MOBILE_FFMPEG_TMPDIR}/enable512.diff
-cd ${BASEDIR}/src/${LIB_NAME}/cmake-build
-
 # fix x86 and x86_64 assembly
 ${SED_INLINE} 's/win64/macho64 -DPREFIX/g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInformation.cmake
 ${SED_INLINE} 's/win/macho/g' ${BASEDIR}/src/x265/source/cmake/CMakeASM_NASMInformation.cmake
