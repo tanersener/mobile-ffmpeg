@@ -393,8 +393,9 @@ void av1_get_block_hash_value(uint8_t *y_src, int stride, int block_size,
                               uint32_t *hash_value1, uint32_t *hash_value2,
                               int use_highbitdepth, MACROBLOCK *x) {
   uint32_t to_hash[4];
-  const int add_value = hash_block_size_to_index(block_size) << crc_bits;
+  int add_value = hash_block_size_to_index(block_size);
   assert(add_value >= 0);
+  add_value <<= crc_bits;
   const int crc_mask = (1 << crc_bits) - 1;
 
   // 2x2 subblock hash values in current CU

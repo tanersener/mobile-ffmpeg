@@ -641,7 +641,7 @@ static INLINE uint8_t get_prob(unsigned int num, unsigned int den) {
   }
 }
 
-static INLINE void update_cdf(aom_cdf_prob *cdf, int val, int nsymbs) {
+static INLINE void update_cdf(aom_cdf_prob *cdf, int8_t val, int nsymbs) {
   int rate;
   int i, tmp;
 

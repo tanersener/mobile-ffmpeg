@@ -108,7 +108,17 @@ static int search_filter_level(const YV12_BUFFER_CONFIG *sd, AV1_COMP *cpi,
   // range.
   int lvl;
   switch (plane) {
-    case 0: lvl = last_frame_filter_level[dir]; break;
+    case 0:
+      switch (dir) {
+        case 2:
+          lvl = (last_frame_filter_level[0] + last_frame_filter_level[1] + 1) >>
+                1;
+          break;
+        case 0:
+        case 1: lvl = last_frame_filter_level[dir]; break;
+        default: assert(dir >= 0 && dir <= 2); return 0;
+      }
+      break;
     case 1: lvl = last_frame_filter_level[2]; break;
     case 2: lvl = last_frame_filter_level[3]; break;
     default: assert(plane >= 0 && plane <= 2); return 0;

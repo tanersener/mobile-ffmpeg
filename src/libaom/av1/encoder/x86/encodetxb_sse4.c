@@ -23,14 +23,6 @@ void av1_txb_init_levels_sse4_1(const tran_low_t *const coeff, const int width,
   const int stride = width + TX_PAD_HOR;
   const __m128i zeros = _mm_setzero_si128();
 
-  const int32_t pre_len = sizeof(*levels) * TX_PAD_TOP * stride;
-  uint8_t *pre_buf = levels - TX_PAD_TOP * stride;
-  uint8_t *pre_buf_end = pre_buf + pre_len;
-  do {
-    _mm_storeu_si128((__m128i *)(pre_buf), zeros);
-    pre_buf += 16;
-  } while (pre_buf < pre_buf_end);
-
   const int32_t bottom_len = sizeof(*levels) * (TX_PAD_BOTTOM * stride);
   uint8_t *bottom_buf = levels + stride * height;
   uint8_t *bottom_buf_end = bottom_buf + bottom_len;

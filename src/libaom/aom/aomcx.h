@@ -575,8 +575,9 @@ enum aome_enc_control_id {
    *
    *                          0 = apply trellis quantization
    *                          1 = do not apply trellis quantization
+   *                          2 = disable trellis quantization partially
    *
-   *  By default, the encoder applies trellis optimization on quantized
+   *  By default, the encoder applies optimization on quantized
    *  coefficients.
    *
    */
@@ -872,6 +873,30 @@ enum aome_enc_control_id {
    */
   AV1E_SET_ENABLE_FILTER_INTRA,
 
+  /*!\brief Codec control function to turn on / off smooth intra modes usage.
+   *
+   * This will enable or disable usage of smooth, smooth_h and smooth_v intra
+   * modes. The default value is 1.
+   *
+   */
+  AV1E_SET_ENABLE_SMOOTH_INTRA,
+
+  /*!\brief Codec control function to turn on / off Paeth intra mode usage.
+   *
+   * This will enable or disable usage of Paeth intra mode. The default value
+   * is 1.
+   *
+   */
+  AV1E_SET_ENABLE_PAETH_INTRA,
+
+  /*!\brief Codec control function to turn on / off CFL uv intra mode usage.
+   *
+   * This will enable or disable usage of chroma-from-luma intra mode. The
+   * default value is 1.
+   *
+   */
+  AV1E_SET_ENABLE_CFL_INTRA,
+
   /*!\brief Codec control function to turn on / off frame superresolution.
    *
    * This will enable or disable frame superresolution. The default value is 1
@@ -884,6 +909,9 @@ enum aome_enc_control_id {
 
   /*!\brief Codec control function to turn on/off intra block copy mode */
   AV1E_SET_ENABLE_INTRABC,
+
+  /*!\brief Codec control function to turn on/off intra angle delta */
+  AV1E_SET_ENABLE_ANGLE_DELTA,
 
   /*!\brief Codec control function to set the delta q mode
    *
@@ -946,9 +974,41 @@ enum aome_enc_control_id {
   /*!\brief Control to use a reduced tx type set */
   AV1E_SET_REDUCED_TX_TYPE_SET,
 
+  /*!\brief Control to use dct only for intra modes */
+  AV1E_SET_INTRA_DCT_ONLY,
+
+  /*!\brief Control to use dct only for inter modes */
+  AV1E_SET_INTER_DCT_ONLY,
+
+  /*!\brief Control to use default tx type only for intra modes */
+  AV1E_SET_INTRA_DEFAULT_TX_ONLY,
+
+  /*!\brief Control to use adaptive quantize_b */
+  AV1E_SET_QUANT_B_ADAPT,
+
   /*!\brief Control to select maximum height for the GF group pyramid structure
    * (valid values: 1 - 4) */
   AV1E_SET_GF_MAX_PYRAMID_HEIGHT,
+
+  /*!\brief Control to select maximum reference frames allowed per frame
+   * (valid values: 3 - 7) */
+  AV1E_SET_MAX_REFERENCE_FRAMES,
+
+  /*!\brief Control to set frequency of the cost updates for coefficients
+   * Possible values are:
+   * 0: Update at SB level (default)
+   * 1: Update at SB row level in tile
+   * 2: Update at tile level
+   */
+  AV1E_SET_COEFF_COST_UPD_FREQ,
+
+  /*!\brief Control to set frequency of the cost updates for mode
+   * Possible values are:
+   * 0: Update at SB level (default)
+   * 1: Update at SB row level in tile
+   * 2: Update at tile level
+   */
+  AV1E_SET_MODE_COST_UPD_FREQ,
 };
 
 /*!\brief aom 1-D scaling mode
@@ -1207,6 +1267,15 @@ AOM_CTRL_USE_TYPE(AV1E_SET_ALLOW_WARPED_MOTION, unsigned int)
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_FILTER_INTRA, unsigned int)
 #define AOM_CTRL_AV1E_SET_ENABLE_FILTER_INTRA
 
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_SMOOTH_INTRA, unsigned int)
+#define AOM_CTRL_AV1E_SET_ENABLE_SMOOTH_INTRA
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_PAETH_INTRA, unsigned int)
+#define AOM_CTRL_AV1E_SET_ENABLE_PAETH_INTRA
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_CFL_INTRA, unsigned int)
+#define AOM_CTRL_AV1E_SET_ENABLE_CFL_INTRA
+
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_SUPERRES, unsigned int)
 #define AOM_CTRL_AV1E_SET_ENABLE_SUPERRES
 
@@ -1215,6 +1284,9 @@ AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_PALETTE, unsigned int)
 
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTRABC, unsigned int)
 #define AOM_CTRL_AV1E_SET_ENABLE_INTRABC
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_ANGLE_DELTA, unsigned int)
+#define AOM_CTRL_AV1E_SET_ENABLE_ANGLE_DELTA
 
 AOM_CTRL_USE_TYPE(AV1E_SET_FRAME_PARALLEL_DECODING, unsigned int)
 #define AOM_CTRL_AV1E_SET_FRAME_PARALLEL_DECODING
@@ -1311,8 +1383,29 @@ AOM_CTRL_USE_TYPE(AV1E_SET_CHROMA_SUBSAMPLING_Y, unsigned int)
 AOM_CTRL_USE_TYPE(AV1E_SET_REDUCED_TX_TYPE_SET, unsigned int)
 #define AOM_CTRL_AV1E_SET_REDUCED_TX_TYPE_SET
 
+AOM_CTRL_USE_TYPE(AV1E_SET_INTRA_DCT_ONLY, unsigned int)
+#define AOM_CTRL_AV1E_SET_INTRA_DCT_ONLY
+
+AOM_CTRL_USE_TYPE(AV1E_SET_INTER_DCT_ONLY, unsigned int)
+#define AOM_CTRL_AV1E_SET_INTER_DCT_ONLY
+
+AOM_CTRL_USE_TYPE(AV1E_SET_INTRA_DEFAULT_TX_ONLY, unsigned int)
+#define AOM_CTRL_AV1E_SET_INTRA_DEFAULT_TX_ONLY
+
+AOM_CTRL_USE_TYPE(AV1E_SET_QUANT_B_ADAPT, unsigned int)
+#define AOM_CTRL_AV1E_SET_QUANT_B_ADAPT
+
 AOM_CTRL_USE_TYPE(AV1E_SET_GF_MAX_PYRAMID_HEIGHT, unsigned int)
 #define AOM_CTRL_AV1E_SET_GF_MAX_PYRAMID_HEIGHT
+
+AOM_CTRL_USE_TYPE(AV1E_SET_MAX_REFERENCE_FRAMES, unsigned int)
+#define AOM_CTRL_AV1E_SET_MAX_REFERENCE_FRAMES
+
+AOM_CTRL_USE_TYPE(AV1E_SET_COEFF_COST_UPD_FREQ, unsigned int)
+#define AOM_CTRL_AV1E_SET_COEFF_COST_UPD_FREQ
+
+AOM_CTRL_USE_TYPE(AV1E_SET_MODE_COST_UPD_FREQ, unsigned int)
+#define AOM_CTRL_AV1E_SET_MODE_COST_UPD_FREQ
 
 /*!\endcond */
 /*! @} - end defgroup aom_encoder */

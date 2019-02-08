@@ -203,7 +203,7 @@ static aom_codec_err_t decoder_peek_si_internal(const uint8_t *data,
   memset(&obu_header, 0, sizeof(obu_header));
   size_t payload_size = 0;
   size_t bytes_read = 0;
-  int reduced_still_picture_hdr = 0;
+  uint8_t reduced_still_picture_hdr = 0;
   aom_codec_err_t status = aom_read_obu_header_and_size(
       data, data_sz, si->is_annexb, &obu_header, &payload_size, &bytes_read);
   if (status != AOM_CODEC_OK) return status;
@@ -232,7 +232,7 @@ static aom_codec_err_t decoder_peek_si_internal(const uint8_t *data,
       struct aom_read_bit_buffer rb = { data, data + data_sz, 0, NULL, NULL };
 
       av1_read_profile(&rb);  // profile
-      const int still_picture = aom_rb_read_bit(&rb);
+      const uint8_t still_picture = aom_rb_read_bit(&rb);
       reduced_still_picture_hdr = aom_rb_read_bit(&rb);
 
       if (!still_picture && reduced_still_picture_hdr) {

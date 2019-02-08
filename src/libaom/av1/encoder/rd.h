@@ -48,7 +48,7 @@ extern "C" {
 
 // This enumerator type needs to be kept aligned with the mode order in
 // const MODE_DEFINITION av1_mode_order[MAX_MODES] used in the rd code.
-typedef enum {
+enum {
   THR_NEARESTMV,
   THR_NEARESTL2,
   THR_NEARESTL3,
@@ -246,9 +246,9 @@ typedef enum {
   MAX_SINGLE_REF_MODES = LAST_SINGLE_REF_MODES + 1,
   LAST_COMP_REF_MODES = THR_COMP_GLOBAL_GLOBALBA,
   MAX_COMP_REF_MODES = LAST_COMP_REF_MODES + 1
-} THR_MODES;
+} UENUM1BYTE(THR_MODES);
 
-typedef enum {
+enum {
   THR_LAST,
   THR_LAST2,
   THR_LAST3,
@@ -275,7 +275,7 @@ typedef enum {
   THR_INTRA,
 
   MAX_REFS
-} THR_MODES_SUB8X8;
+} UENUM1BYTE(THR_MODES_SUB8X8);
 
 typedef struct RD_OPT {
   // Thresh_mult is used to set a threshold for the rd score. A higher value
@@ -283,7 +283,6 @@ typedef struct RD_OPT {
   // is used in combination with the current block size, and thresh_freq_fact
   // to pick a threshold.
   int thresh_mult[MAX_MODES];
-  int thresh_mult_sub8x8[MAX_REFS];
 
   int threshes[MAX_SEGMENTS][BLOCK_SIZES_ALL][MAX_MODES];
 
@@ -657,9 +656,10 @@ void av1_initialize_me_consts(const struct AV1_COMP *cpi, MACROBLOCK *x,
 void av1_model_rd_from_var_lapndz(int64_t var, unsigned int n,
                                   unsigned int qstep, int *rate, int64_t *dist);
 
-void av1_model_rd_curvfit(double xqr, double *rate_f, double *distbysse_f);
-void av1_model_rd_surffit(double xm, double yl, double *rate_f,
-                          double *distbysse_f);
+void av1_model_rd_curvfit(BLOCK_SIZE bsize, double sse_norm, double xqr,
+                          double *rate_f, double *distbysse_f);
+void av1_model_rd_surffit(BLOCK_SIZE bsize, double sse_norm, double xm,
+                          double yl, double *rate_f, double *distbysse_f);
 
 int av1_get_switchable_rate(const AV1_COMMON *const cm, MACROBLOCK *x,
                             const MACROBLOCKD *xd);
@@ -683,8 +683,6 @@ void av1_get_entropy_contexts(BLOCK_SIZE bsize,
                               ENTROPY_CONTEXT t_left[MAX_MIB_SIZE]);
 
 void av1_set_rd_speed_thresholds(struct AV1_COMP *cpi);
-
-void av1_set_rd_speed_thresholds_sub8x8(struct AV1_COMP *cpi);
 
 void av1_update_rd_thresh_fact(const AV1_COMMON *const cm,
                                int (*fact)[MAX_MODES], int rd_thresh, int bsize,

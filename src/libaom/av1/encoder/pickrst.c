@@ -200,7 +200,7 @@ int64_t av1_lowbd_pixel_proj_error_c(const uint8_t *src8, int width, int height,
         v += xq[0] * (flt0[j] - u) + xq[1] * (flt1[j] - u);
         const int32_t e =
             ROUND_POWER_OF_TWO(v, SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS) - src[j];
-        err += e * e;
+        err += ((int64_t)e * e);
       }
       dat += dat_stride;
       src += src_stride;
@@ -216,7 +216,7 @@ int64_t av1_lowbd_pixel_proj_error_c(const uint8_t *src8, int width, int height,
         v += xq[0] * (flt0[j] - u);
         const int32_t e =
             ROUND_POWER_OF_TWO(v, SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS) - src[j];
-        err += e * e;
+        err += ((int64_t)e * e);
       }
       dat += dat_stride;
       src += src_stride;
@@ -231,7 +231,7 @@ int64_t av1_lowbd_pixel_proj_error_c(const uint8_t *src8, int width, int height,
         v += xq[1] * (flt1[j] - u);
         const int32_t e =
             ROUND_POWER_OF_TWO(v, SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS) - src[j];
-        err += e * e;
+        err += ((int64_t)e * e);
       }
       dat += dat_stride;
       src += src_stride;
@@ -241,7 +241,7 @@ int64_t av1_lowbd_pixel_proj_error_c(const uint8_t *src8, int width, int height,
     for (i = 0; i < height; ++i) {
       for (j = 0; j < width; ++j) {
         const int32_t e = (int32_t)(dat[j]) - src[j];
-        err += e * e;
+        err += ((int64_t)e * e);
       }
       dat += dat_stride;
       src += src_stride;
@@ -276,7 +276,7 @@ int64_t av1_highbd_pixel_proj_error_c(const uint8_t *src8, int width,
         v += xq0 * v0;
         v += xq1 * v1;
         const int32_t e = (v >> (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS)) + d - s;
-        err += e * e;
+        err += ((int64_t)e * e);
       }
       dat += dat_stride;
       flt0 += flt0_stride;
@@ -304,7 +304,7 @@ int64_t av1_highbd_pixel_proj_error_c(const uint8_t *src8, int width,
         int32_t v = half;
         v += exq * (flt[j] - u);
         const int32_t e = (v >> (SGRPROJ_RST_BITS + SGRPROJ_PRJ_BITS)) + d - s;
-        err += e * e;
+        err += ((int64_t)e * e);
       }
       dat += dat_stride;
       flt += flt_stride;
@@ -316,7 +316,7 @@ int64_t av1_highbd_pixel_proj_error_c(const uint8_t *src8, int width,
         const int32_t d = dat[j];
         const int32_t s = src[j];
         const int32_t e = d - s;
-        err += e * e;
+        err += ((int64_t)e * e);
       }
       dat += dat_stride;
       src += src_stride;

@@ -154,6 +154,8 @@ static const arg_def_t skip =
     ARG_DEF(NULL, "skip", 1, "Skip the first n input frames");
 static const arg_def_t good_dl =
     ARG_DEF(NULL, "good", 0, "Use Good Quality Deadline");
+static const arg_def_t rt_dl =
+    ARG_DEF(NULL, "rt", 0, "Use Realtime Quality Deadline");
 static const arg_def_t quietarg =
     ARG_DEF("q", "quiet", 0, "Do not print encode progress");
 static const arg_def_t verbosearg =
@@ -219,6 +221,7 @@ static const arg_def_t *main_args[] = { &help,
                                         &limit,
                                         &skip,
                                         &good_dl,
+                                        &rt_dl,
                                         &quietarg,
                                         &verbosearg,
                                         &psnrarg,
@@ -263,9 +266,9 @@ static const arg_def_t global_error_resilient =
             "Enable global error resiliency features");
 static const arg_def_t lag_in_frames =
     ARG_DEF(NULL, "lag-in-frames", 1, "Max number of frames to lag");
-static const arg_def_t large_scale_tile =
-    ARG_DEF(NULL, "large-scale-tile", 1,
-            "Large scale tile coding (0: off (default), 1: on)");
+static const arg_def_t large_scale_tile = ARG_DEF(
+    NULL, "large-scale-tile", 1,
+    "Large scale tile coding (0: off (default), 1: on (ivf output only))");
 static const arg_def_t monochrome =
     ARG_DEF(NULL, "monochrome", 0, "Monochrome video (no chroma planes)");
 static const arg_def_t full_still_picture_hdr = ARG_DEF(
@@ -415,7 +418,7 @@ static const arg_def_t cpu_used_av1 =
     ARG_DEF(NULL, "cpu-used", 1, "CPU Used (0..8)");
 static const arg_def_t rowmtarg =
     ARG_DEF(NULL, "row-mt", 1,
-            "Enable row based multi-threading (0: off (default), 1: on)");
+            "Enable row based multi-threading (0: off, 1: on (default))");
 static const arg_def_t tile_cols =
     ARG_DEF(NULL, "tile-columns", 1, "Number of tile columns to use, log2");
 static const arg_def_t tile_rows =
@@ -496,6 +499,17 @@ static const arg_def_t enable_filter_intra =
     ARG_DEF(NULL, "enable-filter-intra", 1,
             "Enable filter intra prediction mode "
             "(0: false, 1: true (default))");
+static const arg_def_t enable_smooth_intra =
+    ARG_DEF(NULL, "enable-smooth-intra", 1,
+            "Enable smooth intra prediction modes "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_paeth_intra =
+    ARG_DEF(NULL, "enable-paeth-intra", 1,
+            "Enable Paeth intra prediction mode (0: false, 1: true (default))");
+static const arg_def_t enable_cfl_intra =
+    ARG_DEF(NULL, "enable-cfl-intra", 1,
+            "Enable chroma from luma intra prediction mode "
+            "(0: false, 1: true (default))");
 static const arg_def_t enable_obmc = ARG_DEF(
     NULL, "enable-obmc", 1, "Enable OBMC (0: false, 1: true (default))");
 static const arg_def_t enable_palette =
@@ -505,10 +519,13 @@ static const arg_def_t enable_intrabc =
     ARG_DEF(NULL, "enable-intrabc", 1,
             "Enable intra block copy prediction mode "
             "(0: false, 1: true (default))");
+static const arg_def_t enable_angle_delta =
+    ARG_DEF(NULL, "enable-angle-delta", 1,
+            "Enable intra angle delta (0: false, 1: true (default))");
 static const arg_def_t disable_trellis_quant =
     ARG_DEF(NULL, "disable-trellis-quant", 1,
             "Disable trellis optimization of quantized coefficients (0: false ("
-            "default) 1: true)");
+            "default) 1: true  2: partial true)");
 static const arg_def_t enable_qm =
     ARG_DEF(NULL, "enable-qm", 1,
             "Enable quantisation matrices (0: false (default), 1: true)");
@@ -518,6 +535,23 @@ static const arg_def_t qm_max = ARG_DEF(
     NULL, "qm-max", 1, "Max quant matrix flatness (0..15), default is 15");
 static const arg_def_t reduced_tx_type_set = ARG_DEF(
     NULL, "reduced-tx-type-set", 1, "Use reduced set of transform types");
+static const arg_def_t use_intra_dct_only =
+    ARG_DEF(NULL, "use-intra-dct-only", 1, "Use DCT only for INTRA modes");
+static const arg_def_t use_inter_dct_only =
+    ARG_DEF(NULL, "use-inter-dct-only", 1, "Use DCT only for INTER modes");
+static const arg_def_t use_intra_default_tx_only =
+    ARG_DEF(NULL, "use-intra-default-tx-only", 1,
+            "Use Default-transform only for INTRA modes");
+static const arg_def_t quant_b_adapt =
+    ARG_DEF(NULL, "quant-b-adapt", 1, "Use adaptive quantize_b");
+static const arg_def_t coeff_cost_upd_freq =
+    ARG_DEF(NULL, "coeff-cost-upd-freq", 1,
+            "Update freq for coeff costs"
+            "0: SB, 1: SB Row per Tile, 2: Tile");
+static const arg_def_t mode_cost_upd_freq =
+    ARG_DEF(NULL, "mode-cost-upd-freq", 1,
+            "Update freq for mode costs"
+            "0: SB, 1: SB Row per Tile, 2: Tile");
 #if CONFIG_DIST_8X8
 static const arg_def_t enable_dist_8x8 =
     ARG_DEF(NULL, "enable-dist-8x8", 1,
@@ -588,6 +622,9 @@ static const arg_def_t max_gf_interval = ARG_DEF(
 static const arg_def_t gf_max_pyr_height =
     ARG_DEF(NULL, "gf-max-pyr-height", 1,
             "maximum height for GF group pyramid structure (1 to 4 (default))");
+static const arg_def_t max_reference_frames = ARG_DEF(
+    NULL, "max-reference-frames", 1,
+    "maximum number of reference frames allowed per frame (3 to 7 (default))");
 
 static const struct arg_enum_list color_primaries_enum[] = {
   { "bt709", AOM_CICP_CP_BT_709 },
@@ -726,14 +763,24 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &enable_global_motion,
                                        &enable_warped_motion,
                                        &enable_filter_intra,
+                                       &enable_smooth_intra,
+                                       &enable_paeth_intra,
+                                       &enable_cfl_intra,
                                        &enable_obmc,
                                        &enable_palette,
                                        &enable_intrabc,
+                                       &enable_angle_delta,
                                        &disable_trellis_quant,
                                        &enable_qm,
                                        &qm_min,
                                        &qm_max,
                                        &reduced_tx_type_set,
+                                       &use_intra_dct_only,
+                                       &use_inter_dct_only,
+                                       &use_intra_default_tx_only,
+                                       &quant_b_adapt,
+                                       &coeff_cost_upd_freq,
+                                       &mode_cost_upd_freq,
 #if CONFIG_DIST_8X8
                                        &enable_dist_8x8,
 #endif
@@ -761,7 +808,8 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
 #if CONFIG_DENOISE
                                        &denoise_noise_level,
                                        &denoise_block_size,
-#endif
+#endif  // CONFIG_DENOISE
+                                       &max_reference_frames,
                                        &enable_ref_frame_mvs,
                                        &bitdeptharg,
                                        &inbitdeptharg,
@@ -804,14 +852,24 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_ENABLE_GLOBAL_MOTION,
                                         AV1E_SET_ENABLE_WARPED_MOTION,
                                         AV1E_SET_ENABLE_FILTER_INTRA,
+                                        AV1E_SET_ENABLE_SMOOTH_INTRA,
+                                        AV1E_SET_ENABLE_PAETH_INTRA,
+                                        AV1E_SET_ENABLE_CFL_INTRA,
                                         AV1E_SET_ENABLE_OBMC,
                                         AV1E_SET_ENABLE_PALETTE,
                                         AV1E_SET_ENABLE_INTRABC,
+                                        AV1E_SET_ENABLE_ANGLE_DELTA,
                                         AV1E_SET_DISABLE_TRELLIS_QUANT,
                                         AV1E_SET_ENABLE_QM,
                                         AV1E_SET_QM_MIN,
                                         AV1E_SET_QM_MAX,
                                         AV1E_SET_REDUCED_TX_TYPE_SET,
+                                        AV1E_SET_INTRA_DCT_ONLY,
+                                        AV1E_SET_INTER_DCT_ONLY,
+                                        AV1E_SET_INTRA_DEFAULT_TX_ONLY,
+                                        AV1E_SET_QUANT_B_ADAPT,
+                                        AV1E_SET_COEFF_COST_UPD_FREQ,
+                                        AV1E_SET_MODE_COST_UPD_FREQ,
 #if CONFIG_DIST_8X8
                                         AV1E_SET_ENABLE_DIST_8X8,
 #endif
@@ -839,7 +897,8 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
 #if CONFIG_DENOISE
                                         AV1E_SET_DENOISE_NOISE_LEVEL,
                                         AV1E_SET_DENOISE_BLOCK_SIZE,
-#endif
+#endif  // CONFIG_DENOISE
+                                        AV1E_SET_MAX_REFERENCE_FRAMES,
                                         AV1E_SET_ENABLE_REF_FRAME_MVS,
                                         0 };
 #endif  // CONFIG_AV1_ENCODER
@@ -1025,7 +1084,9 @@ static void parse_global_config(struct AvxEncoderConfig *global, int argc,
     } else if (arg_match(&arg, &usage, argi))
       global->usage = arg_parse_uint(&arg);
     else if (arg_match(&arg, &good_dl, argi))
-      warn("Deprecated --good option! Ignoring\n");
+      global->usage = AOM_USAGE_GOOD_QUALITY;  // Good quality usage
+    else if (arg_match(&arg, &rt_dl, argi))
+      global->usage = AOM_USAGE_REALTIME;  // Real-time usage
     else if (arg_match(&arg, &use_yv12, argi))
       global->color_type = YV12;
     else if (arg_match(&arg, &use_i420, argi))
@@ -1078,10 +1139,18 @@ static void parse_global_config(struct AvxEncoderConfig *global, int argc,
     // Make default AV1 passes = 2 until there is a better quality 1-pass
     // encoder
     if (global->codec != NULL && global->codec->name != NULL)
-      global->passes = (strcmp(global->codec->name, "av1") == 0) ? 2 : 1;
+      global->passes = (strcmp(global->codec->name, "av1") == 0 &&
+                        global->usage != AOM_USAGE_REALTIME)
+                           ? 2
+                           : 1;
 #else
     global->passes = 1;
 #endif
+  }
+
+  if (global->usage == AOM_USAGE_REALTIME && global->passes > 1) {
+    warn("Enforcing one-pass encoding in realtime mode\n");
+    global->passes = 1;
   }
 }
 
@@ -1316,8 +1385,15 @@ static int parse_stream_params(struct AvxEncoderConfig *global,
       config->cfg.g_error_resilient = arg_parse_uint(&arg);
     } else if (arg_match(&arg, &lag_in_frames, argi)) {
       config->cfg.g_lag_in_frames = arg_parse_uint(&arg);
+      if (global->usage == AOM_USAGE_REALTIME &&
+          config->cfg.rc_end_usage == AOM_CBR &&
+          config->cfg.g_lag_in_frames != 0) {
+        warn("non-zero %s option ignored in realtime CBR mode.\n", arg.name);
+        config->cfg.g_lag_in_frames = 0;
+      }
     } else if (arg_match(&arg, &large_scale_tile, argi)) {
       config->cfg.large_scale_tile = arg_parse_uint(&arg);
+      if (config->cfg.large_scale_tile) global->codec = get_aom_lst_encoder();
     } else if (arg_match(&arg, &monochrome, argi)) {
       config->cfg.monochrome = 1;
     } else if (arg_match(&arg, &full_still_picture_hdr, argi)) {
@@ -2075,6 +2151,10 @@ int main(int argc, const char **argv_) {
   FOREACH_STREAM(stream, streams) {
     check_encoder_config(global.disable_warning_prompt, &global,
                          &stream->config.cfg);
+
+    // If large_scale_tile = 1, only support to output to ivf format.
+    if (stream->config.cfg.large_scale_tile && !stream->config.write_ivf)
+      die("only support ivf output format while large-scale-tile=1\n");
   }
 
   /* Handle non-option arguments */

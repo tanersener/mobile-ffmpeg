@@ -149,6 +149,11 @@ const AvxInterface *get_aom_encoder_by_name(const char *name) {
 
   return NULL;
 }
+
+// large scale tile encoding
+static const AvxInterface aom_lst_encoder = { "av1", LST_FOURCC,
+                                              &aom_codec_av1_cx };
+const AvxInterface *get_aom_lst_encoder(void) { return &aom_lst_encoder; }
 #endif  // CONFIG_AV1_ENCODER
 
 #if CONFIG_AV1_DECODER

@@ -484,6 +484,7 @@ static int main_loop(int argc, const char **argv_) {
   input.webm_ctx = &webm_ctx;
 #endif
   struct ObuDecInputContext obu_ctx = { NULL, NULL, 0, 0, 0 };
+  int is_ivf = 0;
 
   obu_ctx.avx_ctx = &aom_input_ctx;
   input.obu_ctx = &obu_ctx;
@@ -610,8 +611,10 @@ static int main_loop(int argc, const char **argv_) {
 #endif
   input.aom_input_ctx->filename = fn;
   input.aom_input_ctx->file = infile;
-  if (file_is_ivf(input.aom_input_ctx))
+  if (file_is_ivf(input.aom_input_ctx)) {
     input.aom_input_ctx->file_type = FILE_TYPE_IVF;
+    is_ivf = 1;
+  }
 #if CONFIG_WEBM_IO
   else if (file_is_webm(input.webm_ctx, input.aom_input_ctx))
     input.aom_input_ctx->file_type = FILE_TYPE_WEBM;
@@ -661,6 +664,10 @@ static int main_loop(int argc, const char **argv_) {
   }
 
   fourcc_interface = get_aom_decoder_by_fourcc(aom_input_ctx.fourcc);
+
+  if (is_ivf && !fourcc_interface)
+    fatal("Unsupported fourcc: %x\n", aom_input_ctx.fourcc);
+
   if (interface && fourcc_interface && interface != fourcc_interface)
     warn("Header indicates codec: %s\n", fourcc_interface->name);
   else

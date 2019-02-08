@@ -73,7 +73,7 @@ enum {
                               (1 << THR_ALTR) | (1 << THR_GOLD)
 };
 
-typedef enum {
+enum {
   TXFM_CODING_SF = 1,
   INTER_PRED_SF = 2,
   INTRA_PRED_SF = 4,
@@ -82,9 +82,9 @@ typedef enum {
   RD_SKIP_SF = 32,
   RESERVE_2_SF = 64,
   RESERVE_3_SF = 128,
-} DEV_SPEED_FEATURES;
+} UENUM1BYTE(DEV_SPEED_FEATURES);
 
-typedef enum {
+enum {
   DIAMOND = 0,
   NSTEP = 1,
   HEX = 2,
@@ -92,9 +92,9 @@ typedef enum {
   SQUARE = 4,
   FAST_HEX = 5,
   FAST_DIAMOND = 6
-} SEARCH_METHODS;
+} UENUM1BYTE(SEARCH_METHODS);
 
-typedef enum {
+enum {
   // No recode.
   DISALLOW_RECODE = 0,
   // Allow recode for KF and exceeding maximum frame bandwidth.
@@ -103,28 +103,28 @@ typedef enum {
   ALLOW_RECODE_KFARFGF = 2,
   // Allow recode for all frames based on bitrate constraints.
   ALLOW_RECODE = 3,
-} RECODE_LOOP_TYPE;
+} UENUM1BYTE(RECODE_LOOP_TYPE);
 
-typedef enum {
+enum {
   SUBPEL_TREE = 0,
   SUBPEL_TREE_PRUNED = 1,           // Prunes 1/2-pel searches
   SUBPEL_TREE_PRUNED_MORE = 2,      // Prunes 1/2-pel searches more aggressively
   SUBPEL_TREE_PRUNED_EVENMORE = 3,  // Prunes 1/2- and 1/4-pel searches
   // Other methods to come
-} SUBPEL_SEARCH_METHODS;
+} UENUM1BYTE(SUBPEL_SEARCH_METHODS);
 
-typedef enum {
+enum {
   USE_FULL_RD = 0,
   USE_FAST_RD,
   USE_LARGESTALL,
-} TX_SIZE_SEARCH_METHOD;
+} UENUM1BYTE(TX_SIZE_SEARCH_METHOD);
 
-typedef enum {
+enum {
   NOT_IN_USE = 0,
   RELAXED_NEIGHBORING_MIN_MAX = 1
-} AUTO_MIN_MAX_MODE;
+} UENUM1BYTE(AUTO_MIN_MAX_MODE);
 
-typedef enum {
+enum {
   // Try the full image with different values.
   LPF_PICK_FROM_FULL_IMAGE,
   // Try a small portion of the image with different values.
@@ -133,9 +133,9 @@ typedef enum {
   LPF_PICK_FROM_Q,
   // Pick 0 to disable LPF if LPF was enabled last frame
   LPF_PICK_MINIMAL_LPF
-} LPF_PICK_METHOD;
+} UENUM1BYTE(LPF_PICK_METHOD);
 
-typedef enum {
+enum {
   // Terminate search early based on distortion so far compared to
   // qp step, distortion in the neighborhood of the frame, etc.
   FLAG_EARLY_TERMINATE = 1 << 0,
@@ -152,9 +152,9 @@ typedef enum {
 
   // Skips intra modes other than DC_PRED if the source variance is small
   FLAG_SKIP_INTRA_LOWVAR = 1 << 5,
-} MODE_SEARCH_SKIP_LOGIC;
+} UENUM1BYTE(MODE_SEARCH_SKIP_LOGIC);
 
-typedef enum {
+enum {
   NO_PRUNE = 0,
   // eliminates one tx type in vertical and horizontal direction
   PRUNE_ONE = 1,
@@ -165,7 +165,7 @@ typedef enum {
   PRUNE_2D_ACCURATE = 3,
   // similar, but applies much more aggressive pruning to get better speed-up
   PRUNE_2D_FAST = 4,
-} TX_TYPE_PRUNE_MODE;
+} UENUM1BYTE(TX_TYPE_PRUNE_MODE);
 
 typedef struct {
   TX_TYPE_PRUNE_MODE prune_mode;
@@ -184,17 +184,24 @@ typedef struct {
   int skip_tx_search;
 } TX_TYPE_SEARCH;
 
-typedef enum {
+enum {
   // Search partitions using RD criterion
   SEARCH_PARTITION,
 
   // Always use a fixed size partition
   FIXED_PARTITION,
 
-  REFERENCE_PARTITION
-} PARTITION_SEARCH_TYPE;
+  REFERENCE_PARTITION,
 
-typedef enum { EIGHTH_PEL, QUARTER_PEL, HALF_PEL, FULL_PEL } SUBPEL_FORCE_STOP;
+  VAR_BASED_PARTITION
+} UENUM1BYTE(PARTITION_SEARCH_TYPE);
+
+enum {
+  EIGHTH_PEL,
+  QUARTER_PEL,
+  HALF_PEL,
+  FULL_PEL
+} UENUM1BYTE(SUBPEL_FORCE_STOP);
 
 typedef struct MV_SPEED_FEATURES {
   // Motion search method (Diamond, NSTEP, Hex, Big Diamond, Square, etc).
@@ -228,35 +235,42 @@ typedef struct MESH_PATTERN {
   int interval;
 } MESH_PATTERN;
 
-typedef enum {
+enum {
   GM_FULL_SEARCH,
-  GM_REDUCED_REF_SEARCH,
+  GM_REDUCED_REF_SEARCH_SKIP_L2_L3,
+  GM_REDUCED_REF_SEARCH_SKIP_L2_L3_ARF2,
   GM_DISABLE_SEARCH
-} GM_SEARCH_TYPE;
+} UENUM1BYTE(GM_SEARCH_TYPE);
 
-typedef enum {
+enum {
   GM_ERRORADV_TR_0,
   GM_ERRORADV_TR_1,
   GM_ERRORADV_TR_2,
   GM_ERRORADV_TR_TYPES,
-} GM_ERRORADV_TYPE;
+} UENUM1BYTE(GM_ERRORADV_TYPE);
 
-typedef enum {
+enum {
   NO_TRELLIS_OPT,         // No trellis optimization
   FULL_TRELLIS_OPT,       // Trellis optimization in all stages
   FINAL_PASS_TRELLIS_OPT  // Trellis optimization in only the final encode pass
-} TRELLIS_OPT_TYPE;
+} UENUM1BYTE(TRELLIS_OPT_TYPE);
 
-typedef enum {
+enum {
   FULL_TXFM_RD,
   LOW_TXFM_RD,
-} TXFM_RD_MODEL;
+} UENUM1BYTE(TXFM_RD_MODEL);
+
+enum {
+  DIST_WTD_COMP_ENABLED,
+  DIST_WTD_COMP_SKIP_MV_SEARCH,
+  DIST_WTD_COMP_DISABLED,
+} UENUM1BYTE(DIST_WTD_COMP_FLAG);
 
 typedef enum {
-  JNT_COMP_ENABLED,
-  JNT_COMP_SKIP_MV_SEARCH,
-  JNT_COMP_DISABLED,
-} JNT_COMP_FLAG;
+  FLAG_SKIP_EIGHTTAP = 1 << EIGHTTAP_REGULAR,
+  FLAG_SKIP_EIGHTTAP_SMOOTH = 1 << EIGHTTAP_SMOOTH,
+  FLAG_SKIP_EIGHTTAP_SHARP = 1 << MULTITAP_SHARP,
+} INTERP_FILTER_MASK;
 
 typedef struct SPEED_FEATURES {
   MV_SPEED_FEATURES mv;
@@ -337,11 +351,16 @@ typedef struct SPEED_FEATURES {
   // 1: use model based rd breakout
   int model_based_post_interp_filter_breakout;
 
+  // Model based breakout in motion_mode_rd
+  // 0: no breakout
+  // 1: use model based rd breakout
+  int model_based_motion_mode_rd_breakout;
+
   // Used if partition_search_type = FIXED_SIZE_PARTITION
   BLOCK_SIZE always_this_block_size;
 
   // Drop less likely to be picked reference frames in the RD search.
-  // Has four levels for now: 0, 1, 2 and 3, where higher levels prune more
+  // Has five levels for now: 0, 1, 2, 3 and 4, where higher levels prune more
   // aggressively than lower ones. (0 means no pruning).
   int selective_ref_frame;
 
@@ -543,18 +562,23 @@ typedef struct SPEED_FEATURES {
   // Calculate RD cost before doing optimize_b, and skip if the cost is large.
   int optimize_b_precheck;
 
-  // Use model rd instead of transform search in jnt_comp
-  int jnt_comp_fast_tx_search;
+  // Use model rd instead of transform search in dist_wtd_comp
+  int dist_wtd_comp_fast_tx_search;
 
   // Decide when and how to use joint_comp.
-  JNT_COMP_FLAG use_jnt_comp_flag;
+  DIST_WTD_COMP_FLAG use_dist_wtd_comp_flag;
 
   // Decoder side speed feature to add penalty for use of dual-sgr filters.
   // Takes values 0 - 10, 0 indicating no penalty and each additional level
   // adding a penalty of 1%
   int dual_sgr_penalty_level;
 
-  // Dynamically estimate final rd from prediction error and mode cost
+  // 2-pass inter mode model estimation where the preliminary pass skips
+  // transform search and uses a model to estimate rd, while the final pass
+  // computes the full transform search. two types of models are supported:
+  // 0: not used
+  // 1: used with online dynamic rd model
+  // 2: used with static rd model
   int inter_mode_rd_model_estimation;
 
   // Skip some ref frames in compound motion search by single motion search
@@ -583,14 +607,16 @@ typedef struct SPEED_FEATURES {
   // Prune intra mode candidates based on source block gradient stats.
   int intra_angle_estimation;
 
-  // Performs full pixel motion search before none_partition to decide if we
-  // want to split directly without trying other partition types.
-  int full_pixel_motion_search_based_split;
-
   // Skip obmc or warped motion mode when neighborhood motion field is
   // identical
   int skip_obmc_in_uniform_mv_field;
   int skip_wm_in_uniform_mv_field;
+
+  // Enable/disable ME for interinter wedge search.
+  int disable_interinter_wedge_newmv_search;
+
+  // Enable/disable smooth inter-intra mode
+  int disable_smooth_interintra;
 
   // skip sharp_filter evaluation based on regular and smooth filter rd for
   // dual_filter=0 case
@@ -605,12 +631,43 @@ typedef struct SPEED_FEATURES {
   // Values are 0 (not used) , 1 - 3 with progressively increasing
   // aggressiveness
   int prune_motion_mode_level;
+
+  // Gate warp evaluation for motions of type IDENTITY,
+  // TRANSLATION and AFFINE(based on number of warp neighbors)
+  int prune_warp_using_wmtype;
+
+  // Perform simple_motion_search on each possible subblock and use it to prune
+  // PARTITION_HORZ and PARTITION_VERT.
+  int simple_motion_search_prune_rect;
+
+  // Perform simple motion search before none_partition to decide if we
+  // want to split directly without trying other partition types.
+  int simple_motion_search_split_only;
+
+  int cb_pred_filter_search;
+
+  // adaptive interp_filter search to allow skip of certain filter types.
+  int adaptive_interp_filter_search;
+
+  // mask for skip evaluation of certain interp_filter type.
+  INTERP_FILTER_MASK interp_filter_search_mask;
+
+  // Enable/disable interintra wedge search.
+  int disable_wedge_interintra_search;
+
+  // Flag used to control the extent of coeff R-D optimization
+  int perform_coeff_opt;
+
+  // This flag controls the use of non-RD mode decision.
+  int use_nonrd_pick_mode;
 } SPEED_FEATURES;
 
 struct AV1_COMP;
 
-void av1_set_speed_features_framesize_independent(struct AV1_COMP *cpi);
-void av1_set_speed_features_framesize_dependent(struct AV1_COMP *cpi);
+void av1_set_speed_features_framesize_independent(struct AV1_COMP *cpi,
+                                                  int speed);
+void av1_set_speed_features_framesize_dependent(struct AV1_COMP *cpi,
+                                                int speed);
 
 #ifdef __cplusplus
 }  // extern "C"

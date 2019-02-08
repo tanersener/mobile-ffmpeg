@@ -14,6 +14,40 @@
 #include "config/aom_dsp_rtcd.h"
 #include "aom_ports/mem.h"
 
+void aom_minmax_8x8_c(const uint8_t *s, int p, const uint8_t *d, int dp,
+                      int *min, int *max) {
+  int i, j;
+  *min = 255;
+  *max = 0;
+  for (i = 0; i < 8; ++i, s += p, d += dp) {
+    for (j = 0; j < 8; ++j) {
+      int diff = abs(s[j] - d[j]);
+      *min = diff < *min ? diff : *min;
+      *max = diff > *max ? diff : *max;
+    }
+  }
+}
+
+unsigned int aom_avg_4x4_c(const uint8_t *s, int p) {
+  int i, j;
+  int sum = 0;
+  for (i = 0; i < 4; ++i, s += p)
+    for (j = 0; j < 4; sum += s[j], ++j) {
+    }
+
+  return (sum + 8) >> 4;
+}
+
+unsigned int aom_avg_8x8_c(const uint8_t *s, int p) {
+  int i, j;
+  int sum = 0;
+  for (i = 0; i < 8; ++i, s += p)
+    for (j = 0; j < 8; sum += s[j], ++j) {
+    }
+
+  return (sum + 32) >> 6;
+}
+
 // src_diff: first pass, 9 bit, dynamic range [-255, 255]
 //           second pass, 12 bit, dynamic range [-2040, 2040]
 static void hadamard_col8(const int16_t *src_diff, ptrdiff_t src_stride,

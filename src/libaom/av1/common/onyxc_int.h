@@ -79,14 +79,14 @@ extern "C" {
 #define TXCOEFF_TIMER 0
 #define TXCOEFF_COST_TIMER 0
 
-typedef enum {
+enum {
   SINGLE_REFERENCE = 0,
   COMPOUND_REFERENCE = 1,
   REFERENCE_MODE_SELECT = 2,
   REFERENCE_MODES = 3,
-} REFERENCE_MODE;
+} UENUM1BYTE(REFERENCE_MODE);
 
-typedef enum {
+enum {
   /**
    * Frame context updates are disabled
    */
@@ -96,7 +96,7 @@ typedef enum {
    * updates based on entropy/counts in the decoded frame
    */
   REFRESH_FRAME_CONTEXT_BACKWARD,
-} REFRESH_FRAME_CONTEXT_MODE;
+} UENUM1BYTE(REFRESH_FRAME_CONTEXT_MODE);
 
 #define MFMV_STACK_SIZE 3
 typedef struct {
@@ -112,7 +112,7 @@ typedef struct {
 // FIXME(jack.haughton@argondesign.com): This enum was originally in
 // encoder/ratectrl.h, and is encoder specific. When we move to C++, this
 // should go back there and BufferPool should be templatized.
-typedef enum {
+enum {
   INTER_NORMAL = 0,
   INTER_LOW = 1,
   INTER_HIGH = 2,
@@ -120,7 +120,7 @@ typedef enum {
   GF_ARF_STD = 4,
   KF_STD = 5,
   RATE_FACTOR_LEVELS = 6
-} RATE_FACTOR_LEVEL;
+} UENUM1BYTE(RATE_FACTOR_LEVEL);
 
 typedef struct RefCntBuffer {
   // For a RefCntBuffer, the following are reference-holding variables:
@@ -154,7 +154,7 @@ typedef struct RefCntBuffer {
   int height;
   WarpedMotionParams global_motion[REF_FRAMES];
   int showable_frame;  // frame can be used as show existing frame in future
-  int film_grain_params_present;
+  uint8_t film_grain_params_present;
   aom_film_grain_t film_grain_params;
   aom_codec_frame_buffer_t raw_frame_buffer;
   YV12_BUFFER_CONFIG buf;
@@ -222,10 +222,10 @@ typedef struct {
 
 typedef struct {
   int enable_order_hint;           // 0 - disable order hint, and related tools
-  int order_hint_bits_minus_1;
-                                   // jnt_comp, ref_frame_mvs, frame_sign_bias
+  int order_hint_bits_minus_1;     // dist_wtd_comp, ref_frame_mvs,
+                                   // frame_sign_bias
                                    // if 0, enable_dist_wtd_comp and
-                                   // enable_ref_frame_mvs must be set zs 0.
+                                   // enable_ref_frame_mvs must be set as 0.
   int enable_dist_wtd_comp;        // 0 - disable dist-wtd compound modes
                                    // 1 - enable it
   int enable_ref_frame_mvs;        // 0 - disable ref frame mvs
@@ -241,7 +241,7 @@ typedef struct SequenceHeader {
   int num_bits_height;
   int max_frame_width;
   int max_frame_height;
-  int frame_id_numbers_present_flag;
+  uint8_t frame_id_numbers_present_flag;
   int frame_id_length;
   int delta_frame_id_length;
   BLOCK_SIZE sb_size;  // Size of the superblock used for this frame
@@ -250,36 +250,35 @@ typedef struct SequenceHeader {
 
   OrderHintInfo order_hint_info;
 
-  int force_screen_content_tools;  // 0 - force off
-                                   // 1 - force on
-                                   // 2 - adaptive
-  int force_integer_mv;            // 0 - Not to force. MV can be in 1/4 or 1/8
-                                   // 1 - force to integer
-                                   // 2 - adaptive
-  int still_picture;               // Video is a single frame still picture
-  int reduced_still_picture_hdr;   // Use reduced header for still picture
-  int enable_filter_intra;         // enables/disables filterintra
-  int enable_intra_edge_filter;    // enables/disables corner/edge/upsampling
-  int enable_interintra_compound;  // enables/disables interintra_compound
-  int enable_masked_compound;      // enables/disables masked compound
-  int enable_dual_filter;          // 0 - disable dual interpolation filter
-                                   // 1 - enable vert/horiz filter selection
-  int enable_warped_motion;        // 0 - disable warped motion for sequence
-                                   // 1 - enable it for the sequence
-  int enable_superres;     // 0 - Disable superres for the sequence, and disable
-                           //     transmitting per-frame superres enabled flag.
-                           // 1 - Enable superres for the sequence, and also
-                           //     enable per-frame flag to denote if superres is
-                           //     enabled for that frame.
-  int enable_cdef;         // To turn on/off CDEF
-  int enable_restoration;  // To turn on/off loop restoration
+  uint8_t force_screen_content_tools;  // 0 - force off
+                                       // 1 - force on
+                                       // 2 - adaptive
+  uint8_t still_picture;               // Video is a single frame still picture
+  uint8_t reduced_still_picture_hdr;   // Use reduced header for still picture
+  uint8_t force_integer_mv;            // 0 - Don't force. MV can use subpel
+                                       // 1 - force to integer
+                                       // 2 - adaptive
+  uint8_t enable_filter_intra;         // enables/disables filterintra
+  uint8_t enable_intra_edge_filter;    // enables/disables edge upsampling
+  uint8_t enable_interintra_compound;  // enables/disables interintra_compound
+  uint8_t enable_masked_compound;      // enables/disables masked compound
+  uint8_t enable_dual_filter;          // 0 - disable dual interpolation filter
+                                       // 1 - enable vert/horz filter selection
+  uint8_t enable_warped_motion;        // 0 - disable warp for the sequence
+                                       // 1 - enable warp for the sequence
+  uint8_t enable_superres;             // 0 - Disable superres for the sequence
+                                       //     and no frame level superres flag
+                                       // 1 - Enable superres for the sequence
+                                       //     enable per-frame superres flag
+  uint8_t enable_cdef;                 // To turn on/off CDEF
+  uint8_t enable_restoration;          // To turn on/off loop restoration
   BITSTREAM_PROFILE profile;
 
   // Operating point info.
   int operating_points_cnt_minus_1;
   int operating_point_idc[MAX_NUM_OPERATING_POINTS];
-  int display_model_info_present_flag;
-  int decoder_model_info_present_flag;
+  uint8_t display_model_info_present_flag;
+  uint8_t decoder_model_info_present_flag;
   BitstreamLevel level[MAX_NUM_OPERATING_POINTS];
   uint8_t tier[MAX_NUM_OPERATING_POINTS];  // seq_tier in the spec. One bit: 0
                                            // or 1.
@@ -287,8 +286,8 @@ typedef struct SequenceHeader {
   // Color config.
   aom_bit_depth_t bit_depth;  // AOM_BITS_8 in profile 0 or 1,
                               // AOM_BITS_10 or AOM_BITS_12 in profile 2 or 3.
-  int use_highbitdepth;       // If true, we need to use 16bit frame buffers.
-  int monochrome;             // Monochorme video
+  uint8_t use_highbitdepth;   // If true, we need to use 16bit frame buffers.
+  uint8_t monochrome;         // Monochorme video
   aom_color_primaries_t color_primaries;
   aom_transfer_characteristics_t transfer_characteristics;
   aom_matrix_coefficients_t matrix_coefficients;
@@ -296,9 +295,8 @@ typedef struct SequenceHeader {
   int subsampling_x;          // Chroma subsampling for x
   int subsampling_y;          // Chroma subsampling for y
   aom_chroma_sample_position_t chroma_sample_position;
-  int separate_uv_delta_q;
-
-  int film_grain_params_present;
+  uint8_t separate_uv_delta_q;
+  uint8_t film_grain_params_present;
 } SequenceHeader;
 
 typedef struct {
@@ -375,17 +373,17 @@ typedef struct AV1Common {
   // Prepare ref_frame_map for the next frame.
   // Only used in frame parallel decode.
   RefCntBuffer *next_ref_frame_map[REF_FRAMES];
+  FRAME_TYPE last_frame_type; /* last frame's frame type for motion search.*/
 
   int show_frame;
   int showable_frame;  // frame can be used as show existing frame in future
   int show_existing_frame;
-  int reset_decoder_state;
 
   uint8_t disable_cdf_update;
   int allow_high_precision_mv;
-  int cur_frame_force_integer_mv;  // 0 the default in AOM, 1 only integer
+  uint8_t cur_frame_force_integer_mv;  // 0 the default in AOM, 1 only integer
 
-  int allow_screen_content_tools;
+  uint8_t allow_screen_content_tools;
   int allow_intrabc;
   int allow_warped_motion;
 
@@ -433,6 +431,7 @@ typedef struct AV1Common {
   int qm_v;
   int min_qmlevel;
   int max_qmlevel;
+  int use_quant_b_adapt;
 
   /* We allocate a MB_MODE_INFO struct for each macroblock, together with
      an extra row on top and column on the left to simplify prediction. */
@@ -502,7 +501,6 @@ typedef struct AV1Common {
   int primary_ref_frame;
 
   int error_resilient_mode;
-  int force_primary_ref_none;
 
   int tile_cols, tile_rows;
 
@@ -629,6 +627,22 @@ static INLINE int get_free_fb(AV1_COMMON *cm) {
 
   unlock_buffer_pool(cm->buffer_pool);
   return i;
+}
+
+static INLINE RefCntBuffer *assign_cur_frame_new_fb(AV1_COMMON *const cm) {
+  // Release the previously-used frame-buffer
+  if (cm->cur_frame != NULL) {
+    --cm->cur_frame->ref_count;
+    cm->cur_frame = NULL;
+  }
+
+  // Assign a new framebuffer
+  const int new_fb_idx = get_free_fb(cm);
+  if (new_fb_idx == INVALID_IDX) return NULL;
+
+  cm->cur_frame = &cm->buffer_pool->frame_bufs[new_fb_idx];
+  cm->cur_frame->buf.buf_8bit_valid = 0;
+  return cm->cur_frame;
 }
 
 // Modify 'lhs_ptr' to reference the buffer at 'rhs_ptr', and update the ref

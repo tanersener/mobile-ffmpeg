@@ -121,7 +121,7 @@ int av1_log_block_var(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bs) {
 
   for (i = 0; i < bh; i += 4) {
     for (j = 0; j < bw; j += 4) {
-      if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) {
+      if (is_cur_buf_hbd(xd)) {
         var +=
             log(1.0 + cpi->fn_ptr[BLOCK_4X4].vf(
                           x->plane[0].src.buf + i * x->plane[0].src.stride + j,
@@ -153,7 +153,7 @@ static unsigned int haar_ac_energy(MACROBLOCK *x, BLOCK_SIZE bs) {
   uint8_t *buf = x->plane[0].src.buf;
   const int bw = MI_SIZE * mi_size_wide[bs];
   const int bh = MI_SIZE * mi_size_high[bs];
-  int hbd = xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH;
+  const int hbd = is_cur_buf_hbd(xd);
 
   int var = 0;
   for (int r = 0; r < bh; r += 8)

@@ -21,12 +21,11 @@ static INLINE void sse_w32_avx2(__m256i *sum, const uint8_t *a,
                                 const uint8_t *b) {
   const __m256i v_a0 = yy_loadu_256(a);
   const __m256i v_b0 = yy_loadu_256(b);
-  const __m256i v_a00_w = _mm256_cvtepu8_epi16(_mm256_castsi256_si128(v_a0));
-  const __m256i v_a01_w =
-      _mm256_cvtepu8_epi16(_mm256_extracti128_si256(v_a0, 1));
-  const __m256i v_b00_w = _mm256_cvtepu8_epi16(_mm256_castsi256_si128(v_b0));
-  const __m256i v_b01_w =
-      _mm256_cvtepu8_epi16(_mm256_extracti128_si256(v_b0, 1));
+  const __m256i zero = _mm256_setzero_si256();
+  const __m256i v_a00_w = _mm256_unpacklo_epi8(v_a0, zero);
+  const __m256i v_a01_w = _mm256_unpackhi_epi8(v_a0, zero);
+  const __m256i v_b00_w = _mm256_unpacklo_epi8(v_b0, zero);
+  const __m256i v_b01_w = _mm256_unpackhi_epi8(v_b0, zero);
   const __m256i v_d00_w = _mm256_sub_epi16(v_a00_w, v_b00_w);
   const __m256i v_d01_w = _mm256_sub_epi16(v_a01_w, v_b01_w);
   *sum = _mm256_add_epi32(*sum, _mm256_madd_epi16(v_d00_w, v_d00_w));
@@ -35,15 +34,13 @@ static INLINE void sse_w32_avx2(__m256i *sum, const uint8_t *a,
 
 static INLINE int64_t summary_all_avx2(const __m256i *sum_all) {
   int64_t sum;
-  const __m256i sum0_4x64 =
-      _mm256_cvtepu32_epi64(_mm256_castsi256_si128(*sum_all));
-  const __m256i sum1_4x64 =
-      _mm256_cvtepu32_epi64(_mm256_extracti128_si256(*sum_all, 1));
+  __m256i zero = _mm256_setzero_si256();
+  const __m256i sum0_4x64 = _mm256_unpacklo_epi32(*sum_all, zero);
+  const __m256i sum1_4x64 = _mm256_unpackhi_epi32(*sum_all, zero);
   const __m256i sum_4x64 = _mm256_add_epi64(sum0_4x64, sum1_4x64);
   const __m128i sum_2x64 = _mm_add_epi64(_mm256_castsi256_si128(sum_4x64),
                                          _mm256_extracti128_si256(sum_4x64, 1));
   const __m128i sum_1x64 = _mm_add_epi64(sum_2x64, _mm_srli_si128(sum_2x64, 8));
-
   xx_storel_64(&sum, sum_1x64);
   return sum;
 }
@@ -86,7 +83,6 @@ static INLINE void sse_w4x4_avx2(const uint8_t *a, int a_stride,
   const __m256i v_d_w = _mm256_sub_epi16(v_a_w, v_b_w);
   *sum = _mm256_add_epi32(*sum, _mm256_madd_epi16(v_d_w, v_d_w));
 }
-
 static INLINE void sse_w8x2_avx2(const uint8_t *a, int a_stride,
                                  const uint8_t *b, int b_stride, __m256i *sum) {
   const __m128i v_a0 = xx_loadl_64(a);
@@ -98,12 +94,12 @@ static INLINE void sse_w8x2_avx2(const uint8_t *a, int a_stride,
   const __m256i v_d_w = _mm256_sub_epi16(v_a_w, v_b_w);
   *sum = _mm256_add_epi32(*sum, _mm256_madd_epi16(v_d_w, v_d_w));
 }
-
 int64_t aom_sse_avx2(const uint8_t *a, int a_stride, const uint8_t *b,
                      int b_stride, int width, int height) {
   int32_t y = 0;
   int64_t sse = 0;
   __m256i sum = _mm256_setzero_si256();
+  __m256i zero = _mm256_setzero_si256();
   switch (width) {
     case 4:
       do {
@@ -126,14 +122,26 @@ int64_t aom_sse_avx2(const uint8_t *a, int a_stride, const uint8_t *b,
     case 16:
       do {
         const __m128i v_a0 = xx_loadu_128(a);
+        const __m128i v_a1 = xx_loadu_128(a + a_stride);
         const __m128i v_b0 = xx_loadu_128(b);
-        const __m256i v_a_w = _mm256_cvtepu8_epi16(v_a0);
-        const __m256i v_b_w = _mm256_cvtepu8_epi16(v_b0);
-        const __m256i v_d_w = _mm256_sub_epi16(v_a_w, v_b_w);
-        sum = _mm256_add_epi32(sum, _mm256_madd_epi16(v_d_w, v_d_w));
-        a += a_stride;
-        b += b_stride;
-        y += 1;
+        const __m128i v_b1 = xx_loadu_128(b + b_stride);
+        const __m256i v_a =
+            _mm256_insertf128_si256(_mm256_castsi128_si256(v_a0), v_a1, 0x01);
+        const __m256i v_b =
+            _mm256_insertf128_si256(_mm256_castsi128_si256(v_b0), v_b1, 0x01);
+        const __m256i v_al = _mm256_unpacklo_epi8(v_a, zero);
+        const __m256i v_au = _mm256_unpackhi_epi8(v_a, zero);
+        const __m256i v_bl = _mm256_unpacklo_epi8(v_b, zero);
+        const __m256i v_bu = _mm256_unpackhi_epi8(v_b, zero);
+        const __m256i v_asub = _mm256_sub_epi16(v_al, v_bl);
+        const __m256i v_bsub = _mm256_sub_epi16(v_au, v_bu);
+        const __m256i temp =
+            _mm256_add_epi32(_mm256_madd_epi16(v_asub, v_asub),
+                             _mm256_madd_epi16(v_bsub, v_bsub));
+        sum = _mm256_add_epi32(sum, temp);
+        a += a_stride << 1;
+        b += b_stride << 1;
+        y += 2;
       } while (y < height);
       sse = summary_all_avx2(&sum);
       break;

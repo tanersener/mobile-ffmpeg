@@ -33,7 +33,7 @@ void ifd_clear(insp_frame_data *fd) {
 
 /* TODO(negge) This function may be called by more than one thread when using
                a multi-threaded decoder and this may cause a data race. */
-int ifd_inspect(insp_frame_data *fd, void *decoder) {
+int ifd_inspect(insp_frame_data *fd, void *decoder, int skip_not_transform) {
   struct AV1Decoder *pbi = (struct AV1Decoder *)decoder;
   AV1_COMMON *const cm = &pbi->common;
 
@@ -111,13 +111,19 @@ int ifd_inspect(insp_frame_data *fd, void *decoder) {
       else
         mi->tx_size = mbmi->tx_size;
 
+      if (skip_not_transform && mi->skip) mi->tx_size = -1;
+
       mi->tx_type =
           (mi->skip ? 0 : mbmi->txk_type[av1_get_txk_type_index(bsize, r, c)]);
+      if (skip_not_transform &&
+          (mi->skip || mbmi->tx_skip[av1_get_txk_type_index(bsize, r, c)]))
+        mi->tx_type = -1;
 
       mi->cdef_level = cm->cdef_info.cdef_strengths[mbmi->cdef_strength] /
                        CDEF_SEC_STRENGTHS;
       mi->cdef_strength = cm->cdef_info.cdef_strengths[mbmi->cdef_strength] %
                           CDEF_SEC_STRENGTHS;
+
       mi->cdef_strength += mi->cdef_strength == 3;
       if (mbmi->uv_mode == UV_CFL_PRED) {
         mi->cfl_alpha_idx = mbmi->cfl_alpha_idx;

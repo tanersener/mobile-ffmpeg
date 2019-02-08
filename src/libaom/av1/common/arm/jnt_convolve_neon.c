@@ -315,7 +315,7 @@ static INLINE void compute_avg_8x4(
   }
 }
 
-static INLINE void jnt_convolve_2d_horiz_neon(
+static INLINE void dist_wtd_convolve_2d_horiz_neon(
     const uint8_t *src, int src_stride, int16_t *im_block, const int im_stride,
     int16_t *x_filter_tmp, const int im_h, int w, const int round_0) {
   const int bd = 8;
@@ -559,7 +559,7 @@ static INLINE void jnt_convolve_2d_horiz_neon(
   }
 }
 
-static INLINE void jnt_convolve_2d_vert_neon(
+static INLINE void dist_wtd_convolve_2d_vert_neon(
     int16_t *im_block, const int im_stride, uint8_t *dst8, int dst8_stride,
     ConvolveParams *conv_params, const int16_t *y_filter, int h, int w) {
   uint8_t *dst_u8_ptr, *d_u8;
@@ -713,12 +713,12 @@ static INLINE void jnt_convolve_2d_vert_neon(
   } while (w > 0);
 }
 
-void av1_jnt_convolve_2d_neon(const uint8_t *src, int src_stride, uint8_t *dst8,
-                              int dst8_stride, int w, int h,
-                              const InterpFilterParams *filter_params_x,
-                              const InterpFilterParams *filter_params_y,
-                              const int subpel_x_q4, const int subpel_y_q4,
-                              ConvolveParams *conv_params) {
+void av1_dist_wtd_convolve_2d_neon(const uint8_t *src, int src_stride,
+                                   uint8_t *dst8, int dst8_stride, int w, int h,
+                                   const InterpFilterParams *filter_params_x,
+                                   const InterpFilterParams *filter_params_y,
+                                   const int subpel_x_q4, const int subpel_y_q4,
+                                   ConvolveParams *conv_params) {
   assert(!(w % 4));
   assert(!(h % 4));
 
@@ -744,19 +744,18 @@ void av1_jnt_convolve_2d_neon(const uint8_t *src, int src_stride, uint8_t *dst8,
   filter_x_coef = vshrq_n_s16(filter_x_coef, 1);
   vst1q_s16(&x_filter_tmp[0], filter_x_coef);
 
-  jnt_convolve_2d_horiz_neon(src_ptr, src_stride, im_block, im_stride,
-                             x_filter_tmp, im_h, w, round_0);
+  dist_wtd_convolve_2d_horiz_neon(src_ptr, src_stride, im_block, im_stride,
+                                  x_filter_tmp, im_h, w, round_0);
 
-  jnt_convolve_2d_vert_neon(im_block, im_stride, dst8, dst8_stride, conv_params,
-                            y_filter, h, w);
+  dist_wtd_convolve_2d_vert_neon(im_block, im_stride, dst8, dst8_stride,
+                                 conv_params, y_filter, h, w);
 }
 
-void av1_jnt_convolve_2d_copy_neon(const uint8_t *src, int src_stride,
-                                   uint8_t *dst8, int dst8_stride, int w, int h,
-                                   const InterpFilterParams *filter_params_x,
-                                   const InterpFilterParams *filter_params_y,
-                                   const int subpel_x_q4, const int subpel_y_q4,
-                                   ConvolveParams *conv_params) {
+void av1_dist_wtd_convolve_2d_copy_neon(
+    const uint8_t *src, int src_stride, uint8_t *dst8, int dst8_stride, int w,
+    int h, const InterpFilterParams *filter_params_x,
+    const InterpFilterParams *filter_params_y, const int subpel_x_q4,
+    const int subpel_y_q4, ConvolveParams *conv_params) {
   uint8x8_t res0_8, res1_8, res2_8, res3_8, tmp_shift0, tmp_shift1, tmp_shift2,
       tmp_shift3;
   uint16x8_t res_q0, res_q1, res_q2, res_q3, tmp_q0, tmp_q1, tmp_q2, tmp_q3;
@@ -877,12 +876,12 @@ void av1_jnt_convolve_2d_copy_neon(const uint8_t *src, int src_stride,
   }
 }
 
-void av1_jnt_convolve_x_neon(const uint8_t *src, int src_stride, uint8_t *dst8,
-                             int dst8_stride, int w, int h,
-                             const InterpFilterParams *filter_params_x,
-                             const InterpFilterParams *filter_params_y,
-                             const int subpel_x_q4, const int subpel_y_q4,
-                             ConvolveParams *conv_params) {
+void av1_dist_wtd_convolve_x_neon(const uint8_t *src, int src_stride,
+                                  uint8_t *dst8, int dst8_stride, int w, int h,
+                                  const InterpFilterParams *filter_params_x,
+                                  const InterpFilterParams *filter_params_y,
+                                  const int subpel_x_q4, const int subpel_y_q4,
+                                  ConvolveParams *conv_params) {
   assert(!(w % 4));
   assert(!(h % 4));
 
@@ -1340,12 +1339,12 @@ void av1_jnt_convolve_x_neon(const uint8_t *src, int src_stride, uint8_t *dst8,
   }
 }
 
-void av1_jnt_convolve_y_neon(const uint8_t *src, int src_stride, uint8_t *dst8,
-                             int dst8_stride, int w, int h,
-                             const InterpFilterParams *filter_params_x,
-                             const InterpFilterParams *filter_params_y,
-                             const int subpel_x_q4, const int subpel_y_q4,
-                             ConvolveParams *conv_params) {
+void av1_dist_wtd_convolve_y_neon(const uint8_t *src, int src_stride,
+                                  uint8_t *dst8, int dst8_stride, int w, int h,
+                                  const InterpFilterParams *filter_params_x,
+                                  const InterpFilterParams *filter_params_y,
+                                  const int subpel_x_q4, const int subpel_y_q4,
+                                  ConvolveParams *conv_params) {
   assert(!(w % 4));
   assert(!(h % 4));
 

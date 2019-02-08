@@ -64,6 +64,7 @@ list(APPEND AOM_UNIT_TEST_ENCODER_SOURCES
             "${AOM_ROOT}/test/encode_test_driver.cc"
             "${AOM_ROOT}/test/encode_test_driver.h"
             "${AOM_ROOT}/test/end_to_end_test.cc"
+            "${AOM_ROOT}/test/rt_end_to_end_test.cc"
             "${AOM_ROOT}/test/error_resilience_test.cc"
             "${AOM_ROOT}/test/frame_size_tests.cc"
             "${AOM_ROOT}/test/horz_superres_test.cc"
@@ -233,13 +234,6 @@ if(ENABLE_TESTS)
               "make sure it's in your PATH.")
   endif()
 
-  if(MSVC) # Force static run time to avoid collisions with googletest.
-    include("${AOM_ROOT}/build/cmake/msvc_runtime.cmake")
-    if(BUILD_SHARED_LIBS)
-      set(AOM_DISABLE_GTEST_CMAKE 1)
-    endif()
-  endif()
-
   if(BUILD_SHARED_LIBS AND APPLE) # Silence an RPATH warning.
     set(CMAKE_MACOSX_RPATH 1)
   endif()
@@ -247,15 +241,16 @@ if(ENABLE_TESTS)
   include_directories(
     "${AOM_ROOT}/third_party/googletest/src/googletest/include")
 
-  if(AOM_DISABLE_GTEST_CMAKE)
-    include_directories("${AOM_ROOT}/third_party/googletest/src/googletest")
-    add_library(
-      gtest
-      STATIC
-      "${AOM_ROOT}/third_party/googletest/src/googletest/src/gtest-all.cc")
+  include_directories("${AOM_ROOT}/third_party/googletest/src/googletest")
+  add_library(
+    aom_gtest
+    STATIC "${AOM_ROOT}/third_party/googletest/src/googletest/src/gtest-all.cc")
+  if(MSVC OR WIN32)
+    target_compile_definitions(aom_gtest PRIVATE GTEST_OS_WINDOWS=1)
+  elseif(CONFIG_MULTITHREAD AND CMAKE_USE_PTHREADS_INIT)
+    target_compile_definitions(aom_gtest PRIVATE GTEST_HAS_PTHREAD=1)
   else()
-    add_subdirectory("${AOM_ROOT}/third_party/googletest/src/googletest"
-                     EXCLUDE_FROM_ALL)
+    target_compile_definitions(aom_gtest PRIVATE GTEST_HAS_PTHREAD=0)
   endif()
 endif()
 
@@ -307,12 +302,12 @@ function(setup_aom_test_targets)
       add_executable(test_intra_pred_speed ${AOM_TEST_INTRA_PRED_SPEED_SOURCES}
                      $<TARGET_OBJECTS:aom_common_app_util>)
       target_link_libraries(test_intra_pred_speed ${AOM_LIB_LINK_TYPE} aom
-                            gtest)
+                            aom_gtest)
       list(APPEND AOM_APP_TARGETS test_intra_pred_speed)
     endif()
   endif()
 
-  target_link_libraries(test_libaom ${AOM_LIB_LINK_TYPE} aom gtest)
+  target_link_libraries(test_libaom ${AOM_LIB_LINK_TYPE} aom aom_gtest)
 
   if(CONFIG_LIBYUV)
     target_sources(test_libaom PRIVATE $<TARGET_OBJECTS:yuv>)

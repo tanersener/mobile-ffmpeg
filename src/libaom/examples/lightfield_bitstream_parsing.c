@@ -211,6 +211,8 @@ int main(int argc, char **argv) {
   num_references = (int)strtol(argv[3], NULL, 0);
   info = aom_video_reader_get_info(reader);
 
+  aom_video_reader_set_fourcc(reader, AV1_FOURCC);
+
   // The writer to write out ivf file in tile list OBU, which can be decoded by
   // AV1 decoder.
   writer = aom_video_writer_open(argv[2], kContainerIVF, info);

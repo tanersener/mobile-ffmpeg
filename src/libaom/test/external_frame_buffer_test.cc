@@ -58,7 +58,7 @@ class ExternalFrameBufferList {
 
   // Searches the frame buffer list for a free frame buffer. Makes sure
   // that the frame buffer is at least |min_size| in bytes. Marks that the
-  // frame buffer is in use by libvpx. Finally sets |fb| to point to the
+  // frame buffer is in use by libaom. Finally sets |fb| to point to the
   // external frame buffer. Returns < 0 on an error.
   int GetFreeFrameBuffer(size_t min_size, aom_codec_frame_buffer_t *fb) {
     EXPECT_TRUE(fb != NULL);
@@ -114,9 +114,9 @@ class ExternalFrameBufferList {
     return 0;
   }
 
-  // Checks that the ximage data is contained within the external frame buffer
-  // private data passed back in the ximage.
-  void CheckXImageFrameBuffer(const aom_image_t *img) {
+  // Checks that the aom_image_t data is contained within the external frame
+  // buffer private data passed back in the aom_image_t.
+  void CheckImageFrameBuffer(const aom_image_t *img) {
     if (img->fb_priv != NULL) {
       const struct ExternalFrameBuffer *const ext_fb =
           reinterpret_cast<ExternalFrameBuffer *>(img->fb_priv);
@@ -158,7 +158,7 @@ class ExternalFrameBufferList {
 
 #if CONFIG_WEBM_IO
 
-// Callback used by libvpx to request the application to return a frame
+// Callback used by libaom to request the application to return a frame
 // buffer of at least |min_size| in bytes.
 int get_aom_frame_buffer(void *user_priv, size_t min_size,
                          aom_codec_frame_buffer_t *fb) {
@@ -167,7 +167,7 @@ int get_aom_frame_buffer(void *user_priv, size_t min_size,
   return fb_list->GetFreeFrameBuffer(min_size, fb);
 }
 
-// Callback used by libvpx to tell the application that |fb| is not needed
+// Callback used by libaom to tell the application that |fb| is not needed
 // anymore.
 int release_aom_frame_buffer(void *user_priv, aom_codec_frame_buffer_t *fb) {
   ExternalFrameBufferList *const fb_list =
@@ -218,7 +218,7 @@ class ExternalFrameBufferMD5Test
       const libaom_test::CompressedVideoSource &video,
       libaom_test::Decoder *decoder) {
     if (num_buffers_ > 0 && video.frame_number() == 0) {
-      // Have libvpx use frame buffers we create.
+      // Have libaom use frame buffers we create.
       ASSERT_TRUE(fb_list_.CreateBufferList(num_buffers_));
       ASSERT_EQ(AOM_CODEC_OK,
                 decoder->SetFrameBufferFunctions(GetAV1FrameBuffer,
@@ -299,7 +299,7 @@ class ExternalFrameBufferMD5Test
 const char kAV1TestFile[] = "av1-1-b8-03-sizeup.mkv";
 const char kAV1NonRefTestFile[] = "av1-1-b8-01-size-226x226.ivf";
 
-// Class for testing passing in external frame buffers to libvpx.
+// Class for testing passing in external frame buffers to libaom.
 class ExternalFrameBufferTest : public ::testing::Test {
  protected:
   ExternalFrameBufferTest() : video_(NULL), decoder_(NULL), num_buffers_(0) {}
@@ -322,7 +322,7 @@ class ExternalFrameBufferTest : public ::testing::Test {
     video_ = NULL;
   }
 
-  // Passes the external frame buffer information to libvpx.
+  // Passes the external frame buffer information to libaom.
   aom_codec_err_t SetFrameBufferFunctions(
       int num_buffers, aom_get_frame_buffer_cb_fn_t cb_get,
       aom_release_frame_buffer_cb_fn_t cb_release) {
@@ -359,7 +359,7 @@ class ExternalFrameBufferTest : public ::testing::Test {
 
     // Get decompressed data
     while ((img = dec_iter.Next()) != NULL) {
-      fb_list_.CheckXImageFrameBuffer(img);
+      fb_list_.CheckImageFrameBuffer(img);
     }
   }
 
@@ -390,7 +390,7 @@ class ExternalFrameBufferNonRefTest : public ExternalFrameBufferTest {
 #endif  // CONFIG_WEBM_IO
 
 // This test runs through the set of test vectors, and decodes them.
-// Libvpx will call into the application to allocate a frame buffer when
+// Libaom will call into the application to allocate a frame buffer when
 // needed. The md5 checksums are computed for each frame in the video file.
 // If md5 checksums match the correct md5 data, then the test is passed.
 // Otherwise, the test failed.

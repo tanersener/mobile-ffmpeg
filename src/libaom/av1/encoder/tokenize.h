@@ -38,11 +38,11 @@ struct tokenize_b_args {
   uint8_t allow_update_cdf;
 };
 
-typedef enum {
+enum {
   OUTPUT_ENABLED = 0,
   DRY_RUN_NORMAL,
   DRY_RUN_COSTCOEFFS,
-} RUN_TYPE;
+} UENUM1BYTE(RUN_TYPE);
 
 // Note in all the tokenize functions rate if non NULL is incremented
 // with the coefficient token cost only if dry_run = DRY_RUN_COSTCOEFS,

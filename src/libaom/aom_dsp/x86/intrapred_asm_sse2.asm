@@ -27,23 +27,6 @@ pw2_32:  times 8 dw 16
 
 SECTION .text
 
-; ------------------------------------------
-; input: x, y, z, result
-;
-; trick from pascal
-; (x+2y+z+2)>>2 can be calculated as:
-; result = avg(x,z)
-; result -= xor(x,z) & 1
-; result = avg(result,y)
-; ------------------------------------------
-%macro X_PLUS_2Y_PLUS_Z_PLUS_2_RSH_2 4
-  pavgb               %4, %1, %3
-  pxor                %3, %1
-  pand                %3, [GLOBAL(pb_1)]
-  psubb               %4, %3
-  pavgb               %4, %2
-%endmacro
-
 INIT_XMM sse2
 cglobal dc_predictor_4x4, 4, 5, 3, dst, stride, above, left, goffset
   GET_GOT     goffsetq

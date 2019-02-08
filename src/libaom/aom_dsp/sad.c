@@ -54,12 +54,12 @@ static INLINE unsigned int sad(const uint8_t *a, int a_stride, const uint8_t *b,
     aom_comp_avg_pred(comp_pred, second_pred, m, n, ref, ref_stride);         \
     return sad(src, src_stride, comp_pred, m, m, n);                          \
   }                                                                           \
-  unsigned int aom_jnt_sad##m##x##n##_avg_c(                                  \
+  unsigned int aom_dist_wtd_sad##m##x##n##_avg_c(                             \
       const uint8_t *src, int src_stride, const uint8_t *ref, int ref_stride, \
-      const uint8_t *second_pred, const JNT_COMP_PARAMS *jcp_param) {         \
+      const uint8_t *second_pred, const DIST_WTD_COMP_PARAMS *jcp_param) {    \
     uint8_t comp_pred[m * n];                                                 \
-    aom_jnt_comp_avg_pred_c(comp_pred, second_pred, m, n, ref, ref_stride,    \
-                            jcp_param);                                       \
+    aom_dist_wtd_comp_avg_pred_c(comp_pred, second_pred, m, n, ref,           \
+                                 ref_stride, jcp_param);                      \
     return sad(src, src_stride, comp_pred, m, m, n);                          \
   }
 
@@ -208,12 +208,13 @@ static INLINE unsigned int highbd_sadb(const uint8_t *a8, int a_stride,
                              ref, ref_stride);                                 \
     return highbd_sadb(src, src_stride, comp_pred, m, m, n);                   \
   }                                                                            \
-  unsigned int aom_highbd_jnt_sad##m##x##n##_avg_c(                            \
+  unsigned int aom_highbd_dist_wtd_sad##m##x##n##_avg_c(                       \
       const uint8_t *src, int src_stride, const uint8_t *ref, int ref_stride,  \
-      const uint8_t *second_pred, const JNT_COMP_PARAMS *jcp_param) {          \
+      const uint8_t *second_pred, const DIST_WTD_COMP_PARAMS *jcp_param) {     \
     uint16_t comp_pred[m * n];                                                 \
-    aom_highbd_jnt_comp_avg_pred(CONVERT_TO_BYTEPTR(comp_pred), second_pred,   \
-                                 m, n, ref, ref_stride, jcp_param);            \
+    aom_highbd_dist_wtd_comp_avg_pred(CONVERT_TO_BYTEPTR(comp_pred),           \
+                                      second_pred, m, n, ref, ref_stride,      \
+                                      jcp_param);                              \
     return highbd_sadb(src, src_stride, comp_pred, m, m, n);                   \
   }
 

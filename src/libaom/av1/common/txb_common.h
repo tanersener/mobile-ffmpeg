@@ -159,6 +159,19 @@ static INLINE int get_br_ctx_2d(const uint8_t *const levels,
   return mag + 14;
 }
 
+static AOM_FORCE_INLINE int get_br_ctx_eob(const int c,  // raster order
+                                           const int bwl,
+                                           const TX_CLASS tx_class) {
+  const int row = c >> bwl;
+  const int col = c - (row << bwl);
+  if (c == 0) return 0;
+  if ((tx_class == TX_CLASS_2D && row < 2 && col < 2) ||
+      (tx_class == TX_CLASS_HORIZ && col == 0) ||
+      (tx_class == TX_CLASS_VERT && row == 0))
+    return 7;
+  return 14;
+}
+
 static AOM_FORCE_INLINE int get_br_ctx(const uint8_t *const levels,
                                        const int c,  // raster order
                                        const int bwl, const TX_CLASS tx_class) {
@@ -272,12 +285,10 @@ static AOM_FORCE_INLINE int get_nz_map_ctx_from_stats(
       const int row = coeff_idx >> bwl;
       const int col = coeff_idx - (row << bwl);
       return ctx + nz_map_ctx_offset_1d[col];
-      break;
     }
     case TX_CLASS_VERT: {
       const int row = coeff_idx >> bwl;
       return ctx + nz_map_ctx_offset_1d[row];
-      break;
     }
     default: break;
   }

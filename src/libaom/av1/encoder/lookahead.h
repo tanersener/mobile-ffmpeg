@@ -46,7 +46,8 @@ struct lookahead_ctx {
  */
 struct lookahead_ctx *av1_lookahead_init(
     unsigned int width, unsigned int height, unsigned int subsampling_x,
-    unsigned int subsampling_y, int use_highbitdepth, unsigned int depth);
+    unsigned int subsampling_y, int use_highbitdepth, unsigned int depth,
+    const int border_in_pixels);
 
 /**\brief Destroys the lookahead stage
  */

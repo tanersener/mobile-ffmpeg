@@ -27,6 +27,7 @@ typedef struct QUANT_PARAM {
   TX_SIZE tx_size;
   const qm_val_t *qmatrix;
   const qm_val_t *iqmatrix;
+  int use_quant_b_adapt;
 } QUANT_PARAM;
 
 typedef void (*AV1_QUANT_FACADE)(const tran_low_t *coeff_ptr, intptr_t n_coeffs,

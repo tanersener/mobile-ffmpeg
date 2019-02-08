@@ -172,9 +172,9 @@ static INLINE void add_store_aligned_256(CONV_BUF_TYPE *const dst,
 static INLINE __m256i comp_avg(const __m256i *const data_ref_0,
                                const __m256i *const res_unsigned,
                                const __m256i *const wt,
-                               const int use_jnt_comp_avg) {
+                               const int use_dist_wtd_comp_avg) {
   __m256i res;
-  if (use_jnt_comp_avg) {
+  if (use_dist_wtd_comp_avg) {
     const __m256i data_lo = _mm256_unpacklo_epi16(*data_ref_0, *res_unsigned);
     const __m256i data_hi = _mm256_unpackhi_epi16(*data_ref_0, *res_unsigned);
 
@@ -206,9 +206,9 @@ static INLINE __m256i highbd_comp_avg(const __m256i *const data_ref_0,
                                       const __m256i *const res_unsigned,
                                       const __m256i *const wt0,
                                       const __m256i *const wt1,
-                                      const int use_jnt_comp_avg) {
+                                      const int use_dist_wtd_comp_avg) {
   __m256i res;
-  if (use_jnt_comp_avg) {
+  if (use_dist_wtd_comp_avg) {
     const __m256i wt0_res = _mm256_mullo_epi32(*data_ref_0, *wt0);
     const __m256i wt1_res = _mm256_mullo_epi32(*res_unsigned, *wt1);
     const __m256i wt_res = _mm256_add_epi32(wt0_res, wt1_res);

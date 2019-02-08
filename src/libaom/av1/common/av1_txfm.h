@@ -110,7 +110,7 @@ typedef void (*TxfmFunc)(const int32_t *input, int32_t *output, int8_t cos_bit,
 typedef void (*FwdTxfm2dFunc)(const int16_t *input, int32_t *output, int stride,
                               TX_TYPE tx_type, int bd);
 
-typedef enum TXFM_TYPE {
+enum {
   TXFM_TYPE_DCT4,
   TXFM_TYPE_DCT8,
   TXFM_TYPE_DCT16,
@@ -125,7 +125,7 @@ typedef enum TXFM_TYPE {
   TXFM_TYPE_IDENTITY32,
   TXFM_TYPES,
   TXFM_TYPE_INVALID,
-} TXFM_TYPE;
+} UENUM1BYTE(TXFM_TYPE);
 
 typedef struct TXFM_2D_FLIP_CFG {
   TX_SIZE tx_size;

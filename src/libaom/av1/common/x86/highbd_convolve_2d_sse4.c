@@ -21,7 +21,7 @@
 #include "aom_dsp/x86/convolve_sse4_1.h"
 #include "av1/common/convolve.h"
 
-void av1_highbd_jnt_convolve_2d_copy_sse4_1(
+void av1_highbd_dist_wtd_convolve_2d_copy_sse4_1(
     const uint16_t *src, int src_stride, uint16_t *dst0, int dst_stride0, int w,
     int h, const InterpFilterParams *filter_params_x,
     const InterpFilterParams *filter_params_y, const int subpel_x_q4,
@@ -168,7 +168,7 @@ void av1_highbd_jnt_convolve_2d_copy_sse4_1(
   }
 }
 
-void av1_highbd_jnt_convolve_2d_sse4_1(
+void av1_highbd_dist_wtd_convolve_2d_sse4_1(
     const uint16_t *src, int src_stride, uint16_t *dst0, int dst_stride0, int w,
     int h, const InterpFilterParams *filter_params_x,
     const InterpFilterParams *filter_params_y, const int subpel_x_q4,

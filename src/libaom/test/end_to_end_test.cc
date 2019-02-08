@@ -53,6 +53,13 @@ typedef struct {
   unsigned int profile;
 } TestVideoParam;
 
+std::ostream &operator<<(std::ostream &os, const TestVideoParam &test_arg) {
+  return os << "TestVideoParam { filename:" << test_arg.filename
+            << " input_bit_depth:" << test_arg.input_bit_depth
+            << " fmt:" << test_arg.fmt << " bit_depth:" << test_arg.bit_depth
+            << " profile:" << test_arg.profile << "}";
+}
+
 const TestVideoParam kTestVectors[] = {
   { "park_joy_90p_8_420.y4m", 8, AOM_IMG_FMT_I420, AOM_BITS_8, 0 },
   { "park_joy_90p_8_422.y4m", 8, AOM_IMG_FMT_I422, AOM_BITS_8, 2 },

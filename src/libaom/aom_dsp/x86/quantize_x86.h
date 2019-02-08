@@ -75,3 +75,23 @@ static INLINE int16_t accumulate_eob(__m128i eob) {
   eob = _mm_max_epi16(eob, eob_shuffled);
   return _mm_extract_epi16(eob, 1);
 }
+
+static INLINE __m128i load_coefficients(const tran_low_t *coeff_ptr) {
+  assert(sizeof(tran_low_t) == 4);
+  const __m128i coeff1 = _mm_load_si128((__m128i *)(coeff_ptr));
+  const __m128i coeff2 = _mm_load_si128((__m128i *)(coeff_ptr + 4));
+  return _mm_packs_epi32(coeff1, coeff2);
+}
+
+static INLINE void store_coefficients(__m128i coeff_vals,
+                                      tran_low_t *coeff_ptr) {
+  assert(sizeof(tran_low_t) == 4);
+
+  __m128i one = _mm_set1_epi16(1);
+  __m128i coeff_vals_hi = _mm_mulhi_epi16(coeff_vals, one);
+  __m128i coeff_vals_lo = _mm_mullo_epi16(coeff_vals, one);
+  __m128i coeff_vals_1 = _mm_unpacklo_epi16(coeff_vals_lo, coeff_vals_hi);
+  __m128i coeff_vals_2 = _mm_unpackhi_epi16(coeff_vals_lo, coeff_vals_hi);
+  _mm_store_si128((__m128i *)(coeff_ptr), coeff_vals_1);
+  _mm_store_si128((__m128i *)(coeff_ptr + 4), coeff_vals_2);
+}

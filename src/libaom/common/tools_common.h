@@ -18,6 +18,7 @@
 #include "aom/aom_codec.h"
 #include "aom/aom_image.h"
 #include "aom/aom_integer.h"
+#include "aom_ports/mem.h"
 #include "aom_ports/msvc.h"
 
 #if CONFIG_AV1_ENCODER
@@ -78,11 +79,14 @@ enum VideoFileType {
 };
 
 // Used in lightfield example.
-typedef enum OUTPUT_FORMAT {
+enum {
   YUV1D,  // 1D tile output for conformance test.
   YUV,    // Tile output in YUV format.
   NV12,   // Tile output in NV12 format.
-} OUTPUT_FORMAT;
+} UENUM1BYTE(OUTPUT_FORMAT);
+
+// The fourcc for large_scale_tile encoding is "LSTC".
+#define LST_FOURCC 0x4354534c
 
 struct FileTypeDetectionBuffer {
   char buf[4];
@@ -149,6 +153,7 @@ typedef struct AvxInterface {
 int get_aom_encoder_count(void);
 const AvxInterface *get_aom_encoder_by_index(int i);
 const AvxInterface *get_aom_encoder_by_name(const char *name);
+const AvxInterface *get_aom_lst_encoder(void);
 
 int get_aom_decoder_count(void);
 const AvxInterface *get_aom_decoder_by_index(int i);

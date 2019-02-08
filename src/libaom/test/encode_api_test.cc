@@ -50,7 +50,7 @@ TEST(EncodeAPI, InvalidParams) {
     EXPECT_EQ(AOM_CODEC_INVALID_PARAM,
               aom_codec_enc_init(&enc, kCodecs[i], NULL, 0));
     EXPECT_EQ(AOM_CODEC_INVALID_PARAM,
-              aom_codec_enc_config_default(kCodecs[i], &cfg, 1));
+              aom_codec_enc_config_default(kCodecs[i], &cfg, 2));
 
     EXPECT_EQ(AOM_CODEC_OK, aom_codec_enc_config_default(kCodecs[i], &cfg, 0));
     EXPECT_EQ(AOM_CODEC_OK, aom_codec_enc_init(&enc, kCodecs[i], &cfg, 0));

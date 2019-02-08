@@ -43,7 +43,7 @@ static void subtract_block(const MACROBLOCKD *xd, int rows, int cols,
                            const uint8_t *src8, ptrdiff_t src_stride,
                            const uint8_t *pred8, ptrdiff_t pred_stride) {
   if (check_subtract_block_size(rows, cols)) {
-    if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) {
+    if (is_cur_buf_hbd(xd)) {
       aom_highbd_subtract_block_c(rows, cols, diff, diff_stride, src8,
                                   src_stride, pred8, pred_stride, xd->bd);
       return;
@@ -54,7 +54,7 @@ static void subtract_block(const MACROBLOCKD *xd, int rows, int cols,
     return;
   }
 
-  if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) {
+  if (is_cur_buf_hbd(xd)) {
     aom_highbd_subtract_block(rows, cols, diff, diff_stride, src8, src_stride,
                               pred8, pred_stride, xd->bd);
     return;
@@ -116,11 +116,11 @@ int av1_optimize_b(const struct AV1_COMP *cpi, MACROBLOCK *mb, int plane,
                               rate_cost, cpi->oxcf.sharpness);
 }
 
-typedef enum QUANT_FUNC {
+enum {
   QUANT_FUNC_LOWBD = 0,
   QUANT_FUNC_HIGHBD = 1,
   QUANT_FUNC_TYPES = 2
-} QUANT_FUNC;
+} UENUM1BYTE(QUANT_FUNC);
 
 static AV1_QUANT_FACADE
     quant_func_list[AV1_XFORM_QUANT_TYPES][QUANT_FUNC_TYPES] = {
@@ -163,6 +163,7 @@ void av1_xform_quant(const AV1_COMMON *cm, MACROBLOCK *x, int plane, int block,
   qparam.tx_size = tx_size;
   qparam.qmatrix = qmatrix;
   qparam.iqmatrix = iqmatrix;
+  qparam.use_quant_b_adapt = cm->use_quant_b_adapt;
   TxfmParam txfm_param;
   txfm_param.tx_type = tx_type;
   txfm_param.tx_size = tx_size;
@@ -171,7 +172,7 @@ void av1_xform_quant(const AV1_COMMON *cm, MACROBLOCK *x, int plane, int block,
       txfm_param.tx_size, is_inter_block(mbmi), cm->reduced_tx_set_used);
 
   txfm_param.bd = xd->bd;
-  txfm_param.is_hbd = get_bitdepth_data_path_index(xd);
+  txfm_param.is_hbd = is_cur_buf_hbd(xd);
 
   av1_fwd_txfm(src_diff, coeff, diff_stride, &txfm_param);
 
@@ -226,7 +227,7 @@ static void encode_block(int plane, int block, int blk_row, int blk_col,
   if (!is_blk_skip(x, plane, blk_row * bw + blk_col) && !mbmi->skip_mode) {
     TX_TYPE tx_type = av1_get_tx_type(pd->plane_type, xd, blk_row, blk_col,
                                       tx_size, cm->reduced_tx_set_used);
-    if (args->enable_optimize_b) {
+    if (args->enable_optimize_b != NO_TRELLIS_OPT) {
       av1_xform_quant(cm, x, plane, block, blk_row, blk_col, plane_bsize,
                       tx_size, tx_type, AV1_XFORM_QUANT_FP);
       TXB_CTX txb_ctx;
@@ -431,7 +432,7 @@ static void encode_block_pass1(int plane, int block, int blk_row, int blk_col,
 
   if (p->eobs[block] > 0) {
     txfm_param.bd = xd->bd;
-    txfm_param.is_hbd = get_bitdepth_data_path_index(xd);
+    txfm_param.is_hbd = is_cur_buf_hbd(xd);
     txfm_param.tx_type = DCT_DCT;
     txfm_param.tx_size = tx_size;
     txfm_param.eob = p->eobs[block];
@@ -578,7 +579,7 @@ void av1_encode_block_intra(int plane, int block, int blk_row, int blk_col,
 
     const ENTROPY_CONTEXT *a = &args->ta[blk_col];
     const ENTROPY_CONTEXT *l = &args->tl[blk_row];
-    if (args->enable_optimize_b) {
+    if (args->enable_optimize_b != NO_TRELLIS_OPT) {
       av1_xform_quant(cm, x, plane, block, blk_row, blk_col, plane_bsize,
                       tx_size, tx_type, AV1_XFORM_QUANT_FP);
       TXB_CTX txb_ctx;

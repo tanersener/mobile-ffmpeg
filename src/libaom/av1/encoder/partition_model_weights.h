@@ -2572,14 +2572,20 @@ static const float av1_op_svm_early_term_std_16[FEATURE_SIZE] = {
 #undef FEATURE_SIZE
 #endif  // CONFIG_ONE_PASS_SVM
 
-// Below are the models used for full_pixel_motion_search_based_split
+// Below are the models used for simple_motion_search_based_split
+static const float av1_simple_motion_search_based_split_thresh_128 = 2.0f;
+static const float av1_simple_motion_search_based_split_thresh_64 = 2.0f;
+static const float av1_simple_motion_search_based_split_thresh_32 = 2.0f;
+static const float av1_simple_motion_search_based_split_thresh_16 = 2.0f;
+static const float av1_simple_motion_search_based_split_thresh_8 = 2.0f;
+
 // BLOCK_128X128
 #define NUM_HIDDEN_LAYERS_128 1
 #define NUM_FEATURES_128 6
 #define NUM_LAYER_0_UNITS_128 16
 #define NUM_LOGITS_128 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_128[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_128[] = {
   -0.807346f,  0.242298f,   12.9862f,   -1.19161f,  5.21734f,    -1.1363f,
   -2.39127f,   0.930915f,   -2.44285f,  -2.42966f,  5.73476f,    0.0506879f,
   -0.234878f,  -0.317875f,  0.361322f,  0.431648f,  -0.39105f,   -0.110225f,
@@ -2598,23 +2604,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_128[] = {
   0.702545f,   -0.612227f,  -7.68881f,  9.52225f,   -1.18581f,   -2.56762f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_128[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_128[] = {
   0.364895f,    0.577553f,  0.115758f,  -0.999496f, 0.124885f, 3.23193f,
   -0.00386642f, 0.970794f,  0.136637f,  -4.28052f,  -1.49234f, 0.370436f,
   0.576981f,    -0.469656f, -0.124071f, 1.07669f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_128[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_128[] = {
   1.32916f,    0.817212f,  0.0f,       -0.921066f, 0.0f,      3.57649f,
   -0.0204517f, 2.97286f,   0.0f,       5.49957f,   -8.14518f, 0.0f,
   1.30826f,    -0.349536f, -0.638933f, 5.4496f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_128[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_128[] = {
   0.683442f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_128 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_128 = {
   NUM_FEATURES_128,
   NUM_LOGITS_128,
   NUM_HIDDEN_LAYERS_128,
@@ -2622,16 +2628,14 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_128 = {
       NUM_LAYER_0_UNITS_128,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_128,
-      full_pixel_motion_search_based_split_logits_kernel_128,
+      av1_simple_motion_search_based_split_layer_0_kernel_128,
+      av1_simple_motion_search_based_split_logits_kernel_128,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_128,
-      full_pixel_motion_search_based_split_logits_bias_128,
+      av1_simple_motion_search_based_split_layer_0_bias_128,
+      av1_simple_motion_search_based_split_logits_bias_128,
   },
 };
-
-static const float full_pixel_motion_search_based_split_thresh_128 = 2.0f;
 
 #undef NUM_HIDDEN_LAYERS_128
 #undef NUM_FEATURES_128
@@ -2644,7 +2648,7 @@ static const float full_pixel_motion_search_based_split_thresh_128 = 2.0f;
 #define NUM_LAYER_0_UNITS_64 16
 #define NUM_LOGITS_64 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_64[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_64[] = {
   0.0345945f,  -0.394064f,  0.0919978f, 0.270358f,  -0.384502f, -0.504608f,
   -0.25759f,   0.155981f,   2.62567f,   -10.7204f,  -0.709802f, 8.15948f,
   0.589866f,   -0.445645f,  -1.68232f,  10.0061f,   -3.17671f,  4.87259f,
@@ -2663,23 +2667,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_64[] = {
   -0.217072f,  -0.0984913f, -0.265515f, 0.360021f,  0.0779512f, 0.361516f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_64[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_64[] = {
   0.470821f, 0.474747f, -0.571292f, 0.403221f,  0.628966f,  -0.617029f,
   0.501105f, 0.499962f, -1.5451f,   -0.473518f, -0.730568f, -5.55817f,
   0.776761f, 0.42569f,  0.311925f,  0.469968f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_64[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_64[] = {
   -0.134085f, 0.0758715f, 1.10419f,  0.0f,       -5.75737f, 1.65494f,
   0.0f,       3.44047f,   0.394852f, 3.43858f,   3.65871f,  -4.84987f,
   1.21207f,   -1.7705f,   -5.46469f, -0.0889634f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_64[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_64[] = {
   -0.479491f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_64 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_64 = {
   NUM_FEATURES_64,
   NUM_LOGITS_64,
   NUM_HIDDEN_LAYERS_64,
@@ -2687,16 +2691,14 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_64 = {
       NUM_LAYER_0_UNITS_64,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_64,
-      full_pixel_motion_search_based_split_logits_kernel_64,
+      av1_simple_motion_search_based_split_layer_0_kernel_64,
+      av1_simple_motion_search_based_split_logits_kernel_64,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_64,
-      full_pixel_motion_search_based_split_logits_bias_64,
+      av1_simple_motion_search_based_split_layer_0_bias_64,
+      av1_simple_motion_search_based_split_logits_bias_64,
   },
 };
-
-static const float full_pixel_motion_search_based_split_thresh_64 = 2.0f;
 
 #undef NUM_HIDDEN_LAYERS_64
 #undef NUM_FEATURES_64
@@ -2709,7 +2711,7 @@ static const float full_pixel_motion_search_based_split_thresh_64 = 2.0f;
 #define NUM_LAYER_0_UNITS_32 16
 #define NUM_LOGITS_32 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_32[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_32[] = {
   -1.61796f,   0.0585128f,  1.57904f,   1.52703f,   0.367779f, 0.220434f,
   1.66652f,    -1.77782f,   6.41118f,   4.16976f,   4.97299f,  4.84111f,
   -0.0956536f, -0.163284f,  -0.143662f, 0.129329f,  0.449659f, -0.528844f,
@@ -2728,23 +2730,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_32[] = {
   -1.91327f,   -0.0356497f, 1.47611f,   1.27499f,   -1.76108f, -0.578954f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_32[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_32[] = {
   -0.220382f, -0.693902f, 0.424827f, 0.379952f, -0.413791f, -0.326785f,
   -0.455086f, 0.242402f,  0.307986f, 0.175746f, 0.498901f,  -0.628053f,
   0.285447f,  0.230052f,  0.415151f, -0.842946f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_32[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_32[] = {
   -1.80751f, 6.40356f,   -0.0512058f, -4.59163f, -0.369933f, -0.195755f,
   -0.16648f, -0.599755f, -5.35975f,   -1.21349f, 2.48414f,   1.07096f,
   -3.66684f, -6.17761f,  4.2159f,     -1.05286f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_32[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_32[] = {
   -2.58676f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_32 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_32 = {
   NUM_FEATURES_32,
   NUM_LOGITS_32,
   NUM_HIDDEN_LAYERS_32,
@@ -2752,16 +2754,14 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_32 = {
       NUM_LAYER_0_UNITS_32,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_32,
-      full_pixel_motion_search_based_split_logits_kernel_32,
+      av1_simple_motion_search_based_split_layer_0_kernel_32,
+      av1_simple_motion_search_based_split_logits_kernel_32,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_32,
-      full_pixel_motion_search_based_split_logits_bias_32,
+      av1_simple_motion_search_based_split_layer_0_bias_32,
+      av1_simple_motion_search_based_split_logits_bias_32,
   },
 };
-
-static const float full_pixel_motion_search_based_split_thresh_32 = 2.0f;
 
 #undef NUM_HIDDEN_LAYERS_32
 #undef NUM_FEATURES_32
@@ -2774,7 +2774,7 @@ static const float full_pixel_motion_search_based_split_thresh_32 = 2.0f;
 #define NUM_LAYER_0_UNITS_16 16
 #define NUM_LOGITS_16 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_16[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_16[] = {
   -0.611497f,  -0.0422086f, -0.555957f,   -0.632451f, -0.144179f, -0.152722f,
   -0.330265f,  -0.419866f,  0.287343f,    0.385295f,  -0.424486f, 0.424281f,
   2.27442f,    -2.47933f,   5.24731f,     4.33827f,   4.73215f,   3.41909f,
@@ -2793,23 +2793,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_16[] = {
   0.0333619f,  -0.377782f,  0.160767f,    -0.128169f, -0.484818f, -0.311973f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_16[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_16[] = {
   -0.132207f,   0.15176f,   -0.680086f, 0.605921f, -0.43294f,  0.485811f,
   -0.306286f,   0.551368f,  0.413904f,  0.548748f, -0.437391f, 0.560778f,
   -0.00685266f, -0.558657f, 0.122127f,  0.260165f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_16[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_16[] = {
   -0.200928f, -0.074132f, 8.69963f,    -9.00807f,  9.08983f, -6.83586f,
   -3.89329f,  10.4881f,   -0.0670618f, 0.0f,       9.21614f, 8.41773f,
   -0.145851f, 0.0f,       -1.43038f,   -0.0460311f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_16[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_16[] = {
   -4.19885f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_16 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_16 = {
   NUM_FEATURES_16,
   NUM_LOGITS_16,
   NUM_HIDDEN_LAYERS_16,
@@ -2817,16 +2817,14 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_16 = {
       NUM_LAYER_0_UNITS_16,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_16,
-      full_pixel_motion_search_based_split_logits_kernel_16,
+      av1_simple_motion_search_based_split_layer_0_kernel_16,
+      av1_simple_motion_search_based_split_logits_kernel_16,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_16,
-      full_pixel_motion_search_based_split_logits_bias_16,
+      av1_simple_motion_search_based_split_layer_0_bias_16,
+      av1_simple_motion_search_based_split_logits_bias_16,
   },
 };
-
-static const float full_pixel_motion_search_based_split_thresh_16 = 2.0f;
 
 #undef NUM_HIDDEN_LAYERS_16
 #undef NUM_FEATURES_16
@@ -2840,7 +2838,7 @@ static const float full_pixel_motion_search_based_split_thresh_16 = 2.0f;
 #define NUM_LAYER_0_UNITS_8 16
 #define NUM_LOGITS_8 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_8[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_8[] = {
   0.0370236f,   -0.580211f,  2.0134f,    1.69637f,    2.43181f,   -0.521648f,
   -0.00375187f, 0.122712f,   -4.74411f,  7.36187f,    5.42574f,   -5.53557f,
   0.0993344f,   -0.358843f,  0.0765453f, -0.615987f,  -0.754633f, -0.175846f,
@@ -2859,23 +2857,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_8[] = {
   0.616966f,    -0.451472f,  -0.319365f, 0.00807278f, -0.303261f, -0.351679f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_8[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_8[] = {
   -0.625847f, 0.381323f, 0.342475f, 0.526161f,  -0.665965f, -0.515317f,
   -0.406218f, 0.568007f, 0.479397f, -0.426116f, 0.615638f,  0.338572f,
   0.185583f,  0.308031f, 0.260748f, 0.531619f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_8[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_8[] = {
   4.73775f,  -1.12658f, -0.258038f, -6.06696f, 1.79131f, 2.49609f,
   4.28388f,  0.0f,      -4.63598f,  3.06034f,  5.31994f, -0.152142f,
   0.514738f, -1.30098f, 3.00296f,   -3.83481f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_8[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_8[] = {
   -3.44508f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_8 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_8 = {
   NUM_FEATURES_8,
   NUM_LOGITS_8,
   NUM_HIDDEN_LAYERS_8,
@@ -2883,22 +2881,996 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_8 = {
       NUM_LAYER_0_UNITS_8,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_8,
-      full_pixel_motion_search_based_split_logits_kernel_8,
+      av1_simple_motion_search_based_split_layer_0_kernel_8,
+      av1_simple_motion_search_based_split_logits_kernel_8,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_8,
-      full_pixel_motion_search_based_split_logits_bias_8,
+      av1_simple_motion_search_based_split_layer_0_bias_8,
+      av1_simple_motion_search_based_split_logits_bias_8,
   },
 };
 
-static const float full_pixel_motion_search_based_split_thresh_8 = 2.0f;
+#endif
+
+// Model based on simple_motion_search
+
+// Thresholds for doing a single type of partition
+// TODO(chiyotsai@google.com): Set the thresholds for PARTITION_SPLIT.
+static const float av1_simple_motion_search_prune_part_only_thresh_128[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+static const float av1_simple_motion_search_prune_part_only_thresh_64[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+static const float av1_simple_motion_search_prune_part_only_thresh_32[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+static const float av1_simple_motion_search_prune_part_only_thresh_16[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+static const float av1_simple_motion_search_prune_part_only_thresh_8[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+// Thresholds for pruning a partition type
+// TODO(chiyotsai@google.com): Retune the thresholds for rectangular partition.
+static const float av1_simple_motion_search_prune_part_prune_thresh_128[10] = {
+  0.0f, 0.0110f, 0.0110f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+};
+
+static const float av1_simple_motion_search_prune_part_prune_thresh_64[10] = {
+  0.0f, 0.0110f, 0.0110f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+};
+
+static const float av1_simple_motion_search_prune_part_prune_thresh_32[10] = {
+  0.0f, 0.0110f, 0.0110f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+};
+
+static const float av1_simple_motion_search_prune_part_prune_thresh_16[10] = {
+  0.0f, 0.0110f, 0.0110f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+};
+
+static const float av1_simple_motion_search_prune_part_prune_thresh_8[10] = {
+  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+};
+
+// Mean and std
+static const float av1_simple_motion_search_prune_part_mean_128[19] = {
+  11.561261f, 11.626691f, 10.820066f, 10.880652f, 11.193911f,
+  11.269741f, 10.509796f, 10.584754f, 12.659430f, 12.724323f,
+  12.254200f, 12.326454f, 12.632568f, 12.694887f, 11.814313f,
+  11.872458f, 13.690346f, 13.753730f, 5.165726f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_128[19] = {
+  2.434728f, 2.429037f, 3.701918f, 3.709713f, 3.288111f, 3.286657f, 4.174337f,
+  4.185339f, 2.531916f, 2.540137f, 3.488878f, 3.496263f, 2.459336f, 2.460739f,
+  3.919058f, 3.930766f, 2.511685f, 2.524923f, 2.257989f,
+};
+
+static const float av1_simple_motion_search_prune_part_mean_64[19] = {
+  10.073195f, 10.158249f, 9.627341f,  9.708094f,  9.002025f,
+  9.076430f,  8.597153f,  8.668316f,  11.021699f, 11.097507f,
+  9.852887f,  9.919513f,  11.007151f, 11.085718f, 10.525035f,
+  10.599575f, 11.936800f, 12.007580f, 4.860905f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_64[19] = {
+  2.272113f, 2.256767f, 3.023892f, 3.027094f, 3.794186f, 3.808349f, 4.143885f,
+  4.164291f, 2.262401f, 2.249636f, 4.039632f, 4.053496f, 2.234799f, 2.219867f,
+  3.136350f, 3.139975f, 2.199973f, 2.187191f, 2.185985f,
+};
+
+static const float av1_simple_motion_search_prune_part_mean_32[19] = {
+  8.499073f, 8.600074f, 8.508158f,  8.611221f,  8.498978f, 8.599821f, 8.506126f,
+  8.609448f, 9.481358f, 9.569901f,  9.481697f,  9.569918f, 9.469805f, 9.557789f,
+  9.483047f, 9.572816f, 10.416696f, 10.496502f, 4.413157f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_32[19] = {
+  2.129560f, 2.117602f, 2.115962f, 2.104043f, 2.136564f, 2.125870f, 2.125247f,
+  2.114250f, 2.146261f, 2.134374f, 2.160289f, 2.149360f, 2.116179f, 2.103744f,
+  2.099453f, 2.087138f, 2.115011f, 2.101419f, 2.024279f,
+};
+
+static const float av1_simple_motion_search_prune_part_mean_16[19] = {
+  6.990048f, 7.116367f, 6.883459f, 7.007796f, 6.993151f, 7.119445f, 6.886147f,
+  7.010345f, 7.994230f, 8.099907f, 7.998478f, 8.104088f, 7.988468f, 8.092865f,
+  7.868373f, 7.971079f, 8.946122f, 9.037547f, 3.976610f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_16[19] = {
+  1.963746f, 1.954729f, 2.127820f, 2.126451f, 1.963392f, 1.955016f, 2.126736f,
+  2.126004f, 1.991209f, 1.981070f, 1.992683f, 1.983143f, 1.986913f, 1.977408f,
+  2.200119f, 2.197786f, 1.997332f, 1.986091f, 1.829684f,
+};
+
+static const float av1_simple_motion_search_prune_part_mean_8[19] = {
+  5.362649f, 5.561670f, 5.362880f, 5.564151f, 5.365307f, 5.565139f, 5.365830f,
+  5.567452f, 6.453082f, 6.598073f, 6.458814f, 6.604363f, 6.454421f, 6.599441f,
+  6.458431f, 6.604804f, 7.469143f, 7.585015f, 3.625800f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_8[19] = {
+  1.846273f, 1.835266f, 1.846272f, 1.834365f, 1.836967f, 1.826428f, 1.837247f,
+  1.825985f, 1.886601f, 1.874138f, 1.874622f, 1.862656f, 1.877218f, 1.865398f,
+  1.874494f, 1.862057f, 1.896421f, 1.883210f, 1.670200f,
+};
+
+// BLOCK_128X128
+#define NUM_HIDDEN_LAYERS_128 1
+#define NUM_FEATURES_128 19
+#define NUM_LAYER_0_UNITS_128 24
+#define NUM_LOGITS_128 4
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_128[] = {
+  -0.12815f,   -1.2107f,    0.525183f,  0.379155f,   -2.04966f,  -0.212818f,
+  -0.0609484f, -0.119338f,  1.07054f,   -0.0304129f, 0.563817f,  -0.0204729f,
+  0.757013f,   0.464791f,   0.191185f,  0.183903f,   -2.71738f,  1.41455f,
+  -0.449089f,  -0.0344047f, 0.349133f,  -0.945292f,  0.63729f,   -0.973444f,
+  -0.203447f,  -19.7875f,   -12.7536f,  -0.260806f,  0.934733f,  -3.17648f,
+  -1.11806f,   -4.63145f,   -16.0947f,  -24.203f,    -2.94649f,  -8.34109f,
+  -0.720804f,  -5.16623f,   -0.443715f, 0.510014f,   -4.2846f,   -11.2272f,
+  0.187633f,   -10.0189f,   -0.915574f, -0.235434f,  -2.57912f,  0.151642f,
+  -0.180428f,  -0.110439f,  0.349015f,  -1.83906f,   -3.38461f,  -0.309185f,
+  -9.3706f,    -5.54824f,   0.45334f,   -8.48801f,   0.392325f,  -4.19948f,
+  -0.535814f,  -4.92133f,   0.0159878f, 0.275078f,   -2.65358f,  1.32524f,
+  -0.761795f,  -14.782f,    -4.15338f,  -0.177581f,  -0.158376f, -0.0832793f,
+  0.226712f,   -0.349409f,  0.0529463f, -0.412873f,  -0.241807f, 0.19054f,
+  0.79237f,    0.218937f,   -1.60466f,  0.845653f,   -0.287058f, 0.766271f,
+  -0.455829f,  0.00261991f, 0.506805f,  -0.0593004f, 2.25348f,   -2.29282f,
+  0.0491916f,  0.38261f,    -0.281848f, -0.17802f,   -0.472124f, 0.204326f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_128[] = {
+  0.485797f,   -0.326149f,  0.238042f,     -1.41255f,     -0.00899515f,
+  -0.715324f,  0.623049f,   0.502229f,     0.54064f,      -0.0667834f,
+  0.0591777f,  -0.435869f,  0.221466f,     -0.222184f,    0.696493f,
+  -0.514433f,  -0.771882f,  -0.080914f,    -1.58162f,     -0.214871f,
+  -0.0141856f, -0.566004f,  -1.01071f,     -0.0400122f,   -0.212581f,
+  0.144009f,   0.156065f,   0.419812f,     0.351579f,     -0.0363798f,
+  0.272286f,   0.177348f,   0.643484f,     -0.686943f,    -1.5021f,
+  -0.283203f,  -0.317958f,  0.834615f,     1.18195f,      0.704402f,
+  0.723567f,   0.0765064f,  0.0998969f,    0.358114f,     -0.471958f,
+  -0.33568f,   -0.0455057f, 0.0659417f,    0.717502f,     1.40203f,
+  -1.78214f,   -1.00743f,   -0.217992f,    -0.244456f,    -0.681988f,
+  0.199185f,   1.27797f,    0.744351f,     0.853728f,     0.976386f,
+  1.5212f,     0.246886f,   0.458125f,     -0.278508f,    -0.601164f,
+  -0.874409f,  -0.0882617f, -0.93093f,     -0.0279819f,   0.289613f,
+  -0.795015f,  1.2224f,     0.464495f,     -0.996107f,    -1.05131f,
+  0.780663f,   1.70779f,    -0.122481f,    2.64976f,      0.284897f,
+  -0.129159f,  -0.0472128f, 0.190105f,     0.549306f,     -0.829239f,
+  -2.87392f,   0.0735607f,  -1.00692f,     -0.0171315f,   0.217386f,
+  0.715055f,   1.2976f,     -0.387801f,    -0.301424f,    -0.265159f,
+  0.381381f,   -0.637641f,  0.424966f,     0.317794f,     1.99832f,
+  0.604094f,   0.444838f,   0.354898f,     -0.2603f,      -0.625206f,
+  1.37372f,    0.474128f,   1.47492f,      -0.318267f,    -0.32122f,
+  -1.29434f,   0.426303f,   -0.604944f,    -2.33438f,     -1.33476f,
+  -2.13254f,   2.28472f,    0.844804f,     0.366394f,     0.148218f,
+  -0.0996413f, -0.665787f,  1.30951f,      0.447868f,     -0.160892f,
+  0.336539f,   -0.461251f,  -0.940939f,    1.9886f,       0.774578f,
+  -0.0274317f, -0.288034f,  -0.188082f,    0.296018f,     -0.171846f,
+  0.245583f,   0.39913f,    -0.0544446f,   0.823534f,     0.215969f,
+  -0.393239f,  -0.208693f,  -0.336752f,    0.258191f,     1.03315f,
+  -0.0356378f, -0.35999f,   0.48529f,      1.09123f,      -0.243654f,
+  0.131594f,   -2.5832f,    1.26485f,      -0.700618f,    0.466223f,
+  -0.525984f,  2.19872f,    0.685663f,     1.40228f,      1.10528f,
+  0.0451285f,  -0.39981f,   -0.644025f,    -1.31137f,     0.836056f,
+  -0.884238f,  0.394441f,   -0.16017f,     -1.45246f,     -1.24252f,
+  0.195623f,   0.716485f,   -0.0522381f,   0.271321f,     0.560211f,
+  0.685537f,   -0.117774f,  -0.227596f,    0.346762f,     -0.402137f,
+  0.00528979f, 0.756388f,   0.181091f,     -0.513235f,    -0.354307f,
+  1.04355f,    -0.114563f,  0.457349f,     -0.525175f,    -1.306f,
+  -1.57685f,   -1.69919f,   0.393799f,     1.35822f,      -0.496799f,
+  0.102504f,   -0.0950497f, 0.518029f,     0.211844f,     0.385925f,
+  0.366614f,   0.52377f,    -0.22419f,     -0.209355f,    0.343361f,
+  0.0535484f,  0.320409f,   0.467987f,     -0.00542184f,  -1.02011f,
+  0.488822f,   -0.248647f,  0.113298f,     -0.665206f,    0.374419f,
+  0.731859f,   1.20004f,    -0.000319085f, -0.000491633f, -0.260543f,
+  0.804927f,   -0.410925f,  0.960751f,     0.281493f,     0.607288f,
+  -0.681745f,  -0.0925707f, -2.06876f,     -0.52926f,     0.864695f,
+  -0.712922f,  0.706643f,   -0.651177f,    -0.231887f,    -0.318515f,
+  0.0635488f,  -0.183294f,  -0.589271f,    0.288583f,     0.38702f,
+  0.582912f,   0.225519f,   1.23027f,      0.108471f,     1.3328f,
+  0.689896f,   -2.21988f,   -0.337789f,    -0.762238f,    1.79149f,
+  0.840519f,   0.825442f,   0.460811f,     0.434437f,     2.13268f,
+  -0.341805f,  -0.139746f,  -1.66773f,     -0.583511f,    -0.238547f,
+  0.156871f,   0.719404f,   1.05882f,      -0.173445f,    -0.867368f,
+  0.170469f,   1.57755f,    1.36095f,      -0.418987f,    -0.396689f,
+  0.289496f,   -0.292606f,  0.688943f,     0.176553f,     0.853828f,
+  1.19608f,    -0.557087f,  -0.58118f,     1.12805f,      0.232023f,
+  -0.167864f,  -0.222265f,  -0.719284f,    -0.802184f,    -2.85383f,
+  -1.01816f,   -1.344f,     -0.154875f,    0.308999f,     -0.62822f,
+  0.389045f,   -0.498046f,  -0.0646747f,   0.056343f,     0.188288f,
+  0.493475f,   0.241337f,   0.122423f,     -0.506522f,    0.0492923f,
+  0.0642163f,  -0.508636f,  0.0328815f,    0.78567f,      0.224673f,
+  0.627972f,   0.759423f,   1.16089f,      1.28274f,      1.19646f,
+  1.63401f,    1.56657f,    -0.131442f,    -0.423053f,    -0.599536f,
+  -1.20933f,   0.0438751f,  -0.538444f,    -0.749136f,    -0.769951f,
+  -1.06683f,   -1.66474f,   0.136208f,     1.35745f,      -0.960854f,
+  2.32612f,    0.349384f,   1.04506f,      -0.888194f,    1.28114f,
+  0.579831f,   0.53927f,    -1.07214f,     0.456708f,     -0.884062f,
+  0.789767f,   -0.776746f,  -0.0143946f,   -0.930974f,    -0.632568f,
+  -1.487f,     0.0284456f,  -0.865849f,    -1.51263f,     0.117335f,
+  -0.671304f,  -0.367558f,  -0.650224f,    1.09562f,      0.246097f,
+  0.461775f,   -0.722606f,  0.0886829f,    -0.490978f,    1.92718f,
+  0.864959f,   0.0705385f,  -0.543902f,    1.4704f,       -0.643494f,
+  0.194486f,   0.890657f,   0.901154f,     -0.458931f,    0.209679f,
+  0.303869f,   -0.167078f,  1.60197f,      1.05005f,      -0.499959f,
+  0.930484f,   -0.555236f,  -0.778482f,    -0.772935f,    -0.590988f,
+  -0.122397f,  -0.346605f,  0.100747f,     -0.237732f,    -0.180927f,
+  0.136491f,   -0.230076f,  1.52049f,      1.70212f,      0.415758f,
+  -0.811552f,  0.570249f,   1.73167f,      0.808393f,     -1.28608f,
+  0.518307f,   0.601205f,   0.258751f,     -0.498631f,    -0.790802f,
+  -0.465072f,  -0.507542f,  0.312956f,     -0.485421f,    -0.0525576f,
+  0.24136f,    -0.201595f,  -0.721587f,    0.190955f,     -0.123108f,
+  -0.263243f,  -0.36142f,   -0.105093f,    0.0651603f,    0.240065f,
+  0.241104f,   -0.238277f,  -1.11714f,     1.50723f,      0.443715f,
+  1.83051f,    1.29719f,    -0.0367089f,   1.57883f,      1.96011f,
+  0.0373268f,  0.480469f,   0.497726f,     1.47078f,      -0.359254f,
+  0.120578f,   -0.651964f,  -0.537215f,    -1.20527f,     -0.374681f,
+  -0.443443f,  -0.39421f,   0.688228f,     0.0989643f,    -1.28785f,
+  -1.24392f,   -0.165236f,  1.1812f,       -0.76329f,     1.44085f,
+  -0.540544f,  0.0958765f,  -0.31224f,     0.471211f,     -0.997358f,
+  1.16174f,    -0.948466f,  0.660749f,     -0.574517f,    1.42706f,
+  -0.477758f,  0.509914f,   -0.930534f,    0.722869f,     -0.955477f,
+  -0.383073f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_128[] = {
+  0.814703f, -1.18485f, -1.49788f, -0.0054509f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_128[] = {
+  -0.283185f, -2.5867f,  -2.07531f, -2.31513f,  -1.85869f,  -0.310685f,
+  -0.802324f, 0.056964f, -1.43881f, 2.84016f,   -1.15494f,  -2.30652f,
+  0.015622f,  0.303776f, 0.774322f, -1.25979f,  -2.37144f,  -1.35687f,
+  0.743607f,  0.768569f, -1.09908f, -0.470101f, -0.615497f, 1.04214f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_128 = {
+  NUM_FEATURES_128,
+  NUM_LOGITS_128,
+  NUM_HIDDEN_LAYERS_128,
+  {
+      NUM_LAYER_0_UNITS_128,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_128,
+      av1_simple_motion_search_prune_part_logits_kernel_128,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_128,
+      av1_simple_motion_search_prune_part_logits_bias_128,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_128
+#undef NUM_FEATURES_128
+#undef NUM_LAYER_0_UNITS_128
+#undef NUM_LOGITS_128
+
+// BLOCK_64X64
+#define NUM_HIDDEN_LAYERS_64 1
+#define NUM_FEATURES_64 19
+#define NUM_LAYER_0_UNITS_64 24
+#define NUM_LOGITS_64 10
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_64[] = {
+  -2.71432f,    0.853994f,   0.740156f,   -0.30982f,   -0.448512f,  0.0984177f,
+  -0.664821f,   -0.150188f,  0.104798f,   1.27746f,    0.217043f,   -0.553914f,
+  -0.985639f,   1.99904f,    -0.994877f,  0.0697683f,  0.64856f,    -0.412276f,
+  -0.740292f,   0.93851f,    0.647461f,   0.874707f,   -1.06881f,   0.704589f,
+  0.641148f,    -0.23997f,   -0.0955951f, 0.249869f,   -0.240726f,  0.420737f,
+  -0.558423f,   -0.863005f,  0.981276f,   -0.520796f,  0.206416f,   -0.0512005f,
+  -0.76665f,    -0.341038f,  -0.727661f,  0.348269f,   -0.0786858f, -0.370214f,
+  -0.292226f,   -0.106107f,  0.262638f,   1.0065f,     0.558744f,   -0.0492801f,
+  -1.22877f,    0.225909f,   0.485238f,   -0.009513f,  -0.299224f,  -0.405938f,
+  -0.379131f,   0.0190173f,  -0.66387f,   0.846164f,   0.298606f,   -0.811507f,
+  -0.0853147f,  -0.146277f,  0.0860954f,  0.151524f,   0.239613f,   -0.0141985f,
+  0.684708f,    -0.0732401f, -0.709585f,  -1.86211f,   -0.622393f,  -0.503456f,
+  0.482376f,    -0.10075f,   -0.449184f,  0.999368f,   0.442391f,   -0.60335f,
+  0.631041f,    0.377315f,   -0.141438f,  -0.395021f,  -0.750439f,  0.79456f,
+  0.29555f,     -1.51727f,   0.964882f,   -0.256708f,  -0.182677f,  0.727967f,
+  0.411337f,    -0.252901f,  -0.546165f,  -0.620733f,  0.948828f,   0.187498f,
+  -6.20879f,    0.1671f,     -0.131667f,  -0.0719152f, -0.101839f,  -0.326827f,
+  0.00418824f,  -0.819253f,  -0.168854f,  -0.588437f,  -0.192699f,  0.126879f,
+  -0.0287044f,  -0.686708f,  -0.445826f,  -0.0993483f, -0.682881f,  0.0685043f,
+  -0.472371f,   -0.399788f,  0.170985f,   -0.164692f,  -0.380181f,  -0.268889f,
+  -3.16193f,    -0.965943f,  -0.178737f,  -0.517274f,  -0.102274f,  -0.359742f,
+  0.0117419f,   -0.0690246f, 0.206539f,   -1.29449f,   0.0976349f,  -0.188444f,
+  0.160939f,    -0.387867f,  -0.34513f,   -0.221073f,  -0.326615f,  0.0302811f,
+  0.245349f,    -0.381586f,  0.0414228f,  -0.414076f,  0.0232891f,  -0.118837f,
+  -2.81659f,    -0.288328f,  -0.0328096f, -0.61535f,   -0.23593f,   -1.16019f,
+  -0.0619081f,  0.0646133f,  -0.313036f,  -0.390373f,  -0.0481636f, 0.0450287f,
+  0.196415f,    -0.717419f,  -0.0707908f, -0.2078f,    -0.459761f,  0.230835f,
+  -0.0703036f,  -0.112402f,  -0.170908f,  0.0485359f,  -0.237293f,  -0.989058f,
+  -2.05295f,    0.134268f,   -0.173105f,  -0.493955f,  -0.28408f,   -0.91465f,
+  -0.00206022f, -0.297255f,  0.161636f,   -0.52414f,   -0.324677f,  -0.321039f,
+  0.188412f,    -0.333399f,  -0.325067f,  -0.024484f,  0.128572f,   0.20541f,
+  -0.0743476f,  0.0762302f,  -0.0370672f, -1.53757f,   -0.199054f,  -0.318512f,
+  -3.41239f,    -0.50942f,   0.100088f,   0.395587f,   0.00633016f, 0.851201f,
+  -0.0700995f,  -0.685436f,  0.0817234f,  -0.632139f,  -0.41931f,   0.15613f,
+  -0.201166f,   -0.0721472f, -0.239791f,  0.656797f,   -0.501886f,  -0.160969f,
+  -0.561536f,   -0.491154f,  -0.213447f,  0.21926f,    -0.542261f,  0.594975f,
+  -1.75303f,    0.284615f,   -0.0128245f, -0.0316972f, -0.300138f,  -0.980628f,
+  -0.332859f,   0.19298f,    -0.248332f,  0.445278f,   -0.470188f,  -0.483686f,
+  0.361407f,    -0.363551f,  0.175335f,   -0.401025f,  0.494573f,   0.366983f,
+  0.302351f,    -0.368503f,  -0.443071f,  -0.562775f,  -0.375816f,  -0.657459f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_64[] = {
+  0.615272f,   -0.151592f,   0.346172f,   -0.0656032f,  0.212875f,
+  0.0798838f,  -0.146093f,   -0.230484f,  -0.620322f,   0.0277852f,
+  -0.400931f,  -0.777044f,   -0.0871401f, -0.248128f,   0.471518f,
+  -0.34174f,   -0.149884f,   -0.0763207f, 0.900372f,    0.233323f,
+  -0.788699f,  0.28221f,     0.327214f,   -0.244877f,   -0.414568f,
+  0.0472988f,  0.168193f,    0.64126f,    0.56686f,     -0.318429f,
+  0.530612f,   -0.750709f,   0.0400333f,  -0.023951f,   -0.0218727f,
+  -0.0449836f, -0.0764245f,  -0.070088f,  -0.0427561f,  -0.0873884f,
+  -0.216423f,  0.622787f,    0.0297492f,  -0.233673f,   0.510639f,
+  0.481654f,   -0.234274f,   0.347734f,   -0.480302f,   0.832741f,
+  0.228223f,   0.247019f,    -0.32416f,   0.352315f,    -1.1491f,
+  0.00806435f, -0.439654f,   0.151723f,   -0.0719021f,  0.463499f,
+  0.00134313f, 0.0553619f,   -0.582163f,  -0.215118f,   -0.291413f,
+  0.889738f,   0.284575f,    0.00450409f, -0.896799f,   0.0303598f,
+  0.187935f,   -0.160993f,   0.089854f,   0.0450689f,   -0.548899f,
+  -0.10556f,   0.29384f,     -0.154158f,  0.423591f,    0.322065f,
+  0.244633f,   -0.320866f,   0.739022f,   -0.500495f,   0.595557f,
+  -0.62001f,   0.259688f,    0.114985f,   -0.13888f,    -0.0737616f,
+  0.801863f,   -0.0606944f,  0.238712f,   -0.0636556f,  0.04317f,
+  0.359843f,   -0.273265f,   0.782092f,   0.341857f,    0.884373f,
+  0.378388f,   0.632049f,    0.633597f,   -0.32103f,    -1.1014f,
+  -0.852525f,  -0.867999f,   0.228625f,   0.444601f,    0.246595f,
+  0.386288f,   -0.341772f,   -0.335849f,  -0.482717f,   0.00928882f,
+  -0.262618f,  0.497003f,    0.579316f,   0.371681f,    -0.440324f,
+  0.115786f,   -0.112295f,   0.07564f,    -0.326419f,   -0.195152f,
+  0.315485f,   -0.368989f,   0.281852f,   0.418865f,    0.807047f,
+  0.293759f,   -0.129749f,   -1.26096f,   -0.0526466f,  -0.618876f,
+  0.330563f,   0.26479f,     0.364751f,   0.68361f,     0.500237f,
+  -0.564011f,  0.158277f,    -0.214105f,  0.50558f,     0.69422f,
+  -0.172224f,  -0.280568f,   0.17241f,    -0.500658f,   -0.00418558f,
+  -0.420356f,  0.0453594f,   0.00471851f, -0.273979f,   0.355633f,
+  0.515393f,   0.0699701f,   -0.413576f,  0.487255f,    -0.388845f,
+  -0.192441f,  -0.353274f,   -0.1773f,    0.256746f,    -0.380197f,
+  0.023061f,   0.431125f,    1.0368f,     -0.0915799f,  -0.268898f,
+  0.0408016f,  0.593356f,    0.308486f,   0.508452f,    -0.0623963f,
+  0.307066f,   0.180916f,    0.326197f,   0.246641f,    0.270665f,
+  -0.145655f,  -0.341277f,   0.0218018f,  -0.326939f,   -0.203528f,
+  -0.25496f,   -0.772783f,   -0.306114f,  -0.79778f,    0.690016f,
+  -0.183109f,  -0.076211f,   -0.474873f,  -0.0219729f,  -0.152253f,
+  -0.0315833f, -0.134908f,   -0.111871f,  0.0409385f,   -0.282586f,
+  -0.101171f,  0.351942f,    0.30023f,    0.369243f,    0.0619639f,
+  -0.170842f,  -0.235501f,   -0.615927f,  0.883574f,    0.150949f,
+  -0.338489f,  -0.213431f,   -0.6075f,    -0.107739f,   -0.251963f,
+  0.143906f,   0.254205f,    -0.260084f,  0.224897f,    0.609902f,
+  0.5606f,     0.795273f,    0.117204f,   0.345592f,    0.243912f,
+  0.0626369f,  -0.166448f,   -0.886364f,  -0.280833f,   -0.0891074f,
+  0.0372486f,  -0.138729f,   0.120189f,   0.345857f,    0.176341f,
+  0.481862f,   -0.137464f,   -0.208001f,  0.621677f,    -0.121462f,
+  0.00445475f, 0.159351f,    0.149918f,   0.198679f,    -0.489814f,
+  -0.30931f,   -0.39161f,    0.268615f,   0.323864f,    0.770061f,
+  0.27962f,    0.536173f,    0.122727f,   0.571712f,    0.48351f,
+  -0.13558f,   -0.426532f,   -0.100426f,  -0.209695f,   0.470483f,
+  -0.424789f,  0.0973791f,   -0.296483f,  -0.302057f,   -0.918591f,
+  0.16328f,    0.0335916f,   0.415762f,   -0.235873f,   -0.00934998f,
+  -0.0967718f, 0.616418f,    0.0931619f,  -0.447975f,   0.156388f,
+  -0.40139f,   0.382807f,    -0.578455f,  1.01437f,     0.37469f,
+  -0.986411f,  -0.827175f,   0.0344976f,  -0.00244486f, -0.142117f,
+  -0.344406f,  -0.0124787f,  -0.226427f,  -0.301835f,   -0.705097f,
+  0.214542f,   -0.0346878f,  -0.255193f,  0.552685f,    -0.104125f,
+  0.77408f,    0.00984395f,  0.0476041f,  -0.244548f,   -0.35082f,
+  -0.487322f,  0.700091f,    -0.138812f,  -0.0110718f,  -0.0400376f,
+  0.254488f,   -0.0867923f,  -0.215463f,  1.03355f,     0.214947f,
+  0.385536f,   0.140597f,    -0.234973f,  -0.0611124f,  1.0974f,
+  0.463592f,   -0.393788f,   -0.428132f,  -0.14664f,    -0.156533f,
+  -0.113426f,  -0.111081f,   -0.0228256f, 0.354909f,    -0.0232978f,
+  0.177394f,   0.0503901f,   -0.220314f,  0.170207f,    0.236719f,
+  0.681525f,   -0.245544f,   -0.119278f,  -0.258491f,   -0.285309f,
+  0.186384f,   -0.119177f,   -0.279398f,  -0.097341f,   -0.324634f,
+  -0.296797f,  -1.3325f,     0.147225f,   0.0158408f,   -0.0365257f,
+  -0.166737f,  -0.159859f,   -0.0765398f, 0.0973026f,   0.294529f,
+  -0.16425f,   0.241506f,    0.561487f,   0.799885f,    -0.565667f,
+  -0.254387f,  -0.360831f,   -0.138432f,  0.406999f,    0.463259f,
+  -0.497314f,  -0.00549591f, -0.0313973f, -0.386042f,   -0.364537f,
+  -0.079987f,  0.148503f,    0.0532473f,  -0.0196838f,  0.232687f,
+  0.212998f,   0.2142f,      0.409001f,   -0.104871f,   -0.217793f,
+  0.0161162f,  -0.371663f,   0.887427f,   0.420187f,    -0.649711f,
+  -0.398999f,  0.448972f,    -0.116108f,  0.0444676f,   -0.501289f,
+  -0.0410878f, 0.00447241f,  -0.402102f,  -0.0926268f,  -0.254362f,
+  -0.395526f,  0.165273f,    0.339347f,   0.91932f,     -0.280113f,
+  0.320112f,   -0.102728f,   -0.131682f,  -0.566621f,   0.386611f,
+  0.146975f,   0.333248f,    -0.179748f,  0.655328f,    0.222658f,
+  0.349512f,   -0.135588f,   -0.22506f,   -0.353001f,   -0.400244f,
+  -0.815125f,  0.72407f,     0.281178f,   -0.109426f,   -0.0977383f,
+  -0.679406f,  -0.401318f,   0.308941f,   -0.594461f,   0.482289f,
+  -0.168467f,  0.76529f,     -0.155056f,  0.0874018f,   0.266124f,
+  -0.0808725f, 0.078792f,    -0.33271f,   -1.0637f,     -0.172125f,
+  0.427025f,   0.332865f,    0.625523f,   0.264166f,    -0.843882f,
+  -0.275777f,  -0.657372f,   0.172814f,   0.0490389f,   -0.561928f,
+  0.0998399f,  0.106047f,    0.39061f,    0.422161f,    0.46369f,
+  -0.364271f,  -0.326968f,   -0.527243f,  -0.618535f,   -0.287804f,
+  -0.211365f,  0.349277f,    0.456535f,   -0.0815191f,  -0.156835f,
+  0.57273f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_64[] = {
+  0.272852f,  -0.260088f, 0.11881f,   0.146764f,  0.00289019f,
+  -0.559007f, -0.203668f, -0.268267f, -0.218921f, -0.260717f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_64[] = {
+  -2.12804f,   0.445147f,  -0.0210471f, 0.533662f,   0.662023f,  0.020519f,
+  -0.0452071f, -0.343995f, 0.112379f,   -0.16776f,   0.112004f,  0.932147f,
+  -1.22944f,   -0.822248f, 0.370083f,   -0.0951491f, 0.0631258f, -0.875801f,
+  0.996276f,   0.116103f,  0.925914f,   0.054293f,   -1.02697f,  -0.359516f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_64 = {
+  NUM_FEATURES_64,
+  NUM_LOGITS_64,
+  NUM_HIDDEN_LAYERS_64,
+  {
+      NUM_LAYER_0_UNITS_64,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_64,
+      av1_simple_motion_search_prune_part_logits_kernel_64,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_64,
+      av1_simple_motion_search_prune_part_logits_bias_64,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_64
+#undef NUM_FEATURES_64
+#undef NUM_LAYER_0_UNITS_64
+#undef NUM_LOGITS_64
+
+// BLOCK_32X32
+#define NUM_HIDDEN_LAYERS_32 1
+#define NUM_FEATURES_32 19
+#define NUM_LAYER_0_UNITS_32 24
+#define NUM_LOGITS_32 10
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_32[] = {
+  -1.22965f,   0.49978f,    -0.376271f,  0.0615445f,  -0.212491f,  0.58427f,
+  0.142683f,   2.62142f,    -0.459751f,  -0.570143f,  0.72257f,    -0.64127f,
+  0.266919f,   0.3235f,     0.64405f,    -0.0398269f, -1.82822f,   -0.366573f,
+  0.753387f,   -0.274241f,  -0.484971f,  -0.503907f,  -0.911176f,  -0.455827f,
+  -0.706345f,  0.0687611f,  -0.362788f,  -0.369416f,  -0.530408f,  0.0812615f,
+  -0.863012f,  -0.613333f,  -0.268833f,  0.0982181f,  0.19374f,    -0.147078f,
+  -0.0200551f, 0.363817f,   0.179229f,   0.429671f,   0.905826f,   -0.441191f,
+  0.48874f,    0.539192f,   -0.418992f,  -0.468762f,  -0.482158f,  -0.770778f,
+  -0.743739f,  0.0175955f,  -0.40662f,   0.0276107f,  0.0110658f,  -0.119298f,
+  0.698777f,   -0.187602f,  -0.300483f,  -0.147972f,  0.324042f,   -0.0265165f,
+  -0.375496f,  0.245762f,   -0.111271f,  -0.829879f,  -0.434606f,  -0.367099f,
+  0.113229f,   -0.755101f,  -0.0623393f, -0.13764f,   -0.205864f,  -0.332027f,
+  0.966638f,   0.477078f,   0.262501f,   -0.110232f,  0.141242f,   -0.699602f,
+  -0.14943f,   -2.36868f,   0.556236f,   0.345883f,   -0.466765f,  0.279446f,
+  -0.56809f,   -0.356351f,  -0.503855f,  -0.607959f,  -0.0328514f, 0.313352f,
+  -0.644447f,  0.221808f,   0.254575f,   0.476802f,   1.40433f,    0.317169f,
+  0.109761f,   -0.0105197f, -0.22896f,   -0.389234f,  0.423948f,   -0.272114f,
+  -1.02704f,   -1.50706f,   0.0563541f,  -0.0371609f, -0.306187f,  0.0570354f,
+  -0.367998f,  0.0949103f,  -0.254703f,  -0.0853516f, 1.56471f,    -0.594372f,
+  -0.23582f,   0.267108f,   0.015297f,   -0.318317f,  0.287599f,   -0.687022f,
+  0.360804f,   -0.177637f,  -0.118144f,  -0.418225f,  -0.985658f,  -0.391334f,
+  -0.772539f,  -0.44002f,   0.0722112f,  -0.0825626f, 0.0466844f,  0.0525818f,
+  -0.788047f,  0.120401f,   -0.785688f,  -0.346177f,  0.240363f,   0.0248826f,
+  -0.0815654f, 0.39317f,    -0.122372f,  0.199969f,   0.202777f,   -0.1979f,
+  0.313558f,   -0.180202f,  0.191204f,   -0.313598f,  0.155464f,   -0.600106f,
+  0.0230461f,  -0.718126f,  0.266874f,   -0.313614f,  0.0352148f,  0.131058f,
+  -0.221112f,  0.115419f,   -1.41928f,   -0.909453f,  0.341747f,   -0.25318f,
+  -0.312476f,  -0.288919f,  -0.0135884f, -0.278496f,  0.381449f,   -0.0725586f,
+  0.254479f,   -0.0658647f, -0.694657f,  -0.0653643f, -0.0233378f, -0.484902f,
+  -0.104919f,  -1.52446f,   0.0140919f,  -0.142396f,  -0.11836f,   0.113235f,
+  -1.21564f,   0.0618471f,  0.0421833f,  -0.883143f,  0.288008f,   -0.278322f,
+  -0.185151f,  -0.616223f,  0.334549f,   0.370898f,   0.24646f,    -0.027439f,
+  0.366905f,   -0.40628f,   0.0260464f,  -0.506151f,  0.0191214f,  -0.104617f,
+  -0.848722f,  -1.66357f,   -0.194607f,  0.0346545f,  -0.412502f,  0.200471f,
+  -0.285588f,  0.0309609f,  -0.150546f,  0.569096f,   0.210382f,   0.14322f,
+  0.908182f,   1.23553f,    -0.432935f,  -0.0963189f, -0.610778f,  -0.532583f,
+  -0.302028f,  -0.600906f,  -0.0777476f, 0.0230625f,  0.375802f,   -0.466292f,
+  1.01104f,    -1.16706f,   0.0121855f,  0.0100479f,  -0.147181f,  0.255058f,
+  -0.285898f,  -0.167804f,  -0.240171f,  -1.15287f,   -1.51181f,   0.0859809f,
+  0.0811324f,  -0.829305f,  0.272793f,   0.407484f,   0.324943f,   0.230197f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_32[] = {
+  -0.0711848f, 0.187893f,     -0.0532872f,  -0.0403218f, 0.132223f,
+  0.0150309f,  0.132917f,     -0.00883543f, -0.0614934f, 0.207838f,
+  -0.102772f,  0.127833f,     -0.332145f,   0.00237219f, -0.338402f,
+  0.123288f,   -0.248341f,    -0.0182967f,  -1.16283f,   -0.166611f,
+  -0.220962f,  -0.268939f,    -0.207455f,   -0.214904f,  -0.0639896f,
+  -0.0729676f, -0.000552725f, 0.217902f,    0.350537f,   -0.0217492f,
+  0.136239f,   0.0641448f,    0.515814f,    0.525507f,   0.240539f,
+  0.109375f,   0.322722f,     -1.20791f,    0.323287f,   0.0231209f,
+  -0.194629f,  0.143504f,     0.193943f,    -0.15059f,   -0.0156431f,
+  -0.210354f,  0.13426f,      -0.379795f,   0.0585494f,  0.0947257f,
+  0.948153f,   0.492681f,     -0.977907f,   -0.30367f,   0.216922f,
+  -0.366185f,  0.00734769f,   0.528627f,    0.334327f,   0.0222445f,
+  0.400606f,   -0.0313966f,   -0.047664f,   -0.512993f,  -0.433836f,
+  0.340769f,   -0.131347f,    -0.518235f,   -0.220933f,  -0.379338f,
+  -0.116978f,  0.143766f,     0.456281f,    -0.0921022f, -0.0109533f,
+  -0.107467f,  0.335672f,     -0.313228f,   0.175586f,   0.108769f,
+  0.129646f,   -0.053502f,    0.272574f,    0.220172f,   1.51046f,
+  0.255032f,   -0.162058f,    -0.770721f,   0.238623f,   -0.65159f,
+  -0.0354393f, -0.577323f,    0.0954972f,   -0.661719f,  0.227893f,
+  -0.0584787f, 0.234849f,     -0.16515f,    -0.247194f,  0.12563f,
+  0.39043f,    -0.178219f,    -0.0629665f,  0.395761f,   0.24224f,
+  -0.336032f,  0.552893f,     -0.300073f,   -0.235499f,  -0.33557f,
+  0.0398952f,  -0.853526f,    -0.550247f,   1.13965f,    0.197325f,
+  -0.0750203f, 0.145096f,     0.128642f,    0.113606f,   0.0972738f,
+  0.219874f,   0.252284f,     0.833398f,    0.398332f,   0.802753f,
+  0.650573f,   -0.725374f,    -0.548798f,   -0.668723f,  -0.705524f,
+  -0.929613f,  -0.138145f,    0.161306f,    0.578878f,   0.0605056f,
+  0.720406f,   0.163571f,     0.707962f,    -0.0777347f, 0.52085f,
+  0.279096f,   0.180012f,     -0.459535f,   0.219678f,   -0.273058f,
+  -0.030387f,  -0.262664f,    0.367791f,    -0.899145f,  -1.07191f,
+  -1.15497f,   0.460442f,     0.020009f,    -0.329794f,  0.846777f,
+  0.287855f,   0.603544f,     0.645424f,    0.00753003f, -0.0666031f,
+  -0.141114f,  -0.149588f,    -0.431897f,   -0.591811f,  0.134026f,
+  0.0933469f,  -0.130808f,    -0.0335611f,  -0.488446f,  -0.275566f,
+  -0.937488f,  0.245793f,     -0.548915f,   0.0108641f,  -0.216292f,
+  0.00680863f, -0.113137f,    -0.137064f,   0.083321f,   0.689742f,
+  -0.213193f,  0.172408f,     -0.123794f,   0.383401f,   -0.496176f,
+  0.427836f,   -0.644447f,    0.967995f,    0.181371f,   0.301512f,
+  -0.376098f,  -0.0571203f,   0.0012891f,   0.467542f,   -0.400791f,
+  -0.204521f,  0.253847f,     0.107368f,    -0.434741f,  -0.389665f,
+  0.30953f,    0.053949f,     -0.0415711f,  0.0432576f,  -0.319656f,
+  -0.228939f,  -0.0928546f,   0.164408f,    1.26655f,    0.991928f,
+  -0.0596439f, 0.0786943f,    0.001457f,    0.282831f,   0.0975484f,
+  0.13724f,    0.0891527f,    -0.0471925f,  0.255467f,   -0.469073f,
+  -0.0759757f, 0.331197f,     0.139434f,    -0.0118866f, 0.359463f,
+  -0.774947f,  -0.474647f,    -1.36563f,    0.24901f,    0.776025f,
+  0.150621f,   0.192407f,     0.752499f,    0.0435322f,  -0.0334263f,
+  0.470741f,   -0.781907f,    -0.149471f,   -0.649484f,  -0.866079f,
+  0.536967f,   0.541611f,     -0.00237101f, -0.119688f,  -0.594591f,
+  -0.967503f,  0.545025f,     -0.335037f,   -0.172105f,  -0.532514f,
+  -0.442211f,  -0.0864824f,   0.038418f,    -0.337492f,  -0.412653f,
+  0.0778177f,  0.0824839f,    -0.232478f,   0.553077f,   0.179073f,
+  0.222848f,   -0.261019f,    0.854277f,    -0.643185f,  0.476021f,
+  -0.0174448f, 0.621669f,     -0.527978f,   0.45279f,    -0.286967f,
+  0.328291f,   0.0627781f,    0.495794f,    0.0156424f,  -0.170515f,
+  -0.435815f,  -0.264061f,    -0.964473f,   0.259361f,   -0.297514f,
+  0.667044f,   0.719631f,     -0.812974f,   -0.350331f,  0.594795f,
+  -0.106071f,  -0.409225f,    0.283481f,    0.5735f,     -0.231666f,
+  -0.270059f,  0.687725f,     0.349693f,    0.0637911f,  0.208738f,
+  0.299087f,   -0.249188f,    -0.426365f,   -1.01906f,   0.0919539f,
+  -0.198362f,  0.256663f,     -0.302723f,   0.457283f,   0.433322f,
+  0.242223f,   0.740515f,     0.247248f,    0.436274f,   0.588906f,
+  0.852493f,   0.385838f,     0.243232f,    -0.501191f,  0.212121f,
+  0.297253f,   -0.664029f,    -0.470196f,   0.0175681f,  -1.01849f,
+  -0.619865f,  -1.26982f,     -0.088134f,   -0.29233f,   -0.196112f,
+  -0.141886f,  0.0602684f,    0.469327f,    0.0227135f,  0.275863f,
+  0.161156f,   -0.864189f,    -0.72576f,    0.62214f,    0.804845f,
+  0.183776f,   -0.155777f,    -0.0826676f,  -0.23302f,   0.0845181f,
+  -0.126365f,  0.0925764f,    0.889037f,    -0.208894f,  0.441273f,
+  0.476529f,   0.510144f,     0.321464f,    0.764386f,   0.198938f,
+  -0.669809f,  -0.13214f,     -0.426596f,   -0.547804f,  -0.0953238f,
+  0.164997f,   0.275626f,     -0.0469242f,  -0.923263f,  -1.05855f,
+  -0.487197f,  0.261922f,     -0.108634f,   0.409852f,   0.142348f,
+  0.153656f,   -0.119714f,    0.490507f,    -0.26725f,   -0.0651784f,
+  -0.962803f,  -0.596098f,    -0.686329f,   0.66723f,    0.290971f,
+  0.692586f,   0.56926f,      -0.0494205f,  -0.498585f,  -0.1832f,
+  -0.571507f,  -0.438308f,    0.607958f,    0.985154f,   0.131991f,
+  0.0469712f,  0.415769f,     -0.518799f,   -0.353338f,  -0.219197f,
+  -0.159141f,  0.085484f,     -0.405673f,   -0.222816f,  0.813276f,
+  0.323344f,   -0.235178f,    -0.40799f,    -0.083177f,  0.514834f,
+  0.177916f,   0.0197744f,    -0.523574f,   -0.445548f,  -0.21085f,
+  0.760991f,   0.170654f,     -0.00312635f, -0.175464f,  0.665364f,
+  -0.713881f,  -0.701069f,    -0.628863f,   1.03196f,    -0.0414137f,
+  -0.0163186f, 0.16796f,      -0.0263498f,  0.484873f,   0.153922f,
+  0.0593931f,  0.171615f,     0.330269f,    -0.0728948f, 0.42332f,
+  0.294273f,   -0.0185935f,   -0.609248f,   -0.305841f,  -0.293534f,
+  0.0766015f,  0.130506f,     0.16716f,     0.0168997f,  -0.429074f,
+  -0.744995f,  -0.972633f,    0.50621f,     -0.275645f,  0.402252f,
+  -0.0190824f, 0.637343f,     -0.410791f,   0.546844f,   -0.555088f,
+  0.491182f,   -0.0369695f,   0.974657f,    -0.142378f,  -0.148588f,
+  -0.217919f,  0.0146815f,    -0.419912f,   0.111356f,   -0.640505f,
+  -0.352691f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_32[] = {
+  0.0868818f, 0.370904f,  0.126136f,  0.57768f,   -0.316245f,
+  -0.526958f, -0.451775f, -0.595569f, -0.805166f, -0.592605f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_32[] = {
+  -1.85942f, 0.727049f,   -0.0421259f, 0.759194f,   0.241057f,  0.0752973f,
+  0.321934f, -0.593116f,  -0.873202f,  -0.238779f,  0.851339f,  -0.536633f,
+  -0.18552f, -0.0941714f, 0.0153855f,  -1.34736f,   -0.870722f, 0.0973251f,
+  0.491483f, 0.650638f,   -0.205986f,  -0.0499654f, -1.00592f,  0.65992f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_32 = {
+  NUM_FEATURES_32,
+  NUM_LOGITS_32,
+  NUM_HIDDEN_LAYERS_32,
+  {
+      NUM_LAYER_0_UNITS_32,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_32,
+      av1_simple_motion_search_prune_part_logits_kernel_32,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_32,
+      av1_simple_motion_search_prune_part_logits_bias_32,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_32
+#undef NUM_FEATURES_32
+#undef NUM_LAYER_0_UNITS_32
+#undef NUM_LOGITS_32
+
+// BLOCK_16X16
+#define NUM_HIDDEN_LAYERS_16 1
+#define NUM_FEATURES_16 19
+#define NUM_LAYER_0_UNITS_16 16
+#define NUM_LOGITS_16 10
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_16[] = {
+  0.274123f,   -0.551439f,  0.578938f,   -0.213001f,  -0.310021f,
+  0.0301311f,  -0.377388f,  -3.16339f,   0.434616f,   0.264216f,
+  0.320385f,   -1.41657f,   1.05919f,    -0.396075f,  -0.855458f,
+  0.418105f,   -0.0769093f, -0.54773f,   -0.215041f,  -0.13885f,
+  -0.209062f,  -0.526914f,  0.211082f,   -2.34741f,   -0.000587922f,
+  -0.431294f,  0.757511f,   -0.184199f,  -0.623552f,  -0.221362f,
+  -0.628871f,  0.646393f,   -0.192193f,  0.0166809f,  -0.061691f,
+  -0.214283f,  -0.35264f,   0.361452f,   -0.0160958f, -0.0475499f,
+  0.196822f,   0.44674f,    -0.408064f,  -0.559148f,  -0.67489f,
+  -0.202201f,  -0.358012f,  -0.341735f,  -0.325682f,  0.220407f,
+  -0.642416f,  0.350069f,   0.430505f,   -0.0997745f, -0.300435f,
+  1.25364f,    -0.869717f,  -0.0728051f, -0.172433f,  0.385328f,
+  -2.13737f,   0.673629f,   0.580102f,   -0.0745359f, -0.442542f,
+  -0.208393f,  -0.44303f,   0.318855f,   0.0557663f,  0.268257f,
+  -0.0941132f, -4.52876f,   -0.638897f,  -0.907808f,  0.28328f,
+  0.619328f,   -1.64249f,   0.0241431f,  -0.0880383f, 0.299287f,
+  -0.248316f,  0.039253f,   -0.544645f,  -0.141389f,  0.0185283f,
+  -1.01973f,   -0.269349f,  -4.88803f,   -0.632892f,  0.181151f,
+  0.193291f,   0.592713f,   -1.71466f,   0.398923f,   0.00355734f,
+  0.212158f,   -0.949188f,  0.386679f,   -0.243317f,  -0.17458f,
+  0.0576348f,  0.096034f,   -0.282317f,  -4.13556f,   -0.516689f,
+  0.169427f,   -0.541422f,  0.529281f,   -1.45161f,   -0.0417835f,
+  0.0174299f,  -0.26404f,   -0.105773f,  0.102701f,   -0.65039f,
+  0.308121f,   -0.185395f,  0.273611f,   -0.408464f,  -6.09866f,
+  -0.512249f,  0.0668662f,  -0.547454f,  0.62565f,    -1.63952f,
+  0.510116f,   0.127461f,   -0.506263f,  0.113016f,   -0.258605f,
+  -0.308066f,  0.0957733f,  0.059395f,   -0.915338f,  0.499407f,
+  -10.3199f,   -0.32224f,   -0.677307f,  1.13218f,    -0.0888689f,
+  -0.108029f,  -0.156533f,  -0.391431f,  0.576607f,   -0.0833897f,
+  0.536752f,   -0.0832957f, -0.0957492f, -0.135149f,  0.423881f,
+  0.317691f,   -7.29755f,   0.104775f,   0.534134f,   -0.797288f,
+  -0.386335f,  -0.20785f,   -0.0507494f, -0.338127f,  -0.868801f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_16[] = {
+  -0.244782f,   0.00425059f, -0.337534f,  -0.423125f,   -0.349549f,
+  -0.00261207f, -0.0845866f, -0.259278f,  -0.375872f,   0.00052185f,
+  -0.427483f,   0.175625f,   -0.357737f,  0.129946f,    0.97588f,
+  1.19281f,     -0.51292f,   -0.100629f,  1.04044f,     0.197375f,
+  -0.210977f,   -0.20334f,   0.173408f,   0.431999f,    0.083979f,
+  -0.334416f,   -0.171408f,  0.160035f,   -0.0464933f,  0.164574f,
+  -0.162781f,   1.01648f,    0.624844f,   -1.20372f,    -0.698742f,
+  0.335747f,    -0.362217f,  -0.0817772f, -0.0366522f,  -0.249627f,
+  -0.3135f,     0.256151f,   -0.257869f,  0.0816391f,   -0.256592f,
+  0.071219f,    -0.295956f,  0.287213f,   -0.375107f,   -0.149275f,
+  0.0449292f,   0.49489f,    -0.958944f,  0.386166f,    -0.76147f,
+  -0.223786f,   1.91139f,    -0.0866129f, -0.516556f,   0.871813f,
+  0.389086f,    0.3205f,     0.605997f,   -0.531384f,   -0.693121f,
+  0.728219f,    0.223733f,   -0.58534f,   -0.410249f,   0.0271334f,
+  -0.43904f,    0.325998f,   -0.123988f,  0.103988f,    -0.2227f,
+  0.0779071f,   0.100073f,   -0.924956f,  -0.00472742f, -0.21932f,
+  -0.220187f,   -0.719278f,  0.099118f,   -0.0891471f,  0.743678f,
+  -0.173308f,   0.588225f,   -0.31524f,   1.1415f,      0.408762f,
+  -0.213088f,   -0.291621f,  0.655754f,   0.531725f,    -0.013178f,
+  -0.100753f,   -0.0775942f, -0.181806f,  -0.441297f,   -0.00589338f,
+  0.14217f,     -0.0592671f, 0.10907f,    1.47619f,     0.813817f,
+  0.1996f,      0.178263f,   -0.569958f,  -0.374858f,   -0.743922f,
+  -0.269343f,   -0.118752f,  0.0797114f,  0.027829f,    -0.133402f,
+  -0.164884f,   -0.42919f,   0.0682661f,  -0.206438f,   0.0184534f,
+  -0.141316f,   -0.138817f,  0.0305671f,  0.295578f,    -0.236413f,
+  0.172918f,    -0.35082f,   -0.0986917f, -0.650484f,   0.13655f,
+  0.212195f,    0.549501f,   1.64941f,    0.152883f,    0.0117464f,
+  -0.200688f,   -0.0412075f, -0.0296324f, 0.122624f,    0.1871f,
+  -0.515693f,   0.20351f,    0.333617f,   0.254752f,    0.293802f,
+  -0.428904f,   -0.0312053f, -0.879481f,  -0.516353f,   -0.417837f,
+  -0.230442f,   0.229367f,   0.615339f,   0.327347f,    0.288747f,
+  0.596166f,    0.497054f,   0.536953f,   0.462426f,    0.517022f,
+  -0.287359f,   -0.162824f,  -0.249174f,  -0.364887f,   -0.538065f,
+  -0.506783f,   -0.163213f,  -0.617007f,  -0.70433f,    -0.759151f,
+  -0.235183f,   -0.196496f,  0.0925943f,  -0.0786896f,  0.135073f,
+  -0.106243f,   -0.190647f,  -0.311848f,  -0.428009f,   0.467477f,
+  0.259139f,    1.4948f,     0.986061f,   -0.534924f,   -0.193525f,
+  -0.66125f,    -0.693799f,  -0.489594f,  0.238264f,    0.249978f,
+  -0.365372f,   -0.197998f,  -0.664471f,  -0.0312145f,  -0.297293f,
+  0.0278792f,   -0.877716f,  0.0473106f,  0.913044f,    0.815569f,
+  0.789972f,    0.641374f,   -0.122848f,  -0.353137f,   -0.381102f,
+  -0.960138f,   -0.166101f,  0.230364f,   0.534173f,    0.398882f,
+  0.0599076f,   0.00176035f, 0.291062f,   0.021087f,    0.374562f,
+  0.402516f,    0.144006f,   -0.149598f,  0.065063f,    -0.0774656f,
+  -0.18804f,    -0.21123f,   0.0119723f,  -0.244286f,   0.109912f,
+  -0.98136f,    -0.583136f,  -1.3897f,    0.33196f,     0.319226f,
+  0.490015f,    0.316438f,   0.565049f,   0.163159f,    0.523771f,
+  0.325115f,    -0.0515304f, -0.0827355f, 0.112763f,    -0.517608f,
+  -0.161398f,   -0.124513f,  -0.0384277f, -0.49491f,    -1.53384f,
+  -1.3086f,     1.20601f,    0.399591f,   0.233774f,    0.0154149f,
+  -0.431196f,   0.187116f,   0.033398f,   0.655468f,    -0.390814f,
+  0.418144f,    -0.572053f,  0.936493f,   -0.116933f,   -0.20803f,
+  -0.908834f,   1.2524f,     -0.285888f,  0.227437f,    -0.317727f,
+  -0.6331f,     0.159656f,   0.244652f,   0.169768f,    0.379279f,
+  0.37089f,     0.118264f,   0.150946f,   0.536513f,    -0.261398f,
+  -0.15329f,    -0.413112f,  -0.243792f,  -0.215096f,   0.288741f,
+  -0.193763f,   -0.130652f,  -0.328159f,  -0.719996f,   -1.66213f,
+  0.0815627f,   0.129643f,   -0.0974464f, -0.0660102f,  0.349602f,
+  0.120356f,    -0.144144f,  -0.13641f,   -0.154818f,   -0.468552f,
+  -0.442585f,   -0.312206f,  0.879662f,   0.846103f,    0.0485413f,
+  0.18676f,     -0.477959f,  -0.112404f,  -0.366477f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_16[] = {
+  0.791815f,  0.888054f,  0.406071f, -0.217564f, -0.504713f,
+  -0.514339f, -0.200842f, -1.09239f, -1.78297f,  -2.41754f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_16[] = {
+  0.89469f,   0.10871f,  0.664404f,  -0.00639695f, -0.745647f, 0.910444f,
+  0.168436f,  -4.05854f, 1.00981f,   0.743352f,    -0.73947f,  -2.5654f,
+  -0.654753f, 0.602252f, -0.973004f, 1.1113f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_16 = {
+  NUM_FEATURES_16,
+  NUM_LOGITS_16,
+  NUM_HIDDEN_LAYERS_16,
+  {
+      NUM_LAYER_0_UNITS_16,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_16,
+      av1_simple_motion_search_prune_part_logits_kernel_16,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_16,
+      av1_simple_motion_search_prune_part_logits_bias_16,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_16
+#undef NUM_FEATURES_16
+#undef NUM_LAYER_0_UNITS_16
+#undef NUM_LOGITS_16
+
+// BLOCK_8X8
+#define NUM_HIDDEN_LAYERS_8 1
+#define NUM_FEATURES_8 19
+#define NUM_LAYER_0_UNITS_8 24
+#define NUM_LOGITS_8 4
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_8[] = {
+  -0.806717f,  0.0244927f,  -0.0280725f, 0.210426f,   0.0820434f,  -0.0222324f,
+  -0.0728984f, -0.424785f,  -0.0568035f, -0.0744017f, 0.204282f,   0.43611f,
+  0.319456f,   0.119903f,   -0.333224f,  -0.932499f,  0.105907f,   0.0905287f,
+  -0.612538f,  0.0978191f,  -0.0858663f, 0.0468925f,  -0.312509f,  0.0527469f,
+  0.308466f,   -0.139768f,  -0.468023f,  -0.069522f,  0.248949f,   0.0408582f,
+  0.199935f,   -0.448705f,  0.242315f,   0.00472276f, -0.468445f,  -0.591226f,
+  0.107975f,   0.261228f,   -0.10724f,   0.104639f,   -0.211234f,  -0.304658f,
+  -0.261689f,  -0.259529f,  0.0331369f,  -0.468468f,  -0.0555605f, -0.0495414f,
+  0.247612f,   -0.112518f,  -0.393122f,  0.302172f,   -0.252151f,  0.076605f,
+  -0.34155f,   -0.182731f,  0.154079f,   -0.464538f,  -0.396327f,  -0.654858f,
+  0.0921198f,  0.202867f,   -0.0712573f, 0.0349611f,  0.243043f,   -0.177452f,
+  -0.205536f,  -0.268024f,  0.0358315f,  -0.560347f,  -0.204207f,  -0.0890628f,
+  -1.013f,     -0.461748f,  -0.429801f,  -0.100352f,  -0.34369f,   0.115318f,
+  -0.556285f,  -0.0751575f, 0.183418f,   -0.285223f,  0.197177f,   -0.825216f,
+  -0.125709f,  -0.100452f,  0.180481f,   0.764462f,   0.136609f,   -0.660743f,
+  0.212887f,   -0.410408f,  -0.330839f,  -0.714646f,  -0.115863f,  -0.389509f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_8[] = {
+  0.0561017f,   0.530692f,    0.129047f,   0.296138f,   0.407593f,
+  0.151159f,    0.180472f,    0.298995f,   -0.0265362f, -0.380313f,
+  -0.136716f,   -0.0644648f,  0.00808564f, 0.0875876f,  -0.0719683f,
+  -0.0996071f,  -1.49722f,    -1.31176f,   1.54169f,    -0.50717f,
+  -0.0186767f,  -0.525924f,   0.0402954f,  -0.553913f,  0.139015f,
+  0.171752f,    -0.376497f,   0.485084f,   0.182424f,   -0.0236465f,
+  0.380048f,    -0.185493f,   0.554435f,   0.241565f,   -0.225917f,
+  -1.08637f,    -0.305121f,   1.3603f,     0.0806333f,  -0.0697466f,
+  0.216192f,    0.0493694f,   0.0620039f,  -0.0042489f, 0.0707283f,
+  0.0998331f,   -0.0252022f,  0.342077f,   -0.200664f,  0.335261f,
+  -0.100772f,   0.212881f,    -0.374258f,  0.310442f,   -1.95981f,
+  -1.16615f,    1.88243f,     0.503536f,   -0.0919037f, 0.392323f,
+  0.33149f,     0.563121f,    -0.0898854f, 0.130267f,   0.404959f,
+  1.06767f,     0.75134f,     0.810919f,   0.865237f,   -1.08001f,
+  -0.949809f,   -1.24941f,    -0.95081f,   -0.539575f,  -0.355324f,
+  -0.110592f,   -0.311277f,   0.023022f,   -0.039287f,  0.491298f,
+  -0.248853f,   -0.294741f,   0.288811f,   0.470638f,   0.330094f,
+  0.146603f,    0.0958486f,   0.308326f,   -0.87134f,   -1.06074f,
+  -0.315428f,   0.717577f,    -0.0174599f, -0.491904f,  0.977014f,
+  0.922693f,    0.0265707f,   -0.743468f,  -0.273647f,  -0.430625f,
+  -0.473789f,   0.119983f,    0.476441f,   0.639803f,   -0.0753475f,
+  -0.0746323f,  -0.0422539f,  0.013454f,   -0.0174412f, -0.253015f,
+  -0.279585f,   0.11562f,     -0.396919f,  0.306388f,   0.430346f,
+  0.275945f,    -0.196508f,   0.00180146f, 0.396652f,   0.324022f,
+  -0.142132f,   0.1768f,      -0.0746152f, 0.314189f,   -0.031924f,
+  0.254196f,    -0.253449f,   0.1537f,     -0.98635f,   -0.850926f,
+  0.0762147f,   -0.652507f,   1.16528f,    -0.122595f,  -0.00561333f,
+  0.424954f,    -0.00258127f, -0.421957f,  -0.0714059f, 0.782031f,
+  -0.0129133f,  -0.00544328f, -0.193527f,  -0.0936037f, -0.00490983f,
+  -0.852396f,   -0.649662f,   0.820325f,   0.484966f,   0.265405f,
+  -0.33032f,    0.104917f,    -0.364478f,  0.26858f,    0.068847f,
+  -0.0751046f,  0.238931f,    -0.151554f,  0.0296385f,  -0.14869f,
+  -0.173547f,   -0.397285f,   0.0561029f,  -0.0681254f, 0.222631f,
+  -0.00800993f, 0.0686761f,   0.196754f,   0.249358f,   0.348125f,
+  -2.22757f,    0.186675f,    -0.0426998f, 0.123301f,   -0.0196412f,
+  0.104882f,    0.138482f,    0.340663f,   0.0684671f,  -1.22841f,
+  -1.08539f,    -1.1055f,     -0.732678f,  0.766626f,   0.727742f,
+  1.26906f,     0.812594f,    -0.446312f,  -0.166752f,  0.396628f,
+  0.00141587f,  0.0137288f,   -0.0920456f, 0.123027f,   -0.118517f,
+  -0.0412321f,  -0.124952f,   0.00875945f, 0.0149883f,  -0.0218859f,
+  -0.233299f,   -0.0812722f,  0.269917f,   0.0246593f,  0.0915655f,
+  -0.019122f,   0.706718f,    -0.172051f,  -1.85551f,   0.0578997f,
+  0.100269f,    0.131412f,    -0.0952751f, 0.181419f,   -0.0106305f,
+  0.106179f,    -0.142344f,   0.0916649f,  -0.41298f,   0.113846f,
+  -0.322459f,   0.0415754f,   -0.2205f,    -0.224231f,  0.147907f,
+  -0.135093f,   -0.398757f,   1.93381f,    0.20456f,    -0.205381f,
+  -0.263999f,   0.364463f,    -0.424052f,  -0.0166924f, -0.319968f,
+  0.0439144f,   -0.692733f,   0.678982f,   -0.445194f,  -0.527451f,
+  0.383248f,    0.330927f,    -0.0367725f, 0.572847f,   -0.620804f,
+  -0.286471f,   1.39367f,     0.470732f,   0.0751676f,  0.637958f,
+  0.574865f,    0.411091f,    0.263806f,   0.555064f,   0.047788f,
+  0.201792f,    -0.0821822f,  -0.0226181f, -0.176679f,  -0.612642f,
+  -0.992254f,   -0.292099f,   -0.562201f,  -0.567948f,  -0.767681f,
+  1.33645f,     0.0932564f,   -0.421675f,  0.198262f,   -0.401979f,
+  0.244609f,    -0.261484f,   0.0304534f,  -0.200004f,  0.00951232f,
+  -0.085364f,   0.555152f,    -0.243778f,  0.371369f,   0.152997f,
+  0.154443f,    -0.281229f,   0.967176f,   1.0212f,     0.276169f,
+  0.0962747f,   0.449737f,    0.300859f,   0.376659f,   0.165669f,
+  0.332263f,    0.238315f,    0.376668f,   -0.139238f,  -0.0694765f,
+  -0.256137f,   -0.262146f,   -0.246265f,  0.0261978f,  -0.118975f,
+  -0.207184f,   -0.614041f,   -0.866987f,  -1.75604f,   -0.04917f,
+  0.0794673f,   -0.355224f,   0.0035685f,  -0.340216f,  0.398567f,
+  -0.314826f,   -0.12464f,    0.693428f,   0.701697f,   0.511653f,
+  0.861303f,    -0.64449f,    -1.06257f,   -0.773944f,  -0.838084f,
+  0.802429f,    -0.24573f,    0.720913f,   -0.31002f,   0.615694f,
+  0.287994f,    0.18495f,     0.0188525f,  0.374338f,   -0.12243f,
+  0.613532f,    0.132456f,    0.177285f,   -0.187238f,  0.0872563f,
+  -0.425068f,   0.154711f,    -0.24283f,   -0.193267f,  -1.14008f,
+  -1.17759f,    0.517845f,    0.458782f,   -0.161137f,  0.142772f,
+  0.2811f,      0.171871f,    0.276129f,   0.018275f,   0.390464f,
+  -0.156414f,   0.108248f,    -0.0909085f, -0.11346f,   0.0815138f,
+  0.0729377f,   -0.0769677f,  0.0110251f,  -0.46098f,   -0.421538f,
+  -2.18003f,    0.6639f,      0.541278f,   0.704337f,   0.480695f,
+  0.727474f,    0.473937f,    0.770863f,   0.41774f,    -0.112943f,
+  -0.107412f,   0.083639f,    -0.351127f,  -0.149221f,  0.0705735f,
+  -0.0908294f,  -0.0789572f,  -1.62533f,   -2.14051f,   -0.188871f,
+  0.796224f,    0.00144302f,  0.467569f,   -0.113915f,  0.660595f,
+  0.101025f,    0.020895f,    0.604505f,   -0.26598f,   -0.149282f,
+  -0.548818f,   -0.140463f,   0.13669f,    -0.0955724f, -0.694851f,
+  -0.13438f,    -0.384164f,   -0.600513f,  1.48183f,    0.16481f,
+  0.340894f,    -0.190813f,   0.487458f,   0.0769957f,  0.192901f,
+  0.039483f,    0.213366f,    -0.508968f,  -0.494034f,  -0.987906f,
+  -0.188502f,   -0.907188f,   0.0109838f,  -0.275008f,  -0.331017f,
+  -0.447202f,   0.0521897f,   0.837215f,   0.344802f,   0.216526f,
+  0.456105f,    0.139706f,    -0.373955f,  0.0232853f,  -0.365632f,
+  -0.0586727f,  0.828841f,    0.737974f,   -0.933899f,  -0.0620807f,
+  -0.262087f,   -0.0551274f,  -0.374378f,  0.118385f,   -0.0375933f,
+  -0.39549f,    -0.0844191f,  0.274343f,   0.21814f,    0.52751f,
+  0.449546f,    0.075518f,    0.369501f,   0.345248f,   0.403972f,
+  -0.465168f,   -0.551238f,   -0.354305f,  -0.233872f,  0.664137f,
+  -0.214848f,   -0.0363864f,  0.446154f,   -0.500073f,  -1.07883f,
+  -1.07772f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_8[] = {
+  1.09425f, -0.345875f, -0.56098f, -1.84859f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_8[] = {
+  -1.75332f, 0.419404f,  -0.0423004f, 0.345601f, -2.40097f,  -0.574857f,
+  -2.53366f, -0.207096f, -1.08866f,   0.801763f, -2.72428f,  -2.39884f,
+  1.04072f,  -0.782749f, -1.47003f,   -2.98207f, 0.8829f,    1.81741f,
+  -2.02369f, 0.241717f,  -0.178749f,  -3.00588f, -0.232007f, 0.21717f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_8 = {
+  NUM_FEATURES_8,
+  NUM_LOGITS_8,
+  NUM_HIDDEN_LAYERS_8,
+  {
+      NUM_LAYER_0_UNITS_8,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_8,
+      av1_simple_motion_search_prune_part_logits_kernel_8,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_8,
+      av1_simple_motion_search_prune_part_logits_bias_8,
+  },
+};
 
 #undef NUM_HIDDEN_LAYERS_8
 #undef NUM_FEATURES_8
 #undef NUM_LAYER_0_UNITS_8
 #undef NUM_LOGITS_8
-#endif
+
+#define FEATURE_SIZE 19
+static const float av1_2pass_split_partition_weights_128[FEATURE_SIZE + 1] = {
+  2.683936f, -0.193620f, -4.106470f, -0.141320f, -0.282289f,
+  0.125296f, -1.134961f, 0.862757f,  -0.418799f, -0.637666f,
+  0.016232f, 0.345013f,  0.018823f,  -0.393394f, -1.130700f,
+  0.695357f, 0.112569f,  -0.341975f, -0.513882f, 5.7488966f,
+};
+
+static const float av1_2pass_split_partition_weights_64[FEATURE_SIZE + 1] = {
+  2.990993f,  0.423273f,  -0.926544f, 0.454646f,  -0.292698f,
+  -1.311632f, -0.284432f, 0.717141f,  -0.419257f, -0.574760f,
+  -0.674444f, 0.669047f,  -0.374255f, 0.380624f,  -0.804036f,
+  0.264021f,  0.004163f,  1.896802f,  0.924287f,  0.13490619f,
+};
+
+static const float av1_2pass_split_partition_weights_32[FEATURE_SIZE + 1] = {
+  2.795181f,  -0.136943f, -0.924842f, 0.405330f,  -0.463505f,
+  -0.584076f, -0.831472f, 0.382985f,  -0.597544f, -0.138915f,
+  -1.354350f, 0.466035f,  -0.553961f, 0.213202f,  -1.166429f,
+  0.010776f,  -0.096236f, 2.335084f,  1.699857f,  -0.58178353f,
+};
+
+static const float av1_2pass_split_partition_weights_16[FEATURE_SIZE + 1] = {
+  1.987888f,  -0.431100f, -1.687703f, 0.262602f,  -0.425298f,
+  -0.463870f, -1.493457f, 0.470917f,  -0.528457f, -0.087700f,
+  -1.815092f, 0.152883f,  -0.337908f, 0.093679f,  -1.548267f,
+  -0.042387f, -0.000861f, 2.556746f,  1.619192f,  0.03643292f,
+};
+
+static const float av1_2pass_split_partition_weights_8[FEATURE_SIZE + 1] = {
+  2.188344f,  -0.817528f, -2.119219f, 0.000000f,  -0.348167f,
+  -0.658074f, -1.960362f, 0.000000f,  -0.403080f, 0.282699f,
+  -2.061088f, 0.000000f,  -0.431919f, -0.127960f, -1.099550f,
+  0.000000f,  0.121622f,  2.017455f,  2.058228f,  -0.15475988f,
+};
+
+static const float av1_2pass_none_partition_weights_128[FEATURE_SIZE + 1] = {
+  -1.006689f, 0.777908f,  4.461072f,  -0.395782f, -0.014610f,
+  -0.853863f, 0.729997f,  -0.420477f, 0.282429f,  -1.194595f,
+  3.181220f,  -0.511416f, 0.117084f,  -1.149348f, 1.507990f,
+  -0.477212f, 0.202963f,  -1.469581f, 0.624461f,  -0.89081228f,
+};
+
+static const float av1_2pass_none_partition_weights_64[FEATURE_SIZE + 1] = {
+  -1.241117f, 0.844878f,  5.638803f,  -0.489780f, -0.108796f,
+  -4.576821f, 1.540624f,  -0.477519f, 0.227791f,  -1.443968f,
+  1.586911f,  -0.505125f, 0.140764f,  -0.464194f, 1.466658f,
+  -0.641166f, 0.195412f,  1.427905f,  2.080007f,  -1.98272777f,
+};
+
+static const float av1_2pass_none_partition_weights_32[FEATURE_SIZE + 1] = {
+  -2.130825f, 0.476023f,  5.907343f,  -0.516002f, -0.097471f,
+  -2.662754f, 0.614858f,  -0.576728f, 0.085261f,  -0.031901f,
+  0.727842f,  -0.600034f, 0.079326f,  0.324328f,  0.504502f,
+  -0.547105f, -0.037670f, 0.304995f,  0.369018f,  -2.66299987f,
+};
+
+static const float av1_2pass_none_partition_weights_16[FEATURE_SIZE + 1] = {
+  -1.626410f, 0.872047f,  5.414965f,  -0.554781f, -0.084514f,
+  -3.020550f, 0.467632f,  -0.382280f, 0.199568f,  0.426220f,
+  0.829426f,  -0.467100f, 0.153098f,  0.662994f,  0.327545f,
+  -0.560106f, -0.141610f, 0.403372f,  0.523991f,  -3.02891231f,
+};
+
+static const float av1_2pass_none_partition_weights_8[FEATURE_SIZE + 1] = {
+  -1.463349f, 0.375376f,  4.751430f, 0.000000f, -0.184451f,
+  -1.655447f, 0.443214f,  0.000000f, 0.127961f, 0.152435f,
+  0.083288f,  0.000000f,  0.143105f, 0.438012f, 0.073238f,
+  0.000000f,  -0.278137f, 0.186134f, 0.073737f, -1.6494962f,
+};
 
 #ifdef __cplusplus
 }  // extern "C"

@@ -297,7 +297,7 @@ class ResizeInternalTestLarge : public ResizeTest {
 
   virtual void PSNRPktHook(const aom_codec_cx_pkt_t *pkt) {
     if (frame0_psnr_ == 0.) frame0_psnr_ = pkt->data.psnr.psnr[0];
-    EXPECT_NEAR(pkt->data.psnr.psnr[0], frame0_psnr_, 2.5);
+    EXPECT_NEAR(pkt->data.psnr.psnr[0], frame0_psnr_, 3.0);
   }
 
 #if WRITE_COMPRESSED_STREAM
@@ -374,6 +374,7 @@ class ResizeRealtimeTest
     if (video->frame() == 0) {
       encoder->Control(AV1E_SET_AQ_MODE, 3);
       encoder->Control(AOME_SET_CPUUSED, set_cpu_used_);
+      encoder->Control(AV1E_SET_FRAME_PARALLEL_DECODING, 1);
     }
 
     if (change_bitrate_ && video->frame() == 120) {

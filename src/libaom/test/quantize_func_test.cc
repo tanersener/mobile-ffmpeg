@@ -63,7 +63,7 @@ void highbd_quan64x64_wrapper(QUAN_PARAM_LIST) {
   HBD_QUAN_FUNC;
 }
 
-typedef enum { TYPE_B, TYPE_DC, TYPE_FP } QuantType;
+enum { TYPE_B, TYPE_DC, TYPE_FP } UENUM1BYTE(QuantType);
 
 using ::testing::tuple;
 typedef tuple<QuantizeFunc, QuantizeFunc, TX_SIZE, QuantType, aom_bit_depth_t>
@@ -398,6 +398,12 @@ const QuantizeParam kQParamArraySSE2[] = {
              TX_32X32, TYPE_B, AOM_BITS_10),
   make_tuple(&aom_highbd_quantize_b_32x32_c, &aom_highbd_quantize_b_32x32_sse2,
              TX_32X32, TYPE_B, AOM_BITS_12),
+  make_tuple(&aom_highbd_quantize_b_64x64_c, &aom_highbd_quantize_b_64x64_sse2,
+             TX_64X64, TYPE_B, AOM_BITS_8),
+  make_tuple(&aom_highbd_quantize_b_64x64_c, &aom_highbd_quantize_b_64x64_sse2,
+             TX_64X64, TYPE_B, AOM_BITS_10),
+  make_tuple(&aom_highbd_quantize_b_64x64_c, &aom_highbd_quantize_b_64x64_sse2,
+             TX_64X64, TYPE_B, AOM_BITS_12)
 };
 
 INSTANTIATE_TEST_CASE_P(SSE2, QuantizeTest,
@@ -411,6 +417,9 @@ INSTANTIATE_TEST_CASE_P(
                                  TX_16X16, TYPE_B, AOM_BITS_8),
                       make_tuple(&aom_quantize_b_32x32_c,
                                  &aom_quantize_b_32x32_ssse3, TX_32X32, TYPE_B,
+                                 AOM_BITS_8),
+                      make_tuple(&aom_quantize_b_64x64_c,
+                                 &aom_quantize_b_64x64_ssse3, TX_64X64, TYPE_B,
                                  AOM_BITS_8)));
 
 #endif  // HAVE_SSSE3 && ARCH_X86_64

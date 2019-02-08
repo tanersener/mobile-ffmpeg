@@ -56,13 +56,13 @@ typedef struct mv32 {
 #define WARPEDDIFF_PREC_BITS (WARPEDMODEL_PREC_BITS - WARPEDPIXEL_PREC_BITS)
 
 /* clang-format off */
-typedef enum ATTRIBUTE_PACKED {
+enum {
   IDENTITY = 0,      // identity transformation, 0-parameter
   TRANSLATION = 1,   // translational motion 2-parameter
   ROTZOOM = 2,       // simplified affine with rotation + zoom only, 4-parameter
   AFFINE = 3,        // affine, 6-parameter
   TRANS_TYPES,
-} TransformationType;
+} UENUM1BYTE(TransformationType);
 /* clang-format on */
 
 // Number of types used for global motion (must be >= 3 and <= TRANS_TYPES)
@@ -87,18 +87,18 @@ static const int trans_model_params[TRANS_TYPES] = { 0, 2, 4, 6 };
 //  z .  y'  =   m4 m5 m1 *  y
 //       1]      m6 m7 1)    1]
 typedef struct {
-  TransformationType wmtype;
   int32_t wmmat[8];
   int16_t alpha, beta, gamma, delta;
+  TransformationType wmtype;
   int8_t invalid;
 } WarpedMotionParams;
 
 /* clang-format off */
 static const WarpedMotionParams default_warp_params = {
-  IDENTITY,
   { 0, 0, (1 << WARPEDMODEL_PREC_BITS), 0, 0, (1 << WARPEDMODEL_PREC_BITS), 0,
     0 },
   0, 0, 0, 0,
+  IDENTITY,
   0,
 };
 /* clang-format on */
@@ -263,7 +263,7 @@ static INLINE int_mv gm_get_motion_vector(const WarpedMotionParams *gm,
   return res;
 }
 
-static INLINE TransformationType get_gmtype(const WarpedMotionParams *gm) {
+static INLINE TransformationType get_wmtype(const WarpedMotionParams *gm) {
   if (gm->wmmat[5] == (1 << WARPEDMODEL_PREC_BITS) && !gm->wmmat[4] &&
       gm->wmmat[2] == (1 << WARPEDMODEL_PREC_BITS) && !gm->wmmat[3]) {
     return ((!gm->wmmat[1] && !gm->wmmat[0]) ? IDENTITY : TRANSLATION);

@@ -33,7 +33,8 @@ uint32_t write_obu_header(OBU_TYPE obu_type, int obu_extension,
 int write_uleb_obu_size(uint32_t obu_header_size, uint32_t obu_payload_size,
                         uint8_t *dest);
 
-int av1_pack_bitstream(AV1_COMP *const cpi, uint8_t *dest, size_t *size);
+int av1_pack_bitstream(AV1_COMP *const cpi, uint8_t *dst, size_t *size,
+                       int *const largest_tile_id);
 
 static INLINE int av1_preserve_existing_gf(const AV1_COMP *const cpi) {
   // Do not swap gf and arf indices for internal overlay frames

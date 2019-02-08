@@ -120,6 +120,7 @@ int aom_realloc_frame_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
       // Allocation to hold larger frame, or first allocation.
       aom_free(ybf->buffer_alloc);
       ybf->buffer_alloc = NULL;
+      ybf->buffer_alloc_sz = 0;
 
       if (frame_size != (size_t)frame_size) return -1;
 
