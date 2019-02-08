@@ -189,14 +189,14 @@ public class MediaInformationParser {
                             pEnd = count(part2, ")");
                         }
 
-                        streamInformation.setFullFormat(part2.toLowerCase().trim());
-                        streamInformation.setFormat(part2.replaceAll("\\(.*\\)", "").toLowerCase().trim());
+                        streamInformation.setFullFormat(part2.toLowerCase(Locale.getDefault()).trim());
+                        streamInformation.setFormat(part2.replaceAll("\\(.*\\)", "").toLowerCase(Locale.getDefault()).trim());
                     }
 
                     lastUsedPart++;
                     String videoDimensionPart = safeGet(parts, lastUsedPart);
                     if (videoDimensionPart != null) {
-                        String videoLayout = videoDimensionPart.toLowerCase().trim();
+                        String videoLayout = videoDimensionPart.toLowerCase(Locale.getDefault()).trim();
                         Pair<Long, Long> dimensions = parseVideoDimensions(videoLayout);
                         streamInformation.setWidth(dimensions.getFirst());
                         streamInformation.setHeight(dimensions.getSecond());
@@ -205,7 +205,7 @@ public class MediaInformationParser {
                     }
 
                     for (int i = lastUsedPart + 1; i < parts.length; i++) {
-                        String part = parts[i].replaceAll("\\(.*\\)", "").toLowerCase();
+                        String part = parts[i].replaceAll("\\(.*\\)", "").toLowerCase(Locale.getDefault());
 
                         if (part.contains("kb/s")) {
                             streamInformation.setBitrate(toLongObject(part.replaceAll("kb/s", "").trim()));
@@ -225,13 +225,13 @@ public class MediaInformationParser {
                         streamInformation.setSampleRate(parseAudioStreamSampleRate(part2));
                     }
                     if (part3 != null) {
-                        streamInformation.setChannelLayout(part3.toLowerCase().trim());
+                        streamInformation.setChannelLayout(part3.toLowerCase(Locale.getDefault()).trim());
                     }
                     if (part4 != null) {
-                        streamInformation.setSampleFormat(part4.toLowerCase().trim());
+                        streamInformation.setSampleFormat(part4.toLowerCase(Locale.getDefault()).trim());
                     }
                     if (part5 != null) {
-                        streamInformation.setBitrate(toLongObject(part5.toLowerCase().replaceAll("\\(.*\\)", "").replaceAll("kb/s", "").trim()));
+                        streamInformation.setBitrate(toLongObject(part5.toLowerCase(Locale.getDefault()).replaceAll("\\(.*\\)", "").replaceAll("kb/s", "").trim()));
                     }
                 }
             }
@@ -245,7 +245,7 @@ public class MediaInformationParser {
         Long height = null;
 
         if (input != null) {
-            final String[] dimensions = input.toLowerCase().replaceAll("\\[.*\\]", "").trim().split("x");
+            final String[] dimensions = input.toLowerCase(Locale.getDefault()).replaceAll("\\[.*\\]", "").trim().split("x");
             width = toLongObject(safeGet(dimensions, 0));
             height = toLongObject(safeGet(dimensions, 1));
         }
@@ -257,7 +257,7 @@ public class MediaInformationParser {
         if (input != null) {
             String[] parts = input.replaceAll("\\[", "").replaceAll("\\]", "").split(" ");
             for (int i = 0; i < parts.length; i++) {
-                if (parts[i].toLowerCase().equals("sar")) {
+                if (parts[i].toLowerCase(Locale.getDefault()).equals("sar")) {
                     return safeGet(parts, i + 1);
                 }
             }
@@ -270,7 +270,7 @@ public class MediaInformationParser {
         if (input != null) {
             String[] parts = input.replaceAll("\\[", "").replaceAll("\\]", "").split(" ");
             for (int i = 0; i < parts.length; i++) {
-                if (parts[i].toLowerCase().equals("dar")) {
+                if (parts[i].toLowerCase(Locale.getDefault()).equals("dar")) {
                     return safeGet(parts, i + 1);
                 }
             }
@@ -284,7 +284,7 @@ public class MediaInformationParser {
             boolean khz = false;
             boolean mhz = false;
 
-            String lowerCase = input.toLowerCase();
+            String lowerCase = input.toLowerCase(Locale.getDefault());
             if (lowerCase.contains("khz")) {
                 khz = true;
             }
@@ -312,9 +312,9 @@ public class MediaInformationParser {
 
     static String parseStreamType(final String input) {
         if (input != null) {
-            if (input.toLowerCase().contains("audio:")) {
+            if (input.toLowerCase(Locale.getDefault()).contains("audio:")) {
                 return "audio";
-            } else if (input.toLowerCase().contains("video:")) {
+            } else if (input.toLowerCase(Locale.getDefault()).contains("video:")) {
                 return "video";
             }
         }
@@ -324,7 +324,7 @@ public class MediaInformationParser {
 
     static String parseStreamCodec(final String input) {
         if (input != null) {
-            return input.toLowerCase()
+            return input.toLowerCase(Locale.getDefault())
                     .replaceAll("\\(.*\\)", "")
                     .replaceAll("video:", "")
                     .replaceAll("audio:", "")
@@ -336,7 +336,7 @@ public class MediaInformationParser {
 
     static String parseStreamFullCodec(final String input) {
         if (input != null) {
-            return input.toLowerCase()
+            return input.toLowerCase(Locale.getDefault())
                     .replaceAll("video:", "")
                     .replaceAll("audio:", "")
                     .trim();
