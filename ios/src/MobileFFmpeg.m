@@ -182,7 +182,11 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutpu
     if (rc == 0) {
         return [MediaInformationParser from:systemCommandOutput];
     } else {
-        NSLog(@"%@", systemCommandOutput);
+        int activeLogLevel = av_log_get_level();
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+            NSLog(@"%@", systemCommandOutput);
+        }
+
         return nil;
     }
 }

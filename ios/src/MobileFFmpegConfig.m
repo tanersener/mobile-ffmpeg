@@ -254,7 +254,10 @@ void mobileffmpeg_statistics_callback_function(int frameNumber, float fps, float
  * Forwards callback messages to Delegates.
  */
 void callbackBlockFunction() {
-    NSLog(@"Async callback block started.\n");
+    int activeLogLevel = av_log_get_level();
+    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+        NSLog(@"Async callback block started.\n");
+    }
 
     while(redirectionEnabled) {
         @autoreleasepool {
@@ -313,13 +316,19 @@ void callbackBlockFunction() {
                 }
 
             } @catch(NSException *exception) {
-                NSLog(@"Async callback block received error: %@n\n", exception);
-                NSLog(@"%@", [exception callStackSymbols]);
+                activeLogLevel = av_log_get_level();
+                if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+                    NSLog(@"Async callback block received error: %@n\n", exception);
+                    NSLog(@"%@", [exception callStackSymbols]);
+                }
             }
         }
     }
 
-    NSLog(@"Async callback block stopped.\n");
+    activeLogLevel = av_log_get_level();
+    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+        NSLog(@"Async callback block stopped.\n");
+    }
 }
 
 static int systemCommandOutputContainsPattern(NSArray *patternList) {
@@ -564,20 +573,27 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     int validFontNameMappingCount = 0;
     NSString *tempConfigurationDirectory = [NSTemporaryDirectory() stringByAppendingPathComponent:@".mobileffmpeg"];
     NSString *fontConfigurationFile = [tempConfigurationDirectory stringByAppendingPathComponent:@"fonts.conf"];
+    int activeLogLevel = av_log_get_level();
 
     if (![[NSFileManager defaultManager] fileExistsAtPath:tempConfigurationDirectory isDirectory:&isDirectory]) {
 
         if (![[NSFileManager defaultManager] createDirectoryAtPath:tempConfigurationDirectory withIntermediateDirectories:YES attributes:nil error:&error]) {
-            NSLog(@"Failed to set font directory. Error received while creating temp conf directory: %@.", error);
+            if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+                NSLog(@"Failed to set font directory. Error received while creating temp conf directory: %@.", error);
+            }
             return;
         }
 
-        NSLog(@"Created temporary font conf directory: TRUE.");
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+            NSLog(@"Created temporary font conf directory: TRUE.");
+        }
     }
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:fontConfigurationFile isDirectory:&isFile]) {
         BOOL fontConfigurationDeleted = [[NSFileManager defaultManager] removeItemAtPath:fontConfigurationFile error:NULL];
-        NSLog(@"Deleted old temporary font configuration: %s.", fontConfigurationDeleted?"TRUE":"FALSE");
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+            NSLog(@"Deleted old temporary font configuration: %s.", fontConfigurationDeleted?"TRUE":"FALSE");
+        }
     }
 
     /* PROCESS MAPPINGS FIRST */
@@ -611,14 +627,20 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
                             @"</fontconfig>"];
 
     if (![fontConfiguration writeToFile:fontConfigurationFile atomically:YES encoding:NSUTF8StringEncoding error:&error]) {
-        NSLog(@"Failed to set font directory. Error received while saving font configuration: %@.", error);
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+            NSLog(@"Failed to set font directory. Error received while saving font configuration: %@.", error);
+        }
         return;
     }
-    NSLog(@"Saved new temporary font configuration with %d font name mappings.", validFontNameMappingCount);
+    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+        NSLog(@"Saved new temporary font configuration with %d font name mappings.", validFontNameMappingCount);
+    }
 
     [MobileFFmpegConfig setFontconfigConfigurationPath:tempConfigurationDirectory];
 
-    NSLog(@"Font directory %@ registered successfully.", fontDirectoryPath);
+    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+        NSLog(@"Font directory %@ registered successfully.", fontDirectoryPath);
+    }
 }
 
 /**
@@ -858,7 +880,10 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     if (rc == 0) {
         return newFFmpegPipePath;
     } else {
-        NSLog(@"Failed to register new FFmpeg pipe %@. Operation failed with rc=%d.", newFFmpegPipePath, rc);
+        int activeLogLevel = av_log_get_level();
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+            NSLog(@"Failed to register new FFmpeg pipe %@. Operation failed with rc=%d.", newFFmpegPipePath, rc);
+        }
         return nil;
     }
 }
