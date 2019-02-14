@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        localConfig {
+            keyAlias 'androiddebugkey'
+            storeFile file('/home/taner/.android/debug.keystore')
+            storePassword 'android'
+            keyPassword 'android'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.arthenica.mobileffmpeg.test"
@@ -11,9 +19,14 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        release {
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.localConfig
         }
     }
     splits {
@@ -39,9 +52,9 @@ android.applicationVariants.all { variant ->
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     // implementation 'com.arthenica:mobile-ffmpeg-full:4.2'
-    implementation project(":app")
+    implementation project(':app')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
