@@ -20,6 +20,7 @@
 /*
  * CHANGES 02.2019
  * --------------------------------------------------------
+ * - JavaVM registered via av_jni_set_java_vm()
  * - registerNewNativeFFmpegPipe() method added
  *
  * CHANGES 10.2018
@@ -40,6 +41,7 @@
 #include <sys/stat.h>
 
 #include "config.h"
+#include "libavcodec/jni.h"
 #include "libavutil/bprint.h"
 #include "mobileffmpeg.h"
 #include "fftools_ffmpeg.h"
@@ -508,6 +510,8 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         (*globalVm)->DetachCurrentThread(globalVm);
         return JNI_FALSE;
     }
+
+    av_jni_set_java_vm(vm, NULL);
 
     configClass = (jclass) ((*env)->NewGlobalRef(env, localConfigClass));
 
