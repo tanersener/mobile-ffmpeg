@@ -4,7 +4,7 @@ android {
     signingConfigs {
         localConfig {
             keyAlias 'androiddebugkey'
-            storeFile file('/home/taner/.android/debug.keystore')
+            storeFile file(System.getProperty("user.home") + '/.android/debug.keystore')
             storePassword 'android'
             keyPassword 'android'
         }
@@ -20,13 +20,8 @@ android {
     }
     buildTypes {
         debug {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-        release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.localConfig
         }
     }
     splits {
