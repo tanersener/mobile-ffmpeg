@@ -347,14 +347,14 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
+    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${TARGET_HOST}/${API} -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
 
     case $1 in
         ffmpeg)
             if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-                echo "-lc -lm -ldl -llog -lcamera2ndk -lmediandk -lc++_shared ${COMMON_LIBRARY_PATHS}"
+                echo "-lc -lm -ldl -llog -lcamera2ndk -lmediandk ${COMMON_LIBRARY_PATHS}"
             else
-                echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
+                echo "-lc -lm -ldl -llog ${COMMON_LIBRARY_PATHS}"
             fi
         ;;
         tesseract)
@@ -751,7 +751,7 @@ URL: https://github.com/tesseract-ocr/tesseract
 Version: ${TESSERACT_VERSION}
 
 Requires: lept, libjpeg, libpng, giflib, zlib, libwebp, libtiff-4
-Libs: -L\${libdir} -ltesseract
+Libs: -L\${libdir} -ltesseract -lc++_shared
 Cflags: -I\${includedir}
 EOF
 }
