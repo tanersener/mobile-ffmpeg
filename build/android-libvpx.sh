@@ -30,7 +30,7 @@ set_toolchain_clang_paths ${LIB_NAME}
 # PREPARING FLAGS
 export CFLAGS="$(get_cflags ${LIB_NAME}) -I${ANDROID_NDK_ROOT}/sources/android/cpufeatures"
 export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
-export LDFLAGS="$(get_ldflags ${LIB_NAME}) -L${ANDROID_NDK_ROOT}/sources/android/cpufeatures -lcpufeatures"
+export LDFLAGS="$(get_ldflags ${LIB_NAME})"
 
 TARGET_CPU=""
 DISABLE_NEON_FLAG=""
