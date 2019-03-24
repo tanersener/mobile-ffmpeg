@@ -602,6 +602,7 @@ DISPLAY_HELP=""
 BUILD_LTS=""
 BUILD_TYPE_ID=""
 BUILD_FORCE=""
+BUILD_VERSION=$(git describe --tags 2>>${BASEDIR}/build.log)
 
 while [ ! $# -eq 0 ]
 do
@@ -697,7 +698,7 @@ fi
 
 echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}static library for IOS\n"
 
-echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_TYPE_ID}for IOS: " 1>>${BASEDIR}/build.log 2>&1
+echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}for IOS: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 print_enabled_architectures

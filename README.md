@@ -292,7 +292,7 @@ This table shows the differences between two variants.
 1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
 
     ```
-    autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen patch
+    autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen patch git
     ```
 Some of these packages are not mandatory for the default build.
 Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Prerequisites) and

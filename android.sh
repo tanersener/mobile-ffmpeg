@@ -500,6 +500,7 @@ GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_LTS=""
 BUILD_TYPE_ID=""
+BUILD_VERSION=$(git describe --tags 2>>${BASEDIR}/build.log)
 
 while [ ! $# -eq 0 ]
 do
@@ -586,7 +587,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
 fi
 
 echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android\n"
-echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
+echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 # PERFORM THIS CHECK ONLY ON LTS
