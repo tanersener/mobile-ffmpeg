@@ -193,15 +193,17 @@ get_common_includes() {
 
 get_common_cflags() {
     if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-        local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
+        local LTS_BUILD_FLAG="-DMOBILE_FFMPEG_LTS "
     fi
+    
+    local BUILD_DATE="-DMOBILE_FFMPEG_BUILD_DATE=$(date +%Y%m%d 2>>${BASEDIR}/build.log)"
 
     case ${ARCH} in
         i386 | x86-64)
-            echo "-fstrict-aliasing -DIOS ${LTS_BUILD__FLAG}-isysroot ${SDK_PATH}"
+            echo "-fstrict-aliasing -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
         ;;
         *)
-            echo "-fstrict-aliasing -fembed-bitcode -DIOS ${LTS_BUILD__FLAG}-isysroot ${SDK_PATH}"
+            echo "-fstrict-aliasing -fembed-bitcode -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
         ;;
     esac
 }

@@ -116,4 +116,11 @@ extern int const RETURN_CODE_CANCEL;
  */
  + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout;
 
+/**
+ * Returns MobileFFmpeg library build date.
+ *
+ * @return MobileFFmpeg library build date
+ */
++ (NSString*)getBuildDate;
+
 @end

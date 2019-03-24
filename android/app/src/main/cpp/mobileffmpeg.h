@@ -117,4 +117,11 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildC
  */
 JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFFmpegPipe(JNIEnv *env, jclass object, jstring ffmpegPipePath);
 
+/*
+ * Class:     com_arthenica_mobileffmpeg_Config
+ * Method:    getNativeBuildDate
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildDate(JNIEnv *env, jclass object);
+
 #endif /* MOBILE_FFMPEG_H */

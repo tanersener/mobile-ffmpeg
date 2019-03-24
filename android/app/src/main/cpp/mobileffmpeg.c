@@ -709,3 +709,16 @@ JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFF
 
     return mkfifo(ffmpegPipePathString, S_IRWXU | S_IRWXG | S_IROTH);
 }
+
+/**
+ * Returns MobileFFmpeg library build date natively.
+ *
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return MobileFFmpeg library build date
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildDate(JNIEnv *env, jclass object) {
+    char buildDate[10];
+    sprintf(buildDate, "%d", MOBILE_FFMPEG_BUILD_DATE);
+    return (*env)->NewStringUTF(env, buildDate);
+}

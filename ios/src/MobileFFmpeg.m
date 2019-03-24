@@ -47,7 +47,7 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutpu
     lastReturnCode = 0;
     lastCommandOutput = [[NSMutableString alloc] init];
 
-    NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpeg getVersion]);
+    NSLog(@"Loaded mobile-ffmpeg-%@-%@-%@-%@\n", [MobileFFmpegConfig getPackageName], [ArchDetect getArch], [MobileFFmpeg getVersion], [MobileFFmpeg getBuildDate]);
 }
 
 /**
@@ -189,6 +189,17 @@ extern int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutpu
 
         return nil;
     }
+}
+
+/**
+ * Returns MobileFFmpeg library build date.
+ *
+ * @return MobileFFmpeg library build date
+ */
++ (NSString*)getBuildDate {
+    char buildDate[10];
+    sprintf(buildDate, "%d", MOBILE_FFMPEG_BUILD_DATE);
+    return [NSString stringWithUTF8String:buildDate];
 }
 
 @end

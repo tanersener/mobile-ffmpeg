@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.arthenica.mobileffmpeg.FFmpeg.getBuildDate;
 import static com.arthenica.mobileffmpeg.FFmpeg.getVersion;
 
 /**
@@ -115,7 +116,7 @@ public class Config {
             System.loadLibrary("mobileffmpeg");
         }
 
-        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s-%s.", getPackageName(), AbiDetect.getAbi(), getVersion()));
+        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s-%s-%s.", getPackageName(), AbiDetect.getAbi(), getVersion(), getBuildDate()));
 
         /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
         activeLogLevel = Level.from(getNativeLogLevel());
@@ -577,5 +578,12 @@ public class Config {
      * @return zero on successful creation, non-zero on error
      */
     native static int registerNewNativeFFmpegPipe(final String ffmpegPipePath);
+
+    /**
+     * <p>Returns MobileFFmpeg library build date natively.
+     *
+     * @return MobileFFmpeg library build date
+     */
+    native static String getNativeBuildDate();
 
 }
