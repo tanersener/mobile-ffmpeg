@@ -597,6 +597,8 @@ get_external_library_version() {
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/ios-common.sh
 
+echo -e "INFO: Build options: $@\n" 1>>${BASEDIR}/build.log 2>&1
+
 GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_LTS=""
