@@ -128,6 +128,9 @@ do
     fi
 done
 
+# BUILD CPU-FEATURES FIRST
+build_cpufeatures
+
 let completed=0
 while [ ${#enabled_library_list[@]} -gt $completed ]; do
     for library in "${enabled_library_list[@]}"
