@@ -73,8 +73,8 @@ if ! [ -x "$(command -v xcrun)" ]; then
     exit 1
 fi
 
-# USE SDK VERSION AS IOS_MIN_VERSION
-export IOS_MIN_VERSION="$(xcrun --sdk iphoneos --show-sdk-version)"
+# USE 12.1 AS IOS_MIN_VERSION
+export IOS_MIN_VERSION=12.1
 
 get_mobile_ffmpeg_version() {
     local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
@@ -597,7 +597,7 @@ get_external_library_version() {
 # ENABLE COMMON FUNCTIONS
 . ${BASEDIR}/build/ios-common.sh
 
-echo -e "INFO: Build options: $@\n" 1>>${BASEDIR}/build.log 2>&1
+echo -e "\nINFO: Build options: $@\n" 1>>${BASEDIR}/build.log 2>&1
 
 GPL_ENABLED="no"
 DISPLAY_HELP=""
