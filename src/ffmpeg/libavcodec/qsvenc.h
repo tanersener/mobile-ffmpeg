@@ -131,6 +131,8 @@ typedef struct QSVEncContext {
 
     QSVFramesContext frames_ctx;
 
+    mfxVersion          ver;
+
     // options set by the caller
     int async_depth;
     int idr_interval;
@@ -151,7 +153,6 @@ typedef struct QSVEncContext {
 
     int single_sei_nal_unit;
     int max_dec_frame_buffering;
-    int trellis;
 
     int bitrate_limit;
     int mbbrc;

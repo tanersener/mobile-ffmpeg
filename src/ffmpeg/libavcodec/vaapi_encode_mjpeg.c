@@ -142,7 +142,7 @@ static int vaapi_encode_mjpeg_write_image_header(AVCodecContext *avctx,
 
     err = 0;
 fail:
-    ff_cbs_fragment_uninit(priv->cbc, frag);
+    ff_cbs_fragment_reset(priv->cbc, frag);
     return err;
 }
 
@@ -438,7 +438,7 @@ static av_cold int vaapi_encode_mjpeg_configure(AVCodecContext *avctx)
     VAAPIEncodeMJPEGContext *priv = avctx->priv_data;
     int err;
 
-    priv->quality = avctx->global_quality;
+    priv->quality = ctx->rc_quality;
     if (priv->quality < 1 || priv->quality > 100) {
         av_log(avctx, AV_LOG_ERROR, "Invalid quality value %d "
                "(must be 1-100).\n", priv->quality);
@@ -483,6 +483,8 @@ static const VAAPIEncodeType vaapi_encode_type_mjpeg = {
 
     .configure             = &vaapi_encode_mjpeg_configure,
 
+    .default_quality       = 80,
+
     .picture_params_size   = sizeof(VAEncPictureParameterBufferJPEG),
     .init_picture_params   = &vaapi_encode_mjpeg_init_picture_params,
 
@@ -515,6 +517,7 @@ static av_cold int vaapi_encode_mjpeg_close(AVCodecContext *avctx)
 {
     VAAPIEncodeMJPEGContext *priv = avctx->priv_data;
 
+    ff_cbs_fragment_free(priv->cbc, &priv->current_fragment);
     ff_cbs_close(&priv->cbc);
 
     return ff_vaapi_encode_close(avctx);
@@ -536,7 +539,6 @@ static const AVOption vaapi_encode_mjpeg_options[] = {
 };
 
 static const AVCodecDefault vaapi_encode_mjpeg_defaults[] = {
-    { "global_quality", "80" },
     { "b",              "0"  },
     { NULL },
 };

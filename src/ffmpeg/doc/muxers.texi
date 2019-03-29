@@ -315,6 +315,9 @@ This option will also try to comply with the above open spec, till Apple's spec 
 Applicable only when @var{streaming} and @var{hls_playlist} options are enabled.
 This is an experimental feature.
 
+@item -master_m3u8_publish_rate @var{master_m3u8_publish_rate}
+Publish master playlist repeatedly every after specified number of segment intervals.
+
 @end table
 
 @anchor{framecrc}
@@ -1018,7 +1021,7 @@ ffmpeg -re -i in.ts -b:v 1000k -b:a 64k -a53cc 1 -f hls \
   http://example.com/live/out.m3u8
 @end example
 This example adds @code{#EXT-X-MEDIA} tag with @code{TYPE=CLOSED-CAPTIONS} in
-the master playlist with group name 'cc', langauge 'en' (english) and
+the master playlist with group name 'cc', language 'en' (english) and
 INSTREAM-ID 'CC1'. Also, it adds @code{CLOSED-CAPTIONS} attribute with group
 name 'cc' for the output variant stream.
 @example
@@ -1523,7 +1526,7 @@ Set the program @samp{service_type}. Default is @code{digital_tv}.
 Accepts the following options:
 @table @samp
 @item hex_value
-Any hexdecimal value between @code{0x01} to @code{0xff} as defined in
+Any hexadecimal value between @code{0x01} and @code{0xff} as defined in
 ETSI 300 468.
 @item digital_tv
 Digital TV service.
@@ -1626,7 +1629,7 @@ ffmpeg -i file.mpg -c copy \
      out.ts
 @end example
 
-@section mxf, mxf_d10
+@section mxf, mxf_d10, mxf_opatom
 
 MXF muxer.
 
@@ -1638,7 +1641,7 @@ The muxer options are:
 @item store_user_comments @var{bool}
 Set if user comments should be stored if available or never.
 IRT D-10 does not allow user comments. The default is thus to write them for
-mxf but not for mxf_d10
+mxf and mxf_opatom but not for mxf_d10
 @end table
 
 @section null

@@ -523,6 +523,9 @@ The offset is added to the timestamps of the input files. Specifying
 a positive offset means that the corresponding streams are delayed by
 the time duration specified in @var{offset}.
 
+@item -itsscale @var{scale} (@emph{input,per-stream})
+Rescale input timestamps. @var{scale} should be a floating point number.
+
 @item -timestamp @var{date} (@emph{output})
 Set the recording timestamp in the container.
 
@@ -1393,10 +1396,6 @@ loss).
 By default @command{ffmpeg} attempts to read the input(s) as fast as possible.
 This option will slow down the reading of the input(s) to the native frame rate
 of the input(s). It is useful for real-time output (e.g. live streaming).
-@item -loop_output @var{number_of_times}
-Repeatedly loop output for formats that support looping such as animated GIF
-(0 will loop the output infinitely).
-This option is deprecated, use -loop.
 @item -vsync @var{parameter}
 Video sync method.
 For compatibility reasons old values can be specified as numbers.
@@ -1516,9 +1515,9 @@ Enable bitexact mode for (de)muxer and (de/en)coder
 Finish encoding when the shortest input stream ends.
 @item -dts_delta_threshold
 Timestamp discontinuity delta threshold.
-@item -muxdelay @var{seconds} (@emph{input})
+@item -muxdelay @var{seconds} (@emph{output})
 Set the maximum demux-decode delay.
-@item -muxpreload @var{seconds} (@emph{input})
+@item -muxpreload @var{seconds} (@emph{output})
 Set the initial demux-decode delay.
 @item -streamid @var{output-stream-index}:@var{new-value} (@emph{output})
 Assign a new stream-id value to an output stream. This option should be

@@ -46,7 +46,6 @@ typedef struct XAVS2EContext {
     int min_qp;
     int preset_level;
     int log_level;
-    int hierarchical_reference;
 
     void *encoder;
     char *xavs2_opts;
@@ -110,8 +109,8 @@ static av_cold int xavs2_init(AVCodecContext *avctx)
         xavs2_opt_set2("RateControl",   "%d", 1);
         xavs2_opt_set2("TargetBitRate", "%"PRId64"", avctx->bit_rate);
         xavs2_opt_set2("InitialQP",     "%d", cae->initial_qp);
-        xavs2_opt_set2("MaxQP",         "%d", cae->max_qp);
-        xavs2_opt_set2("MinQP",         "%d", cae->min_qp);
+        xavs2_opt_set2("MaxQP",         "%d", avctx->qmax >= 0 ? avctx->qmax : cae->max_qp);
+        xavs2_opt_set2("MinQP",         "%d", avctx->qmin >= 0 ? avctx->qmin : cae->min_qp);
     } else {
         xavs2_opt_set2("InitialQP",     "%d", cae->qp);
     }

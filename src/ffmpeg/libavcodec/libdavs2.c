@@ -45,9 +45,9 @@ static av_cold int davs2_init(AVCodecContext *avctx)
     /* init the decoder */
     cad->param.threads      = avctx->thread_count;
     cad->param.info_level   = 0;
-    cad->decoder            = davs2_decoder_open(&cad->param);
     cad->param.disable_avx  = !(cpu_flags & AV_CPU_FLAG_AVX &&
                                 cpu_flags & AV_CPU_FLAG_AVX2);
+    cad->decoder            = davs2_decoder_open(&cad->param);
 
     if (!cad->decoder) {
         av_log(avctx, AV_LOG_ERROR, "decoder created error.");
@@ -107,7 +107,7 @@ static int davs2_dump_frames(AVCodecContext *avctx, davs2_picture_t *pic, int *g
         frame->buf[plane]  = av_buffer_alloc(size_line * pic->lines[plane]);
 
         if (!frame->buf[plane]){
-            av_log(avctx, AV_LOG_ERROR, "dump error: alloc failed.\n");
+            av_log(avctx, AV_LOG_ERROR, "Decoder error: allocation failure, can't dump frames.\n");
             return AVERROR(ENOMEM);
         }
 
@@ -127,6 +127,21 @@ static int davs2_dump_frames(AVCodecContext *avctx, davs2_picture_t *pic, int *g
 
     *got_frame = 1;
     return 0;
+}
+
+static void davs2_flush(AVCodecContext *avctx)
+{
+    DAVS2Context *cad      = avctx->priv_data;
+    int           ret      = DAVS2_GOT_FRAME;
+
+    while (ret == DAVS2_GOT_FRAME) {
+        ret = davs2_decoder_flush(cad->decoder, &cad->headerset, &cad->out_frame);
+        davs2_decoder_frame_unref(cad->decoder, &cad->out_frame);
+    }
+
+    if (ret == DAVS2_ERROR) {
+        av_log(avctx, AV_LOG_WARNING, "Decoder flushing failed.\n");
+    }
 }
 
 static int send_delayed_frame(AVCodecContext *avctx, AVFrame *frame, int *got_frame)
@@ -205,6 +220,7 @@ AVCodec ff_libdavs2_decoder = {
     .init           = davs2_init,
     .close          = davs2_end,
     .decode         = davs2_decode_frame,
+    .flush          = davs2_flush,
     .capabilities   =  AV_CODEC_CAP_DELAY | AV_CODEC_CAP_AUTO_THREADS,
     .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV420P,
                                                      AV_PIX_FMT_NONE },

@@ -56,21 +56,13 @@ static int decode_frame(AVCodecContext *avctx,
     }
 
     bytestream2_init(&gb, avpkt->data, avpkt->size);
+    blocks = bytestream2_get_le16(&gb);
+    if (!blocks)
+        return avpkt->size;
 
     if ((ret = ff_get_buffer(avctx, frame, AV_GET_BUFFER_FLAG_REF)) < 0)
         return ret;
 
-    if (s->prev_frame->data[0]) {
-        ret = av_frame_copy(frame, s->prev_frame);
-        if (ret < 0)
-            return ret;
-    } else {
-        ptrdiff_t linesize[4] = { frame->linesize[0], 0, 0, 0 };
-        av_image_fill_black(frame->data, linesize, avctx->pix_fmt, 0,
-                            avctx->width, avctx->height);
-    }
-
-    blocks = bytestream2_get_le16(&gb);
     if (blocks > 5) {
         GetByteContext bgb;
         int x = 0, size;
@@ -160,6 +152,16 @@ static int decode_frame(AVCodecContext *avctx,
         s->zstream.avail_in = avpkt->size - skip;
 
         bytestream2_seek(&gb, 2, SEEK_SET);
+    }
+
+    if (s->prev_frame->data[0]) {
+        ret = av_frame_copy(frame, s->prev_frame);
+        if (ret < 0)
+            return ret;
+    } else {
+        ptrdiff_t linesize[4] = { frame->linesize[0], 0, 0, 0 };
+        av_image_fill_black(frame->data, linesize, avctx->pix_fmt, 0,
+                            avctx->width, avctx->height);
     }
 
     for (int block = 0; block < blocks; block++) {

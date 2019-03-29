@@ -174,7 +174,7 @@ static int vaapi_encode_h264_write_sequence_header(AVCodecContext *avctx,
 
     err = vaapi_encode_h264_write_access_unit(avctx, data, data_len, au);
 fail:
-    ff_cbs_fragment_uninit(priv->cbc, au);
+    ff_cbs_fragment_reset(priv->cbc, au);
     return err;
 }
 
@@ -200,7 +200,7 @@ static int vaapi_encode_h264_write_slice_header(AVCodecContext *avctx,
 
     err = vaapi_encode_h264_write_access_unit(avctx, data, data_len, au);
 fail:
-    ff_cbs_fragment_uninit(priv->cbc, au);
+    ff_cbs_fragment_reset(priv->cbc, au);
     return err;
 }
 
@@ -264,7 +264,7 @@ static int vaapi_encode_h264_write_extra_header(AVCodecContext *avctx,
         if (err < 0)
             goto fail;
 
-        ff_cbs_fragment_uninit(priv->cbc, au);
+        ff_cbs_fragment_reset(priv->cbc, au);
 
         *type = VAEncPackedHeaderRawData;
         return 0;
@@ -286,7 +286,7 @@ static int vaapi_encode_h264_write_extra_header(AVCodecContext *avctx,
     }
 
 fail:
-    ff_cbs_fragment_uninit(priv->cbc, au);
+    ff_cbs_fragment_reset(priv->cbc, au);
     return err;
 }
 
@@ -298,9 +298,6 @@ static int vaapi_encode_h264_init_sequence_params(AVCodecContext *avctx)
     H264RawPPS                        *pps = &priv->raw_pps;
     VAEncSequenceParameterBufferH264 *vseq = ctx->codec_sequence_params;
     VAEncPictureParameterBufferH264  *vpic = ctx->codec_picture_params;
-
-    memset(&priv->current_access_unit, 0,
-           sizeof(priv->current_access_unit));
 
     memset(sps, 0, sizeof(*sps));
     memset(pps, 0, sizeof(*pps));
@@ -332,9 +329,16 @@ static int vaapi_encode_h264_init_sequence_params(AVCodecContext *avctx)
         sps->level_idc = avctx->level;
     } else {
         const H264LevelDescriptor *level;
+        int framerate;
+
+        if (avctx->framerate.num > 0 && avctx->framerate.den > 0)
+            framerate = avctx->framerate.num / avctx->framerate.den;
+        else
+            framerate = 0;
 
         level = ff_h264_guess_level(sps->profile_idc,
                                     avctx->bit_rate,
+                                    framerate,
                                     priv->mb_width  * 16,
                                     priv->mb_height * 16,
                                     priv->dpb_frames);
@@ -623,9 +627,6 @@ static int vaapi_encode_h264_init_picture_params(AVCodecContext *avctx,
     VAAPIEncodeH264Picture         *hprev = prev ? prev->priv_data : NULL;
     VAEncPictureParameterBufferH264 *vpic = pic->codec_picture_params;
     int i;
-
-    memset(&priv->current_access_unit, 0,
-           sizeof(priv->current_access_unit));
 
     if (pic->type == PICTURE_TYPE_IDR) {
         av_assert0(pic->display_order == pic->encode_order);
@@ -1071,33 +1072,34 @@ static av_cold int vaapi_encode_h264_configure(AVCodecContext *avctx)
     priv->mb_height = FFALIGN(avctx->height, 16) / 16;
 
     if (ctx->va_rc_mode == VA_RC_CQP) {
-        priv->fixed_qp_p = priv->qp;
+        priv->fixed_qp_p = av_clip(ctx->rc_quality, 1, 51);
         if (avctx->i_quant_factor > 0.0)
-            priv->fixed_qp_idr = (int)((priv->fixed_qp_p * avctx->i_quant_factor +
-                                        avctx->i_quant_offset) + 0.5);
+            priv->fixed_qp_idr =
+                av_clip((avctx->i_quant_factor * priv->fixed_qp_p +
+                         avctx->i_quant_offset) + 0.5, 1, 51);
         else
             priv->fixed_qp_idr = priv->fixed_qp_p;
         if (avctx->b_quant_factor > 0.0)
-            priv->fixed_qp_b = (int)((priv->fixed_qp_p * avctx->b_quant_factor +
-                                      avctx->b_quant_offset) + 0.5);
+            priv->fixed_qp_b =
+                av_clip((avctx->b_quant_factor * priv->fixed_qp_p +
+                         avctx->b_quant_offset) + 0.5, 1, 51);
         else
             priv->fixed_qp_b = priv->fixed_qp_p;
-
-        priv->sei &= ~SEI_TIMING;
 
         av_log(avctx, AV_LOG_DEBUG, "Using fixed QP = "
                "%d / %d / %d for IDR- / P- / B-frames.\n",
                priv->fixed_qp_idr, priv->fixed_qp_p, priv->fixed_qp_b);
 
-    } else if (ctx->va_rc_mode == VA_RC_CBR ||
-               ctx->va_rc_mode == VA_RC_VBR) {
+    } else {
         // These still need to be  set for pic_init_qp/slice_qp_delta.
         priv->fixed_qp_idr = 26;
         priv->fixed_qp_p   = 26;
         priv->fixed_qp_b   = 26;
+    }
 
-    } else {
-        av_assert0(0 && "Invalid RC mode.");
+    if (!ctx->rc_mode->hrd) {
+        // Timing SEI requires a mode respecting HRD parameters.
+        priv->sei &= ~SEI_TIMING;
     }
 
     if (priv->sei & SEI_IDENTIFIER) {
@@ -1146,6 +1148,8 @@ static const VAAPIEncodeType vaapi_encode_type_h264 = {
                              FLAG_B_PICTURES |
                              FLAG_B_PICTURE_REFERENCES |
                              FLAG_NON_IDR_KEY_PICTURES,
+
+    .default_quality       = 20,
 
     .configure             = &vaapi_encode_h264_configure,
 
@@ -1226,6 +1230,9 @@ static av_cold int vaapi_encode_h264_init(AVCodecContext *avctx)
 
     ctx->slice_block_height = ctx->slice_block_width = 16;
 
+    if (priv->qp > 0)
+        ctx->explicit_qp = priv->qp;
+
     return ff_vaapi_encode_init(avctx);
 }
 
@@ -1233,6 +1240,7 @@ static av_cold int vaapi_encode_h264_close(AVCodecContext *avctx)
 {
     VAAPIEncodeH264Context *priv = avctx->priv_data;
 
+    ff_cbs_fragment_free(priv->cbc, &priv->current_access_unit);
     ff_cbs_close(&priv->cbc);
     av_freep(&priv->sei_identifier_string);
 
@@ -1243,9 +1251,10 @@ static av_cold int vaapi_encode_h264_close(AVCodecContext *avctx)
 #define FLAGS (AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM)
 static const AVOption vaapi_encode_h264_options[] = {
     VAAPI_ENCODE_COMMON_OPTIONS,
+    VAAPI_ENCODE_RC_OPTIONS,
 
     { "qp", "Constant QP (for P-frames; scaled by qfactor/qoffset for I/B)",
-      OFFSET(qp), AV_OPT_TYPE_INT, { .i64 = 20 }, 0, 52, FLAGS },
+      OFFSET(qp), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 52, FLAGS },
     { "quality", "Set encode quality (trades off against speed, higher is faster)",
       OFFSET(quality), AV_OPT_TYPE_INT, { .i64 = -1 }, -1, INT_MAX, FLAGS },
     { "coder", "Entropy coder type",

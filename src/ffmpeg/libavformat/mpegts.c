@@ -37,6 +37,9 @@
 #include "avio_internal.h"
 #include "mpeg.h"
 #include "isom.h"
+#if CONFIG_ICONV
+#include <iconv.h>
+#endif
 
 /* maximum size in which we look for synchronization if
  * synchronization is lost */
@@ -52,6 +55,9 @@
             (modulus) = (dividend) % (divisor);                                \
         (prev_dividend) = (dividend);                                          \
     } while (0)
+
+#define PROBE_PACKET_MAX_BUF 8192
+#define PROBE_PACKET_MARGIN 5
 
 enum MpegTSFilterType {
     MPEGTS_PES,
@@ -591,28 +597,42 @@ static int analyze(const uint8_t *buf, int size, int packet_size,
     return best_score - FFMAX(stat_all - 10*best_score, 0)/10;
 }
 
-/* autodetect fec presence. Must have at least 1024 bytes  */
-static int get_packet_size(const uint8_t *buf, int size)
+/* autodetect fec presence */
+static int get_packet_size(AVFormatContext* s)
 {
     int score, fec_score, dvhs_score;
+    int margin;
+    int ret;
 
-    if (size < (TS_FEC_PACKET_SIZE * 5 + 1))
-        return AVERROR_INVALIDDATA;
+    /*init buffer to store stream for probing */
+    uint8_t buf[PROBE_PACKET_MAX_BUF] = {0};
+    int buf_size = 0;
 
-    score      = analyze(buf, size, TS_PACKET_SIZE,      0);
-    dvhs_score = analyze(buf, size, TS_DVHS_PACKET_SIZE, 0);
-    fec_score  = analyze(buf, size, TS_FEC_PACKET_SIZE,  0);
-    av_log(NULL, AV_LOG_TRACE, "score: %d, dvhs_score: %d, fec_score: %d \n",
-            score, dvhs_score, fec_score);
+    while (buf_size < PROBE_PACKET_MAX_BUF) {
+        ret = avio_read_partial(s->pb, buf + buf_size, PROBE_PACKET_MAX_BUF - buf_size);
+        if (ret < 0)
+            return AVERROR_INVALIDDATA;
+        buf_size += ret;
 
-    if (score > fec_score && score > dvhs_score)
-        return TS_PACKET_SIZE;
-    else if (dvhs_score > score && dvhs_score > fec_score)
-        return TS_DVHS_PACKET_SIZE;
-    else if (score < fec_score && dvhs_score < fec_score)
-        return TS_FEC_PACKET_SIZE;
-    else
-        return AVERROR_INVALIDDATA;
+        score      = analyze(buf, buf_size, TS_PACKET_SIZE,      0);
+        dvhs_score = analyze(buf, buf_size, TS_DVHS_PACKET_SIZE, 0);
+        fec_score  = analyze(buf, buf_size, TS_FEC_PACKET_SIZE,  0);
+        av_log(s, AV_LOG_TRACE, "Probe: %d, score: %d, dvhs_score: %d, fec_score: %d \n",
+            buf_size, score, dvhs_score, fec_score);
+
+        margin = mid_pred(score, fec_score, dvhs_score);
+
+        if (buf_size < PROBE_PACKET_MAX_BUF)
+            margin += PROBE_PACKET_MARGIN; /*if buffer not filled */
+
+        if (score > margin)
+            return TS_PACKET_SIZE;
+        else if (dvhs_score > margin)
+            return TS_DVHS_PACKET_SIZE;
+        else if (fec_score > margin)
+            return TS_FEC_PACKET_SIZE;
+    }
+    return AVERROR_INVALIDDATA;
 }
 
 typedef struct SectionHeader {
@@ -674,6 +694,51 @@ static char *getstr8(const uint8_t **pp, const uint8_t *p_end)
         return NULL;
     if (len > p_end - p)
         return NULL;
+#if CONFIG_ICONV
+    if (len) {
+        const char *encodings[] = {
+            "ISO6937", "ISO-8859-5", "ISO-8859-6", "ISO-8859-7",
+            "ISO-8859-8", "ISO-8859-9", "ISO-8859-10", "ISO-8859-11",
+            "", "ISO-8859-13", "ISO-8859-14", "ISO-8859-15", "", "", "", "",
+            "", "UCS-2BE", "KSC_5601", "GB2312", "UCS-2BE", "UTF-8", "", "",
+            "", "", "", "", "", "", "", ""
+        };
+        iconv_t cd;
+        char *in, *out;
+        size_t inlen = len, outlen = inlen * 6 + 1;
+        if (len >= 3 && p[0] == 0x10 && !p[1] && p[2] && p[2] <= 0xf && p[2] != 0xc) {
+            char iso8859[12];
+            snprintf(iso8859, sizeof(iso8859), "ISO-8859-%d", p[2]);
+            inlen -= 3;
+            in = (char *)p + 3;
+            cd = iconv_open("UTF-8", iso8859);
+        } else if (p[0] < 0x20) {
+            inlen -= 1;
+            in = (char *)p + 1;
+            cd = iconv_open("UTF-8", encodings[*p]);
+        } else {
+            in = (char *)p;
+            cd = iconv_open("UTF-8", encodings[0]);
+        }
+        if (cd == (iconv_t)-1)
+            goto no_iconv;
+        str = out = av_malloc(outlen);
+        if (!str) {
+            iconv_close(cd);
+            return NULL;
+        }
+        if (iconv(cd, &in, &inlen, &out, &outlen) == -1) {
+            iconv_close(cd);
+            av_freep(&str);
+            goto no_iconv;
+        }
+        iconv_close(cd);
+        *out = 0;
+        *pp = p + len;
+        return str;
+    }
+no_iconv:
+#endif
     str = av_malloc(len + 1);
     if (!str)
         return NULL;
@@ -2014,6 +2079,50 @@ int ff_parse_mpeg2_descriptor(AVFormatContext *fc, AVStream *st, int stream_type
             }
         }
         break;
+    case 0xfd: /* ARIB data coding type descriptor */
+        // STD-B24, fascicle 3, chapter 4 defines private_stream_1
+        // for captions
+        if (stream_type == STREAM_TYPE_PRIVATE_DATA) {
+            // This structure is defined in STD-B10, part 1, listing 5.4 and
+            // part 2, 6.2.20).
+            // Listing of data_component_ids is in STD-B10, part 2, Annex J.
+            // Component tag limits are documented in TR-B14, fascicle 2,
+            // Vol. 3, Section 2, 4.2.8.1
+            int actual_component_tag = st->stream_identifier - 1;
+            int picked_profile = FF_PROFILE_UNKNOWN;
+            int data_component_id = get16(pp, desc_end);
+            if (data_component_id < 0)
+                return AVERROR_INVALIDDATA;
+
+            switch (data_component_id) {
+            case 0x0008:
+                // [0x30..0x37] are component tags utilized for
+                // non-mobile captioning service ("profile A").
+                if (actual_component_tag >= 0x30 &&
+                    actual_component_tag <= 0x37) {
+                    picked_profile = FF_PROFILE_ARIB_PROFILE_A;
+                }
+                break;
+            case 0x0012:
+                // component tag 0x87 signifies a mobile/partial reception
+                // (1seg) captioning service ("profile C").
+                if (actual_component_tag == 0x87) {
+                    picked_profile = FF_PROFILE_ARIB_PROFILE_C;
+                }
+                break;
+            default:
+                break;
+            }
+
+            if (picked_profile == FF_PROFILE_UNKNOWN)
+                break;
+
+            st->codecpar->codec_type = AVMEDIA_TYPE_SUBTITLE;
+            st->codecpar->codec_id   = AV_CODEC_ID_ARIB_CAPTION;
+            st->codecpar->profile    = picked_profile;
+            st->request_probe        = 0;
+        }
+        break;
     default:
         break;
     }
@@ -2759,7 +2868,7 @@ static int handle_packets(MpegTSContext *ts, int64_t nb_packets)
     return ret;
 }
 
-static int mpegts_probe(AVProbeData *p)
+static int mpegts_probe(const AVProbeData *p)
 {
     const int size = p->buf_size;
     int maxscore = 0;
@@ -2841,8 +2950,6 @@ static int mpegts_read_header(AVFormatContext *s)
 {
     MpegTSContext *ts = s->priv_data;
     AVIOContext *pb   = s->pb;
-    uint8_t buf[8 * 1024] = {0};
-    int len;
     int64_t pos, probesize = s->probesize;
 
     s->internal->prefer_codec_framerate = 1;
@@ -2850,10 +2957,8 @@ static int mpegts_read_header(AVFormatContext *s)
     if (ffio_ensure_seekback(pb, probesize) < 0)
         av_log(s, AV_LOG_WARNING, "Failed to allocate buffers for seekback\n");
 
-    /* read the first 8192 bytes to get packet size */
     pos = avio_tell(pb);
-    len = avio_read(pb, buf, sizeof(buf));
-    ts->raw_packet_size = get_packet_size(buf, len);
+    ts->raw_packet_size = get_packet_size(s);
     if (ts->raw_packet_size <= 0) {
         av_log(s, AV_LOG_WARNING, "Could not detect TS packet size, defaulting to non-FEC/DVHS\n");
         ts->raw_packet_size = TS_PACKET_SIZE;

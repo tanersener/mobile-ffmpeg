@@ -218,6 +218,7 @@ External library support:
   --enable-jni             enable JNI support [no]
   --enable-ladspa          enable LADSPA audio filtering [no]
   --enable-libaom          enable AV1 video encoding/decoding via libaom [no]
+  --enable-libaribb24      enable ARIB text and caption decoding via libaribb24 [no]
   --enable-libass          enable libass subtitles rendering,
                            needed for subtitles and ass filter [no]
   --enable-libbluray       enable BluRay reading using libbluray [no]
@@ -297,7 +298,6 @@ External library support:
   --enable-lv2             enable LV2 audio filtering [no]
   --disable-lzma           disable lzma [autodetect]
   --enable-decklink        enable Blackmagic DeckLink I/O support [no]
-  --enable-libndi_newtek   enable Newteck NDI I/O support [no]
   --enable-mbedtls         enable mbedTLS, needed for https support
                            if openssl, gnutls or libtls is not used [no]
   --enable-mediacodec      enable Android MediaCodec support [no]
@@ -320,7 +320,7 @@ External library support:
   The following libraries provide various hardware acceleration features:
   --disable-amf            disable AMF video encoding code [autodetect]
   --disable-audiotoolbox   disable Apple AudioToolbox code [autodetect]
-  --enable-cuda-sdk        enable CUDA features that require the CUDA SDK [no]
+  --enable-cuda-nvcc       enable Nvidia CUDA compiler [no]
   --disable-cuvid          disable Nvidia CUVID support [autodetect]
   --disable-d3d11va        disable Microsoft Direct3D 11 video acceleration code [autodetect]
   --disable-dxva2          disable Microsoft DirectX 9 video acceleration code [autodetect]
@@ -648,12 +648,26 @@ request(){
     done
 }
 
+warn_if_gets_disabled(){
+    for var in $*; do
+        WARN_IF_GETS_DISABLED_LIST="$WARN_IF_GETS_DISABLED_LIST $var"
+    done
+}
+
 enable(){
     set_all yes $*
 }
 
 disable(){
     set_all no $*
+}
+
+disable_with_reason(){
+    disable $1
+    eval "${1}_disable_reason=\"$2\""
+    if requested $1; then
+        die "ERROR: $1 requested, but $2"
+    fi
 }
 
 enable_weak(){
@@ -784,10 +798,10 @@ check_deps(){
 
             [ -n "$dep_ifa" ] && { enabled_all $dep_ifa && enable_weak $cfg; }
             [ -n "$dep_ifn" ] && { enabled_any $dep_ifn && enable_weak $cfg; }
-            enabled_all  $dep_all || { disable $cfg && requested $cfg && die "ERROR: $cfg requested, but not all dependencies are satisfied: $dep_all"; }
-            enabled_any  $dep_any || { disable $cfg && requested $cfg && die "ERROR: $cfg requested, but not any dependency is satisfied: $dep_any"; }
-            disabled_all $dep_con || { disable $cfg && requested $cfg && die "ERROR: $cfg requested, but some conflicting dependencies are unsatisfied: $dep_con"; }
-            disabled_any $dep_sel && { disable $cfg && requested $cfg && die "ERROR: $cfg requested, but some selected dependency is unsatisfied: $dep_sel"; }
+            enabled_all  $dep_all || { disable_with_reason $cfg "not all dependencies are satisfied: $dep_all"; }
+            enabled_any  $dep_any || { disable_with_reason $cfg "not any dependency is satisfied: $dep_any"; }
+            disabled_all $dep_con || { disable_with_reason $cfg "some conflicting dependencies are unsatisfied: $dep_con"; }
+            disabled_any $dep_sel && { disable_with_reason $cfg "some selected dependency is unsatisfied: $dep_sel"; }
 
             enabled $cfg && enable_deep_weak $dep_sel $dep_sgs
 
@@ -986,6 +1000,10 @@ hostcc_o(){
     eval printf '%s\\n' $HOSTCC_O
 }
 
+nvcc_o(){
+    eval printf '%s\\n' $NVCC_O
+}
+
 test_cc(){
     log test_cc "$@"
     cat > $TMPC
@@ -1005,6 +1023,25 @@ test_objcc(){
     cat > $TMPM
     log_file $TMPM
     test_cmd $objcc -Werror=missing-prototypes $CPPFLAGS $CFLAGS $OBJCFLAGS "$@" $OBJCC_C $(cc_o $TMPO) $TMPM
+}
+
+test_nvcc(){
+    log test_nvcc "$@"
+    cat > $TMPCU
+    log_file $TMPCU
+    tmpcu_=$TMPCU
+    tmpo_=$TMPO
+    [ -x "$(command -v cygpath)" ] && tmpcu_=$(cygpath -m $tmpcu_) && tmpo_=$(cygpath -m $tmpo_)
+    test_cmd $nvcc -ptx $NVCCFLAGS "$@" $NVCC_C $(nvcc_o $tmpo_) $tmpcu_
+}
+
+check_nvcc() {
+    log check_nvcc "$@"
+    test_nvcc <<EOF
+extern "C" {
+    __global__ void hello(unsigned char *data) {}
+}
+EOF
 }
 
 test_cpp(){
@@ -1675,7 +1712,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
 
 EXTERNAL_LIBRARY_NONFREE_LIST="
     decklink
-    libndi_newtek
     libfdk_aac
     openssl
     libtls
@@ -1683,6 +1719,7 @@ EXTERNAL_LIBRARY_NONFREE_LIST="
 
 EXTERNAL_LIBRARY_VERSION3_LIST="
     gmp
+    libaribb24
     liblensfun
     libopencore_amrnb
     libopencore_amrwb
@@ -1790,6 +1827,7 @@ EXTRALIBS_LIST="
 "
 
 HWACCEL_LIBRARY_NONFREE_LIST="
+    cuda_nvcc
     cuda_sdk
     libnpp
 "
@@ -2683,7 +2721,7 @@ mjpeg_decoder_select="blockdsp hpeldsp exif idctdsp jpegtables"
 mjpeg_encoder_select="jpegtables mpegvideoenc"
 mjpegb_decoder_select="mjpeg_decoder"
 mlp_decoder_select="mlp_parser"
-mlp_encoder_select="lpc"
+mlp_encoder_select="lpc audio_frame_queue"
 motionpixels_decoder_select="bswapdsp"
 mp1_decoder_select="mpegaudio"
 mp1float_decoder_select="mpegaudio"
@@ -2765,7 +2803,7 @@ thp_decoder_select="mjpeg_decoder"
 tiff_decoder_suggest="zlib lzma"
 tiff_encoder_suggest="zlib"
 truehd_decoder_select="mlp_parser"
-truehd_encoder_select="lpc"
+truehd_encoder_select="lpc audio_frame_queue"
 truemotion2_decoder_select="bswapdsp"
 truespeech_decoder_select="bswapdsp"
 tscc_decoder_deps="zlib"
@@ -2937,8 +2975,8 @@ v4l2_m2m_deps="linux_videodev2_h sem_timedwait"
 
 hwupload_cuda_filter_deps="ffnvcodec"
 scale_npp_filter_deps="ffnvcodec libnpp"
-scale_cuda_filter_deps="cuda_sdk"
-thumbnail_cuda_filter_deps="cuda_sdk"
+scale_cuda_filter_deps="ffnvcodec cuda_nvcc"
+thumbnail_cuda_filter_deps="ffnvcodec cuda_nvcc"
 transpose_npp_filter_deps="ffnvcodec libnpp"
 
 amf_deps_any="libdl LoadLibrary"
@@ -3094,6 +3132,7 @@ hevc_videotoolbox_encoder_select="videotoolbox_encoder"
 libaom_av1_decoder_deps="libaom"
 libaom_av1_encoder_deps="libaom"
 libaom_av1_encoder_select="extract_extradata_bsf"
+libaribb24_decoder_deps="libaribb24"
 libcelt_decoder_deps="libcelt"
 libcodec2_decoder_deps="libcodec2"
 libcodec2_encoder_deps="libcodec2"
@@ -3258,10 +3297,6 @@ decklink_indev_extralibs="-lstdc++"
 decklink_outdev_deps="decklink threads"
 decklink_outdev_suggest="libklvanc"
 decklink_outdev_extralibs="-lstdc++"
-libndi_newtek_indev_deps="libndi_newtek"
-libndi_newtek_indev_extralibs="-lndi"
-libndi_newtek_outdev_deps="libndi_newtek"
-libndi_newtek_outdev_extralibs="-lndi"
 dshow_indev_deps="IBaseFilter"
 dshow_indev_extralibs="-lpsapi -lole32 -lstrmiids -luuid -loleaut32 -lshlwapi"
 fbdev_indev_deps="linux_fb_h"
@@ -3496,7 +3531,7 @@ zscale_filter_deps="libzimg const_nan"
 scale_vaapi_filter_deps="vaapi"
 vpp_qsv_filter_deps="libmfx"
 vpp_qsv_filter_select="qsvvpp"
-yadif_cuda_filter_deps="cuda_sdk"
+yadif_cuda_filter_deps="ffnvcodec cuda_nvcc"
 
 # examples
 avio_dir_cmd_deps="avformat avutil"
@@ -3554,8 +3589,8 @@ avutil_extralibs="d3d11va_extralibs nanosleep_extralibs pthreads_extralibs vaapi
 # programs
 ffmpeg_deps="avcodec avfilter avformat"
 ffmpeg_select="aformat_filter anull_filter atrim_filter format_filter
-               null_filter
-               trim_filter"
+               hflip_filter null_filter
+               transpose_filter trim_filter vflip_filter"
 ffmpeg_suggest="ole32 psapi shell32"
 ffplay_deps="avcodec avformat swscale swresample sdl2"
 ffplay_select="rdft crop_filter transpose_filter hflip_filter vflip_filter rotate_filter"
@@ -3880,6 +3915,7 @@ for opt do
             name=$(echo "${optval}" | sed "s/,/_${thing}|/g")_${thing}
             list=$(filter "$name" $list)
             [ "$list" = "" ] && warn "Option $opt did not match anything"
+            test $action = enable && warn_if_gets_disabled $list
             $action $list
         ;;
         --enable-yasm|--disable-yasm)
@@ -4220,6 +4256,7 @@ tmpfile TMPCPP .cpp
 tmpfile TMPE   $EXESUF
 tmpfile TMPH   .h
 tmpfile TMPM   .m
+tmpfile TMPCU  .cu
 tmpfile TMPO   .o
 tmpfile TMPS   .S
 tmpfile TMPSH  .sh
@@ -5985,21 +6022,19 @@ check_type "windows.h d3d11.h" "ID3D11VideoDecoder"
 check_type "windows.h d3d11.h" "ID3D11VideoContext"
 check_type "d3d9.h dxva2api.h" DXVA2_ConfigPictureDecode -D_WIN32_WINNT=0x0602
 
-check_type "va/va.h va/va_dec_hevc.h" "VAPictureParameterBufferHEVC"
-check_struct "va/va.h" "VADecPictureParameterBufferVP9" bit_depth
-check_struct "va/va.h va/va_vpp.h" "VAProcPipelineCaps" rotation_flags
-check_type "va/va.h va/va_enc_hevc.h" "VAEncPictureParameterBufferHEVC"
-check_type "va/va.h va/va_enc_jpeg.h" "VAEncPictureParameterBufferJPEG"
-check_type "va/va.h va/va_enc_vp8.h"  "VAEncPictureParameterBufferVP8"
-check_type "va/va.h va/va_enc_vp9.h"  "VAEncPictureParameterBufferVP9"
-
 check_type "vdpau/vdpau.h" "VdpPictureInfoHEVC"
 
+if enabled cuda_sdk; then
+    warn "Option --enable-cuda-sdk is deprecated. Use --enable-cuda-nvcc instead."
+    enable cuda_nvcc
+fi
+
 if ! disabled ffnvcodec; then
-    check_pkg_config ffnvcodec "ffnvcodec >= 8.1.24.2" \
-          "ffnvcodec/nvEncodeAPI.h ffnvcodec/dynlink_cuda.h ffnvcodec/dynlink_cuviddec.h ffnvcodec/dynlink_nvcuvid.h" "" || \
-      check_pkg_config ffnvcodec "ffnvcodec >= 8.0.14.2 ffnvcodec < 8.1" \
-          "ffnvcodec/nvEncodeAPI.h ffnvcodec/dynlink_cuda.h ffnvcodec/dynlink_cuviddec.h ffnvcodec/dynlink_nvcuvid.h" ""
+    ffnv_hdr_list="ffnvcodec/nvEncodeAPI.h ffnvcodec/dynlink_cuda.h ffnvcodec/dynlink_cuviddec.h ffnvcodec/dynlink_nvcuvid.h"
+    check_pkg_config ffnvcodec "ffnvcodec >= 9.0.18.0" "$ffnv_hdr_list" "" || \
+      check_pkg_config ffnvcodec "ffnvcodec >= 8.2.15.8 ffnvcodec < 8.3" "$ffnv_hdr_list" "" || \
+      check_pkg_config ffnvcodec "ffnvcodec >= 8.1.24.9 ffnvcodec < 8.2" "$ffnv_hdr_list" "" || \
+      check_pkg_config ffnvcodec "ffnvcodec >= 8.0.14.9 ffnvcodec < 8.1" "$ffnv_hdr_list" ""
 fi
 
 check_cpp_condition winrt windows.h "!WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)"
@@ -6069,17 +6104,19 @@ for func in $COMPLEX_FUNCS; do
 done
 
 # these are off by default, so fail if requested and not available
-enabled cuda_sdk          && require cuda_sdk cuda.h cuCtxCreate -lcuda
+enabled cuda_nvcc         && { check_nvcc || die "ERROR: failed checking for nvcc."; }
 enabled chromaprint       && require chromaprint chromaprint.h chromaprint_get_version -lchromaprint
 enabled decklink          && { require_headers DeckLinkAPI.h &&
                                { test_cpp_condition DeckLinkAPIVersion.h "BLACKMAGIC_DECKLINK_API_VERSION >= 0x0a090500" || die "ERROR: Decklink API version must be >= 10.9.5."; } }
-enabled libndi_newtek     && require_headers Processing.NDI.Lib.h
 enabled frei0r            && require_headers "frei0r.h dlfcn.h"
 enabled gmp               && require gmp gmp.h mpz_export -lgmp
 enabled gnutls            && require_pkg_config gnutls gnutls gnutls/gnutls.h gnutls_global_init
 enabled jni               && { [ $target_os = "android" ] && check_headers jni.h && enabled pthreads || die "ERROR: jni not found"; }
 enabled ladspa            && require_headers "ladspa.h dlfcn.h"
 enabled libaom            && require_pkg_config libaom "aom >= 1.0.0" aom/aom_codec.h aom_codec_version
+enabled libaribb24        && { check_pkg_config libaribb24 "aribb24 > 1.0.3" "aribb24/aribb24.h" arib_instance_new ||
+                               { enabled gpl && require_pkg_config libaribb24 aribb24 "aribb24/aribb24.h" arib_instance_new; } ||
+                               die "ERROR: libaribb24 requires version higher than 1.0.3 or --enable-gpl."; }
 enabled lv2               && require_pkg_config lv2 lilv-0 "lilv/lilv.h" lilv_world_new
 enabled libiec61883       && require libiec61883 libiec61883/iec61883.h iec61883_cmp_connect -lraw1394 -lavc1394 -lrom1394 -liec61883
 enabled libass            && require_pkg_config libass libass ass/ass.h ass_library_init
@@ -6090,7 +6127,7 @@ enabled libcelt           && require libcelt celt/celt.h celt_decode -lcelt0 &&
                                die "ERROR: libcelt must be installed and version must be >= 0.11.0."; }
 enabled libcaca           && require_pkg_config libcaca caca caca.h caca_create_canvas
 enabled libcodec2         && require libcodec2 codec2/codec2.h codec2_create -lcodec2
-enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.1.0" "dav1d/dav1d.h" dav1d_version
+enabled libdav1d          && require_pkg_config libdav1d "dav1d >= 0.2.1" "dav1d/dav1d.h" dav1d_version
 enabled libdavs2          && require_pkg_config libdavs2 "davs2 >= 1.6.0" davs2.h davs2_decoder_open
 enabled libdc1394         && require_pkg_config libdc1394 libdc1394-2 dc1394/dc1394.h dc1394_new
 enabled libdrm            && require_pkg_config libdrm libdrm xf86drm.h drmGetVersion
@@ -6174,21 +6211,19 @@ enabled libvorbis         && require_pkg_config libvorbis vorbis vorbis/codec.h 
 enabled libvpx            && {
     enabled libvpx_vp8_decoder && {
         check_pkg_config libvpx_vp8_decoder "vpx >= 1.4.0" "vpx/vpx_decoder.h vpx/vp8dx.h" vpx_codec_vp8_dx ||
-            check_lib libvpx_vp8_decoder "vpx/vpx_decoder.h vpx/vp8dx.h" "vpx_codec_dec_init_ver VPX_IMG_FMT_HIGHBITDEPTH" -lvpx ||
-                die "ERROR: libvpx decoder version must be >=1.4.0";
+            check_lib libvpx_vp8_decoder "vpx/vpx_decoder.h vpx/vp8dx.h" "vpx_codec_vp8_dx VPX_IMG_FMT_HIGHBITDEPTH" "-lvpx $libm_extralibs $pthreads_extralibs"
     }
     enabled libvpx_vp8_encoder && {
         check_pkg_config libvpx_vp8_encoder "vpx >= 1.4.0" "vpx/vpx_encoder.h vpx/vp8cx.h" vpx_codec_vp8_cx ||
-            check_lib libvpx_vp8_encoder "vpx/vpx_encoder.h vpx/vp8cx.h" "vpx_codec_enc_init_ver VPX_IMG_FMT_HIGHBITDEPTH" -lvpx ||
-                die "ERROR: libvpx encoder version must be >=1.4.0";
+            check_lib libvpx_vp8_encoder "vpx/vpx_encoder.h vpx/vp8cx.h" "vpx_codec_vp8_cx VPX_IMG_FMT_HIGHBITDEPTH" "-lvpx $libm_extralibs $pthreads_extralibs"
     }
     enabled libvpx_vp9_decoder && {
         check_pkg_config libvpx_vp9_decoder "vpx >= 1.4.0" "vpx/vpx_decoder.h vpx/vp8dx.h" vpx_codec_vp9_dx ||
-            check_lib libvpx_vp9_decoder "vpx/vpx_decoder.h vpx/vp8dx.h" "vpx_codec_vp9_dx VPX_IMG_FMT_HIGHBITDEPTH" "-lvpx $libm_extralibs"
+            check_lib libvpx_vp9_decoder "vpx/vpx_decoder.h vpx/vp8dx.h" "vpx_codec_vp9_dx VPX_IMG_FMT_HIGHBITDEPTH" "-lvpx $libm_extralibs $pthreads_extralibs"
     }
     enabled libvpx_vp9_encoder && {
         check_pkg_config libvpx_vp9_encoder "vpx >= 1.4.0" "vpx/vpx_encoder.h vpx/vp8cx.h" vpx_codec_vp9_cx ||
-            check_lib libvpx_vp9_encoder "vpx/vpx_encoder.h vpx/vp8cx.h" "vpx_codec_vp9_cx VPX_IMG_FMT_HIGHBITDEPTH" "-lvpx $libm_extralibs"
+            check_lib libvpx_vp9_encoder "vpx/vpx_encoder.h vpx/vp8cx.h" "vpx_codec_vp9_cx VPX_IMG_FMT_HIGHBITDEPTH" "-lvpx $libm_extralibs $pthreads_extralibs"
     }
     if disabled_all libvpx_vp8_decoder libvpx_vp9_decoder libvpx_vp8_encoder libvpx_vp9_encoder; then
         die "libvpx enabled but no supported decoders found"
@@ -6418,6 +6453,14 @@ if enabled vaapi; then
     fi
 
     check_cpp_condition vaapi_1 "va/va.h" "VA_CHECK_VERSION(1, 0, 0)"
+
+    check_type "va/va.h va/va_dec_hevc.h" "VAPictureParameterBufferHEVC"
+    check_struct "va/va.h" "VADecPictureParameterBufferVP9" bit_depth
+    check_struct "va/va.h va/va_vpp.h" "VAProcPipelineCaps" rotation_flags
+    check_type "va/va.h va/va_enc_hevc.h" "VAEncPictureParameterBufferHEVC"
+    check_type "va/va.h va/va_enc_jpeg.h" "VAEncPictureParameterBufferJPEG"
+    check_type "va/va.h va/va_enc_vp8.h"  "VAEncPictureParameterBufferVP8"
+    check_type "va/va.h va/va_enc_vp9.h"  "VAEncPictureParameterBufferVP9"
 fi
 
 if enabled_all opencl libdrm ; then
@@ -6428,9 +6471,12 @@ if enabled_all opencl libdrm ; then
 fi
 
 if enabled_all opencl vaapi ; then
-    enabled opencl_drm_beignet && enable opencl_vaapi_beignet
-    check_type "CL/cl.h CL/va_ext.h" "clCreateFromVA_APIMediaSurfaceINTEL_fn" &&
-        enable opencl_vaapi_intel_media
+    if enabled opencl_drm_beignet ; then
+        enable opencl_vaapi_beignet
+    else
+        check_type "CL/cl.h CL/cl_va_api_media_sharing_intel.h" "clCreateFromVA_APIMediaSurfaceINTEL_fn" &&
+            enable opencl_vaapi_intel_media
+    fi
 fi
 
 if enabled_all opencl dxva2 ; then
@@ -7102,6 +7148,15 @@ fi
 echo "License: $license"
 
 fi # test "$quiet" != "yes"
+
+if test -n "$WARN_IF_GETS_DISABLED_LIST"; then
+    for cfg in $WARN_IF_GETS_DISABLED_LIST; do
+        if disabled $cfg; then
+            varname=${cfg}_disable_reason
+            eval "warn \"Disabled $cfg because \$$varname\""
+        fi
+    done
+fi
 
 if test -n "$WARNINGS"; then
     printf "\n%s%s$WARNINGS%s" "$warn_color" "$bold_color" "$reset_color"

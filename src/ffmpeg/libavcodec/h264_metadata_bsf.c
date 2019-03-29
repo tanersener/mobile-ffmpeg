@@ -223,6 +223,7 @@ static int h264_metadata_update_sps(AVBSFContext *bsf,
             const H264LevelDescriptor *desc;
             int64_t bit_rate;
             int width, height, dpb_frames;
+            int framerate;
 
             if (sps->vui.nal_hrd_parameters_present_flag) {
                 bit_rate = (sps->vui.nal_hrd_parameters.bit_rate_value_minus1[0] + 1) *
@@ -244,7 +245,12 @@ static int h264_metadata_update_sps(AVBSFContext *bsf,
             height = 16 * (sps->pic_height_in_map_units_minus1 + 1) *
                 (2 - sps->frame_mbs_only_flag);
 
-            desc = ff_h264_guess_level(sps->profile_idc, bit_rate,
+            if (sps->vui.timing_info_present_flag)
+                framerate = sps->vui.time_scale / sps->vui.num_units_in_tick / 2;
+            else
+                framerate = 0;
+
+            desc = ff_h264_guess_level(sps->profile_idc, bit_rate, framerate,
                                        width, height, dpb_frames);
             if (desc) {
                 level_idc = desc->level_idc;
@@ -604,7 +610,7 @@ static int h264_metadata_filter(AVBSFContext *bsf, AVPacket *out)
 
     err = 0;
 fail:
-    ff_cbs_fragment_uninit(ctx->cbc, au);
+    ff_cbs_fragment_reset(ctx->cbc, au);
     av_freep(&displaymatrix_side_data);
 
     if (err < 0)
@@ -648,13 +654,15 @@ static int h264_metadata_init(AVBSFContext *bsf)
 
     err = 0;
 fail:
-    ff_cbs_fragment_uninit(ctx->cbc, au);
+    ff_cbs_fragment_reset(ctx->cbc, au);
     return err;
 }
 
 static void h264_metadata_close(AVBSFContext *bsf)
 {
     H264MetadataContext *ctx = bsf->priv_data;
+
+    ff_cbs_fragment_free(ctx->cbc, &ctx->access_unit);
     ff_cbs_close(&ctx->cbc);
 }
 

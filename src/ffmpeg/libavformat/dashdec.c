@@ -1851,7 +1851,7 @@ static void close_demux_for_component(struct representation *pls)
 static int reopen_demux_for_component(AVFormatContext *s, struct representation *pls)
 {
     DASHContext *c = s->priv_data;
-    AVInputFormat *in_fmt = NULL;
+    ff_const59 AVInputFormat *in_fmt = NULL;
     AVDictionary  *in_fmt_opts = NULL;
     uint8_t *avio_ctx_buffer  = NULL;
     int ret = 0, i;
@@ -2302,7 +2302,7 @@ static int dash_read_seek(AVFormatContext *s, int stream_index, int64_t timestam
     return ret;
 }
 
-static int dash_probe(AVProbeData *p)
+static int dash_probe(const AVProbeData *p)
 {
     if (!av_stristr(p->buf, "<MPD"))
         return 0;

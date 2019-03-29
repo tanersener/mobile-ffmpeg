@@ -685,7 +685,10 @@ static int decode_component(DiracContext *s, int comp)
                 }
                 align_get_bits(&s->gb);
                 b->coeff_data = s->gb.buffer + get_bits_count(&s->gb)/8;
-                b->length = FFMIN(b->length, FFMAX(get_bits_left(&s->gb)/8, 0));
+                if (b->length > FFMAX(get_bits_left(&s->gb)/8, 0)) {
+                    b->length = FFMAX(get_bits_left(&s->gb)/8, 0);
+                    damaged_count ++;
+                }
                 skip_bits_long(&s->gb, b->length*8);
             }
         }
@@ -2137,7 +2140,7 @@ static int dirac_decode_data_unit(AVCodecContext *avctx, const uint8_t *buf, int
             return ret;
         }
 
-        if (CALC_PADDING((int64_t)dsh->width, MAX_DWT_LEVELS) * CALC_PADDING((int64_t)dsh->height, MAX_DWT_LEVELS) > avctx->max_pixels)
+        if (CALC_PADDING((int64_t)dsh->width, MAX_DWT_LEVELS) * CALC_PADDING((int64_t)dsh->height, MAX_DWT_LEVELS) * 5LL > avctx->max_pixels)
             ret = AVERROR(ERANGE);
         if (ret >= 0)
             ret = ff_set_dimensions(avctx, dsh->width, dsh->height);

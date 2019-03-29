@@ -77,7 +77,7 @@ typedef struct FLVContext {
     int64_t time_pos;
 } FLVContext;
 
-static int probe(AVProbeData *p, int live)
+static int probe(const AVProbeData *p, int live)
 {
     const uint8_t *d = p->buf;
     unsigned offset = AV_RB32(d + 5);
@@ -96,12 +96,12 @@ static int probe(AVProbeData *p, int live)
     return 0;
 }
 
-static int flv_probe(AVProbeData *p)
+static int flv_probe(const AVProbeData *p)
 {
     return probe(p, 0);
 }
 
-static int live_flv_probe(AVProbeData *p)
+static int live_flv_probe(const AVProbeData *p)
 {
     return probe(p, 1);
 }
@@ -386,7 +386,7 @@ static int parse_keyframes_index(AVFormatContext *s, AVIOContext *ioc, int64_t m
     int64_t initial_pos    = avio_tell(ioc);
 
     if (flv->keyframe_count > 0) {
-        av_log(s, AV_LOG_DEBUG, "keyframes have been paresed\n");
+        av_log(s, AV_LOG_DEBUG, "keyframes have been parsed\n");
         return 0;
     }
     av_assert0(!flv->keyframe_times);

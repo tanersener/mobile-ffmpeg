@@ -159,7 +159,7 @@ static int vaapi_encode_h265_write_sequence_header(AVCodecContext *avctx,
 
     err = vaapi_encode_h265_write_access_unit(avctx, data, data_len, au);
 fail:
-    ff_cbs_fragment_uninit(priv->cbc, au);
+    ff_cbs_fragment_reset(priv->cbc, au);
     return err;
 }
 
@@ -185,7 +185,7 @@ static int vaapi_encode_h265_write_slice_header(AVCodecContext *avctx,
 
     err = vaapi_encode_h265_write_access_unit(avctx, data, data_len, au);
 fail:
-    ff_cbs_fragment_uninit(priv->cbc, au);
+    ff_cbs_fragment_reset(priv->cbc, au);
     return err;
 }
 
@@ -242,7 +242,7 @@ static int vaapi_encode_h265_write_extra_header(AVCodecContext *avctx,
         if (err < 0)
             goto fail;
 
-        ff_cbs_fragment_uninit(priv->cbc, au);
+        ff_cbs_fragment_reset(priv->cbc, au);
 
         *type = VAEncPackedHeaderRawData;
         return 0;
@@ -251,7 +251,7 @@ static int vaapi_encode_h265_write_extra_header(AVCodecContext *avctx,
     }
 
 fail:
-    ff_cbs_fragment_uninit(priv->cbc, au);
+    ff_cbs_fragment_reset(priv->cbc, au);
     return err;
 }
 
@@ -269,9 +269,6 @@ static int vaapi_encode_h265_init_sequence_params(AVCodecContext *avctx)
     const AVPixFmtDescriptor *desc;
     int chroma_format, bit_depth;
     int i;
-
-    memset(&priv->current_access_unit, 0,
-           sizeof(priv->current_access_unit));
 
     memset(vps, 0, sizeof(*vps));
     memset(sps, 0, sizeof(*sps));
@@ -1076,15 +1073,21 @@ static av_cold int vaapi_encode_h265_configure(AVCodecContext *avctx)
         return err;
 
     if (ctx->va_rc_mode == VA_RC_CQP) {
-        priv->fixed_qp_p = priv->qp;
+        // Note that VAAPI only supports positive QP values - the range is
+        // therefore always bounded below by 1, even in 10-bit mode where
+        // it should go down to -12.
+
+        priv->fixed_qp_p = av_clip(ctx->rc_quality, 1, 51);
         if (avctx->i_quant_factor > 0.0)
-            priv->fixed_qp_idr = (int)((priv->fixed_qp_p * avctx->i_quant_factor +
-                                        avctx->i_quant_offset) + 0.5);
+            priv->fixed_qp_idr =
+                av_clip((avctx->i_quant_factor * priv->fixed_qp_p +
+                         avctx->i_quant_offset) + 0.5, 1, 51);
         else
             priv->fixed_qp_idr = priv->fixed_qp_p;
         if (avctx->b_quant_factor > 0.0)
-            priv->fixed_qp_b = (int)((priv->fixed_qp_p * avctx->b_quant_factor +
-                                      avctx->b_quant_offset) + 0.5);
+            priv->fixed_qp_b =
+                av_clip((avctx->b_quant_factor * priv->fixed_qp_p +
+                         avctx->b_quant_offset) + 0.5, 1, 51);
         else
             priv->fixed_qp_b = priv->fixed_qp_p;
 
@@ -1092,15 +1095,11 @@ static av_cold int vaapi_encode_h265_configure(AVCodecContext *avctx)
                "%d / %d / %d for IDR- / P- / B-frames.\n",
                priv->fixed_qp_idr, priv->fixed_qp_p, priv->fixed_qp_b);
 
-    } else if (ctx->va_rc_mode == VA_RC_CBR ||
-               ctx->va_rc_mode == VA_RC_VBR) {
-        // These still need to be  set for pic_init_qp/slice_qp_delta.
+    } else {
+        // These still need to be set for init_qp/slice_qp_delta.
         priv->fixed_qp_idr = 30;
         priv->fixed_qp_p   = 30;
         priv->fixed_qp_b   = 30;
-
-    } else {
-        av_assert0(0 && "Invalid RC mode.");
     }
 
     return 0;
@@ -1123,6 +1122,8 @@ static const VAAPIEncodeType vaapi_encode_type_h265 = {
                              FLAG_B_PICTURES |
                              FLAG_B_PICTURE_REFERENCES |
                              FLAG_NON_IDR_KEY_PICTURES,
+
+    .default_quality       = 25,
 
     .configure             = &vaapi_encode_h265_configure,
 
@@ -1175,6 +1176,9 @@ static av_cold int vaapi_encode_h265_init(AVCodecContext *avctx)
     // CTU size is currently hard-coded to 32.
     ctx->slice_block_width = ctx->slice_block_height = 32;
 
+    if (priv->qp > 0)
+        ctx->explicit_qp = priv->qp;
+
     return ff_vaapi_encode_init(avctx);
 }
 
@@ -1182,6 +1186,7 @@ static av_cold int vaapi_encode_h265_close(AVCodecContext *avctx)
 {
     VAAPIEncodeH265Context *priv = avctx->priv_data;
 
+    ff_cbs_fragment_free(priv->cbc, &priv->current_access_unit);
     ff_cbs_close(&priv->cbc);
 
     return ff_vaapi_encode_close(avctx);
@@ -1191,9 +1196,10 @@ static av_cold int vaapi_encode_h265_close(AVCodecContext *avctx)
 #define FLAGS (AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM)
 static const AVOption vaapi_encode_h265_options[] = {
     VAAPI_ENCODE_COMMON_OPTIONS,
+    VAAPI_ENCODE_RC_OPTIONS,
 
     { "qp", "Constant QP (for P-frames; scaled by qfactor/qoffset for I/B)",
-      OFFSET(qp), AV_OPT_TYPE_INT, { .i64 = 25 }, 0, 52, FLAGS },
+      OFFSET(qp), AV_OPT_TYPE_INT, { .i64 = 0 }, 0, 52, FLAGS },
 
     { "aud", "Include AUD",
       OFFSET(aud), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, FLAGS },
