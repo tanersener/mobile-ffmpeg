@@ -564,7 +564,6 @@ PIXA    *pixa1;
     } else {
         pixa1 = pixaCopy(pixa, L_CLONE);
     }
-    boxa = boxaCreate(n);
 
         /* Have number of rows and columns approximately equal */
     nw = (l_int32)sqrt((l_float64)n);
@@ -583,6 +582,7 @@ PIXA    *pixa1;
     }
     pixSetBlackOrWhite(pixd, L_SET_WHITE);
     pixSetResolution(pixd, res, res);
+    boxa = boxaCreate(n);
 
         /* Tile the output */
     index = 0;
@@ -2183,7 +2183,6 @@ pixaMakeFromTiledPix(PIX     *pixs,
                      l_int32  num,
                      BOXA    *boxa)
 {
-char     *text;
 l_int32   i, j, k, ws, hs, d, nx, ny, n, n_isvalid, ntiles, nmax;
 PIX      *pix1;
 PIXA     *pixa1;

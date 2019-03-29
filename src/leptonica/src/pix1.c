@@ -364,7 +364,7 @@ l_uint32  *data;
  * </pre>
  */
 PIX *
-pixCreateTemplate(PIX  *pixs)
+pixCreateTemplate(const PIX  *pixs)
 {
 PIX  *pixd;
 
@@ -394,7 +394,7 @@ PIX  *pixd;
  * </pre>
  */
 PIX *
-pixCreateTemplateNoInit(PIX  *pixs)
+pixCreateTemplateNoInit(const PIX  *pixs)
 {
 l_int32  w, h, d;
 PIX     *pixd;
@@ -625,11 +625,10 @@ char      *text;
  * </pre>
  */
 PIX *
-pixCopy(PIX  *pixd,   /* can be null */
-        PIX  *pixs)
+pixCopy(PIX        *pixd,   /* can be null */
+        const PIX  *pixs)
 {
-l_int32    bytes;
-l_uint32  *datas, *datad;
+l_int32  bytes;
 
     PROCNAME("pixCopy");
 
@@ -645,9 +644,7 @@ l_uint32  *datas, *datad;
     if (!pixd) {
         if ((pixd = pixCreateTemplate(pixs)) == NULL)
             return (PIX *)ERROR_PTR("pixd not made", procName, NULL);
-        datas = pixGetData(pixs);
-        datad = pixGetData(pixd);
-        memcpy(datad, datas, bytes);
+        memcpy(pixd->data, pixs->data, bytes);
         return pixd;
     }
 
@@ -668,9 +665,7 @@ l_uint32  *datas, *datad;
     pixCopyText(pixd, pixs);
 
         /* Copy image data */
-    datas = pixGetData(pixs);
-    datad = pixGetData(pixd);
-    memcpy(datad, datas, bytes);
+    memcpy(pixd->data, pixs->data, bytes);
     return pixd;
 }
 
@@ -737,16 +732,16 @@ l_uint32  *data;
  *
  * <pre>
  * Notes:
- *      (1) This always destroys any colormap in pixd (except if
- *          the operation is a no-op.
+ *      (1) This destroys the colormap in pixd, unless the operation is a no-op
  * </pre>
  */
 l_ok
-pixCopyColormap(PIX  *pixd,
-                PIX  *pixs)
+pixCopyColormap(PIX        *pixd,
+                const PIX  *pixs)
 {
-l_int32   valid;
-PIXCMAP  *cmaps, *cmapd;
+l_int32         valid;
+const PIXCMAP  *cmaps;
+PIXCMAP        *cmapd;
 
     PROCNAME("pixCopyColormap");
 
@@ -758,7 +753,7 @@ PIXCMAP  *cmaps, *cmapd;
         return 0;   /* no-op */
 
     pixDestroyColormap(pixd);
-    if ((cmaps = pixGetColormap(pixs)) == NULL)  /* not an error */
+    if ((cmaps = pixs->colormap) == NULL)  /* not an error */
         return 0;
     pixcmapIsValid(cmaps, &valid);
     if (!valid)
@@ -1526,8 +1521,8 @@ char  *newstring;
 
 
 l_int32
-pixCopyText(PIX  *pixd,
-            PIX  *pixs)
+pixCopyText(PIX        *pixd,
+            const PIX  *pixs)
 {
     PROCNAME("pixCopyText");
 
@@ -1538,7 +1533,7 @@ pixCopyText(PIX  *pixd,
     if (pixs == pixd)
         return 0;   /* no-op */
 
-    pixSetText(pixd, pixGetText(pixs));
+    pixSetText(pixd, pixs->text);
     return 0;
 }
 
@@ -1848,12 +1843,11 @@ extern const char *ImageFileFormatExtensions[];
  */
 l_ok
 pixPrintStreamInfo(FILE        *fp,
-                   PIX         *pix,
+                   const PIX   *pix,
                    const char  *text)
 {
-char     *textdata;
-l_int32   informat;
-PIXCMAP  *cmap;
+l_int32         informat;
+const PIXCMAP  *cmap;
 
     PROCNAME("pixPrintStreamInfo");
 
@@ -1865,20 +1859,20 @@ PIXCMAP  *cmap;
     if (text)
         fprintf(fp, "  Pix Info for %s:\n", text);
     fprintf(fp, "    width = %d, height = %d, depth = %d, spp = %d\n",
-               pixGetWidth(pix), pixGetHeight(pix), pixGetDepth(pix),
-               pixGetSpp(pix));
+            pixGetWidth(pix), pixGetHeight(pix), pixGetDepth(pix),
+            pixGetSpp(pix));
     fprintf(fp, "    wpl = %d, data = %p, refcount = %d\n",
-               pixGetWpl(pix), pixGetData(pix), pixGetRefcount(pix));
+            pixGetWpl(pix), pix->data, pixGetRefcount(pix));
     fprintf(fp, "    xres = %d, yres = %d\n", pixGetXRes(pix), pixGetYRes(pix));
-    if ((cmap = pixGetColormap(pix)) != NULL)
+    if ((cmap = pix->colormap) != NULL)
         pixcmapWriteStream(fp, cmap);
     else
         fprintf(fp, "    no colormap\n");
     informat = pixGetInputFormat(pix);
     fprintf(fp, "    input format: %d (%s)\n", informat,
             ImageFileFormatExtensions[informat]);
-    if ((textdata = pixGetText(pix)) != NULL)
-        fprintf(fp, "    text: %s\n", textdata);
+    if (pix->text != NULL)
+        fprintf(fp, "    text: %s\n", pix->text);
 
     return 0;
 }

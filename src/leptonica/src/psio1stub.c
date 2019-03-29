@@ -71,8 +71,7 @@ l_ok sarrayConvertFilesFittedToPS(SARRAY *sa, l_float32 xpts,
 /* ----------------------------------------------------------------------*/
 
 l_ok writeImageCompressedToPSFile(const char *filein, const char *fileout,
-                                  l_int32 res, l_int32 *pfirstfile,
-                                  l_int32 *pindex)
+                                  l_int32 res, l_int32 *pindex)
 {
     return ERROR_INT("function not present", "writeImageCompressedToPSFile", 1);
 }
@@ -119,6 +118,14 @@ l_ok pixaWriteCompressedToPS(PIXA *pixa, const char *fileout,
                              l_int32 res, l_int32 level)
 {
     return ERROR_INT("function not present", "pixaWriteCompressedtoPS", 1);
+}
+
+/* ----------------------------------------------------------------------*/
+
+l_ok pixWriteCompressedToPS(PIX *pix, const char *fileout, l_int32 res,
+                            l_int32 level, l_int32 *pindex)
+{
+    return ERROR_INT("function not present", "pixWriteCompressedtoPS", 1);
 }
 
 /* --------------------------------------------*/

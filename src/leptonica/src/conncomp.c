@@ -131,9 +131,9 @@ static void popFillseg(L_STACK *stack, l_int32 *pxleft, l_int32 *pxright,
 /*!
  * \brief   pixConnComp()
  *
- * \param[in]    pixs 1 bpp
- * \param[out]   ppixa   [optional] pixa of each c.c.
- * \param[in]    connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[out]   ppixa          [optional] pixa of each c.c.
+ * \param[in]    connectivity   4 or 8
  * \return  boxa, or NULL on error
  *
  * <pre>
@@ -167,9 +167,9 @@ pixConnComp(PIX     *pixs,
 /*!
  * \brief   pixConnCompPixa()
  *
- * \param[in]    pixs 1 bpp
- * \param[out]   ppixa pixa of each c.c.
- * \param[in]    connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[out]   ppixa          pixa of each c.c.
+ * \param[in]    connectivity   4 or 8
  * \return  boxa, or NULL on error
  *
  * <pre>
@@ -289,8 +289,8 @@ cleanup:
 /*!
  * \brief   pixConnCompBB()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    connectivity   4 or 8
  * \return  boxa, or NULL on error
  *
  * <pre>
@@ -375,8 +375,8 @@ cleanup:
 /*!
  * \brief   pixCountConnComp()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    connectivity   4 or 8
  * \param[out]   pcount
  * \return  0 if OK, 1 on error
  *
@@ -444,9 +444,9 @@ L_STACK  *stack, *auxstack;
 /*!
  * \brief   nextOnPixelInRaster()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    xstart, ystart  starting point for search
- * \param[out]   px, py  coord value of next ON pixel
+ * \param[in]    pixs             1 bpp
+ * \param[in]    xstart, ystart   starting point for search
+ * \param[out]   px, py           coord value of next ON pixel
  * \return  1 if a pixel is found; 0 otherwise or on error
  */
 l_int32
@@ -476,11 +476,11 @@ l_uint32  *data;
 /*!
  * \brief   nextOnPixelInRasterLow()
  *
- * \param[in]    data pix data
- * \param[in]    w, h width and height
- * \param[in]    wpl  words per line
- * \param[in]    xstart, ystart  starting point for search
- * \param[out]   px, py  coord value of next ON pixel
+ * \param[in]    data             pix data
+ * \param[in]    w, h             width and height
+ * \param[in]    wpl              words per line
+ * \param[in]    xstart, ystart   starting point for search
+ * \param[out]   px, py           coord value of next ON pixel
  * \return  1 if a pixel is found; 0 otherwise or on error
  */
 static l_int32
@@ -548,10 +548,10 @@ l_uint32  *line, *pword;
 /*!
  * \brief   pixSeedfillBB()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    stack for holding fillsegs
- * \param[in]    x,y   location of seed pixel
- * \param[in]    connectivity  4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    stack          for holding fillsegs
+ * \param[in]    x,y            location of seed pixel
+ * \param[in]    connectivity   4 or 8
  * \return  box or NULL on error
  *
  * <pre>
@@ -595,9 +595,9 @@ BOX  *box;
 /*!
  * \brief   pixSeedfill4BB()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    stack for holding fillsegs
- * \param[in]    x,y   location of seed pixel
+ * \param[in]    pixs     1 bpp
+ * \param[in]    stack    for holding fillsegs
+ * \param[in]    x,y      location of seed pixel
  * \return  box or NULL on error.
  *
  * <pre>
@@ -717,9 +717,9 @@ BOX       *box;
 /*!
  * \brief   pixSeedfill8BB()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    stack for holding fillsegs
- * \param[in]    x,y   location of seed pixel
+ * \param[in]    pixs    1 bpp
+ * \param[in]    stack   for holding fillsegs
+ * \param[in]    x,y     location of seed pixel
  * \return  box or NULL on error.
  *
  * <pre>
@@ -832,10 +832,10 @@ BOX       *box;
 /*!
  * \brief   pixSeedfill()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    stack for holding fillsegs
- * \param[in]    x,y   location of seed pixel
- * \param[in]    connectivity  4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    stack          for holding fillsegs
+ * \param[in]    x,y            location of seed pixel
+ * \param[in]    connectivity   4 or 8
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -874,9 +874,9 @@ l_int32  retval;
 /*!
  * \brief   pixSeedfill4()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    stack for holding fillsegs
- * \param[in]    x,y   location of seed pixel
+ * \param[in]    pixs    1 bpp
+ * \param[in]    stack   for holding fillsegs
+ * \param[in]    x,y     location of seed pixel
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -968,9 +968,9 @@ l_uint32  *data, *line;
 /*!
  * \brief   pixSeedfill8()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    stack for holding fillsegs
- * \param[in]    x,y   location of seed pixel
+ * \param[in]    pixs    1 bpp
+ * \param[in]    stack   for holding fillsegs
+ * \param[in]    x,y     location of seed pixel
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1071,10 +1071,10 @@ l_uint32  *data, *line;
  * \param[in]    y
  * \param[in]    dy
  * \param[in]    ymax
- * \param[out]   pminx minimum x
- * \param[out]   pmaxx maximum x
- * \param[out]   pminy minimum y
- * \param[out]   pmaxy maximum y
+ * \param[out]   pminx            minimum x
+ * \param[out]   pmaxx            maximum x
+ * \param[out]   pminy            minimum y
+ * \param[out]   pmaxy            maximum y
  * \return  void
  *
  * <pre>
@@ -1204,10 +1204,10 @@ L_STACK  *auxstack;
  * \brief   popFillseg()
  *
  * \param[in]    stack
- * \param[out]   pxleft left x
- * \param[out]   pxright right x
- * \param[out]   py y coordinate
- * \param[out]   pdy delta y
+ * \param[out]   pxleft    left x
+ * \param[out]   pxright   right x
+ * \param[out]   py        y coordinate
+ * \param[out]   pdy       delta y
  * \return  void
  *
  * <pre>

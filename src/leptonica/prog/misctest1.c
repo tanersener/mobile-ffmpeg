@@ -34,6 +34,7 @@
  *        * Extract text lines
  *        * Plot box side locations and dimension of a boxa
  *        * Extract and display rank sized components
+ *        * Extract parts of an image using a boxa
  */
 
 #include "allheaders.h"
@@ -45,7 +46,7 @@ int main(int    argc,
 {
 l_int32   w, h, bx, by, bw, bh, i, j;
 BOX      *box1, *box2;
-BOXA     *boxa, *boxae, *boxao;
+BOXA     *boxa1, *boxa2, *boxae, *boxao;
 PIX      *pixs, *pix1, *pix2, *pix3, *pixg, *pixb, *pixd, *pixc;
 PIX      *pixm, *pixm2, *pixd2, *pixs2;
 PIXA     *pixa1, *pixa2;
@@ -99,7 +100,7 @@ PIXCMAP  *cmap, *cmapg;
     pixs = pixRead("lucasta.150.jpg");
     pixGetDimensions(pixs, &w, &h, NULL);
     pixb = pixThresholdToBinary(pixs, 128);
-    boxa = pixConnComp(pixb, &pixa2, 8);
+    boxa1 = pixConnComp(pixb, &pixa2, 8);
     pixSaveTiled(pixs, pixa1, 1.0, 1, 40, 0);
     cmap = pixcmapGrayToColor(0x6f90c0);
     pixSetColormap(pixs, cmap);
@@ -110,7 +111,7 @@ PIXCMAP  *cmap, *cmapg;
     pixDestroy(&pixs);
     pixDestroy(&pixb);
     pixDestroy(&pixc);
-    boxaDestroy(&boxa);
+    boxaDestroy(&boxa1);
     pixaDestroy(&pixa2);
 
         /* Convert color to gray */
@@ -141,13 +142,13 @@ PIXCMAP  *cmap, *cmapg;
         /* Extract text lines */
     pix1 = pixRead("feyn.tif");
     pixa1 = pixExtractTextlines(pix1, 150, 150, 0, 0, 5, 5, NULL);
-    boxa = pixaGetBoxa(pixa1, L_CLONE);
-    boxaWrite("/tmp/lept/misc/lines1.ba", boxa);
+    boxa1 = pixaGetBoxa(pixa1, L_CLONE);
+    boxaWrite("/tmp/lept/misc/lines1.ba", boxa1);
     pix2 = pixaDisplayRandomCmap(pixa1, 0, 0);
     pixcmapResetColor(pixGetColormap(pix2), 0, 255, 255, 255);
     pixDisplay(pix2, 400, 0);
     pixWrite("/tmp/lept/misc/lines1.png", pix2, IFF_PNG);
-    boxaDestroy(&boxa);
+    boxaDestroy(&boxa1);
     pixDestroy(&pix1);
     pixDestroy(&pix2);
     pixaDestroy(&pixa1);
@@ -174,8 +175,8 @@ PIXCMAP  *cmap, *cmapg;
 
         /* Plot box side locations and dimensions of a boxa */
     pixa1 = pixaCreate(0);
-    boxa = boxaRead("boxa2.ba");
-    boxaSplitEvenOdd(boxa, 0, &boxae, &boxao);
+    boxa1 = boxaRead("boxa2.ba");
+    boxaSplitEvenOdd(boxa1, 0, &boxae, &boxao);
     boxaPlotSides(boxae, "1-sides-even", NULL, NULL, NULL, NULL, &pix1);
     pixaAddPix(pixa1, pix1, L_INSERT);
     boxaPlotSides(boxao, "1-sides-odd", NULL, NULL, NULL, NULL, &pix1);
@@ -186,9 +187,9 @@ PIXCMAP  *cmap, *cmapg;
     pixaAddPix(pixa1, pix1, L_INSERT);
     boxaDestroy(&boxae);
     boxaDestroy(&boxao);
-    boxaDestroy(&boxa);
-    boxa = boxaRead("boxa3.ba");
-    boxaSplitEvenOdd(boxa, 0, &boxae, &boxao);
+    boxaDestroy(&boxa1);
+    boxa1 = boxaRead("boxa3.ba");
+    boxaSplitEvenOdd(boxa1, 0, &boxae, &boxao);
     boxaPlotSides(boxae, "2-sides-even", NULL, NULL, NULL, NULL, &pix1);
     pixaAddPix(pixa1, pix1, L_INSERT);
     boxaPlotSides(boxao, "2-sides-odd", NULL, NULL, NULL, NULL, &pix1);
@@ -199,7 +200,7 @@ PIXCMAP  *cmap, *cmapg;
     pixaAddPix(pixa1, pix1, L_INSERT);
     boxaDestroy(&boxae);
     boxaDestroy(&boxao);
-    boxaDestroy(&boxa);
+    boxaDestroy(&boxa1);
     pix1 = pixaDisplayTiledInRows(pixa1, 32, 1500, 1.0, 0, 30, 2);
     pixWrite("/tmp/lept/misc/boxaplots.png", pix1, IFF_PNG);
     pixDisplay(pix1, 800, 0);
@@ -235,6 +236,18 @@ PIXCMAP  *cmap, *cmapg;
     pixaDestroy(&pixa1);
     pixDestroy(&pixs);
     pixDestroy(&pix3);
+
+        /* Extract parts of an image using a boxa */
+    pix1 = pixRead("feyn-fract.tif");
+    boxa1 = pixConnCompBB(pix1, 4);
+    boxa2 = boxaSelectBySize(boxa1, 0, 28, L_SELECT_HEIGHT, L_SELECT_IF_GT, NULL),
+    pix2 = pixCopyWithBoxa(pix1, boxa2, L_SET_WHITE);
+    pixWrite("/tmp/lept/misc/tallcomps.png", pix2, IFF_PNG);
+    pixDisplay(pix2, 600, 600);
+    pixDestroy(&pix1);
+    pixDestroy(&pix2);
+    boxaDestroy(&boxa1);
+    boxaDestroy(&boxa2);
 
     return 0;
 }

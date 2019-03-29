@@ -8,8 +8,8 @@
 #      alltests_reg generate
 #      alltests_reg compare
 #
-#  Ten of the tests require gnuplot.  These tests are skipped if
-#  gnuplot is not available.
+#  A few of the tests require gnuplot.  These tests, listed below,
+#  are skipped if gnuplot is not available.
 #
 #  The wrapper receives several parameters in this form:
 #      path/to/source/config/test-driver <TEST DRIVER ARGS> -- ./foo_reg
@@ -31,7 +31,7 @@ TEST_NAME="${TEST##*/}"
 TEST_NAME="${TEST_NAME%_reg*}"
 
 case "${TEST_NAME}" in
-    baseline|boxa1|colormask|colorspace|dna|enhance|extrema|fpix1|italic|kernel|nearline|projection|rankbin|rankhisto|wordboxes)
+    baseline|boxa[12]|colormask|colorspace|dna|enhance|extrema|fpix1|italic|kernel|nearline|numa[12]|projection|rankbin|rankhisto|wordboxes)
         GNUPLOT=$(type -P gnuplot || type -P wgnuplot)
 
         if [ -z "${GNUPLOT}" ] || ! "${GNUPLOT}" -e "set terminal png" 2>/dev/null ; then

@@ -218,13 +218,13 @@ static void pixDebugFlipDetect(const char *filename, PIX *pixs,
 /*!
  * \brief   pixOrientCorrect()
  *
- * \param[in]    pixs 1 bpp, deskewed, English text, 150 - 300 ppi
- * \param[in]    minupconf minimum value for which a decision can be made
- * \param[in]    minratio minimum conf ratio required for a decision
- * \param[out]   pupconf [optional] ; use NULL to skip
- * \param[out]   pleftconf [optional] ; use NULL to skip
- * \param[out]   protation [optional] ; use NULL to skip
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    pixs        1 bpp, deskewed, English text, 150 - 300 ppi
+ * \param[in]    minupconf   minimum value for which a decision can be made
+ * \param[in]    minratio    minimum conf ratio required for a decision
+ * \param[out]   pupconf     [optional] ; use NULL to skip
+ * \param[out]   pleftconf   [optional] ; use NULL to skip
+ * \param[out]   protation   [optional] ; use NULL to skip
+ * \param[in]    debug       1 for debug output; 0 otherwise
  * \return  pixd  may be rotated by 90, 180 or 270; null on error
  *
  * <pre>
@@ -309,11 +309,11 @@ PIX       *pix1;
 /*!
  * \brief   pixOrientDetect()
  *
- * \param[in]    pixs 1 bpp, deskewed, English text, 150 - 300 ppi
- * \param[out]   pupconf [optional] ; may be NULL
- * \param[out]   pleftconf [optional] ; may be NULL
- * \param[in]    mincount min number of up + down; use 0 for default
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    pixs       1 bpp, deskewed, English text, 150 - 300 ppi
+ * \param[out]   pupconf    [optional] ; may be NULL
+ * \param[out]   pleftconf  [optional] ; may be NULL
+ * \param[in]    mincount   min number of up + down; use 0 for default
+ * \param[in]    debug      1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -397,12 +397,12 @@ PIX  *pix1;
 /*!
  * \brief   makeOrientDecision()
  *
- * \param[in]    upconf nonzero
- * \param[in]    leftconf nonzero
- * \param[in]    minupconf minimum value for which a decision can be made
- * \param[in]    minratio minimum conf ratio required for a decision
- * \param[out]   porient text orientation enum {0,1,2,3,4}
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    upconf      nonzero
+ * \param[in]    leftconf    nonzero
+ * \param[in]    minupconf   minimum value for which a decision can be made
+ * \param[in]    minratio    minimum conf ratio required for a decision
+ * \param[out]   porient     text orientation enum {0,1,2,3,4}
+ * \param[in]    debug       1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -482,10 +482,10 @@ l_float32  absupconf, absleftconf;
 /*!
  * \brief   pixUpDownDetect()
  *
- * \param[in]    pixs 1 bpp, deskewed, English text, 150 - 300 ppi
- * \param[out]   pconf confidence that text is rightside-up
- * \param[in]    mincount min number of up + down; use 0 for default
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    pixs       1 bpp, deskewed, English text, 150 - 300 ppi
+ * \param[out]   pconf      confidence that text is rightside-up
+ * \param[in]    mincount   min number of up + down; use 0 for default
+ * \param[in]    debug      1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -513,11 +513,11 @@ pixUpDownDetect(PIX        *pixs,
 /*!
  * \brief   pixUpDownDetectGeneral()
  *
- * \param[in]    pixs 1 bpp, deskewed, English text, 150 - 300 ppi
- * \param[out]   pconf confidence that text is rightside-up
- * \param[in]    mincount min number of up + down; use 0 for default
- * \param[in]    npixels number of pixels removed from each side of word box
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    pixs       1 bpp, deskewed, English text, 150 - 300 ppi
+ * \param[out]   pconf      confidence that text is rightside-up
+ * \param[in]    mincount   min number of up + down; use 0 for default
+ * \param[in]    npixels    number of pixels removed from each side of word box
+ * \param[in]    debug      1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -673,11 +673,11 @@ SEL       *sel1, *sel2, *sel3, *sel4;
 /*!
  * \brief   pixOrientDetectDwa()
  *
- * \param[in]    pixs 1 bpp, deskewed, English text
- * \param[out]   pupconf [optional] ; may be NULL
- * \param[out]   pleftconf [optional] ; may be NULL
- * \param[in]    mincount min number of up + down; use 0 for default
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    pixs        1 bpp, deskewed, English text
+ * \param[out]   pupconf     [optional] ; may be NULL
+ * \param[out]   pleftconf   [optional] ; may be NULL
+ * \param[in]    mincount    min number of up + down; use 0 for default
+ * \param[in]    debug       1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -724,10 +724,10 @@ PIX  *pix1;
 /*!
  * \brief   pixUpDownDetectDwa()
  *
- * \param[in]    pixs 1 bpp, deskewed, English text, 150 - 300 ppi
- * \param[out]   pconf confidence that text is rightside-up
- * \param[in]    mincount min number of up + down; use 0 for default
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    pixs       1 bpp, deskewed, English text, 150 - 300 ppi
+ * \param[out]   pconf      confidence that text is rightside-up
+ * \param[in]    mincount   min number of up + down; use 0 for default
+ * \param[in]    debug      1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -757,11 +757,11 @@ pixUpDownDetectDwa(PIX       *pixs,
 /*!
  * \brief   pixUpDownDetectGeneralDwa()
  *
- * \param[in]    pixs 1 bpp, deskewed, English text
- * \param[out]   pconf confidence that text is rightside-up
- * \param[in]    mincount min number of up + down; use 0 for default
- * \param[in]    npixels number of pixels removed from each side of word box
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    pixs       1 bpp, deskewed, English text
+ * \param[out]   pconf      confidence that text is rightside-up
+ * \param[in]    mincount   min number of up + down; use 0 for default
+ * \param[in]    npixels    number of pixels removed from each side of word box
+ * \param[in]    debug      1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -891,10 +891,10 @@ PIX       *pixt, *pix0, *pix1, *pix2, *pix3, *pixm;
 /*!
  * \brief   pixMirrorDetect()
  *
- * \param[in]    pixs 1 bpp, deskewed, English text
- * \param[out]   pconf confidence that text is not LR mirror reversed
- * \param[in]    mincount min number of left + right; use 0 for default
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    pixs       1 bpp, deskewed, English text
+ * \param[out]   pconf      confidence that text is not LR mirror reversed
+ * \param[in]    mincount   min number of left + right; use 0 for default
+ * \param[in]    debug      1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1009,10 +1009,10 @@ SEL       *sel1, *sel2;
 /*!
  * \brief   pixMirrorDetectDwa()
  *
- * \param[in]    pixs 1 bpp, deskewed, English text
- * \param[out]   pconf confidence that text is not LR mirror reversed
- * \param[in]    mincount min number of left + right; use 0 for default
- * \param[in]    debug 1 for debug output; 0 otherwise
+ * \param[in]    pixs       1 bpp, deskewed, English text
+ * \param[out]   pconf      confidence that text is not LR mirror reversed
+ * \param[in]    mincount   min number of left + right; use 0 for default
+ * \param[in]    debug      1 for debug output; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1094,13 +1094,13 @@ PIX       *pix0, *pix1, *pix2, *pix3;
  *                        Static debug helper                     *
  *----------------------------------------------------------------*/
 /*
- *  pixDebugFlipDetect()
+ * \brief   pixDebugFlipDetect()
  *
- *      Input:  filename (for output debug file)
- *              pixs (input to pix*Detect)
- *              pixhm (hit-miss result from ascenders or descenders)
- *              enable (1 to enable this function; 0 to disable)
- *      Return: void
+ * \param[in]    filename   for output debug file
+ * \param[in]    pixs       input to pix*Detect
+ * \param[in]    pixhm      hit-miss result from ascenders or descenders
+ * \param[in]    enable     1 to enable this function; 0 to disable
+ * \return   void
  */
 static void
 pixDebugFlipDetect(const char *filename,

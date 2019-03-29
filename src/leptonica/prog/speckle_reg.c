@@ -86,7 +86,7 @@ L_REGPARAMS  *rp;
     pix6 = pixSubtract(NULL, pix3, pix5);
     pixaAddPix(pixa1, pix6, L_INSERT);
     regTestWritePixAndCheck(rp, pix6, IFF_PNG);  /* 5 */
-    
+
         /* Remove the speckle noise up to 3x3 */
     sel3 = selCreateFromString(selstr3, 5, 5, "speckle3");
     pix7 = pixHMT(NULL, pix3, sel3);

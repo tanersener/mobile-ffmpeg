@@ -108,7 +108,7 @@ static const unsigned char JP2K_IMAGE_DATA[12] = { 0x00, 0x00, 0x00, 0x0C,
  * \brief   pixaReadFiles()
  *
  * \param[in]    dirname
- * \param[in]    substr [optional] substring filter on filenames; can be null
+ * \param[in]    substr   [optional] substring filter on filenames; can be null
  * \return  pixa, or NULL on error
  *
  * <pre>
@@ -144,7 +144,7 @@ SARRAY  *sa;
 /*!
  * \brief   pixaReadFilesSA()
  *
- * \param[in]    sa full pathnames for all files
+ * \param[in]    sa     full pathnames for all files
  * \return  pixa, or NULL on error
  */
 PIXA *
@@ -178,7 +178,7 @@ PIXA    *pixa;
 /*!
  * \brief   pixRead()
  *
- * \param[in]    filename with full pathname or in local directory
+ * \param[in]    filename    with full pathname or in local directory
  * \return  pix if OK; NULL on error
  *
  * <pre>
@@ -212,8 +212,9 @@ PIX   *pix;
 /*!
  * \brief   pixReadWithHint()
  *
- * \param[in]    filename with full pathname or in local directory
- * \param[in]    hint bitwise OR of L_HINT_* values for jpeg; use 0 for no hint
+ * \param[in]    filename    with full pathname or in local directory
+ * \param[in]    hint        bitwise OR of L_HINT_* values for jpeg;
+ *                           use 0 for no hint
  * \return  pix if OK; NULL on error
  *
  * <pre>
@@ -248,8 +249,8 @@ PIX   *pix;
 /*!
  * \brief   pixReadIndexed()
  *
- * \param[in]    sa string array of full pathnames
- * \param[in]    index into pathname array
+ * \param[in]    sa      string array of full pathnames
+ * \param[in]    index   into pathname array
  * \return  pix if OK; null if not found
  *
  * <pre>
@@ -305,8 +306,8 @@ PIX     *pix;
 /*!
  * \brief   pixReadStream()
  *
- * \param[in]    fp file stream
- * \param[in]    hint bitwise OR of L_HINT_* values for jpeg; use 0 for no hint
+ * \param[in]    fp      file stream
+ * \param[in]    hint    bitwise OR of L_HINT_* values for jpeg; 0 for no hint
  * \return  pix if OK; NULL on error
  *
  * <pre>
@@ -423,12 +424,12 @@ PIXCMAP  *cmap;
 /*!
  * \brief   pixReadHeader()
  *
- * \param[in]    filename with full pathname or in local directory
- * \param[out]   pformat [optional] file format
- * \param[out]   pw, ph [optional] width and height
- * \param[out]   pbps [optional] bits/sample
- * \param[out]   pspp [optional] samples/pixel 1, 3 or 4
- * \param[out]   piscmap [optional] 1 if cmap exists; 0 otherwise
+ * \param[in]    filename    with full pathname or in local directory
+ * \param[out]   pformat     [optional] file format
+ * \param[out]   pw, ph      [optional] width and height
+ * \param[out]   pbps        [optional] bits/sample
+ * \param[out]   pspp        [optional] samples/pixel 1, 3 or 4
+ * \param[out]   piscmap     [optional] 1 if cmap exists; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -602,8 +603,8 @@ FILE    *fp;
 /*!
  * \brief   findFileFormatStream()
  *
- * \param[in]    fp file stream
- * \param[out]   pformat found format
+ * \param[in]    fp        file stream
+ * \param[out]   pformat   found format
  * \return  0 if OK, 1 on error or if format is not recognized
  *
  * <pre>
@@ -650,8 +651,8 @@ l_int32  format;
 /*!
  * \brief   findFileFormatBuffer()
  *
- * \param[in]    buf byte buffer at least 12 bytes in size; we can't check
- * \param[out]   pformat found format
+ * \param[in]    buf       byte buffer at least 12 bytes in size; we can't check
+ * \param[out]   pformat   found format
  * \return  0 if OK, 1 on error or if format is not recognized
  *
  * <pre>
@@ -788,7 +789,7 @@ l_uint16  twobytepw;
 /*!
  * \brief   fileFormatIsTiff()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp    file stream
  * \return  1 if file is tiff; 0 otherwise or on error
  */
 l_int32
@@ -818,8 +819,8 @@ l_int32  format;
 /*!
  * \brief   pixReadMem()
  *
- * \param[in]    data const; encoded
- * \param[in]    size size of data
+ * \param[in]    data    const; encoded
+ * \param[in]    size    size of data
  * \return  pix, or NULL on error
  *
  * <pre>
@@ -942,13 +943,13 @@ PIXCMAP  *cmap;
 /*!
  * \brief   pixReadHeaderMem()
  *
- * \param[in]    data const; encoded
- * \param[in]    size size of data
- * \param[out]   pformat [optional] image format
- * \param[out]   pw, ph [optional] width and height
- * \param[out]   pbps [optional] bits/sample
- * \param[out]   pspp [optional] samples/pixel 1, 3 or 4
- * \param[out]   piscmap [optional] 1 if cmap exists; 0 otherwise
+ * \param[in]    data       const; encoded
+ * \param[in]    size       size of data
+ * \param[out]   pformat    [optional] image format
+ * \param[out]   pw, ph     [optional] width and height
+ * \param[out]   pbps       [optional] bits/sample
+ * \param[out]   pspp       [optional] samples/pixel 1, 3 or 4
+ * \param[out]   piscmap    [optional] 1 if cmap exists; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1260,7 +1261,7 @@ PIXCMAP  *cmap;
 /*!
  * \brief   ioFormatTest()
  *
- * \param[in]    filename input file
+ * \param[in]    filename    input image file
  * \return  0 if OK; 1 on error or if the test fails
  *
  * <pre>

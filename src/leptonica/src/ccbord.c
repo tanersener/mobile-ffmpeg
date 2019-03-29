@@ -30,56 +30,56 @@
  * <pre>
  *
  *     CCBORDA and CCBORD creation and destruction
- *         CCBORDA     *ccbaCreate()
- *         void        *ccbaDestroy()
- *         CCBORD      *ccbCreate()
- *         void        *ccbDestroy()
+ *         CCBORDA         *ccbaCreate()
+ *         void            *ccbaDestroy()
+ *         CCBORD          *ccbCreate()
+ *         void            *ccbDestroy()
  *
  *     CCBORDA addition
- *         l_int32      ccbaAddCcb()
- *         static l_int32  ccbaExtendArray()
+ *         l_int32          ccbaAddCcb()
+ *         static l_int32   ccbaExtendArray()
  *
  *     CCBORDA accessors
- *         l_int32      ccbaGetCount()
- *         l_int32      ccbaGetCcb()
+ *         l_int32          ccbaGetCount()
+ *         l_int32          ccbaGetCcb()
  *
  *     Top-level border-finding routines
- *         CCBORDA     *pixGetAllCCBorders()
- *         CCBORD      *pixGetCCBorders()
- *         PTAA        *pixGetOuterBordersPtaa()
- *         PTA         *pixGetOuterBorderPta()
+ *         CCBORDA         *pixGetAllCCBorders()
+ *         static CCBORD   *pixGetCCBorders()
+ *         PTAA            *pixGetOuterBordersPtaa()
+ *         static PTA      *pixGetOuterBorderPta()
  *
  *     Lower-level border location routines
- *         l_int32      pixGetOuterBorder()
- *         l_int32      pixGetHoleBorder()
- *         l_int32      findNextBorderPixel()
- *         void         locateOutsideSeedPixel()
+ *         PTAA            *pixGetOuterBorder()
+ *         static l_int32   pixGetHoleBorder()
+ *         static l_int32   findNextBorderPixel()
+ *         static void      locateOutsideSeedPixel()
  *
  *     Border conversions
- *         l_int32      ccbaGenerateGlobalLocs()
- *         l_int32      ccbaGenerateStepChains()
- *         l_int32      ccbaStepChainsToPixCoords()
- *         l_int32      ccbaGenerateSPGlobalLocs()
+ *         l_int32          ccbaGenerateGlobalLocs()
+ *         l_int32          ccbaGenerateStepChains()
+ *         l_int32          ccbaStepChainsToPixCoords()
+ *         l_int32          ccbaGenerateSPGlobalLocs()
  *
  *     Conversion to single path
- *         l_int32      ccbaGenerateSinglePath()
- *         PTA         *getCutPathForHole()
+ *         l_int32          ccbaGenerateSinglePath()
+ *         PTA             *getCutPathForHole()
  *
  *     Border and full image rendering
- *         PIX         *ccbaDisplayBorder()
- *         PIX         *ccbaDisplaySPBorder()
- *         PIX         *ccbaDisplayImage1()
- *         PIX         *ccbaDisplayImage2()
+ *         PIX             *ccbaDisplayBorder()
+ *         PIX             *ccbaDisplaySPBorder()
+ *         PIX             *ccbaDisplayImage1()
+ *         PIX             *ccbaDisplayImage2()
  *
  *     Serialize for I/O
- *         l_int32      ccbaWrite()
- *         l_int32      ccbaWriteStream()
- *         l_int32      ccbaRead()
- *         l_int32      ccbaReadStream()
+ *         l_int32          ccbaWrite()
+ *         l_int32          ccbaWriteStream()
+ *         l_int32          ccbaRead()
+ *         l_int32          ccbaReadStream()
  *
  *     SVG output
- *         l_int32      ccbaWriteSVG()
- *         char        *ccbaWriteSVGString()
+ *         l_int32          ccbaWriteSVG()
+ *         char            *ccbaWriteSVGString()
  *
  *
  *     Border finding is tricky because components can have
@@ -277,8 +277,18 @@ static const l_int32   xpostab[] = {-1, -1, 0, 1, 1, 1, 0, -1};
 static const l_int32   ypostab[] = {0, -1, -1, -1, 0, 1, 1, 1};
 static const l_int32   qpostab[] = {6, 6, 0, 0, 2, 2, 4, 4};
 
-    /* Static function */
+    /* Static functions */
 static l_int32 ccbaExtendArray(CCBORDA  *ccba);
+static CCBORD *pixGetCCBorders(PIX *pixs, BOX *box);
+static PTA *pixGetOuterBorderPta(PIX *pixs, BOX *box);
+static l_ok pixGetHoleBorder(CCBORD *ccb, PIX *pixs, BOX *box,
+                             l_int32 xs, l_int32 ys);
+static l_int32 findNextBorderPixel(l_int32 w, l_int32 h, l_uint32 *data,
+                                   l_int32 wpl, l_int32 px, l_int32 py,
+                                   l_int32 *pqpos, l_int32 *pnpx,
+                                   l_int32 *pnpy);
+static void locateOutsideSeedPixel(l_int32 fpx, l_int32 fpy, l_int32 spx,
+                                   l_int32 spy, l_int32 *pxs, l_int32 *pys);
 
 #ifndef  NO_CONSOLE_IO
 #define  DEBUG_PRINT   0
@@ -291,8 +301,8 @@ static l_int32 ccbaExtendArray(CCBORDA  *ccba);
 /*!
  * \brief    ccbaCreate()
  *
- * \param[in]    pixs  binary image; can be null
- * \param[in]    n  initial number of ptrs
+ * \param[in]    pixs    1 bpp; can be null
+ * \param[in]    n       initial number of ptrs
  * \return  ccba, or NULL on error
  */
 CCBORDA *
@@ -325,7 +335,7 @@ CCBORDA  *ccba;
 /*!
  * \brief   ccbaDestroy()
  *
- * \param[in,out]   pccba  to be nulled
+ * \param[in,out]   pccba     will be set to null befoe returning
  * \return  void
  */
 void
@@ -357,7 +367,7 @@ CCBORDA  *ccba;
 /*!
  * \brief   ccbCreate()
  *
- * \param[in]    pixs  [optional]
+ * \param[in]    pixs    [optional]; can be null
  * \return  ccb or NULL on error
  */
 CCBORD *
@@ -397,7 +407,7 @@ PTAA    *local;
 /*!
  * \brief   ccbDestroy()
  *
- * \param[in,out]   pccb to be nulled
+ * \param[in,out]   pccb    will be set to null before returning
  * \return  void
  */
 void
@@ -447,7 +457,7 @@ CCBORD  *ccb;
  * \brief   ccbaAddCcb()
  *
  * \param[in]    ccba
- * \param[in]    ccb to be added by insertion
+ * \param[in]    ccb     to be added by insertion
  * \return  0 if OK; 1 on error
  */
 l_ok
@@ -557,7 +567,7 @@ CCBORD  *ccb;
 /*!
  * \brief   pixGetAllCCBorders()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs    1 bpp
  * \return  ccborda, or NULL on error
  */
 CCBORDA *
@@ -623,8 +633,8 @@ PIXA     *pixa;
 /*!
  * \brief   pixGetCCBorders()
  *
- * \param[in]    pixs 1 bpp, one 8-connected component
- * \param[in]    box  xul, yul, width, height in global coords
+ * \param[in]    pixs     1 bpp, one 8-connected component
+ * \param[in]    box      of %pixs, in global coords
  * \return  ccbord, or NULL on error
  *
  * <pre>
@@ -646,7 +656,7 @@ PIXA     *pixa;
  *          and qpostab[] -- see above where they are defined.
  * </pre>
  */
-CCBORD *
+static CCBORD *
 pixGetCCBorders(PIX      *pixs,
                 BOX      *box)
 {
@@ -754,7 +764,7 @@ PIXA     *pixa;
 /*!
  * \brief   pixGetOuterBordersPtaa()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs     1 bpp
  * \return  ptaa of outer borders, in global coords, or NULL on error
  */
 PTAA *
@@ -803,8 +813,8 @@ PTAA    *ptaa;
 /*!
  * \brief   pixGetOuterBorderPta()
  *
- * \param[in]    pixs 1 bpp, one 8-connected component
- * \param[in]    box  [optional] of pixs, in global coordinates
+ * \param[in]    pixs    1 bpp, one 8-connected component
+ * \param[in]    box     [optional] of %pixs, in global coordinates
  * \return  pta of outer border, in global coords, or NULL on error
  *
  * <pre>
@@ -817,7 +827,7 @@ PTAA    *ptaa;
  *          pta will be in those global coordinates.
  * </pre>
  */
-PTA *
+static PTA *
 pixGetOuterBorderPta(PIX  *pixs,
                      BOX  *box)
 {
@@ -873,9 +883,9 @@ PTA     *ptaloc, *ptad;
 /*!
  * \brief   pixGetOuterBorder()
  *
- * \param[in]    ccb  unfilled
- * \param[in]    pixs for the component at hand
- * \param[in]    box  for the component, in global coords
+ * \param[in]    ccb     unfilled
+ * \param[in]    pixs    for the component at hand
+ * \param[in]    box     for the component, in global coords
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -962,10 +972,10 @@ PIX       *pixb;  /* with 1 pixel border */
 /*!
  * \brief   pixGetHoleBorder()
  *
- * \param[in]    ccb  the exterior border is already made
- * \param[in]    pixs for the connected component at hand
- * \param[in]    box  for the specific hole border, in relative
- *                    coordinates to the c.c.
+ * \param[in]    ccb      the exterior border is already made
+ * \param[in]    pixs     for the connected component at hand
+ * \param[in]    box      for the specific hole border, in relative
+ *                        coordinates to the c.c.
  * \param[in]    xs, ys   first pixel on hole border, relative to c.c.
  * \return  0 if OK, 1 on error
  *
@@ -978,7 +988,7 @@ PIX       *pixb;  /* with 1 pixel border */
  *          exterior borders
  * </pre>
  */
-l_ok
+static l_ok
 pixGetHoleBorder(CCBORD   *ccb,
                  PIX      *pixs,
                  BOX      *box,
@@ -1046,10 +1056,11 @@ PTA       *pta;
 /*!
  * \brief   findNextBorderPixel()
  *
- * \param[in]       w, h, data, wpl
- * \param[in]       px, py      current P
- * \param[in,out]   pqpos       input current Q; new Q
- * \param[out]      pnpx, pnpy  new P
+ * \param[in]       w, h
+ * \param[in]       data, wpl
+ * \param[in]       px, py       current P
+ * \param[in,out]   pqpos        input current Q; new Q
+ * \param[out]      pnpx, pnpy   new P
  * \return  0 if next pixel found; 1 otherwise
  *
  * <pre>
@@ -1060,7 +1071,7 @@ PTA       *pta;
  *          parameters.  All calling functions should check them.
  * </pre>
  */
-l_int32
+static l_int32
 findNextBorderPixel(l_int32    w,
                     l_int32    h,
                     l_uint32  *data,
@@ -1102,16 +1113,16 @@ l_uint32  *line;
  *
  * <pre>
  * Notes:
- *      (1) the first and second pixels must be 8-adjacent,
+ *      (1) The first and second pixels must be 8-adjacent,
  *          so |dx| <= 1 and |dy| <= 1 and both dx and dy
  *          cannot be 0.  There are 8 possible cases.
- *      (2) the seed pixel is OUTSIDE the foreground of the c.c.
- *      (3) these rules are for the situation where the INSIDE
+ *      (2) The seed pixel is OUTSIDE the foreground of the c.c.
+ *      (3) These rules are for the situation where the INSIDE
  *          of the c.c. is on the right as you follow the border:
  *          cw for an exterior border and ccw for a hole border.
  * </pre>
  */
-void
+static void
 locateOutsideSeedPixel(l_int32   fpx,
                        l_int32   fpy,
                        l_int32   spx,
@@ -1149,12 +1160,15 @@ l_int32  dx, dy;
 /*!
  * \brief   ccbaGenerateGlobalLocs()
  *
- * \param[in]    ccba with local chain ptaa of borders computed
+ * \param[in]    ccba     with local chain ptaa of borders computed
  * \return  0 if OK, 1 on error
  *
- *  Action: this uses the pixel locs in the local ptaa, which are all
+ * <pre>
+ * Notes:
+ *      (1) This uses the pixel locs in the local ptaa, which are all
  *          relative to each c.c., to find the global pixel locations,
  *          and stores them in the global ptaa.
+ * </pre>
  */
 l_ok
 ccbaGenerateGlobalLocs(CCBORDA  *ccba)
@@ -1208,7 +1222,7 @@ PTA     *ptal, *ptag;
 /*!
  * \brief   ccbaGenerateStepChains()
  *
- * \param[in]    ccba with local chain ptaa of borders computed
+ * \param[in]    ccba     with local chain ptaa of borders computed
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1288,8 +1302,8 @@ PTAA    *ptaal;  /* local chain code */
 /*!
  * \brief   ccbaStepChainsToPixCoords()
  *
- * \param[in]    ccba with step chains numaa of borders
- * \param[in]    coordtype  CCB_GLOBAL_COORDS or CCB_LOCAL_COORDS
+ * \param[in]    ccba        with step chains numaa of borders
+ * \param[in]    coordtype   CCB_GLOBAL_COORDS or CCB_LOCAL_COORDS
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1386,7 +1400,7 @@ PTA     *ptas, *ptan;
  * \brief   ccbaGenerateSPGlobalLocs()
  *
  * \param[in]    ccba
- * \param[in]    ptsflag  CCB_SAVE_ALL_PTS or CCB_SAVE_TURNING_PTS
+ * \param[in]    ptsflag      CCB_SAVE_ALL_PTS or CCB_SAVE_TURNING_PTS
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1654,11 +1668,11 @@ PTAA     *ptaap;  /* ptaa for all paths between borders */
 /*!
  * \brief   getCutPathForHole()
  *
- * \param[in]    pix  of c.c.
- * \param[in]    pta  of outer border
- * \param[in]    boxinner b.b. of hole path
- * \param[out]   pdir  direction (0-3), returned; only needed for debug
- * \param[out]   plen  length of path, returned
+ * \param[in]    pix        1 bpp, of c.c.
+ * \param[in]    pta        of outer border
+ * \param[in]    boxinner   bounding box of hole path
+ * \param[out]   pdir       direction (0-3), returned; only needed for debug
+ * \param[out]   plen       length of path, returned
  * \return  pta of pts on cut path from the hole border
  *              to the outer border, including end points on
  *              both borders; or NULL on error
@@ -2220,7 +2234,7 @@ FILE  *fp;
 /*!
  * \brief   ccbaWriteStream()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp       file stream
  * \param[in]    ccba
  * \return  0 if OK; 1 on error
  *
@@ -2369,7 +2383,7 @@ CCBORDA  *ccba;
 /*!
  * \brief   ccbaReadStream()
  *
- * \param[in]     fp file stream
+ * \param[in]     fp     file stream
  * \return   ccba, or NULL on error
  *
  * \code

@@ -32,7 +32,7 @@
  * (1) It makes recog/digits/bootnum4.pa, a pixa of 100 samples
  *     from each of the 10 digits.  These are stored as 10 mosaics
  *     where the 100 samples are packed in 20x30 pixel tiles.
- *  
+ *
  * (2) It generates the code that is able to generate a pixa with
  *     any number from 1 to 100 of samples for each digit.  This
  *     new pixa has one pix for each sample (the tiled pix in the
@@ -75,7 +75,7 @@ L_STRCODE  *strc;
         /* Write it out (and copy to recog/digits/bootnum4.pa) */
     pixaWrite("/tmp/lept/digit/bootnum4.pa", pixa1);
     pixaDestroy(&pixa1);
-    
+
         /* Generate the stringcode in two files for this pixa.
          * Both files are then assempled into the source file
          * bootnumgen4.c, which is compiled into the library.  */

@@ -94,8 +94,8 @@
 /*!
  * \brief   pixExtractBoundary()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    type 0 for background pixels; 1 for foreground pixels
+ * \param[in]    pixs    1 bpp
+ * \param[in]    type    0 for background pixels; 1 for foreground pixels
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -130,11 +130,11 @@ PIX  *pixd;
 /*!
  * \brief   pixMorphSequenceMasked()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    pixm [optional] 1 bpp mask
- * \param[in]    sequence string specifying sequence of operations
- * \param[in]    dispsep horizontal separation in pixels between
- *                       successive displays; use zero to suppress display
+ * \param[in]    pixs       1 bpp
+ * \param[in]    pixm       [optional] 1 bpp mask
+ * \param[in]    sequence   string specifying sequence of operations
+ * \param[in]    dispsep    horizontal separation in pixels between
+ *                          successive displays; use zero to suppress display
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -171,12 +171,12 @@ PIX  *pixd;
 /*!
  * \brief   pixMorphSequenceByComponent()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    sequence string specifying sequence
- * \param[in]    connectivity 4 or 8
- * \param[in]    minw  minimum width to consider; use 0 or 1 for any width
- * \param[in]    minh  minimum height to consider; use 0 or 1 for any height
- * \param[out]   pboxa [optional] return boxa of c.c. in pixs
+ * \param[in]    pixs          1 bpp
+ * \param[in]    sequence      string specifying sequence
+ * \param[in]    connectivity  4 or 8
+ * \param[in]    minw          min width to consider; use 0 or 1 for any width
+ * \param[in]    minh          min height to consider; use 0 or 1 for any height
+ * \param[out]   pboxa         [optional] return boxa of c.c. in pixs
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -245,10 +245,10 @@ PIXA    *pixas, *pixad;
 /*!
  * \brief   pixaMorphSequenceByComponent()
  *
- * \param[in]    pixas of 1 bpp pix
- * \param[in]    sequence string specifying sequence
- * \param[in]    minw  minimum width to consider; use 0 or 1 for any width
- * \param[in]    minh  minimum height to consider; use 0 or 1 for any height
+ * \param[in]    pixas       of 1 bpp pix
+ * \param[in]    sequence    string specifying sequence
+ * \param[in]    minw        min width to consider; use 0 or 1 for any width
+ * \param[in]    minh        min height to consider; use 0 or 1 for any height
  * \return  pixad, or NULL on error
  *
  * <pre>
@@ -319,13 +319,13 @@ PIXA    *pixad;
 /*!
  * \brief   pixMorphSequenceByRegion()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    pixm mask specifying regions
- * \param[in]    sequence string specifying sequence
- * \param[in]    connectivity 4 or 8, used on mask
- * \param[in]    minw  minimum width to consider; use 0 or 1 for any width
- * \param[in]    minh  minimum height to consider; use 0 or 1 for any height
- * \param[out]   pboxa [optional] return boxa of c.c. in pixm
+ * \param[in]    pixs          1 bpp
+ * \param[in]    pixm          mask specifying regions
+ * \param[in]    sequence      string specifying sequence
+ * \param[in]    connectivity  4 or 8, used on mask
+ * \param[in]    minw          min width to consider; use 0 or 1 for any width
+ * \param[in]    minh          min height to consider; use 0 or 1 for any height
+ * \param[out]   pboxa         [optional] return boxa of c.c. in pixm
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -404,11 +404,11 @@ PIXA    *pixam, *pixad;
 /*!
  * \brief   pixaMorphSequenceByRegion()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    pixam of 1 bpp mask elements
- * \param[in]    sequence string specifying sequence
- * \param[in]    minw  minimum width to consider; use 0 or 1 for any width
- * \param[in]    minh  minimum height to consider; use 0 or 1 for any height
+ * \param[in]    pixs       1 bpp
+ * \param[in]    pixam      of 1 bpp mask elements
+ * \param[in]    sequence   string specifying sequence
+ * \param[in]    minw       min width to consider; use 0 or 1 for any width
+ * \param[in]    minh       min height to consider; use 0 or 1 for any height
  * \return  pixad, or NULL on error
  *
  * <pre>
@@ -492,9 +492,9 @@ PIXA    *pixad;
 /*!
  * \brief   pixUnionOfMorphOps()
  *
- * \param[in]    pixs binary
+ * \param[in]    pixs    1 bpp
  * \param[in]    sela
- * \param[in]    type L_MORPH_DILATE, etc.
+ * \param[in]    type    L_MORPH_DILATE, etc.
  * \return  pixd union of the specified morphological operation
  *                    on pixs for each Sel in the Sela, or NULL on error
  */
@@ -545,9 +545,9 @@ SEL     *sel;
 /*!
  * \brief   pixIntersectionOfMorphOps()
  *
- * \param[in]    pixs binary
+ * \param[in]    pixs    1 bpp
  * \param[in]    sela
- * \param[in]    type L_MORPH_DILATE, etc.
+ * \param[in]    type    L_MORPH_DILATE, etc.
  * \return  pixd intersection of the specified morphological operation
  *                    on pixs for each Sel in the Sela, or NULL on error
  */
@@ -603,10 +603,10 @@ SEL     *sel;
 /*!
  * \brief   pixSelectiveConnCompFill()
  *
- * \param[in]    pixs binary
- * \param[in]    connectivity 4 or 8
- * \param[in]    minw  minimum width to consider; use 0 or 1 for any width
- * \param[in]    minh  minimum height to consider; use 0 or 1 for any height
+ * \param[in]    pixs          1 bpp
+ * \param[in]    connectivity  4 or 8
+ * \param[in]    minw          min width to consider; use 0 or 1 for any width
+ * \param[in]    minh          min height to consider; use 0 or 1 for any height
  * \return  pix with holes filled in selected c.c., or NULL on error
  */
 PIX *
@@ -660,13 +660,13 @@ PIXA    *pixa;
 /*!
  * \brief   pixRemoveMatchedPattern()
  *
- * \param[in]    pixs input image, 1 bpp
- * \param[in]    pixp pattern to be removed from image, 1 bpp
- * \param[in]    pixe image after erosion by Sel that approximates pixp, 1 bpp
- * \param[in]    x0, y0 center of Sel
- * \param[in]    dsize number of pixels on each side by which pixp is
- *                     dilated before being subtracted from pixs;
- *                     valid values are {0, 1, 2, 3, 4}
+ * \param[in]    pixs     input image, 1 bpp
+ * \param[in]    pixp     pattern to be removed from image, 1 bpp
+ * \param[in]    pixe     image after erosion by Sel that approximates pixp
+ * \param[in]    x0, y0   center of Sel
+ * \param[in]    dsize    number of pixels on each side by which pixp is
+ *                        dilated before being subtracted from pixs;
+ *                        valid values are {0, 1, 2, 3, 4}
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -762,13 +762,13 @@ SEL     *sel;
 /*!
  * \brief   pixDisplayMatchedPattern()
  *
- * \param[in]    pixs input image, 1 bpp
- * \param[in]    pixp pattern to be removed from image, 1 bpp
- * \param[in]    pixe image after erosion by Sel that approximates pixp, 1 bpp
- * \param[in]    x0, y0 center of Sel
- * \param[in]    color to paint the matched patterns; 0xrrggbb00
- * \param[in]    scale reduction factor for output pixd
- * \param[in]    nlevels if scale < 1.0, threshold to this number of levels
+ * \param[in]    pixs      input image, 1 bpp
+ * \param[in]    pixp      pattern to be removed from image, 1 bpp
+ * \param[in]    pixe      image after erosion by Sel that approximates pixp
+ * \param[in]    x0, y0    center of Sel
+ * \param[in]    color     to paint the matched patterns; 0xrrggbb00
+ * \param[in]    scale     reduction factor for output pixd
+ * \param[in]    nlevels   if scale < 1.0, threshold to this number of levels
  * \return  pixd 8 bpp, colormapped, or NULL on error
  *
  * <pre>
@@ -879,11 +879,11 @@ PIXCMAP  *cmap;
  * \brief   pixaExtendByMorph()
  *
  * \param[in]    pixas
- * \param[in]    type L_MORPH_DILATE, L_MORPH_ERODE
+ * \param[in]    type       L_MORPH_DILATE, L_MORPH_ERODE
  * \param[in]    niters
- * \param[in]    sel used for dilation, erosion; uses 2x2 if null
- * \param[in]    include 1 to include a copy of the input pixas in pixad;
- *                       0 to omit
+ * \param[in]    sel        used for dilation, erosion; uses 2x2 if null
+ * \param[in]    include    1 to include a copy of the input pixas in pixad;
+ *                          0 to omit
  * \return  pixad   with derived pix, using all iterations, or NULL on error
  *
  * <pre>
@@ -954,10 +954,10 @@ PIXA    *pixad;
  * \brief   pixaExtendByScaling()
  *
  * \param[in]    pixas
- * \param[in]    nasc   numa of scaling factors
- * \param[in]    type    L_HORIZ, L_VERT, L_BOTH_DIRECTIONS
- * \param[in]    include 1 to include a copy of the input pixas in pixad;
- *                       0 to omit
+ * \param[in]    nasc     numa of scaling factors
+ * \param[in]    type     L_HORIZ, L_VERT, L_BOTH_DIRECTIONS
+ * \param[in]    include  1 to include a copy of the input pixas in pixad;
+ *                        0 to omit
  * \return  pixad   with derived pix, using all scalings, or NULL on error
  *
  * <pre>
@@ -1024,8 +1024,8 @@ PIXA      *pixad;
  *
  * \param[in]    pixs seed
  * \param[in]    pixm mask
- * \param[in]    maxiters use 0 to go to completion
- * \param[in]    connectivity 4 or 8
+ * \param[in]    maxiters      use 0 to go to completion
+ * \param[in]    connectivity  4 or 8
  * \return  pixd after filling into the mask or NULL on error
  *
  * <pre>
@@ -1093,10 +1093,10 @@ SEL     *sel_3;
 /*!
  * \brief   pixRunHistogramMorph()
  *
- * \param[in]    pixs
- * \param[in]    runtype L_RUN_OFF, L_RUN_ON
- * \param[in]    direction L_HORIZ, L_VERT
- * \param[in]    maxsize  size of largest runlength counted
+ * \param[in]    pixs        1 bpp
+ * \param[in]    runtype     L_RUN_OFF, L_RUN_ON
+ * \param[in]    direction   L_HORIZ, L_VERT
+ * \param[in]    maxsize     size of largest runlength counted
  * \return  numa of run-lengths
  */
 NUMA *
@@ -1182,11 +1182,11 @@ SEL       *sel_2a;
 /*!
  * \brief   pixTophat()
  *
- * \param[in]    pixs
- * \param[in]    hsize of Sel; must be odd; origin implicitly in center
- * \param[in]    vsize ditto
- * \param[in]    type   L_TOPHAT_WHITE: image - opening
- *                      L_TOPHAT_BLACK: closing - image
+ * \param[in]    pixs     1 bpp
+ * \param[in]    hsize    of Sel; must be odd; origin implicitly in center
+ * \param[in]    vsize    ditto
+ * \param[in]    type     L_TOPHAT_WHITE: image - opening
+ *                        L_TOPHAT_BLACK: closing - image
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1254,9 +1254,9 @@ PIX  *pixt, *pixd;
 /*!
  * \brief   pixHDome()
  *
- * \param[in]    pixs 8 bpp, filling mask
- * \param[in]    height of seed below the filling maskhdome; must be >= 0
- * \param[in]    connectivity 4 or 8
+ * \param[in]    pixs          8 bpp, filling mask
+ * \param[in]    height        of seed below the filling maskhdome; must be >= 0
+ * \param[in]    connectivity  4 or 8
  * \return  pixd 8 bpp, or NULL on error
  *
  * <pre>
@@ -1330,11 +1330,11 @@ PIX  *pixsd, *pixd;
 /*!
  * \brief   pixFastTophat()
  *
- * \param[in]    pixs
- * \param[in]    xsize width of max/min op, smoothing; any integer >= 1
- * \param[in]    ysize height of max/min op, smoothing; any integer >= 1
- * \param[in]    type   L_TOPHAT_WHITE: image - min
- *                      L_TOPHAT_BLACK: max - image
+ * \param[in]    pixs    8 bpp
+ * \param[in]    xsize   width of max/min op, smoothing; any integer >= 1
+ * \param[in]    ysize   height of max/min op, smoothing; any integer >= 1
+ * \param[in]    type    L_TOPHAT_WHITE: image - min
+ *                       L_TOPHAT_BLACK: max - image
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1410,9 +1410,9 @@ PIX  *pix1, *pix2, *pix3, *pixd;
 /*!
  * \brief   pixMorphGradient()
  *
- * \param[in]    pixs
- * \param[in]    hsize of Sel; must be odd; origin implicitly in center
- * \param[in]    vsize ditto
+ * \param[in]    pixs       8 bpp
+ * \param[in]    hsize      sel width; must be odd; origin implicitly in center
+ * \param[in]    vsize      sel height
  * \param[in]    smoothing  half-width of convolution smoothing filter.
  *                          The width is (2 * smoothing + 1, so 0 is no-op.
  * \return  pixd, or NULL on error
@@ -1460,7 +1460,7 @@ PIX  *pixg, *pixd;
 /*!
  * \brief   pixaCentroids()
  *
- * \param[in]    pixa of components 1 or 8 bpp
+ * \param[in]    pixa    of components; 1 or 8 bpp
  * \return  pta of centroids relative to the UL corner of
  *              each pix, or NULL on error
  *
@@ -1510,11 +1510,13 @@ PTA       *pta;
 /*!
  * \brief   pixCentroid()
  *
- * \param[in]    pix 1 or 8 bpp
- * \param[in]    centtab [optional] table for finding centroids; can be null
- * \param[in]    sumtab [optional] table for finding pixel sums; can be null
- * \param[out]   pxave, pyave coordinates of centroid, relative to
- *                            the UL corner of the pix
+ * \param[in]    pix       1 or 8 bpp
+ * \param[in]    centtab   [optional] table for finding centroids; can be null
+ * \param[in]    sumtab    [optional] table for finding pixel sums; can be null
+ * \param[out]   pxave     x coordinate of centroid, relative to the UL corner
+ *                         of the pix
+ * \param[out]   pyave     y coordinate of centroid, relative to the UL corner
+ *                         of the pix
  * \return  0 if OK, 1 on error
  *
  * <pre>

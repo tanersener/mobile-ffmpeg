@@ -31,8 +31,12 @@
  *    |=============================================================|
  *    |                         Important note                      |
  *    |=============================================================|
- *    | Some of these functions require libtiff, libjpeg and libz.  |
- *    | If you do not have these libraries, you must set            |
+ *    | Some of these functions require I/O libraries such as       |
+ *    | libtiff, libjpeg, and libz.  If you do not have these       |
+ *    | libraries, some calls will fail.                            |
+ *    |                                                             |
+ *    | You can manually deactivate all PostScript writing by       |
+ *    | setting this in environ.h:                                  |
  *    | \code                                                       |
  *    |     #define  USE_PSIO     0                                 |
  *    | \endcode                                                    |
@@ -134,8 +138,8 @@ static const l_float32  DEFAULT_FILL_FRACTION = 0.95;
 /*!
  * \brief   pixWritePSEmbed()
  *
- * \param[in]    filein input file, all depths, colormap OK
- * \param[in]    fileout output ps file
+ * \param[in]    filein    input file, all depths, colormap OK
+ * \param[in]    fileout   output ps file
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -186,11 +190,11 @@ PIX       *pix;
 /*!
  * \brief   pixWriteStreamPS()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp      file stream
  * \param[in]    pix
- * \param[in]    box  [optional]
- * \param[in]    res  can use 0 for default of 300 ppi
- * \param[in]    scale to prevent scaling, use either 1.0 or 0.0
+ * \param[in]    box     [optional]
+ * \param[in]    res     can use 0 for default of 300 ppi
+ * \param[in]    scale   to prevent scaling, use either 1.0 or 0.0
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -393,15 +397,15 @@ PIX       *pix;
  * \brief   generateUncompressedPS()
  *
  * \param[in]    hexdata
- * \param[in]    w, h  raster image size in pixels
- * \param[in]    d image depth in bpp; rgb is 32
- * \param[in]    psbpl raster bytes/line, when packed to the byte boundary
- * \param[in]    bps bits/sample: either 1 or 8
- * \param[in]    xpt, ypt location of LL corner of image, in pts, relative
- *                    to the PostScript origin (0,0) at the LL corner
- *                    of the page
- * \param[in]    wpt, hpt rendered image size in pts
- * \param[in]    boxflag 1 to print out bounding box hint; 0 to skip
+ * \param[in]    w, h       raster image size in pixels
+ * \param[in]    d          image depth in bpp; rgb is 32
+ * \param[in]    psbpl      raster bytes/line, when packed to the byte boundary
+ * \param[in]    bps        bits/sample: either 1 or 8
+ * \param[in]    xpt, ypt   location of LL corner of image, in pts, relative
+ *                          to the PostScript origin (0,0) at the LL corner
+ *                          of the page
+ * \param[in]    wpt, hpt   rendered image size in pts
+ * \param[in]    boxflag    1 to print out bounding box hint; 0 to skip
  * \return  PS string, or NULL on error
  *
  * <pre>
@@ -499,16 +503,15 @@ SARRAY  *sa;
 /*!
  * \brief   getScaledParametersPS()
  *
- * \param[in]    box [optional] location of image in mils; with
- *                   x,y being the LL corner
- * \param[in]    wpix pix width in pixels
- * \param[in]    hpix pix height in pixels
- * \param[in]    res of printer; use 0 for default
- * \param[in]    scale use 1.0 or 0.0 for no scaling
- * \param[out]   pxpt location of llx in pts
- * \param[out]   pypt location of lly in pts
- * \param[out]   pwpt image width in pts
- * \param[out]   phpt image height in pts
+ * \param[in]    box     [optional] location of image in mils; x,y is LL corner
+ * \param[in]    wpix    pix width in pixels
+ * \param[in]    hpix    pix height in pixels
+ * \param[in]    res     of printer; use 0 for default
+ * \param[in]    scale   use 1.0 or 0.0 for no scaling
+ * \param[out]   pxpt    location of llx in pts
+ * \param[out]   pypt    location of lly in pts
+ * \param[out]   pwpt    image width in pts
+ * \param[out]   phpt    image height in pts
  * \return  void no arg checking
  *
  * <pre>
@@ -593,8 +596,8 @@ l_float32  winch, hinch, xinch, yinch, fres;
 /*!
  * \brief   convertByteToHexAscii()
  *
- * \param[in]    byteval  input byte
- * \param[out]   pnib1, pnib2  two hex ascii characters
+ * \param[in]    byteval        input byte
+ * \param[out]   pnib1, pnib2   two hex ascii characters
  * \return  void
  */
 void
@@ -625,8 +628,8 @@ l_uint8  nib;
 /*!
  * \brief   convertJpegToPSEmbed()
  *
- * \param[in]    filein input jpeg file
- * \param[in]    fileout output ps file
+ * \param[in]    filein    input jpeg file
+ * \param[in]    fileout   output ps file
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -691,18 +694,19 @@ L_COMP_DATA  *cid;
 /*!
  * \brief   convertJpegToPS()
  *
- * \param[in]    filein input jpeg file
- * \param[in]    fileout output ps file
- * \param[in]    operation "w" for write; "a" for append
- * \param[in]    x, y location of LL corner of image, in pixels, relative
- *                    to the PostScript origin (0,0) at the LL corner
- *                    of the page
- * \param[in]    res resolution of the input image, in ppi; use 0 for default
- * \param[in]    scale scaling by printer; use 0.0 or 1.0 for no scaling
- * \param[in]    pageno page number; must start with 1; you can use 0
- *                      if there is only one page
- * \param[in]    endpage boolean: use TRUE if this is the last image to be
- *                       added to the page; FALSE otherwise
+ * \param[in]    filein     input jpeg file
+ * \param[in]    fileout    output ps file
+ * \param[in]    operation  "w" for write; "a" for append
+ * \param[in]    x, y       location of LL corner of image, in pixels, relative
+ *                          to the PostScript origin (0,0) at the LL corner
+ *                          of the page
+ * \param[in]    res        resolution of the input image, in ppi;
+ *                          use 0 for default
+ * \param[in]    scale      scaling by printer; use 0.0 or 1.0 for no scaling
+ * \param[in]    pageno     page number; must start with 1; you can use 0
+ *                          if there is only one page
+ * \param[in]    endpage    boolean: use TRUE if this is the last image to be
+ *                          added to the page; FALSE otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -794,18 +798,19 @@ l_int32  nbytes;
  *
  *      Generates PS string in jpeg format from jpeg file
  *
- * \param[in]    filein input jpeg file
- * \param[out]   poutstr PS string
- * \param[out]   pnbytes number of bytes in PS string
- * \param[in]    x, y location of LL corner of image, in pixels, relative
- *                    to the PostScript origin (0,0) at the LL corner
- *                     of the page
- * \param[in]    res resolution of the input image, in ppi; use 0 for default
- * \param[in]    scale scaling by printer; use 0.0 or 1.0 for no scaling
- * \param[in]    pageno page number; must start with 1; you can use 0
- *                      if there is only one page
- * \param[in]    endpage boolean: use TRUE if this is the last image to be
- *                       added to the page; FALSE otherwise
+ * \param[in]    filein     input jpeg file
+ * \param[out]   poutstr    PS string
+ * \param[out]   pnbytes    number of bytes in PS string
+ * \param[in]    x, y       location of LL corner of image, in pixels, relative
+ *                          to the PostScript origin (0,0) at the LL corner
+ *                           of the page
+ * \param[in]    res        resolution of the input image, in ppi;
+ *                          use 0 for default
+ * \param[in]    scale      scaling by printer; use 0.0 or 1.0 for no scaling
+ * \param[in]    pageno     page number; must start with 1; you can use 0
+ *                          if there is only one page
+ * \param[in]    endpage    boolean: use TRUE if this is the last image to be
+ *                          added to the page; FALSE otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -890,16 +895,16 @@ L_COMP_DATA  *cid;
 /*!
  * \brief   generateJpegPS()
  *
- * \param[in]    filein [optional] input jpeg filename; can be null
- * \param[in]    cid jpeg compressed image data
- * \param[in]    xpt, ypt location of LL corner of image, in pts, relative
- *                        to the PostScript origin (0,0) at the LL corner
- *                        of the page
- * \param[in]    wpt, hpt rendered image size in pts
- * \param[in]    pageno page number; must start with 1; you can use 0
- *                      if there is only one page.
- * \param[in]    endpage boolean: use TRUE if this is the last image to be
- *                       added to the page; FALSE otherwise
+ * \param[in]    filein     [optional] input jpeg filename; can be null
+ * \param[in]    cid        jpeg compressed image data
+ * \param[in]    xpt, ypt   location of LL corner of image, in pts, relative
+ *                          to the PostScript origin (0,0) at the LL corner
+ *                          of the page
+ * \param[in]    wpt, hpt   rendered image size in pts
+ * \param[in]    pageno     page number; must start with 1; you can use 0
+ *                          if there is only one page.
+ * \param[in]    endpage    boolean: use TRUE if this is the last image to be
+ *                          added to the page; FALSE otherwise
  * \return  PS string, or NULL on error
  *
  * <pre>
@@ -1019,8 +1024,8 @@ SARRAY  *sa;
 /*!
  * \brief   convertG4ToPSEmbed()
  *
- * \param[in]    filein input tiff file
- * \param[in]    fileout output ps file
+ * \param[in]    filein    input tiff file
+ * \param[in]    fileout   output ps file
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1086,22 +1091,22 @@ L_COMP_DATA  *cid;
 /*!
  * \brief   convertG4ToPS()
  *
- * \param[in]    filein input tiff g4 file
- * \param[in]    fileout output ps file
- * \param[in]    operation "w" for write; "a" for append
- * \param[in]    x, y location of LL corner of image, in pixels, relative
- *                    to the PostScript origin (0,0) at the LL corner
- *                    of the page
- * \param[in]    res resolution of the input image, in ppi; typ. values
- *                   are 300 and 600; use 0 for automatic determination
- *                   based on image size
- * \param[in]    scale scaling by printer; use 0.0 or 1.0 for no scaling
- * \param[in]    pageno page number; must start with 1; you can use 0
- *                      if there is only one page.
- * \param[in]    maskflag boolean: use TRUE if just painting through fg;
- *                        FALSE if painting both fg and bg.
- * \param[in]    endpage boolean: use TRUE if this is the last image to be
- *                       added to the page; FALSE otherwise
+ * \param[in]    filein     input tiff g4 file
+ * \param[in]    fileout    output ps file
+ * \param[in]    operation  "w" for write; "a" for append
+ * \param[in]    x, y       location of LL corner of image, in pixels, relative
+ *                          to the PostScript origin (0,0) at the LL corner
+ *                          of the page
+ * \param[in]    res        resolution of the input image, in ppi; typ. values
+ *                          are 300 and 600; use 0 for automatic determination
+ *                          based on image size
+ * \param[in]    scale      scaling by printer; use 0.0 or 1.0 for no scaling
+ * \param[in]    pageno     page number; must start with 1; you can use 0
+ *                          if there is only one page.
+ * \param[in]    maskflag   boolean: use TRUE if just painting through fg;
+ *                          FALSE if painting both fg and bg.
+ * \param[in]    endpage    boolean: use TRUE if this is the last image to be
+ *                          added to the page; FALSE otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1180,22 +1185,22 @@ l_int32  nbytes;
 /*!
  * \brief   convertG4ToPSString()
  *
- * \param[in]    filein input tiff g4 file
- * \param[out]   poutstr PS string
- * \param[out]   pnbytes number of bytes in PS string
- * \param[in]    x, y location of LL corner of image, in pixels, relative
- *                    to the PostScript origin (0,0) at the LL corner
- *                    of the page
- * \param[in]    res resolution of the input image, in ppi; typ. values
- *                   are 300 and 600; use 0 for automatic determination
- *                   based on image size
- * \param[in]    scale scaling by printer; use 0.0 or 1.0 for no scaling
- * \param[in]    pageno page number; must start with 1; you can use 0
- *                      if there is only one page.
- * \param[in]    maskflag boolean: use TRUE if just painting through fg;
- *                        FALSE if painting both fg and bg.
- * \param[in]    endpage boolean: use TRUE if this is the last image to be
- *                       added to the page; FALSE otherwise
+ * \param[in]    filein     input tiff g4 file
+ * \param[out]   poutstr    PS string
+ * \param[out]   pnbytes    number of bytes in PS string
+ * \param[in]    x, y       location of LL corner of image, in pixels, relative
+ *                          to the PostScript origin (0,0) at the LL corner
+ *                          of the page
+ * \param[in]    res        resolution of the input image, in ppi; typ. values
+ *                          are 300 and 600; use 0 for automatic determination
+ *                          based on image size
+ * \param[in]    scale      scaling by printer; use 0.0 or 1.0 for no scaling
+ * \param[in]    pageno     page number; must start with 1; you can use 0
+ *                          if there is only one page.
+ * \param[in]    maskflag   boolean: use TRUE if just painting through fg;
+ *                          FALSE if painting both fg and bg.
+ * \param[in]    endpage    boolean: use TRUE if this is the last image to be
+ *                          added to the page; FALSE otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1281,18 +1286,18 @@ L_COMP_DATA  *cid;
 /*!
  * \brief   generateG4PS()
  *
- * \param[in]    filein [optional] input tiff g4 file; can be null
- * \param[in]    cid g4 compressed image data
- * \param[in]    xpt, ypt location of LL corner of image, in pts, relative
- *                        to the PostScript origin (0,0) at the LL corner
- *                        of the page
- * \param[in]    wpt, hpt rendered image size in pts
- * \param[in]    maskflag boolean: use TRUE if just painting through fg;
- *                        FALSE if painting both fg and bg.
- * \param[in]    pageno page number; must start with 1; you can use 0
- *                      if there is only one page.
- * \param[in]    endpage boolean: use TRUE if this is the last image to be
- *                       added to the page; FALSE otherwise
+ * \param[in]    filein     [optional] input tiff g4 file; can be null
+ * \param[in]    cid g4     compressed image data
+ * \param[in]    xpt, ypt   location of LL corner of image, in pts, relative
+ *                          to the PostScript origin (0,0) at the LL corner
+ *                          of the page
+ * \param[in]    wpt, hpt   rendered image size in pts
+ * \param[in]    maskflag   boolean: use TRUE if just painting through fg;
+ *                          FALSE if painting both fg and bg.
+ * \param[in]    pageno     page number; must start with 1; you can use 0
+ *                          if there is only one page.
+ * \param[in]    endpage    boolean: use TRUE if this is the last image to be
+ *                          added to the page; FALSE otherwise
  * \return  PS string, or NULL on error
  *
  * <pre>
@@ -1419,10 +1424,10 @@ SARRAY  *sa;
 /*!
  * \brief   convertTiffMultipageToPS()
  *
- * \param[in]    filein input tiff multipage file
- * \param[in]    fileout output ps file
- * \param[in]    fillfract factor for filling 8.5 x 11 inch page;
- *                      use 0.0 for DEFAULT_FILL_FRACTION
+ * \param[in]    filein      input tiff multipage file
+ * \param[in]    fileout     output ps file
+ * \param[in]    fillfract   factor for filling 8.5 x 11 inch page;
+ *                           use 0.0 for DEFAULT_FILL_FRACTION
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1500,8 +1505,8 @@ FILE      *fp;
 /*!
  * \brief   convertFlateToPSEmbed()
  *
- * \param[in]    filein input file -- any format
- * \param[in]    fileout output ps file
+ * \param[in]    filein    input file -- any format
+ * \param[in]    fileout   output ps file
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1565,18 +1570,19 @@ L_COMP_DATA  *cid;
 /*!
  * \brief   convertFlateToPS()
  *
- * \param[in]    filein input file -- any format
- * \param[in]    fileout output ps file
- * \param[in]    operation "w" for write; "a" for append
- * \param[in]    x, y location of LL corner of image, in pixels, relative
- *                    to the PostScript origin (0,0) at the LL corner
- *                    of the page
- * \param[in]    res resolution of the input image, in ppi; use 0 for default
- * \param[in]    scale scaling by printer; use 0.0 or 1.0 for no scaling
- * \param[in]    pageno page number; must start with 1; you can use 0
- *                      if there is only one page.
- * \param[in]    endpage boolean: use TRUE if this is the last image to be
- *                       added to the page; FALSE otherwise
+ * \param[in]    filein    input file -- any format
+ * \param[in]    fileout    output ps file
+ * \param[in]    operation  "w" for write; "a" for append
+ * \param[in]    x, y       location of LL corner of image, in pixels, relative
+ *                          to the PostScript origin (0,0) at the LL corner
+ *                          of the page
+ * \param[in]    res        resolution of the input image, in ppi;
+ *                          use 0 for default
+ * \param[in]    scale      scaling by printer; use 0.0 or 1.0 for no scaling
+ * \param[in]    pageno     page number; must start with 1; you can use 0
+ *                          if there is only one page.
+ * \param[in]    endpage    boolean: use TRUE if this is the last image to be
+ *                          added to the page; FALSE otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1666,18 +1672,19 @@ l_int32  nbytes, ret;
  *
  *      Generates level 3 PS string in flate compressed format.
  *
- * \param[in]    filein input image file
- * \param[out]   poutstr PS string
- * \param[out]   pnbytes number of bytes in PS string
- * \param[in]    x, y location of LL corner of image, in pixels, relative
- *                    to the PostScript origin (0,0) at the LL corner
- *                    of the page
- * \param[in]    res resolution of the input image, in ppi; use 0 for default
- * \param[in]    scale scaling by printer; use 0.0 or 1.0 for no scaling
- * \param[in]    pageno page number; must start with 1; you can use 0
- *                      if there is only one page.
- * \param[in]    endpage boolean: use TRUE if this is the last image to be
- *                       added to the page; FALSE otherwise
+ * \param[in]    filein    input image file
+ * \param[out]   poutstr   PS string
+ * \param[out]   pnbytes   number of bytes in PS string
+ * \param[in]    x, y      location of LL corner of image, in pixels, relative
+ *                         to the PostScript origin (0,0) at the LL corner
+ *                         of the page
+ * \param[in]    res       resolution of the input image, in ppi;
+ *                         use 0 for default
+ * \param[in]    scale     scaling by printer; use 0.0 or 1.0 for no scaling
+ * \param[in]    pageno    page number; must start with 1; you can use 0
+ *                         if there is only one page.
+ * \param[in]    endpage   boolean: use TRUE if this is the last image to be
+ *                         added to the page; FALSE otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1765,16 +1772,16 @@ L_COMP_DATA  *cid;
 /*!
  * \brief   generateFlatePS()
  *
- * \param[in]    filein [optional] input filename; can be null
- * \param[in]    cid flate compressed image data
- * \param[in]    xpt, ypt location of LL corner of image, in pts, relative
- *                        to the PostScript origin (0,0) at the LL corner
- *                        of the page
- * \param[in]    wpt, hpt rendered image size in pts
- * \param[in]    pageno page number; must start with 1; you can use 0
- *                      if there is only one page
- * \param[in]    endpage boolean: use TRUE if this is the last image to be
- *                       added to the page; FALSE otherwise
+ * \param[in]    filein      [optional] input filename; can be null
+ * \param[in]    cid         flate compressed image data
+ * \param[in]    xpt, ypt    location of LL corner of image, in pts, relative
+ *                           to the PostScript origin (0,0) at the LL corner
+ *                           of the page
+ * \param[in]    wpt, hpt    rendered image size in pts
+ * \param[in]    pageno      page number; must start with 1; you can use 0
+ *                           if there is only one page
+ * \param[in]    endpage     boolean: use TRUE if this is the last image to be
+ *                           added to the page; FALSE otherwise
  * \return  PS string, or NULL on error
  */
 char *
@@ -1903,12 +1910,12 @@ SARRAY  *sa;
 /*!
  * \brief   pixWriteMemPS()
  *
- * \param[out]   pdata data of tiff compressed image
- * \param[out]   psize size of returned data
+ * \param[out]   pdata    data of tiff compressed image
+ * \param[out]   psize    size of returned data
  * \param[in]    pix
- * \param[in]    box  [optional]
- * \param[in]    res  can use 0 for default of 300 ppi
- * \param[in]    scale to prevent scaling, use either 1.0 or 0.0
+ * \param[in]    box      [optional]
+ * \param[in]    res      can use 0 for default of 300 ppi
+ * \param[in]    scale    to prevent scaling, use either 1.0 or 0.0
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1947,10 +1954,10 @@ pixWriteMemPS(l_uint8  **pdata,
 /*!
  * \brief   getResLetterPage()
  *
- * \param[in]    w image width, pixels
- * \param[in]    h image height, pixels
- * \param[in]    fillfract fraction in linear dimension of full page, not
- *                         to be exceeded; use 0 for default
+ * \param[in]    w           image width, pixels
+ * \param[in]    h           image height, pixels
+ * \param[in]    fillfract   fraction in linear dimension of full page,
+ *                           not to be exceeded; use 0 for default
  * \return  resolution
  */
 l_int32
@@ -1972,10 +1979,10 @@ l_int32  resw, resh, res;
 /*!
  * \brief   getResA4Page()
  *
- * \param[in]    w image width, pixels
- * \param[in]    h image height, pixels
- * \param[in]    fillfract fraction in linear dimension of full page, not
- *                        to be exceeded; use 0 for default
+ * \param[in]    w           image width, pixels
+ * \param[in]    h           image height, pixels
+ * \param[in]    fillfract   fraction in linear dimension of full page,
+ *                           not to be exceeded; use 0 for default
  * \return  resolution
  */
 l_int32

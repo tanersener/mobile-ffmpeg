@@ -157,12 +157,12 @@ static l_int32 blendHardLightComponents(l_int32 a, l_int32 b, l_float32 fract);
 /*!
  * \brief   pixBlend()
  *
- * \param[in]    pixs1 blendee
- * \param[in]    pixs2 blender; typ. smaller
- * \param[in]    x,y  origin [UL corner] of pixs2 relative to
- *                    the origin of pixs1; can be < 0
- * \param[in]    fract blending fraction
- * \return  pixd blended image, or NULL on error
+ * \param[in]    pixs1    blendee
+ * \param[in]    pixs2    blender; typ. smaller
+ * \param[in]    x,y      origin [UL corner] of pixs2 relative to
+ *                        the origin of pixs1; can be < 0
+ * \param[in]    fract    blending fraction
+ * \return  pixd blended image, or null on error
  *
  * <pre>
  * Notes:
@@ -236,14 +236,15 @@ PIX       *pixc, *pixt, *pixd;
 /*!
  * \brief   pixBlendMask()
  *
- * \param[in]    pixd [optional]; either NULL or equal to pixs1 for in-place
- * \param[in]    pixs1 blendee, depth > 1
- * \param[in]    pixs2 blender, 1 bpp; typ. smaller in size than pixs1
- * \param[in]    x,y  origin [UL corner] of pixs2 relative to
- *                    the origin of pixs1; can be < 0
- * \param[in]    fract blending fraction
- * \param[in]    type L_BLEND_WITH_INVERSE, L_BLEND_TO_WHITE, L_BLEND_TO_BLACK
- * \return  pixd if OK; NULL on error
+ * \param[in]    pixd    [optional]; either NULL or equal to pixs1 for in-place
+ * \param[in]    pixs1   blendee, depth > 1
+ * \param[in]    pixs2   blender, 1 bpp; typ. smaller in size than pixs1
+ * \param[in]    x,y     origin [UL corner] of pixs2 relative to
+ *                       the origin of pixs1; can be < 0
+ * \param[in]    fract   blending fraction
+ * \param[in]    type    L_BLEND_WITH_INVERSE, L_BLEND_TO_WHITE,
+ *                       L_BLEND_TO_BLACK
+ * \return  pixd if OK; null on error
  *
  * <pre>
  * Notes:
@@ -448,15 +449,17 @@ PIX       *pixc, *pix1, *pix2;
 /*!
  * \brief   pixBlendGray()
  *
- * \param[in]    pixd [optional]; either NULL or equal to pixs1 for in-place
- * \param[in]    pixs1 blendee, depth > 1
- * \param[in]    pixs2 blender, any depth; typ. smaller in size than pixs1
- * \param[in]    x,y  origin [UL corner] of pixs2 relative to
- *                    the origin of pixs1; can be < 0
- * \param[in]    fract blending fraction
- * \param[in]    type L_BLEND_GRAY, L_BLEND_GRAY_WITH_INVERSE
- * \param[in]    transparent 1 to use transparency; 0 otherwise
- * \param[in]    transpix pixel grayval in pixs2 that is to be transparent
+ * \param[in]    pixd         [optional] either equal to pixs1 for in-place,
+ *                            or NULL
+ * \param[in]    pixs1        blendee, depth > 1
+ * \param[in]    pixs2        blender, any depth; typically, the area of
+ *                            pixs2 is smaller than pixs1
+ * \param[in]    x,y          origin [UL corner] of pixs2 relative to
+ *                            the origin of pixs1; can be < 0
+ * \param[in]    fract        blending fraction
+ * \param[in]    type         L_BLEND_GRAY, L_BLEND_GRAY_WITH_INVERSE
+ * \param[in]    transparent  1 to use transparency; 0 otherwise
+ * \param[in]    transpix     pixel grayval in pixs2 that is to be transparent
  * \return  pixd if OK; pixs1 on error
  *
  * <pre>
@@ -652,12 +655,13 @@ PIX       *pixc, *pix1, *pix2;
 /*!
  * \brief   pixBlendGrayInverse()
  *
- * \param[in]    pixd [optional]; either NULL or equal to pixs1 for in-place
- * \param[in]    pixs1 blendee, depth > 1
- * \param[in]    pixs2 blender, any depth; typ. smaller in size than pixs1
- * \param[in]    x,y  origin [UL corner] of pixs2 relative to
- *                    the origin of pixs1; can be < 0
- * \param[in]    fract blending fraction
+ * \param[in]    pixd     [optional] either equal to pixs1 for in-place, or NULL
+ * \param[in]    pixd     [optional] either NULL or equal to pixs1 for in-place
+ * \param[in]    pixs1    blendee, depth > 1
+ * \param[in]    pixs2    blender, any depth; typ. smaller in size than pixs1
+ * \param[in]    x,y      origin [UL corner] of pixs2 relative to
+ *                        the origin of pixs1; can be < 0
+ * \param[in]    fract    blending fraction
  * \return  pixd if OK; pixs1 on error
  *
  * <pre>
@@ -790,15 +794,17 @@ PIX       *pixc, *pix1, *pix2;
 /*!
  * \brief   pixBlendColor()
  *
- * \param[in]    pixd [optional]; either NULL or equal to pixs1 for in-place
- * \param[in]    pixs1 blendee; depth > 1
- * \param[in]    pixs2 blender, any depth;; typ. smaller in size than pixs1
- * \param[in]    x,y  origin [UL corner] of pixs2 relative to
- *                    the origin of pixs1
- * \param[in]    fract blending fraction
- * \param[in]    transparent 1 to use transparency; 0 otherwise
- * \param[in]    transpix pixel color in pixs2 that is to be transparent
- * \return  pixd, or NULL on error
+ * \param[in]    pixd          [optional] either equal to pixs1 for in-place,
+ *                             or NULL
+ * \param[in]    pixs1         blendee; depth > 1
+ * \param[in]    pixs2         blender, any depth; typically, the area of
+ *                             pixs2 is smaller than pixs1
+ * \param[in]    x,y           origin [UL corner] of pixs2 relative to
+ *                             the origin of pixs1
+ * \param[in]    fract         blending fraction
+ * \param[in]    transparent   1 to use transparency; 0 otherwise
+ * \param[in]    transpix      pixel color in pixs2 that is to be transparent
+ * \return  pixd, or null on error
  *
  * <pre>
  * Notes:
@@ -898,35 +904,41 @@ PIX       *pixc;
 
 
 /*
- *  pixBlendColorByChannel()
+ * \brief    pixBlendColorByChannel()
  *
- *      Input:  pixd (<optional>; either NULL or equal to pixs1 for in-place)
- *              pixs1 (blendee; depth > 1)
- *              pixs2 (blender, any depth; typ. smaller in size than pixs1)
- *              x,y  (origin [UL corner] of pixs2 relative to
- *                    the origin of pixs1)
- *              rfract, gfract, bfract (blending fractions by channel)
- *              transparent (1 to use transparency; 0 otherwise)
- *              transpix (pixel color in pixs2 that is to be transparent)
- *      Return: pixd if OK; pixs1 on error
+ * \param[in]    pixd          [optional] either equal to pixs1 for in-place,
+ *                             or NULL
+ * \param[in]    pixs1         blendee; depth > 1
+ * \param[in]    pixs2         blender, any depth; typically, the area of
+ *                             pixs2 is smaller than pixs1
+ * \param[in]    x,y           origin [UL corner] of pixs2 relative to
+ *                             the origin of pixs1
+ * \param[in]    rfract        blending fraction in red channel
+ * \param[in]    gfract        blending fraction in green channel
+ * \param[in]    bfract        blending fraction in blue channel
+ * \param[in]    transparent   1 to use transparency; 0 otherwise
+ * \param[in]    transpix      pixel color in pixs2 that is to be transparent
+ * \return  pixd if OK; pixd on error
  *
- *  Notes:
- *     (1) This generalizes pixBlendColor() in two ways:
- *         (a) The mixing fraction is specified per channel.
- *         (b) The mixing fraction may be < 0 or > 1, in which case,
- *             the min or max of two images are taken, respectively.
- *     (2) Specifically,
- *         for p = pixs1[i], c = pixs2[i], f = fract[i], i = 1, 2, 3:
- *             f < 0.0:          p --> min(p, c)
- *             0.0 <= f <= 1.0:  p --> (1 - f) * p + f * c
- *             f > 1.0:          p --> max(a, c)
- *         Special cases:
- *             f = 0:   p --> p
- *             f = 1:   p --> c
- *     (3) See usage notes in pixBlendColor()
- *     (4) pixBlendColor() would be equivalent to
- *           pixBlendColorChannel(..., fract, fract, fract, ...);
- *         at a small cost of efficiency.
+ * <pre>
+ * Notes:
+ *      (1) This generalizes pixBlendColor() in two ways:
+ *          (a) The mixing fraction is specified per channel.
+ *          (b) The mixing fraction may be < 0 or > 1, in which case,
+ *              the min or max of two images are taken, respectively.
+ *      (2) Specifically,
+ *          for p = pixs1[i], c = pixs2[i], f = fract[i], i = 1, 2, 3:
+ *              f < 0.0:          p --> min(p, c)
+ *              0.0 <= f <= 1.0:  p --> (1 - f) * p + f * c
+ *              f > 1.0:          p --> max(a, c)
+ *          Special cases:
+ *              f = 0:   p --> p
+ *              f = 1:   p --> c
+ *      (3) See usage notes in pixBlendColor()
+ *      (4) pixBlendColor() would be equivalent to
+ *            pixBlendColorChannel(..., fract, fract, fract, ...);
+ *          at a small cost of efficiency.
+ * </pre>
  */
 PIX *
 pixBlendColorByChannel(PIX       *pixd,
@@ -1017,14 +1029,15 @@ blendComponents(l_int32    a,
 /*!
  * \brief   pixBlendGrayAdapt()
  *
- * \param[in]    pixd [optional]; either NULL or equal to pixs1 for in-place
- * \param[in]    pixs1 blendee, depth > 1
- * \param[in]    pixs2 blender, any depth; typ. smaller in size than pixs1
- * \param[in]    x,y  origin [UL corner] of pixs2 relative to
- *                    the origin of pixs1; can be < 0
- * \param[in]    fract blending fraction
- * \param[in]    shift >= 0 but <= 128: shift of zero blend value from
- *                     median source; use -1 for default value;
+ * \param[in]    pixd    [optional] either equal to pixs1 for in-place, or NULL
+ * \param[in]    pixs1   blendee; depth > 1
+ * \param[in]    pixs2   blender, any depth; typically, the area of
+ *                       pixs2 is smaller than pixs1
+ * \param[in]    x,y     origin [UL corner] of pixs2 relative to
+ *                       the origin of pixs1; can be < 0
+ * \param[in]    fract   blending fraction
+ * \param[in]    shift   >= 0 but <= 128: shift of zero blend value from
+ *                       median source; use -1 for default value;
  * \return  pixd if OK; pixs1 on error
  *
  * <pre>
@@ -1215,11 +1228,11 @@ PIX       *pixc, *pix1, *pix2;
 /*!
  * \brief   pixFadeWithGray()
  *
- * \param[in]    pixs colormapped or 8 bpp or 32 bpp
- * \param[in]    pixb 8 bpp blender
- * \param[in]    factor multiplicative factor to apply to blender value
- * \param[in]    type L_BLEND_TO_WHITE, L_BLEND_TO_BLACK
- * \return  pixd, or NULL on error
+ * \param[in]    pixs     colormapped or 8 bpp or 32 bpp
+ * \param[in]    pixb     8 bpp blender
+ * \param[in]    factor   multiplicative factor to apply to blender value
+ * \param[in]    type     L_BLEND_TO_WHITE, L_BLEND_TO_BLACK
+ * \return  pixd, or null on error
  *
  * <pre>
  * Notes:
@@ -1313,18 +1326,19 @@ PIX       *pixd;
 
 
 /*
- *  pixBlendHardLight()
+ * \brief   pixBlendHardLight()
  *
- *      Input:  pixd (<optional>; either NULL or equal to pixs1 for in-place)
- *              pixs1 (blendee; depth > 1, may be cmapped)
- *              pixs2 (blender, 8 or 32 bpp; may be colormapped;
- *                     typ. smaller in size than pixs1)
- *              x,y  (origin [UL corner] of pixs2 relative to
- *                    the origin of pixs1)
- *              fract (blending fraction, or 'opacity factor')
- *      Return: pixd if OK; pixs1 on error
+ * \param[in]   pixd    either NULL or equal to pixs1 for in-place
+ * \param[in]   pixs1   blendee; depth > 1, may be cmapped
+ * \param[in]   pixs2   blender, 8 or 32 bpp; may be colormapped;
+ *                      typ. smaller in size than pixs1
+ * \param[in]   x,y     origin [UL corner] of pixs2 relative to
+ *                      the origin of pixs1
+ * \param[in]   fract   blending fraction, or 'opacity factor'
+ * \return   pixd if OK; pixs1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) pixs2 must be 8 or 32 bpp; either may have a colormap.
  *      (2) Clipping of pixs2 to pixs1 is done in the inner pixel loop.
  *      (3) Only call in-place if pixs1 is not colormapped.
@@ -1344,6 +1358,7 @@ PIX       *pixd;
  *           http://www.pegtop.net/delphi/articles/blendmodes/hardlight.htm
  *           http://www.digitalartform.com/imageArithmetic.htm
  *      (10) This function was built by Paco Galanes.
+ * </pre>
  */
 PIX *
 pixBlendHardLight(PIX       *pixd,
@@ -1464,13 +1479,15 @@ PIX       *pixc, *pixt;
 
 
 /*
- *  blendHardLightComponents()
- *      Input:  a (8 bpp blendee component)
- *              b (8 bpp blender component)
- *              fract (fraction of blending; use 1.0 for usual definition)
- *      Return: blended 8 bpp component
+ * \brief   blendHardLightComponents()
  *
- *  Notes:
+ * \param[in]   a        8 bpp blendee component
+ * \param[in]   b        8 bpp blender component
+ * \param[in]   fract    fraction of blending; use 1.0 for usual definition
+ * \return   blended 8 bpp component
+ *
+ * <pre>
+ * Notes:
  *
  *    The basic logic for this blending is:
  *      b < 0.5:
@@ -1506,6 +1523,7 @@ PIX       *pixc, *pixt;
  *    away from 0.5.
  *    As you can see, there are a nearly infinite number of different
  *    blending formulas that can be conjured up.
+ * </pre>
  */
 static l_int32 blendHardLightComponents(l_int32    a,
                                         l_int32    b,
@@ -1527,10 +1545,10 @@ static l_int32 blendHardLightComponents(l_int32    a,
 /*!
  * \brief   pixBlendCmap()
  *
- * \param[in]    pixs 2, 4 or 8 bpp, with colormap
- * \param[in]    pixb colormapped blender
- * \param[in]    x, y UL corner of blender relative to pixs
- * \param[in]    sindex colormap index of pixels in pixs to be changed
+ * \param[in]    pixs     2, 4 or 8 bpp, with colormap
+ * \param[in]    pixb     colormapped blender
+ * \param[in]    x, y     UL corner of blender relative to pixs
+ * \param[in]    sindex   colormap index of pixels in pixs to be changed
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1657,12 +1675,12 @@ PIXCMAP   *cmaps, *cmapb, *cmapsc;
 /*!
  * \brief   pixBlendWithGrayMask()
  *
- * \param[in]    pixs1 8 bpp gray, rgb, rgba or colormapped
- * \param[in]    pixs2 8 bpp gray, rgb, rgba or colormapped
- * \param[in]    pixg [optional] 8 bpp gray, for transparency of pixs2;
- *                    can be null
- * \param[in]    x, y UL corner of pixs2 and pixg with respect to pixs1
- * \return  pixd blended image, or NULL on error
+ * \param[in]    pixs1   8 bpp gray, rgb, rgba or colormapped
+ * \param[in]    pixs2   8 bpp gray, rgb, rgba or colormapped
+ * \param[in]    pixg    [optional] 8 bpp gray, for transparency of pixs2;
+ *                       can be null
+ * \param[in]    x, y    UL corner of pixs2 and pixg with respect to pixs1
+ * \return  pixd blended image, or null on error
  *
  * <pre>
  * Notes:
@@ -1820,11 +1838,11 @@ PIX       *pixr1, *pixr2, *pix1, *pix2, *pixg2, *pixd;
 /*!
  * \brief   pixBlendBackgroundToColor()
  *
- * \param[in]    pixd can be NULL or pixs
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    box region for blending; can be NULL)
- * \param[in]    color 32 bit color in 0xrrggbb00 format
- * \param[in]    gamma, minval, maxval args for grayscale TRC mapping
+ * \param[in]    pixd    can be NULL or pixs
+ * \param[in]    pixs    32 bpp rgb
+ * \param[in]    box     region for blending; can be NULL)
+ * \param[in]    color   32 bit color in 0xrrggbb00 format
+ * \param[in]    gamma, minval, maxval    args for grayscale TRC mapping
  * \return  pixd always
  *
  * <pre>
@@ -1906,10 +1924,10 @@ PIX     *pixt, *pixc, *pixr, *pixg;
 /*!
  * \brief   pixMultiplyByColor()
  *
- * \param[in]    pixd can be NULL or pixs
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    box region for filtering; can be NULL)
- * \param[in]    color 32 bit color in 0xrrggbb00 format
+ * \param[in]    pixd    can be NULL or pixs
+ * \param[in]    pixs    32 bpp rgb
+ * \param[in]    box     region for filtering; can be NULL)
+ * \param[in]    color   32 bit color in 0xrrggbb00 format
  * \return  pixd always
  *
  * <pre>
@@ -1985,10 +2003,10 @@ PIX       *pixt;
 /*!
  * \brief   pixAlphaBlendUniform()
  *
- * \param[in]    pixs 32 bpp rgba, with alpha
- * \param[in]    color 32 bit color in 0xrrggbb00 format
+ * \param[in]    pixs    32 bpp rgba, with alpha
+ * \param[in]    color   32 bit color in 0xrrggbb00 format
  * \return  pixd 32 bpp rgb: pixs blended over uniform color %color,
- *                    a clone of pixs if no alpha, and NULL on error
+ *                    a clone of pixs if no alpha, and null on error
  *
  * <pre>
  * Notes:
@@ -2033,10 +2051,10 @@ PIX  *pixt, *pixd;
 /*!
  * \brief   pixAddAlphaToBlend()
  *
- * \param[in]    pixs any depth
- * \param[in]    fract fade fraction in the alpha component
- * \param[in]    invert 1 to photometrically invert pixs
- * \return  pixd 32 bpp with alpha, or NULL on error
+ * \param[in]    pixs     any depth
+ * \param[in]    fract    fade fraction in the alpha component
+ * \param[in]    invert   1 to photometrically invert pixs
+ * \return  pixd 32 bpp with alpha, or null on error
  *
  * <pre>
  * Notes:
@@ -2096,9 +2114,9 @@ PIX  *pixd, *pix1, *pix2;
 /*!
  * \brief   pixSetAlphaOverWhite()
  *
- * \param[in]    pixs colormapped or 32 bpp rgb; no alpha
+ * \param[in]    pixs    colormapped or 32 bpp rgb; no alpha
  * \return  pixd new pix with meaningful alpha component,
- *                   or NULL on error
+ *                   or null on error
  *
  * <pre>
  * Notes:
@@ -2158,11 +2176,11 @@ PIX  *pixd, *pix1, *pix2, *pix3, *pix4;
 /*!
  * \brief   pixLinearEdgeFade()
  *
- * \param[in]    pixs      8 or 32 bpp; no colormap
- * \param[in]    dir       L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT
- * \param[in]    fadeto    L_BLEND_TO_WHITE, L_BLEND_TO_BLACK
- * \param[in]    distfract fraction of width or height over which fading occurs
- * \param[in]    maxfade   fraction of fading at the edge, <= 1.0
+ * \param[in]    pixs       8 or 32 bpp; no colormap
+ * \param[in]    dir        L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT
+ * \param[in]    fadeto     L_BLEND_TO_WHITE, L_BLEND_TO_BLACK
+ * \param[in]    distfract  fraction of width or height over which fading occurs
+ * \param[in]    maxfade    fraction of fading at the edge, <= 1.0
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2273,5 +2291,3 @@ l_uint32  *data, *line;
 
     return 0;
 }
-
-

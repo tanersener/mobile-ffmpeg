@@ -2481,6 +2481,7 @@ PIXCMAP   *cmaps, *cmapd;
     pixGetDimensions(pixs, &w, &h, NULL);
     if ((pixd = pixCreate(w, h, 8)) == NULL)
         return (PIX *)ERROR_PTR("pixd not made", procName, NULL);
+    pixSetPadBits(pixs, 0);
     pixCopyResolution(pixd, pixs);
     pixCopyInputFormat(pixd, pixs);
     datas = pixGetData(pixs);

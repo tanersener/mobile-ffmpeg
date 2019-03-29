@@ -141,7 +141,7 @@ static char *l_genDescrString(const char *filein, l_int32 ifunc, l_int32 itype);
 /*!
  * \brief   strcodeCreate()
  *
- * \param[in]    fileno integer that labels the two output files
+ * \param[in]    fileno    integer that labels the two output files
  * \return  initialized L_StrCode, or NULL on error
  *
  * <pre>
@@ -175,7 +175,7 @@ L_STRCODE  *strcode;
 /*!
  * \brief   strcodeDestroy()
  *
- * \param[out]  pstrcode &strcode is set to null after destroying the sarrays
+ * \param[out]  pstrcode    will be set to null after destroying the sarrays
  * \return  void
  */
 static void
@@ -205,9 +205,9 @@ L_STRCODE  *strcode;
 /*!
  * \brief   strcodeCreateFromFile()
  *
- * \param[in]    filein containing filenames of serialized data
- * \param[in]    fileno integer that labels the two output files
- * \param[in]    outdir [optional] if null, files are made in /tmp/lept/auto
+ * \param[in]    filein    containing filenames of serialized data
+ * \param[in]    fileno    integer that labels the two output files
+ * \param[in]    outdir    [optional] if null, files are made in /tmp/lept/auto
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -270,9 +270,9 @@ L_STRCODE   *strcode;
 /*!
  * \brief   strcodeGenerate()
  *
- * \param[in]    strcode for accumulating data
- * \param[in]    filein input file with serialized data
- * \param[in]    type of data; use the typedef string
+ * \param[in]    strcode    for accumulating data
+ * \param[in]    filein     input file with serialized data
+ * \param[in]    type       of data; use the typedef string
  * \return  0 if OK, 1 on error.
  *
  * <pre>
@@ -328,8 +328,9 @@ l_int32  itype;
 /*!
  * \brief   strcodeFinalize()
  *
- * \param[in,out]  pstrcode destroys after .c and .h files have been generated
- * \param[in]      outdir [optional] if NULL, files are made in /tmp/lept/auto
+ * \param[in,out]  pstrcode   destroys and sets to null after .c and .h files
+ *                            have been generated
+ * \param[in]      outdir     [optional] if NULL, make files in /tmp/lept/auto
  * \return  void
  */
 l_int32
@@ -510,8 +511,8 @@ SARRAY     *sa1, *sa2, *sa3;
  * \brief   l_getStructStrFromFile()
  *
  * \param[in]    filename
- * \param[in]    field  (L_STR_TYPE, L_STR_NAME, L_STR_READER, L_STR_MEMREADER)
- * \param[out]   pstr  struct string for this file
+ * \param[in]    field   (L_STR_TYPE, L_STR_NAME, L_STR_READER, L_STR_MEMREADER)
+ * \param[out]   pstr    struct string for this file
  * \return  0 if found, 1 on error.
  *
  * <pre>
@@ -559,8 +560,8 @@ l_int32  index;
 /*!
  * \brief   l_getIndexFromType()
  *
- * \param[in]    type e.g., "PIXA"
- * \param[out]   pindex found index
+ * \param[in]    type     e.g., "PIXA"
+ * \param[out]   pindex   found index
  * \return  0 if found, 1 if not.
  *
  * <pre>
@@ -597,8 +598,8 @@ l_int32  i, found;
 /*!
  * \brief   l_getIndexFromStructname()
  *
- * \param[in]    sn structname e.g., "Pixa"
- * \param[out]   pindex found index
+ * \param[in]    sn       structname e.g., "Pixa"
+ * \param[out]   pindex   found index
  * \return  0 if found, 1 if not.
  *
  * <pre>
@@ -638,7 +639,7 @@ l_int32  i, found;
  * \brief   l_getIndexFromFile()
  *
  * \param[in]    filename
- * \param[out]   pindex found index
+ * \param[out]   pindex     found index
  * \return  0 if found, 1 on error.
  */
 static l_int32
@@ -692,8 +693,8 @@ SARRAY  *sa;
 /*!
  * \brief   l_genDataString()
  *
- * \param[in]    filein input file of serialized data
- * \param[in]    ifunc index into set of functions in output file
+ * \param[in]    filein   input file of serialized data
+ * \param[in]    ifunc    index into set of functions in output file
  * \return  encoded ascii data string, or NULL on error reading from file
  */
 static char *
@@ -738,8 +739,8 @@ SARRAY   *sa;
 /*!
  * \brief   l_genCaseString()
  *
- * \param[in]    ifunc index into set of functions in generated file
- * \param[in]    itype index into type of function to be used
+ * \param[in]    ifunc   index into set of functions in generated file
+ * \param[in]    itype   index into type of function to be used
  * \return  case string for this decoding function
  *
  * <pre>
@@ -776,9 +777,9 @@ char  *code = NULL;
 /*!
  * \brief   l_genDescrString()
  *
- * \param[in]    filein input file of serialized data
- * \param[in]    ifunc index into set of functions in generated file
- * \param[in]    itype index into type of function to be used
+ * \param[in]    filein   input file of serialized data
+ * \param[in]    ifunc    index into set of functions in generated file
+ * \param[in]    itype    index into type of function to be used
  * \return  description string for this decoding function
  */
 static char *

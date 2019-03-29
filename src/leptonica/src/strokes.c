@@ -61,9 +61,9 @@
 /*!
  * \brief   pixFindStrokeLength()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    tab8  [optional] table for counting fg pixels; can be NULL
- * \param[out]  *plength  estimated length of the strokes
+ * \param[in]    pixs      1 bpp
+ * \param[in]    tab8      [optional] table for counting fg pixels; can be NULL
+ * \param[out]   plength   estimated length of the strokes
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -101,11 +101,11 @@ PIX      *pix1;
 /*!
  * \brief   pixFindStrokeWidth()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    thresh  fractional count threshold relative to distance 1
- * \param[in]    tab8  [optional] table for counting fg pixels; can be NULL
- * \param[out]  *pwidth  estimated width of the strokes
- * \param[out]  *pnahisto  [optional] histo of pixel distances from bg
+ * \param[in]    pixs       1 bpp
+ * \param[in]    thresh     fractional count threshold relative to distance 1
+ * \param[in]    tab8       [optional] table for counting fg pixels; can be NULL
+ * \param[out]   pwidth     estimated width of the strokes
+ * \param[out]   pnahisto   [optional] histo of pixel distances from bg
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -193,10 +193,10 @@ PIX        *pix1;
 /*!
  * \brief   pixaFindStrokeWidth()
  *
- * \param[in]    pixa  of 1 bpp images
- * \param[in]    thresh  fractional count threshold relative to distance 1
- * \param[in]    tab8  [optional] table for counting fg pixels; can be NULL
- * \param[in]    debug  1 for debug output; 0 to skip
+ * \param[in]    pixa     of 1 bpp images
+ * \param[in]    thresh   fractional count threshold relative to distance 1
+ * \param[in]    tab8     [optional] table for counting fg pixels; can be NULL
+ * \param[in]    debug    1 for debug output; 0 to skip
  * \return  na  array of stroke widths for each pix in %pixa; NULL on error
  *
  * <pre>
@@ -246,8 +246,8 @@ PIX       *pix;
 /*!
  * \brief   pixaModifyStrokeWidth()
  *
- * \param[in]     pixas  of 1 bpp pix
- * \param[out]    targetw  desired width for strokes in each pix
+ * \param[in]     pixas      of 1 bpp pix
+ * \param[out]    targetw    desired width for strokes in each pix
  * \return  pixa  with modified stroke widths, or NULL on error
  */
 PIXA *
@@ -289,9 +289,9 @@ PIXA      *pixad;
 /*!
  * \brief   pixModifyStrokeWidth()
  *
- * \param[in]   pixs  of 1 bpp pix
- * \param[in]   width  measured average stroke width
- * \param[in]   targetw  desired stroke width
+ * \param[in]   pixs      of 1 bpp pix
+ * \param[in]   width     measured average stroke width
+ * \param[in]   targetw   desired stroke width
  * \return  pix  with modified stroke width, or NULL on error
  */
 PIX *
@@ -324,10 +324,10 @@ l_int32  diff, size;
 /*!
  * \brief   pixaSetStrokeWidth()
  *
- * \param[in]   pixas  of 1 bpp pix
- * \param[in]   width  set stroke width to this value, in [1 ... 100].
- * \param[in]   thinfirst  1 to thin all pix to a skeleton first; 0 to skip
- * \param[in]   connectivity  4 or 8, to be used if %thinfirst == 1
+ * \param[in]   pixas          of 1 bpp pix
+ * \param[in]   width          set stroke width to this value, in [1 ... 100].
+ * \param[in]   thinfirst      1 to thin all pix to a skeleton first; 0 to skip
+ * \param[in]   connectivity   4 or 8, to be used if %thinfirst == 1
  * \return  pixa  with all stroke widths being %width, or NULL on error
  *
  * <pre>
@@ -379,10 +379,10 @@ PIXA    *pixad;
 /*!
  * \brief   pixSetStrokeWidth()
  *
- * \param[in]   pixs  1 bpp pix
- * \param[in]   width  set stroke width to this value, in [1 ... 100].
- * \param[in]   thinfirst  1 to thin all pix to a skeleton first; 0 to skip
- * \param[in]   connectivity  4 or 8, to be used if %thinfirst == 1
+ * \param[in]   pixs           1 bpp
+ * \param[in]   width          set stroke width to this value, in [1 ... 100].
+ * \param[in]   thinfirst      1 to thin all pix to a skeleton first; 0 to skip
+ * \param[in]   connectivity   4 or 8, to be used if %thinfirst == 1
  * \return  pixd  with stroke width set to %width, or NULL on error
  *
  * <pre>
@@ -433,4 +433,3 @@ PIX     *pix1, *pix2, *pixd;
     pixDestroy(&pix2);
     return pixd;
 }
-

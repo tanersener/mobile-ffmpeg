@@ -43,6 +43,7 @@
  *           l_int32     pixCombineMasked()
  *           l_int32     pixCombineMaskedGeneral()
  *           l_int32     pixPaintThroughMask()
+ *           l_int32     pixCopyWithBoxa()  -- this is boxa-directed
  *           PIX        *pixPaintSelfThroughMask()
  *           PIX        *pixMakeMaskFromVal()
  *           PIX        *pixMakeMaskFromLUT()
@@ -718,6 +719,60 @@ l_uint32  *data, *datam, *line, *linem;
     }
 
     return 0;
+}
+
+
+/*!
+ * \brief   pixCopyWithBoxa()
+ *
+ * \param[in]   pixs         all depths; cmap ok
+ * \param[in]   boxa         e.g., from components of a photomask
+ * \param[in]   background   L_SET_WHITE or L_SET_BLACK
+ * \return  pixd or NULL on error
+ *
+ * <pre>
+ * Notes:
+ *      (1) Pixels from pixs are copied ("blitted") through each box into pixd.
+ *      (2) Pixels not copied are preset to either white or black.
+ *      (3) This fast and simple implementation can use rasterop because
+ *          each region to be copied is rectangular.
+ *      (4) A much slower implemention that doesn't use rasterop would make
+ *          a 1 bpp mask from the boxa and then copy, pixel by pixel,
+ *          through the mask:
+ *             pixGetDimensions(pixs, &w, &h, NULL);
+ *             pixm = pixCreate(w, h, 1);
+ *             pixm = pixMaskBoxa(pixm, pixm, boxa);
+ *             pixd = pixCreateTemplate(pixs);
+ *             pixSetBlackOrWhite(pixd, background);
+ *             pixCombineMasked(pixd, pixs, pixm);
+ *             pixDestroy(&pixm);
+ * </pre>
+ */
+PIX *
+pixCopyWithBoxa(PIX     *pixs,
+                BOXA    *boxa,
+                l_int32  background)
+{
+l_int32  i, n, x, y, w, h;
+PIX     *pixd;
+
+    PROCNAME("pixCopyWithBoxa");
+
+    if (!pixs)
+        return (PIX *)ERROR_PTR("pixs not defined", procName, NULL);
+    if (!boxa)
+        return (PIX *)ERROR_PTR("boxa not defined", procName, NULL);
+    if (background != L_SET_WHITE && background != L_SET_BLACK)
+        return (PIX *)ERROR_PTR("invalid background", procName, NULL);
+
+    pixd = pixCreateTemplate(pixs);
+    pixSetBlackOrWhite(pixd, background);
+    n = boxaGetCount(boxa);
+    for (i = 0; i < n; i++) {
+        boxaGetBoxGeometry(boxa, i, &x, &y, &w, &h);
+        pixRasterop(pixd, x, y, w, h, PIX_SRC, pixs, x, y);
+    }
+    return pixd;
 }
 
 

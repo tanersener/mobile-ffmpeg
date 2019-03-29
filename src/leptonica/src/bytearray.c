@@ -624,7 +624,6 @@ size_t    size, maxbytes;
         return ERROR_INT("ba not defined", procName, 1);
 
     data = l_byteaGetData(ba, &size);
-    startloc = L_MAX(0, startloc);
     if (startloc >= size)
         return ERROR_INT("invalid startloc", procName, 1);
     maxbytes = size - startloc;

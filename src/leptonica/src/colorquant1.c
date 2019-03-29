@@ -276,10 +276,10 @@ static PIX *pixOctcubeQuantFromCmapLUT(PIX *pixs, PIXCMAP *cmap,
 /*!
  * \brief   pixOctreeColorQuant()
  *
- * \param[in]    pixs  32 bpp; 24-bit color
- * \param[in]    colors  in colormap; some number in range [128 ... 256];
- *                      the actual number of colors used will be smaller
- * \param[in]    ditherflag  1 to dither, 0 otherwise
+ * \param[in]    pixs         32 bpp; 24-bit color
+ * \param[in]    colors       in colormap; some number in range [128 ... 256];
+ *                            the actual number of colors used will be smaller
+ * \param[in]    ditherflag   1 to dither, 0 otherwise
  * \return  pixd 8 bpp with colormap, or NULL on error
  *
  * <pre>
@@ -552,19 +552,19 @@ pixOctreeColorQuant(PIX     *pixs,
 /*!
  * \brief   pixOctreeColorQuantGeneral()
  *
- * \param[in]    pixs  32 bpp; 24-bit color
- * \param[in]    colors  in colormap; some number in range [128 ... 240];
- *                      the actual number of colors used will be smaller
- * \param[in]    ditherflag  1 to dither, 0 otherwise
- * \param[in]    validthresh minimum fraction of pixels neither near white
- *                           nor black, required for color quantization;
- *                           typically ~0.01, but smaller for images that have
- *                           color but are nearly all white
- * \param[in]    colorthresh minimum fraction of pixels with color that are
- *                           not near white or black, that are required
- *                           for color quantization; typ. ~0.01, but smaller
- *                           for images that have color along with a
- *                           significant fraction of gray
+ * \param[in]    pixs          32 bpp; 24-bit color
+ * \param[in]    colors        in colormap; some number in range [128 ... 240];
+ *                             the actual number of colors used will be smaller
+ * \param[in]    ditherflag    1 to dither, 0 otherwise
+ * \param[in]    validthresh   minimum fraction of pixels neither near white
+ *                             nor black, required for color quantization;
+ *                             typically ~0.01, but smaller for images that have
+ *                             color but are nearly all white
+ * \param[in]    colorthresh   minimum fraction of pixels with color that are
+ *                             not near white or black, that are required
+ *                             for color quantization; typ. ~0.01, but smaller
+ *                             for images that have color along with a
+ *                             significant fraction of gray
  * \return  pixd 8 bit with colormap, or NULL on error
  *
  * <pre>
@@ -708,9 +708,9 @@ PIXCMAP   *cmap;
  * \brief   octreeGenerateAndPrune()
  *
  * \param[in]    pixs
- * \param[in]    colors number of colors to use between 128 and 256
- * \param[in]    reservedcolors number of reserved colors
- * \param[out]   pcmap  made and returned
+ * \param[in]    colors           number of colors to use between 128 and 256
+ * \param[in]    reservedcolors   number of reserved colors
+ * \param[out]   pcmap            colormap returned
  * \return  octree, colormap and number of colors used, or NULL
  *              on error
  *
@@ -761,7 +761,7 @@ NUMA      *nar;  /* accumulates levels for residual cells */
 
         /* Make the canonical index tables */
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, CQ_NLEVELS);
+    makeRGBToIndexTables(CQ_NLEVELS, &rtab, &gtab, &btab);
 
         /* Generate an 8 bpp cmap (max size 256) */
     cmap = pixcmapCreate(8);
@@ -950,9 +950,9 @@ l_int32    nt, nr, ival;
 /*!
  * \brief   pixOctreeQuantizePixels()
  *
- * \param[in]    pixs 32 bpp
- * \param[in]    cqcaa octree in array format
- * \param[in]    ditherflag 1 for dithering, 0 for no dithering
+ * \param[in]    pixs         32 bpp
+ * \param[in]    cqcaa        octree in array format
+ * \param[in]    ditherflag   1 for dithering, 0 for no dithering
  * \return  pixd or NULL on error
  *
  * <pre>
@@ -1008,7 +1008,7 @@ PIX       *pixd;
 
         /* Make the canonical index tables */
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, CQ_NLEVELS);
+    makeRGBToIndexTables(CQ_NLEVELS, &rtab, &gtab, &btab);
 
         /* Traverse tree from root, looking for lowest cube
          * that is a leaf, and set dest pix to its
@@ -1291,7 +1291,7 @@ CQCELL   **cqca;   /* one array for each octree level */
 /*!
  * \brief   cqcellTreeDestroy()
  *
- * \param[in,out]   pcqcaa to be nulled
+ * \param[in,out]   pcqcaa   will be set to null before returning
  */
 static void
 cqcellTreeDestroy(CQCELL  ****pcqcaa)
@@ -1331,8 +1331,8 @@ CQCELL   **cqca;
 /*!
  * \brief   makeRGBToIndexTables()
  *
- * \param[out]   prtab, pgtab, pbtab  tables
- * \param[in]    cqlevels can be 1, 2, 3, 4, 5 or 6
+ * \param[in]    cqlevels               can be 1, 2, 3, 4, 5 or 6
+ * \param[out]   prtab, pgtab, pbtab    tables
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -1358,10 +1358,10 @@ CQCELL   **cqca;
  * </pre>
  */
 l_ok
-makeRGBToIndexTables(l_uint32  **prtab,
+makeRGBToIndexTables(l_int32     cqlevels,
+                     l_uint32  **prtab,
                      l_uint32  **pgtab,
-                     l_uint32  **pbtab,
-                     l_int32     cqlevels)
+                     l_uint32  **pbtab)
 {
 l_int32    i;
 l_uint32  *rtab, *gtab, *btab;
@@ -1370,9 +1370,9 @@ l_uint32  *rtab, *gtab, *btab;
 
     if (cqlevels < 1 || cqlevels > 6)
         return ERROR_INT("cqlevels must be in {1,...6}", procName, 1);
-
     if (!prtab || !pgtab || !pbtab)
         return ERROR_INT("not all &tabs defined", procName, 1);
+
     rtab = (l_uint32 *)LEPT_CALLOC(256, sizeof(l_uint32));
     gtab = (l_uint32 *)LEPT_CALLOC(256, sizeof(l_uint32));
     btab = (l_uint32 *)LEPT_CALLOC(256, sizeof(l_uint32));
@@ -1457,7 +1457,7 @@ l_uint32  *rtab, *gtab, *btab;
  * \brief   getOctcubeIndexFromRGB()
  *
  * \param[in]    rval, gval, bval
- * \param[in]    rtab, gtab, btab  generated with makeRGBToIndexTables()
+ * \param[in]    rtab, gtab, btab    generated with makeRGBToIndexTables()
  * \param[out]   pindex found index
  * \return  void
  *
@@ -1557,9 +1557,9 @@ l_int32  rgbindex;
  * \brief   getOctcubeIndices()
  *
  * \param[in]    rgbindex
- * \param[in]    level octree level 0, 1, 2, 3, 4, 5
- * \param[out]   pbindex base index index at the octree level
- * \param[out]   psindex sub index index at the next lower level
+ * \param[in]    level     octree level 0, 1, 2, 3, 4, 5
+ * \param[out]   pbindex   base index index at the octree level
+ * \param[out]   psindex   sub index index at the next lower level
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1613,9 +1613,9 @@ getOctcubeIndices(l_int32   rgbindex,
 /*!
  * \brief   octcubeGetCount()
  *
- * \param[in]    level valid values are in [1,...6]; there are 2^level
- *                     cubes along each side of the rgb cube
- * \param[out]   psize 2^(3 * level) cubes in the entire rgb cube
+ * \param[in]    level   valid values are in [1,...6]; there are 2^level
+ *                       cubes along each side of the rgb cube
+ * \param[out]   psize   2^(3 * level) cubes in the entire rgb cube
  * \return   0 if OK, 1 on error.  Caller must check!
  *
  * <pre>
@@ -1645,10 +1645,10 @@ octcubeGetCount(l_int32   level,
 /*!
  * \brief   pixOctreeQuantByPopulation()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    level significant bits for each of RGB; valid for {3,4},
- *                     Use 0 for default (level 4; recommended
- * \param[in]    ditherflag  1 to dither, 0 otherwise
+ * \param[in]    pixs         32 bpp rgb
+ * \param[in]    level        significant bits for each of RGB; valid for {3,4}.
+ *                            Use 0 for default (level 4; recommended
+ * \param[in]    ditherflag   1 to dither, 0 otherwise
  * \return  pixd quantized to octcubes or NULL on error
  *
  * <pre>
@@ -1733,7 +1733,7 @@ PIXCMAP        *cmap;
     if (octcubeGetCount(level, &size))  /* array size = 2 ** (3 * level) */
         return (PIX *)ERROR_PTR("size not returned", procName, NULL);
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, level);
+    makeRGBToIndexTables(level, &rtab, &gtab, &btab);
 
     pixd = NULL;
     narray = (l_int32 *)LEPT_CALLOC(size, sizeof(l_int32));
@@ -1856,7 +1856,7 @@ PIXCMAP        *cmap;
 
         /* Make the octindex tables for level 2, and reuse rarray, etc. */
     rtab2 = gtab2 = btab2 = NULL;
-    makeRGBToIndexTables(&rtab2, &gtab2, &btab2, 2);
+    makeRGBToIndexTables(2, &rtab2, &gtab2, &btab2);
     for (i = 0; i < 64; i++) {
         narray[i] = 0;
         rarray[i] = 0;
@@ -1959,11 +1959,12 @@ array_cleanup:
 /*!
  * \brief   pixDitherOctindexWithCmap()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    pixd 8 bpp cmapped
- * \param[in]    rtab, gtab, btab tables from rval to octindex
- * \param[in]    indexmap array mapping octindex to cmap index
- * \param[in]    difcap max allowed dither transfer; use 0 for infinite cap
+ * \param[in]    pixs               32 bpp rgb
+ * \param[in]    pixd               8 bpp cmapped
+ * \param[in]    rtab, gtab, btab   tables from rval to octindex
+ * \param[in]    indexmap           array mapping octindex to cmap index
+ * \param[in]    difcap             max allowed dither transfer;
+ *                                  use 0 for infinite cap
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2173,11 +2174,11 @@ buffer_cleanup:
 /*!
  * \brief   pixOctreeQuantNumColors()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    maxcolors 8 to 256; the actual number of colors used
- *                         may be less than this
- * \param[in]    subsample factor for computing color distribution;
- *                         use 0 for default
+ * \param[in]    pixs        32 bpp rgb
+ * \param[in]    maxcolors   8 to 256; the actual number of colors used
+ *                           may be less than this
+ * \param[in]    subsample   factor for computing color distribution;
+ *                           use 0 for default
  * \return  pixd 4 or 8 bpp, colormapped, or NULL on error
  *
  * <pre>
@@ -2342,7 +2343,7 @@ PIXCMAP   *cmap;
         }
 
         rtab = gtab = btab = NULL;
-        makeRGBToIndexTables(&rtab, &gtab, &btab, maxlevel - 1);
+        makeRGBToIndexTables(maxlevel - 1, &rtab, &gtab, &btab);
 
             /* Go through the entire image, gathering statistics and
              * assigning pixels to their quantized value */
@@ -2413,7 +2414,7 @@ PIXCMAP   *cmap;
         /* Make the tables to map color to the octindex,
          * of which there are 'ncubes' at 'maxlevel' */
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, maxlevel);
+    makeRGBToIndexTables(maxlevel, &rtab, &gtab, &btab);
 
         /* Estimate the color distribution; we want to find the
          * most popular nextra colors at 'maxlevel' */
@@ -2631,7 +2632,7 @@ PIXCMAP   *cmap;
 
         /* Make octcube index tables */
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, octlevels);
+    makeRGBToIndexTables(octlevels, &rtab, &gtab, &btab);
 
         /* Make octcube arrays for storing points in each cube */
     carray = (l_int32 *)LEPT_CALLOC(size, sizeof(l_int32));
@@ -2748,8 +2749,8 @@ array_cleanup:
 /*!
  * \brief   pixFixedOctcubeQuant256()
  *
- * \param[in]    pixs  32 bpp; 24-bit color
- * \param[in]    ditherflag  1 for dithering; 0 for no dithering
+ * \param[in]    pixs         32 bpp; 24-bit color
+ * \param[in]    ditherflag   1 for dithering; 0 for no dithering
  * \return  pixd 8 bit with colormap, or NULL on error
  *
  * <pre>
@@ -2915,8 +2916,8 @@ PIXCMAP   *cmap;
 /*!
  * \brief   pixFewColorsOctcubeQuant1()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    level significant bits for each of RGB; valid in [1...6]
+ * \param[in]    pixs    32 bpp rgb
+ * \param[in]    level   significant bits for each of RGB; valid in [1...6]
  * \return  pixd quantized to octcube or NULL on error
  *
  * <pre>
@@ -2969,7 +2970,7 @@ PIXCMAP   *cmap;
     if (octcubeGetCount(level, &size))  /* array size = 2 ** (3 * level) */
         return (PIX *)ERROR_PTR("size not returned", procName, NULL);
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, level);
+    makeRGBToIndexTables(level, &rtab, &gtab, &btab);
 
     carray = (l_int32 *)LEPT_CALLOC(size, sizeof(l_int32));
     rarray = (l_int32 *)LEPT_CALLOC(size, sizeof(l_int32));
@@ -3072,13 +3073,13 @@ array_cleanup:
 /*!
  * \brief   pixFewColorsOctcubeQuant2()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    level of octcube indexing, for histogram: 3, 4, 5, 6
- * \param[in]    na histogram of pixel occupation in octree leaves at
- *                  given level
- * \param[in]    ncolors number of occupied octree leaves at given level
- * \param[out]   pnerrors [optional] num of pixels not exactly
- *                        represented in the colormap
+ * \param[in]    pixs       32 bpp rgb
+ * \param[in]    level      of octcube indexing, for histogram: 3, 4, 5, 6
+ * \param[in]    na         histogram of pixel occupation in octree leaves
+ *                          at given level
+ * \param[in]    ncolors    number of occupied octree leaves at given level
+ * \param[out]   pnerrors   [optional] num of pixels not exactly
+ *                          represented in the colormap
  * \return  pixd 2, 4 or 8 bpp with colormap, or NULL on error
  *
  * <pre>
@@ -3148,7 +3149,7 @@ PIXCMAP   *cmap;
         /* Represent the image with a set of leaf octcubes
          * at 'level', one for each color. */
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, level);
+    makeRGBToIndexTables(level, &rtab, &gtab, &btab);
 
         /* The octarray will give a ptr from the octcube to the colorarray */
     ncubes = numaGetCount(na);
@@ -3245,21 +3246,21 @@ cleanup_arrays:
 /*!
  * \brief   pixFewColorsOctcubeQuantMixed()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    level significant octcube bits for each of RGB;
- *                     valid in [1...6]; use 0 for default
- * \param[in]    darkthresh threshold near black; if the lightest component
- *                          is below this, the pixel is not considered to
- *                          be gray or color; uses 0 for default
- * \param[in]    lightthresh threshold near white; if the darkest component
- *                           is above this, the pixel is not considered to
- *                           be gray or color; use 0 for default
- * \param[in]    diffthresh thresh for the max difference between component
- *                          values; for differences below this, the pixel
- *                          is considered to be gray; use 0 for default
- * \param[in]    minfract min fraction of pixels for gray histo bin;
- *                        use 0.0 for default
- * \param[in]    maxspan max size of gray histo bin; use 0 for default
+ * \param[in]    pixs          32 bpp rgb
+ * \param[in]    level         significant octcube bits for each of RGB;
+ *                             valid in [1...6]; use 0 for default
+ * \param[in]    darkthresh    threshold near black; if the lightest component
+ *                             is below this, the pixel is not considered to
+ *                             be gray or color; uses 0 for default
+ * \param[in]    lightthresh   threshold near white; if the darkest component
+ *                             is above this, the pixel is not considered to
+ *                             be gray or color; use 0 for default
+ * \param[in]    diffthresh    thresh for the max difference between component
+ *                             values; for differences below this, the pixel
+ *                             is considered to be gray; use 0 for default
+ * \param[in]    minfract      min fraction of pixels for gray histo bin;
+ *                             use 0.0 for default
+ * \param[in]    maxspan       max size of gray histo bin; use 0 for default
  * \return  pixd 8 bpp, quantized to octcube for pixels that are
  *                    not gray; gray pixels are quantized separately
  *                    over the full gray range, or NULL on error
@@ -3406,8 +3407,8 @@ PIXCMAP   *cmap, *cmapd;
 /*!
  * \brief   pixFixedOctcubeQuantGenRGB()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    level significant bits for each of r,g,b
+ * \param[in]    pixs    32 bpp rgb
+ * \param[in]    level   significant bits for each of r,g,b
  * \return  pixd rgb; quantized to octcube centers, or NULL on error
  *
  * <pre>
@@ -3439,7 +3440,7 @@ PIX       *pixd;
     if (level < 1 || level > 6)
         return (PIX *)ERROR_PTR("level not in {1,...6}", procName, NULL);
 
-    if (makeRGBToIndexTables(&rtab, &gtab, &btab, level))
+    if (makeRGBToIndexTables(level, &rtab, &gtab, &btab))
         return (PIX *)ERROR_PTR("tables not made", procName, NULL);
 
     pixGetDimensions(pixs, &w, &h, NULL);
@@ -3474,11 +3475,11 @@ PIX       *pixd;
 /*!
  * \brief   pixQuantFromCmap()
  *
- * \param[in]    pixs  8 bpp grayscale without cmap, or 32 bpp rgb
- * \param[in]    cmap  to quantize to; insert copy into dest pix
- * \param[in]    mindepth minimum depth of pixd: can be 2, 4 or 8 bpp
- * \param[in]    level of octcube used for finding nearest color in cmap
- * \param[in]    metric L_MANHATTAN_DISTANCE, L_EUCLIDEAN_DISTANCE
+ * \param[in]    pixs       8 bpp grayscale without cmap, or 32 bpp rgb
+ * \param[in]    cmap       to quantize to; insert copy into dest pix
+ * \param[in]    mindepth   minimum depth of pixd: can be 2, 4 or 8 bpp
+ * \param[in]    level      of octcube used for finding nearest color in cmap
+ * \param[in]    metric     L_MANHATTAN_DISTANCE, L_EUCLIDEAN_DISTANCE
  * \return  pixd  2, 4 or 8 bpp, colormapped, or NULL on error
  *
  * <pre>
@@ -3522,11 +3523,11 @@ l_int32  d;
 /*!
  * \brief   pixOctcubeQuantFromCmap()
  *
- * \param[in]    pixs  32 bpp rgb
- * \param[in]    cmap  to quantize to; insert copy into dest pix
- * \param[in]    mindepth minimum depth of pixd: can be 2, 4 or 8 bpp
- * \param[in]    level of octcube used for finding nearest color in cmap
- * \param[in]    metric L_MANHATTAN_DISTANCE, L_EUCLIDEAN_DISTANCE
+ * \param[in]    pixs       32 bpp rgb
+ * \param[in]    cmap       to quantize to; insert copy into dest pix
+ * \param[in]    mindepth   minimum depth of pixd: can be 2, 4 or 8 bpp
+ * \param[in]    level      of octcube used for finding nearest color in cmap
+ * \param[in]    metric     L_MANHATTAN_DISTANCE, L_EUCLIDEAN_DISTANCE
  * \return  pixd  2, 4 or 8 bpp, colormapped, or NULL on error
  *
  * <pre>
@@ -3609,7 +3610,7 @@ PIX       *pixd;
 
         /* Set up the tables to map rgb to the nearest colormap index */
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, level);
+    makeRGBToIndexTables(level, &rtab, &gtab, &btab);
     cmaptab = pixcmapToOctcubeLUT(cmap, level, metric);
 
     pixd = pixOctcubeQuantFromCmapLUT(pixs, cmap, mindepth,
@@ -3626,11 +3627,11 @@ PIX       *pixd;
 /*!
  * \brief   pixOctcubeQuantFromCmapLUT()
  *
- * \param[in]    pixs  32 bpp rgb
- * \param[in]    cmap  to quantize to; insert copy into dest pix
- * \param[in]    mindepth minimum depth of pixd: can be 2, 4 or 8 bpp
- * \param[in]    cmaptab  table mapping from octindex to colormap index
- * \param[in]    rtab, gtab, btab tables mapping from RGB to octindex
+ * \param[in]    pixs              32 bpp rgb
+ * \param[in]    cmap              to quantize to; insert copy into dest pix
+ * \param[in]    mindepth          minimum depth of pixd: can be 2, 4 or 8 bpp
+ * \param[in]    cmaptab           table mapping from octindex to colormap index
+ * \param[in]    rtab, gtab, btab  tables mapping from RGB to octindex
  * \return  pixd  2, 4 or 8 bpp, colormapped, or NULL on error
  *
  * <pre>
@@ -3721,9 +3722,9 @@ PIXCMAP   *cmapc;
 /*!
  * \brief   pixOctcubeHistogram()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    level significant bits for each of RGB; valid in [1...6]
- * \param[out]   pncolors [optional] number of occupied cubes
+ * \param[in]    pixs       32 bpp rgb
+ * \param[in]    level      significant bits for each of RGB; valid in [1...6]
+ * \param[out]   pncolors   [optional] number of occupied cubes
  * \return  numa histogram of color pixels, or NULL on error
  *
  * <pre>
@@ -3759,7 +3760,7 @@ NUMA       *na;
     if (octcubeGetCount(level, &size))  /* array size = 2 ** (3 * level) */
         return (NUMA *)ERROR_PTR("size not returned", procName, NULL);
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, level);
+    makeRGBToIndexTables(level, &rtab, &gtab, &btab);
 
     if ((na = numaCreate(size)) == NULL) {
         L_ERROR("na not made\n", procName);
@@ -3813,8 +3814,8 @@ cleanup_arrays:
  * \brief   pixcmapToOctcubeLUT()
  *
  * \param[in]    cmap
- * \param[in]    level significant bits for each of RGB; valid in [1...6]
- * \param[in]    metric L_MANHATTAN_DISTANCE, L_EUCLIDEAN_DISTANCE
+ * \param[in]    level    significant bits for each of RGB; valid in [1...6]
+ * \param[in]    metric   L_MANHATTAN_DISTANCE, L_EUCLIDEAN_DISTANCE
  * \return  tab[2**3 * level]
  *
  * <pre>
@@ -3929,7 +3930,7 @@ l_int32   *rmap, *gmap, *bmap, *tab;
 /*!
  * \brief   pixRemoveUnusedColors()
  *
- * \param[in]    pixs  colormapped
+ * \param[in]    pixs   colormapped
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -4069,13 +4070,13 @@ PIXCMAP    *cmap, *cmapd;
 /*!
  * \brief   pixNumberOccupiedOctcubes()
  *
- * \param[in]    pix 32 bpp
- * \param[in]    level of octcube
- * \param[in]    mincount minimum num pixels in an octcube to be counted;
- *                        -1 to not use
- * \param[in]    minfract minimum fract of pixels in an octcube to be
- *                        counted; -1 to not use
- * \param[out]   pncolors number of occupied octcubes
+ * \param[in]    pix        32 bpp
+ * \param[in]    level      of octcube
+ * \param[in]    mincount   minimum num pixels in an octcube to be counted;
+ *                          -1 to not use
+ * \param[in]    minfract   minimum fract of pixels in an octcube to be
+ *                          counted; -1 to not use
+ * \param[out]   pncolors   number of occupied octcubes
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -4120,7 +4121,7 @@ l_uint32  *data, *line, *rtab, *gtab, *btab;
     if (octcubeGetCount(level, &size))  /* array size = 2 ** (3 * level) */
         return ERROR_INT("size not returned", procName, 1);
     rtab = gtab = btab = NULL;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, level);
+    makeRGBToIndexTables(level, &rtab, &gtab, &btab);
     if ((carray = (l_int32 *)LEPT_CALLOC(size, sizeof(l_int32))) == NULL) {
         L_ERROR("carray not made\n", procName);
         goto cleanup_arrays;

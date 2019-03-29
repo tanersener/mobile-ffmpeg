@@ -38,22 +38,22 @@
  *  ===================================================================
  *
  *      Adaptive Otsu-based thresholding
- *          l_int32    pixOtsuAdaptiveThreshold()       8 bpp
+ *          l_int32       pixOtsuAdaptiveThreshold()       8 bpp
  *
  *      Otsu thresholding on adaptive background normalization
- *          PIX       *pixOtsuThreshOnBackgroundNorm()  8 bpp
+ *          PIX          *pixOtsuThreshOnBackgroundNorm()  8 bpp
  *
  *      Masking and Otsu estimate on adaptive background normalization
- *          PIX       *pixMaskedThreshOnBackgroundNorm()  8 bpp
+ *          PIX          *pixMaskedThreshOnBackgroundNorm()  8 bpp
  *
  *      Sauvola local thresholding
- *          l_int32    pixSauvolaBinarizeTiled()
- *          l_int32    pixSauvolaBinarize()
- *          PIX       *pixSauvolaGetThreshold()
- *          PIX       *pixApplyLocalThreshold();
+ *          l_int32       pixSauvolaBinarizeTiled()
+ *          l_int32       pixSauvolaBinarize()
+ *          static PIX   *pixSauvolaGetThreshold()
+ *          static PIX   *pixApplyLocalThreshold();
  *
  *      Thresholding using connected components
- *          PIX       *pixThresholdByConnComp()
+ *          PIX          *pixThresholdByConnComp()
  *
  *  Notes:
  *      (1) pixOtsuAdaptiveThreshold() computes a global threshold over each
@@ -78,22 +78,26 @@
 #include <math.h>
 #include "allheaders.h"
 
+static PIX *pixSauvolaGetThreshold(PIX *pixm, PIX *pixms, l_float32 factor,
+                                   PIX **ppixsd);
+static PIX *pixApplyLocalThreshold(PIX *pixs, PIX *pixth);
+
 /*------------------------------------------------------------------*
  *                 Adaptive Otsu-based thresholding                 *
  *------------------------------------------------------------------*/
 /*!
  * \brief   pixOtsuAdaptiveThreshold()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    sx, sy desired tile dimensions; actual size may vary
- * \param[in]    smoothx, smoothy half-width of convolution kernel applied to
- *                                threshold array: use 0 for no smoothing
- * \param[in]    scorefract fraction of the max Otsu score; typ. 0.1;
- *                          use 0.0 for standard Otsu
- * \param[out]   ppixth [optional] array of threshold values
- *                      found for each tile
- * \param[out]   ppixd [optional] thresholded input pixs, based on
- *                     the threshold array
+ * \param[in]    pixs              8 bpp
+ * \param[in]    sx, sy            desired tile dimensions; actual size may vary
+ * \param[in]    smoothx, smoothy  half-width of convolution kernel applied to
+ *                                 threshold array: use 0 for no smoothing
+ * \param[in]    scorefract        fraction of the max Otsu score; typ. 0.1;
+ *                                 use 0.0 for standard Otsu
+ * \param[out]   ppixth            [optional] array of threshold values
+ *                                 found for each tile
+ * \param[out]   ppixd             [optional] thresholded input pixs,
+ *                                 based on the threshold array
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -220,17 +224,17 @@ PIXTILING  *pt;
 /*!
  * \brief   pixOtsuThreshOnBackgroundNorm()
  *
- * \param[in]    pixs 8 bpp grayscale; not colormapped
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    sx, sy tile size in pixels
- * \param[in]    thresh threshold for determining foreground
- * \param[in]    mincount min threshold on counts in a tile
- * \param[in]    bgval target bg val; typ. > 128
- * \param[in]    smoothx half-width of block convolution kernel width
- * \param[in]    smoothy half-width of block convolution kernel height
- * \param[in]    scorefract fraction of the max Otsu score; typ. 0.1
- * \param[out]   pthresh [optional] threshold value that was
- *                       used on the normalized image
+ * \param[in]    pixs         8 bpp grayscale; not colormapped
+ * \param[in]    pixim        [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    sx, sy       tile size in pixels
+ * \param[in]    thresh       threshold for determining foreground
+ * \param[in]    mincount     min threshold on counts in a tile
+ * \param[in]    bgval        target bg val; typ. > 128
+ * \param[in]    smoothx      half-width of block convolution kernel width
+ * \param[in]    smoothy      half-width of block convolution kernel height
+ * \param[in]    scorefract   fraction of the max Otsu score; typ. 0.1
+ * \param[out]   pthresh      [optional] threshold value that was
+ *                            used on the normalized image
  * \return  pixd 1 bpp thresholded image, or NULL on error
  *
  * <pre>
@@ -314,16 +318,16 @@ PIX      *pixn, *pixt, *pixd;
 /*!
  * \brief   pixMaskedThreshOnBackgroundNorm()
  *
- * \param[in]    pixs 8 bpp grayscale; not colormapped
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    sx, sy tile size in pixels
- * \param[in]    thresh threshold for determining foreground
- * \param[in]    mincount min threshold on counts in a tile
- * \param[in]    smoothx half-width of block convolution kernel width
- * \param[in]    smoothy half-width of block convolution kernel height
- * \param[in]    scorefract fraction of the max Otsu score; typ. ~ 0.1
- * \param[out]   pthresh [optional] threshold value that was
- *                       used on the normalized image
+ * \param[in]    pixs         8 bpp grayscale; not colormapped
+ * \param[in]    pixim        [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    sx, sy       tile size in pixels
+ * \param[in]    thresh       threshold for determining foreground
+ * \param[in]    mincount     min threshold on counts in a tile
+ * \param[in]    smoothx      half-width of block convolution kernel width
+ * \param[in]    smoothy      half-width of block convolution kernel height
+ * \param[in]    scorefract   fraction of the max Otsu score; typ. ~ 0.1
+ * \param[out]   pthresh      [optional] threshold value that was
+ *                            used on the normalized image
  * \return  pixd 1 bpp thresholded image, or NULL on error
  *
  * <pre>
@@ -437,12 +441,12 @@ PIX      *pixn, *pixm, *pixd, *pix1, *pix2, *pix3, *pix4;
 /*!
  * \brief   pixSauvolaBinarizeTiled()
  *
- * \param[in]    pixs 8 bpp grayscale, not colormapped
- * \param[in]    whsize window half-width for measuring local statistics
- * \param[in]    factor factor for reducing threshold due to variance; >= 0
- * \param[in]    nx, ny subdivision into tiles; >= 1
- * \param[out]   ppixth [optional] Sauvola threshold values
- * \param[out]   ppixd [optional] thresholded image
+ * \param[in]    pixs      8 bpp grayscale, not colormapped
+ * \param[in]    whsize    window half-width for measuring local statistics
+ * \param[in]    factor    factor for reducing threshold due to variance; >= 0
+ * \param[in]    nx, ny    subdivision into tiles; >= 1
+ * \param[out]   ppixth    [optional] Sauvola threshold values
+ * \param[out]   ppixd     [optional] thresholded image
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -555,14 +559,14 @@ PIXTILING  *pt;
 /*!
  * \brief   pixSauvolaBinarize()
  *
- * \param[in]    pixs 8 bpp grayscale; not colormapped
- * \param[in]    whsize window half-width for measuring local statistics
- * \param[in]    factor factor for reducing threshold due to variance; >= 0
- * \param[in]    addborder 1 to add border of width (%whsize + 1) on all sides
- * \param[out]   ppixm [optional] local mean values
- * \param[out]   ppixsd [optional] local standard deviation values
- * \param[out]   ppixth [optional] threshold values
- * \param[out]   ppixd [optional] thresholded image
+ * \param[in]    pixs       8 bpp grayscale; not colormapped
+ * \param[in]    whsize     window half-width for measuring local statistics
+ * \param[in]    factor     factor for reducing threshold due to variance; >= 0
+ * \param[in]    addborder  1 to add border of width (%whsize + 1) on all sides
+ * \param[out]   ppixm      [optional] local mean values
+ * \param[out]   ppixsd     [optional] local standard deviation values
+ * \param[out]   ppixth     [optional] threshold values
+ * \param[out]   ppixd      [optional] thresholded image
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -642,7 +646,7 @@ PIX     *pixg, *pixsc, *pixm, *pixms, *pixth, *pixd;
     if (ppixth || ppixd)
         pixth = pixSauvolaGetThreshold(pixm, pixms, factor, ppixsd);
     if (ppixd) {
-        pixd = pixApplyLocalThreshold(pixsc, pixth, 1);
+        pixd = pixApplyLocalThreshold(pixsc, pixth);
         pixCopyResolution(pixd, pixs);
     }
 
@@ -666,11 +670,11 @@ PIX     *pixg, *pixsc, *pixm, *pixms, *pixth, *pixd;
 /*!
  * \brief   pixSauvolaGetThreshold()
  *
- * \param[in]    pixm 8 bpp grayscale; not colormapped
- * \param[in]    pixms 32 bpp
- * \param[in]    factor factor for reducing threshold due to variance; >= 0
- * \param[out]   ppixsd [optional] local standard deviation
- * \return  pixd 8 bpp, sauvola threshold values, or NULL on error
+ * \param[in]    pixm     8 bpp grayscale; not colormapped
+ * \param[in]    pixms    32 bpp
+ * \param[in]    factor   factor for reducing threshold due to variance; >= 0
+ * \param[out]   ppixsd   [optional] local standard deviation
+ * \return  pixd   8 bpp, sauvola threshold values, or NULL on error
  *
  * <pre>
  * Notes:
@@ -700,7 +704,7 @@ PIX     *pixg, *pixsc, *pixm, *pixms, *pixth, *pixd;
  *            s = sqrt(ms - mv * mv)
  * </pre>
  */
-PIX *
+static PIX *
 pixSauvolaGetThreshold(PIX       *pixm,
                        PIX       *pixms,
                        l_float32  factor,
@@ -778,15 +782,13 @@ PIX        *pixsd, *pixd;
 /*!
  * \brief   pixApplyLocalThreshold()
  *
- * \param[in]    pixs 8 bpp grayscale; not colormapped
- * \param[in]    pixth 8 bpp array of local thresholds
- * \param[in]    redfactor  ...
- * \return  pixd 1 bpp, thresholded image, or NULL on error
+ * \param[in]    pixs     8 bpp grayscale; not colormapped
+ * \param[in]    pixth    8 bpp array of local thresholds
+ * \return  pixd   1 bpp, thresholded image, or NULL on error
  */
-PIX *
+static PIX *
 pixApplyLocalThreshold(PIX     *pixs,
-                       PIX     *pixth,
-                       l_int32  redfactor)
+                       PIX     *pixth)
 {
 l_int32    i, j, w, h, wpls, wplt, wpld, vals, valt;
 l_uint32  *datas, *datat, *datad, *lines, *linet, *lined;
@@ -831,19 +833,19 @@ PIX       *pixd;
 /*!
  * \brief   pixThresholdByConnComp()
  *
- * \param[in]    pixs depth > 1, colormap OK
- * \param[in]    pixm [optional] 1 bpp mask giving region to ignore by setting
- *                    pixels to white; use NULL if no mask
- * \param[in]    start, end, incr binarization threshold levels to test
- * \param[in]    thresh48 threshold on normalized difference between the
- *                        numbers of 4 and 8 connected components
- * \param[in]    threshdiff threshold on normalized difference between the
- *                          number of 4 cc at successive iterations
- * \param[out]   pglobthresh [optional] best global threshold; 0
- *                           if no threshold is found
- * \param[out]   ppixd [optional] image thresholded to binary, or
- *                     null if no threshold is found
- * \param[in]    debugflag 1 for plotted results
+ * \param[in]    pixs          depth > 1, colormap OK
+ * \param[in]    pixm          [optional] 1 bpp mask giving region to ignore
+ *                             by setting pixels to white; use NULL if no mask
+ * \param[in]    start, end, incr   binarization threshold levels to test
+ * \param[in]    thresh48      threshold on normalized difference between the
+ *                             numbers of 4 and 8 connected components
+ * \param[in]    threshdiff    threshold on normalized difference between the
+ *                             number of 4 cc at successive iterations
+ * \param[out]   pglobthresh   [optional] best global threshold; 0
+ *                             if no threshold is found
+ * \param[out]   ppixd         [optional] image thresholded to binary, or
+ *                             null if no threshold is found
+ * \param[in]    debugflag     1 for plotted results
  * \return  0 if OK, 1 on error or if no threshold is found
  *
  * <pre>

@@ -29,20 +29,26 @@
  *
  *   Syntax:  printtiff filein [printer]
  *
- *   Prints a multipage tiff file to a printer.  If the tiff is
- *   at standard fax resolution, it expands the vertical size
- *   by a factor of two before encapsulating in ccittg4 encoded
- *   PostScript.  The PostScript file is left in /tmp, and
- *   erased (deleted, removed, unlinked) on the next invocation.
+ *   Prints a multipage tiff file of 1 bpp images to a printer.
+ *   If the tiff is at standard fax resolution, it expands the
+ *   vertical size by a factor of two before encapsulating in
+ *   ccittg4 encoded PostScript.  The PostScript file is left in /tmp,
+ *   and erased (deleted, removed, unlinked) on the next invocation.
  *
  *   If the printer is not specified, this just writes the PostScript
- *   file into /tmp.
+ *   file /tmp/print_tiff.ps.
+ *
+ *   If your system does not have lpr, it likely has lp.  You can run
+ *   printtiff to make the PostScript file, and then print with lp:
+ *       lp -d <printer> /tmp/print_tiff.ps
+ *       lp -d <printer> -o ColorModel=Color /tmp/print_tiff.ps
+ *   etc.
  *
  *   ***************************************************************
- *   N.B.  This requires lpr, which is invoked via 'system'.  It could
- *         pose a security vulnerability if used as a service in a
- *         production environment.  Consequently, this program should
- *         only be used for debug and testing.
+ *   N.B.  If a printer is specified, this program invokes lpr via
+ *         "system'.  It could pose a security vulnerability if used
+ *         as a service in a production environment.  Consequently,
+ *         this program should only be used for debug and testing.
  *   ***************************************************************
  */
 

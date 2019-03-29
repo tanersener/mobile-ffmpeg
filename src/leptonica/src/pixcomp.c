@@ -487,7 +487,11 @@ pixcompGetParameters(PIXC     *pixc,
  *      (2) If %comptype == IFF_DEFAULT, this does not necessarily result
  *          in png encoding.  Instead, it returns one of the three formats
  *          that is both valid and most likely to give best compression.
- *      (3) If the pix cannot be compressed by the input value of
+ *      (3) If %d == 8 with no colormap and:
+ *          * you wish to compress with png, use %comptype == IFF_PNG
+ *          * you wish to compress with jpeg, use either
+ *            %comptype == IFF_JFIF_JPEG or %comptype == IFF_DEFAULT.
+ *      (4) If the pix cannot be compressed by the input value of
  *          %comptype, this selects IFF_PNG, which can compress all pix.
  * </pre>
  */

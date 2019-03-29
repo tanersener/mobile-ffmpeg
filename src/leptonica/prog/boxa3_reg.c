@@ -27,10 +27,10 @@
 /*
  *  boxa3_reg.c
  *
- *  Higher-level operations that can search for anomalous sized boxes
+ *  Higher-level operations that can search for anomalous-sized boxes
  *  in a boxa, where the widths and heights of the boxes are expected
  *  to be similar.  These can be corrected by moving the appropriate
- *  sides of the anomalous boxes.
+ *  sides of the outlier boxes.
  */
 
 #include "allheaders.h"
@@ -38,6 +38,7 @@
 static const char  *boxafiles[3] = {"boxap1.ba", "boxap2.ba", "boxap3.ba"};
 
 void static TestBoxa(L_REGPARAMS *rp, l_int32 index);
+void static PlotBoxa(L_REGPARAMS *rp, l_int32 index);
 static l_float32  varp[3] = {0.0165, 0.0432, 0.0716};
 static l_float32  varm[3] = {0.0088, 0.0213, 0.0357};
 static l_int32  same[3] = {1, -1, -1};
@@ -56,9 +57,10 @@ L_REGPARAMS  *rp;
 
     for (i = 0; i < 3; i++)
         TestBoxa(rp, i);
+    for (i = 0; i < 3; i++)
+        PlotBoxa(rp, i);
     return regTestCleanup(rp);
 }
-
 
 void static
 TestBoxa(L_REGPARAMS  *rp,
@@ -109,7 +111,7 @@ PIX       *pix1;
         fprintf(stderr, "dev width = %7.4f, dev height = %7.4f\n", devw, devh);
 
         /* Reconcile widths */
-    boxa3 = boxaReconcileSizeByMedian(boxa2, L_CHECK_WIDTH, 0.05, 1.03,
+    boxa3 = boxaReconcileSizeByMedian(boxa2, L_CHECK_WIDTH, 0.05, 0.04, 1.03,
                                       NULL, NULL, &ratiowh);
     boxaWriteMem(&data, &size, boxa3);
     regTestWriteDataAndCheck(rp, data, size, "ba");  /* 7, 20, 33 */
@@ -123,7 +125,7 @@ PIX       *pix1;
     pixDestroy(&pix1);
 
         /* Reconcile heights */
-    boxa3 = boxaReconcileSizeByMedian(boxa2, L_CHECK_HEIGHT, 0.05, 1.03,
+    boxa3 = boxaReconcileSizeByMedian(boxa2, L_CHECK_HEIGHT, 0.05, 0.04, 1.03,
                                       NULL, NULL, NULL);
     boxaWriteMem(&data, &size, boxa3);
     regTestWriteDataAndCheck(rp, data, size, "ba");  /* 9, 22, 35 */
@@ -135,7 +137,7 @@ PIX       *pix1;
     pixDestroy(&pix1);
 
         /* Reconcile both widths and heights */
-    boxa3 = boxaReconcileSizeByMedian(boxa2, L_CHECK_BOTH, 0.05, 1.03,
+    boxa3 = boxaReconcileSizeByMedian(boxa2, L_CHECK_BOTH, 0.05, 0.04, 1.03,
                                       NULL, NULL, NULL);
     boxaWriteMem(&data, &size, boxa3);
     regTestWriteDataAndCheck(rp, data, size, "ba");  /* 11, 24, 37 */
@@ -148,4 +150,44 @@ PIX       *pix1;
     boxaDestroy(&boxa1);
     boxaDestroy(&boxa2);
     boxaDestroy(&boxa3);
+}
+
+
+void static
+PlotBoxa(L_REGPARAMS  *rp,
+         l_int32       index)
+{
+BOXA  *boxa1, *boxa2;
+PIX   *pix1, *pix2, *pix3;
+PIXA  *pixa;
+
+    boxa1 = boxaRead(boxafiles[index]);
+
+        /* Read and display initial boxa */
+    boxaPlotSizes(boxa1, NULL, NULL, NULL, &pix1);
+    boxaPlotSides(boxa1, NULL, NULL, NULL, NULL, NULL, &pix2);
+    pixa = pixaCreate(2);
+    pixaAddPix(pixa, pix1, L_INSERT);
+    pixaAddPix(pixa, pix2, L_INSERT);
+    pix3 = pixaDisplayTiledInColumns(pixa, 2, 1.0, 20, 2);
+    regTestWritePixAndCheck(rp, pix3, IFF_PNG);  /* 39, 41, 43 */
+    pixDisplayWithTitle(pix3, 0 + 800 * index, 500, NULL, rp->display);
+    pixDestroy(&pix3);
+    pixaDestroy(&pixa);
+
+        /* Read and display reconciled boxa */
+    boxa2 = boxaReconcileSizeByMedian(boxa1, L_CHECK_BOTH, 0.05, 0.04, 1.03,
+                                      NULL, NULL, NULL);
+    boxaPlotSizes(boxa2, NULL, NULL, NULL, &pix1);
+    boxaPlotSides(boxa2, NULL, NULL, NULL, NULL, NULL, &pix2);
+    pixa = pixaCreate(2);
+    pixaAddPix(pixa, pix1, L_INSERT);
+    pixaAddPix(pixa, pix2, L_INSERT);
+    pix3 = pixaDisplayTiledInColumns(pixa, 2, 1.0, 20, 2);
+    regTestWritePixAndCheck(rp, pix3, IFF_PNG);  /* 40, 42, 44 */
+    pixDisplayWithTitle(pix3, 0 + 800 * index, 920, NULL, rp->display);
+    pixDestroy(&pix3);
+    pixaDestroy(&pixa);
+    boxaDestroy(&boxa1);
+    boxaDestroy(&boxa2);
 }

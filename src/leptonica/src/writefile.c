@@ -962,7 +962,7 @@ char            fullpath[_MAX_PATH];
     maxheight = (threeviews) ? MAX_DISPLAY_HEIGHT / 3 : MAX_DISPLAY_HEIGHT;
     if (w <= MAX_DISPLAY_WIDTH && h <= maxheight) {
         if (d == 16)  /* take MSB */
-            pix1 = pixConvert16To8(pix0, 1);
+            pix1 = pixConvert16To8(pix0, L_MS_BYTE);
         else
             pix1 = pixClone(pix0);
     } else {
@@ -1341,8 +1341,8 @@ l_chooseDisplayProg(l_int32  selection)
  *      (6) For 16 bpp, this displays the full dynamic range with log scale.
  *          Alternative image transforms to generate 8 bpp pix are:
  *             pix8 = pixMaxDynamicRange(pixt, L_LINEAR_SCALE);
- *             pix8 = pixConvert16To8(pixt, 0);  // low order byte
- *             pix8 = pixConvert16To8(pixt, 1);  // high order byte
+ *             pix8 = pixConvert16To8(pixt, L_LS_BYTE);  // low order byte
+ *             pix8 = pixConvert16To8(pixt, L_MS_BYTE);  // high order byte
  * </pre>
  */
 l_ok

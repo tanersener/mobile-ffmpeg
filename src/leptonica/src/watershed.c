@@ -295,11 +295,13 @@ L_WSHED  *wshed;
  * \param[in]    wshed generated from wshedCreate()
  * \return  0 if OK, 1 on error
  *
- *  Iportant note:
- *      1 This is buggy.  It seems to locate watersheds that are
+ * <pre>
+ * Notes:
+ *      (1) N.B. This is buggy!  It seems to locate watersheds that are
  *          duplicates.  The watershed extraction after complete fill
  *          grabs some regions belonging to existing watersheds.
  *          See prog/watershedtest.c for testing.
+ * </pre>
  */
 l_ok
 wshedApply(L_WSHED  *wshed)
@@ -538,9 +540,9 @@ PTA      *ptas, *ptao;
  * \brief   wshedSaveBasin()
  *
  * \param[in]    wshed
- * \param[in]    index index of basin to be located
- * \param[in]    level filling level reached at the time this function
- *                     is called
+ * \param[in]    index   index of basin to be located
+ * \param[in]    level   filling level reached at the time this function
+ *                       is called
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -578,10 +580,10 @@ PIX  *pix;
  * \brief   identifyWatershedBasin()
  *
  * \param[in]    wshed
- * \param[in]    index index of basin to be located
- * \param[in]    level of basin at point at which the two basins met
- * \param[out]   pbox bounding box of basin
- * \param[out]   ppixd pix of basin, cropped to its bounding box
+ * \param[in]    index   index of basin to be located
+ * \param[in]    level   of basin at point at which the two basins met
+ * \param[out]   pbox    bounding box of basin
+ * \param[out]   ppixd   pix of basin, cropped to its bounding box
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -688,8 +690,8 @@ L_QUEUE  *lq;
  * \brief   mergeLookup()
  *
  * \param[in]    wshed
- * \param[in]    sindex primary index being changed in the merge
- * \param[in]    dindex index that %sindex will point to after the merge
+ * \param[in]    sindex   primary index being changed in the merge
+ * \param[in]    dindex   index that %sindex will point to after the merge
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -758,11 +760,11 @@ NUMA    **links;
 /*!
  * \brief   wshedGetHeight()
  *
- * \param[in]    wshed array of current indices
- * \param[in]    val value of current pixel popped off queue
- * \param[in]    label of pixel or 32 bpp label image
- * \param[out]   pheight height of current value from seed
- *                       or minimum of watershed
+ * \param[in]    wshed     array of current indices
+ * \param[in]    val       value of current pixel popped off queue
+ * \param[in]    label     of pixel or 32 bpp label image
+ * \param[out]   pheight   height of current value from seed
+ *                         or minimum of watershed
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -801,17 +803,19 @@ l_int32  minval;
 
 
 /*
- *  pushNewPixel()
+ * \brief   pushNewPixel()
  *
- *      Input:  lqueue
- *              x, y   (pixel coordinates)
- *              &minx, &maxx, &miny, &maxy  (<return> bounding box update)
- *      Return: void
+ * \param[in]     lqueue
+ * \param[in]     x, y                          pixel coordinates
+ * \param[out]    pminx, pmaxx, pminy, pmaxy    bounding box update
+ * \return   void
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This is a wrapper for adding a NewPixel to a queue, which
  *          updates the bounding box for all pixels on that queue and
  *          uses the storage stack to retrieve a NewPixel.
+ * </pre>
  */
 static void
 pushNewPixel(L_QUEUE  *lq,
@@ -851,16 +855,18 @@ L_NEWPIXEL  *np;
 
 
 /*
- *  popNewPixel()
+ * \brief   popNewPixel()
  *
- *      Input:  lqueue
- *              &x, &y   (<return> pixel coordinates)
- *      Return: void
+ * \param[in]    lqueue
+ * \param[out]   px, py    pixel coordinates
+ * \return   void
  *
- *   Notes:
- *       (1) This is a wrapper for removing a NewPixel from a queue,
- *           which returns the pixel coordinates and saves the NewPixel
- *           on the storage stack.
+ * <pre>
+ * Notes:
+ *      (1) This is a wrapper for removing a NewPixel from a queue,
+ *          which returns the pixel coordinates and saves the NewPixel
+ *          on the storage stack.
+ * </pre>
  */
 static void
 popNewPixel(L_QUEUE  *lq,
@@ -886,18 +892,20 @@ L_NEWPIXEL  *np;
 
 
 /*
- *  pushWSPixel()
+ * \brief   pushWSPixel()
  *
- *      Input:  lh  (priority queue)
- *              stack  (of reusable WSPixels)
- *              val  (pixel value: used for ordering the heap)
- *              x, y  (pixel coordinates)
- *              index  (label for set to which pixel belongs)
- *      Return: void
+ * \param[in]    lh       priority queue
+ * \param[in]    stack    of reusable WSPixels
+ * \param[in]    val      pixel value: used for ordering the heap
+ * \param[in]    x, y     pixel coordinates
+ * \param[in]    index    label for set to which pixel belongs
+ * \return    void
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) This is a wrapper for adding a WSPixel to a heap.  It
  *          uses the storage stack to retrieve a WSPixel.
+ * </pre>
  */
 static void
 pushWSPixel(L_HEAP   *lh,
@@ -936,19 +944,21 @@ L_WSPIXEL  *wsp;
 
 
 /*
- *  popWSPixel()
+ * \brief  popWSPixel()
  *
- *      Input:  lh  (priority queue)
- *              stack  (of reusable WSPixels)
- *              &val  (<return> pixel value)
- *              &x, &y  (<return> pixel coordinates)
- *              &index  (<return> label for set to which pixel belongs)
- *      Return: void
+ * \param[in]     lh        priority queue
+ * \param[in]     stack     of reusable WSPixels
+ * \param[out]    pval      pixel value
+ * \param[out]    px, py    pixel coordinates
+ * \param[out]    pindex    label for set to which pixel belongs
+ * \return   void
  *
- *   Notes:
- *       (1) This is a wrapper for removing a WSPixel from a heap,
- *           which returns the WSPixel data and saves the WSPixel
- *           on the storage stack.
+ * <pre>
+ * Notes:
+ *      (1) This is a wrapper for removing a WSPixel from a heap,
+ *          which returns the WSPixel data and saves the WSPixel
+ *          on the storage stack.
+ * </pre>
  */
 static void
 popWSPixel(L_HEAP   *lh,
@@ -1026,7 +1036,7 @@ debugWshedMerge(L_WSHED *wshed,
  * \brief   wshedBasins()
  *
  * \param[in]    wshed
- * \param[out]   ppixa  [optional] mask of watershed basins
+ * \param[out]   ppixa       [optional] mask of watershed basins
  * \param[out]   pnalevels   [optional] watershed levels
  * \return  0 if OK, 1 on error
  */
@@ -1052,7 +1062,7 @@ wshedBasins(L_WSHED  *wshed,
  * \brief   wshedRenderFill()
  *
  * \param[in]    wshed
- * \return  pixd initial image with all basins filled, or NULL on error
+ * \return  pixd   initial image with all basins filled, or NULL on error
  */
 PIX *
 wshedRenderFill(L_WSHED  *wshed)
@@ -1088,7 +1098,7 @@ PIXA    *pixa;
  * \brief   wshedRenderColors()
  *
  * \param[in]    wshed
- * \return  pixd initial image with all basins filled, or NULL on error
+ * \return  pixd   initial image with all basins filled, or null on error
  */
 PIX *
 wshedRenderColors(L_WSHED  *wshed)

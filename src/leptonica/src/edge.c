@@ -67,9 +67,9 @@
 /*!
  * \brief   pixSobelEdgeFilter()
  *
- * \param[in]    pixs 8 bpp; no colormap
- * \param[in]    orientflag L_HORIZONTAL_EDGES, L_VERTICAL_EDGES, L_ALL_EDGES
- * \return  pixd 8 bpp, edges are brighter, or NULL on error
+ * \param[in]    pixs         8 bpp; no colormap
+ * \param[in]    orientflag   L_HORIZONTAL_EDGES, L_VERTICAL_EDGES, L_ALL_EDGES
+ * \return  pixd   8 bpp, edges are brighter, or NULL on error
  *
  * <pre>
  * Notes:
@@ -170,9 +170,9 @@ PIX       *pixt, *pixd;
 /*!
  * \brief   pixTwoSidedEdgeFilter()
  *
- * \param[in]    pixs 8 bpp; no colormap
- * \param[in]    orientflag L_HORIZONTAL_EDGES, L_VERTICAL_EDGES
- * \return  pixd 8 bpp, edges are brighter, or NULL on error
+ * \param[in]    pixs         8 bpp; no colormap
+ * \param[in]    orientflag   L_HORIZONTAL_EDGES, L_VERTICAL_EDGES
+ * \return  pixd    8 bpp, edges are brighter, or NULL on error
  *
  * <pre>
  * Notes:
@@ -273,20 +273,20 @@ PIX       *pixd;
 /*!
  * \brief   pixMeasureEdgeSmoothness()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    side L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT
- * \param[in]    minjump minimum jump to be counted; >= 1
- * \param[in]    minreversal minimum reversal size for new peak or valley
- * \param[out]   pjpl [optional] jumps/length: number of jumps,
- *                    normalized to length of component side
- * \param[out]   pjspl [optional] jumpsum/length: sum of all
- *                     sufficiently large jumps, normalized to length
- *                     of component side
- * \param[out]   prpl [optional] reversals/length: number of
- *                    peak-to-valley or valley-to-peak reversals,
- *                    normalized to length of component side
- * \param[in]    debugfile [optional] displays constructed edge; use NULL
- *                         for no output
+ * \param[in]    pixs          1 bpp
+ * \param[in]    side          L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT
+ * \param[in]    minjump       minimum jump to be counted; >= 1
+ * \param[in]    minreversal   minimum reversal size for new peak or valley
+ * \param[out]   pjpl          [optional] jumps/length: number of jumps,
+ *                             normalized to length of component side
+ * \param[out]   pjspl         [optional] jumpsum/length: sum of all
+ *                             sufficiently large jumps, normalized to length
+ *                             of component side
+ * \param[out]   prpl          [optional] reversals/length: number of
+ *                             peak-to-valley or valley-to-peak reversals,
+ *                             normalized to length of component side
+ * \param[in]    debugfile     [optional] displays constructed edge; use NULL
+ *                             for no output
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -376,11 +376,11 @@ NUMA    *na, *nae;
 /*!
  * \brief   pixGetEdgeProfile()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    side L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT
- * \param[in]    debugfile [optional] displays constructed edge; use NULL
- *                         for no output
- * \return  na of fg edge pixel locations, or NULL on error
+ * \param[in]    pixs        1 bpp
+ * \param[in]    side        L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT
+ * \param[in]    debugfile   [optional] displays constructed edge; use NULL
+ *                           for no output
+ * \return  na   of fg edge pixel locations, or NULL on error
  */
 NUMA *
 pixGetEdgeProfile(PIX         *pixs,
@@ -492,16 +492,17 @@ PIXCMAP  *cmap;
 
 
 /*
- *  pixGetLastOffPixelInRun()
+ * \brief   pixGetLastOffPixelInRun()
  *
- *      Input:  pixs (1 bpp)
- *              x, y (starting location)
- *              direction (L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT)
- *              &loc (<return> location in scan direction coordinate
- *                    of last OFF pixel found)
- *      Return: na (of fg edge pixel locations), or NULL on error
+ * \param[in]    pixs        1 bpp
+ * \param[in]    x, y        starting location
+ * \param[in]    direction   L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT
+ * \param[out]   ploc        location in scan direction coordinate
+ *                           of last OFF pixel found
+ * \return   0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) Search starts from the pixel at (x, y), which is OFF.
  *      (2) It returns the location in the scan direction of the last
  *          pixel in the current run that is OFF.
@@ -510,8 +511,9 @@ PIXCMAP  *cmap;
  *          first pixel of opposite polarity that is found, because the
  *          current run may go to the edge of the image, in which case
  *          no pixel of opposite polarity is found.
+ * </pre>
  */
-l_int32
+l_ok
 pixGetLastOffPixelInRun(PIX      *pixs,
                         l_int32   x,
                         l_int32   y,
@@ -569,19 +571,21 @@ l_uint32  val;
 
 
 /*
- *  pixGetLastOnPixelInRun()
+ * \brief   pixGetLastOnPixelInRun()
  *
- *      Input:  pixs (1 bpp)
- *              x, y (starting location)
- *              direction (L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT)
- *              &loc (<return> location in scan direction coordinate
- *                    of first ON pixel found)
- *      Return: na (of fg edge pixel locations), or NULL on error
+ * \param[in]    pixs        1 bpp
+ * \param[in]    x, y        starting location
+ * \param[in]    direction   L_FROM_LEFT, L_FROM_RIGHT, L_FROM_TOP, L_FROM_BOT
+ * \param[out]   ploc        location in scan direction coordinate
+ *                           of first ON pixel found
+ * \return  0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) Search starts from the pixel at (x, y), which is ON.
  *      (2) It returns the location in the scan direction of the last
  *          pixel in the current run that is ON.
+ * </pre>
  */
 l_int32
 pixGetLastOnPixelInRun(PIX      *pixs,

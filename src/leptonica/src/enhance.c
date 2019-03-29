@@ -45,6 +45,7 @@
  *
  *      Generic TRC mapper
  *           PIX     *pixTRCMap()
+ *           PIX     *pixTRCMapGeneral()
  *
  *      Unsharp-masking
  *           PIX     *pixUnsharpMasking()
@@ -168,6 +169,8 @@ static const l_int32  DEFAULT_HISTO_SAMPLES = 100000;
  *           will darken the image and make the colors more intense;
  *           e.g., minval = 50, maxval = 200.
  *      (11) See numaGammaTRC() for further examples of use.
+ *      (12) Use pixTRCMapGeneral() if applying different mappings
+ *           to each channel in an RGB image.
  * </pre>
  */
 PIX *
@@ -873,6 +876,101 @@ l_uint32  *data, *datam, *line, *linem, *tab;
     }
 
     LEPT_FREE(tab);
+    return 0;
+}
+
+
+/*!
+ * \brief   pixTRCMapGeneral()
+ *
+ * \param[in]    pixs             32 bpp rgb; not colormapped
+ * \param[in]    pixm             [optional] 1 bpp mask
+ * \param[in]    nar, nag, nab    mapping arrays
+ * \return  pixd, or NULL on error
+ *
+ * <pre>
+ * Notes:
+ *      (1) This operation is in-place on %pixs.
+ *      (2) Each of the r,g,b mapping arrays is of size 256. They map the
+ *          input value for that color component into values in the
+ *          range [0, 255].
+ *      (3) In the special case where the r, g and b mapping arrays are
+ *          all the same, call pixTRCMap() instead.
+ *      (4) If defined, the optional 1 bpp mask %pixm has its origin
+ *          aligned with %pixs, and the map function is applied only
+ *          to pixels in %pixs under the fg of pixm.
+ *      (5) The alpha channel is not saved.
+ * </pre>
+ */
+l_int32
+pixTRCMapGeneral(PIX   *pixs,
+                 PIX   *pixm,
+                 NUMA  *nar,
+                 NUMA  *nag,
+                 NUMA  *nab)
+{
+l_int32    w, h, wm, hm, wpl, wplm, i, j;
+l_uint32   sval32, dval32;
+l_uint32  *data, *datam, *line, *linem, *tabr, *tabg, *tabb;
+
+    PROCNAME("pixTRCMapGeneral");
+
+    if (!pixs || pixGetDepth(pixs) != 32)
+        return ERROR_INT("pixs not defined or not 32 bpp", procName, 1);
+    if (pixm && pixGetDepth(pixm) != 1)
+        return ERROR_INT("pixm defined and not 1 bpp", procName, 1);
+    if (!nar || !nag || !nab)
+        return ERROR_INT("na{r,g,b} not all defined", procName, 1);
+    if (numaGetCount(nar) != 256 || numaGetCount(nag) != 256 ||
+        numaGetCount(nab) != 256)
+        return ERROR_INT("na{r,g,b} not all of size 256", procName, 1);
+
+        /* Get the arrays for efficiency */
+    tabr = (l_uint32 *)numaGetIArray(nar);
+    tabg = (l_uint32 *)numaGetIArray(nag);
+    tabb = (l_uint32 *)numaGetIArray(nab);
+    pixGetDimensions(pixs, &w, &h, NULL);
+    wpl = pixGetWpl(pixs);
+    data = pixGetData(pixs);
+    if (!pixm) {
+        for (i = 0; i < h; i++) {
+            line = data + i * wpl;
+            for (j = 0; j < w; j++) {
+                sval32 = *(line + j);
+                dval32 =
+                    tabr[(sval32 >> L_RED_SHIFT) & 0xff] << L_RED_SHIFT |
+                    tabg[(sval32 >> L_GREEN_SHIFT) & 0xff] << L_GREEN_SHIFT |
+                    tabb[(sval32 >> L_BLUE_SHIFT) & 0xff] << L_BLUE_SHIFT;
+                *(line + j) = dval32;
+            }
+        }
+    } else {
+        datam = pixGetData(pixm);
+        wplm = pixGetWpl(pixm);
+        pixGetDimensions(pixm, &wm, &hm, NULL);
+        for (i = 0; i < h; i++) {
+            if (i >= hm)
+                break;
+            line = data + i * wpl;
+            linem = datam + i * wplm;
+            for (j = 0; j < w; j++) {
+                if (j >= wm)
+                    break;
+                if (GET_DATA_BIT(linem, j) == 0)
+                    continue;
+                sval32 = *(line + j);
+                dval32 =
+                    tabr[(sval32 >> L_RED_SHIFT) & 0xff] << L_RED_SHIFT |
+                    tabg[(sval32 >> L_GREEN_SHIFT) & 0xff] << L_GREEN_SHIFT |
+                    tabb[(sval32 >> L_BLUE_SHIFT) & 0xff] << L_BLUE_SHIFT;
+                *(line + j) = dval32;
+            }
+        }
+    }
+
+    LEPT_FREE(tabr);
+    LEPT_FREE(tabg);
+    LEPT_FREE(tabb);
     return 0;
 }
 

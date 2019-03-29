@@ -5,14 +5,14 @@ LDADD = $(top_builddir)/src/liblept.la $(LIBM)
  
 INSTALL_PROGS = convertfilestopdf convertfilestops \
 	convertformat convertsegfilestopdf convertsegfilestops \
-	converttopdf converttops fileinfo xtractprotos
+	converttopdf converttops fileinfo imagetops xtractprotos
 
 AUTO_REG_PROGS = adaptmap_reg adaptnorm_reg affine_reg alphaops_reg \
 	alphaxform_reg baseline_reg bilateral2_reg \
 	bilinear_reg binarize_reg \
 	binmorph1_reg binmorph3_reg blackwhite_reg \
 	blend1_reg blend2_reg blend3_reg blend4_reg blend5_reg \
-	boxa1_reg boxa2_reg boxa3_reg bytea_reg \
+	boxa1_reg boxa2_reg boxa3_reg boxa4_reg bytea_reg \
 	ccthin1_reg ccthin2_reg cmapquant_reg \
 	colorcontent_reg coloring_reg colorize_reg \
 	colormask_reg colormorph_reg colorquant_reg \
@@ -42,8 +42,8 @@ AUTO_REG_PROGS = adaptmap_reg adaptnorm_reg affine_reg alphaops_reg \
 	rank_reg rasteropip_reg rasterop_reg \
 	rotate1_reg rotate2_reg rotateorth_reg \
 	scale_reg seedspread_reg \
-	selio_reg shear1_reg shear2_reg \
-	skew_reg speckle_reg splitcomp_reg subpixel_reg \
+	selio_reg shear1_reg shear2_reg skew_reg \
+	speckle_reg splitcomp_reg string_reg subpixel_reg \
 	texturefill_reg threshnorm_reg translate_reg \
 	warper_reg watershed_reg wordboxes_reg \
 	writetext_reg xformbox_reg
@@ -66,7 +66,7 @@ MANUAL_REG_PROGS = alltests_reg bilateral1_reg \
 	files_reg flipdetect_reg fmorphauto_reg \
 	heap_reg morphseq_reg pixa1_reg \
 	pixalloc_reg pixtile_reg \
-	smallpix_reg smoothedge_reg string_reg
+	smallpix_reg smoothedge_reg
 
 OTHER_PROGS = adaptmap_dark \
 	arabic_lines arithtest \

@@ -413,7 +413,7 @@ static const l_int32     DEFAULT_MIN_LINES = 15;
 static const l_int32     MIN_MIN_LINES = 4;
 static const l_int32     DEFAULT_MAX_REF_DIST = 16;
 static const l_int32     DEFAULT_USE_BOTH = TRUE;
-static const l_int32     DEFAULT_CHECK_COLUMNS = FALSE;
+static const l_int32     DEFAULT_CHECK_COLUMNS = TRUE;
 
     /* Parameter values used in dewarpaSetCurvatures() */
 static const l_int32     DEFAULT_MAX_LINECURV = 180;

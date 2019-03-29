@@ -70,9 +70,9 @@ static const l_int32  ZLIB_COMPRESSION_LEVEL = 6;
 /*!
  * \brief   zlibCompress()
  *
- * \param[in]    datain byte buffer with input data
- * \param[in]    nin    number of bytes of input data
- * \param[out]   pnout  number of bytes of output data
+ * \param[in]    datain    byte buffer with input data
+ * \param[in]    nin       number of bytes of input data
+ * \param[out]   pnout     number of bytes of output data
  * \return  dataout compressed data, or NULL on error
  *
  * <pre>
@@ -184,9 +184,9 @@ cleanup_arrays:
 /*!
  * \brief   zlibUncompress()
  *
- * \param[in]    datain byte buffer with compressed input data
- * \param[in]    nin    number of bytes of input data
- * \param[out]   pnout  number of bytes of output data
+ * \param[in]    datain    byte buffer with compressed input data
+ * \param[in]    nin       number of bytes of input data
+ * \param[out]   pnout     number of bytes of output data
  * \return  dataout uncompressed data, or NULL on error
  *
  * <pre>

@@ -3094,11 +3094,10 @@ NUMA    *nas;
     *pval = 0.0;  /* init */
     if (!na)
         return ERROR_INT("na not defined", procName, 1);
+    if ((n = numaGetCount(na)) == 0)
+        return ERROR_INT("na empty", procName, 1);
     if (fract < 0.0 || fract > 1.0)
         return ERROR_INT("fract not in [0.0 ... 1.0]", procName, 1);
-    n = numaGetCount(na);
-    if (n == 0)
-        return ERROR_INT("na empty", procName, 1);
 
     if (nasort) {
         nas = nasort;
