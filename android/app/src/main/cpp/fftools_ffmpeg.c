@@ -1102,6 +1102,7 @@ static void do_video_out(OutputFile *of,
 
     if (!ost->filters_script &&
         !ost->filters &&
+        (nb_filtergraphs == 0 || !filtergraphs[0]->graph_desc) &&
         next_picture &&
         ist &&
         lrintf(next_picture->pkt_duration * av_q2d(ist->st->time_base) / av_q2d(enc->time_base)) > 0) {
@@ -1219,6 +1220,8 @@ static void do_video_out(OutputFile *of,
   /* duplicates frame if needed */
   for (i = 0; i < nb_frames; i++) {
     AVFrame *in_picture;
+        int forced_keyframe = 0;
+        double pts_time;
     av_init_packet(&pkt);
     pkt.data = NULL;
     pkt.size = 0;
@@ -1233,16 +1236,8 @@ static void do_video_out(OutputFile *of,
 
     in_picture->pts = ost->sync_opts;
 
-#if 1
     if (!check_recording_time(ost))
-#else
-    if (ost->frame_number >= ost->max_frames)
-#endif
         return;
-
-    {
-        int forced_keyframe = 0;
-        double pts_time;
 
         if (enc->flags & (AV_CODEC_FLAG_INTERLACED_DCT | AV_CODEC_FLAG_INTERLACED_ME) &&
             ost->top_field_first >= 0)
@@ -1315,6 +1310,8 @@ static void do_video_out(OutputFile *of,
         ret = avcodec_send_frame(enc, in_picture);
         if (ret < 0)
             goto error;
+        // Make sure Closed Captions will not be duplicated
+        av_frame_remove_side_data(in_picture, AV_FRAME_DATA_A53_CC);
 
         while (1) {
             ret = avcodec_receive_packet(enc, &pkt);
@@ -1351,7 +1348,6 @@ static void do_video_out(OutputFile *of,
                 fprintf(ost->logfile, "%s", enc->stats_out);
             }
         }
-    }
     ost->sync_opts++;
     /*
      * For video, number of frames in == number of packets out.
@@ -1515,8 +1511,6 @@ static int reap_filters(int flush)
                     av_rescale_q(filtered_frame->pts, filter_tb, enc->time_base) -
                     av_rescale_q(start_time, AV_TIME_BASE_Q, enc->time_base);
             }
-            //if (ost->source_index >= 0)
-            //    *filtered_frame= *input_streams[ost->source_index]->decoded_frame; //for me_threshold
 
             switch (av_buffersink_get_type(filter)) {
             case AVMEDIA_TYPE_VIDEO:
@@ -2247,9 +2241,6 @@ static int ifilter_send_frame(InputFilter *ifilter, AVFrame *frame)
 
     /* determine if the parameters for this input changed */
     need_reinit = ifilter->format != frame->format;
-    if (!!ifilter->hw_frames_ctx != !!frame->hw_frames_ctx ||
-        (ifilter->hw_frames_ctx && ifilter->hw_frames_ctx->data != frame->hw_frames_ctx->data))
-        need_reinit = 1;
 
     switch (ifilter->ist->st->codecpar->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
@@ -2262,6 +2253,13 @@ static int ifilter_send_frame(InputFilter *ifilter, AVFrame *frame)
                        ifilter->height != frame->height;
         break;
     }
+
+    if (!ifilter->ist->reinit_filters && fg->graph)
+        need_reinit = 0;
+
+    if (!!ifilter->hw_frames_ctx != !!frame->hw_frames_ctx ||
+        (ifilter->hw_frames_ctx && ifilter->hw_frames_ctx->data != frame->hw_frames_ctx->data))
+        need_reinit = 1;
 
     if (need_reinit) {
         ret = ifilter_parameters_from_frame(ifilter, frame);
@@ -2427,14 +2425,12 @@ static int decode_audio(InputStream *ist, AVPacket *pkt, int *got_output,
     ist->samples_decoded += decoded_frame->nb_samples;
     ist->frames_decoded++;
 
-#if 1
     /* increment next_dts to use for the case where the input stream does not
        have timestamps or there are multiple frames in the packet */
     ist->next_pts += ((int64_t)AV_TIME_BASE * decoded_frame->nb_samples) /
                      avctx->sample_rate;
     ist->next_dts += ((int64_t)AV_TIME_BASE * decoded_frame->nb_samples) /
                      avctx->sample_rate;
-#endif
 
     if (decoded_frame->pts != AV_NOPTS_VALUE) {
         decoded_frame_tb   = ist->st->time_base;
@@ -3457,7 +3453,7 @@ static int init_output_stream_encode(OutputStream *ost)
                    "if you want a different framerate.\n",
                    ost->file_index, ost->index);
         }
-//      ost->frame_rate = ist->st->avg_frame_rate.num ? ist->st->avg_frame_rate : (AVRational){25, 1};
+
         if (ost->enc->supported_framerates && !ost->force_fps) {
             int idx = av_find_nearest_q_idx(ost->frame_rate, ost->enc->supported_framerates);
             ost->frame_rate = ost->enc->supported_framerates[idx];
@@ -4588,7 +4584,10 @@ static int process_input(int file_index)
                 pkt_dts + AV_TIME_BASE/10 < FFMAX(ist->pts, ist->dts)) {
                 ifile->ts_offset -= delta;
                 av_log(NULL, AV_LOG_DEBUG,
-                       "timestamp discontinuity %"PRId64", new offset= %"PRId64"\n",
+                       "timestamp discontinuity for stream #%d:%d "
+                       "(id=%d, type=%s): %"PRId64", new offset= %"PRId64"\n",
+                       ist->file_index, ist->st->index, ist->st->id,
+                       av_get_media_type_string(ist->dec_ctx->codec_type),
                        delta, ifile->ts_offset);
                 pkt.dts -= av_rescale_q(delta, AV_TIME_BASE_Q, ist->st->time_base);
                 if (pkt.pts != AV_NOPTS_VALUE)
@@ -5040,11 +5039,6 @@ int execute(int argc, char **argv)
             av_log(NULL, AV_LOG_FATAL, "At least one output file must be specified\n");
             exit_program(1);
         }
-
-    //     if (nb_input_files == 0) {
-    //         av_log(NULL, AV_LOG_FATAL, "At least one input file must be specified\n");
-    //         exit_program(1);
-    //     }
 
         for (i = 0; i < nb_output_files; i++) {
             if (strcmp(output_files[i]->ctx->oformat->name, "rtp"))
