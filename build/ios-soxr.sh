@@ -59,7 +59,7 @@ cmake -Wno-dev \
     -DCMAKE_SYSTEM_NAME=Generic \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
-    -DCMAKE_AR="$AR" \
+    -DCMAKE_AR="$(xcrun --sdk $(get_sdk_name) -f ar)" \
     -DCMAKE_AS="$AS" \
     -DBUILD_TESTS=0 \
     -DWITH_DEV_TRACE=0 \

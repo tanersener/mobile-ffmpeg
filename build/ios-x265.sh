@@ -119,7 +119,7 @@ cmake -Wno-dev \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_CXX_COMPILER="$CXX" \
     -DCMAKE_LINKER="$LD" \
-    -DCMAKE_AR="$AR" \
+    -DCMAKE_AR="$(xcrun --sdk $(get_sdk_name) -f ar)" \
     -DCMAKE_AS="$AS" \
     -DSTATIC_LINK_CRT=1 \
     -DENABLE_PIC=1 \

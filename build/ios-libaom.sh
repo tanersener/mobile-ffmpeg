@@ -89,7 +89,7 @@ cmake -Wno-dev \
     -DCMAKE_CXX_COMPILER="$CXX" \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
-    -DCMAKE_AR="$AR" \
+    -DCMAKE_AR="$(xcrun --sdk $(get_sdk_name) -f ar)" \
     -DCMAKE_AS="$AS" \
     -DCMAKE_TOOLCHAIN_FILE=${TOOLCHAIN_FILE} \
     ${ARCH_OPTIONS} \

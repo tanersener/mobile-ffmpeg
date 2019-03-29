@@ -305,6 +305,9 @@ get_app_specific_cflags() {
         ffmpeg)
             APP_FLAGS="-Wno-unused-function -Wno-deprecated-declarations"
         ;;
+        jpeg)
+            APP_FLAGS="-Wno-nullability-completeness"
+        ;;
         kvazaar)
             APP_FLAGS="-std=gnu99 -Wno-unused-function"
         ;;
@@ -1026,10 +1029,10 @@ set_toolchain_clang_paths() {
 
     TARGET_HOST=$(get_target_host)
     
-    export AR="$(xcrun --sdk $(get_sdk_name) -f ar)"
-    export CC="$(xcrun --sdk $(get_sdk_name) -f clang)"
-    export OBJC="$(xcrun --sdk $(get_sdk_name) -f clang)"
-    export CXX="$(xcrun --sdk $(get_sdk_name) -f clang++)"
+    export AR="ar"
+    export CC="clang"
+    export OBJC="clang"
+    export CXX="clang++"
 
     LOCAL_ASMFLAGS="$(get_asmflags $1)"
     case ${ARCH} in
@@ -1056,9 +1059,9 @@ set_toolchain_clang_paths() {
         ;;
     esac
 
-    export LD="$(xcrun --sdk $(get_sdk_name) -f ld)"
-    export RANLIB="$(xcrun --sdk $(get_sdk_name) -f ranlib)"
-    export STRIP="$(xcrun --sdk $(get_sdk_name) -f strip)"
+    export LD="ld"
+    export RANLIB="ranlib"
+    export STRIP="strip"
 
     export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
