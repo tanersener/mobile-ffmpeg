@@ -173,6 +173,7 @@ model {
             include "cost.c"
             include "cost_mips32.c"
             include "cost_mips_dsp_r2.c"
+            include "cost_neon.$NEON"
             include "cost_sse2.c"
             include "enc.c"
             include "enc_mips32.c"

@@ -40,6 +40,7 @@ ENC_SOURCES =
 ENC_SOURCES += cost.c
 ENC_SOURCES += enc.c
 ENC_SOURCES += lossless_enc.c
+ENC_SOURCES += quant.h
 ENC_SOURCES += ssim.c
 
 libwebpdspdecode_sse41_la_SOURCES =
@@ -121,6 +122,7 @@ libwebpdsp_sse41_la_CFLAGS = $(AM_CFLAGS) $(SSE41_FLAGS)
 libwebpdsp_sse41_la_LIBADD = libwebpdspdecode_sse41.la
 
 libwebpdsp_neon_la_SOURCES =
+libwebpdsp_neon_la_SOURCES += cost_neon.c
 libwebpdsp_neon_la_SOURCES += enc_neon.c
 libwebpdsp_neon_la_SOURCES += lossless_enc_neon.c
 libwebpdsp_neon_la_CPPFLAGS = $(libwebpdsp_la_CPPFLAGS)

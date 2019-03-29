@@ -33,6 +33,16 @@ CFLAGS=$(get_cflags ${LIB_NAME})
 CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 LDFLAGS=$(get_ldflags ${LIB_NAME})
 
+SIMD_OPTIONS=""
+case ${ARCH} in
+    arm-v7a)
+        SIMD_OPTIONS="-DWEBP_ENABLE_SIMD=OFF"
+    ;;
+    *)
+        SIMD_OPTIONS="-DWEBP_ENABLE_SIMD=ON"
+    ;;
+esac
+
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 if [ -d "build" ]; then
@@ -85,12 +95,13 @@ cmake -Wno-dev \
     -DWEBP_BUILD_IMG2WEBP=0 \
     -DWEBP_BUILD_WEBPMUX=0 \
     -DWEBP_BUILD_WEBPINFO=0 \
+    ${SIMD_OPTIONS} \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_cmake_target_processor) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libwebp_package_config "1.0.1"
+create_libwebp_package_config "1.0.2"
 
 make install || exit 1

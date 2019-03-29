@@ -1,5 +1,5 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
-.TH CWEBP 1 "January 20, 2017"
+.TH CWEBP 1 "January 11, 2019"
 .SH NAME
 cwebp \- compress an image file to a WebP file
 .SH SYNOPSIS
@@ -41,10 +41,12 @@ the invisible pixel values (R/G/B or Y/U/V) will be preserved only if the
 \-exact option is used.
 .TP
 .BI \-near_lossless " int
-Use near\-lossless image preprocessing. This option adjusts pixel values
-to help compressibility, but has minimal impact on the visual quality.
-It triggers lossless compression mode automatically.
-Range is 0 (maximum preprocessing) to 100 (no preprocessing, the default).
+Specify the level of near\-lossless image preprocessing. This option adjusts
+pixel values to help compressibility, but has minimal impact on the visual
+quality. It triggers lossless compression mode automatically. The range is 0
+(maximum preprocessing) to 100 (no preprocessing, the default). The typical
+value is around 60. Note that lossy with \fB\-q 100\fP can at times yield
+better results.
 .TP
 .BI \-q " float
 Specify the compression factor for RGB channels between 0 and 100. The default

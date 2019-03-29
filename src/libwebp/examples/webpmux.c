@@ -62,6 +62,7 @@
 #include "webp/mux.h"
 #include "../examples/example_util.h"
 #include "../imageio/imageio_util.h"
+#include "./unicode.h"
 
 //------------------------------------------------------------------------------
 // Config object to parse command-line arguments.
@@ -390,23 +391,25 @@ static int CreateMux(const char* const filename, WebPMux** mux) {
   *mux = WebPMuxCreate(&bitstream, 1);
   WebPDataClear(&bitstream);
   if (*mux != NULL) return 1;
-  fprintf(stderr, "Failed to create mux object from file %s.\n", filename);
+  WFPRINTF(stderr, "Failed to create mux object from file %s.\n",
+           (const W_CHAR*)filename);
   return 0;
 }
 
 static int WriteData(const char* filename, const WebPData* const webpdata) {
   int ok = 0;
-  FILE* fout = strcmp(filename, "-") ? fopen(filename, "wb")
-                                     : ImgIoUtilSetBinaryMode(stdout);
+  FILE* fout = WSTRCMP(filename, "-") ? WFOPEN(filename, "wb")
+                                      : ImgIoUtilSetBinaryMode(stdout);
   if (fout == NULL) {
-    fprintf(stderr, "Error opening output WebP file %s!\n", filename);
+    WFPRINTF(stderr, "Error opening output WebP file %s!\n",
+             (const W_CHAR*)filename);
     return 0;
   }
   if (fwrite(webpdata->bytes, webpdata->size, 1, fout) != 1) {
-    fprintf(stderr, "Error writing file %s!\n", filename);
+    WFPRINTF(stderr, "Error writing file %s!\n", (const W_CHAR*)filename);
   } else {
-    fprintf(stderr, "Saved file %s (%d bytes)\n",
-            filename, (int)webpdata->size);
+    WFPRINTF(stderr, "Saved file %s (%d bytes)\n",
+             (const W_CHAR*)filename, (int)webpdata->size);
     ok = 1;
   }
   if (fout != stdout) fclose(fout);
@@ -612,13 +615,16 @@ static int ValidateCommandLine(const CommandLineArguments* const cmd_args,
   CHECK_NUM_ARGS_AT_MOST(NUM, LABEL);
 
 // Parses command-line arguments to fill up config object. Also performs some
-// semantic checks.
-static int ParseCommandLine(Config* config) {
+// semantic checks. unicode_argv contains wchar_t arguments or is null.
+static int ParseCommandLine(Config* config, const W_CHAR** const unicode_argv) {
   int i = 0;
   int feature_arg_index = 0;
   int ok = 1;
   int argc = config->cmd_args_.argc_;
   const char* const* argv = config->cmd_args_.argv_;
+  // Unicode file paths will be used if available.
+  const char* const* wargv =
+      (unicode_argv != NULL) ? (const char**)(unicode_argv + 1) : argv;
 
   while (i < argc) {
     FeatureArg* const arg = &config->args_[feature_arg_index];
@@ -696,7 +702,7 @@ static int ParseCommandLine(Config* config) {
         i += 2;
       } else if (!strcmp(argv[i], "-o")) {
         CHECK_NUM_ARGS_AT_LEAST(2, ErrParse);
-        config->output_ = argv[i + 1];
+        config->output_ = wargv[i + 1];
         i += 2;
       } else if (!strcmp(argv[i], "-info")) {
         CHECK_NUM_ARGS_EXACTLY(2, ErrParse);
@@ -705,24 +711,26 @@ static int ParseCommandLine(Config* config) {
         } else {
           config->action_type_ = ACTION_INFO;
           config->arg_count_ = 0;
-          config->input_ = argv[i + 1];
+          config->input_ = wargv[i + 1];
         }
         i += 2;
       } else if (!strcmp(argv[i], "-h") || !strcmp(argv[i], "-help")) {
         PrintHelp();
         DeleteConfig(config);
+        LOCAL_FREE((W_CHAR** const)unicode_argv);
         exit(0);
       } else if (!strcmp(argv[i], "-version")) {
         const int version = WebPGetMuxVersion();
         printf("%d.%d.%d\n",
                (version >> 16) & 0xff, (version >> 8) & 0xff, version & 0xff);
         DeleteConfig(config);
+        LOCAL_FREE((W_CHAR** const)unicode_argv);
         exit(0);
       } else if (!strcmp(argv[i], "--")) {
         if (i < argc - 1) {
           ++i;
           if (config->input_ == NULL) {
-            config->input_ = argv[i];
+            config->input_ = wargv[i];
           } else {
             ERROR_GOTO2("ERROR at '%s': Multiple input files specified.\n",
                         argv[i], ErrParse);
@@ -747,7 +755,7 @@ static int ParseCommandLine(Config* config) {
         }
         if (config->action_type_ == ACTION_SET) {
           CHECK_NUM_ARGS_AT_LEAST(2, ErrParse);
-          arg->filename_ = argv[i + 1];
+          arg->filename_ = wargv[i + 1];
           ++feature_arg_index;
           i += 2;
         } else {
@@ -762,7 +770,7 @@ static int ParseCommandLine(Config* config) {
         i += 2;
       } else {  // Assume input file.
         if (config->input_ == NULL) {
-          config->input_ = argv[i];
+          config->input_ = wargv[i];
         } else {
           ERROR_GOTO2("ERROR at '%s': Multiple input files specified.\n",
                       argv[i], ErrParse);
@@ -808,8 +816,8 @@ static int ValidateConfig(Config* const config) {
 }
 
 // Create config object from command-line arguments.
-static int InitializeConfig(int argc, const char* argv[],
-                            Config* const config) {
+static int InitializeConfig(int argc, const char* argv[], Config* const config,
+                            const W_CHAR** const unicode_argv) {
   int num_feature_args = 0;
   int ok;
 
@@ -830,7 +838,7 @@ static int InitializeConfig(int argc, const char* argv[],
   }
 
   // Parse command-line.
-  if (!ParseCommandLine(config) || !ValidateConfig(config)) {
+  if (!ParseCommandLine(config, unicode_argv) || !ValidateConfig(config)) {
     ERROR_GOTO1("Exiting due to command-line parsing error.\n", Err1);
   }
 
@@ -1140,14 +1148,18 @@ static int Process(const Config* config) {
 
 int main(int argc, const char* argv[]) {
   Config config;
-  int ok = InitializeConfig(argc - 1, argv + 1, &config);
+  int ok;
+
+  INIT_WARGV(argc, argv);
+
+  ok = InitializeConfig(argc - 1, argv + 1, &config, GET_WARGV_OR_NULL());
   if (ok) {
     ok = Process(&config);
   } else {
     PrintHelp();
   }
   DeleteConfig(&config);
-  return !ok;
+  FREE_WARGV_AND_RETURN(!ok);
 }
 
 //------------------------------------------------------------------------------

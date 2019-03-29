@@ -26,6 +26,7 @@
 #include "webp/encode.h"
 #include "imageio/image_dec.h"
 #include "imageio/imageio_util.h"
+#include "../examples/unicode.h"
 
 static size_t ReadPicture(const char* const filename, WebPPicture* const pic,
                           int keep_alpha) {
@@ -48,7 +49,8 @@ static size_t ReadPicture(const char* const filename, WebPPicture* const pic,
 
  End:
   if (!ok) {
-    fprintf(stderr, "Error! Could not process file %s\n", filename);
+    WFPRINTF(stderr, "Error! Could not process file %s\n",
+             (const W_CHAR*)filename);
   }
   free((void*)data);
   return ok ? data_size : 0;
@@ -239,9 +241,11 @@ int main(int argc, const char *argv[]) {
   const char* name2 = NULL;
   const char* output = NULL;
 
+  INIT_WARGV(argc, argv);
+
   if (!WebPPictureInit(&pic1) || !WebPPictureInit(&pic2)) {
     fprintf(stderr, "Can't init pictures\n");
-    return 1;
+    FREE_WARGV_AND_RETURN(1);
   }
 
   for (c = 1; c < argc; ++c) {
@@ -263,11 +267,11 @@ int main(int argc, const char *argv[]) {
         fprintf(stderr, "missing file name after %s option.\n", argv[c - 1]);
         goto End;
       }
-      output = argv[c];
+      output = (const char*)GET_WARGV(argv, c);
     } else if (name1 == NULL) {
-      name1 = argv[c];
+      name1 = (const char*)GET_WARGV(argv, c);
     } else {
-      name2 = argv[c];
+      name2 = (const char*)GET_WARGV(argv, c);
     }
   }
   if (help || name1 == NULL || name2 == NULL) {
@@ -347,5 +351,5 @@ int main(int argc, const char *argv[]) {
  End:
   WebPPictureFree(&pic1);
   WebPPictureFree(&pic2);
-  return ret;
+  FREE_WARGV_AND_RETURN(ret);
 }
