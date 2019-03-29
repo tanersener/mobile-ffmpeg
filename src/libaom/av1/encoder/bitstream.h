@@ -27,19 +27,14 @@ uint32_t write_sequence_header_obu(AV1_COMP *cpi, uint8_t *const dst);
 
 // Writes the OBU header byte, and the OBU header extension byte when
 // 'obu_extension' is non-zero. Returns number of bytes written to 'dst'.
-uint32_t write_obu_header(OBU_TYPE obu_type, int obu_extension,
-                          uint8_t *const dst);
+uint32_t av1_write_obu_header(AV1_COMP *const cpi, OBU_TYPE obu_type,
+                              int obu_extension, uint8_t *const dst);
 
 int write_uleb_obu_size(uint32_t obu_header_size, uint32_t obu_payload_size,
                         uint8_t *dest);
 
 int av1_pack_bitstream(AV1_COMP *const cpi, uint8_t *dst, size_t *size,
                        int *const largest_tile_id);
-
-static INLINE int av1_preserve_existing_gf(const AV1_COMP *const cpi) {
-  // Do not swap gf and arf indices for internal overlay frames
-  return cpi->rc.is_src_frame_alt_ref && !cpi->rc.is_src_frame_ext_arf;
-}
 
 void av1_write_tx_type(const AV1_COMMON *const cm, const MACROBLOCKD *xd,
                        int blk_row, int blk_col, int plane, TX_SIZE tx_size,

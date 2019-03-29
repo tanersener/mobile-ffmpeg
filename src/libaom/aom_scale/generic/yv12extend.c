@@ -434,3 +434,28 @@ void aom_yv12_partial_coloc_copy_v_c(const YV12_BUFFER_CONFIG *src_bc,
   aom_yv12_partial_copy_v_c(src_bc, hstart, hend, vstart, vend, dst_bc, hstart,
                             vstart);
 }
+
+int aom_yv12_realloc_with_new_border_c(YV12_BUFFER_CONFIG *ybf, int new_border,
+                                       int byte_alignment, int num_planes) {
+  if (ybf) {
+    if (new_border == ybf->border) return 0;
+    YV12_BUFFER_CONFIG new_buf;
+    memset(&new_buf, 0, sizeof(new_buf));
+    const int error = aom_alloc_frame_buffer(
+        &new_buf, ybf->y_crop_width, ybf->y_crop_height, ybf->subsampling_x,
+        ybf->subsampling_y, ybf->flags & YV12_FLAG_HIGHBITDEPTH, new_border,
+        byte_alignment);
+    if (error) return error;
+    // Copy image buffer
+    aom_yv12_copy_frame(ybf, &new_buf, num_planes);
+
+    // Extend up to new border
+    aom_extend_frame_borders(&new_buf, num_planes);
+
+    // Now free the old buffer and replace with the new
+    aom_free_frame_buffer(ybf);
+    memcpy(ybf, &new_buf, sizeof(new_buf));
+    return 0;
+  }
+  return -2;
+}

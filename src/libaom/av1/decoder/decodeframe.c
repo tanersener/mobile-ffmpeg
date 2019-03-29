@@ -781,7 +781,7 @@ static INLINE void dec_build_inter_predictors(const AV1_COMMON *cm,
       dec_calc_subpel_params(xd, sf, mv, plane, pre_x, pre_y, 0, 0, pre_buf,
                              &subpel_params[ref], bw, bh, &block, mi_x, mi_y,
                              &scaled_mv, &subpel_x_mv, &subpel_y_mv);
-      pre[ref] = pre_buf->buf0 + block.y0 * pre_buf->stride + block.x0;
+      pre[ref] = pre_buf->buf0 + (int64_t)block.y0 * pre_buf->stride + block.x0;
       src_stride[ref] = pre_buf->stride;
       highbd = is_cur_buf_hbd(xd);
 
@@ -4240,6 +4240,25 @@ void av1_read_film_grain_params(AV1_COMMON *cm,
   if (!pars->update_parameters) {
     // inherit parameters from a previous reference frame
     int film_grain_params_ref_idx = aom_rb_read_literal(rb, 3);
+    // Section 6.8.20: It is a requirement of bitstream conformance that
+    // film_grain_params_ref_idx is equal to ref_frame_idx[ j ] for some value
+    // of j in the range 0 to REFS_PER_FRAME - 1.
+    int found = 0;
+    for (int i = 0; i < INTER_REFS_PER_FRAME; ++i) {
+      if (film_grain_params_ref_idx == cm->remapped_ref_idx[i]) {
+        found = 1;
+        break;
+      }
+    }
+    if (!found) {
+      aom_internal_error(&cm->error, AOM_CODEC_UNSUP_BITSTREAM,
+                         "Invalid film grain reference idx %d. ref_frame_idx = "
+                         "{%d, %d, %d, %d, %d, %d, %d}",
+                         film_grain_params_ref_idx, cm->remapped_ref_idx[0],
+                         cm->remapped_ref_idx[1], cm->remapped_ref_idx[2],
+                         cm->remapped_ref_idx[3], cm->remapped_ref_idx[4],
+                         cm->remapped_ref_idx[5], cm->remapped_ref_idx[6]);
+    }
     RefCntBuffer *const buf = cm->ref_frame_map[film_grain_params_ref_idx];
     if (buf == NULL) {
       aom_internal_error(&cm->error, AOM_CODEC_UNSUP_BITSTREAM,
@@ -4468,13 +4487,13 @@ void av1_read_timing_info_header(AV1_COMMON *cm,
   cm->timing_info.equal_picture_interval =
       aom_rb_read_bit(rb);  // Equal picture interval bit
   if (cm->timing_info.equal_picture_interval) {
-    cm->timing_info.num_ticks_per_picture =
-        aom_rb_read_uvlc(rb) + 1;  // ticks per picture
-    if (cm->timing_info.num_ticks_per_picture == 0) {
+    const uint32_t num_ticks_per_picture_minus_1 = aom_rb_read_uvlc(rb);
+    if (num_ticks_per_picture_minus_1 == UINT32_MAX) {
       aom_internal_error(
           &cm->error, AOM_CODEC_UNSUP_BITSTREAM,
           "num_ticks_per_picture_minus_1 cannot be (1 << 32) − 1.");
     }
+    cm->timing_info.num_ticks_per_picture = num_ticks_per_picture_minus_1 + 1;
   }
 }
 
@@ -5179,7 +5198,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
           aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
                              "Inter frame requests nonexistent reference");
 
-        av1_set_frame_refs(cm, lst_ref, gld_ref);
+        av1_set_frame_refs(cm, cm->remapped_ref_idx, lst_ref, gld_ref);
       }
 
       for (int i = 0; i < INTER_REFS_PER_FRAME; ++i) {
@@ -5189,7 +5208,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
 
           // Most of the time, streams start with a keyframe. In that case,
           // ref_frame_map will have been filled in at that point and will not
-          // contain any -1's. However, streams are explicitly allowed to start
+          // contain any NULLs. However, streams are explicitly allowed to start
           // with an intra-only frame, so long as they don't then signal a
           // reference to a slot that hasn't been set yet. That's what we are
           // checking here.
@@ -5319,6 +5338,11 @@ static int read_uncompressed_header(AV1Decoder *pbi,
   }
 
   read_tile_info(pbi, rb);
+  if (!is_min_tile_width_satisfied(cm)) {
+    aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
+                       "Minimum tile width requirement not satisfied");
+  }
+
   setup_quantization(cm, rb);
   xd->bd = (int)seq_params->bit_depth;
 

@@ -851,7 +851,7 @@ static int main_loop(int argc, const char **argv_) {
         }
         // Default to codec bit depth if output bit depth not set
         unsigned int output_bit_depth;
-        if (!fixed_output_bit_depth && single_file && !do_md5) {
+        if (!fixed_output_bit_depth && single_file) {
           output_bit_depth = img->bit_depth;
         } else {
           output_bit_depth = fixed_output_bit_depth;

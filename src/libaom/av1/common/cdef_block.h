@@ -38,7 +38,6 @@ DECLARE_ALIGNED(16, extern const int, cdef_directions[8][2]);
 typedef struct {
   uint8_t by;
   uint8_t bx;
-  uint8_t skip;
 } cdef_list;
 
 typedef void (*cdef_filter_block_func)(uint8_t *dst8, uint16_t *dst16,

@@ -144,10 +144,6 @@ static const arg_def_t pass_arg =
     ARG_DEF(NULL, "pass", 1, "Pass to execute (1/2)");
 static const arg_def_t fpf_name =
     ARG_DEF(NULL, "fpf", 1, "First pass statistics file name");
-#if CONFIG_FP_MB_STATS
-static const arg_def_t fpmbf_name =
-    ARG_DEF(NULL, "fpmbf", 1, "First pass block statistics file name");
-#endif
 static const arg_def_t limit =
     ARG_DEF(NULL, "limit", 1, "Stop encoding after n input frames");
 static const arg_def_t skip =
@@ -444,6 +440,21 @@ static const arg_def_t enable_rect_partitions =
     ARG_DEF(NULL, "enable-rect-partitions", 1,
             "Enable rectangular partitions "
             "(0: false, 1: true (default))");
+static const arg_def_t enable_ab_partitions =
+    ARG_DEF(NULL, "enable-ab-partitions", 1,
+            "Enable ab partitions (0: false, 1: true (default))");
+static const arg_def_t enable_1to4_partitions =
+    ARG_DEF(NULL, "enable-1to4-partitions", 1,
+            "Enable 1:4 and 4:1 partitions "
+            "(0: false, 1: true (default))");
+static const arg_def_t min_partition_size =
+    ARG_DEF(NULL, "min-partition-size", 4,
+            "Set min partition size "
+            "(4:4x4, 8:8x8, 16:16x16, 32:32x32, 64:64x64, 128:128x128)");
+static const arg_def_t max_partition_size =
+    ARG_DEF(NULL, "max-partition-size", 128,
+            "Set max partition size "
+            "(4:4x4, 8:8x8, 16:16x16, 32:32x32, 64:64x64, 128:128x128)");
 static const arg_def_t enable_dual_filter =
     ARG_DEF(NULL, "enable-dual-filter", 1,
             "Enable dual filter "
@@ -459,6 +470,16 @@ static const arg_def_t enable_order_hint =
 static const arg_def_t enable_tx64 =
     ARG_DEF(NULL, "enable-tx64", 1,
             "Enable 64-pt transform (0: false, 1: true (default))");
+static const arg_def_t tx_size_search_method =
+    ARG_DEF(NULL, "tx-size-search-method", 0,
+            "Set transform block size search method "
+            "(0: Full RD (default), 1: Fast RD, 2: use largest allowed)");
+static const arg_def_t enable_flip_idtx =
+    ARG_DEF(NULL, "enable-flip-idtx", 1,
+            "Enable extended transform type (0: false, 1: true (default)) "
+            "including FLIPADST_DCT, DCT_FLIPADST, FLIPADST_FLIPADST, "
+            "ADST_FLIPADST, FLIPADST_ADST, IDTX, V_DCT, H_DCT, V_ADST, "
+            "H_ADST, V_FLIPADST, H_FLIPADST");
 static const arg_def_t enable_dist_wtd_comp =
     ARG_DEF(NULL, "enable-dist-wtd-comp", 1,
             "Enable distance-weighted compound "
@@ -466,6 +487,10 @@ static const arg_def_t enable_dist_wtd_comp =
 static const arg_def_t enable_masked_comp =
     ARG_DEF(NULL, "enable-masked-comp", 1,
             "Enable masked (wedge/diff-wtd) compound "
+            "(0: false, 1: true (default))");
+static const arg_def_t enable_onesided_comp =
+    ARG_DEF(NULL, "enable-onesided-comp", 1,
+            "Enable one sided compound "
             "(0: false, 1: true (default))");
 static const arg_def_t enable_interintra_comp =
     ARG_DEF(NULL, "enable-interintra-comp", 1,
@@ -621,10 +646,23 @@ static const arg_def_t max_gf_interval = ARG_DEF(
     "max gf/arf frame interval (default 0, indicating in-built behavior)");
 static const arg_def_t gf_max_pyr_height =
     ARG_DEF(NULL, "gf-max-pyr-height", 1,
-            "maximum height for GF group pyramid structure (1 to 4 (default))");
+            "maximum height for GF group pyramid structure (0 to 4 (default))");
 static const arg_def_t max_reference_frames = ARG_DEF(
     NULL, "max-reference-frames", 1,
     "maximum number of reference frames allowed per frame (3 to 7 (default))");
+static const arg_def_t reduced_reference_set =
+    ARG_DEF(NULL, "reduced-reference-set", 1,
+            "Use reduced set of single and compound references (0: off "
+            "(default), 1: on)");
+static const arg_def_t target_seq_level_idx =
+    ARG_DEF(NULL, "target-seq-level-idx", 1,
+            "Target sequence level index. "
+            "Possible values are in the form of \"ABxy\"(pad leading zeros if "
+            "less than 4 digits). "
+            "AB: Operating point(OP) index; "
+            "xy: Target level index for the OP. "
+            "E.g. \"0\" means target level index 0 for the 0th OP; "
+            "\"1021\" means target level index 21 for the 10th OP.");
 
 static const struct arg_enum_list color_primaries_enum[] = {
   { "bt709", AOM_CICP_CP_BT_709 },
@@ -730,6 +768,12 @@ static const struct arg_enum_list superblock_size_enum[] = {
 static const arg_def_t superblock_size = ARG_DEF_ENUM(
     NULL, "sb-size", 1, "Superblock size to use", superblock_size_enum);
 
+static const arg_def_t set_tier_mask =
+    ARG_DEF(NULL, "set-tier-mask", 1,
+            "Set bit mask to specify which tier each of the 32 possible "
+            "operating points conforms to. "
+            "Bit value 0(defualt): Main Tier; 1: High Tier.");
+
 static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &auto_altref,
                                        &sharpness,
@@ -749,12 +793,19 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &enable_cdef,
                                        &enable_restoration,
                                        &enable_rect_partitions,
+                                       &enable_ab_partitions,
+                                       &enable_1to4_partitions,
+                                       &min_partition_size,
+                                       &max_partition_size,
                                        &enable_dual_filter,
                                        &enable_intra_edge_filter,
                                        &enable_order_hint,
                                        &enable_tx64,
+                                       &tx_size_search_method,
+                                       &enable_flip_idtx,
                                        &enable_dist_wtd_comp,
                                        &enable_masked_comp,
+                                       &enable_onesided_comp,
                                        &enable_interintra_comp,
                                        &enable_smooth_interintra,
                                        &enable_diff_wtd_comp,
@@ -810,7 +861,10 @@ static const arg_def_t *av1_args[] = { &cpu_used_av1,
                                        &denoise_block_size,
 #endif  // CONFIG_DENOISE
                                        &max_reference_frames,
+                                       &reduced_reference_set,
                                        &enable_ref_frame_mvs,
+                                       &target_seq_level_idx,
+                                       &set_tier_mask,
                                        &bitdeptharg,
                                        &inbitdeptharg,
                                        &input_chroma_subsampling_x,
@@ -838,12 +892,19 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_ENABLE_CDEF,
                                         AV1E_SET_ENABLE_RESTORATION,
                                         AV1E_SET_ENABLE_RECT_PARTITIONS,
+                                        AV1E_SET_ENABLE_AB_PARTITIONS,
+                                        AV1E_SET_ENABLE_1TO4_PARTITIONS,
+                                        AV1E_SET_MIN_PARTITION_SIZE,
+                                        AV1E_SET_MAX_PARTITION_SIZE,
                                         AV1E_SET_ENABLE_DUAL_FILTER,
                                         AV1E_SET_ENABLE_INTRA_EDGE_FILTER,
                                         AV1E_SET_ENABLE_ORDER_HINT,
                                         AV1E_SET_ENABLE_TX64,
+                                        AV1E_SET_TX_SIZE_SEARCH_METHOD,
+                                        AV1E_SET_ENABLE_FLIP_IDTX,
                                         AV1E_SET_ENABLE_DIST_WTD_COMP,
                                         AV1E_SET_ENABLE_MASKED_COMP,
+                                        AV1E_SET_ENABLE_ONESIDED_COMP,
                                         AV1E_SET_ENABLE_INTERINTRA_COMP,
                                         AV1E_SET_ENABLE_SMOOTH_INTERINTRA,
                                         AV1E_SET_ENABLE_DIFF_WTD_COMP,
@@ -899,7 +960,10 @@ static const int av1_arg_ctrl_map[] = { AOME_SET_CPUUSED,
                                         AV1E_SET_DENOISE_BLOCK_SIZE,
 #endif  // CONFIG_DENOISE
                                         AV1E_SET_MAX_REFERENCE_FRAMES,
+                                        AV1E_SET_REDUCED_REFERENCE_SET,
                                         AV1E_SET_ENABLE_REF_FRAME_MVS,
+                                        AV1E_SET_TARGET_SEQ_LEVEL_IDX,
+                                        AV1E_SET_TIER_MASK,
                                         0 };
 #endif  // CONFIG_AV1_ENCODER
 
@@ -966,9 +1030,6 @@ struct stream_config {
   struct aom_codec_enc_cfg cfg;
   const char *out_fn;
   const char *stats_fn;
-#if CONFIG_FP_MB_STATS
-  const char *fpmb_stats_fn;
-#endif
   stereo_format_t stereo_fmt;
   int arg_ctrls[ARG_CTRL_CNT_MAX][2];
   int arg_ctrl_cnt;
@@ -996,9 +1057,6 @@ struct stream_state {
   uint64_t cx_time;
   size_t nbytes;
   stats_io_t stats;
-#if CONFIG_FP_MB_STATS
-  stats_io_t fpmb_stats;
-#endif
   struct aom_image *img;
   aom_codec_ctx_t decoder;
   int mismatch_seen;
@@ -1268,6 +1326,17 @@ static void set_config_arg_ctrls(struct stream_config *config, int key,
     return;
   }
 
+  // For target level, the settings should accumulate rather than overwrite,
+  // so we simply append it.
+  if (key == AV1E_SET_TARGET_SEQ_LEVEL_IDX) {
+    j = config->arg_ctrl_cnt;
+    assert(j < (int)ARG_CTRL_CNT_MAX);
+    config->arg_ctrls[j][0] = key;
+    config->arg_ctrls[j][1] = arg_parse_enum_or_int(arg);
+    ++config->arg_ctrl_cnt;
+    return;
+  }
+
   /* Point either to the next free element or the first instance of this
    * control.
    */
@@ -1337,10 +1406,6 @@ static int parse_stream_params(struct AvxEncoderConfig *global,
       }
     } else if (arg_match(&arg, &fpf_name, argi)) {
       config->stats_fn = arg.val;
-#if CONFIG_FP_MB_STATS
-    } else if (arg_match(&arg, &fpmbf_name, argi)) {
-      config->fpmb_stats_fn = arg.val;
-#endif
     } else if (arg_match(&arg, &use_webm, argi)) {
 #if CONFIG_WEBM_IO
       config->write_webm = 1;
@@ -1534,17 +1599,6 @@ static void validate_stream_config(const struct stream_state *stream,
         fatal("Stream %d: duplicate stats file (from stream %d)",
               streami->index, stream->index);
     }
-
-#if CONFIG_FP_MB_STATS
-    /* Check for two streams sharing a mb stats file. */
-    if (streami != stream) {
-      const char *a = stream->config.fpmb_stats_fn;
-      const char *b = streami->config.fpmb_stats_fn;
-      if (a && b && !strcmp(a, b))
-        fatal("Stream %d: duplicate mb stats file (from stream %d)",
-              streami->index, stream->index);
-    }
-#endif
   }
 }
 
@@ -1709,26 +1763,11 @@ static void setup_pass(struct stream_state *stream,
       fatal("Failed to open statistics store");
   }
 
-#if CONFIG_FP_MB_STATS
-  if (stream->config.fpmb_stats_fn) {
-    if (!stats_open_file(&stream->fpmb_stats, stream->config.fpmb_stats_fn,
-                         pass))
-      fatal("Failed to open mb statistics store");
-  } else {
-    if (!stats_open_mem(&stream->fpmb_stats, pass))
-      fatal("Failed to open mb statistics store");
-  }
-#endif
-
   stream->config.cfg.g_pass = global->passes == 2
                                   ? pass ? AOM_RC_LAST_PASS : AOM_RC_FIRST_PASS
                                   : AOM_RC_ONE_PASS;
   if (pass) {
     stream->config.cfg.rc_twopass_stats_in = stats_get(&stream->stats);
-#if CONFIG_FP_MB_STATS
-    stream->config.cfg.rc_firstpass_mb_stats_in =
-        stats_get(&stream->fpmb_stats);
-#endif
   }
 
   stream->cx_time = 0;
@@ -1957,13 +1996,6 @@ static void get_cx_data(struct stream_state *stream,
                     pkt->data.twopass_stats.sz);
         stream->nbytes += pkt->data.raw.sz;
         break;
-#if CONFIG_FP_MB_STATS
-      case AOM_CODEC_FPMB_STATS_PKT:
-        stats_write(&stream->fpmb_stats, pkt->data.firstpass_mb_stats.buf,
-                    pkt->data.firstpass_mb_stats.sz);
-        stream->nbytes += pkt->data.raw.sz;
-        break;
-#endif
       case AOM_CODEC_PSNR_PKT:
 
         if (global->show_psnr) {
@@ -2559,12 +2591,6 @@ int main(int argc, const char **argv_) {
     FOREACH_STREAM(stream, streams) {
       stats_close(&stream->stats, global.passes - 1);
     }
-
-#if CONFIG_FP_MB_STATS
-    FOREACH_STREAM(stream, streams) {
-      stats_close(&stream->fpmb_stats, global.passes - 1);
-    }
-#endif
 
     if (global.pass) break;
   }

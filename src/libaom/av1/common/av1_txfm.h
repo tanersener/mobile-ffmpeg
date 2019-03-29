@@ -59,7 +59,9 @@ static INLINE int32_t range_check_value(int32_t value, int8_t bit) {
   const int64_t min_value = -(1LL << (bit - 1));
   if (value < min_value || value > max_value) {
     fprintf(stderr, "coeff out of bit range, value: %d bit %d\n", value, bit);
+#if !CONFIG_AV1_ENCODER
     assert(0);
+#endif
   }
 #endif  // CONFIG_COEFFICIENT_RANGE_CHECKING
 #if DO_RANGE_CHECK_CLAMP

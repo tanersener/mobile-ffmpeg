@@ -2920,8 +2920,18 @@ void av1_inv_txfm_add_ssse3(const tran_low_t *dqcoeff, uint8_t *dst, int stride,
                             const TxfmParam *txfm_param) {
   const TX_TYPE tx_type = txfm_param->tx_type;
   if (!txfm_param->lossless) {
-    av1_lowbd_inv_txfm2d_add_ssse3(dqcoeff, dst, stride, tx_type,
-                                   txfm_param->tx_size, txfm_param->eob);
+    switch (txfm_param->tx_size) {
+      case TX_4X16:
+      case TX_16X4:
+        // TODO(http://crbug.com/aomedia/2350): the ssse3 versions cause test
+        // vector mismatches.
+        av1_inv_txfm_add_c(dqcoeff, dst, stride, txfm_param);
+        break;
+      default:
+        av1_lowbd_inv_txfm2d_add_ssse3(dqcoeff, dst, stride, tx_type,
+                                       txfm_param->tx_size, txfm_param->eob);
+        break;
+    }
   } else {
     av1_inv_txfm_add_c(dqcoeff, dst, stride, txfm_param);
   }

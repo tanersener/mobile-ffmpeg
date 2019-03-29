@@ -678,11 +678,10 @@ static void read_intrabc_info(AV1_COMMON *const cm, MACROBLOCKD *const xd,
 
     int16_t inter_mode_ctx[MODE_CTX_REF_FRAMES];
     int_mv ref_mvs[INTRA_FRAME + 1][MAX_MV_REF_CANDIDATES];
-    int_mv global_mvs[REF_FRAMES];
 
     av1_find_mv_refs(cm, xd, mbmi, INTRA_FRAME, xd->ref_mv_count,
-                     xd->ref_mv_stack, ref_mvs, global_mvs, mi_row, mi_col,
-                     inter_mode_ctx);
+                     xd->ref_mv_stack, ref_mvs, /*global_mvs=*/NULL, mi_row,
+                     mi_col, inter_mode_ctx);
 
     int_mv nearestmv, nearmv;
 
@@ -1271,9 +1270,9 @@ static void read_inter_block_mode_info(AV1Decoder *const pbi,
   const int is_compound = has_second_ref(mbmi);
 
   MV_REFERENCE_FRAME ref_frame = av1_ref_frame_type(mbmi->ref_frame);
-  int_mv global_mvs[REF_FRAMES];
   av1_find_mv_refs(cm, xd, mbmi, ref_frame, xd->ref_mv_count, xd->ref_mv_stack,
-                   ref_mvs, global_mvs, mi_row, mi_col, inter_mode_ctx);
+                   ref_mvs, /*global_mvs=*/NULL, mi_row, mi_col,
+                   inter_mode_ctx);
 
   int mode_ctx = av1_mode_context_analyzer(inter_mode_ctx, mbmi->ref_frame);
   mbmi->ref_mv_idx = 0;

@@ -190,11 +190,6 @@ typedef struct RD_STATS {
   int64_t ref_rdcost;
   int zero_rate;
   uint8_t invalid_rate;
-#if CONFIG_ONE_PASS_SVM
-  int eob, eob_0, eob_1, eob_2, eob_3;
-  int64_t rd, rd_0, rd_1, rd_2, rd_3;
-  int64_t y_sse, sse_0, sse_1, sse_2, sse_3;
-#endif
 #if CONFIG_RD_DEBUG
   int txb_coeff_cost[MAX_MB_PLANE];
   int txb_coeff_cost_map[MAX_MB_PLANE][TXB_COEFF_COST_MAP_SIZE]

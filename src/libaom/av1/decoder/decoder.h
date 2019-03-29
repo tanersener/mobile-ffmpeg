@@ -48,9 +48,9 @@ typedef void (*cfl_store_inter_block_visitor_fn_t)(AV1_COMMON *const cm,
                                                    MACROBLOCKD *const xd);
 
 typedef struct ThreadData {
-  aom_reader *bit_reader;
   DECLARE_ALIGNED(32, MACROBLOCKD, xd);
   CB_BUFFER cb_buffer_base;
+  aom_reader *bit_reader;
   uint8_t *mc_buf[2];
   int32_t mc_buf_size;
   int mc_buf_use_highbd;  // Boolean: whether the byte pointers stored in

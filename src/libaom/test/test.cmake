@@ -64,11 +64,14 @@ list(APPEND AOM_UNIT_TEST_ENCODER_SOURCES
             "${AOM_ROOT}/test/encode_test_driver.cc"
             "${AOM_ROOT}/test/encode_test_driver.h"
             "${AOM_ROOT}/test/end_to_end_test.cc"
+            "${AOM_ROOT}/test/fwd_kf_test.cc"
+            "${AOM_ROOT}/test/gf_max_pyr_height_test.cc"
             "${AOM_ROOT}/test/rt_end_to_end_test.cc"
             "${AOM_ROOT}/test/error_resilience_test.cc"
             "${AOM_ROOT}/test/frame_size_tests.cc"
             "${AOM_ROOT}/test/horz_superres_test.cc"
             "${AOM_ROOT}/test/i420_video_source.h"
+            "${AOM_ROOT}/test/level_test.cc"
             "${AOM_ROOT}/test/lossless_test.cc"
             "${AOM_ROOT}/test/monochrome_test.cc"
             "${AOM_ROOT}/test/qm_test.cc"
@@ -121,7 +124,8 @@ if(NOT BUILD_SHARED_LIBS)
                 "${AOM_ROOT}/test/film_grain_table_test.cc"
                 "${AOM_ROOT}/test/segment_binarization_sync.cc"
                 "${AOM_ROOT}/test/superframe_test.cc"
-                "${AOM_ROOT}/test/tile_independence_test.cc")
+                "${AOM_ROOT}/test/tile_independence_test.cc"
+                "${AOM_ROOT}/test/yuv_temporal_filter_test.cc")
   endif()
 
   list(APPEND AOM_UNIT_TEST_COMMON_INTRIN_NEON

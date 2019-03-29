@@ -179,7 +179,8 @@ static void set_block_size(AV1_COMP *const cpi, MACROBLOCK *const x,
 }
 
 static int set_vt_partitioning(AV1_COMP *cpi, MACROBLOCK *const x,
-                               MACROBLOCKD *const xd, void *data,
+                               MACROBLOCKD *const xd,
+                               const TileInfo *const tile, void *data,
                                BLOCK_SIZE bsize, int mi_row, int mi_col,
                                int64_t threshold, BLOCK_SIZE bsize_min,
                                int force_split) {
@@ -192,6 +193,10 @@ static int set_vt_partitioning(AV1_COMP *cpi, MACROBLOCK *const x,
   tree_to_node(data, bsize, &vt);
 
   if (force_split == 1) return 0;
+
+  if (mi_col + block_width > tile->mi_col_end ||
+      mi_row + block_height > tile->mi_row_end)
+    return 0;
 
   // For bsize=bsize_min (16x16/8x8 for 8x8/4x4 downsampling), select if
   // variance is below threshold, otherwise split will be selected.
@@ -425,8 +430,7 @@ void av1_set_variance_partition_thresholds(AV1_COMP *cpi, int q,
 // This function chooses partitioning based on the variance between source and
 // reconstructed last, where variance is computed for down-sampled inputs.
 // TODO(kyslov): lot of things. Bring back noise estimation, brush up partition
-// selection
-//               and most of all - retune the thresholds
+// selection and most of all - retune the thresholds
 int av1_choose_var_based_partitioning(AV1_COMP *cpi, const TileInfo *const tile,
                                       MACROBLOCK *x, int mi_row, int mi_col) {
   AV1_COMMON *const cm = &cpi->common;
@@ -455,6 +459,10 @@ int av1_choose_var_based_partitioning(AV1_COMP *cpi, const TileInfo *const tile,
   int compute_minmax_variance = 1;
   int is_key_frame = frame_is_intra_only(cm);
   int pixels_wide = 128, pixels_high = 128;
+  assert(cm->seq_params.sb_size == BLOCK_64X64 ||
+         cm->seq_params.sb_size == BLOCK_128X128);
+  const int is_small_sb = (cm->seq_params.sb_size == BLOCK_64X64);
+  const int num_64x64_blocks = is_small_sb ? 1 : 4;
 
   CHECK_MEM_ERROR(cm, vt, aom_calloc(1, sizeof(*vt)));
 
@@ -470,6 +478,11 @@ int av1_choose_var_based_partitioning(AV1_COMP *cpi, const TileInfo *const tile,
   segment_id = xd->mi[0]->segment_id;
 
   set_vbp_thresholds(cpi, thresholds, cm->base_qindex, content_state);
+
+  if (is_small_sb) {
+    pixels_wide = 64;
+    pixels_high = 64;
+  }
 
   // For non keyframes, disable 4x4 average for low resolution when speed = 8
   threshold_4x4avg = INT64_MAX;
@@ -496,9 +509,14 @@ int av1_choose_var_based_partitioning(AV1_COMP *cpi, const TileInfo *const tile,
                          get_ref_scale_factors(cm, LAST_FRAME), num_planes);
     mi->ref_frame[0] = LAST_FRAME;
     mi->ref_frame[1] = NONE_FRAME;
-    mi->sb_type = BLOCK_128X128;
+    mi->sb_type = cm->seq_params.sb_size;
     mi->mv[0].as_int = 0;
     mi->interp_filters = av1_make_interp_filters(BILINEAR, BILINEAR);
+    if (xd->mb_to_right_edge >= 0 && xd->mb_to_bottom_edge >= 0) {
+      const MV dummy_mv = { 0, 0 };
+      av1_int_pro_motion_estimation(cpi, x, cm->seq_params.sb_size, mi_row,
+                                    mi_col, &dummy_mv);
+    }
 
 // TODO(kyslov): bring the small SAD functionality back
 #if 0
@@ -509,8 +527,9 @@ int av1_choose_var_based_partitioning(AV1_COMP *cpi, const TileInfo *const tile,
     x->pred_mv[LAST_FRAME] = mi->mv[0].as_mv;
 
     set_ref_ptrs(cm, xd, mi->ref_frame[0], mi->ref_frame[1]);
-    av1_enc_build_inter_predictor(cm, xd, mi_row, mi_col, NULL, BLOCK_128X128,
-                                  AOM_PLANE_Y, AOM_PLANE_Y);
+    av1_enc_build_inter_predictor(cm, xd, mi_row, mi_col, NULL,
+                                  cm->seq_params.sb_size, AOM_PLANE_Y,
+                                  AOM_PLANE_Y);
 
     d = xd->plane[0].dst.buf;
     dp = xd->plane[0].dst.stride;
@@ -537,7 +556,7 @@ int av1_choose_var_based_partitioning(AV1_COMP *cpi, const TileInfo *const tile,
     CHECK_MEM_ERROR(cm, vt2, aom_calloc(64, sizeof(*vt2)));
   // Fill in the entire tree of 8x8 (or 4x4 under some conditions) variances
   // for splits.
-  for (m = 0; m < 4; m++) {
+  for (m = 0; m < num_64x64_blocks; m++) {
     const int x64_idx = ((m & 1) << 6);
     const int y64_idx = ((m >> 1) << 6);
     const int m2 = m << 2;
@@ -618,7 +637,7 @@ int av1_choose_var_based_partitioning(AV1_COMP *cpi, const TileInfo *const tile,
   }
 
   // Fill the rest of the variance tree by summing split partition values.
-  for (m = 0; m < 4; ++m) {
+  for (m = 0; m < num_64x64_blocks; ++m) {
     avg_32x32 = 0;
     const int m2 = m << 2;
     for (i = 0; i < 4; i++) {
@@ -687,6 +706,7 @@ int av1_choose_var_based_partitioning(AV1_COMP *cpi, const TileInfo *const tile,
           max_var_32x32 > thresholds[1] >> 1)
         force_split[1 + m] = 1;
     }
+    if (is_small_sb) force_split[0] = 1;
   }
 
   if (!force_split[0]) {
@@ -698,71 +718,51 @@ int av1_choose_var_based_partitioning(AV1_COMP *cpi, const TileInfo *const tile,
       force_split[0] = 1;
   }
 
-  const int mi_rows_remaining = tile->mi_row_end - mi_row;
-  const int mi_cols_remaining = tile->mi_col_end - mi_col;
-  if (!((mi_cols_remaining >= cm->seq_params.mib_size) &&
-        (mi_rows_remaining >= cm->seq_params.mib_size))) {
-    int bh = mi_size_high[BLOCK_128X128];
-    int bw = mi_size_wide[BLOCK_128X128];
+  if (!set_vt_partitioning(cpi, x, xd, tile, vt, BLOCK_128X128, mi_row, mi_col,
+                           thresholds[0], BLOCK_16X16, force_split[0])) {
+    for (m = 0; m < num_64x64_blocks; ++m) {
+      const int x64_idx = ((m & 1) << 4);
+      const int y64_idx = ((m >> 1) << 4);
+      const int m2 = m << 2;
 
-    int r, c;
-    for (r = 0; r < cm->seq_params.mib_size; r += bh) {
-      bw = mi_size_wide[BLOCK_128X128];
-      for (c = 0; c < cm->seq_params.mib_size; c += bw) {
-        BLOCK_SIZE sb_type =
-            find_partition_size(BLOCK_128X128, mi_rows_remaining - r,
-                                mi_cols_remaining - c, &bh, &bw);
-        set_block_size(cpi, x, xd, mi_row + r, mi_col + c, sb_type);
-      }
-    }
-
-  } else {
-    if (!set_vt_partitioning(cpi, x, xd, vt, BLOCK_128X128, mi_row, mi_col,
-                             thresholds[0], BLOCK_16X16, force_split[0])) {
-      for (m = 0; m < 4; ++m) {
-        const int x64_idx = ((m & 1) << 4);
-        const int y64_idx = ((m >> 1) << 4);
-        const int m2 = m << 2;
-
-        // Now go through the entire structure, splitting every block size until
-        // we get to one that's got a variance lower than our threshold.
-        if (!set_vt_partitioning(cpi, x, xd, &vt->split[m], BLOCK_64X64,
-                                 mi_row + y64_idx, mi_col + x64_idx,
-                                 thresholds[1], BLOCK_16X16,
-                                 force_split[1 + m])) {
-          for (i = 0; i < 4; ++i) {
-            const int x32_idx = ((i & 1) << 3);
-            const int y32_idx = ((i >> 1) << 3);
-            const int i2 = (m2 + i) << 2;
-            if (!set_vt_partitioning(
-                    cpi, x, xd, &vt->split[m].split[i], BLOCK_32X32,
-                    (mi_row + y64_idx + y32_idx), (mi_col + x64_idx + x32_idx),
-                    thresholds[2], BLOCK_16X16, force_split[5 + m2 + i])) {
-              for (j = 0; j < 4; ++j) {
-                const int x16_idx = ((j & 1) << 2);
-                const int y16_idx = ((j >> 1) << 2);
-                const int split_index = 21 + i2 + j;
-                // For inter frames: if variance4x4downsample[] == 1 for this
-                // 16x16 block, then the variance is based on 4x4 down-sampling,
-                // so use vt2 in set_vt_partioning(), otherwise use vt.
-                v16x16 *vtemp =
-                    (!is_key_frame && variance4x4downsample[i2 + j] == 1)
-                        ? &vt2[i2 + j]
-                        : &vt->split[m].split[i].split[j];
-                if (!set_vt_partitioning(cpi, x, xd, vtemp, BLOCK_16X16,
-                                         mi_row + y64_idx + y32_idx + y16_idx,
-                                         mi_col + x64_idx + x32_idx + x16_idx,
-                                         thresholds[3], BLOCK_8X8,
-                                         force_split[split_index])) {
-                  for (k = 0; k < 4; ++k) {
-                    const int x8_idx = (k & 1) << 1;
-                    const int y8_idx = (k >> 1) << 1;
-                    set_block_size(
-                        cpi, x, xd,
-                        (mi_row + y64_idx + y32_idx + y16_idx + y8_idx),
-                        (mi_col + x64_idx + x32_idx + x16_idx + x8_idx),
-                        BLOCK_8X8);
-                  }
+      // Now go through the entire structure, splitting every block size until
+      // we get to one that's got a variance lower than our threshold.
+      if (!set_vt_partitioning(cpi, x, xd, tile, &vt->split[m], BLOCK_64X64,
+                               mi_row + y64_idx, mi_col + x64_idx,
+                               thresholds[1], BLOCK_16X16,
+                               force_split[1 + m])) {
+        for (i = 0; i < 4; ++i) {
+          const int x32_idx = ((i & 1) << 3);
+          const int y32_idx = ((i >> 1) << 3);
+          const int i2 = (m2 + i) << 2;
+          if (!set_vt_partitioning(cpi, x, xd, tile, &vt->split[m].split[i],
+                                   BLOCK_32X32, (mi_row + y64_idx + y32_idx),
+                                   (mi_col + x64_idx + x32_idx), thresholds[2],
+                                   BLOCK_16X16, force_split[5 + m2 + i])) {
+            for (j = 0; j < 4; ++j) {
+              const int x16_idx = ((j & 1) << 2);
+              const int y16_idx = ((j >> 1) << 2);
+              const int split_index = 21 + i2 + j;
+              // For inter frames: if variance4x4downsample[] == 1 for this
+              // 16x16 block, then the variance is based on 4x4 down-sampling,
+              // so use vt2 in set_vt_partioning(), otherwise use vt.
+              v16x16 *vtemp =
+                  (!is_key_frame && variance4x4downsample[i2 + j] == 1)
+                      ? &vt2[i2 + j]
+                      : &vt->split[m].split[i].split[j];
+              if (!set_vt_partitioning(cpi, x, xd, tile, vtemp, BLOCK_16X16,
+                                       mi_row + y64_idx + y32_idx + y16_idx,
+                                       mi_col + x64_idx + x32_idx + x16_idx,
+                                       thresholds[3], BLOCK_8X8,
+                                       force_split[split_index])) {
+                for (k = 0; k < 4; ++k) {
+                  const int x8_idx = (k & 1) << 1;
+                  const int y8_idx = (k >> 1) << 1;
+                  set_block_size(
+                      cpi, x, xd,
+                      (mi_row + y64_idx + y32_idx + y16_idx + y8_idx),
+                      (mi_col + x64_idx + x32_idx + x16_idx + x8_idx),
+                      BLOCK_8X8);
                 }
               }
             }

@@ -32,7 +32,6 @@
 #define MIN_INLIER_PROB 0.1
 
 #define MIN_TRANS_THRESH (1 * GM_TRANS_DECODE_FACTOR)
-#define USE_GM_FEATURE_BASED 1
 
 // Border over which to compute the global motion
 #define ERRORADV_BORDER 0
@@ -276,7 +275,6 @@ static unsigned char *downconvert_frame(YV12_BUFFER_CONFIG *frm,
   return buf_8bit;
 }
 
-#if USE_GM_FEATURE_BASED
 static int compute_global_motion_feature_based(
     TransformationType type, YV12_BUFFER_CONFIG *frm, YV12_BUFFER_CONFIG *ref,
     int bit_depth, int *num_inliers_by_motion, double *params_by_motion,
@@ -331,7 +329,7 @@ static int compute_global_motion_feature_based(
   }
   return 0;
 }
-#else
+
 static INLINE RansacFuncDouble
 get_ransac_double_prec_type(TransformationType type) {
   switch (type) {
@@ -543,6 +541,7 @@ static INLINE void solve_2x2_system(const double *M, const double *b,
   output_vec[1] = -M[2] * mult_b0 + M_0 * mult_b1;
 }
 
+/*
 static INLINE void image_difference(const uint8_t *src, int src_stride,
                                     const uint8_t *ref, int ref_stride,
                                     int16_t *dst, int dst_stride, int height,
@@ -557,6 +556,7 @@ static INLINE void image_difference(const uint8_t *src, int src_stride,
     }
   }
 }
+*/
 
 // Compute an image gradient using a sobel filter.
 // If dir == 1, compute the x gradient. If dir == 0, compute y. This function
@@ -869,19 +869,22 @@ static int compute_global_motion_disflow_based(
   }
   return 0;
 }
-#endif
 
 int av1_compute_global_motion(TransformationType type, YV12_BUFFER_CONFIG *frm,
                               YV12_BUFFER_CONFIG *ref, int bit_depth,
+                              GlobalMotionEstimationType gm_estimation_type,
                               int *num_inliers_by_motion,
                               double *params_by_motion, int num_motions) {
-#if USE_GM_FEATURE_BASED
-  return compute_global_motion_feature_based(type, frm, ref, bit_depth,
-                                             num_inliers_by_motion,
-                                             params_by_motion, num_motions);
-#else
-  return compute_global_motion_disflow_based(type, frm, ref, bit_depth,
-                                             num_inliers_by_motion,
-                                             params_by_motion, num_motions);
-#endif
+  switch (gm_estimation_type) {
+    case GLOBAL_MOTION_FEATURE_BASED:
+      return compute_global_motion_feature_based(type, frm, ref, bit_depth,
+                                                 num_inliers_by_motion,
+                                                 params_by_motion, num_motions);
+    case GLOBAL_MOTION_DISFLOW_BASED:
+      return compute_global_motion_disflow_based(type, frm, ref, bit_depth,
+                                                 num_inliers_by_motion,
+                                                 params_by_motion, num_motions);
+    default: assert(0 && "Unknown global motion estimation type");
+  }
+  return 0;
 }

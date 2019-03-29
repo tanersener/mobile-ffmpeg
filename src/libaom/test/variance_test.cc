@@ -703,6 +703,7 @@ class SubpelVarianceTest
  protected:
   void RefTest();
   void ExtremeRefTest();
+  void SpeedTest();
 
   ACMRandom rnd_;
   uint8_t *src_;
@@ -783,6 +784,41 @@ void SubpelVarianceTest<SubpelVarianceFunctionType>::ExtremeRefTest() {
       EXPECT_EQ(var1, var2) << "for xoffset " << x << " and yoffset " << y;
     }
   }
+}
+
+template <typename SubpelVarianceFunctionType>
+void SubpelVarianceTest<SubpelVarianceFunctionType>::SpeedTest() {
+  if (!use_high_bit_depth()) {
+    for (int j = 0; j < block_size(); j++) {
+      src_[j] = rnd_.Rand8();
+    }
+    for (int j = 0; j < block_size() + width() + height() + 1; j++) {
+      ref_[j] = rnd_.Rand8();
+    }
+  } else {
+    for (int j = 0; j < block_size(); j++) {
+      CONVERT_TO_SHORTPTR(src_)[j] = rnd_.Rand16() & mask();
+    }
+    for (int j = 0; j < block_size() + width() + height() + 1; j++) {
+      CONVERT_TO_SHORTPTR(ref_)[j] = rnd_.Rand16() & mask();
+    }
+  }
+
+  unsigned int sse1;
+  int run_time = 1000000000 / block_size();
+  aom_usec_timer timer;
+
+  aom_usec_timer_start(&timer);
+  for (int i = 0; i < run_time; ++i) {
+    int x = rnd_(8);
+    int y = rnd_(8);
+    params_.func(ref_, width() + 1, x, y, src_, width(), &sse1);
+  }
+  aom_usec_timer_mark(&timer);
+
+  const int elapsed_time = static_cast<int>(aom_usec_timer_elapsed(&timer));
+  printf("sub_pixel_variance_%dx%d_%d: %d us\n", width(), height(),
+         params_.bit_depth, elapsed_time);
 }
 
 template <>
@@ -1188,6 +1224,7 @@ TEST_P(AvxHBDVarianceTest, OneQuarter) { OneQuarterTest(); }
 TEST_P(AvxHBDVarianceTest, DISABLED_Speed) { SpeedTest(); }
 TEST_P(AvxHBDSubpelVarianceTest, Ref) { RefTest(); }
 TEST_P(AvxHBDSubpelVarianceTest, ExtremeRef) { ExtremeRefTest(); }
+TEST_P(AvxHBDSubpelVarianceTest, DISABLED_Speed) { SpeedTest(); }
 TEST_P(AvxHBDSubpelAvgVarianceTest, Ref) { RefTest(); }
 
 /* TODO(debargha): This test does not support the highbd version
@@ -1677,6 +1714,9 @@ INSTANTIATE_TEST_CASE_P(AVX2, AvxHBDVarianceTest,
 #endif  // HAVE_AVX2
 
 const SubpelVarianceParams kArrayHBDSubpelVariance_sse2[] = {
+  SubpelVarianceParams(7, 7, &aom_highbd_12_sub_pixel_variance128x128_sse2, 12),
+  SubpelVarianceParams(7, 6, &aom_highbd_12_sub_pixel_variance128x64_sse2, 12),
+  SubpelVarianceParams(6, 7, &aom_highbd_12_sub_pixel_variance64x128_sse2, 12),
   SubpelVarianceParams(6, 6, &aom_highbd_12_sub_pixel_variance64x64_sse2, 12),
   SubpelVarianceParams(6, 5, &aom_highbd_12_sub_pixel_variance64x32_sse2, 12),
   SubpelVarianceParams(5, 6, &aom_highbd_12_sub_pixel_variance32x64_sse2, 12),
@@ -1688,6 +1728,9 @@ const SubpelVarianceParams kArrayHBDSubpelVariance_sse2[] = {
   SubpelVarianceParams(3, 4, &aom_highbd_12_sub_pixel_variance8x16_sse2, 12),
   SubpelVarianceParams(3, 3, &aom_highbd_12_sub_pixel_variance8x8_sse2, 12),
   SubpelVarianceParams(3, 2, &aom_highbd_12_sub_pixel_variance8x4_sse2, 12),
+  SubpelVarianceParams(7, 7, &aom_highbd_10_sub_pixel_variance128x128_sse2, 10),
+  SubpelVarianceParams(7, 6, &aom_highbd_10_sub_pixel_variance128x64_sse2, 10),
+  SubpelVarianceParams(6, 7, &aom_highbd_10_sub_pixel_variance64x128_sse2, 10),
   SubpelVarianceParams(6, 6, &aom_highbd_10_sub_pixel_variance64x64_sse2, 10),
   SubpelVarianceParams(6, 5, &aom_highbd_10_sub_pixel_variance64x32_sse2, 10),
   SubpelVarianceParams(5, 6, &aom_highbd_10_sub_pixel_variance32x64_sse2, 10),
@@ -1699,6 +1742,9 @@ const SubpelVarianceParams kArrayHBDSubpelVariance_sse2[] = {
   SubpelVarianceParams(3, 4, &aom_highbd_10_sub_pixel_variance8x16_sse2, 10),
   SubpelVarianceParams(3, 3, &aom_highbd_10_sub_pixel_variance8x8_sse2, 10),
   SubpelVarianceParams(3, 2, &aom_highbd_10_sub_pixel_variance8x4_sse2, 10),
+  SubpelVarianceParams(7, 7, &aom_highbd_8_sub_pixel_variance128x128_sse2, 8),
+  SubpelVarianceParams(7, 6, &aom_highbd_8_sub_pixel_variance128x64_sse2, 8),
+  SubpelVarianceParams(6, 7, &aom_highbd_8_sub_pixel_variance64x128_sse2, 8),
   SubpelVarianceParams(6, 6, &aom_highbd_8_sub_pixel_variance64x64_sse2, 8),
   SubpelVarianceParams(6, 5, &aom_highbd_8_sub_pixel_variance64x32_sse2, 8),
   SubpelVarianceParams(5, 6, &aom_highbd_8_sub_pixel_variance32x64_sse2, 8),
@@ -1711,7 +1757,6 @@ const SubpelVarianceParams kArrayHBDSubpelVariance_sse2[] = {
   SubpelVarianceParams(3, 3, &aom_highbd_8_sub_pixel_variance8x8_sse2, 8),
   SubpelVarianceParams(3, 2, &aom_highbd_8_sub_pixel_variance8x4_sse2, 8)
 };
-
 INSTANTIATE_TEST_CASE_P(SSE2, AvxHBDSubpelVarianceTest,
                         ::testing::ValuesIn(kArrayHBDSubpelVariance_sse2));
 

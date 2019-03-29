@@ -180,3 +180,48 @@ int aom_satd_c(const tran_low_t *coeff, int length) {
   // satd: 26 bits, dynamic range [-32640 * 1024, 32640 * 1024]
   return satd;
 }
+
+// Integer projection onto row vectors.
+// height: value range {16, 32, 64, 128}.
+void aom_int_pro_row_c(int16_t hbuf[16], const uint8_t *ref,
+                       const int ref_stride, const int height) {
+  int idx;
+  const int norm_factor = height >> 1;
+  for (idx = 0; idx < 16; ++idx) {
+    int i;
+    hbuf[idx] = 0;
+    // hbuf[idx]: 14 bit, dynamic range [0, 32640].
+    for (i = 0; i < height; ++i) hbuf[idx] += ref[i * ref_stride];
+    // hbuf[idx]: 9 bit, dynamic range [0, 1020].
+    hbuf[idx] /= norm_factor;
+    ++ref;
+  }
+}
+
+// width: value range {16, 32, 64, 128}.
+int16_t aom_int_pro_col_c(const uint8_t *ref, const int width) {
+  int idx;
+  int16_t sum = 0;
+  // sum: 14 bit, dynamic range [0, 32640]
+  for (idx = 0; idx < width; ++idx) sum += ref[idx];
+  return sum;
+}
+
+// ref: [0 - 510]
+// src: [0 - 510]
+// bwl: {2, 3, 4, 5}
+int aom_vector_var_c(const int16_t *ref, const int16_t *src, const int bwl) {
+  int i;
+  int width = 4 << bwl;
+  int sse = 0, mean = 0, var;
+
+  for (i = 0; i < width; ++i) {
+    int diff = ref[i] - src[i];  // diff: dynamic range [-510, 510], 10 bits.
+    mean += diff;                // mean: dynamic range 16 bits.
+    sse += diff * diff;          // sse:  dynamic range 26 bits.
+  }
+
+  // (mean * mean): dynamic range 31 bits.
+  var = sse - ((mean * mean) >> (bwl + 2));
+  return var;
+}

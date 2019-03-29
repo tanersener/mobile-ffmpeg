@@ -98,12 +98,10 @@ static int byte_alignment(AV1_COMMON *const cm,
 static uint32_t read_temporal_delimiter_obu() { return 0; }
 
 // Returns a boolean that indicates success.
-static int read_bitstream_level(BitstreamLevel *bl,
+static int read_bitstream_level(AV1_LEVEL *seq_level_idx,
                                 struct aom_read_bit_buffer *rb) {
-  const uint8_t seq_level_idx = aom_rb_read_literal(rb, LEVEL_BITS);
-  if (!is_valid_seq_level_idx(seq_level_idx)) return 0;
-  bl->major = (seq_level_idx >> LEVEL_MINOR_BITS) + LEVEL_MAJOR_MIN;
-  bl->minor = seq_level_idx & ((1 << LEVEL_MINOR_BITS) - 1);
+  *seq_level_idx = aom_rb_read_literal(rb, LEVEL_BITS);
+  if (!is_valid_seq_level_idx(*seq_level_idx)) return 0;
   return 1;
 }
 
@@ -151,7 +149,7 @@ static uint32_t read_sequence_header_obu(AV1Decoder *pbi,
     seq_params->display_model_info_present_flag = 0;
     seq_params->operating_points_cnt_minus_1 = 0;
     seq_params->operating_point_idc[0] = 0;
-    if (!read_bitstream_level(&seq_params->level[0], rb)) {
+    if (!read_bitstream_level(&seq_params->seq_level_idx[0], rb)) {
       cm->error.error_code = AOM_CODEC_UNSUP_BITSTREAM;
       return 0;
     }
@@ -175,13 +173,13 @@ static uint32_t read_sequence_header_obu(AV1Decoder *pbi,
     for (int i = 0; i < seq_params->operating_points_cnt_minus_1 + 1; i++) {
       seq_params->operating_point_idc[i] =
           aom_rb_read_literal(rb, OP_POINTS_IDC_BITS);
-      if (!read_bitstream_level(&seq_params->level[i], rb)) {
+      if (!read_bitstream_level(&seq_params->seq_level_idx[i], rb)) {
         cm->error.error_code = AOM_CODEC_UNSUP_BITSTREAM;
         return 0;
       }
       // This is the seq_level_idx[i] > 7 check in the spec. seq_level_idx 7
       // is equivalent to level 3.3.
-      if (seq_params->level[i].major > 3)
+      if (seq_params->seq_level_idx[i] >= SEQ_LEVEL_4_0)
         seq_params->tier[i] = aom_rb_read_bit(rb);
       else
         seq_params->tier[i] = 0;
@@ -195,10 +193,9 @@ static uint32_t read_sequence_header_obu(AV1Decoder *pbi,
       if (cm->timing_info_present &&
           (cm->timing_info.equal_picture_interval ||
            cm->op_params[i].decoder_model_param_present_flag)) {
-        cm->op_params[i].bitrate = max_level_bitrate(
-            seq_params->profile,
-            major_minor_to_seq_level_idx(seq_params->level[i]),
-            seq_params->tier[i]);
+        cm->op_params[i].bitrate =
+            max_level_bitrate(seq_params->profile, seq_params->seq_level_idx[i],
+                              seq_params->tier[i]);
         // Level with seq_level_idx = 31 returns a high "dummy" bitrate to pass
         // the check
         if (cm->op_params[i].bitrate == 0)

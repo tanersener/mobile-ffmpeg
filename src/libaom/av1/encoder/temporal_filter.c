@@ -37,6 +37,16 @@
 #define EDGE_THRESHOLD 50
 #define SQRT_PI_BY_2 1.25331413732
 
+static unsigned int index_mult[14] = {
+  0, 0, 0, 0, 49152, 39322, 32768, 28087, 24576, 21846, 19661, 17874, 0, 15124
+};
+
+static int64_t highbd_index_mult[14] = { 0U,          0U,          0U,
+                                         0U,          3221225472U, 2576980378U,
+                                         2147483648U, 1840700270U, 1610612736U,
+                                         1431655766U, 1288490189U, 1171354718U,
+                                         0U,          991146300U };
+
 static void temporal_filter_predictors_mb_c(
     MACROBLOCKD *xd, uint8_t *y_mb_ptr, uint8_t *u_mb_ptr, uint8_t *v_mb_ptr,
     int stride, int uv_block_width, int uv_block_height, int mv_row, int mv_col,
@@ -167,12 +177,38 @@ static void highbd_apply_temporal_filter_self(
   }
 }
 
-static INLINE int mod_index(int64_t sum_dist, int index, int rounding,
-                            int strength, int filter_weight) {
-  int mod = (int)(((sum_dist * 3) / index + rounding) >> strength);
+static INLINE int mod_index(int sum_dist, int index, int rounding, int strength,
+                            int filter_weight) {
+  assert(index >= 0 && index <= 13);
+  assert(index_mult[index] != 0);
+
+  int mod = (clamp(sum_dist, 0, UINT16_MAX) * index_mult[index]) >> 16;
+  mod += rounding;
+  mod >>= strength;
+
   mod = AOMMIN(16, mod);
+
   mod = 16 - mod;
   mod *= filter_weight;
+
+  return mod;
+}
+
+static INLINE int highbd_mod_index(int64_t sum_dist, int index, int rounding,
+                                   int strength, int filter_weight) {
+  assert(index >= 0 && index <= 13);
+  assert(highbd_index_mult[index] != 0);
+
+  int mod =
+      (int)((AOMMIN(sum_dist, INT32_MAX) * highbd_index_mult[index]) >> 32);
+  mod += rounding;
+  mod >>= strength;
+
+  mod = AOMMIN(16, mod);
+
+  mod = 16 - mod;
+  mod *= filter_weight;
+
   return mod;
 }
 
@@ -194,7 +230,7 @@ static INLINE void calculate_squared_errors(const uint8_t *s, int s_stride,
 
 static INLINE int get_filter_weight(unsigned int i, unsigned int j,
                                     unsigned int block_height,
-                                    unsigned int block_width, int *blk_fw,
+                                    unsigned int block_width, const int *blk_fw,
                                     int use_32x32) {
   if (use_32x32)
     // blk_fw[0] ~ blk_fw[3] are the same.
@@ -215,12 +251,12 @@ static INLINE int get_filter_weight(unsigned int i, unsigned int j,
   return filter_weight;
 }
 
-static void apply_temporal_filter(
+void av1_apply_temporal_filter_c(
     const uint8_t *y_frame1, int y_stride, const uint8_t *y_pred,
     int y_buf_stride, const uint8_t *u_frame1, const uint8_t *v_frame1,
     int uv_stride, const uint8_t *u_pred, const uint8_t *v_pred,
     int uv_buf_stride, unsigned int block_width, unsigned int block_height,
-    int ss_x, int ss_y, int strength, int *blk_fw, int use_32x32,
+    int ss_x, int ss_y, int strength, const int *blk_fw, int use_32x32,
     uint32_t *y_accumulator, uint16_t *y_count, uint32_t *u_accumulator,
     uint16_t *u_count, uint32_t *v_accumulator, uint16_t *v_count) {
   unsigned int i, j, k, m;
@@ -357,14 +393,14 @@ static INLINE void highbd_calculate_squared_errors(
   }
 }
 
-static void highbd_apply_temporal_filter(
+void av1_highbd_apply_temporal_filter_c(
     const uint8_t *yf, int y_stride, const uint8_t *yp, int y_buf_stride,
     const uint8_t *uf, const uint8_t *vf, int uv_stride, const uint8_t *up,
     const uint8_t *vp, int uv_buf_stride, unsigned int block_width,
-    unsigned int block_height, int ss_x, int ss_y, int strength, int *blk_fw,
-    int use_32x32, uint32_t *y_accumulator, uint16_t *y_count,
-    uint32_t *u_accumulator, uint16_t *u_count, uint32_t *v_accumulator,
-    uint16_t *v_count) {
+    unsigned int block_height, int ss_x, int ss_y, int strength,
+    const int *blk_fw, int use_32x32, uint32_t *y_accumulator,
+    uint16_t *y_count, uint32_t *u_accumulator, uint16_t *u_count,
+    uint32_t *v_accumulator, uint16_t *v_count) {
   unsigned int i, j, k, m;
   int64_t modifier;
   const int rounding = (1 << strength) >> 1;
@@ -428,8 +464,8 @@ static void highbd_apply_temporal_filter(
 
       y_index += 2;
 
-      const int final_y_mod =
-          mod_index(modifier, y_index, rounding, strength, filter_weight);
+      const int final_y_mod = highbd_mod_index(modifier, y_index, rounding,
+                                               strength, filter_weight);
 
       y_count[k] += final_y_mod;
       y_accumulator[k] += final_y_mod * pixel_value;
@@ -474,10 +510,10 @@ static void highbd_apply_temporal_filter(
         u_mod += y_diff;
         v_mod += y_diff;
 
-        const int final_u_mod =
-            mod_index(u_mod, cr_index, rounding, strength, filter_weight);
-        const int final_v_mod =
-            mod_index(v_mod, cr_index, rounding, strength, filter_weight);
+        const int final_u_mod = highbd_mod_index(u_mod, cr_index, rounding,
+                                                 strength, filter_weight);
+        const int final_v_mod = highbd_mod_index(v_mod, cr_index, rounding,
+                                                 strength, filter_weight);
 
         u_count[m] += final_u_mod;
         u_accumulator[m] += final_u_mod * u_pixel_value;
@@ -494,7 +530,7 @@ static void highbd_apply_temporal_filter(
 void av1_temporal_filter_apply_c(uint8_t *frame1, unsigned int stride,
                                  uint8_t *frame2, unsigned int block_width,
                                  unsigned int block_height, int strength,
-                                 int *blk_fw, int use_32x32,
+                                 const int *blk_fw, int use_32x32,
                                  unsigned int *accumulator, uint16_t *count) {
   unsigned int i, j, k;
   int modifier;
@@ -661,7 +697,7 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
   // x->best_mv.
   av1_full_pixel_search(cpi, x, TF_BLOCK, &best_ref_mv1_full, step_param, NSTEP,
                         1, sadpb, cond_cost_list(cpi, cost_list), &best_ref_mv1,
-                        0, 0, x_pos, y_pos, 0);
+                        0, 0, x_pos, y_pos, 0, &cpi->ss_cfg[SS_CFG_LOOKAHEAD]);
   x->mv_limits = tmp_mv_limits;
 
   // Ignore mv costing by sending NULL pointer instead of cost array
@@ -715,9 +751,10 @@ static int temporal_filter_find_matching_mb_c(AV1_COMP *cpi,
       xd->plane[0].pre[0].stride = stride;
 
       av1_set_mv_search_range(&x->mv_limits, &best_ref_mv1);
-      av1_full_pixel_search(
-          cpi, x, TF_SUB_BLOCK, &best_ref_mv1_full, step_param, NSTEP, 1, sadpb,
-          cond_cost_list(cpi, cost_list), &best_ref_mv1, 0, 0, x_pos, y_pos, 0);
+      av1_full_pixel_search(cpi, x, TF_SUB_BLOCK, &best_ref_mv1_full,
+                            step_param, NSTEP, 1, sadpb,
+                            cond_cost_list(cpi, cost_list), &best_ref_mv1, 0, 0,
+                            x_pos, y_pos, 0, &cpi->ss_cfg[SS_CFG_LOOKAHEAD]);
       x->mv_limits = tmp_mv_limits;
 
       blk_bestsme[k] = cpi->find_fractional_mv_step(
@@ -916,7 +953,7 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
                     BH, adj_strength, blk_fw, use_32x32, accumulator, count);
               } else {
                 // Process 3 planes together.
-                highbd_apply_temporal_filter(
+                av1_highbd_apply_temporal_filter(
                     f->y_buffer + mb_y_src_offset, f->y_stride, predictor, BW,
                     f->u_buffer + mb_uv_src_offset,
                     f->v_buffer + mb_uv_src_offset, f->uv_stride,
@@ -935,7 +972,7 @@ static void temporal_filter_iterate_c(AV1_COMP *cpi,
                     BH, strength, blk_fw, use_32x32, accumulator, count);
               } else {
                 // Process 3 planes together.
-                apply_temporal_filter(
+                av1_apply_temporal_filter(
                     f->y_buffer + mb_y_src_offset, f->y_stride, predictor, BW,
                     f->u_buffer + mb_uv_src_offset,
                     f->v_buffer + mb_uv_src_offset, f->uv_stride,
@@ -1216,9 +1253,8 @@ void av1_temporal_filter(AV1_COMP *cpi, int distance) {
   // Apply context specific adjustments to the arnr filter parameters.
   if (gf_group->update_type[gf_group->index] == INTNL_ARF_UPDATE) {
     // TODO(weitinglin): Currently, we enforce the filtering strength on
-    //                   extra ARFs' to be zeros. We should investigate in which
-    //                   case it is more beneficial to use non-zero strength
-    //                   filtering.
+    // internal ARFs to be zeros. We should investigate in which case it is more
+    // beneficial to use non-zero strength filtering.
     strength = 0;
     frames_to_blur = 1;
   } else {

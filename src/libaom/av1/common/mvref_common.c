@@ -821,7 +821,7 @@ void av1_find_mv_refs(const AV1_COMMON *cm, const MACROBLOCKD *xd,
   MV_REFERENCE_FRAME rf[2];
   av1_set_ref_frame(rf, ref_frame);
 
-  if (ref_frame < REF_FRAMES) {
+  if (global_mvs != NULL && ref_frame < REF_FRAMES) {
     if (ref_frame != INTRA_FRAME) {
       global_mvs[ref_frame] = gm_get_motion_vector(
           &cm->global_motion[ref_frame], cm->allow_high_precision_mv, bsize,
@@ -1362,15 +1362,15 @@ static int compare_ref_frame_info(const void *arg_a, const void *arg_b) {
   return info_a->map_idx - info_b->map_idx;
 }
 
-static void set_ref_frame_info(AV1_COMMON *const cm, int frame_idx,
+static void set_ref_frame_info(int *remapped_ref_idx, int frame_idx,
                                REF_FRAME_INFO *ref_info) {
   assert(frame_idx >= 0 && frame_idx < INTER_REFS_PER_FRAME);
 
-  cm->remapped_ref_idx[frame_idx] = ref_info->map_idx;
+  remapped_ref_idx[frame_idx] = ref_info->map_idx;
 }
 
-void av1_set_frame_refs(AV1_COMMON *const cm, int lst_map_idx,
-                        int gld_map_idx) {
+void av1_set_frame_refs(AV1_COMMON *const cm, int *remapped_ref_idx,
+                        int lst_map_idx, int gld_map_idx) {
   int lst_frame_sort_idx = -1;
   int gld_frame_sort_idx = -1;
 
@@ -1395,8 +1395,6 @@ void av1_set_frame_refs(AV1_COMMON *const cm, int lst_map_idx,
     if (buf == NULL) continue;
     // If this assertion fails, there is a reference leak.
     assert(buf->ref_count > 0);
-    // TODO(wtc@google.com): Remove the checking on ref_count after 2019-03-01.
-    if (buf->ref_count <= 0) continue;
 
     const int offset = (int)buf->order_hint;
     ref_frame_info[i].sort_idx =
@@ -1449,7 +1447,7 @@ void av1_set_frame_refs(AV1_COMMON *const cm, int lst_map_idx,
 
   // == ALTREF_FRAME ==
   if (bwd_start_idx <= bwd_end_idx) {
-    set_ref_frame_info(cm, ALTREF_FRAME - LAST_FRAME,
+    set_ref_frame_info(remapped_ref_idx, ALTREF_FRAME - LAST_FRAME,
                        &ref_frame_info[bwd_end_idx]);
     ref_flag_list[ALTREF_FRAME - LAST_FRAME] = 1;
     bwd_end_idx--;
@@ -1457,7 +1455,7 @@ void av1_set_frame_refs(AV1_COMMON *const cm, int lst_map_idx,
 
   // == BWDREF_FRAME ==
   if (bwd_start_idx <= bwd_end_idx) {
-    set_ref_frame_info(cm, BWDREF_FRAME - LAST_FRAME,
+    set_ref_frame_info(remapped_ref_idx, BWDREF_FRAME - LAST_FRAME,
                        &ref_frame_info[bwd_start_idx]);
     ref_flag_list[BWDREF_FRAME - LAST_FRAME] = 1;
     bwd_start_idx++;
@@ -1465,7 +1463,7 @@ void av1_set_frame_refs(AV1_COMMON *const cm, int lst_map_idx,
 
   // == ALTREF2_FRAME ==
   if (bwd_start_idx <= bwd_end_idx) {
-    set_ref_frame_info(cm, ALTREF2_FRAME - LAST_FRAME,
+    set_ref_frame_info(remapped_ref_idx, ALTREF2_FRAME - LAST_FRAME,
                        &ref_frame_info[bwd_start_idx]);
     ref_flag_list[ALTREF2_FRAME - LAST_FRAME] = 1;
   }
@@ -1475,13 +1473,15 @@ void av1_set_frame_refs(AV1_COMMON *const cm, int lst_map_idx,
   for (int i = fwd_start_idx; i <= fwd_end_idx; ++i) {
     // == LAST_FRAME ==
     if (ref_frame_info[i].map_idx == lst_map_idx) {
-      set_ref_frame_info(cm, LAST_FRAME - LAST_FRAME, &ref_frame_info[i]);
+      set_ref_frame_info(remapped_ref_idx, LAST_FRAME - LAST_FRAME,
+                         &ref_frame_info[i]);
       ref_flag_list[LAST_FRAME - LAST_FRAME] = 1;
     }
 
     // == GOLDEN_FRAME ==
     if (ref_frame_info[i].map_idx == gld_map_idx) {
-      set_ref_frame_info(cm, GOLDEN_FRAME - LAST_FRAME, &ref_frame_info[i]);
+      set_ref_frame_info(remapped_ref_idx, GOLDEN_FRAME - LAST_FRAME,
+                         &ref_frame_info[i]);
       ref_flag_list[GOLDEN_FRAME - LAST_FRAME] = 1;
     }
   }
@@ -1513,7 +1513,7 @@ void av1_set_frame_refs(AV1_COMMON *const cm, int lst_map_idx,
     }
     if (fwd_start_idx > fwd_end_idx) break;
 
-    set_ref_frame_info(cm, ref_frame - LAST_FRAME,
+    set_ref_frame_info(remapped_ref_idx, ref_frame - LAST_FRAME,
                        &ref_frame_info[fwd_end_idx]);
     ref_flag_list[ref_frame - LAST_FRAME] = 1;
 
@@ -1524,7 +1524,7 @@ void av1_set_frame_refs(AV1_COMMON *const cm, int lst_map_idx,
   for (; ref_idx < (INTER_REFS_PER_FRAME - 2); ref_idx++) {
     const MV_REFERENCE_FRAME ref_frame = ref_frame_list[ref_idx];
     if (ref_flag_list[ref_frame - LAST_FRAME] == 1) continue;
-    set_ref_frame_info(cm, ref_frame - LAST_FRAME,
+    set_ref_frame_info(remapped_ref_idx, ref_frame - LAST_FRAME,
                        &ref_frame_info[fwd_start_idx]);
     ref_flag_list[ref_frame - LAST_FRAME] = 1;
   }

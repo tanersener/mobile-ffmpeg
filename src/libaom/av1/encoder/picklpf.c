@@ -213,19 +213,25 @@ void av1_pick_filter_level(const YV12_BUFFER_CONFIG *sd, AV1_COMP *cpi,
     const int min_filter_level = 0;
     const int max_filter_level = av1_get_max_filter_level(cpi);
     const int q = av1_ac_quant_Q3(cm->base_qindex, 0, cm->seq_params.bit_depth);
+    // based on tests result for rtc test set
+    // 0.04590 boosted or 0.02295 non-booseted in 18-bit fixed point
+    const int strength_boost_q_treshold = 700;
+    const int inter_frame_multiplier =
+        q > strength_boost_q_treshold ? 12034 : 6017;
     // These values were determined by linear fitting the result of the
     // searched level for 8 bit depth:
     // Keyframes: filt_guess = q * 0.06699 - 1.60817
-    // Other frames: filt_guess = q * 0.02295 + 2.48225
+    // Other frames: filt_guess = q * inter_frame_multiplier + 2.48225
     //
     // And high bit depth separately:
     // filt_guess = q * 0.316206 + 3.87252
     int filt_guess;
     switch (cm->seq_params.bit_depth) {
       case AOM_BITS_8:
-        filt_guess = (cm->current_frame.frame_type == KEY_FRAME)
-                         ? ROUND_POWER_OF_TWO(q * 17563 - 421574, 18)
-                         : ROUND_POWER_OF_TWO(q * 6017 + 650707, 18);
+        filt_guess =
+            (cm->current_frame.frame_type == KEY_FRAME)
+                ? ROUND_POWER_OF_TWO(q * 17563 - 421574, 18)
+                : ROUND_POWER_OF_TWO(q * inter_frame_multiplier + 650707, 18);
         break;
       case AOM_BITS_10:
         filt_guess = ROUND_POWER_OF_TWO(q * 20723 + 4060632, 20);

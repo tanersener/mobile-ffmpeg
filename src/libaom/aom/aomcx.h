@@ -512,16 +512,25 @@ enum aome_enc_control_id {
    */
   AV1E_SET_RENDER_SIZE,
 
-  /*!\brief Codec control function to set target level.
-   *
-   * 255: off (default); 0: only keep level stats; 10: target for level 1.0;
-   * 11: target for level 1.1; ... 62: target for level 6.2
+  /*!\brief Control to set target sequence level index for a certain operating
+   * point(OP).
+   * Possible values are in the form of "ABxy"(pad leading zeros if less than
+   * 4 digits).
+   *   AB: OP index.
+   *   xy: Target level index for the OP. Can be values 0~23(corresponding to
+   *   level 2.0 ~ 7.3) or 31(maximum level parameter, no level-based
+   *   constraints).
+   * E.g. "0" means target level index 0 for the 0th OP;
+   *      "111" means target level index 11 for the 1st OP;
+   *      "1021" means target level index 21 for the 10th OP.
+   * If the target level is not specified for an OP, the maximum level parameter
+   * of 31 is used as default.
    */
-  AV1E_SET_TARGET_LEVEL,
+  AV1E_SET_TARGET_SEQ_LEVEL_IDX,
 
-  /*!\brief Codec control function to get bitstream level.
+  /*!\brief Codec control function to get sequence level index.
    */
-  AV1E_GET_LEVEL,
+  AV1E_GET_SEQ_LEVEL_IDX,
 
   /*!\brief Codec control function to set intended superblock size.
    *
@@ -719,6 +728,43 @@ enum aome_enc_control_id {
    */
   AV1E_SET_ENABLE_RECT_PARTITIONS,
 
+  /*!\brief Codec control function to enable/disable AB partitions.
+   *
+   * This will enable or disable usage of AB partitions. The default
+   * value is 1.
+   *
+   */
+  AV1E_SET_ENABLE_AB_PARTITIONS,
+
+  /*!\brief Codec control function to enable/disable 1:4 and 4:1 partitions.
+   *
+   * This will enable or disable usage of 1:4 and 4:1 partitions. The default
+   * value is 1.
+   *
+   */
+  AV1E_SET_ENABLE_1TO4_PARTITIONS,
+
+  /*!\brief Codec control function to set min partition size.
+   *
+   * This will set min partition size. The default value is 4 for 4x4.
+   * valid values are [4, 8, 16, 32, 64, 128]
+   * min_partition_size is applied to both width and height of the partition.
+   * i.e, both width and height of a partition can not be smaller than
+   * the min_partition_size, except the partition at the picture boundary.
+   *
+   */
+  AV1E_SET_MIN_PARTITION_SIZE,
+
+  /*!\brief Codec control function to set max partition size.
+   *
+   * This will set max partition size. The default value is 128 for 128x128.
+   * valid values are [4, 8, 16, 32, 64, 128]
+   * max_partition_size is applied to both width and height of the partition.
+   * i.e, both width and height of a partition can not be larger than
+   * the max_partition_size.
+   */
+  AV1E_SET_MAX_PARTITION_SIZE,
+
   /*!\brief Codec control function to turn on / off intra edge filter
    * at sequence level.
    *
@@ -747,6 +793,25 @@ enum aome_enc_control_id {
    *
    */
   AV1E_SET_ENABLE_TX64,
+
+  /*!\brief Codec control function to turn on / off flip and identity
+   * transforms.
+   *
+   * This will enable or disable usage of flip and identity transform
+   * types in any direction. The default value is 1. Including:
+   * FLIPADST_DCT, DCT_FLIPADST, FLIPADST_FLIPADST, ADST_FLIPADST,
+   * FLIPADST_ADST, IDTX, V_DCT, H_DCT, V_ADST, H_ADST, V_FLIPADST,
+   * H_FLIPADST
+   */
+  AV1E_SET_ENABLE_FLIP_IDTX,
+
+  /*!\brief Codec control function to set transform block size search method.
+   *
+   * This will set the transform block size search method.
+   * 0: use Full RD search, 1: use Fast RD search, 2: always use largest
+   * allowed transform block size based on partition size.
+   */
+  AV1E_SET_TX_SIZE_SEARCH_METHOD,
 
   /*!\brief Codec control function to turn on / off dist-wtd compound mode
    * at sequence level.
@@ -793,6 +858,15 @@ enum aome_enc_control_id {
    *
    */
   AV1E_SET_ENABLE_MASKED_COMP,
+
+  /*!\brief Codec control function to turn on / off one sided compound usage
+   * for a sequence.
+   *
+   * This will enable or disable usage of one sided compound
+   * modes. The default value is 1.
+   *
+   */
+  AV1E_SET_ENABLE_ONESIDED_COMP,
 
   /*!\brief Codec control function to turn on / off interintra compound
    * for a sequence.
@@ -987,12 +1061,15 @@ enum aome_enc_control_id {
   AV1E_SET_QUANT_B_ADAPT,
 
   /*!\brief Control to select maximum height for the GF group pyramid structure
-   * (valid values: 1 - 4) */
+   * (valid values: 0 - 4) */
   AV1E_SET_GF_MAX_PYRAMID_HEIGHT,
 
   /*!\brief Control to select maximum reference frames allowed per frame
    * (valid values: 3 - 7) */
   AV1E_SET_MAX_REFERENCE_FRAMES,
+
+  /*!\brief Control to use reduced set of single and compound references. */
+  AV1E_SET_REDUCED_REFERENCE_SET,
 
   /*!\brief Control to set frequency of the cost updates for coefficients
    * Possible values are:
@@ -1009,6 +1086,12 @@ enum aome_enc_control_id {
    * 2: Update at tile level
    */
   AV1E_SET_MODE_COST_UPD_FREQ,
+
+  /*!\brief Control to set bit mask that specifies which tier each of the 32
+   * possible operating points conforms to.
+   * Bit value 0: Main Tier; 1: High Tier.
+   */
+  AV1E_SET_TIER_MASK,
 };
 
 /*!\brief aom 1-D scaling mode
@@ -1115,13 +1198,11 @@ AOM_CTRL_USE_TYPE(AOME_SET_ACTIVEMAP, aom_active_map_t *)
 AOM_CTRL_USE_TYPE(AOME_SET_SCALEMODE, aom_scaling_mode_t *)
 #define AOM_CTRL_AOME_SET_SCALEMODE
 
-AOM_CTRL_USE_TYPE(AOME_SET_SPATIAL_LAYER_ID, int)
+AOM_CTRL_USE_TYPE(AOME_SET_SPATIAL_LAYER_ID, unsigned int)
 #define AOM_CTRL_AOME_SET_SPATIAL_LAYER_ID
 
 AOM_CTRL_USE_TYPE(AOME_SET_CPUUSED, int)
 #define AOM_CTRL_AOME_SET_CPUUSED
-AOM_CTRL_USE_TYPE(AOME_SET_DEVSF, int)
-#define AOM_CTRL_AOME_SET_DEVSF
 AOM_CTRL_USE_TYPE(AOME_SET_ENABLEAUTOALTREF, unsigned int)
 #define AOM_CTRL_AOME_SET_ENABLEAUTOALTREF
 
@@ -1142,12 +1223,12 @@ AOM_CTRL_USE_TYPE(AOME_SET_TUNING, int) /* aom_tune_metric */
 AOM_CTRL_USE_TYPE(AOME_SET_CQ_LEVEL, unsigned int)
 #define AOM_CTRL_AOME_SET_CQ_LEVEL
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ROW_MT, int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ROW_MT, unsigned int)
 #define AOM_CTRL_AV1E_SET_ROW_MT
 
-AOM_CTRL_USE_TYPE(AV1E_SET_TILE_COLUMNS, int)
+AOM_CTRL_USE_TYPE(AV1E_SET_TILE_COLUMNS, unsigned int)
 #define AOM_CTRL_AV1E_SET_TILE_COLUMNS
-AOM_CTRL_USE_TYPE(AV1E_SET_TILE_ROWS, int)
+AOM_CTRL_USE_TYPE(AV1E_SET_TILE_ROWS, unsigned int)
 #define AOM_CTRL_AV1E_SET_TILE_ROWS
 
 AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_TPL_MODEL, unsigned int)
@@ -1213,88 +1294,109 @@ AOM_CTRL_USE_TYPE(AV1E_SET_MTU, unsigned int)
 AOM_CTRL_USE_TYPE(AV1E_SET_TIMING_INFO_TYPE, int) /* aom_timing_info_type_t */
 #define AOM_CTRL_AV1E_SET_TIMING_INFO_TYPE
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_RECT_PARTITIONS, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_RECT_PARTITIONS, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_RECT_PARTITIONS
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTRA_EDGE_FILTER, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_AB_PARTITIONS, int)
+#define AOM_CTRL_AV1E_SET_ENABLE_AB_PARTITIONS
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_1TO4_PARTITIONS, int)
+#define AOM_CTRL_AV1E_SET_ENABLE_1TO4_PARTITIONS
+
+AOM_CTRL_USE_TYPE(AV1E_SET_MIN_PARTITION_SIZE, int)
+#define AOM_CTRL_AV1E_SET_MIN_PARTITION_SIZE
+
+AOM_CTRL_USE_TYPE(AV1E_SET_MAX_PARTITION_SIZE, int)
+#define AOM_CTRL_AV1E_SET_MAX_PARTITION_SIZE
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTRA_EDGE_FILTER, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_INTRA_EDGE_FILTER
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_ORDER_HINT, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_ORDER_HINT, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_ORDER_HINT
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_TX64, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_TX64, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_TX64
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_DIST_WTD_COMP, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_TX_SIZE_SEARCH_METHOD, int)
+#define AOM_CTRL_AV1E_SET_TXSIZE_SEARCH_METHOD
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_FLIP_IDTX, int)
+#define AOM_CTRL_AV1E_SET_ENABLE_FLIP_IDTX
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_DIST_WTD_COMP, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_DIST_WTD_COMP
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_REF_FRAME_MVS, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_REF_FRAME_MVS, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_REF_FRAME_MVS
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ALLOW_REF_FRAME_MVS, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ALLOW_REF_FRAME_MVS, int)
 #define AOM_CTRL_AV1E_SET_ALLOW_REF_FRAME_MVS
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_DUAL_FILTER, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_DUAL_FILTER, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_DUAL_FILTER
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_MASKED_COMP, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_MASKED_COMP, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_MASKED_COMP
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTERINTRA_COMP, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_ONESIDED_COMP, int)
+#define AOM_CTRL_AV1E_SET_ENABLE_ONESIDED_COMP
+
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTERINTRA_COMP, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_INTERINTRA_COMP
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_SMOOTH_INTERINTRA, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_SMOOTH_INTERINTRA, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_SMOOTH_INTERINTRA
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_DIFF_WTD_COMP, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_DIFF_WTD_COMP, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_DIFF_WTD_COMP
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTERINTER_WEDGE, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTERINTER_WEDGE, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_INTERINTER_WEDGE
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTERINTRA_WEDGE, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTERINTRA_WEDGE, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_INTERINTRA_WEDGE
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_GLOBAL_MOTION, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_GLOBAL_MOTION, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_GLOBAL_MOTION
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_WARPED_MOTION, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_WARPED_MOTION, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_WARPED_MOTION
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ALLOW_WARPED_MOTION, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ALLOW_WARPED_MOTION, int)
 #define AOM_CTRL_AV1E_SET_ALLOW_WARPED_MOTION
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_FILTER_INTRA, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_FILTER_INTRA, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_FILTER_INTRA
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_SMOOTH_INTRA, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_SMOOTH_INTRA, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_SMOOTH_INTRA
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_PAETH_INTRA, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_PAETH_INTRA, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_PAETH_INTRA
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_CFL_INTRA, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_CFL_INTRA, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_CFL_INTRA
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_SUPERRES, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_SUPERRES, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_SUPERRES
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_PALETTE, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_PALETTE, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_PALETTE
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTRABC, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_INTRABC, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_INTRABC
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_ANGLE_DELTA, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ENABLE_ANGLE_DELTA, int)
 #define AOM_CTRL_AV1E_SET_ENABLE_ANGLE_DELTA
 
 AOM_CTRL_USE_TYPE(AV1E_SET_FRAME_PARALLEL_DECODING, unsigned int)
 #define AOM_CTRL_AV1E_SET_FRAME_PARALLEL_DECODING
 
-AOM_CTRL_USE_TYPE(AV1E_SET_ERROR_RESILIENT_MODE, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_ERROR_RESILIENT_MODE, int)
 #define AOM_CTRL_AV1E_SET_ERROR_RESILIENT_MODE
 
-AOM_CTRL_USE_TYPE(AV1E_SET_S_FRAME_MODE, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_S_FRAME_MODE, int)
 #define AOM_CTRL_AV1E_SET_S_FRAME_MODE
 
 AOM_CTRL_USE_TYPE(AV1E_SET_AQ_MODE, unsigned int)
@@ -1342,14 +1444,8 @@ AOM_CTRL_USE_TYPE(AV1E_SET_RENDER_SIZE, int *)
 AOM_CTRL_USE_TYPE(AV1E_SET_SUPERBLOCK_SIZE, unsigned int)
 #define AOM_CTRL_AV1E_SET_SUPERBLOCK_SIZE
 
-AOM_CTRL_USE_TYPE(AV1E_SET_TARGET_LEVEL, unsigned int)
-#define AOM_CTRL_AV1E_SET_TARGET_LEVEL
-
-AOM_CTRL_USE_TYPE(AV1E_GET_LEVEL, int *)
-#define AOM_CTRL_AV1E_GET_LEVEL
-
-AOM_CTRL_USE_TYPE(AV1E_SET_ANS_WINDOW_SIZE_LOG2, unsigned int)
-#define AOM_CTRL_AV1E_SET_ANS_WINDOW_SIZE_LOG2
+AOM_CTRL_USE_TYPE(AV1E_GET_SEQ_LEVEL_IDX, int *)
+#define AOM_CTRL_AV1E_GET_SEQ_LEVEL_IDX
 
 AOM_CTRL_USE_TYPE(AV1E_SET_SINGLE_TILE_DECODING, unsigned int)
 #define AOM_CTRL_AV1E_SET_SINGLE_TILE_DECODING
@@ -1357,13 +1453,13 @@ AOM_CTRL_USE_TYPE(AV1E_SET_SINGLE_TILE_DECODING, unsigned int)
 AOM_CTRL_USE_TYPE(AV1E_ENABLE_MOTION_VECTOR_UNIT_TEST, unsigned int)
 #define AOM_CTRL_AV1E_ENABLE_MOTION_VECTOR_UNIT_TEST
 
-AOM_CTRL_USE_TYPE(AV1E_SET_FILM_GRAIN_TEST_VECTOR, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_FILM_GRAIN_TEST_VECTOR, int)
 #define AOM_CTRL_AV1E_SET_FILM_GRAIN_TEST_VECTOR
 
 AOM_CTRL_USE_TYPE(AV1E_SET_FILM_GRAIN_TABLE, const char *)
 #define AOM_CTRL_AV1E_SET_FILM_GRAIN_TABLE
 
-AOM_CTRL_USE_TYPE(AV1E_SET_CDF_UPDATE_MODE, int)
+AOM_CTRL_USE_TYPE(AV1E_SET_CDF_UPDATE_MODE, unsigned int)
 #define AOM_CTRL_AV1E_SET_CDF_UPDATE_MODE
 
 #ifdef CONFIG_DENOISE
@@ -1380,32 +1476,41 @@ AOM_CTRL_USE_TYPE(AV1E_SET_CHROMA_SUBSAMPLING_X, unsigned int)
 AOM_CTRL_USE_TYPE(AV1E_SET_CHROMA_SUBSAMPLING_Y, unsigned int)
 #define AOM_CTRL_AV1E_SET_CHROMA_SUBSAMPLING_Y
 
-AOM_CTRL_USE_TYPE(AV1E_SET_REDUCED_TX_TYPE_SET, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_REDUCED_TX_TYPE_SET, int)
 #define AOM_CTRL_AV1E_SET_REDUCED_TX_TYPE_SET
 
-AOM_CTRL_USE_TYPE(AV1E_SET_INTRA_DCT_ONLY, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_INTRA_DCT_ONLY, int)
 #define AOM_CTRL_AV1E_SET_INTRA_DCT_ONLY
 
-AOM_CTRL_USE_TYPE(AV1E_SET_INTER_DCT_ONLY, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_INTER_DCT_ONLY, int)
 #define AOM_CTRL_AV1E_SET_INTER_DCT_ONLY
 
-AOM_CTRL_USE_TYPE(AV1E_SET_INTRA_DEFAULT_TX_ONLY, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_INTRA_DEFAULT_TX_ONLY, int)
 #define AOM_CTRL_AV1E_SET_INTRA_DEFAULT_TX_ONLY
 
-AOM_CTRL_USE_TYPE(AV1E_SET_QUANT_B_ADAPT, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_QUANT_B_ADAPT, int)
 #define AOM_CTRL_AV1E_SET_QUANT_B_ADAPT
 
 AOM_CTRL_USE_TYPE(AV1E_SET_GF_MAX_PYRAMID_HEIGHT, unsigned int)
 #define AOM_CTRL_AV1E_SET_GF_MAX_PYRAMID_HEIGHT
 
-AOM_CTRL_USE_TYPE(AV1E_SET_MAX_REFERENCE_FRAMES, unsigned int)
+AOM_CTRL_USE_TYPE(AV1E_SET_MAX_REFERENCE_FRAMES, int)
 #define AOM_CTRL_AV1E_SET_MAX_REFERENCE_FRAMES
+
+AOM_CTRL_USE_TYPE(AV1E_SET_REDUCED_REFERENCE_SET, int)
+#define AOM_CTRL_AV1E_SET_REDUCED_REFERENCE_SET
 
 AOM_CTRL_USE_TYPE(AV1E_SET_COEFF_COST_UPD_FREQ, unsigned int)
 #define AOM_CTRL_AV1E_SET_COEFF_COST_UPD_FREQ
 
 AOM_CTRL_USE_TYPE(AV1E_SET_MODE_COST_UPD_FREQ, unsigned int)
 #define AOM_CTRL_AV1E_SET_MODE_COST_UPD_FREQ
+
+AOM_CTRL_USE_TYPE(AV1E_SET_TARGET_SEQ_LEVEL_IDX, int)
+#define AOM_CTRL_AV1E_SET_TARGET_SEQ_LEVEL_IDX
+
+AOM_CTRL_USE_TYPE(AV1E_SET_TIER_MASK, unsigned int)
+#define AOM_CTRL_AV1E_SET_TIER_MASK
 
 /*!\endcond */
 /*! @} - end defgroup aom_encoder */

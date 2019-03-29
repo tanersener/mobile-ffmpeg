@@ -365,9 +365,11 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(DrPredFunc<DrPred>(&z1_wrapper<av1_dr_prediction_z1_c>,
                                          &z1_wrapper<av1_dr_prediction_z1_avx2>,
                                          AOM_BITS_8, kZ1Start),
+                      /* TODO(niva213@gmail.com): Re-enable this test after
+                      fixing valgrind issue: https://crbug.com/aomedia/2316
                       DrPredFunc<DrPred>(&z2_wrapper<av1_dr_prediction_z2_c>,
                                          &z2_wrapper<av1_dr_prediction_z2_avx2>,
-                                         AOM_BITS_8, kZ2Start),
+                                         AOM_BITS_8, kZ2Start), */
                       DrPredFunc<DrPred>(&z3_wrapper<av1_dr_prediction_z3_c>,
                                          &z3_wrapper<av1_dr_prediction_z3_avx2>,
                                          AOM_BITS_8, kZ3Start)));
@@ -412,6 +414,8 @@ INSTANTIATE_TEST_CASE_P(
                           &z1_wrapper_hbd<av1_highbd_dr_prediction_z1_c>,
                           &z1_wrapper_hbd<av1_highbd_dr_prediction_z1_avx2>,
                           AOM_BITS_12, kZ1Start),
+                      /* TODO(niva213@gmail.com): Re-enable these tests after
+                      fixing valgrind issue: https://crbug.com/aomedia/2316
                       DrPredFunc<DrPred_Hbd>(
                           &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_c>,
                           &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_avx2>,
@@ -423,7 +427,7 @@ INSTANTIATE_TEST_CASE_P(
                       DrPredFunc<DrPred_Hbd>(
                           &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_c>,
                           &z2_wrapper_hbd<av1_highbd_dr_prediction_z2_avx2>,
-                          AOM_BITS_12, kZ2Start),
+                          AOM_BITS_12, kZ2Start),*/
                       DrPredFunc<DrPred_Hbd>(
                           &z3_wrapper_hbd<av1_highbd_dr_prediction_z3_c>,
                           &z3_wrapper_hbd<av1_highbd_dr_prediction_z3_avx2>,

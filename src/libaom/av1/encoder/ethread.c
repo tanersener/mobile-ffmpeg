@@ -236,8 +236,12 @@ static void switch_tile_and_get_next_job(AV1_COMP *const cpi, int *cur_tile_id,
       int tile_index = tile_row * tile_cols + tile_col;
       TileDataEnc *this_tile = &cpi->tile_data[tile_index];
       AV1RowMTInfo *row_mt_info = &this_tile->row_mt_info;
-      int theoretical_limit_on_threads = (int)(round(AOMMAX(
-          (double)(av1_get_sb_cols_in_tile(cm, this_tile->tile_info)) / 2, 1)));
+      int num_sb_rows_in_tile =
+          av1_get_sb_rows_in_tile(cm, this_tile->tile_info);
+      int num_sb_cols_in_tile =
+          av1_get_sb_cols_in_tile(cm, this_tile->tile_info);
+      int theoretical_limit_on_threads =
+          AOMMIN((num_sb_cols_in_tile + 1) >> 1, num_sb_rows_in_tile);
       int num_threads_working = row_mt_info->num_threads_working;
       if (num_threads_working < theoretical_limit_on_threads) {
         int num_mis_to_encode =
@@ -637,8 +641,8 @@ void av1_encode_tiles_row_mt(AV1_COMP *cpi) {
           av1_get_sb_rows_in_tile(cm, tile_data->tile_info);
       int num_sb_cols_in_tile =
           av1_get_sb_cols_in_tile(cm, tile_data->tile_info);
-      total_num_threads_row_mt += (int)round(AOMMIN(
-          AOMMAX((double)(num_sb_cols_in_tile) / 2, 1), num_sb_rows_in_tile));
+      total_num_threads_row_mt +=
+          AOMMIN((num_sb_cols_in_tile + 1) >> 1, num_sb_rows_in_tile);
       max_sb_rows = AOMMAX(max_sb_rows, num_sb_rows_in_tile);
     }
   }

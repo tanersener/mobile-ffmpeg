@@ -34,5 +34,9 @@ function(setup_aom_scale_targets)
                                   "AOM_SCALE_INTRIN_DSPR2" "aom")
   endif()
 
+  target_sources(aom PRIVATE $<TARGET_OBJECTS:aom_scale>)
+
+  # Pass the new lib targets up to the parent scope instance of
+  # $AOM_LIB_TARGETS.
   set(AOM_LIB_TARGETS ${AOM_LIB_TARGETS} aom_scale PARENT_SCOPE)
 endfunction()

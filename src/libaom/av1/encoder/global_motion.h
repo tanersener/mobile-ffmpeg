@@ -22,6 +22,11 @@ extern "C" {
 
 #define RANSAC_NUM_MOTIONS 1
 
+typedef enum {
+  GLOBAL_MOTION_FEATURE_BASED,
+  GLOBAL_MOTION_DISFLOW_BASED,
+} GlobalMotionEstimationType;
+
 void av1_convert_model_to_params(const double *params,
                                  WarpedMotionParams *model);
 
@@ -56,6 +61,7 @@ int64_t av1_refine_integerized_param(WarpedMotionParams *wm,
 */
 int av1_compute_global_motion(TransformationType type, YV12_BUFFER_CONFIG *frm,
                               YV12_BUFFER_CONFIG *ref, int bit_depth,
+                              GlobalMotionEstimationType gm_estimation_type,
                               int *num_inliers_by_motion,
                               double *params_by_motion, int num_motions);
 #ifdef __cplusplus

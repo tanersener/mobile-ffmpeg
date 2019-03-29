@@ -82,6 +82,9 @@ int ifd_inspect(insp_frame_data *fd, void *decoder, int skip_not_transform) {
       mi->ref_frame[1] = mbmi->ref_frame[1];
       // Prediction Mode
       mi->mode = mbmi->mode;
+      mi->intrabc = (int16_t)mbmi->use_intrabc;
+      mi->palette = (int16_t)mbmi->palette_mode_info.palette_size[0];
+      mi->uv_palette = (int16_t)mbmi->palette_mode_info.palette_size[1];
       // Prediction Mode for Chromatic planes
       if (mi->mode < INTRA_MODES) {
         mi->uv_mode = mbmi->uv_mode;

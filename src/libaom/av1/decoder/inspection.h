@@ -52,6 +52,9 @@ struct insp_mi_data {
   int16_t current_qindex;
   int16_t compound_type;
   int16_t motion_mode;
+  int16_t intrabc;
+  int16_t palette;
+  int16_t uv_palette;
 };
 
 typedef struct insp_frame_data insp_frame_data;

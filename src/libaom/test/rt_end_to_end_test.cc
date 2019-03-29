@@ -26,7 +26,7 @@ const int kBitrate = 500;
 
 // List of psnr thresholds for speed settings 0-8
 const double kPsnrThreshold[9] = { 36.9, 36.9, 36.85, 36.8, 36.6,
-                                   36.4, 36.0, 35.5,  34.5 };
+                                   36.4, 36.0, 35.5,  35.0 };
 
 typedef struct {
   const char *filename;

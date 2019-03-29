@@ -80,7 +80,6 @@ int sb_compute_cdef_list(const AV1_COMMON *const cm, int mi_row, int mi_col,
       if (!is_8x8_block_skip(grid, mi_row + r, mi_col + c, cm->mi_stride)) {
         dlist[count].by = r >> r_shift;
         dlist[count].bx = c >> c_shift;
-        dlist[count].skip = 0;
         count++;
       }
     }

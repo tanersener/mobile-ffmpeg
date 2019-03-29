@@ -31,7 +31,7 @@ static void generate_kernels(ACMRandom *rnd, InterpKernel hkernel,
   hkernel[2] = hkernel[4] =
       WIENER_FILT_TAP2_MINV +
       rnd->PseudoUniform(WIENER_FILT_TAP2_MAXV + 1 - WIENER_FILT_TAP2_MINV);
-  hkernel[3] = -2 * (hkernel[0] + hkernel[1] + hkernel[2]);
+  hkernel[3] = -(hkernel[0] + hkernel[1] + hkernel[2]);
   hkernel[7] = 0;
 
   vkernel[0] = vkernel[6] =
@@ -43,7 +43,7 @@ static void generate_kernels(ACMRandom *rnd, InterpKernel hkernel,
   vkernel[2] = vkernel[4] =
       WIENER_FILT_TAP2_MINV +
       rnd->PseudoUniform(WIENER_FILT_TAP2_MAXV + 1 - WIENER_FILT_TAP2_MINV);
-  vkernel[3] = -2 * (vkernel[0] + vkernel[1] + vkernel[2]);
+  vkernel[3] = -(vkernel[0] + vkernel[1] + vkernel[2]);
   vkernel[7] = 0;
 }
 
