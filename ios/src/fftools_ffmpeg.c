@@ -2890,7 +2890,7 @@ static void print_sdp(void)
     av_sdp_create(avc, j, sdp, sizeof(sdp));
 
     if (!sdp_filename) {
-        printf("SDP:\n%s\n", sdp);
+        av_log(NULL, AV_LOG_INFO, "SDP:\n%s\n", sdp);
         fflush(stdout);
     } else {
         if (avio_open2(&sdp_pb, sdp_filename, AVIO_FLAG_WRITE, &int_cb, NULL) < 0) {
