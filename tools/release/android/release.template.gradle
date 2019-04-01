@@ -127,7 +127,7 @@ bintray {
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = allLicenses
-        dryRun = false
+        dryRun = true
         publish = false
         override = false
         publicDownloadNumbers = false
