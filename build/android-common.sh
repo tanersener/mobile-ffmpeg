@@ -357,11 +357,11 @@ get_common_linked_libraries() {
                 echo "-lc -lm -ldl -llog ${COMMON_LIBRARY_PATHS}"
             fi
         ;;
-        tesseract)
-            echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
-        ;;
         libvpx)
             echo "-lc -lm ${COMMON_LIBRARY_PATHS}"
+        ;;
+        tesseract | x265)
+            echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
         ;;
         *)
             echo "-lc -lm -ldl -llog ${COMMON_LIBRARY_PATHS}"
@@ -789,7 +789,7 @@ Version: ${X265_VERSION}
 
 Requires:
 Libs: -L\${libdir} -lx265
-Libs.private: -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl
+Libs.private: -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl -lc++_shared
 Cflags: -I\${includedir}
 EOF
 }
