@@ -17,6 +17,7 @@ var searchData=
   ['getaverageframerate',['getAverageFrameRate',['../dd/ddc/interface_stream_information.html#aca8380f0b5dc6c9b3d35a22e7bec5655',1,'StreamInformation']]],
   ['getbitrate',['getBitrate',['../d6/dca/interface_media_information.html#a15deef44dbf3020cadd5bb099e528a0d',1,'MediaInformation::getBitrate()'],['../d9/dcc/interface_statistics.html#a56b9b377bc9d7c36590452982047809f',1,'Statistics::getBitrate()'],['../dd/ddc/interface_stream_information.html#abc1f237f5e07903cbdeee53c31f9ed7e',1,'StreamInformation::getBitrate()']]],
   ['getbuildconf',['getBuildConf',['../df/d45/interface_mobile_f_fmpeg_config.html#aa5d2ee83a36d86a735474684fb33433c',1,'MobileFFmpegConfig']]],
+  ['getbuilddate',['getBuildDate',['../d3/d21/interface_mobile_f_fmpeg.html#a281bfe6912866d6272510e567c97680e',1,'MobileFFmpeg']]],
   ['getchannellayout',['getChannelLayout',['../dd/ddc/interface_stream_information.html#a2bd6bdfea6652e7c0641ca3a64764d61',1,'StreamInformation']]],
   ['getcodec',['getCodec',['../dd/ddc/interface_stream_information.html#a5e896eb85cba4b117733565651a05513',1,'StreamInformation']]],
   ['getcodectimebase',['getCodecTimeBase',['../dd/ddc/interface_stream_information.html#adbc3359673c9d1f7861ebc15d2cf514a',1,'StreamInformation']]],

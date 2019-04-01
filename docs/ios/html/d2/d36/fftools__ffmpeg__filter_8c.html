@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">MobileFFmpeg IOS API
-   &#160;<span id="projectnumber">4.2</span>
+   &#160;<span id="projectnumber">4.2.1</span>
    </div>
   </td>
  </tr>
@@ -260,7 +260,7 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">char</span> *choose_ ## suffix (<a class="code" href="../../d0/d0f/struct_output_filter.html">OutputFilter</a> *ofilter)                         \</div><div class="line">{                                                                              \</div><div class="line">    if (ofilter-&gt;var != none) {                                                \</div><div class="line">        get_name(ofilter-&gt;var);                                                \</div><div class="line">        return av_strdup(name);                                                \</div><div class="line">    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ofilter-&gt;supported_list) {                                      \</div><div class="line">        const <a class="code" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a> *p;                                                         \</div><div class="line">        AVIOContext *s = NULL;                                                 \</div><div class="line">        uint8_t *ret;                                                          \</div><div class="line">        int len;                                                               \</div><div class="line">                                                                               \</div><div class="line">        if (avio_open_dyn_buf(&amp;s) &lt; 0)                                         \</div><div class="line">            exit_program(1);                                                           \</div><div class="line">                                                                               \</div><div class="line">        for (p = ofilter-&gt;supported_list; *p != none; p++) {                   \</div><div class="line">            get_name(*p);                                                      \</div><div class="line">            avio_printf(s, <span class="stringliteral">&quot;%s|&quot;</span>, name);                                       \</div><div class="line">        }                                                                      \</div><div class="line">        len = avio_close_dyn_buf(s, &amp;ret);                                     \</div><div class="line">        ret[len - 1] = 0;                                                      \</div><div class="line">        return ret;                                                            \</div><div class="line">    } else                                                                     \</div><div class="line">        return NULL;                                                           \</div><div class="line">}</div><div class="ttc" id="struct_output_filter_html"><div class="ttname"><a href="../../d0/d0f/struct_output_filter.html">OutputFilter</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d7/db3/fftools__ffmpeg_8h_source.html#l00271">fftools_ffmpeg.h:271</a></div></div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keyword">static</span> <span class="keywordtype">char</span> *choose_ ## suffix (<a class="code" href="../../d0/d0f/struct_output_filter.html">OutputFilter</a> *ofilter)                         \</div><div class="line">{                                                                              \</div><div class="line">    if (ofilter-&gt;var != none) {                                                \</div><div class="line">        get_name(ofilter-&gt;var);                                                \</div><div class="line">        return av_strdup(name);                                                \</div><div class="line">    } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (ofilter-&gt;supported_list) {                                      \</div><div class="line">        const <a class="code" href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a> *p;                                                         \</div><div class="line">        AVIOContext *s = NULL;                                                 \</div><div class="line">        uint8_t *ret;                                                          \</div><div class="line">        int len;                                                               \</div><div class="line">                                                                               \</div><div class="line">        if (avio_open_dyn_buf(&amp;s) &lt; 0)                                         \</div><div class="line">            exit_program(1);                                                           \</div><div class="line">                                                                               \</div><div class="line">        for (p = ofilter-&gt;supported_list; *p != none; p++) {                   \</div><div class="line">            get_name(*p);                                                      \</div><div class="line">            avio_printf(s, <span class="stringliteral">&quot;%s|&quot;</span>, name);                                       \</div><div class="line">        }                                                                      \</div><div class="line">        len = avio_close_dyn_buf(s, &amp;ret);                                     \</div><div class="line">        ret[len - 1] = 0;                                                      \</div><div class="line">        return ret;                                                            \</div><div class="line">    } else                                                                     \</div><div class="line">        return NULL;                                                           \</div><div class="line">}</div><div class="ttc" id="struct_output_filter_html"><div class="ttname"><a href="../../d0/d0f/struct_output_filter.html">OutputFilter</a></div><div class="ttdef"><b>Definition:</b> <a href="../../d7/db3/fftools__ffmpeg_8h_source.html#l00273">fftools_ffmpeg.h:273</a></div></div>
 <div class="ttc" id="_stream_information_8m_html_abff6a04d71c2bba87e646615388a1f5c"><div class="ttname"><a href="../../d7/da5/_stream_information_8m.html#abff6a04d71c2bba87e646615388a1f5c">type</a></div><div class="ttdeci">NSString * type</div><div class="ttdef"><b>Definition:</b> <a href="../../d7/da5/_stream_information_8m_source.html#l00022">StreamInformation.m:22</a></div></div>
 </div><!-- fragment -->
 <p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00167">167</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
@@ -284,7 +284,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00691">691</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00698">698</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -412,7 +412,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00995">995</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l01003">1003</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -432,7 +432,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l01005">1005</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l01013">1013</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -476,7 +476,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00869">869</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00877">877</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -520,7 +520,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00979">979</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00987">987</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -564,7 +564,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00746">746</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00754">754</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -608,7 +608,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00549">549</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00556">556</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -644,7 +644,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00677">677</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00684">684</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -688,7 +688,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00455">455</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00462">462</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -858,7 +858,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l01217">1217</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l01225">1225</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -926,7 +926,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l01185">1185</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l01193">1193</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -946,7 +946,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00341">341</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00348">348</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -1034,7 +1034,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00433">433</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00440">440</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -1090,7 +1090,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00382">382</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00389">389</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -1120,7 +1120,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l01208">1208</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l01216">1216</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -1158,7 +1158,7 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00706">706</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html#l00713">713</a> of file <a class="el" href="../../d2/d36/fftools__ffmpeg__filter_8c_source.html">fftools_ffmpeg_filter.c</a>.</p>
 
 </div>
 </div>
@@ -1214,7 +1214,7 @@ Variables</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Feb 8 2019 23:59:39 for MobileFFmpeg IOS API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 1 2019 13:29:42 for MobileFFmpeg IOS API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="../../doxygen.png" alt="doxygen"/>
 </a> 1.8.14
 </small></address>
