@@ -114,7 +114,7 @@
  * \brief   ptaSubsample()
  *
  * \param[in]    ptas
- * \param[in]    subfactor subsample factor, >= 1
+ * \param[in]    subfactor    subsample factor, >= 1
  * \return  ptad evenly sampled pt values from ptas, or NULL on error
  */
 PTA *
@@ -147,10 +147,10 @@ PTA       *ptad;
 /*!
  * \brief   ptaJoin()
  *
- * \param[in]    ptad  dest pta; add to this one
- * \param[in]    ptas  source pta; add from this one
- * \param[in]    istart  starting index in ptas
- * \param[in]    iend  ending index in ptas; use -1 to cat all
+ * \param[in]    ptad     dest pta; add to this one
+ * \param[in]    ptas     source pta; add from this one
+ * \param[in]    istart   starting index in ptas
+ * \param[in]    iend     ending index in ptas; use -1 to cat all
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -195,10 +195,10 @@ l_int32  n, i, x, y;
 /*!
  * \brief   ptaaJoin()
  *
- * \param[in]    ptaad  dest ptaa; add to this one
- * \param[in]    ptaas  source ptaa; add from this one
- * \param[in]    istart  starting index in ptaas
- * \param[in]    iend  ending index in ptaas; use -1 to cat all
+ * \param[in]    ptaad    dest ptaa; add to this one
+ * \param[in]    ptaas    source ptaa; add from this one
+ * \param[in]    istart   starting index in ptaas
+ * \param[in]    iend     ending index in ptaas; use -1 to cat all
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -245,7 +245,7 @@ PTA     *pta;
  * \brief   ptaReverse()
  *
  * \param[in]    ptas
- * \param[in]    type  0 for float values; 1 for integer values
+ * \param[in]    type     0 for float values; 1 for integer values
  * \return  ptad reversed pta, or NULL on error
  */
 PTA  *
@@ -312,7 +312,7 @@ PTA       *ptad;
  * \brief   ptaCyclicPerm()
  *
  * \param[in]    ptas
- * \param[in]    xs, ys  start point; must be in ptas
+ * \param[in]    xs, ys     start point; must be in ptas
  * \return  ptad cyclic permutation, starting and ending at (xs, ys,
  *              or NULL on error
  *
@@ -466,10 +466,10 @@ l_int32  n, i, x, y, minx, maxx, miny, maxy;
  * \brief   ptaGetRange()
  *
  * \param[in]    pta
- * \param[out]   pminx [optional] min value of x
- * \param[out]   pmaxx [optional] max value of x
- * \param[out]   pminy [optional] min value of y
- * \param[out]   pmaxy [optional] max value of y
+ * \param[out]   pminx    [optional] min value of x
+ * \param[out]   pmaxx    [optional] max value of x
+ * \param[out]   pminy    [optional] min value of y
+ * \param[out]   pmaxy    [optional] max value of y
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -525,7 +525,7 @@ l_float32  x, y, minx, maxx, miny, maxy;
 /*!
  * \brief   ptaGetInsideBox()
  *
- * \param[in]    ptas input pts
+ * \param[in]    ptas    input pts
  * \param[in]    box
  * \return  ptad of pts in ptas that are inside the box, or NULL on error
  */
@@ -560,7 +560,7 @@ l_float32  x, y;
 /*!
  * \brief   pixFindCornerPixels()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs    1 bpp
  * \return  pta, or NULL on error
  *
  * <pre>
@@ -658,7 +658,7 @@ PTA       *pta;
  * \brief   ptaContainsPt()
  *
  * \param[in]    pta
- * \param[in]    x, y  point
+ * \param[in]    x, y     point
  * \return  1 if contained, 0 otherwise or on error
  */
 l_int32
@@ -761,9 +761,9 @@ PTA     *ptad;
 /*!
  * \brief   ptaPtInsidePolygon()
  *
- * \param[in]    pta vertices of a polygon
- * \param[in]    x, y point to be tested
- * \param[out]   pinside 1 if inside; 0 if outside or on boundary
+ * \param[in]    pta       vertices of a polygon
+ * \param[in]    x, y      point to be tested
+ * \param[out]   pinside   1 if inside; 0 if outside or on boundary
  * \return  1 if OK, 0 on error
  *
  *  The abs value of the sum of the angles subtended from a point by
@@ -811,8 +811,8 @@ l_float32  sum, x1, y1, x2, y2, xp1, yp1, xp2, yp2;
 /*!
  * \brief   l_angleBetweenVectors()
  *
- * \param[in]    x1, y1 end point of first vector
- * \param[in]    x2, y2 end point of second vector
+ * \param[in]    x1, y1     end point of first vector
+ * \param[in]    x2, y2     end point of second vector
  * \return  angle radians, or 0.0 on error
  *
  * <pre>
@@ -845,10 +845,10 @@ l_float64  ang;
  * \brief   ptaGetMinMax()
  *
  * \param[in]    pta
- * \param[out]   pxmin  [optional] min of x
- * \param[out]   pymin  [optional] min of y
- * \param[out]   pxmax  [optional] max of x
- * \param[out]   pymax  [optional] max of y
+ * \param[out]   pxmin   [optional] min of x
+ * \param[out]   pymin   [optional] min of y
+ * \param[out]   pxmax   [optional] max of x
+ * \param[out]   pymax   [optional] max of y
  * \return  0 if OK, 1 on error.  If pta is empty, requested
  *              values are returned as -1.0.
  */
@@ -898,11 +898,11 @@ l_float32  x, y, xmin, ymin, xmax, ymax;
  * \brief   ptaSelectByValue()
  *
  * \param[in]    ptas
- * \param[in]    xth, yth threshold values
- * \param[in]    type L_SELECT_XVAL, L_SELECT_YVAL,
- *                    L_SELECT_IF_EITHER, L_SELECT_IF_BOTH
- * \param[in]    relation L_SELECT_IF_LT, L_SELECT_IF_GT,
- *                        L_SELECT_IF_LTE, L_SELECT_IF_GTE
+ * \param[in]    xth, yth    threshold values
+ * \param[in]    type        L_SELECT_XVAL, L_SELECT_YVAL,
+ *                           L_SELECT_IF_EITHER, L_SELECT_IF_BOTH
+ * \param[in]    relation    L_SELECT_IF_LT, L_SELECT_IF_GT,
+ *                           L_SELECT_IF_LTE, L_SELECT_IF_GTE
  * \return  ptad filtered set, or NULL on error
  */
 PTA *
@@ -969,8 +969,8 @@ PTA       *ptad;
 /*!
  * \brief   ptaCropToMask()
  *
- * \param[in]    ptas  input pta
- * \param[in]    pixm  1 bpp mask
+ * \param[in]    ptas    input pta
+ * \param[in]    pixm    1 bpp mask
  * \return  ptad  with only pts under the mask fg, or NULL on error
  */
 PTA *
@@ -1011,9 +1011,9 @@ PTA      *ptad;
  * \brief   ptaGetLinearLSF()
  *
  * \param[in]    pta
- * \param[out]   pa  [optional] slope a of least square fit: y = ax + b
- * \param[out]   pb  [optional] intercept b of least square fit
- * \param[out]   pnafit [optional] numa of least square fit
+ * \param[out]   pa      [optional] slope a of least square fit: y = ax + b
+ * \param[out]   pb      [optional] intercept b of least square fit
+ * \param[out]   pnafit  [optional] numa of least square fit
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1113,10 +1113,10 @@ l_float32  *xa, *ya;
  * \brief   ptaGetQuadraticLSF()
  *
  * \param[in]    pta
- * \param[out]   pa  [optional] coeff a of LSF: y = ax^2 + bx + c
- * \param[out]   pb  [optional] coeff b of LSF: y = ax^2 + bx + c
- * \param[out]   pc  [optional] coeff c of LSF: y = ax^2 + bx + c
- * \param[out]   pnafit [optional] numa of least square fit
+ * \param[out]   pa      [optional] coeff a of LSF: y = ax^2 + bx + c
+ * \param[out]   pb      [optional] coeff b of LSF: y = ax^2 + bx + c
+ * \param[out]   pc      [optional] coeff c of LSF: y = ax^2 + bx + c
+ * \param[out]   pnafit  [optional] numa of least square fit
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1223,11 +1223,11 @@ l_float32   g[3];
  * \brief   ptaGetCubicLSF()
  *
  * \param[in]    pta
- * \param[out]   pa  [optional] coeff a of LSF: y = ax^3 + bx^2 + cx + d
- * \param[out]   pb  [optional] coeff b of LSF
- * \param[out]   pc  [optional] coeff c of LSF
- * \param[out]   pd  [optional] coeff d of LSF
- * \param[out]   pnafit [optional] numa of least square fit
+ * \param[out]   pa      [optional] coeff a of LSF: y = ax^3 + bx^2 + cx + d
+ * \param[out]   pb      [optional] coeff b of LSF
+ * \param[out]   pc      [optional] coeff c of LSF
+ * \param[out]   pd      [optional] coeff d of LSF
+ * \param[out]   pnafit  [optional] numa of least square fit
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1350,13 +1350,13 @@ l_float32   g[4];
  * \brief   ptaGetQuarticLSF()
  *
  * \param[in]    pta
- * \param[out]   pa  [optional] coeff a of LSF:
- *                        y = ax^4 + bx^3 + cx^2 + dx + e
- * \param[out]   pb  [optional] coeff b of LSF
- * \param[out]   pc  [optional] coeff c of LSF
- * \param[out]   pd  [optional] coeff d of LSF
- * \param[out]   pe  [optional] coeff e of LSF
- * \param[out]   pnafit [optional] numa of least square fit
+ * \param[out]   pa      [optional] coeff a of LSF:
+ *                            y = ax^4 + bx^3 + cx^2 + dx + e
+ * \param[out]   pb      [optional] coeff b of LSF
+ * \param[out]   pc      [optional] coeff c of LSF
+ * \param[out]   pd      [optional] coeff d of LSF
+ * \param[out]   pe      [optional] coeff e of LSF
+ * \param[out]   pnafit  [optional] numa of least square fit
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1499,13 +1499,13 @@ l_float32   g[5];
  * \brief   ptaNoisyLinearLSF()
  *
  * \param[in]    pta
- * \param[in]    factor reject outliers with error greater than this
- *                      number of medians; typically ~ 3
- * \param[out]   pptad [optional] with outliers removed
- * \param[out]   pa  [optional] slope a of least square fit: y = ax + b
- * \param[out]   pb  [optional] intercept b of least square fit
- * \param[out]   pmederr [optional] median error
- * \param[out]   pnafit [optional] numa of least square fit to ptad
+ * \param[in]    factor    reject outliers with error greater than this
+ *                         number of medians; typically ~ 3
+ * \param[out]   pptad     [optional] with outliers removed
+ * \param[out]   pa        [optional] slope a of least square fit: y = ax + b
+ * \param[out]   pb        [optional] intercept b of least square fit
+ * \param[out]   pmederr   [optional] median error
+ * \param[out]   pnafit    [optional] numa of least square fit to ptad
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1589,14 +1589,14 @@ PTA       *ptad;
  * \brief   ptaNoisyQuadraticLSF()
  *
  * \param[in]    pta
- * \param[in]    factor reject outliers with error greater than this
- *                      number of medians; typically ~ 3
- * \param[out]   pptad [optional] with outliers removed
- * \param[out]   pa  [optional] coeff a of LSF: y = ax^2 + bx + c
- * \param[out]   pb  [optional] coeff b of LSF: y = ax^2 + bx + c
- * \param[out]   pc  [optional] coeff c of LSF: y = ax^2 + bx + c
- * \param[out]   pmederr [optional] median error
- * \param[out]   pnafit [optional] numa of least square fit to ptad
+ * \param[in]    factor    reject outliers with error greater than this
+ *                         number of medians; typically ~ 3
+ * \param[out]   pptad     [optional] with outliers removed
+ * \param[out]   pa        [optional] coeff a of LSF: y = ax^2 + bx + c
+ * \param[out]   pb        [optional] coeff b of LSF: y = ax^2 + bx + c
+ * \param[out]   pc        [optional] coeff c of LSF: y = ax^2 + bx + c
+ * \param[out]   pmederr   [optional] median error
+ * \param[out]   pnafit    [optional] numa of least square fit to ptad
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1682,9 +1682,9 @@ PTA       *ptad;
 /*!
  * \brief   applyLinearFit()
  *
- * \param[in]   a, b linear fit coefficients
+ * \param[in]   a, b    linear fit coefficients
  * \param[in]   x
- * \param[out]  py y = a * x + b
+ * \param[out]  py      y = a * x + b
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1706,9 +1706,9 @@ applyLinearFit(l_float32   a,
 /*!
  * \brief   applyQuadraticFit()
  *
- * \param[in]   a, b, c quadratic fit coefficients
+ * \param[in]   a, b, c    quadratic fit coefficients
  * \param[in]   x
- * \param[out]  py y = a * x^2 + b * x + c
+ * \param[out]  py         y = a * x^2 + b * x + c
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1731,9 +1731,9 @@ applyQuadraticFit(l_float32   a,
 /*!
  * \brief   applyCubicFit()
  *
- * \param[in]   a, b, c, d cubic fit coefficients
+ * \param[in]   a, b, c, d   cubic fit coefficients
  * \param[in]   x
- * \param[out]  py y = a * x^3 + b * x^2  + c * x + d
+ * \param[out]  py           y = a * x^3 + b * x^2  + c * x + d
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1757,9 +1757,9 @@ applyCubicFit(l_float32   a,
 /*!
  * \brief   applyQuarticFit()
  *
- * \param[in]   a, b, c, d, e quartic fit coefficients
+ * \param[in]   a, b, c, d, e   quartic fit coefficients
  * \param[in]   x
- * \param[out]  py y = a * x^4 + b * x^3  + c * x^2 + d * x + e
+ * \param[out]  py              y = a * x^4 + b * x^3  + c * x^2 + d * x + e
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1790,10 +1790,10 @@ l_float32  x2;
 /*!
  * \brief   pixPlotAlongPta()
  *
- * \param[in]   pixs any depth
- * \param[in]   pta set of points on which to plot
- * \param[in]   outformat GPLOT_PNG, GPLOT_PS, GPLOT_EPS, GPLOT_LATEX
- * \param[in]   title [optional] for plot; can be null
+ * \param[in]   pixs        any depth
+ * \param[in]   pta         set of points on which to plot
+ * \param[in]   outformat   GPLOT_PNG, GPLOT_PS, GPLOT_EPS, GPLOT_LATEX
+ * \param[in]   title       [optional] for plot; can be null
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1894,8 +1894,8 @@ PIX            *pixt;
 /*!
  * \brief   ptaGetPixelsFromPix()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    box [optional] can be null
+ * \param[in]    pixs     1 bpp
+ * \param[in]    box      [optional] can be null
  * \return  pta, or NULL on error
  *
  * <pre>
@@ -1947,7 +1947,7 @@ PTA       *pta;
  * \brief   pixGenerateFromPta()
  *
  * \param[in]    pta
- * \param[in]    w, h of pix
+ * \param[in]    w, h    of pix
  * \return  pix 1 bpp, or NULL on error
  *
  * <pre>
@@ -1987,8 +1987,8 @@ PIX     *pix;
 /*!
  * \brief   ptaGetBoundaryPixels()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    type L_BOUNDARY_FG, L_BOUNDARY_BG
+ * \param[in]    pixs    1 bpp
+ * \param[in]    type    L_BOUNDARY_FG, L_BOUNDARY_BG
  * \return  pta, or NULL on error
  *
  * <pre>
@@ -2027,11 +2027,11 @@ PTA  *pta;
 /*!
  * \brief   ptaaGetBoundaryPixels()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    type L_BOUNDARY_FG, L_BOUNDARY_BG
- * \param[in]    connectivity 4 or 8
- * \param[out]   pboxa [optional] bounding boxes of the c.c.
- * \param[out]   ppixa [optional] pixa of the c.c.
+ * \param[in]    pixs          1 bpp
+ * \param[in]    type          L_BOUNDARY_FG, L_BOUNDARY_BG
+ * \param[in]    connectivity  4 or 8
+ * \param[out]   pboxa         [optional] bounding boxes of the c.c.
+ * \param[out]   ppixa         [optional] pixa of the c.c.
  * \return  ptaa, or NULL on error
  *
  * <pre>
@@ -2112,8 +2112,8 @@ PTAA    *ptaa;
 /*!
  * \brief   ptaaIndexLabeledPixels()
  *
- * \param[in]    pixs 32 bpp, of indices of c.c.
- * \param[out]   pncc [optional] number of connected components
+ * \param[in]    pixs     32 bpp, of indices of c.c.
+ * \param[out]   pncc     [optional] number of connected components
  * \return  ptaa, or NULL on error
  *
  * <pre>
@@ -2344,9 +2344,9 @@ l_float32  valx, valy;
 /*!
  * \brief   pixDisplayPta()
  *
- * \param[in]    pixd can be same as pixs or NULL; 32 bpp if in-place
- * \param[in]    pixs 1, 2, 4, 8, 16 or 32 bpp
- * \param[in]    pta of path to be plotted
+ * \param[in]    pixd    can be same as pixs or NULL; 32 bpp if in-place
+ * \param[in]    pixs    1, 2, 4, 8, 16 or 32 bpp
+ * \param[in]    pta     of path to be plotted
  * \return  pixd 32 bpp RGB version of pixs, with path in green.
  *
  * <pre>
@@ -2404,12 +2404,12 @@ l_uint32  rpixel, gpixel, bpixel;
 /*!
  * \brief   pixDisplayPtaaPattern()
  *
- * \param[in]    pixd 32 bpp
- * \param[in]    pixs 1, 2, 4, 8, 16 or 32 bpp; 32 bpp if in place
- * \param[in]    ptaa giving locations at which the pattern is displayed
- * \param[in]    pixp 1 bpp pattern to be placed such that its reference
- *                    point co-locates with each point in pta
- * \param[in]    cx, cy reference point in pattern
+ * \param[in]    pixd     32 bpp
+ * \param[in]    pixs     1, 2, 4, 8, 16 or 32 bpp; 32 bpp if in place
+ * \param[in]    ptaa     giving locations at which the pattern is displayed
+ * \param[in]    pixp     1 bpp pattern to be placed such that its reference
+ *                        point co-locates with each point in pta
+ * \param[in]    cx, cy   reference point in pattern
  * \return  pixd 32 bpp RGB version of pixs.
  *
  * <pre>
@@ -2471,13 +2471,13 @@ PTA      *pta;
 /*!
  * \brief   pixDisplayPtaPattern()
  *
- * \param[in]    pixd can be same as pixs or NULL; 32 bpp if in-place
- * \param[in]    pixs 1, 2, 4, 8, 16 or 32 bpp
- * \param[in]    pta giving locations at which the pattern is displayed
- * \param[in]    pixp 1 bpp pattern to be placed such that its reference
- *                    point co-locates with each point in pta
- * \param[in]    cx, cy reference point in pattern
- * \param[in]    color in 0xrrggbb00 format
+ * \param[in]    pixd     can be same as pixs or NULL; 32 bpp if in-place
+ * \param[in]    pixs     1, 2, 4, 8, 16 or 32 bpp
+ * \param[in]    pta      giving locations at which the pattern is displayed
+ * \param[in]    pixp     1 bpp pattern to be placed such that its reference
+ *                        point co-locates with each point in pta
+ * \param[in]    cx, cy   reference point in pattern
+ * \param[in]    color    in 0xrrggbb00 format
  * \return  pixd 32 bpp RGB version of pixs.
  *
  * <pre>
@@ -2537,11 +2537,12 @@ PTA     *ptat;
 /*!
  * \brief   ptaReplicatePattern()
  *
- * \param[in]    ptas "sparse" input pta
- * \param[in]    pixp [optional] 1 bpp pattern, to be replicated in output pta
- * \param[in]    ptap [optional] set of pts, to be replicated in output pta
- * \param[in]    cx, cy reference point in pattern
- * \param[in]    w, h clipping sizes for output pta
+ * \param[in]    ptas    "sparse" input pta
+ * \param[in]    pixp    [optional] 1 bpp pattern, to be replicated
+ *                                  in output pta
+ * \param[in]    ptap    [optional] set of pts, to be replicated in output pta
+ * \param[in]    cx, cy  reference point in pattern
+ * \param[in]    w, h    clipping sizes for output pta
  * \return  ptad with all points of replicated pattern, or NULL on error
  *
  * <pre>
@@ -2600,8 +2601,8 @@ PTA     *ptat, *ptad;
 /*!
  * \brief   pixDisplayPtaa()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16 or 32 bpp
- * \param[in]    ptaa array of paths to be plotted
+ * \param[in]    pixs    1, 2, 4, 8, 16 or 32 bpp
+ * \param[in]    ptaa    array of paths to be plotted
  * \return  pixd 32 bpp RGB version of pixs, with paths plotted
  *                    in different colors, or NULL on error
  */

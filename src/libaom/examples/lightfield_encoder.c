@@ -275,9 +275,13 @@ static void pass1(aom_image_t *raw, FILE *infile, const char *outfile_name,
   aom_img_fmt_t ref_fmt = AOM_IMG_FMT_I420;
   if (!CONFIG_LOWBITDEPTH) ref_fmt |= AOM_IMG_FMT_HIGHBITDEPTH;
   // Allocate memory with the border so that it can be used as a reference.
+  int border_in_pixels =
+      (codec.config.enc->rc_resize_mode || codec.config.enc->rc_superres_mode)
+          ? AOM_BORDER_IN_PIXELS
+          : AOM_ENC_NO_SCALE_BORDER;
   for (i = 0; i < reference_image_num; i++) {
     if (!aom_img_alloc_with_border(&reference_images[i], ref_fmt, cfg->g_w,
-                                   cfg->g_h, 32, 8, AOM_BORDER_IN_PIXELS)) {
+                                   cfg->g_h, 32, 8, border_in_pixels)) {
       die("Failed to allocate image.");
     }
   }
@@ -393,6 +397,10 @@ static void pass1(aom_image_t *raw, FILE *infile, const char *outfile_name,
   for (i = 0; i < reference_image_num; i++) aom_img_free(&reference_images[i]);
 
   if (aom_codec_destroy(&codec)) die_codec(&codec, "Failed to destroy codec.");
+
+  // Modify large_scale_file fourcc.
+  if (cfg->large_scale_tile == 1)
+    aom_video_writer_set_fourcc(writer, LST_FOURCC);
   aom_video_writer_close(writer);
 
   printf("\nSecond pass complete. Processed %d frames.\n", frame_count);

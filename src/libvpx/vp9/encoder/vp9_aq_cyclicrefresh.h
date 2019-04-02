@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP9_ENCODER_VP9_AQ_CYCLICREFRESH_H_
-#define VP9_ENCODER_VP9_AQ_CYCLICREFRESH_H_
+#ifndef VPX_VP9_ENCODER_VP9_AQ_CYCLICREFRESH_H_
+#define VPX_VP9_ENCODER_VP9_AQ_CYCLICREFRESH_H_
 
 #include "vpx/vpx_integer.h"
 #include "vp9/common/vp9_blockd.h"
@@ -68,6 +68,8 @@ struct CYCLIC_REFRESH {
   int reduce_refresh;
   double weight_segment;
   int apply_cyclic_refresh;
+  int counter_encode_maxq_scene_change;
+  int skip_flat_static_blocks;
 };
 
 struct VP9_COMP;
@@ -139,8 +141,10 @@ static INLINE int cyclic_refresh_segment_id(int segment_id) {
     return CR_SEGMENT_ID_BASE;
 }
 
+void vp9_cyclic_refresh_limit_q(const struct VP9_COMP *cpi, int *q);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif
 
-#endif  // VP9_ENCODER_VP9_AQ_CYCLICREFRESH_H_
+#endif  // VPX_VP9_ENCODER_VP9_AQ_CYCLICREFRESH_H_

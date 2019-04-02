@@ -73,9 +73,9 @@ static char  mainName[] = "histoduptest";
     lept_mkdir("lept/comp");
     pac = pixacompRead("dinos.pac");  /* resolution = 75 ppi */
 
-#if TEST1 
+#if TEST1
     /* -------------------------------------------------------------- *
-     *                         Test rotation                          *
+     *                  Test comparison with rotation                 *
      * -------------------------------------------------------------- */
         /* Make a second set that is rotated; combine with the input set. */
     pixa1 = pixaCreateFromPixacomp(pac, L_COPY);
@@ -88,9 +88,10 @@ static char  mainName[] = "histoduptest";
         pixaAddPix(pixa2, pix2, L_INSERT);
         pixDestroy(&pix1);
     }
-   
-        /* Compare between every pair of images. */
-    pixaComparePhotoRegionsByHisto(pixa2, 0.85, 1.3, 1, 3, 3, 0.20,
+
+        /* Compare between every pair of images;
+         * can also use n = 2, simthresh = 0.50.  */
+    pixaComparePhotoRegionsByHisto(pixa2, 0.85, 1.3, 1, 3, 0.20,
                                    &nai, &scores, &pix1, debug);
     lept_free(scores);
 
@@ -118,9 +119,9 @@ static char  mainName[] = "histoduptest";
     pixa2 = pixaScaleBySampling(pixa1, 2.0, 2.0);  /* to resolution 150 ppi */
     pixa3 = pixaTranslate(pixa2, 15, -21, L_BRING_IN_WHITE);
     pixaJoin(pixa2, pixa3, 0, -1);
-   
+
         /* Compare between every pair of images. */
-    pixaComparePhotoRegionsByHisto(pixa2, 0.85, 1.3, 1, 3, 3, 0.20,
+    pixaComparePhotoRegionsByHisto(pixa2, 0.85, 1.3, 1, 3, 0.20,
                                    &nai, &scores, &pix1, debug);
     lept_free(scores);
 
@@ -152,8 +153,8 @@ static char  mainName[] = "histoduptest";
     box1 = pixaGetBox(pixa2, 5, L_COPY);
     pix2 = pixaGetPix(pixa2, 7, L_CLONE);
     box2 = pixaGetBox(pixa2, 7, L_COPY);
-    pixGenPhotoHistos(pix1, box1, 1, 1.2, 3, 3, &naa1, &w1, &h1, 5);
-    pixGenPhotoHistos(pix2, box2, 1, 1.2, 3, 3, &naa2, &w2, &h2, 7);
+    pixGenPhotoHistos(pix1, box1, 1, 1.2, 3, &naa1, &w1, &h1, 5);
+    pixGenPhotoHistos(pix2, box2, 1, 1.2, 3, &naa2, &w2, &h2, 7);
     pixaDestroy(&pixa1);
     pixaDestroy(&pixa2);
     if (!naa1 || !naa2) {
@@ -199,7 +200,7 @@ static char  mainName[] = "histoduptest";
         for (j = 0; j <= i; j++) {
             pix2 = pixaGetPix(pixa1, j, L_CLONE);
             box2 = pixaGetBox(pixa1, j, L_COPY);
-            pixCompareGrayByHisto(pix1, pix2, box1, box2, 0.85, 230, 1, 3, 3,
+            pixCompareGrayByHisto(pix1, pix2, box1, box2, 0.85, 230, 1, 3,
                                   &score, 0);
             fprintf(stderr, "Score[%d,%d] = %5.3f\n", i, j, score);
             if (i != j && score > maxscore) {

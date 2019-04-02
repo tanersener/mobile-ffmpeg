@@ -354,12 +354,11 @@ void av1_convolve_2d_copy_sr_sse2(const uint8_t *src, int src_stride,
   }
 }
 
-void av1_jnt_convolve_2d_copy_sse2(const uint8_t *src, int src_stride,
-                                   uint8_t *dst0, int dst_stride0, int w, int h,
-                                   const InterpFilterParams *filter_params_x,
-                                   const InterpFilterParams *filter_params_y,
-                                   const int subpel_x_q4, const int subpel_y_q4,
-                                   ConvolveParams *conv_params) {
+void av1_dist_wtd_convolve_2d_copy_sse2(
+    const uint8_t *src, int src_stride, uint8_t *dst0, int dst_stride0, int w,
+    int h, const InterpFilterParams *filter_params_x,
+    const InterpFilterParams *filter_params_y, const int subpel_x_q4,
+    const int subpel_y_q4, ConvolveParams *conv_params) {
   const int bd = 8;
   CONV_BUF_TYPE *dst = conv_params->dst;
   int dst_stride = conv_params->dst_stride;

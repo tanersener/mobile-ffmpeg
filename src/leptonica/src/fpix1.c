@@ -245,8 +245,8 @@ fpixClone(FPIX  *fpix)
 /*!
  * \brief   fpixCopy()
  *
- * \param[in]    fpixd [optional]; can be null, or equal to fpixs,
- *                    or different from fpixs
+ * \param[in]    fpixd    [optional] can be null, or equal to fpixs,
+ *                        or different from fpixs
  * \param[in]    fpixs
  * \return  fpixd, or NULL on error
  *
@@ -360,7 +360,7 @@ l_float32  *data;
 /*!
  * \brief   fpixDestroy()
  *
- * \param[in,out]   pfpix will be nulled
+ * \param[in,out]   pfpix    will be set to null before returning
  * \return  void
  *
  * <pre>
@@ -405,7 +405,7 @@ FPIX       *fpix;
  * \brief   fpixGetDimensions()
  *
  * \param[in]    fpix
- * \param[out]   pw, ph [optional]  each can be null
+ * \param[out]   pw, ph    [optional] each can be null
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -529,7 +529,7 @@ fpixChangeRefcount(FPIX    *fpix,
  * \brief   fpixGetResolution()
  *
  * \param[in]    fpix
- * \param[out]   pxres, pyres [optional] x and y resolution
+ * \param[out]   pxres, pyres     [optional] x and y resolution
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -551,7 +551,7 @@ fpixGetResolution(FPIX     *fpix,
  * \brief   fpixSetResolution()
  *
  * \param[in]    fpix
- * \param[in]    xres, yres x and y resolution
+ * \param[in]    xres, yres     x and y resolution
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -596,7 +596,7 @@ l_int32  xres, yres;
  * \brief   fpixGetData()
  *
  * \param[in]    fpix
- * \return  ptr FPix::data, or NULL on error
+ * \return  ptr to fpix data, or NULL on error
  */
 l_float32 *
 fpixGetData(FPIX  *fpix)
@@ -634,8 +634,8 @@ fpixSetData(FPIX       *fpix,
  * \brief   fpixGetPixel()
  *
  * \param[in]    fpix
- * \param[in]    x,y pixel coords
- * \param[out]   pval pixel value
+ * \param[in]    x,y     pixel coords
+ * \param[out]   pval    pixel value
  * \return  0 if OK; 1 or 2 on error
  *
  * Notes:
@@ -671,8 +671,8 @@ l_int32  w, h;
  * \brief   fpixSetPixel()
  *
  * \param[in]    fpix
- * \param[in]    x,y pixel coords
- * \param[in]    val pixel value
+ * \param[in]    x,y    pixel coords
+ * \param[in]    val    pixel value
  * \return  0 if OK; 1 or 2 on error
  *
  * Notes:
@@ -707,7 +707,7 @@ l_int32  w, h;
 /*!
  * \brief   fpixaCreate()
  *
- * \param[in]    n  initial number of ptrs
+ * \param[in]    n     initial number of ptrs
  * \return  fpixa, or NULL on error
  */
 FPIXA *
@@ -739,7 +739,7 @@ FPIXA  *fpixa;
  * \brief   fpixaCopy()
  *
  * \param[in]    fpixa
- * \param[in]    copyflag L_COPY, L_CLODE or L_COPY_CLONE
+ * \param[in]    copyflag     L_COPY, L_CLODE or L_COPY_CLONE
  * \return  new fpixa, or NULL on error
  *
  * <pre>
@@ -788,7 +788,7 @@ FPIXA   *fpixac;
 /*!
  * \brief   fpixaDestroy()
  *
- * \param[in,out]   pfpixa to be nulled
+ * \param[in,out]   pfpixa    will be set to null before returning
  * \return  void
  *
  * <pre>
@@ -834,8 +834,8 @@ FPIXA   *fpixa;
  * \brief   fpixaAddFPix()
  *
  * \param[in]    fpixa
- * \param[in]    fpix  to be added
- * \param[in]    copyflag L_INSERT, L_COPY, L_CLONE
+ * \param[in]    fpix        to be added
+ * \param[in]    copyflag    L_INSERT, L_COPY, L_CLONE
  * \return  0 if OK; 1 on error
  */
 l_ok
@@ -901,7 +901,7 @@ fpixaExtendArray(FPIXA  *fpixa)
  * \brief   fpixaExtendArrayToSize()
  *
  * \param[in]    fpixa
- * \param[in]    size new size
+ * \param[in]    size      new ptr array size
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -975,8 +975,8 @@ fpixaChangeRefcount(FPIXA   *fpixa,
  * \brief   fpixaGetFPix()
  *
  * \param[in]    fpixa
- * \param[in]    index  to the index-th fpix
- * \param[in]    accesstype  L_COPY or L_CLONE
+ * \param[in]    index        to the index-th fpix
+ * \param[in]    accesstype   L_COPY or L_CLONE
  * \return  fpix, or NULL on error
  */
 FPIX *
@@ -1004,8 +1004,8 @@ fpixaGetFPix(FPIXA   *fpixa,
  * \brief   fpixaGetFPixDimensions()
  *
  * \param[in]    fpixa
- * \param[in]    index  to the index-th box
- * \param[out]   pw, ph [optional]  each can be null
+ * \param[in]    index      to the index-th box
+ * \param[out]   pw, ph     [optional] each can be null
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1039,7 +1039,7 @@ FPIX  *fpix;
  * \brief   fpixaGetData()
  *
  * \param[in]    fpixa
- * \param[in]    index into fpixa array
+ * \param[in]    index     into fpixa array
  * \return  data not a copy, or NULL on error
  */
 l_float32 *
@@ -1069,9 +1069,9 @@ FPIX       *fpix;
  * \brief   fpixaGetPixel()
  *
  * \param[in]    fpixa
- * \param[in]    index into fpixa array
- * \param[in]    x,y pixel coords
- * \param[out]   pval pixel value
+ * \param[in]    index     into fpixa array
+ * \param[in]    x,y       pixel coords
+ * \param[out]   pval      pixel value
  * \return  0 if OK; 1 on error
  */
 l_ok
@@ -1106,9 +1106,9 @@ FPIX    *fpix;
  * \brief   fpixaSetPixel()
  *
  * \param[in]    fpixa
- * \param[in]    index into fpixa array
- * \param[in]    x,y pixel coords
- * \param[in]    val pixel value
+ * \param[in]    index    into fpixa array
+ * \param[in]    x,y      pixel coords
+ * \param[in]    val      pixel value
  * \return  0 if OK; 1 on error
  */
 l_ok
@@ -1247,8 +1247,8 @@ dpixClone(DPIX  *dpix)
 /*!
  * \brief   dpixCopy()
  *
- * \param[in]    dpixd [optional]; can be null, or equal to dpixs,
- *                    or different from dpixs
+ * \param[in]    dpixd    [optional] can be null, or equal to dpixs,
+ *                        or different from dpixs
  * \param[in]    dpixs
  * \return  dpixd, or NULL on error
  *
@@ -1354,7 +1354,7 @@ l_float64  *data;
 /*!
  * \brief   dpixDestroy()
  *
- * \param[in,out]   pdpix will be nulled
+ * \param[in,out]   pdpix    will be set to null before returning
  * \return  void
  *
  * <pre>
@@ -1399,7 +1399,7 @@ DPIX       *dpix;
  * \brief   dpixGetDimensions()
  *
  * \param[in]    dpix
- * \param[out]   pw, ph [optional]  each can be null
+ * \param[out]   pw, ph     [optional] each can be null
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1523,7 +1523,7 @@ dpixChangeRefcount(DPIX    *dpix,
  * \brief   dpixGetResolution()
  *
  * \param[in]    dpix
- * \param[out]   pxres, pyres [optional] x and y resolution
+ * \param[out]   pxres, pyres    [optional] x and y resolution
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1545,7 +1545,7 @@ dpixGetResolution(DPIX     *dpix,
  * \brief   dpixSetResolution()
  *
  * \param[in]    dpix
- * \param[in]    xres, yres x and y resolution
+ * \param[in]    xres, yres     x and y resolution
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1590,7 +1590,7 @@ l_int32  xres, yres;
  * \brief   dpixGetData()
  *
  * \param[in]    dpix
- * \return  ptr DPix::data, or NULL on error
+ * \return  ptr to dpix data, or NULL on error
  */
 l_float64 *
 dpixGetData(DPIX  *dpix)
@@ -1628,8 +1628,8 @@ dpixSetData(DPIX       *dpix,
  * \brief   dpixGetPixel()
  *
  * \param[in]    dpix
- * \param[in]    x,y pixel coords
- * \param[out]   pval pixel value
+ * \param[in]    x,y     pixel coords
+ * \param[out]   pval    pixel value
  * \return  0 if OK; 1 or 2 on error
  *
  * Notes:
@@ -1665,8 +1665,8 @@ l_int32  w, h;
  * \brief   dpixSetPixel()
  *
  * \param[in]    dpix
- * \param[in]    x,y pixel coords
- * \param[in]    val pixel value
+ * \param[in]    x,y    pixel coords
+ * \param[in]    val    pixel value
  * \return  0 if OK; 1 or 2 on error
  *
  * Notes:
@@ -1728,7 +1728,7 @@ FPIX  *fpix;
 /*!
  * \brief   fpixReadStream()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp     file stream
  * \return  fpix, or NULL on error
  */
 FPIX *
@@ -1780,8 +1780,8 @@ FPIX       *fpix;
 /*!
  * \brief   fpixReadMem()
  *
- * \param[in]    data  of serialized fpix
- * \param[in]    size  of data in bytes
+ * \param[in]    data    of serialized fpix
+ * \param[in]    size    of data in bytes
  * \return  fpix, or NULL on error
  */
 FPIX *
@@ -1839,7 +1839,7 @@ FILE    *fp;
 /*!
  * \brief   fpixWriteStream()
  *
- * \param[in]    fp file stream opened for "wb"
+ * \param[in]    fp       file stream opened for "wb"
  * \param[in]    fpix
  * \return  0 if OK, 1 on error
  */
@@ -1880,8 +1880,8 @@ FPIX       *fpixt;
 /*!
  * \brief   fpixWriteMem()
  *
- * \param[out]   pdata data of serialized fpix
- * \param[out]   psize size of returned data
+ * \param[out]   pdata     data of serialized fpix
+ * \param[out]   psize     size of returned data
  * \param[in]    fpix
  * \return  0 if OK, 1 on error
  *
@@ -1934,7 +1934,7 @@ FILE    *fp;
 /*!
  * \brief   fpixEndianByteSwap()
  *
- * \param[in]    fpixd can be equal to fpixs or NULL
+ * \param[in]    fpixd     can be equal to fpixs or NULL
  * \param[in]    fpixs
  * \return  fpixd always
  *
@@ -2026,7 +2026,7 @@ DPIX  *dpix;
 /*!
  * \brief   dpixReadStream()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp      file stream
  * \return  dpix, or NULL on error
  */
 DPIX *
@@ -2078,8 +2078,8 @@ DPIX       *dpix;
 /*!
  * \brief   dpixReadMem()
  *
- * \param[in]    data  of serialized dpix
- * \param[in]    size  of data in bytes
+ * \param[in]    data     of serialized dpix
+ * \param[in]    size     of data in bytes
  * \return  dpix, or NULL on error
  */
 DPIX *
@@ -2137,7 +2137,7 @@ FILE    *fp;
 /*!
  * \brief   dpixWriteStream()
  *
- * \param[in]    fp file stream opened for "wb"
+ * \param[in]    fp      file stream opened for "wb"
  * \param[in]    dpix
  * \return  0 if OK, 1 on error
  */
@@ -2178,8 +2178,8 @@ DPIX       *dpixt;
 /*!
  * \brief   dpixWriteMem()
  *
- * \param[out]   pdata data of serialized dpix
- * \param[out]   psize size of returned data
+ * \param[out]   pdata     data of serialized dpix
+ * \param[out]   psize     size of returned data
  * \param[in]    dpix
  * \return  0 if OK, 1 on error
  *
@@ -2232,7 +2232,7 @@ FILE    *fp;
 /*!
  * \brief   dpixEndianByteSwap()
  *
- * \param[in]    dpixd can be equal to dpixs or NULL
+ * \param[in]    dpixd     can be equal to dpixs or NULL
  * \param[in]    dpixs
  * \return  dpixd always
  *
@@ -2297,9 +2297,9 @@ dpixEndianByteSwap(DPIX  *dpixd,
 /*!
  * \brief   fpixPrintStream()
  *
- * \param[in]    fp file stream
+ * \param[in]    fp       file stream
  * \param[in]    fpix
- * \param[in]    factor subsampled
+ * \param[in]    factor   for subsampling
  * \return  0 if OK, 1 on error
  *
  * <pre>

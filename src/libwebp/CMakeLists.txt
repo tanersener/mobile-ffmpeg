@@ -18,6 +18,11 @@ option(WEBP_NEAR_LOSSLESS "Enable near-lossless encoding" ON)
 option(WEBP_ENABLE_SWAP_16BIT_CSP "Enable byte swap for 16 bit colorspaces."
        OFF)
 
+# Option needed for handling Unicode file names on Windows.
+if(WIN32)
+  option(WEBP_UNICODE "Build Unicode executables." ON)
+endif()
+
 if(WEBP_BUILD_WEBP_JS)
   set(WEBP_ENABLE_SIMD OFF)
   set(WEBP_BUILD_ANIM_UTILS OFF)
@@ -48,6 +53,11 @@ include(GNUInstallDirs)
 # Options.
 if(WEBP_ENABLE_SWAP_16BIT_CSP)
   add_definitions(-DWEBP_SWAP_16BIT_CSP=1)
+endif()
+
+if(WEBP_UNICODE)
+  # Windows recommends setting both UNICODE and _UNICODE.
+  add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
 set(prefix ${CMAKE_INSTALL_PREFIX})

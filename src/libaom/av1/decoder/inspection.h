@@ -52,6 +52,9 @@ struct insp_mi_data {
   int16_t current_qindex;
   int16_t compound_type;
   int16_t motion_mode;
+  int16_t intrabc;
+  int16_t palette;
+  int16_t uv_palette;
 };
 
 typedef struct insp_frame_data insp_frame_data;
@@ -80,7 +83,7 @@ struct insp_frame_data {
 
 void ifd_init(insp_frame_data *fd, int frame_width, int frame_height);
 void ifd_clear(insp_frame_data *fd);
-int ifd_inspect(insp_frame_data *fd, void *decoder);
+int ifd_inspect(insp_frame_data *fd, void *decoder, int skip_not_transform);
 
 #ifdef __cplusplus
 }  // extern "C"

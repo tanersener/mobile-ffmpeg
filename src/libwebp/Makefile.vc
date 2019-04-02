@@ -129,12 +129,16 @@ LIBWEBP_PDBNAME = $(DIROBJ)\$(LIBWEBP_BASENAME)_dll.pdb
 CFGSET = TRUE
 !ENDIF
 
+!IF "$(UNICODE)" == "1"
+CFLAGS = $(CFLAGS) /D_UNICODE /DUNICODE
+!ENDIF
+
 #######################
 # Usage
 #
 !IF "$(CFGSET)" == "FALSE"
 !MESSAGE Usage: nmake /f Makefile.vc [CFG=<config>]
-!MESSAGE .          [OBJDIR=<path>] [RTLIBCFG=<rtlib>] [<target>]
+!MESSAGE .          [OBJDIR=<path>] [RTLIBCFG=<rtlib>] [UNICODE=1] [<target>]
 !MESSAGE
 !MESSAGE where <config> is one of:
 !MESSAGE -  release-static                - release static library
@@ -234,6 +238,7 @@ DSP_ENC_OBJS = \
     $(DIROBJ)\dsp\cost.obj \
     $(DIROBJ)\dsp\cost_mips32.obj \
     $(DIROBJ)\dsp\cost_mips_dsp_r2.obj \
+    $(DIROBJ)\dsp\cost_neon.obj \
     $(DIROBJ)\dsp\cost_sse2.obj \
     $(DIROBJ)\dsp\enc.obj \
     $(DIROBJ)\dsp\enc_mips32.obj \
@@ -483,15 +488,18 @@ $(DIROBJ)\examples\gifdec.obj: examples\gifdec.c
 {src\utils}.c{$(DIROBJ)\utils}.obj::
 	$(CC) $(CFLAGS) /Fd$(LIBWEBP_PDBNAME) /Fo$(DIROBJ)\utils\ $<
 
+LNKLIBS     = ole32.lib windowscodecs.lib shlwapi.lib
+!IF "$(UNICODE)" == "1"
+LNKLIBS     = $(LNKLIBS) Shell32.lib
+!ENDIF
+
 {$(DIROBJ)\examples}.obj{$(DIRBIN)}.exe:
-	$(LNKEXE) $(LDFLAGS) /OUT:$@ $** \
-	    ole32.lib windowscodecs.lib shlwapi.lib
+	$(LNKEXE) $(LDFLAGS) /OUT:$@ $** $(LNKLIBS)
 	$(MT) -manifest $@.manifest -outputresource:$@;1
 	del $@.manifest
 
 {$(DIROBJ)\extras}.obj{$(DIRBIN)}.exe:
-	$(LNKEXE) $(LDFLAGS) /OUT:$@ $** \
-	    ole32.lib windowscodecs.lib shlwapi.lib
+	$(LNKEXE) $(LDFLAGS) /OUT:$@ $** $(LNKLIBS)
 	$(MT) -manifest $@.manifest -outputresource:$@;1
 	del $@.manifest
 

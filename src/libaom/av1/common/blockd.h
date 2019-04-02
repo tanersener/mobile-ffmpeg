@@ -38,19 +38,19 @@ extern "C" {
 #define MAX_DIFFWTD_MASK_BITS 1
 
 // DIFFWTD_MASK_TYPES should not surpass 1 << MAX_DIFFWTD_MASK_BITS
-typedef enum ATTRIBUTE_PACKED {
+enum {
   DIFFWTD_38 = 0,
   DIFFWTD_38_INV,
   DIFFWTD_MASK_TYPES,
-} DIFFWTD_MASK_TYPE;
+} UENUM1BYTE(DIFFWTD_MASK_TYPE);
 
-typedef enum ATTRIBUTE_PACKED {
+enum {
   KEY_FRAME = 0,
   INTER_FRAME = 1,
   INTRA_ONLY_FRAME = 2,  // replaces intra-only
   S_FRAME = 3,
   FRAME_TYPES,
-} FRAME_TYPE;
+} UENUM1BYTE(FRAME_TYPE);
 
 static INLINE int is_comp_ref_allowed(BLOCK_SIZE bsize) {
   return AOMMIN(block_size_wide[bsize], block_size_high[bsize]) >= 8;
@@ -157,10 +157,10 @@ static INLINE int is_masked_compound_type(COMPOUND_TYPE type) {
    is a single probability table. */
 
 typedef struct {
-  // Number of base colors for Y (0) and UV (1)
-  uint8_t palette_size[2];
   // Value of base colors for Y, U, and V
   uint16_t palette_colors[3 * PALETTE_MAX_SIZE];
+  // Number of base colors for Y (0) and UV (1)
+  uint8_t palette_size[2];
 } PALETTE_MODE_INFO;
 
 typedef struct {
@@ -190,11 +190,6 @@ typedef struct RD_STATS {
   int64_t ref_rdcost;
   int zero_rate;
   uint8_t invalid_rate;
-#if CONFIG_ONE_PASS_SVM
-  int eob, eob_0, eob_1, eob_2, eob_3;
-  int64_t rd, rd_0, rd_1, rd_2, rd_3;
-  int64_t y_sse, sse_0, sse_1, sse_2, sse_3;
-#endif
 #if CONFIG_RD_DEBUG
   int txb_coeff_cost[MAX_MB_PLANE];
   int txb_coeff_cost_map[MAX_MB_PLANE][TXB_COEFF_COST_MAP_SIZE]
@@ -205,42 +200,29 @@ typedef struct RD_STATS {
 // This struct is used to group function args that are commonly
 // sent together in functions related to interinter compound modes
 typedef struct {
+  uint8_t *seg_mask;
   int wedge_index;
   int wedge_sign;
   DIFFWTD_MASK_TYPE mask_type;
   COMPOUND_TYPE type;
-  uint8_t *seg_mask;
 } INTERINTER_COMPOUND_DATA;
 
 #define INTER_TX_SIZE_BUF_LEN 16
 #define TXK_TYPE_BUF_LEN 64
 // This structure now relates to 4x4 block regions.
 typedef struct MB_MODE_INFO {
-  // Common for both INTER and INTRA blocks
-  BLOCK_SIZE sb_type;
-  PREDICTION_MODE mode;
-  // Only for INTRA blocks
-  UV_PREDICTION_MODE uv_mode;
-
-  // Only for INTER blocks
-  InterpFilters interp_filters;
-
-  TX_TYPE txk_type[TXK_TYPE_BUF_LEN];
-
-  FILTER_INTRA_MODE_INFO filter_intra_mode_info;
-
-  // interintra members
-  INTERINTRA_MODE interintra_mode;
-  // TODO(debargha): Consolidate these flags
-  int use_wedge_interintra;
-  int interintra_wedge_index;
-  int interintra_wedge_sign;
+  PALETTE_MODE_INFO palette_mode_info;
+  WarpedMotionParams wm_params;
   // interinter members
   INTERINTER_COMPOUND_DATA interinter_comp;
-  MOTION_MODE motion_mode;
-  int overlappable_neighbors[2];
+  FILTER_INTRA_MODE_INFO filter_intra_mode_info;
   int_mv mv[2];
-  PARTITION_TYPE partition;
+  // Only for INTER blocks
+  InterpFilters interp_filters;
+  // TODO(debargha): Consolidate these flags
+  int interintra_wedge_index;
+  int interintra_wedge_sign;
+  int overlappable_neighbors[2];
   int current_qindex;
   int delta_lf_from_base;
   int delta_lf[FRAME_LF_COUNT];
@@ -250,17 +232,31 @@ typedef struct MB_MODE_INFO {
   int mi_col;
 #endif
   int num_proj_ref;
-  WarpedMotionParams wm_params;
 
   // Index of the alpha Cb and alpha Cr combination
   int cfl_alpha_idx;
   // Joint sign of alpha Cb and alpha Cr
   int cfl_alpha_signs;
 
-  int compound_idx;
+  // Indicate if masked compound is used(1) or not(0).
   int comp_group_idx;
-  PALETTE_MODE_INFO palette_mode_info;
+  // If comp_group_idx=0, indicate if dist_wtd_comp(0) or avg_comp(1) is used.
+  int compound_idx;
+#if CONFIG_INSPECTION
+  int16_t tx_skip[TXK_TYPE_BUF_LEN];
+#endif
+  // Common for both INTER and INTRA blocks
+  BLOCK_SIZE sb_type;
+  PREDICTION_MODE mode;
+  // Only for INTRA blocks
+  UV_PREDICTION_MODE uv_mode;
+  // interintra members
+  INTERINTRA_MODE interintra_mode;
+  MOTION_MODE motion_mode;
+  PARTITION_TYPE partition;
+  TX_TYPE txk_type[TXK_TYPE_BUF_LEN];
   MV_REFERENCE_FRAME ref_frame[2];
+  int8_t use_wedge_interintra;
   int8_t skip;
   int8_t skip_mode;
   uint8_t inter_tx_size[INTER_TX_SIZE_BUF_LEN];
@@ -372,7 +368,7 @@ static INLINE void mi_to_pixel_loc(int *pixel_c, int *pixel_r, int mi_col,
 }
 #endif
 
-enum ATTRIBUTE_PACKED mv_precision { MV_PRECISION_Q3, MV_PRECISION_Q4 };
+enum { MV_PRECISION_Q3, MV_PRECISION_Q4 } UENUM1BYTE(mv_precision);
 
 struct buf_2d {
   uint8_t *buf;
@@ -483,11 +479,11 @@ typedef struct cfl_ctx {
   int is_chroma_reference;
 } CFL_CTX;
 
-typedef struct jnt_comp_params {
+typedef struct dist_wtd_comp_params {
   int use_dist_wtd_comp_avg;
   int fwd_offset;
   int bck_offset;
-} JNT_COMP_PARAMS;
+} DIST_WTD_COMP_PARAMS;
 
 struct scale_factors;
 
@@ -587,7 +583,7 @@ typedef struct macroblockd {
   uint8_t *mc_buf[2];
   CFL_CTX cfl;
 
-  JNT_COMP_PARAMS jcp_param;
+  DIST_WTD_COMP_PARAMS jcp_param;
 
   uint16_t cb_offset[MAX_MB_PLANE];
   uint16_t txb_offset[MAX_MB_PLANE];
@@ -597,7 +593,7 @@ typedef struct macroblockd {
   uint8_t *tmp_obmc_bufs[2];
 } MACROBLOCKD;
 
-static INLINE int get_bitdepth_data_path_index(const MACROBLOCKD *xd) {
+static INLINE int is_cur_buf_hbd(const MACROBLOCKD *xd) {
   return xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH ? 1 : 0;
 }
 
@@ -772,11 +768,13 @@ static INLINE int av1_raster_order_to_block_index(TX_SIZE tx_size,
 
 static INLINE TX_TYPE get_default_tx_type(PLANE_TYPE plane_type,
                                           const MACROBLOCKD *xd,
-                                          TX_SIZE tx_size) {
+                                          TX_SIZE tx_size,
+                                          int is_screen_content_type) {
   const MB_MODE_INFO *const mbmi = xd->mi[0];
 
   if (is_inter_block(mbmi) || plane_type != PLANE_TYPE_Y ||
-      xd->lossless[mbmi->segment_id] || tx_size >= TX_32X32)
+      xd->lossless[mbmi->segment_id] || tx_size >= TX_32X32 ||
+      is_screen_content_type)
     return DCT_DCT;
 
   return intra_mode_to_tx_type(mbmi, plane_type);

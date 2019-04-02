@@ -140,9 +140,9 @@ SRC =		adaptmap_reg.c adaptnorm_reg.c affine_reg.c \
 		bilinear_reg.c binarize_reg.c \
 		binmorph1_reg.c binmorph2_reg.c \
 		binmorph3_reg.c binmorph4_reg.c binmorph5_reg.c \
-		blackwhite_reg.c \
-		blend1_reg.c blend2_reg.c blend3_reg.c blend4_reg.c \
-		blend5_reg.c boxa1_reg.c boxa2_reg.c boxa3_reg.c \
+		blackwhite_reg.c blend1_reg.c blend2_reg.c \
+		blend3_reg.c blend4_reg.c blend5_reg.c \
+		boxa1_reg.c boxa2_reg.c boxa3_reg.c boxa4_reg.c \
 		bytea_reg.c ccthin1_reg.c ccthin2_reg.c \
 		cmapquant_reg.c colorcontent_reg.c \
 		coloring_reg.c colorize_reg.c \
@@ -216,7 +216,7 @@ SRC =		adaptmap_reg.c adaptnorm_reg.c affine_reg.c \
 		fpixcontours.c gammatest.c \
 		graphicstest.c graymorphtest.c \
 		hashtest.c histoduptest.c histotest.c \
-		htmlviewer.c \
+		htmlviewer.c imagetops.c \
 		jbcorrelation.c jbrankhaus.c jbwords.c \
 		listtest.c livre_adapt.c livre_hmt.c \
 		livre_makefigs.c livre_orient.c \
@@ -374,6 +374,9 @@ boxa2_reg:	boxa2_reg.o $(LEPTLIB)
 
 boxa3_reg:	boxa3_reg.o $(LEPTLIB)
 	$(CC) -o boxa3_reg boxa3_reg.o $(ALL_LIBS) $(EXTRALIBS)
+
+boxa4_reg:	boxa4_reg.o $(LEPTLIB)
+	$(CC) -o boxa4_reg boxa4_reg.o $(ALL_LIBS) $(EXTRALIBS)
 
 bytea_reg:	bytea_reg.o $(LEPTLIB)
 	$(CC) -o bytea_reg bytea_reg.o $(ALL_LIBS) $(EXTRALIBS)
@@ -914,6 +917,9 @@ histotest:	histotest.o $(LEPTLIB)
 
 htmlviewer:	htmlviewer.o $(LEPTLIB)
 	$(CC) -o htmlviewer htmlviewer.o $(ALL_LIBS) $(EXTRALIBS)
+
+imagetops:	imagetops.o $(LEPTLIB)
+	$(CC) -o imagetops imagetops.o $(ALL_LIBS) $(EXTRALIBS)
 
 jbcorrelation:	jbcorrelation.o $(LEPTLIB)
 	$(CC) -o jbcorrelation jbcorrelation.o $(ALL_LIBS) $(EXTRALIBS)

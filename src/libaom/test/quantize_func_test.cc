@@ -63,7 +63,7 @@ void highbd_quan64x64_wrapper(QUAN_PARAM_LIST) {
   HBD_QUAN_FUNC;
 }
 
-typedef enum { TYPE_B, TYPE_DC, TYPE_FP } QuantType;
+enum { TYPE_B, TYPE_DC, TYPE_FP } UENUM1BYTE(QuantType);
 
 using ::testing::tuple;
 typedef tuple<QuantizeFunc, QuantizeFunc, TX_SIZE, QuantType, aom_bit_depth_t>
@@ -191,6 +191,13 @@ class QuantizeTest : public ::testing::TestWithParam<QuantizeParam> {
     }
   }
 
+  void FillCoeffRandomRows(int num) {
+    FillCoeffZero();
+    for (int i = 0; i < num; ++i) {
+      coeff_[i] = GetRandomCoeff();
+    }
+  }
+
   void FillCoeffZero() { FillCoeff(0); }
 
   void FillCoeffConstant() {
@@ -287,28 +294,31 @@ TEST_P(QuantizeTest, DISABLED_Speed) {
   const int16_t *dequant = qtab_->dequant.y_dequant_QTX[q];
   const int kNumTests = 5000000;
   aom_usec_timer timer, simd_timer;
+  int rows = tx_size_high[tx_size_];
+  int cols = tx_size_wide[tx_size_];
+  for (int cnt = 0; cnt <= rows; cnt++) {
+    FillCoeffRandomRows(cnt * cols);
 
-  FillCoeffRandom();
+    aom_usec_timer_start(&timer);
+    for (int n = 0; n < kNumTests; ++n) {
+      quant_ref_(coeff_ptr, n_coeffs, zbin, round_fp, quant_fp, quant_shift,
+                 qcoeff, dqcoeff, dequant, eob, sc->scan, sc->iscan);
+    }
+    aom_usec_timer_mark(&timer);
 
-  aom_usec_timer_start(&timer);
-  for (int n = 0; n < kNumTests; ++n) {
-    quant_ref_(coeff_ptr, n_coeffs, zbin, round_fp, quant_fp, quant_shift,
-               qcoeff, dqcoeff, dequant, eob, sc->scan, sc->iscan);
+    aom_usec_timer_start(&simd_timer);
+    for (int n = 0; n < kNumTests; ++n) {
+      quant_(coeff_ptr, n_coeffs, zbin, round_fp, quant_fp, quant_shift, qcoeff,
+             dqcoeff, dequant, eob, sc->scan, sc->iscan);
+    }
+    aom_usec_timer_mark(&simd_timer);
+
+    const int elapsed_time = static_cast<int>(aom_usec_timer_elapsed(&timer));
+    const int simd_elapsed_time =
+        static_cast<int>(aom_usec_timer_elapsed(&simd_timer));
+    printf("c_time = %d \t simd_time = %d \t Gain = %d \n", elapsed_time,
+           simd_elapsed_time, (elapsed_time / simd_elapsed_time));
   }
-  aom_usec_timer_mark(&timer);
-
-  aom_usec_timer_start(&simd_timer);
-  for (int n = 0; n < kNumTests; ++n) {
-    quant_(coeff_ptr, n_coeffs, zbin, round_fp, quant_fp, quant_shift, qcoeff,
-           dqcoeff, dequant, eob, sc->scan, sc->iscan);
-  }
-  aom_usec_timer_mark(&simd_timer);
-
-  const int elapsed_time = static_cast<int>(aom_usec_timer_elapsed(&timer));
-  const int simd_elapsed_time =
-      static_cast<int>(aom_usec_timer_elapsed(&simd_timer));
-  printf("c_time = %d \t simd_time = %d \t Gain = %d \n", elapsed_time,
-         simd_elapsed_time, (elapsed_time / simd_elapsed_time));
 }
 
 using ::testing::make_tuple;
@@ -398,6 +408,24 @@ const QuantizeParam kQParamArraySSE2[] = {
              TX_32X32, TYPE_B, AOM_BITS_10),
   make_tuple(&aom_highbd_quantize_b_32x32_c, &aom_highbd_quantize_b_32x32_sse2,
              TX_32X32, TYPE_B, AOM_BITS_12),
+  make_tuple(&aom_highbd_quantize_b_64x64_c, &aom_highbd_quantize_b_64x64_sse2,
+             TX_64X64, TYPE_B, AOM_BITS_8),
+  make_tuple(&aom_highbd_quantize_b_64x64_c, &aom_highbd_quantize_b_64x64_sse2,
+             TX_64X64, TYPE_B, AOM_BITS_10),
+  make_tuple(&aom_highbd_quantize_b_64x64_c, &aom_highbd_quantize_b_64x64_sse2,
+             TX_64X64, TYPE_B, AOM_BITS_12),
+  make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_sse2,
+             TX_16X16, TYPE_B, AOM_BITS_8),
+  make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_sse2, TX_8X8,
+             TYPE_B, AOM_BITS_8),
+  make_tuple(&aom_quantize_b_adaptive_c, &aom_quantize_b_adaptive_sse2, TX_4X4,
+             TYPE_B, AOM_BITS_8),
+  make_tuple(&aom_quantize_b_32x32_adaptive_c,
+             &aom_quantize_b_32x32_adaptive_sse2, TX_32X16, TYPE_B, AOM_BITS_8),
+  make_tuple(&aom_quantize_b_32x32_adaptive_c,
+             &aom_quantize_b_32x32_adaptive_sse2, TX_16X32, TYPE_B, AOM_BITS_8),
+  make_tuple(&aom_quantize_b_32x32_adaptive_c,
+             &aom_quantize_b_32x32_adaptive_sse2, TX_32X32, TYPE_B, AOM_BITS_8)
 };
 
 INSTANTIATE_TEST_CASE_P(SSE2, QuantizeTest,
@@ -411,6 +439,9 @@ INSTANTIATE_TEST_CASE_P(
                                  TX_16X16, TYPE_B, AOM_BITS_8),
                       make_tuple(&aom_quantize_b_32x32_c,
                                  &aom_quantize_b_32x32_ssse3, TX_32X32, TYPE_B,
+                                 AOM_BITS_8),
+                      make_tuple(&aom_quantize_b_64x64_c,
+                                 &aom_quantize_b_64x64_ssse3, TX_64X64, TYPE_B,
                                  AOM_BITS_8)));
 
 #endif  // HAVE_SSSE3 && ARCH_X86_64

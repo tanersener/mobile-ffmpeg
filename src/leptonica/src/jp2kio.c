@@ -160,10 +160,10 @@ static void info_callback(const char *msg, void *client_data) {
  * \brief   pixReadJp2k()
  *
  * \param[in]    filename
- * \param[in]    reduction scaling factor: 1, 2, 4, 8, 16
- * \param[in]    box  [optional] for extracting a subregion, can be null
- * \param[in]    hint a bitwise OR of L_JP2K_* values; 0 for default
- * \param[in]    debug output callback messages, etc
+ * \param[in]    reduction   scaling factor: 1, 2, 4, 8, 16
+ * \param[in]    box         [optional] for extracting a subregion, can be null
+ * \param[in]    hint        a bitwise OR of L_JP2K_* values; 0 for default
+ * \param[in]    debug       output callback messages, etc
  * \return  pix 8 or 32 bpp, or NULL on error
  *
  * <pre>
@@ -224,11 +224,11 @@ PIX      *pix;
 /*!
  * \brief   pixReadStreamJp2k()
  *
- * \param[in]    fp file stream
- * \param[in]    reduction scaling factor: 1, 2, 4, 8
- * \param[in]    box  [optional] for extracting a subregion, can be null
- * \param[in]    hint a bitwise OR of L_JP2K_* values; 0 for default
- * \param[in]    debug output callback messages, etc
+ * \param[in]    fp          file stream
+ * \param[in]    reduction   scaling factor: 1, 2, 4, 8
+ * \param[in]    box         [optional] for extracting a subregion, can be null
+ * \param[in]    hint        a bitwise OR of L_JP2K_* values; 0 for default
+ * \param[in]    debug       output callback messages, etc
  * \return  pix 8 or 32 bpp, or NULL on error
  *
  * <pre>
@@ -444,11 +444,11 @@ PIX               *pix = NULL;
  * \brief   pixWriteJp2k()
  *
  * \param[in]    filename
- * \param[in]    pix  any depth, cmap is OK
- * \param[in]    quality SNR > 0; default ~34; 0 for lossless encoding
- * \param[in]    nlevels resolution levels; <= 10; default = 5
- * \param[in]    hint a bitwise OR of L_JP2K_* values; 0 for default
- * \param[in]    debug output callback messages, etc
+ * \param[in]    pix        any depth, cmap is OK
+ * \param[in]    quality    SNR > 0; 0 for default (34); 100 for lossless
+ * \param[in]    nlevels    resolution levels; <= 10; default = 5
+ * \param[in]    hint       a bitwise OR of L_JP2K_* values; 0 for default
+ * \param[in]    debug      output callback messages, etc
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -458,7 +458,7 @@ PIX               *pix = NULL;
  *             SNR = 34  (default; approximately equivalent to jpeg quality 75)
  *             SNR = 40  (very high quality)
  *             SNR = 45  (nearly lossless)
- *          Use 0 for default.
+ *          Use 0 for default; 100 for lossless.
  *      (2) The %nlevels parameter is the number of resolution levels
  *          to be written.  For example, with nlevels == 5, images with
  *          reduction factors of 1, 2, 4, 8 and 16 are encoded, and retrieval
@@ -501,12 +501,12 @@ FILE  *fp;
 /*!
  * \brief   pixWriteStreamJp2k()
  *
- * \param[in]    fp file stream
- * \param[in]    pix  any depth, cmap is OK
- * \param[in]    quality SNR > 0; default ~34; 0 for lossless encoding
- * \param[in]    nlevels <= 10
- * \param[in]    hint a bitwise OR of L_JP2K_* values; 0 for default
- * \param[in]    debug output callback messages, etc
+ * \param[in]    fp         file stream
+ * \param[in]    pix        any depth, cmap is OK
+ * \param[in]    quality    SNR > 0; 0 for default (34); 100 for lossless
+ * \param[in]    nlevels    <= 10
+ * \param[in]    hint       a bitwise OR of L_JP2K_* values; 0 for default
+ * \param[in]    debug      output callback messages, etc
  * \return  0 if OK, 1 on error
  * <pre>
  * Notes:
@@ -523,7 +523,8 @@ pixWriteStreamJp2k(FILE    *fp,
                    l_int32  hint,
                    l_int32  debug)
 {
-l_int32            w, h, d, success, snr;
+l_int32            w, h, d, success;
+l_float32          snr;
 const char        *opjVersion;
 PIX               *pixs;
 opj_cparameters_t  parameters;   /* compression parameters */
@@ -537,13 +538,16 @@ opj_image_t       *image = NULL;
         return ERROR_INT("stream not open", procName, 1);
     if (!pix)
         return ERROR_INT("pix not defined", procName, 1);
-    if (quality < 0)
-        return ERROR_INT("quality must be >= 0", procName, 1);
-    if (quality > 0 && quality < 27)
-        L_WARNING("SNR = %d < 27; very low\n", procName, quality);
-    if (quality > 45)
-        L_WARNING("SNR = %d > 45; nearly lossless\n", procName, quality);
+
     snr = (l_float32)quality;
+    if (snr <= 0) snr = 34.0;   /* default */
+    if (snr < 27)
+        L_WARNING("SNR = %d < 27; very low\n", procName, (l_int32)snr);
+    if (snr == 100) snr = 0;  /* for lossless */
+    if (snr > 45) {
+        L_WARNING("SNR > 45; using lossless encoding\n", procName);
+        snr = 0;
+    }
 
     if (nlevels <= 0) nlevels = 5;  /* default */
     if (nlevels > 10) {
@@ -671,7 +675,7 @@ opj_image_t       *image = NULL;
 /*!
  * \brief   pixConvertToOpjImage()
  *
- * \param[in]    pix  8 or 32 bpp
+ * \param[in]    pix     8 or 32 bpp
  * \return  opj_image, or NULL on error
  *
  * <pre>
@@ -757,16 +761,15 @@ opj_image_cmptparm_t  cmptparm[4];
 /*---------------------------------------------------------------------*
  *                         Read/write to memory                        *
  *---------------------------------------------------------------------*/
-
 /*!
  * \brief   pixReadMemJp2k()
  *
- * \param[in]    data const; jpeg-encoded
- * \param[in]    size of data
- * \param[in]    reduction scaling factor: 1, 2, 4, 8
- * \param[in]    box  [optional] for extracting a subregion, can be null
- * \param[in]    hint a bitwise OR of L_JP2K_* values; 0 for default
- * \param[in]    debug output callback messages, etc
+ * \param[in]    data        const; jpeg-encoded
+ * \param[in]    size        of data
+ * \param[in]    reduction   scaling factor: 1, 2, 4, 8
+ * \param[in]    box         [optional] for extracting a subregion, can be null
+ * \param[in]    hint        a bitwise OR of L_JP2K_* values; 0 for default
+ * \param[in]    debug       output callback messages, etc
  * \return  pix, or NULL on error
  *
  * <pre>
@@ -806,13 +809,13 @@ PIX      *pix;
 /*!
  * \brief   pixWriteMemJp2k()
  *
- * \param[out]   pdata data of jpeg compressed image
- * \param[out]   psize size of returned data
- * \param[in]    pix 8 or 32 bpp
- * \param[in]    quality SNR > 0; default ~34; 0 for lossless encoding
- * \param[in]    nlevels 0 for default
- * \param[in]    hint a bitwise OR of L_JP2K_* values; 0 for default
- * \param[in]    debug output callback messages, etc
+ * \param[out]   pdata     data of jpeg compressed image
+ * \param[out]   psize     size of returned data
+ * \param[in]    pix       8 or 32 bpp
+ * \param[in]    quality   SNR > 0; 0 for default (34); 100 for lossless
+ * \param[in]    nlevels   0 for default
+ * \param[in]    hint      a bitwise OR of L_JP2K_* values; 0 for default
+ * \param[in]    debug     output callback messages, etc
  * \return  0 if OK, 1 on error
  *
  * <pre>

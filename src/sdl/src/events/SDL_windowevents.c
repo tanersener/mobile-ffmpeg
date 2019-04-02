@@ -25,16 +25,30 @@
 #include "SDL_events.h"
 #include "SDL_events_c.h"
 #include "SDL_mouse_c.h"
+#include "../video/SDL_sysvideo.h"
 
 
 static int SDLCALL
-RemovePendingSizeChangedAndResizedEvents(void * userdata, SDL_Event *event)
+RemovePendingResizedEvents(void * userdata, SDL_Event *event)
 {
     SDL_Event *new_event = (SDL_Event *)userdata;
 
     if (event->type == SDL_WINDOWEVENT &&
-        (event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED ||
-         event->window.event == SDL_WINDOWEVENT_RESIZED) &&
+        event->window.event == SDL_WINDOWEVENT_RESIZED &&
+        event->window.windowID == new_event->window.windowID) {
+        /* We're about to post a new size event, drop the old one */
+        return 0;
+    }
+    return 1;
+}
+
+static int SDLCALL
+RemovePendingSizeChangedEvents(void * userdata, SDL_Event *event)
+{
+    SDL_Event *new_event = (SDL_Event *)userdata;
+
+    if (event->type == SDL_WINDOWEVENT &&
+        event->window.event == SDL_WINDOWEVENT_SIZE_CHANGED &&
         event->window.windowID == new_event->window.windowID) {
         /* We're about to post a new size event, drop the old one */
         return 0;
@@ -186,8 +200,11 @@ SDL_SendWindowEvent(SDL_Window * window, Uint8 windowevent, int data1,
         event.window.windowID = window->id;
 
         /* Fixes queue overflow with resize events that aren't processed */
+        if (windowevent == SDL_WINDOWEVENT_RESIZED) {
+            SDL_FilterEvents(RemovePendingResizedEvents, &event);
+        }
         if (windowevent == SDL_WINDOWEVENT_SIZE_CHANGED) {
-            SDL_FilterEvents(RemovePendingSizeChangedAndResizedEvents, &event);
+            SDL_FilterEvents(RemovePendingSizeChangedEvents, &event);
         }
         if (windowevent == SDL_WINDOWEVENT_MOVED) {
             SDL_FilterEvents(RemovePendingMoveEvents, &event);

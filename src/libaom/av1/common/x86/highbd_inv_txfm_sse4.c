@@ -5926,28 +5926,16 @@ void av1_highbd_inv_txfm_add_sse4_1(const tran_low_t *input, uint8_t *dest,
   assert(av1_ext_tx_used[txfm_param->tx_set_type][txfm_param->tx_type]);
   const TX_SIZE tx_size = txfm_param->tx_size;
   switch (tx_size) {
-    case TX_8X8:
-      av1_highbd_inv_txfm_add_8x8_sse4_1(input, dest, stride, txfm_param);
-      break;
     case TX_4X8:
       av1_highbd_inv_txfm_add_4x8_sse4_1(input, dest, stride, txfm_param);
       break;
     case TX_8X4:
       av1_highbd_inv_txfm_add_8x4_sse4_1(input, dest, stride, txfm_param);
       break;
-    case TX_4X4:
-      av1_highbd_inv_txfm_add_4x4_sse4_1(input, dest, stride, txfm_param);
-      break;
-    case TX_16X4:
-      av1_highbd_inv_txfm_add_16x4_sse4_1(input, dest, stride, txfm_param);
-      break;
-    case TX_4X16:
-      av1_highbd_inv_txfm_add_4x16_sse4_1(input, dest, stride, txfm_param);
-      break;
     default:
-      av1_highbd_inv_txfm2d_add_universe_sse4_1(
-          input, dest, stride, txfm_param->tx_type, tx_size, txfm_param->eob,
-          txfm_param->bd);
+      // TODO(http://crbug.com/aomedia/2350): the remaining sse4_1 versions
+      // cause test vector mismatches.
+      av1_highbd_inv_txfm_add_c(input, dest, stride, txfm_param);
       break;
   }
 }

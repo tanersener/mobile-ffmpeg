@@ -162,12 +162,12 @@ static l_int32 *iaaGetLinearTRC(l_int32 **iaa, l_int32 diff);
 /*!
  * \brief   pixCleanBackgroundToWhite()
  *
- * \param[in]    pixs 8 bpp grayscale or 32 bpp rgb
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    pixg [optional] 8 bpp grayscale version; can be null
- * \param[in]    gamma gamma correction; must be > 0.0; typically ~1.0
- * \param[in]    blackval dark value to set to black (0)
- * \param[in]    whiteval light value to set to white (255)
+ * \param[in]    pixs       8 bpp grayscale or 32 bpp rgb
+ * \param[in]    pixim      [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    pixg       [optional] 8 bpp grayscale version; can be null
+ * \param[in]    gamma      gamma correction; must be > 0.0; typically ~1.0
+ * \param[in]    blackval   dark value to set to black (0)
+ * \param[in]    whiteval   light value to set to white (255)
  * \return  pixd 8 bpp or 32 bpp rgb, or NULL on error
  *
  * <pre>
@@ -214,9 +214,9 @@ PIX     *pixd;
 /*!
  * \brief   pixBackgroundNormSimple()
  *
- * \param[in]    pixs 8 bpp grayscale or 32 bpp rgb
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    pixg [optional] 8 bpp grayscale version; can be null
+ * \param[in]    pixs     8 bpp grayscale or 32 bpp rgb
+ * \param[in]    pixim    [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    pixg     [optional] 8 bpp grayscale version; can be null
  * \return  pixd 8 bpp or 32 bpp rgb, or NULL on error
  *
  * <pre>
@@ -243,15 +243,15 @@ pixBackgroundNormSimple(PIX  *pixs,
 /*!
  * \brief   pixBackgroundNorm()
  *
- * \param[in]    pixs 8 bpp grayscale or 32 bpp rgb
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    pixg [optional] 8 bpp grayscale version; can be null
- * \param[in]    sx, sy tile size in pixels
- * \param[in]    thresh threshold for determining foreground
- * \param[in]    mincount min threshold on counts in a tile
- * \param[in]    bgval target bg val; typ. > 128
- * \param[in]    smoothx half-width of block convolution kernel width
- * \param[in]    smoothy half-width of block convolution kernel height
+ * \param[in]    pixs        8 bpp grayscale or 32 bpp rgb
+ * \param[in]    pixim       [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    pixg        [optional] 8 bpp grayscale version; can be null
+ * \param[in]    sx, sy      tile size in pixels
+ * \param[in]    thresh      threshold for determining foreground
+ * \param[in]    mincount    min threshold on counts in a tile
+ * \param[in]    bgval       target bg val; typ. > 128
+ * \param[in]    smoothx     half-width of block convolution kernel width
+ * \param[in]    smoothy     half-width of block convolution kernel height
  * \return  pixd 8 bpp or 32 bpp rgb, or NULL on error
  *
  * <pre>
@@ -399,11 +399,11 @@ PIX     *pixmr, *pixmg, *pixmb, *pixmri, *pixmgi, *pixmbi;
 /*!
  * \brief   pixBackgroundNormMorph()
  *
- * \param[in]    pixs 8 bpp grayscale or 32 bpp rgb
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    reduction at which morph closings are done; between 2 and 16
- * \param[in]    size of square Sel for the closing; use an odd number
- * \param[in]    bgval target bg val; typ. > 128
+ * \param[in]    pixs        8 bpp grayscale or 32 bpp rgb
+ * \param[in]    pixim       [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    reduction   at which morph closings are done; between 2 and 16
+ * \param[in]    size        of square Sel for the closing; use an odd number
+ * \param[in]    bgval       target bg val; typ. > 128
  * \return  pixd 8 bpp, or NULL on error
  *
  * <pre>
@@ -527,15 +527,15 @@ PIX       *pixmr, *pixmg, *pixmb, *pixmri, *pixmgi, *pixmbi;
 /*!
  * \brief   pixBackgroundNormGrayArray()
  *
- * \param[in]    pixs 8 bpp grayscale
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    sx, sy tile size in pixels
- * \param[in]    thresh threshold for determining foreground
- * \param[in]    mincount min threshold on counts in a tile
- * \param[in]    bgval target bg val; typ. > 128
- * \param[in]    smoothx half-width of block convolution kernel width
- * \param[in]    smoothy half-width of block convolution kernel height
- * \param[out]   ppixd 16 bpp array of inverted background value
+ * \param[in]    pixs       8 bpp grayscale
+ * \param[in]    pixim      [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    sx, sy     tile size in pixels
+ * \param[in]    thresh     threshold for determining foreground
+ * \param[in]    mincount   min threshold on counts in a tile
+ * \param[in]    bgval      target bg val; typ. > 128
+ * \param[in]    smoothx    half-width of block convolution kernel width
+ * \param[in]    smoothy    half-width of block convolution kernel height
+ * \param[out]   ppixd      16 bpp array of inverted background value
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -601,18 +601,18 @@ PIX     *pixm;
 /*!
  * \brief   pixBackgroundNormRGBArrays()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    pixg [optional] 8 bpp grayscale version; can be null
- * \param[in]    sx, sy tile size in pixels
- * \param[in]    thresh threshold for determining foreground
- * \param[in]    mincount min threshold on counts in a tile
- * \param[in]    bgval target bg val; typ. > 128
- * \param[in]    smoothx half-width of block convolution kernel width
- * \param[in]    smoothy half-width of block convolution kernel height
- * \param[out]   ppixr 16 bpp array of inverted R background value
- * \param[out]   ppixg 16 bpp array of inverted G background value
- * \param[out]   ppixb 16 bpp array of inverted B background value
+ * \param[in]    pixs       32 bpp rgb
+ * \param[in]    pixim      [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    pixg       [optional] 8 bpp grayscale version; can be null
+ * \param[in]    sx, sy     tile size in pixels
+ * \param[in]    thresh     threshold for determining foreground
+ * \param[in]    mincount   min threshold on counts in a tile
+ * \param[in]    bgval      target bg val; typ. > 128
+ * \param[in]    smoothx    half-width of block convolution kernel width
+ * \param[in]    smoothy    half-width of block convolution kernel height
+ * \param[out]   ppixr      16 bpp array of inverted R background value
+ * \param[out]   ppixg      16 bpp array of inverted G background value
+ * \param[out]   ppixb      16 bpp array of inverted B background value
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -690,12 +690,12 @@ PIX     *pixmr, *pixmg, *pixmb;
 /*!
  * \brief   pixBackgroundNormGrayArrayMorph()
  *
- * \param[in]    pixs 8 bpp grayscale
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    reduction at which morph closings are done; between 2 and 16
- * \param[in]    size of square Sel for the closing; use an odd number
- * \param[in]    bgval target bg val; typ. > 128
- * \param[out]   ppixd 16 bpp array of inverted background value
+ * \param[in]    pixs        8 bpp grayscale
+ * \param[in]    pixim       [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    reduction   at which morph closings are done; between 2 and 16
+ * \param[in]    size        of square Sel for the closing; use an odd number
+ * \param[in]    bgval       target bg val; typ. > 128
+ * \param[out]   ppixd       16 bpp array of inverted background value
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -753,14 +753,14 @@ PIX     *pixm;
 /*!
  * \brief   pixBackgroundNormRGBArraysMorph()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    reduction at which morph closings are done; between 2 and 16
- * \param[in]    size of square Sel for the closing; use an odd number
- * \param[in]    bgval target bg val; typ. > 128
- * \param[out]   ppixr 16 bpp array of inverted R background value
- * \param[out]   ppixg 16 bpp array of inverted G background value
- * \param[out]   ppixb 16 bpp array of inverted B background value
+ * \param[in]    pixs        32 bpp rgb
+ * \param[in]    pixim       [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    reduction   at which morph closings are done; between 2 and 16
+ * \param[in]    size        of square Sel for the closing; use an odd number
+ * \param[in]    bgval       target bg val; typ. > 128
+ * \param[out]   ppixr       16 bpp array of inverted R background value
+ * \param[out]   ppixg       16 bpp array of inverted G background value
+ * \param[out]   ppixb       16 bpp array of inverted B background value
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -832,13 +832,13 @@ PIX     *pixmr, *pixmg, *pixmb;
 /*!
  * \brief   pixGetBackgroundGrayMap()
  *
- * \param[in]    pixs 8 bpp grayscale; not cmapped
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null; it
- *                     should not have all foreground pixels
- * \param[in]    sx, sy tile size in pixels
- * \param[in]    thresh threshold for determining foreground
- * \param[in]    mincount min threshold on counts in a tile
- * \param[out]   ppixd 8 bpp grayscale map
+ * \param[in]    pixs       8 bpp grayscale; not cmapped
+ * \param[in]    pixim      [optional] 1 bpp 'image' mask; can be null;
+ *                          it should not have only foreground pixels
+ * \param[in]    sx, sy     tile size in pixels
+ * \param[in]    thresh     threshold for determining foreground
+ * \param[in]    mincount   min threshold on counts in a tile
+ * \param[out]   ppixd      8 bpp grayscale map
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1008,14 +1008,16 @@ PIX       *pixd, *piximi, *pixb, *pixf, *pixims;
 /*!
  * \brief   pixGetBackgroundRGBMap()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null; it
- *                     should not have all foreground pixels
- * \param[in]    pixg [optional] 8 bpp grayscale version; can be null
- * \param[in]    sx, sy tile size in pixels
- * \param[in]    thresh threshold for determining foreground
- * \param[in]    mincount min threshold on counts in a tile
- * \param[out]   ppixmr, ppixmg, ppixmb rgb maps
+ * \param[in]    pixs       32 bpp rgb
+ * \param[in]    pixim      [optional] 1 bpp 'image' mask; can be null; it
+ *                          should not have all foreground pixels
+ * \param[in]    pixg       [optional] 8 bpp grayscale version; can be null
+ * \param[in]    sx, sy     tile size in pixels
+ * \param[in]    thresh     threshold for determining foreground
+ * \param[in]    mincount   min threshold on counts in a tile
+ * \param[out]   ppixmr     red component map
+ * \param[out]   ppixmg     green component map
+ * \param[out]   ppixmb     blue component map
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1203,12 +1205,12 @@ PIX       *pixmr, *pixmg, *pixmb;
 /*!
  * \brief   pixGetBackgroundGrayMapMorph()
  *
- * \param[in]    pixs 8 bpp grayscale; not cmapped
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null; it
- *                     should not have all foreground pixels
- * \param[in]    reduction factor at which closing is performed
- * \param[in]    size of square Sel for the closing; use an odd number
- * \param[out]   ppixm grayscale map
+ * \param[in]    pixs        8 bpp grayscale; not cmapped
+ * \param[in]    pixim       [optional] 1 bpp 'image' mask; can be null; it
+ *                           should not have all foreground pixels
+ * \param[in]    reduction   factor at which closing is performed
+ * \param[in]    size        of square Sel for the closing; use an odd number
+ * \param[out]   ppixm       grayscale map
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1292,14 +1294,14 @@ PIX       *pixm, *pix1, *pix2, *pix3, *pixims;
 /*!
  * \brief   pixGetBackgroundRGBMapMorph()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null; it
- *                     should not have all foreground pixels
- * \param[in]    reduction factor at which closing is performed
- * \param[in]    size of square Sel for the closing; use an odd number
- * \param[out]   ppixmr red component map
- * \param[out]   ppixmg green component map
- * \param[out]   ppixmb blue component map
+ * \param[in]    pixs        32 bpp rgb
+ * \param[in]    pixim       [optional] 1 bpp 'image' mask; can be null; it
+ *                           should not have all foreground pixels
+ * \param[in]    reduction   factor at which closing is performed
+ * \param[in]    size        of square Sel for the closing; use an odd number
+ * \param[out]   ppixmr      red component map
+ * \param[out]   ppixmg      green component map
+ * \param[out]   ppixmb      blue component map
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1423,12 +1425,12 @@ PIX       *pixm, *pixmr, *pixmg, *pixmb, *pix1, *pix2, *pix3, *pixims;
 /*!
  * \brief   pixFillMapHoles()
  *
- * \param[in]    pix 8 bpp; a map, with one pixel for each tile in
- *              a larger image
- * \param[in]    nx number of horizontal pixel tiles that are entirely
- *                  covered with pixels in the original source image
- * \param[in]    ny ditto for the number of vertical pixel tiles
- * \param[in]    filltype L_FILL_WHITE or L_FILL_BLACK
+ * \param[in]    pix        8 bpp; a map, with one pixel for each tile in
+ *                          a larger image
+ * \param[in]    nx         number of horizontal pixel tiles that are entirely
+ *                          covered with pixels in the original source image
+ * \param[in]    ny         ditto for the number of vertical pixel tiles
+ * \param[in]    filltype   L_FILL_WHITE or L_FILL_BLACK
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1558,9 +1560,9 @@ PIX      *pixt;
 /*!
  * \brief   pixExtendByReplication()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    addw number of extra pixels horizontally to add
- * \param[in]    addh number of extra pixels vertically to add
+ * \param[in]    pixs    8 bpp
+ * \param[in]    addw    number of extra pixels horizontally to add
+ * \param[in]    addh    number of extra pixels vertically to add
  * \return  pixd extended with replicated pixel values, or NULL on error
  *
  * <pre>
@@ -1614,9 +1616,9 @@ PIX      *pixd;
 /*!
  * \brief   pixSmoothConnectedRegions()
  *
- * \param[in]    pixs 8 bpp grayscale; no colormap
- * \param[in]    pixm [optional] 1 bpp; if null, this is a no-op
- * \param[in]    factor subsampling factor for getting average; >= 1
+ * \param[in]    pixs    8 bpp grayscale; no colormap
+ * \param[in]    pixm    [optional] 1 bpp; if null, this is a no-op
+ * \param[in]    factor  subsampling factor for getting average; >= 1
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1687,11 +1689,11 @@ PIXA      *pixa;
 /*!
  * \brief   pixGetForegroundGrayMap()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    pixim [optional] 1 bpp 'image' mask; can be null
- * \param[in]    sx, sy src tile size, in pixels
- * \param[in]    thresh threshold for determining foreground
- * \param[out]   ppixd 8 bpp grayscale map
+ * \param[in]    pixs      8 bpp
+ * \param[in]    pixim     [optional] 1 bpp 'image' mask; can be null
+ * \param[in]    sx, sy    src tile size, in pixels
+ * \param[in]    thresh    threshold for determining foreground
+ * \param[out]   ppixd     8 bpp grayscale map
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1819,10 +1821,10 @@ PIX     *pixd, *piximi, *pixim2, *pixims, *pixs2, *pixb, *pixt1, *pixt2, *pixt3;
 /*!
  * \brief   pixGetInvBackgroundMap()
  *
- * \param[in]    pixs 8 bpp grayscale; no colormap
- * \param[in]    bgval target bg val; typ. > 128
- * \param[in]    smoothx half-width of block convolution kernel width
- * \param[in]    smoothy half-width of block convolution kernel height
+ * \param[in]    pixs       8 bpp grayscale; no colormap
+ * \param[in]    bgval      target bg val; typ. > 128
+ * \param[in]    smoothx    half-width of block convolution kernel width
+ * \param[in]    smoothy    half-width of block convolution kernel height
  * \return  pixd 16 bpp, or NULL on error
  *
  * <pre>
@@ -1889,10 +1891,10 @@ PIX       *pixsm, *pixd;
 /*!
  * \brief   pixApplyInvBackgroundGrayMap()
  *
- * \param[in]    pixs 8 bpp grayscale; no colormap
- * \param[in]    pixm 16 bpp, inverse background map
- * \param[in]    sx tile width in pixels
- * \param[in]    sy tile height in pixels
+ * \param[in]    pixs    8 bpp grayscale; no colormap
+ * \param[in]    pixm    16 bpp, inverse background map
+ * \param[in]    sx      tile width in pixels
+ * \param[in]    sy      tile height in pixels
  * \return  pixd 8 bpp, or NULL on error
  */
 PIX *
@@ -1953,12 +1955,12 @@ PIX       *pixd;
 /*!
  * \brief   pixApplyInvBackgroundRGBMap()
  *
- * \param[in]    pixs 32 bpp rbg
- * \param[in]    pixmr 16 bpp, red inverse background map
- * \param[in]    pixmg 16 bpp, green inverse background map
- * \param[in]    pixmb 16 bpp, blue inverse background map
- * \param[in]    sx tile width in pixels
- * \param[in]    sy tile height in pixels
+ * \param[in]    pixs    32 bpp rbg
+ * \param[in]    pixmr   16 bpp, red inverse background map
+ * \param[in]    pixmg   16 bpp, green inverse background map
+ * \param[in]    pixmb   16 bpp, blue inverse background map
+ * \param[in]    sx      tile width in pixels
+ * \param[in]    sy      tile height in pixels
  * \return  pixd 32 bpp rbg, or NULL on error
  */
 PIX *
@@ -2036,9 +2038,9 @@ PIX       *pixd;
 /*!
  * \brief   pixApplyVariableGrayMap()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    pixg 8 bpp, variable map
- * \param[in]    target typ. 128 for threshold
+ * \param[in]    pixs     8 bpp
+ * \param[in]    pixg     8 bpp, variable map
+ * \param[in]    target   typ. 128 for threshold
  * \return  pixd 8 bpp, or NULL on error
  *
  * <pre>
@@ -2146,11 +2148,11 @@ PIX       *pixd;
 /*!
  * \brief   pixGlobalNormRGB()
  *
- * \param[in]    pixd [optional] null, existing or equal to pixs
- * \param[in]    pixs 32 bpp rgb, or colormapped
- * \param[in]    rval, gval, bval pixel values in pixs that are
- *                                linearly mapped to mapval
- * \param[in]    mapval use 255 for mapping to white
+ * \param[in]    pixd     [optional] null, existing or equal to pixs
+ * \param[in]    pixs     32 bpp rgb, or colormapped
+ * \param[in]    rval, gval, bval   pixel values in pixs that are
+ *                                  linearly mapped to mapval
+ * \param[in]    mapval   use 255 for mapping to white
  * \return  pixd 32 bpp rgb or colormapped, or NULL on error
  *
  * <pre>
@@ -2256,12 +2258,12 @@ cleanup_arrays:
 /*!
  * \brief   pixGlobalNormNoSatRGB()
  *
- * \param[in]    pixd [optional] null, existing or equal to pixs
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    rval, gval, bval pixel values in pixs that are
- *                                linearly mapped to mapval; but see below
- * \param[in]    factor subsampling factor; integer >= 1
- * \param[in]    rank between 0.0 and 1.0; typ. use a value near 1.0
+ * \param[in]    pixd       [optional] null, existing or equal to pixs
+ * \param[in]    pixs       32 bpp rgb
+ * \param[in]    rval, gval, bval   pixel values in pixs that are
+ *                                  linearly mapped to mapval; but see below
+ * \param[in]    factor     subsampling factor; integer >= 1
+ * \param[in]    rank       between 0.0 and 1.0; typ. use a value near 1.0
  * \return  pixd 32 bpp rgb, or NULL on error
  *
  * <pre>
@@ -2348,18 +2350,20 @@ l_float32  rfract, gfract, bfract, maxfract;
 /*!
  * \brief   pixThresholdSpreadNorm()
  *
- * \param[in]    pixs 8 bpp grayscale; not colormapped
- * \param[in]    filtertype L_SOBEL_EDGE or L_TWO_SIDED_EDGE;
- * \param[in]    edgethresh threshold on magnitude of edge filter; typ 10-20
- * \param[in]    smoothx, smoothy half-width of convolution kernel applied to
- *                                spread threshold: use 0 for no smoothing
- * \param[in]    gamma gamma correction; typ. about 0.7
- * \param[in]    minval  input value that gives 0 for output; typ. -25
- * \param[in]    maxval  input value that gives 255 for output; typ. 255
- * \param[in]    targetthresh target threshold for normalization
- * \param[out]   ppixth [optional] computed local threshold value
- * \param[out]   ppixb [optional] thresholded normalized image
- * \param[out]   ppixd [optional] normalized image
+ * \param[in]    pixs              8 bpp grayscale; not colormapped
+ * \param[in]    filtertype        L_SOBEL_EDGE or L_TWO_SIDED_EDGE;
+ * \param[in]    edgethresh        threshold on magnitude of edge filter;
+ *                                 typ 10-20
+ * \param[in]    smoothx, smoothy  half-width of convolution kernel applied to
+ *                                 spread threshold: use 0 for no smoothing
+ * \param[in]    gamma             gamma correction; typ. about 0.7
+ * \param[in]    minval            input value that gives 0 for output; typ. -25
+ * \param[in]    maxval            input value that gives 255 for output;
+ *                                 typ. 255
+ * \param[in]    targetthresh      target threshold for normalization
+ * \param[out]   ppixth            [optional] computed local threshold value
+ * \param[out]   ppixb             [optional] thresholded normalized image
+ * \param[out]   ppixd             [optional] normalized image
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2466,13 +2470,13 @@ PIX  *pixe, *pixet, *pixsd, *pixg1, *pixg2, *pixth;
 /*!
  * \brief   pixBackgroundNormFlex()
  *
- * \param[in]    pixs 8 bpp grayscale; not colormapped
- * \param[in]    sx, sy desired tile dimensions; actual size may vary; use
- *                      values between 3 and 10
- * \param[in]    smoothx, smoothy half-width of convolution kernel applied to
- *                                threshold array: use values between 1 and 3
- * \param[in]    delta difference parameter in basin filling; use 0
- *                     to skip
+ * \param[in]    pixs               8 bpp grayscale; not colormapped
+ * \param[in]    sx, sy             desired tile dimensions; size may vary;
+ *                                  use values between 3 and 10
+ * \param[in]    smoothx, smoothy   half-width of convolution kernel applied to
+ *                                  threshold array: use values between 1 and 3
+ * \param[in]    delta              difference parameter in basin filling;
+ *                                  use 0 to skip
  * \return  pixd 8 bpp, background-normalized), or NULL on error
  *
  * <pre>
@@ -2551,12 +2555,12 @@ PIX       *pixt, *pixsd, *pixmin, *pixbg, *pixbgi, *pixd;
 /*!
  * \brief   pixContrastNorm()
  *
- * \param[in]    pixd [optional] 8 bpp; null or equal to pixs
- * \param[in]    pixs 8 bpp grayscale; not colormapped
- * \param[in]    sx, sy tile dimensions
- * \param[in]    mindiff minimum difference to accept as valid
- * \param[in]    smoothx, smoothy half-width of convolution kernel applied to
- *                                min and max arrays: use 0 for no smoothing
+ * \param[in]    pixd               [optional] 8 bpp; null or equal to pixs
+ * \param[in]    pixs               8 bpp grayscale; not colormapped
+ * \param[in]    sx, sy             tile dimensions
+ * \param[in]    mindiff            minimum difference to accept as valid
+ * \param[in]    smoothx, smoothy   half-width of convolution kernel applied to
+ *                                  min and max arrays: use 0 for no smoothing
  * \return  pixd always
  *
  * <pre>
@@ -2631,13 +2635,13 @@ PIX  *pixmin, *pixmax;
 /*!
  * \brief   pixMinMaxTiles()
  *
- * \param[in]    pixs 8 bpp grayscale; not colormapped
- * \param[in]    sx, sy tile dimensions
- * \param[in]    mindiff minimum difference to accept as valid
- * \param[in]    smoothx, smoothy half-width of convolution kernel applied to
- *                                min and max arrays: use 0 for no smoothing
- * \param[out]   ppixmin tiled minima
- * \param[out]   ppixmax tiled maxima
+ * \param[in]    pixs               8 bpp grayscale; not colormapped
+ * \param[in]    sx, sy             tile dimensions
+ * \param[in]    mindiff            minimum difference to accept as valid
+ * \param[in]    smoothx, smoothy   half-width of convolution kernel applied to
+ *                                  min and max arrays: use 0 for no smoothing
+ * \param[out]   ppixmin            tiled minima
+ * \param[out]   ppixmax            tiled maxima
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2721,9 +2725,9 @@ PIX     *pixmin1, *pixmax1, *pixmin2, *pixmax2;
 /*!
  * \brief   pixSetLowContrast()
  *
- * \param[in]    pixs1 8 bpp
- * \param[in]    pixs2 8 bpp
- * \param[in]    mindiff minimum difference to accept as valid
+ * \param[in]    pixs1      8 bpp
+ * \param[in]    pixs2      8 bpp
+ * \param[in]    mindiff    minimum difference to accept as valid
  * \return  0 if OK; 1 if no pixel diffs are large enough, or on error
  *
  * <pre>
@@ -2801,11 +2805,11 @@ l_uint32  *data1, *data2, *line1, *line2;
 /*!
  * \brief   pixLinearTRCTiled()
  *
- * \param[in]    pixd [optional] 8 bpp
- * \param[in]    pixs 8 bpp, not colormapped
- * \param[in]    sx, sy tile dimensions
- * \param[in]    pixmin pix of min values in tiles
- * \param[in]    pixmax pix of max values in tiles
+ * \param[in]    pixd     [optional] 8 bpp
+ * \param[in]    pixs     8 bpp, not colormapped
+ * \param[in]    sx, sy   tile dimensions
+ * \param[in]    pixmin   pix of min values in tiles
+ * \param[in]    pixmax   pix of max values in tiles
  * \return  pixd always
  *
  * <pre>
@@ -2902,9 +2906,9 @@ l_uint32  *data, *datamin, *datamax, *line, *tline, *linemin, *linemax;
 /*!
  * \brief   iaaGetLinearTRC()
  *
- * \param[in]    iaa bare array of ptrs to l_int32
- * \param[in]    diff between min and max pixel values that are
- *                    to be mapped to 0 and 255
+ * \param[in]    iaa     bare array of ptrs to l_int32
+ * \param[in]    diff    between min and max pixel values that are
+ *                       to be mapped to 0 and 255
  * \return  ia LUT with input (val - minval) and output a
  *                  value between 0 and 255)
  */

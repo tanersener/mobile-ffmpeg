@@ -46,7 +46,6 @@ typedef struct XAVS2EContext {
     int min_qp;
     int preset_level;
     int log_level;
-    int hierarchical_reference;
 
     void *encoder;
     char *xavs2_opts;
@@ -110,8 +109,8 @@ static av_cold int xavs2_init(AVCodecContext *avctx)
         xavs2_opt_set2("RateControl",   "%d", 1);
         xavs2_opt_set2("TargetBitRate", "%"PRId64"", avctx->bit_rate);
         xavs2_opt_set2("InitialQP",     "%d", cae->initial_qp);
-        xavs2_opt_set2("MaxQP",         "%d", cae->max_qp);
-        xavs2_opt_set2("MinQP",         "%d", cae->min_qp);
+        xavs2_opt_set2("MaxQP",         "%d", avctx->qmax >= 0 ? avctx->qmax : cae->max_qp);
+        xavs2_opt_set2("MinQP",         "%d", avctx->qmin >= 0 ? avctx->qmin : cae->min_qp);
     } else {
         xavs2_opt_set2("InitialQP",     "%d", cae->qp);
     }
@@ -161,7 +160,7 @@ static void xavs2_copy_frame(xavs2_picture_t *pic, const AVFrame *frame)
 }
 
 static int xavs2_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
-                      const AVFrame *frame, int *got_packet)
+                              const AVFrame *frame, int *got_packet)
 {
     XAVS2EContext *cae = avctx->priv_data;
     xavs2_picture_t pic;
@@ -175,22 +174,22 @@ static int xavs2_encode_frame(AVCodecContext *avctx, AVPacket *pkt,
     }
     if (frame) {
         switch (frame->format) {
-            case AV_PIX_FMT_YUV420P:
-                if (pic.img.in_sample_size == pic.img.enc_sample_size) {
-                    xavs2_copy_frame(&pic, frame);
-                } else {
-                    const int shift_in = atoi(cae->api->opt_get(cae->param, "SampleShift"));
-                    xavs2_copy_frame_with_shift(&pic, frame, shift_in);
-                }
+        case AV_PIX_FMT_YUV420P:
+            if (pic.img.in_sample_size == pic.img.enc_sample_size) {
+                xavs2_copy_frame(&pic, frame);
+            } else {
+                const int shift_in = atoi(cae->api->opt_get(cae->param, "SampleShift"));
+                xavs2_copy_frame_with_shift(&pic, frame, shift_in);
+            }
             break;
-            case AV_PIX_FMT_YUV420P10:
-                if (pic.img.in_sample_size == pic.img.enc_sample_size) {
-                    xavs2_copy_frame(&pic, frame);
-                    break;
-                }
-            default:
-                av_log(avctx, AV_LOG_ERROR, "Unsupported pixel format\n");
-                return AVERROR(EINVAL);
+        case AV_PIX_FMT_YUV420P10:
+            if (pic.img.in_sample_size == pic.img.enc_sample_size) {
+                xavs2_copy_frame(&pic, frame);
+                break;
+            }
+        default:
+            av_log(avctx, AV_LOG_ERROR, "Unsupported pixel format\n");
+            return AVERROR(EINVAL);
             break;
         }
 
@@ -271,7 +270,7 @@ static const AVClass libxavs2 = {
 
 static const AVCodecDefault xavs2_defaults[] = {
     { "b",                "0" },
-    { "g",                "48" },
+    { "g",                "48"},
     { "bf",               "7" },
     { NULL },
 };

@@ -50,7 +50,7 @@ autoreconf_library ${LIB_NAME}
 ./configure \
     --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
     --with-pic \
-    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot \
+    --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot \
     --with-zlib \
     --with-iconv=${BASEDIR}/prebuilt/android-$(get_target_build)/libiconv/lib \
     --with-sax1 \
@@ -65,6 +65,6 @@ autoreconf_library ${LIB_NAME}
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libxml2_package_config "2.9.8"
+create_libxml2_package_config "2.9.9"
 
 make install || exit 1

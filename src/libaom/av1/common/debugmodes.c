@@ -40,7 +40,7 @@ static void print_mi_data(AV1_COMMON *cm, FILE *file, const char *descriptor,
       mi++;
     }
     fprintf(file, "\n");
-    mi += MAX_MIB_SIZE;
+    mi += cm->mi_stride - cols;
   }
   fprintf(file, "\n");
 }
@@ -68,7 +68,7 @@ void av1_print_modes_and_motion_vectors(AV1_COMMON *cm, const char *file) {
       mi++;
     }
     fprintf(mvs, "\n");
-    mi += MAX_MIB_SIZE;
+    mi += cm->mi_stride - cols;
   }
   fprintf(mvs, "\n");
 
@@ -82,7 +82,7 @@ void av1_print_modes_and_motion_vectors(AV1_COMMON *cm, const char *file) {
       mi++;
     }
     fprintf(mvs, "\n");
-    mi += MAX_MIB_SIZE;
+    mi += cm->mi_stride - cols;
   }
   fprintf(mvs, "\n");
 

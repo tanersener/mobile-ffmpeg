@@ -112,7 +112,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__EXEEXT_1 = convertfilestopdf$(EXEEXT) convertfilestops$(EXEEXT) \
 	convertformat$(EXEEXT) convertsegfilestopdf$(EXEEXT) \
 	convertsegfilestops$(EXEEXT) converttopdf$(EXEEXT) \
-	converttops$(EXEEXT) fileinfo$(EXEEXT) xtractprotos$(EXEEXT)
+	converttops$(EXEEXT) fileinfo$(EXEEXT) imagetops$(EXEEXT) \
+	xtractprotos$(EXEEXT)
 am__installdirs = "$(DESTDIR)$(bindir)"
 @HAVE_LIBGIF_TRUE@am__EXEEXT_2 = gifio_reg$(EXEEXT)
 @HAVE_LIBWEBP_TRUE@am__EXEEXT_3 = webpio_reg$(EXEEXT)
@@ -125,8 +126,8 @@ am__EXEEXT_5 = adaptmap_reg$(EXEEXT) adaptnorm_reg$(EXEEXT) \
 	binmorph3_reg$(EXEEXT) blackwhite_reg$(EXEEXT) \
 	blend1_reg$(EXEEXT) blend2_reg$(EXEEXT) blend3_reg$(EXEEXT) \
 	blend4_reg$(EXEEXT) blend5_reg$(EXEEXT) boxa1_reg$(EXEEXT) \
-	boxa2_reg$(EXEEXT) boxa3_reg$(EXEEXT) bytea_reg$(EXEEXT) \
-	ccthin1_reg$(EXEEXT) ccthin2_reg$(EXEEXT) \
+	boxa2_reg$(EXEEXT) boxa3_reg$(EXEEXT) boxa4_reg$(EXEEXT) \
+	bytea_reg$(EXEEXT) ccthin1_reg$(EXEEXT) ccthin2_reg$(EXEEXT) \
 	cmapquant_reg$(EXEEXT) colorcontent_reg$(EXEEXT) \
 	coloring_reg$(EXEEXT) colorize_reg$(EXEEXT) \
 	colormask_reg$(EXEEXT) colormorph_reg$(EXEEXT) \
@@ -164,12 +165,13 @@ am__EXEEXT_5 = adaptmap_reg$(EXEEXT) adaptnorm_reg$(EXEEXT) \
 	rotateorth_reg$(EXEEXT) scale_reg$(EXEEXT) \
 	seedspread_reg$(EXEEXT) selio_reg$(EXEEXT) shear1_reg$(EXEEXT) \
 	shear2_reg$(EXEEXT) skew_reg$(EXEEXT) speckle_reg$(EXEEXT) \
-	splitcomp_reg$(EXEEXT) subpixel_reg$(EXEEXT) \
-	texturefill_reg$(EXEEXT) threshnorm_reg$(EXEEXT) \
-	translate_reg$(EXEEXT) warper_reg$(EXEEXT) \
-	watershed_reg$(EXEEXT) wordboxes_reg$(EXEEXT) \
-	writetext_reg$(EXEEXT) xformbox_reg$(EXEEXT) $(am__EXEEXT_2) \
-	$(am__EXEEXT_3) $(am__EXEEXT_4)
+	splitcomp_reg$(EXEEXT) string_reg$(EXEEXT) \
+	subpixel_reg$(EXEEXT) texturefill_reg$(EXEEXT) \
+	threshnorm_reg$(EXEEXT) translate_reg$(EXEEXT) \
+	warper_reg$(EXEEXT) watershed_reg$(EXEEXT) \
+	wordboxes_reg$(EXEEXT) writetext_reg$(EXEEXT) \
+	xformbox_reg$(EXEEXT) $(am__EXEEXT_2) $(am__EXEEXT_3) \
+	$(am__EXEEXT_4)
 am__EXEEXT_6 = alltests_reg$(EXEEXT) bilateral1_reg$(EXEEXT) \
 	binmorph2_reg$(EXEEXT) binmorph4_reg$(EXEEXT) \
 	binmorph5_reg$(EXEEXT) dwamorph2_reg$(EXEEXT) \
@@ -177,7 +179,7 @@ am__EXEEXT_6 = alltests_reg$(EXEEXT) bilateral1_reg$(EXEEXT) \
 	fmorphauto_reg$(EXEEXT) heap_reg$(EXEEXT) \
 	morphseq_reg$(EXEEXT) pixa1_reg$(EXEEXT) pixalloc_reg$(EXEEXT) \
 	pixtile_reg$(EXEEXT) smallpix_reg$(EXEEXT) \
-	smoothedge_reg$(EXEEXT) string_reg$(EXEEXT)
+	smoothedge_reg$(EXEEXT)
 am__EXEEXT_7 = adaptmap_dark$(EXEEXT) arabic_lines$(EXEEXT) \
 	arithtest$(EXEEXT) autogentest1$(EXEEXT) autogentest2$(EXEEXT) \
 	barcodetest$(EXEEXT) binarizefiles$(EXEEXT) \
@@ -407,6 +409,11 @@ boxa3_reg_SOURCES = boxa3_reg.c
 boxa3_reg_OBJECTS = boxa3_reg.$(OBJEXT)
 boxa3_reg_LDADD = $(LDADD)
 boxa3_reg_DEPENDENCIES = $(top_builddir)/src/liblept.la \
+	$(am__DEPENDENCIES_1)
+boxa4_reg_SOURCES = boxa4_reg.c
+boxa4_reg_OBJECTS = boxa4_reg.$(OBJEXT)
+boxa4_reg_LDADD = $(LDADD)
+boxa4_reg_DEPENDENCIES = $(top_builddir)/src/liblept.la \
 	$(am__DEPENDENCIES_1)
 buffertest_SOURCES = buffertest.c
 buffertest_OBJECTS = buffertest.$(OBJEXT)
@@ -894,6 +901,11 @@ htmlviewer_SOURCES = htmlviewer.c
 htmlviewer_OBJECTS = htmlviewer.$(OBJEXT)
 htmlviewer_LDADD = $(LDADD)
 htmlviewer_DEPENDENCIES = $(top_builddir)/src/liblept.la \
+	$(am__DEPENDENCIES_1)
+imagetops_SOURCES = imagetops.c
+imagetops_OBJECTS = imagetops.$(OBJEXT)
+imagetops_LDADD = $(LDADD)
+imagetops_DEPENDENCIES = $(top_builddir)/src/liblept.la \
 	$(am__DEPENDENCIES_1)
 insert_reg_SOURCES = insert_reg.c
 insert_reg_OBJECTS = insert_reg.$(OBJEXT)
@@ -1643,32 +1655,33 @@ SOURCES = adaptmap_dark.c adaptmap_reg.c adaptnorm_reg.c affine_reg.c \
 	binmorph4_reg.c binmorph5_reg.c blackwhite_reg.c blend1_reg.c \
 	blend2_reg.c blend3_reg.c blend4_reg.c blend5_reg.c \
 	blendcmaptest.c boxa1_reg.c boxa2_reg.c boxa3_reg.c \
-	buffertest.c bytea_reg.c ccbordtest.c cctest1.c ccthin1_reg.c \
-	ccthin2_reg.c cleanpdf.c cmapquant_reg.c colorcontent_reg.c \
-	coloring_reg.c colorize_reg.c colormask_reg.c colormorph_reg.c \
-	colorquant_reg.c colorseg_reg.c colorsegtest.c \
-	colorspace_reg.c compare_reg.c comparepages.c comparepixa.c \
-	comparetest.c compfilter_reg.c concatpdf.c conncomp_reg.c \
-	contrasttest.c conversion_reg.c convertfilestopdf.c \
-	convertfilestops.c convertformat.c convertsegfilestopdf.c \
-	convertsegfilestops.c converttogray.c converttopdf.c \
-	converttops.c convolve_reg.c cornertest.c corrupttest.c \
-	croptest.c croptext.c dewarp_reg.c dewarprules.c dewarptest1.c \
-	dewarptest2.c dewarptest3.c dewarptest4.c dewarptest5.c \
-	digitprep1.c displayboxa.c displayboxes_on_pixa.c displaypix.c \
-	displaypixa.c distance_reg.c dither_reg.c dna_reg.c \
-	dwalineargen.c $(dwamorph1_reg_SOURCES) \
-	$(dwamorph2_reg_SOURCES) edge_reg.c enhance_reg.c equal_reg.c \
-	expand_reg.c extrema_reg.c falsecolor_reg.c fcombautogen.c \
-	fhmtauto_reg.c fhmtautogen.c fileinfo.c files_reg.c \
-	find_colorregions.c findbinding.c findcorners_reg.c \
-	findpattern1.c findpattern2.c findpattern3.c findpattern_reg.c \
-	flipdetect_reg.c flipselgen.c fmorphauto_reg.c fmorphautogen.c \
-	fpix1_reg.c fpix2_reg.c fpixcontours.c gammatest.c \
-	genfonts_reg.c gifio_reg.c graphicstest.c grayfill_reg.c \
-	graymorph1_reg.c graymorph2_reg.c graymorphtest.c \
-	grayquant_reg.c hardlight_reg.c hashtest.c heap_reg.c \
-	histoduptest.c histotest.c htmlviewer.c insert_reg.c \
+	boxa4_reg.c buffertest.c bytea_reg.c ccbordtest.c cctest1.c \
+	ccthin1_reg.c ccthin2_reg.c cleanpdf.c cmapquant_reg.c \
+	colorcontent_reg.c coloring_reg.c colorize_reg.c \
+	colormask_reg.c colormorph_reg.c colorquant_reg.c \
+	colorseg_reg.c colorsegtest.c colorspace_reg.c compare_reg.c \
+	comparepages.c comparepixa.c comparetest.c compfilter_reg.c \
+	concatpdf.c conncomp_reg.c contrasttest.c conversion_reg.c \
+	convertfilestopdf.c convertfilestops.c convertformat.c \
+	convertsegfilestopdf.c convertsegfilestops.c converttogray.c \
+	converttopdf.c converttops.c convolve_reg.c cornertest.c \
+	corrupttest.c croptest.c croptext.c dewarp_reg.c dewarprules.c \
+	dewarptest1.c dewarptest2.c dewarptest3.c dewarptest4.c \
+	dewarptest5.c digitprep1.c displayboxa.c \
+	displayboxes_on_pixa.c displaypix.c displaypixa.c \
+	distance_reg.c dither_reg.c dna_reg.c dwalineargen.c \
+	$(dwamorph1_reg_SOURCES) $(dwamorph2_reg_SOURCES) edge_reg.c \
+	enhance_reg.c equal_reg.c expand_reg.c extrema_reg.c \
+	falsecolor_reg.c fcombautogen.c fhmtauto_reg.c fhmtautogen.c \
+	fileinfo.c files_reg.c find_colorregions.c findbinding.c \
+	findcorners_reg.c findpattern1.c findpattern2.c findpattern3.c \
+	findpattern_reg.c flipdetect_reg.c flipselgen.c \
+	fmorphauto_reg.c fmorphautogen.c fpix1_reg.c fpix2_reg.c \
+	fpixcontours.c gammatest.c genfonts_reg.c gifio_reg.c \
+	graphicstest.c grayfill_reg.c graymorph1_reg.c \
+	graymorph2_reg.c graymorphtest.c grayquant_reg.c \
+	hardlight_reg.c hashtest.c heap_reg.c histoduptest.c \
+	histotest.c htmlviewer.c imagetops.c insert_reg.c \
 	ioformats_reg.c iomisc_reg.c italic_reg.c jbclass_reg.c \
 	jbcorrelation.c jbrankhaus.c jbwords.c jp2kio_reg.c \
 	jpegio_reg.c kernel_reg.c label_reg.c lineremoval_reg.c \
@@ -1714,32 +1727,33 @@ DIST_SOURCES = adaptmap_dark.c adaptmap_reg.c adaptnorm_reg.c \
 	binmorph4_reg.c binmorph5_reg.c blackwhite_reg.c blend1_reg.c \
 	blend2_reg.c blend3_reg.c blend4_reg.c blend5_reg.c \
 	blendcmaptest.c boxa1_reg.c boxa2_reg.c boxa3_reg.c \
-	buffertest.c bytea_reg.c ccbordtest.c cctest1.c ccthin1_reg.c \
-	ccthin2_reg.c cleanpdf.c cmapquant_reg.c colorcontent_reg.c \
-	coloring_reg.c colorize_reg.c colormask_reg.c colormorph_reg.c \
-	colorquant_reg.c colorseg_reg.c colorsegtest.c \
-	colorspace_reg.c compare_reg.c comparepages.c comparepixa.c \
-	comparetest.c compfilter_reg.c concatpdf.c conncomp_reg.c \
-	contrasttest.c conversion_reg.c convertfilestopdf.c \
-	convertfilestops.c convertformat.c convertsegfilestopdf.c \
-	convertsegfilestops.c converttogray.c converttopdf.c \
-	converttops.c convolve_reg.c cornertest.c corrupttest.c \
-	croptest.c croptext.c dewarp_reg.c dewarprules.c dewarptest1.c \
-	dewarptest2.c dewarptest3.c dewarptest4.c dewarptest5.c \
-	digitprep1.c displayboxa.c displayboxes_on_pixa.c displaypix.c \
-	displaypixa.c distance_reg.c dither_reg.c dna_reg.c \
-	dwalineargen.c $(dwamorph1_reg_SOURCES) \
-	$(dwamorph2_reg_SOURCES) edge_reg.c enhance_reg.c equal_reg.c \
-	expand_reg.c extrema_reg.c falsecolor_reg.c fcombautogen.c \
-	fhmtauto_reg.c fhmtautogen.c fileinfo.c files_reg.c \
-	find_colorregions.c findbinding.c findcorners_reg.c \
-	findpattern1.c findpattern2.c findpattern3.c findpattern_reg.c \
-	flipdetect_reg.c flipselgen.c fmorphauto_reg.c fmorphautogen.c \
-	fpix1_reg.c fpix2_reg.c fpixcontours.c gammatest.c \
-	genfonts_reg.c gifio_reg.c graphicstest.c grayfill_reg.c \
-	graymorph1_reg.c graymorph2_reg.c graymorphtest.c \
-	grayquant_reg.c hardlight_reg.c hashtest.c heap_reg.c \
-	histoduptest.c histotest.c htmlviewer.c insert_reg.c \
+	boxa4_reg.c buffertest.c bytea_reg.c ccbordtest.c cctest1.c \
+	ccthin1_reg.c ccthin2_reg.c cleanpdf.c cmapquant_reg.c \
+	colorcontent_reg.c coloring_reg.c colorize_reg.c \
+	colormask_reg.c colormorph_reg.c colorquant_reg.c \
+	colorseg_reg.c colorsegtest.c colorspace_reg.c compare_reg.c \
+	comparepages.c comparepixa.c comparetest.c compfilter_reg.c \
+	concatpdf.c conncomp_reg.c contrasttest.c conversion_reg.c \
+	convertfilestopdf.c convertfilestops.c convertformat.c \
+	convertsegfilestopdf.c convertsegfilestops.c converttogray.c \
+	converttopdf.c converttops.c convolve_reg.c cornertest.c \
+	corrupttest.c croptest.c croptext.c dewarp_reg.c dewarprules.c \
+	dewarptest1.c dewarptest2.c dewarptest3.c dewarptest4.c \
+	dewarptest5.c digitprep1.c displayboxa.c \
+	displayboxes_on_pixa.c displaypix.c displaypixa.c \
+	distance_reg.c dither_reg.c dna_reg.c dwalineargen.c \
+	$(dwamorph1_reg_SOURCES) $(dwamorph2_reg_SOURCES) edge_reg.c \
+	enhance_reg.c equal_reg.c expand_reg.c extrema_reg.c \
+	falsecolor_reg.c fcombautogen.c fhmtauto_reg.c fhmtautogen.c \
+	fileinfo.c files_reg.c find_colorregions.c findbinding.c \
+	findcorners_reg.c findpattern1.c findpattern2.c findpattern3.c \
+	findpattern_reg.c flipdetect_reg.c flipselgen.c \
+	fmorphauto_reg.c fmorphautogen.c fpix1_reg.c fpix2_reg.c \
+	fpixcontours.c gammatest.c genfonts_reg.c gifio_reg.c \
+	graphicstest.c grayfill_reg.c graymorph1_reg.c \
+	graymorph2_reg.c graymorphtest.c grayquant_reg.c \
+	hardlight_reg.c hashtest.c heap_reg.c histoduptest.c \
+	histotest.c htmlviewer.c imagetops.c insert_reg.c \
 	ioformats_reg.c iomisc_reg.c italic_reg.c jbclass_reg.c \
 	jbcorrelation.c jbrankhaus.c jbwords.c jp2kio_reg.c \
 	jpegio_reg.c kernel_reg.c label_reg.c lineremoval_reg.c \
@@ -2148,13 +2162,13 @@ AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src
 LDADD = $(top_builddir)/src/liblept.la $(LIBM)
 INSTALL_PROGS = convertfilestopdf convertfilestops \
 	convertformat convertsegfilestopdf convertsegfilestops \
-	converttopdf converttops fileinfo xtractprotos
+	converttopdf converttops fileinfo imagetops xtractprotos
 
 AUTO_REG_PROGS = adaptmap_reg adaptnorm_reg affine_reg alphaops_reg \
 	alphaxform_reg baseline_reg bilateral2_reg bilinear_reg \
 	binarize_reg binmorph1_reg binmorph3_reg blackwhite_reg \
 	blend1_reg blend2_reg blend3_reg blend4_reg blend5_reg \
-	boxa1_reg boxa2_reg boxa3_reg bytea_reg ccthin1_reg \
+	boxa1_reg boxa2_reg boxa3_reg boxa4_reg bytea_reg ccthin1_reg \
 	ccthin2_reg cmapquant_reg colorcontent_reg coloring_reg \
 	colorize_reg colormask_reg colormorph_reg colorquant_reg \
 	colorseg_reg colorspace_reg compare_reg compfilter_reg \
@@ -2175,16 +2189,17 @@ AUTO_REG_PROGS = adaptmap_reg adaptnorm_reg affine_reg alphaops_reg \
 	rankhisto_reg rank_reg rasteropip_reg rasterop_reg rotate1_reg \
 	rotate2_reg rotateorth_reg scale_reg seedspread_reg selio_reg \
 	shear1_reg shear2_reg skew_reg speckle_reg splitcomp_reg \
-	subpixel_reg texturefill_reg threshnorm_reg translate_reg \
-	warper_reg watershed_reg wordboxes_reg writetext_reg \
-	xformbox_reg $(am__append_1) $(am__append_2) $(am__append_3)
+	string_reg subpixel_reg texturefill_reg threshnorm_reg \
+	translate_reg warper_reg watershed_reg wordboxes_reg \
+	writetext_reg xformbox_reg $(am__append_1) $(am__append_2) \
+	$(am__append_3)
 MANUAL_REG_PROGS = alltests_reg bilateral1_reg \
 	binmorph2_reg binmorph4_reg binmorph5_reg \
 	dwamorph2_reg \
 	files_reg flipdetect_reg fmorphauto_reg \
 	heap_reg morphseq_reg pixa1_reg \
 	pixalloc_reg pixtile_reg \
-	smallpix_reg smoothedge_reg string_reg
+	smallpix_reg smoothedge_reg
 
 OTHER_PROGS = adaptmap_dark \
 	arabic_lines arithtest \
@@ -2475,6 +2490,10 @@ boxa2_reg$(EXEEXT): $(boxa2_reg_OBJECTS) $(boxa2_reg_DEPENDENCIES) $(EXTRA_boxa2
 boxa3_reg$(EXEEXT): $(boxa3_reg_OBJECTS) $(boxa3_reg_DEPENDENCIES) $(EXTRA_boxa3_reg_DEPENDENCIES) 
 	@rm -f boxa3_reg$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(boxa3_reg_OBJECTS) $(boxa3_reg_LDADD) $(LIBS)
+
+boxa4_reg$(EXEEXT): $(boxa4_reg_OBJECTS) $(boxa4_reg_DEPENDENCIES) $(EXTRA_boxa4_reg_DEPENDENCIES) 
+	@rm -f boxa4_reg$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(boxa4_reg_OBJECTS) $(boxa4_reg_LDADD) $(LIBS)
 
 buffertest$(EXEEXT): $(buffertest_OBJECTS) $(buffertest_DEPENDENCIES) $(EXTRA_buffertest_DEPENDENCIES) 
 	@rm -f buffertest$(EXEEXT)
@@ -2863,6 +2882,10 @@ histotest$(EXEEXT): $(histotest_OBJECTS) $(histotest_DEPENDENCIES) $(EXTRA_histo
 htmlviewer$(EXEEXT): $(htmlviewer_OBJECTS) $(htmlviewer_DEPENDENCIES) $(EXTRA_htmlviewer_DEPENDENCIES) 
 	@rm -f htmlviewer$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(htmlviewer_OBJECTS) $(htmlviewer_LDADD) $(LIBS)
+
+imagetops$(EXEEXT): $(imagetops_OBJECTS) $(imagetops_DEPENDENCIES) $(EXTRA_imagetops_DEPENDENCIES) 
+	@rm -f imagetops$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(imagetops_OBJECTS) $(imagetops_LDADD) $(LIBS)
 
 insert_reg$(EXEEXT): $(insert_reg_OBJECTS) $(insert_reg_DEPENDENCIES) $(EXTRA_insert_reg_DEPENDENCIES) 
 	@rm -f insert_reg$(EXEEXT)
@@ -3470,6 +3493,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxa1_reg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxa2_reg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxa3_reg.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/boxa4_reg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/buffertest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bytea_reg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ccbordtest.Po@am__quote@
@@ -3569,6 +3593,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/histoduptest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/histotest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/htmlviewer.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imagetops.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/insert_reg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ioformats_reg.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/iomisc_reg.Po@am__quote@
@@ -4067,6 +4092,13 @@ boxa2_reg.log: boxa2_reg$(EXEEXT)
 boxa3_reg.log: boxa3_reg$(EXEEXT)
 	@p='boxa3_reg$(EXEEXT)'; \
 	b='boxa3_reg'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+boxa4_reg.log: boxa4_reg$(EXEEXT)
+	@p='boxa4_reg$(EXEEXT)'; \
+	b='boxa4_reg'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -4725,6 +4757,13 @@ speckle_reg.log: speckle_reg$(EXEEXT)
 splitcomp_reg.log: splitcomp_reg$(EXEEXT)
 	@p='splitcomp_reg$(EXEEXT)'; \
 	b='splitcomp_reg'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+string_reg.log: string_reg$(EXEEXT)
+	@p='string_reg$(EXEEXT)'; \
+	b='string_reg'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \

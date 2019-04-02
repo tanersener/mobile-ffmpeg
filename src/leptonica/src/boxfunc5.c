@@ -64,19 +64,20 @@ static l_int32 boxaFillAll(BOXA *boxa);
 /*!
  * \brief   boxaSmoothSequenceLS()
  *
- * \param[in]    boxas source boxa
- * \param[in]    factor reject outliers with widths and heights deviating
- *                      from the median by more than %factor times
- *                      the median variation from the median; typically ~3
- * \param[in]    subflag L_USE_MINSIZE, L_USE_MAXSIZE,
- *                       L_SUB_ON_LOC_DIFF, L_SUB_ON_SIZE_DIFF,
- *                       L_USE_CAPPED_MIN, L_USE_CAPPED_MAX
- * \param[in]    maxdiff parameter used with L_SUB_ON_LOC_DIFF,
- *                       L_SUB_ON_SIZE_DIFF, L_USE_CAPPED_MIN, L_USE_CAPPED_MAX
+ * \param[in]    boxas       source boxa
+ * \param[in]    factor      reject outliers with widths and heights deviating
+ *                           from the median by more than %factor times
+ *                           the median variation from the median; typically ~3
+ * \param[in]    subflag     L_USE_MINSIZE, L_USE_MAXSIZE,
+ *                           L_SUB_ON_LOC_DIFF, L_SUB_ON_SIZE_DIFF,
+ *                           L_USE_CAPPED_MIN, L_USE_CAPPED_MAX
+ * \param[in]    maxdiff     parameter used with L_SUB_ON_LOC_DIFF,
+ *                           L_SUB_ON_SIZE_DIFF, L_USE_CAPPED_MIN,
+ *                           L_USE_CAPPED_MAX
  * \param[in]    extrapixels  pixels added on all sides (or subtracted
  *                            if %extrapixels < 0) when using
  *                            L_SUB_ON_LOC_DIFF and L_SUB_ON_SIZE_DIFF
- * \param[in]    debug 1 for debug output
+ * \param[in]    debug       1 for debug output
  * \return  boxad fitted boxa, or NULL on error
  *
  * <pre>
@@ -163,17 +164,18 @@ BOXA    *boxae, *boxao, *boxalfe, *boxalfo, *boxame, *boxamo, *boxad;
 /*!
  * \brief   boxaSmoothSequenceMedian()
  *
- * \param[in]    boxas source boxa
- * \param[in]    halfwin half-width of sliding window; used to find median
- * \param[in]    subflag L_USE_MINSIZE, L_USE_MAXSIZE,
- *                       L_SUB_ON_LOC_DIFF, L_SUB_ON_SIZE_DIFF,
- *                       L_USE_CAPPED_MIN, L_USE_CAPPED_MAX
- * \param[in]    maxdiff parameter used with L_SUB_ON_LOC_DIFF,
- *                       L_SUB_ON_SIZE_DIFF, L_USE_CAPPED_MIN, L_USE_CAPPED_MAX
+ * \param[in]    boxas        source boxa
+ * \param[in]    halfwin      half-width of sliding window; used to find median
+ * \param[in]    subflag      L_USE_MINSIZE, L_USE_MAXSIZE,
+ *                            L_SUB_ON_LOC_DIFF, L_SUB_ON_SIZE_DIFF,
+ *                            L_USE_CAPPED_MIN, L_USE_CAPPED_MAX
+ * \param[in]    maxdiff      parameter used with L_SUB_ON_LOC_DIFF,
+ *                            L_SUB_ON_SIZE_DIFF, L_USE_CAPPED_MIN,
+ *                            L_USE_CAPPED_MAX
  * \param[in]    extrapixels  pixels added on all sides (or subtracted
  *                            if %extrapixels < 0) when using
  *                            L_SUB_ON_LOC_DIFF and L_SUB_ON_SIZE_DIFF
- * \param[in]    debug 1 for debug output
+ * \param[in]    debug        1 for debug output
  * \return  boxad fitted boxa, or NULL on error
  *
  * <pre>
@@ -276,11 +278,11 @@ BOXA    *boxae, *boxao, *boxamede, *boxamedo, *boxame, *boxamo, *boxad;
 /*!
  * \brief   boxaLinearFit()
  *
- * \param[in]    boxas source boxa
- * \param[in]    factor reject outliers with widths and heights deviating
- *                      from the median by more than %factor times
- *                      the median deviation from the median; typically ~3
- * \param[in]    debug 1 for debug output
+ * \param[in]    boxas    source boxa
+ * \param[in]    factor   reject outliers with widths and heights deviating
+ *                        from the median by more than %factor times
+ *                        the median deviation from the median; typically ~3
+ * \param[in]    debug    1 for debug output
  * \return  boxad fitted boxa, or NULL on error
  *
  * <pre>
@@ -443,9 +445,9 @@ PTA       *ptal, *ptat, *ptar, *ptab;
 /*!
  * \brief   boxaWindowedMedian()
  *
- * \param[in]    boxas source boxa
- * \param[in]    halfwin half width of window over which the median is found
- * \param[in]    debug 1 for debug output
+ * \param[in]    boxas     source boxa
+ * \param[in]    halfwin   half width of window over which the median is found
+ * \param[in]    debug     1 for debug output
  * \return  boxad smoothed boxa, or NULL on error
  *
  * <pre>
@@ -527,17 +529,17 @@ NUMA    *nal, *nat, *nar, *nab, *naml, *namt, *namr, *namb;
  * \brief   boxaModifyWithBoxa()
  *
  * \param[in]    boxas
- * \param[in]    boxam boxa with boxes used to modify those in boxas
- * \param[in]    subflag L_USE_MINSIZE, L_USE_MAXSIZE,
- *                       L_SUB_ON_LOC_DIFF, L_SUB_ON_SIZE_DIFF,
- *                       L_USE_CAPPED_MIN, L_USE_CAPPED_MAX
- * \param[in]    maxdiff parameter used with L_SUB_ON_LOC_DIFF,
- *                       L_SUB_ON_SIZE_DIFF, L_USE_CAPPED_MIN, L_USE_CAPPED_MAX
+ * \param[in]    boxam        boxa with boxes used to modify those in boxas
+ * \param[in]    subflag      L_USE_MINSIZE, L_USE_MAXSIZE,
+ *                            L_SUB_ON_LOC_DIFF, L_SUB_ON_SIZE_DIFF,
+ *                            L_USE_CAPPED_MIN, L_USE_CAPPED_MAX
+ * \param[in]    maxdiff      parameter used with L_SUB_ON_LOC_DIFF,
+ *                            L_SUB_ON_SIZE_DIFF, L_USE_CAPPED_MIN,
+ *                            L_USE_CAPPED_MAX
  * \param[in]    extrapixels  pixels added on all sides (or subtracted
  *                            if %extrapixels < 0) when using
  *                            L_SUB_ON_LOC_DIFF and L_SUB_ON_SIZE_DIFF
- * \return  boxad result after adjusting boxes in boxas, or NULL
- *                     on error.
+ * \return  boxad  result after adjusting boxes in boxas, or NULL on error.
  *
  * <pre>
  * Notes:
@@ -688,14 +690,14 @@ BOXA    *boxad;
  * \brief   boxaConstrainSize()
  *
  * \param[in]    boxas
- * \param[in]    width force width of all boxes to this size;
- *                     input 0 to use the median width
- * \param[in]    widthflag L_ADJUST_SKIP, L_ADJUST_LEFT, L_ADJUST_RIGHT,
- *                         or L_ADJUST_LEFT_AND_RIGHT
- * \param[in]    height force height of all boxes to this size;
- *                      input 0 to use the median height
- * \param[in]    heightflag L_ADJUST_SKIP, L_ADJUST_TOP, L_ADJUST_BOT,
- *                          or L_ADJUST_TOP_AND_BOT
+ * \param[in]    width        force width of all boxes to this size;
+ *                            input 0 to use the median width
+ * \param[in]    widthflag    L_ADJUST_SKIP, L_ADJUST_LEFT, L_ADJUST_RIGHT,
+ *                            or L_ADJUST_LEFT_AND_RIGHT
+ * \param[in]    height       force height of all boxes to this size;
+ *                            input 0 to use the median height
+ * \param[in]    heightflag   L_ADJUST_SKIP, L_ADJUST_TOP, L_ADJUST_BOT,
+ *                            or L_ADJUST_TOP_AND_BOT
  * \return  boxad adjusted so all boxes are the same size
  *
  * <pre>
@@ -781,12 +783,12 @@ BOXA    *boxad;
 /*!
  * \brief   boxaReconcileEvenOddHeight()
  *
- * \param[in]    boxas containing at least 3 valid boxes in even and odd
- * \param[in]    sides L_ADJUST_TOP, L_ADJUST_BOT, L_ADJUST_TOP_AND_BOT
- * \param[in]    delh threshold on median height difference
- * \param[in]    op L_ADJUST_CHOOSE_MIN, L_ADJUST_CHOOSE_MAX
- * \param[in]    factor > 0.0, typically near 1.0
- * \param[in]    start 0 if pairing (0,1), etc; 1 if pairing (1,2), etc
+ * \param[in]    boxas    containing at least 3 valid boxes in even and odd
+ * \param[in]    sides    L_ADJUST_TOP, L_ADJUST_BOT, L_ADJUST_TOP_AND_BOT
+ * \param[in]    delh     threshold on median height difference
+ * \param[in]    op       L_ADJUST_CHOOSE_MIN, L_ADJUST_CHOOSE_MAX
+ * \param[in]    factor   > 0.0, typically near 1.0
+ * \param[in]    start    0 if pairing (0,1), etc; 1 if pairing (1,2), etc
  * \return  boxad adjusted, or a copy of boxas on error
  *
  * <pre>
@@ -918,10 +920,11 @@ BOXA      *boxae, *boxao, *boxa1e, *boxa1o, *boxad;
 /*!
  * \brief   boxaTestEvenOddHeight()
  *
- * \param[in]    boxa1, boxa2
- * \param[in]    start 0 if pairing (0,1), etc; 1 if pairing (1,2), etc
- * \param[out]   pdel1 root mean of (dely^2 + delh^2 for boxa1
- * \param[out]   pdel2 root mean of (dely^2 + delh^2 for boxa2
+ * \param[in]    boxa1     input boxa 1
+ * \param[in]    boxa2     input boxa 2
+ * \param[in]    start     0 if pairing (0,1), etc; 1 if pairing (1,2), etc
+ * \param[out]   pdel1     root mean of (dely^2 + delh^2 for boxa1
+ * \param[out]   pdel2     root mean of (dely^2 + delh^2 for boxa2
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -978,10 +981,10 @@ l_float32  del1, del2;
  * \brief   boxaReconcilePairWidth()
  *
  * \param[in]    boxas
- * \param[in]    delw threshold on adjacent width difference
- * \param[in]    op L_ADJUST_CHOOSE_MIN, L_ADJUST_CHOOSE_MAX
- * \param[in]    factor > 0.0, typically near 1.0
- * \param[in]    na [optional] indicator array allowing change
+ * \param[in]    delw      threshold on adjacent width difference
+ * \param[in]    op        L_ADJUST_CHOOSE_MIN, L_ADJUST_CHOOSE_MAX
+ * \param[in]    factor    > 0.0, typically near 1.0
+ * \param[in]    na        [optional] indicator array allowing change
  * \return  boxad adjusted, or a copy of boxas on error
  *
  * <pre>
@@ -1332,8 +1335,10 @@ PIXA      *pixa;
  *
  * \param[in]    boxas    containing at least 6 valid boxes
  * \param[in]    type     L_CHECK_WIDTH, L_CHECK_HEIGHT, L_CHECK_BOTH
- * \param[in]    fract    threshold fraction of size variation from median;
- *                        in range (0 ... 1); typ. about 0.05.
+ * \param[in]    dfract   threshold fraction of dimensional variation from
+ *                        median; in range (0 ... 1); typ. about 0.05.
+ * \param[in]    sfract   threshold fraction of side variation from median;
+ *                        in range (0 ... 1); typ. about 0.04.
  * \param[in]    factor   expansion for fixed box beyond median width;
  *                        should be near 1.0.
  * \param[out]   pnadelw  [optional] diff from median width for boxes
@@ -1348,20 +1353,27 @@ PIXA      *pixa;
  *      (1) The basic idea is to identify significant differences in box
  *          dimension (either width or height) and modify the outlier boxes.
  *      (2) %type specifies if we are reconciling the width, height or both.
- *      (3) %fract specifies the tolerance for different dimensions. Any
+ *      (3) %dfract specifies the tolerance for different dimensions. Any
  *          box with a fractional difference from the median size that
- *          exceeds %fract will be altered.
- *      (4) Median width and height are found for all valid boxes (i.e.,
+ *          exceeds %dfract will be altered.
+ *      (4) %sfract specifies the tolerance for different side locations.
+ *          If a box has been marked by (3) for alteration, any side
+ *          location that differs from the median side location by
+ *          more than %sfract of the median dimension (medw or medh)
+ *          will be moved.
+ *      (5) Median width and height are found for all valid boxes (i.e.,
  *          for all boxes with width and height > 0.
  *          Median side locations are found separately for even and odd boxes,
- *          using only boxes that are "inliers"; i.e., that are within
- *          tolerance for width or height.
- *      (5) If all box dimensions are within threshold of the median,
- *          just return a copy.  Otherwise, find the side farthest
- *          from the median side location of the "inliers".  Adjust
- *          that side so that the final dimension (width or height)
- *          is the median dimension, expanded by %factor.
- *      (6) The arrays that are the initial deviation from median size
+ *          using only boxes that are "inliers"; i.e., that have been
+ *          found by (3) to be within tolerance for width or height.
+ *      (6) If all box dimensions are within threshold of the median size,
+ *          just return a copy.  Otherwise, box sides of the outliers
+ *          will be adjusted.
+ *      (7) Using %sfract, sides that are sufficiently far from the median
+ *          are first moved to the median value.  Then they are moved
+ *          together (in or out) so that the final box dimension
+ *          is %factor times the median dimension.
+ *      (8) The arrays that are the initial deviation from median size
  *          (width and height) are optionally returned.  Also optionally
  *          returned is the median w/h asperity ratio of the input %boxas.
  * </pre>
@@ -1369,14 +1381,15 @@ PIXA      *pixa;
 BOXA *
 boxaReconcileSizeByMedian(BOXA       *boxas,
                           l_int32     type,
-                          l_float32   fract,
+                          l_float32   dfract,
+                          l_float32   sfract,
                           l_float32   factor,
                           NUMA      **pnadelw,
                           NUMA      **pnadelh,
                           l_float32  *pratiowh)
 {
-l_int32    i, n, ne, no, outfound, isvalid, ind, ldist, rdist, tdist, bdist;
-l_int32    medw, medh, newloc, bw, bh, left, right, top, bot;
+l_int32    i, n, ne, no, outfound, isvalid, ind, del, maxdel;
+l_int32    medw, medh, bw, bh, left, right, top, bot;
 l_int32    medleft, medlefte, medlefto, medright, medrighte, medrighto;
 l_int32    medtop, medtope, medtopo, medbot, medbote, medboto;
 l_float32  brat;
@@ -1396,11 +1409,15 @@ NUMA      *naind, *nadelw, *nadelh;
         L_WARNING("invalid type; returning copy\n", procName);
         return boxaCopy(boxas, L_COPY);
     }
-    if (fract <= 0.0 || fract >= 1.0) {
-        L_WARNING("invalid fract; returning copy\n", procName);
+    if (dfract <= 0.0 || dfract >= 0.5) {
+        L_WARNING("invalid dimensional fract; returning copy\n", procName);
         return boxaCopy(boxas, L_COPY);
     }
-    if (factor < 0.7 || factor > 1.4)
+    if (sfract <= 0.0 || sfract >= 0.5) {
+        L_WARNING("invalid side fract; returning copy\n", procName);
+        return boxaCopy(boxas, L_COPY);
+    }
+    if (factor < 0.8 || factor > 1.25)
         L_WARNING("factor %5.3f is typ. closer to 1.0\n", procName, factor);
     if (boxaGetValidCount(boxas) < 6) {
         L_WARNING("need at least 6 valid boxes; returning copy\n", procName);
@@ -1410,9 +1427,9 @@ NUMA      *naind, *nadelw, *nadelh;
         /* If reconciling both width and height, optionally return array of
          * median deviations and even/odd ratio for width measurements */
     if (type == L_CHECK_BOTH) {
-        boxa1 = boxaReconcileSizeByMedian(boxas, L_CHECK_WIDTH, fract,
+        boxa1 = boxaReconcileSizeByMedian(boxas, L_CHECK_WIDTH, dfract, sfract,
                                           factor, pnadelw, NULL, pratiowh);
-        boxad = boxaReconcileSizeByMedian(boxa1, L_CHECK_HEIGHT, fract,
+        boxad = boxaReconcileSizeByMedian(boxa1, L_CHECK_HEIGHT, dfract, sfract,
                                           factor, NULL, pnadelh, NULL);
         boxaDestroy(&boxa1);
         return boxad;
@@ -1443,7 +1460,7 @@ NUMA      *naind, *nadelw, *nadelh;
             }
             boxGetGeometry(box, NULL, NULL, &bw, NULL);
             brat = (l_float32)bw / (l_float32)medw;
-            if (brat < 1.0 - fract || brat > 1.0 + fract) {
+            if (brat < 1.0 - dfract || brat > 1.0 + dfract) {
                 outfound = TRUE;
                 numaAddNumber(naind, 1);
                 boxDestroy(&box);
@@ -1486,25 +1503,27 @@ NUMA      *naind, *nadelw, *nadelh;
             medrighto = medrighte;
         }
 
-            /* Adjust sides of outliers */
+            /* Adjust the left and/or right sides of outliers.
+             * For each box that is a dimensional outlier, consider each side.
+             * Any side that differs fractionally from the median value
+             * by more than %sfract times the median width (medw) is set to
+             * the median value for that side.  Then both sides are moved
+             * an equal distance in or out to make w = %factor * medw. */
         boxad = boxaCreate(n);
+        maxdel = (l_int32)(sfract * medw + 0.5);
         for (i = 0; i < n; i++) {
             box = boxaGetBox(boxas, i, L_COPY);
             boxIsValid(box, &isvalid);
             numaGetIValue(naind, i, &ind);
             medleft = (i % 2 == 0) ? medlefte : medlefto;
             medright = (i % 2 == 0) ? medrighte : medrighto;
-            if (ind == 1 && isvalid) {  /* adjust side */
+            if (ind == 1 && isvalid) {  /* adjust sides */
                 boxGetSideLocations(box, &left, &right, NULL, NULL);
-                ldist = L_ABS(left - medleft);
-                rdist = L_ABS(right - medright);
-                if (ldist > rdist) {  /* adjust left */
-                    newloc = L_MAX(0, right - factor * medw);
-                    boxSetSide(box, L_SET_LEFT, newloc, 0);
-                } else {
-                    newloc = left + factor * medw;
-                    boxSetSide(box, L_SET_RIGHT, newloc, 0);
-                }
+                if (L_ABS(left - medleft) > maxdel) left = medleft;
+                if (L_ABS(right - medright) > maxdel) right = medright;
+                del = (l_int32)(factor * medw - (right - left)) / 2;
+                boxSetSide(box, L_SET_LEFT, left - del, 0);
+                boxSetSide(box, L_SET_RIGHT, right + del, 0);
             }
             boxaAddBox(boxad, box, L_INSERT);
         }
@@ -1528,7 +1547,7 @@ NUMA      *naind, *nadelw, *nadelh;
             }
             boxGetGeometry(box, NULL, NULL, NULL, &bh);
             brat = (l_float32)bh / (l_float32)medh;
-            if (brat < 1.0 - fract || brat > 1.0 + fract) {
+            if (brat < 1.0 - dfract || brat > 1.0 + dfract) {
                 outfound = TRUE;
                 numaAddNumber(naind, 1);
                 boxDestroy(&box);
@@ -1571,25 +1590,28 @@ NUMA      *naind, *nadelw, *nadelh;
             medboto = medbote;
         }
 
-            /* Adjust sides of outliers */
+            /* Adjust the top and/or bottom sides of outliers.
+             * For each box that is a dimensional outlier, consider each side.
+             * Any side that differs fractionally from the median value
+             * by more than %sfract times the median height (medh) is
+             * set to the median value for that that side.  Then both
+             * sides are moved an equal distance in or out to make
+             * h = %factor * medh). */
         boxad = boxaCreate(n);
+        maxdel = (l_int32)(sfract * medh + 0.5);
         for (i = 0; i < n; i++) {
             box = boxaGetBox(boxas, i, L_COPY);
             boxIsValid(box, &isvalid);
             numaGetIValue(naind, i, &ind);
             medtop = (i % 2 == 0) ? medtope : medtopo;
             medbot = (i % 2 == 0) ? medbote : medboto;
-            if (ind == 1 && isvalid) {  /* adjust side */
+            if (ind == 1 && isvalid) {  /* adjust sides */
                 boxGetSideLocations(box, NULL, NULL, &top, &bot);
-                tdist = L_ABS(top - medtop);
-                bdist = L_ABS(bot - medbot);
-                if (tdist > bdist) {  /* adjust top */
-                    newloc = L_MAX(0, bot - factor * medh);
-                    boxSetSide(box, L_SET_TOP, newloc, 0);
-                } else {  /* adjust bottom */
-                    newloc = top + factor * medh;
-                    boxSetSide(box, L_SET_BOT, newloc, 0);
-                }
+                if (L_ABS(top - medtop) > maxdel) top = medtop;
+                if (L_ABS(bot - medbot) > maxdel) bot = medbot;
+                del = (l_int32)(factor * medh - (bot - top)) / 2;  /* typ > 0 */
+                boxSetSide(box, L_SET_TOP, L_MAX(0, top - del), 0);
+                boxSetSide(box, L_SET_BOT, bot + del, 0);
             }
             boxaAddBox(boxad, box, L_INSERT);
         }
@@ -1635,8 +1657,10 @@ boxaPlotSides(BOXA        *boxa,
               PIX        **ppixd)
 {
 char            buf[128], titlebuf[128];
+char           *dataname;
 static l_int32  plotid = 0;
 l_int32         n, i, w, h, left, top, right, bot;
+l_float32       med, dev;
 BOXA           *boxat;
 GPLOT          *gplot;
 NUMA           *nal, *nat, *nar, *nab;
@@ -1693,6 +1717,24 @@ NUMA           *nal, *nat, *nar, *nab;
     if (ppixd) {
         stringCat(buf, sizeof(buf), ".png");
         *ppixd = pixRead(buf);
+        dataname = (plotname) ? stringNew(plotname) : stringNew("no_name");
+        numaGetMedian(nal, &med);
+        numaGetMeanDevFromMedian(nal, med, &dev);
+        fprintf(stderr, "%s left: med = %7.3f, meandev = %7.3f\n",
+                dataname, med, dev);
+        numaGetMedian(nat, &med);
+        numaGetMeanDevFromMedian(nat, med, &dev);
+        fprintf(stderr, "%s top: med = %7.3f, meandev = %7.3f\n",
+                dataname, med, dev);
+        numaGetMedian(nar, &med);
+        numaGetMeanDevFromMedian(nar, med, &dev);
+        fprintf(stderr, "%s right: med = %7.3f, meandev = %7.3f\n",
+                dataname, med, dev);
+        numaGetMedian(nab, &med);
+        numaGetMeanDevFromMedian(nab, med, &dev);
+        fprintf(stderr, "%s bot: med = %7.3f, meandev = %7.3f\n",
+                dataname, med, dev);
+        LEPT_FREE(dataname);
     }
 
     if (pnal)

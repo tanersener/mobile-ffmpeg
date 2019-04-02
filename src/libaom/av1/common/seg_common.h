@@ -24,7 +24,7 @@ extern "C" {
 #define SEG_TEMPORAL_PRED_CTXS 3
 #define SPATIAL_PREDICTION_PROBS 3
 
-typedef enum {
+enum {
   SEG_LVL_ALT_Q,       // Use alternate Quantizer ....
   SEG_LVL_ALT_LF_Y_V,  // Use alternate loop filter value on y plane vertical
   SEG_LVL_ALT_LF_Y_H,  // Use alternate loop filter value on y plane horizontal
@@ -34,7 +34,7 @@ typedef enum {
   SEG_LVL_SKIP,        // Optional Segment (0,0) + skip mode
   SEG_LVL_GLOBALMV,
   SEG_LVL_MAX
-} SEG_LVL_FEATURES;
+} UENUM1BYTE(SEG_LVL_FEATURES);
 
 struct segmentation {
   uint8_t enabled;

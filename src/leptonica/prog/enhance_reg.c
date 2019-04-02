@@ -38,19 +38,17 @@
 
 #include "allheaders.h"
 
-static const char *filein = "test24.jpg";
-static const l_int32 WIDTH = 150;
 
 int main(int    argc,
          char **argv)
 {
 char          textstr[256];
-l_int32       w, h, d, i;
+l_int32       i, w, h;
 l_uint32      srcval, dstval;
 l_float32     scalefact, sat, fract;
 L_BMF        *bmf8;
 L_KERNEL     *kel;
-NUMA         *na;
+NUMA         *na1, *na2, *na3;
 PIX          *pix, *pixs, *pixs1, *pixs2, *pixd;
 PIX          *pix0, *pix1, *pix2, *pix3, *pix4;
 PIXA         *pixa, *pixaf;
@@ -59,11 +57,10 @@ L_REGPARAMS  *rp;
     if (regTestSetup(argc, argv, &rp))
         return 1;
 
-    pix = pixRead(filein);
-    pixGetDimensions(pix, &w, &h, &d);
-    if (d != 32)
-        return ERROR_INT("file not 32 bpp", argv[0], 1);
-    scalefact = (l_float32)WIDTH / (l_float32)w;
+    lept_mkdir("lept/enhance");
+    pix = pixRead("test24.jpg");  /* rgb */
+    w = pixGetWidth(pix);
+    scalefact = 150.0 / (l_float32)w;  /* scale to w = 150 */
     pixs = pixScale(pix, scalefact, scalefact);
     w = pixGetWidth(pixs);
     pixaf = pixaCreate(5);
@@ -110,20 +107,20 @@ L_REGPARAMS  *rp;
 
         /* Vary saturation */
     pixa = pixaCreate(20);
-    na = numaCreate(20);
+    na1 = numaCreate(20);
     for (i = 0; i < 20; i++) {
         pix0 = pixModifySaturation(NULL, pixs, -0.9 + 0.1 * i);
         pixMeasureSaturation(pix0, 1, &sat);
         pixaAddPix(pixa, pix0, L_INSERT);
-        numaAddNumber(na, sat);
+        numaAddNumber(na1, sat);
     }
     pix1 = pixaDisplayTiledAndScaled(pixa, 32, w, 5, 0, 10, 2);
     pixSaveTiled(pix1, pixaf, 1.0, 1, 20, 0);
-    gplotSimple1(na, GPLOT_PNG, "/tmp/lept/regout/enhance.7",
+    gplotSimple1(na1, GPLOT_PNG, "/tmp/lept/regout/enhance.7",
                  "Average Saturation");
     regTestWritePixAndCheck(rp, pix1, IFF_PNG);  /* 3 */
     pixDisplayWithTitle(pix1, 900, 100, "Saturation", rp->display);
-    numaDestroy(&na);
+    numaDestroy(&na1);
     pixDestroy(&pix1);
     pixaDestroy(&pixa);
 
@@ -195,6 +192,67 @@ L_REGPARAMS  *rp;
     pixDestroy(&pixd);
     pixDestroy(&pixs);
 
+        /* More trc testing */
+    pix = pixRead("test24.jpg");  /* rgb */
+    pixs = pixScale(pix, 0.3, 0.3);
+    pixDestroy(&pix);
+    pixaf = pixaCreate(5);
+    pixaAddPix(pixaf, pixs, L_COPY);
+
+    na1 = numaGammaTRC(0.6, 40, 200);
+    na2 = numaGammaTRC(1.2, 40, 225);
+    na3 = numaGammaTRC(0.6, 40, 255);
+    pixGetDimensions(pixs, &w, &h, NULL);
+    pix1 = pixCopy(NULL, pixs);
+    pix2 = pixMakeSymmetricMask(w, h, 0.5, 0.5, L_USE_INNER);
+    pixaAddPix(pixaf, pix2, L_COPY);
+    pixTRCMapGeneral(pix1, pix2, na1, na2, na3);
+    pixaAddPix(pixaf, pix1, L_COPY);
+    regTestWritePixAndCheck(rp, pix1, IFF_PNG);  /* 10 */
+    numaDestroy(&na1);
+    numaDestroy(&na2);
+    numaDestroy(&na3);
+    pixDestroy(&pix1);
+    pixDestroy(&pix2);
+
+    na1 = numaGammaTRC(1.0, 0, 255);
+    na2 = numaGammaTRC(1.0, 0, 255);
+    na3 = numaGammaTRC(1.0, 0, 255);
+    pix1 = pixCopy(NULL, pixs);
+    pixTRCMapGeneral(pix1, NULL, na1, na2, na3);
+    regTestComparePix(rp, pixs, pix1);  /* 11 */
+    numaDestroy(&na1);
+    numaDestroy(&na2);
+    numaDestroy(&na3);
+    pixDestroy(&pix1);
+
+    na1 = numaGammaTRC(1.7, 150, 255);
+    na2 = numaGammaTRC(0.7, 0, 150);
+    na3 = numaGammaTRC(1.2, 80, 200);
+    pixTRCMapGeneral(pixs, NULL, na1, na2, na3);
+    regTestWritePixAndCheck(rp, pixs, IFF_PNG);  /* 12 */
+    pixaAddPix(pixaf, pixs, L_COPY);
+    numaDestroy(&na1);
+    numaDestroy(&na2);
+    numaDestroy(&na3);
+    pixDestroy(&pixs);
+
+    na1 = numaGammaTRC(0.8, 0, 220);
+    na2 = numaGammaTRC(1.0, 40, 220);
+    gplotSimple2(na1, na2, GPLOT_PNG, "/tmp/lept/enhance/junkp", NULL);
+    pix1 = pixRead("/tmp/lept/enhance/junkp.png");
+    regTestWritePixAndCheck(rp, pix1, IFF_PNG);  /* 13 */
+    pixaAddPix(pixaf, pix1, L_COPY);
+    numaDestroy(&na1);
+    numaDestroy(&na2);
+    pixDestroy(&pix1);
+
+    pixd = pixaDisplayTiledInColumns(pixaf, 4, 1.0, 30, 2);
+    regTestWritePixAndCheck(rp, pixd, IFF_PNG);  /* 14 */
+    pixDisplayWithTitle(pixd, 100, 800, NULL, rp->display);
+    pixDestroy(&pixd);
+    pixaDestroy(&pixaf);
+
     /* -----------------------------------------------*
      *           Test global color transforms         *
      * -----------------------------------------------*/
@@ -202,7 +260,7 @@ L_REGPARAMS  *rp;
     pix = pixRead("wet-day.jpg");
     pixs1 = pixOctreeColorQuant(pix, 200, 0);
     pixs2 = pixRemoveColormap(pixs1, REMOVE_CMAP_TO_FULL_COLOR);
-    regTestComparePix(rp, pixs1, pixs2);  /* 10 */
+    regTestComparePix(rp, pixs1, pixs2);  /* 15 */
 
         /* Make a diagonal color transform matrix */
     kel = kernelCreate(3, 3);
@@ -213,15 +271,15 @@ L_REGPARAMS  *rp;
         /* Apply to both cmap and rgb images. */
     pix1 = pixMultMatrixColor(pixs1, kel);
     pix2 = pixMultMatrixColor(pixs2, kel);
-    regTestComparePix(rp, pix1, pix2);  /* 11 */
+    regTestComparePix(rp, pix1, pix2);  /* 16 */
     kernelDestroy(&kel);
 
         /* Apply the same transform in the simpler interface */
     pix3 = pixMultConstantColor(pixs1, 0.7, 0.4, 1.3);
     pix4 = pixMultConstantColor(pixs2, 0.7, 0.4, 1.3);
-    regTestComparePix(rp, pix3, pix4);  /* 12 */
-    regTestComparePix(rp, pix1, pix3);  /* 13 */
-    regTestWritePixAndCheck(rp, pix1, IFF_JFIF_JPEG);  /* 14 */
+    regTestComparePix(rp, pix3, pix4);  /* 17 */
+    regTestComparePix(rp, pix1, pix3);  /* 18 */
+    regTestWritePixAndCheck(rp, pix1, IFF_JFIF_JPEG);  /* 19 */
 
     pixDestroy(&pix);
     pixDestroy(&pixs1);

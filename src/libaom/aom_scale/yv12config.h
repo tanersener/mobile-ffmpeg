@@ -24,15 +24,10 @@ extern "C" {
 
 #define AOMINNERBORDERINPIXELS 160
 #define AOM_INTERP_EXTEND 4
-
-// TODO(jingning): Use unified inter predictor for encoder and
-// decoder during the development process. Revisit the frame border
-// to improve the decoder performance.
-#if CONFIG_REDUCED_ENCODER_BORDER
-#define AOM_BORDER_IN_PIXELS 160
-#else
 #define AOM_BORDER_IN_PIXELS 288
-#endif  // CONFIG_REDUCED_ENCODER_BORDER
+#define AOM_ENC_NO_SCALE_BORDER 160
+#define AOM_ENC_LOOKAHEAD_BORDER 64
+#define AOM_DEC_BORDER_IN_PIXELS 64
 
 typedef struct yv12_buffer_config {
   union {
@@ -102,7 +97,7 @@ typedef struct yv12_buffer_config {
   aom_color_primaries_t color_primaries;
   aom_transfer_characteristics_t transfer_characteristics;
   aom_matrix_coefficients_t matrix_coefficients;
-  int monochrome;
+  uint8_t monochrome;
   aom_chroma_sample_position_t chroma_sample_position;
   aom_color_range_t color_range;
   int render_width;
@@ -130,6 +125,14 @@ int aom_realloc_frame_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
                              int border, int byte_alignment,
                              aom_codec_frame_buffer_t *fb,
                              aom_get_frame_buffer_cb_fn_t cb, void *cb_priv);
+
+int aom_realloc_lookahead_buffer(YV12_BUFFER_CONFIG *ybf, int width, int height,
+                                 int ss_x, int ss_y, int use_highbitdepth,
+                                 int border, int byte_alignment,
+                                 aom_codec_frame_buffer_t *fb,
+                                 aom_get_frame_buffer_cb_fn_t cb,
+                                 void *cb_priv);
+
 int aom_free_frame_buffer(YV12_BUFFER_CONFIG *ybf);
 
 #ifdef __cplusplus

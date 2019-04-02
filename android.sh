@@ -169,7 +169,7 @@ skip_library() {
 }
 
 enable_debug() {
-    export MOBILE_FFMPEG_DEBUG="-DDEBUG -g"
+    export MOBILE_FFMPEG_DEBUG="-g"
 
     BUILD_TYPE_ID+="debug "
 }
@@ -459,8 +459,18 @@ print_enabled_libraries() {
 
 build_application_mk() {
     if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-        local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
+        local LTS_BUILD_FLAG="-DMOBILE_FFMPEG_LTS "
     fi
+
+    if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]]; then
+        local APP_STL="c++_shared"
+    else
+        local APP_STL="none"
+
+        ${SED_INLINE} 's/c++_shared //g' ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
+    fi
+
+    local BUILD_DATE="-DMOBILE_FFMPEG_BUILD_DATE=$(date +%Y%m%d 2>>${BASEDIR}/build.log)"
 
     rm -f ${BASEDIR}/android/jni/Application.mk
 
@@ -469,11 +479,11 @@ APP_OPTIM := release
 
 APP_ABI := ${ANDROID_ARCHITECTURES}
 
-APP_STL := c++_shared
+APP_STL := ${APP_STL}
 
 APP_PLATFORM := android-${API}
 
-APP_CFLAGS := -O3 -DANDROID ${LTS_BUILD__FLAG}-Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable
+APP_CFLAGS := -O3 -DANDROID ${LTS_BUILD_FLAG}${BUILD_DATE} -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable
 EOF
 }
 
@@ -483,6 +493,7 @@ EOF
 DETECTED_NDK_VERSION=$(grep -Eo Revision.* ${ANDROID_NDK_ROOT}/source.properties | sed 's/Revision//g;s/=//g;s/ //g')
 
 echo -e "\nINFO: Using Android NDK v${DETECTED_NDK_VERSION} provided at ${ANDROID_NDK_ROOT}\n" 1>>${BASEDIR}/build.log 2>&1
+echo -e "INFO: Build options: $@\n" 1>>${BASEDIR}/build.log 2>&1
 
 # CLEAR OLD NATIVE LIBS
 rm -rf ${BASEDIR}/android/libs 1>>${BASEDIR}/build.log 2>&1
@@ -492,6 +503,7 @@ GPL_ENABLED="no"
 DISPLAY_HELP=""
 BUILD_LTS=""
 BUILD_TYPE_ID=""
+BUILD_VERSION=$(git describe --tags 2>>${BASEDIR}/build.log)
 
 while [ ! $# -eq 0 ]
 do
@@ -578,7 +590,7 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
 fi
 
 echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android\n"
-echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
+echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 # PERFORM THIS CHECK ONLY ON LTS
@@ -613,28 +625,12 @@ do
     fi
 done
 
-# CLEANING PREVIOUSLY COPIED c++_shared.so FILES
-rm -rf ${BASEDIR}/prebuilt/android-cpp-shared 1>>${BASEDIR}/build.log 2>&1
-
 for run_arch in {0..4}
 do
     if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
         export ARCH=$(get_arch_name $run_arch)
         export TOOLCHAIN=$(get_toolchain)
         export TOOLCHAIN_ARCH=$(get_toolchain_arch)
-
-        create_toolchain || exit 1
-
-        # COPY libc++_shared.so FROM EACH TOOLCHAIN
-        mkdir -p ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH}
-
-        if [[ $run_arch -eq 0 ]] || [[ $run_arch -eq 1 ]]; then
-            cp ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/$(get_target_host)/lib/armv7-a/libc++_shared.so ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH} 1>>${BASEDIR}/build.log 2>&1
-        elif [[ $run_arch -eq 4 ]]; then
-            cp ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/$(get_target_host)/lib64/libc++_shared.so ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH} 1>>${BASEDIR}/build.log 2>&1
-        else
-            cp ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/$(get_target_host)/lib/libc++_shared.so ${BASEDIR}/prebuilt/android-cpp-shared/${TOOLCHAIN_ARCH} 1>>${BASEDIR}/build.log 2>&1
-        fi
 
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
@@ -701,7 +697,7 @@ if [[ ! -z ${ANDROID_ARCHITECTURES} ]]; then
         exit 1
     fi
 
-    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg-*.aar ${MOBILE_FFMPEG_AAR}/mobile-ffmpeg.aar 1>>${BASEDIR}/build.log 2>&1
+    cp ${BASEDIR}/android/app/build/outputs/aar/mobile-ffmpeg.aar ${MOBILE_FFMPEG_AAR}/mobile-ffmpeg.aar 1>>${BASEDIR}/build.log 2>&1
 
     if [ $? -ne 0 ]; then
         echo -e "failed\n"

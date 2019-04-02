@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2009-2018 D. R. Commander.  All Rights Reserved.
+ * Copyright (C)2009-2019 D. R. Commander.  All Rights Reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -139,7 +139,7 @@ int decomp(unsigned char *srcBuf, unsigned char **jpegBuf,
            unsigned long *jpegSize, unsigned char *dstBuf, int w, int h,
            int subsamp, int jpegQual, char *fileName, int tilew, int tileh)
 {
-  char tempStr[1024], sizeStr[20] = "\0", qualStr[6] = "\0", *ptr;
+  char tempStr[1024], sizeStr[20] = "\0", qualStr[13] = "\0", *ptr;
   FILE *file = NULL;
   tjhandle handle = NULL;
   int row, col, iter = 0, dstBufAlloc = 0, retval = 0;
@@ -152,8 +152,8 @@ int decomp(unsigned char *srcBuf, unsigned char **jpegBuf,
   unsigned char *dstPtr, *dstPtr2, *yuvBuf = NULL;
 
   if (jpegQual > 0) {
-    snprintf(qualStr, 6, "_Q%d", jpegQual);
-    qualStr[5] = 0;
+    snprintf(qualStr, 13, "_Q%d", jpegQual);
+    qualStr[12] = 0;
   }
 
   if ((handle = tjInitDecompress()) == NULL)
@@ -541,6 +541,8 @@ int decompTest(char *fileName)
   if (tjDecompressHeader3(handle, srcBuf, srcSize, &w, &h, &subsamp,
                           &cs) == -1)
     _throwtj("executing tjDecompressHeader3()");
+  if (w < 1 || h < 1)
+    _throw("reading JPEG header", "Invalid image dimensions");
   if (cs == TJCS_YCCK || cs == TJCS_CMYK) {
     pf = TJPF_CMYK;  ps = tjPixelSize[pf];
   }

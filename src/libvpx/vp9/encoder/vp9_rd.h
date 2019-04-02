@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP9_ENCODER_VP9_RD_H_
-#define VP9_ENCODER_VP9_RD_H_
+#ifndef VPX_VP9_ENCODER_VP9_RD_H_
+#define VPX_VP9_ENCODER_VP9_RD_H_
 
 #include <limits.h>
 
@@ -108,9 +108,14 @@ typedef struct RD_OPT {
   int64_t prediction_type_threshes[MAX_REF_FRAMES][REFERENCE_MODES];
 
   int64_t filter_threshes[MAX_REF_FRAMES][SWITCHABLE_FILTER_CONTEXTS];
+#if CONFIG_CONSISTENT_RECODE
+  int64_t prediction_type_threshes_prev[MAX_REF_FRAMES][REFERENCE_MODES];
 
+  int64_t filter_threshes_prev[MAX_REF_FRAMES][SWITCHABLE_FILTER_CONTEXTS];
+#endif
   int RDMULT;
   int RDDIV;
+  double r0;
 } RD_OPT;
 
 typedef struct RD_COST {
@@ -129,16 +134,17 @@ struct TileDataEnc;
 struct VP9_COMP;
 struct macroblock;
 
-int64_t vp9_compute_rd_mult_based_on_qindex(const struct VP9_COMP *cpi,
-                                            int qindex);
+int vp9_compute_rd_mult_based_on_qindex(const struct VP9_COMP *cpi, int qindex);
 
 int vp9_compute_rd_mult(const struct VP9_COMP *cpi, int qindex);
+
+int vp9_get_adaptive_rdmult(const struct VP9_COMP *cpi, double beta);
 
 void vp9_initialize_rd_consts(struct VP9_COMP *cpi);
 
 void vp9_initialize_me_consts(struct VP9_COMP *cpi, MACROBLOCK *x, int qindex);
 
-void vp9_model_rd_from_var_lapndz(unsigned int var, unsigned int n,
+void vp9_model_rd_from_var_lapndz(unsigned int var, unsigned int n_log2,
                                   unsigned int qstep, int *rate, int64_t *dist);
 
 void vp9_model_rd_from_var_lapndz_vec(unsigned int var[MAX_MB_PLANE],
@@ -169,8 +175,8 @@ void vp9_set_rd_speed_thresholds(struct VP9_COMP *cpi);
 
 void vp9_set_rd_speed_thresholds_sub8x8(struct VP9_COMP *cpi);
 
-void vp9_update_rd_thresh_fact(int (*fact)[MAX_MODES], int rd_thresh, int bsize,
-                               int best_mode_index);
+void vp9_update_rd_thresh_fact(int (*factor_buf)[MAX_MODES], int rd_thresh,
+                               int bsize, int best_mode_index);
 
 static INLINE int rd_less_than_thresh(int64_t best_rd, int thresh,
                                       const int *const thresh_fact) {
@@ -212,4 +218,4 @@ unsigned int vp9_high_get_sby_perpixel_variance(struct VP9_COMP *cpi,
 }  // extern "C"
 #endif
 
-#endif  // VP9_ENCODER_VP9_RD_H_
+#endif  // VPX_VP9_ENCODER_VP9_RD_H_

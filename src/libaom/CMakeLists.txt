@@ -293,8 +293,11 @@ if(CONFIG_AV1_DECODER AND ENABLE_EXAMPLES)
 
     if(EMSCRIPTEN)
       add_preproc_definition(_POSIX_SOURCE)
-      append_link_flag_to_target("inspect" "-s TOTAL_MEMORY=402653184")
+      append_link_flag_to_target("inspect" "--emrun")
+      append_link_flag_to_target("inspect" "-s USE_PTHREADS=0")
+      append_link_flag_to_target("inspect" "-s WASM=1")
       append_link_flag_to_target("inspect" "-s MODULARIZE=1")
+      append_link_flag_to_target("inspect" "-s ALLOW_MEMORY_GROWTH=1")
       append_link_flag_to_target(
         "inspect" "-s \'EXTRA_EXPORTED_RUNTIME_METHODS=[\"UTF8ToString\"]\'")
       append_link_flag_to_target("inspect"

@@ -40,6 +40,16 @@ export CXXFLAGS=$(get_cxxflags ${LIB_NAME})
 export LDFLAGS=$(get_ldflags ${LIB_NAME})
 export ASM_FLAGS=$(get_asmflags ${LIB_NAME})
 
+SIMD_OPTIONS=""
+case ${ARCH} in
+    armv7 | armv7s | arm64 | arm64e)
+        SIMD_OPTIONS="-DWITH_SIMD=1"
+    ;;
+    *)
+        SIMD_OPTIONS="-DWITH_SIMD=0"
+    ;;
+esac
+
 cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 if [ -d "build" ]; then
@@ -62,15 +72,16 @@ cmake -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME}" \
     -DCMAKE_SYSTEM_NAME=Darwin \
+    -DCMAKE_OSX_SYSROOT="" \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
-    -DCMAKE_AR="$AR" \
+    -DCMAKE_AR="$(xcrun --sdk $(get_sdk_name) -f ar)" \
     -DCMAKE_ASM_FLAGS="$ASM_FLAGS" \
     -DENABLE_PIC=1 \
     -DENABLE_STATIC=1 \
     -DENABLE_SHARED=0 \
     -DWITH_JPEG8=1 \
-    -DWITH_SIMD=1 \
+    ${SIMD_OPTIONS} \
     -DWITH_TURBOJPEG=0 \
     -DWITH_JAVA=0 \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \

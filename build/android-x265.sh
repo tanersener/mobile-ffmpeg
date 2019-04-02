@@ -65,27 +65,21 @@ fi
 mkdir cmake-build || exit 1
 cd cmake-build || exit 1
 
-# apply detect512 patch
-rc=$(download "https://bitbucket.org/multicoreware/x265/issues/attachments/442/multicoreware/x265/1539002893.24/442/enable512.diff" "enable512.diff")
-cd ${BASEDIR}/src/${LIB_NAME}/source/common
-patch -p3 < ${MOBILE_FFMPEG_TMPDIR}/enable512.diff
-cd ${BASEDIR}/src/${LIB_NAME}/cmake-build
-
 cmake -Wno-dev \
     -DCMAKE_VERBOSE_MAKEFILE=0 \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
     -DCMAKE_CXX_FLAGS="${CXXFLAGS}" \
     -DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}" \
-    -DCMAKE_SYSROOT="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot" \
-    -DCMAKE_FIND_ROOT_PATH="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot" \
+    -DCMAKE_SYSROOT="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \
+    -DCMAKE_FIND_ROOT_PATH="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot" \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME}" \
     -DCMAKE_SYSTEM_NAME=Generic \
-    -DCMAKE_C_COMPILER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/bin/$CC" \
-    -DCMAKE_CXX_COMPILER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/bin/$CXX" \
-    -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/bin/$LD" \
-    -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/bin/$AR" \
-    -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/bin/$AS" \
+    -DCMAKE_C_COMPILER="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$CC" \
+    -DCMAKE_CXX_COMPILER="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$CXX" \
+    -DCMAKE_LINKER="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$LD" \
+    -DCMAKE_AR="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$AR" \
+    -DCMAKE_AS="${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin/$AS" \
     -DCMAKE_POSITION_INDEPENDENT_CODE=1 \
     -DSTATIC_LINK_CRT=1 \
     -DENABLE_PIC=1 \
@@ -97,6 +91,6 @@ cmake -Wno-dev \
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_x265_package_config "2.9"
+create_x265_package_config "3.0"
 
 make install || exit 1

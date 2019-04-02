@@ -166,7 +166,7 @@ static const char valid_solution[] = "3 8 7 2 6 4 1 9 5 "
 /*!
  * \brief   sudokuReadFile()
  *
- * \param[in]    filename of formatted sudoku file
+ * \param[in]    filename     formatted sudoku file
  * \return  array of 81 numbers, or NULL on error
  *
  * <pre>
@@ -247,7 +247,7 @@ SARRAY   *saline, *sa1, *sa2;
 /*!
  * \brief   sudokuReadString()
  *
- * \param[in]    str of input data
+ * \param[in]    str     formatted input data
  * \return  array of 81 numbers, or NULL on error
  *
  * <pre>
@@ -281,12 +281,12 @@ l_int32  *array;
 
 
 /*---------------------------------------------------------------------*
- *                        Create/destroy sudoku                        *
+ *                       Create/destroy sudoku                         *
  *---------------------------------------------------------------------*/
 /*!
  * \brief   sudokuCreate()
  *
- * \param[in]    array of 81 numbers, 9 rows of 9 numbers each
+ * \param[in]    array   81 numbers, 9 rows of 9 numbers each
  * \return  l_sudoku, or NULL on error
  *
  * <pre>
@@ -330,7 +330,7 @@ L_SUDOKU  *sud;
 /*!
  * \brief   sudokuDestroy()
  *
- * \param[in,out]   psud to be nulled
+ * \param[in,out]   psud    will be set to null before returning
  * \return  void
  */
 void
@@ -363,7 +363,7 @@ L_SUDOKU  *sud;
 /*!
  * \brief   sudokuSolve()
  *
- * \param[in]    sud l_sudoku starting in initial state
+ * \param[in]    sud     l_sudoku starting in initial state
  * \return  1 on success, 0 on failure to solve note reversal of
  *              typical unix returns
  */
@@ -398,7 +398,7 @@ sudokuSolve(L_SUDOKU  *sud)
 /*!
  * \brief   sudokuValidState()
  *
- * \param[in]    state array of size 81
+ * \param[in]    state    array of size 81
  * \return  1 if valid, 0 if invalid
  *
  * <pre>
@@ -430,7 +430,7 @@ l_int32  i;
 /*!
  * \brief   sudokuNewGuess()
  *
- * \param[in]    sud l_sudoku
+ * \param[in]    sud    l_sudoku
  * \return  0 if OK; 1 if no solution is possible
  *
  * <pre>
@@ -483,8 +483,8 @@ l_int32  *locs, *state;
 /*!
  * \brief   sudokuTestState()
  *
- * \param[in]    state current state: array of 81 values
- * \param[in]    index into state element that we are testing
+ * \param[in]    state    current state: array of 81 values
+ * \param[in]    index    into state element that we are testing
  * \return  1 if valid; 0 if invalid no error checking
  */
 static l_int32
@@ -545,8 +545,8 @@ l_int32  blockrow, blockcol, blockstart, rowindex, locindex;
 /*!
  * \brief   sudokuTestUniqueness()
  *
- * \param[in]    array of 81 numbers, 9 lines of 9 numbers each
- * \param[out]   punique 1 if unique, 0 if not
+ * \param[in]    array     of 81 numbers, 9 lines of 9 numbers each
+ * \param[out]   punique   1 if unique, 0 if not
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -605,10 +605,10 @@ L_SUDOKU  *sud, *sud1, *sud2, *sud3;
 /*!
  * \brief   sudokuCompareState()
  *
- * \param[in]    sud1, sud2
- * \param[in]    quads rotation of sud2 input with respect to sud1,
- *                    in units of 90 degrees cw
- * \param[out]   psame 1 if all 4 results are identical; 0 otherwise
+ * \param[in]    sud1, sud2  two l_Sudoku states (solutions)
+ * \param[in]    quads       rotation of sud2 input with respect to sud1,
+ *                           in units of 90 degrees cw
+ * \param[out]   psame       1 if all 4 results are identical; 0 otherwise
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -658,8 +658,8 @@ l_int32  *array;
 /*!
  * \brief   sudokuRotateArray()
  *
- * \param[in]    array of 81 numbers; 9 lines of 9 numbers each
- * \param[in]    quads 1-3; number of 90 degree cw rotations
+ * \param[in]    array     81 numbers; 9 lines of 9 numbers each
+ * \param[in]    quads     1-3; number of 90 degree cw rotations
  * \return  rarray rotated array, or NULL on error
  */
 static l_int32 *
@@ -710,10 +710,10 @@ l_int32  *rarray;
 /*!
  * \brief   sudokuGenerate()
  *
- * \param[in]    array of 81 numbers, 9 rows of 9 numbers each
- * \param[in]    seed random number
- * \param[in]    minelems min non-zero elements allowed; <= 80
- * \param[in]    maxtries max tries to remove a number and get a valid sudoku
+ * \param[in]    array      81 numbers, 9 rows of 9 numbers each
+ * \param[in]    seed       random number
+ * \param[in]    minelems   min non-zero elements allowed; <= 80
+ * \param[in]    maxtries   max tries to remove a number and get a valid sudoku
  * \return  l_sudoku, or NULL on error
  *
  * <pre>
@@ -840,8 +840,8 @@ L_SUDOKU  *sud, *testsud;
 /*!
  * \brief   sudokuOutput()
  *
- * \param[in]    sud l_sudoku at any stage
- * \param[in]    arraytype L_SUDOKU_INIT, L_SUDOKU_STATE
+ * \param[in]    sud          l_sudoku at any stage
+ * \param[in]    arraytype    L_SUDOKU_INIT, L_SUDOKU_STATE
  * \return  void
  *
  * <pre>

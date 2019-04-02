@@ -132,12 +132,6 @@ static const AVOption options[] = {
     { "int_ref_qp_delta",   "QP difference for the refresh MBs",                 OFFSET(qsv.int_ref_qp_delta),        AV_OPT_TYPE_INT, { .i64 = INT16_MIN }, INT16_MIN,  INT16_MAX, VE },
     { "recovery_point_sei", "Insert recovery point SEI messages",                OFFSET(qsv.recovery_point_sei),      AV_OPT_TYPE_INT, { .i64 = -1 },               -1,          1, VE },
 
-    { "trellis",             "Trellis quantization",                             OFFSET(qsv.trellis),                 AV_OPT_TYPE_FLAGS, { .i64 = 0 }, 0, UINT_MAX, VE, "trellis" },
-        { "off", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_TRELLIS_OFF }, .flags = VE, "trellis" },
-        { "I",   NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_TRELLIS_I },   .flags = VE, "trellis" },
-        { "P",   NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_TRELLIS_P },   .flags = VE, "trellis" },
-        { "B",   NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_TRELLIS_B },   .flags = VE, "trellis" },
-
     { "profile", NULL, OFFSET(qsv.profile), AV_OPT_TYPE_INT, { .i64 = MFX_PROFILE_UNKNOWN }, 0, INT_MAX, VE, "profile" },
     { "unknown" , NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_UNKNOWN      }, INT_MIN, INT_MAX,     VE, "profile" },
     { "baseline", NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_AVC_BASELINE }, INT_MIN, INT_MAX,     VE, "profile" },
@@ -152,6 +146,10 @@ static const AVOption options[] = {
     { "mfmode", "Multi-Frame Mode", OFFSET(qsv.mfmode), AV_OPT_TYPE_INT, { .i64 = MFX_MF_AUTO }, MFX_MF_DEFAULT, MFX_MF_AUTO, VE, "mfmode"},
     { "off"    , NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_MF_DISABLED }, INT_MIN, INT_MAX,     VE, "mfmode" },
     { "auto"   , NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_MF_AUTO     }, INT_MIN, INT_MAX,     VE, "mfmode" },
+#endif
+
+#if QSV_HAVE_VDENC
+    { "low_power", "enable low power mode(experimental: many limitations by mfx version, BRC modes, etc.)", OFFSET(qsv.low_power), AV_OPT_TYPE_BOOL, { .i64 =  0 }, 0, 1, VE},
 #endif
 
     { "repeat_pps", "repeat pps for every frame", OFFSET(qsv.repeat_pps), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
@@ -177,7 +175,7 @@ static const AVCodecDefault qsv_enc_defaults[] = {
 #if FF_API_CODER_TYPE
     { "coder",     "-1"    },
 #endif
-
+    { "trellis",   "-1"    },
     { "flags",     "+cgop" },
 #if FF_API_PRIVATE_OPT
     { "b_strategy", "-1"   },

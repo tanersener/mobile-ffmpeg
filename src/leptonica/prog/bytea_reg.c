@@ -36,7 +36,7 @@
 int main(int    argc,
          char **argv)
 {
-char         *str;
+char         *str1, *str2;
 l_uint8      *data1, *data2;
 l_int32       i, n;
 size_t        size1, size2, slice, total, start;
@@ -78,29 +78,51 @@ L_REGPARAMS  *rp;
     l_byteaDestroy(&lba3);
     l_byteaDestroy(&lba4);
 
-        /* Test appending with strings */
+        /* Test appending with strings
+         * In order to make sure it succeeds on windows, where text
+         * lines are typically terminated with with "\r\n" instead
+         * of '\n', we remove the '\r' characters.  Also, note that
+         * for files opened for read with "rb", as we do throughout
+         * leptonica with fopenReadStream(), windows will not
+         * append the '\r'.  We have 3 ways to remove the '\r'
+         * characters from the byte array data1 with size1 bytes:
+         *   str1 = (char *)arrayReplaceEachSequence(data1, size1,
+         *          (l_uint8 *)"\r", 1, NULL, 0, &size2, NULL);
+         *   str1 = stringReplaceEachSubstr((char *)data1, "\r",
+         *           "", NULL);
+         *   str1 = stringRemoveChars((char *)data1, "\r");
+         * which can then be used to initialize a L_Bytea using
+         *   lba1 = l_byteaInitFromMem((l_uint8 *)str1, strlen(str1));
+         */
+
     data1 = l_binaryRead("kernel_reg.c", &size1);
-    lba1 = l_byteaInitFromMem(data1, size1);
-    sa = sarrayCreateLinesFromString((char *)data1, 1);
+#if 0
+    str1 = (char *)arrayReplaceEachSequence(data1, size1, (l_uint8 *)"\r", 1,
+                                            NULL, 0, &size2, NULL);
+    lba1 = l_byteaInitFromMem((l_uint8 *)str1, size2);
+#elif 0
+    str1 = stringReplaceEachSubstr((char *)data1, "\r", "", NULL);
+    lba1 = l_byteaInitFromMem((l_uint8 *)str1, strlen(str1));
+#else
+    str1 = stringRemoveChars((char *)data1, "\r");
+    lba1 = l_byteaInitFromMem((l_uint8 *)str1, strlen(str1));
+#endif
+    sa = sarrayCreateLinesFromString(str1, 1);
     lba2 = l_byteaCreate(0);
     n = sarrayGetCount(sa);
     for (i = 0; i < n; i++) {
-        str = sarrayGetString(sa, i, L_NOCOPY);
-        l_byteaAppendString(lba2, str);
-#ifdef _WIN32
-        l_byteaAppendString(lba2, "\r\n");
-#else
+        str2 = sarrayGetString(sa, i, L_NOCOPY);
+        l_byteaAppendString(lba2, str2);
         l_byteaAppendString(lba2, "\n");
-#endif
     }
     data2 = l_byteaGetData(lba1, &size2);
     regTestCompareStrings(rp, lba1->data, lba1->size, lba2->data, lba2->size);
                               /* 4 */
     lept_free(data1);
+    lept_free(str1);
     sarrayDestroy(&sa);
     l_byteaDestroy(&lba1);
     l_byteaDestroy(&lba2);
-
 
         /* Test appending with binary data */
     slice = 1000;
@@ -147,4 +169,3 @@ L_REGPARAMS  *rp;
 
     return regTestCleanup(rp);
 }
-

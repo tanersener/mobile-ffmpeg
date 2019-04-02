@@ -528,7 +528,7 @@ pixFindWordAndCharacterBoxes(PIX         *pixs,
                              const char  *debugdir)
 {
 char      *debugfile, *subdir;
-l_int32    i, xs, ys, xb, yb, nb;
+l_int32    i, xs, ys, xb, yb, nb, loc;
 l_float32  scalefact;
 BOX       *box1, *box2;
 BOXA      *boxa1, *boxa1a, *boxa2, *boxa3, *boxa4, *boxa5, *boxaw;
@@ -570,7 +570,8 @@ PIX       *pix1, *pix2, *pix3, *pix3a, *pix4, *pix5;
     pixGetWordBoxesInTextlines(pix3a, 1, 4, 150, 40, &boxa1a, NULL);
     boxa1 = boxaTransform(boxa1a, 0, 0, 1.0 / scalefact, 1.0 / scalefact);
     if (debugdir) {
-        subdir = stringReplaceSubstr(debugdir, "/tmp/", "", NULL, NULL);
+        loc = 0;
+        subdir = stringReplaceSubstr(debugdir, "/tmp/", "", &loc, NULL);
         lept_mkdir(subdir);
         LEPT_FREE(subdir);
         pix4 = pixConvertTo32(pix2);

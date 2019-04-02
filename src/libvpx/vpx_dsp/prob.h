@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VPX_DSP_PROB_H_
-#define VPX_DSP_PROB_H_
+#ifndef VPX_VPX_DSP_PROB_H_
+#define VPX_VPX_DSP_PROB_H_
 
 #include <assert.h>
 
@@ -103,4 +103,4 @@ DECLARE_ALIGNED(16, extern const uint8_t, vpx_norm[256]);
 }  // extern "C"
 #endif
 
-#endif  // VPX_DSP_PROB_H_
+#endif  // VPX_VPX_DSP_PROB_H_

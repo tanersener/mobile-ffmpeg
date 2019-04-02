@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.arthenica.mobileffmpeg.FFmpeg.getBuildDate;
 import static com.arthenica.mobileffmpeg.FFmpeg.getVersion;
 
 /**
@@ -64,6 +65,8 @@ public class Config {
      */
     public static final String TAG = "mobile-ffmpeg";
 
+    public static final String MOBILE_FFMPEG_PIPE_PREFIX = "mf_pipe_";
+
     private static LogCallback logCallbackFunction;
 
     private static Level activeLogLevel;
@@ -75,6 +78,8 @@ public class Config {
     private static final AtomicReference<StringBuffer> systemCommandOutputReference;
 
     private static boolean runningSystemCommand;
+
+    private static int lastCreatedPipeIndex;
 
     static {
 
@@ -111,7 +116,7 @@ public class Config {
             System.loadLibrary("mobileffmpeg");
         }
 
-        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s-%s.", getPackageName(), AbiDetect.getAbi(), getVersion()));
+        Log.i(Config.TAG, String.format("Loaded mobile-ffmpeg-%s-%s-%s-%s.", getPackageName(), AbiDetect.getAbi(), getVersion(), getBuildDate()));
 
         /* NATIVE LOG LEVEL IS RECEIVED ONLY ON STARTUP */
         activeLogLevel = Level.from(getNativeLogLevel());
@@ -124,6 +129,7 @@ public class Config {
         systemCommandOutputReference.set(new StringBuffer());
 
         runningSystemCommand = false;
+        lastCreatedPipeIndex = 0;
     }
 
     /**
@@ -412,6 +418,45 @@ public class Config {
     }
 
     /**
+     * <p>Creates a new named pipe to use in <code>FFmpeg</code> operations.
+     *
+     * <p>Please note that creator is responsible of closing created pipes.
+     *
+     * @param context application context to access application data
+     * @return the full path of named pipe
+     */
+    public static String registerNewFFmpegPipe(final Context context) {
+
+        // PIPES ARE CREATED UNDER THE CACHE DIRECTORY
+        final File cacheDir = context.getCacheDir();
+
+        final String newFFmpegPipePath = cacheDir + File.separator + MOBILE_FFMPEG_PIPE_PREFIX + (++lastCreatedPipeIndex);
+
+        // FIRST CLOSE OLD PIPES WITH THE SAME NAME
+        closeFFmpegPipe(newFFmpegPipePath);
+
+        int rc = registerNewNativeFFmpegPipe(newFFmpegPipePath);
+        if (rc == 0) {
+            return newFFmpegPipePath;
+        } else {
+            Log.e(TAG, String.format("Failed to register new FFmpeg pipe %s. Operation failed with rc=%d.", newFFmpegPipePath, rc));
+            return null;
+        }
+    }
+
+    /**
+     * <p>Closes a previously created <code>FFmpeg</code> pipe.
+     *
+     * @param ffmpegPipePath full path of ffmpeg pipe
+     */
+    public static void closeFFmpegPipe(final String ffmpegPipePath) {
+        File file = new File(ffmpegPipePath);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    /**
      * Executes system command. System command is not logged to output.
      *
      * @param arguments                   command arguments
@@ -523,5 +568,22 @@ public class Config {
      * @return build configuration string
      */
     native static String getNativeBuildConf();
+
+    /**
+     * <p>Creates natively a new named pipe to use in <code>FFmpeg</code> operations.
+     *
+     * <p>Please note that creator is responsible of closing created pipes.
+     *
+     * @param ffmpegPipePath full path of ffmpeg pipe
+     * @return zero on successful creation, non-zero on error
+     */
+    native static int registerNewNativeFFmpegPipe(final String ffmpegPipePath);
+
+    /**
+     * <p>Returns MobileFFmpeg library build date natively.
+     *
+     * @return MobileFFmpeg library build date
+     */
+    native static String getNativeBuildDate();
 
 }

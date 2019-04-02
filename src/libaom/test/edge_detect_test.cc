@@ -185,8 +185,9 @@ TEST_P(EdgeDetectBrightnessTest, DetectUniformBrightness) {
   const bool high_bd = GET_PARAM(3);
   const int bd = GET_PARAM(4);
 
-  ASSERT_EQ(0, av1_edge_exists(input_, stride_8tap(width), width, height,
-                               high_bd, bd));
+  ASSERT_EQ(
+      0, av1_edge_exists(input_, stride_8tap(width), width, height, high_bd, bd)
+             .magnitude);
 }
 
 INSTANTIATE_TEST_CASE_P(ImageBrightnessTests, EdgeDetectBrightnessTest,
@@ -245,9 +246,11 @@ TEST_P(EdgeDetectImageTest, BlackWhite) {
   free(orig);
   // Value should be between 556 and 560.
   ASSERT_LE(556, av1_edge_exists(padded, stride_8tap(width), width, height,
-                                 high_bd, bd));
+                                 high_bd, bd)
+                     .magnitude);
   ASSERT_GE(560, av1_edge_exists(padded, stride_8tap(width), width, height,
-                                 high_bd, bd));
+                                 high_bd, bd)
+                     .magnitude);
 
   free_pad_8tap(padded, width, high_bd);
 }

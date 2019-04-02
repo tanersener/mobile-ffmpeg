@@ -108,8 +108,8 @@ static const l_int32  INITIAL_BUFFER_ARRAYSIZE = 1024;   /*!< n'importe quoi */
 /*!
  * \brief   bbufferCreate()
  *
- * \param[in]    indata address in memory [optional]
- * \param[in]    nalloc size of byte array to be alloc'd 0 for default
+ * \param[in]    indata   address in memory [optional]
+ * \param[in]    nalloc   size of byte array to be alloc'd 0 for default
  * \return  bbuffer, or NULL on error
  *
  * <pre>
@@ -154,7 +154,7 @@ L_BBUFFER  *bb;
 /*!
  * \brief   bbufferDestroy()
  *
- * \param[in,out]   pbb  buffer to be nulled
+ * \param[in,out]   pbb   will be set to null before returning
  * \return  void
  *
  * <pre>
@@ -190,8 +190,8 @@ L_BBUFFER  *bb;
 /*!
  * \brief   bbufferDestroyAndSaveData()
  *
- * \param[in,out]   pbb buffer to be nulled
- * \param[out]      pnbytes  number of bytes saved in array
+ * \param[in,out]   pbb       input data buffer; will be nulled
+ * \param[out]      pnbytes   number of bytes saved in array
  * \return  barray newly allocated array of data
  *
  * <pre>
@@ -345,8 +345,8 @@ l_int32  navail, nadd, nread, nwritten;
 /*!
  * \brief   bbufferExtendArray()
  *
- * \param[in]    bb      bbuffer
- * \param[in]    nbytes  number of bytes to extend array size
+ * \param[in]    bb       bbuffer
+ * \param[in]    nbytes   number of bytes to extend array size
  * \return  0 if OK, 1 on error
  *
  * <pre>

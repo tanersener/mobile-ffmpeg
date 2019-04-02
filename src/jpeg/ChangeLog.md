@@ -1,3 +1,43 @@
+2.0.2
+=====
+
+### Significant changes relative to 2.0.1:
+
+1. Fixed a regression introduced by 2.0.1[5] that prevented a runtime search
+path (rpath) from being embedded in the libjpeg-turbo shared libraries and
+executables for macOS and iOS.  This caused a fatal error of the form
+"dyld: Library not loaded" when attempting to use one of the executables,
+unless `DYLD_LIBRARY_PATH` was explicitly set to the location of the
+libjpeg-turbo shared libraries.
+
+2. Fixed an integer overflow and subsequent segfault (CVE-2018-20330) that
+occurred when attempting to load a BMP file with more than 1 billion pixels
+using the `tjLoadImage()` function.
+
+3. Fixed a buffer overrun (CVE-2018-19664) that occurred when attempting to
+decompress a specially-crafted malformed JPEG image to a 256-color BMP using
+djpeg.
+
+4. Fixed a floating point exception that occurred when attempting to
+decompress a specially-crafted malformed JPEG image with a specified image
+width or height of 0 using the C version of TJBench.
+
+5. The TurboJPEG API will now decompress 4:4:4 JPEG images with 2x1, 1x2, 3x1,
+or 1x3 luminance and chrominance sampling factors.  This is a non-standard way
+of specifying 1x subsampling (normally 4:4:4 JPEGs have 1x1 luminance and
+chrominance sampling factors), but the JPEG format and the libjpeg API both
+allow it.
+
+6. Fixed a regression introduced by 2.0 beta1[7] that caused djpeg to generate
+incorrect PPM images when used with the `-colors` option.
+
+7. Fixed an issue whereby a static build of libjpeg-turbo (a build in which
+`ENABLE_SHARED` is `0`) could not be installed using the Visual Studio IDE.
+
+8. Fixed a severe performance issue in the Loongson MMI SIMD extensions that
+occurred when compressing RGB images whose image rows were not 64-bit-aligned.
+
+
 2.0.1
 =====
 

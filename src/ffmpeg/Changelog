@@ -12,6 +12,14 @@ version <next>:
 - PCM-DVD encoder
 - GIF parser
 - vividas demuxer
+- hymt decoder
+- anlmdn filter
+- maskfun filter
+- hcom demuxer and decoder
+- ARBC decoder
+- libaribb24 based ARIB STD-B24 caption support (profiles A and C)
+- Support decoding of HEVC 4:4:4 content in nvdec and cuviddec
+- removed libndi-newtek
 
 
 version 4.1:

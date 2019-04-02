@@ -31,9 +31,9 @@ struct CYCLIC_REFRESH {
   // excess of the cycle time, i.e., in the case of all zero motion, block
   // will be refreshed every (100/percent_refresh + time_for_refresh) frames.
   int time_for_refresh;
-  // Target number of (8x8) blocks that are set for delta-q.
+  // Target number of (4x4) blocks that are set for delta-q.
   int target_num_seg_blocks;
-  // Actual number of (8x8) blocks that were applied delta-q.
+  // Actual number of (4x4) blocks that were applied delta-q.
   int actual_num_seg1_blocks;
   int actual_num_seg2_blocks;
   // RD mult. parameters for segment 1.
@@ -55,6 +55,8 @@ struct CYCLIC_REFRESH {
   int rate_boost_fac;
   double low_content_avg;
   int qindex_delta[3];
+  double weight_segment;
+  int apply_cyclic_refresh;
 };
 
 CYCLIC_REFRESH *av1_cyclic_refresh_alloc(int mi_rows, int mi_cols) {
@@ -85,27 +87,6 @@ void av1_cyclic_refresh_free(CYCLIC_REFRESH *cr) {
     aom_free(cr->last_coded_q_map);
     aom_free(cr);
   }
-}
-
-// Check if we should turn off cyclic refresh based on bitrate condition.
-static int apply_cyclic_refresh_bitrate(const AV1_COMMON *cm,
-                                        const RATE_CONTROL *rc) {
-  // Turn off cyclic refresh if bits available per frame is not sufficiently
-  // larger than bit cost of segmentation. Segment map bit cost should scale
-  // with number of seg blocks, so compare available bits to number of blocks.
-  // Average bits available per frame = avg_frame_bandwidth
-  // Number of (8x8) blocks in frame = mi_rows * mi_cols;
-  const float factor = 0.25;
-  const int number_blocks = cm->mi_rows * cm->mi_cols;
-  // The condition below corresponds to turning off at target bitrates:
-  // (at 30fps), ~12kbps for CIF, 36kbps for VGA, 100kps for HD/720p.
-  // Also turn off at very small frame sizes, to avoid too large fraction of
-  // superblocks to be refreshed per frame. Threshold below is less than QCIF.
-  if (rc->avg_frame_bandwidth < factor * number_blocks ||
-      number_blocks / 64 < 5)
-    return 0;
-  else
-    return 1;
 }
 
 // Check if this coding block, of size bsize, should be considered for refresh
@@ -158,11 +139,11 @@ int av1_cyclic_refresh_estimate_bits_at_q(const AV1_COMP *cpi,
   const CYCLIC_REFRESH *const cr = cpi->cyclic_refresh;
   int estimated_bits;
   int mbs = cm->MBs;
-  int num8x8bl = mbs << 2;
+  int num4x4bl = mbs << 4;
   // Weight for non-base segments: use actual number of blocks refreshed in
-  // previous/just encoded frame. Note number of blocks here is in 8x8 units.
-  double weight_segment1 = (double)cr->actual_num_seg1_blocks / num8x8bl;
-  double weight_segment2 = (double)cr->actual_num_seg2_blocks / num8x8bl;
+  // previous/just encoded frame. Note number of blocks here is in 4x4 units.
+  double weight_segment1 = (double)cr->actual_num_seg1_blocks / num4x4bl;
+  double weight_segment2 = (double)cr->actual_num_seg2_blocks / num4x4bl;
   // Take segment weighted average for estimated bits.
   estimated_bits =
       (int)((1.0 - weight_segment1 - weight_segment2) *
@@ -190,14 +171,14 @@ int av1_cyclic_refresh_rc_bits_per_mb(const AV1_COMP *cpi, int i,
   const AV1_COMMON *const cm = &cpi->common;
   CYCLIC_REFRESH *const cr = cpi->cyclic_refresh;
   int bits_per_mb;
-  int num8x8bl = cm->MBs << 2;
+  int num4x4bl = cm->MBs << 4;
   // Weight for segment prior to encoding: take the average of the target
   // number for the frame to be encoded and the actual from the previous frame.
   double weight_segment =
       (double)((cr->target_num_seg_blocks + cr->actual_num_seg1_blocks +
                 cr->actual_num_seg2_blocks) >>
                1) /
-      num8x8bl;
+      num4x4bl;
   // Compute delta-q corresponding to qindex i.
   int deltaq = compute_deltaq(cpi, i, cr->rate_ratio_qdelta);
   // Take segment weighted average for bits per mb.
@@ -264,21 +245,6 @@ void av1_cyclic_refresh_update_segment(const AV1_COMP *cpi,
       int map_offset = block_index + y * cm->mi_cols + x;
       cr->map[map_offset] = new_map_value;
       cpi->segmentation_map[map_offset] = mbmi->segment_id;
-      // Inter skip blocks were clearly not coded at the current qindex, so
-      // don't update the map for them. For cases where motion is non-zero or
-      // the reference frame isn't the previous frame, the previous value in
-      // the map for this spatial location is not entirely correct.
-      if ((!is_inter_block(mbmi) || !skip) &&
-          mbmi->segment_id <= CR_SEGMENT_ID_BOOST2) {
-        cr->last_coded_q_map[map_offset] = clamp(
-            cm->base_qindex + cr->qindex_delta[mbmi->segment_id], 0, MAXQ);
-      } else if (is_inter_block(mbmi) && skip &&
-                 mbmi->segment_id <= CR_SEGMENT_ID_BOOST2) {
-        cr->last_coded_q_map[map_offset] =
-            AOMMIN(clamp(cm->base_qindex + cr->qindex_delta[mbmi->segment_id],
-                         0, MAXQ),
-                   cr->last_coded_q_map[map_offset]);
-      }
     }
 }
 
@@ -313,73 +279,6 @@ void av1_cyclic_refresh_set_golden_update(AV1_COMP *const cpi) {
     rc->baseline_gf_interval = 4 * (100 / cr->percent_refresh);
   else
     rc->baseline_gf_interval = 40;
-}
-
-// Update some encoding stats (from the just encoded frame). If this frame's
-// background has high motion, refresh the golden frame. Otherwise, if the
-// golden reference is to be updated check if we should NOT update the golden
-// ref.
-void av1_cyclic_refresh_check_golden_update(AV1_COMP *const cpi) {
-  AV1_COMMON *const cm = &cpi->common;
-  CYCLIC_REFRESH *const cr = cpi->cyclic_refresh;
-  int mi_row, mi_col;
-  double fraction_low = 0.0;
-  int low_content_frame = 0;
-
-  MB_MODE_INFO **mi;
-  RATE_CONTROL *const rc = &cpi->rc;
-  const int rows = cm->mi_rows, cols = cm->mi_cols;
-  int cnt1 = 0, cnt2 = 0;
-  int force_gf_refresh = 0;
-
-  for (mi_row = 0; mi_row < rows; mi_row++) {
-    mi = cm->mi_grid_visible + mi_row * cm->mi_stride;
-
-    for (mi_col = 0; mi_col < cols; mi_col++) {
-      int16_t abs_mvr = mi[0]->mv[0].as_mv.row >= 0
-                            ? mi[0]->mv[0].as_mv.row
-                            : -1 * mi[0]->mv[0].as_mv.row;
-      int16_t abs_mvc = mi[0]->mv[0].as_mv.col >= 0
-                            ? mi[0]->mv[0].as_mv.col
-                            : -1 * mi[0]->mv[0].as_mv.col;
-
-      // Calculate the motion of the background.
-      if (abs_mvr <= 16 && abs_mvc <= 16) {
-        cnt1++;
-        if (abs_mvr == 0 && abs_mvc == 0) cnt2++;
-      }
-      mi++;
-
-      // Accumulate low_content_frame.
-      if (cr->map[mi_row * cols + mi_col] < 1) low_content_frame++;
-    }
-  }
-
-  // For video conference clips, if the background has high motion in current
-  // frame because of the camera movement, set this frame as the golden frame.
-  // Use 70% and 5% as the thresholds for golden frame refreshing.
-  if (cnt1 * 10 > (70 * rows * cols) && cnt2 * 20 < cnt1) {
-    av1_cyclic_refresh_set_golden_update(cpi);
-    rc->frames_till_gf_update_due = rc->baseline_gf_interval;
-
-    if (rc->frames_till_gf_update_due > rc->frames_to_key)
-      rc->frames_till_gf_update_due = rc->frames_to_key;
-    cpi->refresh_golden_frame = 1;
-    force_gf_refresh = 1;
-  }
-
-  fraction_low = (double)low_content_frame / (rows * cols);
-  // Update average.
-  cr->low_content_avg = (fraction_low + 3 * cr->low_content_avg) / 4;
-  if (!force_gf_refresh && cpi->refresh_golden_frame == 1) {
-    // Don't update golden reference if the amount of low_content for the
-    // current encoded frame is small, or if the recursive average of the
-    // low_content over the update interval window falls below threshold.
-    if (fraction_low < 0.8 || cr->low_content_avg < 0.7)
-      cpi->refresh_golden_frame = 0;
-    // Reset for next internal.
-    cr->low_content_avg = fraction_low;
-  }
 }
 
 // Update the segmentation map, and related quantities: cyclic refresh map,
@@ -458,26 +357,70 @@ static void cyclic_refresh_update_map(AV1_COMP *const cpi) {
 
 // Set cyclic refresh parameters.
 void av1_cyclic_refresh_update_parameters(AV1_COMP *const cpi) {
+  // TODO(marpan): Parameters need to be tuned.
   const RATE_CONTROL *const rc = &cpi->rc;
   const AV1_COMMON *const cm = &cpi->common;
   CYCLIC_REFRESH *const cr = cpi->cyclic_refresh;
+  int num4x4bl = cm->MBs << 4;
+  int target_refresh = 0;
+  double weight_segment_target = 0;
+  double weight_segment = 0;
+  int qp_thresh = AOMMIN(20, rc->best_quality << 1);
+  cr->apply_cyclic_refresh = 1;
+  if (frame_is_intra_only(cm) || is_lossless_requested(&cpi->oxcf) ||
+      rc->avg_frame_qindex[INTER_FRAME] < qp_thresh) {
+    cr->apply_cyclic_refresh = 0;
+    return;
+  }
   cr->percent_refresh = 10;
-  cr->max_qdelta_perc = 50;
+  cr->max_qdelta_perc = 60;
   cr->time_for_refresh = 0;
+  cr->motion_thresh = 32;
+  cr->rate_boost_fac = 15;
   // Use larger delta-qp (increase rate_ratio_qdelta) for first few (~4)
   // periods of the refresh cycle, after a key frame.
-  if (rc->frames_since_key < 4 * cr->percent_refresh)
+  // Account for larger interval on base layer for temporal layers.
+  if (cr->percent_refresh > 0 &&
+      rc->frames_since_key < 400 / cr->percent_refresh) {
     cr->rate_ratio_qdelta = 3.0;
-  else
-    cr->rate_ratio_qdelta = 2.0;
-  // Adjust some parameters for low resolutions at low bitrates.
-  if (cm->width <= 352 && cm->height <= 288 && rc->avg_frame_bandwidth < 3400) {
-    cr->motion_thresh = 4;
-    cr->rate_boost_fac = 10;
   } else {
-    cr->motion_thresh = 32;
-    cr->rate_boost_fac = 17;
+    cr->rate_ratio_qdelta = 2.0;
   }
+  // Adjust some parameters for low resolutions.
+  if (cm->width <= 352 && cm->height <= 288) {
+    if (rc->avg_frame_bandwidth < 3000) {
+      cr->motion_thresh = 16;
+      cr->rate_boost_fac = 13;
+    } else {
+      cr->max_qdelta_perc = 70;
+      cr->rate_ratio_qdelta = AOMMAX(cr->rate_ratio_qdelta, 2.5);
+    }
+  }
+  if (cpi->oxcf.rc_mode == AOM_VBR) {
+    // To be adjusted for VBR mode, e.g., based on gf period and boost.
+    // For now use smaller qp-delta (than CBR), no second boosted seg, and
+    // turn-off (no refresh) on golden refresh (since it's already boosted).
+    cr->percent_refresh = 10;
+    cr->rate_ratio_qdelta = 1.5;
+    cr->rate_boost_fac = 10;
+    if (cpi->refresh_golden_frame == 1) {
+      cr->percent_refresh = 0;
+      cr->rate_ratio_qdelta = 1.0;
+    }
+  }
+  // Weight for segment prior to encoding: take the average of the target
+  // number for the frame to be encoded and the actual from the previous frame.
+  // Use the target if its less. To be used for setting the base qp for the
+  // frame in vp9_rc_regulate_q.
+  target_refresh = cr->percent_refresh * cm->mi_rows * cm->mi_cols / 100;
+  weight_segment_target = (double)(target_refresh) / num4x4bl;
+  weight_segment = (double)((target_refresh + cr->actual_num_seg1_blocks +
+                             cr->actual_num_seg2_blocks) >>
+                            1) /
+                   num4x4bl;
+  if (weight_segment_target < 7 * weight_segment / 8)
+    weight_segment = weight_segment_target;
+  cr->weight_segment = weight_segment;
 }
 
 // Setup cyclic background refresh: set delta q and segmentation map.
@@ -486,7 +429,6 @@ void av1_cyclic_refresh_setup(AV1_COMP *const cpi) {
   const RATE_CONTROL *const rc = &cpi->rc;
   CYCLIC_REFRESH *const cr = cpi->cyclic_refresh;
   struct segmentation *const seg = &cm->seg;
-  const int apply_cyclic_refresh = apply_cyclic_refresh_bitrate(cm, rc);
   int resolution_change =
       cm->prev_frame && (cm->width != cm->prev_frame->width ||
                          cm->height != cm->prev_frame->height);
@@ -498,8 +440,7 @@ void av1_cyclic_refresh_setup(AV1_COMP *const cpi) {
     return;
   }
   if (cm->current_frame.frame_number == 0) cr->low_content_avg = 0.0;
-  // Don't apply refresh on key frame or enhancement layer frames.
-  if (!apply_cyclic_refresh || cm->current_frame.frame_type == KEY_FRAME) {
+  if (!cr->apply_cyclic_refresh) {
     // Set segmentation map to 0 and disable.
     unsigned char *const seg_map = cpi->segmentation_map;
     memset(seg_map, 0, cm->mi_rows * cm->mi_cols);

@@ -150,7 +150,7 @@ is_windows_target() {
 # empty string. Caller is responsible for testing the string once the function
 # returns.
 vpx_tool_path() {
-  local readonly tool_name="$1"
+  local tool_name="$1"
   local tool_path="${LIBVPX_BIN_PATH}/${tool_name}${VPX_TEST_EXE_SUFFIX}"
   if [ ! -x "${tool_path}" ]; then
     # Try one directory up: when running via examples.sh the tool could be in
@@ -403,6 +403,8 @@ VP9_IVF_FILE="${LIBVPX_TEST_DATA_PATH}/vp90-2-09-subpixel-00.ivf"
 VP9_WEBM_FILE="${LIBVPX_TEST_DATA_PATH}/vp90-2-00-quantizer-00.webm"
 VP9_FPM_WEBM_FILE="${LIBVPX_TEST_DATA_PATH}/vp90-2-07-frame_parallel-1.webm"
 VP9_LT_50_FRAMES_WEBM_FILE="${LIBVPX_TEST_DATA_PATH}/vp90-2-02-size-32x08.webm"
+
+VP9_RAW_FILE="${LIBVPX_TEST_DATA_PATH}/crbug-1539.rawfile"
 
 YUV_RAW_INPUT="${LIBVPX_TEST_DATA_PATH}/hantro_collage_w352h288.yuv"
 YUV_RAW_INPUT_WIDTH=352

@@ -2441,145 +2441,20 @@ static const NN_CONFIG av1_rect_partition_nnconfig_128 = {
 #undef NUM_NODES
 #undef LABEL_SIZE
 
-#if CONFIG_ONE_PASS_SVM
-#define FEATURE_SIZE 24
-static const float av1_op_svm_early_term_weights_128[FEATURE_SIZE + 1] = {
-  -4.5893036051f, 6.9065208136f,  -9.1579514692f, 0.1353151366f,
-  -1.0271889653f, -0.0020988254f, -0.0094355949f, 0.0040209656f,
-  0.0073014747f,  0.7939705382f,  0.0254545714f,  0.0557559708f,
-  -0.0339662064f, -0.0496818300f, 0.3053600283f,  0.3699486845f,
-  0.0848271391f,  0.4091075988f,  0.1196729398f,  -0.0038137193f,
-  -0.0773495909f, -0.0651630642f, -0.0123704995f, -0.0036697401f,
-  -4.1930227095f,
-};
+// Below are the models used for simple_motion_search_based_split
+static const float av1_simple_motion_search_based_split_thresh_128 = 2.0f;
+static const float av1_simple_motion_search_based_split_thresh_64 = 2.0f;
+static const float av1_simple_motion_search_based_split_thresh_32 = 2.0f;
+static const float av1_simple_motion_search_based_split_thresh_16 = 2.0f;
+static const float av1_simple_motion_search_based_split_thresh_8 = 2.0f;
 
-static const float av1_op_svm_early_term_weights_64[FEATURE_SIZE + 1] = {
-  -2.7600454480f, 5.6822046712f,  -6.7576830133f, 0.1326457117f,
-  -1.0541818372f, 0.0107782654f,  0.0050469147f,  -0.0021362631f,
-  -0.0135151040f, -0.1020115005f, -0.0283409957f, -0.0176311233f,
-  0.0250648204f,  0.0196228570f,  0.5441528594f,  0.2767320141f,
-  0.1261231351f,  0.2998476408f,  0.1336215695f,  -0.1107823946f,
-  -0.0697279598f, -0.0577520545f, -0.0558441075f, -0.0699750617f,
-  -2.6995991503f,
-};
-
-static const float av1_op_svm_early_term_weights_32[FEATURE_SIZE + 1] = {
-  -0.8950734172f, 1.3559565008f,  -2.6733642653f, 0.2661361319f,
-  -0.0314731140f, 0.0044943456f,  0.0006438044f,  -0.0029066686f,
-  -0.0021903213f, 0.5845049496f,  -0.0003629350f, 0.0006982840f,
-  0.0014157386f,  -0.0017427528f, 0.7078456733f,  0.1600998068f,
-  0.0933852747f,  0.2822125876f,  0.1923826165f,  -0.0905903459f,
-  -0.0564717590f, -0.0591007486f, -0.0692268554f, -0.0677411981f,
-  -0.7101853206f,
-};
-
-static const float av1_op_svm_early_term_weights_16[FEATURE_SIZE + 1] = {
-  -0.1719124013f, -0.3192305362f, -1.1714597182f, 0.4437770294f,
-  -0.0042344643f, 0.0000027764f,  0.0018827450f,  -0.0015555613f,
-  -0.0003250050f, 0.9413693294f,  0.0076188418f,  -0.0067870352f,
-  0.0006329246f,  -0.0013059613f, 0.8596697254f,  0.0635558018f,
-  0.0447224598f,  0.0915706321f,  0.0741662273f,  -0.0269096547f,
-  -0.0244610614f, -0.0281113318f, -0.0326108845f, -0.0350908892f,
-  -0.0307521675f,
-};
-
-static const float av1_op_svm_early_term_mean_128[FEATURE_SIZE] = {
-  940540.3259649610f,    3988285.5905584921f, 575475302.3545289040f,
-  0.5775348803f,         866.9828469502f,     0.2503762393f,
-  0.2501466215f,         0.2513213770f,       0.2481557622f,
-  521994448.3219169378f, 0.2666920631f,       0.2535864361f,
-  0.2481589186f,         0.2315625823f,       100519.1049708007f,
-  12.1299754840f,        0.8279971004f,       12.6664603305f,
-  0.7313258998f,         935.8233056680f,     0.7436563032f,
-  0.7710055018f,         0.7376516970f,       0.6859818720f,
-};
-
-static const float av1_op_svm_early_term_mean_64[FEATURE_SIZE] = {
-  420419.7529613562f,    839754.4414347620f, 129360420.5256031156f,
-  0.6525652037f,         548.8972009954f,    0.2506918565f,
-  0.2488349076f,         0.2501724146f,      0.2503008213f,
-  113132974.7944754064f, 0.2479344278f,      0.2471446791f,
-  0.2524478512f,         0.2524730419f,      91147.9854189453f,
-  10.9642508460f,        0.8936554428f,      11.3877865621f,
-  0.8307555282f,         752.7787491956f,    0.7243363939f,
-  0.7198362119f,         0.7329432336f,      0.7245090283f,
-};
-
-static const float av1_op_svm_early_term_mean_32[FEATURE_SIZE] = {
-  105111.0236438536f,   184296.0939716828f, 29117017.6751756854f,
-  0.6402298612f,        140.2223339218f,    0.2495860872f,
-  0.2496407600f,        0.2506238629f,      0.2501492900f,
-  24480304.9390618578f, 0.2494442027f,      0.2496080963f,
-  0.2504881563f,        0.2504595447f,      60297.6762059058f,
-  9.4279752138f,        0.9287901132f,      9.6516813792f,
-  0.9009173677f,        591.5406335030f,    0.6944486917f,
-  0.6983941982f,        0.6927236901f,      0.6921613649f,
-};
-
-static const float av1_op_svm_early_term_mean_16[FEATURE_SIZE] = {
-  34080.7994802934f, 44108.1176228864f,   7494288.4946180154f, 0.6240636218f,
-  36.4539515827f,    0.2490867417f,       0.2499231014f,       0.2505361492f,
-  0.2504540077f,     5913397.2957480755f, 0.2487482536f,       0.2495500728f,
-  0.2503693302f,     0.2513323434f,       36574.9686737814f,   7.4345592768f,
-  0.9592429205f,     7.6001764585f,       0.9459867777f,       490.4635033056f,
-  0.6626215237f,     0.6580791886f,       0.6655481064f,       0.6589010119f,
-};
-
-static const float av1_op_svm_early_term_std_128[FEATURE_SIZE] = {
-  2054266.2732957317f,    7550554.6241466375f, 1078688147.1656334400f,
-  0.4939517611f,          1414.3139592985f,    0.1504634077f,
-  0.1515907199f,          0.1590329744f,       0.1515653324f,
-  1006422867.8989596367f, 0.1168668155f,       0.1195725959f,
-  0.1195825693f,          0.1123065533f,       195261.0940245980f,
-  4.5876675121f,          0.3773829648f,       4.8017339769f,
-  0.4432700397f,          973.7532938848f,     0.4790027843f,
-  0.5056275222f,          0.5262278749f,       0.4685586148f,
-};
-
-static const float av1_op_svm_early_term_std_64[FEATURE_SIZE] = {
-  1093636.0522712648f,   1749863.5221569177f, 255168612.8025657237f,
-  0.4761552884f,         1084.7927994662f,    0.1099344646f,
-  0.1100619440f,         0.1090853225f,       0.1115303745f,
-  232084513.1365262568f, 0.0759732385f,       0.0762942913f,
-  0.0785624106f,         0.0779284747f,       185687.9441778057f,
-  4.4371901245f,         0.3082781088f,       4.6670562831f,
-  0.3749677061f,         854.3212307408f,     0.4920531348f,
-  0.5073919158f,         0.5054698298f,       0.4904895620f,
-};
-
-static const float av1_op_svm_early_term_std_32[FEATURE_SIZE] = {
-  238229.7484988807f,   400136.8703966461f, 60267828.4581554681f,
-  0.4799328974f,        268.9377064297f,    0.1122938575f,
-  0.1126479260f,        0.1137018559f,      0.1126389337f,
-  52174139.1477040648f, 0.0715628767f,      0.0720997035f,
-  0.0728961434f,        0.0732065300f,      147785.0049793872f,
-  4.2092341484f,        0.2571751131f,      4.3893075417f,
-  0.2987729310f,        769.0253148602f,    0.5027558039f,
-  0.4982811444f,        0.5092312751f,      0.4991214994f,
-};
-
-static const float av1_op_svm_early_term_std_16[FEATURE_SIZE] = {
-  64177.9527087587f,    103729.9987511119f, 16632490.8146969266f,
-  0.4843637247f,        65.8114470725f,     0.0884226846f,
-  0.0912638659f,        0.0914771167f,      0.0916078800f,
-  13364581.3877149168f, 0.0677468925f,      0.0689631274f,
-  0.0689915367f,        0.0702648469f,      111397.2620676765f,
-  3.7858187888f,        0.1977269328f,      3.9420183951f,
-  0.2260437881f,        717.5336868275f,    0.5017939514f,
-  0.5066633533f,        0.5086806985f,      0.5085585987f,
-};
-
-#undef FEATURE_SIZE
-#endif  // CONFIG_ONE_PASS_SVM
-
-// Below are the models used for full_pixel_motion_search_based_split
 // BLOCK_128X128
 #define NUM_HIDDEN_LAYERS_128 1
 #define NUM_FEATURES_128 6
 #define NUM_LAYER_0_UNITS_128 16
 #define NUM_LOGITS_128 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_128[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_128[] = {
   -0.807346f,  0.242298f,   12.9862f,   -1.19161f,  5.21734f,    -1.1363f,
   -2.39127f,   0.930915f,   -2.44285f,  -2.42966f,  5.73476f,    0.0506879f,
   -0.234878f,  -0.317875f,  0.361322f,  0.431648f,  -0.39105f,   -0.110225f,
@@ -2598,23 +2473,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_128[] = {
   0.702545f,   -0.612227f,  -7.68881f,  9.52225f,   -1.18581f,   -2.56762f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_128[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_128[] = {
   0.364895f,    0.577553f,  0.115758f,  -0.999496f, 0.124885f, 3.23193f,
   -0.00386642f, 0.970794f,  0.136637f,  -4.28052f,  -1.49234f, 0.370436f,
   0.576981f,    -0.469656f, -0.124071f, 1.07669f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_128[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_128[] = {
   1.32916f,    0.817212f,  0.0f,       -0.921066f, 0.0f,      3.57649f,
   -0.0204517f, 2.97286f,   0.0f,       5.49957f,   -8.14518f, 0.0f,
   1.30826f,    -0.349536f, -0.638933f, 5.4496f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_128[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_128[] = {
   0.683442f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_128 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_128 = {
   NUM_FEATURES_128,
   NUM_LOGITS_128,
   NUM_HIDDEN_LAYERS_128,
@@ -2622,16 +2497,14 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_128 = {
       NUM_LAYER_0_UNITS_128,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_128,
-      full_pixel_motion_search_based_split_logits_kernel_128,
+      av1_simple_motion_search_based_split_layer_0_kernel_128,
+      av1_simple_motion_search_based_split_logits_kernel_128,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_128,
-      full_pixel_motion_search_based_split_logits_bias_128,
+      av1_simple_motion_search_based_split_layer_0_bias_128,
+      av1_simple_motion_search_based_split_logits_bias_128,
   },
 };
-
-static const float full_pixel_motion_search_based_split_thresh_128 = 2.0f;
 
 #undef NUM_HIDDEN_LAYERS_128
 #undef NUM_FEATURES_128
@@ -2644,7 +2517,7 @@ static const float full_pixel_motion_search_based_split_thresh_128 = 2.0f;
 #define NUM_LAYER_0_UNITS_64 16
 #define NUM_LOGITS_64 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_64[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_64[] = {
   0.0345945f,  -0.394064f,  0.0919978f, 0.270358f,  -0.384502f, -0.504608f,
   -0.25759f,   0.155981f,   2.62567f,   -10.7204f,  -0.709802f, 8.15948f,
   0.589866f,   -0.445645f,  -1.68232f,  10.0061f,   -3.17671f,  4.87259f,
@@ -2663,23 +2536,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_64[] = {
   -0.217072f,  -0.0984913f, -0.265515f, 0.360021f,  0.0779512f, 0.361516f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_64[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_64[] = {
   0.470821f, 0.474747f, -0.571292f, 0.403221f,  0.628966f,  -0.617029f,
   0.501105f, 0.499962f, -1.5451f,   -0.473518f, -0.730568f, -5.55817f,
   0.776761f, 0.42569f,  0.311925f,  0.469968f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_64[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_64[] = {
   -0.134085f, 0.0758715f, 1.10419f,  0.0f,       -5.75737f, 1.65494f,
   0.0f,       3.44047f,   0.394852f, 3.43858f,   3.65871f,  -4.84987f,
   1.21207f,   -1.7705f,   -5.46469f, -0.0889634f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_64[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_64[] = {
   -0.479491f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_64 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_64 = {
   NUM_FEATURES_64,
   NUM_LOGITS_64,
   NUM_HIDDEN_LAYERS_64,
@@ -2687,16 +2560,14 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_64 = {
       NUM_LAYER_0_UNITS_64,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_64,
-      full_pixel_motion_search_based_split_logits_kernel_64,
+      av1_simple_motion_search_based_split_layer_0_kernel_64,
+      av1_simple_motion_search_based_split_logits_kernel_64,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_64,
-      full_pixel_motion_search_based_split_logits_bias_64,
+      av1_simple_motion_search_based_split_layer_0_bias_64,
+      av1_simple_motion_search_based_split_logits_bias_64,
   },
 };
-
-static const float full_pixel_motion_search_based_split_thresh_64 = 2.0f;
 
 #undef NUM_HIDDEN_LAYERS_64
 #undef NUM_FEATURES_64
@@ -2709,7 +2580,7 @@ static const float full_pixel_motion_search_based_split_thresh_64 = 2.0f;
 #define NUM_LAYER_0_UNITS_32 16
 #define NUM_LOGITS_32 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_32[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_32[] = {
   -1.61796f,   0.0585128f,  1.57904f,   1.52703f,   0.367779f, 0.220434f,
   1.66652f,    -1.77782f,   6.41118f,   4.16976f,   4.97299f,  4.84111f,
   -0.0956536f, -0.163284f,  -0.143662f, 0.129329f,  0.449659f, -0.528844f,
@@ -2728,23 +2599,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_32[] = {
   -1.91327f,   -0.0356497f, 1.47611f,   1.27499f,   -1.76108f, -0.578954f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_32[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_32[] = {
   -0.220382f, -0.693902f, 0.424827f, 0.379952f, -0.413791f, -0.326785f,
   -0.455086f, 0.242402f,  0.307986f, 0.175746f, 0.498901f,  -0.628053f,
   0.285447f,  0.230052f,  0.415151f, -0.842946f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_32[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_32[] = {
   -1.80751f, 6.40356f,   -0.0512058f, -4.59163f, -0.369933f, -0.195755f,
   -0.16648f, -0.599755f, -5.35975f,   -1.21349f, 2.48414f,   1.07096f,
   -3.66684f, -6.17761f,  4.2159f,     -1.05286f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_32[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_32[] = {
   -2.58676f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_32 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_32 = {
   NUM_FEATURES_32,
   NUM_LOGITS_32,
   NUM_HIDDEN_LAYERS_32,
@@ -2752,16 +2623,14 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_32 = {
       NUM_LAYER_0_UNITS_32,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_32,
-      full_pixel_motion_search_based_split_logits_kernel_32,
+      av1_simple_motion_search_based_split_layer_0_kernel_32,
+      av1_simple_motion_search_based_split_logits_kernel_32,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_32,
-      full_pixel_motion_search_based_split_logits_bias_32,
+      av1_simple_motion_search_based_split_layer_0_bias_32,
+      av1_simple_motion_search_based_split_logits_bias_32,
   },
 };
-
-static const float full_pixel_motion_search_based_split_thresh_32 = 2.0f;
 
 #undef NUM_HIDDEN_LAYERS_32
 #undef NUM_FEATURES_32
@@ -2774,7 +2643,7 @@ static const float full_pixel_motion_search_based_split_thresh_32 = 2.0f;
 #define NUM_LAYER_0_UNITS_16 16
 #define NUM_LOGITS_16 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_16[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_16[] = {
   -0.611497f,  -0.0422086f, -0.555957f,   -0.632451f, -0.144179f, -0.152722f,
   -0.330265f,  -0.419866f,  0.287343f,    0.385295f,  -0.424486f, 0.424281f,
   2.27442f,    -2.47933f,   5.24731f,     4.33827f,   4.73215f,   3.41909f,
@@ -2793,23 +2662,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_16[] = {
   0.0333619f,  -0.377782f,  0.160767f,    -0.128169f, -0.484818f, -0.311973f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_16[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_16[] = {
   -0.132207f,   0.15176f,   -0.680086f, 0.605921f, -0.43294f,  0.485811f,
   -0.306286f,   0.551368f,  0.413904f,  0.548748f, -0.437391f, 0.560778f,
   -0.00685266f, -0.558657f, 0.122127f,  0.260165f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_16[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_16[] = {
   -0.200928f, -0.074132f, 8.69963f,    -9.00807f,  9.08983f, -6.83586f,
   -3.89329f,  10.4881f,   -0.0670618f, 0.0f,       9.21614f, 8.41773f,
   -0.145851f, 0.0f,       -1.43038f,   -0.0460311f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_16[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_16[] = {
   -4.19885f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_16 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_16 = {
   NUM_FEATURES_16,
   NUM_LOGITS_16,
   NUM_HIDDEN_LAYERS_16,
@@ -2817,16 +2686,14 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_16 = {
       NUM_LAYER_0_UNITS_16,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_16,
-      full_pixel_motion_search_based_split_logits_kernel_16,
+      av1_simple_motion_search_based_split_layer_0_kernel_16,
+      av1_simple_motion_search_based_split_logits_kernel_16,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_16,
-      full_pixel_motion_search_based_split_logits_bias_16,
+      av1_simple_motion_search_based_split_layer_0_bias_16,
+      av1_simple_motion_search_based_split_logits_bias_16,
   },
 };
-
-static const float full_pixel_motion_search_based_split_thresh_16 = 2.0f;
 
 #undef NUM_HIDDEN_LAYERS_16
 #undef NUM_FEATURES_16
@@ -2840,7 +2707,7 @@ static const float full_pixel_motion_search_based_split_thresh_16 = 2.0f;
 #define NUM_LAYER_0_UNITS_8 16
 #define NUM_LOGITS_8 1
 
-static const float full_pixel_motion_search_based_split_layer_0_kernel_8[] = {
+static const float av1_simple_motion_search_based_split_layer_0_kernel_8[] = {
   0.0370236f,   -0.580211f,  2.0134f,    1.69637f,    2.43181f,   -0.521648f,
   -0.00375187f, 0.122712f,   -4.74411f,  7.36187f,    5.42574f,   -5.53557f,
   0.0993344f,   -0.358843f,  0.0765453f, -0.615987f,  -0.754633f, -0.175846f,
@@ -2859,23 +2726,23 @@ static const float full_pixel_motion_search_based_split_layer_0_kernel_8[] = {
   0.616966f,    -0.451472f,  -0.319365f, 0.00807278f, -0.303261f, -0.351679f
 };
 
-static const float full_pixel_motion_search_based_split_logits_kernel_8[] = {
+static const float av1_simple_motion_search_based_split_logits_kernel_8[] = {
   -0.625847f, 0.381323f, 0.342475f, 0.526161f,  -0.665965f, -0.515317f,
   -0.406218f, 0.568007f, 0.479397f, -0.426116f, 0.615638f,  0.338572f,
   0.185583f,  0.308031f, 0.260748f, 0.531619f
 };
 
-static const float full_pixel_motion_search_based_split_layer_0_bias_8[] = {
+static const float av1_simple_motion_search_based_split_layer_0_bias_8[] = {
   4.73775f,  -1.12658f, -0.258038f, -6.06696f, 1.79131f, 2.49609f,
   4.28388f,  0.0f,      -4.63598f,  3.06034f,  5.31994f, -0.152142f,
   0.514738f, -1.30098f, 3.00296f,   -3.83481f
 };
 
-static const float full_pixel_motion_search_based_split_logits_bias_8[] = {
+static const float av1_simple_motion_search_based_split_logits_bias_8[] = {
   -3.44508f
 };
 
-static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_8 = {
+static const NN_CONFIG av1_simple_motion_search_based_split_nn_config_8 = {
   NUM_FEATURES_8,
   NUM_LOGITS_8,
   NUM_HIDDEN_LAYERS_8,
@@ -2883,22 +2750,2056 @@ static const NN_CONFIG full_pixel_motion_search_based_split_nn_config_8 = {
       NUM_LAYER_0_UNITS_8,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_kernel_8,
-      full_pixel_motion_search_based_split_logits_kernel_8,
+      av1_simple_motion_search_based_split_layer_0_kernel_8,
+      av1_simple_motion_search_based_split_logits_kernel_8,
   },
   {
-      full_pixel_motion_search_based_split_layer_0_bias_8,
-      full_pixel_motion_search_based_split_logits_bias_8,
+      av1_simple_motion_search_based_split_layer_0_bias_8,
+      av1_simple_motion_search_based_split_logits_bias_8,
   },
 };
 
-static const float full_pixel_motion_search_based_split_thresh_8 = 2.0f;
+#endif
+
+// Model based on simple_motion_search
+
+// Thresholds for doing a single type of partition
+// TODO(chiyotsai@google.com): Set the thresholds for PARTITION_SPLIT.
+static const float av1_simple_motion_search_prune_part_only_thresh_128[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+static const float av1_simple_motion_search_prune_part_only_thresh_64[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+static const float av1_simple_motion_search_prune_part_only_thresh_32[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+static const float av1_simple_motion_search_prune_part_only_thresh_16[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+static const float av1_simple_motion_search_prune_part_only_thresh_8[10] = {
+  1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+};
+
+// Thresholds for pruning a partition type
+static const float av1_simple_motion_search_prune_part_prune_thresh_128[10] = {
+  0.0f, 0.0288721601835f, 0.0288721601835f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+  0.0f
+};
+
+static const float av1_simple_motion_search_prune_part_prune_thresh_64[10] = {
+  0.0f, 0.0281573780991f, 0.0281573780991f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+  0.0f
+};
+
+static const float av1_simple_motion_search_prune_part_prune_thresh_32[10] = {
+  0.0f, 0.0225501403434f, 0.0225501403434f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+  0.0f
+};
+
+static const float av1_simple_motion_search_prune_part_prune_thresh_16[10] = {
+  0.0f,
+  0.000961189195907f,
+  0.000961189195907f,
+  0.0f,
+  0.0f,
+  0.0f,
+  0.0f,
+  0.0f,
+  0.0f,
+  0.0f
+};
+
+static const float av1_simple_motion_search_prune_part_prune_thresh_8[10] = {
+  0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f
+};
+
+// Mean and std
+static const float av1_simple_motion_search_prune_part_mean_128[25] = {
+  13.292176f, 13.231236f, 11.098058f, 11.049944f, 10.481336f,
+  10.431587f, 10.789337f, 10.732787f, 10.233817f, 10.173738f,
+  12.214045f, 12.157505f, 11.863353f, 11.802220f, 12.204053f,
+  12.152315f, 11.517566f, 11.465651f, 5.383040f,  0.757934f,
+  4.012611f,  4.052191f,  0.853365f,  3.954503f,  3.944135f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_128[25] = {
+  2.589217f, 2.559396f, 2.268402f, 2.282274f, 3.341234f, 3.341994f, 3.033007f,
+  3.041550f, 3.786247f, 3.784053f, 2.523459f, 2.511275f, 3.349364f, 3.340481f,
+  2.390149f, 2.384226f, 3.599467f, 3.587460f, 2.319911f, 0.428335f, 1.241087f,
+  1.208679f, 0.353742f, 1.228122f, 1.211777f,
+};
+
+static const float av1_simple_motion_search_prune_part_mean_64[25] = {
+  11.439831f, 11.382639f, 9.647134f, 9.578121f, 9.146770f,
+  9.084122f,  8.559063f,  8.499496f, 8.095865f, 8.041795f,
+  10.547537f, 10.486240f, 9.362147f, 9.308391f, 10.548071f,
+  10.484358f, 10.002225f, 9.944480f, 4.964504f, 0.897164f,
+  3.306144f,  3.351039f,  0.928582f, 3.319739f, 3.287726f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_64[25] = {
+  2.033404f, 2.050657f, 2.064671f, 2.081519f, 2.916312f, 2.914649f, 3.628949f,
+  3.618760f, 4.011421f, 3.996068f, 2.087127f, 2.103106f, 3.885277f, 3.876166f,
+  2.035599f, 2.052976f, 3.052501f, 3.050985f, 2.232998f, 0.303745f, 1.111161f,
+  1.081292f, 0.257521f, 1.112510f, 1.089404f,
+};
+
+static const float av1_simple_motion_search_prune_part_mean_32[25] = {
+  9.862349f, 9.793658f, 8.043962f, 7.954083f, 8.058867f, 7.966165f, 8.046844f,
+  7.956817f, 8.061414f, 7.967906f, 8.966450f, 8.890165f, 8.968315f, 8.891513f,
+  8.953573f, 8.877070f, 8.974275f, 8.895363f, 4.387239f, 0.954143f, 2.701000f,
+  2.751266f, 0.963302f, 2.716584f, 2.709725f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_32[25] = {
+  1.971555f, 1.985517f, 1.935986f, 1.944743f, 1.924122f, 1.932169f, 1.943151f,
+  1.950612f, 1.931156f, 1.938242f, 1.987803f, 1.997670f, 2.000859f, 2.009913f,
+  1.938270f, 1.949277f, 1.922999f, 1.933145f, 1.991504f, 0.209175f, 0.973824f,
+  0.952221f, 0.188018f, 0.985295f, 0.946228f,
+};
+
+static const float av1_simple_motion_search_prune_part_mean_16[25] = {
+  8.391692f, 8.303431f, 6.590342f, 6.459725f, 6.460719f, 6.333274f, 6.592615f,
+  6.461661f, 6.464787f, 6.337191f, 7.499753f, 7.395166f, 7.503220f, 7.398344f,
+  7.498312f, 7.395039f, 7.353743f, 7.253139f, 3.874267f, 0.979701f, 2.087404f,
+  2.131698f, 0.981005f, 2.110868f, 2.106539f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_16[25] = {
+  1.865867f, 1.870012f, 1.773885f, 1.770447f, 1.972922f, 1.961361f, 1.777224f,
+  1.772864f, 1.974519f, 1.962281f, 1.831632f, 1.831837f, 1.837595f, 1.837008f,
+  1.822791f, 1.822053f, 2.074991f, 2.067200f, 1.676261f, 0.141022f, 0.840297f,
+  0.829935f, 0.136507f, 0.828972f, 0.808563f,
+};
+
+static const float av1_simple_motion_search_prune_part_mean_8[25] = {
+  6.997798f, 6.867032f, 5.134819f, 4.883330f, 5.134804f, 4.879707f, 5.140518f,
+  4.886751f, 5.142186f, 4.885262f, 6.069946f, 5.896944f, 6.080442f, 5.906130f,
+  6.077539f, 5.905929f, 6.083087f, 5.909298f, 3.552709f, 0.990654f, 1.497349f,
+  1.531762f, 0.989606f, 1.496581f, 1.484139f,
+};
+
+static const float av1_simple_motion_search_prune_part_std_8[25] = {
+  1.727562f, 1.725050f, 1.633396f, 1.618773f, 1.633586f, 1.620657f, 1.620798f,
+  1.604892f, 1.621570f, 1.607439f, 1.691024f, 1.684225f, 1.676065f, 1.668442f,
+  1.680016f, 1.672452f, 1.677775f, 1.671586f, 1.451902f, 0.096223f, 0.751190f,
+  0.754040f, 0.101419f, 0.738239f, 0.729455f,
+};
+
+#define NUM_HIDDEN_LAYERS_128 1
+#define NUM_FEATURES_128 25
+#define NUM_LAYER_0_UNITS_128 8
+#define NUM_LOGITS_128 4
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_128[] = {
+  -0.129103f, 0.457758f,  -0.489986f, 0.65462f,   -0.184312f, 3.81202f,
+  -0.444407f, -0.64198f,  -0.575008f, 0.0311711f, 0.525243f,  -20.892f,
+  1.08811f,   -65.0976f,  -12.3973f,  -1.38278f,  -0.264233f, 0.241636f,
+  -10.6925f,  -0.725414f, -18.8987f,  -40.2284f,  -16.08f,    0.995331f,
+  1.47614f,   -0.964864f, 0.405506f,  0.140449f,  0.459534f,  -1.9093f,
+  0.398452f,  0.696949f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_128[] = {
+  1.22789f, -1.34527f, 0.759048f,  0.315086f,
+  1.0834f,  -1.58019f, -0.465158f, 1.20716f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_128[] = {
+  -0.668677f,  0.58694f,    -0.417094f,   0.754735f,   -0.7859f,
+  0.377479f,   -0.0415929f, -0.0140585f,  -0.730001f,  0.747528f,
+  -0.135247f,  0.406505f,   -0.234184f,   0.956362f,   -0.637555f,
+  0.791884f,   0.0303722f,  1.04424f,     -0.727859f,  -0.274321f,
+  -0.122986f,  0.066312f,   -0.00559175f, -0.239643f,  -0.0188767f,
+  -0.102787f,  -0.262967f,  0.071882f,    -0.283398f,  0.111607f,
+  -0.425826f,  0.02699f,    0.108873f,    -0.180558f,  -0.0794057f,
+  0.29665f,    -0.0252969f, -0.0266213f,  -0.277462f,  -0.361973f,
+  0.512552f,   0.395011f,   -0.225876f,   0.301924f,   0.136954f,
+  0.507259f,   1.23425f,    0.0137135f,   0.662572f,   0.591583f,
+  0.101564f,   0.416805f,   -0.645081f,   -0.179086f,  -0.36747f,
+  -0.332213f,  0.095177f,   0.220739f,    -0.153256f,  0.706155f,
+  0.161701f,   0.696815f,   -1.21531f,    -0.115059f,  0.486764f,
+  -0.396093f,  0.784883f,   0.535357f,    -0.278021f,  0.143496f,
+  -0.44931f,   -0.144543f,  0.319326f,    0.0190167f,  -0.206295f,
+  0.373995f,   -0.247897f,  -0.608095f,   -0.41796f,   -0.137129f,
+  -0.709562f,  0.678273f,   0.537607f,    0.557474f,   0.453308f,
+  0.21405f,    -0.0466495f, 0.519139f,    -0.168832f,  0.902911f,
+  0.681131f,   -0.139876f,  -0.2052f,     -0.393271f,  0.262222f,
+  -0.246246f,  -0.213993f,  0.646619f,    0.0496181f,  -0.00354157f,
+  0.822927f,   0.0939522f,  0.180738f,    0.118355f,   0.120456f,
+  -0.0472214f, -0.144958f,  0.173405f,    -0.886644f,  -0.0949769f,
+  -0.813518f,  -0.3947f,    -0.128021f,   0.356196f,   0.469169f,
+  -0.413702f,  1.04242f,    0.428853f,    -0.387293f,  0.0850877f,
+  0.279409f,   -0.142276f,  0.0579376f,   0.211112f,   0.0703013f,
+  -1.9274f,    -0.729147f,  0.534193f,    0.773586f,   0.922864f,
+  0.642881f,   1.15127f,    0.621032f,    0.933942f,   1.01837f,
+  -0.660282f,  -0.40059f,   -1.11279f,    -0.77088f,   -0.43349f,
+  0.202361f,   -0.0840912f, 0.0935707f,   0.056333f,   -0.0779369f,
+  0.0173447f,  -0.0104756f, 0.0115005f,   -0.0195593f, 0.03592f,
+  -0.343454f,  -0.618048f,  0.258172f,    -0.412322f,  -0.0463746f,
+  -0.0413654f, -0.0400194f, 0.615981f,    -0.452094f,  0.644555f,
+  0.0822476f,  -0.359791f,  -0.0904274f,  0.209427f,   0.0116338f,
+  -0.190978f,  0.890233f,   0.737769f,    -1.66663f,   -0.392605f,
+  0.0785728f,  -0.224553f,  -0.128258f,   -0.227227f,  -0.0777773f,
+  0.685976f,   0.347042f,   -0.555325f,   -0.249221f,  0.0919837f,
+  -0.0660016f, -0.272316f,  0.0390632f,   -0.619624f,  -0.0565801f,
+  0.585026f,   0.597375f,   0.54114f,     0.593389f,   0.604391f,
+  0.0820294f,  -0.85339f,   -1.40741f,    -0.391675f,  0.0579205f,
+  -0.197626f,  0.130044f,   -0.234488f,   -0.0373991f, -0.0717973f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_128[] = {
+  1.58571f, -4.6314f, -2.00273f, 0.543699f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_128 = {
+  NUM_FEATURES_128,
+  NUM_LOGITS_128,
+  NUM_HIDDEN_LAYERS_128,
+  {
+      NUM_LAYER_0_UNITS_128,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_128,
+      av1_simple_motion_search_prune_part_logits_kernel_128,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_128,
+      av1_simple_motion_search_prune_part_logits_bias_128,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_128
+#undef NUM_FEATURES_128
+#undef NUM_LAYER_0_UNITS_128
+#undef NUM_LOGITS_128
+
+#define NUM_HIDDEN_LAYERS_64 1
+#define NUM_FEATURES_64 25
+#define NUM_LAYER_0_UNITS_64 32
+#define NUM_LOGITS_64 10
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_64[] = {
+  0.10424f,    -0.346025f,  0.534547f,   -0.385925f,  2.58341f,    -0.256414f,
+  -0.232498f,  0.329823f,   -0.0777376f, -0.590939f,  0.062657f,   -0.628252f,
+  0.0934588f,  2.04029f,    -0.224448f,  0.371168f,   -0.385348f,  -0.589883f,
+  -3.73627f,   -0.943144f,  0.346409f,   -0.211215f,  -0.351008f,  0.418807f,
+  0.943663f,   0.173267f,   1.16585f,    -0.0840888f, 0.227464f,   0.374412f,
+  0.0422597f,  -0.338868f,  0.222576f,   0.431713f,   1.12366f,    0.00753411f,
+  0.248412f,   -0.0902425f, 0.542455f,   -0.665629f,  -0.311245f,  -0.205639f,
+  -0.447149f,  -0.0502733f, -0.290186f,  -0.794384f,  0.0940881f,  -0.0686117f,
+  -0.0199961f, -0.587965f,  0.777096f,   -0.083381f,  -1.21282f,   0.652959f,
+  -1.18238f,   0.539991f,   0.352497f,   -0.540076f,  -0.26222f,   -0.568556f,
+  0.409102f,   -0.131146f,  -0.407161f,  -0.188287f,  -0.478657f,  0.000401932f,
+  -0.689324f,  0.351064f,   -1.43704f,   -0.315185f,  -0.868726f,  0.376341f,
+  -0.0566277f, 0.364831f,   0.611298f,   -0.495253f,  -0.0193132f, 0.617978f,
+  0.189586f,   -0.236758f,  -0.608246f,  -0.149017f,  -1.78303f,   0.143023f,
+  0.698386f,   -0.994086f,  -0.673327f,  0.233868f,   0.360425f,   0.0294123f,
+  -0.248683f,  -0.148392f,  0.0861829f,  -0.190843f,  -0.414906f,  0.607378f,
+  -0.756715f,  -0.511713f,  -0.321556f,  1.0078f,     -1.18141f,   0.519751f,
+  0.834629f,   -0.359343f,  0.612262f,   -0.0730553f, 0.262935f,   0.488276f,
+  0.387071f,   -1.44123f,   1.08269f,    0.554402f,   -0.069f,     0.14113f,
+  0.323817f,   0.824314f,   -0.431417f,  -0.349448f,  0.950728f,   -0.587836f,
+  -0.83914f,   -0.10844f,   0.26602f,    0.831933f,   -0.271315f,  0.231563f,
+  0.417049f,   0.190627f,   -0.0940667f, 0.255363f,   -0.0741022f, -0.0987662f,
+  -0.847522f,  0.00287554f, 0.0615741f,  -0.0832218f, 0.0847148f,  -0.392843f,
+  -0.938068f,  -0.10621f,   -0.260859f,  -0.825175f,  -0.401039f,  0.315213f,
+  -0.108269f,  0.288036f,   -8.66166f,   -0.970752f,  -0.66678f,   -0.593405f,
+  -0.518294f,  -0.138722f,  -0.454698f,  -0.22969f,   -0.553006f,  -0.440111f,
+  0.462661f,   -0.536854f,  0.0108295f,  -0.522888f,  0.00111157f, 0.229999f,
+  0.0267768f,  0.176266f,   -1.57043f,   0.0318106f,  0.257534f,   -0.198583f,
+  0.175564f,   -0.251465f,  -0.262441f,  -1.65283f,   -0.319603f,  -0.875282f,
+  -0.301303f,  0.0170948f,  -0.227075f,  0.0299545f,  -4.98346f,   0.470046f,
+  -1.28051f,   -0.213809f,  -0.486585f,  -0.906463f,  -0.169984f,  -0.333153f,
+  -0.376733f,  0.108016f,   0.486744f,   -0.186936f,  -0.429259f,  0.056501f,
+  -0.266545f,  0.265447f,   -0.137718f,  -0.490687f,  -0.935668f,  -0.16229f,
+  -0.696932f,  0.173157f,   0.434959f,   -0.140595f,  0.345845f,   -1.08013f,
+  -0.0205929f, -0.815874f,  -0.179812f,  0.02767f,    -0.141727f,  0.471936f,
+  -7.29453f,   -1.04362f,   -0.745482f,  -0.28725f,   -0.214997f,  -0.0850651f,
+  -0.748471f,  0.161325f,   -1.04387f,   -0.705305f,  0.489427f,   -0.765373f,
+  -0.301576f,  0.0742467f,  -0.331282f,  0.0372328f,  -0.90298f,   -0.0608646f,
+  -2.18756f,   0.170384f,   -0.258357f,  0.106287f,   -0.161684f,  -0.103799f,
+  -0.127774f,  -0.156313f,  0.0705286f,  -0.977908f,  -0.281191f,  -0.056757f,
+  -0.309474f,  0.050476f,   -9.78198f,   -2.42795f,   -0.289626f,  -1.07579f,
+  -0.439256f,  -1.09948f,   -0.564671f,  0.0913182f,  -0.417216f,  -1.19909f,
+  0.287063f,   0.402315f,   -0.17646f,   0.540488f,   0.00840239f, 0.397492f,
+  0.702393f,   -0.10566f,   0.655296f,   -0.0443876f, 0.154918f,   -0.760479f,
+  -0.0523153f, -0.366199f,  -1.08212f,   -0.398556f,  -0.415203f,  -1.10488f,
+  0.208349f,   0.27079f,    0.101546f,   -0.205752f,  -13.7923f,   -0.218637f,
+  -1.10077f,   0.355735f,   -0.306196f,  0.627434f,   -0.473101f,  -0.308027f,
+  -1.12724f,   0.301597f,   0.660785f,   0.0576217f,  -0.155925f,  -0.56107f,
+  -0.223537f,  0.114299f,   -0.53803f,   -0.252674f,  -2.66103f,   -0.185245f,
+  -0.314673f,  0.403337f,   0.679821f,   -0.69231f,   0.506264f,   -0.999705f,
+  -0.549097f,  0.353745f,   0.188249f,   0.414484f,   -0.615853f,  0.525681f,
+  -5.23065f,   -3.05174f,   1.02074f,    -0.965499f,  -0.158947f,  0.0436088f,
+  -0.485824f,  0.0375094f,  -1.39985f,   -0.481392f,  0.485785f,   -0.24874f,
+  -0.359633f,  0.668108f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_64[] = {
+  0.0735592f, -0.045064f, -0.0114103f, 1.39246f,    -0.683467f,  0.155765f,
+  -0.667652f, -0.202425f, -0.585433f,  -0.146752f,  -0.0812931f, 0.580642f,
+  0.578542f,  -0.831916f, 0.610063f,   0.0101856f,  -0.235863f,  0.538141f,
+  -2.91334f,  -1.71887f,  0.126616f,   0.582497f,   -0.438879f,  0.221833f,
+  0.850773f,  -0.280886f, 0.443233f,   -0.0964873f, -0.216161f,  0.34413f,
+  0.656818f,  0.0169274f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_64[] = {
+  -0.310947f,   -0.232675f,    0.0171092f,    0.0834474f,   0.373977f,
+  0.300429f,    0.215072f,     -0.454074f,    0.187565f,    0.282742f,
+  0.562562f,    -0.0419322f,   0.000978486f,  -0.298267f,   0.216934f,
+  -0.388722f,   -0.146866f,    -0.275946f,    0.202361f,    0.225847f,
+  1.42868f,     0.473127f,     -0.145747f,    -0.104986f,   0.153459f,
+  0.69382f,     0.162266f,     0.0207715f,    -0.45095f,    -0.412071f,
+  -0.235109f,   -0.130199f,    0.231741f,     0.460193f,    0.0378202f,
+  0.429516f,    0.387691f,     -0.272479f,    0.0723884f,   -0.453914f,
+  -0.150618f,   -0.10745f,     -0.258615f,    0.0838312f,   -0.00554958f,
+  0.105377f,    -0.0415479f,   0.13228f,      1.09044f,     -0.73053f,
+  -0.422553f,   -0.435842f,    0.211416f,     0.420332f,    0.0181353f,
+  -0.030891f,   0.522788f,     0.613526f,     0.374032f,    0.287986f,
+  -0.403118f,   -0.287362f,    -1.11523f,     -0.577713f,   -0.020228f,
+  0.86465f,     -0.0590579f,   0.341274f,     -0.0115644f,  -0.260236f,
+  0.192123f,    -0.0849825f,   0.0501709f,    0.444382f,    0.0762727f,
+  0.0926596f,   -0.101157f,    -0.142787f,    0.40861f,     0.555805f,
+  -0.00614654f, -0.122846f,    0.203163f,     0.234266f,    0.409795f,
+  -0.0206245f,  -0.224679f,    0.025081f,     0.518044f,    -0.287186f,
+  0.016494f,    -0.0886331f,   0.236438f,     -1.01032f,    0.118332f,
+  0.364217f,    0.061438f,     0.0381303f,    0.128418f,    0.0257077f,
+  -0.975751f,   -0.694894f,    0.00351914f,   0.278179f,    0.29363f,
+  0.525576f,    0.0604849f,    0.531734f,     0.406643f,    0.812497f,
+  -0.403196f,   -0.16664f,     -0.620887f,    -0.428194f,   0.275401f,
+  0.432063f,    -0.00378342f,  0.295758f,     0.105615f,    -0.00683626f,
+  0.00396146f,  0.00598654f,   -0.0131701f,   -0.0115787f,  0.00386643f,
+  -0.69686f,    -0.139623f,    -0.440817f,    0.0542873f,   0.217962f,
+  0.527035f,    -0.0201046f,   0.0471354f,    0.0271858f,   -0.0775197f,
+  -0.309797f,   0.184879f,     -0.232854f,    -0.407081f,   0.706227f,
+  -0.0877534f,  0.306843f,     0.455075f,     -0.333961f,   0.0759148f,
+  0.0444791f,   -0.0693626f,   -0.0850289f,   -0.513063f,   -0.643971f,
+  -0.630279f,   -0.153889f,    0.123315f,     0.00548238f,  0.170707f,
+  0.734339f,    -0.176988f,    0.322519f,     0.178365f,    0.183519f,
+  -0.698683f,   -0.12043f,     -0.349914f,    -0.0696762f,  -0.53986f,
+  -0.104738f,   1.05264f,      0.983568f,     -0.109035f,   0.0113748f,
+  0.0815189f,   -0.0628812f,   0.0769389f,    0.010261f,    0.146573f,
+  -0.433194f,   -0.211572f,    -0.000397392f, 0.445325f,    0.145091f,
+  -0.0625902f,  0.29394f,      0.302315f,     0.0892226f,   -0.209504f,
+  -0.0150374f,  0.242608f,     0.216223f,     0.366857f,    0.209829f,
+  -0.540035f,   0.117599f,     -0.329315f,    0.0471133f,   -0.0115449f,
+  -0.0638235f,  0.0527461f,    0.348149f,     0.360802f,    1.06624f,
+  -0.615991f,   -0.341396f,    0.18972f,      0.0709888f,   -0.0414466f,
+  -0.0193809f,  0.0938933f,    0.209058f,     0.575042f,    0.483608f,
+  -0.285875f,   -0.115905f,    -0.363637f,    0.375425f,    0.336217f,
+  0.0336358f,   -0.00265618f,  -0.406854f,    -0.792959f,   -0.219354f,
+  0.0331615f,   0.0298859f,    -0.211446f,    -0.00280773f, -0.194011f,
+  0.262109f,    0.548076f,     0.120183f,     -0.661603f,   0.241855f,
+  -0.501428f,   0.00102718f,   -0.347331f,    -0.58306f,    0.0977254f,
+  0.117491f,    0.0840667f,    0.00693675f,   0.000600294f, 0.649569f,
+  -0.0553811f,  -0.197198f,    0.397236f,     -0.523737f,   -0.564192f,
+  -0.374679f,   -0.249344f,    0.00861428f,   0.00393439f,  -0.0834608f,
+  0.124389f,    -0.0393049f,   0.0425391f,    -0.153383f,   -0.182346f,
+  0.420953f,    0.464221f,     0.288984f,     0.570921f,    -0.239965f,
+  0.247239f,    -0.083434f,    0.714418f,     0.986323f,    -0.460244f,
+  -0.260993f,   -0.947743f,    -1.0789f,      -0.0391231f,  0.612407f,
+  -0.0306767f,  0.281419f,     0.0072426f,    -0.37623f,    0.188744f,
+  0.221666f,    -0.424914f,    0.29703f,      0.261715f,    0.277809f,
+  -0.0617616f,  -0.000611999f, -0.0547053f,   -0.0901018f,  -0.347669f,
+  0.856072f,    0.596675f,     -0.467639f,    -1.09324f,    -0.184224f,
+  -0.56051f,    -0.0144704f,   0.102894f,     -0.122982f,   -0.0020749f,
+  -0.0423487f,  0.0328702f,    -0.0154263f,   0.0349021f,   -0.00315595f,
+  0.0254802f,   -0.729191f,    0.207296f,     -0.0212349f,  -0.207078f,
+  0.20636f,     -0.156883f,    0.429765f,     -0.42672f,    0.138775f,
+  -0.0267343f,  0.631528f,     0.300646f,     -0.4793f,     -0.273833f,
+  -0.0135367f,  -0.530819f,    -0.534881f,    0.830896f,    0.0266992f,
+  0.473744f,    0.210334f,     0.0234739f,    0.255394f,    0.123531f,
+  -0.489341f,   -0.796627f,    0.372617f,     0.190136f,    0.275342f,
+  0.739505f,    0.402354f,     0.782806f,     0.437374f,    1.04948f,
+  -0.55963f,    0.382704f,     -0.698321f,    0.0817868f,   -0.440108f,
+  -0.0635004f,  -0.277851f,    -0.524194f,    0.286157f,    -0.01097f,
+  -0.0293145f,  -0.0405071f,   -0.035662f,    -0.012871f,   -0.0516409f,
+  -0.406671f,   0.709259f,     -0.525177f,    0.521123f,    -0.44813f,
+  0.48412f,     -0.0546513f,   0.305253f,     -0.468328f,   0.316453f,
+  -0.36307f,    0.497515f,     -0.0606276f,   0.315764f,    -0.422066f,
+  0.554025f,    -0.679183f,    0.616914f,     0.00283324f,  -0.000643824f,
+  0.0639999f,   0.0488285f,    -0.141031f,    0.068003f,    -0.0792678f,
+  -0.425307f,   -0.152235f,    0.269917f,     -0.352327f,   0.44792f,
+  -0.116514f,   -0.465868f,    0.154287f,     0.0161028f,   -0.16848f,
+  -0.255487f,   0.189832f,     0.254883f,     0.0240822f,   0.432638f,
+  -0.136564f,   0.137036f,     0.0375734f,    0.989246f,    -0.126287f,
+  0.111416f,    -0.0271002f,   0.718755f,     -0.0412969f,  0.00645681f,
+  0.253811f,    -0.0186998f,   0.691971f,     -0.282042f,   -0.0783915f,
+  0.274592f,    -0.358449f,    0.34155f,      -0.186374f,   -0.136907f,
+  -0.192334f,   -0.251168f,    -0.100874f,    -0.166578f,   -0.336507f,
+  0.402373f,    0.173695f,     0.108788f,     0.00885581f,  -0.310063f,
+  1.05545f,     0.0295867f,    0.180785f,     -0.173469f,   -0.469924f,
+  -0.224155f,   0.665862f,     -0.126546f,    0.240691f,    -0.0415301f,
+  -0.598534f,   0.0012723f,    -0.122297f,    -0.558947f,   0.268844f,
+  0.241193f,    0.0524422f,    -0.1683f,      0.575588f,    -0.139012f,
+  0.0636691f,   -0.446709f,    -0.094532f,    0.883809f,    -0.112981f,
+  -0.224047f,   0.0811193f,    -0.140571f,    -0.09683f,    -0.0796143f,
+  -0.102246f,   -0.863392f,    -0.0755124f,   0.23125f,     -0.0301361f,
+  -0.153029f,   -0.172238f,    -0.0286382f,   -0.338495f,   -0.317216f,
+  -0.146629f,   -0.242264f,    -0.702306f,    -0.285052f,   0.0623479f,
+  0.265735f,    0.00674475f,   0.666196f,     0.883586f,    0.278416f,
+  -0.341692f,   -0.509931f,    -0.156263f,    0.635885f,    -0.544143f,
+  -0.572632f,   -0.213285f,    0.443396f,     -0.268329f,   0.0638439f,
+  -0.185397f,   0.071126f,     0.386503f,     -0.402212f,   -0.140784f,
+  -0.411661f,   0.049398f,     -0.0672907f,   -0.267034f,   -0.0560875f,
+  0.0607937f,   0.0445484f,    -0.547651f,    0.574718f,    0.417189f,
+  -0.0610166f,  0.0632293f,    0.391619f,     -0.00671215f, -0.136883f,
+  -0.339346f,   0.0356183f,    0.511993f,     0.178676f,    0.286998f,
+  0.136511f,    -0.00796929f,  0.203985f,     0.0423532f,   -0.175196f,
+  0.378534f,    0.770417f,     0.593778f,     0.0256067f,   -0.82394f,
+  -0.500691f,   -0.425725f,    -0.623708f,    -0.0406241f,  -0.00226464f,
+  0.0207836f,   0.30732f,      -0.00784268f,  0.0065445f,   -0.0991039f,
+  -0.20871f,    -0.206835f,    0.281219f,     0.119361f,    0.259346f,
+  -0.102713f,   0.186488f,     -0.034455f,    -0.00198392f, -0.279107f,
+  -0.638993f,   -0.374404f,    -0.48601f,     -0.262345f,   0.624532f,
+  0.620632f,    -0.227014f,    0.433579f,     -0.0455096f,  1.22123f,
+  -0.429156f,   0.12396f,      0.0815152f,    -0.0837355f,  0.0282623f,
+  -0.407475f,   0.787321f,     -0.434974f,    0.312904f,    -0.230805f,
+  0.213042f,    -0.250929f,    0.302997f,     -0.354709f,   0.0504905f,
+  -0.561706f,   0.595558f,     0.374951f,     0.802969f,    -0.674902f,
+  0.33136f,     0.156606f,     0.0218968f,    -0.694188f,   -0.0221949f,
+  -0.00639123f, 0.0146536f,    0.0104145f,    0.021635f,    -0.0499428f,
+  -0.575116f,   -0.239035f,    -0.0588276f,   0.599722f,    0.541932f,
+  0.437433f,    0.716268f,     0.193207f,     0.548351f,    0.326951f,
+  -0.197124f,   0.0355353f,    -0.0952009f,   -0.217265f,   -0.389789f,
+  0.0528124f,   -0.21334f,     -0.190296f,    -1.17367f,    0.108905f,
+  0.109397f,    -0.0192577f,   0.0343813f,    0.085004f,    -0.0556737f,
+  -0.0411158f,  -0.534989f,    0.0361896f,    0.124415f,    0.291603f,
+  -0.0311974f,  -0.326726f,    0.343131f,     0.0276456f,   -0.231827f,
+  -0.373894f,   -0.208898f,    -0.273011f,    0.061323f,    -0.0910538f,
+  -0.30746f,    -0.108644f,    -0.190736f,    1.58048f,     -0.0739711f,
+  -0.0623489f,  -0.137967f,    -0.0601359f,   -0.133004f,   -0.0857153f,
+  0.00955987f,  -0.365561f,    -0.0329051f,   0.463463f,    0.14758f,
+  -0.512256f,   -0.227463f,    -0.26008f,     -0.567777f,   0.0646234f,
+  1.02161f,     0.66157f,      -0.16733f,     0.264921f,    -0.242036f,
+  0.214622f,    0.0712054f,    -0.260377f,    0.0849665f,   0.735094f,
+  0.11001f,     0.297301f,     -0.333342f,    0.066978f,    -0.123625f,
+  1.07596f,     0.401263f,     0.0800875f,    -0.340862f,   -0.115587f,
+  -0.32692f,    -0.300842f,    0.0277397f,    0.0630788f,   -0.261198f,
+  0.428695f,    -0.0544757f,   -0.124511f,    0.036992f,    0.126322f,
+  0.0317603f,   0.0820762f,    0.117277f,     -1.14594f,    -0.108076f,
+  -0.0258198f,  -0.00337525f,  -0.00512531f,  0.1274f,      -0.0660535f,
+  -0.640733f,   0.197142f,     0.147278f,     0.489271f,    0.226507f,
+  -0.0668414f,  0.0946318f,    0.0994164f,    -0.820516f,   0.512939f,
+  -0.305172f,   -0.715187f,    -0.195125f,    0.279346f,    0.462144f,
+  0.913882f,    -0.453879f,    0.0582033f,    -0.462866f,   0.0538736f,
+  0.0115737f,   0.00626993f,   -0.0185185f,   0.0114601f,   -0.0181164f,
+  0.41588f,     -0.0447331f,   0.611756f,     0.43385f,     0.834465f,
+  0.122019f,    -0.352983f,    0.340429f,     -0.245425f,   -0.365328f,
+  -0.521825f,   0.0371057f,    0.172188f,     -0.387949f,   0.221054f,
+  0.0126359f,   0.422958f,     0.584198f,     -0.581498f,   -0.019466f,
+  -0.0271737f,  -0.0740885f,   0.00540879f,   0.186086f,    -0.0324402f,
+  -0.563462f,   -0.458759f,    -0.425296f,    -0.0118862f,  -0.641508f,
+  0.0132084f,   0.0581128f,    0.0231444f,    0.468587f,    0.258838f,
+  0.0296665f,   0.0562801f,    0.630014f,     0.381816f,    -0.269761f,
+  -0.135515f,   0.046186f,     1.07632f,      -0.050616f,   0.104987f,
+  0.29991f,     0.119316f,     0.117248f,     0.0795009f,   0.242573f,
+  0.0416634f,   -0.0577639f,   -0.0974078f,   0.106255f,    -0.13098f,
+  0.0141486f,   -0.00418257f,  0.144848f,     -0.463934f,   0.0452591f,
+  0.252617f,    0.205222f,     -0.189843f,    0.0652245f,   -0.135386f,
+  0.0500646f,   -0.200368f,    -0.0142312f,   -0.0286832f,  -0.254355f,
+  -1.02752f,    -0.73549f,     0.0364518f,    0.0416227f,   -0.13185f,
+  -0.0886515f,  -0.502314f,    -0.102916f,    0.410911f,    -0.355655f,
+  0.400416f,    -0.340217f,    0.208829f,     0.245972f,    0.149739f,
+  -0.49458f,    0.589482f,     0.550827f,     0.912709f,    -0.351275f,
+  -0.128076f,   -0.285172f,    -0.672752f,    0.090583f,    -0.245286f,
+  -0.737297f,   -0.201515f,    -0.025122f,    -0.109854f,   0.36738f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_64[] = {
+  0.346819f,  0.442965f,  -0.0216032f,  0.0229235f, -0.402797f,
+  -0.666074f, -0.455388f, -0.00353411f, -0.595511f, -0.845667f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_64 = {
+  NUM_FEATURES_64,
+  NUM_LOGITS_64,
+  NUM_HIDDEN_LAYERS_64,
+  {
+      NUM_LAYER_0_UNITS_64,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_64,
+      av1_simple_motion_search_prune_part_logits_kernel_64,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_64,
+      av1_simple_motion_search_prune_part_logits_bias_64,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_64
+#undef NUM_FEATURES_64
+#undef NUM_LAYER_0_UNITS_64
+#undef NUM_LOGITS_64
+
+#define NUM_HIDDEN_LAYERS_32 1
+#define NUM_FEATURES_32 25
+#define NUM_LAYER_0_UNITS_32 28
+#define NUM_LOGITS_32 10
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_32[] = {
+  0.486581f,    0.340847f,   -0.109226f,   0.467224f,   -0.541561f,
+  0.0943619f,   -0.429442f,  -0.207442f,   0.959963f,   0.618666f,
+  -0.0636751f,  0.144508f,   -0.0278289f,  0.332293f,   -0.751493f,
+  0.245438f,    -0.917758f,  0.612128f,    -0.32648f,   0.534618f,
+  -0.615239f,   2.71641f,    0.233759f,    0.820558f,   -0.249758f,
+  -0.427783f,   -0.359361f,  0.0375732f,   0.806973f,   0.352512f,
+  -0.0532192f,  0.0576861f,  -0.464178f,   -0.334877f,  -0.697042f,
+  0.0538218f,   0.0919659f,  -0.00765812f, 0.0603847f,  -0.460315f,
+  0.37979f,     -0.0867612f, -0.670683f,   -0.188619f,  -0.570586f,
+  0.233418f,    0.153581f,   0.290905f,    -0.624885f,  -0.557842f,
+  -0.555567f,   0.463773f,   -0.123909f,   -0.277731f,  0.0374468f,
+  0.409903f,    0.287638f,   -0.593066f,   -0.223434f,  0.154263f,
+  -0.250464f,   -0.077696f,  0.229652f,    -0.304174f,  0.308053f,
+  0.33155f,     -0.502825f,  0.361216f,    -0.499294f,  0.00595444f,
+  -0.307201f,   0.5766f,     -0.438384f,   -0.093701f,  -0.118586f,
+  0.202337f,    -0.486623f,  0.261552f,    0.139756f,   -0.655642f,
+  -0.0627001f,  -0.213053f,  -0.243037f,   0.205918f,   0.0718368f,
+  0.188041f,    0.141529f,   -0.132239f,   0.425827f,   -0.218353f,
+  0.153114f,    0.33268f,    0.0226116f,   0.167394f,   0.269854f,
+  -0.457001f,   0.1973f,     -0.526087f,   0.467528f,   0.290934f,
+  1.16267f,     0.0823663f,  -0.754389f,   -0.83716f,   0.270157f,
+  -1.41229f,    0.148511f,   -0.286832f,   0.664796f,   0.492254f,
+  0.360567f,    -0.533993f,  0.0435672f,   -0.103001f,  0.220668f,
+  0.594621f,    -0.0213356f, -0.347638f,   -0.694457f,  0.0759505f,
+  0.161358f,    -0.389384f,  -0.0455192f,  -0.61252f,   -0.174173f,
+  -0.00788878f, -1.22487f,   0.332233f,    -0.0457021f, -0.225918f,
+  -0.197657f,   -0.115408f,  -0.240589f,   -2.05681f,   0.00914629f,
+  -1.92213f,    0.0268578f,  -0.49076f,    -0.0120123f, 0.291157f,
+  0.267116f,    -0.0775724f, 0.181115f,    -0.392441f,  -0.488114f,
+  -0.28842f,    -0.115465f,  0.128974f,    -0.0829899f, -0.14096f,
+  -0.140145f,   -0.700281f,  0.0368945f,   -0.437598f,  0.243485f,
+  -1.00301f,    0.332324f,   0.125014f,    -0.0604481f, -0.0652028f,
+  -0.207295f,   -1.0209f,    -0.341525f,   0.191326f,   -0.147578f,
+  0.0878327f,   0.129827f,   -0.0848319f,  0.187381f,   -1.28663f,
+  0.00537885f,  -0.134277f,  -0.0411126f,  -0.3434f,    -0.0456494f,
+  0.37861f,     0.409095f,   0.237177f,    -0.396855f,  -0.205418f,
+  -1.31701f,    -0.319032f,  -0.123404f,   -0.240005f,  -0.305206f,
+  -0.0258176f,  -0.26367f,   -0.142396f,   0.191672f,   -1.44061f,
+  0.0554776f,   -0.571839f,  -0.284789f,   -0.425677f,  -0.0307376f,
+  0.20275f,     -0.223146f,  0.144612f,    0.0212636f,  0.0238303f,
+  -0.253802f,   -0.188922f,  -0.0637066f,  -0.340836f,  0.124774f,
+  0.130474f,    -0.154099f,  -0.0292733f,  0.158148f,   -0.246989f,
+  -0.259059f,   0.220224f,   0.228449f,    -0.41956f,   -0.321848f,
+  -0.2396f,     -0.316449f,  -1.3363f,     0.0264099f,  -1.46865f,
+  0.113073f,    0.0722885f,  -0.166986f,   -0.164877f,  0.0360911f,
+  0.534472f,    -0.551152f,  -0.328501f,   0.0781121f,  -0.378112f,
+  -0.459502f,   0.28015f,    -0.212302f,   -0.521641f,  0.618993f,
+  -0.347709f,   0.266253f,   -0.0280894f,  0.348511f,   -0.0155031f,
+  -0.100693f,   0.0447673f,  0.277519f,    -0.233998f,  -0.0796738f,
+  -1.73644f,    -0.160776f,  0.53092f,     -0.180406f,  0.056447f,
+  0.385356f,    -0.262337f,  -0.241479f,   -0.271426f,  -0.457354f,
+  -0.266788f,   0.367371f,   -0.103065f,   0.47783f,    -0.188327f,
+  -0.159636f,   0.00142907f, -0.409756f,   0.454889f,   -0.24566f,
+  -0.0760084f,  0.286355f,   0.462102f,    0.0431695f,  -0.127395f,
+  -0.200476f,   -0.350557f,  0.217275f,    -0.23975f,   0.255148f,
+  -0.280626f,   0.42476f,    0.157411f,    0.0358675f,  -0.192591f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_32[] = {
+  0.940498f,  0.15602f,   -0.234831f, 0.0268585f, 0.144769f,  0.243081f,
+  0.611406f,  0.366093f,  0.361868f,  0.39668f,   0.401479f,  0.369467f,
+  0.0909503f, 0.710595f,  0.032786f,  0.525891f,  -1.0232f,   0.732557f,
+  -0.064425f, 0.865222f,  -0.042917f, -0.237191f, -0.527006f, -0.0172101f,
+  0.59681f,   -0.472405f, 0.0969218f, -0.250624f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_32[] = {
+  0.355607f,    0.126701f,    -0.0825159f,  0.200675f,     -0.011308f,
+  -0.280057f,   0.559816f,    0.142689f,    0.0422419f,    -0.151692f,
+  -0.0275637f,  -0.283101f,   -0.20822f,    -0.200394f,    0.465427f,
+  0.344491f,    -0.525319f,   -0.358813f,   -0.39767f,     0.0974486f,
+  0.00559058f,  -0.00546089f, 0.0506486f,   0.114475f,     -0.0436463f,
+  -0.574152f,   -0.376294f,   0.16563f,     -0.0967032f,   0.00579838f,
+  0.0639909f,   -0.037129f,   0.407574f,    -0.231428f,    0.489326f,
+  -0.221566f,   -0.270382f,   -0.784628f,   -0.155502f,    0.481698f,
+  -0.0296057f,  0.431855f,    0.840807f,    0.112291f,     0.773874f,
+  -0.0610936f,  -0.012892f,   0.365154f,    0.0267687f,    -0.0751114f,
+  0.25043f,     0.516472f,    -0.186133f,   -0.12762f,     -0.168804f,
+  -0.146309f,   0.139314f,    -0.367113f,   -0.601079f,    0.0559856f,
+  0.176081f,    0.22397f,     0.434113f,    0.0363256f,    0.313051f,
+  0.0143976f,   0.190076f,    0.474607f,    -0.681134f,    -0.0709097f,
+  -0.253289f,   -0.216277f,   -0.0593789f,  -0.107795f,    -0.194842f,
+  0.513945f,    0.239171f,    -0.720561f,   0.0136723f,    -0.391147f,
+  -0.272043f,   -0.164766f,   0.124248f,    0.147178f,     -0.35497f,
+  0.397725f,    -0.117603f,   0.262937f,    -0.331964f,    0.182418f,
+  0.315671f,    -0.0385649f,  0.488769f,    -0.334568f,    0.00596018f,
+  0.0661557f,   -0.0446985f,  -0.0928255f,  -0.0221032f,   -0.019045f,
+  -0.20881f,    0.197907f,    -0.381881f,   0.0598071f,    -0.0434551f,
+  0.159283f,    -0.110631f,   0.266996f,    -0.0265494f,   0.135199f,
+  -0.00833162f, 0.804482f,    -0.114698f,   -0.15066f,     -0.479553f,
+  0.448407f,    -0.344069f,   -0.0280952f,  -0.208211f,    -0.102269f,
+  -0.679066f,   -0.37476f,    -0.0228875f,  0.0535049f,    0.111015f,
+  -0.18125f,    -0.167584f,   0.0110497f,   0.262723f,     -0.413839f,
+  -0.0611238f,  0.358499f,    0.0807514f,   0.208254f,     0.214499f,
+  0.11137f,     -0.14262f,    -0.0513973f,  0.243718f,     -0.373716f,
+  -0.00413366f, 0.216501f,    -0.164149f,   -0.064935f,    -0.0840282f,
+  0.0566148f,   0.0377686f,   0.289835f,    0.769388f,     0.891198f,
+  -0.592739f,   0.40744f,     -0.153095f,   0.657311f,     0.140737f,
+  0.28209f,     0.158344f,    0.353546f,    0.0868246f,    0.116887f,
+  0.402004f,    0.437184f,    0.589219f,    0.760594f,     -0.575419f,
+  -0.754308f,   -0.709219f,   -0.297814f,   -0.418609f,    -0.0262104f,
+  0.0411959f,   0.0597708f,   -0.143728f,   -0.136642f,    0.099614f,
+  -0.257601f,   -0.2404f,     0.305893f,    0.254009f,     -0.0301398f,
+  -0.0653091f,  -0.459002f,   -0.163404f,   0.123152f,     -0.0284252f,
+  -0.457272f,   0.00788622f,  -0.828399f,   -0.0534199f,   0.586877f,
+  0.982728f,    0.424581f,    0.0891856f,   0.383182f,     -0.122053f,
+  0.0808408f,   -0.00384914f, -0.0560201f,  -0.0524772f,   -0.263444f,
+  -0.239287f,   -0.882777f,   0.0180592f,   -0.0948711f,   -0.177946f,
+  0.0296473f,   0.096082f,    0.0455604f,   -0.108608f,    0.00777951f,
+  -0.140896f,   0.117187f,    -0.342467f,   -0.0691604f,   0.0761611f,
+  -0.0892053f,  0.111386f,    -0.167456f,   1.40616f,      -0.00478793f,
+  0.00547665f,  -0.0441829f,  0.0151323f,   -0.0674099f,   -0.0380578f,
+  0.16072f,     0.31882f,     0.245486f,    -0.424318f,    0.101845f,
+  -0.203343f,   -0.197402f,   -0.163025f,   -0.0771961f,   -0.264435f,
+  0.319429f,    0.250076f,    0.782726f,    0.386003f,     0.00700673f,
+  -0.375715f,   0.151453f,    -0.296265f,   -0.560183f,    -0.00767249f,
+  -0.109593f,   -0.119419f,   -0.0161516f,  0.0380283f,    -0.156417f,
+  0.131708f,    0.396268f,    -0.221796f,   0.232099f,     0.128852f,
+  0.0567268f,   0.297297f,    0.173269f,    0.213411f,     0.0384426f,
+  -0.290985f,   -0.0426841f,  -0.488292f,   -0.087101f,    -0.311582f,
+  0.83009f,     -0.153163f,   0.903335f,    -1.15644f,     -0.0378635f,
+  -0.0552129f,  -0.126362f,   -0.176945f,   0.0653115f,    0.0989368f,
+  -0.333543f,   -0.330586f,   0.29775f,     -0.103535f,    0.210824f,
+  -0.00300509f, 0.317105f,    0.216852f,    0.479718f,     0.0485808f,
+  -0.15662f,    0.718199f,    0.327513f,    0.115169f,     -0.423598f,
+  -0.456633f,   -0.575814f,   -0.494454f,   0.304411f,     0.0493055f,
+  -0.381171f,   0.467251f,    -0.122872f,   -0.167441f,    0.017253f,
+  -0.0583646f,  -0.1586f,     0.214046f,    -0.0284424f,   -0.217112f,
+  0.606567f,    -0.107533f,   0.36615f,     -0.0709227f,   0.604761f,
+  -0.244657f,   -0.296651f,   -0.595611f,   -0.156629f,    -0.693468f,
+  -0.310603f,   0.499272f,    0.282941f,    0.295043f,     -0.178704f,
+  0.281186f,    0.014329f,    -0.120819f,   0.154234f,     0.0131325f,
+  -0.472231f,   -0.631281f,   0.422955f,    0.711432f,     -0.118025f,
+  0.0864996f,   0.343971f,    -0.301477f,   -0.246638f,    0.165068f,
+  0.218044f,    0.224236f,    -0.0848522f,  0.00671216f,   0.401141f,
+  -0.218857f,   -0.0298495f,  -0.135725f,   -0.377618f,    0.022473f,
+  0.106955f,    -0.0582005f,  0.0468484f,   -0.0217442f,   0.130911f,
+  -0.0926905f,  0.383007f,    -0.159353f,   -0.222711f,    -0.0286419f,
+  0.372315f,    -0.469095f,   0.797571f,    -0.301315f,    0.239327f,
+  -0.997507f,   -0.363409f,   0.353717f,    0.676686f,     -0.0500028f,
+  0.0638539f,   -0.431927f,   0.243852f,    0.000884826f,  -0.00166585f,
+  0.0613292f,   -0.029558f,   -0.0248432f,  -0.0125607f,   -0.0309674f,
+  -0.743308f,   0.0409806f,   0.0921015f,   0.167816f,     0.406849f,
+  0.095677f,    0.0308913f,   0.139956f,    -0.400472f,    0.396617f,
+  0.936517f,    0.355057f,    -0.423816f,   -0.232472f,    -0.220188f,
+  -0.399746f,   -0.409623f,   -0.158797f,   0.361153f,     0.0327019f,
+  0.0690844f,   -0.032197f,   0.0248558f,   0.00438518f,   0.0222724f,
+  -0.326832f,   -0.314295f,   0.156563f,    0.0562703f,    0.332694f,
+  0.299424f,    0.228206f,    0.322038f,    0.0136098f,    0.0060297f,
+  -0.165851f,   -0.306512f,   0.0796508f,   -0.37158f,     0.239395f,
+  -0.349442f,   0.198515f,    -0.253854f,   -1.13694f,     0.0202873f,
+  -0.0504009f,  -0.130528f,   -0.017126f,   -0.0370001f,   -0.087458f,
+  -0.119952f,   -0.130404f,   0.0333733f,   -0.184736f,    0.182162f,
+  0.227776f,    -0.166563f,   -0.156162f,   0.118215f,     -0.220183f,
+  0.00474779f,  -0.107792f,   0.260493f,    0.11884f,      0.156587f,
+  0.303936f,    -0.131788f,   -0.314774f,   0.310606f,     0.0935523f,
+  0.790767f,    0.26461f,     0.0236426f,   0.0629469f,    0.0344072f,
+  -0.151513f,   0.211498f,    0.0245435f,   0.0629973f,    0.052019f,
+  -0.03308f,    0.123487f,    0.0885027f,   0.159172f,     -0.0510615f,
+  0.0298033f,   -0.130515f,   -0.121799f,   -0.104915f,    0.208822f,
+  -0.310496f,   -0.314106f,   0.303307f,    -0.0196736f,   0.0420045f,
+  0.461777f,    -0.433699f,   0.00345407f,  0.703139f,     -0.655637f,
+  -0.210767f,   -0.201278f,   0.163694f,    -0.236534f,    0.300877f,
+  0.0769982f,   -0.282453f,   0.149721f,    -0.0303466f,   -0.191473f,
+  -0.406056f,   -0.213472f,   0.1619f,      -0.245953f,    0.00544399f,
+  -0.121434f,   0.193012f,    -0.307165f,   1.45431f,      -0.161468f,
+  -0.12444f,    -0.146129f,   -0.0528212f,  -0.0925165f,   -0.134528f,
+  -0.479475f,   0.315525f,    0.133845f,    0.382158f,     -0.0799693f,
+  -0.151041f,   0.255772f,    0.409536f,    -0.240663f,    -0.323741f,
+  -0.205876f,   0.03699f,     -0.217541f,   0.108511f,     0.640628f,
+  0.705993f,    -0.423899f,   -0.78314f,    -0.100733f,    -0.00859087f,
+  0.0251879f,   0.0458335f,   0.00210128f,  -0.047576f,    -0.0560518f,
+  -1.23869f,    -0.829914f,   0.0346551f,   0.350505f,     0.193688f,
+  0.459154f,    0.137898f,    0.503818f,    0.260867f,     0.649539f,
+  0.0150802f,   0.0239274f,   -0.276069f,   -0.0621478f,   -0.193106f,
+  -0.0375665f,  -0.654529f,   0.189493f,    0.446625f,     -0.0208265f,
+  0.019838f,    -0.0201955f,  0.00180428f,  -0.0110678f,   -0.0172414f,
+  0.0276489f,   -0.252882f,   -0.0351807f,  -0.0518874f,   0.279098f,
+  -0.245122f,   0.101287f,    -0.114202f,   -0.0812187f,   0.572429f,
+  -0.0821731f,  0.564183f,    0.0222552f,   0.190111f,     -0.0417497f,
+  -0.00385925f, -0.182995f,   -0.240482f,   -0.291572f,    -0.0450444f,
+  0.0962974f,   -0.165973f,   -0.0954637f,  -0.163841f,    -0.833405f,
+  -1.31541f,    -0.336473f,   -0.0920702f,  0.816105f,     0.393377f,
+  0.0340241f,   -0.0844545f,  0.61729f,     -0.17596f,     0.241149f,
+  -0.42825f,    -0.59091f,    -0.290702f,   0.0796465f,    0.0982819f,
+  0.466934f,    0.261666f,    0.0373333f,   0.332509f,     -0.0266694f,
+  -0.0476951f,  -0.00642167f, -0.0132542f,  -0.000320841f, 0.00475532f,
+  0.000502778f, 0.296534f,    -0.13297f,    -0.113082f,    -0.327923f,
+  0.35901f,     -0.302246f,   0.189799f,    -0.37994f,     0.16107f,
+  -0.20414f,    0.548575f,    -0.460821f,   0.591878f,     -0.213113f,
+  -0.169373f,   -0.07332f,    0.228841f,    0.682302f,     -0.0665316f,
+  -0.142456f,   -0.0873117f,  0.00607451f,  0.0376443f,    0.0536673f,
+  -0.0109536f,  -0.400279f,   0.550058f,    0.820871f,     -0.666373f,
+  -0.471962f,   -0.315925f,   -0.313142f,   0.952742f,     0.473928f,
+  -0.119006f,   0.153241f,    -0.0383078f,  0.631869f,     -0.343423f,
+  -0.233473f,   -0.218195f,   -0.077688f,   -0.728291f,    0.0382408f,
+  -0.00662886f, -0.0419666f,  0.0309776f,   -0.0281592f,   0.0154229f,
+  -0.198534f,   0.0206324f,   0.0152272f,   -0.235067f,    0.0330486f,
+  0.139198f,    -0.0612118f,  0.133154f,    -0.258675f,    0.0900275f,
+  -0.127771f,   0.157322f,    -0.00767807f, -0.329258f,    0.327458f,
+  0.0528581f,   -0.181125f,   0.409995f,    -0.162979f,    -0.0193475f,
+  0.186009f,    0.0519501f,   0.651877f,    -0.37821f,     -1.10341f,
+  -0.189776f,   -0.0922788f,  0.460256f,    0.168011f,     0.440295f,
+  0.478135f,    0.374573f,    0.384048f,    0.116953f,     0.68886f,
+  -0.427727f,   -0.36676f,    -0.500013f,   -0.228685f,    -0.218859f,
+  0.208396f,    -0.0173765f,  -0.0680241f,  -0.00538013f,  -0.0674409f,
+  -0.092764f,   0.0295707f,   -0.0462887f,  -0.00636006f,  0.0334169f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_32[] = {
+  0.176459f,  0.154405f, 0.281821f,  0.375264f,  -0.882863f,
+  -0.240261f, -1.17075f, -0.280216f, -0.743836f, -0.317511f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_32 = {
+  NUM_FEATURES_32,
+  NUM_LOGITS_32,
+  NUM_HIDDEN_LAYERS_32,
+  {
+      NUM_LAYER_0_UNITS_32,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_32,
+      av1_simple_motion_search_prune_part_logits_kernel_32,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_32,
+      av1_simple_motion_search_prune_part_logits_bias_32,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_32
+#undef NUM_FEATURES_32
+#undef NUM_LAYER_0_UNITS_32
+#undef NUM_LOGITS_32
+
+#define NUM_HIDDEN_LAYERS_16 1
+#define NUM_FEATURES_16 25
+#define NUM_LAYER_0_UNITS_16 32
+#define NUM_LOGITS_16 10
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_16[] = {
+  -0.520913f,   0.395611f,    0.0369091f,   -0.318591f,  -0.463252f,
+  0.134992f,    -0.43154f,    -0.0739112f,  -0.118817f,  0.476373f,
+  -0.281406f,   0.3413f,      0.456255f,    0.33307f,    0.2942f,
+  0.1317f,      0.498113f,    1.95406f,     -0.165726f,  -0.219306f,
+  -0.302656f,   -1.31157f,    -0.433662f,   0.151716f,   -0.214817f,
+  0.504523f,    -0.710049f,   0.359616f,    -0.412695f,  -0.103193f,
+  0.341912f,    0.351378f,    -0.181486f,   0.573862f,   -0.0396254f,
+  -0.17855f,    -0.276163f,   0.0367465f,   -0.353905f,  -0.204689f,
+  0.309581f,    -0.0439686f,  -0.147855f,   0.152745f,   0.290871f,
+  0.131049f,    -0.27808f,    -0.142997f,   0.207843f,   -1.23074f,
+  -0.267714f,   -0.336923f,   0.313781f,    -0.61488f,   -0.161984f,
+  0.238059f,    -0.0879942f,  -0.085543f,   -0.260156f,  -0.13614f,
+  -0.242196f,   0.201216f,    -0.248691f,   0.0936671f,  -0.350522f,
+  -0.35002f,    -0.156583f,   -0.00579001f, 0.300578f,   -0.341269f,
+  -0.290712f,   0.354802f,    -0.31629f,    0.509107f,   -0.236953f,
+  -0.0923519f,  0.544509f,    -0.280991f,   -0.017437f,  -0.202721f,
+  -0.116388f,   -0.7191f,     0.324586f,    0.254249f,   0.125505f,
+  0.00658697f,  -0.333322f,   -0.126537f,   -0.140004f,  -0.0241202f,
+  -0.172466f,   0.210035f,    -0.270833f,   0.0579044f,  0.0950352f,
+  -0.120382f,   0.063292f,    -0.394925f,   0.482165f,   0.147753f,
+  0.331465f,    -0.187444f,   0.1083f,      0.414028f,   0.279238f,
+  -0.486889f,   -0.674349f,   -0.313656f,   -0.131186f,  -0.100662f,
+  0.238191f,    -1.19083f,    -0.30667f,    -2.4324f,    0.235311f,
+  0.108605f,    1.67197f,     0.476157f,    0.30055f,    0.0839538f,
+  0.408469f,    -0.473517f,   0.560283f,    -0.0188136f, 0.273824f,
+  -0.43707f,    -0.0346978f,  -0.438315f,   -0.0196275f, -0.0567921f,
+  -0.220166f,   0.216175f,    -0.0180461f,  0.0116429f,  -0.0096949f,
+  -0.32613f,    0.176829f,    -0.243563f,   -0.240972f,  -0.621819f,
+  -0.00619648f, -0.145525f,   0.124324f,    -0.0306925f, 0.172208f,
+  -2.04631f,    -0.200087f,   -0.594135f,   -0.352303f,  -0.309826f,
+  0.0922786f,   -0.698371f,   -0.0366823f,  0.0244036f,  0.338775f,
+  -0.115947f,   0.144971f,    -0.0607037f,  -0.762412f,  0.0125584f,
+  -0.262427f,   -0.0830273f,  -0.291252f,   -0.176059f,  -0.203983f,
+  0.0871455f,   -0.0894925f,  0.0426263f,   -0.060001f,  -0.542355f,
+  -0.407837f,   -0.0419273f,  0.226608f,    -0.114844f,  0.158733f,
+  -0.187237f,   0.113163f,    -1.86337f,    -0.367544f,  -0.547048f,
+  -0.24192f,    -0.226764f,   0.090912f,    0.819604f,   0.433766f,
+  -0.841657f,   0.446987f,    -0.622761f,   -0.0296385f, -0.130176f,
+  -0.0518136f,  -0.640326f,   -0.330107f,   -0.137832f,  -0.0119033f,
+  0.39401f,     0.111331f,    -0.141367f,   -0.230289f,  0.171054f,
+  -0.924059f,   -0.107317f,   -0.347983f,   0.0261109f,  0.423002f,
+  -0.305817f,   0.247696f,    0.0436002f,   0.0305862f,  -1.52448f,
+  -0.595587f,   -0.155552f,   -1.11949f,    -0.513937f,  0.138347f,
+  -0.301487f,   0.352144f,    -0.615801f,   0.0326701f,  -0.215322f,
+  -0.0608176f,  -0.416557f,   -0.306073f,   -0.441512f,  -0.0569277f,
+  -0.709768f,   -0.602527f,   -0.311134f,   0.152471f,   -0.255299f,
+  0.354505f,    0.194464f,    0.0144251f,   0.110732f,   -0.4452f,
+  -0.804814f,   0.205325f,    -0.0957486f,  0.502684f,   0.09112f,
+  -0.533087f,   -1.77979f,    0.556992f,    -0.176157f,  -0.642633f,
+  0.11553f,     -0.232561f,   0.161277f,    -0.0631125f, -0.20759f,
+  0.489253f,    -0.067533f,   0.0231024f,   -0.179831f,  -0.272985f,
+  -0.390059f,   0.3089f,      0.185733f,    -0.257065f,  -0.508838f,
+  -0.550028f,   0.0665621f,   -0.138288f,   -0.413188f,  0.191193f,
+  -1.32969f,    -0.431025f,   0.270242f,    -0.340062f,  0.0817257f,
+  0.0376051f,   -0.18633f,    0.0828274f,   0.00670051f, -0.431295f,
+  -0.450316f,   -0.173042f,   -0.322248f,   0.370628f,   0.10019f,
+  0.317293f,    -0.266613f,   0.0752441f,   -0.425656f,  -0.112223f,
+  0.557991f,    -0.324368f,   -0.195261f,   -0.0526129f, -0.807472f,
+  -0.387466f,   0.192186f,    0.353213f,    -0.120238f,  0.107686f,
+  0.200678f,    -0.75363f,    0.466857f,    -0.282345f,  -0.0849236f,
+  -0.0490695f,  -0.00643182f, 0.123047f,    -0.207805f,  -0.130456f,
+  -1.09455f,    0.340973f,    0.334784f,    0.0706643f,  -1.65681f,
+  -0.319952f,   -0.198514f,   -0.0787972f,  0.089524f,   0.0531034f,
+  -0.202705f,   -0.0852339f,  -0.62572f,    -0.0734234f, -0.838088f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_16[] = {
+  -0.0616197f, 0.939947f, 0.521161f,  0.213886f,  0.130324f,  -0.127443f,
+  -0.0538715f, 0.708746f, 0.445031f,  0.418781f,  -0.114539f, 0.521941f,
+  1.13719f,    0.606545f, -0.32193f,  -0.150788f, 0.158487f,  -0.224005f,
+  0.654715f,   0.115729f, -0.286506f, -2.06223f,  0.0117697f, 0.503905f,
+  -0.102339f,  0.653256f, -0.813561f, 0.905235f,  -0.417269f, -0.206265f,
+  0.661496f,   0.95533f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_16[] = {
+  -0.203489f,   0.00686229f,  -0.161414f,   0.0637276f,   0.27516f,
+  0.512219f,    0.164205f,    0.00326062f,  -0.41914f,    -0.400334f,
+  0.554419f,    0.715772f,    -0.295569f,   -0.703503f,   0.0137744f,
+  -0.0934259f,  0.174234f,    -0.148618f,   -0.0360558f,  -0.0986598f,
+  -0.138502f,   -0.0770713f,  0.122922f,    -0.00784415f, 0.0953234f,
+  -0.255754f,   -0.310967f,   0.185306f,    0.464554f,    0.147338f,
+  -0.0612304f,  0.164783f,    0.301097f,    0.161364f,    -0.12723f,
+  -0.0265984f,  -0.471361f,   0.0578776f,   -0.362865f,   0.425789f,
+  0.402758f,    -0.190235f,   0.00549738f,  -0.570908f,   1.27206f,
+  0.048868f,    -0.0097675f,  0.0708324f,   0.0456103f,   0.0149062f,
+  -0.563032f,   -0.420573f,   0.107278f,    0.0938258f,   0.142712f,
+  -0.00251036f, -0.250583f,   0.522272f,    0.0113175f,   0.126751f,
+  -0.433028f,   -0.035542f,   -0.536686f,   -0.0668722f,  0.253094f,
+  0.254007f,    -0.435505f,   0.343001f,    0.0531542f,   -0.361914f,
+  -0.102664f,   0.0404874f,   0.132686f,    0.0762298f,   0.0236971f,
+  -0.419454f,   0.230877f,    -0.223714f,   0.037813f,    0.0818604f,
+  0.383705f,    -0.235028f,   -0.0554801f,  0.429851f,    0.0845829f,
+  0.166295f,    0.355111f,    -0.421197f,   0.298949f,    0.0218224f,
+  0.445705f,    -0.392217f,   -0.429578f,   -0.076276f,   -0.0963531f,
+  -0.631425f,   -0.225977f,   8.06349e-06f, 0.0676679f,   0.0779651f,
+  0.0706891f,   0.101377f,    0.517103f,    0.0945502f,   -0.52522f,
+  -0.312022f,   0.0358089f,   0.616509f,    -0.0507444f,  -0.465814f,
+  -0.0326024f,  0.591298f,    0.188544f,    -0.0633316f,  -0.199987f,
+  0.403118f,    -0.511281f,   -0.696263f,   0.112996f,    0.103875f,
+  0.0495595f,   -0.0107449f,  0.521539f,    -0.0123823f,  -0.0642751f,
+  0.08548f,     -0.0679207f,  0.526558f,    0.0651114f,   -0.342643f,
+  -0.349934f,   0.307437f,    0.368763f,    -0.194851f,   -0.134117f,
+  0.102448f,    -0.0520666f,  0.0415824f,   -0.175085f,   0.272685f,
+  0.0675856f,   0.120627f,    0.391408f,    -0.135249f,   -0.357024f,
+  0.019666f,    -0.0622677f,  0.407427f,    0.22655f,     -0.129432f,
+  -0.165327f,   0.004893f,    0.5479f,      0.0613981f,   -0.479682f,
+  -0.144228f,   -0.130106f,   0.206458f,    -0.342086f,   0.12691f,
+  -0.113554f,   0.231164f,    -0.051419f,   0.0401286f,   -0.560429f,
+  -0.070609f,   0.420232f,    0.442465f,    -0.237501f,   -0.000293732f,
+  -1.017f,      -0.210222f,   0.0157063f,   0.0488178f,   0.0734721f,
+  -0.52626f,    -0.276441f,   -0.521579f,   0.443532f,    -0.0819051f,
+  -0.0732633f,  -0.17999f,    0.258525f,    -0.0374872f,  0.150115f,
+  0.0510939f,   0.168116f,    0.473372f,    0.824489f,    0.302195f,
+  -0.348613f,   0.238569f,    0.176444f,    -0.633945f,   -0.0567195f,
+  -0.0305827f,  -0.0551851f,  0.85822f,     -0.0628099f,  0.0364294f,
+  -0.234823f,   0.179067f,    0.143208f,    -0.0511014f,  -0.404191f,
+  0.428035f,    0.0235506f,   0.371991f,    -0.312909f,   0.550933f,
+  -0.389265f,   -0.271813f,   -0.293461f,   -0.583752f,   0.179991f,
+  0.191698f,    0.659094f,    1.07941f,     -0.509555f,   -0.100638f,
+  0.079988f,    -0.0519107f,  -0.112723f,   -0.0663326f,  0.0353569f,
+  -0.795055f,   -0.465999f,   0.283579f,    0.340913f,    0.152738f,
+  0.294664f,    0.527839f,    0.187735f,    0.359461f,    0.164629f,
+  0.107512f,    0.390402f,    0.236702f,    0.114674f,    -0.525655f,
+  -0.555476f,   -0.6589f,     -0.266601f,   -0.0946547f,  0.6306f,
+  0.0248513f,   0.038497f,    0.432706f,    -0.0715465f,  0.0410172f,
+  -0.115313f,   -0.428684f,   0.136283f,    0.0913185f,   0.11277f,
+  0.0968689f,   -0.00437052f, 0.0888981f,   0.10304f,     0.02442f,
+  -0.211315f,   0.00981596f,  -0.0974827f,  0.208611f,    0.140644f,
+  0.0315567f,   0.350332f,    -0.291049f,   -0.0715449f,  -0.352992f,
+  -0.858004f,   0.828658f,    0.439092f,    0.0151291f,   0.0503828f,
+  0.0656112f,   -0.710749f,   -0.0951757f,  0.193908f,    0.00908018f,
+  0.141486f,    -0.0657711f,  0.099791f,    0.153729f,    -0.419576f,
+  -0.892636f,   -0.0449268f,  -0.170786f,   -0.156564f,   0.384511f,
+  0.296565f,    0.0569815f,   -0.103938f,   1.27479f,     -0.0406475f,
+  0.154083f,    -0.186442f,   0.0282588f,   0.0312102f,   -0.188994f,
+  0.284243f,    -0.564693f,   0.425525f,    -0.00924596f, 0.810003f,
+  0.233812f,    -0.0180273f,  0.121082f,    -0.209096f,   0.151437f,
+  0.286921f,    -0.348095f,   0.174813f,    -0.413798f,   0.108994f,
+  -0.34266f,    -0.0337981f,  -0.459f,      -0.409812f,   -0.0890104f,
+  0.0834802f,   -0.00259191f, -0.105914f,   -0.164207f,   0.0697689f,
+  -0.312098f,   -0.00650536f, -0.486758f,   -0.248486f,   0.24314f,
+  -0.0857144f,  0.0884781f,   -0.65615f,    -0.121744f,   0.0709335f,
+  -0.0237193f,  0.10764f,     -0.0409452f,  -0.0824305f,  0.42329f,
+  0.138258f,    0.502607f,    0.228545f,    0.0687789f,   0.0361586f,
+  0.39074f,     0.0722654f,   -0.0133148f,  0.283278f,    0.0743384f,
+  0.310292f,    -0.297675f,   -0.359935f,   0.521021f,    -0.10082f,
+  -0.272333f,   0.0120283f,   0.138118f,    -0.123711f,   -0.0711386f,
+  0.0170747f,   0.831039f,    0.0509626f,   0.790608f,    -0.0863406f,
+  -0.31962f,    0.0631013f,   0.0873453f,   -0.472331f,   -0.0826027f,
+  -0.241722f,   0.148835f,    -0.131611f,   0.000195347f, -0.0615804f,
+  -0.838663f,   -0.586979f,   0.247713f,    0.362254f,    0.492727f,
+  -0.132163f,   0.0516545f,   0.477838f,    -0.0395182f,  0.0124993f,
+  -0.771514f,   0.0386912f,   -0.118525f,   -0.346172f,   -0.265905f,
+  -0.175257f,   -0.406287f,   0.393837f,    0.409096f,    -0.408501f,
+  -0.0207146f,  0.0487809f,   0.0636982f,   0.0276368f,   0.0878249f,
+  0.0425889f,   0.0868633f,   0.17423f,     -0.128217f,   -0.477068f,
+  -0.321294f,   0.0393771f,   0.00812823f,  -0.350529f,   -0.129012f,
+  0.439953f,    0.396662f,    0.410475f,    -0.123129f,   -0.565966f,
+  0.0298635f,   -0.614611f,   -0.477514f,   0.453651f,    0.0617068f,
+  0.0530563f,   0.0479074f,   0.213551f,    0.039034f,    0.0449095f,
+  -1.06868f,    -1.2654f,     -0.175482f,   0.595068f,    -0.230095f,
+  0.719838f,    -0.272148f,   0.696564f,    0.0485396f,   0.468584f,
+  0.0695439f,   -0.0842122f,  -0.228978f,   0.161397f,    -0.000441421f,
+  -0.0297514f,  -0.250599f,   0.196656f,    0.608423f,    -0.0112096f,
+  0.0236881f,   -0.00167311f, 0.0040709f,   0.015495f,    0.00757698f,
+  -0.165886f,   0.359767f,    -0.0214696f,  0.377208f,    0.0303547f,
+  0.0657094f,   0.140775f,    0.21867f,     -0.203922f,   0.263878f,
+  -0.0529099f,  0.202438f,    -0.243226f,   0.156659f,    -0.627056f,
+  -0.845036f,   -0.500873f,   0.172588f,    0.402972f,    -0.147734f,
+  0.151792f,    -0.075579f,   0.443519f,    0.0311335f,   -0.0328222f,
+  -0.0299781f,  0.435956f,    -0.0987376f,  0.288402f,    0.135902f,
+  -0.173584f,   -0.186255f,   0.224524f,    -0.249645f,   0.123702f,
+  -0.0846244f,  0.491317f,    0.544846f,    0.338677f,    -0.258885f,
+  -0.617434f,   -0.629003f,   -0.347233f,   0.181262f,    -0.0606015f,
+  -0.537766f,   0.215089f,    -0.334527f,   0.0488534f,   0.0577997f,
+  -1.12431f,    -0.932292f,   -0.11559f,    0.573715f,    0.151128f,
+  0.693818f,    -0.16956f,    0.802591f,    -0.231531f,   1.04318f,
+  -0.476417f,   0.293452f,    -0.610136f,   0.27506f,     -0.384012f,
+  0.305366f,    -0.0540464f,  -0.337583f,   -0.174285f,   0.157248f,
+  0.0477345f,   -0.0229535f,  0.0475766f,   -0.00603319f, 0.00856119f,
+  -0.702893f,   -0.0579673f,  0.183024f,    -0.166222f,   0.109763f,
+  -0.148019f,   -0.258873f,   -0.0820157f,  -0.186716f,   -0.449265f,
+  -0.0534138f,  0.15732f,     0.46357f,     0.00502591f,  -0.0282085f,
+  0.152277f,    -0.855199f,   -0.357115f,   0.0366159f,   0.0131101f,
+  -0.0407758f,  0.0462835f,   0.146309f,    -0.00276278f, -0.0591814f,
+  -0.109437f,   0.506764f,    -0.044421f,   0.465907f,    0.114444f,
+  -0.241053f,   -0.362649f,   -0.432615f,   0.199989f,    -0.00635866f,
+  -0.521886f,   0.0958924f,   -0.485725f,   0.0430527f,   0.069746f,
+  0.681091f,    -0.288144f,   0.505671f,    0.0489065f,   -0.0373836f,
+  0.266079f,    0.145173f,    -0.011481f,   -0.225074f,   -0.754501f,
+  -0.122939f,   -0.294213f,   0.334738f,    0.281561f,    0.558977f,
+  -0.21551f,    -0.346507f,   -0.0625635f,  0.0782034f,   -0.236999f,
+  -0.803783f,   -0.601117f,   0.091192f,    0.636122f,    -0.250626f,
+  0.0354961f,   0.103915f,    0.508571f,    0.329911f,    -0.0425999f,
+  -0.0867587f,  -0.0385824f,  1.13914f,     -0.0261992f,  0.00484478f,
+  0.124603f,    -0.012173f,   -0.377358f,   -0.243563f,   0.236094f,
+  0.145663f,    -0.132752f,   0.347497f,    -0.529315f,   0.271632f,
+  -0.372805f,   0.0261836f,   0.126169f,    0.0941008f,   0.283773f,
+  0.765701f,    -0.226477f,   -0.181549f,   -0.306896f,   0.110165f,
+  -0.0784234f,  -0.0827892f,  -0.0374252f,  -0.0950872f,  -0.451015f,
+  -0.995793f,   -0.452663f,   0.293338f,    -0.380865f,   0.032683f,
+  0.0178248f,   0.0699194f,   -0.0811722f,  -0.0866096f,  0.139289f,
+  0.296604f,    0.192293f,    -0.0589607f,  -0.179878f,   0.00360266f,
+  -0.0905794f,  0.136744f,    -0.191555f,   1.31877f,     -0.0592033f,
+  -0.158766f,   0.0214746f,   -0.190113f,   -0.116671f,   0.0449292f,
+  -0.109533f,   -0.709307f,   0.386424f,    0.40201f,     0.262211f,
+  -0.155244f,   0.233988f,    -0.0166317f,  0.462665f,    0.0484462f,
+  0.210902f,    -0.352798f,   0.38698f,     -0.228261f,   -0.084309f,
+  -0.220751f,   -0.170879f,   -0.352617f,   -1.24277f,    0.266004f,
+  -0.0125749f,  -0.0380073f,  0.101838f,    -0.0483024f,  -0.0629178f,
+  -0.0695577f,  -0.103439f,   0.242131f,    -0.0796858f,  0.349718f,
+  -0.332045f,   0.0138352f,   -0.380235f,   -0.28717f,    -0.176276f,
+  0.865903f,    0.36593f,     0.243925f,    -0.422289f,   -0.117327f,
+  0.21876f,     0.245393f,    -0.426134f,   -0.186077f,   0.0352515f,
+  -0.123742f,   0.249376f,    1.3281f,      0.0707771f,   0.071415f,
+  -0.286827f,   -0.131691f,   -0.270881f,   -0.434378f,   0.376064f,
+  0.35966f,     0.513374f,    0.439378f,    -0.222716f,   -0.5874f,
+  0.487997f,    -0.293271f,   -0.184245f,   -0.037256f,   0.17723f,
+  -0.438651f,   0.428184f,    0.112983f,    -0.449287f,   -0.0451963f,
+  0.0854929f,   0.0735442f,   -0.0148642f,  -0.0586782f,  -0.176455f,
+  -0.438979f,   -0.127109f,   0.211478f,    0.388035f,    -0.0372021f,
+  0.220575f,    0.382144f,    0.302121f,    0.0857121f,   0.193445f,
+  -0.488858f,   -0.195288f,   -0.316184f,   -0.314026f,   -0.111956f,
+  0.0744768f,   0.292709f,    0.30187f,     -0.285506f,   -0.105006f,
+  0.0851402f,   -0.082318f,   0.277518f,    0.725294f,    -0.756304f,
+  0.0155309f,   -0.378542f,   0.293377f,    -0.347252f,   -0.338458f,
+  0.221449f,    -0.176443f,   -0.131972f,   0.0129163f,   -0.290649f,
+  0.198596f,    -0.0721333f,  0.620591f,    0.568736f,    0.174001f,
+  -0.205186f,   -0.265606f,   -0.249155f,   0.299163f,    1.11842f,
+  0.17423f,     0.196417f,    -0.014484f,   0.0735422f,   0.26329f,
+  0.12284f,     -0.750305f,   -0.351337f,   0.121994f,    -0.00542878f,
+  -0.295707f,   -0.094124f,   0.300993f,    0.412408f,    -0.170761f,
+  -0.0676329f,  -0.106638f,   -0.419785f,   -0.43878f,    0.22421f,
+  0.0339903f,   0.619851f,    0.0615381f,   0.514631f,    1.35424f,
+  -0.0679228f,  -0.203457f,   0.131948f,    -0.0041251f,  -0.209054f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_16[] = {
+  0.304025f,  0.131887f, 0.259279f,  -0.561564f, -0.161729f,
+  -0.208036f, 0.102206f, -0.162937f, -1.42311f,  -0.708305f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_16 = {
+  NUM_FEATURES_16,
+  NUM_LOGITS_16,
+  NUM_HIDDEN_LAYERS_16,
+  {
+      NUM_LAYER_0_UNITS_16,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_16,
+      av1_simple_motion_search_prune_part_logits_kernel_16,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_16,
+      av1_simple_motion_search_prune_part_logits_bias_16,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_16
+#undef NUM_FEATURES_16
+#undef NUM_LAYER_0_UNITS_16
+#undef NUM_LOGITS_16
+
+#define NUM_HIDDEN_LAYERS_8 1
+#define NUM_FEATURES_8 25
+#define NUM_LAYER_0_UNITS_8 32
+#define NUM_LOGITS_8 4
+
+static const float av1_simple_motion_search_prune_part_logits_kernel_8[] = {
+  -0.266303f,  -0.387676f,  0.204501f,   -0.120842f,  -0.0752326f, 0.0337739f,
+  0.0243477f,  -0.356748f,  0.0143051f,  -0.16403f,   -0.139013f,  0.175003f,
+  -0.206754f,  0.349059f,   0.181763f,   0.212768f,   -0.313783f,  0.182829f,
+  0.00205376f, -0.939525f,  -0.0992424f, 0.306254f,   0.083329f,   -0.133137f,
+  -0.179022f,  -0.0237902f, 0.0601026f,  -0.216698f,  -0.551149f,  0.081711f,
+  -0.442191f,  0.0680832f,  -0.0353678f, 0.237704f,   0.23155f,    -0.36097f,
+  0.123389f,   -0.288927f,  0.178133f,   -0.152222f,  -0.235648f,  -0.0495293f,
+  -0.316522f,  0.034207f,   0.0463139f,  -0.817825f,  0.417443f,   -0.110984f,
+  -0.402371f,  0.0341694f,  -0.37383f,   0.414532f,   0.093993f,   0.0039505f,
+  0.0803175f,  -0.511859f,  -0.0154802f, 0.0979595f,  0.0909049f,  -0.120938f,
+  -0.577382f,  -0.155041f,  -0.404295f,  0.122223f,   -0.084703f,  0.00415336f,
+  0.149135f,   0.113219f,   0.124236f,   -0.240905f,  0.163909f,   -0.154202f,
+  -0.208917f,  0.00200158f, -0.71796f,   0.105984f,   -0.131996f,  -0.539603f,
+  0.223768f,   -0.0710733f, -0.346679f,  -0.0745909f, 0.171032f,   0.215701f,
+  0.218519f,   0.105981f,   -0.096209f,  -0.166453f,  -0.468894f,  -0.401578f,
+  -0.239222f,  0.111382f,   0.38747f,    -0.164734f,  -0.175955f,  0.336621f,
+  -0.0305501f, -0.0576765f, 0.0672671f,  -0.183692f,  0.412082f,   -0.262951f,
+  -0.153429f,  -0.128589f,  -0.530472f,  0.0936412f,  -1.08296f,   -0.45147f,
+  0.0714904f,  -3.96842f,   0.438125f,   -0.313945f,  0.231104f,   -0.00183851f,
+  -0.0192768f, -0.637531f,  -0.109296f,  0.0531702f,  0.00262162f, -0.615951f,
+  -0.546241f,  -0.635305f,  -0.0762367f, 0.0122019f,  0.423693f,   -0.129142f,
+  -0.112242f,  0.295184f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_bias_8[] = {
+  -2.16023f,  -3.12831f, -0.213206f,  -2.97875f, -1.83791f, -2.84713f,
+  -0.909636f, -2.05893f, 0.00525274f, -1.51672f, -3.95017f, 1.82847f,
+  -0.853224f, -3.29503f, -0.537517f,  0.923106f, -3.18665f, -1.29905f,
+  1.64506f,   -1.99848f, -2.24315f,   0.408613f, 0.503671f, -3.83393f,
+  -2.88388f,  -3.52337f, 1.46818f,    -1.67169f, -3.83253f, 1.52644f,
+  -0.490783f, -0.415782f
+};
+
+static const float av1_simple_motion_search_prune_part_layer_0_kernel_8[] = {
+  -0.702198f,  -0.102148f,   0.0564545f,   -0.0555548f,  0.16184f,
+  0.0950792f,  0.136974f,    -0.00824146f, 0.05746f,     0.0447542f,
+  0.145978f,   0.0855769f,   -0.041449f,   0.301347f,    -0.0206691f,
+  -0.0662514f, -0.0525079f,  -0.0998387f,  -0.0891438f,  0.110545f,
+  -0.863098f,  -1.83798f,    0.238818f,    0.127797f,    0.116872f,
+  -0.270655f,  -0.21057f,    0.197013f,    -0.123332f,   0.137104f,
+  -0.174766f,  -0.00803025f, 0.0234369f,   -0.0894175f,  -0.0380927f,
+  0.00827928f, -0.134148f,   0.110575f,    -0.250173f,   0.116273f,
+  0.0197749f,  0.270391f,    0.108437f,    0.173197f,    -0.0650348f,
+  0.0884626f,  0.262792f,    0.0649228f,   0.5573f,      -2.81315f,
+  -0.479801f,  -1.15825f,    0.0807932f,   -0.19144f,    0.404016f,
+  -0.211521f,  0.233269f,    -0.391414f,   0.160381f,    -0.277233f,
+  0.426354f,   0.156839f,    0.494315f,    -0.214259f,   -0.0132062f,
+  0.148628f,   -0.0899568f,  0.161845f,    0.467689f,    0.229474f,
+  0.590634f,   -0.705793f,   -0.0486113f,  -0.439088f,   0.994566f,
+  0.679065f,   0.777869f,    -0.225291f,   -0.0303006f,  -0.638782f,
+  -0.0824632f, -0.128561f,   -0.327603f,   0.105624f,    0.567581f,
+  -0.396135f,  -0.471028f,   0.181286f,    0.274604f,    0.180169f,
+  0.0612144f,  -0.865004f,   0.0306804f,   0.142985f,    -0.0914358f,
+  -0.243284f,  0.358359f,    -0.443847f,   -0.371978f,   0.606933f,
+  -0.900408f,  -0.52076f,    0.472118f,    0.0610973f,   0.152526f,
+  -0.550379f,  0.309331f,    -0.141573f,   0.203046f,    -0.231485f,
+  0.505156f,   0.393224f,    0.435487f,    -0.218681f,   0.123707f,
+  -0.270383f,  -0.033565f,   0.210373f,    -2.33967f,    0.367434f,
+  0.0308118f,  -0.205771f,   0.546141f,    0.19837f,     0.035648f,
+  -0.467007f,  -1.50995f,    -0.0314176f,  0.11762f,     -0.15307f,
+  0.618257f,   -0.139502f,   0.303386f,    -0.00758681f, 0.228107f,
+  -0.594499f,  -0.201984f,   -0.239666f,   0.114878f,    -0.922174f,
+  -0.530137f,  -0.379366f,   -0.319582f,   0.0889624f,   -0.00544663f,
+  0.316264f,   -0.204262f,   -0.0959358f,  0.23552f,     0.141369f,
+  -0.207129f,  -1.04067f,    -0.0780501f,  0.226768f,    -0.246752f,
+  0.0823105f,  0.114783f,    0.49315f,     0.0197732f,   0.705433f,
+  0.158076f,   -0.250584f,   -0.157326f,   -0.0439547f,  -0.139047f,
+  0.090531f,   -0.38833f,    0.743143f,    -1.47418f,    -0.155009f,
+  0.511466f,   -0.726716f,   -0.181075f,   0.450133f,    -0.390204f,
+  0.292725f,   0.00811462f,  -0.347738f,   0.613381f,    -0.237124f,
+  0.750748f,   -0.383123f,   0.410309f,    -0.204166f,   0.667199f,
+  -0.313197f,  0.436059f,    -0.607571f,   0.193681f,    0.409399f,
+  0.631747f,   -0.0454149f,  0.198232f,    0.345591f,    -0.0137374f,
+  -0.307014f,  -0.535515f,   0.764678f,    -0.225686f,   -0.451621f,
+  -2.75564f,   -1.52877f,    0.0511933f,   0.905979f,    0.145029f,
+  0.759615f,   0.130166f,    0.83827f,     0.0655081f,   1.07555f,
+  -0.529777f,  0.682967f,    -0.412052f,   0.611947f,    -0.83676f,
+  0.940695f,   -0.465681f,   0.51505f,     -0.883659f,   -0.105524f,
+  -0.0344173f, -0.0683618f,  -0.00698688f, -0.139349f,   0.135741f,
+  -0.294455f,  -0.377834f,   -0.602084f,   -1.00128f,    0.483291f,
+  1.25327f,    0.178987f,    0.75068f,     -0.520731f,   -0.325517f,
+  0.272032f,   0.144144f,    -0.279453f,   0.564907f,    0.144036f,
+  0.297448f,   -0.504243f,   -0.250508f,   -1.26395f,    0.4816f,
+  0.392771f,   -0.389961f,   -0.261585f,   -0.127124f,   -0.202945f,
+  -0.709716f,  -0.174719f,   0.113613f,    0.477753f,    -0.226659f,
+  0.0697828f,  -0.177994f,   0.300726f,    -0.185504f,   0.339424f,
+  -0.316746f,  0.369693f,    -0.339723f,   -0.143886f,   -0.0326589f,
+  -0.268761f,  -0.241094f,   0.284876f,    -0.0270867f,  -0.207397f,
+  -1.42738f,   0.495612f,    -0.0277732f,  0.199675f,    1.48638f,
+  -0.659257f,  -1.28199f,    0.498702f,    0.140695f,    0.571152f,
+  0.416368f,   0.14153f,     0.126876f,    0.521114f,    -0.00150571f,
+  0.375581f,   0.00537624f,  0.1286f,      -0.332227f,   0.417663f,
+  -0.539023f,  0.217124f,    -0.787111f,   -0.0335266f,  1.56751f,
+  0.0640563f,  -0.158791f,   0.118195f,    0.000970493f, -0.0403852f,
+  -0.0572557f, -0.0201181f,  -0.10255f,    0.63237f,     0.156662f,
+  0.418696f,   -0.274802f,   -0.663923f,   -0.375232f,   -0.40846f,
+  0.462092f,   1.2176f,      -0.301532f,   -0.779704f,   -0.112876f,
+  0.0806591f,  -0.0141923f,  0.00960801f,  -0.663557f,   0.0979948f,
+  -0.0575999f, -0.012847f,   0.0403853f,   -0.133666f,   -0.00330217f,
+  -0.931518f,  -0.774599f,   -0.21391f,    0.377601f,    -0.183365f,
+  0.299094f,   0.0238552f,   0.206716f,    -0.18959f,    0.346013f,
+  -0.150991f,  -0.192817f,   -0.293962f,   -0.0537604f,  -0.0648171f,
+  -0.275941f,  -0.144854f,   -0.224092f,   2.43113f,     0.0422494f,
+  -0.047236f,  -0.0262028f,  0.0282119f,   -0.175553f,   0.0888502f,
+  0.580682f,   0.951055f,    -0.284441f,   -0.120133f,   -0.268058f,
+  -0.312083f,  -0.411556f,   0.21431f,     -0.28033f,    0.324851f,
+  -1.02787f,   -0.936816f,   -0.577628f,   0.544743f,    0.295807f,
+  0.406157f,   0.447927f,    0.25369f,     -0.811421f,   -0.0424979f,
+  -0.189867f,  0.00778673f,  -0.113587f,   -0.116175f,   -0.0542222f,
+  -1.80089f,   -1.44175f,    -0.35332f,    0.191314f,    -0.236691f,
+  -0.0261926f, -0.502363f,   0.252278f,    -0.485478f,   0.296495f,
+  0.455612f,   -0.0489631f,  0.227255f,    0.170975f,    0.473487f,
+  0.257812f,   0.178048f,    0.2506f,      2.04637f,     -0.173857f,
+  0.0583379f,  0.00765589f,  -0.025772f,   -0.162666f,   -0.016214f,
+  -0.607486f,  -0.0808025f,  0.0551611f,   -0.0772291f,  0.126421f,
+  0.10869f,    -0.0877463f,  -0.111527f,   -0.0775766f,  0.503886f,
+  -0.002757f,  -0.0421354f,  -0.247857f,   0.140827f,    0.383576f,
+  0.228232f,   -0.157877f,   -0.0927911f,  0.344687f,    0.191181f,
+  0.236533f,   0.00102869f,  -0.0184502f,  -1.4509f,     -1.15945f,
+  -0.521978f,  -0.643225f,   0.133139f,    0.0660321f,   0.0851957f,
+  0.0303648f,  0.0296239f,   0.0455713f,   0.175647f,    0.080532f,
+  0.0445691f,  -0.257356f,   -0.125602f,   -0.138829f,   -0.167057f,
+  -0.0992552f, -0.13944f,    0.507531f,    0.444997f,    0.221452f,
+  -0.308384f,  -0.327554f,   0.13235f,     2.1487f,      -1.15453f,
+  -0.280239f,  -0.363582f,   -0.00358745f, 0.012866f,    0.251088f,
+  0.0676416f,  0.178492f,    -0.136631f,   0.197938f,    -0.078198f,
+  0.812439f,   1.1173f,      0.712113f,    1.10124f,     -0.836503f,
+  -1.22433f,   -1.07894f,    -1.29215f,    0.56057f,     2.23928f,
+  -0.419029f,  0.282178f,    -0.0719266f,  -0.172192f,   0.28034f,
+  -2.99124f,   -2.01481f,    0.0688982f,   0.697466f,    0.00635555f,
+  0.566069f,   0.047534f,    0.507755f,    -0.00690707f, 0.712594f,
+  -0.191467f,  0.355733f,    -0.480016f,   0.664669f,    -0.390619f,
+  0.351199f,   -0.482342f,   0.325005f,    1.9089f,      0.155987f,
+  0.17032f,    0.132729f,    0.0402649f,   0.146991f,    0.0314905f,
+  -0.775316f,  -0.208892f,   -0.105993f,   0.0181653f,   -0.12735f,
+  0.0897852f,  0.0470231f,   0.25807f,     0.127406f,    -0.0893252f,
+  -0.279776f,  0.190844f,    0.110384f,    -0.148833f,   0.025293f,
+  0.239838f,   0.00932245f,  0.35103f,     -0.128268f,   -0.0536754f,
+  0.506899f,   -0.16793f,    0.0955582f,   -2.01108f,    0.721433f,
+  -2.31413f,   -2.08646f,    0.033315f,    0.689828f,    -0.271213f,
+  0.790425f,   -0.114234f,   0.755325f,    -0.211533f,   0.774544f,
+  -0.263268f,  0.795762f,    -0.551455f,   0.953602f,    -0.168454f,
+  0.529055f,   -0.768991f,   0.882371f,    0.29763f,     -0.155017f,
+  0.00464101f, 0.121093f,    0.948271f,    0.113138f,    -0.110332f,
+  -2.0492f,    -1.31322f,    -0.129212f,   0.464778f,    -0.181465f,
+  0.618403f,   0.0627984f,   0.465228f,    0.165729f,    0.278277f,
+  -0.563276f,  -0.358358f,   -0.590638f,   0.0104993f,   0.731206f,
+  0.752569f,   0.631615f,    0.811822f,    0.129804f,    -0.0558327f,
+  0.570081f,   -0.417922f,   -0.168275f,   0.0703671f,   0.269127f,
+  0.240457f,   -0.197159f,   -0.00179261f, 0.220065f,    0.463511f,
+  0.0714626f,  -0.716477f,   -0.441865f,   -0.717028f,   -0.149176f,
+  0.452182f,   0.662699f,    -0.906534f,   -0.817133f,   0.237747f,
+  0.26024f,    -7.7441e-05f, 0.0934616f,   0.824641f,    -0.0404494f,
+  -0.088297f,  -0.157899f,   0.037408f,    0.132435f,    -0.316155f,
+  -0.276785f,  0.0117868f,   0.185008f,    0.32369f,     -0.465855f,
+  -0.302127f,  0.303289f,    0.338597f,    -0.665408f,   -0.507594f,
+  0.526979f,   0.532091f,    0.234395f,    0.754063f,    0.116769f,
+  0.0800309f,  -0.939344f,   -1.51269f,    1.4583f,      0.178444f,
+  0.0106756f,  -0.213468f,   -0.00369439f, 0.071015f,    -0.192798f,
+  -0.0933147f, -0.129901f,   -0.368279f,   -0.246564f,   0.126966f,
+  0.478565f,   -0.476246f,   -0.762863f,   0.168883f,    0.536136f,
+  -0.272969f,  0.2573f,      -0.161577f,   0.311428f,    -0.777994f,
+  -1.29752f,   0.216046f,    0.329016f,    1.57265f,     0.168075f,
+  -0.192518f,  0.0829308f,   -0.073533f,   -0.0202034f,  0.114716f,
+  -0.34888f,   -0.519215f,   0.190809f,    0.0138507f,   0.133635f,
+  0.14194f,    0.410618f,    -0.165106f,   0.214438f,    0.0438265f,
+  -0.8481f,    -1.19182f,    -1.07878f,    -0.882217f,   0.45616f,
+  0.977385f,   0.74929f,     0.918466f,    0.904704f,    0.041938f,
+  0.0362776f,  0.0757255f,   1.14007f,     0.0516825f,   -0.160068f,
+  0.219535f,   0.638634f,    -0.0284544f,  -0.222849f,   -0.0344915f,
+  -0.0350256f, -0.0504452f,  -0.0458416f,  0.146099f,    0.0783083f,
+  0.206579f,   0.241264f,    0.28401f,     0.0425312f,   -0.802049f,
+  -0.746271f,  -0.578969f,   -0.078218f,   0.436176f,    -0.281465f,
+  -2.5539f,    0.237868f,    -0.121796f,   0.0715619f,   0.106992f,
+  -0.621862f,  -0.167142f,   0.153716f,    0.0570912f,   -0.06525f,
+  -0.923773f,  0.130759f,    0.0517066f,   0.0729862f,   -0.873064f,
+  0.0403328f,  -0.186499f,   -0.0831918f,  -0.223723f,   0.144697f,
+  0.212845f,   0.416876f,    0.361598f,    0.138229f,    0.0728777f,
+  -1.95419f,   -0.00382816f, -0.0440387f,  0.433627f,    0.44781f,
+  -1.05229f,   -1.54506f,    0.564827f,    -0.263456f,   0.296105f,
+  -0.158055f,  0.388274f,    -0.366639f,   0.212006f,    -0.245619f,
+  0.593064f,   0.088727f,    0.410632f,    -0.263462f,   0.507075f,
+  -0.0974155f, 0.275268f,    -0.1293f,     0.136679f,    1.98276f,
+  0.411766f,   0.391987f,    0.34283f,     -0.114077f,   0.258462f,
+  -0.302443f,  0.301138f,    -0.00726621f, 0.276441f,    -0.291582f,
+  0.66498f,    -0.321451f,   -0.332805f,   0.0943272f,   0.572253f,
+  -0.45818f,   -0.0219593f,  -0.151679f,   0.402033f,    -1.15502f,
+  -0.882955f,  0.772904f,    0.88126f,     -0.149555f,   0.709525f,
+  0.350116f,   -0.21531f,    0.797893f,    0.0230234f,   0.0203034f,
+  0.2744f,     1.08273f,     0.039349f,    0.503909f,    -0.45892f,
+  -0.579516f,  -0.344058f,   0.390628f,    -0.386941f,   -0.430317f,
+  -0.0807066f, 0.435906f,    0.522996f,    0.724476f,    -0.74371f,
+  -0.05376f,   -0.340898f,   -0.962646f,   -0.0278005f,  0.0981149f,
+  -0.0811161f, 0.00237994f,  0.850042f,    0.0665473f,   0.134413f
+};
+
+static const float av1_simple_motion_search_prune_part_logits_bias_8[] = {
+  1.63404f, -0.715866f, -1.0132f, -2.08745f
+};
+
+static const NN_CONFIG av1_simple_motion_search_prune_part_nn_config_8 = {
+  NUM_FEATURES_8,
+  NUM_LOGITS_8,
+  NUM_HIDDEN_LAYERS_8,
+  {
+      NUM_LAYER_0_UNITS_8,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_kernel_8,
+      av1_simple_motion_search_prune_part_logits_kernel_8,
+  },
+  {
+      av1_simple_motion_search_prune_part_layer_0_bias_8,
+      av1_simple_motion_search_prune_part_logits_bias_8,
+  },
+};
 
 #undef NUM_HIDDEN_LAYERS_8
 #undef NUM_FEATURES_8
 #undef NUM_LAYER_0_UNITS_8
 #undef NUM_LOGITS_8
-#endif
+
+#define FEATURE_SIZE 19
+static const float av1_2pass_split_partition_weights_128[FEATURE_SIZE + 1] = {
+  2.683936f, -0.193620f, -4.106470f, -0.141320f, -0.282289f,
+  0.125296f, -1.134961f, 0.862757f,  -0.418799f, -0.637666f,
+  0.016232f, 0.345013f,  0.018823f,  -0.393394f, -1.130700f,
+  0.695357f, 0.112569f,  -0.341975f, -0.513882f, 5.7488966f,
+};
+
+static const float av1_2pass_split_partition_weights_64[FEATURE_SIZE + 1] = {
+  2.990993f,  0.423273f,  -0.926544f, 0.454646f,  -0.292698f,
+  -1.311632f, -0.284432f, 0.717141f,  -0.419257f, -0.574760f,
+  -0.674444f, 0.669047f,  -0.374255f, 0.380624f,  -0.804036f,
+  0.264021f,  0.004163f,  1.896802f,  0.924287f,  0.13490619f,
+};
+
+static const float av1_2pass_split_partition_weights_32[FEATURE_SIZE + 1] = {
+  2.795181f,  -0.136943f, -0.924842f, 0.405330f,  -0.463505f,
+  -0.584076f, -0.831472f, 0.382985f,  -0.597544f, -0.138915f,
+  -1.354350f, 0.466035f,  -0.553961f, 0.213202f,  -1.166429f,
+  0.010776f,  -0.096236f, 2.335084f,  1.699857f,  -0.58178353f,
+};
+
+static const float av1_2pass_split_partition_weights_16[FEATURE_SIZE + 1] = {
+  1.987888f,  -0.431100f, -1.687703f, 0.262602f,  -0.425298f,
+  -0.463870f, -1.493457f, 0.470917f,  -0.528457f, -0.087700f,
+  -1.815092f, 0.152883f,  -0.337908f, 0.093679f,  -1.548267f,
+  -0.042387f, -0.000861f, 2.556746f,  1.619192f,  0.03643292f,
+};
+
+static const float av1_2pass_split_partition_weights_8[FEATURE_SIZE + 1] = {
+  2.188344f,  -0.817528f, -2.119219f, 0.000000f,  -0.348167f,
+  -0.658074f, -1.960362f, 0.000000f,  -0.403080f, 0.282699f,
+  -2.061088f, 0.000000f,  -0.431919f, -0.127960f, -1.099550f,
+  0.000000f,  0.121622f,  2.017455f,  2.058228f,  -0.15475988f,
+};
+
+static const float av1_2pass_none_partition_weights_128[FEATURE_SIZE + 1] = {
+  -1.006689f, 0.777908f,  4.461072f,  -0.395782f, -0.014610f,
+  -0.853863f, 0.729997f,  -0.420477f, 0.282429f,  -1.194595f,
+  3.181220f,  -0.511416f, 0.117084f,  -1.149348f, 1.507990f,
+  -0.477212f, 0.202963f,  -1.469581f, 0.624461f,  -0.89081228f,
+};
+
+static const float av1_2pass_none_partition_weights_64[FEATURE_SIZE + 1] = {
+  -1.241117f, 0.844878f,  5.638803f,  -0.489780f, -0.108796f,
+  -4.576821f, 1.540624f,  -0.477519f, 0.227791f,  -1.443968f,
+  1.586911f,  -0.505125f, 0.140764f,  -0.464194f, 1.466658f,
+  -0.641166f, 0.195412f,  1.427905f,  2.080007f,  -1.98272777f,
+};
+
+static const float av1_2pass_none_partition_weights_32[FEATURE_SIZE + 1] = {
+  -2.130825f, 0.476023f,  5.907343f,  -0.516002f, -0.097471f,
+  -2.662754f, 0.614858f,  -0.576728f, 0.085261f,  -0.031901f,
+  0.727842f,  -0.600034f, 0.079326f,  0.324328f,  0.504502f,
+  -0.547105f, -0.037670f, 0.304995f,  0.369018f,  -2.66299987f,
+};
+
+static const float av1_2pass_none_partition_weights_16[FEATURE_SIZE + 1] = {
+  -1.626410f, 0.872047f,  5.414965f,  -0.554781f, -0.084514f,
+  -3.020550f, 0.467632f,  -0.382280f, 0.199568f,  0.426220f,
+  0.829426f,  -0.467100f, 0.153098f,  0.662994f,  0.327545f,
+  -0.560106f, -0.141610f, 0.403372f,  0.523991f,  -3.02891231f,
+};
+
+static const float av1_2pass_none_partition_weights_8[FEATURE_SIZE + 1] = {
+  -1.463349f, 0.375376f,  4.751430f, 0.000000f, -0.184451f,
+  -1.655447f, 0.443214f,  0.000000f, 0.127961f, 0.152435f,
+  0.083288f,  0.000000f,  0.143105f, 0.438012f, 0.073238f,
+  0.000000f,  -0.278137f, 0.186134f, 0.073737f, -1.6494962f,
+};
+#undef FEATURE_SIZE
+
+// nn model for predicting max square partition level of a superblock
+#define NUM_HIDDEN_LAYERS 1
+#define NUM_FEATURES 13
+#define NUM_LAYER_0_UNITS 48
+#define NUM_LOGITS 4
+
+static const float av1_max_part_pred_logits_kernel[] = {
+  -0.304561f,   0.0885596f,   -0.988539f,   1.08147f,    0.215213f,
+  0.202965f,    -0.828457f,   -0.233945f,   -0.0866977f, -0.115521f,
+  0.02079f,     0.196491f,    -0.0285075f,  0.05067f,    -0.00872862f,
+  0.00281844f,  -0.238954f,   0.0253801f,   0.0257775f,  0.339269f,
+  0.176174f,    -0.152545f,   -0.0588704f,  -1.62275f,   -0.189329f,
+  0.0808033f,   0.233844f,    -4.53798f,    0.674968f,   -0.0361688f,
+  -0.0754075f,  1.16129f,     -0.0188879f,  0.113255f,   -3.04378f,
+  0.814728f,    -0.568517f,   -0.00179383f, -3.61223f,   -1.67535f,
+  -2.20417f,    -0.197196f,   0.0507745f,   -0.0909394f, -0.0507879f,
+  -1.27999f,    -0.055623f,   0.0318497f,   0.192867f,   0.138726f,
+  0.0443392f,   -0.595075f,   -0.166774f,   0.0882958f,  -0.348161f,
+  0.0214428f,   -0.0599275f,  -0.0995385f,  -0.82358f,   0.141205f,
+  -0.053232f,   0.00508296f,  -1.90872f,    1.15004f,    -0.194219f,
+  0.0229019f,   -0.00354318f, 0.22016f,     0.154101f,   -0.159231f,
+  -0.0446647f,  -0.197503f,   0.0408453f,   0.197659f,   0.797858f,
+  -0.189722f,   0.343653f,    0.124666f,    -1.03083f,   0.603059f,
+  0.101565f,    0.0932993f,   0.462484f,    0.295984f,   1.11198f,
+  0.143709f,    -0.846232f,   -0.464392f,   -1.06058f,   -0.124889f,
+  0.0727475f,   1.18446f,     -0.100302f,   0.0641918f,  -0.101622f,
+  0.10219f,     0.130189f,    0.0915623f,   -0.166904f,  -1.10606f,
+  -0.16726f,    -0.146152f,   0.145443f,    -0.177091f,  -0.0215214f,
+  0.0158506f,   -0.553294f,   0.0784749f,   -0.0416628f, -0.027785f,
+  0.280027f,    0.484898f,    -0.164225f,   0.0238317f,  -0.0345254f,
+  0.0410244f,   0.131529f,    0.0239622f,   -0.0749436f, -0.0224914f,
+  0.128926f,    0.224539f,    0.413297f,    0.0638572f,  0.103308f,
+  0.0913242f,   -0.119274f,   0.0163103f,   0.113828f,   0.119809f,
+  0.297057f,    -0.124889f,   -0.533108f,   -0.181408f,  -0.129896f,
+  0.0221064f,   -0.0773281f,  -0.0386467f,  0.0342961f,  0.126575f,
+  -0.24114f,    0.0735576f,   0.0524791f,   0.246896f,   -0.130674f,
+  -0.03979f,    0.173639f,    1.95193f,     -0.113029f,  -0.0305852f,
+  -0.00671737f, 0.157159f,    -0.00102858f, -0.543688f,  0.566772f,
+  0.124124f,    -0.0294064f,  -0.0699021f,  -0.0704103f, -0.766097f,
+  -0.0625802f,  -0.0906173f,  -0.0520414f,  -0.0272724f, 0.283064f,
+  0.236213f,    -0.127319f,   0.019392f,    0.170042f,   -0.0214542f,
+  0.0740938f,   0.356578f,    -0.236257f,   0.269021f,   0.114759f,
+  -0.641166f,   0.136308f,    -0.0386959f,  -0.112024f,  -0.361209f,
+  0.686095f,    0.183906f,    0.288656f,    0.182007f,   0.337458f,
+  0.058974f,    -0.305512f,   -0.841708f,   -0.243779f,  -0.0614058f,
+  0.208747f,    0.448697f
+};
+
+static const float av1_max_part_pred_layer_0_bias[] = {
+  -0.776544f, -2.0022f,    -0.330294f, 2.47665f,  1.90206f,   -1.61571f,
+  0.536246f,  1.00455f,    5.24561f,   1.55111f,  -0.816399f, -4.88703f,
+  -1.06417f,  -1.15359f,   -0.145289f, 1.91831f,  0.630915f,  -1.94256f,
+  -3.35239f,  -1.05007f,   -1.05186f,  1.36824f,  -5.2878f,   1.10482f,
+  -5.00077f,  -0.0445198f, 3.41427f,   2.3439f,   -0.413306f, -1.88152f,
+  -2.28638f,  8.24783f,    -1.91961f,  -1.49324f, 1.96599f,   -6.32309f,
+  -0.332426f, -0.425506f,  4.06511f,   5.84386f,  4.15747f,   1.22402f,
+  2.8512f,    2.53027f,    0.0170272f, -1.43966f, -0.997785f, 5.43064f
+};
+
+static const float av1_max_part_pred_logits_bias[] = { -4.25432f, 0.144758f,
+                                                       1.96217f, 0.728905f };
+
+static const float av1_max_part_pred_layer_0_kernel[] = {
+  0.992471f,    0.533006f,    0.143743f,     -2.51788f,    -0.468337f,
+  -0.201376f,   -0.151834f,   0.479883f,     1.16061f,     -0.278878f,
+  -0.814954f,   -0.152405f,   -0.0521608f,   0.797104f,    -2.08912f,
+  0.385839f,    -2.22889f,    -0.106858f,    -0.239766f,   -0.951128f,
+  -0.698753f,   0.0831051f,   1.1702f,       0.342834f,    -0.0352795f,
+  -0.0847639f,  -0.802086f,   0.258982f,     1.14174f,     0.645885f,
+  -1.19226f,    -0.592888f,   -0.343659f,    1.1912f,      1.45411f,
+  -1.22927f,    0.152858f,    0.00373585f,   -1.60637f,    0.592611f,
+  0.0857475f,   -0.346147f,   -0.150784f,    -0.0817408f,  -0.189918f,
+  -0.804952f,   -1.33036f,    -1.03307f,     0.0248769f,   0.16607f,
+  -2.896f,      -2.1293f,     0.12293f,      -0.173179f,   -0.212128f,
+  -6.76221f,    0.033188f,    0.0231787f,    0.905957f,    0.0551327f,
+  -0.356276f,   0.0181795f,   0.0977523f,    -0.0352873f,  -0.0396386f,
+  2.3241f,      0.0632874f,   -0.11804f,     -6.32521f,    0.0224659f,
+  -0.00188896f, 0.267992f,    0.272337f,     0.00936963f,  0.659969f,
+  -2.25707f,    -0.0278229f,  -0.0185089f,   -1.14466f,    0.104827f,
+  0.0435885f,   0.558586f,    -0.00697004f,  0.0312611f,   0.540574f,
+  -0.568625f,   0.218608f,    0.378911f,     -0.0289192f,  -0.0734742f,
+  -1.08782f,    -2.42069f,    -0.0127239f,   0.0493651f,   -1.15837f,
+  0.261831f,    0.401824f,    -1.04545f,     0.284173f,    0.784972f,
+  -0.511243f,   -0.982599f,   -0.106134f,    -0.325964f,   -1.44107f,
+  -1.42434f,    -1.02402f,    -1.52034f,     0.0737116f,   0.0462242f,
+  0.628722f,    -1.0405f,     -0.113718f,    2.20573f,     -4.33951f,
+  -0.0192695f,  -0.0229314f,  -1.89156f,     0.645942f,    0.375708f,
+  -1.97447f,    -0.267014f,   0.0989443f,    -0.450534f,   -1.01737f,
+  -0.642416f,   -0.0897288f,  -2.08724f,     -0.190965f,   -0.279135f,
+  -0.830178f,   0.808754f,    -0.139091f,    1.11004f,     -0.454439f,
+  -0.479238f,   -1.44001f,    0.0888059f,    0.885689f,    -0.642505f,
+  -0.00773651f, -0.0265721f,  -0.906346f,    1.68504f,     0.084257f,
+  -0.951101f,   -8.06495f,    0.19231f,      0.16389f,     -0.193678f,
+  0.729837f,    -1.98392f,    -5.98513f,     3.32638f,     -0.0658378f,
+  -0.0910426f,  -0.666567f,   -0.315339f,    0.123124f,    -2.66375f,
+  -0.714852f,   -0.136176f,   -0.460166f,    -0.567551f,   -1.06193f,
+  -1.21389f,    -0.83865f,    0.00280695f,   -0.199519f,   -0.534704f,
+  0.419311f,    -0.149008f,   -3.68707f,     0.00285113f,  -0.0718198f,
+  -1.41026f,    -1.34155f,    -0.538687f,    -0.623666f,   -2.56462f,
+  -0.0183333f,  -0.323532f,   -1.27141f,     -0.0212039f,  0.198633f,
+  0.459554f,    -4.65103f,    -1.01293f,     -1.39512f,    -0.289026f,
+  0.208724f,    -0.665226f,   1.13369f,      -1.96734f,    -1.45442f,
+  -3.46172f,    0.810681f,    -0.603973f,    0.842764f,    -3.90371f,
+  -0.394561f,   -3.61363f,    -2.88085f,     0.031645f,    -0.23125f,
+  -2.63898f,    -1.35314f,    -0.46726f,     1.33145f,     1.20269f,
+  1.38682f,     -0.331637f,   0.069021f,     0.149523f,    -1.24957f,
+  -0.878857f,   -0.200368f,   0.465744f,     1.01365f,     -0.0122221f,
+  -0.550586f,   -1.12581f,    -0.422132f,    -0.0744868f,  -2.4804f,
+  -1.07072f,    -0.479006f,   0.101817f,     -0.118947f,   0.341576f,
+  -1.0538f,     -0.812346f,   -1.13727f,     -0.00939806f, 10.1571f,
+  -0.0441302f,  0.00280407f,  -21.5044f,     0.0181152f,   -0.0143246f,
+  3.23462f,     -1.38624f,    -1.80416f,     4.89763f,     -2.67364f,
+  2.31771e-05f, 0.000393989f, 0.352204f,     -0.193455f,   0.531455f,
+  0.488757f,    -0.442555f,   -0.518528f,    0.431482f,    -2.67727f,
+  -2.00626f,    -0.39729f,    -0.221494f,    -0.0188888f,  -0.0377649f,
+  -1.80169f,    0.0810332f,   -0.0408335f,   -1.28675f,    -0.0353824f,
+  -0.666723f,   -1.07281f,    0.252912f,     -1.24547f,    -1.7831f,
+  -1.14354f,    -0.137662f,   0.00230182f,   0.736862f,    0.175872f,
+  -0.187556f,   0.43963f,     -0.796524f,    0.056219f,    -0.387874f,
+  0.0710224f,   -0.16548f,    -0.100993f,    0.931481f,    -3.20738f,
+  -0.0197576f,  0.266148f,    -0.173909f,    -0.337795f,   -0.0682381f,
+  0.176844f,    0.140286f,    1.12033f,      0.429064f,    -2.24192f,
+  -1.54682f,    2.23646f,     -0.0371138f,   -0.0475339f,  -3.21766f,
+  0.0412858f,   0.387811f,    6.6711f,       0.140649f,    0.0559547f,
+  -0.802839f,   0.599977f,    0.64552f,      -2.08103f,    -0.503401f,
+  -0.0407036f,  -0.0299199f,  0.0849445f,    -0.111657f,   -1.63462f,
+  3.33762f,     0.0441394f,   0.0466889f,    -0.951806f,   0.0723954f,
+  0.00348661f,  -1.36903f,    2.24625f,      -0.0348915f,  -0.0508893f,
+  -0.240891f,   -0.120143f,   -0.17991f,     -2.09137f,    0.0150871f,
+  0.0480333f,   1.72012f,     0.0309551f,    -0.0370507f,  -0.377075f,
+  0.103916f,    -0.0169255f,  -0.0145395f,   -4.02144f,    0.83193f,
+  -0.316502f,   6.3832f,      -1.70038f,     -1.97215f,    -1.94501f,
+  1.45479f,     0.711725f,    -0.348496f,    -0.279056f,   -1.13396f,
+  -1.51744f,    -0.853307f,   1.53131f,      -0.0032358f,  1.41808f,
+  -1.32989f,    -0.245221f,   -0.161614f,    -0.500845f,   -0.449252f,
+  0.0724151f,   -0.116333f,   -0.0946182f,   -2.0945f,     0.0564572f,
+  0.393261f,    -1.06861f,    -0.111458f,    -0.839943f,   -0.0880348f,
+  0.0365742f,   0.415339f,    -1.57494f,     -0.713697f,   1.02349f,
+  -0.221371f,   -0.0446281f,  1.89223f,      -0.0811754f,  -0.402773f,
+  -0.930987f,   0.0243194f,   0.0678332f,    -0.0233014f,  0.165372f,
+  -0.44083f,    -1.2404f,     0.35675f,      -0.040916f,   -0.0512548f,
+  -2.9071f,     0.861174f,    -0.778133f,    2.14436f,     -0.688427f,
+  -0.480371f,   -1.69032f,    0.706687f,     -0.281982f,   -2.30451f,
+  1.61541f,     -0.0213638f,  -0.740509f,    -0.266677f,   0.0268434f,
+  -0.0116908f,  -3.17595f,    0.0114825f,    0.0196997f,   -0.144005f,
+  0.0550181f,   -0.851459f,   -0.000285073f, -0.538441f,   -0.0254868f,
+  -0.0104454f,  -0.0661998f,  -0.196469f,    -0.346372f,   -5.52892f,
+  -0.643683f,   -0.622224f,   -0.31463f,     -0.555956f,   -0.520132f,
+  -0.843166f,   -2.59479f,    -0.750195f,    0.00635995f,  -0.338615f,
+  -0.216676f,   -0.391544f,   -1.62185f,     -0.718471f,   -0.475406f,
+  -0.782041f,   -0.608824f,   -1.09633f,     -1.27308f,    -0.560719f,
+  -0.207539f,   -0.0196445f,  -1.05519f,     -0.575249f,   -1.0642f,
+  1.01615f,     -0.873633f,   -0.417953f,    -0.428051f,   0.350259f,
+  -2.53833f,    -2.72203f,    0.672846f,     -0.503094f,   -1.1374f,
+  0.214291f,    0.013305f,    0.0112064f,    1.10532f,     0.030455f,
+  0.0239614f,   0.628072f,    0.0539135f,    -0.472441f,   -0.688439f,
+  -0.32044f,    -0.0234867f,  -0.0158436f,   -0.949314f,   -0.0453161f,
+  -1.18306f,    0.626845f,    -0.426925f,    -0.688371f,   0.415062f,
+  0.0640985f,   -0.638387f,   -2.01399f,     -0.209744f,   -0.762892f,
+  -0.0753296f,  -0.879315f,   -0.520433f,    -0.111375f,   0.389742f,
+  -0.398862f,   -0.643227f,   -0.246396f,    0.0317051f,   1.06973f,
+  0.413617f,    0.180506f,    -0.0507897f,   -0.00650435f, 0.620892f,
+  0.046312f,    0.475032f,    0.906993f,     -0.0388061f,  -0.256271f,
+  -1.03323f,    0.0125266f,   -0.31116f,     -0.377611f,   -0.0386407f,
+  -0.0232745f,  -0.353644f,   -2.27289f,     0.0571779f,   -0.00865006f,
+  1.65101f,     0.0175711f,   0.0184585f,    0.558458f,    0.2213f,
+  -0.285089f,   0.433445f,    -0.427177f,    -0.0103682f,  -0.0101273f,
+  0.214085f,    -0.0459885f,  0.00761981f,   0.836381f,    0.0175293f,
+  0.02508f,     -1.51778f,    0.0143956f,    -0.162589f,   0.595418f,
+  0.21445f,     -0.0335848f,  -0.0136684f,   -0.16686f,    -0.14612f,
+  0.0816238f,   0.499636f,    0.12458f,      -2.41673f,    -0.261721f,
+  -0.676805f,   -1.88366f,    0.730462f,     0.69196f,     -0.0288489f,
+  -2.38272f,    0.329876f,    0.014517f,     -0.115145f,   -3.48151f,
+  -0.00209072f, -0.0732377f,  0.820443f,     -0.0118701f,  0.112145f,
+  0.272315f,    0.137531f,    -0.0200997f,   -0.0397883f,  -2.19458f,
+  0.183554f,    -0.639716f,   0.481605f,     -0.621639f,   -0.0980299f,
+  -0.710534f,   -0.143105f,   -6.77626f,     -1.65139f,    -2.37718f,
+  -0.533127f,   -1.12574f,    3.34182f,      -0.0758663f,  0.0334238f,
+  -9.48647f,    0.0674974f,   0.0507665f,    0.523007f,    -0.0668f,
+  0.5736f,      -0.589761f,   -1.1692f,      -0.0236497f,  -0.00828928f,
+  -0.265823f,   1.15284f,     0.307927f,     -0.695308f,   0.13725f,
+  -0.20394f,    -0.363965f,   -0.331159f,    -1.50927f,    -1.20051f,
+  -0.0205825f,  -0.0381859f,  -0.0579876f,   -1.6913f,     -1.94626f,
+  3.4214f,      3.3922f,      -2.13798f,     -0.679848f,   -0.890735f,
+  0.235017f,    -0.253202f,   -1.0571f,      1.40354f,     0.00719052f,
+  -1.54365f,    -0.7289f,     -1.05492f,     0.0238169f,   -0.00543592f,
+  -0.0510353f,  -0.175386f,   -0.724207f,    -0.788936f,   0.039976f,
+  1.36966f,     0.869475f,    -0.0302774f,   -0.0537556f
+};
+
+static const NN_CONFIG av1_max_part_pred_nn_config = {
+  NUM_FEATURES,
+  NUM_LOGITS,
+  NUM_HIDDEN_LAYERS,
+  {
+      NUM_LAYER_0_UNITS,
+  },
+  {
+      av1_max_part_pred_layer_0_kernel,
+      av1_max_part_pred_logits_kernel,
+  },
+  {
+      av1_max_part_pred_layer_0_bias,
+      av1_max_part_pred_logits_bias,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS
+#undef NUM_FEATURES
+#undef NUM_LAYER_0_UNITS
+#undef NUM_LOGITS
+
+// Early termination in second pass
+static const float av1_simple_motion_search_term_none_mean_128[28] = {
+  12.661922f, 12.638062f, 10.896497f, 10.865719f, 10.978963f, 10.940105f,
+  11.012235f, 10.972760f, 11.069924f, 11.018533f, 11.773865f, 11.747426f,
+  11.891315f, 11.858107f, 11.793916f, 11.766356f, 11.874997f, 11.840164f,
+  5.940535f,  0.770746f,  4.292692f,  4.309581f,  0.848423f,  4.292334f,
+  4.298179f,  8.514713f,  14.911736f, 19.825352f,
+};
+
+static const float av1_simple_motion_search_term_none_std_128[28] = {
+  1.796731f, 1.797056f, 1.898383f, 1.900753f, 1.846624f, 1.846953f, 1.906632f,
+  1.908089f, 1.836533f, 1.835967f, 1.840262f, 1.840671f, 1.816836f, 1.817103f,
+  1.879846f, 1.881333f, 1.803102f, 1.802654f, 2.263402f, 0.420354f, 1.117165f,
+  1.083779f, 0.358611f, 1.101183f, 1.084938f, 2.462638f, 1.577009f, 1.574711f,
+};
+
+static const float av1_simple_motion_search_term_none_mean_64[28] = {
+  10.904455f, 10.853546f, 9.247903f,  9.184479f,  9.251985f,  9.186686f,
+  9.253490f,  9.190190f,  9.270079f,  9.204357f,  10.086511f, 10.031060f,
+  10.100875f, 10.045429f, 10.069688f, 10.013173f, 10.082980f, 10.024640f,
+  4.888378f,  0.878113f,  3.598450f,  3.628491f,  0.925833f,  3.560971f,
+  3.573322f,  8.807137f,  13.348477f, 18.269117f,
+};
+
+static const float av1_simple_motion_search_term_none_std_64[28] = {
+  1.789300f, 1.787061f, 1.823519f, 1.820226f, 1.794643f, 1.788620f, 1.797194f,
+  1.795135f, 1.777795f, 1.773634f, 1.794000f, 1.790377f, 1.772197f, 1.769692f,
+  1.819050f, 1.817139f, 1.793577f, 1.789333f, 1.998251f, 0.327156f, 0.885748f,
+  0.853767f, 0.262043f, 0.902435f, 0.860033f, 1.224865f, 1.603411f, 1.589296f,
+};
+
+static const float av1_simple_motion_search_term_none_mean_32[28] = {
+  9.818970f, 9.751199f, 8.015079f, 7.927318f, 8.029113f, 7.938330f,  8.012570f,
+  7.923719f, 8.033508f, 7.941911f, 8.933057f, 8.857422f, 8.935639f,  8.859187f,
+  8.905495f, 8.829741f, 8.929428f, 8.851351f, 4.114069f, 0.954752f,  2.645082f,
+  2.709703f, 0.964678f, 2.652077f, 2.673393f, 9.430499f, 11.922798f, 16.942251f,
+};
+
+static const float av1_simple_motion_search_term_none_std_32[28] = {
+  1.737107f, 1.734327f, 1.727923f, 1.720244f, 1.721570f, 1.712775f, 1.718028f,
+  1.710370f, 1.711612f, 1.702596f, 1.754856f, 1.748855f, 1.741871f, 1.736304f,
+  1.722428f, 1.717380f, 1.713563f, 1.707582f, 1.761170f, 0.207847f, 0.900058f,
+  0.862356f, 0.184593f, 0.903822f, 0.856120f, 1.529199f, 1.412085f, 1.453153f,
+};
+
+static const float av1_simple_motion_search_term_none_mean_16[28] = {
+  8.998877f, 8.912468f, 7.085255f, 6.953476f, 7.086386f, 6.954091f,  7.088727f,
+  6.955747f, 7.093955f, 6.960635f, 8.065050f, 7.961432f, 8.071631f,  7.967233f,
+  8.041699f, 7.937715f, 8.046791f, 7.942183f, 3.833521f, 0.978421f,  1.901347f,
+  1.950124f, 0.979418f, 1.928000f, 1.936727f, 9.773951f, 10.735227f, 15.949769f,
+};
+
+static const float av1_simple_motion_search_term_none_std_16[28] = {
+  1.641193f, 1.640172f, 1.614794f, 1.608906f, 1.609571f, 1.603580f, 1.606928f,
+  1.601246f, 1.599230f, 1.593529f, 1.633747f, 1.630219f, 1.625695f, 1.622547f,
+  1.633827f, 1.630182f, 1.626607f, 1.622777f, 1.548838f, 0.145303f, 0.744550f,
+  0.736552f, 0.141980f, 0.742979f, 0.736977f, 1.366255f, 1.258794f, 1.294309f,
+};
+
+static const float av1_simple_motion_search_term_none_model_128[] = {
+  -0.6106842357f, -1.0402954455f, 0.6054417656f,  -0.2116623578f,
+  0.2447714930f,  0.3782256209f,  0.5095592479f,  -0.3275620904f,
+  0.3886188013f,  0.2629499420f,  -0.1979599415f, -0.5389565605f,
+  0.1209207902f,  -0.4913347466f, 0.3798542731f,  -0.2812861709f,
+  -0.1049824167f, -0.1088672020f, 0.4059596517f,  -0.1347896613f,
+  0.2276868621f,  0.0506386970f,  0.0071088411f,  0.0467952100f,
+  0.2091247458f,  -0.7371964736f, 0.1368935545f,  0.3175247786f,
+  -0.5493146094f,
+};
+
+static const float av1_simple_motion_search_term_none_model_64[] = {
+  -0.4150046575f, -0.3954358561f, 0.1997997444f,  0.3395826831f,
+  0.2827215753f,  0.3395683652f,  0.2483140395f,  0.2722216476f,
+  0.2610308009f,  0.3724974359f,  -0.0551479654f, -0.1721616359f,
+  -0.3459358629f, -0.0952524186f, -0.1428993840f, -0.0415654914f,
+  -0.3169539902f, -0.0269429900f, 0.9891530919f,  -0.0125084982f,
+  0.0972182377f,  0.0008889801f,  0.0205418050f,  0.0057237854f,
+  0.1005222691f,  -0.2851321920f, -1.5150336445f, 0.1893942436f,
+  -0.4337360901f,
+};
+
+static const float av1_simple_motion_search_term_none_model_32[] = {
+  -0.4667392852f, -0.3893302767f, 0.1603498635f,  0.2304974726f,
+  0.1404975592f,  0.2505516225f,  0.1423053884f,  0.2189318406f,
+  0.1379765409f,  0.2638241296f,  -0.1342865463f, -0.0549054345f,
+  -0.1925223436f, -0.1142702769f, 0.0127811659f,  0.0868639997f,
+  -0.0643197251f, 0.0279496470f,  0.9904395769f,  -0.0095178685f,
+  0.1179410649f,  -0.0013411972f, 0.0095060660f,  0.0195730400f,
+  0.0779717771f,  -0.2498860763f, -0.8168817125f, -0.4798397348f,
+  -0.6609679881f,
+};
+
+static const float av1_simple_motion_search_term_none_model_16[] = {
+  -0.3021081992f, -0.4620153673f, 0.0448577479f,  0.1738455035f,
+  0.0663209177f,  0.1629614573f,  0.0555168744f,  0.1631870212f,
+  0.0425805150f,  0.1688564954f,  0.0434083772f,  -0.0046603915f,
+  -0.0271580056f, -0.0183879127f, 0.1073730471f,  0.0314201476f,
+  0.0576891756f,  0.0119723753f,  0.9084332022f,  -0.0188429077f,
+  0.0755089811f,  -0.0172550234f, 0.0037663075f,  0.0022094472f,
+  0.0500247894f,  -0.2944572004f, -0.8908521199f, -0.2555515792f,
+  -0.5396254205f,
+};
+
+// Early termination in firstpass
+static const float av1_fp_simple_motion_search_term_none_mean_32[20] = {
+  10.216787f, 10.167575f, 8.405353f, 8.340786f,  8.436503f,
+  8.373259f,  8.444113f,  8.379074f, 8.448215f,  8.384669f,
+  4.107491f,  0.923902f,  2.702687f, 2.712742f,  0.953166f,
+  2.703244f,  2.707070f,  9.549801f, 12.013671f, 17.059454f,
+};
+
+static const float av1_fp_simple_motion_search_term_none_std_32[20] = {
+  1.886182f, 1.886638f, 1.884324f, 1.883410f, 1.851800f, 1.851652f, 1.847129f,
+  1.848014f, 1.832187f, 1.832360f, 1.758185f, 0.265155f, 0.939592f, 0.932395f,
+  0.211284f, 0.950024f, 0.945295f, 1.846744f, 1.453674f, 1.505994f,
+};
+
+static const float av1_fp_simple_motion_search_term_none_mean_16[20] = {
+  9.131485f, 9.065489f, 7.254479f, 7.158092f, 7.274240f,  7.178158f,  7.278780f,
+  7.182110f, 7.278793f, 7.182714f, 3.981902f, 0.964040f,  2.080875f,  2.087185f,
+  0.973397f, 2.088189f, 2.090166f, 9.386505f, 10.826546f, 15.985614f,
+};
+
+static const float av1_fp_simple_motion_search_term_none_std_16[20] = {
+  1.681172f, 1.688587f, 1.710854f, 1.717533f, 1.684010f, 1.691476f, 1.683537f,
+  1.691523f, 1.674699f, 1.682130f, 1.639731f, 0.186191f, 0.796448f, 0.795075f,
+  0.160921f, 0.791005f, 0.790048f, 1.430960f, 1.337976f, 1.370498f,
+};
+
+static const float av1_fp_simple_motion_search_term_none_mean_8[20] = {
+  7.821461f, 7.714526f, 5.799360f, 5.606948f, 5.805885f, 5.614357f,  5.794252f,
+  5.599669f, 5.798780f, 5.605399f, 4.069016f, 0.977720f, 1.577513f,  1.581266f,
+  0.983371f, 1.524603f, 1.524952f, 9.221803f, 9.508886f, 14.972815f,
+};
+
+static const float av1_fp_simple_motion_search_term_none_std_8[20] = {
+  1.618036f, 1.634415f, 1.652861f, 1.672006f, 1.646337f, 1.664935f, 1.650876f,
+  1.670476f, 1.645141f, 1.664301f, 1.502258f, 0.147592f, 0.760353f, 0.762547f,
+  0.127879f, 0.741096f, 0.742186f, 1.042003f, 1.292524f, 1.250398f,
+};
+
+#define NUM_HIDDEN_LAYERS_32 1
+#define NUM_FEATURES_32 20
+#define NUM_LAYER_0_UNITS_32 20
+#define NUM_LOGITS_32 1
+
+static const float
+    av1_fp_simple_motion_search_term_none_hiddenlayer_0_kernel_32[] = {
+      -0.293987f,   0.796773f,     -0.0888487f, -0.00796495f, -0.343768f,
+      0.0783252f,   0.0596814f,    -0.235432f,  -0.0780005f,  -0.409017f,
+      -0.256821f,   -0.281654f,    1.00889f,    0.701893f,    -0.0181661f,
+      0.119718f,    0.0956582f,    0.76792f,    0.235693f,    0.351628f,
+      -1.28111f,    -1.45847f,     0.387732f,   0.476054f,    0.384561f,
+      0.427465f,    0.11875f,      -0.0176598f, -0.0528453f,  0.395589f,
+      -0.331994f,   0.0442108f,    0.195171f,   -0.0377402f,  -0.0736457f,
+      -0.0490903f,  0.116165f,     -0.549512f,  0.12968f,     0.641055f,
+      -1.03066f,    -0.601979f,    0.351981f,   -0.122019f,   0.00869275f,
+      0.399222f,    -0.343995f,    -0.444257f,  -0.160805f,   -0.537537f,
+      0.261478f,    -0.163785f,    0.218916f,   0.106506f,    -0.103819f,
+      0.0121841f,   0.284757f,     -0.362989f,  1.10793f,     0.477236f,
+      -0.424117f,   -0.884156f,    -0.468291f,  -0.510531f,   0.791441f,
+      0.75243f,     0.839871f,     0.604127f,   -0.182956f,   -0.246703f,
+      -1.25861f,    0.0546303f,    0.0811323f,  0.00655988f,  0.0286305f,
+      -0.00938366f, -0.0291418f,   -0.231632f,  -0.331077f,   1.12479f,
+      -0.635514f,   -0.146066f,    0.853122f,   0.923699f,    0.180011f,
+      -0.252973f,   0.1474f,       -0.454344f,  0.354736f,    0.576872f,
+      -1.43275f,    0.0327868f,    0.140849f,   -0.102523f,   0.0524867f,
+      0.007091f,    -0.00232578f,  -0.536116f,  -0.700144f,   0.166646f,
+      0.0636548f,   0.44645f,      -0.346062f,  -0.685779f,   -1.0792f,
+      -0.999219f,   0.442744f,     0.371198f,   0.777914f,    0.719409f,
+      -0.417984f,   0.0602868f,    0.0225539f,  0.0457407f,   0.0249501f,
+      0.0126021f,   0.00450792f,   0.0485095f,  0.203485f,    0.584116f,
+      -0.599426f,   -0.244633f,    0.168231f,   -0.00134934f, -0.106987f,
+      -0.0490239f,  -0.22029f,     0.138017f,   0.373674f,    0.00638684f,
+      -2.08003f,    0.106453f,     0.124456f,   -0.0286108f,  0.0422698f,
+      0.013734f,    0.0780971f,    -0.40173f,   0.473453f,    1.16836f,
+      -0.251035f,   0.0119074f,    0.319241f,   0.0422023f,   -0.730454f,
+      -0.745948f,   0.796709f,     0.277634f,   0.09711f,     -0.212224f,
+      0.825348f,    0.0208521f,    -0.0238098f, 0.00929265f,  0.0516351f,
+      -0.02329f,    0.0983163f,    -0.180721f,  0.0122096f,   -0.246159f,
+      0.61468f,     0.923765f,     0.240435f,   -0.294845f,   -0.495317f,
+      -0.0563837f,  -0.417936f,    0.154874f,   -0.604407f,   -0.0681337f,
+      -0.65738f,    -0.0270073f,   0.0920023f,  -0.0742724f,  0.820862f,
+      -0.602758f,   -1.20617f,     -0.201707f,  0.869499f,    -0.0539076f,
+      0.403097f,    0.429168f,     -0.938227f,  -0.830894f,   -0.362462f,
+      -0.0658648f,  0.471469f,     -0.264827f,  0.610275f,    0.367995f,
+      0.735662f,    -0.0473157f,   -0.0380545f, -0.0848067f,  -0.146108f,
+      -0.125875f,   -0.0576117f,   -0.296198f,  -0.100443f,   -0.212971f,
+      0.593524f,    1.23111f,      -0.810009f,  -0.604572f,   0.203021f,
+      0.256285f,    -1.17049f,     -1.19156f,   0.24365f,     0.727876f,
+      -0.466826f,   0.0298762f,    -0.0331735f, -0.0109056f,  0.0114862f,
+      0.00396703f,  0.0385985f,    -0.0587946f, 0.821079f,    0.0582033f,
+      0.349156f,    1.03529f,      -0.407036f,  0.200308f,    -0.265649f,
+      -0.104567f,   0.161149f,     -0.0717528f, -0.0112724f,  0.0681578f,
+      0.103809f,    -0.0807997f,   0.0316814f,  -0.332323f,   0.112254f,
+      -0.163981f,   0.118988f,     -0.777055f,  -1.34047f,    -0.910482f,
+      0.74599f,     -0.59633f,     0.165649f,   -0.594998f,   0.0845802f,
+      0.00440975f,  0.122606f,     -0.463991f,  0.418502f,    -0.339126f,
+      1.41847f,     -0.109594f,    -0.411879f,  -0.444865f,   -0.0404821f,
+      -0.0607352f,  -0.663753f,    -0.724327f,  -0.138642f,   0.834144f,
+      -0.811695f,   -0.930264f,    0.150993f,   -0.325565f,   0.0615853f,
+      -0.473993f,   0.0966587f,    0.315197f,   1.0345f,      0.35441f,
+      0.703234f,    -0.335715f,    0.783153f,   0.467976f,    -0.0234736f,
+      0.549724f,    0.539107f,     -0.510182f,  -0.154442f,   0.0126656f,
+      1.66711f,     0.884555f,     0.118675f,   -0.341705f,   0.195316f,
+      -0.0366564f,  -0.619244f,    -0.634092f,  -0.559951f,   0.0564255f,
+      0.765917f,    0.0510238f,    0.0667615f,  0.0699302f,   -0.0351751f,
+      -0.0484402f,  -0.000792665f, -0.10775f,   -0.337121f,   -0.983947f,
+      0.517793f,    1.34977f,      -0.567602f,  0.129921f,    -0.443722f,
+      -0.276277f,   -0.501404f,    -0.183234f,  -0.553055f,   -0.447434f,
+      -0.35529f,    -0.0444689f,   0.0192031f,  0.0372702f,   -0.195202f,
+      -0.020753f,   -0.0247035f,   0.420298f,   1.39373f,     0.203699f,
+      -0.218818f,   0.250734f,     -0.0282348f, 0.411986f,    -0.262946f,
+      0.526339f,    0.242769f,     -0.159857f,  -0.546788f,   -0.0410147f,
+      0.954238f,    -0.0252765f,   0.639488f,   -0.491367f,   -0.0572638f,
+      0.285763f,    -0.45764f,     0.121657f,   -1.24374f,    -0.372479f,
+      -0.111521f,   0.194134f,     -0.271364f,  0.179678f,    0.121237f,
+      -0.14305f,    -0.205662f,    0.216891f,   0.344568f,    -0.523745f,
+      -1.00908f,    0.180965f,     0.0263031f,  -0.0556144f,  0.0831083f,
+      -0.0623274f,  0.112748f,     0.597137f,   -0.502616f,   -1.10624f,
+      -0.0487462f,  -1.10744f,     -0.125653f,  0.277049f,    -0.141329f,
+      -0.00457003f, -0.161038f,    0.588462f,   0.323317f,    0.49762f,
+      0.477561f,    0.901705f,     -0.264511f,  0.256557f,    0.076023f,
+      -0.0460696f,  0.0830666f,    -0.0651269f, -0.881245f,   -0.285999f,
+      0.53127f,     0.914533f,     0.0505795f,  -0.3054f,     -0.0988696f,
+      -0.0658403f,  0.15979f,      -0.453316f,  -0.824834f,   -0.280222f,
+      -0.686952f,   -0.0768344f,   -1.12235f,   -0.815408f,   0.0202134f,
+      -0.111892f,   0.0847659f,    -0.18763f,   0.597782f,    0.364016f
+    };
+
+static const float
+    av1_fp_simple_motion_search_term_none_hiddenlayer_0_bias_32[] = {
+      -1.541f,     -0.00935641f, -1.50754f, -0.638648f, -0.679403f,
+      -0.0387804f, -0.714791f,   -1.69522f, 0.435677f,  -1.5846f,
+      0.108788f,   0.614982f,    0.111048f, -0.465826f, -0.611358f,
+      0.637197f,   0.929621f,    -1.20889f, 0.954558f,  0.716529f
+    };
+
+static const float av1_fp_simple_motion_search_term_none_logits_kernel_32[] = {
+  0.396195f,   -0.791364f,  -0.881893f, 1.0542069f, 0.772562f,
+  0.60815647f, 1.117405f,   -1.272638f, 0.483183f,  -0.917147f,
+  0.690799f,   -0.601466f,  -0.545536f, -0.416353f, -0.927874f,
+  0.972198f,   -0.3770457f, 0.542694f,  -0.591889f, 0.464565f
+};
+
+static const float av1_fp_simple_motion_search_term_none_logits_bias_32[] = {
+  -0.590318f
+};
+
+static const NN_CONFIG av1_fp_simple_motion_search_term_none_nn_config_32 = {
+  NUM_FEATURES_32,
+  NUM_LOGITS_32,
+  NUM_HIDDEN_LAYERS_32,
+  {
+      NUM_LAYER_0_UNITS_32,
+  },
+  {
+      av1_fp_simple_motion_search_term_none_hiddenlayer_0_kernel_32,
+      av1_fp_simple_motion_search_term_none_logits_kernel_32,
+  },
+  {
+      av1_fp_simple_motion_search_term_none_hiddenlayer_0_bias_32,
+      av1_fp_simple_motion_search_term_none_logits_bias_32,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_32
+#undef NUM_FEATURES_32
+#undef NUM_LAYER_0_UNITS_32
+#undef NUM_LOGITS_32
+
+#define NUM_HIDDEN_LAYERS_16 1
+#define NUM_FEATURES_16 20
+#define NUM_LAYER_0_UNITS_16 24
+#define NUM_LOGITS_16 1
+
+static const float
+    av1_fp_simple_motion_search_term_none_hiddenlayer_0_kernel_16[] = {
+      -0.315922f,   0.74455f,     -0.0196939f,  0.238336f,    0.288554f,
+      0.0845902f,   -0.0121831f,  0.455303f,    0.0235902f,   0.218997f,
+      -0.0445164f,  0.0752211f,   0.0539915f,   -0.0439682f,  -0.397139f,
+      -0.0030004f,  -0.106365f,   0.845384f,    0.684638f,    -0.965702f,
+      0.307643f,    -0.0433377f,  -0.0644826f,  -0.214946f,   -0.44467f,
+      0.142967f,    0.0109982f,   -0.344458f,   -0.42947f,    0.269175f,
+      -0.88534f,    -0.28077f,    -1.36018f,    -0.33725f,    -0.0885953f,
+      -0.123887f,   0.218107f,    -0.0759977f,  0.739124f,    0.684048f,
+      0.577964f,    -0.328481f,   -0.247837f,   0.00546713f,  0.191895f,
+      -0.145274f,   0.320121f,    -0.482379f,   0.534585f,    -0.1582f,
+      0.944784f,    0.944665f,    0.0494451f,   -0.0399724f,  -0.170375f,
+      -0.0869746f,  0.106216f,    -0.120556f,   -1.57849f,    -0.752895f,
+      0.424454f,    -0.0269515f,  0.00398589f,  0.214165f,    -0.142986f,
+      0.199223f,    0.049624f,    -0.116783f,   -0.648119f,   -0.311599f,
+      0.122629f,    -0.0338422f,  0.345092f,    -0.408254f,   0.601037f,
+      -0.00146985f, 0.00133926f,  0.0392668f,   -0.931156f,   0.31429f,
+      -0.150243f,   0.0755763f,   -0.32177f,    0.258521f,    -0.104078f,
+      -0.144506f,   0.0199566f,   -0.454723f,   -0.292959f,   -0.0953681f,
+      -1.24843f,    0.446814f,    -0.311363f,   0.0590878f,   -0.0568717f,
+      -0.421585f,   0.179852f,    0.668763f,    0.48914f,     0.290584f,
+      -1.14053f,    -1.37576f,    0.420112f,    -0.158582f,   0.268231f,
+      0.252999f,    0.276423f,    0.529033f,    0.141127f,    0.702762f,
+      0.181407f,    -0.0279289f,  -0.0194757f,  0.0752152f,   -0.136963f,
+      0.00902489f,  0.125334f,    0.0680212f,   -0.370449f,   0.438003f,
+      -0.600869f,   0.154209f,    -0.36306f,    -0.484209f,   0.140093f,
+      0.0743079f,   -0.143317f,   0.0442872f,   0.272089f,    0.601531f,
+      1.20687f,     -0.280695f,   0.222235f,    -0.0106747f,  -0.017026f,
+      0.204008f,    -0.0316111f,  -0.64679f,    -0.866749f,   -0.774231f,
+      0.306231f,    -0.0940114f,  -0.56555f,    -0.34399f,    0.425142f,
+      0.424064f,    -0.50189f,    -0.146558f,   0.544899f,    0.141728f,
+      1.14592f,     -0.0124826f,  0.111613f,    -0.0862228f,  0.0211737f,
+      0.0614017f,   0.0245077f,   -0.454523f,   -0.0766391f,  -0.436808f,
+      0.251409f,    -0.13354f,    -0.242447f,   -0.311807f,   -0.844505f,
+      -0.671486f,   0.0946297f,   0.241702f,    0.856521f,    0.529763f,
+      -0.869772f,   -0.0016341f,  0.14511f,     0.0136254f,   -0.0359721f,
+      -0.0454713f,  0.00664495f,  0.0373555f,   0.653991f,    -0.075867f,
+      -0.102728f,   -0.947685f,   -0.119479f,   -0.145413f,   0.148364f,
+      0.310885f,    -0.266837f,   0.354087f,    0.299469f,    0.603911f,
+      0.257161f,    0.0190527f,   0.152862f,    -0.0987196f,  -0.293369f,
+      0.139026f,    -0.128421f,   0.0505933f,   -0.703803f,   1.08628f,
+      -0.562294f,   -0.818943f,   0.102178f,    0.727399f,    -0.228433f,
+      0.484057f,    0.0595919f,   -0.0559087f,  -0.549447f,   0.176168f,
+      1.41744f,     -0.126284f,   0.0987251f,   -0.00123073f, 0.00510827f,
+      0.105209f,    0.0671775f,   -0.438525f,   0.211028f,    -0.782459f,
+      0.286411f,    -0.459887f,   0.0633669f,   0.329958f,    -0.0736945f,
+      0.45188f,     -0.2447f,     0.676601f,    0.600321f,    -0.0336198f,
+      0.108531f,    0.0452834f,   -0.0848577f,  0.0731281f,   1.32381f,
+      -0.118349f,   0.129497f,    -0.840938f,   -1.45444f,    -0.559047f,
+      -0.248109f,   -0.491559f,   -0.139812f,   0.175964f,    0.168687f,
+      0.123031f,    0.201625f,    0.422849f,    0.34436f,     0.0426694f,
+      0.558045f,    -0.246772f,   0.679483f,    -0.0959578f,  -0.102879f,
+      0.391029f,    0.280906f,    0.0867408f,   -1.10932f,    0.402526f,
+      -0.227285f,   0.336087f,    -0.237765f,   0.185619f,    -0.309732f,
+      0.0781132f,   -0.0234955f,  0.0828806f,   0.19966f,     -0.241288f,
+      -0.224634f,   0.0638918f,   -0.143521f,   -0.0206692f,  -0.27131f,
+      0.973051f,    1.12031f,     0.262846f,    0.471585f,    0.105231f,
+      -0.386434f,   -0.355846f,   0.7359f,      0.567308f,    0.130768f,
+      0.242369f,    -0.0272523f,  -0.118436f,   0.374145f,    0.24802f,
+      -1.00186f,    -0.0241195f,  0.0140446f,   0.0202831f,   0.163197f,
+      0.0399298f,   -0.00912791f, -0.280572f,   -0.309893f,   -0.644495f,
+      0.243838f,    0.731391f,    0.0725078f,   0.350308f,    -0.136691f,
+      0.208814f,    0.0218567f,   -0.0805393f,  -0.18681f,    -0.214638f,
+      0.273354f,    -0.355047f,   0.242748f,    0.472951f,    -0.202705f,
+      0.405247f,    0.161622f,    -0.284883f,   -1.31181f,    -0.661056f,
+      -0.248219f,   -0.827307f,   0.289221f,    0.660529f,    0.48563f,
+      0.407366f,    0.0327303f,   -0.0610309f,  -0.647064f,   0.0899991f,
+      0.376267f,    1.27555f,     0.0264175f,   0.153931f,    1.07345f,
+      0.0715052f,   0.174473f,    0.01322f,     -0.715723f,   0.113909f,
+      0.100968f,    -0.457287f,   -0.672022f,   -0.20532f,    0.895176f,
+      0.357034f,    0.5413f,      0.918393f,    -0.455f,      -0.499617f,
+      -1.21799f,    0.0634338f,   0.144944f,    -0.106715f,   0.0227713f,
+      -0.0203213f,  0.030851f,    -0.0726756f,  0.589192f,    -0.060841f,
+      -0.198521f,   0.497179f,    -0.0591156f,  -0.135466f,   -0.132638f,
+      -0.181333f,   -0.332358f,   0.0349959f,   0.212885f,    -0.536206f,
+      -0.425009f,   -0.035525f,   0.0384449f,   0.0360549f,   -0.0383953f,
+      -0.0263281f,  -0.0228435f,  1.11771f,     0.928061f,    -0.163923f,
+      -0.327868f,   -0.894518f,   0.00448907f,  0.0805977f,   0.329559f,
+      0.157429f,    0.292729f,    0.497688f,    0.188659f,    0.203724f,
+      -1.26001f,    -0.0392533f,  -0.0566088f,  0.000859925f, 0.125254f,
+      0.054261f,    0.0357295f,   -0.393813f,   -0.275944f,   0.299657f,
+      -0.211421f,   0.038172f,    -0.439829f,   -0.913949f,   0.35642f,
+      0.865473f,    -0.472033f,   -0.752376f,   0.995255f,    0.417965f,
+      -0.680645f,   0.0622027f,   0.128878f,    -0.0357859f,  0.0793577f,
+      0.203629f,    -0.0600867f,  0.0512268f,   0.528584f,    0.23889f,
+      0.38255f,     -0.216407f,   -0.0338828f,  0.0328103f,   -0.885678f,
+      -0.716634f,   0.438663f,    0.320841f,    -0.119656f,   0.626092f,
+      0.8526f,      -0.0325005f,  -0.0275416f,  -0.171131f,   0.0260563f,
+      -0.0162027f,  0.0879367f,   -0.340473f,   0.0220265f,   -0.1731f,
+      0.512539f,    0.587822f,    -0.175619f,   0.177215f,    -0.35458f,
+      -0.159059f,   -0.423754f,   0.0198413f,   -0.336208f,   -0.359052f,
+      -1.50819f,    0.0628184f,   0.054506f,    0.0048834f,   0.361657f,
+      0.00986886f,  -0.0721521f,  -0.256765f,   1.41173f,     0.376196f,
+      -0.0783331f,  0.174803f,    -0.00240091f, -0.306571f,   -0.304654f,
+      -0.0348377f,  0.115569f,    -0.20359f,    -0.162341f,   -0.0443526f,
+      -0.848317f,   -0.228167f,   0.699534f,    0.482092f,    -0.0921484f,
+      -0.172425f,   -0.0610094f,  -0.188327f,   0.836209f,    0.541725f
+    };
+
+static const float
+    av1_fp_simple_motion_search_term_none_hiddenlayer_0_bias_16[] = {
+      -0.388147f, -0.0868767f, 0.702129f,  0.376659f, -0.709988f, 0.496603f,
+      -0.238442f, -1.35761f,   -0.391887f, 0.235468f, -0.327982f, 0.731842f,
+      1.0949f,    -0.789218f,  -0.881452f, 0.514341f, 0.727894f,  -0.494498f,
+      -1.32304f,  -1.22643f,   -0.294287f, -1.3974f,  -0.128148f, -0.0956137f
+    };
+
+static const float av1_fp_simple_motion_search_term_none_logits_kernel_16[] = {
+  0.456147f,   0.248707f,  -0.5205241f, -0.1506567f, 0.388359f,   -0.6074409f,
+  -0.4719775f, -0.733864f, 0.5588447f,  -0.4021345f, -1.140733f,  -0.73399f,
+  -0.4299591f, 0.450688f,  0.817564f,   -0.265486f,  -0.3525806f, 0.55188314f,
+  1.365457f,   1.180764f,  0.587772f,   -0.870683f,  0.818839f,   0.318488f
+};
+
+static const float av1_fp_simple_motion_search_term_none_logits_bias_16[] = {
+  -0.1046478f
+};
+
+static const NN_CONFIG av1_fp_simple_motion_search_term_none_nn_config_16 = {
+  NUM_FEATURES_16,
+  NUM_LOGITS_16,
+  NUM_HIDDEN_LAYERS_16,
+  {
+      NUM_LAYER_0_UNITS_16,
+  },
+  {
+      av1_fp_simple_motion_search_term_none_hiddenlayer_0_kernel_16,
+      av1_fp_simple_motion_search_term_none_logits_kernel_16,
+  },
+  {
+      av1_fp_simple_motion_search_term_none_hiddenlayer_0_bias_16,
+      av1_fp_simple_motion_search_term_none_logits_bias_16,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_16
+#undef NUM_FEATURES_16
+#undef NUM_LAYER_0_UNITS_16
+#undef NUM_LOGITS_16
+
+#define NUM_HIDDEN_LAYERS_8 1
+#define NUM_FEATURES_8 20
+#define NUM_LAYER_0_UNITS_8 16
+#define NUM_LOGITS_8 1
+
+static const float
+    av1_fp_simple_motion_search_term_none_hiddenlayer_0_kernel_8[] = {
+      -1.11024f,    -0.530449f,    -0.164768f,  0.675431f,   0.456155f,
+      0.711099f,    -0.248095f,    0.112132f,   -0.131481f,  0.234457f,
+      0.128073f,    0.306214f,     0.175471f,   0.220189f,   -0.270533f,
+      0.293534f,    -0.0795547f,   0.234901f,   -0.191754f,  0.101171f,
+      -0.108621f,   0.395477f,     -0.529459f,  -0.354854f,  -0.941334f,
+      -0.237689f,   0.39357f,      0.527129f,   0.174333f,   -0.00520422f,
+      1.22219f,     -0.21815f,     0.0866816f,  -0.29591f,   -0.212968f,
+      0.00431436f,  -0.295382f,    -0.582317f,  -0.284654f,  0.486427f,
+      -0.202448f,   -0.0421883f,   -0.116346f,  -0.345832f,  -0.0471637f,
+      -0.149954f,   -0.0969526f,   -0.59491f,   0.594364f,   0.298285f,
+      -1.33301f,    0.149562f,     0.097433f,   0.157641f,   -0.231132f,
+      -0.0191656f,  0.149396f,     0.811553f,   1.07336f,    0.140674f,
+      1.02134f,     0.455909f,     -0.0548795f, 0.0459996f,  -0.0589837f,
+      -0.116328f,   -0.607502f,    -0.232595f,  -0.517977f,  -0.325901f,
+      1.35047f,     -0.148698f,    0.0313182f,  0.181634f,   0.06539f,
+      0.00820322f,  0.0522113f,    -1.06071f,   -0.817999f,  -0.527422f,
+      -1.39175f,    -0.110088f,    0.0858626f,  -0.247541f,  0.29043f,
+      1.13767f,     0.185834f,     0.390613f,   -0.501175f,  -0.214176f,
+      -0.256376f,   0.496687f,     0.240471f,   0.218852f,   0.513543f,
+      0.400559f,    -0.249168f,    -0.752987f,  0.430491f,   -0.72299f,
+      0.339754f,    0.396623f,     -0.0638322f, 0.353122f,   0.355662f,
+      -0.0704821f,  0.195448f,     0.179396f,   0.486533f,   0.0815535f,
+      -0.503726f,   -0.000321223f, 0.501591f,   -0.117849f,  0.217667f,
+      -0.123391f,   -0.4026f,      0.149756f,   -0.0359276f, -0.0990213f,
+      -0.215278f,   -0.293649f,    0.301629f,   -0.11081f,   -0.206725f,
+      -0.00147108f, 0.363644f,     -0.430092f,  0.169524f,   0.116091f,
+      -0.583605f,   -0.0974948f,   0.253256f,   0.22648f,    0.136902f,
+      -0.882541f,   -0.75078f,     -0.0629343f, 0.411035f,   0.265742f,
+      -0.360904f,   -0.899324f,    0.605871f,   0.0318372f,  0.0735312f,
+      -0.00960722f, 0.691249f,     0.127449f,   -0.133021f,  -0.0793589f,
+      0.665591f,    -0.0682262f,   -0.0437626f, 0.0783621f,  2.25727f,
+      0.126529f,    -0.0320763f,   -0.261759f,  -1.19987f,   0.216295f,
+      -0.253886f,   -0.642908f,    0.1865f,     0.00299179f, 0.0246782f,
+      -0.00750628f, 0.566367f,     0.99916f,    -0.0209625f, 0.273254f,
+      1.09724f,     0.30026f,      0.21585f,    -0.0276715f, 0.338996f,
+      0.129884f,    -0.00628438f,  0.0461783f,  -1.36378f,   -0.394756f,
+      -0.395261f,   0.215928f,     0.252803f,   -0.207108f,  -0.0506214f,
+      -0.0138889f,  0.124197f,     -0.0522996f, 0.533803f,   -0.25729f,
+      -0.463514f,   0.128322f,     -1.04751f,   -0.605498f,  -0.107235f,
+      -0.00813289f, 0.539742f,     -0.0524178f, 0.272101f,   0.151935f,
+      0.607511f,    -0.0608427f,   0.36342f,    0.0999134f,  0.69712f,
+      -0.152471f,   0.364244f,     0.410644f,   0.312606f,   0.405679f,
+      -0.371656f,   -0.0492209f,   -0.148911f,  0.214996f,   -0.274749f,
+      -0.0372888f,  0.079023f,     -0.429136f,  -1.30393f,   -0.833824f,
+      -1.31373f,    -0.445343f,    0.526917f,   1.30569f,    -0.0626746f,
+      0.282353f,    -0.28552f,     0.28084f,    -0.234934f,  0.227076f,
+      1.09919f,     0.33248f,      -0.114933f,  0.40629f,    0.331031f,
+      0.245334f,    -0.0318782f,   0.00735305f, -1.58715f,   0.126443f,
+      -0.09472f,    -0.182152f,    0.311673f,   -0.186136f,  0.817743f,
+      0.928961f,    0.117334f,     -0.373644f,  -0.0797864f, 0.205565f,
+      0.0789797f,   0.0757131f,    -0.152409f,  0.30301f,    -0.0170824f,
+      -0.194496f,   0.485547f,     0.370124f,   -0.802044f,  -0.789671f,
+      0.669258f,    0.55082f,      -0.438853f,  0.0597597f,  -0.0148101f,
+      -0.41603f,    0.0486339f,    -0.464523f,  -0.413725f,  0.00907629f,
+      0.70351f,     -0.136422f,    -0.145957f,  -0.0626726f, -0.115773f,
+      -0.333937f,   0.135474f,     -0.379598f,  -0.134422f,  0.227595f,
+      0.908927f,    0.759504f,     -0.0088258f, -0.349333f,  0.122667f,
+      -0.682175f,   0.2201f,       -0.332003f,  -0.44433f,   -0.620308f,
+      -1.36716f,    -0.0167907f,   -0.538969f,  0.256824f,   -0.0706724f,
+      -0.0392471f,  -0.156312f,    0.153699f,   1.41967f,    0.0434739f,
+      0.428178f,    -0.0714879f,   0.0912104f,  0.00687985f, 0.341789f,
+      0.217381f,    0.128288f,     0.0286751f,  0.527344f,   -0.428139f,
+      0.60908f,     1.02074f,      -0.0977894f, 0.158067f,   0.28958f,
+      -0.065152f,   0.120616f,     -0.882976f,  -1.10413f,   -1.37497f
+    };
+
+static const float
+    av1_fp_simple_motion_search_term_none_hiddenlayer_0_bias_8[] = {
+      1.37086f,  -1.61858f, -1.32395f,  0.276031f, -0.124696f, -1.71489f,
+      -1.68429f, 1.79103f,  -0.335306f, -1.81523f, 0.841083f,  -0.542628f,
+      -1.82168f, 0.459829f, 0.0949306f, 0.918486f
+    };
+
+static const float av1_fp_simple_motion_search_term_none_logits_kernel_8[] = {
+  -0.283418f, -0.444453f, 0.4977782f, -0.4138758f, 0.41890771f, 0.22149438f,
+  0.545079f,  -0.729164f, 0.619389f,  0.5169534f,  -0.4236282f, 0.7304213f,
+  0.531938f,  -0.14828f,  0.75119f,   -0.464074f
+};
+
+static const float av1_fp_simple_motion_search_term_none_logits_bias_8[] = {
+  -2.22338f
+};
+
+static const NN_CONFIG av1_fp_simple_motion_search_term_none_nn_config_8 = {
+  NUM_FEATURES_8,
+  NUM_LOGITS_8,
+  NUM_HIDDEN_LAYERS_8,
+  {
+      NUM_LAYER_0_UNITS_8,
+  },
+  {
+      av1_fp_simple_motion_search_term_none_hiddenlayer_0_kernel_8,
+      av1_fp_simple_motion_search_term_none_logits_kernel_8,
+  },
+  {
+      av1_fp_simple_motion_search_term_none_hiddenlayer_0_bias_8,
+      av1_fp_simple_motion_search_term_none_logits_bias_8,
+  },
+};
+
+#undef NUM_HIDDEN_LAYERS_8
+#undef NUM_FEATURES_8
+#undef NUM_LAYER_0_UNITS_8
+#undef NUM_LOGITS_8
+
+static const float av1_fp_simple_motion_search_term_none_thresh_32 =
+    -2.2884985045792563f;
+static const float av1_fp_simple_motion_search_term_none_thresh_16 =
+    -1.6656874577527165f;
+static const float av1_fp_simple_motion_search_term_none_thresh_8 =
+    -3.608804354309157f;
 
 #ifdef __cplusplus
 }  // extern "C"

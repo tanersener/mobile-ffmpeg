@@ -17,6 +17,8 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sys/types.h>
+#include <sys/stat.h>
 #include "fftools_ffmpeg.h"
 #include "MobileFFmpegConfig.h"
 #include "ArchDetect.h"
@@ -140,6 +142,7 @@ static id<LogDelegate> logDelegate = nil;
 static id<StatisticsDelegate> statisticsDelegate = nil;
 
 NSString *const LIB_NAME = @"mobile-ffmpeg";
+NSString *const MOBILE_FFMPEG_PIPE_PREFIX = @"mf_pipe_";
 
 static Statistics *lastReceivedStatistics = nil;
 
@@ -149,6 +152,7 @@ extern NSMutableString *lastCommandOutput;
 
 NSMutableString *systemCommandOutput;
 static int runningSystemCommand;
+static int lastCreatedPipeIndex;
 
 void callbackWait(int milliSeconds) {
     dispatch_semaphore_wait(semaphore, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(milliSeconds * NSEC_PER_MSEC)));
@@ -160,6 +164,9 @@ void callbackNotify() {
 
 /**
  * Adds log data to the end of callback data list.
+ *
+ * @param level log level
+ * @param logData log data
  */
 void logCallbackDataAdd(int level, NSString *logData) {
     CallbackData *callbackData = [[CallbackData alloc] initWithLogLevel:level data:logData];
@@ -207,10 +214,10 @@ CallbackData *callbackDataRemove() {
 /**
  * Callback function for FFmpeg logs.
  *
- * \param pointer to AVClass struct
- * \param level
- * \param format
- * \param arguments
+ * @param ptr pointer to AVClass struct
+ * @param level log level
+ * @param format format string
+ * @param vargs arguments
  */
 void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format, va_list vargs) {
 
@@ -231,13 +238,13 @@ void mobileffmpeg_log_callback_function(void *ptr, int level, const char* format
 /**
  * Callback function for FFmpeg statistics.
  *
- * \param frameNumber last processed frame number
- * \param fps frames processed per second
- * \param quality quality of the output stream (video only)
- * \param size size in bytes
- * \param time processed output duration
- * \param bitrate output bit rate in kbits/s
- * \param speed processing speed = processed duration / operation duration
+ * @param frameNumber last processed frame number
+ * @param fps frames processed per second
+ * @param quality quality of the output stream (video only)
+ * @param size size in bytes
+ * @param time processed output duration
+ * @param bitrate output bit rate in kbits/s
+ * @param speed processing speed = processed duration / operation duration
  */
 void mobileffmpeg_statistics_callback_function(int frameNumber, float fps, float quality, int64_t size, int time, double bitrate, double speed) {
     statisticsCallbackDataAdd(frameNumber, fps, quality, size, time, bitrate, speed);
@@ -247,7 +254,10 @@ void mobileffmpeg_statistics_callback_function(int frameNumber, float fps, float
  * Forwards callback messages to Delegates.
  */
 void callbackBlockFunction() {
-    NSLog(@"Async callback block started.\n");
+    int activeLogLevel = av_log_get_level();
+    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+        NSLog(@"Async callback block started.\n");
+    }
 
     while(redirectionEnabled) {
         @autoreleasepool {
@@ -306,13 +316,19 @@ void callbackBlockFunction() {
                 }
 
             } @catch(NSException *exception) {
-                NSLog(@"Async callback block received error: %@n\n", exception);
-                NSLog(@"%@", [exception callStackSymbols]);
+                activeLogLevel = av_log_get_level();
+                if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+                    NSLog(@"Async callback block received error: %@n\n", exception);
+                    NSLog(@"%@", [exception callStackSymbols]);
+                }
             }
         }
     }
 
-    NSLog(@"Async callback block stopped.\n");
+    activeLogLevel = av_log_get_level();
+    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+        NSLog(@"Async callback block stopped.\n");
+    }
 }
 
 static int systemCommandOutputContainsPattern(NSArray *patternList) {
@@ -329,10 +345,10 @@ static int systemCommandOutputContainsPattern(NSArray *patternList) {
 /**
  * Executes system command. System command is not logged to output.
  *
- * \param arguments command arguments
- * \param commandOutputEndPatternList list of patterns which will indicate that operation has ended
- * \param timeout execution timeout
- * \return return code
+ * @param arguments command arguments
+ * @param commandOutputEndPatternList list of patterns which will indicate that operation has ended
+ * @param timeout execution timeout
+ * @return return code
  */
 int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPatternList, long timeout) {
     systemCommandOutput = [[NSMutableString alloc] init];
@@ -359,7 +375,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns build configuration for FFmpeg.
  *
- * \return build configuration string
+ * @return build configuration string
  */
 + (NSString*)getBuildConf;
 
@@ -408,6 +424,8 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     callbackDataArray = [[NSMutableArray alloc] init];
 
     runningSystemCommand = 0;
+    lastCreatedPipeIndex = 0;
+
     systemCommandOutput = [[NSMutableString alloc] init];
 
     [MobileFFmpegConfig enableRedirection];
@@ -458,7 +476,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns log level.
  *
- * \return log level
+ * @return log level
  */
 + (int)getLogLevel {
     return av_log_get_level();
@@ -467,7 +485,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Sets log level.
  *
- * \param log level
+ * @param level log level
  */
 + (void)setLogLevel: (int)level {
     av_log_set_level(level);
@@ -476,8 +494,8 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Converts int log level to string.
  *
- * \param level value
- * \return string value
+ * @param level value
+ * @return string value
  */
 + (NSString*)logLevelToString: (int)level {
     switch (level) {
@@ -497,7 +515,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Sets a LogDelegate. logCallback method inside LogDelegate is used to redirect logs.
  *
- * \param new log delegate
+ * @param newLogDelegate new log delegate
  */
 + (void)setLogDelegate: (id<LogDelegate>)newLogDelegate {
     logDelegate = newLogDelegate;
@@ -506,7 +524,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Sets a StatisticsDelegate.
  *
- * \param statistics delegate
+ * @param newStatisticsDelegate statistics delegate
  */
 + (void)setStatisticsDelegate: (id<StatisticsDelegate>)newStatisticsDelegate {
     statisticsDelegate = newStatisticsDelegate;
@@ -515,7 +533,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns the last received statistics data.
  *
- * \return last received statistics data
+ * @return last received statistics data
  */
 + (Statistics*)getLastReceivedStatistics {
     return lastReceivedStatistics;
@@ -531,7 +549,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Sets and overrides fontconfig configuration directory.
  *
- * \param directory which contains fontconfig configuration (fonts.conf)
+ * @param path directory which contains fontconfig configuration (fonts.conf)
  */
 + (void)setFontconfigConfigurationPath: (NSString*)path {
     if (path != nil) {
@@ -545,8 +563,8 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
  * Note that you need to build MobileFFmpeg with fontconfig
  * enabled or use a prebuilt package with fontconfig inside to use this feature.
  *
- * \param directory which contains fonts (.ttf and .otf files)
- * \param custom font name mappings, useful to access your fonts with more friendly names
+ * @param fontDirectoryPath directory which contains fonts (.ttf and .otf files)
+ * @param fontNameMapping custom font name mappings, useful to access your fonts with more friendly names
  */
 + (void)setFontDirectory: (NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping {
     NSError *error = nil;
@@ -555,20 +573,27 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     int validFontNameMappingCount = 0;
     NSString *tempConfigurationDirectory = [NSTemporaryDirectory() stringByAppendingPathComponent:@".mobileffmpeg"];
     NSString *fontConfigurationFile = [tempConfigurationDirectory stringByAppendingPathComponent:@"fonts.conf"];
+    int activeLogLevel = av_log_get_level();
 
     if (![[NSFileManager defaultManager] fileExistsAtPath:tempConfigurationDirectory isDirectory:&isDirectory]) {
 
         if (![[NSFileManager defaultManager] createDirectoryAtPath:tempConfigurationDirectory withIntermediateDirectories:YES attributes:nil error:&error]) {
-            NSLog(@"Failed to set font directory. Error received while creating temp conf directory: %@.", error);
+            if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+                NSLog(@"Failed to set font directory. Error received while creating temp conf directory: %@.", error);
+            }
             return;
         }
 
-        NSLog(@"Created temporary font conf directory: TRUE.");
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+            NSLog(@"Created temporary font conf directory: TRUE.");
+        }
     }
 
     if ([[NSFileManager defaultManager] fileExistsAtPath:fontConfigurationFile isDirectory:&isFile]) {
         BOOL fontConfigurationDeleted = [[NSFileManager defaultManager] removeItemAtPath:fontConfigurationFile error:NULL];
-        NSLog(@"Deleted old temporary font configuration: %s.", fontConfigurationDeleted?"TRUE":"FALSE");
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+            NSLog(@"Deleted old temporary font configuration: %s.", fontConfigurationDeleted?"TRUE":"FALSE");
+        }
     }
 
     /* PROCESS MAPPINGS FIRST */
@@ -602,20 +627,26 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
                             @"</fontconfig>"];
 
     if (![fontConfiguration writeToFile:fontConfigurationFile atomically:YES encoding:NSUTF8StringEncoding error:&error]) {
-        NSLog(@"Failed to set font directory. Error received while saving font configuration: %@.", error);
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+            NSLog(@"Failed to set font directory. Error received while saving font configuration: %@.", error);
+        }
         return;
     }
-    NSLog(@"Saved new temporary font configuration with %d font name mappings.", validFontNameMappingCount);
+    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+        NSLog(@"Saved new temporary font configuration with %d font name mappings.", validFontNameMappingCount);
+    }
 
     [MobileFFmpegConfig setFontconfigConfigurationPath:tempConfigurationDirectory];
 
-    NSLog(@"Font directory %@ registered successfully.", fontDirectoryPath);
+    if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_DEBUG <= activeLogLevel)) {
+        NSLog(@"Font directory %@ registered successfully.", fontDirectoryPath);
+    }
 }
 
 /**
  * Returns build configuration for FFmpeg.
  *
- * \return build configuration string
+ * @return build configuration string
  */
 + (NSString*)getBuildConf {
     return [NSString stringWithUTF8String:FFMPEG_CONFIGURATION];
@@ -624,7 +655,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns package name.
  *
- * \return guessed package name according to supported external libraries
+ * @return guessed package name according to supported external libraries
  */
 + (NSString*)getPackageName {
     NSArray *enabledLibraryArray = [MobileFFmpegConfig getExternalLibraries];
@@ -806,7 +837,7 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 /**
  * Returns supported external libraries.
  *
- * \return array of supported external libraries
+ * @return array of supported external libraries
  */
 + (NSArray*)getExternalLibraries {
     NSString *buildConfiguration = [MobileFFmpegConfig getBuildConf];
@@ -826,6 +857,48 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
     [enabledLibraryArray sortUsingSelector:@selector(compare:)];
 
     return enabledLibraryArray;
+}
+
+/**
+ * Creates a new named pipe to use in FFmpeg operations.
+ *
+ * Please note that creator is responsible of closing created pipes.
+ *
+ * @return the full path of named pipe
+ */
++ (NSString*)registerNewFFmpegPipe {
+
+    // PIPES ARE CREATED UNDER THE CACHE DIRECTORY
+    NSString *cacheDir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+
+    NSString *newFFmpegPipePath = [NSString stringWithFormat:@"%@/%@%d", cacheDir, MOBILE_FFMPEG_PIPE_PREFIX, (++lastCreatedPipeIndex)];
+
+    // FIRST CLOSE OLD PIPES WITH THE SAME NAME
+    [MobileFFmpegConfig closeFFmpegPipe:newFFmpegPipePath];
+
+    int rc = mkfifo([newFFmpegPipePath UTF8String], S_IRWXU | S_IRWXG | S_IROTH);
+    if (rc == 0) {
+        return newFFmpegPipePath;
+    } else {
+        int activeLogLevel = av_log_get_level();
+        if ((activeLogLevel != AV_LOG_QUIET) && (AV_LOG_WARNING <= activeLogLevel)) {
+            NSLog(@"Failed to register new FFmpeg pipe %@. Operation failed with rc=%d.", newFFmpegPipePath, rc);
+        }
+        return nil;
+    }
+}
+
+/**
+ * Closes a previously created FFmpeg pipe.
+ *
+ * @param ffmpegPipePath full path of ffmpeg pipe
+ */
++ (void)closeFFmpegPipe: (NSString*)ffmpegPipePath {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+
+    if ([fileManager fileExistsAtPath:ffmpegPipePath]){
+        [fileManager removeItemAtPath:ffmpegPipePath error:NULL];
+    }
 }
 
 @end

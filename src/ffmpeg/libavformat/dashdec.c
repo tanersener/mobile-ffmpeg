@@ -1851,7 +1851,7 @@ static void close_demux_for_component(struct representation *pls)
 static int reopen_demux_for_component(AVFormatContext *s, struct representation *pls)
 {
     DASHContext *c = s->priv_data;
-    AVInputFormat *in_fmt = NULL;
+    ff_const59 AVInputFormat *in_fmt = NULL;
     AVDictionary  *in_fmt_opts = NULL;
     uint8_t *avio_ctx_buffer  = NULL;
     int ret = 0, i;
@@ -2000,8 +2000,6 @@ static int dash_read_header(AVFormatContext *s)
     if ((ret = save_avio_options(s)) < 0)
         goto fail;
 
-    av_dict_set(&c->avio_opts, "seekable", "0", 0);
-
     if ((ret = parse_manifest(s, s->url, s->pb)) < 0)
         goto fail;
 
@@ -2009,6 +2007,8 @@ static int dash_read_header(AVFormatContext *s)
      * stream. */
     if (!c->is_live) {
         s->duration = (int64_t) c->media_presentation_duration * AV_TIME_BASE;
+    } else {
+        av_dict_set(&c->avio_opts, "seekable", "0", 0);
     }
 
     if(c->n_videos)
@@ -2302,7 +2302,7 @@ static int dash_read_seek(AVFormatContext *s, int stream_index, int64_t timestam
     return ret;
 }
 
-static int dash_probe(AVProbeData *p)
+static int dash_probe(const AVProbeData *p)
 {
     if (!av_stristr(p->buf, "<MPD"))
         return 0;

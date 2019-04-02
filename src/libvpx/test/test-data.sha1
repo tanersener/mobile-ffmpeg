@@ -852,5 +852,16 @@ e402cbbf9e550ae017a1e9f1f73931c1d18474e8 *invalid-crbug-667044.webm
 d3964f9dad9f60363c81b688324d95b4ec7c8038 *invalid-crbug-667044.webm.res
 fd9df7f3f6992af1d7a9dde975c9a0d6f28c053d *invalid-bug-1443.ivf
 fd3020fa6e9ca5966206738654c97dec313b0a95 *invalid-bug-1443.ivf.res
+1a0e405606939f2febab1a21b30c37cb8f2c8cb1 *invalid-token-partition.ivf
+90a8a95e7024f015b87f5483a65036609b3d1b74 *invalid-token-partition.ivf.res
 17696cd21e875f1d6e5d418cbf89feab02c8850a *vp90-2-22-svc_1280x720_1.webm
 e2f9e1e47a791b4e939a9bdc50bf7a25b3761f77 *vp90-2-22-svc_1280x720_1.webm.md5
+a0fbbbc5dd50fd452096f4455a58c1a8c9f66697 *invalid-vp80-00-comprehensive-s17661_r01-05_b6-.ivf
+a61774cf03fc584bd9f0904fc145253bb8ea6c4c *invalid-vp80-00-comprehensive-s17661_r01-05_b6-.ivf.res
+894fae3afee0290546590823974203ab4b8abd95 *crbug-1539.rawfile
+f1026c03efd5da21b381c8eb21f0d64e6d7e4ba3 *invalid-crbug-1558.ivf
+eb198c25f861c3fe2cbd310de11eb96843019345 *invalid-crbug-1558.ivf.res
+c62b005a9fd32c36a1b3f67de6840330f9915e34 *invalid-crbug-1562.ivf
+f0cd8389948ad16085714d96567612136f6a46c5 *invalid-crbug-1562.ivf.res
+bac455906360b45338a16dd626ac5f19bc36a307 *desktop_office1.1280_720-020.yuv
+094be4b80fa30bd227149ea16ab6476d549ea092 *slides_code_term_web_plot.1920_1080.yuv

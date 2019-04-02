@@ -364,7 +364,6 @@ static int read_inter_segment_id(AV1_COMMON *const cm, MACROBLOCKD *const xd,
   if (preskip) {
     if (!seg->segid_preskip) return 0;
   } else {
-    if (seg->segid_preskip) return mbmi->segment_id;
     if (mbmi->skip) {
       if (seg->temporal_update) {
         mbmi->seg_id_predicted = 0;
@@ -679,11 +678,10 @@ static void read_intrabc_info(AV1_COMMON *const cm, MACROBLOCKD *const xd,
 
     int16_t inter_mode_ctx[MODE_CTX_REF_FRAMES];
     int_mv ref_mvs[INTRA_FRAME + 1][MAX_MV_REF_CANDIDATES];
-    int_mv global_mvs[REF_FRAMES];
 
     av1_find_mv_refs(cm, xd, mbmi, INTRA_FRAME, xd->ref_mv_count,
-                     xd->ref_mv_stack, ref_mvs, global_mvs, mi_row, mi_col,
-                     inter_mode_ctx);
+                     xd->ref_mv_stack, ref_mvs, /*global_mvs=*/NULL, mi_row,
+                     mi_col, inter_mode_ctx);
 
     int_mv nearestmv, nearmv;
 
@@ -700,7 +698,8 @@ static void read_intrabc_info(AV1_COMMON *const cm, MACROBLOCKD *const xd,
                                      mi_col, bsize, r);
     if (!valid_dv) {
       // Intra bc motion vectors are not valid - signal corrupt frame
-      aom_merge_corrupted_flag(&xd->corrupted, 1);
+      aom_internal_error(xd->error_info, AOM_CODEC_CORRUPT_FRAME,
+                         "Invalid intrabc dv");
     }
   }
 }
@@ -1271,9 +1270,9 @@ static void read_inter_block_mode_info(AV1Decoder *const pbi,
   const int is_compound = has_second_ref(mbmi);
 
   MV_REFERENCE_FRAME ref_frame = av1_ref_frame_type(mbmi->ref_frame);
-  int_mv global_mvs[REF_FRAMES];
   av1_find_mv_refs(cm, xd, mbmi, ref_frame, xd->ref_mv_count, xd->ref_mv_stack,
-                   ref_mvs, global_mvs, mi_row, mi_col, inter_mode_ctx);
+                   ref_mvs, /*global_mvs=*/NULL, mi_row, mi_col,
+                   inter_mode_ctx);
 
   int mode_ctx = av1_mode_context_analyzer(inter_mode_ctx, mbmi->ref_frame);
   mbmi->ref_mv_idx = 0;
@@ -1421,9 +1420,12 @@ static void read_inter_block_mode_info(AV1Decoder *const pbi,
         const int comp_index_ctx = get_comp_index_context(cm, xd);
         mbmi->compound_idx = aom_read_symbol(
             r, ec_ctx->compound_index_cdf[comp_index_ctx], 2, ACCT_STR);
+        mbmi->interinter_comp.type =
+            mbmi->compound_idx ? COMPOUND_AVERAGE : COMPOUND_DISTWTD;
       } else {
         // Distance-weighted compound is disabled, so always use average
         mbmi->compound_idx = 1;
+        mbmi->interinter_comp.type = COMPOUND_AVERAGE;
       }
     } else {
       assert(cm->current_frame.reference_mode != SINGLE_REFERENCE &&
@@ -1434,8 +1436,9 @@ static void read_inter_block_mode_info(AV1Decoder *const pbi,
       // compound_diffwtd, wedge
       if (is_interinter_compound_used(COMPOUND_WEDGE, bsize))
         mbmi->interinter_comp.type =
-            1 + aom_read_symbol(r, ec_ctx->compound_type_cdf[bsize],
-                                COMPOUND_TYPES - 1, ACCT_STR);
+            COMPOUND_WEDGE + aom_read_symbol(r,
+                                             ec_ctx->compound_type_cdf[bsize],
+                                             MASKED_COMPOUND_TYPES, ACCT_STR);
       else
         mbmi->interinter_comp.type = COMPOUND_DIFFWTD;
 
@@ -1500,7 +1503,8 @@ static void read_inter_frame_mode_info(AV1Decoder *const pbi,
   else
     mbmi->skip = read_skip(cm, xd, mbmi->segment_id, r);
 
-  mbmi->segment_id = read_inter_segment_id(cm, xd, mi_row, mi_col, 0, r);
+  if (!cm->seg.segid_preskip)
+    mbmi->segment_id = read_inter_segment_id(cm, xd, mi_row, mi_col, 0, r);
 
   read_cdef(cm, r, xd, mi_col, mi_row);
 

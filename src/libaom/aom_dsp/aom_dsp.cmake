@@ -53,8 +53,8 @@ list(APPEND AOM_DSP_COMMON_ASM_SSE2
             "${AOM_ROOT}/aom_dsp/x86/aom_high_subpixel_bilinear_sse2.asm"
             "${AOM_ROOT}/aom_dsp/x86/aom_subpixel_8t_sse2.asm"
             "${AOM_ROOT}/aom_dsp/x86/aom_subpixel_bilinear_sse2.asm"
-            "${AOM_ROOT}/aom_dsp/x86/highbd_intrapred_sse2.asm"
-            "${AOM_ROOT}/aom_dsp/x86/intrapred_sse2.asm"
+            "${AOM_ROOT}/aom_dsp/x86/highbd_intrapred_asm_sse2.asm"
+            "${AOM_ROOT}/aom_dsp/x86/intrapred_asm_sse2.asm"
             "${AOM_ROOT}/aom_dsp/x86/inv_wht_sse2.asm")
 
 list(APPEND AOM_DSP_COMMON_INTRIN_SSE2
@@ -194,6 +194,7 @@ if(CONFIG_AV1_ENCODER)
               "${AOM_ROOT}/aom_dsp/x86/highbd_subtract_sse2.c"
               "${AOM_ROOT}/aom_dsp/x86/highbd_variance_sse2.c"
               "${AOM_ROOT}/aom_dsp/x86/quantize_sse2.c"
+              "${AOM_ROOT}/aom_dsp/x86/adaptive_quantize_sse2.c"
               "${AOM_ROOT}/aom_dsp/x86/quantize_x86.h"
               "${AOM_ROOT}/aom_dsp/x86/sum_squares_sse2.c"
               "${AOM_ROOT}/aom_dsp/x86/variance_sse2.c")
@@ -226,6 +227,7 @@ if(CONFIG_AV1_ENCODER)
               "${AOM_ROOT}/aom_dsp/x86/masked_sad_intrin_ssse3.c"
               "${AOM_ROOT}/aom_dsp/x86/masked_variance_intrin_ssse3.h"
               "${AOM_ROOT}/aom_dsp/x86/masked_variance_intrin_ssse3.c"
+              "${AOM_ROOT}/aom_dsp/x86/quantize_ssse3.c"
               "${AOM_ROOT}/aom_dsp/x86/variance_impl_ssse3.c"
               "${AOM_ROOT}/aom_dsp/x86/jnt_variance_ssse3.c"
               "${AOM_ROOT}/aom_dsp/x86/jnt_sad_ssse3.c")
@@ -360,6 +362,8 @@ function(setup_aom_dsp_targets)
                                     "AOM_DSP_ENCODER_INTRIN_MSA" "aom")
     endif()
   endif()
+
+  target_sources(aom PRIVATE $<TARGET_OBJECTS:aom_dsp>)
 
   # Pass the new lib targets up to the parent scope instance of
   # $AOM_LIB_TARGETS.

@@ -8,9 +8,13 @@
 #             output file
 #     output: ccitt-g4 compressed mulitipage tiff file
 #
-#   Notes:
-#        (1) Requires ghostscript
-#        (2) If you give it images with bpp > 1, the result will be ugly.
+#  Note 1:  Requires ghostscript
+#  Note 2:  If you give it images with bpp > 1, the result will be ugly.
+#  Note 3:  A modern alternative to ghostcript is to use poplar:
+#    If the pdf is composed of images that were orthographically generated:
+#          pdftoppm -png <pdf-file> <pdf-root>    [output in png]
+#    If the pdf is composed of images that were scanned:
+#          pdftoppm -jpeg <pdf-file> <pdf-root>   [output in jpeg]
 
 scriptname=${0##*/}
 

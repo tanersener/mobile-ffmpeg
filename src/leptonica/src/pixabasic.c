@@ -1503,7 +1503,7 @@ l_ok
 pixaRemoveSelected(PIXA  *pixa,
                    NUMA  *naindex)
 {
-l_int32  i, n, npix, index;
+l_int32  i, n, index;
 NUMA    *na1;
 
     PROCNAME("pixaRemoveSelected");
@@ -1514,7 +1514,6 @@ NUMA    *na1;
         return ERROR_INT("naindex not defined", procName, 1);
     if ((n = numaGetCount(naindex)) == 0)
         return ERROR_INT("naindex is empty", procName, 1);
-    npix = pixaGetCount(pixa);
 
         /* Remove from highest indices first */
     na1 = numaSort(NULL, naindex, L_SORT_DECREASING);

@@ -47,12 +47,14 @@ void uncaughtExceptionHandler(NSException *exception) {
     UITabBarItem *tabBarItem4 = [tabBar.items objectAtIndex:3];
     UITabBarItem *tabBarItem5 = [tabBar.items objectAtIndex:4];
     UITabBarItem *tabBarItem6 = [tabBar.items objectAtIndex:5];
+    UITabBarItem *tabBarItem7 = [tabBar.items objectAtIndex:6];
     tabBarItem1.title = @"COMMAND";
     tabBarItem2.title = @"VIDEO";
     tabBarItem3.title = @"HTTPS";
     tabBarItem4.title = @"AUDIO";
     tabBarItem5.title = @"SUBTITLE";
     tabBarItem6.title = @"VID.STAB";
+    tabBarItem7.title = @"PIPE";
 
     // SELECTED BAR ITEM
     [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:

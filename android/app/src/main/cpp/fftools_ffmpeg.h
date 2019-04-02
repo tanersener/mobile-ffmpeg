@@ -17,6 +17,10 @@
  */
 
 /*
+ * CHANGES 03.2019
+ * --------------------------------------------------------
+ * - config.h include removed
+ *
  * CHANGES 08.2018
  * --------------------------------------------------------
  * - fftools_ prefix added to file name and include guards
@@ -30,8 +34,6 @@
 
 #ifndef FFTOOLS_FFMPEG_H
 #define FFTOOLS_FFMPEG_H
-
-#include "config.h"
 
 #include <stdint.h>
 #include <stdio.h>

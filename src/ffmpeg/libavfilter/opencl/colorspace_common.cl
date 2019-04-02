@@ -39,31 +39,6 @@ constant const float ST2084_C1 = 0.8359375f;
 constant const float ST2084_C2 = 18.8515625f;
 constant const float ST2084_C3 = 18.6875f;
 
-__constant float yuv2rgb_bt2020[] = {
-    1.0f, 0.0f, 1.4746f,
-    1.0f, -0.16455f, -0.57135f,
-    1.0f, 1.8814f, 0.0f
-};
-
-__constant float yuv2rgb_bt709[] = {
-    1.0f, 0.0f, 1.5748f,
-    1.0f, -0.18732f, -0.46812f,
-    1.0f, 1.8556f, 0.0f
-};
-
-__constant float rgb2yuv_bt709[] = {
-    0.2126f, 0.7152f, 0.0722f,
-    -0.11457f, -0.38543f, 0.5f,
-    0.5f, -0.45415f, -0.04585f
-};
-
-__constant float rgb2yuv_bt2020[] ={
-    0.2627f, 0.678f, 0.0593f,
-    -0.1396f, -0.36037f, 0.5f,
-    0.5f, -0.4598f, -0.0402f,
-};
-
-
 float get_luma_dst(float3 c) {
     return luma_dst.x * c.x + luma_dst.y * c.y + luma_dst.z * c.z;
 }
@@ -149,10 +124,14 @@ float3 yuv2rgb(float y, float u, float v) {
 
 float3 yuv2lrgb(float3 yuv) {
     float3 rgb = yuv2rgb(yuv.x, yuv.y, yuv.z);
+#ifdef linearize
     float r = linearize(rgb.x);
     float g = linearize(rgb.y);
     float b = linearize(rgb.z);
     return (float3)(r, g, b);
+#else
+    return rgb;
+#endif
 }
 
 float3 rgb2yuv(float r, float g, float b) {
@@ -176,19 +155,25 @@ float rgb2y(float r, float g, float b) {
 }
 
 float3 lrgb2yuv(float3 c) {
+#ifdef delinearize
     float r = delinearize(c.x);
     float g = delinearize(c.y);
     float b = delinearize(c.z);
-
     return rgb2yuv(r, g, b);
+#else
+    return rgb2yuv(c.x, c.y, c.z);
+#endif
 }
 
 float lrgb2y(float3 c) {
+#ifdef delinearize
     float r = delinearize(c.x);
     float g = delinearize(c.y);
     float b = delinearize(c.z);
-
     return rgb2y(r, g, b);
+#else
+    return rgb2y(c.x, c.y, c.z);
+#endif
 }
 
 float3 lrgb2lrgb(float3 c) {

@@ -208,12 +208,12 @@ static int headphone_convolute(AVFilterContext *ctx, void *arg, int jobnr, int n
                 continue;
             }
 
-            read = (wr - *(delay + l) - (air_len - 1) + buffer_length) & modulo;
+            read = (wr - *(delay + l) - (ir_len - 1) + buffer_length) & modulo;
 
-            if (read + air_len < buffer_length) {
-                memcpy(temp_src, bptr + read, air_len * sizeof(*temp_src));
+            if (read + ir_len < buffer_length) {
+                memcpy(temp_src, bptr + read, ir_len * sizeof(*temp_src));
             } else {
-                int len = FFMIN(air_len - (read % air_len), buffer_length - read);
+                int len = FFMIN(air_len - (read % ir_len), buffer_length - read);
 
                 memcpy(temp_src, bptr + read, len * sizeof(*temp_src));
                 memcpy(temp_src + len, bptr, (air_len - len) * sizeof(*temp_src));
@@ -418,12 +418,12 @@ static int convert_coeffs(AVFilterContext *ctx, AVFilterLink *inlink)
 
         av_fft_end(s->fft[0]);
         av_fft_end(s->fft[1]);
-        s->fft[0] = av_fft_init(log2(s->n_fft), 0);
-        s->fft[1] = av_fft_init(log2(s->n_fft), 0);
+        s->fft[0] = av_fft_init(av_log2(s->n_fft), 0);
+        s->fft[1] = av_fft_init(av_log2(s->n_fft), 0);
         av_fft_end(s->ifft[0]);
         av_fft_end(s->ifft[1]);
-        s->ifft[0] = av_fft_init(log2(s->n_fft), 1);
-        s->ifft[1] = av_fft_init(log2(s->n_fft), 1);
+        s->ifft[0] = av_fft_init(av_log2(s->n_fft), 1);
+        s->ifft[1] = av_fft_init(av_log2(s->n_fft), 1);
 
         if (!s->fft[0] || !s->fft[1] || !s->ifft[0] || !s->ifft[1]) {
             av_log(ctx, AV_LOG_ERROR, "Unable to create FFT contexts of size %d.\n", s->n_fft);

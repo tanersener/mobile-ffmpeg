@@ -44,10 +44,8 @@ typedef struct
     SDL_bool in_border_change;
     SDL_bool in_title_click;
     Uint8 focus_click_pending;
-    SDL_bool skip_update_clipcursor;
     SDL_bool windowed_mode_was_maximized;
     SDL_bool in_window_deactivation;
-    RECT cursor_clipped_rect;
     struct SDL_VideoData *videodata;
 #if SDL_VIDEO_OPENGL_EGL  
     EGLSurface egl_surface;
@@ -80,7 +78,6 @@ extern SDL_bool WIN_GetWindowWMInfo(_THIS, SDL_Window * window,
 extern void WIN_OnWindowEnter(_THIS, SDL_Window * window);
 extern void WIN_UpdateClipCursor(SDL_Window *window);
 extern int WIN_SetWindowHitTest(SDL_Window *window, SDL_bool enabled);
-extern void WIN_AcceptDragAndDrop(SDL_Window * window, SDL_bool accept);
 
 #endif /* SDL_windowswindow_h_ */
 

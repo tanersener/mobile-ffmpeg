@@ -211,7 +211,7 @@ static const l_int32  MAX_ITERS = 40;
 /*!
  * \brief   pixSeedfillBinary()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
+ * \param[in]    pixd  [optional]; can be null, equal to pixs,
  *                     or different from pixs; 1 bpp
  * \param[in]    pixs  1 bpp seed
  * \param[in]    pixm  1 bpp filling mask
@@ -296,13 +296,13 @@ PIX       *pixt;
 /*!
  * \brief   pixSeedfillBinaryRestricted()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs; 1 bpp
- * \param[in]    pixs  1 bpp seed
- * \param[in]    pixm  1 bpp filling mask
+ * \param[in]    pixd          [optional]; can be null, equal to pixs,
+ *                             or different from pixs; 1 bpp
+ * \param[in]    pixs          1 bpp seed
+ * \param[in]    pixm          1 bpp filling mask
  * \param[in]    connectivity  4 or 8
- * \param[in]    xmax max distance in x direction of fill into the mask
- * \param[in]    ymax max distance in y direction of fill into the mask
+ * \param[in]    xmax          max distance in x direction of fill into mask
+ * \param[in]    ymax          max distance in y direction of fill into mask
  * \return  pixd always
  *
  * <pre>
@@ -582,8 +582,8 @@ l_uint32  *lines, *linem;
 /*!
  * \brief   pixHolesByFilling()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    connectivity   4 or 8
  * \return  pixd  inverted image of all holes, or NULL on error
  *
  * Action:
@@ -633,8 +633,8 @@ PIX  *pixsi, *pixd;
 /*!
  * \brief   pixFillClosedBorders()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    connectivity filling connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    connectivity   filling connectivity 4 or 8
  * \return  pixd  all topologically outer closed borders are filled
  *                     as connected comonents, or NULL on error
  *
@@ -685,8 +685,8 @@ PIX  *pixsi, *pixd;
 /*!
  * \brief   pixExtractBorderConnComps()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    connectivity filling connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    connectivity   filling connectivity 4 or 8
  * \return  pixd  all pixels in the src that are in connected
  *                components touching the border, or NULL on error
  */
@@ -719,8 +719,8 @@ PIX  *pixd;
 /*!
  * \brief   pixRemoveBorderConnComps()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    connectivity filling connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    connectivity   filling connectivity 4 or 8
  * \return  pixd  all pixels in the src that are not touching the
  *                border or NULL on error
  *
@@ -755,8 +755,8 @@ PIX  *pixd;
 /*!
  * \brief   pixFillBgFromBorder()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    connectivity filling connectivity 4 or 8
+ * \param[in]    pixs           1 bpp
+ * \param[in]    connectivity   filling connectivity 4 or 8
  * \return  pixd with the background c.c. touching the border
  *               filled to foreground, or NULL on error
  *
@@ -810,13 +810,12 @@ PIX  *pixd;
 /*!
  * \brief   pixFillHolesToBoundingRect()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    minsize min number of pixels in the hole
- * \param[in]    maxhfract max hole area as fraction of fg pixels in the cc
- * \param[in]    minfgfract min fg area as fraction of bounding rectangle
- * \return  pixd pixs, with some holes possibly filled and some c.c.
- *                    possibly expanded to their bounding rects,
- *                    or NULL on error
+ * \param[in]    pixs         1 bpp
+ * \param[in]    minsize      min number of pixels in the hole
+ * \param[in]    maxhfract    max hole area as fraction of fg pixels in the cc
+ * \param[in]    minfgfract   min fg area as fraction of bounding rectangle
+ * \return  pixd   with some holes possibly filled and some c.c. possibly
+ *                 expanded to their bounding rects, or NULL on error
  *
  * <pre>
  * Notes:
@@ -898,9 +897,9 @@ PIXA      *pixa;
 /*!
  * \brief   pixSeedfillGray()
  *
- * \param[in]    pixs  8 bpp seed; filled in place
- * \param[in]    pixm  8 bpp filling mask
- * \param[in]    connectivity  4 or 8
+ * \param[in]    pixs           8 bpp seed; filled in place
+ * \param[in]    pixm           8 bpp filling mask
+ * \param[in]    connectivity   4 or 8
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -954,9 +953,9 @@ l_uint32  *datas, *datam;
 /*!
  * \brief   pixSeedfillGrayInv()
  *
- * \param[in]    pixs  8 bpp seed; filled in place
- * \param[in]    pixm  8 bpp filling mask
- * \param[in]    connectivity  4 or 8
+ * \param[in]    pixs           8 bpp seed; filled in place
+ * \param[in]    pixm           8 bpp filling mask
+ * \param[in]    connectivity   4 or 8
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1944,9 +1943,9 @@ L_QUEUE  *lq_pixel;
 /*!
  * \brief   pixSeedfillGraySimple()
  *
- * \param[in]    pixs  8 bpp seed; filled in place
- * \param[in]    pixm  8 bpp filling mask
- * \param[in]    connectivity  4 or 8
+ * \param[in]    pixs           8 bpp seed; filled in place
+ * \param[in]    pixm           8 bpp filling mask
+ * \param[in]    connectivity   4 or 8
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2016,9 +2015,9 @@ PIX       *pixt;
 /*!
  * \brief   pixSeedfillGrayInvSimple()
  *
- * \param[in]    pixs  8 bpp seed; filled in place
- * \param[in]    pixm  8 bpp filling mask
- * \param[in]    connectivity  4 or 8
+ * \param[in]    pixs           8 bpp seed; filled in place
+ * \param[in]    pixm           8 bpp filling mask
+ * \param[in]    connectivity   4 or 8
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2410,10 +2409,10 @@ l_uint32  *lines, *linem;
 /*!
  * \brief   pixSeedfillGrayBasin()
  *
- * \param[in]    pixb  binary mask giving seed locations
- * \param[in]    pixm  8 bpp basin-type filling mask
- * \param[in]    delta amount of seed value above mask
- * \param[in]    connectivity  4 or 8
+ * \param[in]    pixb           binary mask giving seed locations
+ * \param[in]    pixm           8 bpp basin-type filling mask
+ * \param[in]    delta          amount of seed value above mask
+ * \param[in]    connectivity   4 or 8
  * \return  pixd filled seed if OK, NULL on error
  *
  * <pre>
@@ -2489,10 +2488,10 @@ PIX  *pixbi, *pixmi, *pixsd;
 /*!
  * \brief   pixDistanceFunction()
  *
- * \param[in]    pixs  1 bpp source
- * \param[in]    connectivity  4 or 8
- * \param[in]    outdepth 8 or 16 bits for pixd
- * \param[in]    boundcond L_BOUNDARY_BG, L_BOUNDARY_FG
+ * \param[in]    pixs           1 bpp
+ * \param[in]    connectivity   4 or 8
+ * \param[in]    outdepth       8 or 16 bits for pixd
+ * \param[in]    boundcond      L_BOUNDARY_BG, L_BOUNDARY_FG
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -2750,8 +2749,8 @@ l_uint32  *lined;
 /*!
  * \brief   pixSeedspread()
  *
- * \param[in]    pixs  8 bpp source
- * \param[in]    connectivity  4 or 8
+ * \param[in]    pixs           8 bpp
+ * \param[in]    connectivity   4 or 8
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -2812,7 +2811,7 @@ PIX       *pixm, *pixt, *pixg, *pixd;
          * mask to set a 1 in pixt at all non-seed points.  Also, set all
          * pixt pixels in an interior boundary of width 1 to the
          * maximum value.   For debugging, to view the distance function,
-         * use pixConvert16To8(pixt, 0) on small images.  */
+         * use pixConvert16To8(pixt, L_LS_BYTE) on small images.  */
     pixm = pixThresholdToBinary(pixg, 1);
     pixt = pixCreate(w, h, 16);
     pixSetMasked(pixt, pixm, 1);
@@ -2980,13 +2979,13 @@ l_uint32  *linet, *lined;
 /*!
  * \brief   pixLocalExtrema()
  *
- * \param[in]    pixs  8 bpp
- * \param[in]    maxmin max allowed for the min in a 3x3 neighborhood;
- *                      use 0 for default which is to have no upper bound
- * \param[in]    minmax min allowed for the max in a 3x3 neighborhood;
- *                      use 0 for default which is to have no lower bound
- * \param[out]   ppixmin [optional] mask of local minima
- * \param[out]   ppixmax [optional] mask of local maxima
+ * \param[in]    pixs       8 bpp
+ * \param[in]    maxmin     max allowed for the min in a 3x3 neighborhood;
+ *                          use 0 for default which is to have no upper bound
+ * \param[in]    minmax     min allowed for the max in a 3x3 neighborhood;
+ *                          use 0 for default which is to have no lower bound
+ * \param[out]   ppixmin    [optional] mask of local minima
+ * \param[out]   ppixmax    [optional] mask of local maxima
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -3057,10 +3056,10 @@ PIX  *pixmin, *pixmax, *pixt1, *pixt2;
 /*!
  * \brief   pixQualifyLocalMinima()
  *
- * \param[in]    pixs  8 bpp image from which pixm has been extracted
- * \param[in]    pixm  1 bpp mask of values equal to min in 3x3 neighborhood
- * \param[in]    maxval max allowed for the min in a 3x3 neighborhood;
- *                      use 0 for default which is to have no upper bound
+ * \param[in]    pixs     8 bpp image from which pixm has been extracted
+ * \param[in]    pixm     1 bpp mask of values equal to min in 3x3 neighborhood
+ * \param[in]    maxval   max allowed for the min in a 3x3 neighborhood;
+ *                        use 0 for default which is to have no upper bound
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -3157,10 +3156,10 @@ PIXA      *pixa;
 /*!
  * \brief   pixSelectedLocalExtrema()
  *
- * \param[in]    pixs  8 bpp
- * \param[in]    mindist -1 for keeping all pixels; >= 0 specifies distance
- * \param[out]   ppixmin mask of local minima
- * \param[out]   ppixmax mask of local maxima
+ * \param[in]    pixs       8 bpp
+ * \param[in]    mindist    -1 for keeping all pixels; >= 0 specifies distance
+ * \param[out]   ppixmin    mask of local minima
+ * \param[out]   ppixmax    mask of local maxima
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -3235,8 +3234,8 @@ PIX  *pixmin, *pixmax, *pixt, *pixtmin, *pixtmax;
 /*!
  * \brief   pixFindEqualValues()
  *
- * \param[in]    pixs1 8 bpp
- * \param[in]    pixs2 8 bpp
+ * \param[in]    pixs1    8 bpp
+ * \param[in]    pixs2    8 bpp
  * \return  pixd 1 bpp mask, or NULL on error
  *
  * <pre>
@@ -3295,10 +3294,10 @@ PIX       *pixd;
 /*!
  * \brief   pixSelectMinInConnComp()
  *
- * \param[in]    pixs 8 bpp
- * \param[in]    pixm 1 bpp
- * \param[out]   ppta pta of min pixel locations
- * \param[out]   pnav [optional] numa of minima values
+ * \param[in]    pixs    8 bpp
+ * \param[in]    pixm    1 bpp
+ * \param[out]   ppta    pta of min pixel locations
+ * \param[out]   pnav    [optional] numa of minima values
  * \return  0 if OK, 1 on error.
  *
  * <pre>
@@ -3406,11 +3405,11 @@ PTA       *pta;
 /*!
  * \brief   pixRemoveSeededComponents()
  *
- * \param[in]    pixd  [optional]; this can be null or equal to pixm; 1 bpp
- * \param[in]    pixs  1 bpp seed
- * \param[in]    pixm  1 bpp filling mask
+ * \param[in]    pixd          [optional]; can be null or equal to pixm; 1 bpp
+ * \param[in]    pixs          1 bpp seed
+ * \param[in]    pixm          1 bpp filling mask
  * \param[in]    connectivity  4 or 8
- * \param[in]    bordersize amount of border clearing
+ * \param[in]    bordersize    amount of border clearing
  * \return  pixd, or NULL on error
  *
  * <pre>

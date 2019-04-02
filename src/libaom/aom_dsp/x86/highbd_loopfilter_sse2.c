@@ -727,8 +727,8 @@ void aom_highbd_lpf_horizontal_14_dual_sse2(
                                    _limit1, _thresh1, bd);
 
   for (i = 0; i < 6; i++) {
-    _mm_store_si128((__m128i *)(s - (i + 1) * pitch), p[i]);
-    _mm_store_si128((__m128i *)(s + i * pitch), q[i]);
+    _mm_storeu_si128((__m128i *)(s - (i + 1) * pitch), p[i]);
+    _mm_storeu_si128((__m128i *)(s + i * pitch), q[i]);
   }
 }
 

@@ -45,3 +45,7 @@ NSTimeInterval const SUBTITLE_TEST_TOOLTIP_DURATION = 4.0;
 // VID.STAB TEST
 NSString *const VIDSTAB_TEST_TOOLTIP_TEXT = @"Click the button to stabilize video. Original video will play above and stabilized video will play below";
 NSTimeInterval const VIDSTAB_TEST_TOOLTIP_DURATION = 4.0;
+
+// PIPE TEST
+NSString *const PIPE_TEST_TOOLTIP_TEXT = @"Click the button to create a video using pipe redirection. Created video will play inside the frame below";
+NSTimeInterval const PIPE_TEST_TOOLTIP_DURATION = 4.0;

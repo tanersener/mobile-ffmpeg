@@ -69,7 +69,7 @@ cmake -Wno-dev \
     -DCMAKE_SYSTEM_NAME=Darwin \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
-    -DCMAKE_AR="$AR" \
+    -DCMAKE_AR="$(xcrun --sdk $(get_sdk_name) -f ar)" \
     -DCMAKE_AS="$AS" \
     -DUSE_OMP=0 \
     ${ASM_FLAGS} \

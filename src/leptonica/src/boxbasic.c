@@ -237,7 +237,6 @@ BOX  *boxc;
         return (BOX *)ERROR_PTR("box not defined", procName, NULL);
 
     boxc = boxCreate(box->x, box->y, box->w, box->h);
-
     return boxc;
 }
 

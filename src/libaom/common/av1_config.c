@@ -322,7 +322,7 @@ static int parse_sequence_header(const uint8_t *const buffer, size_t length,
   AV1C_READ_BITS_OR_RETURN_ERROR(max_frame_height_minus_1,
                                  frame_height_bits_minus_1 + 1);
 
-  int frame_id_numbers_present = 0;
+  uint8_t frame_id_numbers_present = 0;
   if (!reduced_still_picture_header) {
     AV1C_READ_BIT_OR_RETURN_ERROR(frame_id_numbers_present_flag);
     frame_id_numbers_present = frame_id_numbers_present_flag;
@@ -345,7 +345,7 @@ static int parse_sequence_header(const uint8_t *const buffer, size_t length,
 
     AV1C_READ_BIT_OR_RETURN_ERROR(enable_order_hint);
     if (enable_order_hint) {
-      AV1C_READ_BIT_OR_RETURN_ERROR(enable_jnt_comp);
+      AV1C_READ_BIT_OR_RETURN_ERROR(enable_dist_wtd_comp);
       AV1C_READ_BIT_OR_RETURN_ERROR(enable_ref_frame_mvs);
     }
 

@@ -14,6 +14,7 @@
 #include "./vp9_rtcd.h"
 #include "./vpx_dsp_rtcd.h"
 #include "vpx_dsp/txfm_common.h"
+#include "vpx_dsp/x86/bitdepth_conversion_sse2.h"
 #include "vpx_dsp/x86/fwd_txfm_sse2.h"
 #include "vpx_dsp/x86/transpose_sse2.h"
 #include "vpx_dsp/x86/txfm_common_sse2.h"
@@ -170,23 +171,23 @@ void vp9_fht4x4_sse2(const int16_t *input, tran_low_t *output, int stride,
       fadst4_sse2(in);
       write_buffer_4x4(output, in);
       break;
-    case ADST_ADST:
+    default:
+      assert(tx_type == ADST_ADST);
       load_buffer_4x4(input, in, stride);
       fadst4_sse2(in);
       fadst4_sse2(in);
       write_buffer_4x4(output, in);
       break;
-    default: assert(0); break;
   }
 }
 
 void vp9_fdct8x8_quant_sse2(const int16_t *input, int stride,
-                            int16_t *coeff_ptr, intptr_t n_coeffs,
+                            tran_low_t *coeff_ptr, intptr_t n_coeffs,
                             int skip_block, const int16_t *round_ptr,
-                            const int16_t *quant_ptr, int16_t *qcoeff_ptr,
-                            int16_t *dqcoeff_ptr, const int16_t *dequant_ptr,
-                            uint16_t *eob_ptr, const int16_t *scan_ptr,
-                            const int16_t *iscan_ptr) {
+                            const int16_t *quant_ptr, tran_low_t *qcoeff_ptr,
+                            tran_low_t *dqcoeff_ptr, const int16_t *dequant_ptr,
+                            uint16_t *eob_ptr, const int16_t *scan,
+                            const int16_t *iscan) {
   __m128i zero;
   int pass;
 
@@ -215,7 +216,7 @@ void vp9_fdct8x8_quant_sse2(const int16_t *input, int stride,
   __m128i *in[8];
   int index = 0;
 
-  (void)scan_ptr;
+  (void)scan;
   (void)coeff_ptr;
 
   // Pre-condition input (shift by two)
@@ -449,7 +450,7 @@ void vp9_fdct8x8_quant_sse2(const int16_t *input, int stride,
     in7 = _mm_srai_epi16(in7, 1);
   }
 
-  iscan_ptr += n_coeffs;
+  iscan += n_coeffs;
   qcoeff_ptr += n_coeffs;
   dqcoeff_ptr += n_coeffs;
   n_coeffs = -n_coeffs;
@@ -497,15 +498,15 @@ void vp9_fdct8x8_quant_sse2(const int16_t *input, int stride,
         qcoeff0 = _mm_sub_epi16(qcoeff0, coeff0_sign);
         qcoeff1 = _mm_sub_epi16(qcoeff1, coeff1_sign);
 
-        _mm_store_si128((__m128i *)(qcoeff_ptr + n_coeffs), qcoeff0);
-        _mm_store_si128((__m128i *)(qcoeff_ptr + n_coeffs) + 1, qcoeff1);
+        store_tran_low(qcoeff0, qcoeff_ptr + n_coeffs);
+        store_tran_low(qcoeff1, qcoeff_ptr + n_coeffs + 8);
 
         coeff0 = _mm_mullo_epi16(qcoeff0, dequant);
         dequant = _mm_unpackhi_epi64(dequant, dequant);
         coeff1 = _mm_mullo_epi16(qcoeff1, dequant);
 
-        _mm_store_si128((__m128i *)(dqcoeff_ptr + n_coeffs), coeff0);
-        _mm_store_si128((__m128i *)(dqcoeff_ptr + n_coeffs) + 1, coeff1);
+        store_tran_low(coeff0, dqcoeff_ptr + n_coeffs);
+        store_tran_low(coeff1, dqcoeff_ptr + n_coeffs + 8);
       }
 
       {
@@ -518,8 +519,8 @@ void vp9_fdct8x8_quant_sse2(const int16_t *input, int stride,
         zero_coeff1 = _mm_cmpeq_epi16(coeff1, zero);
         nzero_coeff0 = _mm_cmpeq_epi16(zero_coeff0, zero);
         nzero_coeff1 = _mm_cmpeq_epi16(zero_coeff1, zero);
-        iscan0 = _mm_load_si128((const __m128i *)(iscan_ptr + n_coeffs));
-        iscan1 = _mm_load_si128((const __m128i *)(iscan_ptr + n_coeffs) + 1);
+        iscan0 = _mm_load_si128((const __m128i *)(iscan + n_coeffs));
+        iscan1 = _mm_load_si128((const __m128i *)(iscan + n_coeffs) + 1);
         // Add one to convert from indices to counts
         iscan0 = _mm_sub_epi16(iscan0, nzero_coeff0);
         iscan1 = _mm_sub_epi16(iscan1, nzero_coeff1);
@@ -562,14 +563,14 @@ void vp9_fdct8x8_quant_sse2(const int16_t *input, int stride,
         qcoeff0 = _mm_sub_epi16(qcoeff0, coeff0_sign);
         qcoeff1 = _mm_sub_epi16(qcoeff1, coeff1_sign);
 
-        _mm_store_si128((__m128i *)(qcoeff_ptr + n_coeffs), qcoeff0);
-        _mm_store_si128((__m128i *)(qcoeff_ptr + n_coeffs) + 1, qcoeff1);
+        store_tran_low(qcoeff0, qcoeff_ptr + n_coeffs);
+        store_tran_low(qcoeff1, qcoeff_ptr + n_coeffs + 8);
 
         coeff0 = _mm_mullo_epi16(qcoeff0, dequant);
         coeff1 = _mm_mullo_epi16(qcoeff1, dequant);
 
-        _mm_store_si128((__m128i *)(dqcoeff_ptr + n_coeffs), coeff0);
-        _mm_store_si128((__m128i *)(dqcoeff_ptr + n_coeffs) + 1, coeff1);
+        store_tran_low(coeff0, dqcoeff_ptr + n_coeffs);
+        store_tran_low(coeff1, dqcoeff_ptr + n_coeffs + 8);
       }
 
       {
@@ -582,8 +583,8 @@ void vp9_fdct8x8_quant_sse2(const int16_t *input, int stride,
         zero_coeff1 = _mm_cmpeq_epi16(coeff1, zero);
         nzero_coeff0 = _mm_cmpeq_epi16(zero_coeff0, zero);
         nzero_coeff1 = _mm_cmpeq_epi16(zero_coeff1, zero);
-        iscan0 = _mm_load_si128((const __m128i *)(iscan_ptr + n_coeffs));
-        iscan1 = _mm_load_si128((const __m128i *)(iscan_ptr + n_coeffs) + 1);
+        iscan0 = _mm_load_si128((const __m128i *)(iscan + n_coeffs));
+        iscan1 = _mm_load_si128((const __m128i *)(iscan + n_coeffs) + 1);
         // Add one to convert from indices to counts
         iscan0 = _mm_sub_epi16(iscan0, nzero_coeff0);
         iscan1 = _mm_sub_epi16(iscan1, nzero_coeff1);
@@ -609,10 +610,10 @@ void vp9_fdct8x8_quant_sse2(const int16_t *input, int stride,
     }
   } else {
     do {
-      _mm_store_si128((__m128i *)(dqcoeff_ptr + n_coeffs), zero);
-      _mm_store_si128((__m128i *)(dqcoeff_ptr + n_coeffs) + 1, zero);
-      _mm_store_si128((__m128i *)(qcoeff_ptr + n_coeffs), zero);
-      _mm_store_si128((__m128i *)(qcoeff_ptr + n_coeffs) + 1, zero);
+      store_tran_low(zero, qcoeff_ptr + n_coeffs);
+      store_tran_low(zero, qcoeff_ptr + n_coeffs + 8);
+      store_tran_low(zero, dqcoeff_ptr + n_coeffs);
+      store_tran_low(zero, dqcoeff_ptr + n_coeffs + 8);
       n_coeffs += 8 * 2;
     } while (n_coeffs < 0);
     *eob_ptr = 0;
@@ -1097,14 +1098,14 @@ void vp9_fht8x8_sse2(const int16_t *input, tran_low_t *output, int stride,
       right_shift_8x8(in, 1);
       write_buffer_8x8(output, in, 8);
       break;
-    case ADST_ADST:
+    default:
+      assert(tx_type == ADST_ADST);
       load_buffer_8x8(input, in, stride);
       fadst8_sse2(in);
       fadst8_sse2(in);
       right_shift_8x8(in, 1);
       write_buffer_8x8(output, in, 8);
       break;
-    default: assert(0); break;
   }
 }
 
@@ -1963,13 +1964,13 @@ void vp9_fht16x16_sse2(const int16_t *input, tran_low_t *output, int stride,
       fadst16_sse2(in0, in1);
       write_buffer_16x16(output, in0, in1, 16);
       break;
-    case ADST_ADST:
+    default:
+      assert(tx_type == ADST_ADST);
       load_buffer_16x16(input, in0, in1, stride);
       fadst16_sse2(in0, in1);
       right_shift_16x16(in0, in1);
       fadst16_sse2(in0, in1);
       write_buffer_16x16(output, in0, in1, 16);
       break;
-    default: assert(0); break;
   }
 }

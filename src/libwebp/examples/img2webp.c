@@ -27,6 +27,7 @@
 #include "../imageio/image_dec.h"
 #include "../imageio/imageio_util.h"
 #include "./stopwatch.h"
+#include "./unicode.h"
 #include "webp/encode.h"
 #include "webp/mux.h"
 
@@ -138,8 +139,13 @@ int main(int argc, const char* argv[]) {
   int c;
   int have_input = 0;
   CommandLineArguments cmd_args;
-  int ok = ExUtilInitCommandLineArguments(argc - 1, argv + 1, &cmd_args);
-  if (!ok) return 1;
+  int ok;
+
+  INIT_WARGV(argc, argv);
+
+  ok = ExUtilInitCommandLineArguments(argc - 1, argv + 1, &cmd_args);
+  if (!ok) FREE_WARGV_AND_RETURN(1);
+
   argc = cmd_args.argc_;
   argv = cmd_args.argv_;
 
@@ -158,7 +164,7 @@ int main(int argc, const char* argv[]) {
       int parse_error = 0;
       if (!strcmp(argv[c], "-o") && c + 1 < argc) {
         argv[c] = NULL;
-        output = argv[++c];
+        output = (const char*)GET_WARGV_SHIFTED(argv, ++c);
       } else if (!strcmp(argv[c], "-kmin") && c + 1 < argc) {
         argv[c] = NULL;
         anim_config.kmin = ExUtilGetInt(argv[++c], 0, &parse_error);
@@ -245,7 +251,7 @@ int main(int argc, const char* argv[]) {
 
     // read next input image
     pic.use_argb = 1;
-    ok = ReadImage(argv[c], &pic);
+    ok = ReadImage((const char*)GET_WARGV_SHIFTED(argv, c), &pic);
     if (!ok) goto End;
 
     if (enc == NULL) {
@@ -277,8 +283,8 @@ int main(int argc, const char* argv[]) {
     if (!ok) goto End;
 
     if (verbose) {
-      fprintf(stderr, "Added frame #%3d at time %4d (file: %s)\n",
-              pic_num, timestamp_ms, argv[c]);
+      WFPRINTF(stderr, "Added frame #%3d at time %4d (file: %s)\n",
+               pic_num, timestamp_ms, GET_WARGV_SHIFTED(argv, c));
     }
     timestamp_ms += duration;
     ++pic_num;
@@ -302,7 +308,7 @@ int main(int argc, const char* argv[]) {
   if (ok) {
     if (output != NULL) {
       ok = ImgIoUtilWriteFile(output, webp_data.bytes, webp_data.size);
-      if (ok) fprintf(stderr, "output file: %s     ", output);
+      if (ok) WFPRINTF(stderr, "output file: %s     ", (const W_CHAR*)output);
     } else {
       fprintf(stderr, "[no output file specified]   ");
     }
@@ -314,5 +320,5 @@ int main(int argc, const char* argv[]) {
   }
   WebPDataClear(&webp_data);
   ExUtilDeleteCommandLineArguments(&cmd_args);
-  return ok ? 0 : 1;
+  FREE_WARGV_AND_RETURN(ok ? 0 : 1);
 }

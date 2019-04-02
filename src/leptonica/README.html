@@ -75,12 +75,12 @@ This work is licensed under a <a rel="license" href="http://creativecommons.org/
  -  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *====================================================================*/
 
-README (version 1.77.0)
-File update: 14 Dec 2018
+README (version 1.78.0)
+File update: 21 Mar 2019
 ---------------------------
 
-gunzip leptonica-1.77.0.tar.gz
-tar -xvf leptonica-1.77.0.tar
+gunzip leptonica-1.78.0.tar.gz
+tar -xvf leptonica-1.78.0.tar
 
 </pre>
 
@@ -117,7 +117,7 @@ Building leptonica
   Libraries, executables and prototypes are easily made, as described below.
 
   When you extract from the archive, all files are put in a
-  subdirectory 'leptonica-1.77.0'.  In that directory you will
+  subdirectory 'leptonica-1.78.0'.  In that directory you will
   find a src directory containing the source files for the library,
   and a prog directory containing source files for various
   testing and example programs.
@@ -209,7 +209,7 @@ Building leptonica
              using 'make install'.  Examples of these are the PostScript
              and pdf conversion programs: converttopdf, converttops,
              convertfilestopdf, convertfilestops, convertsegfilestopdf,
-             convertsegfilestops, printimage and printsplitimage.
+             convertsegfilestops, imagetops, printimage and printsplitimage.
          (2) Programs that are used as regression tests in alltests_reg.
              These are named *_reg, and 100 of them are invoked together
              (alltests_reg).  The regression test framework has been
@@ -252,7 +252,7 @@ Building leptonica
             make install
 
        Configure also supports building in a separate directory from the
-       source.  Run "/(path-to)/leptonica-1.77.0/configure" and then "make"
+       source.  Run "/(path-to)/leptonica-1.78.0/configure" and then "make"
        from the desired build directory.
 
        Configure has a number of useful options; run "configure --help" for
@@ -939,7 +939,10 @@ What's in leptonica?
    See psio1.c for examples of how to output PS for different applications.
    As examples of usage, see:
      * prog/converttops.c for a general image --> PS conversion
-           for printing.  You can specify compression level (1, 2, or 3).
+           for printing.  You can specify the PS compression level (1, 2, or 3).
+     * prog/imagetops.c for a special image --> PS conversion
+           for printing at maximum size on 8.5 x 11 paper.  You can
+           specify the PS compression level (1, 2, or 3).
      * prog/convertfilestops.c to generate a multipage level 3 compressed
            PS file that can then be converted to pdf with ps2pdf.
      * prog/convertsegfilestops.c to generate a multipage, mixed raster,
@@ -1114,20 +1117,20 @@ What's in leptonica?
    http://code.google.com/p/leptonica, as well as all versions after 1.60.
    These have now been transferred by Egor Pugin to github:
        github.com/danbloomberg/leptonica
-   where all releases (1.42 - 1.77.0) are available; e.g.,
-       https://github.com/DanBloomberg/leptonica/releases/tag/1.77.0
-   Most recent releases from 1.67 are also available at
+   where all releases (1.42 - 1.78.0) are available; e.g.,
+       https://github.com/DanBloomberg/leptonica/releases/tag/1.78.0
+   Many recent releases from 1.71 are also available at
        leptonica.org/download.html
    Note that if you are downloading from github, the releases are more
    likely to be stable than the master.  Also, if you download from
-   the master you need to run the autogen.sh script to generate the
-   configure program and the Makefiles.
+   the master and use autotools (e.g., Makefile.am), you must first run
+   autogen.sh to generate the configure program and the Makefiles.
 
    The number of downloads of leptonica increased by nearly an order
    of magnitude with 1.69, due to bundling with tesseract and
    incorporation in ubuntu 12-04.  Jeff Breidenbach has built all
    the Debian releases, which require release version numbers.
-   The Debian binary release versions are:
+   The Debian binary release versions to date are:
         1.69 : 3.0.0
         1.70 : 4.0.0
         1.71 : 4.2.0
@@ -1136,7 +1139,6 @@ What's in leptonica?
         1.74 : 5.1.0
         1.75 : 5.2.0
         1.76 : 5.3.0
-        1.77 : 5.3.0
 
    A brief version chronology is maintained in version-notes.html.
    Starting with gcc 4.3.3, error warnings (-Werror) are given for

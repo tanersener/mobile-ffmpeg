@@ -170,7 +170,7 @@ static l_int32 scaleBinaryLow(l_uint32 *datad, l_int32 wd, l_int32 hd,
 /*!
  * \brief   pixScale()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16 and 32 bpp
+ * \param[in]    pixs       1, 2, 4, 8, 16 and 32 bpp
  * \param[in]    scalex, scaley
  * \return  pixd, or NULL on error
  *
@@ -266,8 +266,8 @@ l_float32  maxscale, sharpfract;
  * \brief   pixScaleToSizeRel()
  *
  * \param[in]    pixs
- * \param[in]    delw  change in width, in pixels; 0 means no change
- * \param[in]    delh  change in height, in pixels; 0 means no change
+ * \param[in]    delw    change in width, in pixels; 0 means no change
+ * \param[in]    delh    change in height, in pixels; 0 means no change
  * \return  pixd, or NULL on error
  */
 PIX *
@@ -298,9 +298,9 @@ l_int32  w, h, wd, hd;
 /*!
  * \brief   pixScaleToSize()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16 and 32 bpp
- * \param[in]    wd  target width; use 0 if using height as target
- * \param[in]    hd  target height; use 0 if using width as target
+ * \param[in]    pixs    1, 2, 4, 8, 16 and 32 bpp
+ * \param[in]    wd      target width; use 0 if using height as target
+ * \param[in]    hd      target height; use 0 if using width as target
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -386,10 +386,11 @@ l_float32  factor;
 /*!
  * \brief   pixScaleGeneral()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16 and 32 bpp
- * \param[in]    scalex, scaley both > 0.0
- * \param[in]    sharpfract use 0.0 to skip sharpening
- * \param[in]    sharpwidth halfwidth of low-pass filter; typ. 1 or 2
+ * \param[in]    pixs         1, 2, 4, 8, 16 and 32 bpp
+ * \param[in]    scalex       must be > 0.0
+ * \param[in]    scaley       must be > 0.0
+ * \param[in]    sharpfract   use 0.0 to skip sharpening
+ * \param[in]    sharpwidth   halfwidth of low-pass filter; typ. 1 or 2
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -474,8 +475,9 @@ PIX       *pixt, *pixt2, *pixd;
 /*!
  * \brief   pixScaleLI()
  *
- * \param[in]    pixs 2, 4, 8 or 32 bpp; with or without colormap
- * \param[in]    scalex, scaley must both be >= 0.7
+ * \param[in]    pixs       2, 4, 8 or 32 bpp; with or without colormap
+ * \param[in]    scalex     must be >= 0.7
+ * \param[in]    scaley     must be >= 0.7
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -535,8 +537,9 @@ PIX       *pixt, *pixd;
 /*!
  * \brief   pixScaleColorLI()
  *
- * \param[in]    pixs  32 bpp, representing rgb
- * \param[in]    scalex, scaley must both be >= 0.7
+ * \param[in]    pixs       32 bpp, representing rgb
+ * \param[in]    scalex     must be >= 0.7
+ * \param[in]    scaley     must be >= 0.7
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -607,7 +610,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleColor2xLI()
  *
- * \param[in]    pixs  32 bpp, representing rgb
+ * \param[in]    pixs    32 bpp, representing rgb
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -654,7 +657,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleColor4xLI()
  *
- * \param[in]    pixs  32 bpp, representing rgb
+ * \param[in]    pixs    32 bpp, representing rgb
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -710,8 +713,9 @@ PIX  *pixd;
 /*!
  * \brief   pixScaleGrayLI()
  *
- * \param[in]    pixs 8 bpp grayscale, no cmap
- * \param[in]    scalex, scaley must both be >= 0.7
+ * \param[in]    pixs       8 bpp grayscale, no cmap
+ * \param[in]    scalex     must be >= 0.7
+ * \param[in]    scaley     must be >= 0.7
  * \return  pixd, or NULL on error
  *
  *  This function is appropriate for upscaling magnification, where the
@@ -825,7 +829,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleGray2xLI()
  *
- * \param[in]    pixs 8 bpp grayscale, not cmapped
+ * \param[in]    pixs    8 bpp grayscale, not cmapped
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -868,7 +872,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleGray4xLI()
  *
- * \param[in]    pixs 8 bpp grayscale, not cmapped
+ * \param[in]    pixs    8 bpp grayscale, not cmapped
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -914,7 +918,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleGray2xLIThresh()
  *
- * \param[in]    pixs 8 bpp, not cmapped
+ * \param[in]    pixs    8 bpp, not cmapped
  * \param[in]    thresh  between 0 and 256
  * \return  pixd 1 bpp, or NULL on error
  *
@@ -989,7 +993,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleGray2xLIDither()
  *
- * \param[in]    pixs 8 bpp, not cmapped
+ * \param[in]    pixs    8 bpp, not cmapped
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -1108,7 +1112,7 @@ cleanup:
 /*!
  * \brief   pixScaleGray4xLIThresh()
  *
- * \param[in]    pixs 8 bpp
+ * \param[in]    pixs    8 bpp
  * \param[in]    thresh  between 0 and 256
  * \return  pixd 1 bpp, or NULL on error
  *
@@ -1191,7 +1195,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleGray4xLIDither()
  *
- * \param[in]    pixs 8 bpp, not cmapped
+ * \param[in]    pixs    8 bpp, not cmapped
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -1322,8 +1326,9 @@ cleanup:
 /*!
  * \brief   pixScaleBySampling()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16, 32 bpp
- * \param[in]    scalex, scaley both > 0.0
+ * \param[in]    pixs       1, 2, 4, 8, 16, 32 bpp
+ * \param[in]    scalex     must be > 0.0
+ * \param[in]    scaley     must be > 0.0
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1380,9 +1385,9 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleBySamplingToSize()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16 and 32 bpp
- * \param[in]    wd  target width; use 0 if using height as target
- * \param[in]    hd  target height; use 0 if using width as target
+ * \param[in]    pixs    1, 2, 4, 8, 16 and 32 bpp
+ * \param[in]    wd      target width; use 0 if using height as target
+ * \param[in]    hd      target height; use 0 if using width as target
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1430,8 +1435,8 @@ l_float32  scalex, scaley;
 /*!
  * \brief   pixScaleByIntSampling()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16, 32 bpp
- * \param[in]    factor integer subsampling
+ * \param[in]    pixs     1, 2, 4, 8, 16, 32 bpp
+ * \param[in]    factor   integer subsampling
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1468,9 +1473,9 @@ l_float32  scale;
 /*!
  * \brief   pixScaleRGBToGrayFast()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    factor integer reduction factor >= 1
- * \param[in]    color one of COLOR_RED, COLOR_GREEN, COLOR_BLUE
+ * \param[in]    pixs     32 bpp rgb
+ * \param[in]    factor   integer reduction factor >= 1
+ * \param[in]    color    one of COLOR_RED, COLOR_GREEN, COLOR_BLUE
  * \return  pixd 8 bpp, or NULL on error
  *
  * <pre>
@@ -1543,9 +1548,9 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleRGBToBinaryFast()
  *
- * \param[in]    pixs 32 bpp RGB
- * \param[in]    factor integer reduction factor >= 1
- * \param[in]    thresh binarization threshold
+ * \param[in]    pixs     32 bpp RGB
+ * \param[in]    factor   integer reduction factor >= 1
+ * \param[in]    thresh   binarization threshold
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -1610,9 +1615,9 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleGrayToBinaryFast()
  *
- * \param[in]    pixs 8 bpp grayscale
- * \param[in]    factor integer reduction factor >= 1
- * \param[in]    thresh binarization threshold
+ * \param[in]    pixs     8 bpp grayscale
+ * \param[in]    factor   integer reduction factor >= 1
+ * \param[in]    thresh   binarization threshold
  * \return  pixd 1 bpp, or NULL on error
  *
  * <pre>
@@ -1679,8 +1684,9 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleSmooth()
  *
- * \param[in]    pix 2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
- * \param[in]    scalex, scaley must both be < 0.7
+ * \param[in]    pix       2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
+ * \param[in]    scalex    must be < 0.7
+ * \param[in]    scaley    must be < 0.7
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1787,9 +1793,9 @@ PIX       *pixs, *pixd;
 /*!
  * \brief   pixScaleSmoothToSize()
  *
- * \param[in]    pixs 2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
- * \param[in]    wd   target width; use 0 if using height as target
- * \param[in]    hd   target height; use 0 if using width as target
+ * \param[in]    pixs   2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
+ * \param[in]    wd     target width; use 0 if using height as target
+ * \param[in]    hd     target height; use 0 if using width as target
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1837,8 +1843,8 @@ l_float32  scalex, scaley;
 /*!
  * \brief   pixScaleRGBToGray2()
  *
- * \param[in]    pixs 32 bpp rgb
- * \param[in]    rwt, gwt, bwt must sum to 1.0
+ * \param[in]    pixs            32 bpp rgb
+ * \param[in]    rwt, gwt, bwt   must sum to 1.0
  * \return  pixd, 8 bpp, 2x reduced, or NULL on error
  */
 PIX *
@@ -1882,8 +1888,9 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleAreaMap()
  *
- * \param[in]    pix 2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
- * \param[in]    scalex, scaley must both be <= 0.7
+ * \param[in]    pix       2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
+ * \param[in]    scalex    must be <= 0.7
+ * \param[in]    scaley    must be <= 0.7
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -2006,7 +2013,7 @@ PIX       *pixs, *pixd, *pixt1, *pixt2, *pixt3;
 /*!
  * \brief   pixScaleAreaMap2()
  *
- * \param[in]    pix 2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
+ * \param[in]    pix     2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -2077,9 +2084,9 @@ PIX       *pixs, *pixd;
 /*!
  * \brief   pixScaleAreaMapToSize()
  *
- * \param[in]    pixs 2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
- * \param[in]    wd   target width; use 0 if using height as target
- * \param[in]    hd   target height; use 0 if using width as target
+ * \param[in]    pixs    2, 4, 8 or 32 bpp; and 2, 4, 8 bpp with colormap
+ * \param[in]    wd      target width; use 0 if using height as target
+ * \param[in]    hd      target height; use 0 if using width as target
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -2130,8 +2137,9 @@ l_float32  scalex, scaley;
 /*!
  * \brief   pixScaleBinary()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    scalex, scaley both > 0.0
+ * \param[in]    pixs      1 bpp
+ * \param[in]    scalex    must be > 0.0
+ * \param[in]    scaley    must be > 0.0
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -2473,8 +2481,8 @@ scaleColor2xLILineLow(l_uint32  *lined,
                       l_int32    lastlineflag)
 {
 l_int32    j, jd, wsm;
-l_int32    rval1, rval2, rval3, rval4, gval1, gval2, gval3, gval4;
-l_int32    bval1, bval2, bval3, bval4;
+l_uint32   rval1, rval2, rval3, rval4, gval1, gval2, gval3, gval4;
+l_uint32   bval1, bval2, bval3, bval4;
 l_uint32   pixels1, pixels2, pixels3, pixels4, pixel;
 l_uint32  *linesp, *linedp;
 
@@ -2672,7 +2680,7 @@ scaleGray2xLILineLow(l_uint32  *lined,
                      l_int32    lastlineflag)
 {
 l_int32    j, jd, wsm, w;
-l_int32    sval1, sval2, sval3, sval4;
+l_uint32   sval1, sval2, sval3, sval4;
 l_uint32  *linesp, *linedp;
 l_uint32   words, wordsp, wordd, worddp;
 

@@ -65,7 +65,9 @@ void av1_nn_softmax(const float *input, float *output, int n) {
   for (int i = 1; i < n; i++) max_inp = AOMMAX(max_inp, input[i]);
   float sum_out = 0.0f;
   for (int i = 0; i < n; i++) {
-    output[i] = (float)exp(input[i] - max_inp);
+    // Clamp to range [-10.0, 0.0] to prevent FE_UNDERFLOW errors.
+    const float normalized_input = AOMMAX(input[i] - max_inp, -10.0f);
+    output[i] = (float)exp(normalized_input);
     sum_out += output[i];
   }
   for (int i = 0; i < n; i++) output[i] /= sum_out;

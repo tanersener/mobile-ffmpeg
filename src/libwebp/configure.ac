@@ -1,4 +1,4 @@
-AC_INIT([libwebp], [1.0.1],
+AC_INIT([libwebp], [1.0.2],
         [https://bugs.chromium.org/p/webp],,
         [http://developers.google.com/speed/webp])
 AC_CANONICAL_HOST

@@ -18,8 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:largeHeap="true"
-        android:theme="@style/AppTheme"
-        tools:replace="android:icon">
+        android:theme="@style/AppTheme">
         <activity android:name="com.arthenica.mobileffmpeg.test.MainActivity"
             android:theme="@style/AppTheme">
             <intent-filter>

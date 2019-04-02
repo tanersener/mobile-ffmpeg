@@ -59,9 +59,13 @@ static INLINE int av1_get_spatial_seg_pred(const AV1_COMMON *const cm,
     prev_l = get_segment_id(cm, cm->cur_frame->seg_map, BLOCK_4X4, mi_row - 0,
                             mi_col - 1);
   }
+  // This property follows from the fact that get_segment_id() returns a
+  // nonnegative value. This allows us to test for all edge cases with a simple
+  // prev_ul < 0 check.
+  assert(IMPLIES(prev_ul >= 0, prev_u >= 0 && prev_l >= 0));
 
   // Pick CDF index based on number of matching/out-of-bounds segment IDs.
-  if (prev_ul < 0 || prev_u < 0 || prev_l < 0) /* Edge case */
+  if (prev_ul < 0) /* Edge cases */
     *cdf_index = 0;
   else if ((prev_ul == prev_u) && (prev_ul == prev_l))
     *cdf_index = 2;

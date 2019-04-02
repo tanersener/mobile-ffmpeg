@@ -20,6 +20,10 @@
  */
 
 /*
+ * CHANGES 03.2019
+ * --------------------------------------------------------
+ * - config.h include removed
+ *
  * CHANGES 08.2018
  * --------------------------------------------------------
  * - fftools_ prefix added to file name and include guards
@@ -35,7 +39,6 @@
 
 #include <stdint.h>
 
-#include "config.h"
 #include "libavcodec/avcodec.h"
 #include "libavfilter/avfilter.h"
 #include "libavformat/avformat.h"
@@ -358,6 +361,7 @@ typedef struct OptionParseContext {
  * Parse an options group and write results into optctx.
  *
  * @param optctx an app-specific options context. NULL for global options group
+ * @param g option group
  */
 int parse_optgroup(void *optctx, OptionGroup *g);
 

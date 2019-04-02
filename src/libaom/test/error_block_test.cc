@@ -156,6 +156,70 @@ TEST_P(ErrorBlockTest, ExtremeValues) {
       << "First failed at test case " << first_failure;
 }
 
+TEST_P(ErrorBlockTest, DISABLED_Speed) {
+  ACMRandom rnd(ACMRandom::DeterministicSeed());
+  DECLARE_ALIGNED(16, tran_low_t, coeff[4096]);
+  DECLARE_ALIGNED(16, tran_low_t, dqcoeff[4096]);
+  intptr_t block_size;
+  int64_t ssz;
+  int num_iters = 100000;
+  int64_t ref_ssz;
+  int k;
+  const int msb = bit_depth_ + 8 - 1;
+  for (int i = 0; i < 9; ++i) {
+    block_size = 16 << (i % 9);  // All block sizes from 4x4, 8x4 ..64x64
+    for (k = 0; k < 9; k++) {
+      for (int j = 0; j < block_size; j++) {
+        if (k < 5) {
+          if (rnd(2)) {
+            // Positive number
+            coeff[j] = rnd(1 << msb);
+            dqcoeff[j] = rnd(1 << msb);
+          } else {
+            // Negative number
+            coeff[j] = -rnd(1 << msb);
+            dqcoeff[j] = -rnd(1 << msb);
+          }
+        } else {
+          if (rnd(2)) {
+            // Positive number
+            coeff[j] = rnd(1 << 14);
+            dqcoeff[j] = rnd(1 << 14);
+          } else {
+            // Negative number
+            coeff[j] = -rnd(1 << 14);
+            dqcoeff[j] = -rnd(1 << 14);
+          }
+        }
+      }
+      aom_usec_timer ref_timer, test_timer;
+
+      aom_usec_timer_start(&ref_timer);
+      for (int i = 0; i < num_iters; ++i) {
+        ref_error_block_op_(coeff, dqcoeff, block_size, &ref_ssz, bit_depth_);
+      }
+      aom_usec_timer_mark(&ref_timer);
+      const int elapsed_time_c =
+          static_cast<int>(aom_usec_timer_elapsed(&ref_timer));
+
+      aom_usec_timer_start(&test_timer);
+      for (int i = 0; i < num_iters; ++i) {
+        error_block_op_(coeff, dqcoeff, block_size, &ssz, bit_depth_);
+      }
+      aom_usec_timer_mark(&test_timer);
+
+      const int elapsed_time_simd =
+          static_cast<int>(aom_usec_timer_elapsed(&test_timer));
+
+      printf(
+          " c_time=%d \t simd_time=%d \t "
+          "gain=%d \n",
+          elapsed_time_c, elapsed_time_simd,
+          (elapsed_time_c / elapsed_time_simd));
+    }
+  }
+}
+
 #if (HAVE_SSE2 || HAVE_AVX)
 using ::testing::make_tuple;
 
@@ -168,4 +232,17 @@ INSTANTIATE_TEST_CASE_P(
                       make_tuple(&av1_highbd_block_error_sse2,
                                  &av1_highbd_block_error_c, AOM_BITS_8)));
 #endif  // HAVE_SSE2
+
+#if (HAVE_AVX2)
+using ::testing::make_tuple;
+
+INSTANTIATE_TEST_CASE_P(
+    AVX2, ErrorBlockTest,
+    ::testing::Values(make_tuple(&av1_highbd_block_error_avx2,
+                                 &av1_highbd_block_error_c, AOM_BITS_10),
+                      make_tuple(&av1_highbd_block_error_avx2,
+                                 &av1_highbd_block_error_c, AOM_BITS_12),
+                      make_tuple(&av1_highbd_block_error_avx2,
+                                 &av1_highbd_block_error_c, AOM_BITS_8)));
+#endif  // HAVE_AVX2
 }  // namespace

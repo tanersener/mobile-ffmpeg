@@ -58,7 +58,7 @@ static  l_uint32 expandtab16[] = {
 /*!
  * \brief   pixExpandBinaryReplicate()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs   1 bpp
  * \param[in]    xfact  integer scale factor for horiz. replicative expansion
  * \param[in]    yfact  integer scale factor for vertical replicative expansion
  * \return  pixd scaled up, or NULL on error
@@ -124,8 +124,8 @@ PIX       *pixd;
 /*!
  * \brief   pixExpandBinaryPower2()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    factor expansion factor: 1, 2, 4, 8, 16
+ * \param[in]    pixs      1 bpp
+ * \param[in]    factor    expansion factor: 1, 2, 4, 8, 16
  * \return  pixd expanded 1 bpp by replication, or NULL on error
  */
 PIX *

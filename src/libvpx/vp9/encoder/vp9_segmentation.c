@@ -46,6 +46,19 @@ void vp9_clear_segdata(struct segmentation *seg, int segment_id,
   seg->feature_data[segment_id][feature_id] = 0;
 }
 
+void vp9_psnr_aq_mode_setup(struct segmentation *seg) {
+  int i;
+
+  vp9_enable_segmentation(seg);
+  vp9_clearall_segfeatures(seg);
+  seg->abs_delta = SEGMENT_DELTADATA;
+
+  for (i = 0; i < MAX_SEGMENTS; ++i) {
+    vp9_set_segdata(seg, i, SEG_LVL_ALT_Q, 2 * (i - (MAX_SEGMENTS / 2)));
+    vp9_enable_segfeature(seg, i, SEG_LVL_ALT_Q);
+  }
+}
+
 // Based on set of segment counts calculate a probability tree
 static void calc_segtree_probs(int *segcounts, vpx_prob *segment_tree_probs) {
   // Work out probabilities of each segment

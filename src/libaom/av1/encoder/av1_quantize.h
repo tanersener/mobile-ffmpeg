@@ -22,11 +22,15 @@
 extern "C" {
 #endif
 
+#define EOB_FACTOR 325
+#define SKIP_EOB_FACTOR_ADJUST 200
+
 typedef struct QUANT_PARAM {
   int log_scale;
   TX_SIZE tx_size;
   const qm_val_t *qmatrix;
   const qm_val_t *iqmatrix;
+  int use_quant_b_adapt;
 } QUANT_PARAM;
 
 typedef void (*AV1_QUANT_FACADE)(const tran_low_t *coeff_ptr, intptr_t n_coeffs,

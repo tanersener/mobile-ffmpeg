@@ -192,4 +192,13 @@ public class FFmpeg {
         return AbiDetect.isNativeLTSBuild();
     }
 
+    /**
+     * <p>Returns MobileFFmpeg library build date.
+     *
+     * @return MobileFFmpeg library build date
+     */
+    public static String getBuildDate() {
+        return Config.getNativeBuildDate();
+    }
+
 }

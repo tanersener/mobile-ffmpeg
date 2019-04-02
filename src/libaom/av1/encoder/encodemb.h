@@ -37,13 +37,13 @@ struct encode_b_args {
   int8_t enable_optimize_b;
 };
 
-typedef enum AV1_XFORM_QUANT {
+enum {
   AV1_XFORM_QUANT_FP = 0,
   AV1_XFORM_QUANT_B = 1,
   AV1_XFORM_QUANT_DC = 2,
   AV1_XFORM_QUANT_SKIP_QUANT,
   AV1_XFORM_QUANT_TYPES,
-} AV1_XFORM_QUANT;
+} UENUM1BYTE(AV1_XFORM_QUANT);
 
 void av1_encode_sb(const struct AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
                    int mi_row, int mi_col, RUN_TYPE dry_run);

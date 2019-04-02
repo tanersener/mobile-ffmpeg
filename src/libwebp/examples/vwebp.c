@@ -42,6 +42,7 @@
 
 #include "../examples/example_util.h"
 #include "../imageio/imageio_util.h"
+#include "./unicode.h"
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -470,9 +471,11 @@ int main(int argc, char *argv[]) {
   WebPDecoderConfig* const config = &kParams.config;
   WebPIterator* const curr = &kParams.curr_frame;
 
+  INIT_WARGV(argc, argv);
+
   if (!WebPInitDecoderConfig(config)) {
     fprintf(stderr, "Library version mismatch!\n");
-    return -1;
+    FREE_WARGV_AND_RETURN(-1);
   }
   config->options.dithering_strength = 50;
   config->options.alpha_dithering_strength = 100;
@@ -484,7 +487,7 @@ int main(int argc, char *argv[]) {
     int parse_error = 0;
     if (!strcmp(argv[c], "-h") || !strcmp(argv[c], "-help")) {
       Help();
-      return 0;
+      FREE_WARGV_AND_RETURN(0);
     } else if (!strcmp(argv[c], "-noicc")) {
       kParams.use_color_profile = 0;
     } else if (!strcmp(argv[c], "-nofancy")) {
@@ -507,30 +510,30 @@ int main(int argc, char *argv[]) {
              (dec_version >> 16) & 0xff, (dec_version >> 8) & 0xff,
              dec_version & 0xff, (dmux_version >> 16) & 0xff,
              (dmux_version >> 8) & 0xff, dmux_version & 0xff);
-      return 0;
+      FREE_WARGV_AND_RETURN(0);
     } else if (!strcmp(argv[c], "-mt")) {
       config->options.use_threads = 1;
     } else if (!strcmp(argv[c], "--")) {
-      if (c < argc - 1) kParams.file_name = argv[++c];
+      if (c < argc - 1) kParams.file_name = (const char*)GET_WARGV(argv, ++c);
       break;
     } else if (argv[c][0] == '-') {
       printf("Unknown option '%s'\n", argv[c]);
       Help();
-      return -1;
+      FREE_WARGV_AND_RETURN(-1);
     } else {
-      kParams.file_name = argv[c];
+      kParams.file_name = (const char*)GET_WARGV(argv, c);
     }
 
     if (parse_error) {
       Help();
-      return -1;
+      FREE_WARGV_AND_RETURN(-1);
     }
   }
 
   if (kParams.file_name == NULL) {
     printf("missing input file!!\n");
     Help();
-    return 0;
+    FREE_WARGV_AND_RETURN(0);
   }
 
   if (!ImgIoUtilReadFile(kParams.file_name,
@@ -605,11 +608,11 @@ int main(int argc, char *argv[]) {
 
   // Should only be reached when using FREEGLUT:
   ClearParams();
-  return 0;
+  FREE_WARGV_AND_RETURN(0);
 
  Error:
   ClearParams();
-  return -1;
+  FREE_WARGV_AND_RETURN(-1);
 }
 
 #else   // !WEBP_HAVE_GL

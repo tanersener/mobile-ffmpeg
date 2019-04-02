@@ -185,9 +185,9 @@ static PIX * processMorphArgs2(PIX *pixd, PIX *pixs, SEL *sel);
 /*!
  * \brief   pixDilate()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
  * \param[in]    sel
  * \return  pixd
  *
@@ -239,9 +239,9 @@ PIX     *pixt;
 /*!
  * \brief   pixErode()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
  * \param[in]    sel
  * \return  pixd
  *
@@ -312,9 +312,9 @@ PIX     *pixt;
 /*!
  * \brief   pixHMT()
  *
- * \param[in]    pixd [optional]; this can be null, equal to pixs,
- *                    or different from pixs
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixd   [optional]; this can be null, equal to pixs,
+ *                      or different from pixs
+ * \param[in]    pixs   1 bpp
  * \param[in]    sel
  * \return  pixd
  *
@@ -398,9 +398,9 @@ PIX     *pixt;
 /*!
  * \brief   pixOpen()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
  * \param[in]    sel
  * \return  pixd
  *
@@ -489,9 +489,9 @@ PIX  *pixt;
 /*!
  * \brief   pixCloseSafe()
  *
- * \param[in]    pixd [optional]; this can be null, equal to pixs,
- *                    or different from pixs
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixd   [optional]; this can be null, equal to pixs,
+ *                      or different from pixs
+ * \param[in]    pixs   1 bpp
  * \param[in]    sel
  * \return  pixd
  *
@@ -560,9 +560,9 @@ PIX     *pixt1, *pixt2;
 /*!
  * \brief   pixOpenGeneralized()
  *
- * \param[in]    pixd [optional]; this can be null, equal to pixs,
- *                    or different from pixs
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixd   [optional]; this can be null, equal to pixs,
+ *                      or different from pixs
+ * \param[in]    pixs   1 bpp
  * \param[in]    sel
  * \return  pixd
  *
@@ -606,9 +606,9 @@ PIX  *pixt;
 /*!
  * \brief   pixCloseGeneralized()
  *
- * \param[in]    pixd [optional]; this can be null, equal to pixs,
- *                    or different from pixs
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixd   [optional]; this can be null, equal to pixs,
+ *                      or different from pixs
+ * \param[in]    pixs   1 bpp
  * \param[in]    sel
  * \return  pixd
  *
@@ -657,11 +657,11 @@ PIX  *pixt;
 /*!
  * \brief   pixDilateBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd
  *
  * <pre>
@@ -721,11 +721,11 @@ SEL  *sel, *selh, *selv;
 /*!
  * \brief   pixErodeBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd
  *
  * <pre>
@@ -785,11 +785,11 @@ SEL  *sel, *selh, *selv;
 /*!
  * \brief   pixOpenBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -851,11 +851,11 @@ SEL  *sel, *selh, *selv;
 /*!
  * \brief   pixCloseBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -917,11 +917,11 @@ SEL  *sel, *selh, *selv;
 /*!
  * \brief   pixCloseSafeBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1009,15 +1009,16 @@ SEL     *sel, *selh, *selv;
 /*-----------------------------------------------------------------*
  *     Binary composed morphological (raster) ops with brick Sels  *
  *-----------------------------------------------------------------*/
-/*  selectComposableSels()
+/* \brief   selectComposableSels()
  *
- *      Input:  size (of composed sel)
- *              direction (L_HORIZ, L_VERT)
- *              &sel1 (<optional return> contiguous sel; can be null)
- *              &sel2 (<optional return> comb sel; can be null)
- *      Return: 0 if OK, 1 on error
+ * \param[in]    size         of composed sel
+ * \param[in]    direction    L_HORIZ, L_VERT
+ * \param[out]   psel1        [optional] contiguous sel; can be null
+ * \param[out]   psel2        [optional] comb sel; can be null
+ * \return   0 if OK, 1 on error
  *
- *  Notes:
+ * <pre>
+ * Notes:
  *      (1) When using composable Sels, where the original Sel is
  *          decomposed into two, the best you can do in terms
  *          of reducing the computation is by a factor:
@@ -1032,6 +1033,7 @@ SEL     *sel, *selh, *selv;
  *                64        |          1/4
  *               144        |          1/6
  *               256        |          1/8
+ * </pre>
  */
 l_int32
 selectComposableSels(l_int32  size,
@@ -1070,9 +1072,9 @@ l_int32  factor1, factor2;
 /*!
  * \brief   selectComposableSizes()
  *
- * \param[in]    size of sel to be decomposed
- * \param[out]   pfactor1 larger factor
- * \param[out]   pfactor2 smaller factor
+ * \param[in]    size       of sel to be decomposed
+ * \param[out]   pfactor1   larger factor
+ * \param[out]   pfactor2   smaller factor
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1163,11 +1165,11 @@ l_int32  diff[256];  /* diff between product (sel size) and input size */
 /*!
  * \brief   pixDilateCompBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1263,11 +1265,11 @@ SEL  *selh1, *selh2, *selv1, *selv2;
 /*!
  * \brief   pixErodeCompBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1354,11 +1356,11 @@ SEL  *selh1, *selh2, *selv1, *selv2;
 /*!
  * \brief   pixOpenCompBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1453,11 +1455,11 @@ SEL  *selh1, *selh2, *selv1, *selv2;
 /*!
  * \brief   pixCloseCompBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1552,11 +1554,11 @@ SEL  *selh1, *selh2, *selv1, *selv2;
 /*!
  * \brief   pixCloseSafeCompBrick()
  *
- * \param[in]    pixd  [optional]; this can be null, equal to pixs,
- *                     or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    hsize width of brick Sel
- * \param[in]    vsize height of brick Sel
+ * \param[in]    pixd    [optional]; this can be null, equal to pixs,
+ *                       or different from pixs
+ * \param[in]    pixs    1 bpp
+ * \param[in]    hsize   width of brick Sel
+ * \param[in]    vsize   height of brick Sel
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -1680,7 +1682,7 @@ SEL     *selh1, *selh2, *selv1, *selv2;
 /*!
  * \brief   resetMorphBoundaryCondition()
  *
- * \param[in]    bc SYMMETRIC_MORPH_BC, ASYMMETRIC_MORPH_BC
+ * \param[in]    bc    SYMMETRIC_MORPH_BC, ASYMMETRIC_MORPH_BC
  * \return  void
  */
 void
@@ -1733,11 +1735,11 @@ getMorphBorderPixelColor(l_int32  type,
 /*!
  * \brief   processMorphArgs1()
  *
- * \param[in]    pixd [optional]; this can be null, equal to pixs,
- *                    or different from pixs
- * \param[in]    pixs 1 bpp
- * \param[in]    sel
- * \param[out]   ppixt ptr to PIX*
+ * \param[in]       pixd   [optional]; this can be null, equal to pixs,
+ *                         or different from pixs
+ * \param[in]       pixs   1 bpp
+ * \param[in]       sel
+ * \param[out]      ppixt  copy or clone of %pixs
  * \return  pixd, or NULL on error.
  *
  * <pre>

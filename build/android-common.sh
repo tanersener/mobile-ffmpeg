@@ -91,21 +91,40 @@ get_target_host() {
     esac
 }
 
-get_toolchain() {
+
+get_clang_target_host() {
     case ${ARCH} in
         arm-v7a | arm-v7a-neon)
-            echo "arm"
+            echo "armv7a-linux-androideabi${API}"
         ;;
         arm64-v8a)
-            echo "aarch64"
+            echo "aarch64-linux-android${API}"
         ;;
         x86)
-            echo "i686"
+            echo "i686-linux-android${API}"
         ;;
         x86-64)
-            echo "x86_64"
+            echo "x86_64-linux-android${API}"
         ;;
     esac
+}
+
+get_toolchain() {
+    HOST_OS=$(uname -s)
+    case ${HOST_OS} in
+        Darwin) HOST_OS=darwin;;
+        Linux) HOST_OS=linux;;
+        FreeBsd) HOST_OS=freebsd;;
+        CYGWIN*|*_NT-*) HOST_OS=cygwin;;
+    esac
+
+    HOST_ARCH=$(uname -m)
+    case ${HOST_ARCH} in
+        i?86) HOST_ARCH=x86;;
+        x86_64|amd64) HOST_ARCH=x86_64;;
+    esac
+
+    echo "${HOST_OS}-${HOST_ARCH}"
 }
 
 get_cmake_target_processor() {
@@ -184,7 +203,7 @@ get_android_arch() {
 }
 
 get_common_includes() {
-    echo "-I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/local/include"
+    echo "-I${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include -I${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/local/include"
 }
 
 get_common_cflags() {
@@ -328,21 +347,21 @@ get_cxxflags() {
 }
 
 get_common_linked_libraries() {
-    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/lib -L${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/lib"
+    local COMMON_LIBRARY_PATHS="-L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/${TARGET_HOST}/lib -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/lib/${TARGET_HOST}/${API} -L${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/lib"
 
     case $1 in
         ffmpeg)
             if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-                echo "-lc -lm -ldl -llog -lcamera2ndk -lmediandk -lc++_shared ${COMMON_LIBRARY_PATHS}"
+                echo "-lc -lm -ldl -llog -lcamera2ndk -lmediandk ${COMMON_LIBRARY_PATHS}"
             else
-                echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
+                echo "-lc -lm -ldl -llog ${COMMON_LIBRARY_PATHS}"
             fi
-        ;;
-        tesseract)
-            echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
         ;;
         libvpx)
             echo "-lc -lm ${COMMON_LIBRARY_PATHS}"
+        ;;
+        tesseract | x265)
+            echo "-lc -lm -ldl -llog -lc++_shared ${COMMON_LIBRARY_PATHS}"
         ;;
         *)
             echo "-lc -lm -ldl -llog ${COMMON_LIBRARY_PATHS}"
@@ -732,7 +751,7 @@ URL: https://github.com/tesseract-ocr/tesseract
 Version: ${TESSERACT_VERSION}
 
 Requires: lept, libjpeg, libpng, giflib, zlib, libwebp, libtiff-4
-Libs: -L\${libdir} -ltesseract
+Libs: -L\${libdir} -ltesseract -lc++_shared
 Cflags: -I\${includedir}
 EOF
 }
@@ -770,7 +789,7 @@ Version: ${X265_VERSION}
 
 Requires:
 Libs: -L\${libdir} -lx265
-Libs.private: -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl
+Libs.private: -lm -lgcc -lgcc -ldl -lgcc -lgcc -ldl -lc++_shared
 Cflags: -I\${includedir}
 EOF
 }
@@ -795,10 +814,10 @@ EOF
 }
 
 create_zlib_package_config() {
-    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
+    ZLIB_VERSION=$(grep '#define ZLIB_VERSION' ${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr/include/zlib.h | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
     cat > "${INSTALL_PKG_CONFIG_DIR}/zlib.pc" << EOF
-prefix=${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/sysroot/usr
+prefix=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot/usr
 exec_prefix=\${prefix}
 libdir=${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib
 includedir=\${prefix}/include
@@ -876,15 +895,15 @@ download_gpl_library_source() {
             GPL_LIB_DEST_DIR="libvidstab"
         ;;
         x264)
-            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20181224-2245-stable.tar.bz2"
-            GPL_LIB_FILE="x264-snapshot-20181224-2245-stable.tar.bz2"
-            GPL_LIB_ORIG_DIR="x264-snapshot-20181224-2245-stable"
+            GPL_LIB_URL="ftp://ftp.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-20190328-2245-stable.tar.bz2"
+            GPL_LIB_FILE="x264-snapshot-20190328-2245-stable.tar.bz2"
+            GPL_LIB_ORIG_DIR="x264-snapshot-20190328-2245-stable"
             GPL_LIB_DEST_DIR="x264"
         ;;
         x265)
-            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_2.9.tar.gz"
-            GPL_LIB_FILE="x265-2.9.tar.gz"
-            GPL_LIB_ORIG_DIR="x265_2.9"
+            GPL_LIB_URL="https://download.videolan.org/pub/videolan/x265/x265_3.0.tar.gz"
+            GPL_LIB_FILE="x265-3.0.tar.gz"
+            GPL_LIB_ORIG_DIR="x265_3.0"
             GPL_LIB_DEST_DIR="x265"
         ;;
         xvidcore)
@@ -964,13 +983,13 @@ download_gpl_library_source() {
 }
 
 set_toolchain_clang_paths() {
-    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-${TOOLCHAIN}/bin
+    export PATH=$PATH:${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/bin
 
     TARGET_HOST=$(get_target_host)
     
     export AR=${TARGET_HOST}-ar
-    export CC=${TARGET_HOST}-clang
-    export CXX=${TARGET_HOST}-clang++
+    export CC=$(get_clang_target_host)-clang
+    export CXX=$(get_clang_target_host)-clang++
 
     if [ "$1" == "x264" ]; then
         export AS=${CC}
@@ -1002,14 +1021,6 @@ set_toolchain_clang_paths() {
     prepare_inline_sed
 }
 
-create_toolchain() {
-    local TOOLCHAIN_DIR="${ANDROID_NDK_ROOT}/toolchains/mobile-ffmpeg-api-${API}-"${TOOLCHAIN}
-
-    if [ ! -d ${TOOLCHAIN_DIR} ]; then
-        ${ANDROID_NDK_ROOT}/build/tools/make_standalone_toolchain.py --arch ${TOOLCHAIN_ARCH} --api ${API} --stl libc++ --install-dir ${TOOLCHAIN_DIR} || exit 1
-    fi
-}
-
 build_cpufeatures() {
 
     # CLEAN OLD BUILD
@@ -1022,9 +1033,9 @@ build_cpufeatures() {
     echo -e "\nINFO: Building cpu-features for for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
 
     # THEN BUILD FOR THIS ABI
-    ${TARGET_HOST}-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
+    $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
     ${TARGET_HOST}-ar rcs ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
-    ${TARGET_HOST}-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
+    $(get_clang_target_host)-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
 
     create_cpufeatures_package_config
 }

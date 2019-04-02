@@ -188,8 +188,10 @@ int main(int argc, char **argv) {
 
   info = aom_video_reader_get_info(reader);
 
-  decoder = get_aom_decoder_by_fourcc(info->codec_fourcc);
-  if (!decoder) die("Unknown input codec.");
+  if (info->codec_fourcc == LST_FOURCC)
+    decoder = get_aom_decoder_by_fourcc(AV1_FOURCC);
+  else
+    die("Unknown input codec.");
   printf("Using %s\n", aom_codec_iface_name(decoder->codec_interface()));
 
   if (aom_codec_dec_init(&codec, decoder->codec_interface(), NULL, 0))
@@ -218,7 +220,7 @@ int main(int argc, char **argv) {
       // Allocate memory to store decoded references. Allocate memory with the
       // border so that it can be used as a reference.
       for (j = 0; j < num_references; j++) {
-        unsigned int border = AOM_BORDER_IN_PIXELS;
+        unsigned int border = AOM_DEC_BORDER_IN_PIXELS;
         if (!aom_img_alloc_with_border(&reference_images[j], ref_fmt,
                                        frame_res[0], frame_res[1], 32, 8,
                                        border)) {

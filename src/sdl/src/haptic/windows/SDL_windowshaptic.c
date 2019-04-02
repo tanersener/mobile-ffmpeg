@@ -157,7 +157,7 @@ SDL_SYS_HapticMouse(void)
 
     /* Grab the first mouse haptic device we find. */
     for (item = SDL_hapticlist; item != NULL; item = item->next) {
-        if (item->capabilities.dwDevType == DI8DEVCLASS_POINTER) {
+        if (item->capabilities.dwDevType == DI8DEVCLASS_POINTER ) {
             return index;
         }
         ++index;
@@ -173,16 +173,14 @@ SDL_SYS_HapticMouse(void)
 int
 SDL_SYS_JoystickIsHaptic(SDL_Joystick * joystick)
 {
-    if (joystick->driver != &SDL_WINDOWS_JoystickDriver) {
-        return 0;
-    }
+    const struct joystick_hwdata *hwdata = joystick->hwdata;
 #if SDL_HAPTIC_XINPUT
-    if (joystick->hwdata->bXInputHaptic) {
+    if (hwdata->bXInputHaptic) {
         return 1;
     }
 #endif
 #if SDL_HAPTIC_DINPUT
-    if (joystick->hwdata->Capabilities.dwFlags & DIDC_FORCEFEEDBACK) {
+    if (hwdata->Capabilities.dwFlags & DIDC_FORCEFEEDBACK) {
         return 1;
     }
 #endif
@@ -195,9 +193,6 @@ SDL_SYS_JoystickIsHaptic(SDL_Joystick * joystick)
 int
 SDL_SYS_JoystickSameHaptic(SDL_Haptic * haptic, SDL_Joystick * joystick)
 {
-    if (joystick->driver != &SDL_WINDOWS_JoystickDriver) {
-        return 0;
-    }
     if (joystick->hwdata->bXInputHaptic != haptic->hwdata->bXInputHaptic) {
         return 0;  /* one is XInput, one is not; not the same device. */
     } else if (joystick->hwdata->bXInputHaptic) {
@@ -213,8 +208,6 @@ SDL_SYS_JoystickSameHaptic(SDL_Haptic * haptic, SDL_Joystick * joystick)
 int
 SDL_SYS_HapticOpenFromJoystick(SDL_Haptic * haptic, SDL_Joystick * joystick)
 {
-    SDL_assert(joystick->driver == &SDL_WINDOWS_JoystickDriver);
-
     if (joystick->hwdata->bXInputDevice) {
         return SDL_XINPUT_HapticOpenFromJoystick(haptic, joystick);
     } else {

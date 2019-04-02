@@ -223,9 +223,9 @@ static void free_segment_dynarray(struct segment **segments, int n_segments)
 
 static void free_segment_list(struct playlist *pls)
 {
-        free_segment_dynarray(pls->segments, pls->n_segments);
-        av_freep(&pls->segments);
-        pls->n_segments = 0;
+    free_segment_dynarray(pls->segments, pls->n_segments);
+    av_freep(&pls->segments);
+    pls->n_segments = 0;
 }
 
 static void free_init_section_list(struct playlist *pls)
@@ -931,6 +931,7 @@ static int parse_playlist(HLSContext *c, const char *url,
                    prev_start_seq_no, pls->start_seq_no);
         }
         free_segment_dynarray(prev_segments, prev_n_segments);
+        av_freep(&prev_segments);
     }
     if (pls)
         pls->last_load_time = av_gettime_relative();
@@ -1867,7 +1868,7 @@ static int hls_read_header(AVFormatContext *s)
     /* Open the demuxer for each playlist */
     for (i = 0; i < c->n_playlists; i++) {
         struct playlist *pls = c->playlists[i];
-        AVInputFormat *in_fmt = NULL;
+        ff_const59 AVInputFormat *in_fmt = NULL;
 
         if (!(pls->ctx = avformat_alloc_context())) {
             ret = AVERROR(ENOMEM);
@@ -2284,7 +2285,7 @@ static int hls_read_seek(AVFormatContext *s, int stream_index,
     return 0;
 }
 
-static int hls_probe(AVProbeData *p)
+static int hls_probe(const AVProbeData *p)
 {
     /* Require #EXTM3U at the start, and either one of the ones below
      * somewhere for a proper match. */

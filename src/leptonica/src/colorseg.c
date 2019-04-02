@@ -439,7 +439,7 @@ PIXCMAP   *cmap;
 
         /* Set up the tables to map rgb to the nearest colormap index */
     success = TRUE;
-    makeRGBToIndexTables(&rtab, &gtab, &btab, level);
+    makeRGBToIndexTables(level, &rtab, &gtab, &btab);
     cmaptab = pixcmapToOctcubeLUT(cmap, level, L_MANHATTAN_DISTANCE);
     if (!rtab || !gtab || !btab || !cmaptab) {
         L_ERROR("failure to make a table\n", procName);

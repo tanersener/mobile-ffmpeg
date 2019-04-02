@@ -97,13 +97,13 @@ void av1_setup_scale_factors_for_frame(struct scale_factors *sf, int other_w,
   // subpel_x_q4 != 0 && subpel_y_q4 != 0
   sf->convolve[1][1][0] = av1_convolve_2d_sr;
   // subpel_x_q4 == 0 && subpel_y_q4 == 0
-  sf->convolve[0][0][1] = av1_jnt_convolve_2d_copy;
+  sf->convolve[0][0][1] = av1_dist_wtd_convolve_2d_copy;
   // subpel_x_q4 == 0
-  sf->convolve[0][1][1] = av1_jnt_convolve_y;
+  sf->convolve[0][1][1] = av1_dist_wtd_convolve_y;
   // subpel_y_q4 == 0
-  sf->convolve[1][0][1] = av1_jnt_convolve_x;
+  sf->convolve[1][0][1] = av1_dist_wtd_convolve_x;
   // subpel_x_q4 != 0 && subpel_y_q4 != 0
-  sf->convolve[1][1][1] = av1_jnt_convolve_2d;
+  sf->convolve[1][1][1] = av1_dist_wtd_convolve_2d;
   // AV1 High BD convolve functions
   // Special case convolve functions should produce the same result as
   // av1_highbd_convolve_2d.
@@ -116,11 +116,11 @@ void av1_setup_scale_factors_for_frame(struct scale_factors *sf, int other_w,
   // subpel_x_q4 != 0 && subpel_y_q4 != 0
   sf->highbd_convolve[1][1][0] = av1_highbd_convolve_2d_sr;
   // subpel_x_q4 == 0 && subpel_y_q4 == 0
-  sf->highbd_convolve[0][0][1] = av1_highbd_jnt_convolve_2d_copy;
+  sf->highbd_convolve[0][0][1] = av1_highbd_dist_wtd_convolve_2d_copy;
   // subpel_x_q4 == 0
-  sf->highbd_convolve[0][1][1] = av1_highbd_jnt_convolve_y;
+  sf->highbd_convolve[0][1][1] = av1_highbd_dist_wtd_convolve_y;
   // subpel_y_q4 == 0
-  sf->highbd_convolve[1][0][1] = av1_highbd_jnt_convolve_x;
+  sf->highbd_convolve[1][0][1] = av1_highbd_dist_wtd_convolve_x;
   // subpel_x_q4 != 0 && subpel_y_q4 != 0
-  sf->highbd_convolve[1][1][1] = av1_highbd_jnt_convolve_2d;
+  sf->highbd_convolve[1][1][1] = av1_highbd_dist_wtd_convolve_2d;
 }

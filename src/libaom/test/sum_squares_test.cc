@@ -255,7 +255,7 @@ class SSETest : public ::testing::TestWithParam<SSETestParam> {
     aom_free(src_);
     aom_free(ref_);
   }
-  void RunTest(int isRandom, int width, int height);
+  void RunTest(int isRandom, int width, int height, int run_times);
 
   void GenRandomData(int width, int height, int stride) {
     uint16_t *pSrc = (uint16_t *)src_;
@@ -298,8 +298,9 @@ class SSETest : public ::testing::TestWithParam<SSETestParam> {
   ACMRandom rnd_;
 };
 
-void SSETest::RunTest(int isRandom, int width, int height) {
+void SSETest::RunTest(int isRandom, int width, int height, int run_times) {
   int failed = 0;
+  aom_usec_timer ref_timer, test_timer;
   for (int k = 0; k < 3; k++) {
     int stride = 4 << rnd_(7);  // Up to 256 stride
     while (stride < width) {    // Make sure it's valid
@@ -326,31 +327,58 @@ void SSETest::RunTest(int isRandom, int width, int height) {
       pRef = CONVERT_TO_BYTEPTR(ref_);
     }
     res_ref = params_.ref_func(pSrc, stride, pRef, stride, width, height);
+    res_tst = params_.tst_func(pSrc, stride, pRef, stride, width, height);
+    if (run_times > 1) {
+      aom_usec_timer_start(&ref_timer);
+      for (int j = 0; j < run_times; j++) {
+        params_.ref_func(pSrc, stride, pRef, stride, width, height);
+      }
+      aom_usec_timer_mark(&ref_timer);
+      const int elapsed_time_c =
+          static_cast<int>(aom_usec_timer_elapsed(&ref_timer));
 
-    ASM_REGISTER_STATE_CHECK(
-        res_tst = params_.tst_func(pSrc, stride, pRef, stride, width, height));
+      aom_usec_timer_start(&test_timer);
+      for (int j = 0; j < run_times; j++) {
+        params_.tst_func(pSrc, stride, pRef, stride, width, height);
+      }
+      aom_usec_timer_mark(&test_timer);
+      const int elapsed_time_simd =
+          static_cast<int>(aom_usec_timer_elapsed(&test_timer));
 
-    if (!failed) {
-      failed = res_ref != res_tst;
-      EXPECT_EQ(res_ref, res_tst)
-          << "Error:" << (isHbd_ ? "hbd " : " ") << k << " SSE Test [" << width
-          << "x" << height << "] C output does not match optimized output.";
+      printf(
+          "c_time=%d \t simd_time=%d \t "
+          "gain=%d\n",
+          elapsed_time_c, elapsed_time_simd,
+          (elapsed_time_c / elapsed_time_simd));
+    } else {
+      if (!failed) {
+        failed = res_ref != res_tst;
+        EXPECT_EQ(res_ref, res_tst)
+            << "Error:" << (isHbd_ ? "hbd " : " ") << k << " SSE Test ["
+            << width << "x" << height
+            << "] C output does not match optimized output.";
+      }
     }
   }
 }
 
 TEST_P(SSETest, OperationCheck) {
   for (int height = 4; height <= 128; height += 4) {
-    RunTest(1, width_, height);  // GenRandomData
+    RunTest(1, width_, height, 1);  // GenRandomData
   }
 }
 
 TEST_P(SSETest, ExtremeValues) {
   for (int height = 4; height <= 128; height += 4) {
-    RunTest(0, width_, height);
+    RunTest(0, width_, height, 1);
   }
 }
 
+TEST_P(SSETest, DISABLED_Speed) {
+  for (int height = 4; height <= 128; height += 4) {
+    RunTest(1, width_, height, 100);
+  }
+}
 #if HAVE_SSE4_1
 TestSSEFuncs sse_sse4[] = { TestSSEFuncs(&aom_sse_c, &aom_sse_sse4_1),
                             TestSSEFuncs(&aom_highbd_sse_c,

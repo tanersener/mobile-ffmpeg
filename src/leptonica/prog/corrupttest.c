@@ -146,7 +146,7 @@ static char  mainName[] = "corrupttest";
         else if (i < 20) coeff2[i] = 0.01;
         else coeff2[i] = 0.1;
     }
- 
+
         /* Multiple test (argc == 3) */
     show = TRUE;
     for (i = 0; i < 25; i++) {

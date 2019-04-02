@@ -57,10 +57,11 @@ cmake -Wno-dev \
     -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME}" \
     -DCMAKE_SYSTEM_NAME=Darwin \
+    -DCMAKE_OSX_SYSROOT="" \
     -DCMAKE_CXX_COMPILER="$CXX" \
     -DCMAKE_C_COMPILER="$CC" \
     -DCMAKE_LINKER="$LD" \
-    -DCMAKE_AR="$AR" \
+    -DCMAKE_AR="$(xcrun --sdk $(get_sdk_name) -f ar)" \
     -DCMAKE_AS="$AS" \
     -DSNAPPY_BUILD_TESTS=0 \
     -DHAVE_LIBLZO2=0 \

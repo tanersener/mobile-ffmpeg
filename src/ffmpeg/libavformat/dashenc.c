@@ -32,6 +32,7 @@
 #include "libavutil/mathematics.h"
 #include "libavutil/opt.h"
 #include "libavutil/rational.h"
+#include "libavutil/time.h"
 #include "libavutil/time_internal.h"
 
 #include "avc.h"
@@ -60,6 +61,7 @@ typedef struct Segment {
     int64_t start_pos;
     int range_length, index_length;
     int64_t time;
+    double prog_date_time;
     int64_t duration;
     int n;
 } Segment;
@@ -121,6 +123,7 @@ typedef struct DASHContext {
     int64_t last_duration;
     int64_t total_duration;
     char availability_start_time[100];
+    time_t start_time_s;
     char dirname[1024];
     const char *single_file_name;  /* file names as specified in options */
     const char *init_seg_name;
@@ -140,6 +143,7 @@ typedef struct DASHContext {
     SegmentType segment_type_option;  /* segment type as specified in options */
     int ignore_io_errors;
     int lhls;
+    int master_publish_rate;
 } DASHContext;
 
 static struct codec_string {
@@ -431,6 +435,7 @@ static void write_hls_media_playlist(OutputStream *os, AVFormatContext *s,
     const char *proto = avio_find_protocol_name(c->dirname);
     int use_rename = proto && !strcmp(proto, "file");
     int i, start_index, start_number;
+    double prog_date_time = 0;
 
     get_start_index_number(os, c, &start_index, &start_number);
 
@@ -465,11 +470,20 @@ static void write_hls_media_playlist(OutputStream *os, AVFormatContext *s,
 
     for (i = start_index; i < os->nb_segments; i++) {
         Segment *seg = os->segments[i];
+
+        if (prog_date_time == 0) {
+            if (os->nb_segments == 1)
+                prog_date_time = c->start_time_s;
+            else
+                prog_date_time = seg->prog_date_time;
+        }
+        seg->prog_date_time = prog_date_time;
+
         ret = ff_hls_write_file_entry(c->m3u8_out, 0, c->single_file,
                                 (double) seg->duration / timescale, 0,
                                 seg->range_length, seg->start_pos, NULL,
                                 c->single_file ? os->initfile : seg->file,
-                                NULL);
+                                &prog_date_time);
         if (ret < 0) {
             av_log(os->ctx, AV_LOG_WARNING, "ff_hls_write_file_entry get error\n");
         }
@@ -668,12 +682,20 @@ static void write_time(AVIOContext *out, int64_t time)
 
 static void format_date_now(char *buf, int size)
 {
-    time_t t = time(NULL);
     struct tm *ptm, tmbuf;
-    ptm = gmtime_r(&t, &tmbuf);
+    int64_t time_us = av_gettime();
+    int64_t time_ms = time_us / 1000;
+    const time_t time_s = time_ms / 1000;
+    int millisec = time_ms - (time_s * 1000);
+    ptm = gmtime_r(&time_s, &tmbuf);
     if (ptm) {
-        if (!strftime(buf, size, "%Y-%m-%dT%H:%M:%SZ", ptm))
+        int len;
+        if (!strftime(buf, size, "%Y-%m-%dT%H:%M:%S", ptm)) {
             buf[0] = '\0';
+            return;
+        }
+        len = strlen(buf);
+        snprintf(buf + len, size - len, ".%03dZ", millisec);
     }
 }
 
@@ -956,12 +978,17 @@ static int write_manifest(AVFormatContext *s, int final)
             return ret;
     }
 
-    if (c->hls_playlist && !c->master_playlist_created) {
+    if (c->hls_playlist) {
         char filename_hls[1024];
         const char *audio_group = "A1";
         char audio_codec_str[128] = "\0";
         int is_default = 1;
         int max_audio_bitrate = 0;
+
+        // Publish master playlist only the configured rate
+        if (c->master_playlist_created && (!c->master_publish_rate ||
+             c->streams[0].segment_index % c->master_publish_rate))
+            return 0;
 
         if (*c->dirname)
             snprintf(filename_hls, sizeof(filename_hls), "%smaster.m3u8", c->dirname);
@@ -989,7 +1016,7 @@ static int write_manifest(AVFormatContext *s, int final)
                 continue;
             get_hls_playlist_name(playlist_file, sizeof(playlist_file), NULL, i);
             ff_hls_write_audio_rendition(c->m3u8_out, (char *)audio_group,
-                                         playlist_file, i, is_default);
+                                         playlist_file, NULL, i, is_default);
             max_audio_bitrate = FFMAX(st->codecpar->bit_rate +
                                       os->muxer_overhead, max_audio_bitrate);
             if (!av_strnstr(audio_codec_str, os->codec_str, sizeof(audio_codec_str))) {
@@ -1201,7 +1228,10 @@ static int dash_init(AVFormatContext *s)
 
         if (os->segment_type == SEGMENT_TYPE_MP4) {
             if (c->streaming)
-                av_dict_set(&opts, "movflags", "frag_every_frame+dash+delay_moov+skip_sidx", 0);
+                // frag_every_frame : Allows lower latency streaming
+                // skip_sidx : Reduce bitrate overhead
+                // skip_trailer : Avoids growing memory usage with time
+                av_dict_set(&opts, "movflags", "frag_every_frame+dash+delay_moov+skip_sidx+skip_trailer", 0);
             else
                 av_dict_set(&opts, "movflags", "frag_custom+dash+delay_moov", 0);
         } else {
@@ -1574,9 +1604,12 @@ static int dash_write_packet(AVFormatContext *s, AVPacket *pkt)
         os->first_pts = pkt->pts;
     os->last_pts = pkt->pts;
 
-    if (!c->availability_start_time[0])
+    if (!c->availability_start_time[0]) {
+        int64_t start_time_us = av_gettime();
+        c->start_time_s = start_time_us / 1000000;
         format_date_now(c->availability_start_time,
                         sizeof(c->availability_start_time));
+    }
 
     if (!os->availability_time_offset && pkt->duration) {
         int64_t frame_duration = av_rescale_q(pkt->duration, st->time_base,
@@ -1789,6 +1822,7 @@ static const AVOption options[] = {
     { "webm", "make segment file in WebM format", 0, AV_OPT_TYPE_CONST, {.i64 = SEGMENT_TYPE_WEBM }, 0, UINT_MAX,   E, "segment_type"},
     { "ignore_io_errors", "Ignore IO errors during open and write. Useful for long-duration runs with network output", OFFSET(ignore_io_errors), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, E },
     { "lhls", "Enable Low-latency HLS(Experimental). Adds #EXT-X-PREFETCH tag with current segment's URI", OFFSET(lhls), AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, E },
+    { "master_m3u8_publish_rate", "Publish master playlist every after this many segment intervals", OFFSET(master_publish_rate), AV_OPT_TYPE_INT, {.i64 = 0}, 0, UINT_MAX, E},
     { NULL },
 };
 

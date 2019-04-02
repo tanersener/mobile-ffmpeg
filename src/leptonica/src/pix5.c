@@ -65,7 +65,8 @@
  *           PIX        *pixSelectComponentBySize()
  *           PIX        *pixFilterComponentBySize()
  *
- *    Make a frame mask
+ *    Make special masks
+ *           PIX        *pixMakeSymmetricMask()
  *           PIX        *pixMakeFrameMask()
  *
  *    Generate a covering of rectangles over connected components
@@ -1427,8 +1428,63 @@ PIX     *pix1, *pix2;
 
 
 /*---------------------------------------------------------------------*
- *                          Make a frame mask                          *
+ *                         Make special masks                          *
  *---------------------------------------------------------------------*/
+/*!
+ * \brief   pixMakeSymmetricMask()
+ *
+ * \param[in]    w, h    dimensions of output 1 bpp pix
+ * \param[in]    hf      horizontal fraction of half-width
+ * \param[in]    vf      vertical fraction of half-height
+ * \param[in]    type    L_USE_INNER, L_USE_OUTER
+ * \return  pixd 1 bpp, or NULL on error.
+ *
+ * <pre>
+ * Notes:
+ *      (1) This is a convenience function for generating masks with
+ *          horizontal and vertical reflection symmetry, over either
+ *          the inner or outer parts of an image.
+ *      (2) Using L_USE_INNER to generate a mask over the inner part
+ *          of the image, the mask is a solid rectangle, and the fractions
+ *          describe the distance between the boundary of the image and
+ *          the rectangle boundary.  For example, with hf == vf == 0.0,
+ *          the mask covers the full image.
+ *      (3) Using L_USE_OUTER to generate a mask over an outer frame
+ *          of the image, the mask touches the boundary of the image,
+ *          and the fractions describe the location of the inner
+ *          boundary of the frame.  For example, with hf == vf == 1.0,
+ *          the inner boundary is at the center of the image, so the
+ *          mask covers the full image.
+ *      (4) More examples:
+ *           * mask covering the inner 70%: hf = vf = 0.3, type = L_USE_INNER
+ *           * frame covering the outer 30%: hf = vf = 0.3, type = L_USE_OUTER
+ * </pre>
+ */
+PIX *
+pixMakeSymmetricMask(l_int32    w,
+                     l_int32    h,
+                     l_float32  hf,
+                     l_float32  vf,
+                     l_int32    type)
+{
+    PROCNAME("pixMakeSymmetricMask");
+
+    if (w <= 0 || h <= 0)
+        return (PIX *)ERROR_PTR("mask size 0", procName, NULL);
+    if (hf < 0.0 || hf > 1.0)
+        return (PIX *)ERROR_PTR("invalid horiz fractions", procName, NULL);
+    if (vf < 0.0 || vf > 1.0)
+        return (PIX *)ERROR_PTR("invalid vert fractions", procName, NULL);
+
+    if (type == L_USE_INNER)
+        return pixMakeFrameMask(w, h, hf, 1.0, vf, 1.0);
+    else if (type == L_USE_OUTER)
+        return pixMakeFrameMask(w, h, 0.0, hf, 0.0, vf);
+    else
+        return (PIX *)ERROR_PTR("invalid type", procName, NULL);
+}
+
+
 /*!
  * \brief   pixMakeFrameMask()
  *

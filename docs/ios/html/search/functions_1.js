@@ -25,6 +25,7 @@ var searchData=
   ['cleanup_5ffiltergraph',['cleanup_filtergraph',['../d2/d36/fftools__ffmpeg__filter_8c.html#a027d310ab49f2b105fc3b980a6b6c340',1,'fftools_ffmpeg_filter.c']]],
   ['close_5fall_5foutput_5fstreams',['close_all_output_streams',['../d7/d48/fftools__ffmpeg_8c.html#ac237321f98a7041c9f6004d2ce8a425c',1,'fftools_ffmpeg.c']]],
   ['close_5foutput_5fstream',['close_output_stream',['../d7/d48/fftools__ffmpeg_8c.html#a89c049f6683542b855326a6c2d5c3d7d',1,'fftools_ffmpeg.c']]],
+  ['closeffmpegpipe_3a',['closeFFmpegPipe:',['../df/d45/interface_mobile_f_fmpeg_config.html#a98ef246bf01900e2109e628b4d9cc9f9',1,'MobileFFmpegConfig']]],
   ['compare_5fcodec_5fdesc',['compare_codec_desc',['../d7/dcc/fftools__cmdutils_8c.html#a50fec3b5f83e8f355a640dafbf4d2189',1,'fftools_cmdutils.c']]],
   ['compare_5fint64',['compare_int64',['../d7/d48/fftools__ffmpeg_8c.html#a69b0f920b4d91360bd5cd5da5842e282',1,'fftools_ffmpeg.c']]],
   ['configure_5ffiltergraph',['configure_filtergraph',['../d7/db3/fftools__ffmpeg_8h.html#adfc4727f627c5abd0aa843206d046ec6',1,'configure_filtergraph(FilterGraph *fg):&#160;fftools_ffmpeg_filter.c'],['../d2/d36/fftools__ffmpeg__filter_8c.html#adfc4727f627c5abd0aa843206d046ec6',1,'configure_filtergraph(FilterGraph *fg):&#160;fftools_ffmpeg_filter.c']]],

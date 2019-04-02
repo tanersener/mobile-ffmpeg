@@ -50,4 +50,8 @@ extern NSTimeInterval const SUBTITLE_TEST_TOOLTIP_DURATION;
 extern NSString *const VIDSTAB_TEST_TOOLTIP_TEXT;
 extern NSTimeInterval const VIDSTAB_TEST_TOOLTIP_DURATION;
 
+// PIPE TEST
+extern NSString *const PIPE_TEST_TOOLTIP_TEXT;
+extern NSTimeInterval const PIPE_TEST_TOOLTIP_DURATION;
+
 #endif

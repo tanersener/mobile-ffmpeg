@@ -135,7 +135,7 @@ static int vaapi_encode_mpeg2_write_sequence_header(AVCodecContext *avctx,
 
     err = vaapi_encode_mpeg2_write_fragment(avctx, data, data_len, frag);
 fail:
-    ff_cbs_fragment_uninit(priv->cbc, frag);
+    ff_cbs_fragment_reset(priv->cbc, frag);
     return 0;
 }
 
@@ -159,7 +159,7 @@ static int vaapi_encode_mpeg2_write_picture_header(AVCodecContext *avctx,
 
     err = vaapi_encode_mpeg2_write_fragment(avctx, data, data_len, frag);
 fail:
-    ff_cbs_fragment_uninit(priv->cbc, frag);
+    ff_cbs_fragment_reset(priv->cbc, frag);
     return 0;
 }
 
@@ -313,7 +313,8 @@ static int vaapi_encode_mpeg2_init_sequence_params(AVCodecContext *avctx)
 
     goph->group_start_code = MPEG2_START_GROUP;
 
-    goph->time_code   = 0;
+    // Marker bit in the middle of time_code.
+    goph->time_code   = 1 << 12;
     goph->closed_gop  = 1;
     goph->broken_link = 0;
 
@@ -521,19 +522,17 @@ static av_cold int vaapi_encode_mpeg2_configure(AVCodecContext *avctx)
         return err;
 
     if (ctx->va_rc_mode == VA_RC_CQP) {
-        priv->quant_p = av_clip(avctx->global_quality, 1, 31);
+        priv->quant_p = av_clip(ctx->rc_quality, 1, 31);
         if (avctx->i_quant_factor > 0.0)
-            priv->quant_i = av_clip((avctx->global_quality *
-                                     avctx->i_quant_factor +
-                                     avctx->i_quant_offset) + 0.5,
-                                    1, 31);
+            priv->quant_i =
+                av_clip((avctx->i_quant_factor * priv->quant_p +
+                         avctx->i_quant_offset) + 0.5, 1, 31);
         else
             priv->quant_i = priv->quant_p;
         if (avctx->b_quant_factor > 0.0)
-            priv->quant_b = av_clip((avctx->global_quality *
-                                     avctx->b_quant_factor +
-                                     avctx->b_quant_offset) + 0.5,
-                                    1, 31);
+            priv->quant_b =
+                av_clip((avctx->b_quant_factor * priv->quant_p +
+                         avctx->b_quant_offset) + 0.5, 1, 31);
         else
             priv->quant_b = priv->quant_p;
 
@@ -542,7 +541,9 @@ static av_cold int vaapi_encode_mpeg2_configure(AVCodecContext *avctx)
                priv->quant_i, priv->quant_p, priv->quant_b);
 
     } else {
-        av_assert0(0 && "Invalid RC mode.");
+        priv->quant_i = 16;
+        priv->quant_p = 16;
+        priv->quant_b = 16;
     }
 
     ctx->slice_block_rows = FFALIGN(avctx->height, 16) / 16;
@@ -563,7 +564,11 @@ static const VAAPIEncodeProfile vaapi_encode_mpeg2_profiles[] = {
 static const VAAPIEncodeType vaapi_encode_type_mpeg2 = {
     .profiles              = vaapi_encode_mpeg2_profiles,
 
+    .flags                 = FLAG_B_PICTURES,
+
     .configure             = &vaapi_encode_mpeg2_configure,
+
+    .default_quality       = 10,
 
     .sequence_params_size  = sizeof(VAEncSequenceParameterBufferMPEG2),
     .init_sequence_params  = &vaapi_encode_mpeg2_init_sequence_params,
@@ -626,6 +631,7 @@ static av_cold int vaapi_encode_mpeg2_close(AVCodecContext *avctx)
 {
     VAAPIEncodeMPEG2Context *priv = avctx->priv_data;
 
+    ff_cbs_fragment_free(priv->cbc, &priv->current_fragment);
     ff_cbs_close(&priv->cbc);
 
     return ff_vaapi_encode_close(avctx);
@@ -635,6 +641,7 @@ static av_cold int vaapi_encode_mpeg2_close(AVCodecContext *avctx)
 #define FLAGS (AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM)
 static const AVOption vaapi_encode_mpeg2_options[] = {
     VAAPI_ENCODE_COMMON_OPTIONS,
+    VAAPI_ENCODE_RC_OPTIONS,
 
     { "profile", "Set profile (in profile_and_level_indication)",
       OFFSET(profile), AV_OPT_TYPE_INT,
@@ -669,7 +676,6 @@ static const AVCodecDefault vaapi_encode_mpeg2_defaults[] = {
     { "i_qoffset",      "0"   },
     { "b_qfactor",      "6/5" },
     { "b_qoffset",      "0"   },
-    { "global_quality", "10"  },
     { "qmin",           "-1"  },
     { "qmax",           "-1"  },
     { NULL },
@@ -689,7 +695,8 @@ AVCodec ff_mpeg2_vaapi_encoder = {
     .id             = AV_CODEC_ID_MPEG2VIDEO,
     .priv_data_size = sizeof(VAAPIEncodeMPEG2Context),
     .init           = &vaapi_encode_mpeg2_init,
-    .encode2        = &ff_vaapi_encode2,
+    .send_frame     = &ff_vaapi_encode_send_frame,
+    .receive_packet = &ff_vaapi_encode_receive_packet,
     .close          = &vaapi_encode_mpeg2_close,
     .priv_class     = &vaapi_encode_mpeg2_class,
     .capabilities   = AV_CODEC_CAP_DELAY | AV_CODEC_CAP_HARDWARE,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Taner Sener
+ * Copyright (c) 2018-2019 Taner Sener
  *
  * This file is part of MobileFFmpeg.
  *
@@ -27,6 +27,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
@@ -40,9 +41,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.arthenica.mobileffmpeg.Config;
-import com.arthenica.mobileffmpeg.FFmpeg;
-import com.arthenica.mobileffmpeg.util.RunCallback;
-import com.arthenica.mobileffmpeg.util.AsynchronousTaskService;
+import com.arthenica.mobileffmpeg.util.AsyncCommandTask;
 import com.arthenica.mobileffmpeg.util.RunCallback;
 
 import java.io.File;
@@ -53,7 +52,6 @@ import java.util.HashMap;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Future;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,8 +63,6 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA
     };
-
-    protected static final AsynchronousTaskService asynchronousTaskService = new AsynchronousTaskService();
 
     protected static final Queue<Callable> actionQueue = new ConcurrentLinkedQueue<>();
 
@@ -113,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         final ViewPager viewPager = findViewById(R.id.pager);
-        viewPager.setAdapter(new PagerAdapter(getSupportFragmentManager(), this, 6));
+        viewPager.setAdapter(new PagerAdapter(getSupportFragmentManager(), this, 7));
 
         waitForUIAction();
 
@@ -157,21 +153,10 @@ public class MainActivity extends AppCompatActivity {
      *
      * @param runCallback callback function to receive result of this execution
      * @param arguments   FFmpeg command options/arguments
-     * @return <code>Future</code> instance of asynchronous operation started
      */
-    public static Future executeAsync(final RunCallback runCallback, final String arguments) {
-        return asynchronousTaskService.runAsynchronously(new Callable<Integer>() {
-
-            @Override
-            public Integer call() {
-                int returnCode = FFmpeg.execute(arguments, " ");
-                if (runCallback != null) {
-                    runCallback.apply(returnCode);
-                }
-
-                return returnCode;
-            }
-        });
+    public static void executeAsync(final RunCallback runCallback, final String arguments) {
+        final AsyncCommandTask asyncCommandTask = new AsyncCommandTask(runCallback);
+        asyncCommandTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arguments);
     }
 
     public static void waitForUIAction() {

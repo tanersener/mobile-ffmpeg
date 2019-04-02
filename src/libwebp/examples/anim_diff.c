@@ -21,6 +21,7 @@
 
 #include "./anim_util.h"
 #include "./example_util.h"
+#include "./unicode.h"
 
 #if defined(_MSC_VER) && _MSC_VER < 1900
 #define snprintf _snprintf
@@ -218,12 +219,14 @@ int main(int argc, const char* argv[]) {
   const char* files[2] = { NULL, NULL };
   AnimatedImage images[2];
 
+  INIT_WARGV(argc, argv);
+
   for (c = 1; c < argc; ++c) {
     int parse_error = 0;
     if (!strcmp(argv[c], "-dump_frames")) {
       if (c < argc - 1) {
         dump_frames = 1;
-        dump_folder = argv[++c];
+        dump_folder = (const char*)GET_WARGV(argv, ++c);
       } else {
         parse_error = 1;
       }
@@ -243,7 +246,7 @@ int main(int argc, const char* argv[]) {
       }
     } else if (!strcmp(argv[c], "-h") || !strcmp(argv[c], "-help")) {
       Help();
-      return 0;
+      FREE_WARGV_AND_RETURN(0);
     } else if (!strcmp(argv[c], "-version")) {
       int dec_version, demux_version;
       GetAnimatedImageVersions(&dec_version, &demux_version);
@@ -252,13 +255,13 @@ int main(int argc, const char* argv[]) {
              (dec_version >> 0) & 0xff,
              (demux_version >> 16) & 0xff, (demux_version >> 8) & 0xff,
              (demux_version >> 0) & 0xff);
-      return 0;
+      FREE_WARGV_AND_RETURN(0);
     } else {
       if (!got_input1) {
-        files[0] = argv[c];
+        files[0] = (const char*)GET_WARGV(argv, c);
         got_input1 = 1;
       } else if (!got_input2) {
-        files[1] = argv[c];
+        files[1] = (const char*)GET_WARGV(argv, c);
         got_input2 = 1;
       } else {
         parse_error = 1;
@@ -266,29 +269,30 @@ int main(int argc, const char* argv[]) {
     }
     if (parse_error) {
       Help();
-      return -1;
+      FREE_WARGV_AND_RETURN(-1);
     }
   }
   if (argc < 3) {
     Help();
-    return -1;
+    FREE_WARGV_AND_RETURN(-1);
   }
 
 
   if (!got_input2) {
     Help();
-    return -1;
+    FREE_WARGV_AND_RETURN(-1);
   }
 
   if (dump_frames) {
-    printf("Dumping decoded frames in: %s\n", dump_folder);
+    WPRINTF("Dumping decoded frames in: %s\n", (const W_CHAR*)dump_folder);
   }
 
   memset(images, 0, sizeof(images));
   for (i = 0; i < 2; ++i) {
-    printf("Decoding file: %s\n", files[i]);
+    WPRINTF("Decoding file: %s\n", (const W_CHAR*)files[i]);
     if (!ReadAnimatedImage(files[i], &images[i], dump_frames, dump_folder)) {
-      fprintf(stderr, "Error decoding file: %s\n Aborting.\n", files[i]);
+      WFPRINTF(stderr, "Error decoding file: %s\n Aborting.\n",
+               (const W_CHAR*)files[i]);
       return_code = -2;
       goto End;
     } else {
@@ -298,14 +302,16 @@ int main(int argc, const char* argv[]) {
 
   if (!CompareAnimatedImagePair(&images[0], &images[1],
                                 premultiply, min_psnr)) {
-    fprintf(stderr, "\nFiles %s and %s differ.\n", files[0], files[1]);
+    WFPRINTF(stderr, "\nFiles %s and %s differ.\n", (const W_CHAR*)files[0],
+             (const W_CHAR*)files[1]);
     return_code = -3;
   } else {
-    printf("\nFiles %s and %s are identical.\n", files[0], files[1]);
+    WPRINTF("\nFiles %s and %s are identical.\n", (const W_CHAR*)files[0],
+            (const W_CHAR*)files[1]);
     return_code = 0;
   }
  End:
   ClearAnimatedImage(&images[0]);
   ClearAnimatedImage(&images[1]);
-  return return_code;
+  FREE_WARGV_AND_RETURN(return_code);
 }

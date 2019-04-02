@@ -1,57 +1,358 @@
 void build(Solution &s)
 {
-    auto &leptonica = s.addTarget<LibraryTarget>("danbloomberg.leptonica", "1.76.0");
+    auto &leptonica = s.addTarget<LibraryTarget>("danbloomberg.leptonica", "1.78.0");
     leptonica += Git("https://github.com/DanBloomberg/leptonica", "{v}");
 
-    leptonica.setChecks("leptonica");
-
-    leptonica +=
-        "src/.*\\.c"_rr,
-        "src/.*\\.h"_rr,
-        "src/endianness.h.in";
-
-    leptonica.Public +=
-        "src"_id;
-
-    leptonica.Private += "HAVE_LIBGIF"_d;
-    leptonica.Private += "HAVE_LIBJP2K"_d;
-    leptonica.Private += "HAVE_LIBJPEG"_d;
-    leptonica.Private += "HAVE_LIBPNG"_d;
-    leptonica.Private += "HAVE_LIBTIFF"_d;
-    leptonica.Private += "HAVE_LIBWEBP"_d;
-    leptonica.Private += "HAVE_LIBZ"_d;
-    leptonica.Private += "LIBJP2K_HEADER=\"openjpeg.h\""_d;
-    leptonica.Public += "HAVE_CONFIG_H"_d;
-    leptonica.Private += sw::Shared, "LIBLEPT_EXPORTS"_d;
-
-    leptonica += "org.sw.demo.gif-5"_dep;
-    leptonica += "org.sw.demo.jpeg-9"_dep;
-    leptonica += "org.sw.demo.uclouvain.openjpeg.openjp2-2"_dep;
-    leptonica += "org.sw.demo.glennrp.png-1"_dep;
-    leptonica += "org.sw.demo.tiff-4"_dep;
-    leptonica += "org.sw.demo.webmproject.webp-*"_dep;
-
-    if (leptonica.Variables["WORDS_BIGENDIAN"] == "1")
-        leptonica.Variables["ENDIANNESS"] = "L_BIG_ENDIAN";
-    else
-        leptonica.Variables["ENDIANNESS"] = "L_LITTLE_ENDIAN";
-
-    leptonica.Variables["APPLE_UNIVERSAL_BUILD"] = "defined (__APPLE_CC__)";
-
-    leptonica.configureFile("src/endianness.h.in", "endianness.h");
-    leptonica.writeFileOnce("config_auto.h");
-
-    if (s.Settings.Native.CompilerType == CompilerType::MSVC)
     {
-        for (auto *f : leptonica.gatherSourceFiles())
+        leptonica.setChecks("leptonica");
+
+        leptonica +=
+            "src/.*\\.c"_rr,
+            "src/.*\\.h"_rr,
+            "src/endianness.h.in";
+
+        leptonica.Public +=
+            "src"_id;
+
+        leptonica.Private += "HAVE_LIBGIF"_d;
+        leptonica.Private += "HAVE_LIBJP2K"_d;
+        leptonica.Private += "HAVE_LIBJPEG"_d;
+        leptonica.Private += "HAVE_LIBPNG"_d;
+        leptonica.Private += "HAVE_LIBTIFF"_d;
+        leptonica.Private += "HAVE_LIBWEBP"_d;
+        leptonica.Private += "HAVE_LIBZ"_d;
+        leptonica.Private += "LIBJP2K_HEADER=\"openjpeg.h\""_d;
+        leptonica.Public += "HAVE_CONFIG_H"_d;
+        leptonica.Private += sw::Shared, "LIBLEPT_EXPORTS"_d;
+        leptonica.Interface += sw::Shared, "LIBLEPT_IMPORTS"_d;
+
+        leptonica += "org.sw.demo.gif-5"_dep;
+        leptonica += "org.sw.demo.jpeg-9"_dep;
+        leptonica += "org.sw.demo.uclouvain.openjpeg.openjp2-2"_dep;
+        leptonica += "org.sw.demo.glennrp.png-1"_dep;
+        leptonica += "org.sw.demo.tiff-4"_dep;
+        leptonica += "org.sw.demo.webmproject.webp-*"_dep;
+
+        if (leptonica.Variables["WORDS_BIGENDIAN"] == 1)
+            leptonica.Variables["ENDIANNESS"] = "L_BIG_ENDIAN";
+        else
+            leptonica.Variables["ENDIANNESS"] = "L_LITTLE_ENDIAN";
+
+        leptonica.Variables["APPLE_UNIVERSAL_BUILD"] = "defined (__APPLE_CC__)";
+
+        leptonica.configureFile("src/endianness.h.in", "endianness.h");
+        leptonica.writeFileOnce("config_auto.h");
+
+        if (s.Settings.Native.CompilerType == CompilerType::MSVC)
         {
-            //f->BuildAs = NativeSourceFile::CPP;
-            f->args.push_back("-TP");
+            for (auto *f : leptonica.gatherSourceFiles())
+                f->BuildAs = NativeSourceFile::CPP;
         }
+
+        if (s.Settings.TargetOS.Type == OSType::Windows)
+            leptonica += "User32.lib"_l, "Gdi32.lib"_l;
     }
 
-    if (s.Settings.TargetOS.Type == OSType::Windows)
-        leptonica += "User32.lib"_l, "Gdi32.lib"_l;
+    auto &progs = leptonica.addDirectory("progs");
+    if (s.DryRun)
+        progs.Scope = TargetScope::Test;
+
+    {
+        auto add_prog = [&s, &progs, &leptonica](const String &name, const Files &files) -> decltype(auto)
+        {
+            auto &t = progs.addExecutable(name);
+            t.setRootDirectory("prog");
+            t += files;
+            t += leptonica;
+            if (s.Settings.Native.CompilerType == CompilerType::MSVC)
+            {
+                for (auto *f : t.gatherSourceFiles())
+                    f->BuildAs = NativeSourceFile::CPP;
+            }
+            return t;
+        };
+
+        StringMap<Files> m_progs{
+            {"adaptmap_reg", {"adaptmap_reg.c"}},
+            {"adaptnorm_reg", {"adaptnorm_reg.c"}},
+            {"affine_reg", {"affine_reg.c"}},
+            {"alltests_reg", {"alltests_reg.c"}},
+            {"alphaops_reg", {"alphaops_reg.c"}},
+            {"alphaxform_reg", {"alphaxform_reg.c"}},
+            {"baseline_reg", {"baseline_reg.c"}},
+            {"bilateral1_reg", {"bilateral1_reg.c"}},
+            {"bilateral2_reg", {"bilateral2_reg.c"}},
+            {"bilinear_reg", {"bilinear_reg.c"}},
+            {"binarize_reg", {"binarize_reg.c"}},
+            {"binmorph1_reg", {"binmorph1_reg.c"}},
+            {"binmorph2_reg", {"binmorph2_reg.c"}},
+            {"binmorph3_reg", {"binmorph3_reg.c"}},
+            {"binmorph4_reg", {"binmorph4_reg.c"}},
+            {"binmorph5_reg", {"binmorph5_reg.c"}},
+            {"blackwhite_reg", {"blackwhite_reg.c"}},
+            {"blend1_reg", {"blend1_reg.c"}},
+            {"blend2_reg", {"blend2_reg.c"}},
+            {"blend3_reg", {"blend3_reg.c"}},
+            {"blend4_reg", {"blend4_reg.c"}},
+            {"blend5_reg", {"blend5_reg.c"}},
+            {"boxa1_reg", {"boxa1_reg.c"}},
+            {"boxa2_reg", {"boxa2_reg.c"}},
+            {"boxa3_reg", {"boxa3_reg.c"}},
+            {"boxa4_reg", {"boxa4_reg.c"}},
+            {"bytea_reg", {"bytea_reg.c"}},
+            {"ccthin1_reg", {"ccthin1_reg.c"}},
+            {"ccthin2_reg", {"ccthin2_reg.c"}},
+            {"cmapquant_reg", {"cmapquant_reg.c"}},
+            {"colorcontent_reg", {"colorcontent_reg.c"}},
+            {"coloring_reg", {"coloring_reg.c"}},
+            {"colorize_reg", {"colorize_reg.c"}},
+            {"colormask_reg", {"colormask_reg.c"}},
+            {"colormorph_reg", {"colormorph_reg.c"}},
+            {"colorquant_reg", {"colorquant_reg.c"}},
+            {"colorseg_reg", {"colorseg_reg.c"}},
+            {"colorspace_reg", {"colorspace_reg.c"}},
+            {"compare_reg", {"compare_reg.c"}},
+            {"compfilter_reg", {"compfilter_reg.c"}},
+            {"conncomp_reg", {"conncomp_reg.c"}},
+            {"conversion_reg", {"conversion_reg.c"}},
+            {"convolve_reg", {"convolve_reg.c"}},
+            {"dewarp_reg", {"dewarp_reg.c"}},
+            {"distance_reg", {"distance_reg.c"}},
+            {"dither_reg", {"dither_reg.c"}},
+            {"dna_reg", {"dna_reg.c"}},
+            {"dwamorph1_reg", {"dwamorph1_reg.c", "dwalinear.3.c", "dwalinearlow.3.c"}},
+            {"dwamorph2_reg", {"dwamorph2_reg.c", "dwalinear.3.c", "dwalinearlow.3.c"}},
+            {"edge_reg", {"edge_reg.c"}},
+            {"enhance_reg", {"enhance_reg.c"}},
+            {"equal_reg", {"equal_reg.c"}},
+            {"expand_reg", {"expand_reg.c"}},
+            {"extrema_reg", {"extrema_reg.c"}},
+            {"falsecolor_reg", {"falsecolor_reg.c"}},
+            {"fhmtauto_reg", {"fhmtauto_reg.c"}},
+            {"files_reg", {"files_reg.c"}},
+            {"findcorners_reg", {"findcorners_reg.c"}},
+            {"findpattern_reg", {"findpattern_reg.c"}},
+            {"flipdetect_reg", {"flipdetect_reg.c"}},
+            {"fmorphauto_reg", {"fmorphauto_reg.c"}},
+            {"fpix1_reg", {"fpix1_reg.c"}},
+            {"fpix2_reg", {"fpix2_reg.c"}},
+            {"genfonts_reg", {"genfonts_reg.c"}},
+            {"gifio_reg", {"gifio_reg.c"}},
+            {"grayfill_reg", {"grayfill_reg.c"}},
+            {"graymorph1_reg", {"graymorph1_reg.c"}},
+            {"graymorph2_reg", {"graymorph2_reg.c"}},
+            {"grayquant_reg", {"grayquant_reg.c"}},
+            {"hardlight_reg", {"hardlight_reg.c"}},
+            {"heap_reg", {"heap_reg.c"}},
+            {"insert_reg", {"insert_reg.c"}},
+            {"ioformats_reg", {"ioformats_reg.c"}},
+            {"iomisc_reg", {"iomisc_reg.c"}},
+            {"italic_reg", {"italic_reg.c"}},
+            {"jbclass_reg", {"jbclass_reg.c"}},
+            {"jp2kio_reg", {"jp2kio_reg.c"}},
+            {"jpegio_reg", {"jpegio_reg.c"}},
+            {"kernel_reg", {"kernel_reg.c"}},
+            {"label_reg", {"label_reg.c"}},
+            {"lineremoval_reg", {"lineremoval_reg.c"}},
+            {"locminmax_reg", {"locminmax_reg.c"}},
+            {"logicops_reg", {"logicops_reg.c"}},
+            {"lowaccess_reg", {"lowaccess_reg.c"}},
+            {"maze_reg", {"maze_reg.c"}},
+            {"mtiff_reg", {"mtiff_reg.c"}},
+            {"multitype_reg", {"multitype_reg.c"}},
+            {"nearline_reg", {"nearline_reg.c"}},
+            {"newspaper_reg", {"newspaper_reg.c"}},
+            {"numa1_reg", {"numa1_reg.c"}},
+            {"numa2_reg", {"numa2_reg.c"}},
+            {"overlap_reg", {"overlap_reg.c"}},
+            {"pageseg_reg", {"pageseg_reg.c"}},
+            {"paintmask_reg", {"paintmask_reg.c"}},
+            {"paint_reg", {"paint_reg.c"}},
+            {"pdfseg_reg", {"pdfseg_reg.c"}},
+            {"pixa1_reg", {"pixa1_reg.c"}},
+            {"pixa2_reg", {"pixa2_reg.c"}},
+            {"pixadisp_reg", {"pixadisp_reg.c"}},
+            {"pixalloc_reg", {"pixalloc_reg.c"}},
+            {"pixcomp_reg", {"pixcomp_reg.c"}},
+            {"pixmem_reg", {"pixmem_reg.c"}},
+            {"pixserial_reg", {"pixserial_reg.c"}},
+            {"pixtile_reg", {"pixtile_reg.c"}},
+            {"pngio_reg", {"pngio_reg.c"}},
+            {"pnmio_reg", {"pnmio_reg.c"}},
+            {"projection_reg", {"projection_reg.c"}},
+            {"projective_reg", {"projective_reg.c"}},
+            {"psioseg_reg", {"psioseg_reg.c"}},
+            {"psio_reg", {"psio_reg.c"}},
+            {"pta_reg", {"pta_reg.c"}},
+            {"ptra1_reg", {"ptra1_reg.c"}},
+            {"ptra2_reg", {"ptra2_reg.c"}},
+            {"quadtree_reg", {"quadtree_reg.c"}},
+            {"rankbin_reg", {"rankbin_reg.c"}},
+            {"rankhisto_reg", {"rankhisto_reg.c"}},
+            {"rank_reg", {"rank_reg.c"}},
+            {"rasteropip_reg", {"rasteropip_reg.c"}},
+            {"rasterop_reg", {"rasterop_reg.c"}},
+            {"rotate1_reg", {"rotate1_reg.c"}},
+            {"rotate2_reg", {"rotate2_reg.c"}},
+            {"scale_reg", {"scale_reg.c"}},
+            {"selio_reg", {"selio_reg.c"}},
+            {"shear1_reg", {"shear1_reg.c"}},
+            {"shear2_reg", {"shear2_reg.c"}},
+            {"skew_reg", {"skew_reg.c"}},
+            {"smallpix_reg", {"smallpix_reg.c"}},
+            {"smoothedge_reg", {"smoothedge_reg.c"}},
+            {"speckle_reg", {"speckle_reg.c"}},
+            {"splitcomp_reg", {"splitcomp_reg.c"}},
+            {"string_reg", {"string_reg.c"}},
+            {"subpixel_reg", {"subpixel_reg.c"}},
+            {"texturefill_reg", {"texturefill_reg.c"}},
+            {"threshnorm_reg", {"threshnorm_reg.c"}},
+            {"translate_reg", {"translate_reg.c"}},
+            {"warper_reg", {"warper_reg.c"}},
+            {"watershed_reg", {"watershed_reg.c"}},
+            {"webpio_reg", {"webpio_reg.c"}},
+            {"wordboxes_reg", {"wordboxes_reg.c"}},
+            {"writetext_reg", {"writetext_reg.c"}},
+            {"xformbox_reg", {"xformbox_reg.c"}},
+            {"adaptmap_dark", {"adaptmap_dark.c"}},
+            {"arabic_lines", {"arabic_lines.c"}},
+            {"arithtest", {"arithtest.c"}},
+            {"autogentest1", {"autogentest1.c"}},
+            {"autogentest2", {"autogentest2.c", "autogen.137.c"}},
+            {"barcodetest", {"barcodetest.c"}},
+            {"binarize_set", {"binarize_set.c"}},
+            {"binarizefiles", {"binarizefiles.c"}},
+            {"bincompare", {"bincompare.c"}},
+            {"blendcmaptest", {"blendcmaptest.c"}},
+            {"buffertest", {"buffertest.c"}},
+            {"ccbordtest", {"ccbordtest.c"}},
+            {"cctest1", {"cctest1.c"}},
+            {"cleanpdf", {"cleanpdf.c"}},
+            {"colorsegtest", {"colorsegtest.c"}},
+            {"comparepages", {"comparepages.c"}},
+            {"comparepixa", {"comparepixa.c"}},
+            {"comparetest", {"comparetest.c"}},
+            {"concatpdf", {"concatpdf.c"}},
+            {"contrasttest", {"contrasttest.c"}},
+            {"convertfilestopdf", {"convertfilestopdf.c"}},
+            {"convertfilestops", {"convertfilestops.c"}},
+            {"convertformat", {"convertformat.c"}},
+            {"convertsegfilestopdf", {"convertsegfilestopdf.c"}},
+            {"convertsegfilestops", {"convertsegfilestops.c"}},
+            {"converttogray", {"converttogray.c"}},
+            {"converttopdf", {"converttopdf.c"}},
+            {"converttops", {"converttops.c"}},
+            {"cornertest", {"cornertest.c"}},
+            {"corrupttest", {"corrupttest.c"}},
+            {"croptest", {"croptest.c"}},
+            {"croptext", {"croptext.c"}},
+            {"dewarprules", {"dewarprules.c"}},
+            {"dewarptest1", {"dewarptest1.c"}},
+            {"dewarptest2", {"dewarptest2.c"}},
+            {"dewarptest3", {"dewarptest3.c"}},
+            {"dewarptest4", {"dewarptest4.c"}},
+            {"dewarptest5", {"dewarptest5.c"}},
+            {"digitprep1", {"digitprep1.c"}},
+            {"displayboxa", {"displayboxa.c"}},
+            {"displayboxes_on_pixa", {"displayboxes_on_pixa.c"}},
+            {"displaypix", {"displaypix.c"}},
+            {"displaypixa", {"displaypixa.c"}},
+            {"dwalineargen", {"dwalineargen.c"}},
+            {"fcombautogen", {"fcombautogen.c"}},
+            {"fhmtautogen", {"fhmtautogen.c"}},
+            {"fileinfo", {"fileinfo.c"}},
+            {"findbinding", {"findbinding.c"}},
+            {"find_colorregions", {"find_colorregions.c"}},
+            {"findpattern1", {"findpattern1.c"}},
+            {"findpattern2", {"findpattern2.c"}},
+            {"findpattern3", {"findpattern3.c"}},
+            {"flipselgen", {"flipselgen.c"}},
+            {"fmorphautogen", {"fmorphautogen.c"}},
+            {"fpixcontours", {"fpixcontours.c"}},
+            {"gammatest", {"gammatest.c"}},
+            {"graphicstest", {"graphicstest.c"}},
+            {"graymorphtest", {"graymorphtest.c"}},
+            {"hashtest", {"hashtest.c"}},
+            {"histotest", {"histotest.c"}},
+            {"histoduptest", {"histoduptest.c"}},
+            {"htmlviewer", {"htmlviewer.c"}},
+            {"imagetops", {"imagetops.c"}},
+            {"jbcorrelation", {"jbcorrelation.c"}},
+            {"jbrankhaus", {"jbrankhaus.c"}},
+            {"jbwords", {"jbwords.c"}},
+            {"listtest", {"listtest.c"}},
+            {"livre_adapt", {"livre_adapt.c"}},
+            {"livre_hmt", {"livre_hmt.c"}},
+            {"livre_makefigs", {"livre_makefigs.c"}},
+            {"livre_orient", {"livre_orient.c"}},
+            {"livre_pageseg", {"livre_pageseg.c"}},
+            {"livre_seedgen", {"livre_seedgen.c"}},
+            {"livre_tophat", {"livre_tophat.c"}},
+            {"maketile", {"maketile.c"}},
+            {"maptest", {"maptest.c"}},
+            {"misctest1", {"misctest1.c"}},
+            {"modifyhuesat", {"modifyhuesat.c"}},
+            {"morphseq_reg", {"morphseq_reg.c"}},
+            {"morphtest1", {"morphtest1.c"}},
+            {"numaranktest", {"numaranktest.c"}},
+            {"otsutest1", {"otsutest1.c"}},
+            {"otsutest2", {"otsutest2.c"}},
+            {"pagesegtest1", {"pagesegtest1.c"}},
+            {"pagesegtest2", {"pagesegtest2.c"}},
+            {"partitiontest", {"partitiontest.c"}},
+            {"pdfiotest", {"pdfiotest.c"}},
+            {"percolatetest", {"percolatetest.c"}},
+            {"pixaatest", {"pixaatest.c"}},
+            {"pixafileinfo", {"pixafileinfo.c"}},
+            {"plottest", {"plottest.c"}},
+            {"printimage", {"printimage.c"}},
+            {"printsplitimage", {"printsplitimage.c"}},
+            {"printtiff", {"printtiff.c"}},
+            {"rbtreetest", {"rbtreetest.c"}},
+            {"recog_bootnum1", {"recog_bootnum1.c"}},
+            {"recog_bootnum2", {"recog_bootnum2.c"}},
+            {"recog_bootnum3", {"recog_bootnum3.c"}},
+            {"recogsort", {"recogsort.c"}},
+            {"recogtest1", {"recogtest1.c"}},
+            {"recogtest2", {"recogtest2.c"}},
+            {"recogtest3", {"recogtest3.c"}},
+            {"recogtest4", {"recogtest4.c"}},
+            {"recogtest5", {"recogtest5.c"}},
+            {"recogtest6", {"recogtest6.c"}},
+            {"recogtest7", {"recogtest7.c"}},
+            {"reducetest", {"reducetest.c"}},
+            {"removecmap", {"removecmap.c"}},
+            {"renderfonts", {"renderfonts.c"}},
+            {"rotatefastalt", {"rotatefastalt.c"}},
+            {"rotateorthtest1", {"rotateorthtest1.c"}},
+            {"rotateorth_reg", {"rotateorth_reg.c"}},
+            {"rotatetest1", {"rotatetest1.c"}},
+            {"runlengthtest", {"runlengthtest.c"}},
+            {"scaleandtile", {"scaleandtile.c"}},
+            {"scaletest1", {"scaletest1.c"}},
+            {"scaletest2", {"scaletest2.c"}},
+            {"seedfilltest", {"seedfilltest.c"}},
+            {"seedspread_reg", {"seedspread_reg.c"}},
+            {"settest", {"settest.c"}},
+            {"sharptest", {"sharptest.c"}},
+            {"sheartest", {"sheartest.c"}},
+            {"showedges", {"showedges.c"}},
+            {"skewtest", {"skewtest.c"}},
+            {"sorttest", {"sorttest.c"}},
+            {"splitimage2pdf", {"splitimage2pdf.c"}},
+            {"sudokutest", {"sudokutest.c"}},
+            {"textorient", {"textorient.c"}},
+            {"trctest", {"trctest.c"}},
+            {"warpertest", {"warpertest.c"}},
+            {"wordsinorder", {"wordsinorder.c"}},
+            {"writemtiff", {"writemtiff.c"}},
+            {"xtractprotos", {"xtractprotos.c"}},
+            {"yuvtest", {"yuvtest.c"}},
+        };
+
+        for (auto &[p, files] : m_progs)
+            add_prog(p, files);
+    }
 }
 
 void check(Checker &c)

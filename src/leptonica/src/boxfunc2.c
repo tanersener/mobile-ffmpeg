@@ -35,6 +35,7 @@
  *           BOX             *boxTransformOrdered()
  *           BOXA            *boxaRotateOrth()
  *           BOX             *boxRotateOrth()
+ *           BOXA            *boxaShiftWithPta()
  *
  *      Boxa sort
  *           BOXA            *boxaSort()
@@ -51,6 +52,7 @@
  *      Boxa array extraction
  *           l_int32          boxaExtractAsNuma()
  *           l_int32          boxaExtractAsPta()
+ *           PTA             *boxaExtractCorners()
  *
  *      Other Boxaa functions
  *           l_int32          boxaaGetExtent()
@@ -87,6 +89,10 @@ static const l_int32   MIN_COMPS_FOR_BIN_SORT = 200;
  * <pre>
  * Notes:
  *      (1) This is a very simple function that first shifts, then scales.
+ *      (2) The UL corner coordinates of all boxes in the output %boxad
+ *      (3) For the boxes in the output %boxad, the UL corner coordinates
+ *          must be non-negative, and the width and height of valid
+ *          boxes must be at least 1.
  * </pre>
  */
 BOXA *
@@ -135,6 +141,8 @@ BOXA    *boxad;
  * Notes:
  *      (1) This is a very simple function that first shifts, then scales.
  *      (2) If the box is invalid, a new invalid box is returned.
+ *      (3) The UL corner coordinates must be non-negative, and the
+ *          width and height of valid boxes must be at least 1.
  * </pre>
  */
 BOX *
@@ -151,8 +159,8 @@ boxTransform(BOX       *box,
     if (box->w <= 0 || box->h <= 0)
         return boxCreate(0, 0, 0, 0);
     else
-        return boxCreate((l_int32)(scalex * (box->x + shiftx) + 0.5),
-                         (l_int32)(scaley * (box->y + shifty) + 0.5),
+        return boxCreate((l_int32)(L_MAX(0, scalex * (box->x + shiftx) + 0.5)),
+                         (l_int32)(L_MAX(0, scaley * (box->y + shifty) + 0.5)),
                          (l_int32)(L_MAX(1.0, scalex * box->w + 0.5)),
                          (l_int32)(L_MAX(1.0, scaley * box->h + 0.5)));
 }
@@ -172,9 +180,6 @@ boxTransform(BOX       *box,
  * \return  boxd, or NULL on error
  *
  * <pre>
- * Notes:
- *      (1) This allows a sequence of linear transforms on each box.
- *          the transforms are from the affine set, composed of
  *          shift, scaling and rotation, and the order of the
  *          transforms is specified.
  *      (2) Although these operations appear to be on an infinite
@@ -538,6 +543,67 @@ l_int32  bx, by, bw, bh, xdist, ydist;
         return boxCreate(xdist, ydist, bw, bh);
     else  /*  rotation == 3, 270 deg cw */
         return boxCreate(by, xdist, bh, bw);
+}
+
+
+/*!
+ * \brief   boxaShiftWithPta()
+ *
+ * \param[in]    boxas
+ * \param[in]    pta       aligned with the boxes; determines shift amount
+ * \param[in]    dir       +1 to shift by the values in pta; -1 to shift
+ *                         by the negative of the values in the pta.
+ * \return  boxad, or NULL on error
+ *
+ * <pre>
+ * Notes:
+ *      (1) In use, %pta may come from the UL corners of of a boxa, each
+ *          of whose boxes contains the corresponding box of %boxas
+ *          within it.  The output %boxad is then a boxa in the (global)
+ *          coordinates of the containing boxa.  So the input %pta
+ *          could come from boxaExtractCorners().
+ *      (2) The operations with %dir == 1 and %dir == -1 are inverses if
+ *          called in order (1, -1).  Starting with an input boxa and
+ *          calling twice with these values of %dir results in a boxa
+ *          identical to the input.  However, because box parameters can
+ *          never be negative, calling in the order (-1, 1) may result
+ *          in clipping at the left side and the top.
+ * </pre>
+ */
+BOXA *
+boxaShiftWithPta(BOXA    *boxas,
+                 PTA     *pta,
+                 l_int32  dir)
+{
+l_int32  i, n, x, y, full;
+BOX     *box1, *box2;
+BOXA    *boxad;
+
+    PROCNAME("boxaShiftWithPta");
+
+    if (!boxas)
+        return (BOXA *)ERROR_PTR("boxas not defined", procName, NULL);
+    boxaIsFull(boxas, &full);
+    if (!full)
+        return (BOXA *)ERROR_PTR("boxas not full", procName, NULL);
+    if (!pta)
+        return (BOXA *)ERROR_PTR("pta not defined", procName, NULL);
+    if (dir != 1 && dir != -1)
+        return (BOXA *)ERROR_PTR("invalid dir", procName, NULL);
+    n = boxaGetCount(boxas);
+    if (n != ptaGetCount(pta))
+        return (BOXA *)ERROR_PTR("boxas and pta not same size", procName, NULL);
+
+    if ((boxad = boxaCreate(n)) == NULL)
+        return (BOXA *)ERROR_PTR("boxad not made", procName, NULL);
+    for (i = 0; i < n; i++) {
+        box1 = boxaGetBox(boxas, i, L_COPY);
+        ptaGetIPt(pta, i, &x, &y);
+        box2 = boxTransform(box1, dir * x, dir * y, 1.0, 1.0);
+        boxaAddBox(boxad, box2, L_INSERT);
+        boxDestroy(&box1);
+    }
+    return boxad;
 }
 
 
@@ -1172,6 +1238,10 @@ l_int32  i, n, left, top, right, bot, w, h;
  *          boxaExtractAsNuma(), is not necessary.
  *      (2) If invalid boxes are retained, each one will result in
  *          entries (typically 0) in all selected output pta.
+ *      (3) Other boxa --> pta functions are:
+ *          * boxaExtractCorners(): extracts any of the four corners as a pta.
+ *          * boxaConvertToPta(): extracts sufficient number of corners
+ *            to allow reconstruction of the original boxa from the pta.
  * </pre>
  */
 l_ok
@@ -1223,6 +1293,67 @@ l_int32  i, n, left, top, right, bot, w, h;
     }
 
     return 0;
+}
+
+
+/*!
+ * \brief   boxaExtractCorners()
+ *
+ * \param[in]    boxa
+ * \param[in]    corner    L_UPPER_LEFT, L_UPPER_RIGHT, L_LOWER_LEFT,
+ *                         L_LOWER_RIGHT
+ * \return  pta of corner coordinates, or NULL on error
+ *
+ * <pre>
+ * Notes:
+ *      (1) Extracts (0,0) for invalid boxes.
+ *      (2) Other boxa --> pta functions are:
+ *          * boxaExtractAsPta(): allows extraction of any dimension
+ *            and/or side location, with each in a separate pta.
+ *          * boxaConvertToPta(): extracts sufficient number of corners
+ *            to allow reconstruction of the original boxa from the pta.
+ * </pre>
+ */
+PTA *
+boxaExtractCorners(BOXA    *boxa,
+                   l_int32  corner)
+{
+l_int32  i, n, left, top, right, bot, w, h;
+PTA     *pta;
+
+    PROCNAME("boxaExtractCorners");
+
+    if (!boxa)
+        return (PTA *)ERROR_PTR("boxa not defined", procName, NULL);
+    if (corner != L_UPPER_LEFT && corner != L_UPPER_RIGHT &&
+        corner != L_LOWER_LEFT && corner != L_LOWER_RIGHT)
+        return (PTA *)ERROR_PTR("invalid corner", procName, NULL);
+
+    n = boxaGetCount(boxa);
+    if ((pta = ptaCreate(n)) == NULL)
+        return (PTA *)ERROR_PTR("pta not made", procName, NULL);
+
+    for (i = 0; i < n; i++) {
+        boxaGetBoxGeometry(boxa, i, &left, &top, &w, &h);
+        right = left + w - 1;
+        bot = top + h - 1;
+        if (w == 0 || h == 0) {  /* invalid */
+            left = 0;
+            top = 0;
+            right = 0;
+            bot = 0;
+        }
+        if (corner == L_UPPER_LEFT)
+            ptaAddPt(pta, left, top);
+        else if (corner == L_UPPER_RIGHT)
+            ptaAddPt(pta, right, top);
+        else if (corner == L_LOWER_LEFT)
+            ptaAddPt(pta, left, bot);
+        else if (corner == L_LOWER_RIGHT)
+            ptaAddPt(pta, right, bot);
+    }
+
+    return pta;
 }
 
 

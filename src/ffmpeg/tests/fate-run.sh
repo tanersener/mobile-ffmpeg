@@ -243,16 +243,110 @@ stream_remux(){
         -f framecrc - || return
 }
 
-lavffatetest(){
-    t="${test#lavf-fate-}"
-    ref=${base}/ref/lavf-fate/$t
-    ${base}/lavf-regression.sh $t lavf-fate tests/vsynth1 "$target_exec" "$target_path" "$threads" "$thread_type" "$cpuflags" "$target_samples"
+# FIXME: There is a certain duplication between the avconv-related helper
+# functions above and below that should be refactored.
+ffmpeg2="$target_exec ${target_path}/ffmpeg"
+raw_src="${target_path}/tests/vsynth1/%02d.pgm"
+pcm_src="${target_path}/tests/data/asynth1.sw"
+crcfile="tests/data/$test.lavf.crc"
+target_crcfile="${target_path}/$crcfile"
+
+[ "${V-0}" -gt 0 ] && echov=echov || echov=:
+
+echov(){
+    echo "$@" >&3
 }
 
-lavftest(){
+AVCONV_OPTS="-nostdin -nostats -y -cpuflags $cpuflags"
+COMMON_OPTS="-flags +bitexact -idct simple -sws_flags +accurate_rnd+bitexact -fflags +bitexact"
+DEC_OPTS="$COMMON_OPTS -threads $threads"
+ENC_OPTS="$COMMON_OPTS -threads 1 -dct fastint"
+
+run_avconv(){
+    $echov $ffmpeg2 $AVCONV_OPTS $*
+    $ffmpeg2 $AVCONV_OPTS $*
+}
+
+do_avconv(){
+    f="$1"
+    shift
+    set -- $* ${target_path}/$f
+    run_avconv $*
+    do_md5sum $f
+    echo $(wc -c $f)
+}
+
+do_avconv_crc(){
+    f="$1"
+    shift
+    run_avconv $* -f crc "$target_crcfile"
+    echo "$f $(cat $crcfile)"
+}
+
+lavf_audio(){
     t="${test#lavf-}"
-    ref=${base}/ref/lavf/$t
-    ${base}/lavf-regression.sh $t lavf tests/vsynth1 "$target_exec" "$target_path" "$threads" "$thread_type" "$cpuflags" "$target_samples"
+    outdir="tests/data/lavf"
+    file=${outdir}/lavf.$t
+    do_avconv $file $DEC_OPTS $1 -ar 44100 -f s16le -i $pcm_src "$ENC_OPTS -metadata title=lavftest" -t 1 -qscale 10 $2
+    do_avconv_crc $file $DEC_OPTS $3 -i $target_path/$file
+}
+
+lavf_container(){
+    t="${test#lavf-}"
+    outdir="tests/data/lavf"
+    file=${outdir}/lavf.$t
+    do_avconv $file $DEC_OPTS -f image2 -c:v pgmyuv -i $raw_src $DEC_OPTS -ar 44100 -f s16le $1 -i $pcm_src "$ENC_OPTS -metadata title=lavftest" -b:a 64k -t 1 -qscale:v 10 $2
+    test $3 = "disable_crc" ||
+        do_avconv_crc $file $DEC_OPTS -i $target_path/$file $3
+}
+
+lavf_container_attach() {          lavf_container "" "$1 -attach ${raw_src%/*}/00.pgm -metadata:s:t mimetype=image/x-portable-greymap"; }
+lavf_container_timecode_nodrop() { lavf_container "" "$1 -timecode 02:56:14:13"; }
+lavf_container_timecode_drop()   { lavf_container "" "$1 -timecode 02:56:14.13 -r 30000/1001"; }
+
+lavf_container_timecode()
+{
+    lavf_container_timecode_nodrop "$@"
+    lavf_container_timecode_drop "$@"
+    lavf_container "" "$1"
+}
+
+lavf_container_fate()
+{
+    t="${test#lavf-fate-}"
+    outdir="tests/data/lavf-fate"
+    file=${outdir}/lavf.$t
+    input="${target_samples}/$1"
+    do_avconv $file $DEC_OPTS $2 -i "$input" "$ENC_OPTS -metadata title=lavftest" -vcodec copy -acodec copy
+    do_avconv_crc $file $DEC_OPTS -i $target_path/$file $3
+}
+
+lavf_image(){
+    t="${test#lavf-}"
+    outdir="tests/data/images/$t"
+    mkdir -p "$outdir"
+    file=${outdir}/%02d.$t
+    run_avconv $DEC_OPTS -f image2 -c:v pgmyuv -i $raw_src $1 "$ENC_OPTS -metadata title=lavftest" -frames 13 -y -qscale 10 $target_path/$file
+    do_md5sum ${outdir}/02.$t
+    do_avconv_crc $file $DEC_OPTS $2 -i $target_path/$file $2
+    echo $(wc -c ${outdir}/02.$t)
+}
+
+lavf_image2pipe(){
+    t="${test#lavf-}"
+    t="${t%pipe}"
+    outdir="tests/data/lavf"
+    file=${outdir}/${t}pipe.$t
+    do_avconv $file $DEC_OPTS -f image2 -c:v pgmyuv -i $raw_src -f image2pipe "$ENC_OPTS -metadata title=lavftest" -t 1 -qscale 10
+    do_avconv_crc $file $DEC_OPTS -f image2pipe -i $target_path/$file
+}
+
+lavf_video(){
+    t="${test#lavf-}"
+    outdir="tests/data/lavf"
+    file=${outdir}/lavf.$t
+    do_avconv $file $DEC_OPTS -f image2 -c:v pgmyuv -i $raw_src "$ENC_OPTS -metadata title=lavftest" -t 1 -qscale 10 $1 $2
+    do_avconv_crc $file $DEC_OPTS -i $target_path/$file $1
 }
 
 refcmp_metadata(){
@@ -262,6 +356,17 @@ refcmp_metadata(){
     ffmpeg $FLAGS $ENC_OPTS \
         -lavfi "testsrc2=size=300x200:rate=1:duration=5,format=${pixfmt},split[ref][tmp];[tmp]avgblur=4[enc];[enc][ref]${refcmp},metadata=print:file=-" \
         -f null /dev/null | awk -v ref=${ref} -v fuzz=${fuzz} -f ${base}/refcmp-metadata.awk -
+}
+
+pixfmt_conversion(){
+    conversion="${test#pixfmt-}"
+    outdir="tests/data/pixfmt"
+    raw_dst="$outdir/$conversion.out.yuv"
+    file=${outdir}/${conversion}.yuv
+    run_avconv $DEC_OPTS -r 1 -f image2 -c:v pgmyuv -i $raw_src \
+               $ENC_OPTS -f rawvideo -t 1 -s 352x288 -pix_fmt $conversion $target_path/$raw_dst
+    do_avconv $file $DEC_OPTS -f rawvideo -s 352x288 -pix_fmt $conversion -i $target_path/$raw_dst \
+              $ENC_OPTS -f rawvideo -s 352x288 -pix_fmt yuv444p
 }
 
 video_filter(){
@@ -376,8 +481,6 @@ concat(){
 null(){
     :
 }
-
-mkdir -p "$outdir"
 
 # Disable globbing: command arguments may contain globbing characters and
 # must be kept verbatim

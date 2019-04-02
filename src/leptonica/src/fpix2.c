@@ -110,8 +110,8 @@
 /*!
  * \brief   pixConvertToFPix()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16 or 32 bpp
- * \param[in]    ncomps number of components: 3 for RGB, 1 otherwise
+ * \param[in]    pixs      1, 2, 4, 8, 16 or 32 bpp
+ * \param[in]    ncomps    number of components: 3 for RGB, 1 otherwise
  * \return  fpix, or NULL on error
  *
  * <pre>
@@ -203,8 +203,8 @@ FPIX       *fpixd;
 /*!
  * \brief   pixConvertToDPix()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16 or 32 bpp
- * \param[in]    ncomps number of components: 3 for RGB, 1 otherwise
+ * \param[in]    pixs      1, 2, 4, 8, 16 or 32 bpp
+ * \param[in]    ncomps    number of components: 3 for RGB, 1 otherwise
  * \return  dpix, or NULL on error
  *
  * <pre>
@@ -297,9 +297,9 @@ DPIX       *dpixd;
  * \brief   fpixConvertToPix()
  *
  * \param[in]    fpixs
- * \param[in]    outdepth 0, 8, 16 or 32 bpp
- * \param[in]    negvals L_CLIP_TO_ZERO, L_TAKE_ABSVAL
- * \param[in]    errorflag 1 to output error stats; 0 otherwise
+ * \param[in]    outdepth     0, 8, 16 or 32 bpp
+ * \param[in]    negvals      L_CLIP_TO_ZERO, L_TAKE_ABSVAL
+ * \param[in]    errorflag    1 to output error stats; 0 otherwise
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -516,9 +516,9 @@ DPIX       *dpix;
  * \brief   dpixConvertToPix()
  *
  * \param[in]    dpixs
- * \param[in]    outdepth 0, 8, 16 or 32 bpp
- * \param[in]    negvals L_CLIP_TO_ZERO, L_TAKE_ABSVAL
- * \param[in]    errorflag 1 to output error stats; 0 otherwise
+ * \param[in]    outdepth     0, 8, 16 or 32 bpp
+ * \param[in]    negvals      L_CLIP_TO_ZERO, L_TAKE_ABSVAL
+ * \param[in]    errorflag    1 to output error stats; 0 otherwise
  * \return  pixd, or NULL on error
  *
  * <pre>
@@ -682,9 +682,9 @@ FPIX       *fpix;
  * \brief   fpixGetMin()
  *
  * \param[in]    fpix
- * \param[out]   pminval [optional] min value
- * \param[out]   pxminloc [optional] x location of min
- * \param[out]   pyminloc [optional] y location of min
+ * \param[out]   pminval    [optional] min value
+ * \param[out]   pxminloc   [optional] x location of min
+ * \param[out]   pyminloc   [optional] y location of min
  * \return  0 if OK; 1 on error
  */
 l_ok
@@ -735,9 +735,9 @@ l_float32   minval;
  * \brief   fpixGetMax()
  *
  * \param[in]    fpix
- * \param[out]   pmaxval [optional] max value
- * \param[out]   pxmaxloc [optional] x location of max
- * \param[out]   pymaxloc [optional] y location of max
+ * \param[out]   pmaxval    [optional] max value
+ * \param[out]   pxmaxloc   [optional] x location of max
+ * \param[out]   pymaxloc   [optional] y location of max
  * \return  0 if OK; 1 on error
  */
 l_ok
@@ -788,9 +788,9 @@ l_float32   maxval;
  * \brief   dpixGetMin()
  *
  * \param[in]    dpix
- * \param[out]   pminval [optional] min value
- * \param[out]   pxminloc [optional] x location of min
- * \param[out]   pyminloc [optional] y location of min
+ * \param[out]   pminval    [optional] min value
+ * \param[out]   pxminloc   [optional] x location of min
+ * \param[out]   pyminloc   [optional] y location of min
  * \return  0 if OK; 1 on error
  */
 l_ok
@@ -841,9 +841,9 @@ l_float64   minval;
  * \brief   dpixGetMax()
  *
  * \param[in]    dpix
- * \param[out]   pmaxval [optional] max value
- * \param[out]   pxmaxloc [optional] x location of max
- * \param[out]   pymaxloc [optional] y location of max
+ * \param[out]   pmaxval    [optional] max value
+ * \param[out]   pxmaxloc   [optional] x location of max
+ * \param[out]   pymaxloc   [optional] y location of max
  * \return  0 if OK; 1 on error
  */
 l_ok
@@ -896,8 +896,8 @@ l_float64   maxval;
 /*!
  * \brief   fpixScaleByInteger()
  *
- * \param[in]    fpixs low resolution, subsampled
- * \param[in]    factor scaling factor
+ * \param[in]    fpixs     typically low resolution
+ * \param[in]    factor    integer scaling factor
  * \return  fpixd interpolated result, or NULL on error
  *
  * <pre>
@@ -988,8 +988,8 @@ FPIX       *fpixd;
 /*!
  * \brief   dpixScaleByInteger()
  *
- * \param[in]    dpixs low resolution, subsampled
- * \param[in]    factor scaling factor
+ * \param[in]    dpixs     typically low resolution
+ * \param[in]    factor    integer scaling factor
  * \return  dpixd interpolated result, or NULL on error
  *
  * <pre>
@@ -1083,11 +1083,11 @@ DPIX       *dpixd;
 /*!
  * \brief   fpixLinearCombination()
  *
- * \param[in]    fpixd [optional]; this can be null, equal to fpixs1, or
- *                     different from fpixs1
- * \param[in]    fpixs1 can be == to fpixd
+ * \param[in]    fpixd    [optional] this can be null, equal to fpixs1, or
+ *                        different from fpixs1
+ * \param[in]    fpixs1   can be equal to fpixd
  * \param[in]    fpixs2
- * \param[in]    a, b multiplication factors on fpixs1 and fpixs2, rsp.
+ * \param[in]    a, b     multiplication factors on fpixs1 and fpixs2, rsp.
  * \return  fpixd always
  *
  * <pre>
@@ -1149,8 +1149,8 @@ l_float32  *datas, *datad, *lines, *lined;
  * \brief   fpixAddMultConstant()
  *
  * \param[in]    fpix
- * \param[in]    addc  use 0.0 to skip the operation
- * \param[in]    multc use 1.0 to skip the operation
+ * \param[in]    addc     use 0.0 to skip the operation
+ * \param[in]    multc    use 1.0 to skip the operation
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1202,11 +1202,11 @@ l_float32  *line, *data;
 /*!
  * \brief   dpixLinearCombination()
  *
- * \param[in]    dpixd [optional]; this can be null, equal to dpixs1, or
- *                     different from dpixs1
- * \param[in]    dpixs1 can be == to dpixd
+ * \param[in]    dpixd    [optional] this can be null, equal to dpixs1, or
+ *                        different from dpixs1
+ * \param[in]    dpixs1   can be equal to dpixd
  * \param[in]    dpixs2
- * \param[in]    a, b multiplication factors on dpixs1 and dpixs2, rsp.
+ * \param[in]    a, b     multiplication factors on dpixs1 and dpixs2, rsp.
  * \return  dpixd always
  *
  * <pre>
@@ -1268,8 +1268,8 @@ l_float64  *datas, *datad, *lines, *lined;
  * \brief   dpixAddMultConstant()
  *
  * \param[in]    dpix
- * \param[in]    addc  use 0.0 to skip the operation
- * \param[in]    multc use 1.0 to skip the operation
+ * \param[in]    addc     use 0.0 to skip the operation
+ * \param[in]    multc    use 1.0 to skip the operation
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1324,7 +1324,7 @@ l_float64  *line, *data;
  * \brief   fpixSetAllArbitrary()
  *
  * \param[in]    fpix
- * \param[in]    inval to set at each pixel
+ * \param[in]    inval    to set at each pixel
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1355,7 +1355,7 @@ l_float32  *data, *line;
  * \brief   dpixSetAllArbitrary()
  *
  * \param[in]    dpix
- * \param[in]    inval to set at each pixel
+ * \param[in]    inval    to set at each pixel
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -1389,7 +1389,7 @@ l_float64  *data, *line;
  * \brief   fpixAddBorder()
  *
  * \param[in]    fpixs
- * \param[in]    left, right, top, bot pixels on each side to be added
+ * \param[in]    left, right, top, bot     pixels on each side to be added
  * \return  fpixd, or NULL on error
  *
  * <pre>
@@ -1430,7 +1430,7 @@ FPIX    *fpixd;
  * \brief   fpixRemoveBorder()
  *
  * \param[in]    fpixs
- * \param[in]    left, right, top, bot pixels on each side to be removed
+ * \param[in]    left, right, top, bot     pixels on each side to be removed
  * \return  fpixd, or NULL on error
  */
 FPIX *
@@ -1469,7 +1469,7 @@ FPIX    *fpixd;
  * \brief   fpixAddMirroredBorder()
  *
  * \param[in]    fpixs
- * \param[in]    left, right, top, bot pixels on each side to be added
+ * \param[in]    left, right, top, bot      pixels on each side to be added
  * \return  fpixd, or NULL on error
  *
  * <pre>
@@ -1515,7 +1515,7 @@ FPIX    *fpixd;
  * \brief   fpixAddContinuedBorder()
  *
  * \param[in]    fpixs
- * \param[in]    left, right, top, bot pixels on each side to be added
+ * \param[in]    left, right, top, bot     pixels on each side to be added
  * \return  fpixd, or NULL on error
  *
  * <pre>
@@ -1559,7 +1559,7 @@ FPIX    *fpixd;
  * \brief   fpixAddSlopeBorder()
  *
  * \param[in]    fpixs
- * \param[in]    left, right, top, bot pixels on each side to be added
+ * \param[in]    left, right, top, bot     pixels on each side to be added
  * \return  fpixd, or NULL on error
  *
  * <pre>
@@ -1636,14 +1636,14 @@ FPIX      *fpixd;
 /*!
  * \brief   fpixRasterop()
  *
- * \param[in]    fpixd  dest fpix
- * \param[in]    dx     x val of UL corner of dest rectangle
- * \param[in]    dy     y val of UL corner of dest rectangle
- * \param[in]    dw     width of dest rectangle
- * \param[in]    dh     height of dest rectangle
- * \param[in]    fpixs  src fpix
- * \param[in]    sx     x val of UL corner of src rectangle
- * \param[in]    sy     y val of UL corner of src rectangle
+ * \param[in]    fpixd    dest fpix
+ * \param[in]    dx       x val of UL corner of dest rectangle
+ * \param[in]    dy       y val of UL corner of dest rectangle
+ * \param[in]    dw       width of dest rectangle
+ * \param[in]    dh       height of dest rectangle
+ * \param[in]    fpixs    src fpix
+ * \param[in]    sx       x val of UL corner of src rectangle
+ * \param[in]    sy       y val of UL corner of src rectangle
  * \return  0 if OK; 1 on error.
  *
  * <pre>
@@ -1755,7 +1755,7 @@ l_float32  *datas, *datad, *lines, *lined;
  * \brief   fpixRotateOrth()
  *
  * \param[in]    fpixs
- * \param[in]    quads 0-3; number of 90 degree cw rotations
+ * \param[in]    quads    0-3; number of 90 degree cw rotations
  * \return  fpixd, or NULL on error
  */
 FPIX *
@@ -1783,8 +1783,8 @@ fpixRotateOrth(FPIX     *fpixs,
 /*!
  * \brief   fpixRotate180()
  *
- * \param[in]    fpixd  [optional]; can be null, equal to fpixs,
- *                      or different from fpixs
+ * \param[in]    fpixd    [optional] can be null, equal to fpixs,
+ *                        or different from fpixs
  * \param[in]    fpixs
  * \return  fpixd, or NULL on error
  *
@@ -1827,7 +1827,7 @@ fpixRotate180(FPIX  *fpixd,
  * \brief   fpixRotate90()
  *
  * \param[in]    fpixs
- * \param[in]    direction 1 = clockwise,  -1 = counter-clockwise
+ * \param[in]    direction     1 = clockwise; -1 = counter-clockwise
  * \return  fpixd, or NULL on error
  *
  * <pre>
@@ -1888,8 +1888,8 @@ FPIX       *fpixd;
 /*!
  * \brief   pixFlipLR()
  *
- * \param[in]    fpixd [optional]; can be null, equal to fpixs,
- *                     or different from fpixs
+ * \param[in]    fpixd    [optional] can be null, equal to fpixs,
+ *                        or different from fpixs
  * \param[in]    fpixs
  * \return  fpixd, or NULL on error
  *
@@ -1949,8 +1949,8 @@ l_float32  *line, *data, *buffer;
 /*!
  * \brief   fpixFlipTB()
  *
- * \param[in]    fpixd [optional]; can be null, equal to fpixs,
- *                     or different from fpixs
+ * \param[in]    fpixd    [optional] can be null, equal to fpixs,
+ *                        or different from fpixs
  * \param[in]    fpixs
  * \return  fpixd, or NULL on error
  *
@@ -2014,11 +2014,11 @@ l_float32  *linet, *lineb, *data, *buffer;
 /*!
  * \brief   fpixAffinePta()
  *
- * \param[in]    fpixs 8 bpp
- * \param[in]    ptad  4 pts of final coordinate space
- * \param[in]    ptas  4 pts of initial coordinate space
- * \param[in]    border size of extension with constant normal derivative
- * \param[in]    inval value brought in; typ. 0
+ * \param[in]    fpixs     8 bpp
+ * \param[in]    ptad      4 pts of final coordinate space
+ * \param[in]    ptas      4 pts of initial coordinate space
+ * \param[in]    border    size of extension with constant normal derivative
+ * \param[in]    inval     value brought in; typ. 0
  * \return  fpixd, or NULL on error
  *
  * <pre>
@@ -2085,9 +2085,9 @@ FPIX       *fpixs2, *fpixd, *fpixd2;
 /*!
  * \brief   fpixAffine()
  *
- * \param[in]    fpixs 8 bpp
- * \param[in]    vc  vector of 8 coefficients for projective transformation
- * \param[in]    inval value brought in; typ. 0
+ * \param[in]    fpixs    8 bpp
+ * \param[in]    vc       vector of 8 coefficients for projective transformation
+ * \param[in]    inval    value brought in; typ. 0
  * \return  fpixd, or NULL on error
  */
 FPIX *
@@ -2133,11 +2133,11 @@ FPIX       *fpixd;
 /*!
  * \brief   fpixProjectivePta()
  *
- * \param[in]    fpixs 8 bpp
- * \param[in]    ptad  4 pts of final coordinate space
- * \param[in]    ptas  4 pts of initial coordinate space
- * \param[in]    border size of extension with constant normal derivative
- * \param[in]    inval value brought in; typ. 0
+ * \param[in]    fpixs     8 bpp
+ * \param[in]    ptad      4 pts of final coordinate space
+ * \param[in]    ptas      4 pts of initial coordinate space
+ * \param[in]    border    size of extension with constant normal derivative
+ * \param[in]    inval     value brought in; typ. 0
  * \return  fpixd, or NULL on error
  *
  * <pre>
@@ -2204,9 +2204,9 @@ FPIX       *fpixs2, *fpixd, *fpixd2;
 /*!
  * \brief   fpixProjective()
  *
- * \param[in]    fpixs 8 bpp
- * \param[in]    vc  vector of 8 coefficients for projective transformation
- * \param[in]    inval value brought in; typ. 0
+ * \param[in]    fpixs     8 bpp
+ * \param[in]    vc        vector of 8 coefficients for projective transform
+ * \param[in]    inval     value brought in; typ. 0
  * \return  fpixd, or NULL on error
  */
 FPIX *
@@ -2252,12 +2252,12 @@ FPIX       *fpixd;
 /*!
  * \brief   linearInterpolatePixelFloat()
  *
- * \param[in]    datas ptr to beginning of float image data
- * \param[in]    w, h of image
- * \param[in]    x, y floating pt location for evaluation
- * \param[in]    inval float value brought in from the outside when the
- *                     input x,y location is outside the image
- * \param[out]   pval interpolated float value
+ * \param[in]    datas     ptr to beginning of float image data
+ * \param[in]    w, h      dimensions of image
+ * \param[in]    x, y      floating pt location for evaluation
+ * \param[in]    inval     float value brought in from the outside when the
+ *                         input x,y location is outside the image
+ * \param[out]   pval      interpolated float value
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -2370,9 +2370,9 @@ PIX        *pixd;
 /*!
  * \brief   pixComponentFunction()
  *
- * \param[in]    pix 32 bpp rgb
- * \param[in]    rnum, gnum, bnum coefficients for numerator
- * \param[in]    rdenom, gdenom, bdenom coefficients for denominator
+ * \param[in]    pix                       32 bpp rgb
+ * \param[in]    rnum, gnum, bnum          coefficients for numerator
+ * \param[in]    rdenom, gdenom, bdenom    coefficients for denominator
  * \return  fpixd, or NULL on error
  *
  * <pre>

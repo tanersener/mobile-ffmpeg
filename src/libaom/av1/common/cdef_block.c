@@ -232,8 +232,8 @@ void cdef_filter_fb(uint8_t *dst8, uint16_t *dst16, int dstride, uint16_t *in,
   }
 
   for (bi = 0; bi < cdef_count; bi++) {
-    int t = dlist[bi].skip ? 0 : pri_strength;
-    int s = dlist[bi].skip ? 0 : sec_strength;
+    int t = pri_strength;
+    int s = sec_strength;
     by = dlist[bi].by;
     bx = dlist[bi].bx;
     if (dst8)

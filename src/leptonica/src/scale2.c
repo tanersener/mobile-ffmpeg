@@ -137,8 +137,8 @@ extern l_float32  AlphaMaskBorderVals[2];
 /*!
  * \brief   pixScaleToGray()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    scalefactor reduction: must be > 0.0 and < 1.0
+ * \param[in]    pixs          1 bpp
+ * \param[in]    scalefactor   reduction: must be > 0.0 and < 1.0
  * \return  pixd 8 bpp, scaled down by scalefactor in each direction,
  *              or NULL on error.
  *
@@ -292,8 +292,8 @@ PIX       *pixt, *pixd;
 /*!
  * \brief   pixScaleToGrayFast()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    scalefactor reduction: must be > 0.0 and < 1.0
+ * \param[in]    pixs          1 bpp
+ * \param[in]    scalefactor   reduction: must be > 0.0 and < 1.0
  * \return  pixd 8 bpp, scaled down by scalefactor in each direction,
  *              or NULL on error.
  *
@@ -378,7 +378,7 @@ PIX       *pixt, *pixd;
 /*!
  * \brief   pixScaleToGray2()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs     1 bpp
  * \return  pixd 8 bpp, scaled down by 2x in each direction,
  *              or NULL on error.
  */
@@ -427,7 +427,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleToGray3()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs     1 bpp
  * \return  pixd 8 bpp, scaled down by 3x in each direction,
  *              or NULL on error.
  *
@@ -484,7 +484,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleToGray4()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs     1 bpp
  * \return  pixd 8 bpp, scaled down by 4x in each direction,
  *              or NULL on error.
  *
@@ -539,7 +539,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleToGray6()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs     1 bpp
  * \return  pixd 8 bpp, scaled down by 6x in each direction,
  *              or NULL on error.
  *
@@ -592,7 +592,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleToGray8()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs     1 bpp
  * \return  pixd 8 bpp, scaled down by 8x in each direction,
  *              or NULL on error
  */
@@ -641,7 +641,7 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleToGray16()
  *
- * \param[in]    pixs 1 bpp
+ * \param[in]    pixs     1 bpp
  * \return  pixd 8 bpp, scaled down by 16x in each direction,
  *              or NULL on error.
  */
@@ -690,8 +690,8 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleToGrayMipmap()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    scalefactor reduction: must be > 0.0 and < 1.0
+ * \param[in]    pixs          1 bpp
+ * \param[in]    scalefactor   reduction: must be > 0.0 and < 1.0
  * \return  pixd 8 bpp, scaled down by scalefactor in each direction,
  *              or NULL on error.
  *
@@ -793,9 +793,9 @@ PIX       *pixs1, *pixs2, *pixt, *pixd;
 /*!
  * \brief   pixScaleMipmap()
  *
- * \param[in]    pixs1 high res 8 bpp, no cmap
- * \param[in]    pixs2 low res -- 2x reduced -- 8 bpp, no cmap
- * \param[in]    scale reduction with respect to high res image, > 0.5
+ * \param[in]    pixs1    high res 8 bpp, no cmap
+ * \param[in]    pixs2    low res -- 2x reduced -- 8 bpp, no cmap
+ * \param[in]    scale    reduction with respect to high res image, > 0.5
  * \return  8 bpp pix, scaled down by reduction in each direction,
  *              or NULL on error.
  *
@@ -859,8 +859,8 @@ PIX       *pixd;
 /*!
  * \brief   pixExpandReplicate()
  *
- * \param[in]    pixs 1, 2, 4, 8, 16, 32 bpp
- * \param[in]    factor integer scale factor for replicative expansion
+ * \param[in]    pixs     1, 2, 4, 8, 16, 32 bpp
+ * \param[in]    factor   integer scale factor for replicative expansion
  * \return  pixd scaled up, or NULL on error.
  */
 PIX *
@@ -990,10 +990,10 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleGrayMinMax()
  *
- * \param[in]    pixs 8 bpp, not cmapped
- * \param[in]    xfact x downscaling factor; integer
- * \param[in]    yfact y downscaling factor; integer
- * \param[in]    type L_CHOOSE_MIN, L_CHOOSE_MAX, L_CHOOSE_MAXDIFF
+ * \param[in]    pixs     8 bpp, not cmapped
+ * \param[in]    xfact    x downscaling factor; integer
+ * \param[in]    yfact    y downscaling factor; integer
+ * \param[in]    type     L_CHOOSE_MIN, L_CHOOSE_MAX, L_CHOOSE_MAXDIFF
  * \return  pixd 8 bpp
  *
  * <pre>
@@ -1094,8 +1094,8 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleGrayMinMax2()
  *
- * \param[in]    pixs 8 bpp, not cmapped
- * \param[in]    type L_CHOOSE_MIN, L_CHOOSE_MAX, L_CHOOSE_MAXDIFF
+ * \param[in]    pixs    8 bpp, not cmapped
+ * \param[in]    type    L_CHOOSE_MIN, L_CHOOSE_MAX, L_CHOOSE_MAXDIFF
  * \return  pixd 8 bpp downscaled by 2x
  *
  * <pre>
@@ -1189,9 +1189,9 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleGrayRankCascade()
  *
- * \param[in]    pixs 8 bpp, not cmapped
- * \param[in]    level1, level2, level3, level4 rank thresholds,
- *                                              in set {0, 1, 2, 3, 4}
+ * \param[in]    pixs    8 bpp, not cmapped
+ * \param[in]    level1, level2    ...
+ * \param[in]    level3, level4    rank thresholds, in set {0, 1, 2, 3, 4}
  * \return  pixd 8 bpp, downscaled by up to 16x
  *
  * <pre>
@@ -1245,8 +1245,8 @@ PIX  *pixt1, *pixt2, *pixt3, *pixt4;
 /*!
  * \brief   pixScaleGrayRank2()
  *
- * \param[in]    pixs 8 bpp, no cmap
- * \param[in]    rank 1 (darkest), 2, 3, 4 (lightest)
+ * \param[in]    pixs    8 bpp, no cmap
+ * \param[in]    rank    1 (darkest), 2, 3, 4 (lightest)
  * \return  pixd 8 bpp, downscaled by 2x
  *
  * <pre>
@@ -1344,9 +1344,10 @@ PIX       *pixd;
 /*!
  * \brief   pixScaleAndTransferAlpha()
  *
- * \param[in]    pixd  32 bpp, scaled image
- * \param[in]    pixs  32 bpp, original unscaled image
- * \param[in]    scalex, scaley both > 0.0
+ * \param[in]    pixd      32 bpp, scaled image
+ * \param[in]    pixs      32 bpp, original unscaled image
+ * \param[in]    scalex    must be > 0.0
+ * \param[in]    scaley    must be > 0.0
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -1391,11 +1392,12 @@ PIX  *pix1, *pix2;
 /*!
  * \brief   pixScaleWithAlpha()
  *
- * \param[in]    pixs 32 bpp rgb or cmapped
- * \param[in]    scalex, scaley must be > 0.0
- * \param[in]    pixg [optional] 8 bpp, can be null
- * \param[in]    fract between 0.0 and 1.0, with 0.0 fully transparent
- *                     and 1.0 fully opaque
+ * \param[in]    pixs      32 bpp rgb or cmapped
+ * \param[in]    scalex    must be > 0.0
+ * \param[in]    scaley    must be > 0.0
+ * \param[in]    pixg      [optional] 8 bpp, can be null
+ * \param[in]    fract     between 0.0 and 1.0, with 0.0 fully transparent
+ *                         and 1.0 fully opaque
  * \return  pixd 32 bpp rgba, or NULL on error
  *
  * <pre>
@@ -1512,13 +1514,13 @@ PIX     *pixd, *pix32, *pixg2, *pixgs;
 /*!
  * \brief   scaleToGray2Low()
  *
- * \param[in]    datad   dest data
- * \param[in]    wd, hd  dest width, height
- * \param[in]    wpld    dest words/line
- * \param[in]    datas   src data
- * \param[in]    wpls    src words/line
- * \param[in]    sumtab  made from makeSumTabSG2()
- * \param[in]    valtab  made from makeValTabSG2()
+ * \param[in]    datad     dest data
+ * \param[in]    wd, hd    dest width, height
+ * \param[in]    wpld      dest words/line
+ * \param[in]    datas     src data
+ * \param[in]    wpls      src words/line
+ * \param[in]    sumtab    made from makeSumTabSG2()
+ * \param[in]    valtab    made from makeValTabSG2()
  * \return  0 if OK; 1 on error.
  *
  *  The output is processed in sets of 4 output bytes on a row,
@@ -1643,13 +1645,13 @@ l_uint8  *tab;
 /*!
  * \brief   scaleToGray3Low()
  *
- * \param[in]    datad   dest data
- * \param[in]    wd, hd  dest width, height
- * \param[in]    wpld    dest words/line
- * \param[in]    datas   src data
- * \param[in]    wpls    src words/line
- * \param[in]    sumtab  made from makeSumTabSG3()
- * \param[in]    valtab  made from makeValTabSG3()
+ * \param[in]    datad     dest data
+ * \param[in]    wd, hd    dest width, height
+ * \param[in]    wpld      dest words/line
+ * \param[in]    datas     src data
+ * \param[in]    wpls      src words/line
+ * \param[in]    sumtab    made from makeSumTabSG3()
+ * \param[in]    valtab    made from makeValTabSG3()
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -1801,13 +1803,13 @@ l_uint8  *tab;
 /*!
  * \brief   scaleToGray4Low()
  *
- * \param[in]    datad   dest data
- * \param[in]    wd, hd  dest width, height
- * \param[in]    wpld    dest words/line
- * \param[in]    datas   src data
- * \param[in]    wpls    src words/line
- * \param[in]    sumtab  made from makeSumTabSG4()
- * \param[in]    valtab  made from makeValTabSG4()
+ * \param[in]    datad     dest data
+ * \param[in]    wd, hd    dest width, height
+ * \param[in]    wpld      dest words/line
+ * \param[in]    datas     src data
+ * \param[in]    wpls      src words/line
+ * \param[in]    sumtab    made from makeSumTabSG4()
+ * \param[in]    valtab    made from makeValTabSG4()
  * \return  0 if OK; 1 on error.
  *
  *  The output is processed in sets of 2 output bytes on a row,
@@ -1920,13 +1922,13 @@ l_uint8  *tab;
 /*!
  * \brief   scaleToGray6Low()
  *
- * \param[in]    datad   dest data
- * \param[in]    wd, hd  dest width, height
- * \param[in]    wpld    dest words/line
- * \param[in]    datas   src data
- * \param[in]    wpls    src words/line
- * \param[in]    tab8  made from makePixelSumTab8()
- * \param[in]    valtab  made from makeValTabSG6()
+ * \param[in]    datad     dest data
+ * \param[in]    wd, hd    dest width, height
+ * \param[in]    wpld      dest words/line
+ * \param[in]    datas     src data
+ * \param[in]    wpls      src words/line
+ * \param[in]    tab8      made from makePixelSumTab8()
+ * \param[in]    valtab    made from makeValTabSG6()
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -2068,13 +2070,13 @@ l_uint8  *tab;
 /*!
  * \brief   scaleToGray8Low()
  *
- * \param[in]    datad   dest data
- * \param[in]    wd, hd  dest width, height
- * \param[in]    wpld    dest words/line
- * \param[in]    datas   src data
- * \param[in]    wpls    src words/line
- * \param[in]    tab8  made from makePixelSumTab8()
- * \param[in]    valtab  made from makeValTabSG8()
+ * \param[in]    datad     dest data
+ * \param[in]    wd, hd    dest width, height
+ * \param[in]    wpld      dest words/line
+ * \param[in]    datas     src data
+ * \param[in]    wpls      src words/line
+ * \param[in]    tab8      made from makePixelSumTab8()
+ * \param[in]    valtab    made from makeValTabSG8()
  * \return  0 if OK; 1 on error.
  *
  *  The output is processed one dest byte at a time,
@@ -2158,12 +2160,12 @@ l_uint8  *tab;
 /*!
  * \brief   scaleToGray16Low()
  *
- * \param[in]    datad   dest data
- * \param[in]    wd, hd  dest width, height
- * \param[in]    wpld    dest words/line
- * \param[in]    datas   src data
- * \param[in]    wpls    src words/line
- * \param[in]    tab8    made from makePixelSumTab8()
+ * \param[in]    datad     dest data
+ * \param[in]    wd, hd    dest width, height
+ * \param[in]    wpld      dest words/line
+ * \param[in]    datas     src data
+ * \param[in]    wpls      src words/line
+ * \param[in]    tab8      made from makePixelSumTab8()
  * \return  0 if OK; 1 on error.
  *
  *  The output is processed one dest byte at a time, corresponding

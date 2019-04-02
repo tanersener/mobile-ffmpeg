@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP9_COMMON_VP9_COMMON_H_
-#define VP9_COMMON_VP9_COMMON_H_
+#ifndef VPX_VP9_COMMON_VP9_COMMON_H_
+#define VPX_VP9_COMMON_VP9_COMMON_H_
 
 /* Interface header for common constant data structures and lookup tables */
 
@@ -75,4 +75,4 @@ static INLINE int get_unsigned_bits(unsigned int num_values) {
 }  // extern "C"
 #endif
 
-#endif  // VP9_COMMON_VP9_COMMON_H_
+#endif  // VPX_VP9_COMMON_VP9_COMMON_H_

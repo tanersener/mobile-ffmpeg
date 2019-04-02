@@ -1,4 +1,4 @@
-# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![GitHub release](https://img.shields.io/badge/release-v4.2-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2-blue.svg)
+# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![GitHub release](https://img.shields.io/badge/release-v4.2.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.1-blue.svg)
 
 FFmpeg for Android and IOS
 
@@ -98,7 +98,7 @@ There are eight different binary packages. Below you can see which system librar
 1. Add MobileFFmpeg dependency from `jcenter()`
     ```
     dependencies {
-        implementation 'com.arthenica:mobile-ffmpeg-full:4.2'
+        implementation 'com.arthenica:mobile-ffmpeg-full:4.2.1'
     }
     ```
 
@@ -174,7 +174,7 @@ There are eight different binary packages. Below you can see which system librar
 #### 2.2 IOS
 1. Add MobileFFmpeg pod to your `Podfile`
     ```
-    pod 'mobile-ffmpeg-full', '~> 4.2'
+    pod 'mobile-ffmpeg-full', '~> 4.2.1'
     ```
 
 2. Execute commands.
@@ -261,27 +261,27 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 
 ### 3. Versions
 
-`MobileFFmpeg` uses the same version number as `FFmpeg` since `v4.2`. Before that, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different, as shown in the following table. 
+`MobileFFmpeg` version number is aligned with `FFmpeg` since `v4.2`. Before that `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different.
 
-|        | v1.0 | v1.1 | v1.2 | v2.0 | v2.1 | v2.2 | v3.0 | v3.1 | v4.2 |
-| :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: | :----: |
-| FFmpeg | 3.4.2 | 3.4.2 | 3.4.4 | 4.0.1 | 4.0.2 | 4.0.3 | 4.1-dev-1517 | v4.1-10 | v4.2-dev-480 |
-| packages | min<br/>full | min<br/>min-gpl<br/>https<br/>https-gpl<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl | min<br/>min-gpl<br/>https<br/>https-gpl<br/>audio<br/>video<br/>full<br/>full-gpl |
+|        | v2.0 | v2.1 | v2.2 | v3.0 | v3.1 | v4.2 |v4.2.1 |
+| :----: | :----: | :----: | :----: | :----: | :----: | :----: |:----: |
+| FFmpeg | 4.0.1 | 4.0.2 | 4.0.3 | 4.1-dev-1517 | v4.1-10 | v4.2-dev-480 | v4.2-dev-1156 |
+| Includes LTS Variant | - | - | - | - | - | X | - |
 
 ### 4. LTS Releases
 
 Starting from `v4.2`, `MobileFFmpeg` binaries are published in two different variants: `Main Release` and `LTS Release`. 
 
-- Main releases include complete functionality of the library and support the latest SDK/API features
+- Main releases are published every 3 months. They include complete functionality of the library and support the latest SDK/API features.
 
-- LTS releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them
+- LTS releases are published every 6 months. These releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them.
 
 This table shows the differences between two variants.
 
 |        | Main Release | LTS Release |
 | :----: | :----: | :----: |
 | Android API Level | 24 | 21 | 
-| Android Camera Access | x | - |
+| Android Camera Access | Yes | - |
 | Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> |
 | IOS SDK | 12.1 | 9.3 |
 | Xcode Support | 10.1 | 7.3.1 |
@@ -292,7 +292,7 @@ This table shows the differences between two variants.
 1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
 
     ```
-    autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen patch
+    autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen patch git
     ```
 Some of these packages are not mandatory for the default build.
 Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Prerequisites) and
@@ -300,7 +300,7 @@ Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg
 
 2. Android builds require these additional packages.
     - **Android SDK 5.0 Lollipop (API Level 21)** or later
-    - **Android NDK r17c** or later with LLDB and CMake
+    - **Android NDK r19** or later with LLDB and CMake
 
 3. IOS builds need these extra packages and tools.
     - **IOS SDK 8.0.x** or later

@@ -308,7 +308,8 @@ INSTANTIATE_TEST_CASE_P(SSE4_1, AV1HighbdInvTxfm2d,
                         ::testing::Values(av1_highbd_inv_txfm_add_sse4_1));
 #endif
 
-#if HAVE_AVX2
+// TODO(http://crbug.com/aomedia/2350): these cause test vector mismatches.
+#if 0  // HAVE_AVX2
 INSTANTIATE_TEST_CASE_P(AVX2, AV1HighbdInvTxfm2d,
                         ::testing::Values(av1_highbd_inv_txfm_add_avx2));
 #endif

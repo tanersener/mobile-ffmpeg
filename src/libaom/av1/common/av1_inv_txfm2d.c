@@ -228,7 +228,7 @@ void av1_gen_inv_stage_range(int8_t *stage_range_col, int8_t *stage_range_row,
     (void)real_range_row;
     if (cfg->txfm_type_row == TXFM_TYPE_ADST4 && i == 1) {
       // the adst4 may use 1 extra bit on top of opt_range_row at stage 1
-      // so opt_range_col >= real_range_col will not hold
+      // so opt_range_row >= real_range_row will not hold
       stage_range_row[i] = opt_range_row;
     } else {
       assert(opt_range_row >= real_range_row);
@@ -241,7 +241,7 @@ void av1_gen_inv_stage_range(int8_t *stage_range_col, int8_t *stage_range_row,
         cfg->stage_range_col[i] + fwd_shift + shift[0] + bd + 1;
     (void)real_range_col;
     if (cfg->txfm_type_col == TXFM_TYPE_ADST4 && i == 1) {
-      // the adst4 may use 1 extra bit on top of opt_range_row at stage 1
+      // the adst4 may use 1 extra bit on top of opt_range_col at stage 1
       // so opt_range_col >= real_range_col will not hold
       stage_range_col[i] = opt_range_col;
     } else {

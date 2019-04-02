@@ -39,22 +39,22 @@ extern int const RETURN_CODE_CANCEL;
 /**
  * Returns FFmpeg version bundled within the library.
  *
- * \return FFmpeg version
+ * @return FFmpeg version
  */
 + (NSString*)getFFmpegVersion;
 
 /**
  * Returns MobileFFmpeg library version.
  *
- * \return MobileFFmpeg version
+ * @return MobileFFmpeg version
  */
 + (NSString*)getVersion;
 
 /**
  * Synchronously executes FFmpeg with arguments provided.
  *
- * \param FFmpeg command options/arguments as string array
- * \return zero on successful execution, 255 on user cancel and non-zero on error
+ * @param arguments FFmpeg command options/arguments as string array
+ * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)executeWithArguments: (NSArray*)arguments;
 
@@ -62,8 +62,8 @@ extern int const RETURN_CODE_CANCEL;
  * Synchronously executes FFmpeg command provided. Space character is used to split command
  * into arguments.
  *
- * \param FFmpeg command
- * \return zero on successful execution, 255 on user cancel and non-zero on error
+ * @param command FFmpeg command
+ * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)execute: (NSString*)command;
 
@@ -71,9 +71,9 @@ extern int const RETURN_CODE_CANCEL;
  * Synchronously executes FFmpeg command provided. Delimiter parameter is used to split
  * command into arguments.
  *
- * \param FFmpeg command
- * \param arguments delimiter
- * \return zero on successful execution, 255 on user cancel and non-zero on error
+ * @param command FFmpeg command
+ * @param delimiter arguments delimiter
+ * @return zero on successful execution, 255 on user cancel and non-zero on error
  */
 + (int)execute: (NSString*)command delimiter:(NSString*)delimiter;
 
@@ -87,7 +87,7 @@ extern int const RETURN_CODE_CANCEL;
 /**
  * Returns return code of last executed command.
  *
- * \return return code of last executed command
+ * @return return code of last executed command
  */
 + (int)getLastReturnCode;
 
@@ -95,25 +95,32 @@ extern int const RETURN_CODE_CANCEL;
  * Returns log output of last executed command. Please note that disabling redirection using
  * MobileFFmpegConfig.disableRedirection() method also disables this functionality.
  *
- * \return output of last executed command
+ * @return output of last executed command
  */
 + (NSString*)getLastCommandOutput;
 
 /**
  * Returns media information for given file.
  *
- * \param path or uri of media file
- * \return media information
+ * @param path file path or uri of media file
+ * @return media information
  */
 + (MediaInformation*)getMediaInformation: (NSString*)path;
 
 /**
  * Returns media information for given file.
  *
- * \param path    path or uri of media file
- * \param timeout complete timeout
- * \return media information
+ * @param path path or uri of media file
+ * @param timeout complete timeout
+ * @return media information
  */
  + (MediaInformation*)getMediaInformation: (NSString*)path timeout:(long)timeout;
+
+/**
+ * Returns MobileFFmpeg library build date.
+ *
+ * @return MobileFFmpeg library build date
+ */
++ (NSString*)getBuildDate;
 
 @end

@@ -162,7 +162,7 @@ bool AV1Decoder::setInspectionCallback() {
 
 void AV1Decoder::inspect(void *pbi, void *data) {
   AV1Decoder *decoder = (AV1Decoder *)data;
-  ifd_inspect(&decoder->frame_data, pbi);
+  ifd_inspect(&decoder->frame_data, pbi, 0);
 }
 
 #define MIN_ZOOM (1)

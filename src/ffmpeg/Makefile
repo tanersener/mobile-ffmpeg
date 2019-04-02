@@ -135,7 +135,7 @@ uninstall-data:
 
 clean::
 	$(RM) $(CLEANSUFFIXES)
-	$(RM) $(addprefix compat/,$(CLEANSUFFIXES)) $(addprefix compat/*/,$(CLEANSUFFIXES))
+	$(RM) $(addprefix compat/,$(CLEANSUFFIXES)) $(addprefix compat/*/,$(CLEANSUFFIXES)) $(addprefix compat/*/*/,$(CLEANSUFFIXES))
 	$(RM) -r coverage-html
 	$(RM) -rf coverage.info coverage.info.in lcov
 
@@ -159,7 +159,7 @@ check: all alltools examples testprogs fate
 
 include $(SRC_PATH)/tests/Makefile
 
-$(sort $(OBJDIRS)):
+$(sort $(OUTDIRS)):
 	$(Q)mkdir -p $@
 
 # Dummy rule to stop make trying to rebuild removed or renamed headers

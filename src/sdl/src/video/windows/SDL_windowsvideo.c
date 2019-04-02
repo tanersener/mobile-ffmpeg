@@ -63,15 +63,6 @@ UpdateWindowFrameUsableWhileCursorHidden(void *userdata, const char *name, const
     }
 }
 
-static void WIN_SuspendScreenSaver(_THIS)
-{
-    if (_this->suspend_screensaver) {
-        SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED);
-    } else {
-        SetThreadExecutionState(ES_CONTINUOUS);
-    }
-}
-
 
 /* Windows driver bootstrap functions */
 
@@ -145,7 +136,6 @@ WIN_CreateDevice(int devindex)
     device->GetDisplayModes = WIN_GetDisplayModes;
     device->SetDisplayMode = WIN_SetDisplayMode;
     device->PumpEvents = WIN_PumpEvents;
-    device->SuspendScreenSaver = WIN_SuspendScreenSaver;
 
     device->CreateSDLWindow = WIN_CreateWindow;
     device->CreateSDLWindowFrom = WIN_CreateWindowFrom;
@@ -174,7 +164,6 @@ WIN_CreateDevice(int devindex)
     device->DestroyWindowFramebuffer = WIN_DestroyWindowFramebuffer;
     device->OnWindowEnter = WIN_OnWindowEnter;
     device->SetWindowHitTest = WIN_SetWindowHitTest;
-    device->AcceptDragAndDrop = WIN_AcceptDragAndDrop;
 
     device->shape_driver.CreateShaper = Win32_CreateShaper;
     device->shape_driver.SetWindowShape = Win32_SetWindowShape;

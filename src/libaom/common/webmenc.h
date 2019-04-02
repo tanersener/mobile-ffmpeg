@@ -30,13 +30,13 @@ struct WebmOutputContext {
 };
 
 /* Stereo 3D packed frame format */
-typedef enum stereo_format {
+enum {
   STEREO_FORMAT_MONO = 0,
   STEREO_FORMAT_LEFT_RIGHT = 1,
   STEREO_FORMAT_BOTTOM_TOP = 2,
   STEREO_FORMAT_TOP_BOTTOM = 3,
   STEREO_FORMAT_RIGHT_LEFT = 11
-} stereo_format_t;
+} UENUM1BYTE(stereo_format_t);
 
 // The following functions wrap libwebm's mkvmuxer. All functions return 0 upon
 // success, or -1 upon failure.

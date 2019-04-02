@@ -19,6 +19,7 @@
 
 #include "vp9/encoder/vp9_ratectrl.h"
 #include "vp9/encoder/vp9_rd.h"
+#include "vp9/encoder/vp9_encodeframe.h"
 #include "vp9/encoder/vp9_segmentation.h"
 
 #define ENERGY_MIN (-4)
@@ -190,6 +191,40 @@ double vp9_log_block_var(VP9_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bs) {
   unsigned int var = block_variance(cpi, x, bs);
   vpx_clear_system_state();
   return log(var + 1.0);
+}
+
+// Get the range of sub block energy values;
+void vp9_get_sub_block_energy(VP9_COMP *cpi, MACROBLOCK *mb, int mi_row,
+                              int mi_col, BLOCK_SIZE bsize, int *min_e,
+                              int *max_e) {
+  VP9_COMMON *const cm = &cpi->common;
+  const int bw = num_8x8_blocks_wide_lookup[bsize];
+  const int bh = num_8x8_blocks_high_lookup[bsize];
+  const int xmis = VPXMIN(cm->mi_cols - mi_col, bw);
+  const int ymis = VPXMIN(cm->mi_rows - mi_row, bh);
+  int x, y;
+
+  if (xmis < bw || ymis < bh) {
+    vp9_setup_src_planes(mb, cpi->Source, mi_row, mi_col);
+    *min_e = vp9_block_energy(cpi, mb, bsize);
+    *max_e = *min_e;
+  } else {
+    int energy;
+    *min_e = ENERGY_MAX;
+    *max_e = ENERGY_MIN;
+
+    for (y = 0; y < ymis; ++y) {
+      for (x = 0; x < xmis; ++x) {
+        vp9_setup_src_planes(mb, cpi->Source, mi_row + y, mi_col + x);
+        energy = vp9_block_energy(cpi, mb, BLOCK_8X8);
+        *min_e = VPXMIN(*min_e, energy);
+        *max_e = VPXMAX(*max_e, energy);
+      }
+    }
+  }
+
+  // Re-instate source pointers back to what they should have been on entry.
+  vp9_setup_src_planes(mb, cpi->Source, mi_row, mi_col);
 }
 
 #define DEFAULT_E_MIDPOINT 10.0

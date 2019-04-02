@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP9_ENCODER_NOISE_ESTIMATE_H_
-#define VP9_ENCODER_NOISE_ESTIMATE_H_
+#ifndef VPX_VP9_ENCODER_VP9_NOISE_ESTIMATE_H_
+#define VPX_VP9_ENCODER_VP9_NOISE_ESTIMATE_H_
 
 #include "vp9/encoder/vp9_block.h"
 #include "vp9/encoder/vp9_skin_detection.h"
@@ -48,4 +48,4 @@ void vp9_update_noise_estimate(struct VP9_COMP *const cpi);
 }  // extern "C"
 #endif
 
-#endif  // VP9_ENCODER_NOISE_ESTIMATE_H_
+#endif  // VPX_VP9_ENCODER_VP9_NOISE_ESTIMATE_H_

@@ -99,6 +99,25 @@
  *     center wanders -- it seems to be doing a 1 pixel translation
  *     in addition to the rotation.
  *
+ *     Consider again the comparison of image quality between sampling
+ *     and area mapping.  With sampling, sharp edges such as found in
+ *     text images remain sharp.  However, sampling artifacts such as
+ *     characters randomly bouncing up and down by one pixel, or
+ *     one pixel horizontal shear lines going through a line of text
+ *     (causing the characters to look like badly rendered italic),
+ *     are highly visible.  It does not help to sample the source pixel
+ *     with the largest area covering each dest pixel; the result has
+ *     the same ugly sampling artifacts.
+ *
+ *     With area mapping, these annoying artifacts are avoided, but the
+ *     blurring of edges makes small text a bit more difficult to read.
+ *     However, if you are willing to do more computation, you can have
+ *     the best of both worlds: no sampling artifacts and sharp edges.
+ *     Use area mapping to avoid sampling issues, and follow it with
+ *     unsharp masking.  Experiment with the sharpening parameters.
+ *     I have found that a small amount of sharpening is sufficient to
+ *     restore the sharp edges in text; e.g.,
+ *         pix2 = pixUnsharpMasking(pix1, 1, 0.3);
  * </pre>
  */
 

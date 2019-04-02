@@ -45,9 +45,9 @@ static av_cold int davs2_init(AVCodecContext *avctx)
     /* init the decoder */
     cad->param.threads      = avctx->thread_count;
     cad->param.info_level   = 0;
-    cad->decoder            = davs2_decoder_open(&cad->param);
     cad->param.disable_avx  = !(cpu_flags & AV_CPU_FLAG_AVX &&
                                 cpu_flags & AV_CPU_FLAG_AVX2);
+    cad->decoder            = davs2_decoder_open(&cad->param);
 
     if (!cad->decoder) {
         av_log(avctx, AV_LOG_ERROR, "decoder created error.");
@@ -83,23 +83,23 @@ static int davs2_dump_frames(AVCodecContext *avctx, davs2_picture_t *pic, int *g
     }
 
     switch (pic->type) {
-        case DAVS2_PIC_I:
-        case DAVS2_PIC_G:
-            frame->pict_type = AV_PICTURE_TYPE_I;
-            break;
-        case DAVS2_PIC_P:
-        case DAVS2_PIC_S:
-            frame->pict_type = AV_PICTURE_TYPE_P;
-            break;
-        case DAVS2_PIC_B:
-            frame->pict_type = AV_PICTURE_TYPE_B;
-            break;
-        case DAVS2_PIC_F:
-            frame->pict_type = AV_PICTURE_TYPE_S;
-            break;
-        default:
-            av_log(avctx, AV_LOG_ERROR, "Decoder error: unknown frame type\n");
-            return AVERROR_EXTERNAL;
+    case DAVS2_PIC_I:
+    case DAVS2_PIC_G:
+        frame->pict_type = AV_PICTURE_TYPE_I;
+        break;
+    case DAVS2_PIC_P:
+    case DAVS2_PIC_S:
+        frame->pict_type = AV_PICTURE_TYPE_P;
+        break;
+    case DAVS2_PIC_B:
+        frame->pict_type = AV_PICTURE_TYPE_B;
+        break;
+    case DAVS2_PIC_F:
+        frame->pict_type = AV_PICTURE_TYPE_S;
+        break;
+    default:
+        av_log(avctx, AV_LOG_ERROR, "Decoder error: unknown frame type\n");
+        return AVERROR_EXTERNAL;
     }
 
     for (plane = 0; plane < 3; ++plane) {
@@ -107,7 +107,7 @@ static int davs2_dump_frames(AVCodecContext *avctx, davs2_picture_t *pic, int *g
         frame->buf[plane]  = av_buffer_alloc(size_line * pic->lines[plane]);
 
         if (!frame->buf[plane]){
-            av_log(avctx, AV_LOG_ERROR, "dump error: alloc failed.\n");
+            av_log(avctx, AV_LOG_ERROR, "Decoder error: allocation failure, can't dump frames.\n");
             return AVERROR(ENOMEM);
         }
 
@@ -127,6 +127,21 @@ static int davs2_dump_frames(AVCodecContext *avctx, davs2_picture_t *pic, int *g
 
     *got_frame = 1;
     return 0;
+}
+
+static void davs2_flush(AVCodecContext *avctx)
+{
+    DAVS2Context *cad      = avctx->priv_data;
+    int           ret      = DAVS2_GOT_FRAME;
+
+    while (ret == DAVS2_GOT_FRAME) {
+        ret = davs2_decoder_flush(cad->decoder, &cad->headerset, &cad->out_frame);
+        davs2_decoder_frame_unref(cad->decoder, &cad->out_frame);
+    }
+
+    if (ret == DAVS2_ERROR) {
+        av_log(avctx, AV_LOG_WARNING, "Decoder flushing failed.\n");
+    }
 }
 
 static int send_delayed_frame(AVCodecContext *avctx, AVFrame *frame, int *got_frame)
@@ -205,7 +220,8 @@ AVCodec ff_libdavs2_decoder = {
     .init           = davs2_init,
     .close          = davs2_end,
     .decode         = davs2_decode_frame,
-    .capabilities   =  AV_CODEC_CAP_DELAY,//AV_CODEC_CAP_DR1 |
+    .flush          = davs2_flush,
+    .capabilities   =  AV_CODEC_CAP_DELAY | AV_CODEC_CAP_AUTO_THREADS,
     .pix_fmts       = (const enum AVPixelFormat[]) { AV_PIX_FMT_YUV420P,
                                                      AV_PIX_FMT_NONE },
     .wrapper_name   = "libdavs2",

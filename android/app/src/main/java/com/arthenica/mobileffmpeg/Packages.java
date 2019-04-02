@@ -97,7 +97,6 @@ class Packages {
         final boolean gnutls = externalLibraryList.contains("gnutls");
         final boolean xvid = externalLibraryList.contains("xvid");
 
-        boolean min = false;
         boolean minGpl = false;
         boolean https = false;
         boolean httpsGpl = false;
@@ -125,8 +124,6 @@ class Packages {
         } else {
             if (gnutls) {
                 https = true;
-            } else {
-                min = true;
             }
         }
 

@@ -318,7 +318,7 @@ regTestCompareStrings(L_REGPARAMS  *rp,
                       l_uint8      *string2,
                       size_t        bytes2)
 {
-l_int32  i, fail;
+l_int32  same;
 char     buf[256];
 
     PROCNAME("regTestCompareStrings");
@@ -327,19 +327,10 @@ char     buf[256];
         return ERROR_INT("rp not defined", procName, 1);
 
     rp->index++;
-    fail = FALSE;
-    if (bytes1 != bytes2) fail = TRUE;
-    if (fail == FALSE) {
-        for (i = 0; i < bytes1; i++) {
-            if (string1[i] != string2[i]) {
-                fail = TRUE;
-                break;
-            }
-        }
-    }
+    l_binaryCompare(string1, bytes1, string2, bytes2, &same);
 
         /* Output on failure */
-    if (fail == TRUE) {
+    if (!same) {
             /* Write the two strings to file */
         snprintf(buf, sizeof(buf), "/tmp/lept/regout/string1_%d_%lu", rp->index,
                  (unsigned long)bytes1);

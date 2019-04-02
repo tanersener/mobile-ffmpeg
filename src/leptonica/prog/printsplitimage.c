@@ -34,37 +34,42 @@
  *
  *   If printer is not specified, the only action is that the
  *   image is split into a set of tiles, and these are written
- *   out as a set of uncompressed (i.e., very large) level 1
- *   PostScript files.  The images in the PostScript files are
- *   scaled to each fill an 8.5 x 11 inch page, up to the
- *   FILLING_FACTOR fraction in each direction.
+ *   out as a set of compressed (level 3) Postscript files.
+ *   The images in the PostScript files are scaled to each fill
+ *   an 8.5 x 11 inch page, up to the FILLING_FACTOR fraction
+ *    in each direction.
  *
- *   If printer is specified, these are printed on separate pages.
- *   We do this (separate, uncompressed PostScript pages) because
- *   this is the lowest common denominator: many PostScript printers
- *   will not print multi-page PostScript of images, or images that
- *   are level 2 compressed.  Hard to believe, but true.
+ *   If printer is specified, these are printed on separate pages,
+ *   because some printers cannot print multi-page Postscript of images.
+ *
+ *   If your system does not have lpr, it likely has lp.  You can run
+ *   printsplitimage to make the PostScript files, and print them with lp:
+ *       lp -d <printer> /tmp/lept/split/image0.ps
+ *       lp -d <printer> /tmp/lept/split/image1.ps
+ *       ...
+ *   To print in color, see prog/printimage.c.
  *
  *   ***************************************************************
- *   N.B.  This requires lpr, which is invoked via 'system'.  It could
- *         pose a security vulnerability if used as a service in a
- *         production environment.  Consequently, this program should
- *         only be used for debug and testing.
+ *   N.B.  If a printer is specified, this program invokes lpr via
+ *         "system'.  It could pose a security vulnerability if used
+ *         as a service in a production environment.  Consequently,
+ *         this program should only be used for debug and testing.
  *   ***************************************************************
  */
 
 #include "allheaders.h"
 
+#define  USE_COMPRESSED    1
+
     /* fill factor on 8.5 x 11 inch output page */
 static const l_float32   FILL_FACTOR = 0.95;
-
 
 int main(int    argc,
          char **argv)
 {
 char        *filein, *fname, *printer;
 char         buf[512];
-l_int32      nx, ny, i, w, h, ws, hs, n, ignore;
+l_int32      nx, ny, i, w, h, ws, hs, n, ignore, index;
 l_float32    scale;
 FILE        *fp;
 PIX         *pixs, *pixt, *pixr;
@@ -114,9 +119,15 @@ static char  mainName[] = "printsplitimage";
         fname = genPathname("/tmp/lept/split", buf);
         fprintf(stderr, "fname: %s\n", fname);
         sarrayAddString(sa, fname, L_INSERT);
+#if USE_COMPRESSED
+        index = 0;
+        pixWriteCompressedToPS(pixt, fname, (l_int32)(300. / scale), 3, &index);
+        index = 0;  /* write each out to a separate file */
+#else  /* uncompressed, level 1 */
         fp = lept_fopen(fname, "wb+");
         pixWriteStreamPS(fp, pixt, NULL, 300, scale);
         lept_fclose(fp);
+#endif  /* USE_COMPRESSED */
         pixDestroy(&pixt);
     }
 

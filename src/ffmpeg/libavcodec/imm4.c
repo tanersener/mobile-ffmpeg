@@ -41,7 +41,6 @@ typedef struct IMM4Context {
     uint8_t *bitstream;
     int bitstream_size;
 
-    int changed_size;
     int factor;
     unsigned lo;
     unsigned hi;
@@ -139,7 +138,7 @@ static int get_cbphi(GetBitContext *gb, int x)
 }
 
 static int decode_block(AVCodecContext *avctx, GetBitContext *gb,
-                        int block, int factor, int flag, int offset)
+                        int block, int factor, int flag, int offset, int flag2)
 {
     IMM4Context *s = avctx->priv_data;
     const uint8_t *scantable = s->intra_scantable.permutated;
@@ -170,11 +169,19 @@ static int decode_block(AVCodecContext *avctx, GetBitContext *gb,
             break;
     }
 
+    if (s->hi == 2 && flag2 && block < 4) {
+        if (flag)
+            s->block[block][scantable[0]]  *= 2;
+        s->block[block][scantable[1]]  *= 2;
+        s->block[block][scantable[8]]  *= 2;
+        s->block[block][scantable[16]] *= 2;
+    }
+
     return 0;
 }
 
 static int decode_blocks(AVCodecContext *avctx, GetBitContext *gb,
-                         unsigned cbp, int flag, int offset)
+                         unsigned cbp, int flag, int offset, unsigned flag2)
 {
     IMM4Context *s = avctx->priv_data;
     const uint8_t *scantable = s->intra_scantable.permutated;
@@ -194,7 +201,7 @@ static int decode_blocks(AVCodecContext *avctx, GetBitContext *gb,
         }
 
         if (cbp & (1 << (5 - i))) {
-            ret = decode_block(avctx, gb, i, s->factor, flag, offset);
+            ret = decode_block(avctx, gb, i, s->factor, flag, offset, flag2);
             if (ret < 0)
                 return ret;
         }
@@ -213,11 +220,7 @@ static int decode_intra(AVCodecContext *avctx, GetBitContext *gb, AVFrame *frame
             return AVERROR_INVALIDDATA;
         s->factor = intra_cb[s->lo];
     } else {
-        if (s->hi == 1) {
-            s->factor = s->lo * 2;
-        } else {
-            s->factor = s->lo * 2;
-        }
+        s->factor = s->lo * 2;
     }
 
     if (s->hi) {
@@ -229,14 +232,14 @@ static int decode_intra(AVCodecContext *avctx, GetBitContext *gb, AVFrame *frame
 
     for (y = 0; y < avctx->height; y += 16) {
         for (x = 0; x < avctx->width; x += 16) {
-            unsigned cbphi, cbplo;
+            unsigned flag, cbphi, cbplo;
 
             cbplo = get_vlc2(gb, cbplo_tab.table, cbplo_tab.bits, 1) >> 4;
-            skip_bits1(gb);
+            flag = get_bits1(gb);
 
             cbphi = get_cbphi(gb, 1);
 
-            ret = decode_blocks(avctx, gb, cbplo | (cbphi << 2), 0, offset);
+            ret = decode_blocks(avctx, gb, cbplo | (cbphi << 2), 0, offset, flag);
             if (ret < 0)
                 return ret;
 
@@ -269,11 +272,7 @@ static int decode_inter(AVCodecContext *avctx, GetBitContext *gb,
             return AVERROR_INVALIDDATA;
         s->factor = inter_cb[s->lo];
     } else {
-        if (s->hi == 1) {
-            s->factor = s->lo * 2;
-        } else {
-            s->factor = s->lo * 2;
-        }
+        s->factor = s->lo * 2;
     }
 
     if (s->hi) {
@@ -286,7 +285,7 @@ static int decode_inter(AVCodecContext *avctx, GetBitContext *gb,
     for (y = 0; y < avctx->height; y += 16) {
         for (x = 0; x < avctx->width; x += 16) {
             int reverse, intra_block, value;
-            unsigned cbphi, cbplo;
+            unsigned cbphi, cbplo, flag2 = 0;
 
             if (get_bits1(gb)) {
                 copy_block16(frame->data[0] + y * frame->linesize[0] + x,
@@ -308,12 +307,12 @@ static int decode_inter(AVCodecContext *avctx, GetBitContext *gb,
             intra_block = value & 0x07;
             reverse = intra_block == 3;
             if (reverse)
-                skip_bits1(gb);
+                flag2 = get_bits1(gb);
 
             cbplo = value >> 4;
             cbphi = get_cbphi(gb, reverse);
             if (intra_block) {
-                ret = decode_blocks(avctx, gb, cbplo | (cbphi << 2), 0, offset);
+                ret = decode_blocks(avctx, gb, cbplo | (cbphi << 2), 0, offset, flag2);
                 if (ret < 0)
                     return ret;
 
@@ -330,8 +329,9 @@ static int decode_inter(AVCodecContext *avctx, GetBitContext *gb,
                 s->idsp.idct_put(frame->data[2] + (y >> 1) * frame->linesize[2] + (x >> 1),
                                  frame->linesize[2], s->block[5]);
             } else {
-                skip_bits(gb, 2);
-                ret = decode_blocks(avctx, gb, cbplo | (cbphi << 2), 1, offset);
+                flag2 = get_bits1(gb);
+                skip_bits1(gb);
+                ret = decode_blocks(avctx, gb, cbplo | (cbphi << 2), 1, offset, flag2);
                 if (ret < 0)
                     return ret;
 
@@ -370,6 +370,7 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     IMM4Context *s = avctx->priv_data;
     GetBitContext *gb = &s->gb;
     AVFrame *frame = data;
+    int width, height;
     unsigned type;
     int ret, scaled;
 
@@ -391,9 +392,11 @@ static int decode_frame(AVCodecContext *avctx, void *data,
     avctx->pix_fmt = AV_PIX_FMT_YUV420P;
     avctx->color_range = AVCOL_RANGE_JPEG;
 
+    width = avctx->width;
+    height = avctx->height;
+
     scaled = avpkt->data[8];
     if (scaled < 2) {
-        int width, height;
         int mode = avpkt->data[10];
 
         switch (mode) {
@@ -422,18 +425,8 @@ static int decode_frame(AVCodecContext *avctx, void *data,
             height = 576;
             break;
         }
-
-        if (s->changed_size == 1 &&
-            (avctx->width != width || avctx->height != height)) {
-            av_log(avctx, AV_LOG_ERROR, "Frame size change is unsupported.\n");
-            return AVERROR_INVALIDDATA;
-        }
-        ret = ff_set_dimensions(avctx, width, height);
-        if (ret < 0)
-            return ret;
     }
 
-    s->changed_size = 1;
     skip_bits_long(gb, 24 * 8);
     type = get_bits_long(gb, 32);
     s->hi = get_bits(gb, 16);
@@ -452,6 +445,19 @@ static int decode_frame(AVCodecContext *avctx, void *data,
         avpriv_request_sample(avctx, "type %X", type);
         return AVERROR_PATCHWELCOME;
     }
+
+    if (avctx->width  != width ||
+        avctx->height != height) {
+        if (!frame->key_frame) {
+            av_log(avctx, AV_LOG_ERROR, "Frame size change is unsupported.\n");
+            return AVERROR_INVALIDDATA;
+        }
+        av_frame_unref(s->prev_frame);
+    }
+
+    ret = ff_set_dimensions(avctx, width, height);
+    if (ret < 0)
+        return ret;
 
     if ((ret = ff_get_buffer(avctx, frame, frame->key_frame ? AV_GET_BUFFER_FLAG_REF : 0)) < 0)
         return ret;

@@ -65,8 +65,8 @@
 /*!
  * \brief   createMatrix2dTranslate()
  *
- * \param[in]    transx  x component of translation wrt. the origin
- * \param[in]    transy  y component of translation wrt. the origin
+ * \param[in]    transx   x component of translation wrt. the origin
+ * \param[in]    transy   y component of translation wrt. the origin
  * \return  3x3 transform matrix, or NULL on error
  *
  * <pre>
@@ -106,8 +106,8 @@ l_float32  *mat;
 /*!
  * \brief   createMatrix2dScale()
  *
- * \param[in]    scalex  horizontal scale factor
- * \param[in]    scaley  vertical scale factor
+ * \param[in]    scalex    horizontal scale factor
+ * \param[in]    scaley    vertical scale factor
  * \return  3x3 transform matrix, or NULL on error
  *
  * <pre>
@@ -146,8 +146,8 @@ l_float32  *mat;
 /*!
  * \brief   createMatrix2dRotate()
  *
- * \param[in]    xc, yc  location of center of rotation
- * \param[in]    angle  rotation in radians; clockwise is positive
+ * \param[in]    xc, yc    location of center of rotation
+ * \param[in]    angle     rotation in radians; clockwise is positive
  * \return  3x3 transform matrix, or NULL on error
  *
  * <pre>
@@ -209,9 +209,9 @@ l_float32  *mat;
 /*!
  * \brief   ptaTranslate()
  *
- * \param[in]    ptas for initial points
- * \param[in]    transx  x component of translation wrt. the origin
- * \param[in]    transy  y component of translation wrt. the origin
+ * \param[in]    ptas      for initial points
+ * \param[in]    transx    x component of translation wrt. the origin
+ * \param[in]    transy    y component of translation wrt. the origin
  * \return  ptad  translated points, or NULL on error
  *
  * <pre>
@@ -248,9 +248,9 @@ PTA       *ptad;
 /*!
  * \brief   ptaScale()
  *
- * \param[in]    ptas for initial points
- * \param[in]    scalex  horizontal scale factor
- * \param[in]    scaley  vertical scale factor
+ * \param[in]    ptas      for initial points
+ * \param[in]    scalex    horizontal scale factor
+ * \param[in]    scaley    vertical scale factor
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -287,9 +287,9 @@ PTA       *ptad;
 /*!
  * \brief   ptaRotate()
  *
- * \param[in]    ptas for initial points
- * \param[in]    xc, yc  location of center of rotation
- * \param[in]    angle  rotation in radians; clockwise is positive
+ * \param[in]    ptas      for initial points
+ * \param[in]    xc, yc    location of center of rotation
+ * \param[in]    angle     rotation in radians; clockwise is positive
  * \return  0 if OK; 1 on error
  *
  * <pre>
@@ -347,8 +347,8 @@ PTA       *ptad;
  * \brief   boxaTranslate()
  *
  * \param[in]    boxas
- * \param[in]    transx  x component of translation wrt. the origin
- * \param[in]    transy  y component of translation wrt. the origin
+ * \param[in]    transx    x component of translation wrt. the origin
+ * \param[in]    transy    y component of translation wrt. the origin
  * \return  boxad  translated boxas, or NULL on error
  *
  * Notes:
@@ -380,8 +380,8 @@ BOXA  *boxad;
  * \brief   boxaScale()
  *
  * \param[in]    boxas
- * \param[in]    scalex  horizontal scale factor
- * \param[in]    scaley  vertical scale factor
+ * \param[in]    scalex    horizontal scale factor
+ * \param[in]    scaley    vertical scale factor
  * \return  boxad  scaled boxas, or NULL on error
  *
  * Notes:
@@ -413,8 +413,8 @@ BOXA  *boxad;
  * \brief   boxaRotate()
  *
  * \param[in]    boxas
- * \param[in]    xc, yc  location of center of rotation
- * \param[in]    angle  rotation in radians; clockwise is positive
+ * \param[in]    xc, yc    location of center of rotation
+ * \param[in]    angle     rotation in radians; clockwise is positive
  * \return  boxad  scaled boxas, or NULL on error
  *
  * Notes:
@@ -449,8 +449,8 @@ BOXA  *boxad;
 /*!
  * \brief   ptaAffineTransform()
  *
- * \param[in]    ptas for initial points
- * \param[in]    mat  3x3 transform matrix; canonical form
+ * \param[in]    ptas    for initial points
+ * \param[in]    mat     3x3 transform matrix; canonical form
  * \return  ptad  transformed points, or NULL on error
  */
 PTA *
@@ -486,7 +486,7 @@ PTA       *ptad;
  * \brief   boxaAffineTransform()
  *
  * \param[in]    boxas
- * \param[in]    mat  3x3 transform matrix; canonical form
+ * \param[in]    mat      3x3 transform matrix; canonical form
  * \return  boxad  transformed boxas, or NULL on error
  */
 BOXA *
@@ -518,10 +518,10 @@ BOXA  *boxad;
 /*!
  * \brief   l_productMatVec()
  *
- * \param[in]    mat  square matrix, as a 1-dimensional %size^2 array
- * \param[in]    vecs input column vector of length %size
- * \param[in]    vecd result column vector
- * \param[in]    size matrix is %size x %size; vectors are length %size
+ * \param[in]    mat     square matrix, as a 1-dimensional %size^2 array
+ * \param[in]    vecs    input column vector of length %size
+ * \param[in]    vecd    result column vector
+ * \param[in]    size    matrix is %size x %size; vectors are length %size
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -554,10 +554,10 @@ l_int32  i, j;
 /*!
  * \brief   l_productMat2()
  *
- * \param[in]    mat1  square matrix, as a 1-dimensional size^2 array
- * \param[in]    mat2  square matrix, as a 1-dimensional size^2 array
- * \param[in]    matd  square matrix; product stored here
- * \param[in]    size of matrices
+ * \param[in]    mat1     square matrix, as a 1-dimensional size^2 array
+ * \param[in]    mat2     square matrix, as a 1-dimensional size^2 array
+ * \param[in]    matd     square matrix; product stored here
+ * \param[in]    size     of matrices
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -592,11 +592,11 @@ l_int32  i, j, k, index;
 /*!
  * \brief   l_productMat3()
  *
- * \param[in]    mat1  square matrix, as a 1-dimensional size^2 array
- * \param[in]    mat2  square matrix, as a 1-dimensional size^2 array
- * \param[in]    mat3  square matrix, as a 1-dimensional size^2 array
- * \param[in]    matd  square matrix; product stored here
- * \param[in]    size  of matrices
+ * \param[in]    mat1    square matrix, as a 1-dimensional size^2 array
+ * \param[in]    mat2    square matrix, as a 1-dimensional size^2 array
+ * \param[in]    mat3    square matrix, as a 1-dimensional size^2 array
+ * \param[in]    matd    square matrix; product stored here
+ * \param[in]    size    of matrices
  * \return  0 if OK, 1 on error
  */
 l_ok
@@ -632,12 +632,12 @@ l_float32  *matt;
 /*!
  * \brief   l_productMat4()
  *
- * \param[in]    mat1  square matrix, as a 1-dimensional size^2 array
- * \param[in]    mat2  square matrix, as a 1-dimensional size^2 array
- * \param[in]    mat3  square matrix, as a 1-dimensional size^2 array
- * \param[in]    mat4  square matrix, as a 1-dimensional size^2 array
- * \param[in]    matd  square matrix; product stored here
- * \param[in]    size  of matrices
+ * \param[in]    mat1    square matrix, as a 1-dimensional size^2 array
+ * \param[in]    mat2    square matrix, as a 1-dimensional size^2 array
+ * \param[in]    mat3    square matrix, as a 1-dimensional size^2 array
+ * \param[in]    mat4    square matrix, as a 1-dimensional size^2 array
+ * \param[in]    matd    square matrix; product stored here
+ * \param[in]    size    of matrices
  * \return  0 if OK, 1 on error
  */
 l_ok

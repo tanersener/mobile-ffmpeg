@@ -23,21 +23,10 @@
 extern "C" {
 #endif
 
-void av1_build_inter_predictors_sby(const AV1_COMMON *cm, MACROBLOCKD *xd,
-                                    int mi_row, int mi_col, BUFFER_SET *ctx,
-                                    BLOCK_SIZE bsize);
-
-void av1_build_inter_predictors_sbuv(const AV1_COMMON *cm, MACROBLOCKD *xd,
-                                     int mi_row, int mi_col, BUFFER_SET *ctx,
-                                     BLOCK_SIZE bsize);
-
-void av1_build_inter_predictors_sbp(const AV1_COMMON *cm, MACROBLOCKD *xd,
-                                    int mi_row, int mi_col, BUFFER_SET *ctx,
-                                    BLOCK_SIZE bsize, int plane_idx);
-
-void av1_build_inter_predictors_sb(const AV1_COMMON *cm, MACROBLOCKD *xd,
-                                   int mi_row, int mi_col, BUFFER_SET *ctx,
-                                   BLOCK_SIZE bsize);
+void av1_enc_build_inter_predictor(const AV1_COMMON *cm, MACROBLOCKD *xd,
+                                   int mi_row, int mi_col,
+                                   const BUFFER_SET *ctx, BLOCK_SIZE bsize,
+                                   int plane_from, int plane_to);
 
 void av1_build_inter_predictor(const uint8_t *src, int src_stride, uint8_t *dst,
                                int dst_stride, const MV *src_mv,
@@ -46,7 +35,7 @@ void av1_build_inter_predictor(const uint8_t *src, int src_stride, uint8_t *dst,
                                InterpFilters interp_filters,
                                const WarpTypesAllowed *warp_types, int p_col,
                                int p_row, int plane, int ref,
-                               enum mv_precision precision, int x, int y,
+                               mv_precision precision, int x, int y,
                                const MACROBLOCKD *xd, int can_use_previous);
 
 // Detect if the block have sub-pixel level motion vectors

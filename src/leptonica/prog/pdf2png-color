@@ -7,7 +7,13 @@
 #             root name of output files
 #     output: 24 bpp RGB png files for each page
 #
-#  N.B.  Requires ghostscript
+#  Note 1:  Requires ghostscript
+#
+#  Note 2:  A modern alternative to ghostcript is to use poplar:
+#    If the pdf is composed of images that were orthographically generated:
+#          pdftoppm -png <pdf-file> <pdf-root>    [output in png]
+#    If the pdf is composed of images that were scanned:
+#          pdftoppm -jpeg <pdf-file> <pdf-root>   [output in jpeg]
 
 scriptname=${0##*/}
 

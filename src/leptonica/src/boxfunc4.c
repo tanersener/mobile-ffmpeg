@@ -567,6 +567,7 @@ NUMA      *na;
  *      (1) Returns a copy of the boxa if no components are removed.
  *      (2) Uses box copies in the new boxa.
  *      (3) The indicator numa has values 0 (ignore) and 1 (accept).
+ *      (4) If all indicator values are 0, the returned boxa is empty.
  * </pre>
  */
 BOXA *
@@ -747,6 +748,10 @@ BOX     *box;
  * Notes:
  *      (1) If ncorners == 2, we select the UL and LR corners.
  *          Otherwise we save all 4 corners in this order: UL, UR, LL, LR.
+ *      (2) Other boxa --> pta functions are:
+ *          * boxaExtractAsPta(): allows extraction of any dimension
+ *            and/or side location, with each in a separate pta.
+ *          * boxaExtractCorners(): extracts any of the four corners as a pta.
  * </pre>
  */
 PTA *
@@ -931,9 +936,11 @@ l_int32  n, x1, y1, x2, y2, x3, y3, x4, y4, x, y, xmax, ymax;
  *
  * <pre>
  * Notes:
- *      (1) The returned w and h are the minimum size image
+ *      (1) This computes the minimum rectangular bounding region
+ *          that contains all valid boxes in a boxa.
+ *      (2) The returned w and h are the minimum size image
  *          that would contain all boxes untranslated.
- *      (2) If there are no valid boxes, returned w and h are 0 and
+ *      (3) If there are no valid boxes, returned w and h are 0 and
  *          all parameters in the returned box are 0.  This
  *          is not an error, because an empty boxa is valid and
  *          boxaGetExtent() is required for serialization.
@@ -1360,15 +1367,19 @@ PIXA    *pixat;
     }
     first = L_MAX(0, first);
     if (last < 0) last = n - 1;
-    if (first >= n)
+    if (first >= n) {
+        boxaDestroy(&boxa);
         return (PIX *)ERROR_PTR("invalid first", procName, NULL);
+    }
     if (last >= n) {
         L_WARNING("last = %d is beyond max index = %d; adjusting\n",
                   procName, last, n - 1);
         last = n - 1;
     }
-    if (first > last)
+    if (first > last) {
+        boxaDestroy(&boxa);
         return (PIX *)ERROR_PTR("first > last", procName, NULL);
+    }
 
         /* Because the bitmap font will be reduced when tiled, choose the
          * font size inversely with the scale factor. */

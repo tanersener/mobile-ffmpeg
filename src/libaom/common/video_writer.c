@@ -75,3 +75,7 @@ int aom_video_writer_write_frame(AvxVideoWriter *writer, const uint8_t *buffer,
 
   return 1;
 }
+
+void aom_video_writer_set_fourcc(AvxVideoWriter *writer, uint32_t fourcc) {
+  writer->info.codec_fourcc = fourcc;
+}

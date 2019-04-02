@@ -88,7 +88,7 @@ class SDL_BWin:public BDirectWindow
         _clips = NULL;
 
 #ifdef DRAWTHREAD
-        _draw_thread_id = spawn_thread(HAIKU_DrawThread, "drawing_thread",
+        _draw_thread_id = spawn_thread(BE_DrawThread, "drawing_thread",
                             B_NORMAL_PRIORITY, (void*) this);
         resume_thread(_draw_thread_id);
 #endif
@@ -538,7 +538,7 @@ private:
         msg.AddInt32("key-state", keyState);
         msg.AddInt32("key-scancode", keyCode);
         if (keyUtf8 != NULL) {
-            msg.AddData("key-utf8", B_INT8_TYPE, (const void*)keyUtf8, len);
+        	msg.AddData("key-utf8", B_INT8_TYPE, (const void*)keyUtf8, len);
         }
         be_app->PostMessage(&msg);
     }

@@ -43,7 +43,7 @@ static void subtract_block(const MACROBLOCKD *xd, int rows, int cols,
                            const uint8_t *src8, ptrdiff_t src_stride,
                            const uint8_t *pred8, ptrdiff_t pred_stride) {
   if (check_subtract_block_size(rows, cols)) {
-    if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) {
+    if (is_cur_buf_hbd(xd)) {
       aom_highbd_subtract_block_c(rows, cols, diff, diff_stride, src8,
                                   src_stride, pred8, pred_stride, xd->bd);
       return;
@@ -54,7 +54,7 @@ static void subtract_block(const MACROBLOCKD *xd, int rows, int cols,
     return;
   }
 
-  if (xd->cur_buf->flags & YV12_FLAG_HIGHBITDEPTH) {
+  if (is_cur_buf_hbd(xd)) {
     aom_highbd_subtract_block(rows, cols, diff, diff_stride, src8, src_stride,
                               pred8, pred_stride, xd->bd);
     return;
@@ -111,16 +111,15 @@ int av1_optimize_b(const struct AV1_COMP *cpi, MACROBLOCK *mb, int plane,
     return eob;
   }
 
-  (void)fast_mode;
   return av1_optimize_txb_new(cpi, mb, plane, block, tx_size, tx_type, txb_ctx,
-                              rate_cost, cpi->oxcf.sharpness);
+                              rate_cost, cpi->oxcf.sharpness, fast_mode);
 }
 
-typedef enum QUANT_FUNC {
+enum {
   QUANT_FUNC_LOWBD = 0,
   QUANT_FUNC_HIGHBD = 1,
   QUANT_FUNC_TYPES = 2
-} QUANT_FUNC;
+} UENUM1BYTE(QUANT_FUNC);
 
 static AV1_QUANT_FACADE
     quant_func_list[AV1_XFORM_QUANT_TYPES][QUANT_FUNC_TYPES] = {
@@ -163,6 +162,7 @@ void av1_xform_quant(const AV1_COMMON *cm, MACROBLOCK *x, int plane, int block,
   qparam.tx_size = tx_size;
   qparam.qmatrix = qmatrix;
   qparam.iqmatrix = iqmatrix;
+  qparam.use_quant_b_adapt = cm->use_quant_b_adapt;
   TxfmParam txfm_param;
   txfm_param.tx_type = tx_type;
   txfm_param.tx_size = tx_size;
@@ -171,7 +171,7 @@ void av1_xform_quant(const AV1_COMMON *cm, MACROBLOCK *x, int plane, int block,
       txfm_param.tx_size, is_inter_block(mbmi), cm->reduced_tx_set_used);
 
   txfm_param.bd = xd->bd;
-  txfm_param.is_hbd = get_bitdepth_data_path_index(xd);
+  txfm_param.is_hbd = is_cur_buf_hbd(xd);
 
   av1_fwd_txfm(src_diff, coeff, diff_stride, &txfm_param);
 
@@ -184,7 +184,7 @@ void av1_xform_quant(const AV1_COMMON *cm, MACROBLOCK *x, int plane, int block,
       av1_quantize_skip(n_coeffs, qcoeff, dqcoeff, eob);
     }
   }
-  // NOTE: optimize_b_following is ture means av1_optimze_b will be called
+  // NOTE: optimize_b_following is true means av1_optimze_b will be called
   // When the condition of doing optimize_b is changed,
   // this flag need update simultaneously
   const int optimize_b_following =
@@ -226,13 +226,17 @@ static void encode_block(int plane, int block, int blk_row, int blk_col,
   if (!is_blk_skip(x, plane, blk_row * bw + blk_col) && !mbmi->skip_mode) {
     TX_TYPE tx_type = av1_get_tx_type(pd->plane_type, xd, blk_row, blk_col,
                                       tx_size, cm->reduced_tx_set_used);
-    if (args->enable_optimize_b) {
-      av1_xform_quant(cm, x, plane, block, blk_row, blk_col, plane_bsize,
-                      tx_size, tx_type, AV1_XFORM_QUANT_FP);
+    if (args->enable_optimize_b != NO_TRELLIS_OPT) {
+      av1_xform_quant(
+          cm, x, plane, block, blk_row, blk_col, plane_bsize, tx_size, tx_type,
+          USE_B_QUANT_NO_TRELLIS &&
+                  (args->enable_optimize_b == FINAL_PASS_TRELLIS_OPT)
+              ? AV1_XFORM_QUANT_B
+              : AV1_XFORM_QUANT_FP);
       TXB_CTX txb_ctx;
       get_txb_ctx(plane_bsize, tx_size, plane, a, l, &txb_ctx);
-      av1_optimize_b(args->cpi, x, plane, block, tx_size, tx_type, &txb_ctx, 1,
-                     &dummy_rate_cost);
+      av1_optimize_b(args->cpi, x, plane, block, tx_size, tx_type, &txb_ctx,
+                     args->cpi->sf.trellis_eob_fast, &dummy_rate_cost);
     } else {
       av1_xform_quant(
           cm, x, plane, block, blk_row, blk_col, plane_bsize, tx_size, tx_type,
@@ -255,12 +259,12 @@ static void encode_block(int plane, int block, int blk_row, int blk_col,
                                 cm->reduced_tx_set_used);
   }
 
+  // TODO(debargha, jingning): Temporarily disable txk_type check for eob=0
+  // case. It is possible that certain collision in hash index would cause
+  // the assertion failure. To further optimize the rate-distortion
+  // performance, we need to re-visit this part and enable this assert
+  // again.
   if (p->eobs[block] == 0 && plane == 0) {
-    // TODO(debargha, jingning): Temporarily disable txk_type check for eob=0
-    // case. It is possible that certain collision in hash index would cause
-    // the assertion failure. To further optimize the rate-distortion
-    // performance, we need to re-visit this part and enable this assert
-    // again.
 #if 0
     if (args->cpi->oxcf.aq_mode == NO_AQ &&
         args->cpi->oxcf.deltaq_mode == NO_DELTA_Q) {
@@ -431,7 +435,7 @@ static void encode_block_pass1(int plane, int block, int blk_row, int blk_col,
 
   if (p->eobs[block] > 0) {
     txfm_param.bd = xd->bd;
-    txfm_param.is_hbd = get_bitdepth_data_path_index(xd);
+    txfm_param.is_hbd = is_cur_buf_hbd(xd);
     txfm_param.tx_type = DCT_DCT;
     txfm_param.tx_size = tx_size;
     txfm_param.eob = p->eobs[block];
@@ -578,13 +582,17 @@ void av1_encode_block_intra(int plane, int block, int blk_row, int blk_col,
 
     const ENTROPY_CONTEXT *a = &args->ta[blk_col];
     const ENTROPY_CONTEXT *l = &args->tl[blk_row];
-    if (args->enable_optimize_b) {
-      av1_xform_quant(cm, x, plane, block, blk_row, blk_col, plane_bsize,
-                      tx_size, tx_type, AV1_XFORM_QUANT_FP);
+    if (args->enable_optimize_b != NO_TRELLIS_OPT) {
+      av1_xform_quant(
+          cm, x, plane, block, blk_row, blk_col, plane_bsize, tx_size, tx_type,
+          USE_B_QUANT_NO_TRELLIS &&
+                  (args->enable_optimize_b == FINAL_PASS_TRELLIS_OPT)
+              ? AV1_XFORM_QUANT_B
+              : AV1_XFORM_QUANT_FP);
       TXB_CTX txb_ctx;
       get_txb_ctx(plane_bsize, tx_size, plane, a, l, &txb_ctx);
-      av1_optimize_b(args->cpi, x, plane, block, tx_size, tx_type, &txb_ctx, 1,
-                     &dummy_rate_cost);
+      av1_optimize_b(args->cpi, x, plane, block, tx_size, tx_type, &txb_ctx,
+                     args->cpi->sf.trellis_eob_fast, &dummy_rate_cost);
     } else {
       av1_xform_quant(
           cm, x, plane, block, blk_row, blk_col, plane_bsize, tx_size, tx_type,
@@ -597,12 +605,12 @@ void av1_encode_block_intra(int plane, int block, int blk_row, int blk_col,
                                 dst_stride, *eob, cm->reduced_tx_set_used);
   }
 
+  // TODO(jingning): Temporarily disable txk_type check for eob=0 case.
+  // It is possible that certain collision in hash index would cause
+  // the assertion failure. To further optimize the rate-distortion
+  // performance, we need to re-visit this part and enable this assert
+  // again.
   if (*eob == 0 && plane == 0) {
-    // TODO(jingning): Temporarily disable txk_type check for eob=0 case.
-    // It is possible that certain collision in hash index would cause
-    // the assertion failure. To further optimize the rate-distortion
-    // performance, we need to re-visit this part and enable this assert
-    // again.
 #if 0
     if (args->cpi->oxcf.aq_mode == NO_AQ
         && args->cpi->oxcf.deltaq_mode == NO_DELTA_Q) {

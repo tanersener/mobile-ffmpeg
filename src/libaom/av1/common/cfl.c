@@ -37,7 +37,7 @@ void cfl_store_dc_pred(MACROBLOCKD *const xd, const uint8_t *input,
   assert(pred_plane < CFL_PRED_PLANES);
   assert(width <= CFL_BUF_LINE);
 
-  if (get_bitdepth_data_path_index(xd)) {
+  if (is_cur_buf_hbd(xd)) {
     uint16_t *const input_16 = CONVERT_TO_SHORTPTR(input);
     memcpy(xd->cfl.dc_pred_cache[pred_plane], input_16, width << 1);
     return;
@@ -69,7 +69,7 @@ void cfl_load_dc_pred(MACROBLOCKD *const xd, uint8_t *dst, int dst_stride,
   assert(pred_plane < CFL_PRED_PLANES);
   assert(width <= CFL_BUF_LINE);
   assert(height <= CFL_BUF_LINE);
-  if (get_bitdepth_data_path_index(xd)) {
+  if (is_cur_buf_hbd(xd)) {
     uint16_t *dst_16 = CONVERT_TO_SHORTPTR(dst);
     cfl_load_dc_pred_hbd(xd->cfl.dc_pred_cache[pred_plane], dst_16, dst_stride,
                          width, height);
@@ -196,7 +196,7 @@ void cfl_predict_block(MACROBLOCKD *const xd, uint8_t *dst, int dst_stride,
       cfl_idx_to_alpha(mbmi->cfl_alpha_idx, mbmi->cfl_alpha_signs, plane - 1);
   assert((tx_size_high[tx_size] - 1) * CFL_BUF_LINE + tx_size_wide[tx_size] <=
          CFL_BUF_SQUARE);
-  if (get_bitdepth_data_path_index(xd)) {
+  if (is_cur_buf_hbd(xd)) {
     uint16_t *dst_16 = CONVERT_TO_SHORTPTR(dst);
     get_predict_hbd_fn(tx_size)(cfl->ac_buf_q3, dst_16, dst_stride, alpha_q3,
                                 xd->bd);
@@ -388,8 +388,7 @@ void cfl_store_tx(MACROBLOCKD *const xd, int row, int col, TX_SIZE tx_size,
     assert(!((row & 1) && tx_size_high[tx_size] != 4));
     sub8x8_adjust_offset(cfl, &row, &col);
   }
-  cfl_store(cfl, dst, pd->dst.stride, row, col, tx_size,
-            get_bitdepth_data_path_index(xd));
+  cfl_store(cfl, dst, pd->dst.stride, row, col, tx_size, is_cur_buf_hbd(xd));
 }
 
 void cfl_store_block(MACROBLOCKD *const xd, BLOCK_SIZE bsize, TX_SIZE tx_size) {
@@ -405,5 +404,5 @@ void cfl_store_block(MACROBLOCKD *const xd, BLOCK_SIZE bsize, TX_SIZE tx_size) {
   const int height = max_intra_block_height(xd, bsize, AOM_PLANE_Y, tx_size);
   tx_size = get_tx_size(width, height);
   cfl_store(cfl, pd->dst.buf, pd->dst.stride, row, col, tx_size,
-            get_bitdepth_data_path_index(xd));
+            is_cur_buf_hbd(xd));
 }

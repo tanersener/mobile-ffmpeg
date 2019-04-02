@@ -1,15 +1,45 @@
+61e372b7 update NEWS
+7ae658a0 bump version to 1.0.2
+51c4907d update AUTHORS
+666bd6c6 man/cwebp.1: refine near-lossless text
+561cdce5 Clarify the doc about GetFeatures.
+aec2cf02 near_lossless: fix fuzzing-detected integer overflow
+928a75de webp: Fix VP8LBitWriterClone() bug
+5173d4ee neon IsFlat
+5b081219 IsFlat: inline when possible
+381b7b54 IsFlat: use int for thresh
+6ed15ea1 fix unprobable leak in webp_sdl.c
+22bbb24e Merge "IsFlat: return int"
+8b3fb238 Merge tag 'v1.0.1'
+f435de95 IsFlat: return int
+41521aed utils.h: only define WEBP_NEED_LOG_TABLE_8BIT when needed
+9f4d4a3f neon: GetResidualCost
+0fd7514b neon: SetResidualCoeffs
+f95a996c Simpler histogram clustering.
+e85d3313 update ChangeLog (tag: v1.0.1-rc2, tag: v1.0.1, origin/1.0.1, 1.0.1)
 fa8210e4 Fix pair update in stochastic entropy merging.
+fd198f73 add codereview.settings
 825389ac README.mux: add a reference to the AnimDecoder API
 3be698c3 CMake: fix webp_js compilation
+485ff86f Fix pair update in stochastic entropy merging.
+4cd0582d CMake: fix webp_js compilation
 4cbb4caf update NEWS
 f5a5918d bump version to 1.0.1
 d61385db Speed-up: Make sure we only initialize histograms when needed.
+6752904b Speed-up: Make sure we only initialize histograms when needed.
 0c570316 update AUTHORS
 301a2dda img2webp: add help note about arguments from a file
 f0abab92 Speedups for empty histograms.
 f2dfd925 Split HistogramAdd to only have the high level logic in C.
 06b7bc7d Fix compilation on windows and clang-cl+ninja.
+b6284d82 img2webp: add help note about arguments from a file
+decf6f6b Speedups for empty histograms.
+dea3e899 Split HistogramAdd to only have the high level logic in C.
+632798ae Merge "Fix compilation on windows and clang-cl+ninja."
+dc1a9518 Merge "libwebp: Unicode command tools on Windows"
+9cf9841b libwebp: Unicode command tools on Windows
 98179495 remove some minor TODOs
+a376e7b9 Fix compilation on windows and clang-cl+ninja.
 cbf82cc0 Remove AVX2 files.
 5030e902 Merge "TIFF decoder: remove unused KINV definition"
 ac543311 Remove a few more useless #defines

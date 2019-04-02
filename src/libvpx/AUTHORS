@@ -26,6 +26,7 @@ Brion Vibber <bvibber@wikimedia.org>
 changjun.yang <changjun.yang@intel.com>
 Charles 'Buck' Krasic <ckrasic@google.com>
 Cheng Chen <chengchen@google.com>
+Chi Yo Tsai <chiyotsai@google.com>
 chm <chm@rock-chips.com>
 Chris Cunningham <chcunningham@chromium.org>
 Christian Duvivier <cduvivier@google.com>
@@ -38,11 +39,13 @@ Dmitry Kovalev <dkovalev@google.com>
 Dragan Mrdjan <dmrdjan@mips.com>
 Ed Baker <edward.baker@intel.com>
 Ehsan Akhgari <ehsan.akhgari@gmail.com>
+Elliott Karpilovsky <elliottk@google.com>
 Erik Niemeyer <erik.a.niemeyer@intel.com>
 Fabio Pedretti <fabio.ped@libero.it>
 Frank Galligan <fgalligan@google.com>
 Fredrik Söderquist <fs@opera.com>
 Fritz Koenig <frkoenig@google.com>
+Fyodor Kyslov <kyslov@google.com>
 Gabriel Marin <gmx@chromium.org>
 Gaute Strokkenes <gaute.strokkenes@broadcom.com>
 Geza Lore <gezalore@gmail.com>
@@ -55,6 +58,7 @@ Guillermo Ballester Valor <gbvalor@gmail.com>
 Hangyu Kuang <hkuang@google.com>
 Hanno Böck <hanno@hboeck.de>
 Han Shen <shenhan@google.com>
+Harish Mahendrakar <harish.mahendrakar@ittiam.com>
 Henrik Lundin <hlundin@google.com>
 Hui Su <huisu@google.com>
 Ivan Krasin <krasin@chromium.org>
@@ -81,6 +85,7 @@ Johann Koenig <johannkoenig@google.com>
 John Koleszar <jkoleszar@google.com>
 Johnny Klonaris <google@jawknee.com>
 John Stark <jhnstrk@gmail.com>
+Jon Kunkee <jkunkee@microsoft.com>
 Joshua Bleecher Snyder <josh@treelinelabs.com>
 Joshua Litt <joshualitt@google.com>
 Julia Robson <juliamrobson@gmail.com>
@@ -91,15 +96,18 @@ KO Myung-Hun <komh@chollian.net>
 Kyle Siefring <kylesiefring@gmail.com>
 Lawrence Velázquez <larryv@macports.org>
 Linfeng Zhang <linfengz@google.com>
+Liu Peng <pengliu.mail@gmail.com>
 Lou Quillio <louquillio@google.com>
 Luca Barbato <lu_zero@gentoo.org>
+Luc Trudeau <luc@trud.ca>
 Makoto Kato <makoto.kt@gmail.com>
 Mans Rullgard <mans@mansr.com>
 Marco Paniconi <marpan@google.com>
 Mark Mentovai <mark@chromium.org>
 Martin Ettl <ettl.martin78@googlemail.com>
-Martin Storsjo <martin@martin.st>
+Martin Storsjö <martin@martin.st>
 Matthew Heaney <matthewjheaney@chromium.org>
+Matthias Räncker <theonetruecamper@gmx.de>
 Michael Kohler <michaelkohler@live.com>
 Mike Frysinger <vapier@chromium.org>
 Mike Hommey <mhommey@mozilla.com>
@@ -107,10 +115,12 @@ Mikhal Shemer <mikhal@google.com>
 Min Chen <chenm003@gmail.com>
 Minghai Shang <minghai@google.com>
 Min Ye <yeemmi@google.com>
+Mirko Bonadei <mbonadei@google.com>
 Moriyoshi Koizumi <mozo@mozo.jp>
 Morton Jonuschat <yabawock@gmail.com>
 Nathan E. Egge <negge@mozilla.com>
 Nico Weber <thakis@chromium.org>
+Niveditha Rau <niveditha.rau@gmail.com>
 Parag Salasakar <img.mips1@gmail.com>
 Pascal Massimino <pascal.massimino@gmail.com>
 Patrik Westin <patrik.westin@gmail.com>
@@ -129,9 +139,12 @@ Rafael de Lucena Valle <rafaeldelucena@gmail.com>
 Rahul Chaudhry <rahulchaudhry@google.com>
 Ralph Giles <giles@xiph.org>
 Ranjit Kumar Tulabandu <ranjit.tulabandu@ittiam.com>
+Raphael Kubo da Costa <raphael.kubo.da.costa@intel.com>
+Ritu Baldwa <ritu.baldwa@ittiam.com>
 Rob Bradford <rob@linux.intel.com>
 Ronald S. Bultje <rsbultje@gmail.com>
 Rui Ueyama <ruiu@google.com>
+Sai Deng <sdeng@google.com>
 Sami Pietilä <samipietila@google.com>
 Sarah Parker <sarahparker@google.com>
 Sasi Inguva <isasi@google.com>
@@ -139,12 +152,15 @@ Scott Graham <scottmg@chromium.org>
 Scott LaVarnway <slavarnway@google.com>
 Sean McGovern <gseanmcg@gmail.com>
 Sergey Kolomenkin <kolomenkin@gmail.com>
+Sergey Silkin <ssilkin@google.com>
 Sergey Ulanov <sergeyu@chromium.org>
 Shimon Doodkin <helpmepro1@gmail.com>
 Shiyou Yin <yinshiyou-hf@loongson.cn>
+Shubham Tandle <shubham.tandle@ittiam.com>
 Shunyao Li <shunyaoli@google.com>
 Stefan Holmer <holmer@google.com>
 Suman Sunkara <sunkaras@google.com>
+Supradeep T R <supradeep.tr@ittiam.com>
 Sylvestre Ledru <sylvestre@mozilla.com>
 Taekhyun Kim <takim@nvidia.com>
 Takanori MATSUURA <t.matsuu@gmail.com>
@@ -157,8 +173,11 @@ Timothy B. Terriberry <tterribe@xiph.org>
 Tom Finegan <tomfinegan@google.com>
 Tristan Matthews <le.businessman@gmail.com>
 Urvang Joshi <urvang@google.com>
+Venkatarama NG. Avadhani <venkatarama.avadhani@ittiam.com>
 Vignesh Venkatasubramanian <vigneshv@google.com>
 Vlad Tsyrklevich <vtsyrklevich@chromium.org>
+Wan-Teh Chang <wtc@google.com>
+xiwei gu <guxiwei-hf@loongson.cn>
 Yaowu Xu <yaowu@google.com>
 Yi Luo <luoyi@google.com>
 Yongzhe Wang <yongzhe@google.com>

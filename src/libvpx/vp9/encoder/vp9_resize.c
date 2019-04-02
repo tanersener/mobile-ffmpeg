@@ -424,11 +424,11 @@ void vp9_resize_plane(const uint8_t *const input, int height, int width,
                       int in_stride, uint8_t *output, int height2, int width2,
                       int out_stride) {
   int i;
-  uint8_t *intbuf = (uint8_t *)malloc(sizeof(uint8_t) * width2 * height);
+  uint8_t *intbuf = (uint8_t *)calloc(width2 * height, sizeof(*intbuf));
   uint8_t *tmpbuf =
-      (uint8_t *)malloc(sizeof(uint8_t) * (width < height ? height : width));
-  uint8_t *arrbuf = (uint8_t *)malloc(sizeof(uint8_t) * height);
-  uint8_t *arrbuf2 = (uint8_t *)malloc(sizeof(uint8_t) * height2);
+      (uint8_t *)calloc(width < height ? height : width, sizeof(*tmpbuf));
+  uint8_t *arrbuf = (uint8_t *)calloc(height, sizeof(*arrbuf));
+  uint8_t *arrbuf2 = (uint8_t *)calloc(height2, sizeof(*arrbuf2));
   if (intbuf == NULL || tmpbuf == NULL || arrbuf == NULL || arrbuf2 == NULL)
     goto Error;
   assert(width > 0);
@@ -720,6 +720,10 @@ void vp9_highbd_resize_plane(const uint8_t *const input, int height, int width,
   uint16_t *arrbuf2 = (uint16_t *)malloc(sizeof(uint16_t) * height2);
   if (intbuf == NULL || tmpbuf == NULL || arrbuf == NULL || arrbuf2 == NULL)
     goto Error;
+  assert(width > 0);
+  assert(height > 0);
+  assert(width2 > 0);
+  assert(height2 > 0);
   for (i = 0; i < height; ++i) {
     highbd_resize_multistep(CONVERT_TO_SHORTPTR(input + in_stride * i), width,
                             intbuf + width2 * i, width2, tmpbuf, bd);

@@ -30,112 +30,113 @@
 /**
  * Returns format.
  *
- * \return media format
+ * @return media format
  */
 - (NSString*)getFormat;
 
 /**
  * Sets media format.
  *
- * \param media format
+ * @param format media format
  */
 - (void)setFormat:(NSString*)format;
 
 /**
  * Returns path.
  *
- * \return media path
+ * @return media path
  */
 - (NSString*)getPath;
 
 /**
  * Sets media path.
  *
- * \param media path
+ * @param path media path
  */
 - (void)setPath:(NSString*)path;
 
 /**
  * Returns duration.
  *
- * \return media duration in milliseconds
+ * @return media duration in milliseconds
  */
 - (NSNumber*)getDuration;
 
 /**
  * Sets media duration.
  *
- * \param media duration in milliseconds
+ * @param duration media duration in milliseconds
  */
 - (void)setDuration:(NSNumber*) duration;
 
 /**
  * Returns start time.
  *
- * \return media start time in milliseconds
+ * @return media start time in milliseconds
  */
 - (NSNumber*)getStartTime;
 
 /**
  * Sets media start time.
  *
- * \param media start time in milliseconds
+ * @param startTime media start time in milliseconds
  */
 - (void)setStartTime:(NSNumber*)startTime;
 
 /**
  * Returns bitrate.
  *
- * \return media bitrate in kb/s
+ * @return media bitrate in kb/s
  */
 - (NSNumber*)getBitrate;
 
 /**
  * Sets bitrate.
  *
- * \param media bitrate in kb/s
+ * @param bitrate media bitrate in kb/s
  */
 - (void)setBitrate:(NSNumber*) bitrate;
 
 /**
  * Returns unparsed media information.
  *
- * \return unparsed media information data
+ * @return unparsed media information data
  */
 - (NSString*)getRawInformation;
 
 /**
  * Sets unparsed media information.
  *
- * \param unparsed media information data
+ * @param rawInformation unparsed media information data
  */
 - (void)setRawInformation:(NSString*)rawInformation;
 
 /**
  * Adds metadata.
  *
- * \param metadata key and value
+ * @param key metadata key
+ * @param value metadata value
  */
 - (void)addMetadata:(NSString*)key :(NSString*)value;
 
 /**
  * Returns all metadata entries.
  *
- * \return metadata dictionary
+ * @return metadata dictionary
  */
 - (NSDictionary*)getMetadataEntries;
 
 /**
  * Adds new stream.
  *
- * \param new stream information
+ * @param stream new stream information
  */
 - (void)addStream:(StreamInformation*) stream;
 
 /**
  * Returns all streams.
  *
- * \return streams array
+ * @return streams array
  */
 - (NSArray*)getStreams;
 

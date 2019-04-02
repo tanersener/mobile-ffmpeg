@@ -70,7 +70,7 @@ typedef struct VividasDemuxContext {
     VIV_AudioSubpacket audio_subpackets[MAX_AUDIO_SUBPACKETS];
 } VividasDemuxContext;
 
-static int viv_probe(AVProbeData *p)
+static int viv_probe(const AVProbeData *p)
 {
     if (memcmp(p->buf, "vividas03", 9))
         return 0;
@@ -130,7 +130,7 @@ static void xor_block(void *p1, void *p2, unsigned size, int key, unsigned *key_
     size >>= 2;
 
     while (size > 0) {
-        *d2 = *d1 ^ k;
+        *d2 = *d1 ^ (HAVE_BIGENDIAN ? av_bswap32(k) : k);
         k += key;
         d1++;
         d2++;
@@ -392,7 +392,8 @@ static void track_header(VividasDemuxContext *viv, AVFormatContext *s,  uint8_t 
                 offset += data_len[j];
             }
 
-            st->codecpar->extradata_size = offset;
+            if (offset < st->codecpar->extradata_size)
+                st->codecpar->extradata_size = offset;
         }
     }
 

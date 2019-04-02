@@ -361,7 +361,7 @@ static void swap_frame_buffers(AV1Decoder *pbi, int frame_decoded) {
       assert(IMPLIES(!pbi->hold_ref_buf,
                      cm->current_frame.refresh_frame_flags == 0));
       assert(IMPLIES(!pbi->hold_ref_buf,
-                     cm->show_existing_frame && !cm->reset_decoder_state));
+                     cm->show_existing_frame && !pbi->reset_decoder_state));
 
       // The following two for loops need to release the reference stored in
       // cm->ref_frame_map[ref_index] before transferring the reference stored
@@ -374,7 +374,7 @@ static void swap_frame_buffers(AV1Decoder *pbi, int frame_decoded) {
       }
 
       const int check_on_show_existing_frame =
-          !cm->show_existing_frame || cm->reset_decoder_state;
+          !cm->show_existing_frame || pbi->reset_decoder_state;
       for (; ref_index < REF_FRAMES && check_on_show_existing_frame;
            ++ref_index) {
         decrease_ref_count(cm->ref_frame_map[ref_index], pool);
@@ -435,7 +435,6 @@ static void swap_frame_buffers(AV1Decoder *pbi, int frame_decoded) {
 int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
                                 const uint8_t **psource) {
   AV1_COMMON *volatile const cm = &pbi->common;
-  BufferPool *volatile const pool = cm->buffer_pool;
   const uint8_t *source = *psource;
   cm->error.error_code = AOM_CODEC_OK;
   cm->error.has_detail = 0;
@@ -453,18 +452,10 @@ int av1_receive_compressed_data(AV1Decoder *pbi, size_t size,
     if (ref_buf != NULL) ref_buf->buf.corrupted = 1;
   }
 
-  // Find a free buffer for the new frame, releasing the reference previously
-  // held.
-
-  // Find a free frame buffer. Return error if can not find any.
-  int new_fb_idx = get_free_fb(cm);
-  if (new_fb_idx == INVALID_IDX) {
+  if (assign_cur_frame_new_fb(cm) == NULL) {
     cm->error.error_code = AOM_CODEC_MEM_ERROR;
     return 1;
   }
-
-  // Assign a MV array to the frame buffer.
-  cm->cur_frame = &pool->frame_bufs[new_fb_idx];
 
   if (!pbi->camera_frame_header_ready) pbi->hold_ref_buf = 0;
 

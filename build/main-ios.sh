@@ -233,7 +233,7 @@ while [ ${#enabled_library_list[@]} -gt $completed ]; do
                 env 1>>${BASEDIR}/build.log 2>&1
                 echo -e "----------------------------------------------------------------\n" 1>>${BASEDIR}/build.log 2>&1
                 echo -e "INFO: System information\n" 1>>${BASEDIR}/build.log 2>&1
-                uname -a 1>>${BASEDIR}/build.log 2>&1
+                echo -e "INFO: $(uname -a)\n" 1>>${BASEDIR}/build.log 2>&1
                 echo -e "----------------------------------------------------------------\n" 1>>${BASEDIR}/build.log 2>&1
 
                 echo -n "${library}: "

@@ -216,6 +216,8 @@ It creates a MPD manifest file and segment files for each stream.
 The segment filename might contain pre-defined identifiers used with SegmentTemplate
 as defined in section 5.3.9.4.4 of the standard. Available identifiers are "$RepresentationID$",
 "$Number$", "$Bandwidth$" and "$Time$".
+In addition to the standard identifiers, an ffmpeg-specific "$ext$" identifier is also supported.
+When specified ffmpeg will replace $ext$ in the file name with muxing format's extensions such as mp4, webm etc.,
 
 @example
 ffmpeg -re -i <input> -map 0 -map 0 -c:a libfdk_aac -c:v libx264
@@ -312,6 +314,9 @@ trying to standardize a open LHLS spec. The draft spec is available in https://g
 This option will also try to comply with the above open spec, till Apple's spec officially supports it.
 Applicable only when @var{streaming} and @var{hls_playlist} options are enabled.
 This is an experimental feature.
+
+@item -master_m3u8_publish_rate @var{master_m3u8_publish_rate}
+Publish master playlist repeatedly every after specified number of segment intervals.
 
 @end table
 
@@ -965,6 +970,37 @@ and they are mapped to the two video only variant streams with audio group names
 
 By default, a single hls variant containing all the encoded streams is created.
 
+@example
+ffmpeg -re -i in.ts -b:a:0 32k -b:a:1 64k -b:v:0 1000k \
+  -map 0:a -map 0:a -map 0:v -f hls \
+  -var_stream_map "a:0,agroup:aud_low,default:yes a:1,agroup:aud_low v:0,agroup:aud_low" \
+  -master_pl_name master.m3u8 \
+  http://example.com/live/out_%v.m3u8
+@end example
+This example creates two audio only and one video only variant streams. In
+addition to the #EXT-X-STREAM-INF tag for each variant stream in the master
+playlist, #EXT-X-MEDIA tag is also added for the two audio only variant streams
+and they are mapped to the one video only variant streams with audio group name
+'aud_low', and the audio group have default stat is NO or YES.
+
+By default, a single hls variant containing all the encoded streams is created.
+
+@example
+ffmpeg -re -i in.ts -b:a:0 32k -b:a:1 64k -b:v:0 1000k \
+  -map 0:a -map 0:a -map 0:v -f hls \
+  -var_stream_map "a:0,agroup:aud_low,default:yes,language=ENG a:1,agroup:aud_low,language:CHN v:0,agroup:aud_low" \
+  -master_pl_name master.m3u8 \
+  http://example.com/live/out_%v.m3u8
+@end example
+This example creates two audio only and one video only variant streams. In
+addition to the #EXT-X-STREAM-INF tag for each variant stream in the master
+playlist, #EXT-X-MEDIA tag is also added for the two audio only variant streams
+and they are mapped to the one video only variant streams with audio group name
+'aud_low', and the audio group have default stat is NO or YES, and one audio
+have and language is named ENG, the other audio language is named CHN.
+
+By default, a single hls variant containing all the encoded streams is created.
+
 @item cc_stream_map
 Map string which specifies different closed captions groups and their
 attributes. The closed captions stream groups are separated by space.
@@ -985,7 +1021,7 @@ ffmpeg -re -i in.ts -b:v 1000k -b:a 64k -a53cc 1 -f hls \
   http://example.com/live/out.m3u8
 @end example
 This example adds @code{#EXT-X-MEDIA} tag with @code{TYPE=CLOSED-CAPTIONS} in
-the master playlist with group name 'cc', langauge 'en' (english) and
+the master playlist with group name 'cc', language 'en' (english) and
 INSTREAM-ID 'CC1'. Also, it adds @code{CLOSED-CAPTIONS} attribute with group
 name 'cc' for the output variant stream.
 @example
@@ -1490,7 +1526,7 @@ Set the program @samp{service_type}. Default is @code{digital_tv}.
 Accepts the following options:
 @table @samp
 @item hex_value
-Any hexdecimal value between @code{0x01} to @code{0xff} as defined in
+Any hexadecimal value between @code{0x01} and @code{0xff} as defined in
 ETSI 300 468.
 @item digital_tv
 Digital TV service.
@@ -1593,7 +1629,7 @@ ffmpeg -i file.mpg -c copy \
      out.ts
 @end example
 
-@section mxf, mxf_d10
+@section mxf, mxf_d10, mxf_opatom
 
 MXF muxer.
 
@@ -1605,7 +1641,7 @@ The muxer options are:
 @item store_user_comments @var{bool}
 Set if user comments should be stored if available or never.
 IRT D-10 does not allow user comments. The default is thus to write them for
-mxf but not for mxf_d10
+mxf and mxf_opatom but not for mxf_d10
 @end table
 
 @section null

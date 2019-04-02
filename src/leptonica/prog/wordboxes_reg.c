@@ -69,7 +69,7 @@ L_REGPARAMS  *rp;
     pixDestroy(&pix1);
 #endif
 
-#if DO_ALL 
+#if DO_ALL
     pix1 = pixRead("words.15.tif");
     MakeWordBoxes1(pix1, 1.0, 140, 4, rp);  /* 4 */
     MakeWordBoxes1(pix1, 0.6, 140, 5, rp);  /* 5 */
@@ -86,7 +86,7 @@ L_REGPARAMS  *rp;
 #if DO_ALL
         /* Make word boxes using the higher-level functions
          * pixGetWordsInTextlines() and pixGetWordBoxesInTextlines() */
- 
+
     pix1 = pixRead("lucasta.150.jpg");
     MakeWordBoxes2(pix1, 0.7, 140, rp);  /* 8, 9 */
     pixDestroy(&pix1);
@@ -105,7 +105,7 @@ L_REGPARAMS  *rp;
     pixDestroy(&pix1);
 #endif
 
-#if DO_ALL 
+#if DO_ALL
         /* Test word and character box finding */
     pix1 = pixRead("zanotti-78.jpg");
     box1 = boxCreate(0, 0, 1500, 700);

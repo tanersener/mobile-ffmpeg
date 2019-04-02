@@ -8,45 +8,51 @@
   </vendor>
   <product id="libxml2">
     <name>libxml2</name>
-    <version>2.9.7</version>
-    <last-release> Nov 02 2017</last-release>
+    <version>v2.9.8</version>
+    <last-release> Mar 05 2018</last-release>
     <info-url>http://xmlsoft.org/</info-url>
-    <changes>   - Documentation:
-  xmlcatalog: refresh man page wrt. quering system catalog easily (Jan Pokorný)
-  
-   - Portability:
-  Fix deprecated Travis compiler flag (Nick Wellnhofer),
-  Add declaration for DllMain (J. Peter Mugaas),
-  Fix preprocessor conditional in threads.h (J. Peter Mugaas),
-  Fix pointer comparison warnings on 64-bit Windows (J. Peter Mugaas),
-  Fix macro redefinition warning (J. Peter Mugaas),
-  Default to native threads on MinGW-w64 (Nick Wellnhofer),
-  Simplify Windows IO functions (Nick Wellnhofer),
-  Fix runtest on Windows (Nick Wellnhofer),
-  socklen_t is always int on Windows (Nick Wellnhofer),
-  Don't redefine socket error codes on Windows (Nick Wellnhofer),
-  Fix pointer/int cast warnings on 64-bit Windows (Nick Wellnhofer),
-  Fix Windows compiler warnings in xmlCanonicPath (Nick Wellnhofer)
+    <changes>   - Portability:
+  python: remove single use of _PyVerify_fd (Patrick Welche),
+  Build more test executables on Windows/MSVC (Nick Wellnhofer),
+  Stop including ansidecl.h (Nick Wellnhofer),
+  Fix libz and liblzma detection (Nick Wellnhofer),
+  Revert "Compile testapi with -Wno-unused-function" (Nick Wellnhofer)
   
    - Bug Fixes:
-  xmlcatalog: restore ability to query system catalog easily (Jan Pokorný),
-  Fix comparison of nodesets to strings (Nick Wellnhofer)
+  Fix xmlParserEntityCheck (Nick Wellnhofer),
+  Halt parser in case of encoding error (Nick Wellnhofer),
+  Clear entity content in case of errors (Nick Wellnhofer),
+  Change calls to xmlCharEncInput to set flush false when not final call. Having flush incorrectly set to true causes errors for ICU. (Joel Hockey),
+  Fix buffer over-read in xmlParseNCNameComplex (Nick Wellnhofer),
+  Fix ICU library filenames on Windows/MSVC (Nick Wellnhofer),
+  Fix xmlXPathIsNaN broken by recent commit (Nick Wellnhofer),
+  Fix -Wenum-compare warnings (Nick Wellnhofer),
+  Fix callback signature in testapi.c (Nick Wellnhofer),
+  Fix unused parameter warning without ICU (Nick Wellnhofer),
+  Fix IO callback signatures (Nick Wellnhofer),
+  Fix misc callback signatures (Nick Wellnhofer),
+  Fix list callback signatures (Nick Wellnhofer),
+  Fix hash callback signatures (Nick Wellnhofer),
+  Refactor name and type signature for xmlNop (Vlad Tsyrklevich),
+  Fixed ICU to set flush correctly and provide pivot buffer. (Joel Hockey),
+  Skip EBCDIC tests if EBCDIC isn't supported (Nick Wellnhofer)
   
    - Improvements:
-  Add Makefile rules to rebuild HTML man pages (Nick Wellnhofer),
-  Fix mixed decls and code in timsort.h (Nick Wellnhofer),
-  Rework handling of return values in thread tests (Nick Wellnhofer),
-  Fix unused variable warnings in testrecurse (Nick Wellnhofer),
-  Fix -Wimplicit-fallthrough warnings (J. Peter Mugaas),
-  Upgrade timsort.h to latest revision (Nick Wellnhofer),
-  Increase warning level to /W3 under MSVC (Nick Wellnhofer),
-  Fix a couple of warnings in dict.c and threads.c (Nick Wellnhofer),
-  Update .gitignore for Windows (Nick Wellnhofer),
-  Fix unused variable warnings in nanohttp.c (Nick Wellnhofer),
-  Fix the Windows header mess (Nick Wellnhofer),
-  Don't include winsock2.h in xmllint.c (Nick Wellnhofer),
-  Remove generated file python/setup.py from version control (Nick Wellnhofer),
-  Use __linux__ macro in generated code (Nick Wellnhofer)
+  Disable pointer-overflow UBSan checks under Travis (Nick Wellnhofer),
+  Improve handling of context input_id (Daniel Veillard),
+  Add resource file to Windows DLL (ccpaging),
+  Run Travis tests with -Werror (Nick Wellnhofer),
+  Build with "-Wall -Wextra" (Nick Wellnhofer),
+  Fix -Wtautological-pointer-compare warnings (Nick Wellnhofer),
+  Remove unused AC_CHECKs (Nick Wellnhofer),
+  Update information about contributing (Nick Wellnhofer),
+  Fix -Wmisleading-indentation warnings (Nick Wellnhofer),
+  Don't touch CFLAGS in configure.ac (Nick Wellnhofer),
+  Ignore function pointer cast warnings (Nick Wellnhofer),
+  Simplify XPath NaN, inf and -0 handling (Nick Wellnhofer),
+  Introduce xmlPosixStrdup and update xmlMemStrdup (Nick Wellnhofer),
+  Add test for ICU flush and pivot buffer (Nick Wellnhofer),
+  Compile testapi with -Wno-unused-function (Nick Wellnhofer)
   
 
 </changes>

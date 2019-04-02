@@ -40,6 +40,11 @@
  *      * multipage/custom tiff (tested by mtiff_reg)
  *      * pdf (tested by pdfiotest and pdfseg_reg)
  *      * PostScript (tested by psio_reg and psioseg_reg)
+ *
+ *   The large error values that are being used for tests 3-7 and 36
+ *   are only required for older versions of tifflib (e.g., libtiff 4.0.7).
+ *   For libtiff 4.0.11, small values like 10 will pass tests 6, 7 and 36.
+ *   The issue was initially found on the AArch64 (ARM) processor.
  */
 
 #include "string.h"
@@ -90,7 +95,7 @@ L_REGPARAMS  *rp;
         pixSetZlibCompression(pixs, 2 * level);
         pixWrite("/tmp/lept/io/zlibtest.png", pixs, IFF_PNG);
         size = nbytesInFile("/tmp/lept/io/zlibtest.png");
-        regTestCompareValues(rp, zlibsize[level], size, 10.0);  /* 3 - 7 */
+        regTestCompareValues(rp, zlibsize[level], size, 3000.0);  /* 3 - 7 */
         if (rp->display)
             fprintf(stderr, "zlib level = %d, file size = %ld\n",
                     level, (unsigned long)size);
@@ -241,40 +246,40 @@ L_REGPARAMS  *rp;
     if (rp->display)
         fprintf(stderr, "packbits: %ld\n", (unsigned long)size);
     pixWrite("/tmp/lept/io/fract3.tif", pixs, IFF_TIFF_RLE);
-    regTestCheckFile(rp, "/tmp/lept/io/fract3.tif");  /* 26 */
+    regTestCheckFile(rp, "/tmp/lept/io/fract3.tif");  /* 27 */
     size = nbytesInFile("/tmp/lept/io/fract3.tif");
-    regTestCompareValues(rp, tiffsize[2], size, 0.0);  /* 27 */
+    regTestCompareValues(rp, tiffsize[2], size, 0.0);  /* 28 */
     if (rp->display)
         fprintf(stderr, "rle: %ld\n", (unsigned long)size);
     pixWrite("/tmp/lept/io/fract4.tif", pixs, IFF_TIFF_G3);
-    regTestCheckFile(rp, "/tmp/lept/io/fract4.tif");  /* 28 */
+    regTestCheckFile(rp, "/tmp/lept/io/fract4.tif");  /* 29 */
     size = nbytesInFile("/tmp/lept/io/fract4.tif");
-    regTestCompareValues(rp, tiffsize[3], size, 0.0);  /* 29 */
+    regTestCompareValues(rp, tiffsize[3], size, 0.0);  /* 30 */
     if (rp->display)
         fprintf(stderr, "g3: %ld\n", (unsigned long)size);
     pixWrite("/tmp/lept/io/fract5.tif", pixs, IFF_TIFF_G4);
-    regTestCheckFile(rp, "/tmp/lept/io/fract5.tif");  /* 30 */
+    regTestCheckFile(rp, "/tmp/lept/io/fract5.tif");  /* 31 */
     size = nbytesInFile("/tmp/lept/io/fract5.tif");
-    regTestCompareValues(rp, tiffsize[4], size, 0.0);  /* 31 */
+    regTestCompareValues(rp, tiffsize[4], size, 0.0);  /* 32 */
     if (rp->display)
         fprintf(stderr, "g4: %ld\n", (unsigned long)size);
     pixWrite("/tmp/lept/io/fract6.tif", pixs, IFF_TIFF_LZW);
-    regTestCheckFile(rp, "/tmp/lept/io/fract6.tif");  /* 32 */
+    regTestCheckFile(rp, "/tmp/lept/io/fract6.tif");  /* 33 */
     size = nbytesInFile("/tmp/lept/io/fract6.tif");
-    regTestCompareValues(rp, tiffsize[5], size, 0.0);  /* 33 */
+    regTestCompareValues(rp, tiffsize[5], size, 0.0);  /* 34 */
     if (rp->display)
         fprintf(stderr, "lzw: %ld\n", (unsigned long)size);
     pixWrite("/tmp/lept/io/fract7.tif", pixs, IFF_TIFF_ZIP);
-    regTestCheckFile(rp, "/tmp/lept/io/fract7.tif");  /* 34 */
+    regTestCheckFile(rp, "/tmp/lept/io/fract7.tif");  /* 35 */
     size = nbytesInFile("/tmp/lept/io/fract7.tif");
-    regTestCompareValues(rp, tiffsize[6], size, 0.0);  /* 35 */
+    regTestCompareValues(rp, tiffsize[6], size, 200.0);  /* 36 */
     if (rp->display)
         fprintf(stderr, "zip: %ld\n", (unsigned long)size);
     pixg = pixConvertTo8(pixs, 0);
     pixWrite("/tmp/lept/io/fract8.tif", pixg, IFF_TIFF_JPEG);
-    regTestCheckFile(rp, "/tmp/lept/io/fract8.tif");  /* 36 */
+    regTestCheckFile(rp, "/tmp/lept/io/fract8.tif");  /* 37 */
     size = nbytesInFile("/tmp/lept/io/fract8.tif");
-    regTestCompareValues(rp, tiffsize[7], size, 0.0);  /* 37 */
+    regTestCompareValues(rp, tiffsize[7], size, 0.0);  /* 38 */
     if (rp->display)
         fprintf(stderr, "jpeg: %ld\n", (unsigned long)size);
     pixDestroy(&pixs);

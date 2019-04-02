@@ -17,6 +17,7 @@ var searchData=
   ['ref_5fpar',['ref_par',['../db/dde/struct_output_stream.html#a9f511baf1fef17812bf650c35c828382',1,'OutputStream']]],
   ['referenceduration',['referenceDuration',['../d6/d21/_media_information_parser_8m.html#a9d2aefc189f2f6b688eaa6e43984b182',1,'MediaInformationParser.m']]],
   ['register_5fexit',['register_exit',['../d7/dcc/fftools__cmdutils_8c.html#aa64dcad44f54da335b337154d9e9950f',1,'register_exit(void(*cb)(int ret)):&#160;fftools_cmdutils.c'],['../d8/d4e/fftools__cmdutils_8h.html#aa64dcad44f54da335b337154d9e9950f',1,'register_exit(void(*cb)(int ret)):&#160;fftools_cmdutils.c']]],
+  ['registernewffmpegpipe',['registerNewFFmpegPipe',['../df/d45/interface_mobile_f_fmpeg_config.html#ac861ab3fcda37bcdfb88f24f082b2b87',1,'MobileFFmpegConfig']]],
   ['reinit_5ffilters',['reinit_filters',['../df/d77/struct_options_context.html#a9350e7c932cffac2c0abb0084f2e01c6',1,'OptionsContext::reinit_filters()'],['../d3/d6e/struct_input_stream.html#a809d93e64e76fe2f142102e58dc82a1e',1,'InputStream::reinit_filters()']]],
   ['remove_5favoptions',['remove_avoptions',['../d7/d48/fftools__ffmpeg_8c.html#aa34a84957adf117f712efcb6cbfd834f',1,'remove_avoptions(AVDictionary **a, AVDictionary *b):&#160;fftools_ffmpeg.c'],['../d7/db3/fftools__ffmpeg_8h.html#aa34a84957adf117f712efcb6cbfd834f',1,'remove_avoptions(AVDictionary **a, AVDictionary *b):&#160;fftools_ffmpeg.c']]],
   ['report_5fcallback',['report_callback',['../d7/d48/fftools__ffmpeg_8c.html#ab144f8d36db79a4fa550cd011f39748a',1,'fftools_ffmpeg.c']]],

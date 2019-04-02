@@ -71,43 +71,43 @@ extern NSString *const LIB_NAME;
 /**
  * Returns log level.
  *
- * \return log level
+ * @return log level
  */
 + (int)getLogLevel;
 
 /**
  * Sets log level.
  *
- * \param log level
+ * @param level log level
  */
 + (void)setLogLevel: (int)level;
 
 /**
  * Converts int log level to string.
  *
- * \param level value
- * \return string value
+ * @param level value
+ * @return string value
  */
 + (NSString*)logLevelToString: (int)level;
 
 /**
  * Sets a LogDelegate. logCallback method inside LogDelegate is used to redirect logs.
  *
- * \param log delegate or nil to disable a previously defined delegate
+ * @param newLogDelegate log delegate or nil to disable a previously defined delegate
  */
 + (void)setLogDelegate: (id<LogDelegate>)newLogDelegate;
 
 /**
  * Sets a StatisticsDelegate. statisticsCallback method inside StatisticsDelegate is used to redirect statistics.
  *
- * \param statistics delegate or nil to disable a previously defined delegate
+ * @param newStatisticsDelegate statistics delegate or nil to disable a previously defined delegate
  */
 + (void)setStatisticsDelegate: (id<StatisticsDelegate>)newStatisticsDelegate;
 
 /**
  * Returns the last received statistics data. It is recommended to call it before starting a new execution.
  *
- * \return last received statistics data
+ * @return last received statistics data
  */
 + (Statistics*)getLastReceivedStatistics;
 
@@ -119,7 +119,7 @@ extern NSString *const LIB_NAME;
 /**
  * Sets and overrides fontconfig configuration directory.
  *
- * \param directory which contains fontconfig configuration (fonts.conf)
+ * @param path directory which contains fontconfig configuration (fonts.conf)
  */
 + (void)setFontconfigConfigurationPath: (NSString*)path;
 
@@ -129,23 +129,39 @@ extern NSString *const LIB_NAME;
  * Note that you need to build MobileFFmpeg with fontconfig
  * enabled or use a prebuilt package with fontconfig inside to use this feature.
  *
- * \param directory which contains fonts (.ttf and .otf files)
- * \param custom font name mappings, useful to access your fonts with more friendly names
+ * @param fontDirectoryPath directory which contains fonts (.ttf and .otf files)
+ * @param fontNameMapping custom font name mappings, useful to access your fonts with more friendly names
  */
 + (void)setFontDirectory: (NSString*)fontDirectoryPath with:(NSDictionary*)fontNameMapping;
 
 /**
  * Returns package name.
  *
- * \return guessed package name according to supported external libraries
+ * @return guessed package name according to supported external libraries
  */
 + (NSString*)getPackageName;
 
 /**
  * Returns supported external libraries.
  *
- * \return array of supported external libraries
+ * @return array of supported external libraries
  */
 + (NSArray*)getExternalLibraries;
+
+/**
+ * Creates a new named pipe to use in FFmpeg operations.
+ *
+ * Please note that creator is responsible of closing created pipes.
+ *
+ * @return the full path of named pipe
+ */
++ (NSString*)registerNewFFmpegPipe;
+
+/**
+ * Closes a previously created FFmpeg pipe.
+ *
+ * @param ffmpegPipePath full path of ffmpeg pipe
+ */
++ (void)closeFFmpegPipe: (NSString*)ffmpegPipePath;
 
 @end

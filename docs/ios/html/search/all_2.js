@@ -37,6 +37,7 @@ var searchData=
   ['cleanup_5ffiltergraph',['cleanup_filtergraph',['../d2/d36/fftools__ffmpeg__filter_8c.html#a027d310ab49f2b105fc3b980a6b6c340',1,'fftools_ffmpeg_filter.c']]],
   ['close_5fall_5foutput_5fstreams',['close_all_output_streams',['../d7/d48/fftools__ffmpeg_8c.html#ac237321f98a7041c9f6004d2ce8a425c',1,'fftools_ffmpeg.c']]],
   ['close_5foutput_5fstream',['close_output_stream',['../d7/d48/fftools__ffmpeg_8c.html#a89c049f6683542b855326a6c2d5c3d7d',1,'fftools_ffmpeg.c']]],
+  ['closeffmpegpipe_3a',['closeFFmpegPipe:',['../df/d45/interface_mobile_f_fmpeg_config.html#a98ef246bf01900e2109e628b4d9cc9f9',1,'MobileFFmpegConfig']]],
   ['cmdutils_5fcommon_5foptions',['CMDUTILS_COMMON_OPTIONS',['../d8/d4e/fftools__cmdutils_8h.html#af65f53949c69b7d2ce7d64b82f71e0b6',1,'fftools_cmdutils.h']]],
   ['cmdutils_5fcommon_5foptions_5favdevice',['CMDUTILS_COMMON_OPTIONS_AVDEVICE',['../d8/d4e/fftools__cmdutils_8h.html#a51a3d8e6860d954cc6fbefdca1fc267d',1,'fftools_cmdutils.h']]],
   ['codec',['codec',['../d7/da5/_stream_information_8m.html#afc795c423a27dc464531c514244cef50',1,'StreamInformation.m']]],

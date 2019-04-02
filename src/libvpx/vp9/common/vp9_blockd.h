@@ -8,8 +8,8 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef VP9_COMMON_VP9_BLOCKD_H_
-#define VP9_COMMON_VP9_BLOCKD_H_
+#ifndef VPX_VP9_COMMON_VP9_BLOCKD_H_
+#define VPX_VP9_COMMON_VP9_BLOCKD_H_
 
 #include "./vpx_config.h"
 
@@ -60,6 +60,7 @@ typedef struct {
 #define GOLDEN_FRAME 2
 #define ALTREF_FRAME 3
 #define MAX_REF_FRAMES 4
+
 typedef int8_t MV_REFERENCE_FRAME;
 
 // This structure now relates to 8x8 block regions.
@@ -130,6 +131,8 @@ struct macroblockd_plane {
 
   // encoder
   const int16_t *dequant;
+
+  int *eob;
 };
 
 #define BLOCK_OFFSET(x, i) ((x) + (i)*16)
@@ -193,6 +196,8 @@ typedef struct macroblockd {
   int corrupted;
 
   struct vpx_internal_error_info *error_info;
+
+  PARTITION_TYPE *partition;
 } MACROBLOCKD;
 
 static INLINE PLANE_TYPE get_plane_type(int plane) {
@@ -285,4 +290,4 @@ void vp9_set_contexts(const MACROBLOCKD *xd, struct macroblockd_plane *pd,
 }  // extern "C"
 #endif
 
-#endif  // VP9_COMMON_VP9_BLOCKD_H_
+#endif  // VPX_VP9_COMMON_VP9_BLOCKD_H_

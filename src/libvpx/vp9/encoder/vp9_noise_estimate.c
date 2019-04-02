@@ -148,7 +148,9 @@ void vp9_update_noise_estimate(VP9_COMP *const cpi) {
       ne->last_h = cm->height;
     }
     return;
-  } else if (cm->current_video_frame > 60 &&
+  } else if (frame_counter > 60 && cpi->svc.num_encoded_top_layer > 1 &&
+             cpi->rc.frames_since_key > cpi->svc.number_spatial_layers &&
+             cpi->svc.spatial_layer_id == cpi->svc.number_spatial_layers - 1 &&
              cpi->rc.avg_frame_low_motion < (low_res ? 70 : 50)) {
     // Force noise estimation to 0 and denoiser off if content has high motion.
     ne->level = kLowLow;
@@ -157,7 +159,7 @@ void vp9_update_noise_estimate(VP9_COMP *const cpi) {
 #if CONFIG_VP9_TEMPORAL_DENOISING
     if (cpi->oxcf.noise_sensitivity > 0 && noise_est_svc(cpi) &&
         cpi->svc.current_superframe > 1) {
-      vp9_denoiser_set_noise_level(&cpi->denoiser, ne->level);
+      vp9_denoiser_set_noise_level(cpi, ne->level);
       copy_frame(&cpi->denoiser.last_source, cpi->Source);
     }
 #endif
@@ -258,7 +260,7 @@ void vp9_update_noise_estimate(VP9_COMP *const cpi) {
       // Normalize.
       avg_est = avg_est / num_samples;
       // Update noise estimate.
-      ne->value = (int)((15 * ne->value + avg_est) >> 4);
+      ne->value = (int)((3 * ne->value + avg_est) >> 2);
       ne->count++;
       if (ne->count == ne->num_frames_estimate) {
         // Reset counter and check noise level condition.
@@ -267,7 +269,7 @@ void vp9_update_noise_estimate(VP9_COMP *const cpi) {
         ne->level = vp9_noise_estimate_extract_level(ne);
 #if CONFIG_VP9_TEMPORAL_DENOISING
         if (cpi->oxcf.noise_sensitivity > 0 && noise_est_svc(cpi))
-          vp9_denoiser_set_noise_level(&cpi->denoiser, ne->level);
+          vp9_denoiser_set_noise_level(cpi, ne->level);
 #endif
       }
     }

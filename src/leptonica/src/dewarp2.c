@@ -98,7 +98,7 @@ static const l_float32   L_ALLOWED_W_FRACT = 0.05;  /* no bigger */
  * \brief   dewarpBuildPageModel()
  *
  * \param[in]    dew
- * \param[in]    debugfile use NULL to skip writing this
+ * \param[in]    debugfile    use NULL to skip writing this
  * \return  0 if OK, 1 if unable to build the model or on error
  *
  * <pre>
@@ -266,8 +266,8 @@ PTAA    *ptaa1, *ptaa2;
  * \brief   dewarpFindVertDisparity()
  *
  * \param[in]    dew
- * \param[in]    ptaa unsmoothed lines, not vertically ordered
- * \param[in]    rotflag 0 if using dew->pixs; 1 if rotated by 90 degrees cw
+ * \param[in]    ptaa       unsmoothed lines, not vertically ordered
+ * \param[in]    rotflag    0 if using dew->pixs; 1 if rotated by 90 degrees cw
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -537,7 +537,7 @@ FPIX       *fpix;
  * \brief   dewarpFindHorizDisparity()
  *
  * \param[in]    dew
- * \param[in]    ptaa unsmoothed lines, not vertically ordered
+ * \param[in]    ptaa     unsmoothed lines, not vertically ordered
  * \return  0 if OK, 1 if horizontal disparity array is not built, or on error
  *
  * <pre>
@@ -746,8 +746,8 @@ FPIX      *fpix;
 /*!
  * \brief   dewarpGetTextlineCenters()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    debugflag 1 for debug output
+ * \param[in]    pixs        1 bpp
+ * \param[in]    debugflag   1 for debug output
  * \return  ptaa of center values of textlines
  *
  * <pre>
@@ -861,8 +861,8 @@ PTAA     *ptaa;
 /*!
  * \brief   dewarpGetMeanVerticals()
  *
- * \param[in]    pixs 1 bpp, single c.c.
- * \param[in]    x,y location of UL corner of pixs with respect to page image
+ * \param[in]    pixs     1 bpp, single c.c.
+ * \param[in]    x,y      location of UL corner of pixs, relative to page image
  * \return  pta (mean y-values in component for each x-value,
  *                   both translated by (x,y
  */
@@ -905,9 +905,9 @@ PTA       *pta;
 /*!
  * \brief   dewarpRemoveShortLines()
  *
- * \param[in]    pixs 1 bpp
- * \param[in]    ptaas input lines
- * \param[in]    fract minimum fraction of longest line to keep
+ * \param[in]    pixs       1 bpp
+ * \param[in]    ptaas      input lines
+ * \param[in]    fract      minimum fraction of longest line to keep
  * \param[in]    debugflag
  * \return  ptaad containing only lines of sufficient length,
  *                     or NULL on error
@@ -1222,10 +1222,10 @@ PTA       *ptau1, *ptau2, *ptad1, *ptad2;
 /*!
  * \brief   dewarpIsLineCoverageValid()
  *
- * \param[in]    ptaa of validated lines
- * \param[in]    h height of pix
- * \param[out]   ptopline location of top line
- * \param[out]   pbotline location of bottom line
+ * \param[in]    ptaa       of validated lines
+ * \param[in]    h          height of pix
+ * \param[out]   ptopline   location of top line
+ * \param[out]   pbotline   location of bottom line
  * \return  1 if coverage is valid, 0 if not or on error.
  *
  * <pre>
@@ -1276,11 +1276,11 @@ l_float32  top, bot, y, fraction;
 /*!
  * \brief   dewarpQuadraticLSF()
  *
- * \param[in]    ptad left or right end points of longest lines
- * \param[out]   pa  coeff a of LSF: y = ax^2 + bx + c
- * \param[out]   pb  coeff b of LSF: y = ax^2 + bx + c
- * \param[out]   pc  coeff c of LSF: y = ax^2 + bx + c
- * \param[out]   pmederr [optional] median error
+ * \param[in]    ptad      left or right end points of longest lines
+ * \param[out]   pa        coeff a of LSF: y = ax^2 + bx + c
+ * \param[out]   pb        coeff b of LSF: y = ax^2 + bx + c
+ * \param[out]   pc        coeff c of LSF: y = ax^2 + bx + c
+ * \param[out]   pmederr   [optional] median error
  * \return  0 if OK, 1 on error.
  *
  * <pre>
@@ -1340,9 +1340,9 @@ NUMA      *naerr;
  * \brief   dewarpFindHorizSlopeDisparity()
  *
  * \param[in]    dew
- * \param[in]    pixb (1 bpp, with vertical and horizontal disparity removed)
- * \param[in]    fractthresh (threshold fractional difference in density)
- * \param[in]    parity (0 if even page, 1 if odd page)
+ * \param[in]    pixb         1 bpp, with vert and horiz disparity removed
+ * \param[in]    fractthresh  threshold fractional difference in density
+ * \param[in]    parity       0 if even page, 1 if odd page
  * \return       0 if OK, 1 on error
  *
  * <pre>
@@ -1578,8 +1578,8 @@ FPIX      *fpix;
  * \brief   dewarpBuildLineModel()
  *
  * \param[in]    dew
- * \param[in]    opensize size of opening to remove perpendicular lines
- * \param[in]    debugfile use NULL to skip writing this
+ * \param[in]    opensize    size of opening to remove perpendicular lines
+ * \param[in]    debugfile   use NULL to skip writing this
  * \return  0 if OK, 1 if unable to build the model or on error
  *
  * <pre>
@@ -1777,8 +1777,8 @@ PTAA    *ptaa1, *ptaa2;
  *
  * \param[in]    dewa
  * \param[in]    pageno
- * \param[out]   pvsuccess [optional] 1 on success
- * \param[out]   phsuccess [optional] 1 on success
+ * \param[out]   pvsuccess    [optional] 1 on success
+ * \param[out]   phsuccess    [optional] 1 on success
  * \return  0 if OK, 1 on error
  *
  * <pre>
@@ -1815,9 +1815,9 @@ L_DEWARP  *dew;
 /*!
  * \brief   pixRenderMidYs()
  *
- * \param[in]    pixs 32 bpp
- * \param[in]    namidys y location of reference lines for vertical disparity
- * \param[in]    linew width of rendered line; typ 2
+ * \param[in]    pixs      32 bpp
+ * \param[in]    namidys   y location of reference lines for vertical disparity
+ * \param[in]    linew     width of rendered line; typ 2
  * \return  0 if OK, 1 on error
  */
 static l_int32
@@ -1851,10 +1851,10 @@ PIXCMAP  *cmap;
 /*!
  * \brief   pixRenderHorizEndPoints()
  *
- * \param[in]    pixs 32 bpp
- * \param[in]    ptal left side line end points
- * \param[in]    ptar right side line end points
- * \param[in]    color 0xrrggbb00
+ * \param[in]    pixs     32 bpp
+ * \param[in]    ptal     left side line end points
+ * \param[in]    ptar     right side line end points
+ * \param[in]    color    0xrrggbb00
  * \return  0 if OK, 1 on error
  */
 static l_int32

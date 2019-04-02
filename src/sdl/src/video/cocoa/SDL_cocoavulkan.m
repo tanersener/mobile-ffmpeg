@@ -58,7 +58,8 @@ int Cocoa_Vulkan_LoadLibrary(_THIS, const char *path)
     PFN_vkGetInstanceProcAddr vkGetInstanceProcAddr = NULL;
 
     if (_this->vulkan_config.loader_handle) {
-        return SDL_SetError("Vulkan/MoltenVK already loaded");
+        SDL_SetError("Vulkan/MoltenVK already loaded");
+        return -1;
     }
 
     /* Load the Vulkan loader library */
@@ -79,7 +80,6 @@ int Cocoa_Vulkan_LoadLibrary(_THIS, const char *path)
         _this->vulkan_config.loader_handle = DEFAULT_HANDLE;
     } else {
         const char** paths;
-        const char *foundPath = NULL;
         int numPaths;
         int i;
 
@@ -92,17 +92,18 @@ int Cocoa_Vulkan_LoadLibrary(_THIS, const char *path)
             paths = defaultPaths;
             numPaths = SDL_arraysize(defaultPaths);
         }
-
-        for (i = 0; i < numPaths && _this->vulkan_config.loader_handle == NULL; i++) {
-            foundPath = paths[i];
-            _this->vulkan_config.loader_handle = SDL_LoadObject(foundPath);
+        
+        for (i=0; i < numPaths; i++) {
+            _this->vulkan_config.loader_handle = SDL_LoadObject(paths[i]);
+            if (_this->vulkan_config.loader_handle)
+                break;
+            else
+                continue;
         }
+        if (i == numPaths)
+            return -1;
 
-        if (_this->vulkan_config.loader_handle == NULL) {
-            return SDL_SetError("Failed to load Vulkan/MoltenVK library");
-        }
-
-        SDL_strlcpy(_this->vulkan_config.loader_path, foundPath,
+        SDL_strlcpy(_this->vulkan_config.loader_path, paths[i],
                     SDL_arraysize(_this->vulkan_config.loader_path));
         vkGetInstanceProcAddr = (PFN_vkGetInstanceProcAddr)SDL_LoadFunction(
             _this->vulkan_config.loader_handle, "vkGetInstanceProcAddr");

@@ -25,10 +25,20 @@
 		3457454C2113B8AD00059043 /* AudioViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3457454A2113B8AD00059043 /* AudioViewController.m */; };
 		3457454F2113B8D300059043 /* SubtitleViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 3457454D2113B8D300059043 /* SubtitleViewController.h */; };
 		345745502113B8D300059043 /* SubtitleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3457454E2113B8D300059043 /* SubtitleViewController.m */; };
+		345A1C7E2253D4A7000C8650 /* libavdevice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 345A1C762253D4A7000C8650 /* libavdevice.framework */; };
+		345A1C7F2253D4A7000C8650 /* libswscale.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 345A1C772253D4A7000C8650 /* libswscale.framework */; };
+		345A1C802253D4A7000C8650 /* libavcodec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 345A1C782253D4A7000C8650 /* libavcodec.framework */; };
+		345A1C812253D4A7000C8650 /* libswresample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 345A1C792253D4A7000C8650 /* libswresample.framework */; };
+		345A1C822253D4A7000C8650 /* mobileffmpeg.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 345A1C7A2253D4A7000C8650 /* mobileffmpeg.framework */; };
+		345A1C832253D4A7000C8650 /* libavformat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 345A1C7B2253D4A7000C8650 /* libavformat.framework */; };
+		345A1C842253D4A7000C8650 /* libavutil.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 345A1C7C2253D4A7000C8650 /* libavutil.framework */; };
+		345A1C852253D4A7000C8650 /* libavfilter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 345A1C7D2253D4A7000C8650 /* libavfilter.framework */; };
 		348439ED20B2EFAF001A3990 /* pyramid.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EA20B2EFAF001A3990 /* pyramid.jpg */; };
 		348439EE20B2EFAF001A3990 /* tajmahal.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EB20B2EFAF001A3990 /* tajmahal.jpg */; };
 		348439EF20B2EFAF001A3990 /* colosseum.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 348439EC20B2EFAF001A3990 /* colosseum.jpg */; };
 		34BB547C2109D44800606B7C /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 34BB547B2109D44800606B7C /* Constants.m */; };
+		34D0596C220DC4D900E44C62 /* PipeViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 34D0596A220DC4D900E44C62 /* PipeViewController.h */; };
+		34D0596D220DC4D900E44C62 /* PipeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 34D0596B220DC4D900E44C62 /* PipeViewController.m */; };
 		34DC789B21215B5800C3486C /* truenorg.otf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789721215B5800C3486C /* truenorg.otf */; };
 		34DC789C21215B5800C3486C /* subtitle.srt in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789821215B5800C3486C /* subtitle.srt */; };
 		34DC789D21215B5800C3486C /* doppioone_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 34DC789921215B5800C3486C /* doppioone_regular.ttf */; };
@@ -77,10 +87,20 @@
 		3457454A2113B8AD00059043 /* AudioViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AudioViewController.m; sourceTree = "<group>"; };
 		3457454D2113B8D300059043 /* SubtitleViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubtitleViewController.h; sourceTree = "<group>"; };
 		3457454E2113B8D300059043 /* SubtitleViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubtitleViewController.m; sourceTree = "<group>"; };
+		345A1C762253D4A7000C8650 /* libavdevice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavdevice.framework; sourceTree = "<group>"; };
+		345A1C772253D4A7000C8650 /* libswscale.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswscale.framework; sourceTree = "<group>"; };
+		345A1C782253D4A7000C8650 /* libavcodec.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavcodec.framework; sourceTree = "<group>"; };
+		345A1C792253D4A7000C8650 /* libswresample.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libswresample.framework; sourceTree = "<group>"; };
+		345A1C7A2253D4A7000C8650 /* mobileffmpeg.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = mobileffmpeg.framework; sourceTree = "<group>"; };
+		345A1C7B2253D4A7000C8650 /* libavformat.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavformat.framework; sourceTree = "<group>"; };
+		345A1C7C2253D4A7000C8650 /* libavutil.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavutil.framework; sourceTree = "<group>"; };
+		345A1C7D2253D4A7000C8650 /* libavfilter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = libavfilter.framework; sourceTree = "<group>"; };
 		348439EA20B2EFAF001A3990 /* pyramid.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = pyramid.jpg; sourceTree = "<group>"; };
 		348439EB20B2EFAF001A3990 /* tajmahal.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = tajmahal.jpg; sourceTree = "<group>"; };
 		348439EC20B2EFAF001A3990 /* colosseum.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = colosseum.jpg; sourceTree = "<group>"; };
 		34BB547B2109D44800606B7C /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
+		34D0596A220DC4D900E44C62 /* PipeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PipeViewController.h; sourceTree = "<group>"; };
+		34D0596B220DC4D900E44C62 /* PipeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PipeViewController.m; sourceTree = "<group>"; };
 		34DC789721215B5800C3486C /* truenorg.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = truenorg.otf; sourceTree = "<group>"; };
 		34DC789821215B5800C3486C /* subtitle.srt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = subtitle.srt; sourceTree = "<group>"; };
 		34DC789921215B5800C3486C /* doppioone_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = doppioone_regular.ttf; sourceTree = "<group>"; };
@@ -104,9 +124,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				345A1C802253D4A7000C8650 /* libavcodec.framework in Frameworks */,
 				343165D121D136FC001A7185 /* libz.tbd in Frameworks */,
 				3431662B21D13B0A001A7185 /* libc++.tbd in Frameworks */,
+				345A1C852253D4A7000C8650 /* libavfilter.framework in Frameworks */,
 				343165D321D13704001A7185 /* libbz2.tbd in Frameworks */,
+				345A1C812253D4A7000C8650 /* libswresample.framework in Frameworks */,
+				345A1C842253D4A7000C8650 /* libavutil.framework in Frameworks */,
+				345A1C7E2253D4A7000C8650 /* libavdevice.framework in Frameworks */,
+				345A1C7F2253D4A7000C8650 /* libswscale.framework in Frameworks */,
+				345A1C822253D4A7000C8650 /* mobileffmpeg.framework in Frameworks */,
+				345A1C832253D4A7000C8650 /* libavformat.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,6 +158,14 @@
 		3498DC65209F7F1C005F5883 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				345A1C782253D4A7000C8650 /* libavcodec.framework */,
+				345A1C762253D4A7000C8650 /* libavdevice.framework */,
+				345A1C7D2253D4A7000C8650 /* libavfilter.framework */,
+				345A1C7B2253D4A7000C8650 /* libavformat.framework */,
+				345A1C7C2253D4A7000C8650 /* libavutil.framework */,
+				345A1C792253D4A7000C8650 /* libswresample.framework */,
+				345A1C772253D4A7000C8650 /* libswscale.framework */,
+				345A1C7A2253D4A7000C8650 /* mobileffmpeg.framework */,
 				3431662E21D13C58001A7185 /* CoreMotion.framework */,
 				3431662D21D13C4A001A7185 /* GameController.framework */,
 				3431662C21D13C3D001A7185 /* VideoToolbox.framework */,
@@ -161,6 +197,8 @@
 		34FAE212209F7DDD005CE2AE /* MobileFFmpegTest */ = {
 			isa = PBXGroup;
 			children = (
+				34D0596A220DC4D900E44C62 /* PipeViewController.h */,
+				34D0596B220DC4D900E44C62 /* PipeViewController.m */,
 				34FAE213209F7DDD005CE2AE /* AppDelegate.h */,
 				34FAE214209F7DDD005CE2AE /* AppDelegate.m */,
 				34FAE21F209F7DDE005CE2AE /* Assets.xcassets */,
@@ -200,6 +238,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				343E67092107C27600F95E5B /* TabBarController.h in Headers */,
+				34D0596C220DC4D900E44C62 /* PipeViewController.h in Headers */,
 				3423D269217F7D4E00C3C7ED /* MediaInformationParserTests.h in Headers */,
 				3457454B2113B8AD00059043 /* AudioViewController.h in Headers */,
 				3457454F2113B8D300059043 /* SubtitleViewController.h in Headers */,
@@ -291,6 +330,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				34D0596D220DC4D900E44C62 /* PipeViewController.m in Sources */,
 				34FAE21B209F7DDD005CE2AE /* VideoViewController.m in Sources */,
 				34FAE215209F7DDD005CE2AE /* AppDelegate.m in Sources */,
 				34FAE226209F7DDE005CE2AE /* main.m in Sources */,

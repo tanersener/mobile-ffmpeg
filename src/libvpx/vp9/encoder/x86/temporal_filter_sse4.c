@@ -241,7 +241,7 @@ void vp9_temporal_filter_apply_sse4_1(const uint8_t *a, unsigned int stride,
                                       int weight, uint32_t *accumulator,
                                       uint16_t *count) {
   unsigned int h;
-  const int rounding = strength > 0 ? 1 << (strength - 1) : 0;
+  const int rounding = (1 << strength) >> 1;
 
   assert(strength >= 0);
   assert(strength <= 6);

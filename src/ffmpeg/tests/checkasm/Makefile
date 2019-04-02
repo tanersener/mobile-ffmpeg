@@ -31,6 +31,7 @@ AVCODECOBJS-$(CONFIG_VP9_DECODER)       += vp9dsp.o
 CHECKASMOBJS-$(CONFIG_AVCODEC)          += $(AVCODECOBJS-yes)
 
 # libavfilter tests
+AVFILTEROBJS-$(CONFIG_AFIR_FILTER) += af_afir.o
 AVFILTEROBJS-$(CONFIG_BLEND_FILTER) += vf_blend.o
 AVFILTEROBJS-$(CONFIG_COLORSPACE_FILTER) += vf_colorspace.o
 AVFILTEROBJS-$(CONFIG_HFLIP_FILTER)      += vf_hflip.o
@@ -61,7 +62,7 @@ CHECKASMOBJS := $(sort $(CHECKASMOBJS:%=tests/checkasm/%))
 
 CHECKASMDIRS := $(sort $(dir $(CHECKASMOBJS)))
 $(CHECKASMOBJS): | $(CHECKASMDIRS)
-OBJDIRS += $(CHECKASMDIRS)
+OUTDIRS += $(CHECKASMDIRS)
 
 tests/checkasm/checkasm.o: CFLAGS += -Umain
 

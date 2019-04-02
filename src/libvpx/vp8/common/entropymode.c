@@ -99,6 +99,6 @@ void vp8_init_mbmode_probs(VP8_COMMON *x) {
   memcpy(x->fc.sub_mv_ref_prob, sub_mv_ref_prob, sizeof(sub_mv_ref_prob));
 }
 
-void vp8_default_bmode_probs(vp8_prob p[VP8_BINTRAMODES - 1]) {
-  memcpy(p, vp8_bmode_prob, sizeof(vp8_bmode_prob));
+void vp8_default_bmode_probs(vp8_prob dest[VP8_BINTRAMODES - 1]) {
+  memcpy(dest, vp8_bmode_prob, sizeof(vp8_bmode_prob));
 }

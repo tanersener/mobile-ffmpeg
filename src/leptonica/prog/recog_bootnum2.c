@@ -118,7 +118,7 @@ PIXA      *pixa1, *pixa2, *pixa3;
     }
     snprintf(buf, sizeof(buf), "/tmp/lept/digit/%s.comp.pa", rootname);
     pixaWrite(buf, pixa2);
-    
+
         /* Number and show the resulting binary templates */
     snprintf(buf, sizeof(buf), "/tmp/lept/digit/%s.comp-num", rootname);
     PixaDisplayNumbered(pixa2, buf);
@@ -129,7 +129,7 @@ PIXA      *pixa1, *pixa2, *pixa3;
     pixDisplay(pix1, 1000, 500);
     snprintf(buf, sizeof(buf), "/tmp/lept/digit/%s.comp.tif", rootname);
     pixWrite(buf, pix1, IFF_TIFF_G4);
-    
+
         /* The number of templates is in the pix text string; check it. */
     pix2 = pixRead(buf);
     if (sscanf(pixGetText(pix2), "n = %d", &ns) != 1)

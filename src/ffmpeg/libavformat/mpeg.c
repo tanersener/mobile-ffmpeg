@@ -64,7 +64,7 @@ static int check_pack_header(const uint8_t *buf)
     return (buf[1] & 0xC0) == 0x40 || (buf[1] & 0xF0) == 0x20;
 }
 
-static int mpegps_probe(AVProbeData *p)
+static int mpegps_probe(const AVProbeData *p)
 {
     uint32_t code = -1;
     int i;
@@ -525,34 +525,34 @@ redo:
     }
 
     es_type = m->psm_es_type[startcode & 0xff];
-        if (es_type == STREAM_TYPE_VIDEO_MPEG1) {
-            codec_id = AV_CODEC_ID_MPEG2VIDEO;
-            type     = AVMEDIA_TYPE_VIDEO;
-        } else if (es_type == STREAM_TYPE_VIDEO_MPEG2) {
-            codec_id = AV_CODEC_ID_MPEG2VIDEO;
-            type     = AVMEDIA_TYPE_VIDEO;
-        } else if (es_type == STREAM_TYPE_AUDIO_MPEG1 ||
-                   es_type == STREAM_TYPE_AUDIO_MPEG2) {
-            codec_id = AV_CODEC_ID_MP3;
-            type     = AVMEDIA_TYPE_AUDIO;
-        } else if (es_type == STREAM_TYPE_AUDIO_AAC) {
-            codec_id = AV_CODEC_ID_AAC;
-            type     = AVMEDIA_TYPE_AUDIO;
-        } else if (es_type == STREAM_TYPE_VIDEO_MPEG4) {
-            codec_id = AV_CODEC_ID_MPEG4;
-            type     = AVMEDIA_TYPE_VIDEO;
-        } else if (es_type == STREAM_TYPE_VIDEO_H264) {
-            codec_id = AV_CODEC_ID_H264;
-            type     = AVMEDIA_TYPE_VIDEO;
-        } else if (es_type == STREAM_TYPE_VIDEO_HEVC) {
-            codec_id = AV_CODEC_ID_HEVC;
-            type     = AVMEDIA_TYPE_VIDEO;
-        } else if (es_type == STREAM_TYPE_AUDIO_AC3) {
-            codec_id = AV_CODEC_ID_AC3;
-            type     = AVMEDIA_TYPE_AUDIO;
-        } else if (m->imkh_cctv && es_type == 0x91) {
-            codec_id = AV_CODEC_ID_PCM_MULAW;
-            type     = AVMEDIA_TYPE_AUDIO;
+    if (es_type == STREAM_TYPE_VIDEO_MPEG1) {
+        codec_id = AV_CODEC_ID_MPEG2VIDEO;
+        type     = AVMEDIA_TYPE_VIDEO;
+    } else if (es_type == STREAM_TYPE_VIDEO_MPEG2) {
+        codec_id = AV_CODEC_ID_MPEG2VIDEO;
+        type     = AVMEDIA_TYPE_VIDEO;
+    } else if (es_type == STREAM_TYPE_AUDIO_MPEG1 ||
+               es_type == STREAM_TYPE_AUDIO_MPEG2) {
+        codec_id = AV_CODEC_ID_MP3;
+        type     = AVMEDIA_TYPE_AUDIO;
+    } else if (es_type == STREAM_TYPE_AUDIO_AAC) {
+        codec_id = AV_CODEC_ID_AAC;
+        type     = AVMEDIA_TYPE_AUDIO;
+    } else if (es_type == STREAM_TYPE_VIDEO_MPEG4) {
+        codec_id = AV_CODEC_ID_MPEG4;
+        type     = AVMEDIA_TYPE_VIDEO;
+    } else if (es_type == STREAM_TYPE_VIDEO_H264) {
+        codec_id = AV_CODEC_ID_H264;
+        type     = AVMEDIA_TYPE_VIDEO;
+    } else if (es_type == STREAM_TYPE_VIDEO_HEVC) {
+        codec_id = AV_CODEC_ID_HEVC;
+        type     = AVMEDIA_TYPE_VIDEO;
+    } else if (es_type == STREAM_TYPE_AUDIO_AC3) {
+        codec_id = AV_CODEC_ID_AC3;
+        type     = AVMEDIA_TYPE_AUDIO;
+    } else if (m->imkh_cctv && es_type == 0x91) {
+        codec_id = AV_CODEC_ID_PCM_MULAW;
+        type     = AVMEDIA_TYPE_AUDIO;
     } else if (startcode >= 0x1e0 && startcode <= 0x1ef) {
         static const unsigned char avs_seqh[4] = { 0, 0, 1, 0xb0 };
         unsigned char buf[8];
@@ -703,7 +703,7 @@ AVInputFormat ff_mpegps_demuxer = {
 #define REF_STRING "# VobSub index file,"
 #define MAX_LINE_SIZE 2048
 
-static int vobsub_probe(AVProbeData *p)
+static int vobsub_probe(const AVProbeData *p)
 {
     if (!strncmp(p->buf, REF_STRING, sizeof(REF_STRING) - 1))
         return AVPROBE_SCORE_MAX;
@@ -722,7 +722,7 @@ static int vobsub_read_header(AVFormatContext *s)
     int stream_id = -1;
     char id[64] = {0};
     char alt[MAX_LINE_SIZE] = {0};
-    AVInputFormat *iformat;
+    ff_const59 AVInputFormat *iformat;
 
     if (!vobsub->sub_name) {
         char *ext;
