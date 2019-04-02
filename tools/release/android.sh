@@ -77,8 +77,7 @@ cd ${BASEDIR}/../.. || exit 1
 ./android.sh ${CUSTOM_OPTIONS} --enable-gnutls --enable-gmp ${GPL_PACKAGES} || exit 1
 cd ${BASEDIR}/../../android/app || exit 1
 enable_gradle_release
-gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28
- -PreleaseProject=mobile-ffmpeg-https-gpl -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1156 with gmp v6.1.2, gnutls v3.5.19, libvid.stab v1.1.0, x264 20190328-2245-stable, x265 v3.0 and xvidcore v1.3.5 libraries enabled.' -PreleaseGPL=1 clean install bintrayUpload || exit 1
+gradle -p ${BASEDIR}/../../android/app -PreleaseVersionCode=$1 -PreleaseVersionName=$2 -PreleaseMinSdk=24 -PreleaseTargetSdk=28 -PreleaseProject=mobile-ffmpeg-https-gpl -PreleaseProjectDescription='Includes FFmpeg v4.2-dev-1156 with gmp v6.1.2, gnutls v3.5.19, libvid.stab v1.1.0, x264 20190328-2245-stable, x265 v3.0 and xvidcore v1.3.5 libraries enabled.' -PreleaseGPL=1 clean install bintrayUpload || exit 1
 create_package "https-gpl" "$2" || exit 1
 
 # AUDIO RELEASE
