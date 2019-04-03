@@ -8,7 +8,6 @@ android {
         targetSdkVersion 28
         versionCode 240421
         versionName "4.2.1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         project.archivesBaseName = "mobile-ffmpeg"
     }
 
@@ -47,7 +46,7 @@ task javadoc(type: Javadoc) {
 
 afterEvaluate {
     javadoc.classpath += files(android.libraryVariants.collect { variant ->
-        variant.javaCompile.classpath.files
+        variant.javaCompileProvider.classpath.files
     })
 }
 
@@ -55,6 +54,4 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
