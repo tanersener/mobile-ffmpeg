@@ -1,4 +1,4 @@
-# MobileFFmpeg [![Join the chat at https://gitter.im/mobile-ffmpeg/Lobby](https://badges.gitter.im/mobile-ffmpeg/Lobby.svg)](https://gitter.im/mobile-ffmpeg/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) ![GitHub release](https://img.shields.io/badge/release-v4.2.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.1-blue.svg)
+# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.1-blue.svg)
 
 FFmpeg for Android and IOS
 
