@@ -272,9 +272,9 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 
 Starting from `v4.2`, `MobileFFmpeg` binaries are published in two different variants: `Main Release` and `LTS Release`. 
 
-- Main releases are published every 3 months. They include complete functionality of the library and support the latest SDK/API features.
+- They include complete functionality of the library and support the latest SDK/API features.
 
-- LTS releases are published every 6 months. These releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them.
+- These releases are customized to support a wide range of devices. They are built using older API/SDK versions, so some features are not available for them.
 
 This table shows the differences between two variants.
 
