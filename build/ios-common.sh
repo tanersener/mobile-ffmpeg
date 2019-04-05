@@ -1029,9 +1029,9 @@ set_toolchain_clang_paths() {
 
     TARGET_HOST=$(get_target_host)
     
-    export AR="ar"
+    export AR="$(xcrun --sdk $(get_sdk_name) -f ar)"
     export CC="clang"
-    export OBJC="clang"
+    export OBJC="$(xcrun --sdk $(get_sdk_name) -f clang)"
     export CXX="clang++"
 
     LOCAL_ASMFLAGS="$(get_asmflags $1)"
@@ -1059,9 +1059,9 @@ set_toolchain_clang_paths() {
         ;;
     esac
 
-    export LD="ld"
-    export RANLIB="ranlib"
-    export STRIP="strip"
+    export LD="$(xcrun --sdk $(get_sdk_name) -f ld)"
+    export RANLIB="$(xcrun --sdk $(get_sdk_name) -f ranlib)"
+    export STRIP="$(xcrun --sdk $(get_sdk_name) -f strip)"
 
     export INSTALL_PKG_CONFIG_DIR="${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/pkgconfig"
     export ZLIB_PACKAGE_CONFIG_PATH="${INSTALL_PKG_CONFIG_DIR}/zlib.pc"
