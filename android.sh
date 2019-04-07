@@ -589,6 +589,11 @@ if [[ -z ${ANDROID_NDK_ROOT} ]]; then
     exit 1
 fi
 
+if [[ -z ${ANDROID_HOME} ]]; then
+    echo "ANDROID_HOME not defined"
+    exit 1
+fi
+
 echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}library for Android\n"
 echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}library for Android: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1

@@ -316,6 +316,7 @@ Both `android.sh` and `ios.sh` can be customized to override default settings,
 [ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) wiki pages include all available build options.
 ##### 5.2.1 Android 
 ```
+export ANDROID_HOME=<Android SDK Path>
 export ANDROID_NDK_ROOT=<Android NDK Path>
 ./android.sh
 ```
