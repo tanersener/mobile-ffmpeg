@@ -89,15 +89,100 @@
         NSLog(@"Testing HTTPS with default url \'%@\'\n", testUrl);
     }
     
-    // HTTPS COMMAND ARGUMENTS
-    NSString* ffmpegCommand = [NSString stringWithFormat:@"-hide_banner -i %@ -f null -", testUrl];
+    MediaInformation* information = [MobileFFmpeg getMediaInformation:testUrl];
 
-    NSLog(@"FFmpeg process started with arguments\n\'%@\'\n", ffmpegCommand);
+    if (information == nil) {
+        NSLog(@"Get media information failed\n");
+    } else {
+        NSLog(@"Media information for %@\n", [information getPath]);
+        
+        if ([information getFormat] != nil) {
+            NSLog(@"Format: %@\n", [information getFormat]);
+        }
+        if ([information getBitrate] != nil) {
+            NSLog(@"Bitrate: %@\n", [information getBitrate]);
+        }
+        if ([information getDuration] != nil) {
+            NSLog(@"Duration: %@\n", [information getDuration]);
+        }
+        if ([information getStartTime] != nil) {
+            NSLog(@"Start time: %@\n", [information getStartTime]);
+        }
+        if ([information getMetadataEntries] != nil) {
+            NSDictionary* entries = [information getMetadataEntries];
+            for(NSString *key in [entries allKeys]) {
+                NSLog(@"Metadata: %@:%@", key, [entries objectForKey:key]);
+            }
+        }
+        if ([information getStreams] != nil) {
+            for (StreamInformation* stream in [information getStreams]) {
+                if ([stream getIndex] != nil) {
+                    NSLog(@"Stream index: %@\n", [stream getIndex]);
+                }
+                if ([stream getType] != nil) {
+                    NSLog(@"Stream type: %@\n", [stream getType]);
+                }
+                if ([stream getCodec] != nil) {
+                    NSLog(@"Stream codec: %@\n", [stream getCodec]);
+                }
+                if ([stream getFullCodec] != nil) {
+                    NSLog(@"Stream full codec: %@\n", [stream getFullCodec]);
+                }
+                if ([stream getFormat] != nil) {
+                    NSLog(@"Stream format: %@\n", [stream getFormat]);
+                }
+                if ([stream getFullFormat] != nil) {
+                    NSLog(@"Stream full format: %@\n", [stream getFullFormat]);
+                }
 
-    // EXECUTE
-    int result = [MobileFFmpeg execute: ffmpegCommand];
+                if ([stream getWidth] != nil) {
+                    NSLog(@"Stream width: %@\n", [stream getWidth]);
+                }
+                if ([stream getHeight] != nil) {
+                    NSLog(@"Stream height: %@\n", [stream getHeight]);
+                }
 
-    NSLog(@"FFmpeg process exited with rc %d\n", result);
+                if ([stream getBitrate] != nil) {
+                    NSLog(@"Stream bitrate: %@\n", [stream getBitrate]);
+                }
+                if ([stream getSampleRate] != nil) {
+                    NSLog(@"Stream sample rate: %@\n", [stream getSampleRate]);
+                }
+                if ([stream getSampleFormat] != nil) {
+                    NSLog(@"Stream sample format: %@\n", [stream getSampleFormat]);
+                }
+                if ([stream getChannelLayout] != nil) {
+                    NSLog(@"Stream channel layout: %@\n", [stream getChannelLayout]);
+                }
+
+                if ([stream getSampleAspectRatio] != nil) {
+                    NSLog(@"Stream sample aspect ratio: %@\n", [stream getSampleAspectRatio]);
+                }
+                if ([stream getDisplayAspectRatio] != nil) {
+                    NSLog(@"Stream display ascpect ratio: %@\n", [stream getDisplayAspectRatio]);
+                }
+                if ([stream getAverageFrameRate] != nil) {
+                    NSLog(@"Stream average frame rate: %@\n", [stream getAverageFrameRate]);
+                }
+                if ([stream getRealFrameRate] != nil) {
+                    NSLog(@"Stream real frame rate: %@\n", [stream getRealFrameRate]);
+                }
+                if ([stream getTimeBase] != nil) {
+                    NSLog(@"Stream time base: %@\n", [stream getTimeBase]);
+                }
+                if ([stream getCodecTimeBase] != nil) {
+                    NSLog(@"Stream codec time base: %@\n", [stream getCodecTimeBase]);
+                }
+
+                if ([stream getMetadataEntries] != nil) {
+                    NSDictionary* entries = [information getMetadataEntries];
+                    for(NSString *key in [entries allKeys]) {
+                        NSLog(@"Stream metadata: %@:%@", key, [entries objectForKey:key]);
+                    }
+                }
+            }
+        }
+    }
 }
 
 - (void)setActive {

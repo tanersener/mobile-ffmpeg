@@ -347,10 +347,14 @@ static int systemCommandOutputContainsPattern(NSArray *patternList) {
  *
  * @param arguments command arguments
  * @param commandOutputEndPatternList list of patterns which will indicate that operation has ended
+ * @param successPattern success pattern
  * @param timeout execution timeout
  * @return return code
  */
-int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPatternList, long timeout) {
+int mobileffmpeg_system_execute(NSArray *arguments, NSMutableArray *commandOutputEndPatternList, NSString *successPattern, long timeout) {
+    if (successPattern != nil) {
+        [commandOutputEndPatternList addObject:successPattern];
+    }
     systemCommandOutput = [[NSMutableString alloc] init];
     runningSystemCommand = 1;
 
@@ -367,7 +371,11 @@ int mobileffmpeg_system_execute(NSArray *arguments, NSArray *commandOutputEndPat
 
     [MobileFFmpeg cancel];
 
-    return rc;
+    if (successPattern != nil && [systemCommandOutput containsString:successPattern]) {
+        return 0;
+    } else {
+        return rc;
+    }
 }
 
 @interface MobileFFmpegConfig()

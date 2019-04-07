@@ -461,10 +461,14 @@ public class Config {
      *
      * @param arguments                   command arguments
      * @param commandOutputEndPatternList list of patterns which will indicate that operation has ended
+     * @param successPattern              success pattern
      * @param timeout                     execution timeout
      * @return return code
      */
-    static int systemExecute(final String[] arguments, final List<String> commandOutputEndPatternList, final long timeout) {
+    static int systemExecute(final String[] arguments, final List<String> commandOutputEndPatternList, final String successPattern, final long timeout) {
+        if (successPattern != null) {
+            commandOutputEndPatternList.add(successPattern);
+        }
         systemCommandOutputReference.set(new StringBuffer());
         runningSystemCommand = true;
 
@@ -487,7 +491,12 @@ public class Config {
 
         nativeCancel();
 
-        return rc;
+        StringBuffer stringBuffer = systemCommandOutputReference.get();
+        if ((successPattern != null) && (stringBuffer != null) && stringBuffer.toString().contains(successPattern)) {
+            return 0;
+        } else {
+            return rc;
+        }
     }
 
     private static boolean systemCommandOutputContainsPattern(final List<String> patternList) {
