@@ -298,6 +298,40 @@ public class FFmpegTest {
                     "frame=  813 fps=0.0 q=-0.0 Lsize=N/A time=00:00:33.01 bitrate=N/A speed= 234x    \n" +
                     "video:426kB audio:6190kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown";
 
+    private static final String MEDIA_INFORMATION_RECORDING =
+            "Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/mobile/Containers/Data/Application/845A06CD-8427-4D2D-A9A8-F7738063E220/Library/Caches/video.mov':\n" +
+                    "  Metadata:\n" +
+                    "    major_brand     : qt\n" +
+                    "    minor_version   : 0\n" +
+                    "    compatible_brands: qt\n" +
+                    "    creation_time   : 2019-04-18T09:53:38.000000Z\n" +
+                    "    com.apple.quicktime.location.ISO6709: +40.9761+029.0949+070.349/\n" +
+                    "    com.apple.quicktime.make: Apple\n" +
+                    "    com.apple.quicktime.model: iPhone 6\n" +
+                    "    com.apple.quicktime.software: 12.2\n" +
+                    "    com.apple.quicktime.creationdate: 2019-04-18T12:53:38+0300\n" +
+                    "  Duration: 00:00:02.30, start: 0.000000, bitrate: 16658 kb/s\n" +
+                    "    Stream #0:0(und): Video: h264 (avc1 / 0x31637661), yuv420p(tv, bt709), 1920x1080, 16535 kb/s, 29.98 fps, 29.97 tbr, 600 tbn, 1200 tbc (default)\n" +
+                    "    Metadata:\n" +
+                    "      rotate          : 90\n" +
+                    "      creation_time   : 2019-04-18T09:53:38.000000Z\n" +
+                    "      handler_name    : Core Media Video\n" +
+                    "      encoder         : H.264\n" +
+                    "    Side data:\n" +
+                    "      displaymatrix: rotation of -90.00 degrees\n" +
+                    "    Stream #0:1(und): Audio: aac (mp4a / 0x6134706D), 44100 Hz, mono, fltp, 96 kb/s (default)\n" +
+                    "    Metadata:\n" +
+                    "      creation_time   : 2019-04-18T09:53:38.000000Z\n" +
+                    "      handler_name    : Core Media Audio\n" +
+                    "    Stream #0:2(und): Data: none (mebx / 0x7862656D), 0 kb/s (default)\n" +
+                    "    Metadata:\n" +
+                    "      creation_time   : 2019-04-18T09:53:38.000000Z\n" +
+                    "      handler_name    : Core Media Metadata\n" +
+                    "    Stream #0:3(und): Data: none (mebx / 0x7862656D), 0 kb/s (default)\n" +
+                    "    Metadata:\n" +
+                    "      creation_time   : 2019-04-18T09:53:38.000000Z\n" +
+                    "      handler_name    : Core Media Metadata\n";
+
     @Test
     public void mediaInformationMp3() {
         MediaInformation mediaInformation = MediaInformationParser.from(MEDIA_INFORMATION_MP3);
@@ -409,6 +443,20 @@ public class FFmpegTest {
         Assert.assertEquals(2, mediaInformation.getStreams().size());
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "theora", "theora", "yuv420p", "yuv420p(bt470bg/bt470bg/bt709)", 720L, 400L, null, null, null, "25", "25", "25", "25");
         assertAudioStream(mediaInformation.getStreams().get(1), 1L, "vorbis", "vorbis", 48000L, "stereo", "fltp", 80L);
+    }
+
+    @Test
+    public void setMediaInformationRecording() {
+        MediaInformation mediaInformation = MediaInformationParser.from(MEDIA_INFORMATION_RECORDING);
+
+        Assert.assertNotNull(mediaInformation);
+        assertMediaInput(mediaInformation, "mov,mp4,m4a,3gp,3g2,mj2", "/var/mobile/Containers/Data/Application/845A06CD-8427-4D2D-A9A8-F7738063E220/Library/Caches/video.mov");
+        assertMediaDuration(mediaInformation, 2300L, 0L, 16658L);
+        Assert.assertNotNull(mediaInformation.getStreams());
+        Assert.assertEquals(4, mediaInformation.getStreams().size());
+
+        assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (avc1 / 0x31637661)", "yuv420p", "yuv420p(tv, bt709)", 1920L, 1080L, null, null, 16535L, "29.98", "29.97", "600", "1200");
+        assertAudioStream(mediaInformation.getStreams().get(1), 1L, "aac", "aac (mp4a / 0x6134706d)", 44100L, "mono", "fltp", 96L);
     }
 
     private void assertMediaInput(MediaInformation mediaInformation, String format, String path) {

@@ -32,6 +32,7 @@ static NSString *MEDIA_INFORMATION_H264_2;
 static NSString *MEDIA_INFORMATION_MP4;
 static NSString *MEDIA_INFORMATION_MP4_2;
 static NSString *MEDIA_INFORMATION_OGG;
+static NSString *MEDIA_INFORMATION_RECORDING;
 
 static void initTests() {
     MEDIA_INFORMATION_MP3 = [NSString stringWithFormat:
@@ -304,6 +305,40 @@ static void initTests() {
                                  "    Last message repeated 5 times\n"
                                  "frame=  813 fps=0.0 q=-0.0 Lsize=N/A time=00:00:33.01 bitrate=N/A speed= 234x    \n"
                                  "video:426kB audio:6190kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown"];
+    
+    MEDIA_INFORMATION_RECORDING = [NSString stringWithFormat:
+                                   @"Input #0, mov,mp4,m4a,3gp,3g2,mj2, from '/var/mobile/Containers/Data/Application/845A06CD-8427-4D2D-A9A8-F7738063E220/Library/Caches/video.mov':\n"
+                                   "Metadata:\n"
+                                   "    major_brand     : qt\n"
+                                   "    minor_version   : 0\n"
+                                   "    compatible_brands: qt\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    com.apple.quicktime.location.ISO6709: +40.9761+029.0949+070.349/\n"
+                                   "    com.apple.quicktime.make: Apple\n"
+                                   "    com.apple.quicktime.model: iPhone 6\n"
+                                   "    com.apple.quicktime.software: 12.2\n"
+                                   "    com.apple.quicktime.creationdate: 2019-04-18T12:53:38+0300\n"
+                                   "Duration: 00:00:02.30, start: 0.000000, bitrate: 16658 kb/s\n"
+                                   "Stream #0:0(und): Video: h264 (avc1 / 0x31637661), yuv420p(tv, bt709), 1920x1080, 16535 kb/s, 29.98 fps, 29.97 tbr, 600 tbn, 1200 tbc (default)\n"
+                                   "Metadata:\n"
+                                   "    rotate          : 90\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    handler_name    : Core Media Video\n"
+                                   "    encoder         : H.264\n"
+                                   "Side data:\n"
+                                   "    displaymatrix: rotation of -90.00 degrees\n"
+                                   "Stream #0:1(und): Audio: aac (mp4a / 0x6134706D), 44100 Hz, mono, fltp, 96 kb/s (default)\n"
+                                   "Metadata:\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    handler_name    : Core Media Audio\n"
+                                   "    Stream #0:2(und): Data: none (mebx / 0x7862656D), 0 kb/s (default)\n"
+                                   "Metadata:\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    handler_name    : Core Media Metadata\n"
+                                   "Stream #0:3(und): Data: none (mebx / 0x7862656D), 0 kb/s (default)\n"
+                                   "Metadata:\n"
+                                   "    creation_time   : 2019-04-18T09:53:38.000000Z\n"
+                                   "    handler_name    : Core Media Metadata\n"];
 }
 
 void assertNumber(NSNumber *expected, NSNumber *real) {
@@ -795,6 +830,21 @@ void testMediaInformationOgg() {
     assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"vorbis", @"vorbis", [[NSNumber alloc] initWithInt:48000], @"stereo", @"fltp", [[NSNumber alloc] initWithInt:80]);
 }
 
+void testMediaInformationRecording() {
+    MediaInformation *mediaInformation = [MediaInformationParser from:MEDIA_INFORMATION_RECORDING];
+    
+    assertNotNull(mediaInformation);
+    assertMediaInput(mediaInformation, @"mov,mp4,m4a,3gp,3g2,mj2", @"/var/mobile/Containers/Data/Application/845A06CD-8427-4D2D-A9A8-F7738063E220/Library/Caches/video.mov");
+    assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt:2300], [[NSNumber alloc] initWithInt:0], [[NSNumber alloc] initWithInt:16658]);
+    
+    NSArray *streams = [mediaInformation getStreams];
+    assertNotNull(streams);
+    assert(4 == [streams count]);
+    
+    assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (avc1 / 0x31637661)", @"yuv420p", @"yuv420p(tv, bt709)", [[NSNumber alloc] initWithInt:1920], [[NSNumber alloc] initWithInt:1080], nil, nil, [[NSNumber alloc] initWithInt:16535], @"29.98", @"29.97", @"600", @"1200");
+    assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"aac", @"aac (mp4a / 0x6134706d)", [[NSNumber alloc] initWithInt:44100], @"mono", @"fltp", [[NSNumber alloc] initWithInt:96]);
+}
+
 /**
  * All parsing tests are initiated from this method
  */
@@ -835,6 +885,7 @@ void runMediaInformationParserTests() {
     testMediaInformationMp4();
     testMediaInformationMp42();
     testMediaInformationOgg();
+    testMediaInformationRecording();
     
     
     NSLog(@"MediaInformationParserTests passed.");
