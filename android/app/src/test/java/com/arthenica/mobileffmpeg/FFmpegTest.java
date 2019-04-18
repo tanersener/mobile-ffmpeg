@@ -456,6 +456,8 @@ public class FFmpegTest {
         assertStreamMetadata(mediaInformation.getStreams().get(1), "handler_name", "GPAC ISO Audio Handler");
         assertStreamMetadata(mediaInformation.getStreams().get(2), "creation_time", "2013-12-16T17:21:58.000000Z");
         assertStreamMetadata(mediaInformation.getStreams().get(2), "handler_name", "GPAC ISO Audio Handler");
+
+        assertStreamSidedata(mediaInformation.getStreams().get(2), "audio service type", "main");
     }
 
     @Test
@@ -488,6 +490,8 @@ public class FFmpegTest {
         assertStreamMetadata(mediaInformation.getStreams().get(1), "handler_name", "GPAC ISO Audio Handler");
         assertStreamMetadata(mediaInformation.getStreams().get(2), "creation_time", "2013-12-16T17:50:04.000000Z");
         assertStreamMetadata(mediaInformation.getStreams().get(2), "handler_name", "GPAC ISO Audio Handler");
+
+        assertStreamSidedata(mediaInformation.getStreams().get(2), "audio service type", "main");
     }
 
     @Test
@@ -541,6 +545,8 @@ public class FFmpegTest {
         assertStreamMetadata(mediaInformation.getStreams().get(2), "handler_name", "Core Media Metadata");
         assertStreamMetadata(mediaInformation.getStreams().get(3), "creation_time", "2019-04-18T09:53:38.000000Z");
         assertStreamMetadata(mediaInformation.getStreams().get(3), "handler_name", "Core Media Metadata");
+
+        assertStreamSidedata(mediaInformation.getStreams().get(0), "displaymatrix", "rotation of -90.00 degrees");
     }
 
     private void assertMediaInput(MediaInformation mediaInformation, String format, String path) {
@@ -568,7 +574,7 @@ public class FFmpegTest {
             }
         }
 
-        Assert.fail(expectedKey + "not found");
+        Assert.fail(expectedKey + " not found");
     }
 
     private void assertStreamMetadata(StreamInformation streamInformation, String expectedKey, String expectedValue) {
@@ -585,7 +591,24 @@ public class FFmpegTest {
             }
         }
 
-        Assert.fail(expectedKey + "not found");
+        Assert.fail(expectedKey + " not found");
+    }
+
+    private void assertStreamSidedata(StreamInformation streamInformation, String expectedKey, String expectedValue) {
+        Set<Map.Entry<String, String>> sidedataEntries = streamInformation.getSidedataEntries();
+        Assert.assertNotNull(sidedataEntries);
+
+        for (Map.Entry<String, String> metadataEntry : sidedataEntries) {
+            String key = metadataEntry.getKey();
+            String value = metadataEntry.getValue();
+
+            if (key.equals(expectedKey)) {
+                Assert.assertEquals(expectedValue, value);
+                return;
+            }
+        }
+
+        Assert.fail(expectedKey + " not found");
     }
 
     private void assertStream(StreamInformation streamInformation, Long index, String type, String codec, String fullCodec, Long bitrate) {

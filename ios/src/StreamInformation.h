@@ -287,10 +287,41 @@
 - (void)addMetadata:(NSString*)key :(NSString*)value;
 
 /**
+ * Retrieves metadata value associated with this key.
+ *
+ * @param key metadata key
+ * @return metadata value associated with this key
+ */
+- (NSString*)getMetadata:(NSString*)key;
+
+/**
  * Returns all metadata entries.
  *
  * @return metadata dictionary
  */
 - (NSDictionary*)getMetadataEntries;
+
+/**
+ * Adds side data.
+ *
+ * @param key side data key
+ * @param value side data value
+ */
+- (void)addSidedata:(NSString*)key :(NSString*)value;
+
+/**
+ * Retrieves side data value associated with this key.
+ *
+ * @param key side data key
+ * @return side data value associated with this key
+ */
+- (NSString*)getSidedata:(NSString*)key;
+
+/**
+ * Returns all side data entries.
+ *
+ * @return set of site data entries
+ */
+- (NSDictionary*)getSidedataEntries;
 
 @end

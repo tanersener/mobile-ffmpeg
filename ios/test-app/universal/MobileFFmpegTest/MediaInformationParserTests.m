@@ -732,6 +732,16 @@ void assertStreamMetadata(StreamInformation *streamInformation, NSString *expect
     assert([value isEqualToString:expectedValue]);
 }
 
+void assertStreamSidedata(StreamInformation *streamInformation, NSString *expectedKey, NSString *expectedValue) {
+    NSDictionary *sidedata = [streamInformation getSidedataEntries];
+    assertNotNull(sidedata);
+    
+    NSString *value = [sidedata valueForKey:expectedKey];
+    assertNotNull(value);
+    
+    assert([value isEqualToString:expectedValue]);
+}
+
 void testMediaInformationMp3() {
     MediaInformation *mediaInformation = [MediaInformationParser from:MEDIA_INFORMATION_MP3];
     
@@ -864,6 +874,8 @@ void testMediaInformationMp4() {
     assertStreamMetadata([streams objectAtIndex:1], @"handler_name", @"GPAC ISO Audio Handler");
     assertStreamMetadata([streams objectAtIndex:2], @"creation_time", @"2013-12-16T17:21:58.000000Z");
     assertStreamMetadata([streams objectAtIndex:2], @"handler_name", @"GPAC ISO Audio Handler");
+    
+    assertStreamSidedata([streams objectAtIndex:2], @"audio service type", @"main");
 }
 
 void testMediaInformationMp42() {
@@ -897,6 +909,8 @@ void testMediaInformationMp42() {
     assertStreamMetadata([streams objectAtIndex:1], @"handler_name", @"GPAC ISO Audio Handler");
     assertStreamMetadata([streams objectAtIndex:2], @"creation_time", @"2013-12-16T17:50:04.000000Z");
     assertStreamMetadata([streams objectAtIndex:2], @"handler_name", @"GPAC ISO Audio Handler");
+    
+    assertStreamSidedata([streams objectAtIndex:2], @"audio service type", @"main");
 }
 
 void testMediaInformationOgg() {
@@ -953,6 +967,8 @@ void testMediaInformationRecording() {
     assertStreamMetadata([streams objectAtIndex:2], @"handler_name", @"Core Media Metadata");
     assertStreamMetadata([streams objectAtIndex:3], @"creation_time", @"2019-04-18T09:53:38.000000Z");
     assertStreamMetadata([streams objectAtIndex:3], @"handler_name", @"Core Media Metadata");
+    
+    assertStreamSidedata([streams objectAtIndex:0], @"displaymatrix", @"rotation of -90.00 degrees");
 }
 
 /**

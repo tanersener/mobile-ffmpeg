@@ -42,6 +42,7 @@ static NSRegularExpression *bracketsRegex;
     if (rawCommandOutput != nil) {
         NSArray* split = [rawCommandOutput componentsSeparatedByString:@"\n"];
         Boolean metadata = false;
+        Boolean sidedata = false;
         StreamInformation *lastCreatedStream = nil;
         NSMutableString *rawInformation = [[NSMutableString alloc] init];
 
@@ -50,6 +51,7 @@ static NSRegularExpression *bracketsRegex;
 
             if ([outputLine hasPrefix:@"["]) {
                 metadata = false;
+                sidedata = false;
                 continue;
             }
 
@@ -57,6 +59,7 @@ static NSRegularExpression *bracketsRegex;
             
             if ([trimmedLine hasPrefix:@"Input"]) {
                 metadata = false;
+                sidedata = false;
                 lastCreatedStream = nil;
 
                 void(^blockPair)(NSString **, NSString **) = [MediaInformationParser parseInputBlock:trimmedLine];
@@ -69,6 +72,7 @@ static NSRegularExpression *bracketsRegex;
                 [mediaInformation setPath:path];
             } else if ([trimmedLine hasPrefix:@"Duration"]) {
                 metadata = false;
+                sidedata = false;
                 lastCreatedStream = nil;
 
                 void(^blockTrio)(NSNumber **, NSNumber **, NSNumber **) = [MediaInformationParser parseDurationBlock:trimmedLine];
@@ -83,11 +87,16 @@ static NSRegularExpression *bracketsRegex;
                 [mediaInformation setStartTime:startTime];
                 [mediaInformation setBitrate:bitrate];
             } else if ([trimmedLine hasPrefix:@"Metadata"]) {
+                sidedata = false;
                 metadata = true;
+            } else if ([trimmedLine hasPrefix:@"Side data"]) {
+                metadata = false;
+                sidedata = true;
             } else if ([trimmedLine hasPrefix:@"Stream mapping"] || [trimmedLine hasPrefix:@"Press [q] to stop"] || [trimmedLine hasPrefix:@"Output"]) {
                 break;
             } else if ([trimmedLine hasPrefix:@"Stream"]) {
                 metadata = false;
+                sidedata = false;
                 lastCreatedStream = [MediaInformationParser parseStreamBlock:trimmedLine];
                 [mediaInformation addStream:lastCreatedStream];
             } else if (metadata) {
@@ -102,6 +111,18 @@ static NSRegularExpression *bracketsRegex;
                         [lastCreatedStream addMetadata:key:value];
                     } else {
                         [mediaInformation addMetadata:key:value];
+                    }
+                }
+            } else if (sidedata) {
+                void(^blockPair)(NSString **, NSString **) = [MediaInformationParser parseMetadataBlock:trimmedLine];
+
+                NSString *key;
+                NSString *value;
+                blockPair(&key, &value);
+
+                if (key != nil && value != nil) {
+                    if (lastCreatedStream != nil) {
+                        [lastCreatedStream addSidedata:key:value];
                     }
                 }
             }

@@ -84,8 +84,14 @@ public class StreamInformation {
      */
     private final Map<String, String> metadata;
 
+    /**
+     * Side data map
+     */
+    private final Map<String, String> sidedata;
+
     public StreamInformation() {
         this.metadata = new HashMap<>();
+        this.sidedata = new HashMap<>();
     }
 
     /**
@@ -423,12 +429,51 @@ public class StreamInformation {
     }
 
     /**
+     * Retrieves metadata value associated with this key.
+     *
+     * @param key metadata key
+     * @return metadata value associated with this key
+     */
+    public String getMetadata(String key) {
+        return this.metadata.get(key);
+    }
+
+    /**
      * Returns all metadata entries.
      *
      * @return set of metadata entries
      */
     public Set<Map.Entry<String, String>> getMetadataEntries() {
         return this.metadata.entrySet();
+    }
+
+    /**
+     * Adds side data.
+     *
+     * @param key side data key
+     * @param value side data value
+     */
+    public void addSidedata(String key, String value) {
+        this.sidedata.put(key, value);
+    }
+
+    /**
+     * Retrieves side data value associated with this key.
+     *
+     * @param key side data key
+     * @return side data value associated with this key
+     */
+    public String getSidedata(String key) {
+        return this.sidedata.get(key);
+    }
+
+    /**
+     * Returns all side data entries.
+     *
+     * @return set of site data entries
+     */
+    public Set<Map.Entry<String, String>> getSidedataEntries() {
+        return this.sidedata.entrySet();
     }
 
 }

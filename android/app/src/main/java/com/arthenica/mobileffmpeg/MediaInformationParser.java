@@ -67,12 +67,14 @@ public class MediaInformationParser {
         if (rawCommandOutput != null) {
             final String[] split = rawCommandOutput.split("\n");
             boolean metadata = false;
+            boolean sidedata = false;
             StreamInformation lastCreatedStream = null;
             final StringBuilder rawInformation = new StringBuilder();
 
             for (final String outputLine : split) {
                 if (outputLine.startsWith("[")) {
                     metadata = false;
+                    sidedata = false;
                     continue;
                 }
 
@@ -80,23 +82,30 @@ public class MediaInformationParser {
 
                 if (trimmedLine.startsWith("Input")) {
                     metadata = false;
+                    sidedata = false;
                     lastCreatedStream = null;
                     Pair<String, String> pair = parseInputBlock(trimmedLine);
                     mediaInformation.setFormat(pair.getFirst());
                     mediaInformation.setPath(pair.getSecond());
                 } else if (trimmedLine.startsWith("Duration")) {
                     metadata = false;
+                    sidedata = false;
                     lastCreatedStream = null;
                     Trio<Long, Long, Long> trio = parseDurationBlock(trimmedLine);
                     mediaInformation.setDuration(trio.getFirst());
                     mediaInformation.setStartTime(trio.getSecond());
                     mediaInformation.setBitrate(trio.getThird());
-                } else if (trimmedLine.startsWith("Metadata")) {
+                } else if (trimmedLine.toLowerCase().startsWith("metadata")) {
+                    sidedata = false;
                     metadata = true;
+                } else if (trimmedLine.toLowerCase().startsWith("side data")) {
+                    metadata = false;
+                    sidedata = true;
                 } else if (trimmedLine.startsWith("Stream mapping") || trimmedLine.startsWith("Press [q] to stop") || trimmedLine.startsWith("Output")) {
                     break;
                 } else if (trimmedLine.startsWith("Stream")) {
                     metadata = false;
+                    sidedata = false;
                     lastCreatedStream = MediaInformationParser.parseStreamBlock(trimmedLine);
                     mediaInformation.addStream(lastCreatedStream);
                 } else if (metadata) {
@@ -107,6 +116,14 @@ public class MediaInformationParser {
                             lastCreatedStream.addMetadata(pair.getFirst(), pair.getSecond());
                         } else {
                             mediaInformation.addMetadata(pair.getFirst(), pair.getSecond());
+                        }
+                    }
+                } else if (sidedata) {
+                    Pair<String, String> pair = parseMetadataBlock(trimmedLine);
+
+                    if (pair.getFirst() != null && pair.getSecond() != null) {
+                        if (lastCreatedStream != null) {
+                            lastCreatedStream.addSidedata(pair.getFirst(), pair.getSecond());
                         }
                     }
                 }
