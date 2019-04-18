@@ -98,7 +98,7 @@
         realFrameRate = nil;
         timeBase = nil;
         codecTimeBase = nil;
-        metadata = nil;
+        metadata = [[NSMutableDictionary alloc] init];
     }
     
     return self;
