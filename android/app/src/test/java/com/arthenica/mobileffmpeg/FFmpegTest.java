@@ -528,8 +528,8 @@ public class FFmpegTest {
         Assert.assertEquals(4, mediaInformation.getStreams().size());
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (avc1 / 0x31637661)", "yuv420p", "yuv420p(tv, bt709)", 1920L, 1080L, null, null, 16535L, "29.98", "29.97", "600", "1200");
         assertAudioStream(mediaInformation.getStreams().get(1), 1L, "aac", "aac (mp4a / 0x6134706d)", 44100L, "mono", "fltp", 96L);
-        assertStream(mediaInformation.getStreams().get(2), 2L, "data", "none", "none (mebx / 0x7862656d)", 44100L);
-        assertStream(mediaInformation.getStreams().get(3), 3L, "data", "none", "none (mebx / 0x7862656d)", 44100L);
+        assertStream(mediaInformation.getStreams().get(2), 2L, "data", "none", "none (mebx / 0x7862656d)", 0L);
+        assertStream(mediaInformation.getStreams().get(3), 3L, "data", "none", "none (mebx / 0x7862656d)", 0L);
 
         assertStreamMetadata(mediaInformation.getStreams().get(0), "rotate", "90");
         assertStreamMetadata(mediaInformation.getStreams().get(0), "creation_time", "2019-04-18T09:53:38.000000Z");

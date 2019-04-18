@@ -219,8 +219,7 @@ public class MediaInformationParser {
                             streamInformation.setCodecTimeBase(part.replaceAll("tbc", "").trim());
                         }
                     }
-                }
-                if ("audio".equals(type)) {
+                } else if ("audio".equals(type)) {
                     if (part2 != null) {
                         streamInformation.setSampleRate(parseAudioStreamSampleRate(part2));
                     }
@@ -232,6 +231,10 @@ public class MediaInformationParser {
                     }
                     if (part5 != null) {
                         streamInformation.setBitrate(toLongObject(part5.toLowerCase(Locale.getDefault()).replaceAll("\\(.*\\)", "").replaceAll("kb/s", "").trim()));
+                    }
+                } else if ("data".equals(type)) {
+                    if (part2 != null) {
+                        streamInformation.setBitrate(toLongObject(part2.toLowerCase(Locale.getDefault()).replaceAll("\\(.*\\)", "").replaceAll("kb/s", "").trim()));
                     }
                 }
             }
@@ -316,6 +319,8 @@ public class MediaInformationParser {
                 return "audio";
             } else if (input.toLowerCase(Locale.getDefault()).contains("video:")) {
                 return "video";
+            } else if (input.toLowerCase(Locale.getDefault()).contains("data:")) {
+                return "data";
             }
         }
 
@@ -328,6 +333,7 @@ public class MediaInformationParser {
                     .replaceAll("\\(.*\\)", "")
                     .replaceAll("video:", "")
                     .replaceAll("audio:", "")
+                    .replaceAll("data:", "")
                     .trim();
         }
 
@@ -339,6 +345,7 @@ public class MediaInformationParser {
             return input.toLowerCase(Locale.getDefault())
                     .replaceAll("video:", "")
                     .replaceAll("audio:", "")
+                    .replaceAll("data:", "")
                     .trim();
         }
 
