@@ -22,6 +22,9 @@ package com.arthenica.mobileffmpeg;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
  * <p>Tests for {@link FFmpeg} class.
  */
@@ -339,6 +342,17 @@ public class FFmpegTest {
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "mp3", "beethoven_-_symphony_no_9.mp3");
         assertMediaDuration(mediaInformation, 213240L, 0L, 320L);
+
+        assertMetadata(mediaInformation, "comment", "");
+        assertMetadata(mediaInformation, "album", "Symphony No.9");
+        assertMetadata(mediaInformation, "compilation", "0");
+        assertMetadata(mediaInformation, "date", "-1");
+        assertMetadata(mediaInformation, "title", "Symphony No.9");
+        assertMetadata(mediaInformation, "artist", "Beethoven");
+        assertMetadata(mediaInformation, "album_artist", "Beethoven");
+        assertMetadata(mediaInformation, "track", "-1");
+        assertMetadata(mediaInformation, "lyrics-XXX", "");
+
         Assert.assertNotNull(mediaInformation.getStreams());
         Assert.assertEquals(1, mediaInformation.getStreams().size());
         assertAudioStream(mediaInformation.getStreams().get(0), 0L, "mp3", "mp3", 48000L, "stereo", "fltp", 320L);
@@ -375,6 +389,12 @@ public class FFmpegTest {
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "mov,mp4,m4a,3gp,3g2,mj2", "transition_rotate.mp4");
         assertMediaDuration(mediaInformation, 15000L, 0L, 7764L);
+
+        assertMetadata(mediaInformation, "major_brand", "isom");
+        assertMetadata(mediaInformation, "minor_version", "512");
+        assertMetadata(mediaInformation, "compatible_brands", "isomiso2avc1mp41");
+        assertMetadata(mediaInformation, "encoder", "Lavf58.12.100");
+
         Assert.assertNotNull(mediaInformation.getStreams());
         Assert.assertEquals(1, mediaInformation.getStreams().size());
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (main) (avc1 / 0x31637661)", "yuv420p", "yuv420p", 1280L, 720L, "1:1", "16:9", 7762L, "25", "30", "15360", "60");
@@ -411,6 +431,17 @@ public class FFmpegTest {
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "mov,mp4,m4a,3gp,3g2,mj2", "http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_30fps_stereo_abl.mp4");
         assertMediaDuration(mediaInformation, 634530L, 0L, 10385L);
+
+        assertMetadata(mediaInformation, "major_brand", "isom");
+        assertMetadata(mediaInformation, "minor_version", "1");
+        assertMetadata(mediaInformation, "compatible_brands", "isomavc1");
+        assertMetadata(mediaInformation, "creation_time", "2013-12-16T17:21:55.000000Z");
+        assertMetadata(mediaInformation, "title", "Big Buck Bunny, Sunflower version");
+        assertMetadata(mediaInformation, "artist", "Blender Foundation 2008, Janus Bager Kristensen 2013");
+        assertMetadata(mediaInformation, "comment", "Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net");
+        assertMetadata(mediaInformation, "genre", "Animation");
+        assertMetadata(mediaInformation, "composer", "Sacha Goedegebure");
+
         Assert.assertNotNull(mediaInformation.getStreams());
         Assert.assertEquals(3, mediaInformation.getStreams().size());
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (high) (avc1 / 0x31637661)", "yuv420p", "yuv420p", 3840L, 4320L, "1:1", "8:9", 9902L, "30", "30", "30k", "60");
@@ -425,6 +456,17 @@ public class FFmpegTest {
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "mov,mp4,m4a,3gp,3g2,mj2", "http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_stereo_arcd.mp4");
         assertMediaDuration(mediaInformation, 634530L, 0L, 4474L);
+
+        assertMetadata(mediaInformation, "major_brand", "isom");
+        assertMetadata(mediaInformation, "minor_version", "1");
+        assertMetadata(mediaInformation, "compatible_brands", "isomavc1");
+        assertMetadata(mediaInformation, "creation_time", "2013-12-16T17:49:59.000000Z");
+        assertMetadata(mediaInformation, "title", "Big Buck Bunny, Sunflower version");
+        assertMetadata(mediaInformation, "artist", "Blender Foundation 2008, Janus Bager Kristensen 2013");
+        assertMetadata(mediaInformation, "comment", "Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net");
+        assertMetadata(mediaInformation, "genre", "Animation");
+        assertMetadata(mediaInformation, "composer", "Sacha Goedegebure");
+
         Assert.assertNotNull(mediaInformation.getStreams());
         Assert.assertEquals(3, mediaInformation.getStreams().size());
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (high) (avc1 / 0x31637661)", "yuv420p", "yuv420p", 1920L, 1080L, "1:1", "16:9", 3992L, "30", "30", "30k", "60");
@@ -452,9 +494,19 @@ public class FFmpegTest {
         Assert.assertNotNull(mediaInformation);
         assertMediaInput(mediaInformation, "mov,mp4,m4a,3gp,3g2,mj2", "/var/mobile/Containers/Data/Application/845A06CD-8427-4D2D-A9A8-F7738063E220/Library/Caches/video.mov");
         assertMediaDuration(mediaInformation, 2300L, 0L, 16658L);
+
+        assertMetadata(mediaInformation, "major_brand", "qt");
+        assertMetadata(mediaInformation, "minor_version", "0");
+        assertMetadata(mediaInformation, "compatible_brands", "qt");
+        assertMetadata(mediaInformation, "creation_time", "2019-04-18T09:53:38.000000Z");
+        assertMetadata(mediaInformation, "com.apple.quicktime.location.ISO6709", "+40.9761+029.0949+070.349/");
+        assertMetadata(mediaInformation, "com.apple.quicktime.make", "Apple");
+        assertMetadata(mediaInformation, "com.apple.quicktime.model", "iPhone 6");
+        assertMetadata(mediaInformation, "com.apple.quicktime.software", "12.2");
+        assertMetadata(mediaInformation, "com.apple.quicktime.creationdate", "2019-04-18T12:53:38+0300");
+
         Assert.assertNotNull(mediaInformation.getStreams());
         Assert.assertEquals(4, mediaInformation.getStreams().size());
-
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (avc1 / 0x31637661)", "yuv420p", "yuv420p(tv, bt709)", 1920L, 1080L, null, null, 16535L, "29.98", "29.97", "600", "1200");
         assertAudioStream(mediaInformation.getStreams().get(1), 1L, "aac", "aac (mp4a / 0x6134706d)", 44100L, "mono", "fltp", 96L);
     }
@@ -469,6 +521,25 @@ public class FFmpegTest {
         Assert.assertEquals(startTime, mediaInformation.getStartTime());
         Assert.assertEquals(bitrate, mediaInformation.getBitrate());
     }
+
+
+    private void assertMetadata(MediaInformation mediaInformation, String expectedKey, String expectedValue) {
+        Set<Map.Entry<String, String>> metadataEntries = mediaInformation.getMetadataEntries();
+        Assert.assertNotNull(metadataEntries);
+
+        for (Map.Entry<String, String> metadataEntry : metadataEntries) {
+            String key = metadataEntry.getKey();
+            String value = metadataEntry.getValue();
+
+            if (key.equals(expectedKey)) {
+                Assert.assertEquals(expectedValue, value);
+                return;
+            }
+        }
+
+        Assert.fail(expectedKey + "not found");
+    }
+
 
     private void assertAudioStream(StreamInformation streamInformation, Long index, String codec, String fullCodec, Long sampleRate, String channelLayout, String sampleFormat, Long bitrate) {
         Assert.assertEquals(index, streamInformation.getIndex());

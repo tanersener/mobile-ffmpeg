@@ -699,12 +699,32 @@ void assertMediaDuration(MediaInformation *mediaInformation, NSNumber *expectedD
     }
 }
 
+void assertMetadata(MediaInformation *mediaInformation, NSString *expectedKey, NSString *expectedValue) {
+    NSDictionary *metadata = [mediaInformation getMetadataEntries];
+    assertNotNull(metadata);
+    
+    NSString *value = [metadata valueForKey:expectedKey];
+    assertNotNull(value);
+    
+    assert([value isEqualToString:expectedValue]);
+}
+
 void testMediaInformationMp3() {
     MediaInformation *mediaInformation = [MediaInformationParser from:MEDIA_INFORMATION_MP3];
     
     assertNotNull(mediaInformation);
     assertMediaInput(mediaInformation, @"mp3", @"beethoven_-_symphony_no_9.mp3");
     assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt: 213240], [[NSNumber alloc] initWithInt: 0], [[NSNumber alloc] initWithInt: 320]);
+    
+    assertMetadata(mediaInformation, @"comment", @"");
+    assertMetadata(mediaInformation, @"album", @"Symphony No.9");
+    assertMetadata(mediaInformation, @"compilation", @"0");
+    assertMetadata(mediaInformation, @"date", @"-1");
+    assertMetadata(mediaInformation, @"title", @"Symphony No.9");
+    assertMetadata(mediaInformation, @"artist", @"Beethoven");
+    assertMetadata(mediaInformation, @"album_artist", @"Beethoven");
+    assertMetadata(mediaInformation, @"track", @"-1");
+    assertMetadata(mediaInformation, @"lyrics-XXX", @"");
     
     NSArray *streams = [mediaInformation getStreams];
     assertNotNull(streams);
@@ -748,6 +768,11 @@ void testMediaInformationH264() {
     assertMediaInput(mediaInformation, @"mov,mp4,m4a,3gp,3g2,mj2", @"transition_rotate.mp4");
     assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt:15000], [[NSNumber alloc] initWithInt:0], [[NSNumber alloc] initWithInt:7764]);
 
+    assertMetadata(mediaInformation, @"major_brand", @"isom");
+    assertMetadata(mediaInformation, @"minor_version", @"512");
+    assertMetadata(mediaInformation, @"compatible_brands", @"isomiso2avc1mp41");
+    assertMetadata(mediaInformation, @"encoder", @"Lavf58.12.100");
+
     NSArray *streams = [mediaInformation getStreams];
     assertNotNull(streams);
     assert(1 == [streams count]);
@@ -790,6 +815,16 @@ void testMediaInformationMp4() {
     assertMediaInput(mediaInformation, @"mov,mp4,m4a,3gp,3g2,mj2", @"http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_30fps_stereo_abl.mp4");
     assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt:634530], [[NSNumber alloc] initWithInt:0], [[NSNumber alloc] initWithInt:10385]);
 
+    assertMetadata(mediaInformation, @"major_brand", @"isom");
+    assertMetadata(mediaInformation, @"minor_version", @"1");
+    assertMetadata(mediaInformation, @"compatible_brands", @"isomavc1");
+    assertMetadata(mediaInformation, @"creation_time", @"2013-12-16T17:21:55.000000Z");
+    assertMetadata(mediaInformation, @"title", @"Big Buck Bunny, Sunflower version");
+    assertMetadata(mediaInformation, @"artist", @"Blender Foundation 2008, Janus Bager Kristensen 2013");
+    assertMetadata(mediaInformation, @"comment", @"Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net");
+    assertMetadata(mediaInformation, @"genre", @"Animation");
+    assertMetadata(mediaInformation, @"composer", @"Sacha Goedegebure");
+
     NSArray *streams = [mediaInformation getStreams];
     assertNotNull(streams);
     assert(3 == [streams count]);
@@ -805,6 +840,16 @@ void testMediaInformationMp42() {
     assertNotNull(mediaInformation);
     assertMediaInput(mediaInformation, @"mov,mp4,m4a,3gp,3g2,mj2", @"http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_30fps_stereo_arcd.mp4");
     assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt:634530], [[NSNumber alloc] initWithInt:0], [[NSNumber alloc] initWithInt:4474]);
+
+    assertMetadata(mediaInformation, @"major_brand", @"isom");
+    assertMetadata(mediaInformation, @"minor_version", @"1");
+    assertMetadata(mediaInformation, @"compatible_brands", @"isomavc1");
+    assertMetadata(mediaInformation, @"creation_time", @"2013-12-16T17:49:59.000000Z");
+    assertMetadata(mediaInformation, @"title", @"Big Buck Bunny, Sunflower version");
+    assertMetadata(mediaInformation, @"artist", @"Blender Foundation 2008, Janus Bager Kristensen 2013");
+    assertMetadata(mediaInformation, @"comment", @"Creative Commons Attribution 3.0 - http://bbb3d.renderfarming.net");
+    assertMetadata(mediaInformation, @"genre", @"Animation");
+    assertMetadata(mediaInformation, @"composer", @"Sacha Goedegebure");
 
     NSArray *streams = [mediaInformation getStreams];
     assertNotNull(streams);
@@ -836,7 +881,17 @@ void testMediaInformationRecording() {
     assertNotNull(mediaInformation);
     assertMediaInput(mediaInformation, @"mov,mp4,m4a,3gp,3g2,mj2", @"/var/mobile/Containers/Data/Application/845A06CD-8427-4D2D-A9A8-F7738063E220/Library/Caches/video.mov");
     assertMediaDuration(mediaInformation, [[NSNumber alloc] initWithInt:2300], [[NSNumber alloc] initWithInt:0], [[NSNumber alloc] initWithInt:16658]);
-    
+
+    assertMetadata(mediaInformation, @"major_brand", @"qt");
+    assertMetadata(mediaInformation, @"minor_version", @"0");
+    assertMetadata(mediaInformation, @"compatible_brands", @"qt");
+    assertMetadata(mediaInformation, @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.location.ISO6709", @"+40.9761+029.0949+070.349/");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.make", @"Apple");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.model", @"iPhone 6");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.software", @"12.2");
+    assertMetadata(mediaInformation, @"com.apple.quicktime.creationdate", @"2019-04-18T12:53:38+0300");
+
     NSArray *streams = [mediaInformation getStreams];
     assertNotNull(streams);
     assert(4 == [streams count]);
