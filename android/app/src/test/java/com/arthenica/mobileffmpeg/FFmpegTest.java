@@ -398,6 +398,8 @@ public class FFmpegTest {
         Assert.assertNotNull(mediaInformation.getStreams());
         Assert.assertEquals(1, mediaInformation.getStreams().size());
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (main) (avc1 / 0x31637661)", "yuv420p", "yuv420p", 1280L, 720L, "1:1", "16:9", 7762L, "25", "30", "15360", "60");
+
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "handler_name", "VideoHandler");
     }
 
     @Test
@@ -447,6 +449,13 @@ public class FFmpegTest {
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (high) (avc1 / 0x31637661)", "yuv420p", "yuv420p", 3840L, 4320L, "1:1", "8:9", 9902L, "30", "30", "30k", "60");
         assertAudioStream(mediaInformation.getStreams().get(1), 1L, "mp3", "mp3 (mp4a / 0x6134706d)", 48000L, "stereo", "fltp", 160L);
         assertAudioStream(mediaInformation.getStreams().get(2), 2L, "ac3", "ac3 (ac-3 / 0x332d6361)", 48000L, "5.1(side)", "fltp", 320L);
+
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "creation_time", "2013-12-16T17:21:55.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "handler_name", "GPAC ISO Video Handler");
+        assertStreamMetadata(mediaInformation.getStreams().get(1), "creation_time", "2013-12-16T17:21:58.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(1), "handler_name", "GPAC ISO Audio Handler");
+        assertStreamMetadata(mediaInformation.getStreams().get(2), "creation_time", "2013-12-16T17:21:58.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(2), "handler_name", "GPAC ISO Audio Handler");
     }
 
     @Test
@@ -472,6 +481,13 @@ public class FFmpegTest {
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (high) (avc1 / 0x31637661)", "yuv420p", "yuv420p", 1920L, 1080L, "1:1", "16:9", 3992L, "30", "30", "30k", "60");
         assertAudioStream(mediaInformation.getStreams().get(1), 1L, "mp3", "mp3 (mp4a / 0x6134706d)", 48000L, "stereo", "fltp", 160L);
         assertAudioStream(mediaInformation.getStreams().get(2), 2L, "ac3", "ac3 (ac-3 / 0x332d6361)", 48000L, "5.1(side)", "fltp", 320L);
+
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "creation_time", "2013-12-16T17:49:59.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "handler_name", "GPAC ISO Video Handler");
+        assertStreamMetadata(mediaInformation.getStreams().get(1), "creation_time", "2013-12-16T17:50:04.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(1), "handler_name", "GPAC ISO Audio Handler");
+        assertStreamMetadata(mediaInformation.getStreams().get(2), "creation_time", "2013-12-16T17:50:04.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(2), "handler_name", "GPAC ISO Audio Handler");
     }
 
     @Test
@@ -485,6 +501,9 @@ public class FFmpegTest {
         Assert.assertEquals(2, mediaInformation.getStreams().size());
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "theora", "theora", "yuv420p", "yuv420p(bt470bg/bt470bg/bt709)", 720L, 400L, null, null, null, "25", "25", "25", "25");
         assertAudioStream(mediaInformation.getStreams().get(1), 1L, "vorbis", "vorbis", 48000L, "stereo", "fltp", 80L);
+
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "ENCODER", "ffmpeg2theora 0.19");
+        assertStreamMetadata(mediaInformation.getStreams().get(1), "ENCODER", "ffmpeg2theora 0.19");
     }
 
     @Test
@@ -509,6 +528,19 @@ public class FFmpegTest {
         Assert.assertEquals(4, mediaInformation.getStreams().size());
         assertVideoStream(mediaInformation.getStreams().get(0), 0L, "h264", "h264 (avc1 / 0x31637661)", "yuv420p", "yuv420p(tv, bt709)", 1920L, 1080L, null, null, 16535L, "29.98", "29.97", "600", "1200");
         assertAudioStream(mediaInformation.getStreams().get(1), 1L, "aac", "aac (mp4a / 0x6134706d)", 44100L, "mono", "fltp", 96L);
+        assertStream(mediaInformation.getStreams().get(2), 2L, "data", "none", "none (mebx / 0x7862656d)", 44100L);
+        assertStream(mediaInformation.getStreams().get(3), 3L, "data", "none", "none (mebx / 0x7862656d)", 44100L);
+
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "rotate", "90");
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "creation_time", "2019-04-18T09:53:38.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "handler_name", "Core Media Video");
+        assertStreamMetadata(mediaInformation.getStreams().get(0), "encoder", "H.264");
+        assertStreamMetadata(mediaInformation.getStreams().get(1), "creation_time", "2019-04-18T09:53:38.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(1), "handler_name", "Core Media Audio");
+        assertStreamMetadata(mediaInformation.getStreams().get(2), "creation_time", "2019-04-18T09:53:38.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(2), "handler_name", "Core Media Metadata");
+        assertStreamMetadata(mediaInformation.getStreams().get(3), "creation_time", "2019-04-18T09:53:38.000000Z");
+        assertStreamMetadata(mediaInformation.getStreams().get(3), "handler_name", "Core Media Metadata");
     }
 
     private void assertMediaInput(MediaInformation mediaInformation, String format, String path) {
@@ -521,7 +553,6 @@ public class FFmpegTest {
         Assert.assertEquals(startTime, mediaInformation.getStartTime());
         Assert.assertEquals(bitrate, mediaInformation.getBitrate());
     }
-
 
     private void assertMetadata(MediaInformation mediaInformation, String expectedKey, String expectedValue) {
         Set<Map.Entry<String, String>> metadataEntries = mediaInformation.getMetadataEntries();
@@ -540,12 +571,40 @@ public class FFmpegTest {
         Assert.fail(expectedKey + "not found");
     }
 
+    private void assertStreamMetadata(StreamInformation streamInformation, String expectedKey, String expectedValue) {
+        Set<Map.Entry<String, String>> metadataEntries = streamInformation.getMetadataEntries();
+        Assert.assertNotNull(metadataEntries);
+
+        for (Map.Entry<String, String> metadataEntry : metadataEntries) {
+            String key = metadataEntry.getKey();
+            String value = metadataEntry.getValue();
+
+            if (key.equals(expectedKey)) {
+                Assert.assertEquals(expectedValue, value);
+                return;
+            }
+        }
+
+        Assert.fail(expectedKey + "not found");
+    }
+
+    private void assertStream(StreamInformation streamInformation, Long index, String type, String codec, String fullCodec, Long bitrate) {
+        Assert.assertEquals(index, streamInformation.getIndex());
+        Assert.assertEquals(type, streamInformation.getType());
+
+        Assert.assertEquals(codec, streamInformation.getCodec());
+        Assert.assertEquals(fullCodec, streamInformation.getFullCodec());
+
+        Assert.assertEquals(bitrate, streamInformation.getBitrate());
+    }
 
     private void assertAudioStream(StreamInformation streamInformation, Long index, String codec, String fullCodec, Long sampleRate, String channelLayout, String sampleFormat, Long bitrate) {
         Assert.assertEquals(index, streamInformation.getIndex());
         Assert.assertEquals("audio", streamInformation.getType());
+
         Assert.assertEquals(codec, streamInformation.getCodec());
         Assert.assertEquals(fullCodec, streamInformation.getFullCodec());
+
         Assert.assertEquals(sampleRate, streamInformation.getSampleRate());
         Assert.assertEquals(channelLayout, streamInformation.getChannelLayout());
         Assert.assertEquals(sampleFormat, streamInformation.getSampleFormat());
@@ -555,6 +614,7 @@ public class FFmpegTest {
     private void assertVideoStream(StreamInformation streamInformation, Long index, String codec, String fullCodec, String format, String fullFormat, Long width, Long height, String sar, String dar, Long bitrate, String averageFrameRate, String realFrameRate, String timeBase, String codecTimeBase) {
         Assert.assertEquals(index, streamInformation.getIndex());
         Assert.assertEquals("video", streamInformation.getType());
+
         Assert.assertEquals(codec, streamInformation.getCodec());
         Assert.assertEquals(fullCodec, streamInformation.getFullCodec());
 

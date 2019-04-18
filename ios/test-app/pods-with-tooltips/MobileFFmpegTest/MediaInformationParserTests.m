@@ -358,10 +358,10 @@ void assertString(NSString *expected, NSString *real) {
 }
 
 void assertVideoStream(StreamInformation *stream, NSNumber *index, NSString *codec, NSString *fullCodec, NSString *format, NSString *fullFormat, NSNumber *width, NSNumber *height, NSString *sampleAspectRatio, NSString *displayAspectRatio, NSNumber *bitrate, NSString *averageFrameRate, NSString *realFrameRate, NSString *timeBase, NSString *codecTimeBase) {
-
     assert(stream != nil);
     assertNumber(index, [stream getIndex]);
     assertString(@"video", [stream getType]);
+
     assertString(codec, [stream getCodec]);
     assertString(fullCodec, [stream getFullCodec]);
     
@@ -374,6 +374,7 @@ void assertVideoStream(StreamInformation *stream, NSNumber *index, NSString *cod
     assertString(displayAspectRatio, [stream getDisplayAspectRatio]);
 
     assertNumber(bitrate, [stream getBitrate]);
+
     assertString(averageFrameRate, [stream getAverageFrameRate]);
     assertString(realFrameRate, [stream getRealFrameRate]);
     assertString(timeBase, [stream getTimeBase]);
@@ -386,13 +387,25 @@ void parseVideoStreamBlock(NSString *input, NSNumber *index, NSString *codec, NS
     assertVideoStream(stream, index, codec, fullCodec, format, fullFormat, width, height, sampleAspectRatio, displayAspectRatio, bitrate, averageFrameRate, realFrameRate, timeBase, codecTimeBase);
 }
 
-void assertAudioStream(StreamInformation *stream, NSNumber *index, NSString *codec, NSString *fullCodec, NSNumber *sampleRate, NSString *channelLayout, NSString *sampleFormat, NSNumber *bitrate) {
+void assertStream(StreamInformation *stream, NSNumber *index, NSString *type, NSString *codec, NSString *fullCodec, NSNumber *bitrate) {
+    assert(stream != nil);
+    assertNumber(index, [stream getIndex]);
+    assertString(type, [stream getType]);
 
+    assertString(codec, [stream getCodec]);
+    assertString(fullCodec, [stream getFullCodec]);
+
+    assertNumber(bitrate, [stream getBitrate]);
+}
+
+void assertAudioStream(StreamInformation *stream, NSNumber *index, NSString *codec, NSString *fullCodec, NSNumber *sampleRate, NSString *channelLayout, NSString *sampleFormat, NSNumber *bitrate) {
     assert(stream != nil);
     assertNumber(index, [stream getIndex]);
     assertString(@"audio", [stream getType]);
+
     assertString(codec, [stream getCodec]);
     assertString(fullCodec, [stream getFullCodec]);
+
     assertNumber(sampleRate, [stream getSampleRate]);
     assertString(channelLayout, [stream getChannelLayout]);
     assertString(sampleFormat, [stream getSampleFormat]);
@@ -709,6 +722,16 @@ void assertMetadata(MediaInformation *mediaInformation, NSString *expectedKey, N
     assert([value isEqualToString:expectedValue]);
 }
 
+void assertStreamMetadata(StreamInformation *streamInformation, NSString *expectedKey, NSString *expectedValue) {
+    NSDictionary *metadata = [streamInformation getMetadataEntries];
+    assertNotNull(metadata);
+    
+    NSString *value = [metadata valueForKey:expectedKey];
+    assertNotNull(value);
+    
+    assert([value isEqualToString:expectedValue]);
+}
+
 void testMediaInformationMp3() {
     MediaInformation *mediaInformation = [MediaInformationParser from:MEDIA_INFORMATION_MP3];
     
@@ -778,6 +801,8 @@ void testMediaInformationH264() {
     assert(1 == [streams count]);
 
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (main) (avc1 / 0x31637661)", @"yuv420p", @"yuv420p", [[NSNumber alloc] initWithInt:1280], [[NSNumber alloc] initWithInt:720], @"1:1", @"16:9", [[NSNumber alloc] initWithInt:7762], @"25", @"30", @"15360", @"60");
+    
+    assertStreamMetadata([streams objectAtIndex:0], @"handler_name", @"VideoHandler");
 }
 
 void testMediaInformationPng() {
@@ -832,6 +857,13 @@ void testMediaInformationMp4() {
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (high) (avc1 / 0x31637661)", @"yuv420p", @"yuv420p", [[NSNumber alloc] initWithInt:3840], [[NSNumber alloc] initWithInt:4320], @"1:1", @"8:9", [[NSNumber alloc] initWithInt:9902], @"30", @"30", @"30k", @"60");
     assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"mp3", @"mp3 (mp4a / 0x6134706d)", [[NSNumber alloc] initWithInt:48000], @"stereo", @"fltp", [[NSNumber alloc] initWithInt:160]);
     assertAudioStream([streams objectAtIndex:2], [[NSNumber alloc] initWithInt:2], @"ac3", @"ac3 (ac-3 / 0x332d6361)", [[NSNumber alloc] initWithInt:48000], @"5.1(side)", @"fltp", [[NSNumber alloc] initWithInt:320]);
+
+    assertStreamMetadata([streams objectAtIndex:0], @"creation_time", @"2013-12-16T17:21:55.000000Z");
+    assertStreamMetadata([streams objectAtIndex:0], @"handler_name", @"GPAC ISO Video Handler");
+    assertStreamMetadata([streams objectAtIndex:1], @"creation_time", @"2013-12-16T17:21:58.000000Z");
+    assertStreamMetadata([streams objectAtIndex:1], @"handler_name", @"GPAC ISO Audio Handler");
+    assertStreamMetadata([streams objectAtIndex:2], @"creation_time", @"2013-12-16T17:21:58.000000Z");
+    assertStreamMetadata([streams objectAtIndex:2], @"handler_name", @"GPAC ISO Audio Handler");
 }
 
 void testMediaInformationMp42() {
@@ -858,6 +890,13 @@ void testMediaInformationMp42() {
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (high) (avc1 / 0x31637661)", @"yuv420p", @"yuv420p", [[NSNumber alloc] initWithInt:1920], [[NSNumber alloc] initWithInt:1080], @"1:1", @"16:9", [[NSNumber alloc] initWithInt:3992], @"30", @"30", @"30k", @"60");
     assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"mp3", @"mp3 (mp4a / 0x6134706d)", [[NSNumber alloc] initWithInt:48000], @"stereo", @"fltp", [[NSNumber alloc] initWithInt:160]);
     assertAudioStream([streams objectAtIndex:2], [[NSNumber alloc] initWithInt:2], @"ac3", @"ac3 (ac-3 / 0x332d6361)", [[NSNumber alloc] initWithInt:48000], @"5.1(side)", @"fltp", [[NSNumber alloc] initWithInt:320]);
+
+    assertStreamMetadata([streams objectAtIndex:0], @"creation_time", @"2013-12-16T17:49:59.000000Z");
+    assertStreamMetadata([streams objectAtIndex:0], @"handler_name", @"GPAC ISO Video Handler");
+    assertStreamMetadata([streams objectAtIndex:1], @"creation_time", @"2013-12-16T17:50:04.000000Z");
+    assertStreamMetadata([streams objectAtIndex:1], @"handler_name", @"GPAC ISO Audio Handler");
+    assertStreamMetadata([streams objectAtIndex:2], @"creation_time", @"2013-12-16T17:50:04.000000Z");
+    assertStreamMetadata([streams objectAtIndex:2], @"handler_name", @"GPAC ISO Audio Handler");
 }
 
 void testMediaInformationOgg() {
@@ -873,6 +912,9 @@ void testMediaInformationOgg() {
 
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"theora", @"theora", @"yuv420p", @"yuv420p(bt470bg/bt470bg/bt709)", [[NSNumber alloc] initWithInt:720], [[NSNumber alloc] initWithInt:400], nil, nil, nil, @"25", @"25", @"25", @"25");
     assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"vorbis", @"vorbis", [[NSNumber alloc] initWithInt:48000], @"stereo", @"fltp", [[NSNumber alloc] initWithInt:80]);
+
+    assertStreamMetadata([streams objectAtIndex:0], @"ENCODER", @"ffmpeg2theora 0.19");
+    assertStreamMetadata([streams objectAtIndex:1], @"ENCODER", @"ffmpeg2theora 0.19");
 }
 
 void testMediaInformationRecording() {
@@ -898,6 +940,19 @@ void testMediaInformationRecording() {
     
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (avc1 / 0x31637661)", @"yuv420p", @"yuv420p(tv, bt709)", [[NSNumber alloc] initWithInt:1920], [[NSNumber alloc] initWithInt:1080], nil, nil, [[NSNumber alloc] initWithInt:16535], @"29.98", @"29.97", @"600", @"1200");
     assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"aac", @"aac (mp4a / 0x6134706d)", [[NSNumber alloc] initWithInt:44100], @"mono", @"fltp", [[NSNumber alloc] initWithInt:96]);
+    assertStream([streams objectAtIndex:2], [[NSNumber alloc] initWithInt:2], @"data", @"none", @"none (mebx / 0x7862656d)", [[NSNumber alloc] initWithInt:44100]);
+    assertStream([streams objectAtIndex:3], [[NSNumber alloc] initWithInt:3], @"data", @"none", @"none (mebx / 0x7862656d)", [[NSNumber alloc] initWithInt:44100]);
+
+    assertStreamMetadata([streams objectAtIndex:0], @"rotate", @"90");
+    assertStreamMetadata([streams objectAtIndex:0], @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertStreamMetadata([streams objectAtIndex:0], @"handler_name", @"Core Media Video");
+    assertStreamMetadata([streams objectAtIndex:0], @"encoder", @"H.264");
+    assertStreamMetadata([streams objectAtIndex:1], @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertStreamMetadata([streams objectAtIndex:1], @"handler_name", @"Core Media Audio");
+    assertStreamMetadata([streams objectAtIndex:2], @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertStreamMetadata([streams objectAtIndex:2], @"handler_name", @"Core Media Metadata");
+    assertStreamMetadata([streams objectAtIndex:3], @"creation_time", @"2019-04-18T09:53:38.000000Z");
+    assertStreamMetadata([streams objectAtIndex:3], @"handler_name", @"Core Media Metadata");
 }
 
 /**
