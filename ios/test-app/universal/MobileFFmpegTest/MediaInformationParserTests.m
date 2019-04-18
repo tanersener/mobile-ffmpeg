@@ -940,8 +940,8 @@ void testMediaInformationRecording() {
     
     assertVideoStream([streams objectAtIndex:0], [[NSNumber alloc] initWithInt:0], @"h264", @"h264 (avc1 / 0x31637661)", @"yuv420p", @"yuv420p(tv, bt709)", [[NSNumber alloc] initWithInt:1920], [[NSNumber alloc] initWithInt:1080], nil, nil, [[NSNumber alloc] initWithInt:16535], @"29.98", @"29.97", @"600", @"1200");
     assertAudioStream([streams objectAtIndex:1], [[NSNumber alloc] initWithInt:1], @"aac", @"aac (mp4a / 0x6134706d)", [[NSNumber alloc] initWithInt:44100], @"mono", @"fltp", [[NSNumber alloc] initWithInt:96]);
-    assertStream([streams objectAtIndex:2], [[NSNumber alloc] initWithInt:2], @"data", @"none", @"none (mebx / 0x7862656d)", [[NSNumber alloc] initWithInt:44100]);
-    assertStream([streams objectAtIndex:3], [[NSNumber alloc] initWithInt:3], @"data", @"none", @"none (mebx / 0x7862656d)", [[NSNumber alloc] initWithInt:44100]);
+    assertStream([streams objectAtIndex:2], [[NSNumber alloc] initWithInt:2], @"data", @"none", @"none (mebx / 0x7862656d)", [[NSNumber alloc] initWithInt:0]);
+    assertStream([streams objectAtIndex:3], [[NSNumber alloc] initWithInt:3], @"data", @"none", @"none (mebx / 0x7862656d)", [[NSNumber alloc] initWithInt:0]);
 
     assertStreamMetadata([streams objectAtIndex:0], @"rotate", @"90");
     assertStreamMetadata([streams objectAtIndex:0], @"creation_time", @"2019-04-18T09:53:38.000000Z");

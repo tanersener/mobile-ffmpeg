@@ -257,9 +257,7 @@ static NSRegularExpression *bracketsRegex;
                         [streamInformation setCodecTimeBase:part];
                     }
                 }
-            }
-
-            if ([@"audio" isEqualToString:type]) {
+            } else if ([@"audio" isEqualToString:type]) {
                 if (part2 != nil) {
                     [streamInformation setSampleRate:[MediaInformationParser parseAudioStreamSampleRate:part2]];
                 }
@@ -279,6 +277,14 @@ static NSRegularExpression *bracketsRegex;
                     formattedPart5 = [formattedPart5 stringByReplacingOccurrencesOfString:@"kb/s" withString:@""];
                     formattedPart5 = [formattedPart5 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
                     [streamInformation setBitrate:[MediaInformationParser toIntegerObject:formattedPart5]];
+                }
+            } else if ([@"data" isEqualToString:type]) {
+                if (part2 != nil) {
+                    NSString *formattedPart2 = [part2 lowercaseString];
+                    formattedPart2 = [parenthesesRegex stringByReplacingMatchesInString:formattedPart2 options:0 range:NSMakeRange(0, [formattedPart2 length]) withTemplate:@""];
+                    formattedPart2 = [formattedPart2 stringByReplacingOccurrencesOfString:@"kb/s" withString:@""];
+                    formattedPart2 = [formattedPart2 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+                    [streamInformation setBitrate:[MediaInformationParser toIntegerObject:formattedPart2]];
                 }
             }
         }
@@ -387,6 +393,8 @@ static NSRegularExpression *bracketsRegex;
             return @"audio";
         } else if ([formattedString rangeOfString:@"video:"].location != NSNotFound) {
             return @"video";
+        } else if ([formattedString rangeOfString:@"data:"].location != NSNotFound) {
+            return @"data";
         }
     }
     
@@ -399,7 +407,8 @@ static NSRegularExpression *bracketsRegex;
         formattedString = [parenthesesRegex stringByReplacingMatchesInString:formattedString options:0 range:NSMakeRange(0, [formattedString length]) withTemplate:@""];
         formattedString = [formattedString stringByReplacingOccurrencesOfString:@"video:" withString:@""];
         formattedString = [formattedString stringByReplacingOccurrencesOfString:@"audio:" withString:@""];
-        
+        formattedString = [formattedString stringByReplacingOccurrencesOfString:@"data:" withString:@""];
+
         return [formattedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
     
@@ -411,7 +420,8 @@ static NSRegularExpression *bracketsRegex;
         NSString *formattedString = [input lowercaseString];
         formattedString = [formattedString stringByReplacingOccurrencesOfString:@"video:" withString:@""];
         formattedString = [formattedString stringByReplacingOccurrencesOfString:@"audio:" withString:@""];
-        
+        formattedString = [formattedString stringByReplacingOccurrencesOfString:@"data:" withString:@""];
+
         return [formattedString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     }
     
