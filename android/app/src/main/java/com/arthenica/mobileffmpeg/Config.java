@@ -21,7 +21,6 @@ package com.arthenica.mobileffmpeg;
 
 import android.content.Context;
 import android.system.ErrnoException;
-import android.system.Os;
 import android.util.Log;
 
 import java.io.File;
@@ -310,7 +309,10 @@ public class Config {
      * @throws ErrnoException if an error occurs
      */
     public static void setFontconfigConfigurationPath(final String path) throws ErrnoException {
-        Os.setenv("FONTCONFIG_PATH", path, true);
+        int rc = Config.setNativeEnvironmentVariable("FONTCONFIG_PATH", path);
+        if (rc != 0) {
+            throw new ErrnoException("sentenv", rc);
+        }
     }
 
     /**
@@ -594,5 +596,14 @@ public class Config {
      * @return MobileFFmpeg library build date
      */
     native static String getNativeBuildDate();
+
+    /**
+     * <p>Sets an environment variable natively.
+     *
+     * @param variableName environment variable name
+     * @param variableValue environment variable value
+     * @return zero on success, non-zero on error
+     */
+    native static int setNativeEnvironmentVariable(final String variableName, final String variableValue);
 
 }

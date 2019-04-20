@@ -18,6 +18,10 @@
  */
 
 /*
+ * CHANGES 04.2019
+ * --------------------------------------------------------
+ * - setNativeEnvironmentVariable method added
+ *
  * CHANGES 02.2019
  * --------------------------------------------------------
  * - JavaVM registered via av_jni_set_java_vm()
@@ -721,4 +725,20 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildD
     char buildDate[10];
     sprintf(buildDate, "%d", MOBILE_FFMPEG_BUILD_DATE);
     return (*env)->NewStringUTF(env, buildDate);
+}
+
+/**
+ * Sets an environment variable natively
+ *
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @param variableName environment variable name
+ * @param variableValue environment variable value
+ * @return zero on success, non-zero on error
+ */
+JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmentVariable(JNIEnv *env, jclass object, jstring variableName, jstring variableValue) {
+    const char *variableNameString = (*env)->GetStringUTFChars(env, variableName, 0);
+    const char *variableValueString = (*env)->GetStringUTFChars(env, variableValue, 0);
+
+    return setenv(variableNameString, variableValueString, 1);
 }
