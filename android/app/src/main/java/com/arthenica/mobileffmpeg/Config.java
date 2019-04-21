@@ -20,7 +20,6 @@
 package com.arthenica.mobileffmpeg;
 
 import android.content.Context;
-import android.system.ErrnoException;
 import android.util.Log;
 
 import java.io.File;
@@ -306,13 +305,10 @@ public class Config {
      * <p>Sets and overrides <code>fontconfig</code> configuration directory.
      *
      * @param path directory which contains fontconfig configuration (fonts.conf)
-     * @throws ErrnoException if an error occurs
+     * @return zero on success, non-zero on error
      */
-    public static void setFontconfigConfigurationPath(final String path) throws ErrnoException {
-        int rc = Config.setNativeEnvironmentVariable("FONTCONFIG_PATH", path);
-        if (rc != 0) {
-            throw new ErrnoException("sentenv", rc);
-        }
+    public static int setFontconfigConfigurationPath(final String path) {
+        return Config.setNativeEnvironmentVariable("FONTCONFIG_PATH", path);
     }
 
     /**
@@ -386,7 +382,7 @@ public class Config {
 
             Log.d(TAG, String.format("Font directory %s registered successfully.", fontDirectoryPath));
 
-        } catch (final ErrnoException | IOException e) {
+        } catch (final IOException e) {
             Log.e(TAG, String.format("Failed to set font directory: %s.", fontDirectoryPath), e);
         } finally {
             if (reference.get() != null) {

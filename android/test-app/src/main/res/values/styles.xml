@@ -5,7 +5,6 @@
         <item name="colorPrimary">@color/headerColor</item>
         <item name="colorPrimaryDark">@color/headerColor</item>
         <item name="colorAccent">@color/editColor</item>
-        <item name="android:navigationBarColor">@color/editColor</item>
     </style>
 
 </resources>
