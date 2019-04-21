@@ -282,8 +282,6 @@
         return @"-b:v 2M ";
     } else if ([videoCodec isEqualToString:@"aom"]) {
         return @"-crf 30 -strict experimental ";
-    } else if ([videoCodec isEqualToString:@"kvazaar"]) {
-        return @"-preset fast ";
     } else if ([videoCodec isEqualToString:@"theora"]) {
         return @"-qscale:v 7 ";
     } else if ([videoCodec isEqualToString:@"hap"]) {

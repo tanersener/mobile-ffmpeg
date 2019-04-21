@@ -339,15 +339,13 @@ public class VideoTabFragment extends Fragment implements AdapterView.OnItemSele
                 return "-b:v 2M ";
             case "aom":
                 return "-crf 30 -strict experimental ";
-            case "kvazaar":
-                return "-preset fast ";
             case "theora":
                 return "-qscale:v 7 ";
             case "hap":
                 return "-format hap_q ";
             default:
 
-                // mpeg4, x264, xvid
+                // kvazaar, mpeg4, x264, xvid
                 return "";
         }
     }
