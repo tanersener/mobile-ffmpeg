@@ -39,7 +39,6 @@ FFmpeg for Android and IOS
 - `ARC` enabled library
 - Built with `-fembed-bitcode` flag
 - Creates static framework and static universal (fat) library (.a) 
-- Supports Xcode 7.3.1 or later
 
 ### 2. Using
 Binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org). 
@@ -261,12 +260,25 @@ execution, video encoding, accessing https, encoding audio, burning subtitles an
 
 ### 3. Versions
 
-`MobileFFmpeg` version number is aligned with `FFmpeg` since `v4.2`. Before that `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different.
+- `MobileFFmpeg` version number is aligned with `FFmpeg` since `4.2`. 
+In previous versions, `MobileFFmpeg` version of a release and `FFmpeg` version included in that release was different.
+- `dev` part in `FFmpeg` version number indicates that `FFmpeg` source is pulled from the `FFmpeg` `master` branch. 
+Exact version number is obtained using `git describe --tags`. 
 
-|        | v2.0 | v2.1 | v2.2 | v3.0 | v3.1 | v4.2 |v4.2.1 |
-| :----: | :----: | :----: | :----: | :----: | :----: | :----: |:----: |
-| FFmpeg | 4.0.1 | 4.0.2 | 4.0.3 | 4.1-dev-1517 | v4.1-10 | v4.2-dev-480 | v4.2-dev-1156 |
-| Includes LTS Variant | - | - | - | - | - | X | - |
+|  MobileFFmpeg Version | FFmpeg Version | Release Date |
+| :----: | :----: |:----: |
+| 1.0 | 3.4.2 | Jun 6, 2018 |
+| 1.1 | 3.4.2 | Jun 18, 2018 |
+| 1.2 | 3.4.4 | Aug 30, 2018|
+| 2.0 | 4.0.1 | Jun 30, 2018 |
+| 2.1 | 4.0.2 | Sep 5, 2018 |
+| 2.1.1 | 4.0.2 | Sep 19, 2018 |
+| 2.2 | 4.0.3 | Nov 10, 2018 |
+| 3.0 | 4.1-dev-1517 | Oct 25, 2018 |
+| 3.1 | 4.1-10 | Dec 11, 2018 |
+| 4.2.LTS | 4.2-dev-480 | Jan 3, 2019 |
+| 4.2 | 4.2-dev-480 | Jan 3, 2019 |
+| 4.2.1 | 4.2-dev-1156 | Apr 2, 2019 |
 
 ### 4. LTS Releases
 
@@ -280,9 +292,9 @@ This table shows the differences between two variants.
 
 |        | Main Release | LTS Release |
 | :----: | :----: | :----: |
-| Android API Level | 24 | 21 | 
+| Android API Level | 24 | 18 | 
 | Android Camera Access | Yes | - |
-| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> |
+| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>x86<br/> |
 | IOS SDK | 12.1 | 9.3 |
 | Xcode Support | 10.1 | 7.3.1 |
 | IOS Architectures | arm64<br/>arm64e<br/>x86-64</br> | armv7<br/>arm64<br/>i386<br/>x86-64</br> |
@@ -299,7 +311,7 @@ Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg
 [IOS Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/IOS-Prerequisites) for the details.
 
 2. Android builds require these additional packages.
-    - **Android SDK 5.0 Lollipop (API Level 21)** or later
+    - **Android SDK 4.3.x Jelly Bean (API Level 18)** or later
     - **Android NDK r19** or later with LLDB and CMake
 
 3. IOS builds need these extra packages and tools.
