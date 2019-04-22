@@ -267,18 +267,18 @@ Exact version number is obtained using `git describe --tags`.
 
 |  MobileFFmpeg Version | FFmpeg Version | Release Date |
 | :----: | :----: |:----: |
-| 4.2.1 | 4.2-dev-1156 | Apr 2, 2019 |
-| 4.2 | 4.2-dev-480 | Jan 3, 2019 |
-| 4.2.LTS | 4.2-dev-480 | Jan 3, 2019 |
-| 3.1 | 4.1-10 | Dec 11, 2018 |
-| 3.0 | 4.1-dev-1517 | Oct 25, 2018 |
-| 2.2 | 4.0.3 | Nov 10, 2018 |
-| 2.1.1 | 4.0.2 | Sep 19, 2018 |
-| 2.1 | 4.0.2 | Sep 5, 2018 |
-| 2.0 | 4.0.1 | Jun 30, 2018 |
-| 1.2 | 3.4.4 | Aug 30, 2018|
-| 1.1 | 3.4.2 | Jun 18, 2018 |
-| 1.0 | 3.4.2 | Jun 6, 2018 |
+| [4.2.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.1) | 4.2-dev-1156 | Apr 2, 2019 |
+| [4.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2) | 4.2-dev-480 | Jan 3, 2019 |
+| [4.2.LTS](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v4.2.LTS) | 4.2-dev-480 | Jan 3, 2019 |
+| [3.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v3.1) | 4.1-10 | Dec 11, 2018 |
+| [3.0](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v3.0) | 4.1-dev-1517 | Oct 25, 2018 |
+| [2.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v2.2) | 4.0.3 | Nov 10, 2018 |
+| [2.1.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v2.1.1) | 4.0.2 | Sep 19, 2018 |
+| [2.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v2.1) | 4.0.2 | Sep 5, 2018 |
+| [2.0](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v2.0) | 4.0.1 | Jun 30, 2018 |
+| [1.2](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v1.2) | 3.4.4 | Aug 30, 2018|
+| [1.1](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v1.1) | 3.4.2 | Jun 18, 2018 |
+| [1.0](https://github.com/tanersener/mobile-ffmpeg/releases/tag/v1.0) | 3.4.2 | Jun 6, 2018 |
 
 ### 4. LTS Releases
 
