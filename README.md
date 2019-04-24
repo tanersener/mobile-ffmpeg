@@ -292,9 +292,9 @@ This table shows the differences between two variants.
 
 |        | Main Release | LTS Release |
 | :----: | :----: | :----: |
-| Android API Level | 24 | 18 | 
+| Android API Level | 24 | 21 | 
 | Android Camera Access | Yes | - |
-| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>x86<br/> |
+| Android Architectures | arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> | arm-v7a<br/>arm-v7a-neon<br/>arm64-v8a<br/>x86<br/>x86-64</br> |
 | IOS SDK | 12.1 | 9.3 |
 | Xcode Support | 10.1 | 7.3.1 |
 | IOS Architectures | arm64<br/>arm64e<br/>x86-64</br> | armv7<br/>arm64<br/>i386<br/>x86-64</br> |
@@ -311,7 +311,7 @@ Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg
 [IOS Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/IOS-Prerequisites) for the details.
 
 2. Android builds require these additional packages.
-    - **Android SDK 4.3.x Jelly Bean (API Level 18)** or later
+    - **Android SDK 5.0 Lollipop (API Level 21)** or later
     - **Android NDK r19** or later with LLDB and CMake
 
 3. IOS builds need these extra packages and tools.

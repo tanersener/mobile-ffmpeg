@@ -181,12 +181,8 @@ optimize_for_speed() {
 enable_lts_build() {
     export MOBILE_FFMPEG_LTS_BUILD="1"
 
-    # USING API LEVEL 18 / Android 4.3.x (JELLY BEAN)
-    export API=18
-
-    # ARM64-V8A & X86-64 NOT AVAILABLE BELOW API 21
-    ENABLED_ARCHITECTURES[ARCH_ARM64_V8A]=0
-    ENABLED_ARCHITECTURES[ARCH_X86_64]=0
+    # USING API LEVEL 21 / Android 5.0 (LOLLIPOP)
+    export API=21
 }
 
 reconf_library() {

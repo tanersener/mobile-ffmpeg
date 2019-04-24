@@ -4,9 +4,9 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion 18
+        minSdkVersion 21
         targetSdkVersion 28
-        versionCode 180421
+        versionCode 210421
         versionName "4.2.1.LTS"
         project.archivesBaseName = "mobile-ffmpeg"
     }

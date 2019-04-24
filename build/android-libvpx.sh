@@ -41,22 +41,18 @@ case ${ARCH} in
         # NEON disabled explicitly because
         # --enable-runtime-cpu-detect enables NEON for armv7 cpu
         DISABLE_NEON_FLAG="--disable-neon"
-        unset ASFLAGS
     ;;
     arm-v7a-neon)
         # NEON IS ENABLED BY --enable-runtime-cpu-detect
         TARGET_CPU="armv7"
-        unset ASFLAGS
     ;;
     arm64-v8a)
         # NEON IS ENABLED BY --enable-runtime-cpu-detect
         TARGET_CPU="arm64"
-        unset ASFLAGS
     ;;
     *)
         # INTEL CPU EXTENSIONS ENABLED BY --enable-runtime-cpu-detect
         TARGET_CPU="$(get_target_build)"
-        export ASFLAGS="-D__ANDROID__"
     ;;
 esac
 
