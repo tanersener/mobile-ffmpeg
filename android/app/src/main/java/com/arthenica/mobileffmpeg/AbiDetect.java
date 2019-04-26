@@ -37,6 +37,10 @@ public class AbiDetect {
         FFmpeg.class.getName();
     }
 
+    static final String ARM_V7A = "arm-v7a";
+
+    static final String ARM_V7A_NEON = "arm-v7a-neon";
+
     private static boolean armV7aNeonLoaded;
 
     /**
@@ -56,7 +60,7 @@ public class AbiDetect {
      */
     public static String getAbi() {
         if (armV7aNeonLoaded) {
-            return "arm-v7a-neon";
+            return ARM_V7A_NEON;
         } else {
             return getNativeAbi();
         }
@@ -67,7 +71,7 @@ public class AbiDetect {
      *
      * @return loaded ABI name
      */
-    private native static String getNativeAbi();
+    public native static String getNativeAbi();
 
     /**
      * <p>Returns ABI name of the running cpu.

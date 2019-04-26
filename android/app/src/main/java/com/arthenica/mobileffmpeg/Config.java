@@ -27,6 +27,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.arthenica.mobileffmpeg.FFmpeg.getBuildDate;
@@ -91,7 +92,7 @@ public class Config {
          * NEON supported arm-v7a library has a different name
          */
         boolean nativeLibraryLoaded = false;
-        if (cpuAbi == Abi.ABI_ARMV7A_NEON) {
+        if (Objects.equals(AbiDetect.getNativeAbi(), AbiDetect.ARM_V7A)) {
             if (AbiDetect.isNativeLTSBuild()) {
 
                 /*
