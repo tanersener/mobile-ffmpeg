@@ -40,7 +40,7 @@ import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
 import com.arthenica.mobileffmpeg.Statistics;
 import com.arthenica.mobileffmpeg.StatisticsCallback;
-import com.arthenica.mobileffmpeg.util.RunCallback;
+import com.arthenica.mobileffmpeg.util.ExecuteCallback;
 
 import java.io.File;
 import java.io.IOException;
@@ -172,10 +172,10 @@ public class SubtitleTabFragment extends Fragment {
 
             state = State.CREATING;
 
-            MainActivity.executeAsync(new RunCallback() {
+            MainActivity.executeAsync(new ExecuteCallback() {
 
                 @Override
-                public void apply(final int returnCode) {
+                public void apply(final int returnCode, final String commandOutput) {
                     Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
                     state = State.IDLE;
@@ -198,10 +198,10 @@ public class SubtitleTabFragment extends Fragment {
 
                                 state = State.BURNING;
 
-                                MainActivity.executeAsync(new RunCallback() {
+                                MainActivity.executeAsync(new ExecuteCallback() {
 
                                     @Override
-                                    public void apply(final int returnCode) {
+                                    public void apply(final int returnCode, final String commandOutput) {
                                         Log.d(TAG, String.format("FFmpeg process exited with rc %d", returnCode));
 
                                         state = State.IDLE;

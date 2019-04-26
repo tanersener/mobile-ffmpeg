@@ -34,7 +34,7 @@ import com.arthenica.mobileffmpeg.Config;
 import com.arthenica.mobileffmpeg.FFmpeg;
 import com.arthenica.mobileffmpeg.LogCallback;
 import com.arthenica.mobileffmpeg.LogMessage;
-import com.arthenica.mobileffmpeg.util.RunCallback;
+import com.arthenica.mobileffmpeg.util.ExecuteCallback;
 
 import java.util.concurrent.Callable;
 
@@ -141,10 +141,10 @@ public class CommandTabFragment extends Fragment {
 
         android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process started with arguments\n\'%s\'", ffmpegCommand));
 
-        MainActivity.executeAsync(new RunCallback() {
+        MainActivity.executeAsync(new ExecuteCallback() {
 
             @Override
-            public void apply(int result) {
+            public void apply(int result, final String commandOutput) {
 
                 android.util.Log.d(MainActivity.TAG, String.format("FFmpeg process exited with rc %d", result));
 

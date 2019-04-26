@@ -22,24 +22,25 @@ package com.arthenica.mobileffmpeg.util;
 import android.os.AsyncTask;
 
 import com.arthenica.mobileffmpeg.FFmpeg;
+import com.arthenica.mobileffmpeg.MediaInformation;
 
-public class AsyncCommandTask extends AsyncTask<String, Integer, Integer> {
+public class AsyncGetMediaInformationTask extends AsyncTask<String, MediaInformation, MediaInformation> {
 
-    private final RunCallback runCallback;
+    private final GetMediaInformationCallback getMediaInformationCallback;
 
-    public AsyncCommandTask(final RunCallback runCallback) {
-        this.runCallback = runCallback;
+    public AsyncGetMediaInformationTask(final GetMediaInformationCallback getMediaInformationCallback) {
+        this.getMediaInformationCallback = getMediaInformationCallback;
     }
 
     @Override
-    protected Integer doInBackground(final String... arguments) {
-        return FFmpeg.execute(arguments[0], " ");
+    protected MediaInformation doInBackground(final String... arguments) {
+        return FFmpeg.getMediaInformation(arguments[0]);
     }
 
     @Override
-    protected void onPostExecute(final Integer rc) {
-        if (runCallback != null) {
-            runCallback.apply(rc);
+    protected void onPostExecute(final MediaInformation mediaInformation) {
+        if (getMediaInformationCallback != null) {
+            getMediaInformationCallback.apply(mediaInformation);
         }
     }
 

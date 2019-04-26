@@ -41,8 +41,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.arthenica.mobileffmpeg.Config;
-import com.arthenica.mobileffmpeg.util.AsyncCommandTask;
-import com.arthenica.mobileffmpeg.util.RunCallback;
+import com.arthenica.mobileffmpeg.util.AsyncExecuteTask;
+import com.arthenica.mobileffmpeg.util.ExecuteCallback;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -151,12 +151,12 @@ public class MainActivity extends AppCompatActivity {
     /**
      * <p>Starts a new asynchronous FFmpeg operation with arguments provided.
      *
-     * @param runCallback callback function to receive result of this execution
+     * @param executeCallback callback function to receive result of this execution
      * @param arguments   FFmpeg command options/arguments
      */
-    public static void executeAsync(final RunCallback runCallback, final String arguments) {
-        final AsyncCommandTask asyncCommandTask = new AsyncCommandTask(runCallback);
-        asyncCommandTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arguments);
+    public static void executeAsync(final ExecuteCallback executeCallback, final String arguments) {
+        final AsyncExecuteTask asyncCommandTask = new AsyncExecuteTask(executeCallback);
+        asyncCommandTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, arguments.split(" "));
     }
 
     public static void waitForUIAction() {

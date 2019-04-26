@@ -19,15 +19,16 @@
 
 package com.arthenica.mobileffmpeg.util;
 
+import com.arthenica.mobileffmpeg.MediaInformation;
+
 /**
- * <p>Represents a callback function to receive run result.
+ * <p>Represents a callback function to receive getMediaInformation result.
  *
  * @author Taner Sener
- * @since v2.1
  */
 @FunctionalInterface
-public interface RunCallback {
+public interface GetMediaInformationCallback {
 
-    void apply(final int returnCode);
+    void apply(MediaInformation mediaInformation);
 
 }
