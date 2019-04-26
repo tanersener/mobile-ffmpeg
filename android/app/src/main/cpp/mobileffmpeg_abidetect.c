@@ -18,6 +18,7 @@
  */
 
 #include "cpu-features.h"
+#include "fftools_ffmpeg.h"
 #include "mobileffmpeg_abidetect.h"
 
 /** Full name of the Java class that owns native functions in this file. */
@@ -26,7 +27,9 @@ const char *abiDetectClassName = "com/arthenica/mobileffmpeg/AbiDetect";
 /** Prototypes of native functions defined by this file. */
 JNINativeMethod abiDetectMethods[] = {
   {"getNativeAbi", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeAbi},
-  {"getNativeCpuAbi", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeCpuAbi}
+  {"getNativeCpuAbi", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeCpuAbi},
+  {"isNativeLTSBuild", "()Z", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_isNativeLTSBuild},
+  {"getNativeBuildConf", "()Ljava/lang/String;", (void*) Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeBuildConf}
 };
 
 /**
@@ -49,7 +52,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
         return JNI_FALSE;
     }
 
-    if ((*env)->RegisterNatives(env, abiDetectClass, abiDetectMethods, 2) < 0) {
+    if ((*env)->RegisterNatives(env, abiDetectClass, abiDetectMethods, 4) < 0) {
         LOGE("OnLoad failed to RegisterNatives for class %s.\n", abiDetectClassName);
         return JNI_FALSE;
     }
@@ -127,4 +130,15 @@ JNIEXPORT jboolean JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_isNativeLTS
     #else
         return JNI_FALSE;
     #endif
+}
+
+/**
+ * Returns build configuration for FFmpeg.
+ *
+ * @param env pointer to native method interface
+ * @param object reference to the class on which this method is invoked
+ * @return build configuration string
+ */
+JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_AbiDetect_getNativeBuildConf(JNIEnv *env, jclass object) {
+    return (*env)->NewStringUTF(env, FFMPEG_CONFIGURATION);
 }

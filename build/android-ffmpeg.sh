@@ -290,6 +290,11 @@ done
 
 LDFLAGS+=" -L${ANDROID_NDK_ROOT}/platforms/android-${API}/arch-${TOOLCHAIN_ARCH}/usr/lib"
 
+# LINKING WITH ANDROID LTS SUPPORT LIBRARY IS NECESSARY FOR API < 18
+if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${API} < 18 ]]; then
+    LDFLAGS+=" -Wl,--whole-archive ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"
+fi
+
 # OPTIMIZE FOR SPEED INSTEAD OF SIZE
 if [[ -z ${MOBILE_FFMPEG_OPTIMIZED_FOR_SPEED} ]]; then
     SIZE_OPTIONS="--enable-small";

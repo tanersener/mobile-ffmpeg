@@ -131,6 +131,11 @@ done
 # BUILD CPU-FEATURES FIRST
 build_cpufeatures
 
+# BUILD LTS SUPPORT LIBRARY FOR API < 18
+if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${API} < 18 ]]; then
+    build_android_lts_support
+fi
+
 let completed=0
 while [ ${#enabled_library_list[@]} -gt $completed ]; do
     for library in "${enabled_library_list[@]}"

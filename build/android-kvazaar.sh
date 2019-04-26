@@ -43,7 +43,14 @@ if [[ ${RECONF_kvazaar} -eq 1 ]]; then
     autoreconf_library ${LIB_NAME}
 fi
 
-./configure \
+# LINKING WITH ANDROID LTS SUPPORT LIBRARY IS NECESSARY FOR API < 18
+if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${API} < 18 ]]; then
+    ARCH_SPECIFIC_LIBS=" -Wl,--no-whole-archive ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a -Wl,--no-whole-archive"
+else
+    ARCH_SPECIFIC_LIBS=""
+fi
+
+LIBS="${ARCH_SPECIFIC_LIBS}" ./configure \
     --prefix=${BASEDIR}/prebuilt/android-$(get_target_build)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${ANDROID_NDK_ROOT}/toolchains/llvm/prebuilt/${TOOLCHAIN}/sysroot \

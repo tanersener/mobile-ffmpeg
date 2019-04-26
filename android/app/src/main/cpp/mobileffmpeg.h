@@ -105,15 +105,8 @@ JNIEXPORT void JNICALL Java_com_arthenica_mobileffmpeg_Config_nativeCancel(JNIEn
 
 /*
  * Class:     com_arthenica_mobileffmpeg_Config
- * Method:    getNativeBuildConf
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildConf(JNIEnv *, jclass);
-
-/*
- * Class:     com_arthenica_mobileffmpeg_Config
  * Method:    registerNewNativeFFmpegPipe
- * Signature: (Ljava/lang/String)I;
+ * Signature: (Ljava/lang/String;)I
  */
 JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_registerNewNativeFFmpegPipe(JNIEnv *env, jclass object, jstring ffmpegPipePath);
 
@@ -127,7 +120,7 @@ JNIEXPORT jstring JNICALL Java_com_arthenica_mobileffmpeg_Config_getNativeBuildD
 /**
  * Class:     com_arthenica_mobileffmpeg_Config
  * Method:    setNativeEnvironmentVariable
- * Signature: (Ljava/lang/String;Ljava/lang/String)I;
+ * Signature: (Ljava/lang/String;Ljava/lang/String;)I
  */
 JNIEXPORT int JNICALL Java_com_arthenica_mobileffmpeg_Config_setNativeEnvironmentVariable(JNIEnv *env, jclass object, jstring variableName, jstring variableValue);
 

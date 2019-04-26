@@ -20,6 +20,7 @@
 package com.arthenica.mobileffmpeg;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.File;
@@ -27,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.arthenica.mobileffmpeg.FFmpeg.getBuildDate;
@@ -84,15 +84,32 @@ public class Config {
 
         Log.i(Config.TAG, "Loading mobile-ffmpeg.");
 
-        /* ALL LIBRARIES LOADED AT STARTUP */
-        Abi cpuAbi = Abi.from(AbiDetect.getNativeCpuAbi());
+        /* LOAD NOT-LOADED LIBRARIES ON API < 21 */
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+            final List<String> externalLibrariesEnabled = getExternalLibraries();
+            if (externalLibrariesEnabled.contains("tesseract") || externalLibrariesEnabled.contains("x265")) {
+                // libc++_shared.so included only when tesseract or x265 is enabled
+                System.loadLibrary("c++_shared");
+            }
+            System.loadLibrary("cpufeatures");
+            System.loadLibrary("avutil");
+            System.loadLibrary("swscale");
+            System.loadLibrary("swresample");
+            System.loadLibrary("avcodec");
+            System.loadLibrary("avformat");
+            System.loadLibrary("avfilter");
+            System.loadLibrary("avdevice");
+        }
+
+        /* ALL MOBILE-FFMPEG LIBRARIES LOADED AT STARTUP */
+        Abi.class.getName();
         FFmpeg.class.getName();
 
         /*
          * NEON supported arm-v7a library has a different name
          */
         boolean nativeLibraryLoaded = false;
-        if (Objects.equals(AbiDetect.getNativeAbi(), AbiDetect.ARM_V7A)) {
+        if (AbiDetect.ARM_V7A.equals(AbiDetect.getNativeAbi())) {
             if (AbiDetect.isNativeLTSBuild()) {
 
                 /*
@@ -571,13 +588,6 @@ public class Config {
     native static void nativeCancel();
 
     /**
-     * <p>Returns build configuration for <code>FFmpeg</code>.
-     *
-     * @return build configuration string
-     */
-    native static String getNativeBuildConf();
-
-    /**
      * <p>Creates natively a new named pipe to use in <code>FFmpeg</code> operations.
      *
      * <p>Please note that creator is responsible of closing created pipes.
@@ -597,7 +607,7 @@ public class Config {
     /**
      * <p>Sets an environment variable natively.
      *
-     * @param variableName environment variable name
+     * @param variableName  environment variable name
      * @param variableValue environment variable value
      * @return zero on success, non-zero on error
      */

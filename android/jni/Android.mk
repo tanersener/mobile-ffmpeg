@@ -14,9 +14,6 @@ ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
     MY_ARCH_FLAGS := ARM64_V8A
     MY_ARM_NEON := true
 endif
-ifeq ($(TARGET_ARCH_ABI), arm64-v8a)
-    MY_ARCH_FLAGS := ARM64_V8A
-endif
 ifeq ($(TARGET_ARCH_ABI), x86)
     MY_ARCH_FLAGS := X86
 endif

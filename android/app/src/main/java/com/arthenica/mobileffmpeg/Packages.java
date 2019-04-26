@@ -53,10 +53,12 @@ class Packages {
         supportedExternalLibraries.add("libxml2");
         supportedExternalLibraries.add("opencore-amr");
         supportedExternalLibraries.add("opus");
+        supportedExternalLibraries.add("sdl2");
         supportedExternalLibraries.add("shine");
         supportedExternalLibraries.add("snappy");
         supportedExternalLibraries.add("soxr");
         supportedExternalLibraries.add("speex");
+        supportedExternalLibraries.add("tesseract");
         supportedExternalLibraries.add("twolame");
         supportedExternalLibraries.add("wavpack");
         supportedExternalLibraries.add("x264");
@@ -70,7 +72,7 @@ class Packages {
      * @return enabled external libraries
      */
     static List<String> getExternalLibraries() {
-        final String buildConfiguration = Config.getNativeBuildConf();
+        final String buildConfiguration = AbiDetect.getNativeBuildConf();
 
         final List<String> enabledLibraryList = new ArrayList<>();
         for (String supportedExternalLibrary : supportedExternalLibraries) {
@@ -261,7 +263,11 @@ class Packages {
             }
         }
 
-        return "min";
+        if (externalLibraryList.size() == 0) {
+            return "min";
+        } else {
+            return "custom";
+        }
     }
 
 }

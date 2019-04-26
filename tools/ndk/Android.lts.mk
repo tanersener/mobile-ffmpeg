@@ -65,7 +65,6 @@ ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
         include $(BUILD_SHARED_LIBRARY)
 
         $(call import-module, ffmpeg/neon)
-
     endif
 endif
 

@@ -1028,9 +1028,9 @@ build_cpufeatures() {
     rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.a 1>>${BASEDIR}/build.log 2>&1
     rm -f ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
 
-    set_toolchain_clang_paths "cpu-features"
+    echo -e "\nINFO: Building cpu-features for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
 
-    echo -e "\nINFO: Building cpu-features for for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
+    set_toolchain_clang_paths "cpu-features"
 
     # THEN BUILD FOR THIS ABI
     $(get_clang_target_host)-clang -c ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.c -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o 1>>${BASEDIR}/build.log 2>&1
@@ -1038,6 +1038,28 @@ build_cpufeatures() {
     $(get_clang_target_host)-clang -shared ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/cpu-features.o -o ${ANDROID_NDK_ROOT}/sources/android/cpufeatures/libcpufeatures.so 1>>${BASEDIR}/build.log 2>&1
 
     create_cpufeatures_package_config
+}
+
+build_android_lts_support() {
+
+    # CLEAN OLD BUILD
+    rm -f ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
+    rm -f ${BASEDIR}/android/app/src/main/cpp/android_lts_support.a 1>>${BASEDIR}/build.log 2>&1
+
+    echo -e "INFO: Building android-lts-support objects for ${ARCH}\n" 1>>${BASEDIR}/build.log 2>&1
+
+    # PREPARING PATHS
+    LIB_NAME="android-lts-support"
+    set_toolchain_clang_paths ${LIB_NAME}
+
+    # PREPARING FLAGS
+    TARGET_HOST=$(get_target_host)
+    CFLAGS=$(get_cflags ${LIB_NAME})
+    LDFLAGS=$(get_ldflags ${LIB_NAME})
+
+    # THEN BUILD FOR THIS ABI
+    $(get_clang_target_host)-clang ${CFLAGS} -Wno-unused-command-line-argument -c ${BASEDIR}/android/app/src/main/cpp/android_lts_support.c -o ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o ${LDFLAGS} 1>>${BASEDIR}/build.log 2>&1
+    ${TARGET_HOST}-ar rcs ${BASEDIR}/android/app/src/main/cpp/libandroidltssupport.a ${BASEDIR}/android/app/src/main/cpp/android_lts_support.o 1>>${BASEDIR}/build.log 2>&1
 }
 
 autoreconf_library() {

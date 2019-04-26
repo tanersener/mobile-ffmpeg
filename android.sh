@@ -181,8 +181,8 @@ optimize_for_speed() {
 enable_lts_build() {
     export MOBILE_FFMPEG_LTS_BUILD="1"
 
-    # USING API LEVEL 21 / Android 5.0 (LOLLIPOP)
-    export API=21
+    # USING API LEVEL 16 / Android 4.1 (JELLY BEAN)
+    export API=16
 }
 
 reconf_library() {
@@ -633,9 +633,20 @@ do
     fi
 done
 
+# SAVE API VALUE
+export ORIGINAL_API=${API};
+
 for run_arch in {0..4}
 do
     if [[ ${ENABLED_ARCHITECTURES[$run_arch]} -eq 1 ]]; then
+        if [[ ( ${run_arch} -eq ${ARCH_ARM64_V8A} || ${run_arch} -eq ${ARCH_X86_64} ) && ${API} < 21 ]] ; then
+
+            # 64 bit ABIs supported after API 21
+            export API=21
+        else
+            export API=${ORIGINAL_API}
+        fi
+
         export ARCH=$(get_arch_name $run_arch)
         export TOOLCHAIN=$(get_toolchain)
         export TOOLCHAIN_ARCH=$(get_toolchain_arch)
@@ -651,6 +662,8 @@ do
         done
     fi
 done
+
+export API=${ORIGINAL_API}
 
 rm -f ${BASEDIR}/android/build/.neon 1>>${BASEDIR}/build.log 2>&1
 ANDROID_ARCHITECTURES=""
