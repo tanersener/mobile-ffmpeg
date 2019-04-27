@@ -9,6 +9,7 @@ android {
         versionCode 240421
         versionName "4.2.1"
         project.archivesBaseName = "mobile-ffmpeg"
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     buildTypes {
