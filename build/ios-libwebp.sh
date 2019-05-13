@@ -69,6 +69,7 @@ cmake -Wno-dev \
     -DCMAKE_AR="$(xcrun --sdk $(get_sdk_name) -f ar)" \
     -DCMAKE_AS="$AS" \
     -DGIF_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/giflib/include \
+    -DGIF_LIBRARY= \
     -DJPEG_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/jpeg/include \
     -DJPEG_LIBRARY=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/jpeg/lib \
     -DPNG_PNG_INCLUDE_DIR=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng/include \
@@ -90,6 +91,7 @@ cmake -Wno-dev \
     -DWEBP_BUILD_IMG2WEBP=0 \
     -DWEBP_BUILD_WEBPMUX=0 \
     -DWEBP_BUILD_WEBPINFO=0 \
+    -DWEBP_BUILD_ANIM_UTILS=0 \
     -DCMAKE_SYSTEM_PROCESSOR=$(get_target_arch) \
     -DBUILD_SHARED_LIBS=0 .. || exit 1
 
