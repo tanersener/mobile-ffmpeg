@@ -77,9 +77,13 @@ fi
 export IOS_MIN_VERSION=12.1
 
 get_mobile_ffmpeg_version() {
-    local MOBILE_FFMPEG_VERSION=$(grep 'MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
+    local MOBILE_FFMPEG_VERSION=$(grep 'const MOBILE_FFMPEG_VERSION' ${BASEDIR}/ios/src/MobileFFmpeg.m | grep -Eo '\".*\"' | sed -e 's/\"//g')
 
-    echo ${MOBILE_FFMPEG_VERSION}
+    if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+        echo "${MOBILE_FFMPEG_VERSION}"
+    else
+        echo "${MOBILE_FFMPEG_VERSION}.LTS"
+    fi
 }
 
 display_help() {
