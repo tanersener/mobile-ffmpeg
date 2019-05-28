@@ -49,6 +49,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -139,6 +140,9 @@ public class MainActivity extends AppCompatActivity {
         } catch (final IOException e) {
             Log.e(TAG, "Font registration failed.", e);
         }
+
+        Log.d(TAG, "Listing supported camera ids.");
+        listSupportedCameraIds();
     }
 
     @Override
@@ -152,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
      * <p>Starts a new asynchronous FFmpeg operation with arguments provided.
      *
      * @param executeCallback callback function to receive result of this execution
-     * @param arguments   FFmpeg command options/arguments
+     * @param arguments       FFmpeg command options/arguments
      */
     public static void executeAsync(final ExecuteCallback executeCallback, final String arguments) {
         final AsyncExecuteTask asyncCommandTask = new AsyncExecuteTask(executeCallback);
@@ -250,6 +254,17 @@ public class MainActivity extends AppCompatActivity {
         fontNameMapping.put("MyFontName", "Doppio One");
         Config.setFontDirectory(this, cacheDirectory.getAbsolutePath(), fontNameMapping);
         // Config.setFontDirectory(this, cacheDirectory.getAbsolutePath(), null);
+    }
+
+    protected void listSupportedCameraIds() {
+        final List<String> supportedCameraIds = Config.getSupportedCameraIds(this);
+        if (supportedCameraIds.size() == 0) {
+            android.util.Log.d(MainActivity.TAG, "No supported cameras found.");
+        } else {
+            for (String supportedCameraId : supportedCameraIds) {
+                android.util.Log.d(MainActivity.TAG, "Supported camera detected: " + supportedCameraId);
+            }
+        }
     }
 
 }
