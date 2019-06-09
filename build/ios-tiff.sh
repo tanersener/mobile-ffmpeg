@@ -5,11 +5,6 @@ if [[ -z ${ARCH} ]]; then
     exit 1
 fi
 
-if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo -e "(*) IOS_MIN_VERSION not defined\n"
-    exit 1
-fi
-
 if [[ -z ${TARGET_SDK} ]]; then
     echo -e "(*) TARGET_SDK not defined\n"
     exit 1
@@ -26,7 +21,11 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/ios-common.sh
+if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
+    . ${BASEDIR}/build/tvos-common.sh
+else
+    . ${BASEDIR}/build/ios-common.sh
+fi
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="tiff"
@@ -48,11 +47,11 @@ if [[ ${RECONF_tiff} -eq 1 ]]; then
 fi
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-sysroot=${SDK_PATH} \
-    --with-jpeg-include-dir=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/jpeg/include \
-    --with-jpeg-lib-dir=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/jpeg/lib \
+    --with-jpeg-include-dir=${BASEDIR}/prebuilt/$(get_target_build_directory)/jpeg/include \
+    --with-jpeg-lib-dir=${BASEDIR}/prebuilt/$(get_target_build_directory)/jpeg/lib \
     --enable-static \
     --disable-shared \
     --disable-fast-install \

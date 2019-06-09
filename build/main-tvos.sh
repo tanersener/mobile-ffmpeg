@@ -5,8 +5,8 @@ if [[ -z ${ARCH} ]]; then
     exit 1
 fi
 
-if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo -e "(*) IOS_MIN_VERSION not defined\n"
+if [[ -z ${TVOS_MIN_VERSION} ]]; then
+    echo -e "(*) TVOS_MIN_VERSION not defined\n"
     exit 1
 fi
 
@@ -108,7 +108,7 @@ set_dependency_rebuilt_flag() {
 }
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/ios-common.sh
+. ${BASEDIR}/build/tvos-common.sh
 
 echo -e "\nBuilding ${ARCH} platform\n"
 echo -e "\nINFO: Starting new build for ${ARCH} at "$(date)"\n" 1>>${BASEDIR}/build.log 2>&1

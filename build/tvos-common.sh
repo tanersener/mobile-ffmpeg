@@ -59,12 +59,11 @@ get_library_name() {
         38) echo "expat" ;;
         39) echo "libsndfile" ;;
         40) echo "leptonica" ;;
-        41) echo "ios-zlib" ;;
-        42) echo "ios-audiotoolbox" ;;
-        43) echo "ios-coreimage" ;;
-        44) echo "ios-bzip2" ;;
-        45) echo "ios-videotoolbox" ;;
-        46) echo "ios-avfoundation" ;;
+        41) echo "tvos-zlib" ;;
+        42) echo "tvos-audiotoolbox" ;;
+        43) echo "tvos-coreimage" ;;
+        44) echo "tvos-bzip2" ;;
+        45) echo "tvos-videotoolbox" ;;
     esac
 }
 
@@ -119,33 +118,29 @@ get_static_archive_name() {
 
 get_arch_name() {
     case $1 in
-        0) echo "armv7" ;;
-        1) echo "armv7s" ;;
-        2) echo "arm64" ;;
-        3) echo "arm64e" ;;
-        4) echo "i386" ;;
-        5) echo "x86-64" ;;
+        0) echo "arm64" ;;
+        1) echo "x86-64" ;;
     esac
 }
 
 get_target_host() {
-    echo "$(get_target_arch)-ios-darwin"
+    echo "$(get_target_arch)-tvos-darwin"
 }
 
 get_target_build_directory() {
     case ${ARCH} in
         x86-64)
-            echo "ios-x86_64-apple-darwin"
+            echo "tvos-x86_64-apple-darwin"
         ;;
         *)
-            echo "ios-${ARCH}-apple-darwin"
+            echo "tvos-${ARCH}-apple-darwin"
         ;;
     esac
 }
 
 get_target_arch() {
     case ${ARCH} in
-        arm64 | arm64e)
+        arm64)
             echo "aarch64"
         ;;
         x86-64)
@@ -158,16 +153,16 @@ get_target_arch() {
 }
 
 get_target_sdk() {
-    echo "$(get_target_arch)-apple-ios${IOS_MIN_VERSION}"
+    echo "$(get_target_arch)-apple-tvos${TVOS_MIN_VERSION}"
 }
 
 get_sdk_name() {
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
-            echo "iphoneos"
+        arm64)
+            echo "appletvos"
         ;;
-        i386 | x86-64)
-            echo "iphonesimulator"
+        x86-64)
+            echo "appletvsimulator"
         ;;
     esac
 }
@@ -178,11 +173,11 @@ get_sdk_path() {
 
 get_min_version_cflags() {
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
-            echo "-miphoneos-version-min=${IOS_MIN_VERSION}"
+        arm64)
+            echo "-mappletvos-version-min=${TVOS_MIN_VERSION}"
         ;;
-        i386 | x86-64)
-            echo "-mios-simulator-version-min=${IOS_MIN_VERSION}"
+        x86-64)
+            echo "-mappletvsimulator-version-min=${TVOS_MIN_VERSION}"
         ;;
     esac
 }
@@ -200,30 +195,18 @@ get_common_cflags() {
 
     case ${ARCH} in
         i386 | x86-64)
-            echo "-fstrict-aliasing -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
+            echo "-fstrict-aliasing -DTVOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
         ;;
         *)
-            echo "-fstrict-aliasing -fembed-bitcode -DIOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
+            echo "-fstrict-aliasing -fembed-bitcode -DTVOS ${LTS_BUILD_FLAG}${BUILD_DATE} -isysroot ${SDK_PATH}"
         ;;
     esac
 }
 
 get_arch_specific_cflags() {
     case ${ARCH} in
-        armv7)
-            echo "-arch armv7 -target $(get_target_host) -march=armv7 -mcpu=cortex-a8 -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARMV7"
-        ;;
-        armv7s)
-            echo "-arch armv7s -target $(get_target_host) -march=armv7s -mcpu=generic -mfpu=neon -mfloat-abi=softfp -DMOBILE_FFMPEG_ARMV7S"
-        ;;
         arm64)
             echo "-arch arm64 -target $(get_target_host) -march=armv8-a+crc+crypto -mcpu=generic -DMOBILE_FFMPEG_ARM64"
-        ;;
-        arm64e)
-            echo "-arch arm64e -target $(get_target_host) -march=armv8.3-a+dotprod -mcpu=generic -DMOBILE_FFMPEG_ARM64E"
-        ;;
-        i386)
-            echo "-arch i386 -target $(get_target_host) -march=i386 -mtune=intel -mssse3 -mfpmath=sse -m32 -DMOBILE_FFMPEG_I386"
         ;;
         x86-64)
             echo "-arch x86_64 -target $(get_target_host) -march=x86-64 -msse4.2 -mpopcnt -m64 -mtune=intel -DMOBILE_FFMPEG_X86_64"
@@ -235,7 +218,7 @@ get_size_optimization_cflags() {
 
     local ARCH_OPTIMIZATION=""
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
+        arm64)
             case $1 in
                 x264 | x265)
                     ARCH_OPTIMIZATION="-Oz -Wno-ignored-optimization-argument"
@@ -248,7 +231,7 @@ get_size_optimization_cflags() {
                 ;;
             esac
         ;;
-        i386 | x86-64)
+        x86-64)
             case $1 in
                 x264 | ffmpeg)
                     ARCH_OPTIMIZATION="-O2 -Wno-ignored-optimization-argument"
@@ -272,10 +255,10 @@ get_size_optimization_asm_cflags() {
     case $1 in
         jpeg | ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e)
+                arm64)
                     ARCH_OPTIMIZATION="-Oz"
                 ;;
-                i386 | x86-64)
+                x86-64)
                     ARCH_OPTIMIZATION="-O2"
                 ;;
             esac
@@ -294,7 +277,7 @@ get_app_specific_cflags() {
     case $1 in
         fontconfig)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e)
+                arm64)
                     APP_FLAGS="-std=c99 -Wno-unused-function -D__IPHONE_OS_MIN_REQUIRED -D__IPHONE_VERSION_MIN_REQUIRED=30000"
                 ;;
                 *)
@@ -321,7 +304,7 @@ get_app_specific_cflags() {
             APP_FLAGS="-std=c99 -Wno-unused-function -Wall -Wno-deprecated-declarations -Wno-pointer-sign -Wno-switch -Wno-unused-result -Wno-unused-variable -DPIC -fobjc-arc"
         ;;
         sdl2)
-            APP_FLAGS="-DPIC -Wno-unused-function -D__IPHONEOS__"
+            APP_FLAGS="-DPIC -Wno-unused-function -D__TVOS__"
         ;;
         shine)
             APP_FLAGS="-Wno-unused-function"
@@ -380,7 +363,7 @@ get_cxxflags() {
 
     local BITCODE_FLAGS=""
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
+        arm64)
             local BITCODE_FLAGS="-fembed-bitcode"
         ;;
     esac
@@ -417,7 +400,7 @@ get_common_ldflags() {
 
 get_size_optimization_ldflags() {
     case ${ARCH} in
-        armv7 | armv7s | arm64 | arm64e)
+        arm64)
             case $1 in
                 ffmpeg | mobile-ffmpeg)
                     echo "-Oz -dead_strip"
@@ -442,20 +425,8 @@ get_size_optimization_ldflags() {
 
 get_arch_specific_ldflags() {
     case ${ARCH} in
-        armv7)
-            echo "-arch armv7 -march=armv7 -mfpu=neon -mfloat-abi=softfp -fembed-bitcode"
-        ;;
-        armv7s)
-            echo "-arch armv7s -march=armv7s -mfpu=neon -mfloat-abi=softfp -fembed-bitcode"
-        ;;
         arm64)
             echo "-arch arm64 -march=armv8-a+crc+crypto -fembed-bitcode"
-        ;;
-        arm64e)
-            echo "-arch arm64e -march=armv8.3-a+dotprod -fembed-bitcode"
-        ;;
-        i386)
-            echo "-arch i386 -march=i386"
         ;;
         x86-64)
             echo "-arch x86_64 -march=x86-64"
@@ -476,7 +447,7 @@ get_ldflags() {
     case $1 in
         mobile-ffmpeg)
             case ${ARCH} in
-                armv7 | armv7s | arm64 | arm64e)
+                arm64)
                     echo "${ARCH_FLAGS} ${LINKED_LIBRARIES} ${COMMON_FLAGS} -fembed-bitcode -Wc,-fembed-bitcode ${OPTIMIZATION_FLAGS}"
                 ;;
                 *)
@@ -1036,16 +1007,7 @@ set_toolchain_clang_paths() {
 
     LOCAL_ASMFLAGS="$(get_asmflags $1)"
     case ${ARCH} in
-        armv7 | armv7s)
-            if [ "$1" == "x265" ]; then
-                export AS="${LOCAL_GAS_PREPROCESSOR}"
-                export AS_ARGUMENTS="-arch arm"
-                export ASM_FLAGS="${LOCAL_ASMFLAGS}"
-            else
-                export AS="${LOCAL_GAS_PREPROCESSOR} -arch arm -- ${CC} ${LOCAL_ASMFLAGS}"
-            fi
-        ;;
-        arm64 | arm64e)
+        arm64)
             if [ "$1" == "x265" ]; then
                 export AS="${LOCAL_GAS_PREPROCESSOR}"
                 export AS_ARGUMENTS="-arch aarch64"

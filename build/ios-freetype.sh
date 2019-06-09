@@ -5,11 +5,6 @@ if [[ -z ${ARCH} ]]; then
     exit 1
 fi
 
-if [[ -z ${IOS_MIN_VERSION} ]]; then
-    echo -e "(*) IOS_MIN_VERSION not defined\n"
-    exit 1
-fi
-
 if [[ -z ${TARGET_SDK} ]]; then
     echo -e "(*) TARGET_SDK not defined\n"
     exit 1
@@ -26,7 +21,11 @@ if [[ -z ${BASEDIR} ]]; then
 fi
 
 # ENABLE COMMON FUNCTIONS
-. ${BASEDIR}/build/ios-common.sh
+if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
+    . ${BASEDIR}/build/tvos-common.sh
+else
+    . ${BASEDIR}/build/ios-common.sh
+fi
 
 # PREPARING PATHS & DEFINING ${INSTALL_PKG_CONFIG_DIR}
 LIB_NAME="freetype"
@@ -44,11 +43,11 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 make distclean 2>/dev/null 1>/dev/null
 
 # OVERRIDING PKG-CONFIG
-export LIBPNG_CFLAGS="-I${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng/include"
-export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/libpng/lib"
+export LIBPNG_CFLAGS="-I${BASEDIR}/prebuilt/$(get_target_build_directory)/libpng/include"
+export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/libpng/lib"
 
 ./configure \
-    --prefix=${BASEDIR}/prebuilt/ios-$(get_target_build_directory)/${LIB_NAME} \
+    --prefix=${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} \
     --with-pic \
     --with-zlib \
     --with-png \
