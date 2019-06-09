@@ -86,11 +86,7 @@ get_mobile_ffmpeg_version() {
 display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
-    if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for TVOS platform. By default two architectures (arm64 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and TVOS frameworks are created with enabled architectures inside.\n"
-    else
-        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for TVOS platform. By default two architectures (arm64 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and TVOS frameworks are created with enabled architectures inside.\n"
-    fi
+    echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for TVOS platform. By default two architectures (arm64 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and TVOS frameworks are created with enabled architectures inside.\n"
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
@@ -102,7 +98,7 @@ display_help() {
     echo -e "  -V, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
     echo -e "  -s, --speed\t\t\toptimize for speed instead of size"
-    echo -e "  -l, --lts\t\t\tbuild lts packages to support sdk 9.3+ devices, does not include arm64e architecture"
+    echo -e "  -l, --lts\t\t\tbuild lts packages to support sdk 9.2+ devices"
     echo -e "  -f, --force\t\t\tignore warnings\n"
 
     echo -e "Licensing options:"
@@ -120,7 +116,9 @@ display_help() {
     echo -e "  --enable-tvos-audiotoolbox\tbuild with built-in Apple AudioToolbox support[no]"
     echo -e "  --enable-tvos-coreimage\tbuild with built-in Apple CoreImage support[no]"
     echo -e "  --enable-tvos-bzip2\t\tbuild with built-in bzip2 support[no]"
-    echo -e "  --enable-tvos-videotoolbox\tbuild with built-in Apple VideoToolbox support[no]"
+    if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
+        echo -e "  --enable-tvos-videotoolbox\tbuild with built-in Apple VideoToolbox support[no]"
+    fi
     echo -e "  --enable-tvos-zlib\t\tbuild with built-in zlib [no]"
     echo -e "  --enable-chromaprint\t\tbuild with chromaprint [no]"
     echo -e "  --enable-fontconfig\t\tbuild with fontconfig [no]"
@@ -195,8 +193,11 @@ optimize_for_speed() {
 enable_lts_build() {
     export MOBILE_FFMPEG_LTS_BUILD="1"
 
-    # XCODE 7.3 HAS SDK 9.3
-    export TVOS_MIN_VERSION=9.3
+    # XCODE 7.3 HAS TVOS SDK 9.2
+    export TVOS_MIN_VERSION=9.2
+
+    # TVOS SDK 9.2 DOES NOT INCLUDE VIDEOTOOLBOX
+    ENABLED_LIBRARIES[LIBRARY_VIDEOTOOLBOX]=0
 }
 
 reconf_library() {

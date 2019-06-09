@@ -1,6 +1,6 @@
 #!/bin/bash
 # 
-# Creates a new ios release from current branch
+# Creates a new ios lts release from current branch
 #
 
 export BASEDIR=$(pwd)

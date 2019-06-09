@@ -27,7 +27,7 @@
 @interface PipeViewController : UIViewController<LogDelegate,StatisticsDelegate>
 
 - (void)setActive;
-+ (NSString*)generateCreateVideoWithPipesScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile :(NSString *)videoCodec :(NSString *)customOptions;
++ (NSString*)generateCreateVideoWithPipesScript:(NSString *)image1 :(NSString *)image2 :(NSString *)image3 :(NSString *)videoFile;
 
 @end
 

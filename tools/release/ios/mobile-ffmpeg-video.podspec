@@ -12,12 +12,21 @@ Pod::Spec.new do |s|
     s.license           = { :type => "LGPL-3.0", :file => "mobileffmpeg.framework/LICENSE" }
 
     s.platform          = :ios
+    s.platform          = :tvos
+
     s.requires_arc      = true
-    s.ios.deployment_target = '9.3'
-    s.ios.frameworks    = 'AudioToolbox','AVFoundation','CoreMedia','VideoToolbox'
     s.libraries         = 'z', 'bz2', 'c++'
-      
-    s.source            = { :http => "https://github.com/tanersener/mobile-ffmpeg/releases/download/vVERSION/mobile-ffmpeg-video-VERSION-ios-framework.zip" }
-    s.ios.vendored_frameworks = 'mobileffmpeg.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'expat.framework', 'fontconfig.framework', 'freetype.framework', 'fribidi.framework', 'giflib.framework', 'jpeg.framework', 'kvazaar.framework', 'libaom.framework', 'libass.framework', 'libcharset.framework', 'libiconv.framework', 'libogg.framework', 'libpng.framework', 'libtheora.framework', 'libtheoradec.framework', 'libtheoraenc.framework', 'libuuid.framework', 'libvorbis.framework', 'libvorbisenc.framework', 'libvorbisfile.framework', 'libvpx.framework', 'libwebp.framework', 'libwebpdecoder.framework', 'libwebpdemux.framework', 'snappy.framework', 'tiff.framework'
+
+    s.source            = { :http => "https://github.com/tanersener/mobile-ffmpeg/releases/download/vVERSION/mobile-ffmpeg-video-VERSION-ios-tvos-framework.zip" }
+
+    s.ios.deployment_target = '9.3'
+    s.ios.frameworks    = 'AudioToolbox','CoreMedia','VideoToolbox'
+    s.ios.vendored_frameworks  = 'ios/mobileffmpeg.framework', 'ios/libavcodec.framework', 'ios/libavdevice.framework', 'ios/libavfilter.framework', 'ios/libavformat.framework', 'ios/libavutil.framework', 'ios/libswresample.framework', 'ios/libswscale.framework', 'ios/expat.framework', 'ios/fontconfig.framework', 'ios/freetype.framework', 'ios/fribidi.framework', 'ios/giflib.framework', 'ios/jpeg.framework', 'ios/kvazaar.framework', 'ios/libaom.framework', 'ios/libass.framework', 'ios/libcharset.framework', 'ios/libiconv.framework', 'ios/libogg.framework', 'ios/libpng.framework', 'ios/libtheora.framework', 'ios/libtheoradec.framework', 'ios/libtheoraenc.framework', 'ios/libuuid.framework', 'ios/libvorbis.framework', 'ios/libvorbisenc.framework', 'ios/libvorbisfile.framework', 'ios/libvpx.framework', 'ios/libwebp.framework', 'ios/libwebpdecoder.framework', 'ios/libwebpdemux.framework', 'ios/snappy.framework', 'ios/tiff.framework'
+    s.ios.preserve_paths       = 'ios/*.framework'
+
+    s.tvos.deployment_target = '9.2'
+    s.tvos.frameworks   = 'AudioToolbox','CoreMedia','VideoToolbox'
+    s.tvos.vendored_frameworks  = 'tvos/mobileffmpeg.framework', 'tvos/libavcodec.framework', 'tvos/libavdevice.framework', 'tvos/libavfilter.framework', 'tvos/libavformat.framework', 'tvos/libavutil.framework', 'tvos/libswresample.framework', 'tvos/libswscale.framework', 'tvos/expat.framework', 'tvos/fontconfig.framework', 'tvos/freetype.framework', 'tvos/fribidi.framework', 'tvos/giflib.framework', 'tvos/jpeg.framework', 'tvos/kvazaar.framework', 'tvos/libaom.framework', 'tvos/libass.framework', 'tvos/libcharset.framework', 'tvos/libiconv.framework', 'tvos/libogg.framework', 'tvos/libpng.framework', 'tvos/libtheora.framework', 'tvos/libtheoradec.framework', 'tvos/libtheoraenc.framework', 'tvos/libuuid.framework', 'tvos/libvorbis.framework', 'tvos/libvorbisenc.framework', 'tvos/libvorbisfile.framework', 'tvos/libvpx.framework', 'tvos/libwebp.framework', 'tvos/libwebpdecoder.framework', 'tvos/libwebpdemux.framework', 'tvos/snappy.framework', 'tvos/tiff.framework'
+    s.tvos.preserve_paths       = 'tvos/*.framework'
 
 end  

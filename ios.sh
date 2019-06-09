@@ -205,7 +205,7 @@ optimize_for_speed() {
 enable_lts_build() {
     export MOBILE_FFMPEG_LTS_BUILD="1"
 
-    # XCODE 7.3 HAS SDK 9.3
+    # XCODE 7.3 HAS IOS SDK 9.3
     export IOS_MIN_VERSION=9.3
 
     disable_arch "arm64e"

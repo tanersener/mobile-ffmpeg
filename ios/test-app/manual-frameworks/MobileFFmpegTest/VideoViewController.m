@@ -1,7 +1,7 @@
 //
 // VideoViewController.m
 //
-// Copyright (c) 2018 Taner Sener
+// Copyright (c) 2018-2019 Taner Sener
 //
 // This file is part of MobileFFmpeg.
 //
@@ -82,7 +82,7 @@
     
     playerLayer.frame = rectangularFrame;
     [self.view.layer addSublayer:playerLayer];
-    
+
     alertController = nil;
     statistics = nil;
 
