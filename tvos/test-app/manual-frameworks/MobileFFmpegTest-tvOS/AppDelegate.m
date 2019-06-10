@@ -1,12 +1,31 @@
 //
-//  AppDelegate.m
-//  MobileFFmpegTest-tvOS
+// AppDelegate.m
 //
-//  Created by Taner Sener on 9.06.2019.
-//  Copyright © 2019 ARTHENICA. All rights reserved.
+// Copyright (c) 2019 Taner Sener
+//
+// This file is part of MobileFFmpeg.
+//
+// MobileFFmpeg is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// MobileFFmpeg is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+//  You should have received a copy of the GNU Lesser General Public License
+//  along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+#import <mobileffmpeg/MobileFFmpegConfig.h>
 #import "AppDelegate.h"
+
+void uncaughtExceptionHandler(NSException *exception) {
+    NSLog(@"Uncaught exception detected: %@.", exception);
+    NSLog(@"%@", [exception callStackSymbols]);
+}
 
 @interface AppDelegate ()
 
@@ -17,6 +36,45 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
+
+    // UPDATE TAB BAR STYLE
+    UITabBarController *tabBarController = (UITabBarController *)self.window.rootViewController;
+    UITabBar *tabBar = tabBarController.tabBar;
+    UITabBarItem *tabBarItem1 = [tabBar.items objectAtIndex:0];
+    UITabBarItem *tabBarItem2 = [tabBar.items objectAtIndex:1];
+    UITabBarItem *tabBarItem3 = [tabBar.items objectAtIndex:2];
+    UITabBarItem *tabBarItem4 = [tabBar.items objectAtIndex:3];
+    UITabBarItem *tabBarItem5 = [tabBar.items objectAtIndex:4];
+    UITabBarItem *tabBarItem6 = [tabBar.items objectAtIndex:5];
+    UITabBarItem *tabBarItem7 = [tabBar.items objectAtIndex:6];
+    tabBarItem1.title = @"COMMAND";
+    tabBarItem2.title = @"VIDEO";
+    tabBarItem3.title = @"HTTPS";
+    tabBarItem4.title = @"AUDIO";
+    tabBarItem5.title = @"SUBTITLE";
+    tabBarItem6.title = @"VID.STAB";
+    tabBarItem7.title = @"PIPE";
+
+    // SELECTED BAR ITEM
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [UIColor whiteColor], NSForegroundColorAttributeName,
+                                                       [UIFont systemFontOfSize:38], NSFontAttributeName,
+                                                       nil] forState:UIControlStateSelected];
+
+    // NOT SELECTED BAR ITEMS
+    [[UITabBarItem appearance] setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                       [UIColor darkGrayColor], NSForegroundColorAttributeName,
+                                                       [UIFont systemFontOfSize:38], NSFontAttributeName,
+                                                       nil] forState:UIControlStateNormal];
+
+    NSString *resourceFolder = [[NSBundle mainBundle] resourcePath];
+    NSDictionary *fontNameMapping = @{@"MyFontName" : @"Doppio One"};
+
+    [MobileFFmpegConfig setFontDirectory:resourceFolder with:fontNameMapping];
+    [MobileFFmpegConfig setFontDirectory:resourceFolder with:nil];
+
     return YES;
 }
 

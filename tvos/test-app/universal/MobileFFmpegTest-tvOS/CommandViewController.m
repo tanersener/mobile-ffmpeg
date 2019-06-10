@@ -119,7 +119,7 @@
     
     if (self.outputText.text.length > 0 ) {
         NSRange bottom = NSMakeRange(self.outputText.text.length - 1, 1);
-        [self.outputText scrollRangeToVisible:bottom];
+        // [self.outputText scrollRangeToVisible:bottom];
     }
 }
 

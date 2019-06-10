@@ -68,8 +68,8 @@ if ! [ -x "$(command -v xcrun)" ]; then
     exit 1
 fi
 
-# USE 12.1 AS TVOS_MIN_VERSION
-export TVOS_MIN_VERSION=12.1
+# USE 10.2 AS TVOS_MIN_VERSION
+export TVOS_MIN_VERSION=10.2
 
 export APPLE_TVOS_BUILD=1
 
