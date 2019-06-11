@@ -54,7 +54,7 @@ FFmpeg for Android and iOS / tvOS
 ### 2. Using
 Binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org). 
 
-Refer to [Using iOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-IOS-Universal-Binaries) guide to import iOS /tvOS universal binaries released at [Github](https://github.com/tanersener/mobile-ffmpeg/releases).
+Refer to [Using iOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-iOS-Universal-Binaries) guide to import iOS /tvOS universal binaries released at [Github](https://github.com/tanersener/mobile-ffmpeg/releases).
 
 There are eight different binary packages. Below you can see which system libraries and external libraries are enabled in each of them.
 
@@ -331,15 +331,22 @@ This table shows the differences between two variants.
     autoconf automake libtool pkg-config curl cmake gcc gperf texinfo yasm nasm bison autogen patch git
     ```
 Some of these packages are not mandatory for the default build.
-Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Prerequisites) and
-[iOS / tvOS Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/IOS-Prerequisites) for the details.
+Please visit [Android Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/Android-Prerequisites), 
+[iOS Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/iOS-Prerequisites) and 
+[tvOS Prerequisites](https://github.com/tanersener/mobile-ffmpeg/wiki/tvOS-Prerequisites) for the details.
 
 2. Android builds require these additional packages.
     - **Android SDK 4.1 Jelly Bean (API Level 16)** or later
-    - **Android NDK r19** or later with LLDB and CMake
+    - **Android NDK r20** or later with LLDB and CMake
 
-3. iOS / tvOS builds need these extra packages and tools.
+3. iOS builds need these extra packages and tools.
     - **Xcode 7.3.1** or later
+    - **iOS SDK 9.3** or later
+    - **Command Line Tools**
+
+4. tvOS builds need these extra packages and tools.
+    - **Xcode 7.3.1** or later
+    - **tvOS SDK 9.2** or later
     - **Command Line Tools**
 
 #### 5.2 Build Scripts
@@ -347,8 +354,9 @@ Use `android.sh`, `ios.sh` and `tvos.sh` to build MobileFFmpeg for each platform
 
 All three scripts support additional options and 
 can be customized to enable/disable specific external libraries and/or architectures. Please refer to wiki pages of
-[android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh) and
-[ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) to see all available build options.
+[android.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/android.sh), 
+[ios.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/ios.sh) and 
+[tvos.sh](https://github.com/tanersener/mobile-ffmpeg/wiki/tvos.sh) to see all available build options.
 ##### 5.2.1 Android 
 ```
 export ANDROID_HOME=<Android SDK Path>
@@ -413,7 +421,7 @@ Source code of FFmpeg and external libraries is included in compliance with thei
 
 `strip-frameworks.sh` script included and distributed (until v4.x) is published under the [Apache License version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 
-In test applications, embedded fonts are licensed under the [SIL Open Font License](https://opensource.org/licenses/OFL-1.1); other digital assets are published in the public domain.
+In test applications; embedded fonts are licensed under the [SIL Open Font License](https://opensource.org/licenses/OFL-1.1), other digital assets are published in the public domain.
 
 Please visit [License](https://github.com/tanersener/mobile-ffmpeg/wiki/License) page for the details.
 
