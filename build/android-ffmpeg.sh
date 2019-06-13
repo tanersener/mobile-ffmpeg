@@ -76,7 +76,7 @@ esac
 CONFIGURE_POSTFIX=""
 HIGH_PRIORITY_INCLUDES=""
 
-for library in {1..43}
+for library in {1..44}
 do
     if [[ ${!library} -eq 1 ]]; then
         ENABLED_LIBRARY=$(get_library_name $((library - 1)))
@@ -184,6 +184,11 @@ do
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
             ;;
+            openh264)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags openh264)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static openh264)"
+                CONFIGURE_POSTFIX+=" --enable-libopenh264"
+            ;;
             opus)
                 CFLAGS+=" $(pkg-config --cflags opus)"
                 LDFLAGS+=" $(pkg-config --libs --static opus)"
@@ -282,7 +287,7 @@ do
         # THE FOLLOWING LIBRARIES SHOULD BE EXPLICITLY DISABLED TO PREVENT AUTODETECT
         if [[ ${library} -eq 30 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 42 ]]; then
+        elif [[ ${library} -eq 43 ]]; then
             CONFIGURE_POSTFIX+=" --disable-zlib"
         fi
     fi

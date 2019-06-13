@@ -49,18 +49,19 @@ get_library_name() {
         28) echo "twolame" ;;
         29) echo "sdl" ;;
         30) echo "tesseract" ;;
-        31) echo "giflib" ;;
-        32) echo "jpeg" ;;
-        33) echo "libogg" ;;
-        34) echo "libpng" ;;
-        35) echo "libuuid" ;;
-        36) echo "nettle" ;;
-        37) echo "tiff" ;;
-        38) echo "expat" ;;
-        39) echo "libsndfile" ;;
-        40) echo "leptonica" ;;
-        41) echo "android-zlib" ;;
-        42) echo "android-media-codec" ;;
+        31) echo "openh264" ;;
+        32) echo "giflib" ;;
+        33) echo "jpeg" ;;
+        34) echo "libogg" ;;
+        35) echo "libpng" ;;
+        36) echo "libuuid" ;;
+        37) echo "nettle" ;;
+        38) echo "tiff" ;;
+        39) echo "expat" ;;
+        40) echo "libsndfile" ;;
+        41) echo "leptonica" ;;
+        42) echo "android-zlib" ;;
+        43) echo "android-media-codec" ;;
     esac
 }
 
@@ -211,7 +212,7 @@ get_common_cflags() {
         local LTS_BUILD__FLAG="-DMOBILE_FFMPEG_LTS "
     fi
 
-    echo "-fstrict-aliasing -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
+    echo "-fno-integrated-as -fstrict-aliasing -fPIC -DANDROID ${LTS_BUILD__FLAG}-D__ANDROID__ -D__ANDROID_API__=${API}"
 }
 
 get_arch_specific_cflags() {

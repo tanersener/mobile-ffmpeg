@@ -62,8 +62,8 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp theoradec.pc ${INSTALL_PKG_CONFIG_DIR}
-cp theoraenc.pc ${INSTALL_PKG_CONFIG_DIR}
-cp theora.pc ${INSTALL_PKG_CONFIG_DIR}
+cp theoradec.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
+cp theoraenc.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
+cp theora.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

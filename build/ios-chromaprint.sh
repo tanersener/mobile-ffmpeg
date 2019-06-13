@@ -68,6 +68,6 @@ cmake -Wno-dev \
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp libchromaprint.pc ${INSTALL_PKG_CONFIG_DIR}
+cp libchromaprint.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

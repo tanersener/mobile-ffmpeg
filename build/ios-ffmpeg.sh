@@ -87,10 +87,10 @@ esac
 
 if [[ ${APPLE_TVOS_BUILD} -eq 1 ]]; then
     CONFIGURE_POSTFIX="--disable-avfoundation"
-    LIBRARY_COUNT=46
+    LIBRARY_COUNT=47
 else
     CONFIGURE_POSTFIX=""
-    LIBRARY_COUNT=47
+    LIBRARY_COUNT=48
 fi
 
 library=1
@@ -199,6 +199,11 @@ do
                 FFMPEG_LDFLAGS+=" $(pkg-config --libs --static opencore-amrwb)"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrnb"
                 CONFIGURE_POSTFIX+=" --enable-libopencore-amrwb"
+            ;;
+            openh264)
+                FFMPEG_CFLAGS+=" $(pkg-config --cflags openh264)"
+                FFMPEG_LDFLAGS+=" $(pkg-config --libs --static openh264)"
+                CONFIGURE_POSTFIX+=" --enable-libopenh264"
             ;;
             opus)
                 FFMPEG_CFLAGS+=" $(pkg-config --cflags opus)"
@@ -320,17 +325,17 @@ do
             CONFIGURE_POSTFIX+=" --disable-iconv"
         elif [[ ${library} -eq 30 ]]; then
             CONFIGURE_POSTFIX+=" --disable-sdl2"
-        elif [[ ${library} -eq 42 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-zlib"
         elif [[ ${library} -eq 43 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
+            CONFIGURE_POSTFIX+=" --disable-zlib"
         elif [[ ${library} -eq 44 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-coreimage"
+            CONFIGURE_POSTFIX+=" --disable-audiotoolbox"
         elif [[ ${library} -eq 45 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-bzlib"
+            CONFIGURE_POSTFIX+=" --disable-coreimage"
         elif [[ ${library} -eq 46 ]]; then
-            CONFIGURE_POSTFIX+=" --disable-videotoolbox"
+            CONFIGURE_POSTFIX+=" --disable-bzlib"
         elif [[ ${library} -eq 47 ]]; then
+            CONFIGURE_POSTFIX+=" --disable-videotoolbox"
+        elif [[ ${library} -eq 48 ]]; then
             CONFIGURE_POSTFIX+=" --disable-avfoundation"
         fi
     fi

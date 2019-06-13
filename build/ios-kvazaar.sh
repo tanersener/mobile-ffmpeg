@@ -66,6 +66,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp ./src/kvazaar.pc ${INSTALL_PKG_CONFIG_DIR}
+cp ./src/kvazaar.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

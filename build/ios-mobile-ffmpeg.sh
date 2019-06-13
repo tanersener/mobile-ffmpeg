@@ -56,7 +56,7 @@ if [[ ${RECONF_mobile_ffmpeg} -eq 1 ]]; then
 fi
 
 VIDEOTOOLBOX_SUPPORT_FLAG=""
-if [[ ${46} -eq 1 ]]; then
+if [[ ${47} -eq 1 ]]; then
     VIDEOTOOLBOX_SUPPORT_FLAG="--enable-videotoolbox"
 fi
 
@@ -81,14 +81,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
-
-if [ $? -ne 0 ]; then
-    echo "failed"
-    exit 1
-fi
-
-make install 1>>${BASEDIR}/build.log 2>&1
+make -j$(get_cpu_count) install 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -eq 0 ]; then
     echo "ok"

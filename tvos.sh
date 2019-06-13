@@ -36,27 +36,28 @@ LIBRARY_CHROMAPRINT=27
 LIBRARY_TWOLAME=28
 LIBRARY_SDL=29
 LIBRARY_TESSERACT=30
-LIBRARY_GIFLIB=31
-LIBRARY_JPEG=32
-LIBRARY_LIBOGG=33
-LIBRARY_LIBPNG=34
-LIBRARY_LIBUUID=35
-LIBRARY_NETTLE=36
-LIBRARY_TIFF=37
-LIBRARY_EXPAT=38
-LIBRARY_SNDFILE=39
-LIBRARY_LEPTONICA=40
-LIBRARY_ZLIB=41
-LIBRARY_AUDIOTOOLBOX=42
-LIBRARY_COREIMAGE=43
-LIBRARY_BZIP2=44
-LIBRARY_VIDEOTOOLBOX=45
+LIBRARY_OPENH264=31
+LIBRARY_GIFLIB=32
+LIBRARY_JPEG=33
+LIBRARY_LIBOGG=34
+LIBRARY_LIBPNG=35
+LIBRARY_LIBUUID=36
+LIBRARY_NETTLE=37
+LIBRARY_TIFF=38
+LIBRARY_EXPAT=39
+LIBRARY_SNDFILE=40
+LIBRARY_LEPTONICA=41
+LIBRARY_ZLIB=42
+LIBRARY_AUDIOTOOLBOX=43
+LIBRARY_COREIMAGE=44
+LIBRARY_BZIP2=45
+LIBRARY_VIDEOTOOLBOX=46
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -138,6 +139,7 @@ display_help() {
     echo -e "  --enable-libwebp\t\tbuild with libwebp [no]"
     echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
     echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
+    echo -e "  --enable-openh264\t\tbuild with openh264 [no]"
     echo -e "  --enable-opus\t\t\tbuild with opus [no]"
     echo -e "  --enable-sdl\t\t\tbuild with sdl [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
@@ -319,6 +321,9 @@ set_library() {
         opencore-amr)
             ENABLED_LIBRARIES[LIBRARY_OPENCOREAMR]=$2
         ;;
+        openh264)
+            ENABLED_LIBRARIES[LIBRARY_OPENH264]=$2
+        ;;
         opus)
             ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
         ;;
@@ -442,7 +447,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {41..45}
+    for library in {42..46}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -454,7 +459,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..30}
+    for library in {0..31}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -559,11 +564,11 @@ get_external_library_license_path() {
         25) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LGPL" ;;
         27) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md" ;;
         29) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.txt" ;;
-        32) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
-        36) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
-        37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
-        40) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
-        4 | 10 | 13 | 19 | 21 | 26 | 34) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
+        33) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE.md " ;;
+        37) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING.LESSERv3" ;;
+        38) echo "${BASEDIR}/src/$(get_library_name $1)/COPYRIGHT" ;;
+        41) echo "${BASEDIR}/src/$(get_library_name $1)/leptonica-license.txt" ;;
+        4 | 10 | 13 | 19 | 21 | 26 | 31 | 35) echo "${BASEDIR}/src/$(get_library_name $1)/LICENSE" ;;
         *) echo "${BASEDIR}/src/$(get_library_name $1)/COPYING" ;;
     esac
 }
@@ -622,7 +627,7 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..45}
+            for library in {0..46}
             do
                 if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
@@ -728,7 +733,7 @@ do
         TARGET_ARCH_LIST+=(${TARGET_ARCH})
 
         # CLEAR FLAGS
-        for library in {1..46}
+        for library in {1..47}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")
@@ -752,7 +757,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     mkdir -p ${BASEDIR}/prebuilt/tvos-framework 1>>${BASEDIR}/build.log 2>&1
 
     # 1. EXTERNAL LIBRARIES
-    for library in {0..40}
+    for library in {0..41}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
 

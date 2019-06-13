@@ -39,24 +39,25 @@ LIBRARY_CHROMAPRINT=27
 LIBRARY_TWOLAME=28
 LIBRARY_SDL=29
 LIBRARY_TESSERACT=30
-LIBRARY_GIFLIB=31
-LIBRARY_JPEG=32
-LIBRARY_LIBOGG=33
-LIBRARY_LIBPNG=34
-LIBRARY_LIBUUID=35
-LIBRARY_NETTLE=36
-LIBRARY_TIFF=37
-LIBRARY_EXPAT=38
-LIBRARY_SNDFILE=39
-LIBRARY_LEPTONICA=40
-LIBRARY_ZLIB=41
-LIBRARY_MEDIA_CODEC=42
+LIBRARY_OPENH264=31
+LIBRARY_GIFLIB=32
+LIBRARY_JPEG=33
+LIBRARY_LIBOGG=34
+LIBRARY_LIBPNG=35
+LIBRARY_LIBUUID=36
+LIBRARY_NETTLE=37
+LIBRARY_TIFF=38
+LIBRARY_EXPAT=39
+LIBRARY_SNDFILE=40
+LIBRARY_LEPTONICA=41
+LIBRARY_ZLIB=42
+LIBRARY_MEDIA_CODEC=43
 
 # ENABLE ARCH
 ENABLED_ARCHITECTURES=(1 1 1 1 1)
 
 # ENABLE LIBRARIES
-ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
 
@@ -89,7 +90,8 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  -V, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
     echo -e "  -s, --speed\t\t\toptimize for speed instead of size"
-    echo -e "  -l, --lts\t\t\tbuild lts packages to support API 21+ devices\n"
+    echo -e "  -l, --lts\t\t\tbuild lts packages to support API 21+ devices"
+    echo -e "  -f, --force\t\t\tignore warnings\n"
 
     echo -e "Licensing options:"
 
@@ -126,6 +128,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "  --enable-libwebp\t\tbuild with libwebp [no]"
     echo -e "  --enable-libxml2\t\tbuild with libxml2 [no]"
     echo -e "  --enable-opencore-amr\t\tbuild with opencore-amr [no]"
+    echo -e "  --enable-openh264\t\tbuild with openh264 [no]"
     echo -e "  --enable-opus\t\t\tbuild with opus [no]"
     echo -e "  --enable-sdl\t\t\tbuild with sdl [no]"
     echo -e "  --enable-shine\t\tbuild with shine [no]"
@@ -295,6 +298,9 @@ set_library() {
         opencore-amr)
             ENABLED_LIBRARIES[LIBRARY_OPENCOREAMR]=$2
         ;;
+        openh264)
+            ENABLED_LIBRARIES[LIBRARY_OPENH264]=$2
+        ;;
         opus)
             ENABLED_LIBRARIES[LIBRARY_OPUS]=$2
         ;;
@@ -427,7 +433,7 @@ print_enabled_libraries() {
     let enabled=0;
 
     # FIRST BUILT-IN LIBRARIES
-    for library in {41..42}
+    for library in {42..43}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -439,7 +445,7 @@ print_enabled_libraries() {
     done
 
     # THEN EXTERNAL LIBRARIES
-    for library in {0..30}
+    for library in {0..31}
     do
         if [[ ${ENABLED_LIBRARIES[$library]} -eq 1 ]]; then
             if [[ ${enabled} -ge 1 ]]; then
@@ -462,7 +468,7 @@ build_application_mk() {
         local LTS_BUILD_FLAG="-DMOBILE_FFMPEG_LTS "
     fi
 
-    if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]]; then
+    if [[ ${ENABLED_LIBRARIES[$LIBRARY_X265]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_TESSERACT]} -eq 1 ]] || [[ ${ENABLED_LIBRARIES[$LIBRARY_OPENH264]} -eq 1 ]]; then
         local APP_STL="c++_shared"
     else
         local APP_STL="none"
@@ -530,6 +536,9 @@ do
         -l | --lts)
 	        BUILD_LTS="1"
 	    ;;
+        -f | --force)
+	        BUILD_FORCE="1"
+	    ;;
         --reconf-*)
             CONF_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
@@ -541,7 +550,7 @@ do
             rebuild_library ${BUILD_LIBRARY}
 	    ;;
 	    --full)
-            for library in {0..42}
+            for library in {0..43}
             do
                 if [[ $library -ne 18 ]] && [[ $library -ne 19 ]] && [[ $library -ne 20 ]] && [[ $library -ne 21 ]]; then
                     enable_library $(get_library_name $library)
@@ -580,6 +589,11 @@ if [[ ! -z ${BUILD_LTS} ]]; then
 else
     cp ${BASEDIR}/tools/ndk/Android.mk ${BASEDIR}/android/jni/Android.mk 1>>${BASEDIR}/build.log 2>&1
     cp ${BASEDIR}/tools/release/android/build.gradle ${BASEDIR}/android/app/build.gradle 1>>${BASEDIR}/build.log 2>&1
+
+    if [[ -z ${BUILD_FORCE} ]] && [[ ${ENABLED_ARCHITECTURES[${ARCH_ARM_V7A}]} -eq 1 ]]; then
+        echo -e "INFO: Disabled arm-v7a architecture which is not included in Main releases.\n" 1>>${BASEDIR}/build.log 2>&1
+        disable_arch "arm-v7a"
+    fi
 fi
 
 if [[ ! -z ${DISPLAY_HELP} ]]; then
@@ -603,7 +617,7 @@ echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 # PERFORM THIS CHECK ONLY ON LTS
 if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ ${ENABLED_ARCHITECTURES[0]} -eq 0 ]] && [[ ${ENABLED_ARCHITECTURES[1]} -eq 1 ]]; then
-    ENABLED_ARCHITECTURES[0]=1
+    ENABLED_ARCHITECTURES[ARCH_ARM_V7A]=1
 
     echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n"
     echo -e "(*) arm-v7a architecture enabled since arm-v7a-neon will be built\n" 1>>${BASEDIR}/build.log 2>&1
@@ -654,7 +668,7 @@ do
         . ${BASEDIR}/build/main-android.sh "${ENABLED_LIBRARIES[@]}" || exit 1
 
         # CLEAR FLAGS
-        for library in {1..43}
+        for library in {1..44}
         do
             library_name=$(get_library_name $((library - 1)))
             unset $(echo "OK_${library_name}" | sed "s/\-/\_/g")

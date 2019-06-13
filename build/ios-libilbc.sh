@@ -58,6 +58,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp ./libilbc.pc ${INSTALL_PKG_CONFIG_DIR}
+cp ./libilbc.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

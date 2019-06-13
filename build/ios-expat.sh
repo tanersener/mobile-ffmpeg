@@ -60,6 +60,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # MANUALLY COPY PKG-CONFIG FILES
-cp ./expat.pc ${INSTALL_PKG_CONFIG_DIR}
+cp ./expat.pc ${INSTALL_PKG_CONFIG_DIR} || exit 1
 
 make install || exit 1

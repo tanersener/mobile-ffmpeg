@@ -49,21 +49,22 @@ get_library_name() {
         28) echo "twolame" ;;
         29) echo "sdl" ;;
         30) echo "tesseract" ;;
-        31) echo "giflib" ;;
-        32) echo "jpeg" ;;
-        33) echo "libogg" ;;
-        34) echo "libpng" ;;
-        35) echo "libuuid" ;;
-        36) echo "nettle" ;;
-        37) echo "tiff" ;;
-        38) echo "expat" ;;
-        39) echo "libsndfile" ;;
-        40) echo "leptonica" ;;
-        41) echo "tvos-zlib" ;;
-        42) echo "tvos-audiotoolbox" ;;
-        43) echo "tvos-coreimage" ;;
-        44) echo "tvos-bzip2" ;;
-        45) echo "tvos-videotoolbox" ;;
+        31) echo "openh264" ;;
+        32) echo "giflib" ;;
+        33) echo "jpeg" ;;
+        34) echo "libogg" ;;
+        35) echo "libpng" ;;
+        36) echo "libuuid" ;;
+        37) echo "nettle" ;;
+        38) echo "tiff" ;;
+        39) echo "expat" ;;
+        40) echo "libsndfile" ;;
+        41) echo "leptonica" ;;
+        42) echo "tvos-zlib" ;;
+        43) echo "tvos-audiotoolbox" ;;
+        44) echo "tvos-coreimage" ;;
+        45) echo "tvos-bzip2" ;;
+        46) echo "tvos-videotoolbox" ;;
     esac
 }
 
@@ -80,12 +81,12 @@ get_package_config_file_name() {
         26) echo "aom" ;;
         27) echo "libchromaprint" ;;
         29) echo "sdl2" ;;
-        32) echo "libjpeg" ;;
-        33) echo "ogg" ;;
-        35) echo "uuid" ;;
-        37) echo "libtiff-4" ;;
-        39) echo "sndfile" ;;
-        40) echo "lept" ;;
+        33) echo "libjpeg" ;;
+        34) echo "ogg" ;;
+        36) echo "uuid" ;;
+        38) echo "libtiff-4" ;;
+        40) echo "sndfile" ;;
+        41) echo "lept" ;;
         *) echo $(get_library_name $1)
     esac
 }
@@ -106,12 +107,12 @@ get_static_archive_name() {
         28) echo "libtwolame.a" ;;
         29) echo "libSDL2.a" ;;
         30) echo "libtesseract.a" ;;
-        31) echo "libgif.a" ;;
-        33) echo "libogg.a" ;;
-        34) echo "libpng.a" ;;
-        35) echo "libuuid.a" ;;
-        39) echo "libsndfile.a" ;;
-        40) echo "liblept.a" ;;
+        32) echo "libgif.a" ;;
+        34) echo "libogg.a" ;;
+        35) echo "libpng.a" ;;
+        36) echo "libuuid.a" ;;
+        40) echo "libsndfile.a" ;;
+        41) echo "liblept.a" ;;
         *) echo lib$(get_library_name $1).a
     esac
 }
@@ -312,7 +313,7 @@ get_app_specific_cflags() {
         soxr | snappy)
             APP_FLAGS="-std=gnu99 -Wno-unused-function -DPIC"
         ;;
-        x265)
+        openh264 | x265)
             APP_FLAGS="-Wno-unused-function"
         ;;
         *)
