@@ -199,6 +199,14 @@ If set to 1, the protocol will retry reading at the end of the file, allowing
 reading files that still are being written. In order for this to terminate,
 you either need to use the rw_timeout option, or use the interrupt callback
 (for API users).
+
+@item seekable
+Controls if seekability is advertised on the file. 0 means non-seekable, -1
+means auto (seekable for normal files, non-seekable for named pipes).
+
+Many demuxers handle seekable and non-seekable resources differently,
+overriding this might speed up opening certain files at the cost of losing some
+features (e.g. accurate seeking).
 @end table
 
 @section ftp
@@ -384,6 +392,11 @@ ffmpeg -i somefile.ogg -chunked_post 0 -c copy -f ogg http://@var{server}:@var{p
 # Client can also be done with wget:
 wget --post-file=somefile.ogg http://@var{server}:@var{port}
 @end example
+
+@item send_expect_100
+Send an Expect: 100-continue header for POST. If set to 1 it will send, if set
+to 0 it won't, if set to -1 it will try to send if it is applicable. Default
+value is -1.
 
 @end table
 

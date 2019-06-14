@@ -307,6 +307,7 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_INDEO5,       MKTAG('I', 'V', '5', '0') },
     { AV_CODEC_ID_VP3,          MKTAG('V', 'P', '3', '1') },
     { AV_CODEC_ID_VP3,          MKTAG('V', 'P', '3', '0') },
+    { AV_CODEC_ID_VP4,          MKTAG('V', 'P', '4', '0') },
     { AV_CODEC_ID_VP5,          MKTAG('V', 'P', '5', '0') },
     { AV_CODEC_ID_VP6,          MKTAG('V', 'P', '6', '0') },
     { AV_CODEC_ID_VP6,          MKTAG('V', 'P', '6', '1') },
@@ -477,6 +478,15 @@ const AVCodecTag ff_codec_bmp_tags[] = {
     { AV_CODEC_ID_RASC,         MKTAG('R', 'A', 'S', 'C') },
     { AV_CODEC_ID_HYMT,         MKTAG('H', 'Y', 'M', 'T') },
     { AV_CODEC_ID_ARBC,         MKTAG('A', 'R', 'B', 'C') },
+    { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '0') },
+    { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '1') },
+    { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '2') },
+    { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '3') },
+    { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '4') },
+    { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '5') },
+    { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '6') },
+    { AV_CODEC_ID_AGM,          MKTAG('A', 'G', 'M', '7') },
+    { AV_CODEC_ID_LSCR,         MKTAG('L', 'S', 'C', 'R') },
     { AV_CODEC_ID_NONE,         0 }
 };
 
@@ -597,5 +607,6 @@ const AVCodecGuid ff_codec_wav_guids[] = {
     { AV_CODEC_ID_ATRAC9,   { 0xD2, 0x42, 0xE1, 0x47, 0xBA, 0x36, 0x8D, 0x4D, 0x88, 0xFC, 0x61, 0x65, 0x4F, 0x8C, 0x83, 0x6C } },
     { AV_CODEC_ID_EAC3,     { 0xAF, 0x87, 0xFB, 0xA7, 0x02, 0x2D, 0xFB, 0x42, 0xA4, 0xD4, 0x05, 0xCD, 0x93, 0x84, 0x3B, 0xDD } },
     { AV_CODEC_ID_MP2,      { 0x2B, 0x80, 0x6D, 0xE0, 0x46, 0xDB, 0xCF, 0x11, 0xB4, 0xD1, 0x00, 0x80, 0x5F, 0x6C, 0xBB, 0xEA } },
+    { AV_CODEC_ID_ADPCM_AGM,{ 0x82, 0xEC, 0x1F, 0x6A, 0xCA, 0xDB, 0x19, 0x45, 0xBD, 0xE7, 0x56, 0xD3, 0xB3, 0xEF, 0x98, 0x1D } },
     { AV_CODEC_ID_NONE }
 };

@@ -41,20 +41,35 @@
 #define SUBSCRIPTS(subs, ...) (subs > 0 ? ((int[subs + 1]){ subs, __VA_ARGS__ }) : NULL)
 
 #define ui(width, name) \
-        xui(width, name, current->name, 0)
+        xui(width, name, current->name, 0, MAX_UINT_BITS(width), 0)
+#define uir(width, name) \
+        xui(width, name, current->name, 1, MAX_UINT_BITS(width), 0)
 #define uis(width, name, subs, ...) \
-        xui(width, name, current->name, subs, __VA_ARGS__)
+        xui(width, name, current->name, 0, MAX_UINT_BITS(width), subs, __VA_ARGS__)
+#define uirs(width, name, subs, ...) \
+        xui(width, name, current->name, 1, MAX_UINT_BITS(width), subs, __VA_ARGS__)
+#define sis(width, name, subs, ...) \
+        xsi(width, name, current->name, subs, __VA_ARGS__)
 
 
 #define READ
 #define READWRITE read
 #define RWContext GetBitContext
 
-#define xui(width, name, var, subs, ...) do { \
+#define xui(width, name, var, range_min, range_max, subs, ...) do { \
         uint32_t value = 0; \
         CHECK(ff_cbs_read_unsigned(ctx, rw, width, #name, \
                                    SUBSCRIPTS(subs, __VA_ARGS__), \
-                                   &value, 0, (1 << width) - 1)); \
+                                   &value, range_min, range_max)); \
+        var = value; \
+    } while (0)
+
+#define xsi(width, name, var, subs, ...) do { \
+        int32_t value; \
+        CHECK(ff_cbs_read_signed(ctx, rw, width, #name, \
+                                 SUBSCRIPTS(subs, __VA_ARGS__), &value, \
+                                 MIN_INT_BITS(width), \
+                                 MAX_INT_BITS(width))); \
         var = value; \
     } while (0)
 
@@ -73,6 +88,7 @@
 #undef READWRITE
 #undef RWContext
 #undef xui
+#undef xsi
 #undef marker_bit
 #undef nextbits
 
@@ -81,10 +97,17 @@
 #define READWRITE write
 #define RWContext PutBitContext
 
-#define xui(width, name, var, subs, ...) do { \
+#define xui(width, name, var, range_min, range_max, subs, ...) do { \
         CHECK(ff_cbs_write_unsigned(ctx, rw, width, #name, \
                                     SUBSCRIPTS(subs, __VA_ARGS__), \
-                                    var, 0, (1 << width) - 1)); \
+                                    var, range_min, range_max)); \
+    } while (0)
+
+#define xsi(width, name, var, subs, ...) do { \
+        CHECK(ff_cbs_write_signed(ctx, rw, width, #name, \
+                                  SUBSCRIPTS(subs, __VA_ARGS__), var, \
+                                  MIN_INT_BITS(width), \
+                                  MAX_INT_BITS(width))); \
     } while (0)
 
 #define marker_bit() do { \
@@ -95,10 +118,11 @@
 
 #include "cbs_mpeg2_syntax_template.c"
 
-#undef READ
+#undef WRITE
 #undef READWRITE
 #undef RWContext
 #undef xui
+#undef xsi
 #undef marker_bit
 #undef nextbits
 
@@ -215,18 +239,19 @@ static int cbs_mpeg2_read_unit(CodedBitstreamContext *ctx,
                     return err; \
             } \
             break;
-            START(0x00, MPEG2RawPictureHeader,  picture_header,  NULL);
-            START(0xb2, MPEG2RawUserData,       user_data,
-                                            &cbs_mpeg2_free_user_data);
-            START(0xb3, MPEG2RawSequenceHeader, sequence_header, NULL);
-            START(0xb5, MPEG2RawExtensionData,  extension_data,  NULL);
-            START(0xb8, MPEG2RawGroupOfPicturesHeader,
-                                       group_of_pictures_header, NULL);
+            START(MPEG2_START_PICTURE,   MPEG2RawPictureHeader,
+                  picture_header,           NULL);
+            START(MPEG2_START_USER_DATA, MPEG2RawUserData,
+                  user_data,                &cbs_mpeg2_free_user_data);
+            START(MPEG2_START_SEQUENCE_HEADER, MPEG2RawSequenceHeader,
+                  sequence_header,          NULL);
+            START(MPEG2_START_EXTENSION, MPEG2RawExtensionData,
+                  extension_data,           NULL);
+            START(MPEG2_START_GROUP,     MPEG2RawGroupOfPicturesHeader,
+                  group_of_pictures_header, NULL);
 #undef START
         default:
-            av_log(ctx->log_ctx, AV_LOG_ERROR, "Unknown start code %02"PRIx32".\n",
-                   unit->type);
-            return AVERROR_INVALIDDATA;
+            return AVERROR(ENOSYS);
         }
     }
 
@@ -244,11 +269,12 @@ static int cbs_mpeg2_write_header(CodedBitstreamContext *ctx,
     case start_code: \
         err = cbs_mpeg2_write_ ## func(ctx, pbc, unit->content); \
         break;
-        START(0x00, MPEG2RawPictureHeader,  picture_header);
-        START(0xb2, MPEG2RawUserData,       user_data);
-        START(0xb3, MPEG2RawSequenceHeader, sequence_header);
-        START(0xb5, MPEG2RawExtensionData,  extension_data);
-        START(0xb8, MPEG2RawGroupOfPicturesHeader, group_of_pictures_header);
+        START(MPEG2_START_PICTURE,         MPEG2RawPictureHeader,  picture_header);
+        START(MPEG2_START_USER_DATA,       MPEG2RawUserData,       user_data);
+        START(MPEG2_START_SEQUENCE_HEADER, MPEG2RawSequenceHeader, sequence_header);
+        START(MPEG2_START_EXTENSION,       MPEG2RawExtensionData,  extension_data);
+        START(MPEG2_START_GROUP,           MPEG2RawGroupOfPicturesHeader,
+                                                         group_of_pictures_header);
 #undef START
     default:
         av_log(ctx->log_ctx, AV_LOG_ERROR, "Write unimplemented for start "
@@ -331,7 +357,7 @@ static int cbs_mpeg2_write_unit(CodedBitstreamContext *ctx,
 
     init_put_bits(&pbc, priv->write_buffer, priv->write_buffer_size);
 
-    if (unit->type >= 0x01 && unit->type <= 0xaf)
+    if (MPEG2_START_IS_SLICE(unit->type))
         err = cbs_mpeg2_write_slice(ctx, unit, &pbc);
     else
         err = cbs_mpeg2_write_header(ctx, unit, &pbc);

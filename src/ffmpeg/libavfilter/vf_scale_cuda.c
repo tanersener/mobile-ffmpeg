@@ -43,7 +43,8 @@ static const enum AVPixelFormat supported_formats[] = {
     AV_PIX_FMT_NV12,
     AV_PIX_FMT_YUV444P,
     AV_PIX_FMT_P010,
-    AV_PIX_FMT_P016
+    AV_PIX_FMT_P016,
+    AV_PIX_FMT_YUV444P16,
 };
 
 #define DIV_UP(a, b) ( ((a) + (b) - 1) / (b) )
@@ -357,7 +358,7 @@ static int call_resize_kernel(AVFilterContext *ctx, CUfunction func, int channel
         .res.pitch2D.numChannels = channels,
         .res.pitch2D.width = src_width,
         .res.pitch2D.height = src_height,
-        .res.pitch2D.pitchInBytes = src_pitch,
+        .res.pitch2D.pitchInBytes = src_pitch * pixel_size,
         .res.pitch2D.devPtr = (CUdeviceptr)src_dptr,
     };
 
@@ -389,12 +390,12 @@ static int scalecuda_resize(AVFilterContext *ctx,
                            out->data[0], out->width, out->height, out->linesize[0],
                            1);
         call_resize_kernel(ctx, s->cu_func_uchar, 1,
-                           in->data[0]+in->linesize[0]*in->height, in->width/2, in->height/2, in->linesize[0]/2,
-                           out->data[0]+out->linesize[0]*out->height, out->width/2, out->height/2, out->linesize[0]/2,
+                           in->data[1], in->width/2, in->height/2, in->linesize[0]/2,
+                           out->data[1], out->width/2, out->height/2, out->linesize[0]/2,
                            1);
         call_resize_kernel(ctx, s->cu_func_uchar, 1,
-                           in->data[0]+ ALIGN_UP((in->linesize[0]*in->height*5)/4, s->tex_alignment), in->width/2, in->height/2, in->linesize[0]/2,
-                           out->data[0]+(out->linesize[0]*out->height*5)/4, out->width/2, out->height/2, out->linesize[0]/2,
+                           in->data[2], in->width/2, in->height/2, in->linesize[0]/2,
+                           out->data[2], out->width/2, out->height/2, out->linesize[0]/2,
                            1);
         break;
     case AV_PIX_FMT_YUV444P:
@@ -403,13 +404,27 @@ static int scalecuda_resize(AVFilterContext *ctx,
                            out->data[0], out->width, out->height, out->linesize[0],
                            1);
         call_resize_kernel(ctx, s->cu_func_uchar, 1,
-                           in->data[0]+in->linesize[0]*in->height, in->width, in->height, in->linesize[0],
-                           out->data[0]+out->linesize[0]*out->height, out->width, out->height, out->linesize[0],
+                           in->data[1], in->width, in->height, in->linesize[0],
+                           out->data[1], out->width, out->height, out->linesize[0],
                            1);
         call_resize_kernel(ctx, s->cu_func_uchar, 1,
-                           in->data[0]+in->linesize[0]*in->height*2, in->width, in->height, in->linesize[0],
-                           out->data[0]+out->linesize[0]*out->height*2, out->width, out->height, out->linesize[0],
+                           in->data[2], in->width, in->height, in->linesize[0],
+                           out->data[2], out->width, out->height, out->linesize[0],
                            1);
+        break;
+    case AV_PIX_FMT_YUV444P16:
+        call_resize_kernel(ctx, s->cu_func_ushort, 1,
+                           in->data[0], in->width, in->height, in->linesize[0] / 2,
+                           out->data[0], out->width, out->height, out->linesize[0] / 2,
+                           2);
+        call_resize_kernel(ctx, s->cu_func_ushort, 1,
+                           in->data[1], in->width, in->height, in->linesize[1] / 2,
+                           out->data[1], out->width, out->height, out->linesize[1] / 2,
+                           2);
+        call_resize_kernel(ctx, s->cu_func_ushort, 1,
+                           in->data[2], in->width, in->height, in->linesize[2] / 2,
+                           out->data[2], out->width, out->height, out->linesize[2] / 2,
+                           2);
         break;
     case AV_PIX_FMT_NV12:
         call_resize_kernel(ctx, s->cu_func_uchar, 1,
@@ -418,7 +433,7 @@ static int scalecuda_resize(AVFilterContext *ctx,
                            1);
         call_resize_kernel(ctx, s->cu_func_uchar2, 2,
                            in->data[1], in->width/2, in->height/2, in->linesize[1],
-                           out->data[0] + out->linesize[0] * ((out->height + 31) & ~0x1f), out->width/2, out->height/2, out->linesize[1]/2,
+                           out->data[1], out->width/2, out->height/2, out->linesize[1]/2,
                            1);
         break;
     case AV_PIX_FMT_P010LE:
@@ -428,7 +443,7 @@ static int scalecuda_resize(AVFilterContext *ctx,
                            2);
         call_resize_kernel(ctx, s->cu_func_ushort2, 2,
                            in->data[1], in->width / 2, in->height / 2, in->linesize[1]/2,
-                           out->data[0] + out->linesize[0] * ((out->height + 31) & ~0x1f), out->width / 2, out->height / 2, out->linesize[1] / 4,
+                           out->data[1], out->width / 2, out->height / 2, out->linesize[1] / 4,
                            2);
         break;
     case AV_PIX_FMT_P016LE:
@@ -438,7 +453,7 @@ static int scalecuda_resize(AVFilterContext *ctx,
                            2);
         call_resize_kernel(ctx, s->cu_func_ushort2, 2,
                            in->data[1], in->width / 2, in->height / 2, in->linesize[1] / 2,
-                           out->data[0] + out->linesize[0] * ((out->height + 31) & ~0x1f), out->width / 2, out->height / 2, out->linesize[1] / 4,
+                           out->data[1], out->width / 2, out->height / 2, out->linesize[1] / 4,
                            2);
         break;
     default:
@@ -465,6 +480,9 @@ static int cudascale_scale(AVFilterContext *ctx, AVFrame *out, AVFrame *in)
 
     av_frame_move_ref(out, s->frame);
     av_frame_move_ref(s->frame, s->tmp_frame);
+
+    s->frame->width  = s->planes_out[0].width;
+    s->frame->height = s->planes_out[0].height;
 
     ret = av_frame_copy_props(out, in);
     if (ret < 0)

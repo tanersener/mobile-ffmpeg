@@ -103,18 +103,9 @@ license version needs to be upgraded by passing `--enable-version3` to configure
 There are certain libraries you can combine with FFmpeg whose licenses are not
 compatible with the GPL and/or the LGPL. If you wish to enable these
 libraries, even in circumstances that their license may be incompatible, pass
-`--enable-nonfree` to configure. But note that if you enable any of these
-libraries the resulting binary will be under a complex license mix that is
-more restrictive than the LGPL and that may result in additional obligations.
-It is possible that these restrictions cause the resulting binary to be
+`--enable-nonfree` to configure. This will cause the resulting binary to be
 unredistributable.
 
 The Fraunhofer FDK AAC and OpenSSL libraries are under licenses which are
 incompatible with the GPLv2 and v3. To the best of our knowledge, they are
 compatible with the LGPL.
-
-The NVENC library, while its header file is licensed under the compatible MIT
-license, requires a proprietary binary blob at run time, and is deemed to be
-incompatible with the GPL. We are not certain if it is compatible with the
-LGPL, but we require `--enable-nonfree` even with LGPL configurations in case
-it is not.

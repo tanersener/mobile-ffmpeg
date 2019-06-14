@@ -310,8 +310,8 @@ typedef struct MatroskaCluster {
 } MatroskaCluster;
 
 typedef struct MatroskaLevel1Element {
-    uint64_t id;
     uint64_t pos;
+    uint32_t id;
     int parsed;
 } MatroskaLevel1Element;
 
@@ -322,7 +322,6 @@ typedef struct MatroskaDemuxContext {
     /* EBML stuff */
     int num_levels;
     MatroskaLevel levels[EBML_MAX_DEPTH];
-    int level_up;
     uint32_t current_id;
 
     uint64_t time_scale;
@@ -1203,11 +1202,29 @@ static int ebml_parse_elem(MatroskaDemuxContext *matroska,
             MatroskaLevel *level = &matroska->levels[matroska->num_levels - 1];
             AVIOContext *pb = matroska->ctx->pb;
             int64_t pos = avio_tell(pb);
-            if (level->length != EBML_UNKNOWN_LENGTH &&
-                (pos + length) > (level->start + level->length)) {
+
+            if (length != EBML_UNKNOWN_LENGTH &&
+                level->length != EBML_UNKNOWN_LENGTH) {
+                uint64_t elem_end = pos + length,
+                        level_end = level->start + level->length;
+
+                if (level_end < elem_end) {
+                    av_log(matroska->ctx, AV_LOG_ERROR,
+                           "Element at 0x%"PRIx64" ending at 0x%"PRIx64" exceeds "
+                           "containing master element ending at 0x%"PRIx64"\n",
+                           pos, elem_end, level_end);
+                    return AVERROR_INVALIDDATA;
+                }
+            } else if (level->length != EBML_UNKNOWN_LENGTH) {
+                av_log(matroska->ctx, AV_LOG_ERROR, "Unknown-sized element "
+                       "at 0x%"PRIx64" inside parent with finite size\n", pos);
+                return AVERROR_INVALIDDATA;
+            } else if (length == EBML_UNKNOWN_LENGTH && id != MATROSKA_ID_CLUSTER) {
+                // According to the specifications only clusters and segments
+                // are allowed to be unknown-sized.
                 av_log(matroska->ctx, AV_LOG_ERROR,
-                       "Invalid length 0x%"PRIx64" > 0x%"PRIx64" in parent\n",
-                       length, level->start + level->length);
+                       "Found unknown-sized element other than a cluster at "
+                       "0x%"PRIx64". Dropping the invalid element.\n", pos);
                 return AVERROR_INVALIDDATA;
             }
         }
@@ -1593,7 +1610,6 @@ static void matroska_convert_tags(AVFormatContext *s)
 static int matroska_parse_seekhead_entry(MatroskaDemuxContext *matroska,
                                          uint64_t pos)
 {
-    uint32_t level_up       = matroska->level_up;
     uint32_t saved_id       = matroska->current_id;
     int64_t before_pos = avio_tell(matroska->ctx->pb);
     MatroskaLevel level;
@@ -1629,7 +1645,6 @@ static int matroska_parse_seekhead_entry(MatroskaDemuxContext *matroska,
     }
     /* seek back */
     avio_seek(matroska->ctx->pb, before_pos, SEEK_SET);
-    matroska->level_up   = level_up;
     matroska->current_id = saved_id;
 
     return ret;
@@ -3344,7 +3359,7 @@ static int matroska_parse_block(MatroskaDemuxContext *matroska, AVBufferRef *buf
     track = matroska_find_track_by_num(matroska, num);
     if (!track || !track->stream) {
         av_log(matroska->ctx, AV_LOG_INFO,
-               "Invalid stream %"PRIu64" or size %u\n", num, size);
+               "Invalid stream %"PRIu64"\n", num);
         return AVERROR_INVALIDDATA;
     } else if (size <= 3)
         return 0;
@@ -3564,7 +3579,7 @@ static int matroska_read_seek(AVFormatContext *s, int stream_index,
     MatroskaDemuxContext *matroska = s->priv_data;
     MatroskaTrack *tracks = NULL;
     AVStream *st = s->streams[stream_index];
-    int i, index, index_min;
+    int i, index;
 
     /* Parse the CUES now since we need the index data to seek. */
     if (matroska->cues_parsing_deferred > 0) {
@@ -3591,7 +3606,6 @@ static int matroska_read_seek(AVFormatContext *s, int stream_index,
     if (index < 0 || (matroska->cues_parsing_deferred < 0 && index == st->nb_index_entries - 1))
         goto err;
 
-    index_min = index;
     tracks = matroska->tracks.elem;
     for (i = 0; i < matroska->tracks.nb_elem; i++) {
         tracks[i].audio.pkt_cnt        = 0;
@@ -3600,7 +3614,7 @@ static int matroska_read_seek(AVFormatContext *s, int stream_index,
         tracks[i].end_timecode         = 0;
     }
 
-    avio_seek(s->pb, st->index_entries[index_min].pos, SEEK_SET);
+    avio_seek(s->pb, st->index_entries[index].pos, SEEK_SET);
     matroska->current_id       = 0;
     if (flags & AVSEEK_FLAG_ANY) {
         st->skip_to_keyframe = 0;

@@ -35,7 +35,6 @@ enum {
 };
 
 typedef struct H265RawNALUnitHeader {
-    uint8_t forbidden_zero_bit;
     uint8_t nal_unit_type;
     uint8_t nuh_layer_id;
     uint8_t nuh_temporal_id_plus1;
@@ -659,7 +658,7 @@ typedef struct H265RawSEITimeCode {
     uint8_t  minutes_flag[3];
     uint8_t  hours_flag[3];
     uint8_t  time_offset_length[3];
-    uint32_t time_offset_value[3];
+    int32_t  time_offset_value[3];
 } H265RawSEITimeCode;
 
 typedef struct H265RawSEIMasteringDisplayColourVolume {

@@ -337,6 +337,7 @@ const AVCodecTag ff_codec_movaudio_tags[] = {
     { AV_CODEC_ID_MP1,             MKTAG('.', 'm', 'p', '1') },
     { AV_CODEC_ID_MP2,             MKTAG('.', 'm', 'p', '2') },
     { AV_CODEC_ID_MP3,             MKTAG('.', 'm', 'p', '3') },
+    { AV_CODEC_ID_MP3,             MKTAG('m', 'p', '3', ' ') }, /* vlc */
     { AV_CODEC_ID_MP3,             0x6D730055                },
     { AV_CODEC_ID_NELLYMOSER,      MKTAG('n', 'm', 'o', 's') }, /* Flash Media Server */
     { AV_CODEC_ID_NELLYMOSER,      MKTAG('N', 'E', 'L', 'L') }, /* Perian */
@@ -534,6 +535,10 @@ FF_ENABLE_DEPRECATION_WARNINGS
     len = ff_mp4_read_descr(fc, pb, &tag);
     if (tag == MP4DecSpecificDescrTag) {
         av_log(fc, AV_LOG_TRACE, "Specific MPEG-4 header len=%d\n", len);
+        /* As per 14496-3:2009 9.D.2.2, No decSpecificInfo is defined
+           for MPEG-1 Audio or MPEG-2 Audio; MPEG-2 AAC excluded. */
+        if (object_type_id == 0x69 || object_type_id == 0x6b)
+            return 0;
         if (!len || (uint64_t)len > (1<<30))
             return AVERROR_INVALIDDATA;
         if ((ret = ff_get_extradata(fc, st->codecpar, pb, len)) < 0)

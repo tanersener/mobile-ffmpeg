@@ -194,10 +194,12 @@ static av_cold int qsv_enc_init(AVCodecContext *avctx)
     if (ret < 0)
         return ret;
 
-    ret = generate_fake_vps(&q->qsv, avctx);
-    if (ret < 0) {
-        ff_qsv_enc_close(avctx, &q->qsv);
-        return ret;
+    if (!q->qsv.hevc_vps) {
+        ret = generate_fake_vps(&q->qsv, avctx);
+        if (ret < 0) {
+            ff_qsv_enc_close(avctx, &q->qsv);
+            return ret;
+        }
     }
 
     return 0;
@@ -238,6 +240,8 @@ static const AVOption options[] = {
     { "main",    NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_HEVC_MAIN    }, INT_MIN, INT_MAX,     VE, "profile" },
     { "main10",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_HEVC_MAIN10  }, INT_MIN, INT_MAX,     VE, "profile" },
     { "mainsp",  NULL, 0, AV_OPT_TYPE_CONST, { .i64 = MFX_PROFILE_HEVC_MAINSP  }, INT_MIN, INT_MAX,     VE, "profile" },
+
+    { "gpb", "1: GPB (generalized P/B frame); 0: regular P frame", OFFSET(qsv.gpb), AV_OPT_TYPE_BOOL, { .i64 = 1 }, 0, 1, VE},
 
     { NULL },
 };

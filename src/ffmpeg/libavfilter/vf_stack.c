@@ -83,6 +83,17 @@ static av_cold int init(AVFilterContext *ctx)
         return AVERROR(ENOMEM);
 
     if (!strcmp(ctx->filter->name, "xstack")) {
+        if (!s->layout) {
+            if (s->nb_inputs == 2) {
+                s->layout = av_strdup("0_0|w0_0");
+                if (!s->layout)
+                    return AVERROR(ENOMEM);
+            } else {
+                av_log(ctx, AV_LOG_ERROR, "No layout specified.\n");
+                return AVERROR(EINVAL);
+            }
+        }
+
         s->items = av_calloc(s->nb_inputs, sizeof(*s->items));
         if (!s->items)
             return AVERROR(ENOMEM);
@@ -174,7 +185,6 @@ static int config_output(AVFilterLink *outlink)
 {
     AVFilterContext *ctx = outlink->src;
     StackContext *s = ctx->priv;
-    AVRational time_base = ctx->inputs[0]->time_base;
     AVRational frame_rate = ctx->inputs[0]->frame_rate;
     AVRational sar = ctx->inputs[0]->sample_aspect_ratio;
     int height = ctx->inputs[0]->h;
@@ -281,7 +291,6 @@ static int config_output(AVFilterLink *outlink)
 
     outlink->w          = width;
     outlink->h          = height;
-    outlink->time_base  = time_base;
     outlink->frame_rate = frame_rate;
     outlink->sample_aspect_ratio = sar;
 
@@ -301,7 +310,10 @@ static int config_output(AVFilterLink *outlink)
         in[i].after  = s->shortest ? EXT_STOP : EXT_INFINITY;
     }
 
-    return ff_framesync_configure(&s->fs);
+    ret = ff_framesync_configure(&s->fs);
+    outlink->time_base = s->fs.time_base;
+
+    return ret;
 }
 
 static av_cold void uninit(AVFilterContext *ctx)
@@ -384,7 +396,7 @@ AVFilter ff_vf_vstack = {
 
 static const AVOption xstack_options[] = {
     { "inputs", "set number of inputs", OFFSET(nb_inputs), AV_OPT_TYPE_INT, {.i64=2}, 2, INT_MAX, .flags = FLAGS },
-    { "layout", "set custom layout", OFFSET(layout), AV_OPT_TYPE_STRING, {.str="0_0|w0_0"}, 0, 0, .flags = FLAGS },
+    { "layout", "set custom layout", OFFSET(layout), AV_OPT_TYPE_STRING, {.str=NULL}, 0, 0, .flags = FLAGS },
     { "shortest", "force termination when the shortest input terminates", OFFSET(shortest), AV_OPT_TYPE_BOOL, {.i64=0}, 0, 1, .flags = FLAGS },
     { NULL },
 };

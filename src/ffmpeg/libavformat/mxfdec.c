@@ -429,19 +429,19 @@ static int mxf_get_stream_index(AVFormatContext *s, KLVPacket *klv, int body_sid
     return s->nb_streams == 1 && s->streams[0]->priv_data ? 0 : -1;
 }
 
-static int find_body_sid_by_offset(MXFContext *mxf, int64_t offset)
+static int find_body_sid_by_absolute_offset(MXFContext *mxf, int64_t offset)
 {
     // we look for partition where the offset is placed
     int a, b, m;
-    int64_t this_partition;
+    int64_t pack_ofs;
 
     a = -1;
     b = mxf->partitions_count;
 
     while (b - a > 1) {
-        m         = (a + b) >> 1;
-        this_partition = mxf->partitions[m].this_partition;
-        if (this_partition <= offset)
+        m = (a + b) >> 1;
+        pack_ofs = mxf->partitions[m].pack_ofs;
+        if (pack_ofs <= offset)
             a = m;
         else
             b = m;
@@ -590,7 +590,7 @@ static int mxf_decrypt_triplet(AVFormatContext *s, AVPacket *pkt, KLVPacket *klv
     if (!IS_KLV_KEY(klv, mxf_essence_element_key))
         return AVERROR_INVALIDDATA;
 
-    body_sid = find_body_sid_by_offset(mxf, klv->offset);
+    body_sid = find_body_sid_by_absolute_offset(mxf, klv->offset);
     index = mxf_get_stream_index(s, klv, body_sid);
     if (index < 0)
         return AVERROR_INVALIDDATA;
@@ -654,6 +654,7 @@ static int mxf_read_primer_pack(void *arg, AVIOContext *pb, int tag, int size, U
 static int mxf_read_partition_pack(void *arg, AVIOContext *pb, int tag, int size, UID uid, int64_t klv_offset)
 {
     MXFContext *mxf = arg;
+    AVFormatContext *s = mxf->fc;
     MXFPartition *partition, *tmp_part;
     UID op;
     uint64_t footer_partition;
@@ -717,6 +718,12 @@ static int mxf_read_partition_pack(void *arg, AVIOContext *pb, int tag, int size
         return AVERROR_INVALIDDATA;
     }
     nb_essence_containers = avio_rb32(pb);
+
+    if (partition->type == Header) {
+        char str[36];
+        snprintf(str, sizeof(str), "%08x.%08x.%08x.%08x", AV_RB32(&op[0]), AV_RB32(&op[4]), AV_RB32(&op[8]), AV_RB32(&op[12]));
+        av_dict_set(&s->metadata, "operational_pattern_ul", str, 0);
+    }
 
     if (partition->this_partition &&
         partition->previous_partition == partition->this_partition) {
@@ -1538,10 +1545,7 @@ static int mxf_absolute_bodysid_offset(MXFContext *mxf, int body_sid, int64_t of
  */
 static int64_t mxf_essence_container_end(MXFContext *mxf, int body_sid)
 {
-    int x;
-    int64_t ret = 0;
-
-    for (x = 0; x < mxf->partitions_count; x++) {
+    for (int x = mxf->partitions_count - 1; x >= 0; x--) {
         MXFPartition *p = &mxf->partitions[x];
 
         if (p->body_sid != body_sid)
@@ -1550,10 +1554,10 @@ static int64_t mxf_essence_container_end(MXFContext *mxf, int body_sid)
         if (!p->essence_length)
             return 0;
 
-        ret = p->essence_offset + p->essence_length;
+        return p->essence_offset + p->essence_length;
     }
 
-    return ret;
+    return 0;
 }
 
 /* EditUnit -> absolute offset */
@@ -2549,6 +2553,24 @@ static int mxf_parse_structural_metadata(MXFContext *mxf)
         }
     }
 
+    for (int i = 0; i < mxf->fc->nb_streams; i++) {
+        MXFTrack *track1 = mxf->fc->streams[i]->priv_data;
+        if (track1 && track1->body_sid) {
+            for (int j = i + 1; j < mxf->fc->nb_streams; j++) {
+                MXFTrack *track2 = mxf->fc->streams[j]->priv_data;
+                if (track2 && track1->body_sid == track2->body_sid && track1->wrapping != track2->wrapping) {
+                    if (track1->wrapping == UnknownWrapped)
+                        track1->wrapping = track2->wrapping;
+                    else if (track2->wrapping == UnknownWrapped)
+                        track2->wrapping = track1->wrapping;
+                    else
+                        av_log(mxf->fc, AV_LOG_ERROR, "stream %d and stream %d have the same BodySID (%d) "
+                                                      "with different wrapping\n", i, j, track1->body_sid);
+                }
+            }
+        }
+    }
+
     ret = 0;
 fail_and_free:
     return ret;
@@ -3116,9 +3138,12 @@ static void mxf_read_random_index_pack(AVFormatContext *s)
         goto end;
     avio_seek(s->pb, file_size - length, SEEK_SET);
     if (klv_read_packet(&klv, s->pb) < 0 ||
-        !IS_KLV_KEY(klv.key, mxf_random_index_pack_key) ||
-        klv.length != length - 20)
+        !IS_KLV_KEY(klv.key, mxf_random_index_pack_key))
         goto end;
+    if (klv.next_klv != file_size || klv.length <= 4 || (klv.length - 4) % 12) {
+        av_log(s, AV_LOG_WARNING, "Invalid RIP KLV length\n");
+        goto end;
+    }
 
     avio_skip(s->pb, klv.length - 12);
     mxf->footer_partition = avio_rb64(s->pb);
@@ -3449,7 +3474,7 @@ static int mxf_read_packet(AVFormatContext *s, AVPacket *pkt)
         if (IS_KLV_KEY(klv.key, mxf_essence_element_key) ||
             IS_KLV_KEY(klv.key, mxf_canopus_essence_element_key) ||
             IS_KLV_KEY(klv.key, mxf_avid_essence_element_key)) {
-            int body_sid = find_body_sid_by_offset(mxf, klv.offset);
+            int body_sid = find_body_sid_by_absolute_offset(mxf, klv.offset);
             int index = mxf_get_stream_index(s, &klv, body_sid);
             int64_t next_ofs;
             AVStream *st;

@@ -1161,6 +1161,34 @@ static int parse_manifest_adaptationset(AVFormatContext *s, const char *url,
     return 0;
 }
 
+static int parse_programinformation(AVFormatContext *s, xmlNodePtr node)
+{
+    xmlChar *val = NULL;
+
+    node = xmlFirstElementChild(node);
+    while (node) {
+        if (!av_strcasecmp(node->name, "Title")) {
+            val = xmlNodeGetContent(node);
+            if (val) {
+                av_dict_set(&s->metadata, "Title", val, 0);
+            }
+        } else if (!av_strcasecmp(node->name, "Source")) {
+            val = xmlNodeGetContent(node);
+            if (val) {
+                av_dict_set(&s->metadata, "Source", val, 0);
+            }
+        } else if (!av_strcasecmp(node->name, "Copyright")) {
+            val = xmlNodeGetContent(node);
+            if (val) {
+                av_dict_set(&s->metadata, "Copyright", val, 0);
+            }
+        }
+        node = xmlNextElementSibling(node);
+        xmlFree(val);
+    }
+    return 0;
+}
+
 static int parse_manifest(AVFormatContext *s, const char *url, AVIOContext *in)
 {
     DASHContext *c = s->priv_data;
@@ -1310,6 +1338,8 @@ static int parse_manifest(AVFormatContext *s, const char *url, AVIOContext *in)
                     if (c->period_start > 0)
                         c->media_presentation_duration = c->period_duration;
                 }
+            } else if (!av_strcasecmp(node->name, "ProgramInformation")) {
+                parse_programinformation(s, node);
             }
             node = xmlNextElementSibling(node);
         }
@@ -1657,6 +1687,7 @@ static int open_input(DASHContext *c, struct representation *pls, struct fragmen
 
     url = av_mallocz(c->max_url_size);
     if (!url) {
+        ret = AVERROR(ENOMEM);
         goto cleanup;
     }
 
@@ -1671,9 +1702,6 @@ static int open_input(DASHContext *c, struct representation *pls, struct fragmen
     av_log(pls->parent, AV_LOG_VERBOSE, "DASH request for url '%s', offset %"PRId64", playlist %d\n",
            url, seg->url_offset, pls->rep_idx);
     ret = open_url(pls->parent, &pls->input, url, c->avio_opts, opts, NULL);
-    if (ret < 0) {
-        goto cleanup;
-    }
 
 cleanup:
     av_free(url);
@@ -1763,8 +1791,8 @@ restart:
         ret = open_input(c, v, v->cur_seg);
         if (ret < 0) {
             if (ff_check_interrupt(c->interrupt_callback)) {
-                goto end;
                 ret = AVERROR_EXIT;
+                goto end;
             }
             av_log(v->parent, AV_LOG_WARNING, "Failed to open fragment of playlist %d\n", v->rep_idx);
             v->cur_seq_no++;
@@ -1806,7 +1834,9 @@ end:
 static int save_avio_options(AVFormatContext *s)
 {
     DASHContext *c = s->priv_data;
-    const char *opts[] = { "headers", "user_agent", "cookies", NULL }, **opt = opts;
+    const char *opts[] = {
+        "headers", "user_agent", "cookies", "http_proxy", "referer", "rw_timeout", NULL };
+    const char **opt = opts;
     uint8_t *buf = NULL;
     int ret = 0;
 
@@ -1978,13 +2008,19 @@ static int is_common_init_section_exist(struct representation **pls, int n_pls)
     return 1;
 }
 
-static void copy_init_section(struct representation *rep_dest, struct representation *rep_src)
+static int copy_init_section(struct representation *rep_dest, struct representation *rep_src)
 {
     rep_dest->init_sec_buf = av_mallocz(rep_src->init_sec_buf_size);
+    if (!rep_dest->init_sec_buf) {
+        av_log(rep_dest->ctx, AV_LOG_WARNING, "Cannot alloc memory for init_sec_buf\n");
+        return AVERROR(ENOMEM);
+    }
     memcpy(rep_dest->init_sec_buf, rep_src->init_sec_buf, rep_src->init_sec_data_len);
     rep_dest->init_sec_buf_size = rep_src->init_sec_buf_size;
     rep_dest->init_sec_data_len = rep_src->init_sec_data_len;
     rep_dest->cur_timestamp = rep_src->cur_timestamp;
+
+    return 0;
 }
 
 
@@ -2018,7 +2054,9 @@ static int dash_read_header(AVFormatContext *s)
     for (i = 0; i < c->n_videos; i++) {
         struct representation *cur_video = c->videos[i];
         if (i > 0 && c->is_init_section_common_video) {
-            copy_init_section(cur_video,c->videos[0]);
+            ret = copy_init_section(cur_video,c->videos[0]);
+            if (ret < 0)
+                goto fail;
         }
         ret = open_demux_for_component(s, cur_video);
 
@@ -2034,7 +2072,9 @@ static int dash_read_header(AVFormatContext *s)
     for (i = 0; i < c->n_audios; i++) {
         struct representation *cur_audio = c->audios[i];
         if (i > 0 && c->is_init_section_common_audio) {
-            copy_init_section(cur_audio,c->audios[0]);
+            ret = copy_init_section(cur_audio,c->audios[0]);
+            if (ret < 0)
+                goto fail;
         }
         ret = open_demux_for_component(s, cur_audio);
 
@@ -2050,7 +2090,9 @@ static int dash_read_header(AVFormatContext *s)
     for (i = 0; i < c->n_subtitles; i++) {
         struct representation *cur_subtitle = c->subtitles[i];
         if (i > 0 && c->is_init_section_common_audio) {
-            copy_init_section(cur_subtitle,c->subtitles[0]);
+            ret = copy_init_section(cur_subtitle,c->subtitles[0]);
+            if (ret < 0)
+                goto fail;
         }
         ret = open_demux_for_component(s, cur_subtitle);
 

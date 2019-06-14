@@ -30,29 +30,9 @@
 #include "libavutil/pixdesc.h"
 #include "avfilter.h"
 #include "formats.h"
+#include "gblur.h"
 #include "internal.h"
 #include "video.h"
-
-typedef struct GBlurContext {
-    const AVClass *class;
-
-    float sigma;
-    float sigmaV;
-    int steps;
-    int planes;
-
-    int depth;
-    int planewidth[4];
-    int planeheight[4];
-    float *buffer;
-    float boundaryscale;
-    float boundaryscaleV;
-    float postscale;
-    float postscaleV;
-    float nu;
-    float nuV;
-    int nb_planes;
-} GBlurContext;
 
 #define OFFSET(x) offsetof(GBlurContext, x)
 #define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
@@ -72,6 +52,28 @@ typedef struct ThreadData {
     int width;
 } ThreadData;
 
+static void horiz_slice_c(float *buffer, int width, int height, int steps,
+                          float nu, float bscale)
+{
+    int step, x, y;
+    float *ptr;
+    for (y = 0; y < height; y++) {
+        for (step = 0; step < steps; step++) {
+            ptr = buffer + width * y;
+            ptr[0] *= bscale;
+
+            /* Filter rightwards */
+            for (x = 1; x < width; x++)
+                ptr[x] += nu * ptr[x - 1];
+            ptr[x = width - 1] *= bscale;
+
+            /* Filter leftwards */
+            for (; x > 0; x--)
+                ptr[x - 1] += nu * ptr[x];
+        }
+    }
+}
+
 static int filter_horizontally(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
 {
     GBlurContext *s = ctx->priv;
@@ -84,28 +86,45 @@ static int filter_horizontally(AVFilterContext *ctx, void *arg, int jobnr, int n
     const int steps = s->steps;
     const float nu = s->nu;
     float *buffer = s->buffer;
-    int y, x, step;
-    float *ptr;
 
-    /* Filter horizontally along each row */
-    for (y = slice_start; y < slice_end; y++) {
-        for (step = 0; step < steps; step++) {
-            ptr = buffer + width * y;
-            ptr[0] *= boundaryscale;
-
-            /* Filter rightwards */
-            for (x = 1; x < width; x++)
-                ptr[x] += nu * ptr[x - 1];
-
-            ptr[x = width - 1] *= boundaryscale;
-
-            /* Filter leftwards */
-            for (; x > 0; x--)
-                ptr[x - 1] += nu * ptr[x];
-        }
-    }
-
+    s->horiz_slice(buffer + width * slice_start, width, slice_end - slice_start,
+                   steps, nu, boundaryscale);
+    emms_c();
     return 0;
+}
+
+static void do_vertical_columns(float *buffer, int width, int height,
+                                int column_begin, int column_end, int steps,
+                                float nu, float boundaryscale, int column_step)
+{
+    const int numpixels = width * height;
+    int i, x, k, step;
+    float *ptr;
+    for (x = column_begin; x < column_end;) {
+        for (step = 0; step < steps; step++) {
+            ptr = buffer + x;
+            for (k = 0; k < column_step; k++) {
+                ptr[k] *= boundaryscale;
+            }
+            /* Filter downwards */
+            for (i = width; i < numpixels; i += width) {
+                for (k = 0; k < column_step; k++) {
+                    ptr[i + k] += nu * ptr[i - width + k];
+                }
+            }
+            i = numpixels - width;
+
+            for (k = 0; k < column_step; k++)
+                ptr[i + k] *= boundaryscale;
+
+            /* Filter upwards */
+            for (; i > 0; i -= width) {
+                for (k = 0; k < column_step; k++)
+                    ptr[i - width + k] += nu * ptr[i + k];
+            }
+        }
+        x += column_step;
+    }
 }
 
 static int filter_vertically(AVFilterContext *ctx, void *arg, int jobnr, int nb_jobs)
@@ -117,31 +136,19 @@ static int filter_vertically(AVFilterContext *ctx, void *arg, int jobnr, int nb_
     const int slice_start = (width *  jobnr   ) / nb_jobs;
     const int slice_end   = (width * (jobnr+1)) / nb_jobs;
     const float boundaryscale = s->boundaryscaleV;
-    const int numpixels = width * height;
     const int steps = s->steps;
     const float nu = s->nuV;
     float *buffer = s->buffer;
-    int i, x, step;
-    float *ptr;
+    int aligned_end;
 
-    /* Filter vertically along each column */
-    for (x = slice_start; x < slice_end; x++) {
-        for (step = 0; step < steps; step++) {
-            ptr = buffer + x;
-            ptr[0] *= boundaryscale;
+    aligned_end = slice_start + (((slice_end - slice_start) >> 3) << 3);
+    /* Filter vertically along columns (process 8 columns in each step) */
+    do_vertical_columns(buffer, width, height, slice_start, aligned_end,
+                        steps, nu, boundaryscale, 8);
 
-            /* Filter downwards */
-            for (i = width; i < numpixels; i += width)
-                ptr[i] += nu * ptr[i - width];
-
-            ptr[i = numpixels - width] *= boundaryscale;
-
-            /* Filter upwards */
-            for (; i > 0; i -= width)
-                ptr[i - width] += nu * ptr[i];
-        }
-    }
-
+    /* Filter un-aligned columns one by one */
+    do_vertical_columns(buffer, width, height, aligned_end, slice_end,
+                        steps, nu, boundaryscale, 1);
     return 0;
 }
 
@@ -209,6 +216,13 @@ static int query_formats(AVFilterContext *ctx)
     return ff_set_common_formats(ctx, ff_make_format_list(pix_fmts));
 }
 
+void ff_gblur_init(GBlurContext *s)
+{
+    s->horiz_slice = horiz_slice_c;
+    if (ARCH_X86_64)
+        ff_gblur_init_x86(s);
+}
+
 static int config_input(AVFilterLink *inlink)
 {
     const AVPixFmtDescriptor *desc = av_pix_fmt_desc_get(inlink->format);
@@ -229,6 +243,7 @@ static int config_input(AVFilterLink *inlink)
     if (s->sigmaV < 0) {
         s->sigmaV = s->sigma;
     }
+    ff_gblur_init(s);
 
     return 0;
 }
