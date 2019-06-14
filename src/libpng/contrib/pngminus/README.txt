@@ -1,17 +1,7 @@
 PngMinus
 --------
-(copyright Willem van Schaik, 1999)
+(copyright Willem van Schaik, 1999-2019)
 
-
-License
--------
-
-Permission to use, copy, modify, and distribute this software and
-its documentation for any purpose and without fee is hereby granted,
-provided that the above copyright notice appear in all copies and
-that both that copyright notice and this permission notice appear in
-supporting documentation. This software is provided "as is" without
-express or implied warranty.
 
 
 Some history
@@ -19,8 +9,8 @@ Some history
 Soon after the creation of PNG in 1995, the need was felt for a set of
 pnmtopng / pngtopnm utilities. Independently Alexander Lehmann and I
 (Willem van Schaik) started such a project. Luckily we discovered this
-and merged the two together into pnmtopng.tar.gz, which is available
-from a/o ftp://ftp.simplesystems.org/pub/libpng/png/.
+and merged the two, which later became part of NetPBM, available from
+SourceForge.
 
 These two utilities have many, many options and make use of most of the
 features of PNG, like gamma, alpha, sbit, text-chunks, etc. This makes
@@ -35,8 +25,8 @@ makes the whole setup a bit bulky. But that's unavoidable given the many
 features of pnmtopng.
 
 
-What now
---------
+What now (1999)
+---------------
 At this moment libpng is in a very stable state and can do much of the
 work done in pnmtopng. Also, pnmtopng needs to be upgraded to the new
 interface of libpng. Hence, it is time for a rewrite from the ground up
@@ -49,8 +39,8 @@ a small prototype that contains only the basic functionality. It doesn't
 have any of the options to read or write special chunks and it will do
 no gamma correction. But this makes it also a simple program that is
 quite easy to understand and can serve well as a template for other
-software developments. (By now there are of course a couple of programs,
-like Greg Roelofs' rpng/wpng, that can be used just as good.)
+software developments. By now there are of course a couple of programs,
+like Greg Roelofs' rpng/wpng, that can be used just as good.
 
 
 Can and can not
@@ -60,7 +50,8 @@ PngMinus. Because I started this development in good-old Turbo-C, I
 avoided the use the netpbm library, which requires DOS extenders. Again,
 another reason to call it PngMinus (minus netpbm :-). So, part of the
 program are some elementary routines to read / write pgm- and ppm-files.
-It does not read b&w pbm-files.
+It does not handle B&W pbm-files, but instead you could do pgm with bit-
+depth 1.
 
 The downside of this approach is that you can not use them on images
 that require blocks of memory bigger than 64k (the DOS version). For
@@ -96,58 +87,34 @@ To list the options type "png2pnm -h" or "pnm2png -h".
 
 Just like Scandinavian furniture
 --------------------------------
-You have to put it together yourself. I did test the software under
-MS-DOS with Turbo-C 3.0 and under RedHat Linux 4.2 with gcc. In both
-cases I used libpng-1.0.4 and zlib-1.1.3. Later versions should be OK,
-however some older libpng versions have a bug in pngmem.c when using
-Turbo-C 3.0 (see below).
+You have to put it together yourself. I developed the software on MS-DOS
+with Turbo-C 3.0 and RedHat Linux 4.2 with gcc. In both cases I used
+libpng-1.0.4 and zlib-1.1.3. By now (2019) it is twenty years later and
+more current versions are OK.
 
-You can build it using one of the two makefiles (make -f makefile.###)
-or use the batch/script files pngminus.bat / pngminus.sh. This assumes
-that you have built the libraries in ../libpng and ../zlib. Using Linux,
-make sure that you have built libpng with makefile.std and not
-makefile.linux (also called .lnx in earlier versions of libpng). The
-latter creates a .so shared-library, while the PngMinus makefile assumes
-a normal .a static library.
+The makefile assumes that the libpng libraries can be found in ../.. and
+libz in ../../../zlib. But you can change this to for example ../libpng
+and ../zlib. The makefile creates two versions of each program, one with
+static library support and the other using shared libraries.
 
 If you create a ../pngsuite directory and then store the basn####.png
 files from PngSuite (http://www.schaik.com/pngsuite/) in there, you can
-test in one go the proper functioning of PngMinus, see png2pnm.bat and
-pnm2png.bat (or the .sh versions).
+test the proper functioning of PngMinus by running pngminus.sh.
 
 
 Warranty
 -------
 Please, remember that this was just a small experiment to learn a few
-things. It will have many unforeseen features <vbg>. Who said bugs? Use
-it when you are in need for something simple or when you want to start
-developing your own stuff.
-
-
-The Turbo bug
--------------
-** pngmem.old
-          hptr = (png_byte huge *)((long)(hptr) & 0xfffffff0L);
-          hptr += 16L;
-** pngmem.c
-          hptr = (png_byte huge *)((long)(hptr) & 0xfffffff0L);
-          hptr = hptr + 16L;
-**
-
-** pngmem.old
-          png_ptr->offset_table_ptr[i] = (png_bytep)hptr;
-          hptr += (png_uint_32)65536L;
-** pngmem.c
-          png_ptr->offset_table_ptr[i] = (png_bytep)hptr;
-          hptr = hptr + 65536L;
-**
+things. It will have many unforeseen features <vbg> ... who said bugs? Use
+it when you are in need for something simple or when you want a starting
+point for developing your own stuff.
 
 
 The end
 -------
 Willem van Schaik
-mailto:willem at schaik.com
+mailto:willem at schaik dot com
 http://www.schaik.com/png/
--------
-Oct 1999
+
+Oct 1999, Jan 2019
 
