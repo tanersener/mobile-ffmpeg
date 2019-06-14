@@ -837,7 +837,7 @@ static opus_int32 compute_equiv_rate(opus_int32 bitrate, int channels,
 
 #ifndef DISABLE_FLOAT_API
 
-static int is_digital_silence(const opus_val16* pcm, int frame_size, int channels, int lsb_depth)
+int is_digital_silence(const opus_val16* pcm, int frame_size, int channels, int lsb_depth)
 {
    int silence = 0;
    opus_val32 sample_max = 0;
@@ -1140,21 +1140,19 @@ opus_int32 opus_encode_native(OpusEncoder *st, const opus_val16 *pcm, int frame_
     if (st->silk_mode.complexity >= 7 && st->Fs>=16000)
 #endif
     {
-       if (is_digital_silence(pcm, frame_size, st->channels, lsb_depth))
-       {
-          is_silence = 1;
-       } else {
-          analysis_read_pos_bak = st->analysis.read_pos;
-          analysis_read_subframe_bak = st->analysis.read_subframe;
-          run_analysis(&st->analysis, celt_mode, analysis_pcm, analysis_size, frame_size,
-                c1, c2, analysis_channels, st->Fs,
-                lsb_depth, downmix, &analysis_info);
-       }
+       is_silence = is_digital_silence(pcm, frame_size, st->channels, lsb_depth);
+       analysis_read_pos_bak = st->analysis.read_pos;
+       analysis_read_subframe_bak = st->analysis.read_subframe;
+       run_analysis(&st->analysis, celt_mode, analysis_pcm, analysis_size, frame_size,
+             c1, c2, analysis_channels, st->Fs,
+             lsb_depth, downmix, &analysis_info);
 
        /* Track the peak signal energy */
        if (!is_silence && analysis_info.activity_probability > DTX_ACTIVITY_THRESHOLD)
           st->peak_signal_energy = MAX32(MULT16_32_Q15(QCONST16(0.999f, 15), st->peak_signal_energy),
                 compute_frame_energy(pcm, frame_size, st->channels, st->arch));
+    } else if (st->analysis.initialized) {
+       tonality_analysis_reset(&st->analysis);
     }
 #else
     (void)analysis_pcm;
@@ -1338,6 +1336,14 @@ opus_int32 opus_encode_native(OpusEncoder *st, const opus_val16 *pcm, int frame_
     equiv_rate = compute_equiv_rate(st->bitrate_bps, st->stream_channels, st->Fs/frame_size,
           st->use_vbr, 0, st->silk_mode.complexity, st->silk_mode.packetLossPercentage);
 
+    /* Allow SILK DTX if DTX is enabled but the generalized DTX cannot be used,
+       e.g. because of the complexity setting or sample rate. */
+#ifndef DISABLE_FLOAT_API
+    st->silk_mode.useDTX = st->use_dtx && !(analysis_info.valid || is_silence);
+#else
+    st->silk_mode.useDTX = st->use_dtx;
+#endif
+
     /* Mode selection depending on application and signal type */
     if (st->application == OPUS_APPLICATION_RESTRICTED_LOWDELAY)
     {
@@ -1386,13 +1392,7 @@ opus_int32 opus_encode_native(OpusEncoder *st, const opus_val16 *pcm, int frame_
        if (st->silk_mode.useInBandFEC && st->silk_mode.packetLossPercentage > (128-voice_est)>>4)
           st->mode = MODE_SILK_ONLY;
        /* When encoding voice and DTX is enabled but the generalized DTX cannot be used,
-          because of complexity and sampling frequency settings, switch to SILK DTX and
-          set the encoder to SILK mode */
-#ifndef DISABLE_FLOAT_API
-       st->silk_mode.useDTX = st->use_dtx && !(analysis_info.valid || is_silence);
-#else
-       st->silk_mode.useDTX = st->use_dtx;
-#endif
+          use SILK in order to make use of its DTX. */
        if (st->silk_mode.useDTX && voice_est > 100)
           st->mode = MODE_SILK_ONLY;
 #endif
@@ -2152,6 +2152,8 @@ opus_int32 opus_encode_native(OpusEncoder *st, const opus_val16 *pcm, int frame_
           RESTORE_STACK;
           return 1;
        }
+    } else {
+       st->nb_no_activity_frames = 0;
     }
 #endif
 
@@ -2629,7 +2631,6 @@ int opus_encoder_ctl(OpusEncoder *st, int request, ...)
                goto bad_arg;
             }
             st->variable_duration = value;
-            celt_encoder_ctl(celt_enc, OPUS_SET_EXPERT_FRAME_DURATION(value));
         }
         break;
         case OPUS_GET_EXPERT_FRAME_DURATION_REQUEST:
@@ -2724,6 +2725,33 @@ int opus_encoder_ctl(OpusEncoder *st, int request, ...)
             opus_val16 *value = va_arg(ap, opus_val16*);
             st->energy_masking = value;
             ret = celt_encoder_ctl(celt_enc, OPUS_SET_ENERGY_MASK(value));
+        }
+        break;
+        case OPUS_GET_IN_DTX_REQUEST:
+        {
+            opus_int32 *value = va_arg(ap, opus_int32*);
+            if (!value)
+            {
+                goto bad_arg;
+            }
+            if (st->silk_mode.useDTX && (st->prev_mode == MODE_SILK_ONLY || st->prev_mode == MODE_HYBRID)) {
+                /* DTX determined by Silk. */
+                int n;
+                void *silk_enc = (char*)st+st->silk_enc_offset;
+                *value = 1;
+                for (n=0;n<st->silk_mode.nChannelsInternal;n++) {
+                    *value = *value && ((silk_encoder*)silk_enc)->state_Fxx[n].sCmn.noSpeechCounter >= NB_SPEECH_FRAMES_BEFORE_DTX;
+                }
+            }
+#ifndef DISABLE_FLOAT_API
+            else if (st->use_dtx) {
+                /* DTX determined by Opus. */
+                *value = st->nb_no_activity_frames >= NB_SPEECH_FRAMES_BEFORE_DTX;
+            }
+#endif
+            else {
+                *value = 0;
+            }
         }
         break;
 

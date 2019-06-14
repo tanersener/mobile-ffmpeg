@@ -41,7 +41,7 @@ export LDFLAGS=$(get_ldflags ${LIB_NAME})
 CPU_SPECIFIC_OPTIONS="--enable-hardware-optimizations=yes"
 case ${ARCH} in
     x86 | x86-64)
-        CPU_SPECIFIC_OPTIONS+=" --enable-sse=yes"
+        CPU_SPECIFIC_OPTIONS+=" --enable-intel-sse=yes"
     ;;
     armv7 | armv7s | arm64 | arm64e)
         CPU_SPECIFIC_OPTIONS+=" --enable-arm-neon=yes"
@@ -72,6 +72,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libpng_package_config "1.6.36"
+create_libpng_package_config "1.6.37"
 
 make install || exit 1

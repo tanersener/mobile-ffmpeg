@@ -360,6 +360,8 @@ void test_encode_decode(opus_int32 bitrate, opus_int32 channels,
     goto bad_cleanup;
   }
 
+  opus_projection_decoder_destroy(st_dec);
+  opus_projection_encoder_destroy(st_enc);
   free(buffer_in);
   free(buffer_out);
   return;

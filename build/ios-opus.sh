@@ -60,7 +60,6 @@ fi
     --disable-maintainer-mode \
     --disable-doc \
     --disable-extra-programs \
-    --disable-ambisonics \
     --host=${TARGET_HOST} || exit 1
 
 make -j$(get_cpu_count) || exit 1

@@ -487,7 +487,7 @@ int opus_multistream_decoder_ctl_va_list(OpusMSDecoder *st, int request,
           OpusDecoder **value;
           stream_id = va_arg(ap, opus_int32);
           if (stream_id<0 || stream_id >= st->layout.nb_streams)
-             ret = OPUS_BAD_ARG;
+             goto bad_arg;
           value = va_arg(ap, OpusDecoder**);
           if (!value)
           {

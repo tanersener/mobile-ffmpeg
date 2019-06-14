@@ -55,6 +55,6 @@ fi
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_libiconv_package_config "1.15"
+create_libiconv_package_config "1.16"
 
 make install || exit 1

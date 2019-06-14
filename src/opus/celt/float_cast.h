@@ -99,7 +99,7 @@ static OPUS_INLINE opus_int32 float2int(float x) {return _mm_cvt_ss2si(_mm_set_s
 #elif (defined(_MSC_VER) && _MSC_VER >= 1400) && (defined(_M_X64) || (defined(_M_IX86_FP) && _M_IX86_FP >= 1))
         #include <xmmintrin.h>
 
-        __inline long int float2int(float value)
+        static __inline long int float2int(float value)
         {
                 return _mm_cvtss_si32(_mm_load_ss(&value));
         }
@@ -110,7 +110,7 @@ static OPUS_INLINE opus_int32 float2int(float x) {return _mm_cvt_ss2si(_mm_set_s
         **      Therefore implement OPUS_INLINE versions of these functions here.
         */
 
-        __inline long int
+        static __inline long int
         float2int (float flt)
         {       int intgr;
 
