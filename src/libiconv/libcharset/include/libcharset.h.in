@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU Library General Public License
    along with the GNU CHARSET Library; see the file COPYING.LIB.  If not,
-   see <http://www.gnu.org/licenses/>.  */
+   see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _LIBCHARSET_H
 #define _LIBCHARSET_H

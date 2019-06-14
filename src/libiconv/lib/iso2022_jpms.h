@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2001, 2008, 2011-2012, 2016 Free Software Foundation, Inc.
+ * Copyright (C) 1999-2001, 2008, 2011-2012, 2016, 2018 Free Software Foundation, Inc.
  * This file is part of the GNU LIBICONV Library.
  *
  * The GNU LIBICONV Library is free software; you can redistribute it
@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, see <http://www.gnu.org/licenses/>.
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -26,11 +26,11 @@
  * JIS X 0212, respectively.  This violates the principles of ISO 2022,
  * where
  *   1. character sets to be used by ISO 2022 have to be registered at the
- *      ISO IR registry <http://www.itscj.ipsj.or.jp/ISO-IR/>,
+ *      ISO IR registry <https://www.itscj.ipsj.or.jp/ISO-IR/>,
  *   2. different character sets are designated by different escape
  *      sequences.
  * It's a typical instance of the "embrace and extend" strategy by Microsoft
- * <http://en.wikipedia.org/wiki/Embrace,_extend_and_extinguish>.
+ * <https://en.wikipedia.org/wiki/Embrace,_extend_and_extinguish>.
  */
 
 /*

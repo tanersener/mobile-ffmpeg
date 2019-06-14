@@ -1,5 +1,5 @@
 /* Provide relocatable packages.
-   Copyright (C) 2003-2006, 2008-2012 Free Software Foundation, Inc.
+   Copyright (C) 2003-2006, 2008-2018 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software; you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 
 /* Tell glibc's <stdio.h> to provide a prototype for getline().
@@ -42,7 +42,7 @@
 # include "xalloc.h"
 #endif
 
-#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 #endif
@@ -77,7 +77,7 @@
    ISSLASH(C)           tests whether C is a directory separator character.
    IS_PATH_WITH_DIR(P)  tests whether P contains a directory specification.
  */
-#if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) || defined __EMX__ || defined __DJGPP__
+#if (defined _WIN32 && !defined __CYGWIN__) || defined __EMX__ || defined __DJGPP__
   /* Native Windows, OS/2, DOS */
 # define ISSLASH(C) ((C) == '/' || (C) == '\\')
 # define HAS_DEVICE(P) \
@@ -99,7 +99,7 @@
    platforms, see below.  Therefore we enable it by default only on native
    Windows platforms.  */
 #ifndef ENABLE_COSTLY_RELOCATABLE
-# if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+# if defined _WIN32 && !defined __CYGWIN__
 #  define ENABLE_COSTLY_RELOCATABLE 1
 # else
 #  define ENABLE_COSTLY_RELOCATABLE 0
@@ -256,7 +256,7 @@ compute_curr_prefix (const char *orig_installprefix,
             /* Do case-insensitive comparison if the file system is always or
                often case-insensitive.  It's better to accept the comparison
                if the difference is only in case, rather than to fail.  */
-#if defined _WIN32 || defined __WIN32__ || defined __CYGWIN__ || defined __EMX__ || defined __DJGPP__
+#if defined _WIN32 || defined __CYGWIN__ || defined __EMX__ || defined __DJGPP__
             /* Native Windows, Cygwin, OS/2, DOS - case insignificant file system */
             if ((*rpi >= 'a' && *rpi <= 'z' ? *rpi - 'a' + 'A' : *rpi)
                 != (*cpi >= 'a' && *cpi <= 'z' ? *cpi - 'a' + 'A' : *cpi))
@@ -310,12 +310,12 @@ compute_curr_prefix (const char *orig_installprefix,
 /* Full pathname of shared library, or NULL.  */
 static char *shared_library_fullname;
 
-#if (defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__
+#if defined _WIN32 && !defined __CYGWIN__
 /* Native Windows only.
    On Cygwin, it is better to use the Cygwin provided /proc interface, than
    to use native Windows API and cygwin_conv_to_posix_path, because it
    supports longer file names
-   (see <http://cygwin.com/ml/cygwin/2011-01/msg00410.html>).  */
+   (see <https://cygwin.com/ml/cygwin/2011-01/msg00410.html>).  */
 
 /* Determine the full pathname of the shared library when it is loaded.  */
 
@@ -445,8 +445,7 @@ find_shared_library_fullname ()
 static char *
 get_shared_library_fullname ()
 {
-#if (!((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) \
-     && !defined __EMX__)
+#if !(defined _WIN32 && !defined __CYGWIN__) && !defined __EMX__
   static bool tried_find_shared_library_fullname;
   if (!tried_find_shared_library_fullname)
     {
@@ -542,27 +541,26 @@ relocate (const char *pathname)
 # ifdef __KLIBC__
 #  undef strncmp
 
-  if (pathname && strncmp (pathname, "/@unixroot", 10) == 0
-      && (pathname[10] == '\0' || pathname[10] == '/' || pathname[10] == '\\'))
+  if (strncmp (pathname, "/@unixroot", 10) == 0
+      && (pathname[10] == '\0' || ISSLASH (pathname[10])))
     {
       /* kLIBC itself processes /@unixroot prefix */
-
       return pathname;
     }
   else
 # endif
-  if (pathname && ISSLASH (pathname[0]))
+  if (ISSLASH (pathname[0]))
     {
       const char *unixroot = getenv ("UNIXROOT");
 
-      if (unixroot && HAS_DEVICE (unixroot) && !unixroot[2])
+      if (unixroot && HAS_DEVICE (unixroot) && unixroot[2] == '\0')
         {
           char *result = (char *) xmalloc (2 + strlen (pathname) + 1);
 #ifdef NO_XMALLOC
           if (result != NULL)
 #endif
             {
-              strcpy (result, unixroot);
+              memcpy (result, unixroot, 2);
               strcpy (result + 2, pathname);
               return result;
             }
@@ -572,6 +570,19 @@ relocate (const char *pathname)
 
   /* Nothing to relocate.  */
   return pathname;
+}
+
+/* Returns the pathname, relocated according to the current installation
+   directory.
+   This function sets *ALLOCATEDP to the allocated memory, or to NULL if
+   no memory allocation occurs.  So that, after you're done with the return
+   value, to reclaim allocated memory, you can do: free (*ALLOCATEDP).  */
+const char *
+relocate2 (const char *pathname, char **allocatedp)
+{
+  const char *result = relocate (pathname);
+  *allocatedp = (result != pathname ? (char *) result : NULL);
+  return result;
 }
 
 #endif

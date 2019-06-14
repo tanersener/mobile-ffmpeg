@@ -1,5 +1,5 @@
-# unistd_h.m4 serial 69
-dnl Copyright (C) 2006-2017 Free Software Foundation, Inc.
+# unistd_h.m4 serial 74
+dnl Copyright (C) 2006-2019 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -37,17 +37,17 @@ AC_DEFUN([gl_UNISTD_H],
 # include <fcntl.h>
 # include <stdio.h>
 # include <stdlib.h>
-# if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+# if defined _WIN32 && ! defined __CYGWIN__
 #  include <io.h>
 # endif
 #endif
     ]], [chdir chown dup dup2 dup3 environ euidaccess faccessat fchdir fchownat
     fdatasync fsync ftruncate getcwd getdomainname getdtablesize getgroups
-    gethostname getlogin getlogin_r getpagesize
+    gethostname getlogin getlogin_r getpagesize getpass
     getusershell setusershell endusershell
     group_member isatty lchown link linkat lseek pipe pipe2 pread pwrite
-    readlink readlinkat rmdir sethostname sleep symlink symlinkat ttyname_r
-    unlink unlinkat usleep])
+    readlink readlinkat rmdir sethostname sleep symlink symlinkat
+    truncate ttyname_r unlink unlinkat usleep])
 ])
 
 AC_DEFUN([gl_UNISTD_MODULE_INDICATOR],
@@ -83,6 +83,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   GNULIB_GETLOGIN=0;             AC_SUBST([GNULIB_GETLOGIN])
   GNULIB_GETLOGIN_R=0;           AC_SUBST([GNULIB_GETLOGIN_R])
   GNULIB_GETPAGESIZE=0;          AC_SUBST([GNULIB_GETPAGESIZE])
+  GNULIB_GETPASS=0;              AC_SUBST([GNULIB_GETPASS])
   GNULIB_GETUSERSHELL=0;         AC_SUBST([GNULIB_GETUSERSHELL])
   GNULIB_GROUP_MEMBER=0;         AC_SUBST([GNULIB_GROUP_MEMBER])
   GNULIB_ISATTY=0;               AC_SUBST([GNULIB_ISATTY])
@@ -102,6 +103,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   GNULIB_SLEEP=0;                AC_SUBST([GNULIB_SLEEP])
   GNULIB_SYMLINK=0;              AC_SUBST([GNULIB_SYMLINK])
   GNULIB_SYMLINKAT=0;            AC_SUBST([GNULIB_SYMLINKAT])
+  GNULIB_TRUNCATE=0;             AC_SUBST([GNULIB_TRUNCATE])
   GNULIB_TTYNAME_R=0;            AC_SUBST([GNULIB_TTYNAME_R])
   GNULIB_UNISTD_H_NONBLOCKING=0; AC_SUBST([GNULIB_UNISTD_H_NONBLOCKING])
   GNULIB_UNISTD_H_SIGPIPE=0;     AC_SUBST([GNULIB_UNISTD_H_SIGPIPE])
@@ -125,6 +127,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   HAVE_GETHOSTNAME=1;     AC_SUBST([HAVE_GETHOSTNAME])
   HAVE_GETLOGIN=1;        AC_SUBST([HAVE_GETLOGIN])
   HAVE_GETPAGESIZE=1;     AC_SUBST([HAVE_GETPAGESIZE])
+  HAVE_GETPASS=1;         AC_SUBST([HAVE_GETPASS])
   HAVE_GROUP_MEMBER=1;    AC_SUBST([HAVE_GROUP_MEMBER])
   HAVE_LCHOWN=1;          AC_SUBST([HAVE_LCHOWN])
   HAVE_LINK=1;            AC_SUBST([HAVE_LINK])
@@ -150,6 +153,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   HAVE_DECL_GETPAGESIZE=1; AC_SUBST([HAVE_DECL_GETPAGESIZE])
   HAVE_DECL_GETUSERSHELL=1; AC_SUBST([HAVE_DECL_GETUSERSHELL])
   HAVE_DECL_SETHOSTNAME=1; AC_SUBST([HAVE_DECL_SETHOSTNAME])
+  HAVE_DECL_TRUNCATE=1;   AC_SUBST([HAVE_DECL_TRUNCATE])
   HAVE_DECL_TTYNAME_R=1;  AC_SUBST([HAVE_DECL_TTYNAME_R])
   HAVE_OS_H=0;            AC_SUBST([HAVE_OS_H])
   HAVE_SYS_PARAM_H=0;     AC_SUBST([HAVE_SYS_PARAM_H])
@@ -157,6 +161,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   REPLACE_CLOSE=0;        AC_SUBST([REPLACE_CLOSE])
   REPLACE_DUP=0;          AC_SUBST([REPLACE_DUP])
   REPLACE_DUP2=0;         AC_SUBST([REPLACE_DUP2])
+  REPLACE_FACCESSAT=0;    AC_SUBST([REPLACE_FACCESSAT])
   REPLACE_FCHOWNAT=0;     AC_SUBST([REPLACE_FCHOWNAT])
   REPLACE_FTRUNCATE=0;    AC_SUBST([REPLACE_FTRUNCATE])
   REPLACE_GETCWD=0;       AC_SUBST([REPLACE_GETCWD])
@@ -165,6 +170,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   REPLACE_GETLOGIN_R=0;   AC_SUBST([REPLACE_GETLOGIN_R])
   REPLACE_GETGROUPS=0;    AC_SUBST([REPLACE_GETGROUPS])
   REPLACE_GETPAGESIZE=0;  AC_SUBST([REPLACE_GETPAGESIZE])
+  REPLACE_GETPASS=0;      AC_SUBST([REPLACE_GETPASS])
   REPLACE_ISATTY=0;       AC_SUBST([REPLACE_ISATTY])
   REPLACE_LCHOWN=0;       AC_SUBST([REPLACE_LCHOWN])
   REPLACE_LINK=0;         AC_SUBST([REPLACE_LINK])
@@ -179,6 +185,7 @@ AC_DEFUN([gl_UNISTD_H_DEFAULTS],
   REPLACE_SLEEP=0;        AC_SUBST([REPLACE_SLEEP])
   REPLACE_SYMLINK=0;      AC_SUBST([REPLACE_SYMLINK])
   REPLACE_SYMLINKAT=0;    AC_SUBST([REPLACE_SYMLINKAT])
+  REPLACE_TRUNCATE=0;     AC_SUBST([REPLACE_TRUNCATE])
   REPLACE_TTYNAME_R=0;    AC_SUBST([REPLACE_TTYNAME_R])
   REPLACE_UNLINK=0;       AC_SUBST([REPLACE_UNLINK])
   REPLACE_UNLINKAT=0;     AC_SUBST([REPLACE_UNLINKAT])

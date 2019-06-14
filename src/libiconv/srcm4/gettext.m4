@@ -1,5 +1,5 @@
-# gettext.m4 serial 68 (gettext-0.19.8)
-dnl Copyright (C) 1995-2014, 2016-2017 Free Software Foundation, Inc.
+# gettext.m4 serial 69 (gettext-0.20)
+dnl Copyright (C) 1995-2014, 2016, 2018-2019 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -91,8 +91,7 @@ AC_DEFUN([AM_GNU_GETTEXT],
   dnl again, outside any 'if'. There are two solutions:
   dnl - Invoke AM_ICONV_LINKFLAGS_BODY here, outside any 'if'.
   dnl - Control the expansions in more detail using AC_PROVIDE_IFELSE.
-  dnl Since AC_PROVIDE_IFELSE is only in autoconf >= 2.52 and not
-  dnl documented, we avoid it.
+  dnl Since AC_PROVIDE_IFELSE is not documented, we avoid it.
   ifelse(gt_included_intl, yes, , [
     AC_REQUIRE([AM_ICONV_LINKFLAGS_BODY])
   ])

@@ -1,5 +1,5 @@
 # DO NOT EDIT! GENERATED AUTOMATICALLY!
-# Copyright (C) 2002-2017 Free Software Foundation, Inc.
+# Copyright (C) 2002-2019 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this file.  If not, see <http://www.gnu.org/licenses/>.
+# along with this file.  If not, see <https://www.gnu.org/licenses/>.
 #
 # As a special exception to the GNU General Public License,
 # this file may be distributed as part of a program that
@@ -59,10 +59,10 @@ AC_DEFUN([gl_EARLY],
   # Code from module extensions:
   # Code from module extern-inline:
   # Code from module fcntl-h:
+  # Code from module filename:
   # Code from module getprogname:
   # Code from module gettext:
   # Code from module gettext-h:
-  # Code from module gettimeofday:
   # Code from module havelib:
   # Code from module include_next:
   # Code from module intprops:
@@ -95,6 +95,7 @@ AC_DEFUN([gl_EARLY],
   # Code from module snippet/warn-on-use:
   # Code from module ssize_t:
   # Code from module stat:
+  # Code from module stat-time:
   # Code from module stdbool:
   # Code from module stddef:
   # Code from module stdint:
@@ -105,7 +106,6 @@ AC_DEFUN([gl_EARLY],
   # Code from module strerror-override:
   # Code from module string:
   # Code from module sys_stat:
-  # Code from module sys_time:
   # Code from module sys_types:
   # Code from module time:
   # Code from module unistd:
@@ -164,12 +164,6 @@ AC_DEFUN([gl_INIT],
   AM_GNU_GETTEXT_VERSION([0.18.1])
   AC_SUBST([LIBINTL])
   AC_SUBST([LTLIBINTL])
-  gl_FUNC_GETTIMEOFDAY
-  if test $HAVE_GETTIMEOFDAY = 0 || test $REPLACE_GETTIMEOFDAY = 1; then
-    AC_LIBOBJ([gettimeofday])
-    gl_PREREQ_GETTIMEOFDAY
-  fi
-  gl_SYS_TIME_MODULE_INDICATOR([gettimeofday])
   AC_REQUIRE([gl_LARGEFILE])
   gl_LIMITS_H
   gl_FUNC_LSTAT
@@ -193,6 +187,7 @@ AC_DEFUN([gl_INIT],
   if test $HAVE_MSVC_INVALID_PARAMETER_HANDLER = 1; then
     AC_LIBOBJ([msvc-nothrow])
   fi
+  gl_MODULE_INDICATOR([msvc-nothrow])
   gl_MULTIARCH
   gl_PATHMAX
   AC_CHECK_DECLS([program_invocation_name], [], [], [#include <errno.h>])
@@ -250,9 +245,16 @@ AC_DEFUN([gl_INIT],
   gl_FUNC_STAT
   if test $REPLACE_STAT = 1; then
     AC_LIBOBJ([stat])
+    case "$host_os" in
+      mingw*)
+        AC_LIBOBJ([stat-w32])
+        ;;
+    esac
     gl_PREREQ_STAT
   fi
   gl_SYS_STAT_MODULE_INDICATOR([stat])
+  gl_STAT_TIME
+  gl_STAT_BIRTHTIME
   AM_STDBOOL_H
   gl_STDDEF_H
   gl_STDINT_H
@@ -273,15 +275,13 @@ AC_DEFUN([gl_INIT],
   gl_HEADER_STRING_H
   gl_HEADER_SYS_STAT_H
   AC_PROG_MKDIR_P
-  gl_HEADER_SYS_TIME_H
-  AC_PROG_MKDIR_P
   gl_SYS_TYPES_H
   AC_PROG_MKDIR_P
   gl_HEADER_TIME_H
   gl_UNISTD_H
   gl_LIBUNISTRING_LIBHEADER([0.9.4], [unitypes.h])
   gl_LIBUNISTRING_LIBHEADER([0.9.4], [uniwidth.h])
-  gl_LIBUNISTRING_MODULE([0.9.6], [uniwidth/width])
+  gl_LIBUNISTRING_MODULE([0.9.8], [uniwidth/width])
   gl_FUNC_GLIBC_UNLOCKED_IO
   # End of code from modules
   m4_ifval(gl_LIBSOURCES_LIST, [
@@ -426,20 +426,20 @@ AC_DEFUN([gl_FILE_LIST], [
   build-aux/config.libpath
   build-aux/config.rpath
   build-aux/install-reloc
+  build-aux/libtool-reloc
   build-aux/reloc-ldflags
-  build-aux/snippet/_Noreturn.h
-  build-aux/snippet/arg-nonnull.h
-  build-aux/snippet/c++defs.h
-  build-aux/snippet/warn-on-use.h
   doc/relocatable.texi
+  lib/_Noreturn.h
   lib/alloca.in.h
   lib/allocator.c
   lib/allocator.h
   lib/areadlink.c
   lib/areadlink.h
+  lib/arg-nonnull.h
   lib/basename-lgpl.c
   lib/binary-io.c
   lib/binary-io.h
+  lib/c++defs.h
   lib/c-ctype.c
   lib/c-ctype.h
   lib/canonicalize-lgpl.c
@@ -452,10 +452,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/error.c
   lib/error.h
   lib/fcntl.in.h
+  lib/filename.h
   lib/getprogname.c
   lib/getprogname.h
   lib/gettext.h
-  lib/gettimeofday.c
   lib/intprops.h
   lib/limits.in.h
   lib/localcharset.h
@@ -463,7 +463,6 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/malloc.c
   lib/malloca.c
   lib/malloca.h
-  lib/malloca.valgrind
   lib/msvc-inval.c
   lib/msvc-inval.h
   lib/msvc-nothrow.c
@@ -483,6 +482,10 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/setenv.c
   lib/signal.in.h
   lib/sigprocmask.c
+  lib/stat-time.c
+  lib/stat-time.h
+  lib/stat-w32.c
+  lib/stat-w32.h
   lib/stat.c
   lib/stdbool.in.h
   lib/stddef.in.h
@@ -496,8 +499,8 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/strerror.c
   lib/string.in.h
   lib/stripslash.c
+  lib/sys-limits.h
   lib/sys_stat.in.h
-  lib/sys_time.in.h
   lib/sys_types.in.h
   lib/time.in.h
   lib/unistd.c
@@ -508,6 +511,7 @@ AC_DEFUN([gl_FILE_LIST], [
   lib/uniwidth/width.c
   lib/unlocked-io.h
   lib/verify.h
+  lib/warn-on-use.h
   lib/xalloc-oversized.h
   lib/xalloc.h
   lib/xmalloc.c
@@ -532,13 +536,14 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/fcntl_h.m4
   m4/getprogname.m4
   m4/gettext.m4
-  m4/gettimeofday.m4
   m4/glibc2.m4
   m4/glibc21.m4
   m4/gnulib-common.m4
+  m4/host-cpu-c-abi.m4
   m4/iconv.m4
   m4/include_next.m4
   m4/intdiv0.m4
+  m4/intl-thread-locale.m4
   m4/intl.m4
   m4/intldir.m4
   m4/intlmacosx.m4
@@ -580,6 +585,7 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/sigpipe.m4
   m4/size_max.m4
   m4/ssize_t.m4
+  m4/stat-time.m4
   m4/stat.m4
   m4/stdbool.m4
   m4/stddef_h.m4
@@ -591,7 +597,6 @@ AC_DEFUN([gl_FILE_LIST], [
   m4/string_h.m4
   m4/sys_socket_h.m4
   m4/sys_stat_h.m4
-  m4/sys_time_h.m4
   m4/sys_types_h.m4
   m4/threadlib.m4
   m4/time_h.m4

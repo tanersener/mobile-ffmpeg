@@ -24,12 +24,13 @@ INCLUDES = -I. -I$(srcdir) -I../include -I$(srcdir)/../include -I.. -I$(srcdir)/
 DEFS = -DLIBDIR=\"$(libdir)\" -DBUILDING_LIBICONV -DBUILDING_DLL \
 -DENABLE_RELOCATABLE=1 -DIN_LIBRARY -DINSTALLDIR=\"$(libdir)\" -DNO_XMALLOC \
 -Dset_relocation_prefix=libiconv_set_relocation_prefix \
--Drelocate=libiconv_relocate @DEFS@
+-Drelocate=libiconv_relocate -Drelocate2=libiconv_relocate2 @DEFS@
 LIBTOOL = @LIBTOOL@
 LIBTOOL_COMPILE = $(LIBTOOL) --mode=compile
 LIBTOOL_LINK = $(LIBTOOL) --mode=link
 LIBTOOL_INSTALL = $(LIBTOOL) --mode=install
 LIBTOOL_UNINSTALL = $(LIBTOOL) --mode=uninstall
+AR = @AR@
 # Windows resource compiler (windres). Used via libtool.
 RC = @RC@
 CP = cp
@@ -46,11 +47,11 @@ mkinstalldirs = $(SHELL) @top_srcdir@/build-aux/mkinstalldirs
 
 #### End of system configuration section. ####
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
 # Before making a release, change this according to the libtool documentation,
 # section "Library interface versions".
-LIBICONV_VERSION_INFO = 8:0:6
+LIBICONV_VERSION_INFO = 8:1:6
 
 PACKAGE_VERSION = @VERSION@
 
@@ -106,9 +107,9 @@ install : all force
 	$(LIBTOOL_INSTALL) $(INSTALL) libiconv.la $(DESTDIR)$(libdir)/libiconv.la
 	case "@host_os@" in \
 	  aix*) (cd $(DESTDIR)$(libdir) && \
-	         objects=`ar t libiconv.a`" "`ar t /lib/libiconv.a` && \
-	         ar x libiconv.a && ar x /lib/libiconv.a && \
-	         ar q libiconv.new.a $$objects && \
+	         objects=`$(AR) t libiconv.a`" "`$(AR) t /lib/libiconv.a` && \
+	         $(AR) x libiconv.a && $(AR) x /lib/libiconv.a && \
+	         $(AR) q libiconv.new.a $$objects && \
 	         rm -f $$objects && \
 	         mv -f libiconv.new.a libiconv.a) ;; \
 	esac

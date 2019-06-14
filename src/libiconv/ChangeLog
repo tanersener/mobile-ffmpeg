@@ -1,3 +1,213 @@
+2019-04-26  Bruno Haible  <bruno@clisp.org>
+
+	Update translations.
+	$ rsync -Lrtvz translationproject.org::tp/latest/libiconv/ po/new
+	$ cd po/new
+	$ for f in *.po; do \
+	    msgmerge --update --lang=${f%.po} --previous $f ../libiconv.pot; \
+	  done
+	$ mv *.po ../
+	$ cd ..; rm -rf new
+
+2019-04-26  Bruno Haible  <bruno@clisp.org>
+
+	Update POT file.
+	$ cd po; make update-po
+
+2019-04-26  Bruno Haible  <bruno@clisp.org>
+
+	Prepare for version 1.16.
+	* configure.ac: Bump version number to 1.15.
+	* include/iconv.h.in (_LIBICONV_VERSION): Likewise.
+	* lib/Makefile.in (LIBICONV_VERSION_INFO): Bump to 8:1:6.
+	* src/iconv.c (print_version): Update copyright year.
+	* windows/iconv.rc: Likewise.
+	* windows/libiconv.rc: Likewise.
+	* README: Update download link.
+
+2019-04-26  Bruno Haible  <bruno@clisp.org>
+
+	Tweak exported symbols when --enable-relocatable is used.
+	* lib/Makefile.in (DEFS): Map 'relocate2' to a different symbol.
+
+2019-04-01  Bruno Haible  <bruno@clisp.org>
+
+	build: Separate git operations from build operations.
+	* gitsub.sh: New file, from gnulib.
+	* .gitmodules: New file.
+	* autogen.sh: Remove all git operations. Look at GNULIB_SRCDIR
+	environment variable. Ignore the GNULIB_TOOL environment variable.
+	* HACKING: Explain when to use gitsub.sh.
+
+2019-03-07  Bruno Haible  <bruno@clisp.org>
+
+	Avoid signed integer overflow during shifts.
+	Reported by Jeffrey Walton <noloader@gmail.com>.
+	* lib/tcvn.h (tcvn_wctomb): Use unsigned integer type for bit mask
+	operation.
+	* lib/viscii.h (viscii_wctomb): Likewise.
+
+2019-03-04  Bruno Haible  <bruno@clisp.org>
+
+	Add support for --enable-relocatable to libcharset.
+	* autogen.sh: Copy some more files to libcharset/build-aux/ and
+	libcharset/m4/.
+
+2019-03-04  Bruno Haible  <bruno@clisp.org>
+
+	Update --enable-relocatable support after gnulib changed.
+	* configure.ac: Move the LT_INIT invocation before the gl_RELOCATABLE
+	invocation. Remove unused argument to gl_RELOCATABLE.
+
+2019-01-27  Bruno Haible  <bruno@clisp.org>
+
+	Accommodate a shell that is not in /bin/sh.
+	* Makefile.in (SHELL): Use the value found by configure.
+	* lib/Makefile.in (SHELL): Likewise.
+	* man/Makefile.in (SHELL): Likewise.
+	* src/Makefile.in (SHELL): Likewise.
+	* tests/Makefile.in (SHELL): Likewise.
+	(check, check-extra-yes): Use SHELL to run the check-* scripts.
+
+2019-01-27  Bruno Haible  <bruno@clisp.org>
+
+	Update after gnulib changed.
+	* Makefile.in (GNULIB_IMPORTED_FILES): Remove build-aux/snippet/*.
+
+2019-01-27  Bruno Haible  <bruno@clisp.org>
+
+	Update support for building with MSVC. Automake does not install ar-lib.
+	* autogen.sh: Fetch build-aux/ar-lib here.
+	* Makefile.devel (srclib/Makefile.in): Don't fetch build-aux/ar-lib
+	here.
+	* Makefile.in (AUTOMAKE_IMPORTED_FILES): Remove build-aux/ar-lib.
+	(IMPORTED_FILES): Add build-aux/ar-lib.
+
+2019-01-06  Bruno Haible  <bruno@clisp.org>
+
+	Revisit handling of file descriptors closed by the parent process.
+	* src/iconv.c (main): Add comment.
+
+2018-10-23  Bruno Haible  <bruno@clisp.org>
+
+	Remove outdated DJGPP build infrastructure.
+	Approved by Juan Manuel Guerrero <juan.guerrero@gmx.de>.
+	* djgpp: Remove directory.
+	* INSTALL.djgpp: Remove file.
+	* Makefile.in (SOURCE_FILES): Remove them.
+
+2018-10-23  Bruno Haible  <bruno@clisp.org>
+
+	Update after gnulib changed.
+	* configure.ac (AC_PREREQ): Bump minimum Autoconf version to 2.63.
+
+2018-09-22  Bruno Haible  <bruno@clisp.org>
+
+	Avoid some warnings in MSVC build.
+	* include/export.h: Handle MSVC compiler as well.
+
+2018-09-22  Bruno Haible  <bruno@clisp.org>
+
+	Update from gnulib. Move mapping tables into the code.
+	* autogen.sh: Don't create libcharset/m4/relocatable-lib.m4.
+	* Makefile.in (mostlyclean, clean, distclean, maintainer-clean): Don't
+	remove lib/charset.alias.
+	* tests/check-subst: Don't set CHARSETALIASDIR.
+
+2018-05-04  Bruno Haible  <bruno@clisp.org>
+
+	Drop special instructions for OSF/1.
+	* INSTALL.generic: Remove the recommendation for OSF/1.
+
+2018-05-04  Bruno Haible  <bruno@clisp.org>
+
+	Simplify: Remove the ability to install a preloadable library.
+	* preload/*: Remove directory.
+	* Makefile.devel: Don't recurse into 'preload'.
+	* Makefile.in: Likewise.
+	* configure.ac: Don't declare 'preload' as a subdirectory.
+	* README, NEWS: Update.
+
+2018-05-04  Bruno Haible  <bruno@clisp.org>
+
+	Simplify code. Drop support for Borland C++ on Windows.
+	* lib/iconv.c: Simplify 'defined _WIN32 || defined __WIN32__' to just
+	'defined _WIN32'.
+	* lib/iconv_open1.h: Likewise.
+
+2018-05-04  Bruno Haible  <bruno@clisp.org>
+
+	* lib/relocatable.c: Update from gnulib.
+
+2018-05-04  Bruno Haible  <bruno@clisp.org>
+
+	Switch to automake 1.16.
+	* autogen.sh: Update comment.
+	* Makefile.devel (AUTOMAKE, ACLOCAL): Switch to version 1.16.
+	* libcharset/Makefile.devel (ACLOCAL): Likewise.
+	* preload/Makefile.devel (ACLOCAL): Likewise.
+
+2018-03-27  Bruno Haible  <bruno@clisp.org>
+
+	Doc tweaks.
+	* README: Don't recommend to use --prefix=/usr/local, as it produces
+	problems with GCC (since GCC's treatment of /usr/local/include and
+	/usr/local/lib is inconsistent by default). Don't recommend to use
+	the iconv.m4 installed by GNU gettext, because it won't work when
+	GNU automake and GNU gettext are installed with different --prefix
+	options; instead recommend the 'iconv' module from gnulib.
+
+2018-01-27  Bruno Haible  <bruno@clisp.org>
+
+	Rename some files.
+	* INSTALL.windows: Renamed from README.windows.
+	* INSTALL.djgpp: Renamed from README.djgpp.
+	* Makefile.in (SOURCE_FILES): Update.
+
+2018-01-03  Bruno Haible  <bruno@clisp.org>
+
+	Fix installation in 64-bit mode on AIX.
+	* lib/Makefile.in (AR): New variable.
+	(install): Use it instead of hardcoding 'ar'.
+
+2017-11-26  Bruno Haible  <bruno@clisp.org>
+
+	Avoid end-of-lines problem in generated shell scripts on Cygwin.
+	Patch by Feiyun Wang <feiyunw@yahoo.com>.
+	* lib/genaliases.c (main): Create canonical.sh and canonical_local.sh
+	with Unix end-of-line characters, regardless of Cygwin choice of
+	text mode vs. binary mode.
+
+2017-07-15  Bruno Haible  <bruno@clisp.org>
+
+	Allow building statically linked binaries, through LDFLAGS="-static".
+	Apply patch from
+	<https://lists.gnu.org/archive/html/bug-libtool/2017-07/msg00000.html>.
+	* build-aux/ltmain.sh (func_mode_help, func_mode_link): In the link
+	mode, accept option '-static-uninstalled-libs' in place of '-static',
+	and make '-static' an equivalent of '-all-static'.
+
+2017-07-15  Bruno Haible  <bruno@clisp.org>
+
+	Don't attempt to build preloadable_libiconv.so when linking statically.
+	* preload/configure.ac (enable_shared, enable_static): Don't force
+	shared libraries when LDFLAGS indicates static linking.
+	(PLUGLIB): Set to empty when is not configured for building shared
+	libraries.
+
+2017-07-15  Bruno Haible  <bruno@clisp.org>
+
+	Get rid of autom4te.cache directories, as far as possible.
+	* Makefile.devel (srclib/Makefile.in, aclocal.m4, configure,
+	config.h.in): Remove autom4te.cache after invoking aclocal, autoconf,
+	autoheader, automake.
+	* preload/Makefile.devel (aclocal, configure): Likewise.
+
+2017-05-18  Bruno Haible  <bruno@clisp.org>
+
+	* lib/relocatable.h: Update from gnulib.
+	* lib/relocatable.c: Update from gnulib.
+
 2017-01-30  Bruno Haible  <bruno@clisp.org>
 
 	Prepare for version 1.15.
@@ -216,7 +426,7 @@
 	Extend CP1255 mapping.
 	* lib/cp1255.h (cp1255_2uni, cp1255_page05): Map 0xCA to U+05BA.
 	* tests/CP1255.TXT: Likewise.
-	This matches http://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/bestfit1255.txt
+	This matches https://www.unicode.org/Public/MAPPINGS/VENDORS/MICSFT/WindowsBestFit/bestfit1255.txt
 	and what the native Windows converter does since at least Windows XP.
 
 2016-10-01  Ben Noordhuis  <info@bnoordhuis.nl>  (tiny change)
@@ -275,14 +485,14 @@
 	explicitly. Complain if they don't exist.
 	* Makefile.devel (lib/aliases_*.h): Pass the output filenames as
 	arguments to genaliases.
-	Reported at <http://savannah.gnu.org/bugs/?36748>.
+	Reported at <https://savannah.gnu.org/bugs/?36748>.
 
 	Make it possible to run 'genaliases' on native Windows.
 	* lib/genaliases.c (main): Expect 3 arguments. Open the output files
 	explicitly. Complain if they don't exist. Improve error checking.
 	* Makefile.devel (lib/aliases*.h): Pass the output filenames as
 	arguments to genaliases.
-	Reported at <http://savannah.gnu.org/bugs/?36748>.
+	Reported at <https://savannah.gnu.org/bugs/?36748>.
 
 2012-05-13  Bruno Haible  <bruno@clisp.org>
 
@@ -544,7 +754,7 @@
 	Fix installation on OS/2.
 	* src/Makefile.in (all, iconv_no_i18n): Add $(EXEEXT) suffix to
 	iconv_no_i18n. This is the recommended way to use libtool, see
-	<http://lists.gnu.org/archive/html/bug-libtool/2009-04/msg00013.html>.
+	<https://lists.gnu.org/archive/html/bug-libtool/2009-04/msg00013.html>.
 
 2011-03-31  Bruno Haible  <bruno@clisp.org>
 
@@ -565,7 +775,7 @@
 	* lib/iconv.c (iconv_canonicalize): On Cygwin >= 1.7, map
 	ei_local_wchar_t to ei_utf16le or ei_utf16be, not ei_ucs2internal.
 	* lib/iconv_open1.h: Likewise.
-	Rationale: <http://cygwin.com/ml/cygwin/2011-01/msg00410.html>.
+	Rationale: <https://cygwin.com/ml/cygwin/2011-01/msg00410.html>.
 
 2011-01-29  Bruno Haible  <bruno@clisp.org>
 
@@ -574,7 +784,7 @@
 	ei_local_wchar_t to ei_utf16le or ei_utf16be, not ei_ucs2internal.
 	* lib/iconv_open1.h: Likewise.
 	Reported by Corinna Vinschen <corinna-cygwin@cygwin.com>
-	in <http://cygwin.com/ml/cygwin/2011-01/msg00410.html>.
+	in <https://cygwin.com/ml/cygwin/2011-01/msg00410.html>.
 
 2010-11-23  Bruno Haible  <bruno@clisp.org>
 
@@ -931,7 +1141,7 @@
 	(test-shiftseq, test-shiftseq.@OBJEXT@): New rules.
 	(clean): Remove test-shiftseq executable.
 	Reported by Roman Rybalko <roman_rybalko@users.sourceforge.net>
-	at <http://savannah.gnu.org/bugs/?24216>.
+	at <https://savannah.gnu.org/bugs/?24216>.
 
 2008-09-07  Bruno Haible  <bruno@clisp.org>
 
@@ -953,7 +1163,7 @@
 
 	* lib/gbk.h (gbk_wctomb): Fix an out-of-bounds write.
 	Reported by Roman Rybalko <roman_rybalko@users.sourceforge.net>
-	at <http://savannah.gnu.org/bugs/?24214>.
+	at <https://savannah.gnu.org/bugs/?24214>.
 
 2008-06-30  Bruno Haible  <bruno@clisp.org>
 
@@ -1188,7 +1398,7 @@
 2007-06-30  Bruno Haible  <bruno@clisp.org>
 
 	* src/iconv.c (print_version): Use the standard --version output, see
-	<http://lists.gnu.org/archive/html/bug-gnulib/2007-03/msg00302.html>.
+	<https://lists.gnu.org/archive/html/bug-gnulib/2007-03/msg00302.html>.
 
 2007-06-30  Bruno Haible  <bruno@clisp.org>
 

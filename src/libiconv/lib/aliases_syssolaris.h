@@ -1,4 +1,4 @@
-/* ANSI-C code produced by gperf version 3.0.4 */
+/* ANSI-C code produced by gperf version 3.1 */
 /* Command-line: gperf -m 10 lib/aliases_syssolaris.gperf  */
 /* Computed positions: -k'1,3-11,$' */
 
@@ -26,7 +26,7 @@
       && ('w' == 119) && ('x' == 120) && ('y' == 121) && ('z' == 122) \
       && ('{' == 123) && ('|' == 124) && ('}' == 125) && ('~' == 126))
 /* The character set is not based on ISO-646.  */
-#error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gnu-gperf@gnu.org>."
+#error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gperf@gnu.org>."
 #endif
 
 #line 1 "lib/aliases_syssolaris.gperf"
@@ -47,7 +47,7 @@ inline
 #endif
 #endif
 static unsigned int
-aliases_hash (register const char *str, register unsigned int len)
+aliases_hash (register const char *str, register size_t len)
 {
   static const unsigned short asso_values[] =
     {
@@ -65,7 +65,7 @@ aliases_hash (register const char *str, register unsigned int len)
       957, 957, 957, 957, 957, 957, 957, 957, 957, 957,
       957, 957, 957, 957, 957, 957, 957, 957
     };
-  register int hval = len;
+  register unsigned int hval = len;
 
   switch (hval)
     {
@@ -828,923 +828,917 @@ static const struct alias aliases[] =
   {
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 291 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str8, ei_iso646_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str8, ei_iso646_cn},
     {-1}, {-1}, {-1},
 #line 23 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str12, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str12, ei_ascii},
     {-1}, {-1},
 #line 209 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str15, ei_cp866},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str15, ei_cp866},
     {-1}, {-1}, {-1},
 #line 52 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str19, ei_c99},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str19, ei_c99},
     {-1}, {-1},
 #line 207 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str22, ei_cp866},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str22, ei_cp866},
     {-1}, {-1},
 #line 205 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str25, ei_cp862},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str25, ei_cp862},
 #line 175 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str26, ei_cp1251},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str26, ei_cp1251},
     {-1},
 #line 191 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str28, ei_cp1256},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str28, ei_cp1256},
 #line 58 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str29, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str29, ei_iso8859_1},
 #line 188 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str30, ei_cp1255},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str30, ei_cp1255},
     {-1},
 #line 203 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str32, ei_cp862},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str32, ei_cp862},
     {-1},
 #line 197 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str34, ei_cp1258},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str34, ei_cp1258},
     {-1}, {-1}, {-1},
 #line 179 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str38, ei_cp1252},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str38, ei_cp1252},
 #line 13 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str39, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str39, ei_ascii},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 358 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str46, ei_euc_kr},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str46, ei_euc_kr},
     {-1},
 #line 229 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str48, ei_hp_roman8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str48, ei_hp_roman8},
     {-1},
 #line 63 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str50, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str50, ei_iso8859_1},
     {-1},
 #line 103 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str52, ei_iso8859_6},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str52, ei_iso8859_6},
 #line 140 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str53, ei_iso8859_11},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str53, ei_iso8859_11},
 #line 94 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str54, ei_iso8859_5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str54, ei_iso8859_5},
 #line 167 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str55, ei_iso8859_16},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str55, ei_iso8859_16},
     {-1},
 #line 160 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str57, ei_iso8859_15},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str57, ei_iso8859_15},
 #line 121 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str58, ei_iso8859_8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str58, ei_iso8859_8},
 #line 359 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str59, ei_cp949},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str59, ei_cp949},
 #line 129 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str60, ei_iso8859_9},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str60, ei_iso8859_9},
 #line 54 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str61, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str61, ei_iso8859_1},
 #line 71 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str62, ei_iso8859_2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str62, ei_iso8859_2},
 #line 95 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str63, ei_iso8859_6},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str63, ei_iso8859_6},
 #line 138 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str64, ei_iso8859_11},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str64, ei_iso8859_11},
 #line 88 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str65, ei_iso8859_5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str65, ei_iso8859_5},
 #line 161 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str66, ei_iso8859_16},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str66, ei_iso8859_16},
 #line 322 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str67, ei_iso2022_jpms},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str67, ei_iso2022_jpms},
 #line 155 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str68, ei_iso8859_15},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str68, ei_iso8859_15},
 #line 115 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str69, ei_iso8859_8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str69, ei_iso8859_8},
 #line 289 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str70, ei_iso646_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str70, ei_iso646_cn},
 #line 122 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str71, ei_iso8859_9},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str71, ei_iso8859_9},
     {-1},
 #line 64 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str73, ei_iso8859_2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str73, ei_iso8859_2},
     {-1},
 #line 238 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str75, ei_pt154},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str75, ei_pt154},
     {-1},
 #line 201 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str77, ei_cp850},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str77, ei_cp850},
     {-1}, {-1},
 #line 16 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str80, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str80, ei_ascii},
     {-1}, {-1}, {-1},
 #line 185 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str84, ei_cp1254},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str84, ei_cp1254},
 #line 199 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str85, ei_cp850},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str85, ei_cp850},
 #line 348 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str86, ei_cp950},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str86, ei_cp950},
 #line 254 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str87, ei_tis620},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str87, ei_tis620},
     {-1},
 #line 297 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str89, ei_isoir165},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str89, ei_isoir165},
 #line 172 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str90, ei_cp1250},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str90, ei_cp1250},
 #line 294 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str91, ei_gb2312},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str91, ei_gb2312},
 #line 108 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str92, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str92, ei_iso8859_7},
     {-1}, {-1},
 #line 324 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str95, ei_euc_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str95, ei_euc_cn},
 #line 286 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str96, ei_jisx0212},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str96, ei_jisx0212},
     {-1},
 #line 164 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str98, ei_iso8859_16},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str98, ei_iso8859_16},
 #line 150 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str99, ei_iso8859_14},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str99, ei_iso8859_14},
     {-1},
 #line 211 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str101, ei_cp1131},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str101, ei_cp1131},
 #line 362 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str102, ei_johab},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str102, ei_johab},
 #line 333 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str103, ei_iso2022_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str103, ei_iso2022_cn},
     {-1},
 #line 329 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str105, ei_cp936},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str105, ei_cp936},
 #line 323 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str106, ei_euc_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str106, ei_euc_cn},
 #line 22 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str107, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str107, ei_ascii},
 #line 87 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str108, ei_iso8859_4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str108, ei_iso8859_4},
     {-1}, {-1},
 #line 154 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str111, ei_iso8859_14},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str111, ei_iso8859_14},
 #line 366 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str112, ei_local_char},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str112, ei_local_char},
     {-1}, {-1},
 #line 315 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str115, ei_cp932},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str115, ei_cp932},
 #line 67 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str116, ei_iso8859_2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str116, ei_iso8859_2},
 #line 137 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str117, ei_iso8859_10},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str117, ei_iso8859_10},
     {-1},
 #line 80 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str119, ei_iso8859_4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str119, ei_iso8859_4},
     {-1},
 #line 125 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str121, ei_iso8859_9},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str121, ei_iso8859_9},
 #line 147 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str122, ei_iso8859_14},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str122, ei_iso8859_14},
 #line 302 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str123, ei_ksc5601},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str123, ei_ksc5601},
 #line 336 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str124, ei_hz},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str124, ei_hz},
 #line 241 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str125, ei_rk1048},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str125, ei_rk1048},
 #line 75 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str126, ei_iso8859_3},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str126, ei_iso8859_3},
     {-1},
 #line 130 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str128, ei_iso8859_10},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str128, ei_iso8859_10},
 #line 178 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str129, ei_cp1251},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str129, ei_cp1251},
 #line 360 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str130, ei_cp949},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str130, ei_cp949},
 #line 335 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str131, ei_iso2022_cn_ext},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str131, ei_iso2022_cn_ext},
     {-1},
 #line 55 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str133, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str133, ei_iso8859_1},
     {-1},
 #line 96 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str135, ei_iso8859_6},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str135, ei_iso8859_6},
 #line 139 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str136, ei_iso8859_11},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str136, ei_iso8859_11},
 #line 89 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str137, ei_iso8859_5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str137, ei_iso8859_5},
 #line 162 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str138, ei_iso8859_16},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str138, ei_iso8859_16},
 #line 267 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str139, ei_iso646_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str139, ei_iso646_jp},
 #line 156 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str140, ei_iso8859_15},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str140, ei_iso8859_15},
 #line 116 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str141, ei_iso8859_8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str141, ei_iso8859_8},
 #line 163 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str142, ei_iso8859_16},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str142, ei_iso8859_16},
 #line 123 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str143, ei_iso8859_9},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str143, ei_iso8859_9},
     {-1},
 #line 65 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str145, ei_iso8859_2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str145, ei_iso8859_2},
 #line 261 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str146, ei_tcvn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str146, ei_tcvn},
 #line 157 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str147, ei_iso8859_15},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str147, ei_iso8859_15},
 #line 83 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str148, ei_iso8859_4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str148, ei_iso8859_4},
 #line 334 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str149, ei_iso2022_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str149, ei_iso2022_cn},
 #line 214 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str150, ei_mac_roman},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str150, ei_mac_roman},
     {-1}, {-1},
 #line 61 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str153, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str153, ei_iso8859_1},
 #line 135 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str154, ei_iso8859_10},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str154, ei_iso8859_10},
 #line 127 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str155, ei_iso8859_9},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str155, ei_iso8859_9},
     {-1},
 #line 152 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str157, ei_iso8859_14},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str157, ei_iso8859_14},
     {-1},
 #line 69 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str159, ei_iso8859_2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str159, ei_iso8859_2},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 208 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str166, ei_cp866},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str166, ei_cp866},
     {-1}, {-1}, {-1}, {-1},
 #line 91 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str171, ei_iso8859_5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str171, ei_iso8859_5},
     {-1},
 #line 59 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str173, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str173, ei_iso8859_1},
 #line 149 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str174, ei_iso8859_14},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str174, ei_iso8859_14},
 #line 118 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str175, ei_iso8859_8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str175, ei_iso8859_8},
 #line 204 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str176, ei_cp862},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str176, ei_cp862},
 #line 249 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str177, ei_tis620},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str177, ei_tis620},
     {-1},
 #line 132 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str179, ei_iso8859_10},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str179, ei_iso8859_10},
 #line 57 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str180, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str180, ei_iso8859_1},
     {-1},
 #line 85 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str182, ei_iso8859_4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str182, ei_iso8859_4},
 #line 235 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str183, ei_koi8_t},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str183, ei_koi8_t},
 #line 258 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str184, ei_viscii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str184, ei_viscii},
     {-1}, {-1}, {-1},
 #line 248 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str188, ei_tis620},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str188, ei_tis620},
 #line 21 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str189, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str189, ei_ascii},
 #line 260 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str190, ei_viscii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str190, ei_viscii},
 #line 81 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str191, ei_iso8859_4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str191, ei_iso8859_4},
 #line 182 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str192, ei_cp1253},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str192, ei_cp1253},
 #line 60 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str193, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str193, ei_iso8859_1},
 #line 148 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str194, ei_iso8859_14},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str194, ei_iso8859_14},
 #line 134 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str195, ei_iso8859_10},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str195, ei_iso8859_10},
 #line 244 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str196, ei_rk1048},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str196, ei_rk1048},
 #line 126 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str197, ei_iso8859_9},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str197, ei_iso8859_9},
 #line 311 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str198, ei_sjis},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str198, ei_sjis},
 #line 243 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str199, ei_rk1048},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str199, ei_rk1048},
 #line 131 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str200, ei_iso8859_10},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str200, ei_iso8859_10},
 #line 151 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str201, ei_iso8859_14},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str201, ei_iso8859_14},
 #line 169 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str202, ei_koi8_r},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str202, ei_koi8_r},
     {-1}, {-1},
 #line 68 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str205, ei_iso8859_2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str205, ei_iso8859_2},
     {-1},
 #line 168 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str207, ei_koi8_r},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str207, ei_koi8_r},
     {-1}, {-1}, {-1}, {-1},
 #line 236 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str212, ei_pt154},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str212, ei_pt154},
     {-1},
 #line 159 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str214, ei_iso8859_15},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str214, ei_iso8859_15},
 #line 325 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str215, ei_euc_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str215, ei_euc_cn},
 #line 79 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str216, ei_iso8859_3},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str216, ei_iso8859_3},
     {-1},
 #line 25 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str218, ei_ucs2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str218, ei_ucs2},
 #line 146 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str219, ei_iso8859_13},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str219, ei_iso8859_13},
 #line 166 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str220, ei_iso8859_16},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str220, ei_iso8859_16},
 #line 285 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str221, ei_jisx0212},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str221, ei_jisx0212},
     {-1},
 #line 250 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str223, ei_tis620},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str223, ei_tis620},
     {-1},
 #line 110 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str225, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str225, ei_iso8859_7},
     {-1},
 #line 72 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str227, ei_iso8859_3},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str227, ei_iso8859_3},
 #line 101 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str228, ei_iso8859_6},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str228, ei_iso8859_6},
 #line 200 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str229, ei_cp850},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str229, ei_cp850},
 #line 141 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str230, ei_iso8859_13},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str230, ei_iso8859_13},
 #line 228 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str231, ei_hp_roman8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str231, ei_hp_roman8},
     {-1}, {-1}, {-1}, {-1},
 #line 77 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str236, ei_iso8859_3},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str236, ei_iso8859_3},
     {-1}, {-1},
 #line 12 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str239, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str239, ei_ascii},
 #line 299 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str240, ei_ksc5601},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str240, ei_ksc5601},
 #line 272 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str241, ei_jisx0201},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str241, ei_jisx0201},
     {-1},
 #line 26 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str243, ei_ucs2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str243, ei_ucs2},
     {-1},
 #line 256 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str245, ei_cp874},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str245, ei_cp874},
 #line 330 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str246, ei_cp936},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str246, ei_cp936},
     {-1}, {-1},
 #line 278 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str249, ei_jisx0208},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str249, ei_jisx0208},
     {-1},
 #line 84 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str251, ei_iso8859_4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str251, ei_iso8859_4},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 181 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str258, ei_cp1252},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str258, ei_cp1252},
 #line 36 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str259, ei_ucs4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str259, ei_ucs4},
 #line 165 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str260, ei_iso8859_16},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str260, ei_iso8859_16},
 #line 304 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str261, ei_ksc5601},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str261, ei_ksc5601},
 #line 143 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str262, ei_iso8859_13},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str262, ei_iso8859_13},
     {-1},
 #line 34 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str264, ei_ucs4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str264, ei_ucs4},
     {-1},
 #line 35 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str266, ei_ucs4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str266, ei_ucs4},
 #line 246 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str267, ei_cp1133},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str267, ei_cp1133},
 #line 356 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str268, ei_euc_kr},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str268, ei_euc_kr},
 #line 31 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str269, ei_ucs2be},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str269, ei_ucs2be},
 #line 232 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str270, ei_armscii_8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str270, ei_armscii_8},
     {-1},
 #line 39 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str272, ei_utf16},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str272, ei_utf16},
     {-1},
 #line 342 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str274, ei_ces_big5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str274, ei_ces_big5},
 #line 24 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str275, ei_utf8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str275, ei_utf8},
 #line 364 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str276, ei_iso2022_kr},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str276, ei_iso2022_kr},
     {-1}, {-1},
 #line 355 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str279, ei_euc_kr},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str279, ei_euc_kr},
 #line 347 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str280, ei_ces_big5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str280, ei_ces_big5},
 #line 109 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str281, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str281, ei_iso8859_7},
 #line 341 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str282, ei_euc_tw},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str282, ei_euc_tw},
 #line 30 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str283, ei_ucs2be},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str283, ei_ucs2be},
     {-1},
 #line 343 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str285, ei_ces_big5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str285, ei_ces_big5},
     {-1},
 #line 153 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str287, ei_iso8859_14},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str287, ei_iso8859_14},
 #line 158 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str288, ei_iso8859_15},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str288, ei_iso8859_15},
 #line 251 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str289, ei_tis620},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str289, ei_tis620},
 #line 218 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str290, ei_mac_croatian},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str290, ei_mac_croatian},
 #line 346 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str291, ei_ces_big5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str291, ei_ces_big5},
     {-1}, {-1},
 #line 62 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str294, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str294, ei_iso8859_1},
 #line 288 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str295, ei_iso646_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str295, ei_iso646_cn},
 #line 136 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str296, ei_iso8859_10},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str296, ei_iso8859_10},
     {-1},
 #line 128 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str298, ei_iso8859_9},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str298, ei_iso8859_9},
 #line 73 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str299, ei_iso8859_3},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str299, ei_iso8859_3},
 #line 332 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str300, ei_gb18030},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str300, ei_gb18030},
 #line 93 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str301, ei_iso8859_5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str301, ei_iso8859_5},
 #line 142 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str302, ei_iso8859_13},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str302, ei_iso8859_13},
     {-1}, {-1}, {-1},
 #line 70 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str306, ei_iso8859_2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str306, ei_iso8859_2},
 #line 328 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str307, ei_ces_gbk},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str307, ei_ces_gbk},
     {-1},
 #line 268 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str309, ei_iso646_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str309, ei_iso646_jp},
     {-1},
 #line 14 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str311, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str311, ei_ascii},
     {-1},
 #line 296 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str313, ei_gb2312},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str313, ei_gb2312},
     {-1},
 #line 259 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str315, ei_viscii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str315, ei_viscii},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 145 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str321, ei_iso8859_13},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str321, ei_iso8859_13},
 #line 365 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str322, ei_iso2022_kr},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str322, ei_iso2022_kr},
 #line 102 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str323, ei_iso8859_6},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str323, ei_iso8859_6},
     {-1}, {-1}, {-1},
 #line 277 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str327, ei_jisx0208},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str327, ei_jisx0208},
 #line 226 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str328, ei_mac_thai},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str328, ei_mac_thai},
 #line 233 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str329, ei_georgian_academy},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str329, ei_georgian_academy},
 #line 53 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str330, ei_java},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str330, ei_java},
 #line 99 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str331, ei_iso8859_6},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str331, ei_iso8859_6},
     {-1}, {-1},
 #line 210 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str334, ei_cp866},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str334, ei_cp866},
     {-1},
 #line 90 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str336, ei_iso8859_5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str336, ei_iso8859_5},
     {-1},
 #line 117 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str338, ei_iso8859_8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str338, ei_iso8859_8},
 #line 27 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str339, ei_ucs2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str339, ei_ucs2},
 #line 124 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str340, ei_iso8859_9},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str340, ei_iso8859_9},
     {-1}, {-1}, {-1}, {-1},
 #line 301 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str345, ei_ksc5601},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str345, ei_ksc5601},
 #line 263 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str346, ei_tcvn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str346, ei_tcvn},
     {-1},
 #line 314 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str348, ei_sjis},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str348, ei_sjis},
 #line 262 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str349, ei_tcvn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str349, ei_tcvn},
     {-1}, {-1},
 #line 86 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str352, ei_iso8859_4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str352, ei_iso8859_4},
 #line 242 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str353, ei_rk1048},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str353, ei_rk1048},
     {-1},
 #line 237 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str355, ei_pt154},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str355, ei_pt154},
 #line 92 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str356, ei_iso8859_5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str356, ei_iso8859_5},
     {-1},
 #line 269 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str358, ei_iso646_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str358, ei_iso646_jp},
 #line 76 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str359, ei_iso8859_3},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str359, ei_iso8859_3},
     {-1}, {-1},
 #line 194 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str362, ei_cp1257},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str362, ei_cp1257},
 #line 82 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str363, ei_iso8859_4},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str363, ei_iso8859_4},
 #line 227 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str364, ei_hp_roman8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str364, ei_hp_roman8},
 #line 42 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str365, ei_utf32},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str365, ei_utf32},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 287 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str371, ei_jisx0212},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str371, ei_jisx0212},
 #line 212 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str372, ei_mac_roman},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str372, ei_mac_roman},
 #line 170 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str373, ei_koi8_u},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str373, ei_koi8_u},
     {-1},
 #line 111 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str375, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str375, ei_iso8859_7},
     {-1},
 #line 293 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str377, ei_gb2312},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str377, ei_gb2312},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 327 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str383, ei_euc_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str383, ei_euc_cn},
     {-1}, {-1},
 #line 114 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str386, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str386, ei_iso8859_7},
 #line 240 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str387, ei_pt154},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str387, ei_pt154},
     {-1}, {-1}, {-1}, {-1},
 #line 174 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str392, ei_cp1250},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str392, ei_cp1250},
     {-1}, {-1},
 #line 357 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str395, ei_euc_kr},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str395, ei_euc_kr},
     {-1},
 #line 104 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str397, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str397, ei_iso8859_7},
     {-1},
 #line 15 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str399, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str399, ei_ascii},
 #line 265 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str400, ei_iso646_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str400, ei_iso646_jp},
     {-1}, {-1}, {-1},
 #line 318 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str404, ei_iso2022_jp1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str404, ei_iso2022_jp1},
 #line 100 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str405, ei_iso8859_6},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str405, ei_iso8859_6},
 #line 303 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str406, ei_ksc5601},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str406, ei_ksc5601},
     {-1}, {-1}, {-1},
 #line 319 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str410, ei_iso2022_jp2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str410, ei_iso2022_jp2},
     {-1},
 #line 298 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str412, ei_isoir165},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str412, ei_isoir165},
     {-1},
 #line 171 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str414, ei_koi8_ru},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str414, ei_koi8_ru},
     {-1},
 #line 225 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str416, ei_mac_arabic},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str416, ei_mac_arabic},
 #line 74 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str417, ei_iso8859_3},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str417, ei_iso8859_3},
     {-1},
 #line 290 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str419, ei_iso646_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str419, ei_iso646_cn},
     {-1},
 #line 279 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str421, ei_jisx0208},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str421, ei_jisx0208},
 #line 133 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str422, ei_iso8859_10},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str422, ei_iso8859_10},
     {-1},
 #line 219 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str424, ei_mac_romania},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str424, ei_mac_romania},
     {-1},
 #line 98 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str426, ei_iso8859_6},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str426, ei_iso8859_6},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 19 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str435, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str435, ei_ascii},
     {-1},
 #line 339 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str437, ei_euc_tw},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str437, ei_euc_tw},
     {-1}, {-1}, {-1},
 #line 47 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str441, ei_utf7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str441, ei_utf7},
     {-1},
 #line 326 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str443, ei_euc_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str443, ei_euc_cn},
 #line 253 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str444, ei_tis620},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str444, ei_tis620},
     {-1}, {-1}, {-1},
 #line 338 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str448, ei_euc_tw},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str448, ei_euc_tw},
 #line 280 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str449, ei_jisx0208},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str449, ei_jisx0208},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 320 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str455, ei_iso2022_jp2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str455, ei_iso2022_jp2},
     {-1},
 #line 46 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str457, ei_utf7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str457, ei_utf7},
     {-1}, {-1},
 #line 78 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str460, ei_iso8859_3},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str460, ei_iso8859_3},
     {-1}, {-1}, {-1},
 #line 239 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str464, ei_pt154},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str464, ei_pt154},
 #line 112 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str465, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str465, ei_iso8859_7},
     {-1},
 #line 321 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str467, ei_iso2022_jpms},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str467, ei_iso2022_jpms},
     {-1},
 #line 105 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str469, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str469, ei_iso8859_7},
     {-1},
 #line 176 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str471, ei_cp1251},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str471, ei_cp1251},
 #line 192 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str472, ei_cp1256},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str472, ei_cp1256},
 #line 189 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str473, ei_cp1255},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str473, ei_cp1255},
     {-1},
 #line 198 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str475, ei_cp1258},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str475, ei_cp1258},
 #line 252 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str476, ei_tis620},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str476, ei_tis620},
 #line 180 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str477, ei_cp1252},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str477, ei_cp1252},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 295 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str484, ei_gb2312},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str484, ei_gb2312},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 213 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str490, ei_mac_roman},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str490, ei_mac_roman},
 #line 367 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str491, ei_local_wchar_t},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str491, ei_local_wchar_t},
     {-1}, {-1},
 #line 217 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str494, ei_mac_iceland},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str494, ei_mac_iceland},
 #line 113 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str495, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str495, ei_iso8859_7},
 #line 230 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str496, ei_hp_roman8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str496, ei_hp_roman8},
     {-1},
 #line 56 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str498, ei_iso8859_1},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str498, ei_iso8859_1},
 #line 97 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str499, ei_iso8859_6},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str499, ei_iso8859_6},
 #line 186 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str500, ei_cp1254},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str500, ei_cp1254},
     {-1}, {-1},
 #line 173 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str503, ei_cp1250},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str503, ei_cp1250},
 #line 66 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str504, ei_iso8859_2},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str504, ei_iso8859_2},
 #line 177 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str505, ei_cp1251},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str505, ei_cp1251},
 #line 266 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str506, ei_iso646_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str506, ei_iso646_jp},
     {-1},
 #line 300 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str508, ei_ksc5601},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str508, ei_ksc5601},
 #line 220 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str509, ei_mac_cyrillic},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str509, ei_mac_cyrillic},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 32 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str517, ei_ucs2le},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str517, ei_ucs2le},
     {-1}, {-1},
 #line 215 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str520, ei_mac_roman},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str520, ei_mac_roman},
 #line 337 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str521, ei_hz},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str521, ei_hz},
     {-1}, {-1}, {-1},
 #line 255 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str525, ei_tis620},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str525, ei_tis620},
     {-1}, {-1}, {-1},
 #line 144 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str529, ei_iso8859_13},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str529, ei_iso8859_13},
 #line 48 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str530, ei_ucs2internal},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str530, ei_ucs2internal},
 #line 306 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str531, ei_euc_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str531, ei_euc_jp},
 #line 28 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str532, ei_ucs2be},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str532, ei_ucs2be},
     {-1},
 #line 292 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str534, ei_iso646_cn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str534, ei_iso646_cn},
 #line 271 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str535, ei_jisx0201},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str535, ei_jisx0201},
 #line 310 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str536, ei_sjis},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str536, ei_sjis},
     {-1},
 #line 312 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str538, ei_sjis},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str538, ei_sjis},
 #line 316 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str539, ei_iso2022_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str539, ei_iso2022_jp},
 #line 38 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str540, ei_ucs4le},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str540, ei_ucs4le},
     {-1},
 #line 305 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str542, ei_euc_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str542, ei_euc_jp},
     {-1},
 #line 33 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str544, ei_ucs2le},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str544, ei_ucs2le},
 #line 206 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str545, ei_cp862},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str545, ei_cp862},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 331 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str552, ei_cp936},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str552, ei_cp936},
 #line 50 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str553, ei_ucs4internal},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str553, ei_ucs4internal},
 #line 183 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str554, ei_cp1253},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str554, ei_cp1253},
 #line 37 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str555, ei_ucs4be},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str555, ei_ucs4be},
     {-1},
 #line 187 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str557, ei_cp1254},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str557, ei_cp1254},
 #line 234 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str558, ei_georgian_ps},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str558, ei_georgian_ps},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 340 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str564, ei_euc_tw},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str564, ei_euc_tw},
 #line 247 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str565, ei_cp1133},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str565, ei_cp1133},
     {-1}, {-1}, {-1}, {-1},
 #line 245 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str570, ei_mulelao},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str570, ei_mulelao},
     {-1}, {-1},
 #line 282 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str573, ei_jisx0212},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str573, ei_jisx0212},
     {-1},
 #line 120 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str575, ei_iso8859_8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str575, ei_iso8859_8},
 #line 41 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str576, ei_utf16le},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str576, ei_utf16le},
     {-1}, {-1},
 #line 20 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str579, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str579, ei_ascii},
 #line 193 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str580, ei_cp1256},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str580, ei_cp1256},
 #line 107 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str581, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str581, ei_iso8859_7},
     {-1}, {-1}, {-1},
 #line 317 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str585, ei_iso2022_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str585, ei_iso2022_jp},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 40 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str591, ei_utf16be},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str591, ei_utf16be},
     {-1},
 #line 270 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str593, ei_jisx0201},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str593, ei_jisx0201},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 190 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str600, ei_cp1255},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str600, ei_cp1255},
 #line 274 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str601, ei_jisx0208},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str601, ei_jisx0208},
     {-1},
 #line 45 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str603, ei_utf7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str603, ei_utf7},
     {-1}, {-1}, {-1}, {-1},
 #line 309 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str608, ei_sjis},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str608, ei_sjis},
 #line 221 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str609, ei_mac_ukraine},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str609, ei_mac_ukraine},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 284 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str616, ei_jisx0212},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str616, ei_jisx0212},
     {-1},
 #line 29 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str618, ei_ucs2be},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str618, ei_ucs2be},
 #line 18 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str619, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str619, ei_ascii},
     {-1}, {-1},
 #line 17 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str622, ei_ascii},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str622, ei_ascii},
     {-1}, {-1}, {-1},
 #line 264 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str626, ei_tcvn},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str626, ei_tcvn},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1},
 #line 195 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str639, ei_cp1257},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str639, ei_cp1257},
     {-1}, {-1}, {-1}, {-1},
 #line 216 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str644, ei_mac_centraleurope},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str644, ei_mac_centraleurope},
 #line 361 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str645, ei_johab},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str645, ei_johab},
 #line 276 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str646, ei_jisx0208},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str646, ei_jisx0208},
 #line 313 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str647, ei_sjis},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str647, ei_sjis},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 222 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str653, ei_mac_greek},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str653, ei_mac_greek},
     {-1}, {-1}, {-1}, {-1},
 #line 345 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str658, ei_ces_big5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str658, ei_ces_big5},
     {-1}, {-1},
 #line 184 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str661, ei_cp1253},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str661, ei_cp1253},
     {-1}, {-1},
 #line 44 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str664, ei_utf32le},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str664, ei_utf32le},
     {-1},
 #line 106 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str666, ei_iso8859_7},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str666, ei_iso8859_7},
     {-1}, {-1},
 #line 344 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str669, ei_ces_big5},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str669, ei_ces_big5},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 307 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str676, ei_euc_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str676, ei_euc_jp},
     {-1},
 #line 231 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str678, ei_nextstep},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str678, ei_nextstep},
 #line 43 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str679, ei_utf32be},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str679, ei_utf32be},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1},
 #line 353 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str690, ei_big5hkscs2008},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str690, ei_big5hkscs2008},
 #line 281 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str691, ei_jisx0208},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str691, ei_jisx0208},
 #line 257 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str692, ei_cp874},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str692, ei_cp874},
     {-1}, {-1}, {-1}, {-1},
 #line 275 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str697, ei_jisx0208},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str697, ei_jisx0208},
     {-1}, {-1}, {-1},
 #line 352 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str701, ei_big5hkscs2008},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str701, ei_big5hkscs2008},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 283 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str718, ei_jisx0212},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str718, ei_jisx0212},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1},
 #line 119 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str730, ei_iso8859_8},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str730, ei_iso8859_8},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1},
 #line 223 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str751, ei_mac_turkish},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str751, ei_mac_turkish},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 49 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str797, ei_ucs2swapped},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str797, ei_ucs2swapped},
 #line 202 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str798, ei_cp850},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str798, ei_cp850},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 273 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str814, ei_jisx0201},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str814, ei_jisx0201},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 51 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str820, ei_ucs4swapped},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str820, ei_ucs4swapped},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 350 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str836, ei_big5hkscs2001},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str836, ei_big5hkscs2001},
     {-1}, {-1}, {-1},
 #line 354 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str840, ei_big5hkscs2008},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str840, ei_big5hkscs2008},
 #line 349 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str841, ei_big5hkscs1999},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str841, ei_big5hkscs1999},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 351 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str865, ei_big5hkscs2004},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str865, ei_big5hkscs2004},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 196 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str871, ei_cp1257},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str871, ei_cp1257},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 308 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str879, ei_euc_jp},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str879, ei_euc_jp},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1},
 #line 363 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str912, ei_johab},
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str912, ei_johab},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 #line 224 "lib/aliases_syssolaris.gperf"
-    {(int)(long)&((struct stringpool_t *)0)->stringpool_str956, ei_mac_hebrew}
+    {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str956, ei_mac_hebrew}
   };
 
-#ifdef __GNUC__
-__inline
-#if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
-__attribute__ ((__gnu_inline__))
-#endif
-#endif
 const struct alias *
-aliases_lookup (register const char *str, register unsigned int len)
+aliases_lookup (register const char *str, register size_t len)
 {
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register int key = aliases_hash (str, len);
+      register unsigned int key = aliases_hash (str, len);
 
-      if (key <= MAX_HASH_VALUE && key >= 0)
+      if (key <= MAX_HASH_VALUE)
         {
           register int o = aliases[key].name;
           if (o >= 0)

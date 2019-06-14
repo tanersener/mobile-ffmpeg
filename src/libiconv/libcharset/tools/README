@@ -1,4 +1,5 @@
-This directory contains tools for maintaining the config.charset file.
+This directory contains tools for maintaining the tables in the localcharset.c
+file.
 
 The main script is "all-charsets". Before using it, you must configure
 this package. For all installed locales, it prints

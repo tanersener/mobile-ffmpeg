@@ -1,3 +1,71 @@
+2019-03-04  Bruno Haible  <bruno@clisp.org>
+
+	Add support for --enable-relocatable.
+	* libcharset/configure.ac: Invoke gl_RELOCATABLE.
+
+2019-01-27  Bruno Haible  <bruno@clisp.org>
+
+	Accommodate a shell that is not in /bin/sh.
+	* Makefile.in (SHELL): Use the value found by configure.
+
+2019-01-27  Bruno Haible  <bruno@clisp.org>
+
+	Fix configure (regression from 2018-09-22).
+	* configure.ac: Don't invoke gl_RELOCATABLE_LIBRARY.
+
+2018-10-23  Bruno Haible  <bruno@clisp.org>
+
+	Remove outdated DJGPP build infrastructure.
+	Approved by Juan Manuel Guerrero <juan.guerrero@gmx.de>.
+	* djgpp: Remove directory.
+	* INSTALL.djgpp: Remove file.
+	* Makefile.in (SOURCE_FILES): Remove them.
+
+2018-10-23  Bruno Haible  <bruno@clisp.org>
+
+	Update after gnulib changed.
+	* configure.ac (AC_PREREQ): Bump minimum Autoconf version to 2.63.
+
+2018-09-22  Bruno Haible  <bruno@clisp.org>
+
+	Avoid some warnings in MSVC build.
+	* include/export.h: Handle MSVC compiler as well.
+
+2018-09-22  Bruno Haible  <bruno@clisp.org>
+
+	Update from gnulib. Move mapping tables into the code.
+	* include/localcharset.h.in: Update from gnulib.
+	2018-05-19  Bruno Haible  <bruno@clisp.org>
+		* localcharset.h: Update comments for locale encodings found in
+		FreeBSD 11, NetBSD 7, Solaris 10, Openindiana, HP-UX 11.31,
+		IRIX 6.5, Minix 3.3. Also for Cygwin 2.9.
+	2018-05-19  Bruno Haible  <bruno@clisp.org>
+		* localcharset.h: Document the GNU canonical names for character
+		encodings here.
+	* Makefile.in (PARENT_IMPORTED_FILES): Remove m4/relocatable-lib.m4.
+	* INTEGRATE: Removing all text related to config.charset, charset.alias,
+	ref-add.sin, ref-del.sin.
+	* README: Update.
+	* tools/README: Update.
+
+2018-01-27  Bruno Haible  <bruno@clisp.org>
+
+	Rename some files.
+	* INSTALL.windows: Renamed from README.windows.
+	* INSTALL.djgpp: Renamed from README.djgpp.
+	* Makefile.in (SOURCE_FILES): Update.
+
+2018-01-23  Bruno Haible  <bruno@clisp.org>
+
+	Don't use an undocumented Autoconf macro.
+	* configure.ac: Use AC_CONFIG_HEADERS instead of AC_CONFIG_HEADER.
+
+2017-07-15  Bruno Haible  <bruno@clisp.org>
+
+	Get rid of autom4te.cache directories, as far as possible.
+	* Makefile.devel (autoconf/aclocal.m4, configure, config.h.in): Remove
+	autom4te.cache after invoking aclocal, autoconf, autoheader.
+
 2016-12-14  Bruno Haible  <bruno@clisp.org>
 
 	Avoid error during initial autogen.sh invocation.

@@ -1,4 +1,4 @@
-dnl Copyright (C) 1999-2011, 2016 Free Software Foundation, Inc.
+dnl Copyright (C) 1999-2011, 2016, 2018-2019 Free Software Foundation, Inc.
 dnl This file is part of the GNU LIBICONV Library.
 dnl
 dnl The GNU LIBICONV Library is free software; you can redistribute it
@@ -13,10 +13,10 @@ dnl Library General Public License for more details.
 dnl
 dnl You should have received a copy of the GNU Library General Public
 dnl License along with the GNU LIBICONV Library; see the file COPYING.LIB.
-dnl If not, see <http://www.gnu.org/licenses/>.
+dnl If not, see <https://www.gnu.org/licenses/>.
 
-AC_PREREQ([2.60])
-AC_INIT([libiconv], [1.15])
+AC_PREREQ([2.63])
+AC_INIT([libiconv], [1.16])
 AC_CONFIG_SRCDIR([lib/iconv.c])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE
@@ -50,9 +50,10 @@ dnl           checks for UNIX variants that set DEFS
 
 gl_EARLY
 
-dnl           checks for installer options
+dnl           checks for build configuration
 
-gl_RELOCATABLE([srclib])
+LT_INIT([disable-static win32-dll])
+gl_RELOCATABLE
 
 AC_ARG_ENABLE([extra-encodings],
   [AC_HELP_STRING([--enable-extra-encodings],
@@ -74,9 +75,7 @@ dnl           checks for compiler output filename suffixes
 AC_OBJEXT
 AC_EXEEXT
 
-dnl           check for build configuration
-
-LT_INIT([disable-static win32-dll])
+dnl           checks for build configuration
 
 dnl Prepares the libtool configuration for handling of Windows resources, and
 dnl sets the RC variable to a program that compiles Windows resource files.
@@ -198,7 +197,6 @@ AH_BOTTOM([
 ])
 
 AC_CONFIG_SUBDIRS([libcharset])
-AC_CONFIG_SUBDIRS([preload])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([lib/Makefile])
 AC_CONFIG_FILES([srclib/Makefile])

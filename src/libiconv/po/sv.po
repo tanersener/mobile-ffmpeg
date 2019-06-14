@@ -1,45 +1,48 @@
 # Swedish messages for libiconv.
-# Copyright (C) 2002, 2006, 2007, 2008 Free Software Foundation, Inc.
+# Copyright © 2002, 2006, 2007, 2008, 2017 Free Software Foundation, Inc.
 # This file is distributed under the same license as the libiconv package.
 # Christian Rose <menthos@menthos.com>, 2002.
 # Daniel Nylander <po@danielnylander.se>, 2006, 2007, 2008.
+# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2017.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: libiconv 1.12\n"
+"Project-Id-Version: libiconv 1.15-pre1\n"
 "Report-Msgid-Bugs-To: bug-gnu-libiconv@gnu.org\n"
-"POT-Creation-Date: 2016-12-04 17:16+0100\n"
-"PO-Revision-Date: 2008-02-09 20:58+0100\n"
-"Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
+"POT-Creation-Date: 2019-04-26 21:02+0200\n"
+"PO-Revision-Date: 2017-06-04 15:02+0200\n"
+"Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.8.11\n"
 
 #. TRANSLATORS: The first line of the short usage message.
 #: src/iconv.c:104
 msgid "Usage: iconv [-c] [-s] [-f fromcode] [-t tocode] [file ...]"
-msgstr "Användning: iconv [-c] [-s] [-f frånkod] [-t tillkod] [fil ...]"
+msgstr "Användning: iconv [-c] [-s] [-f frånkod] [-t tillkod] [fil …]"
 
 #. TRANSLATORS: The second line of the short usage message.
 #. Align it correctly against the first line.
 #: src/iconv.c:108
 msgid "or:    iconv -l"
-msgstr "eller: iconv -l"
+msgstr "eller:      iconv -l"
 
 #: src/iconv.c:110
-#, fuzzy, c-format
+#, c-format
 msgid "Try '%s --help' for more information.\n"
-msgstr "Prova \"%s --help\" för mer information.\n"
+msgstr "Prova ”%s --help” för mer information.\n"
 
 #. TRANSLATORS: The first line of the long usage message.
 #. The %s placeholder expands to the program name.
 #: src/iconv.c:115
 #, c-format, no-wrap
 msgid "Usage: %s [OPTION...] [-f ENCODING] [-t ENCODING] [INPUTFILE...]\n"
-msgstr "Användning: %s [FLAGGA...] [-f KODNING] [-t KODNING] [INMATNINGSFIL...]\n"
+msgstr "Användning: %s [FLAGGA…] [-f KODNING] [-t KODNING] [INMATNINGSFIL…]\n"
 
 #. TRANSLATORS: The second line of the long usage message.
 #. Align it correctly against the first line.
@@ -47,7 +50,7 @@ msgstr "Användning: %s [FLAGGA...] [-f KODNING] [-t KODNING] [INMATNINGSFIL...]
 #: src/iconv.c:122
 #, c-format, no-wrap
 msgid "or:    %s -l\n"
-msgstr "eller: %s -l\n"
+msgstr "eller:      %s -l\n"
 
 #. TRANSLATORS: Description of the iconv program.
 #: src/iconv.c:128
@@ -155,11 +158,11 @@ msgstr ""
 #: src/iconv.c:196
 #, fuzzy, no-wrap
 msgid ""
-"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+"License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\n"
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
-"Licens GPLv2+: GNU GPL version 2 eller senare <http://gnu.org/licenses/gpl.html>\n"
+"Licens GPLv3+: GNU GPL version 3 eller senare <http://gnu.org/licenses/gpl.html>\n"
 "Det här är fri programvara: du kan ändra och distribuera den.\n"
 "Det finns INGEN GARANTI, så långt lagen tillåter.\n"
 
@@ -303,47 +306,47 @@ msgstr "%s: In-/Ut-fel"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --from-code.
-#: src/iconv.c:1015
+#: src/iconv.c:1024
 #, c-format
 msgid "conversion from %s unsupported"
 msgstr "konvertering från %s stöds inte"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --to-code.
-#: src/iconv.c:1021
+#: src/iconv.c:1030
 #, c-format
 msgid "conversion to %s unsupported"
 msgstr "konvertering till %s stöds inte"
 
 #. TRANSLATORS: An error message.
 #. The placeholders expand to the encoding names, specified through --from-code and --to-code, respectively.
-#: src/iconv.c:1027
+#: src/iconv.c:1036
 #, c-format
 msgid "conversion from %s to %s unsupported"
 msgstr "konvertering från %s till %s stöds inte"
 
 #. TRANSLATORS: Additional advice after an error message.
 #. The %s placeholder expands to the program name.
-#: src/iconv.c:1032
+#: src/iconv.c:1041
 #, c-format
 msgid "try '%s -l' to get the list of supported encodings"
-msgstr "prova \"%s -l\" för att få listan på kodningar som stöds"
+msgstr "prova ”%s -l” för att få listan på kodningar som stöds"
 
 #. TRANSLATORS: A filename substitute denoting standard input.
-#: src/iconv.c:1089
+#: src/iconv.c:1098
 msgid "(stdin)"
 msgstr "(standard in)"
 
 #. TRANSLATORS: The first part of an error message.
 #. It is followed by a colon and a detail message.
 #. The %s placeholder expands to the input file name.
-#: src/iconv.c:1101
+#: src/iconv.c:1110
 #, c-format
 msgid "%s"
 msgstr "%s"
 
 #. TRANSLATORS: An error message.
-#: src/iconv.c:1115
+#: src/iconv.c:1124
 #, c-format
 msgid "I/O error"
 msgstr "In-/Ut-fel"

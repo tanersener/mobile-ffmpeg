@@ -1,5 +1,5 @@
 /* Substitute for and wrapper around <unistd.h>.
-   Copyright (C) 2003-2017 Free Software Foundation, Inc.
+   Copyright (C) 2003-2019 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,7 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _@GUARD_PREFIX@_UNISTD_H
 
@@ -61,16 +61,18 @@
 /* But avoid namespace pollution on glibc systems.  */
 #if (!(defined SEEK_CUR && defined SEEK_END && defined SEEK_SET) \
      || ((@GNULIB_UNLINK@ || defined GNULIB_POSIXCHECK) \
-         && ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__)) \
+         && (defined _WIN32 && ! defined __CYGWIN__)) \
      || ((@GNULIB_SYMLINKAT@ || defined GNULIB_POSIXCHECK) \
          && defined __CYGWIN__)) \
     && ! defined __GLIBC__
 # include <stdio.h>
 #endif
 
-/* Cygwin 1.7.1 declares unlinkat in <fcntl.h>, not in <unistd.h>.  */
+/* Cygwin 1.7.1 and Android 4.3 declare unlinkat in <fcntl.h>, not in
+   <unistd.h>.  */
 /* But avoid namespace pollution on glibc systems.  */
-#if (@GNULIB_UNLINKAT@ || defined GNULIB_POSIXCHECK) && defined __CYGWIN__ \
+#if (@GNULIB_UNLINKAT@ || defined GNULIB_POSIXCHECK) \
+    && (defined __CYGWIN__ || defined __ANDROID__) \
     && ! defined __GLIBC__
 # include <fcntl.h>
 #endif
@@ -94,13 +96,13 @@
    lseek(), read(), unlink(), write() in <io.h>.  */
 #if ((@GNULIB_CHDIR@ || @GNULIB_GETCWD@ || @GNULIB_RMDIR@ \
       || defined GNULIB_POSIXCHECK) \
-     && ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__))
+     && (defined _WIN32 && ! defined __CYGWIN__))
 # include <io.h>     /* mingw32, mingw64 */
 # include <direct.h> /* mingw64, MSVC 9 */
 #elif (@GNULIB_CLOSE@ || @GNULIB_DUP@ || @GNULIB_DUP2@ || @GNULIB_ISATTY@ \
        || @GNULIB_LSEEK@ || @GNULIB_READ@ || @GNULIB_UNLINK@ || @GNULIB_WRITE@ \
        || defined GNULIB_POSIXCHECK) \
-      && ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__)
+      && (defined _WIN32 && ! defined __CYGWIN__)
 # include <io.h>
 #endif
 
@@ -111,6 +113,13 @@
      || (@GNULIB_GETHOSTNAME@ && defined __TANDEM)) \
     && !defined __GLIBC__
 # include <netdb.h>
+#endif
+
+/* Android 4.3 declares fchownat in <sys/stat.h>, not in <unistd.h>.  */
+/* But avoid namespace pollution on glibc systems.  */
+#if (@GNULIB_FCHOWNAT@ || defined GNULIB_POSIXCHECK) && defined __ANDROID__ \
+    && !defined __GLIBC__
+# include <sys/stat.h>
 #endif
 
 /* MSVC defines off_t in <sys/types.h>.
@@ -127,11 +136,17 @@
 # include <sys/types.h>
 #endif
 
-/* Get getopt(), optarg, optind, opterr, optopt.
-   But avoid namespace pollution on glibc systems.  */
-#if @GNULIB_UNISTD_H_GETOPT@ && !defined __GLIBC__ && !defined _GL_SYSTEM_GETOPT
-# define __need_getopt
-# include <getopt.h>
+/* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */
+
+/* The definition of _GL_ARG_NONNULL is copied here.  */
+
+/* The definition of _GL_WARN_ON_USE is copied here.  */
+
+
+/* Get getopt(), optarg, optind, opterr, optopt.  */
+#if @GNULIB_UNISTD_H_GETOPT@ && !defined _GL_SYSTEM_GETOPT
+# include <getopt-cdefs.h>
+# include <getopt-pfx-core.h>
 #endif
 
 #ifndef _GL_INLINE_HEADER_BEGIN
@@ -141,13 +156,6 @@ _GL_INLINE_HEADER_BEGIN
 #ifndef _GL_UNISTD_INLINE
 # define _GL_UNISTD_INLINE _GL_INLINE
 #endif
-
-/* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */
-
-/* The definition of _GL_ARG_NONNULL is copied here.  */
-
-/* The definition of _GL_WARN_ON_USE is copied here.  */
-
 
 /* Hide some function declarations from <winsock2.h>.  */
 
@@ -379,7 +387,7 @@ _GL_WARN_ON_USE (dup2, "dup2 is unportable - "
    Close NEWFD first if it is open.
    Return newfd if successful, otherwise -1 and errno set.
    See the Linux man page at
-   <http://www.kernel.org/doc/man-pages/online/pages/man2/dup3.2.html>.  */
+   <https://www.kernel.org/doc/man-pages/online/pages/man2/dup3.2.html>.  */
 # if @HAVE_DUP3@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   define dup3 rpl_dup3
@@ -401,6 +409,13 @@ _GL_WARN_ON_USE (dup3, "dup3 is unportable - "
 
 
 #if @GNULIB_ENVIRON@
+# if defined __CYGWIN__ && !defined __i386__
+/* The 'environ' variable is defined in a DLL. Therefore its declaration needs
+   the '__declspec(dllimport)' attribute, but the system's <unistd.h> lacks it.
+   This leads to a link error on 64-bit Cygwin when the option
+   -Wl,--disable-auto-import is in use.  */
+_GL_EXTERN_C __declspec(dllimport) char **environ;
+# endif
 # if !@HAVE_DECL_ENVIRON@
 /* Set of environment variables and values.  An array of strings of the form
    "VARIABLE=VALUE", terminated with a NULL.  */
@@ -426,12 +441,12 @@ extern char **environ;
 #elif defined GNULIB_POSIXCHECK
 # if HAVE_RAW_DECL_ENVIRON
 _GL_UNISTD_INLINE char ***
+_GL_WARN_ON_USE_ATTRIBUTE ("environ is unportable - "
+                           "use gnulib module environ for portability")
 rpl_environ (void)
 {
   return &environ;
 }
-_GL_WARN_ON_USE (rpl_environ, "environ is unportable - "
-                 "use gnulib module environ for portability");
 #  undef environ
 #  define environ (*rpl_environ ())
 # endif
@@ -462,13 +477,25 @@ _GL_WARN_ON_USE (euidaccess, "euidaccess is unportable - "
 
 
 #if @GNULIB_FACCESSAT@
-# if !@HAVE_FACCESSAT@
+# if @REPLACE_FACCESSAT@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef faccessat
+#   define faccessat rpl_faccessat
+#  endif
+_GL_FUNCDECL_RPL (faccessat, int,
+                  (int fd, char const *name, int mode, int flag)
+                  _GL_ARG_NONNULL ((2)));
+_GL_CXXALIAS_RPL (faccessat, int,
+                  (int fd, char const *name, int mode, int flag));
+# else
+#  if !@HAVE_FACCESSAT@
 _GL_FUNCDECL_SYS (faccessat, int,
                   (int fd, char const *file, int mode, int flag)
                   _GL_ARG_NONNULL ((2)));
-# endif
+#  endif
 _GL_CXXALIAS_SYS (faccessat, int,
                   (int fd, char const *file, int mode, int flag));
+# endif
 _GL_CXXALIASWARN (faccessat);
 #elif defined GNULIB_POSIXCHECK
 # undef faccessat
@@ -917,6 +944,36 @@ _GL_WARN_ON_USE (getpagesize, "getpagesize is unportable - "
 #endif
 
 
+#if @GNULIB_GETPASS@
+/* Function getpass() from module 'getpass':
+     Read a password from /dev/tty or stdin.
+   Function getpass() from module 'getpass-gnu':
+     Read a password of arbitrary length from /dev/tty or stdin.  */
+# if @REPLACE_GETPASS@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef getpass
+#   define getpass rpl_getpass
+#  endif
+_GL_FUNCDECL_RPL (getpass, char *, (const char *prompt)
+                                   _GL_ARG_NONNULL ((1)));
+_GL_CXXALIAS_RPL (getpass, char *, (const char *prompt));
+# else
+#  if !@HAVE_GETPASS@
+_GL_FUNCDECL_SYS (getpass, char *, (const char *prompt)
+                                   _GL_ARG_NONNULL ((1)));
+#  endif
+_GL_CXXALIAS_SYS (getpass, char *, (const char *prompt));
+# endif
+_GL_CXXALIASWARN (getpass);
+#elif defined GNULIB_POSIXCHECK
+# undef getpass
+# if HAVE_RAW_DECL_GETPASS
+_GL_WARN_ON_USE (getpass, "getpass is unportable - "
+                 "use gnulib module getpass or getpass-gnu for portability");
+# endif
+#endif
+
+
 #if @GNULIB_GETUSERSHELL@
 /* Return the next valid login shell on the system, or NULL when the end of
    the list has been reached.  */
@@ -1149,7 +1206,7 @@ _GL_WARN_ON_USE (pipe, "pipe is unportable - "
    Store the read-end as fd[0] and the write-end as fd[1].
    Return 0 upon success, or -1 with errno set upon failure.
    See also the Linux man page at
-   <http://www.kernel.org/doc/man-pages/online/pages/man2/pipe2.2.html>.  */
+   <https://www.kernel.org/doc/man-pages/online/pages/man2/pipe2.2.html>.  */
 # if @HAVE_PIPE2@
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   define pipe2 rpl_pipe2
@@ -1453,6 +1510,36 @@ _GL_CXXALIASWARN (symlinkat);
 # if HAVE_RAW_DECL_SYMLINKAT
 _GL_WARN_ON_USE (symlinkat, "symlinkat is not portable - "
                  "use gnulib module symlinkat for portability");
+# endif
+#endif
+
+
+#if @GNULIB_TRUNCATE@
+/* Change the size of the file designated by FILENAME to become equal to LENGTH.
+   Return 0 if successful, otherwise -1 and errno set.
+   See the POSIX:2008 specification
+   <http://pubs.opengroup.org/onlinepubs/9699919799/functions/truncate.html>.  */
+# if @REPLACE_TRUNCATE@
+#  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
+#   undef truncate
+#   define truncate rpl_truncate
+#  endif
+_GL_FUNCDECL_RPL (truncate, int, (const char *filename, off_t length)
+                                 _GL_ARG_NONNULL ((1)));
+_GL_CXXALIAS_RPL (truncate, int, (const char *filename, off_t length));
+# else
+#  if !@HAVE_DECL_TRUNCATE@
+_GL_FUNCDECL_SYS (truncate, int, (const char *filename, off_t length)
+                                 _GL_ARG_NONNULL ((1)));
+#  endif
+_GL_CXXALIAS_SYS (truncate, int, (const char *filename, off_t length));
+# endif
+_GL_CXXALIASWARN (truncate);
+#elif defined GNULIB_POSIXCHECK
+# undef truncate
+# if HAVE_RAW_DECL_TRUNCATE
+_GL_WARN_ON_USE (truncate, "truncate is unportable - "
+                 "use gnulib module truncate for portability");
 # endif
 #endif
 

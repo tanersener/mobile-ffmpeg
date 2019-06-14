@@ -1,4 +1,4 @@
-/* Copyright (C) 1999-2001, 2003, 2005, 2008, 2012 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2001, 2003, 2005, 2008, 2012, 2017 Free Software Foundation, Inc.
    This file is part of the GNU LIBICONV Library.
 
    The GNU LIBICONV Library is free software; you can redistribute it
@@ -13,7 +13,7 @@
 
    You should have received a copy of the GNU Library General Public
    License along with the GNU LIBICONV Library; see the file COPYING.LIB.
-   If not, see <http://www.gnu.org/licenses/>.  */
+   If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Creates the aliases.gperf table. */
 
@@ -98,7 +98,7 @@ int main (int argc, char* argv[])
 #define BRACIFY(...) { __VA_ARGS__ }
 #define DEFALIAS(xxx_alias,xxx) emit_alias(aliases_file,xxx_alias,#xxx);
 
-  canonical_sh_file = fopen(canonical_sh_file_name, "w");
+  canonical_sh_file = fopen(canonical_sh_file_name, "wb");
   if (canonical_sh_file == NULL) {
     fprintf(stderr, "Could not open '%s' for writing\n", canonical_sh_file_name);
     exit(1);
@@ -107,7 +107,7 @@ int main (int argc, char* argv[])
   if (ferror(canonical_sh_file) || fclose(canonical_sh_file))
     exit(1);
 
-  canonical_sh_file = fopen(canonical_local_sh_file_name, "w");
+  canonical_sh_file = fopen(canonical_local_sh_file_name, "wb");
   if (canonical_sh_file == NULL) {
     fprintf(stderr, "Could not open '%s' for writing\n", canonical_local_sh_file_name);
     exit(1);

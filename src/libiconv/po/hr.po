@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: libiconv 1.12\n"
 "Report-Msgid-Bugs-To: bug-gnu-libiconv@gnu.org\n"
-"POT-Creation-Date: 2016-12-04 17:16+0100\n"
+"POT-Creation-Date: 2019-04-26 21:02+0200\n"
 "PO-Revision-Date: 2012-04-16 16:14+0200\n"
 "Last-Translator: Tomislav Krznar <tomislav.krznar@gmail.com>\n"
 "Language-Team: Croatian <lokalizacija@linux.hr>\n"
@@ -16,6 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 "X-Generator: TransDict server\n"
@@ -156,7 +157,7 @@ msgstr ""
 #: src/iconv.c:196
 #, fuzzy, no-wrap
 msgid ""
-"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+"License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>\n"
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
@@ -309,47 +310,47 @@ msgstr "%s: U/I greška"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --from-code.
-#: src/iconv.c:1015
+#: src/iconv.c:1024
 #, c-format
 msgid "conversion from %s unsupported"
 msgstr "pretvaranje iz %s nije podržano"
 
 #. TRANSLATORS: An error message.
 #. The placeholder expands to the encoding name, specified through --to-code.
-#: src/iconv.c:1021
+#: src/iconv.c:1030
 #, c-format
 msgid "conversion to %s unsupported"
 msgstr "pretvaranje u %s nije podržano"
 
 #. TRANSLATORS: An error message.
 #. The placeholders expand to the encoding names, specified through --from-code and --to-code, respectively.
-#: src/iconv.c:1027
+#: src/iconv.c:1036
 #, c-format
 msgid "conversion from %s to %s unsupported"
 msgstr "pretvaranje iz %s u %s nije podržano"
 
 #. TRANSLATORS: Additional advice after an error message.
 #. The %s placeholder expands to the program name.
-#: src/iconv.c:1032
+#: src/iconv.c:1041
 #, c-format
 msgid "try '%s -l' to get the list of supported encodings"
 msgstr "pokušajte „%s -l” za prikaz popisa podržanih kodiranja"
 
 #. TRANSLATORS: A filename substitute denoting standard input.
-#: src/iconv.c:1089
+#: src/iconv.c:1098
 msgid "(stdin)"
 msgstr "(stdin)"
 
 #. TRANSLATORS: The first part of an error message.
 #. It is followed by a colon and a detail message.
 #. The %s placeholder expands to the input file name.
-#: src/iconv.c:1101
+#: src/iconv.c:1110
 #, c-format
 msgid "%s"
 msgstr "%s"
 
 #. TRANSLATORS: An error message.
-#: src/iconv.c:1115
+#: src/iconv.c:1124
 #, c-format
 msgid "I/O error"
 msgstr "U/I greška"

@@ -1,5 +1,5 @@
-# intl.m4 serial 29 (gettext-0.19)
-dnl Copyright (C) 1995-2014, 2016-2017 Free Software Foundation, Inc.
+# intl.m4 serial 34 (gettext-0.20)
+dnl Copyright (C) 1995-2014, 2016-2019 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -29,7 +29,6 @@ AC_DEFUN([AM_INTL_SUBDIR],
   AC_REQUIRE([AC_PROG_CC])dnl
   AC_REQUIRE([AC_CANONICAL_HOST])dnl
   AC_REQUIRE([gt_GLIBC2])dnl
-  AC_REQUIRE([AC_PROG_RANLIB])dnl
   AC_REQUIRE([gl_VISIBILITY])dnl
   AC_REQUIRE([gt_INTL_SUBDIR_CORE])dnl
   AC_REQUIRE([AC_TYPE_LONG_LONG_INT])dnl
@@ -41,9 +40,26 @@ AC_DEFUN([AM_INTL_SUBDIR],
   AC_REQUIRE([gl_GLIBC21])dnl
   AC_REQUIRE([gl_XSIZE])dnl
   AC_REQUIRE([gl_FCNTL_O_FLAGS])dnl
+  AC_REQUIRE([gt_INTL_THREAD_LOCALE_NAME])
   AC_REQUIRE([gt_INTL_MACOSX])dnl
   AC_REQUIRE([gl_EXTERN_INLINE])dnl
   AC_REQUIRE([gt_GL_ATTRIBUTE])dnl
+  AC_REQUIRE([AC_C_FLEXIBLE_ARRAY_MEMBER])dnl
+
+  dnl In projects that use gnulib, use gl_PROG_AR_RANLIB.
+  dnl The '][' hides this use from 'aclocal'.
+  m4_ifdef([g][l_PROG_AR_RANLIB],
+    [AC_REQUIRE([g][l_PROG_AR_RANLIB])],
+    [AC_REQUIRE([AC_PROG_RANLIB])
+     dnl Use Automake-documented default values for AR and ARFLAGS, but prefer
+     dnl ${host}-ar over ar (useful for cross-compiling).
+     AC_CHECK_TOOL([AR], [ar], [ar])
+     if test -z "$ARFLAGS"; then
+       ARFLAGS='cr'
+     fi
+     AC_SUBST([AR])
+     AC_SUBST([ARFLAGS])
+    ])
 
   dnl Support for automake's --enable-silent-rules.
   case "$enable_silent_rules" in
@@ -59,7 +75,7 @@ AC_DEFUN([AM_INTL_SUBDIR],
     ])
   AC_CHECK_HEADERS([features.h stddef.h stdlib.h string.h])
   AC_CHECK_FUNCS([asprintf fwprintf newlocale putenv setenv setlocale \
-    snprintf strnlen wcslen wcsnlen mbrtowc wcrtomb])
+    snprintf strnlen uselocale wcslen wcsnlen mbrtowc wcrtomb])
 
   dnl Use the _snprintf function only if it is declared (because on NetBSD it
   dnl is defined as a weak alias of snprintf; we prefer to use the latter).
@@ -104,6 +120,13 @@ AC_DEFUN([AM_INTL_SUBDIR],
   AM_LANGINFO_CODESET
   gt_LC_MESSAGES
 
+  if test $gt_nameless_locales = yes; then
+    HAVE_NAMELESS_LOCALES=1
+  else
+    HAVE_NAMELESS_LOCALES=0
+  fi
+  AC_SUBST([HAVE_NAMELESS_LOCALES])
+
   dnl Compilation on mingw and Cygwin needs special Makefile rules, because
   dnl 1. when we install a shared library, we must arrange to export
   dnl    auxiliary pointer variables for every exported variable,
@@ -134,18 +157,6 @@ AC_DEFUN([AM_INTL_SUBDIR],
     dnl Check for a program that compiles Windows resource files.
     AC_CHECK_TOOL([WINDRES], [windres])
   fi
-
-  dnl Determine whether when creating a library, "-lc" should be passed to
-  dnl libtool or not. On many platforms, it is required for the libtool option
-  dnl -no-undefined to work. On HP-UX, however, the -lc - stored by libtool
-  dnl in the *.la files - makes it impossible to create multithreaded programs,
-  dnl because libtool also reorders the -lc to come before the -pthread, and
-  dnl this disables pthread_create() <http://docs.hp.com/en/1896/pthreads.html>.
-  case "$host_os" in
-    hpux*) LTLIBC="" ;;
-    *)     LTLIBC="-lc" ;;
-  esac
-  AC_SUBST([LTLIBC])
 
   dnl Rename some macros and functions used for locking.
   AH_BOTTOM([
@@ -229,14 +240,8 @@ AC_DEFUN([gt_INTL_SUBDIR_CORE],
 
   AC_CHECK_HEADERS([argz.h inttypes.h limits.h unistd.h sys/param.h])
   AC_CHECK_FUNCS([getcwd getegid geteuid getgid getuid mempcpy munmap \
-    stpcpy strcasecmp strdup strtoul tsearch uselocale argz_count \
-    argz_stringify argz_next __fsetlocking])
-
-  dnl Solaris 12 provides getlocalename_l, while Illumos doesn't have
-  dnl it nor the equivalent.
-  if test $ac_cv_func_uselocale = yes; then
-    AC_CHECK_FUNCS([getlocalename_l])
-  fi
+    stpcpy strcasecmp strdup strtoul tsearch argz_count argz_stringify \
+    argz_next __fsetlocking])
 
   dnl Use the *_unlocked functions only if they are declared.
   dnl (because some of them were defined without being declared in Solaris

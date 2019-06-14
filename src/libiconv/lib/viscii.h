@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1999-2001, 2016 Free Software Foundation, Inc.
+ * Copyright (C) 1999-2001, 2016, 2019 Free Software Foundation, Inc.
  * This file is part of the GNU LIBICONV Library.
  *
  * The GNU LIBICONV Library is free software; you can redistribute it
@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Library General Public
  * License along with the GNU LIBICONV Library; see the file COPYING.LIB.
- * If not, see <http://www.gnu.org/licenses/>.
+ * If not, see <https://www.gnu.org/licenses/>.
  */
 
 /*
@@ -124,7 +124,7 @@ static int
 viscii_wctomb (conv_t conv, unsigned char *r, ucs4_t wc, size_t n)
 {
   unsigned char c = 0;
-  if (wc < 0x0080 && (wc >= 0x0020 || (0x42100064 & (1 << wc)) == 0)) {
+  if (wc < 0x0080 && (wc >= 0x0020 || (0x42100064U & (1U << wc)) == 0)) {
     *r = wc;
     return 1;
   }

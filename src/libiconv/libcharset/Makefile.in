@@ -28,7 +28,7 @@ mkinstalldirs = $(SHELL) @top_srcdir@/build-aux/mkinstalldirs
 
 #### End of system configuration section. ####
 
-SHELL = /bin/sh
+SHELL = @SHELL@
 
 all : include/libcharset.h force
 	cd lib && $(MAKE) all
@@ -83,7 +83,7 @@ maintainer-clean : force
 
 # List of source files.
 SOURCE_FILES = \
-  README README.windows DEPENDENCIES HACKING INTEGRATE AUTHORS NEWS \
+  README DEPENDENCIES INSTALL.windows HACKING INTEGRATE AUTHORS NEWS \
   ChangeLog Makefile.devel configure.ac Makefile.in \
   include/export.h include/libcharset.h.in include/localcharset.h.in \
   tools/README \
@@ -107,12 +107,7 @@ SOURCE_FILES = \
   tools/osf1-4.0a tools/osf1-4.0d tools/osf1-5.1 \
   tools/solaris-2.4 tools/solaris-2.5.1 tools/solaris-2.6 tools/solaris-2.6-cjk tools/solaris-2.7 \
   tools/sunos-4.1.4 \
-  tools/win32 \
-  README.djgpp \
-  djgpp/config.bat djgpp/config.sed djgpp/config.site \
-  djgpp/fnchange.in djgpp/fnchange.lst \
-  djgpp/Makefile.maint \
-  djgpp/README djgpp/README.in
+  tools/win32
 # List of distributed files imported from other packages.
 LIBTOOL_IMPORTED_FILES = \
   build-aux/ltmain.sh \
@@ -131,7 +126,6 @@ PARENT_IMPORTED_FILES = \
   m4/codeset.m4 \
   m4/fcntl-o.m4 \
   m4/glibc21.m4 \
-  m4/relocatable-lib.m4 \
   m4/visibility.m4
 IMPORTED_FILES = \
   COPYING.LIB \

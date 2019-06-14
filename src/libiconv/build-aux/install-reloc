@@ -1,6 +1,6 @@
 #!/bin/sh
 # install-reloc - install a program including a relocating wrapper
-# Copyright (C) 2003-2017 Free Software Foundation, Inc.
+# Copyright (C) 2003-2019 Free Software Foundation, Inc.
 # Written by Bruno Haible <bruno@clisp.org>, 2003.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Usage 1:
 #   install-reloc -- library_path_var library_path_value prefix destdir \
@@ -138,7 +138,9 @@ fi
 # Outputs a command and runs it.
 func_verbose ()
 {
-  echo "$@"
+  # Make it easy to copy&paste the printed command into a shell in most cases,
+  # by escaping '\\', '"', and '$'. This is not perfect, just good enough.
+  echo "$@" | sed -e 's/\([\\"$]\)/\\\1/g'
   "$@"
 }
 

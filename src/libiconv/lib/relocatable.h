@@ -1,5 +1,5 @@
 /* Provide relocatable packages.
-   Copyright (C) 2003, 2005, 2008-2011 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005, 2008-2017 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software; you can redistribute it and/or modify it
@@ -13,7 +13,7 @@
    Library General Public License for more details.
 
    You should have received a copy of the GNU Library General Public License
-   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _RELOCATABLE_H
 #define _RELOCATABLE_H
@@ -52,10 +52,29 @@ extern RELOCATABLE_DLL_EXPORTED void
    string that you can free with free() after casting it to 'char *'.  */
 extern const char * relocate (const char *pathname);
 
+/* Returns the pathname, relocated according to the current installation
+   directory.
+   This function sets *ALLOCATEDP to the allocated memory, or to NULL if
+   no memory allocation occurs.  So that, after you're done with the return
+   value, to reclaim allocated memory, you can do: free (*ALLOCATEDP).  */
+extern const char * relocate2 (const char *pathname, char **allocatedp);
+
 /* Memory management: relocate() potentially allocates memory, because it has
    to construct a fresh pathname.  If this is a problem because your program
-   calls relocate() frequently, think about caching the result.  Or free the
-   return value if it was different from the argument pathname.  */
+   calls relocate() frequently or because you want to fix all potential memory
+   leaks anyway, you have three options:
+   1) Use this idiom:
+        const char *pathname = ...;
+        const char *rel_pathname = relocate (pathname);
+        ...
+        if (rel_pathname != pathname)
+          free ((char *) rel_pathname);
+   2) Use this idiom:
+        char *allocated;
+        const char *rel_pathname = relocate2 (..., &allocated);
+        ...
+        free (allocated);
+   3) Think about caching the result.  */
 
 /* Convenience function:
    Computes the current installation prefix, based on the original
@@ -70,6 +89,7 @@ extern char * compute_curr_prefix (const char *orig_installprefix,
 
 /* By default, we use the hardwired pathnames.  */
 #define relocate(pathname) (pathname)
+#define relocate2(pathname,allocatedp) (*(allocatedp) = NULL, (pathname))
 
 #endif
 

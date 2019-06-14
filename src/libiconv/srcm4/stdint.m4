@@ -1,5 +1,5 @@
-# stdint.m4 serial 50
-dnl Copyright (C) 2001-2017 Free Software Foundation, Inc.
+# stdint.m4 serial 53
+dnl Copyright (C) 2001-2019 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -7,9 +7,12 @@ dnl with or without modifications, as long as this notice is preserved.
 dnl From Paul Eggert and Bruno Haible.
 dnl Test whether <stdint.h> is supported or must be substituted.
 
+AC_PREREQ([2.61])
+
 AC_DEFUN_ONCE([gl_STDINT_H],
 [
   AC_PREREQ([2.59])dnl
+  AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
 
   AC_REQUIRE([gl_LIMITS_H])
   AC_REQUIRE([gt_TYPE_WINT_T])
@@ -288,8 +291,12 @@ static const char *macro_values[] =
 ]])],
               [gl_cv_header_working_stdint_h=yes],
               [],
-              [dnl When cross-compiling, assume it works.
-               gl_cv_header_working_stdint_h=yes
+              [case "$host_os" in
+                         # Guess yes on native Windows.
+                 mingw*) gl_cv_header_working_stdint_h="guessing yes" ;;
+                         # In general, assume it works.
+                 *)      gl_cv_header_working_stdint_h="guessing yes" ;;
+               esac
               ])
          ])
       ])
@@ -299,15 +306,16 @@ static const char *macro_values[] =
   HAVE_SYS_BITYPES_H=0
   HAVE_SYS_INTTYPES_H=0
   STDINT_H=stdint.h
-  if test "$gl_cv_header_working_stdint_h" = yes; then
-    HAVE_C99_STDINT_H=1
-    dnl Now see whether the system <stdint.h> works without
-    dnl __STDC_CONSTANT_MACROS/__STDC_LIMIT_MACROS defined.
-    AC_CACHE_CHECK([whether stdint.h predates C++11],
-      [gl_cv_header_stdint_predates_cxx11_h],
-      [gl_cv_header_stdint_predates_cxx11_h=yes
-       AC_COMPILE_IFELSE([
-         AC_LANG_PROGRAM([[
+  case "$gl_cv_header_working_stdint_h" in
+    *yes)
+      HAVE_C99_STDINT_H=1
+      dnl Now see whether the system <stdint.h> works without
+      dnl __STDC_CONSTANT_MACROS/__STDC_LIMIT_MACROS defined.
+      AC_CACHE_CHECK([whether stdint.h predates C++11],
+        [gl_cv_header_stdint_predates_cxx11_h],
+        [gl_cv_header_stdint_predates_cxx11_h=yes
+         AC_COMPILE_IFELSE([
+           AC_LANG_PROGRAM([[
 #define _GL_JUST_INCLUDE_SYSTEM_STDINT_H 1 /* work if build isn't clean */
 #include <stdint.h>
 ]
@@ -315,49 +323,50 @@ gl_STDINT_INCLUDES
 [
 intmax_t im = INTMAX_MAX;
 int32_t i32 = INT32_C (0x7fffffff);
-         ]])],
-         [gl_cv_header_stdint_predates_cxx11_h=no])])
+           ]])],
+           [gl_cv_header_stdint_predates_cxx11_h=no])])
 
-    if test "$gl_cv_header_stdint_predates_cxx11_h" = yes; then
-      AC_DEFINE([__STDC_CONSTANT_MACROS], [1],
-                [Define to 1 if the system <stdint.h> predates C++11.])
-      AC_DEFINE([__STDC_LIMIT_MACROS], [1],
-                [Define to 1 if the system <stdint.h> predates C++11.])
-    fi
-    AC_CACHE_CHECK([whether stdint.h has UINTMAX_WIDTH etc.],
-      [gl_cv_header_stdint_width],
-      [gl_cv_header_stdint_width=no
-       AC_COMPILE_IFELSE(
-         [AC_LANG_PROGRAM([[
-            /* Work if build is not clean.  */
-            #define _GL_JUST_INCLUDE_SYSTEM_STDINT_H 1
-            #ifndef __STDC_WANT_IEC_60559_BFP_EXT__
-             #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-            #endif
-            #include <stdint.h>
-            ]gl_STDINT_INCLUDES[
-            int iw = UINTMAX_WIDTH;
-            ]])],
-         [gl_cv_header_stdint_width=yes])])
-    if test "$gl_cv_header_stdint_width" = yes; then
-      STDINT_H=
-    fi
-  else
-    dnl Check for <sys/inttypes.h>, and for
-    dnl <sys/bitypes.h> (used in Linux libc4 >= 4.6.7 and libc5).
-    AC_CHECK_HEADERS([sys/inttypes.h sys/bitypes.h])
-    if test $ac_cv_header_sys_inttypes_h = yes; then
-      HAVE_SYS_INTTYPES_H=1
-    fi
-    if test $ac_cv_header_sys_bitypes_h = yes; then
-      HAVE_SYS_BITYPES_H=1
-    fi
-    gl_STDINT_TYPE_PROPERTIES
-  fi
+      if test "$gl_cv_header_stdint_predates_cxx11_h" = yes; then
+        AC_DEFINE([__STDC_CONSTANT_MACROS], [1],
+                  [Define to 1 if the system <stdint.h> predates C++11.])
+        AC_DEFINE([__STDC_LIMIT_MACROS], [1],
+                  [Define to 1 if the system <stdint.h> predates C++11.])
+      fi
+      AC_CACHE_CHECK([whether stdint.h has UINTMAX_WIDTH etc.],
+        [gl_cv_header_stdint_width],
+        [gl_cv_header_stdint_width=no
+         AC_COMPILE_IFELSE(
+           [AC_LANG_PROGRAM([[
+              /* Work if build is not clean.  */
+              #define _GL_JUST_INCLUDE_SYSTEM_STDINT_H 1
+              #ifndef __STDC_WANT_IEC_60559_BFP_EXT__
+               #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
+              #endif
+              #include <stdint.h>
+              ]gl_STDINT_INCLUDES[
+              int iw = UINTMAX_WIDTH;
+              ]])],
+           [gl_cv_header_stdint_width=yes])])
+      if test "$gl_cv_header_stdint_width" = yes; then
+        STDINT_H=
+      fi
+      ;;
+    *)
+      dnl Check for <sys/inttypes.h>, and for
+      dnl <sys/bitypes.h> (used in Linux libc4 >= 4.6.7 and libc5).
+      AC_CHECK_HEADERS([sys/inttypes.h sys/bitypes.h])
+      if test $ac_cv_header_sys_inttypes_h = yes; then
+        HAVE_SYS_INTTYPES_H=1
+      fi
+      if test $ac_cv_header_sys_bitypes_h = yes; then
+        HAVE_SYS_BITYPES_H=1
+      fi
+      gl_STDINT_TYPE_PROPERTIES
+      ;;
+  esac
 
   dnl The substitute stdint.h needs the substitute limit.h's _GL_INTEGER_WIDTH.
-  LIMITS_H=limits.h
-  AM_CONDITIONAL([GL_GENERATE_LIMITS_H], [test -n "$LIMITS_H"])
+  gl_REPLACE_LIMITS_H
 
   AC_SUBST([HAVE_C99_STDINT_H])
   AC_SUBST([HAVE_SYS_BITYPES_H])
@@ -532,10 +541,4 @@ AC_DEFUN([gl_STDINT_TYPE_PROPERTIES],
   if test $GNULIB_OVERRIDES_WINT_T = 1; then
     BITSIZEOF_WINT_T=32
   fi
-])
-
-dnl Autoconf >= 2.61 has AC_COMPUTE_INT built-in.
-dnl Remove this when we can assume autoconf >= 2.61.
-m4_ifdef([AC_COMPUTE_INT], [], [
-  AC_DEFUN([AC_COMPUTE_INT], [_AC_COMPUTE_INT([$2],[$1],[$3],[$4])])
 ])

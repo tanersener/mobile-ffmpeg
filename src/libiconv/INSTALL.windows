@@ -82,8 +82,8 @@ There are three ways to create binaries of this package for Microsoft Windows:
          make
 
    You also need the scripts 'ar-lib' and 'compile' from
-     http://git.savannah.gnu.org/gitweb/?p=automake.git;a=blob_plain;f=lib/ar-lib;hb=HEAD
-     http://git.savannah.gnu.org/gitweb/?p=automake.git;a=blob_plain;f=lib/compile;hb=HEAD
+     https://git.savannah.gnu.org/gitweb/?p=automake.git;a=blob_plain;f=lib/ar-lib;hb=HEAD
+     https://git.savannah.gnu.org/gitweb/?p=automake.git;a=blob_plain;f=lib/compile;hb=HEAD
    respectively.
    They may also be included in this package, in directory 'build-aux/'.
    Save them; the instructions below assume that you stored them in $HOME/msvc/.
