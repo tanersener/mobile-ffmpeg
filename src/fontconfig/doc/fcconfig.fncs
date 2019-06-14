@@ -393,7 +393,9 @@ parse error, semantic error or allocation failure. Otherwise returns FcTrue.
 @TYPE1@		const FcConfig *		@ARG1@		config
 @PURPOSE@	Obtain the system root directory
 @DESC@
-Obtrains the system root directory in 'config' if available.
+Obtains the system root directory in 'config' if available. All files
+(including file properties in patterns) obtained from this 'config' are
+relative to this system root directory.
 @SINCE@		2.10.92
 @@
 
@@ -403,10 +405,13 @@ Obtrains the system root directory in 'config' if available.
 @TYPE2@		const FcChar8 *			@ARG2@		sysroot
 @PURPOSE@	Set the system root directory
 @DESC@
-Set 'sysroot' as the system root directory. fontconfig prepend 'sysroot'
-to the cache directories in order to allow people to generate caches at
-the build time. Note that this causes changing current config. i.e.
-this function calls FcConfigSetCurrent() internally.
+Set 'sysroot' as the system root directory. All file paths used or created with
+this 'config' (including file properties in patterns) will be considered or
+made relative to this 'sysroot'. This allows a host to generate caches for
+targets at build time. This also allows a cache to be re-targeted to a
+different base directory if 'FcConfigGetSysRoot' is used to resolve file paths.
+When setting this on the current config this causes changing current config
+(calls FcConfigSetCurrent()).
 @SINCE@		2.10.92
 @@
 

@@ -48,7 +48,7 @@
 to use with FC_WEIGHT, from an double in the 1..1000 range, resembling
 the numbers from OpenType specification's OS/2 usWeight numbers, which
 are also similar to CSS font-weight numbers.  If input is negative,
-zero, or greater than 1000, returns -1.  This function linearly doubleerpolates
+zero, or greater than 1000, returns -1.  This function linearly interpolates
 between various FC_WEIGHT_* constants.  As such, the returned value does not
 necessarily match any of the predefined constants.
 	    </para>

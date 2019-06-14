@@ -91,9 +91,9 @@ display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
     if [[ -z ${MOBILE_FFMPEG_LTS_BUILD} ]]; then
-        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default six architectures (armv7, armv7s, arm64, arm64e, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and IOS frameworks are created with enabled architectures inside.\n"
+        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for iOS platform. By default six architectures (armv7, armv7s, arm64, arm64e, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and iOS frameworks are created with enabled architectures inside.\n"
     else
-        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for IOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and IOS frameworks are created with enabled architectures inside.\n"
+        echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for iOS platform. By default five architectures (armv7, armv7s, arm64, i386 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and iOS frameworks are created with enabled architectures inside.\n"
     fi
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
@@ -723,9 +723,9 @@ if [[ ${DETECTED_IOS_SDK_VERSION} == 11* ]] || [[ ${DETECTED_IOS_SDK_VERSION} ==
     fi
 fi
 
-echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}static library for IOS\n"
+echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}static library for iOS\n"
 
-echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}for IOS: " 1>>${BASEDIR}/build.log 2>&1
+echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}for iOS: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 print_enabled_architectures

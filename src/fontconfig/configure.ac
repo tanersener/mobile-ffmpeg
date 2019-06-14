@@ -33,8 +33,8 @@ dnl This is the package version number, not the shared library
 dnl version.  This same version number must appear in fontconfig/fontconfig.h
 dnl Yes, it is a pain to synchronize version numbers.  Unfortunately, it's
 dnl not possible to extract the version number here from fontconfig.h
-AC_INIT([fontconfig], [2.13.1], [https://gitlab.freedesktop.org/fontconfig/fontconfig/issues/new])
-AM_INIT_AUTOMAKE([1.11 parallel-tests dist-bzip2])
+AC_INIT([fontconfig], [2.13.91], [https://gitlab.freedesktop.org/fontconfig/fontconfig/issues/new])
+AM_INIT_AUTOMAKE([1.11 parallel-tests dist-xz])
 m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 
 dnl ==========================================================================
@@ -104,7 +104,7 @@ GETTEXT_PACKAGE=$PACKAGE
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Gettext package])
 
-AM_GNU_GETTEXT_VERSION([0.19.8])
+AM_GNU_GETTEXT_VERSION([0.19.7])
 AM_GNU_GETTEXT([external])
 
 dnl ==========================================================================
@@ -331,39 +331,6 @@ AM_CONDITIONAL(FREETYPE_PCF_LONG_FAMILY_NAMES, test "x$have_pcf_long_family_name
 
 LIBS="$fontconfig_save_libs"
 CFLAGS="$fontconfig_save_cflags"
-
-#
-# Check for uuid
-#
-if test "$os_win32" != "yes"; then
-	use_pkgconfig_for_uuid=yes
-	if test -n "${UUID_LIBS}"; then
-		save_UUID_LIBS=$UUID_LIBS
-	fi
-	PKG_CHECK_MODULES([UUID], [uuid],
-			  [use_pkgconfig_for_uuid=yes],
-			  [use_pkgconfig_for_uuid=no])
-	if test "x$use_pkgconfig_for_uuid" = "xno"; then
-		AC_MSG_CHECKING([where uuid functions comes from])
-		AC_TRY_LINK([#include <uuid/uuid.h>],
-			[uuid_t a; uuid_generate(a);],
-			[AC_MSG_RESULT([builtin])
-			 UUID_CFLAGS=""
-			 UUID_LIBS=""
-			],[AC_MSG_ERROR([
-*** uuid is required. install util-linux.
-			])])
-	else
-		if test -z "${save_UUID_LIBS+x}" && test "x${UUID_LIBS}" != "x"; then
-			PKGCONFIG_REQUIRES_PRIVATELY="$PKGCONFIG_REQUIRES_PRIVATELY uuid"
-		fi
-	fi
-else
-	UUID_CFLAGS=""
-	UUID_LIBS=""
-fi
-AC_SUBST(UUID_CFLAGS)
-AC_SUBST(UUID_LIBS)
 
 #
 # Check expat configuration

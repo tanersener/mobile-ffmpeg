@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: fontconfig 2.13.1\n"
+"Project-Id-Version: fontconfig 2.13.91\n"
 "Report-Msgid-Bugs-To: https://bugs.freedesktop.org/enter_bug.cgi?"
 "product=fontconfig\n"
-"POT-Creation-Date: 2018-08-30 08:06+0000\n"
+"POT-Creation-Date: 2019-06-10 08:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,71 +131,71 @@ msgstr ""
 msgid "skipping, looped directory detected\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:173
+#: fc-cache/fc-cache.c:182
 #, c-format
 msgid "skipping, no such directory\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:186
+#: fc-cache/fc-cache.c:198
 #, c-format
 msgid "\"%s\": not a directory, skipping\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:211
+#: fc-cache/fc-cache.c:222
 #, c-format
 msgid "\"%s\": scanning error\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:220
+#: fc-cache/fc-cache.c:231
 #, c-format
 msgid "skipping, existing cache is valid: %d fonts, %d dirs\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:226
+#: fc-cache/fc-cache.c:237
 #, c-format
 msgid "caching, new cache contents: %d fonts, %d dirs\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:231
+#: fc-cache/fc-cache.c:242
 #, c-format
 msgid "%s: failed to write cache\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:240
+#: fc-cache/fc-cache.c:251
 #, c-format
 msgid "%s: Can't create subdir set\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:254
+#: fc-cache/fc-cache.c:265
 #, c-format
 msgid "%s: Can't create subdir list\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:361 fc-cat/fc-cat.c:307
+#: fc-cache/fc-cache.c:373 fc-cat/fc-cat.c:307
 #, c-format
 msgid "%s: Can't initialize font config library\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:371
+#: fc-cache/fc-cache.c:383
 #, c-format
 msgid "%s: Can't create list of directories\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:379
+#: fc-cache/fc-cache.c:391
 #, c-format
 msgid "%s: Can't add directory\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:391
+#: fc-cache/fc-cache.c:403
 #, c-format
 msgid "Out of Memory\n"
 msgstr ""
 
-#: fc-cache/fc-cache.c:423
+#: fc-cache/fc-cache.c:446
 msgid "failed"
 msgstr ""
 
-#: fc-cache/fc-cache.c:423
+#: fc-cache/fc-cache.c:446
 msgid "succeeded"
 msgstr ""
 
@@ -566,16 +566,16 @@ msgstr ""
 msgid "Unable to open %s\n"
 msgstr ""
 
-#: fc-validate/fc-validate.c:200
+#: fc-validate/fc-validate.c:201
 #, c-format
 msgid "%s:%d Missing %d glyph(s) to satisfy the coverage for %s language\n"
 msgstr ""
 
-#: fc-validate/fc-validate.c:230
+#: fc-validate/fc-validate.c:231
 #, c-format
 msgid "%s:%d Satisfy the coverage for %s language\n"
 msgstr ""
 
-#: src/fccfg.c:2701
+#: src/fccfg.c:2799
 msgid "No description"
 msgstr ""

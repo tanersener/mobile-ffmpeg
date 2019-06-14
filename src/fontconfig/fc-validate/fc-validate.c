@@ -197,6 +197,7 @@ main (int argc, char **argv)
 		{
 		    FcChar32 ucs4, pos, map[FC_CHARSET_MAP_SIZE];
 
+		    err = 1;
 		    printf (_("%s:%d Missing %d glyph(s) to satisfy the coverage for %s language\n"),
 			    argv[i], index, count, lang);
 

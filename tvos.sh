@@ -87,7 +87,7 @@ get_mobile_ffmpeg_version() {
 display_help() {
     COMMAND=`echo $0 | sed -e 's/\.\///g'`
 
-    echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for TVOS platform. By default two architectures (arm64 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and TVOS frameworks are created with enabled architectures inside.\n"
+    echo -e "\n'"$COMMAND"' builds FFmpeg and MobileFFmpeg for tvOS platform. By default two architectures (arm64 and x86_64) are built without any external libraries enabled. Options can be used to disable architectures and/or enable external libraries. Please note that GPL libraries (external libraries with GPL license) need --enable-gpl flag to be set explicitly. When compilation ends universal fat binaries and tvOS frameworks are created with enabled architectures inside.\n"
 
     echo -e "Usage: ./"$COMMAND" [OPTION]...\n"
 
@@ -681,9 +681,9 @@ if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ "${DETECTED_TVOS_SDK_VERSION}" !=
     fi
 fi
 
-echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}static library for TVOS\n"
+echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}static library for tvOS\n"
 
-echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}for TVOS: " 1>>${BASEDIR}/build.log 2>&1
+echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}for tvOS: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 print_enabled_architectures

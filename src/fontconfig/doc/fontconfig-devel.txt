@@ -1,4 +1,4 @@
-                Fontconfig Developers Reference, Version 2.13.1
+                Fontconfig Developers Reference, Version 2.13.91
 
    Copyright © 2002 Keith Packard
 
@@ -120,6 +120,7 @@ FUNCTIONAL OVERVIEW
                                                   normal hinter
     globaladvance  FC_GLOBAL_ADVANCE      Bool    Use font global advance data (deprecated)
     file           FC_FILE                String  The filename holding the font
+                                                  relative to the config's sysroot
     index          FC_INDEX               Int     The index of the font within
                                                   the file
     ftface         FC_FT_FACE             FT_Face Use the specified FreeType
@@ -3892,7 +3893,9 @@ Synopsis
 
 Description
 
-   Obtrains the system root directory in 'config' if available.
+   Obtains the system root directory in 'config' if available. All files
+   (including file properties in patterns) obtained from this 'config' are
+   relative to this system root directory.
 
 Since
 
@@ -3913,10 +3916,13 @@ Synopsis
 
 Description
 
-   Set 'sysroot' as the system root directory. fontconfig prepend 'sysroot'
-   to the cache directories in order to allow people to generate caches at
-   the build time. Note that this causes changing current config. i.e. this
-   function calls FcConfigSetCurrent() internally.
+   Set 'sysroot' as the system root directory. All file paths used or created
+   with this 'config' (including file properties in patterns) will be
+   considered or made relative to this 'sysroot'. This allows a host to
+   generate caches for targets at build time. This also allows a cache to be
+   re-targeted to a different base directory if 'FcConfigGetSysRoot' is used
+   to resolve file paths. When setting this on the current config this causes
+   changing current config (calls FcConfigSetCurrent()).
 
 Since
 
@@ -4183,7 +4189,7 @@ Description
    from an double in the 1..1000 range, resembling the numbers from OpenType
    specification's OS/2 usWeight numbers, which are also similar to CSS
    font-weight numbers. If input is negative, zero, or greater than 1000,
-   returns -1. This function linearly doubleerpolates between various
+   returns -1. This function linearly interpolates between various
    FC_WEIGHT_* constants. As such, the returned value does not necessarily
    match any of the predefined constants.
 
@@ -4953,9 +4959,7 @@ Synopsis
 
 Description
 
-   This is to create .uuid file containing an UUID at a font directory of
-   dir. The UUID will be used to identify the font directory and is used to
-   determine the cache filename if available.
+   This function is deprecated. it doesn't take any effects.
 
 Since
 
@@ -5242,15 +5246,17 @@ Description
 
    [215]FcStrStr -- locate UTF-8 substring
 
-   [216]FcStrStrIgnoreCase -- locate UTF-8 substring ignoring ASCII case
+   [216]FcStrStrIgnoreCase -- locate UTF-8 substring ignoring case
 
    [217]FcStrPlus -- concatenate two strings
 
    [218]FcStrFree -- free a string
 
-   [219]FcStrDirname -- directory part of filename
+   [219]FcStrBuildFilename -- Concatenate strings as a file path
 
-   [220]FcStrBasename -- last component of filename
+   [220]FcStrDirname -- directory part of filename
+
+   [221]FcStrBasename -- last component of filename
 
    Fontconfig manipulates many UTF-8 strings represented with the FcChar8
    type. These functions are exposed to help applications deal with these
@@ -5521,7 +5527,7 @@ Description
 
 Name
 
-   FcStrStrIgnoreCase -- locate UTF-8 substring ignoring ASCII case
+   FcStrStrIgnoreCase -- locate UTF-8 substring ignoring case
 
 Synopsis
 
@@ -5572,6 +5578,26 @@ Description
    This is just a wrapper around free(3) which helps track memory usage of
    strings within the fontconfig library.
 
+                               FcStrBuildFilename
+
+Name
+
+   FcStrBuildFilename -- Concatenate strings as a file path
+
+Synopsis
+
+   #include <fontconfig/fontconfig.h>
+
+
+   FcChar8 * FcStrBuildFilename(const FcChar8 *path, ...);
+
+Description
+
+   Creates a filename from the given elements of strings as file paths and
+   concatenate them with the appropriate file separator. Arguments must be
+   null-terminated. This returns a newly-allocated memory which should be
+   freed when no longer needed.
+
                                   FcStrDirname
 
 Name
@@ -5612,223 +5638,224 @@ Description
 References
 
    Visible links
-   1. file:///tmp/html-am902r#AEN16
-   2. file:///tmp/html-am902r#AEN19
-   3. file:///tmp/html-am902r#AEN31
-   4. file:///tmp/html-am902r#AEN103
-   5. file:///tmp/html-am902r#FCINITLOADCONFIG
-   6. file:///tmp/html-am902r#FCINITLOADCONFIGANDFONTS
-   7. file:///tmp/html-am902r#FCINIT
-   8. file:///tmp/html-am902r#FCFINI
-   9. file:///tmp/html-am902r#FCGETVERSION
-  10. file:///tmp/html-am902r#FCINITREINITIALIZE
-  11. file:///tmp/html-am902r#FCINITBRINGUPTODATE
-  12. file:///tmp/html-am902r#FCPATTERNCREATE
-  13. file:///tmp/html-am902r#FCPATTERNDUPLICATE
-  14. file:///tmp/html-am902r#FCPATTERNREFERENCE
-  15. file:///tmp/html-am902r#FCPATTERNDESTROY
-  16. file:///tmp/html-am902r#FCPATTERNOBJECTCOUNT
-  17. file:///tmp/html-am902r#FCPATTERNEQUAL
-  18. file:///tmp/html-am902r#FCPATTERNEQUALSUBSET
-  19. file:///tmp/html-am902r#FCPATTERNFILTER
-  20. file:///tmp/html-am902r#FCPATTERNHASH
-  21. file:///tmp/html-am902r#FCPATTERNADD
-  22. file:///tmp/html-am902r#FCPATTERNADDWEAK
-  23. file:///tmp/html-am902r#FCPATTERNADD-TYPE
-  24. file:///tmp/html-am902r#FCPATTERNGETWITHBINDING
-  25. file:///tmp/html-am902r#FCPATTERNGET
-  26. file:///tmp/html-am902r#FCPATTERNGET-TYPE
-  27. file:///tmp/html-am902r#FCPATTERNBUILD
-  28. file:///tmp/html-am902r#FCPATTERNDEL
-  29. file:///tmp/html-am902r#FCPATTERNREMOVE
-  30. file:///tmp/html-am902r#FCPATTERNITERSTART
-  31. file:///tmp/html-am902r#FCPATTERNITERNEXT
-  32. file:///tmp/html-am902r#FCPATTERNITEREQUAL
-  33. file:///tmp/html-am902r#FCPATTERNFINDITER
-  34. file:///tmp/html-am902r#FCPATTERNITERISVALID
-  35. file:///tmp/html-am902r#FCPATTERNITERGETOBJECT
-  36. file:///tmp/html-am902r#FCPATTERNITERVALUECOUNT
-  37. file:///tmp/html-am902r#FCPATTERNITERGETVALUE
-  38. file:///tmp/html-am902r#FCPATTERNPRINT
-  39. file:///tmp/html-am902r#FCDEFAULTSUBSTITUTE
-  40. file:///tmp/html-am902r#FCNAMEPARSE
-  41. file:///tmp/html-am902r#FCNAMEUNPARSE
-  42. file:///tmp/html-am902r#FCPATTERNFORMAT
-  43. file:///tmp/html-am902r#FCFONTSETCREATE
-  44. file:///tmp/html-am902r#FCFONTSETDESTROY
-  45. file:///tmp/html-am902r#FCFONTSETADD
-  46. file:///tmp/html-am902r#FCFONTSETLIST
-  47. file:///tmp/html-am902r#FCFONTSETMATCH
-  48. file:///tmp/html-am902r#FCFONTSETPRINT
-  49. file:///tmp/html-am902r#FCFONTSETSORT
-  50. file:///tmp/html-am902r#FCFONTSETSORTDESTROY
-  51. file:///tmp/html-am902r#FCOBJECTSETCREATE
-  52. file:///tmp/html-am902r#FCOBJECTSETADD
-  53. file:///tmp/html-am902r#FCOBJECTSETDESTROY
-  54. file:///tmp/html-am902r#FCOBJECTSETBUILD
-  55. file:///tmp/html-am902r#FCFREETYPECHARINDEX
-  56. file:///tmp/html-am902r#FCFREETYPECHARSET
-  57. file:///tmp/html-am902r#FCFREETYPECHARSETANDSPACING
-  58. file:///tmp/html-am902r#FCFREETYPEQUERY
-  59. file:///tmp/html-am902r#FCFREETYPEQUERYALL
-  60. file:///tmp/html-am902r#FCFREETYPEQUERYFACE
-  61. file:///tmp/html-am902r#FCVALUEDESTROY
-  62. file:///tmp/html-am902r#FCVALUESAVE
-  63. file:///tmp/html-am902r#FCVALUEPRINT
-  64. file:///tmp/html-am902r#FCVALUEEQUAL
-  65. file:///tmp/html-am902r#FCCHARSETCREATE
-  66. file:///tmp/html-am902r#FCCHARSETDESTROY
-  67. file:///tmp/html-am902r#FCCHARSETADDCHAR
-  68. file:///tmp/html-am902r#FCCHARSETDELCHAR
-  69. file:///tmp/html-am902r#FCCHARSETCOPY
-  70. file:///tmp/html-am902r#FCCHARSETEQUAL
-  71. file:///tmp/html-am902r#FCCHARSETINTERSECT
-  72. file:///tmp/html-am902r#FCCHARSETUNION
-  73. file:///tmp/html-am902r#FCCHARSETSUBTRACT
-  74. file:///tmp/html-am902r#FCCHARSETMERGE
-  75. file:///tmp/html-am902r#FCCHARSETHASCHAR
-  76. file:///tmp/html-am902r#FCCHARSETCOUNT
-  77. file:///tmp/html-am902r#FCCHARSETINTERSECTCOUNT
-  78. file:///tmp/html-am902r#FCCHARSETSUBTRACTCOUNT
-  79. file:///tmp/html-am902r#FCCHARSETISSUBSET
-  80. file:///tmp/html-am902r#FCCHARSETFIRSTPAGE
-  81. file:///tmp/html-am902r#FCCHARSETNEXTPAGE
-  82. file:///tmp/html-am902r#FCCHARSETCOVERAGE
-  83. file:///tmp/html-am902r#FCCHARSETNEW
-  84. file:///tmp/html-am902r#FCLANGSETCREATE
-  85. file:///tmp/html-am902r#FCLANGSETDESTROY
-  86. file:///tmp/html-am902r#FCLANGSETCOPY
-  87. file:///tmp/html-am902r#FCLANGSETADD
-  88. file:///tmp/html-am902r#FCLANGSETDEL
-  89. file:///tmp/html-am902r#FCLANGSETUNION
-  90. file:///tmp/html-am902r#FCLANGSETSUBTRACT
-  91. file:///tmp/html-am902r#FCLANGSETCOMPARE
-  92. file:///tmp/html-am902r#FCLANGSETCONTAINS
-  93. file:///tmp/html-am902r#FCLANGSETEQUAL
-  94. file:///tmp/html-am902r#FCLANGSETHASH
-  95. file:///tmp/html-am902r#FCLANGSETHASLANG
-  96. file:///tmp/html-am902r#FCGETDEFAULTLANGS
-  97. file:///tmp/html-am902r#FCLANGSETGETLANGS
-  98. file:///tmp/html-am902r#FCGETLANGS
-  99. file:///tmp/html-am902r#FCLANGNORMALIZE
- 100. file:///tmp/html-am902r#FCLANGGETCHARSET
- 101. file:///tmp/html-am902r#FCMATRIXINIT
- 102. file:///tmp/html-am902r#FCMATRIXCOPY
- 103. file:///tmp/html-am902r#FCMATRIXEQUAL
- 104. file:///tmp/html-am902r#FCMATRIXMULTIPLY
- 105. file:///tmp/html-am902r#FCMATRIXROTATE
- 106. file:///tmp/html-am902r#FCMATRIXSCALE
- 107. file:///tmp/html-am902r#FCMATRIXSHEAR
- 108. file:///tmp/html-am902r#FCRANGECOPY
- 109. file:///tmp/html-am902r#FCRANGECREATEDOUBLE
- 110. file:///tmp/html-am902r#FCRANGECREATEINTEGER
- 111. file:///tmp/html-am902r#FCRANGEDESTROY
- 112. file:///tmp/html-am902r#FCRANGEGETDOUBLE
- 113. file:///tmp/html-am902r#FCCONFIGCREATE
- 114. file:///tmp/html-am902r#FCCONFIGREFERENCE
- 115. file:///tmp/html-am902r#FCCONFIGDESTROY
- 116. file:///tmp/html-am902r#FCCONFIGSETCURRENT
- 117. file:///tmp/html-am902r#FCCONFIGGETCURRENT
- 118. file:///tmp/html-am902r#FCCONFIGUPTODATE
- 119. file:///tmp/html-am902r#FCCONFIGHOME
- 120. file:///tmp/html-am902r#FCCONFIGENABLEHOME
- 121. file:///tmp/html-am902r#FCCONFIGBUILDFONTS
- 122. file:///tmp/html-am902r#FCCONFIGGETCONFIGDIRS
- 123. file:///tmp/html-am902r#FCCONFIGGETFONTDIRS
- 124. file:///tmp/html-am902r#FCCONFIGGETCONFIGFILES
- 125. file:///tmp/html-am902r#FCCONFIGGETCACHE
- 126. file:///tmp/html-am902r#FCCONFIGGETCACHEDIRS
- 127. file:///tmp/html-am902r#FCCONFIGGETFONTS
- 128. file:///tmp/html-am902r#FCCONFIGGETBLANKS
- 129. file:///tmp/html-am902r#FCCONFIGGETRESCANINTERVAL
- 130. file:///tmp/html-am902r#FCCONFIGSETRESCANINTERVAL
- 131. file:///tmp/html-am902r#FCCONFIGAPPFONTADDFILE
- 132. file:///tmp/html-am902r#FCCONFIGAPPFONTADDDIR
- 133. file:///tmp/html-am902r#FCCONFIGAPPFONTCLEAR
- 134. file:///tmp/html-am902r#FCCONFIGSUBSTITUTEWITHPAT
- 135. file:///tmp/html-am902r#FCCONFIGSUBSTITUTE
- 136. file:///tmp/html-am902r#FCFONTMATCH
- 137. file:///tmp/html-am902r#FCFONTSORT
- 138. file:///tmp/html-am902r#FCFONTRENDERPREPARE
- 139. file:///tmp/html-am902r#FCFONTLIST
- 140. file:///tmp/html-am902r#FCCONFIGFILENAME
- 141. file:///tmp/html-am902r#FCCONFIGPARSEANDLOAD
- 142. file:///tmp/html-am902r#FCCONFIGPARSEANDLOADFROMMEMORY
- 143. file:///tmp/html-am902r#FCCONFIGGETSYSROOT
- 144. file:///tmp/html-am902r#FCCONFIGSETSYSROOT
- 145. file:///tmp/html-am902r#FCCONFIGFILEINFOITERINIT
- 146. file:///tmp/html-am902r#FCCONFIGFILEINFOITERNEXT
- 147. file:///tmp/html-am902r#FCCONFIGFILEINFOITERGET
- 148. file:///tmp/html-am902r#FCNAMEREGISTEROBJECTTYPES
- 149. file:///tmp/html-am902r#FCNAMEUNREGISTEROBJECTTYPES
- 150. file:///tmp/html-am902r#FCNAMEGETOBJECTTYPE
- 151. file:///tmp/html-am902r#FCNAMEREGISTERCONSTANTS
- 152. file:///tmp/html-am902r#FCNAMEUNREGISTERCONSTANTS
- 153. file:///tmp/html-am902r#FCNAMEGETCONSTANT
- 154. file:///tmp/html-am902r#FCNAMECONSTANT
- 155. file:///tmp/html-am902r#FCWEIGHTFROMOPENTYPEDOUBLE
- 156. file:///tmp/html-am902r#FCWEIGHTTOOPENTYPEDOUBLE
- 157. file:///tmp/html-am902r#FCWEIGHTFROMOPENTYPE
- 158. file:///tmp/html-am902r#FCWEIGHTTOOPENTYPE
- 159. file:///tmp/html-am902r#FCBLANKSCREATE
- 160. file:///tmp/html-am902r#FCBLANKSDESTROY
- 161. file:///tmp/html-am902r#FCBLANKSADD
- 162. file:///tmp/html-am902r#FCBLANKSISMEMBER
- 163. file:///tmp/html-am902r#FCATOMICCREATE
- 164. file:///tmp/html-am902r#FCATOMICLOCK
- 165. file:///tmp/html-am902r#FCATOMICNEWFILE
- 166. file:///tmp/html-am902r#FCATOMICORIGFILE
- 167. file:///tmp/html-am902r#FCATOMICREPLACEORIG
- 168. file:///tmp/html-am902r#FCATOMICDELETENEW
- 169. file:///tmp/html-am902r#FCATOMICUNLOCK
- 170. file:///tmp/html-am902r#FCATOMICDESTROY
- 171. file:///tmp/html-am902r#FCFILESCAN
- 172. file:///tmp/html-am902r#FCFILEISDIR
- 173. file:///tmp/html-am902r#FCDIRSCAN
- 174. file:///tmp/html-am902r#FCDIRSAVE
- 175. file:///tmp/html-am902r#FCDIRCACHEUNLINK
- 176. file:///tmp/html-am902r#FCDIRCACHEVALID
- 177. file:///tmp/html-am902r#FCDIRCACHELOAD
- 178. file:///tmp/html-am902r#FCDIRCACHERESCAN
- 179. file:///tmp/html-am902r#FCDIRCACHEREAD
- 180. file:///tmp/html-am902r#FCDIRCACHELOADFILE
- 181. file:///tmp/html-am902r#FCDIRCACHEUNLOAD
- 182. file:///tmp/html-am902r#FCCACHEDIR
- 183. file:///tmp/html-am902r#FCCACHECOPYSET
- 184. file:///tmp/html-am902r#FCCACHESUBDIR
- 185. file:///tmp/html-am902r#FCCACHENUMSUBDIR
- 186. file:///tmp/html-am902r#FCCACHENUMFONT
- 187. file:///tmp/html-am902r#FCDIRCACHECLEAN
- 188. file:///tmp/html-am902r#FCCACHECREATETAGFILE
- 189. file:///tmp/html-am902r#FCDIRCACHECREATEUUID
- 190. file:///tmp/html-am902r#FCDIRCACHEDELETEUUID
- 191. file:///tmp/html-am902r#FCSTRSETCREATE
- 192. file:///tmp/html-am902r#FCSTRSETMEMBER
- 193. file:///tmp/html-am902r#FCSTRSETEQUAL
- 194. file:///tmp/html-am902r#FCSTRSETADD
- 195. file:///tmp/html-am902r#FCSTRSETADDFILENAME
- 196. file:///tmp/html-am902r#FCSTRSETDEL
- 197. file:///tmp/html-am902r#FCSTRSETDESTROY
- 198. file:///tmp/html-am902r#FCSTRLISTCREATE
- 199. file:///tmp/html-am902r#FCSTRLISTFIRST
- 200. file:///tmp/html-am902r#FCSTRLISTNEXT
- 201. file:///tmp/html-am902r#FCSTRLISTDONE
- 202. file:///tmp/html-am902r#FCUTF8TOUCS4
- 203. file:///tmp/html-am902r#FCUCS4TOUTF8
- 204. file:///tmp/html-am902r#FCUTF8LEN
- 205. file:///tmp/html-am902r#FCUTF16TOUCS4
- 206. file:///tmp/html-am902r#FCUTF16LEN
- 207. file:///tmp/html-am902r#FCISLOWER
- 208. file:///tmp/html-am902r#FCISUPPER
- 209. file:///tmp/html-am902r#FCTOLOWER
- 210. file:///tmp/html-am902r#FCSTRCOPY
- 211. file:///tmp/html-am902r#FCSTRDOWNCASE
- 212. file:///tmp/html-am902r#FCSTRCOPYFILENAME
- 213. file:///tmp/html-am902r#FCSTRCMP
- 214. file:///tmp/html-am902r#FCSTRCMPIGNORECASE
- 215. file:///tmp/html-am902r#FCSTRSTR
- 216. file:///tmp/html-am902r#FCSTRSTRIGNORECASE
- 217. file:///tmp/html-am902r#FCSTRPLUS
- 218. file:///tmp/html-am902r#FCSTRFREE
- 219. file:///tmp/html-am902r#FCSTRDIRNAME
- 220. file:///tmp/html-am902r#FCSTRBASENAME
+   1. file:///tmp/html-Fkcb1X#AEN16
+   2. file:///tmp/html-Fkcb1X#AEN19
+   3. file:///tmp/html-Fkcb1X#AEN31
+   4. file:///tmp/html-Fkcb1X#AEN103
+   5. file:///tmp/html-Fkcb1X#FCINITLOADCONFIG
+   6. file:///tmp/html-Fkcb1X#FCINITLOADCONFIGANDFONTS
+   7. file:///tmp/html-Fkcb1X#FCINIT
+   8. file:///tmp/html-Fkcb1X#FCFINI
+   9. file:///tmp/html-Fkcb1X#FCGETVERSION
+  10. file:///tmp/html-Fkcb1X#FCINITREINITIALIZE
+  11. file:///tmp/html-Fkcb1X#FCINITBRINGUPTODATE
+  12. file:///tmp/html-Fkcb1X#FCPATTERNCREATE
+  13. file:///tmp/html-Fkcb1X#FCPATTERNDUPLICATE
+  14. file:///tmp/html-Fkcb1X#FCPATTERNREFERENCE
+  15. file:///tmp/html-Fkcb1X#FCPATTERNDESTROY
+  16. file:///tmp/html-Fkcb1X#FCPATTERNOBJECTCOUNT
+  17. file:///tmp/html-Fkcb1X#FCPATTERNEQUAL
+  18. file:///tmp/html-Fkcb1X#FCPATTERNEQUALSUBSET
+  19. file:///tmp/html-Fkcb1X#FCPATTERNFILTER
+  20. file:///tmp/html-Fkcb1X#FCPATTERNHASH
+  21. file:///tmp/html-Fkcb1X#FCPATTERNADD
+  22. file:///tmp/html-Fkcb1X#FCPATTERNADDWEAK
+  23. file:///tmp/html-Fkcb1X#FCPATTERNADD-TYPE
+  24. file:///tmp/html-Fkcb1X#FCPATTERNGETWITHBINDING
+  25. file:///tmp/html-Fkcb1X#FCPATTERNGET
+  26. file:///tmp/html-Fkcb1X#FCPATTERNGET-TYPE
+  27. file:///tmp/html-Fkcb1X#FCPATTERNBUILD
+  28. file:///tmp/html-Fkcb1X#FCPATTERNDEL
+  29. file:///tmp/html-Fkcb1X#FCPATTERNREMOVE
+  30. file:///tmp/html-Fkcb1X#FCPATTERNITERSTART
+  31. file:///tmp/html-Fkcb1X#FCPATTERNITERNEXT
+  32. file:///tmp/html-Fkcb1X#FCPATTERNITEREQUAL
+  33. file:///tmp/html-Fkcb1X#FCPATTERNFINDITER
+  34. file:///tmp/html-Fkcb1X#FCPATTERNITERISVALID
+  35. file:///tmp/html-Fkcb1X#FCPATTERNITERGETOBJECT
+  36. file:///tmp/html-Fkcb1X#FCPATTERNITERVALUECOUNT
+  37. file:///tmp/html-Fkcb1X#FCPATTERNITERGETVALUE
+  38. file:///tmp/html-Fkcb1X#FCPATTERNPRINT
+  39. file:///tmp/html-Fkcb1X#FCDEFAULTSUBSTITUTE
+  40. file:///tmp/html-Fkcb1X#FCNAMEPARSE
+  41. file:///tmp/html-Fkcb1X#FCNAMEUNPARSE
+  42. file:///tmp/html-Fkcb1X#FCPATTERNFORMAT
+  43. file:///tmp/html-Fkcb1X#FCFONTSETCREATE
+  44. file:///tmp/html-Fkcb1X#FCFONTSETDESTROY
+  45. file:///tmp/html-Fkcb1X#FCFONTSETADD
+  46. file:///tmp/html-Fkcb1X#FCFONTSETLIST
+  47. file:///tmp/html-Fkcb1X#FCFONTSETMATCH
+  48. file:///tmp/html-Fkcb1X#FCFONTSETPRINT
+  49. file:///tmp/html-Fkcb1X#FCFONTSETSORT
+  50. file:///tmp/html-Fkcb1X#FCFONTSETSORTDESTROY
+  51. file:///tmp/html-Fkcb1X#FCOBJECTSETCREATE
+  52. file:///tmp/html-Fkcb1X#FCOBJECTSETADD
+  53. file:///tmp/html-Fkcb1X#FCOBJECTSETDESTROY
+  54. file:///tmp/html-Fkcb1X#FCOBJECTSETBUILD
+  55. file:///tmp/html-Fkcb1X#FCFREETYPECHARINDEX
+  56. file:///tmp/html-Fkcb1X#FCFREETYPECHARSET
+  57. file:///tmp/html-Fkcb1X#FCFREETYPECHARSETANDSPACING
+  58. file:///tmp/html-Fkcb1X#FCFREETYPEQUERY
+  59. file:///tmp/html-Fkcb1X#FCFREETYPEQUERYALL
+  60. file:///tmp/html-Fkcb1X#FCFREETYPEQUERYFACE
+  61. file:///tmp/html-Fkcb1X#FCVALUEDESTROY
+  62. file:///tmp/html-Fkcb1X#FCVALUESAVE
+  63. file:///tmp/html-Fkcb1X#FCVALUEPRINT
+  64. file:///tmp/html-Fkcb1X#FCVALUEEQUAL
+  65. file:///tmp/html-Fkcb1X#FCCHARSETCREATE
+  66. file:///tmp/html-Fkcb1X#FCCHARSETDESTROY
+  67. file:///tmp/html-Fkcb1X#FCCHARSETADDCHAR
+  68. file:///tmp/html-Fkcb1X#FCCHARSETDELCHAR
+  69. file:///tmp/html-Fkcb1X#FCCHARSETCOPY
+  70. file:///tmp/html-Fkcb1X#FCCHARSETEQUAL
+  71. file:///tmp/html-Fkcb1X#FCCHARSETINTERSECT
+  72. file:///tmp/html-Fkcb1X#FCCHARSETUNION
+  73. file:///tmp/html-Fkcb1X#FCCHARSETSUBTRACT
+  74. file:///tmp/html-Fkcb1X#FCCHARSETMERGE
+  75. file:///tmp/html-Fkcb1X#FCCHARSETHASCHAR
+  76. file:///tmp/html-Fkcb1X#FCCHARSETCOUNT
+  77. file:///tmp/html-Fkcb1X#FCCHARSETINTERSECTCOUNT
+  78. file:///tmp/html-Fkcb1X#FCCHARSETSUBTRACTCOUNT
+  79. file:///tmp/html-Fkcb1X#FCCHARSETISSUBSET
+  80. file:///tmp/html-Fkcb1X#FCCHARSETFIRSTPAGE
+  81. file:///tmp/html-Fkcb1X#FCCHARSETNEXTPAGE
+  82. file:///tmp/html-Fkcb1X#FCCHARSETCOVERAGE
+  83. file:///tmp/html-Fkcb1X#FCCHARSETNEW
+  84. file:///tmp/html-Fkcb1X#FCLANGSETCREATE
+  85. file:///tmp/html-Fkcb1X#FCLANGSETDESTROY
+  86. file:///tmp/html-Fkcb1X#FCLANGSETCOPY
+  87. file:///tmp/html-Fkcb1X#FCLANGSETADD
+  88. file:///tmp/html-Fkcb1X#FCLANGSETDEL
+  89. file:///tmp/html-Fkcb1X#FCLANGSETUNION
+  90. file:///tmp/html-Fkcb1X#FCLANGSETSUBTRACT
+  91. file:///tmp/html-Fkcb1X#FCLANGSETCOMPARE
+  92. file:///tmp/html-Fkcb1X#FCLANGSETCONTAINS
+  93. file:///tmp/html-Fkcb1X#FCLANGSETEQUAL
+  94. file:///tmp/html-Fkcb1X#FCLANGSETHASH
+  95. file:///tmp/html-Fkcb1X#FCLANGSETHASLANG
+  96. file:///tmp/html-Fkcb1X#FCGETDEFAULTLANGS
+  97. file:///tmp/html-Fkcb1X#FCLANGSETGETLANGS
+  98. file:///tmp/html-Fkcb1X#FCGETLANGS
+  99. file:///tmp/html-Fkcb1X#FCLANGNORMALIZE
+ 100. file:///tmp/html-Fkcb1X#FCLANGGETCHARSET
+ 101. file:///tmp/html-Fkcb1X#FCMATRIXINIT
+ 102. file:///tmp/html-Fkcb1X#FCMATRIXCOPY
+ 103. file:///tmp/html-Fkcb1X#FCMATRIXEQUAL
+ 104. file:///tmp/html-Fkcb1X#FCMATRIXMULTIPLY
+ 105. file:///tmp/html-Fkcb1X#FCMATRIXROTATE
+ 106. file:///tmp/html-Fkcb1X#FCMATRIXSCALE
+ 107. file:///tmp/html-Fkcb1X#FCMATRIXSHEAR
+ 108. file:///tmp/html-Fkcb1X#FCRANGECOPY
+ 109. file:///tmp/html-Fkcb1X#FCRANGECREATEDOUBLE
+ 110. file:///tmp/html-Fkcb1X#FCRANGECREATEINTEGER
+ 111. file:///tmp/html-Fkcb1X#FCRANGEDESTROY
+ 112. file:///tmp/html-Fkcb1X#FCRANGEGETDOUBLE
+ 113. file:///tmp/html-Fkcb1X#FCCONFIGCREATE
+ 114. file:///tmp/html-Fkcb1X#FCCONFIGREFERENCE
+ 115. file:///tmp/html-Fkcb1X#FCCONFIGDESTROY
+ 116. file:///tmp/html-Fkcb1X#FCCONFIGSETCURRENT
+ 117. file:///tmp/html-Fkcb1X#FCCONFIGGETCURRENT
+ 118. file:///tmp/html-Fkcb1X#FCCONFIGUPTODATE
+ 119. file:///tmp/html-Fkcb1X#FCCONFIGHOME
+ 120. file:///tmp/html-Fkcb1X#FCCONFIGENABLEHOME
+ 121. file:///tmp/html-Fkcb1X#FCCONFIGBUILDFONTS
+ 122. file:///tmp/html-Fkcb1X#FCCONFIGGETCONFIGDIRS
+ 123. file:///tmp/html-Fkcb1X#FCCONFIGGETFONTDIRS
+ 124. file:///tmp/html-Fkcb1X#FCCONFIGGETCONFIGFILES
+ 125. file:///tmp/html-Fkcb1X#FCCONFIGGETCACHE
+ 126. file:///tmp/html-Fkcb1X#FCCONFIGGETCACHEDIRS
+ 127. file:///tmp/html-Fkcb1X#FCCONFIGGETFONTS
+ 128. file:///tmp/html-Fkcb1X#FCCONFIGGETBLANKS
+ 129. file:///tmp/html-Fkcb1X#FCCONFIGGETRESCANINTERVAL
+ 130. file:///tmp/html-Fkcb1X#FCCONFIGSETRESCANINTERVAL
+ 131. file:///tmp/html-Fkcb1X#FCCONFIGAPPFONTADDFILE
+ 132. file:///tmp/html-Fkcb1X#FCCONFIGAPPFONTADDDIR
+ 133. file:///tmp/html-Fkcb1X#FCCONFIGAPPFONTCLEAR
+ 134. file:///tmp/html-Fkcb1X#FCCONFIGSUBSTITUTEWITHPAT
+ 135. file:///tmp/html-Fkcb1X#FCCONFIGSUBSTITUTE
+ 136. file:///tmp/html-Fkcb1X#FCFONTMATCH
+ 137. file:///tmp/html-Fkcb1X#FCFONTSORT
+ 138. file:///tmp/html-Fkcb1X#FCFONTRENDERPREPARE
+ 139. file:///tmp/html-Fkcb1X#FCFONTLIST
+ 140. file:///tmp/html-Fkcb1X#FCCONFIGFILENAME
+ 141. file:///tmp/html-Fkcb1X#FCCONFIGPARSEANDLOAD
+ 142. file:///tmp/html-Fkcb1X#FCCONFIGPARSEANDLOADFROMMEMORY
+ 143. file:///tmp/html-Fkcb1X#FCCONFIGGETSYSROOT
+ 144. file:///tmp/html-Fkcb1X#FCCONFIGSETSYSROOT
+ 145. file:///tmp/html-Fkcb1X#FCCONFIGFILEINFOITERINIT
+ 146. file:///tmp/html-Fkcb1X#FCCONFIGFILEINFOITERNEXT
+ 147. file:///tmp/html-Fkcb1X#FCCONFIGFILEINFOITERGET
+ 148. file:///tmp/html-Fkcb1X#FCNAMEREGISTEROBJECTTYPES
+ 149. file:///tmp/html-Fkcb1X#FCNAMEUNREGISTEROBJECTTYPES
+ 150. file:///tmp/html-Fkcb1X#FCNAMEGETOBJECTTYPE
+ 151. file:///tmp/html-Fkcb1X#FCNAMEREGISTERCONSTANTS
+ 152. file:///tmp/html-Fkcb1X#FCNAMEUNREGISTERCONSTANTS
+ 153. file:///tmp/html-Fkcb1X#FCNAMEGETCONSTANT
+ 154. file:///tmp/html-Fkcb1X#FCNAMECONSTANT
+ 155. file:///tmp/html-Fkcb1X#FCWEIGHTFROMOPENTYPEDOUBLE
+ 156. file:///tmp/html-Fkcb1X#FCWEIGHTTOOPENTYPEDOUBLE
+ 157. file:///tmp/html-Fkcb1X#FCWEIGHTFROMOPENTYPE
+ 158. file:///tmp/html-Fkcb1X#FCWEIGHTTOOPENTYPE
+ 159. file:///tmp/html-Fkcb1X#FCBLANKSCREATE
+ 160. file:///tmp/html-Fkcb1X#FCBLANKSDESTROY
+ 161. file:///tmp/html-Fkcb1X#FCBLANKSADD
+ 162. file:///tmp/html-Fkcb1X#FCBLANKSISMEMBER
+ 163. file:///tmp/html-Fkcb1X#FCATOMICCREATE
+ 164. file:///tmp/html-Fkcb1X#FCATOMICLOCK
+ 165. file:///tmp/html-Fkcb1X#FCATOMICNEWFILE
+ 166. file:///tmp/html-Fkcb1X#FCATOMICORIGFILE
+ 167. file:///tmp/html-Fkcb1X#FCATOMICREPLACEORIG
+ 168. file:///tmp/html-Fkcb1X#FCATOMICDELETENEW
+ 169. file:///tmp/html-Fkcb1X#FCATOMICUNLOCK
+ 170. file:///tmp/html-Fkcb1X#FCATOMICDESTROY
+ 171. file:///tmp/html-Fkcb1X#FCFILESCAN
+ 172. file:///tmp/html-Fkcb1X#FCFILEISDIR
+ 173. file:///tmp/html-Fkcb1X#FCDIRSCAN
+ 174. file:///tmp/html-Fkcb1X#FCDIRSAVE
+ 175. file:///tmp/html-Fkcb1X#FCDIRCACHEUNLINK
+ 176. file:///tmp/html-Fkcb1X#FCDIRCACHEVALID
+ 177. file:///tmp/html-Fkcb1X#FCDIRCACHELOAD
+ 178. file:///tmp/html-Fkcb1X#FCDIRCACHERESCAN
+ 179. file:///tmp/html-Fkcb1X#FCDIRCACHEREAD
+ 180. file:///tmp/html-Fkcb1X#FCDIRCACHELOADFILE
+ 181. file:///tmp/html-Fkcb1X#FCDIRCACHEUNLOAD
+ 182. file:///tmp/html-Fkcb1X#FCCACHEDIR
+ 183. file:///tmp/html-Fkcb1X#FCCACHECOPYSET
+ 184. file:///tmp/html-Fkcb1X#FCCACHESUBDIR
+ 185. file:///tmp/html-Fkcb1X#FCCACHENUMSUBDIR
+ 186. file:///tmp/html-Fkcb1X#FCCACHENUMFONT
+ 187. file:///tmp/html-Fkcb1X#FCDIRCACHECLEAN
+ 188. file:///tmp/html-Fkcb1X#FCCACHECREATETAGFILE
+ 189. file:///tmp/html-Fkcb1X#FCDIRCACHECREATEUUID
+ 190. file:///tmp/html-Fkcb1X#FCDIRCACHEDELETEUUID
+ 191. file:///tmp/html-Fkcb1X#FCSTRSETCREATE
+ 192. file:///tmp/html-Fkcb1X#FCSTRSETMEMBER
+ 193. file:///tmp/html-Fkcb1X#FCSTRSETEQUAL
+ 194. file:///tmp/html-Fkcb1X#FCSTRSETADD
+ 195. file:///tmp/html-Fkcb1X#FCSTRSETADDFILENAME
+ 196. file:///tmp/html-Fkcb1X#FCSTRSETDEL
+ 197. file:///tmp/html-Fkcb1X#FCSTRSETDESTROY
+ 198. file:///tmp/html-Fkcb1X#FCSTRLISTCREATE
+ 199. file:///tmp/html-Fkcb1X#FCSTRLISTFIRST
+ 200. file:///tmp/html-Fkcb1X#FCSTRLISTNEXT
+ 201. file:///tmp/html-Fkcb1X#FCSTRLISTDONE
+ 202. file:///tmp/html-Fkcb1X#FCUTF8TOUCS4
+ 203. file:///tmp/html-Fkcb1X#FCUCS4TOUTF8
+ 204. file:///tmp/html-Fkcb1X#FCUTF8LEN
+ 205. file:///tmp/html-Fkcb1X#FCUTF16TOUCS4
+ 206. file:///tmp/html-Fkcb1X#FCUTF16LEN
+ 207. file:///tmp/html-Fkcb1X#FCISLOWER
+ 208. file:///tmp/html-Fkcb1X#FCISUPPER
+ 209. file:///tmp/html-Fkcb1X#FCTOLOWER
+ 210. file:///tmp/html-Fkcb1X#FCSTRCOPY
+ 211. file:///tmp/html-Fkcb1X#FCSTRDOWNCASE
+ 212. file:///tmp/html-Fkcb1X#FCSTRCOPYFILENAME
+ 213. file:///tmp/html-Fkcb1X#FCSTRCMP
+ 214. file:///tmp/html-Fkcb1X#FCSTRCMPIGNORECASE
+ 215. file:///tmp/html-Fkcb1X#FCSTRSTR
+ 216. file:///tmp/html-Fkcb1X#FCSTRSTRIGNORECASE
+ 217. file:///tmp/html-Fkcb1X#FCSTRPLUS
+ 218. file:///tmp/html-Fkcb1X#FCSTRFREE
+ 219. file:///tmp/html-Fkcb1X#FCSTRBUILDFILENAME
+ 220. file:///tmp/html-Fkcb1X#FCSTRDIRNAME
+ 221. file:///tmp/html-Fkcb1X#FCSTRBASENAME

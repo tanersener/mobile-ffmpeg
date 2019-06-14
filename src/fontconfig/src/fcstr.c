@@ -36,6 +36,32 @@ FcStrCopy (const FcChar8 *s)
     return FcStrdup (s);
 }
 
+static FcChar8 *
+FcStrMakeTriple (const FcChar8 *s1, const FcChar8 *s2, const FcChar8 *s3)
+{
+    int	    s1l = s1 ? strlen ((char *) s1) : 0;
+    int	    s2l = s2 ? strlen ((char *) s2) : 0;
+    int     s3l = s3 ? strlen ((char *) s3) : 0;
+    int	    l = s1l + 1 + s2l + 1 + s3l + 1;
+    FcChar8 *s = malloc (l);
+
+    if (!s)
+	return 0;
+    if (s1)
+	memcpy (s, s1, s1l + 1);
+    else
+	s[0] = '\0';
+    if (s2)
+	memcpy (s + s1l + 1, s2, s2l + 1);
+    else
+	s[s1l + 1] = '\0';
+    if (s3)
+	memcpy (s + s1l + 1 + s2l + 1, s3, s3l + 1);
+    else
+	s[s1l + 1 + s2l + 1] = '\0';
+    return s;
+}
+
 FcChar8 *
 FcStrPlus (const FcChar8 *s1, const FcChar8 *s2)
 {
@@ -1207,6 +1233,58 @@ FcStrSetMember (FcStrSet *set, const FcChar8 *s)
     return FcFalse;
 }
 
+static int
+fc_strcmp_r (const FcChar8 *s1, const FcChar8 *s2, const FcChar8 **ret)
+{
+    FcChar8 c1, c2;
+
+    if (s1 == s2)
+    {
+	if (ret)
+	    *ret = NULL;
+	return 0;
+    }
+    for (;;)
+    {
+	if (s1)
+	    c1 = *s1++;
+	else
+	    c1 = 0;
+	if (s2)
+	    c2 = *s2++;
+	else
+	    c2 = 0;
+	if (!c1 || c1 != c2)
+	    break;
+    }
+    if (ret)
+	*ret = s1;
+    return (int) c1  - (int) c2;
+}
+
+FcBool
+FcStrSetMemberAB (FcStrSet *set, const FcChar8 *a, FcChar8 *b, FcChar8 **ret)
+{
+    int i;
+    const FcChar8 *s = NULL;
+
+    for (i = 0; i < set->num; i++)
+    {
+	if (!fc_strcmp_r (set->strs[i], a, &s) && s)
+	{
+	    if (!fc_strcmp_r (s, b, NULL))
+	    {
+		if (ret)
+		    *ret = set->strs[i];
+		return FcTrue;
+	    }
+	}
+    }
+    if (ret)
+	*ret = NULL;
+    return FcFalse;
+}
+
 FcBool
 FcStrSetEqual (FcStrSet *sa, FcStrSet *sb)
 {
@@ -1234,6 +1312,41 @@ FcStrSetAdd (FcStrSet *set, const FcChar8 *s)
 }
 
 FcBool
+FcStrSetAddTriple (FcStrSet *set, const FcChar8 *a, const FcChar8 *b, const FcChar8 *c)
+{
+    FcChar8 *new = FcStrMakeTriple (a, b, c);
+    if (!new)
+	return FcFalse;
+    if (!_FcStrSetAppend (set, new))
+    {
+	FcStrFree (new);
+	return FcFalse;
+    }
+    return FcTrue;
+}
+
+const FcChar8 *
+FcStrTripleSecond (FcChar8 *str)
+{
+    FcChar8 *second = str + strlen((char *) str) + 1;
+
+    if (*second == '\0')
+	return 0;
+    return second;
+}
+
+const FcChar8 *
+FcStrTripleThird (FcChar8 *str)
+{
+    FcChar8 *second = str + strlen ((char *) str) + 1;
+    FcChar8 *third = second + strlen ((char *) second) + 1;
+
+    if (*third == '\0')
+	return 0;
+    return third;
+}
+
+FcBool
 FcStrSetAddFilename (FcStrSet *set, const FcChar8 *s)
 {
     FcChar8 *new = FcStrCopyFilename (s);
@@ -1245,6 +1358,43 @@ FcStrSetAddFilename (FcStrSet *set, const FcChar8 *s)
 	return FcFalse;
     }
     return FcTrue;
+}
+
+FcBool
+FcStrSetAddFilenamePairWithSalt (FcStrSet *set, const FcChar8 *a, const FcChar8 *b, const FcChar8 *salt)
+{
+    FcChar8 *new_a = NULL;
+    FcChar8 *new_b = NULL;
+    FcChar8 *rs = NULL;
+    FcBool  ret;
+
+    if (a)
+    {
+	new_a = FcStrCopyFilename (a);
+	if (!new_a)
+	    return FcFalse;
+    }
+    if (b)
+    {
+	new_b = FcStrCopyFilename(b);
+	if (!new_b)
+	{
+	    if (new_a)
+		FcStrFree(new_a);
+	    return FcFalse;
+	}
+    }
+    /* Override maps with new one if exists */
+    if (FcStrSetMemberAB (set, new_a, new_b, &rs))
+    {
+	FcStrSetDel (set, rs);
+    }
+    ret = FcStrSetAddTriple (set, new_a, new_b, salt);
+    if (new_a)
+	FcStrFree (new_a);
+    if (new_b)
+	FcStrFree (new_b);
+    return ret;
 }
 
 FcBool
@@ -1310,6 +1460,22 @@ FcStrSetDel (FcStrSet *set, const FcChar8 *s)
 	    return FcTrue;
 	}
     return FcFalse;
+}
+
+FcBool
+FcStrSetDeleteAll (FcStrSet *set)
+{
+    int i;
+
+    if (FcRefIsConst (&set->ref))
+	return FcFalse;
+
+    for (i = set->num; i > 0; i--)
+    {
+	FcStrFree (set->strs[i - 1]);
+	set->num--;
+    }
+    return FcTrue;
 }
 
 /* TODO Make public */

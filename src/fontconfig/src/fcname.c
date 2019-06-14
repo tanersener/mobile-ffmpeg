@@ -242,6 +242,24 @@ FcNameConstant (const FcChar8 *string, int *result)
 }
 
 FcBool
+FcNameConstantWithObjectCheck (const FcChar8 *string, const char *object, int *result)
+{
+    const FcConstant	*c;
+
+    if ((c = FcNameGetConstant(string)))
+    {
+	if (strcmp (c->object, object) != 0)
+	{
+	    fprintf (stderr, "Fontconfig error: Unexpected constant name `%s' used for object `%s': should be `%s'\n", string, object, c->object);
+	    return FcFalse;
+	}
+	*result = c->value;
+	return FcTrue;
+    }
+    return FcFalse;
+}
+
+FcBool
 FcNameBool (const FcChar8 *v, FcBool *result)
 {
     char    c0, c1;
@@ -287,7 +305,7 @@ FcNameBool (const FcChar8 *v, FcBool *result)
 }
 
 static FcValue
-FcNameConvert (FcType type, FcChar8 *string)
+FcNameConvert (FcType type, const char *object, FcChar8 *string)
 {
     FcValue	v;
     FcMatrix	m;
@@ -297,7 +315,7 @@ FcNameConvert (FcType type, FcChar8 *string)
     v.type = type;
     switch ((int) v.type) {
     case FcTypeInteger:
-	if (!FcNameConstant (string, &v.u.i))
+	if (!FcNameConstantWithObjectCheck (string, object, &v.u.i))
 	    v.u.i = atoi ((char *) string);
 	break;
     case FcTypeString:
@@ -338,8 +356,8 @@ FcNameConvert (FcType type, FcChar8 *string)
 	    ec = malloc (len + 1);
 	    if (sc && ec && sscanf ((char *) string, "[%s %[^]]]", sc, ec) == 2)
 	    {
-		if (FcNameConstant ((const FcChar8 *) sc, &si) &&
-		    FcNameConstant ((const FcChar8 *) ec, &ei))
+		if (FcNameConstantWithObjectCheck ((const FcChar8 *) sc, object, &si) &&
+		    FcNameConstantWithObjectCheck ((const FcChar8 *) ec, object, &ei))
 		    v.u.r =  FcRangeCreateDouble (si, ei);
 		else
 		    goto bail1;
@@ -348,7 +366,7 @@ FcNameConvert (FcType type, FcChar8 *string)
 	    {
 	    bail1:
 		v.type = FcTypeDouble;
-		if (FcNameConstant (string, &si))
+		if (FcNameConstantWithObjectCheck (string, object, &si))
 		{
 		    v.u.d = (double) si;
 		} else {
@@ -461,7 +479,7 @@ FcNameParse (const FcChar8 *name)
 		    name = FcNameFindNext (name, ":,", save, &delim);
 		    if (t)
 		    {
-			v = FcNameConvert (t->type, save);
+			v = FcNameConvert (t->type, t->object, save);
 			if (!FcPatternAdd (pat, t->object, v, FcTrue))
 			{
 			    FcValueDestroy (v);

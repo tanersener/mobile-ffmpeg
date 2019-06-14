@@ -1,26 +1,33 @@
 <!-- This is the Document Type Definition for font configuration files -->
-<!ELEMENT fontconfig (dir | 
+<!ELEMENT fontconfig (alias |
 		      cache | 
 		      cachedir |
-		      include | 
 		      config |
-		      selectfont |
-		      match | 
-		      alias)* >
+		      description |
+		      dir |
+		      include |
+		      match |
+		      remap-dir |
+		      reset-dirs |
+		      selectfont)* >
 
 <!-- 
     Add a directory that provides fonts
 -->
 <!ELEMENT dir (#PCDATA)>
 <!ATTLIST dir
-	  prefix    CDATA       "default"
-	  xml:space (default|preserve) 'preserve'>
+	  prefix    (default|xdg|relative|cwd)    "default"
+	  xml:space (default|preserve)            'preserve'>
 
 <!--
     Define the per-user file that holds cache font information.
 
     If the filename begins with '~', it is replaced with the users
     home directory path.
+
+    If 'prefix' is 'default' or 'cwd', then the current working directory will be added prior to the value.
+    If 'prefix' is 'xdg', then the value in the $XDG_DATA_HOME will be added prior to the value.
+    If 'prefix' is 'relative', then the path of curent file will be added prior to the value.
 -->
 <!ELEMENT cache (#PCDATA)>
 <!ATTLIST cache xml:space (default|preserve) 'preserve'>
@@ -38,6 +45,16 @@
 <!ATTLIST cachedir
 	  prefix    CDATA      "default"
 	  xml:space (default|preserve) 'preserve'>
+
+<!--
+    Set a string as a description for the targeted config file
+
+    Set 'domain' to change where to pull translations from.
+    This will be done through gettext.
+-->
+<!ELEMENT description (#PCDATA)>
+<!ATTLIST description
+	  domain	CDATA	"fontconfig-conf">
 
 <!--
     Reference another configuration file; note that this
@@ -94,6 +111,21 @@
 	</edit>
     </match>
 -->
+
+<!--
+    Map a font path as the path "as-path"
+-->
+<!ELEMENT remap-dir (#PCDATA)>
+<!ATTLIST remap-dir
+          as-path   CDATA                       #REQUIRED
+          prefix    (default|xdg|relative|cwd)  "default"
+	  xml:space (default|preserve)          "preserve">
+
+<!--
+    Reset the list of fonts directories
+-->
+<!ELEMENT reset-dirs >
+
 <!--
     Periodically rescan the font configuration and
     directories to synch internal state with filesystem

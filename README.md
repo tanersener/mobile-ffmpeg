@@ -54,7 +54,7 @@ FFmpeg for Android and iOS / tvOS
 ### 2. Using
 Binaries are available at [Github](https://github.com/tanersener/mobile-ffmpeg/releases), [JCenter](https://bintray.com/bintray/jcenter) and [CocoaPods](https://cocoapods.org). 
 
-Refer to [Using iOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-iOS-Universal-Binaries) guide to import iOS /tvOS universal binaries released at [Github](https://github.com/tanersener/mobile-ffmpeg/releases).
+Refer to [Using iOS Universal Binaries](https://github.com/tanersener/mobile-ffmpeg/wiki/Using-iOS-Universal-Binaries) guide to import iOS / tvOS universal binaries released at [Github](https://github.com/tanersener/mobile-ffmpeg/releases).
 
 There are eight different binary packages. Below you can see which system libraries and external libraries are enabled in each of them.
 
@@ -109,9 +109,7 @@ There are eight different binary packages. Below you can see which system librar
 
  - Since `v4.2`, `chromaprint`, `sdl` and `tesseract` libraries are not included in binary releases. You can still build them and include in your releases
  
- - `AVFoundation` is not available on `tvOS`
- 
- - `VideoToolbox` is not available on `tvOS` LTS releases
+ - `AVFoundation` is not available on `tvOS`, `VideoToolbox` is not available on `tvOS` LTS releases
 
 #### 2.1 Android
 1. Add MobileFFmpeg dependency from `jcenter()`

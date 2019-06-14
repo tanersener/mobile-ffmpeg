@@ -21,7 +21,7 @@
 # DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
 # TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
-set -eu
+set -e
 
 case "$OSTYPE" in
     msys ) MyPWD=`pwd -W` ;;  # On Msys/MinGW, returns a MS Windows style path.
@@ -33,4 +33,11 @@ BUILDTESTDIR=${builddir-"$MyPWD"}
 
 RUNNER=../test/test-conf$EXEEXT
 
-$RUNNER $TESTDIR/../conf.d/90-synthetic.conf $TESTDIR/test-90-synthetic.json
+for i in \
+	60-generic.conf \
+	90-synthetic.conf \
+    ; do
+    test_json=$(echo test-$i|sed s'/\.conf/.json/')
+    echo $RUNNER $TESTDIR/../conf.d/$i $TESTDIR/$test_json
+    $RUNNER $TESTDIR/../conf.d/$i $TESTDIR/$test_json
+done

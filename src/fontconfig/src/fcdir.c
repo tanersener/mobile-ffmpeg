@@ -413,7 +413,6 @@ FcDirCacheRead (const FcChar8 *dir, FcBool force, FcConfig *config)
 {
     FcCache		*cache = NULL;
 
-    FcDirCacheCreateUUID ((FcChar8 *) dir, FcFalse, config);
     /* Try to use existing cache file */
     if (!force)
 	cache = FcDirCacheLoad (dir, config, NULL);
@@ -421,13 +420,6 @@ FcDirCacheRead (const FcChar8 *dir, FcBool force, FcConfig *config)
     /* Not using existing cache file, construct new cache */
     if (!cache)
 	cache = FcDirCacheScan (dir, config);
-    if (cache)
-    {
-	FcFontSet *fs = FcCacheSet (cache);
-
-	if (cache->dirs_count == 0 && (!fs || fs->nfont == 0))
-	    FcDirCacheDeleteUUID (dir, config);
-    }
 
     return cache;
 }
