@@ -12,21 +12,13 @@ Pod::Spec.new do |s|
     s.license           = { :type => "GPL-3.0", :file => "mobileffmpeg.framework/LICENSE" }
 
     s.platform          = :ios
-    s.platform          = :tvos
-
     s.requires_arc      = true
     s.libraries         = 'z', 'bz2', 'c++'
 
-    s.source            = { :http => "https://github.com/tanersener/mobile-ffmpeg/releases/download/vVERSION/mobile-ffmpeg-https-gpl-VERSION-ios-tvos-framework.zip" }
+    s.source            = { :http => "https://github.com/tanersener/mobile-ffmpeg/releases/download/vVERSION/mobile-ffmpeg-https-gpl-VERSION-ios-framework.zip" }
 
     s.ios.deployment_target = '9.3'
-    s.ios.frameworks    = 'AudioToolbox','CoreMedia','VideoToolbox'
-    s.ios.vendored_frameworks  = 'ios/mobileffmpeg.framework', 'ios/libavcodec.framework', 'ios/libavdevice.framework', 'ios/libavfilter.framework', 'ios/libavformat.framework', 'ios/libavutil.framework', 'ios/libswresample.framework', 'ios/libswscale.framework', 'ios/gmp.framework', 'ios/gnutls.framework', 'ios/libcharset.framework', 'ios/libhogweed.framework', 'ios/libiconv.framework', 'ios/libnettle.framework', 'ios/libvidstab.framework', 'ios/x264.framework', 'ios/x265.framework', 'ios/xvidcore.framework'
-    s.ios.preserve_paths       = 'ios/*.framework'
-
-    s.tvos.deployment_target = '9.2'
-    s.tvos.frameworks   = 'AudioToolbox','CoreMedia','VideoToolbox'
-    s.tvos.vendored_frameworks  = 'tvos/mobileffmpeg.framework', 'tvos/libavcodec.framework', 'tvos/libavdevice.framework', 'tvos/libavfilter.framework', 'tvos/libavformat.framework', 'tvos/libavutil.framework', 'tvos/libswresample.framework', 'tvos/libswscale.framework', 'tvos/gmp.framework', 'tvos/gnutls.framework', 'tvos/libcharset.framework', 'tvos/libhogweed.framework', 'tvos/libiconv.framework', 'tvos/libnettle.framework', 'tvos/libvidstab.framework', 'tvos/x264.framework', 'tvos/x265.framework', 'tvos/xvidcore.framework'
-    s.tvos.preserve_paths       = 'tvos/*.framework'
+    s.ios.frameworks    = 'AudioToolbox','AVFoundation','CoreMedia','VideoToolbox'
+    s.ios.vendored_frameworks = 'mobileffmpeg.framework', 'libavcodec.framework', 'libavdevice.framework', 'libavfilter.framework', 'libavformat.framework', 'libavutil.framework', 'libswresample.framework', 'libswscale.framework', 'gmp.framework', 'gnutls.framework', 'libcharset.framework', 'libhogweed.framework', 'libiconv.framework', 'libnettle.framework', 'libvidstab.framework', 'x264.framework', 'x265.framework', 'xvidcore.framework'
 
 end  

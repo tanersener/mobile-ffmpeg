@@ -13,7 +13,7 @@ export GPL_PACKAGES="--enable-gpl --enable-libvidstab --enable-x264 --enable-x26
 export FULL_PACKAGES="--enable-fontconfig --enable-freetype --enable-fribidi --enable-gmp --enable-gnutls --enable-kvazaar --enable-lame --enable-libaom --enable-libass --enable-libiconv --enable-libilbc --enable-libtheora --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libxml2 --enable-opencore-amr --enable-opus --enable-shine --enable-snappy --enable-soxr --enable-speex --enable-twolame --enable-wavpack"
 
 create_package() {
-    local PACKAGE_NAME="mobile-ffmpeg-$1"
+    local PACKAGE_NAME="mobile-ffmpeg-tvos-$1"
     local PACKAGE_VERSION="$2"
 
     local CURRENT_PACKAGE="${COCOA_PACKAGE}/${PACKAGE_NAME}"
@@ -22,10 +22,10 @@ create_package() {
 
     cp -r ${SOURCE_PACKAGE}/* ${CURRENT_PACKAGE} || exit 1
     cd ${CURRENT_PACKAGE} || exit 1
-    zip -r "../mobile-ffmpeg-$1-$2-tvos-framework.zip" * || exit 1
+    zip -r "../mobile-ffmpeg-$1-${PACKAGE_VERSION}-tvos-framework.zip" * || exit 1
 
     # COPY PODSPEC AS THE LAST ITEM
-    cp ${BASEDIR}/ios/${PACKAGE_NAME}.podspec ${CURRENT_PACKAGE} || exit 1
+    cp ${BASEDIR}/tvos/${PACKAGE_NAME}.podspec ${CURRENT_PACKAGE} || exit 1
     sed -i '' "s/VERSION/${PACKAGE_VERSION}/g" ${CURRENT_PACKAGE}/${PACKAGE_NAME}.podspec || exit 1
 
     mkdir -p ${ALL_UNIVERSAL_PACKAGES} || exit 1
@@ -37,6 +37,8 @@ create_package() {
     cp -r ${UNIVERSAL_PACKAGE}/mobile-ffmpeg-universal/include/* ${CURRENT_UNIVERSAL_PACKAGE}/include || exit 1
     cp -r ${UNIVERSAL_PACKAGE}/ffmpeg-universal/include/* ${CURRENT_UNIVERSAL_PACKAGE}/include || exit 1
     cp ${UNIVERSAL_PACKAGE}/ffmpeg-universal/LICENSE ${CURRENT_UNIVERSAL_PACKAGE}/LICENSE || exit 1
+
+    zip -r "${ALL_UNIVERSAL_PACKAGES}/mobile-ffmpeg-$1-${PACKAGE_VERSION}-tvos-static-universal.zip" ${CURRENT_UNIVERSAL_PACKAGE} || exit 1
 }
 
 if [[ $# -ne 1 ]];

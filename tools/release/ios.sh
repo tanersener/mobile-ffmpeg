@@ -37,6 +37,8 @@ create_package() {
     cp -r ${UNIVERSAL_PACKAGE}/mobile-ffmpeg-universal/include/* ${CURRENT_UNIVERSAL_PACKAGE}/include || exit 1
     cp -r ${UNIVERSAL_PACKAGE}/ffmpeg-universal/include/* ${CURRENT_UNIVERSAL_PACKAGE}/include || exit 1
     cp ${UNIVERSAL_PACKAGE}/ffmpeg-universal/LICENSE ${CURRENT_UNIVERSAL_PACKAGE}/LICENSE || exit 1
+
+    zip -r "${ALL_UNIVERSAL_PACKAGES}/${PACKAGE_NAME}-${PACKAGE_VERSION}-ios-static-universal.zip" ${CURRENT_UNIVERSAL_PACKAGE} || exit 1
 }
 
 if [[ $# -ne 1 ]];
