@@ -173,25 +173,20 @@ static INLINE int adjust_strength(int strength, int32_t var) {
   return var ? (strength * (4 + i) + 8) >> 4 : 0;
 }
 
-void cdef_filter_fb(uint8_t *dst8, uint16_t *dst16, int dstride, uint16_t *in,
-                    int xdec, int ydec, int dir[CDEF_NBLOCKS][CDEF_NBLOCKS],
-                    int *dirinit, int var[CDEF_NBLOCKS][CDEF_NBLOCKS], int pli,
-                    cdef_list *dlist, int cdef_count, int level,
-                    int sec_strength, int pri_damping, int sec_damping,
-                    int coeff_shift) {
+void av1_cdef_filter_fb(uint8_t *dst8, uint16_t *dst16, int dstride,
+                        uint16_t *in, int xdec, int ydec,
+                        int dir[CDEF_NBLOCKS][CDEF_NBLOCKS], int *dirinit,
+                        int var[CDEF_NBLOCKS][CDEF_NBLOCKS], int pli,
+                        cdef_list *dlist, int cdef_count, int level,
+                        int sec_strength, int damping, int coeff_shift) {
   int bi;
   int bx;
   int by;
-  int bsize, bsizex, bsizey;
-
-  int pri_strength = level << coeff_shift;
+  const int pri_strength = level << coeff_shift;
   sec_strength <<= coeff_shift;
-  sec_damping += coeff_shift - (pli != AOM_PLANE_Y);
-  pri_damping += coeff_shift - (pli != AOM_PLANE_Y);
-  bsize =
-      ydec ? (xdec ? BLOCK_4X4 : BLOCK_8X4) : (xdec ? BLOCK_4X8 : BLOCK_8X8);
-  bsizex = 3 - xdec;
-  bsizey = 3 - ydec;
+  damping += coeff_shift - (pli != AOM_PLANE_Y);
+  const int bw_log2 = 3 - xdec;
+  const int bh_log2 = 3 - ydec;
   if (dirinit && pri_strength == 0 && sec_strength == 0) {
     // If we're here, both primary and secondary strengths are 0, and
     // we still haven't written anything to y[] yet, so we just copy
@@ -200,12 +195,12 @@ void cdef_filter_fb(uint8_t *dst8, uint16_t *dst16, int dstride, uint16_t *in,
     for (bi = 0; bi < cdef_count; bi++) {
       by = dlist[bi].by;
       bx = dlist[bi].bx;
-      int iy, ix;
       // TODO(stemidts/jmvalin): SIMD optimisations
-      for (iy = 0; iy < 1 << bsizey; iy++)
-        for (ix = 0; ix < 1 << bsizex; ix++)
-          dst16[(bi << (bsizex + bsizey)) + (iy << bsizex) + ix] =
-              in[((by << bsizey) + iy) * CDEF_BSTRIDE + (bx << bsizex) + ix];
+      for (int iy = 0; iy < 1 << bh_log2; iy++) {
+        memcpy(&dst16[(bi << (bw_log2 + bh_log2)) + (iy << bw_log2)],
+               &in[((by << bh_log2) + iy) * CDEF_BSTRIDE + (bx << bw_log2)],
+               (1 << bw_log2) * sizeof(*dst16));
+      }
     }
     return;
   }
@@ -231,25 +226,28 @@ void cdef_filter_fb(uint8_t *dst8, uint16_t *dst16, int dstride, uint16_t *in,
     }
   }
 
+  const int bsize =
+      ydec ? (xdec ? BLOCK_4X4 : BLOCK_8X4) : (xdec ? BLOCK_4X8 : BLOCK_8X8);
+  const int t = pri_strength;
+  const int s = sec_strength;
   for (bi = 0; bi < cdef_count; bi++) {
-    int t = pri_strength;
-    int s = sec_strength;
     by = dlist[bi].by;
     bx = dlist[bi].bx;
-    if (dst8)
+    if (dst8) {
       cdef_filter_block(
-          &dst8[(by << bsizey) * dstride + (bx << bsizex)], NULL, dstride,
-          &in[(by * CDEF_BSTRIDE << bsizey) + (bx << bsizex)],
+          &dst8[(by << bh_log2) * dstride + (bx << bw_log2)], NULL, dstride,
+          &in[(by * CDEF_BSTRIDE << bh_log2) + (bx << bw_log2)],
           (pli ? t : adjust_strength(t, var[by][bx])), s, t ? dir[by][bx] : 0,
-          pri_damping, sec_damping, bsize, coeff_shift);
-    else
+          damping, damping, bsize, coeff_shift);
+    } else {
       cdef_filter_block(
           NULL,
-          &dst16[dirinit ? bi << (bsizex + bsizey)
-                         : (by << bsizey) * dstride + (bx << bsizex)],
-          dirinit ? 1 << bsizex : dstride,
-          &in[(by * CDEF_BSTRIDE << bsizey) + (bx << bsizex)],
+          &dst16[dirinit ? bi << (bw_log2 + bh_log2)
+                         : (by << bh_log2) * dstride + (bx << bw_log2)],
+          dirinit ? 1 << bw_log2 : dstride,
+          &in[(by * CDEF_BSTRIDE << bh_log2) + (bx << bw_log2)],
           (pli ? t : adjust_strength(t, var[by][bx])), s, t ? dir[by][bx] : 0,
-          pri_damping, sec_damping, bsize, coeff_shift);
+          damping, damping, bsize, coeff_shift);
+    }
   }
 }

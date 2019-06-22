@@ -12,6 +12,7 @@
 list(APPEND AOM_TEST_DATA_FILE_NAMES
             "hantro_collage_w352h288.yuv"
             "hantro_odd.yuv"
+            "paris_352_288_30.y4m"
             "park_joy_90p_10_420.y4m"
             "park_joy_90p_10_422.y4m"
             "park_joy_90p_10_444.y4m"
@@ -536,8 +537,12 @@ if(CONFIG_AV1_DECODER)
               "invalid-oss-fuzz-11477.ivf.res"
               "invalid-oss-fuzz-11479.ivf"
               "invalid-oss-fuzz-11479.ivf.res"
+              "invalid-oss-fuzz-11479.ivf.res.2"
               "invalid-oss-fuzz-11523.ivf"
               "invalid-oss-fuzz-11523.ivf.res"
+              "invalid-oss-fuzz-11523.ivf.res.2"
+              "invalid-oss-fuzz-15363.ivf"
+              "invalid-oss-fuzz-15363.ivf.res"
               "invalid-oss-fuzz-9288.ivf"
               "invalid-oss-fuzz-9288.ivf.res"
               "invalid-oss-fuzz-9463.ivf"
@@ -625,7 +630,7 @@ endfunction()
 # writes it to $local_path.
 function(download_test_file file_url file_checksum local_path)
   message("Downloading ${file_url} ...")
-  file(DOWNLOAD "${file_url}" "${local_path}" SHOW_PROGRESS
-       EXPECTED_HASH SHA1=${file_checksum})
+  file(DOWNLOAD "${file_url}" "${local_path}" SHOW_PROGRESS EXPECTED_HASH
+                                              SHA1=${file_checksum})
   message("Download of ${file_url} complete.")
 endfunction()

@@ -99,10 +99,10 @@ void av1_crc32c_calculator_init(CRC32C *p_crc32c) {
 /* Table-driven software version as a fall-back.  This is about 15 times slower
  than using the hardware instructions.  This assumes little-endian integers,
  as is the case on Intel processors that the assembler code here is for. */
-uint32_t av1_get_crc32c_value_c(CRC32C *p, uint8_t *buf, size_t len) {
+uint32_t av1_get_crc32c_value_c(void *c, uint8_t *buf, size_t len) {
   const uint8_t *next = (const uint8_t *)(buf);
   uint64_t crc;
-
+  CRC32C *p = (CRC32C *)c;
   crc = 0 ^ 0xffffffff;
   while (len && ((uintptr_t)next & 7) != 0) {
     crc = p->table[0][(crc ^ *next++) & 0xff] ^ (crc >> 8);

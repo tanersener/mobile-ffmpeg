@@ -26,11 +26,15 @@
 extern "C" {
 #endif
 
-#define MAX_REF_MV_SERCH 3
+#define MAX_REF_MV_SEARCH 3
 #define DEFAULT_LUMA_INTERP_SKIP_FLAG 1
 #define DEFAULT_CHROMA_INTERP_SKIP_FLAG 2
 #define DEFAULT_INTERP_SKIP_FLAG \
   (DEFAULT_LUMA_INTERP_SKIP_FLAG | DEFAULT_CHROMA_INTERP_SKIP_FLAG)
+#define INTER_INTRA_RD_THRESH_SCALE 9
+#define INTER_INTRA_RD_THRESH_SHIFT 4
+#define COMP_TYPE_RD_THRESH_SCALE 11
+#define COMP_TYPE_RD_THRESH_SHIFT 4
 
 struct TileInfo;
 struct macroblock;
@@ -117,11 +121,20 @@ unsigned int av1_high_get_sby_perpixel_variance(const struct AV1_COMP *cpi,
                                                 const struct buf_2d *ref,
                                                 BLOCK_SIZE bs, int bd);
 
+#if !CONFIG_REALTIME_ONLY
 void av1_rd_pick_inter_mode_sb(struct AV1_COMP *cpi,
                                struct TileDataEnc *tile_data,
                                struct macroblock *x, int mi_row, int mi_col,
                                struct RD_STATS *rd_cost, BLOCK_SIZE bsize,
                                PICK_MODE_CONTEXT *ctx, int64_t best_rd_so_far);
+#endif
+
+void av1_fast_nonrd_pick_inter_mode_sb(struct AV1_COMP *cpi,
+                                       struct TileDataEnc *tile_data,
+                                       struct macroblock *x, int mi_row,
+                                       int mi_col, struct RD_STATS *rd_cost,
+                                       BLOCK_SIZE bsize, PICK_MODE_CONTEXT *ctx,
+                                       int64_t best_rd_so_far);
 
 void av1_nonrd_pick_inter_mode_sb(struct AV1_COMP *cpi,
                                   struct TileDataEnc *tile_data,
@@ -155,8 +168,8 @@ EdgeInfo av1_edge_exists(const uint8_t *src, int src_stride, int w, int h,
 /** Applies a Gaussian blur with sigma = 1.3. Used by av1_edge_exists and
  * tests.
  */
-void gaussian_blur(const uint8_t *src, int src_stride, int w, int h,
-                   uint8_t *dst, bool high_bd, int bd);
+void av1_gaussian_blur(const uint8_t *src, int src_stride, int w, int h,
+                       uint8_t *dst, bool high_bd, int bd);
 
 /* Applies standard 3x3 Sobel matrix. */
 typedef struct {
@@ -164,7 +177,8 @@ typedef struct {
   int16_t y;
 } sobel_xy;
 
-sobel_xy sobel(const uint8_t *input, int stride, int i, int j, bool high_bd);
+sobel_xy av1_sobel(const uint8_t *input, int stride, int i, int j,
+                   bool high_bd);
 
 void av1_inter_mode_data_init(struct TileDataEnc *tile_data);
 void av1_inter_mode_data_fit(TileDataEnc *tile_data, int rdmult);

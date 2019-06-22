@@ -221,7 +221,8 @@ TEST_P(WedgeUtilsSSEOptTest, ExtremeValues) {
 // av1_wedge_sign_from_residuals
 //////////////////////////////////////////////////////////////////////////////
 
-typedef int (*FSign)(const int16_t *ds, const uint8_t *m, int N, int64_t limit);
+typedef int8_t (*FSign)(const int16_t *ds, const uint8_t *m, int N,
+                        int64_t limit);
 typedef libaom_test::FuncParam<FSign> TestFuncsFSign;
 
 class WedgeUtilsSignOptTest : public FunctionEquivalenceTest<FSign> {

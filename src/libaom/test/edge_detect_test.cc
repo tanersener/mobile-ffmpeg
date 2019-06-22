@@ -168,8 +168,8 @@ TEST_P(EdgeDetectBrightnessTest, BlurUniformBrightness) {
   const bool high_bd = GET_PARAM(3);
   const int bd = GET_PARAM(4);
 
-  gaussian_blur(input_, stride_8tap(width), width, height, output_, high_bd,
-                bd);
+  av1_gaussian_blur(input_, stride_8tap(width), width, height, output_, high_bd,
+                    bd);
   for (int i = 0; i < width * height; ++i) {
     ASSERT_EQ(brightness, get_pix(output_, i, high_bd));
   }
@@ -276,7 +276,7 @@ static void hardcoded_blur_test_aux(const bool high_bd) {
     }
     uint8_t *output = malloc_bd(w * h, high_bd);
     uint8_t *padded = pad_8tap_convolve(luma, w, h, high_bd);
-    gaussian_blur(padded, stride_8tap(w), w, h, output, high_bd, bd);
+    av1_gaussian_blur(padded, stride_8tap(w), w, h, output, high_bd, bd);
     for (int i = 0; i < w * h; ++i) {
       ASSERT_EQ(expected[i], get_pix(output, i, high_bd));
     }
@@ -292,7 +292,7 @@ static void hardcoded_blur_test_aux(const bool high_bd) {
       }
       uint8_t *output = malloc_bd(w * h, high_bd);
       uint8_t *padded = pad_8tap_convolve(scaled_luma, w, h, high_bd);
-      gaussian_blur(padded, stride_8tap(w), w, h, output, high_bd, bd);
+      av1_gaussian_blur(padded, stride_8tap(w), w, h, output, high_bd, bd);
       for (int i = 0; i < w * h; ++i) {
         ASSERT_GE(c / 2, abs(expected[i] * c - get_pix(output, i, high_bd)));
       }
@@ -312,20 +312,20 @@ TEST(EdgeDetectImageTest, SobelTest) {
   const uint8_t buf[9] = { 241, 147, 7, 90, 184, 103, 28, 186, 2 };
   const int stride = 3;
   bool high_bd = false;
-  sobel_xy result = sobel(buf, stride, 1, 1, high_bd);
+  sobel_xy result = av1_sobel(buf, stride, 1, 1, high_bd);
   ASSERT_EQ(234, result.x);
   ASSERT_EQ(140, result.y);
 
   // Verify it works for 8-bit values in a high bit-depth buffer.
   const uint16_t buf8_16[9] = { 241, 147, 7, 90, 184, 103, 28, 186, 2 };
   high_bd = true;
-  result = sobel(CONVERT_TO_BYTEPTR(buf8_16), stride, 1, 1, high_bd);
+  result = av1_sobel(CONVERT_TO_BYTEPTR(buf8_16), stride, 1, 1, high_bd);
   ASSERT_EQ(234, result.x);
   ASSERT_EQ(140, result.y);
 
   // Verify it works for high bit-depth values as well.
   const uint16_t buf16[9] = { 241, 147, 7, 90, 184, 2003, 1028, 186, 2 };
-  result = sobel(CONVERT_TO_BYTEPTR(buf16), stride, 1, 1, high_bd);
+  result = av1_sobel(CONVERT_TO_BYTEPTR(buf16), stride, 1, 1, high_bd);
   ASSERT_EQ(-2566, result.x);
   ASSERT_EQ(-860, result.y);
 }

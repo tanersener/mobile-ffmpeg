@@ -86,6 +86,7 @@ void av1_subtract_txb(MACROBLOCK *x, int plane, BLOCK_SIZE plane_bsize,
 void av1_subtract_plane(MACROBLOCK *x, BLOCK_SIZE bsize, int plane) {
   struct macroblock_plane *const p = &x->plane[plane];
   const struct macroblockd_plane *const pd = &x->e_mbd.plane[plane];
+  assert(bsize < BLOCK_SIZES_ALL);
   const BLOCK_SIZE plane_bsize =
       get_plane_block_size(bsize, pd->subsampling_x, pd->subsampling_y);
   const int bw = block_size_wide[plane_bsize];
@@ -478,10 +479,11 @@ void av1_encode_sb(const struct AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
 
   if (x->skip) return;
 
+  assert(bsize < BLOCK_SIZES_ALL);
+
   for (plane = 0; plane < num_planes; ++plane) {
     const int subsampling_x = xd->plane[plane].subsampling_x;
     const int subsampling_y = xd->plane[plane].subsampling_y;
-
     if (!is_chroma_reference(mi_row, mi_col, bsize, subsampling_x,
                              subsampling_y))
       continue;
@@ -493,6 +495,7 @@ void av1_encode_sb(const struct AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
     const struct macroblockd_plane *const pd = &xd->plane[plane];
     const BLOCK_SIZE plane_bsize =
         get_plane_block_size(bsizec, pd->subsampling_x, pd->subsampling_y);
+    assert(plane_bsize < BLOCK_SIZES_ALL);
     const int mi_width = block_size_wide[plane_bsize] >> tx_size_wide_log2[0];
     const int mi_height = block_size_high[plane_bsize] >> tx_size_high_log2[0];
     const TX_SIZE max_tx_size = get_vartx_max_txsize(xd, plane_bsize, plane);
@@ -638,6 +641,7 @@ void av1_encode_intra_block_plane(const struct AV1_COMP *cpi, MACROBLOCK *x,
   const MACROBLOCKD *const xd = &x->e_mbd;
   ENTROPY_CONTEXT ta[MAX_MIB_SIZE] = { 0 };
   ENTROPY_CONTEXT tl[MAX_MIB_SIZE] = { 0 };
+  assert(bsize < BLOCK_SIZES_ALL);
 
   struct encode_b_args arg = {
     cpi, x, NULL, &(xd->mi[0]->skip), ta, tl, enable_optimize_b

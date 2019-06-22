@@ -385,7 +385,7 @@ static void create_enc_workers(AV1_COMP *cpi, int num_workers) {
                   aom_calloc(num_workers, sizeof(*cpi->tile_thr_data)));
 
 #if CONFIG_MULTITHREAD
-  if (cpi->row_mt == 1) {
+  if (cpi->oxcf.row_mt == 1) {
     if (cpi->row_mt_mutex_ == NULL) {
       CHECK_MEM_ERROR(cm, cpi->row_mt_mutex_,
                       aom_malloc(sizeof(*(cpi->row_mt_mutex_))));
@@ -454,6 +454,8 @@ static void create_enc_workers(AV1_COMP *cpi, int num_workers) {
           cm, thread_data->td->palette_buffer,
           aom_memalign(16, sizeof(*thread_data->td->palette_buffer)));
 
+      av1_alloc_compound_type_rd_buffers(cm, &thread_data->td->comp_rd_buffer);
+
       CHECK_MEM_ERROR(
           cm, thread_data->td->tmp_conv_dst,
           aom_memalign(32, MAX_SB_SIZE * MAX_SB_SIZE *
@@ -473,7 +475,7 @@ static void create_enc_workers(AV1_COMP *cpi, int num_workers) {
       // Main thread acts as a worker and uses the thread data in cpi.
       thread_data->td = &cpi->td;
     }
-    if (cpi->row_mt == 1)
+    if (cpi->oxcf.row_mt == 1)
       CHECK_MEM_ERROR(
           cm, thread_data->td->tctx,
           (FRAME_CONTEXT *)aom_memalign(16, sizeof(*thread_data->td->tctx)));
@@ -518,6 +520,8 @@ static void accumulate_counters_enc_workers(AV1_COMP *cpi, int num_workers) {
     AVxWorker *const worker = &cpi->workers[i];
     EncWorkerData *const thread_data = (EncWorkerData *)worker->data1;
     cpi->intrabc_used |= thread_data->td->intrabc_used;
+    cpi->deltaq_used |= thread_data->td->deltaq_used;
+
     // Accumulate counters.
     if (i > 0) {
       av1_accumulate_frame_counts(&cpi->counts, thread_data->td->counts);
@@ -541,6 +545,7 @@ static void prepare_enc_workers(AV1_COMP *cpi, AVxWorkerHook hook,
     worker->data2 = NULL;
 
     thread_data->td->intrabc_used = 0;
+    thread_data->td->deltaq_used = 0;
 
     // Before encoding a frame, copy the thread data from cpi.
     if (thread_data->td != &cpi->td) {
@@ -569,6 +574,7 @@ static void prepare_enc_workers(AV1_COMP *cpi, AVxWorkerHook hook,
 
     if (i > 0) {
       thread_data->td->mb.palette_buffer = thread_data->td->palette_buffer;
+      thread_data->td->mb.comp_rd_buffer = thread_data->td->comp_rd_buffer;
       thread_data->td->mb.tmp_conv_dst = thread_data->td->tmp_conv_dst;
       for (int j = 0; j < 2; ++j) {
         thread_data->td->mb.tmp_obmc_bufs[j] =

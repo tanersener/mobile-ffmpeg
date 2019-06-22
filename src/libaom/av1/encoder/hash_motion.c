@@ -170,8 +170,10 @@ int32_t av1_has_exact_match(hash_table *p_hash_table, uint32_t hash_value1,
   Iterator iterator =
       aom_vector_begin(p_hash_table->p_lookup_table[hash_value1]);
   Iterator last = aom_vector_end(p_hash_table->p_lookup_table[hash_value1]);
-  for (; !iterator_equals(&iterator, &last); iterator_increment(&iterator)) {
-    if ((*(block_hash *)iterator_get(&iterator)).hash_value2 == hash_value2) {
+  for (; !aom_iterator_equals(&iterator, &last);
+       aom_iterator_increment(&iterator)) {
+    if ((*(block_hash *)aom_iterator_get(&iterator)).hash_value2 ==
+        hash_value2) {
       return 1;
     }
   }

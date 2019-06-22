@@ -88,39 +88,39 @@ void av1_setup_scale_factors_for_frame(struct scale_factors *sf, int other_w,
   // AV1 convolve functions
   // Special case convolve functions should produce the same result as
   // av1_convolve_2d.
-  // subpel_x_q4 == 0 && subpel_y_q4 == 0
+  // subpel_x_qn == 0 && subpel_y_qn == 0
   sf->convolve[0][0][0] = av1_convolve_2d_copy_sr;
-  // subpel_x_q4 == 0
+  // subpel_x_qn == 0
   sf->convolve[0][1][0] = av1_convolve_y_sr;
-  // subpel_y_q4 == 0
+  // subpel_y_qn == 0
   sf->convolve[1][0][0] = av1_convolve_x_sr;
-  // subpel_x_q4 != 0 && subpel_y_q4 != 0
+  // subpel_x_qn != 0 && subpel_y_qn != 0
   sf->convolve[1][1][0] = av1_convolve_2d_sr;
-  // subpel_x_q4 == 0 && subpel_y_q4 == 0
+  // subpel_x_qn == 0 && subpel_y_qn == 0
   sf->convolve[0][0][1] = av1_dist_wtd_convolve_2d_copy;
-  // subpel_x_q4 == 0
+  // subpel_x_qn == 0
   sf->convolve[0][1][1] = av1_dist_wtd_convolve_y;
-  // subpel_y_q4 == 0
+  // subpel_y_qn == 0
   sf->convolve[1][0][1] = av1_dist_wtd_convolve_x;
-  // subpel_x_q4 != 0 && subpel_y_q4 != 0
+  // subpel_x_qn != 0 && subpel_y_qn != 0
   sf->convolve[1][1][1] = av1_dist_wtd_convolve_2d;
   // AV1 High BD convolve functions
   // Special case convolve functions should produce the same result as
   // av1_highbd_convolve_2d.
-  // subpel_x_q4 == 0 && subpel_y_q4 == 0
+  // subpel_x_qn == 0 && subpel_y_qn == 0
   sf->highbd_convolve[0][0][0] = av1_highbd_convolve_2d_copy_sr;
-  // subpel_x_q4 == 0
+  // subpel_x_qn == 0
   sf->highbd_convolve[0][1][0] = av1_highbd_convolve_y_sr;
-  // subpel_y_q4 == 0
+  // subpel_y_qn == 0
   sf->highbd_convolve[1][0][0] = av1_highbd_convolve_x_sr;
-  // subpel_x_q4 != 0 && subpel_y_q4 != 0
+  // subpel_x_qn != 0 && subpel_y_qn != 0
   sf->highbd_convolve[1][1][0] = av1_highbd_convolve_2d_sr;
-  // subpel_x_q4 == 0 && subpel_y_q4 == 0
+  // subpel_x_qn == 0 && subpel_y_qn == 0
   sf->highbd_convolve[0][0][1] = av1_highbd_dist_wtd_convolve_2d_copy;
-  // subpel_x_q4 == 0
+  // subpel_x_qn == 0
   sf->highbd_convolve[0][1][1] = av1_highbd_dist_wtd_convolve_y;
-  // subpel_y_q4 == 0
+  // subpel_y_qn == 0
   sf->highbd_convolve[1][0][1] = av1_highbd_dist_wtd_convolve_x;
-  // subpel_x_q4 != 0 && subpel_y_q4 != 0
+  // subpel_x_qn != 0 && subpel_y_qn != 0
   sf->highbd_convolve[1][1][1] = av1_highbd_dist_wtd_convolve_2d;
 }

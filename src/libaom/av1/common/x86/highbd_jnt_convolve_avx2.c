@@ -25,14 +25,14 @@
 void av1_highbd_dist_wtd_convolve_2d_copy_avx2(
     const uint16_t *src, int src_stride, uint16_t *dst0, int dst_stride0, int w,
     int h, const InterpFilterParams *filter_params_x,
-    const InterpFilterParams *filter_params_y, const int subpel_x_q4,
-    const int subpel_y_q4, ConvolveParams *conv_params, int bd) {
+    const InterpFilterParams *filter_params_y, const int subpel_x_qn,
+    const int subpel_y_qn, ConvolveParams *conv_params, int bd) {
   CONV_BUF_TYPE *dst = conv_params->dst;
   int dst_stride = conv_params->dst_stride;
   (void)filter_params_x;
   (void)filter_params_y;
-  (void)subpel_x_q4;
-  (void)subpel_y_q4;
+  (void)subpel_x_qn;
+  (void)subpel_y_qn;
 
   const int bits =
       FILTER_BITS * 2 - conv_params->round_1 - conv_params->round_0;
@@ -231,8 +231,8 @@ void av1_highbd_dist_wtd_convolve_2d_copy_avx2(
 void av1_highbd_dist_wtd_convolve_2d_avx2(
     const uint16_t *src, int src_stride, uint16_t *dst0, int dst_stride0, int w,
     int h, const InterpFilterParams *filter_params_x,
-    const InterpFilterParams *filter_params_y, const int subpel_x_q4,
-    const int subpel_y_q4, ConvolveParams *conv_params, int bd) {
+    const InterpFilterParams *filter_params_y, const int subpel_x_qn,
+    const int subpel_y_qn, ConvolveParams *conv_params, int bd) {
   DECLARE_ALIGNED(32, int16_t, im_block[(MAX_SB_SIZE + MAX_FILTER_TAP) * 8]);
   CONV_BUF_TYPE *dst = conv_params->dst;
   int dst_stride = conv_params->dst_stride;
@@ -277,8 +277,8 @@ void av1_highbd_dist_wtd_convolve_2d_avx2(
   const __m256i clip_pixel_to_bd =
       _mm256_set1_epi16(bd == 10 ? 1023 : (bd == 12 ? 4095 : 255));
 
-  prepare_coeffs(filter_params_x, subpel_x_q4, coeffs_x);
-  prepare_coeffs(filter_params_y, subpel_y_q4, coeffs_y);
+  prepare_coeffs(filter_params_x, subpel_x_qn, coeffs_x);
+  prepare_coeffs(filter_params_y, subpel_y_qn, coeffs_y);
 
   for (j = 0; j < w; j += 8) {
     /* Horizontal filter */
@@ -467,15 +467,15 @@ void av1_highbd_dist_wtd_convolve_2d_avx2(
 void av1_highbd_dist_wtd_convolve_x_avx2(
     const uint16_t *src, int src_stride, uint16_t *dst0, int dst_stride0, int w,
     int h, const InterpFilterParams *filter_params_x,
-    const InterpFilterParams *filter_params_y, const int subpel_x_q4,
-    const int subpel_y_q4, ConvolveParams *conv_params, int bd) {
+    const InterpFilterParams *filter_params_y, const int subpel_x_qn,
+    const int subpel_y_qn, ConvolveParams *conv_params, int bd) {
   CONV_BUF_TYPE *dst = conv_params->dst;
   int dst_stride = conv_params->dst_stride;
   const int fo_horiz = filter_params_x->taps / 2 - 1;
   const uint16_t *const src_ptr = src - fo_horiz;
   const int bits = FILTER_BITS - conv_params->round_1;
   (void)filter_params_y;
-  (void)subpel_y_q4;
+  (void)subpel_y_qn;
 
   int i, j;
   __m256i s[4], coeffs_x[4];
@@ -504,7 +504,7 @@ void av1_highbd_dist_wtd_convolve_x_avx2(
       _mm256_set1_epi16(bd == 10 ? 1023 : (bd == 12 ? 4095 : 255));
 
   assert(bits >= 0);
-  prepare_coeffs(filter_params_x, subpel_x_q4, coeffs_x);
+  prepare_coeffs(filter_params_x, subpel_x_qn, coeffs_x);
 
   for (j = 0; j < w; j += 8) {
     /* Horizontal filter */
@@ -636,15 +636,15 @@ void av1_highbd_dist_wtd_convolve_x_avx2(
 void av1_highbd_dist_wtd_convolve_y_avx2(
     const uint16_t *src, int src_stride, uint16_t *dst0, int dst_stride0, int w,
     int h, const InterpFilterParams *filter_params_x,
-    const InterpFilterParams *filter_params_y, const int subpel_x_q4,
-    const int subpel_y_q4, ConvolveParams *conv_params, int bd) {
+    const InterpFilterParams *filter_params_y, const int subpel_x_qn,
+    const int subpel_y_qn, ConvolveParams *conv_params, int bd) {
   CONV_BUF_TYPE *dst = conv_params->dst;
   int dst_stride = conv_params->dst_stride;
   const int fo_vert = filter_params_y->taps / 2 - 1;
   const uint16_t *const src_ptr = src - fo_vert * src_stride;
   const int bits = FILTER_BITS - conv_params->round_0;
   (void)filter_params_x;
-  (void)subpel_x_q4;
+  (void)subpel_x_qn;
 
   assert(bits >= 0);
   int i, j;
@@ -672,7 +672,7 @@ void av1_highbd_dist_wtd_convolve_y_avx2(
       _mm256_set1_epi16(bd == 10 ? 1023 : (bd == 12 ? 4095 : 255));
   const __m256i zero = _mm256_setzero_si256();
 
-  prepare_coeffs(filter_params_y, subpel_y_q4, coeffs_y);
+  prepare_coeffs(filter_params_y, subpel_y_qn, coeffs_y);
 
   for (j = 0; j < w; j += 8) {
     const uint16_t *data = &src_ptr[j];

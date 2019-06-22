@@ -214,6 +214,7 @@ static void set_chroma_coefficient_fallback_soln(aom_equation_system_t *eqns) {
 
 int aom_noise_strength_lut_init(aom_noise_strength_lut_t *lut, int num_points) {
   if (!lut) return 0;
+  lut->num_points = 0;
   lut->points = (double(*)[2])aom_malloc(num_points * sizeof(*lut->points));
   if (!lut->points) return 0;
   lut->num_points = num_points;
@@ -426,6 +427,9 @@ int aom_flat_block_finder_init(aom_flat_block_finder_t *block_finder,
   double *AtA_inv = 0;
   double *A = 0;
   int x = 0, y = 0, i = 0, j = 0;
+  block_finder->A = NULL;
+  block_finder->AtA_inv = NULL;
+
   if (!equation_system_init(&eqns, kLowPolyNumParams)) {
     fprintf(stderr, "Failed to init equation system for block_size=%d\n",
             block_size);

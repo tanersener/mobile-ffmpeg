@@ -453,6 +453,6 @@ const int8_t *av1_nz_map_ctx_offset[19] = {
   av1_nz_map_ctx_offset_64x32,  // TX_64x16
 };
 
-const int16_t k_eob_group_start[12] = { 0,  1,  2,  3,   5,   9,
-                                        17, 33, 65, 129, 257, 513 };
-const int16_t k_eob_offset_bits[12] = { 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+const int16_t av1_eob_group_start[12] = { 0,  1,  2,  3,   5,   9,
+                                          17, 33, 65, 129, 257, 513 };
+const int16_t av1_eob_offset_bits[12] = { 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };

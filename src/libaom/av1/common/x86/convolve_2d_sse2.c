@@ -22,7 +22,7 @@ void av1_convolve_2d_sr_sse2(const uint8_t *src, int src_stride, uint8_t *dst,
                              int dst_stride, int w, int h,
                              const InterpFilterParams *filter_params_x,
                              const InterpFilterParams *filter_params_y,
-                             const int subpel_x_q4, const int subpel_y_q4,
+                             const int subpel_x_qn, const int subpel_y_qn,
                              ConvolveParams *conv_params) {
   const int bd = 8;
 
@@ -45,7 +45,7 @@ void av1_convolve_2d_sr_sse2(const uint8_t *src, int src_stride, uint8_t *dst,
   /* Horizontal filter */
   {
     const int16_t *x_filter = av1_get_interp_filter_subpel_kernel(
-        filter_params_x, subpel_x_q4 & SUBPEL_MASK);
+        filter_params_x, subpel_x_qn & SUBPEL_MASK);
     const __m128i coeffs_x = _mm_loadu_si128((__m128i *)x_filter);
 
     // coeffs 0 1 0 1 2 3 2 3
@@ -111,7 +111,7 @@ void av1_convolve_2d_sr_sse2(const uint8_t *src, int src_stride, uint8_t *dst,
   /* Vertical filter */
   {
     const int16_t *y_filter = av1_get_interp_filter_subpel_kernel(
-        filter_params_y, subpel_y_q4 & SUBPEL_MASK);
+        filter_params_y, subpel_y_qn & SUBPEL_MASK);
     const __m128i coeffs_y = _mm_loadu_si128((__m128i *)y_filter);
 
     // coeffs 0 1 0 1 2 3 2 3
@@ -240,12 +240,12 @@ void av1_convolve_2d_copy_sr_sse2(const uint8_t *src, int src_stride,
                                   uint8_t *dst, int dst_stride, int w, int h,
                                   const InterpFilterParams *filter_params_x,
                                   const InterpFilterParams *filter_params_y,
-                                  const int subpel_x_q4, const int subpel_y_q4,
+                                  const int subpel_x_qn, const int subpel_y_qn,
                                   ConvolveParams *conv_params) {
   (void)filter_params_x;
   (void)filter_params_y;
-  (void)subpel_x_q4;
-  (void)subpel_y_q4;
+  (void)subpel_x_qn;
+  (void)subpel_y_qn;
   (void)conv_params;
 
   if (w >= 16) {
@@ -357,15 +357,15 @@ void av1_convolve_2d_copy_sr_sse2(const uint8_t *src, int src_stride,
 void av1_dist_wtd_convolve_2d_copy_sse2(
     const uint8_t *src, int src_stride, uint8_t *dst0, int dst_stride0, int w,
     int h, const InterpFilterParams *filter_params_x,
-    const InterpFilterParams *filter_params_y, const int subpel_x_q4,
-    const int subpel_y_q4, ConvolveParams *conv_params) {
+    const InterpFilterParams *filter_params_y, const int subpel_x_qn,
+    const int subpel_y_qn, ConvolveParams *conv_params) {
   const int bd = 8;
   CONV_BUF_TYPE *dst = conv_params->dst;
   int dst_stride = conv_params->dst_stride;
   (void)filter_params_x;
   (void)filter_params_y;
-  (void)subpel_x_q4;
-  (void)subpel_y_q4;
+  (void)subpel_x_qn;
+  (void)subpel_y_qn;
 
   const int bits =
       FILTER_BITS * 2 - conv_params->round_1 - conv_params->round_0;

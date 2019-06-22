@@ -386,7 +386,7 @@ void aom_blend_a64_mask_sse4_1(uint8_t *dst, uint32_t dst_stride,
                                const uint8_t *src0, uint32_t src0_stride,
                                const uint8_t *src1, uint32_t src1_stride,
                                const uint8_t *mask, uint32_t mask_stride, int w,
-                               int h, int subx, int suby) {
+                               int h, int subw, int subh) {
   typedef void (*blend_fn)(
       uint8_t * dst, uint32_t dst_stride, const uint8_t *src0,
       uint32_t src0_stride, const uint8_t *src1, uint32_t src1_stride,
@@ -415,9 +415,9 @@ void aom_blend_a64_mask_sse4_1(uint8_t *dst, uint32_t dst_stride,
 
   if (UNLIKELY((h | w) & 3)) {  // if (w <= 2 || h <= 2)
     aom_blend_a64_mask_c(dst, dst_stride, src0, src0_stride, src1, src1_stride,
-                         mask, mask_stride, w, h, subx, suby);
+                         mask, mask_stride, w, h, subw, subh);
   } else {
-    blend[(w >> 2) & 3][subx != 0][suby != 0](dst, dst_stride, src0,
+    blend[(w >> 2) & 3][subw != 0][subh != 0](dst, dst_stride, src0,
                                               src0_stride, src1, src1_stride,
                                               mask, mask_stride, w, h);
   }
@@ -819,13 +819,13 @@ void aom_highbd_blend_a64_mask_sse4_1(uint8_t *dst_8, uint32_t dst_stride,
                                       const uint8_t *src1_8,
                                       uint32_t src1_stride, const uint8_t *mask,
                                       uint32_t mask_stride, int w, int h,
-                                      int subx, int suby, int bd) {
+                                      int subw, int subh, int bd) {
   typedef void (*blend_fn)(
       uint16_t * dst, uint32_t dst_stride, const uint16_t *src0,
       uint32_t src0_stride, const uint16_t *src1, uint32_t src1_stride,
       const uint8_t *mask, uint32_t mask_stride, int w, int h);
 
-  // Dimensions are: bd_index X width_index X subx X suby
+  // Dimensions are: bd_index X width_index X subw X subh
   static const blend_fn blend[2][2][2][2] = {
     {   // bd == 8 or 10
       { // w % 8 == 0
@@ -858,14 +858,14 @@ void aom_highbd_blend_a64_mask_sse4_1(uint8_t *dst_8, uint32_t dst_stride,
   assert(bd == 8 || bd == 10 || bd == 12);
   if (UNLIKELY((h | w) & 3)) {  // if (w <= 2 || h <= 2)
     aom_highbd_blend_a64_mask_c(dst_8, dst_stride, src0_8, src0_stride, src1_8,
-                                src1_stride, mask, mask_stride, w, h, subx,
-                                suby, bd);
+                                src1_stride, mask, mask_stride, w, h, subw,
+                                subh, bd);
   } else {
     uint16_t *const dst = CONVERT_TO_SHORTPTR(dst_8);
     const uint16_t *const src0 = CONVERT_TO_SHORTPTR(src0_8);
     const uint16_t *const src1 = CONVERT_TO_SHORTPTR(src1_8);
 
-    blend[bd == 12][(w >> 2) & 1][subx != 0][suby != 0](
+    blend[bd == 12][(w >> 2) & 1][subw != 0][subh != 0](
         dst, dst_stride, src0, src0_stride, src1, src1_stride, mask,
         mask_stride, w, h);
   }

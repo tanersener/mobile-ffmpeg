@@ -36,20 +36,20 @@ macro(setup_aom_install_targets)
     add_library(aom_pc ${AOM_PKG_CONFIG_SOURCES})
 
     # Setup a rule to generate aom.pc.
-    add_custom_command(OUTPUT "${AOM_PKG_CONFIG_FILE}"
-                       COMMAND
-                         ${CMAKE_COMMAND} ARGS
-                         -DAOM_CONFIG_DIR=${AOM_CONFIG_DIR}
-                         -DAOM_ROOT=${AOM_ROOT}
-                         -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                         -DCMAKE_INSTALL_BINDIR=${CMAKE_INSTALL_BINDIR}
-                         -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
-                         -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}
-                         -DCMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
-                         -DCONFIG_MULTITHREAD=${CONFIG_MULTITHREAD}
-                         -DHAVE_PTHREAD_H=${HAVE_PTHREAD_H} -P
-                         "${AOM_ROOT}/build/cmake/pkg_config.cmake"
-                       COMMENT "Writing aom.pc" VERBATIM)
+    add_custom_command(
+      OUTPUT "${AOM_PKG_CONFIG_FILE}"
+      COMMAND ${CMAKE_COMMAND} ARGS
+              -DAOM_CONFIG_DIR=${AOM_CONFIG_DIR} -DAOM_ROOT=${AOM_ROOT}
+              -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
+              -DCMAKE_INSTALL_BINDIR=${CMAKE_INSTALL_BINDIR}
+              -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
+              -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}
+              -DCMAKE_PROJECT_NAME=${CMAKE_PROJECT_NAME}
+              -DCONFIG_MULTITHREAD=${CONFIG_MULTITHREAD}
+              -DHAVE_PTHREAD_H=${HAVE_PTHREAD_H} -P
+              "${AOM_ROOT}/build/cmake/pkg_config.cmake"
+      COMMENT "Writing aom.pc"
+      VERBATIM)
 
     # Explicitly add a dependency on the pkg-config file to ensure it's built.
     get_property(aom_pc_sources TARGET aom_pc PROPERTY SOURCES)
@@ -75,10 +75,12 @@ macro(setup_aom_install_targets)
     set(AOM_INSTALL_LIBS aom)
 
     # Setup the install rules.
-    install(FILES ${AOM_INSTALL_INCS} DESTINATION
-                  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/aom")
-    install(FILES "${AOM_PKG_CONFIG_FILE}" DESTINATION
-                  "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig")
+    install(
+      FILES ${AOM_INSTALL_INCS}
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/aom")
+    install(
+      FILES "${AOM_PKG_CONFIG_FILE}"
+      DESTINATION "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig")
     install(TARGETS ${AOM_INSTALL_LIBS} DESTINATION
                     "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 

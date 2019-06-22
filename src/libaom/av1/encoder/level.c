@@ -221,9 +221,13 @@ typedef enum {
   LUMA_PIC_SIZE_TOO_LARGE,
   LUMA_PIC_H_SIZE_TOO_LARGE,
   LUMA_PIC_V_SIZE_TOO_LARGE,
+  LUMA_PIC_H_SIZE_TOO_SMALL,
+  LUMA_PIC_V_SIZE_TOO_SMALL,
   TOO_MANY_TILE_COLUMNS,
   TOO_MANY_TILES,
+  TILE_RATE_TOO_HIGH,
   TILE_TOO_LARGE,
+  SUPERRES_TILE_WIDTH_TOO_LARGE,
   CROPPED_TILE_WIDTH_TOO_SMALL,
   CROPPED_TILE_HEIGHT_TOO_SMALL,
   TILE_WIDTH_INVALID,
@@ -231,6 +235,9 @@ typedef enum {
   DISPLAY_RATE_TOO_HIGH,
   DECODE_RATE_TOO_HIGH,
   CR_TOO_SMALL,
+  TILE_SIZE_HEADER_RATE_TOO_HIGH,
+  BITRATE_TOO_HIGH,
+  DECODER_MODEL_FAIL,
 
   TARGET_LEVEL_FAIL_IDS,
   TARGET_LEVEL_OK,
@@ -240,35 +247,518 @@ static const char *level_fail_messages[TARGET_LEVEL_FAIL_IDS] = {
   "The picture size is too large.",
   "The picture width is too large.",
   "The picture height is too large.",
+  "The picture width is too small.",
+  "The picture height is too small.",
   "Too many tile columns are used.",
   "Too many tiles are used.",
+  "The tile rate is too high.",
   "The tile size is too large.",
-  "The cropped tile width is less than 8",
-  "The cropped tile height is less than 8",
-  "The tile width is invalid",
-  "The frame header rate is too high",
-  "The display luma sample rate is too high",
-  "The decoded luma sample rate is too high",
-  "The compression ratio is too small",
+  "The superres tile width is too large.",
+  "The cropped tile width is less than 8.",
+  "The cropped tile height is less than 8.",
+  "The tile width is invalid.",
+  "The frame header rate is too high.",
+  "The display luma sample rate is too high.",
+  "The decoded luma sample rate is too high.",
+  "The compression ratio is too small.",
+  "The product of max tile size and header rate is too high.",
+  "The bitrate is too high.",
+  "The decoder model fails.",
 };
+
+static double get_max_bitrate(const AV1LevelSpec *const level_spec, int tier,
+                              BITSTREAM_PROFILE profile) {
+  if (level_spec->level < SEQ_LEVEL_4_0) tier = 0;
+  const double bitrate_basis =
+      (tier ? level_spec->high_mbps : level_spec->main_mbps) * 1e6;
+  const double bitrate_profile_factor =
+      profile == PROFILE_0 ? 1.0 : (profile == PROFILE_1 ? 2.0 : 3.0);
+  return bitrate_basis * bitrate_profile_factor;
+}
+
+// We assume time t to be valid if and only if t >= 0.0.
+// So INVALID_TIME can be defined as anything less than 0.
+#define INVALID_TIME (-1.0)
+
+// This corresponds to "free_buffer" in the spec.
+static void release_buffer(DECODER_MODEL *const decoder_model, int idx) {
+  assert(idx >= 0 && idx < BUFFER_POOL_MAX_SIZE);
+  FRAME_BUFFER *const this_buffer = &decoder_model->frame_buffer_pool[idx];
+  this_buffer->decoder_ref_count = 0;
+  this_buffer->player_ref_count = 0;
+  this_buffer->display_index = -1;
+  this_buffer->presentation_time = INVALID_TIME;
+}
+
+static void initialize_buffer_pool(DECODER_MODEL *const decoder_model) {
+  for (int i = 0; i < BUFFER_POOL_MAX_SIZE; ++i) {
+    release_buffer(decoder_model, i);
+  }
+  for (int i = 0; i < REF_FRAMES; ++i) {
+    decoder_model->vbi[i] = -1;
+  }
+}
+
+static int get_free_buffer(DECODER_MODEL *const decoder_model) {
+  for (int i = 0; i < BUFFER_POOL_MAX_SIZE; ++i) {
+    const FRAME_BUFFER *const this_buffer =
+        &decoder_model->frame_buffer_pool[i];
+    if (this_buffer->decoder_ref_count == 0 &&
+        this_buffer->player_ref_count == 0)
+      return i;
+  }
+  return -1;
+}
+
+static void update_ref_buffers(DECODER_MODEL *const decoder_model, int idx,
+                               int refresh_frame_flags) {
+  FRAME_BUFFER *const this_buffer = &decoder_model->frame_buffer_pool[idx];
+  for (int i = 0; i < REF_FRAMES; ++i) {
+    if (refresh_frame_flags & (1 << i)) {
+      const int pre_idx = decoder_model->vbi[i];
+      if (pre_idx != -1) {
+        --decoder_model->frame_buffer_pool[pre_idx].decoder_ref_count;
+      }
+      decoder_model->vbi[i] = idx;
+      ++this_buffer->decoder_ref_count;
+    }
+  }
+}
+
+// The time (in seconds) required to decode a frame.
+static double time_to_decode_frame(const AV1_COMMON *const cm,
+                                   int64_t max_decode_rate) {
+  if (cm->show_existing_frame) return 0.0;
+
+  const FRAME_TYPE frame_type = cm->current_frame.frame_type;
+  int luma_samples = 0;
+  if (frame_type == KEY_FRAME || frame_type == INTRA_ONLY_FRAME) {
+    luma_samples = cm->superres_upscaled_width * cm->height;
+  } else {
+    const int spatial_layer_dimensions_present_flag = 0;
+    if (spatial_layer_dimensions_present_flag) {
+      assert(0 && "Spatial layer dimensions not supported yet.");
+    } else {
+      const SequenceHeader *const seq_params = &cm->seq_params;
+      const int max_frame_width = seq_params->max_frame_width;
+      const int max_frame_height = seq_params->max_frame_height;
+      luma_samples = max_frame_width * max_frame_height;
+    }
+  }
+
+  return luma_samples / (double)max_decode_rate;
+}
+
+// Release frame buffers that are no longer needed for decode or display.
+// It corresponds to "start_decode_at_removal_time" in the spec.
+static void release_processed_frames(DECODER_MODEL *const decoder_model,
+                                     double removal_time) {
+  for (int i = 0; i < BUFFER_POOL_MAX_SIZE; ++i) {
+    FRAME_BUFFER *const this_buffer = &decoder_model->frame_buffer_pool[i];
+    if (this_buffer->player_ref_count > 0) {
+      if (this_buffer->presentation_time >= 0.0 &&
+          this_buffer->presentation_time <= removal_time) {
+        this_buffer->player_ref_count = 0;
+        if (this_buffer->decoder_ref_count == 0) {
+          release_buffer(decoder_model, i);
+        }
+      }
+    }
+  }
+}
+
+static int frames_in_buffer_pool(const DECODER_MODEL *const decoder_model) {
+  int frames_in_pool = 0;
+  for (int i = 0; i < BUFFER_POOL_MAX_SIZE; ++i) {
+    const FRAME_BUFFER *const this_buffer =
+        &decoder_model->frame_buffer_pool[i];
+    if (this_buffer->decoder_ref_count > 0 ||
+        this_buffer->player_ref_count > 0) {
+      ++frames_in_pool;
+    }
+  }
+  return frames_in_pool;
+}
+
+static double get_presentation_time(const DECODER_MODEL *const decoder_model,
+                                    int display_index) {
+  if (decoder_model->mode == SCHEDULE_MODE) {
+    assert(0 && "SCHEDULE_MODE NOT SUPPORTED");
+    return INVALID_TIME;
+  } else {
+    const double initial_presentation_delay =
+        decoder_model->initial_presentation_delay;
+    // Can't decide presentation time until the initial presentation delay is
+    // known.
+    if (initial_presentation_delay < 0.0) return INVALID_TIME;
+
+    return initial_presentation_delay +
+           display_index * decoder_model->num_ticks_per_picture *
+               decoder_model->display_clock_tick;
+  }
+}
+
+#define MAX_TIME 1e16
+double time_next_buffer_is_free(const DECODER_MODEL *const decoder_model) {
+  if (decoder_model->num_decoded_frame == 0) {
+    return (double)decoder_model->decoder_buffer_delay / 90000.0;
+  }
+
+  double buf_free_time = MAX_TIME;
+  for (int i = 0; i < BUFFER_POOL_MAX_SIZE; ++i) {
+    const FRAME_BUFFER *const this_buffer =
+        &decoder_model->frame_buffer_pool[i];
+    if (this_buffer->decoder_ref_count == 0) {
+      if (this_buffer->player_ref_count == 0) {
+        return decoder_model->current_time;
+      }
+      const double presentation_time = this_buffer->presentation_time;
+      if (presentation_time >= 0.0 && presentation_time < buf_free_time) {
+        buf_free_time = presentation_time;
+      }
+    }
+  }
+  return buf_free_time < MAX_TIME ? buf_free_time : INVALID_TIME;
+}
+#undef MAX_TIME
+
+static double get_removal_time(const DECODER_MODEL *const decoder_model) {
+  if (decoder_model->mode == SCHEDULE_MODE) {
+    assert(0 && "SCHEDULE_MODE IS NOT SUPPORTED YET");
+    return INVALID_TIME;
+  } else {
+    return time_next_buffer_is_free(decoder_model);
+  }
+}
+
+void av1_decoder_model_print_status(const DECODER_MODEL *const decoder_model) {
+  printf(
+      "\n status %d, num_frame %3d, num_decoded_frame %3d, "
+      "num_shown_frame %3d, current time %6.2f, frames in buffer %2d, "
+      "presentation delay %6.2f, total interval %6.2f\n",
+      decoder_model->status, decoder_model->num_frame,
+      decoder_model->num_decoded_frame, decoder_model->num_shown_frame,
+      decoder_model->current_time, frames_in_buffer_pool(decoder_model),
+      decoder_model->initial_presentation_delay,
+      decoder_model->dfg_interval_queue.total_interval);
+  for (int i = 0; i < 10; ++i) {
+    const FRAME_BUFFER *const this_buffer =
+        &decoder_model->frame_buffer_pool[i];
+    printf("buffer %d, decode count %d, display count %d, present time %6.4f\n",
+           i, this_buffer->decoder_ref_count, this_buffer->player_ref_count,
+           this_buffer->presentation_time);
+  }
+}
+
+// op_index is the operating point index.
+void av1_decoder_model_init(const AV1_COMP *const cpi, AV1_LEVEL level,
+                            int op_index, DECODER_MODEL *const decoder_model) {
+  aom_clear_system_state();
+
+  decoder_model->status = DECODER_MODEL_OK;
+  decoder_model->level = level;
+
+  const AV1_COMMON *const cm = &cpi->common;
+  const SequenceHeader *const seq_params = &cm->seq_params;
+  decoder_model->bit_rate = get_max_bitrate(
+      av1_level_defs + level, seq_params->tier[op_index], seq_params->profile);
+
+  // TODO(huisu or anyone): implement SCHEDULE_MODE.
+  decoder_model->mode = RESOURCE_MODE;
+  decoder_model->encoder_buffer_delay = 20000;
+  decoder_model->decoder_buffer_delay = 70000;
+  decoder_model->is_low_delay_mode = false;
+
+  decoder_model->first_bit_arrival_time = 0.0;
+  decoder_model->last_bit_arrival_time = 0.0;
+  decoder_model->coded_bits = 0;
+
+  decoder_model->removal_time = INVALID_TIME;
+  decoder_model->presentation_time = INVALID_TIME;
+  decoder_model->decode_samples = 0;
+  decoder_model->display_samples = 0;
+  decoder_model->max_decode_rate = 0.0;
+  decoder_model->max_display_rate = 0.0;
+
+  decoder_model->num_frame = -1;
+  decoder_model->num_decoded_frame = -1;
+  decoder_model->num_shown_frame = -1;
+  decoder_model->current_time = 0.0;
+
+  initialize_buffer_pool(decoder_model);
+
+  DFG_INTERVAL_QUEUE *const dfg_interval_queue =
+      &decoder_model->dfg_interval_queue;
+  dfg_interval_queue->total_interval = 0.0;
+  dfg_interval_queue->head = 0;
+  dfg_interval_queue->size = 0;
+
+  if (cm->timing_info_present) {
+    decoder_model->num_ticks_per_picture =
+        cm->timing_info.num_ticks_per_picture;
+    decoder_model->display_clock_tick =
+        cm->timing_info.num_units_in_display_tick / cm->timing_info.time_scale;
+  } else {
+    decoder_model->num_ticks_per_picture = 1;
+    decoder_model->display_clock_tick = 1.0 / cpi->framerate;
+  }
+
+  decoder_model->initial_display_delay =
+      cm->op_params[op_index].initial_display_delay;
+  decoder_model->initial_presentation_delay = INVALID_TIME;
+  decoder_model->decode_rate = av1_level_defs[level].max_decode_rate;
+}
+
+void av1_decoder_model_process_frame(const AV1_COMP *const cpi,
+                                     size_t coded_bits,
+                                     DECODER_MODEL *const decoder_model) {
+  if (!decoder_model || decoder_model->status != DECODER_MODEL_OK) return;
+
+  aom_clear_system_state();
+
+  const AV1_COMMON *const cm = &cpi->common;
+  const int luma_pic_size = cm->superres_upscaled_width * cm->height;
+  const int show_existing_frame = cm->show_existing_frame;
+  const int show_frame = cm->show_frame || show_existing_frame;
+  ++decoder_model->num_frame;
+  if (!show_existing_frame) ++decoder_model->num_decoded_frame;
+  if (show_frame) ++decoder_model->num_shown_frame;
+  decoder_model->coded_bits += coded_bits;
+
+  int display_idx = -1;
+  if (show_existing_frame) {
+    display_idx = decoder_model->vbi[cpi->existing_fb_idx_to_show];
+    if (display_idx < 0) {
+      decoder_model->status = DECODE_EXISTING_FRAME_BUF_EMPTY;
+      return;
+    }
+    if (decoder_model->frame_buffer_pool[display_idx].frame_type == KEY_FRAME) {
+      update_ref_buffers(decoder_model, display_idx, 0xFF);
+    }
+  } else {
+    const double removal_time = get_removal_time(decoder_model);
+    if (removal_time < 0.0) {
+      decoder_model->status = DECODE_FRAME_BUF_UNAVAILABLE;
+      return;
+    }
+
+    const int previous_decode_samples = decoder_model->decode_samples;
+    const double previous_removal_time = decoder_model->removal_time;
+    assert(previous_removal_time < removal_time);
+    decoder_model->removal_time = removal_time;
+    decoder_model->decode_samples = luma_pic_size;
+    const double this_decode_rate =
+        previous_decode_samples / (removal_time - previous_removal_time);
+    decoder_model->max_decode_rate =
+        AOMMAX(decoder_model->max_decode_rate, this_decode_rate);
+
+    // A frame with show_existing_frame being false indicates the end of a DFG.
+    // Update the bits arrival time of this DFG.
+    const double buffer_delay = (decoder_model->encoder_buffer_delay +
+                                 decoder_model->decoder_buffer_delay) /
+                                90000.0;
+    const double latest_arrival_time = removal_time - buffer_delay;
+    decoder_model->first_bit_arrival_time =
+        AOMMAX(decoder_model->last_bit_arrival_time, latest_arrival_time);
+    decoder_model->last_bit_arrival_time =
+        decoder_model->first_bit_arrival_time +
+        (double)decoder_model->coded_bits / decoder_model->bit_rate;
+    // Smoothing buffer underflows if the last bit arrives after the removal
+    // time.
+    if (decoder_model->last_bit_arrival_time > removal_time &&
+        !decoder_model->is_low_delay_mode) {
+      decoder_model->status = SMOOTHING_BUFFER_UNDERFLOW;
+      return;
+    }
+    // Reset the coded bits for the next DFG.
+    decoder_model->coded_bits = 0;
+
+    // Check if the smoothing buffer overflows.
+    DFG_INTERVAL_QUEUE *const queue = &decoder_model->dfg_interval_queue;
+    if (queue->size >= DFG_INTERVAL_QUEUE_SIZE) {
+      assert(0);
+    }
+    const double first_bit_arrival_time = decoder_model->first_bit_arrival_time;
+    const double last_bit_arrival_time = decoder_model->last_bit_arrival_time;
+    // Remove the DFGs with removal time earlier than last_bit_arrival_time.
+    while (queue->buf[queue->head].removal_time <= last_bit_arrival_time &&
+           queue->size > 0) {
+      if (queue->buf[queue->head].removal_time - first_bit_arrival_time +
+              queue->total_interval >
+          1.0) {
+        decoder_model->status = SMOOTHING_BUFFER_OVERFLOW;
+        return;
+      }
+      queue->total_interval -= queue->buf[queue->head].last_bit_arrival_time -
+                               queue->buf[queue->head].first_bit_arrival_time;
+      queue->head = (queue->head + 1) % DFG_INTERVAL_QUEUE_SIZE;
+      --queue->size;
+    }
+    // Push current DFG into the queue.
+    const int queue_index =
+        (queue->head + queue->size++) % DFG_INTERVAL_QUEUE_SIZE;
+    queue->buf[queue_index].first_bit_arrival_time = first_bit_arrival_time;
+    queue->buf[queue_index].last_bit_arrival_time = last_bit_arrival_time;
+    queue->buf[queue_index].removal_time = removal_time;
+    queue->total_interval += last_bit_arrival_time - first_bit_arrival_time;
+    // The smoothing buffer can hold at most "bit_rate" bits, which is
+    // equivalent to 1 second of total interval.
+    if (queue->total_interval > 1.0) {
+      decoder_model->status = SMOOTHING_BUFFER_OVERFLOW;
+      return;
+    }
+
+    release_processed_frames(decoder_model, removal_time);
+    decoder_model->current_time =
+        removal_time + time_to_decode_frame(cm, decoder_model->decode_rate);
+
+    const int cfbi = get_free_buffer(decoder_model);
+    if (cfbi < 0) {
+      decoder_model->status = DECODE_FRAME_BUF_UNAVAILABLE;
+      return;
+    }
+    const CurrentFrame *const current_frame = &cm->current_frame;
+    decoder_model->frame_buffer_pool[cfbi].frame_type =
+        cm->current_frame.frame_type;
+    display_idx = cfbi;
+    update_ref_buffers(decoder_model, cfbi, current_frame->refresh_frame_flags);
+
+    if (decoder_model->initial_presentation_delay < 0.0) {
+      // Display can begin after required number of frames have been buffered.
+      if (frames_in_buffer_pool(decoder_model) >=
+          decoder_model->initial_display_delay) {
+        decoder_model->initial_presentation_delay = decoder_model->current_time;
+        // Update presentation time for each shown frame in the frame buffer.
+        for (int i = 0; i < BUFFER_POOL_MAX_SIZE; ++i) {
+          FRAME_BUFFER *const this_buffer =
+              &decoder_model->frame_buffer_pool[i];
+          if (this_buffer->player_ref_count == 0) continue;
+          assert(this_buffer->display_index >= 0);
+          this_buffer->presentation_time =
+              get_presentation_time(decoder_model, this_buffer->display_index);
+        }
+      }
+    }
+  }
+
+  // Display.
+  if (show_frame) {
+    assert(display_idx >= 0 && display_idx < BUFFER_POOL_MAX_SIZE);
+    FRAME_BUFFER *const this_buffer =
+        &decoder_model->frame_buffer_pool[display_idx];
+    ++this_buffer->player_ref_count;
+    this_buffer->display_index = decoder_model->num_shown_frame;
+    const double presentation_time =
+        get_presentation_time(decoder_model, this_buffer->display_index);
+    this_buffer->presentation_time = presentation_time;
+    if (presentation_time >= 0.0 &&
+        decoder_model->current_time > presentation_time) {
+      decoder_model->status = DISPLAY_FRAME_LATE;
+      return;
+    }
+
+    const int previous_display_samples = decoder_model->display_samples;
+    const double previous_presentation_time = decoder_model->presentation_time;
+    decoder_model->display_samples = luma_pic_size;
+    decoder_model->presentation_time = presentation_time;
+    if (presentation_time >= 0.0 && previous_presentation_time >= 0.0) {
+      assert(previous_presentation_time < presentation_time);
+      const double this_display_rate =
+          previous_display_samples /
+          (presentation_time - previous_presentation_time);
+      decoder_model->max_display_rate =
+          AOMMAX(decoder_model->max_display_rate, this_display_rate);
+    }
+  }
+}
+
+void av1_init_level_info(AV1_COMP *cpi) {
+  for (int op_index = 0; op_index < MAX_NUM_OPERATING_POINTS; ++op_index) {
+    AV1LevelInfo *const this_level_info = cpi->level_info[op_index];
+    if (!this_level_info) continue;
+    memset(this_level_info, 0, sizeof(*this_level_info));
+    AV1LevelSpec *const level_spec = &this_level_info->level_spec;
+    level_spec->level = SEQ_LEVEL_MAX;
+    AV1LevelStats *const level_stats = &this_level_info->level_stats;
+    level_stats->min_cropped_tile_width = INT_MAX;
+    level_stats->min_cropped_tile_height = INT_MAX;
+    level_stats->min_frame_width = INT_MAX;
+    level_stats->min_frame_height = INT_MAX;
+    level_stats->tile_width_is_valid = 1;
+    level_stats->min_cr = 1e8;
+
+    FrameWindowBuffer *const frame_window_buffer =
+        &this_level_info->frame_window_buffer;
+    frame_window_buffer->num = 0;
+    frame_window_buffer->start = 0;
+
+    const AV1_COMMON *const cm = &cpi->common;
+    const int upscaled_width = cm->superres_upscaled_width;
+    const int height = cm->height;
+    const int pic_size = upscaled_width * height;
+    for (AV1_LEVEL level = SEQ_LEVEL_2_0; level < SEQ_LEVELS; ++level) {
+      DECODER_MODEL *const this_model = &this_level_info->decoder_models[level];
+      const AV1LevelSpec *const spec = &av1_level_defs[level];
+      if (upscaled_width > spec->max_h_size || height > spec->max_v_size ||
+          pic_size > spec->max_picture_size) {
+        // Turn off decoder model for this level as the frame size already
+        // exceeds level constraints.
+        this_model->status = DECODER_MODEL_DISABLED;
+      } else {
+        av1_decoder_model_init(cpi, level, op_index, this_model);
+      }
+    }
+  }
+}
 
 static double get_min_cr(const AV1LevelSpec *const level_spec, int tier,
                          int is_still_picture, int64_t decoded_sample_rate) {
   if (is_still_picture) return 0.8;
+  if (level_spec->level < SEQ_LEVEL_4_0) tier = 0;
   const double min_cr_basis = tier ? level_spec->high_cr : level_spec->main_cr;
   const double speed_adj =
       (double)decoded_sample_rate / level_spec->max_display_rate;
   return AOMMAX(min_cr_basis * speed_adj, 0.8);
 }
 
-static TARGET_LEVEL_FAIL_ID check_level_constraints(
-    const AV1LevelSpec *const target_level_spec,
-    const AV1LevelSpec *const level_spec,
-    const AV1LevelStats *const level_stats, int tier, int is_still_picture) {
-  const double min_cr = get_min_cr(target_level_spec, tier, is_still_picture,
-                                   level_spec->max_decode_rate);
-  TARGET_LEVEL_FAIL_ID fail_id = TARGET_LEVEL_OK;
+static void get_temporal_parallel_params(int scalability_mode_idc,
+                                         int *temporal_parallel_num,
+                                         int *temporal_parallel_denom) {
+  if (scalability_mode_idc < 0) {
+    *temporal_parallel_num = 1;
+    *temporal_parallel_denom = 1;
+    return;
+  }
 
+  // TODO(huisu@): handle scalability cases.
+  if (scalability_mode_idc == SCALABILITY_SS) {
+    (void)scalability_mode_idc;
+  } else {
+    (void)scalability_mode_idc;
+  }
+}
+
+#define MAX_TILE_SIZE (4096 * 2304)
+#define MIN_CROPPED_TILE_WIDTH 8
+#define MIN_CROPPED_TILE_HEIGHT 8
+#define MIN_FRAME_WIDTH 16
+#define MIN_FRAME_HEIGHT 16
+#define MAX_TILE_SIZE_HEADER_RATE_PRODUCT 588251136
+
+static TARGET_LEVEL_FAIL_ID check_level_constraints(
+    const AV1LevelInfo *const level_info, AV1_LEVEL level, int tier,
+    int is_still_picture, BITSTREAM_PROFILE profile) {
+  const DECODER_MODEL *const decoder_model = &level_info->decoder_models[level];
+  const DECODER_MODEL_STATUS decoder_model_status = decoder_model->status;
+  if (decoder_model_status != DECODER_MODEL_OK &&
+      decoder_model_status != DECODER_MODEL_DISABLED) {
+    return DECODER_MODEL_FAIL;
+  }
+
+  const AV1LevelSpec *const level_spec = &level_info->level_spec;
+  const AV1LevelSpec *const target_level_spec = &av1_level_defs[level];
+  const AV1LevelStats *const level_stats = &level_info->level_stats;
+  TARGET_LEVEL_FAIL_ID fail_id = TARGET_LEVEL_OK;
   do {
     if (level_spec->max_picture_size > target_level_spec->max_picture_size) {
       fail_id = LUMA_PIC_SIZE_TOO_LARGE;
@@ -300,28 +790,52 @@ static TARGET_LEVEL_FAIL_ID check_level_constraints(
       break;
     }
 
-    if (level_spec->max_display_rate > target_level_spec->max_display_rate) {
+    if (decoder_model->max_display_rate >
+        (double)target_level_spec->max_display_rate) {
       fail_id = DISPLAY_RATE_TOO_HIGH;
       break;
     }
 
+    // TODO(huisu): we are not using max decode rate calculated by the decoder
+    // model because the model in resource availability mode always returns
+    // MaxDecodeRate(as in the level definitions) as the max decode rate.
     if (level_spec->max_decode_rate > target_level_spec->max_decode_rate) {
       fail_id = DECODE_RATE_TOO_HIGH;
       break;
     }
 
-    if (level_stats->max_tile_size > 4096 * 2304) {
+    if (level_spec->max_tile_rate > target_level_spec->max_tiles * 120) {
+      fail_id = TILE_RATE_TOO_HIGH;
+      break;
+    }
+
+    if (level_stats->max_tile_size > MAX_TILE_SIZE) {
       fail_id = TILE_TOO_LARGE;
       break;
     }
 
-    if (level_stats->min_cropped_tile_width < 8) {
+    if (level_stats->max_superres_tile_width > MAX_TILE_WIDTH) {
+      fail_id = SUPERRES_TILE_WIDTH_TOO_LARGE;
+      break;
+    }
+
+    if (level_stats->min_cropped_tile_width < MIN_CROPPED_TILE_WIDTH) {
       fail_id = CROPPED_TILE_WIDTH_TOO_SMALL;
       break;
     }
 
-    if (level_stats->min_cropped_tile_height < 8) {
+    if (level_stats->min_cropped_tile_height < MIN_CROPPED_TILE_HEIGHT) {
       fail_id = CROPPED_TILE_HEIGHT_TOO_SMALL;
+      break;
+    }
+
+    if (level_stats->min_frame_width < MIN_FRAME_WIDTH) {
+      fail_id = LUMA_PIC_H_SIZE_TOO_SMALL;
+      break;
+    }
+
+    if (level_stats->min_frame_height < MIN_FRAME_HEIGHT) {
+      fail_id = LUMA_PIC_V_SIZE_TOO_SMALL;
       break;
     }
 
@@ -330,9 +844,32 @@ static TARGET_LEVEL_FAIL_ID check_level_constraints(
       break;
     }
 
+    const double min_cr = get_min_cr(target_level_spec, tier, is_still_picture,
+                                     level_spec->max_decode_rate);
     if (level_stats->min_cr < min_cr) {
       fail_id = CR_TOO_SMALL;
       break;
+    }
+
+    const double max_bitrate =
+        get_max_bitrate(target_level_spec, tier, profile);
+    if ((double)level_stats->max_bitrate > max_bitrate) {
+      fail_id = BITRATE_TOO_HIGH;
+      break;
+    }
+
+    if (target_level_spec->level > SEQ_LEVEL_5_1) {
+      int temporal_parallel_num;
+      int temporal_parallel_denom;
+      const int scalability_mode_idc = -1;
+      get_temporal_parallel_params(scalability_mode_idc, &temporal_parallel_num,
+                                   &temporal_parallel_denom);
+      const int val = level_stats->max_tile_size * level_spec->max_header_rate *
+                      temporal_parallel_denom / temporal_parallel_num;
+      if (val > MAX_TILE_SIZE_HEADER_RATE_PRODUCT) {
+        fail_id = TILE_SIZE_HEADER_RATE_TOO_HIGH;
+        break;
+      }
     }
   } while (0);
 
@@ -349,14 +886,17 @@ static INLINE int is_in_operating_point(int operating_point,
 }
 
 static void get_tile_stats(const AV1_COMP *const cpi, int *max_tile_size,
+                           int *max_superres_tile_width,
                            int *min_cropped_tile_width,
                            int *min_cropped_tile_height,
                            int *tile_width_valid) {
   const AV1_COMMON *const cm = &cpi->common;
   const int tile_cols = cm->tile_cols;
   const int tile_rows = cm->tile_rows;
+  const int superres_scale_denominator = cm->superres_scale_denominator;
 
   *max_tile_size = 0;
+  *max_superres_tile_width = 0;
   *min_cropped_tile_width = INT_MAX;
   *min_cropped_tile_height = INT_MAX;
   *tile_width_valid = 1;
@@ -371,6 +911,11 @@ static void get_tile_stats(const AV1_COMP *const cpi, int *max_tile_size,
           (tile_info->mi_row_end - tile_info->mi_row_start) * MI_SIZE;
       const int tile_size = tile_width * tile_height;
       *max_tile_size = AOMMAX(*max_tile_size, tile_size);
+
+      const int supperres_tile_width =
+          tile_width * superres_scale_denominator / SCALE_NUMERATOR;
+      *max_superres_tile_width =
+          AOMMAX(*max_superres_tile_width, supperres_tile_width);
 
       const int cropped_tile_width =
           cm->width - tile_info->mi_col_start * MI_SIZE;
@@ -392,8 +937,9 @@ static void get_tile_stats(const AV1_COMP *const cpi, int *max_tile_size,
   }
 }
 
-static int store_frame_record(int64_t ts_start, int64_t ts_end, int pic_size,
-                              int frame_header_count, int show_frame,
+static int store_frame_record(int64_t ts_start, int64_t ts_end,
+                              size_t encoded_size, int pic_size,
+                              int frame_header_count, int tiles, int show_frame,
                               int show_existing_frame,
                               FrameWindowBuffer *const buffer) {
   if (buffer->num < FRAME_WINDOW_SIZE) {
@@ -405,8 +951,10 @@ static int store_frame_record(int64_t ts_start, int64_t ts_end, int pic_size,
   FrameRecord *const record = &buffer->buf[new_idx];
   record->ts_start = ts_start;
   record->ts_end = ts_end;
+  record->encoded_size_in_bytes = encoded_size;
   record->pic_size = pic_size;
   record->frame_header_count = frame_header_count;
+  record->tiles = tiles;
   record->show_frame = show_frame;
   record->show_existing_frame = show_existing_frame;
 
@@ -439,12 +987,15 @@ static int count_frames(const FrameWindowBuffer *const buffer,
 // Scan previously encoded frames and update level metrics accordingly.
 static void scan_past_frames(const FrameWindowBuffer *const buffer,
                              int num_frames_to_scan,
-                             AV1LevelSpec *const level_spec) {
+                             AV1LevelSpec *const level_spec,
+                             AV1LevelStats *const level_stats) {
   const int num_frames_in_buffer = buffer->num;
   int index = (buffer->start + num_frames_in_buffer - 1) % FRAME_WINDOW_SIZE;
   int frame_headers = 0;
+  int tiles = 0;
   int64_t display_samples = 0;
   int64_t decoded_samples = 0;
+  size_t encoded_size_in_bytes = 0;
   for (int i = 0; i < AOMMIN(num_frames_in_buffer, num_frames_to_scan); ++i) {
     const FrameRecord *const record = &buffer->buf[index];
     if (!record->show_existing_frame) {
@@ -454,21 +1005,30 @@ static void scan_past_frames(const FrameWindowBuffer *const buffer,
     if (record->show_frame) {
       display_samples += record->pic_size;
     }
+    tiles += record->tiles;
+    encoded_size_in_bytes += record->encoded_size_in_bytes;
     --index;
     if (index < 0) index = FRAME_WINDOW_SIZE - 1;
   }
   level_spec->max_header_rate =
       AOMMAX(level_spec->max_header_rate, frame_headers);
+  // TODO(huisu): we can now compute max display rate with the decoder model, so
+  // these couple of lines can be removed. Keep them here for a while for
+  // debugging purpose.
   level_spec->max_display_rate =
       AOMMAX(level_spec->max_display_rate, display_samples);
   level_spec->max_decode_rate =
       AOMMAX(level_spec->max_decode_rate, decoded_samples);
+  level_spec->max_tile_rate = AOMMAX(level_spec->max_tile_rate, tiles);
+  level_stats->max_bitrate =
+      AOMMAX(level_stats->max_bitrate, (int)encoded_size_in_bytes * 8);
 }
 
 void av1_update_level_info(AV1_COMP *cpi, size_t size, int64_t ts_start,
                            int64_t ts_end) {
   AV1_COMMON *const cm = &cpi->common;
   const int upscaled_width = cm->superres_upscaled_width;
+  const int width = cm->width;
   const int height = cm->height;
   const int tile_cols = cm->tile_cols;
   const int tile_rows = cm->tile_rows;
@@ -478,58 +1038,51 @@ void av1_update_level_info(AV1_COMP *cpi, size_t size, int64_t ts_start,
   const int show_frame = cm->show_frame;
   const int show_existing_frame = cm->show_existing_frame;
 
-  // Store info. of current frame into FrameWindowBuffer.
-  FrameWindowBuffer *const buffer = &cpi->frame_window_buffer;
-  store_frame_record(ts_start, ts_end, luma_pic_size, frame_header_count,
-                     show_frame, show_existing_frame, buffer);
-  // Count the number of frames encoded in the past 1 second.
-  const int encoded_frames_in_last_second =
-      show_frame ? count_frames(buffer, TICKS_PER_SEC) : 0;
-
   int max_tile_size;
   int min_cropped_tile_width;
   int min_cropped_tile_height;
+  int max_superres_tile_width;
   int tile_width_is_valid;
-  get_tile_stats(cpi, &max_tile_size, &min_cropped_tile_width,
-                 &min_cropped_tile_height, &tile_width_is_valid);
-
-  const SequenceHeader *const seq_params = &cm->seq_params;
-  const BITSTREAM_PROFILE profile = seq_params->profile;
-  const int pic_size_profile_factor =
-      profile == PROFILE_0 ? 15 : (profile == PROFILE_1 ? 30 : 36);
-  const size_t frame_compressed_size = (size > 129 ? size - 128 : 1);
-  const size_t frame_uncompressed_size =
-      (luma_pic_size * pic_size_profile_factor) >> 3;
+  get_tile_stats(cpi, &max_tile_size, &max_superres_tile_width,
+                 &min_cropped_tile_width, &min_cropped_tile_height,
+                 &tile_width_is_valid);
 
   aom_clear_system_state();
-  const double compression_ratio =
-      frame_uncompressed_size / (double)frame_compressed_size;
+  const double compression_ratio = av1_get_compression_ratio(cm, size);
   const double total_time_encoded =
       (cpi->last_end_time_stamp_seen - cpi->first_time_stamp_ever) /
       (double)TICKS_PER_SEC;
 
   const int temporal_layer_id = cm->temporal_layer_id;
   const int spatial_layer_id = cm->spatial_layer_id;
+  const SequenceHeader *const seq_params = &cm->seq_params;
+  const BITSTREAM_PROFILE profile = seq_params->profile;
   const int is_still_picture = seq_params->still_picture;
   // update level_stats
   // TODO(kyslov@) fix the implementation according to buffer model
   for (int i = 0; i < seq_params->operating_points_cnt_minus_1 + 1; ++i) {
     if (!is_in_operating_point(seq_params->operating_point_idc[i],
-                               temporal_layer_id, spatial_layer_id)) {
+                               temporal_layer_id, spatial_layer_id) ||
+        !((cpi->keep_level_stats >> i) & 1)) {
       continue;
     }
 
-    AV1LevelInfo *const level_info = &cpi->level_info[i];
+    AV1LevelInfo *const level_info = cpi->level_info[i];
+    assert(level_info != NULL);
     AV1LevelStats *const level_stats = &level_info->level_stats;
 
     level_stats->max_tile_size =
         AOMMAX(level_stats->max_tile_size, max_tile_size);
+    level_stats->max_superres_tile_width =
+        AOMMAX(level_stats->max_superres_tile_width, max_superres_tile_width);
     level_stats->min_cropped_tile_width =
         AOMMIN(level_stats->min_cropped_tile_width, min_cropped_tile_width);
     level_stats->min_cropped_tile_height =
         AOMMIN(level_stats->min_cropped_tile_height, min_cropped_tile_height);
     level_stats->tile_width_is_valid &= tile_width_is_valid;
-    level_stats->total_compressed_size += frame_compressed_size;
+    level_stats->min_frame_width = AOMMIN(level_stats->min_frame_width, width);
+    level_stats->min_frame_height =
+        AOMMIN(level_stats->min_frame_height, height);
     if (show_frame) level_stats->total_time_encoded = total_time_encoded;
     level_stats->min_cr = AOMMIN(level_stats->min_cr, compression_ratio);
 
@@ -544,21 +1097,33 @@ void av1_update_level_info(AV1_COMP *cpi, size_t size, int64_t ts_start,
     level_spec->max_tile_cols = AOMMAX(level_spec->max_tile_cols, tile_cols);
     level_spec->max_tiles = AOMMAX(level_spec->max_tiles, tiles);
 
+    // Store info. of current frame into FrameWindowBuffer.
+    FrameWindowBuffer *const buffer = &level_info->frame_window_buffer;
+    store_frame_record(ts_start, ts_end, size, luma_pic_size,
+                       frame_header_count, tiles, show_frame,
+                       show_existing_frame, buffer);
     if (show_frame) {
-      scan_past_frames(buffer, encoded_frames_in_last_second, level_spec);
+      // Count the number of frames encoded in the past 1 second.
+      const int encoded_frames_in_last_second =
+          show_frame ? count_frames(buffer, TICKS_PER_SEC) : 0;
+      scan_past_frames(buffer, encoded_frames_in_last_second, level_spec,
+                       level_stats);
+    }
+
+    DECODER_MODEL *const decoder_models = level_info->decoder_models;
+    for (AV1_LEVEL level = SEQ_LEVEL_2_0; level < SEQ_LEVELS; ++level) {
+      av1_decoder_model_process_frame(cpi, size << 3, &decoder_models[level]);
     }
 
     // Check whether target level is met.
-    const AV1_LEVEL target_seq_level_idx = cpi->target_seq_level_idx[i];
-    if (target_seq_level_idx < SEQ_LEVELS) {
-      const AV1LevelSpec *const target_level_spec =
-          av1_level_defs + target_seq_level_idx;
+    const AV1_LEVEL target_level = cpi->target_seq_level_idx[i];
+    if (target_level < SEQ_LEVELS) {
       const int tier = seq_params->tier[i];
       const TARGET_LEVEL_FAIL_ID fail_id = check_level_constraints(
-          target_level_spec, level_spec, level_stats, tier, is_still_picture);
+          level_info, target_level, tier, is_still_picture, profile);
       if (fail_id != TARGET_LEVEL_OK) {
-        const int target_level_major = 2 + (target_seq_level_idx >> 2);
-        const int target_level_minor = target_seq_level_idx & 3;
+        const int target_level_major = 2 + (target_level >> 2);
+        const int target_level_minor = target_level & 3;
         aom_internal_error(&cm->error, AOM_CODEC_ERROR,
                            "Failed to encode to the target level %d_%d. %s",
                            target_level_major, target_level_minor,
@@ -570,24 +1135,17 @@ void av1_update_level_info(AV1_COMP *cpi, size_t size, int64_t ts_start,
 
 aom_codec_err_t av1_get_seq_level_idx(const AV1_COMP *cpi, int *seq_level_idx) {
   const SequenceHeader *const seq_params = &cpi->common.seq_params;
-  if (!cpi->keep_level_stats) {
-    for (int op = 0; op < seq_params->operating_points_cnt_minus_1 + 1; ++op) {
-      seq_level_idx[op] = (int)SEQ_LEVEL_MAX;
-    }
-    return AOM_CODEC_OK;
-  }
-
   const int is_still_picture = seq_params->still_picture;
+  const BITSTREAM_PROFILE profile = seq_params->profile;
   for (int op = 0; op < seq_params->operating_points_cnt_minus_1 + 1; ++op) {
     seq_level_idx[op] = (int)SEQ_LEVEL_MAX;
+    if (!((cpi->keep_level_stats >> op) & 1)) continue;
     const int tier = seq_params->tier[op];
-    const AV1LevelInfo *const level_info = &cpi->level_info[op];
-    const AV1LevelStats *const level_stats = &level_info->level_stats;
-    const AV1LevelSpec *const level_spec = &level_info->level_spec;
+    const AV1LevelInfo *const level_info = cpi->level_info[op];
+    assert(level_info != NULL);
     for (int level = 0; level < SEQ_LEVELS; ++level) {
-      const AV1LevelSpec *const target_level_spec = av1_level_defs + level;
       const TARGET_LEVEL_FAIL_ID fail_id = check_level_constraints(
-          target_level_spec, level_spec, level_stats, tier, is_still_picture);
+          level_info, level, tier, is_still_picture, profile);
       if (fail_id == TARGET_LEVEL_OK) {
         seq_level_idx[op] = level;
         break;

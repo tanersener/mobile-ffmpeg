@@ -143,3 +143,60 @@ static INLINE void store_coefficients(__m128i coeff_vals,
   _mm_store_si128((__m128i *)(coeff_ptr), coeff_vals_1);
   _mm_store_si128((__m128i *)(coeff_ptr + 4), coeff_vals_2);
 }
+
+static INLINE void update_mask1(__m128i *cmp_mask0, __m128i *cmp_mask1,
+                                const int16_t *iscan_ptr, int *is_found,
+                                __m128i *mask) {
+  __m128i all_zero;
+  __m128i temp_mask = _mm_setzero_si128();
+  all_zero = _mm_or_si128(*cmp_mask0, *cmp_mask1);
+  if (_mm_movemask_epi8(all_zero)) {
+    __m128i iscan0 = _mm_load_si128((const __m128i *)(iscan_ptr));
+    __m128i mask0 = _mm_and_si128(*cmp_mask0, iscan0);
+    __m128i iscan1 = _mm_load_si128((const __m128i *)(iscan_ptr + 8));
+    __m128i mask1 = _mm_and_si128(*cmp_mask1, iscan1);
+    temp_mask = _mm_max_epi16(mask0, mask1);
+    *is_found = 1;
+  }
+  *mask = _mm_max_epi16(temp_mask, *mask);
+}
+
+static INLINE void update_mask0(__m128i *qcoeff0, __m128i *qcoeff1,
+                                __m128i *threshold, const int16_t *iscan_ptr,
+                                int *is_found, __m128i *mask) {
+  __m128i zero = _mm_setzero_si128();
+  __m128i coeff[4], cmp_mask0, cmp_mask1, cmp_mask2, cmp_mask3;
+
+  coeff[0] = _mm_unpacklo_epi16(*qcoeff0, zero);
+  coeff[1] = _mm_unpackhi_epi16(*qcoeff0, zero);
+  coeff[2] = _mm_unpacklo_epi16(*qcoeff1, zero);
+  coeff[3] = _mm_unpackhi_epi16(*qcoeff1, zero);
+
+  coeff[0] = _mm_slli_epi32(coeff[0], AOM_QM_BITS);
+  cmp_mask0 = _mm_cmpgt_epi32(coeff[0], threshold[0]);
+  coeff[1] = _mm_slli_epi32(coeff[1], AOM_QM_BITS);
+  cmp_mask1 = _mm_cmpgt_epi32(coeff[1], threshold[1]);
+  coeff[2] = _mm_slli_epi32(coeff[2], AOM_QM_BITS);
+  cmp_mask2 = _mm_cmpgt_epi32(coeff[2], threshold[1]);
+  coeff[3] = _mm_slli_epi32(coeff[3], AOM_QM_BITS);
+  cmp_mask3 = _mm_cmpgt_epi32(coeff[3], threshold[1]);
+
+  cmp_mask0 = _mm_packs_epi32(cmp_mask0, cmp_mask1);
+  cmp_mask1 = _mm_packs_epi32(cmp_mask2, cmp_mask3);
+
+  update_mask1(&cmp_mask0, &cmp_mask1, iscan_ptr, is_found, mask);
+}
+
+static INLINE int calculate_non_zero_count(__m128i mask) {
+  __m128i mask0, mask1;
+  int non_zero_count = 0;
+  mask0 = _mm_unpackhi_epi64(mask, mask);
+  mask1 = _mm_max_epi16(mask0, mask);
+  mask0 = _mm_shuffle_epi32(mask1, 1);
+  mask0 = _mm_max_epi16(mask0, mask1);
+  mask1 = _mm_srli_epi32(mask0, 16);
+  mask0 = _mm_max_epi16(mask0, mask1);
+  non_zero_count = _mm_extract_epi16(mask0, 0) + 1;
+
+  return non_zero_count;
+}

@@ -16,7 +16,7 @@
 #include "av1/common/seg_common.h"
 #include "av1/common/blockd.h"
 
-static const int16_t dc_qlookup_Q3[QINDEX_RANGE] = {
+static const int16_t dc_qlookup_QTX[QINDEX_RANGE] = {
   4,    8,    8,    9,    10,  11,  12,  12,  13,  14,  15,   16,   17,   18,
   19,   19,   20,   21,   22,  23,  24,  25,  26,  26,  27,   28,   29,   30,
   31,   32,   32,   33,   34,  35,  36,  37,  38,  38,  39,   40,   41,   42,
@@ -38,7 +38,7 @@ static const int16_t dc_qlookup_Q3[QINDEX_RANGE] = {
   1184, 1232, 1282, 1336,
 };
 
-static const int16_t dc_qlookup_10_Q3[QINDEX_RANGE] = {
+static const int16_t dc_qlookup_10_QTX[QINDEX_RANGE] = {
   4,    9,    10,   13,   15,   17,   20,   22,   25,   28,   31,   34,   37,
   40,   43,   47,   50,   53,   57,   60,   64,   68,   71,   75,   78,   82,
   86,   90,   93,   97,   101,  105,  109,  113,  116,  120,  124,  128,  132,
@@ -61,7 +61,7 @@ static const int16_t dc_qlookup_10_Q3[QINDEX_RANGE] = {
   3953, 4089, 4236, 4394, 4559, 4737, 4929, 5130, 5347,
 };
 
-static const int16_t dc_qlookup_12_Q3[QINDEX_RANGE] = {
+static const int16_t dc_qlookup_12_QTX[QINDEX_RANGE] = {
   4,     12,    18,    25,    33,    41,    50,    60,    70,    80,    91,
   103,   115,   127,   140,   153,   166,   180,   194,   208,   222,   237,
   251,   266,   281,   296,   312,   327,   343,   358,   374,   390,   405,
@@ -88,7 +88,7 @@ static const int16_t dc_qlookup_12_Q3[QINDEX_RANGE] = {
   19718, 20521, 21387,
 };
 
-static const int16_t ac_qlookup_Q3[QINDEX_RANGE] = {
+static const int16_t ac_qlookup_QTX[QINDEX_RANGE] = {
   4,    8,    9,    10,   11,   12,   13,   14,   15,   16,   17,   18,   19,
   20,   21,   22,   23,   24,   25,   26,   27,   28,   29,   30,   31,   32,
   33,   34,   35,   36,   37,   38,   39,   40,   41,   42,   43,   44,   45,
@@ -111,7 +111,7 @@ static const int16_t ac_qlookup_Q3[QINDEX_RANGE] = {
   1567, 1597, 1628, 1660, 1692, 1725, 1759, 1793, 1828,
 };
 
-static const int16_t ac_qlookup_10_Q3[QINDEX_RANGE] = {
+static const int16_t ac_qlookup_10_QTX[QINDEX_RANGE] = {
   4,    9,    11,   13,   16,   18,   21,   24,   27,   30,   33,   37,   40,
   44,   48,   51,   55,   59,   63,   67,   71,   75,   79,   83,   88,   92,
   96,   100,  105,  109,  114,  118,  122,  127,  131,  136,  140,  145,  149,
@@ -134,7 +134,7 @@ static const int16_t ac_qlookup_10_Q3[QINDEX_RANGE] = {
   6268, 6388, 6512, 6640, 6768, 6900, 7036, 7172, 7312,
 };
 
-static const int16_t ac_qlookup_12_Q3[QINDEX_RANGE] = {
+static const int16_t ac_qlookup_12_QTX[QINDEX_RANGE] = {
   4,     13,    19,    27,    35,    44,    54,    64,    75,    87,    99,
   112,   126,   139,   154,   168,   183,   199,   214,   230,   247,   263,
   280,   297,   314,   331,   349,   366,   384,   402,   420,   438,   456,
@@ -190,39 +190,28 @@ static const int16_t ac_qlookup_12_Q3[QINDEX_RANGE] = {
 // addition, the minimum allowable quantizer is 4; smaller values will
 // underflow to 0 in the actual quantization routines.
 
-int16_t av1_dc_quant_Q3(int qindex, int delta, aom_bit_depth_t bit_depth) {
-  const int q_clamped = clamp(qindex + delta, 0, MAXQ);
-  switch (bit_depth) {
-    case AOM_BITS_8: return dc_qlookup_Q3[q_clamped];
-    case AOM_BITS_10: return dc_qlookup_10_Q3[q_clamped];
-    case AOM_BITS_12: return dc_qlookup_12_Q3[q_clamped];
-    default:
-      assert(0 && "bit_depth should be AOM_BITS_8, AOM_BITS_10 or AOM_BITS_12");
-      return -1;
-  }
-}
-
-int16_t av1_ac_quant_Q3(int qindex, int delta, aom_bit_depth_t bit_depth) {
-  const int q_clamped = clamp(qindex + delta, 0, MAXQ);
-  switch (bit_depth) {
-    case AOM_BITS_8: return ac_qlookup_Q3[q_clamped];
-    case AOM_BITS_10: return ac_qlookup_10_Q3[q_clamped];
-    case AOM_BITS_12: return ac_qlookup_12_Q3[q_clamped];
-    default:
-      assert(0 && "bit_depth should be AOM_BITS_8, AOM_BITS_10 or AOM_BITS_12");
-      return -1;
-  }
-}
-
-// In AV1 TX, the coefficients are always scaled up a factor of 8 (3
-// bits), so QTX == Q3.
-
 int16_t av1_dc_quant_QTX(int qindex, int delta, aom_bit_depth_t bit_depth) {
-  return av1_dc_quant_Q3(qindex, delta, bit_depth);
+  const int q_clamped = clamp(qindex + delta, 0, MAXQ);
+  switch (bit_depth) {
+    case AOM_BITS_8: return dc_qlookup_QTX[q_clamped];
+    case AOM_BITS_10: return dc_qlookup_10_QTX[q_clamped];
+    case AOM_BITS_12: return dc_qlookup_12_QTX[q_clamped];
+    default:
+      assert(0 && "bit_depth should be AOM_BITS_8, AOM_BITS_10 or AOM_BITS_12");
+      return -1;
+  }
 }
 
 int16_t av1_ac_quant_QTX(int qindex, int delta, aom_bit_depth_t bit_depth) {
-  return av1_ac_quant_Q3(qindex, delta, bit_depth);
+  const int q_clamped = clamp(qindex + delta, 0, MAXQ);
+  switch (bit_depth) {
+    case AOM_BITS_8: return ac_qlookup_QTX[q_clamped];
+    case AOM_BITS_10: return ac_qlookup_10_QTX[q_clamped];
+    case AOM_BITS_12: return ac_qlookup_12_QTX[q_clamped];
+    default:
+      assert(0 && "bit_depth should be AOM_BITS_8, AOM_BITS_10 or AOM_BITS_12");
+      return -1;
+  }
 }
 
 int av1_get_qindex(const struct segmentation *seg, int segment_id,

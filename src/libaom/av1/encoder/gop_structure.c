@@ -42,6 +42,7 @@ static void set_multi_layer_params(GF_GROUP *const gf_group, int start, int end,
       gf_group->arf_src_offset[*frame_ind] = 0;
       gf_group->arf_pos_in_gf[*frame_ind] = 0;
       gf_group->arf_update_idx[*frame_ind] = arf_ind;
+      gf_group->frame_disp_idx[*frame_ind] = start;
       gf_group->pyramid_level[*frame_ind] = MIN_PYRAMID_LVL;
       ++gf_group->pyramid_lvl_nodes[MIN_PYRAMID_LVL];
       ++(*frame_ind);
@@ -55,6 +56,7 @@ static void set_multi_layer_params(GF_GROUP *const gf_group, int start, int end,
     gf_group->arf_src_offset[*frame_ind] = m - start - 1;
     gf_group->arf_pos_in_gf[*frame_ind] = 0;
     gf_group->arf_update_idx[*frame_ind] = 1;  // mark all internal ARF 1
+    gf_group->frame_disp_idx[*frame_ind] = m;
     gf_group->pyramid_level[*frame_ind] = level;
     ++gf_group->pyramid_lvl_nodes[level];
     ++(*frame_ind);
@@ -67,6 +69,7 @@ static void set_multi_layer_params(GF_GROUP *const gf_group, int start, int end,
     gf_group->arf_src_offset[*frame_ind] = 0;
     gf_group->arf_pos_in_gf[*frame_ind] = arf_pos_in_gf;  // For bit allocation.
     gf_group->arf_update_idx[*frame_ind] = 1;
+    gf_group->frame_disp_idx[*frame_ind] = m;
     gf_group->pyramid_level[*frame_ind] = MIN_PYRAMID_LVL;
     ++(*frame_ind);
 
@@ -101,6 +104,7 @@ static int construct_multi_layer_gf_structure(
     gf_group->arf_src_offset[frame_index] = gf_interval - 1;
     gf_group->arf_pos_in_gf[frame_index] = 0;
     gf_group->arf_update_idx[frame_index] = 0;
+    gf_group->frame_disp_idx[frame_index] = gf_interval;
     gf_group->pyramid_level[frame_index] = gf_group->pyramid_height;
     ++frame_index;
   }
@@ -125,7 +129,7 @@ void check_frame_params(GF_GROUP *const gf_group, int gf_interval) {
   FILE *fid = fopen("GF_PARAMS.txt", "a");
 
   fprintf(fid, "\ngf_interval = {%d}\n", gf_interval);
-  for (int i = 0; i <= gf_group->size; ++i) {
+  for (int i = 0; i < gf_group->size; ++i) {
     fprintf(fid, "#%2d : %s %d %d %d %d\n", i,
             update_type_strings[gf_group->update_type[i]],
             gf_group->arf_src_offset[i], gf_group->arf_pos_in_gf[i],
@@ -165,11 +169,140 @@ static int get_pyramid_height(const AV1_COMP *const cpi) {
                 cpi->oxcf.gf_max_pyr_height);
 }
 
+#define REF_IDX(ref) ((ref)-LAST_FRAME)
+
+static INLINE void reset_ref_frame_idx(int *ref_idx, int reset_value) {
+  for (int i = 0; i < REF_FRAMES; ++i) ref_idx[i] = reset_value;
+}
+
+static INLINE void set_ref_frame_disp_idx(GF_GROUP *const gf_group) {
+  for (int i = 0; i < gf_group->size; ++i) {
+    for (int ref = 0; ref < INTER_REFS_PER_FRAME + 1; ++ref) {
+      int ref_gop_idx = gf_group->ref_frame_gop_idx[i][ref];
+      if (ref_gop_idx == -1) {
+        gf_group->ref_frame_disp_idx[i][ref] = -1;
+      } else {
+        gf_group->ref_frame_disp_idx[i][ref] =
+            gf_group->frame_disp_idx[ref_gop_idx];
+      }
+    }
+  }
+}
+
+static void set_gop_ref_frame_map(GF_GROUP *const gf_group) {
+  // Initialize the reference slots as all -1.
+  for (int frame_idx = 0; frame_idx < gf_group->size; ++frame_idx)
+    reset_ref_frame_idx(gf_group->ref_frame_gop_idx[frame_idx], -1);
+
+  // Set the map for frames in the current gop
+  for (int frame_idx = 0; frame_idx < gf_group->size; ++frame_idx) {
+    const FRAME_UPDATE_TYPE update_type = gf_group->update_type[frame_idx];
+    // TODO(yuec): need to figure out how to determine
+    // (1) whether a KEY_FRAME has show_frame on
+    // (2) whether a frame with INTNL_OVERLAY_UPDATE type has
+    //     show_existing_frame on
+    const int show_frame =
+        update_type != ARF_UPDATE && update_type != INTNL_ARF_UPDATE;
+    const int show_existing_frame =
+        update_type == OVERLAY_UPDATE || update_type == INTNL_OVERLAY_UPDATE;
+
+    int this_ref_map[INTER_REFS_PER_FRAME + 1];
+    memcpy(this_ref_map, gf_group->ref_frame_gop_idx[frame_idx],
+           sizeof(this_ref_map));
+    int *next_ref_map = &gf_group->ref_frame_gop_idx[frame_idx + 1][0];
+
+    switch (update_type) {
+      case KF_UPDATE:
+        if (show_frame) {
+          reset_ref_frame_idx(this_ref_map, frame_idx);
+        } else {
+          this_ref_map[REF_IDX(LAST3_FRAME)] = frame_idx;
+          this_ref_map[REF_IDX(EXTREF_FRAME)] = frame_idx;
+          this_ref_map[REF_IDX(ALTREF2_FRAME)] = frame_idx;
+          this_ref_map[REF_IDX(GOLDEN_FRAME)] = frame_idx;
+          this_ref_map[REF_IDX(ALTREF_FRAME)] = frame_idx;
+        }
+        break;
+      case LF_UPDATE: this_ref_map[REF_IDX(LAST3_FRAME)] = frame_idx; break;
+      case GF_UPDATE:
+        this_ref_map[REF_IDX(LAST3_FRAME)] = frame_idx;
+        this_ref_map[REF_IDX(GOLDEN_FRAME)] = frame_idx;
+        break;
+      case OVERLAY_UPDATE:
+        this_ref_map[REF_IDX(ALTREF_FRAME)] = frame_idx;
+        break;
+      case ARF_UPDATE: this_ref_map[REF_IDX(ALTREF_FRAME)] = frame_idx; break;
+      case INTNL_OVERLAY_UPDATE:
+        if (!show_existing_frame)
+          this_ref_map[REF_IDX(LAST3_FRAME)] = frame_idx;
+        break;
+      case INTNL_ARF_UPDATE:
+        this_ref_map[REF_IDX(EXTREF_FRAME)] = frame_idx;
+        break;
+      default: assert(0); break;
+    }
+
+    memcpy(next_ref_map, this_ref_map, sizeof(this_ref_map));
+
+    switch (update_type) {
+      case LF_UPDATE:
+      case GF_UPDATE:
+        next_ref_map[REF_IDX(LAST3_FRAME)] = this_ref_map[REF_IDX(LAST2_FRAME)];
+        next_ref_map[REF_IDX(LAST2_FRAME)] = this_ref_map[REF_IDX(LAST_FRAME)];
+        next_ref_map[REF_IDX(LAST_FRAME)] = this_ref_map[REF_IDX(LAST3_FRAME)];
+        break;
+      case INTNL_OVERLAY_UPDATE:
+        if (!show_existing_frame) {
+          next_ref_map[REF_IDX(LAST3_FRAME)] =
+              this_ref_map[REF_IDX(LAST2_FRAME)];
+          next_ref_map[REF_IDX(LAST2_FRAME)] =
+              this_ref_map[REF_IDX(LAST_FRAME)];
+          next_ref_map[REF_IDX(LAST_FRAME)] =
+              this_ref_map[REF_IDX(LAST3_FRAME)];
+        } else {
+          next_ref_map[REF_IDX(LAST_FRAME)] =
+              this_ref_map[REF_IDX(BWDREF_FRAME)];
+          next_ref_map[REF_IDX(LAST2_FRAME)] =
+              this_ref_map[REF_IDX(LAST_FRAME)];
+          next_ref_map[REF_IDX(LAST3_FRAME)] =
+              this_ref_map[REF_IDX(LAST2_FRAME)];
+          next_ref_map[REF_IDX(BWDREF_FRAME)] =
+              this_ref_map[REF_IDX(ALTREF2_FRAME)];
+          next_ref_map[REF_IDX(ALTREF2_FRAME)] =
+              this_ref_map[REF_IDX(EXTREF_FRAME)];
+          next_ref_map[REF_IDX(EXTREF_FRAME)] =
+              this_ref_map[REF_IDX(LAST3_FRAME)];
+        }
+        break;
+      case INTNL_ARF_UPDATE:
+        if (!show_existing_frame) {
+          next_ref_map[REF_IDX(BWDREF_FRAME)] =
+              this_ref_map[REF_IDX(EXTREF_FRAME)];
+          next_ref_map[REF_IDX(ALTREF2_FRAME)] =
+              this_ref_map[REF_IDX(BWDREF_FRAME)];
+          next_ref_map[REF_IDX(EXTREF_FRAME)] =
+              this_ref_map[REF_IDX(ALTREF2_FRAME)];
+        }
+        break;
+      case OVERLAY_UPDATE:
+        next_ref_map[REF_IDX(ALTREF_FRAME)] =
+            this_ref_map[REF_IDX(GOLDEN_FRAME)];
+        next_ref_map[REF_IDX(GOLDEN_FRAME)] =
+            this_ref_map[REF_IDX(ALTREF_FRAME)];
+        break;
+      default: break;
+    }
+  }
+
+  // Set the map in display order index by converting from gop indices in the
+  // above map
+  set_ref_frame_disp_idx(gf_group);
+}
+
 void av1_gop_setup_structure(AV1_COMP *cpi,
                              const EncodeFrameParams *const frame_params) {
   RATE_CONTROL *const rc = &cpi->rc;
-  TWO_PASS *const twopass = &cpi->twopass;
-  GF_GROUP *const gf_group = &twopass->gf_group;
+  GF_GROUP *const gf_group = &cpi->gf_group;
   const int key_frame = (frame_params->frame_type == KEY_FRAME);
   const FRAME_UPDATE_TYPE first_frame_update_type =
       key_frame ? KF_UPDATE
@@ -178,13 +311,7 @@ void av1_gop_setup_structure(AV1_COMP *cpi,
       gf_group, rc->baseline_gf_interval, get_pyramid_height(cpi),
       first_frame_update_type);
 
-  // We need to configure the frame at the end of the sequence + 1 that
-  // will be the start frame for the next group. Otherwise prior to the
-  // call to av1_get_second_pass_params(), the data will be undefined.
-  gf_group->update_type[gf_group->size] =
-      (rc->source_alt_ref_pending) ? OVERLAY_UPDATE : GF_UPDATE;
-  gf_group->arf_update_idx[gf_group->size] = 0;
-  gf_group->arf_pos_in_gf[gf_group->size] = 0;
+  set_gop_ref_frame_map(gf_group);
 
 #if CHECK_GF_PARAMETER
   check_frame_params(gf_group, rc->baseline_gf_interval);

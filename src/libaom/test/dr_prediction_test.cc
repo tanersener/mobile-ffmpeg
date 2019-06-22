@@ -365,11 +365,9 @@ INSTANTIATE_TEST_CASE_P(
     ::testing::Values(DrPredFunc<DrPred>(&z1_wrapper<av1_dr_prediction_z1_c>,
                                          &z1_wrapper<av1_dr_prediction_z1_avx2>,
                                          AOM_BITS_8, kZ1Start),
-                      /* TODO(niva213@gmail.com): Re-enable this test after
-                      fixing valgrind issue: https://crbug.com/aomedia/2316
                       DrPredFunc<DrPred>(&z2_wrapper<av1_dr_prediction_z2_c>,
                                          &z2_wrapper<av1_dr_prediction_z2_avx2>,
-                                         AOM_BITS_8, kZ2Start), */
+                                         AOM_BITS_8, kZ2Start),
                       DrPredFunc<DrPred>(&z3_wrapper<av1_dr_prediction_z3_c>,
                                          &z3_wrapper<av1_dr_prediction_z3_avx2>,
                                          AOM_BITS_8, kZ3Start)));

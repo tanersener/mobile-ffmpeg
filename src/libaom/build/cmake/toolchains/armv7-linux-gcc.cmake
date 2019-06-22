@@ -31,7 +31,7 @@ set(AS_EXECUTABLE ${CROSS}as)
 set(CMAKE_C_COMPILER_ARG1 "-march=armv7-a ${AOM_EXTRA_TOOLCHAIN_FLAGS}")
 set(CMAKE_CXX_COMPILER_ARG1 "-march=armv7-a ${AOM_EXTRA_TOOLCHAIN_FLAGS}")
 set(AOM_AS_FLAGS --defsym ARCHITECTURE=7 -march=armv7-a -mfpu=neon
-    ${AOM_EXTRA_TOOLCHAIN_FLAGS})
+                 ${AOM_EXTRA_TOOLCHAIN_FLAGS})
 set(CMAKE_SYSTEM_PROCESSOR "armv7")
 
 set(AOM_NEON_INTRIN_FLAG "-mfpu=neon")

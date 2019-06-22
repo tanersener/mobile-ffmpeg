@@ -21,37 +21,20 @@
 #include "av1/common/onyxc_int.h"
 #include "av1/common/reconinter.h"
 
-int sb_all_skip(const AV1_COMMON *const cm, int mi_row, int mi_col) {
-  int maxc, maxr;
-  int skip = 1;
-  maxc = cm->mi_cols - mi_col;
-  maxr = cm->mi_rows - mi_row;
-
-  maxr = AOMMIN(maxr, MI_SIZE_64X64);
-  maxc = AOMMIN(maxc, MI_SIZE_64X64);
-
-  for (int r = 0; r < maxr; r++) {
-    for (int c = 0; c < maxc; c++) {
-      skip =
-          skip &&
-          cm->mi_grid_visible[(mi_row + r) * cm->mi_stride + mi_col + c]->skip;
-    }
-  }
-  return skip;
-}
-
 static int is_8x8_block_skip(MB_MODE_INFO **grid, int mi_row, int mi_col,
                              int mi_stride) {
-  int is_skip = 1;
-  for (int r = 0; r < mi_size_high[BLOCK_8X8]; ++r)
-    for (int c = 0; c < mi_size_wide[BLOCK_8X8]; ++c)
-      is_skip &= grid[(mi_row + r) * mi_stride + (mi_col + c)]->skip;
+  MB_MODE_INFO **mbmi = grid + mi_row * mi_stride + mi_col;
+  for (int r = 0; r < mi_size_high[BLOCK_8X8]; ++r, mbmi += mi_stride) {
+    for (int c = 0; c < mi_size_wide[BLOCK_8X8]; ++c) {
+      if (!mbmi[c]->skip) return 0;
+    }
+  }
 
-  return is_skip;
+  return 1;
 }
 
-int sb_compute_cdef_list(const AV1_COMMON *const cm, int mi_row, int mi_col,
-                         cdef_list *dlist, BLOCK_SIZE bs) {
+int av1_cdef_compute_sb_list(const AV1_COMMON *const cm, int mi_row, int mi_col,
+                             cdef_list *dlist, BLOCK_SIZE bs) {
   MB_MODE_INFO **grid = cm->mi_grid_visible;
   int maxc = cm->mi_cols - mi_col;
   int maxr = cm->mi_rows - mi_row;
@@ -65,16 +48,11 @@ int sb_compute_cdef_list(const AV1_COMMON *const cm, int mi_row, int mi_col,
   else
     maxr = AOMMIN(maxr, MI_SIZE_64X64);
 
-  const int r_step = mi_size_high[BLOCK_8X8];
-  const int c_step = mi_size_wide[BLOCK_8X8];
-  const int r_shift = (r_step == 2);
-  const int c_shift = (c_step == 2);
-
-  assert(r_step == 1 || r_step == 2);
-  assert(c_step == 1 || c_step == 2);
-
+  const int r_step = 2;  // mi_size_high[BLOCK_8X8]
+  const int c_step = 2;  // mi_size_wide[BLOCK_8X8]
+  const int r_shift = 1;
+  const int c_shift = 1;
   int count = 0;
-
   for (int r = 0; r < maxr; r += r_step) {
     for (int c = 0; c < maxc; c += c_step) {
       if (!is_8x8_block_skip(grid, mi_row + r, mi_col + c, cm->mi_stride)) {
@@ -87,8 +65,9 @@ int sb_compute_cdef_list(const AV1_COMMON *const cm, int mi_row, int mi_col,
   return count;
 }
 
-void copy_rect8_8bit_to_16bit_c(uint16_t *dst, int dstride, const uint8_t *src,
-                                int sstride, int v, int h) {
+void cdef_copy_rect8_8bit_to_16bit_c(uint16_t *dst, int dstride,
+                                     const uint8_t *src, int sstride, int v,
+                                     int h) {
   for (int i = 0; i < v; i++) {
     for (int j = 0; j < h; j++) {
       dst[i * dstride + j] = src[i * sstride + j];
@@ -96,9 +75,9 @@ void copy_rect8_8bit_to_16bit_c(uint16_t *dst, int dstride, const uint8_t *src,
   }
 }
 
-void copy_rect8_16bit_to_16bit_c(uint16_t *dst, int dstride,
-                                 const uint16_t *src, int sstride, int v,
-                                 int h) {
+void cdef_copy_rect8_16bit_to_16bit_c(uint16_t *dst, int dstride,
+                                      const uint16_t *src, int sstride, int v,
+                                      int h) {
   for (int i = 0; i < v; i++) {
     for (int j = 0; j < h; j++) {
       dst[i * dstride + j] = src[i * sstride + j];
@@ -112,10 +91,10 @@ static void copy_sb8_16(AV1_COMMON *cm, uint16_t *dst, int dstride,
   if (cm->seq_params.use_highbitdepth) {
     const uint16_t *base =
         &CONVERT_TO_SHORTPTR(src)[src_voffset * sstride + src_hoffset];
-    copy_rect8_16bit_to_16bit(dst, dstride, base, sstride, vsize, hsize);
+    cdef_copy_rect8_16bit_to_16bit(dst, dstride, base, sstride, vsize, hsize);
   } else {
     const uint8_t *base = &src[src_voffset * sstride + src_hoffset];
-    copy_rect8_8bit_to_16bit(dst, dstride, base, sstride, vsize, hsize);
+    cdef_copy_rect8_8bit_to_16bit(dst, dstride, base, sstride, vsize, hsize);
   }
 }
 
@@ -243,9 +222,9 @@ void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
       uv_sec_strength += uv_sec_strength == 3;
       if ((level == 0 && sec_strength == 0 && uv_level == 0 &&
            uv_sec_strength == 0) ||
-          (cdef_count = sb_compute_cdef_list(cm, fbr * MI_SIZE_64X64,
-                                             fbc * MI_SIZE_64X64, dlist,
-                                             BLOCK_64X64)) == 0) {
+          (cdef_count = av1_cdef_compute_sb_list(cm, fbr * MI_SIZE_64X64,
+                                                 fbc * MI_SIZE_64X64, dlist,
+                                                 BLOCK_64X64)) == 0) {
         cdef_left = 0;
         continue;
       }
@@ -254,8 +233,7 @@ void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
       for (int pli = 0; pli < num_planes; pli++) {
         int coffset;
         int rend, cend;
-        int pri_damping = cdef_info->cdef_pri_damping;
-        int sec_damping = cdef_info->cdef_sec_damping;
+        int damping = cdef_info->cdef_damping;
         int hsize = nhb << mi_wide_l2[pli];
         int vsize = nvb << mi_high_l2[pli];
 
@@ -366,7 +344,7 @@ void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
         }
 
         if (cm->seq_params.use_highbitdepth) {
-          cdef_filter_fb(
+          av1_cdef_filter_fb(
               NULL,
               &CONVERT_TO_SHORTPTR(
                   xd->plane[pli]
@@ -376,9 +354,9 @@ void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
               xd->plane[pli].dst.stride,
               &src[CDEF_VBORDER * CDEF_BSTRIDE + CDEF_HBORDER], xdec[pli],
               ydec[pli], dir, NULL, var, pli, dlist, cdef_count, level,
-              sec_strength, pri_damping, sec_damping, coeff_shift);
+              sec_strength, damping, coeff_shift);
         } else {
-          cdef_filter_fb(
+          av1_cdef_filter_fb(
               &xd->plane[pli]
                    .dst.buf[xd->plane[pli].dst.stride *
                                 (MI_SIZE_64X64 * fbr << mi_high_l2[pli]) +
@@ -386,7 +364,7 @@ void av1_cdef_frame(YV12_BUFFER_CONFIG *frame, AV1_COMMON *cm,
               NULL, xd->plane[pli].dst.stride,
               &src[CDEF_VBORDER * CDEF_BSTRIDE + CDEF_HBORDER], xdec[pli],
               ydec[pli], dir, NULL, var, pli, dlist, cdef_count, level,
-              sec_strength, pri_damping, sec_damping, coeff_shift);
+              sec_strength, damping, coeff_shift);
         }
       }
       cdef_left = 1;

@@ -85,8 +85,8 @@ function(get_asm_obj_format out_format)
       set(objformat "macho64")
     elseif("${AOM_TARGET_SYSTEM}" STREQUAL "Linux")
       set(objformat "elf64")
-    elseif("${AOM_TARGET_SYSTEM}" STREQUAL "MSYS" OR "${AOM_TARGET_SYSTEM}"
-           STREQUAL "Windows")
+    elseif("${AOM_TARGET_SYSTEM}" STREQUAL "MSYS"
+           OR "${AOM_TARGET_SYSTEM}" STREQUAL "Windows")
       set(objformat "win64")
     else()
       message(FATAL_ERROR "Unknown obj format: ${AOM_TARGET_SYSTEM}")
@@ -96,15 +96,15 @@ function(get_asm_obj_format out_format)
       set(objformat "macho32")
     elseif("${AOM_TARGET_SYSTEM}" STREQUAL "Linux")
       set(objformat "elf32")
-    elseif("${AOM_TARGET_SYSTEM}" STREQUAL "MSYS" OR "${AOM_TARGET_SYSTEM}"
-           STREQUAL "Windows")
+    elseif("${AOM_TARGET_SYSTEM}" STREQUAL "MSYS"
+           OR "${AOM_TARGET_SYSTEM}" STREQUAL "Windows")
       set(objformat "win32")
     else()
       message(FATAL_ERROR "Unknown obj format: ${AOM_TARGET_SYSTEM}")
     endif()
   else()
-    message(FATAL_ERROR
-              "Unknown obj format: ${AOM_TARGET_CPU}-${AOM_TARGET_SYSTEM}")
+    message(
+      FATAL_ERROR "Unknown obj format: ${AOM_TARGET_CPU}-${AOM_TARGET_SYSTEM}")
   endif()
 
   set(${out_format} ${objformat} PARENT_SCOPE)
@@ -138,7 +138,8 @@ function(add_asm_library lib_name asm_sources dependent_target)
                                "${asm_object}" "${asm_source}"
                        DEPENDS "${asm_source}"
                        COMMENT "Building ASM object ${asm_object}"
-                       WORKING_DIRECTORY "${AOM_CONFIG_DIR}" VERBATIM)
+                       WORKING_DIRECTORY "${AOM_CONFIG_DIR}"
+                       VERBATIM)
     target_sources(aom PRIVATE "${asm_object}")
   endforeach()
 
@@ -161,32 +162,32 @@ function(test_nasm)
   execute_process(COMMAND ${AS_EXECUTABLE} -hf OUTPUT_VARIABLE nasm_helptext)
 
   if(NOT "${nasm_helptext}" MATCHES "-Ox")
-    message(FATAL_ERROR
-              "Unsupported nasm: multipass optimization not supported.")
+    message(
+      FATAL_ERROR "Unsupported nasm: multipass optimization not supported.")
   endif()
 
   if("${AOM_TARGET_CPU}" STREQUAL "x86")
     if("${AOM_TARGET_SYSTEM}" STREQUAL "Darwin")
       if(NOT "${nasm_helptext}" MATCHES "macho32")
-        message(FATAL_ERROR
-                  "Unsupported nasm: macho32 object format not supported.")
+        message(
+          FATAL_ERROR "Unsupported nasm: macho32 object format not supported.")
       endif()
     elseif("${AOM_TARGET_SYSTEM}" STREQUAL "Linux")
       if(NOT "${nasm_helptext}" MATCHES "elf32")
-        message(FATAL_ERROR
-                  "Unsupported nasm: elf32 object format not supported.")
+        message(
+          FATAL_ERROR "Unsupported nasm: elf32 object format not supported.")
       endif()
     endif()
   else()
     if("${AOM_TARGET_SYSTEM}" STREQUAL "Darwin")
       if(NOT "${nasm_helptext}" MATCHES "macho64")
-        message(FATAL_ERROR
-                  "Unsupported nasm: macho64 object format not supported.")
+        message(
+          FATAL_ERROR "Unsupported nasm: macho64 object format not supported.")
       endif()
     elseif("${AOM_TARGET_SYSTEM}" STREQUAL "Linux")
       if(NOT "${nasm_helptext}" MATCHES "elf64")
-        message(FATAL_ERROR
-                  "Unsupported nasm: elf64 object format not supported.")
+        message(
+          FATAL_ERROR "Unsupported nasm: elf64 object format not supported.")
       endif()
     endif()
   endif()
@@ -197,16 +198,16 @@ endfunction()
 # include file, $source is the C source file, and $symbol is used for the symbol
 # argument passed to rtcd.pl.
 function(add_rtcd_build_step config output source symbol)
-  add_custom_command(OUTPUT ${output}
-                     COMMAND ${PERL_EXECUTABLE} ARGS
-                             "${AOM_ROOT}/build/cmake/rtcd.pl"
-                             --arch=${AOM_TARGET_CPU}
-                             --sym=${symbol} ${AOM_RTCD_FLAGS}
-                             --config=${AOM_CONFIG_DIR}/config/aom_config.h
-                             ${config} > ${output}
-                     DEPENDS ${config}
-                     COMMENT "Generating ${output}"
-                     WORKING_DIRECTORY ${AOM_CONFIG_DIR} VERBATIM)
+  add_custom_command(
+    OUTPUT ${output}
+    COMMAND ${PERL_EXECUTABLE} ARGS "${AOM_ROOT}/build/cmake/rtcd.pl"
+            --arch=${AOM_TARGET_CPU}
+            --sym=${symbol} ${AOM_RTCD_FLAGS}
+            --config=${AOM_CONFIG_DIR}/config/aom_config.h ${config} > ${output}
+    DEPENDS ${config}
+    COMMENT "Generating ${output}"
+    WORKING_DIRECTORY ${AOM_CONFIG_DIR}
+    VERBATIM)
   set_property(SOURCE ${source} PROPERTY OBJECT_DEPENDS ${output})
   set_property(SOURCE ${output} PROPERTY GENERATED)
 endfunction()

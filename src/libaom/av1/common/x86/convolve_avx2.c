@@ -21,7 +21,7 @@ void av1_convolve_y_sr_avx2(const uint8_t *src, int src_stride, uint8_t *dst,
                             int dst_stride, int w, int h,
                             const InterpFilterParams *filter_params_x,
                             const InterpFilterParams *filter_params_y,
-                            const int subpel_x_q4, const int subpel_y_q4,
+                            const int subpel_x_qn, const int subpel_y_qn,
                             ConvolveParams *conv_params) {
   int i, j, is_vert_4tap = 0;
   // right shift is F-1 because we are already dividing
@@ -36,12 +36,12 @@ void av1_convolve_y_sr_avx2(const uint8_t *src, int src_stride, uint8_t *dst,
          ((conv_params->round_0 + conv_params->round_1) == (2 * FILTER_BITS)));
 
   (void)filter_params_x;
-  (void)subpel_x_q4;
+  (void)subpel_x_qn;
   (void)conv_params;
   __m256i coeffs[4], s[8];
   __m128i d[6];
 
-  prepare_coeffs_lowbd(filter_params_y, subpel_y_q4, coeffs);
+  prepare_coeffs_lowbd(filter_params_y, subpel_y_qn, coeffs);
 
   // Condition for checking valid vert_filt taps
   if (!(_mm256_extract_epi32(_mm256_or_si256(coeffs[0], coeffs[3]), 0)))
@@ -264,7 +264,7 @@ void av1_convolve_x_sr_avx2(const uint8_t *src, int src_stride, uint8_t *dst,
                             int dst_stride, int w, int h,
                             const InterpFilterParams *filter_params_x,
                             const InterpFilterParams *filter_params_y,
-                            const int subpel_x_q4, const int subpel_y_q4,
+                            const int subpel_x_qn, const int subpel_y_qn,
                             ConvolveParams *conv_params) {
   const int bits = FILTER_BITS - conv_params->round_0;
 
@@ -275,7 +275,7 @@ void av1_convolve_x_sr_avx2(const uint8_t *src, int src_stride, uint8_t *dst,
   const __m128i round_shift = _mm_cvtsi32_si128(bits);
   int i, is_horiz_4tap = 0;
   (void)filter_params_y;
-  (void)subpel_y_q4;
+  (void)subpel_y_qn;
 
   assert(bits >= 0);
   assert((FILTER_BITS - conv_params->round_1) >= 0 ||
@@ -286,7 +286,7 @@ void av1_convolve_x_sr_avx2(const uint8_t *src, int src_stride, uint8_t *dst,
   filt[0] = _mm256_load_si256((__m256i const *)(filt_global_avx2));
   filt[1] = _mm256_load_si256((__m256i const *)(filt_global_avx2 + 32));
 
-  prepare_coeffs_lowbd(filter_params_x, subpel_x_q4, coeffs);
+  prepare_coeffs_lowbd(filter_params_x, subpel_x_qn, coeffs);
 
   // Condition for checking valid horz_filt taps
   if (!(_mm256_extract_epi32(_mm256_or_si256(coeffs[0], coeffs[3]), 0)))

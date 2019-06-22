@@ -88,6 +88,10 @@ list(APPEND AOM_AV1_COMMON_SOURCES
             "${AOM_ROOT}/av1/common/warped_motion.c"
             "${AOM_ROOT}/av1/common/warped_motion.h")
 
+if(CONFIG_LPF_MASK)
+  list(APPEND AOM_AV1_COMMON_SOURCES "${AOM_ROOT}/av1/common/loopfiltermask.c")
+endif()
+
 list(APPEND AOM_AV1_DECODER_SOURCES
             "${AOM_ROOT}/av1/av1_dx_iface.c"
             "${AOM_ROOT}/av1/decoder/decodeframe.c"
@@ -123,6 +127,8 @@ list(APPEND AOM_AV1_ENCODER_SOURCES
             "${AOM_ROOT}/av1/encoder/bitstream.c"
             "${AOM_ROOT}/av1/encoder/bitstream.h"
             "${AOM_ROOT}/av1/encoder/block.h"
+            "${AOM_ROOT}/av1/encoder/cnn.c"
+            "${AOM_ROOT}/av1/encoder/cnn.h"
             "${AOM_ROOT}/av1/encoder/context_tree.c"
             "${AOM_ROOT}/av1/encoder/context_tree.h"
             "${AOM_ROOT}/av1/encoder/corner_detect.c"
@@ -188,6 +194,7 @@ list(APPEND AOM_AV1_ENCODER_SOURCES
             "${AOM_ROOT}/av1/encoder/rd.c"
             "${AOM_ROOT}/av1/encoder/rd.h"
             "${AOM_ROOT}/av1/encoder/rdopt.c"
+            "${AOM_ROOT}/av1/encoder/nonrd_pickmode.c"
             "${AOM_ROOT}/av1/encoder/rdopt.h"
             "${AOM_ROOT}/av1/encoder/reconinter_enc.c"
             "${AOM_ROOT}/av1/encoder/reconinter_enc.h"
@@ -221,7 +228,8 @@ list(APPEND AOM_AV1_COMMON_INTRIN_SSE2
             "${AOM_ROOT}/av1/common/x86/highbd_convolve_2d_sse2.c"
             "${AOM_ROOT}/av1/common/x86/jnt_convolve_sse2.c"
             "${AOM_ROOT}/av1/common/x86/wiener_convolve_sse2.c"
-            "${AOM_ROOT}/av1/common/x86/av1_txfm_sse2.h")
+            "${AOM_ROOT}/av1/common/x86/av1_txfm_sse2.h"
+            "${AOM_ROOT}/av1/common/x86/warp_plane_sse2.c")
 
 list(APPEND AOM_AV1_COMMON_INTRIN_SSSE3
             "${AOM_ROOT}/av1/common/cdef_block_ssse3.c"
@@ -237,7 +245,6 @@ list(APPEND AOM_AV1_COMMON_INTRIN_SSE4_1
             "${AOM_ROOT}/av1/common/cdef_block_sse4.c"
             "${AOM_ROOT}/av1/common/x86/av1_convolve_horiz_rs_sse4.c"
             "${AOM_ROOT}/av1/common/x86/av1_convolve_scale_sse4.c"
-            "${AOM_ROOT}/av1/common/x86/av1_highbd_convolve_sse4.c"
             "${AOM_ROOT}/av1/common/x86/av1_txfm_sse4.c"
             "${AOM_ROOT}/av1/common/x86/av1_txfm_sse4.h"
             "${AOM_ROOT}/av1/common/x86/filterintra_sse4.c"
@@ -264,6 +271,7 @@ list(APPEND AOM_AV1_COMMON_INTRIN_AVX2
             "${AOM_ROOT}/av1/common/x86/jnt_convolve_avx2.c"
             "${AOM_ROOT}/av1/common/x86/reconinter_avx2.c"
             "${AOM_ROOT}/av1/common/x86/selfguided_avx2.c"
+            "${AOM_ROOT}/av1/common/x86/warp_plane_avx2.c"
             "${AOM_ROOT}/av1/common/x86/wiener_convolve_avx2.c")
 
 list(APPEND AOM_AV1_ENCODER_ASM_SSE2 "${AOM_ROOT}/av1/encoder/x86/dct_sse2.asm"
@@ -352,6 +360,21 @@ endif()
 
 if(CONFIG_INTERNAL_STATS)
   list(APPEND AOM_AV1_ENCODER_SOURCES "${AOM_ROOT}/av1/encoder/blockiness.c")
+endif()
+
+if(CONFIG_REALTIME_ONLY)
+  list(REMOVE_ITEM AOM_AV1_ENCODER_SOURCES
+                   "${AOM_ROOT}/av1/encoder/firstpass.c"
+                   "${AOM_ROOT}/av1/encoder/firstpass.h"
+                   "${AOM_ROOT}/av1/encoder/pass2_strategy.c"
+                   "${AOM_ROOT}/av1/encoder/mbgraph.c"
+                   "${AOM_ROOT}/av1/encoder/mbgraph.h"
+                   "${AOM_ROOT}/av1/encoder/partition_model_weights.h"
+                   "${AOM_ROOT}/av1/encoder/temporal_filter.c"
+                   "${AOM_ROOT}/av1/encoder/temporal_filter.h"
+                   "${AOM_ROOT}/av1/encoder/temporal_filter_constants.h"
+                   "${AOM_ROOT}/av1/encoder/x86/temporal_filter_sse4.c"
+                   "${AOM_ROOT}/av1/encoder/x86/highbd_temporal_filter_sse4.c")
 endif()
 
 # Setup AV1 common/decoder/encoder targets. The libaom target must exist before

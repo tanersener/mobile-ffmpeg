@@ -60,24 +60,24 @@ struct lookahead_ctx *av1_lookahead_init(
     unsigned int i;
     ctx->max_sz = depth;
     ctx->buf = calloc(depth, sizeof(*ctx->buf));
-    if (!ctx->buf) goto bail;
+    if (!ctx->buf) goto fail;
     for (i = 0; i < depth; i++)
       if (is_scale) {
         if (aom_alloc_frame_buffer(
                 &ctx->buf[i].img, width, height, subsampling_x, subsampling_y,
                 use_highbitdepth, border_in_pixels, legacy_byte_alignment))
-          goto bail;
+          goto fail;
       } else {
         aom_free_frame_buffer(&ctx->buf[i].img);
         if (aom_realloc_lookahead_buffer(
                 &ctx->buf[i].img, width, height, subsampling_x, subsampling_y,
                 use_highbitdepth, AOM_ENC_LOOKAHEAD_BORDER,
                 legacy_byte_alignment, NULL, NULL, NULL))
-          goto bail;
+          goto fail;
       }
   }
   return ctx;
-bail:
+fail:
   av1_lookahead_destroy(ctx);
   return NULL;
 }

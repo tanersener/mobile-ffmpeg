@@ -131,8 +131,24 @@ static double calc_psnrhvs(const unsigned char *src, int _systride,
   int pixels;
   int x;
   int y;
+  float sum1;
+  float sum2;
+  float delt;
   (void)_par;
   ret = pixels = 0;
+  sum1 = sum2 = delt = 0.0f;
+  for (y = 0; y < _h; y++) {
+    for (x = 0; x < _w; x++) {
+      if (!buf_is_hbd) {
+        sum1 += _src8[y * _systride + x];
+        sum2 += _dst8[y * _dystride + x];
+      } else {
+        sum1 += _src16[y * _systride + x] >> _shift;
+        sum2 += _dst16[y * _dystride + x] >> _shift;
+      }
+    }
+  }
+  delt = (sum1 - sum2) / (_w * _h);
   /*In the PSNR-HVS-M paper[1] the authors describe the construction of
    their masking table as "we have used the quantization table for the
    color component Y of JPEG [6] that has been also obtained on the
@@ -140,7 +156,7 @@ static double calc_psnrhvs(const unsigned char *src, int _systride,
    been normalized and then squared." Their CSF matrix (from PSNR-HVS)
    was also constructed from the JPEG matrices. I can not find any obvious
    scheme of normalizing to produce their table, but if I multiply their
-   CSF by 0.38857 and square the result I get their masking table.
+   CSF by 0.3885746225901003 and square the result I get their masking table.
    I have no idea where this constant comes from, but deviating from it
    too greatly hurts MOS agreement.
 
@@ -148,11 +164,15 @@ static double calc_psnrhvs(const unsigned char *src, int _systride,
    Jaakko Astola, Vladimir Lukin, "On between-coefficient contrast masking
    of DCT basis functions", CD-ROM Proceedings of the Third
    International Workshop on Video Processing and Quality Metrics for Consumer
-   Electronics VPQM-07, Scottsdale, Arizona, USA, 25-26 January, 2007, 4 p.*/
+   Electronics VPQM-07, Scottsdale, Arizona, USA, 25-26 January, 2007, 4 p.
+
+   Suggested in aomedia issue#2363:
+   0.3885746225901003 is a reciprocal of the maximum coefficient (2.573509)
+   of the old JPEG based matrix from the paper. Since you are not using that,
+   divide by actual maximum coefficient. */
   for (x = 0; x < 8; x++)
     for (y = 0; y < 8; y++)
-      mask[x][y] =
-          (_csf[x][y] * 0.3885746225901003) * (_csf[x][y] * 0.3885746225901003);
+      mask[x][y] = (_csf[x][y] / _csf[1][0]) * (_csf[x][y] / _csf[1][0]);
   for (y = 0; y < _h - 7; y += _step) {
     for (x = 0; x < _w - 7; x += _step) {
       int i;
@@ -179,6 +199,7 @@ static double calc_psnrhvs(const unsigned char *src, int _systride,
             dct_s[i * 8 + j] = _src16[(y + i) * _systride + (j + x)] >> _shift;
             dct_d[i * 8 + j] = _dst16[(y + i) * _dystride + (j + x)] >> _shift;
           }
+          dct_d[i * 8 + j] += (int)(delt + 0.5f);
           s_gmean += dct_s[i * 8 + j];
           d_gmean += dct_d[i * 8 + j];
           s_means[sub] += dct_s[i * 8 + j];
@@ -238,6 +259,7 @@ static double calc_psnrhvs(const unsigned char *src, int _systride,
   }
   if (pixels <= 0) return 0;
   ret /= pixels;
+  ret += 0.04 * delt * delt;
   return ret;
 }
 

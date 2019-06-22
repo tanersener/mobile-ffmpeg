@@ -192,25 +192,17 @@ int_mv av1_get_ref_mv_from_stack(int ref_idx,
   const int8_t ref_frame_type = av1_ref_frame_type(ref_frame);
   const CANDIDATE_MV *curr_ref_mv_stack =
       mbmi_ext->ref_mv_stack[ref_frame_type];
-  int_mv ref_mv;
-  ref_mv.as_int = INVALID_MV;
 
   if (ref_frame[1] > INTRA_FRAME) {
-    if (ref_idx == 0) {
-      ref_mv = curr_ref_mv_stack[ref_mv_idx].this_mv;
-    } else {
-      assert(ref_idx == 1);
-      ref_mv = curr_ref_mv_stack[ref_mv_idx].comp_mv;
-    }
-  } else {
-    assert(ref_idx == 0);
-    if (ref_mv_idx < mbmi_ext->ref_mv_count[ref_frame_type]) {
-      ref_mv = curr_ref_mv_stack[ref_mv_idx].this_mv;
-    } else {
-      ref_mv = mbmi_ext->global_mvs[ref_frame_type];
-    }
+    assert(ref_idx == 0 || ref_idx == 1);
+    return ref_idx ? curr_ref_mv_stack[ref_mv_idx].comp_mv
+                   : curr_ref_mv_stack[ref_mv_idx].this_mv;
   }
-  return ref_mv;
+
+  assert(ref_idx == 0);
+  return ref_mv_idx < mbmi_ext->ref_mv_count[ref_frame_type]
+             ? curr_ref_mv_stack[ref_mv_idx].this_mv
+             : mbmi_ext->global_mvs[ref_frame_type];
 }
 
 int_mv av1_get_ref_mv(const MACROBLOCK *x, int ref_idx) {

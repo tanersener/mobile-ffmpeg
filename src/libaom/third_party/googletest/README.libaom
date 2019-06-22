@@ -1,5 +1,5 @@
 URL: https://github.com/google/googletest
-Version: 1.8.0
+Version: 1.8.1
 License: BSD
 License File: LICENSE
 
@@ -22,5 +22,3 @@ Local Modifications:
     CONTRIBUTORS
     LICENSE
     README.md
-- Suppress unsigned overflow instrumentation in the LCG
-  https://github.com/google/googletest/pull/1066

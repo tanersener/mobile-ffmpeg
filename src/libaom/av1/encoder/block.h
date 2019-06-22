@@ -31,7 +31,7 @@ typedef struct {
 } DIFF;
 
 typedef struct macroblock_plane {
-  DECLARE_ALIGNED(16, int16_t, src_diff[MAX_SB_SQUARE]);
+  DECLARE_ALIGNED(32, int16_t, src_diff[MAX_SB_SQUARE]);
   tran_low_t *qcoeff;
   tran_low_t *coeff;
   uint16_t *eobs;
@@ -75,8 +75,8 @@ typedef struct {
 
 typedef struct {
   // TODO(angiebird): Reduce the buffer size according to sb_type
-  CB_COEFF_BUFFER *cb_coef_buff;
   CANDIDATE_MV ref_mv_stack[MODE_CTX_REF_FRAMES][MAX_REF_MV_STACK_SIZE];
+  uint16_t weight[MODE_CTX_REF_FRAMES][MAX_REF_MV_STACK_SIZE];
   int_mv global_mvs[REF_FRAMES];
   int cb_offset;
   int16_t mode_context[MODE_CTX_REF_FRAMES];
@@ -151,33 +151,6 @@ typedef struct {
 // 4: NEAREST, NEW, NEAR, GLOBAL
 #define SINGLE_REF_MODES ((REF_FRAMES - 1) * 4)
 
-// Region size for mode decision sampling in the first pass of partition
-// search(two_pass_partition_search speed feature), in units of mi size(4).
-// Used by the mode pruning in two_pass_partition_search feature.
-#define FIRST_PARTITION_PASS_SAMPLE_REGION 8
-#define FIRST_PARTITION_PASS_SAMPLE_REGION_LOG2 3
-#define FIRST_PARTITION_PASS_STATS_TABLES                     \
-  (MAX_MIB_SIZE >> FIRST_PARTITION_PASS_SAMPLE_REGION_LOG2) * \
-      (MAX_MIB_SIZE >> FIRST_PARTITION_PASS_SAMPLE_REGION_LOG2)
-#define FIRST_PARTITION_PASS_STATS_STRIDE \
-  (MAX_MIB_SIZE_LOG2 - FIRST_PARTITION_PASS_SAMPLE_REGION_LOG2)
-
-static INLINE int av1_first_partition_pass_stats_index(int mi_row, int mi_col) {
-  const int row =
-      (mi_row & MAX_MIB_MASK) >> FIRST_PARTITION_PASS_SAMPLE_REGION_LOG2;
-  const int col =
-      (mi_col & MAX_MIB_MASK) >> FIRST_PARTITION_PASS_SAMPLE_REGION_LOG2;
-  return (row << FIRST_PARTITION_PASS_STATS_STRIDE) + col;
-}
-
-typedef struct {
-  uint8_t ref0_counts[REF_FRAMES];  // Counters for ref_frame[0].
-  uint8_t ref1_counts[REF_FRAMES];  // Counters for ref_frame[1].
-  int sample_counts;                // Number of samples collected.
-  uint8_t interintra_motion_mode_count[REF_FRAMES];  // Counter for interintra
-                                                     // motion mode
-} FIRST_PARTITION_PASS_STATS;
-
 #define MAX_INTERP_FILTER_STATS 64
 typedef struct {
   InterpFilters filters;
@@ -203,6 +176,17 @@ typedef struct {
   int is_global[2];
 } COMP_RD_STATS;
 
+// Struct for buffers used by compound_type_rd() function.
+// For sizes and alignment of these arrays, refer to
+// alloc_compound_type_rd_buffers() function.
+typedef struct {
+  uint8_t *pred0;
+  uint8_t *pred1;
+  int16_t *residual1;          // src - pred1
+  int16_t *diff10;             // pred1 - pred0
+  uint8_t *tmp_best_mask_buf;  // backup of the best segmentation mask
+} CompoundTypeRdBuffers;
+
 struct inter_modes_info;
 typedef struct macroblock MACROBLOCK;
 struct macroblock {
@@ -213,23 +197,12 @@ struct macroblock {
   // to select transform kernel.
   int rd_model;
 
-  // Indicate if the encoder is running in the first pass partition search.
-  // In that case, apply certain speed features therein to reduce the overhead
-  // cost in the first pass search.
-  int cb_partition_scan;
-
-  FIRST_PARTITION_PASS_STATS
-  first_partition_pass_stats[FIRST_PARTITION_PASS_STATS_TABLES];
-
   // [comp_idx][saved stat_idx]
   INTERPOLATION_FILTER_STATS interp_filter_stats[2][MAX_INTERP_FILTER_STATS];
   int interp_filter_stats_idx[2];
 
-  // prune_comp_search_by_single_result (3:MAX_REF_MV_SERCH)
+  // prune_comp_search_by_single_result (3:MAX_REF_MV_SEARCH)
   SimpleRDState simple_rd_state[SINGLE_REF_MODES][3];
-
-  // Activate constrained coding block partition search range.
-  int use_cb_search_range;
 
   // Inter macroblock RD search info.
   MB_RD_RECORD mb_rd_record;
@@ -258,7 +231,6 @@ struct macroblock {
   // for sub-8x8 blocks.
   int sadperbit4;
   int rdmult;
-  int cb_rdmult;
   int mb_energy;
   int sb_energy_level;
   int *m_search_count_ptr;
@@ -291,6 +263,7 @@ struct macroblock {
   uint8_t *left_pred_buf;
 
   PALETTE_BUFFER *palette_buffer;
+  CompoundTypeRdBuffers comp_rd_buffer;
 
   CONV_BUF_TYPE *tmp_conv_dst;
   uint8_t *tmp_obmc_bufs[2];
@@ -327,8 +300,6 @@ struct macroblock {
 
   int skip_mode;  // 0: off; 1: on
   int skip_mode_cost[SKIP_CONTEXTS][2];
-
-  int compound_idx;
 
   LV_MAP_COEFF_COST coeff_costs[TX_SIZES][PLANE_TYPES];
   LV_MAP_EOB_COST eob_costs[7][2];
@@ -416,10 +387,7 @@ struct macroblock {
 #endif  // CONFIG_DIST_8X8
   int comp_idx_cost[COMP_INDEX_CONTEXTS][2];
   int comp_group_idx_cost[COMP_GROUP_IDX_CONTEXTS][2];
-  // Bit flags for pruning tx type search, tx split, etc.
-  int tx_search_prune[EXT_TX_SET_TYPES];
   int must_find_valid_partition;
-  int tx_split_prune_flag;  // Flag to skip tx split RD search.
   int recalc_luma_mc_data;  // Flag to indicate recalculation of MC data during
                             // interpolation filter search
   // The likelihood of an edge existing in the block (using partial Canny edge
@@ -429,10 +397,13 @@ struct macroblock {
   // The strongest edge strength seen along the x/y axis.
   uint16_t edge_strength_x;
   uint16_t edge_strength_y;
+  uint8_t compound_idx;
 
   // [Saved stat index]
   COMP_RD_STATS comp_rd_stats[MAX_COMP_RD_STATS];
   int comp_rd_stats_idx;
+
+  CB_COEFF_BUFFER *cb_coef_buff;
 };
 
 static INLINE int is_rect_tx_allowed_bsize(BLOCK_SIZE bsize) {

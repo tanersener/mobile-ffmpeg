@@ -323,9 +323,9 @@ int main(int argc, const char **argv) {
   /* block partition */
   cts_each_dim[0] = PARTITION_CONTEXTS;
   cts_each_dim[1] = EXT_PARTITION_TYPES;
-  int part_types_each_ctx[PARTITION_CONTEXTS] = {
-    4, 4, 4, 4, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 8, 8, 8, 8
-  };
+  int part_types_each_ctx[PARTITION_CONTEXTS] = { 4,  4,  4,  4,  10, 10, 10,
+                                                  10, 10, 10, 10, 10, 10, 10,
+                                                  10, 10, 8,  8,  8,  8 };
   optimize_cdf_table_var_modes_2d(
       &fc.partition[0][0], probsfile, 2, cts_each_dim, part_types_each_ctx,
       "static const aom_cdf_prob default_partition_cdf[PARTITION_CONTEXTS]"

@@ -14,8 +14,8 @@
 
 #include "av1/common/onyxc_int.h"
 
-extern const int16_t k_eob_group_start[12];
-extern const int16_t k_eob_offset_bits[12];
+extern const int16_t av1_eob_group_start[12];
+extern const int16_t av1_eob_offset_bits[12];
 
 extern const int8_t av1_coeff_band_4x4[16];
 

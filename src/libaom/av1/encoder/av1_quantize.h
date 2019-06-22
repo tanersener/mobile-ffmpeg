@@ -79,10 +79,7 @@ typedef struct {
   DECLARE_ALIGNED(16, int16_t,
                   u_dequant_QTX[QINDEX_RANGE][8]);  // 8: SIMD width
   DECLARE_ALIGNED(16, int16_t,
-                  v_dequant_QTX[QINDEX_RANGE][8]);              // 8: SIMD width
-  DECLARE_ALIGNED(16, int16_t, y_dequant_Q3[QINDEX_RANGE][8]);  // 8: SIMD width
-  DECLARE_ALIGNED(16, int16_t, u_dequant_Q3[QINDEX_RANGE][8]);  // 8: SIMD width
-  DECLARE_ALIGNED(16, int16_t, v_dequant_Q3[QINDEX_RANGE][8]);  // 8: SIMD width
+                  v_dequant_QTX[QINDEX_RANGE][8]);  // 8: SIMD width
 } Dequants;
 
 struct AV1_COMP;

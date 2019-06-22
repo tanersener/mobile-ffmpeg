@@ -31,6 +31,10 @@ extern "C" {
   (ROUND_POWER_OF_TWO(((int64_t)(R)) * (RM), AV1_PROB_COST_SHIFT) + \
    ((D) * (1 << RDDIV_BITS)))
 
+#define RDCOST_NEG_R(RM, R, D) \
+  (((D) * (1 << RDDIV_BITS)) - \
+   ROUND_POWER_OF_TWO(((int64_t)(R)) * (RM), AV1_PROB_COST_SHIFT))
+
 #define RDCOST_DBL(RM, R, D)                                       \
   (((((double)(R)) * (RM)) / (double)(1 << AV1_PROB_COST_SHIFT)) + \
    ((double)(D) * (1 << RDDIV_BITS)))
@@ -78,8 +82,8 @@ enum {
   THR_GLOBALL3,
   THR_GLOBALB,
   THR_GLOBALA2,
-  THR_GLOBALA,
   THR_GLOBALG,
+  THR_GLOBALA,
 
   THR_COMP_NEAREST_NEARESTLA,
   THR_COMP_NEAREST_NEARESTL2A,
@@ -290,7 +294,8 @@ typedef struct RD_OPT {
 
   int RDMULT;
 
-  double r0;
+  double r0, arf_r0;
+  double mc_saved_base, mc_count_base;
 } RD_OPT;
 
 static INLINE void av1_init_rd_stats(RD_STATS *rd_stats) {
@@ -303,8 +308,6 @@ static INLINE void av1_init_rd_stats(RD_STATS *rd_stats) {
   rd_stats->sse = 0;
   rd_stats->skip = 1;
   rd_stats->zero_rate = 0;
-  rd_stats->invalid_rate = 0;
-  rd_stats->ref_rdcost = INT64_MAX;
 #if CONFIG_RD_DEBUG
   // This may run into problems when monochrome video is
   // encoded, as there will only be 1 plane
@@ -330,8 +333,6 @@ static INLINE void av1_invalid_rd_stats(RD_STATS *rd_stats) {
   rd_stats->sse = INT64_MAX;
   rd_stats->skip = 0;
   rd_stats->zero_rate = 0;
-  rd_stats->invalid_rate = 1;
-  rd_stats->ref_rdcost = INT64_MAX;
 #if CONFIG_RD_DEBUG
   // This may run into problems when monochrome video is
   // encoded, as there will only be 1 plane
@@ -349,20 +350,17 @@ static INLINE void av1_invalid_rd_stats(RD_STATS *rd_stats) {
 
 static INLINE void av1_merge_rd_stats(RD_STATS *rd_stats_dst,
                                       const RD_STATS *rd_stats_src) {
-#if CONFIG_RD_DEBUG
-  int plane;
-#endif
+  assert(rd_stats_dst->rate != INT_MAX && rd_stats_src->rate != INT_MAX);
   rd_stats_dst->rate += rd_stats_src->rate;
   if (!rd_stats_dst->zero_rate)
     rd_stats_dst->zero_rate = rd_stats_src->zero_rate;
   rd_stats_dst->dist += rd_stats_src->dist;
   rd_stats_dst->sse += rd_stats_src->sse;
   rd_stats_dst->skip &= rd_stats_src->skip;
-  rd_stats_dst->invalid_rate &= rd_stats_src->invalid_rate;
 #if CONFIG_RD_DEBUG
   // This may run into problems when monochrome video is
   // encoded, as there will only be 1 plane
-  for (plane = 0; plane < MAX_MB_PLANE; ++plane) {
+  for (int plane = 0; plane < MAX_MB_PLANE; ++plane) {
     rd_stats_dst->txb_coeff_cost[plane] += rd_stats_src->txb_coeff_cost[plane];
     {
       // TODO(angiebird): optimize this part
@@ -378,6 +376,38 @@ static INLINE void av1_merge_rd_stats(RD_STATS *rd_stats_dst,
     }
   }
 #endif
+}
+
+static INLINE int64_t av1_calculate_rd_cost(int mult, int rate, int64_t dist) {
+  assert(mult >= 0);
+  if (rate >= 0) {
+    return RDCOST(mult, rate, dist);
+  }
+  return RDCOST_NEG_R(mult, -rate, dist);
+}
+
+static INLINE void av1_rd_cost_update(int mult, RD_STATS *rd_cost) {
+  if (rd_cost->rate < INT_MAX && rd_cost->dist < INT64_MAX &&
+      rd_cost->rdcost < INT64_MAX) {
+    rd_cost->rdcost = av1_calculate_rd_cost(mult, rd_cost->rate, rd_cost->dist);
+  } else {
+    av1_invalid_rd_stats(rd_cost);
+  }
+}
+
+static INLINE void av1_rd_stats_subtraction(int mult,
+                                            const RD_STATS *const left,
+                                            const RD_STATS *const right,
+                                            RD_STATS *result) {
+  if (left->rate == INT_MAX || right->rate == INT_MAX ||
+      left->dist == INT64_MAX || right->dist == INT64_MAX ||
+      left->rdcost == INT64_MAX || right->rdcost == INT64_MAX) {
+    av1_invalid_rd_stats(result);
+  } else {
+    result->rate = left->rate - right->rate;
+    result->dist = left->dist - right->dist;
+    result->rdcost = av1_calculate_rd_cost(mult, result->rate, result->dist);
+  }
 }
 
 struct TileInfo;
@@ -462,6 +492,8 @@ void av1_fill_coeff_costs(MACROBLOCK *x, FRAME_CONTEXT *fc,
                           const int num_planes);
 
 int av1_get_adaptive_rdmult(const struct AV1_COMP *cpi, double beta);
+
+int av1_get_deltaq_offset(const struct AV1_COMP *cpi, int qindex, double beta);
 
 #ifdef __cplusplus
 }  // extern "C"

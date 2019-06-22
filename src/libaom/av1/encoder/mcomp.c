@@ -59,21 +59,6 @@ void av1_set_mv_search_range(MvLimits *mv_limits, const MV *mv) {
   if (mv_limits->row_max > row_max) mv_limits->row_max = row_max;
 }
 
-static void set_subpel_mv_search_range(const MvLimits *mv_limits, int *col_min,
-                                       int *col_max, int *row_min, int *row_max,
-                                       const MV *ref_mv) {
-  const int max_mv = MAX_FULL_PEL_VAL * 8;
-  const int minc = AOMMAX(mv_limits->col_min * 8, ref_mv->col - max_mv);
-  const int maxc = AOMMIN(mv_limits->col_max * 8, ref_mv->col + max_mv);
-  const int minr = AOMMAX(mv_limits->row_min * 8, ref_mv->row - max_mv);
-  const int maxr = AOMMIN(mv_limits->row_max * 8, ref_mv->row + max_mv);
-
-  *col_min = AOMMAX(MV_LOW + 1, minc);
-  *col_max = AOMMIN(MV_UPP - 1, maxc);
-  *row_min = AOMMAX(MV_LOW + 1, minr);
-  *row_max = AOMMIN(MV_UPP - 1, maxr);
-}
-
 int av1_init_search_range(int size) {
   int sr = 0;
   // Minimum search size no matter what the passed in value.
@@ -123,6 +108,7 @@ void av1_init_dsmotion_compensation(search_site_config *cfg, int stride) {
 
   cfg->ss[0].mv.col = cfg->ss[0].mv.row = 0;
   cfg->ss[0].offset = 0;
+  cfg->stride = stride;
 
   for (len = MAX_FIRST_STEP; len > 0; len /= 2) {
     // Generate offsets for 4 search sites per step.
@@ -144,6 +130,7 @@ void av1_init3smotion_compensation(search_site_config *cfg, int stride) {
 
   cfg->ss[0].mv.col = cfg->ss[0].mv.row = 0;
   cfg->ss[0].offset = 0;
+  cfg->stride = stride;
 
   for (len = MAX_FIRST_STEP; len > 0; len /= 2) {
     // Generate offsets for 8 search sites per step.
@@ -958,10 +945,10 @@ unsigned int av1_refine_warped_mv(const AV1_COMP *cpi, MACROBLOCK *const x,
         memcpy(pts_inref, pts_inref0, total_samples * 2 * sizeof(*pts_inref0));
         if (total_samples > 1)
           mbmi->num_proj_ref =
-              selectSamples(&this_mv, pts, pts_inref, total_samples, bsize);
+              av1_selectSamples(&this_mv, pts, pts_inref, total_samples, bsize);
 
-        if (!find_projection(mbmi->num_proj_ref, pts, pts_inref, bsize, *tr,
-                             *tc, &mbmi->wm_params, mi_row, mi_col)) {
+        if (!av1_find_projection(mbmi->num_proj_ref, pts, pts_inref, bsize, *tr,
+                                 *tc, &mbmi->wm_params, mi_row, mi_col)) {
           thismse =
               av1_compute_motion_cost(cpi, x, bsize, mi_row, mi_col, &this_mv);
 
@@ -2017,8 +2004,8 @@ int av1_refining_search_8p_c(MACROBLOCK *x, int error_per_bit, int search_range,
   MV *best_mv = &x->best_mv.as_mv;
   unsigned int best_sad = INT_MAX;
   int i, j;
-  uint8_t do_refine_search_grid[SEARCH_GRID_STRIDE_8P * SEARCH_GRID_STRIDE_8P] =
-      { 0 };
+  uint8_t do_refine_search_grid[SEARCH_GRID_STRIDE_8P *
+                                SEARCH_GRID_STRIDE_8P] = { 0 };
   int grid_center = SEARCH_GRID_CENTER_8P;
   int grid_coord = grid_center;
 
@@ -2438,8 +2425,9 @@ int av1_full_pixel_search(const AV1_COMP *cpi, MACROBLOCK *x, BLOCK_SIZE bsize,
 
         Iterator iterator =
             av1_hash_get_first_iterator(ref_frame_hash, hash_value1);
-        for (int i = 0; i < count; i++, iterator_increment(&iterator)) {
-          block_hash ref_block_hash = *(block_hash *)(iterator_get(&iterator));
+        for (int i = 0; i < count; i++, aom_iterator_increment(&iterator)) {
+          block_hash ref_block_hash =
+              *(block_hash *)(aom_iterator_get(&iterator));
           if (hash_value2 == ref_block_hash.hash_value2) {
             // For intra, make sure the prediction is from valid area.
             if (intra) {
@@ -3095,20 +3083,20 @@ void av1_simple_motion_search(AV1_COMP *const cpi, MACROBLOCK *x, int mi_row,
   MV ref_mv = { 0, 0 };
   const int step_param = cpi->mv_step_param;
   const MvLimits tmp_mv_limits = x->mv_limits;
-  const SEARCH_METHODS search_methods = NSTEP;
+  const SEARCH_METHODS search_methods = cpi->sf.mv.search_method;
   const int do_mesh_search = 0;
   const int sadpb = x->sadperbit16;
   int cost_list[5];
   const int ref_idx = 0;
   int var;
 
+  av1_setup_pre_planes(xd, ref_idx, yv12, mi_row, mi_col,
+                       get_ref_scale_factors(cm, ref), num_planes);
+  set_ref_ptrs(cm, xd, mbmi->ref_frame[0], mbmi->ref_frame[1]);
   if (scaled_ref_frame) {
     backup_yv12 = xd->plane[AOM_PLANE_Y].pre[ref_idx];
     av1_setup_pre_planes(xd, ref_idx, scaled_ref_frame, mi_row, mi_col, NULL,
                          num_planes);
-  } else {
-    av1_setup_pre_planes(xd, ref_idx, yv12, mi_row, mi_col,
-                         get_ref_scale_factors(cm, ref), num_planes);
   }
 
   // This overwrites the mv_limits so we will need to restore it later.
@@ -3122,6 +3110,9 @@ void av1_simple_motion_search(AV1_COMP *const cpi, MACROBLOCK *x, int mi_row,
 
   const int use_subpel_search =
       var < INT_MAX && !cpi->common.cur_frame_force_integer_mv && use_subpixel;
+  if (scaled_ref_frame) {
+    xd->plane[AOM_PLANE_Y].pre[ref_idx] = backup_yv12;
+  }
   if (use_subpel_search) {
     int not_used = 0;
     if (cpi->sf.use_accurate_subpel_search) {
@@ -3151,7 +3142,6 @@ void av1_simple_motion_search(AV1_COMP *const cpi, MACROBLOCK *x, int mi_row,
   mbmi->mv[0].as_mv = x->best_mv.as_mv;
 
   // Get a copy of the prediction output
-  set_ref_ptrs(cm, xd, mbmi->ref_frame[0], mbmi->ref_frame[1]);
   av1_enc_build_inter_predictor(cm, xd, mi_row, mi_col, NULL, bsize,
                                 AOM_PLANE_Y, AOM_PLANE_Y);
 

@@ -23,23 +23,10 @@ struct AV1_COMP;
 struct AV1Common;
 struct ThreadData;
 
-enum {
-  // Search all the partition types in this plane.
-  SEARCH_FULL_PLANE = 0,
-  // Only search none_partition coding block.
-  NONE_PARTITION_PLANE = 1,
-  // Search all the partition types in this plane except split.
-  SEARCH_SAME_PLANE = 2,
-  // Skip search partition on this plane. Go split directly.
-  SPLIT_PLANE = 3,
-} UENUM1BYTE(CB_TREE_SEARCH);
-
 // Structure to hold snapshot of coding context during the mode picking process
 typedef struct {
   MB_MODE_INFO mic;
   MB_MODE_INFO_EXT mbmi_ext;
-  int64_t dist;
-  int64_t rdcost;
   uint8_t *color_index_map[2];
   uint8_t *blk_skip;
 
@@ -50,7 +37,6 @@ typedef struct {
   uint8_t *txb_entropy_ctx[MAX_MB_PLANE];
 
   int num_4x4_blk;
-  int skip;
   // For current partition, only if all Y, U, and V transform blocks'
   // coefficients are quantized to 0, skippable is set to 1.
   int skippable;
@@ -59,9 +45,7 @@ typedef struct {
   int comp_pred_diff;
   int single_pred_diff;
 
-  // TODO(jingning) Use RD_COST struct here instead. This involves a boarder
-  // scope of refactoring.
-  int rate;
+  RD_STATS rd_stats;
 
   int rd_mode_is_ready;  // Flag to indicate whether rd pick mode decision has
                          // been made.
@@ -72,16 +56,6 @@ typedef struct {
   InterpFilter pred_interp_filter;
   PARTITION_TYPE partition;
 } PICK_MODE_CONTEXT;
-
-typedef struct {
-  int64_t rdcost;
-  int64_t sub_block_rdcost[4];
-  int valid;
-  int split;
-  int sub_block_split[4];
-  int sub_block_skip[4];
-  int skip;
-} PC_TREE_STATS;
 
 typedef struct PC_TREE {
   PARTITION_TYPE partitioning;
@@ -96,10 +70,14 @@ typedef struct PC_TREE {
   PICK_MODE_CONTEXT horizontal4[4];
   PICK_MODE_CONTEXT vertical4[4];
   struct PC_TREE *split[4];
-  PC_TREE_STATS pc_tree_stats;
-  CB_TREE_SEARCH cb_search_range;
   int index;
+
+  // Simple motion search_features
   MV mv_ref_fulls[REF_FRAMES];
+  unsigned int sms_none_feat[2];
+  unsigned int sms_rect_feat[8];
+  int sms_none_valid;
+  int sms_rect_valid;
 } PC_TREE;
 
 void av1_setup_pc_tree(struct AV1Common *cm, struct ThreadData *td);

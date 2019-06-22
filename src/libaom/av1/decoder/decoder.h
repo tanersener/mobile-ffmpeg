@@ -209,9 +209,6 @@ typedef struct AV1Decoder {
   int acct_enabled;
   Accounting accounting;
 #endif
-  int tg_size;   // Number of tiles in the current tilegroup
-  int tg_start;  // First tile in the current tilegroup
-  int tg_size_bit_offset;
   int sequence_header_ready;
   int sequence_header_changed;
 #if CONFIG_INSPECTION
@@ -221,6 +218,8 @@ typedef struct AV1Decoder {
   int operating_point;
   int current_operating_point;
   int seen_frame_header;
+  // The expected start_tile (tg_start syntax element) of the next tile group.
+  int next_start_tile;
 
   // State if the camera frame header is already decoded while
   // large_scale_tile = 1.

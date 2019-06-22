@@ -54,7 +54,7 @@ static INLINE int aom_daala_read(daala_reader *r, int prob) {
 #if CONFIG_BITSTREAM_DEBUG
 /*{
   const int queue_r = bitstream_queue_get_read();
-  const int frame_idx = bitstream_queue_get_frame_read();
+  const int frame_idx = aom_bitstream_queue_get_frame_read();
   if (frame_idx == 0 && queue_r == 0) {
     fprintf(stderr, "\n *** bitstream queue at frame_idx_r %d queue_r %d\n",
             frame_idx, queue_r);
@@ -70,7 +70,7 @@ static INLINE int aom_daala_read(daala_reader *r, int prob) {
     int ref_bit, ref_nsymbs;
     aom_cdf_prob ref_cdf[16];
     const int queue_r = bitstream_queue_get_read();
-    const int frame_idx = bitstream_queue_get_frame_read();
+    const int frame_idx = aom_bitstream_queue_get_frame_read();
     bitstream_queue_pop(&ref_bit, ref_cdf, &ref_nsymbs);
     if (ref_nsymbs != 2) {
       fprintf(stderr,
@@ -114,7 +114,7 @@ static INLINE int daala_read_symbol(daala_reader *r, const aom_cdf_prob *cdf,
     int ref_symb, ref_nsymbs;
     aom_cdf_prob ref_cdf[16];
     const int queue_r = bitstream_queue_get_read();
-    const int frame_idx = bitstream_queue_get_frame_read();
+    const int frame_idx = aom_bitstream_queue_get_frame_read();
     bitstream_queue_pop(&ref_symb, ref_cdf, &ref_nsymbs);
     if (nsymbs != ref_nsymbs) {
       fprintf(stderr,

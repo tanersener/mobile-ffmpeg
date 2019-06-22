@@ -43,7 +43,7 @@ static int read_golomb(MACROBLOCKD *xd, aom_reader *r) {
 }
 
 static INLINE int rec_eob_pos(const int eob_token, const int extra) {
-  int eob = k_eob_group_start[eob_token];
+  int eob = av1_eob_group_start[eob_token];
   if (eob > 2) {
     eob += extra;
   }
@@ -220,7 +220,7 @@ uint8_t av1_read_coeffs_txb(const AV1_COMMON *const cm, MACROBLOCKD *const xd,
       break;
   }
 
-  const int eob_offset_bits = k_eob_offset_bits[eob_pt];
+  const int eob_offset_bits = av1_eob_offset_bits[eob_pt];
   if (eob_offset_bits > 0) {
     const int eob_ctx = eob_pt - 3;
     int bit = aom_read_symbol(
@@ -336,6 +336,7 @@ void av1_read_coeffs_txb_facade(const AV1_COMMON *const cm,
   struct macroblockd_plane *const pd = &xd->plane[plane];
 
   const BLOCK_SIZE bsize = mbmi->sb_type;
+  assert(bsize < BLOCK_SIZES_ALL);
   const BLOCK_SIZE plane_bsize =
       get_plane_block_size(bsize, pd->subsampling_x, pd->subsampling_y);
 

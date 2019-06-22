@@ -1233,12 +1233,6 @@ static void decode_token_recon_block(AV1Decoder *const pbi,
                     set_color_index_map_offset);
 }
 
-#if LOOP_FILTER_BITMASK
-static void store_bitmask_vartx(AV1_COMMON *cm, int mi_row, int mi_col,
-                                BLOCK_SIZE bsize, TX_SIZE tx_size,
-                                MB_MODE_INFO *mbmi);
-#endif
-
 static void set_inter_tx_size(MB_MODE_INFO *mbmi, int stride_log2,
                               int tx_w_log2, int tx_h_log2, int min_txs,
                               int split_size, int txs, int blk_row,
@@ -1256,7 +1250,7 @@ static void set_inter_tx_size(MB_MODE_INFO *mbmi, int stride_log2,
 
 static void read_tx_size_vartx(MACROBLOCKD *xd, MB_MODE_INFO *mbmi,
                                TX_SIZE tx_size, int depth,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
                                AV1_COMMON *cm, int mi_row, int mi_col,
                                int store_bitmask,
 #endif
@@ -1301,18 +1295,18 @@ static void read_tx_size_vartx(MACROBLOCKD *xd, MB_MODE_INFO *mbmi,
       mbmi->tx_size = sub_txs;
       txfm_partition_update(xd->above_txfm_context + blk_col,
                             xd->left_txfm_context + blk_row, sub_txs, tx_size);
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
       if (store_bitmask) {
-        store_bitmask_vartx(cm, mi_row + blk_row, mi_col + blk_col,
-                            txsize_to_bsize[tx_size], TX_4X4, mbmi);
+        av1_store_bitmask_vartx(cm, mi_row + blk_row, mi_col + blk_col,
+                                txsize_to_bsize[tx_size], TX_4X4, mbmi);
       }
 #endif
       return;
     }
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
     if (depth + 1 == MAX_VARTX_DEPTH && store_bitmask) {
-      store_bitmask_vartx(cm, mi_row + blk_row, mi_col + blk_col,
-                          txsize_to_bsize[tx_size], sub_txs, mbmi);
+      av1_store_bitmask_vartx(cm, mi_row + blk_row, mi_col + blk_col,
+                              txsize_to_bsize[tx_size], sub_txs, mbmi);
       store_bitmask = 0;
     }
 #endif
@@ -1323,7 +1317,7 @@ static void read_tx_size_vartx(MACROBLOCKD *xd, MB_MODE_INFO *mbmi,
         int offsetr = blk_row + row;
         int offsetc = blk_col + col;
         read_tx_size_vartx(xd, mbmi, sub_txs, depth + 1,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
                            cm, mi_row, mi_col, store_bitmask,
 #endif
                            offsetr, offsetc, r);
@@ -1335,10 +1329,10 @@ static void read_tx_size_vartx(MACROBLOCKD *xd, MB_MODE_INFO *mbmi,
     mbmi->tx_size = tx_size;
     txfm_partition_update(xd->above_txfm_context + blk_col,
                           xd->left_txfm_context + blk_row, tx_size, tx_size);
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
     if (store_bitmask) {
-      store_bitmask_vartx(cm, mi_row + blk_row, mi_col + blk_col,
-                          txsize_to_bsize[tx_size], tx_size, mbmi);
+      av1_store_bitmask_vartx(cm, mi_row + blk_row, mi_col + blk_col,
+                              txsize_to_bsize[tx_size], tx_size, mbmi);
     }
 #endif
   }
@@ -1378,209 +1372,6 @@ static TX_SIZE read_tx_size(AV1_COMMON *cm, MACROBLOCKD *xd, int is_inter,
   }
 }
 
-#if LOOP_FILTER_BITMASK
-static void store_bitmask_vartx(AV1_COMMON *cm, int mi_row, int mi_col,
-                                BLOCK_SIZE bsize, TX_SIZE tx_size,
-                                MB_MODE_INFO *mbmi) {
-  LoopFilterMask *lfm = get_loop_filter_mask(cm, mi_row, mi_col);
-  const TX_SIZE tx_size_y_vert = txsize_vert_map[tx_size];
-  const TX_SIZE tx_size_y_horz = txsize_horz_map[tx_size];
-  const TX_SIZE tx_size_uv_vert = txsize_vert_map[av1_get_max_uv_txsize(
-      mbmi->sb_type, cm->seq_params.subsampling_x,
-      cm->seq_params.subsampling_y)];
-  const TX_SIZE tx_size_uv_horz = txsize_horz_map[av1_get_max_uv_txsize(
-      mbmi->sb_type, cm->seq_params.subsampling_x,
-      cm->seq_params.subsampling_y)];
-  const int is_square_transform_size = tx_size <= TX_64X64;
-  int mask_id = 0;
-  int offset = 0;
-  const int half_ratio_tx_size_max32 =
-      (tx_size > TX_64X64) & (tx_size <= TX_32X16);
-  if (is_square_transform_size) {
-    switch (tx_size) {
-      case TX_4X4: mask_id = mask_id_table_tx_4x4[bsize]; break;
-      case TX_8X8:
-        mask_id = mask_id_table_tx_8x8[bsize];
-        offset = 19;
-        break;
-      case TX_16X16:
-        mask_id = mask_id_table_tx_16x16[bsize];
-        offset = 33;
-        break;
-      case TX_32X32:
-        mask_id = mask_id_table_tx_32x32[bsize];
-        offset = 42;
-        break;
-      case TX_64X64: mask_id = 46; break;
-      default: assert(!is_square_transform_size); return;
-    }
-    mask_id += offset;
-  } else if (half_ratio_tx_size_max32) {
-    int tx_size_equal_block_size = bsize == txsize_to_bsize[tx_size];
-    mask_id = 47 + 2 * (tx_size - TX_4X8) + (tx_size_equal_block_size ? 0 : 1);
-  } else if (tx_size == TX_32X64) {
-    mask_id = 59;
-  } else if (tx_size == TX_64X32) {
-    mask_id = 60;
-  } else {  // quarter ratio tx size
-    mask_id = 61 + (tx_size - TX_4X16);
-  }
-  int index = 0;
-  const int row = mi_row % MI_SIZE_64X64;
-  const int col = mi_col % MI_SIZE_64X64;
-  const int shift = get_index_shift(col, row, &index);
-  const int vert_shift = tx_size_y_vert <= TX_8X8 ? shift : col;
-  for (int i = 0; i + index < 4; ++i) {
-    // y vertical.
-    lfm->tx_size_ver[0][tx_size_y_horz].bits[i + index] |=
-        (left_mask_univariant_reordered[mask_id].bits[i] << vert_shift);
-    // y horizontal.
-    lfm->tx_size_hor[0][tx_size_y_vert].bits[i + index] |=
-        (above_mask_univariant_reordered[mask_id].bits[i] << shift);
-    // u/v vertical.
-    lfm->tx_size_ver[1][tx_size_uv_horz].bits[i + index] |=
-        (left_mask_univariant_reordered[mask_id].bits[i] << vert_shift);
-    // u/v horizontal.
-    lfm->tx_size_hor[1][tx_size_uv_vert].bits[i + index] |=
-        (above_mask_univariant_reordered[mask_id].bits[i] << shift);
-  }
-}
-
-static void store_bitmask_univariant_tx(AV1_COMMON *cm, int mi_row, int mi_col,
-                                        BLOCK_SIZE bsize, MB_MODE_INFO *mbmi) {
-  // Use a lookup table that provides one bitmask for a given block size and
-  // a univariant transform size.
-  int index;
-  int shift;
-  int row;
-  int col;
-  LoopFilterMask *lfm = get_loop_filter_mask(cm, mi_row, mi_col);
-  const TX_SIZE tx_size_y_vert = txsize_vert_map[mbmi->tx_size];
-  const TX_SIZE tx_size_y_horz = txsize_horz_map[mbmi->tx_size];
-  const TX_SIZE tx_size_uv_vert = txsize_vert_map[av1_get_max_uv_txsize(
-      mbmi->sb_type, cm->seq_params.subsampling_x,
-      cm->seq_params.subsampling_y)];
-  const TX_SIZE tx_size_uv_horz = txsize_horz_map[av1_get_max_uv_txsize(
-      mbmi->sb_type, cm->seq_params.subsampling_x,
-      cm->seq_params.subsampling_y)];
-  const int is_square_transform_size = mbmi->tx_size <= TX_64X64;
-  int mask_id = 0;
-  int offset = 0;
-  const int half_ratio_tx_size_max32 =
-      (mbmi->tx_size > TX_64X64) & (mbmi->tx_size <= TX_32X16);
-  if (is_square_transform_size) {
-    switch (mbmi->tx_size) {
-      case TX_4X4: mask_id = mask_id_table_tx_4x4[bsize]; break;
-      case TX_8X8:
-        mask_id = mask_id_table_tx_8x8[bsize];
-        offset = 19;
-        break;
-      case TX_16X16:
-        mask_id = mask_id_table_tx_16x16[bsize];
-        offset = 33;
-        break;
-      case TX_32X32:
-        mask_id = mask_id_table_tx_32x32[bsize];
-        offset = 42;
-        break;
-      case TX_64X64: mask_id = 46; break;
-      default: assert(!is_square_transform_size); return;
-    }
-    mask_id += offset;
-  } else if (half_ratio_tx_size_max32) {
-    int tx_size_equal_block_size = bsize == txsize_to_bsize[mbmi->tx_size];
-    mask_id =
-        47 + 2 * (mbmi->tx_size - TX_4X8) + (tx_size_equal_block_size ? 0 : 1);
-  } else if (mbmi->tx_size == TX_32X64) {
-    mask_id = 59;
-  } else if (mbmi->tx_size == TX_64X32) {
-    mask_id = 60;
-  } else {  // quarter ratio tx size
-    mask_id = 61 + (mbmi->tx_size - TX_4X16);
-  }
-  row = mi_row % MI_SIZE_64X64;
-  col = mi_col % MI_SIZE_64X64;
-  shift = get_index_shift(col, row, &index);
-  const int vert_shift = tx_size_y_vert <= TX_8X8 ? shift : col;
-  for (int i = 0; i + index < 4; ++i) {
-    // y vertical.
-    lfm->tx_size_ver[0][tx_size_y_horz].bits[i + index] |=
-        (left_mask_univariant_reordered[mask_id].bits[i] << vert_shift);
-    // y horizontal.
-    lfm->tx_size_hor[0][tx_size_y_vert].bits[i + index] |=
-        (above_mask_univariant_reordered[mask_id].bits[i] << shift);
-    // u/v vertical.
-    lfm->tx_size_ver[1][tx_size_uv_horz].bits[i + index] |=
-        (left_mask_univariant_reordered[mask_id].bits[i] << vert_shift);
-    // u/v horizontal.
-    lfm->tx_size_hor[1][tx_size_uv_vert].bits[i + index] |=
-        (above_mask_univariant_reordered[mask_id].bits[i] << shift);
-  }
-}
-
-static void store_bitmask_other_info(AV1_COMMON *cm, int mi_row, int mi_col,
-                                     BLOCK_SIZE bsize, MB_MODE_INFO *mbmi,
-                                     int is_horz_coding_block_border,
-                                     int is_vert_coding_block_border) {
-  int index;
-  int shift;
-  int row;
-  LoopFilterMask *lfm = get_loop_filter_mask(cm, mi_row, mi_col);
-  const int row_start = mi_row % MI_SIZE_64X64;
-  const int col_start = mi_col % MI_SIZE_64X64;
-  shift = get_index_shift(col_start, row_start, &index);
-  if (is_horz_coding_block_border) {
-    const int block_shift = shift + mi_size_wide[bsize];
-    assert(block_shift <= 64);
-    const uint64_t right_edge_shift =
-        (block_shift == 64) ? 0xffffffffffffffff : ((uint64_t)1 << block_shift);
-    const uint64_t left_edge_shift = (block_shift == 64)
-                                         ? (((uint64_t)1 << shift) - 1)
-                                         : ((uint64_t)1 << shift);
-    assert(right_edge_shift > left_edge_shift);
-    const uint64_t top_edge_mask = right_edge_shift - left_edge_shift;
-    lfm->is_horz_border.bits[index] |= top_edge_mask;
-  }
-  if (is_vert_coding_block_border) {
-    const int is_vert_border = mask_id_table_vert_border[bsize];
-    const int vert_shift = block_size_high[bsize] <= 8 ? shift : col_start;
-    for (int i = 0; i + index < 4; ++i) {
-      lfm->is_vert_border.bits[i + index] |=
-          (left_mask_univariant_reordered[is_vert_border].bits[i]
-           << vert_shift);
-    }
-  }
-  const int is_skip = mbmi->skip && is_inter_block(mbmi);
-  if (is_skip) {
-    const int is_skip_mask = mask_id_table_tx_4x4[bsize];
-    for (int i = 0; i + index < 4; ++i) {
-      lfm->skip.bits[i + index] |=
-          (above_mask_univariant_reordered[is_skip_mask].bits[i] << shift);
-    }
-  }
-  const uint8_t level_vert_y = get_filter_level(cm, &cm->lf_info, 0, 0, mbmi);
-  const uint8_t level_horz_y = get_filter_level(cm, &cm->lf_info, 1, 0, mbmi);
-  const uint8_t level_u = get_filter_level(cm, &cm->lf_info, 0, 1, mbmi);
-  const uint8_t level_v = get_filter_level(cm, &cm->lf_info, 0, 2, mbmi);
-  for (int r = mi_row; r < mi_row + mi_size_high[bsize]; r++) {
-    index = 0;
-    row = r % MI_SIZE_64X64;
-    memset(&lfm->lfl_y_ver[row][col_start], level_vert_y,
-           sizeof(uint8_t) * mi_size_wide[bsize]);
-    memset(&lfm->lfl_y_hor[row][col_start], level_horz_y,
-           sizeof(uint8_t) * mi_size_wide[bsize]);
-    memset(&lfm->lfl_u_ver[row][col_start], level_u,
-           sizeof(uint8_t) * mi_size_wide[bsize]);
-    memset(&lfm->lfl_u_hor[row][col_start], level_u,
-           sizeof(uint8_t) * mi_size_wide[bsize]);
-    memset(&lfm->lfl_v_ver[row][col_start], level_v,
-           sizeof(uint8_t) * mi_size_wide[bsize]);
-    memset(&lfm->lfl_v_hor[row][col_start], level_v,
-           sizeof(uint8_t) * mi_size_wide[bsize]);
-  }
-}
-#endif
-
 static void parse_decode_block(AV1Decoder *const pbi, ThreadData *const td,
                                int mi_row, int mi_col, aom_reader *r,
                                PARTITION_TYPE partition, BLOCK_SIZE bsize) {
@@ -1605,7 +1396,7 @@ static void parse_decode_block(AV1Decoder *const pbi, ThreadData *const td,
     for (int idy = 0; idy < height; idy += bh)
       for (int idx = 0; idx < width; idx += bw)
         read_tx_size_vartx(xd, mbmi, max_tx_size, 0,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
                            cm, mi_row, mi_col, 1,
 #endif
                            idy, idx, r);
@@ -1615,31 +1406,31 @@ static void parse_decode_block(AV1Decoder *const pbi, ThreadData *const td,
       memset(mbmi->inter_tx_size, mbmi->tx_size, sizeof(mbmi->inter_tx_size));
     set_txfm_ctxs(mbmi->tx_size, xd->n4_w, xd->n4_h,
                   mbmi->skip && is_inter_block(mbmi), xd);
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
     const int w = mi_size_wide[bsize];
     const int h = mi_size_high[bsize];
     if (w <= mi_size_wide[BLOCK_64X64] && h <= mi_size_high[BLOCK_64X64]) {
-      store_bitmask_univariant_tx(cm, mi_row, mi_col, bsize, mbmi);
+      av1_store_bitmask_univariant_tx(cm, mi_row, mi_col, bsize, mbmi);
     } else {
       for (int row = 0; row < h; row += mi_size_high[BLOCK_64X64]) {
         for (int col = 0; col < w; col += mi_size_wide[BLOCK_64X64]) {
-          store_bitmask_univariant_tx(cm, mi_row + row, mi_col + col,
-                                      BLOCK_64X64, mbmi);
+          av1_store_bitmask_univariant_tx(cm, mi_row + row, mi_col + col,
+                                          BLOCK_64X64, mbmi);
         }
       }
     }
 #endif
   }
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
   const int w = mi_size_wide[bsize];
   const int h = mi_size_high[bsize];
   if (w <= mi_size_wide[BLOCK_64X64] && h <= mi_size_high[BLOCK_64X64]) {
-    store_bitmask_other_info(cm, mi_row, mi_col, bsize, mbmi, 1, 1);
+    av1_store_bitmask_other_info(cm, mi_row, mi_col, bsize, mbmi, 1, 1);
   } else {
     for (int row = 0; row < h; row += mi_size_high[BLOCK_64X64]) {
       for (int col = 0; col < w; col += mi_size_wide[BLOCK_64X64]) {
-        store_bitmask_other_info(cm, mi_row + row, mi_col + col, BLOCK_64X64,
-                                 mbmi, row == 0, col == 0);
+        av1_store_bitmask_other_info(cm, mi_row + row, mi_col + col,
+                                     BLOCK_64X64, mbmi, row == 0, col == 0);
       }
     }
   }
@@ -1734,6 +1525,7 @@ static PARTITION_TYPE read_partition(MACROBLOCKD *xd, int mi_row, int mi_col,
 static void decode_partition(AV1Decoder *const pbi, ThreadData *const td,
                              int mi_row, int mi_col, aom_reader *reader,
                              BLOCK_SIZE bsize, int parse_decode_flag) {
+  assert(bsize < BLOCK_SIZES_ALL);
   AV1_COMMON *const cm = &pbi->common;
   MACROBLOCKD *const xd = &td->xd;
   const int bw = mi_size_wide[bsize];
@@ -1751,9 +1543,9 @@ static void decode_partition(AV1Decoder *const pbi, ThreadData *const td,
   // 01 - do parse only
   // 10 - do decode only
   // 11 - do parse and decode
-  static const block_visitor_fn_t block_visit[4] = {
-    NULL, parse_decode_block, decode_block, parse_decode_block
-  };
+  static const block_visitor_fn_t block_visit[4] = { NULL, parse_decode_block,
+                                                     decode_block,
+                                                     parse_decode_block };
 
   if (parse_decode_flag & 1) {
     const int num_planes = av1_num_planes(cm);
@@ -1778,7 +1570,11 @@ static void decode_partition(AV1Decoder *const pbi, ThreadData *const td,
     partition = get_partition(cm, mi_row, mi_col, bsize);
   }
   subsize = get_partition_subsize(bsize, partition);
-
+  if (subsize == BLOCK_INVALID) {
+    aom_internal_error(xd->error_info, AOM_CODEC_CORRUPT_FRAME,
+                       "Partition is invalid for block size %dx%d",
+                       block_size_wide[bsize], block_size_high[bsize]);
+  }
   // Check the bitstream is conformant: if there is subsampling on the
   // chroma planes, subsize must subsample to a valid block size.
   const struct macroblockd_plane *const pd_u = &xd->plane[1];
@@ -1944,7 +1740,7 @@ static void setup_segmentation(AV1_COMMON *const cm,
         av1_set_segdata(seg, i, j, data);
       }
     }
-    calculate_segdata(seg);
+    av1_calculate_segdata(seg);
   } else if (cm->prev_frame) {
     segfeatures_copy(seg, &cm->prev_frame->seg);
   }
@@ -2069,7 +1865,7 @@ static void read_wiener_filter(int wiener_win, WienerInfo *wiener_info,
 static void read_sgrproj_filter(SgrprojInfo *sgrproj_info,
                                 SgrprojInfo *ref_sgrproj_info, aom_reader *rb) {
   sgrproj_info->ep = aom_read_literal(rb, SGRPROJ_PARAMS_BITS, ACCT_STR);
-  const sgr_params_type *params = &sgr_params[sgrproj_info->ep];
+  const sgr_params_type *params = &av1_sgr_params[sgrproj_info->ep];
 
   if (params->r[0] == 0) {
     sgrproj_info->xqd[0] = 0;
@@ -2202,8 +1998,7 @@ static void setup_cdef(AV1_COMMON *cm, struct aom_read_bit_buffer *rb) {
   CdefInfo *const cdef_info = &cm->cdef_info;
 
   if (cm->allow_intrabc) return;
-  cdef_info->cdef_pri_damping = aom_rb_read_literal(rb, 2) + 3;
-  cdef_info->cdef_sec_damping = cdef_info->cdef_pri_damping;
+  cdef_info->cdef_damping = aom_rb_read_literal(rb, 2) + 3;
   cdef_info->cdef_bits = aom_rb_read_literal(rb, 2);
   cdef_info->nb_cdef_strengths = 1 << cdef_info->cdef_bits;
   for (int i = 0; i < cdef_info->nb_cdef_strengths; i++) {
@@ -2804,7 +2599,7 @@ static void get_tile_buffer(const uint8_t *const data_end,
   if (!is_last) {
     if (!read_is_valid(*data, tile_size_bytes, data_end))
       aom_internal_error(error_info, AOM_CODEC_CORRUPT_FRAME,
-                         "Truncated packet or corrupt tile length");
+                         "Not enough data to read tile size");
 
     size = mem_get_varsize(*data, tile_size_bytes) + AV1_MIN_TILE_SIZE_BYTES;
     *data += tile_size_bytes;
@@ -2830,7 +2625,6 @@ static void get_tile_buffers(AV1Decoder *pbi, const uint8_t *data,
   const int tile_cols = cm->tile_cols;
   const int tile_rows = cm->tile_rows;
   int tc = 0;
-  int first_tile_in_tg = 0;
 
   for (int r = 0; r < tile_rows; ++r) {
     for (int c = 0; c < tile_cols; ++c, ++tc) {
@@ -2844,7 +2638,6 @@ static void get_tile_buffers(AV1Decoder *pbi, const uint8_t *data,
       if (data + hdr_offset >= data_end)
         aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
                            "Data ended before all tiles were read.");
-      first_tile_in_tg += tc == first_tile_in_tg ? pbi->tg_size : 0;
       data += hdr_offset;
       get_tile_buffer(data_end, pbi->tile_size_bytes, is_last,
                       &pbi->common.error, &data, buf);
@@ -4526,8 +4319,8 @@ void av1_read_op_parameters_info(AV1_COMMON *const cm,
   cm->op_params[op_num].low_delay_mode_flag = aom_rb_read_bit(rb);
 }
 
-static void av1_read_temporal_point_info(AV1_COMMON *const cm,
-                                         struct aom_read_bit_buffer *rb) {
+static void read_temporal_point_info(AV1_COMMON *const cm,
+                                     struct aom_read_bit_buffer *rb) {
   cm->frame_presentation_time = aom_rb_read_unsigned_literal(
       rb, cm->buffer_model.frame_presentation_time_length);
 }
@@ -4681,7 +4474,7 @@ static int read_global_motion_params(WarpedMotionParams *params,
   }
 
   if (params->wmtype <= AFFINE) {
-    int good_shear_params = get_shear_params(params);
+    int good_shear_params = av1_get_shear_params(params);
     if (!good_shear_params) return 0;
   }
 
@@ -4805,7 +4598,8 @@ static void show_existing_frame_reset(AV1Decoder *const pbi,
   // Note that the displayed frame must be valid for referencing in order to
   // have been selected.
   if (cm->seq_params.frame_id_numbers_present_flag) {
-    update_ref_frame_id(cm, cm->ref_frame_id[existing_frame_idx]);
+    cm->current_frame_id = cm->ref_frame_id[existing_frame_idx];
+    update_ref_frame_id(cm, cm->current_frame_id);
   }
 
   cm->refresh_frame_context = REFRESH_FRAME_CONTEXT_DISABLED;
@@ -4890,7 +4684,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
       }
       if (seq_params->decoder_model_info_present_flag &&
           cm->timing_info.equal_picture_interval == 0) {
-        av1_read_temporal_point_info(cm, rb);
+        read_temporal_point_info(cm, rb);
       }
       if (seq_params->frame_id_numbers_present_flag) {
         int frame_id_length = seq_params->frame_id_length;
@@ -4922,9 +4716,17 @@ static int read_uncompressed_header(AV1Decoder *pbi,
       cm->lf.filter_level[1] = 0;
       cm->show_frame = 1;
 
+      // Section 6.8.2: It is a requirement of bitstream conformance that when
+      // show_existing_frame is used to show a previous frame, that the value
+      // of showable_frame for the previous frame was equal to 1.
       if (!frame_to_show->showable_frame) {
-        aom_merge_corrupted_flag(&xd->corrupted, 1);
+        aom_internal_error(&cm->error, AOM_CODEC_UNSUP_BITSTREAM,
+                           "Buffer does not contain a showable frame");
       }
+      // Section 6.8.2: It is a requirement of bitstream conformance that when
+      // show_existing_frame is used to show a previous frame with
+      // RefFrameType[ frame_to_show_map_idx ] equal to KEY_FRAME, that the
+      // frame is output via the show_existing_frame mechanism at most once.
       if (pbi->reset_decoder_state) frame_to_show->showable_frame = 0;
 
       cm->film_grain_params = frame_to_show->film_grain_params;
@@ -4961,7 +4763,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
     if (cm->show_frame) {
       if (seq_params->decoder_model_info_present_flag &&
           cm->timing_info.equal_picture_interval == 0)
-        av1_read_temporal_point_info(cm, rb);
+        read_temporal_point_info(cm, rb);
     } else {
       // See if this frame can be used as show_existing_frame in future
       cm->showable_frame = aom_rb_read_bit(rb);
@@ -5338,7 +5140,7 @@ static int read_uncompressed_header(AV1Decoder *pbi,
   }
 
   read_tile_info(pbi, rb);
-  if (!is_min_tile_width_satisfied(cm)) {
+  if (!av1_is_min_tile_width_satisfied(cm)) {
     aom_internal_error(&cm->error, AOM_CODEC_CORRUPT_FRAME,
                        "Minimum tile width requirement not satisfied");
   }
@@ -5479,9 +5281,7 @@ static void superres_post_decode(AV1Decoder *pbi) {
   if (!av1_superres_scaled(cm)) return;
   assert(!cm->all_lossless);
 
-  lock_buffer_pool(pool);
   av1_superres_upscale(cm, pool);
-  unlock_buffer_pool(pool);
 }
 
 uint32_t av1_decode_frame_headers_and_setup(AV1Decoder *pbi,
@@ -5494,8 +5294,8 @@ uint32_t av1_decode_frame_headers_and_setup(AV1Decoder *pbi,
   MACROBLOCKD *const xd = &pbi->mb;
 
 #if CONFIG_BITSTREAM_DEBUG
-  bitstream_queue_set_frame_read(cm->current_frame.frame_number * 2 +
-                                 cm->show_frame);
+  aom_bitstream_queue_set_frame_read(cm->current_frame.frame_number * 2 +
+                                     cm->show_frame);
 #endif
 #if CONFIG_MISMATCH_DEBUG
   mismatch_move_frame_idx_r();
@@ -5589,7 +5389,7 @@ void av1_decode_tg_tiles_and_wrapup(AV1Decoder *pbi, const uint8_t *data,
 
   if (initialize_flag) setup_frame_info(pbi);
   const int num_planes = av1_num_planes(cm);
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
   av1_loop_filter_frame_init(cm, 0, num_planes);
 #endif
 
@@ -5617,13 +5417,13 @@ void av1_decode_tg_tiles_and_wrapup(AV1Decoder *pbi, const uint8_t *data,
       if (pbi->num_workers > 1) {
         av1_loop_filter_frame_mt(
             &cm->cur_frame->buf, cm, &pbi->mb, 0, num_planes, 0,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
             1,
 #endif
             pbi->tile_workers, pbi->num_workers, &pbi->lf_row_sync);
       } else {
         av1_loop_filter_frame(&cm->cur_frame->buf, cm, &pbi->mb,
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
                               1,
 #endif
                               0, num_planes, 0);
@@ -5681,7 +5481,7 @@ void av1_decode_tg_tiles_and_wrapup(AV1Decoder *pbi, const uint8_t *data,
       }
     }
   }
-#if LOOP_FILTER_BITMASK
+#if CONFIG_LPF_MASK
   av1_zero_array(cm->lf.lfm, cm->lf.lfm_num);
 #endif
 

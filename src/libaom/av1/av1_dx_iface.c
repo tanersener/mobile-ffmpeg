@@ -336,6 +336,8 @@ static aom_codec_err_t decoder_peek_si_internal(const uint8_t *data,
           if (frame_type == KEY_FRAME) {
             found_keyframe = 1;
             break;  // Stop here as no further OBUs will change the outcome.
+          } else if (frame_type == INTRA_ONLY_FRAME) {
+            intra_only_flag = 1;
           }
         }
       }

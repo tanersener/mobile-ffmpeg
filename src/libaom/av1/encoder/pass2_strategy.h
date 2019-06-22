@@ -27,6 +27,8 @@ void av1_get_second_pass_params(struct AV1_COMP *cpi,
 
 void av1_twopass_postencode_update(struct AV1_COMP *cpi);
 
+void av1_assign_q_and_bounds_q_mode(AV1_COMP *cpi);
+
 #ifdef __cplusplus
 }  // extern "C"
 #endif

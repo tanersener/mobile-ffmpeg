@@ -4219,7 +4219,7 @@ static void highbd_inv_txfm2d_add_no_identity_avx2(const int32_t *input,
   __m256i buf1[64 * 8];
   int eobx, eoby;
   get_eobx_eoby_scan_default(&eobx, &eoby, tx_size, eob);
-  const int8_t *shift = inv_txfm_shift_ls[tx_size];
+  const int8_t *shift = av1_inv_txfm_shift_ls[tx_size];
   const int txw_idx = get_txw_idx(tx_size);
   const int txh_idx = get_txh_idx(tx_size);
   const int txfm_size_col = tx_size_wide[tx_size];
@@ -4255,7 +4255,8 @@ static void highbd_inv_txfm2d_add_no_identity_avx2(const int32_t *input,
       av1_round_shift_rect_array_32_avx2(
           buf0, buf0, buf_size_nonzero_w_div8 << 3, 0, NewInvSqrt2);
     }
-    row_txfm(buf0, buf0, inv_cos_bit_row[txw_idx][txh_idx], 0, bd, -shift[0]);
+    row_txfm(buf0, buf0, av1_inv_cos_bit_row[txw_idx][txh_idx], 0, bd,
+             -shift[0]);
 
     __m256i *_buf1 = buf1 + i * 8;
     if (lr_flip) {
@@ -4272,7 +4273,7 @@ static void highbd_inv_txfm2d_add_no_identity_avx2(const int32_t *input,
   // 2nd stage: column transform
   for (int i = 0; i < buf_size_w_div8; i++) {
     col_txfm(buf1 + i * txfm_size_row, buf1 + i * txfm_size_row,
-             inv_cos_bit_col[txw_idx][txh_idx], 1, bd, 0);
+             av1_inv_cos_bit_col[txw_idx][txh_idx], 1, bd, 0);
 
     av1_round_shift_array_32_avx2(buf1 + i * txfm_size_row,
                                   buf1 + i * txfm_size_row, txfm_size_row,

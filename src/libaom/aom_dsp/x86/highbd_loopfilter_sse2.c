@@ -497,8 +497,9 @@ static AOM_FORCE_INLINE void highbd_lpf_internal_14_sse2(
 }
 
 void aom_highbd_lpf_horizontal_14_sse2(uint16_t *s, int pitch,
-                                       const uint8_t *blt, const uint8_t *lt,
-                                       const uint8_t *thr, int bd) {
+                                       const uint8_t *blimit,
+                                       const uint8_t *limit,
+                                       const uint8_t *thresh, int bd) {
   __m128i p[7], q[7], pq[7];
   int i;
 
@@ -507,7 +508,7 @@ void aom_highbd_lpf_horizontal_14_sse2(uint16_t *s, int pitch,
     q[i] = _mm_loadl_epi64((__m128i *)(s + i * pitch));
   }
 
-  highbd_lpf_internal_14_sse2(p, q, pq, blt, lt, thr, bd);
+  highbd_lpf_internal_14_sse2(p, q, pq, blimit, limit, thresh, bd);
 
   for (i = 0; i < 6; i++) {
     _mm_storel_epi64((__m128i *)(s - (i + 1) * pitch), pq[i]);

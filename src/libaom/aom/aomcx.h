@@ -220,8 +220,8 @@ enum aome_enc_control_id {
 
   /*!\brief Codec control function to set constrained quality level.
    *
-   * \attention For this value to be used aom_codec_enc_cfg_t::g_usage must be
-   *            set to #AOM_CQ.
+   * \attention For this value to be used aom_codec_enc_cfg_t::rc_end_usage
+   *            must be set to #AOM_CQ.
    * \note Valid range: 0..63
    */
   AOME_SET_CQ_LEVEL,
@@ -518,8 +518,8 @@ enum aome_enc_control_id {
    * 4 digits).
    *   AB: OP index.
    *   xy: Target level index for the OP. Can be values 0~23(corresponding to
-   *   level 2.0 ~ 7.3) or 31(maximum level parameter, no level-based
-   *   constraints).
+   *   level 2.0 ~ 7.3) or 24(keep level stats only for level monitoring) or
+   *   31(maximum level parameter, no level-based constraints).
    * E.g. "0" means target level index 0 for the 0th OP;
    *      "111" means target level index 11 for the 1st OP;
    *      "1021" means target level index 21 for the 10th OP.
@@ -528,7 +528,9 @@ enum aome_enc_control_id {
    */
   AV1E_SET_TARGET_SEQ_LEVEL_IDX,
 
-  /*!\brief Codec control function to get sequence level index.
+  /*!\brief Codec control function to get sequence level index for each
+   * operating point. There can be at most 32 operating points. The results will
+   * be written into a provided integer array of sufficient size.
    */
   AV1E_GET_SEQ_LEVEL_IDX,
 
@@ -584,7 +586,8 @@ enum aome_enc_control_id {
    *
    *                          0 = apply trellis quantization
    *                          1 = do not apply trellis quantization
-   *                          2 = disable trellis quantization partially
+   *                          2 = disable trellis quantization in rd search
+   *                          3 = disable trellis quantization in estimate yrd
    *
    *  By default, the encoder applies optimization on quantized
    *  coefficients.
@@ -989,15 +992,22 @@ enum aome_enc_control_id {
 
   /*!\brief Codec control function to set the delta q mode
    *
-   * AV1 has a segment based feature that allows encoder to adaptively change
-   * quantization parameter for each segment within a frame to improve the
-   * subjective quality. the delta q mode is added on top of segment based
-   * feature, and allows control per 64x64 q and lf delta.This control makes
-   * encoder operate in one of the several DELTA_Q_modes supported.
+   * AV1 supports a delta q mode feature, that allows modulating q per
+   * superblock. This control makes encoder operate in one of several
+   * DELTA_Q_modes supported:
+   * 0: Not Supported
+   * 1: Use modulation to maximize objective quality
+   * 2: Use modulation to maximize perceptual quality
    *
    * By default, encoder operates with DELTAQ_Mode 0(deltaq signaling off).
    */
   AV1E_SET_DELTAQ_MODE,
+
+  /*!\brief Codec control function to turn on/off loopfilter modulation
+   * when delta q modulation is enabled. Note AV1 only supports loopfilter
+   * modulation when delta q modulation is enabled as well.
+   */
+  AV1E_SET_DELTALF_MODE,
 
   /*!\brief Codec control function to set the single tile decoding mode to 0 or
    * 1.
@@ -1092,6 +1102,13 @@ enum aome_enc_control_id {
    * Bit value 0: Main Tier; 1: High Tier.
    */
   AV1E_SET_TIER_MASK,
+
+  /*!\brief Control to set minimum compression ratio.
+   * Take integer values. If non-zero, encoder will try to keep the compression
+   * ratio of each frame to be higher than the given value divided by 100.
+   * E.g. 850 means minimum compression ratio of 8.5.
+   */
+  AV1E_SET_MIN_CR
 };
 
 /*!\brief aom 1-D scaling mode
@@ -1405,6 +1422,9 @@ AOM_CTRL_USE_TYPE(AV1E_SET_AQ_MODE, unsigned int)
 AOM_CTRL_USE_TYPE(AV1E_SET_DELTAQ_MODE, unsigned int)
 #define AOM_CTRL_AV1E_SET_DELTAQ_MODE
 
+AOM_CTRL_USE_TYPE(AV1E_SET_DELTALF_MODE, unsigned int)
+#define AOM_CTRL_AV1E_SET_DELTALF_MODE
+
 AOM_CTRL_USE_TYPE(AV1E_SET_FRAME_PERIODIC_BOOST, unsigned int)
 #define AOM_CTRL_AV1E_SET_FRAME_PERIODIC_BOOST
 
@@ -1462,13 +1482,11 @@ AOM_CTRL_USE_TYPE(AV1E_SET_FILM_GRAIN_TABLE, const char *)
 AOM_CTRL_USE_TYPE(AV1E_SET_CDF_UPDATE_MODE, unsigned int)
 #define AOM_CTRL_AV1E_SET_CDF_UPDATE_MODE
 
-#ifdef CONFIG_DENOISE
 AOM_CTRL_USE_TYPE(AV1E_SET_DENOISE_NOISE_LEVEL, int);
 #define AOM_CTRL_AV1E_SET_DENOISE_NOISE_LEVEL
 
 AOM_CTRL_USE_TYPE(AV1E_SET_DENOISE_BLOCK_SIZE, unsigned int);
 #define AOM_CTRL_AV1E_SET_DENOISE_BLOCK_SIZE
-#endif
 
 AOM_CTRL_USE_TYPE(AV1E_SET_CHROMA_SUBSAMPLING_X, unsigned int)
 #define AOM_CTRL_AV1E_SET_CHROMA_SUBSAMPLING_X
@@ -1511,6 +1529,9 @@ AOM_CTRL_USE_TYPE(AV1E_SET_TARGET_SEQ_LEVEL_IDX, int)
 
 AOM_CTRL_USE_TYPE(AV1E_SET_TIER_MASK, unsigned int)
 #define AOM_CTRL_AV1E_SET_TIER_MASK
+
+AOM_CTRL_USE_TYPE(AV1E_SET_MIN_CR, unsigned int)
+#define AOM_CTRL_AV1E_SET_MIN_CR
 
 /*!\endcond */
 /*! @} - end defgroup aom_encoder */

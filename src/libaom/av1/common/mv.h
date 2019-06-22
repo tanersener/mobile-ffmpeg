@@ -277,7 +277,6 @@ static INLINE TransformationType get_wmtype(const WarpedMotionParams *gm) {
 typedef struct candidate_mv {
   int_mv this_mv;
   int_mv comp_mv;
-  int weight;
 } CANDIDATE_MV;
 
 static INLINE int is_zero_mv(const MV *mv) {

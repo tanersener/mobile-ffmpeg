@@ -73,7 +73,7 @@ typedef struct {
   wedge_masks_type *masks;
 } wedge_params_type;
 
-extern const wedge_params_type wedge_params_lookup[BLOCK_SIZES_ALL];
+extern const wedge_params_type av1_wedge_params_lookup[BLOCK_SIZES_ALL];
 
 typedef struct SubpelParams {
   int xs;
@@ -170,7 +170,7 @@ static INLINE int is_interinter_compound_used(COMPOUND_TYPE type,
     case COMPOUND_DISTWTD:
     case COMPOUND_DIFFWTD: return comp_allowed;
     case COMPOUND_WEDGE:
-      return comp_allowed && wedge_params_lookup[sb_type].bits > 0;
+      return comp_allowed && av1_wedge_params_lookup[sb_type].bits > 0;
     default: assert(0); return 0;
   }
 }
@@ -189,20 +189,20 @@ static INLINE int is_any_masked_compound_used(BLOCK_SIZE sb_type) {
 }
 
 static INLINE int get_wedge_bits_lookup(BLOCK_SIZE sb_type) {
-  return wedge_params_lookup[sb_type].bits;
+  return av1_wedge_params_lookup[sb_type].bits;
 }
 
 static INLINE int get_interinter_wedge_bits(BLOCK_SIZE sb_type) {
-  const int wbits = wedge_params_lookup[sb_type].bits;
+  const int wbits = av1_wedge_params_lookup[sb_type].bits;
   return (wbits > 0) ? wbits + 1 : 0;
 }
 
 static INLINE int is_interintra_wedge_used(BLOCK_SIZE sb_type) {
-  return wedge_params_lookup[sb_type].bits > 0;
+  return av1_wedge_params_lookup[sb_type].bits > 0;
 }
 
 static INLINE int get_interintra_wedge_bits(BLOCK_SIZE sb_type) {
-  return wedge_params_lookup[sb_type].bits;
+  return av1_wedge_params_lookup[sb_type].bits;
 }
 
 void av1_make_inter_predictor(const uint8_t *src, int src_stride, uint8_t *dst,
@@ -323,10 +323,10 @@ void av1_count_overlappable_neighbors(const AV1_COMMON *cm, MACROBLOCKD *xd,
 
 void av1_init_wedge_masks();
 
-static INLINE const uint8_t *av1_get_contiguous_soft_mask(int wedge_index,
-                                                          int wedge_sign,
+static INLINE const uint8_t *av1_get_contiguous_soft_mask(int8_t wedge_index,
+                                                          int8_t wedge_sign,
                                                           BLOCK_SIZE sb_type) {
-  return wedge_params_lookup[sb_type].masks[wedge_sign][wedge_index];
+  return av1_wedge_params_lookup[sb_type].masks[wedge_sign][wedge_index];
 }
 
 const uint8_t *av1_get_compound_type_mask(
@@ -344,9 +344,11 @@ void av1_build_interintra_predictors_sbuv(const AV1_COMMON *cm, MACROBLOCKD *xd,
                                           const BUFFER_SET *ctx,
                                           BLOCK_SIZE bsize);
 
-void av1_build_intra_predictors_for_interintra(
-    const AV1_COMMON *cm, MACROBLOCKD *xd, BLOCK_SIZE bsize, int plane,
-    const BUFFER_SET *ctx, uint8_t *intra_pred, int intra_stride);
+void av1_build_intra_predictors_for_interintra(const AV1_COMMON *cm,
+                                               MACROBLOCKD *xd,
+                                               BLOCK_SIZE bsize, int plane,
+                                               const BUFFER_SET *ctx,
+                                               uint8_t *dst, int dst_stride);
 
 void av1_combine_interintra(MACROBLOCKD *xd, BLOCK_SIZE bsize, int plane,
                             const uint8_t *inter_pred, int inter_stride,

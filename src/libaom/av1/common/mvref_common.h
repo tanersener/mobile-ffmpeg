@@ -189,18 +189,17 @@ static INLINE int16_t av1_mode_context_analyzer(
   return comp_ctx;
 }
 
-static INLINE uint8_t av1_drl_ctx(const CANDIDATE_MV *ref_mv_stack,
-                                  int ref_idx) {
-  if (ref_mv_stack[ref_idx].weight >= REF_CAT_LEVEL &&
-      ref_mv_stack[ref_idx + 1].weight >= REF_CAT_LEVEL)
+static INLINE uint8_t av1_drl_ctx(const uint16_t *ref_mv_weight, int ref_idx) {
+  if (ref_mv_weight[ref_idx] >= REF_CAT_LEVEL &&
+      ref_mv_weight[ref_idx + 1] >= REF_CAT_LEVEL)
     return 0;
 
-  if (ref_mv_stack[ref_idx].weight >= REF_CAT_LEVEL &&
-      ref_mv_stack[ref_idx + 1].weight < REF_CAT_LEVEL)
+  if (ref_mv_weight[ref_idx] >= REF_CAT_LEVEL &&
+      ref_mv_weight[ref_idx + 1] < REF_CAT_LEVEL)
     return 1;
 
-  if (ref_mv_stack[ref_idx].weight < REF_CAT_LEVEL &&
-      ref_mv_stack[ref_idx + 1].weight < REF_CAT_LEVEL)
+  if (ref_mv_weight[ref_idx] < REF_CAT_LEVEL &&
+      ref_mv_weight[ref_idx + 1] < REF_CAT_LEVEL)
     return 2;
 
   return 0;
@@ -251,6 +250,7 @@ void av1_find_mv_refs(const AV1_COMMON *cm, const MACROBLOCKD *xd,
                       MB_MODE_INFO *mi, MV_REFERENCE_FRAME ref_frame,
                       uint8_t ref_mv_count[MODE_CTX_REF_FRAMES],
                       CANDIDATE_MV ref_mv_stack[][MAX_REF_MV_STACK_SIZE],
+                      uint16_t ref_mv_weight[][MAX_REF_MV_STACK_SIZE],
                       int_mv mv_ref_list[][MAX_MV_REF_CANDIDATES],
                       int_mv *global_mvs, int mi_row, int mi_col,
                       int16_t *mode_context);
@@ -261,9 +261,10 @@ void av1_find_mv_refs(const AV1_COMMON *cm, const MACROBLOCKD *xd,
 void av1_find_best_ref_mvs(int allow_hp, int_mv *mvlist, int_mv *nearest_mv,
                            int_mv *near_mv, int is_integer);
 
-int selectSamples(MV *mv, int *pts, int *pts_inref, int len, BLOCK_SIZE bsize);
-int findSamples(const AV1_COMMON *cm, MACROBLOCKD *xd, int mi_row, int mi_col,
-                int *pts, int *pts_inref);
+uint8_t av1_selectSamples(MV *mv, int *pts, int *pts_inref, int len,
+                          BLOCK_SIZE bsize);
+uint8_t av1_findSamples(const AV1_COMMON *cm, MACROBLOCKD *xd, int mi_row,
+                        int mi_col, int *pts, int *pts_inref);
 
 #define INTRABC_DELAY_PIXELS 256  //  Delay of 256 pixels
 #define INTRABC_DELAY_SB64 (INTRABC_DELAY_PIXELS / 64)

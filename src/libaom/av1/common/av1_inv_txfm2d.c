@@ -149,7 +149,7 @@ static const int8_t inv_shift_32x8[2] = { -2, -4 };
 static const int8_t inv_shift_16x64[2] = { -2, -4 };
 static const int8_t inv_shift_64x16[2] = { -2, -4 };
 
-const int8_t *inv_txfm_shift_ls[TX_SIZES_ALL] = {
+const int8_t *av1_inv_txfm_shift_ls[TX_SIZES_ALL] = {
   inv_shift_4x4,   inv_shift_8x8,   inv_shift_16x16, inv_shift_32x32,
   inv_shift_64x64, inv_shift_4x8,   inv_shift_8x4,   inv_shift_8x16,
   inv_shift_16x8,  inv_shift_16x32, inv_shift_32x16, inv_shift_32x64,
@@ -158,7 +158,7 @@ const int8_t *inv_txfm_shift_ls[TX_SIZES_ALL] = {
 };
 
 /* clang-format off */
-const int8_t inv_cos_bit_col[MAX_TXWH_IDX]      // txw_idx
+const int8_t av1_inv_cos_bit_col[MAX_TXWH_IDX]      // txw_idx
                             [MAX_TXWH_IDX] = {  // txh_idx
     { INV_COS_BIT, INV_COS_BIT, INV_COS_BIT,           0,           0 },
     { INV_COS_BIT, INV_COS_BIT, INV_COS_BIT, INV_COS_BIT,           0 },
@@ -167,7 +167,7 @@ const int8_t inv_cos_bit_col[MAX_TXWH_IDX]      // txw_idx
     {           0,           0, INV_COS_BIT, INV_COS_BIT, INV_COS_BIT }
   };
 
-const int8_t inv_cos_bit_row[MAX_TXWH_IDX]      // txw_idx
+const int8_t av1_inv_cos_bit_row[MAX_TXWH_IDX]      // txw_idx
                             [MAX_TXWH_IDX] = {  // txh_idx
     { INV_COS_BIT, INV_COS_BIT, INV_COS_BIT,           0,           0 },
     { INV_COS_BIT, INV_COS_BIT, INV_COS_BIT, INV_COS_BIT,           0 },
@@ -177,7 +177,7 @@ const int8_t inv_cos_bit_row[MAX_TXWH_IDX]      // txw_idx
   };
 /* clang-format on */
 
-const int8_t iadst4_range[7] = { 0, 1, 0, 0, 0, 0, 0 };
+static const int8_t iadst4_range[7] = { 0, 1, 0, 0, 0, 0, 0 };
 
 void av1_get_inv_txfm_cfg(TX_TYPE tx_type, TX_SIZE tx_size,
                           TXFM_2D_FLIP_CFG *cfg) {
@@ -188,11 +188,11 @@ void av1_get_inv_txfm_cfg(TX_TYPE tx_type, TX_SIZE tx_size,
   set_flip_cfg(tx_type, cfg);
   const TX_TYPE_1D tx_type_1d_col = vtx_tab[tx_type];
   const TX_TYPE_1D tx_type_1d_row = htx_tab[tx_type];
-  cfg->shift = inv_txfm_shift_ls[tx_size];
+  cfg->shift = av1_inv_txfm_shift_ls[tx_size];
   const int txw_idx = get_txw_idx(tx_size);
   const int txh_idx = get_txh_idx(tx_size);
-  cfg->cos_bit_col = inv_cos_bit_col[txw_idx][txh_idx];
-  cfg->cos_bit_row = inv_cos_bit_row[txw_idx][txh_idx];
+  cfg->cos_bit_col = av1_inv_cos_bit_col[txw_idx][txh_idx];
+  cfg->cos_bit_row = av1_inv_cos_bit_row[txw_idx][txh_idx];
   cfg->txfm_type_col = av1_txfm_type_ls[txh_idx][tx_type_1d_col];
   if (cfg->txfm_type_col == TXFM_TYPE_ADST4) {
     memcpy(cfg->stage_range_col, iadst4_range, sizeof(iadst4_range));

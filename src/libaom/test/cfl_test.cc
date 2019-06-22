@@ -24,30 +24,37 @@ using libaom_test::ACMRandom;
 #define NUM_ITERATIONS (100)
 #define NUM_ITERATIONS_SPEED (INT16_MAX)
 
-#define ALL_CFL_TX_SIZES(function)                                     \
-  make_tuple(TX_4X4, &function), make_tuple(TX_4X8, &function),        \
-      make_tuple(TX_4X16, &function), make_tuple(TX_8X4, &function),   \
-      make_tuple(TX_8X8, &function), make_tuple(TX_8X16, &function),   \
-      make_tuple(TX_8X32, &function), make_tuple(TX_16X4, &function),  \
-      make_tuple(TX_16X8, &function), make_tuple(TX_16X16, &function), \
-      make_tuple(TX_16X32, &function), make_tuple(TX_32X8, &function), \
-      make_tuple(TX_32X16, &function), make_tuple(TX_32X32, &function)
+#define ALL_CFL_TX_SIZES(function)                           \
+  make_tuple(static_cast<TX_SIZE>(TX_4X4), &function),       \
+      make_tuple(static_cast<TX_SIZE>(TX_4X8), &function),   \
+      make_tuple(static_cast<TX_SIZE>(TX_4X16), &function),  \
+      make_tuple(static_cast<TX_SIZE>(TX_8X4), &function),   \
+      make_tuple(static_cast<TX_SIZE>(TX_8X8), &function),   \
+      make_tuple(static_cast<TX_SIZE>(TX_8X16), &function),  \
+      make_tuple(static_cast<TX_SIZE>(TX_8X32), &function),  \
+      make_tuple(static_cast<TX_SIZE>(TX_16X4), &function),  \
+      make_tuple(static_cast<TX_SIZE>(TX_16X8), &function),  \
+      make_tuple(static_cast<TX_SIZE>(TX_16X16), &function), \
+      make_tuple(static_cast<TX_SIZE>(TX_16X32), &function), \
+      make_tuple(static_cast<TX_SIZE>(TX_32X8), &function),  \
+      make_tuple(static_cast<TX_SIZE>(TX_32X16), &function), \
+      make_tuple(static_cast<TX_SIZE>(TX_32X32), &function)
 
-#define ALL_CFL_TX_SIZES_SUBSAMPLE(fun420, fun422, fun444) \
-  make_tuple(TX_4X4, &fun420, &fun422, &fun444),           \
-      make_tuple(TX_4X8, &fun420, &fun422, &fun444),       \
-      make_tuple(TX_4X16, &fun420, &fun422, &fun444),      \
-      make_tuple(TX_8X4, &fun420, &fun422, &fun444),       \
-      make_tuple(TX_8X8, &fun420, &fun422, &fun444),       \
-      make_tuple(TX_8X16, &fun420, &fun422, &fun444),      \
-      make_tuple(TX_8X32, &fun420, &fun422, &fun444),      \
-      make_tuple(TX_16X4, &fun420, &fun422, &fun444),      \
-      make_tuple(TX_16X8, &fun420, &fun422, &fun444),      \
-      make_tuple(TX_16X16, &fun420, &fun422, &fun444),     \
-      make_tuple(TX_16X32, &fun420, &fun422, &fun444),     \
-      make_tuple(TX_32X8, &fun420, &fun422, &fun444),      \
-      make_tuple(TX_32X16, &fun420, &fun422, &fun444),     \
-      make_tuple(TX_32X32, &fun420, &fun422, &fun444)
+#define ALL_CFL_TX_SIZES_SUBSAMPLE(fun420, fun422, fun444)                   \
+  make_tuple(static_cast<TX_SIZE>(TX_4X4), &fun420, &fun422, &fun444),       \
+      make_tuple(static_cast<TX_SIZE>(TX_4X8), &fun420, &fun422, &fun444),   \
+      make_tuple(static_cast<TX_SIZE>(TX_4X16), &fun420, &fun422, &fun444),  \
+      make_tuple(static_cast<TX_SIZE>(TX_8X4), &fun420, &fun422, &fun444),   \
+      make_tuple(static_cast<TX_SIZE>(TX_8X8), &fun420, &fun422, &fun444),   \
+      make_tuple(static_cast<TX_SIZE>(TX_8X16), &fun420, &fun422, &fun444),  \
+      make_tuple(static_cast<TX_SIZE>(TX_8X32), &fun420, &fun422, &fun444),  \
+      make_tuple(static_cast<TX_SIZE>(TX_16X4), &fun420, &fun422, &fun444),  \
+      make_tuple(static_cast<TX_SIZE>(TX_16X8), &fun420, &fun422, &fun444),  \
+      make_tuple(static_cast<TX_SIZE>(TX_16X16), &fun420, &fun422, &fun444), \
+      make_tuple(static_cast<TX_SIZE>(TX_16X32), &fun420, &fun422, &fun444), \
+      make_tuple(static_cast<TX_SIZE>(TX_32X8), &fun420, &fun422, &fun444),  \
+      make_tuple(static_cast<TX_SIZE>(TX_32X16), &fun420, &fun422, &fun444), \
+      make_tuple(static_cast<TX_SIZE>(TX_32X32), &fun420, &fun422, &fun444)
 
 namespace {
 
@@ -166,7 +173,7 @@ class CFLSubAvgTest : public ::testing::TestWithParam<sub_avg_param>,
   virtual void SetUp() {
     CFLTest::init(::testing::get<0>(this->GetParam()));
     sub_avg = ::testing::get<1>(this->GetParam())(tx_size);
-    sub_avg_ref = get_subtract_average_fn_c(tx_size);
+    sub_avg_ref = cfl_get_subtract_average_fn_c(tx_size);
   }
   virtual ~CFLSubAvgTest() {}
 
@@ -353,7 +360,7 @@ class CFLPredictTest : public ::testing::TestWithParam<predict_param>,
   virtual void SetUp() {
     CFLTest::init(::testing::get<0>(this->GetParam()));
     predict = ::testing::get<1>(this->GetParam())(tx_size);
-    predict_ref = get_predict_lbd_fn_c(tx_size);
+    predict_ref = cfl_get_predict_lbd_fn_c(tx_size);
   }
   virtual ~CFLPredictTest() {}
 
@@ -399,7 +406,7 @@ class CFLPredictHBDTest : public ::testing::TestWithParam<predict_param_hbd>,
   virtual void SetUp() {
     CFLTest::init(::testing::get<0>(this->GetParam()));
     predict = ::testing::get<1>(this->GetParam())(tx_size);
-    predict_ref = get_predict_hbd_fn_c(tx_size);
+    predict_ref = cfl_get_predict_hbd_fn_c(tx_size);
   }
   virtual ~CFLPredictHBDTest() {}
 
@@ -441,7 +448,7 @@ TEST_P(CFLPredictHBDTest, DISABLED_PredictHBDSpeedTest) {
 
 #if HAVE_SSE2
 const sub_avg_param sub_avg_sizes_sse2[] = { ALL_CFL_TX_SIZES(
-    get_subtract_average_fn_sse2) };
+    cfl_get_subtract_average_fn_sse2) };
 
 INSTANTIATE_TEST_CASE_P(SSE2, CFLSubAvgTest,
                         ::testing::ValuesIn(sub_avg_sizes_sse2));
@@ -462,10 +469,10 @@ const subsample_hbd_param subsample_hbd_sizes_ssse3[] = {
 };
 
 const predict_param predict_sizes_ssse3[] = { ALL_CFL_TX_SIZES(
-    get_predict_lbd_fn_ssse3) };
+    cfl_get_predict_lbd_fn_ssse3) };
 
 const predict_param_hbd predict_sizes_hbd_ssse3[] = { ALL_CFL_TX_SIZES(
-    get_predict_hbd_fn_ssse3) };
+    cfl_get_predict_hbd_fn_ssse3) };
 
 INSTANTIATE_TEST_CASE_P(SSSE3, CFLSubsampleLBDTest,
                         ::testing::ValuesIn(subsample_lbd_sizes_ssse3));
@@ -482,7 +489,7 @@ INSTANTIATE_TEST_CASE_P(SSSE3, CFLPredictHBDTest,
 
 #if HAVE_AVX2
 const sub_avg_param sub_avg_sizes_avx2[] = { ALL_CFL_TX_SIZES(
-    get_subtract_average_fn_avx2) };
+    cfl_get_subtract_average_fn_avx2) };
 
 const subsample_lbd_param subsample_lbd_sizes_avx2[] = {
   ALL_CFL_TX_SIZES_SUBSAMPLE(cfl_get_luma_subsampling_420_lbd_avx2,
@@ -497,10 +504,10 @@ const subsample_hbd_param subsample_hbd_sizes_avx2[] = {
 };
 
 const predict_param predict_sizes_avx2[] = { ALL_CFL_TX_SIZES(
-    get_predict_lbd_fn_avx2) };
+    cfl_get_predict_lbd_fn_avx2) };
 
 const predict_param_hbd predict_sizes_hbd_avx2[] = { ALL_CFL_TX_SIZES(
-    get_predict_hbd_fn_avx2) };
+    cfl_get_predict_hbd_fn_avx2) };
 
 INSTANTIATE_TEST_CASE_P(AVX2, CFLSubAvgTest,
                         ::testing::ValuesIn(sub_avg_sizes_avx2));
@@ -521,7 +528,7 @@ INSTANTIATE_TEST_CASE_P(AVX2, CFLPredictHBDTest,
 #if HAVE_NEON
 
 const sub_avg_param sub_avg_sizes_neon[] = { ALL_CFL_TX_SIZES(
-    get_subtract_average_fn_neon) };
+    cfl_get_subtract_average_fn_neon) };
 
 const subsample_lbd_param subsample_lbd_sizes_neon[] = {
   ALL_CFL_TX_SIZES_SUBSAMPLE(cfl_get_luma_subsampling_420_lbd_neon,
@@ -536,10 +543,10 @@ const subsample_hbd_param subsample_hbd_sizes_neon[] = {
 };
 
 const predict_param predict_sizes_neon[] = { ALL_CFL_TX_SIZES(
-    get_predict_lbd_fn_neon) };
+    cfl_get_predict_lbd_fn_neon) };
 
 const predict_param_hbd predict_sizes_hbd_neon[] = { ALL_CFL_TX_SIZES(
-    get_predict_hbd_fn_neon) };
+    cfl_get_predict_hbd_fn_neon) };
 
 INSTANTIATE_TEST_CASE_P(NEON, CFLSubAvgTest,
                         ::testing::ValuesIn(sub_avg_sizes_neon));
@@ -559,7 +566,7 @@ INSTANTIATE_TEST_CASE_P(NEON, CFLPredictHBDTest,
 
 #if HAVE_VSX
 const sub_avg_param sub_avg_sizes_vsx[] = { ALL_CFL_TX_SIZES(
-    get_subtract_average_fn_vsx) };
+    cfl_get_subtract_average_fn_vsx) };
 
 INSTANTIATE_TEST_CASE_P(VSX, CFLSubAvgTest,
                         ::testing::ValuesIn(sub_avg_sizes_vsx));

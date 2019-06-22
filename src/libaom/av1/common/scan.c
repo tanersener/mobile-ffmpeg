@@ -14,9 +14,9 @@
 #include "av1/common/common_data.h"
 #include "av1/common/scan.h"
 
-DECLARE_ALIGNED(16, static const int16_t, default_scan_4x4[16]) = {
-  0, 1, 4, 8, 5, 2, 3, 6, 9, 12, 13, 10, 7, 11, 14, 15
-};
+DECLARE_ALIGNED(16, static const int16_t,
+                default_scan_4x4[16]) = { 0, 1,  4,  8,  5, 2,  3,  6,
+                                          9, 12, 13, 10, 7, 11, 14, 15 };
 
 DECLARE_ALIGNED(16, static const int16_t, mcol_scan_4x4[16]) = {
   0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15,
@@ -2376,9 +2376,9 @@ DECLARE_ALIGNED(16, static const int16_t,
   990, 1021, 991, 1022, 0,   0
 };
 
-DECLARE_ALIGNED(16, static const int16_t, av1_default_iscan_4x4[16]) = {
-  0, 1, 5, 6, 2, 4, 7, 12, 3, 8, 11, 13, 9, 10, 14, 15
-};
+DECLARE_ALIGNED(16, static const int16_t,
+                av1_default_iscan_4x4[16]) = { 0, 1, 5,  6,  2, 4,  7,  12,
+                                               3, 8, 11, 13, 9, 10, 14, 15 };
 
 DECLARE_ALIGNED(16, static const int16_t, av1_mcol_iscan_4x4[16]) = {
   0, 4, 8, 12, 1, 5, 9, 13, 2, 6, 10, 14, 3, 7, 11, 15,
