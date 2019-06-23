@@ -95,10 +95,10 @@ public class MediaInformationParser {
                     mediaInformation.setDuration(trio.getFirst());
                     mediaInformation.setStartTime(trio.getSecond());
                     mediaInformation.setBitrate(trio.getThird());
-                } else if (trimmedLine.toLowerCase().startsWith("metadata")) {
+                } else if (trimmedLine.toLowerCase(Locale.ENGLISH).startsWith("metadata")) {
                     sidedata = false;
                     metadata = true;
-                } else if (trimmedLine.toLowerCase().startsWith("side data")) {
+                } else if (trimmedLine.toLowerCase(Locale.ENGLISH).startsWith("side data")) {
                     metadata = false;
                     sidedata = true;
                 } else if (trimmedLine.startsWith("Stream mapping") || trimmedLine.startsWith("Press [q] to stop") || trimmedLine.startsWith("Output")) {

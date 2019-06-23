@@ -3,26 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TableRow
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:layout_centerInParent="true">
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="46dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="30dp"
+        android:layout_marginStart="30dp"
+        android:gravity="center|start" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="46dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="30dp"
-            android:layout_marginStart="30dp"
-            android:gravity="center|start" />
-
-        <TextView
-            android:id="@+id/progressDialogText"
-            android:layout_width="200dp"
-            android:layout_height="match_parent"
-            android:gravity="center|start"
-            android:textColor="@android:color/black"
-            android:textSize="18sp" />
-    </TableRow>
+    <TextView
+        android:id="@+id/progressDialogText"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:gravity="center|start"
+        android:textColor="@android:color/black"
+        android:textSize="18sp" />
 </RelativeLayout>

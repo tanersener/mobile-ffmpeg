@@ -8,6 +8,7 @@
     tools:context=".CommandTabFragment">
 
     <EditText
+        tools:ignore="Autofill"
         android:id="@+id/commandText"
         android:layout_width="match_parent"
         android:layout_height="40dp"
@@ -17,7 +18,8 @@
         android:layout_marginTop="20dp"
         android:hint="@string/command_text_input_placeholder"
         android:inputType="text"
-        android:singleLine="true" />
+        android:singleLine="true"
+        tools:targetApi="cupcake" />
 
     <Button
         android:id="@+id/runButton"
@@ -32,7 +34,8 @@
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:targetApi="jelly_bean" />
 
     <Button
         android:id="@+id/runAsyncButton"
@@ -47,7 +50,8 @@
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:targetApi="jelly_bean" />
 
     <TextView
         android:id="@+id/outputText"
@@ -65,5 +69,6 @@
         android:scrollbars="vertical"
         android:textColor="@android:color/black"
         android:textSize="14sp"
-        android:typeface="sans" />
+        android:typeface="sans"
+        tools:targetApi="jelly_bean" />
 </LinearLayout>
