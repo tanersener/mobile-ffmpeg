@@ -16,6 +16,7 @@ buildscript {
 
 android {
     compileSdkVersion Integer.parseInt(releaseTargetSdk)
+
     defaultConfig {
         minSdkVersion Integer.parseInt(releaseMinSdk)
         targetSdkVersion Integer.parseInt(releaseTargetSdk)
@@ -24,6 +25,7 @@ android {
         project.archivesBaseName = releaseProject
         consumerProguardFiles 'proguard-rules.pro'
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -37,11 +39,13 @@ android {
         }
     }
 
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     libraryVariants.all { variant ->
-        variant.outputs.all { output ->
-            if (outputFile != null && outputFileName.endsWith('.aar')) {
-                outputFileName = "${archivesBaseName}-${android.defaultConfig.versionName}.aar"
-            }
+        variant.outputs.all {
+            outputFileName = "${archivesBaseName}-${android.defaultConfig.versionName}.aar"
         }
     }
 }
@@ -156,12 +160,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives javadocJar
     archives sourcesJar
-}
-
-afterEvaluate {
-    javadoc.classpath += files(android.libraryVariants.collect { variant ->
-        variant.javaCompile.classpath.files
-    })
 }
 
 dependencies {
