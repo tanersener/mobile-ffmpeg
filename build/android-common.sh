@@ -236,13 +236,18 @@ get_arch_specific_cflags() {
 }
 
 get_size_optimization_cflags() {
+    if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
+        local LINK_TIME_OPTIMIZATION_FLAGS="-flto"
+    else
+        local LINK_TIME_OPTIMIZATION_FLAGS=""
+    fi
 
     local ARCH_OPTIMIZATION=""
     case ${ARCH} in
         arm-v7a | arm-v7a-neon)
             case $1 in
                 ffmpeg)
-                    ARCH_OPTIMIZATION="-flto -O2 -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
                     ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
@@ -252,7 +257,7 @@ get_size_optimization_cflags() {
         arm64-v8a)
             case $1 in
                 ffmpeg | nettle)
-                    ARCH_OPTIMIZATION="-flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections"
                 ;;
                 *)
                     ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
@@ -262,7 +267,7 @@ get_size_optimization_cflags() {
         x86 | x86-64)
             case $1 in
                 ffmpeg)
-                    ARCH_OPTIMIZATION="-flto -Os -ffunction-sections -fdata-sections"
+                    ARCH_OPTIMIZATION="${LINK_TIME_OPTIMIZATION_FLAGS} -Os -ffunction-sections -fdata-sections"
                 ;;
                 *)
                     ARCH_OPTIMIZATION="-Os -ffunction-sections -fdata-sections"
@@ -318,6 +323,12 @@ get_cflags() {
 }
 
 get_cxxflags() {
+    if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
+        local LINK_TIME_OPTIMIZATION_FLAGS="-flto"
+    else
+        local LINK_TIME_OPTIMIZATION_FLAGS=""
+    fi
+
     if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
         local OPTIMIZATION_FLAGS="-Os -ffunction-sections -fdata-sections"
     else
@@ -330,7 +341,7 @@ get_cxxflags() {
         ;;
         ffmpeg)
             if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-                echo "-std=c++11 -fno-exceptions -fno-rtti -flto -O2 -ffunction-sections -fdata-sections"
+                echo "-std=c++11 -fno-exceptions -fno-rtti ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections"
             else
                 echo "-std=c++11 -fno-exceptions -fno-rtti ${MOBILE_FFMPEG_DEBUG}"
             fi
@@ -371,11 +382,17 @@ get_common_linked_libraries() {
 }
 
 get_size_optimization_ldflags() {
+    if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
+        local LINK_TIME_OPTIMIZATION_FLAGS="-flto"
+    else
+        local LINK_TIME_OPTIMIZATION_FLAGS=""
+    fi
+
     case ${ARCH} in
         arm64-v8a)
             case $1 in
                 ffmpeg | nettle)
-                    echo "-Wl,--gc-sections -flto -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
+                    echo "-Wl,--gc-sections ${LINK_TIME_OPTIMIZATION_FLAGS} -fuse-ld=gold -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
                     echo "-Wl,--gc-sections -Os -ffunction-sections -fdata-sections"
@@ -385,7 +402,7 @@ get_size_optimization_ldflags() {
         *)
             case $1 in
                 ffmpeg)
-                    echo "-Wl,--gc-sections,--icf=safe -flto -O2 -ffunction-sections -fdata-sections -finline-functions"
+                    echo "-Wl,--gc-sections,--icf=safe ${LINK_TIME_OPTIMIZATION_FLAGS} -O2 -ffunction-sections -fdata-sections -finline-functions"
                 ;;
                 *)
                     echo "-Wl,--gc-sections,--icf=safe -Os -ffunction-sections -fdata-sections"

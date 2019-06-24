@@ -179,6 +179,10 @@ no_workspace_cleanup_library() {
     export ${NO_WORKSPACE_CLEANUP_VARIABLE}=1
 }
 
+no_link_time_optimization() {
+    export NO_LINK_TIME_OPTIMIZATION=1
+}
+
 enable_debug() {
     export MOBILE_FFMPEG_DEBUG="-g"
 
@@ -609,6 +613,9 @@ do
             NO_WORKSPACE_CLEANUP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-[A-Za-z]*-//g'`
 
             no_workspace_cleanup_library ${NO_WORKSPACE_CLEANUP_LIBRARY}
+	    ;;
+	    --no-link-time-optimization)
+            no_link_time_optimization
 	    ;;
         -d | --debug)
             enable_debug
