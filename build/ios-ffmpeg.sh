@@ -391,7 +391,10 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 echo -n -e "\n${LIB_NAME}: "
 
-make distclean 2>/dev/null 1>/dev/null
+if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
+    echo -e "INFO: Cleaning workspace for library ${LIB_NAME}" 1>>${BASEDIR}/build.log 2>&1
+    make distclean 2>/dev/null 1>/dev/null
+fi
 
 ./configure \
     --sysroot=${SDK_PATH} \
