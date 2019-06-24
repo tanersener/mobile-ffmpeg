@@ -1,48 +1,91 @@
 branches:
   only:
   - travis-test
-language: android
 sudo: false
-android:
-  components:
-    - tools
-    - platform-tools
-    - build-tools-28.0.3
-    - android-24
-    - extra-google-google_play_services
-    - extra-google-m2repository
-    - extra-android-m2repository
-  licenses:
-    - 'android-sdk-license-.+'
-    - 'google-gdk-license-.+'
-addons:
-  apt:
-    packages:
-      - autoconf
-      - automake
-      - libtool
-      - pkg-config
-      - curl
-      - git
-      - cmake
-      - gcc
-      - gperf
-      - texinfo
-      - yasm
-      - nasm
-      - bison
-      - autogen
-      - patch
+git:
+  quiet: true
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
-install:
-  - echo y | sdkmanager "ndk-bundle"
-  - echo y | sdkmanager "cmake;3.10.2.4988404"
-  - echo y | sdkmanager "lldb;3.1"
-before_script:
-  - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
-script:
-  - bash ./android.sh
+matrix:
+  include:
+    - name: "Main Build"
+      language: android
+      android:
+        components:
+          - tools
+          - platform-tools
+          - build-tools-28.0.3
+          - android-24
+          - extra-google-google_play_services
+          - extra-google-m2repository
+          - extra-android-m2repository
+      addons:
+        apt:
+          packages:
+            - autoconf
+            - automake
+            - libtool
+            - pkg-config
+            - curl
+            - git
+            - cmake
+            - gcc
+            - gperf
+            - texinfo
+            - yasm
+            - nasm
+            - bison
+            - autogen
+            - patch
+      install:
+        - echo y | sdkmanager "ndk-bundle"
+        - echo y | sdkmanager "cmake;3.10.2.4988404"
+        - echo y | sdkmanager "lldb;3.1"
+      before_script:
+        - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
+      script:
+        - bash ./android.sh -d
+    - name: "LTS Build"
+      language: android
+      android:
+        components:
+          - tools
+          - platform-tools
+          - build-tools-28.0.3
+          - android-16
+          - android-21
+          - extra-google-google_play_services
+          - extra-google-m2repository
+          - extra-android-m2repository
+      addons:
+        apt:
+          packages:
+            - autoconf
+            - automake
+            - libtool
+            - pkg-config
+            - curl
+            - git
+            - cmake
+            - gcc
+            - gperf
+            - texinfo
+            - yasm
+            - nasm
+            - bison
+            - autogen
+            - patch
+      install:
+        - echo y | sdkmanager "ndk-bundle"
+        - echo y | sdkmanager "cmake;3.10.2.4988404"
+        - echo y | sdkmanager "lldb;3.1"
+      before_script:
+        - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
+      script:
+        - bash ./android.sh -d --lts
