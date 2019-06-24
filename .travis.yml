@@ -1,0 +1,36 @@
+branches:
+  only:
+  - travis-test
+language: android
+android:
+  components:
+    - tools
+    - platform-tools
+    - extra-google-m2repository
+    - extra-android-m2repository
+addons:
+  apt:
+    packages:
+      - autoconf
+      - automake
+      - libtool
+      - pkg-config
+      - curl
+      - git
+      - cmake
+      - gcc
+      - gperf
+      - texinfo
+      - yasm
+      - nasm
+      - bison
+      - autogen
+      - patch
+install:
+  - echo y | sdkmanager "ndk-bundle"
+  - echo y | sdkmanager "cmake;3.10.2.4988404"
+  - echo y | sdkmanager "lldb;3.1"
+before_script:
+  - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
+script:
+  - bash ./android.sh
