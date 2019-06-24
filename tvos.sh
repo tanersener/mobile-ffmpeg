@@ -60,8 +60,10 @@ ENABLED_ARCHITECTURES=(1 1)
 ENABLED_LIBRARIES=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 export BASEDIR=$(pwd)
-
 export MOBILE_FFMPEG_TMPDIR="${BASEDIR}/.tmp"
+
+RECONF_LIBRARIES=()
+REBUILD_LIBRARIES=()
 
 # CHECKING IF XCODE IS INSTALLED
 if ! [ -x "$(command -v xcrun)" ]; then
@@ -203,15 +205,43 @@ enable_lts_build() {
 }
 
 reconf_library() {
-    RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
+    local RECONF_VARIABLE=$(echo "RECONF_$1" | sed "s/\-/\_/g")
+    local library_supported=0
 
-    export ${RECONF_VARIABLE}=1
+    for library in {1..42}
+    do
+        library_name=$(get_library_name $((library - 1)))
+
+        if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
+            export ${RECONF_VARIABLE}=1
+            RECONF_LIBRARIES+=($1)
+            library_supported=1
+        fi
+    done
+
+    if [[ ${library_supported} -eq 0 ]]; then
+        echo -e "INFO: --reconf flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
+    fi
 }
 
 rebuild_library() {
-    REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
+    local REBUILD_VARIABLE=$(echo "REBUILD_$1" | sed "s/\-/\_/g")
+    local library_supported=0
 
-    export ${REBUILD_VARIABLE}=1
+    for library in {1..42}
+    do
+        library_name=$(get_library_name $((library - 1)))
+
+        if [[ $1 != "ffmpeg" ]] && [[ ${library_name} == $1 ]]; then
+            export ${REBUILD_VARIABLE}=1
+            REBUILD_LIBRARIES+=($1)
+            library_supported=1
+        fi
+    done
+
+    if [[ ${library_supported} -eq 0 ]]; then
+        echo -e "INFO: --rebuild flag detected for library $1 is not supported.\n" 1>>${BASEDIR}/build.log 2>&1
+    fi
 }
 
 enable_library() {
@@ -477,6 +507,48 @@ print_enabled_libraries() {
     fi
 }
 
+print_reconfigure_requested_libraries() {
+    local counter=0;
+
+    for RECONF_LIBRARY in "${RECONF_LIBRARIES[@]}"
+    do
+        if [[ ${counter} -eq 0 ]]; then
+            echo -n "Reconfigure: "
+        else
+            echo -n ", "
+        fi
+
+        echo -n ${RECONF_LIBRARY}
+
+        counter=$((${counter} + 1));
+    done
+
+    if [[ ${counter} -gt 0 ]]; then
+        echo ""
+    fi
+}
+
+print_rebuild_requested_libraries() {
+    local counter=0;
+
+    for REBUILD_LIBRARY in "${REBUILD_LIBRARIES[@]}"
+    do
+        if [[ ${counter} -eq 0 ]]; then
+            echo -n "Rebuild: "
+        else
+            echo -n ", "
+        fi
+
+        echo -n ${REBUILD_LIBRARY}
+
+        counter=$((${counter} + 1));
+    done
+
+    if [[ ${counter} -gt 0 ]]; then
+        echo ""
+    fi
+}
+
 build_info_plist() {
     local FILE_PATH="$1"
     local FRAMEWORK_NAME="$2"
@@ -688,6 +760,8 @@ echo -e `date` 1>>${BASEDIR}/build.log 2>&1
 
 print_enabled_architectures
 print_enabled_libraries
+print_reconfigure_requested_libraries
+print_rebuild_requested_libraries
 
 # CHECKING GPL LIBRARIES
 for gpl_library in {18..21}
