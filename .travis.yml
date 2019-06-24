@@ -12,9 +12,45 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - $HOME/.android/build-cache
+addons:
+  apt:
+    packages:
+      - autoconf
+      - automake
+      - libtool
+      - pkg-config
+      - curl
+      - git
+      - cmake
+      - gcc
+      - gperf
+      - texinfo
+      - yasm
+      - nasm
+      - bison
+      - autogen
+      - patch
+  homebrew:
+    packages:
+      - autoconf
+      - automake
+      - libtool
+      - pkg-config
+      - curl
+      - git
+      - cmake
+      - gcc
+      - gperf
+      - texinfo
+      - yasm
+      - nasm
+      - bison
+      - autogen
+      - coreutils
+    update: true
 matrix:
   include:
-    - name: "Main Build"
+    - name: "Android Main Build"
       language: android
       android:
         components:
@@ -25,33 +61,38 @@ matrix:
           - extra-google-google_play_services
           - extra-google-m2repository
           - extra-android-m2repository
-      addons:
-        apt:
-          packages:
-            - autoconf
-            - automake
-            - libtool
-            - pkg-config
-            - curl
-            - git
-            - cmake
-            - gcc
-            - gperf
-            - texinfo
-            - yasm
-            - nasm
-            - bison
-            - autogen
-            - patch
       install:
         - echo y | sdkmanager "ndk-bundle"
         - echo y | sdkmanager "cmake;3.10.2.4988404"
         - echo y | sdkmanager "lldb;3.1"
       before_script:
         - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
+        - truncate --size 0 ./build.log
+      script:
+        - bash ./android.sh
+        - grep -e INFO ./build.log | grep build
+    - name: "Android Main Debug Build"
+      language: android
+      android:
+        components:
+          - tools
+          - platform-tools
+          - build-tools-28.0.3
+          - android-24
+          - extra-google-google_play_services
+          - extra-google-m2repository
+          - extra-android-m2repository
+      install:
+        - echo y | sdkmanager "ndk-bundle"
+        - echo y | sdkmanager "cmake;3.10.2.4988404"
+        - echo y | sdkmanager "lldb;3.1"
+      before_script:
+        - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
+        - truncate --size 0 ./build.log
       script:
         - bash ./android.sh -d
-    - name: "LTS Build"
+        - grep -e INFO ./build.log | grep build
+    - name: "Android LTS Build"
       language: android
       android:
         components:
@@ -63,29 +104,35 @@ matrix:
           - extra-google-google_play_services
           - extra-google-m2repository
           - extra-android-m2repository
-      addons:
-        apt:
-          packages:
-            - autoconf
-            - automake
-            - libtool
-            - pkg-config
-            - curl
-            - git
-            - cmake
-            - gcc
-            - gperf
-            - texinfo
-            - yasm
-            - nasm
-            - bison
-            - autogen
-            - patch
       install:
         - echo y | sdkmanager "ndk-bundle"
         - echo y | sdkmanager "cmake;3.10.2.4988404"
         - echo y | sdkmanager "lldb;3.1"
       before_script:
         - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
+        - truncate --size 0 ./build.log
+      script:
+        - bash ./android.sh --lts
+        - grep -e INFO ./build.log | grep build
+    - name: "Android LTS Debug Build"
+      language: android
+      android:
+        components:
+          - tools
+          - platform-tools
+          - build-tools-28.0.3
+          - android-16
+          - android-21
+          - extra-google-google_play_services
+          - extra-google-m2repository
+          - extra-android-m2repository
+      install:
+        - echo y | sdkmanager "ndk-bundle"
+        - echo y | sdkmanager "cmake;3.10.2.4988404"
+        - echo y | sdkmanager "lldb;3.1"
+      before_script:
+        - export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk-bundle
+        - truncate --size 0 ./build.log
       script:
         - bash ./android.sh -d --lts
+        - grep -e INFO ./build.log | grep build
