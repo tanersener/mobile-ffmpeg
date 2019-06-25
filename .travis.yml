@@ -1,6 +1,7 @@
 branches:
   only:
-  - travis-test
+  - master
+  - development
 sudo: false
 git:
   quiet: true

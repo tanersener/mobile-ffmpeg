@@ -707,18 +707,18 @@ do
             display_version
             exit 0
 	    ;;
-      --skip-*)
-          SKIP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
+        --skip-*)
+            SKIP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-//g'`
 
-          skip_library ${SKIP_LIBRARY}
+            skip_library ${SKIP_LIBRARY}
 	    ;;
 	    --no-output-redirection)
-          no_output_redirection
+            no_output_redirection
 	    ;;
-      --no-workspace-cleanup-*)
-          NO_WORKSPACE_CLEANUP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-[A-Za-z]*-//g'`
+        --no-workspace-cleanup-*)
+            NO_WORKSPACE_CLEANUP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-[A-Za-z]*-//g'`
 
-          no_workspace_cleanup_library ${NO_WORKSPACE_CLEANUP_LIBRARY}
+            no_workspace_cleanup_library ${NO_WORKSPACE_CLEANUP_LIBRARY}
 	    ;;
         -d | --debug)
           enable_debug

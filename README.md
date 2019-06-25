@@ -1,4 +1,4 @@
-# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.1-blue.svg)
+# MobileFFmpeg ![GitHub release](https://img.shields.io/badge/release-v4.2.1-blue.svg) ![Bintray](https://img.shields.io/badge/bintray-v4.2.1-blue.svg) ![CocoaPods](https://img.shields.io/badge/pod-v4.2.1-blue.svg) [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg)
 
 FFmpeg for Android and iOS / tvOS
 
@@ -337,6 +337,13 @@ Unreleased binaries built from `development` branch can be found under the [deve
 Please remember that these builds are provided for testing and development purposes only since they are not % 100 tested and may include minor issues. 
 
 ### 6. Building
+
+|  | status |
+| :---: | :---: |
+|  master | [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg) |
+|  development | [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=development)](https://travis-ci.org/tanersener/mobile-ffmpeg) |
+
+
 #### 6.1 Prerequisites
 1. Use your package manager (apt, yum, dnf, brew, etc.) to install the following packages.
 

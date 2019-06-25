@@ -689,7 +689,7 @@ do
 	    --no-output-redirection)
             no_output_redirection
 	    ;;
-      --no-workspace-cleanup-*)
+        --no-workspace-cleanup-*)
             NO_WORKSPACE_CLEANUP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-[A-Za-z]*-//g'`
 
             no_workspace_cleanup_library ${NO_WORKSPACE_CLEANUP_LIBRARY}
