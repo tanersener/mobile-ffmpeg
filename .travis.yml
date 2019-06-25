@@ -24,6 +24,7 @@ addons:
       - patch
   homebrew:
     packages:
+      - yasm
       - nasm
     update: false
 matrix:
