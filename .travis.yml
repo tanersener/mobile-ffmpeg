@@ -26,7 +26,7 @@ addons:
     packages:
       - yasm
       - nasm
-    update: false
+    update: true
 matrix:
   include:
     - name: "iOS LTS Build"
@@ -37,8 +37,8 @@ matrix:
       after_success:
         - grep -e INFO ./build.log | grep build
       after_failure:
-        - tail -30f ./build.log
-        - tail -30f ./src/ffmpeg/ffbuild/config.log
+        - tail -30 ./build.log
+        - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
         - bash ./ios.sh --lts --disable-armv7 --disable-armv7s --disable-arm64 --disable-i386
     - name: "iOS LTS Debug Build"
