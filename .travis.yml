@@ -4,14 +4,6 @@ branches:
 sudo: false
 git:
   quiet: true
-before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
-cache:
-  directories:
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
-    - $HOME/.android/build-cache
 addons:
   apt:
     packages:
@@ -37,9 +29,13 @@ matrix:
       osx_image: xcode7.3
       before_script:
         - rm -f ./build.log
-      script:
-        - bash ./ios.sh --lts
+      after_success:
         - grep -e INFO ./build.log | grep build
+      after_failure:
+        - tail -30f ./build.log
+        - tail -30f ./src/ffmpeg/ffbuild/config.log
+      script:
+        - bash ./ios.sh --lts --disable-armv7 --disable-armv7s --disable-arm64 --disable-i386
     - name: "iOS LTS Debug Build"
       language: objective-c
       osx_image: xcode7.3
