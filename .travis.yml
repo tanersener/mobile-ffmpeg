@@ -23,10 +23,6 @@ addons:
       - autogen
       - patch
   homebrew:
-    packages:
-      - yasm
-      - nasm
-    update: true
 matrix:
   include:
     - name: "iOS LTS Build"
