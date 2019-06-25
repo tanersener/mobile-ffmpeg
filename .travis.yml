@@ -28,6 +28,30 @@ addons:
     update: true
 matrix:
   include:
+    - name: "iOS Main Build"
+      language: objective-c
+      osx_image: xcode10.2
+      before_script:
+        - rm -f ./build.log
+      after_success:
+        - grep -e INFO ./build.log | grep build
+      after_failure:
+        - tail -30 ./build.log
+        - tail -30 ./src/ffmpeg/ffbuild/config.log
+      script:
+        - bash ./ios.sh
+    - name: "iOS Main Debug Build"
+      language: objective-c
+      osx_image: xcode10.2
+      before_script:
+        - rm -f ./build.log
+      after_success:
+        - grep -e INFO ./build.log | grep build
+      after_failure:
+        - tail -30 ./build.log
+        - tail -30 ./src/ffmpeg/ffbuild/config.log
+      script:
+        - bash ./ios.sh -d
     - name: "iOS LTS Build"
       language: objective-c
       osx_image: xcode7.3
@@ -39,7 +63,7 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./ios.sh
+        - bash ./ios.sh --lts
     - name: "iOS LTS Debug Build"
       language: objective-c
       osx_image: xcode7.3
@@ -51,4 +75,52 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./ios.sh -d
+        - bash ./ios.sh --lts -d
+    - name: "tvOS Main Build"
+      language: objective-c
+      osx_image: xcode10.2
+      before_script:
+        - rm -f ./build.log
+      after_success:
+        - grep -e INFO ./build.log | grep build
+      after_failure:
+        - tail -30 ./build.log
+        - tail -30 ./src/ffmpeg/ffbuild/config.log
+      script:
+        - bash ./tvos.sh
+    - name: "tvOS Main Debug Build"
+      language: objective-c
+      osx_image: xcode10.2
+      before_script:
+        - rm -f ./build.log
+      after_success:
+        - grep -e INFO ./build.log | grep build
+      after_failure:
+        - tail -30 ./build.log
+        - tail -30 ./src/ffmpeg/ffbuild/config.log
+      script:
+        - bash ./tvos.sh -d
+    - name: "tvOS LTS Build"
+      language: objective-c
+      osx_image: xcode7.3
+      before_script:
+        - rm -f ./build.log
+      after_success:
+        - grep -e INFO ./build.log | grep build
+      after_failure:
+        - tail -30 ./build.log
+        - tail -30 ./src/ffmpeg/ffbuild/config.log
+      script:
+        - bash ./tvos.sh --lts
+    - name: "tvOS LTS Debug Build"
+      language: objective-c
+      osx_image: xcode7.3
+      before_script:
+        - rm -f ./build.log
+      after_success:
+        - grep -e INFO ./build.log | grep build
+      after_failure:
+        - tail -30 ./build.log
+        - tail -30 ./src/ffmpeg/ffbuild/config.log
+      script:
+        - bash ./tvos.sh --lts -d
