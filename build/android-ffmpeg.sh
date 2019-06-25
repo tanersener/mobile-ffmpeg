@@ -397,11 +397,18 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
+if [[ -z ${NO_OUTPUT_REDIRECTION} ]]; then
+    make -j$(get_cpu_count) 1>>${BASEDIR}/build.log 2>&1
+else
+    echo -e "started\n"
+    make -j$(get_cpu_count)
+fi
 
 if [ $? -ne 0 ]; then
-    echo "failed"
+    echo -n -e "\n${LIB_NAME}: failed\n"
     exit 1
+else
+    echo -n -e "\n${LIB_NAME}: "
 fi
 
 make install 1>>${BASEDIR}/build.log 2>&1

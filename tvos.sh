@@ -184,6 +184,10 @@ skip_library() {
     export ${SKIP_VARIABLE}=1
 }
 
+no_output_redirection() {
+    export NO_OUTPUT_REDIRECTION=1
+}
+
 no_workspace_cleanup_library() {
     NO_WORKSPACE_CLEANUP_VARIABLE=$(echo "NO_WORKSPACE_CLEANUP_$1" | sed "s/\-/\_/g")
 
@@ -682,7 +686,10 @@ do
 
             skip_library ${SKIP_LIBRARY}
 	    ;;
-        --no-workspace-cleanup-*)
+	    --no-output-redirection)
+            no_output_redirection
+	    ;;
+      --no-workspace-cleanup-*)
             NO_WORKSPACE_CLEANUP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-[A-Za-z]*-//g'`
 
             no_workspace_cleanup_library ${NO_WORKSPACE_CLEANUP_LIBRARY}
