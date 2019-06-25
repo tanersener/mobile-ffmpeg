@@ -38,7 +38,7 @@ matrix:
       before_script:
         - rm -f ./build.log
       script:
-        - bash ./ios.sh -lts
+        - bash ./ios.sh --lts
         - grep -e INFO ./build.log | grep build
     - name: "iOS LTS Debug Build"
       language: objective-c
@@ -46,5 +46,5 @@ matrix:
       before_script:
         - rm -f ./build.log
       script:
-        - bash ./ios.sh -lts -d
+        - bash ./ios.sh --lts -d
         - grep -e INFO ./build.log | grep build
