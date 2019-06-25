@@ -22,6 +22,10 @@ addons:
       - bison
       - autogen
       - patch
+  homebrew:
+    packages:
+      - nasm
+    update: false
 matrix:
   include:
     - name: "iOS LTS Build"
