@@ -338,7 +338,7 @@ Please remember that these builds are provided for testing and development purpo
 
 ### 6. Building
 
-|  | status |
+| branch | status |
 | :---: | :---: |
 |  master | [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=master)](https://travis-ci.org/tanersener/mobile-ffmpeg) |
 |  development | [![Build Status](https://travis-ci.org/tanersener/mobile-ffmpeg.svg?branch=development)](https://travis-ci.org/tanersener/mobile-ffmpeg) |
