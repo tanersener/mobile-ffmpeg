@@ -30,31 +30,13 @@ addons:
       - bison
       - autogen
       - patch
-  homebrew:
-    packages:
-      - autoconf
-      - automake
-      - libtool
-      - pkg-config
-      - curl
-      - git
-      - cmake
-      - gcc
-      - gperf
-      - texinfo
-      - yasm
-      - nasm
-      - bison
-      - autogen
-      - coreutils
-    update: false
 matrix:
   include:
     - name: "iOS LTS Build"
       language: objective-c
       osx_image: xcode7.3
       before_script:
-        - truncate --size 0 ./build.log
+        - rm -f ./build.log
       script:
         - bash ./ios.sh
         - grep -e INFO ./build.log | grep build
