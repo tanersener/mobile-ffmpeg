@@ -23,6 +23,9 @@ addons:
       - autogen
       - patch
   homebrew:
+    packages:
+      - nasm
+    update: true
 matrix:
   include:
     - name: "iOS LTS Build"
@@ -36,12 +39,16 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./ios.sh --lts --disable-armv7 --disable-armv7s --disable-arm64 --disable-i386
+        - bash ./ios.sh
     - name: "iOS LTS Debug Build"
       language: objective-c
       osx_image: xcode7.3
       before_script:
         - rm -f ./build.log
-      script:
-        - bash ./ios.sh --lts -d
+      after_success:
         - grep -e INFO ./build.log | grep build
+      after_failure:
+        - tail -30 ./build.log
+        - tail -30 ./src/ffmpeg/ffbuild/config.log
+      script:
+        - bash ./ios.sh -d
