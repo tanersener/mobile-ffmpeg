@@ -39,7 +39,7 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./ios.sh
+        - bash ./ios.sh --no-output-redirection
     - name: "iOS Main Debug Build"
       language: objective-c
       osx_image: xcode10.2
@@ -51,7 +51,7 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./ios.sh -d
+        - bash ./ios.sh -d --no-output-redirection
     - name: "iOS LTS Build"
       language: objective-c
       osx_image: xcode7.3
@@ -63,7 +63,7 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./ios.sh --lts
+        - bash ./ios.sh --lts --no-output-redirection
     - name: "iOS LTS Debug Build"
       language: objective-c
       osx_image: xcode7.3
@@ -75,7 +75,7 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./ios.sh --lts -d
+        - bash ./ios.sh --lts -d --no-output-redirection
     - name: "tvOS Main Build"
       language: objective-c
       osx_image: xcode10.2
@@ -87,7 +87,7 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./tvos.sh
+        - bash ./tvos.sh --no-output-redirection
     - name: "tvOS Main Debug Build"
       language: objective-c
       osx_image: xcode10.2
@@ -99,7 +99,7 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./tvos.sh -d
+        - bash ./tvos.sh -d --no-output-redirection
     - name: "tvOS LTS Build"
       language: objective-c
       osx_image: xcode7.3
@@ -111,7 +111,7 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./tvos.sh --lts
+        - bash ./tvos.sh --lts --no-output-redirection
     - name: "tvOS LTS Debug Build"
       language: objective-c
       osx_image: xcode7.3
@@ -123,4 +123,4 @@ matrix:
         - tail -30 ./build.log
         - tail -30 ./src/ffmpeg/ffbuild/config.log
       script:
-        - bash ./tvos.sh --lts -d
+        - bash ./tvos.sh --lts -d --no-output-redirection
