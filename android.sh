@@ -177,6 +177,16 @@ no_output_redirection() {
     export NO_OUTPUT_REDIRECTION=1
 }
 
+no_workspace_cleanup_library() {
+    NO_WORKSPACE_CLEANUP_VARIABLE=$(echo "NO_WORKSPACE_CLEANUP_$1" | sed "s/\-/\_/g")
+
+    export ${NO_WORKSPACE_CLEANUP_VARIABLE}=1
+}
+
+no_link_time_optimization() {
+    export NO_LINK_TIME_OPTIMIZATION=1
+}
+
 enable_debug() {
     export MOBILE_FFMPEG_DEBUG="-g"
 
@@ -605,6 +615,14 @@ do
 	    ;;
 	    --no-output-redirection)
             no_output_redirection
+	    ;;
+	    --no-workspace-cleanup-*)
+            NO_WORKSPACE_CLEANUP_LIBRARY=`echo $1 | sed -e 's/^--[A-Za-z]*-[A-Za-z]*-[A-Za-z]*-//g'`
+
+            no_workspace_cleanup_library ${NO_WORKSPACE_CLEANUP_LIBRARY}
+	    ;;
+	    --no-link-time-optimization)
+            no_link_time_optimization
 	    ;;
         -d | --debug)
             enable_debug

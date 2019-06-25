@@ -309,7 +309,13 @@ fi
 
 # SET DEBUG OPTIONS
 if [[ -z ${MOBILE_FFMPEG_DEBUG} ]]; then
-    DEBUG_OPTIONS="--disable-debug --enable-lto";
+
+    # SET LTO FLAGS
+    if [[ -z ${NO_LINK_TIME_OPTIMIZATION} ]]; then
+        DEBUG_OPTIONS="--disable-debug --enable-lto";
+    else
+        DEBUG_OPTIONS="--disable-debug --disable-lto";
+    fi
 else
     DEBUG_OPTIONS="--enable-debug";
 fi
@@ -318,7 +324,10 @@ cd ${BASEDIR}/src/${LIB_NAME} || exit 1
 
 echo -n -e "\n${LIB_NAME}: "
 
-make distclean 2>/dev/null 1>/dev/null
+if [[ -z ${NO_WORKSPACE_CLEANUP_ffmpeg} ]]; then
+    echo -e "INFO: Cleaning workspace for ${LIB_NAME}" 1>>${BASEDIR}/build.log 2>&1
+    make distclean 2>/dev/null 1>/dev/null
+fi
 
 export CFLAGS="${HIGH_PRIORITY_INCLUDES} ${CFLAGS}"
 export CXXFLAGS="${CXXFLAGS}"
