@@ -628,6 +628,28 @@ build_info_plist() {
 EOF
 }
 
+build_modulemap() {
+    local FILE_PATH="$1"
+
+    cat > ${FILE_PATH} <<EOF
+framework module mobileffmpeg {
+
+  header "ArchDetect.h"
+  header "LogDelegate.h"
+  header "MediaInformation.h"
+  header "MediaInformationParser.h"
+  header "MobileFFmpeg.h"
+  header "MobileFFmpegConfig.h"
+  header "Statistics.h"
+  header "StatisticsDelegate.h"
+  header "StreamInformation.h"
+  header "mobileffmpeg_exception.h"
+
+  export *
+}
+EOF
+}
+
 create_static_fat_library() {
     local FAT_LIBRARY_PATH=${BASEDIR}/prebuilt/ios-universal/$2-universal
 
@@ -1387,6 +1409,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     mkdir -p ${MOBILE_FFMPEG_UNIVERSAL}/lib 1>>${BASEDIR}/build.log 2>&1
     rm -rf ${MOBILE_FFMPEG_FRAMEWORK_PATH} 1>>${BASEDIR}/build.log 2>&1
     mkdir -p ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
+    mkdir -p ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Modules 1>>${BASEDIR}/build.log 2>&1
 
     LIPO_COMMAND="${LIPO} -create"
     for TARGET_ARCH in "${TARGET_ARCH_LIST[@]}"
@@ -1416,6 +1439,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     fi
 
     build_info_plist "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
+    build_modulemap "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Modules/module.modulemap"
 
     echo -e "Created mobile-ffmpeg.framework successfully.\n" 1>>${BASEDIR}/build.log 2>&1
 

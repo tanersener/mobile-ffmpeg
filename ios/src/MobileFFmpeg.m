@@ -17,6 +17,7 @@
  * along with MobileFFmpeg.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "libavutil/ffversion.h"
 #include "fftools_ffmpeg.h"
 
 #include "MobileFFmpeg.h"
