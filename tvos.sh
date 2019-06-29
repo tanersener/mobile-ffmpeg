@@ -793,7 +793,7 @@ if [[ ! -z ${MOBILE_FFMPEG_LTS_BUILD} ]] && [[ "${DETECTED_TVOS_SDK_VERSION}" !=
     fi
 fi
 
-echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}static library for tvOS\n"
+echo -e "\nBuilding mobile-ffmpeg ${BUILD_TYPE_ID}static library for tvOS\n"
 
 echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}for tvOS: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1

@@ -835,7 +835,7 @@ if [[ ${DETECTED_IOS_SDK_VERSION} == 11* ]] || [[ ${DETECTED_IOS_SDK_VERSION} ==
     fi
 fi
 
-echo -e "Building mobile-ffmpeg ${BUILD_TYPE_ID}static library for iOS\n"
+echo -e "\nBuilding mobile-ffmpeg ${BUILD_TYPE_ID}static library for iOS\n"
 
 echo -e -n "INFO: Building mobile-ffmpeg ${BUILD_VERSION} ${BUILD_TYPE_ID}for iOS: " 1>>${BASEDIR}/build.log 2>&1
 echo -e `date` 1>>${BASEDIR}/build.log 2>&1
