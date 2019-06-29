@@ -83,6 +83,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+rm -rf ${BASEDIR}/prebuilt/$(get_target_build_directory)/${LIB_NAME} 1>>${BASEDIR}/build.log 2>&1
 make -j$(get_cpu_count) install 1>>${BASEDIR}/build.log 2>&1
 
 if [ $? -eq 0 ]; then

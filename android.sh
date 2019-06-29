@@ -89,7 +89,7 @@ When compilation ends an Android Archive (AAR) file is created with enabled plat
     echo -e "Options:"
 
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
-    echo -e "  -V, --version\t\t\tdisplay version information and exit"
+    echo -e "  -v, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
     echo -e "  -s, --speed\t\t\toptimize for speed instead of size"
     echo -e "  -l, --lts\t\t\tbuild lts packages to support API 21+ devices"
@@ -604,7 +604,7 @@ do
 	    -h | --help)
             DISPLAY_HELP="1"
 	    ;;
-	    -V | --version)
+	    -v | --version)
             display_version
             exit 0
 	    ;;

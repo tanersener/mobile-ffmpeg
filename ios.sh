@@ -105,7 +105,7 @@ display_help() {
     echo -e "Options:"
 
     echo -e "  -h, --help\t\t\tdisplay this help and exit"
-    echo -e "  -V, --version\t\t\tdisplay version information and exit"
+    echo -e "  -v, --version\t\t\tdisplay version information and exit"
     echo -e "  -d, --debug\t\t\tbuild with debug information"
     echo -e "  -s, --speed\t\t\toptimize for speed instead of size"
     echo -e "  -l, --lts\t\t\tbuild lts packages to support sdk 9.3+ devices, does not include arm64e architecture"
@@ -725,7 +725,7 @@ do
 	    -h | --help)
             DISPLAY_HELP="1"
 	    ;;
-	    -V | --version)
+	    -v | --version)
             display_version
             exit 0
 	    ;;
@@ -905,7 +905,7 @@ BUILD_LIBRARY_EXTENSION="a";
 
 if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
 
-    echo -e -n "\n\nCreating frameworks under prebuilt: "
+    echo -e -n "\n\nCreating frameworks and universal libraries under prebuilt: "
 
     # BUILDING UNIVERSAL LIBRARIES
     rm -rf ${BASEDIR}/prebuilt/ios-universal 1>>${BASEDIR}/build.log 2>&1
@@ -928,7 +928,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
                 exit 1
             fi
 
-            echo -e "Creating fat library for ${library_name}\n" 1>>${BASEDIR}/build.log 2>&1
+            echo -e "Creating universal library for ${library_name}\n" 1>>${BASEDIR}/build.log 2>&1
 
             if [[ ${LIBRARY_LIBICONV} == $library ]]; then
 
@@ -1378,7 +1378,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         cp -r ${FFMPEG_UNIVERSAL}/include/${FFMPEG_LIB}/* ${FFMPEG_LIB_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
         cp ${FFMPEG_UNIVERSAL}/lib/${FFMPEG_LIB}.${BUILD_LIBRARY_EXTENSION} ${FFMPEG_LIB_FRAMEWORK_PATH}/${FFMPEG_LIB} 1>>${BASEDIR}/build.log 2>&1
 
-        # COPYING THE LICENSE
+        # COPY THE LICENSES
         if  [ ${GPL_ENABLED} == "yes" ]; then
 
             # GPLv3.0
@@ -1394,7 +1394,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
         echo -e "Created ${FFMPEG_LIB} framework successfully.\n" 1>>${BASEDIR}/build.log 2>&1
     done
 
-    # COPYING THE LICENSE
+    # COPY THE LICENSES
     if  [ ${GPL_ENABLED} == "yes" ]; then
         cp ${BASEDIR}/LICENSE.GPLv3 ${FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
     else
@@ -1429,7 +1429,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     cp -r ${MOBILE_FFMPEG_UNIVERSAL}/include/* ${MOBILE_FFMPEG_FRAMEWORK_PATH}/Headers 1>>${BASEDIR}/build.log 2>&1
     cp ${MOBILE_FFMPEG_UNIVERSAL}/lib/libmobileffmpeg.${BUILD_LIBRARY_EXTENSION} ${MOBILE_FFMPEG_FRAMEWORK_PATH}/mobileffmpeg 1>>${BASEDIR}/build.log 2>&1
 
-    # COPYING THE LICENSE
+    # COPY THE LICENSES
     if  [ ${GPL_ENABLED} == "yes" ]; then
         cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_UNIVERSAL}/LICENSE 1>>${BASEDIR}/build.log 2>&1
         cp ${BASEDIR}/LICENSE.GPLv3 ${MOBILE_FFMPEG_FRAMEWORK_PATH}/LICENSE 1>>${BASEDIR}/build.log 2>&1
@@ -1441,7 +1441,7 @@ if [[ ! -z ${TARGET_ARCH_LIST} ]]; then
     build_info_plist "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Info.plist" "mobileffmpeg" "com.arthenica.mobileffmpeg.MobileFFmpeg" "${MOBILE_FFMPEG_VERSION}" "${MOBILE_FFMPEG_VERSION}"
     build_modulemap "${MOBILE_FFMPEG_FRAMEWORK_PATH}/Modules/module.modulemap"
 
-    echo -e "Created mobile-ffmpeg.framework successfully.\n" 1>>${BASEDIR}/build.log 2>&1
+    echo -e "Created mobile-ffmpeg.framework and universal library successfully.\n" 1>>${BASEDIR}/build.log 2>&1
 
     echo -e "ok\n"
 fi
