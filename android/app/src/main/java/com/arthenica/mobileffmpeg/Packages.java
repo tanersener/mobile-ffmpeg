@@ -52,6 +52,7 @@ class Packages {
         supportedExternalLibraries.add("libwebp");
         supportedExternalLibraries.add("libxml2");
         supportedExternalLibraries.add("opencore-amr");
+        supportedExternalLibraries.add("openh264");
         supportedExternalLibraries.add("opus");
         supportedExternalLibraries.add("sdl2");
         supportedExternalLibraries.add("shine");

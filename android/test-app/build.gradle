@@ -14,8 +14,8 @@ android {
         applicationId "com.arthenica.mobileffmpeg.test"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 240421
-        versionName "4.2.1"
+        versionCode 240422
+        versionName "4.2.2"
     }
     buildTypes {
         debug {
@@ -52,7 +52,7 @@ android.applicationVariants.all { variant ->
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    // implementation 'com.arthenica:mobile-ffmpeg-full:4.2.1'
+    // implementation 'com.arthenica:mobile-ffmpeg-full-gpl:4.2.2.LTS'
     implementation project(':app')
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:support-v4:28.0.0'

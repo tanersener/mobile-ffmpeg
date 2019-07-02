@@ -727,7 +727,7 @@ Description: a fast compressor/decompressor
 Version: ${SNAPPY_VERSION}
 
 Requires:
-Libs: -L\${libdir} -lz
+Libs: -L\${libdir} -lz -lc++
 Cflags: -I\${includedir}
 EOF
 }

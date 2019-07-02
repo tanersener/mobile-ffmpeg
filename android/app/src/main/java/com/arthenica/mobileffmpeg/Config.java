@@ -93,7 +93,7 @@ public class Config {
         /* LOAD NOT-LOADED LIBRARIES ON API < 21 */
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             final List<String> externalLibrariesEnabled = getExternalLibraries();
-            if (externalLibrariesEnabled.contains("tesseract") || externalLibrariesEnabled.contains("x265")) {
+            if (externalLibrariesEnabled.contains("tesseract") || externalLibrariesEnabled.contains("x265") || externalLibrariesEnabled.contains("snappy") || externalLibrariesEnabled.contains("openh264")) {
                 // libc++_shared.so included only when tesseract or x265 is enabled
                 System.loadLibrary("c++_shared");
             }
@@ -551,25 +551,7 @@ public class Config {
         final List<String> detectedCameraIdList = new ArrayList<>();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            try {
-                final CameraManager manager = (CameraManager) context.getSystemService(CAMERA_SERVICE);
-                if (manager != null) {
-                    final String[] cameraIdList = manager.getCameraIdList();
-
-                    for (String cameraId : cameraIdList) {
-                        final CameraCharacteristics chars = manager.getCameraCharacteristics(cameraId);
-                        final Integer cameraSupport = chars.get(CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL);
-
-                        if (cameraSupport != null && cameraSupport == CameraMetadata.INFO_SUPPORTED_HARDWARE_LEVEL_LEGACY) {
-                            Log.d(TAG, "Detected camera with id " + cameraId + " has LEGACY hardware level which is not supported by Android Camera2 NDK API.");
-                        } else if (cameraSupport != null) {
-                            detectedCameraIdList.add(cameraId);
-                        }
-                    }
-                }
-            } catch (final CameraAccessException e) {
-                Log.w(TAG, "Detecting camera ids failed.", e);
-            }
+            detectedCameraIdList.addAll(CameraSupport.extractSupportedCameraIds(context));
         }
 
         return detectedCameraIdList;
