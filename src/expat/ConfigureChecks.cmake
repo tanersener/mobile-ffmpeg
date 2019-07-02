@@ -18,8 +18,6 @@ check_include_file("sys/types.h" HAVE_SYS_TYPES_H)
 check_include_file("unistd.h" HAVE_UNISTD_H)
 
 check_symbol_exists("getpagesize" "unistd.h" HAVE_GETPAGESIZE)
-check_symbol_exists("bcopy" "strings.h" HAVE_BCOPY)
-check_symbol_exists("memmove" "string.h" HAVE_MEMMOVE)
 check_symbol_exists("mmap" "sys/mman.h" HAVE_MMAP)
 check_symbol_exists("getrandom" "sys/random.h" HAVE_GETRANDOM)
 
@@ -68,3 +66,4 @@ configure_file(expat_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/expat_config.h"
 add_definitions(-DHAVE_EXPAT_CONFIG_H)
 
 check_c_compiler_flag("-fno-strict-aliasing" FLAG_NO_STRICT_ALIASING)
+check_c_compiler_flag("-fvisibility=hidden" FLAG_VISIBILITY)

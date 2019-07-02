@@ -6,7 +6,7 @@ project(expat)
 cmake_minimum_required(VERSION 2.8.10)
 set(PACKAGE_BUGREPORT "expat-bugs@libexpat.org")
 set(PACKAGE_NAME "expat")
-set(PACKAGE_VERSION "2.2.6")
+set(PACKAGE_VERSION "2.2.7")
 set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 set(PACKAGE_TARNAME "${PACKAGE_NAME}")
 
@@ -101,6 +101,10 @@ set(EXTRA_COMPILE_FLAGS)
 if(FLAG_NO_STRICT_ALIASING)
     set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -fno-strict-aliasing")
 endif()
+if(FLAG_VISIBILITY)
+  add_definitions(-DXML_ENABLE_VISIBILITY=1)
+  set(EXTRA_COMPILE_FLAGS "${EXTRA_COMPILE_FLAGS} -fvisibility=hidden")
+endif(FLAG_VISIBILITY)
 if (WARNINGS_AS_ERRORS)
     if(MSVC)
         add_definitions(/WX)
@@ -165,7 +169,7 @@ if(USE_libbsd)
 endif()
 
 set(LIBCURRENT 7)   # sync
-set(LIBREVISION 8)  # with
+set(LIBREVISION 9)  # with
 set(LIBAGE 6)       # configure.ac!
 math(EXPR LIBCURRENT_MINUS_AGE "${LIBCURRENT} - ${LIBAGE}")
 
@@ -187,8 +191,8 @@ expat_install(TARGETS expat RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 
 set(prefix ${CMAKE_INSTALL_PREFIX})
 set(exec_prefix "\${prefix}")
-set(libdir "\${exec_prefix}/lib")
-set(includedir "\${prefix}/include")
+set(libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
+set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
 configure_file(expat.pc.in ${CMAKE_CURRENT_BINARY_DIR}/expat.pc @ONLY)
 
 expat_install(FILES lib/expat.h lib/expat_external.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
@@ -207,9 +211,10 @@ if(BUILD_tools)
     target_link_libraries(xmlwf expat)
     expat_install(TARGETS xmlwf DESTINATION ${CMAKE_INSTALL_BINDIR})
     if(BUILD_doc)
-        add_custom_command(TARGET expat PRE_BUILD COMMAND "${DOCBOOK_TO_MAN}" "${PROJECT_SOURCE_DIR}/doc/xmlwf.xml" && mv "XMLWF.1" "${PROJECT_SOURCE_DIR}/doc/xmlwf.1")
-        expat_install(FILES "${PROJECT_SOURCE_DIR}/doc/xmlwf.1" DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
-    endif()
+        file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/doc)
+        add_custom_command(TARGET expat PRE_BUILD COMMAND "${DOCBOOK_TO_MAN}" "${PROJECT_SOURCE_DIR}/doc/xmlwf.xml" && mv "XMLWF.1" "${PROJECT_BINARY_DIR}/doc/xmlwf.1")
+        expat_install(FILES "${PROJECT_BINARY_DIR}/doc/xmlwf.1" DESTINATION ${CMAKE_INSTALL_MANDIR}/man1)
+     endif()
 endif()
 
 if(BUILD_examples)

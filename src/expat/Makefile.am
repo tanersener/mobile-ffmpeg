@@ -30,14 +30,21 @@
 
 AUTOMAKE_OPTIONS = \
     dist-bzip2 \
+    dist-lzip \
+    dist-xz \
     foreign \
-    no-dist-gzip \
     subdir-objects
 
 ACLOCAL_AMFLAGS = -I m4
 LIBTOOLFLAGS = --verbose
 
-SUBDIRS = lib examples tests  # lib goes first to build first
+SUBDIRS = lib # lib goes first to build first
+if WITH_EXAMPLES
+SUBDIRS += examples
+endif
+if WITH_TESTS
+SUBDIRS += tests  
+endif
 if WITH_XMLWF
 SUBDIRS += xmlwf doc
 endif
