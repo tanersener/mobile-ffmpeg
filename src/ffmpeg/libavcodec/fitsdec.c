@@ -143,7 +143,7 @@ static int fits_read_header(AVCodecContext *avctx, const uint8_t **ptr, FITSHead
 
     size = abs(header->bitpix) >> 3;
     for (i = 0; i < header->naxis; i++) {
-        if (header->naxisn[i] > SIZE_MAX / size) {
+        if (size && header->naxisn[i] > SIZE_MAX / size) {
             av_log(avctx, AV_LOG_ERROR, "unsupported size of FITS image");
             return AVERROR_INVALIDDATA;
         }
@@ -167,6 +167,14 @@ static int fits_read_header(AVCodecContext *avctx, const uint8_t **ptr, FITSHead
          */
         header->data_min = (header->data_min - header->bzero) / header->bscale;
         header->data_max = (header->data_max - header->bzero) / header->bscale;
+    }
+    if (!header->rgb && header->data_min >= header->data_max) {
+        if (header->data_min > header->data_max) {
+            av_log(avctx, AV_LOG_ERROR, "data min/max (%g %g) is invalid\n", header->data_min, header->data_max);
+            return AVERROR_INVALIDDATA;
+        }
+        av_log(avctx, AV_LOG_WARNING, "data min/max indicates a blank image\n");
+        header->data_max ++;
     }
 
     return 0;
