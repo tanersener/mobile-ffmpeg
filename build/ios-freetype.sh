@@ -67,6 +67,6 @@ export LIBPNG_LIBS="-L${BASEDIR}/prebuilt/$(get_target_build_directory)/libpng/l
 make -j$(get_cpu_count) || exit 1
 
 # CREATE PACKAGE CONFIG MANUALLY
-create_freetype_package_config "23.0.17"
+create_freetype_package_config "23.1.17"
 
 make install || exit 1
